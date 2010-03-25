@@ -41,6 +41,8 @@ public:
          int num
 );
 
+   TaskExec( const QString & Command); ///< Render test task probe
+
    TaskExec( Msg * msg); ///< Read task from message.
    ~TaskExec();
 

@@ -118,6 +118,10 @@ bool           Environment::visor_mode = false;
 bool           Environment::god_mode = false;
 bool           Environment::valid = false;
 
+QStringList    Environment::cmdarguments;
+QStringList    Environment::cmdarguments_usagearg;
+QStringList    Environment::cmdarguments_usagehelp;
+bool           Environment::help_mode = false;
 
 bool Environment::getVars( const QString & filename)
 {
@@ -288,6 +292,9 @@ bool Environment::openXMLDomDocument( QDomDocument & doc, const QString & filena
 Environment::Environment( uint32_t flags, int argc, char** argv )
 {
    verbose = flags & Verbose;
+//
+// Init command arguments:
+   initCommandArguments( argc, argv);
 
    QDir dir;
 //
@@ -366,7 +373,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    hostname = QString::fromUtf8( getenv("AF_HOSTNAME"));
 
    load();
-   valid = init( flags & SolveServerAddress, argc, argv);
+   valid = init( flags & SolveServerAddress);
 
    PRINT("Render host name = '%s'\n", hostname.toUtf8().data());
 }
@@ -376,6 +383,7 @@ Environment::~Environment()
    if( address != NULL) delete address;
    if( qafserveraddress != NULL) delete qafserveraddress;
    if( passwd != NULL) delete passwd;
+   printUsage();
 }
 
 void Environment::load()
@@ -419,53 +427,51 @@ bool Environment::setClientPort( uint16_t port)
 
 bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
 
-bool Environment::init( bool solveServerAddress, int argc, char** argv)
+bool Environment::init( bool solveServerAddress)
 {
 //
 //############ Afansy server QHostAddress:
    if( solveServerAddress)
    {
+      static QString serveraddrnum_arg("-srvaddrnum");
+      addUsage( QString("%1 [number]").arg(serveraddrnum_arg), "use specified server address number");
       QHostInfo qhostinfo = QHostInfo::fromName( servername);
       QList<QHostAddress> adresses = qhostinfo.addresses();
       // Try direct IP literals, if no addresses solved
       if( adresses.size() < 1 ) adresses << QHostAddress ( servername );
-      static QString serveraddrnum_arg("srvaddrnum");
       if( adresses.size() > 1 )
       {
          printf( "Solved several server addresses:\n");
          for( int i = 0; i < adresses.size(); i++) printf( "%s\n", adresses[i].toString().toUtf8().data());
       }
       if( qafserveraddress != NULL ) delete qafserveraddress;
-      // Use the first IP address, if no args provided
+      // Use the first IP address, if no address number not provided
       int serveraddrnum = -1;
 
-      for( int i = 0; i < argc; i++)
+      QString serveraddrnum_str;
+      if( getArgument( serveraddrnum_arg, serveraddrnum_str))
       {
-         if( serveraddrnum_arg == argv[i])
+         if( false == serveraddrnum_str.isEmpty())
          {
-            i++;
-            if( i < argc)
+            bool ok;
+            int number = serveraddrnum_str.toInt( &ok);
+            if( ok )
             {
-               bool ok;
-               int number = QString( argv[i]).toUInt( &ok);
-               if( ok )
+               if( number >= adresses.size())
                {
-                  if( number >= adresses.size())
-                  {
-                     AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
-                     number = adresses.size() - 1;
-                  }
-                  serveraddrnum = number;
+                  AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
+                  number = adresses.size() - 1;
                }
-               else
-               {
-                  AFERRAR("Invaid server address number: '%s'\n", argv[i]);
-               }
+               serveraddrnum = number;
             }
             else
             {
-               AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.toUtf8().data());
+               AFERRAR("Invaid server address number: '%s'\n", serveraddrnum_str.toUtf8().data());
             }
+         }
+         else
+         {
+            AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.toUtf8().data());
          }
       }
 
@@ -501,4 +507,69 @@ bool Environment::init( bool solveServerAddress, int argc, char** argv)
    passwd = new Passwd( pswd_visor, pswd_god);
 
    return true;
+}
+
+void Environment::initCommandArguments( int argc, char** argv)
+{
+   if(( argc == 0 ) || ( argv == NULL )) return;
+
+   for( int i = 0; i < argc; i++)
+   {
+      cmdarguments << argv[i];
+
+      if( help_mode ) continue;
+
+      if(( cmdarguments.last() == "-"     ) ||
+         ( cmdarguments.last() == "--"    ) ||
+         ( cmdarguments.last() == "-?"    ) ||
+         ( cmdarguments.last() == "?"     ) ||
+         ( cmdarguments.last() == "/?"    ) ||
+         ( cmdarguments.last() == "h"     ) ||
+         ( cmdarguments.last() == "-h"    ) ||
+         ( cmdarguments.last() == "--h"   ) ||
+         ( cmdarguments.last() == "help"  ) ||
+         ( cmdarguments.last() == "-help" ) ||
+         ( cmdarguments.last() == "--help")
+         )
+      {
+         help_mode = true;
+         addUsage("-h --help", "display this help");
+      }
+   }
+}
+
+bool Environment::hasArgument( const QString & argument)
+{
+   for( int i = 0; i < cmdarguments.size(); i++)
+      if( cmdarguments[i] == argument )
+         return true;
+   return false;
+}
+
+bool Environment::getArgument( const QString & argument, QString & value)
+{
+   for( int i = 0; i < cmdarguments.size(); i++)
+   {
+      if( cmdarguments[i] == argument )
+      {
+         // check for next argument:
+         if( ++i < cmdarguments.size()) value = cmdarguments[i];
+         return true;
+      }
+   }
+   return false;
+}
+
+void Environment::printUsage()
+{
+   if( false == help_mode ) return;
+   if( cmdarguments_usagearg.size() < 1 ) return;
+   printf("USAGE: %s [arguments]\n", cmdarguments.first().toUtf8().data());
+   for( int i = 0; i < cmdarguments_usagearg.size(); i++)
+   {
+      printf("   %s:\n      %s.\n",
+             cmdarguments_usagearg[i].toUtf8().data(),
+             cmdarguments_usagehelp[i].toUtf8().data()
+             );
+   }
 }

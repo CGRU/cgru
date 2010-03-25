@@ -26,36 +26,48 @@ Object * Object::OBJECT = NULL;
 
 bool recvMessage_handler( QTcpSocket *qsocket, af::Msg *msg) { return Object::OBJECT->requestAnswer( qsocket, msg);}
 
-Object::Object( uint32_t State, uint8_t Priority):
+Object::Object( uint32_t State, uint8_t Priority, const QString & command):
    connected( false),
+   cmdMode( false),
    render( NULL),
    timer( this),
+   qServer( NULL),
+   qthreadClientUp( NULL),
+   qthreadClientSend( NULL),
+   qthreadClientSendOutput( NULL),
    init(false ),
    exiting( false),
    exitRequest( false)
 {
-   qServer = new afqt::QServer( this);
-   qthreadClientUp = new afqt::QThreadClientUp( this, true, af::Environment::getRenderUpdateSec(), af::Environment::getRenderConnectRetries());
-   qthreadClientSend = new afqt::QThreadClientSend( this, af::Environment::getRenderConnectRetries());
-   qthreadClientSendOutput = new afqt::QThreadClientSend( this, af::Environment::getRenderConnectRetries());
+   pCLIENT = NULL;
+   pRENDER = NULL;
 
-   if( qServer->isInitialized() == false )
+   if( command.isEmpty())
    {
-      AFERROR("ChatDialog::ChatDialog: Server initialization failed.\n");
-      return;
+      qServer = new afqt::QServer( this);
+      qthreadClientUp = new afqt::QThreadClientUp( this, true, af::Environment::getRenderUpdateSec(), af::Environment::getRenderConnectRetries());
+      qthreadClientSend = new afqt::QThreadClientSend( this, af::Environment::getRenderConnectRetries());
+      qthreadClientSendOutput = new afqt::QThreadClientSend( this, af::Environment::getRenderConnectRetries());
+      if( qServer->isInitialized() == false )
+      {
+         AFERROR("ChatDialog::ChatDialog: Server initialization failed.\n");
+         return;
+      }
+      qServer->set_recvMessage_handler( recvMessage_handler);
+      qthreadClientUp->set_update_handler( update_handler_ptr);
+      //
+      // connect network objects
+      connect( qServer,           SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));
+      connect( qthreadClientSend, SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));
+      connect( qthreadClientUp,   SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));
+      connect( qthreadClientUp,         SIGNAL( connectionLost( af::Address*)), this, SLOT( connectionLost( af::Address*)));
+      connect( qthreadClientSendOutput, SIGNAL( connectionLost( af::Address*)), this, SLOT( connectionLostOutput( af::Address*)));
    }
-   qServer->set_recvMessage_handler( recvMessage_handler);
-   qthreadClientUp->set_update_handler( update_handler_ptr);
-
-//
-// connect network objects
-
-   connect( qServer,           SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));
-   connect( qthreadClientSend, SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));
-   connect( qthreadClientUp,   SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));
-
-   connect( qthreadClientUp,         SIGNAL( connectionLost( af::Address*)), this, SLOT( connectionLost( af::Address*)));
-   connect( qthreadClientSendOutput, SIGNAL( connectionLost( af::Address*)), this, SLOT( connectionLostOutput( af::Address*)));
+   else
+   {
+      cmdMode = true;
+      tasks.append( new TaskProcess( this, new af::TaskExec( command), 0));
+   }
 
    connect( &timer, SIGNAL( timeout()), this, SLOT( refresh()));
    timer.start( 1000);
@@ -75,8 +87,11 @@ Object::~Object()
 {
    if( false == exiting )
    {
-      qthreadClientUp->stop();
-      if( connected ) qthreadClientSend->send( new afqt::QMsg( af::Msg::TRenderDeregister, render->getId()));
+      if( false == cmdMode )
+      {
+         qthreadClientUp->stop();
+         qthreadClientSend->send( new afqt::QMsg( af::Msg::TRenderDeregister, render->getId()));
+      }
    }
    for( int t = 0; t < tasks.size(); t++) delete tasks[t];
    if( render  != NULL  ) delete render;
@@ -85,6 +100,7 @@ AFINFO("Object:~Object()\n");
 
 void Object::connectionLost( af::Address * address)
 {
+   if( cmdMode ) return;
    if( connected == false ) return;
    connected = false;
    render->setId( 0);
@@ -101,6 +117,7 @@ void Object::connectionLost( af::Address * address)
 
 void Object::connectionLostOutput( af::Address * address)
 {
+   if( cmdMode ) return;
    if( address == NULL)
    {
       AFERROR("Object::connectionLostOutput: Address == NULL.\n");
@@ -242,6 +259,7 @@ void Object::runTask( af::Msg *msg)
 
 void Object::setUpMsg( int type)
 {
+   if( cmdMode ) return;
    afqt::QMsg * msg = new afqt::QMsg( type, render, true);
    qthreadClientUp->setUpMsg( msg);
 }
@@ -268,6 +286,7 @@ bool Object::requestAnswer( QTcpSocket *qsocket, af::Msg *msg)
 
 void Object::refresh()
 {
+//printf("Object::refresh(): tasks.size() == %d\n", tasks.size());
    for( int t = 0; t < tasks.size(); t++)
    {
       tasks[t]->refresh();
@@ -280,11 +299,14 @@ void Object::refresh()
 
    if( exitRequest && ( exiting == false ))
    {
-      printf("Object::refresh(): Exit requested. Finishing tasks.\n");
+      printf("Object::refresh(): Exit requested. Finishing %d task(s).\n", tasks.size());
       for( int t = 0; t < tasks.size(); t++) tasks[t]->stop( true /* No update needed*/);
       exiting = true;
-      qthreadClientUp->stop();
-      if( connected ) qthreadClientSend->send( new afqt::QMsg( af::Msg::TRenderDeregister, render->getId()));
+      if( false == cmdMode )
+      {
+         qthreadClientUp->stop();
+         qthreadClientSend->send( new afqt::QMsg( af::Msg::TRenderDeregister, render->getId()));
+      }
    }
 
    if( exiting && ( tasks.size() == 0 ))

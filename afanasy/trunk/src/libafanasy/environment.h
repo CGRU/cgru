@@ -32,6 +32,15 @@ public:
 /// Return \c true if address environment is valid.
    static inline bool isValid() { return valid; }
 
+/// Return \c true if argument exists
+   static bool hasArgument( const QString & argument);
+/// Return \c true if argument exists and return its value if it has any:
+   static bool getArgument( const QString & argument, QString & value);
+
+   static inline bool isHelpMode() { return help_mode; }
+   static inline void addUsage( const QString & arg, const QString & help)
+      { cmdarguments_usagearg << arg; cmdarguments_usagehelp << help;}
+
    static bool reload();
    static bool load( QString & filename, uint32_t flags = 0);
 
@@ -149,10 +158,16 @@ private:
 
    static bool valid;       ///< \c true if environment is valid.
    static bool verbose;
+   static QStringList cmdarguments;
+   static QStringList cmdarguments_usagearg;
+   static QStringList cmdarguments_usagehelp;
+   static bool help_mode;
 
+   static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
+   static void printUsage(); ///< Output command usage
    static void load();
    static bool getVars(     const QString & filename);
-   static bool init( bool solveServerAddress, int argc = 0, char** argv = NULL);
+   static bool init( bool solveServerAddress);
 
    static QString afroot;         ///< Afanasy root directory.
    static QString home;           ///< User home directory.

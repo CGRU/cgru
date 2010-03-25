@@ -49,13 +49,15 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    printf("\nStarting[%d]: ", runningtasks); exec->stdOut( true);
    if( exec->hasWDir()) setWorkingDirectory( exec->getWDir());
 
-   service = new af::Service(
-         exec->getServiceType(),
-         exec->getCmd(),
-         exec->getCmdView()
+   if( false == exec->getServiceType().isEmpty())
+      service = new af::Service(
+            exec->getServiceType(),
+            exec->getCmd(),
+            exec->getCmdView()
          );
 
-   parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
+   if( false == exec->getParserType().isEmpty())
+      parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
 
    if( service)
    {
@@ -125,8 +127,13 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 
 void TaskProcess::p_readyRead()
 {
-   if( parser == NULL) return;
    QByteArray output = readAll();
+   if( parser == NULL)
+   {
+      printf("%s\n", output.data());
+      return;
+   }
+
    parser->read( output.data(), output.size());
 
    if( exec->getListenAddressesNum() == 0 ) return;
@@ -141,7 +148,7 @@ printf("Sending output to addresses:");
 #ifdef AFOUTPUT
 printf(" ");(*it)->stdOut();
 #endif
-      pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, *it));
+      if( pCLIENT) pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, *it));
    }
 #ifdef AFOUTPUT
 printf("\n");
@@ -150,6 +157,7 @@ printf("\n");
 
 void TaskProcess::sendTaskSate()
 {
+   if( pCLIENT == NULL ) return;
    if( update_status == 0 ) return;
 
    int    type = af::Msg::TTaskUpdatePercent;
@@ -192,19 +200,24 @@ void TaskProcess::sendTaskSate()
                      stdout_size,
                      stdout_data
                   );
+
    afqt::QMsg * msg = new afqt::QMsg( type, &taskup, toRecieve);
-//printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
+   //printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
    pCLIENT->send( msg);
 }
 
 void TaskProcess::stop( bool noStatusUpdate)
 {
    if( noStatusUpdate ) update_status = 0;
+
+   // Store the time when task was asked to be stopped (was asked first time)
+   if( stop_time == 0 ) stop_time = time(NULL);
+
+   // Return if task is not running
    if( pid() == 0 ) return;
+
    // Trying to terminate() first, and only if no response after some time, then perform kill()
    terminate();
-//   QTimer::singleShot( 10000, this, SLOT( killProcess()));
-   stop_time = time(NULL);
 }
 
 void TaskProcess::refresh()

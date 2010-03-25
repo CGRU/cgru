@@ -59,6 +59,27 @@ AFINFA("TaskExec::TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().
    listen_addresses = new AddressesList();
 }
 
+TaskExec::TaskExec( const QString & Command):
+   cmd( Command),
+   capacity( 0),
+   capcoeff( 0),
+   filesize_min( 0),
+   filesize_max( 0),
+
+   jobid(    0),
+   blocknum( 0),
+   tasknum(  0),
+   number(   0),
+
+   frame_start(   1),
+   frame_finish(  1),
+   frames_num(    1),
+
+   time_start( time(NULL)),
+   onClient( true)
+{
+}
+
 TaskExec::~TaskExec()
 {
 AFINFA("TaskExec:: ~ TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().data(), name.toUtf8().data());
@@ -134,7 +155,7 @@ void TaskExec::stdOut( bool full) const
 
    if(full)
    {
-      printf("   Working directory = \"%s\".\n", wdir.toUtf8().data());
+      if( false == wdir.isEmpty()) printf("   Working directory = \"%s\".\n", wdir.toUtf8().data());
       if( false == env.isEmpty()) printf("   Environment = \"%s\".\n", env.toUtf8().data());
    }
 

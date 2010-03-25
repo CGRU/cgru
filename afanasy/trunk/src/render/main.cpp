@@ -62,32 +62,42 @@ int main(int argc, char *argv[])
    afqt::init( ENV.getRenderWaitForConnected(), ENV.getRenderWaitForReadyRead(), ENV.getRenderWaitForBytesWritten());
 
    uint32_t state = af::Render::SOnline;
-   if( argc > 1)
+
+   QString NIMBY = "-NIMBY";
+   QString nimby = "-nimby";
+   ENV.addUsage( NIMBY, "Set initial state to 'NIMBY'");
+   ENV.addUsage( nimby, "Set initial state to 'nimby'");
+   if( ENV.hasArgument( NIMBY))
    {
-      if( strcmp( argv[1], "nimby") == 0)
-      {
-         printf("Initial state set to \"nimby\"\n");
-         state = state | af::Render::Snimby;
-      }
-      else if( strcmp( argv[1], "NIMBY") == 0)
-      {
-         printf("Initial state set to \"NIMBY\"\n");
-         state = state | af::Render::SNIMBY;
-      }
+      printf("Initial state set to 'NIMBY'\n");
+      state = state | af::Render::SNIMBY;
    }
+   else if( ENV.hasArgument( nimby))
+   {
+      printf("Initial state set to 'nimby'\n");
+      state = state | af::Render::Snimby;
+   }
+
    uint8_t priority = ENV.getPriority();
 
-   QCoreApplication app( argc, argv);
-   Object object( state, priority);
-   RenderObject = &object;
-   QObject::connect( &object, SIGNAL( exitApplication()), &app, SLOT( quit()));
+   QString cmdArgName = "-cmd";
+   ENV.addUsage( QString("%1 [command]").arg( cmdArgName), "Run command only, do not connect to server.");
+   QString command;
+   ENV.getArgument( cmdArgName, command);
 
-   int retval = app.exec();
+   int retval = 0;
+   if( false == ENV.isHelpMode())
+   {
+      QCoreApplication app( argc, argv);
+      Object object( state, priority, command);
+      RenderObject = &object;
+      QObject::connect( &object, SIGNAL( exitApplication()), &app, SLOT( quit()));
+      retval = app.exec();
+      printf("main: QApplication::exec: returned status = %d\n", retval);
+   }
 
    af::destroy();
    Py_Finalize();
-
-   printf("main: QApplication::exec: returned status = %d\n", retval);
 
    return retval;
 }

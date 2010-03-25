@@ -18,7 +18,7 @@ class Object : public QObject
    Q_OBJECT
 
 public:
-   Object( uint32_t State, uint8_t Priority);
+   Object( uint32_t State, uint8_t Priority, const QString & command);
    ~Object();
 
    inline bool initialized() const { return init;}
@@ -45,6 +45,7 @@ private:
 
 private:
    bool connected;
+   bool cmdMode;
 
    RenderHost *render;
    QList<TaskProcess*> tasks;
