@@ -2,4 +2,4 @@ PUSHD ..\..
 call setup.cmd
 POPD
 
-start %AF_ROOT%\bin\aftalk.exe
+start %AF_ROOT%\bin\aftalk.exe %*

@@ -15,7 +15,6 @@
 
 Object * RenderObject;
 
-#ifndef WINNT
 //####################### interrupt signal handler ####################################
 #include <signal.h>
 void sig_pipe(int signum)
@@ -27,14 +26,16 @@ void sig_int(int signum)
    RenderObject->exitRender();
 }
 //#####################################################################################
-#endif
 
 int main(int argc, char *argv[])
 {
 #ifdef WINNT
    af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::Verbose, argc, argv);      // Verbose environment initialization
-   Py_Initialize();
+   Py_InitializeEx(0);
    if( af::init( af::InitServices | af::Verbose)  == false) return 1;
+   signal( SIGINT,  sig_int);
+   signal( SIGTERM, sig_int);
+   signal( SIGSEGV, sig_int);
 #else
    af::Environment ENV( af::Environment::SolveServerAddress, argc, argv );     // Silent environment initialization
    Py_InitializeEx(0);

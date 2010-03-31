@@ -76,6 +76,9 @@ TaskExec::TaskExec( const QString & Command):
    frames_num(    1),
 
    time_start( time(NULL)),
+
+   listen_addresses( NULL),
+
    onClient( true)
 {
 }
