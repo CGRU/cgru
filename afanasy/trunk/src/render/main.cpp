@@ -3,11 +3,13 @@
 #include <Python.h>
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/host.h"
 #include "../libafanasy/render.h"
 
 #include "../libafqt/name_afqt.h"
 
 #include "qobject.h"
+#include "res.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -86,8 +88,15 @@ int main(int argc, char *argv[])
    QString command;
    ENV.getArgument( cmdArgName, command);
 
+   bool checkResourcesMode = false;
+   QString checkResourcesModeCmdArg = "-res";
+   ENV.addUsage( checkResourcesModeCmdArg, "Check host resources only and quit.");
+   if( ENV.hasArgument( checkResourcesModeCmdArg)) checkResourcesMode = true;
+   
    int retval = 0;
-   if( false == ENV.isHelpMode())
+
+   if(( false == ENV.isHelpMode()) &&
+      ( false == checkResourcesMode ))
    {
       QCoreApplication app( argc, argv);
       Object object( state, priority, command);
@@ -97,6 +106,22 @@ int main(int argc, char *argv[])
       printf("main: QApplication::exec: returned status = %d\n", retval);
    }
 
+   if( checkResourcesMode )
+   {
+      af::Host host;
+      af::HostRes hostres;
+      GetResources( host, hostres, true);
+#ifdef WINNT
+      Sleep(100);
+#else
+      sleep(1);
+#endif
+      GetResources( host, hostres, false);
+      printf("\n");
+      host.stdOut( true);
+      hostres.stdOut( true);
+   }
+   
    af::destroy();
    Py_Finalize();
 

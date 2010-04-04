@@ -129,15 +129,18 @@ void Host::readwrite( Msg * msg)
 
 void Host::stdOut( bool full) const
 {
+   printf("Host: ");
    if( full)
    {
-      printf("OS=\"%s\": Capacity = %d, Max tasks = %d, Power = %d, CPU = %d MHz x %d, MEM = %d (+%d swap) Mb, HDD = %d Gb\n",
-         os.toUtf8().data(), capacity, maxtasks, power, cpu_mhz, cpu_num, mem_mb, swap_mb, hdd_gb);
+      printf("CPU = %d MHz x %d, MEM = %d (+%d swap) Mb, HDD = %d Gb\n",
+         cpu_mhz, cpu_num, mem_mb, swap_mb, hdd_gb);
+      printf("   OS=\"%s\": Capacity = %d, Max tasks = %d, Power = %d\n",
+         os.toUtf8().data(), capacity, maxtasks, power);
       for( int i = 0; i < servicesnum; i++)
       {
-         printf("\tService: \"%s\" - %d\n", servicesnames[i].toUtf8().data(), servicescounts[i]);
+         printf("   Service: \"%s\" - %d\n", servicesnames[i].toUtf8().data(), servicescounts[i]);
       }
-      if( servicesnum == 0) printf("\tNo services descripion.\n");
+      if( servicesnum == 0) printf("   No services descripion.\n");
    }
    else
    {
@@ -154,14 +157,15 @@ void Host::stdOut( bool full) const
 
 void HostRes::stdOut( bool full) const
 {
+   printf("Resources: ");
    if( full)
    {
       printf("Load average: %g %g %g\n", cpu_loadavg1/10.0, cpu_loadavg2/10.0, cpu_loadavg3/10.0);
-      printf("CPU usage: %d%% usr, %d%% nice, %d%% sys, %d%% idle, %d%% iow, %d%% irq, %d%% sirq\n",
+      printf("   CPU usage: %d%% usr, %d%% nice, %d%% sys, %d%% idle, %d%% iow, %d%% irq, %d%% sirq\n",
          cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_iowait, cpu_irq, cpu_softirq);
-      printf("Memory: Free %d Mb, Cached %d Mb, Buffers %d Mb, Swap %d Mb and HDD Free %d Gb\n",
+      printf("   Memory: Free %d Mb, Cached %d Mb, Buffers %d Mb, Swap %d Mb and HDD Free %d Gb\n",
          mem_free_mb, mem_cached_mb, mem_buffers_mb, swap_used_mb, hdd_free_gb );
-      printf("Network: Recieved %d Kb/sec, Send %d Kb/sec\n",
+      printf("   Network: Recieved %d Kb/sec, Send %d Kb/sec\n",
          net_recv_kbsec, net_send_kbsec );
    }
    else
