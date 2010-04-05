@@ -22,12 +22,12 @@ QServer::QServer( QObject *parent):
    for( int i = 0; i <= maxports; i++)
    {
       bool listening = false;
+      int port_to_listen = port;
 #ifdef MACOSX
-      listening = listen( QHostAddress::Any);
-#else
-//      listening = listen( QHostAddress::Any, port);
-      listening = listen( QHostAddress::AnyIPv6, port);
+      port_to_listen = 0; // Let system choose port automatically
 #endif
+      listening = listen( QHostAddress::AnyIPv6, port_to_listen);
+      if( false == listening ) listening = listen( QHostAddress::Any, port_to_listen);
       if( listening)
       {
          port = serverPort();
@@ -43,6 +43,9 @@ QServer::QServer( QObject *parent):
       {
          AFINFA("QServer::QServer: can't listen port %d (address may be already in use).\n", port);
       }
+#ifdef MACOSX
+      break; // Do not probe next port on MAC, system must choose port autamatically
+#endif
       port++;
    }
    if( isListening())

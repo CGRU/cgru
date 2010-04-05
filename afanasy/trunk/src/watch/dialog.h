@@ -83,10 +83,10 @@ private:
 
    InfoLine * infoline;
 
-   QHBoxLayout *hlayoutB;
-   QVBoxLayout *vlayoutB;
-   QHBoxLayout *hlayout;
-   QVBoxLayout *vlayout;
+   QHBoxLayout *hlayout_a;
+   QVBoxLayout *vlayout_a;
+   QHBoxLayout *hlayout_b;
+   QVBoxLayout *vlayout_b;
 
    QTimer repaintTimer;
 

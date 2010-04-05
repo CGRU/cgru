@@ -53,42 +53,42 @@ Dialog::Dialog():
 
    for( int b = 0; b < Watch::WLAST; b++) btnMonitor[b] = NULL;
 
-   hlayoutB = new QHBoxLayout( this);
-   vlayoutB = new QVBoxLayout();
-   hlayout = new QHBoxLayout();
-   vlayout = new QVBoxLayout();
+   hlayout_a = new QHBoxLayout( this);
+   vlayout_a = new QVBoxLayout();
+   hlayout_b = new QHBoxLayout();
+   vlayout_b = new QVBoxLayout();
 
-   hlayoutB->setMargin ( 1);
-   vlayoutB->setMargin ( 1);
-   hlayout ->setMargin ( 1);
-   vlayout ->setMargin ( 1);
-   hlayoutB->setSpacing( 1);
-   vlayoutB->setSpacing( 1);
-   hlayout ->setSpacing( 1);
-   vlayout ->setSpacing( 1);
+   hlayout_a->setMargin ( 1);
+   vlayout_a->setMargin ( 1);
+   hlayout_b->setMargin ( 1);
+   vlayout_b->setMargin ( 1);
+   hlayout_a->setSpacing( 1);
+   vlayout_a->setSpacing( 1);
+   hlayout_b->setSpacing( 1);
+   vlayout_b->setSpacing( 1);
 
    btn_outlft = new ButtonOut( ButtonOut::Left,  this);
    btn_outrht = new ButtonOut( ButtonOut::Right, this);
 
-   hlayoutB->addWidget( btn_outlft);
-   hlayoutB->addLayout( vlayoutB);
-   hlayoutB->addWidget( btn_outrht);
-   vlayoutB->addLayout( hlayout);
-   vlayoutB->addLayout( vlayout);
+   hlayout_a->addWidget( btn_outlft);
+   hlayout_a->addLayout( vlayout_a);
+   hlayout_a->addWidget( btn_outrht);
+   vlayout_a->addLayout( hlayout_b);
+   vlayout_a->addLayout( vlayout_b);
 
-   hlayoutB->setAlignment( btn_outlft, Qt::AlignVCenter);
-   hlayoutB->setAlignment( btn_outrht, Qt::AlignVCenter);
+   hlayout_a->setAlignment( btn_outlft, Qt::AlignVCenter);
+   hlayout_a->setAlignment( btn_outrht, Qt::AlignVCenter);
 
    infoline = new InfoLine( this);
    infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
-   vlayout->addWidget( infoline);
+   vlayout_b->addWidget( infoline);
 
    btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
-   hlayout->addWidget( btnMonitor[Watch::WJobs    ]);
+   hlayout_b->addWidget( btnMonitor[Watch::WJobs    ]);
    btnMonitor[Watch::WRenders] = new ButtonMonitor( Watch::WRenders, this);
-   hlayout->addWidget( btnMonitor[Watch::WRenders ]);
+   hlayout_b->addWidget( btnMonitor[Watch::WRenders ]);
    btnMonitor[Watch::WUsers]   = new ButtonMonitor( Watch::WUsers,   this);
-   hlayout->addWidget( btnMonitor[Watch::WUsers   ]);
+   hlayout_b->addWidget( btnMonitor[Watch::WUsers   ]);
 
    setFocusPolicy(Qt::StrongFocus);
 
@@ -373,7 +373,7 @@ AFINFA("Dialog::openMonitor: %s[%d]\n", Watch::WndName[type].toUtf8().data(), op
    else
    {
       listitems = newlist;
-      vlayout->insertWidget( 0, newlist);
+      vlayout_b->insertWidget( 0, newlist);
       monitorType = type;
    }
 }
@@ -388,10 +388,10 @@ void Dialog::keyPressEvent( QKeyEvent * event)
       if( af::Environment::GOD())
       {
          btnMonitor[Watch::WTalks] = new ButtonMonitor( Watch::WTalks, this, 40, 20);
-         hlayout->addWidget( btnMonitor[Watch::WTalks]);
+         hlayout_b->addWidget( btnMonitor[Watch::WTalks]);
 
          btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this, 40, 20);
-         hlayout->addWidget( btnMonitor[Watch::WMonitors]);
+         hlayout_b->addWidget( btnMonitor[Watch::WMonitors]);
 
          setBackgroundRole( QPalette::LinkVisited );
          displayWarning("GOD MODE");

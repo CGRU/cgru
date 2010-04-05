@@ -92,7 +92,7 @@ int main(int argc, char *argv[])
    Dialog dialog;
    if( !dialog.isInitialized())
    {
-      AFERROR("main: ChatDialog initialization failed.\n");
+      AFERROR("main: Dialog initialization failed.\n");
       exit(1);
    }
 
