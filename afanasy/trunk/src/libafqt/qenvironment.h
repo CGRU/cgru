@@ -36,6 +36,7 @@ public:
    static AttrNumber savePrefsOnExit;
    static AttrNumber saveWndRectsOnExit;
    static AttrNumber saveGUIOnExit;
+   static AttrNumber showOfflineNoise;
 
    static AttrColor clr_Window;
    static AttrColor clr_WindowText;

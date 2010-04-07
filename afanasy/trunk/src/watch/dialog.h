@@ -18,6 +18,7 @@
 class ButtonOut;
 class ButtonMonitor;
 class ListItems;
+class OfflineScreen;
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -62,6 +63,7 @@ private slots:
    void actSaveGUIOnExit();
    void actSaveWndRectsOnExit();
    void actSavePreferences();
+   void actShowOfflineNoise();
 
 protected:
    void keyPressEvent(     QKeyEvent   * event);
@@ -80,7 +82,7 @@ private:
    afqt::QServer           qServer;
 
    ListItems * listitems;
-
+   OfflineScreen * offlinescreen;
    InfoLine * infoline;
 
    QHBoxLayout *hlayout_a;

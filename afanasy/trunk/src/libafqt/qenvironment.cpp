@@ -19,6 +19,7 @@ using namespace afqt;
 AttrNumber QEnvironment::savePrefsOnExit(     "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT        );
 AttrNumber QEnvironment::saveWndRectsOnExit(  "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS           );
 AttrNumber QEnvironment::saveGUIOnExit(       "saveguionexit",        "Save Gui Settings",       AFGUI::SAVEGUI                );
+AttrNumber QEnvironment::showOfflineNoise(    "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE       );
 
 Attr       QEnvironment::font_family(         "font_family",          "Font Family",             AFGUI::FONT_FAMILY            );
 AttrNumber QEnvironment::font_sizename(       "font_sizename",        "Font Size Name",          AFGUI::FONT_SIZENAME          );
@@ -89,6 +90,7 @@ QEnvironment::QEnvironment( const QString & name)
    attrs_prefs.append( &savePrefsOnExit   );
    attrs_prefs.append( &saveWndRectsOnExit);
    attrs_prefs.append( &saveGUIOnExit     );
+   attrs_prefs.append( &showOfflineNoise  );
 
    attrs_gui.append( &font_family         );
    attrs_gui.append( &font_sizename       );

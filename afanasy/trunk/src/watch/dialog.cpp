@@ -24,6 +24,7 @@
 #include "listtalks.h"
 #include "listmonitors.h"
 #include "monitorhost.h"
+#include "offlinescreen.h"
 #include "watch.h"
 #include "wnd.h"
 #include "wndcustomizegui.h"
@@ -42,6 +43,7 @@ Dialog::Dialog():
    qThreadSend( this, af::Environment::getMonitorConnectRetries()),
    qServer( this),
    listitems( NULL),
+   offlinescreen( NULL),
    repaintTimer( this),
    initialized( false)
 {
@@ -167,6 +169,12 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
    connect( action, SIGNAL( triggered() ), this, SLOT( actSaveWndRectsOnExit() ));
    submenu->addAction( action);
 
+   action = new QAction( "Show Offline Noise", this);
+   action->setCheckable( true);
+   action->setChecked( afqt::QEnvironment::showOfflineNoise.n != 0);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actShowOfflineNoise() ));
+   submenu->addAction( action);
+
    menu.addMenu( submenu);
 
    action = new QAction( "Save Preferences", this);
@@ -180,6 +188,11 @@ void Dialog::connectionLost( af::Address* address)
 {
    if( monitorType == Watch::WJobs )
    {
+      if( afqt::QEnvironment::showOfflineNoise.n)
+      {
+         offlinescreen =  new OfflineScreen( listitems);
+         vlayout_b->insertWidget( 0, offlinescreen);
+      }
       closeList();
       ButtonMonitor::unset();
    }
@@ -197,6 +210,11 @@ void Dialog::connectionLost( af::Address* address)
 
 void Dialog::connectionEstablished()
 {
+   if( offlinescreen )
+   {
+      delete offlinescreen;
+      offlinescreen = NULL;
+   }
    displayInfo("Connection established.");
    connected = true;
    setDefaultWindowTitle();
@@ -434,6 +452,7 @@ void Dialog::actColors()
 void Dialog::actSavePreferencesOnExit()   { afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;     }
 void Dialog::actSaveGUIOnExit()           { afqt::QEnvironment::saveGUIOnExit.n      = 1 - afqt::QEnvironment::saveGUIOnExit.n;       }
 void Dialog::actSaveWndRectsOnExit()      { afqt::QEnvironment::saveWndRectsOnExit.n = 1 - afqt::QEnvironment::saveWndRectsOnExit.n;  }
+void Dialog::actShowOfflineNoise()        { afqt::QEnvironment::showOfflineNoise.n   = 1 - afqt::QEnvironment::showOfflineNoise.n;    }
 
 void Dialog::actSavePreferences()
 {

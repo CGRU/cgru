@@ -32,18 +32,18 @@
    <p>
    Environment needed to fill $PATH with CGRU commands and to specify configuration files location.<br/>
    Go into CGRU top directory:<br />
-   <code>$ cd cgru</code><br />
+   <code>$ cd cgru/afanasy/[trunk|branch|tag]</code><br />
    Source script which exports some variables:<br />
    <code>$ source setup.sh</code><br />
    Also this setup appends your $PYTHONPATH to specify python CGRU modules location.
    </p>
    <p>
    To automate process you can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
-   <code>pwd=$PWD; cd .../cgru; source startup.sh; cd $pwd</code><br/>
+   <code>pwd=$PWD; cd .../afanasy/...; source setup.sh; cd $pwd</code><br/>
    </p>
 </li>
 <li><h4>Check Environment</h4>
-   <kbd>cgru/bin</kbd> must be in <kbd>PATH</kbd>, so you can launch cgru programs<br/>
+   <kbd>afanasy/bin</kbd> must be in <kbd>PATH</kbd>, so you can launch afanasy programs<br/>
    Launch <kbd>afcmd</kbd> to check it. If programs is exists and output produced no errors, environment is OK.<br/>
 </li>
 <li><h4>Create User</h4>
@@ -57,10 +57,10 @@ This command will create him. Next scripts use this user name.
 </li>
 <li><h4>Launch Scripts</h4>
 <p>
-There are some <kbd>bash</kbd> scripts in <code>cgru/afanasy/scripts</code> directory. They can help you to setup automatic server and render launch. You can manually link <kbd>afserver</kbd> or <kbd>afrender</kbd> script in your startup scripts location  or use <kbd>initlink.sh</kbd> utility to do it.
+There are some <kbd>bash</kbd> scripts in <code>cgru/afanasy/init</code> directory. They can help you to setup automatic server and render launch. You can manually link <kbd>afserver</kbd> or <kbd>afrender</kbd> script in your startup scripts location  or use <kbd>initlink.sh</kbd> utility to do it.
 </p>
-<code># initlink.sh afserver</code><br/>
-<code># initlink.sh afrender</code><br/>
+<code># ./initlinks.sh afserver</code><br/>
+<code># ./initlinks.sh afrender</code><br/>
 <p>
 This command create a link in <kbd>/etc/init.d</kbd> directory to a file, which located in current directory and name provided in first argument. Put links in <kbd>/etc/rc?.d</kbd> directories to provide service starting and stopping. See script file for details.
 </p>
@@ -78,11 +78,6 @@ If you starting scripts as <kbd>root</kbd> user, applications will be launched b
 <p>
 This starting scripts also provide log rotating. Logs and pid files are stored in <kbd>/var/tmp/afanasy</kbd> directory.
 </p>
-<p>
-Also you can use them to run other GUI afanasy applications, it you want to run them as detached processes and store their logs.
-</p>
-<code>$ cgru/afanasy/scripts/afwatch launch</code><br/>
-<code>$ cgru/afanasy/scripts/aftalk launch</code><br/>
 </ol>
 <!--FOOTER-->
 <br/>
