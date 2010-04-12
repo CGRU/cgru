@@ -65,8 +65,6 @@ void Watch::addJobId( int jId ) { if(m) m->addJobId( jId );}
 void Watch::delJobId( int jId ) { if(m) m->delJobId( jId );}
 void Watch::setUid(   int uid ) { if(m) m->setUid(   uid );}
 
-void Watch::openMonitor( int type, bool open) { if(d) d->openMonitor( type, open);}
-
 void Watch::addWindow( Wnd * wnd)
 {
    if( windows.contains( wnd))
@@ -120,7 +118,7 @@ void Watch::listenTask( int jobid, int block, int task, const QString & name)
 
 void Watch::watchTasks( int id, const QString & name)
 {
-AFINFA("Watch::raiseWindow: trying to open job \"%s\"[%d] tasks window.\n", name.toUtf8().data(), id);
+AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.\n", name.toUtf8().data(), id);
    QLinkedList<int>::const_iterator iIt = watchtasksjobids.begin();
    QLinkedList<QWidget*>::iterator wIt = watchtaskswindows.begin();
    while( iIt != watchtasksjobids.end())
@@ -140,7 +138,7 @@ AFINFA("Watch::raiseWindow: trying to open job \"%s\"[%d] tasks window.\n", name
    watchtasksjobids.append( id);
    watchtaskswindows.append( wnd);
    displayInfo(QString("Opening '%1' tasks window.").arg(name));
-AFINFA("Watch::raiseWindow: \"%s\" window opened.\n", name.toUtf8().data());
+AFINFA("Watch::watchTasks: \"%s\" window opened.\n", name.toUtf8().data());
 }
 
 void Watch::watchTasks_rem( int id)
@@ -174,6 +172,17 @@ void Watch::connectionEstablished()
    for( QLinkedList<Reciever*>::iterator rIt = recievers.begin(); rIt != recievers.end(); ++rIt)
       (*rIt)->connectionEstablished();
    if(m) m->connectionEstablished();
+}
+
+bool Watch::openMonitor( int type, bool open)
+{
+   if( d == NULL ) return false;
+   if( opened[type])
+   {
+      raiseWindow( opened[type], &WndName[type]);
+      return false;
+   }
+   return d->openMonitor( type, open);
 }
 
 void Watch::raiseWindow( QWidget * wnd, const QString * name)

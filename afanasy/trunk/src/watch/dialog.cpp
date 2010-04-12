@@ -85,12 +85,14 @@ Dialog::Dialog():
    infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
    vlayout_b->addWidget( infoline);
 
+   hlayout_b->addStretch();
    btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
    hlayout_b->addWidget( btnMonitor[Watch::WJobs    ]);
    btnMonitor[Watch::WRenders] = new ButtonMonitor( Watch::WRenders, this);
    hlayout_b->addWidget( btnMonitor[Watch::WRenders ]);
    btnMonitor[Watch::WUsers]   = new ButtonMonitor( Watch::WUsers,   this);
    hlayout_b->addWidget( btnMonitor[Watch::WUsers   ]);
+   hlayout_b->addStretch();
 
    setFocusPolicy(Qt::StrongFocus);
 
@@ -279,7 +281,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
          displayWarning("You have registered.");
          if( monitorType == Watch::WNONE )
          {
-            btnMonitor[Watch::WJobs]->pressed_SLOT();
+            ButtonMonitor::pushButton( Watch::WJobs);
          }
       }
       break;
@@ -321,16 +323,23 @@ void Dialog::closeList()
    monitorType = Watch::WNONE;
 }
 
-void Dialog::openMonitor( int type, bool open)
+bool Dialog::openMonitor( int type, bool open)
 {
 AFINFA("Dialog::openMonitor: %s[%d]\n", Watch::WndName[type].toUtf8().data(), open);
-   if( !connected ) return;
+
+   if( open && (type == Watch::WJobs))
+   {
+      AFERROR("Dialog::openMonitor: Jobs monitor can't be opened is separate window.\n");
+      return false;
+   }
+
+   if( !connected ) return false;
    if(( type == Watch::WJobs) && ( uid == 0 ) && ( af::Environment::VISOR() == false ))
    {
       ButtonMonitor::unset();
       displayWarning("You are not registered ( and have no jobs).");
       qThreadSend.send( new afqt::QMsg( af::Msg::TUserIdRequest, &mcuserhost, true));
-      return;
+      return false;
    }
 
    QWidget * parent = this;
@@ -381,7 +390,7 @@ AFINFA("Dialog::openMonitor: %s[%d]\n", Watch::WndName[type].toUtf8().data(), op
    default:
       AFERRAR("Dialog::changeMonitor: unknown type = %d.\n", type);
       if( false == open ) monitorType = Watch::WNONE;
-      return;
+      return false;
    }
 
    if( open )
@@ -394,6 +403,8 @@ AFINFA("Dialog::openMonitor: %s[%d]\n", Watch::WndName[type].toUtf8().data(), op
       vlayout_b->insertWidget( 0, newlist);
       monitorType = type;
    }
+
+   return true;
 }
 
 void Dialog::keyPressEvent( QKeyEvent * event)
@@ -405,10 +416,10 @@ void Dialog::keyPressEvent( QKeyEvent * event)
    {
       if( af::Environment::GOD())
       {
-         btnMonitor[Watch::WTalks] = new ButtonMonitor( Watch::WTalks, this, 40, 20);
+         btnMonitor[Watch::WTalks] = new ButtonMonitor( Watch::WTalks, this);
          hlayout_b->addWidget( btnMonitor[Watch::WTalks]);
 
-         btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this, 40, 20);
+         btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
          hlayout_b->addWidget( btnMonitor[Watch::WMonitors]);
 
          setBackgroundRole( QPalette::LinkVisited );
@@ -438,6 +449,7 @@ void Dialog::keyPressEvent( QKeyEvent * event)
       int opened_type = monitorType ;
       closeList();
 //      ButtonMonitor::unset();
+      ButtonMonitor::refreshImages();
       setDefaultWindowTitle();
       if( opened_type != Watch::WNONE) openMonitor( opened_type, false);
    }

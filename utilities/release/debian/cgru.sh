@@ -10,15 +10,20 @@ root=$4
 # Creating directories:
 mkdir -p $pack/$cgru/doc
 mkdir -p $pack/$cgru/utilities/regexp/bin
+mkdir -p $pack/$cgru/utilities/fbx2clip/bin
 
 # Moving icons to standart linux location:
 cp -r $src/doc/icons/icons $pack/usr/local/share
-cp -r $src/utilities/regexp/icons/icons $pack/usr/local/share
 cp -r $src/utilities/moviemaker/icons/icons $pack/usr/local/share
+cp -r $src/utilities/regexp/icons/icons $pack/usr/local/share
 
 # Copying files:
-cp -r $root/utilities/regexp/bin/regexp $pack/$cgru/utilities/regexp/bin
+cp -r $root/utilities/doc $pack/$cgru/utilities
 cp -r $root/utilities/moviemaker $pack/$cgru/utilities
+cp -r $root/utilities/regexp/doc $pack/$cgru/utilities/regexp
+cp -r $root/utilities/regexp/bin/regexp $pack/$cgru/utilities/regexp/bin
+cp -r $root/utilities/fbx2clip/doc $pack/$cgru/utilities/fbx2clip
+cp -r $root/utilities/fbx2clip/bin/fbx2clip $pack/$cgru/utilities/fbx2clip/bin
 
 files="\
 index.html \

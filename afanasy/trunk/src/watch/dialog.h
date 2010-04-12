@@ -43,7 +43,7 @@ public:
 
    void sendMsg( afqt::QMsg * msg);
 
-   void openMonitor( int type, bool open);
+   bool openMonitor( int type, bool open);
 
    inline MonitorHost * getMonitor() { return monitor;}
 

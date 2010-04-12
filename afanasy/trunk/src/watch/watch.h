@@ -63,7 +63,7 @@ public:
 
    inline static const QStringList * getPreviewCmds() { return &previewcmds; }
 
-   static void openMonitor( int type, bool open);
+   static bool openMonitor( int type, bool open);
 
    static void listenJob(  int id, const QString & name);
    inline static void listenJob_rem(  int id) { listenjobids.removeAll(id);}

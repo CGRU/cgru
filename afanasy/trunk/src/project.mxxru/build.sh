@@ -5,8 +5,6 @@ export MXX_RU_CPP_TOOLSET=gcc_linux
 
 export AF_PYTHON="python2.6"
 
-if [ -f override.sh ]; then
-   source override.sh
-fi
+[ -f override.sh ] && source override.sh
 
 exec ruby afanasy.mxw.rb $*
