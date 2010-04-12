@@ -8,13 +8,13 @@ QT -= gui
 QT += xml network sql
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
-LIBS += $$(AF_PYTHON_LIB)
 
 DIR = ../../cmd
 LIBS += -L../libafapi -lafapi
 LIBS += -L../libafsql -lafsql
 LIBS += -L../libafnetwork -lafnetwork
 LIBS += -L../libafanasy -lafanasy
+LIBS += $$(AF_PYTHON_LIB)
 
 SOURCES += $$system(ls $$DIR/*.cpp)
 HEADERS += $$system(ls $$DIR/*.h)

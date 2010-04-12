@@ -3,7 +3,7 @@
 import os
 import shutil
 
-store = ['.svn','build.sh','clear.py','CMakeLists.txt','win_build_mingw.cmd','win_build_msvc.cmd']
+store = ['.svn','build.sh','override.sh','clear.py','CMakeLists.txt','win_build_mingw.cmd','win_build_msvc.cmd']
 projects = ['libafanasy','libafnetwork','libafapi','libafqt','libafsql','libpyaf','cmd','server','render','talk','watch','monitor']
 
 DEBUG = True

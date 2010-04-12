@@ -7,11 +7,11 @@ CONFIG += qt
 QT += xml network
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
-LIBS += $$(AF_PYTHON_LIB)
 
 DIR = ../../watch
 LIBS += -L../libafqt -lafqt
 LIBS += -L../libafanasy -lafanasy
+LIBS += $$(AF_PYTHON_LIB)
 
 SOURCES += $$system(ls $$DIR/*.cpp)
 HEADERS += $$system(ls $$DIR/*.h)
