@@ -3,7 +3,7 @@ DESTDIR = ../../../bin
 
 TEMPLATE = app
 
-CONFIG += qt
+CONFIG += qt release
 QT -= gui
 QT += xml network sql
 

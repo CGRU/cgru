@@ -4,11 +4,15 @@ file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SO
 find_package(Qt4 COMPONENTS QtCore QtXml QtNetwork QtSql REQUIRED)
 
 include(${QT_USE_FILE})
-#include_directories(${PYTHON_INCLUDE_PATH})
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../server/src/")
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libafanasy/src")
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libafnetwork/src")
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libafsql/src")
 
 add_executable(afserver ${src} ${inc})
+
+if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+   set_target_properties(afserver PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
+endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+
+if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+   set_target_properties(afserver PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
+endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+
 target_link_libraries(afserver afnetwork afsql)

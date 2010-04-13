@@ -12,4 +12,13 @@ include(${QT_USE_FILE})
 #include_directories("${afanasy_SOURCE_DIR}/../libafsql/src")
 
 add_executable(afcmd ${src} ${inc})
+
+if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+   set_target_properties(afcmd PROPERTIES LINK_FLAGS $ENV{AF_ADD_CFLAGS})
+endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+
+if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+   set_target_properties(afcmd PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
+endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+
 target_link_libraries(afcmd afapi afnetwork afsql)

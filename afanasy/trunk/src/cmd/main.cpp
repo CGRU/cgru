@@ -2,6 +2,8 @@
 
 #include <stdio.h>
 
+#include <QtCore/QCoreApplication>
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/afattr.h"
@@ -24,6 +26,7 @@ int ServerPort;
 
 int main( int argc, char** argv )
 {
+   QCoreApplication app( argc, argv);
    if ( argc == 1)
    {
       printf("afcmd = '%s'\n", argv[0]);

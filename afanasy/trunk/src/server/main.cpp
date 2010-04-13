@@ -245,9 +245,7 @@ void* ThreadServer_accept(void* arg)
 //######################################## main #########################################
 int main(int argc, char *argv[])
 {
-//
-// initialize environment variables
-//   QCoreApplication app( argc, argv);
+   QCoreApplication app( argc, argv);
 
    running = true;
    Py_InitializeEx(0);

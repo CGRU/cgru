@@ -15,4 +15,14 @@ set(moc_hdr
 qt4_wrap_cpp(moc_src ${moc_hdr})
 
 add_executable(afmonitor ${src} ${inc} ${moc_src})
+
+
+if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+   set_target_properties(afmonitor PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
+endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
+
+if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+   set_target_properties(afmonitor PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
+endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+
 target_link_libraries(afmonitor afqt)
