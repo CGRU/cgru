@@ -8,14 +8,16 @@ function usage(){
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "`basename $0` AFANASY_BRANCH DISTRVARS_FILE VERSION_NUMBER"
+   echo "   `basename $0` AFANASY_BRANCH DISTRVARS_FILE VERSION_NUMBER"
+   echo "Example:"
+   echo "   `basename $0` trunk vars_ubuntu9.10_amd64.sh 1.1.0"
    exit
 }
 
 # Afanasy location:
 afanasy=$1
 if [ -z $afanasy ]; then
-   ErrorMessage="Afanasy branch '$afanasy' not specitied."
+   ErrorMessage="Afanasy branch not specitied."
    usage
 fi
 afanasy="afanasy/${afanasy}"
@@ -34,7 +36,6 @@ if [ ! -f $varsfile ]; then
    ErrorMessage="Disrtibutive variables file '$varsfile' does not exists."
    usage
 fi
-source $varsfile
 
 # Packages version number:
 packsver=$3
@@ -43,19 +44,6 @@ if [ -z $packsver ]; then
    usage
 fi
 export VERSION_NUMBER=$packsver
-
-# CGRU general components:
-cgruAll="__all__"
-
-# Releases binary files directory:
-releases="__releases__"
-
-# Directory to export CGRU Subversion:
-cgruExp="cgru_export"
-
-# Debian packages:
-debpackages="debpackages"
-installdir="/opt/cgru"
 
 # Temporary directory
 tmpdir="tmp"
@@ -66,6 +54,7 @@ fi
 mkdir -p $tmpdir
 
 # Exporting CGRU:
+cgruExp="cgru_export"
 cgruExp=$tmpdir/$cgruExp
 if [ -d $cgruExp ]; then
    echo "Removing old export directory '$cgruExp'"
@@ -74,45 +63,16 @@ fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
 svn export $cgruRoot $cgruExp
 
-# Copying general components (__all__)
+# Copying general components:
+cgruAll="__all__"
 if [ -d $cgruAll ]; then
    echo "Copying components from '$cgruAll'"
    cp -rp $cgruAll/* $cgruExp
 fi
 
+# Processing icons:
+./process_icons.sh $afanasy $cgruExp
 #
-echo "Processing icons:"
-#
-# Icons directories:
-iconsdirssrc="\
-utilities/release/icons \
-doc/icons utilities/regexp/icons \
-utilities/moviemaker/icons \
-$afanasy/icons \
-$afanasy/doc/icons \
-"
-for iconsdir in $iconsdirssrc; do
-   src="$cgruRoot/$iconsdir"
-   if [ ! -d "$src" ]; then
-      ErrorMessage="Icons source folder '$src' does not exists."
-      usage
-   fi
-   dest="$cgruExp/$iconsdir"
-   if [ ! -d "$dest" ]; then
-      ErrorMessage="Icons destination folder '$dest' does not exists."
-      usage
-   fi
-   # Generate png icons from svg if was not:
-   if [ ! -d "$src/icons" ]; then
-      echo "Generating icons in '$src':"
-      tmp=$PWD
-      cd $src
-      ./make.sh   
-      cd $tmp
-   fi
-   echo "Copying '$iconsdir' icons"
-   cp -r "$src/icons" "$dest"
-done
 
 #
 echo "Extracting Afanasy components from '$afanasy' to 'afanasy'..."
@@ -122,6 +82,7 @@ rm -rf $cgruExp/afanasy/branches
 rm -rf $cgruExp/afanasy/trunk
 
 # Creating ZIP archives:
+releases="__releases__"
 if [ -d ${releases} ]; then
    echo "Creating ZIP archives with all CGRU files.."
    releasesnames=`ls "${releases}"`
@@ -141,7 +102,11 @@ if [ -d ${releases} ]; then
 fi
 #
 echo "Creating debian packages..."
+source $varsfile
 #
+# Debian packages:
+debpackages="debpackages"
+installdir="/opt/cgru"
 [ -d $debpackages ] && rm -rf $debpackages
 mkdir $debpackages
 echo "Copying current afanasy binaries..."
