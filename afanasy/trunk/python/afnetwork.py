@@ -10,7 +10,7 @@ def sendServer( data, datalen, host, port, verbose = False):
    for res in socket.getaddrinfo( host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
 #      print res
       af, socktype, proto, canonname, sa = res
-      print 'Trying to connect to "%s"' % str(sa[0])
+      if verbose: print 'Trying to connect to "%s"' % str(sa[0])
       try:
          s = socket.socket(af, socktype, proto)
       except socket.error, msg:

@@ -23,14 +23,14 @@ source houdini_setup_bash
 cd $pwd
 
 # Set Afanasy houdini scripts version
-export HOUDINI_CGRU_VERSION="10"
+export HOUDINI_AF_VERSION="10"
 # Set Afanasy houdini scripts location
-export HOUDINI_CGRU_PATH=$AF_ROOT/plugins/houdini/houdini$HOUDINI_CGRU_VERSION
+export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini/houdini$HOUDINI_AF_VERSION
 
-export HOUDINI_CGRU_OTLSCAN_PATH=$HIH/otls:$HOUDINI_CGRU_PATH/otls:$HH/otls
+export HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH/otls:$HH/otls
 
 if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
-   export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
+   export HOUDINI_OTLSCAN_PATH="${HOUDINI_AF_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
 else
-   export HOUDINI_OTLSCAN_PATH=$HOUDINI_CGRU_OTLSCAN_PATH
+   export HOUDINI_OTLSCAN_PATH=$HOUDINI_AF_OTLSCAN_PATH
 fi

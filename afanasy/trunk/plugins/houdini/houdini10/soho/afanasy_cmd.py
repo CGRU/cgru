@@ -123,7 +123,14 @@ elif drivertypename == 'af_multiply_sender':
 if len(capacity_coefficient) == 1: capacity_coefficient.append(-1)
 capacity_min,capacity_max = capacity_coefficient
 
-cmd = 'afjob %(tmphip)s %(start)d %(end)d -fpr %(fpr)d -node %(hdriver)s -type %(taskstype)s -take %(take)s -name %(jobname)s -deletescene' % vars()
+cmd = os.getenv('AF_ROOT', '')
+if cmd == '':
+   cmd = 'afjob.py'
+else:
+   cmd = os.path.join( cmd, 'python')
+   cmd = os.path.join( cmd, 'afjob.py')
+cmd += ' %(tmphip)s %(start)d %(end)d -fpr %(fpr)d -node %(hdriver)s -type %(taskstype)s -take %(take)s -name %(jobname)s -deletescene' % vars()
+
 if priority           != -1: cmd += ' -priority '     + str(priority)
 if maximum_hosts      != -1: cmd += ' -maxhosts '     + str(maximum_hosts)
 if capacity           != -1: cmd += ' -capacity '     + str(capacity)

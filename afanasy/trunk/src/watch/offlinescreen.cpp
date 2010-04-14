@@ -33,7 +33,11 @@ OfflineScreen::OfflineScreen( QWidget * widget):
 
    // Grab widget:
    QImage qimage( image_w, image_h, QImage::Format_RGB32);
+#if QT_VERSION >= 0x040300
    widget->render( &qimage);
+#else
+   qimage.fill( 0xff808080);
+#endif
 
    // Draw border:
    QPainter painter( &qimage);

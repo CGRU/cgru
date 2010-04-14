@@ -13,7 +13,9 @@ FontWidget::FontWidget( QWidget * parent, afqt::Attr * attrString):
       attr( attrString)
 {
    QHBoxLayout * layout = new QHBoxLayout(this);
+#if QT_VERSION >= 0x040300
    layout->setContentsMargins( 1, 1, 1, 1);
+#endif
    layout->setSpacing( 2);
    QLabel * label = new QLabel( attr->getLabel(), this);
    lineedit = new QLineEdit( this);

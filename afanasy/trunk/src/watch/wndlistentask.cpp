@@ -22,7 +22,9 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    task(       TaskNum  ),
    taskname(   Name     )
 {
+#if QT_VERSION >= 0x040300
    layout->setContentsMargins( 5, 5, 5, 5);
+#endif
    setContentsMargins(1,1,1,1);
 
    qTextEdit->moveCursor( QTextCursor::End, QTextCursor::KeepAnchor);

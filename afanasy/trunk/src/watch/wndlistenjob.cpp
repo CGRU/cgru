@@ -20,7 +20,9 @@ WndListenJob::WndListenJob( int JobId, const QString & Name):
    jobid( JobId),
    jobname( Name)
 {
+#if QT_VERSION >= 0x040300
    layout->setContentsMargins( 10, 10, 10, 10);
+#endif
    setContentsMargins(1,1,1,1);
 
    qTextEdit->moveCursor( QTextCursor::End, QTextCursor::KeepAnchor);

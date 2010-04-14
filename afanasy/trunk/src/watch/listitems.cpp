@@ -26,8 +26,9 @@ AFINFO("ListItems::ListItems.\n");
 
    layout = new QVBoxLayout( this);
    layout->setSpacing( 0);
+#if QT_VERSION >= 0x040300
    layout->setContentsMargins( 0, 0, 0, 0);
-
+#endif
    infoline = new InfoLine( this);
 
 //printf("parentWindow = %p\n", parentWindow);

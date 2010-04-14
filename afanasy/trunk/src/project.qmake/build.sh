@@ -4,8 +4,8 @@
 export QMAKE=qmake
 
 # Setup Python:
-export AF_PYTHON_INC=`python-config --cflags`
-export AF_PYTHON_LIB=`python-config --libs`
+export AF_PYTHON_INC="`python-config --cflags` -fPIC"
+export AF_PYTHON_LIB="`python-config --ldflags`"
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
