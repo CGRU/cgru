@@ -7,6 +7,8 @@ if [ -d $dest ]; then
    rm -rf $dest
 fi
 
+[ -f override.sh ] && source override.sh
+
 mkdir bin
 cd bin
 cmake ..
