@@ -9,6 +9,8 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
+Requires:      afanasy-common = @VERSION@
+
 %description
 Afanasy server.
 
@@ -18,7 +20,11 @@ Afanasy server.
 
 %install
 cd ../..
-mv opt $RPM_BUILD_ROOT
+dirs="opt"
+for dir in $dirs; do
+   mkdir -p $RPM_BUILD_ROOT/$dir
+   mv $dir/* $RPM_BUILD_ROOT/$dir
+done
 
 %files
 %defattr(-,root,root)

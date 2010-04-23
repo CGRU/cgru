@@ -18,9 +18,11 @@ Description of myrpmtest.
 
 %install
 cd ../..
-mv etc $RPM_BUILD_ROOT
-mv usr $RPM_BUILD_ROOT
-mv opt $RPM_BUILD_ROOT
+dirs="etc usr opt"
+for dir in $dirs; do
+   mkdir -p $RPM_BUILD_ROOT/$dir
+   mv $dir/* $RPM_BUILD_ROOT/$dir
+done
 
 %files
 %defattr(-,root,root)

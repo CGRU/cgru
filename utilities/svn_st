@@ -14,6 +14,9 @@ egExpr="
 |/CMakeFiles$\
 |/CMakeCache.txt$\
 |/__$\
+|\.a$\
+|\.so$\
+|\.so\.\
 |config.xml$\
 |afanasy/webvisor$\
 |afanasy/plugins$\

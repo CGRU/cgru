@@ -9,6 +9,8 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
+Requires:      cgru-common = @VERSION@
+
 %description
 Afanasy documentation.
 
@@ -18,8 +20,11 @@ Afanasy documentation.
 
 %install
 cd ../..
-mv opt $RPM_BUILD_ROOT
-mv usr $RPM_BUILD_ROOT
+dirs="usr opt"
+for dir in $dirs; do
+   mkdir -p $RPM_BUILD_ROOT/$dir
+   mv $dir/* $RPM_BUILD_ROOT/$dir
+done
 
 %files
 %defattr(-,root,root)

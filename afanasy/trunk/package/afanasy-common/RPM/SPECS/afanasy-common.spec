@@ -18,7 +18,11 @@ Afanasy common files.
 
 %install
 cd ../..
-mv opt $RPM_BUILD_ROOT
+dirs="opt"
+for dir in $dirs; do
+   mkdir -p $RPM_BUILD_ROOT/$dir
+   mv $dir/* $RPM_BUILD_ROOT/$dir
+done
 
 %files
 %defattr(-,root,root)
