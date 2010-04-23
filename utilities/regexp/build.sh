@@ -1,16 +1,17 @@
 #!/bin/bash
 
-dest="bin"
+# Setup Qt:
+export QMAKE=qmake
 
-if [ -d $dest ]; then
-   echo "Removing old destination directory '$dest'"
-   rm -rf $dest
-fi
-
+# overrides (set custom values there):
 [ -f override.sh ] && source override.sh
 
-mkdir bin
-cd bin
-cmake ..
+cd src
+
+# Run qmake to make makefiles
+$QMAKE
+
+# Make files
 make
+
 cd ..
