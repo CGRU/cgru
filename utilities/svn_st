@@ -19,6 +19,7 @@ egExpr="
 |afanasy/plugins$\
 |afanasy/doc$\
 |afanasy/icons$\
+|/nonrootuser$\
 |plugins/maya/mll\
 |utilities/fbx2clip/fbxsdk$\
 |utilities/release/debpackages$"

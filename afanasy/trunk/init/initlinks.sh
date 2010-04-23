@@ -9,8 +9,9 @@ cd $curdir
 
 echo "Afanasy location = '$afroot'"
 
-app=$1
-remove=$2
+manager=$1
+action=$2
+app=$3
 daemon="${afroot}/init/afdaemon.sh"
 initd="/etc/init.d"
 
@@ -19,18 +20,43 @@ function usage(){
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "`basename $0` APPLICATION [rm]"
+   echo "`basename $0` [u|c|i] [rm|add] APPLICATION"
+   echo "'u'   - use 'update-rc.d' (Debian, Ubuntu)"
+   echo "'c'   - use 'chkconfig' (CentOS, Fedora, openSUSE)"
+   echo "'i'   - use 'insserv' (openSUSE)"
+   echo "'add' - add application"
+   echo "'rm'  - remove application"
+   echo "Examples:"
+   echo "`basename $0` add c afrender"
+   echo "`basename $0` rm u afserver"
    exit 0
 }
 
-if [ -z $app ]; then
+if [ -z "${app}" ]; then
    ErrorMessage="Application is not set."
    usage
 fi
 
-if [ "$remove" == "rm" ]; then
-   removing="Removing "
+if [ -z "${manager}" ]; then
+   ErrorMessage="Config manager is not set."
+   usage
+elif [ "${manager}" == "u" ]; then
+   echo "Using 'update-rc.d'"
+elif [ "${manager}" == "c" ]; then
+   echo "Using 'chkconfig'"
+elif [ "${manager}" == "i" ]; then
+   echo "Using 'insserv'"
 else
+   ErrorMessage="Unknown config manager '$manager'."
+   usage
+fi
+
+if [ -z "${action}" ]; then
+   ErrorMessage="Action is not set."
+   usage
+elif [ "$action" == "rm" ]; then
+   removing="Removing "
+elif [ "$action" == "add" ]; then
    appfile="${afroot}/bin/${app}"
    if [ ! -f $appfile ]; then
       ErrorMessage="Application '$appfile' does not exists."
@@ -40,22 +66,30 @@ else
       ErrorMessage="Daemon script '$daemon' does not exists."
       usage
    fi
+else
+   ErrorMessage="Unknown action '$action'."
+   usage
 fi
 
 echo "${removing}Application = '$app'"
-
 echo "Removing old links:"
-update-rc.d -f $app remove
+
+[ "${manager}" == "u" ] && update-rc.d -f $app remove
+[ "${manager}" == "c" ] && chkconfig $app off
+[ "${manager}" == "i" ] && insserv -r $app
+
 if [ -L $initd/$app ]; then
    rm -fv $initd/$app
 fi
-
-if [ "$remove" == "rm" ]; then
+if [ "$action" == "rm" ]; then
    exit
 fi
 
 echo "Creating new links:"
 ln -sv $daemon $initd/$app
-update-rc.d $app defaults 80 20
+
+[ "${manager}" == "u" ] && update-rc.d $app defaults 80 20
+[ "${manager}" == "c" ] && chkconfig $app on
+[ "${manager}" == "i" ] && insserv $app
 
 echo "Done"; exit 0

@@ -1,5 +1,6 @@
 #/bin/bash
 
+export PACKAGE_MANAGER="DPKG"
 export VERSION_NAME="ubuntu9.10_amd64"
 export ARCHITECTURE="amd64"
 export QT_VERSION=">= 4.5"

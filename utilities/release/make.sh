@@ -100,15 +100,30 @@ if [ -d ${releases} ]; then
       cd $tmp
    done
 fi
+
 #
-echo "Creating debian packages..."
-source $varsfile
-#
-# Debian packages:
-debpackages="debpackages"
+# Creating Packages:
 installdir="/opt/cgru"
-[ -d $debpackages ] && rm -rf $debpackages
-mkdir $debpackages
+
+source $varsfile
+if [ -z "$PACKAGE_MANAGER" ]; then
+   echo "Package manager is not set (PACKAGE_MANAGER variable is empty)."
+   exit 1
+elif [ "$PACKAGE_MANAGER" == "DPKG" ]; then
+   echo "Creating DEBIAN packages..."
+elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
+   echo "Creating RPM packages..."
+else
+   echo "Unknown package manager = '$PACKAGE_MANAGER'"
+   exit 1
+fi
+
+# packages output directoty:
+packages_output_dir="output"
+[ -d $packages_output_dir ] && rm -rf $packages_output_dir
+mkdir $packages_output_dir
+
+# copy current afanasy binaries from branch:
 echo "Copying current afanasy binaries..."
 if [ ! -d $cgruRoot/$afanasy/bin ]; then
    ErrorMessage="No afanasy binaries directory founded '$cgruRoot/$afanasy/bin'."
@@ -116,26 +131,57 @@ if [ ! -d $cgruRoot/$afanasy/bin ]; then
 fi
 cp -rp $cgruRoot/$afanasy/bin $cgruExp/afanasy
 
-# Debian packages control:
-debianall="$cgruExp/afanasy/debian $cgruExp/utilities/release/debian"
-for debian in $debianall; do
-   packages=`ls "${debian}"`
+# Walk in every package folder:
+packages_dirs="$cgruExp/afanasy/package $cgruExp/utilities/release/package"
+#packages_dirs="$cgruExp/utilities/release/package"
+for packages_dir in $packages_dirs; do
+   packages=`ls "${packages_dir}"`
    for package in $packages; do
-      [ -d "${debian}/${package}" ] || continue
-      commands="${debian}/${package}.sh"
+      [ -d "${packages_dir}/${package}" ] || continue
+      # check copy script:
+      commands="${packages_dir}/${package}.sh"
       [ -f $commands ] || continue
-      # copy package stucture:
-      cp -rp "${debian}/${package}" "${tmpdir}"
-      # perform specific commands:
+      # copy files for package, but not control folders:
+      mkdir -p ${tmpdir}/${package}
+      for folder in `ls "${packages_dir}/${package}"`; do
+         [ "${folder}" == "RPM" ] && continue
+         [ "${folder}" == "DEBIAN" ] && continue
+         folder="${packages_dir}/${package}/${folder}"
+         cp -r "${folder}" "${tmpdir}/${package}"
+      done
+      # apply copy script, for common files:
       $commands $cgruExp $tmpdir/$package $installdir $cgruRoot
+
+#continue
       # count package size:
       for i in `du -sb0 ${tmpdir}/${package}`; do size=$i; break; done
       [ -z $size ] || export SIZE=$size
-      # replace variables:
-      ./replacevars.sh ${debian}/${package}/DEBIAN/control ${tmpdir}/${package}/DEBIAN/control
-      # build package:
-      dpkg-deb -b "${tmpdir}/${package}" "${debpackages}/${package}.${VERSION_NUMBER}_${VERSION_NAME}.deb"
+
+      # perform package manager specific operations:
+      if [ "$PACKAGE_MANAGER" == "DPKG" ]; then
+         # copy DEBIAN folder:
+         cp -r "${packages_dir}/${package}/DEBIAN" "${tmpdir}/${package}"
+         # replace variables:
+         ./replacevars.sh ${packages_dir}/${package}/DEBIAN/control ${tmpdir}/${package}/DEBIAN/control
+         # build package:
+         dpkg-deb -b "${tmpdir}/${package}" "${packages_output_dir}/${package}.${VERSION_NUMBER}_${VERSION_NAME}.deb"
+      elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
+         # copy RPM folder:
+         cp -r "${packages_dir}/${package}/RPM" "${tmpdir}/${package}"
+         # replace variables:
+         ./replacevars.sh  "${packages_dir}/${package}/RPM/SPECS/${package}.spec" "${tmpdir}/${package}/RPM/SPECS/${package}.spec"
+         # launch rpm build script:
+         curdir=$PWD
+         cd ${tmpdir}/${package}
+         rpmbuild -bb "RPM/SPECS/${package}.spec" --buildroot "${PWD}/RPM/BUILDROOT"
+         cd $curdir
+         # move package from RPM build directories structure:
+         for folder in `ls ${tmpdir}/${package}/RPM/RPMS`; do
+            mv -f ${tmpdir}/${package}/RPM/RPMS/${folder}/* "${packages_output_dir}"
+         done
+      fi
       echo "   Size = $size"
+#break
    done
 done
 

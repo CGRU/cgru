@@ -1,4 +1,8 @@
 #!/bin/bash
+#
+# chkconfig: 2345 90 10
+# description: Afanasy Daemon
+#
 ### BEGIN INIT INFO
 # Provides: afanasy
 # Required-Start:  $local_fs $remote_fs $network
@@ -13,7 +17,8 @@
 link=$0
 # Check whether executed file is a link:
 if [ ! -L $link ]; then
-   log_failure_msg "You should run a symbolic link named like application with absolute path to afdaemon script."
+#   log_failure_msg "You should run a symbolic link named like application with absolute path to afdaemon script."
+   echo "You should run a symbolic link named like application with absolute path to afdaemon script."
    exit 1
 fi
 
@@ -38,14 +43,22 @@ cd $curdir
 # Get Afanasy application:
 afapp=`basename $link`
 
+# Afanasy "nonroot" user:
 nonrootuser=renderer
-tmpdir=/var/tmp/afanasy
+if [ -f "${afroot}/nonrootuser" ]; then
+   nonrootuser=`cat "${afroot}/nonrootuser"`
+else
+   echo "${nonrootuser}" > "${afroot}/nonrootuser"
+fi
+id "${nonrootuser}" || nonrootuser=""
 
 # Temp directory:
+tmpdir=/var/tmp/afanasy
 if [ ! -d "$tmpdir" ]; then
    mkdir $tmpdir
    if [ ! -d "$tmpdir" ]; then
-      log_failure_msg "temp directory was not created"
+#      log_failure_msg "temp directory was not created"
+      echo "temp directory was not created"
       exit 1
    else
       chmod a+rwx $tmpdir
@@ -88,45 +101,53 @@ execfile="$afroot/bin/$afapp"
 startcmd="$afroot/init/afstart.sh $execfile $logfile"
 
 function start(){
-   log_begin_msg "Starting $afapp"
+#   log_begin_msg "Starting $afapp"
+   echo "Starting $afapp"
    if [ -f $pidfile ]; then
       kill `cat $pidfile`
       rm -fv $pidfile
    fi
    logrotate $logfile
    startcmd="$startcmd $pidfile"
-   if [ "$UID" == "0" ]; then
+   if [ "$UID" == "0" ] && [ ! -z "${nonrootuser}" ]; then
       su - $nonrootuser -c "$startcmd"
    else
       $startcmd
    fi
    if [ $? != 0 ]; then
-      log_failure_msg "Can't execute process."
+#      log_failure_msg "Can't execute process."
+      echo "Can't execute process."
       exit 1
    fi
    if [ ! -f $pidfile ]; then
-      log_failure_msg "Pid file was not created."
+#      log_failure_msg "Pid file was not created."
+      echo "Pid file was not created."
       exit 1
    fi
-   log_end_msg $?
+#   log_end_msg $?
+   echo $?
 }
 
 function stop(){
-   log_begin_msg "Stopping $afapp"
+#   log_begin_msg "Stopping $afapp"
+   echo "Stopping $afapp"
    if [ ! -f $pidfile ]; then
       log_failure_msg "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
       exit 1
    fi
    kill `cat $pidfile`
    if [ $? != 0 ]; then
-      log_failure_msg "Can't kill process."
+#      log_failure_msg "Can't kill process."
+      echo "Can't kill process."
       exit 1
    fi
    rm -f $pidfile
    if [ -f $pidfile ]; then
-      log_failure_msg "Can't delete pid file."
+#      log_failure_msg "Can't delete pid file."
+      echo "Can't delete pid file."
    fi
-   log_end_msg $?
+#   log_end_msg $?
+   echo $?
 }
 
 case $1 in

@@ -1,0 +1,48 @@
+# This is RPM spec file:
+
+%define _topdir %(echo $PWD)/RPM
+
+Summary:       Afanasy server
+License:       GPL
+Name:          afanasy-server
+Version:       @VERSION@
+Release:       @RELEASE@
+Group:         Applications/Graphics
+
+%description
+Afanasy server.
+
+%prep
+
+%build
+
+%install
+cd ../..
+mv opt $RPM_BUILD_ROOT
+
+%files
+%defattr(-,root,root)
+/opt
+
+%clean
+
+%pre
+echo "Afanasy server PRE INSTALL"
+if [ -e /etc/init.d/afserver ]; then
+   echo "Trying to stop previously installed service..."
+   /etc/init.d/afserver stop || true
+fi
+exit 0
+
+%post
+echo "Afanasy server POST INSTALL"
+id renderer || useradd renderer --create-home
+/opt/cgru/afanasy/init/initlinks.sh c add afserver || true
+/etc/init.d/afserver start || true
+exit 0
+
+%preun
+echo "Afanasy server PRE REMOVE:"
+/etc/init.d/afserver stop || true
+/opt/cgru/afanasy/init/initlinks.sh c rm afserver || true
+exit 0
