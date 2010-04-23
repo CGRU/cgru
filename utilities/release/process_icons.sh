@@ -39,8 +39,9 @@ fi
 
 # Icons directories:
 iconsdirssrc="\
+doc/icons \
 utilities/release/icons \
-doc/icons utilities/regexp/icons \
+utilities/regexp/icons \
 utilities/moviemaker/icons \
 ${afanasy}/icons \
 ${afanasy}/doc/icons \

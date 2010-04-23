@@ -19,6 +19,6 @@ for s in $sizes; do
    for icon in $iconsall; do
       folder="${iconsdir}/${s}x${s}/apps"
       mkdir -p $folder
-      inkscape -w=${s} -h=${s} --export-png=$folder/af$icon.png $svgdir/af$icon.svg
+      inkscape -w ${s} -h ${s} --export-png=$folder/af$icon.png $svgdir/af$icon.svg
    done
 done
