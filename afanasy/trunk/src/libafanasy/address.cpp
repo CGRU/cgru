@@ -163,9 +163,9 @@ void Address::setQAddress( QHostAddress & qhostaddress) const
       }
       case IPv6:
          qhostaddress.setAddress( (quint8*)addr);
+         break;
       default:
          AFERROR("Address::setQAddress: Unknown address family.\n");
-         break;
    }
 }
 
