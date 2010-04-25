@@ -235,7 +235,7 @@ TaskData * BlockData::createTask( Msg * msg)
 
 bool BlockData::setCapacity( int value)
 {
-   if( value > 0);
+   if( value > 0)
    {
       capacity = value;
       return true;

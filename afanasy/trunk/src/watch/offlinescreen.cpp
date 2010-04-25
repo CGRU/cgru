@@ -62,7 +62,7 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    }
 
    // Echo screen:
-   int echo = -10 - random() * 10 / RAND_MAX;
+   int echo = -10 - rand() * 10 / RAND_MAX;
    for( int h = 0; h < image_h; h++)
    for( int w = 0; w < image_w; w++)
    {
@@ -92,20 +92,20 @@ OfflineScreen::OfflineScreen( QWidget * widget):
 
    // Fill pseudo randoms:
    rand_all = new int[image_s];
-   for( int i = 0; i < image_s; i++) rand_all[i] = random();
+   for( int i = 0; i < image_s; i++) rand_all[i] = rand();
    rand_all_size = new int[image_s];
-   for( int i = 0; i < image_s; i++) rand_all_size[i] = random() * (image_s - 1) / RAND_MAX;
+   for( int i = 0; i < image_s; i++) rand_all_size[i] = rand() * (image_s - 1) / RAND_MAX;
    // All constant sum:
    rand_all_grain = new int[image_s];
    for( int i = 0; i < image_s; i++)
    {
       RGBA rgba;
       int c;
-      c = 100 + random() * 40 / RAND_MAX - 20;
+      c = 100 + rand() * 40 / RAND_MAX - 20;
       rgba.c[R] = c;
-      c = 100 + random() * 100 / RAND_MAX - 50;
+      c = 100 + rand() * 100 / RAND_MAX - 50;
       rgba.c[G] = c;
-      c = 120 + random() * 200 / RAND_MAX - 100;
+      c = 120 + rand() * 200 / RAND_MAX - 100;
       rgba.c[B] = c;
       rand_all_grain[i] = rgba.all;
    }
@@ -126,10 +126,10 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    {
       rand_bw_pos[bw] = new int[rand_bw_len[bw]];
       for( int i = 0; i < rand_bw_len[bw]; i++)
-         rand_bw_pos[bw][i] = random() * rand_bw_max[bw] / RAND_MAX;
+         rand_bw_pos[bw][i] = rand() * rand_bw_max[bw] / RAND_MAX;
    }
    rand_bw_val = new int[image_s];
-   for( int i = 0; i < image_s; i++) rand_bw_val[i] = 200 * random() / RAND_MAX;
+   for( int i = 0; i < image_s; i++) rand_bw_val[i] = 200 * rand() / RAND_MAX;
 
    // Create timer to refresh screen:
    timer = new QTimer( this);

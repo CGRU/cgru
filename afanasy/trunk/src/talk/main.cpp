@@ -86,12 +86,15 @@ int main(int argc, char *argv[])
 
    return status;
 }
-/*
-int APIENTRY _tWinMain(HINSTANCE hInstance,
-                     HINSTANCE hPrevInstance,
-                     LPTSTR    lpCmdLine,
-                     int       nCmdShow)
+
+int WINAPI WinMain(
+  __in  HINSTANCE hInstance,
+  __in  HINSTANCE hPrevInstance,
+  __in  LPSTR lpCmdLine,
+  __in  int nCmdShow
+)
 {
-   return main( 0, 0);
+   char * name = "aftalk";
+   char ** ptr = &name;
+   return main( 1, ptr);
 }
-*/
