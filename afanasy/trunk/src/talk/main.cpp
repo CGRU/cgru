@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 
    return status;
 }
-
+#ifdef WINNT
 int WINAPI WinMain(
   __in  HINSTANCE hInstance,
   __in  HINSTANCE hPrevInstance,
@@ -98,3 +98,4 @@ int WINAPI WinMain(
    char ** ptr = &name;
    return main( 1, ptr);
 }
+#endif
