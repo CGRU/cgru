@@ -55,6 +55,7 @@ Mxx_ru::Cpp::macos_bundle_target {
          define "UNIX"
          case ENV['UNIXTYPE']
             when "MACOSX"
+               puts "Trying to build on MAC..."
                define "MACOSX"
                define "OSMac_"
                target_ext ".bundle"
@@ -72,7 +73,7 @@ Mxx_ru::Cpp::macos_bundle_target {
                linker_option "-Wl,-dylib_file,/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib:/System/Library/Frameworks/OpenGL.framework/Versions/A/Libraries/libGL.dylib"
 #               linker_option "-bundle"
             else
-               puts "Trying to build on UNIX..."
+               define "LINUX"
                include_path "#{maya_location}/include"
                lib_path "#{maya_location}/lib"
                lib "Foundation"
@@ -108,7 +109,6 @@ Mxx_ru::Cpp::macos_bundle_target {
                linker_option "-Wl,-Bsymbolic"
                include_path "/usr/include/X11"
                if  maya_arch == nil || (maya_arch.empty? || maya_arch.include?("32"))
-                  define "LINUX"
                   compiler_option "-m32" # suppose it's 32bit if no architecture specified
                   linker_option "-m32"
                else

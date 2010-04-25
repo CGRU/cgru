@@ -4,14 +4,14 @@
 export MAYA_CGRU_LOCATION=$PWD
 
 # Set Maya version, to get it default location and setup CGRU scripts path
-export MAYA_VERSION=2009
+export MAYA_VERSION=2010
 # Set Maya architecture, to get it default location and setup CGRU plugins path
 export MAYA_ARCH=-x64
 # For 32bit Maya uncomment next line
 # export MAYA_ARCH=
 
 # Set Maya location
-export MAYA_LOCATION=/cg/soft/maya${MAYA_VERSION}${MAYA_ARCH}
+export MAYA_LOCATION=/usr/autodesk/maya${MAYA_VERSION}${MAYA_ARCH}
 # Set Maya executable
 export MAYA_EXEC=${MAYA_LOCATION}/bin/maya${MAYA_VERSION}
 
