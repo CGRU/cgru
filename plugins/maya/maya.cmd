@@ -1,12 +1,12 @@
 rem Set Maya version:
-set MAYA_VERSION=2009
+set MAYA_VERSION=2011
 rem Set Maya architecture:
 set MAYA_ARCH=-x64
 rem For 32bit Maya uncomment next line
 rem set MAYA_ARCH=
 
 rem Set Maya location:
-set MAYA_LOCATION=c:\cg\soft\Maya%MAYA_VERSION%%MAYA_ARCH%
+set MAYA_LOCATION="C:\Program Files\Autodesk\Maya%MAYA_VERSION%"
 
 rem Set CGRU Maya scripts location:
 set MAYA_CGRU_LOCATION=%CD%
