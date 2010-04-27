@@ -11,7 +11,7 @@ function build_cgru(){
    ruby cgru_plugin.mxw.rb $*
 }
 
-export MAYA_VERSION=2010
+export MAYA_VERSION=2011
 export MAYA_ARCH=-x64
 
 [ -f override.sh ] && source override.sh
