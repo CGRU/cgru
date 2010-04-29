@@ -2,4 +2,4 @@
 
 source ./setup_houdini.sh
 
-$HOUDINI_CGRU_PATH/hrender_af.py $*
+$HOUDINI_AF_PATH/hrender_af.py $*

@@ -1,49 +1,187 @@
-#! /cg/soft/Nuke5.1v3/Nuke5.1 -nx
-version 5.1300
+#! /cg/soft/Nuke5.2v3-64/Nuke5.2 -nx
+version 5.2300
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
     <window x="0" y="25" w="1280" h="750" screen="0">
         <splitter orientation="1">
-            <split size="1274"></split>
+            <split size="807"></split>
             <splitter orientation="1">
-                <split size="48"></split>
+                <split size="40"></split>
                 <dock id="" hideTitles="1" activePageId="Toolbar.1">
                     <page id="Toolbar.1"></page>
                 </dock>
-                <split size="1222"></split>
+                <split size="763"></split>
                 <splitter orientation="2">
-                    <split size="27"></split>
-                    <dock id=""></dock>
-                    <split size="665"></split>
+                    <split size="346"></split>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"></page>
+                    </dock>
+                    <split size="346"></split>
                     <dock id="" activePageId="DAG.1">
                         <page id="DAG.1"></page>
                         <page id="Curve Editor.1"></page>
                     </dock>
                 </splitter>
             </splitter>
-            <split size="0"></split>
-            <dock id=""></dock>
+            <split size="467"></split>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"></page>
+                <page id="Script Editor.1"></page>
+            </dock>
         </splitter>
     </window>
 </layout>
 }
 Root {
  inputs 0
- name /cg/tools/cgru/examples/nuke/scene.nk
+ name /cg/tools/cgru/afanasy/branches/1.x/examples/nuke/scene.nk
+ frame 5
  last_frame 11
  lock_range true
  format "640 480 0 0 640 480 1 PC_Video"
  proxy_format "640 480 0 0 640 480 1 PC_Video"
 }
-Read {
+ColorBars {
  inputs 0
- file render/final.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 1
- name Read1
+ name ColorBars2
+ xpos 726
+ ypos -268
+}
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform2
+ xpos 726
+ ypos -194
+}
+Defocus {
+ defocus 100
+ mix 0.5
+ name Defocus3
+ xpos 726
+ ypos -152
+}
+TimeBlur {
+ shutteroffset start
+ shuttercustomoffset 0
+ name TimeBlur2
+ xpos 726
+ ypos -110
+}
+Defocus {
+ defocus 100
+ mix 0.5
+ name Defocus4
+ xpos 726
+ ypos -82
+}
+Write {
+ file render/heavy.%04d.jpg
+ file_type jpeg
+ _jpeg_quality 1
+ checkHashOnRead false
+ name heavy
+ xpos 726
+ ypos -16
+}
+Viewer {
+ inputs 0
+ input_process false
+ name Viewer1
+ xpos 589
+ ypos -50
+}
+afanasy {
+ inputs 0
+ name ab
+ xpos 743
+ ypos -1081
+ jobname ""
+ knob ""
+ framefirst 4
+ framelast 5
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes "test_\\\[a-b\\]"
+ independent true
+}
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos 223
+ ypos -329
+}
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform1
+ xpos 223
+ ypos -222
+}
+set N2e48a00 [stack 0]
+Write {
+ channels rgba
+ file render/key.%04d.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -229
+}
+Constant {
+ inputs 0
+ channels rgb
+ color {0.0443748 0.0548952 0.205 0.35}
+ name Constant1
  xpos 3
- ypos -32
+ ypos -335
+}
+Ramp {
+ opacity {{.6+.4*noise(3.1+.4*frame) i}}
+ p0 {480 -95}
+ p1 {230 625}
+ color {1 0.829351 0.381265 1}
+ name Ramp1
+ xpos 3
+ ypos -259
+}
+set N2e5d710 [stack 0]
+Write {
+ file render/back.%04d.exr
+ file_type exr
+ name back
+ xpos 113
+ ypos -266
+}
+Dot {
+ name Dot2
+ xpos 480
+ ypos -254
+}
+afanasy {
+ inputs 2
+ name afanasy1
+ label raw
+ xpos 446
+ ypos -163
+ jobname raw
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ independent true
+ fullrange true
 }
 Read {
  inputs 0
@@ -55,29 +193,13 @@ Read {
  xpos 223
  ypos -165
 }
-ColorBars {
- inputs 0
- name ColorBars1
- xpos 223
- ypos -320
-}
-Transform {
- translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
- rotate {{180*noise(4.56+.05*frame) i}}
- scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
- center {320 240}
- motionblur 1
- name Transform1
- xpos 223
- ypos -244
-}
-set N39750f0 [stack 0]
+push $N2e48a00
 Switch {
  inputs 2
  which 1
  name Switch2
  xpos 223
- ypos -194
+ ypos -193
 }
 Read {
  inputs 0
@@ -89,24 +211,7 @@ Read {
  xpos 3
  ypos -165
 }
-Constant {
- inputs 0
- channels rgb
- color {0.0443748 0.0548952 0.205 0.35}
- name Constant1
- xpos 3
- ypos -373
-}
-Ramp {
- opacity {{.6+.4*noise(3.1+.4*frame) i}}
- p0 {480 -95}
- p1 {230 625}
- color {1 0.829351 0.381265 1}
- name Ramp1
- xpos 3
- ypos -297
-}
-set N3993590 [stack 0]
+push $N2e5d710
 Switch {
  inputs 2
  which 1
@@ -127,7 +232,25 @@ Crop {
  xpos 113
  ypos -58
 }
-set N39a43e0 [stack 0]
+set N2f9aca0 [stack 0]
+Write {
+ file render/final.%04d.exr
+ file_type exr
+ name final
+ xpos 223
+ ypos -65
+}
+Read {
+ inputs 0
+ file render/final.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ last 9999
+ version 1
+ name Read1
+ xpos 3
+ ypos -32
+}
+push $N2f9aca0
 Switch {
  inputs 2
  which 1
@@ -138,146 +261,328 @@ Switch {
 Write {
  file render/preview.%04d.jpg
  file_type jpeg
- _jpeg_quality 0.95
+ checkHashOnRead false
  name preview
- tile_color 0x79743aff
  xpos 113
  ypos 46
- addUserKnob {20 cgruTab l CGRU}
- addUserKnob {4 cgruOrder l Order M {0 1 2 3 4 5 6 7 8 9}}
- addUserKnob {1 cgruJobName l "Job Name"}
- cgruJobName shot01
- addUserKnob {3 cgruFirst l "First Frame"}
- cgruFirst 1
- addUserKnob {22 cgruUTR l "Use Time Range" -STARTLINE T "nuke.thisNode()\[\"cgruFirst\"].setValue(nuke.root().firstFrame())\nnuke.thisNode()\[\"cgruLast\"].setValue(nuke.root().lastFrame())"}
- addUserKnob {3 cgruLast l "Last Frame"}
- cgruLast 11
- addUserKnob {3 cgruFPR l "Frames Per Render"}
- cgruFPR 1
- addUserKnob {3 cgruBy l "By Frame"}
- cgruBy 1
- addUserKnob {22 cgruRender l RENDER -STARTLINE T "cgru.render(\[nuke.thisNode()])"}
- addUserKnob {20 cgruJobTab l "Job Parametrs"}
- addUserKnob {6 cgruExt l Enable -STARTLINE}
- cgruExt true
- addUserKnob {3 cgruMax l "Maximum Hosts"}
- cgruMax -1
- addUserKnob {6 cgruPause l "Start Job Paused" -STARTLINE}
- addUserKnob {1 cgruHMask l "Hosts Mask"}
- addUserKnob {1 cgruDMask l "Depend Mask"}
- cgruDMask "shot01_back|shot01_key|shot01_final"
- addUserKnob {20 cgruTaskTab l "Task Parametrs"}
- addUserKnob {6 cgruUseTask l "Use Task Depend" -STARTLINE}
- cgruUseTask true
- addUserKnob {1 cgruTMask l "Task Depend Mask"}
- cgruTMask final
 }
-push $N3993590
-Write {
- channels rgba
- file render/back.%04d.exr
- file_type exr
- name back
- tile_color 0x379899ff
- xpos 113
- ypos -304
- addUserKnob {20 cgruTab l CGRU}
- addUserKnob {4 cgruOrder l Order M {0 1 2 3 4 5 6 7 8 9}}
- cgruOrder 3
- addUserKnob {1 cgruJobName l "Job Name"}
- cgruJobName shot01_back
- addUserKnob {3 cgruFirst l "First Frame"}
- cgruFirst 1
- addUserKnob {22 cgruUTR l "Use Time Range" -STARTLINE T "nuke.thisNode()\[\"cgruFirst\"].setValue(nuke.root().firstFrame())\nnuke.thisNode()\[\"cgruLast\"].setValue(nuke.root().lastFrame())"}
- addUserKnob {3 cgruLast l "Last Frame"}
- cgruLast 11
- addUserKnob {3 cgruFPR l "Frames Per Render"}
- cgruFPR 1
- addUserKnob {3 cgruBy l "By Frame"}
- cgruBy 1
- addUserKnob {22 cgruRender l RENDER -STARTLINE T "cgru.render(\[nuke.thisNode()])"}
- addUserKnob {20 cgruJobTab l "Job Parametrs"}
- addUserKnob {6 cgruExt l Enable -STARTLINE}
- addUserKnob {3 cgruMax l "Maximum Hosts"}
- cgruMax -1
- addUserKnob {6 cgruPause l "Start Job Paused" -STARTLINE}
- addUserKnob {1 cgruHMask l "Hosts Mask"}
- addUserKnob {1 cgruDMask l "Depend Mask"}
- addUserKnob {20 cgruTaskTab l "Task Parametrs"}
- addUserKnob {6 cgruUseTask l "Use Task Depend" -STARTLINE}
- addUserKnob {1 cgruTMask l "Task Depend Mask"}
+afanasy {
+ inputs 3
+ name afanasy2
+ label "all\n"
+ xpos 446
+ ypos 46
+ jobname ""
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
 }
-push $N39750f0
-Write {
- channels rgba
- file render/key.%04d.exr
- file_type exr
- name key
- tile_color 0x379899ff
- xpos 113
- ypos -251
- addUserKnob {20 cgruTab l CGRU}
- addUserKnob {4 cgruOrder l Order M {0 1 2 3 4 5 6 7 8 9}}
- cgruOrder 2
- addUserKnob {1 cgruJobName l "Job Name"}
- cgruJobName shot01_key
- addUserKnob {3 cgruFirst l "First Frame"}
- cgruFirst 1
- addUserKnob {22 cgruUTR l "Use Time Range" -STARTLINE T "nuke.thisNode()\[\"cgruFirst\"].setValue(nuke.root().firstFrame())\nnuke.thisNode()\[\"cgruLast\"].setValue(nuke.root().lastFrame())"}
- addUserKnob {3 cgruLast l "Last Frame"}
- cgruLast 11
- addUserKnob {3 cgruFPR l "Frames Per Render"}
- cgruFPR 1
- addUserKnob {3 cgruBy l "By Frame"}
- cgruBy 1
- addUserKnob {22 cgruRender l RENDER -STARTLINE T "cgru.render(\[nuke.thisNode()])"}
- addUserKnob {20 cgruJobTab l "Job Parametrs"}
- addUserKnob {6 cgruExt l Enable -STARTLINE}
- addUserKnob {3 cgruMax l "Maximum Hosts"}
- cgruMax -1
- addUserKnob {6 cgruPause l "Start Job Paused" -STARTLINE}
- addUserKnob {1 cgruHMask l "Hosts Mask"}
- addUserKnob {1 cgruDMask l "Depend Mask"}
- addUserKnob {20 cgruTaskTab l "Task Parametrs"}
- addUserKnob {6 cgruUseTask l "Use Task Depend" -STARTLINE}
- addUserKnob {1 cgruTMask l "Task Depend Mask"}
+ColorBars {
+ inputs 0
+ name ColorBars4
+ xpos 688
+ ypos -959
 }
-push $N39a43e0
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform7
+ xpos 688
+ ypos -885
+}
+set N30cae80 [stack 0]
+Transform {
+ scale 0.5
+ center {1 479}
+ name Transform3
+ xpos 798
+ ypos -885
+}
 Write {
- channels rgba
- file render/final.%04d.exr
+ file render/test_0.%04d.exr
  file_type exr
- name final
- tile_color 0x379899ff
- xpos 223
- ypos -65
- addUserKnob {20 cgruTab l CGRU}
- addUserKnob {4 cgruOrder l Order M {0 1 2 3 4 5 6 7 8 9}}
- cgruOrder 1
- addUserKnob {1 cgruJobName l "Job Name"}
- cgruJobName shot01_final
- addUserKnob {3 cgruFirst l "First Frame"}
- cgruFirst 1
- addUserKnob {22 cgruUTR l "Use Time Range" -STARTLINE T "nuke.thisNode()\[\"cgruFirst\"].setValue(nuke.root().firstFrame())\nnuke.thisNode()\[\"cgruLast\"].setValue(nuke.root().lastFrame())"}
- addUserKnob {3 cgruLast l "Last Frame"}
- cgruLast 11
- addUserKnob {3 cgruFPR l "Frames Per Render"}
- cgruFPR 1
- addUserKnob {3 cgruBy l "By Frame"}
- cgruBy 1
- addUserKnob {22 cgruRender l RENDER -STARTLINE T "cgru.render(\[nuke.thisNode()])"}
- addUserKnob {20 cgruJobTab l "Job Parametrs"}
- addUserKnob {6 cgruExt l Enable -STARTLINE}
- cgruExt true
- addUserKnob {3 cgruMax l "Maximum Hosts"}
- cgruMax -1
- addUserKnob {6 cgruPause l "Start Job Paused" -STARTLINE}
- addUserKnob {1 cgruHMask l "Hosts Mask"}
- addUserKnob {1 cgruDMask l "Depend Mask"}
- cgruDMask "shot01_back|shot01_key"
- addUserKnob {20 cgruTaskTab l "Task Parametrs"}
- addUserKnob {6 cgruUseTask l "Use Task Depend" -STARTLINE}
- cgruUseTask true
- addUserKnob {1 cgruTMask l "Task Depend Mask"}
- cgruTMask "back|key"
+ name test_0
+ xpos 798
+ ypos -559
+}
+push $N30cae80
+Write {
+ file render/test_a.%04d.exr
+ file_type exr
+ name test_a
+ xpos 688
+ ypos -816
+}
+push $N30cae80
+Write {
+ file render/test_b.%04d.exr
+ file_type exr
+ name test_b
+ xpos 578
+ ypos -892
+}
+Read {
+ inputs 0
+ file render/test_a.%04d.exr
+ last 9999
+ name Read6
+ xpos 546
+ ypos -1274
+}
+Transform {
+ scale 0.5
+ center {639 479}
+ name Transform6
+ xpos 546
+ ypos -1186
+}
+Write {
+ file render/test_e.%04d.exr
+ file_type exr
+ name test_e
+ xpos 546
+ ypos -1120
+}
+Read {
+ inputs 0
+ file render/test_b.%04d.exr
+ last 9999
+ name Read4
+ xpos 326
+ ypos -1274
+}
+Transform {
+ scale 0.5
+ center {639 1}
+ name Transform5
+ xpos 326
+ ypos -1186
+}
+Write {
+ file render/test_d.%04d.exr
+ file_type exr
+ name test_d
+ xpos 326
+ ypos -1120
+}
+Read {
+ inputs 0
+ file render/test_a.%04d.exr
+ last 9999
+ name Read5
+ xpos 436
+ ypos -1346
+}
+Transform {
+ scale 0.5
+ center {1 1}
+ name Transform4
+ xpos 436
+ ypos -1258
+}
+Write {
+ file render/test_c.%04d.exr
+ file_type exr
+ name test_c
+ xpos 436
+ ypos -1196
+}
+afanasy {
+ inputs 3
+ name cde
+ xpos 436
+ ypos -1113
+ jobname ""
+ knob ""
+ framefirst 2
+ framelast 9
+ framespertask 3
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ independent true
+ singlejob false
+}
+Dot {
+ name Dot3
+ xpos 470
+ ypos -934
+}
+Read {
+ inputs 0
+ file render/test_0.%04d.exr
+ last 9999
+ name Read9
+ xpos 136
+ ypos -1033
+}
+Read {
+ inputs 0
+ file render/test_e.%04d.exr
+ last 9999
+ name Read8
+ xpos 26
+ ypos -946
+}
+Merge2 {
+ inputs 2
+ name Merge3
+ xpos 136
+ ypos -916
+}
+Write {
+ file render/test_f.%04d.exr
+ file_type exr
+ name test_f
+ xpos 246
+ ypos -923
+}
+Read {
+ inputs 0
+ file render/test_c.%04d.exr
+ last 9999
+ name Read7
+ xpos -188
+ ypos -839
+}
+Read {
+ inputs 0
+ file render/test_f.%04d.exr
+ last 9999
+ name Read10
+ xpos -78
+ ypos -755
+}
+Merge2 {
+ inputs 2
+ name Merge2
+ xpos -78
+ ypos -809
+}
+Write {
+ file render/test_g.%04d.exr
+ file_type exr
+ name test_g
+ xpos 32
+ ypos -816
+}
+afanasy {
+ inputs 2
+ name gf
+ xpos 246
+ ypos -809
+ jobname ""
+ knob ""
+ framefirst 12
+ framelast 18
+ framespertask 2
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+}
+Read {
+ inputs 0
+ file render/test_g.%04d.exr
+ last 9999
+ name Read11
+ xpos 1138
+ ypos -723
+}
+Read {
+ inputs 0
+ file render/test_d.%04d.exr
+ last 9999
+ name Read12
+ xpos 1028
+ ypos -802
+}
+Merge2 {
+ inputs 2
+ name Merge4
+ xpos 1028
+ ypos -693
+}
+Write {
+ file render/test_h.%04d.exr
+ file_type exr
+ name test_h
+ xpos 918
+ ypos -700
+}
+Dot {
+ name Dot1
+ xpos 726
+ ypos -688
+}
+afanasy {
+ inputs 5
+ name abcgh
+ xpos 578
+ ypos -809
+ jobname ""
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ singlejob false
+}
+Read {
+ inputs 0
+ file render/test_h.%04d.exr
+ last 9999
+ name Read13
+ xpos 344
+ ypos -669
+}
+Read {
+ inputs 0
+ file render/test_g.%04d.exr
+ last 9999
+ name Read14
+ xpos 234
+ ypos -582
+}
+Merge2 {
+ inputs 2
+ name Merge5
+ xpos 344
+ ypos -552
+}
+Write {
+ file render/test_i.%04d.exr
+ file_type exr
+ name test_i
+ xpos 454
+ ypos -559
+}
+afanasy {
+ inputs 3
+ name ia0
+ xpos 578
+ ypos -552
+ jobname ""
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ forceframes true
 }
