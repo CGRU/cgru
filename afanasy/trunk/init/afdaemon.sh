@@ -3,8 +3,9 @@
 # chkconfig: 2345 90 10
 # description: Afanasy Daemon
 #
+# disable service name, as afrender and afserver uses links to the same file, and no doubles allowed
 ### BEGIN INIT INFO
-# Provides: afanasy
+##Provides: afanasy
 # Required-Start:  $local_fs $remote_fs $network
 # Required-Stop:   $local_fs $remote_fs $network
 # Should-Start:    $syslog

@@ -12,7 +12,6 @@ if [ -z $AF_ROOT ]; then
    cd $curdir
 fi
 
-echo ":"
 echo "AF_ROOT    = '$AF_ROOT'"
 [ -z $AF_HOSTNAME ] || echo "AF_HOSTNAME= '$AF_HOSTNAME'"
 echo "Launchfile = '$exefile'"
