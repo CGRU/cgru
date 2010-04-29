@@ -3,8 +3,8 @@ Version: @VERSION@
 Architecture: all
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: ffmpeg, python-qt4, mencoder, cgru-common (= @VERSION@), afanasy-doc (= @VERSION@), afanasy-gui (= @VERSION@), afanasy-render (= @VERSION@), afanasy-plugins (= @VERSION@), afanasy-examples (= @VERSION@)
-Suggests: apache2, php5, php5-gd, php5-pgsql
+Depends: cgru-common (= @VERSION@), afanasy-doc (= @VERSION@), afanasy-gui (= @VERSION@), afanasy-render (= @VERSION@), afanasy-plugins (= @VERSION@), afanasy-examples (= @VERSION@)
+Suggests: python-qt4, ffmpeg, mencoder
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/
