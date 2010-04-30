@@ -70,7 +70,8 @@ fi
 . /lib/lsb/init-functions
 
 # Afanasy host name:
-if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=`hostname -s`; fi
+#if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=`hostname -s`; fi
+if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=`hostname`; fi
 
 #
 # PID file:
