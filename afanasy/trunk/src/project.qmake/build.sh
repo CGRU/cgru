@@ -6,6 +6,7 @@ export QMAKE=
 # Setup Python:
 export AF_PYTHON_INC="`python-config --cflags` -fPIC"
 export AF_PYTHON_LIB="`python-config --ldflags`"
+# CentOS with Python2.5: -lrt -lz
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
