@@ -59,8 +59,11 @@ This command will create him. Next scripts use this user name.
 <p>
 There are some <kbd>bash</kbd> scripts in <code>cgru/afanasy/init</code> directory. They can help you to setup automatic server and render launch. You can manually link <kbd>afserver</kbd> or <kbd>afrender</kbd> script in your startup scripts location  or use <kbd>initlink.sh</kbd> utility to do it.
 </p>
-<code># ./initlinks.sh afserver</code><br/>
-<code># ./initlinks.sh afrender</code><br/>
+<code># ./initlinks.sh [options] afserver</code><br/>
+<code># ./initlinks.sh [options] afrender</code><br/>
+<p>
+You can launch this script with no arguments to output help.
+</p>
 <p>
 This command create a link in <kbd>/etc/init.d</kbd> directory to a file, which located in current directory and name provided in first argument. Put links in <kbd>/etc/rc?.d</kbd> directories to provide service starting and stopping. See script file for details.
 </p>
@@ -74,6 +77,7 @@ After this afanasy services will start on machine boot and stop on shutdown auto
 </li>
 <p>
 If you starting scripts as <kbd>root</kbd> user, applications will be launched by <kbd>renderer</kbd> user.
+You can customize 'non root' username in <kbd>cgru/afanasy/nonrootuser</kbd> file.
 </p>
 <p>
 This starting scripts also provide log rotating. Logs and pid files are stored in <kbd>/var/tmp/afanasy</kbd> directory.

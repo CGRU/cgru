@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Afanasy</title>
+<title>Afanasy Features</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,393 +26,231 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">Afanasy</h2>
+<h2 align="center">Afanasy - Free Render Farm Manager Features</h2>
 <hr />
 
-<h3>General Configuration:</h3>
+<table><tr><td valign="top">
+
+<h4>Render computer resources monitoring.</h4>
 <p>
-Afanasy configuration stored in XML files. It reads them on launch.
+You can monitor CPU usage: user, nice, system, I/O wait and load average. Memory, swap and HDD usage. Network traffic. This can help you to diagnose what slows rendering process. Especially swap, I/O wait and network traffic.
+</p>
+
+<h4>Multiply Tasks Renders (clients, slaves, hosts)</h4>
+<p>
+Render can run several tasks at the same time.<br/>
 </p><p>
-Default configuration:<br/>
-<kbd>cgru/afanasy/config_default.xml</kbd><br/>
-Configuration overrides:<br/>
-<kbd>cgru/afanasy/config.xml</kbd><br/>
-Per user turning:<br/>
-<kbd>~/.afanasy/config.xml</kbd><br/>
-Last values, which overrides even users values and which initialization will not be echoed by <code>afcmd</code> (for passwords):<br/>
-<kbd>cgru/afanasy/config_shadow.xml</kbd><br/>
-It reads them in specified sequence, each time overriding previous variables value.<br/>
+Useful for "powerful" hosts with several CPUs. Render and Task has a capacity attribute, each task checks available capacity on render, and if its enough, task launches and take its capacity value from render.<br/>
+</p>
+<h5>Tasks can variate capacity 'on-the-fly'</h5>
+Capacity variation can be described through its minimum and maximum coefficients. If task with 1000 capacity units runs on render with 4000 free capacity, task can take capacity coefficient 4. This coefficient can be caught in task command line (so Mantra can be launched 'mantra -j 4 ...', or 3000 capacity can be used by one 'houdini' task, for example to generate something, which use only one CPU, and 'mantra -j 3'). Hosts capacity values described in 'Farm Setup' ('xml' file).
+</p>
+
+<h4>Dependencies</h4>
+<p>
+Job can depends on other job(s) of the same user (<i>depend mask</i>) or on some job(s) from any user (<i>global depend mask</i>). Job will wait other jobs to be done matching this mask regular expression (Afanasy uses Qt Regular Expressions, they are Perl-like).
+</p><p>
+Job Block can wait other block(s) to be done (<i>depend mask</i>). Block tasks can wait other block tasks to be done (<i>tasks depend mask</i>).
+</p>
+
+<h4>Errors Solving</h4>
+<p>
+Job Blocks Errors Hosts List - block store host names where error was occurred and number of errors for each host. If this number greater it's limit, block will 'avoid' this host (not to run tasks on render with such hostname).<br/>
+</p><p>
+Blocks Tasks Errors Hosts List - the same as described above, but for each task.<br/>
+</p><p>
+Tasks Auto Retry - maximum number of errors to retry task automatically.
+</p><p>
+Tasks Maximum Run Time - the time after running considered as an error task.
+</p><p>
+User define this default values for his new jobs and can to override them in each job, watch and reset any error hosts list.
+</p>
+
+<h4>Priorities</h4>
+<p>
+User priority - user with greater priority can get more hosts.
+</p><p>
+Job priority - to simple sort user jobs queue.
+</p>
+
+<h4>Hosts Masks</h4>
+<p>
+User, job and block has a mask of host names to be able to run on and exclude mask for hosts to avoid.
+</p>
+
+<h4>Maximum Hosts</h4>
+<p>
+User, job and block has maximum number of hosts - no new hosts will be available above this limit.
+</p>
+
+<h4>Python API</h4>
+<p>
+You can create and send job using python.
+</p><p>
+Setup services and parsers through python classes inherited from base service and parser.<br/>
+</p>
+
+<h4>Services and Parsers</h4>
+<p>
+Service - 'block tasks type', for example: 'hbatch', 'mantra', 'prman', 'nuke', 'maya'.<br/>
 </p>
 <p>
-You can copy <kbd>cgru/afanasy/config_default.xml</kbd> file in <kbd>cgru/afanasy/config.xml</kbd> and remove elements which default values you want to keep. You need at least to override <code>servername</code> (if you want other computers to find it). Override <code>cmdprefix</code> to empty value to use default software (or you own project setup). Generate keys using <code>afcmd passwd</code> command for your own passwords and put them into <kbd>cgru/afanasy/config_shadow.xml</kbd>.
+Service setups a default task output parser type (which can be overridden later). Services are python classes. They all inherits a base 'service' class. Service class describes command line manipulations, such as task capacity (how to specify how much CPUs to use ('mantra - j @AF_CAPACITY@')).
 </p>
-
-<h3><a name="Configuration"/>Configuration Elements:</h3>
-
-<h4><a name="ConfGeneral"/>General:</h4>
-<ul>
-<li><p>
-<code>timeformat</code> = ddd dMMM hh:mm.ss<br/>
-Time format for afanasy logs. See <a href="http://doc.trolltech.com/qdatetime.html#toString">QDateTime::toString</a> for time format documentation.
-</p></li>
-<li><p>
-<code>filenamesizemax</code> = 250<br/>
-Afanasy generates some file names automatically, to store task output for example. If filename length for some reasons will be grater this value, it will be truncated to maximum.<br>
-( tasks outputs storing filename generating policy prevents same filenames, truncating will never produce the same file name )
-</p></li>
-<li><p>
-<code>cmdprefix</code> = ""<br/>
-Tasks commands prefix. Set it to './' to launch 'myrender' not from path but from current task directory where 'myrender' can be reconfigured individually for the asset.
-</p></li>
-<li><p>
-<code>path_client</code> = c:/cg/tools;c:/projects<br/>
-<code>path_server</code> = /cg/tools;/cg/projects<br/>
-Remap path from client to server. Path list separated with ';'. Linux server has another path than MS Windows workstations. May be your Linux server has another path than even Linux workstations.
-</p></li>
-<li><p>
-<code>priority</code> = 99<br/>
-Default priority for users and jobs. User with no administrative rights can't set priority greater than this value.
-</p></li>
-<li><p>
-<code>maxhosts</code> = -1<br/>
-Default maximum hosts number for users and jobs. Value '-1' means no hosts number limit.
-</p></li>
-<li><p>
-<code>hostsmask</code> = ""<br/>
-Default hosts mask number for users and jobs. Empty means that users and jobs can run on any host. Afanasy uses <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).
-</p></li>
-</ul>
-
-<h4><a name="ConfClientServer"/>Client &amp; Server:</h4>
-<ul>
-<li><p>
-<code>servername</code> = localhost<br/>
-Command for render to execute another render or to restart.
-</p></li>
-<li><p>
-<code>serverport</code> = 51000<br/>
-Port to listen to server.
-</p></li>
-<li><p>
-<code>clientport</code> = 51001<br/>
-First port to listen to clients. Next client launched on the host will listen the next port.
-</p></li>
-<li><p>
-<code>srv_so_rcvtimeo_sec</code> = 2<br/>
-Set socket maximum time to wait for an input operation to complete (see <i>man setsockopt</i>).
-</p></li>
-<li><p>
-<code>srv_so_sndtimeo_sec</code> = 2<br/>
-Set socket maximum time to wait for an output operation to complete (see <i>man setsockopt</i>).
-</p></li>
-<li><p>
-<code>tempdirectory</code> = /var/tmp/afanasy/<br/>
-Directory for sever to store logs and tasks outputs.
-</p></li>
-</ul>
-
-<h4><a name="ConfJob"/>Job:</h4>
-<ul>
-<li><p>
-<code>task_default_capacity</code> = 1000<br/>
-Default tasks capacity value, if not set manually on job creation or running job GUI.
-</p></li>
-<li><p>
-<code>task_update_timeout</code> = 300 (seconds)<br/>
-If task status or percentage has not been updated for this period it's considered as an error.
-</p></li>
-<li><p>
-<code>job_logs_rotate</code> = 10<br/>
-Server store logs of a jobs with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
-</p></li>
-</ul>
-
-<h4><a name="ConfRender"/>Render:</h4>
-<ul>
-<li><p>
-<code>render_default_capacity</code> = 1000<br/>
-Default render capacity value, if not set in farm config.
-</p></li>
-<li><p>
-<code>render_default_maxtasks</code> = 5<br/>
-Maximum allowed simultaneously running tasks on render, if not set in farm config.
-</p></li>
-<li><p>
-<code>render_exec</code> = afrender<br/>
-Command for render to execute another render or to restart.
-</p></li>
-<li><p>
-<code>render_nice</code> = 10<br/>
-Renice task command process on render.
-</p></li>
-<li><p>
-<code>render_update_sec</code> = 5 (seconds)<br/>
-Render resources update interval.
-</p></li>
-<li><p>
-<code>render_updatetaskperiod</code> = 1 (seconds)<br/>
-Period to render to update task state or percentage (even if there is no parser).
-</p></li>
-<li><p>
-<code>render_zombietime</code> = 60 (seconds)<br/>
-Time to server to delete render if there is no update (resources usage) for this period.
-</p></li>
-<li><p>
-<code>render_connectretries</code> = 3<br/>
-Connection fails times to consider to render that there is no connection to server.
-</p></li>
-<li><p>
-<code>render_waitforconnected</code> = 15000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-<code>render_waitforreadyread</code> = 15000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>render_waitforbyteswritten</code> = 15000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>render_logs_linesmax</code> = 100<br/>
-Server truncates log above this limit.
-</p></li>
-<li><p>
-<code>render_logs_rotate</code> = 10<br/>
-Server store logs of renders with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
-</p></li>
-</ul>
-
-
-<h4><a name="ConfUser"/>User:</h4>
-<ul>
-<li><p>
-<code>errors_avoid_host</code> = 3<br/>
-<a href="user.html#ErrorsAvoidHost">Errors Avoid Host</a> parameter for new user.
-</p></li>
-<li><p>
-<code>task_error_retries</code> = 3<br/>
-<a href="user.html#ErrorRetries">Error Retries</a> parameter for new user.
-</p></li>
-<li><p>
-<code>task_error_same_host</code> = 3<br/>
-<a href="user.html#ErrorsTaskSameHost">Errors Task Same Host</a> parameter for new user.
-</p></li>
-<li><p>
-<code>user_zombietime</code> = 2 (seconds)<br/>
-Time to temporary (not registered) user to have no jobs and to be deleted from server.
-</p></li>
-<li><p>
-<code>user_logs_linesmax</code> = 100<br/>
-Server truncates log above this limit.
-</p></li>
-<li><p>
-<code>user_logs_rotate</code> = 10<br/>
-Server store logs of users with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
-</p></li>
-</ul>
-
-<h4><a name="ConfWatch"/>Watch:</h4>
-<ul>
-<li><p>
-<code>pswd_visor</code> = 1832116180fdc61b64fd978401e462e9<br/>
-Visor rights password. You can use <kbd>afcmd passwd [string]</kbd> to get password digits key.
-</p></li>
-<li><p>
-<code>pswd_visor</code> = 73bcaaa458bff0d27989ed331b68b64d<br/>
-GOD rights password.<br/>
-(This default values are very common passwords which exists in any MD5 database)<br/>
-Password length must be <b>five characters</b>.
-</p></li>
-<li><p>
-<code>previewcmds</code> = kuickshow;djv_view<br/>
-Programs to view frames. 'kuickshow' - is a common and very light KDE viewer which supports various formats. 'djv_view' - good sequence (and movies) viewer.
-</p></li>
-<li><p>
-<code>watch_font_family</code> = SansSerif<br/>
-GUI font.
-</p></li>
-<li><p>
-<code>watch_font_sizename</code> = 8<br/>
-Font size for nodes names and important information.
-</p></li>
-<li><p>
-<code>watch_font_sizeinfo</code> = 7<br/>
-Font size for nodes common information.
-</p></li>
-<li><p>
-<code>watch_font_sizemin</code> = 5<br/>
-Smallest font for nodes state.
-</p></li>
-<li><p>
-<code>watch_connectretries</code> = 3<br/>
-Connection fails times to consider to Watch that there is no connection to server.
-</p></li>
-<li><p>
-<code>watch_waitforconnected</code> = 8000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-<code>watch_waitforreadyread</code> = 8000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>watch_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>watch_refreshinterval</code> = 5 (seconds)<br/>
-Force update some widgets painting, even if there is no information change ( they can display a timer, for example).
-</p></li>
-</ul>
-
-<h4><a name="ConfMonitor"/>Monitor:</h4>
-<ul>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_updateperiod</code> = 10 (seconds)<br/>
-Period to send dummy message to server to keep alive.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_zombietime</code> = 40 (seconds)<br/>
-Time to server to delete monitor if there is no update (even no dummy message) for this period.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_connectretries</code> = 3<br/>
-Connection fails times to consider to Monitor that there is no connection to server.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_waitforconnected</code> = 8000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_waitforreadyread</code> = 8000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-</ul>
-
-<h4><a name="ConfTalk"/>Talk:</h4>
-<ul>
-<li><p>
-<code>talk_updateperiod</code> = 5 (seconds)<br/>
-Period to send dummy message to server to keep alive.
-</p></li>
-<li><p>
-<code>talk_zombietime</code> = 18 (seconds)<br/>
-Time to server to delete monitor if there is no update (even no dummy message) for this period.
-</p></li>
-<li><p>
-<code>talk_connectretries</code> = 3<br/>
-Connection fails times to consider to Talk that there is no connection to server.
-</p></li>
-<li><p>
-<code>talk_waitforconnected</code> = 8000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-<code>talk_waitforreadyread</code> = 8000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>talk_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-</ul>
-
-<h4><a name="ConfDatabase"/>Database:</h4>
-Try to keep this default values.
-<ul>
-<li><p>
-<code>db_type</code> = QPSQL<br/>
-Database type. You can query available database drivers by <kbd>afcmd db_drivers</kbd> command.
-</p></li>
-<li><p>
-<code>db_hostname</code> = localhost<br/>
-Host to connect to database.
-</p></li>
-<li><p>
-<code>db_databasename</code> = afanasy<br/>
-Database name.
-</p></li>
-<li><p>
-<code>db_username</code> = afadmin<br/>
-Database user name.
-</p></li>
-<li><p>
-<code>db_password</code> = AfPassword<br/>
-Database password.
-</p></li>
-<li><p>
-<code>db_stringquotes</code> = $$<br/>
-String quotes in statements. With default quotes ( " or ' ) you can't operate strings which contains such characters. Check whether your database supports it.
-</p></li>
-<li><p>
-<code>db_stringnamelen</code> = 512<br/>
-Names length limit. It is a name of job, block, task, user, host e.t.c.
-</p></li>
-<li><p>
-<code>db_stringexprlen</code> = 4096<br/>
-Expressions length limit. It is an expression of hosts mask, depend mask and command, working directory.
-</p></li>
-</ul>
-You can check database connection by <kbd>afcmd db_check</kbd> command.
-
-<h3><a name="Farm"/>Farm Setup:</h3>
 <p>
-After general configuration, afanasy try to load <kbd>cgru/afanasy/farm.xml</kbd> to setup a farm. If this file does not exists it load <kbd>cgru/afanasy/farm_default.xml</kbd> which setup default farm and provided as an example to copy and modify to describe your hosts.
+Parser - read task output to calculate running progress. Parsers are python classes and can be combined (multiply inheritance), for example: 'hbatch_mantra' - inherits 'hbatch' and 'mantra' parsers to listen to tasks when Houdini generates a files for mantra, such parser listen for frames switching (when several frames per render set) and calculates valid percentage.<br/>
 </p>
-<ul>
-<li><p>
-<code>pattern</code> name="<i>pattern name</i>"<br/>
-</p></li>
-<li><p>
-<code>mask</code><br/>
-Hosts which names matches this mask will take this pattern settings.
-</p></li>
-<li><p>
-<code>description</code><br/>
-Does not mean anything for sever, job or render host, only for humans.
-</p></li>
-<li><p>
-<code>os</code><br/>
-Operating system name. Can be matched by jobs.
-</p></li>
-<li><p>
-<code>capacity</code><br/>
-Running Tasks maximum capacity value.
-</p></li>
-<li><p>
-<code>maxtasks</code><br/>
-Maximum number of simultaneously running tasks.
-</p></li>
-<li><p>
-<code>power</code><br/>
-Some number which minimum can be needed by jobs.
-</p></li>
-<li><p>
-<code>properties</code><br/>
-Some string which matching can be needed by jobs.
-</p></li>
-<li><p>
-<code>service</code> name="<i>type</i>" count="<i>limit number</i>"<br/>
-List of names and counts of available services.
-</p></li>
-</ul>
-Host will take parameters from last matched pattern. So first pattern mask in default farm is ".*" - means that host with any name will take some default settings.
 
-<h3>Main server launching command:</h3>
-<p><code>$ afserver</code></p>
-<p>Server can re-read configuration files "on-the-fly", without restart or even stop jobs solving and running tasks. Use <kbd>afcmd cload</kbd> command to ask server to reload configuration and <kbd>afcmd fload</kbd> to reload farm setup. But sever will not change listen port or database connection setup without restart. Client can't reload configuration "on-the-fly", it needs restart to reconfigure.
+<h4>Job - Block - Task</h4>
+<p>
+Job consists of blocks, which produce tasks. There are two types of blocks <i>numeric</i> and not. Numeric block don't store tasks data, it generates tasks 'on-the-fly' by some rules. Not numeric blocks contains data for each task. Task inherits most attributes from block (for example all block tasks has the same working directory). But some other attributes individual (commands for example).
 </p>
+<h5>1 000 000 Tasks Job !</h5>
+As Tasks are generated by job blocks "on demand", Afanasy (and Server and GUI) can handle <i>numeric</i> blocks with huge tasks number.
+</p>
+
+<h4>Farm setup</h4>
+<p>
+Map hosts names and their abilities through patterns described in XML file. You can describe job and block '<i>need</i>' properties to be able to run only on hosts which satisfy this needs (OS, free memory etc.). Server can reload this file (and reconfigure itself) "on-the-fly", without restart and keep tasks running.
+</p>
+
+<h4>Watch - minimalistic GUI to afanasy</h4>
+<p>
+Watch - afanasy monitor. It can be in three modes - USER, VISOR and GOD.<br/>
+<i>USER</i> ( common mode ) - user can change any his and any his job parameter. He can manipulate render host which was registered with it's user name or if it contains user computer name<br/>
+<i>VISOR</i> ( super user mode ) - can do same as user but he change or remove job of any user.<br/>
+<i>GOD</i> ( super user mode ) - can do anything. Change any parameter of any user, job or host. Add or delete users. Start, stop, restart any render host.<br/>
+To switch user mode you need to type password in active Watch window (you do not need to relogin to switch between modes). To reset super user mode you can type password again.
+</p>
+
+<h4>Web Visor</h4>
+<p>
+Web interface to afanasy database to show current state tables or draw history usage statistics diagrams.
+</p><p>
+All calculations and database queries are on the server side, simple HTML text and PNG images provided to client. So you need no libraries or plug-ins for it, any browser will be enough.
+</p>
+
+<h4>SQL Database Connection</h4>
+<p>
+Afanasy server can connect SQL database.
+It process it through Qt classes, you can query available SQL drivers for your system by <code>afcmd</code> command line utility.
+Postgre SQL, MySQL and SQLite are available for most common systems. It can be chosen in configuration file.
+Postgre SQL (QPSQL) is set as default. <br/>
+Afanasy stores jobs and users information in database. It get this information back on start.
+So you can shut down afanasy, and it will restore it's state on start again.
+Also you can type any SQL query to get some afanasy information yourself.
+</p>
+
+<h4>Command Line Interface</h4>
+<p>
+Afanasy has a command line interface for various purposes. It can connect to Afanasy server from remote Linux machine. You can set some server parameter "on-the-fly". Change some user, job and host attributes. Query users, jobs, hosts attributes and traffic statistics.
+</p>
+<h4>Job Example</h4>
+
+<pre>
+
+   #!/usr/bin/env python
+   import af
+
+   job = af.Job('somejob')
+   job.setDependMask('another_job_name(s)')
+   job.setPriority( 75)
+   job.setMaxHosts( 15)
+   job.setHostsMask('r0.*')
+   job.setNeedOS('linux')
+
+   block_1 = job.addBlock('final', 'nuke')
+   block_1.setWorkingDirectory('/cg/projects/test/nuke')
+   block_1.setCommand('nuke -i -X WriteDPX -x scene.nk.tmp.nk %1,%2')
+   block_1.setCommandView('dpx/img.%04d.dpx')
+   block_1.setNumeric( 1, 100, 5)
+   block_1.setTasksDependMask('keying')
+
+   block_2 = job.addBlock('keying', 'nuke')
+   block_2.setWorkingDirectory('/cg/projects/test/nuke')
+   block_2.setCommand('nuke -i -X WriteKey -x scene.nk.tmp.nk %1,%2')
+   block_2.setCommandView('key/key.%04d.exr')
+   block_2.setNumeric( 1, 100, 5)
+   block_2.setNeedMemory( 2048)
+
+   # Remove temporary render scene (if needed).
+   job.setCmdPost('rm /cg/projects/test/nuke/scene.nk.tmp.nk')
+
+   # Start job paused (if needed).
+   job.offLine()
+
+   job.send()
+
+</pre>
+
+<p>
+You can write any custom job directly in python, or use some GUI to generate jobs. Use some already written job generators (see <i>'Software Integration'</i> chapter) or write your own.
+</p>
+
+<h4>Farm Patterns Example</h4>
+<pre>
+
+   &lt;farm&gt;
+      &lt;pattern name="Some Host"&gt;
+         &lt;mask&gt;.*&lt;/mask&gt;
+         &lt;description&gt;Unrecognized machine&lt;/description&gt;
+         &lt;capacity&gt;1200&lt;/capacity&gt;
+         &lt;maxtasks&gt;2&lt;/maxtasks&gt;
+         &lt;power&gt;100&lt;/power&gt;
+         &lt;service name="generic" /&gt;
+      &lt;/pattern&gt;
+      &lt;pattern name="Render Host"&gt;
+         &lt;mask&gt;r.*&lt;/mask&gt;
+         &lt;description&gt;Some render machine&lt;/description&gt;
+         &lt;os&gt;linux&lt;/os&gt;
+         &lt;capacity&gt;2400&lt;/capacity&gt;
+         &lt;maxtasks&gt;4&lt;/maxtasks&gt;
+         &lt;power&gt;1000&lt;/power&gt;
+         &lt;properties&gt;intel nvidiagpu&lt;/properties&gt;
+         &lt;service name="generic" /&gt;
+         &lt;service name="nuke" /&gt;
+         &lt;service name="hbatch" /&gt;
+         &lt;service name="prman" /&gt;
+         &lt;service name="mantra" /&gt;
+         &lt;service name="hbatch_prman" /&gt;
+         &lt;service name="hbatch_mantra" /&gt;
+         &lt;service name="maya" /&gt;
+      &lt;/pattern&gt;
+   &lt;/farm&gt;
+
+</pre>
+<p>
+When some machine registers on server, it finds last pattern with mask that match it's hostname. So '.*' first mask put at the top to give any machine some properties.
+</p>
+
+<h4>See <a href="index.html">full documentation</a> for details.</h4>
+
+</td><td align="center" valign="middle">
+<p>
+<small>
+Watch Renders<br/>
+<img hspace="10" vspace="10" src="images/watch/renders.png" alt="watch/renders.png"/><br/>
+<br/><br/>
+Watch Jobs<br/>
+<img hspace="10" vspace="10" src="images/watch/jobs.png" alt="watch/jobs.png"/><br/>
+<br/><br/>
+1 000 000 Tasks Job:<br/>
+<img hspace="10" vspace="10" src="images/watch/million_job.png" alt="watch/million_job.png"/><br/>
+<br/><br/>
+Watch Job Tasks<br/>
+<img hspace="10" vspace="10" src="images/watch/job_tasks_block.png" alt="watch/job_tasks_block.png"/><br/>
+<br/><br/>
+Watch Users<br/>
+<img hspace="10" vspace="10" src="images/watch/users.png" alt="watch/users.png"/><br/>
+<br/><br/>
+Web Visor Statistics Chart - Tasks Quantity / Task Type<br/>
+<img hspace="10" vspace="10" width="400" height="300" src="images/webvisor/tasksquantity.png" alt="webvisor/tasksquantity.png"/><br/>
+<br/><br/>
+Web Visor Statistics Chart - Jobs Quantity / Job Name<br/>
+<img hspace="10" vspace="10" width="400" height="300"  src="images/webvisor/jobsquantity.png" alt="webvisor/jobsquantity.png"/><br/>
+</small>
+</p>
+</td></tr></table>
 
 <!--FOOTER-->
 <br/>
