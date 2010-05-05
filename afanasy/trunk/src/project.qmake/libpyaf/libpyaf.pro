@@ -13,6 +13,7 @@ DIR = ../../libpyaf
 LIBS += -L../libafapi -lafapi
 LIBS += -L../libafanasy -lafanasy
 LIBS += $$(AF_PYTHON_LIB)
+LIBS += $$(AF_PYTHON_MODULE_EXTRA_LIBS)
 
 SOURCES += $$system(ls $$DIR/*.cpp)
 HEADERS += $$system(ls $$DIR/*.h)
