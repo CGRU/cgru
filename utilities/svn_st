@@ -24,8 +24,7 @@ egExpr="
 |afanasy/icons$\
 |/nonrootuser$\
 |plugins/maya/mll\
-|utilities/fbx2clip/fbxsdk$\
-|utilities/release/debpackages$"
+|utilities/release/output$"
 
 for str in $*; do
    egExpr="${egExpr}|${str}"
