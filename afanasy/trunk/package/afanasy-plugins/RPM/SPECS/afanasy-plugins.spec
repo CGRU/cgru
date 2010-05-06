@@ -31,3 +31,14 @@ done
 /opt
 
 %clean
+
+%post
+echo "Afanasy plugins POST INSTALL"
+[ -d /opt/cgru/afanasy/plugins ] && find /opt/cgru/afanasy/plugins -type d -exec chmod a+rwx {} \;
+exit 0
+
+%preun
+echo "Afanasy plugins PRE REMOVE:"
+pkill afcmd || true
+[ -d /opt/cgru/afanasy/plugins ] && find /opt/cgru/afanasy/plugins -type f -name *.pyc -exec rm -vf {} \;
+exit 0

@@ -5,7 +5,7 @@ echo "Afanasy common PRE REMOVE:"
 pkill afcmd || true
 
 if [ -d /opt/cgru/afanasy/python ]; then
-   find /opt/cgru/afanasy/python -type f -name *.pyc -exec rm -f {} \;
+   find /opt/cgru/afanasy/python -type f -name *.pyc -exec rm -vf {} \;
 fi
 
 exit 0

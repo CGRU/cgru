@@ -39,5 +39,5 @@ exit 0
 %preun
 echo "Afanasy common PRE REMOVE:"
 pkill afcmd || true
-[ -d /opt/cgru/afanasy/python ] && find /opt/cgru/afanasy/python -type f -name *.pyc -exec rm -f {} \;
+[ -d /opt/cgru/afanasy/python ] && find /opt/cgru/afanasy/python -type f -name *.pyc -exec rm -vf {} \;
 exit 0

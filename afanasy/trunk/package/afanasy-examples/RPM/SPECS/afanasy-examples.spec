@@ -31,3 +31,8 @@ done
 /opt
 
 %clean
+
+%post
+echo "Afanasy examples POST INSTALL"
+[ -d /opt/cgru/afanasy/examples ] && find /opt/cgru/afanasy/examples -type d -exec chmod a+rwx {} \;
+exit 0

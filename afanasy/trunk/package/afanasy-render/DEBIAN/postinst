@@ -2,7 +2,7 @@
 
 echo "Afanasy render POST INSTALL"
 
-id renderer || useradd renderer
+id renderer || useradd renderer --create-home
 
 /opt/cgru/afanasy/init/initlinks.sh u add afrender || true
 
