@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "CGRU plugins PRE REMOVE:"
+
+pkill afcmd || true
+
+if [ -d /opt/cgru/plugins ]; then
+   find /opt/cgru/plugins -type f -name *.pyc -exec rm -vf {} \;
+fi
+
+exit 0

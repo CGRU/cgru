@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "CGRU plugins POST INSTALL"
+
+if [ -d /opt/cgru/plugins ]; then
+   find /opt/cgru/plugins -type d -exec chmod a+rwx {} \;
+fi
+
+exit 0

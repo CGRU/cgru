@@ -32,3 +32,14 @@ done
 /usr
 
 %clean
+
+%post
+echo "CGRU plugins POST INSTALL"
+[ -d /opt/cgru/plugins ] && find /opt/cgru/plugins -type d -exec chmod a+rwx {} \;
+exit 0
+
+%preun
+echo "CGRU plugins PRE REMOVE:"
+pkill afcmd || true
+[ -d /opt/cgru/plugins ] && find /opt/cgru/plugins -type f -name *.pyc -exec rm -vf {} \;
+exit 0

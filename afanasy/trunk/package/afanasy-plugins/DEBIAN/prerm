@@ -1,6 +1,6 @@
 #!/bin/bash
 
-echo "Afanasy common PRE REMOVE:"
+echo "Afanasy plugins PRE REMOVE:"
 
 pkill afcmd || true
 
