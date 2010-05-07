@@ -18,7 +18,6 @@
 link=$0
 # Check whether executed file is a link:
 if [ ! -L $link ]; then
-#   log_failure_msg "You should run a symbolic link named like application with absolute path to afdaemon script."
    echo "You should run a symbolic link named like application with absolute path to afdaemon script."
    exit 1
 fi
@@ -58,7 +57,6 @@ tmpdir=/var/tmp/afanasy
 if [ ! -d "$tmpdir" ]; then
    mkdir $tmpdir
    if [ ! -d "$tmpdir" ]; then
-#      log_failure_msg "temp directory was not created"
       echo "temp directory was not created"
       exit 1
    else
@@ -66,11 +64,7 @@ if [ ! -d "$tmpdir" ]; then
    fi
 fi
 
-# Get lsb functions
-. /lib/lsb/init-functions
-
 # Afanasy host name:
-#if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=`hostname -s`; fi
 if [ -z $AF_HOSTNAME ]; then AF_HOSTNAME=`hostname`; fi
 
 #
@@ -103,7 +97,6 @@ execfile="$afroot/bin/$afapp"
 startcmd="$afroot/init/afstart.sh $execfile $logfile"
 
 function start(){
-#   log_begin_msg "Starting $afapp"
    echo "Starting $afapp"
    if [ -f $pidfile ]; then
       kill `cat $pidfile`
@@ -117,21 +110,17 @@ function start(){
       $startcmd
    fi
    if [ $? != 0 ]; then
-#      log_failure_msg "Can't execute process."
       echo "Can't execute process."
       exit 1
    fi
    if [ ! -f $pidfile ]; then
-#      log_failure_msg "Pid file was not created."
       echo "Pid file was not created."
       exit 1
    fi
-#   log_end_msg $?
    echo $?
 }
 
 function stop(){
-#   log_begin_msg "Stopping $afapp"
    echo "Stopping $afapp"
    if [ ! -f $pidfile ]; then
       log_failure_msg "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
@@ -139,16 +128,13 @@ function stop(){
    fi
    kill `cat $pidfile`
    if [ $? != 0 ]; then
-#      log_failure_msg "Can't kill process."
       echo "Can't kill process."
       exit 1
    fi
    rm -f $pidfile
    if [ -f $pidfile ]; then
-#      log_failure_msg "Can't delete pid file."
       echo "Can't delete pid file."
    fi
-#   log_end_msg $?
    echo $?
 }
 
