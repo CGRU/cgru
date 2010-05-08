@@ -41,13 +41,6 @@
 </li>
 <li><h4>Download</h4>
    <code>
-   $ su<br/>
-   # mkdir /cg<br/>
-   # chown a+w /cg<br/>
-   # exit<br/>
-   $ cd /cg<br/>
-   $ mkdir tools<br/>
-   $ cd tools<br/>
    $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
    </code>
 </li>
@@ -67,11 +60,15 @@ You can install database using package manager, and its the best way. But if Qt 
 <h5>Database Setup</h5>
 <ul>
    <li>
-      Edit Postgre SQL client authentication configuration file<br/>
-      <kbd>/usr/local/pgsql/data/pg_hba.conf</kbd><br/>
+      Edit Postgre SQL client authentication configuration file <kbd>pg_hba.conf</kbd>.<br/>
+      Its location depends on linux distributive. For example:<br/>
+      Debian, Ubuntu: <kbd>/etc/postgresql/ [version] /main/pg_hba.conf</kbd><br/>
+      CentOS, Fedora, openSUSE: <kbd>/var/lib/pgsql/data/pg_hba.conf</kbd><br/>
+      <i>make install</i>:<kbd>/usr/local/pgsql/data/pg_hba.conf</kbd><br/>
       Add this line<br/>
       <kbd>local afanasy afadmin password</kbd><br/>
-      Read comments in this file to know what does it mean.
+      Read comments in this file to know what does it mean.<br/>
+      (If problems with authentication try <kbd>trust</kbd> for all methods.)
    </li>
    <li>
       Restart database<br/>
@@ -90,7 +87,7 @@ You can install database using package manager, and its the best way. But if Qt 
 <ul>
    <li>
       Go into CGRU commands directory:<br />
-      <code>$ cd cgru/bin</code><br />
+      <code>$ cd cgru/afanasy/bin</code><br />
    </li>
    <li>
       Get a list of available QT database drivers:<br />

@@ -45,8 +45,8 @@ fi
 # Path to save 'Untitled' scene to render, if not set 'tmp' name in current folder will be used
 # export NUKE_AF_TMPSCENE="compositing/tmp"
 
-NUKE_LOCATION="/cg/soft/Nuke5.2"
-export NUKE_EXEC="${NUKE_LOCATION}/Nuke5.2"
+NUKE_LOCATION="/cg/soft/Nuke6.0"
+export NUKE_EXEC="${NUKE_LOCATION}/Nuke6.0"
 
 # to launch commands from current directory:
 export AF_CMD_PREFIX="./"
