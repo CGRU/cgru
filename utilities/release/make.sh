@@ -1,48 +1,40 @@
 #!/bin/bash
 
-# CGRU location:
+# Version:
+packsver="1.1.0"
+
+# Location:
 cgruRoot="../.."
 
+# Afanasy branch:
+afanasy="trunk"
+
+# Disrtibutive variables:
+source ./distribution.sh
+[ -z "${DISTRIBUTIVE}" ] && exit 1
+
+# Function to print usage and exit:
 function usage(){
    if [ -n "$ErrorMessage" ]; then
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "   `basename $0` AFANASY_BRANCH DISTRVARS_FILE VERSION_NUMBER"
+   echo "   `basename $0` afanasy_branch=\"${afanasy}\" [version_number=\"${packsver}\"]"
    echo "Example:"
-   echo "   `basename $0` trunk vars_ubuntu9.10_amd64.sh 1.1.0"
+   echo "   `basename $0` ${afanasy} ${packsver}"
    exit
 }
 
 # Afanasy location:
-afanasy=$1
-if [ -z $afanasy ]; then
-   ErrorMessage="Afanasy branch not specitied."
-   usage
-fi
+[ ! -z "$1" ] && afanasy=$1
 afanasy="afanasy/${afanasy}"
 if [ ! -d $cgruRoot/$afanasy ]; then
    ErrorMessage="Afanasy directory '$cgruRoot/$afanasy' does not exists."
    usage
 fi
 
-# Disrtibutive variables:
-varsfile=$2
-if [ -z $varsfile ]; then
-   ErrorMessage="Disrtibutive variables file not specitied."
-   usage
-fi
-if [ ! -f $varsfile ]; then
-   ErrorMessage="Disrtibutive variables file '$varsfile' does not exists."
-   usage
-fi
-
 # Packages version number:
-packsver=$3
-if [ -z $packsver ]; then
-   ErrorMessage="Packages version number is not set."
-   usage
-fi
+[ ! -z "$2" ] && packsver=$2
 export VERSION_NUMBER=$packsver
 
 # Temporary directory
@@ -105,7 +97,6 @@ fi
 # Creating Packages:
 installdir="/opt/cgru"
 
-source $varsfile
 if [ -z "$PACKAGE_MANAGER" ]; then
    echo "Package manager is not set (PACKAGE_MANAGER variable is empty)."
    exit 1

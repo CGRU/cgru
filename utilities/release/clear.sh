@@ -1,3 +1,3 @@
 #!/bin/bash
 
-su -c "rm -r debpackages; rm -r tmp;"
+su -c "rm -r output; rm -r tmp;"
