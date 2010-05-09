@@ -49,6 +49,7 @@ function debianArch(){
 
 # Common for RedHat distributives:
 function redhatArch(){
+   export VERSION_NAME="${DISTRIBUTIVE}-${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
    export PACKAGE_MANAGER="RPM"
    export RELEASE_NUMBER="0"
 }

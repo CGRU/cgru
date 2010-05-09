@@ -178,4 +178,16 @@ for packages_dir in $packages_dirs; do
    done
 done
 
+# Create archive:
+curdir=$PWD
+cd "${packages_output_dir}"
+archive_name="cgru.${packsver}.${VERSION_NAME}.tar.gz"
+tar -cvzf "${archive_name}" *
+mv "${archive_name}" "${curdir}/"
+cd "${curdir}"
+
+# Copmleted.
+chmod a+rwx "${archive_name}"
+chmod -R a+rwx "${tmpdir}"
+chmod -R a+rwx "${packages_output_dir}"
 echo "Completed"; exit 0
