@@ -10,7 +10,6 @@ if [ ! -f "${issuefile}" ]; then
    echo "File '${issuefile}' not founded. Can't detect distribution."
    exit 1
 fi
-cat "${issuefile}"
 
 # Search issue file:
 for distr in $knowndistrs; do
