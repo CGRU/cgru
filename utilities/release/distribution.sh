@@ -5,15 +5,17 @@ echo "Detecting linux distribution..."
 knowndistrs="Debian Ubuntu CentOS Fedora openSUSE"
 
 # Load issue file:
-issue="/etc/issue"
-if [ ! -f "${issue}" ]; then
-   echo "File '${issue}' not founded. Can't detect distribution."
+issuefile="/etc/issue"
+if [ ! -f "${issuefile}" ]; then
+   echo "File '${issuefile}' not founded. Can't detect distribution."
    exit 1
 fi
-issue=`cat "${issue}"`
+cat "${issuefile}"
 
 # Search issue file:
 for distr in $knowndistrs; do
+   issue=`cat "${issuefile}" | grep "${distr}"`
+   [ -z "${issue}" ] && continue
    if [ `eval "echo \"${issue}\" | awk '{ print match(\\$0,\"${distr}\")}'"` != "0" ]; then
       export DISTRIBUTIVE="${distr}"
       break
@@ -23,14 +25,14 @@ done
 # No distribution founded:
 if [ -z "${DISTRIBUTIVE}" ]; then
    echo "Unsupported distribution:"
-   echo "${issue}"
+   cat "${issuefile}"
    echo "Supported distributions:"
    echo "${knowndistrs}"
    exit
 fi
 
 # Search distribution version:
-export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9]+.[0-9]+"); print substr($0,RSTART,RLENGTH)}'`
+export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9.-]+"); print substr($0,RSTART,RLENGTH)}'`
 
 # Check architecture:
 export ARCHITECTURE=`uname -m`
