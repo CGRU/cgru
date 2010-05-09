@@ -14,7 +14,7 @@ issue=`cat "${issue}"`
 
 # Search issue file:
 for distr in $knowndistrs; do
-   if [ `eval "echo \"${issue}\" | gawk '{ print match(\\$0,\"${distr}\")}'"` != "0" ]; then
+   if [ `eval "echo \"${issue}\" | awk '{ print match(\\$0,\"${distr}\")}'"` != "0" ]; then
       export DISTRIBUTIVE="${distr}"
       break
    fi
@@ -30,7 +30,7 @@ if [ -z "${DISTRIBUTIVE}" ]; then
 fi
 
 # Search distribution version:
-export DISTRIBUTIVE_VERSION=`echo "${issue}" | gawk '{match($0,"[0-9]+.[0-9]+"); print substr($0,RSTART,RLENGTH)}'`
+export DISTRIBUTIVE_VERSION=`echo "${issue}" | awk '{match($0,"[0-9]+.[0-9]+"); print substr($0,RSTART,RLENGTH)}'`
 
 # Check architecture:
 export ARCHITECTURE=`uname -m`
