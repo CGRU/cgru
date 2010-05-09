@@ -77,7 +77,7 @@ rm -rf $cgruExp/afanasy/trunk
 # Creating ZIP archives:
 releases="__releases__"
 if [ -d ${releases} ]; then
-   echo "Creating ZIP archives with all CGRU files.."
+   echo "Creating ZIP archives with all CGRU files..."
    releasesnames=`ls "${releases}"`
    for release in $releasesnames; do
       releasedir="${releases}/$release"
