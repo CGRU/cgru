@@ -44,6 +44,7 @@ if [ -d $tmpdir ]; then
    rm -rf $tmpdir
 fi
 mkdir -p $tmpdir
+chmod a+rwx $tmpdir
 
 # Exporting CGRU:
 cgruExp="cgru_export"
@@ -113,6 +114,7 @@ fi
 packages_output_dir="output"
 [ -d $packages_output_dir ] && rm -rf $packages_output_dir
 mkdir $packages_output_dir
+chmod a+rwx $packages_output_dir
 
 # copy current afanasy binaries from branch:
 echo "Copying current afanasy binaries..."
