@@ -10,12 +10,12 @@ fi
 # to launch commands from current directory:
 export AF_CMD_PREFIX="./"
 
-export MAYA_VERSION=2009
+export MAYA_VERSION=2011
 export MAYA_ARCH=-x64
 # For 32bit Maya uncomment next line
 # export MAYA_ARCH=
 
-export MAYA_LOCATION=/cg/soft/maya${MAYA_VERSION}${MAYA_ARCH}
+export MAYA_LOCATION=/usr/autodesk/maya${MAYA_VERSION}${MAYA_ARCH}
 
 export MAYA_EXEC=${MAYA_LOCATION}/bin/maya${MAYA_VERSION}
 

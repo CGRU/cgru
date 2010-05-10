@@ -43,7 +43,8 @@ export MAYA_SCRIPT_PATH=${MAYA_CGRU_LOCATION}/mel/AETemplates:${MAYA_CGRU_LOCATI
 export MAYA_PLUG_IN_PATH=${MAYA_CGRU_LOCATION}/mll/${MAYA_VERSION}${MAYA_ARCH}:${MAYA_PLUG_IN_PATH}
 
 # Enable Afanasy if it is set:
-if [ ! -z $AF_ROOT ]; then
+if [ ! -z "${AF_ROOT}" ]; then
+   echo "Afanasy seup founded: '${AF_ROOT}'"
    # add Afanasy scripts:
    export MAYA_SCRIPT_PATH="${AF_ROOT}/plugins/maya:${MAYA_SCRIPT_PATH}"
    # to launch commands from current directory:
