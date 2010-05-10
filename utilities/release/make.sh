@@ -73,6 +73,7 @@ echo "Extracting Afanasy components from '$afanasy' to 'afanasy'..."
 cp -rp $cgruExp/$afanasy/* $cgruExp/afanasy
 rm -rf $cgruExp/afanasy/branches
 rm -rf $cgruExp/afanasy/trunk
+rm -rf $cgruExp/afanasy/tags
 
 # Creating ZIP archives:
 releases="__releases__"
