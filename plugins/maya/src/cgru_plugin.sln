@@ -14,6 +14,8 @@ Global
 		release2009|x64 = release2009|x64
 		release2010|Win32 = release2010|Win32
 		release2010|x64 = release2010|x64
+		release2011|Win32 = release2011|Win32
+		release2011|x64 = release2011|x64
 		release7.0|Win32 = release7.0|Win32
 		release7.0|x64 = release7.0|x64
 		release8.0|Win32 = release8.0|Win32
@@ -42,6 +44,10 @@ Global
 		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2010|Win32.Build.0 = release2010|Win32
 		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2010|x64.ActiveCfg = release2010|x64
 		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2010|x64.Build.0 = release2010|x64
+		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2011|Win32.ActiveCfg = release2011|Win32
+		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2011|Win32.Build.0 = release2011|Win32
+		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2011|x64.ActiveCfg = release2011|x64
+		{681412B0-F197-4A2F-9263-DEA2E8690146}.release2011|x64.Build.0 = release2011|x64
 		{681412B0-F197-4A2F-9263-DEA2E8690146}.release7.0|Win32.ActiveCfg = release7.0|Win32
 		{681412B0-F197-4A2F-9263-DEA2E8690146}.release7.0|Win32.Build.0 = release7.0|Win32
 		{681412B0-F197-4A2F-9263-DEA2E8690146}.release7.0|x64.ActiveCfg = release7.0|x64
