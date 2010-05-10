@@ -4,7 +4,7 @@ call setup.cmd
 POPD
 
 rem Set Maya location:
-set MAYA_LOCATION=c:\cg\soft\Maya2009-x64
+set MAYA_LOCATION="C:\Program Files\Autodesk\Maya2011"
 
 rem Set custom values if needed here:
 IF EXIST override.cmd CALL override.cmd
