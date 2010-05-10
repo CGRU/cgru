@@ -87,7 +87,7 @@ if [ -d ${releases} ]; then
       mkdir -p $tmp
       echo "Creating CGRU archive for ${release}..."
       cp -rp $cgruExp/* $tmp
-      cp -rp $releasedir/* $tmp
+      [ ! -z "`ls $releasedir`" ] && cp -rp $releasedir/* $tmp
       tmp=$PWD
       cd $tmpdir/${release}
       zip -qr "../../${releases}/cgru.${VERSION_NUMBER}.${release}.zip" "cgru"
