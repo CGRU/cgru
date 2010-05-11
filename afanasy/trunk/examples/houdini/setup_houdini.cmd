@@ -2,7 +2,7 @@ PUSHD ..\..
 call setup.cmd
 POPD
 
-set HOUDINI_LOCATION="C:\Program Files\Side Effects Software\Houdini 10.0.554"
+set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 10.0.554
 
 if exist override.cmd call override.cmd
 

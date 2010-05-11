@@ -2,7 +2,7 @@ PUSHD ..\..
 call setup.cmd
 POPD
 
-set BLENDER_LOCATION=c:\cg\soft\Blender
+set BLENDER_LOCATION="C:\Program Files\Blender Foundation\Blender"
 
 if exist override.cmd call override.cmd
 

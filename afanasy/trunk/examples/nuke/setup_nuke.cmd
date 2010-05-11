@@ -2,12 +2,12 @@ PUSHD ..\..
 call setup.cmd
 POPD
 
-SET NUKE_CGRU_VERSION=python
+SET NUKE_AF_VERSION=python
 
-SET NUKE_CGRU_PATH=%AF_ROOT%\plugins\nuke\%NUKE_CGRU_VERSION%
+SET NUKE_AF_PATH=%AF_ROOT%\plugins\nuke\%NUKE_AF_VERSION%
 
-SET NUKE_PATH=%NUKE_CGRU_PATH%
+SET NUKE_PATH=%NUKE_AF_PATH%
 
-SET NUKE_EXEC=c:\cg\soft\Nuke5.2v3\Nuke5.2.exe
+SET NUKE_EXEC=C":\Program Files\Nuke6.0v5\Nuke6.0.exe"
 
 IF EXIST override.cmd CALL override.cmd

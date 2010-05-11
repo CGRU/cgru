@@ -26,7 +26,9 @@ QServer::QServer( QObject *parent):
 #ifdef MACOSX
       port_to_listen = 0; // Let system choose port automatically
 #endif
+#ifndef WINNT
       listening = listen( QHostAddress::AnyIPv6, port_to_listen);
+#endif
       if( false == listening ) listening = listen( QHostAddress::Any, port_to_listen);
       if( listening)
       {
