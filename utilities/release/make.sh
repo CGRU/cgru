@@ -90,7 +90,9 @@ if [ -d ${releases} ]; then
       [ ! -z "`ls $releasedir`" ] && cp -rp $releasedir/* $tmp
       tmp=$PWD
       cd $tmpdir/${release}
-      zip -qr "../../${releases}/cgru.${VERSION_NUMBER}.${release}.zip" "cgru"
+      acrhivename="cgru.${VERSION_NUMBER}.${release}.zip"
+      zip -qr "../../${releases}/${acrhivename}" "cgru"
+      chmod a+rw "../../${releases}/${acrhivename}"
       cd $tmp
    done
 fi
