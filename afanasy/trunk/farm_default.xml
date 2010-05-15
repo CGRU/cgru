@@ -3,9 +3,9 @@
    <pattern name="Some Host">
       <mask>.*</mask>
       <description>Unrecognized machine</description>
-      <capacity>1100</capacity>
-      <maxtasks>2</maxtasks>
-      <power>1000</power>
+      <capacity>2200</capacity>
+      <maxtasks>8</maxtasks>
+      <power>2000</power>
       <resources>{'c':1000,'m':3000}</resources>
       <data>{'c':'render','m':10}</data>
       <service name="generic" />
@@ -70,37 +70,33 @@ This is commented text.
       <service name="hbatch" />
       <service name="hbatch_mantra" />
    </pattern>
-   <pattern name="Renders #3">
-      <mask>r2.*</mask>
-      <description>Third 8CPU renders</description>
-      <os>linux</os>
-      <maxtasks>80</maxtasks>
-      <capacity>8800</capacity>
-      <power>8000</power>
-      <properties>intel nvidiagpu</properties>
-      <service name="generic" />
-      <service name="nuke" />
-      <service name="prman" count="2" />
-      <service name="mantra" />
-      <service name="hbatch" />
-      <service name="hbatch_mantra" />
-   </pattern>
    <pattern name="WndStation">
       <mask>w.*</mask>
       <description>Windows workstation</description>
       <os>windows</os>
-      <maxtasks>1</maxtasks>
-      <capacity>1000</capacity>
-      <power>1000</power>
+      <maxtasks>4</maxtasks>
+      <capacity>2200</capacity>
+      <power>2000</power>
       <service name="generic"/>
+      <service name="nuke" />
+      <service name="prman" />
+      <service name="mantra" />
+      <service name="hbatch" />
+      <service name="hbatch_mantra" />
+      <service name="hbatch_prman" />
+      <service name="maya" />
+      <service name="blender" />
+      <service name="blender_internal" />
+      <service name="blender_yafray" />
+      <service name="yafray" />
    </pattern>
    <pattern name="LinStation">
       <mask>l.*</mask>
       <description>Linux workstation</description>
       <os>linux</os>
-      <maxtasks>1</maxtasks>
-      <capacity>1000</capacity>
-      <power>1000</power>
+      <maxtasks>4</maxtasks>
+      <capacity>2200</capacity>
+      <power>2000</power>
       <service name="generic" />
       <service name="nuke" />
       <service name="prman" />
