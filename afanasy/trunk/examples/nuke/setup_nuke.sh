@@ -1,12 +1,7 @@
 #!/bin/bash
 
-# Setup Afanasy if was not
-if [ -z "${AF_ROOT}" ]; then
-   pwd=$PWD
-   cd ../..
-   source setup.sh
-   cd $pwd
-fi
+# Setup Afanasy:
+source ./setup_afanasy.sh
 
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then
@@ -47,9 +42,6 @@ fi
 
 NUKE_LOCATION="/cg/soft/Nuke6.0"
 export NUKE_EXEC="${NUKE_LOCATION}/Nuke6.0"
-
-# to launch commands from current directory:
-export AF_CMD_PREFIX="./"
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh

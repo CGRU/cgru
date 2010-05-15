@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ./setup_houdini.sh
+
+$HOUDINI_AF_PATH/hrender_af.py $*
