@@ -1,0 +1,84 @@
+#! C:/Program Files/Nuke6.0v5/Nuke6.0.exe -nx
+version 6.0 v5
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="22" w="1280" h="760" screen="0">
+        <splitter orientation="1">
+            <split size="798"></split>
+            <splitter orientation="1">
+                <split size="40"></split>
+                <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                    <page id="Toolbar.1"></page>
+                </dock>
+                <split size="754"></split>
+                <splitter orientation="2">
+                    <split size="449"></split>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"></page>
+                    </dock>
+                    <split size="243"></split>
+                    <dock id="" activePageId="DAG.1">
+                        <page id="DAG.1"></page>
+                        <page id="Curve Editor.1"></page>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="462"></split>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"></page>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name C:/cg/tools/cgru/afanasy/trunk/examples/nuke/heavy/scene.nk
+ format "4096 3112 0 0 4096 3112 1 4K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+}
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos -42
+ ypos -164
+}
+Transform {
+ rotate {{frame x1 1}}
+ scale 0.4
+ center {2048 1556}
+ name Transform1
+ xpos -42
+ ypos -92
+}
+set N826ec28 [stack 0]
+Defocus {
+ defocus 500
+ name Defocus1
+ xpos -42
+ ypos -66
+}
+TimeBlur {
+ shutteroffset start
+ shuttercustomoffset 0
+ name TimeBlur1
+ xpos -42
+ ypos -28
+}
+Write {
+ file render/img.%04d.jpg
+ file_type jpeg
+ checkHashOnRead false
+ name Write1
+ xpos -42
+ ypos -2
+}
+push $N826ec28
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos -169
+ ypos -100
+}
