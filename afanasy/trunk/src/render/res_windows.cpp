@@ -7,9 +7,9 @@
 
 struct cpu
 {
-   ULARGE_INTEGER user;
-   ULARGE_INTEGER system;
    ULARGE_INTEGER idle;
+   ULARGE_INTEGER kernel;
+   ULARGE_INTEGER user;
 }cpu0,cpu1;
 int now = 0;
 
@@ -86,8 +86,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
    GetSystemTimes( &idleTime, &kernelTime, &userTime);
    cpu_now->idle.HighPart    = idleTime.dwHighDateTime;
    cpu_now->idle.LowPart     = idleTime.dwLowDateTime;
-   cpu_now->system.HighPart  = kernelTime.dwHighDateTime;
-   cpu_now->system.LowPart   = kernelTime.dwLowDateTime;
+   cpu_now->kernel.HighPart  = kernelTime.dwHighDateTime;
+   cpu_now->kernel.LowPart   = kernelTime.dwLowDateTime;
    cpu_now->user.HighPart    = userTime.dwHighDateTime;
    cpu_now->user.LowPart     = userTime.dwLowDateTime;
 /*
@@ -95,22 +95,23 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
    printf("kernelTime = %u %u\n", kernelTime.dwHighDateTime, kernelTime.dwLowDateTime);
    printf("userTime   = %u %u\n", userTime.dwHighDateTime, userTime.dwLowDateTime);
    printf("idleTime   = %u\n", cpu_now->idle.QuadPart);
-   printf("kernelTime = %u\n", cpu_now->system.QuadPart);
+   printf("kernelTime = %u\n", cpu_now->kernel.QuadPart);
    printf("userTime   = %u\n", cpu_now->user.QuadPart);
 */
    int idle   = cpu_now->idle.QuadPart   - cpu_last->idle.QuadPart;
-   int system = cpu_now->system.QuadPart - cpu_last->system.QuadPart;
+   int kernel = cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart;
    int user   = cpu_now->user.QuadPart   - cpu_last->user.QuadPart;
-   int total  = idle + system + user;
+   int total  = kernel + user;
+   int system = kernel - idle;
 /*
-   printf("delta idle   = %u\n", idle);
-   printf("delta kernel = %u\n", system);
-   printf("delta user   = %u\n", user);
-   printf("total  = %u\n", total);
+   printf("idle   = %9d\n", idle);
+   printf("kernel = %9d\n", kernel);
+   printf("user   = %9d\n", user);
+   printf("total  = %9d\n", total);
 */
-   hres.cpu_user    = ( 100 * user    ) / total;
-   hres.cpu_system  = ( 100 * system  ) / total;
-   hres.cpu_idle    = ( 100 * idle    ) / total;
+   hres.cpu_user    = user   / ( total / 100 );
+   hres.cpu_system  = system / ( total / 100 );
+   hres.cpu_idle    = idle   / ( total / 100 );
    hres.cpu_nice    = 0;
    hres.cpu_iowait  = 0;
    hres.cpu_irq     = 0;
@@ -147,5 +148,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
    }//network
 
    now = 1 - now;
+
+//hres.stdOut(false);
 }
 #endif

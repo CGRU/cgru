@@ -2,9 +2,18 @@
 # -*- coding: utf-8 -*-
 
 import os
+import random
+import signal
 import sys
 import time
-import random
+
+def interrupt( signum, frame):
+   exit('\nInterrupt signal received...')
+
+# Set interrupt function:
+signal.signal( signal.SIGTERM, interrupt)
+signal.signal( signal.SIGABRT, interrupt)
+signal.signal( signal.SIGINT,  interrupt)
 
 from time import strftime
 print 'Started at ' + strftime('%A %d %B %H:%M:%S')

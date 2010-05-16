@@ -2,8 +2,7 @@
 
 #include <QtCore/QProcess>
 
-#ifndef Q_OS_UNIX
-#define WINVER 0x0500
+#ifdef WINNT
 #include <windows.h>
 #endif
 
@@ -18,13 +17,14 @@ public slots:
    void kill();
    void terminate();
 
-#if defined Q_OS_UNIX
+#ifndef WINNT
 protected:
    virtual void setupChildProcess();
 #else
 public:
    void setupChildProcess();
 private:
+   PROCESS_INFORMATION * process_info;
    HANDLE hJob;
-#endif //Q_OS_UNIX
+#endif
 };

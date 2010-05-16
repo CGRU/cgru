@@ -434,7 +434,7 @@ bool Environment::init( bool solveServerAddress)
    if( solveServerAddress)
    {
       static QString serveraddrnum_arg("-srvaddrnum");
-      addUsage( QString("%1 [number]").arg(serveraddrnum_arg), "use specified server address number");
+      addUsage( QString("%1 [number]").arg(serveraddrnum_arg), "Use specified server address number.");
       QHostInfo qhostinfo = QHostInfo::fromName( servername);
       QList<QHostAddress> adresses = qhostinfo.addresses();
       // Try direct IP literals, if no addresses solved
@@ -444,7 +444,7 @@ bool Environment::init( bool solveServerAddress)
          printf( "Solved several server addresses:\n");
          for( int i = 0; i < adresses.size(); i++) printf( "%s\n", adresses[i].toString().toUtf8().data());
       }
-      if( qafserveraddress != NULL ) delete qafserveraddress;
+
       // Use the first IP address, if no address number not provided
       int serveraddrnum = -1;
 
@@ -481,6 +481,8 @@ bool Environment::init( bool solveServerAddress)
          if( adresses.size() > 1 )
             printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.toUtf8().data());
       }
+
+      if( qafserveraddress != NULL ) delete qafserveraddress;
       qafserveraddress = new QHostAddress( adresses[serveraddrnum]);
       printf( "Server address = '%s:%u'\n", qafserveraddress->toString().toUtf8().data(), serverport);
    }
@@ -533,7 +535,7 @@ void Environment::initCommandArguments( int argc, char** argv)
          )
       {
          help_mode = true;
-         addUsage("-h --help", "display this help");
+         addUsage("-h --help", "Display this help.");
       }
    }
 }
@@ -567,7 +569,7 @@ void Environment::printUsage()
    printf("USAGE: %s [arguments]\n", cmdarguments.first().toUtf8().data());
    for( int i = 0; i < cmdarguments_usagearg.size(); i++)
    {
-      printf("   %s:\n      %s.\n",
+      printf("   %s:\n      %s\n",
              cmdarguments_usagearg[i].toUtf8().data(),
              cmdarguments_usagehelp[i].toUtf8().data()
              );

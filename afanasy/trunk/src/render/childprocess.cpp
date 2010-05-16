@@ -34,14 +34,14 @@ void ChildProcess::setupChildProcess()
    if( nicenew == -1)
       AFERRPE("nice");
 #else
-   PROCESS_INFORMATION *pi = pid();
-   SetPriorityClass( pi->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
+   process_info = pid();
+   SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
    hJob = CreateJobObject( NULL, NULL);
    JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
-   jeli.BasicLimitInformation.LimitFlags = 0x00002000;//JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+   jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE; //0x00002000;
    if( SetInformationJobObject( hJob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) ) == 0)
       AFERROR("SetInformationJobObject failed.\n");
-   if( AssignProcessToJobObject( hJob, pi->hProcess) == false)
+   if( AssignProcessToJobObject( hJob, process_info->hProcess) == false)
       AFERROR("AssignProcessToJobObject failed.\n");
 #endif
 }
@@ -52,7 +52,7 @@ void ChildProcess::kill()
    ::killpg(::getpgid(pid()), SIGKILL);
 #else
    CloseHandle( hJob );
-   QProcess::kill();
+//   QProcess::kill();
 #endif
 }
 
@@ -62,6 +62,6 @@ void ChildProcess::terminate()
    ::killpg(::getpgid(pid()), SIGTERM);
 #else
    CloseHandle( hJob );
-   QProcess::terminate();
+//   QProcess::terminate();
 #endif
 }

@@ -103,23 +103,23 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 {
    if( update_status == 0 ) return;
    printf("Finished: "); exec->stdOut( false);
-   if( exitStatus == QProcess::NormalExit)
+   if(( exitStatus != QProcess::NormalExit ) || ( stop_time != 0 ))
+   {
+      update_status = af::TaskExec::UPFinishedCrash;
+      printf("Task terminated/killed.\n");
+   }
+   else
    {
       if( exitCode != 0)
       {
          update_status = af::TaskExec::UPFinishedError;
-         printf("exitCode = %d != 0.\n", exitCode);
+         printf("Error: exitcode = %d.\n", exitCode);
       }
       else
       {
          update_status = af::TaskExec::UPFinishedSuccess;
-         printf("success. (exitCode=%d)\n", exitCode);
+         printf("Success: exitcode = %d.\n", exitCode);
       }
-   }
-   else
-   {
-      update_status = af::TaskExec::UPFinishedCrash;
-      printf("exitStatus != QProcess::NormalExit.\n");
    }
    printf("\n");
    sendTaskSate();

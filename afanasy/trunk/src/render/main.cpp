@@ -31,17 +31,17 @@ void sig_int(int signum)
 
 int main(int argc, char *argv[])
 {
-#ifdef WINNT
-   af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::Verbose, argc, argv);      // Verbose environment initialization
    Py_InitializeEx(0);
-   if( af::init( af::InitServices | af::Verbose)  == false) return 1;
+#ifdef WINNT
+   int verbose_env = 0;
+   if( argc == 1 ) verbose_env = af::Environment::Verbose;
+//   af::Environment ENV( 0, argc, argv);      // Verbose environment initialization
+   af::Environment ENV( af::Environment::SolveServerAddress | verbose_env, argc, argv);      // Verbose environment initialization
    signal( SIGINT,  sig_int);
    signal( SIGTERM, sig_int);
    signal( SIGSEGV, sig_int);
 #else
    af::Environment ENV( af::Environment::SolveServerAddress, argc, argv );     // Silent environment initialization
-   Py_InitializeEx(0);
-   if( af::init( af::InitServices) == false) return 1;
 //
 // interrupt signal catch:
    struct sigaction actint;
@@ -56,6 +56,7 @@ int main(int argc, char *argv[])
    actpipe.sa_handler = sig_pipe;
    sigaction( SIGPIPE, &actpipe, NULL);
 #endif
+
    if( !ENV.isValid())
    {
       AFERROR("main: Environment initialization failed.\n");
@@ -68,8 +69,8 @@ int main(int argc, char *argv[])
 
    QString NIMBY = "-NIMBY";
    QString nimby = "-nimby";
-   ENV.addUsage( NIMBY, "Set initial state to 'NIMBY'");
-   ENV.addUsage( nimby, "Set initial state to 'nimby'");
+   ENV.addUsage( NIMBY, "Set initial state to 'NIMBY'.");
+   ENV.addUsage( nimby, "Set initial state to 'nimby'.");
    if( ENV.hasArgument( NIMBY))
    {
       printf("Initial state set to 'NIMBY'\n");
@@ -98,6 +99,11 @@ int main(int argc, char *argv[])
    if(( false == ENV.isHelpMode()) &&
       ( false == checkResourcesMode ))
    {
+#ifdef WINNT
+      if( af::init( af::InitServices | af::Verbose)  == false) return 1;
+#else
+      if( af::init( af::InitServices) == false) return 1;
+#endif
       QCoreApplication app( argc, argv);
       Object object( state, priority, command);
       RenderObject = &object;
