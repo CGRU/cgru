@@ -94,7 +94,7 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    rand_all = new int[image_s];
    for( int i = 0; i < image_s; i++) rand_all[i] = rand();
    rand_all_size = new int[image_s];
-   for( int i = 0; i < image_s; i++) rand_all_size[i] = rand() * (image_s - 1) / RAND_MAX;
+   for( int i = 0; i < image_s; i++) rand_all_size[i] = float(rand()) * (image_s - 1.0f) / float(RAND_MAX);
    // All constant sum:
    rand_all_grain = new int[image_s];
    for( int i = 0; i < image_s; i++)
@@ -126,7 +126,7 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    {
       rand_bw_pos[bw] = new int[rand_bw_len[bw]];
       for( int i = 0; i < rand_bw_len[bw]; i++)
-         rand_bw_pos[bw][i] = rand() * rand_bw_max[bw] / RAND_MAX;
+         rand_bw_pos[bw][i] = float(rand()) * rand_bw_max[bw] / float(RAND_MAX);
    }
    rand_bw_val = new int[image_s];
    for( int i = 0; i < image_s; i++) rand_bw_val[i] = 200 * rand() / RAND_MAX;
@@ -157,20 +157,20 @@ void OfflineScreen::paintEvent( QPaintEvent *)
 {
    int x = ( width() - image_w) >> 1;
    int y = ( height() - image_h) >> 1;
-   int rand, rand_koeff;
+   int rand_num;
 
    QPainter painter( this);
 
    // Copy image and add grain:
    static int grain_phase = 0;
-   grain_phase ++; if( grain_phase >= image_s) grain_phase = 0; rand = rand_all_size[grain_phase];
+   grain_phase ++; if( grain_phase >= image_s) grain_phase = 0; rand_num = rand_all_size[grain_phase];
    for( int i = 0; i < image_s; i++)
    {
-      rand++;
-      if( rand >= image_s ) rand -= image_s;
+      rand_num++;
+      if( rand_num >= image_s ) rand_num -= image_s;
       RGBA src, noise, dest;
       src.all = image[i];
-      noise.all = rand_all_grain[rand];
+      noise.all = rand_all_grain[rand_num];
       for( int c = 0; c < 4; c ++)
       {
          if( c == A ) continue;
@@ -186,13 +186,11 @@ void OfflineScreen::paintEvent( QPaintEvent *)
    // Offset image:
    static int offset_phase = 0;
    offset_phase ++; if( offset_phase >= image_s) offset_phase = 0;
-   rand_koeff = 16;
-   rand = rand_all[offset_phase] >> rand_koeff;
-   rand_koeff = RAND_MAX >> rand_koeff;
+   rand_num = rand_all[offset_phase];
    for( int i = 0; i < image_s; i++)
    {
       int dest = i + rand_all[offset_phase];
-      dest = dest + (rand * dest) / rand_koeff;
+      dest = dest + float(rand_num) * float(dest) / float(RAND_MAX);
       dest = dest % image_s;
       buffer_b[i] = buffer_a[dest];
 //      buffer_b[i] = buffer_a[i]; // Disable offset
@@ -205,11 +203,11 @@ void OfflineScreen::paintEvent( QPaintEvent *)
    {
       bw_phase_pos ++;
       if( bw_phase_pos >= image_s) bw_phase_pos = 0;
-      rand = rand_all_size[bw_phase_pos];
+      rand_num = rand_all_size[bw_phase_pos];
       for( int i = 0; i < rand_bw_len[bw]; i++)
       {
-         int pos = rand + rand_bw_pos[bw][i];
-         if( pos >= image_s ) pos -= image_s;
+         int pos = rand_num + rand_bw_pos[bw][i];
+         pos = pos % image_s;
          int val = rand_bw_val[bw_phase_val];
          buffer_b[pos] = 0xff000000 + (val<<16) + (val<<8) + val;
          bw_phase_val++;
