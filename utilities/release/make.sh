@@ -181,6 +181,9 @@ for packages_dir in $packages_dirs; do
    done
 done
 
+# Create install & uninstall scripts:
+./install_create.sh "${packages_output_dir}"
+
 # Create archive:
 curdir=$PWD
 cd "${packages_output_dir}"
