@@ -26,7 +26,7 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -name my_job         -   job name\n\
 -node                -   node to render ( houdini driver or nuke write )\n\
 -type                -   service type\n\
--take                -   take to use ( houdini render with take )\n\
+-take                -   take to use ( houdini render with take, xsi pass )\n\
 -ignoreinputs        -   not to render input nodes ( houdini ignore inputs ROP parameter )\n\
 -deletescene         -   delete scene when job deleted\n\
 -pause               -   start job paused ( offline afanasy state )\n\
@@ -265,6 +265,13 @@ elif ext == 'mb':
    scenetype = 'maya'
    cmd = 'maya' + cmdextension + ' -batch -file "' + scene + '" -command "afanasyBatch(%1,%2,1,1)"'
 
+# XSI:
+elif ext == 'scn':
+   scenetype = 'xsi'
+   cmd = 'xsibatch' + cmdextension + ' -render ' + scene + ' -frames %1,%2,' + str(by)
+   if take != '': cmd += ' -pass ' + take
+   cmd += ' -verbose on'
+
 # simple generic:
 else:
    scenetype = 'generic'
@@ -304,4 +311,3 @@ job.blocks.append( block)
 
 # Send Job to server:
 job.send()
-
