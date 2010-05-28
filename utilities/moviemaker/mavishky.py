@@ -21,46 +21,58 @@ signal.signal(signal.SIGINT,  rmdir)
 
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-parser.add_option('-f', '--fps',        dest='fps',        type  ='int',        default=25,          help='Frames per second')
-parser.add_option('-c', '--codec',      dest='codec',      type  ='string',     default='mov',       help='Codec: mov,mpeg')
-parser.add_option('-r', '--resolution', dest='resolution', type  ='string',     default='',          help='Format: 768x576, if empty images format used')
-parser.add_option('-i', '--inpattern',  dest='inpattern',  type  ='string',     default='',          help='Input files pattern: img.####.jpg')
-parser.add_option('-o', '--output',     dest='output',     type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
-parser.add_option('-t', '--title',      dest='title',      type  ='string',     default='',          help='Draw title if specified')
-parser.add_option('-a', '--annotate',   dest='annotate',   type  ='string',     default='',          help='Draw annotation if specified')
-parser.add_option('-g', '--gamma',      dest='gamma',      type  ='float',      default=-1.0,        help='Apply gamma correction')
-parser.add_option('--logopath',         dest='logopath',   type  ='string',     default='',          help='Add a specified image')
-parser.add_option('--logosize',         dest='logosize',   type  ='string',     default='200x100',   help='Logotype size')
-parser.add_option('--drawdate',         dest='drawdate',   action='store_true', default=False,       help='Draw date')
-parser.add_option('--drawframe',        dest='drawframe',  action='store_true', default=False,       help='Draw frame')
-parser.add_option('--draw169',          dest='draw169',    type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
-parser.add_option('--draw235',          dest='draw235',    type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
-parser.add_option('-d', '--datesuffix', dest='datesuffix', action='store_true', default=False,       help='Add date suffix to name')
-parser.add_option('-V', '--verbose',    dest='verbose',    action='store_true', default=False,       help='Verbose mode')
-parser.add_option('-D', '--debug',      dest='debug',      action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
-parser.add_option('-A', '--afanasy',    dest='afanasy',    action='store_true', default=False,       help='Send to Afanasy')
-parser.add_option('--afconvcap',        dest='afconvcap',  type  ='int',        default=10,          help='Afanasy convert tasks capacity')
-parser.add_option('--afenccap',         dest='afenccap',   type  ='int',        default=500,         help='Afanasy encode task capacity')
-parser.add_option('-u', '--username',   dest='username',   type  ='string',     default='',          help='Change Afanasy job user')
-parser.add_option('--tmpdir',           dest='tmpdir',     type  ='string',     default='',          help='Temporary directory, if not specified, .makeMovie+date will be used')
+parser.add_option('-f', '--fps',        dest='fps',         type  ='int',        default=25,          help='Frames per second')
+parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='mov',       help='Codec: mov,mpeg')
+parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
+parser.add_option('-i', '--inpattern',  dest='inpattern',   type  ='string',     default='',          help='Input files pattern: img.####.jpg')
+parser.add_option('-o', '--output',     dest='output',      type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
+parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
+parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
+parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
+parser.add_option('--shotversion',      dest='shotversion', type  ='string',     default='',          help='Draw shot version')
+parser.add_option('--artist',           dest='artist',      type  ='string',     default='',          help='Draw artist')
+parser.add_option('--activity',         dest='activity',    type  ='string',     default='',          help='Draw activity')
+parser.add_option('--annotate',         dest='annotate',    type  ='string',     default='',          help='Draw annotation if specified')
+parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
+parser.add_option('--logopath',         dest='logopath',    type  ='string',     default='',          help='Add a specified image')
+parser.add_option('--logosize',         dest='logosize',    type  ='string',     default='200x100',   help='Logotype size')
+parser.add_option('--drawdate',         dest='drawdate',    action='store_true', default=False,       help='Draw date')
+parser.add_option('--drawframe',        dest='drawframe',   action='store_true', default=False,       help='Draw frame')
+parser.add_option('--drawfilename',     dest='drawfilename',action='store_true', default=False,       help='Draw file name')
+parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
+parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
+parser.add_option('-d', '--datesuffix', dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to name')
+parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,       help='Verbose mode')
+parser.add_option('-D', '--debug',      dest='debug',       action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
+parser.add_option('-A', '--afanasy',    dest='afanasy',     action='store_true', default=False,       help='Send to Afanasy')
+parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',        default=10,          help='Afanasy convert tasks capacity')
+parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=500,         help='Afanasy encode task capacity')
+parser.add_option('-u', '--username',   dest='username',    type  ='string',     default='',          help='Change Afanasy job user')
+parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makeMovie+date will be used')
 
 (options, args) = parser.parse_args()
 
-fps         = options.fps
-codec       = options.codec
-resolution  = options.resolution
-inpattern   = options.inpattern
-output      = options.output
-drawdate    = options.drawdate
-drawframe   = options.drawframe
-draw169     = options.draw169
-draw235     = options.draw235
-logopath    = options.logopath
-logosize    = options.logosize
-title       = options.title
-annotate    = options.annotate
-datesuffix  = options.datesuffix
-gamma       = options.gamma
+fps            = options.fps
+codec          = options.codec
+resolution     = options.resolution
+inpattern      = options.inpattern
+output         = options.output
+drawdate       = options.drawdate
+drawframe      = options.drawframe
+drawfilename   = options.drawfilename
+draw169        = options.draw169
+draw235        = options.draw235
+font           = options.font
+logopath       = options.logopath
+logosize       = options.logosize
+project        = options.project
+shot           = options.shot
+shotversion    = options.shotversion
+artist         = options.artist
+activity       = options.activity
+annotate       = options.annotate
+datesuffix     = options.datesuffix
+gamma          = options.gamma
 
 verbose     = options.verbose
 debug       = options.debug
@@ -88,12 +100,12 @@ if debug: verbose = True
 if verbose: print 'VERBOSE MODE:'
 if debug: print 'DEBUG MODE:'
 if drawdate or drawframe: need_convert = True
-if title != '':
-   need_convert = True
-   if verbose: print 'Draw Title: "%s"' % title
-if annotate != '':
-   need_convert = True
-   if verbose: print 'Draw Annotation: "%s"' % annotate
+if project     != '': need_convert = True
+if shot        != '': need_convert = True
+if shotversion != '': need_convert = True
+if artist      != '': need_convert = True
+if activity    != '': need_convert = True
+if annotate    != '': need_convert = True
 
 # Input directory:
 inputdir = os.path.dirname( inpattern)
@@ -230,25 +242,49 @@ name_convert = []
 imgCount = 0
 if need_convert:
    for afile in allFiles:
-      cmd = 'convert'
+#      cmd = 'convert'
+      cmd = 'convert -size %(width)dx%(height)d xc:black' % vars()
       if need_logo: cmd += ' ' + tmpLogo
       cmd += ' ' + os.path.join( inputdir, afile)
-      cmd += ' -resize %(width)d -gravity center -background black -extent %(width)dx%(height)d +repage' % vars()
+#      cmd += ' -resize %(width)d -gravity center -background black -extent %(width)dx%(height)d +repage' % vars()
+      cmd += ' -resize %(width)d' % vars()
       if gamma > 0: cmd += ' -gamma %.2f' % gamma
       if correction != '': cmd += correction
+      cmd += ' -compose plus -gravity center -composite'
       if draw169:
          cmd += ' -fill "rgba(0,0,0,%(draw169_a)f)" -draw "rectangle 0,0,%(width)d,%(draw169_y)d"' % vars()
          cmd += ' -fill "rgba(0,0,0,%(draw169_a)f)" -draw "rectangle 0,%(draw169_h)d,%(width)d,%(height)d"' % vars()
       if draw235:
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,0,%(width)d,%(draw235_y)d"' % vars()
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(width)d,%(height)d"' % vars()
-      if drawdate:  cmd += ' -fill white -pointsize 30 -gravity north -annotate +0-0 `date +%y-%m-%d_%H-%M`'
+      fontneeded = False
+      if drawdate:
+         cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 `date +%y-%m-%d_%H-%M`'
+         fontneeded = True
       if drawframe:
          digits = afile[ len(prefix) : len(afile) - len(suffix)]
-         cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +0-0 "%s"' % digits
-      if title != '':  cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +0-0 "%s"' % title
-      if annotate != '': cmd += ' -fill white -pointsize 15 -gravity southwest -annotate +0-0 "%s"' % annotate
-      if need_logo: cmd += ' -compose plus -composite'
+         cmd += ' -fill white -pointsize 30 -gravity southeast -annotate +10+10 "%s"' % digits
+         fontneeded = True
+      if project != '':
+         cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+10 "%s"' % project
+         fontneeded = True
+      if shot != '' or version != '':
+         cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+10 "%s"' % (shot + ' ' + shotversion)
+         fontneeded = True
+      if artist != '':
+         cmd += ' -fill white -pointsize 25 -gravity northwest -annotate +10+50 "%s"' % artist
+         fontneeded = True
+      if activity != '':
+         cmd += ' -fill white -pointsize 25 -gravity northeast -annotate +10+50 "%s"' % activity
+         fontneeded = True
+      if annotate != '':
+         cmd += ' -fill white -pointsize 15 -gravity north -annotate +0+10 "%s"' % annotate
+         fontneeded = True
+      if drawfilename:
+         cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 ' + os.path.basename(output)
+         fontneeded = True
+      if fontneeded and font != '': cmd += ' -font %s' % font
+#      if need_logo: cmd += ' -compose plus -composite'
       cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
       cmd_convert.append( cmd)
       name_convert.append( afile)
