@@ -226,11 +226,12 @@ if logopath != '':
    if need_convert:
       need_logo = True
       tmpLogo = os.path.join( tmpdir, tmpLogo)
-      cmd_convertlogo = 'convert'
+      cmd_convertlogo = 'convert -size %(width)dx%(height)d xc:black' % vars()
+      cmd_convertlogo += ' -compose plus -gravity southeast -composite'
       cmd_convertlogo += ' ' + logopath
-      cmd_convertlogo += ' -gravity southeast -background black'
+#      cmd_convertlogo += ' -gravity southeast -background black'
       cmd_convertlogo += ' -resize ' + logosize
-      cmd_convertlogo += ' -extent %(width)dx%(height)d' % vars()
+#      cmd_convertlogo += ' -extent %(width)dx%(height)d' % vars()
       cmd_convertlogo += ' ' + tmpLogo
    else:
       print 'Can\'t add logo if output resolution is not specified.'
@@ -242,11 +243,9 @@ name_convert = []
 imgCount = 0
 if need_convert:
    for afile in allFiles:
-#      cmd = 'convert'
       cmd = 'convert -size %(width)dx%(height)d xc:black' % vars()
       if need_logo: cmd += ' ' + tmpLogo
       cmd += ' ' + os.path.join( inputdir, afile)
-#      cmd += ' -resize %(width)d -gravity center -background black -extent %(width)dx%(height)d +repage' % vars()
       cmd += ' -resize %(width)d' % vars()
       if gamma > 0: cmd += ' -gamma %.2f' % gamma
       if correction != '': cmd += correction
