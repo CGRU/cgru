@@ -9,7 +9,14 @@ import pyaf
 import afenv
 import afnetwork
 import services
-import parsers
+#import parsers
+
+def CheckClass( name, folder):
+   filename = name + '.py'
+   path = os.path.join( os.environ['AF_ROOT'], 'python')
+   path = os.path.join( path, folder)
+   if filename in os.listdir( path): return True
+   return False   
 
 class Task(pyaf.Task):
    def __init__( self, taskname = ''):
@@ -21,7 +28,7 @@ class Block(pyaf.Block):
       self.env = afenv.Env()
       pyaf.Block.__init__( self)
       parsertype = 'none'
-      if (blocktype in services.__all__) == False:
+      if not CheckClass( blocktype, 'services'):
          print 'Error: Unknown service "%s", setting to "generic"' % blocktype
          blocktype = 'generic'
       else:
@@ -36,7 +43,7 @@ class Block(pyaf.Block):
 
    def setParserType( self, parsertype, nocheck = False):
       if not nocheck:
-         if (parsertype in parsers.__all__) == False:
+         if not CheckClass( parsertype, 'parsers'):
             if parsertype != 'none':
                print 'Error: Unknown parser "%s", setting to "none"' % parsertype
                parsertype = 'none'
