@@ -86,13 +86,10 @@ namespace af
       NoFlags      = 0,
       Verbose      = 1,
       InitFarm     = 1 << 1,
-      InitServices = 1 << 2
    };
    void  destroy();
 
    bool  loadFarm( bool verbose = false);
    bool  loadFarm( const QString & filename, bool verbose = false);
-   bool  loadServices( bool verbose = false);
-   const Services * srv();
    const Farm * farm();
 }

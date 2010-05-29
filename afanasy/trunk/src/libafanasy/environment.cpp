@@ -4,6 +4,8 @@
 #include <stdlib.h>
 #include <memory.h>
 
+#include <Python.h>
+
 #include <QtXml/QDomDocument>
 #include <QtCore/QDir>
 #include <QtNetwork/QHostInfo>
@@ -322,28 +324,17 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 //
 // Afanasy python path:
+   if( flags & AppendPythonPath)
    {
-      QString afpython = getenv( AFGENERAL::PYTHONVAR);
-      if( afpython.isEmpty())
-      {
-         afpython = QString( AFGENERAL::PYTHONADD).arg( QDir::toNativeSeparators( afroot));
-         QString pythonpath = getenv( AFGENERAL::PYTHONPATHVAR);
-         if( pythonpath.isEmpty()) 
-             pythonpath = afpython;
-         else 
-             pythonpath = QString( AFGENERAL::PYTHONPATHADD).arg( afpython, pythonpath);
-//         setenv( AFGENERAL::PYTHONVAR, afpython.toUtf8().data(), 1);
-//         setenv( AFGENERAL::PYTHONPATHVAR, pythonpath.toUtf8().data(), 1);
-//         SetEnvironmentVariable( AFGENERAL::PYTHONPATHVAR, pythonpath.toUtf8().data());
-         afpython   = QString( "%1=%2").arg(AFGENERAL::PYTHONVAR,       afpython.toUtf8().data());
-         pythonpath = QString( "%1=%2").arg(AFGENERAL::PYTHONPATHVAR, pythonpath.toUtf8().data());
-         static QByteArray   afpython_ =   afpython.toUtf8();
-         static QByteArray pythonpath_ = pythonpath.toUtf8();
-         putenv(   afpython_.data());
-         putenv( pythonpath_.data());
-         PRINT("%s\n",   afpython_.data());
-         PRINT("%s\n", pythonpath_.data());
-      }
+      QString script = ""
+      "import os\n"
+      "import sys\n"
+      "afpython = os.path.join( '%1', 'python')\n"
+      "if not afpython in sys.path:\n"
+      "   print 'PYTHONPATH: appending \"%s\"' % afpython\n"
+      "   sys.path.append( afpython)\n"
+      ;
+      PyRun_SimpleString( script.arg( afroot).toUtf8().data());
    }
 
 
@@ -405,7 +396,6 @@ void Environment::load()
 bool Environment::load( QString & filename, uint32_t flags)
 {
    verbose = flags & Verbose;
-   if( flags & FromHome ) filename = home_afanasy + filename;
    if( getVars( filename)) return init( flags & SolveServerAddress);
    return false;
 }

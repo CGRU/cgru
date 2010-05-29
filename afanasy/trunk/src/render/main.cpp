@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
    signal( SIGTERM, sig_int);
    signal( SIGSEGV, sig_int);
 #else
-   af::Environment ENV( af::Environment::SolveServerAddress, argc, argv );     // Silent environment initialization
+   af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::AppendPythonPath, argc, argv );     // Silent environment initialization
 //
 // interrupt signal catch:
    struct sigaction actint;
@@ -99,11 +99,13 @@ int main(int argc, char *argv[])
    if(( false == ENV.isHelpMode()) &&
       ( false == checkResourcesMode ))
    {
+/*
 #ifdef WINNT
       if( af::init( af::InitServices | af::Verbose)  == false) return 1;
 #else
       if( af::init( af::InitServices) == false) return 1;
 #endif
+*/
       QCoreApplication app( argc, argv);
       Object object( state, priority, command);
       RenderObject = &object;

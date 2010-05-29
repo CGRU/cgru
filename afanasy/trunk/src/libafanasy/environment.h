@@ -26,7 +26,7 @@ public:
       NoFlags              = 0,
       Verbose              = 1,
       SolveServerAddress   = 1 << 1,
-      FromHome             = 1 << 2
+      AppendPythonPath     = 1 << 2
    };
 
 /// Return \c true if address environment is valid.

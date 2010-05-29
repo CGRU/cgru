@@ -8,10 +8,11 @@
 #include "../include/aftypes.h"
 
 #include "name_af.h"
+#include "pyclass.h"
 
 namespace af
 {
-class Service
+class Service: public PyClass
 {
 public:
    Service( const QString & type,
@@ -29,8 +30,6 @@ public:
 private:
    QString name;
 
-   PyObject* PyObj_ServiceClass;
-   PyObject* PyObj_Instance;
    PyObject* PyObj_FuncApplyCmdCapacity;
    PyObject* PyObj_FuncApplyCmdHosts;
    PyObject* PyObj_FuncCheckFiles;

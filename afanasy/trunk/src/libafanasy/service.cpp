@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "services.h"
+#include "../include/afpynames.h"
 
 using namespace af;
 
@@ -21,38 +21,31 @@ Service::Service( const QString & type,
             const QString & files,
             bool verbose):
    name( type),
-   PyObj_ServiceClass( NULL),
-   PyObj_Instance( NULL),
    PyObj_FuncApplyCmdCapacity( NULL),
    PyObj_FuncApplyCmdHosts( NULL),
    PyObj_FuncCheckFiles( NULL),
    initialized( false)
 {
-   PyObj_ServiceClass = srv()->getServiceClass( type);
-   if( PyObj_ServiceClass == NULL) return;
-
    PyObject *pArgs;
    pArgs = PyTuple_New( 2);
    PyTuple_SetItem( pArgs, 0, PyString_FromString( command.toUtf8().data() ));
    PyTuple_SetItem( pArgs, 1, PyString_FromString(   files.toUtf8().data() ));
-   PyObj_Instance = PyInstance_New( PyObj_ServiceClass, pArgs, NULL);
-   Py_DECREF( pArgs);
-   if( PyObj_Instance == NULL)
-   {
-      PyErr_Print();
-      AFERRAR( "Failed to instance \"%s\"\n", name.toUtf8().data());
-      return;
-   }
-   PyObj_FuncApplyCmdCapacity = PyObject_GetAttrString( PyObj_Instance, PYNAME_FuncApplyCmdCapacity);
-   PyObj_FuncApplyCmdHosts    = PyObject_GetAttrString( PyObj_Instance, PYNAME_FuncApplyCmdHosts);
-   PyObj_FuncCheckFiles       = PyObject_GetAttrString( PyObj_Instance, PYNAME_FuncCheckFiles);
+
+   if( PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name.toUtf8().data(), pArgs) == false) return;
+
+   //Get functions:
+   PyObj_FuncApplyCmdCapacity = getFunction( AFPYNAMES::SERVICE_FUNC_APPLYCMDCAPACITY);
+   if( PyObj_FuncApplyCmdCapacity == NULL ) return;
+   PyObj_FuncApplyCmdHosts = getFunction( AFPYNAMES::SERVICE_FUNC_APPLYCMDHOSTS);
+   if( PyObj_FuncApplyCmdHosts == NULL ) return;
+   PyObj_FuncCheckFiles = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKFILES);
+   if( PyObj_FuncCheckFiles == NULL ) return;
 
    initialized = true;
 }
 
 Service::~Service()
 {
-   if( PyObj_Instance) Py_XDECREF( PyObj_Instance);
 }
 
 const QString Service::applyCmdCapacity( int capacity)

@@ -9,7 +9,6 @@
 #endif
 
 #include "environment.h"
-#include "services.h"
 #include "farm.h"
 
 af::Services* services = NULL;
@@ -27,40 +26,12 @@ bool af::init( uint32_t flags)
       AFINFO("af::init: trying to load farm\n");
       if( loadFarm( flags & Verbose) == false)  return false;
    }
-   if( flags & InitServices)
-   {
-      AFINFO("af::init: trying to load services\n");
-      if( loadServices( flags & Verbose) == false) return false;
-   }
    return true;
-}
-
-const af::Services * af::srv()
-{
-   return services;
 }
 
 const af::Farm * af::farm()
 {
    return ferma;
-}
-
-bool af::loadServices( bool verbose )
-{
-   af::Services * new_services = new Services( verbose);
-   if( new_services == NULL)
-   {
-      AFERROR("af::loadServices: Can't allocate memory for services");
-      return false;
-   }
-   if( new_services->isValid())
-   {
-      if( services != NULL) delete services;
-      services = new_services;
-      return true;
-   }
-   delete new_services;
-   return false;
 }
 
 bool af::loadFarm( bool verbose)

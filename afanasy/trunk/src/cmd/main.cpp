@@ -52,13 +52,15 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    Protocol = AF_UNSPEC;
 //
 // initialize environment variables
-   af::Environment ENV( argc == 1 ? af::Environment::Verbose : af::Environment::NoFlags, argc, argv);
+   uint32_t envflags = af::Environment::AppendPythonPath;
+   if( argc == 1) envflags = envflags | af::Environment::Verbose;
+   af::Environment ENV( envflags, argc, argv);
    if( ENV.isValid() == false ) return 1;
    ServerName = af::Environment::getServerName().toUtf8().data();
    ServerPort = af::Environment::getServerPort();
 
    Py_InitializeEx(0);
-   if( af::init( af::InitFarm | af::InitServices | (argc == 1 ? af::Verbose : af::NoFlags)) == false) return 1;
+   if( af::init( af::InitFarm | (argc == 1 ? af::Verbose : af::NoFlags)) == false) return 1;
    afsql::init();
 
 
