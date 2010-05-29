@@ -1,4 +1,4 @@
-#/usr/bin/env python
+#!/usr/bin/env python
 
 import re
 import subprocess
@@ -8,8 +8,12 @@ r'.*[/\\]{1,1}override.*',
 r'.*[/\\]{1,1}tmp.*',
 r'.*afanasy.trunk.bin.*',
 r'.*afanasy.trunk.config.xml.*',
+r'.*afanasy.trunk.farm.xml.*',
 r'.*plugins.maya.mll.*',
 r'.*utilities.regexp.bin.*',
+r'.*[/\\]{1,1}icons.icons',
+r'.*[/\\]{1,1}Makefile',
+r'.*[/\\]{1,1}moc_.*',
 r'.*project.cmake.*CMakeFiles',
 r'.*project.cmake.*CMakeCache.*',
 r'.*project.cmake.*\.cmake',
@@ -19,6 +23,10 @@ r'.*project.cmake.*[/\\]__',
 r'.*project.cmake.*\\Release',
 r'.*project.cmake.*\\.*\.dir',
 r'.*project.cmake.*\\.*\.ncb',
+r'.*afanasy/webvisor',
+r'.*afanasy/plugins',
+r'.*afanasy/doc',
+r'.*afanasy/icons',
 ]
 
 exprs = []
