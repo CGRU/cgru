@@ -12,15 +12,6 @@ namespace AFGENERAL
    const int  DEFAULT_PRIORITY   = 99;                   ///< Default priority for user, jobs and hosts.
    const int  MAXHOSTS           = -1;                   ///< Default maximum hosts.
    const int  FILENAMESIZEMAX    = 250;                  ///< Maximum filename size.
-   const char PYTHONVAR[]        = "AF_PYTHON";
-   const char PYTHONPATHVAR[]    = "PYTHONPATH";
-#ifdef WINNT
-   const char PYTHONADD[]        = "%1\\bin;%1\\python";
-   const char PYTHONPATHADD[]    = "%1;%2";
-#else
-   const char PYTHONADD[]        = "%1/bin:%1/python";
-   const char PYTHONPATHADD[]    = "%1:%2";
-#endif
 }
 
 /// Addresses:
