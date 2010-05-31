@@ -26,12 +26,13 @@ parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',    
 parser.add_option('-i', '--inpattern',  dest='inpattern',   type  ='string',     default='',          help='Input files pattern: img.####.jpg')
 parser.add_option('-o', '--output',     dest='output',      type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
 parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
+parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
 parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
 parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
 parser.add_option('--shotversion',      dest='shotversion', type  ='string',     default='',          help='Draw shot version')
 parser.add_option('--artist',           dest='artist',      type  ='string',     default='',          help='Draw artist')
 parser.add_option('--activity',         dest='activity',    type  ='string',     default='',          help='Draw activity')
-parser.add_option('--annotate',         dest='annotate',    type  ='string',     default='',          help='Draw annotation if specified')
+parser.add_option('--comments',         dest='comments',    type  ='string',     default='',          help='Draw comments')
 parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
 parser.add_option('--logopath',         dest='logopath',    type  ='string',     default='',          help='Add a specified image')
 parser.add_option('--logosize',         dest='logosize',    type  ='string',     default='200x100',   help='Logotype size')
@@ -67,12 +68,13 @@ draw235        = options.draw235
 font           = options.font
 logopath       = options.logopath
 logosize       = options.logosize
+company        = options.company
 project        = options.project
 shot           = options.shot
 shotversion    = options.shotversion
 artist         = options.artist
 activity       = options.activity
-annotate       = options.annotate
+comments       = options.comments
 datesuffix     = options.datesuffix
 timesuffix     = options.timesuffix
 gamma          = options.gamma
@@ -88,9 +90,9 @@ username    = options.username
 tmpdir      = options.tmpdir
 
 # Definitions:
-tmpName = 'img'
+tmpName   = 'img'
 tmpFormat = 'jpg'
-tmpLogo = 'logo.png'
+tmpLogo   = 'logo.png'
 
 need_convert = False
 need_logo = False
@@ -98,16 +100,14 @@ need_logo = False
 #datetimestring = '`date +%y-%m-%d_%H-%M`'
 datetimestring = ''
 datetimesuffix = ''
-datestring = time.strftime('%y-%m-%d')
-timestring = time.strftime('%H-%M')
-if drawdate  : datetimestring += datestring
-if datesuffix: datetimesuffix += datestring
+if drawdate  : datetimestring += time.strftime('%y-%m-%d')
+if datesuffix: datetimesuffix += time.strftime('%y%m%d')
 if drawtime:
-   if datetimestring != '': datetimestring += '_'
-   datetimestring += timestring
+   if datetimestring != '': datetimestring += ' '
+   datetimestring += time.strftime('%H:%M')
 if timesuffix:
    if datetimesuffix != '': datetimesuffix += '_'
-   datetimesuffix += timestring
+   datetimesuffix += time.strftime('%H%M')
 #if re.match( r'win.*', sys.platform) != None: datetimestring = '%DATE%'
 #datetimestring = "`python -c \"import time;print time.strftime('%y-%m-%d_%H-%M')\"`"
 
@@ -127,7 +127,7 @@ if shot        != '': need_convert = True
 if shotversion != '': need_convert = True
 if artist      != '': need_convert = True
 if activity    != '': need_convert = True
-if annotate    != '': need_convert = True
+if comments    != '': need_convert = True
 
 # Input directory:
 inputdir = os.path.dirname( inpattern)
@@ -201,7 +201,7 @@ elif imgtype == 'CIN': correction = corr_Log
 # Output file:
 if output == '': output = os.path.join( os.path.dirname( inputdir), prefix.strip('_. '))
 afjobname = os.path.basename( output)
-if datetimesuffix != '': output += '.' + datetimesuffix
+if datetimesuffix != '': output += '_' + datetimesuffix
 if codec == 'mov': output += '.mov'
 elif codec == 'mpeg': output += '.avi'
 else:
@@ -242,31 +242,80 @@ draw235_y = int((height - width/2.35) / 2)
 draw235_h = height - draw235_y
 if draw235_y < 1: draw235 = False
 
-# Generate reformat logo command:
-cmd_convertlogo = ''
+imgCount = 0
+# Pre composition:
+cmd_precomp = []
+name_precomp = []
+# Generate header:
+if need_convert:
+   cmd = 'convert -size %(width)dx%(height)d -colorspace RGB xc:black' % vars()
+   cmd += ' -fill "rgb(255,0,0)" -draw "rectangle  0,0 10,10"'
+   cmd += ' -fill "rgb(0,255,0)" -draw "rectangle 10,0 20,10"'
+   cmd += ' -fill "rgb(0,0,255)" -draw "rectangle 20,0 30,10"'
+   rect_num = 10
+   rect_w = width / (rect_num + 2)
+   rect_c = 0
+   rect_y1 = 30
+   rect_y2 = 70
+   rect_x1 = rect_w
+   rect_x2 = rect_x1 + rect_w
+   for r in range( 0, rect_num):
+      cmd += ' -fill "rgb(%(rect_c)d,%(rect_c)d,%(rect_c)d)"' % vars()
+      cmd += ' -draw "rectangle %(rect_x1)d,%(rect_y1)d %(rect_x2)d,%(rect_y2)d"' % vars()
+      rect_x1 += rect_w
+      rect_x2 += rect_w
+      rect_c += 255 / (rect_num - 1)
+   if datetimestring != '':
+      cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+100 "%s"' % datetimestring
+   if company != '':
+      cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+100 "%s"' % company
+   if project != '':
+      cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+100 "%s"' % project
+   if shot != '':
+      cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+150 "%s"' % shot
+   if shotversion != '':
+      cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+150 "%s"' % shotversion
+   if artist != '':
+      cmd += ' -fill white -pointsize 25 -gravity southwest -annotate +10+50 "%s"' % ('Artist: ' + artist)
+   if activity != '':
+      cmd += ' -fill white -pointsize 25 -gravity northeast -annotate +10+50 "%s"' % ('Activity: ' + activity)
+   if comments != '':
+      cmd += ' -fill white -pointsize 20 -gravity west -annotate +10+0 "%s"' % ('Comments: ' + comments)
+   if drawfilename:
+      cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
+   if font != '': cmd += ' -font %s' % font
+   cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
+   cmd_precomp.append(cmd)
+   name_precomp.append('Generate header')
+   imgCount += 1
+
+# Reformat logo command:
 if logopath != '':
    if need_convert:
       need_logo = True
+      logosizes = logosize.split('x')
+      logotx = width  - int(logosizes[0])
+      logoty = height - int(logosizes[1])
       tmpLogo = os.path.join( tmpdir, tmpLogo)
-      cmd_convertlogo = 'convert -size %(width)dx%(height)d xc:black' % vars()
-      cmd_convertlogo += ' -compose plus -gravity southeast -composite'
-      cmd_convertlogo += ' ' + logopath
-#      cmd_convertlogo += ' -gravity southeast -background black'
-      cmd_convertlogo += ' -resize ' + logosize
-#      cmd_convertlogo += ' -extent %(width)dx%(height)d' % vars()
-      cmd_convertlogo += ' ' + tmpLogo
+      cmd = 'convert'
+      cmd += ' ' + logopath
+      cmd += ' -colorspace RGB'
+      cmd += ' -resize "%s!"' % logosize
+      cmd += ' -extent %(width)dx%(height)d' % vars()
+      cmd += ' -affine 1,0,0,1,-%(logotx)d,-%(logoty)d -transform' % vars()
+      cmd += ' ' + tmpLogo
    else:
       print 'Can\'t add logo if output resolution is not specified.'
       exit(1)
+   cmd_precomp.append(cmd)
+   name_precomp.append('Reformat logo')
 
 # Generate convert commands lists:
 cmd_convert = []
 name_convert = []
-imgCount = 0
 if need_convert:
    for afile in allFiles:
-      cmd = 'convert -size %(width)dx%(height)d xc:black' % vars()
-      if need_logo: cmd += ' ' + tmpLogo
+      cmd = 'convert -size %(width)dx%(height)d -colorspace RGB xc:black' % vars()
       cmd += ' ' + os.path.join( inputdir, afile)
       cmd += ' -resize %(width)d' % vars()
       if gamma > 0: cmd += ' -gamma %.2f' % gamma
@@ -280,7 +329,7 @@ if need_convert:
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(width)d,%(height)d"' % vars()
       fontneeded = False
       if datetimestring != '':
-         cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 ' + datetimestring
+         cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 "%s"' % datetimestring
          fontneeded = True
       if drawframe:
          digits = afile[ len(prefix) : len(afile) - len(suffix)]
@@ -289,23 +338,16 @@ if need_convert:
       if project != '':
          cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+10 "%s"' % project
          fontneeded = True
-      if shot != '' or version != '':
+      if shot != '' or shotversion != '':
          cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+10 "%s"' % (shot + ' ' + shotversion)
          fontneeded = True
-      if artist != '':
-         cmd += ' -fill white -pointsize 25 -gravity northwest -annotate +10+50 "%s"' % artist
-         fontneeded = True
-      if activity != '':
-         cmd += ' -fill white -pointsize 25 -gravity northeast -annotate +10+50 "%s"' % activity
-         fontneeded = True
-      if annotate != '':
-         cmd += ' -fill white -pointsize 15 -gravity north -annotate +0+10 "%s"' % annotate
-         fontneeded = True
       if drawfilename:
-         cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 ' + os.path.basename(output)
+         cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
          fontneeded = True
       if fontneeded and font != '': cmd += ' -font %s' % font
-#      if need_logo: cmd += ' -compose plus -composite'
+      if need_logo:
+         cmd += ' ' + tmpLogo
+         cmd += ' -compose plus -composite'
       cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
       cmd_convert.append( cmd)
       name_convert.append( afile)
@@ -316,7 +358,7 @@ cmd_encode = ''
 if codec == 'mov':
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.%07d.'+tmpFormat)
-   cmd = 'ffmpeg'
+   cmd = 'ffmpeg -pix_fmt rgb24'
    cmd += ' -y -r ' + str(fps) + ' -i '
    cmd += inputmask
    cmd += ' -vcodec mjpeg -qscale 1 '
@@ -336,10 +378,13 @@ else:
 
 # Print commands:
 if verbose:
-   if need_logo:
-      print 'Reformating logotype command:'
+   if len(cmd_precomp):
+      print 'Precomp  first and last commands:'
       print
-      print cmd_convertlogo
+      print cmd_precomp[0]
+      if len(cmd_precomp) > 1:
+         print '...'
+         print cmd_precomp[len(cmd_precomp)-1]
       print
    if need_convert:
       print 'Convert first and last commands:'
@@ -359,14 +404,16 @@ if afanasy:
    j=af.Job( afjobname)
    if username != '': j.setUserName(username)
 
-   if need_logo:
-      bl=af.Block( 'logo', 'generic')
-      j.blocks.append( bl)
-      t=af.Task( logopath)
-      bl.tasks.append( t)
-      t.setCommand( cmd_convertlogo)
-      bl.setCapacity( afconvcap)
-#      bl.setHostsMaskExclude('l.*')
+   if len(cmd_precomp):
+      bp=af.Block( 'precomp', 'generic')
+      j.blocks.append( bp)
+      n = 0
+      for cmd in cmd_precomp:
+         t=af.Task( name_precomp[n])
+         bp.tasks.append( t)
+         t.setCommand( cmd)
+         n += 1
+      bp.setCapacity( afconvcap)
 
    if need_convert:
       bc=af.Block( 'convert', 'generic')
@@ -378,8 +425,7 @@ if afanasy:
          t.setCommand( cmd)
          n += 1
       bc.setCapacity( afconvcap)
-#      bc.setHostsMask('r.*')
-      if need_logo: bc.setDependMask('logo')
+      if need_logo: bc.setDependMask('precomp')
       bc.setTasksMaxRunTime(11)
 
    be = af.Block( 'encode', 'generic')
@@ -389,8 +435,7 @@ if afanasy:
    t.setCommand( cmd_encode)
    be.setCapacity( afenccap)
    if need_convert:
-      if need_logo: be.setDependMask('convert|logo')
-      else: be.setDependMask('convert')
+      be.setDependMask('convert')
       j.setCmdPre( 'mkdir ' + os.path.abspath(tmpdir))
       j.setCmdPost('rm -R ' + os.path.abspath(tmpdir))
 
@@ -400,10 +445,17 @@ if afanasy:
 if debug == False:
    if afanasy: j.send( verbose)
    else:
-      if need_logo or need_convert: os.mkdir(tmpdir, 0777)
-      if need_logo:
-         print 'Reformatting logo...'
-         os.system( cmd_convertlogo)
+      if len(cmd_precomp) or need_convert: os.mkdir(tmpdir, 0777)
+      if len(cmd_precomp):
+         n = 0
+         print 'Precomositing...'
+         for cmd in cmd_precomp:
+            print name_precomp[n]
+            os.system( cmd)
+            n += 1
+            print 'PROGRESS: %d' % (100.0 * n / len(cmd_precomp)) + '%'
+            sys.stdout.flush()
+         print
       if need_convert:
          n = 0
          print 'Converting...',

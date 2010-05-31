@@ -72,9 +72,14 @@ class Dialog( QtGui.QWidget):
       self.cFileName.setChecked( True)
       self.lDraw.addWidget( self.cFileName)
       QtCore.QObject.connect( self.cFileName, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.tCompany = QtGui.QLabel('Company:', self)
+      self.lDraw.addWidget( self.tCompany)
+      self.editCompany = QtGui.QLineEdit('Bazelevs VFX', self)
+      self.lDraw.addWidget( self.editCompany)
+      QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tFont = QtGui.QLabel('Font:', self)
       self.lDraw.addWidget( self.tFont)
-      self.editFont = QtGui.QLineEdit( 'Arial', self)
+      self.editFont = QtGui.QLineEdit('Arial', self)
       self.lDraw.addWidget( self.editFont)
       QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lDrawing.addLayout( self.lDraw)
@@ -109,7 +114,7 @@ class Dialog( QtGui.QWidget):
 
       self.lUser = QtGui.QHBoxLayout()
       self.lArtist = QtGui.QLabel('Artist:', self)
-      self.editArtist = QtGui.QLineEdit( os.getenv('USER', os.getenv('USERNAME', 'user')), self)
+      self.editArtist = QtGui.QLineEdit( os.getenv('USER', os.getenv('USERNAME', 'user')).capitalize(), self)
       QtCore.QObject.connect( self.editArtist, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lActivity = QtGui.QLabel('Activity:', self)
       self.editActivity = QtGui.QLineEdit('', self)
@@ -120,13 +125,13 @@ class Dialog( QtGui.QWidget):
       self.lUser.addWidget( self.editActivity)
       self.lDrawing.addLayout( self.lUser)
 
-      self.lAnnotate = QtGui.QHBoxLayout()
-      self.tAnnotate = QtGui.QLabel('Annotate:', self)
-      self.editAnnotate = QtGui.QLineEdit( self)
-      QtCore.QObject.connect( self.editAnnotate, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lAnnotate.addWidget( self.tAnnotate)
-      self.lAnnotate.addWidget( self.editAnnotate)
-      self.lDrawing.addLayout( self.lAnnotate)
+      self.lComments = QtGui.QHBoxLayout()
+      self.tComments = QtGui.QLabel('Comments:', self)
+      self.editComments = QtGui.QLineEdit( self)
+      QtCore.QObject.connect( self.editComments, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lComments.addWidget( self.tComments)
+      self.lComments.addWidget( self.editComments)
+      self.lDrawing.addLayout( self.lComments)
 
       self.lLogo = QtGui.QHBoxLayout()
       self.cLogo = QtGui.QCheckBox('Logo', self)
@@ -493,9 +498,10 @@ class Dialog( QtGui.QWidget):
          version = os.path.basename( os.path.dirname(self.inputPattern))
          self.editVersion.setText( version)
 
+      company  = re.escape( str( self.editCompany.text()))
       artist   = re.escape( str( self.editArtist.text()))
       activity = re.escape( str( self.editActivity.text()))
-      annotate = re.escape( str( self.editAnnotate.text()))
+      comments = re.escape( str( self.editComments.text()))
 
       outdir = str( self.editOutputDir.text())
       if self.cAutoOutput.isChecked() or outdir == None or outdir == '':
@@ -513,7 +519,7 @@ class Dialog( QtGui.QWidget):
       fontneeded = False
       if self.cProject.isChecked() and project != '': fontneeded = True
       if self.cShot.isChecked() and shot != '': fontneeded = True
-      if annotate != '': fontneeded = True
+      if comments != '': fontneeded = True
       if self.cFrame.isChecked(): fontneeded = True
       if self.cDate.isChecked(): fontneeded = True
       if self.cTime.isChecked(): fontneeded = True
@@ -540,9 +546,10 @@ class Dialog( QtGui.QWidget):
       if self.cProject.isChecked() and project != '': cmd += ' --project "%s"' % project
       if self.cShot.isChecked() and shot != '': cmd += ' --shot "%s"' % shot
       if self.cVersion.isChecked() and version != '': cmd += ' --shotversion "%s"' % version
+      if company != '': cmd += ' --company "%s"' % company
       if artist != '': cmd += ' --artist "%s"' % artist
       if activity != '': cmd += ' --activity "%s"' % activity
-      if annotate != '': cmd += ' --annotate "%s"' % annotate
+      if comments != '': cmd += ' --comments "%s"' % comments
       if self.cFrame.isChecked(): cmd += ' --drawframe'
       if self.cDate.isChecked(): cmd += ' --drawdate'
       if self.cTime.isChecked(): cmd += ' --drawtime'
