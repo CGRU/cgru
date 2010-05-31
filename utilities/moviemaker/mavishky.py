@@ -16,7 +16,6 @@ def rmdir( signum, frame):
 
 signal.signal(signal.SIGTERM, rmdir)
 signal.signal(signal.SIGABRT, rmdir)
-signal.signal(signal.SIGQUIT, rmdir)
 signal.signal(signal.SIGINT,  rmdir)
 
 from optparse import OptionParser
@@ -37,11 +36,13 @@ parser.add_option('--font',             dest='font',        type  ='string',    
 parser.add_option('--logopath',         dest='logopath',    type  ='string',     default='',          help='Add a specified image')
 parser.add_option('--logosize',         dest='logosize',    type  ='string',     default='200x100',   help='Logotype size')
 parser.add_option('--drawdate',         dest='drawdate',    action='store_true', default=False,       help='Draw date')
+parser.add_option('--drawtime',         dest='drawtime',    action='store_true', default=False,       help='Draw time')
 parser.add_option('--drawframe',        dest='drawframe',   action='store_true', default=False,       help='Draw frame')
 parser.add_option('--drawfilename',     dest='drawfilename',action='store_true', default=False,       help='Draw file name')
 parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
 parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
-parser.add_option('-d', '--datesuffix', dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to name')
+parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')
+parser.add_option('--timesuffix',       dest='timesuffix',  action='store_true', default=False,       help='Add time suffix to output file name')
 parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,       help='Verbose mode')
 parser.add_option('-D', '--debug',      dest='debug',       action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 parser.add_option('-A', '--afanasy',    dest='afanasy',     action='store_true', default=False,       help='Send to Afanasy')
@@ -58,6 +59,7 @@ resolution     = options.resolution
 inpattern      = options.inpattern
 output         = options.output
 drawdate       = options.drawdate
+drawtime       = options.drawtime
 drawframe      = options.drawframe
 drawfilename   = options.drawfilename
 draw169        = options.draw169
@@ -72,6 +74,7 @@ artist         = options.artist
 activity       = options.activity
 annotate       = options.annotate
 datesuffix     = options.datesuffix
+timesuffix     = options.timesuffix
 gamma          = options.gamma
 
 verbose     = options.verbose
@@ -92,6 +95,22 @@ tmpLogo = 'logo.png'
 need_convert = False
 need_logo = False
 
+#datetimestring = '`date +%y-%m-%d_%H-%M`'
+datetimestring = ''
+datetimesuffix = ''
+datestring = time.strftime('%y-%m-%d')
+timestring = time.strftime('%H-%M')
+if drawdate  : datetimestring += datestring
+if datesuffix: datetimesuffix += datestring
+if drawtime:
+   if datetimestring != '': datetimestring += '_'
+   datetimestring += timestring
+if timesuffix:
+   if datetimesuffix != '': datetimesuffix += '_'
+   datetimesuffix += timestring
+#if re.match( r'win.*', sys.platform) != None: datetimestring = '%DATE%'
+#datetimestring = "`python -c \"import time;print time.strftime('%y-%m-%d_%H-%M')\"`"
+
 # Check required parameters:
 if inpattern == '': parser.error('Input files not specified.')
 
@@ -99,7 +118,10 @@ if inpattern == '': parser.error('Input files not specified.')
 if debug: verbose = True
 if verbose: print 'VERBOSE MODE:'
 if debug: print 'DEBUG MODE:'
-if drawdate or drawframe: need_convert = True
+if drawframe        : need_convert = True
+if drawdate         : need_convert = True
+if drawtime         : need_convert = True
+if drawfilename     : need_convert = True
 if project     != '': need_convert = True
 if shot        != '': need_convert = True
 if shotversion != '': need_convert = True
@@ -179,7 +201,7 @@ elif imgtype == 'CIN': correction = corr_Log
 # Output file:
 if output == '': output = os.path.join( os.path.dirname( inputdir), prefix.strip('_. '))
 afjobname = os.path.basename( output)
-if datesuffix: output += '.`date +%y-%m-%d_%H-%M`'
+if datetimesuffix != '': output += '.' + datetimesuffix
 if codec == 'mov': output += '.mov'
 elif codec == 'mpeg': output += '.avi'
 else:
@@ -257,8 +279,8 @@ if need_convert:
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,0,%(width)d,%(draw235_y)d"' % vars()
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(width)d,%(height)d"' % vars()
       fontneeded = False
-      if drawdate:
-         cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 `date +%y-%m-%d_%H-%M`'
+      if datetimestring != '':
+         cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 ' + datetimestring
          fontneeded = True
       if drawframe:
          digits = afile[ len(prefix) : len(afile) - len(suffix)]

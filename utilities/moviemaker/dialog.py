@@ -58,21 +58,25 @@ class Dialog( QtGui.QWidget):
       self.lDraw = QtGui.QHBoxLayout()
       self.cFrame = QtGui.QCheckBox('Frame', self)
       self.cFrame.setChecked( True)
+      self.lDraw.addWidget( self.cFrame)
       QtCore.QObject.connect( self.cFrame, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.cDate = QtGui.QCheckBox('Date', self)
       self.cDate.setChecked( True)
+      self.lDraw.addWidget( self.cDate)
       QtCore.QObject.connect( self.cDate, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.cTime = QtGui.QCheckBox('Time', self)
+      self.cTime.setChecked( False)
+      self.lDraw.addWidget( self.cTime)
+      QtCore.QObject.connect( self.cTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.cFileName = QtGui.QCheckBox('File Name', self)
       self.cFileName.setChecked( True)
+      self.lDraw.addWidget( self.cFileName)
       QtCore.QObject.connect( self.cFileName, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.tFont = QtGui.QLabel('Font:', self)
-      self.editFont = QtGui.QLineEdit( 'Arial', self)
-      QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lDraw.addWidget( self.cFrame)
-      self.lDraw.addWidget( self.cDate)
-      self.lDraw.addWidget( self.cFileName)
       self.lDraw.addWidget( self.tFont)
+      self.editFont = QtGui.QLineEdit( 'Arial', self)
       self.lDraw.addWidget( self.editFont)
+      QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lDrawing.addLayout( self.lDraw)
 
       self.lTitles = QtGui.QHBoxLayout()
@@ -243,21 +247,25 @@ class Dialog( QtGui.QWidget):
 
       self.lOutputName = QtGui.QHBoxLayout()
       self.tOutputName = QtGui.QLabel('Output file name:', self)
+      self.lOutputName.addWidget( self.tOutputName)
       self.editOutputName = QtGui.QLineEdit( self)
+      self.lOutputName.addWidget( self.editOutputName)
       QtCore.QObject.connect( self.editOutputName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.btnBrowseOutput = QtGui.QPushButton('Browse', self)
+      self.lOutputName.addWidget( self.btnBrowseOutput)
       QtCore.QObject.connect( self.btnBrowseOutput, QtCore.SIGNAL('pressed()'), self.browseOutput)
       self.cAutoOutput = QtGui.QCheckBox('Auto', self)
       self.cAutoOutput.setChecked( True)
+      self.lOutputName.addWidget( self.cAutoOutput)
       QtCore.QObject.connect( self.cAutoOutput, QtCore.SIGNAL('stateChanged(int)'), self.autoOutput)
       self.cDateOutput = QtGui.QCheckBox('Add Date', self)
       self.cDateOutput.setChecked( True)
-      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.lOutputName.addWidget( self.tOutputName)
-      self.lOutputName.addWidget( self.editOutputName)
-      self.lOutputName.addWidget( self.btnBrowseOutput)
-      self.lOutputName.addWidget( self.cAutoOutput)
       self.lOutputName.addWidget( self.cDateOutput)
+      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.cTimeOutput = QtGui.QCheckBox('Add Time', self)
+      self.cTimeOutput.setChecked( False)
+      self.lOutputName.addWidget( self.cTimeOutput)
+      QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.lOutputSettings.addLayout( self.lOutputName)
 
       self.lOutputDir = QtGui.QHBoxLayout()
@@ -508,6 +516,7 @@ class Dialog( QtGui.QWidget):
       if annotate != '': fontneeded = True
       if self.cFrame.isChecked(): fontneeded = True
       if self.cDate.isChecked(): fontneeded = True
+      if self.cTime.isChecked(): fontneeded = True
       if fontneeded: fontpath = self.editFont.text()
 
       logodraw = self.cLogo.isChecked()
@@ -526,7 +535,8 @@ class Dialog( QtGui.QWidget):
       cmd += ' -i "%s"' % self.inputPattern
       cmd += ' -o "%s"' % os.path.join( outdir, outname)
       cmd += ' -g %.2f' % self.dsbGamma.value()
-      if self.cDateOutput.isChecked(): cmd += ' -d'
+      if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
+      if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
       if self.cProject.isChecked() and project != '': cmd += ' --project "%s"' % project
       if self.cShot.isChecked() and shot != '': cmd += ' --shot "%s"' % shot
       if self.cVersion.isChecked() and version != '': cmd += ' --shotversion "%s"' % version
@@ -535,6 +545,7 @@ class Dialog( QtGui.QWidget):
       if annotate != '': cmd += ' --annotate "%s"' % annotate
       if self.cFrame.isChecked(): cmd += ' --drawframe'
       if self.cDate.isChecked(): cmd += ' --drawdate'
+      if self.cTime.isChecked(): cmd += ' --drawtime'
       if self.cFileName.isChecked(): cmd += ' --drawfilename'
       if fontneeded: cmd += ' --font "%s"' % fontpath
       cacher = self.cbCacherH.itemData( self.cbCacherH.currentIndex()).toString()
