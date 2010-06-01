@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import re
 import socket
 import xml.parsers.expat
 
@@ -17,6 +18,12 @@ class Env:
       if home == None: home = 'None'
       username = os.getenv('AF_USERNAME', os.getenv('USER', os.getenv('USERNAME')))
       if username == None: username = 'None'
+
+      # cut DOMAIN from username:
+      dpos = username.rfind('/')
+      if dpos == -1: dpos = username.rfind('\\')
+      if dpos != -1: username = username[dpos+1:]
+
       hostname = os.getenv('AF_HOSTNAME', socket.gethostname())
       if self.verbose:
          print 'Afanasy root = "%s"' % afroot
