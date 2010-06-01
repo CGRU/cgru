@@ -9,6 +9,17 @@ import sys
 
 from PyQt4 import QtCore, QtGui
 
+# Initializations:
+
+CompanyName = 'Bazelevs VFX'
+
+UserName = os.getenv('USER', os.getenv('USERNAME', 'user'))
+# cut DOMAIN from username:
+dpos = UserName.rfind('/')
+if dpos == -1: dpos = UserName.rfind('\\')
+if dpos != -1: UserName = UserName[dpos+1:]
+UserName = UserName.capitalize()
+
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 LogosPath = os.path.join( DialogPath, 'logos')
 FontsList = ['Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
@@ -75,7 +86,7 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.cFileName, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.tCompany = QtGui.QLabel('Company:', self)
       self.lDraw.addWidget( self.tCompany)
-      self.editCompany = QtGui.QLineEdit('Bazelevs VFX', self)
+      self.editCompany = QtGui.QLineEdit( CompanyName, self)
       self.lDraw.addWidget( self.editCompany)
       QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tFont = QtGui.QLabel('Font:', self)
@@ -120,7 +131,7 @@ class Dialog( QtGui.QWidget):
       self.lUser = QtGui.QHBoxLayout()
       self.lArtist = QtGui.QLabel('Artist:', self)
       self.lUser.addWidget( self.lArtist)
-      self.editArtist = QtGui.QLineEdit( os.getenv('USER', os.getenv('USERNAME', 'user')).capitalize(), self)
+      self.editArtist = QtGui.QLineEdit( UserName, self)
       self.lUser.addWidget( self.editArtist)
       QtCore.QObject.connect( self.editArtist, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lActivity = QtGui.QLabel('Activity:', self)
