@@ -348,6 +348,8 @@ class Dialog( QtGui.QWidget):
       self.lProcess.addWidget( self.btnStop)
       self.mainLayout.addLayout( self.lProcess)
 
+      self.inputEvaluated = False
+
       self.autoTitles()
       self.activityChanged()
       self.autoOutput()
@@ -376,9 +378,11 @@ class Dialog( QtGui.QWidget):
 
    def activityChanged( self):
       self.editActivity.setText( self.cbActivity.currentText())
+      self.evaluate()
 
    def fontChanged( self):
       self.editFont.setText( self.cbFont.currentText())
+      self.evaluate()
 
    def afanasy( self):
       enableAf = self.cAfanasy.isChecked()

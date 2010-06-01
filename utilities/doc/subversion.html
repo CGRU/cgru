@@ -30,14 +30,11 @@
 <hr />
 
 <p>
-<code> svn st </code> command used to check status of local version. It shows all local changes.
+<code> subversion.py </code> command shows changes in project.
 </p>
 <p>
-<code>utilities/svn_st</code> command parse <code>svn st</code> command output to filter files and folders with are not in repository.
-It is some binary, temporary and generated files.
-The status of local project version should produce no output with this filter, even if you build everything.
+It uses <code> svn st </code> command to check status of local version and filter its result to cut temporary files.
 </p>
-
 
 <!--FOOTER-->
 <br/>
