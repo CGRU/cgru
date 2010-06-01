@@ -11,6 +11,7 @@ from PyQt4 import QtCore, QtGui
 
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 LogosPath = os.path.join( DialogPath, 'logos')
+FontsList = ['Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 
 class Dialog( QtGui.QWidget):
    def __init__( self):
@@ -23,13 +24,13 @@ class Dialog( QtGui.QWidget):
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
       self.cbFormat = QtGui.QComboBox( self)
-      self.cbFormat.addItem('try "as is"')
+      self.cbFormat.addItem('Encode "as is" only')
       self.cbFormat.addItem('PAL (720x576)', QtCore.QVariant('720x576'))
       self.cbFormat.addItem('PAL Square (768x576)', QtCore.QVariant('768x576'))
       self.cbFormat.addItem('HD 720p (1280x720)', QtCore.QVariant('1280x720'))
       self.cbFormat.addItem('HD 1080p (1920x1080)', QtCore.QVariant('1920x1080'))
       self.cbFormat.setCurrentIndex( 1)
-      QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.formatChanged)
+      QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tCodec = QtGui.QLabel('Codec:', self)
       self.cbCodec = QtGui.QComboBox( self)
       self.cbCodec.addItem('Quicktime (PhotoJPG)', QtCore.QVariant('mov'))
@@ -82,6 +83,10 @@ class Dialog( QtGui.QWidget):
       self.editFont = QtGui.QLineEdit('Arial', self)
       self.lDraw.addWidget( self.editFont)
       QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.cbFont = QtGui.QComboBox( self)
+      for font in FontsList: self.cbFont.addItem( font)
+      self.lDraw.addWidget( self.cbFont)
+      QtCore.QObject.connect( self.cbFont, QtCore.SIGNAL('currentIndexChanged(int)'), self.fontChanged)
       self.lDrawing.addLayout( self.lDraw)
 
       self.lTitles = QtGui.QHBoxLayout()
@@ -114,15 +119,21 @@ class Dialog( QtGui.QWidget):
 
       self.lUser = QtGui.QHBoxLayout()
       self.lArtist = QtGui.QLabel('Artist:', self)
+      self.lUser.addWidget( self.lArtist)
       self.editArtist = QtGui.QLineEdit( os.getenv('USER', os.getenv('USERNAME', 'user')).capitalize(), self)
+      self.lUser.addWidget( self.editArtist)
       QtCore.QObject.connect( self.editArtist, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lActivity = QtGui.QLabel('Activity:', self)
-      self.editActivity = QtGui.QLineEdit('', self)
-      QtCore.QObject.connect( self.editActivity, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lUser.addWidget( self.lArtist)
-      self.lUser.addWidget( self.editArtist)
       self.lUser.addWidget( self.lActivity)
+      self.editActivity = QtGui.QLineEdit('', self)
       self.lUser.addWidget( self.editActivity)
+      QtCore.QObject.connect( self.editActivity, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.cbActivity = QtGui.QComboBox( self)
+      self.cbActivity.addItem('comp')
+      self.cbActivity.addItem('render')
+      self.cbActivity.addItem('anim')
+      self.lUser.addWidget( self.cbActivity)
+      QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
       self.lDrawing.addLayout( self.lUser)
 
       self.lComments = QtGui.QHBoxLayout()
@@ -338,6 +349,7 @@ class Dialog( QtGui.QWidget):
       self.mainLayout.addLayout( self.lProcess)
 
       self.autoTitles()
+      self.activityChanged()
       self.autoOutput()
       self.inputFileChanged()
       self.evaluate()
@@ -362,13 +374,11 @@ class Dialog( QtGui.QWidget):
       self.sbLogoSizeY.setEnabled( enable)
       self.evaluate()
 
-   def formatChanged( self):
-      if self.cbFormat.itemData( self.cbFormat.currentIndex()).isNull():
-         self.cLogo.setChecked( False)
-         self.cLogo.setEnabled( False)
-      else:
-         self.cLogo.setEnabled( True)
-      self.evaluate()
+   def activityChanged( self):
+      self.editActivity.setText( self.cbActivity.currentText())
+
+   def fontChanged( self):
+      self.editFont.setText( self.cbFont.currentText())
 
    def afanasy( self):
       enableAf = self.cAfanasy.isChecked()
@@ -403,7 +413,6 @@ class Dialog( QtGui.QWidget):
       self.inputFileChanged()
 
    def inputFileChanged( self):
-#      print 'inputFileChanged( self):'
       self.inputEvaluated = False
       self.editInputFilesCount.clear()
       self.editInputFilesPattern.clear()
@@ -474,7 +483,6 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def evaluate( self):
-#      print 'evaluate( self):'
       self.evaluated = False
       if not self.inputEvaluated: return
 
@@ -534,37 +542,38 @@ class Dialog( QtGui.QWidget):
 
       cmd = 'mavishky.py'
       cmd = 'python ' + os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
-      format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
-      if not format.isEmpty(): cmd += ' -r %s' % format
       cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
       cmd += ' -f %s' % self.cbFPS.currentText()
       cmd += ' -i "%s"' % self.inputPattern
       cmd += ' -o "%s"' % os.path.join( outdir, outname)
-      cmd += ' -g %.2f' % self.dsbGamma.value()
+      format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
+      if not format.isEmpty():
+         cmd += ' -r %s' % format
+         cmd += ' -g %.2f' % self.dsbGamma.value()
+         if self.cProject.isChecked() and project != '': cmd += ' --project "%s"' % project
+         if self.cShot.isChecked() and shot != '': cmd += ' --shot "%s"' % shot
+         if self.cVersion.isChecked() and version != '': cmd += ' --shotversion "%s"' % version
+         if company != '': cmd += ' --company "%s"' % company
+         if artist != '': cmd += ' --artist "%s"' % artist
+         if activity != '': cmd += ' --activity "%s"' % activity
+         if comments != '': cmd += ' --comments "%s"' % comments
+         if self.cFrame.isChecked(): cmd += ' --drawframe'
+         if self.cDate.isChecked(): cmd += ' --drawdate'
+         if self.cTime.isChecked(): cmd += ' --drawtime'
+         if self.cFileName.isChecked(): cmd += ' --drawfilename'
+         if fontneeded: cmd += ' --font "%s"' % fontpath
+         cacher = self.cbCacherH.itemData( self.cbCacherH.currentIndex()).toString()
+         if not cacher.isEmpty(): cmd += ' --draw169 %s' % cacher
+         cacher = self.cbCacherC.itemData( self.cbCacherC.currentIndex()).toString()
+         if not cacher.isEmpty(): cmd += ' --draw235 %s' % cacher
+         if self.cLogo.isChecked():
+            cmd += ' --logopath "%s"' % logopath
+            logosize  = str( self.sbLogoSizeX.value())
+            logosize += 'x'
+            logosize += str( self.sbLogoSizeY.value())
+            cmd += ' --logosize %s' % logosize
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
-      if self.cProject.isChecked() and project != '': cmd += ' --project "%s"' % project
-      if self.cShot.isChecked() and shot != '': cmd += ' --shot "%s"' % shot
-      if self.cVersion.isChecked() and version != '': cmd += ' --shotversion "%s"' % version
-      if company != '': cmd += ' --company "%s"' % company
-      if artist != '': cmd += ' --artist "%s"' % artist
-      if activity != '': cmd += ' --activity "%s"' % activity
-      if comments != '': cmd += ' --comments "%s"' % comments
-      if self.cFrame.isChecked(): cmd += ' --drawframe'
-      if self.cDate.isChecked(): cmd += ' --drawdate'
-      if self.cTime.isChecked(): cmd += ' --drawtime'
-      if self.cFileName.isChecked(): cmd += ' --drawfilename'
-      if fontneeded: cmd += ' --font "%s"' % fontpath
-      cacher = self.cbCacherH.itemData( self.cbCacherH.currentIndex()).toString()
-      if not cacher.isEmpty(): cmd += ' --draw169 %s' % cacher
-      cacher = self.cbCacherC.itemData( self.cbCacherC.currentIndex()).toString()
-      if not cacher.isEmpty(): cmd += ' --draw235 %s' % cacher
-      if self.cLogo.isChecked():
-         cmd += ' --logopath "%s"' % logopath
-         logosize  = str( self.sbLogoSizeX.value())
-         logosize += 'x'
-         logosize += str( self.sbLogoSizeY.value())
-         cmd += ' --logosize %s' % logosize
       if self.cAfanasy.isChecked() and not self.cAfOneTask.isChecked():
          cmd += ' -A'
          cmd += ' --afconvcap %d' % self.sbAfCapConvert.value()

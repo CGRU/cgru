@@ -118,16 +118,6 @@ if inpattern == '': parser.error('Input files not specified.')
 if debug: verbose = True
 if verbose: print 'VERBOSE MODE:'
 if debug: print 'DEBUG MODE:'
-if drawframe        : need_convert = True
-if drawdate         : need_convert = True
-if drawtime         : need_convert = True
-if drawfilename     : need_convert = True
-if project     != '': need_convert = True
-if shot        != '': need_convert = True
-if shotversion != '': need_convert = True
-if artist      != '': need_convert = True
-if activity    != '': need_convert = True
-if comments    != '': need_convert = True
 
 # Input directory:
 inputdir = os.path.dirname( inpattern)
@@ -221,11 +211,11 @@ height = 0
 if resolution != '':
    need_convert = True
    pos = resolution.find('x')
-   width = int(resolution[ 0 : pos ])
-   height = int(resolution[ pos + 1 : len(resolution) ])
    if pos <= 0:
       print 'Invalid resolution specified.'
       exit(1)
+   width = int(resolution[ 0 : pos ])
+   height = int(resolution[ pos + 1 : len(resolution) ])
    if verbose: print 'Output resolution = %(width)d x %(height)d' % vars()
    afjobname += ' %s' % resolution
 
@@ -265,6 +255,7 @@ if need_convert:
       rect_x1 += rect_w
       rect_x2 += rect_w
       rect_c += 255 / (rect_num - 1)
+   if font != '': cmd += ' -font %s' % font
    if datetimestring != '':
       cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+100 "%s"' % datetimestring
    if company != '':
@@ -278,12 +269,11 @@ if need_convert:
    if artist != '':
       cmd += ' -fill white -pointsize 25 -gravity southwest -annotate +10+50 "%s"' % ('Artist: ' + artist)
    if activity != '':
-      cmd += ' -fill white -pointsize 25 -gravity northeast -annotate +10+50 "%s"' % ('Activity: ' + activity)
+      cmd += ' -fill white -pointsize 25 -gravity southeast -annotate +10+50 "%s"' % ('Activity: ' + activity)
    if comments != '':
       cmd += ' -fill white -pointsize 20 -gravity west -annotate +10+0 "%s"' % ('Comments: ' + comments)
    if drawfilename:
       cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
-   if font != '': cmd += ' -font %s' % font
    cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')
@@ -327,24 +317,18 @@ if need_convert:
       if draw235:
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,0,%(width)d,%(draw235_y)d"' % vars()
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(width)d,%(height)d"' % vars()
-      fontneeded = False
+      if font != '': cmd += ' -font %s' % font
       if datetimestring != '':
          cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 "%s"' % datetimestring
-         fontneeded = True
       if drawframe:
          digits = afile[ len(prefix) : len(afile) - len(suffix)]
          cmd += ' -fill white -pointsize 30 -gravity southeast -annotate +10+10 "%s"' % digits
-         fontneeded = True
       if project != '':
          cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+10 "%s"' % project
-         fontneeded = True
       if shot != '' or shotversion != '':
          cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+10 "%s"' % (shot + ' ' + shotversion)
-         fontneeded = True
       if drawfilename:
          cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
-         fontneeded = True
-      if fontneeded and font != '': cmd += ' -font %s' % font
       if need_logo:
          cmd += ' ' + tmpLogo
          cmd += ' -compose plus -composite'
