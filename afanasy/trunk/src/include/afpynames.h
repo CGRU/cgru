@@ -11,9 +11,7 @@ namespace AFPYNAMES
    const char SERVICE_CLASSESDIR[]        = "services";     ///< Services directory relative to PYTHONPATH
    const char SERVICE_FUNC_GETWDIR[]      = "getWDir";
    const char SERVICE_FUNC_GETCOMMAND[]   = "getCommand";
-//   const char SERVICE_FUNC_APPLYCMDCAPACITY[] = "applycmdcapacity";
-//   const char SERVICE_FUNC_APPLYCMDHOSTS[]    = "applycmdhosts";
-   const char SERVICE_FUNC_CHECKFILES[]       = "checkfiles";
+   const char SERVICE_FUNC_CHECKFILES[]   = "checkfiles";
 
    const char PARSER_CLASSESDIR[] = "parsers";      ///< Parsers directory relative to PYTHONPATH
    const char PARSER_FUNC_PARSE[] = "parse";
