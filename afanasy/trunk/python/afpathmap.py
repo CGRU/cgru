@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import sys
 
 def findPositions( path):
    PathBegin = ' "'
@@ -24,10 +25,8 @@ def findPathEnd( path):
    if pathlen <= 1: return 1
    while position < pathlen:
       position += 1
-      if position >= pathlen: return position
-      if path[position] == ' ':
-         if path[position-1] != '\\': break
-   return position - 1
+      if position >= pathlen or path[position] == ' ': break
+   return position
 
 def findSeparator( path):
    sep = ''
@@ -50,7 +49,7 @@ def replaceSeperators( path, path_from, path_to):
    if sep_from == '' or sep_to == '': return newpath
    pathend = findPathEnd( newpath)
 #   print 'Path end for "%s" = %d' % (newpath, pathend)
-   if pathend > 1 and pathend < len(newpath):
+   if pathend > 1 and pathend <= len(newpath):
       part1 = newpath[:pathend]
       part2 = newpath[pathend:]
       part1 = part1.replace( sep_from, sep_to)
@@ -109,16 +108,16 @@ class PathMap:
          for i in range( 0, len( self.PathServer)):
             if toserver:
                path_from = self.PathClient[i]
+               if sys.platform.find('win') == 0: path_from = path_from.lower()
                path_to   = self.PathServer[i]
             else:
                path_from = self.PathServer[i]
                path_to   = self.PathClient[i]
-            if newpath[position:].find(path_from) == 0:
+            if newpath[position:].lower().find(path_from) == 0:
                part1 = newpath[:position]
-               part2 = newpath[position:]
-               part2 = part2.replace( path_from, path_to, 1)
+               part2 = newpath[position+len(path_from):]
                part2 = replaceSeperators( part2, path_from, path_to)
-               newpath = part1 + part2
+               newpath = part1 + path_to + part2
                if Verbose:
                   print 'Pathes mapped:'
                   print path
