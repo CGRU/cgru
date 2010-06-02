@@ -9,11 +9,12 @@ import pyaf
 import afenv
 import afnetwork
 import services
-#import parsers
 
-def CheckClass( name, folder):
+from afpathmap import PathMap
+
+def CheckClass( afroot, name, folder):
    filename = name + '.py'
-   path = os.path.join( os.environ['AF_ROOT'], 'python')
+   path = os.path.join( afroot, 'python')
    path = os.path.join( path, folder)
    if filename in os.listdir( path): return True
    return False   
@@ -22,13 +23,22 @@ class Task(pyaf.Task):
    def __init__( self, taskname = ''):
       pyaf.Task.__init__( self)
       if taskname != '': self.setName( taskname) 
+      self.env = afenv.Env()
+      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      self.pm = PathMap( self.env.Vars['afroot'])
+
+   def setCommand( self, cmd, TransferToServer = True):
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
+      pyaf.Task.setCommand( self, str(cmd))
 
 class Block(pyaf.Block):
    def __init__( self, blockname = 'block', blocktype = 'generic'):
       self.env = afenv.Env()
+      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Block.__init__( self)
       parsertype = 'none'
-      if not CheckClass( blocktype, 'services'):
+      if not CheckClass( self.env.Vars['afroot'], blocktype, 'services'):
          print 'Error: Unknown service "%s", setting to "generic"' % blocktype
          blocktype = 'generic'
       else:
@@ -43,7 +53,7 @@ class Block(pyaf.Block):
 
    def setParserType( self, parsertype, nocheck = False):
       if not nocheck:
-         if not CheckClass( parsertype, 'parsers'):
+         if not CheckClass( self.env.Vars['afroot'], parsertype, 'parsers'):
             if parsertype != 'none':
                print 'Error: Unknown parser "%s", setting to "none"' % parsertype
                parsertype = 'none'
@@ -56,14 +66,18 @@ class Block(pyaf.Block):
    def setVariableCapacity( self, capmin, capmax):
       if capmin >= 0 or capmax >= 0: pyaf.Block.setVariableCapacity( self, capmin, capmax)
 
-   def setCommand( self, cmd, prefix = True):
+   def setWorkingDirectory( self, cmd, TransferToServer = True):
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
+      pyaf.Block.setWorkingDirectory( self, str(cmd))
+   def setCommand( self, cmd, prefix = True, TransferToServer = True):
       if prefix: cmd = os.getenv('AF_CMD_PREFIX', self.env.Vars['cmdprefix']) + str(cmd)
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Block.setCommand( self, str(cmd))
    def setCmdPre(  self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.env.pathToServer( str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Block.setCmdPre(  self, str(cmd))
    def setCmdPost( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.env.pathToServer( str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Block.setCmdPost( self, str(cmd))
 
    def addTask( self, taskname = ''):
@@ -89,6 +103,7 @@ class Job(pyaf.Job):
       pyaf.Job.__init__( self)
       self.env = afenv.Env( verbose)
       if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      self.pm = PathMap( self.env.Vars['afroot'])
       self.setPriority(  int( self.env.Vars['priority'] ))
       self.setMaxHosts(  int( self.env.Vars['maxhosts'] ))
       self.setUserName(       self.env.Vars['username']  )
@@ -110,10 +125,10 @@ class Job(pyaf.Job):
       pyaf.Job.setPriority( self, priority)
 
    def setCmdPre(  self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.env.pathToServer( str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Job.setCmdPre(  self, str(cmd))
    def setCmdPost( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.env.pathToServer( str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Job.setCmdPost( self, str(cmd))
 
    def fillBlocks( self):

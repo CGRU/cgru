@@ -12,8 +12,6 @@ Prefix './' used in examples and set through environment.
    <cmdprefix>./</cmdprefix>
 So each path (project, asset) can have individual software setup.
 -->
-   <path_client>c:/cg/tools;c:/projects</path_client>
-   <path_server>/cg/tools;/cg/projects</path_server>
    <priority>99</priority>
    <maxhosts>-1</maxhosts>
    <hostsmask></hostsmask>

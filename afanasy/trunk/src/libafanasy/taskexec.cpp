@@ -160,9 +160,8 @@ void TaskExec::stdOut( bool full) const
    {
       if( false == wdir.isEmpty()) printf("   Working directory = \"%s\".\n", wdir.toUtf8().data());
       if( false == env.isEmpty()) printf("   Environment = \"%s\".\n", env.toUtf8().data());
+      printf( "%s\n", cmd.toUtf8().data());
    }
-
-   printf( "%s\n", cmd.toUtf8().data());
 }
 
 int TaskExec::calcWeight() const

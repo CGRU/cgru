@@ -43,4 +43,3 @@ def pathToC( path_a, path_b):
    path = path_a[0:len_begin] + '%' + padding + 'd' + path_a[len_a-len_end:len_a]
 
    return path
-

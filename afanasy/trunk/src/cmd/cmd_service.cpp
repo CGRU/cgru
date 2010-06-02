@@ -23,17 +23,19 @@ bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
       AFERRAR("Invalid capacity number '%s'.\n", argv[2]);
       return false;
    }
+   QString wdir;
    QString command( argv[1]);
+   QStringList hosts;
    QString files;
 
-   af::Service service( argv[0], command, files, true);
+   af::Service service( argv[0], wdir, command, capacity, hosts, files, true);
    if( service.isInitialized() == false)
    {
       AFERRAR("Service '%s' initialization failed.\n", argv[0]);
       return false;
    }
 
-   command = service.applyCmdCapacity( capacity);
+   command = service.getCommand();
    printf("Result Command:\n%s\n", command.toUtf8().data());
    return true;
 }
@@ -52,16 +54,18 @@ bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
    QStringList hosts;
    for( int a = 2; a < argc; a++) hosts << argv[a];
 
+   QString wdir;
+   int capacity = -1;
    QString files;
 
-   af::Service service( argv[0], command, files, true);
+   af::Service service( argv[0], wdir, command, capacity, hosts, files, true);
    if( service.isInitialized() == false)
    {
       AFERRAR("Service '%s' initialization failed.\n", argv[0]);
       return false;
    }
 
-   command = service.applyCmdHosts( hosts);
+   command = service.getCommand();
    printf("Result Command:\n%s\n", command.toUtf8().data());
    return true;
 }

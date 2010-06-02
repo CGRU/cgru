@@ -65,25 +65,3 @@ class Env:
       if self.element == '': return
       self.Vars[self.element] = str(data)
       self.element_hasdata = True
-
-   def pathToServer( self, path):
-#      path = path.lower()
-      paths_client = self.Vars['path_client']
-      if paths_client == '':
-        return path
-      paths_server = self.Vars['path_server']
-      if paths_server == '':
-        return path
-      paths_client_array = paths_client.split(';')
-      paths_server_array = paths_server.split(';')
-      paths_size = len(paths_client_array)
-      if paths_size != len(paths_client_array):
-        print 'ERROR: Server and Client paths map have different sizes.'
-        return path
-
-      for i in range( paths_size):
-         if path.find(paths_client_array[i]) >= 0:
-            print 'Replacing: "'+paths_client_array[i]+'" on "'+paths_server_array[i]+'"'
-            return path.replace( paths_client_array[i], paths_server_array[i])
-
-      return path

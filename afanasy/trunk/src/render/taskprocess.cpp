@@ -44,34 +44,31 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    connect( &timer, SIGNAL( timeout() ), this, SLOT( sendTaskSate() ));
    timer.setInterval( af::Environment::getRenderUpdateTaskPeriod() * 1000 * (runningtasks+1));
 
+   QString wdir = exec->getWDir();
    QString command = exec->getCmd();
-
-   printf("\nStarting[%d]: ", runningtasks); exec->stdOut( true);
-   if( exec->hasWDir()) setWorkingDirectory( exec->getWDir());
 
    if( false == exec->getServiceType().isEmpty())
       service = new af::Service(
             exec->getServiceType(),
-            exec->getCmd(),
+            wdir,
+            command,
+            exec->getCapCoeff(),
+            exec->getMultiHostsNames(),
             exec->getCmdView()
          );
+
+   if( service)
+   {
+      command = service->getCommand();
+      wdir = service->getWDir();
+   }
 
    if( false == exec->getParserType().isEmpty())
       parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
 
-   if( service)
-   {
-      if( exec->getCapCoeff())
-      {
-         command = service->applyCmdCapacity( exec->getCapCoeff());
-         printf("   Capacity coefficient applied to command:\n%s\n", command.toUtf8().data());
-      }
-      if( exec->getMultiHostsNames().size() > 0)
-      {
-         command = service->applyCmdHosts( exec->getMultiHostsNames());
-         printf("   Hosts names applied to command:\n%s\n", command.toUtf8().data());
-      }
-   }
+   if( false == wdir.isEmpty()) setWorkingDirectory( wdir);
+
+   printf("\nStarting[%d]: ", runningtasks); exec->stdOut( false);
 
    QStringList args;
 #ifdef WINNT
@@ -102,7 +99,7 @@ TaskProcess::~TaskProcess()
 void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 {
    if( update_status == 0 ) return;
-   printf("Finished: "); exec->stdOut( false);
+   printf("\nFinished: "); exec->stdOut( false);
    if(( exitStatus != QProcess::NormalExit ) || ( stop_time != 0 ))
    {
       update_status = af::TaskExec::UPFinishedCrash;

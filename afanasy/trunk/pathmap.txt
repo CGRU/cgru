@@ -1,0 +1,7 @@
+# This is an example pathes map file
+# This is a comment
+
+#     Client:             Server:
+
+#\\server\projects          /cg/projects
+
