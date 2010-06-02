@@ -1,6 +1,8 @@
 #include <QtGui/QApplication>
 #include <QtGui/QIcon>
 
+#include <Python.h>
+
 #define _USE_MATH_DEFINES
 #include <math.h>
 
@@ -32,10 +34,11 @@ void sig_int(int signum)
 
 int main(int argc, char *argv[])
 {
+   Py_InitializeEx(0);
+   uint32_t env_flags = af::Environment::SolveServerAddress | af::Environment::AppendPythonPath;
 #ifdef WINNT
-   af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::Verbose, argc, argv);   // Verbose environment initialization
+   env_flags = env_flags | af::Environment::Verbose; // Verbose environment initialization
 #else
-   af::Environment ENV( af::Environment::SolveServerAddress, argc, argv);  // Silent environment initialization
 //
 // interrupt signal catch:
    struct sigaction actint;
@@ -50,6 +53,7 @@ int main(int argc, char *argv[])
    actpipe.sa_handler = sig_pipe;
    sigaction( SIGPIPE, &actpipe, NULL);
 #endif
+   af::Environment ENV( env_flags, argc, argv);  // Silent environment initialization
 
    if( !ENV.isValid())
    {
@@ -104,6 +108,7 @@ int main(int argc, char *argv[])
    int status = app.exec();
 
    af::destroy();
+   Py_Finalize();
 
    AFINFA("main: QApplication::exec: returned status = %d\n", status);
 

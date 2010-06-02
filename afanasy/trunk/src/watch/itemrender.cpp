@@ -271,8 +271,8 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    // Draw back with job state specific color (if it is not selected)
    const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
    if     ( online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
-   else if( busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
    else if( NIMBY || nimby  ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
+   else if( busy            ) itemColor = &(afqt::QEnvironment::clr_itemrenderbusy.c  );
    if((option.state & QStyle::State_Selected) == false)
       painter->fillRect( option.rect, *itemColor );
 

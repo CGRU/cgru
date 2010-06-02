@@ -31,21 +31,32 @@ class service:
       return self.pm.toClient( self.wdir)
 
    def getCommand( self):
-      return self.pm.toClient( self.command)
+      command = self.pm.toClient( self.command)
+      # Apply capacity:
+      if self.capacity > 0: command = self.applycmdcapacity( command)
+      # Apply hosts (multihosts tasks):
+      if len( self.hosts): command = self.applycmdhosts( command)
+      return command
 
-   def applycmdcapacity( self, capacity):
-      return self.command.replace( self.str_capacity, str( capacity))
+   def applycmdcapacity( self, command):
+      command = command.replace( self.str_capacity, str( self.capacity))
+      print 'Capacity coefficient %s applied:' % str( self.capacity)
+      print command
+      return command
 
-   def applycmdhosts( self, hostslist):
+   def applycmdhosts( self, command):
       hosts = str_hostsprefix
       firsthost = True
-      for host in hostslist:
+      for host in self.hosts:
          if firsthost:
             firsthost = False
          else:
             hosts += self.str_hostseparator
          hosts += host
-      return self.command.replace( self.str_hosts, hosts)
+      command = command.replace( self.str_hosts, hosts)
+      print 'Hosts list "%s" applied:' % str( hosts)
+      print command
+      return command
 
    def checkfiles( self, sizemin, sizemax):
       print 'Checking for "'+self.files+'" '+str(sizemin)+'-'+str(sizemax)

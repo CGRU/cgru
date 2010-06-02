@@ -4,6 +4,7 @@
 #include <QtGui/QTextEdit>
 
 #include "../libafanasy/msg.h"
+#include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"
 
 #define AFOUTPUT
@@ -52,51 +53,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
          }
          case af::Msg::TTask:
          {
-            QTextCharFormat fParameter;
-            QTextCharFormat fInfo;
-            fParameter.setFontWeight(QFont::Bold);
-            fInfo.setFontItalic(true);
-
-            QTextCursor c( qTextEdit->textCursor());
-
-            af::TaskExec task( msg);
-            c.insertText( task.getName(), fParameter);
-            c.insertText( "\n");
-            c.insertText( task.getServiceType(), fParameter);
-            c.insertText( "[", fInfo);
-            c.insertText( task.getParserType(), fParameter);
-            c.insertText( "]:", fInfo);
-            c.insertText( QString::number(task.getCapacity()), fParameter);
-            c.insertText( " frames(", fInfo);
-            c.insertText( QString::number(task.getFrameStart()), fParameter);
-            c.insertText( ",", fInfo);
-            c.insertText( QString::number(task.getFrameFinish()), fParameter);
-            c.insertText( ",", fInfo);
-            c.insertText( QString::number(task.getFramesNum()), fParameter);
-            c.insertText( "):", fInfo);
-            c.insertText( "\n");
-            c.insertText( "Command:", fInfo);
-            c.insertText( "\n");
-            c.insertText( task.getCmd(), fParameter);
-            c.insertText( "\n");
-            c.insertText( "Working Directory:", fInfo);
-            c.insertText( "\n");
-            c.insertText( task.getWDir(), fParameter);
-            if( task.getCmdView().isEmpty() == false)
-            {
-               c.insertText( "\n");
-               c.insertText( "Preview:", fInfo);
-               c.insertText( "\n");
-               c.insertText( task.getCmdView(), fParameter);
-            }
-            if( task.hasFileSizeCheck())
-            {
-               c.insertText( "\n");
-               c.insertText( "File Size Check: ", fInfo);
-               c.insertText( QString::number( task.getFileSizeMin()), fParameter);
-               c.insertText( " - ", fInfo);
-               c.insertText( QString::number( task.getFileSizeMax()), fParameter);
-            }
+            showTask( msg);
             break;
          }
          default:
@@ -108,4 +65,80 @@ WndText::WndText( const QString & Name, af::Msg * msg):
 
 WndText::~WndText()
 {
+}
+
+void WndText::showTask( af::Msg * msg)
+{
+   af::TaskExec task( msg);
+   QString wdir = task.getWDir();
+   QString command = task.getCmd();
+   af::Service * service;
+   if( false == task.getServiceType().isEmpty())
+   {
+      service = new af::Service(
+            task.getServiceType(),
+            wdir,
+            command,
+            task.getCapCoeff(),
+            task.getMultiHostsNames(),
+            task.getCmdView()
+         );
+      if(( service != NULL ) && ( false == service->isInitialized() ))
+      {
+         delete service;
+         service = NULL;
+      }
+   }
+   if( service)
+   {
+      wdir = service->getWDir();
+      command = service->getCommand();
+   }
+
+   QTextCharFormat fParameter;
+   QTextCharFormat fInfo;
+   fParameter.setFontWeight(QFont::Bold);
+   fInfo.setFontItalic(true);
+
+   QTextCursor c( qTextEdit->textCursor());
+
+   c.insertText( task.getName(), fParameter);
+   c.insertText( "\n");
+   c.insertText( task.getServiceType(), fParameter);
+   c.insertText( "[", fInfo);
+   c.insertText( task.getParserType(), fParameter);
+   c.insertText( "]:", fInfo);
+   c.insertText( QString::number(task.getCapacity()), fParameter);
+   c.insertText( " frames(", fInfo);
+   c.insertText( QString::number(task.getFrameStart()), fParameter);
+   c.insertText( ",", fInfo);
+   c.insertText( QString::number(task.getFrameFinish()), fParameter);
+   c.insertText( ",", fInfo);
+   c.insertText( QString::number(task.getFramesNum()), fParameter);
+   c.insertText( "):", fInfo);
+   c.insertText( "\n");
+   c.insertText( "Command:", fInfo);
+   c.insertText( "\n");
+   c.insertText( command, fParameter);
+   c.insertText( "\n");
+   c.insertText( "Working Directory:", fInfo);
+   c.insertText( "\n");
+   c.insertText( wdir, fParameter);
+   if( task.getCmdView().isEmpty() == false)
+   {
+      c.insertText( "\n");
+      c.insertText( "Preview:", fInfo);
+      c.insertText( "\n");
+      c.insertText( task.getCmdView(), fParameter);
+   }
+   if( task.hasFileSizeCheck())
+   {
+      c.insertText( "\n");
+      c.insertText( "File Size Check: ", fInfo);
+      c.insertText( QString::number( task.getFileSizeMin()), fParameter);
+      c.insertText( " - ", fInfo);
+      c.insertText( QString::number( task.getFileSizeMax()), fParameter);
+   }
+
+   if( service != NULL) delete service;
 }

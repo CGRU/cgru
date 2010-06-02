@@ -32,16 +32,13 @@ void sig_int(int signum)
 int main(int argc, char *argv[])
 {
    Py_InitializeEx(0);
+   uint32_t env_flags = af::Environment::SolveServerAddress | af::Environment::AppendPythonPath;
 #ifdef WINNT
-   int verbose_env = 0;
-   if( argc == 1 ) verbose_env = af::Environment::Verbose;
-//   af::Environment ENV( 0, argc, argv);      // Verbose environment initialization
-   af::Environment ENV( af::Environment::SolveServerAddress | verbose_env, argc, argv);      // Verbose environment initialization
+   if( argc <= 1 ) env_flags = env_flags | af::Environment::Verbose; // Verbose environment initialization
    signal( SIGINT,  sig_int);
    signal( SIGTERM, sig_int);
    signal( SIGSEGV, sig_int);
 #else
-   af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::AppendPythonPath, argc, argv );     // Silent environment initialization
 //
 // interrupt signal catch:
    struct sigaction actint;
@@ -56,6 +53,7 @@ int main(int argc, char *argv[])
    actpipe.sa_handler = sig_pipe;
    sigaction( SIGPIPE, &actpipe, NULL);
 #endif
+   af::Environment ENV( env_flags, argc, argv);
 
    if( !ENV.isValid())
    {

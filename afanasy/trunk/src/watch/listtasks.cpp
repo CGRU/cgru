@@ -490,17 +490,19 @@ void ListTasks::actTaskStdOut( int number ){ do_Info_StdOut(  af::Msg::TTaskOutp
 
 void ListTasks::doubleClicked( Item * item)
 {
-   if( item->getId() == ItemJobTask ::ItemId ) do_Info_StdOut(  af::Msg::TTaskRequest, 0, item);
-   if( item->getId() != ItemJobBlock::ItemId ) return;
-
-   ItemJobBlock * block = (ItemJobBlock*)item;
-   int blockNum = block->getNumBlock();
-   bool hide = false == wblocks[blockNum]->tasksHidded;
-   wblocks[blockNum]->tasksHidded = hide;
-   int row_start = getRow( blockNum, 0);
-   int row_end   = getRow( blockNum, tasksnum[blockNum]-1);
-   for( int row = row_start; row <= row_end; row++) view->setRowHidden( row, hide);
+   if( item->getId() == ItemJobTask ::ItemId )
+      do_Info_StdOut(  af::Msg::TTaskRequest, 0, item);
+   else if( item->getId() != ItemJobBlock::ItemId )
+   {
+      ItemJobBlock * block = (ItemJobBlock*)item;
+      int blockNum = block->getNumBlock();
+      bool hide = false == wblocks[blockNum]->tasksHidded;
+      wblocks[blockNum]->tasksHidded = hide;
+      int row_start = getRow( blockNum, 0);
+      int row_end   = getRow( blockNum, tasksnum[blockNum]-1);
+      for( int row = row_start; row <= row_end; row++) view->setRowHidden( row, hide);
 //   view->updateGeometries();
+   }
 }
 
 void ListTasks::do_Skip_Restart( int type, int itemid)

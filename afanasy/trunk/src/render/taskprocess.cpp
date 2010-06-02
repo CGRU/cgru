@@ -48,6 +48,7 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    QString command = exec->getCmd();
 
    if( false == exec->getServiceType().isEmpty())
+   {
       service = new af::Service(
             exec->getServiceType(),
             wdir,
@@ -56,6 +57,12 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
             exec->getMultiHostsNames(),
             exec->getCmdView()
          );
+      if(( service != NULL ) && ( false == service->isInitialized() ))
+      {
+         delete service;
+         service = NULL;
+      }
+   }
 
    if( service)
    {
