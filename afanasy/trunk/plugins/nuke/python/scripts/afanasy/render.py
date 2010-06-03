@@ -5,7 +5,6 @@ import os
 import re
 import time
 
-import af
 import services.service
 
 
@@ -479,6 +478,7 @@ def renderNodes( nodes, fparams, storeframes):
 
 
 def render( node = None):
+   import af
    nodes = []
    fparams = dict()
 

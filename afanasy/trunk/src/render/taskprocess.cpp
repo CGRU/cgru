@@ -1,5 +1,7 @@
 #include "taskprocess.h"
 
+#include <QtCore/QDir>
+
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -73,7 +75,32 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    if( false == exec->getParserType().isEmpty())
       parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
 
-   if( false == wdir.isEmpty()) setWorkingDirectory( wdir);
+   // Process task working directory:
+   if( false == wdir.isEmpty())
+   {
+      QDir dir( wdir);
+      if( dir.exists())
+      {
+         bool correct = true;
+#ifdef WINNT
+         if( wdir.startsWith("/"))
+         {
+            AFERROR("Working directory starts with '/'. May be it not translated from unix?\n");
+            correct = false;
+         }
+         else if( wdir.startsWith("\\\\"))
+         {
+            AFERROR("Working directory starts with '\\\\'. UNC path can't be current. May be incorrect translation?\n");
+            correct = false;
+         }
+#endif
+         if( correct ) setWorkingDirectory( wdir);
+      }
+      else
+      {
+         AFERROR("Working directory does not exists.\n");
+      }
+   }
 
    printf("\nStarting[%d]: ", runningtasks); exec->stdOut( false);
 
