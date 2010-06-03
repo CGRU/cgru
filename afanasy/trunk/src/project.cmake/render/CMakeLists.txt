@@ -27,4 +27,8 @@ if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
    set_target_properties(afrender PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
+if(WIN32)
+   target_link_libraries(afrender Ws2_32.lib)
+endif(WIN32)
+
 target_link_libraries(afrender afqt)

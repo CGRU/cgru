@@ -19,10 +19,6 @@ set(moc_hdr
 qt4_wrap_cpp(moc_src ${moc_hdr})
 
 add_executable(aftalk ${src} ${inc} ${moc_src})
-if(WIN32)
-   set_target_properties(aftalk PROPERTIES LINK_FLAGS "-Wl,-subsystem,windows")
-endif(WIN32)
-
 if( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
    set_target_properties(aftalk PROPERTIES COMPILE_FLAGS $ENV{AF_ADD_CFLAGS})
 endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
@@ -30,5 +26,10 @@ endif( NOT $ENV{AF_ADD_CFLAGS} STREQUAL "" )
 if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
    set_target_properties(aftalk PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
+
+if(WIN32)
+   set_target_properties(aftalk PROPERTIES WIN32_EXECUTABLE 1)
+   target_link_libraries(aftalk Ws2_32.lib)
+endif(WIN32)
 
 target_link_libraries(aftalk afqt)
