@@ -78,27 +78,24 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    // Process task working directory:
    if( false == wdir.isEmpty())
    {
-      QDir dir( wdir);
-      if( dir.exists())
-      {
-         bool correct = true;
 #ifdef WINNT
-         if( wdir.startsWith("/"))
-         {
-            AFERROR("Working directory starts with '/'. May be it not translated from unix?\n");
-            correct = false;
-         }
-         else if( wdir.startsWith("\\\\"))
-         {
-            AFERROR("Working directory starts with '\\\\'. UNC path can't be current. May be incorrect translation?\n");
-            correct = false;
-         }
+      if( wdir.startsWith("/"))
+      {
+         AFERROR("Working directory starts with '/'. May be it not translated from unix?\n");
+      }
+      else if( wdir.startsWith("\\\\"))
+      {
+         AFERROR("Working directory starts with '\\\\'. UNC path can't be current. May be incorrect translation?\n");
+      }
+      else
 #endif
-         if( correct ) setWorkingDirectory( wdir);
+      if( false == QDir( wdir).exists())
+      {
+         AFERROR("Working directory does not exists.\n");
       }
       else
       {
-         AFERROR("Working directory does not exists.\n");
+         setWorkingDirectory( wdir);
       }
    }
 
