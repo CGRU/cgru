@@ -44,8 +44,9 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tCodec = QtGui.QLabel('Codec:', self)
       self.cbCodec = QtGui.QComboBox( self)
-      self.cbCodec.addItem('Quicktime (PhotoJPG)', QtCore.QVariant('mov'))
-      self.cbCodec.addItem('Mpeg (MPEG4 XVID)', QtCore.QVariant('mpeg'))
+      self.cbCodec.addItem('Quicktime (PhotoJPG)', QtCore.QVariant('mjpeg'))
+#      self.cbCodec.addItem('Quicktime (H.264)', QtCore.QVariant('h264'))
+      self.cbCodec.addItem('Mpeg (MPEG4 XVID)', QtCore.QVariant('xvid'))
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
       self.cbFPS = QtGui.QComboBox( self)
@@ -508,7 +509,10 @@ class Dialog( QtGui.QWidget):
 
       project = re.escape( str( self.editProject.text()))
       if self.cAutoTitles.isChecked() or project == '':
-         project = self.inputPattern.split('/')[3].upper()
+         if sys.platform.find('win') == 0:
+            project = self.inputPattern.split('\\')[4].upper()
+         else:
+            project = self.inputPattern.split('/')[3].upper()
          self.editProject.setText( project)
 
       shot = re.escape( str( self.editShot.text()))

@@ -21,7 +21,7 @@ signal.signal(signal.SIGINT,  rmdir)
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 parser.add_option('-f', '--fps',        dest='fps',         type  ='int',        default=25,          help='Frames per second')
-parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='mov',       help='Codec: mov,mpeg')
+parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg',  help='Codec: ffmpeg -formats')
 parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 parser.add_option('-i', '--inpattern',  dest='inpattern',   type  ='string',     default='',          help='Input files pattern: img.####.jpg')
 parser.add_option('-o', '--output',     dest='output',      type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
@@ -192,11 +192,8 @@ elif imgtype == 'CIN': correction = corr_Log
 if output == '': output = os.path.join( os.path.dirname( inputdir), prefix.strip('_. '))
 afjobname = os.path.basename( output)
 if datetimesuffix != '': output += '_' + datetimesuffix
-if codec == 'mov': output += '.mov'
-elif codec == 'mpeg': output += '.avi'
-else:
-   print 'Codec "%s" is not supported' % codec
-   exit(1)
+if codec == 'xvid': output += '.avi'
+else: output += '.mov'
 if verbose: print 'Output = ' + output
 afjobname += ' %s' % codec
 
@@ -339,26 +336,24 @@ if need_convert:
 
 # Encode commands:
 cmd_encode = ''
-if codec == 'mov':
+if codec != 'xvid':
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.%07d.'+tmpFormat)
    cmd = 'ffmpeg -pix_fmt rgb24'
    cmd += ' -y -r ' + str(fps) + ' -i '
    cmd += inputmask
-   cmd += ' -vcodec mjpeg -qscale 1 '
-   cmd += output
+   cmd += ' -vcodec ' + codec
+   cmd += ' -qscale 1'
+   cmd += ' ' + output
    cmd = cmd + ' || echo Done'
    cmd_encode = cmd
-elif codec == 'mpeg':
+else:
    inputmask = os.path.join( inputdir, prefix+'*'+suffix)
    if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.*.'+tmpFormat)
    cmd = 'mencoder'
    cmd += ' "mf://%s"' % inputmask
    cmd += ' -mf fps=' + str(fps) + ' -o ' + output + ' -ovc xvid -xvidencopts fixed_quant=1'
    cmd_encode = cmd
-else:
-   print 'Codec "%s" is not supported' % codec
-   exit(1)
 
 # Print commands:
 if verbose:
