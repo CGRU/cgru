@@ -87,7 +87,9 @@ class PathMap:
                print 'Error: Ivalid line in "%s":' % filename
                print line
                continue
-            self.PathClient.append( line[:pos].strip())
+            path_client = line[:pos].strip()
+            if sys.platform.find('win') == 0: path_client = path_client.lower()
+            self.PathClient.append( path_client)
             self.PathServer.append( line[pos:].strip())
             self.initialized = True
 
@@ -108,12 +110,13 @@ class PathMap:
          for i in range( 0, len( self.PathServer)):
             if toserver:
                path_from = self.PathClient[i]
-               if sys.platform.find('win') == 0: path_from = path_from.lower()
                path_to   = self.PathServer[i]
             else:
                path_from = self.PathServer[i]
                path_to   = self.PathClient[i]
-            if newpath[position:].lower().find(path_from) == 0:
+            path_search = newpath[position:]
+            if sys.platform.find('win') == 0: path_search = path_search.lower()
+            if path_search.find(path_from) == 0:
                part1 = newpath[:position]
                part2 = newpath[position+len(path_from):]
                part2 = replaceSeperators( part2, path_from, path_to)

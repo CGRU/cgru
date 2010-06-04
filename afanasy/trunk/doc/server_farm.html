@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Afanasy Server</title>
+<title>Afanasy Farm Setup</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,16 +26,52 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">Afanasy Server</h2>
+<h2 align="center">Afanasy Farm Setup</h2>
 <hr />
 
-<h3>Main server launching command:</h3>
-<p><code>$ afserver</code></p>
-<p>Server can re-read configuration files "on-the-fly", without restart or even stop jobs solving and running tasks.
-Use <kbd>afcmd cload</kbd> command to ask server to reload configuration and <kbd>afcmd fload</kbd> to reload farm setup.
-But sever will not change listen port or database connection setup without restart.
-Clients can't reload configuration "on-the-fly", it needs restart to reconfigure.
+<p>
+After general configuration, afanasy try to load <kbd>cgru/afanasy/farm.xml</kbd> to setup a farm.
+If this file does not exists it load <kbd>cgru/afanasy/farm_default.xml</kbd>
+which setup default farm and provided as an example to copy and modify to describe your hosts.
 </p>
+<ul>
+<li><p>
+<code>pattern</code> name="<i>pattern name</i>"<br/>
+</p></li>
+<li><p>
+<code>mask</code><br/>
+Hosts which names matches this mask will take this pattern settings.
+</p></li>
+<li><p>
+<code>description</code><br/>
+Does not mean anything for sever, job or render host, only for humans.
+</p></li>
+<li><p>
+<code>os</code><br/>
+Operating system name. Can be matched by jobs.
+</p></li>
+<li><p>
+<code>capacity</code><br/>
+Running Tasks maximum capacity value.
+</p></li>
+<li><p>
+<code>maxtasks</code><br/>
+Maximum number of simultaneously running tasks.
+</p></li>
+<li><p>
+<code>power</code><br/>
+Some number which minimum can be needed by jobs.
+</p></li>
+<li><p>
+<code>properties</code><br/>
+Some string which matching can be needed by jobs.
+</p></li>
+<li><p>
+<code>service</code> name="<i>type</i>" count="<i>limit number</i>"<br/>
+List of names and counts of available services.
+</p></li>
+</ul>
+Host will take parameters from last matched pattern. So first pattern mask in default farm is ".*" - means that host with any name will take some default settings.
 
 <!--FOOTER-->
 <br/>

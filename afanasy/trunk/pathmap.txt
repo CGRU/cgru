@@ -1,4 +1,4 @@
-# This is an example pathes map file
+# This is an example paths map file
 # This is a comment
 
 #     Client:             Server:

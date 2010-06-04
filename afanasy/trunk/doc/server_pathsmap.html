@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Afanasy Server</title>
+<title>Afanasy Paths Map</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,16 +26,44 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">Afanasy Server</h2>
+<h2 align="center">Afanasy Paths Map</h2>
 <hr />
 
-<h3>Main server launching command:</h3>
-<p><code>$ afserver</code></p>
-<p>Server can re-read configuration files "on-the-fly", without restart or even stop jobs solving and running tasks.
-Use <kbd>afcmd cload</kbd> command to ask server to reload configuration and <kbd>afcmd fload</kbd> to reload farm setup.
-But sever will not change listen port or database connection setup without restart.
-Clients can't reload configuration "on-the-fly", it needs restart to reconfigure.
+<p>
+Afanasy has an ability to map paths.
+Every client can have a paths map file to translate paths to server and from server.
 </p>
+<p>
+Paths map desribed in <kbd>pathmap.*</kbd> file(s).
+This file located in AF_ROOT folder <kbd>cgru/afanasy</kbd>.
+Client read this file(s) each time task starts.
+Every file appends previous paths map.
+If there is no such file(s), or everything in it commented, paths will not be mapped at all.
+</p>
+<p>
+When job constructs (on the client side) all commands and working directories are translated from client to server.
+When task starts (on the client side) all commands and working directories are translated from server to client.
+Server does know nothing about paths map.
+</p>
+<h3>Paths map file example:</h3>
+<pre>
+# This is an example paths map file
+# This is a comment
+
+#     Client:             Server:
+
+\\server\projects          /cg/projects
+</pre>
+<h3>Paths map file syntax:</h3>
+<p>
+<b> # </b> : comment<br/>
+<b>Client path</b> <b>server_path</b> : entry<br/>
+Last space(s) is separator, so sever path can't contain spaces.<br/>
+Empty or containing only spaces lines are ignored.<br/>
+Spaces an the beginning or at the end of line are ignored.<br/>
+On MS Windows platform client paths changed to lower case.<br/>
+</p>
+
 
 <!--FOOTER-->
 <br/>
