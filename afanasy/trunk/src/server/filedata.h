@@ -11,8 +11,8 @@ public:
    FileData( char * Data, int Length, const QString & FileName, int Rotate = 0);
    ~FileData();
 
-   inline const char * getData()     const { return data;     }
-   inline const char * getFileName() const { return filename.toUtf8().data(); }
+   inline const char *    getData()     const { return data;     }
+   inline const QString & getFileName() const { return filename; }
 
    inline int getLength() const { return length; }
    inline int getRotate() const { return rotate; }

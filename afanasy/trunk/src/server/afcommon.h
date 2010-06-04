@@ -25,7 +25,7 @@ public:
 /// Save string list, perform log file rotation;
    static void saveLog( const QStringList & log, const QString & dirname, QString filename, int rotate);
 
-   static bool writeFile( const char * data, const int length, const char * name); ///< Write a file
+   static bool writeFile( const char * data, const int length, const QString & filename); ///< Write a file
 
 //   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 

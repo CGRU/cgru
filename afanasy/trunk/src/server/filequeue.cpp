@@ -20,11 +20,12 @@ FileQueue::~FileQueue()
 void FileQueue::processItem( AfQueueItem* item) const
 {
    FileData * filedata = (FileData*)item;
+   AFINFA("FileQueue::processItem: \"%s\"\n", filedata->getFileName().toUtf8().data());
    int rotate = filedata->getRotate();
    QString filename( filedata->getFileName());
    if( rotate )
    {
-#ifdef _DEBUG
+#ifdef AFOUTPUT
 printf("FileQueue::processItem: rotating \"%s\" %d times:\n", filename.toUtf8().data(), rotate);
 #endif
       if( QFile::exists(filename))
@@ -41,7 +42,7 @@ void FileQueue::renameNext( const QString & filename, int number, int maxnumber)
    QString curname( QString("%1.%2").arg(filename).arg(number++));
    if( number >= maxnumber )
    {
-#ifdef _DEBUG
+#ifdef AFOUTPUT
 printf("FileQueue::renameNext: removing \"%s\"\n", curname.toUtf8().data());
 #endif
       if( QFile::remove( curname) == false)
@@ -54,7 +55,7 @@ printf("FileQueue::renameNext: removing \"%s\"\n", curname.toUtf8().data());
 
    renameNext( filename, number, maxnumber);
 
-#ifdef _DEBUG
+#ifdef AFOUTPUT
 printf("FileQueue::renameNext: renaming \"%s\" in \"%s\"\n", curname.toUtf8().data(), newname.toUtf8().data());
 #endif
    if( QFile::rename( curname, newname) == false)

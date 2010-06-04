@@ -106,12 +106,17 @@ void AFCommon::saveLog( const QStringList & log, const QString & dirname, QStrin
    FileWriteQueue->pushFile( filedata);
 }
 
-bool AFCommon::writeFile( const char * data, const int length, const char * name)
+bool AFCommon::writeFile( const char * data, const int length, const QString & filename)
 {
-   int fd = open( name, O_WRONLY | O_CREAT, 0777);
+   if( filename.isEmpty())
+   {
+      AFERROR("AFCommon::writeFile: File name is empty.\n");
+      return false;
+   }
+   int fd = open( filename.toUtf8().data(), O_WRONLY | O_CREAT, 0777);
    if( fd == -1 )
    {
-      AFERRPA("AFCommon::writeFile - \"%s\".\n", name);
+      AFERRPA("AFCommon::writeFile - \"%s\".\n", filename.toUtf8().data());
       return false;
    }
    int bytes = 0;
@@ -120,14 +125,14 @@ bool AFCommon::writeFile( const char * data, const int length, const char * name
       int written = write( fd, data+bytes, length-bytes);
       if( written == -1 )
       {
-         AFERRPA("AFCommon::writeFile - \"%s\".\n", name);
+         AFERRPA("AFCommon::writeFile - \"%s\".\n", filename.toUtf8().data());
          close( fd);
          return false;
       }
       bytes += written;
    }
    close( fd);
-   chmod( name, 0777);
-   AFINFA("AFCommon::writeFile - \"%s\".\n", name);
+   chmod( filename.toUtf8().data(), 0777);
+   AFINFA("AFCommon::writeFile - \"%s\".\n", filename.toUtf8().data());
    return true;
 }

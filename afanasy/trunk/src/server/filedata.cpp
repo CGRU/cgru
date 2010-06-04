@@ -10,19 +10,26 @@ FileData::FileData( char * Data, int Length, const QString & FileName, int Rotat
    rotate( Rotate),
    data( NULL)
 {
+   AFINFA("FileData::FileData: \"%s\" %d bytes R(%d).\n", filename.toUtf8().data(), length, rotate);
+
    if( Data == NULL)
    {
-      AFERROR("FileData::FileData: Data == NULL\n");
+      AFERROR("FileData::FileData: Data is null.\n");
       return;
    }
    if( length < 0 )
    {
-      AFERROR("FileData::FileData: length < 0\n");
+      AFERROR("FileData::FileData: Length is negative.\n");
       return;
    }
    if( length == 0 )
    {
-      data = NULL;
+      AFERROR("FileData::FileData: Zero length.\n");
+      return;
+   }
+   if( filename.isEmpty() )
+   {
+      AFERROR("FileData::FileData: File name is empty.\n");
       return;
    }
 
