@@ -32,6 +32,7 @@ genParms = {
     'hosts_mask'                 : SohoParm('hosts_mask'                ,'string', ['']   , False),
     'hosts_mask_exclude'         : SohoParm('hosts_mask_exclude'        ,'string', ['']   , False),
     'start_paused'               : SohoParm('start_paused'              ,'int'   , [0]    , False),
+    'platform'                   : SohoParm('platform'                  ,'string', ['']   , False),
 }
 plist = soho.evaluate(genParms)
 
@@ -48,6 +49,7 @@ now            = plist['now'].Value[0]
 hip            = plist['hip'].Value[0]
 hipname        = plist['hipname'].Value[0]
 
+platform                   = plist['platform'].Value[0]
 start_paused               = plist['start_paused'].Value[0]
 enable_extended_parameters = plist['enable_extended_parameters'].Value[0]
 depend_mask                = plist['depend_mask'].Value[0]
@@ -131,6 +133,7 @@ else:
    cmd = os.path.join( cmd, 'afjob.py')
 cmd += ' %(tmphip)s %(start)d %(end)d -fpr %(fpr)d -node %(hdriver)s -type %(taskstype)s -take %(take)s -name %(jobname)s -deletescene' % vars()
 
+if platform           != '': cmd += ' -os '           + platform
 if priority           != -1: cmd += ' -priority '     + str(priority)
 if maximum_hosts      != -1: cmd += ' -maxhosts '     + str(maximum_hosts)
 if capacity           != -1: cmd += ' -capacity '     + str(capacity)

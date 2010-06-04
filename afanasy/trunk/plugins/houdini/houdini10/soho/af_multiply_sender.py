@@ -29,6 +29,7 @@ genParms = {
     'hosts_mask'                 : SohoParm('hosts_mask'                ,'string', ['']   , False),
     'hosts_mask_exclude'         : SohoParm('hosts_mask_exclude'        ,'string', ['']   , False),
     'start_paused'               : SohoParm('start_paused'              ,'int'   , [0]    , False),
+    'platform'                   : SohoParm('platform'                  ,'string', ['']   , False),
 }
 plist = soho.evaluate(genParms)
 
@@ -51,6 +52,7 @@ job_capacity               = plist['capacity'].Value[0]
 job_hosts_mask             = plist['hosts_mask'].Value[0]
 job_hosts_mask_exclude     = plist['hosts_mask_exclude'].Value[0]
 job_start_paused           = plist['start_paused'].Value[0]
+platform                   = plist['platform'].Value[0]
 
 soho.initialize(now, '')
 soho.lockObjects(now)
@@ -82,6 +84,9 @@ if enable_extended_parameters:
    if job_hosts_mask_exclude != '': job.setHostsMaskExclude( job_hosts_mask_exclude)
 if job_start_paused:
    job.offLine()
+if platform != '':
+   if platform == 'any': job.setNeedOS('')
+   else: job.setNeedOS( platform)
 
 inputs = []
 inputs.extend( hou.pwd().inputs())

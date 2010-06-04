@@ -30,6 +30,7 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -ignoreinputs        -   not to render input nodes ( houdini ignore inputs ROP parameter )\n\
 -deletescene         -   delete scene when job deleted\n\
 -pause               -   start job paused ( offline afanasy state )\n\
+-os                  -   OS needed mask, "any" to render on any platform\n\
 -hostsmask           -   job render hosts mask\n\
 -hostsexcl           -   job render hosts to exclude mask\n\
 -maxhosts            -   maximum number of hosts to use\n\
@@ -85,6 +86,7 @@ dependmask     = ''
 dependglobal   = ''
 images         = ''
 blocktype      = ''
+platform       = ''
 
 #
 # checking some critical argumens values
@@ -231,6 +233,12 @@ for i in range( argsl):
       blocktype = argsv[i]
       continue
 
+   if arg == '-os':
+      i += 1
+      if i == argsl: break
+      platform = argsv[i]
+      continue
+
 
 #
 # command construction:
@@ -294,7 +302,7 @@ block.setNumeric( s, e, fpr)
 block.setCommand( cmd )
 block.setCapacity( capacity)
 block.setVariableCapacity( capmin, capmax)
-if images   != '': block.setCommandView( images)
+if images != '': block.setCommandView( images)
 
 # Create a Job:
 job = af.Job( name)
@@ -306,6 +314,10 @@ if dependmask     != '': job.setDependMask( dependmask)
 if dependglobal   != '': job.setDependMaskGlobal( dependglobal)
 if deletescene         : job.setCmdPost('rm ' + scene)
 if startpaused         : job.offLine()
+if platform != '':
+   if platform == 'any': job.setNeedOS('')
+   else: job.setNeedOS( platform)
+
 # Add a Block to a Job:
 job.blocks.append( block)
 

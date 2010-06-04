@@ -255,6 +255,7 @@ class JobParameters:
          elif len(blocks): nodename = blocks[0].name
          print 'Initializing job parameters: "%s"' % nodename
 
+      self.platform           = ''
       self.startpaused        = 0
       self.maxhosts           = -1
       self.priority           = -1
@@ -267,11 +268,12 @@ class JobParameters:
          self.startpaused        = int(afnode.knob('startpaused').value())
          self.maxhosts           = int(afnode.knob('maxhosts').value())
          self.priority           = int(afnode.knob('priority').value())
+         self.platform           = afnode.knob('platform').value()
          self.hostsmask          = afnode.knob('hostsmask').value()
          self.hostsmaskexclude   = afnode.knob('hostsmaskexcl').value()
          self.dependmask         = afnode.knob('dependmask').value()
          self.dependmaskglobal   = afnode.knob('dependmaskglbl').value()
-         self.nodename         = afnode.name()
+         self.nodename           = afnode.name()
 
       self.blocksparameters   = []
 

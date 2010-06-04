@@ -18,6 +18,7 @@ Gizmo {
    addUserKnob {  6 startpaused     l "Start Paused"     }
 
    addUserKnob { 20 "" Parameters }
+   addUserKnob {  4 platform M { "Any" "Native"}  l "Plafrorm" }
    addUserKnob {  3 maxhosts        l "Maximum Hosts"          }
    addUserKnob {  3 priority        l "Priority"               }
    addUserKnob {  1 hostsmask       l "Hosts Mask"             }

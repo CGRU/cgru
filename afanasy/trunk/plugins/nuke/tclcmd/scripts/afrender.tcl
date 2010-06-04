@@ -24,6 +24,7 @@ proc afrender {args} {
    set capacity      [lindex $args 12]
    set capmin        [lindex $args 13]
    set capmax        [lindex $args 14]
+   set platform      [lindex $args 15]
 
    if {$first > $last} {
       alert "First frame > Last frame"
@@ -57,6 +58,7 @@ proc afrender {args} {
    append cmd " $namesctmp $first $last -fpr $fpr -node $namewrite -name \"$jobname\" -images \"$images\" -deletescene"
 
    if { $startpaused      } { append cmd " -startpaused"                }
+   if { $platform == "Any"} { append cmd " -os any"                     }
    if { $maxhosts   != -1 } { append cmd " -maxhosts $maxhosts"         }
    if { $priority   != -1 } { append cmd " -priority $priority"         }
    if { $capacity   != -1 } { append cmd " -capacity $capacity"         }

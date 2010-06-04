@@ -16,6 +16,8 @@ Gizmo {
    addUserKnob { 3 last  "Last frame" }
    addUserKnob { 3 fpr   "Frames per renderer"}
    addUserKnob { 26 sep2 ""}
+   addUserKnob { 6 pause      "Start Job Paused"         }
+   addUserKnob { 26 sep2 ""}
 
    addUserKnob { 32 render_button "RENDER" T {
       afrender   [node this] \
@@ -33,11 +35,12 @@ Gizmo {
          [knob [node this].capacity] \
          [knob [node this].capmin] \
          [knob [node this].capmax] \
+         [knob [node this].platform] \
       }
    }
 
    addUserKnob { 20 tab2 Parameters }
-   addUserKnob { 6 pause      "Start Job Paused"         }
+   addUserKnob { 4 platform M { "Any" "Native"}  l "Plafrorm" }
    addUserKnob { 3 pri        "Priority"                 }
    addUserKnob { 3 hmax       "Maximum Hosts"            }
    addUserKnob { 1 hmask      "Hosts Mask"               }

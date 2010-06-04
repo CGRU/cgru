@@ -16,6 +16,7 @@ depend_mask = pwd.parm('depend_mask').eval()
 preview = afhoudini.pathToC( pwd.parm('preview').evalAsStringAtFrame(start_frame), pwd.parm('preview').evalAsStringAtFrame(end_frame))
 
 start_paused = pwd.parm('start_paused').eval()
+platform = pwd.parm('platform').eval()
 enable_extended_parameters = pwd.parm('enable_extended_parameters').eval()
 priority = pwd.parm('priority').eval()
 maximum_hosts = pwd.parm('maximum_hosts').eval()
@@ -27,11 +28,13 @@ capacity_min = pwd.parm('capacity_coefficient1').eval()
 capacity_max = pwd.parm('capacity_coefficient2').eval()
 
 block_type='generic'
-for service in af.services.__all__:
-   if command.find( service) > -1: block_type=service
+block_type = command.split()[0]
 
 job = af.Job()
 job.setName( job_name)
+if platform != '':
+   if platform == 'any': job.setNeedOS('')
+   else: job.setNeedOS( platform)
 
 block = af.Block( block_type, block_type)
 block.setWorkingDirectory( asset )
