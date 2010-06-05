@@ -16,8 +16,6 @@ Gizmo {
    addUserKnob { 3 last  "Last frame" }
    addUserKnob { 3 fpr   "Frames per renderer"}
    addUserKnob { 26 sep2 ""}
-   addUserKnob { 6 pause      "Start Job Paused"         }
-   addUserKnob { 26 sep2 ""}
 
    addUserKnob { 32 render_button "RENDER" T {
       afrender   [node this] \
@@ -38,6 +36,8 @@ Gizmo {
          [knob [node this].platform] \
       }
    }
+
+   addUserKnob { 6 pause      "Start Job Paused"         }
 
    addUserKnob { 20 tab2 Parameters }
    addUserKnob { 4 platform M { "Any" "Native"}  l "Plafrorm" }

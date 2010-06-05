@@ -145,7 +145,7 @@ if hosts_mask         != '': cmd += ' -hostsmask '    + hosts_mask
 if hosts_mask_exclude != '': cmd += ' -hostsexcl '    + hosts_mask_exclude
 if preview            != '': cmd += ' -images '       + preview
 if ignore_inputs           : cmd += ' -ignoreinputs'
-if start_paused            : cmd += ' -startpaused'
+if start_paused            : cmd += ' -pause'
 
 print cmd
 

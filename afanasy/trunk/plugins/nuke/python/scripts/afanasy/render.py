@@ -14,6 +14,8 @@ AfanasyServiceType = 'nuke'
 
 VERBOSE = 1
 
+af = None
+
 def getNodeName( node): return node.name()
 
 def checkFrameRange( framefirst, framelast, framespertask, string = ''):
@@ -255,10 +257,10 @@ class JobParameters:
          elif len(blocks): nodename = blocks[0].name
          print 'Initializing job parameters: "%s"' % nodename
 
-      self.platform           = ''
       self.startpaused        = 0
       self.maxhosts           = -1
       self.priority           = -1
+      self.platform           = None
       self.hostsmask          = None
       self.hostsmaskexclude   = None
       self.dependmask         = None
@@ -342,6 +344,8 @@ class JobParameters:
          self.dependmaskglobal = str( self.dependmaskglobal)
          if self.dependmaskglobal != '': job.setDependMaskGlobal( self.dependmaskglobal)
       if self.startpaused: job.offLine()
+      if self.platform != None:
+         if self.platform == 'Any': job.setNeedOS('')
       job.setCmdPost('rm ' + self.scenename)
       job.blocks = blocks
 
@@ -480,7 +484,8 @@ def renderNodes( nodes, fparams, storeframes):
 
 
 def render( node = None):
-   import af
+   global af
+   af = __import__('af', globals(), locals(), [])
    nodes = []
    fparams = dict()
 

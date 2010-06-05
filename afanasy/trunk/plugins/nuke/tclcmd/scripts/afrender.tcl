@@ -57,7 +57,7 @@ proc afrender {args} {
    set cmd "python $cmd"
    append cmd " $namesctmp $first $last -fpr $fpr -node $namewrite -name \"$jobname\" -images \"$images\" -deletescene"
 
-   if { $startpaused      } { append cmd " -startpaused"                }
+   if { $startpaused      } { append cmd " -pause"                      }
    if { $platform == "Any"} { append cmd " -os any"                     }
    if { $maxhosts   != -1 } { append cmd " -maxhosts $maxhosts"         }
    if { $priority   != -1 } { append cmd " -priority $priority"         }
