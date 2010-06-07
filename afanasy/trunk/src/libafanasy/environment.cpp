@@ -327,15 +327,19 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 // Afanasy python path:
    if( flags & AppendPythonPath)
    {
-      QString script = ""
-      "import os\n"
-      "import sys\n"
-      "afpython = os.path.join( '%1', 'python')\n"
-      "if not afpython in sys.path:\n"
-      "   print 'PYTHONPATH: appending \"%s\"' % afpython\n"
-      "   sys.path.append( afpython)\n"
-      ;
-      PyRun_SimpleString( script.arg( afroot).toUtf8().data());
+      QString afpython = getenv("AF_PYTHON");
+      if( afpython.isEmpty())
+      {
+         QString script = ""
+         "import os\n"
+         "import sys\n"
+         "afpython = os.path.join( '%1', 'python')\n"
+         "if not afpython in sys.path:\n"
+         "   print 'PYTHONPATH: appending \"%s\"' % afpython\n"
+         "   sys.path.append( afpython)\n"
+         ;
+         PyRun_SimpleString( script.arg( afroot).toUtf8().data());
+	  }
    }
 
 
