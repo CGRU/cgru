@@ -72,6 +72,7 @@ public:
    static inline const QString& getUserName()      { return username;      } ///< Get current user name.
    static inline const QString& getHostName()      { return hostname;      } ///< Get Render host name.
    static inline const QString& getComputerName()  { return computername;  } ///< Get local computer name.
+   static inline const QString& getPlatform()      { return platform;      } ///< Get platform name.
 
    static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
@@ -190,6 +191,8 @@ private:
    static QString computername;
 /// Render host name
    static QString hostname;
+/// Platform:
+   static QString platform;
 
    static int filenamesizemax;
 

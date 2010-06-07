@@ -109,6 +109,7 @@ QString        Environment::hostsmask = "";
 QString        Environment::username = "";
 QString        Environment::computername = "";
 QString        Environment::hostname = "";
+QString        Environment::platform = "";
 QString        Environment::afroot = "";
 QString        Environment::home = "";
 QString        Environment::home_afanasy = "";
@@ -366,6 +367,29 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //
 //############ local host name:
    hostname = QString::fromUtf8( getenv("AF_HOSTNAME"));
+
+//
+//############ Platform: #############################
+   {
+   // OS Type:
+   platform = "Unix";
+   #ifdef WINNT
+      platform = "MS Windows";
+   #endif
+   #ifdef MACOSX
+      platform += ": MacOSX";
+   #endif
+   #ifdef LINUX
+      platform += ": Linux";
+   #endif
+   int psize = sizeof( void *);
+   switch(psize)
+   {
+      case 4: platform += " 32bit"; break;
+      case 8: platform += " 64bit"; break;
+   }
+   }
+//###################################################
 
    load();
    valid = init( flags & SolveServerAddress);

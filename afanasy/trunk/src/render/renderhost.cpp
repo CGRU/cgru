@@ -25,6 +25,7 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
 {
    setOnline();
    render = this;
+   host.os = af::Environment::getPlatform();
    GetResources( host, hres, true);
 #ifdef WINNT
    Sleep( 100);

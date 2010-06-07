@@ -1,4 +1,7 @@
 <!-- Copy this file into "farm.xml" and describe you own -->
+<!--
+This is commented text.
+-->
 <farm>
    <pattern name="Some Host">
       <mask>.*</mask>
@@ -21,9 +24,10 @@
       <service name="blender_yafray" />
       <service name="yafray" />
       <service name="xsi" />
-      <os>linux mac windows</os>
 <!--
-This is commented text.
+Comment it if you agree with build in os detection (names)
+      <os>linux mac windows</os>
+You can specify several platforms, if host can take tasks for diffent platforms.
 -->
    </pattern>
    <pattern name="Render Host">
@@ -43,7 +47,6 @@ This is commented text.
    <pattern name="Renders #1">
       <mask>r0.*</mask>
       <description>First 2CPU renders</description>
-      <os>linux</os>
       <maxtasks>20</maxtasks>
       <capacity>1100</capacity>
       <power>2000</power>
@@ -59,7 +62,6 @@ This is commented text.
    <pattern name="Renders #2">
       <mask>r1.*</mask>
       <description>Second 4CPU renders</description>
-      <os>linux</os>
       <maxtasks>40</maxtasks>
       <capacity>4400</capacity>
       <power>4000</power>
@@ -74,7 +76,6 @@ This is commented text.
    <pattern name="WndStation">
       <mask>w.*</mask>
       <description>Windows workstation</description>
-      <os>windows</os>
       <maxtasks>4</maxtasks>
       <capacity>2200</capacity>
       <power>2000</power>
@@ -95,7 +96,6 @@ This is commented text.
    <pattern name="LinStation">
       <mask>l.*</mask>
       <description>Linux workstation</description>
-      <os>linux</os>
       <maxtasks>4</maxtasks>
       <capacity>2200</capacity>
       <power>2000</power>
