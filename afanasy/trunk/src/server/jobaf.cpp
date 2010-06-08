@@ -120,12 +120,12 @@ bool JobAf::initialize( UserAf * jobOwner)
 
 //
 // Create tasks output directory ( if needed )
-   QString dirname( name);
-   af::filterFileName( dirname);
-   dirname = af::Environment::getTasksStdOutDir() + '/' + dirname;
-   if( AFCommon::createDirectory( dirname.toUtf8().data()) == false)
+   tasksoutputdir = name;
+   af::filterFileName( tasksoutputdir);
+   tasksoutputdir = af::Environment::getTasksStdOutDir() + '/' + tasksoutputdir;
+   if( AFCommon::createDirectory( tasksoutputdir.toUtf8().data()) == false)
    {
-      log( QString("Unable to create tasks output directory:\n%1").arg( dirname));
+      log( QString("Unable to create tasks output directory:\n%1").arg( tasksoutputdir));
       return false;
    }
 
@@ -234,7 +234,14 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    }
    if(( time_started != 0) && ( time_done == 0 )) time_done = time( NULL);
    Node::setZombie();
-   AFCommon::saveLog( joblog, af::Environment::getJobsLogsDir(), name, af::Environment::getJobLogsRotate());
+   // Rotate = -1: no rotate, but add time to name
+   AFCommon::saveLog( joblog, af::Environment::getJobsLogsDir(), name, -1);
+
+   // Rename tasks output directory:
+   QString timedel = QDateTime::currentDateTime().toString("yyMMdd_hhmm_ss_zzz");
+   QString tasksoutputdir_del = QString("%1.%2").arg( tasksoutputdir, timedel);
+   rename( tasksoutputdir.toUtf8().data(), tasksoutputdir_del.toUtf8().data());
+
    if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
    unLock();

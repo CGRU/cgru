@@ -8,6 +8,8 @@ class FileData: public AfQueueItem
 {
 public:
 
+// Rotate =  0: no ratation
+// Rotate = -1: add time to name
    FileData( char * Data, int Length, const QString & FileName, int Rotate = 0);
    ~FileData();
 

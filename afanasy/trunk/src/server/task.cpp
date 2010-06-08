@@ -210,14 +210,12 @@ void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rende
 
 const QString Task::getOutputFileName( int startcount) const
 {
-   QString jobname = block->job->getName();
-   af::filterFileName( jobname);
    QString filename = QString("b%1.t%2.s%3-%4.%5")
                         .arg( block->data->getBlockNum()).arg( number).arg( startcount)
                         .arg( block->data->getName())
                         .arg( block->data->genTaskName( number));
    af::filterFileName( filename);
-   return QString("%1/%2/%3").arg( af::Environment::getTasksStdOutDir(), jobname, filename);
+   return QString("%1/%2").arg( block->job->getTasksOutputDir(), filename);
 }
 
 bool Task::getOutput( int startcount, MsgAf *msg, QString & filename, RenderContainer * renders) const

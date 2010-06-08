@@ -85,7 +85,6 @@ int     Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC
 int     Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
 QString Environment::tempdirectory =                   AFSERVER::TEMP_DIRECTORY;
 
-int     Environment::job_logs_rotate =                 AFJOB::LOGS_ROTATE;
 int     Environment::user_logs_rotate =                AFUSER::LOGS_ROTATE;
 int     Environment::render_logs_rotate =              AFRENDER::LOGS_ROTATE;
 
@@ -144,7 +143,6 @@ bool Environment::getVars( const QString & filename)
 
 #ifndef WINNT
 
-   getVar( doc, job_logs_rotate,                   "job_logs_rotate"                   );
    getVar( doc, user_logs_rotate,                  "user_logs_rotate"                  );
    getVar( doc, render_logs_rotate,                "render_logs_rotate"                );
 

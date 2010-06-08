@@ -27,7 +27,6 @@ So each path (project, asset) can have individual software setup.
 <!-- Job -->
    <task_default_capacity>1000</task_default_capacity>
    <task_update_timeout>300</task_update_timeout>
-   <job_logs_rotate>10</job_logs_rotate>
 
 <!-- Render -->
    <render_default_capacity>1000</render_default_capacity>

@@ -23,7 +23,7 @@ public:
    static void executeCmd( const QString & cmd);             ///< Execute command.
 
 /// Save string list, perform log file rotation;
-   static void saveLog( const QStringList & log, const QString & dirname, QString filename, int rotate);
+   static void saveLog( const QStringList & log, const QString & dirname, QString filename, int rotate = 0);
 
    static bool writeFile( const char * data, const int length, const QString & filename); ///< Write a file
 

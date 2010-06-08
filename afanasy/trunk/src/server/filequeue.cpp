@@ -23,7 +23,7 @@ void FileQueue::processItem( AfQueueItem* item) const
    AFINFA("FileQueue::processItem: \"%s\"\n", filedata->getFileName().toUtf8().data());
    int rotate = filedata->getRotate();
    QString filename( filedata->getFileName());
-   if( rotate )
+   if( rotate > 0)
    {
 #ifdef AFOUTPUT
 printf("FileQueue::processItem: rotating \"%s\" %d times:\n", filename.toUtf8().data(), rotate);
@@ -34,7 +34,12 @@ printf("FileQueue::processItem: rotating \"%s\" %d times:\n", filename.toUtf8().
          QFile::rename( filename, QString("%1.0").arg(filename));
       }
    }
-   AFCommon::writeFile( filedata->getData(), filedata->getLength(), filedata->getFileName());
+   else if( rotate == -1)
+   {
+      QString timedel = QDateTime::currentDateTime().toString("yyMMdd_hhmm_ss_zzz");
+      filename = QString("%1.%2").arg( filename, timedel);
+   }
+   AFCommon::writeFile( filedata->getData(), filedata->getLength(), filename);
 }
 
 void FileQueue::renameNext( const QString & filename, int number, int maxnumber) const

@@ -88,6 +88,8 @@ public:
    inline int getNumRunningTasks() const /// Get job running tasks.
       {int n=0;for(int b=0;b<blocksnum;b++)n+=blocksdata[b]->getProgressTasksRunning();return n;}
 
+   const QString & getTasksOutputDir() const { return tasksoutputdir; }
+
 /// Get block constant pointer.
    inline BlockData* getBlock( int n) const { if(n<(blocksnum))return blocksdata[n];else return NULL;}
 
@@ -137,6 +139,8 @@ protected:
    QRegExp dependmask_global;
    QRegExp need_os;
    QRegExp need_properties;
+
+   QString tasksoutputdir;       ///< Tasks output directory.
 
 private:
    void construct();

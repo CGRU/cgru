@@ -10,7 +10,6 @@ namespace AFJOB
    const char     TASKS_OUTPUTDIR[]     = "tasksoutput"; ///< Tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
    const char     LOGS_DIRECTORY[]      = "jobs";        ///< Jobs logs store directory, relative to AFSERVER::TEMP_DIRECTORY
    const int      LOGS_LINESMAX         = 100;        ///< Maximum number of lines in each Job log.
-   const int      LOGS_ROTATE           = 10;         ///< Number of logs to keep.
 
    const uint8_t  PROGRESS_BYTES  = 8;
 

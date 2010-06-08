@@ -131,7 +131,6 @@ public:
 
 #ifndef WINNT
 
-   static inline int getJobLogsRotate()     { return    job_logs_rotate; }
    static inline int getUserLogsRotate()    { return   user_logs_rotate; }
    static inline int getRenderLogsRotate()  { return render_logs_rotate; }
 
@@ -256,7 +255,6 @@ private:
 #ifndef WINNT
 
    /// Temp directory
-   static int    job_logs_rotate;
    static int   user_logs_rotate;
    static int render_logs_rotate;
 
