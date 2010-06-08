@@ -4,4 +4,3 @@
 #     Client:             Server:
 
 #\\server\projects          /cg/projects
-

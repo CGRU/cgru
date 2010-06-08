@@ -4,4 +4,4 @@ import service
 parser='hbatch'
 
 class hbatch(service.service):
-   'Houdini9.x batch'
+   'Houdini batch'

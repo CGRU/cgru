@@ -129,3 +129,20 @@ class PathMap:
 
    def toServer( self, path, Verbose = True): return self.translatePath( path, True , Verbose)
    def toClient( self, path, Verbose = True): return self.translatePath( path, False, Verbose)
+
+   def translateFile( self, infile, outfile, toserver , Verbose):
+      if Verbose:
+         print 'TranslateFile:'
+         print 'Input file: "%s"' % infile
+         print 'Output file: "%s"' % outfile
+      filein = open( infile, 'r')
+      fileout = open( outfile, 'w')
+      for linein in filein:
+         lineout = self.translatePath( linein, toserver , Verbose)
+         fileout.write(lineout)
+      filein.close()
+      fileout.close()
+      return True
+
+   def toServerFile( self, infile, outfile, Verbose = False): return self.translateFile( infile, outfile, True , Verbose)
+   def toClientFile( self, infile, outfile, Verbose = False): return self.translateFile( infile, outfile, False , Verbose)

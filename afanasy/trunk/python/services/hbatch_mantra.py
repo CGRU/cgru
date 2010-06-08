@@ -4,4 +4,4 @@ import service
 parser='hbatch_mantra'
 
 class hbatch_mantra(service.service):
-   'Houdini9.x batch execute mantra'
+   'Houdini batch execute mantra'
