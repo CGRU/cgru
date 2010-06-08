@@ -57,9 +57,10 @@ def replaceSeperators( path, path_from, path_to):
    return newpath   
 
 class PathMap:
-   def __init__( self, afroot, Verbose = False):
+   def __init__( self, afroot, UnixSeparators = False, Verbose = False):
       self.initialized = False
       PathMapFile = 'pathmap'
+      self.UnixSeparators = UnixSeparators
       self.PathClient = []
       self.PathServer = []
 
@@ -88,9 +89,14 @@ class PathMap:
                print line
                continue
             path_client = line[:pos].strip()
-            if sys.platform.find('win') == 0: path_client = path_client.lower()
+            path_server = line[pos:].strip()
+            if sys.platform.find('win') == 0:
+               path_client = path_client.lower()
+            if self.UnixSeparators:
+               path_client = path_client.replace('\\','/')
+               path_server = path_server.replace('\\','/')
             self.PathClient.append( path_client)
-            self.PathServer.append( line[pos:].strip())
+            self.PathServer.append( path_server)
             self.initialized = True
 
          file.close()
@@ -119,7 +125,8 @@ class PathMap:
             if path_search.find(path_from) == 0:
                part1 = newpath[:position]
                part2 = newpath[position+len(path_from):]
-               part2 = replaceSeperators( part2, path_from, path_to)
+               if not self.UnixSeparators:
+                  part2 = replaceSeperators( part2, path_from, path_to)
                newpath = part1 + path_to + part2
                if Verbose:
                   print 'Pathes mapped:'
@@ -131,6 +138,7 @@ class PathMap:
    def toClient( self, path, Verbose = True): return self.translatePath( path, False, Verbose)
 
    def translateFile( self, infile, outfile, toserver , Verbose):
+      if not self.initialized: return True
       if Verbose:
          print 'TranslateFile:'
          print 'Input file: "%s"' % infile

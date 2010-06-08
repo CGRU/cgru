@@ -6,12 +6,11 @@ import sys
 path = os.path.abspath(sys.argv[0])
 sys.path.append( path)
 
-import afpathmap
 from afpathmap import PathMap
 
 afroot = os.path.dirname( path)
 afroot = os.path.dirname( afroot)
-pm = PathMap( afroot, len(sys.argv) <= 1)
+pm = PathMap( afroot, len(sys.argv) > 1, len(sys.argv) <= 1)
 
 if len(sys.argv) <= 1:
    print '\nUsage: To check command pathes transfer launch:'

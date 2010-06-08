@@ -6,7 +6,7 @@ import re
 import time
 
 import services.service
-
+from afpathmap import PathMap
 
 RenderNodeClassName = 'Write'
 AfanasyNodeClassName = 'afanasy'
@@ -151,7 +151,8 @@ class BlockParameters:
       if self.capacitymin != -1 or self.capacitymax != -1:
          block.setVariableCapacity( self.capacitymin, self.capacitymax)
          threads = services.service.str_capacity
-      block.setCommand((cmd % vars()) + cmdargs)
+      cmd = cmd.replace('AF_THREADS', threads)
+      block.setCommand( cmd + cmdargs)
 
       if self.dependmask != '': block.setDependMask( self.dependmask)
       if self.tasksdependmask != '': block.setTasksDependMask( self.tasksdependmask)
@@ -425,6 +426,8 @@ def getJobsParameters( afnode, prefix, fparams):
 
 
 def renderNodes( nodes, fparams, storeframes):
+   global af
+   af = __import__('af', globals(), locals(), [])
 
    scenepath = nuke.root().name()
    if scenepath == 'Root': scenepath = os.getenv('NUKE_AF_TMPSCENE', 'tmp')
@@ -471,12 +474,22 @@ def renderNodes( nodes, fparams, storeframes):
       nuke.message('No jobs generated.')
       return
 
+   pm = PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
+
    changed = nuke.modified()
    for i in range(len(jobs)):
-      nuke.scriptSave( jobsparameters[i].scenename)
+      scenename = jobsparameters[i].scenename
+#      initialized = False
+      if pm.initialized:
+         pm_scenename = scenename + '.pm'
+         nuke.scriptSave( pm_scenename)
+         pm.toServerFile( pm_scenename, scenename, Verbose = False)
+#         os.remove( pm_scenename)
+      else:
+         nuke.scriptSave( scenename)
       if jobs[i].send() == False:
          nuke.message('Unable to send job to server.')
-         os.remove( jobsparameters[i].scenename)
+         os.remove( scenename)
          break
       time.sleep( 0.1)
    nuke.modified( changed)
@@ -484,8 +497,6 @@ def renderNodes( nodes, fparams, storeframes):
 
 
 def render( node = None):
-   global af
-   af = __import__('af', globals(), locals(), [])
    nodes = []
    fparams = dict()
 

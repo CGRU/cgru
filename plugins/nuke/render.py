@@ -8,6 +8,8 @@ import re
 
 import nuke
 
+from afpathmap import PathMap
+
 # Interrupt function to delete temp directory:
 def interrupt( signum, frame):
    shutil.rmtree( tmpdir)
@@ -16,7 +18,7 @@ def interrupt( signum, frame):
 # Set interrupt function:
 signal.signal( signal.SIGTERM, interrupt)
 signal.signal( signal.SIGABRT, interrupt)
-signal.signal( signal.SIGQUIT, interrupt)
+if sys.platform.find('win') != 0: signal.signal( signal.SIGQUIT, interrupt)
 signal.signal( signal.SIGINT,  interrupt)
 
 # Error function to print message and delete temp directory:
@@ -71,10 +73,22 @@ if fby < 1: errorExit('By frame (%(fby)d) must be grater or equal 1' % vars(), F
 # Check scene file for existance:
 if not os.path.isfile( xscene): errorExit('File "%s" not founded.' % xscene, False)
 
+# Get Afanasy root directory:
+afroot = os.getenv('AF_ROOT')
+if afroot is None: errorExit('AF_ROOT is not defined.', True)
+
 # Create and check temp directory:
 tmpdir = tempfile.mkdtemp('.afrender.nuke')
 if os.path.exists( tmpdir): print 'Temp directory = "%s"' % tmpdir
 else: errorExit('Error creating temp directory.', False)
+
+# Transfer scene pathes
+pm = PathMap( afroot, UnixSeparators = True, Verbose = True)
+if pm.initialized:
+   pmscene = os.path.basename(xscene)
+   pmscene = os.path.join( tmpdir, pmscene)
+   pm.toServerFile( xscene, pmscene, Verbose = False)
+   xscene = pmscene
 
 # Try to open scene:
 try: nuke.scriptOpen( xscene)
@@ -87,9 +101,15 @@ if writenode.Class() != 'Write': errorExit('Node "%s" is not "Write".' % xnode, 
 try:
    fileknob = writenode['file']
    filepath   = fileknob.value()
+   # Nuke paths has only unix slashes, even on MS Windows platform
+   if sys.platform.find('win') == 0:
+      filepath = filepath.replace('/','\\')
    imagesdir  = os.path.dirname(  filepath)
    imagesname = os.path.basename( filepath)
    tmppath    = os.path.join( tmpdir, imagesname)
+   # Nuke paths has only unix slashes, even on MS Windows platform
+   if sys.platform.find('win') == 0:
+      tmppath = tmppath.replace('\\','/')
    fileknob.setValue( tmppath)
 except:
    errorExit('Write node file operations error:\n' + str(sys.exc_info()[1]), True)
@@ -115,6 +135,7 @@ while frame <= flast:
    allitems = os.listdir( tmpdir)
    for item in allitems:
       if item.rfind('.tmp') == len(item)-4: continue
+      if item.rfind('.nk') == len(item)-3: continue
       src  = os.path.join( tmpdir,    item)
       dest = os.path.join( imagesdir, item)
       if os.path.isfile( dest):

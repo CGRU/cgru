@@ -492,7 +492,7 @@ void ListTasks::doubleClicked( Item * item)
 {
    if( item->getId() == ItemJobTask ::ItemId )
       do_Info_StdOut(  af::Msg::TTaskRequest, 0, item);
-   else if( item->getId() != ItemJobBlock::ItemId )
+   else if( item->getId() == ItemJobBlock::ItemId )
    {
       ItemJobBlock * block = (ItemJobBlock*)item;
       int blockNum = block->getNumBlock();
