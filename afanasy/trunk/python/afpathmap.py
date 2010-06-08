@@ -3,22 +3,6 @@
 import os
 import sys
 
-def findPositions( path):
-   PathBegin = ' "'
-   positions = []
-   position = 0
-   pathlen = len(path)
-   while position < pathlen:
-      while position < pathlen:
-         if not path[position] in PathBegin:
-            positions.append(position)
-            break
-         else: position += 1
-      while position < pathlen:
-         if path[position] == ' ':break
-         position += 1
-   return positions
-
 def findPathEnd( path):
    position = 0
    pathlen = len(path)
@@ -26,6 +10,18 @@ def findPathEnd( path):
    while position < pathlen:
       position += 1
       if position >= pathlen or path[position] == ' ': break
+   return position
+
+def findNextPosition( position, path):
+   PathBegin = ' "'
+   founded = False
+   pathlen = len(path)
+   if position >= pathlen: return -1
+   if path[position] != ' ': position += findPathEnd(path[position:])
+   while position < pathlen:
+      if path[position] in PathBegin: position += 1
+      else: break
+   if position >= pathlen: return -1
    return position
 
 def findSeparator( path):
@@ -111,8 +107,12 @@ class PathMap:
    def translatePath( self, path, toserver, Verbose):
       newpath = path
       if not self.initialized: return newpath
-      positions = findPositions( newpath)
-      for position in positions:
+#      positions = findPositions( newpath)
+      position = 0
+#      for position in positions:
+      while position != -1:
+         path_search = newpath[position:]
+#         print 'position # %d : "%s"' % (position, path_search)
          for i in range( 0, len( self.PathServer)):
             if toserver:
                path_from = self.PathClient[i]
@@ -120,7 +120,7 @@ class PathMap:
             else:
                path_from = self.PathServer[i]
                path_to   = self.PathClient[i]
-            path_search = newpath[position:]
+#            print 'Trying "%s" <> "%s"' % (path_from, path_to)
             if sys.platform.find('win') == 0: path_search = path_search.lower()
             if path_search.find(path_from) == 0:
                part1 = newpath[:position]
@@ -132,6 +132,8 @@ class PathMap:
                   print 'Pathes mapped:'
                   print path
                   print newpath
+               break
+         position = findNextPosition( position, newpath)
       return newpath
 
    def toServer( self, path, Verbose = True): return self.translatePath( path, True , Verbose)

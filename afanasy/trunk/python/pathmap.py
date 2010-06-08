@@ -10,7 +10,6 @@ from afpathmap import PathMap
 
 afroot = os.path.dirname( path)
 afroot = os.path.dirname( afroot)
-pm = PathMap( afroot, len(sys.argv) > 1, len(sys.argv) <= 1)
 
 if len(sys.argv) <= 1:
    print '\nUsage: To check command pathes transfer launch:'
@@ -19,6 +18,7 @@ if len(sys.argv) <= 1:
 if len(sys.argv) > 1:
    path = sys.argv[1]
    if os.path.isfile( path):
+      pm = PathMap( afroot, True, True)
       path_server = path + '_server'
       path_client = path + '_client'
       print 'To server filename = "%s"' % path_server
@@ -26,6 +26,7 @@ if len(sys.argv) > 1:
       print 'To client filename = "%s"' % path_client
       pm.toClientFile( path_server, path_client, Verbose = False)
    else:
+      pm = PathMap( afroot, False, True)
       print 'Origin: ' + path
       path = pm.toServer( path, Verbose = False)
       print 'Server: ' + path
