@@ -479,12 +479,11 @@ def renderNodes( nodes, fparams, storeframes):
    changed = nuke.modified()
    for i in range(len(jobs)):
       scenename = jobsparameters[i].scenename
-#      initialized = False
       if pm.initialized:
          pm_scenename = scenename + '.pm'
          nuke.scriptSave( pm_scenename)
          pm.toServerFile( pm_scenename, scenename, Verbose = False)
-#         os.remove( pm_scenename)
+         os.remove( pm_scenename)
       else:
          nuke.scriptSave( scenename)
       if jobs[i].send() == False:
