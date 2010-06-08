@@ -87,8 +87,9 @@ pm = PathMap( afroot, UnixSeparators = True, Verbose = True)
 if pm.initialized:
    pmscene = os.path.basename(xscene)
    pmscene = os.path.join( tmpdir, pmscene)
-   pm.toServerFile( xscene, pmscene, Verbose = False)
+   pm.toClientFile( xscene, pmscene, Verbose = False)
    xscene = pmscene
+   print 'Scene pathes mapped: "%s"' % xscene
 
 # Try to open scene:
 try: nuke.scriptOpen( xscene)
@@ -151,10 +152,12 @@ while frame <= flast:
          print 'Moving "%s"' % dest
          shutil.move( src, imagesdir)
       except:
+         print 'File moved with error:'
          print str(sys.exc_info()[1])
-         print 'Unable to move file:'
          print src
          print dest
+      if not os.path.isfile( dest):
+         print 'Error: Destination file does not exist.'
          exitcode = 1
 
    sys.stdout.flush()

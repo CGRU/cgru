@@ -434,6 +434,7 @@ class Dialog( QtGui.QWidget):
       self.editInputFilesPattern.clear()
       self.editIdentify.clear()
       inputfile = str( self.editInputFile.text())
+      if sys.platform.find('win') == 0: inputfile = inputfile.replace('/','\\')
 
       if len(inputfile) == 0:
          self.cmdField.setText('Choose one file from sequence')
@@ -486,11 +487,12 @@ class Dialog( QtGui.QWidget):
       if filescount == 1:
          self.cmdField.setText('Founded only 1 file matching pattern.')
          return
+      if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
       afile = os.path.join( self.inputDir, afile)
       pipe = subprocess.Popen( 'identify "%s"' % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
       output = pipe.read()
       if len(output) < len(afile):
-         self.cmdField.setText('Invalid image.')
+         self.cmdField.setText('Invalid image.\n%s' % afile)
          return
       output = output.replace( afile, '')
       self.editIdentify.setText( output)
