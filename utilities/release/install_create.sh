@@ -47,24 +47,25 @@ fi
 curdir=$PWD
 cd "${output}"
 
-for package in ${packages_cgru}; do
-   package_file=`bash -c "ls ${package}*${extension}"`
-   for package_file in $package_file; do break; done
-   if [ -z "${package_file}" ]; then
-      echo "Error: Package '${package}' does not exists."
-      exit 1
-   fi
-   echo "${install_cmd} ${package_file}" >> "${install_cgru}"
-done
-for package in ${packages_afserver}; do
-   package_file=`bash -c "ls ${package}*${extension}"`
-   for package_file in $package_file; do break; done
-   if [ -z "${package_file}" ]; then
-      echo "Error: Package '${package}' does not exists."
-      exit 1
-   fi
-   echo "${install_cmd} ${package_file}" >> "${install_afserver}"
-done
+function assemblecmd(){
+   cmd="${install_cmd}"
+   for package in $*; do
+      package_file=`bash -c "ls ${package}*${extension}"`
+      for package_file in $package_file; do break; done
+      if [ -z "${package_file}" ]; then
+         echo "Error: Package '${package}' does not exists."
+         exit 1
+      fi
+      cmd="${cmd} ${package_file}"
+   done
+}
+
+assemblecmd ${packages_cgru}
+echo "${cmd}" >> "${install_cgru}"
+
+assemblecmd ${packages_afserver}
+echo "${cmd}" >> "${install_afserver}"
+
 echo "${uninstall_cmd} ${packages_uninstall}" >> "${uninstall}"
 
 cd $curdir
