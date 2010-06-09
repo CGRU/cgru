@@ -123,7 +123,7 @@ function start(){
 function stop(){
    echo "Stopping $afapp"
    if [ ! -f $pidfile ]; then
-      log_failure_msg "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
+      echo "Application '$afapp.$AF_HOSTNAME' is not running (or pid file does not exist)."
       exit 1
    fi
    kill `cat $pidfile`

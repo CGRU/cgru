@@ -48,7 +48,8 @@ id renderer || useradd renderer --create-home
 exit 0
 
 %preun
-echo "Afanasy server PRE REMOVE:"
+echo "Afanasy server PRE REMOVE: $1"
+[ "$1" != "0" ] && exit 0
 /etc/init.d/afserver stop || true
 /opt/cgru/afanasy/init/initlinks.sh c rm afserver || true
 exit 0

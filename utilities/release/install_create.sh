@@ -48,7 +48,7 @@ curdir=$PWD
 cd "${output}"
 
 for package in ${packages_cgru}; do
-   package_file=`bash -c "ls ${package}.*${extension}"`
+   package_file=`bash -c "ls ${package}*${extension}"`
    for package_file in $package_file; do break; done
    if [ -z "${package_file}" ]; then
       echo "Error: Package '${package}' does not exists."
@@ -57,7 +57,7 @@ for package in ${packages_cgru}; do
    echo "${install_cmd} ${package_file}" >> "${install_cgru}"
 done
 for package in ${packages_afserver}; do
-   package_file=`bash -c "ls ${package}.*${extension}"`
+   package_file=`bash -c "ls ${package}*${extension}"`
    for package_file in $package_file; do break; done
    if [ -z "${package_file}" ]; then
       echo "Error: Package '${package}' does not exists."

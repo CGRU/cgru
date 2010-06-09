@@ -28,7 +28,11 @@ done
 %defattr(-,root,root)
 /etc
 /usr
-/opt
+/opt/cgru/bin
+/opt/cgru/doc
+/opt/cgru/lib
+/opt/cgru/config_default.xml
+/opt/cgru/setup.sh
 %config /opt/cgru/config.xml
 
 %clean
@@ -40,7 +44,9 @@ pydir="/opt/cgru/lib/python"
 exit 0
 
 %preun
-echo "CGRU common PRE REMOVE:"
+echo "CGRU common PRE REMOVE: $1"
+[ "$1" != "0" ] && exit 0
+echo "Cleaning cgru/lib/python"
 pydir="/opt/cgru/lib/python"
 [ -d "${pydir}" ] && rm -rf "${pydir}"
 exit 0

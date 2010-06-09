@@ -39,7 +39,8 @@ echo "CGRU plugins POST INSTALL"
 exit 0
 
 %preun
-echo "CGRU plugins PRE REMOVE:"
-pkill afcmd || true
+echo "CGRU plugins PRE REMOVE: $1"
+[ "$1" != "0" ] && exit 0
+echo "Cleaning CGRU plugins"
 [ -d /opt/cgru/plugins ] && find /opt/cgru/plugins -type f -name *.pyc -exec rm -vf {} \;
 exit 0

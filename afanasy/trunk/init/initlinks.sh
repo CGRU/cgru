@@ -72,13 +72,11 @@ else
 fi
 
 echo "${removing}Application = '$app'"
-echo "Removing old links:"
-
-[ "${manager}" == "u" ] && update-rc.d -f $app remove
-[ "${manager}" == "c" ] && chkconfig $app off
-[ "${manager}" == "i" ] && insserv -r $app
-
 if [ -L $initd/$app ]; then
+   echo "Removing old links:"
+   [ "${manager}" == "u" ] && update-rc.d -f $app remove
+   [ "${manager}" == "c" ] && chkconfig $app off
+   [ "${manager}" == "i" ] && insserv -r $app
    rm -fv $initd/$app
 fi
 if [ "$action" == "rm" ]; then

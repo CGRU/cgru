@@ -39,6 +39,8 @@ exit 0
 
 %preun
 echo "Afanasy plugins PRE REMOVE:"
+[ "$1" != "0" ] && exit 0
 pkill afcmd || true
+echo "Cleaning afanasy/plugins"
 [ -d /opt/cgru/afanasy/plugins ] && find /opt/cgru/afanasy/plugins -type f -name *.pyc -exec rm -vf {} \;
 exit 0

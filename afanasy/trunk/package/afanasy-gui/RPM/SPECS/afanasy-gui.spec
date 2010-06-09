@@ -34,7 +34,7 @@ done
 %clean
 
 %preun
-echo "Afanasy GUI PRE REMOVE:"
+echo "Afanasy GUI PRE REMOVE: $1"
 procs="afwatch aftalk afmonitor"
 for p in $procs; do pkill $p || true; done
 exit 0
