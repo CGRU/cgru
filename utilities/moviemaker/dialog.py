@@ -13,14 +13,14 @@ from PyQt4 import QtCore, QtGui
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-i', '--input',     dest='inputfile',   type  ='string',     default='',          help='Input file ')
-Parser.add_option('-D', '--debug',     dest='debug',       action='store_true', default=False,       help='Debug mode')
+Parser.add_option('-i', '--input',     dest='inputfile',    type  ='string',     default='',             help='Input file')
+Parser.add_option('--company',         dest='company',      type  ='string',     default='Bazelevs VFX', help='Company name')
+Parser.add_option('--project',         dest='project',      type  ='string',     default='',             help='Project name')
+Parser.add_option('-D', '--debug',     dest='debug',        action='store_true', default=False,          help='Debug mode')
 
 (Options, args) = Parser.parse_args()
 
 # Initializations:
-
-CompanyName = 'Bazelevs VFX'
 
 UserName = os.getenv('USER', os.getenv('USERNAME', 'user'))
 # cut DOMAIN from username:
@@ -96,7 +96,7 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.cFileName, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.tCompany = QtGui.QLabel('Company:', self)
       self.lDraw.addWidget( self.tCompany)
-      self.editCompany = QtGui.QLineEdit( CompanyName, self)
+      self.editCompany = QtGui.QLineEdit( Options.company, self)
       self.lDraw.addWidget( self.editCompany)
       QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tFont = QtGui.QLabel('Font:', self)
@@ -114,7 +114,7 @@ class Dialog( QtGui.QWidget):
       self.cProject = QtGui.QCheckBox('Project:', self)
       self.cProject.setChecked( True)
       QtCore.QObject.connect( self.cProject, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.editProject = QtGui.QLineEdit('', self)
+      self.editProject = QtGui.QLineEdit( Options.project, self)
       QtCore.QObject.connect( self.editProject, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cShot = QtGui.QCheckBox('Shot:', self)
       self.cShot.setChecked( True)
@@ -153,6 +153,7 @@ class Dialog( QtGui.QWidget):
       self.cbActivity.addItem('comp')
       self.cbActivity.addItem('render')
       self.cbActivity.addItem('anim')
+      self.cbActivity.addItem('sim')
       self.lUser.addWidget( self.cbActivity)
       QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
       self.lDrawing.addLayout( self.lUser)
@@ -432,7 +433,7 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def browseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file')
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFile.text())
       if afile.isEmpty(): return
       self.editInputFile.setText( afile)
       self.inputFileChanged()
@@ -519,12 +520,17 @@ class Dialog( QtGui.QWidget):
          self.editOutputDir.clear()
 
       project = re.escape( str( self.editProject.text()))
-      if self.cAutoTitles.isChecked() or project == '':
-         if sys.platform.find('win') == 0:
-            project = self.inputPattern.split('\\')[4].upper()
-         else:
-            project = self.inputPattern.split('/')[3].upper()
-         self.editProject.setText( project)
+      if Options.project == '':
+         if self.cAutoTitles.isChecked() or project == '':
+            if sys.platform.find('win') == 0:
+               pat_split = self.inputPattern.upper().split('\\')
+               if len(pat_split) > 4: project = pat_split[4]
+               else: project = pat_split[len(pat_split)-1]
+            else:
+               pat_split = self.inputPattern.upper().split('/')
+               if len(pat_split) > 3: project = pat_split[3]
+               else: project = pat_split[len(pat_split)-1]
+            self.editProject.setText( project)
 
       shot = re.escape( str( self.editShot.text()))
       if self.cAutoTitles.isChecked() or shot == '':
