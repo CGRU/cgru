@@ -9,6 +9,15 @@ import sys
 
 from PyQt4 import QtCore, QtGui
 
+# Command arguments:
+
+from optparse import OptionParser
+Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
+Parser.add_option('-i', '--input',     dest='inputfile',   type  ='string',     default='',          help='Input file ')
+Parser.add_option('-D', '--debug',     dest='debug',       action='store_true', default=False,       help='Debug mode')
+
+(Options, args) = Parser.parse_args()
+
 # Initializations:
 
 CompanyName = 'Bazelevs VFX'
@@ -235,7 +244,7 @@ class Dialog( QtGui.QWidget):
       self.lInputSettings = QtGui.QVBoxLayout()
       self.gInputSettings.setLayout( self.lInputSettings)
 
-      self.editInputFile = QtGui.QLineEdit( self)
+      self.editInputFile = QtGui.QLineEdit( Options.inputfile, self)
       QtCore.QObject.connect( self.editInputFile, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
       self.lInputSettings.addWidget( self.editInputFile)
 
@@ -539,8 +548,7 @@ class Dialog( QtGui.QWidget):
 
       outname = str( self.editOutputName.text())
       if self.cAutoOutput.isChecked() or outname == None or outname == '':
-         outname = str( self.inputPrefix)
-         outname = outname.strip('_. ')
+         outname = shot
          if activity != '': outname += '_' + activity
          if version  != '': outname += '_' + version
          self.editOutputName.setText( outname)
@@ -599,6 +607,7 @@ class Dialog( QtGui.QWidget):
          cmd += ' -A'
          cmd += ' --afconvcap %d' % self.sbAfCapConvert.value()
          cmd += ' --afenccap %d' % self.sbAfCapEncode.value()
+      if Options.debug: cmd += ' --debug'
 
       self.cmdField.setText( cmd)
       self.evaluated = True

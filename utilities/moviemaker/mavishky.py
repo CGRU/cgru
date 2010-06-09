@@ -11,7 +11,9 @@ import subprocess
 tmpdir = ''
 def rmdir( signum, frame):
    print '\nInterrupt received...'
-   if os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
+   if not debug:
+      if os.path.isdir( tmpdir):
+         shutil.rmtree( tmpdir)
    exit(0)
 
 signal.signal(signal.SIGTERM, rmdir)
@@ -194,12 +196,14 @@ afjobname = os.path.basename( output)
 if datetimesuffix != '': output += '_' + datetimesuffix
 if codec == 'xvid': output += '.avi'
 else: output += '.mov'
+if debug: output = os.path.basename( output)
 if verbose: print 'Output = ' + output
 afjobname += ' %s' % codec
 
 # Temporary directory:
-if tmpdir == '': tmpdir = os.path.join( os.path.dirname(output), '.makeMovie.' + time.strftime('%y-%m-%d_%H-%M-%S'))
-if os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
+if not debug:
+   if tmpdir == '': tmpdir = os.path.join( os.path.dirname(output), '.makeMovie.' + time.strftime('%y-%m-%d_%H-%M-%S'))
+   if os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
 if verbose: print 'TempDir = ' + tmpdir
 
 # Resolution:
@@ -253,24 +257,25 @@ if need_convert:
       rect_x2 += rect_w
       rect_c += 255 / (rect_num - 1)
    if font != '': cmd += ' -font %s' % font
+   if project != '':
+      cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+100 "%s"' % project
    if datetimestring != '':
       cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+100 "%s"' % datetimestring
    if company != '':
       cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+100 "%s"' % company
-   if project != '':
-      cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+100 "%s"' % project
    if shot != '':
       cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+150 "%s"' % shot
    if shotversion != '':
       cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+150 "%s"' % shotversion
+   cmd += ' -fill white -pointsize 20 -gravity northeast -annotate +10+160 "frame range: 1-%d"' % len(allFiles)
    if artist != '':
       cmd += ' -fill white -pointsize 25 -gravity southwest -annotate +10+50 "%s"' % ('Artist: ' + artist)
    if activity != '':
       cmd += ' -fill white -pointsize 25 -gravity southeast -annotate +10+50 "%s"' % ('Activity: ' + activity)
-   if comments != '':
-      cmd += ' -fill white -pointsize 20 -gravity west -annotate +10+0 "%s"' % ('Comments: ' + comments)
    if drawfilename:
       cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
+   if comments != '':
+      cmd += ' -fill white -pointsize 20 -gravity west -annotate +10+0 "%s"' % ('Comments: ' + comments)
    cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')
@@ -356,26 +361,32 @@ else:
    cmd_encode = cmd
 
 # Print commands:
-if verbose:
+if debug:
    if len(cmd_precomp):
       print 'Precomp  first and last commands:'
       print
       print cmd_precomp[0]
+      os.system( cmd_precomp[0])
       if len(cmd_precomp) > 1:
          print '...'
          print cmd_precomp[len(cmd_precomp)-1]
+         os.system( cmd_precomp[len(cmd_precomp)-1])
       print
    if need_convert:
       print 'Convert first and last commands:'
       print
       print cmd_convert[0]
+      os.system( cmd_convert[0])
       print '...'
       print cmd_convert[len(cmd_convert)-1]
+      os.system( cmd_convert[len(cmd_convert)-1])
       print
    print 'Encode command:'
    print
    print cmd_encode
+   os.system( cmd_encode)
    print
+   exit(0)
 
 # Construct Afanasy job:
 if afanasy:
@@ -421,31 +432,32 @@ if afanasy:
    if verbose: j.output(1)
 
 # Commands execution:
-if debug == False:
-   if afanasy: j.send( verbose)
-   else:
-      if len(cmd_precomp) or need_convert: os.mkdir(tmpdir, 0777)
-      if len(cmd_precomp):
-         n = 0
-         print 'Precomositing...'
-         for cmd in cmd_precomp:
-            print name_precomp[n]
-            os.system( cmd)
-            n += 1
-            print 'PROGRESS: %d' % (100.0 * n / len(cmd_precomp)) + '%'
-            sys.stdout.flush()
-         print
-      if need_convert:
-         n = 0
-         print 'Converting...',
-         for cmd in cmd_convert:
-            print name_convert[n]
-            os.system( cmd)
-            n += 1
-            print 'PROGRESS: %d' % (100.0 * n / imgCount) + '%'
-            sys.stdout.flush()
-         print
-      os.system( cmd_encode)
-      if os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
+if afanasy: j.send( verbose)
+else:
+   if len(cmd_precomp) or need_convert: os.mkdir(tmpdir, 0777)
+   if len(cmd_precomp):
+      n = 0
+      print 'Precomositing...'
+      for cmd in cmd_precomp:
+         print name_precomp[n]
+         os.system( cmd)
+         n += 1
+         print 'PROGRESS: %d' % (100.0 * n / len(cmd_precomp)) + '%'
+         sys.stdout.flush()
       print
-      print 'Done'
+   if need_convert:
+      n = 0
+      print 'Converting...',
+      for cmd in cmd_convert:
+         print name_convert[n]
+         os.system( cmd)
+         n += 1
+         print 'PROGRESS: %d' % (100.0 * n / imgCount) + '%'
+         sys.stdout.flush()
+      print
+   os.system( cmd_encode)
+   if not debug:
+      if os.path.isdir( tmpdir):
+         shutil.rmtree( tmpdir)
+   print
+   print 'Done'
