@@ -65,10 +65,11 @@ private slots:
    void actSavePreferences();
    void actShowOfflineNoise();
 
+public:
+   void keyPressEvent(    QKeyEvent         * event);
 protected:
-   void keyPressEvent(     QKeyEvent   * event);
-   void contextMenuEvent( QContextMenuEvent *event);
-   void closeEvent( QCloseEvent * event);
+   void contextMenuEvent( QContextMenuEvent * event);
+   void closeEvent(       QCloseEvent       * event);
 
 private:
    bool connected;

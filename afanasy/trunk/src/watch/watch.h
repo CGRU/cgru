@@ -6,6 +6,7 @@
 #include "../libafqt/name_afqt.h"
 
 class QApplication;
+class QKeyEvent;
 
 class ButtonMonitor;
 class Dialog;
@@ -71,8 +72,8 @@ public:
    static void watchTasks_rem( int id);
    static void listenTask( int jobid, int block, int task, const QString & name);
 
-
-   inline static Dialog      * getDialog()  { return d;}
+   inline static Dialog * getDialog()  { return d;}
+   static void keyPressEvent( QKeyEvent * event);
 
    static void   subscribe( const QList<int> & events);
    static void unsubscribe( const QList<int> & events);

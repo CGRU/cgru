@@ -31,9 +31,6 @@ AFINFO("ListItems::ListItems.\n");
 #endif
    infoline = new InfoLine( this);
 
-//printf("parentWindow = %p\n", parentWindow);
-//printf("Watch::getDialog() = %p\n", Watch::getDialog());
-//printf("(QWidget*)(Watch::getDialog()) = %p\n", (QWidget*)(Watch::getDialog()));
    if( parentWindow != (QWidget*)(Watch::getDialog())) setFocusPolicy(Qt::StrongFocus);
 }
 

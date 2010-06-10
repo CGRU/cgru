@@ -4,6 +4,7 @@
 #include <QtGui/QKeyEvent>
 
 #include "item.h"
+#include "watch.h"
 
 ItemDelegate::ItemDelegate( QWidget *parent):
    QAbstractItemDelegate( parent)
@@ -61,4 +62,8 @@ void ViewItems::keyPressEvent( QKeyEvent * event)
 {
    if(( selectionMode() != QAbstractItemView::NoSelection ) && ( event->key() == Qt::Key_Escape )) clearSelection();
    QListView::keyPressEvent( event);
+
+#if QT_VERSION >= 0x040600
+   Watch::keyPressEvent( event);
+#endif
 }

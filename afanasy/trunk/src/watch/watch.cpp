@@ -51,6 +51,7 @@ void Watch::displayInfo(    const QString &message){if(d){d->displayInfo(    mes
 void Watch::displayWarning( const QString &message){if(d){d->displayWarning( message);if(d->isHidden())d->show();}}
 void Watch::displayError(   const QString &message){if(d){d->displayError(   message);if(d->isHidden())d->show();}}
 void Watch::setWindowTitle( const QString & title ){if(d){d->setWindowTitle( title  );if(d->isHidden())d->show();}}
+void Watch::keyPressEvent( QKeyEvent * event) { if(d) d->keyPressEvent( event);}
 void Watch::repaintStart()  { if(d) d->repaintStart(100); }
 void Watch::repaintFinish() { if(d) d->repaintFinish();   }
 
