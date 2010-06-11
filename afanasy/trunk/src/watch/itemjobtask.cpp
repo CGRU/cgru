@@ -28,10 +28,15 @@ ItemJobTask::~ItemJobTask()
 
 const QVariant ItemJobTask::getToolTip() const
 {
-   if( taskprogress.time_start == 0) return QVariant();
-   QString tooltip = QString("%1 started").arg( af::time2Qstr( taskprogress.time_start));
-   if(((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
-      tooltip += QString("\n%1 finished").arg( af::time2Qstr( taskprogress.time_done));
+   QString tooltip = QString("Task #%1:").arg( tasknum);
+   tooltip += QString("\nTimes started: %1 / %2 with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
+   if( false == taskprogress.hostname.isEmpty()) tooltip += QString("\nLast started host: %1").arg(taskprogress.hostname);
+   if( taskprogress.time_start != 0)
+   {
+      tooltip += QString("\nStarted at %1").arg( af::time2Qstr( taskprogress.time_start));
+      if(((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
+         tooltip += QString("\nFinished at %1").arg( af::time2Qstr( taskprogress.time_done));
+   }
    return tooltip;
 }
 
@@ -61,7 +66,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    int percentframe  = taskprogress.percentframe;
    int frames_num    = block->getFramePerhost();
 
-   QString leftString = QString("%1: %2").arg(tasknum).arg(name);
+   QString leftString = name;
 
    QString rightString = QString("s%1/%2e %3").arg(taskprogress.starts_count).arg(taskprogress.errors_count).arg(taskprogress.hostname);
 

@@ -1,0 +1,1 @@
+# Another pathsmap file location is current directory

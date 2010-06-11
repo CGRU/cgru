@@ -13,7 +13,7 @@ afroot = os.path.dirname( afroot)
 
 if len(sys.argv) <= 1:
    print '\nUsage: To check command pathes transfer launch:'
-   print os.path.basename(sys.argv[0]) + ' [command|file]'
+   print os.path.basename(sys.argv[0]) + ' [command|file]\n'
 
 if len(sys.argv) > 1:
    path = sys.argv[1]

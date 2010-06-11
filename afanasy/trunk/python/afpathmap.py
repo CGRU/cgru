@@ -52,6 +52,19 @@ def replaceSeperators( path, path_from, path_to):
       newpath = part1 + part2
    return newpath   
 
+def findPathMapFiles( folder):
+   PathMapFile = 'pathmap'
+   pathmap_files = []
+   if folder is not None:
+      if os.path.isdir( folder):
+         files = os.listdir( folder)
+         for afile in files:
+            if afile.find( PathMapFile) != 0: continue
+            filename = os.path.join( folder, afile)
+            if not os.path.isfile( filename): continue
+            pathmap_files.append( filename)
+   return pathmap_files
+
 class PathMap:
    def __init__( self, afroot, UnixSeparators = False, Verbose = False):
       self.initialized = False
@@ -59,19 +72,15 @@ class PathMap:
       self.UnixSeparators = UnixSeparators
       self.PathClient = []
       self.PathServer = []
-
       pathmap_files = []
-      afroot_files = os.listdir( afroot)
-      for afile in afroot_files:
-         if afile.find( PathMapFile) == -1: continue
-         filename = os.path.join( afroot, afile)
-         if not os.path.isfile( filename): continue
-         pathmap_files.append( filename)
+
+      pathmap_files.extend( findPathMapFiles( os.path.join( os.getenv('HOME', os.getenv('HOMEPATH', '.')), '.afanasy')))
+      pathmap_files.extend( findPathMapFiles( '.'))
+      pathmap_files.extend( findPathMapFiles( afroot))
 
       for filename in pathmap_files:
          if Verbose:
-            print 'Opening pathes map file:'
-            print filename
+            print 'Opening file: "%s"' % filename
 
          file = open( filename, 'r')
          for line in file:
@@ -98,10 +107,10 @@ class PathMap:
          file.close()
 
       if Verbose:
-         print 'Pathes map:\n'
+         print 'Pathes map:'
          n = 0
          for path in self.PathClient:
-            print '"%s" <-> "%s"' % (path, self.PathServer[n])
+            print '   "%s" <-> "%s"' % (path, self.PathServer[n])
             n += 1
 
    def translatePath( self, path, toserver, Verbose):
