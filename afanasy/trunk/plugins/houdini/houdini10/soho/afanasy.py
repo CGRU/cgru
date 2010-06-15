@@ -79,10 +79,16 @@ if not driver:
 if not isinstance(driver,hou.RopNode):
     soho.error('%s is not a ROP node' % hdriver)
 tr = driver.parm('trange')
-if tr!=None and tr.eval()==0:
-   sf = driver.parm('soho_foreground')
-   if sf==None or sf.eval()==0:
-      soho.error('Set "Block Until Render Complete" on %s node' % hdriver)
+blockSet = False
+sf = driver.parm('soho_foreground')
+if tr != None and tr.eval() == 0:
+   if sf != None:
+      if sf.eval() == 0:
+         try:
+            sf.set( 1)
+            blockSet = True
+         except:
+            soho.error('Set "Block Until Render Complete" on %s node' % hdriver)
 
 if not os.path.isdir(hip):
     soho.error('Unable to find spool directory "%"' % hip)
@@ -163,3 +169,4 @@ job.setCmdPost('rm ' + tmphip)
 
 job.send()
 
+if blockSet: sf.set( 0)
