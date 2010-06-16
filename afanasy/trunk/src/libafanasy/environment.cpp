@@ -369,7 +369,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    PRINT("Afanasy user name = '%s'\n", username.toUtf8().data());
 //
 //############ local host name:
-   hostname = QString::fromUtf8( getenv("AF_HOSTNAME"));
+   hostname = QString::fromUtf8( getenv("AF_HOSTNAME")).toLower();
 
 //
 //############ Platform: #############################
@@ -510,7 +510,7 @@ bool Environment::init( bool solveServerAddress)
 
 //
 //############ Local host address:
-   computername = QHostInfo::localHostName();
+   computername = QHostInfo::localHostName().toLower();
    PRINT("Local computer name = '%s', adress = ", computername.toUtf8().data());
    if (address != NULL) delete address;
    address = new Address( clientport);
