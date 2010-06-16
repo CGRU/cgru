@@ -7,9 +7,10 @@ namespace AFJOB
 {
    const int MAXQUANTITY = 1000000;
 
-   const char     TASKS_OUTPUTDIR[]     = "tasksoutput"; ///< Tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
-   const char     LOGS_DIRECTORY[]      = "jobs";        ///< Jobs logs store directory, relative to AFSERVER::TEMP_DIRECTORY
-   const int      LOGS_LINESMAX         = 100;        ///< Maximum number of lines in each Job log.
+   const char     TASKS_OUTPUTDIR[]          = "tasksoutput";          ///< Tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
+   const char     TASKS_OUTPUTDIR_DELETED[]  = "tasksoutput_deleted";  ///< Deleted jobs tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
+   const char     LOGS_DIRECTORY[]           = "jobs";                 ///< Jobs logs store directory, relative to AFSERVER::TEMP_DIRECTORY
+   const int      LOGS_LINESMAX              = 100;                    ///< Maximum number of lines in each Job log.
 
    const uint8_t  PROGRESS_BYTES  = 8;
 

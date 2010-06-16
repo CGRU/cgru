@@ -21,7 +21,6 @@ namespace af
    class Address;
    class AddressesList;
    class Passwd;
-   class Services;
    class Farm;
    class Host;
    class HostRes;

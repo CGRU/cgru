@@ -4,5 +4,4 @@
 source ./setup_afanasy.sh
 
 # Launch render script:
-./render.py
-
+python ./render.py

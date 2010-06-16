@@ -54,7 +54,7 @@ So each path (project, asset) can have individual software setup.
 <!-- Watch -->
    <pswd_visor>1832116180fdc61b64fd978401e462e9</pswd_visor>
    <pswd_god>73bcaaa458bff0d27989ed331b68b64d</pswd_god>
-   <previewcmds>kuickshow;djv_view</previewcmds>
+   <previewcmds>nuke -v;mplay</previewcmds>
    <watch_connectretries>3</watch_connectretries>
    <watch_waitforconnected>8000</watch_waitforconnected>
    <watch_waitforreadyread>8000</watch_waitforreadyread>

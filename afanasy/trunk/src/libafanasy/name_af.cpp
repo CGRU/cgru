@@ -11,7 +11,6 @@
 #include "environment.h"
 #include "farm.h"
 
-af::Services* services = NULL;
 af::Farm* ferma = NULL;
 
 #define AFOUTPUT
@@ -66,7 +65,6 @@ bool af::loadFarm( const QString & filename, bool verbose )
 
 void af::destroy()
 {
-   if( services != NULL) delete services;
    if( ferma != NULL) delete ferma;
 }
 
