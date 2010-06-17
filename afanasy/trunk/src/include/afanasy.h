@@ -86,9 +86,14 @@ namespace AFWATCH
    const int  WAITFORCONNECTED         = 8000;     ///< Connect to server timeout milliseconds.
    const int  WAITFORREADYREAD         = 8000;     ///< Wait for data from server timeout milliseconds.
    const int  WAITFORBYTESWRITTEN      = 8000;     ///< Wait writing to socket timeout milliseconds.
-   const int  REFRESHINTERVAL          = 5;          ///< Node items update interval time in seconds.
-   const char PREVIEWPROGRAM[]         = "djv_view"; ///< Default images preview command.
-   const char PREVIEWPROGRAMS_SEP      = ';';        ///< Preview commands separator ( listed in AF_PREVIEWPROGRAMS environment variable).
+   const int  REFRESHINTERVAL          = 5;        ///< Node items update interval time in seconds.
+
+   const char CMDS_ARGUMENT[]          = "@ARG@";     ///< Commands argument.
+   const char CMDS_SEPARATOR[]         = " || ";      ///< Commands separator.
+   /// Default images preview commands:
+   const char CMDS_PREVIEW[]           = "nuke -v \"@ARG@\" || mplay \"@ARG@\"";
+   /// Default render menu commands:
+   const char CMDS_RENDER[]            = "xterm -e ssh @ARG@ || xterm -e ping @ARG@";
 }
 
 /// Talk options:

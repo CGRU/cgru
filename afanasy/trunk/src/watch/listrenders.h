@@ -43,6 +43,7 @@ private slots:
    void actRestart();
    void actStart();
 
+   void actCommand( int number);
    void actReboot();
    void actShutdown();
 

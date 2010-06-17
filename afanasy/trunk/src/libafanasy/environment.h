@@ -76,7 +76,8 @@ public:
 
    static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
-   static inline const QString& getPreviewCmds()                    { return previewcmds;                     } ///< Get preview commannds, separated by AFWATCH::PREVIEWPROGRAMS_SEP.
+   static inline const QString& getPreviewCmds()                    { return previewcmds;                     } ///< Get preview commands
+   static inline const QString& getRenderCmds()                     { return rendercmds;                      } ///< Get render commands
    static inline int            getWatchRefreshInterval()           { return watch_refreshinterval;           }
    static inline int            getWatchConnectRetries()            { return watch_connectretries;            }
    static inline int            getWatchWaitForConnected()          { return watch_waitforconnected;          }
@@ -207,7 +208,8 @@ private:
 
    static int clientport;
 
-   static QString previewcmds;    ///< Preview commannds, separated by AFWATCH::PREVIEWPROGRAMS_SEP
+   static QString previewcmds;    ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static QString rendercmds;     ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
    static int watch_refreshinterval;
    static int watch_connectretries;
    static int watch_waitforconnected;

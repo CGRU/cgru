@@ -63,6 +63,7 @@ public:
    static void displayError(   const QString &message);
 
    inline static const QStringList * getPreviewCmds() { return &previewcmds; }
+   inline static const QStringList * getRenderCmds()  { return &rendercmds;  }
 
    static bool openMonitor( int type, bool open);
 
@@ -100,6 +101,7 @@ private:
    static QLinkedList<Reciever*> recievers;
 
    static QStringList previewcmds;
+   static QStringList rendercmds;
 
    static QLinkedList<int> listenjobids;
    static QLinkedList<int> watchtasksjobids;

@@ -30,6 +30,7 @@ QLinkedList<int>       Watch::listenjobids;
 QLinkedList<int>       Watch::watchtasksjobids;
 QLinkedList<QWidget*>  Watch::watchtaskswindows;
 QStringList Watch::previewcmds;
+QStringList Watch::rendercmds;
 QApplication * Watch::app = NULL;
 Dialog * Watch::d = NULL;
 MonitorHost * Watch::m = NULL;
@@ -39,7 +40,8 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    app = pApplication;
    d = pDialog;
    m = d->getMonitor();
-   previewcmds = af::Environment::getPreviewCmds().split( AFWATCH::PREVIEWPROGRAMS_SEP);
+   previewcmds = af::Environment::getPreviewCmds().split( AFWATCH::CMDS_SEPARATOR);
+   rendercmds  = af::Environment::getRenderCmds().split(  AFWATCH::CMDS_SEPARATOR);
 }
 
 Watch::~Watch(){}

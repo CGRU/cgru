@@ -37,7 +37,8 @@ QString Environment::servername =                      AFADDR::SERVER_NAME;
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::clientport =                      AFADDR::CLIENT_PORT;
 
-QString Environment::previewcmds =                     AFWATCH::PREVIEWPROGRAM;
+QString Environment::previewcmds =                     AFWATCH::CMDS_PREVIEW;
+QString Environment::rendercmds =                      AFWATCH::CMDS_RENDER;
 int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
 int     Environment::watch_waitforconnected =          AFWATCH::WAITFORCONNECTED;
 int     Environment::watch_waitforreadyread =          AFWATCH::WAITFORREADYREAD;
@@ -180,6 +181,7 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, render_logs_linesmax,              "render_logs_linesmax"              );
 
    getVar( doc, previewcmds,                       "previewcmds"                       );
+   getVar( doc, rendercmds,                        "rendercmds"                        );
    getVar( doc, watch_refreshinterval,             "watch_refreshinterval"             );
    getVar( doc, watch_connectretries,              "watch_connectretries"              );
    getVar( doc, watch_waitforconnected,            "watch_waitforconnected"            );

@@ -1,13 +1,15 @@
 #include "listtasks.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QEvent>
+#include <QtCore/QProcess>
+#include <QtCore/QTimer>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QContextMenuEvent>
 #include <QtGui/QInputDialog>
 #include <QtGui/QListWidget>
 #include <QtGui/QMenu>
-#include <QtCore/QProcess>
-#include <QtCore/QTimer>
-#include <QtGui/QContextMenuEvent>
+
+#include "../include/afanasy.h"
 
 #include "../libafanasy/address.h"
 #include "../libafanasy/blockdata.h"
@@ -654,8 +656,8 @@ void ListTasks::actTaskPreview( int number)
       return;
    }
    ItemJobTask* taskitem = (ItemJobTask*)item;
-   QString cmd( taskitem ->getCmdView());
-   if( cmd.isEmpty()) return;
+   QString arg( taskitem ->getCmdView());
+   if( arg.isEmpty()) return;
    const QStringList * previewcmds = Watch::getPreviewCmds();
    int previewcmdssize = previewcmds->size();
    if( number >= previewcmdssize )
@@ -664,7 +666,9 @@ void ListTasks::actTaskPreview( int number)
       return;
    }
 
-   cmd = QString("%1 \"%2\"").arg((*previewcmds)[number], cmd);
+   QString cmd((*previewcmds)[number]);
+   cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
+
    QString wdir = taskitem->getWDir();
 printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
 

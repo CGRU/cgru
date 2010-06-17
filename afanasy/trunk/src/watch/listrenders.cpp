@@ -1,19 +1,23 @@
 #include "listrenders.h"
 
-#include <QtGui/QMenu>
 #include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
+#include <QtCore/QProcess>
 #include <QtCore/QTimer>
 #include <QtGui/QContextMenuEvent>
-
+#include <QtGui/QInputDialog>
 #include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QMenu>
+
+#include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
 
 #include "../libafqt/qmsg.h"
 
+#include "actionid.h"
+#include "dialog.h"
 #include "itemrender.h"
 #include "ctrlrenders.h"
 #include "ctrlsortfilter.h"
@@ -187,6 +191,22 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       menu.addAction( action);
    }
 
+   const QStringList * cmds = Watch::getRenderCmds();
+   int cmdssize = cmds->size();
+   if( cmdssize > 0 )
+   {
+      menu.addSeparator();
+
+      QMenu * submenu = new QMenu( "Custom", this);
+      for( int i = 0; i < cmdssize; i++)
+      {
+         ActionId * actionid = new ActionId( i, QString("%1").arg((*cmds)[i]), this);
+         connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
+         submenu->addAction( actionid);
+      }
+      menu.addMenu( submenu);
+   }
+
    menu.exec( event->globalPos());
 }
 
@@ -339,4 +359,28 @@ void ListRenders::actRequestServices()
    displayInfo( "Render services request.");
    afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderServicesRequestId, item->getId(), true);
    Watch::sendMsg( msg);
+}
+
+void ListRenders::actCommand( int number)
+{
+   Item* item = getCurrentItem();
+   if( item == NULL )
+   {
+      displayError( "No items selected.");
+      return;
+   }
+
+   const QStringList * cmds = Watch::getRenderCmds();
+   int cmdssize = cmds->size();
+   if( number >= cmdssize )
+   {
+      displayError( "No such command.");
+      return;
+   }
+   QString cmd((*cmds)[number]);
+   cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
+printf("Starting '%s'\n", cmd.toUtf8().data());
+
+   QProcess * process = new QProcess( Watch::getDialog());
+   process->start( cmd);
 }
