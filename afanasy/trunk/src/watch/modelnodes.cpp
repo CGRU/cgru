@@ -121,8 +121,8 @@ void ModelNodes::sortnodes( const QList<ItemNode*> & itemstosort, bool ascending
 
       if( row == pos ) continue;
 
-      if( row < pos) for( int i = row; i < pos; ) items[i] = items[++i];
-      else           for( int i = row; i > pos; ) items[i] = items[--i];
+      if( row < pos) for( int i = row; i < pos; i++) items[i] = items[i+1];
+      else           for( int i = row; i > pos; i--) items[i] = items[i-1];
       items[pos] = item;
    }
    emit layoutChanged();
