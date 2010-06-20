@@ -15,7 +15,7 @@ Mxx_ru::Cpp::lib_target{
          compiler_option( "-fPIC", MxxRu::Cpp::Target::OPT_UPSPREAD)
          compiler_option( "-Wall", MxxRu::Cpp::Target::OPT_UPSPREAD)
          IO.popen("#{ENV['AF_PYTHON']}-config --includes"){|f| compiler_option(f.gets.chop, MxxRu::Cpp::Target::OPT_UPSPREAD )}
-         IO.popen("#{ENV['AF_PYTHON']}-config --libs"){|f| linker_option(f.gets.chop, MxxRu::Cpp::Target::OPT_UPSPREAD )}
+         IO.popen("#{ENV['AF_PYTHON']}-config --ldflags"){|f| linker_option(f.gets.chop, MxxRu::Cpp::Target::OPT_UPSPREAD )}
 
          case ENV['UNIXTYPE']
             when "MACOSX"
