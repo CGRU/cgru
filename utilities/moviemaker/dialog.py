@@ -76,6 +76,7 @@ class Dialog( QtGui.QWidget):
       i = 0
       for name in CodecNames:
          self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
+         i = i + 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
       self.cbFPS = QtGui.QComboBox( self)

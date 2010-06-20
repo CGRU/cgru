@@ -356,7 +356,9 @@ if need_convert:
       imgCount += 1
 
 # Encode commands:
+auxargs = ''
 if codec != 'ffmpeg':
+   if not sys.platform.find('win') == 0: auxargs = '-threads 0'
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.%07d.'+tmpFormat)
 elif codec == 'mencoder':
@@ -365,9 +367,10 @@ elif codec == 'mencoder':
 else:
    print 'Unknown encoder = "%s"' % encoder
    exit(1)
-cmd_encode = cmd_encode.replace('@INPUT@', inputmask)
-cmd_encode = cmd_encode.replace('@FPS@', str(fps))
+cmd_encode = cmd_encode.replace('@INPUT@',  inputmask)
+cmd_encode = cmd_encode.replace('@FPS@',    str(fps))
 cmd_encode = cmd_encode.replace('@OUTPUT@', output)
+cmd_encode = cmd_encode.replace('@ARGS@',   auxargs)
 
 # Print commands:
 if debug:
