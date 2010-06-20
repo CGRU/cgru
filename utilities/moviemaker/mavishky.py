@@ -23,7 +23,7 @@ signal.signal(signal.SIGINT,  rmdir)
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 parser.add_option('-f', '--fps',        dest='fps',         type  ='int',        default=25,          help='Frames per second')
-parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg',  help='Codec: ffmpeg -formats')
+parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg',  help='File with encode command line in last line')
 parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 parser.add_option('-i', '--inpattern',  dest='inpattern',   type  ='string',     default='',          help='Input files pattern: img.####.jpg')
 parser.add_option('-o', '--output',     dest='output',      type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
@@ -91,6 +91,12 @@ username    = options.username
 
 tmpdir      = options.tmpdir
 
+# Parameters initialization:
+if debug: verbose = True
+if verbose: print 'VERBOSE MODE:'
+if debug: print 'DEBUG MODE:'
+
+
 # Definitions:
 tmpName   = 'img'
 tmpFormat = 'jpg'
@@ -98,6 +104,21 @@ tmpLogo   = 'logo.png'
 
 need_convert = False
 need_logo = False
+
+# Process encode command:
+encoder = codec.split('.')
+if len(encoder) < 1:
+   print 'Invalid encode file "%s"' % codec
+   exit(1)
+encoder = encoder[len(encoder)-1]
+if verbose: print 'Encoder engine = "%s"' % encoder
+file = open( codec)
+lines = file.readlines()
+cmd_encode = lines[len(lines)-1].strip()
+if len(cmd_encode) < 2:
+   print 'Invalid encode file "%s"' % codec
+   exit(1)
+if verbose: print 'Encode command = "%s"' % cmd_encode
 
 #datetimestring = '`date +%y-%m-%d_%H-%M`'
 datetimestring = ''
@@ -116,14 +137,9 @@ if timesuffix:
 # Check required parameters:
 if inpattern == '': parser.error('Input files not specified.')
 
-# Parameters initialization:
-if debug: verbose = True
-if verbose: print 'VERBOSE MODE:'
-if debug: print 'DEBUG MODE:'
-
 # Input directory:
 inputdir = os.path.dirname( inpattern)
-if verbose: print 'InputDir = ' + inputdir
+if verbose: print 'InputDir = "%s"' % inputdir
 if not os.path.isdir( inputdir):
    print 'Can\'t find input directory'
    exit(1)
@@ -340,25 +356,18 @@ if need_convert:
       imgCount += 1
 
 # Encode commands:
-cmd_encode = ''
-if codec != 'xvid':
+if codec != 'ffmpeg':
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.%07d.'+tmpFormat)
-   cmd = 'ffmpeg -pix_fmt rgb24'
-   cmd += ' -y -r ' + str(fps) + ' -i '
-   cmd += inputmask
-   cmd += ' -vcodec ' + codec
-   cmd += ' -qscale 1'
-   cmd += ' ' + output
-   cmd = cmd + ' || echo Done'
-   cmd_encode = cmd
-else:
+elif codec == 'mencoder':
    inputmask = os.path.join( inputdir, prefix+'*'+suffix)
    if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.*.'+tmpFormat)
-   cmd = 'mencoder'
-   cmd += ' "mf://%s"' % inputmask
-   cmd += ' -mf fps=' + str(fps) + ' -o ' + output + ' -ovc xvid -xvidencopts fixed_quant=1'
-   cmd_encode = cmd
+else:
+   print 'Unknown encoder = "%s"' % encoder
+   exit(1)
+cmd_encode = cmd_encode.replace('@INPUT@', inputmask)
+cmd_encode = cmd_encode.replace('@FPS@', str(fps))
+cmd_encode = cmd_encode.replace('@OUTPUT@', output)
 
 # Print commands:
 if debug:

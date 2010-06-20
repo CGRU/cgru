@@ -32,6 +32,26 @@ UserName = UserName.capitalize()
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 LogosPath = os.path.join( DialogPath, 'logos')
 FontsList = ['Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
+CodecsPath = DialogPath
+Encoders = ['ffmpeg', 'mencoder']
+
+# Precess codecs:
+CodecNames = []
+CodecFiles = []
+allFiles = os.listdir( CodecsPath)
+for afile in allFiles:
+   afile = os.path.join( CodecsPath, afile)
+   if os.path.isfile( afile):
+      parts = afile.split('.')
+      if len(parts):
+         if parts[len(parts)-1] in Encoders:
+            CodecFiles.append( afile)
+CodecFiles.sort()
+for afile in CodecFiles:
+   file = open( afile)
+   name = file.readline().strip()
+   file.close()
+   CodecNames.append( name)
 
 class Dialog( QtGui.QWidget):
    def __init__( self):
@@ -53,9 +73,9 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tCodec = QtGui.QLabel('Codec:', self)
       self.cbCodec = QtGui.QComboBox( self)
-      self.cbCodec.addItem('Quicktime (PhotoJPG)', QtCore.QVariant('mjpeg'))
-#      self.cbCodec.addItem('Quicktime (H.264)', QtCore.QVariant('h264'))
-      self.cbCodec.addItem('Mpeg (MPEG4 XVID)', QtCore.QVariant('xvid'))
+      i = 0
+      for name in CodecNames:
+         self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
       self.cbFPS = QtGui.QComboBox( self)

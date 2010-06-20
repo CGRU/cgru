@@ -1,0 +1,2 @@
+Quicktime PhotoJPG
+ffmpeg -pix_fmt rgb24 -y -threads 0 -r @FPS@ -i @INPUT@ -vcodec mjpeg -qscale 1 @OUTPUT@ || echo Done

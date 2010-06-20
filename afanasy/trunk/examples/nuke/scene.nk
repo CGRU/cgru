@@ -1,5 +1,5 @@
-#! /cg/soft/Nuke5.2v3-64/Nuke5.2 -nx
-version 5.2300
+#! /cg/soft/Nuke6.0v5/Nuke6.0 -nx
+version 6.0 v5
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
     <window x="0" y="25" w="1280" h="750" screen="0">
@@ -12,11 +12,11 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
                 </dock>
                 <split size="763"></split>
                 <splitter orientation="2">
-                    <split size="346"></split>
+                    <split size="343"></split>
                     <dock id="" activePageId="Viewer.1">
                         <page id="Viewer.1"></page>
                     </dock>
-                    <split size="346"></split>
+                    <split size="343"></split>
                     <dock id="" activePageId="DAG.1">
                         <page id="DAG.1"></page>
                         <page id="Curve Editor.1"></page>
@@ -26,7 +26,6 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
             <split size="467"></split>
             <dock id="" activePageId="Properties.1">
                 <page id="Properties.1"></page>
-                <page id="Script Editor.1"></page>
             </dock>
         </splitter>
     </window>
@@ -34,12 +33,12 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 }
 Root {
  inputs 0
- name /cg/tools/cgru/afanasy/branches/1.x/examples/nuke/scene.nk
- frame 5
+ name /cg/tools/cgru/afanasy/trunk/examples/nuke/scene.nk
  last_frame 11
  lock_range true
- format "640 480 0 0 640 480 1 PC_Video"
- proxy_format "640 480 0 0 640 480 1 PC_Video"
+ fps 25
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy_format "720 576 0 0 720 576 1.09 PAL"
 }
 ColorBars {
  inputs 0
@@ -87,13 +86,6 @@ Write {
  xpos 726
  ypos -16
 }
-Viewer {
- inputs 0
- input_process false
- name Viewer1
- xpos 589
- ypos -50
-}
 afanasy {
  inputs 0
  name ab
@@ -113,176 +105,6 @@ afanasy {
 }
 ColorBars {
  inputs 0
- name ColorBars1
- xpos 223
- ypos -329
-}
-Transform {
- translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
- rotate {{180*noise(4.56+.05*frame) i}}
- scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
- center {320 240}
- motionblur 1
- name Transform1
- xpos 223
- ypos -222
-}
-set N2e48a00 [stack 0]
-Write {
- channels rgba
- file render/key.%04d.exr
- file_type exr
- name key
- xpos 333
- ypos -229
-}
-Constant {
- inputs 0
- channels rgb
- color {0.0443748 0.0548952 0.205 0.35}
- name Constant1
- xpos 3
- ypos -335
-}
-Ramp {
- opacity {{.6+.4*noise(3.1+.4*frame) i}}
- p0 {480 -95}
- p1 {230 625}
- color {1 0.829351 0.381265 1}
- name Ramp1
- xpos 3
- ypos -259
-}
-set N2e5d710 [stack 0]
-Write {
- file render/back.%04d.exr
- file_type exr
- name back
- xpos 113
- ypos -266
-}
-Dot {
- name Dot2
- xpos 480
- ypos -254
-}
-afanasy {
- inputs 2
- name afanasy1
- label raw
- xpos 446
- ypos -163
- jobname raw
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
- independent true
- fullrange true
-}
-Read {
- inputs 0
- file render/key.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 1
- name Read3
- xpos 223
- ypos -165
-}
-push $N2e48a00
-Switch {
- inputs 2
- which 1
- name Switch2
- xpos 223
- ypos -193
-}
-Read {
- inputs 0
- file render/back.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 2
- name Read2
- xpos 3
- ypos -165
-}
-push $N2e5d710
-Switch {
- inputs 2
- which 1
- name Switch1
- xpos 3
- ypos -194
-}
-Merge2 {
- inputs 2
- name Merge1
- xpos 113
- ypos -194
-}
-Crop {
- box {0 0 640 480}
- crop false
- name Crop1
- xpos 113
- ypos -58
-}
-set N2f9aca0 [stack 0]
-Write {
- file render/final.%04d.exr
- file_type exr
- name final
- xpos 223
- ypos -65
-}
-Read {
- inputs 0
- file render/final.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 1
- name Read1
- xpos 3
- ypos -32
-}
-push $N2f9aca0
-Switch {
- inputs 2
- which 1
- name Switch3
- xpos 113
- ypos -2
-}
-Write {
- file render/preview.%04d.jpg
- file_type jpeg
- checkHashOnRead false
- name preview
- xpos 113
- ypos 46
-}
-afanasy {
- inputs 3
- name afanasy2
- label "all\n"
- xpos 446
- ypos 46
- jobname ""
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
-}
-ColorBars {
- inputs 0
  name ColorBars4
  xpos 688
  ypos -959
@@ -297,7 +119,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N30cae80 [stack 0]
+set N4b9f200 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -312,7 +134,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N30cae80
+push $N4b9f200
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -320,7 +142,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N30cae80
+push $N4b9f200
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -585,4 +407,183 @@ afanasy {
  dependmaskglbl ""
  addnodes ""
  forceframes true
+}
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos 223
+ ypos -329
+}
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform1
+ xpos 223
+ ypos -222
+}
+set N49059e0 [stack 0]
+Write {
+ channels rgba
+ file render/key.%04d.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -229
+}
+Constant {
+ inputs 0
+ channels rgb
+ color {0.0443748 0.0548952 0.205 0.35}
+ name Constant1
+ xpos 3
+ ypos -335
+}
+Ramp {
+ opacity {{.6+.4*noise(3.1+.4*frame)}}
+ p0 {480 -95}
+ p1 {230 625}
+ color {1 0.829351 0.381265 1}
+ name Ramp1
+ xpos 3
+ ypos -259
+}
+set N491d040 [stack 0]
+Write {
+ file render/back.%04d.exr
+ file_type exr
+ name back
+ xpos 113
+ ypos -266
+}
+Dot {
+ name Dot2
+ xpos 480
+ ypos -254
+}
+afanasy {
+ inputs 2
+ name afanasy1
+ label raw
+ xpos 446
+ ypos -163
+ jobname raw
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ independent true
+ fullrange true
+}
+Read {
+ inputs 0
+ file render/key.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ last 9999
+ version 1
+ name Read3
+ xpos 223
+ ypos -165
+}
+push $N49059e0
+Switch {
+ inputs 2
+ which 1
+ name Switch2
+ xpos 223
+ ypos -193
+}
+Read {
+ inputs 0
+ file render/back.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ last 9999
+ version 2
+ name Read2
+ xpos 3
+ ypos -165
+}
+push $N491d040
+Switch {
+ inputs 2
+ which 1
+ name Switch1
+ xpos 3
+ ypos -194
+}
+Merge2 {
+ inputs 2
+ name Merge1
+ xpos 113
+ ypos -194
+}
+Crop {
+ box {0 0 720 576}
+ crop false
+ name Crop1
+ xpos 113
+ ypos -58
+ disable true
+}
+set N4a654b0 [stack 0]
+Write {
+ file render/final.%04d.exr
+ file_type exr
+ name final
+ xpos 223
+ ypos -65
+}
+Read {
+ inputs 0
+ file render/final.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ last 9999
+ version 1
+ name Read1
+ xpos 3
+ ypos -32
+}
+push $N4a654b0
+Switch {
+ inputs 2
+ which 1
+ name Switch3
+ xpos 113
+ ypos -2
+}
+Write {
+ file render/preview.%04d.jpg
+ file_type jpeg
+ checkHashOnRead false
+ name preview
+ xpos 113
+ ypos 46
+}
+afanasy {
+ inputs 3
+ name afanasy2
+ label "all\n"
+ xpos 446
+ ypos 46
+ jobname ""
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+}
+push $N4a654b0
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 589
+ ypos -50
 }
