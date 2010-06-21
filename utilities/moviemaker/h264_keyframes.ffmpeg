@@ -1,0 +1,2 @@
+QT H.264 KeyFrames
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i @INPUT@ -vcodec libx264 -fpre h264_keyframes.ffpreset -b 10000k @OUTPUT@ || echo Done
