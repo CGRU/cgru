@@ -117,6 +117,13 @@ class Job(pyaf.Job):
       else: self.setNeedOS( 'linux')
       self.blocks = []
 
+   def setUserName( self, username):
+      if username == None or username == '':
+         username = 'none'
+         print 'Error: Username is empty.'
+      username = username.lower()
+      pyaf.Job.setUserName( self, username)
+
    def setPriority( self, priority):
       if priority < 0: return
       if priority > 250:

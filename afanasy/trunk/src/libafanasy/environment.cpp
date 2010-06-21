@@ -364,6 +364,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
       AFERROR("Can't find user name.\n");
       return;
    }
+   username = username.toLower();
    // cut DOMAIN/
    int dpos = username.lastIndexOf('/');
    if( dpos == -1) dpos = username.lastIndexOf('\\');
