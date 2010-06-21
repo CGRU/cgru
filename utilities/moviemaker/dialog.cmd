@@ -1,3 +1,3 @@
 call setup.cmd
 
-dialog.py
+python dialog.py
