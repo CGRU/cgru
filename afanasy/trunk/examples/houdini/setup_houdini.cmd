@@ -1,3 +1,4 @@
+call setup_cgru.cmd
 call setup_afanasy.cmd
 
 set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 10.0.554
