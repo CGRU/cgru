@@ -149,9 +149,9 @@ PyObject * PyAf_Block_setNeedHDD( PyAf_Block_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Block_setFramesPerHost( PyAf_Block_Object *self, PyObject *arg)
+PyObject * PyAf_Block_setFramesPerTask( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setFramesPerHost( PyInt_AsLong( arg));
+   self->block->setFramesPerTask( PyInt_AsLong( arg));
    Py_RETURN_TRUE;
 }
 

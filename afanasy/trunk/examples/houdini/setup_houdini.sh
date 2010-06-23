@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Setup CGRU:
+source ./setup_cgru.sh
+
 # Setup Afanasy:
 source ./setup_afanasy.sh
 
@@ -13,6 +16,9 @@ pwd=$PWD
 cd $HOUDINI_LOCATION
 source houdini_setup_bash
 cd $pwd
+
+# Setup CGRU houdini scripts:
+export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 
 # Set Afanasy houdini scripts version
 export HOUDINI_AF_VERSION="10"

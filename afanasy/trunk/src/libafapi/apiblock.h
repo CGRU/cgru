@@ -50,7 +50,7 @@ public:
    bool setNumeric( int start, int end, int perHost = 1, int incement = 1);
 
 /// Set not numeric block frames per host number (for dependicies and parsers)
-   void setFramesPerHost( int perHost);
+   void setFramesPerTask( int perTask);
 
 /// Set block pre register command, witch will be executed before job register.
    void setCmdPre(  const char * str);

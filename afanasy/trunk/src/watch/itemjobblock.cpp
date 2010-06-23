@@ -39,7 +39,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       multihost   = block->isMultiHost();
       first       = block->getFrameFirst();
       last        = block->getFrameLast();
-      perhost     = block->getFramePerhost();
+      pertask     = block->getFramePerTask();
       inc         = block->getFrameInc();
       multihost_service = block->getMultiHostService();
 
@@ -92,9 +92,9 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
 
    description = taskstype;
    if( numeric)
-      description += QString(" (num:%1-%2:%3fpr)").arg(first).arg(last).arg(perhost);
+      description += QString(" (num:%1-%2:%3fpr)").arg(first).arg(last).arg(pertask);
    else
-      description += QString(" (str:%1fpr)").arg(perhost);
+      description += QString(" (str:%1fpr)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
    updateToolTip();
@@ -113,9 +113,9 @@ void ItemJobBlock::generateToolTip()
    blockToolTip += QString("\nWorking directory:\n") + workingdir;
    blockToolTip += QString("\nTasks type = '%1' [%2]").arg(taskstype, parsertype);
    if( numeric)
-      blockToolTip += QString("\nNumeric: from %1 to %2 per %3").arg(first).arg(last).arg(perhost);
+      blockToolTip += QString("\nNumeric: from %1 to %2 per %3").arg(first).arg(last).arg(pertask);
    else
-      blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(perhost);
+      blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(pertask);
 
    blockToolTip += "\nPreview";
    if( previewcmd.isEmpty() == false)  blockToolTip += ":\n" + previewcmd;

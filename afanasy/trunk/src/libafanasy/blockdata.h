@@ -120,8 +120,8 @@ public:
 /// Set maximum number or errors on same host for task NOT to avoid host
    inline void setErrorsTaskSameHost( int8_t value) { errors_tasksamehost = value; }
 
-   bool setNumeric( int start, int end, int perHost = 1, int increment = 1);
-   void setFramesPerHost( int perHost);
+   bool setNumeric( int start, int end, int perTask = 1, int increment = 1);
+   void setFramesPerTask( int perTask); ///< For sting tasks and per tasr dependency solve
 
    inline const QString& getName()              const { return  name;                       }  ///< Get name.
    inline const QString& getWDir()              const { return  wdir;                       }  ///< Get working directory.
@@ -166,8 +166,8 @@ public:
 
    inline int getFrameFirst()   const { return frame_first;    }///< Get first task frame ( if numeric).
    inline int getFrameLast()    const { return frame_last;     }///< Get last task frame  ( if numeric).
-   inline int getFramePerhost() const { return frame_perhost;  }///< Get frames per host  ( if numeric).
    inline int getFrameInc()     const { return frame_inc;      }///< Get frame increment  ( if numeric).
+   inline int getFramePerTask() const { return frame_pertask;  }///< Get frames per task.
 
 
    inline int getFileSizeMin()       const { return filesize_min;     }
@@ -227,12 +227,13 @@ protected:
 
    uint32_t state;      ///< Currend block state flags.
 
-   uint32_t flags;        ///< Block type flags.
-   int32_t tasksnum;         ///< Number of tasks in block.
+   uint32_t flags;            ///< Block type flags.
+
+   int32_t  tasksnum;         ///< Number of tasks in block.
    int32_t  frame_first;      ///< First tasks frame.
    int32_t  frame_last;       ///< Last tasks frame.
-   int32_t frame_perhost;    ///< Tasks frames per host.
-   int32_t frame_inc;        ///< Tasks frames increment.
+   int32_t  frame_pertask;    ///< Tasks frames per task.
+   int32_t  frame_inc;        ///< Tasks frames increment.
 
 /// Maximum number of hosts, block tasks can run on.
    int32_t maxhosts;

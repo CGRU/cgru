@@ -45,7 +45,9 @@ void DBAttr::init()
    DBName[_frame_inc             ] = "frame_inc";
    DBName[_frame_first           ] = "frame_first";
    DBName[_frame_last            ] = "frame_last";
-   DBName[_frame_perhost         ] = "frame_perhost";
+//TODO: Rename frame_perhost in frame_pertask !
+   DBName[_frame_pertask         ] = "frame_perhost";
+//
    DBName[_hostsmask             ] = "hostsmask";
    DBName[_hostsmask_exclude     ] = "hostsmask_exclude";
    DBName[_hostname              ] = "hostname";

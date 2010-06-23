@@ -33,7 +33,7 @@ public:
          _frame_first,
          _frame_inc,
          _frame_last,
-         _frame_perhost,
+         _frame_pertask,
          _id,
          _id_block,
          _id_job,

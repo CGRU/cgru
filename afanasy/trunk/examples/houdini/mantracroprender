@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source ./setup_houdini.sh
+
+python $HOUDINI_CGRU_PATH/mantracroprender.py $*

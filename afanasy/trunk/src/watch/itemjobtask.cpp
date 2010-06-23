@@ -48,7 +48,7 @@ const QString ItemJobTask::getSelectString() const
 const QString ItemJobTask::getWDir()      const { return block->getWDir();            }
 const QString ItemJobTask::getCmdView()   const { return block->genCmdView( tasknum); }
 bool          ItemJobTask::hasCmdView()   const { return block->hasCmdView();         }
-int           ItemJobTask::getFramesNum() const { return block->getFramePerhost();    }
+int           ItemJobTask::getFramesNum() const { return block->getFramePerTask();    }
 void          ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
 
 void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -64,7 +64,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    int percent       = taskprogress.percent;
    int frame         = taskprogress.frame;
    int percentframe  = taskprogress.percentframe;
-   int frames_num    = block->getFramePerhost();
+   int frames_num    = block->getFramePerTask();
 
    QString leftString = name;
 

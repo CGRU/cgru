@@ -80,9 +80,9 @@ bool Block::setNumeric( int start, int end, int perHost, int increment)
    return af::BlockData::setNumeric(  start, end, perHost, increment);
 }
 
-void Block::setFramesPerHost( int perHost)
+void Block::setFramesPerTask( int perTask)
 {
-   af::BlockData::setFramesPerHost( perHost);
+   af::BlockData::setFramesPerTask( perTask);
 }
 
 void Block::setFileSizeCheck( int min, int max)

@@ -37,7 +37,7 @@ PyObject * PyAf_Block_setFileSizeCheck(      PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setVariableCapacity(   PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setMultiHost(          PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setNumeric(            PyAf_Block_Object *self, PyObject *args);
-PyObject * PyAf_Block_setFramesPerHost(      PyAf_Block_Object *self, PyObject *args);
+PyObject * PyAf_Block_setFramesPerTask(      PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_clearTasksList(        PyAf_Block_Object *self);
 
 #ifndef PYAFBLOCK
@@ -65,12 +65,12 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setNeedMemory",       (PyCFunction) PyAf_Block_setNeedMemory,         METH_O,        "Set memory needed."             },
    {"setNeedPower",        (PyCFunction) PyAf_Block_setNeedPower,          METH_O,        "Set power needed."              },
    {"setNeedHDD",          (PyCFunction) PyAf_Block_setNeedHDD,            METH_O,        "Set HDD needed."                },
+   {"setFramesPerTask",    (PyCFunction) PyAf_Block_setFramesPerTask,      METH_O,        "Set frames fer task."           },
    {"setFileSizeCheck",    (PyCFunction) PyAf_Block_setFileSizeCheck,      METH_VARARGS,  "Set file size check."           },
    {"setVariableCapacity", (PyCFunction) PyAf_Block_setVariableCapacity,   METH_VARARGS,  "Set variable capacity."         },
    {"setMultiHost",        (PyCFunction) PyAf_Block_setMultiHost,          METH_VARARGS,  "Set multi hosts tasks."         },
    {"setNumeric",          (PyCFunction) PyAf_Block_setNumeric,            METH_VARARGS,  "Set block type to numeric."     },
-   {"setFramesPerHost",    (PyCFunction) PyAf_Block_setFramesPerHost,      METH_VARARGS,  "Set frames fer host."           },
-   {"clearTasksList",      (PyCFunction) PyAf_Block_clearTasksList,        METH_NOARGS,   "Set frames fer host."           },
+   {"clearTasksList",      (PyCFunction) PyAf_Block_clearTasksList,        METH_NOARGS,   "Clear tasks list."              },
    { NULL, NULL, 0, NULL } // Sentinel
 };
 

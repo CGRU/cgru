@@ -28,7 +28,7 @@ BlockData::BlockData():
    flags( 0),
    frame_first( 0),
    frame_last( 0),
-   frame_perhost( 1),
+   frame_pertask( 1),
    frame_inc( 1),
    maxhosts(-1),
    tasksmaxruntime( 0),
@@ -122,7 +122,7 @@ void BlockData::readwrite( Msg * msg)
    case Msg::TBlocks:
       rw_int32_t ( frame_first,           msg);
       rw_int32_t ( frame_last,            msg);
-      rw_int32_t ( frame_perhost,         msg);
+      rw_int32_t ( frame_pertask,         msg);
       rw_int32_t ( frame_inc,             msg);
       rw_uint32_t( flags,                 msg);
       if( isNotNumeric()) rw_tasks(       msg);
@@ -324,12 +324,12 @@ bool BlockData::checkNeedProperties( const QString & str)
    return str.contains( need_properties);
 }
 
-bool BlockData::setNumeric( int start, int end, int perHost, int increment)
+bool BlockData::setNumeric( int start, int end, int perTask, int increment)
 {
-   if( perHost < 1)
+   if( perTask < 1)
    {
-      AFERRAR("BlockData::setNumeric(): Frames per host = %d < 1 ( setting to 1).\n", perHost);
-      perHost = 1;
+      AFERRAR("BlockData::setNumeric(): Frames per task = %d < 1 ( setting to 1).\n", perTask);
+      perTask = 1;
    }
    if( tasksdata)
    {
@@ -350,29 +350,29 @@ bool BlockData::setNumeric( int start, int end, int perHost, int increment)
 
    frame_first    = start;
    frame_last     = end;
-   frame_perhost  = perHost;
+   frame_pertask  = perTask;
    frame_inc      = increment;
 
    int numframes = frame_last - frame_first + 1;
-   tasksnum = numframes / frame_perhost;
-   if((numframes%perHost) != 0) tasksnum++;
+   tasksnum = numframes / frame_pertask;
+   if((numframes%perTask) != 0) tasksnum++;
 
    return true;
 }
 
-void BlockData::setFramesPerHost( int perHost)
+void BlockData::setFramesPerTask( int perTask)
 {
    if( isNumeric())
    {
       AFERROR("BlockData::setFramesPerHost: this block is numeric.\n");
       return;
    }
-   if( perHost < 1)
+   if( perTask == 0)
    {
-      AFERROR("BlockData::setFramesPerHost: frames per host must be >= 1.\n");
+      AFERROR("BlockData::setFramesPerHost: Frames per task can't be zero.\n");
       return;
    }
-   frame_perhost = perHost;
+   frame_pertask = perTask;
 }
 
 const QString BlockData::genCmd( int num, int *frame_start, int *frame_finish) const
@@ -433,8 +433,8 @@ bool BlockData::genNumbers( int &start, int &end, int num) const
       AFERROR("BlockData::genNumbers: n > tasksnum.\n");
       return false;
    }
-   start = frame_first + num * frame_perhost;
-   end = start + frame_perhost - 1;
+   start = frame_first + num * frame_pertask;
+   end = start + frame_pertask  - 1;
    if( end > frame_last) end = frame_last;
 
    return true;
@@ -490,7 +490,7 @@ const QString BlockData::genTaskName( int num) const
       genNumbers( start, end, num);
       if( tasksname.isEmpty() == false) return fillNumbers( tasksname, start, end);
 
-      if( frame_perhost == 1 )
+      if( frame_pertask == 1 )
          return QString::number( start);
       else
          return QString::number( start) + "-" + QString::number( end);
@@ -559,7 +559,7 @@ void BlockData::stdOut( bool full) const
    if(     need_hdd                 ) printf("Need HDD           =  %u\n"   ,   need_hdd    );
 
    if( isNumeric())
-      printf("numeric: start = %d, end = %d, perHost = %d, increment = %d.\n", frame_first, frame_last, frame_perhost, frame_inc);
+      printf("numeric: start = %d, end = %d, perTask = %d, increment = %d.\n", frame_first, frame_last, frame_pertask, frame_inc);
    else if( tasksdata == NULL ) return;
    // Not numeric block not filled with tasks will exit here
 

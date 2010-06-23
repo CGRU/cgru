@@ -71,7 +71,7 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_name,                 &name                   ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,              &cmd_pre                ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &flags                  ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_frame_perhost,        &frame_perhost          ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_frame_pertask,        &frame_pertask          ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_frame_first,          &frame_first            ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_frame_last,           &frame_last             ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_frame_inc,            &frame_inc              ));

@@ -55,7 +55,7 @@ public:
    bool numeric;        ///< Whether block is numeric.
    int  first;      ///< First tasks frame.
    int  last;       ///< Last tasks frame.
-   int  perhost;    ///< Tasks frames per host.
+   int  pertask;    ///< Tasks frames per task.
    int  inc;        ///< Tasks frames increment.
 
    QString description;
