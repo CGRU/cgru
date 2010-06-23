@@ -7,7 +7,7 @@ import os
 scene = 'scene.hip'
 rop = '/out/ifd'
 ifd = 'render/scene.%04d.ifd'
-img = 'render/img.%04d.jpg'
+img = 'render/img.%04d.exr'
 f_start  = 1
 f_finish = 10
 divx = 3
