@@ -25,4 +25,4 @@ for i in range( 4, len(sys.argv)): cmd.append( sys.argv[i])
 
 p = subprocess.Popen( cmd)
 sts = p.wait()
-exit(sts)
+sys.exit(sts)
