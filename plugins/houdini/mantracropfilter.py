@@ -14,13 +14,8 @@ stepx = 1.0 / divx;
 stepy = 1.0 / divy;
 tileCrop = [ numx*stepx,(numx+1)*stepx, numy*stepy,(numy+1)*stepy ]
 
-# Store names:
-#newNames = []
-
-# Generate tile name:
-#def getNewName( oldName ):
-#   newNames.append( oldName + '.tile_%d.exr' % tile)
-#   return newNames[-1]
+# Store filtered names:
+filteredNames = []
 
 #def getTmpName( newName ):
 #   pos = newName.rfind("/")
@@ -31,10 +26,10 @@ tileCrop = [ numx*stepx,(numx+1)*stepx, numy*stepy,(numy+1)*stepy ]
 # NB! only additional image plane files can be changed here - main image filename will have to be set through command line
 def filterPlane():
    oldName = mantra.property('plane:planefile')[0]
-   newName = oldName + '.tile_%d.exr' % tile
+   newName = oldName
+   if not oldName in filteredNames: newName += '.tile_%d.exr' % tile
+   filteredNames.append( newName)
    print 'Tile filename:\n' + newName
-#   if newNames.count( oldName): return
-#   newName = getNewName( oldName )
 #   if useTmpDir:
    if False:
       tmpName = getTmpName( newName )
