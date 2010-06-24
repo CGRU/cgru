@@ -117,13 +117,10 @@ void ItemJobBlock::generateToolTip()
    else
       blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(pertask);
 
-   blockToolTip += "\nPreview";
-   if( previewcmd.isEmpty() == false)  blockToolTip += ":\n" + previewcmd;
-   else                                blockToolTip += " is empty (no preview available).";
-
-   if( environment.isEmpty() == false) blockToolTip += QString("\nEnvironment:\n") + environment;
-   if( cmdpre.isEmpty() == false) blockToolTip += QString("\nPre command:\n") + cmdpre;
-   if( cmdpost.isEmpty() == false) blockToolTip += QString("\nPost command:\n") + cmdpost;
+   if( previewcmd.isEmpty()  == false) blockToolTip += "\nPreview:\n"      + previewcmd;
+   if( environment.isEmpty() == false) blockToolTip += "\nEnvironment:\n"  + environment;
+   if( cmdpre.isEmpty()      == false) blockToolTip += "\nPre command:\n"  + cmdpre;
+   if( cmdpost.isEmpty()     == false) blockToolTip += "\nPost command:\n" + cmdpost;
 
 }
 

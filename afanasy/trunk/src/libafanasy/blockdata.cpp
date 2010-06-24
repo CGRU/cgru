@@ -407,16 +407,18 @@ const QString BlockData::genCmd( int num, int *frame_start, int *frame_finish) c
 const QString BlockData::genCmdView( int num) const
 {
    QString str;
-   if( num > tasksnum)
+   if( num >= tasksnum)
    {
-      AFERROR("BlockData::genCmdView: n > tasksnum.\n");
+      AFERROR("BlockData::genCmdView: n >= tasksnum.\n");
       return str;
    }
-
    if( isNumeric())
    {
-      int start, end;
-      if( genNumbers( start, end, num)) str = fillNumbers( cmd_view, start, end);
+      if( false == cmd_view.isEmpty())
+      {
+         int start, end;
+         if( genNumbers( start, end, num)) str = fillNumbers( cmd_view, start, end);
+      }
    }
    else
    {

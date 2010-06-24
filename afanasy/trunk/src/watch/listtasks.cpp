@@ -154,7 +154,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
          menu.addAction( action);
 
-         if( ((ItemJobTask*)(item))->hasCmdView())
+         if( ((ItemJobTask*)(item))->genCmdView().isEmpty() == false )
          {
             const QStringList * previewcmds = Watch::getPreviewCmds();
             int previewcmdssize = previewcmds->size();
@@ -656,7 +656,7 @@ void ListTasks::actTaskPreview( int number)
       return;
    }
    ItemJobTask* taskitem = (ItemJobTask*)item;
-   QString arg( taskitem ->getCmdView());
+   QString arg( taskitem ->genCmdView());
    if( arg.isEmpty()) return;
    const QStringList * previewcmds = Watch::getPreviewCmds();
    int previewcmdssize = previewcmds->size();

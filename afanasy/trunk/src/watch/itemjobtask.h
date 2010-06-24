@@ -17,8 +17,7 @@ public:
    inline int getTaskNum()  const { return tasknum;  }
 
    const QString getWDir() const;
-   const QString getCmdView() const;
-   bool hasCmdView() const;
+   const QString genCmdView() const;
    int getFramesNum() const;
 
    af::TaskProgress taskprogress;
