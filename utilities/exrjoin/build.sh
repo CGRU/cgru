@@ -39,3 +39,5 @@ $cmd
 cmd="g++ -s -o ${name} ${name}.o $LDFLAGS"
 echo $cmd
 $cmd
+
+rm exrjoin.o

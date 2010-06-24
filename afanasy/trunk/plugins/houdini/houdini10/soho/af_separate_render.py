@@ -72,25 +72,12 @@ else:
    b_render.setNumeric( f_start, f_finish)
 
 if tile_render:
-   join = os.environ['CGRU_LOCATION']
-   join = os.path.join( join, 'utilities')
-   join = os.path.join( join, 'exrjoin')
-   join = os.path.join( join, 'exrjoin')
-   join += ' %(divx)d %(divy)d' % vars()
+   cmd = 'exrjoin %(divx)d %(divy)d' % vars()
    b_join = af.Block('join', 'generic')
    b_join.setTasksDependMask('render')
-   b_join.setCommand( '%s %s d' % ( join, images), False)
+   b_join.setCommand( '%s %s d' % ( cmd, images), False)
    b_join.setCommandView( images)
    b_join.setNumeric( f_start, f_finish)
-#b_join.setCommand( join + ' %1 d', False)
-#b_join.setCommandView( os.path.dirname( node.parm('images').eval() + '/%1'))
-#for frame in range( f_start, f_finish + 1):
-#   cmd = node.parm('images').evalAsStringAtFrame( frame)
-#   img = os.path.basename(cmd)
-#   task = af.Task( img)
-#   task.setCommand( cmd)
-#   task.setCommandView( img)
-#   b_join.tasks.append( task)
 
 if tile_render: job.blocks.append( b_join)
 job.blocks.append( b_render)
