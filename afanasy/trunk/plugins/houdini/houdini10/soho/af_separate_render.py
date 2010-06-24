@@ -91,8 +91,8 @@ if enable_extended_parameters:
    if hosts_mask != '': job.setHostsMask( hosts_mask)
    if hosts_mask_exclude != '': job.setHostsMaskExclude( hosts_mask_exclude)
    if depend_mask_global != '': job.setDependMaskGlobal( depend_mask_global)
-   b_generate.setCapacity( capacity_generate)
-   b_join.setCapacity( capacity_join)
+   if run_rop: b_generate.setCapacity( capacity_generate)
+   if tile_render: b_join.setCapacity( capacity_join)
    b_render.setCapacity( capacity)
    b_render.setVariableCapacity( capacity_min, capacity_max)
 
