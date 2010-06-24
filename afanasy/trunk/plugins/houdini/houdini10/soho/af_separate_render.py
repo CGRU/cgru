@@ -6,8 +6,6 @@ import af
 import afhoudini
 
 node = hou.pwd()
-#asset = os.getenv('ASSET', os.getcwd())
-#path = node.parm('files').eval()
 f_start = int( node.parm('f1').eval())
 f_finish = int( node.parm('f2').eval())
 take = node.parm('take').eval()
@@ -26,11 +24,13 @@ enable_extended_parameters = node.parm('enable_extended_parameters').eval()
 priority = node.parm('priority').eval()
 maximum_hosts = node.parm('maximum_hosts').eval()
 capacity = node.parm('capacity').eval()
+capacity_min = node.parm('capacity_coefficient1').eval()
+capacity_max = node.parm('capacity_coefficient2').eval()
+capacity_generate = node.parm('capacity_generate').eval()
+capacity_join = node.parm('capacity_join').eval()
 depend_mask_global = node.parm('depend_mask_global').eval()
 hosts_mask = node.parm('hosts_mask').eval()
 hosts_mask_exclude = node.parm('hosts_mask_exclude').eval()
-capacity_min = node.parm('capacity_coefficient1').eval()
-capacity_max = node.parm('capacity_coefficient2').eval()
 
 images = afhoudini.pathToC( node.parm('images').evalAsStringAtFrame(f_start), node.parm('images').evalAsStringAtFrame(f_finish))
 
@@ -91,12 +91,10 @@ if enable_extended_parameters:
    if hosts_mask != '': job.setHostsMask( hosts_mask)
    if hosts_mask_exclude != '': job.setHostsMaskExclude( hosts_mask_exclude)
    if depend_mask_global != '': job.setDependMaskGlobal( depend_mask_global)
-   b_generate.setCapacity( capacity)
-   b_generate.setVariableCapacity( capacity_min, capacity_max)
+   b_generate.setCapacity( capacity_generate)
+   b_join.setCapacity( capacity_join)
    b_render.setCapacity( capacity)
    b_render.setVariableCapacity( capacity_min, capacity_max)
-   b_join.setCapacity( capacity)
-   b_join.setVariableCapacity( capacity_min, capacity_max)
 
 if start_paused:
    job.offLine()
