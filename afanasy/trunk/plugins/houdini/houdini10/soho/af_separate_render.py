@@ -91,8 +91,12 @@ if enable_extended_parameters:
    if hosts_mask != '': job.setHostsMask( hosts_mask)
    if hosts_mask_exclude != '': job.setHostsMaskExclude( hosts_mask_exclude)
    if depend_mask_global != '': job.setDependMaskGlobal( depend_mask_global)
+   b_generate.setCapacity( capacity)
+   b_generate.setVariableCapacity( capacity_min, capacity_max)
    b_render.setCapacity( capacity)
    b_render.setVariableCapacity( capacity_min, capacity_max)
+   b_join.setCapacity( capacity)
+   b_join.setVariableCapacity( capacity_min, capacity_max)
 
 if start_paused:
    job.offLine()
