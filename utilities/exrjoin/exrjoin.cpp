@@ -10,6 +10,11 @@
 
 #define FILENAME_MAXLEN 4096
 
+#ifdef WINNT
+#define unlink _unlink
+#define strncpy strncpy_s
+#endif
+
 // Forward declarations:
 int joinEXRs( int, int, const char*, bool , bool);
 
@@ -180,6 +185,11 @@ int joinEXRs( int tilesX, int tilesY, const char* baseName, bool deleteTiles, bo
 
    printf("Joined EXR image successfully written.\n");
 
+   // Free files:
+   for( int i = 0; i < numTiles; i++)
+      if( iFiles[i] != 0 ) delete iFiles[i];
+   delete [] iFiles;
+
    if( deleteTiles )
    {
       for( int i = 0; i < numTiles; i++)
@@ -191,14 +201,10 @@ int joinEXRs( int tilesX, int tilesY, const char* baseName, bool deleteTiles, bo
    }
    }
 
-   // Free memory:
+   // Free names:
    for( int i = 0; i < numTiles; i++)
-   {
       delete [] tileNames[i];
-      if( iFiles[i] != 0 ) delete iFiles[i];
-   }
    delete [] tileNames;
-   delete [] iFiles;
 
    return exitCode;
 }

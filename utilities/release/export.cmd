@@ -25,6 +25,7 @@ xcopy afanasy\%afanasy%\python %dest%\afanasy\python\ /ys
 xcopy utilities\ %dest%\utilities\ /y
 xcopy utilities\doc %dest%\utilities\doc\ /ys
 xcopy utilities\moviemaker %dest%\utilities\moviemaker\ /ys
+xcopy utilities\exrjoin\exrjoin.exe %dest%\utilities\exrjoin\ /ys
 
 xcopy plugins %dest%\plugins\ /y
 xcopy plugins\nuke %dest%\plugins\nuke\ /ys
