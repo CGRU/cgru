@@ -39,13 +39,25 @@ If Afanasy <b>database schema changed</b> server can't restore state. All inform
 <br/>
 <h4>2010.06.01</h4>
 <p>
-Afanasy has an ability to map paths. Every client can have a paths map file to translate paths to server and from server.
+Block <a href="../afanasy/doc/job_block.html#FramesPerTask">Frames Per Task</a> parameter can be negative. Needed for sub-frame dependency.
 </p>
 <p>
-"Mavichky!" works on MS Windows.
+Afanasy has an ability to <a href="../afanasy/doc/server_pathsmap.html">map paths</a>.
+You can setup farm with various platforms clients.
+Submit jobs on Windows or Linux (MacOSX) to render and on Windows and on Linux (MacOSX) clients.
+Every client can have individual a paths map file to translate paths to server and from server.
+</p>
+<p>
+<a href="../utilities/moviemaker/doc/index.html">"Mavishky!"<a> works on MS Windows.
+Linux releases has <a href="http://www.ffmpeg.org">'ffmpeg'<a> binary compiled with
+<a href="http://www.x264.org">'x264'<a> library to encode <a href="http://www.h264.org">'H.264'<a> codec.
+Windows users need to install <a href="http://www.imagemagick.org">ImageMagick<a>, which contains 'ffmpeg' with 'x264'.
 </p>
 <p>
 Softimage XSI submit to Afanasy sripts. XSI Afanasy service and parser.
+</p>
+<p>
+Lots of bug-fixes for MS Windows platform. Windows version can be called 'beta'.
 </p>
 <br/>
 
@@ -64,7 +76,7 @@ Afanasy supports IPv6. Server needs to support new protocol, as it stores client
 Nuke render network: 'afanasy' nodes can be connected to describe 'Write' nodes dependency.
 </p>
 <p>
-Mavishky! - Dialog and command line utility to make movie file from image sequence on Linux.
+<a href="../utilities/moviemaker/doc/index.html">"Mavishky!"<a> - Dialog and command line utility to make movie file from image sequence on Linux.
 </p>
 <p>
 RPM build scripts (tested on openSUSE, Fedora, CentOS).

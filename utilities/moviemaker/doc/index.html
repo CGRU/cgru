@@ -29,7 +29,14 @@
 <h1 align="center">Make Movie.</h1>
 <hr />
 <p>
-Create movie file from image sequence. Consists of command and GUI for it.
+This is an utility to create movie file from image sequence. It consists of command and GUI for it.
+GUI is written on PyQt, so python and PyQt must be installed. Command is written on python.
+It launches other utilities: <a href="http://www.imagemagick.org">ImageMagick<a>
+to draw annotations and <a href="http://www.ffmpeg.org">ffmpeg<a> to encode.
+On Linux and Windows ImageMagick must be installed.
+To encode <a href="http://www.h264.org">H.264<a> codec it uses ffmpeg with <a href="http://www.x264.org">x264<a> library.
+On Windows ImageMagick contains ffmpeg binary compiled with x264 library.
+Linux releases contains ffmpeg binary compiled with x264 library.
 </p>
 
 <!--FOOTER-->

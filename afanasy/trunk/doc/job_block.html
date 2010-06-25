@@ -40,11 +40,18 @@
 
 <li><a name="FrameLast"/><b>Frame Last</b> - Last block frame.</li>
 
-<li><a name="FramePerHost"/><b>Frames per Host</b> - Frames per host.</li>
-
 <li><a name="FrameInc"/><b>Frames Increment</b> - Frames increment.<br/>
-read <var>Command</var> description for details</li>
+
+<li><a name="FramesPerTask"/><b>Frames Per Task</b> - Frames per task.
+In numeric blocks used to compute command first and last frame, parser percentage.
+When block has tasks with individual commands used to compute blocks per task dependency.
+Negative values means sub-frame dependency. For example you can render tiles or generate shadows in one block
+and generate mantra 'ifd' files in another with 1 frame per task.
+And if task has 4 shadows or 2x2 tiles you can set -4 frames per task for depended block.
+</li>
 </ul>
+
+Read <var>Command</var> description for details.
 
 <h3>Block Editable Parameters:</h3>
 <ul>
