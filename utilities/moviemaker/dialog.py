@@ -682,6 +682,8 @@ class Dialog( QtGui.QWidget):
       self.process.terminate()
 
 app = QtGui.QApplication( sys.argv)
+icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'icon.png'))
+app.setWindowIcon( icon)
 dialog = Dialog()
 dialog.show()
 app.exec_()
