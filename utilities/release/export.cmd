@@ -4,7 +4,6 @@ PUSHD ..\..
 
 if exist %dest% mkdir %dest%
 
-set src=\\soft\config\cgru\win
 set afanasy=trunk
 
 xcopy . %dest%\ /y
