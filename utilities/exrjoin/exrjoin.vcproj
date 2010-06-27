@@ -133,7 +133,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="openexr\IlmImf.lib ilmbase\Half.lib ilmbase\Imath.lib ilmbase\Iex.lib ilmbase\IlmThread.lib zlib\zlibstat.lib"
+				AdditionalDependencies="openexr\IlmImf.lib ilmbase\Half.lib ilmbase\Imath.lib ilmbase\Iex.lib ilmbase\IlmThread.lib zlib\static32\zlibstat.lib"
 				LinkIncremental="1"
 				GenerateDebugInformation="true"
 				SubSystem="1"

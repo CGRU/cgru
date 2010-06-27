@@ -32,11 +32,7 @@ for f in range( f_start, f_finish + 1):
       task.setCommandView( (img % f) + ('.tile_%d.exr' % t))
       b_render.tasks.append( task)
 
-exrjoin = os.environ['CGRU_LOCATION']
-exrjoin = os.path.join( exrjoin, 'utilities')
-exrjoin = os.path.join( exrjoin, 'exrjoin')
-exrjoin = os.path.join( exrjoin, 'exrjoin')
-exrjoin += ' %(divx)d %(divy)d' % vars()
+exrjoin = 'exrjoin %(divx)d %(divy)d' % vars()
 b_exrjoin = af.Block('join tiles')
 b_exrjoin.setCommand( exrjoin + ' ' + img + ' d', False)
 b_exrjoin.setCommandView( img)
