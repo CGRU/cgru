@@ -88,6 +88,11 @@ exitcode = p.wait()
 
 if tmpdir != '':
    # Remove temp directory:
-   shutil.rmtree( tmpdir)
+   try:      
+      shutil.rmtree( tmpdir)
+   except:
+      print 'Unable to remove temporary directory:'
+      print str(sys.exc_info()[1])
+      print tmpdir
 
 sys.exit(exitcode)
