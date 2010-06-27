@@ -17,6 +17,7 @@ depend_mask = node.parm('depend_mask').eval()
 tile_render = node.parm('tile_render').eval()
 divx = node.parm('divx').eval()
 divy = node.parm('divy').eval()
+tmpimg = node.parm('tmpimg').eval()
 
 start_paused = node.parm('start_paused').eval()
 platform = node.parm('platform').eval()
@@ -55,19 +56,21 @@ command = 'mantra'
 tiles = divx * divy
 b_render = af.Block('render', command)
 if run_rop: b_render.setTasksDependMask('generate')
+if tile_render or tmpimg: command = 'mantrarender '
+if tmpimg: command += 't'
 if tile_render:
-   command = 'mantracroprender %(divx)d %(divy)d' % vars()
+   command += 'c %(divx)d %(divy)d' % vars()
    b_render.setCommand( command + ' %1')
    b_render.setFramesPerTask( -tiles)
    for frame in range( f_start, f_finish + 1):
       arguments = node.parm('arguments').evalAsStringAtFrame( frame)
       for tile in range( 0, tiles):
          task = af.Task('%d tile %d' % ( frame, tile))
-         task.setCommand( '%d %s' % ( tile, arguments))
+         task.setCommand( '%d -R %s' % ( tile, arguments))
          b_render.tasks.append( task)
 else:
    arguments = afhoudini.pathToC( node.parm('arguments').evalAsStringAtFrame(f_start), node.parm('arguments').evalAsStringAtFrame(f_finish))
-   b_render.setCommand( command + ' ' + arguments)
+   b_render.setCommand( command + ' -v A ' + arguments)
    b_render.setCommandView( images)
    b_render.setNumeric( f_start, f_finish)
 
@@ -75,7 +78,7 @@ if tile_render:
    cmd = 'exrjoin %(divx)d %(divy)d' % vars()
    b_join = af.Block('join', 'generic')
    b_join.setTasksDependMask('render')
-   b_join.setCommand( '%s %s d' % ( cmd, images), False)
+   b_join.setCommand( '%s %s d' % ( cmd, images))
    b_join.setCommandView( images)
    b_join.setNumeric( f_start, f_finish)
 

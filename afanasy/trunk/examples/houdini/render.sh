@@ -3,4 +3,4 @@
 # Setup Afanasy:
 source ./setup_afanasy.sh
 
-python ./render.py
+python ./render.py $*

@@ -4,21 +4,44 @@
 import af
 import os
 
+scene = 'scene.hip'
 rop = '/out/ifd'
+ifd = 'render/scene.%04d.ifd'
+img = 'render/img.%04d.exr'
+f_start  = 1
+f_finish = 10
+divx = 3
+divy = 2
+tiles = divx * divy
 
-job = af.Job('Houdini Test: IFD - Mantra')
+job = af.Job('Houdini Test: Tile Render')
 
-block1 = af.Block( 'render ifd', 'mantra')
-block1.setCommand('mantra -f render/scene.%04d.ifd')
-block1.setTasksDependMask( 'generate ifd')
-block1.setNumeric( 1, 10)
+b_genifd = af.Block('generate ifd', 'hbatch')
+b_genifd.setCommand('hrender_af -s %1 -e %2 -b 1 '+scene+' '+rop)
+b_genifd.setNumeric( f_start, f_finish)
 
-block2 = af.Block( 'generate ifd', 'hbatch')
-block2.setCommand('hrender_af -s %1 -e %2 -b 1 scene.hip ' + rop)
-block2.setNumeric( 1, 10, 5)
+b_render = af.Block('render tiles', 'mantra')
+b_render.setCommand('mantrarender tc %(divx)d %(divy)d %%1' % vars() )
+b_render.setTasksDependMask('generate ifd')
+b_render.setFramesPerTask( -tiles)
+for f in range( f_start, f_finish + 1):
+   cmd = ' -R -f ' + ifd % f
+   for t in range( 0, tiles):
+      task = af.Task('%d tile %d' % (f,t))
+      task.setCommand( str(t) + cmd)
+      task.setCommandView( (img % f) + ('.tile_%d.exr' % t))
+      b_render.tasks.append( task)
 
-job.blocks.append( block1)
-job.blocks.append( block2)
+exrjoin = 'exrjoin %(divx)d %(divy)d' % vars()
+b_exrjoin = af.Block('join tiles')
+b_exrjoin.setCommand( exrjoin + ' ' + img + ' d')
+b_exrjoin.setCommandView( img)
+b_exrjoin.setNumeric( f_start, f_finish)
+b_exrjoin.setTasksDependMask('render tiles')
+
+job.blocks.append( b_exrjoin )
+job.blocks.append( b_render  )
+job.blocks.append( b_genifd  )
 
 print
 job.output( 1)
