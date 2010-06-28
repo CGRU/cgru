@@ -92,7 +92,7 @@ if tmpdir != '':
       shutil.rmtree( tmpdir)
    except:
       print 'Unable to remove temporary directory:'
-      print str(sys.exc_info()[1])
       print tmpdir
+      print str(sys.exc_info()[1])
 
 sys.exit(exitcode)
