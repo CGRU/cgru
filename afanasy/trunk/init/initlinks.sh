@@ -27,8 +27,8 @@ function usage(){
    echo "'add' - add application"
    echo "'rm'  - remove application"
    echo "Examples:"
-   echo "`basename $0` add c afrender"
-   echo "`basename $0` rm u afserver"
+   echo "`basename $0` c add afrender"
+   echo "`basename $0` u rm afserver"
    exit 0
 }
 

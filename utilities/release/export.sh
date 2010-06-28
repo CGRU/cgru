@@ -18,7 +18,7 @@ function copy(){
 }
 
 function rcopy(){
-   rsync -r --exclude '.svn' --exclude '*.pyc' --delete $1 $2
+   rsync -r --exclude '.svn' --exclude '*.pyc' $1 $2
 }
 
 cd ../..

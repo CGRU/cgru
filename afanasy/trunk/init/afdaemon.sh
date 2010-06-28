@@ -97,7 +97,7 @@ execfile="$afroot/bin/$afapp"
 startcmd="$afroot/init/afstart.sh $execfile $logfile"
 
 function start(){
-   echo "Starting $afapp"
+   echo "Starting $afapp..."
    if [ -f $pidfile ]; then
       kill `cat $pidfile`
       rm -fv $pidfile
@@ -107,6 +107,7 @@ function start(){
    if [ "$UID" == "0" ] && [ ! -z "${nonrootuser}" ]; then
       su - $nonrootuser -c "$startcmd"
    else
+      [ -x $afroot/init/setup.sh ] && source $afroot/init/setup.sh
       $startcmd
    fi
    if [ $? != 0 ]; then
