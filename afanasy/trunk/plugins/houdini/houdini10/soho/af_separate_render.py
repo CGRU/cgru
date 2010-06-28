@@ -5,35 +5,41 @@ import time
 import af
 import afhoudini
 
-node = hou.pwd()
-f_start = int( node.parm('f1').eval())
-f_finish = int( node.parm('f2').eval())
-take = node.parm('take').eval()
+afnode = hou.pwd()
+f_start = int( afnode.parm('f1').eval())
+f_finish = int( afnode.parm('f2').eval())
+take = afnode.parm('take').eval()
 #step_frame = int(pwd.parm('f3').eval())
-job_name = node.parm('jobname').eval()
-rop = node.parm('rop').eval()
-run_rop = node.parm('run_rop').eval()
-depend_mask = node.parm('depend_mask').eval()
-tile_render = node.parm('tile_render').eval()
-divx = node.parm('divx').eval()
-divy = node.parm('divy').eval()
-tmpimg = node.parm('tmpimg').eval()
+job_name = afnode.parm('jobname').eval()
+rop = afnode.parm('rop').eval()
+run_rop = afnode.parm('run_rop').eval()
+read_rop = afnode.parm('read_rop').eval()
+depend_mask = afnode.parm('depend_mask').eval()
+tile_render = afnode.parm('tile_render').eval()
+divx = afnode.parm('divx').eval()
+divy = afnode.parm('divy').eval()
+temp_images = afnode.parm('temp_images').eval()
 
-start_paused = node.parm('start_paused').eval()
-platform = node.parm('platform').eval()
-enable_extended_parameters = node.parm('enable_extended_parameters').eval()
-priority = node.parm('priority').eval()
-maximum_hosts = node.parm('maximum_hosts').eval()
-capacity = node.parm('capacity').eval()
-capacity_min = node.parm('capacity_coefficient1').eval()
-capacity_max = node.parm('capacity_coefficient2').eval()
-capacity_generate = node.parm('capacity_generate').eval()
-capacity_join = node.parm('capacity_join').eval()
-depend_mask_global = node.parm('depend_mask_global').eval()
-hosts_mask = node.parm('hosts_mask').eval()
-hosts_mask_exclude = node.parm('hosts_mask_exclude').eval()
+start_paused = afnode.parm('start_paused').eval()
+platform = afnode.parm('platform').eval()
+enable_extended_parameters = afnode.parm('enable_extended_parameters').eval()
+priority = afnode.parm('priority').eval()
+maximum_hosts = afnode.parm('maximum_hosts').eval()
+capacity = afnode.parm('capacity').eval()
+capacity_min = afnode.parm('capacity_coefficient1').eval()
+capacity_max = afnode.parm('capacity_coefficient2').eval()
+capacity_generate = afnode.parm('capacity_generate').eval()
+capacity_join = afnode.parm('capacity_join').eval()
+depend_mask_global = afnode.parm('depend_mask_global').eval()
+hosts_mask = afnode.parm('hosts_mask').eval()
+hosts_mask_exclude = afnode.parm('hosts_mask_exclude').eval()
 
-images = afhoudini.pathToC( node.parm('images').evalAsStringAtFrame(f_start), node.parm('images').evalAsStringAtFrame(f_finish))
+if read_rop or run_rop:
+   ropnode = hou.node( rop)
+   if not ropnode:
+      soho.error('Can`t find ROP for processing')
+   if not isinstance( ropnode, hou.RopNode):
+      soho.error('%s is not a ROP node' % rop)
 
 job = af.Job()
 job.setName( job_name)
@@ -42,37 +48,62 @@ if platform != '':
    else: job.setNeedOS( platform)
 
 if run_rop:
+   rop_setdiskfile = False
+   if ropnode.parm('soho_outputmode').eval() == 0:
+      # Set outpu mode to produce ifd files:
+      ropnode.parm('soho_outputmode').set(1)
+      rop_setdiskfile = True
+      ropnode.parm('soho_diskfile').set( ropnode.parm('vm_picture').unexpandedString() + '.ifd')
+
+   # Calculate temporary hip name:
    ftime = time.time()
    tmphip = hou.hipFile.name() + '_' + job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
+
    # Use mwrite, because hou.hipFile.save(tmphip)
    # changes current scene file name to tmphip
    hou.hscript('mwrite -n %s' % tmphip)
+
+   # Set output mode back if was enabled:
+   if rop_setdiskfile: ropnode.parm('soho_outputmode').set(0)
+
    job.setCmdPost('rm ' + tmphip)
    b_generate = af.Block('generate', 'hbatch')
    b_generate.setCommand('hrender_af -s %1 -e %2 -b 1 -t '+take+' '+tmphip+' '+rop)
    b_generate.setNumeric( f_start, f_finish)
 
+if read_rop:
+   images = ropnode.parm('vm_picture')
+   files  = ropnode.parm('soho_diskfile')
+   afnode.parm('images').set(images.unexpandedString())
+   afnode.parm('files' ).set( files.unexpandedString())
+
+images = afhoudini.pathToC( afnode.parm('images').evalAsStringAtFrame(f_start), afnode.parm('images').evalAsStringAtFrame(f_finish))
+
 command = 'mantra'
 tiles = divx * divy
 b_render = af.Block('render', command)
 if run_rop: b_render.setTasksDependMask('generate')
-if tile_render or tmpimg: command = 'mantrarender '
-if tmpimg: command += 't'
+if tile_render or temp_images: command = 'mantrarender '
+if temp_images: command += 't'
 if tile_render:
    command += 'c %(divx)d %(divy)d' % vars()
    b_render.setCommand( command + ' %1')
    b_render.setFramesPerTask( -tiles)
    for frame in range( f_start, f_finish + 1):
-      arguments = node.parm('arguments').evalAsStringAtFrame( frame)
+      arguments = afnode.parm('arguments').evalAsStringAtFrame( frame)
       for tile in range( 0, tiles):
          task = af.Task('%d tile %d' % ( frame, tile))
          task.setCommand( '%d -R %s' % ( tile, arguments))
          b_render.tasks.append( task)
 else:
-   arguments = afhoudini.pathToC( node.parm('arguments').evalAsStringAtFrame(f_start), node.parm('arguments').evalAsStringAtFrame(f_finish))
+   arguments = afhoudini.pathToC( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
    b_render.setCommand( command + ' -v A ' + arguments)
    b_render.setCommandView( images)
    b_render.setNumeric( f_start, f_finish)
+
+if read_rop:
+   afnode.parm('images').set('')
+   afnode.parm('files' ).set('')
 
 if tile_render:
    cmd = 'exrjoin %(divx)d %(divy)d' % vars()

@@ -75,9 +75,9 @@ gen = hou.node(gen_name)
 # Find the output driver to process
 driver = gen.node(hdriver)
 if not driver:
-    soho.error('Can\'t find %s for processing' % hdriver)
-if not isinstance(driver,hou.RopNode):
-    soho.error('%s is not a ROP node' % hdriver)
+   soho.error('Can\'t find %s for processing' % hdriver)
+if not isinstance( driver, hou.RopNode):
+   soho.error('%s is not a ROP node' % hdriver)
 tr = driver.parm('trange')
 blockSet = False
 sf = driver.parm('soho_foreground')
@@ -91,7 +91,7 @@ if tr != None and tr.eval() == 0:
             soho.error('Set "Block Until Render Complete" on %s node' % hdriver)
 
 if not os.path.isdir(hip):
-    soho.error('Unable to find spool directory "%"' % hip)
+   soho.error('Unable to find spool directory "%"' % hip)
 
 # Get the frame range
 # Ensure the frame range is at least three values
