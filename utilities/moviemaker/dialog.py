@@ -563,10 +563,10 @@ class Dialog( QtGui.QWidget):
          version = os.path.basename( os.path.dirname(self.inputPattern))
          self.editVersion.setText( version)
 
-      company  = re.escape( str( self.editCompany.text()))
-      artist   = re.escape( str( self.editArtist.text()))
-      activity = re.escape( str( self.editActivity.text()))
-      comments = re.escape( str( self.editComments.text()))
+      company  = str( self.editCompany.text())
+      artist   = str( self.editArtist.text())
+      activity = str( self.editActivity.text())
+      comments = str( self.editComments.text())
 
       outdir = str( self.editOutputDir.text())
       if self.cAutoOutput.isChecked() or outdir == None or outdir == '':
