@@ -26,15 +26,7 @@ done
 
 %files
 %defattr(-,root,root)
-/opt/cgru/afanasy/bin
-/opt/cgru/afanasy/init
-/opt/cgru/afanasy/python
-/opt/cgru/afanasy/config_default.xml
-/opt/cgru/afanasy/farm_default.xml
-/opt/cgru/afanasy/pathmap.txt
-/opt/cgru/afanasy/setup.sh
-%config /opt/cgru/afanasy/config.xml
-%config /opt/cgru/afanasy/nonrootuser
+/opt
 
 %clean
 

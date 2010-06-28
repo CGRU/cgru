@@ -28,12 +28,7 @@ done
 %defattr(-,root,root)
 /etc
 /usr
-/opt/cgru/bin
-/opt/cgru/doc
-/opt/cgru/lib
-/opt/cgru/config_default.xml
-/opt/cgru/setup.sh
-%config /opt/cgru/config.xml
+/opt
 
 %clean
 

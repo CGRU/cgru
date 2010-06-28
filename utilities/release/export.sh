@@ -35,11 +35,17 @@ rcopy doc/images $dest/doc
 copy afanasy/$afanasy $dest/afanasy
 copy afanasy/$afanasy/bin $dest/afanasy/bin
 copy afanasy/$afanasy/icons $dest/afanasy/icons
+rcopy afanasy/$afanasy/init $dest/afanasy
 rcopy afanasy/$afanasy/plugins $dest/afanasy
 rcopy afanasy/$afanasy/python $dest/afanasy
 
 rcopy utilities/doc $dest/utilities
-rcopy utilities/moviemaker $dest/utilities
+
+copy utilities/moviemaker $dest/utilities/moviemaker
+copy utilities/moviemaker/icons $dest/utilities/moviemaker/icons
+rcopy utilities/moviemaker/doc $dest/utilities/moviemaker
+rcopy utilities/moviemaker/ffmpeg $dest/utilities/moviemaker
+rcopy utilities/moviemaker/logos $dest/utilities/moviemaker
 
 createDir $dest/utilities/exrjoin
 cp utilities/exrjoin/exrjoin $dest/utilities/exrjoin
