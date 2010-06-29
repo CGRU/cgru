@@ -107,7 +107,6 @@ function start(){
    if [ "$UID" == "0" ] && [ ! -z "${nonrootuser}" ]; then
       su - $nonrootuser -c "$startcmd"
    else
-      [ -x $afroot/init/setup.sh ] && source $afroot/init/setup.sh
       $startcmd
    fi
    if [ $? != 0 ]; then

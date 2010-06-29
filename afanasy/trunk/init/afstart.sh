@@ -4,15 +4,15 @@ exefile="$1"
 logfile="$2"
 pidfile="$3"
 
-if [ -z $AF_ROOT ]; then
+if [ -z "$AF_ROOT" ]; then
    curdir=$PWD
    cd `dirname $exefile`
    cd ..
-   source setup.sh
+   source ./setup.sh
    cd $curdir
 fi
 
-[ -x $AF_ROOT/init/setup.sh ] && source  $AF_ROOT/init/setup.sh
+source  $AF_ROOT/init/afsetup.sh
 
 echo "AF_ROOT    = '$AF_ROOT'"
 [ -z $AF_HOSTNAME ] || echo "AF_HOSTNAME= '$AF_HOSTNAME'"

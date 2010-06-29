@@ -1,6 +1,7 @@
 #!/bin/bash
 
 name="exrjoin"
+output="../../bin/$name"
 
 if [ -d include ] ; then
    # Custom include:
@@ -36,7 +37,7 @@ $cmd
 
 [ $? != "0" ] && exit 1
 
-cmd="g++ -s -o ${name} ${name}.o $LDFLAGS"
+cmd="g++ -s -o ${output} ${name}.o $LDFLAGS"
 echo $cmd
 $cmd
 

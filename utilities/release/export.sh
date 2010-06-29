@@ -47,9 +47,6 @@ rcopy utilities/moviemaker/doc $dest/utilities/moviemaker
 rcopy utilities/moviemaker/ffmpeg $dest/utilities/moviemaker
 rcopy utilities/moviemaker/logos $dest/utilities/moviemaker
 
-createDir $dest/utilities/exrjoin
-cp utilities/exrjoin/exrjoin $dest/utilities/exrjoin
-
 createDir $dest/utilities/regexp
 rcopy utilities/regexp/doc $dest/utilities/regexp
 copy utilities/regexp/bin $dest/utilities/regexp/bin
