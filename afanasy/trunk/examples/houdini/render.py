@@ -34,7 +34,7 @@ for f in range( f_start, f_finish + 1):
 
 exrjoin = 'exrjoin %(divx)d %(divy)d' % vars()
 b_exrjoin = af.Block('join tiles')
-b_exrjoin.setCommand( exrjoin + ' ' + img + ' d')
+b_exrjoin.setCommand( exrjoin + ' ' + img + ' d', False)
 b_exrjoin.setCommandView( img)
 b_exrjoin.setNumeric( f_start, f_finish)
 b_exrjoin.setTasksDependMask('render tiles')

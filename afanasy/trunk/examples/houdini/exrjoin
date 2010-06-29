@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source ./setup_cgru.sh
-
-$CGRU_LOCATION/utilities/exrjoin/exrjoin $*

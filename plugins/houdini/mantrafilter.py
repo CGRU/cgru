@@ -33,10 +33,10 @@ imagesdir = ''
 # This one is called for each image plane - change name here
 # NB! only additional image plane files can be changed here - main image filename will have to be set through command line
 def filterPlane():
+   global imagesdir
    filename = mantra.property('plane:planefile')[0]
    if not filename in filteredNames:
       if imagesdir == '':
-         global imagesdir
          imagesdir = os.path.dirname( filename)
       if tilerender:
          filename += '.tile_%d.exr' % tilenum
