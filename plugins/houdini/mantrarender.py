@@ -18,17 +18,18 @@ signal.signal( signal.SIGINT,  interrupt)
 # Check environment:
 filter = os.getenv('HOUDINI_CGRU_PATH')
 if filter is None or filter == '':
-   print 'Error: HOUDINI_CGRU_PATH is not set, can`t find mantra pyhton filer location.'
+   print 'Error: HOUDINI_CGRU_PATH is not set, can`t find mantra python filer location.'
    exit(1)
 
 def UsageExit( msg = None):
    if msg is not None: print msg
    else: print 'Error: Invalid arguments.'
-   print 'Usage: ' + os.path.basename(sys.argv[0]) + ' [tc] [divx divy numtile] -R [argumets to mantra]'
-   print 't - enable render in temporary folder'
-   print 'c - crop render region to render one tile'
-   print 'divx, divy, numtile - tile render options'
-   print '-R - seperator for arguments to mantra ("-v A" will be added automatically)'
+   print 'Usage: ' + os.path.basename(sys.argv[0]) + ' [dtc] [divx divy numtile] -R [arguments to mantra]'
+   print 'd - Delete ROP file after successful render (don`t use it with tile render!).'
+   print 't - Enable render in temporary folder.'
+   print 'c - Crop render region to render one tile.'
+   print 'divx, divy, numtile - Tile render options: X, Y division and tile number.'
+   print '-R - separator for arguments to mantra ("-v A" will be added automatically).'
    exit(1)
 
 tmpdir = ''
@@ -41,7 +42,6 @@ for arg in sys.argv:
    if arg != '-R': argspos += 1
    else: break
 if argspos >= ( len(sys.argv) - 1): UsageExit('No arguments for render command specified.')
-if argspos == 1: UsageExit('No arguments for filter specified.')
 
 # Tile render:
 if 'c' in sys.argv[1]:
@@ -64,10 +64,15 @@ if 't' in sys.argv[1]:
       print 'Error creating temp directory.'
       sys.exit(1)
 
-filter = filter.replace('\\','/')
-filter += '/mantrafilter.py'
-if tilerender: filter += ' %d %d %d' % ( divx, divy, numtile)
-if tmpdir != '': filter += ' ' + tmpdir
+# Delete files:
+ropfile = ''
+if 'd' in sys.argv[1]:
+   for a in range( argspos, len(sys.argv)):
+      if sys.argv[a] == '-f':
+         a += 1
+         if a < len(sys.argv):
+            ropfile = sys.argv[a]
+            break
 
 if sys.platform.find('win') == 0:
    houdini = os.getenv('HOUDINI_LOCATION')
@@ -78,8 +83,17 @@ if sys.platform.find('win') == 0:
 else:
    mantra = 'mantra'
 
-# Construcvt command:
-cmd = [ mantra,'-P',filter,'-v','A']
+# Construct a command:
+if argspos > 1:
+   filter = filter.replace('\\','/')
+   filter += '/mantrafilter.py'
+   if tilerender: filter += ' %d %d %d' % ( divx, divy, numtile)
+   if tmpdir != '': filter += ' ' + tmpdir
+   cmd = [ mantra,'-P',filter,'-v','A']
+else:
+   cmd = [ mantra,'-v','A']
+
+# Append arguments for mantra:
 for i in range( argspos+1, len(sys.argv)): cmd.append( sys.argv[i])
 
 # Launch mantra:
@@ -94,5 +108,16 @@ if tmpdir != '':
       print 'Unable to remove temporary directory:'
       print tmpdir
       print str(sys.exc_info()[1])
+
+if exitcode == 0:
+   # Remove ROP file:
+   if ropfile != '':
+      if os.path.isfile( ropfile):
+         try:
+            os.remove( ropfile)
+         except:
+            print 'Unable to remove ROP file:'
+            print ropfile
+            print str(sys.exc_info()[1])
 
 sys.exit(exitcode)

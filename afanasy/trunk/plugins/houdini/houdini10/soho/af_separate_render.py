@@ -19,6 +19,7 @@ tile_render = afnode.parm('tile_render').eval()
 divx = afnode.parm('divx').eval()
 divy = afnode.parm('divy').eval()
 temp_images = afnode.parm('temp_images').eval()
+delete_files = afnode.parm('delete_files').eval()
 
 start_paused = afnode.parm('start_paused').eval()
 platform = afnode.parm('platform').eval()
@@ -78,12 +79,14 @@ if read_rop:
    afnode.parm('files' ).set( files.unexpandedString())
 
 images = afhoudini.pathToC( afnode.parm('images').evalAsStringAtFrame(f_start), afnode.parm('images').evalAsStringAtFrame(f_finish))
+files  = afhoudini.pathToC( afnode.parm('files' ).evalAsStringAtFrame(f_start), afnode.parm('files' ).evalAsStringAtFrame(f_finish))
 
 command = 'mantra'
 tiles = divx * divy
 b_render = af.Block('render', command)
 if run_rop: b_render.setTasksDependMask('generate')
-if tile_render or temp_images: command = 'mantrarender '
+if tile_render or delete_files or temp_images: command = 'mantrarender '
+if delete_files and not tile_render: command += 'd'
 if temp_images: command += 't'
 if tile_render:
    command += 'c %(divx)d %(divy)d' % vars()
@@ -96,22 +99,25 @@ if tile_render:
          task.setCommand( '%d -R %s' % ( tile, arguments))
          b_render.tasks.append( task)
 else:
+   if delete_files or temp_images: command += ' -R '
+   else: command +=  ' -v A '
    arguments = afhoudini.pathToC( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
-   b_render.setCommand( command + ' -v A ' + arguments)
+   b_render.setCommand( command + arguments)
    b_render.setCommandView( images)
    b_render.setNumeric( f_start, f_finish)
+
+if tile_render:
+   cmd = 'exrjoin %(divx)d %(divy)d %(images)s d' % vars()
+   if delete_files: cmd += '; rm %s' % files
+   b_join = af.Block('join', 'generic')
+   b_join.setTasksDependMask('render')
+   b_join.setCommand( cmd)
+   b_join.setCommandView( images)
+   b_join.setNumeric( f_start, f_finish)
 
 if read_rop:
    afnode.parm('images').set('')
    afnode.parm('files' ).set('')
-
-if tile_render:
-   cmd = 'exrjoin %(divx)d %(divy)d' % vars()
-   b_join = af.Block('join', 'generic')
-   b_join.setTasksDependMask('render')
-   b_join.setCommand( '%s %s d' % ( cmd, images))
-   b_join.setCommandView( images)
-   b_join.setNumeric( f_start, f_finish)
 
 if tile_render: job.blocks.append( b_join)
 job.blocks.append( b_render)
