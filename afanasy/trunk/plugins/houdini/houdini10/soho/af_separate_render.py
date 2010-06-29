@@ -108,10 +108,10 @@ else:
 
 if tile_render:
    cmd = 'exrjoin %(divx)d %(divy)d %(images)s d' % vars()
-   if delete_files: cmd += '; rm %s' % files
+   if delete_files: cmd += ' && deletefiles %s' % files
    b_join = af.Block('join', 'generic')
    b_join.setTasksDependMask('render')
-   b_join.setCommand( cmd)
+   b_join.setCommand( cmd, False)
    b_join.setCommandView( images)
    b_join.setNumeric( f_start, f_finish)
 
