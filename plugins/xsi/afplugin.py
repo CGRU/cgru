@@ -1,6 +1,3 @@
-# import os.path
-# import os
-# import sys
 from win32com.client import constants
 
 #------------------------------------------------------------------

@@ -1,4 +1,4 @@
-import os
+import os, shutil, time
 
 import win32com.client
 from win32com.client import constants
@@ -13,7 +13,26 @@ def SubmitButton_OnClicked():
       Application.LogMessage('Error: Can\'t find options.')
       PPG.Close()
 
+#   Application.SaveScene()
    scene = Application.ActiveProject.ActiveScene
+
+   # Copy scene to temporary file:
+   scenefile = scene.Filename.Value
+   if not os.path.isfile( scenefile):
+      Application.LogMessage('Error: Can\'t save scene.')
+      return
+   ftime = time.time()
+   tmpscene = scenefile + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + '.scn'
+   try:
+      shutil.copyfile( scenefile, tmpscene)
+   except:
+      Application.LogMessage('Unable to copy temporary scene:')
+      Application.LogMessage( tmpscene)
+      Application.LogMessage( str(sys.exc_info()[1]))
+      return
+   if not os.path.isfile( tmpscene):
+      Application.LogMessage('Error: Can\'t save temporary scene.')
+      return
 
    frame_start       = opSet.Parameters('afFrame_start'     ).Value
    frame_end         = opSet.Parameters('afFrame_end'       ).Value
@@ -60,7 +79,7 @@ def SubmitButton_OnClicked():
       cmd = os.path.join( cmd, 'python')
       cmd = os.path.join( cmd, 'afjob.py')
       cmd = 'python "%s"' % cmd
-      cmd += ' "%s"' % scene.Filename.Value
+      cmd += ' "%s"' % tmpscene
       cmd += ' %d' % frame_start
       cmd += ' %d' % frame_end
       cmd += ' -fpr %d' % frame_fpt
@@ -75,6 +94,6 @@ def SubmitButton_OnClicked():
       if dependmask        != None and dependmask        != '': cmd += ' -depmask "%s"'   % dependmask
       if dependmaskglobal  != None and dependmaskglobal  != '': cmd += ' -depglbl "%s"'   % dependmaskglobal
       if paused: cmd += ' -pause'
-#      cmd += ' -deletescene'
+      cmd += ' -deletescene'
       Application.LogMessage(cmd)
       os.system(cmd)

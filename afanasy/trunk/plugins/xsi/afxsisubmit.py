@@ -107,13 +107,17 @@ def Main():
 
    oPPGLayout.Language = 'Python'
    logic_script = 'C:\\cg\\tools\\cgru\\afanasy\\trunk\\plugins\\xsi\\afxsisubmit_logic.py'
-   if( os.path.exists( logic_script)):
-      textStream = open( logic_script,'r')
-      logic = textStream.read()
-      oPPGLayout.Logic = logic
-      textStream.close()
+   afroot = os.getenv('AF_ROOT')
+   if afroot is None or afroot == '':
+      Application.LogMessage('AF_ROOT is not set, can`t find Afanasy.')
    else:
-      Application.LogMessage('Script logic file not founded:\n' + logic_script)
+      if( os.path.exists( logic_script)):
+         textStream = open( logic_script,'r')
+         logic = textStream.read()
+         oPPGLayout.Logic = logic
+         textStream.close()
+      else:
+         Application.LogMessage('Script logic file not founded:\n' + logic_script)
 
    oView = Application.Desktop.ActiveLayout.CreateView( 'Property Panel', 'AfanasyProperties' )
    oView.BeginEdit()
