@@ -1,10 +1,12 @@
 import os
+
 import win32com.client
 from win32com.client import constants
+
 #Get handles to the xsi application
-Application = win32com.client.Dispatch( 'XSI.Application' )
-XSIUtils = win32com.client.Dispatch( 'XSI.Utils' )
-XSIUIToolkit = win32com.client.Dispatch( 'XSI.UIToolkit' )
+Application = win32com.client.Dispatch('XSI.Application')
+XSIUtils = win32com.client.Dispatch('XSI.Utils')
+XSIUIToolkit = win32com.client.Dispatch('XSI.UIToolkit')
 
 def GetOpSetValue( opSet, name, defaultValue ):
    if opSet.Parameters(name) != None:
