@@ -500,8 +500,8 @@ class Dialog( QtGui.QWidget):
       self.editInputFilesPattern.setText( pattern)
       self.inputPattern = os.path.join( self.inputDir, pattern)
 
-      eprefix = re.escape( self.inputPrefix)
-      esuffix = re.escape( self.inputSuffix)
+      eprefix = str( self.inputPrefix)
+      esuffix = str( self.inputSuffix)
       epad = self.inputPadding
       expr = re.compile( r'%(eprefix)s([0-9]{%(epad)d,%(epad)d})%(esuffix)s' % vars())
       filescount = 0
@@ -540,7 +540,7 @@ class Dialog( QtGui.QWidget):
          self.editOutputName.clear()
          self.editOutputDir.clear()
 
-      project = re.escape( str( self.editProject.text()))
+      project = str( self.editProject.text())
       if Options.project == '':
          if self.cAutoTitles.isChecked() or project == '':
             if sys.platform.find('win') == 0:
@@ -553,12 +553,12 @@ class Dialog( QtGui.QWidget):
                else: project = pat_split[len(pat_split)-1]
             self.editProject.setText( project)
 
-      shot = re.escape( str( self.editShot.text()))
+      shot = str( self.editShot.text())
       if self.cAutoTitles.isChecked() or shot == '':
          shot = self.inputPrefix.strip('.').upper()
          self.editShot.setText( shot)
 
-      version = re.escape( str( self.editVersion.text()))
+      version = str( self.editVersion.text())
       if self.cAutoTitles.isChecked() or version == '':
          version = os.path.basename( os.path.dirname(self.inputPattern))
          self.editVersion.setText( version)
