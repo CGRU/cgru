@@ -73,12 +73,14 @@ void ItemJob::updateValues( af::Node *node, int type)
    cmd_post          = job->getCmdPost();
    description       = job->getDescription();
 
-   num_hosts            = 0;
+   num_hosts         = 0;
+   compact_display   = true;
    for( int b = 0; b < blocksnum; b++)
    {
       const af::BlockData * block = job->getBlock(b);
       blockinfo[b].update( block, type);
       num_hosts            += blockinfo[b].getTasksRunning();
+      if( block->getProgressAvoidHostsNum() > 0 ) compact_display = false;
    }
    num_hosts_str = QString::number( num_hosts);
 
@@ -134,9 +136,11 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( false == description.isEmpty())
       tooltip += "\n" + description;
 
-   block_height = BlockInfo::Height;
-   if(( time_started == 0) || ( state == AFJOB::STATE_DONE_MASK))
-      block_height = BlockInfo::HeightCompact;
+   if(( time_started ) && ( state != AFJOB::STATE_DONE_MASK))
+      compact_display = false;
+
+   if( compact_display ) block_height = BlockInfo::HeightCompact;
+   else                  block_height = BlockInfo::Height;
 
    height = Height + block_height*blocksnum;
 }
@@ -187,9 +191,9 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    }
 
    for( int b = 0; b < blocksnum; b++)
-      blockinfo[b].paint( painter, option, x+5, y + Height + block_height*b, w-9,
-         ((time_started ) && (state != AFJOB::STATE_DONE_MASK)),
-         itemColor);
+      blockinfo[b].paint( painter, option,
+         x+5, y + Height + block_height*b, w-9,
+         compact_display, itemColor);
 
    if( state & AFJOB::STATE_RUNNING_MASK )
    {

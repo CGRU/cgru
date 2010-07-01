@@ -25,7 +25,7 @@ public:
    bool update( const af::BlockData* block, int type);
    void paint( QPainter * painter, const QStyleOptionViewItem &option,
                int x, int y, int w,
-               bool full = true,
+               bool compact_display = false,
                const QColor * backcolor = NULL)
             const;
 

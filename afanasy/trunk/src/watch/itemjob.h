@@ -59,6 +59,7 @@ protected:
 
 private:
    int blocksnum;
+   bool compact_display;
 
    int tasksdone_job;
    int taskserror_job;
