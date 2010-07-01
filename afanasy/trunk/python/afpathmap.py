@@ -130,8 +130,20 @@ class PathMap:
                path_from = self.PathServer[i]
                path_to   = self.PathClient[i]
 #            print 'Trying "%s" <> "%s"' % (path_from, path_to)
-            if sys.platform.find('win') == 0: path_search = path_search.lower()
-            if path_search.find(path_from) == 0:
+            pathfounded = False
+            if sys.platform.find('win') == 0:
+               path_search = path_search.lower()
+               path_search = path_search.replace('\\','/')
+               if path_search.find(path_from) == 0:
+                  pathfounded = True
+               else:
+                  path_search = path_search.replace('/','\\')
+                  if path_search.find(path_from) == 0:
+                     pathfounded = True
+            else:
+               if path_search.find(path_from) == 0:
+                  pathfounded = True
+            if pathfounded:
                part1 = newpath[:position]
                part2 = newpath[position+len(path_from):]
                if not self.UnixSeparators:

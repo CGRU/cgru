@@ -17,6 +17,7 @@ xcopy doc\images %dest%\doc\images\ /ys
 
 xcopy afanasy\%afanasy% %dest%\afanasy\ /y
 xcopy afanasy\%afanasy%\bin %dest%\afanasy\bin\ /y
+xcopy afanasy\%afanasy%\bin_pyaf %dest%\afanasy\bin_pyaf\ /ys
 xcopy afanasy\%afanasy%\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\%afanasy%\plugins %dest%\afanasy\plugins\ /ys
 xcopy afanasy\%afanasy%\python %dest%\afanasy\python\ /ys

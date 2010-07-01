@@ -9,3 +9,7 @@
 #     Client:                 Server:
 
 #\\server\projects\          /cg/projects/
+
+# Yuo can use only "\" slashes for windows, even if some application on windows use "/" slashes.
+# Afanasy tries both slashes when searchs a path to replace.
+# But will replace with specified slashes, if unix slashes not forced (for Nuke, for example).
