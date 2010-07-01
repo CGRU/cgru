@@ -82,6 +82,9 @@ void ItemJob::updateValues( af::Node *node, int type)
       num_hosts            += blockinfo[b].getTasksRunning();
       if( block->getProgressAvoidHostsNum() > 0 ) compact_display = false;
    }
+   if( time_started ) compact_display = false;
+   if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
+
    num_hosts_str = QString::number( num_hosts);
 
    if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2QstrHMS( time_done - time_started);
@@ -135,9 +138,6 @@ void ItemJob::updateValues( af::Node *node, int type)
       tooltip += QString("\nPost command:\n%1").arg( cmd_post);
    if( false == description.isEmpty())
       tooltip += "\n" + description;
-
-   if(( time_started ) && ( state != AFJOB::STATE_DONE_MASK))
-      compact_display = false;
 
    if( compact_display ) block_height = BlockInfo::HeightCompact;
    else                  block_height = BlockInfo::Height;
