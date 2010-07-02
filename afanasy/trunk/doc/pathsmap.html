@@ -51,12 +51,14 @@ Each next file append previous paths.
 Client read this file(s) each time task starts.
 If there is no such file(s), or everything in it commented, paths will not be mapped at all.
 </p>
+
 <h3>Paths map file example:</h3>
 <pre>
 #     Client:                 Server:
 
 \\server\projects\          /cg/projects/
 </pre>
+
 <h3>Paths map file syntax:</h3>
 <p>
 <b> # </b> : comment<br/>
@@ -66,6 +68,24 @@ Empty or containing only spaces lines are ignored.<br/>
 Spaces an the beginning or at the end of line are ignored.<br/>
 On MS Windows platform client paths changed to lower case.<br/>
 </p>
+
+<h3>MS Windows platform issues:</h3>
+<ul>
+<li>
+When client searches a pattern it converts paths in lower case.
+So no matter how client wrote a path '\\server\projects\', '\\SERVER\PROJECTS\', '\\SERVER\projects\' or '\\server\PROJECTS\'.
+</li>
+<li>
+All separators in client path are translated to '<b>\</b>' even if application uses Unix slashes.
+Some applications allows client to use and '<b>\</b>' and '<b>/</b>' slashes,
+so pattern will be matched in any case, even in mixed slashes.
+</li>
+<li>
+Module (Python Class) can works in 'UnixSeparators' mode.
+During translation from server to client it uses '<b>\</b>' slashes for client paths.
+For example NUKE uses only '<b>\</b>' slashes on any platform.
+</li>
+</ul>
 
 
 <!--FOOTER-->

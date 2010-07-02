@@ -39,10 +39,18 @@ If Afanasy <b>database schema changed</b> server can't restore state. All inform
 <br/>
 <h4>2010.06.01</h4>
 <p>
+<a href="../afanasy/plugins/houdini/doc/afanasy.html#SeparateRender"/>Houdini Separate Render</a>
+ - ROP to separate Mantra ROP render process on 'ifd' files generation and 'mantra' command render.
+It can also split one frame into tiles and render them simultaneous,
+clean 'ifd' files, clean tiles and render an image in local temporary folder,
+and after successful render copy it to network location
+(it can save network traffic, as host do not often write small portions of an image during calculations).
+</p>
+<p>
 Block <a href="../afanasy/doc/job_block.html#FramesPerTask">Frames Per Task</a> parameter can be negative. Needed for sub-frame dependency.
 </p>
 <p>
-Afanasy has an ability to <a href="../afanasy/doc/server_pathsmap.html">map paths</a>.
+Afanasy has an ability to <a href="../afanasy/doc/pathsmap.html">map paths</a>.
 You can setup farm with various platforms clients.
 Submit jobs on Windows or Linux (MacOSX) to render and on Windows and on Linux (MacOSX) clients.
 Every client can have individual a paths map file to translate paths to server and from server.
@@ -54,7 +62,7 @@ Linux releases has <a href="http://www.ffmpeg.org">'ffmpeg'<a> binary compiled w
 Windows users need to install <a href="http://www.imagemagick.org">ImageMagick<a>, which contains 'ffmpeg' with 'x264'.
 </p>
 <p>
-Softimage XSI submit to Afanasy sripts. XSI Afanasy service and parser.
+<a href="../afanasy/plugins/xsi/doc/afanasy.html">Softimage XSI submit to Afanasy sripts</a>. XSI Afanasy service and parser.
 </p>
 <p>
 Lots of bug-fixes for MS Windows platform. Windows version can be called 'beta'.

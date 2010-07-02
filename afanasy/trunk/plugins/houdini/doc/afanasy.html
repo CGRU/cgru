@@ -28,6 +28,7 @@
 <h2 align="center">Afanasy in Houdini</h2>
 <hr />
 
+<a name="Afanasy"/>
 <h3>Afanasy ROP</h3>
 
 <p align="center">General parameters:<br/>
@@ -56,6 +57,7 @@
 </ul>
 <p>Extended parameters are the same for all CGRU Afanasy ROP nodes.</p>
 
+<a name="CmdSender"/>
 <h3>Cmd Sender</h3>
 <p>
 You can construct a command to render <kbd>ifd</kbd> or <kbd>rib</kbd> files and send it to afanasy.<br/>
@@ -70,6 +72,7 @@ You can construct a command to render <kbd>ifd</kbd> or <kbd>rib</kbd> files and
 <p>With this ROP you can send any array of numeric (with %04d) commands to afanasy to do anything (RenderMan and Mantra are just templates).</p>
 <p>If command contains some <kbd>service</kbd> name that will be the block service (and its tasks output will be parsed with the service default <kbd>parser</kbd>).</p>
 
+<a name="MultiplySender"/>
 <h3>Multiply Sender</h3>
 <p>
 <kbd>af_multiply_sender</kbd> constructs one multi-block job from several ROPs with various dependences between connected ROPs (job blocks).
@@ -117,6 +120,7 @@ It generates shadows. This block has no dependence.
 </li>
 </ul>
 
+<a name="SeparateRender"/>
 <h3>Separate Render</h3>
 <p>
 This ROP allows to separate render process on 'ifd' files generation and render it by 'mantra'.
