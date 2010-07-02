@@ -108,11 +108,13 @@ def Main():
    oPPGLayout.EndRow()
 
    oPPGLayout.Language = 'Python'
-   logic_script = 'C:\\cg\\tools\\cgru\\afanasy\\trunk\\plugins\\xsi\\afxsisubmit_logic.py'
    afroot = os.getenv('AF_ROOT')
    if afroot is None or afroot == '':
       Application.LogMessage('AF_ROOT is not set, can`t find Afanasy.')
    else:
+      logic_script = os.path.join( afroot, 'plugins')
+      logic_script = os.path.join( afroot, 'xsi')
+      logic_script = os.path.join( afroot, 'afxsisubmit_logic.py')
       if( os.path.exists( logic_script)):
          textStream = open( logic_script,'r')
          logic = textStream.read()
