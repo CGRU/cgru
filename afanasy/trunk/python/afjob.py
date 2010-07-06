@@ -34,6 +34,7 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -hostsmask           -   job render hosts mask\n\
 -hostsexcl           -   job render hosts to exclude mask\n\
 -maxhosts            -   maximum number of hosts to use\n\
+-maxruntime          -   maximum run time for task in seconds\n\
 -priority            -   job priority\n\
 -capacity            -   tasks capacity\n\
 -capmin              -   tasks minimum capacity coefficient\n\
@@ -41,6 +42,8 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -depmask             -   wait untill other jobs of the same user, satisfying this mask\n\
 -depglbl             -   wait untill other jobs of any user, satisfying this mask\n\
 -images              -   images to preview\n\
+-varirender attr start step count - variate parameter\n\
+-simulate            -   enable simulation\n\
 (R)                  -   REQUIRED arguments\n\
 \n\
 '
@@ -67,7 +70,6 @@ s = int( argsv[2])
 e = int( argsv[3])
 fpr = 1
 by  = 1
-cmd = ''
 pwd = os.getenv('PWD', os.getcwd())
 file           = ''
 node           = ''
@@ -77,6 +79,7 @@ deletescene    = False
 startpaused    = False
 hostsmask      = ''
 hostsexcl      = ''
+maxruntime     = 0
 maxhosts       = -1
 priority       = -1
 capacity       = -1
@@ -87,6 +90,12 @@ dependglobal   = ''
 images         = ''
 blocktype      = ''
 platform       = ''
+varirender     = False
+simulate       = False
+
+cmd = ''
+cmds = []
+blocknames = []
 
 #
 # checking some critical argumens values
@@ -185,6 +194,12 @@ for i in range( argsl):
       maxhosts = int(argsv[i])
       continue
 
+   if arg == '-maxruntime':
+      i += 1
+      if i == argsl: break
+      maxruntime = int(argsv[i])
+      continue
+
    if arg == '-priority':
       i += 1
       if i == argsl: break
@@ -239,7 +254,25 @@ for i in range( argsl):
       platform = argsv[i]
       continue
 
+   if arg == '-varirender':
+      i += 1
+      if i == argsl: break
+      varirender_attr = argsv[i]
+      i += 1
+      if i == argsl: break
+      varirender_start = int(argsv[i])
+      i += 1
+      if i == argsl: break
+      varirender_step = int(argsv[i])
+      i += 1
+      if i == argsl: break
+      varirender_count = int(argsv[i])
+      varirender = True
+      continue
 
+   if arg == '-simulate':
+      simulate = True
+      continue
 #
 # command construction:
 cmdextension = os.getenv('AF_CMDEXTENSION', '')
@@ -276,9 +309,27 @@ elif ext == 'mb':
 # XSI:
 elif ext == 'scn':
    scenetype = 'xsi'
-   cmd = 'xsibatch' + cmdextension + ' -render ' + scene + ' -frames %1,%2,' + str(by)
-   if take != '': cmd += ' -pass ' + take
-   cmd += ' -verbose on'
+   cmd = os.environ['XSI_CGRU_PATH']
+   cmd = os.path.join( cmd, 'afrender.py')
+   cmd = 'xsibatch' + cmdextension + ' -script %s' % cmd
+   cmd += ' -lang Python -main afRender -args'
+   cmd += ' -scene %s' % scene
+   cmd += ' -start %1 -end %2 -step ' + str(by)
+   cmd += ' -simulate'
+   if simulate:   cmd += ' 1'
+   else:          cmd += ' 0'
+   if take != '': cmd += ' -renderPass ' + take
+   if varirender:
+      cmd += ' -attr ' + varirender_attr + ' -value '
+      value = varirender_start
+      for i in range( 0, varirender_count):
+         cmds.append( cmd + str(value))
+         blocknames.append( 'variant[%d]' % value)
+         value += varirender_step
+      cmd = ''
+
+#xsibatch -script "%XSI_CGRU_PATH%\afrender.py" -lang Python -main afRenderCurPass -args
+#-scenePath "%CD%\project\Scenes\scene.scn" -startFrame 1 -endFrame 2 -step 1 -simulate 0 -setAttr torus.polymsh.geom.enduangle -setValue 120
 
 # simple generic:
 else:
@@ -292,17 +343,26 @@ if fpr < 1:
 #
 # Creating a Job:
 
-# Create a Block af first:
+# Create a Block(s) af first:
+blocks = []
 blockname = node
 if blockname == '': blockname = scenetype
 if blocktype == '': blocktype = scenetype
-block = af.Block( blockname, blocktype)
-block.setWorkingDirectory( pwd )
-block.setNumeric( s, e, fpr)
-block.setCommand( cmd )
-block.setCapacity( capacity)
-block.setVariableCapacity( capmin, capmax)
-if images != '': block.setCommandView( images)
+if len( cmds) == 0:
+   cmds.append( cmd)
+   blocknames.append( blockname)
+i = 0   
+for cmd in cmds:
+   block = af.Block( blocknames[i], blocktype)
+   block.setWorkingDirectory( pwd )
+   block.setNumeric( s, e, fpr)
+   block.setCommand( cmd )
+   block.setCapacity( capacity)
+   block.setVariableCapacity( capmin, capmax)
+   if maxruntime != 0: block.setTasksMaxRunTime( maxruntime)
+   if images != '': block.setCommandView( images)
+   blocks.append( block)
+   i += 1
 
 # Create a Job:
 job = af.Job( name)
@@ -319,7 +379,7 @@ if platform != '':
    else: job.setNeedOS( platform)
 
 # Add a Block to a Job:
-job.blocks.append( block)
+job.blocks.extend( blocks)
 
 # Send Job to server:
 job.send()

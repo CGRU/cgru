@@ -77,9 +77,9 @@
          <ImageHeight>486</ImageHeight>
          <ImagePixelRatio>0.9</ImagePixelRatio>
          <ImageLockAspectRatio>1</ImageLockAspectRatio>
-         <FrameRangeSource>3</FrameRangeSource>
-         <FrameStart>1</FrameStart>
-         <FrameEnd>100</FrameEnd>
+         <FrameRangeSource>0</FrameRangeSource>
+         <FrameStart>2</FrameStart>
+         <FrameEnd>5</FrameEnd>
          <FrameStep>1</FrameStep>
          <FrameSet>1-100</FrameSet>
          <FrameSkipRendered>0</FrameSkipRendered>
@@ -105,8 +105,8 @@
                <RenderChannel>Main</RenderChannel>
                <Enabled>1</Enabled>
                <Filename>[Pass]_[Framebuffer]</Filename>
-               <Format>pic</Format>
-               <DataType>RGBA</DataType>
+               <Format>jpg</Format>
+               <DataType>RGB</DataType>
                <BitDepth>3</BitDepth>
             </FrameBuffer>
          </FrameBuffers>
@@ -121,9 +121,9 @@
          <ImageHeight>486</ImageHeight>
          <ImagePixelRatio>0.9</ImagePixelRatio>
          <ImageLockAspectRatio>1</ImageLockAspectRatio>
-         <FrameRangeSource>3</FrameRangeSource>
+         <FrameRangeSource>0</FrameRangeSource>
          <FrameStart>1</FrameStart>
-         <FrameEnd>100</FrameEnd>
+         <FrameEnd>10</FrameEnd>
          <FrameStep>1</FrameStep>
          <FrameSet>1-100</FrameSet>
          <FrameSkipRendered>0</FrameSkipRendered>
@@ -149,8 +149,8 @@
                <RenderChannel>Main</RenderChannel>
                <Enabled>1</Enabled>
                <Filename>[Pass]_[Framebuffer]</Filename>
-               <Format>pic</Format>
-               <DataType>RGBA</DataType>
+               <Format>jpg</Format>
+               <DataType>RGB</DataType>
                <BitDepth>3</BitDepth>
             </FrameBuffer>
          </FrameBuffers>
