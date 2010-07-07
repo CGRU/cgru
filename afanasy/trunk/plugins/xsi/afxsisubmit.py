@@ -126,8 +126,8 @@ def Main():
 
    oPPGLayout.AddRow()
    oPPGLayout.AddButton('SubmitButton', 'Submit To Afanasy')
-   oPPGLayout.AddButton('CloseButton', 'Close Dialog')
-#	oPPGLayout.AddButton('ResetButton', 'Close Dialog And Reset Options')
+   oPPGLayout.AddButton('HelpButton',   'Show Help')
+   oPPGLayout.AddButton('CloseButton',  'Close Dialog')
    oPPGLayout.EndRow()
 
    oPPGLayout.AddItem('afStartPaused', 'Start Job Paused', constants.siControlBoolean)

@@ -1,9 +1,19 @@
 import os, shutil, time
 
+import webbrowser
+
 #Get handles to the xsi application
 #Application = win32com.client.Dispatch('XSI.Application')
 
 def CloseButton_OnClicked(): PPG.Close()
+
+def HelpButton_OnClicked():
+   path = os.getenv('XSI_AF_PATH')
+   path = os.path.join( path, 'doc')
+   path = os.path.join( path, 'afanasy.html')
+   Application.LogMessage('Opening "%s"' % path)
+   webbrowser.open(path)
+   
 
 def SubmitButton_OnClicked():
    opSet = Application.ActiveSceneRoot.Properties('afSubmitProperties')
