@@ -3,7 +3,7 @@
 <head>
 <link href="../../../doc/styles.css" rel="stylesheet" type="text/css">
 <link rel="shortcut icon" href="../icon.png" type="image/png" />
-<title>CGRU XSI</title>
+<title>CGRU XSI Python</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,13 +26,24 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h1 align="center">Softimage CGRU Documentation.</h1>
+<h2 align="center">Softimage Python Setup.</h2>
 <hr />
 
 <p>
-CGRU plug-in and Afanasy submit scripts use Python language.
-So it must be in XSI scripting languages list.
-See <a href="setup_python.html" target="mainfrm">Python Setup</a> page.
+Softimage 2010 has no internal Python, so to use it you should setup it.
+Softimage 2011 has internal Python, but you can setup it to use your own, your version with your additional packages.
+</p>
+<p>
+Install Python.<br/>
+Install <a href="http://sourceforge.net/projects/pywin32/files/">Python For Windows</a>.<br/>
+Normally it should appear in Softimage.<br/>
+If not you can run<br/>
+<kbd>Python25\Lib\site-packages\win32comext\axscript\client\pyscript.py</kbd><br/>
+script to register it.<br/>
+</p>
+<p>
+You can simple install all it only on one machine and just copy to anothers.
+But you must run register script in this case.
 </p>
 
 <!--FOOTER-->
