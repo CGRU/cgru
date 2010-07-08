@@ -1,3 +1,5 @@
-PUSHD ..\..\..\..
-call setup.cmd
-POPD
+IF NOT DEFINED CGRU_LOCATION (
+	PUSHD ..\..\..\..
+	call setup.cmd
+	POPD
+)

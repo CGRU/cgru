@@ -96,6 +96,7 @@ while frame <= end:
    print 'Launching command:'
    for c in cmd: print c,
    print
+   sys.stdout.flush()
    p = subprocess.Popen( cmd)
    exitcode = p.wait()
    if exitcode != 0: break
@@ -109,6 +110,7 @@ while frame <= end:
    print 'Launching command:'
    for c in cmd: print c,
    print
+   sys.stdout.flush()
    p = subprocess.Popen( cmd)
    exitcode = p.wait()
    if exitcode != 0: break
