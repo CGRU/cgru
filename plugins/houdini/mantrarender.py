@@ -2,12 +2,13 @@
 
 import subprocess, os, sys, signal, tempfile, shutil
 
+tmpdir = ''
 # Interrupt function to delete temp directory:
 def interrupt( signum, frame):
    if tmpdir != '':
       if os.path.isdir( tmpdir):
          shutil.rmtree( tmpdir)
-   exit('\nInterrupt received...')
+   exit('\nInterrupt received (mantrarender.py)...')
 
 # Set interrupt function:
 signal.signal( signal.SIGTERM, interrupt)
@@ -32,7 +33,6 @@ def UsageExit( msg = None):
    print '-R - separator for arguments to mantra ("-v A" will be added automatically).'
    exit(1)
 
-tmpdir = ''
 tilerender = False
 
 # Mantra arguments position:
@@ -74,14 +74,14 @@ if 'd' in sys.argv[1]:
             ropfile = sys.argv[a]
             break
 
-if sys.platform.find('win') == 0:
-   houdini = os.getenv('HOUDINI_LOCATION')
-   if houdini is None or houdini == '':
-      print 'Error: HOUDINI_LOCATION is not set, can`t find mantra location.'
-      exit(1)
-   mantra = houdini + '/bin/mantra.exe'
-else:
-   mantra = 'mantra'
+#if sys.platform.find('win') == 0:
+#   houdini = os.getenv('HOUDINI_LOCATION')
+#   if houdini is None or houdini == '':
+#      print 'Error: HOUDINI_LOCATION is not set, can`t find mantra location.'
+#      exit(1)
+#   mantra = houdini + '/bin/mantra.exe'
+#else:
+#   mantra = 'mantra'
 
 # Construct a command:
 if argspos > 1:
@@ -89,9 +89,9 @@ if argspos > 1:
    filter += '/mantrafilter.py'
    if tilerender: filter += ' %d %d %d' % ( divx, divy, numtile)
    if tmpdir != '': filter += ' ' + tmpdir
-   cmd = [ mantra,'-P',filter,'-v','A']
+   cmd = ['mantra','-P',filter,'-V','a']
 else:
-   cmd = [ mantra,'-v','A']
+   cmd = ['mantra','-V','a']
 
 # Append arguments for mantra:
 for i in range( argspos+1, len(sys.argv)): cmd.append( sys.argv[i])

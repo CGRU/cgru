@@ -15,6 +15,7 @@ rop = afnode.parm('rop').eval()
 run_rop = afnode.parm('run_rop').eval()
 read_rop = afnode.parm('read_rop').eval()
 depend_mask = afnode.parm('depend_mask').eval()
+join_render = afnode.parm('join_render').eval()
 tile_render = afnode.parm('tile_render').eval()
 divx = afnode.parm('divx').eval()
 divy = afnode.parm('divy').eval()
@@ -42,35 +43,18 @@ if read_rop or run_rop:
    if not isinstance( ropnode, hou.RopNode):
       soho.error('%s is not a ROP node' % rop)
 
+if not run_rop:
+   join_render = False
+
+if join_render:
+   tile_render = False
+   delete_files = True
+
 job = af.Job()
 job.setName( job_name)
 if platform != '':
    if platform == 'any': job.setNeedOS('')
    else: job.setNeedOS( platform)
-
-if run_rop:
-   rop_setdiskfile = False
-   if ropnode.parm('soho_outputmode').eval() == 0:
-      # Set outpu mode to produce ifd files:
-      ropnode.parm('soho_outputmode').set(1)
-      rop_setdiskfile = True
-      ropnode.parm('soho_diskfile').set( ropnode.parm('vm_picture').unexpandedString() + '.ifd')
-
-   # Calculate temporary hip name:
-   ftime = time.time()
-   tmphip = hou.hipFile.name() + '_' + job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
-
-   # Use mwrite, because hou.hipFile.save(tmphip)
-   # changes current scene file name to tmphip
-   hou.hscript('mwrite -n %s' % tmphip)
-
-   # Set output mode back if was enabled:
-   if rop_setdiskfile: ropnode.parm('soho_outputmode').set(0)
-
-   job.setCmdPost('rm ' + tmphip)
-   b_generate = af.Block('generate', 'hbatch')
-   b_generate.setCommand('hrender_af -s %1 -e %2 -b 1 -t '+take+' '+tmphip+' '+rop)
-   b_generate.setNumeric( f_start, f_finish)
 
 if read_rop:
    images = ropnode.parm('vm_picture')
@@ -81,30 +65,66 @@ if read_rop:
 images = afhoudini.pathToC( afnode.parm('images').evalAsStringAtFrame(f_start), afnode.parm('images').evalAsStringAtFrame(f_finish))
 files  = afhoudini.pathToC( afnode.parm('files' ).evalAsStringAtFrame(f_start), afnode.parm('files' ).evalAsStringAtFrame(f_finish))
 
-command = 'mantra'
-tiles = divx * divy
-b_render = af.Block('render', command)
-if run_rop: b_render.setTasksDependMask('generate')
-if tile_render or delete_files or temp_images: command = 'mantrarender '
-if delete_files and not tile_render: command += 'd'
-if temp_images: command += 't'
-if tile_render:
-   command += 'c %(divx)d %(divy)d' % vars()
-   b_render.setCommand( command + ' %1')
-   b_render.setFramesPerTask( -tiles)
-   for frame in range( f_start, f_finish + 1):
-      arguments = afnode.parm('arguments').evalAsStringAtFrame( frame)
-      for tile in range( 0, tiles):
-         task = af.Task('%d tile %d' % ( frame, tile))
-         task.setCommand( '%d -R %s' % ( tile, arguments))
-         b_render.tasks.append( task)
-else:
-   if delete_files or temp_images: command += ' -R '
-   else: command +=  ' -v A '
-   arguments = afhoudini.pathToC( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
-   b_render.setCommand( command + arguments)
-   b_render.setCommandView( images)
-   b_render.setNumeric( f_start, f_finish)
+if run_rop:
+   if not join_render:
+      rop_setdiskfile = False
+      if ropnode.parm('soho_outputmode').eval() == 0:
+         # Set outpu mode to produce ifd files:
+         ropnode.parm('soho_outputmode').set(1)
+         rop_setdiskfile = True
+         ropnode.parm('soho_diskfile').set( ropnode.parm('vm_picture').unexpandedString() + '.ifd')
+
+   # Calculate temporary hip name:
+   ftime = time.time()
+   tmphip = hou.hipFile.name() + '_' + job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
+
+   # Use mwrite, because hou.hipFile.save(tmphip)
+   # changes current scene file name to tmphip
+   hou.hscript('mwrite -n %s' % tmphip)
+
+   if not join_render:
+      # Set output mode back if was enabled:
+      if rop_setdiskfile: ropnode.parm('soho_outputmode').set(0)
+      blocktype = 'hbatch'
+      blockname = 'generate'
+      cmd = 'hrender_af'
+   else:
+      blocktype = 'hbatch_mantra'
+      blockname = 'generate+render'
+      cmd = 'hrender_separate'
+      if temp_images: cmd += ' --tmpimg'
+
+   job.setCmdPost('rm ' + tmphip)
+   b_generate = af.Block( blockname, blocktype)
+   b_generate.setCommand( cmd + ' -s %1 -e %2 -b 1 -t '+take+' '+tmphip+' '+rop)
+   b_generate.setNumeric( f_start, f_finish)
+   if join_render: b_generate.setCommandView( images)
+
+if not join_render:
+   command = 'mantra'
+   tiles = divx * divy
+   b_render = af.Block('render', command)
+   if run_rop: b_render.setTasksDependMask('generate')
+   if tile_render or delete_files or temp_images: command = 'mantrarender '
+   if delete_files and not tile_render: command += 'd'
+   if temp_images: command += 't'
+   if tile_render:
+      command += 'c %(divx)d %(divy)d' % vars()
+      b_render.setCommand( command + ' %1')
+      b_render.setFramesPerTask( -tiles)
+      for frame in range( f_start, f_finish + 1):
+         arguments = afnode.parm('arguments').evalAsStringAtFrame( frame)
+         for tile in range( 0, tiles):
+            task = af.Task('%d tile %d' % ( frame, tile))
+            task.setCommand( '%d -R %s' % ( tile, arguments))
+            b_render.tasks.append( task)
+   else:
+      if delete_files or temp_images: command += ' -R '
+      else: command +=  ' -V a '
+      arguments = afhoudini.pathToC( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
+      b_render.setCommand( command + arguments)
+      b_render.setCommandView( images)
+      b_render.setNumeric( f_start, f_finish)
 
 if tile_render:
    cmd = 'exrjoin %(divx)d %(divy)d %(images)s d' % vars()
@@ -120,7 +140,7 @@ if read_rop:
    afnode.parm('files' ).set('')
 
 if tile_render: job.blocks.append( b_join)
-job.blocks.append( b_render)
+if not join_render: job.blocks.append( b_render)
 if run_rop: job.blocks.append( b_generate)
 
 job.setDependMask( depend_mask)

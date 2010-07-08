@@ -44,7 +44,7 @@ def filterPlane():
          pos = filename.rfind("/")
          filename = tmpdir + filename[pos:]
    filteredNames.append( filename)
-   print 'Tile filename:\n' + filename
+   print 'Mantra plane filename:\n' + filename
    mantra.setproperty('plane:planefile', filename)
 
 # A callback to change image crop and write down main image filename:
