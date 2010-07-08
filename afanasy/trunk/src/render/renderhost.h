@@ -19,4 +19,9 @@ public:
    inline void setId( int new_id) { id = new_id;}
 
    af::Msg* updateMsg( af::Msg *msg);
+
+private:
+#ifdef WINNT
+   QStringList windowsmustdie;
+#endif
 };

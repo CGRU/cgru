@@ -1,0 +1,4 @@
+Visual Studio Just-In-Time Debugger
+mantra.exe
+mantra.exe - Application Error
+Nuke6.0

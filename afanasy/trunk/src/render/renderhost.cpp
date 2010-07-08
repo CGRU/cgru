@@ -9,6 +9,10 @@
 
 #include "res.h"
 
+#ifdef WINNT
+#include <QtCore/QFile>
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -28,7 +32,34 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
    host.os = af::Environment::getPlatform();
    GetResources( host, hres, true);
 #ifdef WINNT
+// Windows Must Die:
    Sleep( 100);
+   QString filename = QString("%1\\windowsmustdie.txt").arg( af::Environment::getAfRoot());
+   QFile file( filename);
+   if( file.open(QFile::ReadOnly))
+   {
+      char buf[4096];
+      int len = 0;
+      do
+      {
+         len = file.readLine( buf, sizeof( buf));
+         if( len > 0 )
+         {
+            QString line = QString( buf).simplified();
+            if( false == line.isEmpty())
+               windowsmustdie.append( line);
+         }
+      }
+      while( len != -1);
+      file.close();
+      if( windowsmustdie.size())
+      {
+         printf("Windows Must Die:\n");
+         for( int i = 0; i < windowsmustdie.size(); i++)
+            printf("   %s\n", windowsmustdie[i].toUtf8().data());
+      }
+   }
+   else printf("Unable to read '%s'.\n", filename.toUtf8().data());
 #else
    usleep( 100000);
 #endif
@@ -51,6 +82,19 @@ af::Msg* RenderHost::updateMsg( af::Msg *msg)
 
 //   hres.stdOut();
    hres.readwrite( msg);
+
+#ifdef WINNT
+// Windows Must Die:
+   for( int i = 0; i < windowsmustdie.size(); i++)
+   {
+      HWND WINAPI hw = FindWindow( NULL, TEXT( windowsmustdie[i].toUtf8().data()));
+      if( hw != NULL )
+      {
+         printf("Window must die founded:\n%s\n", windowsmustdie[i].toUtf8().data());
+         SendMessage( hw, WM_CLOSE, 0, 0);
+      }
+   }
+#endif
 
    return msg;
 }
