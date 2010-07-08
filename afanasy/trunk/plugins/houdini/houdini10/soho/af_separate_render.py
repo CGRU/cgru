@@ -153,8 +153,12 @@ if enable_extended_parameters:
    if depend_mask_global != '': job.setDependMaskGlobal( depend_mask_global)
    if run_rop: b_generate.setCapacity( capacity_generate)
    if tile_render: b_join.setCapacity( capacity_join)
-   b_render.setCapacity( capacity)
-   b_render.setVariableCapacity( capacity_min, capacity_max)
+   if join_render:
+      b_generate.setCapacity( capacity)
+      b_generate.setVariableCapacity( capacity_min, capacity_max)
+   else:
+      b_render.setCapacity( capacity)
+      b_render.setVariableCapacity( capacity_min, capacity_max)
 
 if start_paused:
    job.offLine()
