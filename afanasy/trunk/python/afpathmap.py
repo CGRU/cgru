@@ -129,7 +129,6 @@ class PathMap:
             else:
                path_from = self.PathServer[i]
                path_to   = self.PathClient[i]
-#            print 'Trying "%s" <> "%s"' % (path_from, path_to)
             pathfounded = False
             if sys.platform.find('win') == 0:
                path_search = path_search.lower()
@@ -141,6 +140,7 @@ class PathMap:
                   if path_search.find(path_from) == 0:
                      pathfounded = True
             else:
+#               print 'finding "%s" in "%s"' % (path_from,path_search)
                if path_search.find(path_from) == 0:
                   pathfounded = True
             if pathfounded:

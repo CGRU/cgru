@@ -5,7 +5,6 @@
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/service.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
@@ -26,7 +25,7 @@ extern RenderHost * pRENDER;
 TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int runningtasks):
    ChildProcess( parent),
    exec( taskExec),
-   service( NULL),
+   service( *taskExec),
    parser( NULL),
    timer( this),
    update_status( af::TaskExec::UPPercent),
@@ -46,31 +45,8 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    connect( &timer, SIGNAL( timeout() ), this, SLOT( sendTaskSate() ));
    timer.setInterval( af::Environment::getRenderUpdateTaskPeriod() * 1000 * (runningtasks+1));
 
-   QString wdir = exec->getWDir();
-   QString command = exec->getCmd();
-
-   if( false == exec->getServiceType().isEmpty())
-   {
-      service = new af::Service(
-            exec->getServiceType(),
-            wdir,
-            command,
-            exec->getCapCoeff(),
-            exec->getMultiHostsNames(),
-            exec->getCmdView()
-         );
-      if(( service != NULL ) && ( false == service->isInitialized() ))
-      {
-         delete service;
-         service = NULL;
-      }
-   }
-
-   if( service)
-   {
-      command = service->getCommand();
-      wdir = service->getWDir();
-   }
+   QString command = service.getCommand();
+   QString wdir = service.getWDir();
 
    if( false == exec->getParserType().isEmpty())
       parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
@@ -121,7 +97,6 @@ TaskProcess::~TaskProcess()
    killProcess();
 
    if( exec    != NULL  ) delete exec;
-   if( service != NULL  ) delete service;
    if( parser  != NULL  ) delete parser;
 
    AFINFO("TaskProcess:~TaskProcess()\n");

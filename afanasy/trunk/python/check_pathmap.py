@@ -27,7 +27,9 @@ if len(sys.argv) > 1:
       pm.toClientFile( path_server, path_client, Verbose = False)
    else:
       path = ''
-      for arg in range( 1, len( sys.argv)): path += ' ' + sys.argv[arg]
+      for arg in range( 1, len( sys.argv)):
+         if arg != 1: path += ' '
+         path += sys.argv[arg]
       pm = PathMap( afroot, False, True)
       print 'Origin: ' + path
       path = pm.toServer( path, Verbose = False)

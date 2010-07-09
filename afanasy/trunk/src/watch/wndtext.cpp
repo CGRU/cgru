@@ -69,31 +69,11 @@ WndText::~WndText()
 
 void WndText::showTask( af::Msg * msg)
 {
-   af::TaskExec task( msg);
-   QString wdir = task.getWDir();
-   QString command = task.getCmd();
-   af::Service * service;
-   if( false == task.getServiceType().isEmpty())
-   {
-      service = new af::Service(
-            task.getServiceType(),
-            wdir,
-            command,
-            task.getCapCoeff(),
-            task.getMultiHostsNames(),
-            task.getCmdView()
-         );
-      if(( service != NULL ) && ( false == service->isInitialized() ))
-      {
-         delete service;
-         service = NULL;
-      }
-   }
-   if( service)
-   {
-      wdir = service->getWDir();
-      command = service->getCommand();
-   }
+   af::TaskExec taskexec( msg);
+   af::Service service( taskexec);
+   QString wdir = service.getWDir();
+   QString command = service.getCommand();
+   QString files = service.getFiles();
 
    QTextCharFormat fParameter;
    QTextCharFormat fInfo;
@@ -102,19 +82,19 @@ void WndText::showTask( af::Msg * msg)
 
    QTextCursor c( qTextEdit->textCursor());
 
-   c.insertText( task.getName(), fParameter);
+   c.insertText( taskexec.getName(), fParameter);
    c.insertText( "\n");
-   c.insertText( task.getServiceType(), fParameter);
+   c.insertText( taskexec.getServiceType(), fParameter);
    c.insertText( "[", fInfo);
-   c.insertText( task.getParserType(), fParameter);
+   c.insertText( taskexec.getParserType(), fParameter);
    c.insertText( "]:", fInfo);
-   c.insertText( QString::number(task.getCapacity()), fParameter);
+   c.insertText( QString::number( taskexec.getCapacity()), fParameter);
    c.insertText( " frames(", fInfo);
-   c.insertText( QString::number(task.getFrameStart()), fParameter);
+   c.insertText( QString::number( taskexec.getFrameStart()), fParameter);
    c.insertText( ",", fInfo);
-   c.insertText( QString::number(task.getFrameFinish()), fParameter);
+   c.insertText( QString::number( taskexec.getFrameFinish()), fParameter);
    c.insertText( ",", fInfo);
-   c.insertText( QString::number(task.getFramesNum()), fParameter);
+   c.insertText( QString::number( taskexec.getFramesNum()), fParameter);
    c.insertText( "):", fInfo);
    c.insertText( "\n");
    c.insertText( "Command:", fInfo);
@@ -124,21 +104,19 @@ void WndText::showTask( af::Msg * msg)
    c.insertText( "Working Directory:", fInfo);
    c.insertText( "\n");
    c.insertText( wdir, fParameter);
-   if( task.getCmdView().isEmpty() == false)
+   if( files.isEmpty() == false)
    {
       c.insertText( "\n");
       c.insertText( "Preview:", fInfo);
       c.insertText( "\n");
-      c.insertText( task.getCmdView(), fParameter);
+      c.insertText( files, fParameter);
    }
-   if( task.hasFileSizeCheck())
+   if( taskexec.hasFileSizeCheck())
    {
       c.insertText( "\n");
       c.insertText( "File Size Check: ", fInfo);
-      c.insertText( QString::number( task.getFileSizeMin()), fParameter);
+      c.insertText( QString::number( taskexec.getFileSizeMin()), fParameter);
       c.insertText( " - ", fInfo);
-      c.insertText( QString::number( task.getFileSizeMax()), fParameter);
+      c.insertText( QString::number( taskexec.getFileSizeMax()), fParameter);
    }
-
-   if( service != NULL) delete service;
 }

@@ -18,19 +18,42 @@ extern char PYNAME_FuncApplyCmdCapacity[];
 extern char PYNAME_FuncApplyCmdHosts[];
 extern char PYNAME_FuncCheckFiles[];
 
-Service::Service( const QString & type,
-            const QString & wdir,
-            const QString & command,
-            int capkoeff,
-            const QStringList & hosts,
-            const QString & files,
-            bool verbose):
-   name( type),
-   PyObj_FuncGetWDir( NULL),
-   PyObj_FuncGetCommand( NULL),
-   PyObj_FuncCheckFiles( NULL),
-   initialized( false)
+Service::Service( const QString & Type,
+            const QString & WDir,
+            const QString & Command,
+            const QString & Files,
+            int CapKoeff,
+            const QStringList & Hosts
+):
+   name( Type),
+   wdir( WDir),
+   command( Command),
+   capkoeff( CapKoeff),
+   hosts( Hosts),
+   files( Files)
 {
+   initialize();
+}
+
+Service::Service( const TaskExec & taskexec):
+   name( taskexec.getServiceType()),
+   wdir( taskexec.getWDir()),
+   command( taskexec.getCmd()),
+   capkoeff( taskexec.getCapCoeff()),
+   hosts( taskexec.getMultiHostsNames()),
+   files( taskexec.getCmdView())
+{
+   initialize();
+}
+
+void Service::initialize()
+{
+   PyObj_FuncGetWDir = NULL;
+   PyObj_FuncGetCommand = NULL;
+   PyObj_FuncGetFiles = NULL;
+   PyObj_FuncCheckFiles = NULL;
+   initialized = false;
+
    PyObject * pHostsList = PyList_New(0);
    for( int h = 0; h < hosts.size(); h++)
       if( PyList_Append( pHostsList , PyString_FromString( hosts[h].toUtf8().data())) != 0)
@@ -55,42 +78,60 @@ Service::Service( const QString & type,
    if( PyObj_FuncGetWDir == NULL ) return;
    PyObj_FuncGetCommand = getFunction( AFPYNAMES::SERVICE_FUNC_GETCOMMAND);
    if( PyObj_FuncGetCommand == NULL ) return;
+   PyObj_FuncGetFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETFILES);
+   if( PyObj_FuncGetFiles == NULL ) return;
    PyObj_FuncCheckFiles = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKFILES);
    if( PyObj_FuncCheckFiles == NULL ) return;
+
+   PyObject * pResult;
+
+   // Process working directory:
+   pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
+   if( PyString_Check( pResult))
+   {
+      wdir = PyString_AsString( pResult);
+      Py_DECREF( pResult);
+   }
+   else
+   {
+      AFERROR("Service:FuncGetWDir: Returned object is not a string.\n");
+      Py_DECREF( pResult);
+      return;
+   }
+
+   // Process command:
+   pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
+   if( PyString_Check( pResult))
+   {
+      command = PyString_AsString( pResult);
+      Py_DECREF( pResult);
+   }
+   else
+   {
+      AFERROR("Service:FuncGetCommand: Returned object is not a string.\n");
+      Py_DECREF( pResult);
+      return;
+   }
+
+   // Process files:
+   pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
+   if( PyString_Check( pResult))
+   {
+      files = PyString_AsString( pResult);
+      Py_DECREF( pResult);
+   }
+   else
+   {
+      AFERROR("Service:FuncGetCommand: Returned object is not a string.\n");
+      Py_DECREF( pResult);
+      return;
+   }
 
    initialized = true;
 }
 
 Service::~Service()
 {
-}
-
-const QString Service::getWDir()
-{
-   QString string;
-
-   PyObject * pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
-   if( PyString_Check( pResult))
-      string = PyString_AsString( pResult);
-   else
-      AFERROR("Service::getWDir: returned object is not a string\n");
-   Py_DECREF( pResult);
-
-   return string;
-}
-
-const QString Service::getCommand()
-{
-   QString string;
-
-   PyObject * pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
-   if( PyString_Check( pResult))
-      string = PyString_AsString( pResult);
-   else
-      AFERROR("Service::getCommand: returned object is not a string\n");
-   Py_DECREF( pResult);
-
-   return string;
 }
 
 bool Service::checkFiles( int sizemin, int sizemax)

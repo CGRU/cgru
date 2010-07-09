@@ -38,6 +38,11 @@ class service:
       if len( self.hosts): command = self.applycmdhosts( command)
       return command
 
+   def getFiles( self):
+      files = ''
+      if self.files != '': files = self.pm.toClient( self.files)
+      return files
+
    def applycmdcapacity( self, command):
       command = command.replace( self.str_capacity, str( self.capacity))
       print 'Capacity coefficient %s applied:' % str( self.capacity)

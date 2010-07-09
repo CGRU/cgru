@@ -16,6 +16,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
+#include "../libafanasy/service.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
@@ -655,8 +656,12 @@ void ListTasks::actTaskPreview( int number)
       displayWarning( "This action for task only.");
       return;
    }
+
    ItemJobTask* taskitem = (ItemJobTask*)item;
-   QString arg( taskitem ->genCmdView());
+   af::Service service( "service", taskitem->getWDir(), "", taskitem ->genCmdView());
+   QString arg  = service.getFiles();
+   QString wdir = service.getWDir();
+
    if( arg.isEmpty()) return;
    const QStringList * previewcmds = Watch::getPreviewCmds();
    int previewcmdssize = previewcmds->size();
@@ -669,7 +674,6 @@ void ListTasks::actTaskPreview( int number)
    QString cmd((*previewcmds)[number]);
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
-   QString wdir = taskitem->getWDir();
 printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
 
    QProcess * process = new QProcess( Watch::getDialog());

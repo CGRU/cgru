@@ -28,7 +28,7 @@ bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
    QStringList hosts;
    QString files;
 
-   af::Service service( argv[0], wdir, command, capacity, hosts, files, true);
+   af::Service service( argv[0], wdir, command, files, capacity);
    if( service.isInitialized() == false)
    {
       AFERRAR("Service '%s' initialization failed.\n", argv[0]);
@@ -58,7 +58,7 @@ bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
    int capacity = -1;
    QString files;
 
-   af::Service service( argv[0], wdir, command, capacity, hosts, files, true);
+   af::Service service( argv[0], wdir, command, files, capacity, hosts);
    if( service.isInitialized() == false)
    {
       AFERRAR("Service '%s' initialization failed.\n", argv[0]);

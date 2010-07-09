@@ -4,6 +4,7 @@
 #include <QtCore/QProcess>
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 
@@ -46,7 +47,7 @@ private slots:
    void p_readyRead();
 
 private:
-   af::Service * service;
+   af::Service service;
    ParserHost * parser;
    QTimer timer;
    uint8_t update_status;
