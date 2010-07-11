@@ -8,6 +8,7 @@ class parser:
       self.percentframe = 0
       self.error = False
       self.warning = False
+      self.badresult = False
 
    def do( self, data):
       print 'Erorr: parser.do: Invalid call, this method must be implemented.'
@@ -15,8 +16,11 @@ class parser:
    def parse( self, data):
       self.error = False
       self.warning = False
-      self.do( data)
-      return self.percent, self.frame, self.percentframe, self.warning, self.error
+      self.badresult = False
+      result = self.do( data)
+#      if data.find('[ BAD RESULT ]') != -1: self.badresult = True
+#      self.badresult = True
+      return result, self.percent, self.frame, self.percentframe, self.warning, self.error, sself.badresult
 
    def calculate( self):
       if self.frame < 1: self.frame = 1

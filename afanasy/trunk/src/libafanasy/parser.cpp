@@ -30,27 +30,29 @@ Parser::~Parser()
 {
 }
 
-bool Parser::parse(  char* data, int size,
-                     int &percent, int &frame, int &percentframe,
-                     bool &error, bool &warning) const
+bool Parser::parse(  QByteArray & data,
+                     int & percent, int & frame, int & percentframe,
+                     bool & warning, bool & error, bool & badresult) const
 {
    bool result = false;
-   if( data == NULL) return result;
-   if( size < 1) return result;
+   if( data.size() < 1) return result;
 
    PyObject * pArgs = PyTuple_New( 1);
-   PyTuple_SetItem( pArgs, 0, PyString_FromStringAndSize( data, size));
+   PyTuple_SetItem( pArgs, 0, PyString_FromStringAndSize( data.data(), data.size()));
    PyObject * pTuple = PyObject_CallObject( PyObj_FuncParse, pArgs);
    if( PyTuple_Check( pTuple))
    {
-      if( PyTuple_Size( pTuple) == 5)
+      if( PyTuple_Size( pTuple) == 7)
       {
-         percent        = PyInt_AsLong(    PyTuple_GetItem( pTuple, 0));
-         frame          = PyInt_AsLong(    PyTuple_GetItem( pTuple, 1));
-         percentframe   = PyInt_AsLong(    PyTuple_GetItem( pTuple, 2));
-         error          = PyObject_IsTrue( PyTuple_GetItem( pTuple, 3));
+         percent        = PyInt_AsLong(    PyTuple_GetItem( pTuple, 1));
+         frame          = PyInt_AsLong(    PyTuple_GetItem( pTuple, 2));
+         percentframe   = PyInt_AsLong(    PyTuple_GetItem( pTuple, 3));
          warning        = PyObject_IsTrue( PyTuple_GetItem( pTuple, 4));
-         result         = true;
+         error          = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
+         badresult      = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
+         PyObject * output = PyTuple_GetItem( pTuple, 0);
+         if( PyString_Check( output)) data = PyString_AsString( output);
+         result = true;
       }
       else
          AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 5\n", name.toUtf8().data());

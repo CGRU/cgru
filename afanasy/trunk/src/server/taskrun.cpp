@@ -67,7 +67,12 @@ AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data
    if   ( *counter == 0) { AFERRAR("Tasks counter is negative ! (%d)\n", *counter); }
    else ( *counter )--;
    if( exec) delete exec;
-   if( progress->state == 0 ) progress->state = AFJOB::STATE_READY_MASK;
+   
+   if( progress->state & AFJOB::STATE_DONE_MASK    ) return;
+   if( progress->state & AFJOB::STATE_ERROR_MASK   ) return;
+   if( progress->state & AFJOB::STATE_SKIPPED_MASK ) return;
+
+   progress->state = AFJOB::STATE_READY_MASK;
 }
 
 void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
@@ -99,6 +104,12 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 
    switch ( taskup.getStatus())
    {
+   case af::TaskExec::UPWarning:
+      if( false == (progress->state & AFJOB::STATE_WARNING_MASK))
+      {
+         progress->state = progress->state | AFJOB::STATE_WARNING_MASK;
+         task->updateDatabase();
+      }
    case af::TaskExec::UPPercent:
 //printf("TaskRun::update: case af::TaskExec::UPPercent:\n");
       progress->percent      = taskup.getPercent();
@@ -119,11 +130,23 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       finish( "Finished success", renders, monitoring);
       break;
    }
-   case af::TaskExec::UPFailedToStart: if( message.isEmpty()) message = "Failed to start";
-   case af::TaskExec::UPFinishedCrash: if( message.isEmpty()) message = "Finished crashed";
+   case af::TaskExec::UPFailedToStart: if( message.isEmpty()) message = "Failed to start.";
+   case af::TaskExec::UPFinishedCrash: if( message.isEmpty()) message = "Finished crashed.";
+   case af::TaskExec::UPFinishedParserError:
+      if( message.isEmpty())
+      {
+         message = "Parser error.";
+         progress->state = progress->state | AFJOB::STATE_PARSERERROR_MASK;
+      }
+   case af::TaskExec::UPFinishedParserBadResult:
+      if( message.isEmpty())
+      {
+         message = "Parser bad result.";
+         progress->state = progress->state | AFJOB::STATE_PARSERBADRESULT_MASK;
+      }
    case af::TaskExec::UPFinishedError:
    {
-      if( message.isEmpty()) message = "Finished error";
+      if( message.isEmpty()) message = "Finished error.";
       if( stopTime )
       {
          // Task was asked to be stopped before (skipped, restarted, ejected)

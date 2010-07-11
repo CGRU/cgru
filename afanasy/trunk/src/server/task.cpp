@@ -55,7 +55,9 @@ void Task::updateState( const af::MCTaskUp& taskup, RenderContainer * renders, M
    if( run == NULL)
    {
       AFERRAR("Task::updatestate: Task is not running: %s[%d][%d]\n", block->job->getName().toUtf8().data(), taskup.getNumBlock(), taskup.getNumTask());
-      if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
+      if(( taskup.getStatus() == af::TaskExec::UPPercent) ||
+         ( taskup.getStatus() == af::TaskExec::UPWarning))
+            RenderAf::closeLostTask( taskup);
       return;
    }
 //printf("Task::updateState:\n");

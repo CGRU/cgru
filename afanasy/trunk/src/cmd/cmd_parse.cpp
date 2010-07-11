@@ -48,13 +48,16 @@ bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
       int percentframe = 0;
       bool error = false;
       bool warning = false;
-      if( parser.parse( buffer, size, percent, frame, percentframe, error, warning))
+      bool badresult = false;
+      QByteArray output( buffer, size);
+      if( parser.parse( output, percent, frame, percentframe, error, warning, badresult))
       {
          printf("PERCENT: %d%%", percent);
          printf("; FRAME: %d", frame);
          printf("; PERCENTFRAME: %d%%", percentframe);
          if( error) printf("; ERROR");
          if( warning) printf("; WARNING");
+         if( badresult) printf("; BAD RESULT");
          printf("\n");
       }
    }

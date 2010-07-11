@@ -17,5 +17,5 @@ class mantra(parser.parser):
             if percent >= -1 and percent <= 100:
                self.percentframe = percent
                self.percent = percent
-               return True
-      return False
+
+      if data.find('[ BAD RESULT ]') != -1: self.badresult = True

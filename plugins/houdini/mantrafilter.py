@@ -57,9 +57,10 @@ def filterCamera():
 def filterQuit():
    if tmpdir == '': return
    if imagesdir == '': return
+   badresult = False
    # Copy image files from temp directory:
+   if len(allitems) < 1: badresult = True
    allitems = os.listdir( tmpdir)
-   exitcode = 0
    for item in allitems:
       src  = os.path.join( tmpdir,    item)
       dest = os.path.join( imagesdir, item)
@@ -71,7 +72,7 @@ def filterQuit():
             print str(sys.exc_info()[1])
             print 'Unable to remove destination file:'
             print dest
-            exitcode = 1
+            badresult = True
       try:      
          print 'Moving "%s"' % dest
          shutil.move( src, imagesdir)
@@ -82,5 +83,5 @@ def filterQuit():
          print dest
       if not os.path.isfile( dest):
          print 'Error: Destination file does not exist.'
-         exitcode = 1
-   if exitcode != 0: sys.exit(1)
+         badresult = True
+   if badresult: print '[ BAD RESULT ]'

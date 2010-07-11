@@ -28,6 +28,7 @@ ParserHost::ParserHost( const QString & task_type, int num_frames):
    percentframe( 0),
    error( false),
    warning( false),
+   badresult( false),
    data( NULL),
    datasize( 0),
    overload( false),
@@ -62,29 +63,33 @@ ParserHost::~ParserHost()
    if( data   != NULL) delete [] data;
 }
 
-void ParserHost::read( char* output, int size)
+void ParserHost::read( QByteArray & output)
 {
    // return if parser initialization failed
    //
    if( init == false ) return;
 
+   parse( output);
+   char* out_data = output.data();
+   int   out_size = output.size();
+
 #ifdef AFOUTPUT
-printf("\"");for(int c=0;c<size;c++)if(output[c]>=32)printf("%c", output[c]);printf("\":\n");
+printf("\"");for(int c=0;c<out_size;c++)if(out_data[c]>=32)printf("%c", out_data[c]);printf("\":\n");
 #endif
 
    // writing output in buffer
    //
 //printf("\nParser::read: size = %d ( datasize = %d )\n", size, datasize);
-   char* copy_data = output;
-   int   copy_size = size;
-   if( (datasize+size) > DataSizeMax )
+   char* copy_data = out_data;
+   int   copy_size = out_size;
+   if( (datasize+output.size()) > DataSizeMax )
    {
 //printf("(datasize+size) > DataSizeMax : (%d+%d)>%d\n", datasize, size, DataSizeMax);
       if( datasize < DataSizeHalf )
       {
          memcpy( data+datasize, output, DataSizeHalf-datasize);
-         copy_data = output + DataSizeHalf - datasize ;
-         copy_size = size - ( DataSizeHalf - datasize);
+         copy_data = out_data + DataSizeHalf - datasize ;
+         copy_size = out_size - ( DataSizeHalf - datasize);
          datasize = DataSizeHalf;
       }
 
@@ -94,7 +99,7 @@ printf("\"");for(int c=0;c<size;c++)if(output[c]>=32)printf("%c", output[c]);pri
       if( sizeShift < datasize-DataSizeHalf ) shiftData( sizeShift);
       else
       {
-         copy_data = output + copy_size - DataSizeHalf;
+         copy_data = out_data + copy_size - DataSizeHalf;
          copy_size = DataSizeHalf;
          datasize  = DataSizeHalf;
 //printf("sizeShift >= datasize-DataSizeHalf ( %d >= %d-%d )\n", sizeShift, datasize, DataSizeHalf);
@@ -118,8 +123,6 @@ fflush( stdout);
 #endif*/
 
 //printf("end: datasize = %d\n", datasize);
-
-   parse( output, size);
 }
 
 bool ParserHost::shiftData( int shift)
@@ -141,17 +144,24 @@ void ParserHost::setOverload()
    overload = true;
 }
 
-void ParserHost::parse( char* output, int size)
+void ParserHost::parse( QByteArray & output)
 {
    if( parser )
    {
-      parser->parse( output, size, percent, frame, percentframe, error, warning);
+      bool _warning   = false;
+      bool _error     = false;
+      bool _badresult = false;
+      parser->parse( output, percent, frame, percentframe, _warning, _error, _badresult);
+      if ( _error     ) error     = true;
+      if ( _warning   ) warning   = true;
+      if ( _badresult ) badresult = true;
 #ifdef AFOUTPUT
       printf("PERCENT: %d%%", percent);
       printf("; FRAME: %d", frame);
       printf("; PERCENTFRAME: %d%%", percentframe);
-      if( error) printf("; ERROR");
-      if( warning) printf("; WARNING");
+      if( _error) printf("; ERROR");
+      if( _warning) printf("; WARNING");
+      if( _badresult) printf("; BAD RESULT");
       printf("\n");
 #endif
    }

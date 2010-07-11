@@ -27,3 +27,5 @@ class generic(parser.parser):
             needcalc = True
             self.percentframe = int(data[percent_pos+PERCENT_len:ppos])
       if( needcalc ): self.calculate()
+
+      if data.find('[ BAD RESULT ]') != -1: self.badresult = True

@@ -12,7 +12,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const int ItemJobTask::WidthInfo = 85;
+const int ItemJobTask::WidthInfo = 98;
 
 ItemJobTask::ItemJobTask( const af::BlockData *pBlock, int numtask):
    Item( pBlock->genTaskName( numtask), ItemId),
@@ -69,7 +69,12 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 
    QString leftString = name;
 
-   QString rightString = QString("s%1/%2e %3").arg(taskprogress.starts_count).arg(taskprogress.errors_count).arg(taskprogress.hostname);
+   QString rightString = QString("s%1/%2e").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
+   if( false == taskprogress.hostname.isEmpty() ) rightString += " " + taskprogress.hostname;
+
+   if( taskprogress.state & AFJOB::STATE_WARNING_MASK ) rightString = "Warning! " + rightString;
+   if( taskprogress.state & AFJOB::STATE_PARSERERROR_MASK ) rightString = "Bad Output! " + rightString;
+   if( taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK ) rightString = "Bad Result! " + rightString;
 
    if( taskprogress.state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK)) percent = 100;
    else
@@ -120,11 +125,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    }
 
    painter->drawText( x+2, y+1, w - WidthInfo - 65, 12, Qt::AlignTop | Qt::AlignLeft, leftString );
-   if( taskprogress.state & AFJOB::STATE_ERROR_MASK)
-   {
-      painter->setPen( afqt::QEnvironment::qclr_black );
-      painter->setFont( afqt::QEnvironment::f_name);
-   }
+   if( taskprogress.state & AFJOB::STATE_ERROR_MASK) painter->setPen( afqt::QEnvironment::qclr_black );
    painter->drawText( x+1, y+1, w - WidthInfo-1, Height, Qt::AlignTop | Qt::AlignRight, rightString );
 
    if( taskprogress.state & AFJOB::STATE_RUNNING_MASK)

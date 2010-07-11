@@ -19,9 +19,9 @@ public:
 
    inline bool isInitialized() const { return initialized;}
 
-   bool parse( char* data, int size,
-               int &percent, int &frame, int &percentframe,
-               bool &error, bool &warning) const;
+   bool parse( QByteArray & data,
+               int & percent, int & frame, int & percentframe,
+               bool & warning, bool & error, bool & badresult) const;
 
 private:
    bool initialized;

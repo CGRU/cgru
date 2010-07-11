@@ -62,8 +62,8 @@ namespace AFGUI
 
 #else
 
-   const int  FONT_SIZENAME            = 8;
-   const int  FONT_SIZEINFO            = 7;
+   const int  FONT_SIZENAME            = 10;
+   const int  FONT_SIZEINFO            = 8;
    const int  FONT_SIZEMIN             = 5;
 
 // Qt GUI Palette:

@@ -1,5 +1,6 @@
 #include "listtasks.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QEvent>
 #include <QtCore/QProcess>
 #include <QtCore/QTimer>
@@ -677,7 +678,14 @@ void ListTasks::actTaskPreview( int number)
 printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
 
    QProcess * process = new QProcess( Watch::getDialog());
-   process->setWorkingDirectory( wdir);
+   if( false == QDir( wdir).exists())
+   {
+      AFERROR("Working directory does not exists.\n");
+   }
+   else
+   {
+      process->setWorkingDirectory( wdir);
+   }
    process->start( cmd);
 }
 

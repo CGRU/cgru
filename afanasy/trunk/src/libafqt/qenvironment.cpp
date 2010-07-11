@@ -165,8 +165,10 @@ void QEnvironment::initFonts()
    f_name.setBold(true);
    f_name.setFamily(    font_family.str );
    f_name.setPointSize( font_sizename.n );
+   f_info.setBold(true);
    f_info.setFamily(    font_family.str );
    f_info.setPointSize( font_sizeinfo.n );
+   f_min.setBold(true);
    f_min.setFamily(     font_family.str );
    f_min.setPointSize(  font_sizemin.n  );
 }

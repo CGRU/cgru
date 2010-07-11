@@ -106,10 +106,12 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 {
    if( update_status == 0 ) return;
    printf("\nFinished: "); exec->stdOut( false);
+
    if(( exitStatus != QProcess::NormalExit ) || ( stop_time != 0 ))
    {
-      update_status = af::TaskExec::UPFinishedCrash;
       printf("Task terminated/killed.\n");
+      if( update_status != af::TaskExec::UPFinishedParserError )
+         update_status = af::TaskExec::UPFinishedCrash;
    }
    else
    {
@@ -117,6 +119,11 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
       {
          update_status = af::TaskExec::UPFinishedError;
          printf("Error: exitcode = %d.\n", exitCode);
+      }
+      else if( parser && parser->isBadResult())
+      {
+         update_status = af::TaskExec::UPFinishedParserBadResult;
+         printf("Error: Bad result from parser (exitcode = %d).\n", exitCode);
       }
       else
       {
@@ -137,25 +144,38 @@ void TaskProcess::p_readyRead()
       return;
    }
 
-   parser->read( output.data(), output.size());
+   parser->read( output);
 
-   if( exec->getListenAddressesNum() == 0 ) return;
-
+   if( exec->getListenAddressesNum())
+   {
 #ifdef AFOUTPUT
 printf("Sending output to addresses:");
 #endif
-   af::MCTaskOutput mctaskoutput( pRENDER->getName(), exec->getJobId(), exec->getBlockNum(), exec->getTaskNum(), output.size(), output.data());
-   const std::list<af::Address*> * addresses = exec->getListenAddresses();
-   for( std::list<af::Address*>::const_iterator it = addresses->begin(); it != addresses->end(); it++)
-   {
+      af::MCTaskOutput mctaskoutput( pRENDER->getName(), exec->getJobId(), exec->getBlockNum(), exec->getTaskNum(), output.size(), output.data());
+      const std::list<af::Address*> * addresses = exec->getListenAddresses();
+      for( std::list<af::Address*>::const_iterator it = addresses->begin(); it != addresses->end(); it++)
+      {
 #ifdef AFOUTPUT
 printf(" ");(*it)->stdOut();
 #endif
-      if( pCLIENT) pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, *it));
-   }
+         if( pCLIENT) pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, *it));
+      }
 #ifdef AFOUTPUT
 printf("\n");
 #endif
+   }
+
+   if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning))
+   {
+      printf("Warning: Bad result from parser.\n");
+      update_status = af::TaskExec::UPWarning;
+   }
+   if( parser->hasError() && ( stop_time == 0 ))
+   {
+      printf("Error: Bad result from parser. Stopping task.\n");
+      update_status = af::TaskExec::UPFinishedParserError;
+      stop();
+   }
 }
 
 void TaskProcess::sendTaskSate()
@@ -168,7 +188,8 @@ void TaskProcess::sendTaskSate()
    char * stdout_data = NULL;
    int    stdout_size = 0;
 
-   if( update_status != af::TaskExec::UPPercent )
+   if(( update_status != af::TaskExec::UPPercent ) &&
+      ( update_status != af::TaskExec::UPWarning ))
    {
       timer.setInterval( 10 * af::Environment::getRenderUpdateTaskPeriod() * 1000);
       type = af::Msg::TTaskUpdateState;

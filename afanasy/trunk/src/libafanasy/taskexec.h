@@ -97,10 +97,13 @@ public:
 
       UPStarted,
       UPPercent,
+      UPWarning,
 
       UPFinishedSuccess,
       UPFinishedError,
       UPFinishedCrash,
+      UPFinishedParserError,
+      UPFinishedParserBadResult,
 
       UPRenderDeregister,
       UPRenderExit,

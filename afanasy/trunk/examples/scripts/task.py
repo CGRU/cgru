@@ -66,4 +66,6 @@ for f in range( frame_start, frame_end + 1):
       time.sleep(sleepsec)
       sys.stdout.flush()
 
+#print '[ BAD RESULT ]'
+sys.stdout.flush()
 print 'Finished at ' + strftime('%A %d %B %H:%M:%S')

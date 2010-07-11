@@ -174,7 +174,7 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
    painter->setPen( clrTextMain( option) );
    painter->setFont( afqt::QEnvironment::f_name);
-   painter->drawText( x+30, y+12, name);
+   painter->drawText( x+30, y+13, name);
    printfState( state, x+35+(w>>3), y+25, painter, option);
 
    painter->setFont( afqt::QEnvironment::f_info);

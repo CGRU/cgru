@@ -15,13 +15,16 @@ public:
    ParserHost( const QString & task_type, int num_frames);
    ~ParserHost();
 
-   void read( char* output, int size);
+   void read( QByteArray & output);
 
    inline bool initialized() const { return init;}
 
    inline int getPercent()      const { return percent      ;}
    inline int getFrame()        const { return frame        ;}
    inline int getPercentFrame() const { return percentframe ;}
+   inline int hasWarning()      const { return warning      ;}
+   inline int hasError()        const { return error        ;}
+   inline int isBadResult()     const { return badresult    ;}
 
    inline char* getData( int *size ) const { *size = datasize; return data;}
 
@@ -36,6 +39,7 @@ private:
    int  percentframe;
    bool error;
    bool warning;
+   bool badresult;
 
    char*              data;
    int                datasize;
@@ -51,5 +55,5 @@ private:
 private:
    void setOverload();
    bool shiftData( int offset);
-   void parse( char* output, int size);
+   void parse( QByteArray & output);
 };
