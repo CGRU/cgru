@@ -34,7 +34,15 @@ output   = options.output
 ignoreInputs = options.ignore_inputs
 #print ignore_inputs
 
+# Loading HIP file, and force HIP variable:
 hou.hipFile.load(hip,True)
+envhip = os.path.abspath( hip)
+envhip = os.path.dirname( envhip)
+envhip = envhip.replace('\\\\','/')
+envhip = envhip.replace('\\','/')
+print 'Setting HIP to "%s"' % envhip
+os.environ['HIP'] = envhip
+hou.hscript('set HIP=' + envhip)
 
 # Establish ROP to be used
 if rop[0] != '/':
