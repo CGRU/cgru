@@ -1,6 +1,6 @@
 #!/usr/bin/env hython
 
-import sys
+import os, sys
 from optparse import OptionParser
 import parsers.hbatch
 
