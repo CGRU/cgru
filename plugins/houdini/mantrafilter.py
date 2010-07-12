@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import mantra
 import sys, os, shutil
+import parsers.parser
 
 tmpdir = ''
 tilerender = False
@@ -59,8 +60,8 @@ def filterQuit():
    if imagesdir == '': return
    badresult = False
    # Copy image files from temp directory:
-   if len(allitems) < 1: badresult = True
    allitems = os.listdir( tmpdir)
+   if len(allitems) < 1: badresult = True
    for item in allitems:
       src  = os.path.join( tmpdir,    item)
       dest = os.path.join( imagesdir, item)
@@ -72,8 +73,9 @@ def filterQuit():
             print str(sys.exc_info()[1])
             print 'Unable to remove destination file:'
             print dest
-            badresult = True
-      try:      
+            print parsers.parser.str_badresult
+            sys.stdout.flush()
+      try:
          print 'Moving "%s"' % dest
          shutil.move( src, imagesdir)
       except:
@@ -83,5 +85,5 @@ def filterQuit():
          print dest
       if not os.path.isfile( dest):
          print 'Error: Destination file does not exist.'
-         badresult = True
-   if badresult: print '[ BAD RESULT ]'
+         print parsers.parser.str_badresult
+         sys.stdout.flush()
