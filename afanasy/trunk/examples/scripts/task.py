@@ -7,6 +7,8 @@ import signal
 import sys
 import time
 
+import parsers.parser
+
 def interrupt( signum, frame):
    exit('\nInterrupt signal received...')
 
@@ -66,6 +68,8 @@ for f in range( frame_start, frame_end + 1):
       time.sleep(sleepsec)
       sys.stdout.flush()
 
-#print '[ BAD RESULT ]'
+#print parsers.parser.str_warning
+print parsers.parser.str_error
+#print parsers.parser.str_badresult
 sys.stdout.flush()
 print 'Finished at ' + strftime('%A %d %B %H:%M:%S')

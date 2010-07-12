@@ -675,8 +675,7 @@ void ListTasks::actTaskPreview( int number)
    QString cmd((*previewcmds)[number]);
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
-printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
-
+   printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
    QProcess * process = new QProcess( Watch::getDialog());
    if( false == QDir( wdir).exists())
    {
@@ -686,7 +685,14 @@ printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
    {
       process->setWorkingDirectory( wdir);
    }
-   process->start( cmd);
+   QStringList args;
+#ifdef WINNT
+   args << "/c" << cmd;
+   process->start( "cmd.exe", args, QIODevice::ReadWrite);
+#else
+   args << "-c" << cmd;
+   process->start( "/bin/bash", args, QIODevice::ReadWrite);
+#endif
 }
 
 void ListTasks::actTaskListen()

@@ -1,3 +1,7 @@
+str_warning   = '[ PARSER WARNING ]'
+str_error     = '[ PARSER ERROR ]'
+str_badresult = '[ PARSER BAD RESULT ]'
+
 class parser:
    "This is base class, not to be instanced"
    def __init__( self, frames = 1):
@@ -14,13 +18,19 @@ class parser:
       print 'Erorr: parser.do: Invalid call, this method must be implemented.'
 
    def parse( self, data):
-      self.error = False
       self.warning = False
+      self.error = False
       self.badresult = False
-      result = self.do( data)
-#      if data.find('[ BAD RESULT ]') != -1: self.badresult = True
-#      self.badresult = True
-      return result, self.percent, self.frame, self.percentframe, self.warning, self.error, sself.badresult
+      result = None
+      if data.find( str_warning  ) != -1: self.warning   = True
+      if data.find( str_error    ) != -1: self.error     = True
+      if data.find( str_badresult) != -1: self.badresult = True
+      try:
+         result = self.do( data)
+      except:
+         print 'Error parsing output:'
+         print str(sys.exc_info()[1])
+      return result, self.percent, self.frame, self.percentframe, self.warning, self.error, self.badresult
 
    def calculate( self):
       if self.frame < 1: self.frame = 1

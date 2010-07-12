@@ -2,4 +2,4 @@ PUSHD ..\..
 call setup.cmd
 POPD
 
-python job.py *%
+python job.py %*

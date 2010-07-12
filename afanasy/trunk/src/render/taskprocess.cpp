@@ -107,6 +107,8 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
    if( update_status == 0 ) return;
    printf("\nFinished: "); exec->stdOut( false);
 
+   p_readyRead();
+
    if(( exitStatus != QProcess::NormalExit ) || ( stop_time != 0 ))
    {
       printf("Task terminated/killed.\n");
@@ -138,13 +140,15 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 void TaskProcess::p_readyRead()
 {
    QByteArray output = readAll();
+   if( output.size() == 0 ) return;
    if( parser == NULL)
    {
       printf("%s\n", output.data());
-      return;
    }
-
-   parser->read( output);
+   else
+   {
+      parser->read( output);
+   }
 
    if( exec->getListenAddressesNum())
    {
@@ -164,6 +168,8 @@ printf(" ");(*it)->stdOut();
 printf("\n");
 #endif
    }
+
+   if( parser == NULL) return;
 
    if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning))
    {
