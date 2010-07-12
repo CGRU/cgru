@@ -134,6 +134,7 @@ while frame <= flast:
 
    # Copy image files from temp directory:
    allitems = os.listdir( tmpdir)
+   moveditems = 0
    for item in allitems:
       if item.rfind('.tmp') == len(item)-4: continue
       if item.rfind('.nk') == len(item)-3: continue
@@ -148,7 +149,7 @@ while frame <= flast:
             print 'Unable to remove destination file:'
             print dest
             exitcode = 1
-      try:      
+      try:
          print 'Moving "%s"' % dest
          shutil.move( src, imagesdir)
       except:
@@ -159,7 +160,14 @@ while frame <= flast:
       if not os.path.isfile( dest):
          print 'Error: Destination file does not exist.'
          exitcode = 1
+      else:
+         moveditems += 1
 
+   if( moveditems < 1 ):
+      print 'Error: No images generated.'
+      exitcode = 1
+   else:
+      print 'Images generated: %d' % moveditems
    sys.stdout.flush()
    if exitcode != 0: break
    frame += fby

@@ -61,7 +61,9 @@ def filterQuit():
    badresult = False
    # Copy image files from temp directory:
    allitems = os.listdir( tmpdir)
-   if len(allitems) < 1: badresult = True
+   if len(allitems) < 1:
+      print parsers.parser.str_badresult
+      sys.stdout.flush()
    for item in allitems:
       src  = os.path.join( tmpdir,    item)
       dest = os.path.join( imagesdir, item)
