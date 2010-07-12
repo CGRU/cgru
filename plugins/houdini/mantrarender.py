@@ -102,7 +102,7 @@ exitcode = p.wait()
 
 if tmpdir != '':
    # Remove temp directory:
-   try:      
+   try:
       shutil.rmtree( tmpdir)
    except:
       print 'Unable to remove temporary directory:'
@@ -112,6 +112,7 @@ if tmpdir != '':
 if exitcode == 0:
    # Remove ROP file:
    if ropfile != '':
+      print 'Removing ROP file "%s"' % ropfile
       if os.path.isfile( ropfile):
          try:
             os.remove( ropfile)
@@ -119,5 +120,7 @@ if exitcode == 0:
             print 'Unable to remove ROP file:'
             print ropfile
             print str(sys.exc_info()[1])
+      else:
+         print 'ROP file does not exist.'
 
 sys.exit(exitcode)

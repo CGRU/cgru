@@ -24,7 +24,7 @@
 #include "../include/macrooutput.h"
 
 const int BlockInfo::Height        = 40;
-const int BlockInfo::HeightCompact = 10;
+const int BlockInfo::HeightCompact = 12;
 
 BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
    str_runtime("Run Time"),
