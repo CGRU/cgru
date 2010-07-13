@@ -382,5 +382,13 @@ void ListRenders::actCommand( int number)
 printf("Starting '%s'\n", cmd.toUtf8().data());
 
    QProcess * process = new QProcess( Watch::getDialog());
-   process->start( cmd);
+
+   QStringList args;
+#ifdef WINNT
+   args << "/c" << cmd;
+   process->start( "cmd.exe", args, QIODevice::ReadWrite);
+#else
+   args << "-c" << cmd;
+   process->start( "/bin/bash", args, QIODevice::ReadWrite);
+#endif
 }
