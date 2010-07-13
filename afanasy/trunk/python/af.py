@@ -30,6 +30,9 @@ class Task(pyaf.Task):
    def setCommand( self, cmd, TransferToServer = True):
       if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Task.setCommand( self, str(cmd))
+   def setCommandView( self, cmd, TransferToServer = True):
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
+      pyaf.Task.setCommandView( self, str(cmd))
 
 class Block(pyaf.Block):
    def __init__( self, blockname = 'block', blocktype = 'generic'):
@@ -73,6 +76,9 @@ class Block(pyaf.Block):
       if prefix: cmd = os.getenv('AF_CMD_PREFIX', self.env.Vars['cmdprefix']) + str(cmd)
       if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Block.setCommand( self, str(cmd))
+   def setCommandView(  self, cmd, TransferToServer = True):
+      if TransferToServer: cmd = self.pm.toServer( str(cmd))
+      pyaf.Block.setCommandView(  self, str(cmd))
    def setCmdPre(  self, cmd, TransferToServer = True):
       if TransferToServer: cmd = self.pm.toServer( str(cmd))
       pyaf.Block.setCmdPre(  self, str(cmd))

@@ -2,6 +2,8 @@ import re, os, shutil, time
 
 import webbrowser
 
+import af
+
 #Get handles to the xsi application
 #Application = win32com.client.Dispatch('XSI.Application')
 
@@ -77,7 +79,7 @@ def SubmitButton_OnClicked():
 
    for cpass in passes:
 
-      images = ''
+      images = []
       # Get framebuffers:
       for ps in scene.Passes:
          if ps.Name != cpass: continue
@@ -97,8 +99,7 @@ def SubmitButton_OnClicked():
                      pad += 'd'
                      newpart = part.replace( num, pad)
                      filename = filename.replace( part, newpart)
-                     if images != '': images += ';'
-                     images += filename
+                     images.append( filename)
                else:
                   Application.LogMessage('Can`t solve "%s"' % filename)
 
@@ -131,33 +132,71 @@ def SubmitButton_OnClicked():
 
       # Construct job:
       Application.LogMessage('Sending "%s" pass, range: %d-%d,%d' % (cpass, cp_frame_start, cp_frame_end, cp_frame_by))
-      cmd = os.environ['AF_ROOT']
-      cmd = os.path.join( cmd, 'python')
-      cmd = os.path.join( cmd, 'afjob.py')
-      cmd = 'python "%s"' % cmd
-      cmd += ' "%s"' % tmpscene
-      cmd += ' %d' % cp_frame_start
-      cmd += ' %d' % cp_frame_end
-      cmd += ' -fpr %d' % frame_fpt
-      cmd += ' -by %d' % cp_frame_by
-      cmd += ' -take "%s"' % cpass
-      cmd += ' -name "%s"' % curjobname
-      if images    != '': cmd += ' -images "%s"'   % images
-      if capacity  != -1: cmd += ' -capacity %d'   % capacity
-      if priority  != -1: cmd += ' -priority %d'   % priority
-      if maxhosts  != -1: cmd += ' -maxhosts %d'   % maxhosts
-      if maxruntime >  0: cmd += ' -maxruntime %d' % maxruntime
-      if hostsmask         != None and hostsmask         != '': cmd += ' -hostsmask "%s"' % hostsmask
-      if hostsmaskexclude  != None and hostsmaskexclude  != '': cmd += ' -hostsexcl "%s"' % hostsmaskexclude
-      if dependmask        != None and dependmask        != '': cmd += ' -depmask "%s"'   % dependmask
-      if dependmaskglobal  != None and dependmaskglobal  != '': cmd += ' -depglbl "%s"'   % dependmaskglobal
 
-      if simulate: cmd += ' -simulate'
-      if paused: cmd += ' -pause'
+#xsibatch -script "%XSI_CGRU_PATH%\afrender.py" -lang Python -main afRenderCurPass -args
+#-scenePath "%CD%\project\Scenes\scene.scn" -startFrame 1 -endFrame 2 -step 1 -simulate 0 -setAttr torus.polymsh.geom.enduangle -setValue 120
+
+      blocknames = []
+      blockcmds = []
+      blockimages = []
+
+      cmd = os.environ['XSI_CGRU_PATH']
+      cmd = os.path.join( cmd, 'afrender.py')
+      cmd = 'xsibatch -script %s' % cmd
+      cmd += ' -lang Python -main afRender -args'
+      cmd += ' -scene %s' % tmpscene
+      cmd += ' -start %1 -end %2 -step ' + str(cp_frame_by)
+      cmd += ' -simulate'
+      if simulate:   cmd += ' 1'
+      else:          cmd += ' 0'
+      cmd += ' -renderPass ' + cpass
       if varirender:
-         cmd += ' -varirender %s %d %d %d' % (varirender_attr, varirender_start, varirender_step, varirender_count)
-      cmd += ' -deletescene'
-      Application.LogMessage(cmd)
+         cmd += ' -attr ' + varirender_attr + ' -value '
+         value = varirender_start
+         for i in range( 0, varirender_count):
+            blockcmds.append( cmd + str(value))
+            blocknames.append( 'variant[%d]' % value)
+            images_str = ''
+            for img in images:
+               img_dir = os.path.dirname( img)
+               img_name = os.path.basename( img)
+               img_dir = os.path.join( img_dir, str(value))
+               img = os.path.join( img_dir, img_name)
+               if images_str != '': images_str += ';'
+               images_str += img
+            blockimages.append( images_str)
+            value += varirender_step
+      else:
+         images_str = ''
+         for img in images:
+            if images_str != '': images_str += ';'
+            images_str += img
+ 
+      job=af.Job( curjobname)
+      job.setCmdPost('rm "%s"' % tmpscene)
+      if priority  != -1: job.setPriority( priority)
+      if maxhosts  != -1: job.setMaxHosts( maxhosts)
+      if hostsmask         != None and hostsmask         != '': job.setHostsMask( hostsmask)
+      if hostsmaskexclude  != None and hostsmaskexclude  != '': job.setHostsMaskExclude( hostsmaskexclude)
+      if dependmask        != None and dependmask        != '': job.setDependMask( dependmask)
+      if dependmaskglobal  != None and dependmaskglobal  != '': job.setDependMaskGlobal( dependmaskglobal)
+      if paused: job.offLine()
+
+      if len( blocknames) == 0:
+         blocknames.append( blockname)
+         blockcmds.append( cmd)
+         blockimages.append( images_str)
+
+      i = 0
+      for blockname in blocknames:
+         block = af.Block( blockname, 'xsi')
+         block.setCommand( blockcmds[i])
+         block.setCommandView( blockimages[i])
+         block.setNumeric( cp_frame_start, cp_frame_end, frame_fpt, cp_frame_by)
+         if capacity   != -1: block.setCapacity( capacity)
+         if maxruntime !=  0: block.setTasksMaxRunTime( maxruntime)
+         job.blocks.append( block)
+         i += 1
 
       # Send job:
-      os.system(cmd)
+      job.send()

@@ -4,16 +4,18 @@ import os
 import sys
 
 def findPathEnd( path):
+   PathEnd = ' ";:'
    position = 0
    pathlen = len(path)
    if pathlen <= 1: return 1
    while position < pathlen:
       position += 1
-      if position >= pathlen or path[position] == ' ': break
+      if position >= pathlen: break
+      if path[position] in PathEnd: break
    return position
 
 def findNextPosition( position, path):
-   PathBegin = ' "'
+   PathBegin = ' ";:'
    founded = False
    pathlen = len(path)
    if position >= pathlen: return -1
