@@ -69,7 +69,7 @@ for f in range( frame_start, frame_end + 1):
       sys.stdout.flush()
 
 #print parsers.parser.str_warning
-print parsers.parser.str_error
+#print parsers.parser.str_error
 #print parsers.parser.str_badresult
 sys.stdout.flush()
 print 'Finished at ' + strftime('%A %d %B %H:%M:%S')

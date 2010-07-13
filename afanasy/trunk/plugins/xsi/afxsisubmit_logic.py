@@ -1,4 +1,4 @@
-import os, shutil, time
+import re, os, shutil, time
 
 import webbrowser
 
@@ -21,25 +21,12 @@ def SubmitButton_OnClicked():
       Application.LogMessage('Error: Can\'t find options.')
       PPG.Close()
 
+   # Save scene:
    Application.SaveScene()
    scene = Application.ActiveProject.ActiveScene
-
-   # Copy scene to temporary file:
    scenefile = scene.Filename.Value
    if not os.path.isfile( scenefile):
       Application.LogMessage('Error: Can\'t save scene.')
-      return
-   ftime = time.time()
-   tmpscene = scenefile + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + '.scn'
-   try:
-      shutil.copyfile( scenefile, tmpscene)
-   except:
-      Application.LogMessage('Unable to copy temporary scene:')
-      Application.LogMessage( tmpscene)
-      Application.LogMessage( str(sys.exc_info()[1]))
-      return
-   if not os.path.isfile( tmpscene):
-      Application.LogMessage('Error: Can\'t save temporary scene.')
       return
 
    range_frompass    = opSet.Parameters('afRange_frompass'  ).Value
@@ -86,9 +73,52 @@ def SubmitButton_OnClicked():
    else:
       passes.append( passesOption)
 
-#   python "%AF_ROOT%/python/afjob.py" "%CD%\project\Scenes\scene.scn" 1 2 -fpr 1 -take Default_Pass -name XSI_Job
+   padding = Application.GetValue('Passes.RenderOptions.FramePadding')
 
    for cpass in passes:
+
+      images = ''
+      # Get framebuffers:
+      for ps in scene.Passes:
+         if ps.Name != cpass: continue
+         for fb in ps.Framebuffers:
+            if fb.Enabled.Value:
+               format = fb.Format.Value
+               filename = fb.ResolvedFilename.Value
+               pattern = r'\d+.' + format + '$'
+               match = re.search( pattern, filename)
+               if match is not None:
+                  part = match.group(0)               
+                  match = re.search(r'\d+', part)
+                  if match is not None:
+                     num = match.group(0)
+                     pad = '%'
+                     if padding > 1: pad += '0' + str( padding)
+                     pad += 'd'
+                     newpart = part.replace( num, pad)
+                     filename = filename.replace( part, newpart)
+                     if images != '': images += ';'
+                     images += filename
+               else:
+                  Application.LogMessage('Can`t solve "%s"' % filename)
+
+      # Copy scene to temporary file:
+      curjobname = jobname
+      if len(passes) > 1: curjobname += '-%s' % cpass
+      ftime = time.time()
+      tmpscene = scenefile + '.' + curjobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + '.scn'
+      try:
+         shutil.copyfile( scenefile, tmpscene)
+      except:
+         Application.LogMessage('Unable to copy temporary scene:')
+         Application.LogMessage( tmpscene)
+         Application.LogMessage( str(sys.exc_info()[1]))
+         return
+      if not os.path.isfile( tmpscene):
+         Application.LogMessage('Error: Can\'t save temporary scene.')
+         return
+
+      # Get frame range:
       cp_frame_start = frame_start
       cp_frame_end = frame_end
       cp_frame_by = frame_by
@@ -98,9 +128,9 @@ def SubmitButton_OnClicked():
                cp_frame_start = Application.GetValue('Passes.%s.FrameStart' % cpass)
                cp_frame_end = Application.GetValue('Passes.%s.FrameEnd' % cpass)
                cp_frame_by = Application.GetValue('Passes.%s.FrameStep' % cpass)
+
+      # Construct job:
       Application.LogMessage('Sending "%s" pass, range: %d-%d,%d' % (cpass, cp_frame_start, cp_frame_end, cp_frame_by))
-      curjobname = jobname
-      if len(passes) > 1: curjobname += '-%s' % cpass
       cmd = os.environ['AF_ROOT']
       cmd = os.path.join( cmd, 'python')
       cmd = os.path.join( cmd, 'afjob.py')
@@ -112,6 +142,7 @@ def SubmitButton_OnClicked():
       cmd += ' -by %d' % cp_frame_by
       cmd += ' -take "%s"' % cpass
       cmd += ' -name "%s"' % curjobname
+      if images    != '': cmd += ' -images "%s"'   % images
       if capacity  != -1: cmd += ' -capacity %d'   % capacity
       if priority  != -1: cmd += ' -priority %d'   % priority
       if maxhosts  != -1: cmd += ' -maxhosts %d'   % maxhosts
@@ -120,10 +151,13 @@ def SubmitButton_OnClicked():
       if hostsmaskexclude  != None and hostsmaskexclude  != '': cmd += ' -hostsexcl "%s"' % hostsmaskexclude
       if dependmask        != None and dependmask        != '': cmd += ' -depmask "%s"'   % dependmask
       if dependmaskglobal  != None and dependmaskglobal  != '': cmd += ' -depglbl "%s"'   % dependmaskglobal
+
       if simulate: cmd += ' -simulate'
       if paused: cmd += ' -pause'
       if varirender:
          cmd += ' -varirender %s %d %d %d' % (varirender_attr, varirender_start, varirender_step, varirender_count)
       cmd += ' -deletescene'
       Application.LogMessage(cmd)
+
+      # Send job:
       os.system(cmd)

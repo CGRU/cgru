@@ -153,6 +153,22 @@
                <DataType>RGB</DataType>
                <BitDepth>3</BitDepth>
             </FrameBuffer>
+            <FrameBuffer name="Depth">
+               <RenderChannel>Depth</RenderChannel>
+               <Enabled>0</Enabled>
+               <Filename>[Pass]_[Framebuffer]</Filename>
+               <Format>exr</Format>
+               <DataType>Depth</DataType>
+               <BitDepth>21</BitDepth>
+            </FrameBuffer>
+            <FrameBuffer name="Normal">
+               <RenderChannel>Normal</RenderChannel>
+               <Enabled>1</Enabled>
+               <Filename>[Pass]_[Framebuffer]</Filename>
+               <Format>exr</Format>
+               <DataType>Normal</DataType>
+               <BitDepth>21</BitDepth>
+            </FrameBuffer>
          </FrameBuffers>
       </Pass>
    </Passes>
