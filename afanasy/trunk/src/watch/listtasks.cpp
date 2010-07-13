@@ -158,28 +158,34 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 
          if( ((ItemJobTask*)(item))->genCmdView().isEmpty() == false )
          {
+            QStringList images = ((ItemJobTask*)(item))->genCmdView().split(';');
             const QStringList * previewcmds = Watch::getPreviewCmds();
-            int previewcmdssize = previewcmds->size();
-            if( previewcmdssize > 0 )
+            if( previewcmds->size() > 0 )
             {
                menu.addSeparator();
-               if( previewcmdssize > 1)
+               QMenu * submenu_cmd = new QMenu( "Preview", this);
+               for( int p = 0; p < previewcmds->size(); p++)
                {
-                  QMenu * submenu = new QMenu( "Preview", this);
-                  for( int i = 0; i < previewcmdssize; i++)
+                  if( images.size() > 1)
                   {
-                     ActionId * actionid = new ActionId( i, QString("%1").arg((*previewcmds)[i]), this);
-                     connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskPreview( int ) ));
-                     submenu->addAction( actionid);
+                     QMenu * submenu_img = new QMenu( QString("%1").arg((*previewcmds)[p]), this);
+                     for( int i = 0; i < images.size(); i++)
+                     {
+                        QString imgname = images[i].right(99);
+                        ActionIdId * actionid = new ActionIdId( p, i, imgname, this);
+                        connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+                        submenu_img->addAction( actionid);
+                     }
+                     submenu_cmd->addMenu( submenu_img);
                   }
-                  menu.addMenu( submenu);
+                  else
+                  {
+                     ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg((*previewcmds)[p]), this);
+                     connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+                     submenu_cmd->addAction( actionid);
+                  }
                }
-               else
-               {
-                  ActionId * actionid = new ActionId( 0, QString("Preview (%1)").arg((*previewcmds)[0]), this);
-                  connect( actionid, SIGNAL( triggeredId( int) ), this, SLOT( actTaskPreview(int) ));
-                  menu.addAction( actionid);
-               }
+               menu.addMenu( submenu_cmd);
             }
          }
 
@@ -644,7 +650,7 @@ void ListTasks::setBlockProperty( int type, af::MCGeneral & mcgeneral)
    Watch::sendMsg( msg);
 }
 
-void ListTasks::actTaskPreview( int number)
+void ListTasks::actTaskPreview( int num_cmd, int num_img)
 {
    Item* item = getCurrentItem();
    if( item == NULL )
@@ -660,19 +666,25 @@ void ListTasks::actTaskPreview( int number)
 
    ItemJobTask* taskitem = (ItemJobTask*)item;
    af::Service service( "service", taskitem->getWDir(), "", taskitem ->genCmdView());
-   QString arg  = service.getFiles();
+
+   QStringList images = service.getFiles().split(';');
+   if( num_img >= images.size())
+   {
+      displayError( "No such image nubmer.");
+      return;
+   }
+   QString arg  = images[num_img];
    QString wdir = service.getWDir();
 
    if( arg.isEmpty()) return;
    const QStringList * previewcmds = Watch::getPreviewCmds();
-   int previewcmdssize = previewcmds->size();
-   if( number >= previewcmdssize )
+   if( num_cmd >= previewcmds->size())
    {
-      displayError( "No such preview command.");
+      displayError( "No such command number.");
       return;
    }
 
-   QString cmd((*previewcmds)[number]);
+   QString cmd((*previewcmds)[num_cmd]);
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
    printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());

@@ -45,7 +45,7 @@ private slots:
    void actTaskLog();
    void actTaskStdOut( int number );
    void actTaskErrorHosts();
-   void actTaskPreview( int number);
+   void actTaskPreview( int num_cmd, int num_img);
    void actTaskListen();
    void actTasksRestart();
    void actTasksSkip();
