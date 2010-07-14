@@ -116,11 +116,11 @@ for i in xrange(0,lenInputs):
    if nodeType == 'ifd':
       block_type += '_mantra'
       images = str( node.parm('vm_picture').eval())
-      if images != 'ip': block.setCommandView( images)
+      if images != 'ip': block.setFiles( images)
    elif nodeType == 'rib':
       block_type += '_prman'
       images = str( node.parm('ri_display').eval())
-      if images != 'ip': block.setCommandView( images)
+      if images != 'ip': block.setFiles( images)
    elif nodeType == 'af_cmd_sender':
       block_cmd = str( node.parm('command').eval())
       if block_cmd.find('mantra') > -1:

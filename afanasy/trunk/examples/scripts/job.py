@@ -130,7 +130,7 @@ for b in range( numblocks):
    else:
       block.setCommand('python task.py%(str_capacity)s %%1 -v %(verbose)d' % vars(), False)
       block.setTasksName('task %1')
-      block.setCommandView('view %1')
+      block.setFiles('view %1')
       for t in range( numtasks):
          timesec_task = timesec + randtime * random.random()
          task = af.Task('#' + str(t))

@@ -29,13 +29,13 @@ for f in range( f_start, f_finish + 1):
    for t in range( 0, tiles):
       task = af.Task('%d tile %d' % (f,t))
       task.setCommand( str(t) + cmd)
-      task.setCommandView( (img % f) + ('.tile_%d.exr' % t))
+      task.setFiles( (img % f) + ('.tile_%d.exr' % t))
       b_render.tasks.append( task)
 
 cmd = 'exrjoin %(divx)d %(divy)d %(img)s d && deletefiles %(ifd)s' % vars()
 b_exrjoin = af.Block('join tiles')
 b_exrjoin.setCommand( cmd, False)
-b_exrjoin.setCommandView( img)
+b_exrjoin.setFiles( img)
 b_exrjoin.setNumeric( f_start, f_finish)
 b_exrjoin.setTasksDependMask('render tiles')
 

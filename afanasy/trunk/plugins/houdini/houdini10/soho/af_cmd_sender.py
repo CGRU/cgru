@@ -39,7 +39,7 @@ if platform != '':
 block = af.Block( block_type, block_type)
 block.setWorkingDirectory( asset )
 block.setCommand( command)
-if preview != '': block.setCommandView( preview)
+if preview != '': block.setFiles( preview)
 block.setNumeric( start_frame, end_frame, 1)
 job.blocks.append( block)
 

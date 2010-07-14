@@ -162,14 +162,14 @@ Afanasy has a command line interface for various purposes. It can connect to Afa
    block_1 = job.addBlock('final', 'nuke')
    block_1.setWorkingDirectory('/cg/projects/test/nuke')
    block_1.setCommand('nuke -i -X WriteDPX -x scene.nk.tmp.nk %1,%2')
-   block_1.setCommandView('dpx/img.%04d.dpx')
+   block_1.setFiles('dpx/img.%04d.dpx')
    block_1.setNumeric( 1, 100, 5)
    block_1.setTasksDependMask('keying')
 
    block_2 = job.addBlock('keying', 'nuke')
    block_2.setWorkingDirectory('/cg/projects/test/nuke')
    block_2.setCommand('nuke -i -X WriteKey -x scene.nk.tmp.nk %1,%2')
-   block_2.setCommandView('key/key.%04d.exr')
+   block_2.setFiles('key/key.%04d.exr')
    block_2.setNumeric( 1, 100, 5)
    block_2.setNeedMemory( 2048)
 

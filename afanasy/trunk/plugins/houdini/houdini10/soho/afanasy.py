@@ -148,7 +148,7 @@ if platform != '':
 block = af.Block( hdriver, blocktype)
 block.setWorkingDirectory( os.getenv('PWD', os.getcwd()))
 block.setNumeric( start, end, fpr)
-if preview != '': block.setCommandView( preview)
+if preview != '': block.setFiles( preview)
 job.blocks.append( block)
 
 if enable_extended_parameters:

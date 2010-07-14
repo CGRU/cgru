@@ -142,7 +142,7 @@ class BlockParameters:
       if VERBOSE==2: print 'Generating block "%s"' % self.name
       block = af.Block( self.name, AfanasyServiceType)
       block.setNumeric( self.framefirst, self.framelast, self.framespertask)
-      block.setCommandView( self.imgfile)
+      block.setFiles( self.imgfile)
       if self.capacity != -1: block.setCapacity( self.capacity)
 
       threads = os.getenv('NUKE_AF_RENDERTHREADS', '2')

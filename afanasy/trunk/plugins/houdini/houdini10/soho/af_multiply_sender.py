@@ -173,7 +173,7 @@ for i in xrange(0,lenInputs):
    block = af.Block( name, block_type)
    block.setWorkingDirectory( asset)
    block.setCommand( block_cmd)
-   if preview != '': block.setCommandView( preview)
+   if preview != '': block.setFiles( preview)
    block.setNumeric( block_start, block_end, block_by)
    if depend_block: block.setDependMask( depend_mask)
    if depend_task: block.setTasksDependMask( depend_mask)

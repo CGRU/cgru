@@ -98,7 +98,7 @@ if run_rop:
    b_generate = af.Block( blockname, blocktype)
    b_generate.setCommand( cmd + ' -s %1 -e %2 -b 1 -t '+take+' '+tmphip+' '+rop)
    b_generate.setNumeric( f_start, f_finish)
-   if join_render: b_generate.setCommandView( images)
+   if join_render: b_generate.setFiles( images)
 
 if not join_render:
    command = 'mantra'
@@ -123,7 +123,7 @@ if not join_render:
       else: command +=  ' -V a '
       arguments = afhoudini.pathToC( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
       b_render.setCommand( command + arguments)
-      b_render.setCommandView( images)
+      b_render.setFiles( images)
       b_render.setNumeric( f_start, f_finish)
 
 if tile_render:
@@ -132,7 +132,7 @@ if tile_render:
    b_join = af.Block('join', 'generic')
    b_join.setTasksDependMask('render')
    b_join.setCommand( cmd, False)
-   b_join.setCommandView( images)
+   b_join.setFiles( images)
    b_join.setNumeric( f_start, f_finish)
 
 if read_rop:

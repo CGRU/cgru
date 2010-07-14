@@ -360,7 +360,7 @@ for cmd in cmds:
    block.setCapacity( capacity)
    block.setVariableCapacity( capmin, capmax)
    if maxruntime != 0: block.setTasksMaxRunTime( maxruntime)
-   if images != '': block.setCommandView( images)
+   if images != '': block.setFiles( images)
    blocks.append( block)
    i += 1
 
