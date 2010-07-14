@@ -475,6 +475,9 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 "TRendersList",               ///< Message with a list of online Renders.
 "TRendersListUpdates",        ///< Message with a list of resources of Renders.
 "TRenderPriority",            ///< Set Render priority,
+"TRenderCapacity",            ///< Set Render capacity,
+"TRenderService",             ///< Enable or disable Render service,
+"TRenderRestoreDefaults",     ///< Restore default Render settings,
 "TRenderNIMBY",               ///< Set Render NIMBY,
 "TRenderUser",                ///< Set Render user,
 "TRenderNimby",               ///< Set Render nimby,
@@ -545,9 +548,10 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 "TBlockMaxHosts",             ///< Set block maximum hosts.
 "TBlockCommand",              ///< Set block command.
 "TBlockWorkingDir",           ///< Set block working directory.
-"TBlockPreviewCmd",           ///< Set block preview command.
+"TBlockFiles",                ///< Set block files.
 "TBlockCmdPost",              ///< Set block post command.
 "TBlockTasksType",            ///< Set block task type.
+"TBlockParserCoeff",          ///< Set block parser coefficient.
 "TBlockParserType",           ///< Set block parser type.
 "TBlockResetErrorHosts",      ///< Reset block avoid hosts.
 "TBlockErrorsAvoidHost",      ///< Set number of errors on host to avoid it.

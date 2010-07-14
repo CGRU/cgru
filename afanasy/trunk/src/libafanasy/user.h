@@ -51,7 +51,6 @@ public:
       { if( hostsmask_exclude.isEmpty()) return false;  return hostsmask_exclude.exactMatch(str); }
 
    inline int      getMaxHosts()       const { return maxhosts;       } ///< Get maximum hosts.
-   inline bool     isPermanent()       const { return permanent;      } ///< Wheter the user is permanent.
    inline int      getNumJobs()        const { return numjobs;        } ///< Get jobs quantity.
    inline int      getNumRunningJobs() const { return numrunningjobs; } ///< Get active jobs quantity.
    inline int      getNumHosts()       const { return numhosts;       } ///< Get number of hosts used by user jobs.
@@ -66,12 +65,27 @@ public:
 /// Get maximum number or errors on same host for task NOT to avoid host
    inline uint8_t  getErrorsTaskSameHost()   const { return errors_tasksamehost; }
 
-   inline void setSolved( bool value) { solved = value; }
-   inline bool  isSolved()            { return  solved; }
+/// Set user whether user is permanent.
+/** Permanent user will not be deleted if he has no jobs, Afanasy store them in database**/
+   inline bool  isPermanent() const      { return flags & Permanent; } ///< Wheter the user is permanent.
+   inline bool setPermanent( bool value) { if(value) {flags = flags | Permanent; time_register = time( NULL);} else flags & (~Permanent);}
+
+   inline bool  isSolved() const      { return flags & Solved; }
+   inline void setSolved( bool value) { if(value) flags = flags | Solved; else flags & (~Solved);}
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
+   enum Flags
+   {
+      Permanent   = 1,
+      Solved      = 1 << 1
+   };
+
 protected:
+   uint32_t state;             ///< State.
+   uint32_t flags;             ///< Flags.
+   QString customdata;
+
    QString  hostname;          ///< User host name.
    int32_t  maxhosts;          ///< User maximum hosts.
 
@@ -85,7 +99,7 @@ protected:
 /// Maximum number or errors on same host for task NOT to avoid host
    uint8_t errors_tasksamehost;
 
-   bool permanent;             ///< Whether the user is permanent.
+//   bool permanent;             ///< Whether the user is permanent.
 
    uint32_t time_register;      ///< User registration time (when he become permanent).
 
@@ -94,7 +108,7 @@ protected:
    int32_t numhosts;          ///< User jobs hosts number.
    uint32_t time_online;      ///< User online (server registration) time.
    float need;                ///< User need for hosts.
-   bool solved;               ///< User have produced a task.
+//   bool solved;               ///< User have produced a task.
 
 private:
    void construct();

@@ -48,7 +48,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       if( setHostsMask( mcgeneral.getString()))
       {
          appendLog( QString("Hosts mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
-         if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
+         if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
       }
       break;
    }
@@ -57,7 +57,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       if( setHostsMaskExclude( mcgeneral.getString()))
       {
          appendLog( QString("Hosts mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
-         if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask_exclude);
+         if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask_exclude);
       }
       break;
    }
@@ -65,35 +65,35 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
       appendLog( QString("Maximum hosts set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       maxhosts = mcgeneral.getNumber();
-      if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxhosts);
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxhosts);
       break;
    }
    case af::Msg::TUserPriority:
    {
       appendLog( QString("Priority set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       priority = mcgeneral.getNumber();
-      if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
       break;
    }
    case af::Msg::TUserErrorsAvoidHost:
    {
       appendLog( QString("Errors to avoid host set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_avoidhost = mcgeneral.getNumber();
-      if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_avoidhost);
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_avoidhost);
       break;
    }
    case af::Msg::TUserErrorRetries:
    {
       appendLog( QString("Errors retries set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_retries = mcgeneral.getNumber();
-      if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_retries);
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_retries);
       break;
    }
    case af::Msg::TUserErrorsTaskSameHost:
    {
       appendLog( QString("Errors for task on same host set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_tasksamehost = mcgeneral.getNumber();
-      if( permanent) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_tasksamehost);
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_tasksamehost);
       break;
    }
    case af::Msg::TUserAdd:
@@ -147,7 +147,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    if( isLocked() ) return;
 //printf("UserAf::refresh: \"%s\"\n", getName().toUtf8().data());
    int _numjobs = jobs.getCount();
-   if(( _numjobs == 0) && ( permanent == false))
+   if(( _numjobs == 0) && ( false == isPermanent()))
    {
       if( zombietime )
       {
@@ -265,12 +265,6 @@ void UserAf::appendLog( const QString &message)
 {
    while( log.size() > af::Environment::getUserLogsLinesMax() ) log.removeFirst();
    log << af::time2Qstr() + " : " + message;
-}
-
-void UserAf::setPermanent( bool value)
-{
-   permanent = value;
-   if( permanent ) time_register = time( NULL);
 }
 
 void UserAf::generateJobsIds( af::MCGeneral & ids) const

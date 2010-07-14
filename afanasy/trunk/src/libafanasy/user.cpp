@@ -22,7 +22,6 @@ User::User( const QString &username, const QString &host):
    errors_retries(    af::Environment::getTaskErrorRetries() ),
    errors_avoidhost( af::Environment::getErrorsAvoidHost()  ),
    errors_tasksamehost( af::Environment::getTaskErrorsSameHost() ),
-   permanent( false),
    time_register( 0)
 {
    name = username;
@@ -44,12 +43,13 @@ User::User( Msg * msg)
 
 void User::construct()
 {
+   state = 0;
+   flags = 0;
    numjobs = 0;
    numrunningjobs = 0;
    need = 0.0f;
    numhosts = 0;
    time_online = 0;
-   solved = false;
 
    hostsmask.setCaseSensitivity( Qt::CaseInsensitive);
    hostsmask_exclude.setCaseSensitivity( Qt::CaseInsensitive);
@@ -63,19 +63,20 @@ AFINFO("User::~User:\n");
 void User::readwrite( Msg * msg)
 {
    Node::readwrite( msg);
+
+   rw_uint32_t( state,                 msg);
+   rw_uint32_t( flags,                 msg);
    rw_uint32_t( time_register,         msg);
    rw_QString ( hostname,              msg);
    rw_int32_t ( maxhosts,              msg);
    rw_uint8_t ( errors_retries,        msg);
    rw_uint8_t ( errors_avoidhost,      msg);
    rw_uint8_t ( errors_tasksamehost,   msg);
-   rw_bool    ( permanent,             msg);
    rw_uint32_t( time_online,           msg);
    rw_int32_t ( numjobs,               msg);
    rw_int32_t ( numrunningjobs,        msg);
    rw_int32_t ( numhosts,              msg);
    rw_float   ( need,                  msg);
-   rw_bool    ( solved,                msg);
    rw_QRegExp ( hostsmask,             msg);
    rw_QRegExp ( hostsmask_exclude,     msg);
 }
@@ -105,7 +106,7 @@ void User::stdOut( bool full) const
       printf("Online time = %s\n", time2Qstr( time_online).toUtf8().data());
       printf("Host = %s\n", hostname.toUtf8().data());
       printf("Priority = %d\n", priority);
-      if( permanent) printf("status = PERMANENT\n"); else printf("status = temporary\n");
+      if( isPermanent()) printf("status = PERMANENT\n"); else printf("status = temporary\n");
       printf("Weight = %d bytes.\n", calcWeight());
    }
    else
@@ -122,7 +123,7 @@ void User::stdOut( bool full) const
          hostsmask_exclude.pattern().toUtf8().data(),
          time2Qstr( time_online).toUtf8().data(),
          hostname.toUtf8().data(),
-         (permanent == 1 ? "P" : "T"),
+         (isPermanent() == 1 ? "P" : "T"),
          calcWeight()
       );
    }

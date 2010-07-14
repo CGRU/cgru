@@ -27,7 +27,7 @@ public:
    QString  command;
    int      capacity;
    QString  workingdir;
-   QString  previewcmd;
+   QString  files;
    QString  cmdpre;
    QString  environment;
    QString  cmdpost;

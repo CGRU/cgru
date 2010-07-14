@@ -53,8 +53,8 @@ public:
    TaskExec *genTask( int num) const;
 
    const QString genTaskName( int num) const; ///< Generate task name.
-   const QString genCmd( int num, int *frame_start = NULL, int *frame_finish = NULL) const;
-   const QString genCmdView( int num) const;
+   const QString genCommand( int num, int *frame_start = NULL, int *frame_finish = NULL) const;
+   const QString genFiles( int num) const;
 
    inline bool isNumeric() const { return flags & FNumeric;} ///< Whether the block is numeric.
    inline bool isNotNumeric() const { return false == (flags & FNumeric);} ///< Whether the block is not numeric.
@@ -62,26 +62,28 @@ public:
    inline bool isMultiHost() const { return flags & FMultiHost;} ///< Whether the one block task can run on several hosts.
    inline bool canMasterRunOnSlaveHost() const { return flags & FSameHostMaster;} ///< Can multihost task run master host on slave machines.
 
+   inline void setParserCoeff( int value ) { parsercoeff = value; }
+
 /// Set block tasks type.
-   inline void setTasksType(        const QString  & str) { taskstype          = str;   }
+   inline void setTasksType(        const QString  & str) { taskstype         = str;   }
 /// Set block tasks parser type.
-   inline void setParserType(       const QString  & str) { parsertype         = str;   }
+   inline void setParserType(       const QString  & str) { parsertype        = str;   }
 /// Set block tasks working directory.
-   inline void setWDir(             const QString  & str) { wdir               = str;   }
+   inline void setWDir(             const QString  & str) { wdir              = str;   }
 /// Set block tasks extra environment.
-   inline void setEnv(              const QString  & str) { environment        = str;   }
+   inline void setEnv(              const QString  & str) { environment       = str;   }
 /// Set block tasks command.
-   inline void setCmd(              const QString  & str) { cmd                = str;   }
+   inline void setCommand(          const QString  & str) { command           = str;   }
 /// Set block tasks veiw result command.
-   inline void setCmdView(          const QString  & str) { cmd_view           = str;   }
+   inline void setFiles(            const QString  & str) { files             = str;   }
 /// Set block pre commnand.
-   inline void setCmdPre(           const QString  & str) { cmd_pre            = str;   }
+   inline void setCmdPre(           const QString  & str) { cmd_pre           = str;   }
 /// Set block post commnand.
-   inline void setCmdPost(          const QString  & str) { cmd_post           = str;   }
+   inline void setCmdPost(          const QString  & str) { cmd_post          = str;   }
 /// Set tasks maximum run time, after this time task will be restart as error task
-   inline void setTasksMaxRunTime(  const uint32_t & secs) { tasksmaxruntime    = secs;  }
+   inline void setTasksMaxRunTime(  const uint32_t & secs) { tasksmaxruntime  = secs;  }
 /// Set maximum hosts
-   inline void setMaxHosts(         const int32_t  & hosts){ maxhosts           = hosts; }
+   inline void setMaxHosts(         const int32_t  & hosts){ maxhosts         = hosts; }
 
 /// Set block tasks capacity.
    bool setCapacity( int value);
@@ -123,14 +125,14 @@ public:
    bool setNumeric( int start, int end, int perTask = 1, int increment = 1);
    void setFramesPerTask( int perTask); ///< For sting tasks and per tasr dependency solve
 
-   inline const QString& getName()              const { return  name;                       }  ///< Get name.
-   inline const QString& getWDir()              const { return  wdir;                       }  ///< Get working directory.
-   inline const QString& getCmd()               const { return  cmd;                        }  ///< Get command.
-   inline bool           hasTasksName()         const { return !tasksname.isEmpty();        }  ///< Whether block has tasks name.
-   inline const QString& getTasksName()         const { return  tasksname;                  }  ///< Get tasks name.
-   inline bool           hasCmdView()           const { return !cmd_view.isEmpty();         }  ///< Whether block has view command.
-   inline const QString& getCmdView()           const { return  cmd_view;                   }  ///< Get tasks view command.
-   inline bool           hasEnvironment()       const { return !environment.isEmpty();      }  ///< Whether extra environment is set.
+   inline const QString& getName()              const { return  name;                  }  ///< Get name.
+   inline const QString& getWDir()              const { return  wdir;                  }  ///< Get working directory.
+   inline const QString& getCmd()               const { return  command;               }  ///< Get command.
+   inline bool           hasTasksName()         const { return !tasksname.isEmpty();   }  ///< Whether block has tasks name.
+   inline const QString& getTasksName()         const { return  tasksname;             }  ///< Get tasks name.
+   inline bool           hasFiles()             const { return !files.isEmpty();       }  ///< Whether block has files.
+   inline const QString& getFiles()             const { return  files;                 }  ///< Get tasks files.
+   inline bool           hasEnvironment()       const { return !environment.isEmpty(); }  ///< Whether extra environment is set.
    inline const QString& getEnvironment()       const { return  environment;                }  ///< Get extra environment.
 
    inline bool          hasDependMask()        const { return !dependmask.isEmpty();       }  ///< Whether depend mask is set.
@@ -245,7 +247,8 @@ protected:
    int32_t need_power;
    int32_t need_hdd;
 
-   QString parsertype;  ///< Tasks parser type ( AFJOB::TaskType ).
+   QString parsertype;     ///< Tasks parser type.
+   int32_t parsercoeff;    ///< Parser koefficient.
 
    QString wdir;        ///< Block tasks working directory.
    QString environment; ///< Block tasks extra environment.
@@ -253,8 +256,10 @@ protected:
    QString cmd_pre;   ///< Pre command.
    QString cmd_post;  ///< Post command.
 
-   QString cmd;               ///< Command.
-   QString cmd_view;          ///< Command to view tasks result.
+   QString command;               ///< Command.
+   QString files;          ///< Command to view tasks result.
+
+   QString customdata;     ///< Custom data.
 
    QString tasksname;   ///< Tasks name pattern;
    QString taskstype;   ///< Tasks type description string.

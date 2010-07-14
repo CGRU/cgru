@@ -126,7 +126,7 @@ for b in range( numblocks):
       block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s %%1 -e %%2 -t %(timesec)g -r %(randtime)g -v %(verbose)d' % vars(), False)
       block.setNumeric( 1, numtasks, perhost)
       block.setTasksName('num %1 %2')
-      block.setCommandView('view %1-%2')
+      block.setFiles('view %1-%2')
    else:
       block.setCommand('python task.py%(str_capacity)s %%1 -v %(verbose)d' % vars(), False)
       block.setTasksName('task %1')
@@ -135,7 +135,7 @@ for b in range( numblocks):
          timesec_task = timesec + randtime * random.random()
          task = af.Task('#' + str(t))
          task.setCommand('-s %(t)d -e %(t)d -t %(timesec_task)g' % vars());
-         task.setCommandView('task.' + str(t))
+         task.setFiles('task.' + str(t))
          block.tasks.append( task)
 
 if cmdpre  != '':

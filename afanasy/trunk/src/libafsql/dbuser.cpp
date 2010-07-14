@@ -29,6 +29,8 @@ void DBUser::addDBAttributes()
 {
    dbAddAttr( new DBAttrInt32(  DBAttr::_id,                   &id                  ));
 
+   dbAddAttr( new DBAttrUInt32( DBAttr::_state,                &state               ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &flags               ));
    dbAddAttr( new DBAttrString( DBAttr::_hostname,             &hostname            ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_maxhosts,             &maxhosts            ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_priority,             &priority            ));
@@ -38,6 +40,7 @@ void DBUser::addDBAttributes()
    dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_tasksamehost,  &errors_tasksamehost ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude   ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_time_register,        &time_register       ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &customdata          ));
 
    dbAddAttr( new DBAttrString( DBAttr::_name,                 &name                ));
 }
@@ -65,7 +68,7 @@ bool DBUser::dbSelect( QSqlDatabase * db, const QString * where)
    if( DBItem::dbSelect( db, where) == false) return false;
 
 // This user came from database on core init, so he is permanent
-   permanent = true;
+   setPermanent( true);
 
    return true;
 }

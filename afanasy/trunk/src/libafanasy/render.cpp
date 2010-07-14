@@ -35,6 +35,7 @@ Render::Render( Msg * msg, const af::Address * addr):
 
 void Render::construct()
 {
+   capacity = 0;
    capacity_used = 0;
 }
 
@@ -57,6 +58,7 @@ void Render::readwrite( Msg * msg)
 
       rw_bool    ( locked,                msg);
       rw_uint32_t( taskstartfinishtime,   msg);
+      rw_int32_t ( capacity,              msg);
       rw_int32_t ( capacity_used,         msg);
       rw_uint32_t( time_update,           msg);
       rw_uint32_t( time_register,         msg);

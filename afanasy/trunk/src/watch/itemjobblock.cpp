@@ -51,7 +51,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       command           = block->getCmd();
       capacity          = block->getCapacity();
       workingdir        = block->getWDir();
-      previewcmd        = block->getCmdView();
+      files             = block->getFiles();
       cmdpre            = block->getCmdPre();
       cmdpost           = block->getCmdPost();
       environment       = block->getEnvironment();
@@ -117,7 +117,7 @@ void ItemJobBlock::generateToolTip()
    else
       blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(pertask);
 
-   if( previewcmd.isEmpty()  == false) blockToolTip += "\nPreview:\n"      + previewcmd;
+   if( files.isEmpty()       == false) blockToolTip += "\nFiles:\n"        + files;
    if( environment.isEmpty() == false) blockToolTip += "\nEnvironment:\n"  + environment;
    if( cmdpre.isEmpty()      == false) blockToolTip += "\nPre command:\n"  + cmdpre;
    if( cmdpost.isEmpty()     == false) blockToolTip += "\nPost command:\n" + cmdpost;

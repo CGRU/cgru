@@ -429,7 +429,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TBlockTasksDependMask:
    case af::Msg::TBlockCommand:
    case af::Msg::TBlockWorkingDir:
-   case af::Msg::TBlockPreviewCmd:
+   case af::Msg::TBlockFiles:
    case af::Msg::TBlockCmdPost:
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:

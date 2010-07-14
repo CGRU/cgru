@@ -27,10 +27,10 @@ void DBAttr::init()
    DBName[_capacity              ] = "capacity";
    DBName[_capcoeff_max          ] = "capcoeff_max";
    DBName[_capcoeff_min          ] = "capcoeff_min";
-   DBName[_cmd                   ] = "cmd";
+   DBName[_command               ] = "command";
    DBName[_cmd_post              ] = "cmd_post";
    DBName[_cmd_pre               ] = "cmd_pre";
-   DBName[_cmd_view              ] = "cmd_view";
+   DBName[_customdata            ] = "customdata";
    DBName[_dependmask            ] = "dependmask";
    DBName[_dependmask_global     ] = "dependmask_global";
    DBName[_description           ] = "description";
@@ -39,15 +39,14 @@ void DBAttr::init()
    DBName[_errors_avoidhost      ] = "errors_avoidhost";
    DBName[_errors_count          ] = "errors_count";
    DBName[_errors_tasksamehost   ] = "errorstasksamehost";
+   DBName[_files                 ] = "files";
    DBName[_filesize_max          ] = "filesize_max";
    DBName[_filesize_min          ] = "filesize_min";
    DBName[_flags                 ] = "flags";
    DBName[_frame_inc             ] = "frame_inc";
    DBName[_frame_first           ] = "frame_first";
    DBName[_frame_last            ] = "frame_last";
-//TODO: Rename frame_perhost in frame_pertask !
-   DBName[_frame_pertask         ] = "frame_perhost";
-//
+   DBName[_frame_pertask         ] = "frame_pertask";
    DBName[_hostsmask             ] = "hostsmask";
    DBName[_hostsmask_exclude     ] = "hostsmask_exclude";
    DBName[_hostname              ] = "hostname";
@@ -68,8 +67,10 @@ void DBAttr::init()
    DBName[_need_power            ] = "need_power";
    DBName[_need_properties       ] = "need_properties";
    DBName[_need_os               ] = "need_os";
+   DBName[_parsercoeff           ] = "parsercoeff";
    DBName[_parsertype            ] = "parsertype";
    DBName[_priority              ] = "priority";
+   DBName[_services_disabled     ] = "services_disabled";
    DBName[_starts_count          ] = "starts_count";
    DBName[_state                 ] = "state";
    DBName[_tasksdependmask       ] = "tasksdependmask";

@@ -37,8 +37,7 @@ const QVariant ItemJobTask::getToolTip() const
       if(((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
          tooltip += QString("\nFinished at %1").arg( af::time2Qstr( taskprogress.time_done));
    }
-   QString images = block->genCmdView( tasknum);
-   if( false == images.isEmpty()) tooltip += "\nImages:\n" + images;
+   if( block->hasFiles()) tooltip += "\nFiles:\n" + block->genFiles( tasknum);
    return tooltip;
 }
 
@@ -48,9 +47,9 @@ const QString ItemJobTask::getSelectString() const
 }
 
 const QString ItemJobTask::getWDir()      const { return block->getWDir();            }
-const QString ItemJobTask::genCmdView()   const { return block->genCmdView( tasknum); }
+const QString ItemJobTask::genFiles()     const { return block->genFiles( tasknum);   }
 int           ItemJobTask::getFramesNum() const { return block->getFramePerTask();    }
-void          ItemJobTask::upProgress( const af::TaskProgress &tp){ taskprogress = tp;}
+void          ItemJobTask::upProgress(    const af::TaskProgress &tp){ taskprogress = tp;}
 
 void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {

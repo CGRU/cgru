@@ -17,7 +17,7 @@ TaskExec::TaskExec(
          int Capacity,
          int fileSizeMin,
          int fileSizeMax,
-         const QString  &CmdView,
+         const QString  &Files,
 
          int Start_Frame,
          int End_Frame,
@@ -28,14 +28,19 @@ TaskExec::TaskExec(
 
          int JobId,
          int BlockNumber,
-         int TaskNumber
+         int TaskNumber,
+
+         int ParserCoeff,
+
+         const QString * CustomDataBlock,
+         const QString * CustomDataTask
    ):
 
    name( Name),
    wdir( WorkingDirectory),
    env(  Environment),
-   cmd( Command),
-   cmdview( CmdView),
+   command( Command),
+   files( Files),
    servicetype( ServiceType),
    parsertype( ParserType),
    capacity( Capacity),
@@ -52,17 +57,22 @@ TaskExec::TaskExec(
    frame_finish(  End_Frame),
    frames_num(    FramesNum),
 
+   parsercoeff( ParserCoeff),
+
    time_start( time(NULL)),
    onClient( false)
 {
 AFINFA("TaskExec::TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().data(), name.toUtf8().data());
    listen_addresses = new AddressesList();
+   if( CustomDataBlock ) customdata_block = *CustomDataBlock;
+   if( CustomDataTask )  customdata_task  = *CustomDataTask;
 }
 
 TaskExec::TaskExec( const QString & Command):
-   cmd( Command),
+   command( Command),
    capacity( 0),
    capcoeff( 0),
+   parsercoeff( 0),
    filesize_min( 0),
    filesize_max( 0),
 
@@ -101,32 +111,35 @@ void TaskExec::readwrite( Msg * msg)
    switch( msg->type())
    {
    case Msg::TTask:
-      rw_QString ( wdir,         msg);
-      rw_QString ( env,          msg);
-      rw_QString ( cmd,          msg);
-      rw_QString ( cmdview,      msg);
-      rw_QString ( parsertype,   msg);
-      rw_int32_t ( jobid,        msg);
-      rw_int32_t ( blocknum,     msg);
-      rw_int32_t ( tasknum,      msg);
-      rw_int32_t ( frames_num,   msg);
-      rw_int32_t ( frame_start,  msg);
-      rw_int32_t ( frame_finish, msg);
-      rw_int32_t ( filesize_min, msg);
-      rw_int32_t ( filesize_max, msg);
+      rw_QString ( wdir,            msg);
+      rw_QString ( env,             msg);
+      rw_QString ( command,         msg);
+      rw_QString ( files,           msg);
+      rw_QString ( parsertype,      msg);
+      rw_QString ( customdata_block,msg);
+      rw_QString ( customdata_task, msg);
+      rw_int32_t ( parsercoeff,     msg);
+      rw_int32_t ( jobid,           msg);
+      rw_int32_t ( blocknum,        msg);
+      rw_int32_t ( tasknum,         msg);
+      rw_int32_t ( frames_num,      msg);
+      rw_int32_t ( frame_start,     msg);
+      rw_int32_t ( frame_finish,    msg);
+      rw_int32_t ( filesize_min,    msg);
+      rw_int32_t ( filesize_max,    msg);
 
       rw_QStringList( multihost_names, msg);
 
    case Msg::TRendersList:
-      rw_QString ( servicetype,  msg);
-      rw_QString ( name,         msg);
-      rw_QString ( username,     msg);
-      rw_QString ( blockname,    msg);
-      rw_QString ( jobname,      msg);
-      rw_int32_t ( number,       msg);
-      rw_int32_t ( capacity,     msg);
-      rw_int32_t ( capcoeff,     msg);
-      rw_uint32_t( time_start,   msg);
+      rw_QString ( servicetype,     msg);
+      rw_QString ( name,            msg);
+      rw_QString ( username,        msg);
+      rw_QString ( blockname,       msg);
+      rw_QString ( jobname,         msg);
+      rw_int32_t ( number,          msg);
+      rw_int32_t ( capacity,        msg);
+      rw_int32_t ( capcoeff,        msg);
+      rw_uint32_t( time_start,      msg);
 
       break;
 
@@ -160,7 +173,7 @@ void TaskExec::stdOut( bool full) const
    {
       if( false == wdir.isEmpty()) printf("   Working directory = \"%s\".\n", wdir.toUtf8().data());
       if( false == env.isEmpty()) printf("   Environment = \"%s\".\n", env.toUtf8().data());
-      printf( "%s\n", cmd.toUtf8().data());
+      printf( "%s\n", command.toUtf8().data());
    }
 }
 
@@ -173,10 +186,12 @@ int TaskExec::calcWeight() const
    weight += weigh( username);
    weight += weigh( wdir);
    weight += weigh( env);
-   weight += weigh( cmd);
-   weight += weigh( cmdview);
+   weight += weigh( command);
+   weight += weigh( files);
    weight += weigh( servicetype);
    weight += weigh( parsertype);
+   weight += weigh( customdata_block);
+   weight += weigh( customdata_task);
    if( listen_addresses ) weight += listen_addresses->calcWeight();
    return weight;
 }

@@ -17,7 +17,7 @@ const QString DBTaskData::Keys("FOREIGN KEY (id_job, id_block) REFERENCES blocks
 
 const QString DBTaskData::dbPrepareInsert
 ("INSERT INTO tasks (id_job,id_block,id_task,name,cmd,cmd_view,dependmask)\
- VALUES(:id_job,:id_block,:id_task,:name,:cmd,:cmd_view,:dependmask);\
+ VALUES(:id_job,:id_block,:id_task,:name,:command,:files,:dependmask,:customdata);\
 ");
 
 DBTaskData::DBTaskData():
@@ -36,9 +36,10 @@ DBTaskData::DBTaskData( af::Msg * msg)
 void DBTaskData::addDBAttributes()
 {
    dbAddAttr( new DBAttrString( DBAttr::_name,        &name       ));
-   dbAddAttr( new DBAttrString( DBAttr::_cmd,         &cmd        ));
-   dbAddAttr( new DBAttrString( DBAttr::_cmd_view,    &cmd_view   ));
+   dbAddAttr( new DBAttrString( DBAttr::_command,     &command    ));
+   dbAddAttr( new DBAttrString( DBAttr::_files,       &files      ));
    dbAddAttr( new DBAttrString( DBAttr::_dependmask,  &dependmask ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,  &customdata ));
 }
 
 DBTaskData::~DBTaskData()
@@ -58,9 +59,10 @@ void DBTaskData::dbBindInsert( QSqlQuery *query, const QVariant & id_job, const 
    query->bindValue(":id_task",     id_task     );
 
    query->bindValue(":name",             name.size() > af::Environment::get_DB_StringNameLen() ?       name.left( af::Environment::get_DB_StringNameLen()) : name       );
-   query->bindValue(":cmd",               cmd.size() > af::Environment::get_DB_StringExprLen() ?        cmd.left( af::Environment::get_DB_StringExprLen()) : cmd        );
-   query->bindValue(":cmd_view",     cmd_view.size() > af::Environment::get_DB_StringExprLen() ?   cmd_view.left( af::Environment::get_DB_StringExprLen()) : cmd_view   );
+   query->bindValue(":command",       command.size() > af::Environment::get_DB_StringExprLen() ?    command.left( af::Environment::get_DB_StringExprLen()) : command    );
+   query->bindValue(":files",           files.size() > af::Environment::get_DB_StringExprLen() ?      files.left( af::Environment::get_DB_StringExprLen()) : files      );
    query->bindValue(":dependmask", dependmask.size() > af::Environment::get_DB_StringExprLen() ? dependmask.left( af::Environment::get_DB_StringExprLen()) : dependmask );
+   query->bindValue(":customdata", customdata.size() > af::Environment::get_DB_StringExprLen() ? customdata.left( af::Environment::get_DB_StringExprLen()) : customdata );
 }
 
 void DBTaskData::readwrite( af::Msg * msg)

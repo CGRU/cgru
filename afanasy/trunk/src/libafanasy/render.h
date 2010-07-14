@@ -81,6 +81,11 @@ public:
 protected:
 
    uint32_t state;   ///< State.
+
+   int32_t capacity;
+   QString services_disabled;
+   QString customdata;
+
    std::list<TaskExec*> tasks;
    uint32_t taskstartfinishtime; ///< Task start or finish time.
 

@@ -12,17 +12,19 @@ void PyAf_Task_dealloc( PyAf_Task_Object * self);
 
 PyObject * PyAf_Task_setName(          PyAf_Task_Object *self, PyObject *arg);
 PyObject * PyAf_Task_setCommand(       PyAf_Task_Object *self, PyObject *arg);
-PyObject * PyAf_Task_setCommandView(   PyAf_Task_Object *self, PyObject *arg);
-PyObject * PyAf_Task_setDepend(        PyAf_Task_Object *self, PyObject *arg);
+PyObject * PyAf_Task_setFiles(         PyAf_Task_Object *self, PyObject *arg);
+PyObject * PyAf_Task_setDependMask(    PyAf_Task_Object *self, PyObject *arg);
+PyObject * PyAf_Task_setCustomData(    PyAf_Task_Object *self, PyObject *arg);
 PyObject * PyAf_Task_output(           PyAf_Task_Object *self, PyObject *arg);
 
 #ifndef PYAFTASK
 static PyMethodDef PyAf_Task_methods[] = {
-   {"setName",          (PyCFunction) PyAf_Task_setName,          METH_O, "Set name."                    },
-   {"setCommand",       (PyCFunction) PyAf_Task_setCommand,       METH_O, "Set command."                 },
-   {"setCommandView",   (PyCFunction) PyAf_Task_setCommandView,   METH_O, "Set preview command argument."},
-   {"setDepend",        (PyCFunction) PyAf_Task_setDepend,        METH_O, "Set depends."                 },
-   {"output",           (PyCFunction) PyAf_Task_output,           METH_O, "Print information."           },
+   {"setName",          (PyCFunction) PyAf_Task_setName,          METH_O, "Set name."           },
+   {"setCommand",       (PyCFunction) PyAf_Task_setCommand,       METH_O, "Set command."        },
+   {"setFiles",         (PyCFunction) PyAf_Task_setFiles,         METH_O, "Set files."          },
+   {"setDependMask",    (PyCFunction) PyAf_Task_setDependMask,    METH_O, "Set depend mask."    },
+   {"setCustomData",    (PyCFunction) PyAf_Task_setCustomData,    METH_O, "Set custom data."    },
+   {"output",           (PyCFunction) PyAf_Task_output,           METH_O, "Print information."  },
    { NULL, NULL, 0, NULL } // Sentinel
 };
 

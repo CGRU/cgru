@@ -16,10 +16,12 @@ PyObject * PyAf_Block_setName(               PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setTasksName(          PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setTasksType(          PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setParserType(         PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setParserCoeff(        PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setWorkingDirectory(   PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setEnvironment(        PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setCommand(            PyAf_Block_Object *self, PyObject *arg);
-PyObject * PyAf_Block_setCommandView(        PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setFiles(              PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setCustomData(         PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setCmdPre(             PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setCmdPost(            PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setHostsMask(          PyAf_Block_Object *self, PyObject *arg);
@@ -48,10 +50,12 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setTasksName",        (PyCFunction) PyAf_Block_setTasksName,          METH_O,        "Set tasks name."                },
    {"setTasksType",        (PyCFunction) PyAf_Block_setTasksType,          METH_O,        "Set tasks service type."        },
    {"setParserType",       (PyCFunction) PyAf_Block_setParserType,         METH_O,        "Set tasks parser type."         },
+   {"setParserCoeff",      (PyCFunction) PyAf_Block_setParserCoeff,        METH_O,        "Set tasks parser coefficient."  },
    {"setWorkingDirectory", (PyCFunction) PyAf_Block_setWorkingDirectory,   METH_O,        "Set tasks working directory."   },
    {"setEnvironment",      (PyCFunction) PyAf_Block_setEnvironment,        METH_O,        "Set tasks extra environment."   },
    {"setCommand",          (PyCFunction) PyAf_Block_setCommand,            METH_O,        "Set tasks command."             },
-   {"setCommandView",      (PyCFunction) PyAf_Block_setCommandView,        METH_O,        "Set preview command argument."  },
+   {"setFiles",            (PyCFunction) PyAf_Block_setFiles,              METH_O,        "Set files."                     },
+   {"setCustomData",       (PyCFunction) PyAf_Block_setCustomData,         METH_O,        "Set custom data."               },
    {"setCmdPre",           (PyCFunction) PyAf_Block_setCmdPre,             METH_O,        "Set pre command."               },
    {"setCmdPost",          (PyCFunction) PyAf_Block_setCmdPost,            METH_O,        "Set post command."              },
    {"setHostsMask",        (PyCFunction) PyAf_Block_setHostsMask,          METH_O,        "Set hosts mask."                },

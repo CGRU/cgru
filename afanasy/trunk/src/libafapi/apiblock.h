@@ -44,7 +44,7 @@ public:
    void setCommand( const char * str);
 
 /// Set block tasks view result command.
-   void setCommandView( const char * str);
+   void setFiles( const char * str);
 
 /// Set block command type to numeric. %1 and %2 arguments in command will be replaced for each task.
    bool setNumeric( int start, int end, int perHost = 1, int incement = 1);
@@ -91,6 +91,9 @@ public:
 /// Set needed hdd.
    void setNeedHDD(    int value );
 
+/// Set parser koefficient.
+   void setParserCoeff( int value );
+
 /// Set file parameters to check
    void setFileSizeCheck( int min, int max);
 
@@ -99,6 +102,9 @@ public:
 
 /// Set block tasks to multihost
    void setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const char * service, int waitsrv);
+
+/// Set task custom data.
+   void setCustomData( const char * str);
 
 public:
    inline void setBlockNumber( int value) { blocknum = value;}

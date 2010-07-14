@@ -46,7 +46,8 @@ BlockData::BlockData():
    multihost_min(0),
    multihost_max(0),
    multihost_waitmax( 0),
-   multihost_waitsrv( 0)
+   multihost_waitsrv( 0),
+   parsercoeff(1)
 {
    construct();
 }
@@ -128,16 +129,18 @@ void BlockData::readwrite( Msg * msg)
       if( isNotNumeric()) rw_tasks(       msg);
 
    case Msg::TBlocksProperties:
+      rw_int32_t ( parsercoeff,           msg);
       rw_QString ( tasksname,             msg);
       rw_QString ( parsertype,            msg);
       rw_QString ( taskstype,             msg);
       rw_QString ( wdir,                  msg);
       rw_QString ( environment,           msg);
-      rw_QString ( cmd,                   msg);
-      rw_QString ( cmd_view,              msg);
+      rw_QString ( command,               msg);
+      rw_QString ( files,                 msg);
       rw_QString ( cmd_pre,               msg);
       rw_QString ( cmd_post,              msg);
       rw_QString ( multihost_service,     msg);
+      rw_QString ( customdata,            msg);
 
    case Msg::TJobsList:
       rw_uint32_t( flags,                 msg);
@@ -375,7 +378,7 @@ void BlockData::setFramesPerTask( int perTask)
    frame_pertask = perTask;
 }
 
-const QString BlockData::genCmd( int num, int *frame_start, int *frame_finish) const
+const QString BlockData::genCommand( int num, int *frame_start, int *frame_finish) const
 {
    QString str;
    if( num > tasksnum)
@@ -388,7 +391,7 @@ const QString BlockData::genCmd( int num, int *frame_start, int *frame_finish) c
       int start, end;
       if( genNumbers( start, end, num))
       {
-         str = fillNumbers( cmd, start, end);
+         str = fillNumbers( command, start, end);
 
          if( frame_start  != NULL) *frame_start  = start;
          if( frame_finish != NULL) *frame_finish = end;
@@ -398,13 +401,13 @@ const QString BlockData::genCmd( int num, int *frame_start, int *frame_finish) c
    }
    else
    {
-      if( cmd.isEmpty()) return tasksdata[num]->getCmd();
-      str = cmd.arg( tasksdata[num]->getCmd());
+      if( command.isEmpty()) return tasksdata[num]->getCommand();
+      str = command.arg( tasksdata[num]->getCommand());
    }
    return str;
 }
 
-const QString BlockData::genCmdView( int num) const
+const QString BlockData::genFiles( int num) const
 {
    QString str;
    if( num >= tasksnum)
@@ -414,16 +417,16 @@ const QString BlockData::genCmdView( int num) const
    }
    if( isNumeric())
    {
-      if( false == cmd_view.isEmpty())
+      if( false == files.isEmpty())
       {
          int start, end;
-         if( genNumbers( start, end, num)) str = fillNumbers( cmd_view, start, end);
+         if( genNumbers( start, end, num)) str = fillNumbers( files, start, end);
       }
    }
    else
    {
-      if( cmd_view.isEmpty()) return tasksdata[num]->getCmdView();
-      str = cmd_view.arg( tasksdata[num]->getCmdView());
+      if( files.isEmpty()) return tasksdata[num]->getFiles();
+      str = files.arg( tasksdata[num]->getFiles());
    }
    return str;
 }
@@ -453,7 +456,7 @@ TaskExec *BlockData::genTask( int num) const
    int start = -1;
    int end = -1;
 
-   QString command = genCmd( num, &start, &end);
+   QString command = genCommand( num, &start, &end);
 
    return new TaskExec(
          genTaskName( num),
@@ -463,7 +466,7 @@ TaskExec *BlockData::genTask( int num) const
          capacity,
          filesize_min,
          filesize_max,
-         genCmdView( num),
+         genFiles( num),
 
          start,
          end,
@@ -533,21 +536,23 @@ int BlockData::calcWeight() const
    weight += weigh(name);
    weight += weigh(wdir);
    weight += weigh(environment);
-   weight += weigh(cmd);
-   weight += weigh(cmd_view);
+   weight += weigh(command);
+   weight += weigh(files);
    weight += weigh(cmd_pre);
    weight += weigh(cmd_post);
+   weight += weigh(customdata);
 
    return weight;
 }
 
 void BlockData::stdOut( bool full) const
 {
-   printf("BLOCK = \"%s\" ( %s-%s ), %d tasks.\n",
-      name.toUtf8().data(), taskstype.toUtf8().data(), parsertype.toUtf8().data(), tasksnum);
+   printf("BLOCK = \"%s\" ( %s-%s[%d] ), %d tasks.\n",
+      name.toUtf8().data(), taskstype.toUtf8().data(), parsertype.toUtf8().data(), parsercoeff, tasksnum);
 
-                                      printf("Command            = \"%s\"\n",               cmd.toUtf8().data());
+                                      printf("Command            = \"%s\"\n",           command.toUtf8().data());
                                       printf("Working Directory  = \"%s\"\n",              wdir.toUtf8().data());
+   if( !             files.isEmpty()) printf("Files              = \"%s\"\n",             files.toUtf8().data());
    if( !        dependmask.isEmpty()) printf("Depend Mask        = \"%s\"\n",        dependmask.pattern().toUtf8().data());
    if( !   tasksdependmask.isEmpty()) printf("Tasks Depend Mask  = \"%s\"\n",   tasksdependmask.pattern().toUtf8().data());
    if( !         hostsmask.isEmpty()) printf("Hosts Mask         = \"%s\"\n",         hostsmask.pattern().toUtf8().data());
@@ -555,6 +560,7 @@ void BlockData::stdOut( bool full) const
    if( !       environment.isEmpty()) printf("Environment        = \"%s\"\n",       environment.toUtf8().data());
    if( !           cmd_pre.isEmpty()) printf("Pre Command        = \"%s\"\n",           cmd_pre.toUtf8().data());
    if( !          cmd_post.isEmpty()) printf("Post Command       = \"%s\"\n",          cmd_post.toUtf8().data());
+   if( !        customdata.isEmpty()) printf("Custom Data        = \"%s\"\n",        customdata.toUtf8().data());
    if( !   need_properties.isEmpty()) printf("Need Properties    = \"%s\"\n",   need_properties.pattern().toUtf8().data());
    if(     need_power               ) printf("Need Power         =  %u\n"   ,   need_power  );
    if(     need_memory              ) printf("Need Memory        =  %u\n"   ,   need_memory );
@@ -572,9 +578,8 @@ void BlockData::stdOut( bool full) const
          printf("#%d:", t);
          TaskExec * task = genTask(t);
          printf(" N'%s'", task->getName().toUtf8().data());
-         printf(" C'%s'", task->getCmd().toUtf8().data());
-         QString preview( task->getCmdView());
-         if( false == preview.isEmpty()) printf(" V'%s'", preview.toUtf8().data());
+         printf(" C'%s'", task->getCommand().toUtf8().data());
+         if( task->hasFiles()) printf(" F'%s'", task->getFiles().toUtf8().data());
          delete task;
          printf("\n");
       }

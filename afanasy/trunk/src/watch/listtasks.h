@@ -35,7 +35,7 @@ private slots:
 
    void actBlockCommand();
    void actBlockWorkingDir();
-   void actBlockPreviewCmd();
+   void actBlockFiles();
    void actBlockCmdPost();
    void actBlockTasksType();
    void actBlockParserType();

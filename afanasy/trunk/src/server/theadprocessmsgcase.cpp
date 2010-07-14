@@ -549,7 +549,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockMaxHosts:
    case af::Msg::TBlockCommand:
    case af::Msg::TBlockWorkingDir:
-   case af::Msg::TBlockPreviewCmd:
+   case af::Msg::TBlockFiles:
    case af::Msg::TBlockCmdPost:
    case af::Msg::TBlockTasksType:
    case af::Msg::TBlockParserType:

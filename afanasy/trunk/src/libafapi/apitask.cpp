@@ -25,9 +25,10 @@ void Task::stdOut( bool full) const
 }
 
 void Task::setName(        const char * str) { name        = QString::fromUtf8(str);  }
-void Task::setCommand(     const char * str) { cmd         = QString::fromUtf8(str);  }
-void Task::setCommandView( const char * str) { cmd_view    = QString::fromUtf8(str);  }
-bool Task::setDepend(      const char * str)
+void Task::setCommand(     const char * str) { command     = QString::fromUtf8(str);  }
+void Task::setFiles(       const char * str) { files       = QString::fromUtf8(str);  }
+void Task::setCustomData(  const char * str) { customdata  = QString::fromUtf8(str);  }
+bool Task::setDependMask(  const char * str)
 {
    dependmask  = QString::fromUtf8(str);
    return true;

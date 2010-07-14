@@ -38,10 +38,10 @@ Service::Service( const QString & Type,
 Service::Service( const TaskExec & taskexec):
    name( taskexec.getServiceType()),
    wdir( taskexec.getWDir()),
-   command( taskexec.getCmd()),
+   command( taskexec.getCommand()),
    capkoeff( taskexec.getCapCoeff()),
    hosts( taskexec.getMultiHostsNames()),
-   files( taskexec.getCmdView())
+   files( taskexec.getFiles())
 {
    initialize();
 }

@@ -21,10 +21,13 @@ public:
    void setCommand( const char * str);
 
 /// Set task view result command.
-   void setCommandView( const char * str);
+   void setFiles( const char * str);
+
+/// Set task custom data.
+   void setCustomData( const char * str);
 
 /// Set task depend mask.
-   bool setDepend( const char * str);
+   bool setDependMask( const char * str);
 
 /// Set task name.
    inline void setName( const QString & str) { name = str; }

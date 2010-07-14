@@ -65,9 +65,15 @@ PyObject * PyAf_Block_setCommand( PyAf_Block_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Block_setCommandView( PyAf_Block_Object *self, PyObject *arg)
+PyObject * PyAf_Block_setFiles( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setCommandView( PyString_AsString( arg));
+   self->block->setFiles( PyString_AsString( arg));
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Block_setCustomData( PyAf_Block_Object *self, PyObject *arg)
+{
+   self->block->setCustomData( PyString_AsString( arg));
    Py_RETURN_TRUE;
 }
 
@@ -146,6 +152,12 @@ PyObject * PyAf_Block_setNeedPower( PyAf_Block_Object *self, PyObject *arg)
 PyObject * PyAf_Block_setNeedHDD( PyAf_Block_Object *self, PyObject *arg)
 {
    self->block->setNeedHDD( PyInt_AsLong( arg));
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Block_setParserCoeff( PyAf_Block_Object *self, PyObject *arg)
+{
+   self->block->setParserCoeff( PyInt_AsLong( arg));
    Py_RETURN_TRUE;
 }
 

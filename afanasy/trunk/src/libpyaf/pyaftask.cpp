@@ -25,15 +25,21 @@ PyObject * PyAf_Task_setCommand( PyAf_Task_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Task_setCommandView( PyAf_Task_Object *self, PyObject *arg)
+PyObject * PyAf_Task_setFiles( PyAf_Task_Object *self, PyObject *arg)
 {
-   self->task->setCommandView( PyString_AsString( arg));
+   self->task->setFiles( PyString_AsString( arg));
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Task_setDepend( PyAf_Task_Object *self, PyObject *arg)
+PyObject * PyAf_Task_setDependMask( PyAf_Task_Object *self, PyObject *arg)
 {
-   self->task->setDepend( PyString_AsString( arg));
+   self->task->setDependMask( PyString_AsString( arg));
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Task_setCustomData( PyAf_Task_Object *self, PyObject *arg)
+{
+   self->task->setCustomData( PyString_AsString( arg));
    Py_RETURN_TRUE;
 }
 

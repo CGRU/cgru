@@ -37,17 +37,19 @@ void Block::setNeedPower(        int value   )  { need_power      = value; }
 void Block::setNeedHDD(          int value   )  { need_hdd        = value; }
 void Block::setMaxHosts(         int value   )  { maxhosts        = value; }
 void Block::setTasksMaxRunTime(  int value   )  { tasksmaxruntime = value; }
+void Block::setParserCoeff(      int value   )  { parsercoeff     = value; }
 
 void Block::setName(             const char * str) {  name        = QString::fromUtf8(str);  }
 void Block::setTasksType(        const char * str) {  taskstype   = QString::fromUtf8(str);  }
 void Block::setTasksName(        const char * str) {  tasksname   = QString::fromUtf8(str);  }
 void Block::setCmdPre(           const char * str) {  cmd_pre     = QString::fromUtf8(str);  }
 void Block::setCmdPost(          const char * str) {  cmd_post    = QString::fromUtf8(str);  }
-void Block::setCommand(          const char * str) {  cmd         = QString::fromUtf8(str);  }
-void Block::setCommandView(      const char * str) {  cmd_view    = QString::fromUtf8(str);  }
+void Block::setCommand(          const char * str) {  command     = QString::fromUtf8(str);  }
+void Block::setFiles(            const char * str) {  files       = QString::fromUtf8(str);  }
 void Block::setParserType(       const char * str) {  parsertype  = QString::fromUtf8(str);  }
 void Block::setWorkingDirectory( const char * str) {  wdir        = QString::fromUtf8(str);  }
 void Block::setEnvironment(      const char * str) {  environment = QString::fromUtf8(str);  }
+void Block::setCustomData(       const char * str) {  customdata  = QString::fromUtf8(str);  }
 
 bool Block::setDependMask( const char* str )
 {

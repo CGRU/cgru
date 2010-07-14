@@ -17,24 +17,28 @@ public:
    int calcWeight() const;                         ///< Calculate and return memory size.
    void stdOut( bool full) const;
 
-   inline const QString& getName()       const { return name;        }
-   inline const QString& getCmd()        const { return cmd;         }
-   inline const QString& getCmdView()    const { return cmd_view;    }
-   inline const QString& getDependMask() const { return dependmask;  }
+   inline const QString& getName()        const { return name;       }
+   inline const QString& getCommand()     const { return command;    }
+   inline const QString& getFiles()       const { return files;      }
+   inline const QString& getDependMask()  const { return dependmask; }
+   inline const QString& getCustomData()  const { return customdata; }
 
-   inline void setCmdView( const QString & str) { cmd_view = str;}
-   inline void setDepend(  const QString & str) { dependmask = str;}
+   inline void setFiles(      const QString & str) { files      = str;  }
+   inline void setDependMask( const QString & str) { dependmask = str;  }
+   inline void setCustomData( const QString & str) { customdata = str;  }
 
-   inline bool hasCmdView()    const { return   !cmd_view.isEmpty();}  ///< Whether view command is set.
-   inline bool hasDependMask() const { return !dependmask.isEmpty();}  ///< Whether depend mask is set.
+   inline bool hasFiles()        const { return      !files.isEmpty();}  ///< Whether files are set.
+   inline bool hasDependMask()   const { return !dependmask.isEmpty();}  ///< Whether depend mask is set.
+   inline bool hasCustomData()   const { return !customdata.isEmpty();}  ///< Whether files are set.
 
    bool checkDependMask( const QString & str);
 
 protected:
    QString name;        ///< Task name.
-   QString cmd;         ///< Command.
-   QString cmd_view;    ///< Command to view task result.
+   QString command;     ///< Command.
+   QString files;       ///< Files.
    QString dependmask;  ///< Dependences.
+   QString customdata;  ///< Some custom data.
 
 protected:
 /// Read or write task data.

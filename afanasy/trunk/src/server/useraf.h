@@ -39,10 +39,6 @@ public:
 
    void moveJobs( const af::MCGeneral & mcgeneral, int type);
 
-/// Set user whether user is permanent.
-/** Permanent user will not be deleted if he has no jobs, Afanasy store them in database**/
-   void setPermanent( bool value);
-
    QStringList* getLog() { return &log; }    ///< Get log.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.

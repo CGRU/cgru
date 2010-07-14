@@ -292,10 +292,10 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    }
    case af::Msg::TBlockCommand:
    {
-      data->setCmd( mcgeneral.getString());
+      data->setCommand( mcgeneral.getString());
       log( QString("Command changed to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
       if( blockchanged_type < af::Msg::TBlocks ) blockchanged_type = af::Msg::TBlocks;
-      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_cmd);
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_command);
       break;
    }
    case af::Msg::TBlockWorkingDir:
@@ -306,12 +306,12 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_wdir);
       break;
    }
-   case af::Msg::TBlockPreviewCmd:
+   case af::Msg::TBlockFiles:
    {
-      data->setCmdView( mcgeneral.getString());
+      data->setFiles( mcgeneral.getString());
       log( QString("Preview command set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
       if( blockchanged_type < af::Msg::TBlocks ) blockchanged_type = af::Msg::TBlocks;
-      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_cmd_view);
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_files);
       break;
    }
    case af::Msg::TBlockCmdPost:

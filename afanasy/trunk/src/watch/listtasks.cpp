@@ -108,8 +108,8 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCmdPost() ));
          menu.addAction( action);
 
-         action = new QAction( "Set Preview Command", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockPreviewCmd() ));
+         action = new QAction( "Set Files", this);
+         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockFiles() ));
          menu.addAction( action);
 
          action = new QAction( "Set Tasks Type", this);
@@ -156,9 +156,9 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
          menu.addAction( action);
 
-         if( ((ItemJobTask*)(item))->genCmdView().isEmpty() == false )
+         if( ((ItemJobTask*)(item))->genFiles().isEmpty() == false )
          {
-            QStringList images = ((ItemJobTask*)(item))->genCmdView().split(';');
+            QStringList files = ((ItemJobTask*)(item))->genFiles().split(';');
             const QStringList * previewcmds = Watch::getPreviewCmds();
             if( previewcmds->size() > 0 )
             {
@@ -166,12 +166,12 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
                QMenu * submenu_cmd = new QMenu( "Preview", this);
                for( int p = 0; p < previewcmds->size(); p++)
                {
-                  if( images.size() > 1)
+                  if( files.size() > 1)
                   {
                      QMenu * submenu_img = new QMenu( QString("%1").arg((*previewcmds)[p]), this);
-                     for( int i = 0; i < images.size(); i++)
+                     for( int i = 0; i < files.size(); i++)
                      {
-                        QString imgname = images[i].right(99);
+                        QString imgname = files[i].right(99);
                         ActionIdId * actionid = new ActionIdId( p, i, imgname, this);
                         connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
                         submenu_img->addAction( actionid);
@@ -593,14 +593,14 @@ void ListTasks::actBlockWorkingDir()
    af::MCGeneral mcgeneral( str);
    setBlockProperty( af::Msg::TBlockWorkingDir, mcgeneral);
 }
-void ListTasks::actBlockPreviewCmd()
+void ListTasks::actBlockFiles()
 {
    bool ok;
-   QString cur = ((ItemJobBlock*)( getCurrentItem()))->previewcmd;
-   QString str = QInputDialog::getText(this, "Change Preview Command", "Enter Command", QLineEdit::Normal, cur, &ok);
+   QString cur = ((ItemJobBlock*)( getCurrentItem()))->files;
+   QString str = QInputDialog::getText(this, "Change Files", "Enter Files", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
    af::MCGeneral mcgeneral( str);
-   setBlockProperty( af::Msg::TBlockPreviewCmd, mcgeneral);
+   setBlockProperty( af::Msg::TBlockFiles, mcgeneral);
 }
 void ListTasks::actBlockCmdPost()
 {
@@ -665,7 +665,7 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
    }
 
    ItemJobTask* taskitem = (ItemJobTask*)item;
-   af::Service service( "service", taskitem->getWDir(), "", taskitem ->genCmdView());
+   af::Service service( "service", taskitem->getWDir(), "", taskitem ->genFiles());
 
    QStringList images = service.getFiles().split(';');
    if( num_img >= images.size())
@@ -688,23 +688,24 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
    printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
-   QProcess * process = new QProcess( Watch::getDialog());
-   if( false == QDir( wdir).exists())
+   QString shell;
+   QStringList args;
+#ifdef WINNT
+   shell = "cmd.exe";
+   args << "/c" << cmd;
+#else
+   shell = "/bin/bash";
+   args << "-c" << cmd;
+#endif
+   if( QDir( wdir).exists())
    {
-      AFERROR("Working directory does not exists.\n");
+      QProcess::startDetached( shell, args, wdir);
    }
    else
    {
-      process->setWorkingDirectory( wdir);
+      AFERROR("Working directory does not exists.\n");
+      QProcess::startDetached( shell, args);
    }
-   QStringList args;
-#ifdef WINNT
-   args << "/c" << cmd;
-   process->start( "cmd.exe", args, QIODevice::ReadWrite);
-#else
-   args << "-c" << cmd;
-   process->start( "/bin/bash", args, QIODevice::ReadWrite);
-#endif
 }
 
 void ListTasks::actTaskListen()
