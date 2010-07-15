@@ -291,7 +291,8 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
    if( dirty )
    {
-      painter->setPen( afqt::QEnvironment::clr_outline.c);
+      painter->setBrush( QBrush( afqt::QEnvironment::clr_starline.c, Qt::NoBrush ));
+      painter->setPen( afqt::QEnvironment::clr_starline.c);
       painter->drawRect( x,y,w,h);
    }
 
