@@ -13,7 +13,11 @@ class mantra(parser.parser):
       if percent_pos > -1:
          ppos = data.find('%')
          if ppos > -1:
-            percent = int(data[percent_pos+PERCENT_len:ppos])
+            print data[percent_pos+PERCENT_len:ppos]
+            try:
+               percent = int(data[percent_pos+PERCENT_len:ppos])
+            except:
+               pass
             if percent >= -1 and percent <= 100:
                self.percentframe = percent
                self.percent = percent

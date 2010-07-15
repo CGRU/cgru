@@ -142,7 +142,7 @@ bool Render::addTask( TaskExec * taskexec)
 
    capacity_used += taskexec->getCapResult();
 
-   if( capacity_used > host.capacity )
+   if( capacity_used > getCapacity() )
       AFERRAR("Render::addTask(): capacity_used > host.capacity (%d>%d)\n", capacity_used, host.capacity);
 
    return becamebusy;

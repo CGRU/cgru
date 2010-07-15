@@ -6,9 +6,9 @@ This is commented text.
    <pattern name="Some Host">
       <mask>.*</mask>
       <description>Unrecognized machine</description>
-      <capacity>2200</capacity>
-      <maxtasks>8</maxtasks>
-      <power>2000</power>
+      <capacity>1100</capacity>
+      <maxtasks>10</maxtasks>
+      <power>1000</power>
       <resources>{'c':1000,'m':3000}</resources>
       <data>{'c':'render','m':10}</data>
       <service name="generic" />
@@ -77,8 +77,8 @@ You can specify several platforms, if host can take tasks for diffent platforms.
       <mask>w.*</mask>
       <description>Windows workstation</description>
       <maxtasks>4</maxtasks>
-      <capacity>2200</capacity>
-      <power>2000</power>
+      <capacity>1100</capacity>
+      <power>1000</power>
       <service name="generic"/>
       <service name="nuke" />
       <service name="prman" />
@@ -96,9 +96,9 @@ You can specify several platforms, if host can take tasks for diffent platforms.
    <pattern name="LinStation">
       <mask>l.*</mask>
       <description>Linux workstation</description>
-      <maxtasks>4</maxtasks>
-      <capacity>2200</capacity>
-      <power>2000</power>
+      <maxtasks>10</maxtasks>
+      <capacity>1100</capacity>
+      <power>1000</power>
       <service name="generic" />
       <service name="nuke" />
       <service name="prman" />
