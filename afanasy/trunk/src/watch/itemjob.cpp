@@ -14,6 +14,7 @@
 #include "../include/macrooutput.h"
 
 const int ItemJob::Height = 30;
+const int ItemJob::HeightAnnotation = 12;
 
 ItemJob::ItemJob( af::Job *job):
    ItemNode( (af::Node*)job),
@@ -54,6 +55,7 @@ void ItemJob::updateValues( af::Node *node, int type)
       return;
    }
 
+   annotation        = job->getAnnontation();
    priority          = job->getPriority();
    username          = job->getUserName();
    hostname          = job->getHostName();
@@ -79,7 +81,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    {
       const af::BlockData * block = job->getBlock(b);
       blockinfo[b].update( block, type);
-      num_hosts            += blockinfo[b].getTasksRunning();
+      num_hosts += blockinfo[b].getTasksRunning();
       if( block->getProgressAvoidHostsNum() > 0 ) compact_display = false;
    }
    if( time_started ) compact_display = false;
@@ -139,10 +141,21 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( false == description.isEmpty())
       tooltip += "\n" + description;
 
+   calcHeight();
+}
+
+bool ItemJob::calcHeight()
+{
+   int old_height = height;
+
    if( compact_display ) block_height = BlockInfo::HeightCompact;
    else                  block_height = BlockInfo::Height;
 
    height = Height + block_height*blocksnum;
+
+   if( false == annotation.isEmpty()) height += HeightAnnotation;
+
+   return old_height == height;
 }
 
 void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -201,6 +214,13 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
       painter->setFont( afqt::QEnvironment::f_name);
       painter->setPen( afqt::QEnvironment::clr_textstars.c);
       painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_hosts_str );
+   }
+
+   if( false == annotation.isEmpty())
+   {
+      painter->setPen( clrTextMain( option) );
+      painter->setFont( afqt::QEnvironment::f_info);
+      painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, annotation );
    }
 }
 

@@ -476,7 +476,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 "TRendersListUpdates",        ///< Message with a list of resources of Renders.
 "TRenderPriority",            ///< Set Render priority,
 "TRenderCapacity",            ///< Set Render capacity,
-"TRenderService",             ///< Enable or disable Render service,
+"TRenderSetService",          ///< Enable or disable Render service,
 "TRenderRestoreDefaults",     ///< Restore default Render settings,
 "TRenderNIMBY",               ///< Set Render NIMBY,
 "TRenderUser",                ///< Set Render user,
@@ -491,6 +491,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 "TRenderStart",               ///< Start Render client program,
 "TRenderReboot",              ///< Reboot Render host computer,
 "TRenderShutdown",            ///< Shutdown Render host computer,
+"TRenderAnnotate",            ///< Set Render annotation,
 
 
 /*- Users messages -*/
@@ -511,6 +512,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 "TUserMoveJobsTop",           ///< Move jobs to top position in user jobs list.
 "TUserMoveJobsBottom",        ///< Move jobs to bottom position up in user jobs list.
 "TUserJobsOrder",             ///< Jobs ids in server list order.
+"TUserAnnotate",              ///< Set User annotation,
 
 
 /*- Job messages -*/
@@ -538,6 +540,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 "TJobNeedProperties",         ///< Set a job properties needed.
 "TJobsWeight",                ///< All jobs weight data.
 "TJobCmdPost",                ///< Set job post command.
+"TJobAnnotate",               ///< Set Job annotation,
 "TJob",                       ///< Job (all job data).
 
 "TBlockDependMask",           ///< Set block depend mask.

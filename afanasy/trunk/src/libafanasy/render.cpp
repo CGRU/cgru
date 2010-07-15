@@ -35,19 +35,12 @@ Render::Render( Msg * msg, const af::Address * addr):
 
 void Render::construct()
 {
-   capacity = 0;
+   capacity = -1;
    capacity_used = 0;
 }
 
 Render::~Render()
 {
-}
-
-void Render::setBusy( bool Busy )
-{
-//if(id==1){printf("Render::setBusy: %s - %d - ", name.toUtf8().data(), id);if( Busy ) printf("TRUE\n"); else printf("FALSE\n");}
-   if( Busy ) state = state |   SBusy;
-   else       state = state & (~SBusy);
 }
 
 void Render::readwrite( Msg * msg)
@@ -62,6 +55,7 @@ void Render::readwrite( Msg * msg)
       rw_int32_t ( capacity_used,         msg);
       rw_uint32_t( time_update,           msg);
       rw_uint32_t( time_register,         msg);
+      rw_QString ( annotation,            msg);
 
       if( msg->isWriting())
       {
@@ -111,6 +105,28 @@ void Render::readwrite( Msg * msg)
    }
 
    rw_int32_t( id, msg);
+}
+
+void Render::setCapacity( int value)
+{
+   capacity = value;
+   checkDirty();
+}
+
+void Render::checkDirty()
+{
+   if( capacity == host.capacity ) capacity = -1;
+   if(( capacity == -1) && ( services_disabled.isEmpty()))
+      state = state | SDirty;
+   else
+      state = state & (~SDirty);
+}
+
+void Render::restoreDefaults()
+{
+   capacity == host.capacity;
+   services_disabled.clear();
+   state = state & (~SDirty);
 }
 
 bool Render::addTask( TaskExec * taskexec)

@@ -19,9 +19,6 @@ public:
 /// Construct offline render with provided values from database.
    Render( int Id);
 
-/// Construct offline render with provided values from database.
-//   Render( Render * render);
-
 /// Read Render data from message.
    Render( Msg * msg, const af::Address * addr = NULL );
 
@@ -35,10 +32,12 @@ public:
    inline bool isNimby()   const { return (state & Snimby  ); }///< Whether Render is nimby.
    inline bool isFree()    const { return (((~state) & SNIMBY) && ((~state) & Snimby));}///< Whether Render is free.
    inline bool isOffline() const { return !(state & SOnline );}///< Whether Render is offline.
+   inline bool isDirty()   const { return !(state & SDirty);}  ///< Whether Render is dirty.
 
+   inline int getCapacity()     const { return (capacity == -1 ? host.capacity : capacity);}
    inline int getCapacityUsed() const { return capacity_used;}
    inline int getCapacityFree() const { return host.capacity - capacity_used;}
-   inline bool hasCapacity( int capacity) const { return capacity_used + capacity <= host.capacity;}
+   inline bool hasCapacity( int value) const { return capacity_used + value <= (capacity == -1 ? host.capacity : capacity );}
 
 /// Whether Render is ready to render tasks.
    inline bool isReady() const { return (
@@ -56,7 +55,8 @@ public:
    inline void setOnline()  { state = state |   SOnline ;}
    inline void setOffline() { state = state & (~SOnline);}
 
-   inline void setPriority( uint8_t value) { priority = value; }///< Set priority.
+   inline void setPriority( int value) { priority = value; }///< Set priority.
+   void setCapacity( int value); ///< Set capacity.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
@@ -68,15 +68,25 @@ public:
    bool addTask( TaskExec * taskexec);
    bool removeTask( const TaskExec * taskexec);
 
+   inline const QString & getAnnontation() const { return annotation;}
+
 public:
    Host     host;
    HostRes  hres;
 
-/// Render state.
-   static const uint32_t SOnline = 1<<0;
-   static const uint32_t Snimby  = 1<<1;
-   static const uint32_t SNIMBY  = 1<<2;
-   static const uint32_t SBusy   = 1<<3;
+   enum State
+   {
+      SOnline = 1<<0,
+      Snimby  = 1<<1,
+      SNIMBY  = 1<<2,
+      SBusy   = 1<<3,
+      SDirty  = 1<<4
+   };
+
+protected:
+   inline void setBusy(  bool Busy ) { if(Busy ) state = state | SBusy;  else state = state & (~SBusy );}
+   void restoreDefaults();       ///< Restore host capacity and reset disabled services.
+   void checkDirty();
 
 protected:
 
@@ -85,12 +95,12 @@ protected:
    int32_t capacity;
    QString services_disabled;
    QString customdata;
+   QString annotation;
 
    std::list<TaskExec*> tasks;
    uint32_t taskstartfinishtime; ///< Task start or finish time.
 
 private:
-   void setBusy( bool Busy ); ///< Set busy.
    void construct();
 
 private:

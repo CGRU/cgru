@@ -44,7 +44,11 @@ switch ( msg->type())
       monitors->setInterest( msg->type(), ids);
       break;
    }
+   case af::Msg::TRenderAnnotate:
    case af::Msg::TRenderPriority:
+   case af::Msg::TRenderCapacity:
+   case af::Msg::TRenderSetService:
+   case af::Msg::TRenderRestoreDefaults:
    case af::Msg::TRenderUser:
    case af::Msg::TRenderNIMBY:
    case af::Msg::TRenderNimby:
@@ -61,16 +65,6 @@ switch ( msg->type())
       renders->action( mcgeneral, msg->type(), jobs, monitors);
       break;
    }
-/*
-   case af::Msg::TRenderIamReady:
-   {
-//if( msg->int32() == 1 ) printf("case af::Msg::TRenderIamReady: id=%d\n", msg->int32() );
-      RenderContainerIt rendersIt( renders);
-      RenderAf* render = rendersIt.getRender( msg->int32());
-      if( render != NULL) render->setReady( monitors);
-      break;
-   }
-*/
    case af::Msg::TRenderDeregister:
    {
       RenderContainerIt rendersIt( renders);
@@ -78,6 +72,7 @@ switch ( msg->type())
       if( render != NULL) render->deregister( jobs, monitors);
       break;
    }
+   case af::Msg::TUserAnnotate:
    case af::Msg::TUserHostsMask:
    case af::Msg::TUserHostsMaskExclude:
    case af::Msg::TUserMaxHosts:
@@ -112,6 +107,7 @@ switch ( msg->type())
       else users->setPermanent( mcgeneral, (msg->type()==af::Msg::TUserAdd)?true:false, monitors);
       break;
    }
+   case af::Msg::TJobAnnotate:
    case af::Msg::TJobHostsMask:
    case af::Msg::TJobHostsMaskExclude:
    case af::Msg::TJobDependMask:

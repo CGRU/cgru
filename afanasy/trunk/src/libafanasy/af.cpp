@@ -210,13 +210,7 @@ void Af::rw_QStringList( QStringList& qStringList, Msg * msg)
       }
    }
 }
-/*
-void Af::rw_in_addr( in_addr &sin_addr, Msg * msg)
-{
-   const int size = 4;
-   rw_data( (char*)(&sin_addr), msg, size);
-}
-*/
+
 void Af::rw_Int8_List( std::list<int8_t> &list, Msg * msg)
 {
    uint32_t count;

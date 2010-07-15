@@ -86,6 +86,8 @@ private:
    std::vector<int> servicescounts;
    int servicesnum;
 
+   std::vector<int> disabledservices;
+
    QStringList log;                          ///< Log.
 
 private:
@@ -93,6 +95,9 @@ private:
 
    void addService( const QString & type);
    void remService( const QString & type);
+
+   void setService( const QString srvname, bool enable);
+   void disableServices();
 
    void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus);  ///< Stop task with \c message to log.
 

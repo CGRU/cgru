@@ -29,6 +29,7 @@ public:
    uint32_t time_started;
    uint32_t time_wait;
    uint32_t time_done;
+   QString annotation;
    QString hostname;
    QString username;
    QString hostsmask;
@@ -54,6 +55,8 @@ public:
 
    inline const QString & getBlockName( int num) const { return blockinfo[num].getName();}
 
+   bool calcHeight();
+
 protected:
    void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
@@ -78,6 +81,7 @@ private:
 private:
 
    static const int Height;
+   static const int HeightAnnotation;
    int block_height;
    BlockInfo * blockinfo;
 };

@@ -205,11 +205,45 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    JobContainer * jobs = (JobContainer*)pointer;
    switch( type)
    {
+   case af::Msg::TRenderAnnotate:
+   {
+      appendLog( QString("Annotation set to '%1' by %2").arg(mcgeneral.getString()).arg(userhost));
+      annotation = mcgeneral.getString();
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
+      break;
+   }
    case af::Msg::TRenderPriority:
    {
       appendLog( QString("Priority set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       setPriority( mcgeneral.getNumber());
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
+      break;
+   }
+   case af::Msg::TRenderCapacity:
+   {
+      appendLog( QString("Capacity set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      setCapacity( mcgeneral.getNumber());
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
+      break;
+   }
+   case af::Msg::TRenderSetService:
+   {
+      appendLog( QString("Service '%1' %2 by %3")
+         .arg( mcgeneral.getString())
+         .arg( mcgeneral.getNumber() != 0 ? "enabled" : "disabled")
+         .arg(userhost));
+      setService( mcgeneral.getString(), mcgeneral.getNumber());
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
+      break;
+   }
+   case af::Msg::TRenderRestoreDefaults:
+   {
+      appendLog( QString("Default farm host settings restored by %1").arg(userhost));
+      capacity = -1;
+      services_disabled.clear();
+      disableServices();
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
       break;
    }
    case af::Msg::TRenderNIMBY:
@@ -408,14 +442,19 @@ bool RenderAf::getFarmHost( af::Host * newHost)
    servicescounts.clear();
    servicesnum = 0;
 
+   // When render becames online it refresh hardware information:
    if( newHost ) host.copy( *newHost);
 
+   // Get farm services setttings:
    if( af::farm()->getHost( name, host, hostname, hostdescription ) == false)
    {
       hostname = "no farm host";
       hostdescription = "";
       return false;
    }
+
+   // Check dirty - check if capacity was overriden and now is equal to the new value
+   checkDirty();
 
    servicesnum = host.getServicesNum();
    for( int i = 0; i < servicesnum; i++) servicescounts.push_back(0);
@@ -425,7 +464,36 @@ bool RenderAf::getFarmHost( af::Host * newHost)
          if( servicesnames_old[o] == host.getServiceName(i))
             servicescounts[i] = servicescounts_old[o];
 
+   disableServices();
+
    return true;
+}
+
+void RenderAf::disableServices()
+{
+   disabledservices.clear();
+   disabledservices.resize( servicesnum, 0);
+   if( false == services_disabled.isEmpty())
+   {
+      QStringList dissrv = services_disabled.split(';');
+      for( int i = 0; i < servicesnum; i++)
+         if( dissrv.contains( host.getServiceName(i)))
+            disabledservices[i] = 1;
+   }
+   checkDirty();
+}
+
+void RenderAf::setService( const QString srvname, bool enable)
+{
+   QStringList dissrv = services_disabled.split(';');
+   dissrv.removeAll("");
+   if( enable) dissrv.removeAll( srvname);
+   else dissrv.append( srvname);
+
+   if( dissrv.size()) services_disabled = dissrv.join(";");
+   else services_disabled.clear();
+
+   disableServices();
 }
 
 void RenderAf::getServices( af::Msg * msg) const
@@ -437,9 +505,15 @@ void RenderAf::getServices( af::Msg * msg) const
       return;
    }
    QStringList list;
+   if( false == services_disabled.isEmpty())
+   {
+      list << "Disabled services:";
+      list << services_disabled;
+   }
    for( int i = 0; i < servicesnum; i++)
    {
       QString line = host.getServiceName(i) + ": ";
+      if( disabledservices[i] ) line = "DISABLED " + line;
       if( servicescounts[i] > 0) line += QString::number( servicescounts[i]);
       if( host.getServiceCount(i) > 0) line += " / max=" + QString::number( host.getServiceCount(i));
       list << line;
@@ -453,6 +527,7 @@ bool RenderAf::canRunService( const QString & type) const
    {
       if( host.getServiceName(i) == type)
       {
+         if( disabledservices[i]) return false;
          if( host.getServiceCount(i) > 0)
          {
             return servicescounts[i] < host.getServiceCount(i);

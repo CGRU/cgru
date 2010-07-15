@@ -124,6 +124,10 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
    }
    menu.addSeparator();
 
+   action = new QAction( "Annotate", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+   menu.addAction( action);
+
    submenu = new QMenu( "Set Parameter", this);
 
    action = new QAction( "Max Hosts", this);
@@ -335,6 +339,21 @@ void ListJobs::calcTotals()
          parentWindow->setWindowTitle(QString("J[%1]: Done").arg( numjobs));
    }
 }
+
+void ListJobs::actAnnotate()
+{
+   ItemJob* item = (ItemJob*)getCurrentItem();
+   if( item == NULL ) return;
+   QString current = item->annotation;
+
+   bool ok;
+   QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( text);
+   action( mcgeneral, af::Msg::TJobAnnotate);
+}
+
 
 void ListJobs::actMoveUp()
 {

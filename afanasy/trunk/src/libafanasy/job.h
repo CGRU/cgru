@@ -95,6 +95,8 @@ public:
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
+   inline const QString & getAnnontation() const { return annotation;}
+
 protected:
    BlockData  ** blocksdata;    ///< Blocks pointer.
 
@@ -104,6 +106,7 @@ protected:
    int32_t blocksnum;   ///< Number of blocks in job.
 
    QString description; ///< Job description for statistics purposes only.
+   QString annotation;
 
    QString username;    ///< Job user ( creator ) name.
    QString hostname;    ///< Computer name, where job was created.

@@ -67,23 +67,19 @@ public:
 
 /// Set user whether user is permanent.
 /** Permanent user will not be deleted if he has no jobs, Afanasy store them in database**/
-   inline bool  isPermanent() const      { return flags & Permanent; } ///< Wheter the user is permanent.
-   inline bool setPermanent( bool value) { if(value) {flags = flags | Permanent; time_register = time( NULL);} else flags & (~Permanent);}
+   inline bool  isPermanent() const      { return state & Permanent; } ///< Wheter the user is permanent.
+   inline bool setPermanent( bool value) { if(value) {state = state | Permanent; time_register = time( NULL);} else state & (~Permanent);}
 
-   inline bool  isSolved() const      { return flags & Solved; }
-   inline void setSolved( bool value) { if(value) flags = flags | Solved; else flags & (~Solved);}
+   inline bool  isSolved() const      { return state & Solved; }
+   inline void setSolved( bool value) { if(value) state = state | Solved; else state & (~Solved);}
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   enum Flags
-   {
-      Permanent   = 1,
-      Solved      = 1 << 1
-   };
+   inline const QString & getAnnontation() const { return annotation;}
 
 protected:
    uint32_t state;             ///< State.
-   uint32_t flags;             ///< Flags.
+   QString annotation;
    QString customdata;
 
    QString  hostname;          ///< User host name.
@@ -99,8 +95,6 @@ protected:
 /// Maximum number or errors on same host for task NOT to avoid host
    uint8_t errors_tasksamehost;
 
-//   bool permanent;             ///< Whether the user is permanent.
-
    uint32_t time_register;      ///< User registration time (when he become permanent).
 
    int32_t numjobs;           ///< User jobs quantity.
@@ -108,7 +102,13 @@ protected:
    int32_t numhosts;          ///< User jobs hosts number.
    uint32_t time_online;      ///< User online (server registration) time.
    float need;                ///< User need for hosts.
-//   bool solved;               ///< User have produced a task.
+
+private:
+   enum State
+   {
+      Permanent   = 1,
+      Solved      = 1 << 1
+   };
 
 private:
    void construct();

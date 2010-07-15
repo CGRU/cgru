@@ -160,6 +160,24 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
       menu.addSeparator();
 
+      action = new QAction( "Annotate", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+      menu.addAction( action);
+      action = new QAction( "Change Capacity", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actCapacity() ));
+      menu.addAction( action);
+      action = new QAction( "Enable Service", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actEnableService() ));
+      menu.addAction( action);
+      action = new QAction( "Disable Service", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actDisableService() ));
+      menu.addAction( action);
+      action = new QAction( "Restore Defaults", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actRestoreDefaults() ));
+      menu.addAction( action);
+
+      menu.addSeparator();
+
       action = new QAction( "Eject Tasks", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actEject() ));
       menu.addAction( action);
@@ -287,24 +305,42 @@ void ListRenders::actPriority()
    af::MCGeneral mcgeneral( priority);
    action( mcgeneral, af::Msg::TRenderPriority);
 }
+void ListRenders::actCapacity()
+{
+   ItemRender* item = (ItemRender*)getCurrentItem();
+   if( item == NULL ) return;
+   int current = item->getCapacity();
+
+   bool ok;
+   int32_t capacity = QInputDialog::getInteger(this, "Change Capacity", "Enter New Capacity", current, 0, 1000000, 1, &ok);
+   if( !ok) return;
+   af::MCGeneral mcgeneral( capacity);
+   action( mcgeneral, af::Msg::TRenderCapacity);
+}
 void ListRenders::actNIMBY()
 {
-   af::MCGeneral mcgeneral( af::Environment::getUserName());
+   af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderNIMBY);
 }
 void ListRenders::actNimby()
 {
-   af::MCGeneral mcgeneral( af::Environment::getUserName());
+   af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderNimby);
 }
 void ListRenders::actFree()
 {
-   af::MCGeneral mcgeneral( af::Environment::getUserName());
+   af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderFree);
 }
 void ListRenders::actUser()
 {
-   af::MCGeneral mcgeneral( af::Environment::getUserName());
+   QString current = af::Environment::getUserName();
+
+   bool ok;
+   QString text = QInputDialog::getText(this, "Set User", "Enter User Name", QLineEdit::Normal, current, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( text);
    action( mcgeneral, af::Msg::TRenderUser);
 }
 void ListRenders::actEject()
@@ -361,6 +397,45 @@ void ListRenders::actRequestServices()
    Watch::sendMsg( msg);
 }
 
+void ListRenders::actAnnotate()
+{
+   ItemRender* item = (ItemRender*)getCurrentItem();
+   if( item == NULL ) return;
+   QString current = item->getAnnotation();
+
+   bool ok;
+   QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( text);
+   action( mcgeneral, af::Msg::TRenderAnnotate);
+}
+
+void ListRenders::actEnableService()  { setService( true );}
+void ListRenders::actDisableService() { setService( false);}
+void ListRenders::setService( bool enable)
+{
+   Item* item = getCurrentItem();
+   if( item == NULL ) return;
+   QString caption("Service");
+   if( enable ) caption = "Enable " + caption; else caption = "Disable " + caption;
+
+   bool ok;
+   QString service = QInputDialog::getText(this, caption, "Enter Service Name", QLineEdit::Normal, QString(), &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral;
+   mcgeneral.setString( service);
+   mcgeneral.setNumber( enable);
+   action( mcgeneral, af::Msg::TRenderSetService);
+}
+
+void ListRenders::actRestoreDefaults()
+{
+   af::MCGeneral mcgeneral;
+   action( mcgeneral, af::Msg::TRenderRestoreDefaults);
+}
+
 void ListRenders::actCommand( int number)
 {
    Item* item = getCurrentItem();
@@ -379,16 +454,16 @@ void ListRenders::actCommand( int number)
    }
    QString cmd((*cmds)[number]);
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
-printf("Starting '%s'\n", cmd.toUtf8().data());
 
-   QProcess * process = new QProcess( Watch::getDialog());
-
+   printf("Starting '%s'\n", cmd.toUtf8().data());
+   QString shell;
    QStringList args;
 #ifdef WINNT
+   shell = "cmd.exe";
    args << "/c" << cmd;
-   process->start( "cmd.exe", args, QIODevice::ReadWrite);
 #else
+   shell = "/bin/bash";
    args << "-c" << cmd;
-   process->start( "/bin/bash", args, QIODevice::ReadWrite);
 #endif
+   QProcess::startDetached( shell, args);
 }

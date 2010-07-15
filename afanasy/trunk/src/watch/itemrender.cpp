@@ -15,9 +15,10 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-const int ItemRender::HostHeight = 25;
-const int ItemRender::TaskHeight = 15;
-const int ItemRender::OfflineHeight = 15;
+const int ItemRender::HeightHost = 25;
+const int ItemRender::HeightAnnotation = 15;
+const int ItemRender::HeightTask = 15;
+const int ItemRender::HeightOffline = 15;
 
 ItemRender::ItemRender( af::Render *render):
    ItemNode( (af::Node*)render),
@@ -97,8 +98,16 @@ void ItemRender::deleteTasks()
 bool ItemRender::calcHeight()
 {
    int old_height = height;
-   if( online ) height = HostHeight + TaskHeight * (ListRenders::ConstHeight ? 1 : tasks.size());
-   else height = ListRenders::ConstHeight ? HostHeight + TaskHeight : OfflineHeight;
+   if( ListRenders::ConstHeight )
+   {
+      height = HeightHost + HeightAnnotation;
+   }
+   else
+   {
+      if( online ) height = HeightHost + HeightTask * tasks.size();
+      else height = HeightOffline;
+      if( false == annotation.isEmpty()) height += HeightAnnotation;
+   }
    return old_height == height;
 }
 
@@ -111,8 +120,10 @@ void ItemRender::updateValues( af::Node *node, int type)
    case 0: // The item was just created
    case af::Msg::TRendersList:
    {
-      username = render->getUserName();
-      priority = render->getPriority();
+      username    = render->getUserName();
+      annotation  = render->getAnnontation();
+      priority    = render->getPriority();
+      capacity    = render->getCapacity();
 
       const af::Address * address = render->getAddress();
       if( address ) address_str = render->getAddress()->getIPString()
@@ -149,7 +160,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
          if( host.os.isEmpty() == false ) hostAttrs += QString(" - %1").arg( host.os);
          hostAttrs += QString("; Power = %1").arg( host.power);
-         hostAttrs += QString("\nCapacity = %1; Max tasks = %2").arg( host.capacity).arg( host.maxtasks);
+         hostAttrs += QString("\nCapacity = %1; Max tasks = %2").arg( capacity).arg( host.maxtasks);
          if( host.properties.isEmpty() == false) hostAttrs += QString("\n\"%1\"").arg( host.properties);
 
          hostAttrs += QString("\nCPU: %1 Mhz").arg( host.cpu_mhz);
@@ -168,8 +179,10 @@ void ItemRender::updateValues( af::Node *node, int type)
       tasks = render->getTasks();
       taskstartfinishtime = render->getTasksStartFinishTime();
 
+      dirty = render->isDirty();
+
       capacity_used = render->getCapacityUsed();
-      capacity_usage = QString("%1/%2 (%3/%4)").arg( capacity_used).arg( host.capacity).arg( tasks.size()).arg( host.maxtasks);
+      capacity_usage = QString("%1/%2 (%3/%4)").arg( capacity_used).arg( render->getCapacity()).arg( tasks.size()).arg( host.maxtasks);
 
       if( busy )
       {
@@ -253,6 +266,7 @@ void ItemRender::updateValues( af::Node *node, int type)
    calcHeight();
 
    tooltip = hostAttrs;
+   if( dirty ) tooltip = "Dirty! Capacity changed, or servive(s) disabled.\n" + tooltip;
    if( online ) tooltip += "\n" + hostUsage;
    tooltip += "\nPriority = " + QString::number( priority);
 
@@ -262,13 +276,12 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
-   int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width();
-   //int h = option.rect.height();
+   int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
 
    // Draw standart backgroud
    drawBack( painter, option);
 
-   // Draw back with job state specific color (if it is not selected)
+   // Draw back with render state specific color (if it is not selected)
    const QColor * itemColor = &(afqt::QEnvironment::clr_itemrender.c);
    if     ( online == false ) itemColor = &(afqt::QEnvironment::clr_itemrenderoff.c   );
    else if( NIMBY || nimby  ) itemColor = &(afqt::QEnvironment::clr_itemrendernimby.c );
@@ -276,14 +289,20 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    if((option.state & QStyle::State_Selected) == false)
       painter->fillRect( option.rect, *itemColor );
 
+   if( dirty )
+   {
+      painter->setPen( afqt::QEnvironment::clr_outline.c);
+      painter->drawRect( x,y,w,h);
+   }
+
    if( false == online )
    {
       painter->setPen(   afqt::QEnvironment::qclr_black );
       painter->setFont(  afqt::QEnvironment::f_info);
-      painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignLeft,    name     );
-      painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignRight,   state    );
-      painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, "offline");
-
+      painter->drawText( x+5, y, w-5, HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name     );
+      painter->drawText( x+5, y, w-5, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
+      painter->drawText( x+5, y, w-5, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, "offline");
+      painter->drawText( x, y, w, HeightAnnotation + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
       return;
    }
 
@@ -297,8 +316,8 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
    painter->setPen(  clrTextInfo( option) );
    painter->setFont( afqt::QEnvironment::f_info);
-   painter->drawText( x+25, y, w,   HostHeight, Qt::AlignBottom | Qt::AlignLeft,  capacity_usage);
-   painter->drawText( x,    y, w-5, HostHeight, Qt::AlignBottom | Qt::AlignRight, taskstartfinishtime_str);
+   painter->drawText( x+25, y, w,   HeightHost, Qt::AlignBottom | Qt::AlignLeft,  capacity_usage);
+   painter->drawText( x,    y, w-5, HeightHost, Qt::AlignBottom | Qt::AlignRight, taskstartfinishtime_str);
 
    if( ListRenders::ConstHeight )
    {
@@ -316,7 +335,8 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       }
       QString taskstr;
       for( int i = 0; i < tasks_users.size(); i++) taskstr += QString(" %1:%2").arg( tasks_users[i]).arg( tasks_counts[i]);
-      painter->drawText( x+5, y, w, HostHeight + TaskHeight, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+      if( false == annotation.isEmpty()) taskstr = QString("%1 %2").arg( annotation, taskstr);
+      painter->drawText( x+5, y, w, HeightHost + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, taskstr);
    }
    else
    {
@@ -328,24 +348,25 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          taskstr += QString(" %1: %2[%3][%4]").arg((*it)->getServiceType()).arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
-         painter->drawText( x+5, y, ((w*3)>>2), HostHeight + TaskHeight * numtask, Qt::AlignBottom | Qt::AlignLeft, taskstr);
-         painter->drawText( x, y, w-5, HostHeight + TaskHeight * numtask, Qt::AlignBottom | Qt::AlignRight,
+         painter->drawText( x+5, y, ((w*3)>>2), HeightHost + HeightTask * numtask, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+         painter->drawText( x, y, w-5, HeightHost + HeightTask * numtask, Qt::AlignBottom | Qt::AlignRight,
              QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())));
       }
+      painter->drawText( x+5, y, w, HeightHost + HeightAnnotation + HeightTask * tasks.size(), Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }
 
    int plot_w = w / 10;
    int plot_x = x + (w >> 1) - (plot_w<<1);
    int plot_y = y + 1;
-   plotCpu.paint( painter, plot_x, plot_y, plot_w-2, HostHeight - 3);
+   plotCpu.paint( painter, plot_x, plot_y, plot_w-2, HeightHost - 3);
    plot_x += plot_w;
-   plotMem.paint( painter, plot_x, plot_y, plot_w-2, HostHeight - 3);
+   plotMem.paint( painter, plot_x, plot_y, plot_w-2, HeightHost - 3);
    plot_x += plot_w;
-   plotSwp.paint( painter, plot_x, plot_y, plot_w-2, HostHeight - 3);
+   plotSwp.paint( painter, plot_x, plot_y, plot_w-2, HeightHost - 3);
    plot_x += plot_w;
-   plotHDD.paint( painter, plot_x, plot_y, plot_w-2, HostHeight - 3);
+   plotHDD.paint( painter, plot_x, plot_y, plot_w-2, HeightHost - 3);
    plot_x += plot_w;
-   plotNet.paint( painter, plot_x, plot_y, plot_w-2, HostHeight - 3);
+   plotNet.paint( painter, plot_x, plot_y, plot_w-2, HeightHost - 3);
 
    if( false == busy) return;
 

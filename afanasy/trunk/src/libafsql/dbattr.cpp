@@ -23,6 +23,7 @@ void DBAttr::init()
       DBLength[i] = 0;
    }
 
+   DBName[_annotation            ] = "annotation";
    DBName[_blocksnum             ] = "blocksnum";
    DBName[_capacity              ] = "capacity";
    DBName[_capcoeff_max          ] = "capcoeff_max";

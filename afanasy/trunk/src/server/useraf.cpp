@@ -43,6 +43,13 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    QString userhost( mcgeneral.getUserName()+'@'+mcgeneral.getHostName());
    switch( type)
    {
+   case af::Msg::TUserAnnotate:
+   {
+      annotation = mcgeneral.getString();
+      appendLog( QString("Annotation set to '%1'' by %2").arg( mcgeneral.getString(), userhost));
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
+      break;
+   }
    case af::Msg::TUserHostsMask:
    {
       if( setHostsMask( mcgeneral.getString()))

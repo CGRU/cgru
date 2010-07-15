@@ -33,6 +33,7 @@ void DBRender::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_username,          &username            ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capacity,          &capacity            ));
    dbAddAttr( new DBAttrString( DBAttr::_services_disabled, &services_disabled   ));
+   dbAddAttr( new DBAttrString( DBAttr::_annotation,        &annotation          ));
    dbAddAttr( new DBAttrString( DBAttr::_customdata,        &customdata          ));
 
    dbAddAttr( new DBAttrString( DBAttr::_name,               &name                ));
@@ -61,8 +62,8 @@ bool DBRender::dbSelect( QSqlDatabase * db, const QString * where)
    if( DBItem::dbSelect( db, where) == false) return false;
 
 // This render came from database on core init, it can't be online or busy
-   state = state & (~SOnline);
-   state = state & (~SBusy);
+   setOffline();
+   setBusy( false);
 
    return true;
 }

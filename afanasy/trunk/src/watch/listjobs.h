@@ -5,7 +5,7 @@
 
 #include "listnodes.h"
 
-class ItemJobBrief;
+//class ItemJobBrief;
 
 class ListJobs : public ListNodes
 {
@@ -32,6 +32,7 @@ private slots:
    void actMoveTop();
    void actMoveBottom();
 
+   void actAnnotate();
    void actPriority();
    void actHostsMask();
    void actHostsMaskExclude();

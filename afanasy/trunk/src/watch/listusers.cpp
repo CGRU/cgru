@@ -79,6 +79,12 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
    {
       menu.addSeparator();
 
+      action = new QAction( "Annonate", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+      menu.addAction( action);
+
+      menu.addSeparator();
+
       action = new QAction( "Set Max Hosts", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actMaxHosts() ));
       menu.addAction( action);
@@ -185,6 +191,20 @@ void ListUsers::calcTitle()
       if( itemuser->numrunningtasks > 0 ) running++;
    }
    parentWindow->setWindowTitle(QString("U[%1]: %2R").arg( total).arg( running));
+}
+
+void ListUsers::actAnnotate()
+{
+   ItemUser* item = (ItemUser*)getCurrentItem();
+   if( item == NULL ) return;
+   QString current = item->annotation;
+
+   bool ok;
+   QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( text);
+   action( mcgeneral, af::Msg::TUserAnnotate);
 }
 
 void ListUsers::actPriority()

@@ -22,6 +22,7 @@ private slots:
 
    void userAdded( ItemNode * node, const QModelIndex & index);
 
+   void actAnnotate();
    void actHostsMask();
    void actHostsMaskExclude();
    void actMaxHosts();

@@ -36,6 +36,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,  &hostsmask_exclude   ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,         &dependmask          ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask_global,  &dependmask_global   ));
+   dbAddAttr( new DBAttrString( DBAttr::_annotation,         &annotation          ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_post,           &cmd_post            ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_os,            &need_os             ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,    &need_properties     ));
@@ -45,7 +46,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_name,               &name                ));
    dbAddAttr( new DBAttrString( DBAttr::_hostname,           &hostname            ));
    dbAddAttr( new DBAttrString( DBAttr::_username,           &username            ));
-   dbAddAttr( new DBAttrInt32 (DBAttr::_blocksnum,          &blocksnum           ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &blocksnum           ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,            &cmd_pre             ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_time_creation,      &time_creation       ));
 }

@@ -44,7 +44,6 @@ User::User( Msg * msg)
 void User::construct()
 {
    state = 0;
-   flags = 0;
    numjobs = 0;
    numrunningjobs = 0;
    need = 0.0f;
@@ -65,7 +64,6 @@ void User::readwrite( Msg * msg)
    Node::readwrite( msg);
 
    rw_uint32_t( state,                 msg);
-   rw_uint32_t( flags,                 msg);
    rw_uint32_t( time_register,         msg);
    rw_QString ( hostname,              msg);
    rw_int32_t ( maxhosts,              msg);
@@ -79,6 +77,7 @@ void User::readwrite( Msg * msg)
    rw_float   ( need,                  msg);
    rw_QRegExp ( hostsmask,             msg);
    rw_QRegExp ( hostsmask_exclude,     msg);
+   rw_QString ( annotation,            msg);
 }
 
 int User::calcWeight() const
@@ -88,6 +87,7 @@ int User::calcWeight() const
    weight += weigh(hostname);
    weight += weigh(hostsmask);
    weight += weigh(hostsmask_exclude);
+   weight += weigh(annotation);
    return weight;
 }
 

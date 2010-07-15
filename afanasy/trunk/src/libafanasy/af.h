@@ -40,7 +40,6 @@ protected:
    static void rw_QString(     QString     &qString,     Msg * msg);
    static void rw_QStringList( QStringList &qStringList, Msg * msg);
    static void rw_QRegExp(     QRegExp     &qRegExp,     Msg * msg);
-//   static void rw_in_addr(     in_addr     &sin_addr   , Msg * msg);
 
    static void rw_Int8_List(   std::list   <   int8_t > &list, Msg * msg);
    static void rw_Int32_List(  std::list   <  int32_t > &list, Msg * msg);

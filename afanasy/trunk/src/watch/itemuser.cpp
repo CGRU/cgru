@@ -14,11 +14,13 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+const int ItemUser::HeightUser = 30;
+const int ItemUser::HeightAnnotation = 14;
+
 ItemUser::ItemUser( af::User *user):
    ItemNode( (af::Node*)user)
 {
    updateValues( user, 0);
-   height = 30;
 }
 
 ItemUser::~ItemUser()
@@ -34,6 +36,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    else        setNotRunning();
 
    priority             = user->getPriority();
+   annotation           = user->getAnnontation();
    hostname             = user->getHostName();
    numjobs              = user->getNumJobs();
    numrunningtasks      = user->getNumHosts();
@@ -56,6 +59,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    strErrorHosts = "E-" + errorsAvoidHost_str + "j|" + errorsTaskSameHost_str + "t|" + errorsRetries_str + 'r';
 
    strLeftTop     = name + '-' + priority_str;
+   if( false == permanent ) strLeftTop = QString("(%1)").arg( strLeftTop);
    if( isLocked()) strLeftTop = "(LOCK) " + strLeftTop;
 
    strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
@@ -85,13 +89,23 @@ void ItemUser::updateValues( af::Node *node, int type)
    tooltip += "\nJobs count = " + QString::number( user->getNumJobs());
    tooltip += "\nOnline since " + af::time2Qstr( user->getTimeOnline()   );
    if( permanent) tooltip += "\nRegistered at " + af::time2Qstr( user->getTimeRegister());
+
+   calcHeight();
+}
+
+bool ItemUser::calcHeight()
+{
+   int old_height = height;
+   height = HeightUser;
+   if( false == annotation.isEmpty()) height += HeightAnnotation;
+   return old_height == height;
 }
 
 void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
    drawBack( painter, option);
    int x = option.rect.x(); int y = option.rect.y();
-   //int w = option.rect.width(); int h = option.rect.height();
+   int w = option.rect.width(); int h = option.rect.height();
 
    painter->setPen( clrTextMain( option) );
    if( permanent) painter->setFont( afqt::QEnvironment::f_name);
@@ -100,11 +114,14 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 
    painter->setPen( clrTextInfo( option) );
    painter->setFont( afqt::QEnvironment::f_info);
-   painter->drawText( option.rect, Qt::AlignLeft    | Qt::AlignBottom,  strLeftBottom  );
-   painter->drawText( option.rect, Qt::AlignHCenter | Qt::AlignTop,     strHCenterTop  );
-   painter->drawText( option.rect, Qt::AlignRight   | Qt::AlignBottom,  strRightBottom );
+   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignLeft    | Qt::AlignBottom,  strLeftBottom  );
+   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignHCenter | Qt::AlignTop,     strHCenterTop  );
+   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignRight   | Qt::AlignBottom,  strRightBottom );
    painter->setPen( afqt::QEnvironment::qclr_black );
-   painter->drawText( option.rect, Qt::AlignRight   | Qt::AlignTop,     strRightTop    );
+   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignRight   | Qt::AlignTop,     strRightTop    );
+
+   if( false == annotation.isEmpty())
+      painter->drawText( option.rect, Qt::AlignBottom | Qt::AlignHCenter, annotation );
 
    {  // draw stars:
       static const int stars_size = 8;
@@ -117,7 +134,7 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 
       if( quantity < 1) return;
       int numstars = quantity;
-      int stars_right = option.rect.width() - 50;
+      int stars_right = w - 50;
       int stars_delta = (stars_right - stars_left) / numstars;
       if( stars_delta < 1 )
       {
@@ -134,7 +151,7 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
 
       painter->setFont( afqt::QEnvironment::f_name);
       painter->setPen( afqt::QEnvironment::clr_textstars.c);
-      painter->drawText( option.rect, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
+      painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
    }
 }
 

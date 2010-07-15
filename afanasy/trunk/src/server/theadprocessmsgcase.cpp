@@ -60,7 +60,9 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TFarmLoad:
    {
-      AfContainerLock rlock( renders, AfContainer::WRITELOCK);
+      AfContainerLock rlock( renders,  AfContainer::WRITELOCK);
+      AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+
       printf("RELOADING FARM");
       QString message;
       if( af::loadFarm( true))
@@ -69,6 +71,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
          for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
          {
             render->getFarmHost();
+            monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
             render->stdOut();
          }
          message = "Reloaded successfully.";
@@ -565,6 +568,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockNeedHDD:
    case af::Msg::TBlockNeedProperties:
    case af::Msg::TTasksRestart:
+   case af::Msg::TJobAnnotate:
    case af::Msg::TJobHostsMask:
    case af::Msg::TJobHostsMaskExclude:
    case af::Msg::TJobDependMask:
@@ -583,7 +587,11 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TJobPause:
    case af::Msg::TJobRestartPause:
    case af::Msg::TJobDelete:
+   case af::Msg::TRenderAnnotate:
    case af::Msg::TRenderPriority:
+   case af::Msg::TRenderCapacity:
+   case af::Msg::TRenderSetService:
+   case af::Msg::TRenderRestoreDefaults:
    case af::Msg::TRenderNIMBY:
    case af::Msg::TRenderNimby:
    case af::Msg::TRenderUser:
@@ -596,6 +604,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderReboot:
    case af::Msg::TRenderShutdown:
    case af::Msg::TRenderDeregister:
+   case af::Msg::TUserAnnotate:
    case af::Msg::TUserAdd:
    case af::Msg::TUserDel:
    case af::Msg::TUserHostsMask:

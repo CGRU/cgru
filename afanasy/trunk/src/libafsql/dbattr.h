@@ -70,6 +70,7 @@ public:
          _tasksname,
          _taskstype,
          _username,
+         _annotation,
       _STRINGNAME_END_,
 
       _STRINGEXPR_BEGIN_,

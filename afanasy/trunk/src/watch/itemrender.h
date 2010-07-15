@@ -13,8 +13,10 @@ public:
 
    void updateValues( af::Node *node, int type);
 
-   inline const QString & getUserName() const { return username;}
+   inline const QString & getUserName()   const { return username;   }
+   inline const QString & getAnnotation() const { return annotation; }
    inline int getPriority() const { return priority;  }
+   inline int getCapacity() const { return capacity;  }
 
    bool setSortType(   int type );
    bool setFilterType( int type );
@@ -30,9 +32,10 @@ protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
-   static const int HostHeight;
-   static const int TaskHeight;
-   static const int OfflineHeight;
+   static const int HeightHost;
+   static const int HeightAnnotation;
+   static const int HeightTask;
+   static const int HeightOffline;
 
 private:
    void deleteTasks();
@@ -44,7 +47,9 @@ private:
    QString     hostUsage;
 
    QString  username;
+   QString  annotation;
    int priority;
+   int capacity;
 
    QString  address_str;      ///< Client address
 
@@ -52,9 +57,10 @@ private:
    bool busy;
    bool NIMBY;
    bool nimby;
+   bool dirty;
 
-   int  capacity_used;
-   QString  capacity_usage;
+   int capacity_used;
+   QString capacity_usage;
 
    QString  state;
    std::list<af::TaskExec*> tasks;

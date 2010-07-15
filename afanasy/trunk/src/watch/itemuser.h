@@ -12,7 +12,6 @@ public:
 
    void updateValues( af::Node *node, int type);
 
-//   af::UserHeader userheader;
    int errors_avoidhost;
    int errors_tasksamehost;
    int errors_retries;
@@ -22,16 +21,22 @@ public:
 
    int priority;
    QString hostname;
+   QString annotation;
    int numjobs;
    int numrunningtasks;
 
    bool setSortType(   int type );
    bool setFilterType( int type );
 
+   bool calcHeight();
+
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
+
+   static const int HeightUser;
+   static const int HeightAnnotation;
 
    QString numrunningtasks_str;
    QString maxhosts_str;

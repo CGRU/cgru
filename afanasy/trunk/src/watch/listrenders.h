@@ -28,13 +28,18 @@ private slots:
    void renderAdded( ItemNode * node, const QModelIndex & index);
    void selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
 
+   void actAnnotate();
    void actPriority();
+   void actCapacity();
    void actNIMBY();
    void actNimby();
    void actFree();
    void actUser();
    void actRequestLog();
    void actRequestServices();
+   void actEnableService();
+   void actDisableService();
+   void actRestoreDefaults();
 
    void actEject();
 
@@ -53,6 +58,7 @@ private:
    QTimer * timer;
 
 private:
+   void setService( bool enable);
    void calcTitle();
 
 private:

@@ -257,6 +257,14 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    QString userhost( mcgeneral.getUserName()+'@'+mcgeneral.getHostName());
    switch( type)
    {
+   case af::Msg::TJobAnnotate:
+   {
+      annotation = mcgeneral.getString();
+      log( QString("Annotation set to '%1'' by %2").arg( mcgeneral.getString(), userhost));
+      jobchanged = af::Msg::TMonitorJobsChanged;
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
+      break;
+   }
    case af::Msg::TJobHostsMask:
    {
       if( setHostsMask( mcgeneral.getString()))

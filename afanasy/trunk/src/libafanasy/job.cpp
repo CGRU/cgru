@@ -76,13 +76,14 @@ void Job::readwrite( Msg * msg)
    rw_uint32_t( time_done,          msg);
 
    rw_QString ( description,        msg);
+   rw_QString ( annotation,         msg);
 
-   rw_QRegExp( hostsmask,            msg);
-   rw_QRegExp( hostsmask_exclude,    msg);
-   rw_QRegExp( dependmask,           msg);
-   rw_QRegExp( dependmask_global,    msg);
-   rw_QRegExp( need_os,              msg);
-   rw_QRegExp( need_properties,      msg);
+   rw_QRegExp( hostsmask,           msg);
+   rw_QRegExp( hostsmask_exclude,   msg);
+   rw_QRegExp( dependmask,          msg);
+   rw_QRegExp( dependmask_global,   msg);
+   rw_QRegExp( need_os,             msg);
+   rw_QRegExp( need_properties,     msg);
 
    rw_blocks(  msg);
 //printf("Job::readwrite: END\n");
