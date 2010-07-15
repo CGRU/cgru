@@ -68,7 +68,7 @@ public:
 /// Set user whether user is permanent.
 /** Permanent user will not be deleted if he has no jobs, Afanasy store them in database**/
    inline bool  isPermanent() const      { return state & Permanent; } ///< Wheter the user is permanent.
-   inline bool setPermanent( bool value) { if(value) {state = state | Permanent; time_register = time( NULL);} else state & (~Permanent);}
+   void setPermanent( bool value);
 
    inline bool  isSolved() const      { return state & Solved; }
    inline void setSolved( bool value) { if(value) state = state | Solved; else state & (~Solved);}

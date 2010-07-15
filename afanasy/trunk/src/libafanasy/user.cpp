@@ -80,6 +80,17 @@ void User::readwrite( Msg * msg)
    rw_QString ( annotation,            msg);
 }
 
+void User::setPermanent( bool value)
+{
+   if( value )
+   {
+      state = state | Permanent;
+      time_register = time( NULL);
+   }
+   else
+      state = state & (~Permanent);
+}
+
 int User::calcWeight() const
 {
    int weight = Node::calcWeight();

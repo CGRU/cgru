@@ -105,9 +105,12 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    }
    case af::Msg::TUserAdd:
    {
-      appendLog( QString("Added by %1").arg(userhost));
-      setPermanent( true );
-      AFCommon::QueueDBAddItem( this);
+      if( false == isPermanent())
+      {
+         appendLog( QString("Added by %1").arg(userhost));
+         setPermanent( true );
+         AFCommon::QueueDBAddItem( this);
+      }
       break;
    }
    case af::Msg::TUserDel:

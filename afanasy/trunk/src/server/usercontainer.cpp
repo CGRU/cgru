@@ -71,7 +71,7 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
 {
    QString username( usr.getName());
    QString hostname( usr.getHostName());
-printf("UserContainer::setPermanent: %s@%s - %d\n", username.toUtf8().data(), hostname.toUtf8().data(), permanent);
+
    //
    // Try to find user with provided name in container to edit permanent property
    //
