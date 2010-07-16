@@ -36,8 +36,6 @@ Parser read task output and calculate running percentage and frame (for multiply
 <p>
 Python classes stored in <br/>
 <code>cgru/afanasy/python/parsers</code><br/>
-listed in <br/>
-<code>cgru/afanasy/python/parsers/__init__</code><br/>
 and based from <br/>
 <code>cgru/afanasy/python/parsers/parser.py</code><br/>
 </p>
@@ -51,6 +49,28 @@ and based from <br/>
       Parsing function by overriding <code>parse.do(self, data)</code> method.
    </li>
 </ul>
+
+<h3>Parser method:</h3>
+<p>
+It has data on input to parse. During parsing it can set some properties:
+<ul>
+<li><b>self.percent</b> (<kbd>int</kbd>)
+ - Task execution percenage.
+<li><b>self.frame</b> (<kbd>int</kbd>)
+ - Task execution frame. May set for multiply frame tasks to show current frame in GUI.
+<li><b>self.percentframe</b> (<kbd>int</kbd>)
+ - Task execution current frame percentage.
+<li><b>self.warning</b> (<kbd>False</kbd>/<kbd>True</kbd>)
+ - Some warning. To notify in user only.
+<li><b>self.error</b> (<kbd>False</kbd>/<kbd>True</kbd>)
+ - Error. Render will try to terminate and kill a task.
+<li><b>self.badresult</b> (<kbd>False</kbd>/<kbd>True</kbd>)
+ - Error. Task will finish with an error.
+</li>
+</ul>
+It can return <kbd>None</kbd> or a string
+result
+</p>
 
 <!--FOOTER-->
 <br/>

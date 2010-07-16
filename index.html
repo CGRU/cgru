@@ -99,6 +99,13 @@ switch( window.location.protocol)
 <br/>
 <h4>2010.06.01</h4>
 <p>
+Afanasy render client "<a href="afanasy/doc/windowsmustdie.html">Windows Must Die<a/>" function.
+It finds and kills windows with specified names.
+When process crashes, MS Windows can raise a window with apologizes.
+This can hang process until someone closes the window.
+(afRender periodically sends WM_CLOSE signal to windows listed in special file.)
+</p>
+<p>
 <a href="afanasy/plugins/houdini/doc/afanasy.html#SeparateRender"/>Houdini Separate Render</a>
  - ROP to separate Mantra ROP render process on 'ifd' files generation and 'mantra' command render.
 It can also split one frame into tiles and render them simultaneous,

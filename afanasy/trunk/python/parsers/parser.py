@@ -27,8 +27,6 @@ class parser:
       if data.find( str_warning  ) != -1: self.warning   = True
       if data.find( str_error    ) != -1: self.error     = True
       if data.find( str_badresult) != -1: self.badresult = True
-      print data
-      sys.stdout.flush()
       try:
          result = self.do( data)
       except:

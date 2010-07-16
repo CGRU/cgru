@@ -65,11 +65,6 @@ Afanasy generates some file names automatically, to store task output for exampl
 Tasks commands prefix. Set it to './' to launch 'myrender' not from path but from current task directory where 'myrender' can be reconfigured individually for the asset.
 </p></li>
 <li><p>
-<code>path_client</code> = c:/cg/tools;c:/projects<br/>
-<code>path_server</code> = /cg/tools;/cg/projects<br/>
-Remap path from client to server. Path list separated with ';'. Linux server has another path than MS Windows workstations. May be your Linux server has another path than even Linux workstations.
-</p></li>
-<li><p>
 <code>priority</code> = 99<br/>
 Default priority for users and jobs. User with no administrative rights can't set priority greater than this value.
 </p></li>
@@ -225,8 +220,15 @@ GOD rights password.<br/>
 Password length must be <b>five characters</b>.
 </p></li>
 <li><p>
-<code>previewcmds</code> = kuickshow;djv_view<br/>
-Programs to view frames. 'kuickshow' - is a common and very light KDE viewer which supports various formats. 'djv_view' - good sequence (and movies) viewer.
+<code>previewcmds</code> = nuke -v @ARG@ || imf_disp @ARG@ || mplay @ARG@<br>
+Programs to view images.<br/>
+"@ARG@" - will be replaced with filename.<br/>
+" || " - programs list separator.<br/>
+</p></li>
+<li><p>
+<code>rendercmds</code> = vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"<br/>
+"@ARG@" - will be replaced with hostname.<br/>
+" || " - programs list separator.<br/>
 </p></li>
 <li><p>
 <code>watch_font_family</code> = SansSerif<br/>

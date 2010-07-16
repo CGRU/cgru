@@ -32,7 +32,7 @@
 <p><code>$ afrender</code></p>
 <p>Afanasy server ask Render, running on remote host to run tasks.</p>
 
-<h3><a href="afanasy.html#ConfRender">Render Configuration</a></h3>
+<h3><a href="server_config.html#ConfRender">Render Configuration</a></h3>
 
 <h3>Render Attributes:</h3>
 <ul>
@@ -52,13 +52,17 @@
 <ul>
 <li><a name="UserName"/><b>Render User</b> - Who launched a render. Can be changed only by administrators. Note that process do not change uid. This value for afanasy only.</li>
 <li><a name="Priority"/><b>Priority</b> - Render with greater priority get task first.</li>
+<li><a name="Capacity"/><b>Capacity</b> - You can override host farm setup (see below) capacity.</li>
+<li><a name="DisabledServices"/><b>Disabled Services</b> - You can disable host farm setup (see below) service.</li>
 <li><a name="State"/><b>Render State:</b>
    <ul>
    <li><b><i> Free  </i></b> - Render is not captured by anybody.</li>
    <li><b><i> nimby </i></b> - Render is taken by his user. Only render user can render on it.</li>
    <li><b><i> NIMBY </i></b> - Render is taken by his user and he don't want to render on it.</li>
+   <li><b><i> Dirty </i></b> - Render capacity changed or some service disabled.</li>
    </ul>
 </li>
+<li><a name="Annotation"/><b>Annotation</b> - Annotate render GUI item.</li>
 </ul>
 
 <h3>Render Host Attributes:</h3>

@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Afanasy Services</title>
+<title>Windows Must Die</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,28 +26,30 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">Afanasy Services (block tasks types)</h2>
+<h2 align="center">Windows Must Die</h2>
 <hr />
 
 <p>
-Python classes stored in <br/>
-<code>cgru/afanasy/python/services</code><br/>
-and based from <br/>
-<code>cgru/afanasy/python/services/service.py</code><br/>
+Farm based on MS Windows OS can produce some 'bad' windows.
+If process crashed, Windows OS can launch a window with apologizes,
+and 'hung' the process until someone closes this window.
+</p>
+<p>
+Afanasy Render client periodically finds windows listed in 
+<kbd>afanasy/windowsmustdie.txt</kbd>
+file, and closes them (sends WM_CLOSE signal).
 </p>
 
-<p>It describes a service:</p>
-<ul>
-   <li>
-      Service with this name exists.
-   </li>
-   <li>
-      Default service parser.
-   </li>
-   <li>
-      Method to insert in task command variable capacity coefficient.
-   </li>
-</ul>
+<h3>windowsmustdie.txt example:</h3>
+<table><tr><td>
+<pre>
+
+   Visual Studio Just-In-Time Debugger   
+   mantra.exe
+   mantra.exe - Application Error
+
+</td></tr></pre>
+</table>
 
 <!--FOOTER-->
 <br/>
