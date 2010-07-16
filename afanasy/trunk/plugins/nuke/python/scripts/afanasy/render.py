@@ -113,6 +113,10 @@ class BlockParameters:
 
       self.writename = str( wnode.name())
       self.imgfile = str( wnode.knob('file').value())
+      folder = os.path.dirname( self.imgfile)
+      if not os.path.isdir(folder):
+         result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (folder,self.writename))
+         if result: os.mkdir( folder)
 
       for par in fparams:
          if fparams[par] is not None:
