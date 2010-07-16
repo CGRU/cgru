@@ -115,6 +115,18 @@ try:
 except:
    errorExit('Write node file operations error:\n' + str(sys.exc_info()[1]), True)
 
+# Get views number:
+views_num = 1
+try:
+   views_str = writenode.knob('views').value()
+   print 'Views = "%s"' % views_str
+   views_num = len(views_str.split())
+except:
+   views_num = 1
+   print str(sys.exc_info()[1])
+if views_num < 1: views_num = 1
+print 'Number of views = %d' % views_num
+
 # Render frames cycle:
 exitcode = 0
 frame = ffirst
@@ -124,7 +136,7 @@ while frame <= flast:
 
    # Try to execute write node:
    try:
-      nuke.execute( xnode, frame, frame)
+      nuke.execute( writenode, frame, frame)
    except:
       print 'Node execution error:'
       print str(sys.exc_info()[1])
@@ -163,8 +175,11 @@ while frame <= flast:
       else:
          moveditems += 1
 
-   if( moveditems < 1 ):
+   if moveditems < 1:
       print 'Error: No images generated.'
+      exitcode = 1
+   elif moveditems < views_num:
+      print 'Error: Not enough images generated (%d instead of %d).' % (moveditems,views_num)
       exitcode = 1
    else:
       print 'Images generated: %d' % moveditems

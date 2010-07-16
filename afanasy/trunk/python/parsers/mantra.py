@@ -13,7 +13,6 @@ class mantra(parser.parser):
       if percent_pos > -1:
          ppos = data.find('%')
          if ppos > -1:
-            print data[percent_pos+PERCENT_len:ppos]
             try:
                percent = int(data[percent_pos+PERCENT_len:ppos])
             except:
