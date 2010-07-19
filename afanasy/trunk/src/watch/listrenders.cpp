@@ -1,7 +1,6 @@
 #include "listrenders.h"
 
 #include <QtCore/QEvent>
-#include <QtCore/QProcess>
 #include <QtCore/QTimer>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QInputDialog>
@@ -438,32 +437,21 @@ void ListRenders::actRestoreDefaults()
 
 void ListRenders::actCommand( int number)
 {
-   Item* item = getCurrentItem();
-   if( item == NULL )
+   QModelIndexList indexes( view->selectionModel()->selectedIndexes());
+   for( int i = 0; i < indexes.count(); i++)
    {
-      displayError( "No items selected.");
-      return;
+      if( false == qVariantCanConvert<Item*>( indexes[i].data())) continue;
+      Item* item = qVariantValue<Item*>( indexes[i].data());
+      if( item == NULL ) continue;
+      const QStringList * cmds = Watch::getRenderCmds();
+      int cmdssize = cmds->size();
+      if( number >= cmdssize )
+      {
+         displayError( "No such command.");
+         return;
+      }
+      QString cmd((*cmds)[number]);
+      cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
+      Watch::startProcess( cmd);
    }
-
-   const QStringList * cmds = Watch::getRenderCmds();
-   int cmdssize = cmds->size();
-   if( number >= cmdssize )
-   {
-      displayError( "No such command.");
-      return;
-   }
-   QString cmd((*cmds)[number]);
-   cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
-
-   printf("Starting '%s'\n", cmd.toUtf8().data());
-   QString shell;
-   QStringList args;
-#ifdef WINNT
-   shell = "cmd.exe";
-   args << "/c" << cmd;
-#else
-   shell = "/bin/bash";
-   args << "-c" << cmd;
-#endif
-   QProcess::startDetached( shell, args);
 }

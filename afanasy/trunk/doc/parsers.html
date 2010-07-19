@@ -46,7 +46,7 @@ and based from <br/>
       Parser with this name exists.
    </li>
    <li>
-      Parsing function by overriding <code>parse.do(self, data)</code> method.
+      Parsing function by overriding <code>parser.do(self, data)</code> method.
    </li>
 </ul>
 
@@ -61,15 +61,19 @@ It has data on input to parse. During parsing it can set some properties:
 <li><b>self.percentframe</b> (<kbd>int</kbd>)
  - Task execution current frame percentage.
 <li><b>self.warning</b> (<kbd>False</kbd>/<kbd>True</kbd>)
- - Some warning. To notify in user only.
+ - Some warning. To notify user only.
 <li><b>self.error</b> (<kbd>False</kbd>/<kbd>True</kbd>)
  - Error. Render will try to terminate and kill a task.
 <li><b>self.badresult</b> (<kbd>False</kbd>/<kbd>True</kbd>)
  - Error. Task will finish with an error.
+In this case render will not try to kill it, sometimes you don`t need this.
+You can use at the end of task execution, at final result check.
 </li>
 </ul>
-It can return <kbd>None</kbd> or a string
-result
+This method can return a string result.
+In such case this string will be stored instead of incoming data.
+You can use it to produce some message, by appending incoming data with your information.
+Or you can cut some useless information.
 </p>
 
 <!--FOOTER-->

@@ -92,6 +92,8 @@ public:
    static void repaintStart();
    static void repaintFinish();
 
+   static void startProcess( const QString & cmd, const QString & wdir = QString());
+
 private:
    static MonitorHost * m;
    static Dialog * d;

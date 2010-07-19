@@ -1,8 +1,6 @@
 #include "listtasks.h"
 
-#include <QtCore/QDir>
 #include <QtCore/QEvent>
-#include <QtCore/QProcess>
 #include <QtCore/QTimer>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
@@ -687,25 +685,7 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
    QString cmd((*previewcmds)[num_cmd]);
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
-   printf("Starting '%s'\n in'%s'\n", cmd.toUtf8().data(), wdir.toUtf8().data());
-   QString shell;
-   QStringList args;
-#ifdef WINNT
-   shell = "cmd.exe";
-   args << "/c" << cmd;
-#else
-   shell = "/bin/bash";
-   args << "-c" << cmd;
-#endif
-   if( QDir( wdir).exists())
-   {
-      QProcess::startDetached( shell, args, wdir);
-   }
-   else
-   {
-      AFERROR("Working directory does not exists.\n");
-      QProcess::startDetached( shell, args);
-   }
+   Watch::startProcess( cmd, wdir);
 }
 
 void ListTasks::actTaskListen()

@@ -1,5 +1,7 @@
 #include "watch.h"
 
+#include <QtCore/QDir>
+#include <QtCore/QProcess>
 #include <QtGui/QApplication>
 
 #include "../include/afanasy.h"
@@ -210,4 +212,35 @@ void Watch::repaint()
    for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
    for( QLinkedList<Wnd*>::iterator wIt = windows.begin(); wIt != windows.end(); wIt++) (*wIt)->update();
 //printf("Watch::repaint: finish\n");
+}
+
+void Watch::startProcess( const QString & cmd, const QString & wdir)
+{
+   printf("Starting '%s'", cmd.toUtf8().data());
+   if( false == wdir.isEmpty()) printf(" in '%s'", wdir.toUtf8().data());
+   printf("\n");
+
+   QStringList args;
+   QString shell;
+#ifdef WINNT
+   shell = "cmd.exe";
+   args << "/c" << cmd;
+#else
+   shell = "/bin/bash";
+   args << "-c" << cmd;
+#endif
+
+   if( false == wdir.isEmpty())
+   {
+      if( false == QDir( wdir).exists())
+      {
+         AFERROR("Working directory does not exists.\n");
+      }
+      else
+      {
+         QProcess::startDetached( shell, args, wdir);
+         return;
+      }
+   }
+   QProcess::startDetached( shell, args);
 }

@@ -65,7 +65,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
    }
    eventstitle = EventsName.arg( eventscount);
    height = 25 + 12*eventscount;
-   if( height < 70) height = 70;
+   if( height < 75) height = 75;
 
    superuser = false;
    usersids.clear();
@@ -121,11 +121,12 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 
    painter->setPen(   clrTextInfo( option) );
    painter->setFont(  afqt::QEnvironment::f_info);
-   int i = y-12; int dy = 15;
-   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, address );
+   int i = y; int dy = 15;
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, timel );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, timer );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, timea );
+
+   painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address );
 
    i = y;
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, usersidstitle );
