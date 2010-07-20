@@ -40,8 +40,19 @@ fi
 # Path to save 'Untitled' scene to render, if not set 'tmp' name in current folder will be used
 # export NUKE_AF_TMPSCENE="compositing/tmp"
 
-NUKE_LOCATION="/cg/soft/Nuke6.0"
-export NUKE_EXEC="${NUKE_LOCATION}/Nuke6.0"
+NUKE_INSTALL_DIR="/usr/local"
+NUKE_FORDERS=`ls "$NUKE_INSTALL_DIR"`
+NUKE_LOCATION=""
+NUKE_EXEC=""
+for NUKE_FORDER in $NUKE_FORDERS ;
+do
+   if [ "`echo $NUKE_FORDER | gawk '{print match( \$1, "Nuke")}'`" == "1" ]; then
+      NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FORDER}"
+      NUKE_EXEC="`echo $NUKE_FORDER | gawk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
+   fi
+done
+export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
+echo "NUKE = '${NUKE_EXEC}'"
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh

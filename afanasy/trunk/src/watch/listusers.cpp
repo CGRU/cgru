@@ -115,6 +115,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
    {
       menu.addSeparator();
       action = new QAction( "Add", this);
+      action->setEnabled( false == useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actAdd() ));
       menu.addAction( action);
    }
@@ -122,6 +123,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
    {
       menu.addSeparator();
       action = new QAction( "Delete", this);
+      action->setEnabled( useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
       menu.addAction( action);
    }

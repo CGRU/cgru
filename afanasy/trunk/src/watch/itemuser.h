@@ -12,6 +12,8 @@ public:
 
    void updateValues( af::Node *node, int type);
 
+   inline bool isPermanent() const { return permanent; }
+
    int errors_avoidhost;
    int errors_tasksamehost;
    int errors_retries;

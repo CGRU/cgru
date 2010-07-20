@@ -25,6 +25,8 @@ public:
    inline bool isBusy()   const { return busy;  }
    inline bool isnimby()  const { return nimby; }
    inline bool isNIMBY()  const { return NIMBY; }
+   inline bool isDirty()  const { return dirty; }
+   inline bool hasTasks() const { return tasks.size() > 0; }
 
    bool calcHeight();
 
