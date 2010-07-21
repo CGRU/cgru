@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <link href="styles.css" rel="stylesheet" type="text/css" />
-<title>CGRU Debian Install</title>
+<title>CGRU Linux Packages</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -25,7 +25,7 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">CGRU Debian Install</h2>
+<h2 align="center">CGRU Linux Packages</h2>
 <hr />
 
 <h3>Packages Dependence Structure:</h3>
@@ -130,8 +130,10 @@ Afanasy common files, needed by any Afanasy package.
 
 <h4><a name="cgru"/>cgru</h4>
 <p>
-Contains Afanasy client packages (all except server and web visor) and other CG utilities.
-Regular Expression Checker.
+Afanasy client packages (all except server and web visor).<br/>
+Open EXR files join utility.<br/>
+Movie Maker.<br/>
+Regular Expression Checker.<br/>
 </p>
 
 <h4><a name="cgru-common"/>cgru-common</h4>
@@ -139,6 +141,24 @@ Regular Expression Checker.
 Common files needed by CGRU, Afanasy GUI and documentation.
 It is an applications menu, some images and styles for HTML.
 </p>
+
+<h3>Installation:</h3>
+<ul>
+<li>
+Various GUI utilities, native for each Linux distribution, can install it.
+</li>
+<li>
+Commands like <code>dpkg -i</code> for .<b>deb</b>'s and <code>rpm -i</code> for .<b>rmp</b>'s.
+</li>
+<li>
+Install and uninstall script provided with the packages.
+</li>
+<li>
+The best way is to put this packages in you local company Linux repository.
+And to use native Linux ways to install and update software.
+In this way Linux system solve packages dependences itself.
+</li>
+</ul>
 
 <!--FOOTER-->
 <br/>

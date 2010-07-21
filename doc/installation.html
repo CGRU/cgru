@@ -43,28 +43,39 @@ $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
 <p>
 And build it yourself.
 </p>
-<h4>Debian Packages.</h4>
+<h4>Debian and RPM Packages.</h4>
 <p>
-Debian and Ubuntu users (and may be other Debian-like distributives) can use <kbd>.deb</kbd> packages.<br/>
-See this <a href="install_debian.html">Debian installation</a> page.
+For Linux with Debian (Debian, Ubuntu, ...) and RMP (RedHat, CentOS, Fedora, OpenSUSE, ...)
+Afanasy has software packages.<br/>
+See this <a href="install_linuxpackages.html">Linux Packages</a> page.
 </p>
-<h3>Setup Afanasy Environment</h3>
+<h3>Setup Environment</h3>
 <p>
-You need to go in CGRU Afanasy folder and source a script:
+You can setup you $PATH and $PYTHONPATH variables, to use Afanasy commands and to import Python module.
+</p>
+<p>
+To setup CGRU commands and Python module, you need to go in CGRU folder and source a script:
 </p>
 <code>
-$ cd afanasy<br/>
+$ cd cgru<br/>
 $ source setup.sh<br/>
 </code>
 <p>
-You can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
+To setup Afanasy commands and Python module, you need to go in Afanasy folder and source a script:
+</p>
 <code>
-pwd=$PWD; cd .../cgru/afanasy; source setup.sh; cd $pwd<br/>
+$ cd cgru/afanasy<br/>
+$ source setup.sh<br/>
+</code>
+<p>
+You can put next lines at the end of your <kbd>~/.bashrc</kbd> file:<br/>
+<code>
+# CRGU:<br/>
+pwd=$PWD; cd cgru; source setup.sh; cd $pwd<br/>
+# Afanasy:<br/>
+pwd=$PWD; cd cgru/afanasy; source setup.sh; cd $pwd<br/>
 </code>
 And shell will automatically source it at every launch.
-</p>
-<p>
-After this setup, Afanasy commands will appear in $PATH and $PYTHONPATH will be appended with Python modules location. So you can launch Afanasy commands and import Python module.
 </p>
 <p>
 <b>MS Windows:</b>
