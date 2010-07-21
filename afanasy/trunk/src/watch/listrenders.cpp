@@ -449,21 +449,30 @@ void ListRenders::actRestoreDefaults()
 
 void ListRenders::actCommand( int number)
 {
+   const QStringList * cmds = Watch::getRenderCmds();
+//   int cmdssize = cmds->size();
+   if( number >= cmds->size())
+   {
+      displayError( "No such command.");
+      return;
+   }
+
    QModelIndexList indexes( view->selectionModel()->selectedIndexes());
+
+   if( indexes.count() < 1 )
+   {
+      Item* item = getCurrentItem();
+      QString cmd((*cmds)[number]);
+      Watch::startProcess( cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName()));
+      return;
+   }
+
    for( int i = 0; i < indexes.count(); i++)
    {
       if( false == qVariantCanConvert<Item*>( indexes[i].data())) continue;
       Item* item = qVariantValue<Item*>( indexes[i].data());
       if( item == NULL ) continue;
-      const QStringList * cmds = Watch::getRenderCmds();
-      int cmdssize = cmds->size();
-      if( number >= cmdssize )
-      {
-         displayError( "No such command.");
-         return;
-      }
       QString cmd((*cmds)[number]);
-      cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
-      Watch::startProcess( cmd);
+      Watch::startProcess( cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName()));
    }
 }
