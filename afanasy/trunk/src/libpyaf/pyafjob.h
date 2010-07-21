@@ -27,7 +27,7 @@ PyObject * PyAf_Job_setMaxHosts(          PyAf_Job_Object *self, PyObject *arg);
 PyObject * PyAf_Job_setPriority(          PyAf_Job_Object *self, PyObject *arg);
 PyObject * PyAf_Job_setWaitTime(          PyAf_Job_Object *self, PyObject *arg);
 PyObject * PyAf_Job_output(               PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_offLine(              PyAf_Job_Object *self);
+PyObject * PyAf_Job_offline(              PyAf_Job_Object *self);
 PyObject * PyAf_Job_clearBlocksList(      PyAf_Job_Object *self);
 PyObject * PyAf_Job_construct(            PyAf_Job_Object *self);
 PyObject * PyAf_Job_getDataLen(           PyAf_Job_Object *self);
@@ -52,7 +52,7 @@ static PyMethodDef PyAf_Job_methods[] = {
    {"setPriority",         (PyCFunction) PyAf_Job_setPriority,          METH_O,        "Set priority."            },
    {"setWaitTime",         (PyCFunction) PyAf_Job_setWaitTime,          METH_O,        "Set wait time."           },
    {"output",              (PyCFunction) PyAf_Job_output,               METH_O,        "Print information."       },
-   {"offLine",             (PyCFunction) PyAf_Job_offLine,              METH_NOARGS,   "Start job paused."        },
+   {"offline",             (PyCFunction) PyAf_Job_offline,              METH_NOARGS,   "Start job paused."        },
    {"clearBlocksList",     (PyCFunction) PyAf_Job_clearBlocksList,      METH_NOARGS,   "Clear blocks list."       },
    {"construct",           (PyCFunction) PyAf_Job_construct,            METH_NOARGS,   "Construct job data."      },
    {"getDataLen",          (PyCFunction) PyAf_Job_getDataLen,           METH_NOARGS,   "Get job data length."     },

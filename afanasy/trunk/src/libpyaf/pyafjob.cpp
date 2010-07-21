@@ -119,9 +119,9 @@ PyObject * PyAf_Job_output( PyAf_Job_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Job_offLine( PyAf_Job_Object *self)
+PyObject * PyAf_Job_offline( PyAf_Job_Object *self)
 {
-   self->job->offLine();
+   self->job->offline();
    Py_RETURN_NONE;
 }
 

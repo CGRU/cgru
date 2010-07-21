@@ -32,7 +32,7 @@ void Job::setCmdPost(      const char * str     )  { cmd_post     = QString::fro
 void Job::setMaxHosts(              int value   )  { maxhosts     = value;                               }
 void Job::setPriority(              int value   )  { priority     = value;                               }
 void Job::setWaitTime(              int value   )  { time_wait    = value;                               }
-void Job::offLine()                                { state        = state | AFJOB::STATE_OFFLINE_MASK;   }
+void Job::offline()                                { state        = state | AFJOB::STATE_OFFLINE_MASK;   }
 
 int  Job::getDataLen() { if( message) return message->writeSize(); else return -1;}
 void Job::clearBlocksList() { blocks.clear();}

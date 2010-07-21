@@ -63,7 +63,7 @@ public:
    void setWaitTime( int value);
 
 /// Set job state to offline. Afanasy will not solve it.
-   void offLine();
+   void offline();
 
 
 /// Clear blocks pointers list

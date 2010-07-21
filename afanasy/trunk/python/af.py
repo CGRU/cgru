@@ -180,3 +180,8 @@ class Job(pyaf.Job):
       block = Block( blockname, blocktype)
       self.blocks.append( block)
       return block
+
+   def pause(      self): self.offline()
+   def setPaused(  self): self.offline()
+   def offLine(    self): self.offline()
+   def setOffline( self): self.offline()
