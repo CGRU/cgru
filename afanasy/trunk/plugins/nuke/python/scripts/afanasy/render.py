@@ -88,6 +88,8 @@ def getInputNodes( afnode, parent):
 class BlockParameters:
    def __init__( self, afnode, wnode, subblock, prefix, fparams):
       if VERBOSE==2: print 'Initializing block parameters for "%s"' % wnode.name()
+      self.valid = True
+
       self.subblock          = subblock
       self.prefix            = prefix
 
@@ -112,11 +114,34 @@ class BlockParameters:
          self.hostsmaskexclude  = afnode.knob('hostsmaskexcl').value()
 
       self.writename = str( wnode.name())
+
       self.imgfile = str( wnode.knob('file').value())
       folder = os.path.dirname( self.imgfile)
       if not os.path.isdir(folder):
-         result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (folder,self.writename))
-         if result: os.mkdir( folder)
+         result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
+         if result:
+            os.mkdir( folder)
+         else:
+            self.valid = False
+      views = wnode.knob('views')
+      if views is not None:
+         views = views.value()
+         if views is not None:
+            if views != '':
+               views = views.split(' ')
+               images = []
+               for view in views:
+                  view = view.strip()
+                  if view != '':
+                     img = self.imgfile
+                     img = img.replace('%V', view)
+                     img = img.replace('%v', view[0])
+                     images.append( img)
+               if len(images) > 0:
+                  self.imgfile = ''
+                  for img in images:
+                     if self.imgfile != '': self.imgfile += ';'
+                     self.imgfile += img
 
       for par in fparams:
          if fparams[par] is not None:
@@ -144,6 +169,9 @@ class BlockParameters:
 
    def genBlock( self, scenename):
       if VERBOSE==2: print 'Generating block "%s"' % self.name
+
+      if not self.valid: return None
+
       block = af.Block( self.name, AfanasyServiceType)
       block.setNumeric( self.framefirst, self.framelast, self.framespertask)
       block.setFiles( self.imgfile)
@@ -218,6 +246,7 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
       else:
          # Get block parameters from "write" node:
          bparams = BlockParameters( afnode, node, subblock, prefix, fparams)
+         if not bparams.valid: return None
          newparams.append( bparams)
 
       # Set dependences:
@@ -256,6 +285,7 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
 
 class JobParameters:
    def __init__( self, afnode, jobname, blocks, fparams):
+      self.valid = True
       if VERBOSE==2:
          nodename = '???'
          if afnode is not None: nodename = afnode.name()
@@ -294,6 +324,7 @@ class JobParameters:
 
       if blocks is None:
          self.blocksparameters = getBlocksParameters( afnode, False, '', fparams)
+         if self.blocksparameters is None: self.valid = False
       else:
          self.blocksparameters.extend( blocks)
          blocksnames = blocks[0].name
@@ -312,6 +343,7 @@ class JobParameters:
 
    def genJob( self, renderscenename):
       if VERBOSE==2: print 'Generating job on: "%s"' % self.nodename
+      if not self.valid: return None
 
       if self.blocksparameters == None:
          if VERBOSE: print 'Block parameters generation error on "%s"' % self.nodename
@@ -384,6 +416,7 @@ def getJobsParameters( afnode, prefix, fparams):
    # Construct single job (no jobs recursion)
    if singlejob:
       jobparams = JobParameters( afnode, jobname, None, fparams)
+      if not jobparams.valid: return None
       jobsparameters.append( jobparams)
       return jobsparameters
 
@@ -415,8 +448,10 @@ def getJobsParameters( afnode, prefix, fparams):
          # Generate a job with one block if "write" node connected
          blocksparameters = []
          bparams = BlockParameters( afnode, node, False, '', fparams)
+         if not bparams.valid: return None
          blocksparameters.append( bparams)
          jobparams = JobParameters( afnode, prefix, blocksparameters, fparams)
+         if not jobparams.valid: return None
          # Set dependences
          if not independent:
             if dependname is not None:
@@ -451,14 +486,17 @@ def renderNodes( nodes, fparams, storeframes):
             oldparams[key] = node.knob(key).value()
             node.knob(key).setValue(fparams[key])
          newjobparameters = getJobsParameters( node, scenename, dict())
+         if newjobparameters is None: return
          if storeframes == False:
             for key in oldparams:
                node.knob(key).setValue(oldparams[key])
       if node.Class() == RenderNodeClassName:
          blocksparameters = []
          bparams = BlockParameters( None, node, False, '', fparams)
+         if not bparams.valid: return
          blocksparameters.append( bparams)
          jobparams = JobParameters( None, scenename, blocksparameters, fparams)
+         if not jobparams.valid: return
          newjobparameters = []
          newjobparameters.append( jobparams)
       if newjobparameters is None:

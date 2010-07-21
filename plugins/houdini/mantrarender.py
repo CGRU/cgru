@@ -74,15 +74,6 @@ if 'd' in sys.argv[1]:
             ropfile = sys.argv[a]
             break
 
-#if sys.platform.find('win') == 0:
-#   houdini = os.getenv('HOUDINI_LOCATION')
-#   if houdini is None or houdini == '':
-#      print 'Error: HOUDINI_LOCATION is not set, can`t find mantra location.'
-#      exit(1)
-#   mantra = houdini + '/bin/mantra.exe'
-#else:
-#   mantra = 'mantra'
-
 # Construct a command:
 if argspos > 1:
    filter = filter.replace('\\','/')

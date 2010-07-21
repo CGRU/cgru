@@ -62,8 +62,10 @@ def filterQuit():
    # Copy image files from temp directory:
    allitems = os.listdir( tmpdir)
    if len(allitems) < 1:
+      print 'Error: No images generated.'
       print parsers.parser.str_badresult
       sys.stdout.flush()
+   images_count = 0
    for item in allitems:
       src  = os.path.join( tmpdir,    item)
       dest = os.path.join( imagesdir, item)
@@ -85,7 +87,15 @@ def filterQuit():
          print str(sys.exc_info()[1])
          print src
          print dest
-      if not os.path.isfile( dest):
+      if os.path.isfile( dest):
+         images_count += 1
+      else:
          print 'Error: Destination file does not exist.'
          print parsers.parser.str_badresult
          sys.stdout.flush()
+   if images_count < len(filteredNames):
+         print 'Error: Not enough images generated (%d of %d).' % (images_count,len(filteredNames))
+         print parsers.parser.str_badresult
+         sys.stdout.flush()
+   else:
+      print 'Images processed: %d' % images_count

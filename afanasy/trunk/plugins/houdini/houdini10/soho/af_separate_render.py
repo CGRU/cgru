@@ -36,6 +36,8 @@ depend_mask_global = afnode.parm('depend_mask_global').eval()
 hosts_mask = afnode.parm('hosts_mask').eval()
 hosts_mask_exclude = afnode.parm('hosts_mask_exclude').eval()
 
+rop_setdiskfile = False
+
 if read_rop or run_rop:
    ropnode = hou.node( rop)
    if not ropnode:
@@ -49,6 +51,12 @@ if not run_rop:
 if join_render:
    tile_render = False
    delete_files = True
+else:
+   if ropnode.parm('soho_outputmode').eval() == 0:
+      # Set outpu mode to produce ifd files:
+      ropnode.parm('soho_outputmode').set(1)
+      rop_setdiskfile = True
+      ropnode.parm('soho_diskfile').set( ropnode.parm('vm_picture').unexpandedString() + '.ifd')
 
 job = af.Job()
 job.setName( job_name)
@@ -66,14 +74,6 @@ images = afhoudini.pathToC( afnode.parm('images').evalAsStringAtFrame(f_start), 
 files  = afhoudini.pathToC( afnode.parm('files' ).evalAsStringAtFrame(f_start), afnode.parm('files' ).evalAsStringAtFrame(f_finish))
 
 if run_rop:
-   if not join_render:
-      rop_setdiskfile = False
-      if ropnode.parm('soho_outputmode').eval() == 0:
-         # Set outpu mode to produce ifd files:
-         ropnode.parm('soho_outputmode').set(1)
-         rop_setdiskfile = True
-         ropnode.parm('soho_diskfile').set( ropnode.parm('vm_picture').unexpandedString() + '.ifd')
-
    # Calculate temporary hip name:
    ftime = time.time()
    tmphip = hou.hipFile.name() + '_' + job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
@@ -83,8 +83,6 @@ if run_rop:
    hou.hscript('mwrite -n %s' % tmphip)
 
    if not join_render:
-      # Set output mode back if was enabled:
-      if rop_setdiskfile: ropnode.parm('soho_outputmode').set(0)
       blocktype = 'hbatch'
       blockname = 'generate'
       cmd = 'hrender_af'
@@ -138,6 +136,9 @@ if tile_render:
 if read_rop:
    afnode.parm('images').set('')
    afnode.parm('files' ).set('')
+
+# Set output mode back if was enabled:
+if rop_setdiskfile: ropnode.parm('soho_outputmode').set(0)
 
 if tile_render: job.blocks.append( b_join)
 if not join_render: job.blocks.append( b_render)
