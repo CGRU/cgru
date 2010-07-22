@@ -9,6 +9,10 @@ class hbatch(parser.parser):
       self.firstframe = True
 
    def do( self, data):
+
+      if data.find('No licenses could be found to run this application') != -1: self.error = True
+      if data.find('Please check for a valid license server host') != -1: self.error = True
+
       if data.find( keyframe) > -1:
          if self.firstframe:
             self.firstframe = False
