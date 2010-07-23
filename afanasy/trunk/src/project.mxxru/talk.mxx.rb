@@ -31,7 +31,7 @@ Mxx_ru::Cpp::exe_target {
 
       when "mswin"
          define "WINNT"
-         linker_option "-Wl,-subsystem,windows"
+         linker_option "/SUBSYSTEM:WINDOWS"
       else
          raise "#{toolset.tag('target_os')} platform is not supported."
    end

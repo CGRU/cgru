@@ -6,11 +6,6 @@ Mxx_ru::Cpp::lib_target{
 
    include_path("#{ENV['QTDIR']}/include", MxxRu::Cpp::Target::OPT_UPSPREAD)
 
-   lib_path("#{ENV['QTDIR']}/lib")
-   lib "QtCore"
-   lib "QtNetwork"
-   lib "QtXml"
-
    case toolset.tag( "target_os" )
       when "unix"
 
@@ -30,9 +25,6 @@ Mxx_ru::Cpp::lib_target{
       when "mswin"
          define "WINNT"
          include_path("#{ENV['PYTHONDIR']}/include", MxxRu::Cpp::Target::OPT_UPSPREAD )
-         lib_path "#{ENV['PYTHONDIR']}/libs"
-         lib "#{ENV['PYTHONLIB']}"
-         lib "wsock32"
 
       else
          raise "#{toolset.tag('target_os')} platform is not supported."

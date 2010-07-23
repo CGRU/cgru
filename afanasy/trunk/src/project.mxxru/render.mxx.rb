@@ -30,6 +30,8 @@ Mxx_ru::Cpp::exe_target {
 
       when "mswin"
          define "WINNT"
+         lib "Advapi32"
+         lib "User32"
       else
          raise "#{toolset.tag('target_os')} platform is not supported."
    end

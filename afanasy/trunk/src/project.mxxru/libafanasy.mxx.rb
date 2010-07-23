@@ -28,8 +28,6 @@ Mxx_ru::Cpp::lib_target{
          end
       when "mswin"
          define "WINNT"
-         include_path("#{ENV['MINGWDIR']}/include",  MxxRu::Cpp::Target::OPT_UPSPREAD )
-         lib_path(    "#{ENV['MINGWDIR']}/lib")
          include_path("#{ENV['QTDIR']}/include",     MxxRu::Cpp::Target::OPT_UPSPREAD)
          lib_path(    "#{ENV['QTDIR']}/lib")
          include_path("#{ENV['PYTHONDIR']}/include", MxxRu::Cpp::Target::OPT_UPSPREAD )

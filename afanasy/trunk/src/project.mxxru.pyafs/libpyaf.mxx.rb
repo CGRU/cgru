@@ -2,33 +2,43 @@
 
 Mxx_ru::Cpp::dll_target{
 
-   target "pyaf"
-   target_prefix ""
-   required_prj "libafapi.mxx.rb"
+   target 'pyaf'
+   target_prefix ''
+   required_prj 'libafapi.mxx.rb'
 
-   case toolset.tag( "target_os" )
+   lib_path("#{ENV['QTDIR']}/lib")
+   lib 'QtCore'
+   lib 'QtNetwork'
+   lib 'QtXml'
 
-      when "unix"
+   case toolset.tag('target_os')
 
-         lib "rt"
-         lib "z"
-         lib "glib-2.0"
-         lib "gthread-2.0"
+      when 'unix'
+
+         lib 'rt'
+         lib 'z'
+         lib 'glib-2.0'
+         lib 'gthread-2.0'
 
          case ENV['UNIXTYPE']
-            when "MACOSX"
-               define "MACOSX"
-               linker_option "-prebind -dynamiclib -single_module"
-
+            when 'MACOSX'
+               define 'MACOSX'
+               linker_option '-prebind -dynamiclib -single_module'
             else
-               define "LINUX"
-               compiler_option "-fno-strict-aliasing"
-
+               define 'LINUX'
+               compiler_option '-fno-strict-aliasing'
          end
 
-      when "mswin"
-         define "WINNT"
+      when 'mswin'
+         define 'WINNT'
          target_ext '.pyd'
+         lib_path "#{ENV['PYTHONDIR']}/libs"
+         lib "#{ENV['PYTHONLIB']}"
+         lib 'wsock32'
+         lib 'Advapi32'
+         lib 'User32'
+         lib 'Ws2_32'
+         lib 'ole32'
       else
          raise "#{toolset.tag('target_os')} platform is not supported."
    end
