@@ -44,7 +44,7 @@ def filterPlane():
       if tmpdir != '':
          pos = filename.rfind("/")
          filename = tmpdir + filename[pos:]
-   filteredNames.append( filename)
+      filteredNames.append( filename)
    print 'Mantra plane filename:\n' + filename
    mantra.setproperty('plane:planefile', filename)
 
