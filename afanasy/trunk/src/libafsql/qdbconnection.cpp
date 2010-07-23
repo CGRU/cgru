@@ -2,12 +2,12 @@
 
 #include <stdio.h>
 
-#include <qcoreapplication.h>
-#include <qsqldatabase.h>
-#include <qsqlerror.h>
-#include <qsqlquery.h>
-#include <qstringlist.h>
-#include <qvariant.h>
+#include <QtCore/qcoreapplication.h>
+#include <QtCore/qstringlist.h>
+#include <QtCore/qvariant.h>
+#include <QtSql/qsqldatabase.h>
+#include <QtSql/qsqlerror.h>
+#include <QtSql/qsqlquery.h>
 
 #include "../libafanasy/environment.h"
 

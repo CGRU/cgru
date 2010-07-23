@@ -1,6 +1,6 @@
 #pragma once
 
-#include <qvariant.h>
+#include <QtCore/qvariant.h>
 
 #include "../libafanasy/taskdata.h"
 

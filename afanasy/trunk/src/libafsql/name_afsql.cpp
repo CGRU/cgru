@@ -1,6 +1,7 @@
 #include "name_afsql.h"
 
-#include <qsqlerror.h>
+#include <QtSql/qsqlerror.h>
+
 #include <stdio.h>
 
 #include "../libafanasy/environment.h"

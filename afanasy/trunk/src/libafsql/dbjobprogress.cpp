@@ -1,6 +1,6 @@
 #include "dbjobprogress.h"
 
-#include <qvariant.h>
+#include <QtCore/qvariant.h>
 
 #include "../libafanasy/job.h"
 

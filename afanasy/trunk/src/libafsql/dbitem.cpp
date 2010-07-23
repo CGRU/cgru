@@ -1,8 +1,8 @@
 #include "dbitem.h"
 
-#include <qsqldatabase.h>
-#include <qsqlerror.h>
-#include <qsqlquery.h>
+#include <QtSql/qsqldatabase.h>
+#include <QtSql/qsqlerror.h>
+#include <QtSql/qsqlquery.h>
 
 #include "dbattr.h"
 

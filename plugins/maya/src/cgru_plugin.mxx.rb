@@ -13,9 +13,6 @@ Mxx_ru::Cpp::macos_bundle_target {
 
    include_path "mr_shaders/src"
 
-#   define  "MAYA_VERSION_" + ENV['MAYA_VERSION'] 
-#   define  "MAYA_VERSION_6_0"
-
    define "REQUIRE_IOSTREAM"
 
    case toolset.tag( "target_os" )
@@ -41,8 +38,6 @@ Mxx_ru::Cpp::macos_bundle_target {
          linker_option "/export:uninitializePlugin"
 #         linker_option "/NODEFAULTLIB"
          lib "user32.lib"
-#         include_path "\"C:/Program Files/Microsoft SDKs/Windows/v6.0A/Include\""
-#         lib_path "\"C:/Program Files/Microsoft SDKs/Windows/v6.0A/Lib\""
          if maya_arch == nil || (maya_arch.empty? || maya_arch.include?("32"))
                define "Bits32_" # suppose it's 32bit if no architecture specified
          else
