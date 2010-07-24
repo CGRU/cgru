@@ -15,10 +15,7 @@ Mxx_ru::Cpp::dll_target{
 
       when 'unix'
 
-         lib 'rt'
-         lib 'z'
-         lib 'glib-2.0'
-         lib 'gthread-2.0'
+         linker_option ENV['AF_LFLAGS']
 
          case ENV['UNIXTYPE']
             when 'MACOSX'
