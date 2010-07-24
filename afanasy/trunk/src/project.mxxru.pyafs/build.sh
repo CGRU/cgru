@@ -26,4 +26,8 @@ for python in `ls "$pythondir"`; do
 
    ruby afanasy.mxw.rb $*
 
+   output="../../bin_pyaf/$python"
+   [ -d $output ] || mkdir -p $output
+   cp -v "tmp/$python/pyaf.so" $output
+   
 done

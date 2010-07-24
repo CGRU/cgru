@@ -25,8 +25,7 @@ Mxx_ru::Cpp::composite_target {
 
    puts "OS="+toolset.tag("target_os")
    pyaf = ENV['AF_PYAFVER']
-   bin = "../../bin_pyaf/#{pyaf}"
-   bin = "tmp/#{pyaf}" if toolset.tag("target_os") == 'mswin'
+   bin = "tmp/#{pyaf}"
    tmp = "tmp.#{pyaf}"
 
    # How to store data
