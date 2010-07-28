@@ -325,6 +325,7 @@ if need_convert:
    for afile in allFiles:
       cmd = 'convert -size %(width)dx%(height)d -colorspace RGB xc:black' % vars()
       cmd += ' ' + os.path.join( inputdir, afile)
+      cmd += ' +matte'
       cmd += ' -resize %(width)d' % vars()
       if gamma > 0: cmd += ' -gamma %.2f' % gamma
       if correction != '': cmd += correction
