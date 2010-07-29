@@ -14,10 +14,6 @@ using namespace af;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-extern char PYNAME_FuncApplyCmdCapacity[];
-extern char PYNAME_FuncApplyCmdHosts[];
-extern char PYNAME_FuncCheckFiles[];
-
 Service::Service( const QString & Type,
             const QString & WDir,
             const QString & Command,

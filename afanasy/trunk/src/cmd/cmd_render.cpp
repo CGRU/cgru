@@ -55,7 +55,7 @@ void CmdRenderResoucesList::msgOut( af::Msg& msg)
    for( int i = 0; i < list.getCount(); i++)
    {
       af::Render * render = (af::Render*)(list.getNode(i));
-      render->hres.stdOut( false);
+      render->getHostRes().stdOut( false);
    }
 }
 

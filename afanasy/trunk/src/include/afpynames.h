@@ -16,4 +16,7 @@ namespace AFPYNAMES
 
    const char PARSER_CLASSESDIR[] = "parsers";      ///< Parsers directory relative to PYTHONPATH
    const char PARSER_FUNC_PARSE[] = "parse";
+
+   const char RES_CLASSESDIR[]  = "resources";      ///< Resources directory relative to PYTHONPATH
+   const char RES_FUNC_UPDATE[] = "do";
 }

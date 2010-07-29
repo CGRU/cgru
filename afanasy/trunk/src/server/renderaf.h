@@ -70,7 +70,7 @@ public:
 
    bool canRunService( const QString & type) const; ///< Check whether block can run a service
 
-   bool update( af::Render * render);   ///< Update Render.
+   bool update( const af::Render * render);   ///< Update Render.
 
 public:
    /// Set jobs container.

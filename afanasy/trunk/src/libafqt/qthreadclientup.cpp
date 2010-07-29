@@ -91,7 +91,7 @@ printf("QThreadClientUp::run: (blocking) "); message->stdOut();
 #endif
          if( message )
          {
-            if( update_handler_ptr != NULL ) update_handler_ptr( message);
+            if( update_handler_ptr != NULL ) message = update_handler_ptr( message);
             sendMessage( message, &socket);
          }
 #ifdef WINNT
@@ -109,7 +109,7 @@ printf("QThreadClientUp::run: (non-blocking) "); message->stdOut();
 #endif
          if( message )
          {
-            if( update_handler_ptr != NULL ) update_handler_ptr( message);
+            if( update_handler_ptr != NULL ) message = update_handler_ptr( message);
             sendMessage( message, &socket);
          }
 
@@ -119,4 +119,3 @@ printf("QThreadClientUp::run: (non-blocking) "); message->stdOut();
          }
       }
 }
-

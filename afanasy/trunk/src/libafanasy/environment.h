@@ -128,7 +128,10 @@ public:
    static inline int getRenderWaitForReadyRead()      { return render_waitforreadyread;     }
    static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
    static inline int getRenderLogsLinesMax()          { return render_logs_linesmax;        }
-   static inline const QString& getRenderExec()       { return render_exec;                 } ///< Get Render execution commannd.
+   static inline const QString& getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
+   static inline const QString& getRenderHDDSpacePath()  { return render_hddspace_path;   }
+   static inline const QString& getRenderIOStatDevice()  { return render_iostat_device;   }
+   static inline const QString& getRenderResClasses()    { return render_resclasses;      }
 
 #ifndef WINNT
 
@@ -233,6 +236,9 @@ private:
    static int render_waitforbyteswritten;
    static int render_logs_linesmax;
    static QString render_exec;       ///< How Render can execute anther Render.
+   static QString render_hddspace_path;
+   static QString render_iostat_device;
+   static QString render_resclasses;
 
    static int errors_avoid_host;
    static int task_error_retries;

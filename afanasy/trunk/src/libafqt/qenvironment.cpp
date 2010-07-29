@@ -22,9 +22,10 @@ AttrNumber QEnvironment::saveGUIOnExit(       "saveguionexit",        "Save Gui 
 AttrNumber QEnvironment::showOfflineNoise(    "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE       );
 
 Attr       QEnvironment::font_family(         "font_family",          "Font Family",             AFGUI::FONT_FAMILY            );
-AttrNumber QEnvironment::font_sizename(       "font_sizename",        "Font Size Name",          AFGUI::FONT_SIZENAME          );
-AttrNumber QEnvironment::font_sizeinfo(       "font_sizeinfo",        "Font Size Info",          AFGUI::FONT_SIZEINFO          );
-AttrNumber QEnvironment::font_sizemin(        "font_sizemin",         "Font Size Minimum",       AFGUI::FONT_SIZEMIN           );
+AttrNumber QEnvironment::font_sizename(       "font_sizename",        "Size Name",               AFGUI::FONT_SIZENAME          );
+AttrNumber QEnvironment::font_sizeinfo(       "font_sizeinfo",        "Size Info",               AFGUI::FONT_SIZEINFO          );
+AttrNumber QEnvironment::font_sizemin(        "font_sizemin",         "Size Minimum",            AFGUI::FONT_SIZEMIN           );
+AttrNumber QEnvironment::font_sizeplotter(    "font_sizeplotter",     "Size Plotter",            AFGUI::FONT_SIZEPLOTTER       );
 
 AttrColor QEnvironment::clr_Window(          "clr_Window",           "Window",                  AFGUI::CLR_WINDOW              );
 AttrColor QEnvironment::clr_WindowText(      "clr_WindowText",       "Window Text",             AFGUI::CLR_WINDOWTEXT          );
@@ -56,6 +57,7 @@ AttrColor QEnvironment::clr_itemrender(      "clr_itemrender",       "Render Ite
 AttrColor QEnvironment::clr_itemrenderoff(   "clr_itemrenderoff",    "Offine Render",           AFGUI::CLR_ITEMRENDEROFF       );
 AttrColor QEnvironment::clr_itemrenderbusy(  "clr_itemrenderbusy",   "Busy Render",             AFGUI::CLR_ITEMRENDERBUSY      );
 AttrColor QEnvironment::clr_itemrendernimby( "clr_itemrendernimby",  "Render With Nimby",       AFGUI::CLR_ITEMRENDERNIMBY     );
+AttrColor QEnvironment::clr_itemrenderpltclr("clr_itemrenderpltclr", "Plotter Text Label",      AFGUI::CLR_ITEMRENDERPLTCLR    );
 AttrColor QEnvironment::clr_running(         "clr_running",          "Running Bar",             AFGUI::CLR_RUNNING             );
 AttrColor QEnvironment::clr_done(            "clr_done",             "Done Bar",                AFGUI::CLR_DONE                );
 AttrColor QEnvironment::clr_error(           "clr_error",            "Error Bar",               AFGUI::CLR_ERROR               );
@@ -77,6 +79,7 @@ QString QEnvironment::filename = "";
 
 QFont QEnvironment::f_name;
 QFont QEnvironment::f_info;
+QFont QEnvironment::f_plotter;
 QFont QEnvironment::f_min;
 QList<Attr*>     QEnvironment::attrs_prefs;
 QList<AttrRect*> QEnvironment::attrs_wndrects;
@@ -96,6 +99,7 @@ QEnvironment::QEnvironment( const QString & name)
    attrs_gui.append( &font_sizename       );
    attrs_gui.append( &font_sizeinfo       );
    attrs_gui.append( &font_sizemin        );
+   attrs_gui.append( &font_sizeplotter    );
 
    attrs_gui.append( &clr_Window          );
    attrs_gui.append( &clr_WindowText      );
@@ -127,6 +131,7 @@ QEnvironment::QEnvironment( const QString & name)
    attrs_gui.append( &clr_itemrenderoff   );
    attrs_gui.append( &clr_itemrenderbusy  );
    attrs_gui.append( &clr_itemrendernimby );
+   attrs_gui.append( &clr_itemrenderpltclr);
    attrs_gui.append( &clr_running         );
    attrs_gui.append( &clr_done            );
    attrs_gui.append( &clr_error           );
@@ -162,15 +167,18 @@ QEnvironment::QEnvironment( const QString & name)
 
 void QEnvironment::initFonts()
 {
-   f_name.setBold(true);
-   f_name.setFamily(    font_family.str );
-   f_name.setPointSize( font_sizename.n );
-   f_info.setBold(true);
-   f_info.setFamily(    font_family.str );
-   f_info.setPointSize( font_sizeinfo.n );
-   f_min.setBold(true);
-   f_min.setFamily(     font_family.str );
-   f_min.setPointSize(  font_sizemin.n  );
+   f_name.setBold(         true              );
+   f_name.setFamily(       font_family.str   );
+   f_name.setPointSize(    font_sizename.n   );
+   f_info.setBold(         true              );
+   f_info.setFamily(       font_family.str   );
+   f_info.setPointSize(    font_sizeinfo.n   );
+   f_min.setBold(          true              );
+   f_min.setFamily(        font_family.str   );
+   f_min.setPointSize(     font_sizemin.n    );
+   f_plotter.setBold(      false             );
+   f_plotter.setFamily(    font_family.str   );
+   f_plotter.setPointSize( font_sizeplotter.n);
 }
 
 QEnvironment::~QEnvironment()

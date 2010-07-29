@@ -5,8 +5,9 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 
-#include "../libafqt/name_afqt.h"
+#include "../libafqt/qmsg.h"
 
+#include "pyres.h"
 #include "res.h"
 
 #ifdef WINNT
@@ -19,18 +20,29 @@
 
 RenderHost* render;
 
-af::Msg* update_handler_ptr( af::Msg * msg)
+afqt::QMsg* update_handler_ptr( afqt::QMsg * msg)
 {
    return render->updateMsg( msg);
 }
 
 RenderHost::RenderHost( int32_t State, uint8_t Priority):
-   Render( State, Priority)
+   Render( State, Priority),
+   upmsg( NULL)
 {
    setOnline();
    render = this;
+
    host.os = af::Environment::getPlatform();
    GetResources( host, hres, true);
+
+   QStringList resclasses = af::Environment::getRenderResClasses().split(';');
+   for( int i = 0; i < resclasses.size(); i++)
+   {
+      QString classname = resclasses[i].trimmed();
+      if( classname.isEmpty() ) continue;
+      pyres.push_back( new PyRes(classname.toUtf8().data(), &hres));
+   }
+
 #ifdef WINNT
 // Windows Must Die:
    Sleep( 100);
@@ -63,25 +75,30 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
 #else
    usleep( 100000);
 #endif
+
    GetResources( host, hres, false);
+   for( int i = 0; i < pyres.size(); i++) pyres[i]->update();
+
    host.stdOut( true);
    hres.stdOut( true);
 }
 
 RenderHost::~RenderHost()
 {
+   for( int i = 0; i < pyres.size(); i++) if( pyres[i]) delete pyres[i];
+   if( upmsg != NULL ) delete upmsg;
 }
 
-af::Msg* RenderHost::updateMsg( af::Msg *msg)
+afqt::QMsg* RenderHost::updateMsg( afqt::QMsg *msg)
 {
-   if( msg->type() != af::Msg::TRenderUpdate) return msg;
+//   if( msg->type() != af::Msg::TRenderUpdate) return msg;
 
    GetResources( host, hres, false);
+   for( int i = 0; i < pyres.size(); i++) pyres[i]->update();
 
-   msg->resetWrittenSize();
-
-//   hres.stdOut();
-   hres.readwrite( msg);
+//hres.stdOut();
+//   msg->resetWrittenSize();
+//   hres.readwrite( msg);
 
 #ifdef WINNT
 // Windows Must Die:
@@ -96,5 +113,8 @@ af::Msg* RenderHost::updateMsg( af::Msg *msg)
    }
 #endif
 
-   return msg;
+   if( upmsg != NULL ) delete upmsg;
+   upmsg = new afqt::QMsg( msg->type(), this, true);
+
+   return upmsg;
 }

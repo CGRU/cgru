@@ -72,11 +72,13 @@ namespace AFRENDER
    const int  WAITFORREADYREAD    = 15000;      ///< Wait for data from server timeout milliseconds.
    const int  WAITFORBYTESWRITTEN = 15000;      ///< Wait writing to socket timeout milliseconds.
    const int  MAXCOUNT            = 1000000;    ///< Maximum allowed online Renders.
-   const char EXEC[]              = "afrender"; ///< How Render to execute another Render.
    const int  TASKPROCESSNICE     = 10;         ///< Child process nice.
    const int  LOGS_LINESMAX       = 100;        ///< Maximum number of lines in each Render log.
-   const char LOGS_DIRECTORY[]    = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
    const int  LOGS_ROTATE         = 10;         ///< Number of logs to keep.
+   const char LOGS_DIRECTORY[]    = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
+   const char EXEC[]              = "afrender"; ///< How Render to execute another Render.
+   const char HDDSPACE_PATH[]     = "/";        ///< Path to query total and free space.
+   const char IOSTAT_DEVICE[]     = "sda";      ///< Device to monitor IO.
 }
 
 /// Watch options:

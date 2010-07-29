@@ -680,9 +680,9 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 // check exclude hosts mask:
    if( true == checkHostsMaskExclude( render->getName())) return false;
 // check needed os:
-   if( false == checkNeedOS( render->host.os)) return false;
+   if( false == checkNeedOS( render->getHost().os)) return false;
 // check needed properties:
-   if( false == checkNeedProperties( render->host.properties)) return false;
+   if( false == checkNeedProperties( render->getHost().properties)) return false;
 
 // search for ready task:
    for( int b = 0; b < blocksnum; b++)

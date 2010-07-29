@@ -3,7 +3,7 @@
 using namespace af;
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 PyClass::PyClass():
@@ -15,16 +15,16 @@ PyClass::PyClass():
 
 bool PyClass::init( const char * dir, const char * name, PyObject * initArgs)
 {
-   modulename = QString("%1.%2").arg( dir, name);
-   const char * str = modulename.toUtf8().data();
+   sprintf( modulename, "%s.%s", dir, name);
+   AFINFA("Instancing pyclass '%s'\n", modulename);
 
    //
    // Load module
-   PyObject * _PyObj_Module_ = PyImport_ImportModule( str);
+   PyObject * _PyObj_Module_ = PyImport_ImportModule( modulename);
    if(_PyObj_Module_== NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to import module '%s'\n", str);
+      AFERRAR("Failed to import module '%s'\n", modulename);
       return false;
    }
    // Reload module
@@ -32,7 +32,7 @@ bool PyClass::init( const char * dir, const char * name, PyObject * initArgs)
    if( PyObj_Module == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to reload module '%s'\n", str);
+      AFERRAR("Failed to reload module '%s'\n", modulename);
       return false;
    }
    Py_DECREF( _PyObj_Module_);
@@ -77,7 +77,7 @@ PyObject * PyClass::getFunction( const char * name)
    if( PyObj_Func == NULL )
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Cannot find function '%s' in '%s'\n", name, modulename.toUtf8().data());
+      AFERRAR("Cannot find function '%s' in '%s'\n", name, modulename);
       return NULL;
    }
 
@@ -85,7 +85,7 @@ PyObject * PyClass::getFunction( const char * name)
    if( PyCallable_Check( PyObj_Func) == false)
    {
       Py_XDECREF( PyObj_Func);
-      AFERRAR("Attribute '%s' in object '%s' is not callable\n", name, modulename.toUtf8().data());
+      AFERRAR("Attribute '%s' in object '%s' is not callable\n", name, modulename);
       return NULL;
    }
 

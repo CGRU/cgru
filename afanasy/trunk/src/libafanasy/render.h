@@ -44,9 +44,12 @@ public:
             ( state & SOnline ) &&
             ( false == ( state & SNIMBY )) &&
             ( priority > 0 ) &&
-            ( capacity_used < host.capacity ) &&
+            ( capacity_used < getCapacity() ) &&
             ( (int)tasks.size() < host.maxtasks )
          );}
+
+   inline const Host    & getHost()    const { return host;}
+   inline const HostRes & getHostRes() const { return hres;}
 
    inline void setFree()   { state = state & (~Snimby); state = state & (~SNIMBY);}///< Set free (unset nimby and NIMBY).
    inline void setNIMBY()  { state = state |   SNIMBY;  state = state & (~Snimby);}///< Set NIMBY.
@@ -71,8 +74,6 @@ public:
    inline const QString & getAnnontation() const { return annotation;}
 
 public:
-   Host     host;
-   HostRes  hres;
 
    enum State
    {
@@ -96,6 +97,9 @@ protected:
    QString services_disabled;
    QString customdata;
    QString annotation;
+
+   Host     host;
+   HostRes  hres;
 
    std::list<TaskExec*> tasks;
    uint32_t taskstartfinishtime; ///< Task start or finish time.

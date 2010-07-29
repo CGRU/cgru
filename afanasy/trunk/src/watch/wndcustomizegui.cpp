@@ -91,9 +91,10 @@ WndCustomizeGUI::WndCustomizeGUI():
 
    fw = new FontWidget( this, &afqt::QEnvironment::font_family); vlayout->addWidget( fw);
 
-   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizename ); vlayout->addWidget( nw);
-   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizeinfo ); vlayout->addWidget( nw);
-   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizemin  ); vlayout->addWidget( nw);
+   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizename   ); vlayout->addWidget( nw);
+   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizeinfo   ); vlayout->addWidget( nw);
+   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizemin    ); vlayout->addWidget( nw);
+   nw = new NumberWidget( this, &afqt::QEnvironment::font_sizeplotter); vlayout->addWidget( nw);
 
    label = new QLabel("Job Item Colors:", this);
    label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
@@ -114,6 +115,7 @@ WndCustomizeGUI::WndCustomizeGUI():
    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderoff    ); vlayout->addWidget( cw);
    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderbusy   ); vlayout->addWidget( cw);
    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrendernimby  ); vlayout->addWidget( cw);
+   cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpltclr ); vlayout->addWidget( cw);
 
    label = new QLabel("Watch Nodes Font Colors:", this);
    label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);

@@ -147,13 +147,13 @@ bool Block::canRun( RenderAf * render)
    // Check block avoid hosts list:
    if( avoidHostsCheck( render->getName()) ) return false;
    // Check task avoid hosts list:
-   if( data->getNeedMemory() > (int)render->hres.mem_free_mb ) return false;
+   if( data->getNeedMemory() > render->getHostRes().mem_free_mb ) return false;
    // Check needed hdd:
-   if( data->getNeedHDD()    > (int)render->hres.hdd_free_gb ) return false;
+   if( data->getNeedHDD()    > render->getHostRes().hdd_free_gb ) return false;
    // Check needed power:
-   if( data->getNeedPower()  > (int)render->host.power       ) return false;
+   if( data->getNeedPower()  > render->getHost().power       ) return false;
    // Check needed properties:
-   if( data->checkNeedProperties( render->host.properties) == false ) return false;
+   if( data->checkNeedProperties( render->getHost().properties) == false ) return false;
 
    return true;
 }

@@ -25,7 +25,7 @@ protected:
    PyObject * getFunction( const char * name);
 
 private:
-   QString modulename;           ///< Store "module.class" string to output with errors for indentitication
+   char modulename[512];           ///< Store "module.class" string to output with errors for indentitication
    PyObject * PyObj_Module;      ///< Module object
    PyObject * PyObj_Type;        ///< Class type object
    PyObject * PyObj_Instance;    ///< Class instance object

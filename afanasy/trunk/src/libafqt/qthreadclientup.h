@@ -28,7 +28,7 @@ public:
 
    inline void stop() { toQuit = true; timer.stop();} ///< Stop updating.
 
-   inline void set_update_handler( af::Msg* (*handler_ptr)( af::Msg *))
+   inline void set_update_handler( afqt::QMsg* (*handler_ptr)( afqt::QMsg *))
       { update_handler_ptr = handler_ptr;}
 
 private:
@@ -38,7 +38,7 @@ private:
    QWaitCondition cond;
    int  seconds;
    bool blocking;
-   af::Msg* (*update_handler_ptr)( af::Msg *);
+   afqt::QMsg* (*update_handler_ptr)( afqt::QMsg *);
    bool toQuit;
 
 private slots:

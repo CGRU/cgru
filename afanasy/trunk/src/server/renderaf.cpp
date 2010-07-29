@@ -88,7 +88,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
    address = NULL;
 }
 
-bool RenderAf::update( af::Render * render)
+bool RenderAf::update( const af::Render * render)
 {
    if( isOffline()) return false;
    if( render == NULL )
@@ -97,7 +97,7 @@ bool RenderAf::update( af::Render * render)
       return false;
    }
 
-   hres = render->hres;
+   hres.copy( render->getHostRes());
 
    updateTime();
    return true;
@@ -115,9 +115,9 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
    time_launch = render->time_launch;
    setRegisterTime();
    getFarmHost( &render->host);
+   setOnline();
    update( render);
    appendLog("Online.");
-   setOnline();
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
    AFCommon::QueueDBUpdateItem( this);
    return true;

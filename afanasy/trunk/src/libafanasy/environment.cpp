@@ -47,7 +47,6 @@ int     Environment::watch_refreshinterval =           AFWATCH::REFRESHINTERVAL;
 
 int     Environment::render_default_capacity =         AFRENDER::DEFAULTCAPACITY;
 int     Environment::render_default_maxtasks =         AFRENDER::DEFAULTMAXTASKS;
-QString Environment::render_exec =                     AFRENDER::EXEC;
 int     Environment::render_nice =                     AFRENDER::TASKPROCESSNICE;
 int     Environment::render_update_sec =               AFRENDER::UPDATEPERIOD;
 int     Environment::render_updatetaskperiod =         AFRENDER::UPDATETASKPERIOD;
@@ -57,6 +56,9 @@ int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTE
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
 int     Environment::render_logs_linesmax =            AFRENDER::LOGS_LINESMAX;
+QString Environment::render_exec =                     AFRENDER::EXEC;
+QString Environment::render_hddspace_path =            AFRENDER::HDDSPACE_PATH;
+QString Environment::render_iostat_device =            AFRENDER::IOSTAT_DEVICE;
 
 QString Environment::pswd_visor =                      AFUSER::PSWD_VISOR;
 QString Environment::pswd_god =                        AFUSER::PSWD_GOD;
@@ -114,6 +116,7 @@ QString        Environment::platform = "";
 QString        Environment::afroot = "";
 QString        Environment::home = "";
 QString        Environment::home_afanasy = "";
+QString        Environment::render_resclasses = "";
 bool           Environment::verbose = false;
 Address      * Environment::address = NULL;
 QHostAddress * Environment::qafserveraddress = NULL;
@@ -170,6 +173,9 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, render_default_capacity,           "render_default_capacity"           );
    getVar( doc, render_default_maxtasks,           "render_default_maxtasks"           );
    getVar( doc, render_exec,                       "render_exec"                       );
+   getVar( doc, render_hddspace_path,              "render_hddspace_path"              );
+   getVar( doc, render_iostat_device,              "render_iostat_device"              );
+   getVar( doc, render_resclasses,                 "render_resclasses"                 );
    getVar( doc, render_nice,                       "render_nice"                       );
    getVar( doc, render_update_sec,                 "render_update_sec"                 );
    getVar( doc, render_updatetaskperiod,           "render_updatetaskperiod"           );

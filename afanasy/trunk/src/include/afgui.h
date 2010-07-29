@@ -64,6 +64,7 @@ namespace AFGUI
 
    const int  FONT_SIZENAME            = 10;
    const int  FONT_SIZEINFO            = 8;
+   const int  FONT_SIZEPLOTTER         = 7;
    const int  FONT_SIZEMIN             = 5;
 
 // Qt GUI Palette:
@@ -99,6 +100,7 @@ namespace AFGUI
    const char CLR_ITEMRENDEROFF[]   = "50544C";
    const char CLR_ITEMRENDERBUSY[]  = "637840";
    const char CLR_ITEMRENDERNIMBY[] = "5E778F";
+   const char CLR_ITEMRENDERPLTCLR[]= "FAFA32";
    const char CLR_RUNNING[]         = "A0D26E";
    const char CLR_DONE[]            = "14320A";
    const char CLR_ERROR[]           = "FA320A";

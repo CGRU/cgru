@@ -1,5 +1,7 @@
 #include "plotter.h"
 
+#include "../libafqt/qenvironment.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -13,7 +15,8 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
    graphs( NumGraphs),
    lines( NumLinesWidth),
    scale( Scale),
-   data( NULL),
+   values( NULL),
+   height(0),
    valid( false)
 {
    if( graphs < 1)
@@ -31,52 +34,65 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
    hot_min      = new int [ graphs];
    hot_max      = new int [ graphs];
    clrR_cur     = new int [ graphs];
-   clrR_trl     = new int [ graphs];
    clrR_cur_hot = new int [ graphs];
-   clrR_trl_hot = new int [ graphs];
    clrG_cur     = new int [ graphs];
-   clrG_trl     = new int [ graphs];
    clrG_cur_hot = new int [ graphs];
-   clrG_trl_hot = new int [ graphs];
    clrB_cur     = new int [ graphs];
-   clrB_trl     = new int [ graphs];
    clrB_cur_hot = new int [ graphs];
-   clrB_trl_hot = new int [ graphs];
 
-   data = new int*[ graphs];
+   values = new int*[ graphs];
+   clr_r  = new int*[ graphs];
+   clr_g  = new int*[ graphs];
+   clr_b  = new int*[ graphs];
    int cdelta = 234 / (graphs+1);
    for( int grp = 0; grp < graphs; grp++)
    {
-      data[grp] = new int[lines];
-      for( int l = 0; l < lines; l++) data[grp][l] = 0;
+      values[grp] = new int[lines];
+      clr_r[grp]  = new int[lines];
+      clr_g[grp]  = new int[lines];
+      clr_b[grp]  = new int[lines];
+      for( int l = 0; l < lines; l++)
+      {
+         values[grp][l] = 0;
+         clr_r[grp][l]  = 0;
+         clr_g[grp][l]  = 0;
+         clr_b[grp][l]  = 0;
+      }
       int color = (grp+1) * cdelta;
       setColor( color>>1, color, color>>2, grp);
       hot_min[grp] = 0;
       hot_max[grp] = 0;
+      setColorHot( 255, 0, 0, grp);
    }
+
    bgcolor.setRgb( 10, 20, 5);
-   label_color.setRgb( 150, 250, 50);
+
+   label_font = afqt::QEnvironment::f_plotter;
+
    valid = true;
 }
 
 Plotter::~Plotter()
 {
-   for( int grp = 0; grp < graphs; grp++) if( data[grp] ) delete [] data[grp];
-   delete [] data;
+   for( int grp = 0; grp < graphs; grp++)
+   {
+      delete [] values[grp];
+      delete []  clr_r[grp];
+      delete []  clr_g[grp];
+      delete []  clr_b[grp];
+   }
+   delete [] values;
+   delete [] clr_r;
+   delete [] clr_g;
+   delete [] clr_b;
    delete [] hot_min;
    delete [] hot_max;
    delete [] clrR_cur;
-   delete [] clrR_trl;
    delete [] clrR_cur_hot;
-   delete [] clrR_trl_hot;
    delete [] clrG_cur;
-   delete [] clrG_trl;
    delete [] clrG_cur_hot;
-   delete [] clrG_trl_hot;
    delete [] clrB_cur;
-   delete [] clrB_trl;
    delete [] clrB_cur_hot;
-   delete [] clrB_trl_hot;
 }
 
 void Plotter::setColor( int r, int g, int b, int grp)
@@ -89,9 +105,6 @@ void Plotter::setColor( int r, int g, int b, int grp)
    clrR_cur[grp] = r;
    clrG_cur[grp] = g;
    clrB_cur[grp] = b;
-   clrR_trl[grp] = (2*r)/3;
-   clrG_trl[grp] = (2*g)/3;
-   clrB_trl[grp] = (2*b)/3;
 }
 
 void Plotter::setColorHot( int r, int g, int b, int grp)
@@ -104,20 +117,37 @@ void Plotter::setColorHot( int r, int g, int b, int grp)
    clrR_cur_hot[grp] = r;
    clrG_cur_hot[grp] = g;
    clrB_cur_hot[grp] = b;
-   clrR_trl_hot[grp] = (2*r)/3;
-   clrG_trl_hot[grp] = (2*g)/3;
-   clrB_trl_hot[grp] = (2*b)/3;
 }
 
-void Plotter::addValue( int grp, int val )
+void Plotter::addValue( int grp, int val, bool store)
 {
    if( grp >= graphs)
    {
       AFERRAR("Plotter::addValue: grp >= graphs ( %d >= %d)\n", grp, graphs);
       return;
    }
-   for( int l = 1; l < lines; l++) data[grp][l-1] = data[grp][l];
-   data[grp][lines-1] = val;
+
+   // Shift previous data to store (if needed):
+   if( store)
+      for( int l = 1; l < lines; l++)
+      {
+         values[grp][l-1] = values[grp][l];
+         clr_r[ grp][l-1] =  clr_r[grp][l];
+         clr_g[ grp][l-1] =  clr_g[grp][l];
+         clr_b[ grp][l-1] =  clr_b[grp][l];
+      }
+
+   // Store current value:
+   values[grp][lines-1] = val;
+
+   // Store current color:
+   int r = clrR_cur[grp];
+   int g = clrG_cur[grp];
+   int b = clrB_cur[grp];
+   if( hot_max[grp] == 0 ) calcHot( grp, val, r,g,b);
+   clr_r[ grp][lines-1] = r;
+   clr_g[ grp][lines-1] = g;
+   clr_b[ grp][lines-1] = b;
 
    // Calculate scale
    if( autoscale)
@@ -126,7 +156,7 @@ void Plotter::addValue( int grp, int val )
       for( int l = lines - autoscale_lines; l < lines; l++)
       {
          int sum = 0;
-         for( int grp = 0; grp < graphs; grp++) sum += data[grp][l];
+         for( int grp = 0; grp < graphs; grp++) sum += values[grp][l];
          if( maxvalue < sum) maxvalue = sum;
       }
       scale = 1;
@@ -149,8 +179,8 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
    int line_y = y+h;
    for( int grp = 0; grp < graphs; grp++)
    {
-      painter->setBrush( QBrush( getColor(grp, data[grp][lines-1]), Qt::SolidPattern ));
-      int line_h = (h*data[grp][lines-1]) / (scale != 0 ? scale : 1);
+      painter->setBrush( QBrush( QColor( clr_r[grp][lines-1],clr_g[grp][lines-1],clr_b[grp][lines-1]), Qt::SolidPattern ));
+      int line_h = (h*values[grp][lines-1]) / (scale != 0 ? scale : 1);
       painter->drawRect( x+w-width, line_y - line_h, width, line_h);
       line_y -= line_h;
    }
@@ -163,8 +193,11 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
       line_y = y+h;
       for( int grp = 0; grp < graphs; grp++)
       {
-         painter->setPen( getColor( grp,  data[grp][l], true));
-         int line_h = (h*data[grp][l]) / (scale != 0 ? scale : 1);
+         int r = ( 2 * clr_r[grp][l] ) / 3;
+         int g = ( 2 * clr_g[grp][l] ) / 3;
+         int b = ( 2 * clr_b[grp][l] ) / 3;
+         painter->setPen( QColor( r,g,b));
+         int line_h = (h*values[grp][l]) / (scale != 0 ? scale : 1);
          if( line_y <= y ) break;
          int line_yh = line_y - line_h;
          painter->drawLine( line_x, line_y, line_x, line_yh > y ? line_yh : y);
@@ -173,39 +206,29 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
       line_x ++;
    }
 
-   painter->setPen( label_color);
-   if( autoscale == false ) label_text = label.contains('%') ? label.arg( label_value) : label;
-   painter->drawText( x+1, y+10, label_text);
+   if( label_color.isValid())
+      painter->setPen(  label_color);
+   else
+      painter->setPen(  afqt::QEnvironment::clr_itemrenderpltclr.c);
+   painter->setFont( label_font);
+
+//   if( autoscale == false ) label_text = label;//.contains("%1") ? label.arg( label_value) : label;
+   painter->drawText( x+1, y+1, w, h, Qt::AlignLeft | Qt::AlignTop, label_text.isEmpty() ? label : label_text);
 }
 
-const QColor Plotter::getColor(  int grp, int value, bool trail) const
+void Plotter::calcHot( int grp, int value, int &r, int &g, int &b) const
 {
-   int r = clrR_cur[grp];
-   int g = clrG_cur[grp];
-   int b = clrB_cur[grp];
    int hr = clrR_cur_hot[grp];
    int hg = clrG_cur_hot[grp];
    int hb = clrB_cur_hot[grp];
-   if( trail)
-   {
-      r  = clrR_trl[grp];
-      g  = clrG_trl[grp];
-      b  = clrB_trl[grp];
-      hr = clrR_trl_hot[grp];
-      hg = clrG_trl_hot[grp];
-      hb = clrB_trl_hot[grp];
-   }
 
-   if( hot_max[grp] == 0 )    return QColor(  r,  g,  b);
-   if( value <= hot_min[grp]) return QColor(  r,  g,  b);
-   if( value >= hot_max[grp]) return QColor( hr, hg, hb);
+   if( value <= hot_min[grp]) return;
+   if( value >= hot_max[grp]) return;
 
    int hot_max_min = hot_max[grp] -hot_min[grp];
    if( hot_max_min == 0) hot_max_min = 1;
    float factor = (1.0 * (value - hot_min[grp])) / hot_max_min;
-   r = (float)r*(1.0 - factor)/1 + (float)hr * factor / 1;
-   g = (float)g*(1.0 - factor)/1 + (float)hg * factor / 1;
-   b = (float)b*(1.0 - factor)/1 + (float)hb * factor / 1;
-
-   return QColor( r, g, b);
+   r = (float)r*(1.0 - factor) + (float)hr * factor;
+   g = (float)g*(1.0 - factor) + (float)hg * factor;
+   b = (float)b*(1.0 - factor) + (float)hb * factor;
 }

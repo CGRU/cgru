@@ -41,6 +41,7 @@ private:
 
 private:
    void deleteTasks();
+   void deletePlots();
 
 private:
    af::Host    host;
@@ -76,4 +77,15 @@ private:
    Plotter plotSwp;
    Plotter plotHDD;
    Plotter plotNet;
+   Plotter plotIO;
+   int plotIO_rn_r, plotIO_rn_g, plotIO_rn_b;
+   int plotIO_wn_r, plotIO_wn_g, plotIO_wn_b;
+   int plotIO_rh_r, plotIO_rh_g, plotIO_rh_b;
+   int plotIO_wh_r, plotIO_wh_g, plotIO_wh_b;
+
+   std::vector<Plotter*> plots;
+
+   int plots_height;
+
+   int update_counter;
 };

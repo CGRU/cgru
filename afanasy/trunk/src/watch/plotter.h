@@ -16,15 +16,19 @@ public:
    inline void setScale( int Scale) { scale = Scale; if( scale < 1) autoscale = true; else autoscale = false;}
    inline void setAutoScaleMax( int MaxScale) { autoscale_maxscale = MaxScale; }
    inline void setLabel( const QString & Label) { label = Label; }
+   inline void setBGColor(    int r, int g, int b) {     bgcolor.setRgb( r, g, b); }
    inline void setLabelColor( int r, int g, int b) { label_color.setRgb( r, g, b); }
-   inline void setBGColor( int r, int g, int b) { bgcolor.setRgb( r, g, b); }
+   inline void setLabelFontSize( int size) { label_font.setPointSize( size); }
    inline void setHotMin( int HotMin, int grp = 0) { hot_min[grp] = HotMin; }
    inline void setHotMax( int HotMax, int grp = 0) { hot_max[grp] = HotMax; }
 
-   void addValue( int grp, int val );
+   void addValue( int grp, int val, bool store = true);
    inline void setLabelValue( int Value) { label_value = Value; }
+   inline void addLabelText( const QString & text) { label_text += text; }
 
    void paint( QPainter * painter, int x, int y, int w, int h) const;
+
+   int height;
 
 private:
    QString label;
@@ -42,25 +46,23 @@ private:
    int scale;
 
    int * clrR_cur;
-   int * clrR_trl;
    int * clrR_cur_hot;
-   int * clrR_trl_hot;
    int * clrG_cur;
-   int * clrG_trl;
    int * clrG_cur_hot;
-   int * clrG_trl_hot;
    int * clrB_cur;
-   int * clrB_trl;
    int * clrB_cur_hot;
-   int * clrB_trl_hot;
 
    QColor bgcolor;
    QColor label_color;
+   QFont  label_font;
 
-   int ** data;
+   int ** values;
+   int ** clr_r;
+   int ** clr_g;
+   int ** clr_b;
 
    bool valid;
 
 private:
-   const QColor getColor(  int grp, int value, bool trail = false) const;
+   void calcHot( int grp, int value, int &r, int &g, int &b) const;
 };

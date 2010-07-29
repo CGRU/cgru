@@ -68,6 +68,7 @@ public:
    static AttrColor clr_itemrenderoff;
    static AttrColor clr_itemrenderbusy;
    static AttrColor clr_itemrendernimby;
+   static AttrColor clr_itemrenderpltclr;
    static AttrColor clr_error;
    static AttrColor clr_running;
    static AttrColor clr_done;
@@ -85,12 +86,14 @@ public:
    static AttrNumber font_sizename;
    static AttrNumber font_sizeinfo;
    static AttrNumber font_sizemin;
+   static AttrNumber font_sizeplotter;
 
    static QColor qclr_black;
    static QColor qclr_white;
 
    static QFont f_name;
    static QFont f_info;
+   static QFont f_plotter;
    static QFont f_min;
 
 
