@@ -28,7 +28,7 @@ if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
 if(WIN32)
-   target_link_libraries(afrender Ws2_32.lib)
+   target_link_libraries(afrender Ws2_32.lib Iphlpapi.lib)
 endif(WIN32)
 
 target_link_libraries(afrender afqt)

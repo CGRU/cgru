@@ -2,15 +2,23 @@
 #include "res.h"
 
 #include <Winbase.h>
+#include <Iphlpapi.h>
 
-//#include "../libafanasy/environment.h"
+#include "../libafanasy/environment.h"
 
 struct cpu
 {
    ULARGE_INTEGER idle;
    ULARGE_INTEGER kernel;
    ULARGE_INTEGER user;
-}cpu0,cpu1;
+} cpu0, cpu1;
+
+struct net
+{
+   DWORD send;
+   DWORD recv;
+} net0, net1;
+
 int now = 0;
 
 #define AFOUTPUT
@@ -80,8 +88,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
    // CPU usage:
    //
    {
-                cpu * cpu_last = &cpu0; cpu * cpu_now = &cpu1;
-   if( now ) {        cpu_last = &cpu1;       cpu_now = &cpu0; }
+         cpu * cpu_last = &cpu0; cpu * cpu_now = &cpu1;
+   if( now ) { cpu_last = &cpu1;       cpu_now = &cpu0; }
    FILETIME idleTime, kernelTime, userTime;
    GetSystemTimes( &idleTime, &kernelTime, &userTime);
    cpu_now->idle.HighPart    = idleTime.dwHighDateTime;
@@ -143,8 +151,46 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
    // Network:
    //
    {
-   hres.net_recv_kbsec = 0;
-   hres.net_send_kbsec = 0;
+   // Declare and initialize variables
+   PMIB_IFTABLE ifTable;
+   DWORD dwSize = 0;
+   DWORD dwRetVal = 0;
+
+   // Allocate memory for our pointers
+   ifTable = (MIB_IFTABLE*) malloc(sizeof(MIB_IFTABLE));
+
+   // Make an initial call to GetIfTable to get the
+   // necessary size into the dwSize variable
+   if (GetIfTable(ifTable, &dwSize, 0) == ERROR_INSUFFICIENT_BUFFER)
+   {
+	   GlobalFree(ifTable);
+	   ifTable = (MIB_IFTABLE *) malloc(dwSize);
+   }
+
+   // Make a second call to GetIfTable to get the 
+   // actual data we want
+   if ((dwRetVal = GetIfTable(ifTable, &dwSize, TRUE)) == NO_ERROR)
+   {
+            net * net_last = &net0; net * net_now = &net1;
+      if( now ) { net_last = &net1;       net_now = &net0; }
+      net_now->recv = 0;
+      net_now->send = 0;
+      for( unsigned i = 0; i < ifTable->dwNumEntries; i++)
+      {
+	      MIB_IFROW row = ifTable->table[i];
+         if( row.dwType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
+		   net_now->recv += row.dwInOctets  >> 10;
+         net_now->send += row.dwOutOctets >> 10;
+      }
+      int recv = net_now->recv - net_last->recv;
+      int send = net_now->recv - net_last->send;
+      if( recv >= 0 ) hres.net_recv_kbsec = recv / af::Environment::getRenderUpdateSec();
+      if( send >= 0 ) hres.net_send_kbsec = send / af::Environment::getRenderUpdateSec();
+      //printf("net_recv_kbsec=%d\n", hres.net_recv_kbsec);
+      //printf("net_send_kbsec=%d\n", hres.net_send_kbsec);
+   }
+   if(ifTable)
+   GlobalFree(ifTable);
    }//network
 
    now = 1 - now;
