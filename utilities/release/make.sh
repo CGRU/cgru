@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version:
-packsver="1.1.1"
+packsver="1.2.0"
 
 # Location:
 cgruRoot="../.."
