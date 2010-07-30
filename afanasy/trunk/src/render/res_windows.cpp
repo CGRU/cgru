@@ -149,10 +149,25 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    // HDD space:
    //
    {
+   static char * directory = NULL;
+   if( getConstants && (af::Environment::getRenderHDDSpacePath() != "/"))
+   {
+      static char path[4096];
+      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().toUtf8().data());
+      directory = path;
+      printf("HDD Space Path = '%s'\n", directory);
+   }
    ULARGE_INTEGER totalNumberOfBytes, totalNumberOfFreeBytes;
-   GetDiskFreeSpaceEx( NULL, NULL, &totalNumberOfBytes, &totalNumberOfFreeBytes);
-   if( getConstants) host.hdd_gb = totalNumberOfBytes.QuadPart >> 30;
-   hres.hdd_free_gb  = totalNumberOfFreeBytes.QuadPart >> 30;
+   if( GetDiskFreeSpaceEx( directory, NULL, &totalNumberOfBytes, &totalNumberOfFreeBytes))
+   {
+      if( getConstants) host.hdd_gb = totalNumberOfBytes.QuadPart >> 30;
+      hres.hdd_free_gb  = totalNumberOfFreeBytes.QuadPart >> 30;
+   }
+   else
+   {
+      host.hdd_gb = 0;
+      hres.hdd_free_gb  = 0;
+   }
    }//hdd
 
    //
