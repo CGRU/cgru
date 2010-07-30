@@ -435,7 +435,8 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    for( int i = 0; i < plots.size(); i++)
    {
       int custom_w = w / plots.size();
-      plots[i]->paint( painter, plot_x, HeightHost+4, custom_w-2, plots[i]->height);
+      int plot_y = y + HeightHost + 1;
+      plots[i]->paint( painter, plot_x, plot_y, custom_w-2, plots[i]->height);
       plot_x += custom_w;
    }
 
