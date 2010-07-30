@@ -136,7 +136,7 @@ int now = 0;
 
 int memtotal, memfree, membuffers, memcached, swaptotal, swapfree;
 
-void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
+void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
 {
    //
    // CPU info:

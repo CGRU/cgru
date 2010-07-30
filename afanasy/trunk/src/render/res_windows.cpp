@@ -6,6 +6,13 @@
 
 #include "../libafanasy/environment.h"
 
+#define AFOUTPUT
+#undef AFOUTPUT
+#include "../include/macrooutput.h"
+
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+
 struct cpu
 {
    ULARGE_INTEGER idle;
@@ -25,7 +32,7 @@ int now = 0;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
+void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
 {
    //
    // CPU info:
@@ -152,45 +159,70 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants)
    //
    {
    // Declare and initialize variables
-   PMIB_IFTABLE ifTable;
-   DWORD dwSize = 0;
+   MIB_IFTABLE * ifTable;
+   static DWORD dwSize = sizeof( MIB_IFTABLE);
    DWORD dwRetVal = 0;
 
-   // Allocate memory for our pointers
-   ifTable = (MIB_IFTABLE*) malloc(sizeof(MIB_IFTABLE));
+	// Allocate memory for our pointers
+   ifTable = (MIB_IFTABLE*)MALLOC(dwSize);
 
-   // Make an initial call to GetIfTable to get the
+	// Make an initial call to GetIfTable to get the
    // necessary size into the dwSize variable
-   if (GetIfTable(ifTable, &dwSize, 0) == ERROR_INSUFFICIENT_BUFFER)
+   if(( dwRetVal = GetIfTable(ifTable, &dwSize, FALSE)) == ERROR_INSUFFICIENT_BUFFER )
    {
-	   GlobalFree(ifTable);
-	   ifTable = (MIB_IFTABLE *) malloc(dwSize);
+	   FREE( ifTable);
+		if( verbose ) printf("Size of MIB_IFTABLE = %d\n",dwSize);
+		dwSize *= 2;
+	   ifTable = (MIB_IFTABLE *)MALLOC( dwSize);
+		dwRetVal = GetIfTable(ifTable, &dwSize, FALSE);
    }
 
    // Make a second call to GetIfTable to get the 
    // actual data we want
-   if ((dwRetVal = GetIfTable(ifTable, &dwSize, TRUE)) == NO_ERROR)
+   if( dwRetVal == NO_ERROR )
    {
-            net * net_last = &net0; net * net_now = &net1;
-      if( now ) { net_last = &net1;       net_now = &net0; }
+				net * net_last = &net0; net * net_now = &net1;
+		if( now ) { net_last = &net1;       net_now = &net0; }
       net_now->recv = 0;
       net_now->send = 0;
-      for( unsigned i = 0; i < ifTable->dwNumEntries; i++)
+		std::list<int>iftypes;
+		// Iterare trough devices:
+      for( int i = 0; i < (int)ifTable->dwNumEntries; i++)
       {
-	      MIB_IFROW row = ifTable->table[i];
-         if( row.dwType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
-		   net_now->recv += row.dwInOctets  >> 10;
-         net_now->send += row.dwOutOctets >> 10;
+			MIB_IFROW * row = & ifTable->table[i];
+			// Skip loopback interface:
+         if( row->dwType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
+			// Skip 'empty' interfaces:
+			if((row->dwInOctets == 0) && (row->dwInOctets == 0)) continue;
+			// Skip calculated interfaces:
+			bool calculated = false;
+			for( std::list<int>::const_iterator it = iftypes.begin(); it != iftypes.end(); it++)
+			{
+				if( *it == row->dwType)
+				{
+					calculated = true;
+					break;
+				}
+			}
+			if( calculated ) continue;
+			iftypes.push_back( row->dwType);
+			if( getConstants && verbose)
+			{
+				printf("IF#%2d InterfaceName:\t %ws\n", row->dwType, row->wszName);
+				printf("IF#%2d Description:\t ", row->dwType);
+				for ( int j = 0; j < (int) row->dwDescrLen; j++) printf("%c", row->bDescr[j]);
+				printf("\n");
+			}
+			if( verbose ) printf("IF#%2d: Octets in/out[%d] = %9d %9d\n",  row->dwType, now, row->dwInOctets, row->dwOutOctets);
+			net_now->recv += row->dwInOctets  >> 10;
+			net_now->send += row->dwOutOctets >> 10;
       }
       int recv = net_now->recv - net_last->recv;
-      int send = net_now->recv - net_last->send;
+      int send = net_now->send - net_last->send;
       if( recv >= 0 ) hres.net_recv_kbsec = recv / af::Environment::getRenderUpdateSec();
       if( send >= 0 ) hres.net_send_kbsec = send / af::Environment::getRenderUpdateSec();
-      //printf("net_recv_kbsec=%d\n", hres.net_recv_kbsec);
-      //printf("net_send_kbsec=%d\n", hres.net_send_kbsec);
-   }
-   if(ifTable)
-   GlobalFree(ifTable);
+	}
+   if( ifTable) FREE( ifTable);
    }//network
 
    now = 1 - now;

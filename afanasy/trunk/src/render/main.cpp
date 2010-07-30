@@ -97,13 +97,6 @@ int main(int argc, char *argv[])
    if(( false == ENV.isHelpMode()) &&
       ( false == checkResourcesMode ))
    {
-/*
-#ifdef WINNT
-      if( af::init( af::InitServices | af::Verbose)  == false) return 1;
-#else
-      if( af::init( af::InitServices) == false) return 1;
-#endif
-*/
       QCoreApplication app( argc, argv);
       Object object( state, priority, command);
       RenderObject = &object;
@@ -116,18 +109,18 @@ int main(int argc, char *argv[])
    {
       af::Host host;
       af::HostRes hostres;
-      GetResources( host, hostres, true);
+      GetResources( host, hostres, true, true);
 #ifdef WINNT
       Sleep(100);
 #else
       sleep(1);
 #endif
-      GetResources( host, hostres, false);
+      GetResources( host, hostres, false, true);
       printf("\n");
       host.stdOut( true);
       hostres.stdOut( true);
    }
-   
+
    af::destroy();
    Py_Finalize();
 

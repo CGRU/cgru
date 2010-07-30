@@ -40,7 +40,8 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
    {
       QString classname = resclasses[i].trimmed();
       if( classname.isEmpty() ) continue;
-      pyres.push_back( new PyRes(classname.toUtf8().data(), &hres));
+      printf("Adding custom resource meter '%s'\n", classname.toUtf8().data());
+      pyres.push_back( new PyRes( classname.toUtf8().data(), &hres));
    }
 
 #ifdef WINNT

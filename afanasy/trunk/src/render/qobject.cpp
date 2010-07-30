@@ -94,7 +94,7 @@ Object::~Object()
       }
    }
    for( int t = 0; t < tasks.size(); t++) delete tasks[t];
-   if( render  != NULL  ) delete render;
+   if( render != NULL  ) delete render;
 AFINFO("Object:~Object()\n");
 }
 
@@ -105,8 +105,6 @@ void Object::connectionLost( af::Address * address)
    connected = false;
    render->setId( 0);
 
-//   for( int t = 0; t < tasks.size(); t++) delete tasks[t];
-//   tasks.clear();
    for( int t = 0; t < tasks.size(); t++) tasks[t]->stop();
 
    setUpMsg( af::Msg::TRenderRegister);
