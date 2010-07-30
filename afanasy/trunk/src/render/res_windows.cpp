@@ -26,6 +26,20 @@ struct net
    DWORD recv;
 } net0, net1;
 
+struct io
+{
+  LARGE_INTEGER BytesRead;
+  LARGE_INTEGER BytesWritten;
+  LARGE_INTEGER ReadTime;
+  LARGE_INTEGER WriteTime;
+  LARGE_INTEGER IdleTime;
+  DWORD         ReadCount;
+  DWORD         WriteCount;
+  DWORD         QueueDepth;
+  DWORD         SplitCount;
+  LARGE_INTEGER QueryTime;
+} io0, io1;
+
 int now = 0;
 
 #define AFOUTPUT
@@ -146,9 +160,9 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    }//cpu
 
    //
-   // HDD space:
+   // HDD
    //
-   {
+   {// space:
    static char * directory = NULL;
    if( getConstants && (af::Environment::getRenderHDDSpacePath() != "/"))
    {
@@ -167,6 +181,75 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    {
       host.hdd_gb = 0;
       hres.hdd_free_gb  = 0;
+   }
+   }
+   {// io:
+   hres.hdd_rd_kbsec = 0;
+   hres.hdd_wr_kbsec = 0;
+   hres.hdd_busy = -1;
+
+   HANDLE hDevice;               // handle to the drive to be examined 
+   BOOL bResult;                 // results flag
+   DWORD junk;                   // discard results
+
+   hDevice = CreateFile(TEXT("\\\\.\\PhysicalDrive0"),  // drive to open
+                    0,                // no access to the drive
+                    FILE_SHARE_READ | // share mode
+                    FILE_SHARE_WRITE, 
+                    NULL,             // default security attributes
+                    OPEN_EXISTING,    // disposition
+                    0,                // file attributes
+                    NULL);            // do not copy file attributes
+
+   if( hDevice != INVALID_HANDLE_VALUE) // cannot open the drive
+   {
+      DISK_PERFORMANCE dp;
+      bResult = DeviceIoControl(hDevice,  // device to be queried
+             IOCTL_DISK_PERFORMANCE,  // operation to perform
+                             NULL, 0, // no input buffer
+                            &dp, sizeof(dp),     // output buffer
+                            &junk,                 // # bytes returned
+                            (LPOVERLAPPED) NULL);  // synchronous I/O
+      if( bResult )
+      {
+                io * io_last = &io0; io * io_now = &io1;
+         if( now ) { io_last = &io1;      io_now = &io0; }
+
+         if( getConstants && verbose )
+         {
+            printf("Storage Manager Name = ");
+            for ( int j = 0; j < 8; j++) printf("%c", dp.StorageManagerName[j]);
+            printf("\n");
+         }
+
+         io_now->BytesRead    = dp.BytesRead;
+         io_now->BytesWritten = dp.BytesWritten;
+         io_now->ReadTime     = dp.ReadTime;
+         io_now->WriteTime    = dp.WriteTime;
+         io_now->IdleTime     = dp.IdleTime;
+         io_now->ReadCount    = dp.ReadCount;
+         io_now->WriteCount   = dp.WriteCount;
+         io_now->QueueDepth   = dp.QueueDepth;
+         io_now->SplitCount   = dp.SplitCount;
+         io_now->QueryTime    = dp.QueryTime;
+
+         LONGLONG ReadTime  = io_now->ReadTime.QuadPart  - io_last->ReadTime.QuadPart;
+         LONGLONG WriteTime = io_now->WriteTime.QuadPart - io_last->WriteTime.QuadPart;
+         LONGLONG IdleTime  = io_now->IdleTime.QuadPart  - io_last->IdleTime.QuadPart;
+         LONGLONG TotalTime = ReadTime + WriteTime + IdleTime;
+         //printf("ReadTime = %9d   WriteTime = %9d   IdleTime = %9d   TotalTime=%9d\n", ReadTime, WriteTime, IdleTime, TotalTime);
+
+         int busy = 100 * (TotalTime - IdleTime) / TotalTime;
+         if( busy < 0   ) busy = 0;
+         if( busy > 100 ) busy = 100;
+
+         hres.hdd_rd_kbsec = (( io_now->BytesRead.QuadPart     - io_last->BytesRead.QuadPart    ) >> 10) / af::Environment::getRenderUpdateSec();
+         hres.hdd_wr_kbsec = (( io_now->BytesWritten.QuadPart  - io_last->BytesWritten.QuadPart ) >> 10) / af::Environment::getRenderUpdateSec();
+         hres.hdd_busy = busy;
+
+      }
+
+      CloseHandle(hDevice);
    }
    }//hdd
 
@@ -229,7 +312,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
             for ( int j = 0; j < (int) row->dwDescrLen; j++) printf("%c", row->bDescr[j]);
             printf("\n");
          }
-         if( verbose ) printf("IF#%2d: Octets in/out[%d] = %9d %9d\n",  row->dwType, now, row->dwInOctets, row->dwOutOctets);
+         if( verbose ) printf("IF#%2d: Octets in/out[%d] = %9u %9u\n",  row->dwType, now, row->dwInOctets, row->dwOutOctets);
          net_now->recv += row->dwInOctets  >> 10;
          net_now->send += row->dwOutOctets >> 10;
       }

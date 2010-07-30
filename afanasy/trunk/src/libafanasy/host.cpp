@@ -260,7 +260,7 @@ void HostRes::stdOut( bool full) const
          mem_free_mb, mem_cached_mb, mem_buffers_mb, swap_used_mb, hdd_free_gb );
       printf("   Network: Recieved %d Kb/sec, Send %d Kb/sec\n",
          net_recv_kbsec, net_send_kbsec );
-      printf("   IO: Recieved %d Kb/sec, Send %d Kb/sec, Busy = %d%%\n",
+      printf("   IO: Read %d Kb/sec, Write %d Kb/sec, Busy = %d%%\n",
          hdd_rd_kbsec, hdd_wr_kbsec, hdd_busy);
    }
    else
