@@ -15,7 +15,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Object * RenderObject;
+Object * RenderObject = NULL;
 
 //####################### interrupt signal handler ####################################
 #include <signal.h>
@@ -25,7 +25,7 @@ void sig_pipe(int signum)
 }
 void sig_int(int signum)
 {
-   RenderObject->exitRender();
+   if( RenderObject) RenderObject->exitRender();
 }
 //#####################################################################################
 
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
    QString checkResourcesModeCmdArg = "-res";
    ENV.addUsage( checkResourcesModeCmdArg, "Check host resources only and quit.");
    if( ENV.hasArgument( checkResourcesModeCmdArg)) checkResourcesMode = true;
-   
+
    int retval = 0;
 
    if(( false == ENV.isHelpMode()) &&

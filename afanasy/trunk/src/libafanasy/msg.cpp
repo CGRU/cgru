@@ -264,7 +264,7 @@ bool Msg::checkValidness()
 {
    if( mversion != Msg::Version)
    {
-      AFERRAR("Msg::checkValidness: Version mismatch ( %d != %d )\n", mversion, Msg::Version);
+      AFERRAR("Msg::checkValidness: Version mismatch: Recieved(%d) != Library(%d)\n", mversion, Msg::Version);
       mtype = Msg::TVersionMismatch;
       mint32 = 0;
       return true;

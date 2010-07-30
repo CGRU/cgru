@@ -147,6 +147,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       int irq     = rl->irq      - rn->irq;
       int softirq = rl->softirq  - rn->softirq;
       int total = user + nice + system + idle + iowait + irq + softirq;
+      if( total == 0 ) total = 1;
 
       hres.cpu_user    = ( 100 * user    ) / total;
       hres.cpu_nice    = ( 100 * nice    ) / total;
@@ -177,7 +178,12 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    // HDD space:
    //
    {
-   char path[] = "/";
+   static char path[4096];
+   if( getConstants )
+   {
+      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().toUtf8().data());
+      printf("HDD Space Path = '%s'\n", path);
+   }
    struct statfs fsd;
    if( statfs( path, &fsd) < 0)
    {
@@ -208,8 +214,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       if( getConstants )
       {
          start = 0;
-	     while( strncmp( buffer+(start++), find_net, find_net_len) != 0);
-	     start += find_net_len;
+        while( strncmp( buffer+(start++), find_net, find_net_len) != 0);
+        start += find_net_len;
          if( verbose) printf("start=%d\n", start);
       }
       while( fgets( buffer, buffer_len, f))
@@ -217,19 +223,19 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          int pos = 0;
          if( iname_len && (strncmp( buffer, iname, iname_len) == 0)) continue;
 
-	     while( buffer[++pos] != ' ');
-		 iname_len = pos;
-		 strncpy( iname, buffer, iname_len);
-		 iname[iname_len+1] = '\0';
+         while( buffer[++pos] != ' ');
+         iname_len = pos;
+         strncpy( iname, buffer, iname_len);
+         iname[iname_len+1] = '\0';
 
          while( buffer[++pos] == ' ');
-		 unsigned int mtu = atoi( buffer+pos);
+         unsigned int mtu = atoi( buffer+pos);
          pos = start;
          while( buffer[++pos] != ' '); while( buffer[++pos] == ' ');
          unsigned int Ipkts = atoi( buffer+pos);
          while( buffer[++pos] != ' '); while( buffer[++pos] == ' ');
          while( buffer[++pos] != ' '); while( buffer[++pos] == ' ');
-		 unsigned int Opkts = atoi( buffer+pos);
+         unsigned int Opkts = atoi( buffer+pos);
          net_recv_kb += (Ipkts * mtu) >> 10;
          net_send_kb += (Opkts * mtu) >> 10;
       }

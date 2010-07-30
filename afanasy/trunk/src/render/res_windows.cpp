@@ -60,7 +60,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          host.cpu_mhz = dwMHz;
       }
       else
-	   {
+      {
          FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM,
                          NULL,
                          lError,
@@ -116,17 +116,18 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    int idle   = cpu_now->idle.QuadPart   - cpu_last->idle.QuadPart;
    int kernel = cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart;
    int user   = cpu_now->user.QuadPart   - cpu_last->user.QuadPart;
-   int total  = kernel + user;
-   int system = kernel - idle;
+   int system   =  kernel - idle;
+   int total100 = (kernel + user) / 100;
+   if( total100 < 1 ) total100 = 1;
 /*
    printf("idle   = %9d\n", idle);
    printf("kernel = %9d\n", kernel);
    printf("user   = %9d\n", user);
    printf("total  = %9d\n", total);
 */
-   hres.cpu_user    = user   / ( total / 100 );
-   hres.cpu_system  = system / ( total / 100 );
-   hres.cpu_idle    = idle   / ( total / 100 );
+   hres.cpu_user    = user   / ( total100 );
+   hres.cpu_system  = system / ( total100 );
+   hres.cpu_idle    = idle   / ( total100 );
    hres.cpu_nice    = 0;
    hres.cpu_iowait  = 0;
    hres.cpu_irq     = 0;
@@ -163,65 +164,65 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    static DWORD dwSize = sizeof( MIB_IFTABLE);
    DWORD dwRetVal = 0;
 
-	// Allocate memory for our pointers
+   // Allocate memory for our pointers
    ifTable = (MIB_IFTABLE*)MALLOC(dwSize);
 
-	// Make an initial call to GetIfTable to get the
+   // Make an initial call to GetIfTable to get the
    // necessary size into the dwSize variable
    if(( dwRetVal = GetIfTable(ifTable, &dwSize, FALSE)) == ERROR_INSUFFICIENT_BUFFER )
    {
-	   FREE( ifTable);
-		if( verbose ) printf("Size of MIB_IFTABLE = %d\n",dwSize);
-		dwSize *= 2;
-	   ifTable = (MIB_IFTABLE *)MALLOC( dwSize);
-		dwRetVal = GetIfTable(ifTable, &dwSize, FALSE);
+      FREE( ifTable);
+      if( verbose ) printf("Size of MIB_IFTABLE = %d\n",dwSize);
+      dwSize *= 2;
+      ifTable = (MIB_IFTABLE *)MALLOC( dwSize);
+      dwRetVal = GetIfTable(ifTable, &dwSize, FALSE);
    }
 
    // Make a second call to GetIfTable to get the 
    // actual data we want
    if( dwRetVal == NO_ERROR )
    {
-				net * net_last = &net0; net * net_now = &net1;
-		if( now ) { net_last = &net1;       net_now = &net0; }
+            net * net_last = &net0; net * net_now = &net1;
+      if( now ) { net_last = &net1;       net_now = &net0; }
       net_now->recv = 0;
       net_now->send = 0;
-		std::list<int>iftypes;
-		// Iterare trough devices:
+      std::list<int>iftypes;
+      // Iterare trough devices:
       for( int i = 0; i < (int)ifTable->dwNumEntries; i++)
       {
-			MIB_IFROW * row = & ifTable->table[i];
-			// Skip loopback interface:
+         MIB_IFROW * row = & ifTable->table[i];
+         // Skip loopback interface:
          if( row->dwType == IF_TYPE_SOFTWARE_LOOPBACK) continue;
-			// Skip 'empty' interfaces:
-			if((row->dwInOctets == 0) && (row->dwInOctets == 0)) continue;
-			// Skip calculated interfaces:
-			bool calculated = false;
-			for( std::list<int>::const_iterator it = iftypes.begin(); it != iftypes.end(); it++)
-			{
-				if( *it == row->dwType)
-				{
-					calculated = true;
-					break;
-				}
-			}
-			if( calculated ) continue;
-			iftypes.push_back( row->dwType);
-			if( getConstants && verbose)
-			{
-				printf("IF#%2d InterfaceName:\t %ws\n", row->dwType, row->wszName);
-				printf("IF#%2d Description:\t ", row->dwType);
-				for ( int j = 0; j < (int) row->dwDescrLen; j++) printf("%c", row->bDescr[j]);
-				printf("\n");
-			}
-			if( verbose ) printf("IF#%2d: Octets in/out[%d] = %9d %9d\n",  row->dwType, now, row->dwInOctets, row->dwOutOctets);
-			net_now->recv += row->dwInOctets  >> 10;
-			net_now->send += row->dwOutOctets >> 10;
+         // Skip 'empty' interfaces:
+         if((row->dwInOctets == 0) && (row->dwInOctets == 0)) continue;
+         // Skip calculated interfaces:
+         bool calculated = false;
+         for( std::list<int>::const_iterator it = iftypes.begin(); it != iftypes.end(); it++)
+         {
+            if( *it == row->dwType)
+            {
+               calculated = true;
+               break;
+            }
+         }
+         if( calculated ) continue;
+         iftypes.push_back( row->dwType);
+         if( getConstants && verbose)
+         {
+            printf("IF#%2d InterfaceName:\t %ws\n", row->dwType, row->wszName);
+            printf("IF#%2d Description:\t ", row->dwType);
+            for ( int j = 0; j < (int) row->dwDescrLen; j++) printf("%c", row->bDescr[j]);
+            printf("\n");
+         }
+         if( verbose ) printf("IF#%2d: Octets in/out[%d] = %9d %9d\n",  row->dwType, now, row->dwInOctets, row->dwOutOctets);
+         net_now->recv += row->dwInOctets  >> 10;
+         net_now->send += row->dwOutOctets >> 10;
       }
       int recv = net_now->recv - net_last->recv;
       int send = net_now->send - net_last->send;
       if( recv >= 0 ) hres.net_recv_kbsec = recv / af::Environment::getRenderUpdateSec();
       if( send >= 0 ) hres.net_send_kbsec = send / af::Environment::getRenderUpdateSec();
-	}
+   }
    if( ifTable) FREE( ifTable);
    }//network
 

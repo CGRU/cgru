@@ -114,16 +114,16 @@ struct res
 } r0, r1;
 
 struct io{
-   unsigned int rd_ios;	            // Read I/O operations
-   unsigned int rd_merges;	         // Reads merged
+   unsigned int rd_ios;             // Read I/O operations
+   unsigned int rd_merges;          // Reads merged
    unsigned int rd_sectors;         // Sectors read
-   unsigned int rd_ticks;	         // Time in queue + service for read
-   unsigned int wr_ios;	            // Write I/O operations
-   unsigned int wr_merges;	         // Writes merged
+   unsigned int rd_ticks;           // Time in queue + service for read
+   unsigned int wr_ios;             // Write I/O operations
+   unsigned int wr_merges;          // Writes merged
    unsigned int wr_sectors;         // Sectors written
-   unsigned int wr_ticks;	         // Time in queue + service for write
-   unsigned int ticks;	            // Time of requests in queue
-   unsigned int aveq;	            // Average queue length
+   unsigned int wr_ticks;           // Time in queue + service for write
+   unsigned int ticks;              // Time of requests in queue
+   unsigned int aveq;               // Average queue length
 } io0, io1;
 
 struct net
@@ -225,6 +225,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       unsigned irq     = rn->irq      - rl->irq;
       unsigned softirq = rn->softirq  - rl->softirq;
       unsigned total = user + nice + system + idle + iowait + irq + softirq;
+      if( total == 0 ) total = 1;
 
       cpu_ticks_total = total;
 
@@ -326,16 +327,20 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 //            unsigned n_ios  = rd_ios + wr_ios;                     // Number of requests
 //            unsigned n_ticks = rd_ticks + wr_ticks;                // Total service time
 //            unsigned n_mbytes = (rd_sectors + wr_sectors) >> 11;   // Total MBytes transferred
-//            float deltams = 1000.0 * cpu_ticks_total / host.cpu_num / HZ;
-//            float queue = aveq / deltams;                 // Average queue
+//            float fdeltams = 1000.0 * cpu_ticks_total / host.cpu_num / HZ;
+//            float queue = aveq / fdeltams;                 // Average queue
 //            float size = n_ios ? n_mbytes / n_ios : 0.0;  // Average request size
 //            float wait = n_ios ? n_ticks / n_ios : 0.0;   // Average wait
 //            float svc_t = n_ios ? ticks / n_ios : 0.0;    // Average disk service time
-//            float busyf = 100.0 * ticks / deltams;             // percentage!
-//            int busy = 0;
-            int busy = 100 * ticks / (1000 * cpu_ticks_total / host.cpu_num / HZ);             // percentage!
-            if( busy > 100) busy = 100;
-            if( busy <   0) busy = 0;
+//            float busyf = 100.0 * ticks / fdeltams;       // percentage!
+            int busy = -1;
+            int deltams = 1000 * cpu_ticks_total / host.cpu_num / HZ;
+            if( deltams > 0)
+            {
+               busy = 100 * ticks / deltams;
+               if( busy > 100) busy = 100;
+               if( busy <   0) busy = 0;
+            }
 
 //            printf("\n%-6s: R %d MB/S   W %d MB/S   B %d%%\n", name, rd_sectors >> 11, wr_sectors >> 11, busy);
 

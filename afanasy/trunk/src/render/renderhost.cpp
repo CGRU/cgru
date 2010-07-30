@@ -94,8 +94,13 @@ afqt::QMsg* RenderHost::updateMsg( afqt::QMsg *msg)
 {
 //   if( msg->type() != af::Msg::TRenderUpdate) return msg;
 
-   GetResources( host, hres, false);
-   for( int i = 0; i < pyres.size(); i++) pyres[i]->update();
+   // Do this every update time, but not the first time, as at the begininng they are already updated
+   if( upmsg != NULL )
+   {
+      delete upmsg;
+      GetResources( host, hres, false);
+      for( int i = 0; i < pyres.size(); i++) pyres[i]->update();
+   }
 
 //hres.stdOut();
 //   msg->resetWrittenSize();
@@ -114,7 +119,6 @@ afqt::QMsg* RenderHost::updateMsg( afqt::QMsg *msg)
    }
 #endif
 
-   if( upmsg != NULL ) delete upmsg;
    upmsg = new afqt::QMsg( msg->type(), this, true);
 
    return upmsg;
