@@ -229,7 +229,7 @@ void HostRes::readwrite( Msg * msg)
    rw_int32_t( hdd_free_gb,      msg);
    rw_int32_t( hdd_rd_kbsec,     msg);
    rw_int32_t( hdd_wr_kbsec,     msg);
-   rw_uint8_t( hdd_busy,         msg);
+   rw_int8_t ( hdd_busy,         msg);
    rw_int32_t( net_recv_kbsec,   msg);
    rw_int32_t( net_send_kbsec,   msg);
 

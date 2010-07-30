@@ -101,7 +101,7 @@ public:
    int32_t hdd_free_gb;
    int32_t hdd_rd_kbsec;
    int32_t hdd_wr_kbsec;
-   uint8_t hdd_busy;
+   int8_t  hdd_busy;
 
    int32_t net_recv_kbsec;
    int32_t net_send_kbsec;
