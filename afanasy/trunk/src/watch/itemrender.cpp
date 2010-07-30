@@ -183,6 +183,12 @@ void ItemRender::updateValues( af::Node *node, int type)
          hostAttrs += QString("; HDD: %1 Gb").arg( host.hdd_gb);
 
       }
+
+      // If became offline:
+      if( online && ( render->isOnline() == false))
+         for( int i = 0; i < plots.size(); i++)
+            plots[i]->height = 0;
+
       online = render->isOnline();
       if( render->getTimeLaunch()) creationTime = "Launched   at " + af::time2Qstr( render->getTimeLaunch());
       else creationTime = "Offline.";
