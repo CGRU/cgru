@@ -17,7 +17,7 @@ class iostat(resbase.resbase):
       self.labelr = 250
       self.labelg = 250
       self.labelb = 50
-      self.height = 30
+      self.height = 40
       self.bgcolorr = 10
       self.bgcolorg = 20
       self.bgcolorb = 5
@@ -44,6 +44,7 @@ class iostat(resbase.resbase):
                self.label += '\n'
                self.label += ' %s=%s' % (fields[7],values[7])
                self.label += ' %s=%s' % (fields[8],values[8])
+               self.label += '\n'
                self.label += ' %s=%s' % (fields[9],values[9])
                self.label += ' %s=%s' % (fields[10],values[10])
                

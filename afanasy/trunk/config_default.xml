@@ -35,8 +35,10 @@ So each path (project, asset) can have individual software setup.
    <render_iostat_device>sda</render_iostat_device>
 <!--
 Custom resources meters:
+example - simple resource meter for an example only
 iostat - parce output of linux 'iostat' command
-   <render_resclasses>iostat</render_resclasses>
+   <render_resclasses>example;iostat</render_resclasses>
+';' - separate classes character
 -->
    <render_exec>afrender</render_exec>
    <render_nice>10</render_nice>
