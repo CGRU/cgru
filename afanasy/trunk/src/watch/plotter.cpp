@@ -16,6 +16,7 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
    lines( NumLinesWidth),
    scale( Scale),
    values( NULL),
+   bgc_r(0), bgc_g(0), bgc_b(0),
    height(0),
    valid( false)
 {
@@ -64,8 +65,6 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
       hot_max[grp] = 0;
       setColorHot( 255, 0, 0, grp);
    }
-
-   bgcolor.setRgb( 10, 20, 5);
 
    label_font = afqt::QEnvironment::f_plotter;
 
@@ -149,22 +148,35 @@ void Plotter::addValue( int grp, int val, bool store)
    clr_g[ grp][lines-1] = g;
    clr_b[ grp][lines-1] = b;
 
-   // Calculate scale
+   // Calculate auto scale:
    if( autoscale)
    {
+      // Search for max value in 'autoscale_lines':
       int maxvalue = 0;
       for( int l = lines - autoscale_lines; l < lines; l++)
       {
          int sum = 0;
+         // Sum all grapphs values:
          for( int grp = 0; grp < graphs; grp++) sum += values[grp][l];
          if( maxvalue < sum) maxvalue = sum;
       }
+
+      // Calculate scale:
       scale = 1;
       while((scale < maxvalue) && (scale < autoscale_maxscale)) scale *= 10;
+
+      // Append label text by autoscale value:
       float scale_val = float(scale) / (label_value != 0 ? label_value : 1);
       QString scale_str = QString("%1").arg( scale_val);
       if( scale_str.indexOf('0') == 0) scale_str = scale_str.remove( 0, 1);
       label_text = label.arg( scale_str);
+
+      // Calculate blue backgroud color:
+      int value = scale;
+      bgc_b = 128;
+      while( value < autoscale_maxscale ) { value *= 10; bgc_b = bgc_b >> 1;}
+      if( bgc_b <   0 ) bgc_b = 0;
+      if( bgc_b > 255 ) bgc_b = 255;
    }
 }
 
@@ -173,7 +185,7 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
    int width = 8;
    if( w > lines+width) w = lines+width;
    painter->setPen( Qt::NoPen );
-   painter->setBrush( QBrush( bgcolor, Qt::SolidPattern ));
+   painter->setBrush( QBrush( QColor( bgc_r, bgc_g, bgc_b), Qt::SolidPattern ));
    painter->drawRect( x, y, w, h);
 
    int line_y = y+h;

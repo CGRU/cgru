@@ -43,7 +43,7 @@ AttrColor QEnvironment::clr_Shadow(          "clr_Shadow",           "Shadow",  
 AttrColor QEnvironment::clr_Highlight(       "clr_Highlight",        "Highlight",               AFGUI::CLR_HIGHLIGHT           );
 AttrColor QEnvironment::clr_HighlightedText( "clr_HighlightedText",  "Highlighted Text",        AFGUI::CLR_HIGHLIGHTEDTEXT     );
 AttrColor QEnvironment::clr_Link(            "clr_Link",             "Visor (Link)",            AFGUI::CLR_LINK                );
-AttrColor QEnvironment::clr_LinkVisited(     "clr_LinkVisited",      "GOD ( VisitedLink)",      AFGUI::CLR_LINKVISITED         );
+AttrColor QEnvironment::clr_LinkVisited(     "clr_LinkVisited",      "GOD (VisitedLink)",       AFGUI::CLR_LINKVISITED         );
 
 AttrColor QEnvironment::clr_item(            "clr_item",             "Item",                    AFGUI::CLR_ITEM                );
 AttrColor QEnvironment::clr_selected(        "clr_selected",         "Selected Item",           AFGUI::CLR_SELECTED            );

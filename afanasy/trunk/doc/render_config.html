@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Talk</title>
+<title>Afanasy Render Configuration</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,68 +26,63 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">Talk - Exchange messages using afanasy sever</h2>
+<h2 align="center">Afanasy Render Configuration</h2>
 <hr />
-<p><code>$ aftalk</code></p>
-<p>You can launch several Talks on the same machine (to talk with different people for example).</p>
-<p>Same user can launch several Talks on different machines, and send messages to himself (it's useful to send some text on your other computer).</p>
-<table width="99%">
-<tr align="center">
-<td>
-   Main Dialog<br/>
-   <img src="images/talk/talk.png" alt="talk" /><br/>
-   Select user to send message to. You can select several users to chat with them.<br/>
-</td>
-<td>
-   System Tray Icon (a green star with &quot;t&quot;)<br/>
-   <img src="images/talk/talk_tray.png" alt="talk_tray_msg" /><br/>
-   It has a menu on a right mouse button (RMB) and a tooltip.<br/>
-   Double-click on icon will hide Talk dialog window or raise it if already hidden.<br/>
-   <br/>
-   Tray icon RMB menu and tooltip<br/>
-   <img src="images/talk/talk_tray_rmb.png" alt="talk_tray_msg" />
-   <img src="images/talk/talk_tray_tooltip.png" alt="talk_tray_msg" /><br/>
-   Talk owner name has a @[hostname]:[port] suffix.<br/>
-   (It can helps you to find other talks launched by you on different machines.)<br/>
-   <br/>
-   Icon flashing<br/>
-   <img src="images/talk/talk_tray_flash.png" alt="talk_tray_msg" /><br/>
-   Talk flashes tray icon on new message if dialog is not the active window.<br/>
-   <br/>
-   Incoming message<br/>
-   <img src="images/talk/talk_tray_msg.png" alt="talk_tray_msg" /><br/>
-   Tray shows an incoming message if dialog window is hidden (closed).<br/>
-<td>
-</tr>
-<table>
-<p>Talk works in <kbd>utf8</kbd> encoding.</p>
 
-<h4><a name="Config"/>Configuration:</h4>
 <p>See <a href="server_config.html">server configuration</a> about XML configuration files.</p>
+
 <ul>
 <li><p>
-<code>talk_updateperiod</code> = 5 (seconds)<br/>
-Period to send dummy message to server to keep alive.
+<code>render_default_capacity</code> = 1000<br/>
+Default render capacity value, if not set in farm config.
 </p></li>
 <li><p>
-<code>talk_zombietime</code> = 18 (seconds)<br/>
-Time to server to delete monitor if there is no update (even no dummy message) for this period.
+<code>render_default_maxtasks</code> = 5<br/>
+Maximum allowed simultaneously running tasks on render, if not set in farm config.
 </p></li>
 <li><p>
-<code>talk_connectretries</code> = 3<br/>
-Connection fails times to consider to Talk that there is no connection to server.
+<code>render_exec</code> = afrender<br/>
+Command for render to execute another render or to restart.
 </p></li>
 <li><p>
-<code>talk_waitforconnected</code> = 8000 (milliseconds)<br/>
+<code>render_nice</code> = 10<br/>
+Renice task command process on render.
+</p></li>
+<li><p>
+<code>render_update_sec</code> = 5 (seconds)<br/>
+Render resources update interval.
+</p></li>
+<li><p>
+<code>render_updatetaskperiod</code> = 1 (seconds)<br/>
+Period to render to update task state or percentage (even if there is no parser).
+</p></li>
+<li><p>
+<code>render_zombietime</code> = 60 (seconds)<br/>
+Time to server to delete render if there is no update (resources usage) for this period.
+</p></li>
+<li><p>
+<code>render_connectretries</code> = 3<br/>
+Connection fails times to consider to render that there is no connection to server.
+</p></li>
+<li><p>
+<code>render_waitforconnected</code> = 15000 (milliseconds)<br/>
 Time to wait for connection establishing to consider that connection is available.
 </p></li>
 <li><p>
-<code>talk_waitforreadyread</code> = 8000 (milliseconds)<br/>
+<code>render_waitforreadyread</code> = 15000 (milliseconds)<br/>
 Time to wait for incoming data to consider that connection is not lost.
 </p></li>
 <li><p>
-<code>talk_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
+<code>render_waitforbyteswritten</code> = 15000 (milliseconds)<br/>
 Time to wait for writing data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>render_logs_linesmax</code> = 100<br/>
+Server truncates log above this limit.
+</p></li>
+<li><p>
+<code>render_logs_rotate</code> = 10<br/>
+Server store logs of renders with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
 </p></li>
 </ul>
 

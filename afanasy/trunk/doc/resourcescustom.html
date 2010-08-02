@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Afanasy Services</title>
+<title>Afanasy Custom Resources</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -26,31 +26,41 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">Afanasy Services (block tasks types)</h2>
+<h2 align="center">Afanasy Custom Resources</h2>
 <hr />
 
 <p>
-Python classes stored in <br/>
-<code>cgru/afanasy/python/services</code><br/>
-and based from <br/>
-<code>cgru/afanasy/python/services/service.py</code><br/>
+You can write custom resources meter on Python.
+Render instances a class and runs <kbd>update</kbd> method periodically (each time the Render updates).
+You can inherit base <kbd>resbase</kbd> class and set its properties.
 </p>
 
-<p>It describes a service:</p>
+<p>
+Python classes stored in <br/>
+<code>cgru/afanasy/python/resources</code><br/>
+and based from <br/>
+<code>cgru/afanasy/python/resources/resbase.py</code><br/>
+</p>
+
+<h3>Properties:</h3>
+<p>
 <ul>
-   <li>
-      Service with this name exists.
-   </li>
-   <li>
-      Default service parser.
-   </li>
-   <li>
-      Method to transfer commands and paths from server to client (different OS-es can have different paths).
-   </li>
-   <li>
-      Method to insert in task command variable capacity coefficient.
-   </li>
+<li><b>self.value</b> (<kbd>int</kbd>) - The resource value to watch.
+<li><b>self.valuemax</b> (<kbd>int</kbd>) - Maximum resource value for graph scale.
+<li><b>self.height</b> (<kbd>int</kbd>) - Preferred plotter widget height for GUI.
+<li><b>self.width</b> (<kbd>int</kbd>) - Preferred plotter widget width for GUI.
+<li><b>self.graphr self.graphrg self.graphb</b> (<kbd>int</kbd>) - Graph color.
+<li><b>self.label</b> (<kbd>str</kbd>) - Label text.
+<li><b>self.labelsize</b> (<kbd>int</kbd>) - Label text font size.
+<li><b>self.labelr self.labelg self.labelb</b> (<kbd>int</kbd>) - Label text font color.
+<li><b>self.bgcolorr self.bgcolorg self.bgcolorb</b> (<kbd>int</kbd>) - Plotter background color.
+<li><b>self.tooltip</b> (<kbd>str</kbd>) - Widget tooltip.
+<li><b>self.valid</b> (<kbd>False|True</kbd>) - Resource meter validness.
+Should be set to <kbd>True</kbd> in constructor, or update function will not be called.
+Set <kbd>False</kbd> if resource meter initialization failed.
+</li>
 </ul>
+</p>
 
 <!--FOOTER-->
 <br/>

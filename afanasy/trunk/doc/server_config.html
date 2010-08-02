@@ -44,7 +44,9 @@ Last values, which overrides even users values and which initialization will not
 It reads them in specified sequence, each time overriding previous variables value.<br/>
 </p>
 <p>
-You can copy <kbd>cgru/afanasy/config_default.xml</kbd> file in <kbd>cgru/afanasy/config.xml</kbd> and remove elements which default values you want to keep. You need at least to override <code>servername</code> (if you want other computers to find it). Override <code>cmdprefix</code> to empty value to use default software (or you own project setup). Generate keys using <code>afcmd passwd</code> command for your own passwords and put them into <kbd>cgru/afanasy/config_shadow.xml</kbd>.
+You can copy <kbd>cgru/afanasy/config_default.xml</kbd> file in <kbd>cgru/afanasy/config.xml</kbd> and remove elements which default values you want to keep.
+You need at least to override <code>servername</code> (if you want other computers to find it).
+Generate keys using <code>afcmd passwd</code> command for your own passwords and put them into <kbd>cgru/afanasy/config_shadow.xml</kbd>.
 </p>
 
 <h3><a name="Configuration"/>Configuration Elements:</h3>
@@ -122,63 +124,6 @@ Server store logs of a jobs with the same name by renaming old. It adds a number
 </p></li>
 </ul>
 
-<h4><a name="ConfRender"/>Render:</h4>
-<ul>
-<li><p>
-<code>render_default_capacity</code> = 1000<br/>
-Default render capacity value, if not set in farm config.
-</p></li>
-<li><p>
-<code>render_default_maxtasks</code> = 5<br/>
-Maximum allowed simultaneously running tasks on render, if not set in farm config.
-</p></li>
-<li><p>
-<code>render_exec</code> = afrender<br/>
-Command for render to execute another render or to restart.
-</p></li>
-<li><p>
-<code>render_nice</code> = 10<br/>
-Renice task command process on render.
-</p></li>
-<li><p>
-<code>render_update_sec</code> = 5 (seconds)<br/>
-Render resources update interval.
-</p></li>
-<li><p>
-<code>render_updatetaskperiod</code> = 1 (seconds)<br/>
-Period to render to update task state or percentage (even if there is no parser).
-</p></li>
-<li><p>
-<code>render_zombietime</code> = 60 (seconds)<br/>
-Time to server to delete render if there is no update (resources usage) for this period.
-</p></li>
-<li><p>
-<code>render_connectretries</code> = 3<br/>
-Connection fails times to consider to render that there is no connection to server.
-</p></li>
-<li><p>
-<code>render_waitforconnected</code> = 15000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-<code>render_waitforreadyread</code> = 15000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>render_waitforbyteswritten</code> = 15000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>render_logs_linesmax</code> = 100<br/>
-Server truncates log above this limit.
-</p></li>
-<li><p>
-<code>render_logs_rotate</code> = 10<br/>
-Server store logs of renders with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
-</p></li>
-</ul>
-
-
 <h4><a name="ConfUser"/>User:</h4>
 <ul>
 <li><p>
@@ -204,129 +149,6 @@ Server truncates log above this limit.
 <li><p>
 <code>user_logs_rotate</code> = 10<br/>
 Server store logs of users with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
-</p></li>
-</ul>
-
-<h4><a name="ConfWatch"/>Watch:</h4>
-<ul>
-<li><p>
-<code>pswd_visor</code> = 1832116180fdc61b64fd978401e462e9<br/>
-Visor rights password. You can use <kbd>afcmd passwd [string]</kbd> to get password digits key.
-</p></li>
-<li><p>
-<code>pswd_visor</code> = 73bcaaa458bff0d27989ed331b68b64d<br/>
-GOD rights password.<br/>
-(This default values are very common passwords which exists in any MD5 database)<br/>
-Password length must be <b>five characters</b>.
-</p></li>
-<li><p>
-<code>previewcmds</code> = nuke -v @ARG@ || imf_disp @ARG@ || mplay @ARG@<br>
-Programs to view images.<br/>
-"@ARG@" - will be replaced with filename.<br/>
-" || " - programs list separator.<br/>
-</p></li>
-<li><p>
-<code>rendercmds</code> = vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"<br/>
-"@ARG@" - will be replaced with hostname.<br/>
-" || " - programs list separator.<br/>
-</p></li>
-<li><p>
-<code>watch_font_family</code> = SansSerif<br/>
-GUI font.
-</p></li>
-<li><p>
-<code>watch_font_sizename</code> = 8<br/>
-Font size for nodes names and important information.
-</p></li>
-<li><p>
-<code>watch_font_sizeinfo</code> = 7<br/>
-Font size for nodes common information.
-</p></li>
-<li><p>
-<code>watch_font_sizemin</code> = 5<br/>
-Smallest font for nodes state.
-</p></li>
-<li><p>
-<code>watch_connectretries</code> = 3<br/>
-Connection fails times to consider to Watch that there is no connection to server.
-</p></li>
-<li><p>
-<code>watch_waitforconnected</code> = 8000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-<code>watch_waitforreadyread</code> = 8000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>watch_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>watch_refreshinterval</code> = 5 (seconds)<br/>
-Force update some widgets painting, even if there is no information change ( they can display a timer, for example).
-</p></li>
-</ul>
-
-<h4><a name="ConfMonitor"/>Monitor:</h4>
-<ul>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_updateperiod</code> = 10 (seconds)<br/>
-Period to send dummy message to server to keep alive.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_zombietime</code> = 40 (seconds)<br/>
-Time to server to delete monitor if there is no update (even no dummy message) for this period.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_connectretries</code> = 3<br/>
-Connection fails times to consider to Monitor that there is no connection to server.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_waitforconnected</code> = 8000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_waitforreadyread</code> = 8000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-(this is Watch parameter too)<br/>
-<code>monitor_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
-</p></li>
-</ul>
-
-<h4><a name="ConfTalk"/>Talk:</h4>
-<ul>
-<li><p>
-<code>talk_updateperiod</code> = 5 (seconds)<br/>
-Period to send dummy message to server to keep alive.
-</p></li>
-<li><p>
-<code>talk_zombietime</code> = 18 (seconds)<br/>
-Time to server to delete monitor if there is no update (even no dummy message) for this period.
-</p></li>
-<li><p>
-<code>talk_connectretries</code> = 3<br/>
-Connection fails times to consider to Talk that there is no connection to server.
-</p></li>
-<li><p>
-<code>talk_waitforconnected</code> = 8000 (milliseconds)<br/>
-Time to wait for connection establishing to consider that connection is available.
-</p></li>
-<li><p>
-<code>talk_waitforreadyread</code> = 8000 (milliseconds)<br/>
-Time to wait for incoming data to consider that connection is not lost.
-</p></li>
-<li><p>
-<code>talk_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
-Time to wait for writing data to consider that connection is not lost.
 </p></li>
 </ul>
 

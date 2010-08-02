@@ -15,8 +15,9 @@ public:
    void setColorHot( int r, int g, int b, int grp = 0);
    inline void setScale( int Scale) { scale = Scale; if( scale < 1) autoscale = true; else autoscale = false;}
    inline void setAutoScaleMax( int MaxScale) { autoscale_maxscale = MaxScale; }
+   inline void setAutoScaleLines( int Lines)  { autoscale_lines = Lines; }
    inline void setLabel( const QString & Label) { label = Label; }
-   inline void setBGColor(    int r, int g, int b) {     bgcolor.setRgb( r, g, b); }
+   inline void setBGColor(    int r, int g, int b) { bgc_r=r; bgc_g=g; bgc_b=b; }
    inline void setLabelColor( int r, int g, int b) { label_color.setRgb( r, g, b); }
    inline void setLabelFontSize( int size) { label_font.setPointSize( size); }
    inline void setHotMin( int HotMin, int grp = 0) { hot_min[grp] = HotMin; }
@@ -52,7 +53,6 @@ private:
    int * clrB_cur;
    int * clrB_cur_hot;
 
-   QColor bgcolor;
    QColor label_color;
    QFont  label_font;
 
@@ -60,6 +60,10 @@ private:
    int ** clr_r;
    int ** clr_g;
    int ** clr_b;
+
+   int bgc_r;
+   int bgc_g;
+   int bgc_b;
 
    bool valid;
 

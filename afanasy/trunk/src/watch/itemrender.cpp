@@ -279,13 +279,13 @@ void ItemRender::updateValues( af::Node *node, int type)
       plotIO_rn_b =  20;
       plotIO.setColor( plotIO_r_r, plotIO_r_g, plotIO_r_b, 0);
       plotIO.setColor( plotIO_w_r, plotIO_w_g, plotIO_w_b, 1);
-      plotIO.setBGColor( 10, 20, hres.hdd_busy);
+      plotIO.setBGColor( 10, 20, hres.hdd_busy >> 1);
       plotIO.addValue( 0, hres.hdd_rd_kbsec);
       plotIO.addValue( 1, hres.hdd_wr_kbsec);
-      if( hres.hdd_busy != -1 ) plotIO.addLabelText( QString("\n%1%").arg(hres.hdd_busy));
+//      if( hres.hdd_busy != -1 ) plotIO.addLabelText( QString("\n%1%").arg(hres.hdd_busy));
 
-      hostUsage += QString("\nHDD IO (Kb/sec): %1 Read - %2 Write: %3% Busy")
-         .arg(hres.hdd_rd_kbsec).arg(hres.hdd_wr_kbsec).arg(hres.hdd_busy);
+      hostUsage += QString("\nHDD IO (Kb/sec): %1 Read - %2 Write").arg(hres.hdd_rd_kbsec).arg(hres.hdd_wr_kbsec);
+      if( hres.hdd_busy != -1 ) hostUsage += QString(": %3% Busy").arg(hres.hdd_busy);
 
       // Create custom plots:
       if( plots.size() != hres.custom.size())
