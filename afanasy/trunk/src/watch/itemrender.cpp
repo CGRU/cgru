@@ -217,8 +217,8 @@ void ItemRender::updateValues( af::Node *node, int type)
       NIMBY = render->isNIMBY();
       nimby = render->isNimby();
 
-      if(      NIMBY ) state = "NIMBY(" + username + ")";
-      else if( nimby ) state = "nimby(" + username + ")";
+      if(      NIMBY ) state = "N(" + username + ")";
+      else if( nimby ) state = "n(" + username + ")";
       else             state = username;
       state += '-' + QString::number( priority);
       if( isLocked() ) state += " (LOCK)";
@@ -422,7 +422,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
    int plot_w = w / 10;
    int allplots_w = plot_w * 6;
-   int plot_x = x + (w - allplots_w)/2 + (w>>4);
+   int plot_x = x + (w - allplots_w)/2 + (w>>5);
    int plot_y = y + 1;
 
    plotCpu.paint( painter, plot_x, plot_y, plot_w-2, HeightHost - 3);

@@ -4,9 +4,9 @@ export UNIXTYPE="LINUX"
 export MXX_RU_CPP_TOOLSET=gcc_linux
 
 pythondir=/cg/soft/python
-qt=/cg/data/tools/qt/qt-4.6.3-static
+qt=/cg/tools/qt/qt-4.6.3-static
 
-export AF_LFLAGS="-lrt -lz -lgthread -lglib"
+export AF_LFLAGS="-lrt -lz -lgthread-2.0 -lglib-2.0"
 
 export QTDIR=$qt
 export PATH=$qt/bin:$PATH

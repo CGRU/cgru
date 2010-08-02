@@ -34,6 +34,7 @@ rcopy doc/images $dest/doc
 
 copy afanasy/$afanasy $dest/afanasy
 copy afanasy/$afanasy/bin $dest/afanasy/bin
+[ -d afanasy/$afanasy/bin_pyaf ] && rcopy afanasy/$afanasy/bin_pyaf $dest/afanasy
 copy afanasy/$afanasy/icons $dest/afanasy/icons
 rcopy afanasy/$afanasy/init $dest/afanasy
 rcopy afanasy/$afanasy/plugins $dest/afanasy

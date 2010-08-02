@@ -41,6 +41,18 @@ Default render capacity value, if not set in farm config.
 Maximum allowed simultaneously running tasks on render, if not set in farm config.
 </p></li>
 <li><p>
+<code>render_hddspace_path</code> = /<br/>
+Path to measure free disk space ('/' - for MS Windows means the root of the system disk).
+</p></li>
+<li><p>
+<code>render_iostat_device</code> = sda<br/>
+Device to measure disk IO statistics (for MS Windows - statistics only for first disk available).
+</p></li>
+<li><p>
+<code>render_resclasses</code> = example;iostat<br/>
+Custom resources meter(s). Python class name(s), if several - list separated with ';' character.
+</p></li>
+<li><p>
 <code>render_exec</code> = afrender<br/>
 Command for render to execute another render or to restart.
 </p></li>

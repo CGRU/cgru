@@ -8,7 +8,7 @@ export AF_PYTHON_INC="`python-config --cflags` -fPIC"
 export AF_PYTHON_LIB="`python-config --ldflags`"
 # Extra libs for linking python module ("libpyaf" project "pyaf.so" target):
 export AF_PYTHON_MODULE_EXTRA_LIBS=
-# on CentOS 5 with Python2.5 try "-lrt -lz -lgthread -lglib"
+# on CentOS 5 with Python2.5 try "-lrt -lz -lgthread-2.0 -lglib-2.0"
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh

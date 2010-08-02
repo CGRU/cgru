@@ -33,7 +33,13 @@
 
 <h4>Render computer resources monitoring.</h4>
 <p>
-You can monitor CPU usage: user, nice, system, I/O wait and load average. Memory, swap and HDD usage. Network traffic. This can help you to diagnose what slows rendering process. Especially swap, I/O wait and network traffic.
+You can monitor CPU usage: user, nice, system, I/O wait and load average.
+Memory, swap and HDD usage. Network traffic.
+Disk I/O operations speed and utilization percentage.
+This can help you to diagnose what slows rendering process.
+Especially swap, I/O wait and network traffic.
+<p></p>
+You can write your own custom resource(s) meter(s) on python.
 </p>
 
 <h4>Multiply Tasks Renders (clients, slaves, hosts)</h4>
@@ -44,6 +50,13 @@ Useful for "powerful" hosts with several CPUs. Render and Task has a capacity at
 </p>
 <h5>Tasks can variate capacity 'on-the-fly'</h5>
 Capacity variation can be described through its minimum and maximum coefficients. If task with 1000 capacity units runs on render with 4000 free capacity, task can take capacity coefficient 4. This coefficient can be caught in task command line (so Mantra can be launched 'mantra -j 4 ...', or 3000 capacity can be used by one 'houdini' task, for example to generate something, which use only one CPU, and 'mantra -j 3'). Hosts capacity values described in 'Farm Setup' ('xml' file).
+</p>
+
+<h4>Paths Map.</h4>
+<p>
+Every host can has different paths and a map to translate paths to server and from server.
+With this feature you can setup a multi-OS render.
+You can use different operating systems on farm hosts and to submit jobs from any OS to render it on any OS.
 </p>
 
 <h4>Dependencies</h4>
@@ -229,7 +242,7 @@ When some machine registers on server, it finds last pattern with mask that matc
 <p>
 <small>
 Watch Renders<br/>
-<img hspace="10" vspace="10" src="images/watch/renders.png" alt="watch/renders.png"/><br/>
+<img hspace="10" vspace="10" src="images/watch/renders_features.png" alt="watch/renders.png"/><br/>
 <br/><br/>
 Watch Jobs<br/>
 <img hspace="10" vspace="10" src="images/watch/jobs.png" alt="watch/jobs.png"/><br/>

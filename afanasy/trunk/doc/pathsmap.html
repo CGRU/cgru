@@ -52,12 +52,16 @@ Client read this file(s) each time task starts.
 If there is no such file(s), or everything in it commented, paths will not be mapped at all.
 </p>
 
+<table><tr><td>
 <h3>Paths map file example:</h3>
 <pre>
-#     Client:                 Server:
 
-\\server\projects\          /cg/projects/
+   #     Client:                 Server:
+
+   \\server\projects\          /cg/projects/   
+
 </pre>
+</td></tr></table>
 
 <h3>Paths map file syntax:</h3>
 <p>
@@ -87,6 +91,32 @@ For example NUKE uses only '<b>\</b>' slashes on any platform.
 </li>
 </ul>
 
+<h3>Real working paths map file:</h3>
+<table><tr><td>
+<pre>
+
+   #     Client:             Server:
+   
+   P:\tdh\                 /bz/prj/tdh/
+   P:\                     /bz/prj/
+   \\stor\projects\        /bz/prj/
+   \\stor\tdh\             /bz/prj/tdh/
+   
+   T:\cgru\                /bz/etc/cgru/
+   T:\                     /bz/etc/
+   \\soft\config\          /bz/etc/
+   
+   C:\bz\bin\cgru\         /bz/bin/cgru/
+   
+   # For tests:
+   C:\bz\bin\cgru\         /cg/tools/cgru/
+   C:\bz\bin\cgru\afanasy\ /cg/tools/cgru/afanasy/trunk/   
+
+</pre>
+</td></tr></table>
+<p>Notice that 'tdh' project has two windows shares: '\\stor\projects\' and '\\stor\projects\tdh'.
+Some windows users have 'STOR' and others have 'stor' as the same fileserver name.
+But it's work!</p>
 
 <!--FOOTER-->
 <br/>
