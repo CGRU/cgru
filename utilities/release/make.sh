@@ -75,10 +75,10 @@ rm -rf $cgruExp/afanasy/branches
 rm -rf $cgruExp/afanasy/trunk
 rm -rf $cgruExp/afanasy/tags
 
-# Creating ZIP archives:
+# Creating 7zip archives:
 releases="__releases__"
 if [ -d ${releases} ]; then
-   echo "Creating ZIP archives with all CGRU files..."
+   echo "Creating 7zip archives with all CGRU files..."
    releasesnames=`ls "${releases}"`
    for release in $releasesnames; do
       releasedir="${releases}/$release"
@@ -90,8 +90,9 @@ if [ -d ${releases} ]; then
       [ ! -z "`ls $releasedir`" ] && cp -rp $releasedir/* $tmp
       tmp=$PWD
       cd $tmpdir/${release}
-      acrhivename="cgru.${VERSION_NUMBER}.${release}.zip"
-      zip -qr "../../${releases}/${acrhivename}" "cgru"
+      acrhivename="cgru.${VERSION_NUMBER}.${release}.7z"
+      7za a -r -t7z "../../${releases}/${acrhivename}" "cgru"
+#      zip -qr "../../${releases}/${acrhivename}" "cgru"
       chmod a+rw "../../${releases}/${acrhivename}"
       cd $tmp
    done
