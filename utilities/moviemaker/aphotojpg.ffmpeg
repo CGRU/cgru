@@ -1,2 +1,2 @@
 QuickTime PhotoJPG
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i @INPUT@ -vcodec mjpeg -qscale 1 @OUTPUT@ || echo Done
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i @INPUT@ -vcodec copy @OUTPUT@ || echo Done

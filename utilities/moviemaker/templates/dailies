@@ -1,0 +1,5 @@
+-fill white -pointsize 20 -gravity southwest -annotate +10+50 "%(DATETIME)s"
+-fill white -pointsize 30 -gravity southeast -annotate +10+10 "%(FRAME)s"
+-fill white -pointsize 30 -gravity northwest -annotate +10+10 "%(PROJECT)s"
+-fill white -pointsize 30 -gravity northeast -annotate +10+10 "%(SHOT)s %(VERSION)s"
+-fill white -pointsize 30 -gravity southwest -annotate +10+10 "%(MOVIENAME)s"

@@ -14,7 +14,7 @@ from PyQt4 import QtCore, QtGui
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-i', '--input',     dest='inputfile',    type  ='string',     default='',             help='Input file')
-Parser.add_option('--company',         dest='company',      type  ='string',     default='Bazelevs VFX', help='Company name')
+Parser.add_option('--company',         dest='company',      type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',         dest='project',      type  ='string',     default='',             help='Project name')
 Parser.add_option('-D', '--debug',     dest='debug',        action='store_true', default=False,          help='Debug mode')
 
@@ -31,9 +31,10 @@ UserName = UserName.capitalize()
 
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 LogosPath = os.path.join( DialogPath, 'logos')
-FontsList = ['Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
+FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 CodecsPath = DialogPath
 Encoders = ['ffmpeg', 'mencoder']
+Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
 
 # Precess codecs:
 CodecNames = []
@@ -61,6 +62,16 @@ class Dialog( QtGui.QWidget):
       self.setWindowTitle('Mavishky !')
       self.mainLayout = QtGui.QVBoxLayout( self)
 
+      self.tabwidget = QtGui.QTabWidget( self)
+      self.generalwidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.generalwidget,'General')
+      self.generallayout = QtGui.QVBoxLayout( self.generalwidget)
+      self.parameterswidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.parameterswidget,'Parameters')
+      self.parameterslayout = QtGui.QVBoxLayout( self.parameterswidget)
+      self.mainLayout.addWidget( self.tabwidget)
+
+      # General:
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
       self.cbFormat = QtGui.QComboBox( self)
@@ -91,73 +102,39 @@ class Dialog( QtGui.QWidget):
       self.lFormat.addWidget( self.cbFPS)
       self.lFormat.addWidget( self.tCodec)
       self.lFormat.addWidget( self.cbCodec)
-      self.mainLayout.addLayout( self.lFormat)
+      self.generallayout.addLayout( self.lFormat)
 
 
-      self.gDrawing = QtGui.QGroupBox('Drawing')
-      self.lDrawing = QtGui.QVBoxLayout()
-      self.gDrawing.setLayout( self.lDrawing)
-
-      self.lDraw = QtGui.QHBoxLayout()
-      self.cFrame = QtGui.QCheckBox('Frame', self)
-      self.cFrame.setChecked( True)
-      self.lDraw.addWidget( self.cFrame)
-      QtCore.QObject.connect( self.cFrame, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cDate = QtGui.QCheckBox('Date', self)
-      self.cDate.setChecked( True)
-      self.lDraw.addWidget( self.cDate)
-      QtCore.QObject.connect( self.cDate, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cTime = QtGui.QCheckBox('Time', self)
-      self.cTime.setChecked( False)
-      self.lDraw.addWidget( self.cTime)
-      QtCore.QObject.connect( self.cTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cFileName = QtGui.QCheckBox('File Name', self)
-      self.cFileName.setChecked( True)
-      self.lDraw.addWidget( self.cFileName)
-      QtCore.QObject.connect( self.cFileName, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.tCompany = QtGui.QLabel('Company:', self)
-      self.lDraw.addWidget( self.tCompany)
-      self.editCompany = QtGui.QLineEdit( Options.company, self)
-      self.lDraw.addWidget( self.editCompany)
-      QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.tFont = QtGui.QLabel('Font:', self)
-      self.lDraw.addWidget( self.tFont)
-      self.editFont = QtGui.QLineEdit('Arial', self)
-      self.lDraw.addWidget( self.editFont)
-      QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cbFont = QtGui.QComboBox( self)
-      for font in FontsList: self.cbFont.addItem( font)
-      self.lDraw.addWidget( self.cbFont)
-      QtCore.QObject.connect( self.cbFont, QtCore.SIGNAL('currentIndexChanged(int)'), self.fontChanged)
-      self.lDrawing.addLayout( self.lDraw)
+      self.gInformation = QtGui.QGroupBox('Information')
+      self.lInformation = QtGui.QVBoxLayout()
+      self.gInformation.setLayout( self.lInformation)
 
       self.lTitles = QtGui.QHBoxLayout()
-      self.cProject = QtGui.QCheckBox('Project:', self)
-      self.cProject.setChecked( True)
-      QtCore.QObject.connect( self.cProject, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.tCompany = QtGui.QLabel('Company:', self)
+      self.editCompany = QtGui.QLineEdit( Options.company, self)
+      QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.tProject = QtGui.QLabel('Project:', self)
       self.editProject = QtGui.QLineEdit( Options.project, self)
       QtCore.QObject.connect( self.editProject, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cShot = QtGui.QCheckBox('Shot:', self)
-      self.cShot.setChecked( True)
-      QtCore.QObject.connect( self.cShot, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.tShot = QtGui.QLabel('Shot:', self)
       self.editShot = QtGui.QLineEdit('', self)
       QtCore.QObject.connect( self.editShot, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cVersion = QtGui.QCheckBox('Version:', self)
-      self.cVersion.setChecked( True)
-      QtCore.QObject.connect( self.cVersion, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.tVersion = QtGui.QLabel('Version:', self)
       self.editVersion = QtGui.QLineEdit('', self)
       QtCore.QObject.connect( self.editVersion, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cAutoTitles = QtGui.QCheckBox('Auto', self)
       self.cAutoTitles.setChecked( True)
       QtCore.QObject.connect( self.cAutoTitles, QtCore.SIGNAL('stateChanged(int)'), self.autoTitles)
-      self.lTitles.addWidget( self.cProject)
+      self.lTitles.addWidget( self.tCompany)
+      self.lTitles.addWidget( self.editCompany)
+      self.lTitles.addWidget( self.tProject)
       self.lTitles.addWidget( self.editProject)
-      self.lTitles.addWidget( self.cShot)
+      self.lTitles.addWidget( self.tShot)
       self.lTitles.addWidget( self.editShot)
-      self.lTitles.addWidget( self.cVersion)
+      self.lTitles.addWidget( self.tVersion)
       self.lTitles.addWidget( self.editVersion)
       self.lTitles.addWidget( self.cAutoTitles)
-      self.lDrawing.addLayout( self.lTitles)
+      self.lInformation.addLayout( self.lTitles)
 
       self.lUser = QtGui.QHBoxLayout()
       self.lArtist = QtGui.QLabel('Artist:', self)
@@ -177,7 +154,7 @@ class Dialog( QtGui.QWidget):
       self.cbActivity.addItem('sim')
       self.lUser.addWidget( self.cbActivity)
       QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
-      self.lDrawing.addLayout( self.lUser)
+      self.lInformation.addLayout( self.lUser)
 
       self.lComments = QtGui.QHBoxLayout()
       self.tComments = QtGui.QLabel('Comments:', self)
@@ -185,82 +162,9 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.editComments, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lComments.addWidget( self.tComments)
       self.lComments.addWidget( self.editComments)
-      self.lDrawing.addLayout( self.lComments)
+      self.lInformation.addLayout( self.lComments)
 
-      self.lLogo = QtGui.QHBoxLayout()
-      self.cLogo = QtGui.QCheckBox('Logo', self)
-      QtCore.QObject.connect( self.cLogo, QtCore.SIGNAL('stateChanged(int)'), self.drawLogo)
-      self.tLogoPath = QtGui.QLabel('Path:', self)
-      self.editLogoPath = QtGui.QLineEdit( os.path.join( LogosPath, 'logo.png'), self)
-      QtCore.QObject.connect( self.editLogoPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.tLogoSize = QtGui.QLabel('Size:', self)
-      self.sbLogoSizeX = QtGui.QSpinBox( self)
-      self.sbLogoSizeX.setRange( 1, 1000)
-      self.sbLogoSizeX.setValue( 200)
-      QtCore.QObject.connect( self.sbLogoSizeX, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.sbLogoSizeY = QtGui.QSpinBox( self)
-      self.sbLogoSizeY.setRange( 1, 1000)
-      self.sbLogoSizeY.setValue( 100)
-      QtCore.QObject.connect( self.sbLogoSizeY, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.btnBrowseLogo = QtGui.QPushButton('Browse', self)
-      QtCore.QObject.connect( self.btnBrowseLogo, QtCore.SIGNAL('pressed()'), self.browseLogo)
-      self.editLogoPath.setEnabled( False)
-      self.btnBrowseLogo.setEnabled( False)
-      self.sbLogoSizeX.setEnabled( False)
-      self.sbLogoSizeY.setEnabled( False)
-      self.lLogo.addWidget( self.cLogo)
-      self.lLogo.addWidget( self.tLogoPath)
-      self.lLogo.addWidget( self.editLogoPath)
-      self.lLogo.addWidget( self.btnBrowseLogo)
-      self.lLogo.addWidget( self.tLogoSize)
-      self.lLogo.addWidget( self.sbLogoSizeX)
-      self.lLogo.addWidget( self.sbLogoSizeY)
-      self.lDrawing.addLayout( self.lLogo)
-
-      self.lCacher = QtGui.QHBoxLayout()
-      self.tCacherH = QtGui.QLabel('16:9 Cacher', self)
-      self.cbCacherH = QtGui.QComboBox( self)
-      self.cbCacherH.addItem('None')
-      self.cbCacherH.addItem('25%', QtCore.QVariant('25'))
-      self.cbCacherH.addItem('50%', QtCore.QVariant('50'))
-      self.cbCacherH.addItem('75%', QtCore.QVariant('75'))
-      self.cbCacherH.addItem('100%', QtCore.QVariant('100'))
-      self.cbCacherH.setCurrentIndex( 1)
-      QtCore.QObject.connect( self.cbCacherH, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.tCacherC = QtGui.QLabel('2.35 Cacher', self)
-      self.cbCacherC = QtGui.QComboBox( self)
-      self.cbCacherC.addItem('None')
-      self.cbCacherC.addItem('25%', QtCore.QVariant('25'))
-      self.cbCacherC.addItem('50%', QtCore.QVariant('50'))
-      self.cbCacherC.addItem('75%', QtCore.QVariant('75'))
-      self.cbCacherC.addItem('100%', QtCore.QVariant('100'))
-      self.cbCacherC.setCurrentIndex( 1)
-      QtCore.QObject.connect( self.cbCacherC, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.lCacher.addWidget( self.tCacherH)
-      self.lCacher.addWidget( self.cbCacherH)
-      self.lCacher.addWidget( self.tCacherC)
-      self.lCacher.addWidget( self.cbCacherC)
-      self.lDrawing.addLayout( self.lCacher)
-
-      self.mainLayout.addWidget( self.gDrawing)
-
-
-      self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
-      self.lCorr = QtGui.QHBoxLayout()
-      self.gCorrectionSettings.setLayout( self.lCorr)
-
-      self.tGamma = QtGui.QLabel('Gamma:', self)
-      self.dsbGamma = QtGui.QDoubleSpinBox( self)
-      self.dsbGamma.setRange( 0.1, 10.0)
-      self.dsbGamma.setDecimals( 1)
-      self.dsbGamma.setSingleStep( 0.1)
-      self.dsbGamma.setValue( 1.0)
-      QtCore.QObject.connect( self.dsbGamma, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      self.lCorr.addWidget( self.tGamma)
-      self.lCorr.addWidget( self.dsbGamma)
-
-      self.mainLayout.addWidget( self.gCorrectionSettings)
-
+      self.generallayout.addWidget( self.gInformation)
 
       self.gInputSettings = QtGui.QGroupBox('Input Sequence Pattern')
       self.lInputSettings = QtGui.QVBoxLayout()
@@ -297,7 +201,7 @@ class Dialog( QtGui.QWidget):
       self.lIdentify.addWidget( self.btnIdentify)
       self.lInputSettings.addLayout( self.lIdentify)
 
-      self.mainLayout.addWidget( self.gInputSettings)
+      self.generallayout.addWidget( self.gInputSettings)
 
 
       self.gOutputSettings = QtGui.QGroupBox('Output File')
@@ -335,15 +239,140 @@ class Dialog( QtGui.QWidget):
       self.lOutputDir.addWidget( self.editOutputDir)
       self.lOutputSettings.addLayout( self.lOutputDir)
 
-      self.mainLayout.addWidget( self.gOutputSettings)
+      self.generallayout.addWidget( self.gOutputSettings)
 
 
       self.cmdField = QtGui.QTextEdit( self)
       self.cmdField.setReadOnly( True)
       self.mainLayout.addWidget( self.cmdField)
 
+      self.lProcess = QtGui.QHBoxLayout()
+      self.btnRefresh = QtGui.QPushButton('Refresh', self)
+      QtCore.QObject.connect( self.btnRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
+      self.btnStart = QtGui.QPushButton('Start', self)
+      self.btnStart.setEnabled( False)
+      QtCore.QObject.connect( self.btnStart, QtCore.SIGNAL('pressed()'), self.execute)
+      self.btnStop = QtGui.QPushButton('Stop', self)
+      self.btnStop.setEnabled( False)
+      QtCore.QObject.connect( self.btnStop, QtCore.SIGNAL('pressed()'), self.processStop)
+      self.lProcess.addWidget( self.btnRefresh)
+      self.lProcess.addWidget( self.btnStart)
+      self.lProcess.addWidget( self.btnStop)
+      self.mainLayout.addLayout( self.lProcess)
+
+      # Parameters:
+      self.lJQuality = QtGui.QHBoxLayout()
+      self.tJQuality = QtGui.QLabel('JPEG Quality:', self)
+      self.sbJQuality = QtGui.QSpinBox( self)
+      self.sbJQuality.setRange( 1, 100)
+      self.sbJQuality.setValue( 90)
+      QtCore.QObject.connect( self.sbJQuality, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lJQuality.addWidget( self.tJQuality)
+      self.lJQuality.addWidget( self.sbJQuality)
+      self.parameterslayout.addLayout( self.lJQuality)
+
+      self.gDrawing = QtGui.QGroupBox('Drawing')
+      self.lDrawing = QtGui.QVBoxLayout()
+      self.gDrawing.setLayout( self.lDrawing)
+
+      self.cTime = QtGui.QCheckBox('Add Time To Date', self)
+      self.cTime.setChecked( False)
+      QtCore.QObject.connect( self.cTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.lDrawing.addWidget( self.cTime)
+
+      self.lCacher = QtGui.QHBoxLayout()
+      self.tCacherH = QtGui.QLabel('16:9 Cacher', self)
+      self.cbCacherH = QtGui.QComboBox( self)
+      self.cbCacherH.addItem('None')
+      self.cbCacherH.addItem('25%', QtCore.QVariant('25'))
+      self.cbCacherH.addItem('50%', QtCore.QVariant('50'))
+      self.cbCacherH.addItem('75%', QtCore.QVariant('75'))
+      self.cbCacherH.addItem('100%', QtCore.QVariant('100'))
+      self.cbCacherH.setCurrentIndex( 1)
+      QtCore.QObject.connect( self.cbCacherH, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.tCacherC = QtGui.QLabel('2.35 Cacher', self)
+      self.cbCacherC = QtGui.QComboBox( self)
+      self.cbCacherC.addItem('None')
+      self.cbCacherC.addItem('25%', QtCore.QVariant('25'))
+      self.cbCacherC.addItem('50%', QtCore.QVariant('50'))
+      self.cbCacherC.addItem('75%', QtCore.QVariant('75'))
+      self.cbCacherC.addItem('100%', QtCore.QVariant('100'))
+      self.cbCacherC.setCurrentIndex( 1)
+      QtCore.QObject.connect( self.cbCacherC, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lCacher.addWidget( self.tCacherH)
+      self.lCacher.addWidget( self.cbCacherH)
+      self.lCacher.addWidget( self.tCacherC)
+      self.lCacher.addWidget( self.cbCacherC)
+      self.lDrawing.addLayout( self.lCacher)
+
+      self.lLogo = QtGui.QHBoxLayout()
+      self.cLogo = QtGui.QCheckBox('Logo', self)
+      QtCore.QObject.connect( self.cLogo, QtCore.SIGNAL('stateChanged(int)'), self.drawLogo)
+      self.tLogoPath = QtGui.QLabel('Path:', self)
+      self.editLogoPath = QtGui.QLineEdit( os.path.join( LogosPath, 'logo.png'), self)
+      QtCore.QObject.connect( self.editLogoPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.tLogoSize = QtGui.QLabel('Size:', self)
+      self.sbLogoSizeX = QtGui.QSpinBox( self)
+      self.sbLogoSizeX.setRange( 1, 1000)
+      self.sbLogoSizeX.setValue( 200)
+      QtCore.QObject.connect( self.sbLogoSizeX, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.sbLogoSizeY = QtGui.QSpinBox( self)
+      self.sbLogoSizeY.setRange( 1, 1000)
+      self.sbLogoSizeY.setValue( 100)
+      QtCore.QObject.connect( self.sbLogoSizeY, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.btnBrowseLogo = QtGui.QPushButton('Browse', self)
+      QtCore.QObject.connect( self.btnBrowseLogo, QtCore.SIGNAL('pressed()'), self.browseLogo)
+      self.editLogoPath.setEnabled( False)
+      self.btnBrowseLogo.setEnabled( False)
+      self.sbLogoSizeX.setEnabled( False)
+      self.sbLogoSizeY.setEnabled( False)
+      self.tLogoGravity = QtGui.QLabel('Position:', self)
+      self.cbLogoGravity = QtGui.QComboBox( self)
+      for pos in Gravity: self.cbLogoGravity.addItem( pos)
+      QtCore.QObject.connect( self.cbLogoGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lLogo.addWidget( self.cLogo)
+      self.lLogo.addWidget( self.tLogoPath)
+      self.lLogo.addWidget( self.editLogoPath)
+      self.lLogo.addWidget( self.btnBrowseLogo)
+      self.lLogo.addWidget( self.tLogoSize)
+      self.lLogo.addWidget( self.sbLogoSizeX)
+      self.lLogo.addWidget( self.sbLogoSizeY)
+      self.lLogo.addWidget( self.tLogoGravity)
+      self.lLogo.addWidget( self.cbLogoGravity)
+      self.lDrawing.addLayout( self.lLogo)
+
+      self.lFont = QtGui.QHBoxLayout()
+      self.tFont = QtGui.QLabel('Annotations Text Font:', self)
+      self.lFont.addWidget( self.tFont)
+      self.editFont = QtGui.QLineEdit('', self)
+      self.lFont.addWidget( self.editFont)
+      QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.cbFont = QtGui.QComboBox( self)
+      for font in FontsList: self.cbFont.addItem( font)
+      self.lFont.addWidget( self.cbFont)
+      QtCore.QObject.connect( self.cbFont, QtCore.SIGNAL('currentIndexChanged(int)'), self.fontChanged)
+      self.lDrawing.addLayout( self.lFont)
+
+      self.parameterslayout.addWidget( self.gDrawing)
+
+      self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
+      self.lCorr = QtGui.QHBoxLayout()
+      self.gCorrectionSettings.setLayout( self.lCorr)
+      self.tGamma = QtGui.QLabel('Gamma:', self)
+      self.dsbGamma = QtGui.QDoubleSpinBox( self)
+      self.dsbGamma.setRange( 0.1, 10.0)
+      self.dsbGamma.setDecimals( 1)
+      self.dsbGamma.setSingleStep( 0.1)
+      self.dsbGamma.setValue( 1.0)
+      QtCore.QObject.connect( self.dsbGamma, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      self.lCorr.addWidget( self.tGamma)
+      self.lCorr.addWidget( self.dsbGamma)
+      self.parameterslayout.addWidget( self.gCorrectionSettings)
+
+      self.gAfanasy = QtGui.QGroupBox('Afanasy')
       self.lAfanasy = QtGui.QHBoxLayout()
-      self.cAfanasy = QtGui.QCheckBox('Afanasy:', self)
+      self.gAfanasy.setLayout( self.lAfanasy)
+      self.cAfanasy = QtGui.QCheckBox('Enable', self)
       QtCore.QObject.connect( self.cAfanasy, QtCore.SIGNAL('stateChanged(int)'), self.afanasy)
       self.cAfOneTask = QtGui.QCheckBox('One Task', self)
       self.cAfOneTask.setChecked( True)
@@ -375,24 +404,10 @@ class Dialog( QtGui.QWidget):
       self.lAfanasy.addWidget( self.sbAfCapConvert)
       self.lAfanasy.addWidget( self.tAfCapEncode)
       self.lAfanasy.addWidget( self.sbAfCapEncode)
-      self.mainLayout.addLayout( self.lAfanasy)
+      self.parameterslayout.addWidget( self.gAfanasy)
 
-      self.lProcess = QtGui.QHBoxLayout()
-      self.btnRefresh = QtGui.QPushButton('Refresh', self)
-      QtCore.QObject.connect( self.btnRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
-      self.btnStart = QtGui.QPushButton('Start', self)
-      self.btnStart.setEnabled( False)
-      QtCore.QObject.connect( self.btnStart, QtCore.SIGNAL('pressed()'), self.execute)
-      self.btnStop = QtGui.QPushButton('Stop', self)
-      self.btnStop.setEnabled( False)
-      QtCore.QObject.connect( self.btnStop, QtCore.SIGNAL('pressed()'), self.processStop)
-      self.lProcess.addWidget( self.btnRefresh)
-      self.lProcess.addWidget( self.btnStart)
-      self.lProcess.addWidget( self.btnStop)
-      self.mainLayout.addLayout( self.lProcess)
 
       self.inputEvaluated = False
-
       self.autoTitles()
       self.activityChanged()
       self.autoOutput()
@@ -567,6 +582,7 @@ class Dialog( QtGui.QWidget):
       artist   = str( self.editArtist.text())
       activity = str( self.editActivity.text())
       comments = str( self.editComments.text())
+      font     = str( self.editFont.text())
 
       outdir = str( self.editOutputDir.text())
       if self.cAutoOutput.isChecked() or outdir == None or outdir == '':
@@ -579,15 +595,6 @@ class Dialog( QtGui.QWidget):
          if activity != '': outname += '_' + activity
          if version  != '': outname += '_' + version
          self.editOutputName.setText( outname)
-
-      fontneeded = False
-      if self.cProject.isChecked() and project != '': fontneeded = True
-      if self.cShot.isChecked() and shot != '': fontneeded = True
-      if comments != '': fontneeded = True
-      if self.cFrame.isChecked(): fontneeded = True
-      if self.cDate.isChecked(): fontneeded = True
-      if self.cTime.isChecked(): fontneeded = True
-      if fontneeded: fontpath = self.editFont.text()
 
       logodraw = self.cLogo.isChecked()
       logopath = self.editLogoPath.text()
@@ -605,19 +612,18 @@ class Dialog( QtGui.QWidget):
       format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
       if not format.isEmpty():
          cmd += ' -r %s' % format
+         cmd += ' -s dailies_slate -t dailies'
          cmd += ' -g %.2f' % self.dsbGamma.value()
-         if self.cProject.isChecked() and project != '': cmd += ' --project "%s"' % project
-         if self.cShot.isChecked() and shot != '': cmd += ' --shot "%s"' % shot
-         if self.cVersion.isChecked() and version != '': cmd += ' --shotversion "%s"' % version
-         if company != '': cmd += ' --company "%s"' % company
-         if artist != '': cmd += ' --artist "%s"' % artist
+         if project  != '': cmd += ' --project "%s"'  % project
+         if shot     != '': cmd += ' --shot "%s"'     % shot
+         if version  != '': cmd += ' --ver "%s"'      % version
+         if company  != '': cmd += ' --company "%s"'  % company
+         if artist   != '': cmd += ' --artist "%s"'   % artist
          if activity != '': cmd += ' --activity "%s"' % activity
          if comments != '': cmd += ' --comments "%s"' % comments
-         if self.cFrame.isChecked(): cmd += ' --drawframe'
-         if self.cDate.isChecked(): cmd += ' --drawdate'
-         if self.cTime.isChecked(): cmd += ' --drawtime'
-         if self.cFileName.isChecked(): cmd += ' --drawfilename'
-         if fontneeded: cmd += ' --font "%s"' % fontpath
+         if font     != '': cmd += ' --font "%s"'     % font
+         if self.sbJQuality.value() != -1: cmd += ' -q %d' % self.sbJQuality.value()
+         if self.cTime.isChecked(): cmd += ' --addtime'
          cacher = self.cbCacherH.itemData( self.cbCacherH.currentIndex()).toString()
          if not cacher.isEmpty(): cmd += ' --draw169 %s' % cacher
          cacher = self.cbCacherC.itemData( self.cbCacherC.currentIndex()).toString()
@@ -628,6 +634,7 @@ class Dialog( QtGui.QWidget):
             logosize += 'x'
             logosize += str( self.sbLogoSizeY.value())
             cmd += ' --logosize %s' % logosize
+            cmd += ' --logograv %s' % self.cbLogoGravity.currentText()
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
       if self.cAfanasy.isChecked() and not self.cAfOneTask.isChecked():

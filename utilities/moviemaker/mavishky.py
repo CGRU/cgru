@@ -22,28 +22,14 @@ signal.signal(signal.SIGINT,  rmdir)
 
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
+
 parser.add_option('-f', '--fps',        dest='fps',         type  ='int',        default=25,          help='Frames per second')
 parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='aphotojpg',  help='File with encode command line in last line')
-parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 parser.add_option('-i', '--inpattern',  dest='inpattern',   type  ='string',     default='',          help='Input files pattern: img.####.jpg')
 parser.add_option('-o', '--output',     dest='output',      type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
-parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
-parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
-parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
-parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
-parser.add_option('--shotversion',      dest='shotversion', type  ='string',     default='',          help='Draw shot version')
-parser.add_option('--artist',           dest='artist',      type  ='string',     default='',          help='Draw artist')
-parser.add_option('--activity',         dest='activity',    type  ='string',     default='',          help='Draw activity')
-parser.add_option('--comments',         dest='comments',    type  ='string',     default='',          help='Draw comments')
-parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
-parser.add_option('--logopath',         dest='logopath',    type  ='string',     default='',          help='Add a specified image')
-parser.add_option('--logosize',         dest='logosize',    type  ='string',     default='200x100',   help='Logotype size')
-parser.add_option('--drawdate',         dest='drawdate',    action='store_true', default=False,       help='Draw date')
-parser.add_option('--drawtime',         dest='drawtime',    action='store_true', default=False,       help='Draw time')
-parser.add_option('--drawframe',        dest='drawframe',   action='store_true', default=False,       help='Draw frame')
-parser.add_option('--drawfilename',     dest='drawfilename',action='store_true', default=False,       help='Draw file name')
-parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
-parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
+parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
+parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
+parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
 parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')
 parser.add_option('--timesuffix',       dest='timesuffix',  action='store_true', default=False,       help='Add time suffix to output file name')
 parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,       help='Verbose mode')
@@ -51,43 +37,40 @@ parser.add_option('-D', '--debug',      dest='debug',       action='store_true',
 parser.add_option('-A', '--afanasy',    dest='afanasy',     action='store_true', default=False,       help='Send to Afanasy')
 parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',        default=10,          help='Afanasy convert tasks capacity')
 parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=500,         help='Afanasy encode task capacity')
-parser.add_option('-u', '--username',   dest='username',    type  ='string',     default='',          help='Change Afanasy job user')
+parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user')
 parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makeMovie+date will be used')
+
+# Options to makeframe:
+parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
+parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
+parser.add_option('-q', '--quality',    dest='quality',     type  ='int',        default=-1,          help='Converted JPEG quality')
+parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
+parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
+parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
+parser.add_option('--ver',              dest='shotversion', type  ='string',     default='',          help='Draw shot version')
+parser.add_option('--artist',           dest='artist',      type  ='string',     default='',          help='Draw artist')
+parser.add_option('--activity',         dest='activity',    type  ='string',     default='',          help='Draw activity')
+parser.add_option('--comments',         dest='comments',    type  ='string',     default='',          help='Draw comments')
+parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
+parser.add_option('--logopath',         dest='logopath',    type  ='string',     default='',          help='Add a specified image')
+parser.add_option('--logosize',         dest='logosize',    type  ='string',     default='200x100',   help='Logotype size')
+parser.add_option('--logograv',         dest='logograv',    type  ='string',     default='southeast', help='Logotype positioning gravity')
+parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
+parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
 
 (options, args) = parser.parse_args()
 
-fps            = options.fps
-codec          = options.codec
-resolution     = options.resolution
-inpattern      = options.inpattern
-output         = options.output
-drawdate       = options.drawdate
-drawtime       = options.drawtime
-drawframe      = options.drawframe
-drawfilename   = options.drawfilename
-draw169        = options.draw169
-draw235        = options.draw235
-font           = options.font
-logopath       = options.logopath
-logosize       = options.logosize
-company        = options.company
-project        = options.project
-shot           = options.shot
-shotversion    = options.shotversion
-artist         = options.artist
-activity       = options.activity
-comments       = options.comments
-datesuffix     = options.datesuffix
-timesuffix     = options.timesuffix
-gamma          = options.gamma
+codec       = options.codec
+resolution  = options.resolution
+inpattern   = options.inpattern
+output      = options.output
+logopath    = options.logopath
+logosize    = options.logosize
+datesuffix  = options.datesuffix
+timesuffix  = options.timesuffix
 
 verbose     = options.verbose
 debug       = options.debug
-
-afanasy     = options.afanasy
-afconvcap   = options.afconvcap
-afenccap    = options.afenccap
-username    = options.username
 
 tmpdir      = options.tmpdir
 
@@ -121,18 +104,15 @@ if len(cmd_encode) < 2:
 if verbose: print 'Encode command = "%s"' % cmd_encode
 
 #datetimestring = '`date +%y-%m-%d_%H-%M`'
-datetimestring = ''
+datetimestring = time.strftime('%y-%m-%d')
 datetimesuffix = ''
-if drawdate  : datetimestring += time.strftime('%y-%m-%d')
 if datesuffix: datetimesuffix += time.strftime('%y%m%d')
-if drawtime:
+if options.addtime:
    if datetimestring != '': datetimestring += ' '
    datetimestring += time.strftime('%H:%M')
 if timesuffix:
    if datetimesuffix != '': datetimesuffix += '_'
    datetimesuffix += time.strftime('%H%M')
-#if re.match( r'win.*', sys.platform) != None: datetimestring = '%DATE%'
-#datetimestring = "`python -c \"import time;print time.strftime('%y-%m-%d_%H-%M')\"`"
 
 # Check required parameters:
 if inpattern == '': parser.error('Input files not specified.')
@@ -236,62 +216,34 @@ if resolution != '':
    if verbose: print 'Output resolution = %(width)d x %(height)d' % vars()
    afjobname += ' %s' % resolution
 
-# Cacher:
-if draw169 or draw235: need_convert = True
-if draw169 > 100: draw169 = 100
-draw169_a = 0.01 * draw169
-draw169_y = int((height - width*9/16) / 2)
-draw169_h = height - draw169_y
-if draw169_y < 1: draw169 = False
-if draw235 > 100: draw235 = 100
-draw235_a = 0.01 * draw235
-draw235_y = int((height - width/2.35) / 2)
-draw235_h = height - draw235_y
-if draw235_y < 1: draw235 = False
+cmd_makeframe = os.path.join( os.path.dirname(sys.argv[0]), 'makeframe.py')
+cmd_makeframe = 'python ' + cmd_makeframe
+
+cmd_args = ''
+if options.quality      != -1: cmd_args += ' -q %d' % options.quality
+if options.resolution   != '': cmd_args += ' -r %s' % options.resolution
+if options.company      != '': cmd_args += ' -c "%s"' % options.company
+if options.project      != '': cmd_args += ' -p "%s"' % options.project
+if options.artist       != '': cmd_args += ' -a "%s"' % options.artist
+if options.shot         != '': cmd_args += ' -s "%s"' % options.shot
+if options.shotversion  != '': cmd_args += ' --ver "%s"'       % options.shotversion
+if options.font         != '': cmd_args += ' --font "%s"'      % options.font
+if options.activity     != '': cmd_args += ' --activity "%s"'  % options.activity
+if options.comments     != '': cmd_args += ' --comments "%s"'  % options.comments
+cmd_args += ' -d "%s"' % datetimestring
+cmd_args += ' -m "%s"' % os.path.basename(output)
+
 
 imgCount = 0
 # Pre composition:
 cmd_precomp = []
 name_precomp = []
 # Generate header:
-if need_convert:
-   cmd = 'convert -size %(width)dx%(height)d -colorspace RGB xc:black' % vars()
-   cmd += ' -fill "rgb(255,0,0)" -draw "rectangle  0,0 10,10"'
-   cmd += ' -fill "rgb(0,255,0)" -draw "rectangle 10,0 20,10"'
-   cmd += ' -fill "rgb(0,0,255)" -draw "rectangle 20,0 30,10"'
-   rect_num = 10
-   rect_w = width / (rect_num + 2)
-   rect_c = 0
-   rect_y1 = 30
-   rect_y2 = 70
-   rect_x1 = rect_w
-   rect_x2 = rect_x1 + rect_w
-   for r in range( 0, rect_num):
-      cmd += ' -fill "rgb(%(rect_c)d,%(rect_c)d,%(rect_c)d)"' % vars()
-      cmd += ' -draw "rectangle %(rect_x1)d,%(rect_y1)d %(rect_x2)d,%(rect_y2)d"' % vars()
-      rect_x1 += rect_w
-      rect_x2 += rect_w
-      rect_c += 255 / (rect_num - 1)
-   if font != '': cmd += ' -font %s' % font
-   if project != '':
-      cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+100 "%s"' % project
-   if datetimestring != '':
-      cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+100 "%s"' % datetimestring
-   if company != '':
-      cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+100 "%s"' % company
-   if shot != '':
-      cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+150 "%s"' % shot
-   if shotversion != '':
-      cmd += ' -fill white -pointsize 30 -gravity north -annotate +10+150 "%s"' % shotversion
-   cmd += ' -fill white -pointsize 20 -gravity northeast -annotate +10+160 "frame range: 1-%d"' % len(allFiles)
-   if artist != '':
-      cmd += ' -fill white -pointsize 25 -gravity southwest -annotate +10+50 "%s"' % ('Artist: ' + artist)
-   if activity != '':
-      cmd += ' -fill white -pointsize 25 -gravity southeast -annotate +10+50 "%s"' % ('Activity: ' + activity)
-   if drawfilename:
-      cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
-   if comments != '':
-      cmd += ' -fill white -pointsize 20 -gravity west -annotate +10+0 "%s"' % ('Comments: ' + comments)
+if need_convert and options.slate != '':
+   cmd = cmd_makeframe
+   cmd += ' ' + cmd_args
+   cmd += ' --drawcolorbars' + cmd_args
+   cmd += ' -t "%s"' % options.slate
    cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')
@@ -307,10 +259,9 @@ if logopath != '':
       tmpLogo = os.path.join( tmpdir, tmpLogo)
       cmd = 'convert'
       cmd += ' ' + logopath
-      cmd += ' -colorspace RGB'
-      cmd += ' -resize "%s!"' % logosize
+      cmd += ' -gravity %s -background black' % options.logograv
+      cmd += ' -resize ' + logosize
       cmd += ' -extent %(width)dx%(height)d' % vars()
-      cmd += ' -affine 1,0,0,1,-%(logotx)d,-%(logoty)d -transform' % vars()
       cmd += ' ' + tmpLogo
    else:
       print 'Can\'t add logo if output resolution is not specified.'
@@ -323,35 +274,17 @@ cmd_convert = []
 name_convert = []
 if need_convert:
    for afile in allFiles:
-      cmd = 'convert -size %(width)dx%(height)d -colorspace RGB xc:black' % vars()
+      cmd = cmd_makeframe
+      cmd += ' ' + cmd_args
+      cmd += ' -t "%s"' % options.template
+      if options.gamma   > 0: cmd += ' -g %.2f'     % options.gamma
+      if options.draw169 > 0: cmd += ' --draw169 %d' % options.draw169
+      if options.draw235 > 0: cmd += ' --draw235 %d' % options.draw235
+      if need_logo: cmd += ' --logopath "%s"' % tmpLogo
+
       cmd += ' ' + os.path.join( inputdir, afile)
-      cmd += ' +matte'
-      cmd += ' -resize %(width)d' % vars()
-      if gamma > 0: cmd += ' -gamma %.2f' % gamma
-      if correction != '': cmd += correction
-      cmd += ' -compose plus -gravity center -composite'
-      if draw169:
-         cmd += ' -fill "rgba(0,0,0,%(draw169_a)f)" -draw "rectangle 0,0,%(width)d,%(draw169_y)d"' % vars()
-         cmd += ' -fill "rgba(0,0,0,%(draw169_a)f)" -draw "rectangle 0,%(draw169_h)d,%(width)d,%(height)d"' % vars()
-      if draw235:
-         cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,0,%(width)d,%(draw235_y)d"' % vars()
-         cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(width)d,%(height)d"' % vars()
-      if font != '': cmd += ' -font %s' % font
-      if datetimestring != '':
-         cmd += ' -fill white -pointsize 20 -gravity southwest -annotate +10+50 "%s"' % datetimestring
-      if drawframe:
-         digits = afile[ len(prefix) : len(afile) - len(suffix)]
-         cmd += ' -fill white -pointsize 30 -gravity southeast -annotate +10+10 "%s"' % digits
-      if project != '':
-         cmd += ' -fill white -pointsize 30 -gravity northwest -annotate +10+10 "%s"' % project
-      if shot != '' or shotversion != '':
-         cmd += ' -fill white -pointsize 30 -gravity northeast -annotate +10+10 "%s"' % (shot + ' ' + shotversion)
-      if drawfilename:
-         cmd += ' -fill white -pointsize 30 -gravity southwest -annotate +10+10 "%s"' % os.path.basename(output)
-      if need_logo:
-         cmd += ' ' + tmpLogo
-         cmd += ' -compose plus -composite'
       cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
+
       cmd_convert.append( cmd)
       name_convert.append( afile)
       imgCount += 1
@@ -369,7 +302,7 @@ else:
    print 'Unknown encoder = "%s"' % encoder
    exit(1)
 cmd_encode = cmd_encode.replace('@INPUT@',  inputmask)
-cmd_encode = cmd_encode.replace('@FPS@',    str(fps))
+cmd_encode = cmd_encode.replace('@FPS@',    str(options.fps))
 cmd_encode = cmd_encode.replace('@OUTPUT@', output)
 cmd_encode = cmd_encode.replace('@ARGS@',   auxargs)
 
@@ -382,8 +315,8 @@ if debug:
       os.system( cmd_precomp[0])
       if len(cmd_precomp) > 1:
          print '...'
-         print cmd_precomp[len(cmd_precomp)-1]
-         os.system( cmd_precomp[len(cmd_precomp)-1])
+         print cmd_precomp[-1]
+         os.system( cmd_precomp[-1])
       print
    if need_convert:
       print 'Convert first and last commands:'
@@ -391,8 +324,8 @@ if debug:
       print cmd_convert[0]
       os.system( cmd_convert[0])
       print '...'
-      print cmd_convert[len(cmd_convert)-1]
-      os.system( cmd_convert[len(cmd_convert)-1])
+      print cmd_convert[-1]
+      os.system( cmd_convert[-1])
       print
    print 'Encode command:'
    print
@@ -402,10 +335,10 @@ if debug:
    exit(0)
 
 # Construct Afanasy job:
-if afanasy:
+if options.afanasy:
    af = __import__('af', globals(), locals(), [])
    j=af.Job( afjobname)
-   if username != '': j.setUserName(username)
+   if options.afuser != '': j.setUserName( options.afuser)
 
    if len(cmd_precomp):
       bp=af.Block( 'precomp', 'generic')
@@ -416,7 +349,7 @@ if afanasy:
          bp.tasks.append( t)
          t.setCommand( cmd)
          n += 1
-      bp.setCapacity( afconvcap)
+      bp.setCapacity( options.afconvcap)
 
    if need_convert:
       bc=af.Block( 'convert', 'generic')
@@ -427,7 +360,7 @@ if afanasy:
          bc.tasks.append( t)
          t.setCommand( cmd)
          n += 1
-      bc.setCapacity( afconvcap)
+      bc.setCapacity( options.afconvcap)
       if need_logo: bc.setDependMask('precomp')
       bc.setTasksMaxRunTime(11)
 
@@ -436,7 +369,7 @@ if afanasy:
    t = af.Task( output)
    be.tasks.append( t)
    t.setCommand( cmd_encode)
-   be.setCapacity( afenccap)
+   be.setCapacity( options.afenccap)
    if need_convert:
       be.setDependMask('convert')
       j.setCmdPre( 'mkdir ' + os.path.abspath(tmpdir))
@@ -445,7 +378,7 @@ if afanasy:
    if verbose: j.output(1)
 
 # Commands execution:
-if afanasy: j.send( verbose)
+if options.afanasy: j.send( verbose)
 else:
    if len(cmd_precomp) or need_convert: os.mkdir(tmpdir, 0777)
    if len(cmd_precomp):
