@@ -98,9 +98,9 @@ if FILEIN != '':
    # Input file correction:
    correction = ''
    corr_sRGB = ' -gamma 2.2'
-#   corr_Log = ' -level -50%,120%,1.0'
-#   corr_Log = ' -level 9%,67%,.6'
-   corr_Log = ' -set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
+   corr_Log = ' -level 9%,67%,.6'
+   if sys.platform.find('win') == 0:
+      corr_Log = ' -set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
    if   imgtype == 'EXR': correction = corr_sRGB
    elif imgtype == 'DPX': correction = corr_Log
    elif imgtype == 'CIN': correction = corr_Log
