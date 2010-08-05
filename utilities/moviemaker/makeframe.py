@@ -98,7 +98,9 @@ if FILEIN != '':
    # Input file correction:
    correction = ''
    corr_sRGB = ' -gamma 2.2'
-   corr_Log = ' -level 9%,67%,.6'
+#   corr_Log = ' -level -50%,120%,1.0'
+#   corr_Log = ' -level 9%,67%,.6'
+   corr_Log = ' -set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
    if   imgtype == 'EXR': correction = corr_sRGB
    elif imgtype == 'DPX': correction = corr_Log
    elif imgtype == 'CIN': correction = corr_Log
@@ -136,8 +138,8 @@ cmd = 'convert'
 if FILEIN != '':
    cmd += ' "%(FILEIN)s" +matte' % vars()
    cmd += ' -resize %(width)d -gravity center -background black -extent %(width)dx%(height)d +repage' % vars()
-   if options.gamma > 0: cmd += ' -gamma %.2f' % options.gamma
    if correction != '': cmd += correction
+   if options.gamma > 0: cmd += ' -gamma %.2f' % options.gamma
 else:
    cmd += ' -size %(width)dx%(height)d -colorspace RGB xc:black' % vars()
 

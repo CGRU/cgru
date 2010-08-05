@@ -178,14 +178,6 @@ if len(identify) < 1:
 imgtype = identify[0]
 if verbose: print 'Images type = "%s"' % imgtype
 
-# Input files correction:
-correction = ''
-corr_sRGB = ' -gamma 2.2'
-corr_Log = ' -level 9%,67%,.6'
-if   imgtype == 'EXR': correction = corr_sRGB
-elif imgtype == 'DPX': correction = corr_Log
-elif imgtype == 'CIN': correction = corr_Log
-
 # Output file:
 if output == '': output = os.path.join( os.path.dirname( inputdir), prefix.strip('_. '))
 afjobname = os.path.basename( output)
@@ -240,8 +232,7 @@ cmd_precomp = []
 name_precomp = []
 # Generate header:
 if need_convert and options.slate != '':
-   cmd = cmd_makeframe
-   cmd += ' ' + cmd_args
+   cmd = cmd_makeframe + cmd_args
    cmd += ' --drawcolorbars' + cmd_args
    cmd += ' -t "%s"' % options.slate
    cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
@@ -274,8 +265,7 @@ cmd_convert = []
 name_convert = []
 if need_convert:
    for afile in allFiles:
-      cmd = cmd_makeframe
-      cmd += ' ' + cmd_args
+      cmd = cmd_makeframe + cmd_args
       cmd += ' -t "%s"' % options.template
       if options.gamma   > 0: cmd += ' -g %.2f'     % options.gamma
       if options.draw169 > 0: cmd += ' --draw169 %d' % options.draw169
