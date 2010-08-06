@@ -6,7 +6,7 @@ export MXX_RU_CPP_TOOLSET=gcc_linux
 pythondir=/cg/soft/python
 qt=/cg/tools/qt/qt-4.6.3-static
 
-export AF_LFLAGS="-lrt -lz -lgthread-2.0 -lglib-2.0"
+export AF_LFLAGS="-lrt -lz -lgthread -lglib"
 
 export QTDIR=$qt
 export PATH=$qt/bin:$PATH
