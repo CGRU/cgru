@@ -22,7 +22,7 @@ parser.add_option('--comments',         dest='comments',       type  ='string', 
 parser.add_option('--framerange',       dest='framerange',     type  ='string',     default='',          help='Draw frame range')
 parser.add_option('--filedate',         dest='filedate',       type  ='string',     default='',          help='Draw file date')
 
-parser.add_option('-t', '--template',   dest='template',       type  ='string',     default='dailies',   help='Draw template to use')
+parser.add_option('-t', '--template',   dest='template',       type  ='string',     default='',          help='Draw template to use')
 parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='720x576',   help='Format: 720x576')
 parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
 parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='100',       help='Output image quality')
@@ -69,11 +69,16 @@ if options.debug: Verbose = True
 if options.debug: print 'DEBUG MODE:'
 if Verbose: print 'VERBOSE MODE:'
 
+cmdlines = []
 template = options.template
-template = os.path.join( os.path.join( os.path.dirname( sys.argv[0]),'templates'), template)
-file = open( template)
-cmdlines = file.readlines()
-file.close()
+if template != '':
+   template = os.path.join( os.path.join( os.path.dirname( sys.argv[0]),'templates'), template)
+   if os.path.isfile(template):
+      file = open( template)
+      cmdlines = file.readlines()
+      file.close()
+   else:
+      print 'Error: template file "%s" not founded' % template
 
 # Input file indentify:
 if FILEIN != '':

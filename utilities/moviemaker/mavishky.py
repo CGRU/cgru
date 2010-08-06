@@ -23,8 +23,8 @@ signal.signal(signal.SIGINT,  rmdir)
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 
+parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='aphotojpg.ffmpeg',  help='File with encode command line in last line')
 parser.add_option('-f', '--fps',        dest='fps',         type  ='int',        default=25,          help='Frames per second')
-parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='aphotojpg',  help='File with encode command line in last line')
 parser.add_option('-i', '--inpattern',  dest='inpattern',   type  ='string',     default='',          help='Input files pattern: img.####.jpg')
 parser.add_option('-o', '--output',     dest='output',      type  ='string',     default='',          help='Output filename, if not specified, pattern will be used')
 parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
@@ -186,7 +186,6 @@ if codec.find('xvid') != -1: output += '.avi'
 else: output += '.mov'
 if debug: output = os.path.basename( output)
 if verbose: print 'Output = ' + output
-afjobname += ' %s' % codec
 
 # Temporary directory:
 if not debug:
@@ -266,11 +265,11 @@ name_convert = []
 if need_convert:
    for afile in allFiles:
       cmd = cmd_makeframe + cmd_args
-      cmd += ' -t "%s"' % options.template
-      if options.gamma   > 0: cmd += ' -g %.2f'     % options.gamma
-      if options.draw169 > 0: cmd += ' --draw169 %d' % options.draw169
-      if options.draw235 > 0: cmd += ' --draw235 %d' % options.draw235
-      if need_logo: cmd += ' --logopath "%s"' % tmpLogo
+      if options.template != '': cmd += ' -t "%s"' % options.template
+      if options.gamma     >  0: cmd += ' -g %.2f'     % options.gamma
+      if options.draw169   >  0: cmd += ' --draw169 %d' % options.draw169
+      if options.draw235   >  0: cmd += ' --draw235 %d' % options.draw235
+      if need_logo:              cmd += ' --logopath "%s"' % tmpLogo
 
       cmd += ' ' + os.path.join( inputdir, afile)
       cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat

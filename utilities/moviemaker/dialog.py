@@ -14,6 +14,8 @@ from PyQt4 import QtCore, QtGui
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-i', '--input',     dest='inputfile',    type  ='string',     default='',             help='Input file')
+Parser.add_option('-s', '--slate',     dest='slate',        type  ='string',     default='dailies_slate',help='Slate frame template')
+Parser.add_option('-t', '--template',  dest='template',     type  ='string',     default='dailies',      help='Frame paint template')
 Parser.add_option('--company',         dest='company',      type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',         dest='project',      type  ='string',     default='',             help='Project name')
 Parser.add_option('-D', '--debug',     dest='debug',        action='store_true', default=False,          help='Debug mode')
@@ -30,13 +32,30 @@ if dpos != -1: UserName = UserName[dpos+1:]
 UserName = UserName.capitalize()
 
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
+TemplatesPath = os.path.join( DialogPath, 'templates')
 LogosPath = os.path.join( DialogPath, 'logos')
-FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 CodecsPath = DialogPath
+FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 Encoders = ['ffmpeg', 'mencoder']
 Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
 
-# Precess codecs:
+# Process templates:
+Templates = ['']
+TemplateF = 0
+TemplateS = 0
+if os.path.isdir(TemplatesPath):
+   files = os.listdir(TemplatesPath)
+   files.sort()
+   index = 0
+   for afile in files:
+      if afile[0] == '.': continue
+      index += 1
+      Templates.append(afile)
+      if afile == Options.slate:    TemplateS = index
+      if afile == Options.template: TemplateF = index
+
+
+# Process codecs:
 CodecNames = []
 CodecFiles = []
 allFiles = os.listdir( CodecsPath)
@@ -261,6 +280,24 @@ class Dialog( QtGui.QWidget):
       self.mainLayout.addLayout( self.lProcess)
 
       # Parameters:
+      self.lTemplates = QtGui.QHBoxLayout()
+      self.tTemplateS = QtGui.QLabel('Slate Template:', self)
+      self.tTemplateF = QtGui.QLabel('Frame Template:', self)
+      self.cbTemplateS = QtGui.QComboBox( self)
+      self.cbTemplateF = QtGui.QComboBox( self)
+      for template in Templates:
+         self.cbTemplateS.addItem(template)
+         self.cbTemplateF.addItem(template)
+      self.cbTemplateS.setCurrentIndex( TemplateS)
+      self.cbTemplateF.setCurrentIndex( TemplateF)
+      QtCore.QObject.connect( self.cbTemplateS, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      QtCore.QObject.connect( self.cbTemplateF, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lTemplates.addWidget( self.tTemplateS)
+      self.lTemplates.addWidget( self.cbTemplateS)
+      self.lTemplates.addWidget( self.tTemplateF)
+      self.lTemplates.addWidget( self.cbTemplateF)
+      self.parameterslayout.addLayout( self.lTemplates)
+
       self.lJQuality = QtGui.QHBoxLayout()
       self.tJQuality = QtGui.QLabel('JPEG Quality:', self)
       self.sbJQuality = QtGui.QSpinBox( self)
@@ -611,9 +648,12 @@ class Dialog( QtGui.QWidget):
       cmd += ' -o "%s"' % os.path.join( outdir, outname)
       format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
       if not format.isEmpty():
+         ts = self.cbTemplateS.currentText()
+         tf = self.cbTemplateF.currentText()
          cmd += ' -r %s' % format
-         cmd += ' -s dailies_slate -t dailies'
          cmd += ' -g %.2f' % self.dsbGamma.value()
+         if ts != '': cmd += ' -s "%s"' % ts
+         if tf != '': cmd += ' -t "%s"' % tf
          if project  != '': cmd += ' --project "%s"'  % project
          if shot     != '': cmd += ' --shot "%s"'     % shot
          if version  != '': cmd += ' --ver "%s"'      % version
