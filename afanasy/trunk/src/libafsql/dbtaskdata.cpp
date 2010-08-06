@@ -16,7 +16,7 @@ const QString DBTaskData::IDs("id_job int, id_block int, id_task int");
 const QString DBTaskData::Keys("FOREIGN KEY (id_job, id_block) REFERENCES blocks (id_job, id_block) ON DELETE CASCADE, PRIMARY KEY (id_job, id_block, id_task)");
 
 const QString DBTaskData::dbPrepareInsert
-("INSERT INTO tasks (id_job,id_block,id_task,name,cmd,cmd_view,dependmask)\
+("INSERT INTO tasks (id_job,id_block,id_task,name,command,files,dependmask,customdata)\
  VALUES(:id_job,:id_block,:id_task,:name,:command,:files,:dependmask,:customdata);\
 ");
 
