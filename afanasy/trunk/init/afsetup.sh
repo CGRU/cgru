@@ -20,11 +20,13 @@ fi
 
 cd $AF_ROOT/init
 setup_files=`ls setup_*`
-for setup_file in "$setup_files"; do
-   [ -z "$setup_file" ] && continue
-   [ -f "$setup_file" ] || continue
-   echo "Sourcing custom '$setup_file'."
-   source ./$setup_file
-done
+if [ ! -z "$setup_files" ] ; then
+   for setup_file in $setup_files; do
+      [ -z "$setup_file" ] && continue
+      [ -f "$setup_file" ] || continue
+      echo "Sourcing custom '$setup_file'."
+      source ./$setup_file
+   done
+fi
 
 cd $curdir
