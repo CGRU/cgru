@@ -153,9 +153,17 @@ for item in allItems:
    allFiles.append(item)
 if len(allFiles) == 0:
    print 'No files founded matching pattern.'
+   print 'Input directory:'
+   print inputdir
+   print 'Expression:'
+   print expr.pattern
    exit(1)
 if len(allFiles) == 1:
    print 'Founded only 1 file matching pattern.'
+   print 'Input directory:'
+   print inputdir
+   print 'Expression:'
+   print expr.pattern
    exit(1)
 allFiles.sort()
 #print allFiles
