@@ -12,6 +12,8 @@ Parser.add_option('-i', '--input',     dest='input',     type  ='string',     de
 Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='.',         help='Output folder for movies')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',   help='Frame paint template')
 Parser.add_option('-q', '--jpgquality',dest='jpgquality',type  ='int',        default=90,          help='JPEG quality')
+Parser.add_option('-A', '--afanasy',   dest='afanasy',   type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
+Parser.add_option('-m', '--maxhosts',  dest='maxhosts',  type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
 Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False,       help='Debug mode')
 
 (Options, args) = Parser.parse_args()
@@ -176,22 +178,35 @@ class Dialog( QtGui.QWidget):
       self.mainLayout.addLayout( self.lProcess)
 
       self.lAfanasy = QtGui.QHBoxLayout()
-      self.cAfanasy = QtGui.QCheckBox('Afanasy Capacity:', self)
+      self.cAfanasy = QtGui.QCheckBox('Afanasy', self)
+      self.cAfanasy.setChecked( Options.afanasy != 0)
       QtCore.QObject.connect( self.cAfanasy, QtCore.SIGNAL('stateChanged(int)'), self.afanasy)
+      self.tAfCapacity = QtGui.QLabel('Capacity:', self)
       self.sbAfCapacity = QtGui.QSpinBox( self)
       self.sbAfCapacity.setRange( -1, 1000000)
-      self.sbAfCapacity.setValue( -1)
-      self.sbAfCapacity.setEnabled( False)
+      self.sbAfCapacity.setValue( Options.afanasy)
       QtCore.QObject.connect( self.sbAfCapacity, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.tAfMaxHosts = QtGui.QLabel('Maximum Hosts:', self)
+      self.sbAfMaxHosts = QtGui.QSpinBox( self)
+      self.sbAfMaxHosts.setRange( -1, 1000000)
+      self.sbAfMaxHosts.setValue( Options.maxhosts)
+      QtCore.QObject.connect( self.sbAfMaxHosts, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       self.lAfanasy.addWidget( self.cAfanasy)
+      self.lAfanasy.addWidget( self.tAfCapacity)
       self.lAfanasy.addWidget( self.sbAfCapacity)
+      self.lAfanasy.addWidget( self.tAfMaxHosts)
+      self.lAfanasy.addWidget( self.sbAfMaxHosts)
       self.mainLayout.addLayout( self.lAfanasy)
 
+      self.afanasy()
       self.evaluate()
 
    def afanasy( self):
       enableAf = self.cAfanasy.isChecked()
       self.sbAfCapacity.setEnabled( enableAf)
+      self.sbAfMaxHosts.setEnabled( enableAf)
+      if enableAf is True:
+         if self.sbAfCapacity.value() == 0: self.sbAfCapacity.setValue( -1 )
       self.evaluate()
 
    def inputBrowse( self):
@@ -219,7 +234,9 @@ class Dialog( QtGui.QWidget):
       if self.dsbGamma.value() != 1.0: cmd += ' -g %.2f' % self.dsbGamma.value()
       if template != '': cmd += ' -t "%s"' % template
       if self.sbJQuality.value() != -1: cmd += ' -q %d' % self.sbJQuality.value()
-      if self.cAfanasy.isChecked(): cmd += ' -A %d' % self.sbAfCapacity.value()
+      if self.cAfanasy.isChecked():
+         cmd += ' -A %d' % self.sbAfCapacity.value()
+         cmd += ' -m %d' % self.sbAfMaxHosts.value()
       cmd += ' "%s"' % self.editInput.text()
       cmd += ' "%s"' % self.editOutput.text()
 

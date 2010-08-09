@@ -17,6 +17,7 @@ parser.add_option('-e', '--extension',    dest='extension',    type  ='string', 
 parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
 parser.add_option('-g', '--gamma',        dest='gamma',        type  ='float',      default=-1.0,        help='Apply gamma correction')
 parser.add_option('-A', '--afanasy',      dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
+parser.add_option('-m', '--maxhosts',     dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
 parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,       help='Verbose mode')
 parser.add_option('-D', '--debug',        dest='debug',        action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 
@@ -86,6 +87,7 @@ if options.afanasy != 0:
    block = af.Block('movgen')
    block.setCapacity( options.afanasy)
    job.blocks.append( block)
+   if options.maxhosts != -1: job.setMaxHosts( options.maxhosts)
 
 for dirpath, dirnames, filenames in os.walk( Folder):
    patterns = getPatterns(filenames)
