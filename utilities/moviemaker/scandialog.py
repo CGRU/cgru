@@ -11,6 +11,7 @@ Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", versi
 Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='.',         help='Input folder to scan')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='.',         help='Output folder for movies')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',   help='Frame paint template')
+Parser.add_option('-q', '--jpgquality',dest='jpgquality',type  ='int',        default=90,          help='JPEG quality')
 Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False,       help='Debug mode')
 
 (Options, args) = Parser.parse_args()
@@ -139,7 +140,7 @@ class Dialog( QtGui.QWidget):
       self.tJQuality = QtGui.QLabel('JPEG Quality:', self)
       self.sbJQuality = QtGui.QSpinBox( self)
       self.sbJQuality.setRange( 1, 100)
-      self.sbJQuality.setValue( 50)
+      self.sbJQuality.setValue( Options.jpgquality)
       QtCore.QObject.connect( self.sbJQuality, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       self.lJQuality.addWidget( self.tJQuality)
       self.lJQuality.addWidget( self.sbJQuality)

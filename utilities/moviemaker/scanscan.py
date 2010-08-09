@@ -71,11 +71,14 @@ def getPatterns(filenames):
          patterns.append(pattern)
    return patterns
 
-def validateFileName( afile):
+def genMovieName( path):
+   lastdotpos = path.rfind('.')
+   if lastdotpos > 0: path = path[:lastdotpos-1]
    for char in BadFileCaracters:
-      afile = afile.replace( char, '_')
-   while afile[0] == '_': afile = afile[1:]
-   return afile
+      path = path.replace( char, '_')
+   path = path.strip('_')
+   while path.find('__') != -1: path = path.replace('__', '_')
+   return path
 
 if options.afanasy != 0:
    af = __import__('af', globals(), locals(), [])
@@ -84,12 +87,12 @@ if options.afanasy != 0:
    block.setCapacity( options.afanasy)
    job.blocks.append( block)
 
-for dirpath, dirnames, filenames in os.walk( Folder, True, None, True):
+for dirpath, dirnames, filenames in os.walk( Folder):
    patterns = getPatterns(filenames)
    for pattern in patterns:
       pattern = os.path.join( dirpath, pattern)
       if Verbose: print pattern
-      movname = os.path.join( Output, validateFileName(pattern))
+      movname = os.path.join( Output, genMovieName(pattern))
       cmd = Command
       cmd += ' -r %s' % options.resolution
       cmd += ' -f %d' % options.fps

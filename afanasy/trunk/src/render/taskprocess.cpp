@@ -79,8 +79,9 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
 
    QStringList args;
 #ifdef WINNT
-   args << "/c" << command;
-   start( "cmd.exe", args, QIODevice::ReadWrite);
+//   args << "/c" << command.replace("\"","\"\"\"");
+//   start( "cmd.exe", args, QIODevice::ReadWrite);
+   start( command, QIODevice::ReadWrite);
    setupChildProcess();
 #else
    args << "-c" << command;

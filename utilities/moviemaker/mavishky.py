@@ -35,9 +35,9 @@ parser.add_option('--timesuffix',       dest='timesuffix',  action='store_true',
 parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,       help='Verbose mode')
 parser.add_option('-D', '--debug',      dest='debug',       action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 parser.add_option('-A', '--afanasy',    dest='afanasy',     action='store_true', default=False,       help='Send to Afanasy')
-parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',        default=10,          help='Afanasy convert tasks capacity')
-parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=500,         help='Afanasy encode task capacity')
-parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user')
+parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',        default=-1,          help='Afanasy convert tasks capacity, -1=default')
+parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=-1,          help='Afanasy encode task capacity, -1=default')
+parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user, ''=current')
 parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makeMovie+date will be used')
 
 # Options to makeframe:
@@ -121,7 +121,7 @@ if inpattern == '': parser.error('Input files not specified.')
 inputdir = os.path.dirname( inpattern)
 if verbose: print 'InputDir = "%s"' % inputdir
 if not os.path.isdir( inputdir):
-   print 'Can\'t find input directory'
+   print 'Can\'t find input directory "%s"' % inputdir
    exit(1)
 
 # Input files pattern processing:
@@ -163,7 +163,7 @@ if verbose: print 'Files fonded: %d' % len(allFiles)
 
 # Input files indentify:
 afile = os.path.join( inputdir, allFiles[0])
-pipe = subprocess.Popen( 'identify '+afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
+pipe = subprocess.Popen( 'identify "%s"' % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
 identify = pipe.read()
 identify = identify.replace( afile, '')
 identify = identify.strip()
@@ -179,6 +179,7 @@ imgtype = identify[0]
 if verbose: print 'Images type = "%s"' % imgtype
 
 # Output file:
+output = output.strip('" ')
 if output == '': output = os.path.join( os.path.dirname( inputdir), prefix.strip('_. '))
 afjobname = os.path.basename( output)
 if datetimesuffix != '': output += '_' + datetimesuffix
@@ -234,7 +235,7 @@ if need_convert and options.slate != '':
    cmd = cmd_makeframe + cmd_args
    cmd += ' --drawcolorbars' + cmd_args
    cmd += ' -t "%s"' % options.slate
-   cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
+   cmd += ' "%s"' % (os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat)
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')
    imgCount += 1
@@ -248,11 +249,11 @@ if logopath != '':
       logoty = height - int(logosizes[1])
       tmpLogo = os.path.join( tmpdir, tmpLogo)
       cmd = 'convert'
-      cmd += ' ' + logopath
+      cmd += ' "%s"' % logopath
       cmd += ' -gravity %s -background black' % options.logograv
       cmd += ' -resize ' + logosize
       cmd += ' -extent %(width)dx%(height)d' % vars()
-      cmd += ' ' + tmpLogo
+      cmd += ' "%s"' % tmpLogo
    else:
       print 'Can\'t add logo if output resolution is not specified.'
       exit(1)
@@ -271,8 +272,8 @@ if need_convert:
       if options.draw235   >  0: cmd += ' --draw235 %d' % options.draw235
       if need_logo:              cmd += ' --logopath "%s"' % tmpLogo
 
-      cmd += ' ' + os.path.join( inputdir, afile)
-      cmd += ' ' + os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat
+      cmd += ' "%s"' % os.path.join( inputdir, afile)
+      cmd += ' "%s"' % (os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat)
 
       cmd_convert.append( cmd)
       name_convert.append( afile)
@@ -361,8 +362,8 @@ if options.afanasy:
    be.setCapacity( options.afenccap)
    if need_convert:
       be.setDependMask('convert')
-      j.setCmdPre( 'mkdir ' + os.path.abspath(tmpdir))
-      j.setCmdPost('rm -R ' + os.path.abspath(tmpdir))
+      j.setCmdPre( 'mkdir "%s"' % os.path.abspath(tmpdir))
+      j.setCmdPost('rm -rf "%s"' % os.path.abspath(tmpdir))
 
    if verbose: j.output(1)
 
@@ -377,8 +378,6 @@ else:
          print name_precomp[n]
          os.system( cmd)
          n += 1
-         print 'PROGRESS: %d' % (100.0 * n / len(cmd_precomp)) + '%'
-         sys.stdout.flush()
       print
    if need_convert:
       n = 0

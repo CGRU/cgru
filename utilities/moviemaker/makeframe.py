@@ -89,15 +89,9 @@ if FILEIN != '':
    if FILEDATE == '': FILEDATE = time.strftime('%y/%m/%d', time.gmtime(os.stat(FILEIN).st_mtime))
 
    # Get input file type:
-   pipe = subprocess.Popen( 'identify '+FILEIN, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
-   identify = pipe.read()
-   identify = identify.replace( FILEIN, '')
-   identify = identify.strip()
-   if len(identify) < 1: parser.error('Invalid image "%s"' % FILEIN)
-   if Verbose: print 'Identify: %s' % identify
-   identify = identify.split(' ')
-   if len(identify) < 1: parser.error('Invalid image "%s"' % FILEIN)
-   imgtype = identify[0]
+   imgtype = ''
+   lastdotpos = FILEIN.rfind('.')
+   if lastdotpos > 1: imgtype = FILEIN[lastdotpos+1:]
    if Verbose: print 'Images type = "%s"' % imgtype
 
    # Input file correction:
@@ -106,9 +100,9 @@ if FILEIN != '':
    corr_Log = ' -level 9%,67%,.6'
    if sys.platform.find('win') == 0:
       corr_Log = ' -set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
-   if   imgtype == 'EXR': correction = corr_sRGB
-   elif imgtype == 'DPX': correction = corr_Log
-   elif imgtype == 'CIN': correction = corr_Log
+   if   imgtype == 'exr': correction = corr_sRGB
+   elif imgtype == 'dpx': correction = corr_Log
+   elif imgtype == 'cin': correction = corr_Log
 
    # Get frame number if not specified:
    if FRAME == '':
@@ -191,7 +185,7 @@ cmd += ' -quality ' + options.quality
 cmd += ' -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
 
 # Set output file name:
-cmd += ' ' + FILEOUT
+cmd += ' "%s"' % FILEOUT
 
 if Verbose: print cmd
 
