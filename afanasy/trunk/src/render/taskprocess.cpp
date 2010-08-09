@@ -77,13 +77,15 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
 
    printf("\nStarting[%d]: ", runningtasks); exec->stdOut( false);
 
-   QStringList args;
 #ifdef WINNT
+//   args << "/c" << command;
 //   args << "/c" << command.replace("\"","\"\"\"");
 //   start( "cmd.exe", args, QIODevice::ReadWrite);
-   start( command, QIODevice::ReadWrite);
+   start( QString("cmd.exe /c %1").arg(command), QIODevice::ReadWrite);
+//   start( command, QIODevice::ReadWrite);
    setupChildProcess();
 #else
+   QStringList args;
    args << "-c" << command;
    start( "/bin/bash", args, QIODevice::ReadWrite);
 #endif

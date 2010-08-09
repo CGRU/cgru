@@ -14,6 +14,12 @@ def rmdir( signum, frame):
    if not debug:
       if os.path.isdir( tmpdir):
          shutil.rmtree( tmpdir)
+         if os.path.isdir( tmpdir):
+            print 'Warning: Temporary directory still exsists:'
+            print tmpdir
+      else:
+         print 'Warning: Temporary directory does not exsist:'
+         print tmpdir
    exit(0)
 
 signal.signal(signal.SIGTERM, rmdir)
@@ -401,5 +407,11 @@ else:
    if not debug:
       if os.path.isdir( tmpdir):
          shutil.rmtree( tmpdir)
+         if os.path.isdir( tmpdir):
+            print 'Warning: Temporary directory still exsists:'
+            print tmpdir
+      else:
+         print 'Warning: Temporary directory does not exsist:'
+         print tmpdir
    print
    print 'Done'
