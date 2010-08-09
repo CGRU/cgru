@@ -43,7 +43,6 @@ Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast
 Templates = ['']
 TemplateF = 0
 TemplateS = 0
-print 'TemplatesPath="%s"' % TemplatesPath
 if os.path.isdir(TemplatesPath):
    files = os.listdir(TemplatesPath)
    files.sort()
