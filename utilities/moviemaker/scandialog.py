@@ -8,8 +8,8 @@ from PyQt4 import QtCore, QtGui
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='.',         help='Input folder to scan')
-Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='.',         help='Output folder for movies')
+Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',          help='Input folder to scan')
+Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',          help='Output folder for movies')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',   help='Frame paint template')
 Parser.add_option('-q', '--jpgquality',dest='jpgquality',type  ='int',        default=90,          help='JPEG quality')
 Parser.add_option('-A', '--afanasy',   dest='afanasy',   type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
@@ -223,6 +223,22 @@ class Dialog( QtGui.QWidget):
 
    def evaluate( self):
       self.evaluated = False
+
+      input = str( self.editInput.text())
+      output = str( self.editOutput.text())
+      
+      if input == '':
+         self.cmdField.setText('Selecet a folder to scan.')
+         return
+      if not os.path.isdir( input):
+         self.cmdField.setText('Input folder does not exist.')
+         return
+      if output == '':
+         self.cmdField.setText('Selecet a folder for movies.')
+         return
+      if not os.path.isdir( output):
+         self.cmdField.setText('Ouput folder does not exist.')
+         return
 
       cmd = 'scanscan.py'
       cmd = 'python ' + os.path.join( DialogPath, cmd)
