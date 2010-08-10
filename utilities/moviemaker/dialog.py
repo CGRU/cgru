@@ -78,7 +78,7 @@ class Dialog( QtGui.QWidget):
       QtGui.QWidget.__init__( self)
       self.evaluated = False
 
-      self.setWindowTitle('Mavishky !')
+      self.setWindowTitle('Mavishky')
       self.mainLayout = QtGui.QVBoxLayout( self)
 
       self.tabwidget = QtGui.QTabWidget( self)
