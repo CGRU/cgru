@@ -11,10 +11,9 @@ if [ ! -z "${CGRU_LOCATION}" ]; then
    else
       export NUKE_PATH="${NUKE_PATH}:${NUKE_CGRU_PATH}"
    fi
-   pwd=$PWD
-   cd "${CGRU_LOCATION}"
+   pushd "${CGRU_LOCATION}"
    source setup.sh
-   cd $pwd
+   popd
 fi
 
 # Set Afanasy scripts version to use
@@ -41,14 +40,14 @@ fi
 # export NUKE_AF_TMPSCENE="compositing/tmp"
 
 NUKE_INSTALL_DIR="/usr/local"
-NUKE_FORDERS=`ls "$NUKE_INSTALL_DIR"`
+NUKE_FOLDERS=`ls "$NUKE_INSTALL_DIR"`
 NUKE_LOCATION=""
 NUKE_EXEC=""
-for NUKE_FORDER in $NUKE_FORDERS ;
+for NUKE_FOLDER in $NUKE_FOLDERS ;
 do
-   if [ "`echo $NUKE_FORDER | gawk '{print match( \$1, "Nuke")}'`" == "1" ]; then
-      NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FORDER}"
-      NUKE_EXEC="`echo $NUKE_FORDER | gawk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
+   if [ "`echo $NUKE_FOLDER | gawk '{print match( \$1, "Nuke")}'`" == "1" ]; then
+      NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FOLDER}"
+      NUKE_EXEC="`echo $NUKE_FOLDER | gawk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
    fi
 done
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"

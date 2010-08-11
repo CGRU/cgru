@@ -13,10 +13,9 @@ if [ "" != "$1" ]; then
    HOST=$1
 fi
 
-curdir=$PWD
-cd ../..
+pushd .. >> /dev/null
 source setup.sh
-cd $curdir
+popd >> /dev/null
 
 for(( n=0; n<$count; n++))
 do

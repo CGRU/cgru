@@ -1,10 +1,7 @@
 #!/bin/bash
 
-if [ -z $CGRU_LOCATION ]; then
-   pwd=$PWD
-   cd ../..
-   source setup.sh
-   cd $pwd
-fi
+pushd .. >> /dev/null
+source setup.sh
+popd >> /dev/null
 
 exec python job.py $*

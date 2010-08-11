@@ -176,7 +176,7 @@ printf("\n");
 
    if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning))
    {
-      printf("Warning: Bad result from parser.\n");
+      printf("Warning: Parser notification.\n");
       update_status = af::TaskExec::UPWarning;
    }
    if( parser->hasError() && ( stop_time == 0 ))

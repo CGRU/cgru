@@ -17,8 +17,7 @@ fi
 # Add ffmpeg to path and libraries:
 moviemaker=$CGRU_LOCATION/utilities/moviemaker
 if [ -d "$moviemaker" ] ; then
-   curdir=$PWD
-   cd $moviemaker
+   pushd $moviemaker >> /dev/null
    source ./setup.sh
-   cd $curdir
+   popd >> /dev/null
 fi

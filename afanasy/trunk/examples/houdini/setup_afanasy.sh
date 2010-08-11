@@ -2,10 +2,9 @@
 
 # Setup Afanasy if was not:
 if [ -z $AF_ROOT ]; then
-   pwd=$PWD
-   cd ../..
+   pushd ../.. >> /dev/null
    source setup.sh
-   cd $pwd
+   popd >> /dev/null
 fi
 
 # Launch commands from current directory:

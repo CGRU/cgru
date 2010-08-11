@@ -3,7 +3,7 @@
 using namespace af;
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 PyClass::PyClass():

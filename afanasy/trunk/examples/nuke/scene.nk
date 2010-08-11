@@ -1,5 +1,5 @@
-#! /cg/soft/Nuke6.0v5/Nuke6.0 -nx
-version 6.0 v5
+#! /usr/local/Nuke6.0v7/Nuke6.0 -nx
+version 6.0 v7
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
     <window x="0" y="25" w="1280" h="750" screen="0">
@@ -119,7 +119,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N4b9f200 [stack 0]
+set N3504e40 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -134,7 +134,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N4b9f200
+push $N3504e40
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -142,7 +142,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N4b9f200
+push $N3504e40
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -408,6 +408,16 @@ afanasy {
  addnodes ""
  forceframes true
 }
+Read {
+ inputs 0
+ file render/key.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ last 9999
+ version 1
+ name Read3
+ xpos 223
+ ypos -165
+}
 ColorBars {
  inputs 0
  name ColorBars1
@@ -424,14 +434,23 @@ Transform {
  xpos 223
  ypos -222
 }
-set N49059e0 [stack 0]
-Write {
- channels rgba
- file render/key.%04d.exr
- file_type exr
- name key
- xpos 333
- ypos -229
+set N394a6c0 [stack 0]
+Switch {
+ inputs 2
+ which 1
+ name Switch2
+ xpos 223
+ ypos -193
+}
+Read {
+ inputs 0
+ file render/back.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ last 9999
+ version 2
+ name Read2
+ xpos 3
+ ypos -165
 }
 Constant {
  inputs 0
@@ -450,7 +469,46 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N491d040 [stack 0]
+set N3a79450 [stack 0]
+Switch {
+ inputs 2
+ which 1
+ name Switch1
+ xpos 3
+ ypos -194
+}
+Merge2 {
+ inputs 2
+ name Merge1
+ xpos 113
+ ypos -194
+}
+Crop {
+ box {0 0 720 576}
+ crop false
+ name Crop1
+ xpos 113
+ ypos -58
+ disable true
+}
+set N3bc0190 [stack 0]
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 589
+ ypos -50
+}
+push $N394a6c0
+Write {
+ channels rgba
+ file render/key.%04d.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -229
+}
+push $N3a79450
 Write {
  file render/back.%04d.exr
  file_type exr
@@ -478,59 +536,8 @@ afanasy {
  dependmaskglbl ""
  addnodes ""
  independent true
- fullrange true
 }
-Read {
- inputs 0
- file render/key.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 1
- name Read3
- xpos 223
- ypos -165
-}
-push $N49059e0
-Switch {
- inputs 2
- which 1
- name Switch2
- xpos 223
- ypos -193
-}
-Read {
- inputs 0
- file render/back.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 2
- name Read2
- xpos 3
- ypos -165
-}
-push $N491d040
-Switch {
- inputs 2
- which 1
- name Switch1
- xpos 3
- ypos -194
-}
-Merge2 {
- inputs 2
- name Merge1
- xpos 113
- ypos -194
-}
-Crop {
- box {0 0 720 576}
- crop false
- name Crop1
- xpos 113
- ypos -58
- disable true
-}
-set N4a654b0 [stack 0]
+push $N3bc0190
 Write {
  file render/final.%04d.exr
  file_type exr
@@ -548,7 +555,7 @@ Read {
  xpos 3
  ypos -32
 }
-push $N4a654b0
+push $N3bc0190
 Switch {
  inputs 2
  which 1
@@ -568,6 +575,7 @@ afanasy {
  inputs 3
  name afanasy2
  label "all\n"
+ selected true
  xpos 446
  ypos 46
  jobname ""
@@ -578,12 +586,4 @@ afanasy {
  dependmask ""
  dependmaskglbl ""
  addnodes ""
-}
-push $N4a654b0
-Viewer {
- frame 1
- input_process false
- name Viewer1
- xpos 589
- ypos -50
 }

@@ -12,10 +12,9 @@ export HOUDINI_LOCATION=/cg/soft/houdini-10
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
 
-pwd=$PWD
-cd $HOUDINI_LOCATION
+pushd $HOUDINI_LOCATION >> /dev/null
 source houdini_setup_bash
-cd $pwd
+popd $pwd >> /dev/null
 
 # Setup CGRU houdini scripts:
 export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
