@@ -40,6 +40,7 @@ rcopy afanasy/$afanasy/init $dest/afanasy
 rcopy afanasy/$afanasy/plugins $dest/afanasy
 rcopy afanasy/$afanasy/python $dest/afanasy
 
+copy utilities $dest/utilities
 rcopy utilities/doc $dest/utilities
 
 copy utilities/moviemaker $dest/utilities/moviemaker
