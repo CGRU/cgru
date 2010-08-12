@@ -2,7 +2,7 @@
 
 import os, sys
 
-invalid_characters = ':;![]()$%^&*`\\|/?"\''
+invalid_characters = '<>:;![]()$%^&*`\\|/?"\''
 replace_character  = '_'
 
 from optparse import OptionParser
