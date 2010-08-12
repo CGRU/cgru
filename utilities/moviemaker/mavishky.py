@@ -44,7 +44,7 @@ parser.add_option('-A', '--afanasy',    dest='afanasy',     action='store_true',
 parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',        default=-1,          help='Afanasy convert tasks capacity, -1=default')
 parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=-1,          help='Afanasy encode task capacity, -1=default')
 parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user, ''=current')
-parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makeMovie+date will be used')
+parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makemovie+date will be used')
 
 # Options to makeframe:
 parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
@@ -204,7 +204,7 @@ if verbose: print 'Output = ' + output
 
 # Temporary directory:
 if not debug:
-   if tmpdir == '': tmpdir = os.path.join( os.path.dirname(output), '.makeMovie.' + time.strftime('%y-%m-%d_%H-%M-%S'))
+   if tmpdir == '': tmpdir = os.path.join( os.path.dirname(output), '.makemovie.' + time.strftime('%y-%m-%d_%H-%M-%S'))
    if os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
 if verbose: print 'TempDir = ' + tmpdir
 
