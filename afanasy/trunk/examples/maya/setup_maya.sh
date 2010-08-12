@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ -z $AF_ROOT ]; then
-   pushd ../..
+   pushd ../.. >> /dev/null
    source setup.sh
-   popd
+   popd >> /dev/null
 fi
 
 # to launch commands from current directory:

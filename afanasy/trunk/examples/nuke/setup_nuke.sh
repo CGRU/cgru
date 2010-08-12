@@ -1,7 +1,9 @@
 #!/bin/bash
 
-# Setup Afanasy:
-source ./setup_afanasy.sh
+# Setup CGRU and Afanasy:
+pushd .. >> /dev/null
+source ./setup.sh
+popd >> /dev/null
 
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then

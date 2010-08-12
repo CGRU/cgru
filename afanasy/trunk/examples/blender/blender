@@ -1,9 +1,9 @@
 #!/bin/bash
 
 if [ -z $AF_ROOT ]; then
-   pushd ../..
-   source setup.sh
-   popd $pwd
+   pushd ../.. >> /dev/null
+   source ./setup.sh
+   popd >> /dev/null
 fi
 
 blender $*

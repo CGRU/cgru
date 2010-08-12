@@ -1,10 +1,9 @@
 #!/bin/bash
 
-# Setup CGRU:
-source ./setup_cgru.sh
-
-# Setup Afanasy:
-source ./setup_afanasy.sh
+# Setup CGRU and Afanasy:
+pushd .. >> /dev/null
+source ./setup.sh
+popd >> /dev/null
 
 # directory where Houdini installed (default value):
 export HOUDINI_LOCATION=/cg/soft/houdini-10

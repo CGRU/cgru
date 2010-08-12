@@ -1,7 +1,6 @@
 #!/bin/bash
 
-# Setup Afanasy:
-source ./setup_afanasy.sh
+source ./setup_nuke.sh
 
 # Launch render script:
 python ./render.py

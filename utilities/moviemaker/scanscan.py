@@ -103,7 +103,7 @@ for dirpath, dirnames, filenames in os.walk( Folder):
       cmd += ' -o "%s"' % movname
       if options.gamma > 0: cmd += ' -g %.2f' % options.gamma
       if options.template != '': cmd += ' -t "%s"' % options.template
-      
+
       if Verbose: print cmd
 
       if not options.debug:
