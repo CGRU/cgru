@@ -13,6 +13,9 @@ export AF_PYTHON_MODULE_EXTRA_LIBS=
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
 
+# Add all python symbols to let user to use to use dynamic python modules
+export AF_PYTHON_LIB="-rdynamic ${AF_PYTHON_LIB}"
+
 # Setup Qt if qmake not specified (try qt4 first):
 if [ -z "$QMAKE" ]; then
    QMAKE=qmake-qt4
