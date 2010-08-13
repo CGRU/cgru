@@ -115,14 +115,27 @@ class BlockParameters:
 
       self.writename = str( wnode.name())
 
-      self.imgfile = str( wnode.knob('file').value())
-      folder = os.path.dirname( self.imgfile)
-      if not os.path.isdir(folder):
-         result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
-         if result:
-            os.mkdir( folder)
-         else:
-            self.valid = False
+      # Get images files:
+      self.imgfile = ''
+      if nuke.toNode('root').knob('proxy').value():
+         self.imgfile = str( wnode.knob('proxy').value())
+      else:
+         self.imgfile = str( wnode.knob('file').value())
+
+      # Check images files:
+      if self.imgfile == '':
+         nuke.message('Write Node "%s"\nImages are empty.')
+         self.valid = False
+      else:
+         folder = os.path.dirname( self.imgfile)
+         if folder != '':
+            if not os.path.isdir(folder):
+               result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
+               if result:
+                  os.mkdir( folder)
+               else:
+                  self.valid = False
+
       views = wnode.knob('views')
       if views is not None:
          views = views.value()

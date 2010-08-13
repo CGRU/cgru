@@ -100,7 +100,10 @@ writenode = nuke.toNode( xnode)
 if writenode is None: errorExit('Node "%s" not founded.' % xnode, True)
 if writenode.Class() != 'Write': errorExit('Node "%s" is not "Write".' % xnode, True)
 try:
-   fileknob = writenode['file']
+   if nuke.toNode('root').knob('proxy').value():
+      fileknob = writenode['proxy']
+   else:
+      fileknob = writenode['file']
    filepath   = fileknob.value()
    # Nuke paths has only unix slashes, even on MS Windows platform
    if sys.platform.find('win') == 0:

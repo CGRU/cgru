@@ -1,29 +1,29 @@
-#! /usr/local/Nuke6.0v7/Nuke6.0 -nx
+#! /bz/soft/nuke/6.0v7/Nuke6.0 -nx
 version 6.0 v7
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
-    <window x="0" y="25" w="1280" h="750" screen="0">
+    <window x="-10" y="-24" w="1700" h="1082" screen="0">
         <splitter orientation="1">
-            <split size="807"></split>
+            <split size="1068"></split>
             <splitter orientation="1">
                 <split size="40"></split>
                 <dock id="" hideTitles="1" activePageId="Toolbar.1">
                     <page id="Toolbar.1"></page>
                 </dock>
-                <split size="763"></split>
+                <split size="1024"></split>
                 <splitter orientation="2">
-                    <split size="343"></split>
+                    <split size="511"></split>
                     <dock id="" activePageId="Viewer.1">
                         <page id="Viewer.1"></page>
                     </dock>
-                    <split size="343"></split>
+                    <split size="510"></split>
                     <dock id="" activePageId="DAG.1">
                         <page id="DAG.1"></page>
                         <page id="Curve Editor.1"></page>
                     </dock>
                 </splitter>
             </splitter>
-            <split size="467"></split>
+            <split size="618"></split>
             <dock id="" activePageId="Properties.1">
                 <page id="Properties.1"></page>
             </dock>
@@ -39,6 +39,7 @@ Root {
  fps 25
  format "720 576 0 0 720 576 1.09 PAL"
  proxy_format "720 576 0 0 720 576 1.09 PAL"
+ proxySetting always
 }
 ColorBars {
  inputs 0
@@ -119,7 +120,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N3504e40 [stack 0]
+set N1556c320 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -134,7 +135,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N3504e40
+push $N1556c320
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -142,7 +143,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N3504e40
+push $N1556c320
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -410,19 +411,28 @@ afanasy {
 }
 Read {
  inputs 0
- file render/key.%04d.exr
+ file render/back.%04d.exr
  format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/back_proxy.%04d.exr
  last 9999
- version 1
- name Read3
- xpos 223
- ypos -165
+ version 9
+ name Read2
+ xpos 3
+ ypos -166
+}
+set N15c05fa0 [stack 0]
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 589
+ ypos -50
 }
 ColorBars {
  inputs 0
  name ColorBars1
  xpos 223
- ypos -329
+ ypos -342
 }
 Transform {
  translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
@@ -434,23 +444,15 @@ Transform {
  xpos 223
  ypos -222
 }
-set N394a6c0 [stack 0]
-Switch {
- inputs 2
- which 1
- name Switch2
- xpos 223
- ypos -193
-}
-Read {
- inputs 0
- file render/back.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- last 9999
- version 2
- name Read2
- xpos 3
- ypos -165
+set N159b1890 [stack 0]
+Write {
+ channels rgba
+ file render/key.%04d.exr
+ proxy render/key_proxy.%04d.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -229
 }
 Constant {
  inputs 0
@@ -469,48 +471,10 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N3a79450 [stack 0]
-Switch {
- inputs 2
- which 1
- name Switch1
- xpos 3
- ypos -194
-}
-Merge2 {
- inputs 2
- name Merge1
- xpos 113
- ypos -194
-}
-Crop {
- box {0 0 720 576}
- crop false
- name Crop1
- xpos 113
- ypos -58
- disable true
-}
-set N3bc0190 [stack 0]
-Viewer {
- frame 1
- input_process false
- name Viewer1
- xpos 589
- ypos -50
-}
-push $N394a6c0
-Write {
- channels rgba
- file render/key.%04d.exr
- file_type exr
- name key
- xpos 333
- ypos -229
-}
-push $N3a79450
+set N15ae0630 [stack 0]
 Write {
  file render/back.%04d.exr
+ proxy render/back_proxy.%04d.exr
  file_type exr
  name back
  xpos 113
@@ -537,9 +501,52 @@ afanasy {
  addnodes ""
  independent true
 }
-push $N3bc0190
+Read {
+ inputs 0
+ file render/key.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/key_proxy.%04d.exr
+ last 9999
+ version 11
+ name Read3
+ xpos 223
+ ypos -165
+}
+push $N159b1890
+Switch {
+ inputs 2
+ which 1
+ name Switch2
+ xpos 223
+ ypos -193
+}
+push $N15c05fa0
+push $N15ae0630
+Switch {
+ inputs 2
+ which 1
+ name Switch1
+ xpos 3
+ ypos -194
+}
+Merge2 {
+ inputs 2
+ name Merge1
+ xpos 113
+ ypos -194
+}
+Crop {
+ box {0 0 720 576}
+ crop false
+ name Crop1
+ xpos 113
+ ypos -58
+ disable true
+}
+set N15c27480 [stack 0]
 Write {
  file render/final.%04d.exr
+ proxy render/final_proxy.%04d.exr
  file_type exr
  name final
  xpos 223
@@ -549,13 +556,14 @@ Read {
  inputs 0
  file render/final.%04d.exr
  format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/final_proxy.%04d.exr
  last 9999
- version 1
+ version 2
  name Read1
  xpos 3
  ypos -32
 }
-push $N3bc0190
+push $N15c27480
 Switch {
  inputs 2
  which 1
@@ -565,6 +573,7 @@ Switch {
 }
 Write {
  file render/preview.%04d.jpg
+ proxy render/preview_proxy.%04d.jpg
  file_type jpeg
  checkHashOnRead false
  name preview
@@ -575,7 +584,6 @@ afanasy {
  inputs 3
  name afanasy2
  label "all\n"
- selected true
  xpos 446
  ypos 46
  jobname ""
