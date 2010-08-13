@@ -305,10 +305,11 @@ elif codec == 'mencoder':
 else:
    print 'Unknown encoder = "%s"' % encoder
    exit(1)
-cmd_encode = cmd_encode.replace('@INPUT@',  inputmask)
-cmd_encode = cmd_encode.replace('@FPS@',    str(options.fps))
-cmd_encode = cmd_encode.replace('@OUTPUT@', output)
-cmd_encode = cmd_encode.replace('@ARGS@',   auxargs)
+cmd_encode = cmd_encode.replace('@MOVIEMAKER@', os.path.dirname(sys.argv[0]))
+cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
+cmd_encode = cmd_encode.replace('@FPS@',        str(options.fps))
+cmd_encode = cmd_encode.replace('@OUTPUT@',     output)
+cmd_encode = cmd_encode.replace('@ARGS@',       auxargs)
 
 # Print commands:
 if debug:

@@ -13,11 +13,3 @@ if [ "$PYTHONPATH" != "" ]; then
 else
    export PYTHONPATH="${CGRU_PYTHON}"
 fi
-
-# Add ffmpeg to path and libraries:
-moviemaker=$CGRU_LOCATION/utilities/moviemaker
-if [ -d "$moviemaker" ] ; then
-   pushd $moviemaker >> /dev/null
-   source ./setup.sh
-   popd >> /dev/null
-fi

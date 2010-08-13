@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Mavishky
 Comment=Image Sequence Encoder GUI
-Exec=sh -c "cf=$PWD; cd /opt/cgru/afanasy; source setup.sh; cd $cf; /opt/cgru/utilities/moviemaker/dialog.sh"
+Exec=sh -c "cd /opt/cgru; source ./setup.sh; cd /opt/cgru/afanasy; source ./setup.sh; python /opt/cgru/utilities/moviemaker/dialog.py"
 Icon=cgrumavishky
 Terminal=false
 Type=Application

@@ -46,7 +46,6 @@ rcopy utilities/doc $dest/utilities
 copy utilities/moviemaker $dest/utilities/moviemaker
 copy utilities/moviemaker/icons $dest/utilities/moviemaker/icons
 rcopy utilities/moviemaker/doc $dest/utilities/moviemaker
-rcopy utilities/moviemaker/ffmpeg $dest/utilities/moviemaker
 rcopy utilities/moviemaker/logos $dest/utilities/moviemaker
 rcopy utilities/moviemaker/templates $dest/utilities/moviemaker
 
