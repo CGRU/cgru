@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "Afanasy examples POST INSTALL"
-
-if [ -d /opt/cgru/afanasy/examples ]; then
-   find /opt/cgru/afanasy/examples -type d -exec chmod a+rwx {} \;
-fi
-
-exit 0

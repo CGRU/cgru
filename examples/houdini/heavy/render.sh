@@ -1,7 +1,8 @@
 #!/bin/bash
 
-# Setup Afanasy:
-source ./setup_afanasy.sh
+# Setup CGRU:
+pushd ../.. >> /dev/null
+source ./setup.sh
+popd >> /dev/null
 
-# directory where Houdini installed (default value):
-./render.py
+python render.py $*

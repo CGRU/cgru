@@ -20,6 +20,7 @@ cp -r $src/utilities/regexp/icons/icons $pack/usr/local/share
 files="\
 index.html \
 plugins \
+examples \
 doc/rus_doklad \
 utilities/doc \
 utilities/moviemaker \
