@@ -6,9 +6,9 @@ install_afserver="install_afserver.sh"
 uninstall="uninstall.sh"
 template="install_template"
 
-packages_cgru="afanasy-common cgru-common afanasy-plugins afanasy-render afanasy-examples afanasy-doc afanasy-gui cgru"
+packages_cgru="afanasy-common cgru-common afanasy-plugins afanasy-render afanasy-doc afanasy-gui cgru"
 packages_afserver="afanasy-common afanasy-server"
-packages_uninstall="cgru afanasy-server afanasy-render afanasy-gui afanasy-doc afanasy-examples afanasy-plugins afanasy-common cgru-common"
+packages_uninstall="cgru afanasy-server afanasy-render afanasy-gui afanasy-doc afanasy-plugins afanasy-common cgru-common"
 
 [ -z "${PACKAGE_MANAGER}" ] && source ./distribution.sh
 [ -z "${PACKAGE_MANAGER}" ] && exit 1
