@@ -1,4 +1,7 @@
-call setup_cgru.cmd
-call setup_afanasy.cmd
+if exist override.cmd call override.cmd
 
-render.py %*
+PUSHD ..
+call setup.cmd
+POPD
+
+python render.py %*

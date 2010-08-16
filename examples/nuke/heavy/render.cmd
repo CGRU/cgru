@@ -1,3 +1,5 @@
-call setup_afanasy.cmd
+PUSHD ..
+call setup_nuke.cmd
+POPD
 
-render.py
+python render.py

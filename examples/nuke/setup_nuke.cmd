@@ -1,5 +1,6 @@
-call setup_afanasy.cmd
-call setup_cgru.cmd
+PUSHD ..
+call setup.cmd
+POPD
 
 rem Setup CGRU common scripts if location provided
 set NUKE_CGRU_PATH=%CGRU_LOCATION%\plugins\nuke

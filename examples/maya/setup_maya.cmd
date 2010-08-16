@@ -1,5 +1,5 @@
 rem Setup Afanasy:
-PUSHD ..\..
+PUSHD ..
 call setup.cmd
 POPD
 

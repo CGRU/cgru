@@ -1,5 +1,6 @@
-call setup_cgru.cmd
-call setup_afanasy.cmd
+PUSHD ..
+call setup.cmd
+POPD
 
 set XSI_CGRU_PATH=%CGRU_LOCATION%\plugins\xsi
 set XSI_AF_PATH=%AF_ROOT%\plugins\xsi

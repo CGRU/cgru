@@ -1,3 +1,5 @@
-call setup_afanasy.cmd
+PUSHD ..
+call setup.cmd
+POPD
 
-render.py
+python render.py

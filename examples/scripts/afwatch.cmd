@@ -1,10 +1,4 @@
-PUSHD ..\..
-call setup.cmd
-POPD
-
-call setup.cmd
-
-PUSHD %CGRU_LOCATION%
+PUSHD ..
 call setup.cmd
 POPD
 
