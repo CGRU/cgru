@@ -9,7 +9,7 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
-Requires:      cgru-common = @VERSION@, afanasy-doc = @VERSION@, afanasy-gui = @VERSION@, afanasy-render = @VERSION@, afanasy-plugins = @VERSION@, afanasy-examples = @VERSION@
+Requires:      cgru-common = @VERSION@, afanasy-doc = @VERSION@, afanasy-gui = @VERSION@, afanasy-render = @VERSION@, afanasy-plugins = @VERSION@
 
 %description
 Description of myrpmtest.
