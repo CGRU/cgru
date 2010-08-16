@@ -45,7 +45,7 @@ void ChildProcess::setupChildProcess()
    SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
    if( AssignProcessToJobObject( hJob, process_info->hProcess) == false)
       AFERROR("AssignProcessToJobObject failed.\n");
-   ResumeThread( process_info->hThread);
+   ResumeThread( process_info->hThread); // | CREATE_SUSPENDED
 #endif
 }
 
