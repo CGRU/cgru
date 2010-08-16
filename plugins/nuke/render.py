@@ -139,7 +139,10 @@ while frame <= flast:
 
    # Try to execute write node:
    try:
-      nuke.execute( writenode, frame, frame)
+      if nuke.env['NukeVersionMajor'] < 6:
+         nuke.execute( writenode.name(), frame, frame)
+      else:
+         nuke.execute( writenode, frame, frame)
    except:
       print 'Node execution error:'
       print str(sys.exc_info()[1])

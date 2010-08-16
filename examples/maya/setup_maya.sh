@@ -1,10 +1,8 @@
 #!/bin/bash
 
-if [ -z $AF_ROOT ]; then
-   pushd ../.. >> /dev/null
-   source setup.sh
-   popd >> /dev/null
-fi
+pushd .. >> /dev/null
+source setup.sh
+popd >> /dev/null
 
 # to launch commands from current directory:
 export AF_CMD_PREFIX="./"

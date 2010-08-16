@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $AF_ROOT ]; then
-   pushd .. >> /dev/null
+   pushd ../afanasy/trunk >> /dev/null
    source ./setup.sh
    popd >> /dev/null
 fi

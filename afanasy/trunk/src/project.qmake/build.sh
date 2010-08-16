@@ -41,4 +41,5 @@ $QMAKE
 make
 
 # Copy python library:
-cp -fv libpyaf/libpyaf.so ../../bin/pyaf.so
+pyaf=libpyaf/libpyaf.so
+[ -f $pyaf ] && cp -fv libpyaf/libpyaf.so ../../bin/pyaf.so
