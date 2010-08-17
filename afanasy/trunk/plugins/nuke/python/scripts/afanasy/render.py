@@ -124,7 +124,7 @@ class BlockParameters:
 
       # Check images files:
       if self.imgfile == '':
-         nuke.message('Write Node "%s"\nImages are empty.')
+         nuke.message('Write Node "%s"\nImages are empty.' % self.writename)
          self.valid = False
       else:
          folder = os.path.dirname( self.imgfile)
