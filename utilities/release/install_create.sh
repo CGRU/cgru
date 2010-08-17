@@ -8,7 +8,8 @@ template="install_template"
 
 packages_cgru="afanasy-common cgru-common afanasy-plugins afanasy-render afanasy-doc afanasy-gui cgru"
 packages_afserver="afanasy-common afanasy-server"
-packages_uninstall="cgru afanasy-server afanasy-render afanasy-gui afanasy-doc afanasy-plugins afanasy-common cgru-common"
+#packages_uninstall="afanasy-common cgru-common"
+packages_uninstall="cgru afanasy-gui afanasy-doc afanasy-render afanasy-plugins afanasy-server cgru-common afanasy-common"
 
 [ -z "${PACKAGE_MANAGER}" ] && source ./distribution.sh
 [ -z "${PACKAGE_MANAGER}" ] && exit 1
@@ -38,17 +39,21 @@ elif [ "$PACKAGE_MANAGER" == "DPKG" ]; then
 elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
    extension=".rpm"
    install_cmd="rpm --install"
-   uninstall_cmd="rpm --erase"
+   uninstall_cmd="rpm --erase --nodeps"
 else
    echo "Unknown package manager = '$PACKAGE_MANAGER'"
    exit 1
 fi
 
+#if [ "$DISTRIBUTIVE" == "openSUSE" ]; then
+#   uninstall_cmd="zypper -q -n --no-refresh --no-cd --no-remote remove"
+#fi
+
 curdir=$PWD
 cd "${output}"
 
-function assemblecmd(){
-   cmd="${install_cmd}"
+function writeCommands(){
+#   cmd="${install_cmd}"
    for package in $*; do
       package_file=`bash -c "ls ${package}*${extension}"`
       for package_file in $package_file; do break; done
@@ -56,17 +61,22 @@ function assemblecmd(){
          echo "Error: Package '${package}' does not exists."
          exit 1
       fi
-      cmd="${cmd} ${package_file}"
+#      cmd="${cmd} ${package_file}"
+      echo "${install_cmd} ${package_file}" >> $afile
    done
 }
 
-assemblecmd ${packages_cgru}
-echo "${cmd}" >> "${install_cgru}"
+afile=${install_cgru}
+writeCommands ${packages_cgru}
+#echo "${cmd}" >> ${install_cgru}
 
-assemblecmd ${packages_afserver}
-echo "${cmd}" >> "${install_afserver}"
+afile=${install_afserver}
+writeCommands ${packages_afserver}
+#echo "${cmd}" >> ${install_afserver}
 
-echo "${uninstall_cmd} ${packages_uninstall}" >> "${uninstall}"
+for package in ${packages_uninstall}; do
+   echo "${uninstall_cmd} ${package}" >> "${uninstall}"
+done
 
 cd $curdir
 
