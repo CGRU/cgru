@@ -8,7 +8,6 @@ template="install_template"
 
 packages_cgru="afanasy-common cgru-common afanasy-plugins afanasy-render afanasy-doc afanasy-gui cgru"
 packages_afserver="afanasy-common afanasy-server"
-#packages_uninstall="afanasy-common cgru-common"
 packages_uninstall="cgru afanasy-gui afanasy-doc afanasy-render afanasy-plugins afanasy-server cgru-common afanasy-common"
 
 [ -z "${PACKAGE_MANAGER}" ] && source ./distribution.sh
@@ -45,15 +44,10 @@ else
    exit 1
 fi
 
-#if [ "$DISTRIBUTIVE" == "openSUSE" ]; then
-#   uninstall_cmd="zypper -q -n --no-refresh --no-cd --no-remote remove"
-#fi
-
 curdir=$PWD
 cd "${output}"
 
 function writeCommands(){
-#   cmd="${install_cmd}"
    for package in $*; do
       package_file=`bash -c "ls ${package}*${extension}"`
       for package_file in $package_file; do break; done
@@ -61,18 +55,15 @@ function writeCommands(){
          echo "Error: Package '${package}' does not exists."
          exit 1
       fi
-#      cmd="${cmd} ${package_file}"
       echo "${install_cmd} ${package_file}" >> $afile
    done
 }
 
 afile=${install_cgru}
 writeCommands ${packages_cgru}
-#echo "${cmd}" >> ${install_cgru}
 
 afile=${install_afserver}
 writeCommands ${packages_afserver}
-#echo "${cmd}" >> ${install_afserver}
 
 for package in ${packages_uninstall}; do
    echo "${uninstall_cmd} ${package}" >> "${uninstall}"
