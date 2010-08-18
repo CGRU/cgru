@@ -33,4 +33,4 @@ class mantra(parser.parser):
                pass
             if percent >= -1 and percent <= 100:
                self.percentframe = percent
-               self.percent = percent
+               self.calculate()

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Version:
-packsver="1.2.2"
+packsver="1.2.3"
 
 # Location:
 cgruRoot="../.."
@@ -192,6 +192,14 @@ archive_name="cgru.${packsver}.${VERSION_NAME}.tar.gz"
 tar -cvzf "${archive_name}" *
 mv "${archive_name}" "${curdir}/"
 cd "${curdir}"
+
+# Create pyafs archive:
+pyafs=$cgruRoot/$afanasy/bin_pyaf
+if [ -d $pyafs ]; then
+   echo "Creating pyafs archive..."
+   acrhivename="cgru.${VERSION_NUMBER}.bin_pyaf.7z"
+   7za a -r -t7z $acrhivename $pyafs
+fi
 
 # Copmleted.
 chmod a+rwx "${archive_name}"

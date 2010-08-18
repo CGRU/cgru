@@ -10,5 +10,5 @@ class hbatch_mantra( hbatch.hbatch, mantra.mantra):
 
    def do( self, data):
       #print data
-      if mantra.mantra.do( self, data): self.calculate()
+      mantra.mantra.do( self, data)
       hbatch.hbatch.do( self, data)
