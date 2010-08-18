@@ -65,6 +65,9 @@ iostat - parce output of linux 'iostat' command
    <pswd_god>73bcaaa458bff0d27989ed331b68b64d</pswd_god>
 <!-- Commands argument = "@ARG@", separator = " || ". -->
    <previewcmds>nuke -v @ARG@ || imf_disp @ARG@ || mplay @ARG@</previewcmds>
+<!-- Example for MS Windows:
+   <rendercmds>vncviewer @ARG@ || start ping /t @ARG@</rendercmds>
+-->
    <rendercmds>vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"</rendercmds>
    <watch_connectretries>3</watch_connectretries>
    <watch_waitforconnected>8000</watch_waitforconnected>
