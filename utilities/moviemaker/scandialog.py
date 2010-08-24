@@ -11,7 +11,9 @@ Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", versi
 Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',          help='Input folder to scan')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',          help='Output folder for movies')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',   help='Frame paint template')
+Parser.add_option('-e', '--extensions',dest='extensions',type  ='string',     default='',          help='Files extensions, comma searated')
 Parser.add_option('-q', '--jpgquality',dest='jpgquality',type  ='int',        default=90,          help='JPEG quality')
+Parser.add_option('-a', '--abspath',   dest='abspath',   action='store_true', default=False,       help='Prefix movies with images absolute path')
 Parser.add_option('-A', '--afanasy',   dest='afanasy',   type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 Parser.add_option('-m', '--maxhosts',  dest='maxhosts',  type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
 Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False,       help='Debug mode')
@@ -127,6 +129,11 @@ class Dialog( QtGui.QWidget):
       self.lOutput.addWidget( self.btnOutputBrowse)
       self.generallayout.addLayout( self.lOutput)
 
+      self.cAbsPath = QtGui.QCheckBox('Prefix movies names with images absolute path', self)
+      self.cAbsPath.setChecked( Options.abspath)
+      QtCore.QObject.connect( self.cAbsPath, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.generallayout.addWidget( self.cAbsPath)
+
       # Parameters:
       self.lTemplates = QtGui.QHBoxLayout()
       self.tTemplate = QtGui.QLabel('Frame Template:', self)
@@ -137,6 +144,16 @@ class Dialog( QtGui.QWidget):
       self.lTemplates.addWidget( self.cbTemplate)
       QtCore.QObject.connect( self.cbTemplate, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.parameterslayout.addLayout( self.lTemplates)
+
+      self.lExtensions = QtGui.QHBoxLayout()
+      self.tExtensions1 = QtGui.QLabel('Search extensions:', self)
+      self.lExtensions.addWidget( self.tExtensions1)
+      self.editExtensions = QtGui.QLineEdit( Options.extensions, self)
+      QtCore.QObject.connect( self.editExtensions, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lExtensions.addWidget( self.editExtensions)
+      self.tExtensions2 = QtGui.QLabel('(empty - find all known)', self)
+      self.lExtensions.addWidget( self.tExtensions2)
+      self.parameterslayout.addLayout( self.lExtensions)
 
       self.lJQuality = QtGui.QHBoxLayout()
       self.tJQuality = QtGui.QLabel('JPEG Quality:', self)
@@ -240,16 +257,20 @@ class Dialog( QtGui.QWidget):
          self.cmdField.setText('Ouput folder does not exist.')
          return
 
+      extensions = str( self.editExtensions.text())
+      format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
+      template = self.cbTemplate.currentText()
+
       cmd = 'scanscan.py'
       cmd = 'python ' + os.path.join( DialogPath, cmd)
       cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
       cmd += ' -f %s' % self.cbFPS.currentText()
-      format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
-      template = self.cbTemplate.currentText()
       cmd += ' -r %s' % format
       if self.dsbGamma.value() != 1.0: cmd += ' -g %.2f' % self.dsbGamma.value()
       if template != '': cmd += ' -t "%s"' % template
+      if extensions != '': cmd += ' -e "%s"' % extensions
       if self.sbJQuality.value() != -1: cmd += ' -q %d' % self.sbJQuality.value()
+      if self.cAbsPath.isChecked(): cmd += ' -a'
       if self.cAfanasy.isChecked():
          cmd += ' -A %d' % self.sbAfCapacity.value()
          cmd += ' -m %d' % self.sbAfMaxHosts.value()

@@ -13,9 +13,10 @@ parser.add_option('-c', '--codec',        dest='codec',        type  ='string', 
 parser.add_option('-f', '--fps',          dest='fps',          type  ='int',        default=25,          help='Frames per second')
 parser.add_option('-q', '--quality',      dest='quality',      type  ='int',        default=50,          help='JPEG quality')
 parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='JPEG quality')
-parser.add_option('-e', '--extension',    dest='extension',    type  ='string',     default='',          help='Files extension')
+parser.add_option('-e', '--extensions',   dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
 parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
 parser.add_option('-g', '--gamma',        dest='gamma',        type  ='float',      default=-1.0,        help='Apply gamma correction')
+parser.add_option('-a', '--abspath',      dest='abspath',      action='store_true', default=False,       help='Prefix movies with images absolute path')
 parser.add_option('-A', '--afanasy',      dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 parser.add_option('-m', '--maxhosts',     dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
 parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,       help='Verbose mode')
@@ -34,9 +35,9 @@ if options.debug: Verbose = True
 if options.debug: print 'DEBUG MODE:'
 if Verbose: print 'VERBOSE MODE:'
 
-if options.extension != '':
+if options.extensions != '':
    Extensions = []
-   Extensions.append(options.extension)
+   Extensions.extend(options.extensions.split(','))
 
 def isRightFile(afile):
    for ext in Extensions:
@@ -94,7 +95,14 @@ for dirpath, dirnames, filenames in os.walk( Folder):
    for pattern in patterns:
       pattern = os.path.join( dirpath, pattern)
       if Verbose: print pattern
-      movname = os.path.join( Output, genMovieName(pattern))
+
+      movname = pattern
+      if not options.abspath:
+         movname = movname.replace( Folder, '')
+         movname = movname.strip('/\\')
+      movname = genMovieName(movname)
+      movname = os.path.join( Output, movname)
+
       cmd = Command
       cmd += ' -r %s' % options.resolution
       cmd += ' -f %d' % options.fps
