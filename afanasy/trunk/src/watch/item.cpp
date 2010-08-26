@@ -97,15 +97,18 @@ void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option) cons
    int w = option.rect.width();
    int h = option.rect.height();
 
-   painter->setOpacity( 0.6);
    painter->setPen( afqt::QEnvironment::qclr_black );
+   painter->setOpacity( 0.7);
+
+   painter->drawLine( x, y+h, x+w-1, y+h);
+
+   painter->setOpacity( 0.2);
 
    painter->drawLine( x, y+1, x, y+h-1);
-   painter->drawLine( x, y+h, x+w-1, y+h);
    painter->drawLine( x+w-1, y+1, x+w-1, y+h-1);
 
-   painter->setOpacity( 0.4);
    painter->setPen( afqt::QEnvironment::qclr_white );
+   painter->setOpacity( 0.5);
 
    painter->drawLine( x, y, x+w-1, y);
 
