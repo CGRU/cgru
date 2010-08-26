@@ -16,7 +16,7 @@
 #include "../include/macrooutput.h"
 
 const int ItemRender::HeightHost = 25;
-const int ItemRender::HeightAnnotation = 15;
+const int ItemRender::HeightAnnotation = 14;
 const int ItemRender::HeightTask = 15;
 const int ItemRender::HeightOffline = 15;
 
@@ -107,8 +107,8 @@ void ItemRender::deletePlots()
 bool ItemRender::calcHeight()
 {
    plots_height = 0;
-   for( int i = 0; i < plots.size(); i++) if( plots[i]->height > plots_height ) plots_height = plots[i]->height;
-   plots_height += 8;
+   for( int i = 0; i < plots.size(); i++) if( plots[i]->height+4 > plots_height ) plots_height = plots[i]->height+4;
+   plots_height += 2;
    plots_height += HeightHost;
    int old_height = height;
    if( ListRenders::ConstHeight )
@@ -414,19 +414,19 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          taskstr += QString(" %1: %2[%3][%4]").arg((*it)->getServiceType()).arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
-         painter->drawText( x+5, y, ((w*3)>>2), plots_height + HeightTask * numtask, Qt::AlignBottom | Qt::AlignLeft, taskstr);
-         painter->drawText( x, y, w-5, plots_height + HeightTask * numtask, Qt::AlignBottom | Qt::AlignRight,
+         painter->drawText( x+5, y, ((w*3)>>2), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+         painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
              QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())));
       }
-      painter->drawText( x+5, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, annotation);
+      painter->drawText( x+5, y, w, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }
 
    int plot_dw = w / 10;
    int allplots_w = plot_dw * 6;
    int plot_x = x + (w - allplots_w)/2 + (w>>5);
-   int plot_y = y + 3;
+   int plot_y = y + 4;
    int plot_w = plot_dw - 4;
-   int plot_h = HeightHost - 3;
+   int plot_h = HeightHost - 5;
 
    plotCpu.paint( painter, plot_x, plot_y, plot_w, plot_h);
    plot_x += plot_dw;
@@ -444,7 +444,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    for( int i = 0; i < plots.size(); i++)
    {
       int custom_w = (w - 4) / plots.size();
-      int plot_y = y + HeightHost + 5;
+      int plot_y = y + HeightHost + 4;
       plots[i]->paint( painter, plot_x, plot_y, custom_w-4, plots[i]->height);
       plot_x += custom_w;
    }
