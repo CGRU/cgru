@@ -30,6 +30,8 @@ public:
 
    void itemsHeightCahnged();
 
+   void setItems( int start, Item ** item, int count);
+
 protected:
    QList<Item*> items;
 };

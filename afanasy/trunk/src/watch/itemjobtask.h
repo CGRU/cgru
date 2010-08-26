@@ -26,12 +26,14 @@ public:
    virtual const QString getSelectString() const;
 
    static const int ItemId = 2;
+   static const int WidthInfo;
+
+   bool compare( int type, const ItemJobTask & other, bool ascending) const;
 
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
-   static const int WidthInfo;
 
    int blocknum;
    int tasknum;

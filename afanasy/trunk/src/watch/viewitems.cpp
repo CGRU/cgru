@@ -5,6 +5,7 @@
 
 #include "item.h"
 #include "watch.h"
+#include "listitems.h"
 
 ItemDelegate::ItemDelegate( QWidget *parent):
    QAbstractItemDelegate( parent)
@@ -32,7 +33,9 @@ void ItemDelegate::emitSizeHintChanged( const QModelIndex &index)
 }
 
 ViewItems::ViewItems( QWidget * parent):
-   QListView( parent)
+   QListView( parent),
+   listitems( NULL)
+//   mousePressEvent_handler( NULL)
 {
    setSpacing( 3);
    setUniformItemSizes( false);
@@ -66,4 +69,12 @@ void ViewItems::keyPressEvent( QKeyEvent * event)
 #if QT_VERSION >= 0x040600
    Watch::keyPressEvent( event);
 #endif
+}
+
+void ViewItems::mousePressEvent( QMouseEvent * event)
+{
+   if( listitems)
+      if( listitems->mousePressed( event))
+         return;
+   QListView::mousePressEvent( event);
 }

@@ -35,6 +35,8 @@ public:
    void revertModel();
    void itemsHeightCahnged();
 
+   virtual bool mousePressed( QMouseEvent * event);
+
 public slots:
    void repaintItems();
    void deleteAllItems();
@@ -52,7 +54,7 @@ protected:
    void setAllowSelection( bool allow);
    Item* getCurrentItem() const;
    const QList<Item*> getSelectedItems() const;
-   void setSelectedItems( QList<Item*> & items, bool resetSelection = true);
+   void setSelectedItems( const QList<Item*> & items, bool resetSelection = true);
 
    virtual void showEvent(       QShowEvent  * event );
    virtual void hideEvent(       QHideEvent  * event );

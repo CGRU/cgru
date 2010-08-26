@@ -2,6 +2,8 @@
 
 #include <QtGui/QListView>
 
+class ListItems;
+
 class ItemDelegate : public QAbstractItemDelegate
 {
 public:
@@ -24,9 +26,16 @@ public:
 
    inline void updateGeometries() { QListView::updateGeometries();}
 
+//   inline void set_mousePressEvent_handler( bool (*handler)( QMouseEvent  *)) { mousePressEvent_handler = handler;}
+   inline void setListItems( ListItems * ptr) { listitems = ptr;}
+
 protected:
    void keyPressEvent( QKeyEvent * event);
+   void mousePressEvent( QMouseEvent * event);
 
 private:
+//   bool (*mousePressEvent_handler)( QMouseEvent * );
    ItemDelegate * itemDelegate;
+
+   ListItems * listitems;
 };

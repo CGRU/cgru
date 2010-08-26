@@ -23,6 +23,10 @@ public:
 
    bool caseMessage( af::Msg * msg);
 
+   bool mousePressed( QMouseEvent * event);
+
+   void sortBlock( int numblock);
+
 signals:
    void changeMonitor( int type, int id);
 

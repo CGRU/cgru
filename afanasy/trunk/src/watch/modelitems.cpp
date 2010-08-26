@@ -94,3 +94,19 @@ void ModelItems::emit_dataChanged( int firstChangedRow, int lastChangedRow)
    else if( lastChangedRow == -1 ) lastChangedRow = firstChangedRow;
    emit dataChanged( index( firstChangedRow), index( lastChangedRow));
 }
+
+void ModelItems::setItems( int start, Item ** item, int count)
+{
+   if( count < 1)
+   {
+      AFERROR("ModelItems::setItems: count < 1\n");
+      return;
+   }
+   if( start + count > items.size())
+   {
+      AFERRAR("ModelItems::setItems: start + count > items.size() (%d+%d>=%d)\n", start, count, items.size());
+      return;
+   }
+   for( int i = 0; i < count; i++) items[start+i] = item[i];
+   emit dataChanged( index(start), index(start + count));
+}

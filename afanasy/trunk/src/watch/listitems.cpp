@@ -1,7 +1,7 @@
 #include "listitems.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QEvent>
+#include <QtGui/QBoxLayout>
 
 #include "../libafqt/qmsg.h"
 
@@ -62,6 +62,8 @@ AFINFO("ListItems::~ListItems.\n");
 }
 
 int ListItems::count() const { return model->count();}
+
+bool ListItems::mousePressed( QMouseEvent * event) { return false;}
 
 void ListItems::showEvent( QShowEvent * event)
 {
@@ -153,7 +155,7 @@ const QList<Item*> ListItems::getSelectedItems() const
    return items;
 }
 
-void ListItems::setSelectedItems( QList<Item*> & items, bool resetSelection)
+void ListItems::setSelectedItems( const QList<Item*> & items, bool resetSelection)
 {
    if( resetSelection ) view->clearSelection();
    if( items.count() < 1 ) return;

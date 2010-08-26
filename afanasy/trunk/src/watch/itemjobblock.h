@@ -6,10 +6,12 @@
 #include "item.h"
 #include "blockinfo.h"
 
+class ListTasks;
+
 class ItemJobBlock : public Item
 {
 public:
-   ItemJobBlock( const af::BlockData* block);
+   ItemJobBlock( const af::BlockData* block, ListTasks * list);
    ~ItemJobBlock();
 
    virtual QSize sizeHint( const QStyleOptionViewItem &option) const;
@@ -52,7 +54,7 @@ public:
    int      errors_samehost;
    uint32_t tasksmaxruntime;
 
-   bool numeric;        ///< Whether block is numeric.
+   bool numeric;    ///< Whether the block is numeric.
    int  first;      ///< First tasks frame.
    int  last;       ///< Last tasks frame.
    int  pertask;    ///< Tasks frames per task.
@@ -68,12 +70,34 @@ public:
 
    inline void blockAction( int id_block, int id_action, ListItems * listitems) { info.blockAction( id_block, id_action, listitems);}
 
+   bool mousePressed( const QPoint & pos,const QRect & rect);
+
+   enum SortType
+   {
+      SNULL = 0,
+      SStarts,
+      SErrors,
+      SHost,
+      STime,
+      SState
+   };
+
+   inline int  getSortType()     const { return sort_type;     }
+   inline bool isSortAsceding()  const { return sort_ascending;}
+
+   /// Return old sorting type:
+   inline int resetSortingParameters() { int value = sort_type; sort_type = 0; sort_ascending = false; return value;}
+
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
 private:
    void generateToolTip();
    void updateToolTip();
+
+private:
+   static const int HeightHeader;
+   static const int HeightFooter;
 
 private:
    QString tooltip;
@@ -85,4 +109,14 @@ private:
    QString  blockToolTip;
 
    BlockInfo info;
+
+   static const int WHost = 50;
+   static const int WStarts = 60;
+   static const int WErrors = 60;
+   static const int WTime = 50;
+
+   bool sort_ascending;
+   int sort_type;
+
+   ListTasks * listtasks;
 };

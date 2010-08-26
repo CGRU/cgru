@@ -3,6 +3,9 @@
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
+#include "itemjobtask.h"
+#include "listtasks.h"
+
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
 
@@ -12,11 +15,16 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-ItemJobBlock::ItemJobBlock( const af::BlockData* block):
+const int ItemJobBlock::HeightHeader = 23;
+const int ItemJobBlock::HeightFooter = 14;
+
+ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
    Item( block->getName(), ItemId),
    numblock( block->getBlockNum()),
-   info( this, block->getBlockNum(), block->getJobId())
+   info( this, block->getBlockNum(), block->getJobId()),
+   listtasks( list)
 {
+   resetSortingParameters();
    blockName = name + " #" + QString::number( numblock);
    update( block, af::Msg::TJob);
 }
@@ -88,7 +96,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    if( info.update( block, type)) setRunning();
    else                           setNotRunning();
 
-   height = 23 + BlockInfo::Height;
+   height = HeightHeader  + BlockInfo::Height + HeightFooter;
 
    description = taskstype;
    if( numeric)
@@ -147,5 +155,134 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->setPen(  clrTextInfo( option));
    painter->drawText( x+4, y+9, w-8, h, Qt::AlignRight | Qt::AlignTop, description );
 
-   info.paint( painter, option, x+4, y+23, w-8);
+   y += HeightHeader;
+
+   info.paint( painter, option, x+4, y, w-8);
+
+   y += BlockInfo::Height;
+
+   painter->setPen( afqt::QEnvironment::qclr_black );
+   painter->setBrush( Qt::NoBrush);
+
+   painter->setOpacity( .2);
+   painter->drawLine( x, y, x+w, y);
+
+   y += 1;
+
+   painter->setOpacity( .4);
+   painter->drawRect( x+1, y, w-ItemJobTask::WidthInfo-1, HeightFooter-2);
+
+   int linex = w-ItemJobTask::WidthInfo;
+
+   painter->setOpacity( .7);
+   if( sort_type == STime) painter->fillRect( linex+2, y, WTime-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+   painter->drawText( linex, y-1, WTime, HeightFooter-1, Qt::AlignCenter, "time");
+   linex += WTime;
+   painter->setOpacity( .2);
+   painter->drawLine( linex, y, linex, y+HeightFooter-2);
+   painter->setOpacity( .7);
+   if( sort_type == SState) painter->fillRect( linex+2, y, ItemJobTask::WidthInfo-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+   painter->drawText( linex, y+2, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
+
+   y += 1;
+
+   linex = w-ItemJobTask::WidthInfo-1;
+
+   painter->setOpacity( .7);
+   painter->drawText( x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
+
+   painter->setOpacity( .7);
+   if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost+1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   painter->drawText( linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
+   linex -= WHost;
+   painter->setOpacity( .2);
+   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+
+   painter->setOpacity( .7);
+   if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "/(errors)e");
+   linex -= WErrors;
+   painter->setOpacity( .2);
+   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+
+   painter->setOpacity( .7);
+   if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "s(starts)");
+   linex -= WStarts;
+   painter->setOpacity( .2);
+   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+
+   painter->setOpacity( 1);
+}
+
+bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
+{
+   if( tasksHidded ) return false;
+
+   int mousex = pos.x() - rect.x();
+   int mousey = pos.y() - rect.y();
+
+   if( mousey < height - HeightFooter) return false;
+
+   int x = rect.width() - ItemJobTask::WidthInfo;
+   bool processed = false;
+   int sort_type_old = sort_type;
+
+   x -= WHost + WErrors + WStarts;
+   if( !processed && mousex < x )
+   {
+      if( resetSortingParameters() == 0) return true;
+      processed = true;
+   }
+
+   x += WStarts;
+   if( !processed && mousex < x )
+   {
+      sort_type = SStarts;
+      processed = true;
+   }
+
+   x += WErrors;
+   if( !processed && mousex < x )
+   {
+      sort_type = SErrors;
+      processed = true;
+   }
+
+   x += WHost;
+   if( !processed && mousex < x )
+   {
+      sort_type = SHost;
+      processed = true;
+   }
+
+   x += WTime;
+   if( !processed && mousex < x )
+   {
+      sort_type = STime;
+      processed = true;
+   }
+
+   if( !processed ) sort_type = SState;
+
+   if( sort_type_old != sort_type )
+      sort_ascending = false;
+   else
+      sort_ascending = false == sort_ascending;
+
+#ifdef AFOUTPUT
+switch( sort_type)
+{
+case 0:        printf("Tasks %d \n",   sort_ascending); break;
+case SStarts:  printf("Start %d \n",   sort_ascending); break;
+case SErrors:  printf("Errors %d \n",  sort_ascending); break;
+case SHost:    printf("Host %d \n",    sort_ascending); break;
+case STime:    printf("Time %d \n",    sort_ascending); break;
+case SState:   printf("State %d \n",   sort_ascending); break;
+}
+#endif
+
+   listtasks->sortBlock( numblock);
+
+   return true;
 }

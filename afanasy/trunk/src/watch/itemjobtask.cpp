@@ -8,6 +8,8 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "itemjobblock.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -149,4 +151,30 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    }
 
    if( taskprogress.state & AFJOB::STATE_RUNNING_MASK) drawStar( 7, x + w - 10, y + 7, painter);
+}
+
+bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) const
+{
+   bool result = false;
+   switch( type)
+   {
+   case ItemJobBlock::SErrors:
+      if(( taskprogress.errors_count > other.taskprogress.errors_count ) == ascending) result = true;
+      break;
+   case ItemJobBlock::SHost:
+      if(( taskprogress.hostname > other.taskprogress.hostname ) == ascending) result = true;
+      break;
+   case ItemJobBlock::SStarts:
+      if(( taskprogress.starts_count > other.taskprogress.starts_count ) == ascending) result = true;
+      break;
+   case ItemJobBlock::SState:
+      if(( taskprogress.state > other.taskprogress.state ) == ascending) result = true;
+      break;
+   case ItemJobBlock::STime:
+      if(( taskprogress.time_done-taskprogress.time_start > other.taskprogress.time_done-other.taskprogress.time_start ) == ascending) result = true;
+      break;
+   default:
+      AFERROR("ItemJobTask::compare: Invalid sort type.\n");
+   }
+   return result;
 }

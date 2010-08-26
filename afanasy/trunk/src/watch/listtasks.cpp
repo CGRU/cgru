@@ -53,6 +53,8 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 //   view->setUniformItemSizes( true);
 //   view->setBatchSize( 10000);
 
+   view->setListItems( this);
+
    Watch::sendMsg( new afqt::QMsg( af::Msg::TJobRequestId, jobid, true));
 
    parentWindow->setWindowTitle( jobname);
@@ -332,7 +334,7 @@ void ListTasks::construct()
    for( int b = 0; b < blocksnum; b++)
    {
       const af::BlockData* block = job->getBlock( b);
-      ItemJobBlock *wblock = new ItemJobBlock( block);
+      ItemJobBlock *wblock = new ItemJobBlock( block, this);
       wblock->tasksHidded = blocksnum > 1;
       wblocks[b] = wblock;
       model->addItem( wblock);
@@ -510,6 +512,7 @@ void ListTasks::doubleClicked( Item * item)
       int row_end   = getRow( blockNum, tasksnum[blockNum]-1);
       for( int row = row_start; row <= row_end; row++) view->setRowHidden( row, hide);
 //   view->updateGeometries();
+      if( block->resetSortingParameters()) sortBlock( block->getNumBlock());
    }
 }
 
@@ -703,4 +706,53 @@ void ListTasks::blockAction( int id_block, int id_action)
       return;
    }
    wblocks[id_block]->blockAction( id_block, id_action, this);
+}
+
+bool ListTasks::mousePressed( QMouseEvent * event)
+{
+   QModelIndex index = view->indexAt( event->pos());
+   if( qVariantCanConvert<Item*>( index.data()))
+   {
+      Item * item = qVariantValue<Item*>( index.data());
+      if( item->getId() == ItemJobBlock::ItemId)
+         return ((ItemJobBlock*)item)->mousePressed( event->pos(), view->visualRect( index));
+   }
+   return false;
+}
+
+void ListTasks::sortBlock( int numblock)
+{
+   if( numblock >= blocksnum )
+   {
+      AFERRAR("ListTasks::sortBlock: numblock >= blocksnum (%d>=%d)\n", numblock, blocksnum);
+      return;
+   }
+
+   int sort_type = wblocks[numblock]->getSortType();
+   bool sort_ascending = wblocks[numblock]->isSortAsceding();
+
+   ItemJobTask ** array = new ItemJobTask*[tasksnum[numblock]];
+   for( int i = 0; i < tasksnum[numblock]; i++) array[i] = wtasks[numblock][i];
+
+   if( sort_type)\
+      for( int i = 0; i < tasksnum[numblock]; i++)
+         for( int j = tasksnum[numblock]-1; j > i; j--)
+         {
+            ItemJobTask * item_a = array[j-1];
+            ItemJobTask * item_b = array[j];
+            if( item_a->compare( sort_type, *item_b, sort_ascending ))
+            {
+               array[j-1] = item_b;
+               array[j]   = item_a;
+            }
+         }
+
+   int start = numblock+1;
+   for( int b = 0; b < numblock; b++) start += tasksnum[b];
+
+   const QList<Item*> selection = getSelectedItems();
+   model->setItems( start, (Item**)array, tasksnum[numblock]);
+   setSelectedItems( selection);
+
+   delete [] array;
 }
