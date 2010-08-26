@@ -108,7 +108,7 @@ bool ItemRender::calcHeight()
 {
    plots_height = 0;
    for( int i = 0; i < plots.size(); i++) if( plots[i]->height > plots_height ) plots_height = plots[i]->height;
-   plots_height += 2;
+   plots_height += 8;
    plots_height += HeightHost;
    int old_height = height;
    if( ListRenders::ConstHeight )
@@ -440,12 +440,12 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    plot_x += plot_dw;
    plotIO.paint(  painter, plot_x, plot_y, plot_w, plot_h);
 
-   plot_x = 4;
+   plot_x = x + 4;
    for( int i = 0; i < plots.size(); i++)
    {
-      int custom_w = w / plots.size();
-      int plot_y = y + HeightHost + 1;
-      plots[i]->paint( painter, plot_x, plot_y, custom_w-2, plots[i]->height);
+      int custom_w = (w - 4) / plots.size();
+      int plot_y = y + HeightHost + 5;
+      plots[i]->paint( painter, plot_x, plot_y, custom_w-4, plots[i]->height);
       plot_x += custom_w;
    }
 
