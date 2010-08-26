@@ -194,8 +194,8 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    painter->setPen( clrTextInfo( option));
 
    int cy = y-10; int dy = 13;
-   painter->drawText( x, cy+=dy, w, h, Qt::AlignTop | Qt::AlignRight, user_time_current );
-   painter->drawText( x, cy+=dy, w, h, Qt::AlignTop | Qt::AlignRight, properties );
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time_current );
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties );
    if( state & AFJOB::STATE_DONE_MASK)
    {
       painter->setFont( afqt::QEnvironment::f_name);
@@ -222,6 +222,9 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
       painter->setFont( afqt::QEnvironment::f_info);
       painter->drawText( x, y, w, h, Qt::AlignHCenter | Qt::AlignBottom, annotation );
    }
+
+   // Draw standart post effects:
+   drawPost( painter, option);
 }
 
 bool ItemJob::setSortType(   int type )

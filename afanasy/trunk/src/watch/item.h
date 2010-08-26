@@ -60,6 +60,7 @@ public:
 
 protected:
    virtual void drawBack( QPainter *painter, const QStyleOptionViewItem &option) const;
+   virtual void drawPost( QPainter *painter, const QStyleOptionViewItem &option) const;
 
    /// Print AFJOB::STATE informaton
    void printfState( const uint32_t state, int posx, int posy, QPainter * painter, const QStyleOptionViewItem &option) const;

@@ -46,6 +46,8 @@ void ItemTalk::paint( QPainter *painter, const QStyleOptionViewItem &option) con
    painter->setPen(   clrTextMain( option) );
    painter->setFont(  afqt::QEnvironment::f_name);
    painter->drawText( option.rect, Qt::AlignVCenter | Qt::AlignHCenter, name );
+
+   drawPost( painter, option);
 }
 
 bool ItemTalk::setSortType(   int type )

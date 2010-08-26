@@ -213,4 +213,23 @@ void CtrlSortFilter::paintEvent( QPaintEvent * event)
    r.adjust( 0,0,-1,0);
    painter.setPen( afqt::QEnvironment::clr_item.c);
    painter.drawRect( r);
+
+   int wx = x()+1;
+   int wy = y()+1;
+   int w = width()-2;
+   int h = height()-2;
+
+   painter.setOpacity( 0.6);
+   painter.setPen( afqt::QEnvironment::qclr_black );
+
+   painter.drawLine( wx, wy+1, wx, wy+h-1);
+   painter.drawLine( wx+w-1, wy+1, wx+w-1, wy+h-1);
+   painter.drawLine( wx, wy, wx+w-1, wy);
+
+   painter.setOpacity( 0.4);
+   painter.setPen( afqt::QEnvironment::qclr_white );
+
+   painter.drawLine( wx, wy+h, wx+w-1, wy+h);
+
+   painter.setOpacity( 1.0);
 }

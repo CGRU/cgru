@@ -79,12 +79,37 @@ const QColor & Item::clrTextState( const QStyleOptionViewItem &option, bool on )
 
 void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option) const
 {
+   painter->setOpacity( 1.0);
    painter->setRenderHint( QPainter::Antialiasing, false);
 
    if( option.state & QStyle::State_Selected )
       painter->fillRect( option.rect, afqt::QEnvironment::clr_selected.c);
    else
       painter->fillRect( option.rect, afqt::QEnvironment::clr_item.c);
+}
+
+void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option) const
+{
+   painter->setRenderHint( QPainter::Antialiasing, false);
+
+   int x = option.rect.x();
+   int y = option.rect.y();
+   int w = option.rect.width();
+   int h = option.rect.height();
+
+   painter->setOpacity( 0.6);
+   painter->setPen( afqt::QEnvironment::qclr_black );
+
+   painter->drawLine( x, y+1, x, y+h-1);
+   painter->drawLine( x, y+h, x+w-1, y+h);
+   painter->drawLine( x+w-1, y+1, x+w-1, y+h-1);
+
+   painter->setOpacity( 0.4);
+   painter->setPen( afqt::QEnvironment::qclr_white );
+
+   painter->drawLine( x, y, x+w-1, y);
+
+   painter->setOpacity( 1.0);
 }
 
 void Item::paint( QPainter *painter, const QStyleOptionViewItem &option) const

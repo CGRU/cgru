@@ -104,24 +104,27 @@ bool ItemUser::calcHeight()
 void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
    drawBack( painter, option);
-   int x = option.rect.x(); int y = option.rect.y();
-   int w = option.rect.width(); int h = option.rect.height();
+   int x = option.rect.x() + 5;
+   int y = option.rect.y() + 2;
+   int w = option.rect.width() - 10;
+   int h = option.rect.height() - 4;
+   int height_user = HeightUser-4;
 
    painter->setPen( clrTextMain( option) );
    if( permanent) painter->setFont( afqt::QEnvironment::f_name);
    else           painter->setFont( afqt::QEnvironment::f_info);
-   painter->drawText( option.rect, Qt::AlignLeft    | Qt::AlignTop,     strLeftTop);
+   painter->drawText( x, y, w, h, Qt::AlignLeft | Qt::AlignTop,     strLeftTop);
 
    painter->setPen( clrTextInfo( option) );
    painter->setFont( afqt::QEnvironment::f_info);
-   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignLeft    | Qt::AlignBottom,  strLeftBottom  );
-   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignHCenter | Qt::AlignTop,     strHCenterTop  );
-   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignRight   | Qt::AlignBottom,  strRightBottom );
+   painter->drawText( x, y, w, height_user, Qt::AlignLeft    | Qt::AlignBottom,  strLeftBottom  );
+   painter->drawText( x, y, w, height_user, Qt::AlignHCenter | Qt::AlignTop,     strHCenterTop  );
+   painter->drawText( x, y, w, height_user, Qt::AlignRight   | Qt::AlignBottom,  strRightBottom );
    painter->setPen( afqt::QEnvironment::qclr_black );
-   painter->drawText( x+5, y, w-5, HeightUser, Qt::AlignRight   | Qt::AlignTop,     strRightTop    );
+   painter->drawText( x, y, w, height_user, Qt::AlignRight   | Qt::AlignTop,     strRightTop    );
 
    if( false == annotation.isEmpty())
-      painter->drawText( option.rect, Qt::AlignBottom | Qt::AlignHCenter, annotation );
+      painter->drawText( x, y, w, h, Qt::AlignBottom | Qt::AlignHCenter, annotation );
 
    {  // draw stars:
       static const int stars_size = 8;
@@ -132,27 +135,31 @@ void ItemUser::paint( QPainter *painter, const QStyleOptionViewItem &option) con
       int quantity = numrunningtasks;
       //quantity = 155;
 
-      if( quantity < 1) return;
-      int numstars = quantity;
-      int stars_right = w - 50;
-      int stars_delta = (stars_right - stars_left) / numstars;
-      if( stars_delta < 1 )
+      if( quantity > 0)
       {
-         stars_delta = 1;
-         numstars = stars_right - stars_left;
-      }
-      else if( stars_delta > stars_maxdelta ) stars_delta = stars_maxdelta;
-      int sx = x + stars_left;
-      for( int j = 0; j < numstars; j++)
-      {
-         drawStar( stars_size, sx, y + stars_height, painter);
-         sx += stars_delta;
-      }
+         int numstars = quantity;
+         int stars_right = w - 50;
+         int stars_delta = (stars_right - stars_left) / numstars;
+         if( stars_delta < 1 )
+         {
+            stars_delta = 1;
+            numstars = stars_right - stars_left;
+         }
+         else if( stars_delta > stars_maxdelta ) stars_delta = stars_maxdelta;
+         int sx = x + stars_left;
+         for( int j = 0; j < numstars; j++)
+         {
+            drawStar( stars_size, sx, y + stars_height, painter);
+            sx += stars_delta;
+         }
 
-      painter->setFont( afqt::QEnvironment::f_name);
-      painter->setPen( afqt::QEnvironment::clr_textstars.c);
-      painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
+         painter->setFont( afqt::QEnvironment::f_name);
+         painter->setPen( afqt::QEnvironment::clr_textstars.c);
+         painter->drawText( x, y, w, HeightUser, Qt::AlignHCenter | Qt::AlignBottom, QString::number(numrunningtasks));
+      }
    }
+
+   drawPost( painter, option);
 }
 
 bool ItemUser::setSortType(   int type )

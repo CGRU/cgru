@@ -212,7 +212,7 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->setOpacity( .2);
    painter->drawLine( linex, y, linex, y+HeightFooter-4);
 
-   painter->setOpacity( 1);
+   drawPost( painter, option);
 }
 
 bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)

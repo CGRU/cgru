@@ -226,6 +226,20 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
 
 //   if( autoscale == false ) label_text = label;//.contains("%1") ? label.arg( label_value) : label;
    painter->drawText( x+1, y+1, w, h, Qt::AlignLeft | Qt::AlignTop, label_text.isEmpty() ? label : label_text);
+
+   x -= 1; y -= 1; w += 2; h +=2;
+
+   painter->setOpacity( 0.3);
+   painter->setPen( afqt::QEnvironment::qclr_white );
+   painter->drawLine( x, y+h, x+w-1, y+h);
+
+   painter->setOpacity( 0.5);
+   painter->setPen( afqt::QEnvironment::qclr_black );
+   painter->drawLine( x, y+1, x, y+h-1);
+   painter->drawLine( x+w-1, y+1, x+w-1, y+h-1);
+   painter->drawLine( x, y, x+w-1, y);
+
+   painter->setOpacity( 1.0);
 }
 
 void Plotter::calcHot( int grp, int value, int &r, int &g, int &b) const
