@@ -181,7 +181,7 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->setOpacity( .2);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
    painter->setOpacity( .7);
-   if( sort_type == SState) painter->fillRect( linex+2, y, ItemJobTask::WidthInfo-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+   if( sort_type == SState) painter->fillRect( linex+1, y, ItemJobTask::WidthInfo-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex, y+2, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
 
    y += 1;
