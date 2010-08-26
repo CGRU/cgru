@@ -147,12 +147,12 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
          painter->setPen( clrTextInfo( option));
       else
          painter->setPen( clrTextDone( option));
-      painter->drawText( x + w - WidthInfo+10, y+9, timeString);
+      painter->drawText( x + w - WidthInfo+10, y+8, timeString);
    }
 
    if( taskprogress.state & AFJOB::STATE_RUNNING_MASK) drawStar( 7, x + w - 10, y + 7, painter);
 
-   drawPost( painter, option);
+//   drawPost( painter, option);
 }
 
 bool ItemJobTask::compare( int type, const ItemJobTask & other, bool ascending) const

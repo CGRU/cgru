@@ -165,7 +165,7 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->setBrush( Qt::NoBrush);
 
    painter->setOpacity( .2);
-   painter->drawLine( x, y, x+w, y);
+   painter->drawLine( x, y, x+w-1, y);
 
    y += 1;
 
