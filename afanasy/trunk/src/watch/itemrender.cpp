@@ -364,9 +364,9 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    {
       painter->setPen(   afqt::QEnvironment::qclr_black );
       painter->setFont(  afqt::QEnvironment::f_info);
-      painter->drawText( x+5, y+2, w-10, HeightOffline-4, Qt::AlignVCenter | Qt::AlignLeft,    name     );
-      painter->drawText( x+5, y+2, w-10, HeightOffline-4, Qt::AlignVCenter | Qt::AlignRight,   state    );
-      painter->drawText( x+5, y+2, w-10, HeightOffline-4, Qt::AlignVCenter | Qt::AlignHCenter, "offline");
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name     );
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, "offline");
       painter->drawText( x+5, y+2, w-10, HeightOffline-4 + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
       drawPost( painter, option);
       return;
