@@ -1,8 +1,9 @@
+
 #!/bin/bash
 
 if [ -z $CGRU_LOCATION ]; then
    pwd=$PWD
-   cd ../../..
+   cd ../..
    source setup.sh
    cd $pwd
 fi
@@ -35,26 +36,26 @@ afcmd rNIMBY l0[0\|2]
 
 export AF_USERNAME=tima
 export AF_HOSTNAME=l00
-./job.py --name BFT103.moviePAL --labels convert:encode --types generic -n100 -t5
-./job.py --name BFT103.comp --labels dpx:key:back --types nuke -n100 -t5
-./job.py --name ET305.comp --labels ready:key:back --types nuke -n100 -t10
+python ./job.py --name BFT103.moviePAL --labels convert:encode --types generic -n100 -t5
+python ./job.py --name BFT103.comp --labels dpx:key:back --types nuke -n100 -t5
+python ./job.py --name ET305.comp --labels ready:key:back --types nuke -n100 -t10
 
 export AF_USERNAME=john
 export AF_HOSTNAME=l01
-./job.py --name ET305.train --labels /out/mantra1 --types mantra -n100 -t10
-./job.py --name ET305.cars --labels /out/mantra1 --types mantra -n100 -t10
+python ./job.py --name ET305.train --labels /out/mantra1 --types mantra -n100 -t10
+python ./job.py --name ET305.cars --labels /out/mantra1 --types mantra -n100 -t10
 
 export AF_USERNAME=bob
 export AF_HOSTNAME=l02
-./job.py --name BFT103.bullet --labels image:shadow --types prman -n100 -t30
-./job.py --name BFT103.bridge --labels image:shadow --types prman -n100 -t30
+python ./job.py --name BFT103.bullet --labels image:shadow --types prman -n100 -t30
+python ./job.py --name BFT103.bridge --labels image:shadow --types prman -n100 -t30
 
 export AF_USERNAME=alex
 export AF_HOSTNAME=l03
-./job.py --name CAP300.house --labels image:ifd --types mantra:hbatch -n100 -t20
-./job.py --name CAP300.cars --labels /out/mantra1 --types mantra -n100 -t10
+python ./job.py --name CAP300.house --labels image:ifd --types mantra:hbatch -n100 -t20
+python ./job.py --name CAP300.cars --labels /out/mantra1 --types mantra -n100 -t10
 
 export AF_USERNAME=peter
 export AF_HOSTNAME=l04
-./job.py --name CAP300.comp --labels preview:dpx:key:back --types nuke -n100 -t10
-./job.py --name CAP300.people --labels /out/mantra1 --types mantra -n100 -t10
+python ./job.py --name CAP300.comp --labels preview:dpx:key:back --types nuke -n100 -t10
+python ./job.py --name CAP300.people --labels /out/mantra1 --types mantra -n100 -t10
