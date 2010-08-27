@@ -159,38 +159,23 @@ Also you can type any SQL query to get some afanasy information yourself.
 Afanasy has a command line interface for various purposes. It can connect to Afanasy server from remote Linux machine. You can set some server parameter "on-the-fly". Change some user, job and host attributes. Query users, jobs, hosts attributes and traffic statistics.
 </p>
 <h4>Job Example</h4>
-
+<p>The simplest job:</p>
 <pre>
 
    #!/usr/bin/env python
+
    import af
 
-   job = af.Job('somejob')
-   job.setDependMask('another_job_name(s)')
-   job.setPriority( 75)
-   job.setMaxHosts( 15)
-   job.setHostsMask('r0.*')
-   job.setNeedOS('linux')
+   job = af.Job('example job')
 
-   block_1 = job.addBlock('final', 'nuke')
-   block_1.setWorkingDirectory('/cg/projects/test/nuke')
-   block_1.setCommand('nuke -i -X WriteDPX -x scene.nk.tmp.nk %1,%2')
-   block_1.setFiles('dpx/img.%04d.dpx')
-   block_1.setNumeric( 1, 100, 5)
-   block_1.setTasksDependMask('keying')
+   block = af.Block('block of tasks')  
+   block.setWorkingDirectory('/home')  
 
-   block_2 = job.addBlock('keying', 'nuke')
-   block_2.setWorkingDirectory('/cg/projects/test/nuke')
-   block_2.setCommand('nuke -i -X WriteKey -x scene.nk.tmp.nk %1,%2')
-   block_2.setFiles('key/key.%04d.exr')
-   block_2.setNumeric( 1, 100, 5)
-   block_2.setNeedMemory( 2048)
+   task = af.Task('simple task')
+   task.setCommand('ls -l')
 
-   # Remove temporary render scene (if needed).
-   job.setCmdPost('rm /cg/projects/test/nuke/scene.nk.tmp.nk')
-
-   # Start job paused (if needed).
-   job.offLine()
+   block.tasks.append(task)
+   job.blocks.append(block)
 
    job.send()
 
