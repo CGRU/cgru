@@ -331,7 +331,7 @@ elif ext == 'scn':
 # 3D MAX:
 elif ext == 'max':
    scenetype = 'max'
-   cmd = '3dsmaxcmd' + cmdextension + ' ' + scene + ' -start:%1 -end:%2 -v:5 -showRFW:0'
+   cmd = '3dsmaxcmd' + cmdextension + ' ' + scene + ' -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5 -showRFW:0'
 
 # simple generic:
 else:
