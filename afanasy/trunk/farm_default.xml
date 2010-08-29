@@ -24,6 +24,7 @@ This is commented text.
       <service name="blender_yafray" />
       <service name="yafray" />
       <service name="xsi" />
+      <service name="max" />
 <!--
 Comment it if you agree with build in os detection (names)
       <os>linux mac windows</os>
@@ -38,36 +39,7 @@ You can specify several platforms, if host can take tasks for diffent platforms.
       <maxtasks>2</maxtasks>
       <power>1000</power>
       <service name="generic" />
-      <service name="nuke" count="2"/>
-      <service name="prman" count="2" />
-      <service name="mantra" />
-      <service name="hbatch" />
-      <service name="hbatch_mantra" />
-   </pattern>
-   <pattern name="Renders #1">
-      <mask>r0.*</mask>
-      <description>First 2CPU renders</description>
-      <maxtasks>20</maxtasks>
-      <capacity>1100</capacity>
-      <power>2000</power>
-      <properties>intel</properties>
-      <service name="generic" />
-      <service name="nuke" count="2"/>
-      <service name="prman" count="2" />
-      <service name="prman" />
-      <service name="mantra" />
-      <service name="hbatch" />
-      <service name="hbatch_mantra" />
-   </pattern>
-   <pattern name="Renders #2">
-      <mask>r1.*</mask>
-      <description>Second 4CPU renders</description>
-      <maxtasks>40</maxtasks>
-      <capacity>4400</capacity>
-      <power>4000</power>
-      <properties>intel nvidiagpu</properties>
-      <service name="generic" />
-      <service name="nuke" />
+      <service name="nuke"/>
       <service name="prman" count="2" />
       <service name="mantra" />
       <service name="hbatch" />
@@ -92,6 +64,7 @@ You can specify several platforms, if host can take tasks for diffent platforms.
       <service name="blender_yafray" />
       <service name="yafray" />
       <service name="xsi" />
+      <service name="max" />
    </pattern>
    <pattern name="LinStation">
       <mask>l.*</mask>

@@ -328,8 +328,10 @@ elif ext == 'scn':
          value += varirender_step
       cmd = ''
 
-#xsibatch -script "%XSI_CGRU_PATH%\afrender.py" -lang Python -main afRenderCurPass -args
-#-scenePath "%CD%\project\Scenes\scene.scn" -startFrame 1 -endFrame 2 -step 1 -simulate 0 -setAttr torus.polymsh.geom.enduangle -setValue 120
+# 3D MAX:
+elif ext == 'max':
+   scenetype = 'max'
+   cmd = '3dsmaxcmd' + cmdextension + ' ' + scene + ' -start:%1 -end:%2 -v:5 -showRFW:0'
 
 # simple generic:
 else:
