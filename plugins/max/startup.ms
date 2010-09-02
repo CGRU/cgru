@@ -1,6 +1,6 @@
 (
 	-- Load macros:
-	macros.load "C:/cg/tools/cgru/afanasy/trunk/plugins/max"
+	macros.load (systemTools.getEnvVariable "AF_ROOT" + "/plugins/max")
 
 	-- in interacive mode only
 	if (IsNetServer() == false) then (  
