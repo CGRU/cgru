@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import sys
 import os
+import sys
 
 import af
+import cgruutils
 import services.service
 
 def usage_exit():
@@ -13,7 +14,7 @@ examples:\n\
 \n\
 afjob path/scene.shk 1 100\n\
 \n\
-afjob path/scene.hip 1 100 -fpr 3 -pwd projects/test -node /out/mantra1 -take back -name my_job\n\
+afjob path/scene.hip 1 100 -fpt 3 -pwd projects/test -node /out/mantra1 -take back -name my_job\n\
 \n\
 arguments:\n\
 \n\
@@ -21,13 +22,14 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 1                    -   (R) first frame to render\n\
 100                  -   (R) last frame to render\n\
 -by 1                -   frames increment\n\
--fpr 3               -   frames per render\n\
+-fpt 3               -   frames per task\n\
 -pwd projects/test   -   working wirectory\n\
 -name my_job         -   job name\n\
 -node                -   node to render ( houdini driver or nuke write )\n\
 -type                -   service type\n\
 -take                -   take to use ( houdini render with take, xsi pass )\n\
 -ignoreinputs        -   not to render input nodes ( houdini ignore inputs ROP parameter )\n\
+-tempscene           -   copy scene to temporary file to render\n\
 -deletescene         -   delete scene when job deleted\n\
 -pause               -   start job paused ( offline afanasy state )\n\
 -os                  -   OS needed mask, "any" to render on any platform\n\
@@ -41,7 +43,8 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -capmax              -   tasks maximum capacity coefficient\n\
 -depmask             -   wait untill other jobs of the same user, satisfying this mask\n\
 -depglbl             -   wait untill other jobs of any user, satisfying this mask\n\
--images              -   images to preview\n\
+-images              -   images to preview (img.%04d.jpg)\n\
+-image               -   image to preview (img.0000.jpg)\n\
 -varirender attr start step count - variate parameter\n\
 -simulate            -   enable simulation\n\
 (R)                  -   REQUIRED arguments\n\
@@ -60,15 +63,19 @@ if argsl < 4:
    usage_exit()
 
 scene = argsv[1]
-ext   = scene.rpartition('.')[2]
-name  = scene.rpartition('/')[2]
+#ext   = scene.rpartition('.')[2]
+#name  = scene.rpartition('/')[2]
+ext = scene.rfind('.')
+if ext == -1: ext = ''
+else: ext = scene[ext+1:]
+name = os.path.basename(scene)
 
 #
 # initial arguments values
 
 s = int( argsv[2])
 e = int( argsv[3])
-fpr = 1
+fpt = 1
 by  = 1
 pwd = os.getenv('PWD', os.getcwd())
 file           = ''
@@ -76,6 +83,7 @@ node           = ''
 ignoreinputs   = False
 take           = ''
 deletescene    = False
+tempscene      = False
 startpaused    = False
 hostsmask      = ''
 hostsexcl      = ''
@@ -88,6 +96,7 @@ capmax         = -1
 dependmask     = ''
 dependglobal   = ''
 images         = ''
+image          = ''
 blocktype      = ''
 platform       = ''
 varirender     = False
@@ -130,9 +139,12 @@ for i in range( argsl):
       continue
 
    if arg == '-fpr':
+      print '"-fpr" (frame per render) is absolete, use "-fpt" (frame per task) instead.'
+      arg = '-fpt'
+   if arg == '-fpt':
       i += 1
       if i == argsl: break
-      fpr = int(argsv[i])
+      fpt = int(argsv[i])
       continue
 
    if arg == '-pwd':
@@ -167,6 +179,10 @@ for i in range( argsl):
 
    if arg == '-deletescene':
       deletescene = True
+      continue
+
+   if arg == '-tempscene':
+      tempscene = True
       continue
 
    if arg == '-ignoreinputs':
@@ -242,6 +258,12 @@ for i in range( argsl):
       images = argsv[i]
       continue
 
+   if arg == '-image':
+      i += 1
+      if i == argsl: break
+      image = argsv[i]
+      continue
+
    if arg == '-type':
       i += 1
       if i == argsl: break
@@ -276,6 +298,18 @@ for i in range( argsl):
 #
 # command construction:
 cmdextension = os.getenv('AF_CMDEXTENSION', '')
+
+# Check some parameters:
+if fpt < 1:
+   print 'fpt - frames per task - must be > 0 ( setting to 1)'
+   fpt = 1
+
+if images == '' and image != '': images = cgruutils.cPathFrom1(image)
+
+if tempscene:
+   scene = cgruutils.copyJobFile( scene, name, ext)
+   if scene == '': sys.exit(1)
+
 
 # Shake:
 if   ext == 'shk':
@@ -331,16 +365,12 @@ elif ext == 'scn':
 # 3D MAX:
 elif ext == 'max':
    scenetype = 'max'
-   cmd = '3dsmaxcmd' + cmdextension + ' ' + scene + ' -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5 -showRFW:0'
+   cmd = '3dsmaxcmd' + cmdextension + ' ' + scene + ' -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
 
 # simple generic:
 else:
    scenetype = 'generic'
    cmd = scene + ' %1 %2'
-
-if fpr < 1:
-  print 'fpr - frames per render - must be > 0 ( setting to 1)'
-  fpr = 1;
 
 #
 # Creating a Job:
@@ -357,7 +387,7 @@ i = 0
 for cmd in cmds:
    block = af.Block( blocknames[i], blocktype)
    block.setWorkingDirectory( pwd )
-   block.setNumeric( s, e, fpr)
+   block.setNumeric( s, e, fpt)
    block.setCommand( cmd )
    block.setCapacity( capacity)
    block.setVariableCapacity( capmin, capmax)
@@ -374,7 +404,7 @@ if hostsmask      != '': job.setHostsMask( hostsmask)
 if hostsexcl      != '': job.setHostsMaskExclude( hostsexcl)
 if dependmask     != '': job.setDependMask( dependmask)
 if dependglobal   != '': job.setDependMaskGlobal( dependglobal)
-if deletescene         : job.setCmdPost('rm ' + scene)
+if deletescene         : job.setCmdPost('rm ' + os.path.abspath(scene))
 if startpaused         : job.offLine()
 if platform != '':
    if platform == 'any': job.setNeedOS('')
