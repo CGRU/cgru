@@ -219,15 +219,15 @@ void CtrlSortFilter::paintEvent( QPaintEvent * event)
    int w = width()-2;
    int h = height()-2;
 
-   painter.setOpacity( 0.6);
    painter.setPen( afqt::QEnvironment::qclr_black );
-
+   painter.setOpacity( 0.2);
    painter.drawLine( wx, wy+1, wx, wy+h-1);
    painter.drawLine( wx+w-1, wy+1, wx+w-1, wy+h-1);
+   painter.setOpacity( 0.6);
    painter.drawLine( wx, wy, wx+w-1, wy);
 
-   painter.setOpacity( 0.4);
    painter.setPen( afqt::QEnvironment::qclr_white );
+   painter.setOpacity( 0.4);
 
    painter.drawLine( wx, wy+h, wx+w-1, wy+h);
 
