@@ -31,6 +31,7 @@ xcopy plugins\nuke %dest%\plugins\nuke\ /ys
 xcopy plugins\houdini %dest%\plugins\houdini\ /ys
 xcopy plugins\xsi %dest%\plugins\xsi\ /ys
 xcopy plugins\blender %dest%\plugins\blender\ /ys
+xcopy plugins\max %dest%\plugins\max\ /ys
 
 xcopy plugins\maya %dest%\plugins\maya\ /y
 xcopy plugins\maya\doc %dest%\plugins\maya\doc\ /ys
