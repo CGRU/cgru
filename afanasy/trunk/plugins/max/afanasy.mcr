@@ -36,13 +36,13 @@ function createCommand useTemp taskFrameNumber pause= (
       endFramei = rendEnd.frame as integer
    )
    if rendTimeType == 4 then(
-      format "--Warning: Can render frame range only.%\n" ""
+      format "-- Warning: Can render frame range only.%\n" ""
       startFramei = rendStart.frame as integer
       endFramei = rendEnd.frame as integer
    )
 
    local cmd = "afjob.py "
-   cmd += maxFilePath + maxFileName
+   cmd += "\"" + maxFilePath + maxFileName + "\""
    cmd += " " + (startFramei as string)
    cmd += " " + (endFramei as string)
    cmd += " -fpt " + (taskFrameNumberi as string)
@@ -64,11 +64,11 @@ rollout AfanasyDialog ver
 (
    checkbox useTempControl "Save Temporary Scene" pos:[16,10] width:152 height:20 checked:false toolTip:"Save scene to temporary file before render."
    spinner taskFrameNumberControl "Frames Per Task" pos:[70,40]  width:60 height:19 range:[1,999,1] type:#integer scale:1 toolTip:"Number of frames in one task"
-   button render "Render" pos:[16,70] width:64 height:24 toolTip:"Start Render Proces"
-   button close "Close" pos:[80,70] width:64 height:24 toolTip:"Close window"
+   button renderButton "Render" pos:[16,70] width:64 height:24 toolTip:"Start Render Proces"
+   button closeButton "Close" pos:[80,70] width:64 height:24 toolTip:"Close window"
    checkbox pauseControl "Start Job Paused" pos:[16,100] checked:false toolTip:"Send job paused."
 
-   on render pressed do
+   on renderButton pressed do
    (
       local useTemp = useTempControl.checked 
       local taskFrameNumber = taskFrameNumberControl.value
@@ -88,17 +88,34 @@ rollout AfanasyDialog ver
       -- Prepare  command:
       cmd = systemTools.getEnvVariable("AF_ROOT") + "\\python\\" + cmd
       cmd = "python " + cmd
-      format "%\n" cmd
+      format "-- %\n" cmd
 
-      -- Launch command:
-      --DOSCommand ("start \"" + cmd + "\"")
-      DOSCommand (cmd)
+      -- Prepare command output file
+      local outputfile = "afanasy_submint_max.txt"
+      local tempdir = systemTools.getEnvVariable("TMP")
+      if tempdir == undefined then tempdir = systemTools.getEnvVariable("TEMP")
+      if tempdir == undefined then tempdir = "c:\\temp"
+      local outputfile = tempdir + "\\" + outputfile
+
+      -- Launch command with redirected output:
+      HiddenDOSCommand (cmd + " > " + outputfile) ExitCode:&status
+      if status != 0 then
+      (
+         format "-- %\n" "Error:"
+         local outtext = openfile outputfile
+         while not eof outtext do
+         (
+            local str = readLine outtext
+            format "-- %\n" str
+         )
+         close outtext
+      )
 
       -- Close dialog:
       DestroyDialog AfanasyDialog
    )
 
-   on close pressed do	(
+   on closeButton pressed do	(
       try DestroyDialog AfanasyDialog
       catch ()
    )

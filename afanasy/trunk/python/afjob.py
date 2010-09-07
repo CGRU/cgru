@@ -8,6 +8,11 @@ import af
 import cgruutils
 import services.service
 
+def error_exit( error_str = None):
+   if error_str is not None: print error_str
+   sys.stdout.flush()
+   sys.exit(1)
+
 def usage_exit():
    print '\n\
 examples:\n\
@@ -50,12 +55,15 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 (R)                  -   REQUIRED arguments\n\
 \n\
 '
-   sys.exit(1)
+   error_exit()
 
-def error_exit( error_str):
-   print error_str
-   sys.exit(1)
-
+def integer( string):
+   try:
+      number = int( string)
+   except:
+      error_exit( str(sys.exc_info()[1]))
+   return number
+   
 argsv = sys.argv
 argsl = len( argsv)
 
@@ -63,8 +71,6 @@ if argsl < 4:
    usage_exit()
 
 scene = argsv[1]
-#ext   = scene.rpartition('.')[2]
-#name  = scene.rpartition('/')[2]
 ext = scene.rfind('.')
 if ext == -1: ext = ''
 else: ext = scene[ext+1:]
@@ -73,8 +79,8 @@ name = os.path.basename(scene)
 #
 # initial arguments values
 
-s = int( argsv[2])
-e = int( argsv[3])
+s = integer( argsv[2])
+e = integer( argsv[3])
 fpt = 1
 by  = 1
 pwd = os.getenv('PWD', os.getcwd())
@@ -120,22 +126,10 @@ if e < 0:
 for i in range( argsl):
    arg = argsv[i]
 
-   if arg == '-s':
-      i += 1
-      if i == argsl: break
-      s = int(argsv[i])
-      continue
-
-   if arg == '-e':
-      i += 1
-      if i == argsl: break
-      e = int(argsv[i])
-      continue
-
    if arg == '-by':
       i += 1
       if i == argsl: break
-      by = int(argsv[i])
+      by = integer(argsv[i])
       continue
 
    if arg == '-fpr':
@@ -144,7 +138,7 @@ for i in range( argsl):
    if arg == '-fpt':
       i += 1
       if i == argsl: break
-      fpt = int(argsv[i])
+      fpt = integer(argsv[i])
       continue
 
    if arg == '-pwd':
@@ -207,19 +201,19 @@ for i in range( argsl):
    if arg == '-maxhosts':
       i += 1
       if i == argsl: break
-      maxhosts = int(argsv[i])
+      maxhosts = integer(argsv[i])
       continue
 
    if arg == '-maxruntime':
       i += 1
       if i == argsl: break
-      maxruntime = int(argsv[i])
+      maxruntime = integer(argsv[i])
       continue
 
    if arg == '-priority':
       i += 1
       if i == argsl: break
-      priority = int(argsv[i])
+      priority =integer(argsv[i])
       continue
 
    if arg == '-capacity':
@@ -282,13 +276,13 @@ for i in range( argsl):
       varirender_attr = argsv[i]
       i += 1
       if i == argsl: break
-      varirender_start = int(argsv[i])
+      varirender_start = integer(argsv[i])
       i += 1
       if i == argsl: break
-      varirender_step = int(argsv[i])
+      varirender_step = integer(argsv[i])
       i += 1
       if i == argsl: break
-      varirender_count = int(argsv[i])
+      varirender_count = integer(argsv[i])
       varirender = True
       continue
 
@@ -323,7 +317,7 @@ elif ext == 'nk':
    if capmin != -1 or capmax != -1: cmd += ' -m '+ services.service.str_capacity
    if node != '':
       cmd += ' -X ' + node
-   cmd += ' -x ' + scene + ' %1,%2'
+   cmd += ' -x "' + scene + '" %1,%2'
 
 # Houdini:
 elif ext == 'hip':
@@ -333,7 +327,7 @@ elif ext == 'hip':
    cmd = 'hrender_af' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' --numcpus '+ services.service.str_capacity
    if ignoreinputs: cmd += ' -i'
-   cmd += ' -s %%1 -e %%2 -b %(by)d -t %(take)s %(scene)s %(node)s' % vars()
+   cmd += ' -s %%1 -e %%2 -b %(by)d -t %(take)s "%(scene)s" %(node)s' % vars()
 
 # Maya:
 elif ext == 'mb':
@@ -347,7 +341,7 @@ elif ext == 'scn':
    cmd = os.path.join( cmd, 'afrender.py')
    cmd = 'xsibatch' + cmdextension + ' -script %s' % cmd
    cmd += ' -lang Python -main afRender -args'
-   cmd += ' -scene %s' % scene
+   cmd += ' -scene "%s"' % scene
    cmd += ' -start %1 -end %2 -step ' + str(by)
    cmd += ' -simulate'
    if simulate:   cmd += ' 1'
@@ -365,7 +359,7 @@ elif ext == 'scn':
 # 3D MAX:
 elif ext == 'max':
    scenetype = 'max'
-   cmd = '3dsmaxcmd' + cmdextension + ' ' + scene + ' -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
+   cmd = '3dsmaxcmd' + cmdextension + ' "' + scene + '" -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
 
 # simple generic:
 else:
