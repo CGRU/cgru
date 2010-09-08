@@ -25,7 +25,7 @@ parser.add_option('--filedate',         dest='filedate',       type  ='string', 
 parser.add_option('-t', '--template',   dest='template',       type  ='string',     default='',          help='Draw template to use')
 parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='720x576',   help='Format: 720x576')
 parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
-parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='100',       help='Output image quality')
+parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='',          help='Output image quality')
 parser.add_option('--drawcolorbars',    dest='drawcolorbars',  action='store_true', default=False,       help='Draw file name')
 parser.add_option('--draw169',          dest='draw169',        type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
 parser.add_option('--draw235',          dest='draw235',        type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
@@ -178,8 +178,8 @@ for line in cmdlines: cmd += ' ' + line.strip() % vars()
 # Add logo in path specified:
 if options.logopath != '': cmd += ' "%s" -compose plus -composite' % options.logopath
 
-# Set quality:
-cmd += ' -quality ' + options.quality
+# Set quality if specified:
+if options.quality != '': cmd += ' -quality ' + options.quality
 
 # Set/Reset common properties:
 cmd += ' -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'

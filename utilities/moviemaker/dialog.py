@@ -298,16 +298,6 @@ class Dialog( QtGui.QWidget):
       self.lTemplates.addWidget( self.cbTemplateF)
       self.parameterslayout.addLayout( self.lTemplates)
 
-      self.lJQuality = QtGui.QHBoxLayout()
-      self.tJQuality = QtGui.QLabel('JPEG Quality:', self)
-      self.sbJQuality = QtGui.QSpinBox( self)
-      self.sbJQuality.setRange( 1, 100)
-      self.sbJQuality.setValue( 90)
-      QtCore.QObject.connect( self.sbJQuality, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.lJQuality.addWidget( self.tJQuality)
-      self.lJQuality.addWidget( self.sbJQuality)
-      self.parameterslayout.addLayout( self.lJQuality)
-
       self.gDrawing = QtGui.QGroupBox('Drawing')
       self.lDrawing = QtGui.QVBoxLayout()
       self.gDrawing.setLayout( self.lDrawing)
@@ -664,7 +654,6 @@ class Dialog( QtGui.QWidget):
          if activity != '': cmd += ' --activity "%s"' % activity
          if comments != '': cmd += ' --comments "%s"' % comments
          if font     != '': cmd += ' --font "%s"'     % font
-         if self.sbJQuality.value() != -1: cmd += ' -q %d' % self.sbJQuality.value()
          if self.cTime.isChecked(): cmd += ' --addtime'
          cacher = self.cbCacherH.itemData( self.cbCacherH.currentIndex()).toString()
          if not cacher.isEmpty(): cmd += ' --draw169 %s' % cacher

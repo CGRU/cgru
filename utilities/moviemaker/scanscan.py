@@ -11,8 +11,7 @@ BadFileCaracters = '. \\/:;`~!@#$%^&*()[]|,\'"{}'
 
 parser.add_option('-c', '--codec',        dest='codec',        type  ='string',     default='aphotojpg.ffmpeg', help='File with encode command line in last line')
 parser.add_option('-f', '--fps',          dest='fps',          type  ='int',        default=25,          help='Frames per second')
-parser.add_option('-q', '--quality',      dest='quality',      type  ='int',        default=50,          help='JPEG quality')
-parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='JPEG quality')
+parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='Movie resolution')
 parser.add_option('-e', '--extensions',   dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
 parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
 parser.add_option('-g', '--gamma',        dest='gamma',        type  ='float',      default=-1.0,        help='Apply gamma correction')

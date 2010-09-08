@@ -12,7 +12,6 @@ Parser.add_option('-i', '--input',     dest='input',     type  ='string',     de
 Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',          help='Output folder for movies')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',   help='Frame paint template')
 Parser.add_option('-e', '--extensions',dest='extensions',type  ='string',     default='',          help='Files extensions, comma searated')
-Parser.add_option('-q', '--jpgquality',dest='jpgquality',type  ='int',        default=90,          help='JPEG quality')
 Parser.add_option('-a', '--abspath',   dest='abspath',   action='store_true', default=False,       help='Prefix movies with images absolute path')
 Parser.add_option('-A', '--afanasy',   dest='afanasy',   type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 Parser.add_option('-m', '--maxhosts',  dest='maxhosts',  type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
@@ -151,19 +150,9 @@ class Dialog( QtGui.QWidget):
       self.editExtensions = QtGui.QLineEdit( Options.extensions, self)
       QtCore.QObject.connect( self.editExtensions, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lExtensions.addWidget( self.editExtensions)
-      self.tExtensions2 = QtGui.QLabel('(empty - find all known)', self)
+      self.tExtensions2 = QtGui.QLabel('(comma separated list, empty - find all known)', self)
       self.lExtensions.addWidget( self.tExtensions2)
       self.parameterslayout.addLayout( self.lExtensions)
-
-      self.lJQuality = QtGui.QHBoxLayout()
-      self.tJQuality = QtGui.QLabel('JPEG Quality:', self)
-      self.sbJQuality = QtGui.QSpinBox( self)
-      self.sbJQuality.setRange( 1, 100)
-      self.sbJQuality.setValue( Options.jpgquality)
-      QtCore.QObject.connect( self.sbJQuality, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.lJQuality.addWidget( self.tJQuality)
-      self.lJQuality.addWidget( self.sbJQuality)
-      self.parameterslayout.addLayout( self.lJQuality)
 
       self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
       self.lCorr = QtGui.QHBoxLayout()
@@ -269,7 +258,6 @@ class Dialog( QtGui.QWidget):
       if self.dsbGamma.value() != 1.0: cmd += ' -g %.2f' % self.dsbGamma.value()
       if template != '': cmd += ' -t "%s"' % template
       if extensions != '': cmd += ' -e "%s"' % extensions
-      if self.sbJQuality.value() != -1: cmd += ' -q %d' % self.sbJQuality.value()
       if self.cAbsPath.isChecked(): cmd += ' -a'
       if self.cAfanasy.isChecked():
          cmd += ' -A %d' % self.sbAfCapacity.value()

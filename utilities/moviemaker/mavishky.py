@@ -45,11 +45,12 @@ parser.add_option('--afconvcap',        dest='afconvcap',   type  ='int',       
 parser.add_option('--afenccap',         dest='afenccap',    type  ='int',        default=-1,          help='Afanasy encode task capacity, -1=default')
 parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user, ''=current')
 parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makemovie+date will be used')
+parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='tga',       help='Temporary images format')
 
 # Options to makeframe:
 parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
-parser.add_option('-q', '--quality',    dest='quality',     type  ='int',        default=-1,          help='Converted JPEG quality')
+parser.add_option('-q', '--quality',    dest='quality',     type  ='string',     default='',          help='Temporary image quality, or format options')
 parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
 parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
 parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
@@ -79,6 +80,7 @@ verbose     = options.verbose
 debug       = options.debug
 
 tmpdir      = options.tmpdir
+tmpformat   = options.tmpformat
 
 # Parameters initialization:
 if debug: verbose = True
@@ -87,9 +89,8 @@ if debug: print 'DEBUG MODE:'
 
 
 # Definitions:
-tmpName   = 'img'
-tmpFormat = 'jpg'
-tmpLogo   = 'logo.png'
+tmpname   = 'img'
+tmplogo   = 'logo.png'
 
 need_convert = False
 need_logo = False
@@ -204,9 +205,20 @@ if verbose: print 'Output = ' + output
 
 # Temporary directory:
 if not debug:
-   if tmpdir == '': tmpdir = os.path.join( os.path.dirname(output), '.makemovie.' + time.strftime('%y-%m-%d_%H-%M-%S'))
+   if tmpdir == '':
+      ftime = time.time()
+      tmpdir = 'makemovie.' + time.strftime('%y-%m-%d_%H-%M-%S_') + str(ftime - int(ftime))[2:]
+      if options.afanasy:
+         tmpdir = os.path.join( os.path.dirname(output), '.' + tmpdir)
+      else:
+         tmp = os.getenv('TMPDIR', os.getenv('TMP', os.getenv('TEMP')))
+         if tmp is None:
+            if sys.platform.find('win') == 0: tmp = 'c:\\temp'
+            else: tmp = '/tmp'
+         tmpdir = os.path.join( tmp, tmpdir)
    if os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
-if verbose: print 'TempDir = ' + tmpdir
+   print 'Temporary Directory:'
+   print tmpdir
 
 # Resolution:
 width = 0
@@ -226,8 +238,8 @@ cmd_makeframe = os.path.join( os.path.dirname(sys.argv[0]), 'makeframe.py')
 cmd_makeframe = 'python ' + cmd_makeframe
 
 cmd_args = ''
-if options.quality      != -1: cmd_args += ' -q %d' % options.quality
 if options.resolution   != '': cmd_args += ' -r %s' % options.resolution
+if options.quality      != '': cmd_args += ' -q %s' % options.quality
 if options.company      != '': cmd_args += ' -c "%s"' % options.company
 if options.project      != '': cmd_args += ' -p "%s"' % options.project
 if options.artist       != '': cmd_args += ' -a "%s"' % options.artist
@@ -249,7 +261,7 @@ if need_convert and options.slate != '':
    cmd = cmd_makeframe + cmd_args
    cmd += ' --drawcolorbars' + cmd_args
    cmd += ' -t "%s"' % options.slate
-   cmd += ' "%s"' % (os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat)
+   cmd += ' "%s"' % (os.path.join( tmpdir, tmpname) + '.%07d.' % imgCount + tmpformat)
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')
    imgCount += 1
@@ -261,13 +273,13 @@ if logopath != '':
       logosizes = logosize.split('x')
       logotx = width  - int(logosizes[0])
       logoty = height - int(logosizes[1])
-      tmpLogo = os.path.join( tmpdir, tmpLogo)
+      tmplogo = os.path.join( tmpdir, tmplogo)
       cmd = 'convert'
       cmd += ' "%s"' % logopath
       cmd += ' -gravity %s -background black' % options.logograv
       cmd += ' -resize ' + logosize
       cmd += ' -extent %(width)dx%(height)d' % vars()
-      cmd += ' "%s"' % tmpLogo
+      cmd += ' "%s"' % tmplogo
    else:
       print 'Can\'t add logo if output resolution is not specified.'
       exit(1)
@@ -284,10 +296,10 @@ if need_convert:
       if options.gamma     >  0: cmd += ' -g %.2f'     % options.gamma
       if options.draw169   >  0: cmd += ' --draw169 %d' % options.draw169
       if options.draw235   >  0: cmd += ' --draw235 %d' % options.draw235
-      if need_logo:              cmd += ' --logopath "%s"' % tmpLogo
+      if need_logo:              cmd += ' --logopath "%s"' % tmplogo
 
       cmd += ' "%s"' % os.path.join( inputdir, afile)
-      cmd += ' "%s"' % (os.path.join( tmpdir, tmpName) + '.%07d.' % imgCount + tmpFormat)
+      cmd += ' "%s"' % (os.path.join( tmpdir, tmpname) + '.%07d.' % imgCount + tmpformat)
 
       cmd_convert.append( cmd)
       name_convert.append( afile)
@@ -298,10 +310,10 @@ auxargs = ''
 if codec != 'ffmpeg':
    if not sys.platform.find('win') == 0: auxargs = '-threads 0'
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
-   if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.%07d.'+tmpFormat)
+   if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpname+'.%07d.'+tmpformat)
 elif codec == 'mencoder':
    inputmask = os.path.join( inputdir, prefix+'*'+suffix)
-   if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpName+'.*.'+tmpFormat)
+   if len(cmd_convert): inputmask = os.path.join( tmpdir, tmpname+'.*.'+tmpformat)
 else:
    print 'Unknown encoder = "%s"' % encoder
    exit(1)
