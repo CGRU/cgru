@@ -483,13 +483,13 @@ class Dialog( QtGui.QWidget):
    def browseLogo( self):
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', LogosPath)
       if afile.isEmpty(): return
-      self.editLogoPath.setText( str( afile))
+      self.editLogoPath.setText( '%s' % afile)
       self.evaluate()
 
    def browseOutput( self):
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file')
       if afile.isEmpty(): return
-      afile = str( afile)
+      afile = '%s' % afile
       self.editOutputDir.setText( os.path.dirname( afile))
       afile = os.path.basename( afile)
       pos = afile.rfind('.')
@@ -508,7 +508,7 @@ class Dialog( QtGui.QWidget):
       self.editInputFilesCount.clear()
       self.editInputFilesPattern.clear()
       self.editIdentify.clear()
-      inputfile = str( self.editInputFile.text())
+      inputfile = '%s' % self.editInputFile.text()
       if sys.platform.find('win') == 0: inputfile = inputfile.replace('/','\\')
 
       if len(inputfile) == 0:
@@ -584,7 +584,7 @@ class Dialog( QtGui.QWidget):
          self.editOutputName.clear()
          self.editOutputDir.clear()
 
-      project = str( self.editProject.text())
+      project = '%s' % self.editProject.text()
       if Options.project == '':
          if self.cAutoTitles.isChecked() or project == '':
             if sys.platform.find('win') == 0:
@@ -597,28 +597,28 @@ class Dialog( QtGui.QWidget):
                else: project = pat_split[len(pat_split)-1]
             self.editProject.setText( project)
 
-      shot = str( self.editShot.text())
+      shot = '%s' % self.editShot.text()
       if self.cAutoTitles.isChecked() or shot == '':
          shot = self.inputPrefix.strip('.').upper()
          self.editShot.setText( shot)
 
-      version = str( self.editVersion.text())
+      version = '%s' % self.editVersion.text()
       if self.cAutoTitles.isChecked() or version == '':
          version = os.path.basename( os.path.dirname(self.inputPattern))
          self.editVersion.setText( version)
 
-      company  = str( self.editCompany.text())
-      artist   = str( self.editArtist.text())
-      activity = str( self.editActivity.text())
-      comments = str( self.editComments.text())
-      font     = str( self.editFont.text())
+      company  = '%s' % self.editCompany.text()
+      artist   = '%s' % self.editArtist.text()
+      activity = '%s' % self.editActivity.text()
+      comments = '%s' % self.editComments.text()
+      font     = '%s' % self.editFont.text()
 
-      outdir = str( self.editOutputDir.text())
+      outdir = '%s' % self.editOutputDir.text()
       if self.cAutoOutput.isChecked() or outdir == None or outdir == '':
          outdir = os.path.dirname( self.inputDir)
          self.editOutputDir.setText( outdir)
 
-      outname = str( self.editOutputName.text())
+      outname = '%s' % self.editOutputName.text()
       if self.cAutoOutput.isChecked() or outname == None or outname == '':
          outname = shot
          if activity != '': outname += '_' + activity
@@ -680,16 +680,16 @@ class Dialog( QtGui.QWidget):
 
    def execute( self):
       if not self.evaluated: return
-      self.command = str( self.cmdField.toPlainText())
+      self.command = '%s' % self.cmdField.toPlainText()
       if len( self.command) == 0: return
 
       if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
          af = __import__('af', globals(), locals(), [])
-         job = af.Job( str(self.editOutputName.text()) + ' mavishka')
+         job = af.Job( '%s' % self.editOutputName.text() + ' mavishka')
          block = af.Block('mavishky')
          if self.sbAfCapacity.value() != -1: block.setCapacity( self.sbAfCapacity.value())
          job.blocks.append( block)
-         task = af.Task( str(self.editOutputName.text()))
+         task = af.Task( '%s' % self.editOutputName.text())
          task.setCommand( self.command)
          block.tasks.append( task)
          job.send()
