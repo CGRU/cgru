@@ -167,6 +167,7 @@ def SubmitButton_OnClicked():
             blockimages.append( images_str)
             value += varirender_step
       else:
+         blockname = 'xsi'
          images_str = ''
          for img in images:
             if images_str != '': images_str += ';'
