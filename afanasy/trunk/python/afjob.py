@@ -30,9 +30,9 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -fpt 3               -   frames per task\n\
 -pwd projects/test   -   working wirectory\n\
 -name my_job         -   job name\n\
--node                -   node to render ( houdini driver or nuke write )\n\
+-node                -   node to render ( houdini driver, nuke write, max camera )\n\
 -type                -   service type\n\
--take                -   take to use ( houdini render with take, xsi pass )\n\
+-take                -   take to use ( houdini take, xsi pass, max batch )\n\
 -ignoreinputs        -   not to render input nodes ( houdini ignore inputs ROP parameter )\n\
 -tempscene           -   copy scene to temporary file to render\n\
 -deletescene         -   delete scene when job deleted\n\
@@ -304,6 +304,8 @@ if tempscene:
    scene = cgruutils.copyJobFile( scene, name, ext)
    if scene == '': sys.exit(1)
 
+# Initialize general parameters:
+blockname = node
 
 # Shake:
 if   ext == 'shk':
@@ -315,8 +317,7 @@ elif ext == 'nk':
    scenetype = 'nuke'
    cmd = 'nuke' + cmdextension + ' -i'
    if capmin != -1 or capmax != -1: cmd += ' -m '+ services.service.str_capacity
-   if node != '':
-      cmd += ' -X ' + node
+   if node != '': cmd += ' -X ' + node
    cmd += ' -x "' + scene + '" %1,%2'
 
 # Houdini:
@@ -360,6 +361,12 @@ elif ext == 'scn':
 elif ext == 'max':
    scenetype = 'max'
    cmd = '3dsmaxcmd' + cmdextension + ' "' + scene + '" -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
+   if node != '': cmd += ' -camera:"%s"' % node
+   if take != '':
+      cmd += ' -batchrender'
+      if take != 'all': cmd += ':"%s"' % take
+      if blockname != '': blockname = take + ' ' + blockname
+      else: blockname = take
 
 # simple generic:
 else:
@@ -371,7 +378,6 @@ else:
 
 # Create a Block(s) af first:
 blocks = []
-blockname = node
 if blockname == '': blockname = scenetype
 if blocktype == '': blocktype = scenetype
 if len( cmds) == 0:

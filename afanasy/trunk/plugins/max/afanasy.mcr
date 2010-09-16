@@ -5,100 +5,151 @@ toolTip:"Render by Afanasy..."
 (
 global ver = "Afanasy"
 
--- Delete old windows:
-if (AfanasyDialog != undefined) do (
+-- Set initial parameters:
+-- Job name:
+local jobname = maxFileName
+local startFrame = rendStart.frame as integer
+local endFrame = rendEnd.frame as integer
+local byFrame = rendNThFrame
+local taskFrameNumber = 1
+local saveTempScene = false
+local startPaused = false
+
+-- Get scene cameras:
+local CameraNames = #("")
+for cam in cameras do
+(
+   if cam.isTarget then continue
+   append CameraNames cam.name
+)
+
+-- Get batch render views:
+local BatchViewNames = #("", "all")
+for i = 1 to batchRenderMgr.numViews do
+(
+   local batchview = batchRenderMgr.getView i
+   append BatchViewNames batchview.name
+)
+
+-- Delete old dialog:
+if (AfanasyDialog != undefined) do
+(
    try DestroyDialog AfanasyDialog
    catch ()
 )   
 
-function createCommand useTemp taskFrameNumber pause= (
-
-   local startFramei = 1
-   local endFramei = 1
-   local byFramei = rendNThFrame
-   local taskFrameNumberi = taskFrameNumber as integer
-
-   --1 - A single frame. 
-   --2 - The active time segment. 
-   --3 - The user specified range. 
-   --4 - The user specified frame pickup string (for example "1,3,5-12"). 
-   
-   if rendTimeType == 1 then(
-      startFramei = currentTime.frame as integer
-      endFramei = currentTime.frame as integer
-   )
-   if rendTimeType == 2 then(
-      startFramei = animationRange.start.frame as integer
-      endFramei = animationRange.end.frame as integer
-   )
-   if rendTimeType == 3 then(
-      startFramei = rendStart.frame as integer
-      endFramei = rendEnd.frame as integer
-   )
-   if rendTimeType == 4 then(
-      format "-- Warning: Can render frame range only.%\n" ""
-      startFramei = rendStart.frame as integer
-      endFramei = rendEnd.frame as integer
-   )
-
-   local cmd = "afjob.py "
-   cmd += "\"" + maxFilePath + maxFileName + "\""
-   cmd += " " + (startFramei as string)
-   cmd += " " + (endFramei as string)
-   cmd += " -fpt " + (taskFrameNumberi as string)
-   cmd += " -by " + (rendNThFrame as string)
-   if (rendOutputFilename != '') then (
-      cmd += " -image " + rendOutputFilename
-   )
-   if (useTemp == true) then (
-      cmd += " -tempscene"
-      cmd += " -deletescene"
-   )
-   if (pause == true) then (
-      cmd += " -pause"
-   )
-   return cmd
-)	
-
 rollout AfanasyDialog ver
 (
-   checkbox useTempControl "Save Temporary Scene" pos:[16,10] width:152 height:20 checked:false toolTip:"Save scene to temporary file before render."
-   spinner taskFrameNumberControl "Frames Per Task" pos:[70,40]  width:60 height:19 range:[1,999,1] type:#integer scale:1 toolTip:"Number of frames in one task"
-   button renderButton "Render" pos:[16,70] width:64 height:24 toolTip:"Start Render Proces"
-   button closeButton "Close" pos:[80,70] width:64 height:24 toolTip:"Close window"
-   checkbox pauseControl "Start Job Paused" pos:[16,100] checked:false toolTip:"Send job paused."
+-- Job name:
+   edittext jobnameControl "Job Name" text:jobname
+-- Frame range:
+   spinner startFrameControl "Start Frame" range:[1,99999,startFrame] type:#integer scale:1 toolTip:"First frame to render."
+   spinner endFrameControl "End Frame" range:[1,99999,endFrame] type:#integer scale:1 toolTip:"Last Frame to render."
+   spinner byFrameControl "By Frame" range:[1,999,byFrame] type:#integer scale:1 toolTip:"Render every Nth frame."
+   spinner taskFrameNumberControl "Frames Per Task" range:[1,999,taskFrameNumber] type:#integer scale:1 toolTip:"Number of frames in one task."
+-- Cameras:
+   dropdownlist cameraControl "Override Camera" items:CameraNames toolTip:"Override render camera."
+-- Batch views:
+   dropdownlist batchControl "Render Batch View" items:BatchViewNames toolTip:"Render batch view."
+-- Priority:
+   spinner priorityControl "Priority" range:[-1,99,-1] type:#integer scale:1 toolTip:"Job order."
+-- Maximum hosts:
+   spinner maxHostsControl "Max Hosts" range:[-1,9999,-1] type:#integer scale:1 toolTip:"Maximum number of hosts job can run on."
+-- Capacity:
+   spinner capacityControl "Capacity" range:[-1,999999,-1] type:#integer scale:1 toolTip:"Job tasks capacity."
+-- Depend mask:
+   edittext dependMaskControl "Depend Mask" toolTip:"Jobs to wait names pattern (same user)."
+-- Global Depend mask:
+   edittext globalMaskControl "Global Depend" toolTip:"Jobs to wait names pattern (all users)."
+-- Hosts mask:
+   edittext hostsMaskControl "Hosts Mask" toolTip:"Hosts names pattern job can run on."
+-- Exclude hosts:
+   edittext excludeHostsControl "Exclude Hosts" toolTip:"Hosts names pattern job can not run on."
+-- Save temporarry scene:
+   checkbox useTempControl "Save Temporary Scene" checked:saveTempScene toolTip:"Save scene to temporary file before render."
+-- Render button:
+   button renderButton "Render" toolTip:"Start Render Proces."
+-- Start job paused:
+   checkbox pauseControl "Start Job Paused" checked:startPaused toolTip:"Send job paused."
 
+   on batchControl selected i do
+   (
+      local restore = true
+      if i > 2 then
+      (
+         local numview = i - 2
+         local batchview = batchRenderMgr.getView numview
+         if batchview.overridePreset then
+         (
+            startFrameControl.value = batchview.startFrame
+            endFrameControl.value = batchview.endFrame
+            restore = false
+         )
+      )
+      if restore then
+      (
+         startFrameControl.value = startFrame
+         endFrameControl.value = endFrame
+      )
+   )
+   
    on renderButton pressed do
    (
-      local useTemp = useTempControl.checked 
-      local taskFrameNumber = taskFrameNumberControl.value
-      local pause = pauseControl.checked 
-
-      -- Save scene:
+-- Save scene:
       max file save
 
-      -- Create command:
-      local cmd = createCommand useTemp taskFrameNumber pause
-
-      -- If errors, empty command generated and return:
-      if (cmd == "") then (
-         return false
+-- Create command:
+      local cmd = "afjob.py "
+      cmd += "\"" + maxFilePath + maxFileName + "\""
+      cmd += " " + (startFrameControl.value as string)
+      cmd += " " + (endFrameControl.value as string)
+      cmd += " -fpt " + (taskFrameNumberControl.value as string)
+      cmd += " -by " + (byFrameControl.value as string)
+      if priorityControl.value > -1 then cmd += " -priority " + (priorityControl.value as string)
+      if maxHostsControl.value > -1 then cmd += " -maxhosts " + (maxHostsControl.value as string)
+      if capacityControl.value > -1 then cmd += " -capacity " + (capacityControl.value as string)
+      if jobnameControl.text      != "" then cmd += " -name \""      + jobnameControl.text      + "\""
+      if dependMaskControl.text   != "" then cmd += " -depmask \""   + dependMaskControl.text   + "\""
+      if globalMaskControl.text   != "" then cmd += " -depglbl \""   + globalMaskControl.text   + "\""
+      if hostsMaskControl.text    != "" then cmd += " -hostsmask \"" + hostsMaskControl.text    + "\""
+      if excludeHostsControl.text != "" then cmd += " -hostsexcl \"" + excludeHostsControl.text + "\""
+      if pauseControl.checked == true then cmd += " -pause"
+      if useTempControl.checked == true then (
+         cmd += " -tempscene"
+         cmd += " -deletescene"
+      )
+      if cameraControl.selection > 1 then cmd += " -node \"" + cameraControl.selected + "\""
+      if batchControl.selection > 1 then
+      (
+         cmd += " -take \"" + batchControl.selected + "\""
+         if batchControl.selection > 2 then
+         (
+            local batchview = batchRenderMgr.getView(batchControl.selection-2)
+            local image = batchview.outputFilename
+            if image != "" then cmd += " -image \"" + image + "\""
+         )
+      )
+      else
+      (
+         if rendOutputFilename != "" then cmd += " -image \"" + rendOutputFilename + "\""
       )
 
-      -- Prepare  command:
+-- Prepare  command:
       cmd = systemTools.getEnvVariable("AF_ROOT") + "\\python\\" + cmd
       cmd = "python " + cmd
       format "-- %\n" cmd
 
-      -- Prepare command output file
+-- Prepare command output file
       local outputfile = "afanasy_submint_max.txt"
       local tempdir = systemTools.getEnvVariable("TMP")
       if tempdir == undefined then tempdir = systemTools.getEnvVariable("TEMP")
       if tempdir == undefined then tempdir = "c:\\temp"
       local outputfile = tempdir + "\\" + outputfile
 
-      -- Launch command with redirected output:
-      HiddenDOSCommand (cmd + " > " + outputfile) ExitCode:&status
+-- Launch command with redirected output:
+      HiddenDOSCommand (cmd + " > " + outputfile + " 2>&1") ExitCode:&status
+
+-- Output error if bad command exit status:
       if status != 0 then
       (
          format "-- %\n" "Error:"
@@ -110,14 +161,6 @@ rollout AfanasyDialog ver
          )
          close outtext
       )
-
-      -- Close dialog:
-      DestroyDialog AfanasyDialog
-   )
-
-   on closeButton pressed do	(
-      try DestroyDialog AfanasyDialog
-      catch ()
    )
 )
 CreateDialog  AfanasyDialog style:#(#style_titlebar, #style_border, #style_sysmenu,#style_minimizebox,#style_sunkenedge)

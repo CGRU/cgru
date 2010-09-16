@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <link href="../../../../doc/styles.css" rel="stylesheet" type="text/css" />
-<title>XSI Afanasy Setup</title>
+<title>MAX Afanasy</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -25,74 +25,46 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">XSI Afanasy Setup</h2>
+<h2 align="center">Afanasy in 3D Studio MAX</h2>
 <hr />
 
-<p>
-Afanasy XSI python plugin is located in <kbd>cgru/plugins/xsi</kbd> directory.
-You can add it automatically by adding this directory to <code>XSI_PLUGINS</code> variable.
-This plugin imports Afanasy version dependent libraries, located in <kbd>afanasy/plugins/xsi</kbd>.
-So you should add this folder in <code>PYTHONPATH</code> variable.
-</p>
-
-<h4>XSI Setup Example:</h4>
-<p>
-You can use <code>xsi</code> and <code>xsibatch</code> commands, which call the same setup script.
-</p>
-
-<p>xsi.cmd</p>
-<table><tr><td><pre>
-
-   call setup_xsi.cmd
-
-   "%XSI_LOCATION%\Application\bin\XSI.bat" %*                 
-
-</pre></td></tr></table>
-
-<p>xsibatch.cmd</p>
-<table><tr><td><pre>
-
-   call setup_xsi.cmd
-
-   "%XSI_LOCATION%\Application\bin\XSIBatch.bat" %*            
-
-</pre></td></tr></table>
-
-<p>setup_xsi.cmd</p>
-<table><tr><td><pre>
-
-   call setup_cgru.cmd
-   call setup_afanasy.cmd
-
-   set XSI_CGRU_PATH=%CGRU_LOCATION%\plugins\xsi
-   set XSI_AF_PATH=%AF_ROOT%\plugins\xsi
-
-   set XSI_LOCATION=C:\Program Files\Autodesk\Softimage 2011   
-
-   if exist override.cmd call override.cmd
-
-   if defined XSI_PLUGINS (
-      set XSI_PLUGINS=%XSI_CGRU_PATH%;%XSI_PLUGINS%
-   ) else (
-      set XSI_PLUGINS=%XSI_CGRU_PATH%
-   )
-
-   if defined PYTHONPATH (
-      set PYTHONPATH=%XSI_AF_PATH%;%PYTHONPATH%
-   ) else (
-      set PYTHONPATH=%XSI_AF_PATH%
-   )
-
-</pre></td></tr></table>
-
-<p>
-Where <i>setup_cgru.cmd</i> and <i>setup_afanasy.cmd</i>
-are script which setup CGRU and Afanasy in your company, or project, or asset.
-</p>
-
-<p>
-Full working example is located in <kbd>cgru/examples/xsi</kbd>.
-</p>
+<h3>Afanasy Window</h3>
+<b>CGRU - > Afanasy...</b>
+<p align="center"><img src="images/afwindow_submission.png" alt="afwindow_submission.png" /></p>
+<ul>
+<li><b>Job Name</b> - Job name. Scene name by default.
+</li>
+<li><b>Start Frame</b> - First frame to render.
+</li>
+<li><b>End Frame</b> - Last frame to render.
+</li>
+<li><b>By Frame</b> - Render every Nth frame.
+</li>
+<li><b>Frames Per Task</b> - Number of frames in one task.
+</li>
+<li><b>Override camera</b> - Select camera to render.
+</li>
+<li><b>Render Batch View</b> - Select batch view to render.
+</li>
+<li><b>Priority</b> - Job order in user job list, '-1' - use default priority.
+</li>
+<li><b>Max Hosts</b> - Maximum number of hosts job can capture (running tasks limit), '-1' - no limit.
+</li>
+<li><b>Capacity</b> - Job tasks capacity, '-1' - use default value.
+</li>
+<li><b>Depend Mask</b> - Wait same user jobs names pattern.
+</li>
+<li><b>Global Depend</b> - Wait any user jobs names pattern.
+</li>
+<li><b>Hosts Mask</b> - Job can run only on hosts which names match this pattern.
+</li>
+<li><b>Exclude Hosts</b> - Job can not run on hosts which names match this pattern.
+</li>
+<li><b>Save Temporary Scene</b> - Copy scene to temporary file to render. It allows user to continue working with original file.
+</li>
+<li><b>Start Job Paused</b> - Send job in offline state.
+</li>
+</ul>
 
 <!--FOOTER-->
 <br/>

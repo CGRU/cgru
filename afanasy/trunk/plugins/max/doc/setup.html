@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <link href="../../../../doc/styles.css" rel="stylesheet" type="text/css" />
-<title>XSI Afanasy Setup</title>
+<title>MAX Afanasy Setup</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -25,63 +25,57 @@
 <table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
 <!--HEADER-->
 
-<h2 align="center">XSI Afanasy Setup</h2>
+<h2 align="center">MAX Afanasy Setup</h2>
 <hr />
 
 <p>
-Afanasy XSI python plugin is located in <kbd>cgru/plugins/xsi</kbd> directory.
-You can add it automatically by adding this directory to <code>XSI_PLUGINS</code> variable.
-This plugin imports Afanasy version dependent libraries, located in <kbd>afanasy/plugins/xsi</kbd>.
-So you should add this folder in <code>PYTHONPATH</code> variable.
+Afanasy MAX max submission script is located in <kbd>afanasy/plugins/max</kbd> directory.
+It cab be called through CGRU menu.
+CGRU and Afanasy environment must be set.
 </p>
 
-<h4>XSI Setup Example:</h4>
+<h4>MAX Setup Example:</h4>
 <p>
-You can use <code>xsi</code> and <code>xsibatch</code> commands, which call the same setup script.
+You can use <code>3dsmax</code> and <code>3dsmaxcmd</code> commands, which call the same setup script.
 </p>
 
-<p>xsi.cmd</p>
+<p>3dsmax.cmd</p>
 <table><tr><td><pre>
 
-   call setup_xsi.cmd
+   call setup_max.cmd
 
-   "%XSI_LOCATION%\Application\bin\XSI.bat" %*                 
+   IF [%1]==[] (
+   set TOSTART=start
+   ) ELSE (
+   set TOSTART=
+   )
+
+   %TOSTART% 3dsmax.exe %*
 
 </pre></td></tr></table>
 
-<p>xsibatch.cmd</p>
+<p>3dsmaxcmd.cmd</p>
 <table><tr><td><pre>
 
-   call setup_xsi.cmd
+   call setup_max.cmd
 
-   "%XSI_LOCATION%\Application\bin\XSIBatch.bat" %*            
+   3dsmaxcmd.exe %*
 
 </pre></td></tr></table>
 
-<p>setup_xsi.cmd</p>
+<p>setup_max.cmd</p>
 <table><tr><td><pre>
 
    call setup_cgru.cmd
    call setup_afanasy.cmd
 
-   set XSI_CGRU_PATH=%CGRU_LOCATION%\plugins\xsi
-   set XSI_AF_PATH=%AF_ROOT%\plugins\xsi
+   set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2010
 
-   set XSI_LOCATION=C:\Program Files\Autodesk\Softimage 2011   
+   PATH=%CGRU_LOCATION%\plugins\max;%PATH%
 
    if exist override.cmd call override.cmd
 
-   if defined XSI_PLUGINS (
-      set XSI_PLUGINS=%XSI_CGRU_PATH%;%XSI_PLUGINS%
-   ) else (
-      set XSI_PLUGINS=%XSI_CGRU_PATH%
-   )
-
-   if defined PYTHONPATH (
-      set PYTHONPATH=%XSI_AF_PATH%;%PYTHONPATH%
-   ) else (
-      set PYTHONPATH=%XSI_AF_PATH%
-   )
+   set PATH=%MAX_LOCATION%;%PATH%
 
 </pre></td></tr></table>
 
@@ -91,7 +85,7 @@ are script which setup CGRU and Afanasy in your company, or project, or asset.
 </p>
 
 <p>
-Full working example is located in <kbd>cgru/examples/xsi</kbd>.
+Full working example is located in <kbd>cgru/examples/max</kbd>.
 </p>
 
 <!--FOOTER-->
