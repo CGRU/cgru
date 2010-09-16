@@ -50,14 +50,14 @@ You can use <code>3dsmax</code> and <code>3dsmaxcmd</code> commands, which call 
    set TOSTART=
    )
 
-   %TOSTART% 3dsmax.exe %*
+   %TOSTART% 3dsmax.exe %*   
 
 </pre></td></tr></table>
 
 <p>3dsmaxcmd.cmd</p>
 <table><tr><td><pre>
 
-   call setup_max.cmd
+   call setup_max.cmd   
 
    3dsmaxcmd.exe %*
 
@@ -69,7 +69,7 @@ You can use <code>3dsmax</code> and <code>3dsmaxcmd</code> commands, which call 
    call setup_cgru.cmd
    call setup_afanasy.cmd
 
-   set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2010
+   set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2010   
 
    PATH=%CGRU_LOCATION%\plugins\max;%PATH%
 
