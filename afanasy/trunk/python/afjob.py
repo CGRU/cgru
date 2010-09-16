@@ -414,4 +414,4 @@ if platform != '':
 job.blocks.extend( blocks)
 
 # Send Job to server:
-job.send()
+if job.send() == False: sys.exit(1)
