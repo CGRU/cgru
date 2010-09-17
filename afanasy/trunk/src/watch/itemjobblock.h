@@ -75,9 +75,9 @@ public:
    enum SortType
    {
       SNULL = 0,
+      SHost,
       SStarts,
       SErrors,
-      SHost,
       STime,
       SState
    };

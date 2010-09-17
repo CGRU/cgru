@@ -249,6 +249,15 @@ bool ItemJob::setSortType(   int type )
       case CtrlSortFilter::THOSTNAME:
          sort_str = &hostname;
          break;
+      case CtrlSortFilter::TTIMECREATION:
+         sort_uint = &time_creation;
+         break;
+      case CtrlSortFilter::TTIMESTARTED:
+         sort_uint = &time_started;
+         break;
+      case CtrlSortFilter::TTIMEFINISHED:
+         sort_uint = &time_done;
+         break;
       default:
          AFERRAR("ItemJob::setSortType: Invalid type number = %d\n", type);
          return false;

@@ -54,6 +54,9 @@ private:
    int priority;
    int capacity;
 
+   unsigned time_registered;
+   unsigned time_launched;
+
    QString  address_str;      ///< Client address
 
    bool online;

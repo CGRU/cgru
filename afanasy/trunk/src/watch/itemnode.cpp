@@ -14,6 +14,7 @@ ItemNode::ItemNode( af::Node *node):
    Item( node->getName(), node->getId()),
    height( Height),
    sort_int( NULL),
+   sort_uint( NULL),
    sort_str( NULL),
    filter_str( NULL)
 {
@@ -48,11 +49,33 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
       switch( operation)
       {
          case GREATER:        return ((*sort_int) == (*other.sort_int)) ? name > other.name : ((*sort_int) >  (*other.sort_int));
-         case GREATEREQUAL:   return (*sort_int) >= (*other.sort_int);
+         case GREATEREQUAL:   return ( *sort_int) >= (*other.sort_int);
          case SMALLER:        return ((*sort_int) == (*other.sort_int)) ? name < other.name : ((*sort_int) <  (*other.sort_int));
-         case SMALLEREQUAL:   return (*sort_int) <= (*other.sort_int);
-         case EQUAL:          return (*sort_int) == (*other.sort_int);
-         case NOTEQUAL:       return (*sort_int) != (*other.sort_int);
+         case SMALLEREQUAL:   return ( *sort_int) <= (*other.sort_int);
+         case EQUAL:          return ( *sort_int) == (*other.sort_int);
+         case NOTEQUAL:       return ( *sort_int) != (*other.sort_int);
+         default:
+         {
+            AFERRAR("ItemNode::compare: Invalid operation = %d.\n", operation);
+            return false;
+         }
+      }
+   }
+   if( sort_uint )
+   {
+      if( other.sort_uint == NULL )
+      {
+         AFERROR("ItemNode::compare: other.sort_uint == NULL.\n");
+         return false;
+      }
+      switch( operation)
+      {
+         case GREATER:        return ((*sort_uint) == (*other.sort_uint)) ? name > other.name : ((*sort_uint) >  (*other.sort_uint));
+         case GREATEREQUAL:   return ( *sort_uint) >= (*other.sort_uint);
+         case SMALLER:        return ((*sort_uint) == (*other.sort_uint)) ? name < other.name : ((*sort_uint) <  (*other.sort_uint));
+         case SMALLEREQUAL:   return ( *sort_uint) <= (*other.sort_uint);
+         case EQUAL:          return ( *sort_uint) == (*other.sort_uint);
+         case NOTEQUAL:       return ( *sort_uint) != (*other.sort_uint);
          default:
          {
             AFERRAR("ItemNode::compare: Invalid operation = %d.\n", operation);
@@ -70,11 +93,11 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
       switch( operation)
       {
          case GREATER:        return ((*sort_str) == (*other.sort_str)) ? name > other.name : ((*sort_str) >  (*other.sort_str));
-         case GREATEREQUAL:   return (*sort_str) >= (*other.sort_str);
+         case GREATEREQUAL:   return ( *sort_str) >= (*other.sort_str);
          case SMALLER:        return ((*sort_str) == (*other.sort_str)) ? name < other.name : ((*sort_str) <  (*other.sort_str));
-         case SMALLEREQUAL:   return (*sort_str) <= (*other.sort_str);
-         case EQUAL:          return (*sort_str) == (*other.sort_str);
-         case NOTEQUAL:       return (*sort_str) != (*other.sort_str);
+         case SMALLEREQUAL:   return ( *sort_str) <= (*other.sort_str);
+         case EQUAL:          return ( *sort_str) == (*other.sort_str);
+         case NOTEQUAL:       return ( *sort_str) != (*other.sort_str);
          default:
          {
             AFERRAR("ItemNode::compare: Invalid operation = %d.\n", operation);

@@ -41,6 +41,9 @@ ListRenders::ListRenders( QWidget* parent):
    ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
+   ctrl->addSortType(   CtrlSortFilter::TCAPACITY);
+   ctrl->addSortType(   CtrlSortFilter::TTIMELAUNCHED);
+   ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
    ctrl->addSortType(   CtrlSortFilter::TNAME);
    ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
    ctrl->addFilterType( CtrlSortFilter::TNONE);

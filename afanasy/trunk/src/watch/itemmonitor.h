@@ -22,6 +22,10 @@ protected:
 
 private:
 
+   unsigned time_launch;
+   unsigned time_register;
+   unsigned time_activity;
+
    QString timelaunch,   timel;
    QString timeregister, timer;
    QString timeactivity, timea;

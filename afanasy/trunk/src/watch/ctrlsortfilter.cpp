@@ -16,22 +16,36 @@
 const char * CtrlSortFilter::TNAMES[] = {
 "Disabled",
 "Priority",
+"Capacity",
 "Name",
 "User Name",
 "Host Name",
 "Jobs Count",
 "Running Tasks",
+"Time Created",
+"Time Launched",
+"Time Started",
+"Time Registered",
+"Time Activity",
+"Time Finished",
 "[LAST]"
 };
 
 const char * CtrlSortFilter::TNAMES_SHORT[] = {
 "NONE",
 "PRY",
+"CAP",
 "NAME",
 "USER",
 "HOST",
 "JOBS",
 "RUN",
+"TCRT",
+"TLCH",
+"TSTR",
+"TRGS",
+"TACT",
+"TFNS",
 "[LAST]"
 };
 

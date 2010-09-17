@@ -31,11 +31,18 @@ public:
    enum TYPE{
       TNONE,
       TPRIORITY,
+      TCAPACITY,
       TNAME,
       TUSERNAME,
       THOSTNAME,
       TNUMJOBS,
       TNUMRUNNINGTASKS,
+      TTIMECREATION,
+      TTIMELAUNCHED,
+      TTIMESTARTED,
+      TTIMEREGISTERED,
+      TTIMEACTIVITY,
+      TTIMEFINISHED,
       TLAST
    };
    static const char * TNAMES[];

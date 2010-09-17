@@ -192,15 +192,8 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->drawText( x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
 
    painter->setOpacity( .7);
-   if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost+1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
-   linex -= WHost;
-   painter->setOpacity( .2);
-   painter->drawLine( linex, y, linex, y+HeightFooter-4);
-
-   painter->setOpacity( .7);
    if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "/(errors)e");
+   painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "e(errors)");
    linex -= WErrors;
    painter->setOpacity( .2);
    painter->drawLine( linex, y, linex, y+HeightFooter-4);
@@ -209,6 +202,13 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "s(starts)");
    linex -= WStarts;
+   painter->setOpacity( .2);
+   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+
+   painter->setOpacity( .7);
+   if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost+1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   painter->drawText( linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
+   linex -= WHost;
    painter->setOpacity( .2);
    painter->drawLine( linex, y, linex, y+HeightFooter-4);
 
@@ -235,6 +235,13 @@ bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
       processed = true;
    }
 
+   x += WHost;
+   if( !processed && mousex < x )
+   {
+      sort_type = SHost;
+      processed = true;
+   }
+
    x += WStarts;
    if( !processed && mousex < x )
    {
@@ -246,13 +253,6 @@ bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
    if( !processed && mousex < x )
    {
       sort_type = SErrors;
-      processed = true;
-   }
-
-   x += WHost;
-   if( !processed && mousex < x )
-   {
-      sort_type = SHost;
       processed = true;
    }
 
@@ -274,9 +274,9 @@ bool ItemJobBlock::mousePressed( const QPoint & pos,const QRect & rect)
 switch( sort_type)
 {
 case 0:        printf("Tasks %d \n",   sort_ascending); break;
+case SHost:    printf("Host %d \n",    sort_ascending); break;
 case SStarts:  printf("Start %d \n",   sort_ascending); break;
 case SErrors:  printf("Errors %d \n",  sort_ascending); break;
-case SHost:    printf("Host %d \n",    sort_ascending); break;
 case STime:    printf("Time %d \n",    sort_ascending); break;
 case SState:   printf("State %d \n",   sort_ascending); break;
 }

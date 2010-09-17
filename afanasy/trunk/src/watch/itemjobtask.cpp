@@ -60,6 +60,11 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width();
    //int h = option.rect.height();
 
+   static const int w_errors = 30;
+   static const int w_starts = 30;
+   static const int w_host   = 30;
+   static const int w_right  = w_errors + w_starts + w_host;
+
    //
    // Prepare strings:
 
@@ -70,12 +75,11 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 
    QString leftString = name;
 
-   QString rightString = QString("s%1/%2e").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
-   if( false == taskprogress.hostname.isEmpty() ) rightString += " " + taskprogress.hostname;
-
-   if( taskprogress.state & AFJOB::STATE_WARNING_MASK ) rightString = "Warning! " + rightString;
-   if( taskprogress.state & AFJOB::STATE_PARSERERROR_MASK ) rightString = "Bad Output! " + rightString;
-   if( taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK ) rightString = "Bad Result! " + rightString;
+   QString rightString;
+   if( taskprogress.state & AFJOB::STATE_WARNING_MASK         ) rightString = "Warning! ";
+   if( taskprogress.state & AFJOB::STATE_PARSERERROR_MASK     ) rightString = "Bad Output! ";
+   if( taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK ) rightString = "Bad Result! ";
+   if( false == taskprogress.hostname.isEmpty() ) rightString += taskprogress.hostname;
 
    if( taskprogress.state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK)) percent = 100;
    else
@@ -125,9 +129,16 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
       else                                       painter->setPen( afqt::QEnvironment::clr_textbright.c);
    }
 
-   painter->drawText( x+2, y+1, w - WidthInfo - 65, 12, Qt::AlignTop | Qt::AlignLeft, leftString );
+   painter->drawText( x+2, y+1, w - WidthInfo - w_right, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
    if( taskprogress.state & AFJOB::STATE_ERROR_MASK) painter->setPen( afqt::QEnvironment::qclr_black );
-   painter->drawText( x+1, y+1, w - WidthInfo-1, Height, Qt::AlignTop | Qt::AlignRight, rightString );
+
+   int text_x = w - WidthInfo-3;
+   painter->drawText( x+1, y+1, text_x, Height, Qt::AlignVCenter | Qt::AlignRight, QString("e%1").arg( taskprogress.errors_count));
+   text_x -= w_errors;
+   painter->drawText( x+1, y+1, text_x, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
+   text_x -= w_starts;
+   if( false == rightString.isEmpty() )
+      painter->drawText( x+1, y+1, text_x, Height, Qt::AlignVCenter | Qt::AlignRight, rightString);
 
    if( taskprogress.state & AFJOB::STATE_RUNNING_MASK)
    {

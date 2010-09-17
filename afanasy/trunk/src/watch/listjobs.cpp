@@ -21,7 +21,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListJobs::SortType       = CtrlSortFilter::TUSERNAME;
+int     ListJobs::SortType       = CtrlSortFilter::TTIMECREATION;
 bool    ListJobs::SortAscending  = false;
 int     ListJobs::FilterType     = CtrlSortFilter::TUSERNAME;
 bool    ListJobs::FilterInclude  = true;
@@ -38,10 +38,13 @@ ListJobs::ListJobs( QWidget* parent):
    {
       ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
       ctrl->addSortType(   CtrlSortFilter::TNONE);
-      ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-      ctrl->addSortType(   CtrlSortFilter::TNAME);
+      ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
+      ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
+      ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
       ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
       ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+      ctrl->addSortType(   CtrlSortFilter::TNAME);
+      ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
       ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
       ctrl->addFilterType( CtrlSortFilter::TNONE);
       ctrl->addFilterType( CtrlSortFilter::TNAME);

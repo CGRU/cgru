@@ -133,10 +133,12 @@ void ItemRender::updateValues( af::Node *node, int type)
    case 0: // The item was just created
    case af::Msg::TRendersList:
    {
-      username    = render->getUserName();
-      annotation  = render->getAnnontation();
-      priority    = render->getPriority();
-      capacity    = render->getCapacity();
+      username          = render->getUserName();
+      annotation        = render->getAnnontation();
+      priority          = render->getPriority();
+      capacity          = render->getCapacity();
+      time_launched     = render->getTimeLaunch();
+      time_registered   = render->getTimeRegister();
 
       const af::Address * address = render->getAddress();
       if( address ) address_str = render->getAddress()->getIPString()
@@ -190,9 +192,9 @@ void ItemRender::updateValues( af::Node *node, int type)
             plots[i]->height = 0;
 
       online = render->isOnline();
-      if( render->getTimeLaunch()) creationTime = "Launched   at " + af::time2Qstr( render->getTimeLaunch());
+      if( time_launched) creationTime = "Launched   at " + af::time2Qstr( time_launched);
       else creationTime = "Offline.";
-      if( render->getTimeRegister()) creationTime += "\nRegistered at " + af::time2Qstr( render->getTimeRegister() );
+      if( time_registered) creationTime += "\nRegistered at " + af::time2Qstr( time_registered);
       else creationTime = "\nNot registered.";
 
       busy = render->isBusy();
@@ -476,6 +478,15 @@ bool ItemRender::setSortType(   int type )
          return false;
       case CtrlSortFilter::TPRIORITY:
          sort_int = &priority;
+         break;
+      case CtrlSortFilter::TCAPACITY:
+         sort_int = &capacity;
+         break;
+      case CtrlSortFilter::TTIMELAUNCHED:
+         sort_uint = &time_launched;
+         break;
+      case CtrlSortFilter::TTIMEREGISTERED:
+         sort_uint = &time_registered;
          break;
       case CtrlSortFilter::TNAME:
          sort_str = &name;

@@ -26,10 +26,13 @@ const QString Address        = "IP: %1";
 ItemMonitor::ItemMonitor( af::Monitor *monitor):
    ItemNode( (af::Monitor*)monitor)
 {
-   timelaunch   = TimeLaunch     .arg( af::time2Qstr( monitor->getTimeLaunch()   ));
-   timel        = TimeL          .arg( af::time2Qstr( monitor->getTimeLaunch()   ));
-   timeregister = TimeRegister   .arg( af::time2Qstr( monitor->getTimeRegister() ));
-   timer        = TimeR          .arg( af::time2Qstr( monitor->getTimeRegister() ));
+   time_launch    = monitor->getTimeLaunch();
+   time_register  = monitor->getTimeRegister();
+
+   timelaunch   = TimeLaunch     .arg( af::time2Qstr( time_launch ));
+   timel        = TimeL          .arg( af::time2Qstr( time_launch ));
+   timeregister = TimeRegister   .arg( af::time2Qstr( time_register ));
+   timer        = TimeR          .arg( af::time2Qstr( time_register ));
 
    address = Address.arg( monitor->getAddress()->getIPString());
 
@@ -50,7 +53,8 @@ void ItemMonitor::updateValues( af::Node *node, int type)
 {
    af::Monitor *monitor = (af::Monitor*)node;
 
-   timea = TimeA.arg(af::time2Qstr( monitor->getTimeActivity()));
+   time_activity = monitor->getTimeActivity();
+   timea = TimeA.arg(af::time2Qstr( time_activity ));
 
    events.clear();
    eventscount = 0;
@@ -88,7 +92,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
       jobsids += QString(" %1").arg( *it);
    jobsidstitle = JobsIdsName.arg( jobsidscount);
 
-   tooltip = tip.arg(af::time2Qstr( monitor->getTimeActivity()));
+   tooltip = tip.arg(af::time2Qstr( time_activity));
    for( int e = 0; e < af::Monitor::EventsCount; e++)
    {
       int etype = e + af::Monitor::EventsShift;
@@ -146,6 +150,15 @@ bool ItemMonitor::setSortType(   int type )
          return false;
       case CtrlSortFilter::TNAME:
          sort_str = &name;
+         break;
+      case CtrlSortFilter::TTIMELAUNCHED:
+         sort_uint = &time_launch;
+         break;
+      case CtrlSortFilter::TTIMEREGISTERED:
+         sort_uint = &time_register;
+         break;
+      case CtrlSortFilter::TTIMEACTIVITY:
+         sort_uint = &time_activity;
          break;
       default:
          AFERRAR("ItemMonitor::setSortType: Invalid type number = %d\n", type);

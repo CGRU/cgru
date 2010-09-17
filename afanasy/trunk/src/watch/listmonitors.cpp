@@ -32,6 +32,9 @@ ListMonitors::ListMonitors( QWidget* parent):
    ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TNAME);
+   ctrl->addSortType(   CtrlSortFilter::TTIMELAUNCHED);
+   ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
+   ctrl->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
    ctrl->addFilterType( CtrlSortFilter::TNONE);
    ctrl->addFilterType( CtrlSortFilter::TNAME);
    initSortFilterCtrl();
