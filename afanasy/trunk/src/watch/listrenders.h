@@ -67,4 +67,5 @@ private:
    static QString FilterString;
    static int     FilterType;
    static bool    FilterInclude;
+   static bool    FilterMatch;
 };

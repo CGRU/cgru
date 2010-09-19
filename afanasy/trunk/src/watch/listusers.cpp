@@ -25,12 +25,13 @@ int     ListUsers::SortType       = CtrlSortFilter::TPRIORITY;
 bool    ListUsers::SortAscending  = false;
 int     ListUsers::FilterType     = CtrlSortFilter::TNAME;
 bool    ListUsers::FilterInclude  = true;
+bool    ListUsers::FilterMatch    = false;
 QString ListUsers::FilterString   = "";
 
 ListUsers::ListUsers( QWidget* parent):
    ListNodes(  parent, af::Msg::TUsersListRequest)
 {
-   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
+   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
    ctrl->addSortType(   CtrlSortFilter::TNAME);

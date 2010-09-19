@@ -41,6 +41,7 @@ protected:
    bool setFilter( const QString & str);
    bool filtering;
    bool filterinclude;
+   bool filtermatch;
    void filter();
 
 private slots:
@@ -48,7 +49,7 @@ private slots:
    void sortDirectionChanged();
    void filterChanged();
    void filterTypeChanged();
-   void filterDirectionChanged();
+   void filterSettingsChanged();
 
 private:
    void filter( ItemNode * item, int row);

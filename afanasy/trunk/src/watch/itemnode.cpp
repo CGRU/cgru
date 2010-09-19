@@ -109,13 +109,14 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
    return false;
 }
 
-bool ItemNode::filter( const QRegExp & regexp)
+bool ItemNode::filter( const QRegExp & regexp, bool filtermatch)
 {
    if( filter_str == NULL)
    {
       AFERROR("ItemNode::filter: Filter string is NULL.\n");
       return false;
    }
-//   return filter_str->contains( regexp);
-   return regexp.exactMatch( *filter_str);
+   if( filtermatch )
+      return regexp.exactMatch( *filter_str);
+   return filter_str->contains( regexp);
 }

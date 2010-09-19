@@ -89,7 +89,8 @@ void ItemJob::updateValues( af::Node *node, int type)
 
    num_hosts_str = QString::number( num_hosts);
 
-   if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2QstrHMS( time_done - time_started);
+   time_run = time_done - time_started;
+   if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2QstrHMS( time_run);
 
    properties.clear();
    if( false == dependmask_global.isEmpty()) properties += QString(" gD(%1)").arg( dependmask_global   );
@@ -257,6 +258,9 @@ bool ItemJob::setSortType(   int type )
          break;
       case CtrlSortFilter::TTIMEFINISHED:
          sort_uint = &time_done;
+         break;
+      case CtrlSortFilter::TTIMERUN:
+         sort_uint = &time_run;
          break;
       default:
          AFERRAR("ItemJob::setSortType: Invalid type number = %d\n", type);

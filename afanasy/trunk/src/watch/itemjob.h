@@ -29,6 +29,7 @@ public:
    uint32_t time_started;
    uint32_t time_wait;
    uint32_t time_done;
+   uint32_t time_run;
    QString annotation;
    QString hostname;
    QString username;

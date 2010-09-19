@@ -11,7 +11,7 @@ class CtrlSortFilter : public QWidget
 Q_OBJECT
 public:
    CtrlSortFilter( QWidget * parent,
-      int * SortType, bool * SortAscending, int * FilterType, bool * FilterInclude, QString * FilterString);
+      int * SortType, bool * SortAscending, int * FilterType, bool * FilterInclude, bool * FilterMatch, QString * FilterString);
    ~CtrlSortFilter();
 
    inline void addSortType(   int type) { if(type < TLAST)   sortsarray[type] = true; }
@@ -25,6 +25,8 @@ public:
    inline int  getFilterType()         const { return   *filtertype;     }
    inline bool isFilterInclude()       const { return   *filterinclude;  }
    inline bool isFilterExclude()       const { return !(*filterinclude); }
+   inline bool isFilterMatch()         const { return   *filtermatch;    }
+   inline bool isFilterContain()       const { return !(*filtermatch);   }
 
    inline QHBoxLayout * getLayout() { return layout;}
 
@@ -43,6 +45,7 @@ public:
       TTIMEREGISTERED,
       TTIMEACTIVITY,
       TTIMEFINISHED,
+      TTIMERUN,
       TLAST
    };
    static const char * TNAMES[];
@@ -53,7 +56,7 @@ signals:
    void sortDirectionChanged();
    void filterChanged();
    void filterTypeChanged();
-   void filterDirectionChanged();
+   void filterSettingsChanged();
 
 protected:
    void contextMenuEvent( QContextMenuEvent *event);
@@ -64,6 +67,7 @@ private slots:
    void actSortAscending();
    void actFilter( const QString & str);
    void actFilterInclude();
+   void actFilterMacth();
    void actFilterType( int type);
 
 private:
@@ -82,4 +86,5 @@ private:
    QString * filter;
    int  * filtertype;
    bool * filterinclude;
+   bool * filtermatch;
 };

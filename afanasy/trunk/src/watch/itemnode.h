@@ -34,7 +34,7 @@ public:
 
    inline void resetSorting()   { sort_int = NULL; sort_uint = NULL; sort_str = NULL; }
    inline void resetFiltering() { filter_str = NULL; }
-   bool filter( const QRegExp & regexp);
+   bool filter( const QRegExp & regexp, bool filtermatch);
 
    bool compare( const ItemNode & other, int operation) const;
    enum COP{

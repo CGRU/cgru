@@ -28,6 +28,7 @@ const char * CtrlSortFilter::TNAMES[] = {
 "Time Registered",
 "Time Activity",
 "Time Finished",
+"Time Running",
 "[LAST]"
 };
 
@@ -46,17 +47,19 @@ const char * CtrlSortFilter::TNAMES_SHORT[] = {
 "TRGS",
 "TACT",
 "TFNS",
+"TRUN",
 "[LAST]"
 };
 
 CtrlSortFilter::CtrlSortFilter( QWidget * parent,
-      int * SortType, bool * SortAscending, int * FilterType, bool * FilterInclude, QString * FilterString):
+      int * SortType, bool * SortAscending, int * FilterType, bool * FilterInclude, bool * FilterMatch, QString * FilterString):
    QWidget(       parent         ),
    sorttype(      SortType       ),
    sortascending( SortAscending  ),
    filter(        FilterString   ),
    filtertype(    FilterType     ),
-   filterinclude( FilterInclude  )
+   filterinclude( FilterInclude  ),
+   filtermatch(   FilterMatch    )
 {
 
    for( int i = 0; i < TLAST; i++)
@@ -154,6 +157,18 @@ void CtrlSortFilter::contextMenuEvent(QContextMenuEvent *event)
    connect( action, SIGNAL( triggered() ), this, SLOT( actFilterInclude() ));
    menu.addAction( action);
 
+   action = new QAction( "Filter Match", this);
+   action->setCheckable( true);
+   action->setChecked( *filtermatch);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMacth() ));
+   menu.addAction( action);
+
+   action = new QAction( "Filter Contain", this);
+   action->setCheckable( true);
+   action->setChecked( *filtermatch == false);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actFilterMacth() ));
+   menu.addAction( action);
+
    menu.exec( event->globalPos());
 }
 
@@ -170,7 +185,15 @@ void CtrlSortFilter::actFilterInclude()
    if( *filterinclude ) *filterinclude = false;
    else *filterinclude = true;
    selLabel();
-   emit filterDirectionChanged();
+   emit filterSettingsChanged();
+}
+
+void CtrlSortFilter::actFilterMacth()
+{
+   if( *filtermatch ) *filtermatch = false;
+   else *filtermatch = true;
+   selLabel();
+   emit filterSettingsChanged();
 }
 
 void CtrlSortFilter::actSortType( int type)

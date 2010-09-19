@@ -25,6 +25,7 @@ int     ListJobs::SortType       = CtrlSortFilter::TTIMECREATION;
 bool    ListJobs::SortAscending  = false;
 int     ListJobs::FilterType     = CtrlSortFilter::TUSERNAME;
 bool    ListJobs::FilterInclude  = true;
+bool    ListJobs::FilterMatch    = false;
 QString ListJobs::FilterString   = "";
 
 ListJobs::ListJobs( QWidget* parent):
@@ -36,9 +37,10 @@ ListJobs::ListJobs( QWidget* parent):
 
    if( af::Environment::VISOR())
    {
-      ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
+      ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
       ctrl->addSortType(   CtrlSortFilter::TNONE);
       ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
+      ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
       ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
       ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
       ctrl->addSortType(   CtrlSortFilter::TUSERNAME);

@@ -24,12 +24,13 @@ int     ListMonitors::SortType       = CtrlSortFilter::TNAME;
 bool    ListMonitors::SortAscending  = true;
 int     ListMonitors::FilterType     = CtrlSortFilter::TNAME;
 bool    ListMonitors::FilterInclude  = true;
+bool    ListMonitors::FilterMatch    = false;
 QString ListMonitors::FilterString   = "";
 
 ListMonitors::ListMonitors( QWidget* parent):
    ListNodes(  parent, af::Msg::TMonitorsListRequest)
 {
-   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
+   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TNAME);
    ctrl->addSortType(   CtrlSortFilter::TTIMELAUNCHED);

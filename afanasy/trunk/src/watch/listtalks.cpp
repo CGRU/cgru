@@ -24,12 +24,13 @@ int     ListTalks::SortType       = CtrlSortFilter::TNAME;
 bool    ListTalks::SortAscending  = true;
 int     ListTalks::FilterType     = CtrlSortFilter::TNAME;
 bool    ListTalks::FilterInclude  = true;
+bool    ListTalks::FilterMatch    = false;
 QString ListTalks::FilterString   = "";
 
 ListTalks::ListTalks( QWidget* parent):
    ListNodes(  parent, af::Msg::TTalksListRequest)
 {
-   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
+   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TNAME);
    ctrl->addFilterType( CtrlSortFilter::TNONE);

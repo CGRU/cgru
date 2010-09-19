@@ -62,7 +62,7 @@ void ListNodes::initSortFilterCtrl()
    connect( ctrl, SIGNAL( sortDirectionChanged()   ), this, SLOT( sortDirectionChanged()  ));
    connect( ctrl, SIGNAL( filterChanged()          ), this, SLOT( filterChanged()         ));
    connect( ctrl, SIGNAL( filterTypeChanged()      ), this, SLOT( filterTypeChanged()     ));
-   connect( ctrl, SIGNAL( filterDirectionChanged() ), this, SLOT( filterDirectionChanged()));
+   connect( ctrl, SIGNAL( filterSettingsChanged()  ), this, SLOT( filterSettingsChanged() ));
 }
 
 bool ListNodes::updateItems( af::Msg * msg)
@@ -246,7 +246,7 @@ void ListNodes::filter( ItemNode * item, int row)
    if((filtering == false) || (filter_str.isEmpty()))
       view->setRowHidden( row , false);
    else
-      view->setRowHidden( row , item->filter( filter_exp) != filterinclude);
+      view->setRowHidden( row , item->filter( filter_exp, filtermatch) != filterinclude);
 }
 
 void ListNodes::sortTypeChanged()
@@ -292,9 +292,10 @@ void ListNodes::filterTypeChanged()
    filter();
 }
 
-void ListNodes::filterDirectionChanged()
+void ListNodes::filterSettingsChanged()
 {
    filterinclude = ctrl->isFilterInclude();
+   filtermatch   = ctrl->isFilterMatch();
    if( filtering) filter();
 }
 

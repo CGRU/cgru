@@ -33,12 +33,13 @@ int     ListRenders::SortType       = CtrlSortFilter::TPRIORITY;
 bool    ListRenders::SortAscending  = false;
 int     ListRenders::FilterType     = CtrlSortFilter::TNAME;
 bool    ListRenders::FilterInclude  = true;
+bool    ListRenders::FilterMatch    = false;
 QString ListRenders::FilterString   = "";
 
 ListRenders::ListRenders( QWidget* parent):
    ListNodes( parent, af::Msg::TRendersListRequest)
 {
-   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterString);
+   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
    ctrl->addSortType(   CtrlSortFilter::TCAPACITY);
