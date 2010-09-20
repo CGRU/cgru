@@ -4,7 +4,7 @@ popd
 
 set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2010
 
-PATH=%CGRU_LOCATION%\plugins\max;%PATH%
+set PATH=%CGRU_LOCATION%\plugins\max;%PATH%
 
 if exist override.cmd call override.cmd
 
