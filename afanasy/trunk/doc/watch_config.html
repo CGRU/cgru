@@ -47,10 +47,11 @@ Programs to view images.<br/>
 " || " - programs list separator.<br/>
 </p></li>
 <li><p>
-<code>rendercmds</code> = vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"<br/>
+<code>rendercmds</code> = vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"<br/>
 Commands for watch to launch with selected render as an argument.<br/>
-"@ARG@" - will be replaced with hostname.<br/>
-" || " - programs list separator.<br/>
+"@ARG@" - This pattern will be replaced with hostname.<br/>
+" || " - Programs list separator.<br/>
+"@ASK@" - Dialog will be raised to enter string to replace this pattern.<br/>
 </p></li>
 <li><p>
 <code>watch_font_family</code> = SansSerif<br/>

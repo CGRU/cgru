@@ -91,6 +91,7 @@ namespace AFWATCH
    const int  REFRESHINTERVAL          = 5;        ///< Node items update interval time in seconds.
 
    const char CMDS_ARGUMENT[]          = "@ARG@";     ///< Commands argument.
+   const char CMDS_ASKCOMMAND[]        = "@ASK@";     ///< Ask a command, dialog will be raised.
    const char CMDS_SEPARATOR[]         = " || ";      ///< Commands separator.
    /// Default images preview commands:
    const char CMDS_PREVIEW[]           = "nuke -v \"@ARG@\" || mplay \"@ARG@\"";

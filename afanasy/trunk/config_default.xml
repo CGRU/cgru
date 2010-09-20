@@ -68,7 +68,7 @@ iostat - parce output of linux 'iostat' command
 <!-- Example for MS Windows:
    <rendercmds>vncviewer @ARG@ || start ping /t @ARG@</rendercmds>
 -->
-   <rendercmds>vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"</rendercmds>
+   <rendercmds>vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"</rendercmds>
    <watch_connectretries>3</watch_connectretries>
    <watch_waitforconnected>8000</watch_waitforconnected>
    <watch_waitforreadyread>8000</watch_waitforreadyread>

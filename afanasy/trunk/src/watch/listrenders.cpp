@@ -454,7 +454,6 @@ void ListRenders::actRestoreDefaults()
 void ListRenders::actCommand( int number)
 {
    const QStringList * cmds = Watch::getRenderCmds();
-//   int cmdssize = cmds->size();
    if( number >= cmds->size())
    {
       displayError( "No such command.");
@@ -463,10 +462,19 @@ void ListRenders::actCommand( int number)
 
    QModelIndexList indexes( view->selectionModel()->selectedIndexes());
 
+   QString cmd((*cmds)[number]);
+   if( cmd.contains( AFWATCH::CMDS_ASKCOMMAND))
+   {
+      bool ok;
+      QString text = QInputDialog::getText(this, "Launch Command",
+         QString("Entrer string to replace %1 in\n%2").arg(AFWATCH::CMDS_ASKCOMMAND).arg(cmd), QLineEdit::Normal, "", &ok);
+      if( !ok) return;
+      cmd = cmd.replace( AFWATCH::CMDS_ASKCOMMAND, text);
+   }
+
    if( indexes.count() < 1 )
    {
       Item* item = getCurrentItem();
-      QString cmd((*cmds)[number]);
       Watch::startProcess( cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName()));
       return;
    }
@@ -476,7 +484,6 @@ void ListRenders::actCommand( int number)
       if( false == qVariantCanConvert<Item*>( indexes[i].data())) continue;
       Item* item = qVariantValue<Item*>( indexes[i].data());
       if( item == NULL ) continue;
-      QString cmd((*cmds)[number]);
       Watch::startProcess( cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName()));
    }
 }
