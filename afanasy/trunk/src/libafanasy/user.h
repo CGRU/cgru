@@ -71,7 +71,7 @@ public:
    void setPermanent( bool value);
 
    inline bool  isSolved() const      { return state & Solved; }
-   inline void setSolved( bool value) { if(value) state = state | Solved; else state & (~Solved);}
+   inline void setSolved( bool value) { if(value) state = state | Solved; else state = state & (~Solved);}
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 

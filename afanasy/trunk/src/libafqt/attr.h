@@ -11,7 +11,7 @@ class afqt::Attr
 {
 public:
    Attr( const QString & Name, const QString & Label, const QString & initString);
-   ~Attr();
+   virtual ~Attr();
 
    virtual bool readData();
    virtual void writeData();

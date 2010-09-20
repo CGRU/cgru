@@ -43,6 +43,7 @@ TaskExec::TaskExec(
    files( Files),
    servicetype( ServiceType),
    parsertype( ParserType),
+   parsercoeff( ParserCoeff),
    capacity( Capacity),
    capcoeff( 0),
    filesize_min( fileSizeMin),
@@ -57,8 +58,6 @@ TaskExec::TaskExec(
    frame_finish(  End_Frame),
    frames_num(    FramesNum),
 
-   parsercoeff( ParserCoeff),
-
    time_start( time(NULL)),
    onClient( false)
 {
@@ -70,9 +69,9 @@ AFINFA("TaskExec::TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().
 
 TaskExec::TaskExec( const QString & Command):
    command( Command),
+   parsercoeff( 0),
    capacity( 0),
    capcoeff( 0),
-   parsercoeff( 0),
    filesize_min( 0),
    filesize_max( 0),
 

@@ -13,7 +13,7 @@ class DBItem
 {
 public:
    DBItem();
-   ~DBItem();
+   virtual ~DBItem();
 
    void dbDropTable(      QSqlDatabase * db     ) const;
    void dbCreateTable(    QSqlDatabase * db     ) const;

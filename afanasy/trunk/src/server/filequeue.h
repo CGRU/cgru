@@ -8,7 +8,7 @@ class FileQueue : public AfQueue
 {
 public:
    FileQueue( const QString & QueueName);
-   ~FileQueue();
+   virtual ~FileQueue();
 
 /// Push filedata to queue back.
    inline bool pushFile( FileData* filedata) { return push( filedata);}

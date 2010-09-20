@@ -17,7 +17,7 @@ class DBActionQueue : public AfQueue
 {
 public:
    DBActionQueue( const QString & QueueName);
-   ~DBActionQueue();
+   virtual ~DBActionQueue();
 
    void addItem(    const afsql::DBItem * item);
    void delItem(    const afsql::DBItem * item);

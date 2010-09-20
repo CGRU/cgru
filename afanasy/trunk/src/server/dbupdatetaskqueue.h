@@ -32,7 +32,7 @@ class DBUpdateTaskQueue : public AfQueue
 {
 public:
    DBUpdateTaskQueue( const QString & QueueName);
-   ~DBUpdateTaskQueue();
+   virtual ~DBUpdateTaskQueue();
 
 /// Push task update data to queue back.
    inline bool pushTaskUp(  int JobId, int BlockNum, int TaskNum, const af::TaskProgress * Progress)

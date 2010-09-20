@@ -8,7 +8,7 @@ class Reciever
 {
 public:
    Reciever();
-   ~Reciever();
+   virtual ~Reciever();
 
    virtual bool caseMessage( af::Msg * msg) = 0;
 

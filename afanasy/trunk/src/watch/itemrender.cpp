@@ -100,14 +100,14 @@ void ItemRender::deleteTasks()
 
 void ItemRender::deletePlots()
 {
-   for( int i = 0; i < plots.size(); i++) if( plots[i] ) delete plots[i];
+   for( unsigned i = 0; i < plots.size(); i++) if( plots[i] ) delete plots[i];
    plots.clear();
 }
 
 bool ItemRender::calcHeight()
 {
    plots_height = 0;
-   for( int i = 0; i < plots.size(); i++) if( plots[i]->height+4 > plots_height ) plots_height = plots[i]->height+4;
+   for( unsigned i = 0; i < plots.size(); i++) if( plots[i]->height+4 > plots_height ) plots_height = plots[i]->height+4;
    plots_height += 2;
    plots_height += HeightHost;
    int old_height = height;
@@ -188,7 +188,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
       // If became offline:
       if( online && ( render->isOnline() == false))
-         for( int i = 0; i < plots.size(); i++)
+         for( unsigned i = 0; i < plots.size(); i++)
             plots[i]->height = 0;
 
       online = render->isOnline();
@@ -293,13 +293,13 @@ void ItemRender::updateValues( af::Node *node, int type)
       if( plots.size() != hres.custom.size())
       {
          deletePlots();
-         for( int i = 0; i < hres.custom.size(); i++)
+         for( unsigned i = 0; i < hres.custom.size(); i++)
          {
             plots.push_back( new Plotter( 1, hres.custom[i]->valuemax, 4096));
          }
       }
       // Update custom plots:
-      for( int i = 0; i < plots.size(); i++)
+      for( unsigned i = 0; i < plots.size(); i++)
       {
          plots[i]->setScale( hres.custom[i]->valuemax);
          plots[i]->setColor(      hres.custom[i]->graphr, hres.custom[i]->graphg, hres.custom[i]->graphb);
@@ -443,7 +443,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    plotIO.paint(  painter, plot_x, plot_y, plot_w, plot_h);
 
    plot_x = x + 4;
-   for( int i = 0; i < plots.size(); i++)
+   for( unsigned i = 0; i < plots.size(); i++)
    {
       int custom_w = (w - 4) / plots.size();
       int plot_y = y + HeightHost + 4;

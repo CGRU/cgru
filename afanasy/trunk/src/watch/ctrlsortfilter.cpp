@@ -61,7 +61,6 @@ CtrlSortFilter::CtrlSortFilter( QWidget * parent,
    filterinclude( FilterInclude  ),
    filtermatch(   FilterMatch    )
 {
-
    for( int i = 0; i < TLAST; i++)
    {
       sortsarray[i] = false;
@@ -230,11 +229,12 @@ void CtrlSortFilter::actFilter( const QString & str)
 void CtrlSortFilter::selLabel()
 {
    label->setText(
-      QString("s:%1-%2 f:%3-%4")
+      QString("s:%1-%2 f:%3-%4%5")
          .arg( TNAMES_SHORT[*sorttype])
          .arg( (*sortascending) ? "a" : "d")
          .arg( TNAMES_SHORT[*filtertype])
          .arg( (*filterinclude) ? "i" : "e")
+         .arg( (*filtermatch) ? "m" : "c")
       );
 
    if((*filtertype == TNONE) || filter->isEmpty())

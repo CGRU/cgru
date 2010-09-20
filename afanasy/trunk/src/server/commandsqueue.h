@@ -16,7 +16,7 @@ class CommandsQueue : public AfQueue
 {
 public:
    CommandsQueue( const QString & QueueName);
-   ~CommandsQueue();
+   virtual ~CommandsQueue();
 
 /// Push queries to queue back.
    inline bool pushCommand( const QString & cmd) { return push( new Command(cmd));}

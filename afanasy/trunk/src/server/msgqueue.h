@@ -8,7 +8,7 @@ class MsgQueue : public AfQueue
 {
 public:
    MsgQueue( const QString & QueueName);
-   ~MsgQueue();
+   virtual ~MsgQueue();
 
 /// Return first message from queue. BLOCKING FUNCTION if \c block==true .
    inline MsgAf* popMsg( bool block = true) { return (MsgAf*)pop( block);}

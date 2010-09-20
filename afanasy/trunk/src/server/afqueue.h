@@ -19,7 +19,7 @@ class AfQueue
 {
 public:
    AfQueue( const QString & QueueName);    ///< Constructor initialize mutex and set \c initialized variable to \c true
-   ~AfQueue();   ///< Desctuctor deletes all existing items in queue
+   virtual ~AfQueue();   ///< Desctuctor deletes all existing items in queue
 
    inline bool isInitialized(){ return initialized;}  ///< Return \c true if queue successfully initialized.
    inline int  size()         { return count;      }  ///< Ruturn number of items in queue.

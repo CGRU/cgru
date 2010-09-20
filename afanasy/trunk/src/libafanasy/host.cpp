@@ -171,7 +171,7 @@ HostRes::HostRes():
 
 HostRes::~HostRes()
 {
-   for( int i = 0; i < custom.size(); i++) if( custom[i]) delete custom[i];
+   for( unsigned i = 0; i < custom.size(); i++) if( custom[i]) delete custom[i];
 }
 
 void HostRes::copy( const HostRes & other)
@@ -199,14 +199,14 @@ void HostRes::copy( const HostRes & other)
 
    if( custom.size() != other.custom.size())
    {
-      for( int i = 0; i < custom.size(); i++)
+      for( unsigned i = 0; i < custom.size(); i++)
          if( custom[i] ) delete custom[i];
       custom.clear();
-      for( int i = 0; i < other.custom.size(); i++)
+      for( unsigned i = 0; i < other.custom.size(); i++)
          custom.push_back( new HostResMeter());
    }
 
-   for( int i = 0; i < custom.size(); i++)
+   for( unsigned i = 0; i < custom.size(); i++)
       *(custom[i]) = *(other.custom[i]);
 }
 
@@ -274,5 +274,5 @@ void HostRes::stdOut( bool full) const
          hdd_rd_kbsec, hdd_wr_kbsec, hdd_busy);
    }
 
-   for( int i = 0; i < custom.size(); i++ ) custom[i]->stdOut( full);
+   for( unsigned i = 0; i < custom.size(); i++ ) custom[i]->stdOut( full);
 }

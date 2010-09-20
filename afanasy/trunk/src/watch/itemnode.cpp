@@ -109,7 +109,7 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
    return false;
 }
 
-bool ItemNode::filter( const QRegExp & regexp, bool filtermatch)
+bool ItemNode::filter( const QRegExp & regexp, const bool & filtermatch)
 {
    if( filter_str == NULL)
    {

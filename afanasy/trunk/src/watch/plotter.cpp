@@ -7,6 +7,7 @@
 #include "../include/macrooutput.h"
 
 Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
+   height(0),
    label("%1"),
    label_value( 1),
    autoscale( false),
@@ -17,7 +18,6 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
    scale( Scale),
    values( NULL),
    bgc_r(0), bgc_g(0), bgc_b(0),
-   height(0),
    valid( false)
 {
    if( graphs < 1)
@@ -254,7 +254,7 @@ void Plotter::calcHot( int grp, int value, int &r, int &g, int &b) const
    int hot_max_min = hot_max[grp] -hot_min[grp];
    if( hot_max_min == 0) hot_max_min = 1;
    float factor = (1.0 * (value - hot_min[grp])) / hot_max_min;
-   r = (float)r*(1.0 - factor) + (float)hr * factor;
-   g = (float)g*(1.0 - factor) + (float)hg * factor;
-   b = (float)b*(1.0 - factor) + (float)hb * factor;
+   r = int( (float)r*(1.0 - factor) + (float)hr * factor );
+   g = int( (float)g*(1.0 - factor) + (float)hg * factor );
+   b = int( (float)b*(1.0 - factor) + (float)hb * factor );
 }

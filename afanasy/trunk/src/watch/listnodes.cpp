@@ -56,6 +56,7 @@ void ListNodes::initSortFilterCtrl()
    sortascending  = ctrl->isSortAscending();
    filtering      = ctrl->getFilterType() != CtrlSortFilter::TNONE;
    filterinclude  = ctrl->isFilterInclude();
+   filtermatch    = ctrl->isFilterMatch();
    setFilter(       ctrl->getFilter());
 
    connect( ctrl, SIGNAL( sortTypeChanged()        ), this, SLOT( sortTypeChanged()       ));

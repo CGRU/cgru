@@ -62,7 +62,7 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    }
 
    // Echo screen:
-   int echo = -10.0f - 10.0f * rand() / RAND_MAX;
+   int echo = int(-10.0f - 10.0f * rand() / RAND_MAX);
    for( int h = 0; h < image_h; h++)
    for( int w = 0; w < image_w; w++)
    {
@@ -94,16 +94,16 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    rand_all = new int[image_s];
    for( int i = 0; i < image_s; i++) rand_all[i] = rand();
    rand_all_size = new int[image_s];
-   for( int i = 0; i < image_s; i++) rand_all_size[i] = float(rand()) * (image_s - 1.0f) / float(RAND_MAX);
+   for( int i = 0; i < image_s; i++) rand_all_size[i] = int(float(rand()) * (image_s - 1.0f) / float(RAND_MAX));
    // All constant sum (grain):
    rand_all_grain = new int[image_s];
    for( int i = 0; i < image_s; i++)
    {
       RGBA rgba;
       int c;
-      c =  40.0f * rand() / RAND_MAX + 80.0f; rgba.c[R] = c;
-      c = 100.0f * rand() / RAND_MAX + 50.0f; rgba.c[G] = c;
-      c = 200.0f * rand() / RAND_MAX + 20.0f; rgba.c[B] = c;
+      c = int(  40.0f * rand() / RAND_MAX + 80.0f); rgba.c[R] = c;
+      c = int( 100.0f * rand() / RAND_MAX + 50.0f); rgba.c[G] = c;
+      c = int( 200.0f * rand() / RAND_MAX + 20.0f); rgba.c[B] = c;
       rand_all_grain[i] = rgba.all;
    }
    // Black & White points:
@@ -123,10 +123,10 @@ OfflineScreen::OfflineScreen( QWidget * widget):
    {
       rand_bw_pos[bw] = new int[rand_bw_len[bw]];
       for( int i = 0; i < rand_bw_len[bw]; i++)
-         rand_bw_pos[bw][i] = float(rand()) * rand_bw_max[bw] / float(RAND_MAX);
+         rand_bw_pos[bw][i] = int( float(rand()) * rand_bw_max[bw] / float(RAND_MAX));
    }
    rand_bw_val = new int[image_s];
-   for( int i = 0; i < image_s; i++) rand_bw_val[i] = 200.0f * rand() / RAND_MAX;
+   for( int i = 0; i < image_s; i++) rand_bw_val[i] = int( 200.0f * rand() / RAND_MAX);
 
    // Create timer to refresh screen:
    timer = new QTimer( this);
@@ -188,7 +188,7 @@ void OfflineScreen::paintEvent( QPaintEvent *)
    for( int i = 0; i < image_s; i++)
    {
       int dest = i + rand_all_size[offset_phase];
-      dest = dest + float(rand_num) * float(dest) / float(RAND_MAX);
+      dest = int( dest + float(rand_num) * float(dest) / float(RAND_MAX));
       dest = dest % image_s;
       buffer_b[i] = buffer_a[dest];
 //      buffer_b[i] = buffer_a[i]; // - disable
