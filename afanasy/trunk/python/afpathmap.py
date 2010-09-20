@@ -159,8 +159,8 @@ class PathMap:
          position = findNextPosition( position, newpath)
       return newpath
 
-   def toServer( self, path, Verbose = True): return self.translatePath( path, True , Verbose)
-   def toClient( self, path, Verbose = True): return self.translatePath( path, False, Verbose)
+   def toServer( self, path, Verbose = False): return self.translatePath( path, True , Verbose)
+   def toClient( self, path, Verbose = False): return self.translatePath( path, False, Verbose)
 
    def translateFile( self, infile, outfile, toserver , Verbose):
       if not self.initialized: return True

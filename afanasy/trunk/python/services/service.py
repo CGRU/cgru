@@ -23,10 +23,6 @@ class service:
       self.str_hostsprefix = str_hostsprefix
       self.str_hostseparator = str_hostseparator
 
-      print 'Service:'
-      print self.wdir
-      print self.command
-
    def getWDir( self):
       return self.pm.toClient( self.wdir)
 

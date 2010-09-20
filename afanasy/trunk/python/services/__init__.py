@@ -1,1 +1,1 @@
-print 'Init services'
+# print 'Init services'

@@ -114,7 +114,7 @@ class Job(pyaf.Job):
       pyaf.Job.__init__( self)
       self.env = afenv.Env( verbose)
       if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
-      self.pm = PathMap( self.env.Vars['afroot'])
+      self.pm = PathMap( self.env.Vars['afroot'], False, verbose)
       self.setPriority(  int( self.env.Vars['priority'] ))
       self.setMaxHosts(  int( self.env.Vars['maxhosts'] ))
       self.setUserName(       self.env.Vars['username']  )
@@ -176,7 +176,7 @@ class Job(pyaf.Job):
       return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)
 
    def addBlock( self, blockname = 'block', blocktype = 'generic'):
-      print 'Warning: Method "Job::addBlock" is depricated, use job "blocks" list instead.'
+      print 'Warning: Method "Job::addBlock" is deprecated, use job "blocks" list instead.'
       block = Block( blockname, blocktype)
       self.blocks.append( block)
       return block
