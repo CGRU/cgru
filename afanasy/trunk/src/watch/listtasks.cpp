@@ -159,16 +159,15 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          if( ((ItemJobTask*)(item))->genFiles().isEmpty() == false )
          {
             QStringList files = ((ItemJobTask*)(item))->genFiles().split(';');
-            const QStringList * previewcmds = Watch::getPreviewCmds();
-            if( previewcmds->size() > 0 )
+            if( af::Environment::getPreviewCmds().size() > 0 )
             {
                menu.addSeparator();
                QMenu * submenu_cmd = new QMenu( "Preview", this);
-               for( int p = 0; p < previewcmds->size(); p++)
+               for( int p = 0; p < af::Environment::getPreviewCmds().size(); p++)
                {
                   if( files.size() > 1)
                   {
-                     QMenu * submenu_img = new QMenu( QString("%1").arg((*previewcmds)[p]), this);
+                     QMenu * submenu_img = new QMenu( QString("%1").arg(af::Environment::getPreviewCmds()[p]), this);
                      for( int i = 0; i < files.size(); i++)
                      {
                         QString imgname = files[i].right(99);
@@ -180,7 +179,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
                   }
                   else
                   {
-                     ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg((*previewcmds)[p]), this);
+                     ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg(af::Environment::getPreviewCmds()[p]), this);
                      connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
                      submenu_cmd->addAction( actionid);
                   }
@@ -678,14 +677,13 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
    QString wdir = service.getWDir();
 
    if( arg.isEmpty()) return;
-   const QStringList * previewcmds = Watch::getPreviewCmds();
-   if( num_cmd >= previewcmds->size())
+   if( num_cmd >= af::Environment::getPreviewCmds().size())
    {
       displayError( "No such command number.");
       return;
    }
 
-   QString cmd((*previewcmds)[num_cmd]);
+   QString cmd(af::Environment::getPreviewCmds()[num_cmd]);
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
    Watch::startProcess( cmd, wdir);

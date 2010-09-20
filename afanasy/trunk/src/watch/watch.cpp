@@ -42,8 +42,6 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    app = pApplication;
    d = pDialog;
    m = d->getMonitor();
-   previewcmds = af::Environment::getPreviewCmds().split( AFWATCH::CMDS_SEPARATOR);
-   rendercmds  = af::Environment::getRenderCmds().split(  AFWATCH::CMDS_SEPARATOR);
 }
 
 Watch::~Watch(){}

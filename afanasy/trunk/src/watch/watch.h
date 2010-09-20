@@ -62,9 +62,6 @@ public:
    static void displayWarning( const QString &message);
    static void displayError(   const QString &message);
 
-   inline static const QStringList * getPreviewCmds() { return &previewcmds; }
-   inline static const QStringList * getRenderCmds()  { return &rendercmds;  }
-
    static bool openMonitor( int type, bool open);
 
    static void listenJob(  int id, const QString & name);

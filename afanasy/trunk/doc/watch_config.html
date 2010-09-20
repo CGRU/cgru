@@ -41,17 +41,28 @@ GOD rights password.<br/>
 Password length must be <b>five characters</b>.
 </p></li>
 <li><p>
-<code>previewcmds</code> = nuke -v @ARG@ || imf_disp @ARG@ || mplay @ARG@<br>
+<code>previewcmds</code> :<br/>
+<i>
+nuke -v @ARG@<br/>
+imf_disp @ARG@<br/>
+mplay @ARG@<br/>
+</i>
 Programs to view images.<br/>
 "@ARG@" - will be replaced with filename.<br/>
-" || " - programs list separator.<br/>
+To clear a list specify an empty element text.<br/>
 </p></li>
 <li><p>
-<code>rendercmds</code> = vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"<br/>
+<code>rendercmds</code> :<br/>
+<i>
+vncviewer @ARG@<br/>
+xterm -e "ssh @ARG@; read -s -n 1"<br/>
+xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1"<br/>
+xterm -e "ping @ARG@; read -s -n 1"<br/>
+</i>
 Commands for watch to launch with selected render as an argument.<br/>
 "@ARG@" - This pattern will be replaced with hostname.<br/>
-" || " - Programs list separator.<br/>
 "@ASK@" - Dialog will be raised to enter string to replace this pattern.<br/>
+To clear a list specify an empty element text.<br/>
 </p></li>
 <li><p>
 <code>watch_font_family</code> = SansSerif<br/>

@@ -63,12 +63,24 @@ iostat - parce output of linux 'iostat' command
 <!-- Watch -->
    <pswd_visor>1832116180fdc61b64fd978401e462e9</pswd_visor>
    <pswd_god>73bcaaa458bff0d27989ed331b68b64d</pswd_god>
-<!-- Commands argument = "@ARG@", separator = " || ". -->
-   <previewcmds>nuke -v @ARG@ || imf_disp @ARG@ || mplay @ARG@</previewcmds>
-<!-- Example for MS Windows:
-   <rendercmds>vncviewer @ARG@ || start ping /t @ARG@</rendercmds>
+<!-- Commands argument = "@ARG@"
+     To clear a list specify an empty element text.
 -->
-   <rendercmds>vncviewer @ARG@ || xterm -e "ssh @ARG@; read -s -n 1" || xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1" || xterm -e "ping @ARG@; read -s -n 1"</rendercmds>
+   <previewcmds>nuke -v @ARG@</previewcmds>
+   <previewcmds>imf_disp @ARG@</previewcmds>
+   <previewcmds>mplay @ARG@</previewcmds>
+<!-- Example for MS Windows:
+     <rendercmds></rendercmds>
+     <rendercmds>vncviewer @ARG@</rendercmds>
+     <rendercmds>start ping /t @ARG@</rendercmds>
+-->
+<!-- Commands argument = "@ARG@", @ASK@ - raise dialog to ask a string
+     To clear a list specify an empty element text.
+-->
+   <rendercmds>vncviewer @ARG@</rendercmds>
+   <rendercmds>xterm -e "ssh @ARG@; read -s -n 1"</rendercmds>
+   <rendercmds>xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1"</rendercmds>
+   <rendercmds>xterm -e "ping @ARG@; read -s -n 1"</rendercmds>
    <watch_connectretries>3</watch_connectretries>
    <watch_waitforconnected>8000</watch_waitforconnected>
    <watch_waitforreadyread>8000</watch_waitforreadyread>

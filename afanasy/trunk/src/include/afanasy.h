@@ -92,11 +92,6 @@ namespace AFWATCH
 
    const char CMDS_ARGUMENT[]          = "@ARG@";     ///< Commands argument.
    const char CMDS_ASKCOMMAND[]        = "@ASK@";     ///< Ask a command, dialog will be raised.
-   const char CMDS_SEPARATOR[]         = " || ";      ///< Commands separator.
-   /// Default images preview commands:
-   const char CMDS_PREVIEW[]           = "nuke -v \"@ARG@\" || mplay \"@ARG@\"";
-   /// Default render menu commands:
-   const char CMDS_RENDER[]            = "xterm -e ssh @ARG@ || xterm -e ping @ARG@";
 }
 
 /// Talk options:

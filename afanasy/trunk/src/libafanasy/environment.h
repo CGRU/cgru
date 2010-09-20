@@ -46,10 +46,12 @@ public:
 
    static void setVerbose( bool value = true) { verbose = value;}
    static bool openXMLDomDocument( QDomDocument & doc, const QString & filename);
-   static bool getXMLElement(   const QDomDocument & doc, const QString & name,   QString & text );
+   static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
+   static bool getXMLElement( const QDomDocument & doc, const QString & name, QStringList & stringlist );
    static bool getXMLAttribute( QDomElement & element, const QString & name, int & value);
-   static bool getVar( const QDomDocument & doc, QString & value, QString name );
-   static bool getVar( const QDomDocument & doc, int     & value, QString name );
+   static bool getVar( const QDomDocument & doc, QString     & value, QString name );
+   static bool getVar( const QDomDocument & doc, QStringList & value, QString name );
+   static bool getVar( const QDomDocument & doc, int         & value, QString name );
 
 /// Check current key matching password sequence.
    static bool checkKey( const char key);
@@ -76,13 +78,14 @@ public:
 
    static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
-   static inline const QString& getPreviewCmds()                    { return previewcmds;                     } ///< Get preview commands
-   static inline const QString& getRenderCmds()                     { return rendercmds;                      } ///< Get render commands
-   static inline int            getWatchRefreshInterval()           { return watch_refreshinterval;           }
-   static inline int            getWatchConnectRetries()            { return watch_connectretries;            }
-   static inline int            getWatchWaitForConnected()          { return watch_waitforconnected;          }
-   static inline int            getWatchWaitForReadyRead()          { return watch_waitforreadyread;          }
-   static inline int            getWatchWaitForBytesWritten()       { return watch_waitforbyteswritten;       }
+   static inline const QStringList& getPreviewCmds()  { return previewcmds;} ///< Get preview commands
+   static inline const QStringList& getRenderCmds()   { return rendercmds; } ///< Get render commands
+
+   static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
+   static inline int getWatchConnectRetries()         { return watch_connectretries;      }
+   static inline int getWatchWaitForConnected()       { return watch_waitforconnected;    }
+   static inline int getWatchWaitForReadyRead()       { return watch_waitforreadyread;    }
+   static inline int getWatchWaitForBytesWritten()    { return watch_waitforbyteswritten; }
 
    static inline const QString& getTimeFormat()         { return timeformat;       } ///< Get default time format.
 
@@ -211,8 +214,8 @@ private:
 
    static int clientport;
 
-   static QString previewcmds;    ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
-   static QString rendercmds;     ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static QStringList previewcmds;    ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static QStringList rendercmds;     ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
    static int watch_refreshinterval;
    static int watch_connectretries;
    static int watch_waitforconnected;

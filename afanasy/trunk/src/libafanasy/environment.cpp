@@ -37,8 +37,6 @@ QString Environment::servername =                      AFADDR::SERVER_NAME;
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::clientport =                      AFADDR::CLIENT_PORT;
 
-QString Environment::previewcmds =                     AFWATCH::CMDS_PREVIEW;
-QString Environment::rendercmds =                      AFWATCH::CMDS_RENDER;
 int     Environment::watch_connectretries =            AFWATCH::CONNECTRETRIES;
 int     Environment::watch_waitforconnected =          AFWATCH::WAITFORCONNECTED;
 int     Environment::watch_waitforreadyread =          AFWATCH::WAITFORREADYREAD;
@@ -124,6 +122,8 @@ Passwd       * Environment::passwd = NULL;
 bool           Environment::visor_mode = false;
 bool           Environment::god_mode = false;
 bool           Environment::valid = false;
+QStringList    Environment::previewcmds;
+QStringList    Environment::rendercmds;
 
 QStringList    Environment::cmdarguments;
 QStringList    Environment::cmdarguments_usagearg;
@@ -225,7 +225,10 @@ bool Environment::getXMLElement( const QDomDocument & doc, const QString & name,
    QDomNodeList list = doc.elementsByTagName( name );
    int size = list.size();
    if( size < 1) return false;
-   if( size > 1) PRINT("Found %d '%s' elements in document, using the last.\n", size, name.toUtf8().data());
+   if( size > 1)
+   {
+      AFERRAR("Found %d '%s' elements in document, using the last.\n", size, name.toUtf8().data());
+   }
    QDomElement element = list.at(size-1).toElement();
    if( element.isNull())
    {
@@ -234,6 +237,26 @@ bool Environment::getXMLElement( const QDomDocument & doc, const QString & name,
       return false;
    }
    text = element.text();
+   return true;
+}
+
+bool Environment::getXMLElement( const QDomDocument & doc, const QString & name, QStringList & stringlist)
+{
+   QDomNodeList list = doc.elementsByTagName( name );
+   int size = list.size();
+   if( size < 1) return false;
+   for( int i = 0; i < size; i++)
+   {
+      QDomElement element = list.at(i).toElement();
+      if( element.isNull())
+      {
+         AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
+            element.lineNumber(), element.columnNumber(), name.toUtf8().data());
+         return false;
+      }
+      if( element.text().isEmpty()) stringlist.clear();
+      else stringlist << element.text();
+   }
    return true;
 }
 
@@ -257,10 +280,15 @@ bool Environment::getXMLAttribute( QDomElement & element, const QString & name, 
 
 bool Environment::getVar( const QDomDocument & doc, QString & value, QString name)
 {
-   QString text;
-   if( getXMLElement( doc, name, text) == false) return false;
-   value = text;
+   if( getXMLElement( doc, name, value) == false) return false;
    PRINT("\t%s = '%s'\n", name.toUtf8().data(), value.toUtf8().data());
+   return true;
+}
+
+bool Environment::getVar( const QDomDocument & doc, QStringList & value, QString name)
+{
+   if( getXMLElement( doc, name, value) == false) return false;
+   PRINT("\t%s:\n\t\t%s\n", name.toUtf8().data(), value.join("\n\t\t").toUtf8().data());
    return true;
 }
 

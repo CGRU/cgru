@@ -224,8 +224,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       menu.addSeparator();
    }
 
-   const QStringList * cmds = Watch::getRenderCmds();
-   int cmdssize = cmds->size();
+   int cmdssize = af::Environment::getRenderCmds().size();
    if( cmdssize > 0 )
    {
       menu.addSeparator();
@@ -233,7 +232,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       QMenu * submenu = new QMenu( "Custom", this);
       for( int i = 0; i < cmdssize; i++)
       {
-         ActionId * actionid = new ActionId( i, QString("%1").arg((*cmds)[i]), this);
+         ActionId * actionid = new ActionId( i, QString("%1").arg( af::Environment::getRenderCmds()[i]), this);
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
          submenu->addAction( actionid);
       }
@@ -453,8 +452,7 @@ void ListRenders::actRestoreDefaults()
 
 void ListRenders::actCommand( int number)
 {
-   const QStringList * cmds = Watch::getRenderCmds();
-   if( number >= cmds->size())
+   if( number >= af::Environment::getRenderCmds().size())
    {
       displayError( "No such command.");
       return;
@@ -462,7 +460,7 @@ void ListRenders::actCommand( int number)
 
    QModelIndexList indexes( view->selectionModel()->selectedIndexes());
 
-   QString cmd((*cmds)[number]);
+   QString cmd(af::Environment::getRenderCmds()[number]);
    if( cmd.contains( AFWATCH::CMDS_ASKCOMMAND))
    {
       bool ok;
