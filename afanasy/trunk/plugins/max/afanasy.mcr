@@ -96,7 +96,7 @@ rollout AfanasyDialog ver
    on renderButton pressed do
    (
 -- Save scene:
-      max file save
+      checkForSave()
 
 -- Create command:
       local cmd = "afjob.py "

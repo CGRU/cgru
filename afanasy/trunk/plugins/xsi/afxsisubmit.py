@@ -25,6 +25,7 @@ def Main():
    defaultFrame_by = 1
    defaultFrame_fpt = 1
    defaultJobName = scene.Name
+   defaultJobNameAuto = 1
    defaultPriority = -1
    defaultSimulate = False
    defaultStartPaused = False
@@ -53,7 +54,9 @@ def Main():
 
    opSet = Application.ActiveSceneRoot.Properties('afSubmitProperties')
    if(opSet != None):
-      defaultJobName          =        GetOpSetValue( opSet, 'afJobName',           defaultJobName )
+      defaultJobNameAuto      =        GetOpSetValue( opSet, 'afJobNameAuto',       defaultJobNameAuto )
+      if not defaultJobNameAuto:
+         defaultJobName       =        GetOpSetValue( opSet, 'afJobName',           defaultJobName )
       defaultRange_frompass   = bool(  GetOpSetValue( opSet, 'afRange_frompass',    defaultRange_frompass ))
       defaultRange_forcepass  = bool(  GetOpSetValue( opSet, 'afRange_forcepass',   defaultRange_forcepass ))
       defaultFrame_start      = int(   GetOpSetValue( opSet, 'afFrame_start',       defaultFrame_start ))
@@ -81,9 +84,10 @@ def Main():
       Application.ExecuteCommand('DeleteObj',[str(Application.ActiveSceneRoot) + '.afSubmitProperties'])
 
    opSet = Application.ActiveSceneRoot.AddProperty('CustomProperty',False,'afSubmitProperties')
+   opSet.AddParameter3('afJobNameAuto',      constants.siBool,    defaultJobNameAuto, 0, 1, False)
    opSet.AddParameter3('afJobName',          constants.siString,  defaultJobName)
-   opSet.AddParameter3('afRange_frompass',   constants.siBool,    defaultRange_frompass , 0, 1, False)
-   opSet.AddParameter3('afRange_forcepass',  constants.siBool,    defaultRange_forcepass , 0, 1, False)
+   opSet.AddParameter3('afRange_frompass',   constants.siBool,    defaultRange_frompass, 0, 1, False)
+   opSet.AddParameter3('afRange_forcepass',  constants.siBool,    defaultRange_forcepass, 0, 1, False)
    opSet.AddParameter3('afFrame_start',      constants.siInt4,    defaultFrame_start, -1000000, 1000000, False)
    opSet.AddParameter3('afFrame_end',        constants.siInt4,    defaultFrame_end, -1000000, 1000000, False)
    opSet.AddParameter3('afFrame_by',         constants.siInt4,    defaultFrame_by, -1000000, 1000000, False)
@@ -111,6 +115,7 @@ def Main():
    oPPGLayout.AddTab('Submission')
 
    oPPGLayout.AddItem('afJobName',     'Job Name',          constants.siControlString)
+   oPPGLayout.AddItem('afJobNameAuto', 'Auto Job Name = Scene Name', constants.siControlBoolean)
 
    oPPGLayout.AddEnumControl('afRenderPass', passControlList, 'Pass', constants.siControlCombo)
 
