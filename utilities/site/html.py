@@ -53,6 +53,7 @@ def replaceHeaderFooter( verbose, lines, doctype, header, footer, relative_path,
          for line in header:
             line = line.replace('href="..','href="%s' % relative_path)
             line = line.replace('src="..','src="%s' % relative_path)
+            line = line.replace("url('..","url('%s" % relative_path)
             lines_dest.append( line)
          continue
 
@@ -61,6 +62,7 @@ def replaceHeaderFooter( verbose, lines, doctype, header, footer, relative_path,
          for line in footer:
             line = line.replace('href="..','href="%s' % relative_path)
             line = line.replace('src="..','src="%s' % relative_path)
+            line = line.replace("url('..","url('%s" % relative_path)
             lines_dest.append( line)
          break
 
