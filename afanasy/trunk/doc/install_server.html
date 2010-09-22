@@ -16,7 +16,7 @@
 <a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
 </td>
 <td width="33%">
-<p><a href="../../index.html" target="_top">CGRU</a></p>
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
 </td>
 <td width="33%">
 <a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
@@ -27,31 +27,81 @@
 <!--HEADER-->
 <h2 align="center">Prepare Afanasy Server</h2>
 <hr />
+<p>
+<i>
+All packages names can slightly vary from one distribution to another, or ever does not exists at all.
+For example on Cent-OS there is no choice whether to install Qt XML module or not,
+you can to install or not the whole Qt.
+</i>
+</p>
 <ol>
-<li><h4>You need UNIX</h4>
+<li><h4>You Need UNIX</h4>
    Any Linux or Mac or other UNIX (any <a href="http://en.wikipedia.org/wiki/POSIX">POSIX</a>, so may be MS Windows with emulators, if you are brave).<br/>
 </li>
-<li><h4>Required packages:</h4>
+<li><h4>Install Required Packages:</h4>
    <kbd>
-   g++<br/>
-   subversion cmake<br/>
-   libqt4-core libqt4-dev libqt4-gui libqt4-sql libqt4-sql-psql<br/>
+   libqt4-core libqt4-gui libqt4-xml libqt4-network libqt4-sql libqt4-sql-psql<br/>
    python python-dev<br/>
    </kbd>
 </li>
-<li><h4>Download</h4>
-   <code>
-   $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
-   </code>
-</li>
-<li><h4>Build a project</h4>
-   Go to Afanasy sources.
-   Find a project you like <a href="http://www.cmake.org/">CMake</a>, <a href="http://doc.trolltech.com/qmake-manual.html">QMake</a> or <a href="http://rubyforge.org/projects/mxx-ru">Mxx_ru</a>.
-   Launch a build script.<br/>
-   <code>
-   $ cd cgru/afanasy/[tag|branch|trunk]/src/project.cmake<br/>
-   $ ./build.sh<br/>
-   </code>
+<li><h4>Install CGRU and Afanasy Server</h4>
+   You can download install <kbd>RPM</kbd> or <kbd>deb</kbd> packages.
+   Or build CGRU and Afanasy yourself.
+   <ul>
+   <li><h4>Linux Packages</h4>
+      See <a href="../../doc/install_linuxpackages.html">Linux Packages</a> page for description.
+      <ul>
+      <li>
+         Download packages from <a href="http://sourceforge.net/projects/cgru/files/">SourceForge</a> and unpack.<br/>
+      </li>
+      <li>
+         You need to install <kbd>cgru</kbd> and <kbd>afanasy-server</kbd> package.<br/>
+         The simples way is to launch install scripts:<br/>
+         <code>
+         # ./install_cgru.sh<br/>
+         # ./install_afserver.sh<br/>
+         </code>
+      </li>
+      </ul>
+   </li>
+   <li><h4>Manual Build</h4>
+      <ul>
+      <li>Install develop packages.<br/>
+         <p>
+         There are three ways ( projects / build systems ) to build Afanasy:
+         <a href="http://www.cmake.org/">CMake</a>,
+         <a href="http://doc.trolltech.com/qmake-manual.html">QMake</a>,
+         <a href="http://rubyforge.org/projects/mxx-ru">Mxx_ru</a>.<br/>
+         Choose one, and install.
+         </p>
+         <p>
+         Install additional developers packages:<br/>
+         <kbd>
+         g++<br/>
+         subversion<br/>
+         qt4 - development<br/>
+         python - development<br/>
+         </kbd>
+         </p>
+      </li>
+      <li>
+
+      Download CGRU sources.<br/>
+      <code>
+      $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
+      </code>
+
+
+      Go to Afanasy sources.
+      Launch a build script.<br/>
+      <code>
+      $ cd cgru/afanasy/[tag|branch|trunk]/src/project.cmake<br/>
+      $ ./build.sh<br/>
+      </code>
+      </li>
+      </ul>
+   </li>
+   </ul>
 </li>
 <li><h4>Postgre SQL</h4>
 <p>Database server needed to store jobs state. Afanasy reads information from database on start. You can use Afanasy without any database, but server will start with no data.
@@ -110,7 +160,7 @@ You can install database using package manager, and its the best way. But if Qt 
 There is an example script to install PostgreSQL using <kbd>apt-get</kbd> and configure it for Afanasy. It works on <kbd>Ubuntu</kbd>, <kbd>Debian</kbd> and other debian-like distributives.<br/>
 Launch under <kbd>root</kbd>:<br/>
 <code>
-# cd afanasy/examples/scripts<br/>
+# cd cgru/examples/scripts<br/>
 # ./setup_pgsql.sh<br/>
 </code>
 </p>
@@ -128,13 +178,13 @@ Launch under <kbd>root</kbd>:<br/>
 <table width="99%" align="center">
 <tr align="center">
 <td width="33%">
-<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
 </td>
 <td width="33%">
-<p><a href="../../index.html" target="_top">CGRU</a></p>
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
 </td>
 <td width="33%">
-<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
 </td>
 </tr>
 </table>
