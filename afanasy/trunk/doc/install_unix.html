@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Build Afanasy</title>
+<title>Afanasy Unix Install</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
@@ -23,9 +23,22 @@
 </td>
 </tr>
 </table>
-<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+
+<table width="90%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
 <!--HEADER-->
-<h2 align="center">Prepare Afanasy Server</h2>
+<h2 align="center">Afanasy Unix Install</h2>
 <hr />
 <p>
 <i>
@@ -34,19 +47,24 @@ For example on Cent-OS there is no choice whether to install Qt XML module or no
 you can to install or not the whole Qt.
 </i>
 </p>
+
 <ol>
 <li><h4>You Need UNIX</h4>
    Any Linux or Mac or other UNIX (any <a href="http://en.wikipedia.org/wiki/POSIX">POSIX</a>, so may be MS Windows with emulators, if you are brave).<br/>
 </li>
+
 <li><h4>Install Required Packages:</h4>
    <kbd>
    libqt4-core libqt4-gui libqt4-xml libqt4-network libqt4-sql libqt4-sql-psql<br/>
-   python python-dev<br/>
+   python<br/>
    </kbd>
 </li>
+
 <li><h4>Install CGRU and Afanasy Server</h4>
-   You can download install <kbd>RPM</kbd> or <kbd>deb</kbd> packages.
-   Or build CGRU and Afanasy yourself.
+   <p>
+      You can download install <kbd>RPM</kbd> or <kbd>deb</kbd> packages.
+      Or build CGRU and Afanasy yourself.
+   </p>
    <ul>
    <li><h4>Linux Packages</h4>
       See <a href="../../doc/install_linuxpackages.html">Linux Packages</a> page for description.
@@ -59,6 +77,9 @@ you can to install or not the whole Qt.
          The simples way is to launch install scripts:<br/>
          <code>
          # ./install_cgru.sh<br/>
+         </code>
+         And on server machine only install Afanasy server:<br/>
+         <code>
          # ./install_afserver.sh<br/>
          </code>
       </li>
@@ -102,16 +123,33 @@ you can to install or not the whole Qt.
       </ul>
    </li>
    </ul>
+   <p>
+      It is better to install render client on server machine too, to watch its resources.
+   </p>
 </li>
+
 <li><h4>Postgre SQL</h4>
-<p>Database server needed to store jobs state. Afanasy reads information from database on start. You can use Afanasy without any database, but server will start with no data.
-</p><p>
-You can install database using package manager, and its the best way. But if Qt and PostgreSQL versions are incompatible in your distributive, you can download and install some previous version of PostgreSQL.</p>
+<p>
+You don't need to install it on clients.
+SQL database server is needed for Afanasy server only.
+It is better to install it on the same host as Afanasy server.
+</p>
+<p>
+Database server needed to store jobs, renders, users state.
+Afanasy reads information from database on start.
+You can use Afanasy without any database, but server will start with no data.
+So you can skip this stage if you want just to try Afanasy.
+</p>
+<p>
+You can install database using package manager, and its the best way.
+But if Qt and PostgreSQL versions are incompatible in your distributive,
+you can download and install some previous version of PostgreSQL.
+</p>
 <h5>Database Setup</h5>
 <ul>
    <li>
       Edit Postgre SQL client authentication configuration file <kbd>pg_hba.conf</kbd>.<br/>
-      Its location depends on linux distributive. For example:<br/>
+      Its location depends on Linux distributive. For example:<br/>
       Debian, Ubuntu: <kbd>/etc/postgresql/ [version] /main/pg_hba.conf</kbd><br/>
       CentOS, Fedora, openSUSE: <kbd>/var/lib/pgsql/data/pg_hba.conf</kbd><br/>
       <i>make install</i>:<kbd>/usr/local/pgsql/data/pg_hba.conf</kbd><br/>
@@ -157,7 +195,7 @@ You can install database using package manager, and its the best way. But if Qt 
 </ul>
 <p>
 <h5>Example script for automatic setup:</h5>
-There is an example script to install PostgreSQL using <kbd>apt-get</kbd> and configure it for Afanasy. It works on <kbd>Ubuntu</kbd>, <kbd>Debian</kbd> and other debian-like distributives.<br/>
+There is an example script to install Postgre SQL using <kbd>apt-get</kbd> and configure it for Afanasy. It works on <kbd>Ubuntu</kbd>, <kbd>Debian</kbd> and other debian-like distributives.<br/>
 Launch under <kbd>root</kbd>:<br/>
 <code>
 # cd cgru/examples/scripts<br/>
@@ -165,16 +203,38 @@ Launch under <kbd>root</kbd>:<br/>
 </code>
 </p>
 </li>
+
 <li><h4>Web Server</h4>
-   <p>If you want to watch afanasy database state through web install packages:</p>
-   <p><kbd>apache2 libapache2-mod-php5 php5 php5-pgsql php5-gd</kbd></p>
-   <p>Site root directory will be available in afanasy/php directory</p>
+<p>
+Web server is needed to browse Afanasy SQL database only.
+So you can skip this stage if you want just to try Afanasy.
+You don't need to install it on clients.
+It is better to install it a host with the database.
+</p>
+<p>
+If you use Linux packages install <kbd>afanasy-webvisor</kbd> package.
+</p>
+<p>Install additional  packages:</p>
+<p><kbd>apache2 libapache2-mod-php5 php5 php5-pgsql php5-gd</kbd></p>
+<p>The site root directory is located in <i>afanasy/webvisor</i> directory.</p>
 </li>
 </ol>
+
 <!--FOOTER-->
-<br/>
-<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
-<br/>
+<table width="90%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
 <table width="99%" align="center">
 <tr align="center">
 <td width="33%">
