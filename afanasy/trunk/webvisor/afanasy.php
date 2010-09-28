@@ -192,26 +192,45 @@ else if (isset($_POST['user']) && isset($_POST['password']))
 <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-<table width=99% height=99% border=1>
-<tr align="center" height=50>
+
+<table width="50%" align="center"><tr align="center">
+   <td><img src="images/star01.png" alt="★" /></td>
+   <td><img src="images/afanasy.png" border="0" alt="AFANASY" /></td>
+   <td><img src="images/star02.png" alt="★" /></td>
+</tr></table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('images/header_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="90%" height="80%" border="1" align="center">
+<tr align="center" height="50">
 <td width=10%>
-   <font color="#DD0000">★</font>
-   <a href="../../" ><i> CGRU </i></a>
-   <font color="#DD0000">★</font>
+   <a href="../../" ><img src="images/cgru.png" alt="CGRU" border="0" width="100" height="40"/></a>
 </td>
 <td width=10%>
 <?
 //echo 'user='.$_POST['user'].' password='.$_POST['password'].'</br>';
 if (isset($_SESSION['valid_user']))
-   echo '<a href="index.php?action=logout"> Logout </a>';
+   echo '<a href="index.php?action=logout"><img src="images/logout.png" alt="Logout" border="0"/></a>';
 else
-   echo '<a href="index.php?action=login" > Login  </a>';
+   echo '<a href="index.php?action=login" ><img src="images/login.png"  alt="Login"  border="0"/></a>';
 ?>
 </td>
-<td width=10%><a href="index.php?action=users"  > Users      </a></td>
-<td width=10%><a href="index.php?action=jobs"   > Jobs       </a></td>
-<td width=10%><a href="index.php?action=renders"> Renders    </a></td>
-<td width=10%><a href="index.php?action=stat"   > Statistics </a></td>
+<td width=10%><a href="index.php?action=users"  ><img src="images/users.png"      alt="Users"      border="0"/></a></td>
+<td width=10%><a href="index.php?action=jobs"   ><img src="images/jobs.png"       alt="Jobs"       border="0"/></a></td>
+<td width=10%><a href="index.php?action=renders"><img src="images/renders.png"    alt="Renders"    border="0"/></a></td>
+<td width=10%><a href="index.php?action=stat"   ><img src="images/statistics.png" alt="Statistics" border="0"/></a></td>
 </tr>
 <tr><td colspan=6 align=center><p>
 
@@ -226,9 +245,9 @@ public function DisplayFooter()
 <?
    if (isset($_SESSION['valid_user']))
    {
-      echo '<font color="#DD0000">★</font>';
+      echo '<font color="#904010">★</font>';
       echo '<a href="index.php?action=cabinet"><b> '.$_SESSION['valid_user'].' </b></a>';
-      echo '<font color="#DD0000">★</font>';
+      echo '<font color="#904010">★</font>';
    }
    else
    {
@@ -247,6 +266,27 @@ public function DisplayFooter()
 </p></td>
 </tr>
 </table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
 </body>
 </html>
 <?php
