@@ -52,11 +52,11 @@ echo "<b><a href='index.php?action=$action&order=jobsrunning'>Running Jobs</a></
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b>Max</b>";
+echo "Max";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b>Mask</b>";
+echo "Mask";
 echo "</td>\n";
 
 echo "\t\t<td>";

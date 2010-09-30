@@ -58,9 +58,14 @@ if( $size == '') $size = 600;
 else $size = (int)$size;
 $type=$_GET['type'];
 
+//$im = @imagecreatetruecolor( $size*4/3, $size) or die("Cannot Initialize new GD image stream");
+//imageantialias( $im, true);
+//imagealphablending( $im, true);
 $im = @imagecreate( $size*4/3, $size) or die("Cannot Initialize new GD image stream");
-$bg = imagecolorallocate($im, 187, 204, 170);
-#002000#BBCCAA
+$bg = imagecolorallocate($im, 0, 0, 0);
+$bg = imagecolortransparent($im, $bg);
+imagefill( $im, 0, 0, $bg);
+
 $title_color = imagecolorallocate( $im, 0,  32, 0);
 $title_posx = $size/2;
 $title_posy = 0;
@@ -186,16 +191,16 @@ $middlenum = $countnames/2;
 for( $n = 0; $n < $countnames; $n++)
 {
    list ( $cr, $cg, $cb) = getColors( $colordelta, $n );
-   $color = imagecolorallocate( $im, .7*$cr, .7*$cg, .7*$cb);
+   $color = imagecolorallocate( $im, .5*$cr, .5*$cg, .5*$cb);
    $ty = ($n)*$size/$countnames;
    imagestring( $im, 5, 0, $ty, $names_array[$n], $color);
 
    $line_x = 0;
    $line_y = $ty+17;
-   $color = imagecolorallocate( $im, 0, 0, 0);
+   $color = imagecolorallocate( $im, 0, 60, 0);
    $horizlen = $linehorizlen + $size*pow(((float) abs($middlenum-$n) / $countnames * 2), 2);
-   imageline ( $im, $line_x, $line_y, $line_x+$horizlen, $line_y, $color);
-   imageline ( $im, $line_x+$horizlen, $line_y, $lineEX[$n], $lineEY[$n], $color);
+   imageline( $im, $line_x, $line_y, $line_x+$horizlen, $line_y, $color);
+   imageline( $im, $line_x+$horizlen, $line_y, $lineEX[$n], $lineEY[$n], $color);
 }
 
 header("Content-type: image/png");

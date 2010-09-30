@@ -41,15 +41,14 @@ a:active {
 
 .state_done
 {
- background-color: #A0BB90;
 }
 
 .state_offline
 {
- background-color: #888888;
+ background-color: #808080;
 }
 
 .state_nimby
 {
- background-color: #BBAABB;
+ background-color: #A0A0D0;
 }
