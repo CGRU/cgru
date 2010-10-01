@@ -132,6 +132,7 @@ public:
    static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
    static inline int getRenderLogsLinesMax()          { return render_logs_linesmax;        }
    static inline const QString& getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
+   static inline const QString& getRenderNetworkIF()     { return render_networkif;       }
    static inline const QString& getRenderHDDSpacePath()  { return render_hddspace_path;   }
    static inline const QString& getRenderIOStatDevice()  { return render_iostat_device;   }
    static inline const QString& getRenderResClasses()    { return render_resclasses;      }
@@ -242,6 +243,7 @@ private:
    static QString render_hddspace_path;
    static QString render_iostat_device;
    static QString render_resclasses;
+   static QString render_networkif;
 
    static int errors_avoid_host;
    static int task_error_retries;

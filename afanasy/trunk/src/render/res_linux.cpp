@@ -27,7 +27,6 @@ const char Buffers[]    = "Buffers:";
 const char Cached[]     = "Cached:";
 const char SwapTotal[]  = "SwapTotal:";
 const char SwapFree[]   = "SwapFree:";
-const char ifLO[]       = "lo";
 const char ifBytes[]    = "bytes";
 
 const int fbuffer_size = 1 << 16;
@@ -375,9 +374,19 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    static int b_recv = 0;
    static int b_trans = 0;
    static int ifBytes_len = strlen( ifBytes);
-   static int ifLO_len = strlen( ifLO);
    int net_recv_kb = 0; int net_send_kb = 0;
    int pos = 0;
+   static QRegExp RenderNetworkIF;
+   if( getConstants)
+   {
+      RenderNetworkIF.setPattern( af::Environment::getRenderNetworkIF());
+      if( RenderNetworkIF.isValid()) printf("Network traffic interface(s) pattern = '%s'\n", RenderNetworkIF.pattern().toUtf8().data());
+      else
+      {
+         AFERRAR("Render network interfaces mask is invalid:\n%s\n%s\n", RenderNetworkIF.pattern().toUtf8().data(), RenderNetworkIF.errorString().toUtf8().data());
+      }
+      printf("Network interfaces founded:\n");
+   }
    while( pos < fdata_len )
    {
       if( !nextLine( pos)) break; // to rows titles
@@ -403,7 +412,22 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       {
          while( fbuffer[++pos] == ' '); // skip spaces
          if( verbose) printf("fbuffer[pos(5)]=\"%c\"\n", fbuffer[pos]);
-         if( strncmp( ifLO, fbuffer + pos, ifLO_len) != 0) // skip loop back interface
+         // Getting interface name:
+         int separator_pos = 0; // search for interface name separator
+         while( fbuffer[pos + (separator_pos++)] != ':') if( separator_pos > 99) break; // stop if no searator founded (99 characters are more than enough)
+         QString ifname = QString::fromAscii( fbuffer + pos, separator_pos-1);
+         if( getConstants)
+         {
+            static int ifcount = 0;
+            if( RenderNetworkIF.isValid() && ( RenderNetworkIF.exactMatch( ifname)))
+               printf(" * ");
+            else
+               printf("   ");
+            printf("#%d = '%s'", ++ifcount, ifname.toUtf8().data());
+            printf("\n");
+         }
+         // Getting interface traffic:
+         if( RenderNetworkIF.isValid() && ( RenderNetworkIF.exactMatch( ifname))) // search for specified interfaces:
          {
             for( int w = 0; w < b_recv;  w++) if( !nextWord( pos)) break; // to bytes recieve
             if( verbose) printf("Recieve  bytes = %d\n", atoi( fbuffer+pos));

@@ -59,6 +59,12 @@ Maximum allowed simultaneously running tasks on render, if not set in farm confi
 Path to measure free disk space ('/' - for MS Windows means the root of the system disk).
 </p></li>
 <li><p>
+<code>render_networkif</code> = (?!lo$).*<br/>
+Network interface(s) name pattern to measure network traffic on.
+It will be a sum of traffic if several interfaces matching pattern are founded.
+Specified above default pattern matches any name except <i>lo</i> (loopback interface name).
+</p></li>
+<li><p>
 <code>render_iostat_device</code> = sda<br/>
 Device to measure disk IO statistics (for MS Windows - statistics only for first disk available).
 </p></li>

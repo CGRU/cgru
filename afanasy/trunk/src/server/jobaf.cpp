@@ -66,7 +66,7 @@ bool JobAf::construct()
    logsWeight           = 0;
    blackListsWeight     = 0;
    runningtaskscounter  = 0;
-   py                   = NULL;
+//   py                   = NULL;
 
    if( blocksnum < 1 )
    {
@@ -104,7 +104,7 @@ JobAf::~JobAf()
       for( int b = 0; b < blocksnum; b++) if( blocks[b]) delete blocks[b];
       delete [] blocks;
    }
-   if( py ) delete py;
+//   if( py ) delete py;
 }
 
 bool JobAf::initialize( UserAf * jobOwner)

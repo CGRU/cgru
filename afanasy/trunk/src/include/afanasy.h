@@ -77,6 +77,7 @@ namespace AFRENDER
    const int  LOGS_ROTATE         = 10;         ///< Number of logs to keep.
    const char LOGS_DIRECTORY[]    = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
    const char EXEC[]              = "afrender"; ///< How Render to execute another Render.
+   const char NETWORK_IF[]        = ".*";       ///< Network interface(s) pattern to measure traffic on.
    const char HDDSPACE_PATH[]     = "/";        ///< Path to query total and free space.
    const char IOSTAT_DEVICE[]     = "sda";      ///< Device to monitor IO.
 }

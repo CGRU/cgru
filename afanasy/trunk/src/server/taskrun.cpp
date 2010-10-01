@@ -67,7 +67,7 @@ AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data
    if   ( *counter == 0) { AFERRAR("Tasks counter is negative ! (%d)\n", *counter); }
    else ( *counter )--;
    if( exec) delete exec;
-   
+
    if( progress->state & AFJOB::STATE_DONE_MASK    ) return;
    if( progress->state & AFJOB::STATE_ERROR_MASK   ) return;
    if( progress->state & AFJOB::STATE_SKIPPED_MASK ) return;
@@ -164,22 +164,22 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    }
    case af::TaskExec::UPEject:
    {
-      restart( "Host owner ejected.", renders, monitoring);
+      restart("Host owner ejected.", renders, monitoring);
       break;
    }
    case af::TaskExec::UPRenderDeregister:
    {
-      finish( "Finished - render deregistered.", renders, monitoring);
+      finish("Finished - render deregistered.", renders, monitoring);
       break;
    }
    case af::TaskExec::UPRenderExit:
    {
-      finish( "Finished - render exit.", renders, monitoring);
+      finish("Finished - render exit.", renders, monitoring);
       break;
    }
    case af::TaskExec::UPRenderZombie:
    {
-      finish( "Finished - render zombie.", renders, monitoring);
+      finish("Finished - render zombie.", renders, monitoring);
       break;
    }
    default:
@@ -204,19 +204,19 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    // Tasks with running time > maximum set to errors: // If it TasksMaxRunTime > 0 ( 0 is "infinite" )
    if((block->data->getTasksMaxRunTime() != 0) && (currentTime - progress->time_start > block->data->getTasksMaxRunTime()))
    {
-      stop( "Task maximum run time reached", renders, monitoring);
+      stop("Task maximum run time reached", renders, monitoring);
    }
 
    // Tasks update timeout check:
    if(( stopTime == 0) && ( currentTime > progress->time_done + af::Environment::getTaskUpdateTimeout()))
    {
-      stop( "Task update timeout", renders, monitoring);
+      stop("Task update timeout", renders, monitoring);
    }
 
    // Tasks stop timeout check:
    if( stopTime &&( currentTime - stopTime > AFJOB::TASK_STOP_TIMEOUT ))
    {
-      finish( "Task stop timeout", renders, monitoring);
+      finish("Task stop timeout", renders, monitoring);
       if( changed == false) changed = true;
    }
 

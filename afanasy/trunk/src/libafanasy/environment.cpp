@@ -55,6 +55,7 @@ int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREA
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
 int     Environment::render_logs_linesmax =            AFRENDER::LOGS_LINESMAX;
 QString Environment::render_exec =                     AFRENDER::EXEC;
+QString Environment::render_networkif =                AFRENDER::NETWORK_IF;
 QString Environment::render_hddspace_path =            AFRENDER::HDDSPACE_PATH;
 QString Environment::render_iostat_device =            AFRENDER::IOSTAT_DEVICE;
 
@@ -174,6 +175,7 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, render_default_maxtasks,           "render_default_maxtasks"           );
    getVar( doc, render_exec,                       "render_exec"                       );
    getVar( doc, render_hddspace_path,              "render_hddspace_path"              );
+   getVar( doc, render_networkif,                  "render_networkif"                  );
    getVar( doc, render_iostat_device,              "render_iostat_device"              );
    getVar( doc, render_resclasses,                 "render_resclasses"                 );
    getVar( doc, render_nice,                       "render_nice"                       );

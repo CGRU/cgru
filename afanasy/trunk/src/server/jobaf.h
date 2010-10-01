@@ -112,7 +112,7 @@ private:
 
    UserAf * user;
 
-   JobPy * py;
+//   JobPy * py;
 
 private:
    mutable int progressWeight;

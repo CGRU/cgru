@@ -31,6 +31,7 @@ So each path (project, asset) can have individual software setup.
 <!-- Render -->
    <render_default_capacity>1000</render_default_capacity>
    <render_default_maxtasks>5</render_default_maxtasks>
+   <render_networkif>(?!lo$).*</render_networkif>
    <render_hddspace_path>/</render_hddspace_path>
    <render_iostat_device>sda</render_iostat_device>
 <!--
