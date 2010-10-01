@@ -190,7 +190,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    }
 }
 
-bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
+bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
    if( exec == NULL)
    {
@@ -205,12 +205,14 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    if((block->data->getTasksMaxRunTime() != 0) && (currentTime - progress->time_start > block->data->getTasksMaxRunTime()))
    {
       stop("Task maximum run time reached", renders, monitoring);
+      errorHostId = hostId;
    }
 
    // Tasks update timeout check:
    if(( stopTime == 0) && ( currentTime > progress->time_done + af::Environment::getTaskUpdateTimeout()))
    {
       stop("Task update timeout", renders, monitoring);
+      errorHostId = hostId;
    }
 
    // Tasks stop timeout check:
@@ -218,6 +220,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    {
       finish("Task stop timeout", renders, monitoring);
       if( changed == false) changed = true;
+      errorHostId = hostId;
    }
 
    return changed;

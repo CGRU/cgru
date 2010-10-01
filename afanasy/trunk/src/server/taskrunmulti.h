@@ -33,7 +33,7 @@ public:
    virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
 
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
-   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
 /// Set null message to special message for request output from its running render.
 /** Return \c true and constuct valid message on success. On fail return \c false and message with error text for client

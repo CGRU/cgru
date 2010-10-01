@@ -74,12 +74,12 @@ void Task::deleteRunningZombie()
    run = NULL;
 }
 
-void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
+void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
    bool changed = false;
    if( renders != NULL )
    {
-      if( run ) changed = run->refresh( currentTime, renders, monitoring);
+      if( run ) changed = run->refresh( currentTime, renders, monitoring, errorHostId);
       else
       {
          // Retry errors:

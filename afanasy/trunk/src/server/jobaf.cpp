@@ -738,8 +738,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    {
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
       for( int b = 0; b < blocksnum; b++)
-         for( int t = 0; t < blocks[b]->data->getTasksNum(); t++)
-            blocks[b]->tasks[t]->refresh( currentTime, renders, monitoring);
+         blocks[b]->refresh( currentTime, renders, monitoring);
       if( runningtaskscounter == 0 ) setZombie( NULL, monitoring);
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
    }

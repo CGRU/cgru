@@ -167,7 +167,12 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
    }
 
    // refresh tasks
-   for( int t = 0; t < data->getTasksNum(); t++) tasks[t]->refresh( currentTime, renders, monitoring);
+   for( int t = 0; t < data->getTasksNum(); t++)
+   {
+      int errorHostId = -1;
+      tasks[t]->refresh( currentTime, renders, monitoring, errorHostId);
+      if( errorHostId != -1 ) errorHostsAppend( t, errorHostId, renders);
+   }
 
    // store old state to know if monitoring and database udate needed
    uint32_t old_block_state = data->getState();

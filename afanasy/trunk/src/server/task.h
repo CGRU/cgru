@@ -23,7 +23,7 @@ public:
 /// Update task state.
    void updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
 
-   void refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+   void refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
    void restart( bool onlyRunning, const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
    void restartError( const QString & message, RenderContainer * renders, MonitorContainer * monitoring);

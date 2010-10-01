@@ -256,7 +256,7 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
       stop("Removing slave host while task is running.\nRrestarting entire task.", renders, monitoring);
 }
 
-bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
+bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
    bool changed = false;
 
@@ -294,7 +294,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
 
    if( masterrunning == false) return changed;
 
-   if( TaskRun::refresh( currentTime, renders, monitoring)) changed = true;
+   if( TaskRun::refresh( currentTime, renders, monitoring, errorHostId)) changed = true;
 
    return changed;
 }

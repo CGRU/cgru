@@ -39,7 +39,7 @@ public:
    virtual void update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
 
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
-   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
 /// Restrart running task, it generate 'stop' message to remote host and send it (do nothing if it is already a zombie).
    virtual void restart( const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
