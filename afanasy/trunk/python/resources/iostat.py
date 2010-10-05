@@ -35,7 +35,7 @@ class iostat(resbase.resbase):
       self.process = None
 
       self.valuemax = 100
-      self.labelsize = 8
+      self.labelsize = 10
       self.labelr = 250
       self.labelg = 250
       self.labelb = 50
@@ -113,19 +113,18 @@ class iostat(resbase.resbase):
 
          if matcheddevices != '':
             self.label = matcheddevices+':'
-            self.label += ' %s=%s' % (fields[5],values[5])
-            self.label += ' %s=%s' % (fields[6],values[6])
-            self.label += ' %s=%s' % (fields[11],values[11])
+            self.label += ' %s=%.2f' % (fields[COL_rMBs], rMBs)
+            self.label += ' %s=%.2f' % (fields[COL_wMBs], wMBs)
+            self.label += ' %s=%.2f' % (fields[COL_util], util)
             self.label += '\n'
-            self.label += ' %s=%s' % (fields[7],values[7])
-            self.label += ' %s=%s' % (fields[8],values[8])
-            self.label += '\n'
-            self.label += ' %s=%s' % (fields[9],values[9])
-            self.label += ' %s=%s' % (fields[10],values[10])
+            self.label += ' %s=%.2f' % (fields[COL_avgrqsz], avgrqsz)
+            self.label += ' %s=%.2f' % (fields[COL_avgqusz], avgqusz)
+            self.label += ' %s=%.2f' % (fields[COL_awaitsz], awaitsz)
+            self.label += ' %s=%.2f' % (fields[COL_svctm],   svctm)
          else:
             self.label = 'No such devices founded: "%s"' % self.device
 
-         self.value = int(float(values[11]))
+         self.value = int(util)
          if self.value > self.valuemax: self.value = self.valuemax
          if self.value < 0: self.value = 0
 
