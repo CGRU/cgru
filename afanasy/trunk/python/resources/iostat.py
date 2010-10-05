@@ -121,16 +121,14 @@ class iostat(resbase.resbase):
             self.label += ' %s=%.2f' % (fields[COL_avgqusz], avgqusz)
             self.label += ' %s=%.2f' % (fields[COL_awaitsz], awaitsz)
             self.label += ' %s=%.2f' % (fields[COL_svctm],   svctm)
+            self.value = int(util)
+            if self.value > self.valuemax: self.value = self.valuemax
+            if self.value < 0: self.value = 0
+            self.graphr = int( 5 * self.value / 2 )
+            self.graphg = 255 - int( 5 * self.value / 2 )
+            self.graphb = 10
+            self.bgcolorb = self.value
          else:
             self.label = 'No such devices founded: "%s"' % self.device
-
-         self.value = int(util)
-         if self.value > self.valuemax: self.value = self.valuemax
-         if self.value < 0: self.value = 0
-
-         self.graphr = int( 5 * self.value / 2 )
-         self.graphg = 255 - int( 5 * self.value / 2 )
-         self.graphb = 10
-         self.bgcolorb = self.value
 
       self.process = subprocess.Popen(['iostat','-x','-d','-m','4','2'], stdout=subprocess.PIPE)
