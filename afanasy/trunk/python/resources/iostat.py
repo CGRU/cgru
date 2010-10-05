@@ -1,15 +1,27 @@
 import resbase
 
+import afenv
+
 import os
 import subprocess
+
+ENV_KEY='render_iostat_device'
+ENV_VAR='AF_IOSTAT_DEVICE'
+DEFAULT_DEVICE='sda'
 
 class iostat(resbase.resbase):
    'IO Stat - linux iostat command output'
    def __init__( self):
       resbase.resbase.__init__( self)
+      self.env = afenv.Env()
+      if self.env.valid == False: print 'ERROR: iostat: Invalid environment, may be some problems.'
       self.value = 0
 
-      self.device = os.getenv('AF_IOSTAT_DEVICE','sda')
+      self.device = DEFAULT_DEVICE
+      if ENV_KEY in self.env.Vars: self.device = self.env.Vars[ENV_KEY]
+      self.device = os.getenv('AF_IOSTAT_DEVICE', self.device)
+      print 'Python IO Stat Device = "%s"' % self.device
+
       self.process = None
 
       self.valuemax = 100
@@ -47,7 +59,7 @@ class iostat(resbase.resbase):
                self.label += '\n'
                self.label += ' %s=%s' % (fields[9],values[9])
                self.label += ' %s=%s' % (fields[10],values[10])
-               
+
                self.value = int(float(values[11]))
                if self.value > self.valuemax: self.value = self.valuemax
                if self.value < 0: self.value = 0
