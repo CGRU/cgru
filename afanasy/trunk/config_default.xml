@@ -37,8 +37,10 @@ So each path (project, asset) can have individual software setup.
 <!--
 Custom resources meters:
 example - simple resource meter for an example only
-iostat - parce output of linux 'iostat' command
+iostat - parce output of linux 'iostat' command, specify device in "render_customiostat_devices" varibale
    <render_resclasses>example;iostat</render_resclasses>
+   <render_customiostat_devices>sda</render_customiostat_devices>
+   - to specify several devices use regular expressions, for example "sda[2-4]"
 ';' - separate classes character
 -->
    <render_exec>afrender</render_exec>
