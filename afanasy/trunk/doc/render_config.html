@@ -73,6 +73,13 @@ Device to measure disk IO statistics (for MS Windows - statistics only for first
 Custom resources meter(s). Python class name(s), if several - list separated with ';' character.
 </p></li>
 <li><p>
+<code>render_customiostat_devices</code> = sda<br/>
+Device(s) for custom python resource meter "<i>iostat</i>".
+To watch several devices use regular expression, for example "<i>sda[2-4]</i>".
+If several devices matching pattern are founded,
+it calculates the sum of traffic parameters and maximum of utilization parameters.
+</p></li>
+<li><p>
 <code>render_exec</code> = afrender<br/>
 Command for render to execute another render or to restart.
 </p></li>
