@@ -1,0 +1,2 @@
+DNxHD 36MBits
+ffmpeg -y -r 23.976 -i "@INPUT@" -vcodec dnxhd -b 36Mb "@OUTPUT@"
