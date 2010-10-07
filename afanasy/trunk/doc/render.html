@@ -45,12 +45,17 @@
 
 <p><code>$ afrender</code></p>
 <p>Render is a client application.
-It runs on a semote host and communicate with server.
-Server send tasks to render to run.</p>
+It runs on a semote host and communicates with server.
+Server sends tasks to render to run.</p>
 
 <h3>Render Attributes:</h3>
 <ul>
-<li><a name="Name"/><b>Name</b> - Each render has an unique name. If new render comes to server with the name which already exists, server change it's name by adding a number. Users and jobs hosts masks (huntgroup) are based on render names and <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).
+<li><a name="Name"/><b>Name</b> - Each render has an unique name.
+If new render comes to server with the name which already exists, server will not register it.
+Users and jobs hosts masks (huntgroup) are based on render names
+and <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).
+<br/>
+To launch another render on the same host use <kbd>AF_HOSTNAME</kbd> environment variable to override render name.
 <br/><br/></li>
 <li><a name="Address"/><b>Address</b> - IP address and port that render listen.
 <br/><br/></li>

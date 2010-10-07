@@ -39,26 +39,57 @@
 </table>
 <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
 <!--HEADER-->
-<h2 align="center">Afanasy Setup</h2>
+<h2 align="center">Afanasy Setup &amp; Launch</h2>
 <hr />
 <ol>
 <li><h4>Setup Environment</h4>
    <p>
-   Environment needed to fill $PATH with CGRU commands and to specify configuration files location.<br/>
-   Go into CGRU top directory:<br />
-   <code>$ cd cgru/afanasy/[trunk|branch|tag]</code><br />
-   Source script which exports some variables:<br />
-   <code>$ source setup.sh</code><br />
-   Also this setup appends your $PYTHONPATH to specify python CGRU modules location.
+   To work proper Afanasy applications need some environment setup.
+   You need to setup CGRU and Afanasy environment.
+   There are scripts to setup it.
+   They based on a working directory.
+   To setup CGRU you need to go to CGRU root folder and source setup scripts.
+   Afanasy setup is the same.
    </p>
+   <ul>
+      <li>
+         Setup CGRU:<br />
+         <code>$ cd .../cgru</code><br />
+         <code>$ source setup.sh</code><br/>
+         (On MS Windows <code>call setup.cmd</code>)<br/>
+      </li>
+      <li>
+         Setup Afanasy:<br />
+         <code>$ cd .../cgru/afanasy/[trunk|branch|tag]</code><br />
+         <code>$ source setup.sh</code><br/>
+         (On MS Windows <code>call setup.cmd</code>)<br/>
+      </li>
+   </ul>
    <p>
-   To automate process you can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
-   <code>pwd=$PWD; cd afanasy; source setup.sh; cd $pwd</code><br/>
+   Setup puts <kbd>.../cgru/bin</kbd> and <kbd>.../cgru/afanasy/bin</kbd> in <kbd>PATH</kbd>.
+   It also appends your <kbd>PYTHONPATH</kbd> to specify python CGRU and Afanasy modules location.
    </p>
+   <ul>
+   <li>Unix:<br/>
+      <p>
+      To check Environment you can launch <kbd>afcmd</kbd> command.
+      If the program is exists and its output produced no errors, the environment is OK.<br/>
+      </p>
+      <p>
+      To automate terminals setup you can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
+      <code>pwd=$PWD; cd .../cgru; source setup.sh; cd afanasy; source setup.sh; cd $pwd</code><br/>
+      </p>
+   </li>
+   </ul>
 </li>
-<li><h4>Check Environment</h4>
-   <kbd>afanasy/bin</kbd> must be in <kbd>PATH</kbd>, so you can launch afanasy programs<br/>
-   Launch <kbd>afcmd</kbd> to check it. If programs is exists and output produced no errors, environment is OK.<br/>
+<li><h4>Launch</h4>
+   <p>
+   It is better to launch server and render processes by a special user. Lets name him <kbd>renderer</kbd>.
+   </p>
+   <code># useradd renderer</code><br/>
+   <p>
+   This command will create him. Next scripts use this user name.
+   </p>
 </li>
 <li><h4>Create User</h4>
 <p>
