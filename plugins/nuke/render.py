@@ -118,14 +118,26 @@ try:
 except:
    errorExit('Write node file operations error:\n' + str(sys.exc_info()[1]), True)
 
-# Get views number:
+# Get views and images folders:
+imagesdirs = []
+views = []
 views_num = 1
 try:
    views_str = writenode.knob('views').value()
    print 'Views = "%s"' % views_str
-   views_num = len(views_str.split())
+   views = views_str.split(' ')
+   views_num = len(views)
+   for view in views:
+      view = view.strip()
+      if view != '':
+         img = imagesdir
+         img = img.replace('%V', view)
+         img = img.replace('%v', view[0])
+         imagesdirs.append( img)
 except:
    views_num = 1
+   imagesdirs.append( imagesdir)
+   views.append('main')
    print str(sys.exc_info()[1])
 if views_num < 1: views_num = 1
 print 'Number of views = %d' % views_num
@@ -137,60 +149,78 @@ while frame <= flast:
    print 'Rendering frame %d:' % frame
    sys.stdout.flush()
 
-   # Try to execute write node:
-   try:
-      if nuke.env['NukeVersionMajor'] < 6:
-         nuke.execute( writenode.name(), frame, frame)
-      else:
-         nuke.execute( writenode, frame, frame)
-   except:
-      print 'Node execution error:'
-      print str(sys.exc_info()[1])
-      exitcode = 1
-   print
-   sys.stdout.flush()
+   # Iterate views:
+   view_num = 0
+   for view in views:
+      if views_num > 1: print 'Executing view "%s":' % view
 
-   # Copy image files from temp directory:
-   allitems = os.listdir( tmpdir)
-   moveditems = 0
-   for item in allitems:
-      if item.rfind('.tmp') == len(item)-4: continue
-      if item.rfind('.nk') == len(item)-3: continue
-      src  = os.path.join( tmpdir,    item)
-      dest = os.path.join( imagesdir, item)
-      if os.path.isfile( dest):
-         try:
-            print 'Deleting old "%s"' % dest
-            os.remove( dest)
-         except:
-            print str(sys.exc_info()[1])
-            print 'Unable to remove destination file:'
-            print dest
-            exitcode = 1
+      # Try to execute write node:
       try:
-         print 'Moving "%s"' % dest
-         shutil.move( src, imagesdir)
+         if nuke.env['NukeVersionMajor'] < 6:
+            nuke.execute( writenode.name(), frame, frame)
+         else:
+            nuke.execute( writenode, frame, frame, 1, [view])
       except:
-         print 'File moved with error:'
+         print 'Node execution error:'
          print str(sys.exc_info()[1])
-         print src
-         print dest
-      if not os.path.isfile( dest):
-         print 'Error: Destination file does not exist.'
          exitcode = 1
-      else:
-         moveditems += 1
+      print
+      sys.stdout.flush()
 
-   if moveditems < 1:
-      print 'Error: No images generated.'
-      exitcode = 1
-   elif moveditems < views_num:
-      print 'Error: Not enough images generated (%d instead of %d).' % (moveditems,views_num)
-      exitcode = 1
-   else:
-      print 'Images generated: %d' % moveditems
-   sys.stdout.flush()
-   if exitcode != 0: break
+      # Copy image files from temp directory:
+      allitems = os.listdir( tmpdir)
+      moveditems = 0
+      for item in allitems:
+         if item.rfind('.tmp') == len(item)-4: continue
+         if item.rfind('.nk') == len(item)-3: continue
+         src  = os.path.join( tmpdir, item)
+         dest = os.path.join( imagesdirs[view_num], item)
+         # Delete old image if any:
+         if os.path.isfile( dest):
+            try:
+               print 'Deleting old "%s"' % dest
+               os.remove( dest)
+            except:
+               print str(sys.exc_info()[1])
+               print 'Unable to remove destination file:'
+               print dest
+               exitcode = 1
+         # Move temporary image:
+         try:
+            print 'Moving "%s"' % dest
+            shutil.move( src, imagesdirs[view_num])
+         except:
+            print 'File moved with error:'
+            print str(sys.exc_info()[1])
+            print src
+            print dest
+         # Check destination image:
+         if not os.path.isfile( dest):
+            print 'Error: Destination file does not exist.'
+            exitcode = 1
+         else:
+            moveditems += 1
+         # Remove temporary image:
+         try:
+            os.remove( src)
+         except:
+            print 'Failed to remove temporary image:'
+            print str(sys.exc_info()[1])
+            print src
+
+      if moveditems < 1:
+         print 'Error: No images generated.'
+         exitcode = 1
+#      elif moveditems < views_num:
+#         print 'Error: Not enough images generated (%d instead of %d).' % (moveditems,views_num)
+#         exitcode = 1
+      else:
+         print 'Images generated: %d' % moveditems
+      sys.stdout.flush()
+      if exitcode != 0: break
+
+      view_num += 1
+
    frame += fby
 
 # Remove temp directory:

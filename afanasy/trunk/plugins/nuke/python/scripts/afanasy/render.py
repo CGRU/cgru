@@ -122,20 +122,7 @@ class BlockParameters:
       else:
          self.imgfile = str( wnode.knob('file').value())
 
-      # Check images files:
-      if self.imgfile == '':
-         nuke.message('Write Node "%s"\nImages are empty.' % self.writename)
-         self.valid = False
-      else:
-         folder = os.path.dirname( self.imgfile)
-         if folder != '':
-            if not os.path.isdir(folder):
-               result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
-               if result:
-                  os.mkdir( folder)
-               else:
-                  self.valid = False
-
+      # Get views:
       views = wnode.knob('views')
       if views is not None:
          views = views.value()
@@ -155,6 +142,21 @@ class BlockParameters:
                   for img in images:
                      if self.imgfile != '': self.imgfile += ';'
                      self.imgfile += img
+
+      # Check images files:
+      if self.imgfile == '':
+         nuke.message('Write Node "%s"\nImages are empty.' % self.writename)
+         self.valid = False
+      else:
+         for imgfile in self.imgfile.split(';'):
+            folder = os.path.dirname( imgfile)
+            if folder != '':
+               if not os.path.isdir(folder):
+                  result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
+                  if result:
+                     os.mkdir( folder)
+                  else:
+                     self.valid = False
 
       for par in fparams:
          if fparams[par] is not None:
