@@ -41,10 +41,31 @@
 <!--HEADER-->
 <h2 align="center">Afanasy Setup &amp; Launch</h2>
 <hr />
+
+<p>
+   If you have used Linux packages (<i>rpm</i> or <i>deb</i>)
+   you already have <code>afrender</code> (and <code>afserver</code> if you have installed it)
+   running automatically at system startup.
+   They run from <kbd>renderer</kbd> user by default, which was created during install.
+</p>
+<p>
+   Afanasy binaries located in <kbd>.../cgru/afanasy/bin</kbd> directory.
+   To work properly they need some environment setup.
+   There are some example scripts to setup environment and launch Afanasy application.
+</p>
+<p>
+   Go in <kbd>.../cgru/examples/scripts</kbd> folder.<br/>
+   <code>afrender.sh</code> - Run render. For MS Windows - <code>afrender.cmd</code>.<br/>
+   <code>afwatch.sh</code> - Run GUI. For MS Windows - <code>afwatch.cmd</code>.<br/>
+   </p>
+<p>
+   This scripts setup CGRU and Afanasy environment and run application.
+   Next documentation shows what you need to do to setup, launch, customize and automatically start Afanasy applications.
+</p>
+
 <ol>
 <li><h4>Setup Environment</h4>
    <p>
-   To work proper Afanasy applications need some environment setup.
    You need to setup CGRU and Afanasy environment.
    There are scripts to setup it.
    They based on a working directory.
@@ -66,8 +87,9 @@
       </li>
    </ul>
    <p>
-   Setup puts <kbd>.../cgru/bin</kbd> and <kbd>.../cgru/afanasy/bin</kbd> in <kbd>PATH</kbd>.
-   It also appends your <kbd>PYTHONPATH</kbd> to specify python CGRU and Afanasy modules location.
+   Setup puts <kbd>.../cgru/bin</kbd> and <kbd>.../cgru/afanasy/bin</kbd> in <code>PATH</code>.<br/>
+   Appends <code>PYTHONPATH</code> with <kbd>.../cgru/bin</kbd>, <kbd>.../cgru/afanasy/python</kbd> and <kbd>.../cgru/afanasy/bin</kbd>.
+   It allows to import CGRU and Afanasy Python modules.
    </p>
    <ul>
    <li>Unix:<br/>
@@ -80,53 +102,84 @@
       <code>pwd=$PWD; cd .../cgru; source setup.sh; cd afanasy; source setup.sh; cd $pwd</code><br/>
       </p>
    </li>
+   <li>MS Windows:<br/>
+      You can do the same to setup command line.
+   </li>
    </ul>
 </li>
 <li><h4>Launch</h4>
    <p>
-   It is better to launch server and render processes by a special user. Lets name him <kbd>renderer</kbd>.
+      After setup you can simply run a command <code>afrender</code> or <code>afwatch</code>,
+      as Afanasy binaries are in PATH.
    </p>
-   <code># useradd renderer</code><br/>
    <p>
-   This command will create him. Next scripts use this user name.
+      You can run Python and import Afanasy module to construct and send jobs.<br/>
+      <code>import af</code>
    </p>
 </li>
-<li><h4>Create User</h4>
-<p>
-It is better to launch server and render processes by a special user. Lets name him <kbd>renderer</kbd>.
-</p>
-<code># useradd renderer</code><br/>
-<p>
-This command will create him. Next scripts use this user name.
-</p>
+<li><h4>Automatic startup</h4>
+   <ul>
+   <li><h4>MS Windows</h4>
+      <p>
+         To start render at computer boot, you can simple make a link to start script in a "Startup" menu.
+      </p>
+      <p>
+         There are no afanasy services written yet.
+         But it should not be a problem for administrator
+         to make a script to run render automatically from any user and with no GUI.
+         And it is very useful to setup Watch render custom commands to stop and start render by such scripts
+         (See <code>rendercmds</code> on <a href="watch_config.html">watch configuration page</a>).
+      </p>
+   </li>
+   <li><h4>Linux</h4>
+      <p>
+         There is some ready solution (<i>bash</i> scripts) to make server and render to launch automatically at system boot.
+      </p>         
+      <p>
+         It is better to launch server and render processes by a special user. Lets name him <kbd>renderer</kbd>.
+      </p>
+      <code># useradd renderer</code><br/>
+      <p>
+         This command will create him. Next scripts use this user name.
+      </p>
+      <p>
+         There are some <kbd>bash</kbd> scripts in <code>cgru/afanasy/init</code> directory.
+         They can help you to setup automatic server and render launch.
+         You can manually link <kbd>afserver</kbd> or <kbd>afrender</kbd> script in your startup scripts location
+         or use <kbd>initlink.sh</kbd> utility to do it.
+      </p>
+         <code># ./initlinks.sh [options] afserver</code><br/>
+         <code># ./initlinks.sh [options] afrender</code><br/>
+      <p>
+         You can launch this script with no arguments to output help.
+      </p>
+      <p>
+         This command creates a link in <kbd>/etc/init.d</kbd> directory to a Afanasy application.
+         Puts links in <kbd>/etc/rc?.d</kbd> directories to provide service starting and stopping.
+         See script file for details.
+      </p>
+      <p>
+         After this afanasy services will start on machine boot and stop on shutdown automatically. Or you can start and stop them manually  by following commands:
+      </p>
+      <code># /etc/init.d/afserver start</code><br/>
+      <code># /etc/init.d/afserver stop</code><br/>
+      <code># /etc/init.d/afrender start</code><br/>
+      <code># /etc/init.d/afrender stop</code><br/>
+      <p>
+         If you starting scripts as <kbd>root</kbd> user, applications will be launched by <kbd>renderer</kbd> user.
+         You can customize 'non root' username in <kbd>cgru/afanasy/nonrootuser</kbd> file.
+      </p>
+      <p>
+         This starting scripts also provide log rotating. Logs and pid files are stored in <kbd>/var/tmp/afanasy</kbd> directory.
+      </p>
+   </li>
+   <li><h4>Other UNIX-es and MAC</h4>
+      <p>
+         You should know how to make something to launch automatically if you enough brave to setup a render farm on such systems.
+      </p>
+   </li>
+   </ul>
 </li>
-<li><h4>Launch Scripts</h4>
-<p>
-There are some <kbd>bash</kbd> scripts in <code>cgru/afanasy/init</code> directory. They can help you to setup automatic server and render launch. You can manually link <kbd>afserver</kbd> or <kbd>afrender</kbd> script in your startup scripts location  or use <kbd>initlink.sh</kbd> utility to do it.
-</p>
-<code># ./initlinks.sh [options] afserver</code><br/>
-<code># ./initlinks.sh [options] afrender</code><br/>
-<p>
-You can launch this script with no arguments to output help.
-</p>
-<p>
-This command create a link in <kbd>/etc/init.d</kbd> directory to a file, which located in current directory and name provided in first argument. Put links in <kbd>/etc/rc?.d</kbd> directories to provide service starting and stopping. See script file for details.
-</p>
-<p>
-After this afanasy services will start on machine boot and stop on shutdown automatically. Or you can start and stop them manually  by following commands:
-</p>
-<code># /etc/init.d/afserver start</code><br/>
-<code># /etc/init.d/afserver stop</code><br/>
-<code># /etc/init.d/afrender start</code><br/>
-<code># /etc/init.d/afrender stop</code><br/>
-</li>
-<p>
-If you starting scripts as <kbd>root</kbd> user, applications will be launched by <kbd>renderer</kbd> user.
-You can customize 'non root' username in <kbd>cgru/afanasy/nonrootuser</kbd> file.
-</p>
-<p>
-This starting scripts also provide log rotating. Logs and pid files are stored in <kbd>/var/tmp/afanasy</kbd> directory.
-</p>
 </ol>
 <!--FOOTER-->
 </td></tr></table>
