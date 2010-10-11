@@ -13,7 +13,6 @@ from PyQt4 import QtCore, QtGui
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-i', '--input',     dest='inputfile',    type  ='string',     default='',             help='Input file')
 Parser.add_option('-s', '--slate',     dest='slate',        type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',  dest='template',     type  ='string',     default='dailies',      help='Frame paint template')
 Parser.add_option('--company',         dest='company',      type  ='string',     default='Company',      help='Company name')
@@ -88,6 +87,9 @@ class Dialog( QtGui.QWidget):
       self.parameterswidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.parameterswidget,'Parameters')
       self.parameterslayout = QtGui.QVBoxLayout( self.parameterswidget)
+      self.steroewidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.steroewidget,'Stereo')
+      self.stereolayout = QtGui.QVBoxLayout( self.steroewidget)
       self.mainLayout.addWidget( self.tabwidget)
 
       # General:
@@ -189,7 +191,7 @@ class Dialog( QtGui.QWidget):
       self.lInputSettings = QtGui.QVBoxLayout()
       self.gInputSettings.setLayout( self.lInputSettings)
 
-      self.editInputFile = QtGui.QLineEdit( Options.inputfile, self)
+      self.editInputFile = QtGui.QLineEdit( self)
       QtCore.QObject.connect( self.editInputFile, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
       self.lInputSettings.addWidget( self.editInputFile)
 
@@ -435,6 +437,12 @@ class Dialog( QtGui.QWidget):
       self.parameterslayout.addWidget( self.gAfanasy)
 
 
+      self.cStereoMode = QtGui.QCheckBox('Turn On Stereo Mode', self)
+      self.cStereoMode.setChecked( False)
+      QtCore.QObject.connect( self.cStereoMode, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.stereolayout.addWidget( self.cStereoMode)
+
+
       self.inputEvaluated = False
       self.autoTitles()
       self.activityChanged()
@@ -579,6 +587,8 @@ class Dialog( QtGui.QWidget):
       self.evaluated = False
       if not self.inputEvaluated: return
 
+      self.StereoMode = self.cStereoMode.isChecked()
+
       if self.cAutoTitles.isChecked(): self.editShot.clear()
       if self.cAutoOutput.isChecked():
          self.editOutputName.clear()
@@ -636,8 +646,6 @@ class Dialog( QtGui.QWidget):
       cmd = 'python ' + os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
       cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
       cmd += ' -f %s' % self.cbFPS.currentText()
-      cmd += ' -i "%s"' % self.inputPattern
-      cmd += ' -o "%s"' % os.path.join( outdir, outname)
       format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
       if not format.isEmpty():
          ts = self.cbTemplateS.currentText()
@@ -668,11 +676,16 @@ class Dialog( QtGui.QWidget):
             cmd += ' --logograv %s' % self.cbLogoGravity.currentText()
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
+      if self.StereoMode:
+         cmd += ' --stereo'
       if self.cAfanasy.isChecked() and not self.cAfOneTask.isChecked():
          cmd += ' -A'
          if self.sbAfCapConvert.value() != -1: cmd += ' --afconvcap %d' % self.sbAfCapConvert.value()
          if self.sbAfCapEncode.value()  != -1: cmd += ' --afenccap %d' % self.sbAfCapEncode.value()
       if Options.debug: cmd += ' --debug'
+
+      cmd += ' "%s"' % self.inputPattern
+      cmd += ' "%s"' % os.path.join( outdir, outname)
 
       self.cmdField.setText( cmd)
       self.evaluated = True
