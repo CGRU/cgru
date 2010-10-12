@@ -2,7 +2,7 @@
 
 prefix=$PWD
 
-cd ilmbase-1.0.1
+cd ilmbase-1.0.2
 
 if [ ! -z $1 ] ; then
    ./configure -h; exit

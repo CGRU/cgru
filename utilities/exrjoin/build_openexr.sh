@@ -2,14 +2,14 @@
 
 prefix=$PWD
 
-CPPFLAGS=" -I$prefix/include"
+CPPFLAGS=" -I$prefix/include -include string.h"
 
 LDFLAGS="-L/lib64 -L/usr/lib64 -L$prefix/lib -lpthread"
 
 export CPPFLAGS
 export LDFLAGS
 
-cd openexr-1.6.1
+cd openexr-1.7.0
 
 if [ ! -z $1 ] ; then
    ./configure -h; exit
