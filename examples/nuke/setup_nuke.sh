@@ -55,5 +55,8 @@ done
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
 echo "NUKE = '${NUKE_EXEC}'"
 
+# Launch commands from current directory:
+export AF_CMD_PREFIX="./"
+
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
