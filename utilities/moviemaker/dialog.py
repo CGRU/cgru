@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from datetime import datetime
 import os
 import re
 import subprocess
 import sys
+import time
 
 from PyQt4 import QtCore, QtGui
 
@@ -173,6 +173,8 @@ class Dialog( QtGui.QWidget):
       self.cbActivity.addItem('render')
       self.cbActivity.addItem('anim')
       self.cbActivity.addItem('sim')
+      self.cbActivity.addItem('clnup')
+      self.cbActivity.addItem('mtpnt')
       self.lUser.addWidget( self.cbActivity)
       QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
       self.lInformation.addLayout( self.lUser)
@@ -242,14 +244,6 @@ class Dialog( QtGui.QWidget):
       self.cAutoOutput.setChecked( True)
       self.lOutputName.addWidget( self.cAutoOutput)
       QtCore.QObject.connect( self.cAutoOutput, QtCore.SIGNAL('stateChanged(int)'), self.autoOutput)
-      self.cDateOutput = QtGui.QCheckBox('Add Date', self)
-      self.cDateOutput.setChecked( True)
-      self.lOutputName.addWidget( self.cDateOutput)
-      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cTimeOutput = QtGui.QCheckBox('Add Time', self)
-      self.cTimeOutput.setChecked( False)
-      self.lOutputName.addWidget( self.cTimeOutput)
-      QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.lOutputSettings.addLayout( self.lOutputName)
 
       self.lOutputDir = QtGui.QHBoxLayout()
@@ -384,6 +378,17 @@ class Dialog( QtGui.QWidget):
       self.lDrawing.addLayout( self.lFont)
 
       self.parameterslayout.addWidget( self.gDrawing)
+
+      self.dateTimeLayout = QtGui.QHBoxLayout()
+      self.cDateOutput = QtGui.QCheckBox('Append Name With Date', self)
+      self.cDateOutput.setChecked( False)
+      self.dateTimeLayout.addWidget( self.cDateOutput)
+      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.cTimeOutput = QtGui.QCheckBox('Append Name With Time', self)
+      self.cTimeOutput.setChecked( False)
+      self.dateTimeLayout.addWidget( self.cTimeOutput)
+      self.parameterslayout.addLayout( self.dateTimeLayout)
+      QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
 
       self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
       self.lCorr = QtGui.QHBoxLayout()
@@ -609,7 +614,7 @@ class Dialog( QtGui.QWidget):
 
       shot = '%s' % self.editShot.text()
       if self.cAutoTitles.isChecked() or shot == '':
-         shot = self.inputPrefix.strip('.').upper()
+         shot = self.inputPrefix.strip('.')
          self.editShot.setText( shot)
 
       version = '%s' % self.editVersion.text()
@@ -633,6 +638,7 @@ class Dialog( QtGui.QWidget):
          outname = shot
          if activity != '': outname += '_' + activity
          if version  != '': outname += '_' + version
+         outname += time.strftime('_%y%m%d')
          self.editOutputName.setText( outname)
 
       logodraw = self.cLogo.isChecked()
