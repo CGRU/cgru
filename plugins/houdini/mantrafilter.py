@@ -36,6 +36,7 @@ imagesdir = ''
 def filterPlane():
    global imagesdir
    filename = mantra.property('image:filename')[0]
+   filteredNames.append( filename)
    if not filename in filteredNames:
       if imagesdir == '':
          imagesdir = os.path.dirname( filename)
@@ -44,9 +45,8 @@ def filterPlane():
       if tmpdir != '':
          pos = filename.rfind("/")
          filename = tmpdir + filename[pos:]
-      filteredNames.append( filename)
-   print 'Mantra plane filename:\n' + filename
-   mantra.setproperty('plane:planefile', filename)
+      print 'Mantra plane filename:\n' + filename
+      mantra.setproperty('plane:planefile', filename)
 
 # A callback to change image crop and write down main image filename:
 def filterCamera():
