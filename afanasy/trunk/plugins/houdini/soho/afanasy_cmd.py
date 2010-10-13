@@ -5,7 +5,7 @@ import os
 import re
 import time
 
-import af
+import afhoudini
 
 genParms = {
     'trange'                     : SohoParm('trange'                    ,'int'   , [0],          False),
@@ -24,11 +24,15 @@ genParms = {
 
     'enable_extended_parameters' : SohoParm('enable_extended_parameters','int'   , [0]    , False),
     'depend_mask'                : SohoParm('depend_mask'               ,'string', ['']   , False),
-    'priority'                   : SohoParm('priority'                  ,'int'   , [99]   , False),
+    'depend_mask_global'         : SohoParm('depend_mask_global'        ,'string', ['']   , False),
+    'priority'                   : SohoParm('priority'                  ,'int'   , [-1]   , False),
     'maximum_hosts'              : SohoParm('maximum_hosts'             ,'int'   , [-1]   , False),
+    'capacity'                   : SohoParm('capacity'                  ,'int'   , [-1]   , False),
+    'capacity_coefficient'       : SohoParm('capacity_coefficient'      ,'int'   , [-1,-1], False),
     'hosts_mask'                 : SohoParm('hosts_mask'                ,'string', ['']   , False),
     'hosts_mask_exclude'         : SohoParm('hosts_mask_exclude'        ,'string', ['']   , False),
     'start_paused'               : SohoParm('start_paused'              ,'int'   , [0]    , False),
+    'platform'                   : SohoParm('platform'                  ,'string', ['']   , False),
 }
 plist = soho.evaluate(genParms)
 
@@ -45,10 +49,14 @@ now            = plist['now'].Value[0]
 hip            = plist['hip'].Value[0]
 hipname        = plist['hipname'].Value[0]
 
+platform                   = plist['platform'].Value[0]
 start_paused               = plist['start_paused'].Value[0]
 enable_extended_parameters = plist['enable_extended_parameters'].Value[0]
 depend_mask                = plist['depend_mask'].Value[0]
+depend_mask_global         = plist['depend_mask_global'].Value[0]
 priority                   = plist['priority'].Value[0]
+capacity                   = plist['capacity'].Value[0]
+capacity_coefficient       = plist['capacity_coefficient'].Value
 maximum_hosts              = plist['maximum_hosts'].Value[0]
 hosts_mask                 = plist['hosts_mask'].Value[0]
 hosts_mask_exclude         = plist['hosts_mask_exclude'].Value[0]
@@ -97,16 +105,16 @@ tmphip = hip + '/' + jobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(
 # changes current scene file name to tmphip, at least in version 9.1.115
 hou.hscript('mwrite -n %s' % tmphip)
 
-jobcmd = 'hrender_af'
-if ignore_inputs: jobcmd += ' -i'
-jobcmd += ' -s %%1 -e %%2 -b %(by)d -t %(take)s %(tmphip)s %(hdriver)s' % vars()
-
-blocktype = 'hbatch'
+taskstype = 'hbatch'
+preview = ''
 drivertypename = driver.type().name()
 if drivertypename == 'ifd':
-   blocktype = 'hbatch_mantra'
+   taskstype = 'hbatch_mantra'
+   vm_picture = driver.parm('vm_picture')
+   if vm_picture != None:
+      preview = afhoudini.pathToC( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
 elif drivertypename == 'rib':
-   blocktype = 'hbatch_prman'
+   taskstype = 'hbatch_prman'
 elif drivertypename == 'afanasy':
    soho.error('Render "afanasy" ROP will cycle process.')
 elif drivertypename == 'af_cmd_sender':
@@ -114,24 +122,31 @@ elif drivertypename == 'af_cmd_sender':
 elif drivertypename == 'af_multiply_sender':
    soho.error('ROP "af_multiply_sender" sends job itself.')
 
-job = af.Job()
-job.setName( jobname )
+if len(capacity_coefficient) == 1: capacity_coefficient.append(-1)
+capacity_min,capacity_max = capacity_coefficient
 
-if start_paused:
-   job.offLine()
+cmd = os.getenv('AF_ROOT', '')
+if cmd == '':
+   cmd = 'afjob.py'
+else:
+   cmd = os.path.join( cmd, 'python')
+   cmd = os.path.join( cmd, 'afjob.py')
+cmd += ' %(tmphip)s %(start)d %(end)d -fpr %(fpr)d -node %(hdriver)s -type %(taskstype)s -take %(take)s -name %(jobname)s -deletescene' % vars()
 
-if enable_extended_parameters:
-   job.setDependMask( depend_mask)
-   job.setPriority( priority)
-   job.setMaxHosts( maximum_hosts)
-   job.setHostsMask( hosts_mask)
-   job.setHostsMaskExclude( hosts_mask_exclude)
+if platform           != '': cmd += ' -os '           + platform
+if priority           != -1: cmd += ' -priority '     + str(priority)
+if maximum_hosts      != -1: cmd += ' -maxhosts '     + str(maximum_hosts)
+if capacity           != -1: cmd += ' -capacity '     + str(capacity)
+if capacity_min       != -1: cmd += ' -capmin '       + str(capacity_min)
+if capacity_max       != -1: cmd += ' -capmax '       + str(capacity_max)
+if depend_mask        != '': cmd += ' -depmask '      + depend_mask
+if depend_mask_global != '': cmd += ' -depglbl '      + depend_mask_global
+if hosts_mask         != '': cmd += ' -hostsmask '    + hosts_mask
+if hosts_mask_exclude != '': cmd += ' -hostsexcl '    + hosts_mask_exclude
+if preview            != '': cmd += ' -images '       + preview
+if ignore_inputs           : cmd += ' -ignoreinputs'
+if start_paused            : cmd += ' -pause'
 
-block = job.addBlock( hdriver, blocktype)
-block.setWorkingDirectory( os.getenv('PWD', os.getcwd()))
-block.setCommand( jobcmd)
-block.setNumeric( start, end, fpr)
+print cmd
 
-job.setCmdPost('rm ' + tmphip)
-
-job.send()
+os.system( cmd)

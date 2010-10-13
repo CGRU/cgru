@@ -114,7 +114,7 @@ hou.hscript('mwrite -n %s' % tmphip)
 
 jobcmd = 'hrender_af'
 if ignore_inputs: jobcmd += ' -i'
-jobargs = ' -s %%1 -e %%2 -b %(by)d -t %(take)s %(tmphip)s %(hdriver)s' % vars()
+jobargs = ' -s %%1 -e %%2 --by %(by)d -t %(take)s %(tmphip)s %(hdriver)s' % vars()
 
 blocktype = 'hbatch'
 preview = ''

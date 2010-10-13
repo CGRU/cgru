@@ -17,7 +17,7 @@ tiles = divx * divy
 job = af.Job('Houdini Test: Tile Render')
 
 b_genifd = af.Block('generate ifd', 'hbatch')
-b_genifd.setCommand('hrender_af -s %1 -e %2 -b 1 '+scene+' '+rop)
+b_genifd.setCommand('hrender_af -s %1 -e %2 '+scene+' '+rop)
 b_genifd.setNumeric( f_start, f_finish)
 
 b_render = af.Block('render tiles', 'mantra')

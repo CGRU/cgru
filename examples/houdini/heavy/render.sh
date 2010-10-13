@@ -1,8 +1,7 @@
 #!/bin/bash
 
-# Setup CGRU:
-pushd ../.. >> /dev/null
-source ./setup.sh
+pushd .. >> /dev/null
+source ./setup_houdini.sh
 popd >> /dev/null
 
 python render.py $*

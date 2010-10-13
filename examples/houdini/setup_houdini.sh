@@ -5,23 +5,37 @@ pushd .. >> /dev/null
 source ./setup.sh
 popd >> /dev/null
 
-# directory where Houdini installed (default value):
-export HOUDINI_LOCATION=/cg/soft/houdini-10
+# Launch commands from current directory:
+export AF_CMD_PREFIX="./"
 
-# overrides (set custom values there):
+# Search directory where Houdini installed:
+HOUDINI_INSTALL_DIR="/opt"
+for folder in `ls "$HOUDINI_INSTALL_DIR"`; do
+   if [ "`echo $folder | gawk '{print match( \$1, "hfs")}'`" == "1" ]; then
+      export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
+   fi
+done
+
+# Overrides (set custom values there):
 [ -f override.sh ] && source override.sh
 
+# Check Houdini location:
+if [ -z "$HOUDINI_LOCATION" ]; then
+   echo "Can't find houdini in '$HOUDINI_DIR'"
+   exit 1
+fi
+echo "Houdni location = '$HOUDINI_LOCATION'"
+
+# Source Houdini setup shell script:
 pushd $HOUDINI_LOCATION >> /dev/null
 source houdini_setup_bash
 popd $pwd >> /dev/null
 
-# Setup CGRU houdini scripts:
+# Setup CGRU houdini scripts location:
 export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 
-# Set Afanasy houdini scripts version
-export HOUDINI_AF_VERSION="10"
-# Set Afanasy houdini scripts location
-export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini/houdini$HOUDINI_AF_VERSION
+# Set Afanasy houdini scripts location:
+export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini
 
 export HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH/otls:$HH/otls
 

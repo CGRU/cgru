@@ -94,7 +94,7 @@ if run_rop:
 
    job.setCmdPost('rm ' + tmphip)
    b_generate = af.Block( blockname, blocktype)
-   b_generate.setCommand( cmd + ' -s %1 -e %2 -b 1 -t '+take+' '+tmphip+' '+rop)
+   b_generate.setCommand( cmd + ' -s %1 -e %2 --by 1 -t '+take+' '+tmphip+' '+rop)
    b_generate.setNumeric( f_start, f_finish)
    if join_render: b_generate.setFiles( images)
 

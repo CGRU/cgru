@@ -115,7 +115,7 @@ for i in xrange(0,lenInputs):
       block_end   = int(node.parm('f2').eval())
       block_by    = int(node.parm('f3').eval())
 #   print name+' %(block_start)d %(block_end)d %(block_by)d' % vars()
-   block_cmd  = 'hrender_af -s %%1 -e %%2 -b 1 -t %(take)s %(tmphip)s %(block_driver)s' % vars()
+   block_cmd  = 'hrender_af -s %%1 -e %%2 --by 1 -t %(take)s %(tmphip)s %(block_driver)s' % vars()
    block_type = 'hbatch'
    preview = ''
 

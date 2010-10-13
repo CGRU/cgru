@@ -328,7 +328,7 @@ elif ext == 'hip':
    cmd = 'hrender_af' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' --numcpus '+ services.service.str_capacity
    if ignoreinputs: cmd += ' -i'
-   cmd += ' -s %%1 -e %%2 -b %(by)d -t %(take)s "%(scene)s" %(node)s' % vars()
+   cmd += ' -s %%1 -e %%2 --by %(by)d -t %(take)s "%(scene)s" %(node)s' % vars()
 
 # Maya:
 elif ext == 'mb':

@@ -35,7 +35,7 @@ imagesdir = ''
 # NB! only additional image plane files can be changed here - main image filename will have to be set through command line
 def filterPlane():
    global imagesdir
-   filename = mantra.property('plane:planefile')[0]
+   filename = mantra.property('image:filename')[0]
    if not filename in filteredNames:
       if imagesdir == '':
          imagesdir = os.path.dirname( filename)
