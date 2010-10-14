@@ -861,6 +861,9 @@ class Dialog( QtGui.QWidget):
 
    def processStop( self):
       self.process.terminate()
+      if sys.platform.find('win') == 0:
+         self.process.kill()
+      self.cmdField.setText('Stopped.')
 
 app = QtGui.QApplication( sys.argv)
 icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'icon.png'))
