@@ -13,11 +13,20 @@ from PyQt4 import QtCore, QtGui
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-s', '--slate',     dest='slate',        type  ='string',     default='dailies_slate',help='Slate frame template')
-Parser.add_option('-t', '--template',  dest='template',     type  ='string',     default='dailies',      help='Frame paint template')
-Parser.add_option('--company',         dest='company',      type  ='string',     default='Company',      help='Company name')
-Parser.add_option('--project',         dest='project',      type  ='string',     default='',             help='Project name')
-Parser.add_option('-D', '--debug',     dest='debug',        action='store_true', default=False,          help='Debug mode')
+Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
+Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies',      help='Frame paint template')
+Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
+Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
+Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
+Parser.add_option(      '--afpriority',      dest='afpriority',      type  ='int',        default=-1,             help='Afanasy job priority')
+Parser.add_option(      '--afmaxhosts',      dest='afmaxhosts',      type  ='int',        default=-1,             help='Afanasy job maximum hosts')
+Parser.add_option(      '--afhostsmask',     dest='afhostsmask',     type  ='string',     default='',             help='Afanasy job hosts mask')
+Parser.add_option(      '--afhostsmaskex',   dest='afhostsmaskex',   type  ='string',     default='',             help='Afanasy job exclude hosts mask')
+Parser.add_option(      '--afdependmask',    dest='afdependmask',    type  ='string',     default='',             help='Afanasy job depend mask')
+Parser.add_option(      '--afdependmaskgl',  dest='afdependmaskgl',  type  ='string',     default='',             help='Afanasy job global depend mask')
+Parser.add_option(      '--afcapacity',      dest='afcapacity',      type  ='int',        default=-1,             help='Afanasy job tasks capacity')
+Parser.add_option(      '--afpause',         dest='afpause',         action='store_true', default=False,          help='Start Afanasy job paused')
+Parser.add_option('-D', '--debug',           dest='debug',           action='store_true', default=False,          help='Debug mode')
 
 (Options, args) = Parser.parse_args()
 
@@ -79,20 +88,28 @@ class Dialog( QtGui.QWidget):
 
       self.setWindowTitle('Mavishky')
       self.mainLayout = QtGui.QVBoxLayout( self)
-
       self.tabwidget = QtGui.QTabWidget( self)
+      self.mainLayout.addWidget( self.tabwidget)
+
       self.generalwidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.generalwidget,'General')
       self.generallayout = QtGui.QVBoxLayout( self.generalwidget)
+
       self.parameterswidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.parameterswidget,'Parameters')
       self.parameterslayout = QtGui.QVBoxLayout( self.parameterswidget)
-      self.steroewidget = QtGui.QWidget( self)
-      self.tabwidget.addTab( self.steroewidget,'Stereo')
-      self.stereolayout = QtGui.QVBoxLayout( self.steroewidget)
-      self.mainLayout.addWidget( self.tabwidget)
+
+      self.stereowidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.stereowidget,'Stereo')
+      self.stereolayout = QtGui.QVBoxLayout( self.stereowidget)
+
+      self.afanasywidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.afanasywidget,'Afanasy')
+      self.afanasylayout = QtGui.QVBoxLayout( self.afanasywidget)
+
 
       # General:
+
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
       self.cbFormat = QtGui.QComboBox( self)
@@ -275,7 +292,9 @@ class Dialog( QtGui.QWidget):
       self.lProcess.addWidget( self.btnStop)
       self.mainLayout.addLayout( self.lProcess)
 
+
       # Parameters:
+
       self.lTemplates = QtGui.QHBoxLayout()
       self.tTemplateS = QtGui.QLabel('Slate Template:', self)
       self.tTemplateF = QtGui.QLabel('Frame Template:', self)
@@ -379,17 +398,6 @@ class Dialog( QtGui.QWidget):
 
       self.parameterslayout.addWidget( self.gDrawing)
 
-      self.dateTimeLayout = QtGui.QHBoxLayout()
-      self.cDateOutput = QtGui.QCheckBox('Append Name With Date', self)
-      self.cDateOutput.setChecked( False)
-      self.dateTimeLayout.addWidget( self.cDateOutput)
-      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cTimeOutput = QtGui.QCheckBox('Append Name With Time', self)
-      self.cTimeOutput.setChecked( False)
-      self.dateTimeLayout.addWidget( self.cTimeOutput)
-      self.parameterslayout.addLayout( self.dateTimeLayout)
-      QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-
       self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
       self.lCorr = QtGui.QHBoxLayout()
       self.gCorrectionSettings.setLayout( self.lCorr)
@@ -404,48 +412,159 @@ class Dialog( QtGui.QWidget):
       self.lCorr.addWidget( self.dsbGamma)
       self.parameterslayout.addWidget( self.gCorrectionSettings)
 
-      self.gAfanasy = QtGui.QGroupBox('Afanasy')
-      self.lAfanasy = QtGui.QHBoxLayout()
-      self.gAfanasy.setLayout( self.lAfanasy)
-      self.cAfanasy = QtGui.QCheckBox('Enable', self)
-      QtCore.QObject.connect( self.cAfanasy, QtCore.SIGNAL('stateChanged(int)'), self.afanasy)
-      self.cAfOneTask = QtGui.QCheckBox('One Task', self)
-      self.cAfOneTask.setChecked( True)
-      self.cAfOneTask.setEnabled( False)
-      QtCore.QObject.connect( self.cAfOneTask, QtCore.SIGNAL('stateChanged(int)'), self.afanasy)
-      self.tAfCapacity = QtGui.QLabel('Capacity:', self)
-      self.sbAfCapacity = QtGui.QSpinBox( self)
-      self.sbAfCapacity.setRange( -1, 1000000)
-      self.sbAfCapacity.setValue( -1)
-      self.sbAfCapacity.setEnabled( False)
-      QtCore.QObject.connect( self.sbAfCapacity, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.tAfCapConvert = QtGui.QLabel('Convert:', self)
-      self.sbAfCapConvert = QtGui.QSpinBox( self)
-      self.sbAfCapConvert.setRange( -1, 1000000)
-      self.sbAfCapConvert.setValue( -1)
-      self.sbAfCapConvert.setEnabled( False)
-      QtCore.QObject.connect( self.sbAfCapConvert, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.tAfCapEncode = QtGui.QLabel('Encode:', self)
-      self.sbAfCapEncode = QtGui.QSpinBox( self)
-      self.sbAfCapEncode.setRange( -1, 1000000)
-      self.sbAfCapEncode.setValue( -1)
-      self.sbAfCapEncode.setEnabled( False)
-      QtCore.QObject.connect( self.sbAfCapEncode, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.lAfanasy.addWidget( self.cAfanasy)
-      self.lAfanasy.addWidget( self.cAfOneTask)
-      self.lAfanasy.addWidget( self.tAfCapacity)
-      self.lAfanasy.addWidget( self.sbAfCapacity)
-      self.lAfanasy.addWidget( self.tAfCapConvert)
-      self.lAfanasy.addWidget( self.sbAfCapConvert)
-      self.lAfanasy.addWidget( self.tAfCapEncode)
-      self.lAfanasy.addWidget( self.sbAfCapEncode)
-      self.parameterslayout.addWidget( self.gAfanasy)
+      self.dateTimeLayout = QtGui.QHBoxLayout()
+      self.cDateOutput = QtGui.QCheckBox('Append Name With Date', self)
+      self.cDateOutput.setChecked( False)
+      self.dateTimeLayout.addWidget( self.cDateOutput)
+      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.cTimeOutput = QtGui.QCheckBox('Append Name With Time', self)
+      self.cTimeOutput.setChecked( False)
+      self.dateTimeLayout.addWidget( self.cTimeOutput)
+      self.parameterslayout.addLayout( self.dateTimeLayout)
+      QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
 
 
       self.cStereoMode = QtGui.QCheckBox('Turn On Stereo Mode', self)
       self.cStereoMode.setChecked( False)
       QtCore.QObject.connect( self.cStereoMode, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.stereolayout.addWidget( self.cStereoMode)
+
+
+      # Afanasy:
+
+      self.cAfanasy = QtGui.QCheckBox('Enable', self)
+      self.cAfanasy.setChecked( Options.afanasy)
+      QtCore.QObject.connect( self.cAfanasy, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.afanasylayout.addWidget( self.cAfanasy)
+
+      # Priority
+      self.lAfPriority = QtGui.QHBoxLayout()
+      self.tAfPriority = QtGui.QLabel('Priority:', self)
+      self.lAfPriority.addWidget( self.tAfPriority)
+      self.sbAfPriority = QtGui.QSpinBox( self)
+      self.sbAfPriority.setRange( -1, 1000000)
+      self.sbAfPriority.setValue( Options.afpriority)
+      QtCore.QObject.connect( self.sbAfPriority, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lAfPriority.addWidget( self.sbAfPriority)
+      self.tAfPriorityDef = QtGui.QLabel('"-1" Means default value.', self)
+      self.lAfPriority.addWidget( self.tAfPriorityDef)
+      self.afanasylayout.addLayout( self.lAfPriority)
+
+      # Hosts
+      self.gAfHosts = QtGui.QGroupBox('Hosts')
+      self.afanasylayout.addWidget( self.gAfHosts)
+      self.lAfHosts = QtGui.QVBoxLayout()
+      self.gAfHosts.setLayout( self.lAfHosts)
+
+      self.lAfMaxHosts = QtGui.QHBoxLayout()
+      self.lAfHosts.addLayout( self.lAfMaxHosts)
+      self.tAfMaxHosts = QtGui.QLabel('Maximum Number:', self)
+      self.lAfMaxHosts.addWidget( self.tAfMaxHosts)
+      self.sbAfMaxHosts = QtGui.QSpinBox( self)
+      self.sbAfMaxHosts.setRange( -1, 1000000)
+      self.sbAfMaxHosts.setValue( Options.afmaxhosts)
+      QtCore.QObject.connect( self.sbAfMaxHosts, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lAfMaxHosts.addWidget( self.sbAfMaxHosts)
+      self.tAfMaxHostsDef = QtGui.QLabel('"-1" Means no hosts count limit.', self)
+      self.lAfMaxHosts.addWidget( self.tAfMaxHostsDef)
+
+      self.lAfHostsMask = QtGui.QHBoxLayout()
+      self.lAfHosts.addLayout( self.lAfHostsMask)
+      self.tAfHostsMask = QtGui.QLabel('Hosts Names Mask:', self)
+      self.lAfHostsMask.addWidget( self.tAfHostsMask)
+      self.editAfHostsMask = QtGui.QLineEdit( Options.afhostsmask, self)
+      QtCore.QObject.connect( self.editAfHostsMask, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lAfHostsMask.addWidget( self.editAfHostsMask)
+      self.tAfHostsMaskDef = QtGui.QLabel('Leave empty to run on any host.', self)
+      self.lAfHostsMask.addWidget( self.tAfHostsMaskDef)
+
+      self.lAfHostsMaskExclude = QtGui.QHBoxLayout()
+      self.lAfHosts.addLayout( self.lAfHostsMaskExclude)
+      self.tAfHostsMaskExclude = QtGui.QLabel('Exclude Hosts Names Mask:', self)
+      self.lAfHostsMaskExclude.addWidget( self.tAfHostsMaskExclude)
+      self.editAfHostsMaskExclude = QtGui.QLineEdit( Options.afhostsmaskex, self)
+      QtCore.QObject.connect( self.editAfHostsMaskExclude, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lAfHostsMaskExclude.addWidget( self.editAfHostsMaskExclude)
+      self.tAfHostsMaskExcludeDef = QtGui.QLabel('Leave empty not to exclude any host.', self)
+      self.lAfHostsMaskExclude.addWidget( self.tAfHostsMaskExcludeDef)
+
+      # Depends
+      self.gAfDepends = QtGui.QGroupBox('Depends')
+      self.afanasylayout.addWidget( self.gAfDepends)
+      self.lAfDepends = QtGui.QVBoxLayout()
+      self.gAfDepends.setLayout( self.lAfDepends)
+
+      self.lAfDependMask = QtGui.QHBoxLayout()
+      self.lAfDepends.addLayout( self.lAfDependMask)
+      self.tAfDependMask = QtGui.QLabel('Depend Jobs Mask:', self)
+      self.lAfDependMask.addWidget( self.tAfDependMask)
+      self.editAfDependMask = QtGui.QLineEdit( Options.afdependmask, self)
+      QtCore.QObject.connect( self.editAfDependMask, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lAfDependMask.addWidget( self.editAfDependMask)
+      self.tAfDependMaskDef = QtGui.QLabel('Leave empty not to wait any jobs.', self)
+      self.lAfDependMask.addWidget( self.tAfDependMaskDef)
+
+      self.lAfDependMaskGlobal = QtGui.QHBoxLayout()
+      self.lAfDepends.addLayout( self.lAfDependMaskGlobal)
+      self.tAfDependMaskGlobal = QtGui.QLabel('Global Depend Jobs Mask:', self)
+      self.lAfDependMaskGlobal.addWidget( self.tAfDependMaskGlobal)
+      self.editAfDependMaskGlobal = QtGui.QLineEdit( Options.afdependmaskgl, self)
+      QtCore.QObject.connect( self.editAfDependMaskGlobal, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lAfDependMaskGlobal.addWidget( self.editAfDependMaskGlobal)
+      self.tAfDependMaskGlobalDef = QtGui.QLabel('Set mask to wait any user jobs.', self)
+      self.lAfDependMaskGlobal.addWidget( self.tAfDependMaskGlobalDef)
+
+      # Capacity
+      self.gAfCapacity = QtGui.QGroupBox('Capacity')
+      self.lAfCapacity = QtGui.QHBoxLayout()
+      self.gAfCapacity.setLayout( self.lAfCapacity)
+
+      self.cAfOneTask = QtGui.QCheckBox('One Task', self)
+      self.cAfOneTask.setChecked( True)
+      QtCore.QObject.connect( self.cAfOneTask, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+
+      self.tAfCapacity = QtGui.QLabel('Capacity:', self)
+      self.sbAfCapacity = QtGui.QSpinBox( self)
+      self.sbAfCapacity.setRange( -1, 1000000)
+      self.sbAfCapacity.setValue( Options.afcapacity)
+      QtCore.QObject.connect( self.sbAfCapacity, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+
+      self.tAfCapConvert = QtGui.QLabel('Convert:', self)
+      self.sbAfCapConvert = QtGui.QSpinBox( self)
+      self.sbAfCapConvert.setRange( -1, 1000000)
+      self.sbAfCapConvert.setValue( Options.afcapacity)
+      QtCore.QObject.connect( self.sbAfCapConvert, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+
+      self.tAfCapEncode = QtGui.QLabel('Encode:', self)
+      self.sbAfCapEncode = QtGui.QSpinBox( self)
+      self.sbAfCapEncode.setRange( -1, 1000000)
+      self.sbAfCapEncode.setValue( Options.afcapacity)
+      QtCore.QObject.connect( self.sbAfCapEncode, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+
+      self.lAfCapacity.addWidget( self.cAfOneTask)
+      self.lAfCapacity.addWidget( self.tAfCapacity)
+      self.lAfCapacity.addWidget( self.sbAfCapacity)
+      self.lAfCapacity.addWidget( self.tAfCapConvert)
+      self.lAfCapacity.addWidget( self.sbAfCapConvert)
+      self.lAfCapacity.addWidget( self.tAfCapEncode)
+      self.lAfCapacity.addWidget( self.sbAfCapEncode)
+      self.afanasylayout.addWidget( self.gAfCapacity)
+
+      # Pause
+      self.lAfPause = QtGui.QHBoxLayout()
+      self.afanasylayout.addLayout( self.lAfPause)
+
+      self.cAfPause = QtGui.QCheckBox('Start Job Paused', self)
+      self.cAfPause.setChecked( Options.afpause)
+      QtCore.QObject.connect( self.cAfPause, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.lAfPause.addWidget( self.cAfPause)
+
+      self.tAfTime = QtGui.QLabel('Start At Time:', self)
+      self.lAfPause.addWidget( self.tAfTime)
+      self.editAfTime = QtGui.QDateTimeEdit( QtCore.QDateTime.currentDateTime(), self)
+      self.editAfTime.setDisplayFormat('dddd d MMMM yyyy, h:mm')
+      QtCore.QObject.connect( self.editAfTime, QtCore.SIGNAL('dateTimeChanged()'), self.evaluate)
+      self.lAfPause.addWidget( self.editAfTime)
 
 
       self.inputEvaluated = False
@@ -482,15 +601,6 @@ class Dialog( QtGui.QWidget):
 
    def fontChanged( self):
       self.editFont.setText( self.cbFont.currentText())
-      self.evaluate()
-
-   def afanasy( self):
-      enableAf = self.cAfanasy.isChecked()
-      oneTask  = self.cAfOneTask.isChecked()
-      self.cAfOneTask.setEnabled(     enableAf )
-      self.sbAfCapacity.setEnabled(   enableAf and oneTask)
-      self.sbAfCapConvert.setEnabled( enableAf and not oneTask)
-      self.sbAfCapEncode.setEnabled(  enableAf and not oneTask)
       self.evaluate()
 
    def browseLogo( self):
@@ -706,7 +816,21 @@ class Dialog( QtGui.QWidget):
          af = __import__('af', globals(), locals(), [])
          job = af.Job( '%s' % self.editOutputName.text() + ' mavishka')
          block = af.Block('mavishky')
-         if self.sbAfCapacity.value() != -1: block.setCapacity( self.sbAfCapacity.value())
+         if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
+         if self.sbAfMaxHosts.value()  != -1: job.setMaxHosts(    self.sbAfMaxHosts.value())
+         if self.sbAfCapacity.value()  != -1: block.setCapacity(  self.sbAfCapacity.value())
+         hostsmask         = '%s' % self.editAfHostsMask.text()
+         hostsmaskexclude  = '%s' % self.editAfHostsMaskExclude.text()
+         dependmask        = '%s' % self.editAfDependMask.text()
+         dependmaskglobal  = '%s' % self.editAfDependMaskGlobal.text()
+         if hostsmask        != '': job.setHostsMask(        hostsmask        )
+         if hostsmaskexclude != '': job.setHostsMaskExclude( hostsmaskexclude )
+         if dependmask       != '': job.setDependMask(       dependmask       )
+         if dependmaskglobal != '': job.setDependMaskGlobal( dependmaskglobal )
+         datetime = self.editAfTime.dateTime()
+         if datetime > QtCore.QDateTime.currentDateTime(): job.setWaitTime( datetime.toTime_t())
+         if self.cAfPause.isChecked(): job.pause()
+         job.setNeedOS('')
          job.blocks.append( block)
          task = af.Task( '%s' % self.editOutputName.text())
          task.setCommand( self.command)
