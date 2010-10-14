@@ -8,8 +8,7 @@ if exist override.cmd call override.cmd
 
 set HOUDINI_CGRU_PATH=%CGRU_LOCATION%\plugins\houdini
 
-set HOUDINI_AF_VERVION=10
-set HOUDINI_AF_PATH=%AF_ROOT%\plugins\houdini\houdini%HOUDINI_AF_VERVION%
+set HOUDINI_AF_PATH=%AF_ROOT%\plugins\houdini
 
 set HOUDINI_AF_OTLSCAN_PATH=%HOUDINI_AF_PATH%\otls;%HOUDINI_LOCATION%\houdini\otls
 

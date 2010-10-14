@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<xsi_file type="SceneTOC" xsi_version="9.0.242.0" syntax_version="2.0">
+<xsi_file type="SceneTOC" xsi_version="9.5.184.0" syntax_version="2.0">
    <Models></Models>
    <Sources>
       <Image name="noIcon_pic">$XSI_HOME/Application/rsrc/noIcon.pic</Image>

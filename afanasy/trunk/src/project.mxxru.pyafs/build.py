@@ -4,10 +4,10 @@ pythons = os.environ['PYTHONS']
 print 'Pythons folder = "%s"' % pythons
 
 for python in os.listdir( pythons):
+   if python[0] == '.' or python[0] == '-': continue
    pythondir = os.path.join( pythons, python )
    if not os.path.isdir( pythondir): continue
    print 'Python = "%s"' % python
-   if python[0] == '.': continue
 
    pythonlib = 'python' + python[0:2]
    qt = os.environ['QTS']

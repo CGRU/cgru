@@ -6,7 +6,7 @@ rem For 32bit Maya uncomment next line (or put it in "override.cmd" file)
 rem set MAYA_ARCH=
 
 rem Set Maya location:
-set MAYA_LOCATION="C:\Program Files\Autodesk\Maya%MAYA_VERSION%"
+set MAYA_LOCATION=C:\Program Files\Autodesk\Maya%MAYA_VERSION%
 
 rem Set CGRU Maya scripts location:
 set MAYA_CGRU_LOCATION=%CD%
