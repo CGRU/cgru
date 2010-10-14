@@ -36,8 +36,8 @@ imagesdir = ''
 def filterPlane():
    global imagesdir
    filename = mantra.property('image:filename')[0]
-   filteredNames.append( filename)
    if not filename in filteredNames:
+      filteredNames.append( filename)
       if imagesdir == '':
          imagesdir = os.path.dirname( filename)
       if tilerender:
