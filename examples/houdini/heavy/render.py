@@ -9,7 +9,7 @@ rop = '/out/image'
 job = af.Job('Houdini Heavy')
 
 block = af.Block( rop, 'hbatch')
-block.setCommand('hrender_af -s %1 -e %2 -b 1 scene.hip ' + rop)
+block.setCommand('hrender_af -s %1 -e %2 scene.hip ' + rop)
 block.setNumeric( 1, 10)
 
 job.blocks.append( block)
