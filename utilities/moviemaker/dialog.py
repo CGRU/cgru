@@ -274,25 +274,6 @@ class Dialog( QtGui.QWidget):
       self.generallayout.addWidget( self.gOutputSettings)
 
 
-      self.cmdField = QtGui.QTextEdit( self)
-      self.cmdField.setReadOnly( True)
-      self.mainLayout.addWidget( self.cmdField)
-
-      self.lProcess = QtGui.QHBoxLayout()
-      self.btnRefresh = QtGui.QPushButton('Refresh', self)
-      QtCore.QObject.connect( self.btnRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
-      self.btnStart = QtGui.QPushButton('Start', self)
-      self.btnStart.setEnabled( False)
-      QtCore.QObject.connect( self.btnStart, QtCore.SIGNAL('pressed()'), self.execute)
-      self.btnStop = QtGui.QPushButton('Stop', self)
-      self.btnStop.setEnabled( False)
-      QtCore.QObject.connect( self.btnStop, QtCore.SIGNAL('pressed()'), self.processStop)
-      self.lProcess.addWidget( self.btnRefresh)
-      self.lProcess.addWidget( self.btnStart)
-      self.lProcess.addWidget( self.btnStop)
-      self.mainLayout.addLayout( self.lProcess)
-
-
       # Parameters:
 
       self.lTemplates = QtGui.QHBoxLayout()
@@ -424,10 +405,35 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
 
 
-      self.cStereoMode = QtGui.QCheckBox('Turn On Stereo Mode', self)
+      # Stereo:
+
+      self.cStereoMode = QtGui.QCheckBox('Stereo Mode', self)
       self.cStereoMode.setChecked( False)
       QtCore.QObject.connect( self.cStereoMode, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.stereolayout.addWidget( self.cStereoMode)
+
+      # Second Pattern:
+      self.tSecondSequence = QtGui.QLabel('Second Sequence Pattern. Leave empty just to duplicate first.', self)
+      self.stereolayout.addWidget( self.tSecondSequence)
+      self.editInputFile2 = QtGui.QLineEdit( self)
+      self.stereolayout.addWidget( self.editInputFile2)
+
+      # Second Pattern Control:
+      self.leditInputFileCtrl2 = QtGui.QHBoxLayout()
+      self.btnInputFileRefresh2 = QtGui.QPushButton('Refresh', self)
+      self.leditInputFileCtrl2.addWidget( self.btnInputFileRefresh2)
+#      QtCore.QObject.connect( self.btnInputFileRefresh2, QtCore.SIGNAL('pressed()'), self.inputFileChanged2)
+      self.tInputFilesCount2 = QtGui.QLabel('Files count:', self)
+      self.leditInputFileCtrl2.addWidget( self.tInputFilesCount2)
+      self.stereolayout.addLayout( self.leditInputFileCtrl2)
+
+      self.lIdentify2 = QtGui.QHBoxLayout()
+      self.tIdentify2 = QtGui.QLabel('Identify:', self)
+      self.lIdentify2.addWidget( self.tIdentify2)
+      self.editIdentify2 = QtGui.QLineEdit( self)
+      self.editIdentify2.setEnabled( False)
+      self.lIdentify2.addWidget( self.editIdentify2)
+      self.stereolayout.addLayout( self.lIdentify2)
 
 
       # Afanasy:
@@ -567,6 +573,30 @@ class Dialog( QtGui.QWidget):
       self.lAfPause.addWidget( self.editAfTime)
 
 
+      # Output Field:
+
+      self.cmdField = QtGui.QTextEdit( self)
+      self.cmdField.setReadOnly( True)
+      self.mainLayout.addWidget( self.cmdField)
+
+
+      # Main Buttons:
+
+      self.lProcess = QtGui.QHBoxLayout()
+      self.btnRefresh = QtGui.QPushButton('Refresh', self)
+      QtCore.QObject.connect( self.btnRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
+      self.btnStart = QtGui.QPushButton('Start', self)
+      self.btnStart.setEnabled( False)
+      QtCore.QObject.connect( self.btnStart, QtCore.SIGNAL('pressed()'), self.execute)
+      self.btnStop = QtGui.QPushButton('Stop', self)
+      self.btnStop.setEnabled( False)
+      QtCore.QObject.connect( self.btnStop, QtCore.SIGNAL('pressed()'), self.processStop)
+      self.lProcess.addWidget( self.btnRefresh)
+      self.lProcess.addWidget( self.btnStart)
+      self.lProcess.addWidget( self.btnStop)
+      self.mainLayout.addLayout( self.lProcess)
+
+
       self.inputEvaluated = False
       self.autoTitles()
       self.activityChanged()
@@ -632,71 +662,80 @@ class Dialog( QtGui.QWidget):
       self.editInputFilesPattern.clear()
       self.editIdentify.clear()
       inputfile = '%s' % self.editInputFile.text()
-      if sys.platform.find('win') == 0: inputfile = inputfile.replace('/','\\')
+      InputFile, InputPattern, FilesCount, Identify = self.calcPattern( inputfile)
+      if InputPattern == None: return
 
-      if len(inputfile) == 0:
-         self.cmdField.setText('Choose one file from sequence')
-         return
-
-      pos = inputfile.rfind('file://')
-      if pos >= 0:
-         inputfile = inputfile[ pos+7 : len(inputfile)]
-         self.editInputFile.setText( inputfile)
-
-      inputfile = inputfile.strip()
-      inputfile = inputfile.strip('\n')
-      self.inputDir = os.path.dirname( inputfile)
-      if not os.path.isdir( self.inputDir):
-         self.cmdField.setText('Can\'t find input directory')
-         return
-      filename = os.path.basename( inputfile)
-      digitsall = re.findall( r'(#{1,})', filename)
-      if len(digitsall) == 0: digitsall = re.findall( r'([0-9]{1,})', filename)
-      if len(digitsall):
-         digits = digitsall[len(digitsall)-1]
-         pos = filename.rfind(digits)
-         self.inputPrefix = filename[0 : pos]
-         self.inputPadding = len(digits)
-         self.inputSuffix = filename[pos+self.inputPadding : len(filename)]
-         padstr = ''
-         for d in range(self.inputPadding): padstr += '#'
-         pattern = self.inputPrefix + padstr + self.inputSuffix
-      else:
-         self.cmdField.setText('Can\'t find digits in input file name')
-         return
-      self.editInputFilesPattern.setText( pattern)
-      self.inputPattern = os.path.join( self.inputDir, pattern)
-
-      eprefix = str( self.inputPrefix)
-      esuffix = str( self.inputSuffix)
-      epad = self.inputPadding
-      expr = re.compile( r'%(eprefix)s([0-9]{%(epad)d,%(epad)d})%(esuffix)s' % vars())
-      filescount = 0
-      allItems = os.listdir(self.inputDir)
-      for item in allItems:
-         if not os.path.isfile( os.path.join( self.inputDir, item)): continue
-         if not expr.match( item): continue
-         if filescount == 0: afile = item
-         filescount += 1
-      self.editInputFilesCount.setText(str(filescount))
-      if filescount == 0:
-         self.cmdField.setText('No files founded matching pattern.')
-         return
-      if filescount == 1:
-         self.cmdField.setText('Founded only 1 file matching pattern.')
-         return
-      if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
-      afile = os.path.join( self.inputDir, afile)
-      pipe = subprocess.Popen( 'identify "%s"' % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
-      output = pipe.read()
-      if len(output) < len(afile):
-         self.cmdField.setText('Invalid image.\n%s' % afile)
-         return
-      output = output.replace( afile, '')
-      self.editIdentify.setText( output)
+      self.inputPattern = InputPattern
+      self.editInputFile.setText( InputFile)
+      self.editInputFilesPattern.setText( os.path.basename( InputPattern))
+      self.editInputFilesCount.setText( str(FilesCount))
+      self.editIdentify.setText( Identify)
 
       self.inputEvaluated = True
       self.evaluate()
+
+   def calcPattern( self, InputFile):
+      InputPattern = None
+      FilesCount = 0
+      Identify = ''
+      if sys.platform.find('win') == 0: InputFile = InputFile.replace('/','\\')
+
+      if len(InputFile) == 0:
+         self.cmdField.setText('Choose one file from sequence.')
+         return InputFile, InputPattern, FilesCount, Identify
+
+      pos = InputFile.rfind('file://')
+      if pos >= 0: InputFile = InputFile[ pos+7 : ]
+
+      InputFile = InputFile.strip()
+      InputFile = InputFile.strip('\n')
+      inputdir = os.path.dirname( InputFile)
+      if not os.path.isdir( inputdir):
+         self.cmdField.setText('Can\'t find input directory.')
+         return InputFile, InputPattern, FilesCount, Identify
+      filename = os.path.basename( InputFile)
+      digitsall = re.findall( r'(#{1,})', filename)
+      if len(digitsall) == 0: digitsall = re.findall( r'([0-9]{1,})', filename)
+      if len(digitsall):
+         digits = digitsall[-1]
+         pos = filename.rfind(digits)
+         prefix = filename[ : pos]
+         padding = len(digits)
+         suffix = filename[pos+padding : ]
+         padstr = ''
+         for d in range(padding): padstr += '#'
+         pattern = prefix + padstr + suffix
+      else:
+         self.cmdField.setText('Can\'t find digits in input file name.')
+         return InputFile, InputPattern, FilesCount, Identify
+      InputPattern = os.path.join( inputdir, pattern)
+
+      eprefix = str( prefix)
+      esuffix = str( suffix)
+      expr = re.compile( r'%(eprefix)s([0-9]{%(padding)d,%(padding)d})%(esuffix)s' % vars())
+      FilesCount = 0
+      allItems = os.listdir( inputdir)
+      for item in allItems:
+         if not os.path.isfile( os.path.join( inputdir, item)): continue
+         if not expr.match( item): continue
+         if FilesCount == 0: afile = item
+         FilesCount += 1
+      if FilesCount == 0:
+         self.cmdField.setText('No files founded matching pattern.')
+         return InputFile, InputPattern, FilesCount, Identify
+      if FilesCount == 1:
+         self.cmdField.setText('Founded only 1 file matching pattern.')
+         return InputFile, InputPattern, FilesCount, Identify
+      if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
+      afile = os.path.join( inputdir, afile)
+      pipe = subprocess.Popen( 'identify "%s"' % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
+      Identify = pipe.read()
+      if len(Identify) < len(afile):
+         self.cmdField.setText('Invalid image.\n%s' % afile)
+         return InputFile, InputPattern, FilesCount, Identify
+      Identify = Identify.replace( afile, '')
+
+      return InputFile, InputPattern, FilesCount, Identify
 
    def evaluate( self):
       self.evaluated = False
@@ -724,7 +763,7 @@ class Dialog( QtGui.QWidget):
 
       shot = '%s' % self.editShot.text()
       if self.cAutoTitles.isChecked() or shot == '':
-         shot = self.inputPrefix.strip('.')
+         shot = os.path.basename( self.inputPattern)[ : os.path.basename( self.inputPattern).find('.')]
          self.editShot.setText( shot)
 
       version = '%s' % self.editVersion.text()
@@ -740,7 +779,7 @@ class Dialog( QtGui.QWidget):
 
       outdir = '%s' % self.editOutputDir.text()
       if self.cAutoOutput.isChecked() or outdir == None or outdir == '':
-         outdir = os.path.dirname( self.inputDir)
+         outdir = os.path.dirname( os.path.dirname( self.inputPattern))
          self.editOutputDir.setText( outdir)
 
       outname = '%s' % self.editOutputName.text()
