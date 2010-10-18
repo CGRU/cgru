@@ -106,10 +106,10 @@ for dirpath, dirnames, filenames in os.walk( Folder):
       cmd += ' -r %s' % options.resolution
       cmd += ' -f %d' % options.fps
       cmd += ' -c %s' % options.codec
-      cmd += ' -i "%s"' % pattern
-      cmd += ' -o "%s"' % movname
       if options.gamma > 0: cmd += ' -g %.2f' % options.gamma
       if options.template != '': cmd += ' -t "%s"' % options.template
+      cmd += ' "%s"' % pattern
+      cmd += ' "%s"' % movname
 
       if Verbose: print cmd
 
