@@ -2,19 +2,22 @@
 
 name="exrjoin"
 output="../../bin/$name"
+openexr="../openexr"
+openexr_inc="${openexr}/include/OpenEXR"
+openexr_lib="${openexr}/lib"
 
-if [ -d include ] ; then
+if [ -d $openexr_inc ] ; then
    # Custom include:
-   CPPFLAGS="-I$PWD/include/OpenEXR"
+   CPPFLAGS="-I$openexr_inc"
 else
    # System include:
    CPPFLAGS="-I/usr/include/OpenEXR"
 fi
 
-if [ -d lib ] ; then
+if [ -d $openexr_lib ] ; then
    # Custom libs:
    LDFLAGS="-L/lib64 -L/usr/lib64"
-   LDFLAGS="$LDFLAGS -L$PWD/lib"
+   LDFLAGS="$LDFLAGS -L${openexr_lib}"
    LDFLAGS="$LDFLAGS -Wl,--start-group"
    LDFLAGS="$LDFLAGS -lz"
    LDFLAGS="$LDFLAGS -lpthread"

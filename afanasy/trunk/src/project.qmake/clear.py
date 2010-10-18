@@ -29,7 +29,6 @@ def delete( item):
       if not DEBUG: os.remove( item)
 
 for item in os.listdir('.'):
-   if item.find('qt-') == 0: continue
    if item in store: continue
    if item in folders:
       project = item

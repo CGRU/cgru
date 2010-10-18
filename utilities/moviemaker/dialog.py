@@ -210,9 +210,9 @@ class Dialog( QtGui.QWidget):
       self.lInputSettings = QtGui.QVBoxLayout()
       self.gInputSettings.setLayout( self.lInputSettings)
 
-      self.editInputFile = QtGui.QLineEdit( self)
-      QtCore.QObject.connect( self.editInputFile, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
-      self.lInputSettings.addWidget( self.editInputFile)
+      self.editInputFiles = QtGui.QLineEdit( self)
+      QtCore.QObject.connect( self.editInputFiles, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
+      self.lInputSettings.addWidget( self.editInputFiles)
 
       self.lBrowseInput = QtGui.QHBoxLayout()
       self.lFilesCount = QtGui.QLabel('Files count:', self)
@@ -407,25 +407,39 @@ class Dialog( QtGui.QWidget):
 
       # Stereo:
 
-      self.cStereoMode = QtGui.QCheckBox('Stereo Mode', self)
-      self.cStereoMode.setChecked( False)
-      QtCore.QObject.connect( self.cStereoMode, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.stereolayout.addWidget( self.cStereoMode)
+      self.cStereoDuplicate = QtGui.QCheckBox('Duplicate first sequence', self)
+      self.cStereoDuplicate.setChecked( False)
+      QtCore.QObject.connect( self.cStereoDuplicate, QtCore.SIGNAL('stateChanged(int)'), self.evalStereo)
+      self.stereolayout.addWidget( self.cStereoDuplicate)
 
       # Second Pattern:
-      self.tSecondSequence = QtGui.QLabel('Second Sequence Pattern. Leave empty just to duplicate first.', self)
-      self.stereolayout.addWidget( self.tSecondSequence)
-      self.editInputFile2 = QtGui.QLineEdit( self)
-      self.stereolayout.addWidget( self.editInputFile2)
+      self.gInputFileGroup2 = QtGui.QGroupBox('Second Sequence Pattern')
+      self.stereolayout.addWidget( self.gInputFileGroup2)
+      self.lInputFileGroup2 = QtGui.QVBoxLayout()
+      self.gInputFileGroup2.setLayout( self.lInputFileGroup2)
 
-      # Second Pattern Control:
+      self.editInputFiles2 = QtGui.QLineEdit( self)
+      self.lInputFileGroup2.addWidget( self.editInputFiles2)
+      QtCore.QObject.connect( self.editInputFiles2, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged2)
+
       self.leditInputFileCtrl2 = QtGui.QHBoxLayout()
-      self.btnInputFileRefresh2 = QtGui.QPushButton('Refresh', self)
-      self.leditInputFileCtrl2.addWidget( self.btnInputFileRefresh2)
-#      QtCore.QObject.connect( self.btnInputFileRefresh2, QtCore.SIGNAL('pressed()'), self.inputFileChanged2)
+      self.btnInputFileCopy = QtGui.QPushButton('Copy first', self)
+      self.leditInputFileCtrl2.addWidget( self.btnInputFileCopy)
+      QtCore.QObject.connect( self.btnInputFileCopy, QtCore.SIGNAL('pressed()'), self.copyInput)
       self.tInputFilesCount2 = QtGui.QLabel('Files count:', self)
       self.leditInputFileCtrl2.addWidget( self.tInputFilesCount2)
-      self.stereolayout.addLayout( self.leditInputFileCtrl2)
+      self.editInputFilesCount2 = QtGui.QLineEdit( self)
+      self.leditInputFileCtrl2.addWidget( self.editInputFilesCount2)
+      self.editInputFilesCount2.setEnabled( False)
+      self.tInputFilesPattern2 = QtGui.QLabel('Pattern:', self)
+      self.leditInputFileCtrl2.addWidget( self.tInputFilesPattern2)
+      self.editInputFilesPattern2 = QtGui.QLineEdit( self)
+      self.leditInputFileCtrl2.addWidget( self.editInputFilesPattern2)
+      self.editInputFilesPattern2.setEnabled( False)
+      self.btnInputFileBrowse2 = QtGui.QPushButton('Browse', self)
+      self.leditInputFileCtrl2.addWidget( self.btnInputFileBrowse2)
+      QtCore.QObject.connect( self.btnInputFileBrowse2, QtCore.SIGNAL('pressed()'), self.browseInput2)
+      self.lInputFileGroup2.addLayout( self.leditInputFileCtrl2)
 
       self.lIdentify2 = QtGui.QHBoxLayout()
       self.tIdentify2 = QtGui.QLabel('Identify:', self)
@@ -433,8 +447,14 @@ class Dialog( QtGui.QWidget):
       self.editIdentify2 = QtGui.QLineEdit( self)
       self.editIdentify2.setEnabled( False)
       self.lIdentify2.addWidget( self.editIdentify2)
-      self.stereolayout.addLayout( self.lIdentify2)
+      self.btnInputFileRefresh2 = QtGui.QPushButton('Refresh', self)
+      self.lIdentify2.addWidget( self.btnInputFileRefresh2)
+      QtCore.QObject.connect( self.btnInputFileRefresh2, QtCore.SIGNAL('pressed()'), self.inputFileChanged2)
+      self.lInputFileGroup2.addLayout( self.lIdentify2)
 
+      self.editStereoStatus = QtGui.QLineEdit( self)
+      self.stereolayout.addWidget( self.editStereoStatus)
+      self.editStereoStatus.setReadOnly( True)
 
       # Afanasy:
 
@@ -597,12 +617,40 @@ class Dialog( QtGui.QWidget):
       self.mainLayout.addLayout( self.lProcess)
 
 
-      self.inputEvaluated = False
+      self.inputPattern = None
+      self.inputPattern2 = None
       self.autoTitles()
       self.activityChanged()
       self.autoOutput()
       self.inputFileChanged()
+      self.evalStereo()
       self.evaluate()
+
+   def evalStereo( self):
+      if self.inputPattern2 is None:
+         if self.cStereoDuplicate.isChecked():
+            self.editStereoStatus.setText('Stereo from one sequence.')
+         else:
+            self.editStereoStatus.setText('Specify second sequence for steteo. Or enable duplicate one sequence.')
+      else:
+         self.cStereoDuplicate.setChecked( False)
+         if self.editInputFilesCount.text() == self.editInputFilesCount2.text():
+            self.editStereoStatus.setText('Stereo from two sequences.')
+         else:
+            self.inputPattern2 = None
+            self.editStereoStatus.setText('Two sequences must be the same lenght.')
+            self.evaluated = False
+            self.btnStart.setEnabled( False)
+            self.cmdField.setText('Sequences length mismatch.')
+            return
+      if self.inputPattern is not None:
+         self.evaluate()
+
+   def copyInput( self):
+      files1 = str(self.editInputFiles.text())
+      if files1 != '':
+         self.editInputFiles2.setText( files1)
+      self.inputFileChanged2()
 
    def autoOutput( self):
       enable = not self.cAutoOutput.isChecked()
@@ -651,30 +699,55 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def browseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFile.text())
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles.text())
       if afile.isEmpty(): return
-      self.editInputFile.setText( afile)
+      self.editInputFiles.setText( afile)
       self.inputFileChanged()
 
+   def browseInput2( self):
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles2.text())
+      if afile.isEmpty(): return
+      self.editInputFiles2.setText( afile)
+      self.inputFileChanged2()
+
    def inputFileChanged( self):
-      self.inputEvaluated = False
       self.editInputFilesCount.clear()
       self.editInputFilesPattern.clear()
       self.editIdentify.clear()
-      inputfile = '%s' % self.editInputFile.text()
+      inputfile = '%s' % self.editInputFiles.text()
       InputFile, InputPattern, FilesCount, Identify = self.calcPattern( inputfile)
-      if InputPattern == None: return
 
       self.inputPattern = InputPattern
-      self.editInputFile.setText( InputFile)
+      if InputPattern == None: return
+
+      self.editInputFiles.setText( InputFile)
       self.editInputFilesPattern.setText( os.path.basename( InputPattern))
       self.editInputFilesCount.setText( str(FilesCount))
       self.editIdentify.setText( Identify)
 
-      self.inputEvaluated = True
       self.evaluate()
 
+   def inputFileChanged2( self):
+      self.editInputFilesCount2.clear()
+      self.editInputFilesPattern2.clear()
+      self.editIdentify2.clear()
+      inputfile = '%s' % self.editInputFiles2.text()
+      InputFile, InputPattern, FilesCount, Identify = self.calcPattern( inputfile)
+
+      self.inputPattern2 = InputPattern
+      if InputPattern == None: return
+
+      self.editInputFiles2.setText( InputFile)
+      self.editInputFilesPattern2.setText( os.path.basename( InputPattern))
+      self.editInputFilesCount2.setText( str(FilesCount))
+      self.editIdentify2.setText( Identify)
+
+      self.evalStereo()
+
    def calcPattern( self, InputFile):
+      self.evaluated = False
+      self.btnStart.setEnabled( False)
+
       InputPattern = None
       FilesCount = 0
       Identify = ''
@@ -684,11 +757,20 @@ class Dialog( QtGui.QWidget):
          self.cmdField.setText('Choose one file from sequence.')
          return InputFile, InputPattern, FilesCount, Identify
 
+      # Remove link and strip filename:
       pos = InputFile.rfind('file://')
       if pos >= 0: InputFile = InputFile[ pos+7 : ]
-
       InputFile = InputFile.strip()
       InputFile = InputFile.strip('\n')
+
+      # If directory is specified, use the first file in it:
+      if os.path.isdir( InputFile):
+         dirfiles = os.listdir( InputFile)
+         if len( dirfiles) == 0:
+            print 'Folder "%s" is empty.' % InputFile
+            return InputFile, InputPattern, FilesCount, Identify
+         InputFile = os.path.join( InputFile, dirfiles[0])
+
       inputdir = os.path.dirname( InputFile)
       if not os.path.isdir( inputdir):
          self.cmdField.setText('Can\'t find input directory.')
@@ -708,16 +790,15 @@ class Dialog( QtGui.QWidget):
       else:
          self.cmdField.setText('Can\'t find digits in input file name.')
          return InputFile, InputPattern, FilesCount, Identify
-      InputPattern = os.path.join( inputdir, pattern)
 
-      eprefix = str( prefix)
-      esuffix = str( suffix)
-      expr = re.compile( r'%(eprefix)s([0-9]{%(padding)d,%(padding)d})%(esuffix)s' % vars())
+      expr = re.compile( r'%(prefix)s([0-9]{%(padding)d,%(padding)d})%(suffix)s' % vars())
       FilesCount = 0
       allItems = os.listdir( inputdir)
       for item in allItems:
          if not os.path.isfile( os.path.join( inputdir, item)): continue
-         if not expr.match( item): continue
+         match = expr.match( item)
+         if not match: continue
+         if match.group(0) != item: continue
          if FilesCount == 0: afile = item
          FilesCount += 1
       if FilesCount == 0:
@@ -735,13 +816,16 @@ class Dialog( QtGui.QWidget):
          return InputFile, InputPattern, FilesCount, Identify
       Identify = Identify.replace( afile, '')
 
+      InputPattern = os.path.join( inputdir, pattern)
+
       return InputFile, InputPattern, FilesCount, Identify
 
    def evaluate( self):
       self.evaluated = False
-      if not self.inputEvaluated: return
+      self.btnStart.setEnabled( False)
+      if self.inputPattern is None: return
 
-      self.StereoMode = self.cStereoMode.isChecked()
+      self.StereoDuplicate = self.cStereoDuplicate.isChecked()
 
       if self.cAutoTitles.isChecked(): self.editShot.clear()
       if self.cAutoOutput.isChecked():
@@ -831,7 +915,7 @@ class Dialog( QtGui.QWidget):
             cmd += ' --logograv %s' % self.cbLogoGravity.currentText()
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
-      if self.StereoMode:
+      if self.StereoDuplicate and self.inputPattern2 is None:
          cmd += ' --stereo'
       if self.cAfanasy.isChecked() and not self.cAfOneTask.isChecked():
          cmd += ' -A'
@@ -840,6 +924,7 @@ class Dialog( QtGui.QWidget):
       if Options.debug: cmd += ' --debug'
 
       cmd += ' "%s"' % self.inputPattern
+      if self.inputPattern2 is not None: cmd += ' "%s"' % self.inputPattern2
       cmd += ' "%s"' % os.path.join( outdir, outname)
 
       self.cmdField.setText( cmd)
