@@ -27,10 +27,12 @@ signal.signal(signal.SIGABRT, rmdir)
 signal.signal(signal.SIGINT,  rmdir)
 
 from optparse import OptionParser
-parser = OptionParser(usage="%prog [options] input_files_pattern(s)] output\n Pattern example = \"img.####.jpg\". Type \"%prog -h\" for help", version="%prog 1.0")
+parser = OptionParser(usage="%prog [options] input_files_pattern(s)] output\n\
+   Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
+   Type \"%prog -h\" for help", version="%prog 1.0")
 
 parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='aphotojpg.ffmpeg',  help='File with encode command line in last line')
-parser.add_option('-f', '--fps',        dest='fps',         type  ='int',        default=25,          help='Frames per second')
+parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default=25,          help='Frames per second')
 parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
 parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
@@ -169,17 +171,34 @@ def getImages( inpattern):
    # Input files pattern processing:
    pattern = os.path.basename( inpattern)
    digitspos = pattern.rfind('#')
+   digitslen = 0
    if digitspos < 0:
-      print 'Can\'t find # in input files pattern'
-      sys.exit(1)
-   digitsnum = 1
-   for i in range(digitspos):
-      if pattern[digitspos-digitsnum] == '#':
-         digitsnum += 1
-      else:
-         break
-   prefix = pattern[ : digitspos-digitsnum+1 ]
-   suffix = pattern[ digitspos+1 :]
+      # Process %04d pattern:
+      digitspos = pattern.rfind('%0')
+      if digitspos < 0:
+         print 'Can\'t find #### or %04d in input files pattern.'
+         sys.exit(1)
+      if pattern[digitspos+3] != 'd':
+         print 'Invalid %04d pattern.'
+         sys.exit(1)
+      try:
+         digitsnum = int(pattern[digitspos+2])
+      except:
+         print 'Unable to find number in %04d pattern.'
+         sys.exit(1)
+      digitslen = 4
+   else:
+      # Process #### pattern:
+      digitsnum = 1
+      for i in range(digitspos):
+         if pattern[digitspos-digitsnum] == '#':
+            digitsnum += 1
+         else:
+            break
+      digitslen = digitsnum
+      digitspos = digitspos - digitslen + 1
+   prefix = pattern[ : digitspos ]
+   suffix = pattern[ digitspos+digitslen :]
 
    # Input files search pattern:
    allFiles = []
@@ -193,17 +212,11 @@ def getImages( inpattern):
       if not os.path.isfile( os.path.join( inputdir, item)): continue
       if not expr.match( item): continue
       allFiles.append( os.path.join( inputdir, item))
-   if len(allFiles) == 0:
-      print 'No files founded matching pattern.'
+   if len(allFiles) <= 1:
+      print 'None or only one file founded matching pattern.'
       print 'Input directory:'
-      print inputdir1
-      print 'Expression:'
-      print expr.pattern
-      sys.exit(1)
-   if len(allFiles) == 1:
-      print 'Founded only 1 file matching pattern.'
-      print 'Input directory:'
-      print inputdir1
+      print inputdir
+      print '  prefix, digits, suffix = %(prefix)s, %(digitsnum)d, %(suffix)s' % vars()
       print 'Expression:'
       print expr.pattern
       sys.exit(1)
@@ -349,7 +362,7 @@ else:
    exit(1)
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', os.path.dirname(sys.argv[0]))
 cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
-cmd_encode = cmd_encode.replace('@FPS@',        str(options.fps))
+cmd_encode = cmd_encode.replace('@FPS@',        options.fps)
 cmd_encode = cmd_encode.replace('@OUTPUT@',     Output)
 cmd_encode = cmd_encode.replace('@ARGS@',       auxargs)
 

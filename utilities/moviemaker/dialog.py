@@ -15,6 +15,7 @@ from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies',      help='Frame paint template')
+Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
 Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
@@ -31,6 +32,7 @@ Parser.add_option('-D', '--debug',           dest='debug',           action='sto
 (Options, args) = Parser.parse_args()
 
 # Initializations:
+FPS = ['23.976','24','25','30']
 
 UserName = os.getenv('USER', os.getenv('USERNAME', 'user'))
 # cut DOMAIN from username:
@@ -125,14 +127,15 @@ class Dialog( QtGui.QWidget):
       i = 0
       for name in CodecNames:
          self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
-         i = i + 1
+         i += 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
       self.cbFPS = QtGui.QComboBox( self)
-      self.cbFPS.addItem('24')
-      self.cbFPS.addItem('25')
-      self.cbFPS.addItem('30')
-      self.cbFPS.setCurrentIndex( 1)
+      i = 0
+      for fps in FPS:
+         self.cbFPS.addItem(fps)
+         if fps == Options.fps: self.cbFPS.setCurrentIndex( i)
+         i += 1
       QtCore.QObject.connect( self.cbFPS, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.lFormat.addWidget( self.tFormat)
       self.lFormat.addWidget( self.cbFormat)
@@ -776,20 +779,34 @@ class Dialog( QtGui.QWidget):
          self.cmdField.setText('Can\'t find input directory.')
          return InputFile, InputPattern, FilesCount, Identify
       filename = os.path.basename( InputFile)
-      digitsall = re.findall( r'(#{1,})', filename)
-      if len(digitsall) == 0: digitsall = re.findall( r'([0-9]{1,})', filename)
+
+      # Search %04d pattern:
+      digitsall = re.findall(r'%0\dd', filename)
       if len(digitsall):
-         digits = digitsall[-1]
-         pos = filename.rfind(digits)
+         padstr = digitsall[-1]
+         padding = int( padstr[2])
+         pos = filename.rfind( padstr)
          prefix = filename[ : pos]
-         padding = len(digits)
-         suffix = filename[pos+padding : ]
-         padstr = ''
-         for d in range(padding): padstr += '#'
-         pattern = prefix + padstr + suffix
+         suffix = filename[pos+4 : ]
       else:
-         self.cmdField.setText('Can\'t find digits in input file name.')
-         return InputFile, InputPattern, FilesCount, Identify
+         # Search #### pattern:
+         digitsall = re.findall(r'(#{1,})', filename)
+         if len(digitsall) == 0:
+            # Search digits pattern:
+            digitsall = re.findall(r'([0-9]{1,})', filename)
+         if len(digitsall):
+            digits = digitsall[-1]
+            pos = filename.rfind(digits)
+            prefix = filename[ : pos]
+            padding = len(digits)
+            suffix = filename[pos+padding : ]
+            padstr = ''
+            for d in range(padding): padstr += '#'
+         else:
+            self.cmdField.setText('Can\'t find digits in input file name.')
+            return InputFile, InputPattern, FilesCount, Identify
+
+      pattern = prefix + padstr + suffix
 
       expr = re.compile( r'%(prefix)s([0-9]{%(padding)d,%(padding)d})%(suffix)s' % vars())
       FilesCount = 0
@@ -801,11 +818,9 @@ class Dialog( QtGui.QWidget):
          if match.group(0) != item: continue
          if FilesCount == 0: afile = item
          FilesCount += 1
-      if FilesCount == 0:
-         self.cmdField.setText('No files founded matching pattern.')
-         return InputFile, InputPattern, FilesCount, Identify
-      if FilesCount == 1:
-         self.cmdField.setText('Founded only 1 file matching pattern.')
+      if FilesCount <= 1:
+         self.cmdField.setText('None or only one file founded matching pattern.\n\
+         prefix, paddindg, suffix = %(prefix)s, %(padding)d, %(suffix)s' % vars())
          return InputFile, InputPattern, FilesCount, Identify
       if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
       afile = os.path.join( inputdir, afile)
@@ -937,7 +952,12 @@ class Dialog( QtGui.QWidget):
       if len( self.command) == 0: return
 
       if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
-         af = __import__('af', globals(), locals(), [])
+         self.btnStart.setEnabled( False)
+         try:
+            af = __import__('af', globals(), locals(), [])
+         except:
+            self.cmdField.setText('Unable to import Afanasy Python module.')
+            return
          job = af.Job( '%s' % self.editOutputName.text() + ' mavishka')
          block = af.Block('mavishky')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
@@ -959,7 +979,8 @@ class Dialog( QtGui.QWidget):
          task = af.Task( '%s' % self.editOutputName.text())
          task.setCommand( self.command)
          block.tasks.append( task)
-         job.send()
+         if job.send(): self.cmdField.setText('Afanasy job successfully sended.')
+         else:          self.cmdField.setText('Unable to send job to Afanasy server.')
       else:
          self.btnStart.setEnabled( False)
          self.btnStop.setEnabled( True)
@@ -974,8 +995,8 @@ class Dialog( QtGui.QWidget):
       print 'Exit code = %d' % exitCode
       self.btnStop.setEnabled( False)
       if exitCode != 0: return
-      self.cmdField.setText( self.command)
-      self.btnStart.setEnabled( True)
+      self.cmdField.setText('Command finished successfully.')
+#      self.btnStart.setEnabled( True)
 
    def processoutput( self):
       output = str( self.process.readAll())

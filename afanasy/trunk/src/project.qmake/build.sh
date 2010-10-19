@@ -1,11 +1,34 @@
 #!/bin/bash
 
+# Set locations:
+cgru=$PWD
+cgru=`dirname $cgru`
+cgru=`dirname $cgru`
+cgru=`dirname $cgru`
+cgru=`dirname $cgru`
+cgru_utils=$cgru/utilities
+cgru_qt=$cgru_utils/qt/qt-4.7.0-static
+cgru_python=$cgru_utils/python/2.5.5
+
 # Setup Qt (use system by default):
 export QMAKE=
+# Use CGRU Qt if presets:
+cgru_qmake=$cgru_qt/bin/qmake
+if [ -e $cgru_qmake ]; then
+	export QMAKE=$cgru_qmake
+   echo "Using CGRU Qt = '$cgru_qt'"
+fi
 
 # Setup Python:
-#export AF_PYTHON_INC="`python-config --cflags` -fPIC"
-#export AF_PYTHON_LIB="`python-config --ldflags`"
+python=python
+# Use CGRU Python if presets:
+if [ -e $cgru_python/bin/python ]; then
+   export PATH=$cgru_python/bin:$PATH
+   echo "Using CGRU Python = '$cgru_python'"
+fi
+
+export AF_PYTHON_INC="`python-config --cflags` -fPIC"
+export AF_PYTHON_LIB="`python-config --ldflags`"
 # Extra libs for linking python module ("libpyaf" project "pyaf.so" target):
 export AF_PYTHON_MODULE_EXTRA_LIBS=
 # on CentOS 5 with Python2.5 try "-lrt -lz -lgthread-2.0 -lglib-2.0"
