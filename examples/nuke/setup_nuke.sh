@@ -58,5 +58,11 @@ echo "NUKE = '${NUKE_EXEC}'"
 # Launch commands from current directory:
 export AF_CMD_PREFIX="./"
 
+LM_LICENSE_FILE="`dirname $NUKE_EXEC`/nuke.lic"
+if [ -f $LM_LICENSE_FILE ]; then
+   export LM_LICENSE_FILE 
+   echo "LM_LICENCS_FILE='$LM_LICENSE_FILE'"
+fi
+
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh
