@@ -4,21 +4,7 @@ echo "Afanasy setup sourced."
 
 curdir=$PWD
 
-if [ -z $CGRU_LOCATION ]; then
-   cd $AF_ROOT
-   cd ..
-   while [ $PWD != "/" ]; do
-      if [ -f ./setup.sh ]; then
-         echo "Sourcing CGRU setup from '$PWD'."
-         source ./setup.sh
-         break
-      fi
-      cd ..
-   done
-fi
-
-
-cd $AF_ROOT/init
+pushd $AF_ROOT/init >> /dev/null
 setup_files=`ls setup_*`
 if [ ! -z "$setup_files" ] ; then
    for setup_file in $setup_files; do
@@ -29,4 +15,4 @@ if [ ! -z "$setup_files" ] ; then
    done
 fi
 
-cd $curdir
+popd /dev/null
