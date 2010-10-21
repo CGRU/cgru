@@ -426,7 +426,7 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.editInputFiles2, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged2)
 
       self.leditInputFileCtrl2 = QtGui.QHBoxLayout()
-      self.btnInputFileCopy = QtGui.QPushButton('Copy first', self)
+      self.btnInputFileCopy = QtGui.QPushButton('Copy&&Paste First Sequence', self)
       self.leditInputFileCtrl2.addWidget( self.btnInputFileCopy)
       QtCore.QObject.connect( self.btnInputFileCopy, QtCore.SIGNAL('pressed()'), self.copyInput)
       self.tInputFilesCount2 = QtGui.QLabel('Files count:', self)
@@ -455,8 +455,13 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.btnInputFileRefresh2, QtCore.SIGNAL('pressed()'), self.inputFileChanged2)
       self.lInputFileGroup2.addLayout( self.lIdentify2)
 
+      self.lStereoStatus = QtGui.QHBoxLayout()
+      self.stereolayout.addLayout( self.lStereoStatus)
+      self.tStereoStatus = QtGui.QLabel( 'Stereo Status:', self)
+      self.tStereoStatus.setAutoFillBackground( True)
+      self.lStereoStatus.addWidget( self.tStereoStatus)
       self.editStereoStatus = QtGui.QLineEdit( self)
-      self.stereolayout.addWidget( self.editStereoStatus)
+      self.lStereoStatus.addWidget( self.editStereoStatus)
       self.editStereoStatus.setReadOnly( True)
 
       # Afanasy:
@@ -631,14 +636,20 @@ class Dialog( QtGui.QWidget):
 
    def evalStereo( self):
       if self.inputPattern2 is None:
+         self.cStereoDuplicate.setEnabled( True)
          if self.cStereoDuplicate.isChecked():
             self.editStereoStatus.setText('Stereo from one sequence.')
+            self.tStereoStatus.setBackgroundRole( QtGui.QPalette.Dark)
          else:
-            self.editStereoStatus.setText('Specify second sequence for steteo. Or enable duplicate one sequence.')
+            self.editStereoStatus.setText('No stereo. Specify second sequence or enable duplicate one sequence.')
+            self.tStereoStatus.setAutoFillBackground( True)
+            self.tStereoStatus.setBackgroundRole( QtGui.QPalette.Window)
       else:
          self.cStereoDuplicate.setChecked( False)
+         self.cStereoDuplicate.setEnabled( False)
          if self.editInputFilesCount.text() == self.editInputFilesCount2.text():
             self.editStereoStatus.setText('Stereo from two sequences.')
+            self.tStereoStatus.setBackgroundRole( QtGui.QPalette.LinkVisited)
          else:
             self.inputPattern2 = None
             self.editStereoStatus.setText('Two sequences must be the same lenght.')
@@ -738,13 +749,11 @@ class Dialog( QtGui.QWidget):
       InputFile, InputPattern, FilesCount, Identify = self.calcPattern( inputfile)
 
       self.inputPattern2 = InputPattern
-      if InputPattern == None: return
-
-      self.editInputFiles2.setText( InputFile)
-      self.editInputFilesPattern2.setText( os.path.basename( InputPattern))
-      self.editInputFilesCount2.setText( str(FilesCount))
-      self.editIdentify2.setText( Identify)
-
+      if InputPattern is not None:
+         self.editInputFiles2.setText( InputFile)
+         self.editInputFilesPattern2.setText( os.path.basename( InputPattern))
+         self.editInputFilesCount2.setText( str(FilesCount))
+         self.editIdentify2.setText( Identify)
       self.evalStereo()
 
    def calcPattern( self, InputFile):
