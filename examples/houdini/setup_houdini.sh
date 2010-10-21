@@ -44,3 +44,12 @@ if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
 else
    export HOUDINI_OTLSCAN_PATH=$HOUDINI_AF_OTLSCAN_PATH
 fi
+
+# Try CGRU 2.6 Python (Houdini 11 uses 2.6 Python):
+cgru_python="$CGRU_LOCATION/utilities/python/2.6.6"
+if [ -d $cgru_python ]; then
+   echo "Using CGRU Python = '$cgru_python'"
+   export PYTHONHOME=$cgru_python
+   export PATH=$cgru_python/bin:$PATH
+   export PYTHONPATH=$AF_ROOT/bin_pyaf/2.6.6:$PYTHONPATH
+fi

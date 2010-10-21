@@ -3,8 +3,14 @@
 export UNIXTYPE="LINUX"
 export MXX_RU_CPP_TOOLSET=gcc_linux
 
-pythondir=/cg/soft/python
-qt=/cg/tools/qt/qt-4.6.3-static
+cgru=$PWD
+cgru=`dirname $cgru`
+cgru=`dirname $cgru`
+cgru=`dirname $cgru`
+cgru=`dirname $cgru`
+cgru_utils=$cgru/utilities
+pythondir=$cgru_utils/python
+qt=$cgru_utils/qt/qt-4.7.0-static
 
 export AF_LFLAGS="-lrt -lz -lgthread -lglib"
 
@@ -15,8 +21,10 @@ export PATH=$qt/bin:$PATH
 
 syspath=$PATH
 for python in `ls "$pythondir"`; do
-
+   # Skip not folders:
    [ -d "$pythondir/$python" ] || continue
+   # Skip folder name does not starts with a digit and a dot:
+   [ "`echo $python | gawk '{print match( \$1, "[0-9]\\\.")}'`" == "1" ] || continue
 
    echo "Building for Python${python}"
 
