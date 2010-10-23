@@ -3,17 +3,40 @@ ButtonText:"Afanasy..."
 category:"CGRU"
 toolTip:"Render by Afanasy..."
 (
-global ver = "Afanasy"
 
 -- Set initial parameters:
--- Job name:
 local jobname = maxFileName
 local startFrame = rendStart.frame as integer
 local endFrame = rendEnd.frame as integer
 local byFrame = rendNThFrame
 local taskFrameNumber = 1
-local saveTempScene = false
-local startPaused = false
+
+persistent global AfOutputImage
+persistent global AfUseSceneWDir
+persistent global AfWorkingDirectory
+persistent global AfPriority
+persistent global AfMaxHosts
+persistent global AfCapacity
+persistent global AfDependMask
+persistent global AfGlobalMask
+persistent global AfHostsMask
+persistent global AfExcludeHosts
+persistent global AfSaveTempScene
+persistent global AfStartPaused
+
+if AfPriority           == undefined then AfPriority           = -1
+if AfMaxHosts           == undefined then AfMaxHosts           = -1
+if AfCapacity           == undefined then AfCapacity           = -1
+if AfOutputImage        == undefined then AfOutputImage        = ""
+if AfWorkingDirectory   == undefined then AfWorkingDirectory   = ""
+if AfDependMask         == undefined then AfDependMask         = ""
+if AfGlobalMask         == undefined then AfGlobalMask         = ""
+if AfHostsMask          == undefined then AfHostsMask          = ""
+if AfExcludeHosts       == undefined then AfExcludeHosts       = ""
+if AfSaveTempScene      == undefined then AfSaveTempScene      = false
+if AfStartPaused        == undefined then AfStartPaused        = false
+if AfUseSceneWDir       == undefined then AfUseSceneWDir       = false
+
 
 -- Get scene cameras:
 local CameraNames = #("")
@@ -38,7 +61,7 @@ if (AfanasyDialog != undefined) do
    catch ()
 )   
 
-rollout AfanasyDialog ver
+rollout AfanasyDialog "Afanasy"
 (
 -- Job name:
    edittext jobnameControl "Job Name" text:jobname
@@ -49,28 +72,35 @@ rollout AfanasyDialog ver
    spinner taskFrameNumberControl "Frames Per Task" range:[1,999,taskFrameNumber] type:#integer scale:1 toolTip:"Number of frames in one task."
 -- Cameras:
    dropdownlist cameraControl "Override Camera" items:CameraNames toolTip:"Override render camera."
+-- Output image:
+   label outputImageLabel "Override Output Image:"
+   edittext outputImageControl text:AfOutputImage toolTip:"Specify output image."
+-- Working directory:
+   checkbox useSceneWDirControl "Use scene folder as WDir" checked:AfUseSceneWDir toolTip:"Use scene folder as working directory."
+   label workingDirectoryLabel "Specify Working Directory:"
+   edittext workingDirectoryControl text:AfWorkingDirectory toolTip:"Specify working directory."
 -- Batch views:
    dropdownlist batchControl "Render Batch View" items:BatchViewNames toolTip:"Render batch view."
 -- Priority:
-   spinner priorityControl "Priority" range:[-1,99,-1] type:#integer scale:1 toolTip:"Job order."
+   spinner priorityControl "Priority" range:[-1,99,AfPriority] type:#integer scale:1 toolTip:"Job order."
 -- Maximum hosts:
-   spinner maxHostsControl "Max Hosts" range:[-1,9999,-1] type:#integer scale:1 toolTip:"Maximum number of hosts job can run on."
+   spinner maxHostsControl "Max Hosts" range:[-1,9999,AfMaxHosts] type:#integer scale:1 toolTip:"Maximum number of hosts job can run on."
 -- Capacity:
-   spinner capacityControl "Capacity" range:[-1,999999,-1] type:#integer scale:1 toolTip:"Job tasks capacity."
+   spinner capacityControl "Capacity" range:[-1,999999,AfCapacity] type:#integer scale:1 toolTip:"Job tasks capacity."
 -- Depend mask:
-   edittext dependMaskControl "Depend Mask" toolTip:"Jobs to wait names pattern (same user)."
+   edittext dependMaskControl "Depend Mask" text:AfDependMask toolTip:"Jobs to wait names pattern (same user)."
 -- Global Depend mask:
-   edittext globalMaskControl "Global Depend" toolTip:"Jobs to wait names pattern (all users)."
+   edittext globalMaskControl "Global Depend" text:AfGlobalMask toolTip:"Jobs to wait names pattern (all users)."
 -- Hosts mask:
-   edittext hostsMaskControl "Hosts Mask" toolTip:"Hosts names pattern job can run on."
+   edittext hostsMaskControl "Hosts Mask" text:AfHostsMask toolTip:"Hosts names pattern job can run on."
 -- Exclude hosts:
-   edittext excludeHostsControl "Exclude Hosts" toolTip:"Hosts names pattern job can not run on."
+   edittext excludeHostsControl "Exclude Hosts" text:AfExcludeHosts toolTip:"Hosts names pattern job can not run on."
 -- Save temporarry scene:
-   checkbox useTempControl "Save Temporary Scene" checked:saveTempScene toolTip:"Save scene to temporary file before render."
+   checkbox useTempControl "Save Temporary Scene" checked:AfSaveTempScene toolTip:"Save scene to temporary file before render."
 -- Render button:
    button renderButton "Render" toolTip:"Start Render Proces."
 -- Start job paused:
-   checkbox pauseControl "Start Job Paused" checked:startPaused toolTip:"Send job paused."
+   checkbox pauseControl "Start Job Paused" checked:AfStartPaused toolTip:"Send job paused."
 
    on batchControl selected i do
    (
@@ -98,6 +128,23 @@ rollout AfanasyDialog ver
 -- Save scene:
       checkForSave()
 
+-- Get Parameters:
+      AfPriority           = priorityControl.value
+      AfMaxHosts           = maxHostsControl.value
+      AfCapacity           = capacityControl.value
+      AfOutputImage        = outputImageControl.text
+      AfWorkingDirectory   = workingDirectoryControl.text
+      AfDependMask         = dependMaskControl.text
+      AfGlobalMask         = globalMaskControl.text
+      AfHostsMask          = hostsMaskControl.text
+      AfExcludeHosts       = excludeHostsControl.text
+      AfStartPaused        = pauseControl.checked
+      AfUseSceneWDir       = useSceneWDirControl.checked
+
+-- Check Parameters:
+      if AfWorkingDirectory[AfWorkingDirectory.count] == "\\" then
+         AfWorkingDirectory = substring AfWorkingDirectory 1 (AfWorkingDirectory.count-1)
+
 -- Create command:
       local cmd = "afjob.py "
       cmd += "\"" + maxFilePath + maxFileName + "\""
@@ -105,16 +152,23 @@ rollout AfanasyDialog ver
       cmd += " " + (endFrameControl.value as string)
       cmd += " -fpt " + (taskFrameNumberControl.value as string)
       cmd += " -by " + (byFrameControl.value as string)
-      if priorityControl.value > -1 then cmd += " -priority " + (priorityControl.value as string)
-      if maxHostsControl.value > -1 then cmd += " -maxhosts " + (maxHostsControl.value as string)
-      if capacityControl.value > -1 then cmd += " -capacity " + (capacityControl.value as string)
-      if jobnameControl.text      != "" then cmd += " -name \""      + jobnameControl.text      + "\""
-      if dependMaskControl.text   != "" then cmd += " -depmask \""   + dependMaskControl.text   + "\""
-      if globalMaskControl.text   != "" then cmd += " -depglbl \""   + globalMaskControl.text   + "\""
-      if hostsMaskControl.text    != "" then cmd += " -hostsmask \"" + hostsMaskControl.text    + "\""
-      if excludeHostsControl.text != "" then cmd += " -hostsexcl \"" + excludeHostsControl.text + "\""
-      if pauseControl.checked == true then cmd += " -pause"
-      if useTempControl.checked == true then (
+      if jobnameControl.text != "" then cmd += " -name \"" + jobnameControl.text + "\""
+      if AfPriority > -1 then cmd += " -priority " + (AfPriority as string)
+      if AfMaxHosts > -1 then cmd += " -maxhosts " + (AfMaxHosts as string)
+      if AfCapacity > -1 then cmd += " -capacity " + (AfCapacity as string)
+      if AfDependMask         != "" then cmd += " -depmask \""   + AfDependMask        + "\""
+      if AfGlobalMask         != "" then cmd += " -depglbl \""   + AfGlobalMask        + "\""
+      if AfHostsMask          != "" then cmd += " -hostsmask \"" + AfHostsMask         + "\""
+      if AfExcludeHosts       != "" then cmd += " -hostsexcl \"" + AfExcludeHosts      + "\""
+      if AfOutputImage        != "" then cmd += " -output \""    + AfOutputImage       + "\""
+      if AfWorkingDirectory   != "" then cmd += " -pwd \""       + AfWorkingDirectory  + "\""
+      else if AfUseSceneWDir == true then (
+         local folder = maxFilePath
+         if folder[folder.count] == "\\" then folder = substring folder 1 (folder.count-1)
+         cmd += " -pwd \"" + folder + "\""
+      )
+      if AfStartPaused == true then cmd += " -pause"
+      if AfSaveTempScene == true then (
          cmd += " -tempscene"
          cmd += " -deletescene"
       )

@@ -2,7 +2,7 @@ pushd ..
 call setup.cmd
 popd
 
-set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2010
+set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2011
 
 set PATH=%CGRU_LOCATION%\plugins\max;%PATH%
 

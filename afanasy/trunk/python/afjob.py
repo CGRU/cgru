@@ -28,7 +28,7 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 100                  -   (R) last frame to render\n\
 -by 1                -   frames increment\n\
 -fpt 3               -   frames per task\n\
--pwd projects/test   -   working wirectory\n\
+-pwd projects/test   -   Working directory, if not set current will be used.\n\
 -name my_job         -   job name\n\
 -node                -   node to render ( houdini driver, nuke write, max camera )\n\
 -type                -   service type\n\
@@ -48,6 +48,7 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -capmax              -   tasks maximum capacity coefficient\n\
 -depmask             -   wait untill other jobs of the same user, satisfying this mask\n\
 -depglbl             -   wait untill other jobs of any user, satisfying this mask\n\
+-output              -   override output filename\n\
 -images              -   images to preview (img.%04d.jpg)\n\
 -image               -   image to preview (img.0000.jpg)\n\
 -varirender attr start step count - variate parameter\n\
@@ -101,6 +102,7 @@ capmin         = -1
 capmax         = -1
 dependmask     = ''
 dependglobal   = ''
+output         = ''
 images         = ''
 image          = ''
 blocktype      = ''
@@ -252,6 +254,12 @@ for i in range( argsl):
       images = argsv[i]
       continue
 
+   if arg == '-output':
+      i += 1
+      if i == argsl: break
+      output = argsv[i]
+      continue
+
    if arg == '-image':
       i += 1
       if i == argsl: break
@@ -361,12 +369,15 @@ elif ext == 'scn':
 elif ext == 'max':
    scenetype = 'max'
    cmd = '3dsmaxcmd' + cmdextension + ' "' + scene + '" -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
-   if node != '': cmd += ' -camera:"%s"' % node
+   if node != '': cmd += ' -cam:"%s"' % node
    if take != '':
       cmd += ' -batchrender'
       if take != 'all': cmd += ':"%s"' % take
       if blockname != '': blockname = take + ' ' + blockname
       else: blockname = take
+   if output != '':
+      cmd += ' -o:"%s"' % output
+      images = cgruutils.cPathFrom1(output)
 
 # simple generic:
 else:
