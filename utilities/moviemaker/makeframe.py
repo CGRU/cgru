@@ -179,7 +179,7 @@ def reformatImage( FILEIN):
    # Get input file type:
    imgtype = ''
    lastdotpos = FILEIN.rfind('.')
-   if lastdotpos > 1: imgtype = FILEIN[lastdotpos+1:]
+   if lastdotpos > 1: imgtype = FILEIN[lastdotpos+1:].lower()
    if Verbose: print 'Images type = "%s"' % imgtype
    # Input file correction:
    correction = ''

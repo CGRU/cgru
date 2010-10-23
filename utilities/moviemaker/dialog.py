@@ -951,13 +951,13 @@ class Dialog( QtGui.QWidget):
       if self.inputPattern2 is not None: cmd += ' "%s"' % self.inputPattern2
       cmd += ' "%s"' % os.path.join( outdir, outname)
 
+      self.command = str(cmd)
       self.cmdField.setText( cmd)
       self.evaluated = True
       self.btnStart.setEnabled( True)
 
    def execute( self):
       if not self.evaluated: return
-      self.command = '%s' % self.cmdField.toPlainText()
       if len( self.command) == 0: return
 
       if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
@@ -965,8 +965,11 @@ class Dialog( QtGui.QWidget):
          try:
             af = __import__('af', globals(), locals(), [])
          except:
-            self.cmdField.setText('Unable to import Afanasy Python module.')
+            error = str(sys.exc_info()[1])
+            print error
+            self.cmdField.setText('Unable to import Afanasy Python module:\n' + error)
             return
+         reload(af)
          job = af.Job( '%s' % self.editOutputName.text() + ' mavishka')
          block = af.Block('mavishky')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
@@ -1005,7 +1008,6 @@ class Dialog( QtGui.QWidget):
       self.btnStop.setEnabled( False)
       if exitCode != 0: return
       self.cmdField.setText('Command finished successfully.')
-#      self.btnStart.setEnabled( True)
 
    def processoutput( self):
       output = str( self.process.readAll())
