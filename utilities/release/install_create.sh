@@ -55,6 +55,7 @@ function writeCommands(){
          echo "Error: Package '${package}' does not exists."
          exit 1
       fi
+      echo "echo Installing ${package_file}" >> $afile
       echo "${install_cmd} ${package_file}" >> $afile
    done
 }
