@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Afanasy
 Comment=Afanasy local HTML documentation
-Exec=firefox /opt/cgru/afanasy/doc/index.html
+Exec=/opt/cgru/bin/showdoc.py afanasy/doc/index.html
 Icon=afdoc
 Terminal=false
 Type=Application
