@@ -661,8 +661,8 @@ class Dialog( QtGui.QWidget):
          self.evaluate()
 
    def copyInput( self):
-      files1 = str(self.editInputFiles.text())
-      if files1 != '':
+      files1 = self.editInputFiles.text()
+      if not files1.empty:
          self.editInputFiles2.setText( files1)
       self.inputFileChanged2()
 
@@ -736,7 +736,7 @@ class Dialog( QtGui.QWidget):
 
       self.editInputFiles.setText( InputFile)
       self.editInputFilesPattern.setText( os.path.basename( InputPattern))
-      self.editInputFilesCount.setText( str(FilesCount))
+      self.editInputFilesCount.setText( '%d' % FilesCount)
       self.editIdentify.setText( Identify)
 
       self.evaluate()
@@ -752,7 +752,7 @@ class Dialog( QtGui.QWidget):
       if InputPattern is not None:
          self.editInputFiles2.setText( InputFile)
          self.editInputFilesPattern2.setText( os.path.basename( InputPattern))
-         self.editInputFilesCount2.setText( str(FilesCount))
+         self.editInputFilesCount2.setText( '%d' % FilesCount)
          self.editIdentify2.setText( Identify)
       self.evalStereo()
 
@@ -932,10 +932,7 @@ class Dialog( QtGui.QWidget):
          if not cacher.isEmpty(): cmd += ' --draw235 %s' % cacher
          if self.cLogo.isChecked():
             cmd += ' --logopath "%s"' % logopath
-            logosize  = str( self.sbLogoSizeX.value())
-            logosize += 'x'
-            logosize += str( self.sbLogoSizeY.value())
-            cmd += ' --logosize %s' % logosize
+            cmd += ' --logosize %dx%d' % ( self.sbLogoSizeX.value(), self.sbLogoSizeY.value())
             cmd += ' --logograv %s' % self.cbLogoGravity.currentText()
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
@@ -951,7 +948,7 @@ class Dialog( QtGui.QWidget):
       if self.inputPattern2 is not None: cmd += ' "%s"' % self.inputPattern2
       cmd += ' "%s"' % os.path.join( outdir, outname)
 
-      self.command = str(cmd)
+      self.command = cmd
       self.cmdField.setText( cmd)
       self.evaluated = True
       self.btnStart.setEnabled( True)
@@ -970,7 +967,7 @@ class Dialog( QtGui.QWidget):
             self.cmdField.setText('Unable to import Afanasy Python module:\n' + error)
             return
          reload(af)
-         job = af.Job( '%s' % self.editOutputName.text() + ' mavishka')
+         job = af.Job(('%s' % self.editOutputName.text()).encode('utf-8') + ' mavishka')
          block = af.Block('mavishky')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
          if self.sbAfMaxHosts.value()  != -1: job.setMaxHosts(    self.sbAfMaxHosts.value())
@@ -979,17 +976,18 @@ class Dialog( QtGui.QWidget):
          hostsmaskexclude  = '%s' % self.editAfHostsMaskExclude.text()
          dependmask        = '%s' % self.editAfDependMask.text()
          dependmaskglobal  = '%s' % self.editAfDependMaskGlobal.text()
-         if hostsmask        != '': job.setHostsMask(        hostsmask        )
-         if hostsmaskexclude != '': job.setHostsMaskExclude( hostsmaskexclude )
-         if dependmask       != '': job.setDependMask(       dependmask       )
-         if dependmaskglobal != '': job.setDependMaskGlobal( dependmaskglobal )
+         if hostsmask        != '': job.setHostsMask(        hostsmask.encode('utf-8')        )
+         if hostsmaskexclude != '': job.setHostsMaskExclude( hostsmaskexclude.encode('utf-8') )
+         if dependmask       != '': job.setDependMask(       dependmask.encode('utf-8')       )
+         if dependmaskglobal != '': job.setDependMaskGlobal( dependmaskglobal.encode('utf-8') )
          datetime = self.editAfTime.dateTime()
          if datetime > QtCore.QDateTime.currentDateTime(): job.setWaitTime( datetime.toTime_t())
          if self.cAfPause.isChecked(): job.pause()
          job.setNeedOS('')
          job.blocks.append( block)
-         task = af.Task( '%s' % self.editOutputName.text())
-         task.setCommand( self.command)
+         task = af.Task(('%s' % self.editOutputName.text()).encode('utf-8'))
+         task.setCommand( self.command.encode('utf-8'))
+
          block.tasks.append( task)
          if job.send(): self.cmdField.setText('Afanasy job successfully sended.')
          else:          self.cmdField.setText('Unable to send job to Afanasy server.')
@@ -1010,9 +1008,9 @@ class Dialog( QtGui.QWidget):
       self.cmdField.setText('Command finished successfully.')
 
    def processoutput( self):
-      output = str( self.process.readAll())
-      print output,
-      self.cmdField.insertPlainText( output)
+      output = self.process.readAll()
+      print ('%s' % output),
+      self.cmdField.insertPlainText( QtCore.QString( output))
       self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
    def processStop( self):

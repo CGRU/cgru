@@ -85,7 +85,7 @@ void Service::initialize()
    pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
    if( PyString_Check( pResult))
    {
-      wdir = PyString_AsString( pResult);
+      wdir = QString::fromUtf8( PyString_AsString( pResult));
       Py_DECREF( pResult);
    }
    else
@@ -99,7 +99,7 @@ void Service::initialize()
    pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
    if( PyString_Check( pResult))
    {
-      command = PyString_AsString( pResult);
+      command = QString::fromUtf8( PyString_AsString( pResult));
       Py_DECREF( pResult);
    }
    else
@@ -113,7 +113,7 @@ void Service::initialize()
    pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
    if( PyString_Check( pResult))
    {
-      files = PyString_AsString( pResult);
+      files = QString::fromUtf8( PyString_AsString( pResult));
       Py_DECREF( pResult);
    }
    else

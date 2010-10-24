@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
 import os
 import sys
@@ -433,7 +434,7 @@ if options.afanasy:
    be.setCapacity( options.afenccap)
    if need_convert:
       be.setDependMask('convert')
-      j.setCmdPre( 'mkdir "%s"' % os.path.abspath(TmpDir))
+      j.setCmdPre( 'mkdir "%s" && chmod a+rwx "%s"' % (os.path.abspath(TmpDir),os.path.abspath(TmpDir)))
       j.setCmdPost('rm -rf "%s"' % os.path.abspath(TmpDir))
 
    if Verbose: j.output(1)

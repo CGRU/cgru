@@ -28,11 +28,11 @@ class Task(pyaf.Task):
       self.pm = PathMap( self.env.Vars['afroot'])
 
    def setCommand( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Task.setCommand( self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Task.setCommand( self, cmd)
    def setFiles( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Task.setFiles( self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Task.setFiles( self, cmd)
 
 class Block(pyaf.Block):
    def __init__( self, blockname = 'block', blocktype = 'generic'):
@@ -70,21 +70,21 @@ class Block(pyaf.Block):
       if capmin >= 0 or capmax >= 0: pyaf.Block.setVariableCapacity( self, capmin, capmax)
 
    def setWorkingDirectory( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Block.setWorkingDirectory( self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Block.setWorkingDirectory( self, cmd)
    def setCommand( self, cmd, prefix = True, TransferToServer = True):
-      if prefix: cmd = os.getenv('AF_CMD_PREFIX', self.env.Vars['cmdprefix']) + str(cmd)
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Block.setCommand( self, str(cmd))
+      if prefix: cmd = os.getenv('AF_CMD_PREFIX', self.env.Vars['cmdprefix']) + cmd
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Block.setCommand( self, cmd)
    def setCmdPre(  self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Block.setCmdPre(  self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Block.setCmdPre(  self, cmd)
    def setCmdPost( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Block.setCmdPost( self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Block.setCmdPost( self, cmd)
    def setFiles(  self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Block.setFiles(  self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Block.setFiles(  self, cmd)
 
 ###### DEPRECATED: ######
    def setCommandView(  self, cmd, TransferToServer = True):
@@ -92,7 +92,7 @@ class Block(pyaf.Block):
       self.setFiles( cmd , TransferToServer)
    def addTask( self, taskname = ''):
       print 'Warning: Method "Job.addTask" is deprecated, use "Block.tasks" list instead.'
-      if taskname == '': taskname = 'task #' + str(len(self.tasks))
+      if taskname == '': taskname = 'task #%d' % len(self.tasks)
       task = Task( taskname)
       self.tasks.append( task)
       return task
@@ -106,7 +106,7 @@ class Block(pyaf.Block):
             self.appendTask( task)
          else:
             print 'Warning: Skipping element[%d] of list "tasks" which is not an instance of "Task" class:' % t
-            print str(task)
+            print repr(task)
          t += 1
 
 class Job(pyaf.Job):
@@ -143,11 +143,11 @@ class Job(pyaf.Job):
       pyaf.Job.setPriority( self, priority)
 
    def setCmdPre(  self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Job.setCmdPre(  self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Job.setCmdPre(  self, cmd)
    def setCmdPost( self, cmd, TransferToServer = True):
-      if TransferToServer: cmd = self.pm.toServer( str(cmd))
-      pyaf.Job.setCmdPost( self, str(cmd))
+      if TransferToServer: cmd = self.pm.toServer( cmd)
+      pyaf.Job.setCmdPost( self, cmd)
 
    def fillBlocks( self):
       self.clearBlocksList()
@@ -158,7 +158,7 @@ class Job(pyaf.Job):
             self.appendBlock( block)
          else:
             print 'Warning: Skipping element[%d] of list "blocks" which is not an instance of "Block" class:' % b
-            print str(block)
+            print repr(block)
          b += 1
 
    def output( self, full = False):
@@ -175,11 +175,13 @@ class Job(pyaf.Job):
       if self.construct() == False: return False
       return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)
 
+###### DEPRECATED: ######
    def addBlock( self, blockname = 'block', blocktype = 'generic'):
       print 'Warning: Method "Job::addBlock" is deprecated, use job "blocks" list instead.'
       block = Block( blockname, blocktype)
       self.blocks.append( block)
       return block
+#########################
 
    def pause(      self): self.offline()
    def setPaused(  self): self.offline()
