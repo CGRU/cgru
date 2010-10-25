@@ -1,9 +1,21 @@
+rem @echo off
 set CMAKE_GENERATOR=Visual Studio 9 2008 Win64
-rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH' at first:
-rem SET PATH=C:\Qt\4.6.2-vc2008\bin;%PATH%
-rem Specify exact python:
-rem SET AF_PYTHON_INCLUDE_PATH=C:\Python25\include
-rem SET AF_PYTHON_LIBRARIES=C:\Python25\libs\python25.lib
+
+pushd ..\..\..\..
+set cgru=%CD%
+popd
+
+rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
+set cgru_qt=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.0-shared
+if exist %cgru_qt% SET PATH=%cgru_qt%\bin;%PATH%
+
+rem Specify Python:
+set cgru_python=%cgru%\utilities\python\2.5.4
+if exist %cgru_python% (
+   echo Using CGRU Python: %cgru_python%
+   SET AF_PYTHON_INCLUDE_PATH=%cgru_python%\include
+   SET AF_PYTHON_LIBRARIES=%cgru_python%\libs\python25.lib
+)
 
 if exist override.cmd call override.cmd
 

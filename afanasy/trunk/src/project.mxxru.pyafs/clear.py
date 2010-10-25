@@ -5,8 +5,7 @@ import shutil
 
 todelete = 'tmp'
 
-for folder in os.listdir( os.getcwd()):
-   if os.path.isdir( folder):
-      if folder.find( todelete) == 0:
-         print 'Deleting "%s"' % folder
-         shutil.rmtree( folder)
+for afile in os.listdir( os.getcwd()):
+   if afile.find( todelete) == 0:
+      print 'Deleting "%s"' % afile
+      shutil.rmtree( afile)

@@ -5,7 +5,7 @@ if exist trunk cd trunk
 call setup.cmd
 popd
 
-set pyver=254_32
+set pyver=2.5.4-32
 set pyaf=%AF_ROOT%\bin_pyaf\%pyver%
 if exist %pyaf% set PYTHONPATH=%pyaf%;%PYTHONPATH%
 

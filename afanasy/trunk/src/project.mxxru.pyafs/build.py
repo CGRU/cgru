@@ -9,10 +9,10 @@ for python in os.listdir( pythons):
    if not os.path.isdir( pythondir): continue
    print 'Python = "%s"' % python
 
-   pythonlib = 'python' + python[0:2]
+   pythonlib = 'python' + python[:3].replace('.','')
    qt = os.environ['QTS']
    arch = 'amd64'
-   if python.find('32') >= 2:
+   if python.find('-32') > 0:
       qt += '-32'
       arch = 'x86'
 
