@@ -3,6 +3,8 @@ PUSHD ..
 call setup.cmd
 POPD
 
+set PYTHONHOME=
+
 rem Set Maya location:
 set MAYA_LOCATION=C:\Program Files\Autodesk\Maya2011
 
