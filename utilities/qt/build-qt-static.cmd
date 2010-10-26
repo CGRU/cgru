@@ -1,9 +1,10 @@
 set VSINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio 9.0"
 set VCVARS=amd64
+set qt=qt-everywhere-opensource-src-4.7.0-static
+
+if exist override.cmd call override.cmd
 
 call %VSINSTALLDIR%\VC\vcvarsall.bat %VCVARS%
-
-set qt=qt-everywhere-opensource-src-4.7.0-static
 
 python patch-qprocess_win.cpp.py %qt%
 
