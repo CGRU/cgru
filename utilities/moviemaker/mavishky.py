@@ -279,6 +279,14 @@ print TmpDir
 cmd_makeframe = os.path.join( os.path.dirname(sys.argv[0]), 'makeframe.py')
 cmd_makeframe = 'python ' + cmd_makeframe
 
+# Calculate frame range:
+FrameRange = ''
+digits1 = re.findall(r'\d+', images1[0])
+digits2 = re.findall(r'\d+', images1[-1])
+if digits1 is not None and digits2 is not None:
+   if len(digits1) and len(digits2):
+      FrameRange = "%s-%s" % (digits1[-1].lstrip('0'), digits2[-1].lstrip('0'))
+
 # Construct frame conversion command arguments:
 cmd_args = ''
 if options.resolution   != '': cmd_args += ' -r %s' % options.resolution
@@ -291,6 +299,7 @@ if options.shotversion  != '': cmd_args += ' --ver "%s"'       % options.shotver
 if options.font         != '': cmd_args += ' --font "%s"'      % options.font
 if options.activity     != '': cmd_args += ' --activity "%s"'  % options.activity
 if options.comments     != '': cmd_args += ' --comments "%s"'  % options.comments
+if FrameRange           != '': cmd_args += ' --framerange "%s"'  % FrameRange
 if Stereo: cmd_args += ' --stereo'
 cmd_args += ' -d "%s"' % datetimestring
 cmd_args += ' -m "%s"' % os.path.basename(Output)

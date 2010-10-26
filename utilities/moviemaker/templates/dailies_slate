@@ -1,7 +1,7 @@
 "%(THUMBNAIL)s"
 -resize @SIZE_3/5@x@SIZE_3/5@
 -background black
--gravity West -extent @SIZE_6/7@x@SIZE_6/7@
+-gravity West -extent @SIZE_4/5@x@SIZE_4/5@
 -gravity East -extent %(Width)dx%(Height)d
 -compose over -composite
 
