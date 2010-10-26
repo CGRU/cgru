@@ -18,6 +18,10 @@ Parser.add_option('-t', '--template',        dest='template',        type  ='str
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
+Parser.add_option('--draw169',               dest='draw169',         type  ='string',     default='',             help='Draw 16:9 cacher opacity')
+Parser.add_option('--draw235',               dest='draw235',         type  ='string',     default='',             help='Draw 2.35 cacher opacity')
+Parser.add_option('--line169',               dest='line169',         type  ='string',     default='200,200,200',  help='Draw 16:9 line color: "255,255,0"')
+Parser.add_option('--line235',               dest='line235',         type  ='string',     default='200,200,200',  help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
 Parser.add_option(      '--afpriority',      dest='afpriority',      type  ='int',        default=-1,             help='Afanasy job priority')
 Parser.add_option(      '--afmaxhosts',      dest='afmaxhosts',      type  ='int',        default=-1,             help='Afanasy job maximum hosts')
@@ -307,7 +311,7 @@ class Dialog( QtGui.QWidget):
       self.lDrawing.addWidget( self.cTime)
 
       self.lCacher = QtGui.QHBoxLayout()
-      self.tCacherH = QtGui.QLabel('16:9 Cacher', self)
+      self.tCacherH = QtGui.QLabel('16:9 Cacher:', self)
       self.cbCacherH = QtGui.QComboBox( self)
       self.cbCacherH.addItem('None')
       self.cbCacherH.addItem('25%', QtCore.QVariant('25'))
@@ -316,7 +320,7 @@ class Dialog( QtGui.QWidget):
       self.cbCacherH.addItem('100%', QtCore.QVariant('100'))
       self.cbCacherH.setCurrentIndex( 1)
       QtCore.QObject.connect( self.cbCacherH, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.tCacherC = QtGui.QLabel('2.35 Cacher', self)
+      self.tCacherC = QtGui.QLabel('2.35 Cacher:', self)
       self.cbCacherC = QtGui.QComboBox( self)
       self.cbCacherC.addItem('None')
       self.cbCacherC.addItem('25%', QtCore.QVariant('25'))
@@ -330,6 +334,17 @@ class Dialog( QtGui.QWidget):
       self.lCacher.addWidget( self.tCacherC)
       self.lCacher.addWidget( self.cbCacherC)
       self.lDrawing.addLayout( self.lCacher)
+
+      self.lLines = QtGui.QHBoxLayout()
+      self.tLine169 = QtGui.QLabel('Line 16:9 Color:', self)
+      self.lLines.addWidget( self.tLine169)
+      self.editLine169 = QtGui.QLineEdit( Options.line169, self)
+      self.lLines.addWidget( self.editLine169)
+      self.tLine235 = QtGui.QLabel('Line 2.35 Color:', self)
+      self.lLines.addWidget( self.tLine235)
+      self.editLine235 = QtGui.QLineEdit( Options.line235, self)
+      self.lLines.addWidget( self.editLine235)
+      self.lDrawing.addLayout( self.lLines)
 
       self.lLogo = QtGui.QHBoxLayout()
       self.cLogo = QtGui.QCheckBox('Logo', self)
@@ -930,6 +945,8 @@ class Dialog( QtGui.QWidget):
          if not cacher.isEmpty(): cmd += ' --draw169 %s' % cacher
          cacher = self.cbCacherC.itemData( self.cbCacherC.currentIndex()).toString()
          if not cacher.isEmpty(): cmd += ' --draw235 %s' % cacher
+         if not self.editLine169.text().isEmpty(): cmd += ' --line169 "%s"' % self.editLine169.text()
+         if not self.editLine235.text().isEmpty(): cmd += ' --line235 "%s"' % self.editLine235.text()
          if self.cLogo.isChecked():
             cmd += ' --logopath "%s"' % logopath
             cmd += ' --logosize %dx%d' % ( self.sbLogoSizeX.value(), self.sbLogoSizeY.value())

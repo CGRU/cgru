@@ -1,10 +1,17 @@
--fill white -pointsize 30 -gravity northwest -annotate +10+100 "%(PROJECT)s"
--fill white -pointsize 30 -gravity north     -annotate +10+100 "%(DATETIME)s"
--fill white -pointsize 30 -gravity northeast -annotate +10+100 "%(COMPANY)s"
--fill white -pointsize 30 -gravity northwest -annotate +10+150 "%(SHOT)s"
--fill white -pointsize 30 -gravity north     -annotate +10+150 "%(VERSION)s"
--fill white -pointsize 20 -gravity northeast -annotate +10+160 "Frame range: %(FRAMERANGE)s"
--fill white -pointsize 25 -gravity southwest -annotate +10+50  "Artist: %(ARTIST)s"
--fill white -pointsize 25 -gravity southeast -annotate +10+50  "Activity: %(ACTIVITY)s"
--fill white -pointsize 20 -gravity west      -annotate +10+0   "Comments: %(COMMENTS)s"
--fill white -pointsize 30 -gravity southwest -annotate +10+10  "%(MOVIENAME)s"
+"%(THUMBNAIL)s"
+-resize @SIZE_3/5@x@SIZE_3/5@
+-background black
+-gravity West -extent @SIZE_6/7@x@SIZE_6/7@
+-gravity East -extent %(Width)dx%(Height)d
+-compose over -composite
+
+-fill white -pointsize @SIZE_1/12@ -gravity west -annotate +@SIZE_1/15@-@SIZE_1/4@ "Project: %(PROJECT)s"
+-fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@-@SIZE_4/30@ "Date: %(DATETIME)s"
+-fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@-@SIZE_1/30@ "Shot: %(SHOT)s"
+-fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@+@SIZE_2/30@ "Version: %(VERSION)s"
+-fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@+@SIZE_5/30@ "Frame range: %(FRAMERANGE)s"
+-fill white -pointsize @SIZE_1/20@ -gravity west -annotate +@SIZE_1/15@+@SIZE_2/7@ "Comments: %(COMMENTS)s"
+-fill white -pointsize @SIZE_1/20@ -gravity southwest -annotate +@SIZE_1/15@+@SIZE_1/12@ "Artist: %(ARTIST)s, Activity: %(ACTIVITY)s"
+#-fill white -pointsize @SIZE_1/20@ -gravity southeast -annotate +10+50 "Activity: %(ACTIVITY)s"
+-fill white -pointsize @SIZE_1/20@ -gravity southwest -annotate +@SIZE_1/15@+@SIZE_1/40@ "%(MOVIENAME)s"
+-fill white -pointsize @SIZE_1/15@ -gravity southeast -annotate +@SIZE_1/15@+@SIZE_1/8@ "%(COMPANY)s"

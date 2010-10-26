@@ -36,6 +36,7 @@ parser.add_option('-c', '--codec',      dest='codec',       type  ='string',    
 parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default=25,          help='Frames per second')
 parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
+parser.add_option('--thumbnail',        dest='thumbnail',   action='store_true', default=False,       help='Add a thumbnail image on slate frame')
 parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
 parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')
 parser.add_option('--timesuffix',       dest='timesuffix',  action='store_true', default=False,       help='Add time suffix to output file name')
@@ -65,6 +66,8 @@ parser.add_option('--logosize',         dest='logosize',    type  ='string',    
 parser.add_option('--logograv',         dest='logograv',    type  ='string',     default='southeast', help='Logotype positioning gravity')
 parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
 parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
+parser.add_option('--line169',          dest='line169',     type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
+parser.add_option('--line235',          dest='line235',     type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
 parser.add_option('--stereo',           dest='stereo',      action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
 
 (options, args) = parser.parse_args()
@@ -301,6 +304,7 @@ if need_convert and options.slate != '':
    cmd = cmd_makeframe + cmd_args
    cmd += ' --drawcolorbars' + cmd_args
    cmd += ' -t "%s"' % options.slate
+   cmd += ' --thumbnail "%s"' % images1[int(len(images1)/2)]
    cmd += ' "%s"' % (os.path.join( TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')
@@ -333,10 +337,12 @@ if need_convert:
    i = 0
    for afile in images1:
       cmd = cmd_makeframe + cmd_args
-      if options.template != '': cmd += ' -t "%s"' % options.template
-      if options.gamma     >  0: cmd += ' -g %.2f'     % options.gamma
-      if options.draw169   >  0: cmd += ' --draw169 %d' % options.draw169
-      if options.draw235   >  0: cmd += ' --draw235 %d' % options.draw235
+      if options.template != '': cmd += ' -t "%s"'         % options.template
+      if options.gamma     >  0: cmd += ' -g %.2f'         % options.gamma
+      if options.draw169   >  0: cmd += ' --draw169 %d'    % options.draw169
+      if options.draw235   >  0: cmd += ' --draw235 %d'    % options.draw235
+      if options.line169  != '': cmd += ' --line169 "%s"'  % options.line169
+      if options.line235  != '': cmd += ' --line235 "%s"'  % options.line235
       if need_logo:              cmd += ' --Logopath "%s"' % tmplogo
 
       cmd += ' "%s"' % afile

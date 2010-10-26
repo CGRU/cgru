@@ -31,8 +31,11 @@ parser.add_option('--stereo',           dest='stereo',         action='store_tru
 parser.add_option('--drawcolorbars',    dest='drawcolorbars',  action='store_true', default=False,       help='Draw file name')
 parser.add_option('--draw169',          dest='draw169',        type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
 parser.add_option('--draw235',          dest='draw235',        type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
+parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
+parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
 parser.add_option('--font',             dest='font',           type  ='string',     default='',          help='Specify font)')
-parser.add_option('--logopath',         dest='logopath',       type  ='string',     default='',          help='Add a specified image')
+parser.add_option('--thumbnail',        dest='thumbnail',      type  ='string',     default='',          help='Add a specified thumbnail image, thumbnail can be resized and placed in image')
+parser.add_option('--logopath',         dest='logopath',       type  ='string',     default='',          help='Add a specified logo image, logo should be the same format')
 parser.add_option('-V', '--verbose',    dest='verbose',        action='store_true', default=False,       help='Verbose mode')
 parser.add_option('-D', '--debug',      dest='debug',          action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 
@@ -53,6 +56,7 @@ if len(args) == 3:
    FILEIN2     = args[1]
    FileOut     = args[2]
    Stereo      = True
+THUMBNAIL      = options.thumbnail
 MOVIENAME      = options.moviename
 DATETIME       = options.datetime
 COMPANY        = options.company
@@ -112,7 +116,7 @@ Counter = 0
 
 def paintAnnotate( FILEIN):
    global Width,Height,Stereo,FileOut
-   global MOVIENAME,DATETIME,COMPANY,PROJECT,SHOT,VERSION,ARTIST,ACTIVITY,COMMENTS,FRAME,FRAMERANGE,FILEDATE,FILEINBASE
+   global THUMBNAIL,MOVIENAME,DATETIME,COMPANY,PROJECT,SHOT,VERSION,ARTIST,ACTIVITY,COMMENTS,FRAME,FRAMERANGE,FILEDATE,FILEINBASE
    global Counter
    Counter += 1
    # Input file indentify:
@@ -129,6 +133,50 @@ def paintAnnotate( FILEIN):
                FRAME = digits[-1]
                if Verbose: print 'Frame = "%s"' % FRAME
    cmd = 'convert -size %(Width)dx%(Height)d -colorspace RGB xc:black -alpha Transparent -antialias' % globals()
+   # Compose thumbnail
+#   if options.thumbnail != '':
+#      cmd += ' "%s"' % options.thumbnail
+#      cmd += ' -resize "%dx%d"' % ( Width*2/5, Height*2/5)
+#      cmd += ' -background black'
+#      cmd += ' -gravity West -extent %dx%d' % ( Width*3/7, Height*3/7)
+#      cmd += ' -gravity East -extent %(Width)dx%(Height)d' % globals()
+#      cmd += ' -compose over -composite'
+   # Apply font:
+   if options.font != '': cmd += ' -font %s' % options.font
+   # Construct command from template:
+   for line in cmdlines:
+      line = line.strip()
+      if len(line) < 1: continue
+      if line[0] == '#': continue
+      # Calculate relative size:
+      while True:
+         pos = line.find('@SIZE_')
+         if pos == -1: break
+         pos1 = line[pos:].find('_')
+         if pos1 != -1:
+            pos1 += pos
+            pos2 = line[pos1:].find('/')
+            if pos2 != -1:
+               pos2 += pos1
+               pos3 = line[pos2:].find('@')
+               if pos3 != -1:
+                  pos3 += pos2
+                  try:
+                     size1 = int(line[pos1+1:pos2])
+                     size2 = int(line[pos2+1:pos3])
+                  except:
+                     str(sys.exc_info()[1])
+                     size1 = -1
+                     size2 = -1
+                  if size1 != -1:
+                     size = str(int(Height*size1/size2))
+                     line = line[:pos]+size+line[pos3+1:]
+                     continue
+         print 'Invalid size syntax in line:'
+         print line
+         sys.exit(1)
+      # Add line with replaced variables:
+      cmd += ' ' + (line % globals())
    # Draw color bars:
    if options.drawcolorbars:
       cmd += ' -fill "rgb(255,0,0)" -draw "rectangle  0,0 10,10"'
@@ -147,10 +195,6 @@ def paintAnnotate( FILEIN):
          rect_x1 += rect_w
          rect_x2 += rect_w
          rect_c += 255 / (rect_num - 1)
-   # Apply font:
-   if options.font != '': cmd += ' -font %s' % options.font
-   # Construct command from template:
-   for line in cmdlines: cmd += ' ' + line.strip() % globals()
    # Add logo in path specified:
    if options.logopath != '': cmd += ' "%s" -compose plus -composite' % options.logopath
    # Stereo:
@@ -210,6 +254,13 @@ def reformatImage( FILEIN):
    if options.draw235 > 0:
       cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,0,%(Width)d,%(draw235_y)d"' % globals()
       cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(Width)d,%(Height)d"' % globals()
+   # Draw cacher lines:
+   if options.line169 != '':
+      cmd += ' -fill "rgba('+options.line169+',1.0)" -draw "rectangle 0,%(draw169_y)d,%(Width)d,%(draw169_y)d"' % globals()
+      cmd += ' -fill "rgba('+options.line169+',1.0)" -draw "rectangle 0,%(draw169_h)d,%(Width)d,%(draw169_h)d"' % globals()
+   if options.line235 != '':
+      cmd += ' -fill "rgba('+options.line235+',1.0)" -draw "rectangle 0,%(draw235_y)d,%(Width)d,%(draw235_y)d"' % globals()
+      cmd += ' -fill "rgba('+options.line235+',1.0)" -draw "rectangle 0,%(draw235_h)d,%(Width)d,%(draw235_h)d"' % globals()
    # Stereo:
    if Stereo: cmd += ' -resize "%dx%d!"' % ( Width/2, Height)
    # Set quality if specified:
