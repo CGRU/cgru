@@ -313,7 +313,9 @@ if need_convert and options.slate != '':
    cmd = cmd_makeframe + cmd_args
    cmd += ' --drawcolorbars' + cmd_args
    cmd += ' -t "%s"' % options.slate
-   cmd += ' --thumbnail "%s"' % images1[int(len(images1)/2)]
+   cmd += ' "%s"' % images1[int(len(images1)/2)]
+   if Inpattern2 != '':
+      cmd += ' "%s"' % images2[int(len(images1)/2)]
    cmd += ' "%s"' % (os.path.join( TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
    cmd_precomp.append(cmd)
    name_precomp.append('Generate header')

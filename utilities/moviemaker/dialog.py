@@ -18,8 +18,8 @@ Parser.add_option('-t', '--template',        dest='template',        type  ='str
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
-Parser.add_option('--draw169',               dest='draw169',         type  ='string',     default='',             help='Draw 16:9 cacher opacity')
-Parser.add_option('--draw235',               dest='draw235',         type  ='string',     default='',             help='Draw 2.35 cacher opacity')
+Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=25,             help='Draw 16:9 cacher opacity')
+Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=25,             help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='200,200,200',  help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='200,200,200',  help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
@@ -49,6 +49,9 @@ DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 TemplatesPath = os.path.join( DialogPath, 'templates')
 LogosPath = os.path.join( DialogPath, 'logos')
 CodecsPath = DialogPath
+
+CacherNames  = ['None', '25%', '50%', '75%', '100%']
+CacherValues = [   '0', '25' , '50' , '75' , '100' ]
 FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 Encoders = ['ffmpeg', 'mencoder']
 Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
@@ -311,28 +314,26 @@ class Dialog( QtGui.QWidget):
       self.lDrawing.addWidget( self.cTime)
 
       self.lCacher = QtGui.QHBoxLayout()
-      self.tCacherH = QtGui.QLabel('16:9 Cacher:', self)
-      self.cbCacherH = QtGui.QComboBox( self)
-      self.cbCacherH.addItem('None')
-      self.cbCacherH.addItem('25%', QtCore.QVariant('25'))
-      self.cbCacherH.addItem('50%', QtCore.QVariant('50'))
-      self.cbCacherH.addItem('75%', QtCore.QVariant('75'))
-      self.cbCacherH.addItem('100%', QtCore.QVariant('100'))
-      self.cbCacherH.setCurrentIndex( 1)
-      QtCore.QObject.connect( self.cbCacherH, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.tCacherC = QtGui.QLabel('2.35 Cacher:', self)
-      self.cbCacherC = QtGui.QComboBox( self)
-      self.cbCacherC.addItem('None')
-      self.cbCacherC.addItem('25%', QtCore.QVariant('25'))
-      self.cbCacherC.addItem('50%', QtCore.QVariant('50'))
-      self.cbCacherC.addItem('75%', QtCore.QVariant('75'))
-      self.cbCacherC.addItem('100%', QtCore.QVariant('100'))
-      self.cbCacherC.setCurrentIndex( 1)
-      QtCore.QObject.connect( self.cbCacherC, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.lCacher.addWidget( self.tCacherH)
-      self.lCacher.addWidget( self.cbCacherH)
-      self.lCacher.addWidget( self.tCacherC)
-      self.lCacher.addWidget( self.cbCacherC)
+      self.tCacher169 = QtGui.QLabel('16:9 Cacher:', self)
+      self.cbCacher169 = QtGui.QComboBox( self)
+      i = 0
+      for cacher in CacherNames:
+         self.cbCacher169.addItem( cacher, QtCore.QVariant( CacherValues[i]))
+         if CacherValues[i] == str(Options.draw169): self.cbCacher169.setCurrentIndex( i)
+         i += 1
+      QtCore.QObject.connect( self.cbCacher169, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.tCacher235 = QtGui.QLabel('2.35 Cacher:', self)
+      self.cbCacher235 = QtGui.QComboBox( self)
+      i = 0
+      for cacher in CacherNames:
+         self.cbCacher235.addItem( cacher, QtCore.QVariant( CacherValues[i]))
+         if CacherValues[i] == str(Options.draw235): self.cbCacher235.setCurrentIndex( i)
+         i += 1
+      QtCore.QObject.connect( self.cbCacher235, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lCacher.addWidget( self.tCacher169)
+      self.lCacher.addWidget( self.cbCacher169)
+      self.lCacher.addWidget( self.tCacher235)
+      self.lCacher.addWidget( self.cbCacher235)
       self.lDrawing.addLayout( self.lCacher)
 
       self.lLines = QtGui.QHBoxLayout()
@@ -677,7 +678,7 @@ class Dialog( QtGui.QWidget):
 
    def copyInput( self):
       files1 = self.editInputFiles.text()
-      if not files1.empty:
+      if not files1.isEmpty():
          self.editInputFiles2.setText( files1)
       self.inputFileChanged2()
 
@@ -941,10 +942,10 @@ class Dialog( QtGui.QWidget):
          if comments != '': cmd += ' --comments "%s"' % comments
          if font     != '': cmd += ' --font "%s"'     % font
          if self.cTime.isChecked(): cmd += ' --addtime'
-         cacher = self.cbCacherH.itemData( self.cbCacherH.currentIndex()).toString()
-         if not cacher.isEmpty(): cmd += ' --draw169 %s' % cacher
-         cacher = self.cbCacherC.itemData( self.cbCacherC.currentIndex()).toString()
-         if not cacher.isEmpty(): cmd += ' --draw235 %s' % cacher
+         cacher = self.cbCacher169.itemData( self.cbCacher169.currentIndex()).toString()
+         if cacher != '0': cmd += ' --draw169 %s' % cacher
+         cacher = self.cbCacher235.itemData( self.cbCacher235.currentIndex()).toString()
+         if cacher != '0': cmd += ' --draw235 %s' % cacher
          if not self.editLine169.text().isEmpty(): cmd += ' --line169 "%s"' % self.editLine169.text()
          if not self.editLine235.text().isEmpty(): cmd += ' --line235 "%s"' % self.editLine235.text()
          if self.cLogo.isChecked():

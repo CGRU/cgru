@@ -1,17 +1,19 @@
-"%(THUMBNAIL)s"
--resize @SIZE_3/5@x@SIZE_3/5@
--background black
--gravity West -extent @SIZE_4/5@x@SIZE_4/5@
--gravity East -extent %(Width)dx%(Height)d
--compose over -composite
+# Create thumbnail trom input image:
 
--fill white -pointsize @SIZE_1/12@ -gravity west -annotate +@SIZE_1/15@-@SIZE_1/4@ "Project: %(PROJECT)s"
--fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@-@SIZE_4/30@ "Date: %(DATETIME)s"
--fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@-@SIZE_1/30@ "Shot: %(SHOT)s"
--fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@+@SIZE_2/30@ "Version: %(VERSION)s"
--fill white -pointsize @SIZE_1/15@ -gravity west -annotate +@SIZE_1/15@+@SIZE_5/30@ "Frame range: %(FRAMERANGE)s"
--fill white -pointsize @SIZE_1/20@ -gravity west -annotate +@SIZE_1/15@+@SIZE_2/7@ "Comments: %(COMMENTS)s"
--fill white -pointsize @SIZE_1/20@ -gravity southwest -annotate +@SIZE_1/15@+@SIZE_1/12@ "Artist: %(ARTIST)s, Activity: %(ACTIVITY)s"
-#-fill white -pointsize @SIZE_1/20@ -gravity southeast -annotate +10+50 "Activity: %(ACTIVITY)s"
--fill white -pointsize @SIZE_1/20@ -gravity southwest -annotate +@SIZE_1/15@+@SIZE_1/40@ "%(MOVIENAME)s"
--fill white -pointsize @SIZE_1/15@ -gravity southeast -annotate +@SIZE_1/15@+@SIZE_1/8@ "%(COMPANY)s"
+-resize @SIZE_2/5X@x@SIZE_2/5Y@
+-background black
+-gravity West -extent @SIZE_3/7X@x@SIZE_3/7Y@
+-gravity East -extent %(Width)dx%(Height)d
+
+
+# Annotate:
+
+-fill white -pointsize @SIZE_1/12Y@ -gravity      west -annotate +@SIZE_1/15X@-@SIZE_1/4Y@  "Project: %(PROJECT)s"
+-fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@-@SIZE_4/30Y@ "Date: %(DATETIME)s"
+-fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@-@SIZE_1/30Y@ "Shot: %(SHOT)s"
+-fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@+@SIZE_2/30Y@ "Version: %(VERSION)s"
+-fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@+@SIZE_5/30Y@ "Frame range: %(FRAMERANGE)s"
+-fill white -pointsize @SIZE_1/20Y@ -gravity      west -annotate +@SIZE_1/15X@+@SIZE_2/7Y@  "Comments: %(COMMENTS)s"
+-fill white -pointsize @SIZE_1/20Y@ -gravity southwest -annotate +@SIZE_1/15X@+@SIZE_1/12Y@ "Artist: %(ARTIST)s, Activity: %(ACTIVITY)s"
+-fill white -pointsize @SIZE_1/20Y@ -gravity southwest -annotate +@SIZE_1/15X@+@SIZE_1/40Y@ "%(MOVIENAME)s"
+-fill white -pointsize @SIZE_1/15Y@ -gravity southeast -annotate +@SIZE_1/15X@+@SIZE_1/8Y@  "%(COMPANY)s"
