@@ -341,10 +341,12 @@ class Dialog( QtGui.QWidget):
       self.lLines.addWidget( self.tLine169)
       self.editLine169 = QtGui.QLineEdit( Options.line169, self)
       self.lLines.addWidget( self.editLine169)
+      QtCore.QObject.connect( self.editLine169, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tLine235 = QtGui.QLabel('Line 2.35 Color:', self)
       self.lLines.addWidget( self.tLine235)
       self.editLine235 = QtGui.QLineEdit( Options.line235, self)
       self.lLines.addWidget( self.editLine235)
+      QtCore.QObject.connect( self.editLine235, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lDrawing.addLayout( self.lLines)
 
       self.lLogo = QtGui.QHBoxLayout()
