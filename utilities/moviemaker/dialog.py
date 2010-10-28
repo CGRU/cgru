@@ -12,9 +12,12 @@ from PyQt4 import QtCore, QtGui
 # Command arguments:
 
 from optparse import OptionParser
-Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
+Parser = OptionParser(usage="%prog [options] [file]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies',      help='Frame paint template')
+Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576',      help='Resolution')
+Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
+Parser.add_option('--stereo',                dest='stereo',          action='store_true', default=False,          help='Stereo mode by default')
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
@@ -35,7 +38,18 @@ Parser.add_option('-D', '--debug',           dest='debug',           action='sto
 
 (Options, args) = Parser.parse_args()
 
+if len(args) > 2: parser.error('Too many arguments provided.')
+
+InFile1 = ''
+InFile2 = ''
+
+if len(args) > 0: InFile1 = os.path.abspath( args[0])
+if len(args) > 1: InFile2 = os.path.abspath( args[1])
+
 # Initializations:
+FormatNames  = ['Encode "as is" only', 'PAL (720x576)', 'PAL Square (768x576)', 'HD 720p (1280x720)', 'HD 1080p (1920x1080)']
+FormatValues = [                   '',      '720x576' ,             '768x576' ,          '1280x720' ,           '1920x1080' ]
+
 FPS = ['23.976','24','25','30']
 
 UserName = os.getenv('USER', os.getenv('USERNAME', 'user'))
@@ -48,7 +62,7 @@ UserName = UserName.capitalize()
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 TemplatesPath = os.path.join( DialogPath, 'templates')
 LogosPath = os.path.join( DialogPath, 'logos')
-CodecsPath = DialogPath
+CodecsPath = os.path.join( DialogPath, 'codecs')
 
 CacherNames  = ['None', '25%', '50%', '75%', '100%']
 CacherValues = [   '0', '25' , '50' , '75' , '100' ]
@@ -122,18 +136,18 @@ class Dialog( QtGui.QWidget):
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
       self.cbFormat = QtGui.QComboBox( self)
-      self.cbFormat.addItem('Encode "as is" only')
-      self.cbFormat.addItem('PAL (720x576)', QtCore.QVariant('720x576'))
-      self.cbFormat.addItem('PAL Square (768x576)', QtCore.QVariant('768x576'))
-      self.cbFormat.addItem('HD 720p (1280x720)', QtCore.QVariant('1280x720'))
-      self.cbFormat.addItem('HD 1080p (1920x1080)', QtCore.QVariant('1920x1080'))
-      self.cbFormat.setCurrentIndex( 1)
+      i = 0
+      for format in FormatValues:
+         self.cbFormat.addItem( FormatNames[i], format)
+         if format == Options.format: self.cbFormat.setCurrentIndex( i)
+         i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tCodec = QtGui.QLabel('Codec:', self)
       self.cbCodec = QtGui.QComboBox( self)
       i = 0
       for name in CodecNames:
          self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
+         if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
@@ -222,7 +236,7 @@ class Dialog( QtGui.QWidget):
       self.lInputSettings = QtGui.QVBoxLayout()
       self.gInputSettings.setLayout( self.lInputSettings)
 
-      self.editInputFiles = QtGui.QLineEdit( self)
+      self.editInputFiles = QtGui.QLineEdit( InFile1, self)
       QtCore.QObject.connect( self.editInputFiles, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
       self.lInputSettings.addWidget( self.editInputFiles)
 
@@ -431,7 +445,7 @@ class Dialog( QtGui.QWidget):
       # Stereo:
 
       self.cStereoDuplicate = QtGui.QCheckBox('Duplicate first sequence', self)
-      self.cStereoDuplicate.setChecked( False)
+      self.cStereoDuplicate.setChecked( Options.stereo)
       QtCore.QObject.connect( self.cStereoDuplicate, QtCore.SIGNAL('stateChanged(int)'), self.evalStereo)
       self.stereolayout.addWidget( self.cStereoDuplicate)
 
@@ -441,7 +455,7 @@ class Dialog( QtGui.QWidget):
       self.lInputFileGroup2 = QtGui.QVBoxLayout()
       self.gInputFileGroup2.setLayout( self.lInputFileGroup2)
 
-      self.editInputFiles2 = QtGui.QLineEdit( self)
+      self.editInputFiles2 = QtGui.QLineEdit( InFile2, self)
       self.lInputFileGroup2.addWidget( self.editInputFiles2)
       QtCore.QObject.connect( self.editInputFiles2, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged2)
 
@@ -650,7 +664,8 @@ class Dialog( QtGui.QWidget):
       self.autoTitles()
       self.activityChanged()
       self.autoOutput()
-      self.evalStereo()
+      self.inputFileChanged()
+      self.inputFileChanged2()
       self.evaluate()
 
    def evalStereo( self):

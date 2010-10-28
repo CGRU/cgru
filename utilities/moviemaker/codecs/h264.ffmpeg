@@ -1,0 +1,2 @@
+QuickTime H.264
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264.ffpreset" -b 10000k "@OUTPUT@"

@@ -379,6 +379,7 @@ else:
    print 'Unknown encoder = "%s"' % encoder
    exit(1)
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', os.path.dirname(sys.argv[0]))
+cmd_encode = cmd_encode.replace('@CODECS@',     os.path.join(os.path.dirname(sys.argv[0]), 'codecs'))
 cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
 cmd_encode = cmd_encode.replace('@FPS@',        options.fps)
 cmd_encode = cmd_encode.replace('@OUTPUT@',     Output)
