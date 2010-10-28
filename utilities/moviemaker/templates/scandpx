@@ -12,7 +12,6 @@
 -fill white -pointsize 15 -gravity northwest -annotate +10+10 "%%[dpx:television.time.code]"
 #-fill white -pointsize 15 -gravity northwest -annotate +10+30 "%%[dpx:file.filename]"
 -fill white -pointsize 15 -gravity northwest -annotate +10+30 "%(FILEIN)s"
--fill white -pointsize 15 -gravity northwest -annotate +10+30 "%%[dpx:file.filename]"
 -fill white -pointsize 15 -gravity northwest -annotate +10+50 "%%[dpx:file.timestamp]"
 -fill white -pointsize 15 -gravity northeast -annotate +10+10 "%%[dpx:file.project]"
 -fill white -pointsize 15 -gravity northeast -annotate +10+30 "%(DATETIME)s"
