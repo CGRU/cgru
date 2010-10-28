@@ -202,6 +202,8 @@ class Dialog( QtGui.QWidget):
       self.cbActivity.addItem('sim')
       self.cbActivity.addItem('clnup')
       self.cbActivity.addItem('mtpnt')
+      self.cbActivity.addItem('rnd')
+      self.cbActivity.addItem('test')
       self.lUser.addWidget( self.cbActivity)
       QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
       self.lInformation.addLayout( self.lUser)
@@ -648,7 +650,6 @@ class Dialog( QtGui.QWidget):
       self.autoTitles()
       self.activityChanged()
       self.autoOutput()
-      self.inputFileChanged()
       self.evalStereo()
       self.evaluate()
 
@@ -670,7 +671,7 @@ class Dialog( QtGui.QWidget):
             self.tStereoStatus.setBackgroundRole( QtGui.QPalette.LinkVisited)
          else:
             self.inputPattern2 = None
-            self.editStereoStatus.setText('Two sequences must be the same lenght.')
+            self.editStereoStatus.setText('Two sequences must be the same length.')
             self.evaluated = False
             self.btnStart.setEnabled( False)
             self.cmdField.setText('Sequences length mismatch.')
@@ -847,7 +848,7 @@ class Dialog( QtGui.QWidget):
          FilesCount += 1
       if FilesCount <= 1:
          self.cmdField.setText('None or only one file founded matching pattern.\n\
-         prefix, paddindg, suffix = %(prefix)s, %(padding)d, %(suffix)s' % vars())
+         prefix, padding, suffix = "%(prefix)s" %(padding)d "%(suffix)s"' % vars())
          return InputFile, InputPattern, FilesCount, Identify
       if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
       afile = os.path.join( inputdir, afile)
@@ -862,10 +863,36 @@ class Dialog( QtGui.QWidget):
 
       return InputFile, InputPattern, FilesCount, Identify
 
+   def validateEditColor( self, string, message):
+      if string is None: return False
+      if string == '': return True
+      values = string.split(',')
+      if len( values) == 3:
+         passed = True
+         for value in values:
+            if len( value) < 1 or len(value) > 3:
+               passed = False
+               break
+            for digit in value:
+               if not digit in '1234567890':
+                  passed = False
+                  break
+         if passed: return True
+      self.cmdField.setText('Invalid %s color string. Example: "255,255,0" - yellow.' % message)
+      return False
+
+
    def evaluate( self):
       self.evaluated = False
       self.btnStart.setEnabled( False)
-      if self.inputPattern is None: return
+
+      if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9 color'): return
+      if not self.validateEditColor( str(self.editLine235.text()), 'line 2.35 color'): return
+
+      self.cmdField.clear()
+      if self.inputPattern is None:
+         self.cmdField.setText('Specify input sequence.')
+         return
 
       self.StereoDuplicate = self.cStereoDuplicate.isChecked()
 
@@ -1009,7 +1036,7 @@ class Dialog( QtGui.QWidget):
          task.setCommand( self.command.encode('utf-8'))
 
          block.tasks.append( task)
-         if job.send(): self.cmdField.setText('Afanasy job successfully sended.')
+         if job.send(): self.cmdField.setText('Afanasy job was successfully sent.')
          else:          self.cmdField.setText('Unable to send job to Afanasy server.')
       else:
          self.btnStart.setEnabled( False)
