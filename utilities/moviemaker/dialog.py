@@ -741,7 +741,7 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def browseOutputFolder( self):
-      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory')
+      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.editOutputDir.text()))
       if not folder.isEmpty(): self.editOutputDir.setText( folder)
 
    def browseInput( self):
@@ -912,7 +912,6 @@ class Dialog( QtGui.QWidget):
       if self.cAutoTitles.isChecked(): self.editShot.clear()
       if self.cAutoOutputName.isChecked():
          self.editOutputName.clear()
-         self.editOutputDir.clear()
 
       project = '%s' % self.editProject.text()
       if Options.project == '':
