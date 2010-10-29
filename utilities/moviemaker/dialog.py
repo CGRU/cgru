@@ -21,6 +21,7 @@ Parser.add_option('--stereo',                dest='stereo',          action='sto
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
+Parser.add_option('--suffix',                dest='suffix',          type  ='string',     default='',             help='Add suffix to output movie filename')
 Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=25,             help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=25,             help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='200,200,200',  help='Draw 16:9 line color: "255,255,0"')
@@ -280,21 +281,26 @@ class Dialog( QtGui.QWidget):
       self.editOutputName = QtGui.QLineEdit( self)
       self.lOutputName.addWidget( self.editOutputName)
       QtCore.QObject.connect( self.editOutputName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.btnBrowseOutput = QtGui.QPushButton('Browse', self)
-      self.lOutputName.addWidget( self.btnBrowseOutput)
-      QtCore.QObject.connect( self.btnBrowseOutput, QtCore.SIGNAL('pressed()'), self.browseOutput)
-      self.cAutoOutput = QtGui.QCheckBox('Auto', self)
-      self.cAutoOutput.setChecked( True)
-      self.lOutputName.addWidget( self.cAutoOutput)
-      QtCore.QObject.connect( self.cAutoOutput, QtCore.SIGNAL('stateChanged(int)'), self.autoOutput)
+      self.cAutoOutputName = QtGui.QCheckBox('Auto', self)
+      self.cAutoOutputName.setChecked( True)
+      self.lOutputName.addWidget( self.cAutoOutputName)
+      QtCore.QObject.connect( self.cAutoOutputName, QtCore.SIGNAL('stateChanged(int)'), self.autoOutputName)
+      self.tOutputSuffix = QtGui.QLabel('Suffix:')
+      self.lOutputName.addWidget( self.tOutputSuffix)
+      self.editOutputSuffix = QtGui.QLineEdit( Options.suffix, self)
+      self.lOutputName.addWidget( self.editOutputSuffix)
+      self.editOutputSuffix.setMaximumWidth(60)
       self.lOutputSettings.addLayout( self.lOutputName)
 
       self.lOutputDir = QtGui.QHBoxLayout()
       self.tOutputDir = QtGui.QLabel('Output folder:', self)
+      self.lOutputDir.addWidget( self.tOutputDir)
       self.editOutputDir = QtGui.QLineEdit( self)
       QtCore.QObject.connect( self.editOutputDir, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lOutputDir.addWidget( self.tOutputDir)
       self.lOutputDir.addWidget( self.editOutputDir)
+      self.btnBrowseOutputDir = QtGui.QPushButton('Browse', self)
+      QtCore.QObject.connect( self.btnBrowseOutputDir, QtCore.SIGNAL('pressed()'), self.browseOutputFolder)
+      self.lOutputDir.addWidget( self.btnBrowseOutputDir)
       self.lOutputSettings.addLayout( self.lOutputDir)
 
       self.generallayout.addWidget( self.gOutputSettings)
@@ -663,7 +669,7 @@ class Dialog( QtGui.QWidget):
       self.inputPattern2 = None
       self.autoTitles()
       self.activityChanged()
-      self.autoOutput()
+      self.autoOutputName()
       self.inputFileChanged()
       self.inputFileChanged2()
       self.evaluate()
@@ -700,11 +706,10 @@ class Dialog( QtGui.QWidget):
          self.editInputFiles2.setText( files1)
       self.inputFileChanged2()
 
-   def autoOutput( self):
-      enable = not self.cAutoOutput.isChecked()
+   def autoOutputName( self):
+      enable = not self.cAutoOutputName.isChecked()
       self.editOutputName.setEnabled( enable)
-      self.btnBrowseOutput.setEnabled( enable)
-      self.editOutputDir.setEnabled( enable)
+      self.editOutputSuffix.setEnabled( not enable)
 
    def autoTitles( self):
       enable = not self.cAutoTitles.isChecked()
@@ -735,16 +740,9 @@ class Dialog( QtGui.QWidget):
       self.editLogoPath.setText( '%s' % afile)
       self.evaluate()
 
-   def browseOutput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file')
-      if afile.isEmpty(): return
-      afile = '%s' % afile
-      self.editOutputDir.setText( os.path.dirname( afile))
-      afile = os.path.basename( afile)
-      pos = afile.rfind('.')
-      if pos > 0: afile = afile[ 0 : pos]
-      self.editOutputName.setText( afile)
-      self.evaluate()
+   def browseOutputFolder( self):
+      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory')
+      if not folder.isEmpty(): self.editOutputDir.setText( folder)
 
    def browseInput( self):
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles.text())
@@ -912,21 +910,21 @@ class Dialog( QtGui.QWidget):
       self.StereoDuplicate = self.cStereoDuplicate.isChecked()
 
       if self.cAutoTitles.isChecked(): self.editShot.clear()
-      if self.cAutoOutput.isChecked():
+      if self.cAutoOutputName.isChecked():
          self.editOutputName.clear()
          self.editOutputDir.clear()
 
       project = '%s' % self.editProject.text()
       if Options.project == '':
-         if self.cAutoTitles.isChecked() or project == '':
+          if self.cAutoTitles.isChecked() or project == '':
             if sys.platform.find('win') == 0:
                pat_split = self.inputPattern.upper().split('\\')
                if len(pat_split) > 4: project = pat_split[4]
-               else: project = pat_split[len(pat_split)-1]
+               else: project = pat_split[-1]
             else:
                pat_split = self.inputPattern.upper().split('/')
                if len(pat_split) > 3: project = pat_split[3]
-               else: project = pat_split[len(pat_split)-1]
+               else: project = pat_split[-1]
             self.editProject.setText( project)
 
       shot = '%s' % self.editShot.text()
@@ -943,17 +941,19 @@ class Dialog( QtGui.QWidget):
       artist   = '%s' % self.editArtist.text()
       activity = '%s' % self.editActivity.text()
       comments = '%s' % self.editComments.text()
+      suffix   = '%s' % self.editOutputSuffix.text()
       font     = '%s' % self.editFont.text()
 
       outdir = '%s' % self.editOutputDir.text()
-      if self.cAutoOutput.isChecked() or outdir == None or outdir == '':
+      if outdir == '':
          outdir = os.path.dirname( os.path.dirname( self.inputPattern))
          self.editOutputDir.setText( outdir)
 
       outname = '%s' % self.editOutputName.text()
-      if self.cAutoOutput.isChecked() or outname == None or outname == '':
+      if self.cAutoOutputName.isChecked() or outname == None or outname == '':
          outname = shot
          if activity != '': outname += '_' + activity
+         if suffix   != '': outname += '_' + suffix
          if version  != '': outname += '_' + version
          outname += time.strftime('_%y%m%d')
          self.editOutputName.setText( outname)
