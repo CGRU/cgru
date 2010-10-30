@@ -289,6 +289,7 @@ class Dialog( QtGui.QWidget):
       self.lOutputName.addWidget( self.tOutputSuffix)
       self.editOutputSuffix = QtGui.QLineEdit( Options.suffix, self)
       self.lOutputName.addWidget( self.editOutputSuffix)
+      QtCore.QObject.connect( self.editOutputSuffix, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.editOutputSuffix.setMaximumWidth(60)
       self.lOutputSettings.addLayout( self.lOutputName)
 
