@@ -138,10 +138,10 @@ def reformatAnnotate( infile, outfile):
       if Verbose: print 'Images type = "%s"' % imgtype
       # Input file correction:
       correction = ''
-      corr_sRGB = ' -gamma 2.2'
-      corr_Log = '' # -level 9%,67%,.6'
+      corr_sRGB = '-set colorspace sRGB'
+      corr_Log = '-set colorspace Log -set gamma 0.15' # -level 9%,67%,.6'
       if sys.platform.find('win') == 0:
-         corr_Log = ' -set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
+         corr_Log = '-set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
       if   imgtype == 'exr': correction = corr_sRGB
       elif imgtype == 'dpx': correction = corr_Log
       elif imgtype == 'cin': correction = corr_Log
@@ -155,7 +155,7 @@ def reformatAnnotate( infile, outfile):
 
       cmd = 'convert "%s" +matte' % infile
       cmd += ' -resize %(Width)d -gravity center -background black -extent %(Width)dx%(Height)d +repage' % globals()
-      if correction != '': cmd += correction
+      if correction != '': cmd += ' %s' % correction
       if options.gamma > 0: cmd += ' -gamma %.2f' % options.gamma
       # Draw cacher:
       if options.draw169 > 0:

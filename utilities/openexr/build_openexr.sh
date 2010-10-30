@@ -2,7 +2,7 @@
 
 prefix=$PWD
 
-CPPFLAGS=" -I$prefix/include -include string.h"
+CPPFLAGS="-fPIC -I$prefix/include -include string.h"
 
 LDFLAGS="-L/lib64 -L/usr/lib64 -L$prefix/lib -lpthread"
 
@@ -14,6 +14,8 @@ cd openexr-1.7.0
 if [ ! -z $1 ] ; then
    ./configure -h; exit
 fi
+
+make clean
 
 ./configure --disable-ilmbasetest --prefix=$prefix --exec-prefix=$prefix --enable-shared=
 
