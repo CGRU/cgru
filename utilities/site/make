@@ -1,5 +1,11 @@
 #!/bin/bash
 
+cgru_python="`dirname $PWD`/python/2.6.6"
+if [ -d $cgru_python ]; then
+   echo "Using CGRU Python = '$cgru_python'"
+   export PATH="$cgru_python/bin:$PATH"
+fi
+
 export DIRS_EXLUDE_FINDSUB="tmp;svn;doxygen;webvisor;trunk;branches;tags;icons/icons"
 export DIRS_INLUDE_FILEEXT=".html;.php;.css;.js;.jpg;.gif;.png"
 
