@@ -13,7 +13,8 @@ cd $im
 
 if [ -z "$1" ]; then
    make clean
-   ./configure --prefix=$prefix --with-quantum-depth=32 --enable-hdri  --enable-shared=
+   #with-quantum-depth=32
+   ./configure --prefix=$prefix --enable-hdri --enable-shared=
    make
    make install
 else
