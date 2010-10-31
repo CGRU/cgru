@@ -369,7 +369,6 @@ if need_convert:
 # Encode commands:
 auxargs = ''
 if Codec != 'ffmpeg':
-   if not sys.platform.find('win') == 0: auxargs = '-threads 0'
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
 elif Codec == 'mencoder':
