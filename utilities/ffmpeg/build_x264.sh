@@ -2,5 +2,5 @@
 
 cd x264
 
-./configure --enable-gpl --enable-libx264
+./configure
 make
