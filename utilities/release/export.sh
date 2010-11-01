@@ -44,11 +44,7 @@ rcopy afanasy/$afanasy/webvisor $dest/afanasy
 copy utilities $dest/utilities
 rcopy utilities/doc $dest/utilities
 
-copy utilities/moviemaker $dest/utilities/moviemaker
-copy utilities/moviemaker/icons $dest/utilities/moviemaker/icons
-rcopy utilities/moviemaker/doc $dest/utilities/moviemaker
-rcopy utilities/moviemaker/logos $dest/utilities/moviemaker
-rcopy utilities/moviemaker/templates $dest/utilities/moviemaker
+rcopy utilities/moviemaker $dest/utilities
 
 createDir $dest/utilities/regexp
 rcopy utilities/regexp/doc $dest/utilities/regexp
