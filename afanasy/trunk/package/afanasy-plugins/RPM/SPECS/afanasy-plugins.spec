@@ -10,6 +10,7 @@ Release:       @RELEASE@
 Group:         Applications/Graphics
 
 Requires:      afanasy-common = @VERSION@, cgru-common = @VERSION@
+AutoReqProv:   no
 
 %description
 Afanasy plugins.
