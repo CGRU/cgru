@@ -866,7 +866,10 @@ class Dialog( QtGui.QWidget):
          return InputFile, InputPattern, FilesCount, Identify
       if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
       afile = os.path.join( inputdir, afile)
-      pipe = subprocess.Popen( 'identify "%s"' % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
+      identify = 'convert -identify "%s"'
+      if sys.platform.find('win') == 0: identify += ' nul'
+      else: identify += ' /dev/null'
+      pipe = subprocess.Popen( identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
       Identify = pipe.read()
       if len(Identify) < len(afile):
          self.cmdField.setText('Invalid image.\n%s' % afile)

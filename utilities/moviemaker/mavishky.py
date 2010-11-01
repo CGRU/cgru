@@ -229,7 +229,10 @@ def getImages( inpattern):
 
    # Input files indentify:
    afile = allFiles[0]
-   pipe = subprocess.Popen('identify "%s"' % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
+   identify = 'convert -identify "%s"'
+   if sys.platform.find('win') == 0: identify += ' nul'
+   else: identify += ' /dev/null'
+   pipe = subprocess.Popen(identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
    identify = pipe.read()
    identify = identify.replace( afile, '')
    identify = identify.strip()
