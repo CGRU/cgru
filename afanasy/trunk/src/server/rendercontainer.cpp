@@ -24,38 +24,42 @@ AFINFO("RenderContainer::~RenderContainer:\n");
 
 MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * monitoring)
 {
+   // Online render register request, from client, not from database:
    if( newRender->isOnline())
    {
-      int id = 0;
       RenderContainerIt rendersIt( this);
+      // Search for a render with the same hostname:
       for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
       {
          if( newRender->getName() == render->getName())
          {
+            // Online render with the same hostname founded:
             if( render->isOnline())
             {
                AFERROR("Online render with the same name exists:\n");
                printTime();
                printf("\nNew render:\n");
-               render->stdOut( false);
-               printf("\nExisting render:\n");
                newRender->stdOut( false);
-               return new MsgAf( Msg::TRenderId, id);
+               printf("\nExisting render:\n");
+               render->stdOut( false);
+               delete newRender;
+               // Return zero ID to render to tell that it was not registered:
+               return new MsgAf( Msg::TRenderId, 0);
             }
+            // Offline render with the same hostname founded:
             else if( render->online( newRender, monitoring))
             {
-               id = render->getId();
+               int id = render->getId();
                printTime(); printf(" : Render online: "); render->stdOut( false );
                delete newRender;
-               newRender = NULL;
-               break;
+               // Return new render ID to render to tell that it was successfully registered:
+               return new MsgAf( Msg::TRenderId, id);
             }
          }
       }
 
-      if( id ) return new MsgAf( Msg::TRenderId, id);
-
-      id = addClient( newRender);
+      // Registering new render, no renders with this hostname exist:
+      int id = addClient( newRender);
       if( id != 0 )
       {
          newRender->getFarmHost();
@@ -63,9 +67,11 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
          printTime(); printf(" : New Render registered: "); newRender->stdOut( false );
          if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
       }
+      // Return new render ID to render to tell that it was successfully registered:
       return new MsgAf( Msg::TRenderId, id);
    }
 
+   // Adding offline render from database:
    if( addClient( newRender))
    {
       printf("Render offline registered - \"%s\".\n", newRender->getName().toUtf8().data());
