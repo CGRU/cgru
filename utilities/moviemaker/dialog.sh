@@ -1,6 +1,8 @@
 #!/bin/bash
 
-pushd ../.. >> /dev/null
+moviemakerdir=`dirname $0`
+pushd $moviemakerdir >> /dev/null
+cd ../..
 source ./setup.sh
 cd afanasy
 [ -d trunk ] && cd trunk
@@ -13,6 +15,4 @@ if [ -e $cgru_python ]; then
    python=$cgru_python
 fi
 
-export PATH=../../bin:$PATH
-
-$python dialog.py $*
+$python $moviemakerdir/dialog.py $*
