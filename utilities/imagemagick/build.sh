@@ -14,7 +14,7 @@ cd $im
 if [ -z "$1" ]; then
    make clean
    #with-quantum-depth=32
-   ./configure --prefix=$prefix --enable-hdri --enable-shared=
+   ./configure --prefix=$prefix --with-openexr --enable-hdri --enable-shared=
    make
    make install
 else
