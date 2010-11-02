@@ -124,7 +124,7 @@ void Render::checkDirty()
 
 void Render::restoreDefaults()
 {
-   capacity == host.capacity;
+   capacity = host.capacity;
    services_disabled.clear();
    state = state & (~SDirty);
 }
