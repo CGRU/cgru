@@ -8,21 +8,22 @@ from PyQt4 import QtCore, QtGui
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',          help='Input folder to scan')
-Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',          help='Output folder for movies')
-Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',   help='Frame paint template')
-Parser.add_option('-e', '--extensions',dest='extensions',type  ='string',     default='',          help='Files extensions, comma searated')
-Parser.add_option('-a', '--abspath',   dest='abspath',   action='store_true', default=False,       help='Prefix movies with images absolute path')
-Parser.add_option('-A', '--afanasy',   dest='afanasy',   type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
-Parser.add_option('-m', '--maxhosts',  dest='maxhosts',  type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
-Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False,       help='Debug mode')
+Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',             help='Input folder to scan')
+Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',             help='Output folder for movies')
+Parser.add_option('-c', '--codec',     dest='codec',     type  ='string',     default='h264.ffmpeg',  help='Default codec preset')
+Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',      help='Frame paint template')
+Parser.add_option('-e', '--extensions',dest='extensions',type  ='string',     default='',             help='Files extensions, comma searated')
+Parser.add_option('-a', '--abspath',   dest='abspath',   action='store_true', default=False,          help='Prefix movies with images absolute path')
+Parser.add_option('-A', '--afanasy',   dest='afanasy',   type  ='int',        default=0,              help='Send commands to Afanasy with specitied capacity')
+Parser.add_option('-m', '--maxhosts',  dest='maxhosts',  type  ='int',        default=-1,             help='Afanasy maximum hosts parameter.')
+Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False,          help='Debug mode')
 
 (Options, args) = Parser.parse_args()
 
 # Initializations:
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 TemplatesPath = os.path.join( DialogPath, 'templates')
-CodecsPath = DialogPath
+CodecsPath = os.path.join( DialogPath, 'codecs')
 Encoders = ['ffmpeg', 'mencoder']
 
 # Process templates:
@@ -89,6 +90,8 @@ class Dialog( QtGui.QWidget):
       i = 0
       for name in CodecNames:
          self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
+         print os.path.basename(CodecFiles[i]) , Options.codec
+         if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex(i)
          i = i + 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
