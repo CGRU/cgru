@@ -1,0 +1,64 @@
+Gizmo {
+   tile_color 0x80d060ff
+   note_font_color 0x200ff
+
+   addUserKnob { 20 ""        l General        }
+   addUserKnob {  4 format  M { "720x576" "768x576" "1280x720" "1920x1080"}  l "Format" +STARTLINE}
+   addUserKnob {  4 fps     M { "23.976" "24" "25" "30"}  l "FPS" -STARTLINE}
+   addUserKnob {  4 codec   M { "DNxHD" "H264"}  l "Codec" -STARTLINE}
+   addUserKnob {  1 suffix  l "Suffix"     -STARTLINE }
+
+   addUserKnob {  1 company   l "Company"  +STARTLINE }
+   addUserKnob {  1 project   l "Project"  -STARTLINE }
+   addUserKnob {  1 shot      l "Shot"     -STARTLINE }
+
+   addUserKnob {  3 version   l "Version"  +STARTLINE }
+   addUserKnob {  1 artist    l "Artist"   -STARTLINE }
+   addUserKnob {  1 activity  l "Activity" -STARTLINE }
+
+   addUserKnob {  1 comments  l "Comments" +STARTLINE }
+
+   addUserKnob {  2 movfolder  l "Dailies Folder" +STARTLINE }
+   addUserKnob {  1 movname    l "Movie Name"     +STARTLINE }
+   addUserKnob {  6 movauto    l "Auto"           -STARTLINE }
+
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 stereodub l "Duplicate single sequence and make stereo from mono." }
+   addUserKnob { 26 "" l "" }
+
+
+   addUserKnob { 22 knob_1 l RENDER T "cgru.dailies( nuke.thisNode())"}
+
+
+
+   addUserKnob { 20 "" Parameters }
+
+   addUserKnob {  1 draw169 l "Cacher 16:9"     +STARTLINE }
+   addUserKnob {  1 draw235 l "Cacher 2.35"     -STARTLINE }
+   addUserKnob {  1 line169 l "Line 16:9 Color" +STARTLINE }
+   addUserKnob {  1 line235 l "line 2.35 Color" -STARTLINE }
+
+
+   name dailies
+
+   company     "BZ-VFX"
+   project     "TDH"
+   activity    "comp"
+   version     0
+   movauto     1
+   stereodub   0
+
+   draw169     "0"
+   draw235     "0"
+   line169     "200,200,200"
+   line235     "200,200,200"
+
+   help "Wee All Die!"
+
+   knobChanged "cgru.dailiesEvaluate( nuke.thisNode())"
+}
+
+Input {}
+Output {}
+
+end_group

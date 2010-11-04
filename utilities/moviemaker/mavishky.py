@@ -75,6 +75,9 @@ parser.add_option('--stereo',           dest='stereo',      action='store_true',
 if len(args) < 2: parser.error('Not enough arguments provided.')
 if len(args) > 3: parser.error('Too many arguments provided.')
 
+MOVIEMAKER = os.path.dirname( sys.argv[0])
+CODECSDIR  = os.path.join( MOVIEMAKER, 'codecs')
+
 Inpattern1 = args[0]
 Inpattern2 = ''
 Output     = args[1]
@@ -112,12 +115,17 @@ if Stereo: need_convert = True
 need_logo = False
 
 # Encode command:
+Codec = Codec.lower()
 encoder = Codec.split('.')
-if len(encoder) < 1:
-   print 'Invalid encode file "%s"' % Codec
-   sys.exit(1)
-encoder = encoder[len(encoder)-1]
+if len(encoder) < 2:
+   encoder = 'ffmpeg'
+   Codec += '.' + encoder
+else: encoder = encoder[-1]
 if Verbose: print 'Encoder engine = "%s"' % encoder
+if os.path.dirname( Codec) == '': Codec = os.path.join( CODECSDIR, Codec)
+if not os.path.isfile( Codec):
+   print 'Can`t find codec "%s"' % Codec
+   sys.exit(1)
 file = open( Codec)
 lines = file.readlines()
 cmd_encode = lines[len(lines)-1].strip()
@@ -380,8 +388,8 @@ elif Codec == 'mencoder':
 else:
    print 'Unknown encoder = "%s"' % encoder
    exit(1)
-cmd_encode = cmd_encode.replace('@MOVIEMAKER@', os.path.dirname(sys.argv[0]))
-cmd_encode = cmd_encode.replace('@CODECS@',     os.path.join(os.path.dirname(sys.argv[0]), 'codecs'))
+cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
+cmd_encode = cmd_encode.replace('@CODECS@',     CODECSDIR)
 cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
 cmd_encode = cmd_encode.replace('@FPS@',        options.fps)
 cmd_encode = cmd_encode.replace('@OUTPUT@',     Output)

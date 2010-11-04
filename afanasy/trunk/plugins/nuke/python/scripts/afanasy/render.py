@@ -9,8 +9,10 @@ import services.service
 from afpathmap import PathMap
 
 RenderNodeClassName = 'Write'
+DailiesNodeClassName = 'cgru_dailies'
 AfanasyNodeClassName = 'afanasy'
 AfanasyServiceType = 'nuke'
+DailiesServiceType = 'movgen'
 
 VERBOSE = 1
 
@@ -65,7 +67,7 @@ def getInputNodes( afnode, parent):
       if afnode != None:
          InputNumber = i + 1
          InputName = node.name()
-      if node.Class() == RenderNodeClassName or node.Class() == AfanasyNodeClassName:
+      if node.Class() == RenderNodeClassName or node.Class() == AfanasyNodeClassName or node.Class() == DailiesNodeClassName:
          disableknob = node.knob('disable')
          if disableknob:
             if not disableknob.value():
@@ -88,6 +90,7 @@ def getInputNodes( afnode, parent):
 class BlockParameters:
    def __init__( self, afnode, wnode, subblock, prefix, fparams):
       if VERBOSE==2: print 'Initializing block parameters for "%s"' % wnode.name()
+      self.wnode = wnode
       self.valid = True
 
       self.subblock          = subblock
@@ -115,48 +118,54 @@ class BlockParameters:
 
       self.writename = str( wnode.name())
 
-      # Get images files:
-      self.imgfile = ''
-      if nuke.toNode('root').knob('proxy').value():
-         self.imgfile = str( wnode.knob('proxy').value())
-      else:
-         self.imgfile = str( wnode.knob('file').value())
+      if wnode.Class() == RenderNodeClassName:
+         # Get images files:
+         self.imgfile = ''
+         if nuke.toNode('root').knob('proxy').value():
+            self.imgfile = str( wnode.knob('proxy').value())
+         else:
+            self.imgfile = str( wnode.knob('file').value())
 
-      # Get views:
-      views = wnode.knob('views')
-      if views is not None:
-         views = views.value()
+         # Get views:
+         views = wnode.knob('views')
          if views is not None:
-            if views != '':
-               views = views.split(' ')
-               images = []
-               for view in views:
-                  view = view.strip()
-                  if view != '':
-                     img = self.imgfile
-                     img = img.replace('%V', view)
-                     img = img.replace('%v', view[0])
-                     images.append( img)
-               if len(images) > 0:
-                  self.imgfile = ''
-                  for img in images:
-                     if self.imgfile != '': self.imgfile += ';'
-                     self.imgfile += img
+            views = views.value()
+            if views is not None:
+               if views != '':
+                  views = views.split(' ')
+                  images = []
+                  for view in views:
+                     view = view.strip()
+                     if view != '':
+                        img = self.imgfile
+                        img = img.replace('%V', view)
+                        img = img.replace('%v', view[0])
+                        images.append( img)
+                  if len(images) > 0:
+                     self.imgfile = ''
+                     for img in images:
+                        if self.imgfile != '': self.imgfile += ';'
+                        self.imgfile += img
 
-      # Check images files:
-      if self.imgfile == '':
-         nuke.message('Write Node "%s"\nImages are empty.' % self.writename)
-         self.valid = False
+         # Check images files:
+         if self.imgfile == '':
+            nuke.message('Write Node "%s"\nImages are empty.' % self.writename)
+            self.valid = False
+         else:
+            for imgfile in self.imgfile.split(';'):
+               folder = os.path.dirname( imgfile)
+               if folder != '':
+                  if not os.path.isdir(folder):
+                     result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
+                     if result:
+                        os.mkdir( folder)
+                     else:
+                        self.valid = False
+      elif wnode.Class() == DailiesNodeClassName:
+         if VERBOSE: print 'Generating dailies "%s"' % self.writename
       else:
-         for imgfile in self.imgfile.split(';'):
-            folder = os.path.dirname( imgfile)
-            if folder != '':
-               if not os.path.isdir(folder):
-                  result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
-                  if result:
-                     os.mkdir( folder)
-                  else:
-                     self.valid = False
+         nuke.message('Node type\n"%s"\nis unsendable.' % self.writename)
+         self.valid = False
 
       for par in fparams:
          if fparams[par] is not None:
@@ -185,21 +194,33 @@ class BlockParameters:
    def genBlock( self, scenename):
       if VERBOSE==2: print 'Generating block "%s"' % self.name
 
-      if not self.valid: return None
+      if not self.valid: return
 
-      block = af.Block( self.name, AfanasyServiceType)
-      block.setNumeric( self.framefirst, self.framelast, self.framespertask)
-      block.setFiles( self.imgfile)
-      if self.capacity != -1: block.setCapacity( self.capacity)
+      if self.wnode.Class == RenderNodeClassName:
+         block = af.Block( self.name, AfanasyServiceType)
+         block.setNumeric( self.framefirst, self.framelast, self.framespertask)
+         block.setFiles( self.imgfile)
+         if self.capacity != -1: block.setCapacity( self.capacity)
 
-      threads = os.getenv('NUKE_AF_RENDERTHREADS', '2')
-      cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i -m %(threads)s')
-      cmdargs = ' -X %s -F%%1-%%2x1 -x %s' % ( self.writename, scenename)
-      if self.capacitymin != -1 or self.capacitymax != -1:
-         block.setVariableCapacity( self.capacitymin, self.capacitymax)
-         threads = services.service.str_capacity
-      cmd = cmd.replace('AF_THREADS', threads)
-      block.setCommand( cmd + cmdargs)
+         threads = os.getenv('NUKE_AF_RENDERTHREADS', '2')
+         cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i -m %(threads)s')
+         cmdargs = ' -X %s -F%%1-%%2x1 -x %s' % ( self.writename, scenename)
+         if self.capacitymin != -1 or self.capacitymax != -1:
+            block.setVariableCapacity( self.capacitymin, self.capacitymax)
+            threads = services.service.str_capacity
+         cmd = cmd.replace('AF_THREADS', threads)
+         block.setCommand( cmd + cmdargs)
+      elif self.wnode.Class == DailiesNodeClassName:
+         cgru = __import__('cgru', globals(), locals(), [])
+         cgru.dailiesEvaluate( self.wnode)
+         cmd = cgru.dailiesGenCmd( self.wnode)
+         block = af.Block( self.name, DailiesServiceType)
+         if cmd is None or cmd == '': return
+         block.setCommand( cmd)
+         boock.setNumeric( 1,1)
+      else:
+         return
+
 
       if self.dependmask != '': block.setDependMask( self.dependmask)
       if self.tasksdependmask != '': block.setTasksDependMask( self.tasksdependmask)
@@ -259,7 +280,7 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
          if len( newparams) == 0: continue
          fullrangedepend = int( node.knob('fullrange').value())
       else:
-         # Get block parameters from "write" node:
+         # Get block parameters from node:
          bparams = BlockParameters( afnode, node, subblock, prefix, fparams)
          if not bparams.valid: return None
          newparams.append( bparams)
@@ -440,7 +461,7 @@ def getJobsParameters( afnode, prefix, fparams):
    if nodes is None: return None
    if len( nodes) == 0: return jobsparameters
 
-   # Reverse nodes, to produce most depended job framelast
+   # Reverse nodes, to send most depended job last
    if reversedepends: nodes.reverse()
 
    # Construct job parameters
