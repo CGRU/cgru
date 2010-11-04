@@ -50,8 +50,10 @@ ViewItems::ViewItems( QWidget * parent):
 #endif
    setSelectionMode( QAbstractItemView::ExtendedSelection);
 
-//   viewport()->setBackgroundRole( QPalette::Mid);
-//   viewport()->setAutoFillBackground( true);
+#ifndef WINNT
+   viewport()->setBackgroundRole( QPalette::Mid);
+   viewport()->setAutoFillBackground( true);
+#endif
 
    itemDelegate = new ItemDelegate;
    setItemDelegate( itemDelegate);
@@ -108,6 +110,7 @@ void ViewItems::mousePressEvent( QMouseEvent * event)
    QListView::mousePressEvent( event);
 }
 
+#ifdef WINNT
 void ViewItems::paintEvent( QPaintEvent * event)
 {
    QPainter p( viewport());
@@ -123,3 +126,4 @@ void ViewItems::paintEvent( QPaintEvent * event)
    // Process drawing:
    QListView::paintEvent( event);
 }
+#endif
