@@ -14,7 +14,7 @@ AfanasyNodeClassName = 'afanasy'
 AfanasyServiceType = 'nuke'
 DailiesServiceType = 'movgen'
 
-VERBOSE = 1
+VERBOSE = 2
 
 af = None
 
@@ -196,7 +196,7 @@ class BlockParameters:
 
       if not self.valid: return
 
-      if self.wnode.Class == RenderNodeClassName:
+      if self.wnode.Class() == RenderNodeClassName:
          block = af.Block( self.name, AfanasyServiceType)
          block.setNumeric( self.framefirst, self.framelast, self.framespertask)
          block.setFiles( self.imgfile)
@@ -210,15 +210,17 @@ class BlockParameters:
             threads = services.service.str_capacity
          cmd = cmd.replace('AF_THREADS', threads)
          block.setCommand( cmd + cmdargs)
-      elif self.wnode.Class == DailiesNodeClassName:
+      elif self.wnode.Class() == DailiesNodeClassName:
          cgru = __import__('cgru', globals(), locals(), [])
          cgru.dailiesEvaluate( self.wnode)
          cmd = cgru.dailiesGenCmd( self.wnode)
-         block = af.Block( self.name, DailiesServiceType)
          if cmd is None or cmd == '': return
-         block.setCommand( cmd)
-         boock.setNumeric( 1,1)
+         block = af.Block( os.path.basename( cmd.split(' ')[-1]), DailiesServiceType)
+         task = af.Task('dailies')
+         task.setCommand( cmd, False) # Prefix don`t needed
+         block.tasks.append( task)
       else:
+         print 'Invalid block node class = "%s"' % self.wnode.Class()
          return
 
 
@@ -526,7 +528,7 @@ def renderNodes( nodes, fparams, storeframes):
          if storeframes == False:
             for key in oldparams:
                node.knob(key).setValue(oldparams[key])
-      if node.Class() == RenderNodeClassName:
+      if node.Class() == RenderNodeClassName or node.Class() == DailiesNodeClassName:
          blocksparameters = []
          bparams = BlockParameters( None, node, False, '', fparams)
          if not bparams.valid: return
@@ -544,7 +546,7 @@ def renderNodes( nodes, fparams, storeframes):
    for jobparams in jobsparameters:
       job = jobparams.genJob( renderscenename)
       if job is None:
-         if VERBOSE: print 'Job generatiton error on "%s"' % jobparams.afnodename
+         if VERBOSE: print 'Job generatiton error on "%s"' % jobparams.nodename
          return
       jobs.append( job)
 
@@ -594,7 +596,7 @@ def render( node = None):
    selectednodes = nuke.selectedNodes()
    selectednodes.sort( None, getNodeName)
    for node in selectednodes:
-      if node.Class() == AfanasyNodeClassName or node.Class() == RenderNodeClassName:
+      if node.Class() == AfanasyNodeClassName or node.Class() == RenderNodeClassName or node.Class() == DailiesNodeClassName:
          nodes.append( node)
          # Check for minimum and maximum
          if node.Class() == AfanasyNodeClassName:
@@ -658,7 +660,7 @@ def render( node = None):
       if node is None:
          nuke.message('Node "%s" not founded.' % name)
          return
-      if node.Class() == AfanasyNodeClassName or node.Class() == RenderNodeClassName:
+      if node.Class() == AfanasyNodeClassName or node.Class() == RenderNodeClassName or node.Class() == DailiesNodeClassName:
          nodes.append( node)
 
    if len( nodes) < 1:

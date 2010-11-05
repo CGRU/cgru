@@ -297,6 +297,7 @@ digits2 = re.findall(r'\d+', images1[-1])
 if digits1 is not None and digits2 is not None:
    if len(digits1) and len(digits2):
       FrameRange = "%s-%s" % (digits1[-1].lstrip('0'), digits2[-1].lstrip('0'))
+      if FrameRange[0] == '-': FrameRange = '0' + FrameRange
 
 # Construct frame conversion command arguments:
 cmd_args = ''
