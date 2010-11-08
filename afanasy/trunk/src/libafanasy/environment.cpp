@@ -131,6 +131,9 @@ QStringList    Environment::cmdarguments_usagearg;
 QStringList    Environment::cmdarguments_usagehelp;
 bool           Environment::help_mode = false;
 
+int            Environment::afanasy_build_version = 0;
+QString        Environment::cgru_version;
+
 bool Environment::getVars( const QString & filename)
 {
    QDomDocument doc("afanasy");
@@ -431,6 +434,14 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
       case 8: platform += " 64bit"; break;
    }
    }
+//
+//############ Version: ########################
+#ifdef CGRU_VERSION
+   afanasy_build_version = CGRU_VERSION;
+#endif
+   PRINT("Afanasy build version = \"%d\"\n", afanasy_build_version);
+   cgru_version = QString::fromUtf8( getenv("CGRU_VERSION"));
+   PRINT("CGRU version = \"%s\"\n", cgru_version.toUtf8().data());
 //###################################################
 
    load();

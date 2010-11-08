@@ -32,15 +32,10 @@ public:
 protected:
    void keyPressEvent( QKeyEvent * event);
    void mousePressEvent( QMouseEvent * event);
-#ifdef WINNT
-   void paintEvent( QPaintEvent * event);
-#endif
+
 private:
 //   bool (*mousePressEvent_handler)( QMouseEvent * );
    ItemDelegate * itemDelegate;
 
    ListItems * listitems;
-
-   QPixmap logo;
-   QPoint logo_offset;
 };

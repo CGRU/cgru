@@ -38,7 +38,6 @@ int main( int argc, char** argv )
       QString exe = QString::fromUtf8( buffer, linksize);
       printf("%s='%s'\n", link, exe.toUtf8().data());
 #endif
-      //GetModuleFileName(NULL, buffer, bufsize);
 /*
 printf("Msg::SizeHeader       = %d\n", Msg::SizeHeader      );
 //printf("Msg::SizeDataMin      = %d\n", Msg::SizeDataMin     );
@@ -103,6 +102,13 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    af::destroy();
    Py_Finalize();
 
-   if( argc == 1) printf("\nType \"afcmd h\" for help.\n");
+   if( argc == 1)
+   {
+      printf("\n");
+      printf("Afanasy build version = \"%d\"\n", af::Environment::getAfanasyBuildVersion());
+      printf("CGRU version = \"%s\"\n", af::Environment::getCGRUVersion().toUtf8().data());
+      printf("\n");
+      printf("Type \"afcmd h\" for help.\n");
+   }
    return return_value;
 }

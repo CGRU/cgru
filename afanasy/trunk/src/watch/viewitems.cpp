@@ -1,13 +1,7 @@
 #include "viewitems.h"
 
 #include <QtCore/QEvent>
-#include <QtCore/QFile>
 #include <QtGui/QKeyEvent>
-#include <QtGui/QPainter>
-#include <QtGui/QScrollBar>
-
-#include "../libafanasy/environment.h"
-#include "../libafqt/qenvironment.h"
 
 #include "item.h"
 #include "watch.h"
@@ -50,37 +44,11 @@ ViewItems::ViewItems( QWidget * parent):
 #endif
    setSelectionMode( QAbstractItemView::ExtendedSelection);
 
-#ifndef WINNT
    viewport()->setBackgroundRole( QPalette::Mid);
    viewport()->setAutoFillBackground( true);
-#endif
 
    itemDelegate = new ItemDelegate;
    setItemDelegate( itemDelegate);
-
-   // Try to load user's custom logo
-   QString filename = af::Environment::getHomeAfanasy() + "/logo.png";
-//printf("Logo = '%s'\n", filename.toUtf8().data());
-   bool custom_logo_loaded = false;
-   if( QFile::exists( filename))
-      if( logo.load( filename))
-         custom_logo_loaded = true;
-
-   // Load standart logo and transform it randomly
-   if( false == custom_logo_loaded)
-   {
-      filename = af::Environment::getAfRoot() + "/icons/afanasy.png";
-//printf("Logo = '%s'\n", filename.toUtf8().data());
-      if( logo.load( filename))
-      {
-         QTransform xform;
-         xform.rotate( -5.0f - 15.0f * float( rand())/RAND_MAX);
-         xform.scale( .4, .4);
-         logo = logo.transformed( xform, Qt::SmoothTransformation);
-         logo_offset.setX( 10 + int(10 * float( rand())/RAND_MAX));
-         logo_offset.setY( 10 + int(10 * float( rand())/RAND_MAX));
-      }
-   }
 }
 
 ViewItems::~ViewItems()
@@ -109,21 +77,3 @@ void ViewItems::mousePressEvent( QMouseEvent * event)
          return;
    QListView::mousePressEvent( event);
 }
-
-#ifdef WINNT
-void ViewItems::paintEvent( QPaintEvent * event)
-{
-   QPainter p( viewport());
-
-   // Fill area:
-   p.fillRect( rect(), afqt::QEnvironment::clr_Mid.c);
-
-   // Draw logo:
-   if( false == verticalScrollBar()->isVisible())
-      if( false == logo.isNull())
-         p.drawPixmap( rect().bottomRight() - logo.rect().bottomRight() - logo_offset, logo);
-
-   // Process drawing:
-   QListView::paintEvent( event);
-}
-#endif

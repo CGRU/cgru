@@ -10,6 +10,13 @@ cgru_utils=$cgru/utilities
 cgru_qt=$cgru_utils/qt/qt-4.7.0-static
 cgru_python=$cgru_utils/python/2.5.5
 
+# Setup Version:
+pushd .. > /dev/null
+folder=$PWD
+cd $cgru
+source ./getversion.sh $folder
+popd > /dev/null
+
 # Setup Qt (use system by default):
 export QMAKE=
 # Use CGRU Qt if presets:

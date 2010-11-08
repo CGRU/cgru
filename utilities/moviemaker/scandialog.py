@@ -63,7 +63,7 @@ class Dialog( QtGui.QWidget):
       QtGui.QWidget.__init__( self)
       self.evaluated = False
 
-      self.setWindowTitle('Scan Scan')
+      self.setWindowTitle('Scan Scan   ' + os.getenv('CGRU_VERSION', ''))
       self.mainLayout = QtGui.QVBoxLayout( self)
 
       self.tabwidget = QtGui.QTabWidget( self)

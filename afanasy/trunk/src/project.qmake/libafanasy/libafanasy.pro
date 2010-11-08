@@ -13,6 +13,8 @@ DIR = ../../libafanasy
 SOURCES += $$system(ls $$DIR/*.cpp)
 HEADERS += $$system(ls $$DIR/*.h)
 
+DEFINES += "CGRU_VERSION=$$(CGRU_VERSION)"
+
 win32:DEFINES += WINNT
 macx:DEFINES += MACOSX
 unix:DEFINES += LINUX

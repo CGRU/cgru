@@ -23,6 +23,8 @@ function rcopy(){
 
 cd ../..
 
+source ./getversion.sh .
+
 copy . $dest
 
 rcopy bin $dest
@@ -63,3 +65,5 @@ rcopy plugins/maya/doc $dest/plugins/maya
 rcopy plugins/maya/icons $dest/plugins/maya
 rcopy plugins/maya/mel $dest/plugins/maya
 rcopy plugins/maya/mll $dest/plugins/maya
+
+echo $CGRU_VERSION > $dest/cgru_version.txt

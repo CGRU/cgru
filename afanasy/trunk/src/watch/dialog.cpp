@@ -17,6 +17,7 @@
 
 #include "buttonmonitor.h"
 #include "buttonout.h"
+#include "labelversion.h"
 #include "listitems.h"
 #include "listjobs.h"
 #include "listusers.h"
@@ -84,6 +85,8 @@ Dialog::Dialog():
    infoline = new InfoLine( this);
    infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
    vlayout_b->addWidget( infoline);
+
+   vlayout_b->addWidget( new LabelVersion(this));
 
    hlayout_b->addStretch();
    btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);

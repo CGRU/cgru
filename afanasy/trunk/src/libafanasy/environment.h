@@ -65,6 +65,10 @@ public:
    static inline const QString& getHome()         { return home;          }
    static inline const QString& getHomeAfanasy()  { return home_afanasy;  }
 
+/// Get versions:
+   static inline int getAfanasyBuildVersion()    { return afanasy_build_version;  }
+   static inline const QString& getCGRUVersion() { return  cgru_version;          }
+
 /// Get Afanasy server QHostAddress.
    static inline const QHostAddress* getAfServerQHostAddress()  { return qafserveraddress;}
 
@@ -181,6 +185,9 @@ private:
    static QString afroot;         ///< Afanasy root directory.
    static QString home;           ///< User home directory.
    static QString home_afanasy;   ///< Afanasy home settings.
+
+   static int afanasy_build_version;  ///< Afanasy build sources version, will be compiled in binaries
+   static QString cgru_version;       ///< CGRU version, will be get from environment on applications startup
 
    static Address *address;             ///< Host address and port class. Point to local host adress.
    static QHostAddress * qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
