@@ -90,7 +90,6 @@ class Dialog( QtGui.QWidget):
       i = 0
       for name in CodecNames:
          self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
-         print os.path.basename(CodecFiles[i]) , Options.codec
          if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex(i)
          i = i + 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
