@@ -9,3 +9,5 @@ if(UNIX AND NOT APPLE)
    set_target_properties(afanasy PROPERTIES COMPILE_FLAGS "-fPIC")
 endif(UNIX AND NOT APPLE)
 target_link_libraries(afanasy ${QT_LIBRARIES} ${PYTHON_LIBRARIES})
+
+add_definitions(-DCGRU_VERSION=$ENV{CGRU_VERSION})

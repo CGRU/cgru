@@ -19,6 +19,10 @@ if exist %cgru_python% (
 
 if exist override.cmd call override.cmd
 
+pushd %cgru%
+call getversion.cmd
+popd
+
 cmake -G "%CMAKE_GENERATOR%" .
 
 cmake .

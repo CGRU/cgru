@@ -25,8 +25,6 @@ if(WIN32)
 	add_definitions(-DWINNT)
 endif(WIN32)
 
-add_definitions(-DCGRU_VERSION=$ENV{CGRU_VERSION})
-
 include_directories(${PYTHON_INCLUDE_PATH})
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../bin")
