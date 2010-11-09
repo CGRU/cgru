@@ -17,7 +17,7 @@ parser.add_option('-s', '--shot',       dest='shot',           type  ='string', 
 parser.add_option('-a', '--artist',     dest='artist',         type  ='string',     default='',          help='Draw artist')
 parser.add_option('-f', '--frame',      dest='frame',          type  ='string',     default='',          help='Draw frame')
 parser.add_option('-m', '--moviename',  dest='moviename',      type  ='string',     default='movie',     help='Draw final movie name')
-parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='ver',       help='Draw shot version')
+parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='version'    help='Draw shot version')
 parser.add_option('--activity',         dest='activity',       type  ='string',     default='',          help='Draw activity')
 parser.add_option('--comments',         dest='comments',       type  ='string',     default='',          help='Draw comments')
 parser.add_option('--framerange',       dest='framerange',     type  ='string',     default='',          help='Draw frame range')
@@ -165,11 +165,11 @@ def reformatAnnotate( infile, outfile):
          cmd += ' -fill "rgba(0,0,0,%(draw235_a)f)" -draw "rectangle 0,%(draw235_h)d,%(Width)d,%(Height)d"' % globals()
       # Draw cacher lines:
       if options.line169 != '':
-         cmd += ' -fill "rgba('+options.line169+',1.0)" -draw "rectangle 0,%(draw169_y)d,%(Width)d,%(draw169_y)d"' % globals()
-         cmd += ' -fill "rgba('+options.line169+',1.0)" -draw "rectangle 0,%(draw169_h)d,%(Width)d,%(draw169_h)d"' % globals()
+         cmd += ' -fill "rgba('+options.line169+',1.0)" -draw "rectangle 0,%d,%d,%d"' % (draw169_y-1,Width,draw169_y)
+         cmd += ' -fill "rgba('+options.line169+',1.0)" -draw "rectangle 0,%d,%d,%d"' % (draw169_h,Width,draw169_h+1)
       if options.line235 != '':
-         cmd += ' -fill "rgba('+options.line235+',1.0)" -draw "rectangle 0,%(draw235_y)d,%(Width)d,%(draw235_y)d"' % globals()
-         cmd += ' -fill "rgba('+options.line235+',1.0)" -draw "rectangle 0,%(draw235_h)d,%(Width)d,%(draw235_h)d"' % globals()
+         cmd += ' -fill "rgba('+options.line235+',1.0)" -draw "rectangle 0,%d,%d,%d"' % (draw235_y-1,Width,draw235_y)
+         cmd += ' -fill "rgba('+options.line235+',1.0)" -draw "rectangle 0,%d,%d,%d"' % (draw235_h,Width,draw235_h+1)
 
    else:
       cmd = 'convert -size %(Width)dx%(Height)d -colorspace RGB xc:black -alpha Transparent -antialias' % globals()

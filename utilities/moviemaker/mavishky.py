@@ -77,6 +77,7 @@ if len(args) > 3: parser.error('Too many arguments provided.')
 
 MOVIEMAKER = os.path.dirname( sys.argv[0])
 CODECSDIR  = os.path.join( MOVIEMAKER, 'codecs')
+LOGOSDIR   = os.path.join( MOVIEMAKER, 'logos')
 
 Inpattern1 = args[0]
 Inpattern2 = ''
@@ -108,7 +109,7 @@ if Debug: print 'DEBUG MODE:'
 
 # Definitions:
 tmpname   = 'img'
-tmplogo   = 'logo.png'
+tmplogo   = 'logo.tga'
 
 need_convert = False
 if Stereo: need_convert = True
@@ -320,23 +321,16 @@ imgCount = 0
 # Pre composition:
 cmd_precomp = []
 name_precomp = []
-# Generate header:
-if need_convert and options.slate != '':
-   cmd = cmd_makeframe + cmd_args
-   cmd += ' --drawcolorbars' + cmd_args
-   cmd += ' -t "%s"' % options.slate
-   cmd += ' "%s"' % images1[int(len(images1)/2)]
-   if Inpattern2 != '':
-      cmd += ' "%s"' % images2[int(len(images1)/2)]
-   cmd += ' "%s"' % (os.path.join( TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
-   cmd_precomp.append(cmd)
-   name_precomp.append('Generate header')
-   imgCount += 1
 
 # Reformat logo command:
 if Logopath != '':
    if need_convert:
       need_logo = True
+      if not os.path.isfile( Logopath):
+         Logopath = os.path.join( LOGOSDIR, Logopath)
+         if not os.path.isfile( Logopath):
+            print 'Can`t find logo image file.'
+            exit(1)
       logosizes = Logosize.split('x')
       logotx = width  - int(logosizes[0])
       logoty = height - int(logosizes[1])
@@ -356,6 +350,20 @@ if Logopath != '':
 # Generate convert commands lists:
 cmd_convert = []
 name_convert = []
+
+# Generate header:
+if need_convert and options.slate != '':
+   cmd = cmd_makeframe + cmd_args
+   if need_logo: cmd += ' --logopath "%s"' % tmplogo
+   cmd += ' --drawcolorbars' + cmd_args
+   cmd += ' -t "%s"' % options.slate
+   cmd += ' "%s"' % images1[int(len(images1)/2)]
+   if Inpattern2 != '': cmd += ' "%s"' % images2[int(len(images1)/2)]
+   cmd += ' "%s"' % (os.path.join( TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
+   cmd_convert.append(cmd)
+   name_convert.append('Generate header')
+   imgCount += 1
+
 if need_convert:
    i = 0
    for afile in images1:
@@ -366,7 +374,6 @@ if need_convert:
       if options.draw235   >  0: cmd += ' --draw235 %d'    % options.draw235
       if options.line169  != '': cmd += ' --line169 "%s"'  % options.line169
       if options.line235  != '': cmd += ' --line235 "%s"'  % options.line235
-      if need_logo:              cmd += ' --Logopath "%s"' % tmplogo
 
       cmd += ' "%s"' % afile
       if Inpattern2 != '':
@@ -432,7 +439,7 @@ if options.afanasy:
    if options.afuser != '': j.setUserName( options.afuser)
 
    if len(cmd_precomp):
-      bp=af.Block( 'precomp', 'generic')
+      bp=af.Block( 'precomp', 'movgen')
       j.blocks.append( bp)
       n = 0
       for cmd in cmd_precomp:

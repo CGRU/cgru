@@ -8,12 +8,30 @@
 
 # Annotate:
 
--fill white -pointsize @SIZE_1/12Y@ -gravity      west -annotate +@SIZE_1/15X@-@SIZE_1/4Y@  "Project: %(PROJECT)s"
--fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@-@SIZE_4/30Y@ "Date: %(DATETIME)s"
--fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@-@SIZE_1/30Y@ "Shot: %(SHOT)s"
--fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@+@SIZE_2/30Y@ "Version: %(VERSION)s"
--fill white -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/15X@+@SIZE_5/30Y@ "Frame range: %(FRAMERANGE)s"
--fill white -pointsize @SIZE_1/20Y@ -gravity      west -annotate +@SIZE_1/15X@+@SIZE_2/7Y@  "Comments: %(COMMENTS)s"
--fill white -pointsize @SIZE_1/20Y@ -gravity southwest -annotate +@SIZE_1/15X@+@SIZE_1/12Y@ "Artist: %(ARTIST)s, Activity: %(ACTIVITY)s"
--fill white -pointsize @SIZE_1/20Y@ -gravity southwest -annotate +@SIZE_1/15X@+@SIZE_1/40Y@ "%(MOVIENAME)s"
--fill white -pointsize @SIZE_1/15Y@ -gravity southeast -annotate +@SIZE_1/15X@+@SIZE_1/8Y@  "%(COMPANY)s"
+-fill DimGrey -pointsize @SIZE_1/18Y@ -gravity      east -annotate +@SIZE_4/5X@-@SIZE_7/30Y@ "Project: "
+-fill white   -pointsize @SIZE_1/18Y@ -gravity      west -annotate +@SIZE_1/5X@-@SIZE_7/30Y@ "%(PROJECT)s"
+
+-fill DimGrey -pointsize @SIZE_1/15Y@ -gravity      east -annotate +@SIZE_4/5X@-@SIZE_4/30Y@ "Date: "
+-fill white   -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/5X@-@SIZE_4/30Y@ "%(DATETIME)s"
+
+-fill DimGrey -pointsize @SIZE_1/15Y@ -gravity      east -annotate +@SIZE_4/5X@-@SIZE_1/30Y@ "Shot: "
+-fill white   -pointsize @SIZE_1/15Y@ -gravity      west -annotate +@SIZE_1/5X@-@SIZE_1/30Y@ "%(SHOT)s"
+
+-fill DimGrey -pointsize @SIZE_1/18Y@ -gravity      east -annotate +@SIZE_4/5X@+@SIZE_2/30Y@ "Version: "
+-fill white   -pointsize @SIZE_1/18Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_2/30Y@ "%(VERSION)s"
+
+-fill DimGrey -pointsize @SIZE_1/24Y@ -gravity      east -annotate +@SIZE_4/5X@+@SIZE_5/30Y@ "Frame range: "
+-fill white   -pointsize @SIZE_1/24Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_5/30Y@ "%(FRAMERANGE)s"
+
+-fill DimGrey -pointsize @SIZE_1/24Y@ -gravity      east -annotate +@SIZE_4/5X@+@SIZE_7/30Y@  "Comments: "
+-fill white   -pointsize @SIZE_1/24Y@ -gravity      west -annotate +@SIZE_1/5X@+@SIZE_7/30Y@  "%(COMMENTS)s"
+
+-fill DimGrey -pointsize @SIZE_1/24Y@ -gravity southeast -annotate +@SIZE_1/3X@+@SIZE_3/30Y@ "Artist: "
+-fill white   -pointsize @SIZE_1/24Y@ -gravity southwest -annotate +@SIZE_2/3X@+@SIZE_3/30Y@ "%(ARTIST)s"
+
+-fill DimGrey -pointsize @SIZE_1/24Y@ -gravity southeast -annotate +@SIZE_1/3X@+@SIZE_1/30Y@ "Activity: "
+-fill white   -pointsize @SIZE_1/24Y@ -gravity southwest -annotate +@SIZE_2/3X@+@SIZE_1/30Y@ "%(ACTIVITY)s"
+
+-fill white -pointsize @SIZE_1/24Y@ -gravity southwest -annotate +@SIZE_1/24X@+@SIZE_1/30Y@ "%(MOVIENAME)s"
+
+-fill white -pointsize @SIZE_1/15Y@ -gravity southeast -annotate +@SIZE_1/24X@+@SIZE_1/30Y@  "%(COMPANY)s"
