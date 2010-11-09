@@ -17,7 +17,7 @@ parser.add_option('-s', '--shot',       dest='shot',           type  ='string', 
 parser.add_option('-a', '--artist',     dest='artist',         type  ='string',     default='',          help='Draw artist')
 parser.add_option('-f', '--frame',      dest='frame',          type  ='string',     default='',          help='Draw frame')
 parser.add_option('-m', '--moviename',  dest='moviename',      type  ='string',     default='movie',     help='Draw final movie name')
-parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='version'    help='Draw shot version')
+parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='version',   help='Draw shot version')
 parser.add_option('--activity',         dest='activity',       type  ='string',     default='',          help='Draw activity')
 parser.add_option('--comments',         dest='comments',       type  ='string',     default='',          help='Draw comments')
 parser.add_option('--framerange',       dest='framerange',     type  ='string',     default='',          help='Draw frame range')
