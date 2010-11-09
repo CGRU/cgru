@@ -1033,7 +1033,7 @@ class Dialog( QtGui.QWidget):
             return
          reload(af)
          job = af.Job(('%s' % self.editOutputName.text()).encode('utf-8') + ' mavishka')
-         block = af.Block('mavishky')
+         block = af.Block('mavishky', 'movgen')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
          if self.sbAfMaxHosts.value()  != -1: job.setMaxHosts(    self.sbAfMaxHosts.value())
          if self.sbAfCapacity.value()  != -1: block.setCapacity(  self.sbAfCapacity.value())

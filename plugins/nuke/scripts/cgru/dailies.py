@@ -5,6 +5,17 @@ import os, sys, time
 
 def dailiesEvaluate( node):
 
+   # Shot:
+   shot = node.knob('shot').value()
+   if shot == None or shot == '':
+      try:
+         shot = os.path.basename( nuke.root().name())
+      except:
+         return
+      dot = shot.find('.')
+      if dot > 0: shot = shot[ : dot]
+      node.knob('shot').setValue( shot)
+
    # Artist:
    artist = node.knob('artist').value()
    if artist == None or artist == '':
@@ -139,8 +150,9 @@ def dailiesGenCmd( node):
 def dailies( node):
    cmd = dailiesGenCmd( node)
    if cmd is None or cmd == '': return
-   cmd = 'launchcmd ' + cmd
-#   if sys.platform.find('win') == 0: cmd = 'start ' + cmd
-#   else: cmd += ' &'
+   if sys.platform.find('win') == 0:
+      cmd = 'start launchcmd.cmd ' + cmd
+   else:
+      cmd = 'launchcmd.py ' + cmd + ' &'
    print "\n%s\n" % cmd
    os.system( cmd)

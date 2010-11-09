@@ -9,7 +9,7 @@
 LabelVersion::LabelVersion( QWidget *parent):
    QWidget( parent)
 {
-   setMinimumHeight(20);
+   setMinimumHeight(16);
    text = QString("AFANASY BUILD %1      CGRU VERSION %2").arg(af::Environment::getAfanasyBuildVersion()).arg(af::Environment::getCGRUVersion());
    setToolTip(QString("Afanasy build sources revision: %1\nCGRU version: %2").arg(af::Environment::getAfanasyBuildVersion()).arg(af::Environment::getCGRUVersion()));
 /*
@@ -29,6 +29,7 @@ LabelVersion::LabelVersion( QWidget *parent):
       if( logo.load( filename)) logo = logo.scaled( 160, 20, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
    }
 */
+   font.setPointSize( 8);
    font.setBold( true);
 }
 

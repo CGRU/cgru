@@ -443,7 +443,7 @@ if options.afanasy:
       bp.setCapacity( options.afconvcap)
 
    if need_convert:
-      bc=af.Block( 'convert', 'generic')
+      bc=af.Block( 'convert', 'movgen')
       j.blocks.append( bc)
       n = 0
       for cmd in cmd_convert:
@@ -455,7 +455,7 @@ if options.afanasy:
       if need_logo: bc.setDependMask('precomp')
       bc.setTasksMaxRunTime(11)
 
-   be = af.Block( 'encode', 'generic')
+   be = af.Block( 'encode', 'movgen')
    j.blocks.append( be)
    t = af.Task( Output)
    be.tasks.append( t)

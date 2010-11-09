@@ -84,7 +84,7 @@ def genMovieName( path):
 if options.afanasy != 0:
    af = __import__('af', globals(), locals(), [])
    job = af.Job('Scan ' + Folder)
-   block = af.Block('movgen')
+   block = af.Block('movgen', 'movgen')
    block.setCapacity( options.afanasy)
    job.blocks.append( block)
    if options.maxhosts != -1: job.setMaxHosts( options.maxhosts)
