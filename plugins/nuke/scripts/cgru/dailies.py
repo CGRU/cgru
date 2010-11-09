@@ -151,7 +151,7 @@ def dailies( node):
    cmd = dailiesGenCmd( node)
    if cmd is None or cmd == '': return
    if sys.platform.find('win') == 0:
-      cmd = 'start launchcmd.cmd ' + cmd
+      cmd = 'start ' + cmd
    else:
       cmd = 'launchcmd.py ' + cmd + ' &'
    print "\n%s\n" % cmd
