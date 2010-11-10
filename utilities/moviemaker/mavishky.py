@@ -114,6 +114,12 @@ need_convert = False
 if Stereo: need_convert = True
 need_logo = False
 
+# Check output folder:
+if not os.path.isdir( os.path.dirname( Output)):
+   print 'Output folder does not exist:'
+   print Output
+   sys.exit(1)
+
 # Encode command:
 Codec = Codec.lower()
 encoder = Codec.split('.')
@@ -247,11 +253,11 @@ def getImages( inpattern):
    if len(identify) < 1:
       print 'Invalid image "%s"' % afile
       sys.exit(1)
-   if Verbose: print 'Identify: %s' % Output
    identify = identify.split(' ')
    if len(identify) < 1:
       print 'Invalid image "%s"' % afile
       sys.exit(1)
+   if Verbose: print 'Identify: %s' % identify
    imgtype = identify[0]
    if Verbose: print 'Images type = "%s"' % imgtype
 

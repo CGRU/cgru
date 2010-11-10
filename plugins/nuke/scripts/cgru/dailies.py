@@ -23,7 +23,7 @@ def dailiesEvaluate( node):
 
    # Dailies Folder:
    movfolder = node.knob('movfolder').value()
-   if movfolder is None or movfolder == '':
+   if movfolder is None or movfolder == '' or not os.path.isdir( movfolder):
       inputnode = None
       for i in range( node.inputs()):
          inputnode = node.input(i)
@@ -34,6 +34,7 @@ def dailiesEvaluate( node):
             movfolder = os.path.abspath( images)
             movfolder = os.path.dirname( movfolder)
             movfolder = os.path.dirname( movfolder)
+            movfolder = movfolder.replace('\\','/')
             node.knob('movfolder').setValue( movfolder)
 
    if node.knob('movauto').value() or node.knob('movname').value is None or node.knob('movname').value == '':
