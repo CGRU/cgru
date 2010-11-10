@@ -33,16 +33,18 @@ Gizmo {
 
    addUserKnob { 20 "" Parameters }
 
-   addUserKnob {  1 draw169 l "Cacher 16:9"     +STARTLINE }
-   addUserKnob {  1 draw235 l "Cacher 2.35"     -STARTLINE }
-   addUserKnob {  1 line169 l "Line 16:9 Color" +STARTLINE }
-   addUserKnob {  1 line235 l "line 2.35 Color" -STARTLINE }
+   addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
+   addUserKnob {  1 draw235  l "Cacher 2.35"     -STARTLINE }
+   addUserKnob {  1 line169  l "Line 16:9 Color" +STARTLINE }
+   addUserKnob {  1 line235  l "line 2.35 Color" -STARTLINE }
+   addUserKnob {  1 logopath l "Logo"            +STARTLINE }
+   addUserKnob {  3 logosize l "Size"            -STARTLINE }
 
 
    name dailies
 
-   company     "BZ-VFX"
-   project     "TDH"
+   company     ""
+   project     ""
    activity    "comp"
    version     0
    movauto     1
@@ -52,6 +54,8 @@ Gizmo {
    draw235     "0"
    line169     "200,200,200"
    line235     "200,200,200"
+   logopath    ""
+   logosize    20
 
    help "Wee All Die!"
 

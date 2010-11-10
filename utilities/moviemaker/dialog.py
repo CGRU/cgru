@@ -19,16 +19,16 @@ Parser.add_option('-f', '--format',          dest='format',          type  ='str
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
 Parser.add_option('--stereo',                dest='stereo',          action='store_true', default=False,          help='Stereo mode by default')
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
-Parser.add_option('--company',               dest='company',         type  ='string',     default='Company',      help='Company name')
+Parser.add_option('--company',               dest='company',         type  ='string',     default='',             help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
 Parser.add_option('--suffix',                dest='suffix',          type  ='string',     default='',             help='Add suffix to output movie filename')
 Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=25,             help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=25,             help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='200,200,200',  help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='200,200,200',  help='Draw 2.35 line color: "255,255,0"')
-parser.add_option('--logopath',         		dest='logopath',    		type  ='string',     default='',          	help='Add a specified image')
-parser.add_option('--logosize',         		dest='logosize',    		type  ='string',     default='200x100',   	help='Logotype size')
-parser.add_option('--logograv',         		dest='logograv',    		type  ='string',     default='southeast', 	help='Logotype positioning gravity')
+Parser.add_option('--logopath',         		dest='logopath',    		type  ='string',     default='',             help='Add a specified image')
+Parser.add_option('--logosize',         		dest='logosize',    		type  ='int',        default=20,   	         help='Logotype size, percent of image')
+Parser.add_option('--logograv',         		dest='logograv',    		type  ='string',     default='southeast', 	help='Logotype positioning gravity')
 Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
 Parser.add_option(      '--afpriority',      dest='afpriority',      type  ='int',        default=-1,             help='Afanasy job priority')
 Parser.add_option(      '--afmaxhosts',      dest='afmaxhosts',      type  ='int',        default=-1,             help='Afanasy job maximum hosts')
@@ -42,7 +42,7 @@ Parser.add_option('-D', '--debug',           dest='debug',           action='sto
 
 (Options, args) = Parser.parse_args()
 
-if len(args) > 2: parser.error('Too many arguments provided.')
+if len(args) > 2: Parser.error('Too many arguments provided.')
 
 InFile1 = ''
 InFile2 = ''
@@ -375,42 +375,40 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.editLine235, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lDrawing.addLayout( self.lLines)
 
+      # Logo
       self.lLogo = QtGui.QHBoxLayout()
-      self.cLogo = QtGui.QCheckBox('Logo', self)
-      QtCore.QObject.connect( self.cLogo, QtCore.SIGNAL('stateChanged(int)'), self.drawLogo)
-      self.tLogoPath = QtGui.QLabel('Path:', self)
-      self.editLogoPath = QtGui.QLineEdit( os.path.join( LogosPath, 'logo.png'), self)
+      self.tLogoPath = QtGui.QLabel('Logo:', self)
+      self.lLogo.addWidget( self.tLogoPath)
+
+      self.editLogoPath = QtGui.QLineEdit( Options.logopath, self)
+      self.lLogo.addWidget( self.editLogoPath)
       QtCore.QObject.connect( self.editLogoPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.tLogoSize = QtGui.QLabel('Size:', self)
-      self.sbLogoSizeX = QtGui.QSpinBox( self)
-      self.sbLogoSizeX.setRange( 1, 1000)
-      self.sbLogoSizeX.setValue( 200)
-      QtCore.QObject.connect( self.sbLogoSizeX, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.sbLogoSizeY = QtGui.QSpinBox( self)
-      self.sbLogoSizeY.setRange( 1, 1000)
-      self.sbLogoSizeY.setValue( 100)
-      QtCore.QObject.connect( self.sbLogoSizeY, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+
       self.btnBrowseLogo = QtGui.QPushButton('Browse', self)
       QtCore.QObject.connect( self.btnBrowseLogo, QtCore.SIGNAL('pressed()'), self.browseLogo)
-      self.tLogoGravity = QtGui.QLabel('Position:', self)
-      self.cbLogoGravity = QtGui.QComboBox( self)
-      for pos in Gravity: self.cbLogoGravity.addItem( pos)
-      QtCore.QObject.connect( self.cbLogoGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.editLogoPath.setEnabled( False)
-      self.btnBrowseLogo.setEnabled( False)
-      self.sbLogoSizeX.setEnabled( False)
-      self.sbLogoSizeY.setEnabled( False)
-      self.cbLogoGravity.setEnabled( False)
-      self.lLogo.addWidget( self.cLogo)
-      self.lLogo.addWidget( self.tLogoPath)
-      self.lLogo.addWidget( self.editLogoPath)
       self.lLogo.addWidget( self.btnBrowseLogo)
+
+      self.tLogoSize = QtGui.QLabel('Size:', self)
       self.lLogo.addWidget( self.tLogoSize)
-      self.lLogo.addWidget( self.sbLogoSizeX)
-      self.lLogo.addWidget( self.sbLogoSizeY)
+      self.sbLogoSize = QtGui.QSpinBox( self)
+      self.sbLogoSize.setRange( 1, 100)
+      self.sbLogoSize.setValue( 17)
+      QtCore.QObject.connect( self.sbLogoSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lLogo.addWidget( self.sbLogoSize)
+
+      self.tLogoGravity = QtGui.QLabel('%  Position:', self)
       self.lLogo.addWidget( self.tLogoGravity)
+      self.cbLogoGravity = QtGui.QComboBox( self)
+      i = 0
+      for grav in Gravity:
+         self.cbLogoGravity.addItem( grav)
+         if grav.lower() == Options.logograv: self.cbLogoGravity.setCurrentIndex( i)
+         i += 1
       self.lLogo.addWidget( self.cbLogoGravity)
+      QtCore.QObject.connect( self.cbLogoGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+
       self.lDrawing.addLayout( self.lLogo)
+
 
       self.lFont = QtGui.QHBoxLayout()
       self.tFont = QtGui.QLabel('Annotations Text Font:', self)
@@ -721,15 +719,6 @@ class Dialog( QtGui.QWidget):
       self.editShot.setEnabled( enable)
       self.editVersion.setEnabled( enable)
 
-   def drawLogo( self):
-      enable = self.cLogo.isChecked()
-      self.btnBrowseLogo.setEnabled( enable)
-      self.editLogoPath.setEnabled( enable)
-      self.sbLogoSizeX.setEnabled( enable)
-      self.sbLogoSizeY.setEnabled( enable)
-      self.cbLogoGravity.setEnabled(enable)
-      self.evaluate()
-
    def activityChanged( self):
       self.editActivity.setText( self.cbActivity.currentText())
       self.evaluate()
@@ -739,7 +728,12 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def browseLogo( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', LogosPath)
+      logopath = LogosPath
+      oldlogo = '%s' % self.editLogoPath.text()
+      if oldlogo != '':
+         dirname = os.path.dirname( oldlogo)
+         if dirname != '': logopath = dirname
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', logopath)
       if afile.isEmpty(): return
       self.editLogoPath.setText( '%s' % afile)
       self.evaluate()
@@ -964,12 +958,12 @@ class Dialog( QtGui.QWidget):
          outname += time.strftime('_%y%m%d')
          self.editOutputName.setText( outname)
 
-      logodraw = self.cLogo.isChecked()
-      logopath = self.editLogoPath.text()
-      if logodraw:
+      logopath = '%s' % self.editLogoPath.text()
+      if logopath != '':
          if not os.path.isfile( logopath):
-            self.cmdField.setText('No logo file founded')
-            return
+            if not os.path.isfile( os.path.join( LogosPath, logopath)):
+               self.cmdField.setText('No logo file founded')
+               return
 
       cmd = 'mavishky.py'
       cmd = 'python ' + os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
@@ -998,9 +992,9 @@ class Dialog( QtGui.QWidget):
          if cacher != '0': cmd += ' --draw235 %s' % cacher
          if not self.editLine169.text().isEmpty(): cmd += ' --line169 "%s"' % self.editLine169.text()
          if not self.editLine235.text().isEmpty(): cmd += ' --line235 "%s"' % self.editLine235.text()
-         if self.cLogo.isChecked():
+         if logopath != '':
             cmd += ' --logopath "%s"' % logopath
-            cmd += ' --logosize %dx%d' % ( self.sbLogoSizeX.value(), self.sbLogoSizeY.value())
+            cmd += ' --logosize %d' % self.sbLogoSize.value()
             cmd += ' --logograv %s' % self.cbLogoGravity.currentText()
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'

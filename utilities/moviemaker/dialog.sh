@@ -3,7 +3,7 @@
 moviemakerdir=`dirname $0`
 pushd $moviemakerdir >> /dev/null
 cd ../..
-source ./setup.sh
+source ./setup.sh .
 cd afanasy
 [ -d trunk ] && cd trunk
 source ./setup.sh

@@ -11,7 +11,7 @@ from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] input [second_input] output\ntype \"%prog -h\" for help", version="%prog 1.  0")
 
 parser.add_option('-d', '--datetime',   dest='datetime',       type  ='string',     default='',          help='Draw date & time')
-parser.add_option('-c', '--company',    dest='company',        type  ='string',     default='company',   help='Draw company')
+parser.add_option('-c', '--company',    dest='company',        type  ='string',     default='',          help='Draw company')
 parser.add_option('-p', '--project',    dest='project',        type  ='string',     default='project',   help='Draw project')
 parser.add_option('-s', '--shot',       dest='shot',           type  ='string',     default='shot',      help='Draw shot')
 parser.add_option('-a', '--artist',     dest='artist',         type  ='string',     default='',          help='Draw artist')
@@ -235,7 +235,7 @@ def reformatAnnotate( infile, outfile):
          rect_x2 += rect_w
          rect_c += 255 / (rect_num - 1)
    # Add logo in path specified:
-   if options.logopath != '': cmd += ' "%s" -compose plus -composite' % options.logopath
+   if options.logopath != '': cmd += ' "%s" -compose plus -gravity center -composite' % options.logopath
    # Stereo:
    if Stereo: cmd += ' -resize "%dx%d!"' % ( Width/2, Height)
    # Set quality if specified:

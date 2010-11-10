@@ -49,7 +49,7 @@ def dailiesEvaluate( node):
       if suffix != None and suffix != '': movname += '_' + suffix
       # Version:
       version = int(node.knob('version').value())
-      if version != None and version != '': movname += '_v%02d' % version
+      if version != None and version != '': movname += '_v%03d' % version
       # Date:
       movname += time.strftime('_%y%m%d')
 
@@ -97,7 +97,9 @@ def dailiesGenCmd( node):
    draw235  = node.knob('draw235' ).value()
    line169  = node.knob('line169' ).value()
    line235  = node.knob('line235' ).value()
+   logopath = node.knob('logopath').value()
    version  = int(node.knob('version').value())
+   logosize = int(node.knob('logosize').value())
 
    # Command Construction:
    cmd = os.environ['CGRU_LOCATION']
@@ -116,7 +118,7 @@ def dailiesGenCmd( node):
    if company  is not None and company  != '': cmd += ' --company "%s"'  % company
    if project  is not None and project  != '': cmd += ' --project "%s"'  % project
    if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot
-   if version  is not None and version  != '': cmd += ' --ver "v%02d"'   % version
+   if version  is not None and version  != '': cmd += ' --ver "v%03d"'   % version
    if artist   is not None and artist   != '': cmd += ' --artist "%s"'   % artist
    if activity is not None and activity != '': cmd += ' --activity "%s"' % activity
    if comments is not None and comments != '': cmd += ' --comments "%s"' % comments
@@ -124,6 +126,9 @@ def dailiesGenCmd( node):
    if draw235  is not None and draw235  != '': cmd += ' --draw235 "%s"'  % draw235
    if line169  is not None and line169  != '': cmd += ' --line169 "%s"'  % line169
    if line235  is not None and line235  != '': cmd += ' --line235 "%s"'  % line235
+   if logopath is not None and logopath != '':
+      cmd += ' --logopath "%s"' % logopath
+      cmd += ' --logosize %d'   % logosize
 
    # Stereo:
    if images.find('%v') != -1 or images.find('%V') != -1:
