@@ -392,7 +392,7 @@ class Dialog( QtGui.QWidget):
       self.lLogo.addWidget( self.tLogoSize)
       self.sbLogoSize = QtGui.QSpinBox( self)
       self.sbLogoSize.setRange( 1, 100)
-      self.sbLogoSize.setValue( 17)
+      self.sbLogoSize.setValue( Options.logosize)
       QtCore.QObject.connect( self.sbLogoSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       self.lLogo.addWidget( self.sbLogoSize)
 
