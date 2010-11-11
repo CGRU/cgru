@@ -436,12 +436,12 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
 //
 //############ Version: ########################
-#ifdef CGRU_VERSION
-   afanasy_build_version = CGRU_VERSION;
+#ifdef CGRU_REVISION
+   afanasy_build_version = CGRU_REVISION;
 #endif
-   PRINT("Afanasy build version = \"%d\"\n", afanasy_build_version);
+   printf("Afanasy build revision = \"%d\"\n", afanasy_build_version);
    cgru_version = QString::fromUtf8( getenv("CGRU_VERSION"));
-   PRINT("CGRU version = \"%s\"\n", cgru_version.toUtf8().data());
+   printf("CGRU version = \"%s\"\n", cgru_version.toUtf8().data());
 //###################################################
 
    load();

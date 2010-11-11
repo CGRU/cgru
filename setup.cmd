@@ -4,9 +4,6 @@ SET CGRU_LOCATION=%CD%
 rem Add CGRU bin to path:
 SET PATH=%CGRU_LOCATION%\bin;%PATH%
 
-rem Get CGRU version:
-call getversion.cmd
-
 rem Python module path:
 SET CGRU_PYTHON=%CGRU_LOCATION%\lib\python
 if defined PYTHONPATH (
@@ -14,3 +11,9 @@ if defined PYTHONPATH (
 ) else (
    SET PYTHONPATH=%CGRU_PYTHON%
 )
+
+rem Get CGRU version:
+@echo off
+set folder=%1
+For /F "Tokens=*" %%I in ('python getrevision.py %folder%') Do Set CGRU_VERSION=%%I
+echo CGRU_VERSION %CGRU_VERSION%

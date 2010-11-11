@@ -11,6 +11,8 @@ Mxx_ru::Cpp::dll_target{
    qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )
    qt.use_modules QT_CORE, QT_NETWORK, QT_XML
 
+   define "CGRU_REVISION=#{ENV['CGRU_REVISION']}"
+
    case toolset.tag( "target_os" )
 
       when "unix"

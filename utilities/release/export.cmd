@@ -4,11 +4,11 @@ if exist override.cmd call override.cmd
 
 PUSHD ..\..
 
-call getversion.cmd
+call getversion.cmd .
 
 if exist %dest% mkdir %dest%
 
-echo %CGRU_VERSION% > %dest%\cgru_version.txt
+echo %CGRU_VERSION% > %dest%\version.txt
 
 set afanasy=trunk
 

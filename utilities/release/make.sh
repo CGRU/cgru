@@ -1,10 +1,14 @@
 #!/bin/bash
 
-# Version:
-packsver="1.2.4"
-
 # Location:
 cgruRoot="../.."
+
+# Version and revision:
+packsver=`cat $cgruRoot/version.txt`
+pushd $cgruRoot/utilities > /dev/null
+packsrev=`python ./getrevision.py ..`
+popd > /dev/null
+echo "CGRU $packsver rev$packsrev"
 
 # Afanasy branch:
 afanasy="trunk"
@@ -55,6 +59,9 @@ if [ -d $cgruExp ]; then
 fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
 svn export $cgruRoot $cgruExp
+
+# Writing version and revision:
+echo "${packsver} rev${packsrev}" > $cgruExp/version.txt
 
 # Copying general components:
 cgruAll="__all__"

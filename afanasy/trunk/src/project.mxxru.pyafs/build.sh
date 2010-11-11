@@ -3,6 +3,7 @@
 export UNIXTYPE="LINUX"
 export MXX_RU_CPP_TOOLSET=gcc_linux
 
+# Set locations:
 cgru=$PWD
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
@@ -11,6 +12,13 @@ cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 pythondir=$cgru_utils/python
 qt=$cgru_utils/qt/qt-4.7.0-static
+
+# Setup Version:
+pushd .. > /dev/null
+folder=$PWD
+cd $cgru/utilities
+source ./getrevision.sh $folder
+popd > /dev/null
 
 export AF_LFLAGS="-lrt -lz -lgthread -lglib"
 

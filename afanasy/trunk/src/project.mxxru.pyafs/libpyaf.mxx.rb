@@ -11,6 +11,8 @@ Mxx_ru::Cpp::dll_target{
    lib 'QtNetwork'
    lib 'QtXml'
 
+   define "CGRU_REVISION=#{ENV['CGRU_REVISION']}"
+
    case toolset.tag('target_os')
 
       when 'unix'

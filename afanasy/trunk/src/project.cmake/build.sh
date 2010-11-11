@@ -8,8 +8,8 @@ export AF_ADD_LFLAGS="-lutil"
 
 pushd .. > /dev/null
 folder=$PWD
-cd ../../..
-source ./getversion.sh $folder
+cd ../../../utilities
+source ./getrevision.sh $folder
 popd > /dev/null
 
 [ -f override.sh ] && source override.sh

@@ -13,8 +13,8 @@ cgru_python=$cgru_utils/python/2.5.5
 # Setup Version:
 pushd .. > /dev/null
 folder=$PWD
-cd $cgru
-source ./getversion.sh $folder
+cd $cgru/utilities
+source ./getrevision.sh $folder
 popd > /dev/null
 
 # Setup Qt (use system by default):

@@ -13,8 +13,8 @@ cgru=`dirname $cgru`
 # Setup Version:
 pushd .. > /dev/null
 folder=$PWD
-cd $cgru
-source ./getversion.sh $folder
+cd $cgru/utilities
+source ./getrevision.sh $folder
 popd > /dev/null
 
 

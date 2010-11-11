@@ -46,7 +46,7 @@ void ButtonMonitor::createImage()
 {
    // Calculate button images filename:
    static const QString img_extension = ".png";
-   QString img_filename = af::Environment::getAfRoot() + "/icons/watch_button_";
+   QString img_filename = af::Environment::getAfRoot() + "/icons/watch/buttons/";
    switch( type)
    {
       case Watch::WJobs:

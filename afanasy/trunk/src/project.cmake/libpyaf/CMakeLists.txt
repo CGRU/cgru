@@ -22,3 +22,5 @@ if(WIN32)
    set_target_properties(pyaf PROPERTIES SUFFIX ".pyd")
 endif(WIN32)
 install(TARGETS pyaf RUNTIME DESTINATION bin LIBRARY DESTINATION bin)
+
+add_definitions(-DCGRU_REVISION=$ENV{CGRU_REVISION})

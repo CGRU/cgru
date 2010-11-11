@@ -6,9 +6,6 @@ export CGRU_LOCATION=$PWD
 # Add CGRU bin to path:
 export PATH="${CGRU_LOCATION}/bin:${PATH}"
 
-# Get CGRU version:
-source "./getversion.sh"
-
 # Python module path:
 export CGRU_PYTHON="${CGRU_LOCATION}/lib/python"
 if [ "$PYTHONPATH" != "" ]; then
@@ -16,3 +13,7 @@ if [ "$PYTHONPATH" != "" ]; then
 else
    export PYTHONPATH="${CGRU_PYTHON}"
 fi
+
+# Get CGRU version:
+export CGRU_VERSION=`cat version.txt`
+echo CGRU_VERSION $CGRU_VERSION

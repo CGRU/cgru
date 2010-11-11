@@ -34,4 +34,10 @@ PyMODINIT_FUNC initpyaf(void)
    PyModule_AddObject( module, "Job",     (PyObject*)&PyAf_Job_Type     );
    PyModule_AddObject( module, "Block",   (PyObject*)&PyAf_Block_Type   );
    PyModule_AddObject( module, "Task",    (PyObject*)&PyAf_Task_Type    );
+
+//############ Version: ########################
+#ifdef CGRU_REVISION
+   printf("Afanasy build revision = \"%d\"\n", CGRU_REVISION);
+#endif
+//###################################################
 }

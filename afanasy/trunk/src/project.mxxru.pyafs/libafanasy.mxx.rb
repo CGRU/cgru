@@ -6,6 +6,8 @@ Mxx_ru::Cpp::lib_target{
 
    include_path("#{ENV['QTDIR']}/include", MxxRu::Cpp::Target::OPT_UPSPREAD)
 
+   define "CGRU_REVISION=#{ENV['CGRU_REVISION']}"
+
    case toolset.tag( "target_os" )
       when "unix"
 

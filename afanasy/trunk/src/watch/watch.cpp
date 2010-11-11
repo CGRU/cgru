@@ -10,6 +10,7 @@
 
 #include "../libafqt/qenvironment.h"
 
+#include "blockinfo.h"
 #include "buttonmonitor.h"
 #include "dialog.h"
 #include "monitorhost.h"
@@ -42,6 +43,24 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    app = pApplication;
    d = pDialog;
    m = d->getMonitor();
+
+// Get services icons:
+/*
+   QMap<QString, QPixmap> services_icons_large;
+   QMap<QString, QPixmap> services_icons_small;
+
+   QDir dir( af::Environment::getAfRoot() + "/icons/watch/services");
+   if( false == dir.exists()) return;
+   QFileInfoList files = dir.entryInfoList();
+   if( files.size() == 0) return;
+   for( int i = 0; i < files.size(); i++)
+   {
+printf( "%s\n", files[i].fileName().toUtf8().data());
+      QPixmap icon( files[i].fileName());
+      services_icons_large[ files[i].completeBaseName()] = icon.scaledToHeight( BlockInfo::Height);
+      services_icons_small[ files[i].completeBaseName()] = icon.scaledToHeight( BlockInfo::HeightCompact);
+   }
+*/
 }
 
 Watch::~Watch(){}
