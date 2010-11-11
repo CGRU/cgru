@@ -19,8 +19,11 @@ if exist %cgru_python% (
 
 if exist override.cmd call override.cmd
 
-pushd %cgru%
-call getversion.cmd
+rem Get Afanasy sources revision:
+pushd ..
+set folder=%CD%
+cd %cgru%\utilities
+call getrevision.cmd %folder%
 popd
 
 cmake -G "%CMAKE_GENERATOR%" .

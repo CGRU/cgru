@@ -1,3 +1,5 @@
+@echo off
+
 rem Set CGRU root:
 SET CGRU_LOCATION=%CD%
 
@@ -13,7 +15,5 @@ if defined PYTHONPATH (
 )
 
 rem Get CGRU version:
-@echo off
-set folder=%1
-For /F "Tokens=*" %%I in ('python getrevision.py %folder%') Do Set CGRU_VERSION=%%I
+For /F "Tokens=*" %%I in ('type version.txt') Do Set CGRU_VERSION=%%I
 echo CGRU_VERSION %CGRU_VERSION%

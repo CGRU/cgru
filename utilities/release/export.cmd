@@ -4,11 +4,7 @@ if exist override.cmd call override.cmd
 
 PUSHD ..\..
 
-call getversion.cmd .
-
 if exist %dest% mkdir %dest%
-
-echo %CGRU_VERSION% > %dest%\version.txt
 
 set afanasy=trunk
 
@@ -44,5 +40,12 @@ xcopy plugins\maya\doc %dest%\plugins\maya\doc\ /ys
 xcopy plugins\maya\icons %dest%\plugins\maya\icons\ /ys
 xcopy plugins\maya\mel %dest%\plugins\maya\mel\ /ys
 xcopy plugins\maya\mll %dest%\plugins\maya\mll\ /ys
+
+rem Get and store version and revision:
+For /F "Tokens=*" %%I in ('type version.txt') Do Set CGRU_VERSION=%%I
+cd utilities
+call getrevision.cmd ..
+echo CGRU_REVISION %CGRU_REVISION%
+echo %CGRU_VERSION% rev%CGRU_REVISION% > %dest%\version.txt
 
 POPD

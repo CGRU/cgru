@@ -1,3 +1,5 @@
+@echo off
+
 PUSHD ..
 call setup.cmd
 POPD

@@ -9,6 +9,13 @@ SET PYTHONS=%cgru%\utilities\python
 
 if exist override.cmd call override.cmd
 
+rem Get Afanasy sources revision:
+pushd ..
+set folder=%CD%
+cd %cgru%\utilities
+call getrevision.cmd %folder%
+popd
+
 python build.py
 
 pause
