@@ -14,7 +14,7 @@ from optparse import OptionParser
 parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
 parser.add_option(      '--name',         dest='jobname',      type='string', default='', help='job name')
 parser.add_option('-l', '--labels',       dest='labels',       type='string', default='', help='blocks names (labels)')
-parser.add_option(      '--types',        dest='types',        type='string', default='', help='blocks types (services)')
+parser.add_option(      '--services',     dest='services',     type='string', default='', help='blocks types (services)')
 parser.add_option('-t', '--time',         dest='timesec',      type='float',  default=2,  help='time per frame in seconds')
 parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
 parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
@@ -39,12 +39,12 @@ parser.add_option(      '--mhsame',       dest='mhsame',       type='int',    de
 parser.add_option(      '--mhservice',    dest='mhservice',    type='int',    default=-1, help='multi host tasks service emulaton sleep seconds')
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
-parser.add_option(      '--parsertype',   dest='parsertype',   type='string', default='', help='parser type, default if not set')
+parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
 parser.add_option(      '--pause',        dest='pause',        type='int',    default=0,  help='start job paused')
 (options, args) = parser.parse_args()
 jobname     = options.jobname
 labels      = options.labels
-types       = options.types
+services    = options.services
 timesec     = options.timesec
 randtime    = options.randtime
 numblocks   = options.numblocks
@@ -70,7 +70,7 @@ mhwaitsrv   = options.mhwaitsrv
 mhsame      = options.mhsame
 mhservice   = options.mhservice
 pause       = options.pause
-parsertype  = options.parsertype
+parser      = options.parser
 
 if jobname == '': jobname = '_empty_'
 job = af.Job( jobname)
@@ -81,7 +81,7 @@ if labels != '': blocknames = labels.split(':')
 else: blocknames.append('block')
 
 blocktypes = []
-if types != '': blocktypes = types.split(':')
+if services != '': blocktypes = services.split(':')
 else: blocktypes.append('generic')
 
 if numblocks < len( blocknames): numblocks = len( blocknames)
@@ -100,7 +100,7 @@ for b in range( numblocks):
    block = af.Block( blockname, blocktype)
    job.blocks.append( block)
 
-   if parsertype != '': block.setParserType( parsertype)
+   if parser != '': block.setParser( parsertype)
 
    if b > 0: job.blocks[b-1].setTasksDependMask( blockname)
 

@@ -34,6 +34,25 @@ void MonitorAf::setZombie()
    Node::setZombie();
 }
 
+bool MonitorAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
+{
+   switch( type)
+   {
+   case af::Msg::TMonitorExit:
+   {
+      MsgAf* msg = new MsgAf( af::Msg::TClientExitRequest);
+      msg->setAddress( this);
+      msg->dispatch();
+      return true;
+   }
+   default:
+   {
+      return false;
+   }
+   }
+   return true;
+}
+
 bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 {
    time_activity = time( NULL);

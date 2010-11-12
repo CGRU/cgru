@@ -14,8 +14,8 @@ PyObject * PyAf_Block_appendTask(            PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_output(                PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setName(               PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setTasksName(          PyAf_Block_Object *self, PyObject *arg);
-PyObject * PyAf_Block_setTasksType(          PyAf_Block_Object *self, PyObject *arg);
-PyObject * PyAf_Block_setParserType(         PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setService(            PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setParser(             PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setParserCoeff(        PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setWorkingDirectory(   PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setEnvironment(        PyAf_Block_Object *self, PyObject *arg);
@@ -48,8 +48,8 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"output",              (PyCFunction) PyAf_Block_output,                METH_O,        "Print information."             },
    {"setName",             (PyCFunction) PyAf_Block_setName,               METH_O,        "Set name."                      },
    {"setTasksName",        (PyCFunction) PyAf_Block_setTasksName,          METH_O,        "Set tasks name."                },
-   {"setTasksType",        (PyCFunction) PyAf_Block_setTasksType,          METH_O,        "Set tasks service type."        },
-   {"setParserType",       (PyCFunction) PyAf_Block_setParserType,         METH_O,        "Set tasks parser type."         },
+   {"setService",          (PyCFunction) PyAf_Block_setService,            METH_O,        "Set tasks service type."        },
+   {"setParser",           (PyCFunction) PyAf_Block_setParser,             METH_O,        "Set tasks parser type."         },
    {"setParserCoeff",      (PyCFunction) PyAf_Block_setParserCoeff,        METH_O,        "Set tasks parser coefficient."  },
    {"setWorkingDirectory", (PyCFunction) PyAf_Block_setWorkingDirectory,   METH_O,        "Set tasks working directory."   },
    {"setEnvironment",      (PyCFunction) PyAf_Block_setEnvironment,        METH_O,        "Set tasks extra environment."   },

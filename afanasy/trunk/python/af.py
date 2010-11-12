@@ -35,32 +35,32 @@ class Task(pyaf.Task):
       pyaf.Task.setFiles( self, cmd)
 
 class Block(pyaf.Block):
-   def __init__( self, blockname = 'block', blocktype = 'generic'):
+   def __init__( self, blockname = 'block', service = 'generic'):
       self.env = afenv.Env()
       if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
       self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Block.__init__( self)
-      parsertype = 'none'
-      if not CheckClass( self.env.Vars['afroot'], blocktype, 'services'):
-         print 'Error: Unknown service "%s", setting to "generic"' % blocktype
-         blocktype = 'generic'
+      parser = 'none'
+      if not CheckClass( self.env.Vars['afroot'], service, 'services'):
+         print 'Error: Unknown service "%s", setting to "generic"' % service
+         service = 'generic'
       else:
-         __import__("services", globals(), locals(), [blocktype])
-         parsertype = eval(('services.%s.parser') % blocktype)
+         __import__("services", globals(), locals(), [service])
+         parser = eval(('services.%s.parser') % service)
       self.setName( blockname)
-      self.setTasksType( blocktype)
-      self.setParserType( parsertype)
+      self.setService( service)
+      self.setParser( parser)
       self.setWorkingDirectory( os.getenv('PWD', os.getcwd()) )
       self.setCapacity( int( self.env.Vars['task_default_capacity'] ) )
       self.tasks = []
 
-   def setParserType( self, parsertype, nocheck = False):
+   def setParser( self, parser, nocheck = False):
       if not nocheck:
-         if not CheckClass( self.env.Vars['afroot'], parsertype, 'parsers'):
+         if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
             if parsertype != 'none':
-               print 'Error: Unknown parser "%s", setting to "none"' % parsertype
-               parsertype = 'none'
-      pyaf.Block.setParserType( self, parsertype)
+               print 'Error: Unknown parser "%s", setting to "none"' % parser
+               parser = 'none'
+      pyaf.Block.setParser( self, parser)
 
    def setNumeric( self, start = 1, end = 10, perhost = 1, increment = 1):
       pyaf.Block.setNumeric( self, start, end, perhost, increment)

@@ -17,9 +17,21 @@ void TheadRun::msgCase( MsgAf *msg)
 {
 switch ( msg->type())
 {
+   case af::Msg::TTalkExit:
+   {
+      af::MCGeneral mcgeneral( msg);
+      talks->action( mcgeneral, msg->type(), NULL, monitors);
+      break;
+   }
    case af::Msg::TTalkDeregister:
    {
       if( talks->setZombie( msg->int32())) monitors->addEvent( af::Msg::TMonitorTalksDel, msg->int32());
+      break;
+   }
+   case af::Msg::TMonitorExit:
+   {
+      af::MCGeneral mcgeneral( msg);
+      monitors->action( mcgeneral, msg->type(), NULL, NULL);
       break;
    }
    case af::Msg::TMonitorDeregister:
@@ -54,12 +66,12 @@ switch ( msg->type())
    case af::Msg::TRenderNimby:
    case af::Msg::TRenderFree:
    case af::Msg::TRenderEject:
-   case af::Msg::TRenderExit:
    case af::Msg::TRenderDelete:
    case af::Msg::TRenderRestart:
    case af::Msg::TRenderStart:
    case af::Msg::TRenderReboot:
    case af::Msg::TRenderShutdown:
+   case af::Msg::TRenderExit:
    {
       af::MCGeneral mcgeneral( msg);
       renders->action( mcgeneral, msg->type(), jobs, monitors);
@@ -140,8 +152,8 @@ switch ( msg->type())
    case af::Msg::TBlockWorkingDir:
    case af::Msg::TBlockFiles:
    case af::Msg::TBlockCmdPost:
-   case af::Msg::TBlockTasksType:
-   case af::Msg::TBlockParserType:
+   case af::Msg::TBlockService:
+   case af::Msg::TBlockParser:
    case af::Msg::TBlockCapacity:
    case af::Msg::TBlockCapacityCoeffMin:
    case af::Msg::TBlockCapacityCoeffMax:

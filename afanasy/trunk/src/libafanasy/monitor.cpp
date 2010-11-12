@@ -53,6 +53,8 @@ void Monitor::readwrite( Msg * msg)
    rw_uint32_t( time_activity, msg);
    rw_QString ( name,          msg);
    rw_QString ( username,      msg);
+   rw_int32_t(  revision,      msg);
+   rw_QString(  version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
 
@@ -82,6 +84,7 @@ void Monitor::stdOut( bool full) const
    printf("#%d: %s@%s :: ", id, name.toUtf8().data(), username.toUtf8().data());
    address->stdOut();
    printf("\n");
+   printf("   Version: %s rev%d\n", version.toUtf8().data(), revision);
 
    printf(" UIds[%d]:", (int)(jobsUsersIds.size()));
    for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
@@ -91,6 +94,7 @@ void Monitor::stdOut( bool full) const
       printf(" %d", *it);
    printf("\n");
 
+   if( full == false ) return;
    for( int e = 0; e < EventsCount; e++)
    {
       if( full )

@@ -40,8 +40,8 @@ JobPy::JobPy( JobAf * jobPtr):
 
       // Block name
       PyTuple_SetItem( args, 0, PyString_FromString( block->getName().toUtf8().data()));
-      // Tasks type
-      PyTuple_SetItem( args, 1, PyString_FromString( block->getTasksType().toUtf8().data()));
+      // Service
+      PyTuple_SetItem( args, 1, PyString_FromString( block->getService().toUtf8().data()));
       // Tasks number
       PyTuple_SetItem( args, 2, PyInt_FromLong( block->getTasksNum()));
 

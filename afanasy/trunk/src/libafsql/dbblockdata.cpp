@@ -64,8 +64,8 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrInt32(  DBAttr::_need_hdd,             &need_hdd               ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_need_power,           &need_power             ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_parsercoeff,          &parsercoeff            ));
-   dbAddAttr( new DBAttrString( DBAttr::_parsertype,           &parsertype             ));
-   dbAddAttr( new DBAttrString( DBAttr::_taskstype,            &taskstype              ));
+   dbAddAttr( new DBAttrString( DBAttr::_service,              &service                ));
+   dbAddAttr( new DBAttrString( DBAttr::_parser,               &parser                 ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_post,             &cmd_post               ));
    dbAddAttr( new DBAttrString( DBAttr::_environment,          &environment            ));
    dbAddAttr( new DBAttrString( DBAttr::_customdata,           &customdata             ));

@@ -33,9 +33,9 @@ public:
    QString  cmdpre;
    QString  environment;
    QString  cmdpost;
-   QString  taskstype;
    QString  tasksname;
-   QString  parsertype;
+   QString  service;
+   QString  parser;
    QString  hostsmask;
    QString  hostsmask_exclude;
    int      maxhosts;

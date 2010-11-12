@@ -113,11 +113,13 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
    if( address) delete address;
    address = new af::Address( render->getAddress());
    time_launch = render->time_launch;
+   revision = render->revision;
+   version = render->version;
    setRegisterTime();
    getFarmHost( &render->host);
    setOnline();
    update( render);
-   appendLog("Online.");
+   appendLog(QString("Online (r%1 v%2).").arg(revision).arg(version));
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
    AFCommon::QueueDBUpdateItem( this);
    return true;
@@ -285,7 +287,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    {
       if( false == isOnline() ) return true;
       appendLog( QString("Exit by %1").arg(userhost));
-      exitClient( af::Msg::TRenderExitRequest, jobs, monitoring);
+      exitClient( af::Msg::TClientExitRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderDelete:
@@ -300,28 +302,28 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    {
       if( false == isOnline() ) return true;
       appendLog( QString("Restarted by %1").arg(userhost));
-      exitClient( af::Msg::TRenderRestartRequest, jobs, monitoring);
+      exitClient( af::Msg::TClientRestartRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderStart:
    {
       if( false == isOnline() ) return true;
       appendLog( QString("Starting another render by %1").arg(userhost));
-      exitClient( af::Msg::TRenderStartRequest, jobs, monitoring);
+      exitClient( af::Msg::TClientStartRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderReboot:
    {
       if( false == isOnline() ) return true;
       appendLog( QString("Reboot computer by %1").arg(userhost));
-      exitClient( af::Msg::TRenderRebootRequest, jobs, monitoring);
+      exitClient( af::Msg::TClientRebootRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderShutdown:
    {
       if( false == isOnline() ) return true;
       appendLog( QString("Shutdown computer by %1").arg(userhost));
-      exitClient( af::Msg::TRenderShutdownRequest, jobs, monitoring);
+      exitClient( af::Msg::TClientShutdownRequest, jobs, monitoring);
       return true;
    }
    default:
@@ -370,7 +372,7 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
    MsgAf* msg = new MsgAf( type);
    msg->setAddress( this);
    msg->dispatch();
-   if( type != af::Msg::TRenderStartRequest ) offline( jobs, af::TaskExec::UPRenderExit, monitoring);
+   if( type != af::Msg::TClientStartRequest ) offline( jobs, af::TaskExec::UPRenderExit, monitoring);
 }
 
 void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)

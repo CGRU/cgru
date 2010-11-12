@@ -58,6 +58,10 @@ void ListTalks::contextMenuEvent( QContextMenuEvent *event)
    connect( action, SIGNAL( triggered() ), this, SLOT( actSendMessage() ));
    menu.addAction( action);
 
+   action = new QAction( "Exit Talk", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
+   menu.addAction( action);
+
    menu.exec( event->globalPos());
 }
 
@@ -118,4 +122,10 @@ void ListTalks::actSendMessage()
    for( int i = 0; i < items.count(); i++) mcdmsg.addUser(((ItemTalk*)(items[i]))->getUserName());
 
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTalkDistributeData, &mcdmsg));
+}
+
+void ListTalks::actExit()
+{
+   af::MCGeneral mcgeneral;
+   action( mcgeneral, af::Msg::TTalkExit);
 }

@@ -26,13 +26,13 @@ public:
    void setName( const char * str);
 
 /// Set tasks service type name.
-   void setTasksType( const char * str);
+   void setService( const char * str);
 
 /// Set tasks name.
    void setTasksName( const char * str);
 
 /// Set tasks parser type ( if parser type name does not match tasks type ).
-   void setParserType( const char * str);
+   void setParser( const char * str);
 
 /// Set current block tasks working directory.
    void setWorkingDirectory( const char * str);

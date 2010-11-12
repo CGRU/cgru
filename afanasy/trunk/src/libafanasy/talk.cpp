@@ -33,13 +33,16 @@ void Talk::readwrite( Msg * msg)
    rw_uint32_t( time_register, msg);
    rw_QString ( name,          msg);
    rw_QString ( username,      msg);
+   rw_int32_t(  revision,      msg);
+   rw_QString(  version,       msg);
    if( msg->isWriting() ) address->write( msg);
    else address = new Address( msg);
 }
 
 void Talk::stdOut( bool full) const
 {
-   printf("%s@%s :: ", name.toUtf8().data(), username.toUtf8().data());
+   printf("%s@%s  :: ", name.toUtf8().data(), username.toUtf8().data());
    address->stdOut();
    printf("\n");
+   printf("   Version: %s rev%d\n", version.toUtf8().data(), revision);
 }

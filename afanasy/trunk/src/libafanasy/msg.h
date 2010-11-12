@@ -72,6 +72,12 @@ public:
 /**/TFarmLoad/**/,                  ///< Reload farm file
 
 
+/**/TClientExitRequest/**/,         ///< Request to client to exit,
+/**/TClientRestartRequest/**/,      ///< Restart client application,
+/**/TClientStartRequest/**/,        ///< Start client application,
+/**/TClientRebootRequest/**/,       ///< Reboot client host computer,
+/**/TClientShutdownRequest/**/,     ///< Shutdown client host computer,
+
 /*- Talk messages -*/
 /**/TTalkId/**/,                    ///< Id for new Talk. Server sends it back when new Talk registered.
 /**/TTalkUpdateId/**/,              ///< Update Talk with given id ( No information for updating Talk needed).
@@ -89,11 +95,6 @@ public:
 /** When Server successfully registered new Render it's send back it's id.**/
 /**/TRenderId/**/,
 /**/TRendersListRequest/**/,        ///< Request online Renders list message.
-/**/TRenderExitRequest/**/,         ///< Exit Render client program,
-/**/TRenderRestartRequest/**/,      ///< Restart Render client program,
-/**/TRenderStartRequest/**/,        ///< Start Render client program,
-/**/TRenderRebootRequest/**/,       ///< Reboot Render host computer,
-/**/TRenderShutdownRequest/**/,     ///< Shutdown Render host computer,
 /**/TRenderLogRequestId/**/,        ///< Request a log of Render with given id.
 /**/TRenderServicesRequestId/**/,   ///< Request a list of services of Render with given id.
 /**/TRenderDeregister/**/,          ///< Deregister Render with given id.
@@ -127,6 +128,7 @@ public:
 
 /**/TStatData/**/,                  ///< Statistics data.
 
+/*- Client messages -*/
 
 /*- Talk messages -*/
 /// Register Talk. Send by Talk client to register. Server sends back its id \c TTalkId.
@@ -135,6 +137,7 @@ public:
 /**/TTalksList/**/,                 ///< Message with a list of online Talks.
 /**/TTalkDistributeData/**/,        ///< Message with a list Talk's users and a text to send to them.
 /**/TTalkData/**/,                  ///< Message to Talk with text.
+/**/TTalkExit/**/,                  ///< Ask server to shutdown client application(s),
 
 
 /*- Monitor messages -*/
@@ -149,6 +152,7 @@ public:
 /**/TMonitorJobsIdsSet/**/,         ///< Set jobs ids for monitoring.
 /**/TMonitorJobsIdsDel/**/,         ///< Delete monitoring jobs ids.
 /**/TMonitorMessage/**/,            ///< Send a message (TQString) to monitors with provieded ids (MCGeneral).
+/**/TMonitorExit/**/,               ///< Ask server to shutdown client application(s),
 
 /**/TMonitorEvents_BEGIN/**/,       ///< Events types start.
 
@@ -195,13 +199,13 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
 /**/TRenderEject/**/,               ///< Stop all tasks on Render,
-/**/TRenderExit/**/,                ///< Exit Render client program,
 /**/TRenderDelete/**/,              ///< Delete Render from afanasy server container and database,
 /**/TRenderRestart/**/,             ///< Restart Render client program,
 /**/TRenderStart/**/,               ///< Start Render client program,
 /**/TRenderReboot/**/,              ///< Reboot Render host computer,
 /**/TRenderShutdown/**/,            ///< Shutdown Render host computer,
 /**/TRenderAnnotate/**/,            ///< Set Render annotation,
+/**/TRenderExit/**/,                ///< Ask server to shutdown client application(s),
 
 
 /*- Users messages -*/
@@ -263,9 +267,9 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TBlockWorkingDir/**/,           ///< Set block working directory.
 /**/TBlockFiles/**/,                ///< Set block files.
 /**/TBlockCmdPost/**/,              ///< Set block post command.
-/**/TBlockTasksType/**/,            ///< Set block task type.
+/**/TBlockService/**/,              ///< Set block task type.
+/**/TBlockParser/**/,               ///< Set block parser type.
 /**/TBlockParserCoeff/**/,          ///< Set block parser coefficient.
-/**/TBlockParserType/**/,           ///< Set block parser type.
 /**/TBlockResetErrorHosts/**/,      ///< Reset block avoid hosts.
 /**/TBlockErrorsAvoidHost/**/,      ///< Set number of errors on host to avoid it.
 /**/TBlockErrorRetries/**/,         ///< Set number of automatic retries task with errors.

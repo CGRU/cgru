@@ -41,8 +41,8 @@ private slots:
    void actBlockWorkingDir();
    void actBlockFiles();
    void actBlockCmdPost();
-   void actBlockTasksType();
-   void actBlockParserType();
+   void actBlockService();
+   void actBlockParser();
 
    void blockAction( int id_block, int id_action);
 

@@ -442,8 +442,8 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:
    case af::Msg::TBlockMaxHosts:
-   case af::Msg::TBlockTasksType:
-   case af::Msg::TBlockParserType:
+   case af::Msg::TBlockService:
+   case af::Msg::TBlockParser:
    case af::Msg::TBlockNeedMemory:
    case af::Msg::TBlockNeedHDD:
    case af::Msg::TBlockNeedPower:

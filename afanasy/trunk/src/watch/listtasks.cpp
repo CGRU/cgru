@@ -112,12 +112,12 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          connect( action, SIGNAL( triggered() ), this, SLOT( actBlockFiles() ));
          menu.addAction( action);
 
-         action = new QAction( "Set Tasks Type", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockTasksType() ));
+         action = new QAction( "Set Service Type", this);
+         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockService() ));
          menu.addAction( action);
 
          action = new QAction( "Set Parser Type", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockParserType() ));
+         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockParser() ));
          menu.addAction( action);
 
          break;
@@ -611,23 +611,23 @@ void ListTasks::actBlockCmdPost()
    af::MCGeneral mcgeneral( str);
    setBlockProperty( af::Msg::TBlockCmdPost, mcgeneral);
 }
-void ListTasks::actBlockTasksType()
+void ListTasks::actBlockService()
 {
    bool ok;
-   QString cur = ((ItemJobBlock*)( getCurrentItem()))->taskstype;
-   QString str = QInputDialog::getText(this, "Change Tasks Type", "Enter Type", QLineEdit::Normal, cur, &ok);
+   QString cur = ((ItemJobBlock*)( getCurrentItem()))->service;
+   QString str = QInputDialog::getText(this, "Change Service", "Enter Type", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
    af::MCGeneral mcgeneral( str);
-   setBlockProperty( af::Msg::TBlockTasksType, mcgeneral);
+   setBlockProperty( af::Msg::TBlockService, mcgeneral);
 }
-void ListTasks::actBlockParserType()
+void ListTasks::actBlockParser()
 {
    bool ok;
-   QString cur = ((ItemJobBlock*)( getCurrentItem()))->parsertype;
-   QString str = QInputDialog::getText(this, "Change Parser Type", "Enter Type", QLineEdit::Normal, cur, &ok);
+   QString cur = ((ItemJobBlock*)( getCurrentItem()))->parser;
+   QString str = QInputDialog::getText(this, "Change Parser", "Enter Type", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
    af::MCGeneral mcgeneral( str);
-   setBlockProperty( af::Msg::TBlockParserType, mcgeneral);
+   setBlockProperty( af::Msg::TBlockParser, mcgeneral);
 }
 
 void ListTasks::setBlockProperty( int type, af::MCGeneral & mcgeneral)

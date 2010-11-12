@@ -68,9 +68,10 @@ void DBAttr::init()
    DBName[_need_power            ] = "need_power";
    DBName[_need_properties       ] = "need_properties";
    DBName[_need_os               ] = "need_os";
+   DBName[_parser                ] = "parser";
    DBName[_parsercoeff           ] = "parsercoeff";
-   DBName[_parsertype            ] = "parsertype";
    DBName[_priority              ] = "priority";
+   DBName[_service               ] = "service";
    DBName[_services_disabled     ] = "services_disabled";
    DBName[_starts_count          ] = "starts_count";
    DBName[_state                 ] = "state";
@@ -79,7 +80,6 @@ void DBAttr::init()
    DBName[_tasksmaxruntime       ] = "tasksmaxruntime";
    DBName[_tasksname             ] = "tasksname";
    DBName[_tasksnum              ] = "tasksnum";
-   DBName[_taskstype             ] = "taskstype";
    DBName[_taskssumruntime       ] = "taskssumruntime";
    DBName[_time_creation         ] = "time_creation";
    DBName[_time_done             ] = "time_done";

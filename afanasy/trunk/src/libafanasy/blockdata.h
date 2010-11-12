@@ -65,9 +65,9 @@ public:
    inline void setParserCoeff( int value ) { parsercoeff = value; }
 
 /// Set block tasks type.
-   inline void setTasksType(        const QString  & str) { taskstype         = str;   }
+   inline void setService(          const QString  & str) { service           = str;   }
 /// Set block tasks parser type.
-   inline void setParserType(       const QString  & str) { parsertype        = str;   }
+   inline void setParser(           const QString  & str) { parser            = str;   }
 /// Set block tasks working directory.
    inline void setWDir(             const QString  & str) { wdir              = str;   }
 /// Set block tasks extra environment.
@@ -159,8 +159,8 @@ public:
    inline uint32_t       getState()          const { return state;            }///< Get state.
    inline int            getTasksNum()       const { return tasksnum;         }///< Get tasks quantity.
    inline int            getBlockNum()       const { return blocknum;         }///< Get block number in job.
-   inline const QString& getTasksType()      const { return taskstype;        }///< Get tasks type description.
-   inline const QString& getParserType()     const { return parsertype;       }///< Get tasks parser type.
+   inline const QString& getService()        const { return service;          }///< Get tasks type description.
+   inline const QString& getParser()         const { return parser;           }///< Get tasks parser type.
    inline uint32_t       getTasksMaxRunTime()const { return tasksmaxruntime;  }///< Get tasks maximum run time.
    inline int            getMaxHosts()       const { return maxhosts;         }///< Get block maximum hosts.
    inline const QString& getMultiHostService()const{ return multihost_service;}///< Get tasks parser type.
@@ -247,8 +247,10 @@ protected:
    int32_t need_power;
    int32_t need_hdd;
 
-   QString parsertype;     ///< Tasks parser type.
-   int32_t parsercoeff;    ///< Parser koefficient.
+   QString tasksname;   ///< Tasks name pattern;
+   QString service;     ///< Tasks service name.
+   QString parser;      ///< Tasks parser type.
+   int32_t parsercoeff; ///< Parser koefficient.
 
    QString wdir;        ///< Block tasks working directory.
    QString environment; ///< Block tasks extra environment.
@@ -261,8 +263,6 @@ protected:
 
    QString customdata;     ///< Custom data.
 
-   QString tasksname;   ///< Tasks name pattern;
-   QString taskstype;   ///< Tasks type description string.
 
 /// Maximum number of errors in task to retry it automatically
    int8_t errors_retries;

@@ -73,6 +73,8 @@ void Render::readwrite( Msg * msg)
 
    case Msg::TRenderRegister:
 
+      rw_int32_t(  revision,              msg);
+      rw_QString(  version,               msg);
       rw_QString ( name,                  msg);
       rw_QString ( username,              msg);
       rw_uint32_t( state,                 msg);
@@ -205,10 +207,11 @@ void Render::stdOut( bool full) const
    if( address == NULL) printf("address == NULL");
    else address->stdOut();
    printf(" - %d bytes.\n", calcWeight());
+   printf("   Version: %s rev%d\n", version.toUtf8().data(), revision);
 
+   if( full == false ) return;
    host.stdOut( full);
    hres.stdOut( full);
-   if( full == false ) return;
 
    printf("   Ready = %s\n", isReady() ? "TRUE" : "FALSE");
    printf("   Busy  = %s\n", isBusy()  ? "true" : "false");

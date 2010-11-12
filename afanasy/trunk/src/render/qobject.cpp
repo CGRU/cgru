@@ -180,29 +180,29 @@ printf("Object::caseMessage: "); msg->stdOut();
       break;
    }*/
    case af::Msg::TVersionMismatch:
-   case af::Msg::TRenderExitRequest:
+   case af::Msg::TClientExitRequest:
    {
       exitRender();
       break;
    }
-   case af::Msg::TRenderRestartRequest:
+   case af::Msg::TClientRestartRequest:
    {
       exitRender();
       QProcess::startDetached( af::Environment::getRenderExec());
       break;
    }
-   case af::Msg::TRenderStartRequest:
+   case af::Msg::TClientStartRequest:
    {
       QProcess::startDetached( af::Environment::getRenderExec());
       break;
    }
-   case af::Msg::TRenderRebootRequest:
+   case af::Msg::TClientRebootRequest:
    {
       exitRender();
       QProcess::startDetached("reboot");
       break;
    }
-   case af::Msg::TRenderShutdownRequest:
+   case af::Msg::TClientShutdownRequest:
    {
       exitRender();
       QProcess::startDetached("shutdown");

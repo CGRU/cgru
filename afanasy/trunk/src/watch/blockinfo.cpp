@@ -88,6 +88,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost_max        = block->getMultiHostMax();
       multihost_waitmax    = block->getMultiHostWaitMax();
       multihost_waitsrv    = block->getMultiHostWaitSrv();
+      service_name         = block->getService();
       numeric              = block->isNotNumeric();
       varcapacity          = block->canVarCapacity();
       multihost            = block->isMultiHost();
@@ -235,7 +236,15 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 
    if( compact_display)
    {
-      painter->drawText(  x+1, y-2, w, 15, Qt::AlignTop | Qt::AlignLeft, str_compact );
+      int xoffset = 1;
+      const QPixmap * icon = Watch::getServiceIcon( service_name, true);
+      if( icon )
+      {
+         painter->drawText(  x, y-2, w, 15, Qt::AlignTop | Qt::AlignLeft, service_name[0] );
+//printf("%s\n", service_name.toUtf8().data());
+         xoffset += 15;
+      }
+      painter->drawText(  x+xoffset, y-2, w, 15, Qt::AlignTop | Qt::AlignLeft, str_compact );
       return;
    }
 

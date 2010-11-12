@@ -22,6 +22,7 @@ protected:
 
 private slots:
    void actSendMessage();
+   void actExit();
 
 private:
    static int     SortType;

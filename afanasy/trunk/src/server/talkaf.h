@@ -14,6 +14,8 @@ public:
 
    void setZombie();
 
+   bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+
    void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 private:

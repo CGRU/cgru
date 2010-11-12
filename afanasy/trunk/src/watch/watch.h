@@ -91,6 +91,8 @@ public:
 
    static void startProcess( const QString & cmd, const QString & wdir = QString());
 
+   static const QPixmap * getServiceIcon( const QString & service_name, bool small);
+
 private:
    static MonitorHost * m;
    static Dialog * d;
@@ -105,4 +107,7 @@ private:
    static QLinkedList<int> listenjobids;
    static QLinkedList<int> watchtasksjobids;
    static QLinkedList<QWidget*> watchtaskswindows;
+
+   static QMap<QString, QPixmap *> services_icons_large;
+   static QMap<QString, QPixmap *> services_icons_small;
 };

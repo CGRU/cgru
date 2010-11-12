@@ -35,15 +35,15 @@ PyObject * PyAf_Block_setTasksName( PyAf_Block_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Block_setTasksType( PyAf_Block_Object *self, PyObject *arg)
+PyObject * PyAf_Block_setService( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setTasksType( PyString_AsString( arg));
+   self->block->setService( PyString_AsString( arg));
    Py_RETURN_TRUE;
 }
 
-PyObject * PyAf_Block_setParserType( PyAf_Block_Object *self, PyObject *arg)
+PyObject * PyAf_Block_setParser( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setParserType( PyString_AsString( arg));
+   self->block->setParser( PyString_AsString( arg));
    Py_RETURN_TRUE;
 }
 

@@ -12,9 +12,9 @@ using namespace afapi;
 Block::Block()
 {
 AFINFA("API: Block constuctor called.\n");
-   name       = AFJOB::BLOCK_DEFAULT_NAME;
-   taskstype  = AFJOB::BLOCK_DEFAULT_SERVICE;
-   parsertype = AFJOB::BLOCK_DEFAULT_PARSER;
+   name     = AFJOB::BLOCK_DEFAULT_NAME;
+   service  = AFJOB::BLOCK_DEFAULT_SERVICE;
+   parser   = AFJOB::BLOCK_DEFAULT_PARSER;
 }
 
 Block::~Block()
@@ -40,13 +40,13 @@ void Block::setTasksMaxRunTime(  int value   )  { tasksmaxruntime = value; }
 void Block::setParserCoeff(      int value   )  { parsercoeff     = value; }
 
 void Block::setName(             const char * str) {  name        = QString::fromUtf8(str);  }
-void Block::setTasksType(        const char * str) {  taskstype   = QString::fromUtf8(str);  }
+void Block::setService(          const char * str) {  service     = QString::fromUtf8(str);  }
+void Block::setParser(           const char * str) {  parser      = QString::fromUtf8(str);  }
 void Block::setTasksName(        const char * str) {  tasksname   = QString::fromUtf8(str);  }
 void Block::setCmdPre(           const char * str) {  cmd_pre     = QString::fromUtf8(str);  }
 void Block::setCmdPost(          const char * str) {  cmd_post    = QString::fromUtf8(str);  }
 void Block::setCommand(          const char * str) {  command     = QString::fromUtf8(str);  }
 void Block::setFiles(            const char * str) {  files       = QString::fromUtf8(str);  }
-void Block::setParserType(       const char * str) {  parsertype  = QString::fromUtf8(str);  }
 void Block::setWorkingDirectory( const char * str) {  wdir        = QString::fromUtf8(str);  }
 void Block::setEnvironment(      const char * str) {  environment = QString::fromUtf8(str);  }
 void Block::setCustomData(       const char * str) {  customdata  = QString::fromUtf8(str);  }

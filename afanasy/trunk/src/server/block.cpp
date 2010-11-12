@@ -137,7 +137,7 @@ bool Block::canRun( RenderAf * render)
    // check available capacity:
    if( false == render->hasCapacity( data->getCapMinResult())) return false;
    // render services:
-   if( render->canRunService( data->getTasksType()) == false) return false;
+   if( render->canRunService( data->getService()) == false) return false;
    // check maximum hosts:
    if(( data->getMaxHosts() >= 0 ) && ( data->getProgressTasksRunning() >= data->getMaxHosts() )) return false;
    // check hosts mask:
@@ -358,20 +358,20 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_maxhosts);
       break;
    }
-   case af::Msg::TBlockTasksType:
+   case af::Msg::TBlockService:
    {
-      data->setTasksType( mcgeneral.getString());
+      data->setService( mcgeneral.getString());
       log( QString("Tasks type set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
-      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_taskstype);
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_service);
       break;
    }
-   case af::Msg::TBlockParserType:
+   case af::Msg::TBlockParser:
    {
-      data->setParserType( mcgeneral.getString());
+      data->setParser( mcgeneral.getString());
       log( QString("Parser type set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
-      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_parsertype);
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_parser);
       break;
    }
    case af::Msg::TBlockNeedMemory:

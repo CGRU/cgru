@@ -15,6 +15,7 @@ Client::Client( int flags, int Id):
    time_launch( 0),
    time_register( 0),
    time_update( 0),
+   revision( 0),
    address( NULL)
 {
    id = Id;
@@ -24,6 +25,8 @@ Client::Client( int flags, int Id):
       time_launch = time(NULL);
       username = af::Environment::getUserName();
       name = af::Environment::getHostName();
+      revision = af::Environment::getAfanasyBuildVersion();
+      version = af::Environment::getCGRUVersion();
    }
 }
 

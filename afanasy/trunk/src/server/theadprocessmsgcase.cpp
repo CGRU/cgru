@@ -554,8 +554,8 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockWorkingDir:
    case af::Msg::TBlockFiles:
    case af::Msg::TBlockCmdPost:
-   case af::Msg::TBlockTasksType:
-   case af::Msg::TBlockParserType:
+   case af::Msg::TBlockService:
+   case af::Msg::TBlockParser:
    case af::Msg::TBlockCapacity:
    case af::Msg::TBlockCapacityCoeffMin:
    case af::Msg::TBlockCapacityCoeffMax:
@@ -597,13 +597,13 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderUser:
    case af::Msg::TRenderFree:
    case af::Msg::TRenderEject:
-   case af::Msg::TRenderExit:
    case af::Msg::TRenderDelete:
    case af::Msg::TRenderRestart:
    case af::Msg::TRenderStart:
    case af::Msg::TRenderReboot:
    case af::Msg::TRenderShutdown:
    case af::Msg::TRenderDeregister:
+   case af::Msg::TRenderExit:
    case af::Msg::TUserAnnotate:
    case af::Msg::TUserAdd:
    case af::Msg::TUserDel:
@@ -627,6 +627,8 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TMonitorJobsIdsSet:
    case af::Msg::TMonitorJobsIdsDel:
    case af::Msg::TMonitorMessage:
+   case af::Msg::TMonitorExit:
+   case af::Msg::TTalkExit:
    {
 //printf("TheadReadMsg::msgCase: pushing message to run thread:\n"); msg->stdOut();
       msgQueue->pushMsg( msg);

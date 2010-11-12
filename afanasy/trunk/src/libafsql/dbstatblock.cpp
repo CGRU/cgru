@@ -14,7 +14,7 @@ DBStatBlock::DBStatBlock()
    dbAddAttr( new DBAttrString( DBAttr::_name_job,          &name_job         ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_flags,             &flags            ));
    dbAddAttr( new DBAttrString( DBAttr::_username,          &username         ));
-   dbAddAttr( new DBAttrString( DBAttr::_taskstype,         &taskstype        ));
+   dbAddAttr( new DBAttrString( DBAttr::_service,           &service          ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_tasksnum,          &tasksnum         ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_tasksdone,         &tasksdone        ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_taskssumruntime,   &taskssumruntime  ));
@@ -36,7 +36,7 @@ void DBStatBlock::addBlocks( const af::Job * job, QStringList * queries)
 
       name = block->getName();
       flags = block->getFlags();
-      taskstype = block->getTasksType();
+      service = block->getService();
       tasksnum = block->getTasksNum();
       tasksdone = block->getProgressTasksDone();
       taskssumruntime = block->getProgressTasksSumRunTime();

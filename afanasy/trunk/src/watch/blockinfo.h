@@ -52,6 +52,7 @@ private:
    uint32_t state;
 
    QString name;
+   QString service_name;
    QString str_runtime;
    QString str_progress;
    QString str_percent;

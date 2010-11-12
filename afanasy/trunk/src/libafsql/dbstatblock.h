@@ -21,7 +21,7 @@ private:
    QString name;
    QString name_job;
    QString username;
-   QString taskstype;
+   QString service;
    uint32_t flags;
    uint32_t tasksnum;
    uint32_t tasksdone;

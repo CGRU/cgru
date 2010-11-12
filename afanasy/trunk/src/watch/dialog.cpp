@@ -240,6 +240,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
 #endif
    switch( msg->type())
    {
+   case af::Msg::TClientExitRequest:
    case af::Msg::TVersionMismatch:
    {
       emit stop();

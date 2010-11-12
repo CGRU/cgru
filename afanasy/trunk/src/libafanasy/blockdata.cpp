@@ -131,8 +131,7 @@ void BlockData::readwrite( Msg * msg)
    case Msg::TBlocksProperties:
       rw_int32_t ( parsercoeff,           msg);
       rw_QString ( tasksname,             msg);
-      rw_QString ( parsertype,            msg);
-      rw_QString ( taskstype,             msg);
+      rw_QString ( parser,                msg);
       rw_QString ( wdir,                  msg);
       rw_QString ( environment,           msg);
       rw_QString ( command,               msg);
@@ -163,6 +162,7 @@ void BlockData::readwrite( Msg * msg)
       rw_QRegExp ( hostsmask_exclude,     msg);
       rw_QRegExp ( need_properties,       msg);
       rw_QString ( name,                  msg);
+      rw_QString ( service,               msg);
       rw_int32_t ( tasksnum,              msg);
       rw_int8_t  ( errors_retries,        msg);
       rw_int8_t  ( errors_avoidhost,      msg);
@@ -460,8 +460,8 @@ TaskExec *BlockData::genTask( int num) const
 
    return new TaskExec(
          genTaskName( num),
-         taskstype,
-         parsertype,
+         service,
+         parser,
          command,
          capacity,
          filesize_min,
@@ -526,8 +526,8 @@ int BlockData::calcWeight() const
       for( int t = 0; t < tasksnum; t++)
          weight += tasksdata[t]->calcWeight();
 
-   weight += weigh(taskstype);
-   weight += weigh(parsertype);
+   weight += weigh(service);
+   weight += weigh(parser);
    weight += weigh(dependmask);
    weight += weigh(tasksdependmask);
    weight += weigh(need_properties);
@@ -548,7 +548,7 @@ int BlockData::calcWeight() const
 void BlockData::stdOut( bool full) const
 {
    printf("BLOCK = \"%s\" ( %s-%s[%d] ), %d tasks.\n",
-      name.toUtf8().data(), taskstype.toUtf8().data(), parsertype.toUtf8().data(), parsercoeff, tasksnum);
+      name.toUtf8().data(), service.toUtf8().data(), parser.toUtf8().data(), parsercoeff, tasksnum);
 
                                       printf("Command            = \"%s\"\n",           command.toUtf8().data());
                                       printf("Working Directory  = \"%s\"\n",              wdir.toUtf8().data());

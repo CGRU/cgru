@@ -176,6 +176,8 @@ void ItemRender::updateValues( af::Node *node, int type)
 
          if( host.os.isEmpty() == false ) hostAttrs += QString(" - %1").arg( host.os);
          hostAttrs += QString("; Power = %1").arg( host.power);
+         if( render->getRevision() > 0)
+            hostAttrs += QString("\nBuild Revision: %1   Version: %2").arg( render->getRevision()).arg( render->getVersion());
          hostAttrs += QString("\nCapacity = %1; Max tasks = %2").arg( capacity).arg( host.maxtasks);
          if( host.properties.isEmpty() == false) hostAttrs += QString("\n\"%1\"").arg( host.properties);
 

@@ -16,6 +16,8 @@ public:
 
    bool setInterest( int type, const af::MCGeneral & ids);
 
+   bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+
    bool hasJobUid( int uid) const;
 
    bool hasJobEvent( int type, int uid) const;

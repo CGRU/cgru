@@ -63,9 +63,9 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       cmdpre            = block->getCmdPre();
       cmdpost           = block->getCmdPost();
       environment       = block->getEnvironment();
-      taskstype         = block->getTasksType();
+      service           = block->getService();
       tasksname         = block->getTasksName();
-      parsertype        = block->getParserType();
+      parser            = block->getParser();
       hostsmask         = block->getHostsMask();
       hostsmask_exclude = block->getHostsMaskExclude();
       maxhosts          = block->getMaxHosts();
@@ -98,7 +98,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
 
    height = HeightHeader  + BlockInfo::Height + HeightFooter;
 
-   description = taskstype;
+   description = service;
    if( numeric)
       description += QString(" (num:%1-%2:%3fpr)").arg(first).arg(last).arg(pertask);
    else
@@ -119,7 +119,7 @@ void ItemJobBlock::generateToolTip()
    if( tasksname.isEmpty() == false) blockToolTip += QString("Tasks Name = '%1'\n").arg( tasksname);
    blockToolTip += QString("Command:\n") + command;
    blockToolTip += QString("\nWorking directory:\n") + workingdir;
-   blockToolTip += QString("\nTasks type = '%1' [%2]").arg(taskstype, parsertype);
+   blockToolTip += QString("\nService = '%1' [%2]").arg(service, parser);
    if( numeric)
       blockToolTip += QString("\nNumeric: from %1 to %2 per %3").arg(first).arg(last).arg(pertask);
    else
