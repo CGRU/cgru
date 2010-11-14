@@ -58,14 +58,15 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    for( int i = 0; i < files.size(); i++)
    {
       if( false == files[i].isFile()) continue;
+      if( services_icons_large.contains( files[i].completeBaseName()) || services_icons_small.contains( files[i].completeBaseName())) continue;
       QPixmap icon( files[i].filePath());
       if( icon.isNull())
       {
          AFERRAR("Invalid service icon:\n%s\n", files[i].filePath().toUtf8().data());
          continue;
       }
-      services_icons_large[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::Height));
-      services_icons_small[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::HeightCompact));
+      services_icons_large[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::Height,        Qt::SmoothTransformation));
+      services_icons_small[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::HeightCompact, Qt::SmoothTransformation));
    }
 }
 
@@ -227,12 +228,6 @@ AFINFO("Watch::raiseWindow: trying to raise a window.\n");
    wnd->raise();
    if( name ) displayInfo(QString("Raising '%1' window.").arg(*name));
 AFINFA("Watch::raiseWindow: \"%s\" window raised.\n", name->toUtf8().data());
-}
-
-const QPixmap * Watch::getServiceIcon( const QString & service_name, bool small)
-{
-   if( small) return services_icons_small.value( service_name, services_icons_small.value("__unknown__", NULL));
-   else       return services_icons_large.value( service_name, services_icons_small.value("__unknown__", NULL));
 }
 
 void Watch::repaint()

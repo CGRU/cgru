@@ -21,7 +21,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListUsers::SortType       = CtrlSortFilter::TPRIORITY;
+int     ListUsers::SortType       = CtrlSortFilter::TNUMJOBS;
 bool    ListUsers::SortAscending  = false;
 int     ListUsers::FilterType     = CtrlSortFilter::TNAME;
 bool    ListUsers::FilterInclude  = true;

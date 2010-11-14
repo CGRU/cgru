@@ -52,7 +52,7 @@ private:
    uint32_t state;
 
    QString name;
-   QString service_name;
+   QString service;
    QString str_runtime;
    QString str_progress;
    QString str_percent;
@@ -120,4 +120,7 @@ private:
       ) const;
    void stdOutFlags( char* data, int size) const;
    void refresh();
+
+   const QPixmap * icon_large;
+   const QPixmap * icon_small;
 };

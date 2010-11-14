@@ -91,7 +91,8 @@ public:
 
    static void startProcess( const QString & cmd, const QString & wdir = QString());
 
-   static const QPixmap * getServiceIcon( const QString & service_name, bool small);
+   inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return services_icons_large.value( service_name, NULL);}
+   inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return services_icons_small.value( service_name, NULL);}
 
 private:
    static MonitorHost * m;

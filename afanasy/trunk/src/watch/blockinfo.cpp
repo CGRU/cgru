@@ -88,7 +88,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost_max        = block->getMultiHostMax();
       multihost_waitmax    = block->getMultiHostWaitMax();
       multihost_waitsrv    = block->getMultiHostWaitSrv();
-      service_name         = block->getService();
+      service              = block->getService();
       numeric              = block->isNotNumeric();
       varcapacity          = block->canVarCapacity();
       multihost            = block->isMultiHost();
@@ -100,6 +100,9 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       if( false == dependmask.isEmpty()) depends += QString(" D(%1)").arg( dependmask);
       if( false == tasksdependmask.isEmpty()) depends += QString(" TD[%1]").arg( tasksdependmask);
       if( false == depends.isEmpty()) if( name.isEmpty()) depends = " Depends: " + depends;
+
+      icon_large = Watch::getServiceIconLarge( service);
+      icon_small = Watch::getServiceIconSmall( service);
 
    case af::Msg::TBlocksProgress:
       state             = block->getState();
@@ -234,23 +237,30 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    painter->setPen( Item::clrTextInfo( tasksrunning, option.state & QStyle::State_Selected, item->isLocked()));
    painter->drawText( x, y+y_properties, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_properties );
 
+   int xoffset = 1;
+
    if( compact_display)
    {
-      int xoffset = 1;
-      const QPixmap * icon = Watch::getServiceIcon( service_name, true);
-      if( icon )
+      if( icon_small )
       {
-         painter->drawText(  x, y-2, w, 15, Qt::AlignTop | Qt::AlignLeft, service_name[0] );
-//printf("%s\n", service_name.toUtf8().data());
+         painter->drawPixmap( x, y-2, *icon_small);
          xoffset += 15;
       }
       painter->drawText(  x+xoffset, y-2, w, 15, Qt::AlignTop | Qt::AlignLeft, str_compact );
       return;
    }
 
-   painter->drawText( x+5, y+y_properties, w,     15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
-   painter->drawText( x+5, y+y_progress,   w-120, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
-   painter->drawText( x+5, y+y_progress,   w-5  , 15, Qt::AlignRight | Qt::AlignTop, str_progress );
+   xoffset = 5;
+
+   if( icon_large )
+   {
+      painter->drawPixmap( x, y-2, *icon_large);
+      xoffset += 40;
+   }
+
+   painter->drawText( x+xoffset, y+y_properties, w,     15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
+   painter->drawText( x+xoffset, y+y_progress,   w-120, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
+   painter->drawText( x+xoffset, y+y_progress,   w-5  , 15, Qt::AlignRight | Qt::AlignTop, str_progress );
 
    int progress_w_offset = 0;
 
@@ -266,30 +276,28 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    }
    Item::drawPercent
    (
-      painter, x, y+y_bars, w-progress_w_offset, 4,
+      painter, x+xoffset, y+y_bars, w-progress_w_offset, 4,
       tasksnum,
       tasksdone, tasksrunning, taskserror,
       false
    );
    Item::drawPercent
    (
-      painter, x, y+y_bars+4, w-progress_w_offset, 4,
+      painter, x+xoffset, y+y_bars+4, w-progress_w_offset, 4,
       100,
       percentage, 0, 0,
       false
    );
    drawProgress
    (
-      painter, x+1, y+y_bars+8, w-progress_w_offset, 6,
+      painter, x+1+xoffset, y+y_bars+8, w-progress_w_offset-xoffset, 6,
       progress_done, progress_running,
       backcolor
    );
-//   if( item->isRunning())
-   {
-      painter->setPen( afqt::QEnvironment::clr_outline.c );
-      painter->setBrush( Qt::NoBrush);
-      painter->drawRect( x-1, y+y_bars-1, w-progress_w_offset+1, 15);
-   }
+
+   painter->setPen( afqt::QEnvironment::clr_outline.c );
+   painter->setBrush( Qt::NoBrush);
+   painter->drawRect( x-1+xoffset, y+y_bars-1, w-progress_w_offset+1-xoffset, 15);
 }
 
 void BlockInfo::drawProgress(

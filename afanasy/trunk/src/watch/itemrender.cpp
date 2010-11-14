@@ -85,6 +85,8 @@ ItemRender::ItemRender( af::Render *render):
    plotIO.setAutoScaleMax( 100000);
 
    updateValues( render, 0);
+
+   name += ' ' + version;
 }
 
 ItemRender::~ItemRender()
@@ -133,6 +135,8 @@ void ItemRender::updateValues( af::Node *node, int type)
    case 0: // The item was just created
    case af::Msg::TRendersList:
    {
+      revision          = render->getRevision();
+      version           = render->getVersion();
       username          = render->getUserName();
       annotation        = render->getAnnontation();
       priority          = render->getPriority();
@@ -177,7 +181,7 @@ void ItemRender::updateValues( af::Node *node, int type)
          if( host.os.isEmpty() == false ) hostAttrs += QString(" - %1").arg( host.os);
          hostAttrs += QString("; Power = %1").arg( host.power);
          if( render->getRevision() > 0)
-            hostAttrs += QString("\nBuild Revision: %1   Version: %2").arg( render->getRevision()).arg( render->getVersion());
+            hostAttrs += QString("\nBuild Revision: %1   Version: %2").arg( revision).arg( version);
          hostAttrs += QString("\nCapacity = %1; Max tasks = %2").arg( capacity).arg( host.maxtasks);
          if( host.properties.isEmpty() == false) hostAttrs += QString("\n\"%1\"").arg( host.properties);
 
@@ -334,7 +338,7 @@ void ItemRender::updateValues( af::Node *node, int type)
    calcHeight();
 
    tooltip = hostAttrs;
-   if( dirty ) tooltip = "Dirty! Capacity changed, or servive(s) disabled.\n" + tooltip;
+   if( dirty ) tooltip = "Dirty! Capacity changed, or service(s) disabled.\n" + tooltip;
    if( online ) tooltip += "\n" + hostUsage;
    tooltip += "\nPriority = " + QString::number( priority);
 
@@ -495,6 +499,9 @@ bool ItemRender::setSortType(   int type )
          break;
       case CtrlSortFilter::TUSERNAME:
          sort_str = &username;
+         break;
+      case CtrlSortFilter::TVERSION:
+         sort_str = &version;
          break;
       default:
          AFERRAR("ItemRender::setSortType: Invalid type number = %d\n", type);

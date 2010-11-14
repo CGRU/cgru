@@ -49,6 +49,8 @@ private:
    QString     hostAttrs;
    QString     hostUsage;
 
+   int revision;
+   QString  version;
    QString  username;
    QString  annotation;
    int priority;

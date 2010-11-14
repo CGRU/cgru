@@ -46,6 +46,7 @@ public:
       TTIMEACTIVITY,
       TTIMEFINISHED,
       TTIMERUN,
+      TVERSION,
       TLAST
    };
    static const char * TNAMES[];
