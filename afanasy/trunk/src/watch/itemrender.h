@@ -72,6 +72,7 @@ private:
 
    QString  state;
    std::list<af::TaskExec*> tasks;
+   std::list<const QPixmap*> tasksicons;
    uint32_t taskstartfinishtime;
    QString  taskstartfinishtime_str;
 

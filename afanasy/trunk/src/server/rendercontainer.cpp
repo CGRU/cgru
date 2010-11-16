@@ -43,8 +43,8 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
                printf("\nExisting render:\n");
                render->stdOut( false);
                delete newRender;
-               // Return zero ID to render to tell that it was not registered:
-               return new MsgAf( Msg::TRenderId, 0);
+               // Return -1 ID to render to tell that there is already registered render with the same name:
+               return new MsgAf( Msg::TRenderId, -1);
             }
             // Offline render with the same hostname founded:
             else if( render->online( newRender, monitoring))

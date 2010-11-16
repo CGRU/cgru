@@ -10,6 +10,7 @@
 
 #include "ctrlsortfilter.h"
 #include "listrenders.h"
+#include "watch.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -85,8 +86,6 @@ ItemRender::ItemRender( af::Render *render):
    plotIO.setAutoScaleMax( 100000);
 
    updateValues( render, 0);
-
-   name += ' ' + version;
 }
 
 ItemRender::~ItemRender()
@@ -98,6 +97,7 @@ ItemRender::~ItemRender()
 void ItemRender::deleteTasks()
 {
    for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++) delete *it;
+   tasksicons.clear();
 }
 
 void ItemRender::deletePlots()
@@ -143,6 +143,8 @@ void ItemRender::updateValues( af::Node *node, int type)
       capacity          = render->getCapacity();
       time_launched     = render->getTimeLaunch();
       time_registered   = render->getTimeRegister();
+
+      if( false == version.isEmpty()) name = render->getName() + ' ' + version;
 
       const af::Address * address = render->getAddress();
       if( address ) address_str = render->getAddress()->getIPString()
@@ -205,8 +207,10 @@ void ItemRender::updateValues( af::Node *node, int type)
 
       busy = render->isBusy();
       deleteTasks();
-      tasks = render->getTasks();
       taskstartfinishtime = render->getTasksStartFinishTime();
+      tasks = render->getTasks();
+      for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
+         tasksicons.push_back( Watch::getServiceIconSmall( (*it)->getServiceType()));
 
       dirty = render->isDirty();
 
@@ -415,16 +419,18 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    else
    {
       std::list<af::TaskExec*>::const_iterator it = tasks.begin();
-      for( int numtask = 1; it != tasks.end(); it++, numtask++)
+      std::list<const QPixmap*>::const_iterator ii = tasksicons.begin();
+      for( int numtask = 1; it != tasks.end(); it++, ii++, numtask++)
       {
          QString taskstr = QString("%1").arg((*it)->getCapacity());
          if((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
          taskstr += QString(" %1: %2[%3][%4]").arg((*it)->getServiceType()).arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
-         painter->drawText( x+5, y, ((w*3)>>2), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+         painter->drawText( x+18, y, ((w*3)>>2), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
-             QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())));
+            QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())));
+         painter->drawPixmap( x+5, plots_height + HeightTask * numtask - 12, *(*ii));
       }
       painter->drawText( x+5, y, w, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }

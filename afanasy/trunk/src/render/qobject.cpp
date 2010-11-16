@@ -155,17 +155,21 @@ printf("Object::caseMessage: "); msg->stdOut();
    case af::Msg::TRenderId:
    {
       int id = msg->int32();
-      // Server sends back zero id if a render with the same hostname already exists:
-      if( id == 0)
+      // Server sends back -1 id if a render with the same hostname already exists:
+      if( id == -1)
       {
          AFERRAR("Render with this hostname '%s' already registered.\n", af::Environment::getHostName().toUtf8().data());
          exitRender();
       }
-      if( render->getId() == 0)
+      // Render was trying to register (its id==0) and server has send id>0
+      // This is the situation when client was sucessfully registered
+      else if((id > 0) && (render->getId() == 0))
       {
          render->setId( id);
          setUpMsg( af::Msg::TRenderUpdate);
       }
+      // Server sends back zero id on any error
+      // May be server was restarted and knows nothing about this render, so render must terister first
       else if ( render->getId() != id )
          connectionLost( NULL);
       break;
