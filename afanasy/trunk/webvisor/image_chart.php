@@ -91,24 +91,24 @@ case 'jobsavgruntime':
    $query="SELECT username AS name,avg(taskssumruntime) AS value FROM stat_jobs GROUP BY username;";
    imagestring( $im, 5, $title_posx, $title_posy,  'Jobs Average Run Time', $title_color);
    break;
-case 'taskstypequantity':
-   $query="SELECT taskstype AS name,sum(1) AS value FROM stat_blocks GROUP BY taskstype;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Type Quantity', $title_color);
+case 'servicequantity':
+   $query="SELECT service AS name,sum(1) AS value FROM stat_blocks GROUP BY service;";
+   imagestring( $im, 5, $title_posx, $title_posy,  'Service Type Quantity', $title_color);
    break;
 case 'tasksquantity':
-   $query="SELECT taskstype AS name,sum(tasksnum) AS value FROM stat_blocks GROUP BY taskstype;";
+   $query="SELECT service AS name,sum(tasksnum) AS value FROM stat_blocks GROUP BY service;";
    imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Quantity', $title_color);
    break;
 case 'taskssumruntime':
-   $query="SELECT taskstype AS name,sum(taskssumruntime) AS value FROM stat_blocks GROUP BY taskstype;";
+   $query="SELECT service AS name,sum(taskssumruntime) AS value FROM stat_blocks GROUP BY service;";
    imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Sum Run Time', $title_color);
    break;
 case 'tasksavgruntime':
-   $query="SELECT taskstype AS name,avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS value FROM stat_blocks GROUP BY taskstype;";
+   $query="SELECT service AS name,avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS value FROM stat_blocks GROUP BY service;";
    imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Avg Run Time', $title_color);
    break;
 case 'tasksdone':
-   $query="SELECT taskstype AS name,round(avg(100*tasksdone/tasksnum),2) AS value FROM stat_blocks GROUP BY taskstype;";
+   $query="SELECT service AS name,round(avg(100*tasksdone/tasksnum),2) AS value FROM stat_blocks GROUP BY service;";
    imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Done', $title_color);
    break;
 default:

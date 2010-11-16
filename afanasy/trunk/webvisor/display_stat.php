@@ -20,8 +20,8 @@ default: $order_u = 'sumruntime';
 $order_t=$_GET['order_t'];
 switch($order_t)
 {
-case "taskstype": break;
-case "typequantity": break;
+case "service": break;
+case "servicequantity": break;
 case "tasksquantity": break;
 case "taskssumruntime": break;
 case "tasksavgruntime": break;
@@ -144,13 +144,13 @@ echo '<h3>Tasks:</h3>';
 //CASE WHEN jobs.id>0 THEN 1 ELSE 0 END
 //sum(tasksdone) AS tasksdone
 $query="
-SELECT taskstype,
-sum(1) AS typequantity,
+SELECT service,
+sum(1) AS servicequantity,
 sum(tasksnum) AS tasksquantity,
 sum(taskssumruntime) AS taskssumruntime,
 avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
 round(avg(100*tasksdone/tasksnum),2) AS tasksdone
-FROM stat_blocks GROUP BY taskstype ORDER BY $order_t DESC;
+FROM stat_blocks GROUP BY service ORDER BY $order_t DESC;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 echo "<table border=1 width=99%>\n";
@@ -162,11 +162,11 @@ echo '#';
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=taskstype'>Type</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=service'>Service</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=typequantity'>Type Quantity</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=servicequantity'>Service Quantity</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
@@ -198,11 +198,11 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    echo "</td>\n";
 
    echo "\t\t<td>";
-   echo $line["taskstype"];
+   echo $line["service"];
    echo "</td>\n";
 
    echo "\t\t<td align=center>";
-   echo $line["typequantity"];
+   echo $line["servicequantity"];
    echo "</td>\n";
 
    echo "\t\t<td align=center>";
@@ -228,7 +228,7 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 echo '<tr align=center>';
 echo "<td></td>";
 echo "<td></td>";
-echo "<td><a href='index.php?action=stat_chart&type=taskstypequantity'>Chart</a></td>";
+echo "<td><a href='index.php?action=stat_chart&type=servicequantity'>Chart</a></td>";
 echo "<td><a href='index.php?action=stat_chart&type=tasksquantity'>Chart</a></td>";
 echo "<td><a href='index.php?action=stat_chart&type=taskssumruntime'>Chart</a></td>";
 echo "<td><a href='index.php?action=stat_chart&type=tasksavgruntime'>Chart</a></td>";
