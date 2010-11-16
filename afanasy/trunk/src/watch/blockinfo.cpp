@@ -258,9 +258,9 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
       xoffset += 40;
    }
 
-   painter->drawText( x+xoffset, y+y_properties, w,     15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
-   painter->drawText( x+xoffset, y+y_progress,   w-120, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
-   painter->drawText( x+xoffset, y+y_progress,   w-5  , 15, Qt::AlignRight | Qt::AlignTop, str_progress );
+   painter->drawText( x+xoffset, y+y_properties, w		 -xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
+   painter->drawText( x+xoffset, y+y_progress,   w-120 -xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
+   painter->drawText( x+xoffset, y+y_progress,   w-5   -xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_progress );
 
    int progress_w_offset = 0;
 
@@ -276,14 +276,14 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    }
    Item::drawPercent
    (
-      painter, x+xoffset, y+y_bars, w-progress_w_offset, 4,
+      painter, x+xoffset, y+y_bars, w-progress_w_offset-xoffset, 4,
       tasksnum,
       tasksdone, tasksrunning, taskserror,
       false
    );
    Item::drawPercent
    (
-      painter, x+xoffset, y+y_bars+4, w-progress_w_offset, 4,
+      painter, x+xoffset, y+y_bars+4, w-progress_w_offset-xoffset, 4,
       100,
       percentage, 0, 0,
       false

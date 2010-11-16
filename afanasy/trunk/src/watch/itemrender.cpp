@@ -144,8 +144,6 @@ void ItemRender::updateValues( af::Node *node, int type)
       time_launched     = render->getTimeLaunch();
       time_registered   = render->getTimeRegister();
 
-      if( false == version.isEmpty()) name = render->getName() + ' ' + version;
-
       const af::Address * address = render->getAddress();
       if( address ) address_str = render->getAddress()->getIPString()
                                  + ':' + render->getAddress()->getPortString();
@@ -376,7 +374,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    {
       painter->setPen(   afqt::QEnvironment::qclr_black );
       painter->setFont(  afqt::QEnvironment::f_info);
-      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name     );
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + version );
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, "offline");
       painter->drawText( x+5, y+2, w-10, HeightOffline-4 + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
@@ -386,7 +384,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
    painter->setPen(   clrTextMain( option) );
    painter->setFont(  afqt::QEnvironment::f_name);
-   painter->drawText( x+25, y, w, h, Qt::AlignTop | Qt::AlignLeft, name );
+   painter->drawText( x+25, y, w, h, Qt::AlignTop | Qt::AlignLeft, name + ' ' + version  );
 
    painter->setPen(   afqt::QEnvironment::qclr_black );
    painter->setFont(  afqt::QEnvironment::f_info);
@@ -430,7 +428,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          painter->drawText( x+18, y, ((w*3)>>2), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
             QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())));
-         painter->drawPixmap( x+5, plots_height + HeightTask * numtask - 12, *(*ii));
+         painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, *(*ii));
       }
       painter->drawText( x+5, y, w, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }
