@@ -51,7 +51,20 @@ If Afanasy <b>database schema changed</b> server can't restore state. All inform
 </p>
 
 <br/>
-<h4>2010.11.03</h4>rev1193
+
+<p>
+<b>1.3.0</b> 2010.11.03 <i>(rev1215)</i> New Afanasy network protocol version. New Afanasy database schema.
+</p>
+<p>
+AfWatch shows services icons, it is common programs icons for users to recognize jobs type.
+</p>
+<p>
+Every Afanasy client has compiled revision number, startup version string and sends them to server.
+Most dialogs in shows CGRU version, Afanasy GUI also shows clients build revision.
+</p>
+<p>
+Nuke "dailies" node to generate movies locally on Afanasy farm.
+</p>
 <p>
 "movgen" service added. It will be used for movies generation: annotate frames, encode, make dailies.
 </p>
@@ -65,7 +78,10 @@ Houdini mantra filter (af_separate_render ROP) does not filter null images now (
 </p>
 
 <br/>
-<h4>1.2.4</h4>2010.11.01
+
+<p>
+<b>1.2.4</b> 2010.11.01
+</p>
 <p>
 <a href="../afanasy/plugins/max/doc/afanasy.html">3D Studio MAX submit to Afanasy scripts</a>. MAX Afanasy service and parser.
 </p>
@@ -82,16 +98,23 @@ Nuke stereo render views in different folders bug fixed.
 </p>
 
 <br/>
-<h4>1.2.3</h4>2010.08.18
+
+<p>
+<b>1.2.3</b> 2010.08.18
+</p>
 <p>
 Houdini parsers total percentage calculation bug fixed.
 </p>
 
 <br/>
-<h4>1.2.2</h4>2010.08.17
+
+<p>
+<b>1.2.2</b> 2010.08.17
+</p>
 <p>
 "Mavishky" works with folders with spaces.
-</p><p>
+</p>
+<p>
 MS Windows:<br/>
 Afanasy Render prefix commands with "<kbd>cmd.exe /c </kbd>".
 Afrender kills all child tasks in any case.
@@ -105,7 +128,10 @@ Full compatibility since 1.2.0.
 </p>
 
 <br/>
-<h4>1.2.1</h4>2010.08.06
+
+<p>
+<b>1.2.1</b> 2010.08.06
+</p>
 <p>
 Afanasy server database communication bug fixed.
 No clients changes.
@@ -113,9 +139,9 @@ Full compatibility with 1.2.0.
 </p>
 
 <br/>
-<h4>1.2.0</h4>2010.08.02
+
 <p>
-New Afanasy network protocol version. New Afanasy database schema.
+<b>1.2.0</b> 2010.08.02 New Afanasy network protocol version. New Afanasy database schema.
 </p>
 <p>
 Afanasy Python <a href="../afanasy/doc/resourcescustom.html">Resources Meter</a>.
@@ -162,12 +188,11 @@ Windows users need to install <a href="http://www.imagemagick.org">ImageMagick<a
 <p>
 Lots of bug-fixes for MS Windows platform. Windows version can be called 'beta'.
 </p>
-<br/>
 
 <br/>
-<h4>1.1.0</h4>2010.05.09
+
 <p>
-New Afanasy network protocol version.
+<b>1.1.0</b> 2010.05.09 New Afanasy network protocol version.
 </p>
 <p>
 Afanasy supports IPv6. Server needs to support new protocol, as it stores client addresses, and do not ask name sever at every connect (most managers do, alfred too).
@@ -193,30 +218,36 @@ Maya 2010 and 2011 support.
 <p>
 'fbx2clip' utility removed.
 </p>
-<br/>
 
 <br/>
-<h4>1.0.0</h4>2009.12.21
+
+<p>
+<b>1.0.0</b> 2009.12.21
+</p>
 <p>
 New project structure. Afanasy source code repository contains 'tags', 'branches' and 'trunk'.
 </p>
 <p>
 CGRU has 'deb' packages build scripts (for Debian and Ubuntu Linux).
 </p>
-<br/>
 
 <br/>
-<h4>2009.11.12</h4>
+
+<p>
+<b>2009.11.12</b>
+</p>
 <p>
 Afanasy project building uses <kbd>CMake</kbd> now. CMakeLists are in repository. <a href="http://www.cmake.org">CMake</a> is a cross-platform build system.
 </p>
 <p>
 CGRU environment initialization is much simplified. You do not need to edit or create scripts. To setup CGRU you need to go in it's root folder and source setup script (like in Houdini now). Unix and Windows examples corrected to work the same way. ( And also total quantity of variables initializing by CGRU setup and needed for correct work is reduced.)
 </p>
-<br/>
 
 <br/>
-<h4>2009.10.07</h4>
+
+<p>
+<b>2009.10.07</b>
+</p>
 <p>
 Python class <a href="python_class_job.html">Job</a> has a 'blocks' list variable. You can manipulate it in your own way it to fill job with blocks.
 </p>
@@ -226,13 +257,11 @@ Python class <a href="python_class_block.html">Block</a> can be constructed with
 <p>
 Python class <a href="python_class_task.html">Task</a> can be constructed without any block or job.
 </p>
-<br/>
 
 <br/>
-<h4>2009.09.16</h4>
+
 <p>
-New network protocol version.
-New database schema.
+<b>2009.09.16</b> New network protocol version. New database schema.
 </p>
 <p>
 Watch renders colors customization.
@@ -243,12 +272,11 @@ Watch renders colors customization.
 <p>
 <a href="python_class_block.html">Python Class Block</a> - <i>setMultiHost</i> method to describe multihosts tasks.
 </p>
-<br/>
 
 <br/>
-<h4>2009.08.24</h4>
+
 <p>
-New network protocol version.
+<b>2009.08.24</b> New network protocol version.
 </p>
 <p>
 Afanasy Watch GUI can manipulate job blocks parameters without to open job tasks window.
@@ -256,13 +284,11 @@ Afanasy Watch GUI can manipulate job blocks parameters without to open job tasks
 <p>
 <code>afjob</code> command, which used to construct job from command line arguments, now supports tasks capacity and capacity coefficients.
 </p>
-<br/>
 
 <br/>
-<h4>2009.08.20</h4>
+
 <p>
-New network protocol version.
-New database schema.
+<b>2009.08.20</b> New network protocol version. New database schema.
 </p>
 <p>
 <a href="job_block.html#Capacity">Block Capacity</a> - job block capacity can be variable.<br/>
@@ -273,13 +299,11 @@ New database schema.
 <p>
 Job blocks errors <a href="job_block#ErrorRetries">solving parameters</a> has '-1' value by default, it means to take this parameters from job user settings. Watch does not show this default values.
 </p>
-<br/>
 
 <br/>
-<h4>2009.08.12</h4>
+
 <p>
-New network protocol version.
-New database schema.
+<b>2009.08.12</b> New network protocol version. New database schema.
 </p>
 <p>
 <a href="job_block.html#TasksName">Block Tasks Names</a> - job block have a rule for generated tasks names.<br/>
@@ -296,10 +320,8 @@ New database schema.
 <p>
 Watch shows block generated task by double click on task in job tasks view.
 </p>
-<br/>
 
-<p>
-</p>
+<br/>
 
 <!--FOOTER-->
 </td></tr></table>
