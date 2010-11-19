@@ -21,6 +21,7 @@ Parser.add_option('--stereo',                dest='stereo',          action='sto
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='',             help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
+Parser.add_option('--artist',                dest='artist',          type  ='string',     default='',             help='Artist name')
 Parser.add_option('--suffix',                dest='suffix',          type  ='string',     default='',             help='Add suffix to output movie filename')
 Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=25,             help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=25,             help='Draw 2.35 cacher opacity')
@@ -56,12 +57,13 @@ FormatValues = [                   '',      '720x576' ,             '768x576' , 
 
 FPS = ['23.976','24','25','30']
 
-UserName = os.getenv('USER', os.getenv('USERNAME', 'user'))
+Artist = Options.artist
+if Artist == '': Artist = os.getenv('USER', os.getenv('USERNAME', 'user'))
 # cut DOMAIN from username:
-dpos = UserName.rfind('/')
-if dpos == -1: dpos = UserName.rfind('\\')
-if dpos != -1: UserName = UserName[dpos+1:]
-UserName = UserName.capitalize()
+dpos = Artist.rfind('/')
+if dpos == -1: dpos = Artist.rfind('\\')
+if dpos != -1: Artist = Artist[dpos+1:]
+Artist = Artist.capitalize()
 
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 TemplatesPath = os.path.join( DialogPath, 'templates')
@@ -205,7 +207,7 @@ class Dialog( QtGui.QWidget):
       self.lUser = QtGui.QHBoxLayout()
       self.lArtist = QtGui.QLabel('Artist:', self)
       self.lUser.addWidget( self.lArtist)
-      self.editArtist = QtGui.QLineEdit( UserName, self)
+      self.editArtist = QtGui.QLineEdit( Artist, self)
       self.lUser.addWidget( self.editArtist)
       QtCore.QObject.connect( self.editArtist, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lActivity = QtGui.QLabel('Activity:', self)
