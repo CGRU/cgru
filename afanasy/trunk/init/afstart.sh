@@ -12,8 +12,6 @@ if [ -z "$AF_ROOT" ]; then
    cd $curdir
 fi
 
-source  $AF_ROOT/init/afsetup.sh
-
 echo "AF_ROOT    = '$AF_ROOT'"
 [ -z $AF_HOSTNAME ] || echo "AF_HOSTNAME= '$AF_HOSTNAME'"
 echo "Launchfile = '$exefile'"

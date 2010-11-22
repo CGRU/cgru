@@ -17,3 +17,13 @@ fi
 # Get CGRU version:
 export CGRU_VERSION=`cat version.txt`
 echo CGRU_VERSION $CGRU_VERSION
+
+# Source custom setup if any exists:
+setup_files=`ls setup_*`
+if [ ! -z "$setup_files" ] ; then
+   for setup_file in $setup_files; do
+      [ -z "$setup_file" ] && continue
+      [ -f "$setup_file" ] || continue
+      source ./$setup_file
+   done
+fi

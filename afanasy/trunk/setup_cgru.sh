@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# This script tries to setup CGRU, if was not.
+# It searches "setup.sh" in upper folders and sources it.
+
 curdir=$PWD
 
 if [ -z $CGRU_LOCATION ]; then
