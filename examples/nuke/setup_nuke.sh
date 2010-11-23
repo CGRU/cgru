@@ -13,9 +13,6 @@ if [ ! -z "${CGRU_LOCATION}" ]; then
    else
       export NUKE_PATH="${NUKE_PATH}:${NUKE_CGRU_PATH}"
    fi
-   pushd "${CGRU_LOCATION}"
-   source setup.sh
-   popd
 fi
 
 # Set Afanasy scripts version to use

@@ -13,6 +13,7 @@ mkdir -p $pack/$cgru/lib/python
 
 # Copying files:
 cp $src/setup.sh $pack/$cgru
+cp $src/setup_custom.sh $pack/$cgru
 cp $src/version.txt $pack/$cgru
 cp -r $src/doc/images $pack/$cgru/doc
 cp $src/bin/*.py $pack/$cgru/bin

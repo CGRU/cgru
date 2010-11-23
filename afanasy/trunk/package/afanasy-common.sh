@@ -8,8 +8,12 @@ cgru=$3
 
 # Copying files:
 mkdir -p $pack/$cgru/afanasy/bin
+mkdir -p $pack/$cgru/afanasy/launch
 files="\
 afanasy/setup.sh \
+afanasy/setup_cgru.sh \
+afanasy/setup_custom.sh \
+afanasy/launch/setup.sh \
 afanasy/python \
 afanasy/bin/pyaf.so \
 afanasy/config_default.xml \

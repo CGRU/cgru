@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Watch
 Comment=Afanasy Watch GUI
-Exec=/opt/cgru/afanasy/bin/afwatch
+Exec=/opt/cgru/afanasy/launch/afwatch.sh
 Icon=afwatch
 Terminal=false
 Type=Application
