@@ -47,7 +47,16 @@ Nuke Afanasy interface consists of 'afanasy' nodes (gizmos) and menu items in ma
 </p>
 
 <p>
-'afanasy' nodes need to render connected 'Write' nodes and to store render settings. You can connect one 'afanasy' node to other 'afanasy' node to render other 'Write' node with different settings at the same time. Each connected node will produce a block - an array of tasks (frames) to render. You can specify dependence between connected nodes. One 'Write' node(s) can wait all frames of other "Write" node(s) to be rendered. Or one frame(s) from one 'Write' node can wait special frame(s) of other 'Write' node(s) to be rendered.
+'afanasy' nodes need to render connected 'Write' nodes and to store render settings.
+You can connect one 'afanasy' node to other 'afanasy' node to render other 'Write' node with different settings at the same time.
+Each connected node will produce a block - an array of tasks (frames) to render.
+You can specify dependence between connected nodes.
+One 'Write' node(s) can wait all frames of other "Write" node(s) to be rendered.
+Or one frame(s) from one 'Write' node can wait special frame(s) of other 'Write' node(s) to be rendered.
+</p>
+
+<p>
+Also 'afanasy' nodes can send dailies jobs to farm.
 </p>
 
 <table width="99%" align="center">
