@@ -17,3 +17,6 @@ if defined PYTHONPATH (
 rem Get CGRU version:
 For /F "Tokens=*" %%I in ('type version.txt') Do Set CGRU_VERSION=%%I
 echo CGRU_VERSION %CGRU_VERSION%
+
+rem Call custom setup scripts:
+For /F "Tokens=*" %%I in ('dir /b setup_*.cmd') Do call %%I
