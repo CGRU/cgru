@@ -1,5 +1,6 @@
-//Maya 2009 x64 Project Definition
+//Maya 2011 Hotfix 1 x64 Project Definition
 
+workspace -fr "offlineEdit" "./";
 workspace -fr "IGES" "data";
 workspace -fr "mentalray" "render";
 workspace -fr "DXFexport" "data";
@@ -13,18 +14,20 @@ workspace -fr "RIBexport" "data";
 workspace -fr "RIB" "data";
 workspace -fr "furFiles" "render";
 workspace -fr "depth" "render";
-workspace -fr "furAttrMap" "render";
+workspace -fr "autoSave" "autosave";
 workspace -fr "diskCache" "data";
+workspace -fr "furAttrMap" "render";
 workspace -fr "sourceImages" "sourceimages";
 workspace -fr "animImport" "data";
-workspace -fr "iprImages" "render";
+workspace -fr "movie" "data";
 workspace -fr "mayaAscii" "./";
+workspace -fr "iprImages" "render";
 workspace -fr "furImages" "render";
 workspace -fr "textures" "textures";
 workspace -fr "furEqualMap" "render";
 workspace -fr "aliasWire" "data";
-workspace -fr "move" "data";
 workspace -fr "mayaBinary" "./";
+workspace -fr "move" "data";
 workspace -fr "images" "render";
 workspace -fr "DXF" "data";
 workspace -fr "clips" "clips";

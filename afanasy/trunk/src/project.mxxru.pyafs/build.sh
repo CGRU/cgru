@@ -21,6 +21,7 @@ source ./getrevision.sh $folder
 popd > /dev/null
 
 export AF_LFLAGS="-lrt -lz -lgthread -lglib"
+# on CentOS 5 with Python2.5 try "-lrt -lz -lgthread-2.0 -lglib-2.0"
 
 export QTDIR=$qt
 export PATH=$qt/bin:$PATH
@@ -45,5 +46,5 @@ for python in `ls "$pythondir"`; do
    output="../../bin_pyaf/$python"
    [ -d $output ] || mkdir -p $output
    cp -v "tmp/$python/pyaf.so" $output
-   
+
 done

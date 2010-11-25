@@ -57,7 +57,7 @@ class Block(pyaf.Block):
    def setParser( self, parser, nocheck = False):
       if not nocheck:
          if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
-            if parsertype != 'none':
+            if parser != 'none':
                print 'Error: Unknown parser "%s", setting to "none"' % parser
                parser = 'none'
       pyaf.Block.setParser( self, parser)
