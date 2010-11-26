@@ -1,3 +1,3 @@
 rem   Try change terminal encoding to UTF-8:
 
-chcp 65001
+rem chcp 65001
