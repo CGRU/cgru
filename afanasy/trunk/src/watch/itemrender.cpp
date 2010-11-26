@@ -422,7 +422,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       {
          QString taskstr = QString("%1").arg((*it)->getCapacity());
          if((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
-         taskstr += QString(" %1: %2[%3][%4]").arg((*it)->getServiceType()).arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
+         taskstr += QString(": %1[%2][%3]").arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
          painter->drawText( x+18, y, ((w*3)>>2), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);

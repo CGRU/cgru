@@ -1,9 +1,10 @@
 #!/bin/bash
 
-afanasy=$0
-afanasy="`dirname $afanasy`"
-afanasy="`dirname $afanasy`"
+pushd `dirname $0`
 
-pushd "$afanasy" >> /dev/null
+afanasy=$PWD
+afanasy="`dirname $afanasy`"
+cd "$afanasy"
 source ./setup.sh
+
 popd >> /dev/null
