@@ -6,8 +6,8 @@
 <title>Watch Renders</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
-<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
-<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
 </head>
 <body>
 <table width="99%" align="center">
@@ -45,44 +45,58 @@
 <p>
 To open renders list in a separate window uses RMB on 'RENDERS' button.
 </p>
-<table>
-   <caption>Renders Tab</caption>
+<table width="99%">
    <tr>
-      <td align="right" width="10%">
+      <td align="center" width="50%">
+         <b>Renders Tab</b>
+         <br/>
+         <br/>
+         <img src="images/watch/renders.png" alt="renders" />
+         <br/>
+         <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#609050">
+         <br/>
+         <tr>
+            <td width="5%"/>
+            <td align="left">
+               <font color="#FF6010" size="3">&#9733;</font>
+               <font color="#000000"><b>name</b></font> version
+               <br/>
+               <font color="#D0FFA0">capacity: jobname.blockname.taskname</font>
+               <br/>
+               <br/>
+               <br/>
+            </td>
+            <td align="left">
+               <small><b>CPU MEM SWAP NET HDD</b></small>
+               <br/>
+               <br/>
+               custom resources meters if preset
+               <br/>
+               annotation if not empty
+               <br/>
+            </td>
+            <td align="right">
+               <font color="#000000"><b>user - priority</b></font>
+               <br/>
+               <font color="#D0FFA0">task owner - running time</font>
+               <br/>
+               <br/>
+               <br/>
+            </td>
+            <td width="5%"/>
+         </tr>
+         </table>
+      </td>
+      <td align="left" width="50%">
          RMB Menu<br />
          <img src="images/watch/renders_rmb.png" alt="renders_rmb" />
-      </td>
-      <td align="center" width="10%">
-         <img src="images/watch/renders.png" alt="renders" />
-      </td>
-      <td align="left" width="10%">
+         <br/><br/><br/><br/>
          Tooltip<br />
          <img src="images/watch/renders_tooltip.png" alt="renders_tooltip" />
          <br/><br/><br/><br/>
          Sort&amp;Filter Control<br />
          <img src="images/watch/renders_sortfilter.png" alt="renders_sortfilter" />
       </td>
-   </tr>
-   <tr>
-      <td/>
-      <td>
-         <table width="100%" cellpadding="0" cellspacing="0" bgcolor="#609050">
-         <tr>
-            <td width="5%"/>
-            <td align="left">
-               <font color="#FF6010" size="3">&#9733;</font>
-               <font color="#000000"><b>name</b><br/></font>
-               <font color="#D0FFA0" size="1">capacity.service: jobname.blockname.taskname</font>
-            </td>
-            <td align="right">
-               <font color="#000000" size="1"><b>user - priority</b><br/></font>
-               <font color="#D0FFA0" size="1">task owner - running time</font>
-            </td>
-            <td width="5%"/>
-         </tr>
-         </table>
-      </td>
-      <td/>
    </tr>
 </table>
 
@@ -122,21 +136,24 @@ read and write data on disk.<br/>
 <font color="#FFFF00"><b>.001 - 100</b></font> : Shows graph scale in megabytes per second.
 </p>
 
+<p>
+You can open renders list in a separate window (RMB on 'RENDERS' button).<br />
+</p>
+
 <table>
    <tr>
       <td align="center">
          Renders Separate Window<br />
          <img src="images/watch/renders_filtered.png" alt="users_filtered" />
       </td>
-      <td align="left">
-         You can open renders list in a separate window (RMB on 'RENDERS' button).<br />
-         <br />
-         It's useful to test job hosts mask with Sort&amp;Filter.<br />
-         <br />
-         This is an example of renders list filtered by their name.<br />
-      </td>
    </tr>
 </table>
+
+<p>
+This is an example of renders list filtered by their name.<br />
+You can test job hosts mask with Sort&amp;Filter.<br />
+</p>
+
 
 <!--FOOTER-->
 </td></tr></table>

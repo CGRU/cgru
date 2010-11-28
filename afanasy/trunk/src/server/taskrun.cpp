@@ -58,7 +58,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data(),
    render->setTask( exec, monitoring);
    task->monitor( monitoring );
    task->updateDatabase();
-   log(QString("Starting on '%1'").arg(render->getName()));
+   log(QString("SESSION #%1: Starting on '%2'").arg( progress->starts_count).arg(render->getName()));
 }
 
 TaskRun::~TaskRun()

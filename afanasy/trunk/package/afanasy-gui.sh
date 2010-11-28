@@ -18,5 +18,6 @@ afanasy/bin/afwatch \
 afanasy/bin/aftalk \
 afanasy/bin/afmonitor \
 afanasy/launch/afwatch.sh \
+afanasy/launch/aftalk.sh \
 "
 for f in $files; do cp -r $src/$f $pack/$cgru/$f; done

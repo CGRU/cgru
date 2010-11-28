@@ -1,7 +1,7 @@
 [Desktop Entry]
 Name=Talk
 Comment=Chat Afanasy Client
-Exec=/opt/cgru/afanasy/bin/aftalk
+Exec=/opt/cgru/afanasy/launch/aftalk.sh
 Icon=aftalk
 Terminal=false
 Type=Application

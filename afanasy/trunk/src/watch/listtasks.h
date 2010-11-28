@@ -46,6 +46,7 @@ private slots:
 
    void blockAction( int id_block, int id_action);
 
+   void actTaskInfo();
    void actTaskLog();
    void actTaskStdOut( int number );
    void actTaskErrorHosts();

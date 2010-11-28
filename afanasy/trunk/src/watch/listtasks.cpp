@@ -124,20 +124,18 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
       }
       case ItemJobTask::ItemId:
       {
-//printf("ListTasks::contextMenuEvent: task:\n");
          ActionId * actionid = new ActionId( 0, "Output", this);
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
          menu.addAction( actionid);
 
          int startCount = 1;
          startCount = ((ItemJobTask*)(item))->taskprogress.starts_count;
-//printf("ListTasks::contextMenuEvent: startCount=%d\n", startCount);
          if( startCount > 1 )
          {
             QMenu * submenu = new QMenu( "outputs", this);
             for( int i = 1; i < startCount; i++)
             {
-               actionid = new ActionId( i, QString(" %1 ").arg(i), this);
+               actionid = new ActionId( i, QString("session #%1").arg(i), this);
                connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
                submenu->addAction( actionid);
             }
@@ -146,6 +144,10 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 
          action = new QAction( "Log", this);
          connect( action, SIGNAL( triggered() ), this, SLOT( actTaskLog() ));
+         menu.addAction( action);
+
+         action = new QAction( "Info", this);
+         connect( action, SIGNAL( triggered() ), this, SLOT( actTaskInfo() ));
          menu.addAction( action);
 
          action = new QAction( "Listen", this);
@@ -494,13 +496,14 @@ void ListTasks::actTasksSkip()              { do_Skip_Restart( af::Msg::TTasksSk
 void ListTasks::actTasksRestart()           { do_Skip_Restart( af::Msg::TTasksRestart,  ItemJobTask::ItemId); }
 
 void ListTasks::actTaskLog()               { do_Info_StdOut(  af::Msg::TTaskLogRequest,         0);}
+void ListTasks::actTaskInfo()              { do_Info_StdOut(  af::Msg::TTaskRequest,            0);}
 void ListTasks::actTaskErrorHosts()        { do_Info_StdOut(  af::Msg::TTaskErrorHostsRequest,  0);}
 void ListTasks::actTaskStdOut( int number ){ do_Info_StdOut(  af::Msg::TTaskOutputRequest, number);}
 
 void ListTasks::doubleClicked( Item * item)
 {
    if( item->getId() == ItemJobTask ::ItemId )
-      do_Info_StdOut(  af::Msg::TTaskRequest, 0, item);
+      do_Info_StdOut(  af::Msg::TTaskLogRequest, 0, item);
    else if( item->getId() == ItemJobBlock::ItemId )
    {
       ItemJobBlock * block = (ItemJobBlock*)item;

@@ -6,8 +6,8 @@
 <title>Afanasy Features</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
-<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
-<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
 </head>
 <body>
 <table width="99%" align="center">
@@ -69,23 +69,30 @@ You can use Afanasy to parallel calculate anything you can describe (split) thro
 
 <h4>Render computer resources monitoring.</h4>
 <p>
-You can monitor CPU usage: user, nice, system, I/O wait and load average.
-Memory, swap and HDD usage. Network traffic.
+You can monitor CPU usage: User, Nice, System, I/O Wait and Load Average.
+Memory, Swap and HDD usage. Network traffic.
 Disk I/O operations speed and utilization percentage.
 This can help you to diagnose what slows rendering process.
 Especially swap, I/O wait and network traffic.
-<p></p>
-You can write your own custom resources meters on python.
+</p><p>
+You can write your own custom resource(s) meter(s) on python. And Watch will plot its graph.
 </p>
 
 <h4>Multiply Tasks Renders (clients, slaves, hosts)</h4>
 <p>
 Render can run several tasks at the same time.<br/>
 </p><p>
-Useful for "powerful" hosts with several CPUs. Render and Task has a capacity attribute, each task checks available capacity on render, and if its enough, task launches and take its capacity value from render.<br/>
+Useful for "powerful" hosts with several CPUs.
+Render and Task has a capacity attribute, each task checks available capacity on render, and if its enough,
+task launches and take its capacity value from render.<br/>
 </p>
 <h5>Tasks can variate capacity 'on-the-fly'</h5>
-Capacity variation can be described through its minimum and maximum coefficients. If task with 1000 capacity units runs on render with 4000 free capacity, task can take capacity coefficient 4. This coefficient can be caught in task command line (so Mantra can be launched 'mantra -j 4 ...', or 3000 capacity can be used by one 'houdini' task, for example to generate something, which use only one CPU, and 'mantra -j 3'). Hosts capacity values described in 'Farm Setup' ('xml' file).
+Capacity variation can be described through its minimum and maximum coefficients.
+If task with 1000 capacity units runs on render with 4000 free capacity, task can take capacity coefficient 4.
+This coefficient can be caught in task command line
+(so Mantra can be launched 'mantra -j 4 ...', or 3000 capacity can be used by one 'houdini' task,
+for example to generate something, which use only one CPU, and 'mantra -j 3').
+Hosts capacity values described in 'Farm Setup' ('xml' file).
 </p>
 
 <h4>Paths Map.</h4>
@@ -97,16 +104,19 @@ You can use different operating systems on farm hosts and to submit jobs from an
 
 <h4>Dependencies</h4>
 <p>
-Job can depends on other job(s) of the same user (<i>depend mask</i>) or on some job(s) from any user (<i>global depend mask</i>). Job will wait other jobs to be done matching this mask regular expression (Afanasy uses Qt Regular Expressions, they are Perl-like).
+Job can depends on other job(s) of the same user (<i>depend mask</i>) or on some job(s) from any user (<i>global depend mask</i>).
+Job will wait other jobs to be done matching this mask regular expression (Afanasy uses Qt Regular Expressions, they are Perl-like).
 </p><p>
-Job Block can wait other block(s) to be done (<i>depend mask</i>). Block tasks can wait other block tasks to be done (<i>tasks depend mask</i>).
+Job Block can wait other block(s) to be done (<i>depend mask</i>).
+Block tasks can wait other block tasks to be done (<i>tasks depend mask</i>).
 </p>
 
 <h4>Errors Solving</h4>
 <p>
-Job Blocks Errors Hosts List - block store host names where error was occurred and number of errors for each host. If this number greater it's limit, block will 'avoid' this host (not to run tasks on render with such hostname).<br/>
+Job Errors Hosts List - block store host names where error was occurred and number of errors for each host.
+If this number greater it's limit, block will 'avoid' this host (not to run tasks on render with such hostname).<br/>
 </p><p>
-Blocks Tasks Errors Hosts List - the same as described above, but for each task.<br/>
+Tasks Errors Hosts List - the same as described above, but for each task.<br/>
 </p><p>
 Tasks Auto Retry - maximum number of errors to retry task automatically.
 </p><p>
@@ -124,12 +134,12 @@ Job priority - to simple sort user jobs queue.
 
 <h4>Hosts Masks</h4>
 <p>
-User, job and block has a mask of host names to be able to run on and exclude mask for hosts to avoid.
+Users and Jobs can have a hosts names mask to be able to run on and exclude mask for hosts to avoid.
 </p>
 
 <h4>Maximum Hosts</h4>
 <p>
-User, job and block has maximum number of hosts - no new hosts will be available above this limit.
+Users and Jobs has maximum number of hosts - no new hosts will be available above this limit.
 </p>
 
 <h4>Python API</h4>
@@ -147,36 +157,51 @@ Service - 'block tasks type', for example: 'hbatch', 'mantra', 'prman', 'nuke', 
 Service setups a default task output parser type (which can be overridden later). Services are python classes. They all inherits a base 'service' class. Service class describes command line manipulations, such as task capacity (how to specify how much CPUs to use ('mantra - j @AF_CAPACITY@')).
 </p>
 <p>
-Parser - read task output to calculate running progress. Parsers are python classes and can be combined (multiply inheritance), for example: 'hbatch_mantra' - inherits 'hbatch' and 'mantra' parsers to listen to tasks when Houdini generates a files for mantra, such parser listen for frames switching (when several frames per render set) and calculates valid percentage.<br/>
+Parser - read task output to calculate running progress.
+Parsers are python classes and can be combined (multiply inheritance),
+for example: 'hbatch_mantra' - inherits 'hbatch' and 'mantra' parsers to listen to tasks when Houdini generates a files for mantra,
+such parser listen for frames switching (when several frames per render set) and calculates valid percentage.<br/>
+Parser can produce errors or warnings if it founds "bad" text.
+So render can stop task with error if it produced bad output.
 </p>
 
 <h4>Job - Block - Task</h4>
 <p>
-Job consists of blocks, which produce tasks. There are two types of blocks <i>numeric</i> and not. Numeric block don't store tasks data, it generates tasks 'on-the-fly' by some rules. Not numeric blocks contains data for each task. Task inherits most attributes from block (for example all block tasks has the same working directory). But some other attributes individual (commands for example).
+Job consists of blocks, which produce tasks.
+There are two types of blocks <i>numeric</i> and not.
+Numeric block don't store tasks data, it generates tasks 'on-the-fly' by some rules.
+Not numeric blocks contains data for each task.
+Task inherits most attributes from block (for example all block tasks has the same working directory).
+But some other attributes individual (commands for example).
 </p>
 <h5>1 000 000 Tasks Job !</h5>
-As Tasks are generated by job blocks "on demand", Afanasy (and Server and GUI) can handle <i>numeric</i> blocks with huge tasks number.
+As Tasks are generated by job blocks "on demand",
+Afanasy (and Server and GUI) can handle <i>numeric</i> blocks with huge tasks number.
 </p>
 
 <h4>Farm setup</h4>
 <p>
-Map hosts names and their abilities through patterns described in XML file. You can describe job and block '<i>need</i>' properties to be able to run only on hosts which satisfy this needs (OS, free memory etc.). Server can reload this file (and reconfigure itself) "on-the-fly", without restart and keep tasks running.
+Map hosts names and their abilities through patterns described in XML file.
+You can describe job and block '<i>need</i>' properties to be able to run only on hosts which satisfy this needs(OS, free memory etc.).
+Server can reload this file (and reconfigure itself) "on-the-fly", without restart and keep tasks running.
 </p>
 
 <h4>Watch - minimalistic GUI to afanasy</h4>
 <p>
 Watch - afanasy monitor. It can be in three modes - USER, VISOR and GOD.<br/>
-<i>USER</i> ( common mode ) - user can change any his and any his job parameter. He can manipulate render host which was registered with it's user name or if it contains user computer name<br/>
+<i>USER</i> ( common mode ) - user can change any his and any his job parameter.
+He can manipulate render host which was registered with it's user name or if it contains user computer name<br/>
 <i>VISOR</i> ( super user mode ) - can do same as user but he change or remove job of any user.<br/>
-<i>GOD</i> ( super user mode ) - can do anything. Change any parameter of any user, job or host. Add or delete users. Start, stop, restart any render host.<br/>
-To switch user mode you need to type password in active Watch window (you do not need to relogin to switch between modes). To reset super user mode you can type password again.
+<i>GOD</i> ( super user mode ) - can do anything.
+Change any parameter of any user, job or host. Add or delete users. Start, stop, restart any render host.<br/>
 </p>
 
 <h4>Web Visor</h4>
 <p>
 Web interface to afanasy database to show current state tables or draw history usage statistics diagrams.
 </p><p>
-All calculations and database queries are on the server side, simple HTML text and PNG images provided to client. So you need no libraries or plug-ins for it, any browser will be enough.
+All calculations and database queries are on the server side, simple HTML text and PNG images provided to client.
+So client needs no libraries or plug-ins for it, any browser will be enough.
 </p>
 
 <h4>SQL Database Connection</h4>
@@ -192,7 +217,11 @@ Also you can type any SQL query to get some afanasy information yourself.
 
 <h4>Command Line Interface</h4>
 <p>
-Afanasy has a command line interface for various purposes. It can connect to Afanasy server from remote Linux machine. You can set some server parameter "on-the-fly". Change some user, job and host attributes. Query users, jobs, hosts attributes and traffic statistics.
+Afanasy has a command line interface for various purposes.
+It can connect to Afanasy server from remote Linux machine.
+You can set some server parameter "on-the-fly".
+Change some user, job and host attributes.
+Query users, jobs, hosts attributes and traffic statistics.
 </p>
 <h4>Job Example</h4>
 <p>The simplest job:</p>
@@ -261,7 +290,7 @@ When some machine registers on server, it finds last pattern with mask that matc
 
 </td><td align="center" valign="middle">
 <p>
-<small>
+<b>
 Watch Renders<br/>
 <img hspace="10" vspace="10" src="images/watch/renders_features.png" alt="watch/renders.png"/><br/>
 <br/><br/>
@@ -282,7 +311,7 @@ Web Visor Statistics Chart - Tasks Quantity / Task Type<br/>
 <br/><br/>
 Web Visor Statistics Chart - Jobs Quantity / Job Name<br/>
 <img hspace="10" vspace="10" width="400" height="300"  src="images/visor/jobsquantity.png" alt="visor/jobsquantity.png"/><br/>
-</small>
+</b>
 </p>
 </td></tr></table>
 

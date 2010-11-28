@@ -424,7 +424,13 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
       QStringList *list = job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask());
       if( list == NULL ) break;
       msg_response = new MsgAf();
-      msg_response->setStringList( *job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
+      if( list->isEmpty())
+      {
+         QStringList nolog("No task log available.");
+         msg_response->setStringList( nolog);
+      }
+      else
+         msg_response->setStringList( *list);
       break;
    }
    case af::Msg::TTaskErrorHostsRequest:
@@ -483,7 +489,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
          QFile outFile( filename);
          if( outFile.exists() == false )
          {
-            QString str(QString("No output file '%1'.").arg(filename));
+            QString str("No output exists.");
             msg_response->setString( str);
          }
          else if( outFile.open( QIODevice::ReadOnly ) == false )
@@ -497,7 +503,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
             int output_length = output.size();
             if( output_length == 0)
             {
-               QString str(QString("Output file is empty '%1'.").arg(filename));
+               QString str(QString("Output is empty.").arg(filename));
                msg_response->setString( str);
             }
             else
