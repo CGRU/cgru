@@ -7,6 +7,7 @@
 
 class QApplication;
 class QKeyEvent;
+class QPixmap;
 
 class ButtonMonitor;
 class Dialog;

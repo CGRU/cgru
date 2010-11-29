@@ -3,6 +3,7 @@
 #include <QtCore/QDir>
 #include <QtCore/QProcess>
 #include <QtGui/QApplication>
+#include <QtGui/QPixmap>
 
 #include "../include/afanasy.h"
 
