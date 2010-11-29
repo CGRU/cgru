@@ -188,11 +188,9 @@ void BlockInfo::refresh()
    str_percent = QString::number( percentage) + "%";
    if( false == name.isEmpty()) str_percent += ' ' + name;
 
-   str_progress = QString("b%1-t%2 r%3/%4 d%5/%6e")
-            .arg( blocknum)
+   str_progress = QString("t%1: r%3 d%5 e%6")
             .arg( tasksnum)
             .arg( tasksrunning)
-            .arg( tasksready)
             .arg( tasksdone)
             .arg( taskserror);
 

@@ -350,7 +350,21 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
+   // Calculate some sizes:
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
+
+   static const int plot_h = HeightHost - 5;
+   int plot_dw = w / 10;
+   int allplots_w = plot_dw * 6;
+   int plot_y = y + 4;
+   int plot_w = plot_dw - 4;
+   int plot_x = x + (w - allplots_w)/2 + (w>>5);
+
+   static const int left_x_offset = 25;
+   int left_text_x = x + left_x_offset;
+   int left_text_w = plot_x - left_x_offset - 5;
+   int right_text_x = x + plot_x + allplots_w - 5;
+   int right_text_w = w - plot_x - allplots_w;
 
    // Draw standart backgroud
    drawBack( painter, option);
@@ -384,16 +398,16 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
    painter->setPen(   clrTextMain( option) );
    painter->setFont(  afqt::QEnvironment::f_name);
-   painter->drawText( x+25, y, w, h, Qt::AlignTop | Qt::AlignLeft, name + ' ' + version  );
+   painter->drawText( left_text_x, y, left_text_w, h, Qt::AlignTop | Qt::AlignLeft, name + ' ' + version  );
 
    painter->setPen(   afqt::QEnvironment::qclr_black );
    painter->setFont(  afqt::QEnvironment::f_info);
-   painter->drawText( x+5, y+2, w-10, h, Qt::AlignTop | Qt::AlignRight, state );
+   painter->drawText( right_text_x, y+2, right_text_w, h, Qt::AlignTop | Qt::AlignRight, state );
 
-   painter->setPen(  clrTextInfo( option) );
-   painter->setFont( afqt::QEnvironment::f_info);
-   painter->drawText( x+25, y, w,   HeightHost+2, Qt::AlignBottom | Qt::AlignLeft,  capacity_usage);
-   painter->drawText( x,    y, w-5, HeightHost+2, Qt::AlignBottom | Qt::AlignRight, taskstartfinishtime_str);
+   painter->setPen(   clrTextInfo( option) );
+   painter->setFont(  afqt::QEnvironment::f_info);
+   painter->drawText( left_text_x,  y, left_text_w,  HeightHost+2, Qt::AlignBottom | Qt::AlignLeft,  capacity_usage);
+   painter->drawText( right_text_x, y, right_text_w, HeightHost+2, Qt::AlignBottom | Qt::AlignRight, taskstartfinishtime_str);
 
    if( ListRenders::ConstHeight )
    {
@@ -432,13 +446,6 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       }
       painter->drawText( x+5, y, w, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }
-
-   int plot_dw = w / 10;
-   int allplots_w = plot_dw * 6;
-   int plot_x = x + (w - allplots_w)/2 + (w>>5);
-   int plot_y = y + 4;
-   int plot_w = plot_dw - 4;
-   int plot_h = HeightHost - 5;
 
    plotCpu.paint( painter, plot_x, plot_y, plot_w, plot_h);
    plot_x += plot_dw;
