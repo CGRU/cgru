@@ -23,10 +23,10 @@ Parser.add_option('--company',               dest='company',         type  ='str
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
 Parser.add_option('--artist',                dest='artist',          type  ='string',     default='',             help='Artist name')
 Parser.add_option('--suffix',                dest='suffix',          type  ='string',     default='',             help='Add suffix to output movie filename')
-Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=25,             help='Draw 16:9 cacher opacity')
-Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=25,             help='Draw 2.35 cacher opacity')
-Parser.add_option('--line169',               dest='line169',         type  ='string',     default='200,200,200',  help='Draw 16:9 line color: "255,255,0"')
-Parser.add_option('--line235',               dest='line235',         type  ='string',     default='200,200,200',  help='Draw 2.35 line color: "255,255,0"')
+Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=0,              help='Draw 16:9 cacher opacity')
+Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=0,              help='Draw 2.35 cacher opacity')
+Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
+Parser.add_option('--line235',               dest='line235',         type  ='string',     default='',             help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--logopath',         		dest='logopath',    		type  ='string',     default='',             help='Add a specified image')
 Parser.add_option('--logosize',         		dest='logosize',    		type  ='int',        default=20,   	         help='Logotype size, percent of image')
 Parser.add_option('--logograv',         		dest='logograv',    		type  ='string',     default='southeast', 	help='Logotype positioning gravity')
@@ -52,11 +52,28 @@ if len(args) > 0: InFile1 = os.path.abspath( args[0])
 if len(args) > 1: InFile2 = os.path.abspath( args[1])
 
 # Initializations:
-FormatNames  = ['Encode "as is" only', 'PAL (720x576)', 'PAL Square (768x576)', 'HD 720p (1280x720)', 'HD 1080p (1920x1080)']
-FormatValues = [                   '',      '720x576' ,             '768x576' ,          '1280x720' ,           '1920x1080' ]
-
+DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
+TemplatesPath = os.path.join( DialogPath, 'templates')
+LogosPath = os.path.join( DialogPath, 'logos')
+CodecsPath = os.path.join( DialogPath, 'codecs')
+FormatsPath = os.path.join( DialogPath, 'formats')
 FPS = ['23.976','24','25','30']
 
+FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
+Encoders = ['ffmpeg', 'mencoder']
+Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
+
+# Process Cacher:
+CacherNames  = ['None', '25%', '50%', '75%', '100%']
+CacherValues = [   '0', '25' , '50' , '75' , '100' ]
+if not str(Options.draw169) in CacherValues:
+   CacherNames.append(  str(Options.draw169))
+   CacherValues.append( str(Options.draw169))
+if not str(Options.draw235) in CacherValues:
+   CacherNames.append(  str(Options.draw235))
+   CacherValues.append( str(Options.draw235))
+
+# Precess Artist:
 Artist = Options.artist
 if Artist == '': Artist = os.getenv('USER', os.getenv('USERNAME', 'user'))
 # cut DOMAIN from username:
@@ -65,16 +82,25 @@ if dpos == -1: dpos = Artist.rfind('\\')
 if dpos != -1: Artist = Artist[dpos+1:]
 Artist = Artist.capitalize()
 
-DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
-TemplatesPath = os.path.join( DialogPath, 'templates')
-LogosPath = os.path.join( DialogPath, 'logos')
-CodecsPath = os.path.join( DialogPath, 'codecs')
-
-CacherNames  = ['None', '25%', '50%', '75%', '100%']
-CacherValues = [   '0', '25' , '50' , '75' , '100' ]
-FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
-Encoders = ['ffmpeg', 'mencoder']
-Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
+# Process formats:
+FormatNames = []
+FormatValues = []
+FormatFiles = []
+allFiles = os.listdir( FormatsPath)
+for afile in allFiles:
+   afile = os.path.join( FormatsPath, afile)
+   if os.path.isfile( afile): FormatFiles.append( afile)
+FormatFiles.sort()
+for afile in FormatFiles:
+   file = open( afile)
+   FormatNames.append(file.readline().strip())
+   FormatValues.append(file.readline().strip())
+   file.close()
+FormatNames.append('Encode "as is" only')
+FormatValues.append('')
+if not Options.format in FormatValues:
+   FormatValues.append( Options.format)
+   FormatNames.append( Options.format)
 
 # Process templates:
 Templates = ['']
@@ -902,8 +928,8 @@ class Dialog( QtGui.QWidget):
       self.evaluated = False
       self.btnStart.setEnabled( False)
 
-      if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9 color'): return
-      if not self.validateEditColor( str(self.editLine235.text()), 'line 2.35 color'): return
+      if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9'): return
+      if not self.validateEditColor( str(self.editLine235.text()), 'line 2.35'): return
 
       self.cmdField.clear()
       if self.inputPattern is None:

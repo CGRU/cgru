@@ -10,7 +10,8 @@ from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',             help='Input folder to scan')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',             help='Output folder for movies')
-Parser.add_option('-c', '--codec',     dest='codec',     type  ='string',     default='h264.ffmpeg',  help='Default codec preset')
+Parser.add_option('-f', '--format',    dest='format',    type  ='string',     default='720x576',      help='Resolution')
+Parser.add_option('-c', '--codec',     dest='codec',     type  ='string',     default='h264_hi.ffmpeg',help='Default codec preset')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',      help='Frame paint template')
 Parser.add_option('-e', '--extensions',dest='extensions',type  ='string',     default='',             help='Files extensions, comma searated')
 Parser.add_option('-a', '--abspath',   dest='abspath',   action='store_true', default=False,          help='Prefix movies with images absolute path')
@@ -24,7 +25,26 @@ Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', de
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 TemplatesPath = os.path.join( DialogPath, 'templates')
 CodecsPath = os.path.join( DialogPath, 'codecs')
+FormatsPath = os.path.join( DialogPath, 'formats')
 Encoders = ['ffmpeg', 'mencoder']
+
+# Process formats:
+FormatNames = []
+FormatValues = []
+FormatFiles = []
+allFiles = os.listdir( FormatsPath)
+for afile in allFiles:
+   afile = os.path.join( FormatsPath, afile)
+   if os.path.isfile( afile): FormatFiles.append( afile)
+FormatFiles.sort()
+for afile in FormatFiles:
+   file = open( afile)
+   FormatNames.append(file.readline().strip())
+   FormatValues.append(file.readline().strip())
+   file.close()
+if not Options.format in FormatValues:
+   FormatValues.append( Options.format)
+   FormatNames.append( Options.format)
 
 # Process templates:
 Templates = ['']
@@ -79,11 +99,11 @@ class Dialog( QtGui.QWidget):
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
       self.cbFormat = QtGui.QComboBox( self)
-      self.cbFormat.addItem('PAL (720x576)', QtCore.QVariant('720x576'))
-      self.cbFormat.addItem('PAL Square (768x576)', QtCore.QVariant('768x576'))
-      self.cbFormat.addItem('HD 720p (1280x720)', QtCore.QVariant('1280x720'))
-      self.cbFormat.addItem('HD 1080p (1920x1080)', QtCore.QVariant('1920x1080'))
-      self.cbFormat.setCurrentIndex( 1)
+      i = 0
+      for format in FormatValues:
+         self.cbFormat.addItem( FormatNames[i], format)
+         if format == Options.format: self.cbFormat.setCurrentIndex( i)
+         i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tCodec = QtGui.QLabel('Codec:', self)
       self.cbCodec = QtGui.QComboBox( self)

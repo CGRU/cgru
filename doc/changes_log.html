@@ -43,10 +43,16 @@
 <h2 align="center">CGRU Changes Log.</h2>
 <hr />
 <p>
-If Afanasy <b>network protocol changed</b>, it became incompatible with old one. Protocol version number exist in any Afanasy network system message in it first bytes. When server receives any message with another protocol version, it sends an empty message back to client, but with new protocol version. If client receives a message with new protocol version it exits. So server shut down all incompatible clients that tries to connect.
+If Afanasy <b>network protocol changed</b>, it became incompatible with old one.
+Protocol version number exists in any Afanasy network system message in it first bytes.
+When server receives any message with another protocol version, it sends an empty message back to client, but with new protocol version.
+If client receives a message with new protocol version it exits.
+So server shuts down all incompatible clients that tries to connect.
 </p>
 <p>
-If Afanasy <b>database schema changed</b> server can't restore state. All information will be lost. You need to reset old database tables and create new. You can use this command to perform it:<br/>
+If Afanasy <b>database schema changed</b> server can't restore state. All information will be lost.
+You need to reset old database tables and create new.
+You can use this command to perform it:<br/>
 <code>afcmd db_resetall</code>
 </p>
 
@@ -60,10 +66,10 @@ AfWatch shows services icons, it is common programs icons for users to recognize
 </p>
 <p>
 Every Afanasy client has compiled revision number, startup version string and sends them to server.
-Most dialogs in shows CGRU version, Afanasy GUI also shows clients build revision.
+Most dialogs in CGRU show version, Afanasy GUI also shows clients build revision.
 </p>
 <p>
-Nuke "dailies" node to generate movies locally on Afanasy farm.
+Nuke "dailies" node to generate movies locally or on Afanasy farm.
 </p>
 <p>
 "movgen" service added. It will be used for movies generation: annotate frames, encode, make dailies.
