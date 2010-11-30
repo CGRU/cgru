@@ -157,17 +157,17 @@ void ItemRender::updateValues( af::Node *node, int type)
 
          host = render->getHost();
          plotMem.setScale( host.mem_mb);
-         plotMem.setHotMin( (75*host.mem_mb)/100);
-         plotMem.setHotMax( (95*host.mem_mb)/100);
+         plotMem.setHotMin(( 90*host.mem_mb)/100);
+         plotMem.setHotMax((100*host.mem_mb)/100);
          plotHDD.setScale( host.hdd_gb);
-         plotHDD.setHotMin( (85*host.hdd_gb)/100);
-         plotHDD.setHotMax( (99*host.hdd_gb)/100);
+         plotHDD.setHotMin(( 95*host.hdd_gb)/100);
+         plotHDD.setHotMax((100*host.hdd_gb)/100);
          plotSwp.setScale( host.swap_mb);
          if( host.swap_mb )
          {
             plotSwp.setLabel("S");
-            plotSwp.setHotMin( (10*host.swap_mb)/100);
-            plotSwp.setHotMax( (90*host.swap_mb)/100);
+            plotSwp.setHotMin(( 10*host.swap_mb)/100);
+            plotSwp.setHotMax((100*host.swap_mb)/100);
          }
          else
          {

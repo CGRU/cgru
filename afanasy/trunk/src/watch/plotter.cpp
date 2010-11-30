@@ -143,7 +143,7 @@ void Plotter::addValue( int grp, int val, bool store)
    int r = clrR_cur[grp];
    int g = clrG_cur[grp];
    int b = clrB_cur[grp];
-   if( hot_max[grp] == 0 ) calcHot( grp, val, r,g,b);
+   if( hot_max[grp] != 0 ) calcHot( grp, val, r,g,b);
    clr_r[ grp][lines-1] = r;
    clr_g[ grp][lines-1] = g;
    clr_b[ grp][lines-1] = b;
@@ -244,16 +244,23 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
 
 void Plotter::calcHot( int grp, int value, int &r, int &g, int &b) const
 {
+	if(( hot_min[grp] == 0 ) || ( hot_max[grp] == 0 )) return;
+
+   if( value <= hot_min[grp]) return;
+
    int hr = clrR_cur_hot[grp];
    int hg = clrG_cur_hot[grp];
    int hb = clrB_cur_hot[grp];
 
-   if( value <= hot_min[grp]) return;
-   if( value >= hot_max[grp]) return;
+   if( value >= hot_max[grp])
+   {
+      r = hr; g = hg; b = hb;
+      return;
+   }
 
    int hot_max_min = hot_max[grp] -hot_min[grp];
-   if( hot_max_min == 0) hot_max_min = 1;
-   float factor = (1.0 * (value - hot_min[grp])) / hot_max_min;
+   if( hot_max_min < 1) hot_max_min = 1;
+   float factor = (1.0 * (value - hot_min[grp])) / (float)hot_max_min;
    r = int( (float)r*(1.0 - factor) + (float)hr * factor );
    g = int( (float)g*(1.0 - factor) + (float)hg * factor );
    b = int( (float)b*(1.0 - factor) + (float)hb * factor );
