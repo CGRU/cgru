@@ -1,2 +1,2 @@
 DNxHD 36MBits
-ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec dnxhd -b 36Mb "@OUTPUT@"
+ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec dnxhd -b 36M "@OUTPUT@"
