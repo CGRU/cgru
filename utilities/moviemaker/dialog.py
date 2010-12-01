@@ -170,7 +170,7 @@ class Dialog( QtGui.QWidget):
       self.cbFormat = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
-         self.cbFormat.addItem( FormatNames[i], format)
+         self.cbFormat.addItem( FormatNames[i], QtCore.QVariant( format))
          if format == Options.format: self.cbFormat.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
