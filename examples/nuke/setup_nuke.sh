@@ -61,5 +61,19 @@ if [ -f $LM_LICENSE_FILE ]; then
    echo "LM_LICENCS_FILE='$LM_LICENSE_FILE'"
 fi
 
+# Setup Dailies:
+moviemaker=$CGRU_LOCATION/utilities/moviemaker
+export CGRU_DAILIES_TEMPLATE="$moviemaker/templates/dailies"
+export CGRU_DAILIES_SLATE="$moviemaker/templates/dailies_slate"
+export CGRU_DAILIES_CODEC="$moviemaker/codecs/photojpg_best.ffmpeg"
+export CGRU_DAILIES_LOGOPATH="$moviemaker/logos/logo.png"
+export CGRU_DAILIES_LOGOSIZE="20"
+export CGRU_DAILIES_FORMAT="720x576"
+export CGRU_DAILIES_FPS="24"
+export CGRU_DAILIES_DRAW169="25"
+export CGRU_DAILIES_DRAW235="25"
+export CGRU_DAILIES_LINE169="200,200,200"
+export CGRU_DAILIES_LINE235="200,200,200"
+
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh

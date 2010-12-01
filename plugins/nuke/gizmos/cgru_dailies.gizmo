@@ -2,11 +2,12 @@ Gizmo {
    tile_color 0x80d060ff
    note_font_color 0x200ff
 
-   addUserKnob { 20 ""        l General        }
-   addUserKnob {  4 format  M { "720x576" "768x576" "1280x720" "1920x1080"}  l "Format" +STARTLINE}
-   addUserKnob {  4 fps     M { "23.976" "24" "25" "30"}  l "FPS" -STARTLINE}
-   addUserKnob {  4 codec   M { "DNxHD" "H264"}  l "Codec" -STARTLINE}
-   addUserKnob {  1 suffix  l "Suffix"     -STARTLINE }
+   addUserKnob { 20 ""      l General        }
+   addUserKnob {  1 format  l "Format"    +STARTLINE}
+   addUserKnob {  1 fps     l "FPS"       -STARTLINE}
+   addUserKnob {  1 suffix  l "Suffix"    -STARTLINE }
+
+   addUserKnob {  2 codec     l "Codec Preset" +STARTLINE}
 
    addUserKnob {  1 company   l "Company"  +STARTLINE }
    addUserKnob {  1 project   l "Project"  -STARTLINE }
@@ -33,11 +34,13 @@ Gizmo {
 
    addUserKnob { 20 "" Parameters }
 
+   addUserKnob {  2 template l "Template"        +STARTLINE }
+   addUserKnob {  2 slate    l "Slate"           +STARTLINE }
    addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
    addUserKnob {  1 draw235  l "Cacher 2.35"     -STARTLINE }
    addUserKnob {  1 line169  l "Line 16:9 Color" +STARTLINE }
    addUserKnob {  1 line235  l "line 2.35 Color" -STARTLINE }
-   addUserKnob {  1 logopath l "Logo"            +STARTLINE }
+   addUserKnob {  2 logopath l "Logo"            +STARTLINE }
    addUserKnob {  3 logosize l "Size"            -STARTLINE }
 
 
@@ -50,12 +53,12 @@ Gizmo {
    movauto     1
    stereodub   0
 
-   draw169     "0"
-   draw235     "0"
-   line169     "200,200,200"
-   line235     "200,200,200"
+   draw169     ""
+   draw235     ""
+   line169     ""
+   line235     ""
    logopath    ""
-   logosize    20
+   logosize    0
 
    help "Wee All Die!"
 

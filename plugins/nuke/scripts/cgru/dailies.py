@@ -5,6 +5,74 @@ import os, sys, time
 
 def dailiesEvaluate( node):
 
+   newNode = False
+   
+   # Format:
+   format = node.knob('format').value()
+   if format == None or format == '':
+      format = os.getenv('CGRU_DAILIES_FORMAT', '720x576')
+      node.knob('format').setValue( format)
+
+   # FPS:
+   fps = node.knob('fps').value()
+   if fps == None or fps == '':
+      fps = os.getenv('CGRU_DAILIES_FPS', '24')
+      node.knob('fps').setValue( fps)
+
+   # Codec Preset:
+   codec = node.knob('codec').value()
+   if codec == None or codec == '':
+      newNode = True
+      codec = os.getenv('CGRU_DAILIES_CODEC', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/codecs/photojpg_best.ffmpeg')
+      codec.replace('\\','/')
+      node.knob('codec').setValue( codec)
+
+   # Template:
+   template = node.knob('template').value()
+   if template == None or template == '':
+      template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies')
+      template.replace('\\','/')
+      node.knob('template').setValue( template)
+
+   # Slate:
+   slate = node.knob('slate').value()
+   if slate == None or slate == '':
+      slate = os.getenv('CGRU_DAILIES_SLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_slate')
+      slate.replace('\\','/')
+      node.knob('slate').setValue( slate)
+
+   # Logo:
+   logosize = node.knob('logosize').value()
+   if logosize < 1:
+      logosize = os.getenv('CGRU_DAILIES_LOGOSIZE', '20')
+      node.knob('logosize').setValue( float(logosize))
+
+   if newNode:
+
+      logopath = node.knob('logopath').value()
+      if logopath == None or logopath == '':
+         logopath = os.getenv('CGRU_DAILIES_LOGOPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
+         logopath.replace('\\','/')
+         node.knob('logopath').setValue( logopath)
+
+      # Cacher:
+      draw169 = node.knob('draw169').value()
+      if draw169 == None or draw169 == '':
+         draw169 = os.getenv('CGRU_DAILIES_DRAW169', '0')
+         node.knob('draw169').setValue( draw169)
+      draw235 = node.knob('draw235').value()
+      if draw235 == None or draw235 == '':
+         draw235 = os.getenv('CGRU_DAILIES_DRAW235', '0')
+         node.knob('draw235').setValue( draw235)
+      line169 = node.knob('line169').value()
+      if line169 == None or line169 == '':
+         line169 = os.getenv('CGRU_DAILIES_LINE169', '')
+         node.knob('line169').setValue( line169)
+      line235 = node.knob('line235').value()
+      if line235 == None or line235 == '':
+         line235 = os.getenv('CGRU_DAILIES_LINE235', '')
+         node.knob('line235').setValue( line235)
+
    # Shot:
    shot = node.knob('shot').value()
    if shot == None or shot == '':
@@ -87,7 +155,9 @@ def dailiesGenCmd( node):
    # Get Parameters:
    format   = node.knob('format'  ).value()
    fps      = node.knob('fps'     ).value()
-   codec    = node.knob('codec'   ).value().lower()
+   codec    = node.knob('codec'   ).value()
+   template = node.knob('template').value()
+   slate    = node.knob('slate'   ).value()
    company  = node.knob('company' ).value()
    project  = node.knob('project' ).value()
    shot     = node.knob('shot'    ).value()
@@ -99,8 +169,8 @@ def dailiesGenCmd( node):
    line169  = node.knob('line169' ).value()
    line235  = node.knob('line235' ).value()
    logopath = node.knob('logopath').value()
-   version  = int(node.knob('version').value())
    logosize = int(node.knob('logosize').value())
+   version  = int(node.knob('version').value())
 
    # Command Construction:
    cmd = os.environ['CGRU_LOCATION']
@@ -112,9 +182,8 @@ def dailiesGenCmd( node):
    cmd += ' -r "%s"' % format
    cmd += ' -f "%s"' % fps
    cmd += ' -c "%s"' % codec
-
-   cmd += ' -t "%s"' % 'dailies'
-   cmd += ' -s "%s"' % 'dailies_slate'
+   cmd += ' -t "%s"' % template
+   cmd += ' -s "%s"' % slate
 
    if company  is not None and company  != '': cmd += ' --company "%s"'  % company
    if project  is not None and project  != '': cmd += ' --project "%s"'  % project
