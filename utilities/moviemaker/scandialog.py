@@ -11,7 +11,7 @@ Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", versi
 Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',             help='Input folder to scan')
 Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',             help='Output folder for movies')
 Parser.add_option('-f', '--format',    dest='format',    type  ='string',     default='720x576',      help='Resolution')
-Parser.add_option('-c', '--codec',     dest='codec',     type  ='string',     default='h264_hi.ffmpeg',help='Default codec preset')
+Parser.add_option('-c', '--codec',     dest='codec',     type  ='string',     default='photojpg_best.ffmpeg',help='Default codec preset')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',      help='Frame paint template')
 Parser.add_option('-e', '--extensions',dest='extensions',type  ='string',     default='',             help='Files extensions, comma searated')
 Parser.add_option('-a', '--abspath',   dest='abspath',   action='store_true', default=False,          help='Prefix movies with images absolute path')
@@ -101,7 +101,7 @@ class Dialog( QtGui.QWidget):
       self.cbFormat = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
-         self.cbFormat.addItem( FormatNames[i], format)
+         self.cbFormat.addItem( FormatNames[i], QtCore.QVariant( format))
          if format == Options.format: self.cbFormat.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -254,7 +254,7 @@ class Dialog( QtGui.QWidget):
 
       input = str( self.editInput.text())
       output = str( self.editOutput.text())
-      
+
       if input == '':
          self.cmdField.setText('Selecet a folder to scan.')
          return
@@ -262,8 +262,8 @@ class Dialog( QtGui.QWidget):
          self.cmdField.setText('Input folder does not exist.')
          return
       if output == '':
-         self.cmdField.setText('Selecet a folder for movies.')
-         return
+         output = input
+         self.editOutput.setText( output)
       if not os.path.isdir( output):
          self.cmdField.setText('Ouput folder does not exist.')
          return
@@ -321,7 +321,7 @@ class Dialog( QtGui.QWidget):
       self.process.terminate()
 
 app = QtGui.QApplication( sys.argv)
-icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'icon.png'))
+icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'scanscan.png'))
 app.setWindowIcon( icon)
 dialog = Dialog()
 dialog.show()

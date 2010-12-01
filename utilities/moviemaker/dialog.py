@@ -1110,7 +1110,7 @@ class Dialog( QtGui.QWidget):
          self.process.kill()
 
 app = QtGui.QApplication( sys.argv)
-icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'icon.png'))
+icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'mavishky.png'))
 app.setWindowIcon( icon)
 dialog = Dialog()
 dialog.show()
