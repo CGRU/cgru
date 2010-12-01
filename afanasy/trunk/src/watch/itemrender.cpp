@@ -388,9 +388,10 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    {
       painter->setPen(   afqt::QEnvironment::qclr_black );
       painter->setFont(  afqt::QEnvironment::f_info);
-      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + version );
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
-      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, "offline");
+		QRect rect_center;
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, "offline", &rect_center);
+      painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + version );
       painter->drawText( x+5, y+2, w-10, HeightOffline-4 + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
       drawPost( painter, option);
       return;
@@ -426,7 +427,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       QString taskstr;
       for( int i = 0; i < tasks_users.size(); i++) taskstr += QString(" %1:%2").arg( tasks_users[i]).arg( tasks_counts[i]);
       if( false == annotation.isEmpty()) taskstr = QString("%1 %2").arg( annotation, taskstr);
-      painter->drawText( x+5, y, w, plots_height + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+      painter->drawText( x+5, y, w-10, plots_height + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, taskstr);
    }
    else
    {
@@ -439,12 +440,13 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          taskstr += QString(": %1[%2][%3]").arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
-         painter->drawText( x+18, y, ((w*3)>>2), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+			QRect rect_usertime;
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
-            QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())));
+            QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())), &rect_usertime);
+         painter->drawText( x+18, y, w-30-rect_usertime.width(), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
          painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, *(*ii));
       }
-      painter->drawText( x+5, y, w, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
+      painter->drawText( x+5, y, w-10, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }
 
    plotCpu.paint( painter, plot_x, plot_y, plot_w, plot_h);

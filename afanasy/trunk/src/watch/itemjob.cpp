@@ -184,19 +184,22 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
       user_time_current = af::time2QstrHMS( currenttime - time_started  ) + " - " + user_time;
    }
    if( time_wait > currenttime )
-      user_time_current = user_time + " - " + af::time2QstrHMS( time_wait  - currenttime );
+      user_time_current = user_time + " - " + af::time2QstrHMS( time_wait - currenttime );
 
-   painter->setPen( clrTextMain( option) );
-   painter->setFont( afqt::QEnvironment::f_name);
-   painter->drawText( x+30, y+13, name);
    printfState( state, x+35+(w>>3), y+25, painter, option);
 
    painter->setFont( afqt::QEnvironment::f_info);
    painter->setPen( clrTextInfo( option));
 
    int cy = y-10; int dy = 13;
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time_current );
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties );
+	QRect rect_user;
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time_current, &rect_user);
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties);
+
+   painter->setPen( clrTextMain( option) );
+   painter->setFont( afqt::QEnvironment::f_name);
+   painter->drawText( x+30, y, w-40-rect_user.width(), 20, Qt::AlignVCenter | Qt::AlignLeft, name);
+
    if( state & AFJOB::STATE_DONE_MASK)
    {
       painter->setFont( afqt::QEnvironment::f_name);

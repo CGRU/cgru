@@ -233,7 +233,8 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 
    painter->setFont( afqt::QEnvironment::f_info);
    painter->setPen( Item::clrTextInfo( tasksrunning, option.state & QStyle::State_Selected, item->isLocked()));
-   painter->drawText( x, y+y_properties, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_properties );
+	QRect rect_properties;
+   painter->drawText( x, y+y_properties, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_properties, &rect_properties );
 
    int xoffset = 1;
 
@@ -244,7 +245,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
          painter->drawPixmap( x, y-2, *icon_small);
          xoffset += 15;
       }
-      painter->drawText(  x+xoffset, y-2, w, 15, Qt::AlignTop | Qt::AlignLeft, str_compact );
+      painter->drawText(  x+xoffset, y-2, w-rect_properties.width()-20, 15, Qt::AlignTop | Qt::AlignLeft, str_compact );
       return;
    }
 
@@ -256,9 +257,10 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
       xoffset += 40;
    }
 
-   painter->drawText( x+xoffset, y+y_properties, w		 -xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
-   painter->drawText( x+xoffset, y+y_progress,   w-120 -xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
-   painter->drawText( x+xoffset, y+y_progress,   w-5   -xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_progress );
+   painter->drawText( x+xoffset, y+y_properties, w-rect_properties.width()-20-xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_runtime  );
+	QRect rect_progress;
+   painter->drawText( x+xoffset, y+y_progress,   w-5-xoffset, 15, Qt::AlignRight | Qt::AlignTop, str_progress, &rect_progress);
+   painter->drawText( x+xoffset, y+y_progress,   w-rect_progress.width()-10-xoffset, 15, Qt::AlignLeft  | Qt::AlignTop, str_percent  );
 
    int progress_w_offset = 0;
 
