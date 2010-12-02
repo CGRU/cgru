@@ -10,9 +10,6 @@ cgru=$3
 mkdir -p $pack/$cgru/afanasy/bin
 mkdir -p $pack/$cgru/afanasy/launch
 files="\
-afanasy/setup.sh \
-afanasy/setup_cgru.sh \
-afanasy/setup_custom.sh \
 afanasy/launch/setup.sh \
 afanasy/python \
 afanasy/bin/pyaf.so \
@@ -23,3 +20,5 @@ afanasy/bin/afcmd \
 afanasy/init \
 "
 for f in $files; do cp -r $src/$f $pack/$cgru/$f; done
+
+cp $src/afanasy/setup*.sh $pack/$cgru/afanasy

@@ -2,7 +2,7 @@
 version 6.1 v1
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
-    <window x="0" y="24" w="1366" h="720" screen="0">
+    <window x="-1" y="4" w="1366" h="718" screen="0">
         <splitter orientation="1">
             <split size="862"></split>
             <splitter orientation="1">
@@ -12,12 +12,11 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
                 </dock>
                 <split size="818"></split>
                 <splitter orientation="2">
-                    <split size="380"></split>
+                    <split size="330"></split>
                     <dock id="" activePageId="Viewer.1">
                         <page id="Viewer.1"></page>
-                        <page id="Script Editor.2"></page>
                     </dock>
-                    <split size="276"></split>
+                    <split size="330"></split>
                     <dock id="" activePageId="DAG.1">
                         <page id="DAG.1"></page>
                         <page id="Curve Editor.1"></page>
@@ -105,6 +104,28 @@ Write {
  xpos 726
  ypos -16
 }
+Read {
+ inputs 0
+ file render/final.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/final_proxy.%04d.exr
+ last 9999
+ version 2
+ name Read1
+ xpos 3
+ ypos -32
+}
+Read {
+ inputs 0
+ file render/key.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/key_proxy.%04d.exr
+ last 9999
+ version 11
+ name Read3
+ xpos 223
+ ypos -165
+}
 ColorBars {
  inputs 0
  name ColorBars1
@@ -121,75 +142,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N501e1e0 [stack 0]
-Write {
- channels rgba
- file render/key.%04d.exr
- proxy render/key_proxy.%04d.exr
- file_type exr
- name key
- xpos 333
- ypos -229
-}
-Constant {
- inputs 0
- channels rgb
- color {0.0443748 0.0548952 0.205 0.35}
- name Constant1
- xpos 3
- ypos -335
-}
-Ramp {
- opacity {{.6+.4*noise(3.1+.4*frame)}}
- p0 {480 -95}
- p1 {230 625}
- color {1 0.829351 0.381265 1}
- name Ramp1
- xpos 3
- ypos -259
-}
-set N515f2c0 [stack 0]
-Write {
- file render/back.%04d.exr
- proxy render/back_proxy.%04d.exr
- file_type exr
- name back
- xpos 113
- ypos -266
-}
-Dot {
- name Dot2
- xpos 433
- ypos -254
-}
-afanasy {
- inputs 2
- name afanasy1
- label raw
- xpos 399
- ypos -163
- jobname raw
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
- independent true
-}
-Read {
- inputs 0
- file render/key.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/key_proxy.%04d.exr
- last 9999
- version 11
- name Read3
- xpos 223
- ypos -165
-}
-push $N501e1e0
+set N127658b0 [stack 0]
 Switch {
  inputs 2
  which 1
@@ -208,7 +161,24 @@ Read {
  xpos 3
  ypos -166
 }
-push $N515f2c0
+Constant {
+ inputs 0
+ channels rgb
+ color {0.0443748 0.0548952 0.205 0.35}
+ name Constant1
+ xpos 3
+ ypos -335
+}
+Ramp {
+ opacity {{.6+.4*noise(3.1+.4*frame)}}
+ p0 {480 -95}
+ p1 {230 625}
+ color {1 0.829351 0.381265 1}
+ name Ramp1
+ xpos 3
+ ypos -259
+}
+set N1277eb70 [stack 0]
 Switch {
  inputs 2
  which 1
@@ -229,27 +199,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N52b9ec0 [stack 0]
-Write {
- file render/final.%04d.exr
- proxy render/final_proxy.%04d.exr
- file_type exr
- name final
- xpos 223
- ypos -65
-}
-Read {
- inputs 0
- file render/final.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/final_proxy.%04d.exr
- last 9999
- version 2
- name Read1
- xpos 3
- ypos -32
-}
-push $N52b9ec0
+set N128db080 [stack 0]
 Switch {
  inputs 2
  which 1
@@ -266,76 +216,7 @@ Write {
  xpos 113
  ypos 46
 }
-set N52d7a80 [stack 0]
-afanasy {
- inputs 3
- name afanasy2
- label comp
- xpos 399
- ypos 46
- jobname comp
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
- fullrange true
-}
-push $N52d7a80
-cgru_dailies {
- name dailies
- xpos 113
- ypos 125
- codec H264
- suffix ""
- company CGRU
- project Nuke
- shot scene
- version 1
- artist Afanasy
- activity comp
- comments "cgru afanasy nuke example"
- movfolder /cg/tools/cgru/examples/nuke
- movname scene_comp_v001_101123
- knob_1 ""
- draw169 25
- draw235 25
- line169 200,200,200
- line235 200,200,200
- logopath ""
-}
-afanasy {
- name afanasy3
- label dailies
- xpos 289
- ypos 118
- jobname dailies
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask scene.nk.*
- dependmaskglbl ""
- addnodes ""
-}
-afanasy {
- inputs 2
- name afanasy
- label all
- xpos 399
- ypos 118
- jobname all
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
-}
-push $N52d7a80
+set N128f8990 [stack 0]
 Viewer {
  frame 1
  input_process false
@@ -359,7 +240,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N4b91f90 [stack 0]
+set N12c8b0e0 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -374,7 +255,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N4b91f90
+push $N12c8b0e0
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -382,7 +263,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N4b91f90
+push $N12c8b0e0
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -648,4 +529,127 @@ afanasy {
  addnodes ""
  forceframes true
  singlejob false
+}
+push $N127658b0
+Write {
+ channels rgba
+ file render/key.%04d.exr
+ proxy render/key_proxy.%04d.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -229
+}
+push $N1277eb70
+Write {
+ file render/back.%04d.exr
+ proxy render/back_proxy.%04d.exr
+ file_type exr
+ name back
+ xpos 113
+ ypos -266
+}
+Dot {
+ name Dot2
+ xpos 433
+ ypos -254
+}
+afanasy {
+ inputs 2
+ name afanasy1
+ label raw
+ xpos 399
+ ypos -163
+ jobname raw
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ independent true
+}
+push $N128db080
+Write {
+ file render/final.%04d.exr
+ proxy render/final_proxy.%04d.exr
+ file_type exr
+ name final
+ xpos 223
+ ypos -65
+}
+push $N128f8990
+afanasy {
+ inputs 3
+ name afanasy2
+ label comp
+ xpos 399
+ ypos 46
+ jobname comp
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ fullrange true
+}
+push $N128f8990
+cgru_dailies {
+ name dailies
+ xpos 113
+ ypos 125
+ format 720x576
+ fps 24
+ suffix ""
+ codec /cg/tools/cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg
+ company CGRU
+ project Nuke
+ shot scene
+ version 1
+ artist Afanasy
+ activity comp
+ comments "cgru afanasy nuke example"
+ movfolder /cg/tools/cgru/examples/nuke
+ movname scene_comp_v001_101202
+ knob_1 ""
+ template /cg/tools/cgru/utilities/moviemaker/templates/dailies
+ slate /cg/tools/cgru/utilities/moviemaker/templates/dailies_slate
+ draw169 25
+ draw235 25
+ line169 200,200,200
+ line235 200,200,200
+ logopath /cg/tools/cgru/utilities/moviemaker/logos/logo.png
+ logosize 20
+}
+afanasy {
+ name afanasy3
+ label dailies
+ xpos 289
+ ypos 118
+ jobname dailies
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask scene.nk.*
+ dependmaskglbl ""
+ addnodes ""
+}
+afanasy {
+ inputs 2
+ name afanasy
+ label all
+ xpos 399
+ ypos 118
+ jobname all
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
 }

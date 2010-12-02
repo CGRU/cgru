@@ -205,6 +205,7 @@ pyafs=$cgruRoot/$afanasy/bin_pyaf
 if [ -d $pyafs ]; then
    echo "Creating pyafs archive..."
    acrhivename="cgru.${VERSION_NUMBER}.bin_pyaf.7z"
+   [ -f $acrhivename ] && rm -fv $acrhivename
    7za a -r -t7z $acrhivename $pyafs
 fi
 

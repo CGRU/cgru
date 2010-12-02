@@ -2,8 +2,8 @@
 
 echo "CGRU plugins PRE REMOVE:"
 
-if [ -d /opt/cgru/plugins ]; then
-   find /opt/cgru/plugins -type f -name *.pyc -exec rm -vf {} \;
+if [ -d /opt/cgru ]; then
+   find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
 fi
 
 exit 0

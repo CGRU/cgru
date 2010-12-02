@@ -21,7 +21,7 @@ Description of myrpmtest.
 
 %install
 cd ../..
-dirs="usr opt"
+dirs="etc usr opt"
 for dir in $dirs; do
    mkdir -p $RPM_BUILD_ROOT/$dir
    mv $dir/* $RPM_BUILD_ROOT/$dir
@@ -29,6 +29,7 @@ done
 
 %files
 %defattr(-,root,root)
+/etc
 /opt
 /usr
 
@@ -36,12 +37,12 @@ done
 
 %post
 echo "CGRU plugins POST INSTALL"
-[ -d /opt/cgru/plugins ] && find /opt/cgru/plugins -type d -exec chmod a+rwx {} \;
+find /opt/cgru -type d -exec chmod a+rwx {} \;
 exit 0
 
 %preun
 echo "CGRU plugins PRE REMOVE: $1"
 [ "$1" != "0" ] && exit 0
-echo "Cleaning CGRU plugins"
-[ -d /opt/cgru/plugins ] && find /opt/cgru/plugins -type f -name *.pyc -exec rm -vf {} \;
+echo "Cleaning CGRU"
+[ -d /opt/cgru ] && find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
 exit 0

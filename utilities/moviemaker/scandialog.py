@@ -7,9 +7,7 @@ from PyQt4 import QtCore, QtGui
 # Command arguments:
 
 from optparse import OptionParser
-Parser = OptionParser(usage="%prog [options]\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-i', '--input',     dest='input',     type  ='string',     default='',             help='Input folder to scan')
-Parser.add_option('-o', '--output',    dest='output',    type  ='string',     default='',             help='Output folder for movies')
+Parser = OptionParser(usage="%prog [options] InputFolder OutputFolder\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-f', '--format',    dest='format',    type  ='string',     default='720x576',      help='Resolution')
 Parser.add_option('-c', '--codec',     dest='codec',     type  ='string',     default='photojpg_best.ffmpeg',help='Default codec preset')
 Parser.add_option('-t', '--template',  dest='template',  type  ='string',     default='scandpx',      help='Frame paint template')
@@ -20,6 +18,10 @@ Parser.add_option('-m', '--maxhosts',  dest='maxhosts',  type  ='int',        de
 Parser.add_option('-D', '--debug',     dest='debug',     action='store_true', default=False,          help='Debug mode')
 
 (Options, args) = Parser.parse_args()
+InputFolder  = ''
+OutputFolder = ''
+if len(args) > 0: InputFolder  = args[0]
+if len(args) > 1: OutputFolder = args[1]
 
 # Initializations:
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -131,7 +133,7 @@ class Dialog( QtGui.QWidget):
       self.lInput = QtGui.QHBoxLayout()
       self.tInput = QtGui.QLabel('Scan Folder', self)
       self.lInput.addWidget( self.tInput)
-      self.editInput = QtGui.QLineEdit( Options.input, self)
+      self.editInput = QtGui.QLineEdit( InputFolder, self)
       QtCore.QObject.connect( self.editInput, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
       self.lInput.addWidget( self.editInput)
       self.btnInputBrowse = QtGui.QPushButton('Browse', self)
@@ -142,7 +144,7 @@ class Dialog( QtGui.QWidget):
       self.lOutput = QtGui.QHBoxLayout()
       self.tOutput = QtGui.QLabel('Output Folder:', self)
       self.lOutput.addWidget( self.tOutput)
-      self.editOutput = QtGui.QLineEdit( Options.output, self)
+      self.editOutput = QtGui.QLineEdit( OutputFolder, self)
       QtCore.QObject.connect( self.editOutput, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lOutput.addWidget( self.editOutput)
       self.btnOutputBrowse = QtGui.QPushButton('Browse', self)
