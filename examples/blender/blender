@@ -4,4 +4,10 @@ pushd .. >> /dev/null
 source ./setup.sh
 popd >> /dev/null
 
+afscripts=$HOME/.blender/scripts/afanasy
+if [ ! -d $afscripts ]; then
+   echo "Linking Afanasy scripts folder:"
+   ln -svf /opt/cgru/afanasy/plugins/blender $afscripts
+fi
+
 blender $*
