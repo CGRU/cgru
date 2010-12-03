@@ -1,4 +1,6 @@
-rem   Try to setup CGRU (if will be founded):
+@echo off
+
+rem   Try to setup CGRU if was not and if it will be founded:
 
 IF NOT DEFINED CGRU_LOCATION (
 	PUSHD ..

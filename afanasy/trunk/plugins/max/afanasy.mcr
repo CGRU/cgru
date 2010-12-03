@@ -138,7 +138,9 @@ rollout AfanasyDialog "Afanasy"
       AfGlobalMask         = globalMaskControl.text
       AfHostsMask          = hostsMaskControl.text
       AfExcludeHosts       = excludeHostsControl.text
+      AfSaveTempScene      = useTempControl.checked
       AfStartPaused        = pauseControl.checked
+
       AfUseSceneWDir       = useSceneWDirControl.checked
 
 -- Check Parameters:
