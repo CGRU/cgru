@@ -100,9 +100,9 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
 
    description = service;
    if( numeric)
-      description += QString(" (num:%1-%2:%3fpr)").arg(first).arg(last).arg(pertask);
+      description += QString(" (num:%1-%2:%3fpt)").arg(first).arg(last).arg(pertask);
    else
-      description += QString(" (str:%1fpr)").arg(pertask);
+      description += QString(" (str:%1fpt)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
    updateToolTip();
@@ -121,7 +121,7 @@ void ItemJobBlock::generateToolTip()
    blockToolTip += QString("\nWorking directory:\n") + workingdir;
    blockToolTip += QString("\nService = '%1' [%2]").arg(service, parser);
    if( numeric)
-      blockToolTip += QString("\nNumeric: from %1 to %2 per %3").arg(first).arg(last).arg(pertask);
+      blockToolTip += QString("\nNumeric: from %1 to %2: %3 per task").arg(first).arg(last).arg(pertask);
    else
       blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(pertask);
 
