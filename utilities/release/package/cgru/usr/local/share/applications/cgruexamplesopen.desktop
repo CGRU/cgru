@@ -1,5 +1,5 @@
 [Desktop Entry]
-Name=Browse
+Name=[ browse examples ]
 Comment=Open CGRU examples folder
 Exec=/opt/cgru/examples/browse.sh
 Terminal=false
