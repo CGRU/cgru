@@ -10,22 +10,39 @@ export AF_CMD_PREFIX="./"
 # CGRU for Maya add-ons location, override it, or simple launch from current folder as an example
 export MAYA_CGRU_LOCATION=$CGRU_LOCATION/plugins/maya
 
-export MAYA_VERSION=2011
-export MAYA_ARCH=-x64
-# For 32bit Maya uncomment next line
-# export MAYA_ARCH=
+# Locate Maya:
+MAYA_INSTALL_DIR="/usr/autodesk"
+MAYA_FOLDERS=`ls "$MAYA_INSTALL_DIR"`
+MAYA_VERSION=""
+MAYA_ARCH=""
+MAYA_LOCATION=""
+MAYA_EXEC=""
+for MAYA_FOLDER in $MAYA_FOLDERS ;
+do
+   if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, "maya")}'`" == "1" ]; then
+      MAYA_LOCATION="${MAYA_INSTALL_DIR}/${MAYA_FOLDER}"
+      MAYA_VERSION="`echo $MAYA_FOLDER | gawk '{print substr( \$1, 5, 4)}'`"
+      if [ "`echo $MAYA_FOLDER | gawk '{print match( \$1, "x64")}'`" != "0" ]; then
+         MAYA_ARCH="-x64"
+      else
+         MAYA_ARCH=
+      fi
+   fi
+done
+export MAYA_EXEC="${MAYA_LOCATION}/bin/maya${MAYA_VERSION}"
+echo "MAYA: ${MAYA_EXEC}"
+echo "MAYA_VERSION: ${MAYA_VERSION}"
+echo "MAYA_ARCH: ${MAYA_ARCH}"
+export MAYA_LOCATION
+export MAYA_EXEC
+export MAYA_VERSION
+export MAYA_ARCH
 
 # The name of Maya main window menu
 export MAYA_CGRU_MENUS_NAME="CGRU"
 
 # automatically load plugins located in MAYA_CGRU_LOCATION/mll/MAYA_VERSION directory
 export MAYA_CGRU_PLUG_INS_AUTOLOAD=1
-
-# Locate Maya:
-export MAYA_LOCATION=/usr/autodesk/maya${MAYA_VERSION}${MAYA_ARCH}
-
-# Define Maya executabe:
-export MAYA_EXEC=${MAYA_LOCATION}/bin/maya${MAYA_VERSION}
 
 # Set more standart (to all distributives) temporary directory:
 export TMPDIR=/tmp
