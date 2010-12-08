@@ -274,17 +274,29 @@ class Dialog( QtGui.QWidget):
 
       self.lBrowseInput = QtGui.QHBoxLayout()
       self.lFilesCount = QtGui.QLabel('Files count:', self)
+      self.lBrowseInput.addWidget( self.lFilesCount)
       self.editInputFilesCount = QtGui.QLineEdit( self)
       self.editInputFilesCount.setEnabled( False)
+      self.lBrowseInput.addWidget( self.editInputFilesCount)
       self.lPattern = QtGui.QLabel('Pattern:', self)
+      self.lBrowseInput.addWidget( self.lPattern)
       self.editInputFilesPattern = QtGui.QLineEdit( self)
       self.editInputFilesPattern.setEnabled( False)
-      self.btnBrowseInput = QtGui.QPushButton('Browse sequence file', self)
-      QtCore.QObject.connect( self.btnBrowseInput, QtCore.SIGNAL('pressed()'), self.browseInput)
-      self.lBrowseInput.addWidget( self.lFilesCount)
-      self.lBrowseInput.addWidget( self.editInputFilesCount)
-      self.lBrowseInput.addWidget( self.lPattern)
       self.lBrowseInput.addWidget( self.editInputFilesPattern)
+
+      self.lFrameRange = QtGui.QLabel('Frames:', self)
+      self.lBrowseInput.addWidget( self.lFrameRange)
+      self.sbFrameFirst = QtGui.QSpinBox( self)
+      self.sbFrameFirst.setRange( -1, -1)
+      QtCore.QObject.connect( self.sbFrameFirst, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lBrowseInput.addWidget( self.sbFrameFirst)
+      self.sbFrameLast = QtGui.QSpinBox( self)
+      self.sbFrameLast.setRange( -1, -1)
+      QtCore.QObject.connect( self.sbFrameLast, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lBrowseInput.addWidget( self.sbFrameLast)
+
+      self.btnBrowseInput = QtGui.QPushButton('Browse sequence', self)
+      QtCore.QObject.connect( self.btnBrowseInput, QtCore.SIGNAL('pressed()'), self.browseInput)
       self.lBrowseInput.addWidget( self.btnBrowseInput)
       self.lInputSettings.addLayout( self.lBrowseInput)
 
@@ -877,6 +889,9 @@ class Dialog( QtGui.QWidget):
 
       expr = re.compile( r'%(prefix)s([0-9]{%(padding)d,%(padding)d})%(suffix)s' % vars())
       FilesCount = 0
+      framefirst = -1
+      framelast  = -1
+      prefixlen = len(prefix)
       allItems = os.listdir( inputdir)
       for item in allItems:
          if not os.path.isfile( os.path.join( inputdir, item)): continue
@@ -885,10 +900,19 @@ class Dialog( QtGui.QWidget):
          if match.group(0) != item: continue
          if FilesCount == 0: afile = item
          FilesCount += 1
+         frame = int(item[prefixlen:prefixlen+padding])
+         if framefirst == -1: framefirst = frame
+         if framelast  == -1: framelast  = frame
+         if framefirst > frame: framefirst = frame
+         if framelast  < frame: framelast  = frame
       if FilesCount <= 1:
          self.cmdField.setText('None or only one file founded matching pattern.\n\
          prefix, padding, suffix = "%(prefix)s" %(padding)d "%(suffix)s"' % vars())
          return InputFile, InputPattern, FilesCount, Identify
+      self.sbFrameFirst.setRange( framefirst, framelast)
+      self.sbFrameFirst.setValue( framefirst)
+      self.sbFrameLast.setRange(  framefirst, framelast)
+      self.sbFrameLast.setValue(  framelast)
       if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
       afile = os.path.join( inputdir, afile)
       identify = 'convert -identify "%s"'
@@ -980,7 +1004,6 @@ class Dialog( QtGui.QWidget):
       outname = '%s' % self.editOutputName.text()
       if self.cAutoOutputName.isChecked() or outname == None or outname == '':
          outname = shot
-         if activity != '': outname += '_' + activity
          if suffix   != '': outname += '_' + suffix
          if version  != '': outname += '_' + version
          outname += time.strftime('_%y%m%d')
@@ -997,6 +1020,8 @@ class Dialog( QtGui.QWidget):
       cmd = 'python ' + os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
       cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
       cmd += ' -f %s' % self.cbFPS.currentText()
+      cmd += ' --fs %d ' % self.sbFrameFirst.value()
+      cmd += ' --fe %d ' % self.sbFrameLast.value()
       format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
       if not format.isEmpty():
          ts = self.cbTemplateS.currentText()

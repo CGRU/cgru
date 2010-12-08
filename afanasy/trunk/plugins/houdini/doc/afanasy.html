@@ -138,12 +138,34 @@ It generates shadows. This block has no dependence.
 <h3>Separate Render</h3>
 <p>
 This ROP allows to separate render process on 'ifd' files generation and render it by 'mantra'.
-It also can gives several advantages on some 'heavy' scenes.
-An ability to split one frame on tiles to render them simultaneously.
-To delete raw data such as tiles after combine and 'ifd' files after render.
-To render images locally in temporary folder and copy whole image after successful render.
-It can save your network traffic as render do not send small portions of an image during render process.
+It can give several advantages on some 'heavy' scenes.
 </p>
+<p>
+This ROP can generate a job which can:
+</p>
+<ul>
+   <li>
+      Render images locally in temporary folder and copy whole image after successful render.
+      It can save your network traffic as render do not send small portions of an image during render process.
+   </li>
+   <li>
+      Generate IFD file locally and then render it in separate process but in the same task.
+      It can save render memory.
+   </li>
+   <li>
+      Split one frame on tiles to render them simultaneously.
+      So you can increase speed of one frame render.
+      And also it can reduce memory needed to render a frame.
+   </li>
+   <li>
+      Cleanup renderer IFD and joined tiles files.
+   </li>
+</ul>
+<p>
+An utility to join EXR file tiles is provided with CGRU.
+It can join EXR files with any number of custom channels.
+</p>
+
 <p align="center">af Separate Render parameters:<br/>
 <img src="images/af_separate_render.png" alt="af_separate_render" />
 </p>
@@ -155,6 +177,10 @@ It can save your network traffic as render do not send small portions of an imag
 <li><b>Job Name</b> - Job name.
 </li>
 <li><b>Depend Mask</b> - Jobs to wait pattern.
+</li>
+<li><b>Join Render Stages</b> - Generate IDF files and render in the same task.
+In this case IFD file will be generated to local temporary folder.
+It can save and memory usage and network traffic.
 </li>
 <li><b>Tile Render</b> - Enable rendering tiles and then combine them.
 </li>

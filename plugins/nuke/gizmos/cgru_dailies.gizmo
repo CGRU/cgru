@@ -34,6 +34,8 @@ Gizmo {
 
    addUserKnob { 20 "" Parameters }
 
+   addUserKnob {  3 fstart   l "Frame Range"     +STARTLINE }
+   addUserKnob {  3 fend     l " -  "            -STARTLINE }
    addUserKnob {  2 template l "Template"        +STARTLINE }
    addUserKnob {  2 slate    l "Slate"           +STARTLINE }
    addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
@@ -53,6 +55,8 @@ Gizmo {
    movauto     1
    stereodub   0
 
+   fstart      -1
+   fend        -1
    draw169     ""
    draw235     ""
    line169     ""

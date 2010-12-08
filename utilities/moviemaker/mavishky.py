@@ -36,6 +36,8 @@ Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',    
 Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default=25,          help='Frames per second')
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
+Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first founded')
+Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last founded')
 Parser.add_option('--thumbnail',        dest='thumbnail',   action='store_true', default=False,       help='Add a thumbnail image on slate frame')
 Parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
 Parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')
@@ -113,6 +115,12 @@ tmplogo   = 'logo.tga'
 need_convert = False
 if Stereo: need_convert = True
 need_logo = False
+
+# Check frame range:
+if Options.framestart != -1 and Options.frameend != -1:
+   if Options.framestart > Options.frameend:
+      print 'Error: First frame %d > last frame %d' % (Options.framestart, Options.frameend)
+      sys.exit(1)
 
 # Check output folder:
 if not os.path.isdir( os.path.dirname( Output)):
@@ -229,6 +237,9 @@ def getImages( inpattern):
    for item in allItems:
       if not os.path.isfile( os.path.join( inputdir, item)): continue
       if not expr.match( item): continue
+      if Options.framestart != -1 or Options.frameend != -1:
+         frame = int(item[digitspos:digitspos+digitslen])
+         if frame < Options.framestart or frame > Options.frameend: continue
       allFiles.append( os.path.join( inputdir, item))
    if len(allFiles) <= 1:
       print 'None or only one file founded matching pattern.'

@@ -1,13 +1,11 @@
 -stroke black -strokewidth 3
--fill white -pointsize @SIZE_1/20Y@ -gravity northwest -annotate +@SIZE_6/30X@+@SIZE_1/30Y@ "%(PROJECT)s"
--fill white -pointsize @SIZE_1/20Y@ -gravity northwest -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(FRAME)s"
+-fill white -pointsize @SIZE_1/20Y@ -gravity northwest -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(PROJECT)s"
 -fill white -pointsize @SIZE_1/20Y@ -gravity northeast -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(SHOT)s %(VERSION)s"
 -fill white -pointsize @SIZE_1/25Y@ -gravity north     -annotate            +0+@SIZE_1/30Y@ "%(DATETIME)s"
 -fill white -pointsize @SIZE_1/20Y@ -gravity southeast -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(FRAME)s"
 -fill white -pointsize @SIZE_1/24Y@ -gravity southwest -annotate +@SIZE_1/24X@+@SIZE_1/30Y@ "%(MOVIENAME)s"
 -stroke none
--fill white -pointsize @SIZE_1/20Y@ -gravity northwest -annotate +@SIZE_6/30X@+@SIZE_1/30Y@ "%(PROJECT)s"
--fill white -pointsize @SIZE_1/20Y@ -gravity northwest -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(FRAME)s"
+-fill white -pointsize @SIZE_1/20Y@ -gravity northwest -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(PROJECT)s"
 -fill white -pointsize @SIZE_1/20Y@ -gravity northeast -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(SHOT)s %(VERSION)s"
 -fill white -pointsize @SIZE_1/25Y@ -gravity north     -annotate            +0+@SIZE_1/30Y@ "%(DATETIME)s"
 -fill white -pointsize @SIZE_1/20Y@ -gravity southeast -annotate +@SIZE_1/30X@+@SIZE_1/30Y@ "%(FRAME)s"

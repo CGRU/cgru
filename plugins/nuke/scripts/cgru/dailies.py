@@ -21,7 +21,7 @@ def dailiesEvaluate( node):
 
    # Codec Preset:
    codec = node.knob('codec').value()
-   if codec == None or codec == '':
+   if codec == None or codec == '' or not os.path.isfile( codec):
       newNode = True
       codec = os.getenv('CGRU_DAILIES_CODEC', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/codecs/photojpg_best.ffmpeg')
       codec.replace('\\','/')
@@ -29,14 +29,14 @@ def dailiesEvaluate( node):
 
    # Template:
    template = node.knob('template').value()
-   if template == None or template == '':
+   if template == None or template == '' or not os.path.isfile( template):
       template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies')
       template.replace('\\','/')
       node.knob('template').setValue( template)
 
    # Slate:
    slate = node.knob('slate').value()
-   if slate == None or slate == '':
+   if slate == None or slate == '' or not os.path.isfile( slate):
       slate = os.getenv('CGRU_DAILIES_SLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_slate')
       slate.replace('\\','/')
       node.knob('slate').setValue( slate)
@@ -50,7 +50,7 @@ def dailiesEvaluate( node):
    if newNode:
 
       logopath = node.knob('logopath').value()
-      if logopath == None or logopath == '':
+      if logopath == None or logopath == '' or not os.path.isfile( logopath):
          logopath = os.getenv('CGRU_DAILIES_LOGOPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
          logopath.replace('\\','/')
          node.knob('logopath').setValue( logopath)
@@ -110,9 +110,6 @@ def dailiesEvaluate( node):
       # Shot:
       shot = node.knob('shot').value()
       if shot != None and shot != '': movname = shot
-      # Acivity:
-      activity = node.knob('activity').value()
-      if activity != None and activity != '': movname += '_' + activity
       # Suffix:
       suffix = node.knob('suffix').value()
       if suffix != None and suffix != '': movname += '_' + suffix
@@ -171,6 +168,8 @@ def dailiesGenCmd( node):
    logopath = node.knob('logopath').value()
    logosize = int(node.knob('logosize').value())
    version  = int(node.knob('version').value())
+   fstart   = int(node.knob('fstart').value())
+   fend     = int(node.knob('fend').value())
 
    # Command Construction:
    cmd = os.environ['CGRU_LOCATION']
@@ -185,6 +184,8 @@ def dailiesGenCmd( node):
    cmd += ' -t "%s"' % template
    cmd += ' -s "%s"' % slate
 
+   if fstart != -1: cmd += ' --fs %d ' % fstart
+   if fend   != -1: cmd += ' --fe %d ' % fend
    if company  is not None and company  != '': cmd += ' --company "%s"'  % company
    if project  is not None and project  != '': cmd += ' --project "%s"'  % project
    if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot
