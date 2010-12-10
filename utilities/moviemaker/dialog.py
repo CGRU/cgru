@@ -22,7 +22,7 @@ Parser.add_option('--fps',                   dest='fps',             type  ='str
 Parser.add_option('--company',               dest='company',         type  ='string',     default='',             help='Company name')
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
 Parser.add_option('--artist',                dest='artist',          type  ='string',     default='',             help='Artist name')
-Parser.add_option('--suffix',                dest='suffix',          type  ='string',     default='',             help='Add suffix to output movie filename')
+Parser.add_option('--naming',                dest='naming',          type  ='string',     default='',             help='Auto movie naming rule: [s]_[v]_[d]')
 Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=0,              help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=0,              help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
@@ -59,9 +59,22 @@ CodecsPath = os.path.join( DialogPath, 'codecs')
 FormatsPath = os.path.join( DialogPath, 'formats')
 FPS = ['23.976','24','25','30']
 
+Activities = ['comp','render','anim','dyn','sim','cloth','part','skin','setup','clnup','mtpnt','rnd','test']
 FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 Encoders = ['ffmpeg', 'mencoder']
 Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
+
+Namings = [
+'(s)_(v)_(d)',
+'(S)_(V)_(D)',
+'(s)_(a)_(v)_(d)',
+'(S)_(A)_(V)_(D)',
+'(s)_(v)_(a)_(d)',
+'(S)_(V)_(A)_(D)',
+'(P)_(S)_(D)_(V)_(D)_(A)_(C)_(U)',
+'(p)_(s)_(d)_(v)_(d)_(a)_(c)_(u)'
+]
+if Options.naming != '' and not Options.naming in Namings: Namings.append( Options.naming)
 
 # Process Cacher:
 CacherNames  = ['None', '25%', '50%', '75%', '100%']
@@ -242,14 +255,7 @@ class Dialog( QtGui.QWidget):
       self.lUser.addWidget( self.editActivity)
       QtCore.QObject.connect( self.editActivity, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cbActivity = QtGui.QComboBox( self)
-      self.cbActivity.addItem('comp')
-      self.cbActivity.addItem('render')
-      self.cbActivity.addItem('anim')
-      self.cbActivity.addItem('sim')
-      self.cbActivity.addItem('clnup')
-      self.cbActivity.addItem('mtpnt')
-      self.cbActivity.addItem('rnd')
-      self.cbActivity.addItem('test')
+      for act in Activities: self.cbActivity.addItem( act)
       self.lUser.addWidget( self.cbActivity)
       QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
       self.lInformation.addLayout( self.lUser)
@@ -295,7 +301,7 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.sbFrameLast, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       self.lBrowseInput.addWidget( self.sbFrameLast)
 
-      self.btnBrowseInput = QtGui.QPushButton('Browse sequence', self)
+      self.btnBrowseInput = QtGui.QPushButton('Browse Sequence', self)
       QtCore.QObject.connect( self.btnBrowseInput, QtCore.SIGNAL('pressed()'), self.browseInput)
       self.lBrowseInput.addWidget( self.btnBrowseInput)
       self.lInputSettings.addLayout( self.lBrowseInput)
@@ -319,25 +325,34 @@ class Dialog( QtGui.QWidget):
       self.gOutputSettings.setLayout( self.lOutputSettings)
 
       self.lOutputName = QtGui.QHBoxLayout()
-      self.tOutputName = QtGui.QLabel('Output file name:', self)
+      self.tOutputName = QtGui.QLabel('Name:', self)
       self.lOutputName.addWidget( self.tOutputName)
       self.editOutputName = QtGui.QLineEdit( self)
       self.lOutputName.addWidget( self.editOutputName)
       QtCore.QObject.connect( self.editOutputName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cAutoOutputName = QtGui.QCheckBox('Auto', self)
+      self.cAutoOutputName = QtGui.QCheckBox('Rule:', self)
       self.cAutoOutputName.setChecked( True)
-      self.lOutputName.addWidget( self.cAutoOutputName)
       QtCore.QObject.connect( self.cAutoOutputName, QtCore.SIGNAL('stateChanged(int)'), self.autoOutputName)
-      self.tOutputSuffix = QtGui.QLabel('Suffix:')
-      self.lOutputName.addWidget( self.tOutputSuffix)
-      self.editOutputSuffix = QtGui.QLineEdit( Options.suffix, self)
-      self.lOutputName.addWidget( self.editOutputSuffix)
-      QtCore.QObject.connect( self.editOutputSuffix, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.editOutputSuffix.setMaximumWidth(60)
+      self.lOutputName.addWidget( self.cAutoOutputName)
+      naming = Options.naming
+      if naming == '': naming = Namings[0]
+      self.editNaming = QtGui.QLineEdit( naming, self)
+      QtCore.QObject.connect( self.editNaming, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.editNaming.setMaximumWidth(150)
+      self.lOutputName.addWidget( self.editNaming)
+      self.cbNaming = QtGui.QComboBox( self)
+      i = 0
+      for rule in Namings:
+         self.cbNaming.addItem( rule)
+         if rule == Options.naming: self.cbNaming.setCurrentIndex( i)
+         i += 1
+      self.cbNaming.setMaximumWidth(120)
+      QtCore.QObject.connect( self.cbNaming, QtCore.SIGNAL('currentIndexChanged(int)'), self.namingChanged)
+      self.lOutputName.addWidget( self.cbNaming)
       self.lOutputSettings.addLayout( self.lOutputName)
 
       self.lOutputDir = QtGui.QHBoxLayout()
-      self.tOutputDir = QtGui.QLabel('Output folder:', self)
+      self.tOutputDir = QtGui.QLabel('Folder:', self)
       self.lOutputDir.addWidget( self.tOutputDir)
       self.editOutputDir = QtGui.QLineEdit( self)
       QtCore.QObject.connect( self.editOutputDir, QtCore.SIGNAL('editingFinished()'), self.evaluate)
@@ -751,7 +766,9 @@ class Dialog( QtGui.QWidget):
    def autoOutputName( self):
       enable = not self.cAutoOutputName.isChecked()
       self.editOutputName.setEnabled( enable)
-      self.editOutputSuffix.setEnabled( not enable)
+      self.cbNaming.setEnabled( not enable)
+      self.editNaming.setEnabled( not enable)
+      self.evaluate()
 
    def autoTitles( self):
       enable = not self.cAutoTitles.isChecked()
@@ -761,6 +778,10 @@ class Dialog( QtGui.QWidget):
 
    def activityChanged( self):
       self.editActivity.setText( self.cbActivity.currentText())
+      self.evaluate()
+
+   def namingChanged( self):
+      self.editNaming.setText( self.cbNaming.currentText())
       self.evaluate()
 
    def fontChanged( self):
@@ -993,8 +1014,8 @@ class Dialog( QtGui.QWidget):
       artist   = '%s' % self.editArtist.text()
       activity = '%s' % self.editActivity.text()
       comments = '%s' % self.editComments.text()
-      suffix   = '%s' % self.editOutputSuffix.text()
       font     = '%s' % self.editFont.text()
+      date     = time.strftime('%y%m%d')
 
       outdir = '%s' % self.editOutputDir.text()
       if outdir == '':
@@ -1003,10 +1024,21 @@ class Dialog( QtGui.QWidget):
 
       outname = '%s' % self.editOutputName.text()
       if self.cAutoOutputName.isChecked() or outname == None or outname == '':
-         outname = shot
-         if suffix   != '': outname += '_' + suffix
-         if version  != '': outname += '_' + version
-         outname += time.strftime('_%y%m%d')
+         outname = '%s' % self.editNaming.text()
+         outname = outname.replace('(p)', project)
+         outname = outname.replace('(P)', project.upper())
+         outname = outname.replace('(s)', shot)
+         outname = outname.replace('(S)', shot.upper())
+         outname = outname.replace('(v)', version)
+         outname = outname.replace('(V)', version.upper())
+         outname = outname.replace('(d)', date)
+         outname = outname.replace('(D)', date.upper())
+         outname = outname.replace('(a)', activity)
+         outname = outname.replace('(A)', activity.upper())
+         outname = outname.replace('(c)', company)
+         outname = outname.replace('(C)', company.upper())
+         outname = outname.replace('(u)', artist)
+         outname = outname.replace('(U)', artist.upper())
          self.editOutputName.setText( outname)
 
       logopath = '%s' % self.editLogoPath.text()

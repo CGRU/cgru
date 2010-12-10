@@ -105,19 +105,45 @@ def dailiesEvaluate( node):
             movfolder = movfolder.replace('\\','/')
             node.knob('movfolder').setValue( movfolder)
 
+   # Naming Rule:
+   movrule = node.knob('movrule').value()
+   if movrule == None or movrule == '':
+      movrule = os.getenv('CGRU_DAILIES_NAMING', '(s)_(v)_(d)')
+      node.knob('movrule').setValue( movrule)
+
+   # Movie Name:
    if node.knob('movauto').value() or node.knob('movname').value is None or node.knob('movname').value == '':
-      movname = ''
-      # Shot:
-      shot = node.knob('shot').value()
-      if shot != None and shot != '': movname = shot
-      # Suffix:
-      suffix = node.knob('suffix').value()
-      if suffix != None and suffix != '': movname += '_' + suffix
+
+      movname = movrule
+
+      # Project:
+      project = node.knob('project').value()
+      if project is None: project = ''
       # Version:
-      version = int(node.knob('version').value())
-      if version != None and version != '': movname += '_v%03d' % version
+      version = 'v%03d' % int(node.knob('version').value())
       # Date:
-      movname += time.strftime('_%y%m%d')
+      date = time.strftime('%y%m%d')
+      # Activity:
+      activity = node.knob('activity').value()
+      if activity is None: activity = ''
+      # Company:
+      company = node.knob('company').value()
+      if company is None: company = ''
+
+      movname = movname.replace('(p)', project)
+      movname = movname.replace('(P)', project.upper())
+      movname = movname.replace('(s)', shot)
+      movname = movname.replace('(S)', shot.upper())
+      movname = movname.replace('(v)', version)
+      movname = movname.replace('(V)', version.upper())
+      movname = movname.replace('(d)', date)
+      movname = movname.replace('(D)', date.upper())
+      movname = movname.replace('(a)', activity)
+      movname = movname.replace('(A)', activity.upper())
+      movname = movname.replace('(c)', company)
+      movname = movname.replace('(C)', company.upper())
+      movname = movname.replace('(u)', artist)
+      movname = movname.replace('(U)', artist.upper())
 
       node.knob('movname').setValue( movname)
 

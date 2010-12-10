@@ -74,6 +74,7 @@ export CGRU_DAILIES_DRAW169="25"
 export CGRU_DAILIES_DRAW235="25"
 export CGRU_DAILIES_LINE169="200,200,200"
 export CGRU_DAILIES_LINE235="200,200,200"
+export CGRU_DAILIES_NAMING="(s)_(v)_(d)"
 
 # overrides (set custom values there):
 [ -f override.sh ] && source override.sh

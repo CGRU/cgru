@@ -5,8 +5,7 @@ Gizmo {
    addUserKnob { 20 ""      l General        }
    addUserKnob {  1 format  l "Format"    +STARTLINE}
    addUserKnob {  1 fps     l "FPS"       -STARTLINE}
-   addUserKnob {  1 suffix  l "Suffix"    -STARTLINE }
-
+ 
    addUserKnob {  2 codec     l "Codec Preset" +STARTLINE}
 
    addUserKnob {  1 company   l "Company"  +STARTLINE }
@@ -19,9 +18,10 @@ Gizmo {
 
    addUserKnob {  1 comments  l "Comments" +STARTLINE }
 
-   addUserKnob {  2 movfolder  l "Dailies Folder" +STARTLINE }
-   addUserKnob {  1 movname    l "Movie Name"     +STARTLINE }
-   addUserKnob {  6 movauto    l "Auto"           -STARTLINE }
+   addUserKnob {  2 movfolder  l "Dailies Folder"   +STARTLINE }
+   addUserKnob {  6 movauto    l "Use Naming Rule:" +STARTLINE }
+   addUserKnob {  1 movrule    l ""                 -STARTLINE }
+   addUserKnob {  1 movname    l "Movie Name"       +STARTLINE }
 
    addUserKnob { 26 "" l "" }
    addUserKnob {  6 stereodub l "Duplicate single sequence and make stereo from mono." }

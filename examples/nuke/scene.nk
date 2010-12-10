@@ -1,29 +1,30 @@
-#! C:/Program Files/Nuke6.1v1/Nuke6.1.exe -nx
+#! /usr/local/Nuke6.1v1/Nuke6.1 -nx
 version 6.1 v1
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
-    <window x="0" y="22" w="1366" h="728" screen="0">
+    <window x="0" y="25" w="1366" h="718" screen="0">
         <splitter orientation="1">
-            <split size="853"></split>
+            <split size="858"></split>
             <splitter orientation="1">
                 <split size="40"></split>
                 <dock id="" hideTitles="1" activePageId="Toolbar.1">
                     <page id="Toolbar.1"></page>
                 </dock>
-                <split size="809"></split>
+                <split size="814"></split>
                 <splitter orientation="2">
-                    <split size="330"></split>
+                    <split size="381"></split>
                     <dock id="" activePageId="Viewer.1">
                         <page id="Viewer.1"></page>
+                        <page id="Script Editor.2"></page>
                     </dock>
-                    <split size="330"></split>
+                    <split size="277"></split>
                     <dock id="" activePageId="DAG.1">
                         <page id="DAG.1"></page>
                         <page id="Curve Editor.1"></page>
                     </dock>
                 </splitter>
             </splitter>
-            <split size="493"></split>
+            <split size="496"></split>
             <dock id="" activePageId="Properties.1">
                 <page id="Properties.1"></page>
             </dock>
@@ -33,7 +34,7 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 }
 Root {
  inputs 0
- name C:/cg/tools/cgru/examples/nuke/scene.nk
+ name /cg/tools/cgru/examples/nuke/scene.nk
  last_frame 11
  lock_range true
  fps 25
@@ -142,7 +143,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N142daf00 [stack 0]
+set N532a340 [stack 0]
 Switch {
  inputs 2
  which 1
@@ -178,7 +179,7 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N142dbda0 [stack 0]
+set N5343890 [stack 0]
 Switch {
  inputs 2
  which 1
@@ -199,7 +200,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N14361970 [stack 0]
+set N53591e0 [stack 0]
 Switch {
  inputs 2
  which 1
@@ -216,8 +217,9 @@ Write {
  xpos 113
  ypos 46
 }
-set N14361be0 [stack 0]
+set N5361bd0 [stack 0]
 Viewer {
+ frame 1
  input_process false
  name Viewer1
  xpos 43
@@ -239,7 +241,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N14363b90 [stack 0]
+set N5381c90 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -254,7 +256,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N14363b90
+push $N5381c90
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -262,7 +264,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N14363b90
+push $N5381c90
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -529,7 +531,7 @@ afanasy {
  forceframes true
  singlejob false
 }
-push $N142daf00
+push $N532a340
 Write {
  channels rgba
  file render/key.%04d.exr
@@ -539,7 +541,7 @@ Write {
  xpos 333
  ypos -229
 }
-push $N142dbda0
+push $N5343890
 Write {
  file render/back.%04d.exr
  proxy render/back_proxy.%04d.exr
@@ -569,7 +571,7 @@ afanasy {
  addnodes ""
  independent true
 }
-push $N14361970
+push $N53591e0
 Write {
  file render/final.%04d.exr
  proxy render/final_proxy.%04d.exr
@@ -578,7 +580,7 @@ Write {
  xpos 223
  ypos -65
 }
-push $N14361be0
+push $N5361bd0
 afanasy {
  inputs 3
  name afanasy2
@@ -595,14 +597,13 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N14361be0
+push $N5361bd0
 cgru_dailies {
  name dailies
  xpos 113
  ypos 125
  format 720x576
  fps 24
- suffix ""
  codec /cg/tools/cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg
  company ""
  project Nuke
@@ -612,7 +613,8 @@ cgru_dailies {
  activity comp
  comments "cgru afanasy nuke example"
  movfolder /cg/tools/cgru/examples/nuke
- movname scene_comp_v001_101203
+ movrule (s)_(v)_(d)
+ movname scene_v001_101210
  knob_1 ""
  template /cg/tools/cgru/utilities/moviemaker/templates/dailies
  slate /cg/tools/cgru/utilities/moviemaker/templates/dailies_slate
@@ -641,7 +643,6 @@ afanasy {
  inputs 2
  name afanasy
  label all
- selected true
  xpos 399
  ypos 118
  jobname all
