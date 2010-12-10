@@ -88,6 +88,11 @@ public:
    /// Return old sorting type:
    inline int resetSortingParameters() { int value = sort_type; sort_type = 0; sort_ascending = false; return value;}
 
+   static const int WHost = 60;
+   static const int WStarts = 40;
+   static const int WErrors = 40;
+   static const int WTime = 50;
+
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
@@ -109,11 +114,6 @@ private:
    QString  blockToolTip;
 
    BlockInfo info;
-
-   static const int WHost = 50;
-   static const int WStarts = 60;
-   static const int WErrors = 60;
-   static const int WTime = 50;
 
    bool sort_ascending;
    int sort_type;

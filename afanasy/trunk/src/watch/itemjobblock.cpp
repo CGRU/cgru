@@ -193,14 +193,14 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
 
    painter->setOpacity( .7);
    if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "e(errors)");
+   painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "errors");
    linex -= WErrors;
    painter->setOpacity( .2);
    painter->drawLine( linex, y, linex, y+HeightFooter-4);
 
    painter->setOpacity( .7);
    if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "s(starts)");
+   painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "starts");
    linex -= WStarts;
    painter->setOpacity( .2);
    painter->drawLine( linex, y, linex, y+HeightFooter-4);

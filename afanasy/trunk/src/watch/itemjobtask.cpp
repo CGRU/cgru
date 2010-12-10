@@ -60,11 +60,6 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width();
    //int h = option.rect.height();
 
-   static const int w_errors = 30;
-   static const int w_starts = 30;
-   static const int w_host   = 30;
-   static const int w_right  = w_errors + w_starts + w_host;
-
    //
    // Prepare strings:
 
@@ -129,16 +124,19 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
       else                                       painter->setPen( afqt::QEnvironment::clr_textbright.c);
    }
 
-   painter->drawText( x+2, y+1, w - WidthInfo - w_right, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
-   if( taskprogress.state & AFJOB::STATE_ERROR_MASK) painter->setPen( afqt::QEnvironment::qclr_black );
-
-   int text_x = w - WidthInfo-3;
-   painter->drawText( x+1, y+1, text_x, Height, Qt::AlignVCenter | Qt::AlignRight, QString("e%1").arg( taskprogress.errors_count));
-   text_x -= w_errors;
-   painter->drawText( x+1, y+1, text_x, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
-   text_x -= w_starts;
+   int text_x = w - WidthInfo;
+   painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("e%1").arg( taskprogress.errors_count));
+   text_x -= ItemJobBlock::WErrors;
+   painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
    if( false == rightString.isEmpty() )
-      painter->drawText( x+1, y+1, text_x, Height, Qt::AlignVCenter | Qt::AlignRight, rightString);
+   {
+      text_x -= ItemJobBlock::WStarts;
+      QRect rect;
+      painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, rightString, &rect);
+      text_x -= rect.width();
+   }
+
+   painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 
    if( taskprogress.state & AFJOB::STATE_RUNNING_MASK)
    {
