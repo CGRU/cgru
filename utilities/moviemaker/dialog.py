@@ -71,8 +71,8 @@ Namings = [
 '(S)_(A)_(V)_(D)',
 '(s)_(v)_(a)_(d)',
 '(S)_(V)_(A)_(D)',
-'(P)_(S)_(D)_(V)_(D)_(A)_(C)_(U)',
-'(p)_(s)_(d)_(v)_(d)_(a)_(c)_(u)'
+'(P)_(S)_(V)_(D)_(A)_(C)_(U)',
+'(p)_(s)_(v)_(d)_(a)_(c)_(u)'
 ]
 if Options.naming != '' and not Options.naming in Namings: Namings.append( Options.naming)
 
