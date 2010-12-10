@@ -1114,8 +1114,8 @@ class Dialog( QtGui.QWidget):
             self.cmdField.setText('Unable to import Afanasy Python module:\n' + error)
             return
          reload(af)
-         job = af.Job(('%s' % self.editOutputName.text()).encode('utf-8') + ' mavishka')
-         block = af.Block('mavishky', 'movgen')
+         job = af.Job(('%s' % self.editOutputName.text()).encode('utf-8'))
+         block = af.Block('Make Movie', 'movgen')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
          if self.sbAfMaxHosts.value()  != -1: job.setMaxHosts(    self.sbAfMaxHosts.value())
          if self.sbAfCapacity.value()  != -1: block.setCapacity(  self.sbAfCapacity.value())

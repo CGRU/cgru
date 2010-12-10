@@ -39,7 +39,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
          {
             QString str;
             msg->getString( str);
-            if( str.isEmpty()) str = "Empty string recieved.";
+            if( str.isEmpty()) str = "An empty string recieved.";
             qTextEdit->setPlainText( str);
             break;
          }
@@ -47,7 +47,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
          {
             QStringList strlist;
             msg->getStringList( strlist);
-            if( strlist.isEmpty()) strlist.append("Empty list recieved.");
+            if( strlist.isEmpty()) strlist.append("An empty list recieved.");
             int size = strlist.size();
             for( int i = 0; i < size; i++)
                qTextEdit->append( strlist[i]);
