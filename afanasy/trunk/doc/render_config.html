@@ -80,10 +80,6 @@ If several devices matching pattern are founded,
 it calculates the sum of traffic parameters and maximum of utilization parameters.
 </p></li>
 <li><p>
-<code>render_exec</code> = afrender<br/>
-Command for render to execute another render or to restart.
-</p></li>
-<li><p>
 <code>render_nice</code> = 10<br/>
 Renice task command process on render.
 </p></li>
@@ -122,6 +118,20 @@ Server truncates log above this limit.
 <li><p>
 <code>render_logs_rotate</code> = 10<br/>
 Server store logs of renders with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
+</p></li>
+<!--
+<li><p>
+<code>render_exec</code> = afrender<br/>
+Command for render to execute another render or to restart.
+</p></li>
+-->
+<li><p>
+<code>render_cmd_reboot</code> = reboot<br/>
+Command for render to reboot a machine. For MS Windows you can use "shutdown /r".
+</p></li>
+<li><p>
+<code>render_cmd_shutdown</code> = shutdown -P 1 afrequest<br/>
+Command for render to shutdown a machine. For MS Windows you can use "shutdown /s".
 </p></li>
 </ul>
 

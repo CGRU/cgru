@@ -45,7 +45,7 @@ JobAf::JobAf( int Id):
    fromdatabase( true),
    blocks( NULL)
 {
-   id = Id;
+//   id = Id;
 }
 
 bool JobAf::dbSelect( QSqlDatabase * db, const QString * where)

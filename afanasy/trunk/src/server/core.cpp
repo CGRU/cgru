@@ -11,6 +11,7 @@
 #include <sys/types.h>
 
 #include "msgaf.h"
+//#include "jobsys.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -70,6 +71,12 @@ Core::Core():
    theadReadMsg = new TheadReadMsg( &ptrs);
    if( theadReadMsg == NULL){ AFERROR("Core::Core: Can't allocate memory for read messages thread."); return; }
 
+
+//
+// Create system maintenance job:
+//
+//   JobSys * job = new JobSys();
+//   jobs->job_register( job, users, NULL);
 
 //
 // Open database to get nodes:

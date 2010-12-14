@@ -486,7 +486,7 @@ if Options.afanasy:
    be.setCapacity( Options.afenccap)
    if need_convert:
       be.setDependMask('convert')
-      j.setCmdPre( 'mkdir "%s" && chmod a+rwx "%s"' % (os.path.abspath(TmpDir),os.path.abspath(TmpDir)))
+      os.makedirs( TmpDir)
       j.setCmdPost('rm -rf "%s"' % os.path.abspath(TmpDir))
 
    if Verbose: j.output(1)

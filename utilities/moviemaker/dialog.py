@@ -701,7 +701,6 @@ class Dialog( QtGui.QWidget):
       # Output Field:
 
       self.cmdField = QtGui.QTextEdit( self)
-      self.cmdField.setReadOnly( True)
       self.mainLayout.addWidget( self.cmdField)
 
 
@@ -1095,14 +1094,14 @@ class Dialog( QtGui.QWidget):
       if self.inputPattern2 is not None: cmd += ' "%s"' % self.inputPattern2
       cmd += ' "%s"' % os.path.join( outdir, outname)
 
-      self.command = cmd
       self.cmdField.setText( cmd)
       self.evaluated = True
       self.btnStart.setEnabled( True)
 
    def execute( self):
       if not self.evaluated: return
-      if len( self.command) == 0: return
+      command = "%s" % self.cmdField.toPlainText()
+      if len(command) == 0: return
 
       if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
          self.btnStart.setEnabled( False)
@@ -1133,7 +1132,7 @@ class Dialog( QtGui.QWidget):
          job.setNeedOS('')
          job.blocks.append( block)
          task = af.Task(('%s' % self.editOutputName.text()).encode('utf-8'))
-         task.setCommand( self.command.encode('utf-8'))
+         task.setCommand( command.encode('utf-8'))
 
          block.tasks.append( task)
          if job.send(): self.cmdField.setText('Afanasy job was successfully sent.')
@@ -1146,7 +1145,7 @@ class Dialog( QtGui.QWidget):
          self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('readyRead()'), self.processoutput)
-         self.process.start( self.command)
+         self.process.start( command)
 
    def processfinished( self, exitCode):
       print 'Exit code = %d' % exitCode
