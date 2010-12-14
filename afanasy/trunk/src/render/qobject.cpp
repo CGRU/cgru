@@ -192,24 +192,28 @@ printf("Object::caseMessage: "); msg->stdOut();
    case af::Msg::TClientRestartRequest:
    {
       exitRender();
+      printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().toUtf8().data());
       QProcess::startDetached( af::Environment::getRenderExec());
       break;
    }
    case af::Msg::TClientStartRequest:
    {
+      printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().toUtf8().data());
       QProcess::startDetached( af::Environment::getRenderExec());
       break;
    }
    case af::Msg::TClientRebootRequest:
    {
       exitRender();
-      QProcess::startDetached("reboot");
+      printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().toUtf8().data());
+      QProcess::startDetached( af::Environment::getRenderCmdReboot());
       break;
    }
    case af::Msg::TClientShutdownRequest:
    {
       exitRender();
-      QProcess::startDetached("shutdown");
+      printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().toUtf8().data());
+      QProcess::startDetached( af::Environment::getRenderCmdShutdown());
       break;
    }
    case af::Msg::TRenderStopTask:

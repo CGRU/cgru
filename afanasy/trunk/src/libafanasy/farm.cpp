@@ -22,6 +22,7 @@ const QString XMLNAME_DATA          = "data";
 const QString XMLNAME_CAPACITY      = "capacity";
 const QString XMLNAME_MAXTASKS      = "maxtasks";
 const QString XMLNAME_SERVISE       = "service";
+const QString XMLNAME_SERVISEREMOVE = "remservice";
 const QString XMLNAME_SERVISENAME   = "name";
 const QString XMLNAME_SERVISECOUNT  = "count";
 
@@ -37,7 +38,6 @@ Farm::Farm( const QString & File, bool Verbose ):
    QFile file( filename);
    if( file.open(QIODevice::ReadOnly) == false)
    {
-//      if( Verbose) printf("Unable to open \"%s\".\n", filename.toUtf8().data());
       printf("Unable to open \"%s\".\n", filename.toUtf8().data());
       return;
    }
@@ -53,26 +53,27 @@ Farm::Farm( const QString & File, bool Verbose ):
    if( Verbose) printf("\nParsing XML file \"%s\":\n", filename.toUtf8().data());
 
    QDomElement docElem = doc.documentElement();
-   QDomNode p = docElem.firstChild();
-   while( !p.isNull())
+   QDomNode patDomNode = docElem.firstChild();
+   while( !patDomNode.isNull())
    {
-      QDomElement pattern = p.toElement();
-      if( !pattern.isNull())
+      QDomElement patDomElement = patDomNode.toElement();
+      if( !patDomElement.isNull())
       {
-         if( pattern.tagName() == XMLNAME_PATTERN)
+         if( patDomElement.tagName() == XMLNAME_PATTERN)
          {
-            QString name = pattern.attribute( XMLNAME_PATTERNNAME, "");
+            QString name = patDomElement.attribute( XMLNAME_PATTERNNAME, "");
             QString description = "";
             QString mask;
             Host host;
+            QStringList remservices;
             if( name == "")
             {
                AFERRAR("Pattern has no name [Line %d - Col %d]: \"%s\"\n",
-                  pattern.lineNumber(), pattern.columnNumber(), pattern.tagName().toUtf8().data());
+                  patDomElement.lineNumber(), patDomElement.columnNumber(), patDomElement.tagName().toUtf8().data());
                return;
             }
             if( Verbose) printf("name: %s\n", name.toUtf8().data());
-            QDomNode f = pattern.firstChild();
+            QDomNode f = patDomElement.firstChild();
             while( !f.isNull())
             {
                QDomElement field = f.toElement();
@@ -94,7 +95,6 @@ Farm::Farm( const QString & File, bool Verbose ):
                      host.properties = field.text().toUtf8().data();
                      if( Verbose) printf("\tproperties: \"%s\"\n", field.text().toUtf8().data());
                   }
-
                   else if( fieldname == XMLNAME_RESOURCES)
                   {
                      host.resources = field.text().toUtf8().data();
@@ -199,26 +199,39 @@ Farm::Farm( const QString & File, bool Verbose ):
                      host.setService( servicename, servicecount);
                      if( Verbose) printf("\t%s: %d\n", servicename.toUtf8().data(), servicecount);
                   }
+                  else if( fieldname == XMLNAME_SERVISEREMOVE)
+                  {
+                     QString servicename = field.attribute( XMLNAME_SERVISENAME, "");
+                     if( servicename == "")
+                     {
+                        AFERRAR("Service to delete has no name [Line %d - Col %d]: \"%s\"\n",
+                           field.lineNumber(), field.columnNumber(), field.tagName().toUtf8().data());
+                        return;
+                     }
+                     if( Verbose) printf("\tRemove Service \"%s\"", servicename.toUtf8().data());
+                     remservices.append( servicename);
+                  }
                }
                f = f.nextSibling();
             }
-            Pattern * p = new Pattern( name);
-            p->setMask( mask);
-            p->setDescription( description);
-            p->setHost( host);
-            if( addPattern(p) == false)
+            Pattern * pat = new Pattern( name);
+            pat->setMask( mask);
+            pat->setDescription( description);
+            pat->setHost( host);
+            pat->remServices( remservices);
+            if( addPattern( pat) == false)
             {
-               delete p;
+               delete pat;
                return;
             }
          }
          else
          {
             printf("Unknown element [Line %d - Col %d]: \"%s\"\n",
-               pattern.lineNumber(), pattern.columnNumber(), pattern.tagName().toUtf8().data());
+               patDomElement.lineNumber(), patDomElement.columnNumber(), patDomElement.tagName().toUtf8().data());
          }
       }
-      p = p.nextSibling();
+      patDomNode = patDomNode.nextSibling();
    }
    if( count) valid = true;
    else
@@ -235,22 +248,22 @@ Farm::~Farm()
    }
 }
 
-bool Farm::addPattern( Pattern * p)
+bool Farm::addPattern( Pattern * patern)
 {
-   if( p->isValid() == false)
+   if( patern->isValid() == false)
    {
-      AFERRAR("Farm::addPattern: invalid pattern \"%s\"\n", p->getName().toUtf8().data());
+      AFERRAR("Farm::addPattern: invalid pattern \"%s\"\n", patern->getName().toUtf8().data());
       return false;
    }
    if( ptr_first == NULL)
    {
-      ptr_first = p;
+      ptr_first = patern;
    }
    else
    {
-      ptr_last->ptr_next = p;
+      ptr_last->ptr_next = patern;
    }
-   ptr_last = p;
+   ptr_last = patern;
    count++;
    return true;
 }
@@ -259,40 +272,24 @@ void Farm::stdOut( bool full) const
 {
    if( full) printf("\n");
    printf("Farm filename = \"%s\":\n", filename.toUtf8().data());
-//   if( full) printf("\n");
-   Pattern * p = ptr_first;
-   while( p != NULL)
+   Pattern * patern = ptr_first;
+   while( patern != NULL)
    {
-      p->stdOut(full);
-//      if( full) printf("\n");
-      p = p->ptr_next;
+      patern->stdOut(full);
+      patern = patern->ptr_next;
    }
-}
-
-bool Farm::getHost( const QString & hostname, Host & host) const
-{
-   Pattern * ptr = NULL;
-   for( Pattern * p = ptr_first; p != NULL; p = p->ptr_next) if( p->match( hostname)) ptr = p;
-   if( ptr == NULL) return false;
-   ptr->getHost( host);
-   return true;
-}
-
-bool Farm::getHost( const QString & hostname, Host & host, QString & name) const
-{
-   Pattern * ptr = NULL;
-   for( Pattern * p = ptr_first; p != NULL; p = p->ptr_next) if( p->match( hostname)) ptr = p;
-   if( ptr == NULL) return false;
-   name = ptr->getName();
-   return true;
 }
 
 bool Farm::getHost( const QString & hostname, Host & host, QString & name, QString & description) const
 {
    Pattern * ptr = NULL;
-   for( Pattern * p = ptr_first; p != NULL; p = p->ptr_next) if( p->match( hostname)) ptr = p;
-   if( ptr == NULL) return false;
-   ptr->getHost( host);
+   for( Pattern * p = ptr_first; p != NULL; p = p->ptr_next)
+   {
+      if( p->match( hostname)) ptr = p;
+      if( ptr == NULL) continue;
+      ptr->getHost( host);
+   }
+   if( ptr == NULL ) return false;
    name = ptr->getName();
    description = ptr->getDescription();
    return true;

@@ -46,10 +46,15 @@ bool Pattern::isValid() const
    if( regexp.isValid() == false)
    {
       AFERRAR("Pattern::isValid: \"%s\" mask \"%s\" is invalid:\n", name.toUtf8().data(), mask.toUtf8().data());
-//      printf("%s\n", regexp.errorString().toUtf8().data());
       return false;
    }
    return true;
+}
+
+void Pattern::getHost( Host & newhost) const
+{
+   newhost.merge( host);
+   if( remservices.size()) newhost.remServices( remservices);
 }
 
 void Pattern::stdOut( bool full) const

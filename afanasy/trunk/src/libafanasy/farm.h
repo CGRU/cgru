@@ -16,8 +16,6 @@ public:
 
    void stdOut( bool full = false ) const;
 
-   bool getHost( const QString & hostname, Host & host) const;
-   bool getHost( const QString & hostname, Host & host, QString & name) const;
    bool getHost( const QString & hostname, Host & host, QString & name, QString & description) const;
 
 private:

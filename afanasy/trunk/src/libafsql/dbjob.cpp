@@ -111,7 +111,7 @@ bool DBJob::dbSelect( QSqlDatabase * db, const QString * where)
    progress = new DBJobProgress( this);
    if( progress == NULL)
    {
-      AFERROR("DBJob::dbSelect: can't allocate memory for progresses.\n");
+      AFERROR("DBJob::dbSelect: can't allocate memory for tasks progress.\n");
       return false;
    }
    if( progress->dbSelect( db) == false) return false;

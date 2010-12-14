@@ -12,7 +12,6 @@
 #include "afcommon.h"
 #include "block.h"
 #include "jobcontainer.h"
-#include "jobpy.h"
 #include "monitorcontainer.h"
 #include "msgqueue.h"
 #include "renderaf.h"
@@ -66,7 +65,6 @@ bool JobAf::construct()
    logsWeight           = 0;
    blackListsWeight     = 0;
    runningtaskscounter  = 0;
-//   py                   = NULL;
 
    if( blocksnum < 1 )
    {
@@ -104,7 +102,6 @@ JobAf::~JobAf()
       for( int b = 0; b < blocksnum; b++) if( blocks[b]) delete blocks[b];
       delete [] blocks;
    }
-//   if( py ) delete py;
 }
 
 bool JobAf::initialize( UserAf * jobOwner)
@@ -178,17 +175,6 @@ bool JobAf::initialize( UserAf * jobOwner)
    if(( state & AFJOB::STATE_DONE_MASK) == false ) state = state | AFJOB::STATE_WAITDEP_MASK;
 
    refresh( time(NULL), NULL, NULL);
-
-/*
-   //
-   // Creating python class
-   py = new JobPy( this );
-   if( py->isInitialized() == false )
-   {
-      log("Python class initialization failed, see server log for details.");
-      return false;
-   }
-*/
 
    initialized = true;
 

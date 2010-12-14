@@ -40,7 +40,38 @@ void Host::setService( const QString & name, int count)
 
 void Host::copy( const Host & other)
 {
-//printf("Host::copy: servicesnum = %d\n", servicesnum);
+   mergeParameters( other);
+
+   servicesnames.clear();
+   servicescounts.clear();
+   servicesnum = 0;
+
+   for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
+}
+
+void Host::merge( const Host & other)
+{
+   mergeParameters( other);
+
+   for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
+}
+
+void Host::remServices( const QStringList & names)
+{
+   for( int i = 0; i < names.size(); i++)
+      for( int j = 0; j < servicesnum; j++)
+      {
+         if( servicesnames[j] == names[i])
+         {
+            servicesnames.removeAt( j);
+            j--;
+            servicesnum--;
+         }
+      }
+}
+
+void Host::mergeParameters( const Host & other)
+{
    if( other.maxtasks      ) maxtasks = other.maxtasks;
    if( other.capacity      ) capacity = other.capacity;
    if( other.power         ) power    = other.power;
@@ -54,13 +85,6 @@ void Host::copy( const Host & other)
    if(!other.properties.isEmpty()   ) properties   = other.properties;
    if(!other.resources.isEmpty()    ) resources    = other.resources;
    if(!other.data.isEmpty()         ) data         = other.data;
-
-   servicesnames.clear();
-   servicescounts.clear();
-   servicesnum = 0;
-
-   for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
-//printf("Host::copy: servicesnum = %d\n", servicesnum);
 }
 
 void Host::readwrite( Msg * msg)
@@ -90,7 +114,9 @@ void Host::stdOut( bool full) const
          os.toUtf8().data(), capacity, maxtasks, power);
       for( int i = 0; i < servicesnum; i++)
       {
-         printf("   Service: \"%s\" - %d\n", servicesnames[i].toUtf8().data(), servicescounts[i]);
+         printf("   Service: \"%s\"", servicesnames[i].toUtf8().data());
+         if( servicescounts[i]) printf(" - %d", servicescounts[i]);
+         printf("\n");
       }
       if( servicesnum == 0) printf("   No services descripion.\n");
    }
@@ -100,7 +126,8 @@ void Host::stdOut( bool full) const
          os.toUtf8().data(), capacity, maxtasks, power, cpu_mhz, cpu_num, mem_mb, swap_mb, hdd_gb);
       for( int i = 0; i < servicesnum; i++)
       {
-         printf(", \"%s\"[%d]", servicesnames[i].toUtf8().data(), servicescounts[i]);
+         printf(", \"%s\"", servicesnames[i].toUtf8().data());
+         if( servicescounts[i]) printf("[%d]", servicescounts[i]);
       }
       if( servicesnum == 0) printf(" No services.");
       printf("\n");

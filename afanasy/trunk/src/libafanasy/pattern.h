@@ -24,8 +24,9 @@ public:
    inline const QString & getMask() const { return mask;}
    inline const QString & getDescription() const { return description;}
 
-   inline void setHost( const Host & newhost)       {    host.copy( newhost ); }
-   inline void getHost(       Host & newhost) const { newhost.copy( host    ); }
+   inline void setHost( const Host & newhost) { host.copy( newhost );}
+   inline void remServices( const QStringList & names) { remservices = names;}
+   void getHost( Host & newhost) const;
 
    inline bool match( const QString & hostname) const { return regexp.exactMatch( hostname); }
 
@@ -39,5 +40,6 @@ private:
 
 private:
    QRegExp regexp;
+   QStringList remservices;
 };
 }

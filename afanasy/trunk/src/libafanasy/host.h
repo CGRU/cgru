@@ -13,8 +13,10 @@ public:
    ~Host();
 
    void setService( const QString & name, int count);
+   void remServices( const QStringList & names);
 
-   void copy( const Host & other);
+   void copy(  const Host & other);
+   void merge( const Host & other);
 
    void stdOut( bool full = false ) const;
 
@@ -40,6 +42,8 @@ public:
 private:
    QStringList servicesnames;
    std::vector<int32_t> servicescounts;
+
+   void mergeParameters( const Host & other);
 
 private:
    int32_t servicesnum;

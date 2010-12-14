@@ -43,7 +43,6 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
    - to specify several devices use regular expressions, for example "sda[2-4]"
 ';' - separate classes character
 -->
-   <render_exec>afrender</render_exec>
    <render_nice>10</render_nice>
    <render_update_sec>5</render_update_sec>
    <render_updatetaskperiod>1</render_updatetaskperiod>
@@ -54,6 +53,9 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
    <render_waitforbyteswritten>15000</render_waitforbyteswritten>
    <render_logs_linesmax>100</render_logs_linesmax>
    <render_logs_rotate>10</render_logs_rotate>
+   <render_exec>afrender</render_exec>
+   <render_cmd_reboot>reboot</render_cmd_reboot>
+   <render_cmd_shutdown>shutdown -P 1 afrequest</render_cmd_shutdown>
 
 <!-- User -->
    <errors_avoid_host>3</errors_avoid_host>

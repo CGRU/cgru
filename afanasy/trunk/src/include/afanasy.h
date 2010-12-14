@@ -76,6 +76,8 @@ namespace AFRENDER
    const int  LOGS_LINESMAX       = 100;        ///< Maximum number of lines in each Render log.
    const int  LOGS_ROTATE         = 10;         ///< Number of logs to keep.
    const char LOGS_DIRECTORY[]    = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
+   const char CMD_REBOOT[]        = "reboot";   ///< How to reboot a computer.
+   const char CMD_SHUTDOWN[]      = "shutdown"; ///< How to shutdown a computer.
    const char EXEC[]              = "afrender"; ///< How Render to execute another Render.
    const char NETWORK_IF[]        = ".*";       ///< Network interface(s) pattern to measure traffic on.
    const char HDDSPACE_PATH[]     = "/";        ///< Path to query total and free space.

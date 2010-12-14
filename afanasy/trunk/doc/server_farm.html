@@ -84,8 +84,19 @@ Some string which matching can be needed by jobs.
 <code>service</code> name="<i>type</i>" count="<i>limit number</i>"<br/>
 List of names and counts of available services.
 </p></li>
+<li><p>
+<code>remservice</code> name="<i>type</i>"<br/>
+List of service names to remove.
+</p></li>
 </ul>
-Host will take parameters from last matched pattern. So first pattern mask in default farm is ".*" - means that host with any name will take some default settings.
+<p>
+Host will take parameters from every matched pattern.
+Each next pattern will redefine specified parameter.
+If parameter is not specified host will use parameter from previously matched pattern.
+If you want to remove some previously defined service use <i>remservice</i> field.
+</p><p>
+First pattern mask in default farm is ".*" - means that host with any name will take some default settings.
+</p>
 
 <!--FOOTER-->
 </td></tr></table>
