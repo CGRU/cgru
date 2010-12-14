@@ -56,7 +56,10 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
    <render_exec>afrender</render_exec>
    <render_cmd_reboot>reboot</render_cmd_reboot>
    <render_cmd_shutdown>shutdown -P 1 afrequest</render_cmd_shutdown>
-
+<!-- Reboot and Shutdown for MS Windows:
+   <render_cmd_reboot>shutdown /r</render_cmd_reboot>
+   <render_cmd_shutdown>shutdown /s</render_cmd_shutdown>
+-->
 <!-- User -->
    <errors_avoid_host>3</errors_avoid_host>
    <task_error_retries>3</task_error_retries>
