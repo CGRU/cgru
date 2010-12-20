@@ -22,8 +22,8 @@ public:
    DBConnection( const QString & connection_name = QString("AFLIBSQL"));
    ~DBConnection();
 
-   void ResetOnline();
-   void ResetArchive();
+   void ResetJobs();
+   void ResetStat();
    void ResetUsers();
    void ResetRenders();
 

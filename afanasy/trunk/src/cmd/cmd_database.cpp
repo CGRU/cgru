@@ -65,32 +65,32 @@ bool CmdDBResetRenders::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-CmdDBResetOnline::CmdDBResetOnline()
+CmdDBResetJobs::CmdDBResetJobs()
 {
-   setCmd("db_resetonline");
-   setInfo("Reset (create) online jobs table.");
+   setCmd("db_resetjobs");
+   setInfo("Reset (create) jobs table.");
 }
-CmdDBResetOnline::~CmdDBResetOnline(){}
-bool CmdDBResetOnline::processArguments( int argc, char** argv, af::Msg &msg)
+CmdDBResetJobs::~CmdDBResetJobs(){}
+bool CmdDBResetJobs::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetOnline");
    DB.DBOpen();
-   DB.ResetOnline();
+   DB.ResetJobs();
    DB.DBClose();
    return true;
 }
 
-CmdDBResetArchive::CmdDBResetArchive()
+CmdDBResetStat::CmdDBResetStat()
 {
-   setCmd("db_resetarchive");
-   setInfo("Reset (create) archive jobs table.");
+   setCmd("db_resetstat");
+   setInfo("Reset (create) statistics table.");
 }
-CmdDBResetArchive::~CmdDBResetArchive(){}
-bool CmdDBResetArchive::processArguments( int argc, char** argv, af::Msg &msg)
+CmdDBResetStat::~CmdDBResetStat(){}
+bool CmdDBResetStat::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetArchive");
    DB.DBOpen();
-   DB.ResetArchive();
+   DB.ResetStat();
    DB.DBClose();
    return true;
 }
@@ -105,10 +105,10 @@ bool CmdDBResetAll::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetAll");
    DB.DBOpen();
-   DB.ResetArchive();
+   DB.ResetStat();
    DB.ResetUsers();
    DB.ResetRenders();
-   DB.ResetOnline();
+   DB.ResetJobs();
    DB.DBClose();
    return true;
 }

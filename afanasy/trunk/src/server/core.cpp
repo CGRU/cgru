@@ -73,12 +73,6 @@ Core::Core():
 
 
 //
-// Create system maintenance job:
-//
-//   JobSys * job = new JobSys();
-//   jobs->job_register( job, users, NULL);
-
-//
 // Open database to get nodes:
 //
    afDB_JobRegister.DBOpen();
@@ -109,14 +103,30 @@ Core::Core():
 //
 // Get Jobs from database:
 //
+   bool hasMaintenanceJob = false;
    std::list<int> jids;
    afDB_JobRegister.getJobsIds( jids);
    for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
    {
       JobAf * job = new JobAf( *it);
-      if( afDB_JobRegister.getItem( job)) jobs->job_register( job, users, NULL);
+      if( afDB_JobRegister.getItem( job))
+      {
+         jobs->job_register( job, users, NULL);
+         if( *it == 1 ) hasMaintenanceJob = true;
+      }
       else delete job;
    }
+
+//
+// Create system maintenance job if it was not in database:
+//
+/*
+   if( false == hasMaintenanceJob )
+   {
+      JobSys * job = new JobSys();
+      jobs->job_register( job, users, NULL);
+   }
+*/
 
 //
 // Close database:

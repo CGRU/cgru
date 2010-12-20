@@ -13,6 +13,7 @@ import services.service
 from optparse import OptionParser
 parser = OptionParser(usage="usage: %prog [options]", version="%prog 1.0")
 parser.add_option(      '--name',         dest='jobname',      type='string', default='', help='job name')
+parser.add_option('-u', '--user',         dest='user',         type='string', default='', help='job user name')
 parser.add_option('-l', '--labels',       dest='labels',       type='string', default='', help='blocks names (labels)')
 parser.add_option(      '--services',     dest='services',     type='string', default='', help='blocks types (services)')
 parser.add_option('-t', '--time',         dest='timesec',      type='float',  default=2,  help='time per frame in seconds')
@@ -145,6 +146,9 @@ if cmdpost != '':
 
 if waittime:
    job.setWaitTime( int(time.time()) + waittime)
+
+if options.user != '':
+   job.setUserName( options.user)
 
 if pause:
    job.offLine()

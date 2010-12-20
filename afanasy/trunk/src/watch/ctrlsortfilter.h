@@ -36,6 +36,7 @@ public:
       TCAPACITY,
       TNAME,
       TUSERNAME,
+      TTASKUSER,
       THOSTNAME,
       TNUMJOBS,
       TNUMRUNNINGTASKS,

@@ -66,7 +66,7 @@ printf("Registering new job:\n");
    }
    if( job->isConstructed() == false )
    {
-      AFERROR("JobContainer::job_register: Job was not constructed.\n");
+      AFERROR("JobContainer::job_register: Job is not constructed.\n");
       return 0;
    }
    if( users == NULL )

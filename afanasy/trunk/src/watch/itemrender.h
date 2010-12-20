@@ -52,6 +52,7 @@ private:
    int revision;
    QString  version;
    QString  username;
+   QString  tasksusers; ///< For sorting and filtering only
    QString  annotation;
    int priority;
    int capacity;

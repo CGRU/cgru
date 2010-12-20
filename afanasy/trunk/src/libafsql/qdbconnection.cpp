@@ -148,7 +148,7 @@ void DBConnection::ResetRenders()
    render.dbCreateTable( db);
 }
 
-void DBConnection::ResetOnline()
+void DBConnection::ResetJobs()
 {
    if( working == false ) return;
    if( db->isOpen() == false )
@@ -173,7 +173,7 @@ void DBConnection::ResetOnline()
    progress.dbCreateTable( db);
 }
 
-void DBConnection::ResetArchive()
+void DBConnection::ResetStat()
 {
    if( working == false ) return;
    if( db->isOpen() == false )

@@ -24,14 +24,14 @@ class CmdDBResetRenders : public Cmd { public:
    ~CmdDBResetRenders();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
-class CmdDBResetOnline : public Cmd { public:
-   CmdDBResetOnline();
-   ~CmdDBResetOnline();
+class CmdDBResetJobs : public Cmd { public:
+   CmdDBResetJobs();
+   ~CmdDBResetJobs();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
-class CmdDBResetArchive : public Cmd { public:
-   CmdDBResetArchive();
-   ~CmdDBResetArchive();
+class CmdDBResetStat: public Cmd { public:
+   CmdDBResetStat();
+   ~CmdDBResetStat();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 class CmdDBResetAll : public Cmd { public:

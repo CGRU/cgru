@@ -96,6 +96,10 @@ public:
    /// Set Jobs Container.
    inline static void setJobContainer( JobContainer *Jobs){ jobs = Jobs;}
 
+protected:
+/// Allocate JobInfo, tasksLog.
+   bool construct();
+
 private:
    bool constructed;             ///< Whether job was constructed successfully.
    bool fromdatabase;            ///< Whether job constructed from database.
@@ -125,9 +129,6 @@ private:
 
 /// Skip or restart some tasks.
    void tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring);
-
-/// Allocate JobInfo, tasksLog.
-   bool construct();
 
 /// Check whether job has not done depend jobs.
 /** If \c onlyIfDepeds == \c true , check process only if job is already waiting for others. **/

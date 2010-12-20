@@ -346,6 +346,16 @@ void ItemRender::updateValues( af::Node *node, int type)
 
    tooltip += "\n" + creationTime;
    if( online ) tooltip += "\nAddress = " + address_str;
+
+   tasksusers.clear();
+   for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
+   {
+      if( false == tasksusers.contains((*it)->getUserName()))
+      {
+         if( false == tasksusers.isEmpty()) tasksusers.append(' ');
+         tasksusers.append((*it)->getUserName());
+      }
+   }
 }
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -513,6 +523,9 @@ bool ItemRender::setSortType(   int type )
       case CtrlSortFilter::TUSERNAME:
          sort_str = &username;
          break;
+      case CtrlSortFilter::TTASKUSER:
+         sort_str = &tasksusers;
+         break;
       case CtrlSortFilter::TVERSION:
          sort_str = &version;
          break;
@@ -535,6 +548,9 @@ bool ItemRender::setFilterType( int type )
          break;
       case CtrlSortFilter::TUSERNAME:
          filter_str = &username;
+         break;
+      case CtrlSortFilter::TTASKUSER:
+         filter_str = &tasksusers;
          break;
       default:
          AFERRAR("ItemRender::setFilterType: Invalid type number = %d\n", type);

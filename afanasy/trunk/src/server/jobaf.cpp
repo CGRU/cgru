@@ -106,6 +106,12 @@ JobAf::~JobAf()
 
 bool JobAf::initialize( UserAf * jobOwner)
 {
+   if( isConstructed() == false)
+   {
+      AFERROR("JobAf::initialize: Job is not constructed.\n");
+      return 0;
+   }
+
 //printf("JobAf::initialize: BEGIN\n");
    user = jobOwner;
    progress->setJobId( id);

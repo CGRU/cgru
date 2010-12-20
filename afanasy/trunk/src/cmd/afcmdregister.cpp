@@ -88,8 +88,8 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdDBCheck);
    addCmd( new CmdDBResetUsers);
    addCmd( new CmdDBResetRenders);
-   addCmd( new CmdDBResetOnline);
-   addCmd( new CmdDBResetArchive);
+   addCmd( new CmdDBResetJobs);
+   addCmd( new CmdDBResetStat);
    addCmd( new CmdDBResetAll);
    addCmd( new CmdDBJobsList);
    addCmd( new CmdDBJobsClean);
