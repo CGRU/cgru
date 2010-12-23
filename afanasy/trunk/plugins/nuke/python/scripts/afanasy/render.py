@@ -158,7 +158,10 @@ class BlockParameters:
                   if not os.path.isdir(folder):
                      result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
                      if result:
-                        os.mkdir( folder)
+                        os.makedirs( folder)
+                  		if not os.path.isdir(folder):
+         						nuke.message('Can`t create folder:\n%s' % folder)
+                        	self.valid = False
                      else:
                         self.valid = False
       elif wnode.Class() == DailiesNodeClassName:
