@@ -1,6 +1,6 @@
 #!/bin/bash
 
-qt=4.7.0-static
+qt=4.7.1-static
 qtsrc=qt-everywhere-opensource-src-$qt
 qtdir=$PWD/qt-$qt
 

@@ -11,7 +11,7 @@ cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 pythondir=$cgru_utils/python
-qt=$cgru_utils/qt/qt-4.7.0-static
+qt=$cgru_utils/qt/qt-4.7.1-static
 
 # Setup Version:
 pushd .. > /dev/null
