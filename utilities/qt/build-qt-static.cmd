@@ -1,6 +1,6 @@
 set VSINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio 9.0"
 set VCVARS=amd64
-set qt=qt-everywhere-opensource-src-4.7.0-static
+set qt=qt-everywhere-opensource-src-4.7.1-static
 
 if exist override.cmd call override.cmd
 
