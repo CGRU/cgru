@@ -174,7 +174,7 @@ def SubmitButton_OnClicked():
             images_str += img
  
       job=af.Job( curjobname)
-      job.setCmdPost('rm "%s"' % tmpscene)
+      job.setCmdPost('deletefiles "%s"' % os.path.abspath(tmpscene))
       if priority  != -1: job.setPriority( priority)
       if maxhosts  != -1: job.setMaxHosts( maxhosts)
       if hostsmask         != None and hostsmask         != '': job.setHostsMask( hostsmask)

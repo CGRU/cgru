@@ -220,6 +220,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TUserErrorsAvoidHost/**/,       ///< Set number of errors on host to avoid it.
 /**/TUserErrorRetries/**/,          ///< Set number of automatic retries task with errors.
 /**/TUserErrorsTaskSameHost/**/,    ///< Set number of errors for task on same host.
+/**/TUserErrorsForgiveTime/**/,     ///< Set time to forgive error host.
 /**/TUserIdRequest/**/,             ///< Request an id of user with given name.
 /**/TUserMoveJobsUp/**/,            ///< Move jobs one position up in user jobs list.
 /**/TUserMoveJobsDown/**/,          ///< Move jobs one position down in user jobs list.
@@ -273,7 +274,8 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TBlockResetErrorHosts/**/,      ///< Reset block avoid hosts.
 /**/TBlockErrorsAvoidHost/**/,      ///< Set number of errors on host to avoid it.
 /**/TBlockErrorRetries/**/,         ///< Set number of automatic retries task with errors.
-/**/TBlockErrorsSameHost/**/,       ///< Set number of errors for the task on same host to make task to avoid host
+/**/TBlockErrorsSameHost/**/,       ///< Set number of errors for the task on same host to make task to avoid host.
+/**/TBlockErrorsForgiveTime/**/,    ///< Set time to forgive error host.
 /**/TBlockCapacity/**/,             ///< Set block capacity.
 /**/TBlockCapacityCoeffMin/**/,     ///< Set block capacity minimum coefficient.
 /**/TBlockCapacityCoeffMax/**/,     ///< Set block capacity maximum coefficient.

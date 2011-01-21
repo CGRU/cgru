@@ -487,7 +487,7 @@ if Options.afanasy:
    if need_convert:
       be.setDependMask('convert')
       os.makedirs( TmpDir)
-      j.setCmdPost('rm -rf "%s"' % os.path.abspath(TmpDir))
+      j.setCmdPost('deletefiles "%s"' % os.path.abspath(TmpDir))
 
    if Verbose: j.output(1)
 

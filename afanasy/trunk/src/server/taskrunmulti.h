@@ -18,7 +18,6 @@ public:
             const Block * taskBlock,
             RenderAf * render,
             MonitorContainer * monitoring,
-            QStringList * taskLog,
             int * runningtaskscounter
             );
    ~TaskRunMulti();
@@ -51,8 +50,6 @@ protected:
 
 /// Catch master task finishing session. Launch multi host task stopping.
    virtual void finish(  const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
-
-//   inline void log( const QString &message) {TaskRun::log(message); printf("%s\n", message.toUtf8().data());}
 
 private:
    void setMasterTask();

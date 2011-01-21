@@ -142,12 +142,12 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
             menu.addMenu( submenu);
          }
 
-         action = new QAction( "Log", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actTaskLog() ));
-         menu.addAction( action);
-
          action = new QAction( "Info", this);
          connect( action, SIGNAL( triggered() ), this, SLOT( actTaskInfo() ));
+         menu.addAction( action);
+
+         action = new QAction( "Log", this);
+         connect( action, SIGNAL( triggered() ), this, SLOT( actTaskLog() ));
          menu.addAction( action);
 
          action = new QAction( "Listen", this);
@@ -406,7 +406,8 @@ bool ListTasks::updateProgress(  bool blocksOnly)
    {
       af::BlockData * blockdata = job->getBlock(b);
       blockdata->updateProgress( progress);
-      wblocks[b]->update( blockdata, af::Msg::TBlocksProgress);
+      // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
+      wblocks[b]->update( blockdata, 0);
       int row = getRow( b);
       if( row != -1 ) model->emit_dataChanged( row);
 

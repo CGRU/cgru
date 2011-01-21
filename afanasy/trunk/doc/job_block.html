@@ -82,11 +82,10 @@ Block - not numeric, patern - not empty: task simply take its name.<br/>
 
 <li><a name="WorkingDirectory"/><b>Working Directory</b> - Tasks process working directory.</li>
 
-<li><a name="CmdPre"/><b>Pre Command</b> - Command to execute when job comes to server.</li>
-
-<li><a name="CmdPost"/><b>Post Command</b> - Command to execute when job deletes from server.<br/>
-Note, that this commands are executed by server, and not from block working directory. Use absolute paths here or even transfer paths if you server has another file system than renders.<br/>
-They are executed in a special thread with commands queue. This means if somebody executes 'sleep 1000', other commands execution will be delayed on 1000 seconds (only delayed, not lost).<br/></li>
+<li><a name="CmdPre"/><b>Pre Command</b> - Like <a href="job.html#CmdPre">Job Pre Command</a> but for each block.</li>
+<li><a name="CmdPost"/><b>Post Command</b> - Like <a href="job.html#CmdPost">Job Post Command</a> but for each block.
+Working directory of this command will be this block working folder.
+</li>
 
 <li><a name="Capacity"/><b>Capacity</b> - tasks capacity (task checks available capacity on render to run on it, and takes its capacity value). Capacity can be static (by default) and variable - base value and coefficients:<br/>
 <b>Capacity Minimum Coefficient</b> - minimum Capacity multiplier.<br/>
@@ -119,7 +118,14 @@ You can specify number of CPUs to use for your applications (if it supports it b
 
 <li><a name="ErrorsAvoidHost"/><b>Errors Avoid Host</b> - Maximum number of errors on same host. Block begins to avoid render host name if number of errors on it greater or equal this value. Value less then '1' means no limit. Value '-1' means take this value from user settings.</li>
 
-<li><a name="ErrorsTaskSameHost"/><b>Errors Task Same Host</b> - Maximum number of errors for task on same host. Task begin to avoid this host name of errors on it greater or equal this value. Value less then '1' means no limit. Value '-1' means take this value from user settings.</li>
+<li><a name="ErrorsTaskSameHost"/><b>Errors Task Same Host</b>
+ - Maximum number of errors for task on same host.
+Task begin to avoid this host name of errors on it greater or equal this value.
+Value less then '1' means no limit. Value '-1' means take this value from user settings.</li>
+
+<li><a name="ErrorsForgiveTime"/><b>Errors Forgive Time</b>
+ - Time form last error to forgive error host (reset it's errors count).
+Value less then '1' means no forgive. Value '-1' means take this value from user settings.</li>
 
 <li><a name="TasksMaxRunTime"/><b>Tasks Maximum Run Time</b> - Tasks maximum time to run. After this time task will be set to error ( and may be automatically restarted according to <var>Error Retries</var> value). If this value equals zero, no task run time limit exists.
 <br/><br/></li>

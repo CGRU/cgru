@@ -17,6 +17,7 @@ Mask ".*" will match any render name. So here defined some default settings for 
 -->
       <resources>{'c':1000,'m':3000}</resources>
       <data>{'c':'render','m':10}</data>
+      <service name="system" />
       <service name="generic" />
       <service name="movgen" />
       <service name="shake" />

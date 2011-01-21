@@ -58,12 +58,10 @@ public:
    inline uint32_t getTimeRegister()   const { return time_register;  } ///< Get register time.
    inline uint32_t getTimeOnline()     const { return time_online;    } ///< Get online time.
 
-/// Get maximum number or errors on same host for job NOT to avoid host
-   inline uint8_t  getErrorsAvoidHost()      const { return errors_avoidhost;    }
-/// Get maximum number of errors in task to retry it automatically
-   inline uint8_t  getErrorsRetries()        const { return errors_retries;      }
-/// Get maximum number or errors on same host for task NOT to avoid host
-   inline uint8_t  getErrorsTaskSameHost()   const { return errors_tasksamehost; }
+   inline int getErrorsAvoidHost()      const { return errors_avoidhost;    }
+   inline int getErrorsRetries()        const { return errors_retries;      }
+   inline int getErrorsTaskSameHost()   const { return errors_tasksamehost; }
+   inline int getErrorsForgiveTime()    const { return errors_forgivetime;  }
 
 /// Set user whether user is permanent.
 /** Permanent user will not be deleted if he has no jobs, Afanasy store them in database**/
@@ -94,6 +92,8 @@ protected:
    uint8_t errors_avoidhost;
 /// Maximum number or errors on same host for task NOT to avoid host
    uint8_t errors_tasksamehost;
+/// Time from last error to remove host from error list
+   int32_t errors_forgivetime;
 
    uint32_t time_register;      ///< User registration time (when he become permanent).
 

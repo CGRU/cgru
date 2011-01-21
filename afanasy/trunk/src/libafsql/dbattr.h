@@ -25,6 +25,7 @@ public:
          _capcoeff_min,
          _errors_avoidhost,
          _errors_count,
+         _errors_forgivetime,
          _errors_retries,
          _errors_tasksamehost,
          _filesize_max,

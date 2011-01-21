@@ -321,15 +321,9 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
       if( job == NULL ) break;
-      QStringList avoidHostsList;
+      QStringList list( job->getErrorHostsList());
       msg_response = new MsgAf();
-      if( job->getErrorHostsList( avoidHostsList))
-         msg_response->setStringList( avoidHostsList);
-      else
-      {
-         QString message("No error hosts.");
-         msg_response->setString( message);
-      }
+      msg_response->setStringList( list);
       break;
    }
    case af::Msg::TJobProgressRequestId:
@@ -426,7 +420,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
       msg_response = new MsgAf();
       if( list->isEmpty())
       {
-         QStringList nolog("No task log available.");
+         QStringList nolog("Task log is empty.");
          msg_response->setStringList( nolog);
       }
       else
@@ -441,15 +435,9 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
       if( job == NULL ) break;
-      QStringList list;
+      QStringList list( job->getErrorHostsList( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       msg_response = new MsgAf();
-      if( job->getErrorHostsList( list, mctaskpos.getNumBlock(), mctaskpos.getNumTask()))
-         msg_response->setStringList( list);
-      else
-      {
-         QString message("No error hosts.");
-         msg_response->setString( message);
-      }
+      msg_response->setStringList( list);
       break;
    }
    case af::Msg::TTaskOutputRequest:
@@ -549,6 +537,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockErrorsAvoidHost:
    case af::Msg::TBlockErrorRetries:
    case af::Msg::TBlockErrorsSameHost:
+   case af::Msg::TBlockErrorsForgiveTime:
    case af::Msg::TBlockTasksMaxRunTime:
    case af::Msg::TBlockResetErrorHosts:
    case af::Msg::TBlockDependMask:
@@ -620,6 +609,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
    case af::Msg::TUserErrorsTaskSameHost:
+   case af::Msg::TUserErrorsForgiveTime:
    case af::Msg::TUserMoveJobsUp:
    case af::Msg::TUserMoveJobsDown:
    case af::Msg::TUserMoveJobsTop:

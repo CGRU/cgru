@@ -60,6 +60,11 @@ void Block::log( const QString &message)
 
 void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
 {
+   if( task >= data->getTasksNum())
+   {
+      AFERRAR("Block::errorHostsAppend: task >= tasksnum (%d>=%d)\n", task, data->getTasksNum());
+      return;
+   }
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
@@ -74,10 +79,12 @@ bool Block::errorHostsAppend( const QString & hostname)
    {
       errorHosts << hostname;
       errorHostsCounts << 1;
+      errorHostsTime << time( NULL);
    }
    else
    {
       errorHostsCounts[index]++;
+      errorHostsTime[index] = time( NULL);
       if( errorHostsCounts[index] >= getErrorsAvoidHost() ) return true;
    }
    return false;
@@ -92,21 +99,22 @@ bool Block::avoidHostsCheck( const QString & hostname) const
    return false;
 }
 
-bool Block::getErrorHostsList( QStringList & list)
+const QStringList Block::getErrorHostsList() const
 {
-   if( errorHosts.size() < 1 ) return false;
-   list << QString("block['%1']").arg( data->getName());
-   for( int hostNum = 0; hostNum < errorHosts.size(); hostNum++)
-      list << errorHosts[hostNum] + ": " + QString::number( errorHostsCounts[hostNum]) +
-         (((getErrorsAvoidHost() > 0) && (errorHostsCounts[hostNum] >= getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
-   for( int t = 0; t < data->getTasksNum(); t++) tasks[t]->getErrorHostsList( list, true);
-   return true;
+   QStringList list( QString("Block['%1'] error hosts:").arg( data->getName()));
+   for( int h = 0; h < errorHosts.size(); h++)
+      list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
+         .arg( af::time2Qstr( errorHostsTime[h]))
+         .arg(((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
+   for( int t = 0; t < data->getTasksNum(); t++) list << tasks[t]->getErrorHostsList();
+   return list;
 }
 
 void Block::errorHostsReset()
 {
    errorHosts.clear();
    errorHostsCounts.clear();
+   errorHostsTime.clear();
    for( int t = 0; t < data->getTasksNum(); t++) tasks[t]->errorHostsReset();
 }
 
@@ -174,8 +182,28 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       if( errorHostId != -1 ) errorHostsAppend( t, errorHostId, renders);
    }
 
+   // For block in block and tasks list monitoring
+   bool block_changed = false;
+
+   // For block in jobs list monitoring
+   bool blockProgress_changed = false;
+
    // store old state to know if monitoring and database udate needed
    uint32_t old_block_state = data->getState();
+
+   // forgive error hosts
+   if( getErrorsForgiveTime() > 0)
+      for( int i = 0; i < errorHosts.size(); )
+         if( currentTime - errorHostsTime[i] > getErrorsForgiveTime())
+         {
+            log(QString("Forgived error host '%1' since %2.").arg(errorHosts[i]).arg(af::time2Qstr(errorHostsTime[i])));
+            errorHosts.removeAt(i);
+            errorHostsCounts.removeAt(i);
+            errorHostsTime.removeAt(i);
+            block_changed = true;
+            blockProgress_changed = true;
+         }
+         else i++;
 
    // calculate number of error and avoid hosts for monitoring
    {
@@ -188,14 +216,17 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
 
       if(( data->getProgressErrorHostsNum() != errorhostsnum ) ||
          ( data->getProgressAvoidHostsNum() != avoidhostsnum ) )
-         if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, data);
+      {
+         block_changed = true;
+         blockProgress_changed = true;
+      }
 
       data->setProgressErrorHostsNum( errorhostsnum);
       data->setProgressAvoidHostsNum( avoidhostsnum);
    }
 
    // update block tasks progress and bars
-   bool blockProgressBarsChanged = data->updateProgress( jobprogress);
+   if( data->updateProgress( jobprogress)) blockProgress_changed = true;
 
    //
    // blocksdata depend check
@@ -209,14 +240,16 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       }
       //printf("Block::refresh: checking '%s': %s\n", data->getName().toUtf8().data(), data->state & AFJOB::STATE_READY_MASK ? "READY" : "NOT ready");
 
+   if( old_block_state != data->getState()) block_changed = true;
+
    // update block monitoring and database if needed
-   if(( old_block_state != data->getState() ) && (monitoring))
+   if( block_changed && monitoring )
    {
       if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, data);
 //      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
    }
 
-   return blockProgressBarsChanged;
+   return blockProgress_changed;
 }
 
 uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
@@ -249,10 +282,19 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockTasksMaxRunTime:
    {
       data->setTasksMaxRunTime( mcgeneral.getNumber());
-      log( QString("Tasks maximum run time \"%1\" by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( QString("Tasks maximum run time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_tasksmaxruntime);
+      break;
+   }
+   case af::Msg::TBlockErrorsForgiveTime:
+   {
+      data->setErrorsForgiveTime( mcgeneral.getNumber());
+      log( QString("Errors forgive time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
+      jobchanged = af::Msg::TMonitorJobsChanged;
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_errors_forgivetime);
       break;
    }
    case af::Msg::TBlockErrorsSameHost:

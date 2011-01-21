@@ -22,6 +22,7 @@ User::User( const QString &username, const QString &host):
    errors_retries(    af::Environment::getTaskErrorRetries() ),
    errors_avoidhost( af::Environment::getErrorsAvoidHost()  ),
    errors_tasksamehost( af::Environment::getTaskErrorsSameHost() ),
+   errors_forgivetime( af::Environment::getErrorsForgiveTime()),
    time_register( 0)
 {
    name = username;
@@ -70,6 +71,7 @@ void User::readwrite( Msg * msg)
    rw_uint8_t ( errors_retries,        msg);
    rw_uint8_t ( errors_avoidhost,      msg);
    rw_uint8_t ( errors_tasksamehost,   msg);
+   rw_int32_t ( errors_forgivetime,    msg);
    rw_uint32_t( time_online,           msg);
    rw_int32_t ( numjobs,               msg);
    rw_int32_t ( numrunningjobs,        msg);

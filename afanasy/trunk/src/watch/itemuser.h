@@ -17,6 +17,7 @@ public:
    int errors_avoidhost;
    int errors_tasksamehost;
    int errors_retries;
+   int errors_forgivetime;
    int maxhosts;
    QString hostsmask;
    QString hostsmask_exclude;
@@ -39,15 +40,6 @@ private:
 
    static const int HeightUser;
    static const int HeightAnnotation;
-
-   QString numrunningtasks_str;
-   QString maxhosts_str;
-   QString priority_str;
-   QString errorsAvoidHost_str;
-   QString errorsRetries_str;
-   QString errorsTaskSameHost_str;
-
-   QString strErrorHosts;
 
    QString strLeftBottom;
    QString strLeftTop;

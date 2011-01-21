@@ -69,6 +69,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       errors_retries       = block->getErrorsRetries();
       errors_avoidhost     = block->getErrorsAvoidHost();
       errors_tasksamehost  = block->getErrorsTaskSameHost();
+      errors_forgivetime   = block->getErrorsForgiveTime();
       maxhosts             = block->getMaxHosts();
       need_memory          = block->getNeedMemory();
       need_power           = block->getNeedPower();
@@ -105,6 +106,11 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       icon_small = Watch::getServiceIconSmall( service);
 
    case af::Msg::TBlocksProgress:
+      avoidhostsnum     = block->getProgressAvoidHostsNum();
+      errorhostsnum     = block->getProgressErrorHostsNum();
+
+   case 0:
+      // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
       state             = block->getState();
       taskssumruntime   = block->getProgressTasksSumRunTime();
       tasksready        = block->getProgressTasksReady();
@@ -112,8 +118,6 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       tasksdone         = block->getProgressTasksDone();
       taskserror        = block->getProgressTasksError();
       percentage        = block->getProgressPercentage();
-      avoidhostsnum     = block->getProgressAvoidHostsNum();
-      errorhostsnum     = block->getProgressErrorHostsNum();
       memcpy( progress_done,    block->getProgressBarDone(),    AFJOB::PROGRESS_BYTES);
       memcpy( progress_running, block->getProgressBarRunning(), AFJOB::PROGRESS_BYTES);
 
@@ -154,8 +158,9 @@ void BlockInfo::refresh()
 
    if(( errors_avoidhost != -1) || ( errors_tasksamehost != -1) || ( errors_retries != -1))
       str_properties += QString("E:%1b|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
+   if( errors_forgivetime != -1 ) str_properties += QString(" F%1h").arg( double(errors_forgivetime)/3600.0, 0, 'g', 2);
 
-   if( tasksmaxruntime) str_properties += QString(" %1hours").arg( double(tasksmaxruntime)/3600);
+   if( tasksmaxruntime) str_properties += QString(" Max%1h").arg( double(tasksmaxruntime)/3600.0, 0, 'g', 2);
 
    if( maxhosts != -1 ) str_properties += QString(" m%1").arg(maxhosts_str);
    if( false == hostsmask.isEmpty()          ) str_properties += QString(" H(%1)").arg( hostsmask         );
@@ -366,8 +371,16 @@ const QString BlockInfo::generateToolTip() const
       if( errors_tasksamehost == -1) toolTip += " (user settings used)";
    toolTip += "\nRetry task errors = "       +  QString::number( errors_retries);
       if( errors_retries == -1) toolTip += " (user settings used)";
+   toolTip += "\nErrors forgive time = ";
+   if( errors_forgivetime >= 0)
+   {
+      toolTip += QString::number( double(tasksmaxruntime)/3600) + " hours";
+      if( errors_forgivetime == 0) toolTip += QString(" (infinite)");
+   }
+   else toolTip += " = -1 (user settings used)";
+
    toolTip += "\nTasks max run time = "      +  QString::number( double(tasksmaxruntime)/3600) + " hours";
-   if( tasksmaxruntime == 0 )  toolTip  += QString(" (infinite)");
+   if( tasksmaxruntime == 0 ) toolTip        += QString(" (infinite)");
    toolTip += "\nError hosts count = "       +  QString::number( errorhostsnum);
    toolTip += "\nAvoid hosts count = "       +  QString::number( avoidhostsnum);
 
@@ -446,6 +459,10 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    menu->addAction( action);
 
    action = new ActionIdId( id_block, af::Msg::TBlockTasksMaxRunTime, "Set Tasks MaxRunTime", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdId( id_block, af::Msg::TBlockErrorsForgiveTime, "Set Errors Forgive time", qwidget);
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
    menu->addAction( action);
 
@@ -567,6 +584,14 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
          if( id_block == blocknum ) cur_number = errors_tasksamehost;
          set_number = QInputDialog::getInteger( listitems, "Set Task Errors Same Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
          break;
+      case af::Msg::TBlockErrorsForgiveTime:
+      {
+         double cur = 0;
+         if( id_block == blocknum ) cur = double(errors_forgivetime) / (60*60);
+         double hours = QInputDialog::getDouble( listitems, "Set Errors forgive time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
+         set_number = int( hours * 60*60 );
+         break;
+      }
 
       case af::Msg::TBlockResetErrorHosts:
          break;
@@ -575,7 +600,7 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
       {
          double cur = 0;
          if( id_block == blocknum ) cur = double(tasksmaxruntime) / (60*60);
-         double hours = QInputDialog::getDouble( listitems, "Tasks Maximum Run Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
+         double hours = QInputDialog::getDouble( listitems, "Tasks Maximum Run Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 4, &ok);
          set_number = int( hours * 60*60 );
          break;
       }

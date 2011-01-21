@@ -17,8 +17,6 @@ public:
 
    void read( QByteArray & output);
 
-   inline bool initialized() const { return init;}
-
    inline int getPercent()      const { return percent      ;}
    inline int getFrame()        const { return frame        ;}
    inline int getPercentFrame() const { return percentframe ;}
@@ -49,8 +47,6 @@ private:
    bool               overload;
    static const char* overload_string;
    int                overload_string_length;
-
-   bool init;
 
 private:
    void setOverload();

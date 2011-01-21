@@ -5,6 +5,7 @@ Blender: 243
 Group: 'Render'
 """
 import Blender
+import os
 import time
 import af
 
@@ -83,7 +84,7 @@ def main():
    job.setNeedProperties( need_properties.val )
    if paused.val: job.offLine()
    # Make server to delete temporary file after job deletion:
-   job.setCmdPost('rm ' + tmpname)
+   job.setCmdPost('deletefiles "%s"' % os.path.abspath(tmpname))
 
 #  Sending job to server:
 

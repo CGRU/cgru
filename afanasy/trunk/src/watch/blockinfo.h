@@ -74,6 +74,7 @@ private:
    int errors_retries;
    int errors_avoidhost;
    int errors_tasksamehost;
+   int errors_forgivetime;
    uint32_t tasksmaxruntime;
 
    uint8_t  progress_done[AFJOB::PROGRESS_BYTES];

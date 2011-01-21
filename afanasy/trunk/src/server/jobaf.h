@@ -30,22 +30,22 @@ public:
 /// Construct empty Job for database.
    JobAf( int Id);
 
-   ~JobAf();
+   virtual ~JobAf();
 
    void setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
 
    void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
 /// Get job log.
-   QStringList* getLog() { return &joblog; }
+   QStringList* getLog() { return &joblog;}
 
-   bool getErrorHostsList( QStringList & list); /// Get avoid hosts list.
-   bool getErrorHostsList( QStringList & list, int b, int t); /// Get avoid hosts list for \c t task in \c b block.
+   const QStringList getErrorHostsList() const; /// Get avoid hosts list.
+   const QStringList getErrorHostsList( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
    QStringList* getTaskLog( int block, int task);
 
-   af::TaskExec * generateTask( int block, int task);
+   virtual af::TaskExec * generateTask( int block, int task);
 
 /// Construct message for retrieveing output from running remote host or filename if task is not running
 /** return \c true in success, or \c false with error message to send back to client.
@@ -53,10 +53,10 @@ public:
    bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, QString & filename, RenderContainer * renders);
 
 /// Solve a job. Job send ready task to Render, if any.
-   bool solve( RenderAf *render, MonitorContainer * monitoring);
+   virtual bool solve( RenderAf *render, MonitorContainer * monitoring);
 
 /// Update task state.
-   void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Send tasks output to a specified address.
    void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
@@ -65,10 +65,10 @@ public:
    void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 /// Refresh job. Calculate attributes from tasks progress.
-   void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
+   virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
 /// Set some attributes.
-   bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+   virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
    bool dbSelect( QSqlDatabase * db, const QString * where = NULL);
 
@@ -99,20 +99,23 @@ public:
 protected:
 /// Allocate JobInfo, tasksLog.
    bool construct();
+/// Append task log with a \c message .
+   void log( const QString &message);
 
-private:
-   bool constructed;             ///< Whether job was constructed successfully.
+   virtual Block * createBlock( int numBlock); ///< Virtual function to create another blocks in child classes
+
+protected:
+   Block ** blocks;              ///< Blocks.
+   int runningtaskscounter;
    bool fromdatabase;            ///< Whether job constructed from database.
-   bool initialized;             ///< Whether job was initialized successfully.
-   bool deletion;                ///< Whether job is deleting.
-
    QStringList joblog;           ///< Job log.
 
-   Block ** blocks;                ///< Blocks.
+private:
+   bool constructed;             ///< Whether the job was constructed successfully.
+   bool initialized;             ///< Whether the job was initialized successfully.
+   bool deletion;                ///< Whether the job is deleting.
 
    Listeners listeners;     ///> Addresses to send task output to.
-
-   int runningtaskscounter;
 
    UserAf * user;
 
@@ -124,9 +127,6 @@ private:
    mutable int blackListsWeight;
 
 private:
-/// Append task log with a \c message .
-   inline void log( const QString &message) { joblog << af::time2Qstr() + " : " + message; }
-
 /// Skip or restart some tasks.
    void tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring);
 

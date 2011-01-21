@@ -31,9 +31,7 @@ ParserHost::ParserHost( const QString & task_type, int num_frames):
    badresult( false),
    data( NULL),
    datasize( 0),
-   overload( false),
-
-   init( false)
+   overload( false)
 {
    data = new char[DataSizeMax];
    overload_string_length = strlen(overload_string)+1;
@@ -44,7 +42,7 @@ ParserHost::ParserHost( const QString & task_type, int num_frames):
       return;
    }
 
-   if( type != "none")
+   if( false == type.isEmpty())
    {
       parser = new af::Parser( type, numframes);
       if( parser->isInitialized() == false)
@@ -53,8 +51,6 @@ ParserHost::ParserHost( const QString & task_type, int num_frames):
          parser = NULL;
       }
    }
-
-   init = true;
 }
 
 ParserHost::~ParserHost()
@@ -65,10 +61,6 @@ ParserHost::~ParserHost()
 
 void ParserHost::read( QByteArray & output)
 {
-   // return if parser initialization failed
-   //
-   if( init == false ) return;
-
    parse( output);
    char* out_data = output.data();
    int   out_size = output.size();

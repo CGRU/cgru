@@ -25,8 +25,8 @@ ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
    listtasks( list)
 {
    resetSortingParameters();
-   blockName = name + " #" + QString::number( numblock);
    update( block, af::Msg::TJob);
+   height = HeightHeader  + BlockInfo::Height + HeightFooter;
 }
 
 QSize ItemJobBlock::sizeHint( const QStyleOptionViewItem &option) const
@@ -42,22 +42,18 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    case af::Msg::TJobRegister:
    case af::Msg::TBlocks:
 
-      numeric     = block->isNumeric();
-      varcapacity = block->canVarCapacity();
-      multihost   = block->isMultiHost();
-      first       = block->getFrameFirst();
-      last        = block->getFrameLast();
-      pertask     = block->getFramePerTask();
-      inc         = block->getFrameInc();
+      numeric           = block->isNumeric();
+      varcapacity       = block->canVarCapacity();
+      multihost         = block->isMultiHost();
+      first             = block->getFrameFirst();
+      last              = block->getFrameLast();
+      pertask           = block->getFramePerTask();
+      inc               = block->getFrameInc();
       multihost_service = block->getMultiHostService();
 
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
-      name              = block->getName();
-      dependmask        = block->getDependMask();
-      tasksdependmask   = block->getTasksDependMask();
       command           = block->getCmd();
-      capacity          = block->getCapacity();
       workingdir        = block->getWDir();
       files             = block->getFiles();
       cmdpre            = block->getCmdPre();
@@ -66,27 +62,16 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       service           = block->getService();
       tasksname         = block->getTasksName();
       parser            = block->getParser();
-      hostsmask         = block->getHostsMask();
-      hostsmask_exclude = block->getHostsMaskExclude();
-      maxhosts          = block->getMaxHosts();
-      need_memory       = block->getNeedMemory();
-      need_hdd          = block->getNeedHDD();
-      need_power        = block->getNeedPower();
-      need_properties   = block->getNeedProperties();
 
-      errors_retries    = block->getErrorsRetries();
-      errors_avoidhost  = block->getErrorsAvoidHost();
-      errors_samehost   = block->getErrorsTaskSameHost();
-      tasksmaxruntime   = block->getTasksMaxRunTime();
-
-      maxhosts_str = QString::number( maxhosts);
       generateToolTip();
 
    case af::Msg::TBlocksProgress:
+   case 0:
+      // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
 
       state = block->getState();
 
-   break;
+      break;
 
    default:
       AFERRAR("ItemJobBlock::update: Invalid type = %s\n", af::Msg::TNAMES[type]);
@@ -95,8 +80,6 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
 
    if( info.update( block, type)) setRunning();
    else                           setNotRunning();
-
-   height = HeightHeader  + BlockInfo::Height + HeightFooter;
 
    description = service;
    if( numeric)
@@ -119,7 +102,9 @@ void ItemJobBlock::generateToolTip()
    if( tasksname.isEmpty() == false) blockToolTip += QString("Tasks Name = '%1'\n").arg( tasksname);
    blockToolTip += QString("Command:\n") + command;
    blockToolTip += QString("\nWorking directory:\n") + workingdir;
-   blockToolTip += QString("\nService = '%1' [%2]").arg(service, parser);
+   blockToolTip += QString("\nService = '%1'").arg(service);
+      if( parser.isEmpty()) blockToolTip += " (no parser)";
+      else blockToolTip += QString(" Parser = '%1'").arg( parser);
    if( numeric)
       blockToolTip += QString("\nNumeric: from %1 to %2: %3 per task").arg(first).arg(last).arg(pertask);
    else
@@ -147,7 +132,7 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
 
    painter->setFont( afqt::QEnvironment::f_name);
    painter->setPen(  clrTextMain( option));
-   painter->drawText( x+5, y+16, blockName);
+   painter->drawText( x+5, y+16, info.getName());
 
    printfState( state, x+w-90, y+8, painter, option);
 
@@ -169,48 +154,48 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
 
    y += 1;
 
-   painter->setOpacity( .4);
-   painter->drawRect( x+1, y, w-ItemJobTask::WidthInfo-1, HeightFooter-2);
+   static const float sorting_fields_text_opacity = .7;
+   static const float sorting_fields_line_opacity = .4;
 
    int linex = w-ItemJobTask::WidthInfo;
 
-   painter->setOpacity( .7);
+   painter->setOpacity( sorting_fields_text_opacity);
    if( sort_type == STime) painter->fillRect( linex+2, y, WTime-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex, y-1, WTime, HeightFooter-1, Qt::AlignCenter, "time");
+   painter->drawText( linex, y, WTime, HeightFooter-1, Qt::AlignCenter, "time");
    linex += WTime;
-   painter->setOpacity( .2);
+   painter->setOpacity( sorting_fields_line_opacity);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
-   painter->setOpacity( .7);
+   painter->setOpacity( sorting_fields_text_opacity);
    if( sort_type == SState) painter->fillRect( linex+1, y, ItemJobTask::WidthInfo-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
-   painter->drawText( linex, y+2, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
-
-   y += 1;
+   painter->drawText( linex, y, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
 
    linex = w-ItemJobTask::WidthInfo-1;
+   painter->setOpacity( sorting_fields_line_opacity);
+   painter->drawLine( linex, y, linex, y+HeightFooter-2);
 
-   painter->setOpacity( .7);
+   painter->setOpacity( sorting_fields_text_opacity);
    painter->drawText( x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
 
-   painter->setOpacity( .7);
+   painter->setOpacity( sorting_fields_text_opacity);
    if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "errors");
    linex -= WErrors;
-   painter->setOpacity( .2);
-   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+   painter->setOpacity( sorting_fields_line_opacity);
+   painter->drawLine( linex, y, linex, y+HeightFooter-2);
 
-   painter->setOpacity( .7);
+   painter->setOpacity( sorting_fields_text_opacity);
    if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "starts");
    linex -= WStarts;
-   painter->setOpacity( .2);
-   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+   painter->setOpacity( sorting_fields_line_opacity);
+   painter->drawLine( linex, y, linex, y+HeightFooter-2);
 
-   painter->setOpacity( .7);
+   painter->setOpacity( sorting_fields_text_opacity);
    if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost+1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
    linex -= WHost;
-   painter->setOpacity( .2);
-   painter->drawLine( linex, y, linex, y+HeightFooter-4);
+   painter->setOpacity( sorting_fields_line_opacity);
+   painter->drawLine( linex, y, linex, y+HeightFooter-2);
 
    drawPost( painter, option);
 }

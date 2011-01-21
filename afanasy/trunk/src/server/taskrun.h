@@ -26,7 +26,6 @@ public:
             const Block * taskBlock,
             RenderAf * render,
             MonitorContainer * monitoring,
-            QStringList * taskLog,
             int * runningtaskscounter
             );
 
@@ -70,11 +69,8 @@ protected:
 /// Finish running task session. Release task from render and became a zombie (ready to be deleted).
    virtual void finish(  const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
 
-/// Write string to log prepending with the current time.
-   inline void log( const QString &message) { *logStingList << af::time2Qstr() + " : " + message; }
-
 protected:
-   const Task * task;
+   Task * task;
    const Block * block;
    af::TaskExec * exec;
    af::TaskProgress * progress;

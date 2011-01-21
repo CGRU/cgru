@@ -58,8 +58,6 @@ maxtime     = options.maxtime
 sendjob     = options.sendjob
 waittime    = options.waittime
 capacity    = options.capacity
-cmdpre      = options.cmdpre
-cmdpost     = options.cmdpost
 capmin      = options.capmin
 capmax      = options.capmax
 filemin     = options.filemin
@@ -70,7 +68,6 @@ mhwaitmax   = options.mhwaitmax
 mhwaitsrv   = options.mhwaitsrv
 mhsame      = options.mhsame
 mhservice   = options.mhservice
-pause       = options.pause
 parser      = options.parser
 
 if jobname == '': jobname = '_empty_'
@@ -139,10 +136,10 @@ for b in range( numblocks):
          task.setFiles('task.' + str(t))
          block.tasks.append( task)
 
-if cmdpre  != '':
-   job.setCmdPre( cmdpre)
-if cmdpost != '':
-   job.setCmdPost( cmdpost)
+if options.cmdpre  != '':
+   job.setCmdPre( options.cmdpre)
+if options.cmdpost != '':
+   job.setCmdPost( options.cmdpost)
 
 if waittime:
    job.setWaitTime( int(time.time()) + waittime)
@@ -150,7 +147,7 @@ if waittime:
 if options.user != '':
    job.setUserName( options.user)
 
-if pause:
+if options.pause:
    job.offLine()
 
 if output:

@@ -214,17 +214,12 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       action->setEnabled( render->isOnline());
       connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
       menu.addAction( action);
-      action = new QAction( "Shutdown Computer", this);
-      action->setEnabled( render->isOnline());
-      connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
-      menu.addAction( action);
 
 /* Do not needed since multitask renders, but can be used in future.
       action = new QAction( "Start another Render", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actStart() ));
       menu.addAction( action);
 */
-      menu.addSeparator();
    }
 
    int cmdssize = af::Environment::getRenderCmds().size();
@@ -241,6 +236,13 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       }
       menu.addMenu( submenu);
    }
+
+   menu.addSeparator();
+
+   action = new QAction( "Shutdown Computer", this);
+   action->setEnabled( render->isOnline());
+   connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
+   menu.addAction( action);
 
    menu.exec( event->globalPos());
 }

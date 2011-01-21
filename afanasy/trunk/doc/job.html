@@ -66,8 +66,18 @@
 <li><a name="WaitTime"/><b>Wait Time</b> - Time to wait to start a job.</li>
 <li><a name="NeedOS"/><b>OS Needed</b> - Mask to much render host OS name to run on it.</li>
 <li><a name="NeedProperties"/><b>Properties Needed</b> - Mask to much render host properties to run on it. It's custom host parameter can be defined in farm description.</li>
-<li><a name="CmdPre"/><b>Pre Command</b> - Command executed by server on job registration.</li>
-<li><a name="CmdPost"/><b>Post Command</b> - Command executed by server on job deletion.</li>
+
+<li><a name="CmdPre"/><b>Pre Command</b> - Command to execute on job registration.
+Note, that this <b><i>command is executed by server</i></b>, and not from tasks working directory.
+Use absolute paths here or even transfer paths if you server has another file system than renders.<br/>
+Commands are executed in a special thread with commands queue.
+This means if somebody executes 'sleep 1000', other commands execution (and jobs registration) will be delayed on 1000 seconds (only delayed, not lost).<br/>
+Try not use Pre Command at all. You always can create one more task(block) and make other tasks(blocks) depend on it.
+</li>
+<li><a name="CmdPost"/><b>Post Command</b> - Command executed on job deletion.
+This commands are executed on render farm hosts by special system job.
+Working directory of such system task will be the first block working folder.
+</li>
 <li><a name="Annotation"/><b>Annotation</b> - Annotate job GUI item.</li>
 </ul>
 

@@ -23,11 +23,7 @@ public:
    virtual inline const QVariant getToolTip()      const { return tooltip;      }
 
    uint32_t state;
-   QString  blockName;
-   QString  dependmask;
-   QString  tasksdependmask;
    QString  command;
-   int      capacity;
    QString  workingdir;
    QString  files;
    QString  cmdpre;
@@ -36,23 +32,10 @@ public:
    QString  tasksname;
    QString  service;
    QString  parser;
-   QString  hostsmask;
-   QString  hostsmask_exclude;
-   int      maxhosts;
-   QString  maxhosts_str;
-   int      need_memory;
-   int      need_hdd;
-   int      need_power;
-   QString  need_properties;
    bool     varcapacity;
    bool     multihost;
    bool     multuhost_samemaster;
    QString  multihost_service;
-
-   int      errors_retries;
-   int      errors_avoidhost;
-   int      errors_samehost;
-   uint32_t tasksmaxruntime;
 
    bool numeric;    ///< Whether the block is numeric.
    int  first;      ///< First tasks frame.

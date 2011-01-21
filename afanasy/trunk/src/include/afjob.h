@@ -10,7 +10,6 @@ namespace AFJOB
    const char     TASKS_OUTPUTDIR[]          = "tasksoutput";          ///< Tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
    const char     TASKS_OUTPUTDIR_DELETED[]  = "tasksoutput_deleted";  ///< Deleted jobs tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
    const char     LOGS_DIRECTORY[]           = "jobs";                 ///< Jobs logs store directory, relative to AFSERVER::TEMP_DIRECTORY
-   const int      LOGS_LINESMAX              = 100;                    ///< Maximum number of lines in each Job log.
 
    const uint8_t  PROGRESS_BYTES  = 8;
 
@@ -23,6 +22,8 @@ namespace AFJOB
    const int TASK_DEFAULT_CAPACITY = 1000;
    const int TASK_UPDATE_TIMEOUT   = 300;  ///< Seconds for task to have no update to produce error.
    const int TASK_STOP_TIMEOUT     = 5;    ///< Time after running task was asked to stop, it become not running itself.
+   const int TASK_LOG_LINESMAX     = 100;  ///< Maximum number of lines in task log.
+   const int JOB_LOG_LINESMAX      = 100;  ///< Maximum number of lines in job log.
 
    const int TASK_MULTIHOSTMAXHOSTS = 100;
 
@@ -70,4 +71,11 @@ namespace AFJOB
    const uint32_t STATE_PARSERBADRESULT_MASK       = 1<<12;
    const   char   STATE_PARSERBADRESULT_NAME[]     = "ParserBadResult";
    const   char   STATE_PARSERBADRESULT_NAME_S[]   = "PBR";
+
+   const char SYSJOB_NAME[]         = "afanasy";
+   const char SYSJOB_USERNAME[]     = "afadmin";
+   const char SYSJOB_BLOCKNAME[]    = "system";
+   const char SYSJOB_BLOCKSERVICE[] = "system";
+   const int  SYSJOB_TASKMAXRUNTIME = 72;
+   const int  SYSJOB_TASKLIFE       = 1800;
 }

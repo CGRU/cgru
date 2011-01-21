@@ -38,7 +38,7 @@ void Task::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf *
       if( run )
          ((TaskRunMulti*)(run))->addHost( taskexec, render, monitoring);
       else
-         run = new TaskRunMulti( this, taskexec, progress, block, render, monitoring, &logStringList, runningtaskscounter);
+         run = new TaskRunMulti( this, taskexec, progress, block, render, monitoring, runningtaskscounter);
       return;
    }
    if( run)
@@ -47,16 +47,16 @@ void Task::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf *
       delete taskexec;
       return;
    }
-   run = new TaskRun( this, taskexec, progress, block, render, monitoring, &logStringList, runningtaskscounter);
+   run = new TaskRun( this, taskexec, progress, block, render, monitoring, runningtaskscounter);
 }
 
-void Task::updateState( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
+void Task::updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
 {
    if( run == NULL)
    {
       AFERRAR("Task::updatestate: Task is not running: %s[%d][%d]\n", block->job->getName().toUtf8().data(), taskup.getNumBlock(), taskup.getNumTask());
-      if(( taskup.getStatus() == af::TaskExec::UPPercent) ||
-         ( taskup.getStatus() == af::TaskExec::UPWarning))
+      if(( taskup.getStatus() == af::TaskExec::UPPercent  ) ||
+         ( taskup.getStatus() == af::TaskExec::UPWarning ))
             RenderAf::closeLostTask( taskup);
       return;
    }
@@ -68,6 +68,7 @@ void Task::updateState( const af::MCTaskUp& taskup, RenderContainer * renders, M
 
 void Task::deleteRunningZombie()
 {
+//printf("Task::deleteRunningZombie:\n");
    if( run == NULL ) return;
    if( false == run->isZombie()) return;
    delete run;
@@ -76,7 +77,21 @@ void Task::deleteRunningZombie()
 
 void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
+//printf("Task::refresh:\n");
    bool changed = false;
+
+   // forgive error hosts
+   if( block->getErrorsForgiveTime() > 0)
+      for( int i = 0; i < errorHosts.size(); )
+         if( currentTime - errorHostsTime[i] > block->getErrorsForgiveTime())
+         {
+            log(QString("Forgived error host '%1' since %2.").arg(errorHosts[i]).arg(af::time2Qstr(errorHostsTime[i])));
+            errorHosts.removeAt(i);
+            errorHostsCounts.removeAt(i);
+            errorHostsTime.removeAt(i);
+         }
+         else i++;
+
    if( renders != NULL )
    {
       if( run ) changed = run->refresh( currentTime, renders, monitoring, errorHostId);
@@ -92,6 +107,7 @@ void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContai
          }
       }
    }
+
    if( changed)
    {
       monitor( monitoring);
@@ -151,10 +167,12 @@ void Task::errorHostsAppend( const QString & hostname)
    {
       errorHosts << hostname;
       errorHostsCounts << 1;
+      errorHostsTime << time(NULL);
    }
    else
    {
       errorHostsCounts[index]++;
+      errorHostsTime[index] = time(NULL);
       if( errorHostsCounts[index] >= block->getErrorsTaskSameHost() )
       {
          log( hostname + " - AVOIDING HOST !");
@@ -171,18 +189,18 @@ bool Task::avoidHostsCheck( const QString & hostname) const
    return false;
 }
 
-bool Task::getErrorHostsList( QStringList & list, bool addTasksLabes)
+const QStringList Task::getErrorHostsList() const
 {
-   if( errorHosts.size() < 1 ) return false;
-   for( int h = 0; h < errorHosts.size(); h++)
+   QStringList list;
+   if( errorHosts.size())
    {
-      QString line;
-      if( addTasksLabes) line = QString("Task[%1]: ").arg(number);
-      line += QString("'%1': %2").arg( errorHosts[h]).arg( errorHostsCounts[h]);
-      if((block->getErrorsTaskSameHost() > 0) && (errorHostsCounts[h] >= block->getErrorsTaskSameHost())) line += " - ! AVOIDING !";
-      list << line;
+      list << QString("Task[%1] error hosts: ").arg(number);
+      for( int h = 0; h < errorHosts.size(); h++)
+         list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
+            .arg( af::time2Qstr( errorHostsTime[h]))
+            .arg(((block->getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= block->getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
    }
-   return true;
+   return list;
 }
 
 void Task::monitor( MonitorContainer * monitoring) const
@@ -198,6 +216,7 @@ void Task::updateDatabase() const
 void Task::log( const QString &message)
 {
    logStringList << af::time2Qstr() + " : " + message;
+   while( logStringList.size() > af::Environment::getTaskLogLinesMax() ) logStringList.removeFirst();
 }
 
 void Task::writeTaskOutput( const af::MCTaskUp& taskup) const
@@ -250,6 +269,19 @@ bool Task::getOutput( int startcount, MsgAf *msg, QString & filename, RenderCont
 
    filename = getOutputFileName( startcount);
    return true;
+}
+
+const QString Task::getInfo( bool full) const
+{
+   QString info;
+   info += QString("#%1:").arg( number, 3);
+   info += QString(" %1").arg( af::state2str( progress->state), 4);
+   return info;
+}
+
+void Task::stdOut( bool full) const
+{
+   printf("%s\n", getInfo( full).toUtf8().data());
 }
 
 int Task::calcWeight() const

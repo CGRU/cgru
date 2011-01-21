@@ -416,7 +416,7 @@ if hostsmask      != '': job.setHostsMask( hostsmask)
 if hostsexcl      != '': job.setHostsMaskExclude( hostsexcl)
 if dependmask     != '': job.setDependMask( dependmask)
 if dependglobal   != '': job.setDependMaskGlobal( dependglobal)
-if deletescene         : job.setCmdPost('rm ' + os.path.abspath(scene))
+if deletescene         : job.setCmdPost('deletefiles "%s"' % os.path.abspath(scene))
 if startpaused         : job.offLine()
 if platform != '':
    if platform == 'any': job.setNeedOS('')

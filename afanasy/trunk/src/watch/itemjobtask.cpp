@@ -88,10 +88,18 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
       if( frame        <   0 )        frame =   0;
       if( percentframe <   0 ) percentframe =   0;
       if( percentframe > 100 ) percentframe = 100;
-      if( frames_num > 1)
-         leftString = QString("f%1/%2-%3% %4")
-                     .arg(frames_num).arg(frame).arg(percentframe).arg(leftString);
-      leftString = QString("%1% - %2").arg(percent).arg(leftString);
+      if( block->isNumeric())
+      {
+         if( frames_num > 1)
+            leftString = QString("%1 - f%2/%3-%4%").arg(leftString).arg(frames_num).arg(frame).arg(percentframe);
+         leftString = QString("%1 - %2%").arg(leftString).arg(percent);
+      }
+      else
+      {
+         if( frames_num > 1)
+            leftString = QString("f%1/%2-%3% %4").arg(frames_num).arg(frame).arg(percentframe).arg(leftString);
+         leftString = QString("%1% - %2").arg(percent).arg(leftString);
+      }
    }
    else
       setNotRunning();

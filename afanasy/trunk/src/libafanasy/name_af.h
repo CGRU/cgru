@@ -62,14 +62,16 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
-   QString time2Qstr( uint32_t time32 = time( NULL));
-   QString time2QstrHMS( uint32_t time32, bool clamp = false);
+   void printTime( uint32_t time32 = 0);
+
+   const QString time2Qstr( uint32_t time32 = time( NULL));
+   const QString time2QstrHMS( uint32_t time32, bool clamp = false);
+   const QString state2str( int state);
+   const QString fillNumbers( const QString & pattern, int start, int end);
 
    bool setRegExp( QRegExp & regexp, const QString & str, const QString & name);
 
    void filterFileName( QString & filename);
-
-   void printTime( uint32_t time32 = 0);
 
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
@@ -77,7 +79,6 @@ namespace af
    int weigh( const QString & str);
    int weigh( const QRegExp & regexp);
 
-   const QString fillNumbers( const QString & pattern, int start, int end);
 
    bool  init( uint32_t flags );
    enum InitFlags

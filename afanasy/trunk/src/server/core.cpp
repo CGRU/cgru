@@ -11,7 +11,7 @@
 #include <sys/types.h>
 
 #include "msgaf.h"
-//#include "jobsys.h"
+#include "sysjob.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -103,35 +103,41 @@ Core::Core():
 //
 // Get Jobs from database:
 //
-   bool hasMaintenanceJob = false;
+   bool hasSystemJob = false;
    std::list<int> jids;
    afDB_JobRegister.getJobsIds( jids);
    for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
    {
-      JobAf * job = new JobAf( *it);
+      JobAf * job = NULL;
+      if( *it == SysJob::ID )
+         job = new SysJob( SysJob::FromDataBase);
+      else
+         job = new JobAf( *it);
       if( afDB_JobRegister.getItem( job))
       {
          jobs->job_register( job, users, NULL);
-         if( *it == 1 ) hasMaintenanceJob = true;
+         if( *it == SysJob::ID )
+         {
+            printf("System job retrieved from database.\n");
+            hasSystemJob = true;
+         }
       }
       else delete job;
    }
 
 //
-// Create system maintenance job if it was not in database:
-//
-/*
-   if( false == hasMaintenanceJob )
-   {
-      JobSys * job = new JobSys();
-      jobs->job_register( job, users, NULL);
-   }
-*/
-
-//
 // Close database:
 //
    afDB_JobRegister.DBClose();
+
+//
+// Create system maintenance job if it was not in database:
+// (must be created after close of database connection to prevent mutex lock)
+   if( hasSystemJob == false )
+   {
+      SysJob* job = new SysJob( SysJob::New);
+      jobs->job_register( job, users, NULL);
+   }
 
    init = true;
 }

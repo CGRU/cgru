@@ -48,8 +48,7 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    QString command = service.getCommand();
    QString wdir = service.getWDir();
 
-   if( false == exec->getParserType().isEmpty())
-      parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
+   parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
 
    // Process task working directory:
    if( false == wdir.isEmpty())
@@ -125,7 +124,7 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
          update_status = af::TaskExec::UPFinishedError;
          printf("Error: exitcode = %d.\n", exitCode);
       }
-      else if( parser && parser->isBadResult())
+      else if( parser->isBadResult())
       {
          update_status = af::TaskExec::UPFinishedParserBadResult;
          printf("Error: Bad result from parser (exitcode = %d).\n", exitCode);
@@ -144,14 +143,7 @@ void TaskProcess::p_readyRead()
 {
    QByteArray output = readAll();
    if( output.size() == 0 ) return;
-   if( parser == NULL)
-   {
-      printf("%s\n", output.data());
-   }
-   else
-   {
-      parser->read( output);
-   }
+   parser->read( output);
 
    if( exec->getListenAddressesNum())
    {
@@ -171,8 +163,6 @@ printf(" ");(*it)->stdOut();
 printf("\n");
 #endif
    }
-
-   if( parser == NULL) return;
 
    if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning))
    {

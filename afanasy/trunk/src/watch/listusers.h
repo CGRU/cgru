@@ -30,6 +30,7 @@ private slots:
    void actErrorsAvoidHost();
    void actErrorRetries();
    void actErrorsSameHost();
+   void actErrorsForgiveTime();
    void actRequestLog();
 
    void actAdd();

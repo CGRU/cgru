@@ -74,7 +74,7 @@ tmphip = hip + '/' + job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int
 asset = os.getenv('ASSET', os.getcwd())
 
 job = af.Job( job_name)
-job.setCmdPost('rm ' + tmphip)
+job.setCmdPost('deletefiles "%s"' % tmphip)
 if enable_extended_parameters:
    if job_maximum_hosts > -1: job.setMaxHosts( job_maximum_hosts)
    if job_depend_mask != '': job.setDependMask( job_depend_mask)

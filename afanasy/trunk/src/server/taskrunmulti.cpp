@@ -23,7 +23,6 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
                   const Block * taskBlock,
                   RenderAf * render,
                   MonitorContainer * monitoring,
-                  QStringList * taskLog,
                   int * runningtaskscounter
                   ):
    TaskRun( runningTask,
@@ -32,7 +31,6 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
             taskBlock,
             render,
             monitoring,
-            taskLog,
             runningtaskscounter
             ),
    masterrunning( false),
@@ -48,7 +46,7 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
    }
    hasservice = (block->data->getMultiHostService().isEmpty() == false);
    tasknum = taskExec->getTaskNum();
-   log("Starting to capture hosts:");
+   task->log("Starting to capture hosts:");
    progress->state = AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_READY_MASK;
    addHost( taskExec, render, monitoring);
 }
@@ -73,7 +71,7 @@ int TaskRunMulti::calcWeight() const
 
 void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
-   log( QString("Host '%1' added.").arg(render->getName()));
+   task->log( QString("Host '%1' added.").arg(render->getName()));
 
    // Getting unique minimal slave number
    int number = 0;
@@ -127,7 +125,7 @@ void TaskRunMulti::startServices( RenderContainer * renders)
    time_servicestarted = time( NULL);
    if( hasservice == false) return;
 
-   log("Starting services on slave hosts.");
+   task->log("Starting services on slave hosts.");
    RenderContainerIt rendersIt( renders);
    std::list<int>::iterator hIt = hostids.begin();
    std::list<af::TaskExec*>::iterator tIt = execs.begin();
@@ -166,7 +164,7 @@ void TaskRunMulti::startMaster( RenderContainer * renders, MonitorContainer * mo
    masterrunning = true;
    task->monitor( monitoring );
    task->updateDatabase();
-   log(QString("Starting master on '%1'").arg(render->getName()));
+   task->log(QString("Starting master on '%1'").arg(render->getName()));
 }
 
 void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
@@ -202,25 +200,25 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
       return;
 
    case af::TaskExec::UPFinishedSuccess:
-      log("Slave host service finished.");
+      task->log("Slave host service finished.");
       releaseHost( renders, monitoring, &taskup );
       if( stopping == false) errorHost = true;
       break;
 
    case af::TaskExec::UPFailedToStart:
-      log("Failed to start slave host service.");
+      task->log("Failed to start slave host service.");
       releaseHost( renders, monitoring, &taskup );
       errorHost = true;
       break;
 
    case af::TaskExec::UPFinishedCrash:
-      log("Slave host service finished crashed.");
+      task->log("Slave host service finished crashed.");
       releaseHost( renders, monitoring, &taskup );
       if( stopping == false) errorHost = true;
       break;
 
    case af::TaskExec::UPFinishedError:
-      log("Slave host service finished with error.");
+      task->log("Slave host service finished with error.");
       releaseHost( renders, monitoring, &taskup );
       if( stopping == false) errorHost = true;
       break;
@@ -228,21 +226,21 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
    case af::TaskExec::UPEject:
       if( time_servicestarted == false)
          releaseHost( renders, monitoring, &taskup );
-      log("Host owner ejected slave.");
+      task->log("Host owner ejected slave.");
       break;
 
    case af::TaskExec::UPRenderDeregister:
-      log("Slave deregistered.");
+      task->log("Slave deregistered.");
       releaseHost( renders, monitoring, &taskup );
       break;
 
    case af::TaskExec::UPRenderExit:
-      log("Slave exited.");
+      task->log("Slave exited.");
       releaseHost( renders, monitoring, &taskup );
       break;
 
    case af::TaskExec::UPRenderZombie:
-      log("Slave became a zombie.");
+      task->log("Slave became a zombie.");
       releaseHost( renders, monitoring, &taskup );
       errorHost = true;
       break;
@@ -266,7 +264,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
    // Slaves service stop timeout check:
    if( time_servicestarted && time_servicestopped &&( currentTime - time_servicestopped > AFJOB::TASK_STOP_TIMEOUT ))
    {
-      log("Service stop timeout.");
+      task->log("Service stop timeout.");
       releaseHost( renders, monitoring);
       if( changed == false) changed = true;
    }
@@ -280,7 +278,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
          {
             if( progress->state & AFJOB::STATE_READY_MASK) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
             setMasterTask();
-            log( QString("Finished waiting for hosts.\nCaptured slaves:\n%1").arg( hostnames.join(" ")));
+            task->log( QString("Finished waiting for hosts.\nCaptured slaves:\n%1").arg( hostnames.join(" ")));
             startServices( renders);
          }
 
@@ -304,7 +302,7 @@ void TaskRunMulti::stop( const QString & message, RenderContainer * renders, Mon
 //printf("TaskRunMulti::stop: %s[%d][%d]\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, message.toUtf8().data());
 
    stopping = true;
-   log( message);
+   task->log( message);
 
    // Set task not to be ready to get any hosts
    if( progress->state & AFJOB::STATE_READY_MASK) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
@@ -326,7 +324,7 @@ void TaskRunMulti::stop( const QString & message, RenderContainer * renders, Mon
             return;
          }
          // Stopping service on slaves (if it was not asked to be stopped before)
-         log(QString("Stopping service[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
+         task->log(QString("Stopping service[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
          render->stopTask( *tIt);
          hIt++, tIt++;
       }
@@ -334,7 +332,7 @@ void TaskRunMulti::stop( const QString & message, RenderContainer * renders, Mon
       {
          // Finish tasks on slaves if there is no service
          render->taskFinished( *tIt, monitoring);
-         log(QString("Finished task[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
+         task->log(QString("Finished task[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
          delete *tIt;
          tIt = execs.erase( tIt);
          hIt = hostids.erase( hIt);
@@ -389,7 +387,7 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
       else
       {
          render->taskFinished( *tIt, monitoring);
-         log(QString("Releasing task[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
+         task->log(QString("Releasing task[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
       }
       delete *tIt;
       tIt = execs.erase( tIt);

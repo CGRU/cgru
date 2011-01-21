@@ -165,7 +165,7 @@ if enable_extended_parameters:
 
 block.setCommand( jobcmd + jobargs)
 
-job.setCmdPost('rm ' + tmphip)
+job.setCmdPost('deletefiles "%s"' tmphip)
 
 job.send()
 

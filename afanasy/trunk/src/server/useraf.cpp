@@ -103,6 +103,13 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_tasksamehost);
       break;
    }
+   case af::Msg::TUserErrorsForgiveTime:
+   {
+      appendLog( QString("Errors forgive time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      errors_forgivetime = mcgeneral.getNumber();
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_forgivetime);
+      break;
+   }
    case af::Msg::TUserAdd:
    {
       if( false == isPermanent())
@@ -273,7 +280,7 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
 
 void UserAf::appendLog( const QString &message)
 {
-   while( log.size() > af::Environment::getUserLogsLinesMax() ) log.removeFirst();
+   while( log.size() > af::Environment::getUserLogLinesMax() ) log.removeFirst();
    log << af::time2Qstr() + " : " + message;
 }
 

@@ -59,7 +59,7 @@ CodecsPath = os.path.join( DialogPath, 'codecs')
 FormatsPath = os.path.join( DialogPath, 'formats')
 FPS = ['23.976','24','25','30']
 
-Activities = ['comp','render','anim','dyn','sim','cloth','part','skin','setup','clnup','mtpnt','rnd','test']
+Activities = ['comp','render','anim','dyn','sim','stereo','cloth','part','skin','setup','clnup','mtpnt','rnd','test']
 FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
 Encoders = ['ffmpeg', 'mencoder']
 Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']

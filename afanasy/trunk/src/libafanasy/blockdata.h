@@ -121,6 +121,8 @@ public:
    inline void setErrorsRetries(      int8_t value) { errors_retries      = value; }
 /// Set maximum number or errors on same host for task NOT to avoid host
    inline void setErrorsTaskSameHost( int8_t value) { errors_tasksamehost = value; }
+/// Set time to forgive error host
+   inline void setErrorsForgiveTime(     int value) { errors_forgivetime  = value; }
 
    bool setNumeric( int start, int end, int perTask = 1, int increment = 1);
    void setFramesPerTask( int perTask); ///< For sting tasks and per tasr dependency solve
@@ -188,12 +190,10 @@ public:
    inline bool           hasCmdPost() const { return !cmd_post.isEmpty();  }///< Whether post command is set.
    inline const QString& getCmdPost() const { return  cmd_post;            }///< Get post command.
 
-/// Get maximum number or errors on same host for job NOT to avoid host
    inline int getErrorsAvoidHost()      const { return errors_avoidhost;    }
-/// Get maximum number of errors in task to retry it automatically
    inline int getErrorsRetries()        const { return errors_retries;      }
-/// Get maximum number or errors on same host for task NOT to avoid host
    inline int getErrorsTaskSameHost()   const { return errors_tasksamehost; }
+   inline int getErrorsForgiveTime()    const { return errors_forgivetime;  }
 
 /// Called when some task started, to change state and to increment runnung tasks counter
    inline void taskStarted()
@@ -220,6 +220,8 @@ public:
 protected:
    /// Read or write block.
    virtual void readwrite( Msg * msg);
+
+   void initDefaults();  ///< Initialize default values
 
 protected:
    int32_t jobid;   ///< Block job id.
@@ -265,11 +267,13 @@ protected:
 
 
 /// Maximum number of errors in task to retry it automatically
-   int8_t errors_retries;
+   int8_t  errors_retries;
 /// Maximum number or errors on same host for block NOT to avoid host
-   int8_t errors_avoidhost;
+   int8_t  errors_avoidhost;
 /// Maximum number or errors on same host for task NOT to avoid host
-   int8_t errors_tasksamehost;
+   int8_t  errors_tasksamehost;
+/// Time from last error to remove host from error list
+   int32_t errors_forgivetime;
 
    int32_t  filesize_min;
    int32_t  filesize_max;

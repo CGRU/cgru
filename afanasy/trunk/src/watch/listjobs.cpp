@@ -221,9 +221,13 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
    menu.addSeparator();
 
-   action = new QAction( "Delete", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()  ));
-   menu.addAction( action);
+   // System job ID is 1, and can not be deleted
+   if( jobitem->getId() != 1 )
+   {
+      action = new QAction( "Delete", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actDelete()  ));
+      menu.addAction( action);
+   }
 
    menu.exec(event->globalPos());
 }

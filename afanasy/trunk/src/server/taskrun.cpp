@@ -23,7 +23,6 @@ TaskRun::TaskRun( Task * runningTask,
                   const Block * taskBlock,
                   RenderAf * render,
                   MonitorContainer * monitoring,
-                  QStringList * taskLog,
                   int * runningtaskscounter
                   ):
    task( runningTask),
@@ -33,7 +32,6 @@ TaskRun::TaskRun( Task * runningTask,
    tasknum( 0),
    hostId( 0),
    counter( runningtaskscounter),
-   logStingList( taskLog),
    stopTime( 0),
    zombie( false)
 {
@@ -58,7 +56,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data(),
    render->setTask( exec, monitoring);
    task->monitor( monitoring );
    task->updateDatabase();
-   log(QString("SESSION #%1: Starting on '%2'").arg( progress->starts_count).arg(render->getName()));
+   task->log(QString("SESSION #%1: Starting on '%2'").arg( progress->starts_count).arg(render->getName()));
 }
 
 TaskRun::~TaskRun()
@@ -156,8 +154,10 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       {
          // Task stop was not planned, it is an error in any case
          progress->state = progress->state | AFJOB::STATE_ERROR_MASK;
-         finish( message, renders, monitoring);
+         // Increment number of errors before Finish provedure
          progress->errors_count++;
+         // In Finish procedure task updates it's progress database (and write there new number of errors)
+         finish( message, renders, monitoring);
          errorHost = true;
       }
       break;
@@ -245,7 +245,7 @@ void TaskRun::stop( const QString & message, RenderContainer * renders, MonitorC
       if( render ) render->stopTask( exec);
    }
 
-   log( message);
+   task->log( message);
 }
 
 void TaskRun::finish( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -266,7 +266,7 @@ void TaskRun::finish( const QString & message, RenderContainer * renders, Monito
    task->monitor( monitoring );
    task->updateDatabase();
 
-   log( message);
+   task->log( message);
    zombie = true;
 }
 

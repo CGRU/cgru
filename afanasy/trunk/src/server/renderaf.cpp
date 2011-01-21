@@ -426,7 +426,7 @@ void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block,
 
 void RenderAf::appendLog( const QString &message)
 {
-   while( log.size() > af::Environment::getRenderLogsLinesMax() ) log.removeFirst();
+   while( log.size() > af::Environment::getRenderLogLinesMax() ) log.removeFirst();
    log << af::time2Qstr() + " : " + message;
 }
 

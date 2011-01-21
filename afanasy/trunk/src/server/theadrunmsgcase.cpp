@@ -92,6 +92,7 @@ switch ( msg->type())
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
    case af::Msg::TUserErrorsTaskSameHost:
+   case af::Msg::TUserErrorsForgiveTime:
    {
       af::MCGeneral mcgeneral( msg);
       users->action( mcgeneral, msg->type(), NULL, monitors);
@@ -141,6 +142,7 @@ switch ( msg->type())
    case af::Msg::TBlockErrorsAvoidHost:
    case af::Msg::TBlockErrorRetries:
    case af::Msg::TBlockErrorsSameHost:
+   case af::Msg::TBlockErrorsForgiveTime:
    case af::Msg::TBlockTasksMaxRunTime:
    case af::Msg::TBlockResetErrorHosts:
    case af::Msg::TBlockDependMask:

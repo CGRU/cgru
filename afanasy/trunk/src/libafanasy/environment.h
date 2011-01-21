@@ -103,12 +103,15 @@ public:
 
    static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
    static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
+   static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
+   static inline int getJobLogLinesMax()                { return job_log_linesmax;             }
 
+   static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
    static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
    static inline int getTaskErrorRetries()              { return task_error_retries;           }
    static inline int getTaskErrorsSameHost()            { return task_errors_same_host;        }
    static inline int getUserZombieTime()                { return user_zombietime;              }
-   static inline int getUserLogsLinesMax()              { return user_logs_linesmax;           }
+   static inline int getUserLogLinesMax()               { return user_log_linesmax;            }
 
    static inline int getMonitorUpdatePeriod()           { return monitor_updateperiod;         }
    static inline int getMonitorConnectRetries()         { return monitor_connectretries;       }
@@ -134,7 +137,7 @@ public:
    static inline int getRenderWaitForConnected()      { return render_waitforconnected;     }
    static inline int getRenderWaitForReadyRead()      { return render_waitforreadyread;     }
    static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
-   static inline int getRenderLogsLinesMax()          { return render_logs_linesmax;        }
+   static inline int getRenderLogLinesMax()           { return render_log_linesmax;         }
    static inline const QString& getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
    static inline const QString& getRenderCmdReboot()     { return render_cmd_reboot;      }
    static inline const QString& getRenderCmdShutdown()   { return render_cmd_shutdown;    }
@@ -236,6 +239,8 @@ private:
 
    static int task_update_timeout;
    static int task_default_capacity;
+   static int task_log_linesmax;
+   static int job_log_linesmax;
 
    static int render_default_capacity;
    static int render_default_maxtasks;
@@ -247,7 +252,7 @@ private:
    static int render_waitforconnected;
    static int render_waitforreadyread;
    static int render_waitforbyteswritten;
-   static int render_logs_linesmax;
+   static int render_log_linesmax;
    static QString render_exec;       ///< How Render can execute anther Render.
    static QString render_cmd_reboot;
    static QString render_cmd_shutdown;
@@ -259,9 +264,10 @@ private:
    static int errors_avoid_host;
    static int task_error_retries;
    static int task_errors_same_host;
+   static int errors_forgivetime;
 
    static int user_zombietime;
-   static int user_logs_linesmax;
+   static int user_log_linesmax;
 
    static int monitor_updateperiod;
    static int monitor_connectretries;

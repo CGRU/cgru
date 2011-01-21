@@ -139,6 +139,8 @@ public:
    inline void setJobName(   const QString & str) { jobname   = str;}   ///< Set task job name.
    inline void setUserName(  const QString & str) { username  = str;}   ///< Set task user name.
    inline void setCommand(   const QString & str) { command   = str;}   ///< Set task command.
+   inline void setWDir(      const QString & str) { wdir      = str;}   ///< Set working directory.
+   inline void setTaskNumber(      int       num) { tasknum   = num;}   ///< Set task number.
    inline void setNumber(          int       num) { number    = num;}   ///< Set task aux number.
 
    inline void setHostNames( const QStringList & names) { multihost_names = names;}

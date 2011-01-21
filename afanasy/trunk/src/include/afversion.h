@@ -1,3 +1,3 @@
 #pragma once
 
-static const int AFVERSION = 38;
+static const int AFVERSION = 39;

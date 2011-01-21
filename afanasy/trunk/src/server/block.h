@@ -13,7 +13,7 @@ class Block
 {
 public:
    Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, QStringList * log);
-   ~Block();
+   virtual ~Block();
 
    inline bool isInitialized() const { return initialized;}
 
@@ -25,21 +25,23 @@ public:
       { return ( data->getErrorsRetries() > -1) ? data->getErrorsRetries() : user->getErrorsRetries();}
    inline int getErrorsTaskSameHost() const
       { return ( data->getErrorsTaskSameHost() > -1) ? data->getErrorsTaskSameHost() : user->getErrorsTaskSameHost();}
+   inline int getErrorsForgiveTime() const
+      { return ( data->getErrorsForgiveTime() > -1) ? data->getErrorsForgiveTime() : user->getErrorsForgiveTime();}
 
    int calcWeight() const;
    int logsWeight() const;
    int blackListWeight() const;
 
-   void errorHostsAppend( int task, int hostId, RenderContainer * renders);
+   virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    bool avoidHostsCheck( const QString & hostname) const;
-   bool getErrorHostsList( QStringList & list);
-   void errorHostsReset();
+   const QStringList getErrorHostsList() const;
+   virtual void errorHostsReset();
 
    bool canRun( RenderAf * render);
 
-   void startTask( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
+   virtual void startTask( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
 
-   bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
    uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
@@ -49,18 +51,21 @@ public:
    Task ** tasks;                 ///< Tasks.
    UserAf * user;
 
+protected:
+   virtual void log( const QString &message);
+   bool errorHostsAppend( const QString & hostname);
+
 private:
    af::JobProgress * jobprogress;
    QStringList * joblog;
 
-   QStringList errorHosts;       ///< Avoid error hosts list.
-   QList<int>  errorHostsCounts; ///< Number of errors on error host.
+   QStringList    errorHosts;       ///< Avoid error hosts list.
+   QList<int>     errorHostsCounts; ///< Number of errors on error host.
+   QList<time_t>  errorHostsTime;   ///< Time of the last error
 
    std::list<int> dependBlocks;
    bool initialized;             ///< Where the block was successfully  initialized.
 
 private:
-   void log( const QString &message);
-   bool errorHostsAppend( const QString & hostname);
    void constructDependBlocks();
 };

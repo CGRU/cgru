@@ -68,12 +68,12 @@ void af::destroy()
    if( ferma != NULL) delete ferma;
 }
 
-QString af::time2Qstr( uint32_t time32)
+const QString af::time2Qstr( uint32_t time32)
 {
    return QDateTime::fromTime_t( time32).toString( af::Environment::getTimeFormat());
 }
 
-QString af::time2QstrHMS( uint32_t time32, bool clamp)
+const QString af::time2QstrHMS( uint32_t time32, bool clamp)
 {
    int hours = time32 / 3600;
    time32 -= hours * 3600;
@@ -84,6 +84,16 @@ QString af::time2QstrHMS( uint32_t time32, bool clamp)
    if(hours && minutes) return QString("%1:%2"   ).arg( hours  ).arg( minutes, 2, 10, z);
    if( minutes )        return QString("%1.%2"   ).arg( minutes).arg( seconds, 2, 10, z);
    else                 return QString("%1"      ).arg( seconds);
+}
+
+const QString af::state2str( int state)
+{
+   QString str;
+   if( state & AFJOB::STATE_READY_MASK    ) str += QString("%1 ").arg( AFJOB::STATE_READY_NAME_S   );
+   if( state & AFJOB::STATE_RUNNING_MASK  ) str += QString("%1 ").arg( AFJOB::STATE_RUNNING_NAME_S );
+   if( state & AFJOB::STATE_DONE_MASK     ) str += QString("%1 ").arg( AFJOB::STATE_DONE_NAME_S    );
+   if( state & AFJOB::STATE_ERROR_MASK    ) str += QString("%1 ").arg( AFJOB::STATE_ERROR_NAME_S   );
+   return str;
 }
 
 void af::printTime( uint32_t time32)

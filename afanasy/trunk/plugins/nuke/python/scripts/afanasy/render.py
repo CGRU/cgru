@@ -424,7 +424,7 @@ class JobParameters:
       if self.startpaused: job.offLine()
       if self.platform != None:
          if self.platform == 'Any': job.setNeedOS('')
-      job.setCmdPost('rm ' + self.scenename)
+      job.setCmdPost('deletefiles "%s"' % self.scenename)
       job.blocks = blocks
 
       return job

@@ -43,6 +43,7 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrInt8(   DBAttr::_errors_retries,       &errors_retries         ));
    dbAddAttr( new DBAttrInt8(   DBAttr::_errors_avoidhost,     &errors_avoidhost       ));
    dbAddAttr( new DBAttrInt8(   DBAttr::_errors_tasksamehost,  &errors_tasksamehost    ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_errors_forgivetime,   &errors_forgivetime     ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capacity,             &capacity               ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_min,         &capcoeff_min           ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_max,         &capcoeff_max           ));

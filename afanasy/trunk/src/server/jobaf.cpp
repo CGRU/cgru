@@ -16,6 +16,7 @@
 #include "msgqueue.h"
 #include "renderaf.h"
 #include "rendercontainer.h"
+#include "sysjob.h"
 #include "task.h"
 #include "useraf.h"
 
@@ -52,8 +53,8 @@ bool JobAf::dbSelect( QSqlDatabase * db, const QString * where)
 {
 //printf("JobAf::dbSelect:\n");
    if( afsql::DBJob::dbSelect( db) == false) return false;
-   construct();
-   return true;
+//   construct();
+   return construct();
 }
 
 bool JobAf::construct()
@@ -82,10 +83,10 @@ bool JobAf::construct()
    for( int b = 0; b < blocksnum; b++)
    {
       if( blocksdata[b]->isValid() == false) return false;
-      blocks[b] = new Block( this, blocksdata[b], progress, &joblog);
+      blocks[b] = createBlock(b);
       if( blocks[b] == NULL )
       {
-         AFERRAR("JobAf::construct: Can't allocate memory for block %d of %d.\n", b, blocksnum);
+         AFERRAR("JobAf::construct: Can't create block %d of %d.\n", b, blocksnum);
          return false;
       }
    }
@@ -102,6 +103,11 @@ JobAf::~JobAf()
       for( int b = 0; b < blocksnum; b++) if( blocks[b]) delete blocks[b];
       delete [] blocks;
    }
+}
+
+Block * JobAf::createBlock( int numBlock)
+{
+   return new Block( this, blocksdata[numBlock], progress, &joblog);
 }
 
 bool JobAf::initialize( UserAf * jobOwner)
@@ -133,7 +139,7 @@ bool JobAf::initialize( UserAf * jobOwner)
    }
 
 //
-// Executing pre commands ( if it not came from database )
+// Executing pre commands ( if not from database )
 
    if( fromdatabase == false )
    {
@@ -213,14 +219,16 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 
    if( cmd_post.isEmpty() == false )
    {
-      AFCommon::QueueCmdExec( cmd_post);
+//      AFCommon::QueueCmdExec( cmd_post);
+      SysJob::addCommand( cmd_post, blocksnum > 0 ? blocksdata[0]->getWDir(): "", username, name);
       log( "Executing job post command:\n" + cmd_post );
    }
    for( int b = 0; b < blocksnum; b++)
    {
       if( blocksdata[b]->hasCmdPost())
       {
-         AFCommon::QueueCmdExec( blocksdata[b]->getCmdPost());
+//         AFCommon::QueueCmdExec( blocksdata[b]->getCmdPost());
+         SysJob::addCommand( blocksdata[b]->getCmdPost(), blocksdata[b]->getWDir(), username, name);
          log( QString("Executing block[%1] post command:\n%2").arg(b).arg(blocksdata[b]->getCmdPost()));
       }
    }
@@ -420,6 +428,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
    }
+   case af::Msg::TBlockErrorsForgiveTime:
    case af::Msg::TBlockErrorsAvoidHost:
    case af::Msg::TBlockErrorRetries:
    case af::Msg::TBlockTasksMaxRunTime:
@@ -537,7 +546,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          if( block == *bIt)
          {
             log( QString(
-               "Block[%1] '%2' appears second time while job generating a task.\nJob has a recursive blocksdata tasks dependence."
+               "Block[%1] '%2' appears second time while job generating a task.\nJob has a recursive blocks tasks dependence."
                   ).arg(block).arg(blocksdata[block]->getName()));
             state = state | AFJOB::STATE_OFFLINE_MASK;
             if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
@@ -649,7 +658,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 
 // check job state:
    if(            state & AFJOB::STATE_OFFLINE_MASK ) return false;
-   if( false == ( state & AFJOB::STATE_READY_MASK)  ) return false;
+   if( false == ( state & AFJOB::STATE_READY_MASK  )) return false;
 
 // check maximum hosts:
    if(( maxhosts >= 0 ) && ( getNumRunningTasks() >= maxhosts )) return false;
@@ -679,19 +688,21 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 // search for ready task:
    for( int b = 0; b < blocksnum; b++)
    {
-      if( false == (blocksdata[b]->getState() & AFJOB::STATE_READY_MASK) ) continue;
+      if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 
       int numtasks = blocksdata[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
       {
          if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK )) continue;
          std::list<int> blocksIds;
-         af::TaskExec *taskexec =  genTask( render, b, t, &blocksIds, monitoring);
+         af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
+         // Job may became paused, if recursion during task generation detected:
          if( state & AFJOB::STATE_OFFLINE_MASK )
          {
             if( taskexec ) delete taskexec;
             return false;
          }
+         // No task was generated:
          if( taskexec == NULL ) continue;
 
          // Job successfully solved (produced a task)
@@ -747,7 +758,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    {
       bool wasWaiting = state & AFJOB::STATE_WAITTIME_MASK;
       if( time_wait > currentTime ) state = state |   AFJOB::STATE_WAITTIME_MASK;
-      else                             state = state & (~AFJOB::STATE_WAITTIME_MASK);
+      else                          state = state & (~AFJOB::STATE_WAITTIME_MASK);
       bool nowWaining = state & AFJOB::STATE_WAITTIME_MASK;
       if( wasWaiting != nowWaining) jobchanged = af::Msg::TMonitorJobsChanged;
    }
@@ -781,16 +792,43 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
 
    if( state & AFJOB::STATE_DONE_MASK )
    {
-      /// if job was not done, but now is done, we set job header time_done
+      /// if job was not done, but now is done, we set job time_done
       if(( old_state & AFJOB::STATE_DONE_MASK) == false )
       {
          time_done = currentTime;
          log("Done.");
+         jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_done);
       }
    }
    else
       time_done = 0;
+
+   // Reset started time if job was started (for "some" time) but now no tasks are running or done
+   static int check_started_time = 11; // This peroid needed not to update started time every cycle
+   if(( time_started != 0 ) &&
+      ( currentTime - time_started > check_started_time  ) &&
+      ( false == (state & AFJOB::STATE_RUNNING_MASK)     ) &&
+      ( false == (state & AFJOB::STATE_DONE_MASK)        )  )
+   {
+      // Search if the job has at least one done task
+      bool has_done_tasks = false;
+      for( int b = 0; b < blocksnum; b++ )
+      {
+         if( blocksdata[b]->getProgressTasksDone() > 0 )
+         {
+            has_done_tasks = true;
+            break;
+         }
+      }
+      // If the job has done task(s) we not reset started time in any case
+      if( false == has_done_tasks )
+      {
+         time_started = currentTime;
+         jobchanged = af::Msg::TMonitorJobsChanged;
+         AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_started);
+      }
+   }
 
    // If it is no job monitoring, job just came to server and it is first it refresh,
    // so no change event and database storing needed
@@ -900,18 +938,17 @@ af::TaskExec * JobAf::generateTask( int block, int task)
    return blocks[block]->data->genTask( task);
 }
 
-bool JobAf::getErrorHostsList( QStringList & list)
+const QStringList JobAf::getErrorHostsList() const
 {
-   for( int block = 0; block < blocksnum; block++) blocks[block]->getErrorHostsList( list);
-   if( list.size() < 1 ) return false;
-   return true;
+   QStringList list;
+   for( int block = 0; block < blocksnum; block++) list << blocks[block]->getErrorHostsList();
+   return list;
 }
 
-bool JobAf::getErrorHostsList( QStringList & list, int b, int t)
+const QStringList JobAf::getErrorHostsList( int b, int t) const
 {
-   if( b >= blocksnum) return false;
-   if( t >= blocksdata[b]->getTasksNum() ) return false;
-   return blocks[b]->tasks[t]->getErrorHostsList( list);
+   if( false == checkBlockTaskNumbers( b, t, "getErrorHostsList")) return QStringList(QString("Invalid task[%1][%2].").arg(b).arg(t));
+   return blocks[b]->tasks[t]->getErrorHostsList();
 }
 
 bool JobAf::checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str) const
@@ -959,6 +996,12 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
          for( int t = 0; t < blocksdata[b]->getTasksNum(); t++)
             blocks[b]->tasks[t]->listenOutput( mclisten, renders);
    }
+}
+
+void JobAf::log( const QString &message)
+{
+   joblog << af::time2Qstr() + " : " + message;
+   while( joblog.size() > af::Environment::getJobLogLinesMax() ) joblog.removeFirst();
 }
 
 int JobAf::calcWeight() const

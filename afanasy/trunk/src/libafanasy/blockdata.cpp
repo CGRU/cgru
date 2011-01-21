@@ -14,42 +14,48 @@
 
 using namespace af;
 
-BlockData::BlockData():
-   p_percentage( 0),
-   p_errorhostsnum( 0),
-   p_avoidhostsnum( 0),
-   p_tasksready( 0),
-   p_tasksrunning( 0),
-   p_tasksdone( 0),
-   p_taskserror( 0),
-   p_taskssumruntime( 0),
-   jobid( 0),
-   blocknum( 0),
-   flags( 0),
-   frame_first( 0),
-   frame_last( 0),
-   frame_pertask( 1),
-   frame_inc( 1),
-   maxhosts(-1),
-   tasksmaxruntime( 0),
-   capacity( AFJOB::TASK_DEFAULT_CAPACITY),
-   need_memory( 0),
-   need_power( 0),
-   need_hdd( 0),
-   errors_retries( -1),
-   errors_avoidhost( -1),
-   errors_tasksamehost( -1),
-   filesize_min(-1),
-   filesize_max(-1),
-   capcoeff_min(0),
-   capcoeff_max(0),
-   multihost_min(0),
-   multihost_max(0),
-   multihost_waitmax( 0),
-   multihost_waitsrv( 0),
-   parsercoeff(1)
+BlockData::BlockData()
 {
+   initDefaults();
    construct();
+}
+
+void BlockData::initDefaults()
+{
+   p_percentage = 0;
+   p_errorhostsnum = 0;
+   p_avoidhostsnum = 0;
+   p_tasksready = 0;
+   p_tasksrunning = 0;
+   p_tasksdone = 0;
+   p_taskserror = 0;
+   p_taskssumruntime = 0;
+   jobid = 0;
+   blocknum = 0;
+   flags = 0;
+   frame_first = 0;
+   frame_last = 0;
+   frame_pertask = 1;
+   frame_inc = 1;
+   maxhosts = -1;
+   tasksmaxruntime = 0;
+   capacity = AFJOB::TASK_DEFAULT_CAPACITY;
+   need_memory = 0;
+   need_power = 0;
+   need_hdd = 0;
+   errors_retries = -1;
+   errors_avoidhost = -1;
+   errors_tasksamehost = -1;
+   errors_forgivetime = -1;
+   filesize_min = -1;
+   filesize_max = -1;
+   capcoeff_min = 0;
+   capcoeff_max = 0;
+   multihost_min = 0;
+   multihost_max = 0;
+   multihost_waitmax = 0;
+   multihost_waitsrv = 0;
+   parsercoeff = 1;
 }
 
 BlockData::BlockData( Msg * msg)
@@ -167,6 +173,7 @@ void BlockData::readwrite( Msg * msg)
       rw_int8_t  ( errors_retries,        msg);
       rw_int8_t  ( errors_avoidhost,      msg);
       rw_int8_t  ( errors_tasksamehost,   msg);
+      rw_int32_t ( errors_forgivetime,    msg);
       rw_uint32_t( tasksmaxruntime,       msg);
 
    case Msg::TBlocksProgress:

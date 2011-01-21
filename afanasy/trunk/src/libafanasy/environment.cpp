@@ -33,6 +33,9 @@ int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMA
 
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
 int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOUT;
+int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
+int     Environment::job_log_linesmax =                AFJOB::JOB_LOG_LINESMAX;
+
 QString Environment::servername =                      AFADDR::SERVER_NAME;
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::clientport =                      AFADDR::CLIENT_PORT;
@@ -53,7 +56,7 @@ int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
 int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTED;
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
-int     Environment::render_logs_linesmax =            AFRENDER::LOGS_LINESMAX;
+int     Environment::render_log_linesmax =             AFRENDER::LOG_LINESMAX;
 QString Environment::render_exec =                     AFRENDER::EXEC;
 QString Environment::render_cmd_reboot =               AFRENDER::CMD_REBOOT;
 QString Environment::render_cmd_shutdown =             AFRENDER::CMD_SHUTDOWN;
@@ -63,11 +66,12 @@ QString Environment::render_iostat_device =            AFRENDER::IOSTAT_DEVICE;
 
 QString Environment::pswd_visor =                      AFUSER::PSWD_VISOR;
 QString Environment::pswd_god =                        AFUSER::PSWD_GOD;
+int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIME;
 int     Environment::errors_avoid_host =               AFUSER::ERRORS_AVOID_HOST;
 int     Environment::task_error_retries =              AFUSER::TASK_ERROR_RETRIES;
 int     Environment::task_errors_same_host =           AFUSER::TASK_ERRORS_SAME_HOST;
 int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
-int     Environment::user_logs_linesmax =              AFUSER::LOGS_LINESMAX;
+int     Environment::user_log_linesmax =               AFUSER::LOG_LINESMAX;
 
 int     Environment::monitor_updateperiod =            AFMONITOR::UPDATEPERIOD;
 int     Environment::monitor_connectretries =          AFMONITOR::CONNECTRETRIES;
@@ -175,6 +179,8 @@ bool Environment::getVars( const QString & filename)
 
    getVar( doc, task_default_capacity,             "task_default_capacity"             );
    getVar( doc, task_update_timeout,               "task_update_timeout"               );
+   getVar( doc, task_log_linesmax,                 "task_log_linesmax"                 );
+   getVar( doc, job_log_linesmax,                  "job_log_linesmax"                  );
 
    getVar( doc, render_default_capacity,           "render_default_capacity"           );
    getVar( doc, render_default_maxtasks,           "render_default_maxtasks"           );
@@ -193,7 +199,7 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, render_waitforconnected,           "render_waitforconnected"           );
    getVar( doc, render_waitforreadyread,           "render_waitforreadyread"           );
    getVar( doc, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
-   getVar( doc, render_logs_linesmax,              "render_logs_linesmax"              );
+   getVar( doc, render_log_linesmax,               "render_log_linesmax"               );
 
    getVar( doc, previewcmds,                       "previewcmds"                       );
    getVar( doc, rendercmds,                        "rendercmds"                        );
@@ -206,11 +212,12 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, pswd_visor,                        "pswd_visor"                        );
    getVar( doc, pswd_god,                          "pswd_god"                          );
 
+   getVar( doc, errors_forgivetime,                "errors_forgivetime"                );
    getVar( doc, errors_avoid_host,                 "errors_avoid_host"                 );
    getVar( doc, task_error_retries,                "task_error_retries"                );
    getVar( doc, task_errors_same_host,             "task_errors_same_host"             );
    getVar( doc, user_zombietime,                   "user_zombietime"                   );
-   getVar( doc, user_logs_linesmax,                "user_logs_linesmax"                );
+   getVar( doc, user_log_linesmax,                 "user_log_linesmax"                 );
 
    getVar( doc, talk_updateperiod,                 "talk_updateperiod"                 );
    getVar( doc, talk_zombietime,                   "talk_zombietime"                   );
