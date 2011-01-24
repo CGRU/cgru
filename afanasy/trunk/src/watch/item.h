@@ -17,7 +17,6 @@ public:
 
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-   inline void           getName( QString& str) const { str =  name;}   ///< Get item name.
    inline const QString& getName()              const { return name;}   ///< Get item name.
 
    virtual inline const QVariant getToolTip()     const { return QVariant(); }

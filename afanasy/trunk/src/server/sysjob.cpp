@@ -429,7 +429,7 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
 
    capacity = af::Environment::getTaskDefaultCapacity();
 
-   name = AFJOB::SYSJOB_BLOCKNAME;
+   name = "post_commands";
    service = AFJOB::SYSJOB_BLOCKSERVICE;
 
    tasksmaxruntime = AFJOB::SYSJOB_TASKMAXRUNTIME;
@@ -463,7 +463,7 @@ SysBlockData::~SysBlockData()
 SysTaskData::SysTaskData():
    afsql::DBTaskData()
 {
-   name = "post commands";
+   name = "Dummy task. See all tasks logs here.";
 }
 
 SysTaskData::~SysTaskData()

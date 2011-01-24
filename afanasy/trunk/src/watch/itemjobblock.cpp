@@ -24,6 +24,7 @@ ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
    info( this, block->getBlockNum(), block->getJobId()),
    listtasks( list)
 {
+   info.setName( name);
    resetSortingParameters();
    update( block, af::Msg::TJob);
    height = HeightHeader  + BlockInfo::Height + HeightFooter;
