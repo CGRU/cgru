@@ -49,3 +49,8 @@ class CmdDBJobsClean : public Cmd { public:
    ~CmdDBJobsClean();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdDBSysJobDel : public Cmd { public:
+   CmdDBSysJobDel();
+   ~CmdDBSysJobDel();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};

@@ -68,7 +68,13 @@ and for <a href="../afanasy/doc/user.html#ErrorsForgiveTime">user</a>.
 It is a time form last host error to exclude it from error hosts list.
 </p>
 <p>
-<a href="../afanasy/doc/job_system.html">System job<a>. Now job (and block) post commands are executed on a render farm by a special system job.
+<a href="../afanasy/doc/job_system.html">System job<a>.
+Now job (and block) post commands are executed on a render farm by a special system job.
+<br/><b>*<i>Your farm hosts must have "system" service to execute job post commands (remove rendered scenes).</i></b>
+</p>
+<p>
+<code>afcmd db_sysjobdel</code> - New <a href="../afanasy/doc/cmd.html">afcmd</a> command argument.
+It deletes system job from database. Will be needed if system job will have too much changes with new afanasy version.
 </p>
 <p>
 Bugs Fixed:

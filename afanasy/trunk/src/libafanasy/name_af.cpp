@@ -38,7 +38,7 @@ bool af::loadFarm( bool verbose)
    QString filename = af::Environment::getAfRoot() + "/farm.xml";
    if( loadFarm( filename,  verbose) == false)
    {
-      filename = af::Environment::getAfRoot() + "/farm_default.xml";
+      filename = af::Environment::getAfRoot() + "/farm_example.xml";
       if( loadFarm( filename,  verbose) == false) return false;
    }
    return true;

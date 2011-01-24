@@ -165,3 +165,46 @@ bool CmdDBJobsClean::processArguments( int argc, char** argv, af::Msg &msg)
    DB.DBClose();
    return true;
 }
+
+CmdDBSysJobDel::CmdDBSysJobDel()
+{
+   setCmd("db_sysjobdel");
+   setInfo("Delete system job.");
+}
+CmdDBSysJobDel::~CmdDBSysJobDel(){}
+bool CmdDBSysJobDel::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   afsql::DBConnection DB( "afanasy.cmd.SysJobDel");
+   DB.DBOpen();
+
+   std::list<int> jids;
+   DB.getJobsIds( jids);
+
+   bool has_system_job = false;
+   for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
+   {
+      if((*it) == AFJOB::SYSJOB_ID )
+      {
+         has_system_job = true;
+         break;
+      }
+   }
+
+   if( has_system_job )
+   {
+      afsql::DBJob job( AFJOB::SYSJOB_ID);
+      DB.getItem( &job);
+      job.stdOut( false);
+      QStringList queries;
+      job.dbDelete( &queries);
+      DB.execute( queries);
+   }
+   else
+   {
+      printf("No job with system ID=%d founded.\n", AFJOB::SYSJOB_ID);
+      printf("System job not founded.\n");
+   }
+
+   DB.DBClose();
+   return true;
+}

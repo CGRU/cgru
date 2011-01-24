@@ -109,14 +109,14 @@ Core::Core():
    for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
    {
       JobAf * job = NULL;
-      if( *it == SysJob::ID )
+      if( *it == AFJOB::SYSJOB_ID )
          job = new SysJob( SysJob::FromDataBase);
       else
          job = new JobAf( *it);
       if( afDB_JobRegister.getItem( job))
       {
          jobs->job_register( job, users, NULL);
-         if( *it == SysJob::ID )
+         if( *it == AFJOB::SYSJOB_ID )
          {
             printf("System job retrieved from database.\n");
             hasSystemJob = true;

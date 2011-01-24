@@ -93,6 +93,7 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdDBResetAll);
    addCmd( new CmdDBJobsList);
    addCmd( new CmdDBJobsClean);
+   addCmd( new CmdDBSysJobDel);
 
    addCmd( new CmdConfig);
    addCmd( new CmdConfigLoad);

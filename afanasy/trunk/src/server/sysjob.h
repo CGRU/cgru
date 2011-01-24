@@ -91,7 +91,6 @@ private:
 class SysJob : public JobAf
 {
 public:
-   static const int ID = 1;
    static void addCommand( const QString & Command, const QString & WorkingDirectory, const QString & UserName, const QString & JobName);
 
    enum CreationFlags

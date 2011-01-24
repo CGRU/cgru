@@ -286,7 +286,7 @@ SysBlock * SysJob::block_cmdpost = NULL;
 SysJob * SysJob::sysjob = NULL;
 
 SysJob::SysJob( int flags):
-   JobAf( ID)
+   JobAf( AFJOB::SYSJOB_ID)
 {
    sysjob = this;
 
@@ -426,6 +426,8 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
    afsql::DBBlockData( BlockNum, JobId)
 {
    initDefaults();
+
+   capacity = af::Environment::getTaskDefaultCapacity();
 
    name = AFJOB::SYSJOB_BLOCKNAME;
    service = AFJOB::SYSJOB_BLOCKSERVICE;

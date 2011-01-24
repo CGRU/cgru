@@ -122,6 +122,8 @@ Tasks Auto Retry - maximum number of errors to retry task automatically.
 </p><p>
 Tasks Maximum Run Time - the time after running considered as an error task.
 </p><p>
+Errors Forgive Time - time from last host error to forgive all it's errors (remove from error hosts list).
+</p><p>
 User define this default values for his new jobs and can to override them in each job, watch and reset any error hosts list.
 </p>
 
@@ -137,9 +139,9 @@ Job priority - to simple sort user jobs queue.
 Users and Jobs can have a hosts names mask to be able to run on and exclude mask for hosts to avoid.
 </p>
 
-<h4>Maximum Hosts</h4>
+<h4>Maximum Running Tasks Number</h4>
 <p>
-Users and Jobs has maximum number of hosts - no new hosts will be available above this limit.
+Users and Jobs can have a limit for maximum running tasks number - no new tasks will be started above this limit.
 </p>
 
 <h4>Python API</h4>
