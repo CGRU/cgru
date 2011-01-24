@@ -56,7 +56,7 @@ void DBAttr::init()
    DBName[_id_block              ] = "id_block";
    DBName[_id_job                ] = "id_job";
    DBName[_id_task               ] = "id_task";
-   DBName[_maxhosts              ] = "maxhosts";
+   DBName[_maxrunningtasks       ] = "maxrunningtasks";
    DBName[_multihost_max         ] = "multihost_max";
    DBName[_multihost_min         ] = "multihost_min";
    DBName[_multihost_service     ] = "multihost_service";

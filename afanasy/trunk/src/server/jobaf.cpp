@@ -65,7 +65,6 @@ bool JobAf::construct()
    deletion             = false;
    logsWeight           = 0;
    blackListsWeight     = 0;
-   runningtaskscounter  = 0;
 
    if( blocksnum < 1 )
    {
@@ -203,7 +202,7 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
       state = AFJOB::STATE_OFFLINE_MASK;
       lock();
       deletion = true;
-      if( runningtaskscounter && (renders != NULL) && (monitoring != NULL))
+      if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
       {
 //printf("JobAf::setZombie: runningtaskscounter = %d\n", runningtaskscounter);
          restartTasks( true, "Job deletion.", renders, monitoring);
@@ -211,9 +210,9 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
          return;
       }
    }
-   if( runningtaskscounter )
+   if( getRunningTasksNumber() )
    {
-      AFERRAR("JobAf::setZombie: runningtaskscounter = %d\n", runningtaskscounter);
+      AFERRAR("JobAf::setZombie: runningtaskscounter = %d\n", getRunningTasksNumber());
       return;
    }
 
@@ -305,11 +304,11 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       }
       break;
    }
-   case af::Msg::TJobMaxHosts:
+   case af::Msg::TJobMaxRunningTasks:
    {
-      maxhosts  = mcgeneral.getNumber();
-      log( QString("Max hosts set to %1 by %2").arg( maxhosts).arg( userhost));
-      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxhosts);
+      maxrunningtasks  = mcgeneral.getNumber();
+      log( QString("Max hosts set to %1 by %2").arg( maxrunningtasks).arg( userhost));
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
    }
@@ -442,7 +441,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TBlockCmdPost:
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:
-   case af::Msg::TBlockMaxHosts:
+   case af::Msg::TBlockMaxRunningTasks:
    case af::Msg::TBlockService:
    case af::Msg::TBlockParser:
    case af::Msg::TBlockNeedMemory:
@@ -661,7 +660,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
    if( false == ( state & AFJOB::STATE_READY_MASK  )) return false;
 
 // check maximum hosts:
-   if(( maxhosts >= 0 ) && ( getNumRunningTasks() >= maxhosts )) return false;
+   if(( maxrunningtasks >= 0 ) && ( getRunningTasksNumber() >= maxrunningtasks )) return false;
 
 // check blocks with enough capacity
    bool enoughCapacity = false;
@@ -709,7 +708,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
          taskexec->setJobName( name);
          taskexec->setUserName( username);
          listeners.process( *taskexec);
-         blocks[taskexec->getBlockNum()]->startTask( taskexec, &runningtaskscounter, render, monitoring);
+         blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
          // If job was not started it became started
          if( time_started == 0 )
          {
@@ -742,7 +741,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
       for( int b = 0; b < blocksnum; b++)
          blocks[b]->refresh( currentTime, renders, monitoring);
-      if( runningtaskscounter == 0 ) setZombie( NULL, monitoring);
+      if( getRunningTasksNumber() == 0 ) setZombie( NULL, monitoring);
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
    }
    if( isLocked() ) return;

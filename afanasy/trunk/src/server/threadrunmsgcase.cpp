@@ -1,4 +1,4 @@
-#include "theadrun.h"
+#include "threadrun.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,7 +13,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void TheadRun::msgCase( MsgAf *msg)
+void ThreadRun::msgCase( MsgAf *msg)
 {
 switch ( msg->type())
 {
@@ -87,7 +87,7 @@ switch ( msg->type())
    case af::Msg::TUserAnnotate:
    case af::Msg::TUserHostsMask:
    case af::Msg::TUserHostsMaskExclude:
-   case af::Msg::TUserMaxHosts:
+   case af::Msg::TUserMaxRunningTasks:
    case af::Msg::TUserPriority:
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
@@ -125,7 +125,7 @@ switch ( msg->type())
    case af::Msg::TJobHostsMaskExclude:
    case af::Msg::TJobDependMask:
    case af::Msg::TJobDependMaskGlobal:
-   case af::Msg::TJobMaxHosts:
+   case af::Msg::TJobMaxRunningTasks:
    case af::Msg::TJobWaitTime:
    case af::Msg::TJobPriority:
    case af::Msg::TJobStart:
@@ -149,7 +149,7 @@ switch ( msg->type())
    case af::Msg::TBlockTasksDependMask:
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:
-   case af::Msg::TBlockMaxHosts:
+   case af::Msg::TBlockMaxRunningTasks:
    case af::Msg::TBlockCommand:
    case af::Msg::TBlockWorkingDir:
    case af::Msg::TBlockFiles:
@@ -212,7 +212,7 @@ mclass.stdOut();
    }
    default:
    {
-      AFERROR("TheadRun::msgCase: message with unknown type recieved.\n");
+      AFERROR("ThreadRun::msgCase: message with unknown type recieved.\n");
       msg->stdOut();
    }
 }

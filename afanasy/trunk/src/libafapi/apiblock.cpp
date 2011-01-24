@@ -32,12 +32,12 @@ void Block::stdOut( bool full) const
 
 bool Block::setCapacity( int value) { return af::BlockData::setCapacity( value); }
 
-void Block::setNeedMemory(       int value   )  { need_memory     = value; }
-void Block::setNeedPower(        int value   )  { need_power      = value; }
-void Block::setNeedHDD(          int value   )  { need_hdd        = value; }
-void Block::setMaxHosts(         int value   )  { maxhosts        = value; }
-void Block::setTasksMaxRunTime(  int value   )  { tasksmaxruntime = value; }
-void Block::setParserCoeff(      int value   )  { parsercoeff     = value; }
+void Block::setNeedMemory(             int value   )  { need_memory     = value; }
+void Block::setNeedPower(              int value   )  { need_power      = value; }
+void Block::setNeedHDD(                int value   )  { need_hdd        = value; }
+void Block::setMaxRunningTasksNumber(  int value   )  { maxrunningtasks = value; }
+void Block::setTasksMaxRunTime(        int value   )  { tasksmaxruntime = value; }
+void Block::setParserCoeff(            int value   )  { parsercoeff     = value; }
 
 void Block::setName(             const char * str) {  name        = QString::fromUtf8(str);  }
 void Block::setService(          const char * str) {  service     = QString::fromUtf8(str);  }

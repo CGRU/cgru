@@ -62,7 +62,7 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdUserAdd);
    addCmd( new CmdUserDelete);
    addCmd( new CmdUserPriority);
-   addCmd( new CmdUserHostsMaximum);
+   addCmd( new CmdUserRunningTasksMaximum);
    addCmd( new CmdUserHostsMask);
 
    addCmd( new CmdJobsList);
@@ -72,7 +72,7 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdJobLog);
    addCmd( new CmdJobProgress);
    addCmd( new CmdJobPriority);
-   addCmd( new CmdJobHostsMaximum);
+   addCmd( new CmdJobRunningTasksMaximum);
    addCmd( new CmdJobHostsMask);
    addCmd( new CmdJob);
 

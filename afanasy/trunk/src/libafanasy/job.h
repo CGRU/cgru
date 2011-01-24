@@ -26,19 +26,19 @@ public:
 /// Print main job information.
    void stdOut( bool full = false) const;
 
-   inline uint32_t getFlags()              const { return flags;           }
-   inline uint32_t getState()              const { return state;           }
-   inline int      getBlocksNum()          const { return blocksnum;       }
-   inline uint32_t getTimeCreation()       const { return time_creation;   }
-   inline uint32_t getTimeStarted()        const { return time_started;    }
-   inline uint32_t getTimeWait()           const { return time_wait;       }
-   inline uint32_t getTimeDone()           const { return time_done;       }
-   inline int      getMaxHosts()           const { return maxhosts;        }
-   inline const QString & getUserName()    const { return username;        }
-   inline const QString & getHostName()    const { return hostname;        }
-   inline const QString & getCmdPre()      const { return cmd_pre;         }
-   inline const QString & getCmdPost()     const { return cmd_post;        }
-   inline const QString & getDescription() const { return description;     }
+   inline uint32_t getFlags()                const { return flags;                 }
+   inline uint32_t getState()                const { return state;                 }
+   inline int      getBlocksNum()            const { return blocksnum;             }
+   inline uint32_t getTimeCreation()         const { return time_creation;         }
+   inline uint32_t getTimeStarted()          const { return time_started;          }
+   inline uint32_t getTimeWait()             const { return time_wait;             }
+   inline uint32_t getTimeDone()             const { return time_done;             }
+   inline int      getMaxRunningTasks()      const { return maxrunningtasks;       }
+   inline const QString & getUserName()      const { return username;              }
+   inline const QString & getHostName()      const { return hostname;              }
+   inline const QString & getCmdPre()        const { return cmd_pre;               }
+   inline const QString & getCmdPost()       const { return cmd_post;              }
+   inline const QString & getDescription()   const { return description;           }
 
    inline bool isStarted() const {return time_started != 0 ; }                ///< Whether job is started.
    inline bool isReady()   const {return state & AFJOB::STATE_READY_MASK;   }///< Whether job is ready.
@@ -85,8 +85,8 @@ public:
    inline bool checkNeedProperties(    const QString & str  ) const
       { if( need_properties.isEmpty()  ) return true;   return str.contains( need_properties); }
 
-   inline int getNumRunningTasks() const /// Get job running tasks.
-      {int n=0;for(int b=0;b<blocksnum;b++)n+=blocksdata[b]->getProgressTasksRunning();return n;}
+   inline int getRunningTasksNumber() const /// Get job running tasks.
+      {int n=0;for(int b=0;b<blocksnum;b++)n+=blocksdata[b]->getRunningTasksNumber();return n;}
 
    const QString & getTasksOutputDir() const { return tasksoutputdir; }
 
@@ -99,11 +99,11 @@ public:
 
 protected:
    BlockData  ** blocksdata;    ///< Blocks pointer.
+   int32_t blocksnum;   ///< Number of blocks in job.
 
    uint32_t flags;      ///< Job flags.
 
    uint32_t state;      ///< Job state.
-   int32_t blocksnum;   ///< Number of blocks in job.
 
    QString description; ///< Job description for statistics purposes only.
    QString annotation;
@@ -117,8 +117,8 @@ protected:
 /// Job post command (executed by server on job deletion)
    QString cmd_post;
 
-/// Maximum number of hosts, job can run on.
-   int32_t maxhosts;
+/// Maximum number of running tasks
+   int32_t maxrunningtasks;
 
 /// set in this constructor
    uint32_t time_creation;

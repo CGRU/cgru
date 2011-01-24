@@ -1,4 +1,4 @@
-#include "theadrun.h"
+#include "threadrun.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -11,21 +11,21 @@
 
 extern bool running;
 
-TheadRun::TheadRun( const TreadPointers *ptrs, int seconds):
-   TheadAf( ptrs)
+ThreadRun::ThreadRun( const ThreadPointers *ptrs, int seconds):
+   ThreadAf( ptrs)
 {
    sec = seconds;
-AFINFO("TheadRun::TheadRun:\n");
+AFINFO("ThreadRun::ThreadRun:\n");
 }
 
-TheadRun::~TheadRun()
+ThreadRun::~ThreadRun()
 {
-AFINFO("TheadRun::~TheadRun:\n");
+AFINFO("ThreadRun::~ThreadRun:\n");
 }
 
-void TheadRun::run()
+void ThreadRun::run()
 {
-AFINFO("TheadRun::run:\n");
+AFINFO("ThreadRun::run:\n");
 while( running)
 {
 #ifdef _DEBUG
@@ -36,7 +36,7 @@ printf("...................................\n");
 //
 // Lock containers:
 //
-AFINFO("TheadRun::run: Locking containers...\n");
+AFINFO("ThreadRun::run: Locking containers...\n");
       AfContainerLock jLock( jobs,     AfContainer::WRITELOCK);
       AfContainerLock lLock( renders,  AfContainer::WRITELOCK);
       AfContainerLock ulock( users,    AfContainer::WRITELOCK);
@@ -46,13 +46,13 @@ AFINFO("TheadRun::run: Locking containers...\n");
 //
 // Messages reaction:
 //
-AFINFO("TheadRun::run: React on incoming messages:\n");
+AFINFO("ThreadRun::run: React on incoming messages:\n");
       for( MsgAf *msg = msgQueue->popMsg( false); msg != NULL; msg = msgQueue->popMsg( false)) msgCase( msg);
 
 //
 // Refresh data:
 //
-AFINFO("TheadRun::run: Refreshing data:\n");
+AFINFO("ThreadRun::run: Refreshing data:\n");
       talks    ->refresh( NULL,    monitors);
       monitors ->refresh( NULL,    monitors);
       jobs     ->refresh( renders, monitors);
@@ -62,7 +62,7 @@ AFINFO("TheadRun::run: Refreshing data:\n");
 //
 // Jobs sloving:
 //
-      AFINFO("TheadRun::run: Solving jobs:\n");
+      AFINFO("ThreadRun::run: Solving jobs:\n");
       RenderContainerIt rendersIt( renders);
       std::list<int> rIds;
       {
@@ -79,7 +79,7 @@ AFINFO("TheadRun::run: Refreshing data:\n");
       // cycle on renders, which produced a task
       while( rIds.size())
       {
-         AFINFA("TheadRun::run: Renders on cycle: %d\n", int(rIds.size()));
+         AFINFA("ThreadRun::run: Renders on cycle: %d\n", int(rIds.size()));
          std::list<int>::iterator rIt = rIds.begin();
          while( rIt != rIds.end())
          {
@@ -100,13 +100,13 @@ AFINFO("TheadRun::run: Refreshing data:\n");
 //
 // Dispatch events to monitors:
 //
-AFINFO("TheadRun::run: dispatching monitor events:\n");
+AFINFO("ThreadRun::run: dispatching monitor events:\n");
       monitors->dispatch();
 
 //
 // Free Containers:
 //
-AFINFO("TheadRun::run: deleting zombies:\n");
+AFINFO("ThreadRun::run: deleting zombies:\n");
       talks    ->freeZombies();
       monitors ->freeZombies();
       renders  ->freeZombies();
@@ -118,7 +118,7 @@ AFINFO("TheadRun::run: deleting zombies:\n");
 //
 // Sleeping
 //
-AFINFO("TheadRun::run: sleeping...\n");
+AFINFO("ThreadRun::run: sleeping...\n");
    sleep( sec);
 }
 }

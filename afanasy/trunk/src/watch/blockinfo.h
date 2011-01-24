@@ -29,7 +29,7 @@ public:
                const QColor * backcolor = NULL)
             const;
 
-   inline int getTasksRunning()         const { return tasksrunning;       }
+   inline int getRunningTasksNumber()   const { return runningtasksnumber; }
    inline int getPercentage()           const { return percentage;         }
    inline int getErrorsAvoidHost()      const { return errors_avoidhost;   }
    inline int getErrorsRetries()        const { return errors_retries;     }
@@ -51,6 +51,8 @@ public:
 private:
    uint32_t state;
 
+   int runningtasksnumber;
+
    QString name;
    QString service;
    QString str_runtime;
@@ -62,7 +64,6 @@ private:
 
    int tasksnum;
    int tasksready;
-   int tasksrunning;
    int tasksdone;
    int taskserror;
    int percentage;
@@ -81,8 +82,8 @@ private:
    uint8_t  progress_running[AFJOB::PROGRESS_BYTES];
 
    int     capacity;
-   int     maxhosts;
-   QString maxhosts_str;
+   int     maxrunningtasks;
+   QString maxrunningtasks_str;
    int     need_memory;
    int     need_power;
    int     need_hdd;

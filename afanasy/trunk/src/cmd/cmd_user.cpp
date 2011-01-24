@@ -106,16 +106,16 @@ bool CmdUserPriority::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-CmdUserHostsMaximum::CmdUserHostsMaximum()
+CmdUserRunningTasksMaximum::CmdUserRunningTasksMaximum()
 {
-   setCmd("uhmax");
+   setCmd("utmax");
    setArgsCount(2);
-   setInfo("Set user maximum hosts.");
-   setHelp("uhmax [name] [number] Change user maximum hosts.");
-   setMsgType( af::Msg::TUserMaxHosts);
+   setInfo("Set user maximum running tasks number.");
+   setHelp("utmax [name] [number] Change user maximum running tasks number.");
+   setMsgType( af::Msg::TUserMaxRunningTasks);
 }
-CmdUserHostsMaximum::~CmdUserHostsMaximum(){}
-bool CmdUserHostsMaximum::processArguments( int argc, char** argv, af::Msg &msg)
+CmdUserRunningTasksMaximum::~CmdUserRunningTasksMaximum(){}
+bool CmdUserRunningTasksMaximum::processArguments( int argc, char** argv, af::Msg &msg)
 {
    QString name = QString::fromUtf8(argv[0]);
    bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);

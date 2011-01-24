@@ -73,16 +73,16 @@ bool CmdJobPriority::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-CmdJobHostsMaximum::CmdJobHostsMaximum()
+CmdJobRunningTasksMaximum::CmdJobRunningTasksMaximum()
 {
-   setCmd("jhmax");
+   setCmd("jtmax");
    setArgsCount(2);
-   setInfo("Set job maximum hosts.");
-   setHelp("jhmax [name] [number] Change job maximum hosts.");
-   setMsgType( af::Msg::TJobMaxHosts);
+   setInfo("Set job running tasks maximum.");
+   setHelp("jtmax [name] [number] Change job running tasks maximum.");
+   setMsgType( af::Msg::TJobMaxRunningTasks);
 }
-CmdJobHostsMaximum::~CmdJobHostsMaximum(){}
-bool CmdJobHostsMaximum::processArguments( int argc, char** argv, af::Msg &msg)
+CmdJobRunningTasksMaximum::~CmdJobRunningTasksMaximum(){}
+bool CmdJobRunningTasksMaximum::processArguments( int argc, char** argv, af::Msg &msg)
 {
    QString name = QString::fromUtf8(argv[0]);
    bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);

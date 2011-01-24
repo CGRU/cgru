@@ -25,7 +25,7 @@ private slots:
    void actAnnotate();
    void actHostsMask();
    void actHostsMaskExclude();
-   void actMaxHosts();
+   void actMaxRunningTasks();
    void actPriority();
    void actErrorsAvoidHost();
    void actErrorRetries();

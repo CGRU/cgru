@@ -95,9 +95,9 @@ PyObject * PyAf_Job_setNeedProperties( PyAf_Job_Object *self, PyObject *arg)
    else Py_RETURN_FALSE;
 }
 
-PyObject * PyAf_Job_setMaxHosts( PyAf_Job_Object *self, PyObject *arg)
+PyObject * PyAf_Job_setMaxRunningTasks( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setMaxHosts( PyInt_AsLong( arg));
+   self->job->setMaxRunningTasks( PyInt_AsLong( arg));
    Py_RETURN_TRUE;
 }
 

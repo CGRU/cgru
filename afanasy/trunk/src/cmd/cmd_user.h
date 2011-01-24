@@ -29,9 +29,9 @@ class CmdUserPriority : public Cmd { public:
    ~CmdUserPriority();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
-class CmdUserHostsMaximum: public Cmd { public:
-   CmdUserHostsMaximum();
-   ~CmdUserHostsMaximum();
+class CmdUserRunningTasksMaximum: public Cmd { public:
+   CmdUserRunningTasksMaximum();
+   ~CmdUserRunningTasksMaximum();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 class CmdUserHostsMask: public Cmd { public:

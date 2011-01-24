@@ -1,13 +1,13 @@
 #include <stdio.h>
 
-#include "afthead.h"
+#include "afthread.h"
 #include "core.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-TreadPointers::TreadPointers( Core *core):
+ThreadPointers::ThreadPointers( Core *core):
    talks(            core->getTalks()            ),
    monitors(         core->getMonitors()         ),
    renders(          core->getRenders()          ),
@@ -17,11 +17,11 @@ TreadPointers::TreadPointers( Core *core):
 {
 }
 
-TreadPointers::~TreadPointers()
+ThreadPointers::~ThreadPointers()
 {
 }
 
-TheadAf::TheadAf( const TreadPointers *ptrs):
+ThreadAf::ThreadAf( const ThreadPointers *ptrs):
    talks(            ptrs->getTalks()            ),
    monitors(         ptrs->getMonitors()         ),
    renders(          ptrs->getRenders()          ),
@@ -32,6 +32,6 @@ TheadAf::TheadAf( const TreadPointers *ptrs):
 {
 }
 
-TheadAf::~TheadAf()
+ThreadAf::~ThreadAf()
 {
 }

@@ -125,9 +125,9 @@ PyObject * PyAf_Block_setCapacity( PyAf_Block_Object *self, PyObject *arg)
    Py_RETURN_FALSE;
 }
 
-PyObject * PyAf_Block_setMaxHosts( PyAf_Block_Object *self, PyObject *arg)
+PyObject * PyAf_Block_setMaxRunningTasks( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setMaxHosts( PyInt_AsLong( arg));
+   self->block->setMaxRunningTasks( PyInt_AsLong( arg));
    Py_RETURN_TRUE;
 }
 

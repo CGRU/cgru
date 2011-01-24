@@ -31,7 +31,7 @@ void DBUser::addDBAttributes()
 
    dbAddAttr( new DBAttrUInt32( DBAttr::_state,                &state               ));
    dbAddAttr( new DBAttrString( DBAttr::_hostname,             &hostname            ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_maxhosts,             &maxhosts            ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_maxrunningtasks,      &maxrunningtasks     ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_priority,             &priority            ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask           ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_retries,       &errors_retries      ));

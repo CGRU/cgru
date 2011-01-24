@@ -17,7 +17,7 @@ using namespace af;
 
 User::User( const QString &username, const QString &host):
    hostname( host),
-   maxhosts(  af::Environment::getMaxHosts() ),
+   maxrunningtasks(  af::Environment::getMaxRunningTasksNumber() ),
    hostsmask( af::Environment::getHostsMask()),
    errors_retries(    af::Environment::getTaskErrorRetries() ),
    errors_avoidhost( af::Environment::getErrorsAvoidHost()  ),
@@ -48,7 +48,7 @@ void User::construct()
    numjobs = 0;
    numrunningjobs = 0;
    need = 0.0f;
-   numhosts = 0;
+   runningtasksnumber = 0;
    time_online = 0;
 
    hostsmask.setCaseSensitivity( Qt::CaseInsensitive);
@@ -67,7 +67,7 @@ void User::readwrite( Msg * msg)
    rw_uint32_t( state,                 msg);
    rw_uint32_t( time_register,         msg);
    rw_QString ( hostname,              msg);
-   rw_int32_t ( maxhosts,              msg);
+   rw_int32_t ( maxrunningtasks,       msg);
    rw_uint8_t ( errors_retries,        msg);
    rw_uint8_t ( errors_avoidhost,      msg);
    rw_uint8_t ( errors_tasksamehost,   msg);
@@ -75,7 +75,7 @@ void User::readwrite( Msg * msg)
    rw_uint32_t( time_online,           msg);
    rw_int32_t ( numjobs,               msg);
    rw_int32_t ( numrunningjobs,        msg);
-   rw_int32_t ( numhosts,              msg);
+   rw_int32_t ( runningtasksnumber,    msg);
    rw_float   ( need,                  msg);
    rw_QRegExp ( hostsmask,             msg);
    rw_QRegExp ( hostsmask_exclude,     msg);
@@ -111,8 +111,8 @@ void User::stdOut( bool full) const
       printf("User id=%d:\n", id);
       printf("Name = %s:\n", name.toUtf8().data());
       printf("Jobs = %d / active jobs = %d\n", numjobs, numrunningjobs);
-      printf("Max Hosts = \"%d\"\n", maxhosts);
-      printf("Num Hosts = \"%d\"\n", numhosts);
+      printf("Maximum Running Tasks Number = \"%d\"\n", maxrunningtasks);
+      printf("Running Tasks Number = \"%d\"\n", runningtasksnumber);
       if( hasHostsMask()) printf("Hosts Mask = \"%s\"\n", hostsmask.pattern().toUtf8().data());
       if( hasHostsMaskExclude()) printf("Exclude Hosts Mask = \"%s\"\n", hostsmask_exclude.pattern().toUtf8().data());
       printf("Registration time = %s\n", time2Qstr( time_register).toUtf8().data());
@@ -130,8 +130,8 @@ void User::stdOut( bool full) const
          name.toUtf8().data(),
          numjobs,
          numrunningjobs,
-         maxhosts,
-         numhosts,
+         maxrunningtasks,
+         runningtasksnumber,
          hostsmask.pattern().toUtf8().data(),
          hostsmask_exclude.pattern().toUtf8().data(),
          time2Qstr( time_online).toUtf8().data(),

@@ -86,8 +86,8 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
       menu.addSeparator();
 
-      action = new QAction( "Set Max Hosts", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actMaxHosts() ));
+      action = new QAction( "Set Max Running Tasks", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
       menu.addAction( action);
       action = new QAction( "Set Hosts Mask", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
@@ -285,18 +285,18 @@ void ListUsers::actErrorsForgiveTime()
    action( mcgeneral, af::Msg::TUserErrorsForgiveTime);
 }
 
-void ListUsers::actMaxHosts()
+void ListUsers::actMaxRunningTasks()
 {
    ItemUser* useritem = (ItemUser*)getCurrentItem();
    if( useritem == NULL ) return;
-   int current = useritem->maxhosts;
+   int current = useritem->maxrunningtasks;
 
    bool ok;
-   int max = QInputDialog::getInteger(this, "Change Maximum Hosts", "Enter Number of Hosts", current, -1, 9999, 1, &ok);
+   int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 9999, 1, &ok);
    if( !ok) return;
 
    af::MCGeneral mcgeneral( max);
-   action( mcgeneral, af::Msg::TUserMaxHosts);
+   action( mcgeneral, af::Msg::TUserMaxRunningTasks);
 }
 
 void ListUsers::actHostsMask()

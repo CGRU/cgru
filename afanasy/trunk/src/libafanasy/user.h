@@ -50,13 +50,13 @@ public:
    inline bool checkHostsMaskExclude(  const QString & str  ) const
       { if( hostsmask_exclude.isEmpty()) return false;  return hostsmask_exclude.exactMatch(str); }
 
-   inline int      getMaxHosts()       const { return maxhosts;       } ///< Get maximum hosts.
-   inline int      getNumJobs()        const { return numjobs;        } ///< Get jobs quantity.
-   inline int      getNumRunningJobs() const { return numrunningjobs; } ///< Get active jobs quantity.
-   inline int      getNumHosts()       const { return numhosts;       } ///< Get number of hosts used by user jobs.
-   inline float    getNeed()           const { return need;           } ///< Get user need for hosts.
-   inline uint32_t getTimeRegister()   const { return time_register;  } ///< Get register time.
-   inline uint32_t getTimeOnline()     const { return time_online;    } ///< Get online time.
+   inline int      getMaxRunningTasks()      const { return maxrunningtasks;     } ///< Get maximum hosts.
+   inline int      getNumJobs()              const { return numjobs;             } ///< Get jobs quantity.
+   inline int      getNumRunningJobs()       const { return numrunningjobs;      } ///< Get active jobs quantity.
+   inline int      getRunningTasksNumber()   const { return runningtasksnumber;  } ///< Get number of hosts used by user jobs.
+   inline float    getNeed()                 const { return need;                } ///< Get user need for hosts.
+   inline uint32_t getTimeRegister()         const { return time_register;       } ///< Get register time.
+   inline uint32_t getTimeOnline()           const { return time_online;         } ///< Get online time.
 
    inline int getErrorsAvoidHost()      const { return errors_avoidhost;    }
    inline int getErrorsRetries()        const { return errors_retries;      }
@@ -81,7 +81,7 @@ protected:
    QString customdata;
 
    QString  hostname;          ///< User host name.
-   int32_t  maxhosts;          ///< User maximum hosts.
+   int32_t  maxrunningtasks;   ///< User maximum running tasks number hosts.
 
    QRegExp hostsmask;
    QRegExp hostsmask_exclude;
@@ -97,11 +97,11 @@ protected:
 
    uint32_t time_register;      ///< User registration time (when he become permanent).
 
-   int32_t numjobs;           ///< User jobs quantity.
-   int32_t numrunningjobs;    ///< User active jobs quantity.
-   int32_t numhosts;          ///< User jobs hosts number.
-   uint32_t time_online;      ///< User online (server registration) time.
-   float need;                ///< User need for hosts.
+   int32_t numjobs;              ///< User jobs quantity.
+   int32_t numrunningjobs;       ///< User active jobs quantity.
+   int32_t runningtasksnumber;   ///< User jobs hosts number.
+   uint32_t time_online;         ///< User online (server registration) time.
+   float need;                   ///< User need for hosts.
 
 private:
    enum State

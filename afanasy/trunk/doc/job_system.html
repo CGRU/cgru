@@ -3,7 +3,7 @@
 <head>
 <link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
-<title>Afanasy User</title>
+<title>Afanasy System Job</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
@@ -40,42 +40,79 @@
 <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
 <!--HEADER-->
 
-<h2 align="center">Afanasy User</h2>
+<h2 align="center">Afanasy System Job</h2>
 <hr />
+<p>
 
-<h3>User Attributes:</h3>
-<ul>
-<li><a name="Name"/><b>Name</b> - Each user has an unique name. If new user comes to server with the name which already exists, server change it's name by adding a number.</li>
-<li><a name="Need"/><b>Need</b> - Not solved user with greatest need value will get next free host (if he or his jobs are able to do it). We are simply sorted by this value in solving function. Need depends on user's priority and number of running hosts.</li>
-<li><a name="Solved"/><b>Solved</b> - User successfully solved (produced a task) at last solving  cycle.</li>
-<li><a name="LastHost"/><b>Host Name</b> - Host name where last job was send from.</li>
-<li><a name="TimeRegister"/><b>Registration Time</b> - Time when user becomes permanent.</li>
-<li><a name="JobsList"/><b>Jobs List</b> - User jobs list.</li>
-<li><a name="NumJobs"/><b>Jobs Number</b> - Number of jobs user has.</li>
-<li><a name="NumRunningJobs"/><b>Running Jobs Number</b> - Number of currently running jobs user has.</li>
-<li><a name="NumHosts"/><b>Hosts Number</b> - Total number of hosts all running jobs user has.</li>
-<li><a name="TimeOnline"/><b>Online Time</b> - Time when user was registered on server.</li>
-</ul>
+<p>
+System job designed to execute system tasks on render farm (such as post commands).
+When server needs to execute some command it appends system job with a task.
+</p>
 
-<h3>User Editable Parameters:</h3>
+<p>
+You can explore system job by Watch GUI in super user mode.
+You can manipulate it's parameters here to control its running.
+(You only can't to delete system job.)
+</p>
+
+<table width="100%" border="0">
+<tr align="center">
+   <td>
+      <br/>
+      Jobs List: System job "afanasy"<br/>
+      <img src="images/watch/sysjob_job.png" alt="sysjob_job.png"/><br/>
+   </td>
+   <td>
+      <br/>
+      Tasks List: System job block<br/>
+      <img src="images/watch/sysjob_tasks.png" alt="sysjob_tasks.png"/><br/>
+   </td>
+</tr>
+<tr align="center">
+   <td>
+      <br/>
+      Renders List: System tasks execution<br/>
+      <img src="images/watch/sysjob_render.png" alt="sysjob_render.png"/><br/>
+      </td>
+   <td>
+      <br/>
+      Users List: System job user "afadmin"<br/>
+      <img src="images/watch/sysjob_user.png" alt="sysjob_user.png"/><br/>
+      </td>
+</tr>
+</table>
+
+<p>
+System job parameters and behavior have the same meaning as in common job.
+But there are two more special parameters which has system job only.
 <ul>
-<li><a name="Permanent"/><b>Permanent</b> - User exists in database (and his parameters are stored if server restarts). Not permanent with no jobs will be deleted.</li>
-<li><a name="Priority"/><b>Priority</b> - User with greater can get more render hosts.<br/>
-<code>need = pow( 1.1, priority) / (numhosts + 1.0)</code><br/>
-Each priority point gives 10% hosts bonus.
+<li>
+      <b>Maximum tasks number</b>
+    - Maximum number of <i>running</i> or <i>ready</i> tasks.
+   If number of tasks will equal to this number, no new tasks will be created.
+   But commands will not be lost, they will be stored in special list, to wait for some tasks will be done.
+   It needed to prevent the growth of tasks number, if system job running will be stopped for some time.
+   ( may be all hosts appeared in black lists ).
+   Tasks need more memory and CPU time then a simple commands list.
 </li>
-<li><a name="MaxHosts"/><b>Maximum Hosts</b> - Maximum number of hosts all user jobs can take.</li>
-<li><a name="HostsMask"/><b>Hosts Mask</b> - User run only on renders which host name matches this mask.</li>
-<li><a name="HostsMaskExclude"/><b>Exclude Hosts Mask</b> - User can not run on renders which host name matches this mask.</li>
-<li><a name="ErrorRetries"/><b>Error Retries</b> - Default <a href="job_block.html#ErrorRetries">Error Retries</a> value for user jobs.</li>
-<li><a name="ErrorsAvoidHost"/><b>Errors Avoid Host</b> - Default <a href="job_block.html#ErrorsAvoidHost">Errors Avoid Host</a> value for user jobs.</li>
-<li><a name="ErrorsTaskSameHost"/><b>Errors Task Same Host</b>
- - Default <a href="job_block.html#ErrorsTaskSameHost">Errors Task Same Host</a> value for user jobs.</li>
-<li><a name="ErrorsForgiveTime"/><b>Errors Forgive Time</b>
- - Default <a href="job_block.html#ErrorsForgiveTime">Errors Forgive Time</a> value for user jobs.</li>
-<li><a name="Annotation"/><b>Annotation</b>
- - Annotate user GUI item.</li>
+<li>
+      <b>Maximum tasks life</b>
+    - Maximum system task age in seconds.
+   If task age will equal to this number it will be treated as an error task.
+   It needed to prevent the growth of tasks number, if some task(s) can't be executed (restarted).
+</li>
 </ul>
+</p>
+
+<p>
+If error system task can't be restarted (a number of error retries reached the maximum value) they are deleted.
+It needed to prevent the growth of system tasks number.
+</p>
+
+<p>
+You can watch system job log and its task log.
+When error occurs the log will be appended with the command output.
+</p>
 
 <!--FOOTER-->
 </td></tr></table>
@@ -114,3 +151,4 @@ Each priority point gives 10% hosts bonus.
 </table>
 </body>
 </html>
+

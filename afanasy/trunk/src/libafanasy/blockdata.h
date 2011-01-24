@@ -65,25 +65,25 @@ public:
    inline void setParserCoeff( int value ) { parsercoeff = value; }
 
 /// Set block tasks type.
-   inline void setService(          const QString  & str) { service           = str;   }
+   inline void setService(          const QString  & str    ) { service          = str;   }
 /// Set block tasks parser type.
-   inline void setParser(           const QString  & str) { parser            = str;   }
+   inline void setParser(           const QString  & str    ) { parser           = str;   }
 /// Set block tasks working directory.
-   inline void setWDir(             const QString  & str) { wdir              = str;   }
+   inline void setWDir(             const QString  & str    ) { wdir             = str;   }
 /// Set block tasks extra environment.
-   inline void setEnv(              const QString  & str) { environment       = str;   }
+   inline void setEnv(              const QString  & str    ) { environment      = str;   }
 /// Set block tasks command.
-   inline void setCommand(          const QString  & str) { command           = str;   }
+   inline void setCommand(          const QString  & str    ) { command          = str;   }
 /// Set block tasks veiw result command.
-   inline void setFiles(            const QString  & str) { files             = str;   }
+   inline void setFiles(            const QString  & str    ) { files            = str;   }
 /// Set block pre commnand.
-   inline void setCmdPre(           const QString  & str) { cmd_pre           = str;   }
+   inline void setCmdPre(           const QString  & str    ) { cmd_pre          = str;   }
 /// Set block post commnand.
-   inline void setCmdPost(          const QString  & str) { cmd_post          = str;   }
+   inline void setCmdPost(          const QString  & str    ) { cmd_post         = str;   }
 /// Set tasks maximum run time, after this time task will be restart as error task
-   inline void setTasksMaxRunTime(  const uint32_t & secs) { tasksmaxruntime  = secs;  }
+   inline void setTasksMaxRunTime(  const uint32_t & secs   ) { tasksmaxruntime  = secs;  }
 /// Set maximum hosts
-   inline void setMaxHosts(         const int32_t  & hosts){ maxhosts         = hosts; }
+   inline void setMaxRunningTasks(  const int32_t  & value  ) { maxrunningtasks  = value; }
 
 /// Set block tasks capacity.
    bool setCapacity( int value);
@@ -158,14 +158,14 @@ public:
    inline int getNeedPower()         const { return  need_power;      }
    inline int getNeedHDD()           const { return  need_hdd;        }
 
-   inline uint32_t       getState()          const { return state;            }///< Get state.
-   inline int            getTasksNum()       const { return tasksnum;         }///< Get tasks quantity.
-   inline int            getBlockNum()       const { return blocknum;         }///< Get block number in job.
-   inline const QString& getService()        const { return service;          }///< Get tasks type description.
-   inline const QString& getParser()         const { return parser;           }///< Get tasks parser type.
-   inline uint32_t       getTasksMaxRunTime()const { return tasksmaxruntime;  }///< Get tasks maximum run time.
-   inline int            getMaxHosts()       const { return maxhosts;         }///< Get block maximum hosts.
-   inline const QString& getMultiHostService()const{ return multihost_service;}///< Get tasks parser type.
+   inline uint32_t       getState()             const { return state;            }///< Get state.
+   inline int            getTasksNum()          const { return tasksnum;         }///< Get tasks quantity.
+   inline int            getBlockNum()          const { return blocknum;         }///< Get block number in job.
+   inline const QString& getService()           const { return service;          }///< Get tasks type description.
+   inline const QString& getParser()            const { return parser;           }///< Get tasks parser type.
+   inline uint32_t       getTasksMaxRunTime()   const { return tasksmaxruntime;  }///< Get tasks maximum run time.
+   inline int            getMaxRunningTasks()   const { return maxrunningtasks;  }///< Get block maximum number of running tasks.
+   inline const QString& getMultiHostService()  const { return multihost_service;}///< Get tasks parser type.
 
 
    inline int getFrameFirst()   const { return frame_first;    }///< Get first task frame ( if numeric).
@@ -195,9 +195,8 @@ public:
    inline int getErrorsTaskSameHost()   const { return errors_tasksamehost; }
    inline int getErrorsForgiveTime()    const { return errors_forgivetime;  }
 
-/// Called when some task started, to change state and to increment runnung tasks counter
-   inline void taskStarted()
-      { if( false == (state | AFJOB::STATE_RUNNING_MASK)) state = state | AFJOB::STATE_RUNNING_MASK; p_tasksrunning++;}
+   inline int * getRunningTasksCounter()      { return &runningtasks_counter;}
+   inline int   getRunningTasksNumber() const { return  runningtasks_counter;}
 
    bool updateProgress( JobProgress * progress);
    inline const uint8_t * getProgressBarDone()           const { return p_bar_done;          }
@@ -206,7 +205,6 @@ public:
    inline int      getProgressErrorHostsNum()   const { return p_errorhostsnum;     }
    inline int      getProgressAvoidHostsNum()   const { return p_avoidhostsnum;     }
    inline int      getProgressTasksReady()      const { return p_tasksready;        }
-   inline int      getProgressTasksRunning()    const { return p_tasksrunning;      }
    inline int      getProgressTasksDone()       const { return p_tasksdone;         }
    inline int      getProgressTasksError()      const { return p_taskserror;        }
    inline uint32_t getProgressTasksSumRunTime() const { return p_taskssumruntime;   }
@@ -239,8 +237,10 @@ protected:
    int32_t  frame_pertask;    ///< Tasks frames per task.
    int32_t  frame_inc;        ///< Tasks frames increment.
 
-/// Maximum number of hosts, block tasks can run on.
-   int32_t maxhosts;
+   int32_t  runningtasks_counter; ///< Number of running tasks counter.
+
+   /// Maximum number of running tasks
+   int32_t maxrunningtasks;
 
    uint32_t tasksmaxruntime;  ///< Tasks maximum run time.
 
@@ -318,7 +318,6 @@ private:
    int32_t  p_errorhostsnum;     ///< Number of error host of the block.
    int32_t  p_avoidhostsnum;     ///< Number of error host block avoiding.
    int32_t  p_tasksready;        ///< Number of ready tasks.
-   int32_t  p_tasksrunning;      ///< Number of running tasks.
    int32_t  p_tasksdone;         ///< Number of done tasks.
    int32_t  p_taskserror;        ///< Number of error (failed) tasks.
    uint32_t p_taskssumruntime;   ///< Tasks run time summ.

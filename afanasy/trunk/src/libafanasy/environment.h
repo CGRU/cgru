@@ -97,9 +97,9 @@ public:
    static inline int            getClientPort()   { return clientport;      } ///< Get current client port.
    static inline const Address* getAddress()      { return address;         } ///< Return address class pointer.
 
-   static inline int            getPriority()   { return priority;  } ///< Get default host priority.
-   static inline int            getMaxHosts()   { return maxhosts;  } ///< Get default maximium hosts.
-   static inline const QString& getHostsMask()  { return hostsmask; } ///< Get default host mask.
+   static inline int            getPriority()               { return priority;         } ///< Get default host priority.
+   static inline int            getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
+   static inline const QString& getHostsMask()              { return hostsmask;        } ///< Get default host mask.
 
    static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
    static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
@@ -110,6 +110,10 @@ public:
    static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
    static inline int getTaskErrorRetries()              { return task_error_retries;           }
    static inline int getTaskErrorsSameHost()            { return task_errors_same_host;        }
+
+   static inline int getSysJobTasksMax()                { return sysjob_tasksmax;              }
+   static inline int getSysJobTaskLife()                { return sysjob_tasklife;              }
+
    static inline int getUserZombieTime()                { return user_zombietime;              }
    static inline int getUserLogLinesMax()               { return user_log_linesmax;            }
 
@@ -216,9 +220,9 @@ private:
 
    static int filenamesizemax;
 
-   static int priority;    ///< Default priority
-   static int maxhosts;    ///< Default naximum hosts
-   static QString hostsmask;   ///< Default hosts mask
+   static int priority;          ///< Default priority
+   static int maxrunningtasks;   ///< Default maximum running tasks number
+   static QString hostsmask;     ///< Default hosts mask
 
 /// Afanasy server port number
 /** Try to get \c AF_SERVER_PORT environment variable at first.
@@ -265,6 +269,9 @@ private:
    static int task_error_retries;
    static int task_errors_same_host;
    static int errors_forgivetime;
+
+   static int sysjob_tasksmax;
+   static int sysjob_tasklife;
 
    static int user_zombietime;
    static int user_log_linesmax;

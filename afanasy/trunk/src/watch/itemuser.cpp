@@ -39,8 +39,8 @@ void ItemUser::updateValues( af::Node *node, int type)
    annotation           = user->getAnnontation();
    hostname             = user->getHostName();
    numjobs              = user->getNumJobs();
-   numrunningtasks      = user->getNumHosts();
-   maxhosts             = user->getMaxHosts();
+   numrunningtasks      = user->getRunningTasksNumber();
+   maxrunningtasks      = user->getMaxRunningTasks();
    hostsmask            = user->getHostsMask();
    hostsmask_exclude    = user->getHostsMaskExclude();
    errors_avoidhost     = user->getErrorsAvoidHost();
@@ -58,7 +58,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    strLeftBottom  = 'j' + QString::number( numjobs) + '/' + QString::number( user->getNumRunningJobs());
 
    strHCenterTop.clear();
-   if( maxhosts != -1) strHCenterTop  = QString("m%1").arg( maxhosts);
+   if( maxrunningtasks != -1) strHCenterTop  = QString("m%1").arg( maxrunningtasks );
    if( false == hostsmask.isEmpty()       )  strHCenterTop += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" E(%1)").arg( hostsmask_exclude );
    strHCenterTop += QString(" E-%1j|%2t|%3r F%4h")
@@ -72,8 +72,8 @@ void ItemUser::updateValues( af::Node *node, int type)
 
    tooltip = name + ":";
    tooltip += "\nPriority = " + QString::number( priority);
-   tooltip += "\nMaximum hosts = " + QString::number( maxhosts);
-   if( maxhosts == -1 ) tooltip += " (no limit)";
+   tooltip += "\nMaximum running tasks = " + QString::number( maxrunningtasks);
+   if( maxrunningtasks == -1 ) tooltip += " (no limit)";
    tooltip += "\nHosts mask = \"" + hostsmask + '"';
    if( hostsmask.isEmpty() ) tooltip += " (any host)";
    if( false == hostsmask_exclude.isEmpty()   ) tooltip += "\nExclude hosts mask = \"" + hostsmask_exclude + '"';

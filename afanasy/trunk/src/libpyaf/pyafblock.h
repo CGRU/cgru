@@ -29,7 +29,7 @@ PyObject * PyAf_Block_setHostsMaskExclude(   PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setDependMask(         PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setTasksDependMask(    PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedProperties(     PyAf_Block_Object *self, PyObject *arg);
-PyObject * PyAf_Block_setMaxHosts(           PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setMaxRunningTasks(    PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setCapacity(           PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setTasksMaxRunTime(    PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedMemory(         PyAf_Block_Object *self, PyObject *arg);
@@ -63,7 +63,7 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setDependMask",       (PyCFunction) PyAf_Block_setDependMask,         METH_O,        "Set depend mask."               },
    {"setTasksDependMask",  (PyCFunction) PyAf_Block_setTasksDependMask,    METH_O,        "Set global depend mask."        },
    {"setNeedProperties",   (PyCFunction) PyAf_Block_setNeedProperties,     METH_O,        "Set needed properties."         },
-   {"setMaxHosts",         (PyCFunction) PyAf_Block_setMaxHosts,           METH_O,        "Set maximum hosts."             },
+   {"setMaxRunningTasks",  (PyCFunction) PyAf_Block_setMaxRunningTasks,    METH_O,        "Set maximum running tasks."     },
    {"setCapacity",         (PyCFunction) PyAf_Block_setCapacity,           METH_O,        "Set capacity."                  },
    {"setTasksMaxRunTime",  (PyCFunction) PyAf_Block_setTasksMaxRunTime,    METH_O,        "Set tasks maximum run time."    },
    {"setNeedMemory",       (PyCFunction) PyAf_Block_setNeedMemory,         METH_O,        "Set memory needed."             },

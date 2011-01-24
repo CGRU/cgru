@@ -47,7 +47,7 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrInt32(  DBAttr::_capacity,             &capacity               ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_min,         &capcoeff_min           ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_max,         &capcoeff_max           ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_maxhosts,             &maxhosts               ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_maxrunningtasks,      &maxrunningtasks        ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,           &dependmask             ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_tasksdependmask,      &tasksdependmask        ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask              ));

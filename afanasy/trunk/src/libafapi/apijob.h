@@ -35,7 +35,7 @@ public:
    void setCmdPost( const char * str);
 
 /// Set job maximum hosts.
-   void setMaxHosts( int value);
+   void setMaxRunningTasks( int value);
 
 /// Set job hosts mask.
 /** See http://doc.trolltech.com/main-snapshot/qregexp.html#introduction .**/

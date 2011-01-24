@@ -39,7 +39,7 @@ public:
 
    bool canRun( RenderAf * render);
 
-   virtual void startTask( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
+   virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 

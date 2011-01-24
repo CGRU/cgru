@@ -13,7 +13,7 @@ Prefix './' used in examples and set through environment.
 So each path (project, asset) can have individual software setup.
 -->
    <priority>99</priority>
-   <maxhosts>-1</maxhosts>
+   <maxrunningtasks>-1</maxrunningtasks>
    <hostsmask></hostsmask>
 
 <!-- Client & Server -->
@@ -123,5 +123,9 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
    <db_stringquotes>$$</db_stringquotes>
    <db_stringnamelen>512</db_stringnamelen>
    <db_stringexprlen>4096</db_stringexprlen>
+
+<!-- System job -->
+   <sysjob_tasklife>1800</sysjob_tasklife>
+   <sysjob_tasksmax>1000</sysjob_tasksmax>
 
 </afanasy>

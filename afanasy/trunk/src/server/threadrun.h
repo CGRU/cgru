@@ -4,14 +4,14 @@
 
 #include "../libafanasy/name_af.h"
 
-#include "afthead.h"
+#include "afthread.h"
 
 /// Main Afanasy core thread.
-class TheadRun : public TheadAf
+class ThreadRun : public ThreadAf
 {
 public:
-   TheadRun( const TreadPointers *ptrs, int seconds = 1);
-   ~TheadRun();
+   ThreadRun( const ThreadPointers *ptrs, int seconds = 1);
+   ~ThreadRun();
 
    void run();             ///< Thread loop function. Return \c false on fail.
 

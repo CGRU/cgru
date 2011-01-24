@@ -36,7 +36,7 @@ private slots:
    void actPriority();
    void actHostsMask();
    void actHostsMaskExclude();
-   void actMaxHosts();
+   void actMaxRunningTasks();
    void actDependMask();
    void actDependMaskGlobal();
    void actWaitTime();

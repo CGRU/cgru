@@ -19,9 +19,9 @@ class CmdJobPriority : public Cmd { public:
    ~CmdJobPriority();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
-class CmdJobHostsMaximum: public Cmd { public:
-   CmdJobHostsMaximum();
-   ~CmdJobHostsMaximum();
+class CmdJobRunningTasksMaximum: public Cmd { public:
+   CmdJobRunningTasksMaximum();
+   ~CmdJobRunningTasksMaximum();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 class CmdJobHostsMask: public Cmd { public:

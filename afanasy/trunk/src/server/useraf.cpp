@@ -68,11 +68,11 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       }
       break;
    }
-   case af::Msg::TUserMaxHosts:
+   case af::Msg::TUserMaxRunningTasks:
    {
       appendLog( QString("Maximum hosts set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
-      maxhosts = mcgeneral.getNumber();
-      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxhosts);
+      maxrunningtasks = mcgeneral.getNumber();
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
       break;
    }
    case af::Msg::TUserPriority:
@@ -185,7 +185,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    else zombietime = 0;
 
    int _numrunningjobs = 0;
-   int _numhosts = 0;
+   int _runningtasksnumber = 0;
    {
       JobsListIt jobsListIt( &jobs);
       for( af::Job *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
@@ -193,7 +193,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
          if( job->isRunning())
          {
             _numrunningjobs++;
-            _numhosts += job->getNumRunningTasks();
+            _runningtasksnumber += job->getRunningTasksNumber();
          }
       }
    }
@@ -201,16 +201,16 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    float _need = need;
    calcNeed();
 
-   if((( _numrunningjobs != numrunningjobs) ||
-       ( _numjobs != numjobs) ||
-       ( _numhosts != numhosts) ||
-       ( _need != need)) &&
-      monitoring )
+   if((( _numrunningjobs      != numrunningjobs       ) ||
+       ( _numjobs             != numjobs              ) ||
+       ( _runningtasksnumber  != runningtasksnumber   ) ||
+       ( _need                != need                 )) &&
+         monitoring )
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, id);
 
    numjobs = _numjobs;
    numrunningjobs = _numrunningjobs;
-   numhosts = _numhosts;
+   runningtasksnumber = _runningtasksnumber;
 }
 
 bool UserAf::canRun( RenderAf *render)
@@ -222,7 +222,7 @@ bool UserAf::canRun( RenderAf *render)
    if( render->isNimby() && (name != render->getUserName())) return false;
 
 // check maximum hosts:
-   if(( maxhosts >= 0 ) && ( numhosts >= maxhosts )) return false;
+   if(( maxrunningtasks >= 0 ) && ( runningtasksnumber >= maxrunningtasks )) return false;
 // check hosts mask:
    if( false == checkHostsMask( render->getName())) return false;
 // check exclude hosts mask:
@@ -239,7 +239,7 @@ bool UserAf::genTask( RenderAf *render, MonitorContainer * monitoring)
    {
       if( job->solve( render, monitoring))
       {
-         numhosts++;
+         runningtasksnumber++;
          return true;
       }
    }
@@ -312,5 +312,5 @@ void UserAf::calcNeed()
       need = 0;
       return;
    }
-   need = pow( 1.1, priority) / (numhosts + 1.0);
+   need = pow( 1.1, priority) / (runningtasksnumber + 1.0);
 }

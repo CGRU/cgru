@@ -26,7 +26,6 @@ void BlockData::initDefaults()
    p_errorhostsnum = 0;
    p_avoidhostsnum = 0;
    p_tasksready = 0;
-   p_tasksrunning = 0;
    p_tasksdone = 0;
    p_taskserror = 0;
    p_taskssumruntime = 0;
@@ -37,7 +36,7 @@ void BlockData::initDefaults()
    frame_last = 0;
    frame_pertask = 1;
    frame_inc = 1;
-   maxhosts = -1;
+   maxrunningtasks = -1;
    tasksmaxruntime = 0;
    capacity = AFJOB::TASK_DEFAULT_CAPACITY;
    need_memory = 0;
@@ -75,6 +74,7 @@ void BlockData::construct()
 {
    tasksnum = 0;
    tasksdata = NULL;
+   runningtasks_counter = 0;
 
    dependmask.setCaseSensitivity( Qt::CaseSensitive);
    hostsmask.setCaseSensitivity( Qt::CaseInsensitive);
@@ -158,7 +158,7 @@ void BlockData::readwrite( Msg * msg)
       rw_uint16_t( multihost_waitsrv,     msg);
       rw_uint16_t( multihost_waitmax,     msg);
       rw_int32_t ( capacity,              msg);
-      rw_int32_t ( maxhosts,              msg);
+      rw_int32_t ( maxrunningtasks,       msg);
       rw_int32_t ( need_memory,           msg);
       rw_int32_t ( need_power,            msg);
       rw_int32_t ( need_hdd,              msg);
@@ -178,13 +178,13 @@ void BlockData::readwrite( Msg * msg)
 
    case Msg::TBlocksProgress:
 
+      rw_int32_t ( runningtasks_counter,  msg);
       rw_data(   (char*)p_bar_done,       msg, AFJOB::PROGRESS_BYTES);
       rw_data(   (char*)p_bar_running,    msg, AFJOB::PROGRESS_BYTES);
       rw_uint8_t ( p_percentage,          msg);
       rw_int32_t ( p_errorhostsnum,       msg);
       rw_int32_t ( p_avoidhostsnum,       msg);
       rw_int32_t ( p_tasksready,          msg);
-      rw_int32_t ( p_tasksrunning,        msg);
       rw_int32_t ( p_tasksdone,           msg);
       rw_int32_t ( p_taskserror,          msg);
       rw_uint32_t( p_taskssumruntime,     msg);
@@ -605,14 +605,13 @@ bool BlockData::updateProgress( JobProgress * progress)
    if( updateBars( progress))
       changed = true;
 
-   uint32_t new_state        = 0;
-   int32_t  new_tasksready   = 0;
-   int32_t  new_tasksrunning = 0;
-   int32_t  new_tasksdone    = 0;
-   int32_t  new_taskserror   = 0;
-   int32_t  new_percentage   = 0;
-   bool     new_tasksskipped = false;
-   uint32_t new_taskssumruntime = 0;
+   uint32_t new_state                  = 0;
+   int32_t  new_tasksready             = 0;
+   int32_t  new_tasksdone              = 0;
+   int32_t  new_taskserror             = 0;
+   int32_t  new_percentage             = 0;
+   bool     new_tasksskipped           = false;
+   uint32_t new_taskssumruntime        = 0;
 
    for( int t = 0; t < tasksnum; t++)
    {
@@ -631,7 +630,6 @@ bool BlockData::updateProgress( JobProgress * progress)
       }
       if( task_state & AFJOB::STATE_RUNNING_MASK )
       {
-         new_tasksrunning++;
          task_percent = progress->tp[blocknum][t]->percent;
          if( task_percent <  0 ) task_percent = 0;
          else
@@ -653,16 +651,14 @@ bool BlockData::updateProgress( JobProgress * progress)
    }
    new_percentage = new_percentage / tasksnum;
 
-   if(( p_tasksready      != new_tasksready     )||
-      ( p_tasksrunning    != new_tasksrunning   )||
-      ( p_tasksdone       != new_tasksdone      )||
-      ( p_taskserror      != new_taskserror     )||
-      ( p_percentage      != new_percentage     )||
-      ( p_taskssumruntime != new_taskssumruntime))
+   if(( p_tasksready          != new_tasksready             )||
+      ( p_tasksdone           != new_tasksdone              )||
+      ( p_taskserror          != new_taskserror             )||
+      ( p_percentage          != new_percentage             )||
+      ( p_taskssumruntime     != new_taskssumruntime        ))
       changed = true;
 
    p_tasksready         = new_tasksready;
-   p_tasksrunning       = new_tasksrunning;
    p_tasksdone          = new_tasksdone;
    p_taskserror         = new_taskserror;
    p_percentage         = new_percentage;
@@ -678,7 +674,7 @@ bool BlockData::updateProgress( JobProgress * progress)
       new_state = new_state & (~AFJOB::STATE_READY_MASK);
    }
 
-   if( new_tasksrunning)
+   if( runningtasks_counter )
    {
       new_state = new_state |   AFJOB::STATE_RUNNING_MASK;
       new_state = new_state & (~AFJOB::STATE_DONE_MASK);

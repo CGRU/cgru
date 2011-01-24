@@ -27,7 +27,7 @@
 using namespace af;
 
 int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORITY;
-int     Environment::maxhosts =                        AFGENERAL::MAXHOSTS;
+int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
 QString Environment::timeformat =                      AFGENERAL::TIME_FORMAT;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
 
@@ -70,6 +70,10 @@ int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIM
 int     Environment::errors_avoid_host =               AFUSER::ERRORS_AVOID_HOST;
 int     Environment::task_error_retries =              AFUSER::TASK_ERROR_RETRIES;
 int     Environment::task_errors_same_host =           AFUSER::TASK_ERRORS_SAME_HOST;
+
+int     Environment::sysjob_tasklife =                 AFJOB::SYSJOB_TASKLIFE;
+int     Environment::sysjob_tasksmax =                 AFJOB::SYSJOB_TASKSMAX;
+
 int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
 int     Environment::user_log_linesmax =               AFUSER::LOG_LINESMAX;
 
@@ -149,7 +153,7 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, filenamesizemax,                   "filenamesizemax"                   );
    getVar( doc, timeformat,                        "timeformat"                        );
    getVar( doc, priority,                          "priority"                          );
-   getVar( doc, maxhosts,                          "maxhosts"                          );
+   getVar( doc, maxrunningtasks,                   "maxrunningtasks"                   );
    getVar( doc, hostsmask,                         "hostsmask"                         );
 
    getVar( doc, servername,                        "servername"                        );
@@ -216,6 +220,10 @@ bool Environment::getVars( const QString & filename)
    getVar( doc, errors_avoid_host,                 "errors_avoid_host"                 );
    getVar( doc, task_error_retries,                "task_error_retries"                );
    getVar( doc, task_errors_same_host,             "task_errors_same_host"             );
+
+   getVar( doc, sysjob_tasklife,                   "sysjob_tasklife"                   );
+   getVar( doc, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
+
    getVar( doc, user_zombietime,                   "user_zombietime"                   );
    getVar( doc, user_log_linesmax,                 "user_log_linesmax"                 );
 
@@ -315,7 +323,7 @@ bool Environment::getVar( const QDomDocument & doc, int & value, QString name)
    bool ok; int number = text.toInt( &ok);
    if( ok == false)
    {
-      AFERRAR("Invalid number in '%s' element.", name.toUtf8().data());
+      AFERRAR("Invalid number in '%s' element.\n", name.toUtf8().data());
       return false;
    }
    value = number;

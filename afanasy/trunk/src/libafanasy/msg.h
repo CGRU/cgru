@@ -215,7 +215,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TUserDel/**/,                   ///< Remove a permatent user.
 /**/TUserHostsMask/**/,             ///< Set user hosts mask.
 /**/TUserHostsMaskExclude/**/,      ///< Set user exclude hosts mask.
-/**/TUserMaxHosts/**/,              ///< Set user maximum hosts.
+/**/TUserMaxRunningTasks/**/,       ///< Set user maximum running tasks number.
 /**/TUserPriority/**/,              ///< Set user priority.
 /**/TUserErrorsAvoidHost/**/,       ///< Set number of errors on host to avoid it.
 /**/TUserErrorRetries/**/,          ///< Set number of automatic retries task with errors.
@@ -248,7 +248,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TJobHostsMaskExclude/**/,       ///< Set job exclude hosts mask.
 /**/TJobDependMask/**/,             ///< Set job depend mask.
 /**/TJobDependMaskGlobal/**/,       ///< Set job global depend mask.
-/**/TJobMaxHosts/**/,               ///< Set job maximum hosts.
+/**/TJobMaxRunningTasks/**/,        ///< Set job maximum running tasks number.
 /**/TJobWaitTime/**/,               ///< Set job wait time.
 /**/TJobPriority/**/,               ///< Set job priority.
 /**/TJobNeedOS/**/,                 ///< Set a job os needed.
@@ -263,7 +263,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TBlockTasksMaxRunTime/**/,      ///< Set block tasks maximum run time.
 /**/TBlockHostsMask/**/,            ///< Set block hosts mask.
 /**/TBlockHostsMaskExclude/**/,     ///< Set block exclude hosts mask.
-/**/TBlockMaxHosts/**/,             ///< Set block maximum hosts.
+/**/TBlockMaxRunningTasks/**/,      ///< Set block maximum running tasks number.
 /**/TBlockCommand/**/,              ///< Set block command.
 /**/TBlockWorkingDir/**/,           ///< Set block working directory.
 /**/TBlockFiles/**/,                ///< Set block files.

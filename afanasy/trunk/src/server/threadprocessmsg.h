@@ -1,6 +1,6 @@
 #pragma once
 
-#include "afthead.h"
+#include "afthread.h"
 
 struct T_processClient__args
 {
@@ -10,13 +10,13 @@ struct T_processClient__args
 };
 
 /// Thread class to read messages from socket and process it.
-class TheadReadMsg : public TheadAf
+class ThreadReadMsg : public ThreadAf
 {
 public:
 
 /// Constructor to set dispatch message queue, clients lists pointers.
-   TheadReadMsg( const TreadPointers *ptrs);
-   ~TheadReadMsg();
+   ThreadReadMsg( const ThreadPointers *ptrs);
+   ~ThreadReadMsg();
 
 /// Dispatch function loop. Return \c false on fail.
    bool process( const struct T_processClient__args* threadArgs);

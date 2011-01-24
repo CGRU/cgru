@@ -54,6 +54,9 @@ class Block(pyaf.Block):
       self.setCapacity( int( self.env.Vars['task_default_capacity'] ) )
       self.tasks = []
 
+   def setMaxHosts( self, maxhosts):
+      self.setMaxRunningTasks( int( maxhosts))
+
    def setParser( self, parser, nocheck = False):
       if not nocheck:
          if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
@@ -114,12 +117,11 @@ class Job(pyaf.Job):
       pyaf.Job.__init__( self)
       self.env = afenv.Env( verbose)
       if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
-      self.pm = PathMap( self.env.Vars['afroot'], False, verbose)
-      self.setPriority(  int( self.env.Vars['priority'] ))
-      self.setMaxHosts(  int( self.env.Vars['maxhosts'] ))
-      self.setUserName(       self.env.Vars['username']  )
-      self.setHostName(       self.env.Vars['hostname']  )
-      self.setHostsMask(      self.env.Vars['hostsmask'] )
+      self.pm = PathMap(            self.env.Vars['afroot'], False, verbose)
+      self.setPriority(        int( self.env.Vars['priority']       ))
+      self.setUserName(             self.env.Vars['username']        )
+      self.setHostName(             self.env.Vars['hostname']        )
+      self.setHostsMask(            self.env.Vars['hostsmask']       )
       if jobname != None: self.setName( jobname)
       platform = sys.platform
       # looking at 'darwin' at first as its name contains 'win' sting too
@@ -127,6 +129,9 @@ class Job(pyaf.Job):
       elif platform.find('win') > -1: self.setNeedOS( 'win')
       else: self.setNeedOS( 'linux')
       self.blocks = []
+
+   def setMaxHosts( self, maxhosts):
+      self.setMaxRunningTasks( int( maxhosts))
 
    def setUserName( self, username):
       if username == None or username == '':

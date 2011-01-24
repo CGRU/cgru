@@ -23,16 +23,16 @@ Job::~Job()
    for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
 }
 
-void Job::setUserName(     const char * str     )  { username     = QString::fromUtf8(str);              }
-void Job::setHostName(     const char * str     )  { hostname     = QString::fromUtf8(str);              }
-void Job::setName(         const char * str     )  { name         = QString::fromUtf8(str);              }
-void Job::setDescription(  const char * str     )  { description  = QString::fromUtf8(str);              }
-void Job::setCmdPre(       const char * str     )  { cmd_pre      = QString::fromUtf8(str);              }
-void Job::setCmdPost(      const char * str     )  { cmd_post     = QString::fromUtf8(str);              }
-void Job::setMaxHosts(              int value   )  { maxhosts     = value;                               }
-void Job::setPriority(              int value   )  { priority     = value;                               }
-void Job::setWaitTime(              int value   )  { time_wait    = value;                               }
-void Job::offline()                                { state        = state | AFJOB::STATE_OFFLINE_MASK;   }
+void Job::setUserName(        const char * str     )  { username     = QString::fromUtf8(str);              }
+void Job::setHostName(        const char * str     )  { hostname     = QString::fromUtf8(str);              }
+void Job::setName(            const char * str     )  { name         = QString::fromUtf8(str);              }
+void Job::setDescription(     const char * str     )  { description  = QString::fromUtf8(str);              }
+void Job::setCmdPre(          const char * str     )  { cmd_pre      = QString::fromUtf8(str);              }
+void Job::setCmdPost(         const char * str     )  { cmd_post     = QString::fromUtf8(str);              }
+void Job::setMaxRunningTasks(       int value   )  { maxrunningtasks = value;                               }
+void Job::setPriority(              int value   )  { priority        = value;                               }
+void Job::setWaitTime(              int value   )  { time_wait       = value;                               }
+void Job::offline()                                { state           = state | AFJOB::STATE_OFFLINE_MASK;   }
 
 int  Job::getDataLen() { if( message) return message->writeSize(); else return -1;}
 void Job::clearBlocksList() { blocks.clear();}

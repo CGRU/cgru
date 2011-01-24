@@ -57,7 +57,7 @@ void* ThreadCore_processClient(void* arg)
 //
 // run core function
 //   core->theadReadMsg->process((struct T_processClient__args *)arg);
-   core->theadReadMsg->process( threadArgs);
+   core->threadReadMsg->process( threadArgs);
 //
 // close clien socket descriptor
 //   close(((struct T_processClient__args *)arg)->client_sd);
@@ -70,10 +70,10 @@ void* ThreadCore_processClient(void* arg)
    return NULL;
 }
 //########################### main core thread #############################
-void* ThreadCore_theadRun(void* arg)
+void* ThreadCore_threadRun(void* arg)
 {
    AFINFA("Thread (id = %lu) run created.\n", (long unsigned)pthread_self());
-   core->theadRun->run();
+   core->threadRun->run();
    return NULL;
 }
 //########################### queued writing files thread #############################
@@ -338,7 +338,7 @@ int main(int argc, char *argv[])
       AFERRPE("afanasy::main: Common thread update database creation error");
       return 1;
    }
-   if( pthread_create( &childCore_run, NULL, &ThreadCore_theadRun, NULL) != 0)
+   if( pthread_create( &childCore_run, NULL, &ThreadCore_threadRun, NULL) != 0)
    {
       AFERRPE("afanasy::main: Core thread run creation error");
       return 1;

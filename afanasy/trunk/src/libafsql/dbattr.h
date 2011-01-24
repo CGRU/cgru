@@ -39,7 +39,7 @@ public:
          _id_block,
          _id_job,
          _id_task,
-         _maxhosts,
+         _maxrunningtasks,
          _multihost_max,
          _multihost_min,
          _multihost_waitmax,

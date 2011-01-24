@@ -46,7 +46,7 @@ public:
 private:
    SysCmd * syscmd;
    af::TaskProgress taskProgress;
-   int age;
+   int birthtime;
 };
 
 /// System job block:
@@ -66,14 +66,12 @@ public:
    inline int getNumSysTasks() const { return systasks.size();}
    SysTask * getReadySysTask() const;
 
-   virtual void startTask( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
+   virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
    inline static void logCmdPost(const QString &message) { task->log( message);}
 
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();
-
-   static const int TasksMax;
 
 private:
    SysTask * addTask( af::TaskExec * taskexec);

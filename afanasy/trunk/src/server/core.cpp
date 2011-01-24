@@ -21,8 +21,8 @@ extern Core* core;
 //##############################################################################################
 
 Core::Core():
-   theadRun(      NULL ),
-   theadReadMsg(  NULL ),
+   threadRun(      NULL ),
+   threadReadMsg(  NULL ),
    msgQueue(      NULL ),
    talks(         NULL ),
    monitors(      NULL ),
@@ -65,11 +65,11 @@ Core::Core():
    if( !msgQueue->isInitialized()) return;
 
    // theads initialization
-   TreadPointers ptrs( this);
-   theadRun = new TheadRun( &ptrs);
-   if( theadRun == NULL){ AFERROR("Core::Core: Can't allocate memory for run thread."); return; }
-   theadReadMsg = new TheadReadMsg( &ptrs);
-   if( theadReadMsg == NULL){ AFERROR("Core::Core: Can't allocate memory for read messages thread."); return; }
+   ThreadPointers ptrs( this);
+   threadRun = new ThreadRun( &ptrs);
+   if( threadRun == NULL){ AFERROR("Core::Core: Can't allocate memory for run thread."); return; }
+   threadReadMsg = new ThreadReadMsg( &ptrs);
+   if( threadReadMsg == NULL){ AFERROR("Core::Core: Can't allocate memory for read messages thread."); return; }
 
 
 //
@@ -151,9 +151,9 @@ Core::~Core()
    AFINFO("Core::~Core: Destructor begin:\n");
 
    AFINFO("Core::~Core: Deleting read messages thread.\n");
-   if( theadReadMsg     != NULL ) delete theadReadMsg;
+   if( threadReadMsg    != NULL ) delete threadReadMsg;
    AFINFO("Core::~Core: Deleting run messages thread.\n");
-   if( theadRun         != NULL ) delete theadRun;
+   if( threadRun        != NULL ) delete threadRun;
    AFINFO("Core::~Core: Deleting messages queue.\n");
    if( msgQueue      != NULL ) delete msgQueue;
    AFINFO("Core::~Core: Deleting Talks container.\n");

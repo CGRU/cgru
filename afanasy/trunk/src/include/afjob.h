@@ -72,10 +72,15 @@ namespace AFJOB
    const   char   STATE_PARSERBADRESULT_NAME[]     = "ParserBadResult";
    const   char   STATE_PARSERBADRESULT_NAME_S[]   = "PBR";
 
-   const char SYSJOB_NAME[]         = "afanasy";
-   const char SYSJOB_USERNAME[]     = "afadmin";
-   const char SYSJOB_BLOCKNAME[]    = "system";
-   const char SYSJOB_BLOCKSERVICE[] = "system";
-   const int  SYSJOB_TASKMAXRUNTIME = 72;
-   const int  SYSJOB_TASKLIFE       = 1800;
+   const char SYSJOB_NAME[]               = "afanasy";
+   const char SYSJOB_USERNAME[]           = "afadmin";
+   const char SYSJOB_BLOCKNAME[]          = "system";
+   const char SYSJOB_BLOCKSERVICE[]       = "system";
+   const int  SYSJOB_TASKMAXRUNTIME       = 72;    // Maximum time of system task running
+   const int  SYSJOB_TASKLIFE             = 1800;  // Tasks life: older tasks will be deleted
+   const int  SYSJOB_TASKSMAX             = 10000; // Maximum number of tasks in system job
+   const int  SYSJOB_ERRORS_AVIODHOST     = 1;
+   const int  SYSJOB_ERRORS_TASKSAMEHOST  = 1;
+   const int  SYSJOB_ERRORS_RETRIES       = 10;
+   const int  SYSJOB_ERRORS_FORGIVETIME   = 3600;  // System job error hosts forgive time ( default = 1 hour )
 }

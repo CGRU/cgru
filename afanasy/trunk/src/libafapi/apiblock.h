@@ -62,7 +62,7 @@ public:
    void setTasksMaxRunTime( int value);
 
 /// Set block maximum hosts.
-   void setMaxHosts( int value);
+   void setMaxRunningTasksNumber( int value);
 
 /// Set block hosts mask.
    bool setHostsMask( const char * str);

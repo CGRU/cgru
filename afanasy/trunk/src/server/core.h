@@ -7,11 +7,11 @@
 
 #include "../libafsql/qdbconnection.h"
 
-#include "afthead.h"
-#include "theadrun.h"
-#include "theadprocessmsg.h"
+#include "afthread.h"
+#include "threadrun.h"
+#include "threadprocessmsg.h"
 
-class TreadPointers;
+class ThreadPointers;
 
 /// This class do nothing, it initialize data only, and destroy in destructor.
 class Core
@@ -22,10 +22,10 @@ public:
 
    inline bool getInit() {return init;}
 
-   TheadRun *theadRun;
-   TheadReadMsg *theadReadMsg;
+   ThreadRun *threadRun;
+   ThreadReadMsg *threadReadMsg;
 
-   friend class TreadPointers;
+   friend class ThreadPointers;
 
 private:
    inline TalkContainer       *getTalks()            { return talks;            }

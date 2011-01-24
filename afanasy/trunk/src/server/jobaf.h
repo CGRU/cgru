@@ -106,7 +106,6 @@ protected:
 
 protected:
    Block ** blocks;              ///< Blocks.
-   int runningtaskscounter;
    bool fromdatabase;            ///< Whether job constructed from database.
    QStringList joblog;           ///< Job log.
 

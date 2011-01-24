@@ -118,7 +118,7 @@ void Block::errorHostsReset()
    for( int t = 0; t < data->getTasksNum(); t++) tasks[t]->errorHostsReset();
 }
 
-void Block::startTask( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
+void Block::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
    taskexec->setBlockName( data->getName());
    if( data->canVarCapacity() && (taskexec->getCapacity() > 0))
@@ -135,9 +135,7 @@ void Block::startTask( af::TaskExec * taskexec, int * runningtaskscounter, Rende
       }
    }
 
-   data->taskStarted();
-
-   tasks[taskexec->getTaskNum()]->start( taskexec, runningtaskscounter, render, monitoring);
+   tasks[taskexec->getTaskNum()]->start( taskexec, data->getRunningTasksCounter(), render, monitoring);
 }
 
 bool Block::canRun( RenderAf * render)
@@ -147,7 +145,7 @@ bool Block::canRun( RenderAf * render)
    // render services:
    if( render->canRunService( data->getService()) == false) return false;
    // check maximum hosts:
-   if(( data->getMaxHosts() >= 0 ) && ( data->getProgressTasksRunning() >= data->getMaxHosts() )) return false;
+   if(( data->getMaxRunningTasks() >= 0 ) && ( data->getRunningTasksNumber() >= data->getMaxRunningTasks() )) return false;
    // check hosts mask:
    if( data->checkHostsMask( render->getName()) == false ) return false;
    // check exclude hosts mask:
@@ -391,13 +389,13 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
       }
       break;
    }
-   case af::Msg::TBlockMaxHosts:
+   case af::Msg::TBlockMaxRunningTasks:
    {
-      data->setMaxHosts( mcgeneral.getNumber());
+      data->setMaxRunningTasks( mcgeneral.getNumber());
       log( QString("Maximum hosts set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
-      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_maxhosts);
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_maxrunningtasks);
       break;
    }
    case af::Msg::TBlockService:

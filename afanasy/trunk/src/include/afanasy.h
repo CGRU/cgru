@@ -10,7 +10,7 @@ namespace AFGENERAL
 {
    const char TIME_FORMAT[]      = "ddd dMMM hh:mm.ss";  ///< Default time output format.
    const int  DEFAULT_PRIORITY   = 99;                   ///< Default priority for user, jobs and hosts.
-   const int  MAXHOSTS           = -1;                   ///< Default maximum hosts.
+   const int  MAXRUNNINGTASKS    = -1;                   ///< Default maximum running tasks number.
    const int  FILENAMESIZEMAX    = 250;                  ///< Maximum filename size.
 }
 

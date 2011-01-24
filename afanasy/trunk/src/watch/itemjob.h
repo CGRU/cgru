@@ -23,7 +23,7 @@ public:
       {if(block<blocksnum )return blockinfo[ block].getTasksMaxRunTime();     else return 0; }
 
    int priority;
-   int maxhosts;
+   int maxrunningtasks;
    uint32_t state;
    uint32_t time_creation;
    uint32_t time_started;
@@ -76,8 +76,8 @@ private:
 
    QString runningTime;
 
-   int     num_hosts;
-   QString num_hosts_str;
+   int     num_runningtasks;
+   QString num_runningtasks_str;
 
 private:
 

@@ -2,6 +2,8 @@
 
 #include "../include/afanasy.h"
 
+#include "../libafanasy/environment.h"
+
 #include "../libafsql/dbjobprogress.h"
 
 #include "rendercontainer.h"
@@ -24,7 +26,7 @@ SysCmd::SysCmd( const QString & Command, const QString & WorkingDirectory, const
 SysTask::SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, const Block * block, int taskNumber):
    Task( block, &taskProgress, taskNumber),
    syscmd( SystemCommand),
-   age(0)
+   birthtime(0)
 {
    progress = &taskProgress;
 }
@@ -69,10 +71,13 @@ void SysTask::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 {
 //printf("SysTask::refresh:\n");
    Task::refresh( currentTime, renders, monitoring, errorHostId);
-   age++;
-   if((age > AFJOB::SYSJOB_TASKLIFE ) && (isReady()))
+   if( birthtime == 0 ) birthtime = currentTime;
+   if((currentTime - birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
    {
-      log(QString("Error: Task age(%1) > %2").arg(age).arg(AFJOB::SYSJOB_TASKLIFE));
+      QString message = QString( QString("Error: Task age(%1) > %2").arg(currentTime - birthtime).arg(af::Environment::getSysJobTaskLife()));
+      log( message);
+      // Store error in job log
+      SysJob::appendLog( QString("Task[%1]: %2:\n%3").arg(getNumber()).arg(message).arg(syscmd->command));
       progress->state = AFJOB::STATE_ERROR_MASK;
    }
 //stdOut();
@@ -122,7 +127,6 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 //////////////////////////////////////////   BLOCK    /////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-const int SysBlock::TasksMax = 100000;
 Task * SysBlock::task = NULL;
 
 SysBlock::SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, QStringList * log):
@@ -143,7 +147,7 @@ void SysBlock::addCommand( SysCmd * syscmd)
    commands.push_back( syscmd);
 }
 
-void SysBlock::startTask( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
+void SysBlock::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
 //printf("SysBlock::startTask:\n");
    taskexec->setBlockName( data->getName());
@@ -154,8 +158,7 @@ void SysBlock::startTask( af::TaskExec * taskexec, int * runningtaskscounter, Re
 
    if( systask == NULL ) return;
 
-   systask->start( taskexec, runningtaskscounter, render, monitoring);
-   data->taskStarted();
+   systask->start( taskexec, data->getRunningTasksCounter(), render, monitoring);
 }
 
 SysTask * SysBlock::getReadySysTask() const
@@ -180,7 +183,7 @@ SysTask * SysBlock::addTask( af::TaskExec * taskexec)
    // Get the smallest task number:
    int number = 0;
    bool founded;
-   for( ; number < TasksMax; number++)
+   for( ; number < af::Environment::getSysJobTasksMax(); number++)
    {
       founded = true;
       for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
@@ -195,8 +198,8 @@ SysTask * SysBlock::addTask( af::TaskExec * taskexec)
    }
    if( false == founded )
    {
-      AFERRAR("SysBlock::addTask: Can't find free task number (max=%d).\n", TasksMax);
-      log(QString("Can't find task number (max=%1)").arg( TasksMax));
+      AFERRAR("SysBlock::addTask: Can't find free task number (max=%d).\n", af::Environment::getSysJobTasksMax());
+      log(QString("Can't find task number (max=%1)").arg( af::Environment::getSysJobTasksMax()));
       return NULL;
    }
 
@@ -289,10 +292,10 @@ SysJob::SysJob( int flags):
 
    if( flags != New ) return;
 
-   name     = AFJOB::SYSJOB_NAME;
-   username = AFJOB::SYSJOB_USERNAME;
-   priority = AFGENERAL::DEFAULT_PRIORITY;
-   maxhosts = AFGENERAL::MAXHOSTS;
+   name              = AFJOB::SYSJOB_NAME;
+   username          = AFJOB::SYSJOB_USERNAME;
+   priority          = AFGENERAL::DEFAULT_PRIORITY;
+   maxrunningtasks   = AFGENERAL::MAXRUNNINGTASKS;
 
    blocksnum = 1;
    blocksdata = new af::BlockData*[blocksnum];
@@ -337,7 +340,7 @@ bool SysJob::solve( RenderAf *render, MonitorContainer * monitoring)
    if( block_cmdpost->getReadySysTask() == NULL )
    {
       if( block_cmdpost->getNumCommands() < 1 ) return false;
-      if( block_cmdpost->getNumCommands() >= SysBlock::TasksMax ) return false;
+      if( block_cmdpost->getNumSysTasks() >= af::Environment::getSysJobTasksMax() ) return false;
    }
 //printf("SysJob::solve:\n");
    return JobAf::solve( render, monitoring);
@@ -377,7 +380,7 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       case af::Msg::TJobHostsMaskExclude:
       case af::Msg::TJobDependMask:
       case af::Msg::TJobDependMaskGlobal:
-      case af::Msg::TJobMaxHosts:
+      case af::Msg::TJobMaxRunningTasks:
       case af::Msg::TJobWaitTime:
       case af::Msg::TJobPriority:
       case af::Msg::TJobNeedOS:
@@ -396,7 +399,7 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       case af::Msg::TBlockWorkingDir:
       case af::Msg::TBlockHostsMask:
       case af::Msg::TBlockHostsMaskExclude:
-      case af::Msg::TBlockMaxHosts:
+      case af::Msg::TBlockMaxRunningTasks:
       case af::Msg::TBlockNeedMemory:
       case af::Msg::TBlockNeedHDD:
       case af::Msg::TBlockNeedPower:
@@ -430,13 +433,13 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
    tasksmaxruntime = AFJOB::SYSJOB_TASKMAXRUNTIME;
 
 /// Maximum number or errors on same host for block NOT to avoid host
-   errors_avoidhost = 1;
+   errors_avoidhost = AFJOB::SYSJOB_ERRORS_AVIODHOST;
 /// Maximum number or errors on same host for task NOT to avoid host
-   errors_tasksamehost = 1;
+   errors_tasksamehost = AFJOB::SYSJOB_ERRORS_TASKSAMEHOST;
 /// Maximum number of errors in task to retry it automatically
-   errors_retries = 10;
+   errors_retries = AFJOB::SYSJOB_ERRORS_RETRIES;
 /// Time from last error to remove host from error list
-   errors_forgivetime = 3600; // 1 hour
+   errors_forgivetime = AFJOB::SYSJOB_ERRORS_FORGIVETIME;
 
    tasksnum = 1;
 

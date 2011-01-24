@@ -12,11 +12,11 @@
 class Core;
 
 /// This class is made only to provide pointers to threads.
-class TreadPointers
+class ThreadPointers
 {
 public:
-   TreadPointers( Core *core);
-   ~TreadPointers();
+   ThreadPointers( Core *core);
+   ~ThreadPointers();
 
    inline TalkContainer       *getTalks()            const { return talks;            }
    inline MonitorContainer    *getMonitors()         const { return monitors;         }
@@ -35,11 +35,11 @@ private:
 };
 
 /// This class is made only to make the same pointers in threads.
-class TheadAf
+class ThreadAf
 {
 public:
-   TheadAf( const TreadPointers *ptrs);
-   ~TheadAf();
+   ThreadAf( const ThreadPointers *ptrs);
+   ~ThreadAf();
 
    virtual void run() = 0;
 

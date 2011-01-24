@@ -59,7 +59,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    priority          = job->getPriority();
    username          = job->getUserName();
    hostname          = job->getHostName();
-   maxhosts          = job->getMaxHosts();
+   maxrunningtasks   = job->getMaxRunningTasks();
    state             = job->getState();
    time_creation     = job->getTimeCreation();
    time_started      = job->getTimeStarted();
@@ -74,20 +74,19 @@ void ItemJob::updateValues( af::Node *node, int type)
    cmd_pre           = job->getCmdPre();
    cmd_post          = job->getCmdPost();
    description       = job->getDescription();
+   num_runningtasks  = job->getRunningTasksNumber();
 
-   num_hosts         = 0;
    compact_display   = true;
    for( int b = 0; b < blocksnum; b++)
    {
       const af::BlockData * block = job->getBlock(b);
       blockinfo[b].update( block, type);
-      num_hosts += blockinfo[b].getTasksRunning();
       if( block->getProgressAvoidHostsNum() > 0 ) compact_display = false;
    }
    if( time_started ) compact_display = false;
    if( state == AFJOB::STATE_DONE_MASK ) compact_display = true;
 
-   num_hosts_str = QString::number( num_hosts);
+   num_runningtasks_str = QString::number( num_runningtasks);
 
    time_run = time_done - time_started;
    if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2QstrHMS( time_run);
@@ -98,7 +97,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( false == hostsmask.isEmpty()        ) properties += QString(" H(%1)" ).arg( hostsmask           );
    if( false == hostsmask_exclude.isEmpty()) properties += QString(" E(%1)" ).arg( hostsmask_exclude   );
    if( false == need_properties.isEmpty()  ) properties += QString(" P(%1)" ).arg( need_properties     );
-   if( maxhosts != -1 ) properties += QString(" m%1").arg( maxhosts);
+   if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
    properties += QString(" p%2").arg( priority);
 
    user_time = username;
@@ -118,8 +117,8 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( state & AFJOB::STATE_DONE_MASK) tooltip += "\nFinished time = " + af::time2Qstr( time_done);
    tooltip += "\nCreation host = " + hostname;
    tooltip += "\nPriority = " + QString::number(priority);
-   tooltip += "\nMaximum hosts = " + QString::number(maxhosts);
-   if( maxhosts == -1 ) tooltip += " (no limit)";
+   tooltip += "\nMaximum running tasks = " + QString::number(maxrunningtasks);
+   if( maxrunningtasks == -1 ) tooltip += " (no limit)";
    tooltip += "\nHosts mask: \"" + hostsmask + '"';
    if( hostsmask.isEmpty())
       tooltip += " (any host)";
@@ -214,10 +213,10 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
 
    if( state & AFJOB::STATE_RUNNING_MASK )
    {
-      drawStar( num_hosts>=10 ? 14:10, x+15, y+16, painter);
+      drawStar( num_runningtasks>=10 ? 14:10, x+15, y+16, painter);
       painter->setFont( afqt::QEnvironment::f_name);
       painter->setPen( afqt::QEnvironment::clr_textstars.c);
-      painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_hosts_str );
+      painter->drawText( x+0, y+0, 30, 34, Qt::AlignHCenter | Qt::AlignVCenter, num_runningtasks_str );
    }
 
    if( false == annotation.isEmpty())
@@ -248,7 +247,7 @@ bool ItemJob::setSortType(   int type )
          sort_str = &username;
          break;
       case CtrlSortFilter::TNUMRUNNINGTASKS:
-         sort_int = &num_hosts;
+         sort_int = &num_runningtasks;
          break;
       case CtrlSortFilter::THOSTNAME:
          sort_str = &hostname;

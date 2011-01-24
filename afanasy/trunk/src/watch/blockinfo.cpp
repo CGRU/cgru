@@ -35,12 +35,12 @@ BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
    str_avoiderrors("ea"),
 
    tasksnum(1),
-   tasksrunning(0),
    tasksdone(0),
    taskserror(0),
    percentage(0),
    taskssumruntime( 0),
 
+   runningtasksnumber(0),
    errors_retries(-1),
    errors_avoidhost(-1),
    errors_tasksamehost(-1),
@@ -70,7 +70,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       errors_avoidhost     = block->getErrorsAvoidHost();
       errors_tasksamehost  = block->getErrorsTaskSameHost();
       errors_forgivetime   = block->getErrorsForgiveTime();
-      maxhosts             = block->getMaxHosts();
+      maxrunningtasks      = block->getMaxRunningTasks();
       need_memory          = block->getNeedMemory();
       need_power           = block->getNeedPower();
       need_hdd             = block->getNeedHDD();
@@ -95,7 +95,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost            = block->isMultiHost();
       multihost_samemaster = block->canMasterRunOnSlaveHost();
 
-      maxhosts_str = QString::number( maxhosts);
+      maxrunningtasks_str = QString::number( maxrunningtasks);
 
       depends.clear();
       if( false == dependmask.isEmpty()) depends += QString(" D(%1)").arg( dependmask);
@@ -106,18 +106,18 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       icon_small = Watch::getServiceIconSmall( service);
 
    case af::Msg::TBlocksProgress:
-      avoidhostsnum     = block->getProgressAvoidHostsNum();
-      errorhostsnum     = block->getProgressErrorHostsNum();
+      avoidhostsnum        = block->getProgressAvoidHostsNum();
+      errorhostsnum        = block->getProgressErrorHostsNum();
+      runningtasksnumber   = block->getRunningTasksNumber();
 
    case 0:
       // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
-      state             = block->getState();
-      taskssumruntime   = block->getProgressTasksSumRunTime();
-      tasksready        = block->getProgressTasksReady();
-      tasksrunning      = block->getProgressTasksRunning();
-      tasksdone         = block->getProgressTasksDone();
-      taskserror        = block->getProgressTasksError();
-      percentage        = block->getProgressPercentage();
+      state                = block->getState();
+      taskssumruntime      = block->getProgressTasksSumRunTime();
+      tasksready           = block->getProgressTasksReady();
+      tasksdone            = block->getProgressTasksDone();
+      taskserror           = block->getProgressTasksError();
+      percentage           = block->getProgressPercentage();
       memcpy( progress_done,    block->getProgressBarDone(),    AFJOB::PROGRESS_BYTES);
       memcpy( progress_running, block->getProgressBarRunning(), AFJOB::PROGRESS_BYTES);
 
@@ -142,7 +142,7 @@ if( type == af::Msg::TBlocksProgress)
 }
 #endif
 
-   if( tasksrunning || taskserror || ((tasksdone != 0) && (tasksdone != tasksnum))) return true;
+   if( runningtasksnumber || taskserror || ((tasksdone != 0) && (tasksdone != tasksnum))) return true;
 
    return false;
 }
@@ -162,7 +162,7 @@ void BlockInfo::refresh()
 
    if( tasksmaxruntime) str_properties += QString(" Max%1h").arg( double(tasksmaxruntime)/3600.0, 0, 'g', 2);
 
-   if( maxhosts != -1 ) str_properties += QString(" m%1").arg(maxhosts_str);
+   if( maxrunningtasks != -1 ) str_properties += QString(" m%1").arg(maxrunningtasks_str);
    if( false == hostsmask.isEmpty()          ) str_properties += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()  ) str_properties += QString(" E(%1)").arg( hostsmask_exclude );
    if( false == need_properties.isEmpty()    ) str_properties += QString(" P(%1)").arg( need_properties   );
@@ -195,7 +195,7 @@ void BlockInfo::refresh()
 
    str_progress = QString("t%1: r%3 d%5 e%6")
             .arg( tasksnum)
-            .arg( tasksrunning)
+            .arg( runningtasksnumber)
             .arg( tasksdone)
             .arg( taskserror);
 
@@ -237,7 +237,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    static const int y_bars       = 12;
 
    painter->setFont( afqt::QEnvironment::f_info);
-   painter->setPen( Item::clrTextInfo( tasksrunning, option.state & QStyle::State_Selected, item->isLocked()));
+   painter->setPen( Item::clrTextInfo( runningtasksnumber, option.state & QStyle::State_Selected, item->isLocked()));
 	QRect rect_properties;
    painter->drawText( x, y+y_properties, w-5, 15, Qt::AlignRight | Qt::AlignTop, str_properties, &rect_properties );
 
@@ -283,7 +283,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    (
       painter, x+xoffset, y+y_bars, w-progress_w_offset-xoffset, 4,
       tasksnum,
-      tasksdone, tasksrunning, taskserror,
+      tasksdone, runningtasksnumber, taskserror,
       false
    );
    Item::drawPercent
@@ -400,8 +400,8 @@ const QString BlockInfo::generateToolTip() const
 
    if( hostsmask_exclude.isEmpty() == false) toolTip += QString("\nExclude hosts masks: \"%1\"").arg( hostsmask_exclude);
 
-   toolTip += "\nMaximum hosts  = " + maxhosts_str;
-   if( maxhosts == -1 ) toolTip += " (infinite)";
+   toolTip += "\nMaximum running tasks = " + maxrunningtasks_str;
+   if( maxrunningtasks == -1 ) toolTip += " (infinite)";
 
    QString need;
    if( need_memory   ) need += QString(" Mem: %1 Mb;" ).arg( need_memory);
@@ -484,7 +484,7 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockMaxHosts, "Set Maximum Hosts", qwidget);
+   action = new ActionIdId( id_block, af::Msg::TBlockMaxRunningTasks, "Set Max Running Tasks", qwidget);
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
    menu->addAction( action);
 
@@ -624,9 +624,9 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
          set_string = QInputDialog::getText( listitems, "Change Exclude Hosts Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
          break;
 
-      case af::Msg::TBlockMaxHosts:
-         if( id_block == blocknum ) cur_number = maxhosts;
-         set_number = QInputDialog::getInteger( listitems, "Change Maximum Hosts", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+      case af::Msg::TBlockMaxRunningTasks:
+         if( id_block == blocknum ) cur_number = maxrunningtasks;
+         set_number = QInputDialog::getInteger( listitems, "Change Maximum Running Tasks", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
          break;
 
       case af::Msg::TBlockNeedProperties:

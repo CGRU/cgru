@@ -135,8 +135,8 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
    submenu = new QMenu( "Set Parameter", this);
 
-   action = new QAction( "Max Hosts", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actMaxHosts() ));
+   action = new QAction( "Max Running Tasks", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
    submenu->addAction( action);
    action = new QAction( "Hosts Mask", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
@@ -497,19 +497,19 @@ void ListJobs::actWaitTime()
    displayInfo( "Set job wait time.");
 }
 
-void ListJobs::actMaxHosts()
+void ListJobs::actMaxRunningTasks()
 {
    ItemJob* jobitem = (ItemJob*)getCurrentItem();
    if( jobitem == NULL ) return;
-   int current = jobitem->maxhosts;
+   int current = jobitem->maxrunningtasks;
 
    bool ok;
-   int max = QInputDialog::getInteger(this, "Change Maximum Hosts", "Enter Number of Hosts", current, -1, 999999, 1, &ok);
+   int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks", "Enter Number", current, -1, 999999, 1, &ok);
    if( !ok) return;
 
    af::MCGeneral mcgeneral( max);
-   action( mcgeneral, af::Msg::TJobMaxHosts);
-   displayInfo( "Change job maximum hosts.");
+   action( mcgeneral, af::Msg::TJobMaxRunningTasks);
+   displayInfo( "Change job maximum running tasks.");
 }
 
 void ListJobs::actHostsMask()

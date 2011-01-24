@@ -20,7 +20,7 @@ void ItemJob::upNode( const af::Node * node)
    setText(
          QString("%1 m%2_p%3 \"%4\"")
             .arg( job->getName())
-            .arg( job->getMaxHosts())
+            .arg( job->getMaxRunningTasks())
             .arg( job->getPriority())
             .arg( job->getHostsMask())
       );

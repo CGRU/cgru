@@ -23,8 +23,8 @@ void ItemUser::upNode( const af::Node * node)
             .arg( user->getPriority())
             .arg( user->getNumJobs())
             .arg( user->getNumRunningJobs())
-            .arg( user->getNumHosts())
-            .arg( user->getMaxHosts())
+            .arg( user->getRunningTasksNumber())
+            .arg( user->getMaxRunningTasks())
             .arg( user->getHostsMask())
       );
 }

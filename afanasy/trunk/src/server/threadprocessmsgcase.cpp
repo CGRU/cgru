@@ -1,4 +1,4 @@
-#include "theadprocessmsg.h"
+#include "threadprocessmsg.h"
 
 #include <QtCore/QFile>
 
@@ -18,7 +18,7 @@
 #include "../include/macrooutput.h"
 
 //############################################################################################################
-MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
+MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
 {
 //msg->stdOut();
    MsgAf *msg_response = NULL;
@@ -446,7 +446,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
       QString filename;
       af::MCTaskPos mctaskpos( msg);
       msg_response = new MsgAf();
-//printf("TheadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", mctaskpos.getJobId(), mctaskpos.getNumBlock(), mctaskpos.getNumTask(), mctaskpos.getNumber());
+//printf("ThreadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", mctaskpos.getJobId(), mctaskpos.getNumBlock(), mctaskpos.getNumTask(), mctaskpos.getNumber());
       {
          AfContainerLock jLock( jobs,    AfContainer::READLOCK);
          AfContainerLock rLock( renders, AfContainer::READLOCK);
@@ -544,7 +544,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockTasksDependMask:
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:
-   case af::Msg::TBlockMaxHosts:
+   case af::Msg::TBlockMaxRunningTasks:
    case af::Msg::TBlockCommand:
    case af::Msg::TBlockWorkingDir:
    case af::Msg::TBlockFiles:
@@ -568,7 +568,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TJobHostsMaskExclude:
    case af::Msg::TJobDependMask:
    case af::Msg::TJobDependMaskGlobal:
-   case af::Msg::TJobMaxHosts:
+   case af::Msg::TJobMaxRunningTasks:
    case af::Msg::TJobWaitTime:
    case af::Msg::TJobPriority:
    case af::Msg::TJobNeedOS:
@@ -604,7 +604,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TUserDel:
    case af::Msg::TUserHostsMask:
    case af::Msg::TUserHostsMaskExclude:
-   case af::Msg::TUserMaxHosts:
+   case af::Msg::TUserMaxRunningTasks:
    case af::Msg::TUserPriority:
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
@@ -626,7 +626,7 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TMonitorExit:
    case af::Msg::TTalkExit:
    {
-//printf("TheadReadMsg::msgCase: pushing message to run thread:\n"); msg->stdOut();
+//printf("ThreadReadMsg::msgCase: pushing message to run thread:\n"); msg->stdOut();
       msgQueue->pushMsg( msg);
       return msg_response;
    }
@@ -641,13 +641,13 @@ MsgAf* TheadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TInvalid:
    {
       msg->stdOut();
-      AFERROR("TheadReadMsg::msgCase: Invalid message recieved.\n");
+      AFERROR("ThreadReadMsg::msgCase: Invalid message recieved.\n");
       break;
    }
    default:
    {
       msg->stdOut();
-      AFERROR("TheadReadMsg::msgCase: Message with unknown type recieved.\n");
+      AFERROR("ThreadReadMsg::msgCase: Message with unknown type recieved.\n");
       break;
    }
    }

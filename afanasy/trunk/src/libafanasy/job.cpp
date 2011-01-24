@@ -18,7 +18,7 @@ Job::Job( int Id):
    flags( 0),
    state( 0),
    blocksnum( 0),
-   maxhosts(  -1 ),
+   maxrunningtasks(  -1 ),
    time_creation( time( NULL)),
    time_wait( 0),
    time_started( 0),
@@ -66,7 +66,7 @@ void Job::readwrite( Msg * msg)
    rw_int32_t ( blocksnum,          msg);
    rw_uint32_t( flags,              msg);
    rw_uint32_t( state,              msg);
-   rw_int32_t ( maxhosts,           msg);
+   rw_int32_t ( maxrunningtasks,    msg);
    rw_QString ( cmd_pre,            msg);
    rw_QString ( cmd_post,           msg);
 
@@ -168,15 +168,10 @@ void Job::stdOut( bool full) const
       }
    }
 
-   int runningTasks = 0;
    int percentage = 0;
-   for( int b = 0; b < blocksnum; b++)
-   {
-      runningTasks += blocksdata[b]->getProgressTasksRunning();
-      percentage   += blocksdata[b]->getProgressPercentage();
-   }
+   for( int b = 0; b < blocksnum; b++) percentage   += blocksdata[b]->getProgressPercentage();
    percentage /= blocksnum;
-   printf(" r%d-%d%%", runningTasks, percentage);
+   printf(" r%d-%d%%", getRunningTasksNumber(), percentage);
 
    if( full == false )
    {
@@ -199,7 +194,7 @@ void Job::stdOut( bool full) const
       {
          printf("b%d: %d/%d/%d/%d\n", b,
                 blocksdata[b]->getTasksNum(),
-                blocksdata[b]->getProgressTasksRunning(),
+                blocksdata[b]->getRunningTasksNumber(),
                 blocksdata[b]->getProgressTasksDone(),
                 blocksdata[b]->getProgressTasksError());
          blocksdata[b]->stdOutFlags();
