@@ -153,9 +153,11 @@ def dailiesGenCmd( node):
    inputnode = None
    for i in range( node.inputs()):
       inputnode = node.input(i)
-      if inputnode is None: continue
-   if inputnode is None or inputnode.Class() != 'Write':
-      nuke.message('Error:\n%s\nNot connected to "Write" node.' % node.name())
+   if inputnode is None:
+      nuke.message('Error:\n%s\nNot connected to Read or Write node.' % node.name())
+      return
+   if not inputnode.Class() in ['Read','Write']:
+      nuke.message('Error:\n%s\nConnected not to Read or Write node.' % node.name())
       return
    images = inputnode.knob('file').value()
    if images is None or images == '':

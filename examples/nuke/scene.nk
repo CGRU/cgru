@@ -105,126 +105,6 @@ Write {
  xpos 726
  ypos -16
 }
-Read {
- inputs 0
- file render/final.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/final_proxy.%04d.exr
- last 9999
- version 2
- name Read1
- xpos 3
- ypos -32
-}
-Read {
- inputs 0
- file render/key.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/key_proxy.%04d.exr
- last 9999
- version 11
- name Read3
- xpos 223
- ypos -165
-}
-ColorBars {
- inputs 0
- name ColorBars1
- xpos 223
- ypos -334
-}
-Transform {
- translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
- rotate {{180*noise(4.56+.05*frame) i}}
- scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
- center {320 240}
- motionblur 1
- name Transform1
- xpos 223
- ypos -222
-}
-set N532a340 [stack 0]
-Switch {
- inputs 2
- which 1
- name Switch2
- xpos 223
- ypos -193
-}
-Read {
- inputs 0
- file render/back.%04d.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/back_proxy.%04d.exr
- last 9999
- version 9
- name Read2
- xpos 3
- ypos -166
-}
-Constant {
- inputs 0
- channels rgb
- color {0.0443748 0.0548952 0.205 0.35}
- name Constant1
- xpos 3
- ypos -335
-}
-Ramp {
- opacity {{.6+.4*noise(3.1+.4*frame)}}
- p0 {480 -95}
- p1 {230 625}
- color {1 0.829351 0.381265 1}
- name Ramp1
- xpos 3
- ypos -259
-}
-set N5343890 [stack 0]
-Switch {
- inputs 2
- which 1
- name Switch1
- xpos 3
- ypos -194
-}
-Merge2 {
- inputs 2
- name Merge1
- xpos 113
- ypos -194
-}
-Crop {
- box {0 0 720 576}
- crop false
- name Crop1
- xpos 113
- ypos -58
-}
-set N53591e0 [stack 0]
-Switch {
- inputs 2
- which 1
- name Switch3
- xpos 113
- ypos -2
-}
-Write {
- file render/preview.%04d.jpg
- proxy render/preview_proxy.%04d.jpg
- file_type jpeg
- checkHashOnRead false
- name preview
- xpos 113
- ypos 46
-}
-set N5361bd0 [stack 0]
-Viewer {
- frame 1
- input_process false
- name Viewer1
- xpos 43
- ypos 96
-}
 ColorBars {
  inputs 0
  name ColorBars4
@@ -241,7 +121,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N5381c90 [stack 0]
+set N40d9430 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -256,7 +136,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N5381c90
+push $N40d9430
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -264,7 +144,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N5381c90
+push $N40d9430
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -531,7 +411,23 @@ afanasy {
  forceframes true
  singlejob false
 }
-push $N532a340
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos 223
+ ypos -334
+}
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform1
+ xpos 223
+ ypos -222
+}
+set N4565660 [stack 0]
 Write {
  channels rgba
  file render/key.%04d.exr
@@ -541,7 +437,24 @@ Write {
  xpos 333
  ypos -229
 }
-push $N5343890
+Constant {
+ inputs 0
+ channels rgb
+ color {0.0443748 0.0548952 0.205 0.35}
+ name Constant1
+ xpos 3
+ ypos -335
+}
+Ramp {
+ opacity {{.6+.4*noise(3.1+.4*frame)}}
+ p0 {480 -95}
+ p1 {230 625}
+ color {1 0.829351 0.381265 1}
+ name Ramp1
+ xpos 3
+ ypos -259
+}
+set N46a6710 [stack 0]
 Write {
  file render/back.%04d.exr
  proxy render/back_proxy.%04d.exr
@@ -571,7 +484,58 @@ afanasy {
  addnodes ""
  independent true
 }
-push $N53591e0
+Read {
+ inputs 0
+ file render/key.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/key_proxy.%04d.exr
+ last 9999
+ version 11
+ name Read3
+ xpos 223
+ ypos -165
+}
+push $N4565660
+Switch {
+ inputs 2
+ which 1
+ name Switch2
+ xpos 223
+ ypos -193
+}
+Read {
+ inputs 0
+ file render/back.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/back_proxy.%04d.exr
+ last 9999
+ version 9
+ name Read2
+ xpos 3
+ ypos -166
+}
+push $N46a6710
+Switch {
+ inputs 2
+ which 1
+ name Switch1
+ xpos 3
+ ypos -194
+}
+Merge2 {
+ inputs 2
+ name Merge1
+ xpos 113
+ ypos -194
+}
+Crop {
+ box {0 0 720 576}
+ crop false
+ name Crop1
+ xpos 113
+ ypos -58
+}
+set N48012d0 [stack 0]
 Write {
  file render/final.%04d.exr
  proxy render/final_proxy.%04d.exr
@@ -580,7 +544,35 @@ Write {
  xpos 223
  ypos -65
 }
-push $N5361bd0
+Read {
+ inputs 0
+ file render/final.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/final_proxy.%04d.exr
+ last 9999
+ version 2
+ name Read1
+ xpos 3
+ ypos -32
+}
+push $N48012d0
+Switch {
+ inputs 2
+ which 1
+ name Switch3
+ xpos 113
+ ypos -2
+}
+Write {
+ file render/preview.%04d.jpg
+ proxy render/preview_proxy.%04d.jpg
+ file_type jpeg
+ checkHashOnRead false
+ name preview
+ xpos 113
+ ypos 46
+}
+set N481ee90 [stack 0]
 afanasy {
  inputs 3
  name afanasy2
@@ -597,7 +589,7 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N5361bd0
+push $N481ee90
 cgru_dailies {
  name dailies
  xpos 113
@@ -614,7 +606,7 @@ cgru_dailies {
  comments "cgru afanasy nuke example"
  movfolder /cg/tools/cgru/examples/nuke
  movrule (s)_(v)_(d)
- movname scene_v001_101210
+ movname scene_v001_110124
  knob_1 ""
  template /cg/tools/cgru/utilities/moviemaker/templates/dailies
  slate /cg/tools/cgru/utilities/moviemaker/templates/dailies_slate
@@ -653,4 +645,22 @@ afanasy {
  dependmask ""
  dependmaskglbl ""
  addnodes ""
+}
+Read {
+ inputs 0
+ file render/preview.%04d.jpg
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy render/final_proxy.%04d.exr
+ last 11
+ version 2
+ name Read15
+ xpos 3
+ ypos 95
+}
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 168
+ ypos 202
 }
