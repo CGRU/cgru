@@ -100,7 +100,7 @@ if not join_render:
    command = 'mantra'
    tiles = divx * divy
    b_render = af.Block('render', command)
-   if run_rop: b_render.setTasksDependMask('generate')
+   if run_rop: b_render.setTasksDependMask(rop)
    if tile_render or delete_files or temp_images: command = 'mantrarender '
    if delete_files and not tile_render: command += 'd'
    if temp_images: command += 't'
@@ -124,7 +124,7 @@ if not join_render:
 
 if tile_render:
    cmd = 'exrjoin %(divx)d %(divy)d %(images)s d' % vars()
-   if delete_files: cmd += ' && deletefiles %s' % files
+   if delete_files: cmd += ' && deletefiles -s "%s"' % files
    b_join = af.Block('join', 'generic')
    b_join.setTasksDependMask('render')
    b_join.setCommand( cmd, False)
