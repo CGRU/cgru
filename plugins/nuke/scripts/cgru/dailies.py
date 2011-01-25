@@ -231,8 +231,15 @@ def dailiesGenCmd( node):
 
    # Stereo:
    if images.find('%v') != -1 or images.find('%V') != -1:
-      views = inputnode.knob('views').value().split(' ')
-      if len(views) > 1:
+      if node.knob('forceviews').value():
+         views = node.knob('viewsnames').value().split(' ')
+      else:
+         views_knob = inputnode.knob('views')
+         if views_knob is not None:
+            views = inputnode.knob('views').value().split(' ')
+         else:
+            views = nuke.views()
+      if len(views) > 0:
          stereo_images = ''
          for view in views:
             view = view.strip()

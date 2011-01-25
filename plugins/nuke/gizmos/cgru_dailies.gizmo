@@ -24,7 +24,9 @@ Gizmo {
    addUserKnob {  1 movname    l "Movie Name"       +STARTLINE }
 
    addUserKnob { 26 "" l "" }
-   addUserKnob {  6 stereodub l "Duplicate single sequence and make stereo from mono." }
+   addUserKnob {  6 stereodub    l "Duplicate single sequence and make stereo from mono." +STARTLINE }
+   addUserKnob {  6 forceviews   l "Force views:" +STARTLINE}
+   addUserKnob {  1 viewsnames   l "" -STARTLINE}
    addUserKnob { 26 "" l "" }
 
 
@@ -54,6 +56,8 @@ Gizmo {
    version     0
    movauto     1
    stereodub   0
+   forceviews  0
+   viewsnames  "left right"
 
    fstart      -1
    fend        -1

@@ -1,8 +1,11 @@
 #!/bin/bash
 
-for scene in `ls scene.nk*`; do
-   [ $scene == "scene.nk" ] && continue
-   rm -fv $scene
+scenes="scene.nk scene_stereo.nk"
+for scene in $scenes; do
+   for tmpscene in `ls ${scene}*`; do
+      [ $tmpscene == $scene ] && continue
+      rm -fv $tmpscene
+   done
 done
 rm -fv render/*
 rm -fv *.mov
