@@ -31,7 +31,8 @@ for file in args:
       if sys.platform.find('win') == 0:
          cmd = 'DEL /F /Q /S "%s"' % file
       else:
-         cmd = 'rm -rvf "%s"' % file
+         file = file.replace(' ','\\ ')
+         cmd = 'rm -rvf %s' % file
       if not Options.quiet:
          print 'Executing system command:'
          print cmd
