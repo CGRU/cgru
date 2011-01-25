@@ -84,16 +84,14 @@ if run_rop:
 
    if not join_render:
       blocktype = 'hbatch'
-      blockname = 'generate'
       cmd = 'hrender_af'
    else:
       blocktype = 'hbatch_mantra'
-      blockname = 'generate+render'
       cmd = 'hrender_separate'
       if temp_images: cmd += ' --tmpimg'
 
    job.setCmdPost('deletefiles "%s"' % tmphip)
-   b_generate = af.Block( blockname, blocktype)
+   b_generate = af.Block( rop, blocktype)
    b_generate.setCommand( cmd + ' -s %1 -e %2 --by 1 -t '+take+' '+tmphip+' '+rop)
    b_generate.setNumeric( f_start, f_finish)
    if join_render: b_generate.setFiles( images)
