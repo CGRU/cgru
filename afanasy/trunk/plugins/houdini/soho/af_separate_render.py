@@ -92,7 +92,7 @@ if run_rop:
       cmd = 'hrender_separate'
       if temp_images: cmd += ' --tmpimg'
 
-   job.setCmdPost('deletefiles "%s"' tmphip)
+   job.setCmdPost('deletefiles "%s"' % tmphip)
    b_generate = af.Block( blockname, blocktype)
    b_generate.setCommand( cmd + ' -s %1 -e %2 --by 1 -t '+take+' '+tmphip+' '+rop)
    b_generate.setNumeric( f_start, f_finish)
