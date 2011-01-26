@@ -125,7 +125,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    case af::TaskExec::UPFinishedSuccess:
    {
       progress->state = progress->state | AFJOB::STATE_DONE_MASK;
-      finish( "Finished success", renders, monitoring);
+      finish( "Finished success.", renders, monitoring);
       break;
    }
    case af::TaskExec::UPFailedToStart: if( message.isEmpty()) message = "Failed to start.";
@@ -148,7 +148,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       if( stopTime )
       {
          // Task was asked to be stopped before (skipped, restarted, ejected)
-         finish("Stopped", renders, monitoring);
+         finish("Stopped.", renders, monitoring);
       }
       else
       {
@@ -204,21 +204,21 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    // Tasks with running time > maximum set to errors: // If it TasksMaxRunTime > 0 ( 0 is "infinite" )
    if((block->data->getTasksMaxRunTime() != 0) && (currentTime - progress->time_start > block->data->getTasksMaxRunTime()))
    {
-      stop("Task maximum run time reached", renders, monitoring);
+      stop("Task maximum run time reached.", renders, monitoring);
       errorHostId = hostId;
    }
 
    // Tasks update timeout check:
    if(( stopTime == 0) && ( currentTime > progress->time_done + af::Environment::getTaskUpdateTimeout()))
    {
-      stop("Task update timeout", renders, monitoring);
+      stop("Task update timeout.", renders, monitoring);
       errorHostId = hostId;
    }
 
    // Tasks stop timeout check:
    if( stopTime &&( currentTime - stopTime > AFJOB::TASK_STOP_TIMEOUT ))
    {
-      finish("Task stop timeout", renders, monitoring);
+      finish("Task stop timeout.", renders, monitoring);
       if( changed == false) changed = true;
       errorHostId = hostId;
    }
@@ -273,7 +273,7 @@ void TaskRun::finish( const QString & message, RenderContainer * renders, Monito
 void TaskRun::restart( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
    if( zombie ) return;
-   stop( message+" (is running)", renders, monitoring);
+   stop( message+" Is running.", renders, monitoring);
 }
 
 void TaskRun::skip( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -281,7 +281,7 @@ void TaskRun::skip( const QString & message, RenderContainer * renders, MonitorC
    if( zombie ) return;
    progress->state = progress->state | AFJOB::STATE_SKIPPED_MASK;
    progress->state = progress->state | AFJOB::STATE_DONE_MASK;
-   stop( message+" (is running)", renders, monitoring);
+   stop( message+" Is running.", renders, monitoring);
 }
 
 void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)

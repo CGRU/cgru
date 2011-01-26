@@ -43,7 +43,7 @@ void Task::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf *
    }
    if( run)
    {
-      AFERROR("Task is already running");
+      AFERROR("Task is already running.\n");
       delete taskexec;
       return;
    }
@@ -102,7 +102,7 @@ void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContai
          {
             progress->state = progress->state |   AFJOB::STATE_READY_MASK;
             progress->state = progress->state & (~AFJOB::STATE_ERROR_MASK);
-            log(QString("Automatically retrying error task %1 of %2").arg( progress->errors_count).arg( block->getErrorsRetries()));
+            log(QString("Automatically retrying error task %1 of %2.").arg( progress->errors_count).arg( block->getErrorsRetries()));
             if( changed == false) changed = true;
          }
       }

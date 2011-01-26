@@ -1,6 +1,5 @@
 #pragma once
 
-//#include "../libafanasy/name_af.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "../libafsql/dbblockdata.h"
@@ -44,6 +43,9 @@ public:
    virtual void updateDatabase() const;
 
 private:
+   void appendSysJobLog( const QString &message);
+
+private:
    SysCmd * syscmd;
    af::TaskProgress taskProgress;
    int birthtime;
@@ -68,7 +70,7 @@ public:
 
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
-   inline static void logCmdPost(const QString &message) { task->log( message);}
+   inline static void logCmdPost( const QString & message) { task->log( message);}
 
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();

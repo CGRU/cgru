@@ -52,17 +52,25 @@ void SysTask::writeTaskOutput( const af::MCTaskUp& taskup) const {}
 
 void SysTask::log( const QString &message)
 {
-   SysBlock::logCmdPost( QString("#%1: %2:\n%3").arg(getNumber()).arg(message).arg(syscmd->command));
+   SysBlock::logCmdPost( QString("#%1: %2: %3: \"%4\":\n%5")
+                         .arg(getNumber()).arg(message).arg(syscmd->username).arg(syscmd->jobname).arg(syscmd->command));
+}
+
+void SysTask::appendSysJobLog( const QString &message)
+{
+   SysJob::appendLog( QString("Task[%1]: %2: %3: \"%4\":\n%5")
+                         .arg(getNumber()).arg(message).arg(syscmd->username).arg(syscmd->jobname).arg(syscmd->command));
 }
 
 void SysTask::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
 //printf("SysTask::start:\n");
-   taskexec->setCommand(      syscmd->command            );
-   taskexec->setUserName(     syscmd->username           );
-   taskexec->setJobName(      syscmd->jobname            );
-   taskexec->setWDir(         syscmd->workingdirectory   );
-   taskexec->setTaskNumber(   getNumber()                );
+   taskexec->setCommand(      syscmd->command               );
+   taskexec->setName(         syscmd->command.split(' ')[0] );
+   taskexec->setUserName(     syscmd->username              );
+   taskexec->setJobName(      syscmd->jobname               );
+   taskexec->setWDir(         syscmd->workingdirectory      );
+   taskexec->setTaskNumber(   getNumber()                   );
 
    Task::start( taskexec, runningtaskscounter, render, monitoring);
 }
@@ -77,7 +85,7 @@ void SysTask::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
       QString message = QString( QString("Error: Task age(%1) > %2").arg(currentTime - birthtime).arg(af::Environment::getSysJobTaskLife()));
       log( message);
       // Store error in job log
-      SysJob::appendLog( QString("Task[%1]: %2:\n%3").arg(getNumber()).arg(message).arg(syscmd->command));
+      appendSysJobLog( message);
       progress->state = AFJOB::STATE_ERROR_MASK;
    }
 //stdOut();
@@ -106,8 +114,17 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
       case af::TaskExec::UPRenderZombie:              message = "Render zombie";       break;
    default: return;
    }
+
+   // Get render name:
+   if( taskup.getClientId() != 0 )
+   {
+      RenderContainerIt rendersIt( renders);
+      RenderAf * render = rendersIt.getRender( taskup.getClientId());
+      if( render ) message += QString(" on '%1'").arg( render->getName());
+   }
+
    // Store error in job log
-   SysJob::appendLog( QString("Task[%1]: %2:\n%3").arg(getNumber()).arg(message).arg(syscmd->command));
+   appendSysJobLog( message);
 
    // Store error task output in task log
    if( taskup.getDataLen() > 0)

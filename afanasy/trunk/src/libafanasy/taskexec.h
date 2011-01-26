@@ -135,6 +135,7 @@ public:
    inline int   getListenAddressesNum() const { return listen_addresses->getAddressesNum();              }
    inline const std::list<Address*> * getListenAddresses() const { return listen_addresses->getAddresses();       }
 
+   inline void setName(      const QString & str) { name      = str;}   ///< Set task name.
    inline void setBlockName( const QString & str) { blockname = str;}   ///< Set task block name.
    inline void setJobName(   const QString & str) { jobname   = str;}   ///< Set task job name.
    inline void setUserName(  const QString & str) { username  = str;}   ///< Set task user name.
