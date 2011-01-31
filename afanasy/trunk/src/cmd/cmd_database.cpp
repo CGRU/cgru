@@ -105,10 +105,7 @@ bool CmdDBResetAll::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetAll");
    DB.DBOpen();
-   DB.ResetStat();
-   DB.ResetUsers();
-   DB.ResetRenders();
-   DB.ResetJobs();
+   DB.ResetAll();
    DB.DBClose();
    return true;
 }

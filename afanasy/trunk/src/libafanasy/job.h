@@ -26,7 +26,7 @@ public:
 /// Print main job information.
    void stdOut( bool full = false) const;
 
-   inline uint32_t getFlags()                const { return flags;                 }
+//   inline uint32_t getFlags()                const { return flags;                 }
    inline uint32_t getState()                const { return state;                 }
    inline int      getBlocksNum()            const { return blocksnum;             }
    inline uint32_t getTimeCreation()         const { return time_creation;         }

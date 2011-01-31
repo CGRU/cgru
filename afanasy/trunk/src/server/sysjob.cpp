@@ -333,6 +333,16 @@ SysJob::~SysJob()
 {
 }
 
+void SysJob::dbDelete( QStringList  * queries) const
+{
+   AFERROR("Trying to delete system job from database.\n");
+}
+
+void SysJob::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
+{
+   AFERROR("Trying to make system job a zomibe.\n");
+}
+
 Block * SysJob::createBlock( int numBlock)
 {
    switch( numBlock)

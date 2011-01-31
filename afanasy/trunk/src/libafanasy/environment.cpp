@@ -110,7 +110,6 @@ int     Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN
 int     Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
 
 QString        Environment::tasksstdoutdir = "";
-QString        Environment::tasksstdoutdir_deleted = "";
 QString        Environment::jobslogsdir = "";
 QString        Environment::renderslogsdir = "";
 QString        Environment::userslogsdir = "";
@@ -586,11 +585,10 @@ bool Environment::init( bool solveServerAddress)
    if( verbose ) address->stdOut();
    PRINT("\n");
 #ifndef WINNT
-   tasksstdoutdir          = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
-   tasksstdoutdir_deleted  = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR_DELETED;
-   jobslogsdir             = tempdirectory + '/' +    AFJOB::LOGS_DIRECTORY;
-   renderslogsdir          = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
-   userslogsdir            = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
+   tasksstdoutdir = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
+   jobslogsdir    = tempdirectory + '/' +    AFJOB::LOGS_DIRECTORY;
+   renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
+   userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
 #endif
    if( hostname.isEmpty()) hostname = computername;
 

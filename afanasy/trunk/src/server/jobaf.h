@@ -32,7 +32,7 @@ public:
 
    virtual ~JobAf();
 
-   void setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
+   virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
 
    void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 

@@ -115,6 +115,8 @@ public:
    virtual void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+   virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void dbDelete( QStringList  * queries) const;
 
    static void appendLog( const QString message);
 

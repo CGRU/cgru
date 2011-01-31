@@ -155,21 +155,20 @@ public:
    static inline int getUserLogsRotate()    { return   user_logs_rotate; }
    static inline int getRenderLogsRotate()  { return render_logs_rotate; }
 
-   static inline const QString& getTempDirectory()          { return tempdirectory;  }       ///< Get temp directory.
-   static inline const QString& getTasksStdOutDir()         { return tasksstdoutdir; }       ///< Get tasks standart output directory.
-   static inline const QString& getTasksStdOutDirDeleted()  { return tasksstdoutdir_deleted;}///< Get deleted jobs tasks output directory.
-   static inline const QString& getJobsLogsDir()            { return jobslogsdir;    }       ///< Get jobs logs directory.
-   static inline const QString& getRendersLogsDir()         { return renderslogsdir; }       ///< Get renders logs directory.
-   static inline const QString& getUsersLogsDir()           { return userslogsdir;   }       ///< Get users logs directory.
+   static inline const QString& getTempDirectory()       { return tempdirectory;  } ///< Get temp directory.
+   static inline const QString& getTasksStdOutDir()      { return tasksstdoutdir; } ///< Get tasks standart output directory.
+   static inline const QString& getJobsLogsDir()         { return jobslogsdir;    } ///< Get jobs logs directory.
+   static inline const QString& getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
+   static inline const QString& getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
 
-   static inline const QString& get_DB_Type()           { return db_type;         } ///< Get database type.
-   static inline const QString& get_DB_HostName()       { return db_hostname;     } ///< Get database host name.
-   static inline const QString& get_DB_DataBaseName()   { return db_databasename; } ///< Get database name.
-   static inline const QString& get_DB_UserName()       { return db_username;     } ///< Get database user name.
-   static inline const QString& get_DB_Password()       { return db_password;     } ///< Get database user password.
-   static inline const QString& get_DB_StringQuotes()   { return db_stringquotes; } ///< Get database string quotes.
-   static inline int            get_DB_StringNameLen()  { return db_stringnamelen;} ///< Get database string name length.
-   static inline int            get_DB_StringExprLen()  { return db_stringexprlen;} ///< Get database string expression length.
+   static inline const QString& get_DB_Type()            { return db_type;         } ///< Get database type.
+   static inline const QString& get_DB_HostName()        { return db_hostname;     } ///< Get database host name.
+   static inline const QString& get_DB_DataBaseName()    { return db_databasename; } ///< Get database name.
+   static inline const QString& get_DB_UserName()        { return db_username;     } ///< Get database user name.
+   static inline const QString& get_DB_Password()        { return db_password;     } ///< Get database user password.
+   static inline const QString& get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
+   static inline int            get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
+   static inline int            get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
    static inline int getServer_SO_RCVTIMEO_SEC()  { return server_so_rcvtimeo_sec; }
    static inline int getServer_SO_SNDTIMEO_SEC()  { return server_so_sndtimeo_sec; }
@@ -298,7 +297,6 @@ private:
 
    static QString tempdirectory;
    static QString tasksstdoutdir;
-   static QString tasksstdoutdir_deleted;
    static QString jobslogsdir;
    static QString renderslogsdir;
    static QString userslogsdir;

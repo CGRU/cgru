@@ -236,13 +236,8 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    // Rotate = -1: no rotate, but add time to name
    AFCommon::saveLog( joblog, af::Environment::getJobsLogsDir(), name, -1);
 
-   // Rename tasks output directory:
-   QString timedel = QDateTime::currentDateTime().toString("yyMMdd_hhmm_ss_zzz");
-   QString tasksoutputdir_deleted = name;
-   af::filterFileName( tasksoutputdir_deleted);
-   tasksoutputdir_deleted = af::Environment::getTasksStdOutDirDeleted() + '/' + tasksoutputdir_deleted;
-   tasksoutputdir_deleted = QString("%1.%2").arg( tasksoutputdir_deleted, timedel);
-   rename( tasksoutputdir.toUtf8().data(), tasksoutputdir_deleted.toUtf8().data());
+   // Remove tasks output directory:
+   AFCommon::QueueCmdExec( QString("/bin/rm -rf \"%1\"").arg( tasksoutputdir.toUtf8().data()));
 
    if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
