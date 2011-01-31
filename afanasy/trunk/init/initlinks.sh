@@ -72,7 +72,7 @@ else
 fi
 
 echo "${removing}Application = '$app'"
-if [ -L $initd/$app ]; then
+if [ -f $initd/$app ]; then
    echo "Removing old links:"
    [ "${manager}" == "u" ] && update-rc.d -f $app remove
    [ "${manager}" == "c" ] && chkconfig $app off
@@ -83,9 +83,26 @@ if [ "$action" == "rm" ]; then
    exit
 fi
 
-echo "Creating new links:"
-ln -sv $daemon $initd/$app
+# Getting depends:
+depends=cgru_update
+depends_file="$afroot/init/depends_${app}"
+if [ -f $depends_file ]; then
+   depends=`cat $depends_file`
+else
+   echo $depends > $depends_file
+fi
 
+# Replacing variables:
+echo "Creating new daemon script:"
+sed \
+-e "s:@APPLICATION@:${app}:g" \
+-e "s:@AFROOT@:${afroot}:g" \
+-e "s:@DEPENDS@:${depends}:g" \
+< "${daemon}" > "${initd}/${app}"
+
+chmod -v a+x ${initd}/${app}
+
+# Creating statrup links:
 [ "${manager}" == "u" ] && update-rc.d $app defaults 80 20
 [ "${manager}" == "c" ] && chkconfig $app on
 [ "${manager}" == "i" ] && insserv $app

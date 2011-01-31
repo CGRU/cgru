@@ -1,50 +1,27 @@
 #!/bin/bash
 #
 # chkconfig: 2345 90 10
-# description: Afanasy Daemon
+# description: Afanasy @APPLICATION@ daemon
 #
-# disable service name, as afrender and afserver uses links to the same file, and no doubles allowed
 ### BEGIN INIT INFO
-##Provides: afanasy
-# Required-Start:  $local_fs $remote_fs $network
-# Required-Stop:   $local_fs $remote_fs $network
+# Provides: @APPLICATION@
+# Required-Start:  $local_fs $remote_fs $network @DEPENDS@
+# Required-Stop:   $local_fs $remote_fs $network @DEPENDS@
 # Should-Start:    $syslog
 # Should-Stop:     $syslog
 # Default-Start:   2 3 4 5
 # Default-Stop:    0 1 6
-# Short-Description: Afanasy Daemon
+# Short-Description: Afanasy @APPLICATION@ daemon
 ### END INIT INFO
 
-link=$0
-# Check whether executed file is a link:
-if [ ! -L $link ]; then
-   echo "You should run a symbolic link named like application with absolute path to afdaemon script."
-   exit 1
-fi
+# Set Afanasy application:
+afapp=@APPLICATION@
 
-# Get daemon location, solving link until get a file
-cmd=$link
-curdir=$PWD
-cd `dirname $cmd`
-while [ -L $cmd ]; do
-   link=$cmd
-   cmd=`readlink $link`
-   cd `dirname $cmd`
-done
-cd $curdir
-
-# Get Afanasy location:
-curdir=$PWD
-cd `dirname $cmd`
-cd ..
-afroot=$PWD
-cd $curdir
-
-# Get Afanasy application:
-afapp=`basename $link`
+# Set Afanasy location:
+afroot=@AFROOT@
 
 # Afanasy "nonroot" user:
-nonrootuser=renderer
+nonrootuser=render
 if [ -f "${afroot}/nonrootuser" ]; then
    nonrootuser=`cat "${afroot}/nonrootuser"`
 else
@@ -54,7 +31,12 @@ id "${nonrootuser}" || nonrootuser=""
 
 # Temp directory:
 tmpdir=/var/tmp/afanasy
-if [ ! -d "$tmpdir" ]; then
+if [ -d "$tmpdir" ]; then
+   # Delete old temporary folders
+   find $tmpdir -type d -mtime +99 -exec rm -rvf {} \;
+   # Delete old temporary files
+   find $tmpdir -mtime +99 -exec rm -vf {} \;
+else
    mkdir $tmpdir
    if [ ! -d "$tmpdir" ]; then
       echo "temp directory was not created"
