@@ -18,12 +18,12 @@ default: $order = 'jobsnum';
 $dbconn = db_connect();
 
 $query="
-SELECT   users.name,users.priority,users.maxhosts,users.hostsmask,
+SELECT   users.name,users.priority,users.maxrunningtasks,users.hostsmask,
          sum(CASE WHEN jobs.id>0 THEN 1 ELSE 0 END) AS jobsnum,
          sum(CASE WHEN jobs.time_done=0 THEN 1 ELSE 0 END) AS jobsrunning,
          users.id
       FROM users LEFT JOIN jobs ON jobs.username=users.name
-      GROUP BY users.name,users.id,users.priority,users.maxhosts,users.hostsmask
+      GROUP BY users.name,users.id,users.priority,users.maxrunningtasks,users.hostsmask
       ORDER BY $order DESC;";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 

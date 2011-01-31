@@ -17,8 +17,8 @@ case "avgruntime": break;
 default: $order_u = 'sumruntime';
 }
 
-$order_t=$_GET['order_t'];
-switch($order_t)
+$order_s=$_GET['order_s'];
+switch($order_s)
 {
 case "service": break;
 case "servicequantity": break;
@@ -26,10 +26,10 @@ case "tasksquantity": break;
 case "taskssumruntime": break;
 case "tasksavgruntime": break;
 case "tasksdone": break;
-default: $order_t = 'taskssumruntime';
+default: $order_s = 'taskssumruntime';
 }
 
-echo '<h3>Jobs:</h3>';
+echo '<h3>Users:</h3>';
 
 $dbconn = db_connect();
 
@@ -40,7 +40,7 @@ sum(time_done-time_started) AS sumonlinetime,
 avg(time_done-time_started) AS avgonlinetime,
 sum(taskssumruntime) AS sumruntime,
 avg(taskssumruntime) AS avgruntime
-FROM stat_jobs GROUP BY username ORDER BY $order_u DESC;
+FROM statistics GROUP BY username ORDER BY $order_u DESC;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 echo "<table border=1 width=99%>\n";
@@ -52,27 +52,27 @@ echo '#';
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=username&order_t=$order_t'>User Name</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=username&order_s=$order_s'>User Name</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=numjobs&order_t=$order_t'>Num Jobs</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=numjobs&order_s=$order_s'>Num Jobs</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=sumonlinetime&order_t=$order_t'>Sum Online Time</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=sumonlinetime&order_s=$order_s'>Sum Online Time</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=avgonlinetime&order_t=$order_t'>Avg Online Time</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=avgonlinetime&order_s=$order_s'>Avg Online Time</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=sumruntime&order_t=$order_t'>Sum Run Time</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=sumruntime&order_s=$order_s'>Sum Run Time</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=avgruntime&order_t=$order_t'>Avg Run Time</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=avgruntime&order_s=$order_s'>Avg Run Time</a></b>";
 echo "</td>\n";
 
 echo "\t</tr>\n";
@@ -140,7 +140,7 @@ echo "</table>\n";
 pg_free_result($result);
 
 
-echo '<h3>Tasks:</h3>';
+echo '<h3>Services:</h3>';
 //CASE WHEN jobs.id>0 THEN 1 ELSE 0 END
 //sum(tasksdone) AS tasksdone
 $query="
@@ -150,7 +150,7 @@ sum(tasksnum) AS tasksquantity,
 sum(taskssumruntime) AS taskssumruntime,
 avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
 round(avg(100*tasksdone/tasksnum),2) AS tasksdone
-FROM stat_blocks GROUP BY service ORDER BY $order_t DESC;
+FROM statistics GROUP BY service ORDER BY $order_s DESC;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 echo "<table border=1 width=99%>\n";
@@ -162,27 +162,27 @@ echo '#';
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=service'>Service</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=service'>Service</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=servicequantity'>Service Quantity</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=servicequantity'>Service Quantity</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=tasksquantity'>Tasks Quantity</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=tasksquantity'>Tasks Quantity</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=taskssumruntime'>Sum Run Time</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=taskssumruntime'>Sum Run Time</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=tasksavgruntime'>Avg Run Time</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=tasksavgruntime'>Avg Run Time</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&order_u=$order_u&order_t=tasksdone'>Done</a></b>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=tasksdone'>Done</a></b>";
 echo "</td>\n";
 
 echo "\t</tr>\n";

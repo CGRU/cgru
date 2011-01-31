@@ -52,9 +52,9 @@ if( $uid > 0 )
 else $uidstr = '';
 
 $query = '
-SELECT name,username,state,time_creation,time_started,time_done,time_wait,maxhosts,hostsmask,id,
+SELECT name,username,state,time_creation,time_started,time_done,time_wait,maxrunningtasks,hostsmask,id,
 sum(time_done-time_started) AS duration FROM jobs'.$uidstr.' GROUP BY
- jobs.name,jobs.username,jobs.state,jobs.time_creation,jobs.time_started,jobs.time_done,jobs.time_wait,jobs.maxhosts,jobs.hostsmask,jobs.id
+ jobs.name,jobs.username,jobs.state,jobs.time_creation,jobs.time_started,jobs.time_done,jobs.time_wait,jobs.maxrunningtasks,jobs.hostsmask,jobs.id
 '.$sort.';';
 
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
