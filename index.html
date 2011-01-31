@@ -55,9 +55,10 @@
 </tr>
 <tr>
    <td align="center" width="50%">
+      <h1><a href="afanasy/doc/afanasy.html"><img src="doc/images/freeopensource.png" border="0" alt="OPEN SOURCE" /></a></h1>
       <h1><a href="afanasy/doc/afanasy.html"><img src="doc/images/afanasy.png" border="0" alt="AFANASY" /></a></h1>
-      <h1><a href="afanasy/doc/afanasy.html"><img src="doc/images/freerenderfarmmanager.png" border="0" alt="Free Render Farm Manager" /></a></h1>
-      <h2><a href="afanasy/doc/index.html"><img src="doc/images/documentation.png" border="0" alt="Documentation" /></a></h2>
+      <h1><a href="afanasy/doc/afanasy.html"><img src="doc/images/renderfarmmanager.png" border="0" alt="RENDER FARM MANAGER" /></a></h1>
+      <h2><a href="afanasy/doc/index.html"><img src="doc/images/documentation.png" border="0" alt="DOCUMENTATION" /></a></h2>
 
 <!--REMOTE_BEGIN
 <h3><a href="http://sourceforge.net/project/screenshots.php?group_id=178692"><img src="doc/images/screenshots.png" border="0" alt="Screenshots" /></a></h3>
@@ -118,53 +119,14 @@ switch( window.location.protocol)
 <h3>Last Added Features:</h3>
 
 <p>
-<a href="utilities/moviemaker/doc/index.html">Movie Maker<a> stereo mode and
-Nuke <a href="plugins/nuke/doc/dailies.html">"dailies"</a> node to generate movies locally or on Afanasy.
+You can control job post commands (usually used for cleanup) execution by a scpecial
+<a href="afanasy/doc/job_system.html">System Job<a>.<br/>
 </p>
+
 <p>
-<a href="afanasy/plugins/max/doc/afanasy.html">3D Studio MAX submit to Afanasy sripts</a>. MAX Afanasy service and parser.
+<a href="afanasy/doc/job_block.html#ErrorsForgiveTime">Errors Forgive Time</a>
+- time to forgive error host and to continue rendering on it.
 </p>
-<p>
-Render client measures network and disk traffic on MS Windows.
-</p>
-<p>
-Render client MS Windows version has the same functionality as Linux version.
-But there is still no server for Windows.
-</p>
-<p>
-Afanasy Python <a href="afanasy/doc/resourcescustom.html">Resources Meter</a>.
-You can measure any resource by writing you Python resource meter class.
-</p>
-<p>
-Afanasy Python <a href="afanasy/doc/parsers.html">Parsers</a> has a new functionality.
-A parser can produce <i>warning</i> to notify user, <i>error</i> to stop task with error,
-<i>bad result</i> to finish task like with bad exit status (with error in any way).
-</p>
-<p>
-Afanasy render client "<a href="afanasy/doc/windowsmustdie.html">Windows Must Die<a/>" function.
-It finds and kills windows with specified names.
-When process crashes, MS Windows can raise a window with apologizes.
-This can hang process until someone closes the window.
-(afRender periodically sends WM_CLOSE signal to windows listed in special file.)
-</p>
-<p>
-<a href="afanasy/plugins/houdini/doc/afanasy.html#SeparateRender"/>Houdini Separate Render</a>
- - ROP to separate Mantra ROP render process on 'ifd' files generation and 'mantra' command render.
-It can also split one frame into tiles and render them simultaneous,
-clean 'ifd' files, clean tiles and render an image in local temporary folder,
-and after successful render copy it to network location
-(it can save network traffic, as host do not often write small portions of an image during calculations).
-</p>
-<p>
-Afanasy has an ability to <a href="afanasy/doc/pathsmap.html">map paths</a>.
-You can setup farm with various platforms clients.
-Submit jobs on Windows or Linux (MacOSX) to render and on Windows and on Linux (MacOSX) clients.
-Every client can have individual a paths map file to translate paths to server and from server.
-</p>
-<p>
-<a href="afanasy/plugins/xsi/doc/afanasy.html">Softimage XSI submit to Afanasy sripts</a>. XSI Afanasy service and parser.
-</p>
-<br/>
 
 </td></tr></table>
 
