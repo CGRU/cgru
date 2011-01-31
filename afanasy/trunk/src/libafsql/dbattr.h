@@ -63,15 +63,16 @@ public:
       _INTEGER_END_,
 
       _STRINGNAME_BEGIN_,
+         _annotation,
+         _blockname,
+         _jobname,
          _hostname,
          _multihost_service,
          _name,
-         _name_job,
          _parser,
          _service,
          _tasksname,
          _username,
-         _annotation,
       _STRINGNAME_END_,
 
       _STRINGEXPR_BEGIN_,

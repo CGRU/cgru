@@ -13,7 +13,7 @@ using namespace afsql;
 const QString DBJob::TableName("jobs");
 const QString DBJob::Keys("PRIMARY KEY( id)");
 const int     DBJob::KeysNum = 1;
-DBStatJob DBJob::statistics;
+DBStatistics  DBJob::statistics;
 
 DBJob::DBJob( int Id):
    af::Job( Id),

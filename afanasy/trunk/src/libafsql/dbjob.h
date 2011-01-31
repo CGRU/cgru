@@ -4,7 +4,7 @@
 
 #include "name_afsql.h"
 #include "dbitem.h"
-#include "dbstatjob.h"
+#include "dbstatistics.h"
 
 namespace afsql
 {
@@ -37,6 +37,6 @@ private:
    static const QString TableName;
    static const QString Keys;
    static const int KeysNum;
-   static DBStatJob statistics;
+   static DBStatistics statistics;
 };
 }

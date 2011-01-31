@@ -6,23 +6,27 @@
 
 namespace afsql
 {
-class DBStatBlock: public DBItem
+class DBStatistics: public DBItem
 {
 public:
-   DBStatBlock();
-   virtual ~DBStatBlock();
+   DBStatistics();
+   virtual ~DBStatistics();
 
-   void addBlocks( const af::Job * job, QStringList * queries);
+   void addJob( const af::Job * job, QStringList * queries);
 
 protected:
    inline const QString & dbGetTableName()  const { return TableName;}
 
 private:
-   QString name;
-   QString name_job;
+   QString jobname;
+   QString blockname;
    QString username;
+   QString hostname;
    QString service;
-   uint32_t flags;
+   QString description;
+   QString annotation;
+   uint32_t time_started;
+   uint32_t time_done;
    uint32_t tasksnum;
    uint32_t tasksdone;
    uint32_t taskssumruntime;

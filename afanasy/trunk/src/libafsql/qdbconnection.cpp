@@ -15,7 +15,7 @@
 #include "dbblockdata.h"
 #include "dbrender.h"
 #include "dbuser.h"
-#include "dbstatjob.h"
+#include "dbstatistics.h"
 #include "dbtaskdata.h"
 #include "dbtaskprogress.h"
 
@@ -178,13 +178,31 @@ void DBConnection::ResetStat()
    if( working == false ) return;
    if( db->isOpen() == false )
    {
-      AFERROR("DBConnection::ResetArchive: Database connection is not open\n");
+      AFERROR("DBConnection::ResetArchive: Database connection is not open\n")
       return;
    }
 
-   DBStatJob statjob;
-   statjob.dbDropTable( db);
-   statjob.dbCreateTable( db);
+   DBStatistics statistics;
+   statistics.dbDropTable( db);
+   statistics.dbCreateTable( db);
+}
+
+void DBConnection::ResetAll()
+{
+   QStringList tables = db->tables();
+   for( int i = 0; i < tables.size(); i++)
+   {
+      QString query = QString("DROP TABLE %1;").arg( tables[i]);
+      printf("%s\n", query.toUtf8().data());
+      QSqlQuery q( query, *db);
+      q.exec();
+      qChkErr(q, "DBConnection::ResetAll:\n");
+   }
+
+   ResetStat();
+   ResetUsers();
+   ResetRenders();
+   ResetJobs();
 }
 
 void DBConnection::getUsersIds( std::list<int32_t> & ids)

@@ -26,6 +26,7 @@ public:
    void ResetStat();
    void ResetUsers();
    void ResetRenders();
+   void ResetAll();
 
    void getUsersIds(   std::list<int32_t> & ids);
    void getRendersIds( std::list<int32_t> & ids);

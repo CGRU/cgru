@@ -24,6 +24,7 @@ void DBAttr::init()
    }
 
    DBName[_annotation            ] = "annotation";
+   DBName[_blockname             ] = "blockname";
    DBName[_blocksnum             ] = "blocksnum";
    DBName[_capacity              ] = "capacity";
    DBName[_capcoeff_max          ] = "capcoeff_max";
@@ -56,6 +57,7 @@ void DBAttr::init()
    DBName[_id_block              ] = "id_block";
    DBName[_id_job                ] = "id_job";
    DBName[_id_task               ] = "id_task";
+   DBName[_jobname               ] = "jobname";
    DBName[_maxrunningtasks       ] = "maxrunningtasks";
    DBName[_multihost_max         ] = "multihost_max";
    DBName[_multihost_min         ] = "multihost_min";
@@ -63,7 +65,6 @@ void DBAttr::init()
    DBName[_multihost_waitmax     ] = "multihost_waitmax";
    DBName[_multihost_waitsrv     ] = "multihost_waitsrv";
    DBName[_name                  ] = "name";
-   DBName[_name_job              ] = "name_job";
    DBName[_need_hdd              ] = "need_hdd";
    DBName[_need_memory           ] = "need_memory";
    DBName[_need_power            ] = "need_power";
