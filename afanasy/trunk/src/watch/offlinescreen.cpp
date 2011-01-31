@@ -4,6 +4,8 @@
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 
+#include "../libafanasy/environment.h"
+
 #include "watch.h"
 
 #define AFOUTPUT
@@ -21,7 +23,8 @@ int B = 0;
 int A = 3;
 
 OfflineScreen::OfflineScreen( QWidget * widget):
-   QWidget((QWidget*)(Watch::getDialog()))
+   QWidget((QWidget*)(Watch::getDialog())),
+   offlineimage(af::Environment::getAfRoot() + "/icons/watch/offlineimage.png")
 {
    // Allocate memory for image
    image_w = widget->width();
@@ -152,7 +155,7 @@ OfflineScreen::~OfflineScreen()
 
 void OfflineScreen::paintEvent( QPaintEvent *)
 {
-   int x = ( width() - image_w) >> 1;
+   int x = ( width()  - image_w) >> 1;
    int y = ( height() - image_h) >> 1;
    int rand_num;
 
@@ -216,4 +219,15 @@ void OfflineScreen::paintEvent( QPaintEvent *)
    QImage qimage( (unsigned char*)buffer_b, image_w, image_h, QImage::Format_RGB32);
 
    painter.drawImage( QRect( x, y, image_w, image_h), qimage);
+
+   if( false == offlineimage.isNull())
+   {
+      int ox = (rand_all_size[grain_phase>>1] << 1) / image_s;
+      int oy = (rand_all_size[grain_phase   ] << 2) / image_s;
+      int iw = offlineimage.width();
+      int ih = offlineimage.height();
+      int ix = x + (image_w >> 1) - (iw >> 1) + ox;
+      int iy = y + (image_h >> 1) - (ih >> 1) + oy;
+      painter.drawImage( QRect( ix, iy, iw, ih), offlineimage);
+   }
 }

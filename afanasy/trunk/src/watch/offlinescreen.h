@@ -32,4 +32,6 @@ private:
    int * rand_bw_max;
    int ** rand_bw_pos;
    int * rand_bw_val;
+
+   QImage offlineimage;
 };
