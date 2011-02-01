@@ -18,7 +18,7 @@ export PATH=$pythondir/bin:$PATH
 export CFLAGS=-fPIC
 export CPPFLAGS=$CFLAGS
 
-cd sip-4.11.1
+cd sip-4.12.1
 
 if [ ! -z "$2" ]; then
    python configure.py -h

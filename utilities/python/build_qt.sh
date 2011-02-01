@@ -13,11 +13,11 @@ if [ ! -d "$pythondir" ]; then
    exit 1
 fi
 
-qt=`dirname $PWD`/qt/qt-4.7.0-static
+qt=`dirname $PWD`/qt/qt-4.7.1-static
 
 export PATH=$pythondir/bin:$qt/bin:$PATH
 
-cd PyQt-x11-gpl-4.7.7
+cd PyQt-x11-gpl-4.8.3
 
 if [ ! -z "$2" ]; then
    python configure.py -h
