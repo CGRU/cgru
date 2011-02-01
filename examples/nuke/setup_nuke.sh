@@ -44,9 +44,9 @@ NUKE_LOCATION=""
 NUKE_EXEC=""
 for NUKE_FOLDER in $NUKE_FOLDERS ;
 do
-   if [ "`echo $NUKE_FOLDER | gawk '{print match( \$1, "Nuke")}'`" == "1" ]; then
+   if [ "`echo $NUKE_FOLDER | awk '{print match( \$1, "Nuke")}'`" == "1" ]; then
       NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FOLDER}"
-      NUKE_EXEC="`echo $NUKE_FOLDER | gawk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
+      NUKE_EXEC="`echo $NUKE_FOLDER | awk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
    fi
 done
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"

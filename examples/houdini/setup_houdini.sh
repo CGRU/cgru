@@ -11,7 +11,7 @@ export AF_CMD_PREFIX="./"
 # Search directory where Houdini installed:
 HOUDINI_INSTALL_DIR="/opt"
 for folder in `ls "$HOUDINI_INSTALL_DIR"`; do
-   if [ "`echo $folder | gawk '{print match( \$1, "hfs")}'`" == "1" ]; then
+   if [ "`echo $folder | awk '{print match( \$1, "hfs")}'`" == "1" ]; then
       export HOUDINI_LOCATION="${HOUDINI_INSTALL_DIR}/${folder}"
    fi
 done
