@@ -238,7 +238,7 @@ void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders
    if( render == NULL ) return;
    if( Block::errorHostsAppend( render->getName())) log( render->getName() + " - AVOIDING HOST !");
    SysTask * systask = getTask( task, "errorHostsAppend");
-   systask->errorHostsAppend( render->getName());
+   if( systask) systask->errorHostsAppend( render->getName());
 }
 
 void SysBlock::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)
