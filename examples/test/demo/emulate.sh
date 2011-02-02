@@ -9,8 +9,17 @@ fi
 
 cd ..
 
+# Create temporary folder:
 tmpdir=/tmp/afanasy_emulate
-[ -d $tmpdir ] || mkdir $tmpdir
+[ -d $tmpdir ] && rm -rf $tmpdir
+mkdir $tmpdir
+
+# Cleanup previous logs:
+outputdir=/var/tmp/afanasy
+if [ -d $outputdir ]; then
+   rm -rf $outputdir/jobs/job*
+   rm -rf $outputdir/tasksoutput/job*
+fi
 
 Users=10
 Deletion=100
@@ -25,6 +34,10 @@ while [ 1 ]; do
    tmpfile=$tmpdir/$jobname
    echo $output > $tmpfile
    python ./job.py --name $jobname --user $username -b 2 -n 3 --cmdpost "rm $tmpfile"
+   if [ $? != 0 ]; then
+      echo "Error creation new job, exiting."
+      exit 1
+   fi
    let j=$j+1
    let u=$u-1
    let d=$d-1

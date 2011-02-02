@@ -153,5 +153,10 @@ if options.pause:
 if output:
    job.output( 1)
 
+exit_status = 0
 if sendjob:
-   job.send( verbose)
+   if job.send( verbose) == False:
+      print 'Error: Job was not sent.'
+      exit_status = 1
+
+sys.exit( exit_status)
