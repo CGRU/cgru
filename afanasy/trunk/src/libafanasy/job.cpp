@@ -169,7 +169,7 @@ void Job::stdOut( bool full) const
    }
 
    int percentage = 0;
-   for( int b = 0; b < blocksnum; b++) percentage   += blocksdata[b]->getProgressPercentage();
+   for( int b = 0; b < blocksnum; b++) percentage += blocksdata[b]->getProgressPercentage();
    percentage /= blocksnum;
    printf(" r%d-%d%%", getRunningTasksNumber(), percentage);
 

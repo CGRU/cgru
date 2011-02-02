@@ -96,7 +96,6 @@ bool JobAf::construct()
 
 JobAf::~JobAf()
 {
-   af::printTime(); printf(" : Deleting a job: "); stdOut( false);
    if( blocks )
    {
       for( int b = 0; b < blocksnum; b++) if( blocks[b]) delete blocks[b];
@@ -242,6 +241,7 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
    unLock();
+   af::printTime(); printf(" : Deleting a job: "); stdOut( false);
 }
 
 bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
