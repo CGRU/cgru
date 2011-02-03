@@ -96,13 +96,14 @@ public:
    /// Set Jobs Container.
    inline static void setJobContainer( JobContainer *Jobs){ jobs = Jobs;}
 
-protected:
 /// Allocate JobInfo, tasksLog.
-   bool construct();
+bool construct();/////////////////////////////////////////////////////////////////
+
+protected:
 /// Append task log with a \c message .
    void log( const QString &message);
 
-   virtual Block * createBlock( int numBlock); ///< Virtual function to create another blocks in child classes
+   virtual Block * newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
 
 protected:
    Block ** blocks;              ///< Blocks.

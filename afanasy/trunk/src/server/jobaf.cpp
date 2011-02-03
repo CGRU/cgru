@@ -38,7 +38,7 @@ JobAf::JobAf( af::Msg * msg):
       AFERROR("DBJob::DBJob: can't allocate memory for progresses.\n");
       return;
    }
-   construct();
+//   construct();
 }
 
 JobAf::JobAf( int Id):
@@ -82,7 +82,7 @@ bool JobAf::construct()
    for( int b = 0; b < blocksnum; b++)
    {
       if( blocksdata[b]->isValid() == false) return false;
-      blocks[b] = createBlock(b);
+      blocks[b] = newBlock(b);
       if( blocks[b] == NULL )
       {
          AFERRAR("JobAf::construct: Can't create block %d of %d.\n", b, blocksnum);
@@ -103,7 +103,7 @@ JobAf::~JobAf()
    }
 }
 
-Block * JobAf::createBlock( int numBlock)
+Block * JobAf::newBlock( int numBlock)
 {
    return new Block( this, blocksdata[numBlock], progress, &joblog);
 }

@@ -146,9 +146,9 @@ protected:
    QString tasksoutputdir;       ///< Tasks output directory.
 
 private:
-   void construct();
+   void initDefaultValues();
    void readwrite( Msg * msg); ///< Read or write data in buffer.
    void rw_blocks( Msg * msg); ///< Read or write blocks.
-   virtual BlockData * createBlock( Msg * msg);
+   virtual BlockData * newBlockData( Msg * msg);
 };
 }

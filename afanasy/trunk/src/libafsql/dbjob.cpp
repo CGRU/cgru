@@ -56,7 +56,7 @@ DBJob::~DBJob()
    if( progress != NULL ) delete progress;
 }
 
-af::BlockData * DBJob::createBlock( af::Msg * msg)
+af::BlockData * DBJob::newBlockData( af::Msg * msg)
 {
 //printf("DBJob::createBlock:\n");
    return new DBBlockData( msg);

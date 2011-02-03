@@ -22,7 +22,7 @@ if [ -d $outputdir ]; then
 fi
 
 Users=10
-Deletion=100
+Deletion=14
 j=0
 u=$Users
 d=$Deletion

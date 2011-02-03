@@ -121,7 +121,7 @@ public:
    static void appendLog( const QString message);
 
 protected:
-   virtual Block * createBlock( int numBlock);
+   virtual Block * newBlock( int numBlock);
 
 private:
    static SysJob * sysjob;

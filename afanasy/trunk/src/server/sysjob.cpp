@@ -343,7 +343,7 @@ void SysJob::setZombie( RenderContainer * renders, MonitorContainer * monitoring
    AFERROR("Trying to make system job a zomibe.\n");
 }
 
-Block * SysJob::createBlock( int numBlock)
+Block * SysJob::newBlock( int numBlock)
 {
    switch( numBlock)
    {

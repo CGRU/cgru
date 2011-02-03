@@ -24,17 +24,17 @@ Job::Job( int Id):
    time_started( 0),
    time_done( 0)
 {
-   construct();
+   initDefaultValues();
    id = Id;
 }
 
 Job::Job( Msg * msg)
 {
-   construct();
+   initDefaultValues();
    read( msg);
 }
 
-void Job::construct()
+void Job::initDefaultValues()
 {
    blocksdata = NULL;
 
@@ -110,7 +110,7 @@ void Job::rw_blocks( Msg * msg)
       for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
       for( int b = 0; b < blocksnum; b++)
       {
-         blocksdata[b] = createBlock( msg);
+         blocksdata[b] = newBlockData( msg);
          if( blocksdata[b] == NULL)
          {
             AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
@@ -120,7 +120,7 @@ void Job::rw_blocks( Msg * msg)
    }
 }
 
-BlockData * Job::createBlock( Msg * msg)
+BlockData * Job::newBlockData( Msg * msg)
 {
 //printf("Job::createBlock:\n");
    return new BlockData( msg);

@@ -31,7 +31,7 @@ protected:
 
 private:
    void addDBAttributes();
-   virtual af::BlockData * createBlock( af::Msg * msg);
+   virtual af::BlockData * newBlockData( af::Msg * msg);
 
 private:
    static const QString TableName;

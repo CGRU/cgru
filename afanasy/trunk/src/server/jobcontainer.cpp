@@ -57,13 +57,14 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
 
 int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring)
 {
-printf("Registering new job:\n");
+//printf("Registering new job:\n");
 
    if( job == NULL )
    {
       AFERROR("JobContainer::job_register: Can't allocate memory for new job.\n");
       return 0;
    }
+   job->construct();
    if( job->isConstructed() == false )
    {
       AFERROR("JobContainer::job_register: Job is not constructed.\n");
