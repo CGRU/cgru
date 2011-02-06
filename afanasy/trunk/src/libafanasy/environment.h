@@ -157,7 +157,6 @@ public:
 
    static inline const QString& getTempDirectory()       { return tempdirectory;  } ///< Get temp directory.
    static inline const QString& getTasksStdOutDir()      { return tasksstdoutdir; } ///< Get tasks standart output directory.
-   static inline const QString& getJobsLogsDir()         { return jobslogsdir;    } ///< Get jobs logs directory.
    static inline const QString& getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
    static inline const QString& getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
 
@@ -297,7 +296,6 @@ private:
 
    static QString tempdirectory;
    static QString tasksstdoutdir;
-   static QString jobslogsdir;
    static QString renderslogsdir;
    static QString userslogsdir;
 

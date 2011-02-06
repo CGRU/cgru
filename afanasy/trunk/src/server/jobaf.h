@@ -96,11 +96,11 @@ public:
    /// Set Jobs Container.
    inline static void setJobContainer( JobContainer *Jobs){ jobs = Jobs;}
 
-/// Allocate JobInfo, tasksLog.
-bool construct();/////////////////////////////////////////////////////////////////
-
 protected:
-/// Append task log with a \c message .
+   /// Allocate JobInfo, tasksLog.
+   bool construct();
+
+   /// Append task log with a \c message .
    void log( const QString &message);
 
    virtual Block * newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
@@ -127,6 +127,8 @@ private:
    mutable int blackListsWeight;
 
 private:
+   void initializeValues();
+
 /// Skip or restart some tasks.
    void tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring);
 

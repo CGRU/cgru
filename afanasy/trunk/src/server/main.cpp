@@ -1,4 +1,5 @@
 #include <arpa/inet.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <memory.h>
 #include <netdb.h>
@@ -100,7 +101,7 @@ void* ThreadCommon_writeFiles(void* arg)
 void* ThreadCommon_cmdExecQueue(void* arg)
 {
    AFINFA("Thread (id = %lu) to execute commands created.\n", (long unsigned)pthread_self());
-   AFCommon::CmdExecQueueRun();
+   AFCommon::CleanUpJobQueueRun();
    return NULL;
 }
 //########################### queued update tasks in database thread #############################
@@ -217,6 +218,10 @@ void* ThreadServer_accept(void* arg)
    pthread_t childCore_processClient;
 //
 //############ accepting client connections:
+   int error_wait; // Timeout to pause accepting on error
+   static const int error_wait_max = 1 << 30;   // Maximum timeout value
+   static const int error_wait_min = 1 << 3;    // Minimum timeout value
+   error_wait = error_wait_min;
    while( running )
    {
       if( core == NULL) break;
@@ -228,8 +233,25 @@ void* ThreadServer_accept(void* arg)
       if( threadArgs->sd < 0)
       {
          AFERRPE("accept");
+         switch( errno )
+         {
+            case EMFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
+               AFERROR("The per-process limit of open file descriptors has been reached.\n")
+               break;
+            case ENFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
+               AFERROR("The system limit on the total number of open files has been reached.\n")
+               break;
+            case EINTR:
+               printf("Server was interrupted.\n");
+               running = false;
+               break;
+         }
+         if( false == running ) break;
+         sleep( error_wait);
+         if( error_wait < error_wait_max) error_wait = error_wait << 1;
          continue;
       }
+      error_wait = error_wait_min;
       if ( pthread_create(&childCore_processClient, NULL, ThreadCore_processClient, threadArgs) != 0 )
          AFERRPE("Pthread Process creation error");
 //      ThreadCore_processClient( &threadArgs);
@@ -257,7 +279,6 @@ int main(int argc, char *argv[])
    // create directories if it is not exists
    if( AFCommon::createDirectory( ENV.getTempDirectory().toUtf8().data(),  true) == false) return 1;
    if( AFCommon::createDirectory( ENV.getTasksStdOutDir().toUtf8().data(), true) == false) return 1;
-   if( AFCommon::createDirectory( ENV.getJobsLogsDir().toUtf8().data(),    true) == false) return 1;
    if( AFCommon::createDirectory( ENV.getUsersLogsDir().toUtf8().data(),   true) == false) return 1;
    if( AFCommon::createDirectory( ENV.getRendersLogsDir().toUtf8().data(), true) == false) return 1;
 
@@ -368,7 +389,7 @@ int main(int argc, char *argv[])
    AFINFO("afanasy::main: Joining writing files thread.\n");
    pthread_join( childCommon_writeFiles,    NULL);
 
-   AFCommon::CmdExecQueueQuit();
+   AFCommon::CleanUpJobQueueQuit();
    AFINFO("afanasy::main: Joining commands executing thread.\n");
    pthread_join( childCommon_cmdExecQueue,    NULL);
 

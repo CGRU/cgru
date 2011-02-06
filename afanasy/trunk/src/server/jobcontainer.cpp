@@ -64,12 +64,13 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       AFERROR("JobContainer::job_register: Can't allocate memory for new job.\n");
       return 0;
    }
-   job->construct();
+
    if( job->isConstructed() == false )
    {
       AFERROR("JobContainer::job_register: Job is not constructed.\n");
       return 0;
    }
+
    if( users == NULL )
    {
       AFERROR("JobContainer::job_register: Users container is not set.\n");
@@ -79,8 +80,8 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
    UserAf *user;
 
    {  // Register new user if job has a new user name.
-      AfContainerLock uLock( users,       AfContainer::WRITELOCK  );
-      if( monitoring) AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
+      AfContainerLock uLock( users, AfContainer::WRITELOCK  );
+      if( monitoring) AfContainerLock mLock( monitoring, AfContainer::WRITELOCK  );
 
       AFINFA("JobContainer::job_register: Checking job user '%s'\n", job->getUserName().toUtf8().data());
       user = users->addUser( job->getUserName(), job->getHostName(), monitoring);
@@ -91,7 +92,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
          return 0;
       }
       {  // Add job node to container.
-         AfContainerLock jLock( this,  AfContainer::WRITELOCK);
+         AfContainerLock jLock( this, AfContainer::WRITELOCK);
 
          if( add((af::Node*)job) == false )
          {
@@ -113,63 +114,63 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       }
    }
 
-   {  // initialize job ( create tasks output folder, execute "pre"commands if any)
-      AFINFO("JobContainer::job_register: initiaizing new job with user.\n");
-      if( job->initialize( user) == false)
-      {
-         AFERROR("JobContainer::job_register: Job initialization failed.\n");
-
-         user->unLock();
-         job->unLock();
-
-         if( monitoring )
-         {
-            AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
-
-            monitoring->addJobEvent( af::Msg::TMonitorJobsDel, job->getId(), user->getId());
-            monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
-         }
-
-         job->setZombie( NULL, NULL);
-
-         return 0;
-      }
-   }
-
-   {  // write job to database ( if it is not created from database)
-      if( job->fromDataBase() == false )
-      {
-         AFINFO("JobContainer::job_register: writing job to database.\n");
-         if( afDB == NULL )
-         {
-            AFERROR("JobContainer::job_register: Afanasy database is not set.\n");
-         }
-         else
-         {
-            if( afDB->DBOpen())
-            {
-               afDB->addJob( job);
-               afDB->DBClose();
-            }
-         }
-      }
-
-      AFINFO("JobContainer::job_register: unlocking user and job.\n");
-      user->unLock();
-      job->unLock();
+   // initialize job ( create tasks output folder, execute "pre"commands if any)
+   AFINFO("JobContainer::job_register: initiaizing new job with user.\n");
+   if( job->initialize( user) == false)
+   {
+      AFERROR("JobContainer::job_register: Job initialization failed.\n");
 
       if( monitoring )
       {
          AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
 
-         AFINFO("JobContainer::job_register: monitor unlock job and user events.\n");
-         monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, job->getId(), user->getId());
+         monitoring->addJobEvent( af::Msg::TMonitorJobsDel, job->getId(), user->getId());
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+      }
+
+      user->unLock();
+      job->unLock();
+
+      job->setZombie( NULL, NULL);
+
+      return 0;
+   }
+
+   // write job to database ( if it is not created from database)
+   if( job->fromDataBase() == false )
+   {
+      AFINFO("JobContainer::job_register: writing job to database.\n");
+      if( afDB == NULL )
+      {
+         AFERROR("JobContainer::job_register: Afanasy database is not set.\n");
+      }
+      else
+      {
+         if( afDB->DBOpen())
+         {
+            afDB->addJob( job);
+            afDB->DBClose();
+         }
       }
    }
 
-   af::printTime(); printf(" : Job registered: "); job->stdOut( false );
-   return job->getId();
+   if( monitoring )
+   {
+      AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
+
+      AFINFO("JobContainer::job_register: monitor unlock job and user events.\n");
+      monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, job->getId(), user->getId());
+      monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+   }
+
+   af::printTime(); printf(": Job registered: "); job->stdOut( false );
+   int newJobId = job->getId();
+
+   AFINFO("JobContainer::job_register: unlocking user and job.\n");
+   user->unLock();
+   job->unLock();
+
+   return newJobId;
 }
 
 void JobContainer::getWeight( af::MCJobsWeight & jobsWeight )

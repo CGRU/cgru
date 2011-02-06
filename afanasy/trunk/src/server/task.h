@@ -17,7 +17,7 @@ class Task
 {
 public:
    Task( const Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber);
-   ~Task();
+   virtual ~Task();
 
 public:
 

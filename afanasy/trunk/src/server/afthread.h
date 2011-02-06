@@ -39,7 +39,7 @@ class ThreadAf
 {
 public:
    ThreadAf( const ThreadPointers *ptrs);
-   ~ThreadAf();
+   virtual ~ThreadAf();
 
    virtual void run() = 0;
 

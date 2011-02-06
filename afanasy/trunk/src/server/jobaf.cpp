@@ -28,9 +28,9 @@ JobContainer *JobAf::jobs  = NULL;
 
 JobAf::JobAf( af::Msg * msg):
    afsql::DBJob(),
-   fromdatabase( false),
-   blocks( NULL)
+   fromdatabase( false)
 {
+   initializeValues();
    read( msg);
    progress = new afsql::DBJobProgress( this);
    if( progress == NULL)
@@ -38,33 +38,41 @@ JobAf::JobAf( af::Msg * msg):
       AFERROR("DBJob::DBJob: can't allocate memory for progresses.\n");
       return;
    }
-//   construct();
+   construct();
 }
 
 JobAf::JobAf( int Id):
    afsql::DBJob( Id),
-   fromdatabase( true),
-   blocks( NULL)
+   fromdatabase( true)
 {
-//   id = Id;
+   initializeValues();
+}
+
+void JobAf::initializeValues()
+{
+   blocks            = NULL;
+   constructed       = false;
+   initialized       = false;
+   deletion          = false;
+   logsWeight        = 0;
+   blackListsWeight  = 0;
 }
 
 bool JobAf::dbSelect( QSqlDatabase * db, const QString * where)
 {
 //printf("JobAf::dbSelect:\n");
    if( afsql::DBJob::dbSelect( db) == false) return false;
-//   construct();
    return construct();
 }
 
 bool JobAf::construct()
 {
 //printf("JobAf::construct:\n");
-   constructed          = false;
-   initialized          = false;
-   deletion             = false;
-   logsWeight           = 0;
-   blackListsWeight     = 0;
+   if( constructed )
+   {
+      AFERROR("JobAf::construct: Already constructed.\n");
+      return true;
+   }
 
    if( blocksnum < 1 )
    {
@@ -232,16 +240,17 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    }
    if(( time_started != 0) && ( time_done == 0 )) time_done = time( NULL);
    Node::setZombie();
-   // Rotate = -1: no rotate, but add time to name
-   AFCommon::saveLog( joblog, af::Environment::getJobsLogsDir(), name, -1);
 
-   // Remove tasks output directory:
-   AFCommon::QueueCmdExec( QString("/bin/rm -rf \"%1\"").arg( tasksoutputdir.toUtf8().data()));
+   // Rotate = -1: no rotate, but add time to name
+//   AFCommon::saveLog( joblog, af::Environment::getJobsLogsDir(), name, -1);
+
+   // Queue job cleanup:
+   AFCommon::QueueJobCleanUp( this);
 
    if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
+   af::printTime(); printf(": Deleting a job: "); stdOut( false);
    unLock();
-   af::printTime(); printf(" : Deleting a job: "); stdOut( false);
 }
 
 bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)

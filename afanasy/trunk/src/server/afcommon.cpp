@@ -20,13 +20,13 @@ FileQueue         * AFCommon::FileWriteQueue    = NULL;
 MsgQueue          * AFCommon::MsgDispatchQueue  = NULL;
 DBUpdateTaskQueue * AFCommon::DBUpTaskQueue     = NULL;
 DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
-CommandsQueue     * AFCommon::CmdExecQueue      = NULL;
+CleanUpQueue      * AFCommon::CleanUpJobQueue   = NULL;
 
 AFCommon::AFCommon()
 {
    MsgDispatchQueue = new MsgQueue(          "Sheduled sending messages queue.");
    FileWriteQueue   = new FileQueue(         "Sheduled writing files queue.");
-   CmdExecQueue     = new CommandsQueue(     "Sheduled commands executing queue.");
+   CleanUpJobQueue  = new CleanUpQueue(      "Sheduled jobs cleanup queue.");
    DBUpTaskQueue    = new DBUpdateTaskQueue( "Sheduled database update task queue.");
    DBUpdateQueue    = new DBActionQueue(     "Sheduled database update queue.");
 }
@@ -35,7 +35,7 @@ AFCommon::~AFCommon()
 {
    if( FileWriteQueue )   delete FileWriteQueue;
    if( MsgDispatchQueue ) delete MsgDispatchQueue;
-   if( CmdExecQueue )     delete CmdExecQueue;
+   if( CleanUpJobQueue )  delete CleanUpJobQueue;
    if( DBUpTaskQueue )    delete DBUpTaskQueue;
    if( DBUpdateQueue )    delete DBUpdateQueue;
 }
@@ -81,7 +81,7 @@ bool AFCommon::createDirectory( const char * name, bool verbose)
 
 void AFCommon::executeCmd( const QString & cmd)
 {
-   printf("Executing command:\n%s\n", cmd.toUtf8().data());
+   af::printTime(); printf(": Executing command:\n%s\n", cmd.toUtf8().data());
    if( system( cmd.toUtf8().data()) < 0)
    {
       AFERRPE("AFCommon::executeCmd: system: ");
@@ -116,7 +116,7 @@ bool AFCommon::writeFile( const char * data, const int length, const QString & f
    int fd = open( filename.toUtf8().data(), O_WRONLY | O_CREAT, 0777);
    if( fd == -1 )
    {
-      AFERRPA("AFCommon::writeFile - \"%s\".\n", filename.toUtf8().data());
+      AFERRPA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
       return false;
    }
    int bytes = 0;
@@ -125,7 +125,7 @@ bool AFCommon::writeFile( const char * data, const int length, const QString & f
       int written = write( fd, data+bytes, length-bytes);
       if( written == -1 )
       {
-         AFERRPA("AFCommon::writeFile - \"%s\".\n", filename.toUtf8().data());
+         AFERRPA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
          close( fd);
          return false;
       }
@@ -133,6 +133,6 @@ bool AFCommon::writeFile( const char * data, const int length, const QString & f
    }
    close( fd);
    chmod( filename.toUtf8().data(), 0777);
-   AFINFA("AFCommon::writeFile - \"%s\".\n", filename.toUtf8().data());
+   AFINFA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
    return true;
 }

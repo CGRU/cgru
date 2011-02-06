@@ -11,7 +11,7 @@
 #include "filequeue.h"
 #include "dbupdatetaskqueue.h"
 #include "dbactionqueue.h"
-#include "commandsqueue.h"
+#include "cleanupqueue.h"
 
 class AFCommon
 {
@@ -31,13 +31,13 @@ public:
 
    inline static void MsgDispatchQueueRun() { if( MsgDispatchQueue) MsgDispatchQueue->run(); }
    inline static void FileWriteQueueRun()   { if( FileWriteQueue)   FileWriteQueue->run();   }
-   inline static void CmdExecQueueRun()     { if( CmdExecQueue)     CmdExecQueue->run();     }
+   inline static void CleanUpJobQueueRun()  { if( CleanUpJobQueue)  CleanUpJobQueue->run();  }
    inline static void DBUpTaskQueueRun()    { if( DBUpTaskQueue)    DBUpTaskQueue->run();    }
    inline static void DBUpdateQueueRun()    { if( DBUpdateQueue)    DBUpdateQueue->run();    }
 
    inline static bool QueueMsgDispatch( MsgAf* msg)       { if( MsgDispatchQueue ) return MsgDispatchQueue->pushMsg( msg);     else return false;}
    inline static bool QueueFileWrite( FileData* filedata) { if( FileWriteQueue   ) return FileWriteQueue->pushFile( filedata); else return false;}
-   inline static bool QueueCmdExec( const QString & cmd)  { if( CmdExecQueue     ) return CmdExecQueue->pushCommand( cmd);     else return false;}
+   inline static bool QueueJobCleanUp( const JobAf * job) { if( CleanUpJobQueue  ) return CleanUpJobQueue->pushJob( job);      else return false;}
 
    inline static void QueueDBAddItem(    const afsql::DBItem * item) { if( DBUpdateQueue ) DBUpdateQueue->addItem(    item );}
    inline static void QueueDBDelItem(    const afsql::DBItem * item) { if( DBUpdateQueue ) DBUpdateQueue->delItem(    item );}
@@ -50,14 +50,14 @@ public:
 
    inline static void MsgDispatchQueueQuit() { if( MsgDispatchQueue) MsgDispatchQueue->quit(); }
    inline static void FileWriteQueueQuit()   { if( FileWriteQueue)   FileWriteQueue->quit();   }
-   inline static void CmdExecQueueQuit()     { if( CmdExecQueue)     CmdExecQueue->quit();     }
+   inline static void CleanUpJobQueueQuit()  { if( CleanUpJobQueue)  CleanUpJobQueue->quit();  }
    inline static void DBUpTaskQueueQuit()    { if( DBUpTaskQueue)    DBUpTaskQueue->quit();    }
    inline static void DBUpdateQueueQuit()    { if( DBUpdateQueue)    DBUpdateQueue->quit();    }
 
 private:
    static MsgQueue          * MsgDispatchQueue;
    static FileQueue         * FileWriteQueue;
-   static CommandsQueue     * CmdExecQueue;
+   static CleanUpQueue      * CleanUpJobQueue;
    static DBUpdateTaskQueue * DBUpTaskQueue;
    static DBActionQueue     * DBUpdateQueue;
 

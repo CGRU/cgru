@@ -8,7 +8,6 @@ namespace AFJOB
    const int MAXQUANTITY = 1000000;
 
    const char     TASKS_OUTPUTDIR[] = "tasksoutput";  ///< Tasks output directory, relative to AFSERVER::TEMP_DIRECTORY
-   const char     LOGS_DIRECTORY[]  = "jobs";         ///< Jobs logs store directory, relative to AFSERVER::TEMP_DIRECTORY
 
    const uint8_t  PROGRESS_BYTES  = 8;
 

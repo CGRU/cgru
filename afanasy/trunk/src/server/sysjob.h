@@ -26,7 +26,7 @@ class SysTask : public Task
 {
 public:
    SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, const Block * block, int taskNumber);
-   ~SysTask();
+   virtual ~SysTask();
 
    virtual void start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
 

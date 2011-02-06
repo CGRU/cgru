@@ -110,7 +110,6 @@ int     Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN
 int     Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
 
 QString        Environment::tasksstdoutdir = "";
-QString        Environment::jobslogsdir = "";
 QString        Environment::renderslogsdir = "";
 QString        Environment::userslogsdir = "";
 
@@ -586,7 +585,6 @@ bool Environment::init( bool solveServerAddress)
    PRINT("\n");
 #ifndef WINNT
    tasksstdoutdir = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
-   jobslogsdir    = tempdirectory + '/' +    AFJOB::LOGS_DIRECTORY;
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
    userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
 #endif
