@@ -21,12 +21,14 @@ MsgQueue          * AFCommon::MsgDispatchQueue  = NULL;
 DBUpdateTaskQueue * AFCommon::DBUpTaskQueue     = NULL;
 DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
 CleanUpQueue      * AFCommon::CleanUpJobQueue   = NULL;
+LogQueue          * AFCommon::OutputLogQueue    = NULL;
 
 AFCommon::AFCommon()
 {
    MsgDispatchQueue = new MsgQueue(          "Sheduled sending messages queue.");
    FileWriteQueue   = new FileQueue(         "Sheduled writing files queue.");
    CleanUpJobQueue  = new CleanUpQueue(      "Sheduled jobs cleanup queue.");
+   OutputLogQueue   = new LogQueue(          "Sheduled log output quere.");
    DBUpTaskQueue    = new DBUpdateTaskQueue( "Sheduled database update task queue.");
    DBUpdateQueue    = new DBActionQueue(     "Sheduled database update queue.");
 }
@@ -36,6 +38,7 @@ AFCommon::~AFCommon()
    if( FileWriteQueue )   delete FileWriteQueue;
    if( MsgDispatchQueue ) delete MsgDispatchQueue;
    if( CleanUpJobQueue )  delete CleanUpJobQueue;
+   if( OutputLogQueue )   delete OutputLogQueue;
    if( DBUpTaskQueue )    delete DBUpTaskQueue;
    if( DBUpdateQueue )    delete DBUpdateQueue;
 }

@@ -97,11 +97,18 @@ void* ThreadCommon_writeFiles(void* arg)
    AFCommon::FileWriteQueueRun();
    return NULL;
 }
-//########################### queued commands executing thread #############################
-void* ThreadCommon_cmdExecQueue(void* arg)
+//########################### queued job cleanup thread #############################
+void* ThreadCommon_CleanUpQueue(void* arg)
 {
-   AFINFA("Thread (id = %lu) to execute commands created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) to cleanup jobs created.\n", (long unsigned)pthread_self());
    AFCommon::CleanUpJobQueueRun();
+   return NULL;
+}
+//########################### queued output log thread #############################
+void* ThreadCommon_OutputLogQueue(void* arg)
+{
+   AFINFA("Thread (id = %lu) to output logs created.\n", (long unsigned)pthread_self());
+   AFCommon::OutputLogQueueRun();
    return NULL;
 }
 //########################### queued update tasks in database thread #############################
@@ -327,7 +334,8 @@ int main(int argc, char *argv[])
    pthread_t childCore_run;
    pthread_t childCommon_dispatchMessages;
    pthread_t childCommon_writeFiles;
-   pthread_t childCommon_cmdExecQueue;
+   pthread_t childCommon_CleanupQueue;
+   pthread_t childCommon_OutputLogQueue;
    pthread_t childCommon_dbTasksUpdate;
    pthread_t childCommon_dbUpdate;
 
@@ -343,9 +351,14 @@ int main(int argc, char *argv[])
       AFERRPE("afanasy::main: Common thread writeFiles creation error");
       return 1;
    }
-   if( pthread_create( &childCommon_cmdExecQueue, NULL, &ThreadCommon_cmdExecQueue, NULL) != 0)
+   if( pthread_create( &childCommon_CleanupQueue, NULL, &ThreadCommon_CleanUpQueue, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread commands executing creation error");
+      AFERRPE("afanasy::main: Common thread cleanup creation error");
+      return 1;
+   }
+   if( pthread_create( &childCommon_OutputLogQueue, NULL, &ThreadCommon_OutputLogQueue, NULL) != 0)
+   {
+      AFERRPE("afanasy::main: Common thread output logs creation error");
       return 1;
    }
    if( pthread_create( &childCommon_dbTasksUpdate, NULL, &ThreadCommon_dbTasksUpdate, NULL) != 0)
@@ -379,27 +392,31 @@ int main(int argc, char *argv[])
 
 
    AFINFO("afanasy::main: Joining run thread.\n");
-   pthread_join( childCore_run,            NULL);
+   pthread_join( childCore_run, NULL);
 
    AFCommon::MsgDispatchQueueQuit();
    AFINFO("afanasy::main: Joining dispatch messages thread.\n");
-   pthread_join( childCommon_dispatchMessages,    NULL);
+   pthread_join( childCommon_dispatchMessages, NULL);
 
    AFCommon::FileWriteQueueQuit();
    AFINFO("afanasy::main: Joining writing files thread.\n");
-   pthread_join( childCommon_writeFiles,    NULL);
+   pthread_join( childCommon_writeFiles, NULL);
 
    AFCommon::CleanUpJobQueueQuit();
-   AFINFO("afanasy::main: Joining commands executing thread.\n");
-   pthread_join( childCommon_cmdExecQueue,    NULL);
+   AFINFO("afanasy::main: Joining cleanup jobs thread.\n");
+   pthread_join( childCommon_CleanupQueue, NULL);
 
    AFCommon::DBUpTaskQueueQuit();
    AFINFO("afanasy::main: Joining update tasks in database thread.\n");
-   pthread_join( childCommon_dbTasksUpdate,    NULL);
+   pthread_join( childCommon_dbTasksUpdate, NULL);
 
    AFCommon::DBUpdateQueueQuit();
    AFINFO("afanasy::main: Joining update database thread.\n");
-   pthread_join( childCommon_dbUpdate,    NULL);
+   pthread_join( childCommon_dbUpdate, NULL);
+
+   AFCommon::OutputLogQueueQuit();
+   AFINFO("afanasy::main: Joining output logs thread.\n");
+   pthread_join( childCommon_OutputLogQueue, NULL);
 
 
    AFINFO("afanasy::main: Deleting core:\n");

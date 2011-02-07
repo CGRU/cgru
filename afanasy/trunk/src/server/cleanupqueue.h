@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QString>
-
 #include "afqueue.h"
 #include "afqueueitem.h"
 

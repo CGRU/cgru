@@ -9,7 +9,7 @@
 //
 //############## OUPUT INFO FORMATING, if AFOUTPUT only ##############################
 #ifdef AFOUTPUT
-#define AFINFA( msg, ...) {fprintf(stdout,"AFINFO: ");fprintf(stdout,msg,__VA_ARGS__);fflush( stderr);}
+#define AFINFA( msg, ...) {fprintf(stdout,"AFINFO: ");fprintf(stdout,msg,__VA_ARGS__);fflush( stdout);}
 #else
 #define AFINFA( msg, ...) {}
 #endif

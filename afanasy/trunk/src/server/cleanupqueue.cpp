@@ -2,7 +2,6 @@
 
 #include <dirent.h>
 
-#include "afcommon.h"
 #include "jobaf.h"
 
 #define AFOUTPUT
