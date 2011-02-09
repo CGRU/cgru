@@ -21,12 +21,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListJobs::SortType       = CtrlSortFilter::TTIMECREATION;
-bool    ListJobs::SortAscending  = false;
-int     ListJobs::FilterType     = CtrlSortFilter::TUSERNAME;
-bool    ListJobs::FilterInclude  = true;
-bool    ListJobs::FilterMatch    = false;
-QString ListJobs::FilterString   = "";
+int     ListJobs::SortType;
+bool    ListJobs::SortAscending;
+int     ListJobs::FilterType;
+bool    ListJobs::FilterInclude;
+bool    ListJobs::FilterMatch;
+QString ListJobs::FilterString;
 
 ListJobs::ListJobs( QWidget* parent):
    ListNodes( parent)
@@ -35,30 +35,42 @@ ListJobs::ListJobs( QWidget* parent):
    eventsShowHide << af::Msg::TMonitorJobsChanged;
    eventsOnOff    << af::Msg::TMonitorJobsDel;
 
+   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
+   ctrl->addSortType(   CtrlSortFilter::TNONE);
+   ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
+   ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
+   ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
+   ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
+   ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
+   ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+   ctrl->addSortType(   CtrlSortFilter::TNAME);
+   ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
+   ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
+   ctrl->addFilterType( CtrlSortFilter::TNONE);
+   ctrl->addFilterType( CtrlSortFilter::TNAME);
+   ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
+   ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
+   initSortFilterCtrl();
+
    if( af::Environment::VISOR())
    {
-      ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-      ctrl->addSortType(   CtrlSortFilter::TNONE);
-      ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
-      ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
-      ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
-      ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
-      ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
-      ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
-      ctrl->addSortType(   CtrlSortFilter::TNAME);
-      ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-      ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
-      ctrl->addFilterType( CtrlSortFilter::TNONE);
-      ctrl->addFilterType( CtrlSortFilter::TNAME);
-      ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
-      ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
-      initSortFilterCtrl();
-
       Watch::setUid( 0);
+
+      SortType       = CtrlSortFilter::TTIMECREATION;
+      SortAscending  = false;
+      FilterType     = CtrlSortFilter::TUSERNAME;
+      FilterInclude  = true;
+      FilterMatch    = false;
    }
    else
    {
       Watch::setUid( Watch::getUid());
+
+      SortType       = CtrlSortFilter::TNONE;
+      SortAscending  = false;
+      FilterType     = CtrlSortFilter::TNAME;
+      FilterInclude  = true;
+      FilterMatch    = false;
    }
 
    init();
