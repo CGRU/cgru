@@ -70,7 +70,7 @@ void DBJob::getIds( std::list<int32_t> & uids, QSqlDatabase * db)
       return;
    }
    QSqlQuery q( *db);
-   q.exec(QString("SELECT id FROM %1").arg( TableName));
+   q.exec(QString("SELECT id FROM %1 ORDER BY time_creation").arg( TableName));
    while (q.next()) uids.push_back( q.value(0).toUInt());
 printf("DBJob::getIds: %u jobs founded.\n", unsigned(uids.size()));
 }
