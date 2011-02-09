@@ -2,6 +2,7 @@
 
 #include <dirent.h>
 
+#include "afcommon.h"
 #include "jobaf.h"
 
 #define AFOUTPUT
@@ -20,7 +21,9 @@ void CleanUpData::doCleanUp()
    DIR * dir = opendir( tasksoutdir.c_str());
    if( dir == NULL)
    {
-      AFERRPA("CleanUpData::doCleanUp: Can't open folder\n%s\n", tasksoutdir.c_str())
+      std::string errstr = "CleanUpData::doCleanUp: Can't open folder\n";
+      errstr += tasksoutdir;
+      AFCommon::QueueLogErrno( errstr);
       return;
    }
 
@@ -32,7 +35,9 @@ void CleanUpData::doCleanUp()
       sprintf( filename_buffer, "%s/%s", tasksoutdir.c_str(), de->d_name);
       if( unlink( filename_buffer) != 0)
       {
-         AFERRPA("CleanUpData::doCleanUp: Can't delete file\n%s\n", filename_buffer)
+         std::string errstr = "CleanUpData::doCleanUp: Can't delete file\n";
+         errstr += filename_buffer;
+         AFCommon::QueueLogErrno( errstr);
       }
    }
 
@@ -41,7 +46,9 @@ void CleanUpData::doCleanUp()
    // Removing folder
    if( rmdir(tasksoutdir.c_str()) != 0)
    {
-      AFERRPA("CleanUpData::doCleanUp: Can't delete folder\n%s\n", tasksoutdir.c_str())
+      std::string errstr = "CleanUpData::doCleanUp: Can't delete folder\n";
+      errstr += tasksoutdir;
+      AFCommon::QueueLogErrno( errstr);
    }
 }
 

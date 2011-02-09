@@ -799,6 +799,11 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
       if(( old_state & AFJOB::STATE_DONE_MASK) == false )
       {
          time_done = currentTime;
+         if( time_started == 0 )
+         {
+            time_started = time_done;
+            log("Started.");
+         }
          log("Done.");
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_done);

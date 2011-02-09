@@ -113,13 +113,15 @@ bool AFCommon::writeFile( const char * data, const int length, const QString & f
 {
    if( filename.isEmpty())
    {
-      AFERROR("AFCommon::writeFile: File name is empty.\n");
+      QueueLogError("AFCommon::writeFile: File name is empty.");
       return false;
    }
    int fd = open( filename.toUtf8().data(), O_WRONLY | O_CREAT, 0777);
    if( fd == -1 )
    {
-      AFERRPA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
+      std::string errstr = "AFCommon::writeFile: ";
+      errstr += filename.toUtf8().data();
+      QueueLogErrno( errstr);
       return false;
    }
    int bytes = 0;
@@ -128,7 +130,9 @@ bool AFCommon::writeFile( const char * data, const int length, const QString & f
       int written = write( fd, data+bytes, length-bytes);
       if( written == -1 )
       {
-         AFERRPA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
+         std::string errstr = "AFCommon::writeFile: ";
+         errstr += filename.toUtf8().data();
+         QueueLogErrno( errstr);
          close( fd);
          return false;
       }

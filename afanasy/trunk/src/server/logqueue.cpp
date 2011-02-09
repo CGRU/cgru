@@ -1,5 +1,6 @@
 #include "logqueue.h"
 
+#include <errno.h>
 #include <iostream>
 
 #include "../libafanasy/name_af.h"
@@ -8,11 +9,25 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-LogData::LogData( const std::string & str)
+LogData::LogData( const std::string & str, int flags)
 {
-   text = af::time2str();
+   switch(flags)
+   {
+   case Error:
+   case Errno:
+      text += "ERROR ";
+   }
+
+   text += af::time2str();
    text += ": ";
    text += str;
+
+   switch(flags)
+   {
+   case Errno:
+      text += "\n";
+      text += strerror( errno);
+   }
 }
 
 void LogData::output()

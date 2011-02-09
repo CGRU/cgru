@@ -54,7 +54,10 @@ void Task::updateState( const af::MCTaskUp & taskup, RenderContainer * renders, 
 {
    if( run == NULL)
    {
-      AFERRAR("Task::updatestate: Task is not running: %s[%d][%d]\n", block->job->getName().toUtf8().data(), taskup.getNumBlock(), taskup.getNumTask());
+      std::ostringstream stream;
+      stream << "Task::updatestate: Task is not running: " << block->job->getName().toUtf8().data();
+      stream << "[" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "]";
+      AFCommon::QueueLogError( stream.str());
       if(( taskup.getStatus() == af::TaskExec::UPPercent  ) ||
          ( taskup.getStatus() == af::TaskExec::UPWarning ))
             RenderAf::closeLostTask( taskup);

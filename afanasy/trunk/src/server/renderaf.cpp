@@ -579,13 +579,17 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
    RenderAf * render = rIt.getRender( taskup.getClientId());
    if( render == NULL)
    {
-      AFERRAR("RenderAf::closeLostTask: Render with id=%d does not exists.\n", taskup.getClientId());
+      std::ostringstream stream;
+      stream << "RenderAf::closeLostTask: Render with id=" << taskup.getClientId() << " does not exists.";
+      AFCommon::QueueLogError( stream.str());
       return;
    }
    if( render->isOffline()) return;
 
-printf("RenderAf::closeLostTask: '%s': [%d][%d][%d](%d)\n", render->getName().toUtf8().data(),
-taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumBlock());
+   std::ostringstream stream;
+   stream << "RenderAf::closeLostTask: '" << render->getName().toUtf8().data() << "': ";
+   stream << "[" << taskup.getNumJob() << "][" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "](" << taskup.getNumBlock() << ")";
+   AFCommon::QueueLogError( stream.str());
 
    af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
    MsgAf* msg = new MsgAf( af::Msg::TRenderCloseTask, &taskpos);
