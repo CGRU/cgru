@@ -28,7 +28,7 @@ public:
    inline const std::list<int32_t> * getJobsUsersIds() const { return &jobsUsersIds; }
    inline const std::list<int32_t> * getJobsIds()      const { return &jobsIds;      }
 
-   void stdOut( bool full = false) const;       ///< Print Monitor general information.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    static const int EventsCount;
    static const int EventsShift;

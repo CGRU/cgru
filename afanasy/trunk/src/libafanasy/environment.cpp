@@ -26,9 +26,9 @@
 
 using namespace af;
 
+std::string Environment::timeformat =                  AFGENERAL::TIME_FORMAT;
 int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORITY;
 int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
-QString Environment::timeformat =                      AFGENERAL::TIME_FORMAT;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
 
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
@@ -304,6 +304,15 @@ bool Environment::getVar( const QDomDocument & doc, QString & value, QString nam
 {
    if( getXMLElement( doc, name, value) == false) return false;
    PRINT("\t%s = '%s'\n", name.toUtf8().data(), value.toUtf8().data());
+   return true;
+}
+
+bool Environment::getVar( const QDomDocument & doc, std::string & value, const char * name)
+{
+   QString qstr;
+   if( getXMLElement( doc, name, qstr) == false) return false;
+   value = qstr.toUtf8().data();
+   PRINT("\t%s = '%s'\n", name, value.c_str());
    return true;
 }
 

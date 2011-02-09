@@ -1,5 +1,9 @@
 #pragma once
 
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <stdlib.h>
 #include <vector>
 
 #ifndef WINNT
@@ -22,11 +26,13 @@ public:
 
    void write( Msg * msg );
 
-   virtual void stdOut( bool full = false ) const = 0;
+   virtual void stdOut( bool full = false ) const;
+   virtual const std::string generateInfoString( bool full = false) const;
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 protected:
    void read( Msg * msg );
-   virtual void readwrite( Msg * msg ) = 0;
+   virtual void readwrite( Msg * msg );
 
    static void rw_data(        char *          data,     Msg * msg, int size);
    static void rw_bool(        bool        &boolean,     Msg * msg);

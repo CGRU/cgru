@@ -152,27 +152,26 @@ void TaskExec::readwrite( Msg * msg)
    else listen_addresses->write( msg);
 }
 
-void TaskExec::stdOut( bool full) const
+void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf( "%s[%s][%s](%d) - %s: %d",
-      jobname.toUtf8().data(),
-      blockname.toUtf8().data(),
-      name.toUtf8().data(),
-      number,
-      username.toUtf8().data(),
-      capacity
-   );
-   if( capcoeff) printf("x%d ", capcoeff);
+   stream << jobname.toUtf8().data();
+   stream << "[" << blockname.toUtf8().data() << "]";
+   stream << "[" << name.toUtf8().data() << "]";
+   stream << "(" << number << ") - ";
+   stream << username.toUtf8().data() << ": ";
+   stream << capacity;
+   if( capcoeff) stream << "x" << capcoeff << " ";
    if( listen_addresses )
       if( listen_addresses->getAddressesNum())
          listen_addresses->stdOut( false);
-   printf(":\n");
 
    if(full)
    {
-      if( false == wdir.isEmpty()) printf("   Working directory = \"%s\".\n", wdir.toUtf8().data());
-      if( false == env.isEmpty()) printf("   Environment = \"%s\".\n", env.toUtf8().data());
-      printf( "%s\n", command.toUtf8().data());
+      stream << std::endl;
+      if( false == wdir.isEmpty()) stream << "   Working directory = \"" << wdir.toUtf8().data() << "\".\n";
+      if( false ==  env.isEmpty()) stream << "   Environment = \"" << env.toUtf8().data() << "\".\n";
+      stream << command.toUtf8().data();
+      stream << std::endl;
    }
 }
 

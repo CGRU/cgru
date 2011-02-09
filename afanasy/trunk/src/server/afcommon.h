@@ -40,7 +40,7 @@ public:
    inline static bool QueueMsgDispatch( MsgAf* msg)       { if( MsgDispatchQueue ) return MsgDispatchQueue->pushMsg( msg);     else return false;}
    inline static bool QueueFileWrite( FileData* filedata) { if( FileWriteQueue   ) return FileWriteQueue->pushFile( filedata); else return false;}
    inline static bool QueueJobCleanUp( const JobAf * job) { if( CleanUpJobQueue  ) return CleanUpJobQueue->pushJob( job);      else return false;}
-   inline static bool QueueLog( const QString & log)      { if( OutputLogQueue   ) return OutputLogQueue->pushLog( log);       else return false;}
+   inline static bool QueueLog( const std::string & log)  { if( OutputLogQueue   ) return OutputLogQueue->pushLog( log);       else return false;}
 
    inline static void QueueDBAddItem(    const afsql::DBItem * item) { if( DBUpdateQueue ) DBUpdateQueue->addItem(    item );}
    inline static void QueueDBDelItem(    const afsql::DBItem * item) { if( DBUpdateQueue ) DBUpdateQueue->delItem(    item );}

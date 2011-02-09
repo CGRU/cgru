@@ -8,7 +8,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-FileQueue::FileQueue( const QString & QueueName):
+FileQueue::FileQueue( const std::string & QueueName):
    AfQueue( QueueName)
 {
 }

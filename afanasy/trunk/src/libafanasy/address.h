@@ -41,14 +41,11 @@ public:
    void setIP( const Address * other);
 
 
-   const QString getIPString() const;
-   const QString getPortString() const;
-   const QString getAddressString() const;
-
-/// Print address info (port, IP).
-   void printIP() const;                                          ///< Print IP address.
-
-   void stdOut( bool full = false ) const;
+   void generateIPStream( std::ostringstream & stream) const;
+   const std::string generateIPString() const;
+   void generatePortStream( std::ostringstream & stream) const;
+   const std::string generatePortString() const;
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
 

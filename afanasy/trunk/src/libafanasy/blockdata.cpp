@@ -552,8 +552,12 @@ int BlockData::calcWeight() const
    return weight;
 }
 
-void BlockData::stdOut( bool full) const
+void BlockData::generateInfoStream( std::ostringstream & stream, bool full) const
 {
+   stream << "Block[" << name.toUtf8().data() << "]";
+   stream << " (" << service.toUtf8().data() << "-" << parser.toUtf8().data() << "[" << parsercoeff << "] )";
+   stream << " " << tasksnum << " tasks.\n";
+/*
    printf("BLOCK = \"%s\" ( %s-%s[%d] ), %d tasks.\n",
       name.toUtf8().data(), service.toUtf8().data(), parser.toUtf8().data(), parsercoeff, tasksnum);
 
@@ -592,6 +596,42 @@ void BlockData::stdOut( bool full) const
       }
    }
    printf("Memory: %d bytes\n", calcWeight());
+   */
+                                      stream << "Command            = \"" << command.toUtf8().data()                    << "\"\n";
+                                      stream << "Working Directory  = \"" << wdir.toUtf8().data()                       << "\"\n";
+   if( !             files.isEmpty()) stream << "Files              = \"" << files.toUtf8().data()                      << "\"\n";
+   if( !        dependmask.isEmpty()) stream << "Depend Mask        = \"" << dependmask.pattern().toUtf8().data()       << "\"\n";
+   if( !   tasksdependmask.isEmpty()) stream << "Tasks Depend Mask  = \"" << tasksdependmask.pattern().toUtf8().data()  << "\"\n";
+   if( !         hostsmask.isEmpty()) stream << "Hosts Mask         = \"" << hostsmask.pattern().toUtf8().data()        << "\"\n";
+   if( ! hostsmask_exclude.isEmpty()) stream << "Hosts Mask Exclude = \"" << hostsmask_exclude.pattern().toUtf8().data()<< "\"\n";
+   if( !       environment.isEmpty()) stream << "Environment        = \"" << environment.toUtf8().data()                << "\"\n";
+   if( !           cmd_pre.isEmpty()) stream << "Pre Command        = \"" << cmd_pre.toUtf8().data()                    << "\"\n";
+   if( !          cmd_post.isEmpty()) stream << "Post Command       = \"" << cmd_post.toUtf8().data()                   << "\"\n";
+   if( !        customdata.isEmpty()) stream << "Custom Data        = \"" << customdata.toUtf8().data()                 << "\"\n";
+   if( !   need_properties.isEmpty()) stream << "Need Properties    = \"" << need_properties.pattern().toUtf8().data()  << "\"\n";
+   if(     need_power               ) stream << "Need Power         =  "  << need_power                                 <<   "\n";
+   if(     need_memory              ) stream << "Need Memory        =  "  << need_memory                                <<   "\n";
+   if(     need_hdd                 ) stream << "Need HDD           =  "  << need_hdd                                   <<   "\n";
+
+   if( isNumeric())
+      stream << "numeric: start = " << frame_first << ", end = " << frame_last << ", perTask = " << frame_pertask << ", increment = " << frame_inc << ".\n";
+   else if( tasksdata == NULL ) return;
+   // Not numeric block not filled with tasks will exit here
+
+   if( full )
+   {
+      for( int t = 0; t < tasksnum; t++)
+      {
+         stream << "#" << t << ":";
+         TaskExec * task = genTask(t);
+         stream << " [" << task->getName().toUtf8().data() << "] ";
+         stream << "'" << task->getCommand().toUtf8().data() << "'";
+         if( task->hasFiles()) stream << " (" << task->getFiles().toUtf8().data() << ")";
+         delete task;
+         stream << std::endl;
+      }
+   }
+   stream << "Memory: " << calcWeight() << " bytes.";
 }
 
 
@@ -771,26 +811,38 @@ void BlockData::setProgress( uint8_t *array, int task, bool value)
 //printf("\n");
 }
 
-void BlockData::stdOutFlags() const
+void BlockData::stdOutProgress() const
+{
+   std::cout << generateProgressString() << std::endl;
+}
+
+const std::string BlockData::generateProgressString() const
+{
+   std::ostringstream stream;
+   generateProgressStream( stream);
+   return stream.str();
+}
+
+void BlockData::generateProgressStream( std::ostringstream & stream) const
 {
    for( int i = 0; i < AFJOB::PROGRESS_BYTES; i++)
    {
       uint8_t flags = 1;
       for( int b = 0; b < 8; b++)
       {
-         if( p_bar_done[i] & flags) printf("1"); else printf("0");
+         if( p_bar_done[i] & flags) stream << "1"; else stream << "0";
          flags <<= 1;
       }
    }
-   printf("\n");
+   stream << std::endl;
    for( int i = 0; i < AFJOB::PROGRESS_BYTES; i++)
    {
       uint8_t flags = 1;
       for( int b = 0; b < 8; b++)
       {
-         if( p_bar_running[i] & flags) printf("1"); else printf("0");
+         if( p_bar_running[i] & flags) stream << "1"; else stream << "0";
          flags <<= 1;
       }
    }
-   printf("\n");
+   stream << std::endl;
 }

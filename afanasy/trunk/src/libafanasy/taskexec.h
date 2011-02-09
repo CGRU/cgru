@@ -51,7 +51,7 @@ public:
    TaskExec( Msg * msg); ///< Read task from message.
    ~TaskExec();
 
-   void stdOut( bool full = false) const;       ///< Print main task properties.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    inline const QString& getName()        const { return name;       }///< Get task name.
    inline const QString& getServiceType() const { return servicetype;}///< Get task parser type.

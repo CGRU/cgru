@@ -15,6 +15,7 @@ public:
 
    bool isValid() const;
 
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
    void stdOut( bool full = false ) const;
 
    bool setMask( const QString & string);

@@ -18,7 +18,7 @@ class AfQueueItem;
 class AfQueue
 {
 public:
-   AfQueue( const QString & QueueName);    ///< Constructor initialize mutex and set \c initialized variable to \c true
+   AfQueue( const std::string & QueueName);    ///< Constructor initialize mutex and set \c initialized variable to \c true
    virtual ~AfQueue();   ///< Desctuctor deletes all existing items in queue
 
    inline bool isInitialized(){ return initialized;}  ///< Return \c true if queue successfully initialized.
@@ -39,7 +39,7 @@ protected:
    virtual void processItem( AfQueueItem* item) const;
 
 private:
-   QString name;
+   std::string name;
 
 #ifdef MACOSX
    QMutex      q_mutex;      ///< Mutex for \c push() and \c pop() operations.

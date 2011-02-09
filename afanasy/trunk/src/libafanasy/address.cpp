@@ -169,57 +169,58 @@ void Address::setQAddress( QHostAddress & qhostaddress) const
    }
 }
 
-const QString Address::getIPString() const
+void Address::generateIPStream( std::ostringstream & stream) const
 {
-   QString value;
    switch( family)
    {
       case IPv4:
-         value = QString("%1.%2.%3.%4")
-                 .arg( uint8_t(addr[0]))
-                 .arg( uint8_t(addr[1]))
-                 .arg( uint8_t(addr[2]))
-                 .arg( uint8_t(addr[3]));
+         stream << int( addr[0]) << "." << int( addr[1]) << "." << int( addr[2]) << "." << int( addr[3]);
          break;
       case IPv6:
          for( int i = 0; i < 8; i++)
          {
-            static const QChar zero('0');
-            if( i != 0 ) value += ':';
-            value += QString("%1%2")
-                     .arg( uint8_t(addr[2*i  ]), 2, 16, zero)
-                     .arg( uint8_t(addr[2*i+1]), 2, 16, zero);
+            if( i != 0 ) stream << ':';
+            char buffer[8];
+            sprintf( buffer, "%02x", uint8_t(addr[2*i  ]));
+            stream << buffer;
+            sprintf( buffer, "%02x", uint8_t(addr[2*i+1]));
+            stream << buffer;
          }
          break;
       default:
-         value = "Unknown address family";
+         stream << "Unknown address family";
          break;
    }
-   return value;
 }
 
-const QString Address::getPortString() const
+const std::string Address::generateIPString() const
 {
-   return QString::number( port);
+   std::ostringstream stream;
+   generateIPStream( stream);
+   return stream.str();
 }
 
-const QString Address::getAddressString() const
+void Address::generatePortStream( std::ostringstream & stream) const
 {
-   return QString("%1:%2").arg( getIPString(), getPortString());
+   stream << port;
 }
 
-void Address::printIP() const
+const std::string Address::generatePortString() const
 {
-   printf("%s", getIPString().toUtf8().data());
+   std::ostringstream stream;
+   generatePortStream( stream);
+   return stream.str();
+}
+
+void Address::generateInfoStream( std::ostringstream & stream, bool full) const
+{
+   generateIPStream( stream);
+   stream << ":";
+   generatePortStream( stream);
 }
 
 int Address::calcWeight() const
 {
    int weight = sizeof( Address);
    return weight;
-}
-
-void Address::stdOut( bool full ) const
-{
-   printf("%s", getAddressString().toUtf8().data());
 }

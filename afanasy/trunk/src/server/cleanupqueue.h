@@ -11,13 +11,13 @@ public:
    CleanUpData( const JobAf * job);
    void doCleanUp();
 private:
-   char tasksoutdir[512];
+   std::string tasksoutdir;
 };
 
 class CleanUpQueue : public AfQueue
 {
 public:
-   CleanUpQueue( const QString & QueueName);
+   CleanUpQueue( const std::string & QueueName);
    virtual ~CleanUpQueue();
 
 /// Push queries to queue back.

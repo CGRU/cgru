@@ -13,10 +13,10 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-DBActionQueue::DBActionQueue( const QString & QueueName):
+DBActionQueue::DBActionQueue( const std::string & QueueName):
    AfQueue( QueueName)
 {
-   db = afsql::newDatabase( QueueName);
+   db = afsql::newDatabase( QueueName.c_str());
    db->open();
 }
 

@@ -15,7 +15,7 @@ public:
    virtual ~TaskData();
 
    int calcWeight() const;                         ///< Calculate and return memory size.
-   void stdOut( bool full) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    inline const QString& getName()        const { return name;       }
    inline const QString& getCommand()     const { return command;    }

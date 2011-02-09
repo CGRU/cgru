@@ -13,7 +13,7 @@ public:
 
    virtual ~TaskProgress();
 
-   void stdOut( bool full = false ) const;
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const; ///< Generate information string.
 
    virtual int calcWeight() const;
 

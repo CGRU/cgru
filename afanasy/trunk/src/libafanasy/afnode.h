@@ -80,7 +80,7 @@ protected:
    mutable bool locked;    ///< Lock state.
 
 protected:
-   void readwrite( Msg * msg);   ///< Read or write node attributes in message
+   virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
 
 private:
 

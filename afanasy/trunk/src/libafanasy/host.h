@@ -18,7 +18,7 @@ public:
    void copy(  const Host & other);
    void merge( const Host & other);
 
-   void stdOut( bool full = false ) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    inline int getServicesNum()        const { return servicesnum;       }
    inline int getServiceCount( int n) const { return servicescounts[n]; }
@@ -72,7 +72,7 @@ public:
    QString label;
    QString tooltip;
 
-   void stdOut( bool full = false) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    void readwrite( Msg * msg); ///< Read or write Host Resources in message.
 };
@@ -110,7 +110,7 @@ public:
    int32_t net_recv_kbsec;
    int32_t net_send_kbsec;
 
-   void stdOut( bool full = false) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    void copy( const HostRes & other);
 

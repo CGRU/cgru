@@ -201,22 +201,24 @@ const QString Render::getResources() const
    return str;
 }
 
-void Render::stdOut( bool full) const
+void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("#%d:%d %s@%s :: ", id, priority, name.toUtf8().data(), username.toUtf8().data());
-   if( address == NULL) printf("address == NULL");
-   else address->stdOut();
-   printf(" - %d bytes.\n", calcWeight());
-   printf("   Version: %s rev%d\n", version.toUtf8().data(), revision);
+   stream << "#" << id << ":" << int(priority) << " " << name.toUtf8().data() << "@" << username.toUtf8().data() << " :: ";
+   if( address == NULL) stream << "address == NULL";
+   else address->generateInfoStream( stream ,full);
+   stream << " - " << calcWeight() << " bytes.";
+   stream << std::endl;
+   stream << "   Version: " << version.toUtf8().data() << " rev" << revision;
 
    if( full == false ) return;
-   host.stdOut( full);
-   hres.stdOut( full);
+   stream << std::endl;
+   host.generateInfoStream( stream ,full);
+   hres.generateInfoStream( stream ,full);
 
-   printf("   Ready = %s\n", isReady() ? "TRUE" : "FALSE");
-   printf("   Busy  = %s\n", isBusy()  ? "true" : "false");
-   printf("   NIMBY = %s\n", isNIMBY() ? "true" : "false");
-   printf("   Nimby = %s\n", isNimby() ? "true" : "false");
-   if( time_launch   ) printf("   Launched at   = %s\n", time2Qstr( time_launch   ).toUtf8().data());
-   if( time_register ) printf("   Registered at = %s\n", time2Qstr( time_register ).toUtf8().data());
+   stream << "\n   Ready = " << ( isReady() ? "TRUE" : "FALSE" );
+   stream << "\n   Busy  = " << ( isBusy()  ? "true" : "false" );
+   stream << "\n   NIMBY = " << ( isNIMBY() ? "true" : "false" );
+   stream << "\n   Nimby = " << ( isNimby() ? "true" : "false" );
+   if( time_launch   ) stream << "\n   Launched at   = " << time2str( time_launch   );
+   if( time_register ) stream << "\n   Registered at = " << time2str( time_register );
 }

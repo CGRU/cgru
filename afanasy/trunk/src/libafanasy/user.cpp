@@ -104,40 +104,32 @@ int User::calcWeight() const
    return weight;
 }
 
-void User::stdOut( bool full) const
+void User::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      printf("User id=%d:\n", id);
-      printf("Name = %s:\n", name.toUtf8().data());
-      printf("Jobs = %d / active jobs = %d\n", numjobs, numrunningjobs);
-      printf("Maximum Running Tasks Number = \"%d\"\n", maxrunningtasks);
-      printf("Running Tasks Number = \"%d\"\n", runningtasksnumber);
-      if( hasHostsMask()) printf("Hosts Mask = \"%s\"\n", hostsmask.pattern().toUtf8().data());
-      if( hasHostsMaskExclude()) printf("Exclude Hosts Mask = \"%s\"\n", hostsmask_exclude.pattern().toUtf8().data());
-      printf("Registration time = %s\n", time2Qstr( time_register).toUtf8().data());
-      printf("Online time = %s\n", time2Qstr( time_online).toUtf8().data());
-      printf("Host = %s\n", hostname.toUtf8().data());
-      printf("Priority = %d\n", priority);
-      if( isPermanent()) printf("status = PERMANENT\n"); else printf("status = temporary\n");
-      printf("Weight = %d bytes.\n", calcWeight());
+      stream << "User id=" << id << ", name = \"" << name.toUtf8().data() << "\":";
+      stream << "\n\tJobs = " << numjobs << " / active jobs = " << numrunningjobs;
+      stream << "\n\tMaximum Running Tasks Number = " << maxrunningtasks;
+      stream << "\n\tRunning Tasks Number = " << runningtasksnumber;
+      if( hasHostsMask())        stream << "\n\tHosts Mask = \"" << hostsmask.pattern().toUtf8().data() << "\"";
+      if( hasHostsMaskExclude()) stream << "\n\tExclude Hosts Mask = \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"\n";
+      stream << "\n\tRegistration time = " << time2str( time_register);
+      stream << "\n\tOnline time = " << time2str( time_online);
+      stream << "\n\tHost = " << hostname.toUtf8().data();
+      stream << "\n\tPriority = " << int(priority);
+      if( isPermanent()) stream << "\n\tstatus = PERMANENT"; else stream << "\n\tstatus = temporary";
+      stream << "\n\tWeight = " << calcWeight() << " bytes.";
    }
    else
    {
-      printf("#%d:%d %s j%d/%d h%d/%d \"%s\"/\"%s\" %s %s %s - %d bytes.\n",
-         id,
-         priority,
-         name.toUtf8().data(),
-         numjobs,
-         numrunningjobs,
-         maxrunningtasks,
-         runningtasksnumber,
-         hostsmask.pattern().toUtf8().data(),
-         hostsmask_exclude.pattern().toUtf8().data(),
-         time2Qstr( time_online).toUtf8().data(),
-         hostname.toUtf8().data(),
-         (isPermanent() == 1 ? "P" : "T"),
-         calcWeight()
-      );
+      stream << "#" << id << ":" << int(priority)
+            << " " << name.toUtf8().data()
+            << " j" << numjobs << "/" << numrunningjobs
+            << " r" << runningtasksnumber << "/" << maxrunningtasks
+            << " " << time2str( time_online)
+            << " " <<  hostname.toUtf8().data()
+            << " " << (isPermanent() == 1 ? "P" : "T")
+            << " - " << calcWeight() << " bytes.";
    }
 }

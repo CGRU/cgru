@@ -21,6 +21,29 @@ void Af::read( Msg * msg )
    readwrite( msg);
 }
 
+void Af::readwrite( Msg * msg )
+{
+   AFERROR("Af::readwrite: Not implemented.\n")
+}
+
+void Af::generateInfoStream( std::ostringstream & stream, bool full) const
+{
+   stream << "\nAf::generateInfoStream\n";
+   AFERROR("Af::generateInfoStream: Not implemented.\n")
+}
+
+const std::string Af::generateInfoString( bool full) const
+{
+   std::ostringstream stream;
+   generateInfoStream( stream, full);
+   return stream.str();
+}
+
+void Af::stdOut( bool full) const
+{
+   std::cout << generateInfoString( full) << std::endl;
+}
+
 void Af::rw_data( char* data, Msg * msg, int size)
 {
    char * buffer = msg->writtenBuffer( size);

@@ -39,14 +39,20 @@ mkdir $tmpdir
 cd ..
 
 JobsPack=10
-Deletion=1
 Users=5
+PausePeriod=36
+PauseTime=12
+Deletion=12
+DeletionPausePeriod=9
+DeletionPauseTime=11
 counter=0
 usr=$Users
+pp=$PausePeriod
 del=$Deletion
+del_period=$DeletionPausePeriod
 while [ 1 ]; do
    for(( jp=0; jp<$JobsPack; jp++)); do
-      output="Job = $counter, user = $usr, deletion = $del"
+      output="Job = $counter, user = $usr, pause = $pp, deletion = $del, period = $del_period"
       echo $output
       jobname="job_$counter"
       username="user_$usr"
@@ -66,6 +72,18 @@ while [ 1 ]; do
       echo "Deleting Jobs."
       $AF_ROOT/bin/afcmd jdel ".*"
       del=$Deletion
+      let del_period=$del_period-1
+      if [ $del_period == 0 ]; then
+         echo "Deletion pause..."
+         sleep $DeletionPauseTime
+         del_period=$DeletionPausePeriod
+      fi
+   fi
+   let pp=$pp-1
+   if [ $pp == 0 ]; then
+      echo "Pause..."
+      pp=$PausePeriod
+      sleep $PauseTime
    fi
    sleep 1
 done

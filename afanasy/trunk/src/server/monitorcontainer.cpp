@@ -7,6 +7,7 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
 
+#include "afcommon.h"
 #include "monitoraf.h"
 #include "msgaf.h"
 #include "useraf.h"
@@ -44,9 +45,7 @@ MsgAf * MonitorContainer::addMonitor( MonitorAf *newMonitor)
    int id = addClient( newMonitor, true, this, af::Msg::TMonitorMonitorsDel);
    if( id != 0 )
    {
-      af::printTime();
-      printf(" : Monitor registered: ");
-      newMonitor->stdOut( false );
+      AFCommon::QueueLog("Monitor registered: " + newMonitor->generateInfoString( false));
       addEvent( af::Msg::TMonitorMonitorsAdd, id);
    }
    return new MsgAf( af::Msg::TMonitorId, id);

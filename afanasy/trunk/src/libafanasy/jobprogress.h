@@ -22,7 +22,7 @@ public:
 
    virtual ~JobProgress();
 
-   void stdOut( bool full = false ) const; ///< Print job progress information.
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const; ///< Print job progress information.
 
    inline void setJobId( int id ) { jobid = id;   } ///< Set job id.
    inline int  getJobId() const   { return jobid; } ///< Get job id.

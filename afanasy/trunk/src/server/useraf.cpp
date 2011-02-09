@@ -138,7 +138,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
 
 void UserAf::setZombie()
 {
-   af::printTime(); printf(" : Deleting user: "); stdOut( false);
+   AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
    af::Node::setZombie();
    appendLog( "Became a zombie.");
    AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());

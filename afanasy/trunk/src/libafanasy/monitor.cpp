@@ -17,7 +17,7 @@ Monitor::Monitor():
    Client( Client::GetEnvironment, 0)
 {
    construct();
-   name = QString("%1@%2:%3").arg(af::Environment::getUserName(), af::Environment::getHostName()).arg( address->getPortString());
+   name = QString("%1@%2:%3").arg(af::Environment::getUserName(), af::Environment::getHostName()).arg( address->generatePortString().c_str());
 }
 
 Monitor::Monitor( Msg * msg, const Address * addr):
@@ -79,28 +79,23 @@ bool Monitor::hasEvent( int type) const
    }
 }
 
-void Monitor::stdOut( bool full) const
+void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("#%d: %s@%s :: ", id, name.toUtf8().data(), username.toUtf8().data());
-   address->stdOut();
-   printf("\n");
-   printf("   Version: %s rev%d\n", version.toUtf8().data(), revision);
-
-   printf(" UIds[%d]:", (int)(jobsUsersIds.size()));
+   stream << "#" << id << ": " << name.toUtf8().data() << " :: ";
+   address->generateInfoStream( stream);
+   stream << std::endl;
+   stream << "   Version: " << version.toUtf8().data() << " rev" << revision;
+   stream << std::endl;
+   stream << " UIds[" << jobsUsersIds.size() << "]:";
    for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
-      printf(" %d", *it);
-   printf("; JIds[%d]:", (int)(jobsIds.size()));
+      stream << " " << *it;
+   stream << "; JIds[" << jobsIds.size() << "]:";
    for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
-      printf(" %d", *it);
-   printf("\n");
+      stream << " " << *it;
 
    if( full == false ) return;
+
+   stream << std::endl;
    for( int e = 0; e < EventsCount; e++)
-   {
-      if( full )
-         printf("\t%s\n", events[e] ? Msg::TNAMES[e+EventsShift] : "-");
-      else
-         printf(" %s",    events[e] ? Msg::TNAMES[e+EventsShift] : "-");
-   }
-   printf("\n");
+      stream << "\t" << (events[e] ? Msg::TNAMES[e+EventsShift] : "-") << "\n";
 }

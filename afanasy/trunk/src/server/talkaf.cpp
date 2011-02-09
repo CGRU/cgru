@@ -4,6 +4,7 @@
 
 #include "../libafanasy/environment.h"
 
+#include "afcommon.h"
 #include "monitorcontainer.h"
 
 TalkAf::TalkAf( af::Msg * msg, const af::Address * addr):
@@ -46,7 +47,7 @@ void TalkAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
 
 void TalkAf::setZombie()
 {
-   af::printTime(); printf(" : Deleting Talk: "); stdOut( false);
+   AFCommon::QueueLog("Deleting talk: " + generateInfoString( false));
 
    Node::setZombie();
 }

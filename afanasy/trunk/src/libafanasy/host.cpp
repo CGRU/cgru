@@ -103,34 +103,42 @@ void Host::readwrite( Msg * msg)
    rw_QString( data,         msg);
 }
 
-void Host::stdOut( bool full) const
+void Host::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("Host: ");
+   stream << "Host: ";
    if( full)
    {
-      printf("CPU = %d MHz x %d, MEM = %d (+%d swap) Mb, HDD = %d Gb\n",
-         cpu_mhz, cpu_num, mem_mb, swap_mb, hdd_gb);
-      printf("   OS=\"%s\": Capacity = %d, Max tasks = %d, Power = %d\n",
-         os.toUtf8().data(), capacity, maxtasks, power);
+      stream << "CPU = " << cpu_mhz << " MHz x " << cpu_num;
+      stream << ", MEM = " << mem_mb << " (+" << swap_mb << " swap) Mb";
+      stream << ", HDD = " << hdd_gb << " Gb";
+      stream << std::endl;
+      stream << "   OS=\"" << os.toUtf8().data() << "\": ";
+      stream << "Capacity = " << capacity;
+      stream << ", Max tasks = " << maxtasks;
+      stream << ", Power " << power;
+      stream << std::endl;
       for( int i = 0; i < servicesnum; i++)
       {
-         printf("   Service: \"%s\"", servicesnames[i].toUtf8().data());
-         if( servicescounts[i]) printf(" - %d", servicescounts[i]);
-         printf("\n");
+         stream << "   Service: \"" << servicesnames[i].toUtf8().data() << "\"";
+         if( servicescounts[i]) stream << " - " << servicescounts[i];
+         stream << std::endl;
       }
-      if( servicesnum == 0) printf("   No services descripion.\n");
+      if( servicesnum == 0) stream << "   No services descripion.";
    }
    else
    {
-      printf("OS=\"%s\": CAP%d MAX=%d P%d Cpu%dx%d M%d+%ds H%d",
-         os.toUtf8().data(), capacity, maxtasks, power, cpu_mhz, cpu_num, mem_mb, swap_mb, hdd_gb);
+      stream << "OS=\"" << os.toUtf8().data() << "\":";
+      stream << " CAP" << capacity;
+      stream << " MAX=" << maxtasks;
+      stream << " P" << power;
+      stream << " CPU" << cpu_mhz << "x" << cpu_num;
+      stream << " M" << mem_mb << "+" << swap_mb << "S" << " H" << hdd_gb;
       for( int i = 0; i < servicesnum; i++)
       {
-         printf(", \"%s\"", servicesnames[i].toUtf8().data());
-         if( servicescounts[i]) printf("[%d]", servicescounts[i]);
+         stream << ", \"" << servicesnames[i].toUtf8().data() << "\"";
+         if( servicescounts[i]) stream << "[" << servicescounts[i] << "]";
       }
-      if( servicesnum == 0) printf(" No services.");
-      printf("\n");
+      if( servicesnum == 0) stream << " No services.";
    }
 }
 
@@ -158,12 +166,17 @@ void HostResMeter::readwrite( Msg * msg)
    rw_QString( tooltip,    msg);
 }
 
-void HostResMeter::stdOut( bool full) const
+void HostResMeter::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("%s: %d of %d (wh(%d,%d) gc(%d,%d,%d) ls%d lc(%d,%d,%d) bgc(%d,%d,%d))\n%s\n",
-      label.toUtf8().data(), value, valuemax, width, height,
-      graphr, graphg, graphb, labelsize, labelr, labelg, labelb, bgcolorr, bgcolorg, bgcolorb,
-      tooltip.toUtf8().data());
+   stream << label.toUtf8().data() << ": ";
+   stream << value << " of " << valuemax;
+   stream << " wh(" << width << "," << height << ")";
+   stream << " gc(" << graphr << "," << graphg << "," << graphb << ")";
+   stream << " ls" << labelsize;
+   stream << " lc(" << labelr << "," << labelg << "," << labelb << ")";
+   stream << " bgc(" << bgcolorr << "," << bgcolorg << "," << bgcolorb << ")";
+   stream << std::endl;
+   stream << tooltip.toUtf8().data();
 }
 
 HostRes::HostRes():
@@ -275,31 +288,55 @@ void HostRes::readwrite( Msg * msg)
       else custom.push_back( new HostResMeter( msg));
 }
 
-void HostRes::stdOut( bool full) const
+void HostRes::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("Resources: ");
+   stream << "Resources: ";
    if( full)
    {
-      printf("Load average: %g %g %g\n", cpu_loadavg1/10.0, cpu_loadavg2/10.0, cpu_loadavg3/10.0);
-      printf("   CPU usage: %d%% usr, %d%% nice, %d%% sys, %d%% idle, %d%% iow, %d%% irq, %d%% sirq\n",
-         cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_iowait, cpu_irq, cpu_softirq);
-      printf("   Memory: Free %d Mb, Cached %d Mb, Buffers %d Mb, Swap %d Mb and HDD Free %d Gb\n",
-         mem_free_mb, mem_cached_mb, mem_buffers_mb, swap_used_mb, hdd_free_gb );
-      printf("   Network: Recieved %d Kb/sec, Send %d Kb/sec\n",
-         net_recv_kbsec, net_send_kbsec );
-      printf("   IO: Read %d Kb/sec, Write %d Kb/sec, Busy = %d%%\n",
-         hdd_rd_kbsec, hdd_wr_kbsec, hdd_busy);
+      stream << "Load average: " << cpu_loadavg1/10.0 << " " << cpu_loadavg2/10.0 << " " << cpu_loadavg3/10.0;
+      stream << std::endl;
+
+      stream << "   CPU usage: ";
+      stream << int( cpu_user    ) << "% usr, ";
+      stream << int( cpu_nice    ) << "% nice, ";
+      stream << int( cpu_system  ) << "% sys, ";
+      stream << int( cpu_idle    ) << "% idle, ";
+      stream << int( cpu_iowait  ) << "% iow, ";
+      stream << int( cpu_irq     ) << "% irq, ";
+      stream << int( cpu_softirq ) << "% sirq, ";
+      stream << std::endl;
+      stream << "   Memory: Free " << mem_free_mb
+            << " Mb, Cached " << mem_cached_mb
+            << " Mb, Buffers " << mem_buffers_mb
+            << " Mb, Swap " << swap_used_mb
+            << " Mb and HDD Free " << hdd_free_gb  << " Gb";
+      stream << std::endl;
+      stream << "   Network: Recieved " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
+      stream << std::endl;
+      stream << "   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
    }
    else
    {
-      printf("la[%g,%g,%g]", cpu_loadavg1/10.0, cpu_loadavg2/10.0, cpu_loadavg3/10.0);
-      printf("; C: u%d%% n%d%% s%d%% i%d%% o%d%% r%d%% f%d%%",
-         cpu_user, cpu_nice, cpu_system, cpu_idle, cpu_iowait, cpu_irq, cpu_softirq);
-      printf("; M: F%d C%d B%d, S%d; H%d; N%d/%d; D%d\%d:%d%%\n",
-         mem_free_mb, mem_cached_mb, mem_buffers_mb, swap_used_mb, hdd_free_gb,
-         net_recv_kbsec, net_send_kbsec,
-         hdd_rd_kbsec, hdd_wr_kbsec, hdd_busy);
+      stream << "la[" << cpu_loadavg1/10.0 << "," << cpu_loadavg2/10.0 << "," << cpu_loadavg3/10.0 << "]";
+      stream << "; C: u" << int(cpu_user)
+            << "% n" << int(cpu_nice)
+            << "% s" << int(cpu_system)
+            << "% i" << int(cpu_idle)
+            << "% o" << int(cpu_iowait)
+            << "% r" << int(cpu_irq)
+            << "% f" << int(cpu_softirq) << "%";
+      stream << "; M: F" << mem_free_mb
+            << " C" << mem_cached_mb
+            << " B" << mem_buffers_mb
+            << " S" << swap_used_mb
+            << " H" << hdd_free_gb
+            << " N" << net_recv_kbsec << "/" << net_send_kbsec
+            << " D" << hdd_rd_kbsec << "\"" << hdd_wr_kbsec << ":" << int(hdd_busy) << "%";
    }
 
-   for( unsigned i = 0; i < custom.size(); i++ ) custom[i]->stdOut( full);
+   for( unsigned i = 0; i < custom.size(); i++ )
+   {
+      stream << std::endl;
+      custom[i]->generateInfoStream( stream, full);
+   }
 }

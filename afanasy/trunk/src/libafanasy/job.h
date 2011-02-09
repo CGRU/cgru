@@ -23,8 +23,8 @@ public:
    Job( Msg * msg);
 
    virtual ~Job();
-/// Print main job information.
-   void stdOut( bool full = false) const;
+
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 //   inline uint32_t getFlags()                const { return flags;                 }
    inline uint32_t getState()                const { return state;                 }

@@ -19,7 +19,7 @@ public:
 
    virtual ~Talk();
 
-   void stdOut( bool full = false) const;       ///< Print Talk general information.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
 private:
    void readwrite( Msg * msg); ///< Read or write Talk in buffer.

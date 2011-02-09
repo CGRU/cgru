@@ -27,10 +27,10 @@ DBTaskUpdateData::DBTaskUpdateData( int JobId, int BlockNum, int TaskNum, const 
 
 DBTaskUpdateData::~DBTaskUpdateData(){}
 
-DBUpdateTaskQueue::DBUpdateTaskQueue( const QString & QueueName):
+DBUpdateTaskQueue::DBUpdateTaskQueue( const std::string & QueueName):
    AfQueue( QueueName)
 {
-   db = afsql::newDatabase( QueueName);
+   db = afsql::newDatabase( QueueName.c_str());
    db->open();
    query = new QSqlQuery( *db);
    query->prepare( afsql::DBTaskProgress::dbPrepareUpdate);

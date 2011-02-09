@@ -57,16 +57,24 @@ void Pattern::getHost( Host & newhost) const
    if( remservices.size()) newhost.remServices( remservices);
 }
 
-void Pattern::stdOut( bool full) const
+void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      printf("Pattern: \"%s\" (%s):\n", name.toUtf8().data(), description.toUtf8().data());
-      printf("\tMask =\"%s\"\n", mask.toUtf8().data());
+      stream << "Pattern: \"" << name.toUtf8().data() << "\" (" << description.toUtf8().data() << "):";
+      stream << std::endl;
+      stream << "\tMask =\"" << mask.toUtf8().data() << "\"";
    }
    else
    {
-      printf("P:\"%s\"-\"%s\": ", mask.toUtf8().data(), name.toUtf8().data());
+      stream << "P:\"" << mask.toUtf8().data() << "\"-\"" << name.toUtf8().data() << "\": ";
    }
-   host.stdOut( full);
+   host.generateInfoStream( stream, full);
+}
+
+void Pattern::stdOut( bool full) const
+{
+   std::ostringstream stream;
+   generateInfoStream( stream, full);
+   std::cout << stream.str() << std::endl;
 }

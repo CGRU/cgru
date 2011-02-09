@@ -48,23 +48,24 @@ int TaskData::calcWeight() const
    return weight;
 }
 
-void TaskData::stdOut( bool full) const
+void TaskData::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      printf("Name = '%s'\n", name.toUtf8().data());
-      printf("Command = '%s'\n", command.toUtf8().data());
-      printf("Files = '%s'\n", files.toUtf8().data());
-      printf("Dependences = '%s'\n", dependmask.toUtf8().data());
-      printf("Custom Data = '%s'\n", customdata.toUtf8().data());
-      printf("Memory: %d bytes\n", calcWeight());
+      stream << "Name = '" << name.toUtf8().data() << "'\n";
+      stream << "Command = '" << command.toUtf8().data() << "'\n";
+      stream << "Files = '%s'" << files.toUtf8().data() << "'\n";
+      stream << "Dependences = '" << dependmask.toUtf8().data() << "'\n";
+      stream << "Custom Data = '" << customdata.toUtf8().data() << "'\n";
+      stream << "Memory: " << calcWeight() << " bytes\n";
    }
    else
    {
-      printf("N'%s' C'%s'", name.toUtf8().data(), command.toUtf8().data());
-      if( false == files.isEmpty()     ) printf(" F'%s'", files.toUtf8().data());
-      if( false == dependmask.isEmpty()) printf(" D'%s'", dependmask.toUtf8().data());
-      if( false == customdata.isEmpty()      ) printf(" cd'%s'", customdata.toUtf8().data());
-      printf(" %d bytes\n", calcWeight());
+      stream << "N'" << name.toUtf8().data() << "' C'" << command.toUtf8().data() << "'";
+      if( false == files.isEmpty()     ) stream << " F'" << files.toUtf8().data() << "'";
+      if( false == dependmask.isEmpty()) stream << " D'" << dependmask.toUtf8().data() << "'";
+      if( false == customdata.isEmpty()) stream << " cd'" << customdata.toUtf8().data() << "'";
+      stream << " " << calcWeight() << " bytes";
+      stream << std::endl;
    }
 }

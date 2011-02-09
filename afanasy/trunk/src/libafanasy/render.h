@@ -24,7 +24,7 @@ public:
 
    virtual ~Render();
 
-   void stdOut( bool full = false) const;       ///< Print Render general information.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    inline bool isOnline()  const { return (state & SOnline ); }///< Whether Render is online.
    inline bool isBusy()    const { return (state & SBusy   ); }///< Whether Render is busy.

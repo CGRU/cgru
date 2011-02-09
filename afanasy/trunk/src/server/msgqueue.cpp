@@ -20,7 +20,7 @@
 #include "../include/macrooutput.h"
 
 
-MsgQueue::MsgQueue( const QString & QueueName):
+MsgQueue::MsgQueue( const std::string & QueueName):
    AfQueue( QueueName)
 {
 }

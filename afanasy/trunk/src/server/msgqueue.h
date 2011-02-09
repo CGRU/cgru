@@ -7,7 +7,7 @@
 class MsgQueue : public AfQueue
 {
 public:
-   MsgQueue( const QString & QueueName);
+   MsgQueue( const std::string & QueueName);
    virtual ~MsgQueue();
 
 /// Return first message from queue. BLOCKING FUNCTION if \c block==true .

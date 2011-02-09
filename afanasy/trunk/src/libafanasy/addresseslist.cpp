@@ -75,18 +75,17 @@ int AddressesList::calcWeight() const
    return weight;
 }
 
-void AddressesList::stdOut( bool full) const
+void AddressesList::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      printf("Addresses:");
+      stream << "Addresses:";
       for( std::list<Address*>::const_iterator it = addresses.begin(); it != addresses.end(); it++)
       {
-         printf(" ");
-         (*it)->stdOut();
+         stream << " ";
+         (*it)->generateInfoStream( stream);
       }
-      printf("\n");
    }
    else
-      printf("LA[%d] ", (int)(addresses.size()));
+      stream << "LA[" << addresses.size() << "] ";
 }

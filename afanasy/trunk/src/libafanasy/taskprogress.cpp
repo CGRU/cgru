@@ -47,12 +47,15 @@ int TaskProgress::calcWeight() const
    return weight;
 }
 
-void TaskProgress::stdOut( bool full ) const
+void TaskProgress::generateInfoStream( std::ostringstream & stream, bool full ) const
 {
-   QString timeformat("hh:mm.ss");
-   printf("s%d p%d%% (%d-%d%%) s%d/%de (%s-%s=%s) - %s\n", state, percent, frame, percentframe, starts_count, errors_count,
-      QDateTime::fromTime_t(  time_start ).toString( timeformat).toUtf8().data(),
-      QDateTime::fromTime_t(  time_done  ).toString( timeformat).toUtf8().data(),
-      time2QstrHMS( time_done - time_start ).toUtf8().data(),
-      hostname.toUtf8().data());
+   static const char time_format[] = "%H:%M.%S";
+   stream << "s" << state;
+   stream << " p" << int(percent) << "%";
+   stream << " (" << frame << "-" << int(percentframe) << "%)";
+   stream << "s" << starts_count << "/" << starts_count << "e";
+   stream << " (" << af::time2str( time_start, time_format);
+   stream << "-" << af::time2str( time_done, time_format);
+   stream << "=" << af::time2str( time_done - time_start, time_format) << ")";
+   stream << " - " << hostname.toUtf8().data();
 }

@@ -10,7 +10,7 @@ extern bool running;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfQueue::AfQueue( const QString & QueueName):
+AfQueue::AfQueue( const std::string & QueueName):
    name( QueueName),
    count( 0),
    firstPtr( NULL),
@@ -48,7 +48,7 @@ void AfQueue::lock()
 {
    if( locked )
    {
-      AFERRAR("AfQueue::lock: '%s' already locked.\n", name.toUtf8().data());
+      AFERRAR("AfQueue::lock: '%s' already locked.\n", name.c_str());
       return;
    }
 #ifdef MACOSX
@@ -63,7 +63,7 @@ void AfQueue::unlock()
 {
    if( false == locked )
    {
-      AFERRAR("AfQueue::lock: '%s' not locked.\n", name.toUtf8().data());
+      AFERRAR("AfQueue::lock: '%s' not locked.\n", name.c_str());
       return;
    }
 #ifdef MACOSX
@@ -176,5 +176,5 @@ void AfQueue::quit()
 
 void AfQueue::processItem( AfQueueItem* item) const
 {
-   AFERRAR("AfQueue::processItem: \"%s\" - Invalid call\n", name.toUtf8().data());
+   AFERRAR("AfQueue::processItem: \"%s\" - Invalid call\n", name.c_str());
 }

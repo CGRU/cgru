@@ -20,8 +20,7 @@ ItemTalk::ItemTalk( af::Talk *talk):
    tip += "\nRegistered at " + af::time2Qstr( talk->getTimeRegister()  );
    tip += QString("\nVersion: %1").arg( talk->getVersion());
    tip += QString("\nBuild Revision: %1").arg( talk->getRevision());
-   tip += "\n" + talk->getAddress()->getIPString()
-               + ':' + talk->getAddress()->getPortString();
+   tip += QString("\n%1").arg(talk->generateInfoString().c_str());
    tip += "\nLast update ";
 
    updateValues( talk, 0);

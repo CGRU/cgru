@@ -50,7 +50,7 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
             else if( render->online( newRender, monitoring))
             {
                int id = render->getId();
-               printTime(); printf(" : Render online: "); render->stdOut( false );
+               AFCommon::QueueLog("Render online: " + render->generateInfoString( false));
                delete newRender;
                // Return new render ID to render to tell that it was successfully registered:
                return new MsgAf( Msg::TRenderId, id);
@@ -64,7 +64,7 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
       {
          newRender->getFarmHost();
          if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersAdd, id);
-         printTime(); printf(" : New Render registered: "); newRender->stdOut( false );
+         AFCommon::QueueLog("New Render registered: " + newRender->generateInfoString());
          if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
       }
       // Return new render ID to render to tell that it was successfully registered:

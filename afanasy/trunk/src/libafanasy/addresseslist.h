@@ -14,7 +14,7 @@ public:
    AddressesList( Msg * msg); ///< Read adresses from message.
    ~AddressesList();
 
-   void stdOut( bool full = false) const;       ///< Print address.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    bool addAddress( const Address * address );
 

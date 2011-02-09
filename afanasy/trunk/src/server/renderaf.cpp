@@ -69,7 +69,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 
    if( toZombie )
    {
-      af::printTime(); printf(" : Render Deleting: "); stdOut( false);
+      AFCommon::QueueLog("Render Deleting: " + generateInfoString( false));
       appendLog("Waiting for deletion.");
       setZombie();
       AFCommon::saveLog( log, af::Environment::getRendersLogsDir(), name, af::Environment::getRenderLogsRotate());
@@ -77,7 +77,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
    }
    else
    {
-      af::printTime(); printf(" : Render Offline: "); stdOut( false);
+      AFCommon::QueueLog("Render Offline: " + generateInfoString( false));
       appendLog("Offline.");
       time_launch = 0;
       if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);

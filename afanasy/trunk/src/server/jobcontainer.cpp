@@ -8,6 +8,7 @@
 
 #include "../libafsql/qdbconnection.h"
 
+#include "afcommon.h"
 #include "msgaf.h"
 #include "useraf.h"
 #include "usercontainer.h"
@@ -163,7 +164,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
    }
 
-   af::printTime(); printf(": Job registered: "); job->stdOut( false );
+   AFCommon::QueueLog("Job registered: " + job->generateInfoString());
    int newJobId = job->getId();
 
    AFINFO("JobContainer::job_register: unlocking user and job.\n");

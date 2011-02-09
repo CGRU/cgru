@@ -124,11 +124,15 @@ int JobProgress::calcWeight() const
    return weight;
 }
 
-void JobProgress::stdOut( bool full ) const
+void JobProgress::generateInfoStream( std::ostringstream & stream, bool full ) const
 {
    for( int b = 0; b < blocksnum; b++)
    {
-      printf("block%d\n", b);
-      for( int t = 0; t < tasksnum[b]; t++) tp[b][t]->stdOut( full);
+      stream << "Block #"<< b;
+      for( int t = 0; t < tasksnum[b]; t++)
+      {
+         stream << std::endl;
+         tp[b][t]->generateInfoStream( stream);
+      }
    }
 }

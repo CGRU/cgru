@@ -16,7 +16,7 @@ class Queries: public QStringList, public AfQueueItem {};
 class DBActionQueue : public AfQueue
 {
 public:
-   DBActionQueue( const QString & QueueName);
+   DBActionQueue( const std::string & QueueName);
    virtual ~DBActionQueue();
 
    void addItem(    const afsql::DBItem * item);

@@ -49,6 +49,7 @@ public:
    static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
    static bool getXMLElement( const QDomDocument & doc, const QString & name, QStringList & stringlist );
    static bool getXMLAttribute( QDomElement & element, const QString & name, int & value);
+   static bool getVar( const QDomDocument & doc, std::string & value, const char * name );
    static bool getVar( const QDomDocument & doc, QString     & value, QString name );
    static bool getVar( const QDomDocument & doc, QStringList & value, QString name );
    static bool getVar( const QDomDocument & doc, int         & value, QString name );
@@ -91,7 +92,7 @@ public:
    static inline int getWatchWaitForReadyRead()       { return watch_waitforreadyread;    }
    static inline int getWatchWaitForBytesWritten()    { return watch_waitforbyteswritten; }
 
-   static inline const QString& getTimeFormat()         { return timeformat;       } ///< Get default time format.
+   static inline const char * getTimeFormat()         { return timeformat.c_str();       } ///< Get default time format.
 
    static inline int            getServerPort()   { return serverport;      } ///< Get afanasy server port.
    static inline int            getClientPort()   { return clientport;      } ///< Get current client port.
@@ -237,7 +238,7 @@ private:
    static int watch_waitforreadyread;
    static int watch_waitforbyteswritten;
 
-   static QString timeformat;    ///< Default time format.
+   static std::string timeformat;    ///< Default time format.
 
    static int task_update_timeout;
    static int task_default_capacity;

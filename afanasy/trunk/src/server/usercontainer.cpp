@@ -58,7 +58,7 @@ UserAf* UserContainer::addUser( const QString &username, const QString &hostname
 
    if( monitoring) monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
 
-   printTime(); printf(" : User registered: "); user->stdOut( false );
+   AFCommon::QueueLog("User registered: " + user->generateInfoString( false));
    return user;
 }
 

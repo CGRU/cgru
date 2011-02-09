@@ -42,7 +42,7 @@ public:
    bool isValid() const;
    inline  void setJobId( int value) { jobid = value;}   ///< Set id of block job.
    inline  int  getJobId() const { return jobid;}        ///< Get id of block job.
-   virtual void stdOut( bool full = false) const;        ///< Output main block information.
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
    virtual int  calcWeight() const;                      ///< Calculate and return memory size.
 
 /// Generate task.
@@ -213,7 +213,10 @@ public:
    inline void setProgressAvoidHostsNum( int value) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);
 
-   void stdOutFlags() const; ///< Print progress bits.
+/// Generate progress bits info string.
+   void generateProgressStream( std::ostringstream & stream) const;
+   const std::string generateProgressString() const;
+   void stdOutProgress() const;
 
 protected:
    /// Read or write block.

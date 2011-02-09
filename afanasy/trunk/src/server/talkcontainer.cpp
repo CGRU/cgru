@@ -5,6 +5,7 @@
 #include "../libafanasy/msgclasses/mctalkmessage.h"
 #include "../libafanasy/msgclasses/mctalkdistmessage.h"
 
+#include "afcommon.h"
 #include "msgaf.h"
 #include "monitorcontainer.h"
 
@@ -27,9 +28,7 @@ MsgAf * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring)
    int id = addClient( newTalk, true, monitoring, af::Msg::TMonitorTalksDel);
    if( id != 0 )
    {
-      af::printTime();
-      printf(" : Talk registered: ");
-      newTalk->stdOut( false );
+      AFCommon::QueueLog("Talk registered: " + newTalk->generateInfoString( false));
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksAdd, id);
       MsgAf* tmp = generateList( af::Msg::TTalksList);
       tmp->setAddress( newTalk);

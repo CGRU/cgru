@@ -31,7 +31,7 @@ public:
 class DBUpdateTaskQueue : public AfQueue
 {
 public:
-   DBUpdateTaskQueue( const QString & QueueName);
+   DBUpdateTaskQueue( const std::string & QueueName);
    virtual ~DBUpdateTaskQueue();
 
 /// Push task update data to queue back.

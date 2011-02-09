@@ -2,7 +2,10 @@
 <afanasy>
 
 <!-- General -->
-   <timeformat>ddd dMMM hh:mm.ss</timeformat>
+   <timeformat>%a %e %b %H:%M.%S</timeformat>
+<!-- 'strftime' function format
+http://www.cplusplus.com/reference/clibrary/ctime/strftime
+-->
    <filenamesizemax>250</filenamesizemax>
    <cmdprefix></cmdprefix>
 <!--

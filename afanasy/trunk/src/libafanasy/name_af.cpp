@@ -68,9 +68,18 @@ void af::destroy()
    if( ferma != NULL) delete ferma;
 }
 
-const QString af::time2Qstr( uint32_t time32)
+const QString af::time2Qstr( time_t time_sec)
 {
-   return QDateTime::fromTime_t( time32).toString( af::Environment::getTimeFormat());
+   return QString( af::time2str(time_sec).c_str());
+}
+const std::string af::time2str( time_t time_sec, const char * time_format)
+{
+   static const int timeStrLenMax = 64;
+   char buffer[timeStrLenMax];
+   const char * format = time_format;
+   if( format == NULL ) format = af::Environment::getTimeFormat();
+   strftime( buffer, timeStrLenMax, format, localtime( &time_sec));
+   return std::string( buffer);
 }
 
 const QString af::time2QstrHMS( uint32_t time32, bool clamp)

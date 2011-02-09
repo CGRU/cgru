@@ -249,7 +249,7 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 
    if( isInitialized()) AFCommon::QueueDBDelItem( this);
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
-   af::printTime(); printf(": Deleting a job: "); stdOut( false);
+   AFCommon::QueueLog("Deleting a job: " + generateInfoString());
    unLock();
 }
 

@@ -7,7 +7,7 @@
 class FileQueue : public AfQueue
 {
 public:
-   FileQueue( const QString & QueueName);
+   FileQueue( const std::string & QueueName);
    virtual ~FileQueue();
 
 /// Push filedata to queue back.

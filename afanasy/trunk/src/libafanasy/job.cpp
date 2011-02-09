@@ -1,7 +1,5 @@
 #include "job.h"
 
-#include <stdio.h>
-
 #include "../include/afanasy.h"
 
 #include "msg.h"
@@ -142,7 +140,7 @@ int Job::calcWeight() const
    weight += weigh( need_properties);
    return weight;
 }
-
+/*
 void Job::stdOut( bool full) const
 {
    printf("#%d:%d %s[%d] %s@%s: ", id, priority,
@@ -207,4 +205,69 @@ void Job::stdOut( bool full) const
    }
 
    printf("Memory: %d bytes.\n", calcWeight());
+}
+*/
+void Job::generateInfoStream( std::ostringstream & stream, bool full) const
+{
+   stream << "#" << id << ": ";
+
+   stream << "\"" << name.toUtf8().data() << "\" ";
+   stream << username.toUtf8().data() << "@" << hostname.toUtf8().data();
+
+   if( blocksnum == 0)
+   {
+      stream << "\n\t ERROR: HAS NO BLOCKS !";
+      return;
+   }
+   if( blocksdata == NULL)
+   {
+      stream << "\n\t ERROR: HAS NULL BLOCKS DATA !";
+      return;
+   }
+   if( blocksdata != NULL)
+   {
+      for( int b = 0; b < blocksnum; b++)
+      {
+         if( blocksdata[b] != NULL) continue;
+         stream << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
+         return;
+      }
+   }
+
+   if( full == false )
+   {
+      stream << " - " << calcWeight() << " bytes.";
+      return;
+   }
+
+//   const char TIME_FORMAT[] = "%a %e %b %H:%M.%S";
+//   QString timeformat("ddd hh:mm.ss");
+
+   stream << "\nTime created  = " << af::time2str( time_creation);
+
+   if( isStarted())
+      stream << "\nTime started  = " << af::time2str( time_started);
+   if( isDone())
+      stream << "\nTime finished = " << af::time2str( time_done);
+
+   stream << std::endl;
+
+   if( isStarted())
+      for( int b = 0; b < blocksnum; b++)
+      {
+         stream << "block[" << b << "]: ";
+         stream << blocksdata[b]->getTasksNum() <<  " tasks: ";
+         stream << blocksdata[b]->getRunningTasksNumber() <<  " run, ";
+         stream << blocksdata[b]->getRunningTasksNumber() <<  " done, ";
+         stream << blocksdata[b]->getProgressTasksError() <<  " error\n";
+         blocksdata[b]->generateProgressStream( stream);
+      }
+
+   for( int b = 0; b < blocksnum; b++)
+   {
+      stream << std::endl;
+      blocksdata[b]->generateInfoStream( stream);
+   }
+
+   stream << "Memory: " << calcWeight() << " bytes.";
 }

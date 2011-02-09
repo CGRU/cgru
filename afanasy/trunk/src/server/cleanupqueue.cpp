@@ -10,19 +10,17 @@
 
 CleanUpData::CleanUpData( const JobAf * job)
 {
-   sprintf( tasksoutdir, "%s", job->getTasksOutputDir().toUtf8().data());
+   tasksoutdir = job->getTasksOutputDir().toUtf8().data();
 }
 
 void CleanUpData::doCleanUp()
 {
-//printf("removing folder %s\n", tasksoutdir.toUtf8().data());
-
    // Removing tasks output folder
    struct dirent *de = NULL;
-   DIR * dir = opendir( tasksoutdir);
+   DIR * dir = opendir( tasksoutdir.c_str());
    if( dir == NULL)
    {
-      AFERRPA("CleanUpData::doCleanUp: Can't open folder\n%s\n", tasksoutdir)
+      AFERRPA("CleanUpData::doCleanUp: Can't open folder\n%s\n", tasksoutdir.c_str())
       return;
    }
 
@@ -31,7 +29,7 @@ void CleanUpData::doCleanUp()
    {
       if( de->d_name[0] == '.' ) continue;
       static char filename_buffer[4096];
-      sprintf( filename_buffer, "%s/%s", tasksoutdir, de->d_name);
+      sprintf( filename_buffer, "%s/%s", tasksoutdir.c_str(), de->d_name);
       if( unlink( filename_buffer) != 0)
       {
          AFERRPA("CleanUpData::doCleanUp: Can't delete file\n%s\n", filename_buffer)
@@ -41,13 +39,13 @@ void CleanUpData::doCleanUp()
    closedir(dir);
 
    // Removing folder
-   if( rmdir(tasksoutdir) != 0)
+   if( rmdir(tasksoutdir.c_str()) != 0)
    {
-      AFERRPA("CleanUpData::doCleanUp: Can't delete folder\n%s\n", tasksoutdir)
+      AFERRPA("CleanUpData::doCleanUp: Can't delete folder\n%s\n", tasksoutdir.c_str())
    }
 }
 
-CleanUpQueue::CleanUpQueue( const QString & QueueName):  AfQueue( QueueName) {}
+CleanUpQueue::CleanUpQueue( const std::string & QueueName):  AfQueue( QueueName) {}
 
 CleanUpQueue::~CleanUpQueue() {}
 

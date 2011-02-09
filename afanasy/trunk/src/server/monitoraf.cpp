@@ -3,6 +3,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
+#include "afcommon.h"
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
@@ -29,7 +30,7 @@ void MonitorAf::refresh( time_t currentTime, AfContainer * pointer, MonitorConta
 
 void MonitorAf::setZombie()
 {
-   af::printTime(); printf(" : Deleting Monitor: "); stdOut( false);
+   AFCommon::QueueLog("Deleting monitor: " + generateInfoString( false));
 
    Node::setZombie();
 }

@@ -29,7 +29,7 @@ public:
 
    virtual ~User();                       ///< Destructor.
 
-   void stdOut( bool full = false) const; ///< Print user general information.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
    inline bool setHostsMask(         const QString & str  )
       { return setRegExp( hostsmask, str, "user hosts mask");}
