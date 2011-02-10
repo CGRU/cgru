@@ -149,7 +149,8 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 
    stream << "\"" << name.toUtf8().data() << "\"";
    stream << "[" << id << "]: ";
-   stream << username.toUtf8().data() << "@" << hostname.toUtf8().data();
+   stream << username.toUtf8().data();
+   if( false == hostname.isEmpty()) stream << "@" << hostname.toUtf8().data();
 
    if( blocksnum == 0)
    {
@@ -189,7 +190,8 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 
    if( lifetime > 0 ) stream << "\n Life Time " << lifetime << " seconds";
 
-   stream << "\n Creation host = " << hostname.toUtf8().data();
+   if( false == hostname.isEmpty())
+      stream << "\n Creation host = " << hostname.toUtf8().data();
    stream << "\n Priority = " << int(priority);
    stream << "\n Maximum running tasks = " << maxrunningtasks;
    if( maxrunningtasks == -1 ) stream << " (no limit)";
@@ -236,5 +238,5 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
       }
    }
 */
-   stream << "\n Memory: " << calcWeight() << " bytes.";
+//   stream << "\n Memory: " << calcWeight() << " bytes.";
 }

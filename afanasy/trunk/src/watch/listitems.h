@@ -53,6 +53,7 @@ protected:
 
    void setAllowSelection( bool allow);
    Item* getCurrentItem() const;
+   int getSelectedItemsCount() const;
    const QList<Item*> getSelectedItems() const;
    void setSelectedItems( const QList<Item*> & items, bool resetSelection = true);
 

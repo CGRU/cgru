@@ -203,22 +203,33 @@ const QString Render::getResources() const
 
 void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "#" << id << ":" << int(priority) << " " << name.toUtf8().data() << "@" << username.toUtf8().data() << " :: ";
-   if( address == NULL) stream << "address == NULL";
-   else address->generateInfoStream( stream ,full);
-   stream << " - " << calcWeight() << " bytes.";
-   stream << std::endl;
-   stream << "   Version: " << version.toUtf8().data() << " rev" << revision;
+   if( full)
+   {
+      stream << "#" << id << ": " << name.toUtf8().data() << "@" << username.toUtf8().data();
+      stream << " (" << version.toUtf8().data() << " r" << revision << ")";
+      stream << " :: ";
+      if( address == NULL) stream << "address == NULL";
+      else address->generateInfoStream( stream ,full);
+      stream << " - " << calcWeight() << " bytes.";
 
-   if( full == false ) return;
-   stream << std::endl;
-   host.generateInfoStream( stream ,full);
-   hres.generateInfoStream( stream ,full);
+      stream << std::endl;
 
-   stream << "\n   Ready = " << ( isReady() ? "TRUE" : "FALSE" );
-   stream << "\n   Busy  = " << ( isBusy()  ? "true" : "false" );
-   stream << "\n   NIMBY = " << ( isNIMBY() ? "true" : "false" );
-   stream << "\n   Nimby = " << ( isNimby() ? "true" : "false" );
-   if( time_launch   ) stream << "\n   Launched at   = " << time2str( time_launch   );
-   if( time_register ) stream << "\n   Registered at = " << time2str( time_register );
+      host.generateInfoStream( stream ,full);
+      hres.generateInfoStream( stream ,full);
+      stream << "\n Ready = " << ( isReady() ? "TRUE" : "FALSE" );
+      stream << "\n Busy  = " << ( isBusy()  ? "true" : "false" );
+      stream << "\n NIMBY = " << ( isNIMBY() ? "true" : "false" );
+      stream << "\n Nimby = " << ( isNimby() ? "true" : "false" );
+      if( time_launch   ) stream << "\n Launched at   = " << time2str( time_launch   );
+      if( time_register ) stream << "\n Registered at = " << time2str( time_register );
+   }
+   else
+   {
+      stream << "#" << id << ": " << name.toUtf8().data() << "@" << username.toUtf8().data();
+      stream << " (" << version.toUtf8().data() << " r" << revision << ")";
+      stream << " :: ";
+      if( address == NULL) stream << "address == NULL";
+      else address->generateInfoStream( stream ,full);
+      stream << " - " << calcWeight() << " bytes.";
+   }
 }

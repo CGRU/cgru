@@ -143,6 +143,11 @@ Item* ListItems::getCurrentItem() const
    return qVariantValue<Item*>( index.data());
 }
 
+int ListItems::getSelectedItemsCount() const
+{
+   return view->selectionModel()->selectedIndexes().size();
+}
+
 const QList<Item*> ListItems::getSelectedItems() const
 {
    QList<Item*> items;

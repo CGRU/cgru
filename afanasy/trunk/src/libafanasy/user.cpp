@@ -120,9 +120,9 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"";
       stream << "\n Registration time = " << time2str( time_register);
       stream << "\n Online time = " << time2str( time_online);
-      stream << "\n Last host = " << hostname.toUtf8().data();
-      stream << "\n Memory = " << calcWeight() << " bytes.";
-      if( isPermanent()) stream << "\n Status = PERMANENT"; else stream << "\n Status = temporary";
+      if( false == hostname.isEmpty()) stream << "\n Last host = " << hostname.toUtf8().data();
+//      stream << "\n Memory = " << calcWeight() << " bytes.";
+      if( isPermanent()) stream << "\n User is permanent."; else stream << "\n (user is temporal)";
    }
    else
    {

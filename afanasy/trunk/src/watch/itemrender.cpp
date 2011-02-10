@@ -145,7 +145,7 @@ void ItemRender::updateValues( af::Node *node, int type)
       time_registered   = render->getTimeRegister();
 
       const af::Address * address = render->getAddress();
-      if( address ) address_str = render->generateInfoString().c_str();
+      if( address ) address_str = address->generateInfoString().c_str();
 
       bool becameOnline = false;
       if(((online == false) && (render->isOnline())) || (type == 0))

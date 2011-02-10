@@ -149,7 +149,7 @@ if( type == af::Msg::TBlocksProgress)
 
 void BlockInfo::refresh()
 {
-   if( tasksdone) str_runtime = QString("RT: sum%1 avg%2")
+   if( tasksdone) str_runtime = QString("RT: S%1/A%2")
                   .arg( af::time2strHMS( taskssumruntime, true).c_str())
                   .arg( af::time2strHMS( taskssumruntime/tasksdone, true).c_str());
    else str_runtime = "Run Time";

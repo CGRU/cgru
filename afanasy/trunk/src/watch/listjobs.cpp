@@ -35,22 +35,6 @@ ListJobs::ListJobs( QWidget* parent):
    eventsShowHide << af::Msg::TMonitorJobsChanged;
    eventsOnOff    << af::Msg::TMonitorJobsDel;
 
-   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
-   ctrl->addSortType(   CtrlSortFilter::TNONE);
-   ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
-   ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
-   ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
-   ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
-   ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
-   ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
-   ctrl->addSortType(   CtrlSortFilter::TNAME);
-   ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-   ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
-   ctrl->addFilterType( CtrlSortFilter::TNONE);
-   ctrl->addFilterType( CtrlSortFilter::TNAME);
-   ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
-   ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
-
    if( af::Environment::VISOR())
    {
       Watch::setUid( 0);
@@ -71,6 +55,22 @@ ListJobs::ListJobs( QWidget* parent):
       FilterInclude  = true;
       FilterMatch    = false;
    }
+
+   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
+   ctrl->addSortType(   CtrlSortFilter::TNONE);
+   ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
+   ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
+   ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
+   ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
+   ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
+   ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
+   ctrl->addSortType(   CtrlSortFilter::TNAME);
+   ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
+   ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
+   ctrl->addFilterType( CtrlSortFilter::TNONE);
+   ctrl->addFilterType( CtrlSortFilter::TNAME);
+   ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
+   ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
 
    initSortFilterCtrl();
 

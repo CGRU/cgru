@@ -78,7 +78,12 @@ Try not use Pre Command at all. You always can create one more task(block) and m
 This commands are executed on render farm hosts by special system job.
 Working directory of such system task will be the first block working folder.
 </li>
-<li><a name="Annotation"/><b>Annotation</b> - Annotate job GUI item.</li>
+<li><a name="LifeTime"/><b>Life Time</b> - Maximum job age in seconds.
+When job age becomes greater then life time if will be automatically deleted in any case.
+It is useful for some technical jobs to prevent their amount rise.
+You can user default <a href="user.html#JobsLifeTime">life time</a> value for all its jobs.
+</li>
+<li><a name="Annotation"/><b>Annotation</b> - Job annotation. Does not influence anything. This string will be shown in GUI item.</li>
 </ul>
 
 <h3><a name="State"/>Job State:</h3>
