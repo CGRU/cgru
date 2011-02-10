@@ -121,18 +121,18 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
       menu.addAction( action);
    }
 
-   if( af::Environment::VISOR())
+//   if( af::Environment::VISOR())
    {
       menu.addSeparator();
-      action = new QAction( "Add", this);
+      action = new QAction( "Set Permanent", this);
       action->setEnabled( false == useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actAdd() ));
       menu.addAction( action);
    }
-   if( af::Environment::GOD())
+//   if( af::Environment::GOD())
    {
-      menu.addSeparator();
-      action = new QAction( "Delete", this);
+//      menu.addSeparator();
+      action = new QAction( "Delete From Database", this);
       action->setEnabled( useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
       menu.addAction( action);
