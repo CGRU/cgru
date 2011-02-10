@@ -50,7 +50,6 @@ ListJobs::ListJobs( QWidget* parent):
    ctrl->addFilterType( CtrlSortFilter::TNAME);
    ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
    ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
-   initSortFilterCtrl();
 
    if( af::Environment::VISOR())
    {
@@ -72,6 +71,8 @@ ListJobs::ListJobs( QWidget* parent):
       FilterInclude  = true;
       FilterMatch    = false;
    }
+
+   initSortFilterCtrl();
 
    init();
 
@@ -176,6 +177,9 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
    submenu->addAction( action);
    action = new QAction( "Post Command", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
+   submenu->addAction( action);
+   action = new QAction( "Life Time", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
    submenu->addAction( action);
 
    menu.addMenu( submenu);
@@ -669,6 +673,20 @@ void ListJobs::actPostCommand()
    af::MCGeneral mcgeneral( cmd );
    action( mcgeneral, af::Msg::TJobCmdPost);
    displayInfo( "Change post command.");
+}
+
+void ListJobs::actLifeTime()
+{
+   ItemJob* jobitem = (ItemJob*)getCurrentItem();
+   if( jobitem == NULL ) return;
+   double cur = double( jobitem->lifetime ) / (60.0*60.0);
+
+   bool ok;
+   double hours = QInputDialog::getDouble( this, "Life Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( int( hours * 60.0 * 60.0 ));
+   action( mcgeneral, af::Msg::TJobLifeTime);
 }
 
 void ListJobs::doubleClicked( Item * item)

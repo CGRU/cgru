@@ -62,12 +62,12 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
-   void printTime( uint32_t time32 = 0);
+   void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
 
    const QString time2Qstr( time_t time_sec = time( NULL));
-   const QString time2QstrHMS( uint32_t time32, bool clamp = false);
+   const std::string time2strHMS( int time32, bool clamp = false);
    const QString state2str( int state);
    const QString fillNumbers( const QString & pattern, int start, int end);
 

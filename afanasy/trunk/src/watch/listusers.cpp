@@ -113,6 +113,12 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
       action = new QAction( "Set Errors Forgive Time", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actErrorsForgiveTime() ));
       menu.addAction( action);
+
+      menu.addSeparator();
+
+      action = new QAction( "Set Jobs Life Time", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actJobsLifeTime() ));
+      menu.addAction( action);
    }
 
    if( af::Environment::VISOR())
@@ -283,6 +289,20 @@ void ListUsers::actErrorsForgiveTime()
 
    af::MCGeneral mcgeneral( int( hours * 60.0 * 60.0 ));
    action( mcgeneral, af::Msg::TUserErrorsForgiveTime);
+}
+
+void ListUsers::actJobsLifeTime()
+{
+   ItemUser* useritem = (ItemUser*)getCurrentItem();
+   if( useritem == NULL ) return;
+   double cur = double( useritem->jobs_lifetime ) / (60.0*60.0);
+
+   bool ok;
+   double hours = QInputDialog::getDouble( this, "Jobs Life Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( int( hours * 60.0 * 60.0 ));
+   action( mcgeneral, af::Msg::TUserJobsLifeTime);
 }
 
 void ListUsers::actMaxRunningTasks()

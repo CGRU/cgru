@@ -43,6 +43,7 @@ private slots:
    void actNeedOS();
    void actNeedProperties();
    void actPostCommand();
+   void actLifeTime();
 
    void blockAction( int id_block, int id_action);
 

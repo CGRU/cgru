@@ -38,6 +38,7 @@ void DBUser::addDBAttributes()
    dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_avoidhost,     &errors_avoidhost    ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_tasksamehost,  &errors_tasksamehost ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_errors_forgivetime,   &errors_forgivetime  ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_lifetime,             &jobs_lifetime       ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude   ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_time_register,        &time_register       ));
    dbAddAttr( new DBAttrString( DBAttr::_annotation,           &annotation          ));

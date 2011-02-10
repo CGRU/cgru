@@ -31,6 +31,7 @@ private slots:
    void actErrorRetries();
    void actErrorsSameHost();
    void actErrorsForgiveTime();
+   void actJobsLifeTime();
    void actRequestLog();
 
    void actAdd();

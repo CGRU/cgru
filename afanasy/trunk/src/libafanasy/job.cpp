@@ -20,7 +20,8 @@ Job::Job( int Id):
    time_creation( time( NULL)),
    time_wait( 0),
    time_started( 0),
-   time_done( 0)
+   time_done( 0),
+   lifetime( -1)
 {
    initDefaultValues();
    id = Id;
@@ -72,6 +73,7 @@ void Job::readwrite( Msg * msg)
    rw_uint32_t( time_wait,          msg);
    rw_uint32_t( time_started,       msg);
    rw_uint32_t( time_done,          msg);
+   rw_int32_t ( lifetime,           msg);
 
    rw_QString ( description,        msg);
    rw_QString ( annotation,         msg);
@@ -140,78 +142,13 @@ int Job::calcWeight() const
    weight += weigh( need_properties);
    return weight;
 }
-/*
-void Job::stdOut( bool full) const
-{
-   printf("#%d:%d %s[%d] %s@%s: ", id, priority,
-      name.toUtf8().data(), blocksnum, username.toUtf8().data(), hostname.toUtf8().data());
 
-   if( blocksnum == 0)
-   {
-      printf("\n\t ERROR: HAS NO BLOCKS !\n");
-      return;
-   }
-   if( blocksdata == NULL)
-   {
-      printf("\n\t ERROR: HAS NULL BLOCKS DATA !\n");
-      return;
-   }
-   if( blocksdata != NULL)
-   {
-      for( int b = 0; b < blocksnum; b++)
-      {
-         if( blocksdata[b] != NULL) continue;
-         printf("\n\t ERROR: BLOCK[%d] HAS NULL DATA !\n", b);
-         return;
-      }
-   }
-
-   int percentage = 0;
-   for( int b = 0; b < blocksnum; b++) percentage += blocksdata[b]->getProgressPercentage();
-   percentage /= blocksnum;
-   printf(" r%d-%d%%", getRunningTasksNumber(), percentage);
-
-   if( full == false )
-   {
-      printf(" - %d bytes.\n", calcWeight());
-      return;
-   }
-
-   QString timeformat("ddd hh:mm.ss");
-
-   printf("\n");
-   printf("Time created  = \"%s\"\n",    QDateTime::fromTime_t( time_creation).toString( timeformat).toUtf8().data() );
-
-   if( isStarted())
-      printf("Time started  = \"%s\"\n", QDateTime::fromTime_t( time_started ).toString( timeformat).toUtf8().data() );
-   if( isDone())
-      printf("Time finished = \"%s\"\n", QDateTime::fromTime_t( time_done    ).toString( timeformat).toUtf8().data() );
-
-   if( isStarted())
-      for( int b = 0; b < blocksnum; b++)
-      {
-         printf("b%d: %d/%d/%d/%d\n", b,
-                blocksdata[b]->getTasksNum(),
-                blocksdata[b]->getRunningTasksNumber(),
-                blocksdata[b]->getProgressTasksDone(),
-                blocksdata[b]->getProgressTasksError());
-         blocksdata[b]->stdOutFlags();
-      }
-
-   for( int b = 0; b < blocksnum; b++)
-   {
-      printf("\n");
-      blocksdata[b]->stdOut( true);
-   }
-
-   printf("Memory: %d bytes.\n", calcWeight());
-}
-*/
 void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "#" << id << ": ";
+   if( full ) stream << "Job name = ";
 
-   stream << "\"" << name.toUtf8().data() << "\" ";
+   stream << "\"" << name.toUtf8().data() << "\"";
+   stream << "[" << id << "]: ";
    stream << username.toUtf8().data() << "@" << hostname.toUtf8().data();
 
    if( blocksnum == 0)
@@ -243,31 +180,61 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 //   const char TIME_FORMAT[] = "%a %e %b %H:%M.%S";
 //   QString timeformat("ddd hh:mm.ss");
 
-   stream << "\nTime created  = " << af::time2str( time_creation);
+   stream << "\n Time created  = " << af::time2str( time_creation);
 
    if( isStarted())
-      stream << "\nTime started  = " << af::time2str( time_started);
+      stream << "\n Time started  = " << af::time2str( time_started);
    if( isDone())
-      stream << "\nTime finished = " << af::time2str( time_done);
+      stream << "\n Time finished = " << af::time2str( time_done);
 
-   stream << std::endl;
+   if( lifetime > 0 ) stream << "\n Life Time " << lifetime << " seconds";
 
-   if( isStarted())
+   stream << "\n Creation host = " << hostname.toUtf8().data();
+   stream << "\n Priority = " << int(priority);
+   stream << "\n Maximum running tasks = " << maxrunningtasks;
+   if( maxrunningtasks == -1 ) stream << " (no limit)";
+   stream << "\n Hosts mask: \"" << hostsmask.pattern().toUtf8().data() << "\"";
+   if( hostsmask.isEmpty())
+      stream << " (any host)";
+   if( false == hostsmask_exclude.isEmpty())
+      stream << "\n Exclude hosts mask: \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"";
+   if( false == dependmask.isEmpty())
+      stream << "\n Depend mask = \"" << dependmask.pattern().toUtf8().data() << "\"";
+   if( false == dependmask_global.isEmpty())
+      stream << "\n Global depend mask = \"" << dependmask_global.pattern().toUtf8().data() << "\"";
+   if( time_wait )
+      stream << "\n Wait time = " << af::time2str( time_wait);
+   if( false == need_os.isEmpty())
+      stream << "\n Needed OS: \"" << need_os.pattern().toUtf8().data() << "\"";
+   if( false == need_properties.isEmpty())
+      stream << "\n Needed properties: \"" << need_properties.pattern().toUtf8().data() << "\"";
+   if( cmd_pre.isEmpty() == false )
+      stream << "\n Pre command:\n" << cmd_pre.toUtf8().data();
+   if( cmd_post.isEmpty() == false )
+      stream << "\n Post command:\n" << cmd_post.toUtf8().data();
+   if( false == description.isEmpty())
+      stream << "\n " << description.toUtf8().data();
+/*
+   if( blocksdata != NULL)
+   {
+      if( isStarted())
+         for( int b = 0; b < blocksnum; b++)
+         {
+            stream << std::endl;
+            stream << "block[" << b << "]: ";
+            stream << blocksdata[b]->getTasksNum() <<  " tasks: ";
+            stream << blocksdata[b]->getRunningTasksNumber() <<  " run, ";
+            stream << blocksdata[b]->getRunningTasksNumber() <<  " done, ";
+            stream << blocksdata[b]->getProgressTasksError() <<  " error\n";
+            blocksdata[b]->generateProgressStream( stream);
+         }
+
       for( int b = 0; b < blocksnum; b++)
       {
-         stream << "block[" << b << "]: ";
-         stream << blocksdata[b]->getTasksNum() <<  " tasks: ";
-         stream << blocksdata[b]->getRunningTasksNumber() <<  " run, ";
-         stream << blocksdata[b]->getRunningTasksNumber() <<  " done, ";
-         stream << blocksdata[b]->getProgressTasksError() <<  " error\n";
-         blocksdata[b]->generateProgressStream( stream);
+         stream << std::endl;
+         blocksdata[b]->generateInfoStream( stream, false);
       }
-
-   for( int b = 0; b < blocksnum; b++)
-   {
-      stream << std::endl;
-      blocksdata[b]->generateInfoStream( stream);
    }
-
-   stream << "Memory: " << calcWeight() << " bytes.";
+*/
+   stream << "\n Memory: " << calcWeight() << " bytes.";
 }

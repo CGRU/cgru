@@ -570,6 +570,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TJobDependMaskGlobal:
    case af::Msg::TJobMaxRunningTasks:
    case af::Msg::TJobWaitTime:
+   case af::Msg::TJobLifeTime:
    case af::Msg::TJobPriority:
    case af::Msg::TJobNeedOS:
    case af::Msg::TJobNeedProperties:
@@ -606,6 +607,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TUserHostsMaskExclude:
    case af::Msg::TUserMaxRunningTasks:
    case af::Msg::TUserPriority:
+   case af::Msg::TUserJobsLifeTime:
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
    case af::Msg::TUserErrorsTaskSameHost:

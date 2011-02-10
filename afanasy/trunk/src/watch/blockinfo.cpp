@@ -149,9 +149,9 @@ if( type == af::Msg::TBlocksProgress)
 
 void BlockInfo::refresh()
 {
-   if( tasksdone) str_runtime = QString("RT-s%1/%2a")
-                  .arg( af::time2QstrHMS( taskssumruntime, true))
-                  .arg( af::time2QstrHMS( taskssumruntime/tasksdone, true));
+   if( tasksdone) str_runtime = QString("RT: sum%1 avg%2")
+                  .arg( af::time2strHMS( taskssumruntime, true).c_str())
+                  .arg( af::time2strHMS( taskssumruntime/tasksdone, true).c_str());
    else str_runtime = "Run Time";
 
    str_properties.clear();
@@ -359,8 +359,8 @@ void BlockInfo::drawProgress(
 const QString BlockInfo::generateToolTip() const
 {
    QString toolTip = QString("Run Time: Sum = %1 / %2 = Average")
-                     .arg( af::time2QstrHMS( taskssumruntime, true))
-                     .arg( af::time2QstrHMS( tasksdone ? taskssumruntime/tasksdone : 0, true));
+                     .arg( af::time2strHMS( taskssumruntime, true).c_str())
+                     .arg( af::time2strHMS( tasksdone ? taskssumruntime/tasksdone : 0, true).c_str());
 
    toolTip += "\nCapacity = "                +  QString::number( capacity);
 

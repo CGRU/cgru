@@ -75,6 +75,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    cmd_post          = job->getCmdPost();
    description       = job->getDescription();
    num_runningtasks  = job->getRunningTasksNumber();
+   lifetime          = job->getLifeTime();
 
    compact_display   = true;
    for( int b = 0; b < blocksnum; b++)
@@ -89,7 +90,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    num_runningtasks_str = QString::number( num_runningtasks);
 
    time_run = time_done - time_started;
-   if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2QstrHMS( time_run);
+   if( state & AFJOB::STATE_DONE_MASK) runningTime = af::time2strHMS( time_run).c_str();
 
    properties.clear();
    if( false == dependmask_global.isEmpty()) properties += QString(" gD(%1)").arg( dependmask_global   );
@@ -111,35 +112,7 @@ void ItemJob::updateValues( af::Node *node, int type)
       user_time += " (LOCK)";
    }
 
-   tooltip =  name;
-   tooltip += "\nCreation time = " + af::time2Qstr( time_creation);
-   if( time_started ) tooltip += "\nStarted  time = " + af::time2Qstr( time_started);
-   if( state & AFJOB::STATE_DONE_MASK) tooltip += "\nFinished time = " + af::time2Qstr( time_done);
-   tooltip += "\nCreation host = " + hostname;
-   tooltip += "\nPriority = " + QString::number(priority);
-   tooltip += "\nMaximum running tasks = " + QString::number(maxrunningtasks);
-   if( maxrunningtasks == -1 ) tooltip += " (no limit)";
-   tooltip += "\nHosts mask: \"" + hostsmask + '"';
-   if( hostsmask.isEmpty())
-      tooltip += " (any host)";
-   if( false == hostsmask_exclude.isEmpty())
-      tooltip += QString("\nExclude hosts mask: \"%1\"").arg( hostsmask_exclude);
-   if( false == dependmask.isEmpty())
-      tooltip += QString("\nDepend mask = \"%1\"").arg( dependmask);
-   if( false == dependmask_global.isEmpty())
-      tooltip += QString("\nGlobal depend mask = \"%1\"").arg( dependmask_global);
-   if( time_wait )
-      tooltip += QString("\nWait time = %1").arg( QDateTime::fromTime_t( time_wait).toString());
-   if( false == need_os.isEmpty())
-      tooltip += QString("\nNeeded OS: \"%1\"").arg( need_os);
-   if( false == need_properties.isEmpty())
-      tooltip += QString("\nNeeded properties: \"%1\"").arg( need_properties);
-   if( cmd_pre.isEmpty() == false )
-      tooltip += QString("\nPre command:\n%1").arg( cmd_pre);
-   if( cmd_post.isEmpty() == false )
-      tooltip += QString("\nPost command:\n%1").arg( cmd_post);
-   if( false == description.isEmpty())
-      tooltip += "\n" + description;
+   tooltip = job->generateInfoString( true).c_str();
 
    calcHeight();
 }
@@ -180,10 +153,10 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    QString user_time_current = user_time;
    if( time_started && (( state & AFJOB::STATE_DONE_MASK) == false))
    {
-      user_time_current = af::time2QstrHMS( currenttime - time_started  ) + " - " + user_time;
+      user_time_current = QString(af::time2strHMS( currenttime - time_started).c_str()) + " - " + user_time;
    }
    if( time_wait > currenttime )
-      user_time_current = user_time + " - " + af::time2QstrHMS( time_wait - currenttime );
+      user_time_current = user_time + " - " + af::time2strHMS( time_wait - currenttime ).c_str();
 
    printfState( state, x+35+(w>>3), y+25, painter, option);
 
@@ -193,7 +166,11 @@ void ItemJob::paint( QPainter *painter, const QStyleOptionViewItem &option) cons
    int cy = y-10; int dy = 13;
 	QRect rect_user;
    painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, user_time_current, &rect_user);
-   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties);
+
+   QString properties_lifetime = properties;
+   if( lifetime > 0 ) properties_lifetime += QString(" L%1-%2")
+      .arg( af::time2strHMS( lifetime, true).c_str()).arg( af::time2strHMS( lifetime - (currenttime - time_creation)).c_str());
+   painter->drawText( x, cy+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, properties_lifetime);
 
    painter->setPen( clrTextMain( option) );
    painter->setFont( afqt::QEnvironment::f_name);

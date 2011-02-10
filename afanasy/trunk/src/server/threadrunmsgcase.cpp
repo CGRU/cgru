@@ -93,6 +93,7 @@ switch ( msg->type())
    case af::Msg::TUserErrorRetries:
    case af::Msg::TUserErrorsTaskSameHost:
    case af::Msg::TUserErrorsForgiveTime:
+   case af::Msg::TUserJobsLifeTime:
    {
       af::MCGeneral mcgeneral( msg);
       users->action( mcgeneral, msg->type(), NULL, monitors);
@@ -127,6 +128,7 @@ switch ( msg->type())
    case af::Msg::TJobDependMaskGlobal:
    case af::Msg::TJobMaxRunningTasks:
    case af::Msg::TJobWaitTime:
+   case af::Msg::TJobLifeTime:
    case af::Msg::TJobPriority:
    case af::Msg::TJobStart:
    case af::Msg::TJobStop:

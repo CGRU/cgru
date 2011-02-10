@@ -110,6 +110,13 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_forgivetime);
       break;
    }
+   case af::Msg::TUserJobsLifeTime:
+   {
+      appendLog( QString("Jobs life time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      jobs_lifetime = mcgeneral.getNumber();
+      if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
+      break;
+   }
    case af::Msg::TUserAdd:
    {
       if( false == isPermanent())

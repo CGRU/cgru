@@ -330,7 +330,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
    if( taskstartfinishtime )
    {
-      taskstartfinishtime_str = af::time2QstrHMS( time(NULL) - taskstartfinishtime );
+      taskstartfinishtime_str = af::time2strHMS( time(NULL) - taskstartfinishtime ).c_str();
       if( busy == false ) taskstartfinishtime_str += " free";
       else taskstartfinishtime_str += " busy";
    }
@@ -451,7 +451,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
 
 			QRect rect_usertime;
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
-            QString("%1 - %2").arg((*it)->getUserName(), af::time2QstrHMS( time(NULL) - (*it)->getTimeStart())), &rect_usertime);
+            QString("%1 - %2").arg((*it)->getUserName()).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
          painter->drawText( x+18, y, w-30-rect_usertime.width(), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
          painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, *(*ii));
       }

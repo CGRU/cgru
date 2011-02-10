@@ -410,7 +410,12 @@ const char * Msg::TNAMES[]=
    /// Request a job progress with given id. The answer is TJobProgress. If there is no job with such id the answer is TJobProgressRequestId.
    "TJobProgressRequestId",
 
-   /*------------ DATA MESSAGES ----------------------*/
+
+   /*---------------------------------------------------------------------------------------------------------*/
+   /*--------------------------------- DATA MESSAGES ---------------------------------------------------------*/
+   /*---------------------------------------------------------------------------------------------------------*/
+
+
    "TDATA",                      ///< Some data.
    "TTESTDATA",                  ///< Test some data transfer.
    "TQString",                   ///< QString text message.
@@ -503,6 +508,7 @@ const char * Msg::TNAMES[]=
    "TUsersList",                 ///< Active users information.
    "TUserAdd",                   ///< Add a permatent user.
    "TUserDel",                   ///< Remove a permatent user.
+   "TUserJobsLifeTime",          ///< Set user jobs default life time.
    "TUserHostsMask",             ///< Set user hosts mask.
    "TUserHostsMaskExclude",      ///< Set user exclude hosts mask.
    "TUserMaxRunningTasks",       ///< Set user maximum running tasks number.
@@ -540,6 +546,7 @@ const char * Msg::TNAMES[]=
    "TJobDependMaskGlobal",       ///< Set job global depend mask.
    "TJobMaxRunningTasks",        ///< Set job maximum running tasks number.
    "TJobWaitTime",               ///< Set job wait time.
+   "TJobLifeTime",               ///< Set job life time.
    "TJobPriority",               ///< Set job priority.
    "TJobNeedOS",                 ///< Set a job os needed.
    "TJobNeedProperties",         ///< Set a job properties needed.

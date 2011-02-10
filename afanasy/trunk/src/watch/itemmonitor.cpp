@@ -29,10 +29,10 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_launch    = monitor->getTimeLaunch();
    time_register  = monitor->getTimeRegister();
 
-   timelaunch   = TimeLaunch     .arg( af::time2Qstr( time_launch ));
-   timel        = TimeL          .arg( af::time2Qstr( time_launch ));
-   timeregister = TimeRegister   .arg( af::time2Qstr( time_register ));
-   timer        = TimeR          .arg( af::time2Qstr( time_register ));
+   timelaunch   = TimeLaunch     .arg( af::time2str( time_launch  ).c_str());
+   timel        = TimeL          .arg( af::time2str( time_launch  ).c_str());
+   timeregister = TimeRegister   .arg( af::time2str( time_register).c_str());
+   timer        = TimeR          .arg( af::time2str( time_register).c_str());
 
    address = Address.arg( monitor->getAddress()->generateIPString().c_str());
 

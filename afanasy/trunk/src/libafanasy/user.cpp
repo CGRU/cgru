@@ -23,6 +23,7 @@ User::User( const QString &username, const QString &host):
    errors_avoidhost( af::Environment::getErrorsAvoidHost()  ),
    errors_tasksamehost( af::Environment::getTaskErrorsSameHost() ),
    errors_forgivetime( af::Environment::getErrorsForgiveTime()),
+   jobs_lifetime( 0),
    time_register( 0)
 {
    name = username;
@@ -73,6 +74,7 @@ void User::readwrite( Msg * msg)
    rw_uint8_t ( errors_tasksamehost,   msg);
    rw_int32_t ( errors_forgivetime,    msg);
    rw_uint32_t( time_online,           msg);
+   rw_int32_t ( jobs_lifetime,         msg);
    rw_int32_t ( numjobs,               msg);
    rw_int32_t ( numrunningjobs,        msg);
    rw_int32_t ( runningtasksnumber,    msg);
@@ -108,18 +110,19 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "User id=" << id << ", name = \"" << name.toUtf8().data() << "\":";
-      stream << "\n\tJobs = " << numjobs << " / active jobs = " << numrunningjobs;
-      stream << "\n\tMaximum Running Tasks Number = " << maxrunningtasks;
-      stream << "\n\tRunning Tasks Number = " << runningtasksnumber;
-      if( hasHostsMask())        stream << "\n\tHosts Mask = \"" << hostsmask.pattern().toUtf8().data() << "\"";
-      if( hasHostsMaskExclude()) stream << "\n\tExclude Hosts Mask = \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"\n";
-      stream << "\n\tRegistration time = " << time2str( time_register);
-      stream << "\n\tOnline time = " << time2str( time_online);
-      stream << "\n\tHost = " << hostname.toUtf8().data();
-      stream << "\n\tPriority = " << int(priority);
-      if( isPermanent()) stream << "\n\tstatus = PERMANENT"; else stream << "\n\tstatus = temporary";
-      stream << "\n\tWeight = " << calcWeight() << " bytes.";
+      stream << "User name = \"" << name.toUtf8().data() << "\" (id=" << id << "):";
+      stream << "\n Priority = " << int(priority);
+      stream << "\n Jobs = " << numjobs << " / active jobs = " << numrunningjobs;
+      if( jobs_lifetime > 0 ) stream << "\n Jobs life time = " << af::time2strHMS( jobs_lifetime, true);
+      stream << "\n Maximum Running Tasks Number = " << maxrunningtasks;
+      stream << "\n Running Tasks Number = " << runningtasksnumber;
+      if( hasHostsMask())        stream << "\n Hosts Mask = \"" << hostsmask.pattern().toUtf8().data() << "\"";
+      if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"";
+      stream << "\n Registration time = " << time2str( time_register);
+      stream << "\n Online time = " << time2str( time_online);
+      stream << "\n Last host = " << hostname.toUtf8().data();
+      stream << "\n Memory = " << calcWeight() << " bytes.";
+      if( isPermanent()) stream << "\n Status = PERMANENT"; else stream << "\n Status = temporary";
    }
    else
    {

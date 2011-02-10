@@ -47,6 +47,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    errors_tasksamehost  = user->getErrorsTaskSameHost();
    errors_retries       = user->getErrorsRetries();
    errors_forgivetime   = user->getErrorsForgiveTime();
+   jobs_lifetime        = user->getJobsLifeTime();
 
    if( numrunningtasks ) setRunning();
    else                  setNotRunning();
@@ -61,30 +62,16 @@ void ItemUser::updateValues( af::Node *node, int type)
    if( maxrunningtasks != -1) strHCenterTop  = QString("m%1").arg( maxrunningtasks );
    if( false == hostsmask.isEmpty()       )  strHCenterTop += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" E(%1)").arg( hostsmask_exclude );
-   strHCenterTop += QString(" E-%1j|%2t|%3r F%4h")
-                    .arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries)
-                    .arg( float(errors_forgivetime) / 3600.0, 0, 'g', 3);
+   strHCenterTop += QString(" E-%1j|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
+   if( errors_forgivetime > 0 ) strHCenterTop += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+   if( jobs_lifetime      > 0 ) strHCenterTop += QString(" L%1").arg( af::time2strHMS(      jobs_lifetime, true).c_str());
 
    strRightTop = hostname;
 
    strRightBottom = 'n' + QString::number( user->getNeed(), 'g', 5);
    if( user->isSolved()) strRightBottom += "_S";
 
-   tooltip = name + ":";
-   tooltip += "\nPriority = " + QString::number( priority);
-   tooltip += "\nMaximum running tasks = " + QString::number( maxrunningtasks);
-   if( maxrunningtasks == -1 ) tooltip += " (no limit)";
-   tooltip += "\nHosts mask = \"" + hostsmask + '"';
-   if( hostsmask.isEmpty() ) tooltip += " (any host)";
-   if( false == hostsmask_exclude.isEmpty()   ) tooltip += "\nExclude hosts mask = \"" + hostsmask_exclude + '"';
-   tooltip += "\nLast host = " + hostname;
-   tooltip += "\nJob errors avoid host = " + QString::number( errors_avoidhost);
-   tooltip += "\nTask errors avoid host = " + QString::number( errors_tasksamehost);
-   tooltip += "\nRetry task errors = " + QString::number( errors_retries);
-   tooltip += QString("\nErrors forgive time = %1 hours").arg( float(errors_forgivetime) / 3600.0);
-   tooltip += "\nJobs count = " + QString::number( user->getNumJobs());
-   tooltip += "\nOnline since " + af::time2Qstr( user->getTimeOnline()   );
-   if( permanent) tooltip += "\nRegistered at " + af::time2Qstr( user->getTimeRegister());
+   tooltip = user->generateInfoString( true).c_str();
 
    calcHeight();
 }

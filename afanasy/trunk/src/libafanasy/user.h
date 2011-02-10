@@ -57,6 +57,7 @@ public:
    inline float    getNeed()                 const { return need;                } ///< Get user need for hosts.
    inline uint32_t getTimeRegister()         const { return time_register;       } ///< Get register time.
    inline uint32_t getTimeOnline()           const { return time_online;         } ///< Get online time.
+   inline int      getJobsLifeTime()         const { return jobs_lifetime;       } ///< Get jobs default life time.
 
    inline int getErrorsAvoidHost()      const { return errors_avoidhost;    }
    inline int getErrorsRetries()        const { return errors_retries;      }
@@ -96,6 +97,8 @@ protected:
    int32_t errors_forgivetime;
 
    uint32_t time_register;      ///< User registration time (when he become permanent).
+
+   int32_t jobs_lifetime;        ///< User jobs default life time.
 
    int32_t numjobs;              ///< User jobs quantity.
    int32_t numrunningjobs;       ///< User active jobs quantity.

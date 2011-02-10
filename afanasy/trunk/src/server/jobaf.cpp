@@ -324,6 +324,14 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
    }
+   case af::Msg::TJobLifeTime:
+   {
+      lifetime = mcgeneral.getNumber();
+      log( QString("Life time set to \"%1\" by %2").arg( lifetime).arg(userhost));
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
+      jobchanged = af::Msg::TMonitorJobsChanged;
+      break;
+   }
    case af::Msg::TJobPriority:
    {
       priority  = mcgeneral.getNumber();
@@ -420,7 +428,8 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    }
    case af::Msg::TJobDelete:
    {
-      log( "Deleted by " + userhost );
+      log( "Deleted by " + userhost);
+      user->appendLog(QString("Job \"%1\" deleted by %2").arg( name, userhost));
       setZombie( (RenderContainer*)pointer, monitoring);
       if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
       return true;
@@ -845,6 +854,20 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    {
       jobchanged = af::Msg::TMonitorJobsChanged;
       if( monitoring ) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+   }
+
+   // Check age and delete if life finished:
+   if( id != AFJOB::SYSJOB_ID ) // skip system job
+   {
+      int result_lifetime = lifetime;
+      if( result_lifetime < 0 ) result_lifetime = user->getJobsLifeTime(); // get default value from user
+      if((result_lifetime > 0) && ((currentTime - time_creation) > result_lifetime))
+      {
+         log(QString("Life %1 finished.").arg( af::time2strHMS( lifetime, true).c_str()));
+         user->appendLog(QString("Job \"%1\" life %2 finished.").arg( name).arg( af::time2strHMS( lifetime, true).c_str()));
+         setZombie( renders, monitoring);
+         jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
+      }
    }
 
    if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());

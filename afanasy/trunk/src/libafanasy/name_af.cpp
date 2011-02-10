@@ -72,27 +72,63 @@ const QString af::time2Qstr( time_t time_sec)
 {
    return QString( af::time2str(time_sec).c_str());
 }
+
 const std::string af::time2str( time_t time_sec, const char * time_format)
 {
    static const int timeStrLenMax = 64;
    char buffer[timeStrLenMax];
+
    const char * format = time_format;
    if( format == NULL ) format = af::Environment::getTimeFormat();
    strftime( buffer, timeStrLenMax, format, localtime( &time_sec));
    return std::string( buffer);
 }
 
-const QString af::time2QstrHMS( uint32_t time32, bool clamp)
+const std::string af::time2strHMS( int time32, bool clamp)
 {
+   static const int timeStrLenMax = 64;
+   char buffer[timeStrLenMax];
+
    int hours = time32 / 3600;
    time32 -= hours * 3600;
    int minutes = time32 / 60;
    int seconds = time32 - minutes * 60;
-   QChar z('0');
-   if( clamp == false)  return QString("%1:%2.%3").arg( hours  ).arg( minutes, 2, 10, z).arg( seconds, 2, 10, z);
-   if(hours && minutes) return QString("%1:%2"   ).arg( hours  ).arg( minutes, 2, 10, z);
-   if( minutes )        return QString("%1.%2"   ).arg( minutes).arg( seconds, 2, 10, z);
-   else                 return QString("%1"      ).arg( seconds);
+
+   std::string str;
+
+   if( clamp )
+   {
+      if( hours )
+      {
+         sprintf( buffer, "%d", hours); str += buffer;
+         if( minutes || seconds )
+         {
+            sprintf( buffer, ":%02d", minutes); str += buffer;
+            if( seconds ) { sprintf( buffer, ".%02d", seconds); str += buffer;}
+         }
+         else str += "h";
+      }
+      else if( minutes )
+      {
+         sprintf( buffer, "%d", minutes); str += buffer;
+         if( seconds ) { sprintf( buffer, ".%02d", seconds); str += buffer;}
+         else str += "m";
+      }
+      else if( seconds ) { sprintf( buffer, "%ds", seconds); str += buffer;}
+      else str += "0";
+   }
+   else
+   {
+      sprintf( buffer, "%d:%02d.%02d", hours, minutes, seconds);
+      str += buffer;
+   }
+
+//   if( clamp == false)  return QString("%1:%2.%3").arg( hours  ).arg( minutes, 2, 10, z).arg( seconds, 2, 10, z);
+//   if(hours && minutes) return QString("%1:%2"   ).arg( hours  ).arg( minutes, 2, 10, z);
+//   if( minutes )        return QString("%1.%2"   ).arg( minutes).arg( seconds, 2, 10, z);
+//   else                 return QString("%1"      ).arg( seconds);
+
+   return str;
 }
 
 const QString af::state2str( int state)
@@ -105,14 +141,9 @@ const QString af::state2str( int state)
    return str;
 }
 
-void af::printTime( uint32_t time32)
+void af::printTime( time_t time_sec, const char * time_format)
 {
-   QString str;
-   if( time32 == 0)
-      str = time2Qstr( time( NULL));
-   else
-      str = time2Qstr( time32);
-   printf("%s",str.toUtf8().data());
+   std::cout << time2str( time_sec, time_format);
 }
 
 bool af::setRegExp( QRegExp & regexp, const QString & str, const QString & name)

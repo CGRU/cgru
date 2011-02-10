@@ -555,8 +555,13 @@ int BlockData::calcWeight() const
 void BlockData::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << "Block[" << name.toUtf8().data() << "]";
-   stream << " (" << service.toUtf8().data() << "-" << parser.toUtf8().data() << "[" << parsercoeff << "] )";
-   stream << " " << tasksnum << " tasks.\n";
+   if( false == service.isEmpty())
+   {
+      stream << " (" << service.toUtf8().data();
+      if( false == parser.isEmpty()) stream << "-" << parser.toUtf8().data() << "[" << parsercoeff << "]";
+      stream << ")";
+   }
+   stream << " " << tasksnum << " tasks.";
 /*
    printf("BLOCK = \"%s\" ( %s-%s[%d] ), %d tasks.\n",
       name.toUtf8().data(), service.toUtf8().data(), parser.toUtf8().data(), parsercoeff, tasksnum);
@@ -597,24 +602,24 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    }
    printf("Memory: %d bytes\n", calcWeight());
    */
-                                      stream << "Command            = \"" << command.toUtf8().data()                    << "\"\n";
-                                      stream << "Working Directory  = \"" << wdir.toUtf8().data()                       << "\"\n";
-   if( !             files.isEmpty()) stream << "Files              = \"" << files.toUtf8().data()                      << "\"\n";
-   if( !        dependmask.isEmpty()) stream << "Depend Mask        = \"" << dependmask.pattern().toUtf8().data()       << "\"\n";
-   if( !   tasksdependmask.isEmpty()) stream << "Tasks Depend Mask  = \"" << tasksdependmask.pattern().toUtf8().data()  << "\"\n";
-   if( !         hostsmask.isEmpty()) stream << "Hosts Mask         = \"" << hostsmask.pattern().toUtf8().data()        << "\"\n";
-   if( ! hostsmask_exclude.isEmpty()) stream << "Hosts Mask Exclude = \"" << hostsmask_exclude.pattern().toUtf8().data()<< "\"\n";
-   if( !       environment.isEmpty()) stream << "Environment        = \"" << environment.toUtf8().data()                << "\"\n";
-   if( !           cmd_pre.isEmpty()) stream << "Pre Command        = \"" << cmd_pre.toUtf8().data()                    << "\"\n";
-   if( !          cmd_post.isEmpty()) stream << "Post Command       = \"" << cmd_post.toUtf8().data()                   << "\"\n";
-   if( !        customdata.isEmpty()) stream << "Custom Data        = \"" << customdata.toUtf8().data()                 << "\"\n";
-   if( !   need_properties.isEmpty()) stream << "Need Properties    = \"" << need_properties.pattern().toUtf8().data()  << "\"\n";
-   if(     need_power               ) stream << "Need Power         =  "  << need_power                                 <<   "\n";
-   if(     need_memory              ) stream << "Need Memory        =  "  << need_memory                                <<   "\n";
-   if(     need_hdd                 ) stream << "Need HDD           =  "  << need_hdd                                   <<   "\n";
+   if( !           command.isEmpty()) stream << "\n Command            = \"" << command.toUtf8().data()                    << "\"";
+   if( !              wdir.isEmpty()) stream << "\n Working Directory  = \"" << wdir.toUtf8().data()                       << "\"";
+   if( !             files.isEmpty()) stream << "\n Files              = \"" << files.toUtf8().data()                      << "\"";
+   if( !        dependmask.isEmpty()) stream << "\n Depend Mask        = \"" << dependmask.pattern().toUtf8().data()       << "\"";
+   if( !   tasksdependmask.isEmpty()) stream << "\n Tasks Depend Mask  = \"" << tasksdependmask.pattern().toUtf8().data()  << "\"";
+   if( !         hostsmask.isEmpty()) stream << "\n Hosts Mask         = \"" << hostsmask.pattern().toUtf8().data()        << "\"";
+   if( ! hostsmask_exclude.isEmpty()) stream << "\n Hosts Mask Exclude = \"" << hostsmask_exclude.pattern().toUtf8().data()<< "\"";
+   if( !       environment.isEmpty()) stream << "\n Environment        = \"" << environment.toUtf8().data()                << "\"";
+   if( !           cmd_pre.isEmpty()) stream << "\n Pre Command        = \"" << cmd_pre.toUtf8().data()                    << "\"";
+   if( !          cmd_post.isEmpty()) stream << "\n Post Command       = \"" << cmd_post.toUtf8().data()                   << "\"";
+   if( !        customdata.isEmpty()) stream << "\n Custom Data        = \"" << customdata.toUtf8().data()                 << "\"";
+   if( !   need_properties.isEmpty()) stream << "\n Need Properties    = \"" << need_properties.pattern().toUtf8().data()  << "\"";
+   if(     need_power               ) stream << "\n Need Power         =  "  << need_power;
+   if(     need_memory              ) stream << "\n Need Memory        =  "  << need_memory;
+   if(     need_hdd                 ) stream << "\n Need HDD           =  "  << need_hdd;
 
    if( isNumeric())
-      stream << "numeric: start = " << frame_first << ", end = " << frame_last << ", perTask = " << frame_pertask << ", increment = " << frame_inc << ".\n";
+      stream << "\n numeric: start = " << frame_first << ", end = " << frame_last << ", perTask = " << frame_pertask << ", increment = " << frame_inc << ".";
    else if( tasksdata == NULL ) return;
    // Not numeric block not filled with tasks will exit here
 
@@ -622,16 +627,16 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    {
       for( int t = 0; t < tasksnum; t++)
       {
+         stream << std::endl;
          stream << "#" << t << ":";
          TaskExec * task = genTask(t);
          stream << " [" << task->getName().toUtf8().data() << "] ";
          stream << "'" << task->getCommand().toUtf8().data() << "'";
          if( task->hasFiles()) stream << " (" << task->getFiles().toUtf8().data() << ")";
          delete task;
-         stream << std::endl;
       }
    }
-   stream << "Memory: " << calcWeight() << " bytes.";
+   stream << "\n Memory: " << calcWeight() << " bytes.";
 }
 
 

@@ -47,6 +47,8 @@ public:
 
    void generateJobsIds( af::MCGeneral & ids) const;
 
+   void appendLog( const QString &message);  ///< Append task log with a \c message .
+
 private:
    void construct();
    JobsList jobs; ///< Jobs list.
@@ -55,5 +57,4 @@ private:
    uint32_t zombietime; ///< User zombie time - time to have no jobs before deletion.
 
    QStringList log;                          ///< Log.
-   void appendLog( const QString &message);  ///< Append task log with a \c message .
 };

@@ -104,7 +104,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    else
       setNotRunning();
 
-   QString timeString = af::time2QstrHMS( taskprogress.time_done - taskprogress.time_start);
+   QString timeString = af::time2strHMS( taskprogress.time_done - taskprogress.time_start).c_str();
 
    //
    // Paint strings:

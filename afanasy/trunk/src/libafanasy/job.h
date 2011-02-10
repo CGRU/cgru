@@ -33,6 +33,7 @@ public:
    inline uint32_t getTimeStarted()          const { return time_started;          }
    inline uint32_t getTimeWait()             const { return time_wait;             }
    inline uint32_t getTimeDone()             const { return time_done;             }
+   inline int      getLifeTime()             const { return lifetime;              }
    inline int      getMaxRunningTasks()      const { return maxrunningtasks;       }
    inline const QString & getUserName()      const { return username;              }
    inline const QString & getHostName()      const { return hostname;              }
@@ -119,6 +120,9 @@ protected:
 
 /// Maximum number of running tasks
    int32_t maxrunningtasks;
+
+/// Life time, after this time job will be automatically deleted.
+   int32_t lifetime;
 
 /// set in this constructor
    uint32_t time_creation;
