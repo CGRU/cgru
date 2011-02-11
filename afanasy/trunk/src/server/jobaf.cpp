@@ -863,8 +863,8 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
       if( result_lifetime < 0 ) result_lifetime = user->getJobsLifeTime(); // get default value from user
       if((result_lifetime > 0) && ((currentTime - time_creation) > result_lifetime))
       {
-         log(QString("Life %1 finished.").arg( af::time2strHMS( lifetime, true).c_str()));
-         user->appendLog(QString("Job \"%1\" life %2 finished.").arg( name).arg( af::time2strHMS( lifetime, true).c_str()));
+         log(QString("Life %1 finished.").arg( af::time2strHMS( result_lifetime, true).c_str()));
+         user->appendLog(QString("Job \"%1\" life %2 finished.").arg( name).arg( af::time2strHMS( result_lifetime, true).c_str()));
          setZombie( renders, monitoring);
          jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
       }
