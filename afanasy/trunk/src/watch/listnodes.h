@@ -37,6 +37,7 @@ protected:
    bool sortascending;
    void sort();
    void sortMatch( const std::vector<int32_t> * list);
+   virtual void resetSorting();
 
    bool setFilter( const QString & str);
    bool filtering;

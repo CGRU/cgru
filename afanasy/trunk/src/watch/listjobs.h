@@ -24,7 +24,10 @@ protected:
    void doubleClicked( Item * item);
 
    void shownFunc();
+
    void connectionLost();
+
+   void resetSorting();
 
 private slots:
    void actMoveUp();

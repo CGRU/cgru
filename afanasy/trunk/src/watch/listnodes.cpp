@@ -257,6 +257,7 @@ void ListNodes::sortTypeChanged()
    if((ctrl->getSortType() == CtrlSortFilter::TNONE) || (ctrl->getSortType() >= CtrlSortFilter::TLAST))
    {
       sorting = false;
+      resetSorting();
    }
    else
    {
@@ -264,6 +265,8 @@ void ListNodes::sortTypeChanged()
       sort();
    }
 }
+
+void ListNodes::resetSorting(){}
 
 void ListNodes::sortDirectionChanged()
 {

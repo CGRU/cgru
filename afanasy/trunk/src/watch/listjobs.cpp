@@ -312,6 +312,12 @@ ItemNode* ListJobs::createNewItem( af::Node *node)
    return new ItemJob( (af::Job*)node);
 }
 
+void ListJobs::resetSorting()
+{
+   if( af::Environment::VISOR() == false )
+      Watch::sendMsg( new afqt::QMsg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+}
+
 void ListJobs::calcTotals()
 {
    int percent = 0;
