@@ -96,14 +96,15 @@ def dailiesEvaluate( node):
       for i in range( node.inputs()):
          inputnode = node.input(i)
          if inputnode is None: continue
-      if inputnode is not None and inputnode.Class() == 'Write':
-         images = inputnode.knob('file').value()
-         if images is not None and images != '':
-            movfolder = os.path.abspath( images)
-            movfolder = os.path.dirname( movfolder)
-            movfolder = os.path.dirname( movfolder)
-            movfolder = movfolder.replace('\\','/')
-            node.knob('movfolder').setValue( movfolder)
+      if inputnode is not None:
+         if inputnode.Class() == 'Read' or inputnode.Class() == 'Write':
+            images = inputnode.knob('file').value()
+            if images is not None and images != '':
+               movfolder = os.path.abspath( images)
+               movfolder = os.path.dirname( movfolder)
+               movfolder = os.path.dirname( movfolder)
+               movfolder = movfolder.replace('\\','/')
+               node.knob('movfolder').setValue( movfolder)
 
    # Naming Rule:
    movrule = node.knob('movrule').value()
