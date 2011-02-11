@@ -62,15 +62,18 @@ ListJobs::ListJobs( QWidget* parent):
    ctrl->addSortType(   CtrlSortFilter::TTIMERUN);
    ctrl->addSortType(   CtrlSortFilter::TTIMESTARTED);
    ctrl->addSortType(   CtrlSortFilter::TTIMEFINISHED);
-   ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
    ctrl->addSortType(   CtrlSortFilter::TNUMRUNNINGTASKS);
    ctrl->addSortType(   CtrlSortFilter::TNAME);
-   ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
-   ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
    ctrl->addFilterType( CtrlSortFilter::TNONE);
    ctrl->addFilterType( CtrlSortFilter::TNAME);
-   ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
-   ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
+   if( af::Environment::VISOR())
+   {
+      ctrl->addSortType(   CtrlSortFilter::TPRIORITY);
+      ctrl->addSortType(   CtrlSortFilter::THOSTNAME);
+      ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
+      ctrl->addFilterType( CtrlSortFilter::THOSTNAME);
+      ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
+   }
 
    initSortFilterCtrl();
 
