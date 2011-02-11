@@ -164,7 +164,7 @@ printf("\n");
 #endif
    }
 
-   if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning))
+   if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning) && (update_status != af::TaskExec::UPFinishedParserError))
    {
       printf("Warning: Parser notification.\n");
       update_status = af::TaskExec::UPWarning;
