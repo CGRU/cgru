@@ -11,6 +11,7 @@
 #include "res.h"
 
 #ifdef WINNT
+#include <QtCore/QDir>
 #include <QtCore/QFile>
 #endif
 
@@ -45,34 +46,39 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
    }
 
 #ifdef WINNT
-// Windows Must Die:
    Sleep( 100);
-   QString filename = QString("%1\\windowsmustdie.txt").arg( af::Environment::getAfRoot());
-   QFile file( filename);
-   if( file.open(QFile::ReadOnly))
+// Windows Must Die:
+   QStringList wmdfiles = QDir(af::Environment::getAfRoot()).entryList( QStringList("windowsmustdie*.txt"), QDir::Files, QDir::Name);
+   for( int i = 0; i < wmdfiles.size(); i++)
    {
-      char buf[4096];
-      int len = 0;
-      do
+      QString filename = QString("%1\\%2").arg( af::Environment::getAfRoot(), wmdfiles[i]);
+      QFile file( filename);
+      if( file.open(QFile::ReadOnly))
       {
-         len = file.readLine( buf, sizeof( buf));
-         if( len > 0 )
+         char buf[4096];
+         int len = 0;
+         do
          {
-            QString line = QString( buf).simplified();
-            if( false == line.isEmpty())
-               windowsmustdie.append( line);
+            len = file.readLine( buf, sizeof( buf));
+            if( len > 0 )
+            {
+               QString line = QString( buf).simplified();
+               if( false == line.isEmpty())
+                  windowsmustdie.append( line);
+            }
          }
+         while( len != -1);
+         file.close();
       }
-      while( len != -1);
-      file.close();
-      if( windowsmustdie.size())
-      {
-         printf("Windows Must Die:\n");
-         for( int i = 0; i < windowsmustdie.size(); i++)
-            printf("   %s\n", windowsmustdie[i].toUtf8().data());
-      }
+      else printf("Unable to read '%s'.\n", filename.toUtf8().data());
    }
-   else printf("Unable to read '%s'.\n", filename.toUtf8().data());
+   if( windowsmustdie.size())
+   {
+      windowsmustdie.removeDuplicates();
+      printf("Windows Must Die:\n");
+      for( int i = 0; i < windowsmustdie.size(); i++)
+         printf("   %s\n", windowsmustdie[i].toUtf8().data());
+   }
 #else
    usleep( 100000);
 #endif
@@ -88,6 +94,9 @@ RenderHost::~RenderHost()
 {
    for( int i = 0; i < pyres.size(); i++) if( pyres[i]) delete pyres[i];
    if( upmsg != NULL ) delete upmsg;
+#ifdef WINNT
+   windowsMustDie();
+#endif
 }
 
 afqt::QMsg* RenderHost::updateMsg( afqt::QMsg *msg)
@@ -107,7 +116,19 @@ afqt::QMsg* RenderHost::updateMsg( afqt::QMsg *msg)
 //   hres.readwrite( msg);
 
 #ifdef WINNT
+   windowsMustDie();
+#endif
+
+   upmsg = new afqt::QMsg( msg->type(), this, true);
+
+   return upmsg;
+}
+
+#ifdef WINNT
+void RenderHost::windowsMustDie() const
+{
 // Windows Must Die:
+//printf("RenderHost::windowsMustDie():\n");
    for( int i = 0; i < windowsmustdie.size(); i++)
    {
       HWND WINAPI hw = FindWindow( NULL, TEXT( windowsmustdie[i].toUtf8().data()));
@@ -117,9 +138,5 @@ afqt::QMsg* RenderHost::updateMsg( afqt::QMsg *msg)
          SendMessage( hw, WM_CLOSE, 0, 0);
       }
    }
-#endif
-
-   upmsg = new afqt::QMsg( msg->type(), this, true);
-
-   return upmsg;
 }
+#endif

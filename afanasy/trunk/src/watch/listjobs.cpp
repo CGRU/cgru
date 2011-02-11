@@ -682,10 +682,12 @@ void ListJobs::actLifeTime()
    double cur = double( jobitem->lifetime ) / (60.0*60.0);
 
    bool ok;
-   double hours = QInputDialog::getDouble( this, "Life Time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
+   double hours = QInputDialog::getDouble( this, "Life Time", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( int( hours * 60.0 * 60.0 ));
+   int seconds = hours * 60.0 * 60.0;
+   if( seconds < -1 ) seconds = -1;
+   af::MCGeneral mcgeneral( seconds);
    action( mcgeneral, af::Msg::TJobLifeTime);
 }
 

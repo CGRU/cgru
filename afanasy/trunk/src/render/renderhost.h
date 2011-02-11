@@ -23,6 +23,10 @@ public:
 
    afqt::QMsg* updateMsg( afqt::QMsg *msg);
 
+#ifdef WINNT
+   void windowsMustDie() const;
+#endif
+
 private:
 #ifdef WINNT
    QStringList windowsmustdie;

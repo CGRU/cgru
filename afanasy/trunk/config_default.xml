@@ -2,7 +2,7 @@
 <afanasy>
 
 <!-- General -->
-   <timeformat>%a %e %b %H:%M.%S</timeformat>
+   <timeformat>%a %d %b %H:%M.%S</timeformat>
 <!-- 'strftime' function format
 http://www.cplusplus.com/reference/clibrary/ctime/strftime
 -->

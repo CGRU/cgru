@@ -8,7 +8,7 @@
 /// General:
 namespace AFGENERAL
 {
-   const char TIME_FORMAT[]      = "%a %e %b %H:%M.%S";  ///< Default time output format.
+   const char TIME_FORMAT[]      = "%a %d %b %H:%M.%S";  ///< Default time output format.
    const int  DEFAULT_PRIORITY   = 99;                   ///< Default priority for user, jobs and hosts.
    const int  MAXRUNNINGTASKS    = -1;                   ///< Default maximum running tasks number.
    const int  FILENAMESIZEMAX    = 250;                  ///< Maximum filename size.

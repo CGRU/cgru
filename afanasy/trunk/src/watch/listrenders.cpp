@@ -220,29 +220,29 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       connect( action, SIGNAL( triggered() ), this, SLOT( actStart() ));
       menu.addAction( action);
 */
-   }
 
-   int cmdssize = af::Environment::getRenderCmds().size();
-   if( cmdssize > 0 )
-   {
+      int cmdssize = af::Environment::getRenderCmds().size();
+      if( cmdssize > 0 )
+      {
+         menu.addSeparator();
+
+         QMenu * submenu = new QMenu( "Custom", this);
+         for( int i = 0; i < cmdssize; i++)
+         {
+            ActionId * actionid = new ActionId( i, QString("%1").arg( af::Environment::getRenderCmds()[i]), this);
+            connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
+            submenu->addAction( actionid);
+         }
+         menu.addMenu( submenu);
+      }
+
       menu.addSeparator();
 
-      QMenu * submenu = new QMenu( "Custom", this);
-      for( int i = 0; i < cmdssize; i++)
-      {
-         ActionId * actionid = new ActionId( i, QString("%1").arg( af::Environment::getRenderCmds()[i]), this);
-         connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
-         submenu->addAction( actionid);
-      }
-      menu.addMenu( submenu);
+      action = new QAction( "Shutdown Computer", this);
+      if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+      connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
+      menu.addAction( action);
    }
-
-   menu.addSeparator();
-
-   action = new QAction( "Shutdown Computer", this);
-   if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
-   connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
-   menu.addAction( action);
 
    menu.exec( event->globalPos());
 }

@@ -174,19 +174,23 @@ void Address::generateIPStream( std::ostringstream & stream) const
    switch( family)
    {
       case IPv4:
-         stream << int( addr[0]) << "." << int( addr[1]) << "." << int( addr[2]) << "." << int( addr[3]);
+      {
+         char buffer[64];
+         sprintf( buffer, "%u.%u.%u.%u", uint8_t(addr[0]), uint8_t(addr[1]), uint8_t(addr[2]), uint8_t(addr[3]));
+         stream << buffer;
          break;
+      }
       case IPv6:
+      {
+         char buffer[64];
          for( int i = 0; i < 8; i++)
          {
             if( i != 0 ) stream << ':';
-            char buffer[8];
-            sprintf( buffer, "%02x", uint8_t(addr[2*i  ]));
-            stream << buffer;
-            sprintf( buffer, "%02x", uint8_t(addr[2*i+1]));
+            sprintf( buffer, "%02x%02x", uint8_t(addr[2*i]), uint8_t(addr[2*i+1]));
             stream << buffer;
          }
          break;
+      }
       default:
          stream << "Unknown address family";
          break;
