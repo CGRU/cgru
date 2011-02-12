@@ -20,6 +20,7 @@ if [ ! -f "$configure_cgru" ] ; then
    -e "s:OPENEXR_CFLAGS="":#OPENEXR_CFLAGS="":g" \
    -e "s:OPENEXR_LIBS="":#OPENEXR_LIBS="":g" \
    < "${configure_cgru}" > "${configure}"
+   chmod a+rwx $configure
 fi
 
 if [ -z "$1" ]; then
