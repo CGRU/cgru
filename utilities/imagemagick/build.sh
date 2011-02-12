@@ -1,6 +1,8 @@
 #!/bin/bash
 
-im=$PWD/ImageMagick
+v=6.6.7
+
+im=$PWD/ImageMagick-$v
 
 exr=`dirname $PWD`/openexr
 
