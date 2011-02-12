@@ -11,6 +11,17 @@ export OPENEXR_LIBS="-L$exr/lib -lIlmImf -lz -lImath -lHalf -lIex -lIlmThread -l
 
 cd $im
 
+configure="configure"
+configure_cgru="$configure.cgru"
+if [ ! -f "$configure_cgru" ] ; then
+   echo "Processing $configure"
+   mv -vf $configure $configure_cgru
+   sed \
+   -e "s:OPENEXR_CFLAGS="":#OPENEXR_CFLAGS="":g" \
+   -e "s:OPENEXR_LIBS="":#OPENEXR_LIBS="":g" \
+   < "${configure_cgru}" > "${configure}"
+fi
+
 if [ -z "$1" ]; then
    make clean
    #with-quantum-depth=32
