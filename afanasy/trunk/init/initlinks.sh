@@ -84,13 +84,15 @@ if [ "$action" == "rm" ]; then
 fi
 
 # Getting depends:
-depends=cgru_update
-depends_file="$afroot/init/depends_${app}"
-if [ -f $depends_file ]; then
-   depends=`cat $depends_file`
-else
-   echo $depends > $depends_file
-fi
+for depends_file in `ls $afroot/init/depends_${app}_*` ; do
+   echo "Processing depends file \"$depends_file\""
+   if [ -z "$depends" ]; then
+      depends=`cat $depends_file`
+   else
+      depends="$depends `cat $depends_file`"
+   fi
+done
+echo "Depends = \"$depends\""
 
 # Replacing variables:
 echo "Creating new daemon script:"

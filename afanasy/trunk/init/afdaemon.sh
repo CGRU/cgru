@@ -5,8 +5,8 @@
 #
 ### BEGIN INIT INFO
 # Provides: @APPLICATION@
-# Required-Start:  $local_fs $remote_fs $network @DEPENDS@
-# Required-Stop:   $local_fs $remote_fs $network @DEPENDS@
+# Required-Start:  @DEPENDS@
+# Required-Stop:   @DEPENDS@
 # Should-Start:    $syslog
 # Should-Stop:     $syslog
 # Default-Start:   2 3 4 5
