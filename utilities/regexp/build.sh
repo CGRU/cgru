@@ -7,7 +7,7 @@ export QMAKE=
 cgru_qt="`dirname $PWD`/qt"
 if [ -d "$cgru_qt" ]; then
    for folder in `ls $cgru_qt`; do
-      if [ "`echo $folder | gawk '{print match( \$1, "qt-4.")}'`" == "1" ]; then
+      if [ "`echo $folder | gawk '{print match( \$1, "4.")}'`" == "1" ]; then
          QMAKE="${cgru_qt}/${folder}/bin/qmake"
          echo "Founded CGRU Qt in '${folder}'"
       fi
