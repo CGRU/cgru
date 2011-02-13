@@ -9,4 +9,4 @@ link="$lcation/$archive"
 
 wget $link
 
-[ -f $archive ] && tar -xvjf $archive
+[ -f $archive ] && tar -xvzf $archive
