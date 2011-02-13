@@ -17,8 +17,8 @@ if [ ! -f "$configure_cgru" ] ; then
    echo "Processing $configure"
    mv -vf $configure $configure_cgru
    sed \
-   -e "s:OPENEXR_CFLAGS="":#OPENEXR_CFLAGS="":g" \
-   -e "s:OPENEXR_LIBS="":#OPENEXR_LIBS="":g" \
+   -e "s:OPENEXR_CFLAGS=\"\":#OPENEXR_CFLAGS=\"\":g" \
+   -e "s:OPENEXR_LIBS=\"\":#OPENEXR_LIBS=\"\":g" \
    < "${configure_cgru}" > "${configure}"
    chmod a+rwx $configure
 fi
@@ -29,6 +29,8 @@ if [ -z "$1" ]; then
    ./configure --prefix=$prefix --with-openexr --enable-hdri --enable-shared=
    make
    make install
+   cd ..
+   [ -f bin/convert ] && mv -vf bin/convert ../../bin
 else
    ./configure -h
 fi
