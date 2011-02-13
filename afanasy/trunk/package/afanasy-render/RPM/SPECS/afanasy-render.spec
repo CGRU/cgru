@@ -42,7 +42,7 @@ exit 0
 
 %post
 echo "Afanasy render POST INSTALL"
-id renderer || useradd renderer --create-home
+id render || useradd render --create-home
 /opt/cgru/afanasy/init/initlinks.sh c add afrender || true
 /etc/init.d/afrender start || true
 exit 0

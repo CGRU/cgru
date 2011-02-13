@@ -42,7 +42,7 @@ exit 0
 
 %post
 echo "Afanasy server POST INSTALL"
-id renderer || useradd renderer --create-home
+id render || useradd render --create-home
 /opt/cgru/afanasy/init/initlinks.sh c add afserver || true
 /etc/init.d/afserver start || true
 exit 0

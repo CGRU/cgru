@@ -2,7 +2,7 @@
 
 echo "Afanasy server POST INSTALL"
 
-id renderer || useradd renderer --create-home
+id render || useradd render --create-home
 
 /opt/cgru/afanasy/init/initlinks.sh u add afserver || true
 

@@ -17,8 +17,9 @@ echo "AF_ROOT    = '$AF_ROOT'"
 echo "Launchfile = '$exefile'"
 echo "Logfile    = '$logfile'"
 
-$exefile >& $logfile &
+touch $logfile
 chmod a+rw $logfile
+$exefile >& $logfile &
 
 if [ ! -z $pidfile ]; then
    echo "Pidfile    = '$pidfile'"
