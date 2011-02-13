@@ -15,7 +15,7 @@ afanasy/python \
 afanasy/bin/pyaf.so \
 afanasy/config_default.xml \
 afanasy/pathmap.txt \
-afanasy/farm_default.xml \
+afanasy/farm_example.xml \
 afanasy/bin/afcmd \
 afanasy/init \
 "
