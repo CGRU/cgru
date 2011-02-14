@@ -88,7 +88,7 @@
    </ul>
    <p>
    Setup puts <kbd>.../cgru/bin</kbd> and <kbd>.../cgru/afanasy/bin</kbd> in <code>PATH</code>.<br/>
-   Appends <code>PYTHONPATH</code> with <kbd>.../cgru/bin</kbd>, <kbd>.../cgru/afanasy/python</kbd> and <kbd>.../cgru/afanasy/bin</kbd>.
+   Appends <code>PYTHONPATH</code> with <kbd>.../cgru/lib/python</kbd>, <kbd>.../cgru/afanasy/python</kbd> and <kbd>.../cgru/afanasy/bin</kbd>.
    It allows to import CGRU and Afanasy Python modules.
    </p>
    <ul>
@@ -133,28 +133,31 @@
    </li>
    <li><h4>Linux</h4>
       <p>
-         There is some ready solution (<i>bash</i> scripts) to make server and render to launch automatically at system boot.
-      </p>         
-      <p>
-         It is better to launch server and render processes by a special user. Lets name him <kbd>renderer</kbd>.
+         <a href="../../doc/install_linuxpackages.html">Linux Packages</a> setup automatic lauch during installation.
+         So if you use them, you should not have to do anything yourself.
+         But you can read a text below to understand installation process.
       </p>
-      <code># useradd renderer</code><br/>
+
+      <p>
+         Create special user to launch server and render processes. Lets name him <kbd>render</kbd>.
+      </p>
+      <code># useradd render</code><br/>
       <p>
          This command will create him. Next scripts use this user name.
+         Ensure that this user is not disabled by default on some systems.
       </p>
       <p>
          There are some <kbd>bash</kbd> scripts in <code>cgru/afanasy/init</code> directory.
          They can help you to setup automatic server and render launch.
-         You can manually link <kbd>afserver</kbd> or <kbd>afrender</kbd> script in your startup scripts location
-         or use <kbd>initlink.sh</kbd> utility to do it.
       </p>
          <code># ./initlinks.sh [options] afserver</code><br/>
          <code># ./initlinks.sh [options] afrender</code><br/>
       <p>
-         You can launch this script with no arguments to output help.
+         Launching this script with no arguments will outputs help.
+         You can specify dependences in <kbd>depends_afrender_*</kbd> and <kbd>depends_afserver_*</kbd> files for server and render.
       </p>
       <p>
-         This command creates a link in <kbd>/etc/init.d</kbd> directory to a Afanasy application.
+         This command creates a script in <kbd>/etc/init.d</kbd> directory to a Afanasy application.
          Puts links in <kbd>/etc/rc?.d</kbd> directories to provide service starting and stopping.
          See script file for details.
       </p>
@@ -166,7 +169,7 @@
       <code># /etc/init.d/afrender start</code><br/>
       <code># /etc/init.d/afrender stop</code><br/>
       <p>
-         If you starting scripts as <kbd>root</kbd> user, applications will be launched by <kbd>renderer</kbd> user.
+         If you starting scripts as <kbd>root</kbd> user, applications will be launched by <kbd>render</kbd> user.
          You can customize 'non root' username in <kbd>cgru/afanasy/nonrootuser</kbd> file.
       </p>
       <p>
