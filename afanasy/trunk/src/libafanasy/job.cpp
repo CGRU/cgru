@@ -21,6 +21,7 @@ Job::Job( int Id):
    time_wait( 0),
    time_started( 0),
    time_done( 0),
+   userlistorder( -1),
    lifetime( -1)
 {
    initDefaultValues();
@@ -69,6 +70,7 @@ void Job::readwrite( Msg * msg)
    rw_QString ( cmd_pre,            msg);
    rw_QString ( cmd_post,           msg);
 
+   rw_int32_t ( userlistorder,      msg);
    rw_uint32_t( time_creation,      msg);
    rw_uint32_t( time_wait,          msg);
    rw_uint32_t( time_started,       msg);
@@ -151,6 +153,7 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "[" << id << "]: ";
    stream << username.toUtf8().data();
    if( false == hostname.isEmpty()) stream << "@" << hostname.toUtf8().data();
+   stream << "[" << userlistorder << "]";
 
    if( blocksnum == 0)
    {

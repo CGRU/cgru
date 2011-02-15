@@ -60,9 +60,9 @@
 <h3>User Editable Parameters:</h3>
 <ul>
 <li><a name="Permanent"/><b>Permanent</b> - User exists in database (and his parameters are stored if server restarts). Not permanent with no jobs will be deleted.</li>
-<li><a name="Priority"/><b>Priority</b> - User with greater can get more render hosts.<br/>
-<code>need = pow( 1.1, priority) / (numhosts + 1.0)</code><br/>
-Each priority point gives 10% hosts bonus.
+<li><a name="Priority"/><b>Priority</b> - User with greater can have more running tasks number (get more render hosts).<br/>
+<code>need = pow( 1.1, priority) / (runningtasksnumber + 1.0)</code><br/>
+Each priority point gives 10% hosts bonus (running tasks number).
 </li>
 <li><a name="MaxHosts"/><b>Maximum Hosts</b> - Maximum number of hosts all user jobs can take.</li>
 <li><a name="HostsMask"/><b>Hosts Mask</b> - User run only on renders which host name matches this mask.</li>

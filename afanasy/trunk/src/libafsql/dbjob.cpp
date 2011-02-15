@@ -32,6 +32,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrUInt32( DBAttr::_time_done,          &time_done           ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_time_wait,          &time_wait           ));
    dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,    &maxrunningtasks     ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_userlistorder,      &userlistorder       ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,          &hostsmask           ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,  &hostsmask_exclude   ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,         &dependmask          ));
@@ -71,7 +72,7 @@ void DBJob::getIds( std::list<int32_t> & uids, QSqlDatabase * db)
       return;
    }
    QSqlQuery q( *db);
-   q.exec(QString("SELECT id FROM %1 ORDER BY time_creation").arg( TableName));
+   q.exec(QString("SELECT id FROM %1 ORDER BY userlistorder").arg( TableName));
    while (q.next()) uids.push_back( q.value(0).toUInt());
 printf("DBJob::getIds: %u jobs founded.\n", unsigned(uids.size()));
 }

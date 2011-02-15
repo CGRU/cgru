@@ -11,7 +11,7 @@ public:
    JobsList();
    ~JobsList();
 
-   void addJob( JobAf* job);
+   int addJob( JobAf* job);
 
 protected:
 

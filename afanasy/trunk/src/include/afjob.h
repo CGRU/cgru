@@ -74,7 +74,7 @@ namespace AFJOB
    const char SYSJOB_NAME[]               = "afanasy";
    const char SYSJOB_USERNAME[]           = "afadmin";
    const char SYSJOB_BLOCKSERVICE[]       = "system";
-   const int  SYSJOB_TASKMAXRUNTIME       = 72;    // Maximum time of system task running
+   const int  SYSJOB_TASKMAXRUNTIME       = 60;    // Maximum time of system task running
    const int  SYSJOB_TASKLIFE             = 1800;  // Tasks life: older tasks will be deleted
    const int  SYSJOB_TASKSMAX             = 10000; // Maximum number of tasks in system job
    const int  SYSJOB_ERRORS_AVIODHOST     = 3;

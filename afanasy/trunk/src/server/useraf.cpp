@@ -151,12 +151,22 @@ void UserAf::setZombie()
    AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());
 }
 
-void UserAf::addJob( JobAf *job)
+int UserAf::addJob( JobAf *job)
 {
    appendLog( QString("Adding a job: %1").arg(job->getName()));
    zombietime = 0;
-   jobs.addJob( job );
+   int userlistorder = jobs.addJob( job );
    numjobs++;
+   updateJobsOrder( job);
+   return userlistorder;
+}
+
+void UserAf::updateJobsOrder( af::Job * newJob)
+{
+   JobsListIt jobsListIt( &jobs);
+   int userlistorder = 0;
+   for( af::Job *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+      ((JobAf*)(job))->setUserListOrder( userlistorder++, job != newJob);
 }
 
 void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
@@ -280,9 +290,10 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
       default:
       {
          AFERRAR("UserAf::moveJobs: Invalid type = %d.\n", type);
-         break;
+         return;
       }
    }
+   updateJobsOrder();
 }
 
 void UserAf::appendLog( const QString &message)

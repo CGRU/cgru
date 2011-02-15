@@ -92,6 +92,8 @@ public:
 
    bool checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str = NULL) const;
 
+   void setUserListOrder( int index, bool updateDtabase);
+
 public:
    /// Set Jobs Container.
    inline static void setJobContainer( JobContainer *Jobs){ jobs = Jobs;}

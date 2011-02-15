@@ -158,9 +158,9 @@ void BlockInfo::refresh()
 
    if(( errors_avoidhost != -1) || ( errors_tasksamehost != -1) || ( errors_retries != -1))
       str_properties += QString("E:%1b|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
-   if( errors_forgivetime != -1 ) str_properties += QString(" F%1h").arg( double(errors_forgivetime)/3600.0, 0, 'g', 2);
+   if( errors_forgivetime != -1 ) str_properties += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
-   if( tasksmaxruntime) str_properties += QString(" Max%1h").arg( double(tasksmaxruntime)/3600.0, 0, 'g', 2);
+   if( tasksmaxruntime) str_properties += QString(" Max%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
 
    if( maxrunningtasks != -1 ) str_properties += QString(" m%1").arg(maxrunningtasks_str);
    if( false == hostsmask.isEmpty()          ) str_properties += QString(" H(%1)").arg( hostsmask         );

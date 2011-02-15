@@ -27,8 +27,9 @@ AFINFO("AfList::~AfList:\n");
    while( it != end_it) (*it++)->lists.remove( this);
 }
 
-void AfList::add( af::Node *node)
+int AfList::add( af::Node *node)
 {
+   int index = -1;
 //BEGIN mutex
    if( pthread_rwlock_wrlock( &rwlock) != 0)
       AFERRPE("AfList::add: pthread_rwlock_wrlock:");
@@ -37,6 +38,7 @@ void AfList::add( af::Node *node)
    if( *it == node )
    {
       AFERROR("AfList::add: node already exists.\n");
+      return index;
    }
    else
    {
@@ -47,6 +49,7 @@ void AfList::add( af::Node *node)
          bool lessPriorityFounded = false;
          while( it != end_it)
          {
+            index++;
             if( *(*it) >= *node ) { it++; continue;}
 
             nodes_list.insert( it, node);
@@ -59,12 +62,14 @@ void AfList::add( af::Node *node)
       else
          nodes_list.push_back( node);
 
+      index++;
       node->lists.push_back( this);
    }
 /*-------------------------------------------------------------*/
    if( pthread_rwlock_unlock( &rwlock) != 0)
       AFERRPE("AfList::add: pthread_rwlock_unlock:");
 //END mutex
+   return index;
 }
 
 void AfList::remove( af::Node *node)
@@ -81,9 +86,10 @@ void AfList::remove( af::Node *node)
 //END mutex
 }
 
-void AfList::sortPriority( af::Node * node)
+int AfList::sortPriority( af::Node * node)
 {
-   if( nodes_list.size() < 2 ) return;
+   int index = -1;
+   if( nodes_list.size() < 2 ) return index;
 
 //BEGIN mutex
    if( pthread_rwlock_wrlock( &rwlock) != 0)
@@ -95,16 +101,23 @@ void AfList::sortPriority( af::Node * node)
       bool lessPriorityFounded = false;
       while( it != end_it)
       {
+         index++;
          if( *(*it) >= *node ) { it++; continue;}
          nodes_list.insert( it, node);
          lessPriorityFounded = true;
          break;
       }
-      if( lessPriorityFounded == false ) nodes_list.push_back( node);
+      if( lessPriorityFounded == false )
+      {
+         index++;
+         nodes_list.push_back( node);
+      }
 /*-------------------------------------------------------------*/
    if( pthread_rwlock_unlock( &rwlock) != 0)
       AFERRPE("AfList::remove: pthread_rwlock_unlock:");
 //END mutex
+
+   return index;
 }
 
 void AfList::moveNodes( const std::vector<int32_t> * list, int type)
@@ -155,7 +168,7 @@ printf("Founded a node \"%s\"-%d\n", (*it)->getName().toUtf8().data(), (*it)->ge
       it++;
    }
 //
-//    return if nodes to move
+//    return if it os no nodes to move
 //
    if( move_list.size() == 0 )
    {

@@ -75,11 +75,21 @@ Check database connection.
 </p>
 <p>
 <code>$ afcmd db_resetall</code><br/>
-Drop tables in Afanasy database if any, and create new. This command must be executed at least before frist Afanasy start to create needed tables.
+Drop tables in Afanasy database if any, and create new.
+This command must be executed at least before frist Afanasy start to create needed tables.
 </p>
 <p>
 <code>$ afcmd db_jobsclean</code><br/>
-Delete invalid jobs from database. This can happen on some Afanasy bug (which I will fix :) ) or on some connection bug (this never happened yet, but it is possible). Invalid job in this case is a job with not all required data in other tables (blocks, tasks ..)
+Delete invalid jobs from database.
+This can happen on some Afanasy bug (which I will fix :) ) or on some connection bug (this never happened yet, but it is possible).
+Invalid job in this case is a job with not all required data in other tables (blocks, tasks ..)
+</p>
+<p>
+<code>$ afcmd db_sysjobdel</code><br/>
+It deletes system job from database.
+It needed if system job will have too much changes with new Afanasy version.
+Server does not delete system job in any case.
+The only way to delete system job is to stop server and to delete system job from database.
 </p>
 
 <h4>Server:</h4>

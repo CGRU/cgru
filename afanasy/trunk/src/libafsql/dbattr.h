@@ -61,6 +61,7 @@ public:
          _time_register,
          _time_started,
          _time_wait,
+         _userlistorder,
       _INTEGER_END_,
 
       _STRINGNAME_BEGIN_,

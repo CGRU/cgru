@@ -31,7 +31,7 @@ public:
    friend class AfContainer;
 
 protected:
-   void add( af::Node *node);    ///< Add node to list.
+   int add( af::Node *node);    ///< Add node to list.
    void remove( af::Node *node); ///< Remove node from list.
 
 private:
@@ -40,5 +40,5 @@ private:
 
    NodesList nodes_list;      ///< Nodes list.
 
-   void sortPriority( af::Node * node);   ///< Sort nodes by priority.
+   int sortPriority( af::Node * node);   ///< Sort nodes by priority.
 };

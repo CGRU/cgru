@@ -22,7 +22,7 @@ public:
 
    ~UserAf();
 
-   void addJob( JobAf *job);     ///< Add job to user.
+   int addJob( JobAf *job);     ///< Add job to user.
 
    bool canRun( RenderAf *render); ///< Whether the user can produce a task.
 
@@ -51,10 +51,13 @@ public:
 
 private:
    void construct();
-   JobsList jobs; ///< Jobs list.
-
+   void updateJobsOrder( af::Job * newJob = NULL);
    void setZombie();    ///< Set user to zombie.
+
+private:
    uint32_t zombietime; ///< User zombie time - time to have no jobs before deletion.
+
+   JobsList jobs; ///< Jobs list.
 
    QStringList log;                          ///< Log.
 };

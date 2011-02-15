@@ -34,6 +34,8 @@ public:
    inline uint32_t getTimeWait()             const { return time_wait;             }
    inline uint32_t getTimeDone()             const { return time_done;             }
    inline int      getLifeTime()             const { return lifetime;              }
+   inline int      getUserListOrder()        const { return userlistorder;         }
+
    inline int      getMaxRunningTasks()      const { return maxrunningtasks;       }
    inline const QString & getUserName()      const { return username;              }
    inline const QString & getHostName()      const { return hostname;              }
@@ -103,6 +105,8 @@ protected:
    int32_t blocksnum;   ///< Number of blocks in job.
 
    uint32_t flags;      ///< Job flags.
+
+   int32_t userlistorder;   ///< Job order in user jobs list.
 
    uint32_t state;      ///< Job state.
 

@@ -12,9 +12,9 @@ JobsList::~JobsList()
 {
 }
 
-void JobsList::addJob( JobAf* job)
+int JobsList::addJob( JobAf* job)
 {
-   add( (af::Node*)job );
+   return add( (af::Node*)job );
 }
 
 //########################## Iterator ##############################

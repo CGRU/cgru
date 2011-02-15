@@ -498,6 +498,12 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    return true;
 }
 
+void JobAf::setUserListOrder( int index, bool updateDtabase)
+{
+   userlistorder = index;
+   if( updateDtabase) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_userlistorder);
+}
+
 void JobAf::checkDepends()
 {
    state = state & (~AFJOB::STATE_WAITDEP_MASK);

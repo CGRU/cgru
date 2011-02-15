@@ -74,7 +74,7 @@ Now job (and block) post commands are executed on a render farm by a special sys
 </p>
 <p>
 <code>afcmd db_sysjobdel</code> - New <a href="../afanasy/doc/cmd.html">afcmd</a> command argument.
-It deletes system job from database. Will be needed if system job will have too much changes with new afanasy version.
+It deletes system job from database. Will be needed if system job will have too much changes with new Afanasy version.
 </p>
 <p>
 Nuke <a href="../plugins/nuke/doc/dailies.html">dailies</a> gizmo can be connected to "Read" node.
@@ -91,13 +91,15 @@ windows names list can be defined in several files, matched windowsmustdie*.txt 
 User can sort jobs in Watch.
 </p>
 <p>
+Server does not store deleted jobs logs and tasks outputs.
+</p>
+<p>
 Bugs Fixed:
 </p>
 <p>
 Nuke afanasy gizmo: If it creates output folder, it creates recursive all needed folders.<br/>
 Watch job tasks list: Block item error hosts counters corrected.<br/>
-Server gets jobs from database by creation time order, so they are not randomly sorted after server restart.<br/>
-Server not store deleted jobs logs and tasks outputs.<br/>
+Server stores job order in user list in database, so on server restart user jobs list order restored.<br/>
 When parser on render finds an error, and than rapidly finds a warning, error status may be lost.<br/>
 </p>
 
