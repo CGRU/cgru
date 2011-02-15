@@ -9,11 +9,47 @@ if( $action == '') $action = 'stat_chart';
 if( $size == '') $size = 600;
 else $size = (int)$size;
 
-if( $type == '')
+echo '<p><b>';
+switch ($type)
 {
+case 'jobsnum':
+   echo 'User / Jobs Number';
+   break;
+case 'jobssumonlinetime':
+   echo 'User / Jobs Total Online Time';
+   break;
+case 'jobsavgonlinetime':
+   echo 'User / Jobs Average Online Time';
+   break;
+case 'jobssumruntime':
+   echo 'User / Jobs Total Run Time';
+   break;
+case 'jobsavgruntime':
+   echo 'User / Jobs Average Run Time';
+   break;
+case 'servicequantity':
+   echo 'Service / Quantity';
+   break;
+case 'tasksquantity':
+   echo 'Service / Tasks Quantity';
+   break;
+case 'taskssumruntime':
+   echo 'Service / Tasks Total Run Time';
+   break;
+case 'tasksavgruntime':
+   echo 'Service / Tasks Average Run Time';
+   break;
+case 'tasksdone':
+   echo 'Service / Tasks Done';
+   break;
+case '':
    echo 'No type provided.';
    return;
+default:
+   echo "Type '$type' is invalid.</b></p>";
+   return;
 }
+echo '</b></p>';
 
 echo "<img src='image_chart.php?type=$type&size=$size'>";
 

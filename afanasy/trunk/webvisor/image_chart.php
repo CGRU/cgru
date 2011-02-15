@@ -66,53 +66,40 @@ $bg = imagecolorallocate($im, 0, 0, 0);
 $bg = imagecolortransparent($im, $bg);
 imagefill( $im, 0, 0, $bg);
 
-$title_color = imagecolorallocate( $im, 0,  32, 0);
-$title_posx = $size/2;
-$title_posy = 0;
 switch ($type)
 {
 case 'jobsnum':
-   $query="SELECT username AS name,sum(1) AS value FROM stat_jobs GROUP BY username;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Jobs Number', $title_color);
+   $query="SELECT username AS name,sum(1) AS value FROM statistics GROUP BY username;";
    break;
 case 'jobssumonlinetime':
-   $query="SELECT username AS name,sum(time_done-time_started) AS value FROM stat_jobs GROUP BY username;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Jobs Online Time Sum', $title_color);
+   $query="SELECT username AS name,sum(time_done-time_started) AS value FROM statistics GROUP BY username;";
    break;
 case 'jobsavgonlinetime':
-   $query="SELECT username AS name,avg(time_done-time_started) AS value FROM stat_jobs GROUP BY username;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Jobs Average Online Time', $title_color);
+   $query="SELECT username AS name,avg(time_done-time_started) AS value FROM statistics GROUP BY username;";
    break;
 case 'jobssumruntime':
-   $query="SELECT username AS name,sum(taskssumruntime) AS value FROM stat_jobs GROUP BY username;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Jobs Run Time Sum', $title_color);
+   $query="SELECT username AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY username;";
    break;
 case 'jobsavgruntime':
-   $query="SELECT username AS name,avg(taskssumruntime) AS value FROM stat_jobs GROUP BY username;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Jobs Average Run Time', $title_color);
+   $query="SELECT username AS name,avg(taskssumruntime) AS value FROM statistics GROUP BY username;";
    break;
 case 'servicequantity':
-   $query="SELECT service AS name,sum(1) AS value FROM stat_blocks GROUP BY service;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Service Type Quantity', $title_color);
+   $query="SELECT service AS name,sum(1) AS value FROM statistics GROUP BY service;";
    break;
 case 'tasksquantity':
-   $query="SELECT service AS name,sum(tasksnum) AS value FROM stat_blocks GROUP BY service;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Quantity', $title_color);
+   $query="SELECT service AS name,sum(tasksnum) AS value FROM statistics GROUP BY service;";
    break;
 case 'taskssumruntime':
-   $query="SELECT service AS name,sum(taskssumruntime) AS value FROM stat_blocks GROUP BY service;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Sum Run Time', $title_color);
+   $query="SELECT service AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY service;";
    break;
 case 'tasksavgruntime':
-   $query="SELECT service AS name,avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS value FROM stat_blocks GROUP BY service;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Avg Run Time', $title_color);
+   $query="SELECT service AS name,avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS value FROM statistics GROUP BY service;";
    break;
 case 'tasksdone':
-   $query="SELECT service AS name,round(avg(100*tasksdone/tasksnum),2) AS value FROM stat_blocks GROUP BY service;";
-   imagestring( $im, 5, $title_posx, $title_posy,  'Tasks Done', $title_color);
+   $query="SELECT service AS name,round(avg(100*tasksdone/tasksnum),2) AS value FROM statistics GROUP BY service;";
    break;
 default:
-   imagestring( $im, 5, $title_posx, $title_posy,  "Type '$type' is invalid.", $title_color);
+   imagestring( $im, 5, $size/2, 0,  "Type '$type' is invalid.", imagecolorallocate( $im, 0,  32, 0));
    header("Content-type: image/png");
    imagepng( $im);
    return;
