@@ -7,6 +7,14 @@ archive_ext="tar.gz"
 archive="$foldername.$archive_ext"
 link="$lcation/$archive"
 
-wget $link
+if [ -f $archive ]; then
+	echo "Archive $archive already exists."
+else
+	wget $link
+fi
 
-[ -f $archive ] && tar -xvzf $archive
+if [ -d $foldername ]; then
+	echo "Folder $foldername already exists."
+else
+	[ -f $archive ] && tar -xvzf $archive
+fi
