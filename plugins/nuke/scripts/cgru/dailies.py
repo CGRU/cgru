@@ -216,6 +216,7 @@ def dailiesGenCmd( node):
 
    if fstart != -1: cmd += ' --fs %d ' % fstart
    if fend   != -1: cmd += ' --fe %d ' % fend
+   if fffirst     : cmd += ' --fff'
    if company  is not None and company  != '': cmd += ' --company "%s"'  % company
    if project  is not None and project  != '': cmd += ' --project "%s"'  % project
    if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot
@@ -230,7 +231,6 @@ def dailiesGenCmd( node):
    if logopath is not None and logopath != '':
       cmd += ' --logopath "%s"' % logopath
       cmd += ' --logosize %d'   % logosize
-   if fffirst: cmd += ' -fff'
 
    # Stereo:
    if images.find('%v') != -1 or images.find('%V') != -1:
