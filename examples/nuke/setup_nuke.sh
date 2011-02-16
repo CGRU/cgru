@@ -5,6 +5,9 @@ pushd .. >> /dev/null
 source ./setup.sh
 popd >> /dev/null
 
+# Setup special Python module:
+export PYTHONPATH="$AF_ROOT/bin_pyaf/2.6.6:$PYTHONPATH"
+
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then
    export NUKE_CGRU_PATH="${CGRU_LOCATION}/plugins/nuke"
