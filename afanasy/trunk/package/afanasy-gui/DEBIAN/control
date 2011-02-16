@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: @ARCHITECTURE@
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), libqt4-gui (@QT_VERSION@)
+Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), libqt4-gui
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/

@@ -4,6 +4,11 @@ ver=4.7.1
 qtsrc=qt-everywhere-opensource-src-$ver
 qtdir=$PWD/$ver
 
+if [ ! -d $qtsrc ]; then
+   echo "Qt sources folder '$qtsrc' does not exist."
+   exit 1
+fi
+
 cd $qtsrc
 
 if [ ! -z "$1" ]; then

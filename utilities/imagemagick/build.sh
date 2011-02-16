@@ -24,9 +24,9 @@ if [ ! -f "$configure_cgru" ] ; then
 fi
 
 if [ -z "$1" ]; then
-   make clean
+   #make clean
    #with-quantum-depth=32
-   ./configure --prefix=$prefix --with-openexr --enable-hdri --enable-shared=
+   ./configure --prefix=$prefix --with-openexr --enable-hdri --disable-opencl --enable-shared=
    make
    make install
    cd ..

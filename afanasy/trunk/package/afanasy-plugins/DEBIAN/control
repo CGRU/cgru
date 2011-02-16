@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: all
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: afanasy-common (= @VERSION@), cgru-common (= @VERSION@), python-qt4 (@QT_VERSION@)
+Depends: afanasy-common (= @VERSION@), cgru-common (= @VERSION@)
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/

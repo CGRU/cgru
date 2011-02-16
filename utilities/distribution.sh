@@ -27,7 +27,7 @@ if [ -z "${DISTRIBUTIVE}" ]; then
    cat "${issuefile}"
    echo "Supported distributions:"
    echo "${knowndistrs}"
-   exit
+   exit 1
 fi
 
 # Search distribution version:
@@ -44,8 +44,6 @@ function debianArch(){
       export ARCHITECTURE="i386"
    fi
    export PACKAGE_MANAGER="DPKG"
-   export QT_VERSION=">= 4"
-   export PYTHON_VERSION=">= 2"
 }
 
 # Common for RedHat distributives:
@@ -60,27 +58,10 @@ case ${DISTRIBUTIVE} in
    Debian)
       debianArch
       export VERSION_NAME="debian${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
-      case $DISTRIBUTIVE_VERSION in
-         5.0)
-            export VERSION_NAME="debian.lenny_${ARCHITECTURE}"
-            export QT_VERSION=">= 4.4"
-            export PYTHON_VERSION=">= 2.5"
-         ;;
-      esac
       ;;
    Ubuntu)
       debianArch
       export VERSION_NAME="ubuntu${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
-      case $DISTRIBUTIVE_VERSION in
-         9.10)
-            export QT_VERSION=">= 4.5"
-            export PYTHON_VERSION=">= 2.5"
-            ;;
-         10.04)
-            export QT_VERSION=">= 4.6"
-            export PYTHON_VERSION=">= 2.6"
-            ;;
-      esac
       ;;
    *)
       redhatArch
@@ -89,5 +70,3 @@ esac
 
 echo "${DISTRIBUTIVE} ${DISTRIBUTIVE_VERSION} ${ARCHITECTURE}"
 echo "Package manager = '${PACKAGE_MANAGER}'"
-[ ! -z "${QT_VERSION}" ] && echo "Qt version ${QT_VERSION}"
-[ ! -z "${QT_VERSION}" ] && echo "Python version ${PYTHON_VERSION}"

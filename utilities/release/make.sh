@@ -14,7 +14,7 @@ echo "CGRU $packsver rev$packsrev"
 afanasy="trunk"
 
 # Disrtibutive variables:
-source ./distribution.sh
+source ../distribution.sh
 [ -z "${DISTRIBUTIVE}" ] && exit 1
 
 # Function to print usage and exit:
@@ -99,7 +99,6 @@ if [ -d ${releases} ]; then
       cd $tmpdir/${release}
       acrhivename="cgru.${VERSION_NUMBER}.${release}.7z"
       7za a -r -t7z "../../${releases}/${acrhivename}" "cgru"
-#      zip -qr "../../${releases}/${acrhivename}" "cgru"
       chmod a+rw "../../${releases}/${acrhivename}"
       cd $tmp
    done
@@ -133,7 +132,8 @@ if [ ! -d $cgruRoot/$afanasy/bin ]; then
    ErrorMessage="No afanasy binaries directory founded '$cgruRoot/$afanasy/bin'."
    usage
 fi
-cp -rp $cgruRoot/$afanasy/bin $cgruExp/afanasy
+cp -rpv $cgruRoot/$afanasy/bin $cgruExp/afanasy
+[ -d $cgruRoot/$afanasy/bin_pyaf ] && cp -rpv $cgruRoot/$afanasy/bin_pyaf $cgruExp/afanasy
 
 # Walk in every package folder:
 packages_dirs="$cgruExp/afanasy/package $cgruExp/utilities/release/package"
@@ -193,21 +193,21 @@ done
 ./install_create.sh "${packages_output_dir}"
 
 # Create archive:
+archive_name="cgru.${packsver}.${VERSION_NAME}.tar.gz"
 curdir=$PWD
 cd "${packages_output_dir}"
-archive_name="cgru.${packsver}.${VERSION_NAME}.tar.gz"
 tar -cvzf "${archive_name}" *
 mv "${archive_name}" "${curdir}/"
 cd "${curdir}"
 
 # Create pyafs archive:
-pyafs=$cgruRoot/$afanasy/bin_pyaf
-if [ -d $pyafs ]; then
-   echo "Creating pyafs archive..."
-   acrhivename="cgru.${VERSION_NUMBER}.bin_pyaf.7z"
-   [ -f $acrhivename ] && rm -fv $acrhivename
-   7za a -r -t7z $acrhivename $pyafs
-fi
+#pyafs=$cgruRoot/$afanasy/bin_pyaf
+#if [ -d $pyafs ]; then
+#   echo "Creating pyafs archive..."
+#   acrhivename="cgru.${VERSION_NUMBER}.bin_pyaf.7z"
+#   [ -f $acrhivename ] && rm -fv $acrhivename
+#   7za a -r -t7z $acrhivename $pyafs
+#fi
 
 # Copmleted.
 chmod a+rwx "${archive_name}"
