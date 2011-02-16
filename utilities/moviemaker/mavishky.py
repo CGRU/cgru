@@ -38,6 +38,7 @@ Parser.add_option('-t', '--template',   dest='template',    type  ='string',    
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
 Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first founded')
 Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last founded')
+Parser.add_option('--fff',              dest='fffirst',     action='store_true', default=False,       help='Draw first frame as first and not actual frame number.')
 Parser.add_option('--thumbnail',        dest='thumbnail',   action='store_true', default=False,       help='Add a thumbnail image on slate frame')
 Parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
 Parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')
@@ -309,12 +310,17 @@ cmd_makeframe = 'python ' + cmd_makeframe
 
 # Calculate frame range:
 FrameRange = ''
+FramePadding = 0
 digits1 = re.findall(r'\d+', images1[0])
-digits2 = re.findall(r'\d+', images1[-1])
-if digits1 is not None and digits2 is not None:
-   if len(digits1) and len(digits2):
-      FrameRange = "%s-%s" % (digits1[-1].lstrip('0'), digits2[-1].lstrip('0'))
-      if FrameRange[0] == '-': FrameRange = '0' + FrameRange
+if digits1 is not None and len(digits1): FramePadding = len(digits1[-1])
+if Options.fffirst:
+   FrameRange = '1-' + str(len(images1))
+else:
+   digits2 = re.findall(r'\d+', images1[-1])
+   if digits1 is not None and digits2 is not None:
+      if len(digits1) and len(digits2):
+         FrameRange = "%s-%s" % (digits1[-1].lstrip('0'), digits2[-1].lstrip('0'))
+         if FrameRange[0] == '-': FrameRange = '0' + FrameRange
 
 # Construct frame conversion command arguments:
 cmd_args = ''
@@ -390,16 +396,24 @@ if need_convert:
       if Options.draw235   >  0: cmd += ' --draw235 %d'    % Options.draw235
       if Options.line169  != '': cmd += ' --line169 "%s"'  % Options.line169
       if Options.line235  != '': cmd += ' --line235 "%s"'  % Options.line235
+      if Options.fffirst:
+         if FramePadding > 1:
+            framestring = '%0' + str(FramePadding) + 'd'
+            framestring = framestring % (i+1)
+         else:
+            framestring = str(i+1)
+         cmd += ' -f "%s"' % framestring
+
+         print i, FramePadding, framestring
 
       cmd += ' "%s"' % afile
-      if Inpattern2 != '':
-         cmd += ' "%s"' % images2[i]
-         i += 1
+      if Inpattern2 != '': cmd += ' "%s"' % images2[i]
       cmd += ' "%s"' % (os.path.join( TmpDir, tmpname) + '.%07d.' % imgCount + TmpFormat)
 
       cmd_convert.append( cmd)
       name_convert.append( afile)
       imgCount += 1
+      i += 1
 
 # Encode commands:
 auxargs = ''

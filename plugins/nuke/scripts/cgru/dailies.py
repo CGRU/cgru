@@ -199,6 +199,7 @@ def dailiesGenCmd( node):
    version  = int(node.knob('version').value())
    fstart   = int(node.knob('fstart').value())
    fend     = int(node.knob('fend').value())
+   fffirst  = int(node.knob('fffirst').value())
 
    # Command Construction:
    cmd = os.environ['CGRU_LOCATION']
@@ -229,6 +230,7 @@ def dailiesGenCmd( node):
    if logopath is not None and logopath != '':
       cmd += ' --logopath "%s"' % logopath
       cmd += ' --logosize %d'   % logosize
+   if fffirst: cmd += ' -fff'
 
    # Stereo:
    if images.find('%v') != -1 or images.find('%V') != -1:

@@ -33,7 +33,7 @@ for python in `ls "$pythondir"`; do
    # Skip not folders:
    [ -d "$pythondir/$python" ] || continue
    # Skip folder name does not starts with a digit and a dot:
-   [ "`echo $python | gawk '{print match( \$1, "[0-9]\\\.")}'`" == "1" ] || continue
+   [ "`echo $python | awk '{print match( \$1, "[0-9]\\\.")}'`" == "1" ] || continue
 
    echo "Building for Python${python}"
 

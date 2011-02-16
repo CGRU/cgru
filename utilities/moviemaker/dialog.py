@@ -27,6 +27,7 @@ Parser.add_option('--draw169',               dest='draw169',         type  ='int
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=0,              help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='',             help='Draw 2.35 line color: "255,255,0"')
+Parser.add_option('--fff',                   dest='fffirst',         action='store_true', default=False,          help='Draw first frame as first, and not actual first frame number.')
 Parser.add_option('--logopath',         		dest='logopath',    		type  ='string',     default='',             help='Add a specified image')
 Parser.add_option('--logosize',         		dest='logosize',    		type  ='int',        default=20,   	         help='Logotype size, percent of image')
 Parser.add_option('--logograv',         		dest='logograv',    		type  ='string',     default='southeast', 	help='Logotype positioning gravity')
@@ -300,6 +301,13 @@ class Dialog( QtGui.QWidget):
       self.sbFrameLast.setRange( -1, -1)
       QtCore.QObject.connect( self.sbFrameLast, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       self.lBrowseInput.addWidget( self.sbFrameLast)
+      self.cFFFirst = QtGui.QCheckBox('F.F.First', self)
+      self.cFFFirst.setChecked( False)
+      self.cFFFirst.setToolTip('\
+First Frame First:\n\
+Draw first frame number as one.')
+      QtCore.QObject.connect( self.cFFFirst, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.lBrowseInput.addWidget( self.cFFFirst)
 
       self.btnBrowseInput = QtGui.QPushButton('Browse Sequence', self)
       QtCore.QObject.connect( self.btnBrowseInput, QtCore.SIGNAL('pressed()'), self.browseInput)
@@ -332,6 +340,8 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.editOutputName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cAutoOutputName = QtGui.QCheckBox('Rule:', self)
       self.cAutoOutputName.setChecked( True)
+      self.cAutoOutputName.setToolTip('\
+Use Naming Rule.')
       QtCore.QObject.connect( self.cAutoOutputName, QtCore.SIGNAL('stateChanged(int)'), self.autoOutputName)
       self.lOutputName.addWidget( self.cAutoOutputName)
       naming = Options.naming
@@ -1055,6 +1065,7 @@ class Dialog( QtGui.QWidget):
       cmd += ' --fe %d ' % self.sbFrameLast.value()
       format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
       if not format.isEmpty():
+         if self.cFFFirst.isChecked(): cmd += ' --fff'
          ts = self.cbTemplateS.currentText()
          tf = self.cbTemplateF.currentText()
          cmd += ' -r %s' % format

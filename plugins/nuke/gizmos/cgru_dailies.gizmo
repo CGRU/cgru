@@ -38,6 +38,7 @@ Gizmo {
 
    addUserKnob {  3 fstart   l "Frame Range"     +STARTLINE }
    addUserKnob {  3 fend     l " -  "            -STARTLINE }
+   addUserKnob {  6 fffirst  l "Draw First Frame As First" -STARTLINE }
    addUserKnob {  2 template l "Template"        +STARTLINE }
    addUserKnob {  2 slate    l "Slate"           +STARTLINE }
    addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
