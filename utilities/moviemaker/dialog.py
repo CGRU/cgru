@@ -302,7 +302,7 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.sbFrameLast, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       self.lBrowseInput.addWidget( self.sbFrameLast)
       self.cFFFirst = QtGui.QCheckBox('F.F.First', self)
-      self.cFFFirst.setChecked( False)
+      self.cFFFirst.setChecked( Options.fffirst)
       self.cFFFirst.setToolTip('\
 First Frame First:\n\
 Draw first frame number as one.')
