@@ -39,7 +39,7 @@ function redhatArch(){
 }
 
 # Common for SUSE distributives:
-function redhatArch(){
+function suseArch(){
    packages="$packages gcc-c++"
    packages="$packages libzip1 libzip-devel"
    # ImageMagick:
