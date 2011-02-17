@@ -179,8 +179,13 @@ class Dialog( QtGui.QWidget):
 
       # General:
 
+      # Format:
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
+      self.tFormat.setToolTip('\
+Movie resolution.\n\
+Format presets located in\n\
+' + FormatsPath)
       self.cbFormat = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
@@ -188,15 +193,12 @@ class Dialog( QtGui.QWidget):
          if format == Options.format: self.cbFormat.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.tCodec = QtGui.QLabel('Codec:', self)
-      self.cbCodec = QtGui.QComboBox( self)
-      i = 0
-      for name in CodecNames:
-         self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
-         if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex( i)
-         i += 1
-      QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lFormat.addWidget( self.tFormat)
+      self.lFormat.addWidget( self.cbFormat)
+
       self.tFPS = QtGui.QLabel('FPS:', self)
+      self.tFPS.setToolTip('\
+Frame rate.')
       self.cbFPS = QtGui.QComboBox( self)
       i = 0
       for fps in FPS:
@@ -204,12 +206,23 @@ class Dialog( QtGui.QWidget):
          if fps == Options.fps: self.cbFPS.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbFPS, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.lFormat.addWidget( self.tFormat)
-      self.lFormat.addWidget( self.cbFormat)
       self.lFormat.addWidget( self.tFPS)
       self.lFormat.addWidget( self.cbFPS)
+
+      self.tCodec = QtGui.QLabel('Codec:', self)
+      self.tCodec.setToolTip('\
+Codec presets located in\n\
+' + CodecsPath)
+      self.cbCodec = QtGui.QComboBox( self)
+      i = 0
+      for name in CodecNames:
+         self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
+         if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex( i)
+         i += 1
+      QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.lFormat.addWidget( self.tCodec)
       self.lFormat.addWidget( self.cbCodec)
+
       self.generallayout.addLayout( self.lFormat)
 
 
@@ -219,18 +232,29 @@ class Dialog( QtGui.QWidget):
 
       self.lTitles = QtGui.QHBoxLayout()
       self.tCompany = QtGui.QLabel('Company:', self)
+      self.tCompany.setToolTip('\
+Draw company name.\n\
+Leave empty to skip.')
       self.editCompany = QtGui.QLineEdit( Options.company, self)
       QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tProject = QtGui.QLabel('Project:', self)
+      self.tProject.setToolTip('\
+Project name.')
       self.editProject = QtGui.QLineEdit( Options.project, self)
       QtCore.QObject.connect( self.editProject, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tShot = QtGui.QLabel('Shot:', self)
+      self.tShot.setToolTip('\
+Shot name.')
       self.editShot = QtGui.QLineEdit('', self)
       QtCore.QObject.connect( self.editShot, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tVersion = QtGui.QLabel('Version:', self)
+      self.tVersion.setToolTip('\
+Shot version.')
       self.editVersion = QtGui.QLineEdit('', self)
       QtCore.QObject.connect( self.editVersion, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cAutoTitles = QtGui.QCheckBox('Auto', self)
+      self.cAutoTitles.setToolTip('\
+Try to fill values automatically parsing input file name and folder.')
       self.cAutoTitles.setChecked( True)
       QtCore.QObject.connect( self.cAutoTitles, QtCore.SIGNAL('stateChanged(int)'), self.autoTitles)
       self.lTitles.addWidget( self.tCompany)
@@ -246,11 +270,15 @@ class Dialog( QtGui.QWidget):
 
       self.lUser = QtGui.QHBoxLayout()
       self.lArtist = QtGui.QLabel('Artist:', self)
+      self.lArtist.setToolTip('\
+Artist name.')
       self.lUser.addWidget( self.lArtist)
       self.editArtist = QtGui.QLineEdit( Artist, self)
       self.lUser.addWidget( self.editArtist)
       QtCore.QObject.connect( self.editArtist, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lActivity = QtGui.QLabel('Activity:', self)
+      self.lActivity.setToolTip('\
+Shot activity to show.')
       self.lUser.addWidget( self.lActivity)
       self.editActivity = QtGui.QLineEdit('', self)
       self.lUser.addWidget( self.editActivity)
@@ -276,22 +304,32 @@ class Dialog( QtGui.QWidget):
       self.gInputSettings.setLayout( self.lInputSettings)
 
       self.editInputFiles = QtGui.QLineEdit( InFile1, self)
+      self.editInputFiles.setToolTip('\
+Input files(s).\n\
+You put folder name, file name or files patters here.\n\
+Pattern digits can be represented by "%04d" or "####".')
       QtCore.QObject.connect( self.editInputFiles, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
       self.lInputSettings.addWidget( self.editInputFiles)
 
       self.lBrowseInput = QtGui.QHBoxLayout()
       self.lFilesCount = QtGui.QLabel('Files count:', self)
+      self.lFilesCount.setToolTip('\
+Files founded matching pattern.')
       self.lBrowseInput.addWidget( self.lFilesCount)
       self.editInputFilesCount = QtGui.QLineEdit( self)
       self.editInputFilesCount.setEnabled( False)
       self.lBrowseInput.addWidget( self.editInputFilesCount)
       self.lPattern = QtGui.QLabel('Pattern:', self)
+      self.lPattern.setToolTip('\
+Recognized files pattern.')
       self.lBrowseInput.addWidget( self.lPattern)
       self.editInputFilesPattern = QtGui.QLineEdit( self)
       self.editInputFilesPattern.setEnabled( False)
       self.lBrowseInput.addWidget( self.editInputFilesPattern)
 
       self.lFrameRange = QtGui.QLabel('Frames:', self)
+      self.lFrameRange.setToolTip('\
+Frame range.')
       self.lBrowseInput.addWidget( self.lFrameRange)
       self.sbFrameFirst = QtGui.QSpinBox( self)
       self.sbFrameFirst.setRange( -1, -1)
@@ -316,6 +354,8 @@ Draw first frame number as one.')
 
       self.lIdentify = QtGui.QHBoxLayout()
       self.tIdentify = QtGui.QLabel('Identify:', self)
+      self.tIdentify.setToolTip('\
+Input file identification.')
       self.editIdentify = QtGui.QLineEdit( self)
       self.editIdentify.setEnabled( False)
       self.btnIdentify = QtGui.QPushButton('Refresh', self)
@@ -379,7 +419,15 @@ Use Naming Rule.')
 
       self.lTemplates = QtGui.QHBoxLayout()
       self.tTemplateS = QtGui.QLabel('Slate Template:', self)
+      self.tTemplateS.setToolTip('\
+Slate frame template.\n\
+Templates are located in\n\
+' + TemplatesPath)
       self.tTemplateF = QtGui.QLabel('Frame Template:', self)
+      self.tTemplateF.setToolTip('\
+Frame template.\n\
+Templates are located in\n\
+' + TemplatesPath)
       self.cbTemplateS = QtGui.QComboBox( self)
       self.cbTemplateF = QtGui.QComboBox( self)
       for template in Templates:
@@ -429,11 +477,15 @@ Use Naming Rule.')
 
       self.lLines = QtGui.QHBoxLayout()
       self.tLine169 = QtGui.QLabel('Line 16:9 Color:', self)
+      self.tLine169.setToolTip('\
+Example "255,255,0" - yellow.')
       self.lLines.addWidget( self.tLine169)
       self.editLine169 = QtGui.QLineEdit( Options.line169, self)
       self.lLines.addWidget( self.editLine169)
       QtCore.QObject.connect( self.editLine169, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.tLine235 = QtGui.QLabel('Line 2.35 Color:', self)
+      self.tLine235.setToolTip('\
+Example "255,255,0" - yellow.')
       self.lLines.addWidget( self.tLine235)
       self.editLine235 = QtGui.QLineEdit( Options.line235, self)
       self.lLines.addWidget( self.editLine235)
@@ -504,11 +556,11 @@ Use Naming Rule.')
       self.parameterslayout.addWidget( self.gCorrectionSettings)
 
       self.dateTimeLayout = QtGui.QHBoxLayout()
-      self.cDateOutput = QtGui.QCheckBox('Append Name With Date', self)
+      self.cDateOutput = QtGui.QCheckBox('Append Movie File Name With Date', self)
       self.cDateOutput.setChecked( False)
       self.dateTimeLayout.addWidget( self.cDateOutput)
       QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cTimeOutput = QtGui.QCheckBox('Append Name With Time', self)
+      self.cTimeOutput = QtGui.QCheckBox('Append Movie File Name With Time', self)
       self.cTimeOutput.setChecked( False)
       self.dateTimeLayout.addWidget( self.cTimeOutput)
       self.parameterslayout.addLayout( self.dateTimeLayout)

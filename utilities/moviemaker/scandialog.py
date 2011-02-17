@@ -100,6 +100,10 @@ class Dialog( QtGui.QWidget):
       # General:
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
+      self.tFormat.setToolTip('\
+Movie resolution.\n\
+Format presets located in\n\
+' + FormatsPath)
       self.cbFormat = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
@@ -108,6 +112,9 @@ class Dialog( QtGui.QWidget):
          i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tCodec = QtGui.QLabel('Codec:', self)
+      self.tCodec.setToolTip('\
+Codec presets located in\n\
+' + CodecsPath)
       self.cbCodec = QtGui.QComboBox( self)
       i = 0
       for name in CodecNames:
@@ -116,6 +123,8 @@ class Dialog( QtGui.QWidget):
          i = i + 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.tFPS = QtGui.QLabel('FPS:', self)
+      self.tFPS.setToolTip('\
+Frame rate.')
       self.cbFPS = QtGui.QComboBox( self)
       self.cbFPS.addItem('24')
       self.cbFPS.addItem('25')
@@ -152,7 +161,7 @@ class Dialog( QtGui.QWidget):
       self.lOutput.addWidget( self.btnOutputBrowse)
       self.generallayout.addLayout( self.lOutput)
 
-      self.cAbsPath = QtGui.QCheckBox('Prefix movies names with images absolute path', self)
+      self.cAbsPath = QtGui.QCheckBox('Prefix movies names with images absolute input files path', self)
       self.cAbsPath.setChecked( Options.abspath)
       QtCore.QObject.connect( self.cAbsPath, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.generallayout.addWidget( self.cAbsPath)
@@ -160,6 +169,10 @@ class Dialog( QtGui.QWidget):
       # Parameters:
       self.lTemplates = QtGui.QHBoxLayout()
       self.tTemplate = QtGui.QLabel('Frame Template:', self)
+      self.tTemplate.setToolTip('\
+Frame template.\n\
+Templates are located in\n\
+' + TemplatesPath)
       self.cbTemplate = QtGui.QComboBox( self)
       for template in Templates: self.cbTemplate.addItem(template)
       self.cbTemplate.setCurrentIndex( Template)
