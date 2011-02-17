@@ -36,11 +36,21 @@ function redhatArch(){
 
    pkg_manager_cmd="yum install"
    pkg_extension=".$ARCHITECTURE"
+}
 
-   # openSUSE:
-   if [ $DISTRIBUTIVE == "openSUSE" ]; then
-      pkg_manager_cmd="zypper install"
-   fi
+# Common for SUSE distributives:
+function redhatArch(){
+   packages="$packages gcc-c++"
+   packages="$packages libzip1 libzip-devel"
+   # ImageMagick:
+   packages="$packages libjpeg6 libjpeg-devel"
+   packages="$packages libtiff3 libtiff-devel"
+   packages="$packages libpng12-0 libpng-devel"
+   packages="$packages freetype freetype2 freetype2-devel"
+   packages="$packages fontconfig fontconfig-devel"
+
+   pkg_manager_cmd="zypper install"
+   pkg_extension=".$ARCHITECTURE"
 }
 
 # Case distribution:
@@ -50,6 +60,9 @@ case ${DISTRIBUTIVE} in
       ;;
    Ubuntu)
       debianArch
+      ;;
+   openSUSE)
+      suseArch
       ;;
    *)
       redhatArch
