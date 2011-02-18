@@ -63,9 +63,6 @@ echo "Exporting '$cgruRoot' to '$cgruExp'..."
 #svn export $cgruRoot $cgruExp
 ./export.sh $cgruExp $afanasy
 
-# Writing version and revision:
-#echo "${packsver} rev${packsrev}" > $cgruExp/version.txt
-
 # Copying general components:
 cgruAll="__all__"
 if [ -d $cgruAll ]; then
@@ -75,13 +72,6 @@ fi
 
 # Processing icons:
 ./process_icons.sh $afanasy
-
-#echo "Extracting Afanasy components from '$afanasy' to 'afanasy'..."
-#
-#cp -rp $cgruExp/$afanasy/* $cgruExp/afanasy
-#rm -rf $cgruExp/afanasy/branches
-#rm -rf $cgruExp/afanasy/trunk
-#rm -rf $cgruExp/afanasy/tags
 
 #
 # Creating Packages:
@@ -105,19 +95,8 @@ packages_output_dir="output"
 mkdir $packages_output_dir
 chmod a+rwx $packages_output_dir
 
-# copy current afanasy binaries from branch:
-#echo "Copying current afanasy binaries..."
-#if [ ! -d $cgruRoot/$afanasy/bin ]; then
-#   ErrorMessage="No afanasy binaries directory founded '$cgruRoot/$afanasy/bin'."
-#   usage
-#fi
-#cp -rpv $cgruRoot/$afanasy/bin $cgruExp/afanasy
-#[ -d $cgruRoot/$afanasy/bin_pyaf ] && cp -rpv $cgruRoot/$afanasy/bin_pyaf $cgruExp/afanasy
-
 # Walk in every package folder:
-packages_dirs="$cgruExp/afanasy/package $cgruExp/utilities/release/package"
 packages_dirs="$cgruRoot/$afanasy/package $cgruRoot/utilities/release/package"
-#packages_dirs="$cgruExp/utilities/release/package"
 for packages_dir in $packages_dirs; do
    packages=`ls "${packages_dir}"`
    for package in $packages; do
@@ -205,7 +184,17 @@ if [ -d ${releases} ]; then
    done
 fi
 
+# Exporting current subversion:
+cgruSVN=cgru_svn${packsrev}
+echo "Exporting CGRU revision $packsrev"
+svn export $cgruRoot $tmpdir/$cgruSVN
+cd $tmpdir
+acrhivename=../$cgruSVN.7z
+[ -f $acrhivename ] && rm -fv $acrhivename
+7za a -r -y -t7z $acrhivename $cgruSVN > /dev/null || echo "Failed!"
+cd ..
+
 # Copmleted.
 chmod -R a+rwx "${tmpdir}"
 chmod -R a+rwx "${packages_output_dir}"
-echo "Completed"; exit 0
+echo "Done."; exit 0
