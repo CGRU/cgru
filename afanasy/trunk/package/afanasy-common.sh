@@ -3,12 +3,12 @@
 # Initialize variables:
 src=$1
 pack=$2
-cgru=$3
-[ -z $cgru ] && exit
+installdir=$3
+[ -z "$installdir" ] && exit
 
 # Copying files:
-mkdir -p $pack/$cgru/afanasy/bin
-mkdir -p $pack/$cgru/afanasy/launch
+mkdir -p $pack/$installdir/afanasy/bin
+mkdir -p $pack/$installdir/afanasy/launch
 files="\
 afanasy/launch/setup.sh \
 afanasy/python \
@@ -19,8 +19,8 @@ afanasy/farm_example.xml \
 afanasy/bin/afcmd \
 afanasy/init \
 "
-for f in $files; do cp -r $src/$f $pack/$cgru/$f; done
+for f in $files; do cp -r $src/$f $pack/$installdir/$f; done
 
-cp -r $src/afanasy/bin_pyaf $pack/$cgru/afanasy
+cp -r $src/afanasy/bin_pyaf $pack/$installdir/afanasy
 
-cp $src/afanasy/setup*.sh $pack/$cgru/afanasy
+cp $src/afanasy/setup*.sh $pack/$installdir/afanasy

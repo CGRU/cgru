@@ -8,7 +8,7 @@ function usage(){
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "   `basename $0` AFANASY_BRANCH [clear|rebuild|export_path]"
+   echo "   `basename $0` AFANASY_BRANCH [clear|rebuild]"
    echo "Example:"
    echo "   `basename $0` afanasy/trunk rebuild"
    exit
@@ -33,8 +33,6 @@ elif [ "${action}" == "clear" ]; then
    echo 'Clearing icons...'
 elif [ "${action}" == "rebuild" ]; then
    echo 'Rebuilding icons...'
-else
-   echo "Processing icons for export in '${action}'"
 fi
 
 # Icons directories:
@@ -64,7 +62,6 @@ for iconsdir in $iconsdirssrc; do
    # Clear icons:
    [ "${action}" == "rebuild" ] && rm -rvf "${src}/icons"
 
-
    # Generate png icons from svg if was not:
    if [ ! -d "${src}/icons" ]; then
       echo "Generating icons in '${src}':"
@@ -73,22 +70,5 @@ for iconsdir in $iconsdirssrc; do
       ./make.sh   
       cd $tmp
    fi
-
-   # Just build needed:
-   [ -z "${action}" ] && continue
-
-   # Rebuild action:
-   [ "${action}" == "rebuild" ] && continue
-
-   # Check export directory:
-   dest="${action}/${iconsdir}"
-   if [ ! -d "${dest}" ]; then
-      ErrorMessage="Icons destination folder '$dest' does not exists."
-      usage
-   fi
-
-   # Export icons:
-   echo "Copying '${iconsdir}' icons to '${dest}'"
-   cp -r "${src}/icons" "${dest}"
 
 done

@@ -3,9 +3,9 @@
 # Initialize variables:
 src=$1
 pack=$2
-cgru=$3
-[ -z $cgru ] && exit
+installdir=$3
+[ -z "$installdir" ] && exit
 
 # Copying files:
-mkdir -p $pack/$cgru/afanasy
-cp -r $src/afanasy/plugins $pack/$cgru/afanasy
+mkdir -p $pack/$installdir/afanasy
+cp -r $src/afanasy/plugins $pack/$installdir/afanasy

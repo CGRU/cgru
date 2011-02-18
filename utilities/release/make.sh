@@ -3,6 +3,8 @@
 # Location:
 cgruRoot="../.."
 
+function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' $1 $2; }
+
 # Version and revision:
 packsver=`cat $cgruRoot/version.txt`
 pushd $cgruRoot/utilities > /dev/null
@@ -58,51 +60,28 @@ if [ -d $cgruExp ]; then
    rm -rf $cgruExp
 fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
-svn export $cgruRoot $cgruExp
+#svn export $cgruRoot $cgruExp
+./export.sh $cgruExp $afanasy
 
 # Writing version and revision:
-echo "${packsver} rev${packsrev}" > $cgruExp/version.txt
+#echo "${packsver} rev${packsrev}" > $cgruExp/version.txt
 
 # Copying general components:
 cgruAll="__all__"
 if [ -d $cgruAll ]; then
    echo "Copying components from '$cgruAll'"
-   cp -rp $cgruAll/* $cgruExp
+   rsync -rL $cgruAll/* $cgruExp
 fi
 
 # Processing icons:
-./process_icons.sh $afanasy $cgruExp
-#
+./process_icons.sh $afanasy
 
+#echo "Extracting Afanasy components from '$afanasy' to 'afanasy'..."
 #
-echo "Extracting Afanasy components from '$afanasy' to 'afanasy'..."
-#
-cp -rp $cgruExp/$afanasy/* $cgruExp/afanasy
-rm -rf $cgruExp/afanasy/branches
-rm -rf $cgruExp/afanasy/trunk
-rm -rf $cgruExp/afanasy/tags
-
-# Creating 7zip archives:
-releases="__releases__"
-if [ -d ${releases} ]; then
-   echo "Creating 7zip archives with all CGRU files..."
-   releasesnames=`ls "${releases}"`
-   for release in $releasesnames; do
-      releasedir="${releases}/$release"
-      [ -d $releasedir ] || continue
-      tmp="$tmpdir/${release}/cgru"
-      mkdir -p $tmp
-      echo "Creating CGRU archive for ${release}..."
-      cp -rp $cgruExp/* $tmp
-      [ ! -z "`ls $releasedir`" ] && cp -rp $releasedir/* $tmp
-      tmp=$PWD
-      cd $tmpdir/${release}
-      acrhivename="cgru.${VERSION_NUMBER}.${release}.7z"
-      7za a -r -t7z "../../${releases}/${acrhivename}" "cgru"
-      chmod a+rw "../../${releases}/${acrhivename}"
-      cd $tmp
-   done
-fi
+#cp -rp $cgruExp/$afanasy/* $cgruExp/afanasy
+#rm -rf $cgruExp/afanasy/branches
+#rm -rf $cgruExp/afanasy/trunk
+#rm -rf $cgruExp/afanasy/tags
 
 #
 # Creating Packages:
@@ -127,34 +106,35 @@ mkdir $packages_output_dir
 chmod a+rwx $packages_output_dir
 
 # copy current afanasy binaries from branch:
-echo "Copying current afanasy binaries..."
-if [ ! -d $cgruRoot/$afanasy/bin ]; then
-   ErrorMessage="No afanasy binaries directory founded '$cgruRoot/$afanasy/bin'."
-   usage
-fi
-cp -rpv $cgruRoot/$afanasy/bin $cgruExp/afanasy
-[ -d $cgruRoot/$afanasy/bin_pyaf ] && cp -rpv $cgruRoot/$afanasy/bin_pyaf $cgruExp/afanasy
+#echo "Copying current afanasy binaries..."
+#if [ ! -d $cgruRoot/$afanasy/bin ]; then
+#   ErrorMessage="No afanasy binaries directory founded '$cgruRoot/$afanasy/bin'."
+#   usage
+#fi
+#cp -rpv $cgruRoot/$afanasy/bin $cgruExp/afanasy
+#[ -d $cgruRoot/$afanasy/bin_pyaf ] && cp -rpv $cgruRoot/$afanasy/bin_pyaf $cgruExp/afanasy
 
 # Walk in every package folder:
 packages_dirs="$cgruExp/afanasy/package $cgruExp/utilities/release/package"
+packages_dirs="$cgruRoot/$afanasy/package $cgruRoot/utilities/release/package"
 #packages_dirs="$cgruExp/utilities/release/package"
 for packages_dir in $packages_dirs; do
    packages=`ls "${packages_dir}"`
    for package in $packages; do
       [ -d "${packages_dir}/${package}" ] || continue
       # check copy script:
-      commands="${packages_dir}/${package}.sh"
-      [ -f $commands ] || continue
+      copy_script="${packages_dir}/${package}.sh"
+      [ -f $copy_script ] || continue
       # copy files for package, but not control folders:
       mkdir -p ${tmpdir}/${package}
       for folder in `ls "${packages_dir}/${package}"`; do
          [ "${folder}" == "RPM" ] && continue
          [ "${folder}" == "DEBIAN" ] && continue
          folder="${packages_dir}/${package}/${folder}"
-         cp -r "${folder}" "${tmpdir}/${package}"
+         rcopy "${folder}" "${tmpdir}/${package}"
       done
       # apply copy script, for common files:
-      $commands $cgruExp $tmpdir/$package $installdir $cgruRoot
+      $copy_script $cgruExp $tmpdir/$package $installdir
 
 #continue
       # count package size:
@@ -164,14 +144,14 @@ for packages_dir in $packages_dirs; do
       # perform package manager specific operations:
       if [ "$PACKAGE_MANAGER" == "DPKG" ]; then
          # copy DEBIAN folder:
-         cp -r "${packages_dir}/${package}/DEBIAN" "${tmpdir}/${package}"
+         rcopy "${packages_dir}/${package}/DEBIAN" "${tmpdir}/${package}"
          # replace variables:
          ./replacevars.sh ${packages_dir}/${package}/DEBIAN/control ${tmpdir}/${package}/DEBIAN/control
          # build package:
          dpkg-deb -b "${tmpdir}/${package}" "${packages_output_dir}/${package}.${VERSION_NUMBER}_${VERSION_NAME}.deb"
       elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
          # copy RPM folder:
-         cp -r "${packages_dir}/${package}/RPM" "${tmpdir}/${package}"
+         rcopy "${packages_dir}/${package}/RPM" "${tmpdir}/${package}"
          # replace variables:
          ./replacevars.sh  "${packages_dir}/${package}/RPM/SPECS/${package}.spec" "${tmpdir}/${package}/RPM/SPECS/${package}.spec"
          # launch rpm build script:
@@ -199,18 +179,33 @@ cd "${packages_output_dir}"
 tar -cvzf "${archive_name}" *
 mv "${archive_name}" "${curdir}/"
 cd "${curdir}"
+chmod a+rwx "${archive_name}"
 
-# Create pyafs archive:
-#pyafs=$cgruRoot/$afanasy/bin_pyaf
-#if [ -d $pyafs ]; then
-#   echo "Creating pyafs archive..."
-#   acrhivename="cgru.${VERSION_NUMBER}.bin_pyaf.7z"
-#   [ -f $acrhivename ] && rm -fv $acrhivename
-#   7za a -r -t7z $acrhivename $pyafs
-#fi
+# Creating 7zip releazes archives:
+releases="__releases__"
+if [ -d ${releases} ]; then
+   echo "Creating 7zip archives with all CGRU files..."
+   releasesnames=`ls "${releases}"`
+   for release in $releasesnames; do
+      releasedir="${releases}/$release"
+      [ -d $releasedir ] || continue
+      tmp="$tmpdir/${release}/cgru"
+      mkdir -p $tmp
+      echo "Creating CGRU archive for ${release}..."
+      cp -rp $cgruExp/* $tmp
+      [ ! -z "`ls $releasedir`" ] && rsync -rL --inplace $releasedir/* $tmp
+      tmp=$PWD
+      cd $tmpdir/${release}
+      acrhivename="../../${releases}/cgru.${VERSION_NUMBER}.${release}.7z"
+      [ -f $acrhivename ] && rm -fv $acrhivename
+      7za a -r -y -t7z "${acrhivename}" "cgru" | grep "/bin/"
+      [ $? != 0 ] && echo "Failed!"
+      chmod a+rw "${acrhivename}"
+      cd $tmp
+   done
+fi
 
 # Copmleted.
-chmod a+rwx "${archive_name}"
 chmod -R a+rwx "${tmpdir}"
 chmod -R a+rwx "${packages_output_dir}"
 echo "Completed"; exit 0

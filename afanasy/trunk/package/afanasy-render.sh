@@ -3,12 +3,12 @@
 # Initialize variables:
 src=$1
 pack=$2
-cgru=$3
-[ -z $cgru ] && exit
+installdir=$3
+[ -z "$installdir" ] && exit
 
 # Copying files:
-mkdir -p $pack/$cgru/afanasy/bin
-cp -r $src/afanasy/bin/afrender $pack/$cgru/afanasy/bin
+mkdir -p $pack/$installdir/afanasy/bin
+cp -r $src/afanasy/bin/afrender $pack/$installdir/afanasy/bin
 
-mkdir -p $pack/$cgru/afanasy/launch
-cp -r $src/afanasy/launch/afrender.sh $pack/$cgru/afanasy/launch
+mkdir -p $pack/$installdir/afanasy/launch
+cp -r $src/afanasy/launch/afrender.sh $pack/$installdir/afanasy/launch

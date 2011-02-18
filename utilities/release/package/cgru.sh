@@ -3,14 +3,13 @@
 # Initialize variables:
 src=$1
 pack=$2
-cgru=$3
-root=$4
-[ -z $root ] && exit
+installdir=$3
+[ -z "$installdir" ] && exit
 
 # Creating directories:
-mkdir -p $pack/$cgru/doc
-mkdir -p $pack/$cgru/bin
-mkdir -p $pack/$cgru/utilities/regexp/bin
+mkdir -p $pack/$installdir/doc
+mkdir -p $pack/$installdir/bin
+mkdir -p $pack/$installdir/utilities/regexp/bin
 
 # Moving icons to standart linux location:
 cp -r $src/doc/icons/icons $pack/usr/local/share
@@ -28,9 +27,9 @@ utilities/regexp/doc \
 "
 
 # Copying files:
-for f in $files; do cp -r $src/$f $pack/$cgru/$f; done
-cp -r $src/utilities/fixpathes.py $pack/$cgru/utilities
-cp -r $root/utilities/regexp/bin/regexp $pack/$cgru/utilities/regexp/bin
-cp $root/bin/exrjoin $pack/$cgru/bin/
-cp $root/bin/ffmpeg $pack/$cgru/bin/
-[ -f $root/bin/convert ] && cp $root/bin/convert $pack/$cgru/bin/
+for f in $files; do cp -r $src/$f $pack/$installdir/$f; done
+cp -r $src/utilities/fixpathes.py $pack/$installdir/utilities
+cp -r $src/utilities/regexp/bin/regexp $pack/$installdir/utilities/regexp/bin
+cp $src/bin/exrjoin $pack/$installdir/bin/
+cp $src/bin/ffmpeg $pack/$installdir/bin/
+cp $src/bin/convert $pack/$installdir/bin/

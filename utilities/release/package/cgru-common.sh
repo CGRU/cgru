@@ -3,22 +3,22 @@
 # Initialize variables:
 src=$1
 pack=$2
-cgru=$3
-[ -z $cgru ] && exit
+installdir=$3
+[ -z "$installdir" ] && exit
 
 # Creating directories:
-mkdir -p $pack/$cgru/doc
-mkdir -p $pack/$cgru/bin
-mkdir -p $pack/$cgru/lib/python
+mkdir -p $pack/$installdir/doc
+mkdir -p $pack/$installdir/bin
+mkdir -p $pack/$installdir/lib/python
 
 # Copying files:
-cp $src/setup*.sh $pack/$cgru
-cp $src/version.txt $pack/$cgru
-cp -r $src/doc/images $pack/$cgru/doc
-cp $src/bin/*.py $pack/$cgru/bin
-cp $src/bin/deletefiles $pack/$cgru/bin
-cp $src/lib/python/*.py $pack/$cgru/lib/python
-cp $src/config_default.xml $pack/$cgru
+cp $src/setup*.sh $pack/$installdir
+cp $src/version.txt $pack/$installdir
+cp -r $src/doc/images $pack/$installdir/doc
+cp $src/bin/*.py $pack/$installdir/bin
+cp $src/bin/deletefiles $pack/$installdir/bin
+cp $src/lib/python/*.py $pack/$installdir/lib/python
+cp $src/config_default.xml $pack/$installdir
 
 # Moving icons to standart linux location:
 cp -r $src/utilities/release/icons/icons $pack/usr/local/share
@@ -26,5 +26,5 @@ cp -r $src/utilities/release/icons/icons $pack/usr/local/share
 # Copy pages and images from CGRU documentation:
 extexsions="html css"
 for ext in $extexsions; do
-   cp $src/doc/*.$ext $pack/$cgru/doc
+   cp $src/doc/*.$ext $pack/$installdir/doc
 done
