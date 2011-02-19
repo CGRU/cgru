@@ -5,15 +5,19 @@ cgruRoot="../.."
 
 function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' $1 $2; }
 
+# Afanasy branch:
+afanasy="trunk"
+
+# Check:
+../check.sh "afanasy/$afanasy"
+[ "$?" != "0" ] && exit 1
+
 # Version and revision:
 packsver=`cat $cgruRoot/version.txt`
 pushd $cgruRoot/utilities > /dev/null
 packsrev=`python ./getrevision.py ..`
 popd > /dev/null
 echo "CGRU $packsver rev$packsrev"
-
-# Afanasy branch:
-afanasy="trunk"
 
 # Disrtibutive variables:
 source ../distribution.sh
@@ -60,7 +64,6 @@ if [ -d $cgruExp ]; then
    rm -rf $cgruExp
 fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
-#svn export $cgruRoot $cgruExp
 ./export.sh $cgruExp $afanasy
 
 # Copying general components:
@@ -183,16 +186,6 @@ if [ -d ${releases} ]; then
       cd $tmp
    done
 fi
-
-# Exporting current subversion:
-cgruSVN=cgru_svn${packsrev}
-echo "Exporting CGRU revision $packsrev"
-svn export $cgruRoot $tmpdir/$cgruSVN
-cd $tmpdir
-acrhivename=../$cgruSVN.7z
-[ -f $acrhivename ] && rm -fv $acrhivename
-7za a -r -y -t7z $acrhivename $cgruSVN > /dev/null || echo "Failed!"
-cd ..
 
 # Copmleted.
 chmod -R a+rwx "${tmpdir}"
