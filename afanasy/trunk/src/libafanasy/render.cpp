@@ -225,11 +225,10 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << "#" << id << ": " << name.toUtf8().data() << "@" << username.toUtf8().data();
-      stream << " (" << version.toUtf8().data() << " r" << revision << ")";
-      stream << " :: ";
+      stream << name.toUtf8().data() << "@" << username.toUtf8().data() << "[" << id << "]";
+      stream << " (" << version.toUtf8().data() << " r" << revision << ") ";
       if( address == NULL) stream << "address == NULL";
       else address->generateInfoStream( stream ,full);
-      stream << " - " << calcWeight() << " bytes.";
+//      stream << " - " << calcWeight() << " bytes.";
    }
 }

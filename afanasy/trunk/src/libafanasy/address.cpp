@@ -186,8 +186,11 @@ void Address::generateIPStream( std::ostringstream & stream) const
          for( int i = 0; i < 8; i++)
          {
             if( i != 0 ) stream << ':';
-            sprintf( buffer, "%02x%02x", uint8_t(addr[2*i]), uint8_t(addr[2*i+1]));
-            stream << buffer;
+            uint8_t byte0 = uint8_t(addr[2*i]);
+            uint8_t byte1 = uint8_t(addr[2*i+1]);
+            if( byte0 ) sprintf( buffer, "%x%02x", byte0, byte1);
+            else if( byte1 ) sprintf( buffer, "%x", byte1);
+            if( byte0 || byte1 ) stream << buffer;
          }
          break;
       }

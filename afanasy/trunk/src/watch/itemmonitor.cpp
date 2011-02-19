@@ -21,7 +21,7 @@ const QString TimeRegister   = "R: %1 - time registered";
 const QString TimeR          = "R: %1";
 const QString TimeActivity   = "A: %1 - time last activity";
 const QString TimeA          = "A: %1";
-const QString Address        = "IP: %1";
+const QString Address        = "IP=%1";
 
 ItemMonitor::ItemMonitor( af::Monitor *monitor):
    ItemNode( (af::Monitor*)monitor)

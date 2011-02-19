@@ -81,10 +81,12 @@ bool Monitor::hasEvent( int type) const
 
 void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "#" << id << ": " << name.toUtf8().data() << " :: ";
+   stream << name.toUtf8().data() << "[" << id << "]";
+   stream << " (" << version.toUtf8().data() << " r" << revision << ") ";
    address->generateInfoStream( stream);
-   stream << std::endl;
-   stream << "   Version: " << version.toUtf8().data() << " rev" << revision;
+
+   if( full == false ) return;
+
    stream << std::endl;
    stream << " UIds[" << jobsUsersIds.size() << "]:";
    for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
@@ -92,9 +94,6 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "; JIds[" << jobsIds.size() << "]:";
    for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
       stream << " " << *it;
-
-   if( full == false ) return;
-
    stream << std::endl;
    for( int e = 0; e < EventsCount; e++)
       stream << "\t" << (events[e] ? Msg::TNAMES[e+EventsShift] : "-") << "\n";
