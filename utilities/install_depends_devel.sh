@@ -6,11 +6,12 @@ source ./distribution.sh
 
 # List packages:
 
-packages="$packages gcc yasm"
+packages="gcc yasm p7zip inkscape"
 
 # Common for Debian distributives:
 function debianArch(){
    packages="$packages g++"
+   packages="$packages p7zip-full"
    packages="$packages libzip1 libzip-dev"
    # ImageMagick:
    packages="$packages libjpeg62 libjpeg62-dev"
