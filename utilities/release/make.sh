@@ -66,13 +66,6 @@ fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
 ./export.sh $cgruExp $afanasy
 
-# Copying general components:
-cgruAll="__all__"
-if [ -d $cgruAll ]; then
-   echo "Copying components from '$cgruAll'"
-   rsync -rL $cgruAll/* $cgruExp
-fi
-
 # Processing icons:
 ./process_icons.sh $afanasy
 
@@ -166,24 +159,30 @@ chmod a+rwx "${archive_name}"
 # Creating 7zip releazes archives:
 releases="__releases__"
 if [ -d ${releases} ]; then
-   echo "Creating 7zip archives with all CGRU files..."
-   releasesnames=`ls "${releases}"`
-   for release in $releasesnames; do
-      releasedir="${releases}/$release"
-      [ -d $releasedir ] || continue
-      tmp="$tmpdir/${release}/cgru"
+   for release_name in `ls "${releases}"`; do
+      release_script=$releases/$release_name
+      [ -d "$release_script" ] && continue
+      [ -f "$release_script" ] || continue
+      [ -x "$release_script" ] || continue
+      echo "Creating CGRU archive for ${release_name}..."
+      tmp="$tmpdir/${release_name}/cgru"
       mkdir -p $tmp
-      echo "Creating CGRU archive for ${release}..."
       cp -rp $cgruExp/* $tmp
-      [ ! -z "`ls $releasedir`" ] && rsync -rL --inplace $releasedir/* $tmp
-      tmp=$PWD
-      cd $tmpdir/${release}
-      acrhivename="../../${releases}/cgru.${VERSION_NUMBER}.${release}.7z"
+      $release_script $tmp
+      if [ $? != 0 ]; then
+         echo "Failed making release."
+         exit 1
+      fi
+      pushd $tmpdir/${release_name} > /dev/null
+      acrhivename="../../${releases}/cgru.${VERSION_NUMBER}.${release_name}.7z"
       [ -f $acrhivename ] && rm -fv $acrhivename
-      7za a -r -y -t7z "${acrhivename}" "cgru" | grep "/bin/"
-      [ $? != 0 ] && echo "Failed!"
+      7za a -r -y -t7z "${acrhivename}" "cgru" > /dev/null
+      if [ $? != 0 ]; then
+         echo "Error creating archive."
+         exit 1
+      fi
       chmod a+rw "${acrhivename}"
-      cd $tmp
+      popd > /dev/null
    done
 fi
 

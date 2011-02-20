@@ -13,7 +13,7 @@ if [ ! -d $cgru/$afanasy ]; then
    exit 1
 fi
 
-dirs_nonempty="$afanasy/bin_pyaf"
+dirs_nonempty="$afanasy/bin_pyaf plugins/maya/mll"
 cgru_bins="convert ffmpeg exrjoin"
 afanasy_bins="afserver afcmd afrender aftalk afwatch pyaf.so"
 utilities_bins="regexp/bin/regexp"
