@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ver=4.8.3
-lcation="http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4"
+location="http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4"
 foldername="PyQt-x11-gpl-$ver"
 archive_ext="tar.gz"
 archive="$foldername.$archive_ext"
-link="$lcation/$archive"
+link="$location/$archive"
 
 wget $link
 

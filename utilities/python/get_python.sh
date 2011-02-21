@@ -1,11 +1,11 @@
 #!/bin/bash
 
 ver=$1
-lcation="http://www.python.org/ftp/python"
+location="http://www.python.org/ftp/python"
 foldername="Python-$ver"
 archive_ext="tar.bz2"
 archive="$foldername.$archive_ext"
-link="$lcation/$ver/$archive"
+link="$location/$ver/$archive"
 
 function usageErrorExit(){
    echo "Usage:"
