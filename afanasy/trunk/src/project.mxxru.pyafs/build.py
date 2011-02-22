@@ -21,5 +21,8 @@ for python in os.listdir( pythons):
    os.environ['PYTHONDIR'] = pythondir
    os.environ['PYTHONLIB'] = pythonlib
 
+   print 'PYTHONDIR=%s' % pythondir
+   print 'PYTHONLIB=%s' % pythonlib
+   
    cmd = 'make_pyaf.cmd ' + arch
    os.system( cmd)

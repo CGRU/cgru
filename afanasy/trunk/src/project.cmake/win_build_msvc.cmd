@@ -10,11 +10,11 @@ set cgru_qt=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.1-shared
 if exist %cgru_qt% SET PATH=%cgru_qt%\bin;%PATH%
 
 rem Specify Python:
-set cgru_python=%cgru%\utilities\python\2.5.4
+set cgru_python=%cgru%\utilities\python\2.7.1
 if exist %cgru_python% (
    echo Using CGRU Python: %cgru_python%
    SET AF_PYTHON_INCLUDE_PATH=%cgru_python%\include
-   SET AF_PYTHON_LIBRARIES=%cgru_python%\libs\python25.lib
+   SET AF_PYTHON_LIBRARIES=%cgru_python%\libs\python27.lib
 )
 
 if exist override.cmd call override.cmd
