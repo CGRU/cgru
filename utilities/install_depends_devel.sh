@@ -6,7 +6,7 @@ source ./distribution.sh
 
 # List packages:
 
-packages="gcc yasm p7zip inkscape"
+packages="gcc yasm p7zip wget inkscape"
 
 # Common for Debian distributives:
 function debianArch(){
