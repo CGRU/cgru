@@ -6,8 +6,15 @@ set archive_ext=zip
 set archive=%foldername%.%archive_ext%
 set link=%location%/%archive%
 
+if exist %foldername% (
+   echo %archive% already exists, exiting...
+   exit
+)
+
 if not exist %archive% (
    wget %link%
 ) else (
-   echo Archive %archive% already exists.
+   echo Archive %archive% already exists, skipping download...
 )
+
+7z x %archive%

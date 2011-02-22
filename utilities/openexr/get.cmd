@@ -10,7 +10,7 @@ set package=%1
 echo Package=%package%
 if exist %package% (
     echo %package% already exists, skipping...
-    continue
+    GOTO :eof
 )
 set filename=%package%.tar.gz
 if exist %filename% (
@@ -18,4 +18,7 @@ if exist %filename% (
 ) else (
    wget %location%/%filename%
 )
-REM rem tar xvzf $filename
+7z x %filename%
+set filename=%package%.tar
+7z x %filename%
+del /f /q /s %filename%
