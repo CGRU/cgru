@@ -6,7 +6,8 @@ source ./distribution.sh
 
 # List packages:
 
-packages="gcc yasm p7zip wget inkscape"
+packages="gcc yasm p7zip ruby wget inkscape"
+packages_noarch="rubygems"
 
 # Common for Debian distributives:
 function debianArch(){
@@ -73,6 +74,9 @@ esac
 cmd="$pkg_manager_cmd"
 for package in $packages; do
    cmd="$cmd $package$pkg_extension"
+done
+for package in $packages_noarch; do
+   cmd="$cmd $package"
 done
 
 echo $cmd
