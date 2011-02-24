@@ -83,11 +83,11 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
                // recieve message from master if needed
                if( afcmd.isRecieving())
                {
-                  af::Msg answer;
-                  if( afcmd.msgRecv( answer))
+                  af::Msg * answer = afcmd.msgReceive();
+                  if( answer)
                   {
                      // printf message information
-                     afcmd.msgOut( answer);
+                     afcmd.msgOutput( *answer);
                   }
                   else  return_value = 1;
                }

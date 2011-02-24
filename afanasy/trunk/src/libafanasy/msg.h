@@ -25,6 +25,8 @@ public:
 /// Constructor from \c Af class.
    Msg( int msgType, Af * afClass );
 
+   Msg( const char * rawData, int rawDataLen);
+
    ~Msg();///< Destructor.
 
 /// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
@@ -352,7 +354,7 @@ static const char * TNAMES[]; ///< Type names.
 private:
 
 // header:
-   int32_t mversion;                ///< Recieved afanasy version.
+   int32_t mversion;                ///< Afanasy network protocol version.
 //   int32_t msid;                    ///< Sender id.
    int32_t mtype;                   ///< Message type.
    int32_t mint32;                  ///< Some 32-bit integer, data length for data messages.
@@ -373,8 +375,8 @@ private:
    bool checkZero( bool outerror ); ///< Check Zero type, data length and pointer.
    bool checkValidness();           ///< Check message header validness;
 
- /// Allocate memory for buffer, copy \c written bytes in new buffer if any
-   bool allocateBuffer( int size, int written = 0);
+ /// Allocate memory for buffer, copy \c to_copy_len bytes in new buffer if any
+   bool allocateBuffer( int size, int to_copy_len = 0);
 
    void rw_header( bool write ); ///< Read or write message header.
    void readwrite( Msg * msg);

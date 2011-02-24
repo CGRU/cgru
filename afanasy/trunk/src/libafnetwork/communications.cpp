@@ -52,13 +52,14 @@ bool com::writedata( int fd, char* data, int len)
    return true;
 }
 
-int com::readdata( int fd, char* data, int len_min, int len_max)
+int com::readdata( int fd, char* data, int data_len, int buffer_maxlen)
 {
-   AFINFA("com::readdata:: trying to recieve %d bytes.\n", len_min);
+   AFINFA("com::readdata:: trying to recieve %d bytes.\n", data_len);
    int bytes = 0;
-   while( bytes < len_min )
+   while( bytes < data_len )
    {
-      int r = read( fd, data+bytes, len_max);
+//      int r = read( fd, data+bytes, buffer_maxlen);
+      int r = read( fd, data+bytes, buffer_maxlen-bytes);
       if( r < 0)
       {
          AFERRPE("com::readdata:: read");
@@ -147,6 +148,44 @@ int com::connecttomaster( bool verbose, int type, const char * servername, int s
    return socketfd;
 }
 
+char * com::readdata( int fd, int & read_len)
+{
+   int buffer_len = af::Msg::SizeBuffer;  // Beginning buffer length
+   char * buffer = new char[buffer_len];
+   read_len = 0;
+   for(;;)
+   {
+      int bytes = read( fd, buffer + read_len, buffer_len - read_len);
+      AFINFA("com::readdata: recieved %d bytes.\n", bytes)
+      if( bytes == 0 ) break;
+      if( bytes == -1 ) // Error receiving data
+      {
+         read_len = -1; delete buffer; buffer = NULL;
+         break;
+      }
+      read_len += bytes;
+      if( read_len >= af::Msg::SizeBufferLimit) // Too much data recieved
+      {
+         read_len = -1; delete buffer; buffer = NULL;
+         AFERRAR("Too big message received: len >= af::Msg::SizeBufferLimit : %d >= %d\n", read_len, af::Msg::SizeBufferLimit)
+         break;
+      }
+      if( read_len == buffer_len)  // Need to increase buffer size
+      {
+         AFINFO("com::readdata: allocating new buffer.\n")
+         char * old_buffer = buffer;
+         int old_buffer_len = buffer_len;
+         buffer_len = old_buffer_len << 1; // Increasing buffer twice
+         buffer = new char[buffer_len];
+         memcpy( buffer, old_buffer, read_len); // Copy recieved data into new buffer
+         delete old_buffer;
+      }
+      else break;
+   }
+   AFINFA("com::readdata: returning %d bytes.\n", read_len)
+   return buffer;
+}
+
 bool com::msgread( int desc, af::Msg* msg)
 {
 AFINFO("com::msgread:\n");
@@ -158,11 +197,13 @@ AFINFO("com::msgread:\n");
    if( bytes < af::Msg::SizeHeader)
    {
       AFERRAR("com::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).\n", bytes);
+      msg->setInvalid();
       return false;
    }
    if( msg->readHeader( bytes) == false)
    {
       AFERROR("com::msgread: constructing message header failed.\n");
+      msg->setInvalid();
       return false;
    }
 //

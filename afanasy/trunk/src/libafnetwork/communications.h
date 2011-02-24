@@ -17,10 +17,14 @@ namespace com
    bool writedata( int fd, char* data, int len);
 
 /// Read data from file descriptor. Return bytes than was written or -1 on any error and prints an error in \c stderr.
-   int readdata( int fd, char* data, int len_min, int len_max);
+   int readdata( int fd, char* data, int data_len, int buffer_maxlen);
 
 /// Connect to Afanasy and return file discriptor. Return bad discriptor on error and prints an error in \c stderr.
    int  connecttomaster( bool verbose, int type, const char * servername, int serverport);
+
+/// Read data from file descriptor. Return a new allocated buffer pointer and a size passed through an argument.
+/** Return NULL pointer and negative size on error.**/
+   char * readdata( int fd, int & read_len);
 
 /// Recieve message from given file discriptor \c desc to \c buffer
 /** Return true if success. This function will block process.**/

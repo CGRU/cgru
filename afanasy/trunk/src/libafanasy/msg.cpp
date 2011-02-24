@@ -18,9 +18,9 @@ using namespace af;
 
 const int32_t Msg::Version = AFVERSION;
 
-const int Msg::SizeHeader        = 4 + 4 + 4;
-const int Msg::SizeBuffer        = 1 << 14;                 ///< message reading buffer size.
-const int Msg::SizeBufferLimit   = Msg::SizeBuffer << 12;   ///< message buffer maximum size.
+const int Msg::SizeHeader        = 4 + 4 + 4;   ///< Version + Type + Integer = 12 bytes.
+const int Msg::SizeBuffer        = 1 << 14;                 ///< Message reading buffer size = 16 Kilo bytes.
+const int Msg::SizeBufferLimit   = Msg::SizeBuffer << 12;   ///< Message buffer maximum size = 67 Mega bytes.
 const int Msg::SizeDataMax       = Msg::SizeBufferLimit - Msg::SizeHeader;
 
 //
@@ -35,6 +35,29 @@ Msg::Msg( int msgType, Af * afClass )
 {
    construct();
    set( msgType, afClass);
+}
+
+Msg::Msg( const char * rawData, int rawDataLen):
+   mbuffer( NULL),
+   // This message not for write any more data. All data will be written in this constuctor.
+   // We will only read node parameters to constuct af::Af based classes.
+   writing( false)
+{
+   if( rawDataLen < Msg::SizeHeader ) // Check minimum message size.
+   {
+      AFERRAR("Msg::Msg: rawDataLen < Msg::SizeHeader (%d<%d).", rawDataLen, Msg::SizeHeader)
+      setInvalid();
+      return;
+   }
+   if( rawDataLen > Msg::SizeBufferLimit )  // Check maximum message size.
+   {
+      AFERRAR("Msg::Msg: rawDataLen > Msg::SizeHeader (%d>%d).", rawDataLen, Msg::SizeBufferLimit)
+      setInvalid();
+      return;
+   }
+   if( false == allocateBuffer( rawDataLen)) return; // Allocate memory
+   memcpy( mbuffer, rawData, rawDataLen); // Copy raw data to the message internal buffer.
+   rw_header( false);                     // Read header information from the buffer.
 }
 
 Msg::~Msg()
@@ -57,7 +80,7 @@ void Msg::construct()
    allocateBuffer( Msg::SizeBuffer);
 }
 
-bool Msg::allocateBuffer( int size, int written)
+bool Msg::allocateBuffer( int size, int to_copy_len)
 {
    if( mtype == Msg::TInvalid) return false;
    if( size > Msg::SizeBufferLimit)
@@ -82,7 +105,7 @@ AFINFA("Msg::allocateBuffer: new buffer at %p\n", mbuffer);
 
    if( old_buffer != NULL )
    {
-      if( written > 0) memcpy( mdata, old_buffer + Msg::SizeHeader, written);
+      if( to_copy_len > 0) memcpy( mdata, old_buffer + Msg::SizeHeader, to_copy_len);
       delete [] old_buffer;
    }
 
@@ -245,10 +268,11 @@ AFERROR("Msg::readwrite( Msg * msg): - Invalid call, use Msg::readwrite( bool wr
 
 void Msg::rw_header( bool write )
 {
-   int offset = 0; int size = 4;
-   rw_int32( mversion, mbuffer+offset, write); offset+=size;
-   rw_int32( mtype,    mbuffer+offset, write); offset+=size;
-   rw_int32( mint32,   mbuffer+offset, write); offset+=size;
+   static const int int32_size = 4;
+   int offset = 0;
+   rw_int32( mversion, mbuffer+offset, write); offset+=int32_size;
+   rw_int32( mtype,    mbuffer+offset, write); offset+=int32_size;
+   rw_int32( mint32,   mbuffer+offset, write); offset+=int32_size;
 #ifdef AFOUTPUT
 printf("Msg::readwrite: at %p: ", mbuffer); stdOut();
 #endif

@@ -32,8 +32,9 @@ public:
    bool connect();      ///< Connect to Afanasy. Return true on success.
    bool msgSend( af::Msg& msg);  ///< Send message to Afanasy.Return \c true on sucsess.
 
-   bool msgRecv( af::Msg& msg);  ///< Recieve message from Afanasy. Return \c true on sucsess.
-   void msgOut(  af::Msg& msg);  ///< Print message information in stdout.
+   af::Msg * msgReceive();  ///< Recieve message from Afanasy.
+   bool msgReceive( af::Msg& msg);  ///< Recieve message from Afanasy. Return \c true on sucsess.
+   void msgOutput(  af::Msg& msg);  ///< Print message information in stdout.
 
    void disconnect();   ///< Disconnect.
 

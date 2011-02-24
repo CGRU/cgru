@@ -42,7 +42,7 @@ bool AfCmd::msgSend( af::Msg& msg)
    return false;
 }
 
-bool AfCmd::msgRecv( af::Msg& msg)
+bool AfCmd::msgReceive( af::Msg& msg)
 {
    if(!com::msgread( socketfd, &msg))
    {
@@ -51,6 +51,20 @@ bool AfCmd::msgRecv( af::Msg& msg)
    }
    if( Verbose) { printf("AfCmd::msgRecv: "); msg.stdOut();}
    return true;
+}
+
+af::Msg * AfCmd::msgReceive()
+{
+   int rawdata_len = 0;
+   char * rawdata = com::readdata( socketfd, rawdata_len);
+   if(( rawdata_len < 1 ) || ( rawdata == NULL ))
+   {
+      AFERRAR("AfCmd::msgReceive(): Receivind message failed (%d at %p)\n.", rawdata_len, rawdata);
+      return NULL;
+   }
+   af::Msg * answer = new af::Msg( rawdata, rawdata_len);
+   delete rawdata;
+   return answer;
 }
 
 void AfCmd::disconnect()
@@ -115,7 +129,7 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
    return false;
 }
 
-void AfCmd::msgOut( af::Msg &msg)
+void AfCmd::msgOutput( af::Msg &msg)
 {
    if( command->isMsgOutType( msg.type()))
    {
