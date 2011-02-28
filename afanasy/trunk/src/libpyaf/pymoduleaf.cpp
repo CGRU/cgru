@@ -4,6 +4,7 @@
 #include "pyafjob.h"
 #include "pyafblock.h"
 #include "pyaftask.h"
+#include "pyafcmd.h"
 
 static PyMethodDef PyAf_Methods[] = {
    { 0, 0, 0, 0 }// Sentinel
@@ -20,20 +21,25 @@ PyMODINIT_FUNC initpyaf(void)
    PyAf_Job_Type.tp_new    = PyType_GenericNew;
    PyAf_Block_Type.tp_new  = PyType_GenericNew;
    PyAf_Task_Type.tp_new   = PyType_GenericNew;
+   PyAf_Cmd_Type.tp_new    = PyType_GenericNew;
 
    if( PyType_Ready( &PyAf_Job_Type    ) < 0 ) return;
    if( PyType_Ready( &PyAf_Block_Type  ) < 0 ) return;
    if( PyType_Ready( &PyAf_Task_Type   ) < 0 ) return;
+   if( PyType_Ready( &PyAf_Cmd_Type    ) < 0 ) return;
 
    module = Py_InitModule( "pyaf", PyAf_Methods);
 
    Py_INCREF( &PyAf_Job_Type     );
    Py_INCREF( &PyAf_Block_Type   );
    Py_INCREF( &PyAf_Task_Type    );
+   Py_INCREF( &PyAf_Cmd_Type     );
 
    PyModule_AddObject( module, "Job",     (PyObject*)&PyAf_Job_Type     );
    PyModule_AddObject( module, "Block",   (PyObject*)&PyAf_Block_Type   );
    PyModule_AddObject( module, "Task",    (PyObject*)&PyAf_Task_Type    );
+   PyModule_AddObject( module, "Cmd",     (PyObject*)&PyAf_Cmd_Type     );
+
 
 //############ Version: ########################
 #ifdef CGRU_REVISION

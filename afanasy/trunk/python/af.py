@@ -178,7 +178,7 @@ class Job(pyaf.Job):
          return False
       self.fillBlocks()
       if self.construct() == False: return False
-      return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)
+      return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)[0]
 
 ###### DEPRECATED: ######
    def addBlock( self, blockname = 'block', blocktype = 'generic'):
@@ -192,3 +192,43 @@ class Job(pyaf.Job):
    def setPaused(  self): self.offline()
    def offLine(    self): self.offline()
    def setOffline( self): self.offline()
+
+
+class Cmd(pyaf.Cmd):
+   def __init__( self ):
+      self.env = afenv.Env()
+      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      self.pm = PathMap( self.env.Vars['afroot'])
+      pyaf.Cmd.__init__( self, self.env.Vars['servername'], self.env.Vars['serverport'])
+      self.requestOutput = None
+   
+   def _sendRequest(self, verbose = False):
+      output = afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)
+      if output[0] == True:
+         self.requestOutput = output[1]
+         return True
+      else:
+         self.requestOutput = None
+         return False
+   
+   def getJobList( self, verbose = False):
+      self.getjoblist()
+      if self._sendRequest(verbose):
+         return self.decodejoblist(self.requestOutput)
+      else:
+         return False
+   
+   def deleteJob(self, jobName, verbose = False):
+      self.deletejob(jobName)
+      if self._sendRequest(verbose):
+         return True
+      else:
+         return False
+   
+   def getJobInfo(self, jobId, verbose = False):
+      self.getjobinfo(jobId)
+      if self._sendRequest(verbose):
+         return self.decodejobinfo(self.requestOutput)
+      else:
+         return False
+   
