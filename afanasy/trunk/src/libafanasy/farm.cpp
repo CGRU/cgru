@@ -516,6 +516,8 @@ void Farm::servicesLimitsGet( const Farm & other)
 
 const std::string Farm::serviceLimitsInfoString( bool full) const
 {
+   if( servicelimits.size() < 1 ) return std::string();
+
    std::ostringstream stream;
 
    if( full ) stream << "Services Limits:";

@@ -522,8 +522,12 @@ void RenderAf::getServices( af::Msg * msg) const
       if( host.getServiceCount(i) > 0) line += " / max=" + QString::number( host.getServiceCount(i));
       list << "   " + line;
    }
-   list << "";
-   list << QString::fromUtf8( af::farm()->serviceLimitsInfoString( true).c_str());
+   std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
+   if( servicelimits.size())
+   {
+      list << "";
+      list << QString::fromUtf8( af::farm()->serviceLimitsInfoString( true).c_str());
+   }
    msg->setStringList( list);
 }
 
