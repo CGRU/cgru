@@ -74,11 +74,11 @@ public:
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   inline const QString & getAnnontation() const { return annotation;}
+   inline const std::string & getAnnontation() const { return annotation;}
 
 protected:
    uint32_t state;             ///< State.
-   QString annotation;
+   std::string annotation;
    QString customdata;
 
    QString  hostname;          ///< User host name.

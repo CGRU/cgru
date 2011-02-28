@@ -190,23 +190,33 @@ public:
 private: const int32_t * pointer;
 };
 
-class DBAttrString: public DBAttr
+class DBAttrQString: public DBAttr
 {
 public:
-   DBAttrString( int type, QString * parameter);
-   ~DBAttrString();
+   DBAttrQString( int type, QString * parameter);
+   ~DBAttrQString();
    inline const QString getString() const { return DBString( pointer);}
    inline void set( const QVariant & value) { *pointer = value.toString();}
 private: QString * pointer;
 };
 
-class DBAttrRegExp: public DBAttr
+class DBAttrString: public DBAttr
 {
 public:
-   DBAttrRegExp( int type, QRegExp * parameter);
-   ~DBAttrRegExp();
+   DBAttrString( int type, std::string * parameter);
+   ~DBAttrString();
+   inline const QString getString() const { return DBString( QString::fromUtf8( pointer->c_str()));}
+   inline void set( const QVariant & value) { *pointer = value.toString().toUtf8().data();}
+private: std::string * pointer;
+};
+
+class DBAttrQRegExp: public DBAttr
+{
+public:
+   DBAttrQRegExp( int type, QRegExp * parameter);
+   ~DBAttrQRegExp();
    inline const QString getString() const { return DBString( pointer->pattern());}
-   inline void set( const QVariant & value) {af::setRegExp( *pointer, value.toString(), "DBAttrRegExp::set");}
+   inline void set( const QVariant & value) {af::setRegExp( *pointer, value.toString(), "DBAttrQRegExp::set");}
 private: QRegExp * pointer;
 };
 }

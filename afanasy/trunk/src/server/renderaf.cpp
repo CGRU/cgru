@@ -510,21 +510,27 @@ void RenderAf::getServices( af::Msg * msg) const
    if( false == services_disabled.isEmpty())
    {
       list << "Disabled services:";
-      list << services_disabled;
+      list << "   " + services_disabled;
+      list << "";
    }
+   list << "Services:";
    for( int i = 0; i < servicesnum; i++)
    {
       QString line = host.getServiceName(i) + ": ";
       if( disabledservices[i] ) line = "DISABLED " + line;
       if( servicescounts[i] > 0) line += QString::number( servicescounts[i]);
       if( host.getServiceCount(i) > 0) line += " / max=" + QString::number( host.getServiceCount(i));
-      list << line;
+      list << "   " + line;
    }
+   list << "";
+   list << QString::fromUtf8( af::farm()->serviceLimitsInfoString( true).c_str());
    msg->setStringList( list);
 }
 
 bool RenderAf::canRunService( const QString & type) const
 {
+   if( false == af::farm()->serviceLimitCheck( type.toUtf8().data(), name.toUtf8().data())) return false;
+
    for( int i = 0; i < servicesnum; i++)
    {
       if( host.getServiceName(i) == type)
@@ -542,6 +548,8 @@ bool RenderAf::canRunService( const QString & type) const
 
 void RenderAf::addService( const QString & type)
 {
+   af::farm()->serviceLimitAdd( type.toUtf8().data(), name.toUtf8().data());
+
    for( int i = 0; i < servicesnum; i++)
    {
       if( host.getServiceName(i) == type)
@@ -557,6 +565,8 @@ void RenderAf::addService( const QString & type)
 
 void RenderAf::remService( const QString & type)
 {
+   af::farm()->serviceLimitRelease( type.toUtf8().data(), name.toUtf8().data());
+
    for( int i = 0; i < servicesnum; i++)
    {
       if( host.getServiceName(i) == type)

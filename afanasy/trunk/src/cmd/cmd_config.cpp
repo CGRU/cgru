@@ -16,7 +16,7 @@ CmdConfig::CmdConfig()
 CmdConfig::~CmdConfig(){}
 bool CmdConfig::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString filename( argv[0]);
+   std::string filename( argv[0]);
    af::Environment::load( filename, af::Environment::SolveServerAddress | af::Environment::Verbose);
    return true;
 }

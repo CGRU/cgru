@@ -35,8 +35,8 @@ int main( int argc, char** argv )
       char buffer[bufsize];
       char link[] = "/proc/self/exe";
       int linksize = readlink( link, buffer, bufsize);
-      QString exe = QString::fromUtf8( buffer, linksize);
-      printf("%s='%s'\n", link, exe.toUtf8().data());
+      buffer[linksize] = '\0';
+      printf("%s='%s'\n", link, buffer);
 #endif
 /*
 printf("Msg::SizeHeader       = %d\n", Msg::SizeHeader      );

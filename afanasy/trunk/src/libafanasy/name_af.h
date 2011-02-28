@@ -62,6 +62,8 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
+   const std::string getenv( const char * name);
+
    void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
@@ -78,6 +80,7 @@ namespace af
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
 
+   int weigh( const std::string & str);
    int weigh( const QString & str);
    int weigh( const QRegExp & regexp);
 
@@ -92,6 +95,15 @@ namespace af
    void  destroy();
 
    bool  loadFarm( bool verbose = false);
-   bool  loadFarm( const QString & filename, bool verbose = false);
-   const Farm * farm();
+   bool  loadFarm( const std::string & filename, bool verbose = false);
+   Farm * farm();
+
+   void pathFilterFileName( std::string & filename);
+   void pathFilter( std::string & path);
+   bool pathIsAbsolute( const std::string & path);
+   bool pathIsFolder( const std::string & path);
+   const std::string pathAbsolute( const std::string & path);
+   const std::string pathUp( const std::string & path);
+   const std::string pathHome();
+   bool pathMakeDir( const std::string & path, bool verbose = false);
 }

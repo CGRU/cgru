@@ -149,10 +149,12 @@ DBAttrInt32 ::DBAttrInt32  ( int type,  int32_t * parameter): DBAttr( type), poi
 DBAttrInt32 ::~DBAttrInt32 (){}
 DBAttrUInt32::DBAttrUInt32 ( int type, uint32_t * parameter): DBAttr( type), pointer( parameter) {}
 DBAttrUInt32::~DBAttrUInt32(){}
-DBAttrString::DBAttrString ( int type,  QString * parameter): DBAttr( type), pointer( parameter) {}
+DBAttrQString::DBAttrQString ( int type,  QString * parameter): DBAttr( type), pointer( parameter) {}
+DBAttrQString::~DBAttrQString(){}
+DBAttrString::DBAttrString ( int type, std::string * parameter): DBAttr( type), pointer( parameter) {}
 DBAttrString::~DBAttrString(){}
-DBAttrRegExp::DBAttrRegExp ( int type,  QRegExp * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrRegExp::~DBAttrRegExp(){}
+DBAttrQRegExp::DBAttrQRegExp ( int type,  QRegExp * parameter): DBAttr( type), pointer( parameter) {}
+DBAttrQRegExp::~DBAttrQRegExp(){}
 
 DBAttrInt32Const::DBAttrInt32Const( int type, const int32_t * parameter): DBAttr( type), pointer( parameter) {}
 DBAttrInt32Const::~DBAttrInt32Const(){}

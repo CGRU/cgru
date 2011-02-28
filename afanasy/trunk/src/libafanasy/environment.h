@@ -42,7 +42,7 @@ public:
       { cmdarguments_usagearg << arg; cmdarguments_usagehelp << help;}
 
    static bool reload();
-   static bool load( QString & filename, uint32_t flags = 0);
+   static bool load( const std::string & filename, uint32_t flags = 0);
 
    static void setVerbose( bool value = true) { verbose = value;}
    static bool openXMLDomDocument( QDomDocument & doc, const QString & filename);
@@ -63,9 +63,6 @@ public:
 /// Set client port. Client can change its port.
    static bool setClientPort( uint16_t port);
 
-   static inline const QString& getHome()         { return home;          }
-   static inline const QString& getHomeAfanasy()  { return home_afanasy;  }
-
 /// Get versions:
    static inline int getAfanasyBuildVersion()    { return afanasy_build_version;  }
    static inline const QString& getCGRUVersion() { return  cgru_version;          }
@@ -74,7 +71,9 @@ public:
    static inline const QHostAddress* getAfServerQHostAddress()  { return qafserveraddress;}
 
 
-   static inline const QString& getAfRoot()        { return afroot;        } ///< Get Afanasy root directory.
+   static inline const std::string & getHome()        { return home;          }
+   static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
+   static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
    static inline const QString& getServerName()    { return servername;    } ///< Get Afanasy server name.
    static inline const QString& getUserName()      { return username;      } ///< Get current user name.
    static inline const QString& getHostName()      { return hostname;      } ///< Get Render host name.
@@ -187,12 +186,12 @@ private:
    static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
    static void printUsage(); ///< Output command usage
    static void load();
-   static bool getVars(     const QString & filename);
+   static bool getVars( const std::string & filename);
    static bool init( bool solveServerAddress);
 
-   static QString afroot;         ///< Afanasy root directory.
-   static QString home;           ///< User home directory.
-   static QString home_afanasy;   ///< Afanasy home settings.
+   static std::string afroot;         ///< Afanasy root directory.
+   static std::string home;           ///< User home directory.
+   static std::string home_afanasy;   ///< Afanasy home settings.
 
    static int afanasy_build_version;  ///< Afanasy build sources version, will be compiled in binaries
    static QString cgru_version;       ///< CGRU version, will be get from environment on applications startup

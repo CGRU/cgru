@@ -62,8 +62,13 @@ void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
    if( full)
    {
       stream << "Pattern: \"" << name.toUtf8().data() << "\" (" << description.toUtf8().data() << "):";
-      stream << std::endl;
-      stream << "\tMask =\"" << mask.toUtf8().data() << "\"";
+      stream << " Mask =\"" << mask.toUtf8().data() << "\"";
+      if( remservices.size())
+      {
+         stream << "\n   Remove services:";
+         for( int i = 0; i < remservices.size(); i++)
+            stream << " \"" << remservices[i].toUtf8().data() << "\"";
+      }
    }
    else
    {

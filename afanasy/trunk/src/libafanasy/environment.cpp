@@ -120,9 +120,9 @@ QString        Environment::username = "";
 QString        Environment::computername = "";
 QString        Environment::hostname = "";
 QString        Environment::platform = "";
-QString        Environment::afroot = "";
-QString        Environment::home = "";
-QString        Environment::home_afanasy = "";
+std::string    Environment::afroot = "";
+std::string    Environment::home = "";
+std::string    Environment::home_afanasy = "";
 QString        Environment::render_resclasses = "";
 bool           Environment::verbose = false;
 Address      * Environment::address = NULL;
@@ -142,11 +142,11 @@ bool           Environment::help_mode = false;
 int            Environment::afanasy_build_version = 0;
 QString        Environment::cgru_version;
 
-bool Environment::getVars( const QString & filename)
+bool Environment::getVars( const std::string & filename)
 {
    QDomDocument doc("afanasy");
-   if( openXMLDomDocument( doc, filename) == false) return false;
-   if( verbose) printf("Parsing XML file '%s':\n", filename.toUtf8().data());
+   if( openXMLDomDocument( doc, filename.c_str()) == false) return false;
+   if( verbose) printf("Parsing XML file '%s':\n", filename.c_str());
 
    getVar( doc, filenamesizemax,                   "filenamesizemax"                   );
    getVar( doc, timeformat,                        "timeformat"                        );
@@ -365,68 +365,75 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 // Init command arguments:
    initCommandArguments( argc, argv);
 
-   QDir dir;
+//   QDir dir;
 //
 //############ afanasy root directory:
    afroot = getenv("AF_ROOT");
-   if( afroot.isEmpty())
+   if( afroot.size() == 0 )
    {
-      QString exec( argv[0]);
-#ifndef WINNT
-      QString link = QFile::symLinkTarget( exec);
-      if( link.isEmpty() == false ) exec = link;
-#endif
-      dir.setPath( exec);
-      dir.makeAbsolute();
-      dir.cdUp();
-      dir.cdUp();
-      afroot = dir.path();
+      afroot = argv[0];
+//#ifndef WINNT
+//      std::string link = QFile::symLinkTarget( exec);
+//      if( link.isEmpty() == false ) exec = link;
+//#endif
+      afroot = af::pathAbsolute( afroot);
+      afroot = af::pathUp( afroot);
+      afroot = af::pathUp( afroot);
+//      dir.setPath( exec.c_str());
+//      dir.makeAbsolute();
+//      dir.cdUp();
+//      dir.cdUp();
+//      afroot = dir.path().toUtf8().data();
+      std::cout << "afroot=" << afroot;
+      std::cout << std::endl;
    }
-   if( dir.exists( afroot) == false)
+//   if( dir.exists( afroot.c_str()) == false)
+   if( af::pathIsFolder( afroot ) == false)
    {
-      AFERRAR("AF_ROOT directory = '%s' does not exists.\n", afroot.toUtf8().data());
+      AFERRAR("AF_ROOT directory = '%s' does not exists.\n", afroot.c_str());
       return;
    }
-   PRINT("Afanasy root directory = '%s'\n", afroot.toUtf8().data());
+   PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
 
 //
 // Afanasy python path:
    if( flags & AppendPythonPath)
    {
-      QString afpython = getenv("AF_PYTHON");
-      if( afpython.isEmpty())
+      std::string afpython = getenv("AF_PYTHON");
+      if( afpython.size() == 0 )
       {
-         QString script = ""
+         std::string script = ""
          "import os\n"
          "import sys\n"
-         "afpython = os.path.join( '%1', 'python')\n"
+         "afpython = os.path.join( '" + afroot + "', 'python')\n"
          "if not afpython in sys.path:\n"
          "   print 'PYTHONPATH: appending \"%s\"' % afpython\n"
          "   sys.path.append( afpython)\n"
          ;
-         PyRun_SimpleString( script.arg( afroot).toUtf8().data());
+         PyRun_SimpleString( script.c_str());
 	  }
    }
 
 
 //
 //############ home directory:
-   home = QDir::homePath();
-   PRINT("User home directory = '%s'\n", home.toUtf8().data());
-   home_afanasy = home + "/.afanasy/";
-   PRINT("Afanasy home directory = '%s'\n", home_afanasy.toUtf8().data());
-   if( dir.mkpath(home_afanasy) == false)
+   home = af::pathHome();
+   PRINT("User home directory = '%s'\n", home.c_str());
+   home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy" + AFGENERAL::PATH_SEPARATOR;
+   PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
+//   if( dir.mkpath( home_afanasy.c_str()) == false)
+   if( af::pathMakeDir( home_afanasy, true) == false)
    {
-      AFERRAR("Can't make home directory '%s'\n", home_afanasy.toUtf8().data());
+      AFERRAR("Can't make home directory '%s'\n", home_afanasy.c_str());
    }
 //
 //############ user name:
-   username = QString::fromUtf8( getenv("AF_USERNAME"));
-   if( username.isEmpty()) username = QString::fromUtf8( getenv("USER"));
-   if( username.isEmpty()) username = QString::fromUtf8( getenv("USERNAME"));
+   username = QString::fromUtf8( getenv("AF_USERNAME").c_str());
+   if( username.isEmpty()) username = QString::fromUtf8( getenv("USER").c_str());
+   if( username.isEmpty()) username = QString::fromUtf8( getenv("USERNAME").c_str());
    if( username.isEmpty())
    {
-      AFERROR("Can't find user name.\n");
+      AFERROR("Can't get user name.\n");
       return;
    }
    username = username.toLower();
@@ -437,7 +444,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    PRINT("Afanasy user name = '%s'\n", username.toUtf8().data());
 //
 //############ local host name:
-   hostname = QString::fromUtf8( getenv("AF_HOSTNAME")).toLower();
+   hostname = QString::fromUtf8( getenv("AF_HOSTNAME").c_str()).toLower();
 
 //
 //############ Platform: #############################
@@ -466,7 +473,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    afanasy_build_version = CGRU_REVISION;
 #endif
    printf("Afanasy build revision = \"%d\"\n", afanasy_build_version);
-   cgru_version = QString::fromUtf8( getenv("CGRU_VERSION"));
+   cgru_version = QString::fromUtf8( getenv("CGRU_VERSION").c_str());
    printf("CGRU version = \"%s\"\n", cgru_version.toUtf8().data());
 //###################################################
 
@@ -486,7 +493,7 @@ Environment::~Environment()
 
 void Environment::load()
 {
-   QString filename;
+   std::string filename;
    filename = ( afroot + "/config_default.xml");
    getVars( filename);
    filename = ( afroot + "/config.xml");
@@ -500,7 +507,7 @@ void Environment::load()
    verbose=tverbose;
 }
 
-bool Environment::load( QString & filename, uint32_t flags)
+bool Environment::load( const std::string & filename, uint32_t flags)
 {
    verbose = flags & Verbose;
    if( getVars( filename)) return init( flags & SolveServerAddress);

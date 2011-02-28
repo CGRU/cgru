@@ -3,6 +3,13 @@
 This is commented text.
 -->
 <farm>
+<!--
+You can limit service on your farm:
+maxhosts - maximum number if various hosts (renders) service can run on
+maxcount - total maximum number of service starts, no matter on the same host or not
+   <service name="service_to_limit" maxhosts="10" maxcount="20"/>
+-->
+
    <pattern name="Some Host">
       <mask>.*</mask>
 <!--

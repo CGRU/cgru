@@ -81,7 +81,7 @@ void User::readwrite( Msg * msg)
    rw_float   ( need,                  msg);
    rw_QRegExp ( hostsmask,             msg);
    rw_QRegExp ( hostsmask_exclude,     msg);
-   rw_QString ( annotation,            msg);
+   rw_String  ( annotation,            msg);
 }
 
 void User::setPermanent( bool value)
@@ -123,6 +123,7 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       if( false == hostname.isEmpty()) stream << "\n Last host = " << hostname.toUtf8().data();
 //      stream << "\n Memory = " << calcWeight() << " bytes.";
       if( isPermanent()) stream << "\n User is permanent."; else stream << "\n (user is temporal)";
+      if( annotation.size()) stream << "\n" << annotation;
    }
    else
    {

@@ -145,7 +145,7 @@ QEnvironment::QEnvironment( const QString & name)
    attrs_gui.append( &clr_textstars       );
 
    QDomDocument doc( name);
-   filename = af::Environment::getHomeAfanasy() + name + ".xml";
+   filename = QString::fromUtf8( af::Environment::getHomeAfanasy().c_str()) + name + ".xml";
    if( af::Environment::openXMLDomDocument( doc, filename))
    {
       for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->read( doc);

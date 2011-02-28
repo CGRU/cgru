@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
    }
 
    QApplication app( argc, argv);
-   app.setWindowIcon( QIcon( ENV.getAfRoot() + "/icons/talk_tray.png"));
+   app.setWindowIcon( QIcon( QString::fromUtf8( ENV.getAfRoot().c_str()) + "/icons/talk_tray.png"));
 
    QPalette palette = app.palette();
    QENV.setPalette( palette);

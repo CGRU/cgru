@@ -12,6 +12,14 @@ namespace AFGENERAL
    const int  DEFAULT_PRIORITY   = 99;                   ///< Default priority for user, jobs and hosts.
    const int  MAXRUNNINGTASKS    = -1;                   ///< Default maximum running tasks number.
    const int  FILENAMESIZEMAX    = 250;                  ///< Maximum filename size.
+#ifdef WINNT
+   const char PATH_SEPARATOR     = '\\';
+#else
+   const char PATH_SEPARATOR     = '/';
+#endif
+   const char FILENAME_INVALIDCHARACTERS[] = "\"\\ /|!$&?()[]{}*^`',:;";
+   const char FILENAME_INVALIDCHARACTERSLENGTH = strlen( FILENAME_INVALIDCHARACTERS);
+   const char FILENAME_INVALIDCHARACTERREPLACE = '_';
 }
 
 /// Addresses:

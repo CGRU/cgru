@@ -53,6 +53,14 @@ void Af::rw_data( char* data, Msg * msg, int size)
    else                    memcpy( data,   buffer, size);
 }
 
+void Af::w_data( const char * data, Msg * msg, int size)
+{
+   char * buffer = msg->writtenBuffer( size);
+   if( buffer == NULL) return;
+   if( msg->isWriting()) memcpy( buffer, data, size);
+   else AFERROR("Af::w_data: Message is not for reading.\n")
+}
+
 void Af::rw_bool( bool& boolean, Msg * msg)
 {
    const int size = 1;
@@ -193,6 +201,27 @@ void Af::rw_QString(  QString& qString, Msg * msg)
       qString = QString::fromUtf8( buffer);
    }
 //printf("Af::rw_QString: qString = \"%s\"\n", qString.toUtf8().data());
+}
+
+void Af::rw_String( std::string &string, Msg * msg)
+{
+   uint32_t length;
+
+   if( msg->isWriting())
+   {
+      const char * buffer = string.c_str();
+      length = string.length() + 1;
+      rw_uint32_t( length, msg);
+      w_data( buffer, msg, length);
+   }
+   else
+   {
+      rw_uint32_t( length, msg);
+      char * buffer = msg->writtenBuffer( length);
+      if( buffer == NULL ) return;
+      string = buffer;
+   }
+std::cout << "Af::rw_String: string = \"" << string << "\"\n";
 }
 
 void Af::rw_QRegExp( QRegExp &qRegExp, Msg * msg)

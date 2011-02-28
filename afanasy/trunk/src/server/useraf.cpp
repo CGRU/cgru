@@ -45,7 +45,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
    case af::Msg::TUserAnnotate:
    {
-      annotation = mcgeneral.getString();
+      annotation = mcgeneral.getString().toUtf8().data();
       appendLog( QString("Annotation set to '%1'' by %2").arg( mcgeneral.getString(), userhost));
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;

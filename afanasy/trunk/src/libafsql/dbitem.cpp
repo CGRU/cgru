@@ -152,10 +152,10 @@ bool DBItem::dbSelect( QSqlDatabase * db, const QString * where)
    }
    str += ";";
    q.exec( str);
-AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s\n", q.size(), str.toUtf8().data());
+   AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s\n", q.size(), str.toUtf8().data())
    if( q.size() != 1)
    {
-      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s\n", q.size(), str.toUtf8().data());
+      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s\n", q.size(), str.toUtf8().data())
       return false;
    }
    q.next();

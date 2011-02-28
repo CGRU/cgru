@@ -14,8 +14,8 @@
 
 Tray::Tray( QWidget * parent, const QString & UserName):
    QSystemTrayIcon( parent),
-   icon( af::Environment::getAfRoot() + "/icons/talk_tray.png"),
-   icon_msg( af::Environment::getAfRoot() + "/icons/talk_tray_msg.png"),
+   icon( QString::fromUtf8( af::Environment::getAfRoot().c_str()) + "/icons/talk_tray.png"),
+   icon_msg( QString::fromUtf8( af::Environment::getAfRoot().c_str()) + "/icons/talk_tray_msg.png"),
    icon_flashing( false),
    icon_state( false),
    username( UserName),

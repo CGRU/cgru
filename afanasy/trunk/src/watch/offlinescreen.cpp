@@ -24,7 +24,7 @@ int A = 3;
 
 OfflineScreen::OfflineScreen( QWidget * widget):
    QWidget((QWidget*)(Watch::getDialog())),
-   offlineimage(af::Environment::getAfRoot() + "/icons/watch/offlineimage.png")
+   offlineimage( QString::fromUtf8( af::Environment::getAfRoot().c_str()) + "/icons/watch/offlineimage.png")
 {
    // Allocate memory for image
    image_w = widget->width();

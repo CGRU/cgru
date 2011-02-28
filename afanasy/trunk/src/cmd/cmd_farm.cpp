@@ -16,7 +16,7 @@ CmdFarm::CmdFarm()
 CmdFarm::~CmdFarm(){}
 bool CmdFarm::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString filename( argv[0]);
+   std::string filename( argv[0]);
    af::loadFarm( filename,  true);
    return true;
 }

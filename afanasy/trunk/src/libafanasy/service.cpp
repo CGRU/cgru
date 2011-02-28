@@ -60,7 +60,7 @@ void Service::initialize()
 
    PyObject *pArgs;
    pArgs = PyTuple_New( 6);
-   PyTuple_SetItem( pArgs, 0, PyString_FromString( af::Environment::getAfRoot().toUtf8().data()));
+   PyTuple_SetItem( pArgs, 0, PyString_FromString( af::Environment::getAfRoot().c_str()));
    PyTuple_SetItem( pArgs, 1, PyString_FromString( wdir.toUtf8().data()));
    PyTuple_SetItem( pArgs, 2, PyString_FromString( command.toUtf8().data()));
    PyTuple_SetItem( pArgs, 3, PyInt_FromLong( capkoeff));

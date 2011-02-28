@@ -36,7 +36,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    else        setNotRunning();
 
    priority             = user->getPriority();
-   annotation           = user->getAnnontation();
+   annotation           = QString::fromUtf8( user->getAnnontation().c_str());
    hostname             = user->getHostName();
    numjobs              = user->getNumJobs();
    numrunningtasks      = user->getRunningTasksNumber();

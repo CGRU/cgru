@@ -35,11 +35,11 @@ DBTaskData::DBTaskData( af::Msg * msg)
 
 void DBTaskData::addDBAttributes()
 {
-   dbAddAttr( new DBAttrString( DBAttr::_name,        &name       ));
-   dbAddAttr( new DBAttrString( DBAttr::_command,     &command    ));
-   dbAddAttr( new DBAttrString( DBAttr::_files,       &files      ));
-   dbAddAttr( new DBAttrString( DBAttr::_dependmask,  &dependmask ));
-   dbAddAttr( new DBAttrString( DBAttr::_customdata,  &customdata ));
+   dbAddAttr( new DBAttrQString( DBAttr::_name,        &name       ));
+   dbAddAttr( new DBAttrQString( DBAttr::_command,     &command    ));
+   dbAddAttr( new DBAttrQString( DBAttr::_files,       &files      ));
+   dbAddAttr( new DBAttrQString( DBAttr::_dependmask,  &dependmask ));
+   dbAddAttr( new DBAttrQString( DBAttr::_customdata,  &customdata ));
 }
 
 DBTaskData::~DBTaskData()
