@@ -3,13 +3,15 @@
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 
-#include <unistd.h>
-
 #ifdef WINNT
-#include <winsock.h>
-#else
-#include <arpa/inet.h>
+#include <direct.h>
 #include <sys/stat.h>
+#include <winsock.h>
+#define getcwd _getcwd
+#define stat _stat
+#else
+#include <unistd.h>
+#include <arpa/inet.h>
 #endif
 
 #include "environment.h"
@@ -321,7 +323,11 @@ bool af::pathIsFolder( const std::string & path)
 
 const std::string af::pathHome()
 {
+#ifdef WINNT
+   return getenv("HOMEPATH");
+#else
    return getenv("HOME");
+#endif
 }
 
 bool af::pathMakeDir( const std::string & path, bool verbose)
@@ -330,12 +336,18 @@ bool af::pathMakeDir( const std::string & path, bool verbose)
    if( false == af::pathIsFolder(path))
    {
       if( verbose) printf("Creating folder:\n%s\n", path.c_str());
+#ifdef WINNT
+      if( _mkdir( path.c_str()) == -1)
+#else
       if( mkdir( path.c_str(), 0777) == -1)
+#endif
       {
          AFERRPA("af::pathMakeDir - \"%s\".\n", path.c_str());
          return false;
       }
+#ifndef WINNT
       chmod( path.c_str(), 0777);
+#endif
    }
    return true;
 }

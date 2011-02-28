@@ -48,10 +48,10 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
 #ifdef WINNT
    Sleep( 100);
 // Windows Must Die:
-   QStringList wmdfiles = QDir(af::Environment::getAfRoot()).entryList( QStringList("windowsmustdie*.txt"), QDir::Files, QDir::Name);
+   QStringList wmdfiles = QDir(af::Environment::getAfRoot().c_str()).entryList( QStringList("windowsmustdie*.txt"), QDir::Files, QDir::Name);
    for( int i = 0; i < wmdfiles.size(); i++)
    {
-      QString filename = QString("%1\\%2").arg( af::Environment::getAfRoot(), wmdfiles[i]);
+      QString filename = QString("%1\\%2").arg( QString::fromUtf8( af::Environment::getAfRoot().c_str())).arg( wmdfiles[i]);
       QFile file( filename);
       if( file.open(QFile::ReadOnly))
       {
