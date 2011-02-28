@@ -221,7 +221,7 @@ void Af::rw_String( std::string &string, Msg * msg)
       if( buffer == NULL ) return;
       string = buffer;
    }
-std::cout << "Af::rw_String: string = \"" << string << "\"\n";
+//std::cout << "Af::rw_String: string = \"" << string << "\"\n";
 }
 
 void Af::rw_QRegExp( QRegExp &qRegExp, Msg * msg)
