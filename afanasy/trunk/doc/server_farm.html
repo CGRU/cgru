@@ -45,49 +45,65 @@
 
 <p>
 After general configuration, afanasy try to load <kbd>cgru/afanasy/farm.xml</kbd> to setup a farm.
-If this file does not exists it load <kbd>cgru/afanasy/farm_default.xml</kbd>
+If this file does not exists it load <kbd>cgru/afanasy/farm_example.xml</kbd>
 which setup default farm and provided as an example to copy and modify to describe your hosts.
 </p>
 <ul>
 <li><p>
-<code>pattern</code> name="<i>pattern name</i>"<br/>
-</p></li>
-<li><p>
-<code>mask</code><br/>
-Hosts which names matches this mask will take this pattern settings.
-</p></li>
-<li><p>
-<code>description</code><br/>
-Does not mean anything for sever, job or render host, only for humans.
-</p></li>
-<li><p>
-<code>os</code><br/>
-Operating system name. Can be matched by jobs.
-</p></li>
-<li><p>
-<code>capacity</code><br/>
-Running Tasks maximum capacity value.
-</p></li>
-<li><p>
-<code>maxtasks</code><br/>
-Maximum number of simultaneously running tasks.
-</p></li>
-<li><p>
-<code>power</code><br/>
-Some number which minimum can be needed by jobs.
-</p></li>
-<li><p>
-<code>properties</code><br/>
-Some string which matching can be needed by jobs.
-</p></li>
-<li><p>
-<code>service</code> name="<i>type</i>" count="<i>limit number</i>"<br/>
-List of names and counts of available services.
-</p></li>
-<li><p>
-<code>remservice</code> name="<i>type</i>"<br/>
-List of service names to remove.
-</p></li>
+<code>pattern</code> <b>name</b>="<i>pattern name</i>"<br/>
+</p>
+<ul>
+   <li><p>
+   <code>mask</code><br/>
+   Hosts which names matches this mask will take this pattern settings.
+   </p></li>
+   <li><p>
+   <code>description</code><br/>
+   Does not mean anything for sever, job or render host, only for humans.
+   </p></li>
+   <li><p>
+   <code>os</code><br/>
+   Operating system name. Can be matched by jobs.
+   </p></li>
+   <li><p>
+   <code>capacity</code><br/>
+   Running Tasks maximum capacity value.
+   </p></li>
+   <li><p>
+   <code>maxtasks</code><br/>
+   Maximum number of simultaneously running tasks.
+   </p></li>
+   <li><p>
+   <code>power</code><br/>
+   Some number which minimum can be needed by jobs.
+   </p></li>
+   <li><p>
+   <code>properties</code><br/>
+   Some string which matching can be needed by jobs.
+   </p></li>
+   <li><p>
+   <code>service</code> <b>name</b>="<i>type</i>" <b>count</b>="<i>limit number</i>"<br/>
+   List of names and counts of available services.
+   </p></li>
+   <li><p>
+   <code>remservice</code> <b>name</b>="<i>type</i>"<br/>
+   List of service names to remove.
+   </p></li>
+</ul>
+</li>
+<li>
+<p>
+<code>service</code> <b>name</b>="<i>service</i>" <b>maxcount</b>="<i>limit number</i>" <b>maxhosts</b>="<i>limit number</i>"<br/>
+Service limit on entire farm. You can use it to describe software licenses limits.<br/>
+<b>name</b> - Service name.<br/>
+<b>maxhosts</b> - Maximum number of different hosts service can run on.<br/>
+<b>maxcount</b> - Maximum number of service total starts (no matter on the same host or not).<br/>
+</p>
+</li>
+<ul>
+
+</ul>
+</li>
 </ul>
 <p>
 Host will take parameters from every matched pattern.
