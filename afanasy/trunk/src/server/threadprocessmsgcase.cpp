@@ -28,8 +28,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TNULL:
    case af::Msg::TDATA:
    case af::Msg::TTESTDATA:
-   case af::Msg::TQString:
-   case af::Msg::TQStringList:
+   case af::Msg::TString:
+   case af::Msg::TStringList:
    {
       msg->stdOutData();
       break;
@@ -51,7 +51,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    {
       AfContainerLock tlock( talks, AfContainer::WRITELOCK);   AfContainerLock rlock( renders, AfContainer::WRITELOCK);
       AfContainerLock jlock(  jobs, AfContainer::WRITELOCK);   AfContainerLock ulock(   users, AfContainer::WRITELOCK);
-      QString message;
+      std::string message;
       if( af::Environment::reload()) message = "Reloaded successfully.";
       else                message = "Failed, see server logs fo details.";
       msg_response = new MsgAf();
@@ -63,8 +63,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       AfContainerLock rlock( renders,  AfContainer::WRITELOCK);
       AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
 
-      printf("RELOADING FARM");
-      QString message;
+      printf("\nRELOADING FARM\n");
+      std::string message;
       if( af::loadFarm( true))
       {
          RenderContainerIt rendersIt( renders);
@@ -72,7 +72,6 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          {
             render->getFarmHost();
             monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
-            render->stdOut();
          }
          message = "Reloaded successfully.";
       }
@@ -384,8 +383,9 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       if( job == NULL )
       {
          msg_response = new MsgAf();
-         QString str = QString("Msg::TTaskRequest: No job with id=%d").arg(mctaskpos.getJobId());
-         msg_response->setString( str);
+         std::ostringstream stream;
+         stream << "Msg::TTaskRequest: No job with id=" << mctaskpos.getJobId();
+         msg_response->setString( stream.str());
       }
       af::TaskExec * task = job->generateTask( mctaskpos.getNumBlock(), mctaskpos.getNumTask());
       if( task )
@@ -396,9 +396,9 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       else
       {
          msg_response = new MsgAf();
-         QString str = QString("Msg::TTaskRequest: No such task[%d][%d][%d]")
-                       .arg(mctaskpos.getJobId()).arg( mctaskpos.getNumBlock()).arg( mctaskpos.getNumTask());
-         msg_response->setString( str);
+         std::ostringstream stream;
+         stream << "Msg::TTaskRequest: No such task[" << mctaskpos.getJobId() << "][" << mctaskpos.getNumBlock() << "][" << mctaskpos.getNumTask() << "]";
+         msg_response->setString( stream.str());
       }
       break;
    }
@@ -412,8 +412,9 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       if( job == NULL )
       {
          msg_response = new MsgAf();
-         QString str = QString("Msg::TTaskLogRequest: No job with id=%d").arg(mctaskpos.getJobId());
-         msg_response->setString( str);
+         std::ostringstream stream;
+         stream << "Msg::TTaskLogRequest: No job with id=" << mctaskpos.getJobId();
+         msg_response->setString( stream.str());
       }
       QStringList *list = job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask());
       if( list == NULL ) break;
@@ -464,8 +465,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          }
          else
          {
-            QString str("job is NULL");
-            msg_response->setString( str);
+            msg_response->setString("Job is NULL.");
             break;
          }
       }
@@ -477,12 +477,12 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          QFile outFile( filename);
          if( outFile.exists() == false )
          {
-            QString str("No output exists.");
-            msg_response->setString( str);
+            msg_response->setString("No output exists.");
          }
          else if( outFile.open( QIODevice::ReadOnly ) == false )
          {
-            QString str(QString("Can't open output file '%1'.").arg(filename));
+            std::string str = "Can't open output file ";
+            str += filename.toUtf8().data();
             msg_response->setString( str);
          }
          else
@@ -491,8 +491,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
             int output_length = output.size();
             if( output_length == 0)
             {
-               QString str(QString("Output is empty.").arg(filename));
-               msg_response->setString( str);
+               msg_response->setString("Output is empty.");
             }
             else
                msg_response->setData( output_length, output.data());
@@ -509,8 +508,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          {
             delete msg_response;
             msg_response = new MsgAf();
-            QString str("Retrieving output from render failed. See server logs for details.");
-            msg_response->setString( str);
+            msg_response->setString("Retrieving output from render failed. See server logs for details.");
          }
          delete msg_request_render;
       }

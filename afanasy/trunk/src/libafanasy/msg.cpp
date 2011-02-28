@@ -195,10 +195,15 @@ bool Msg::set( int msgType, Af * afClass )
    afClass->write( this);
    if( mtype == Msg::TInvalid)
    {
-      mtype = TQString;
-      sprintf( mdata, "Maximum message size overload !\n");
-      mint32 = strlen( mdata) + 1;
-      rw_header( true);
+      delete mbuffer;
+      mbuffer = NULL;
+      mtype = TNULL;
+      allocateBuffer(100);
+      w_String( "Maximum message size overload !", this);
+//      mtype = TQString;
+//      sprintf( mdata, "Maximum message size overload !\n");
+//      mint32 = strlen( mdata) + 1;
+//      rw_header( true);
       return false;
    }
    mint32 = msgwrittensize;
@@ -206,12 +211,12 @@ bool Msg::set( int msgType, Af * afClass )
    return true;
 }
 
-bool Msg::setString( QString & qstring)
+bool Msg::setString( const std::string & str)
 {
    if(checkZero( true) == false ) return false;
-   mtype = TQString;
+   mtype = TString;
    writing = true;
-   rw_QString( qstring, this);
+   w_String( str, this);
    mint32 = msgwrittensize;
    rw_header( true);
    return true;
@@ -220,7 +225,7 @@ bool Msg::setString( QString & qstring)
 bool Msg::setStringList( QStringList & qstringlist)
 {
    if(checkZero( true) == false ) return false;
-   mtype = TQStringList;
+   mtype = TStringList;
    writing = true;
    rw_QStringList( qstringlist, this);
    mint32 = msgwrittensize;
@@ -228,20 +233,20 @@ bool Msg::setStringList( QStringList & qstringlist)
    return true;
 }
 
-bool Msg::getString( QString & qstring)
+bool Msg::getString( std::string & str)
 {
-   if( mtype != TQString)
+   if( mtype != TString)
    {
-      AFERROR("Msg::getString: type is not TQString.\n");
+      AFERROR("Msg::getString: type is not TString.\n");
       return false;
    }
-   rw_QString( qstring, this);
+   rw_String( str, this);
    return true;
 }
 
 bool Msg::getStringList( QStringList & qstringlist)
 {
-   if( mtype != TQStringList)
+   if( mtype != TStringList)
    {
       AFERROR("Msg::getStringList: type is not TQStringList.\n");
       return false;
@@ -348,14 +353,15 @@ void Msg::stdOutData()
       MCTest( this).stdOut( true);
       break;
    }
-   case Msg::TQString:
+   case Msg::TString:
    {
-      QString str;
+      std::string str;
       getString( str);
-      printf( "%s\n", str.toUtf8().data());
+      std::cout << str;
+      std::cout << std::endl;
       break;
    }
-   case Msg::TQStringList:
+   case Msg::TStringList:
    {
       QStringList strlist;
       rw_QStringList( strlist, this);
@@ -442,8 +448,8 @@ const char * Msg::TNAMES[]=
 
    "TDATA",                      ///< Some data.
    "TTESTDATA",                  ///< Test some data transfer.
-   "TQString",                   ///< QString text message.
-   "TQStringList",               ///< QStringList text message.
+   "TString",                    ///< QString text message.
+   "TStringList",                ///< QStringList text message.
 
    "TStatData",                  ///< Statistics data.
 

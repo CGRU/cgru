@@ -314,8 +314,8 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
    }
    if( founded)
    {
-      QString text = QString("%1: %2").arg( mcgeneral.getUserName(), mcgeneral.getString());
-//printf("%s\n", text.toUtf8().data());
+      std::string text = mcgeneral.getUserName().toUtf8().data();
+      text = text + ": " + mcgeneral.getString().toUtf8().data();
       msg->setString( text);
       msg->dispatch();
    }

@@ -39,13 +39,13 @@ public:
    bool setData( int size, char * msgData);
 
 /// To set zero (\c Msg::TNone ) message to QString message. Return \c true on success.
-   bool setString( QString & qstring);
+   bool setString( const std::string & qstring);
 
 /// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
    bool setStringList( QStringList & qstringlist);
 
 /// Get QString ( if message type is TQString ).
-   bool getString( QString & qstring);
+   bool getString( std::string & qstring);
 
 /// Get QString ( if message type is TQStringList ).
    bool getStringList( QStringList & qstringlist);
@@ -130,8 +130,8 @@ public:
 
 /**/TDATA/**/,                      ///< Some data.
 /**/TTESTDATA/**/,                  ///< Test some data transfer.
-/**/TQString/**/,                   ///< QString text message.
-/**/TQStringList/**/,               ///< QStringList text message.
+/**/TString/**/,                    ///< String message.
+/**/TStringList/**/,                ///< Strings list message.
 
 /**/TStatData/**/,                  ///< Statistics data.
 

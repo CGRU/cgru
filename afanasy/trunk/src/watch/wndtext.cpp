@@ -35,15 +35,15 @@ WndText::WndText( const QString & Name, af::Msg * msg):
             qTextEdit->setPlainText( QString::fromUtf8( msg->data(), msg->int32()));
             break;
          }
-         case af::Msg::TQString:
+         case af::Msg::TString:
          {
-            QString str;
+            std::string str;
             msg->getString( str);
-            if( str.isEmpty()) str = "An empty string recieved.";
-            qTextEdit->setPlainText( str);
+            if( str.size() == 0) str = "An empty string recieved.";
+            qTextEdit->setPlainText( QString::fromUtf8( str.c_str()));
             break;
          }
-         case af::Msg::TQStringList:
+         case af::Msg::TStringList:
          {
             QStringList strlist;
             msg->getStringList( strlist);

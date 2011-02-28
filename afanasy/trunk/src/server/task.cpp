@@ -247,15 +247,14 @@ bool Task::getOutput( int startcount, MsgAf *msg, QString & filename, RenderCont
 //printf("Task::getOutput:\n");
    if( progress->starts_count < 1 )
    {
-      QString str("Task was not started.");
-      msg->setString( str);
+      msg->setString("Task was not started.");
       return false;
    }
    if( startcount > progress->starts_count )
    {
-      QString str("Task was started %1 times ( less than %2 times ).");
-      str = str.arg(progress->starts_count).arg(startcount);
-      msg->setString( str);
+      std::ostringstream stream;
+      stream << "Task was started " << progress->starts_count << " times ( less than " << startcount << " times ).";
+      msg->setString( stream.str());
       return false;
    }
    if( startcount == 0 )
@@ -297,13 +296,13 @@ int Task::calcWeight() const
 int Task::logsWeight() const
 {
    int weight = 0;
-   for( int i = 0; i < logStringList.size(); i++) weight += logStringList[i].size()+1;
+   for( int i = 0; i < logStringList.size(); i++) weight += af::weigh(logStringList[i]);
    return weight;
 }
 
 int Task::blackListWeight() const
 {
    int weight = sizeof(int) * errorHostsCounts.size();
-   for( int i = 0; i < errorHosts.size(); i++) weight += errorHosts[i].size()+1;
+   for( int i = 0; i < errorHosts.size(); i++) weight += af::weigh(errorHosts[i]);
    return weight;
 }

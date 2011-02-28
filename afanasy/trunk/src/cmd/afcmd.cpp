@@ -140,8 +140,8 @@ void AfCmd::msgOutput( af::Msg &msg)
       switch( msg.type())
       {
          case af::Msg::TDATA:
-         case af::Msg::TQString:
-         case af::Msg::TQStringList:
+         case af::Msg::TString:
+         case af::Msg::TStringList:
             msg.stdOutData();
             break;
          case af::Msg::TConfirm:

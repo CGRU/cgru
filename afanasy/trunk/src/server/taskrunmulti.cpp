@@ -416,8 +416,7 @@ bool TaskRunMulti::getOutput( int startcount, MsgAf *msg, RenderContainer * rend
 {
    if( progress->state & AFJOB::STATE_READY_MASK)
    {
-      QString str("Task is waiting for hosts.");
-      msg->setString( str);
+      msg->setString("Task is waiting for hosts.");
       return false;
    }
   return TaskRun::getOutput( startcount, msg, renders);

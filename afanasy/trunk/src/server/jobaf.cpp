@@ -1010,8 +1010,7 @@ bool JobAf::getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, QString & f
 //printf("JobAf::getTaskStdOut:\n");
    if( false == checkBlockTaskNumbers( taskpos.getNumBlock(), taskpos.getNumTask(), "getTaskStdOut"))
    {
-      QString str = "JobAf::getTaskStdOut: invalid job and task numbers";
-      msg->setString( str);
+      msg->setString("JobAf::getTaskStdOut: invalid job and task numbers");
       return false;
    }
    return blocks[taskpos.getNumBlock()]->tasks[taskpos.getNumTask()]->getOutput( taskpos.getNumber(), msg, filename, renders);

@@ -203,7 +203,20 @@ void Af::rw_QString(  QString& qString, Msg * msg)
 //printf("Af::rw_QString: qString = \"%s\"\n", qString.toUtf8().data());
 }
 
-void Af::rw_String( std::string &string, Msg * msg)
+void Af::w_String( const std::string & string, Msg * msg)
+{
+   if( false == msg->isWriting())
+   {
+      AFERROR("Af::w_String: Message is not for reading.\n")
+      return;
+   }
+   const char * buffer = string.c_str();
+   uint32_t length = string.length() + 1;
+   rw_uint32_t( length, msg);
+   w_data( buffer, msg, length);
+}
+
+void Af::rw_String( std::string & string, Msg * msg)
 {
    uint32_t length;
 

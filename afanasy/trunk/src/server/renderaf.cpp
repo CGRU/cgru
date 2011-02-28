@@ -502,8 +502,7 @@ void RenderAf::getServices( af::Msg * msg) const
 {
    if( servicesnum == 0)
    {
-      QString message("No services.");
-      msg->setString( message);
+      msg->setString("No services.");
       return;
    }
    QStringList list;

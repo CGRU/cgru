@@ -302,8 +302,7 @@ bool TaskRun::getOutput( int startcount, MsgAf *msg, RenderContainer * renders) 
 {
    if( exec == NULL)
    {
-      QString str("TaskRun::getOutput: Task is not started.");
-      msg->setString( str);
+      msg->setString("TaskRun::getOutput: Task is not started.");
       return false;
    }
    if( hostId > 0 )
@@ -319,15 +318,13 @@ bool TaskRun::getOutput( int startcount, MsgAf *msg, RenderContainer * renders) 
       }
       else
       {
-         QString str("TaskRun::getOutput: render == NULL");
-         msg->setString( str);
+         msg->setString("TaskRun::getOutput: render == NULL");
          return false;
       }
    }
    else
    {
-      QString str("TaskRun::getOutput: render_id == 0");
-      msg->setString( str);
+      msg->setString("TaskRun::getOutput: render_id == 0");
       return false;
    }
   return true;

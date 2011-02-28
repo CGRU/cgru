@@ -295,7 +295,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
       new WndText( "Data", msg);
       break;
    }
-   case af::Msg::TQStringList:
+   case af::Msg::TStringList:
    {
       new WndText( "List", msg);
       break;
@@ -305,11 +305,11 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
       new WndText( "Task", msg);
       break;
    }
-   case af::Msg::TQString:
+   case af::Msg::TString:
    {
-      QString str;
+      std::string str;
       msg->getString( str);
-      displayInfo( str);
+      displayInfo( QString::fromUtf8( str.c_str()));
       break;
    }
    default:

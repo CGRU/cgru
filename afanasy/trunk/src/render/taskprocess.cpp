@@ -271,8 +271,7 @@ void TaskProcess::getOutput( af::Msg & msg) const
       }
       else
       {
-         QString str("Render: Silence...");
-         msg.setString( str);
+         msg.setString("Render: Silence...");
       }
 /*
 #ifdef AFOUTPUT
@@ -287,7 +286,6 @@ fflush( stdout);
    }
    else
    {
-      QString str("Render: parser is NULL.");
-      msg.setString( str);
+      msg.setString("Render: parser is NULL.");
    }
 }
