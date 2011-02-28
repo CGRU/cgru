@@ -1,11 +1,12 @@
 #include "name_af.h"
 
+#include <sys/stat.h>
+
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 
 #ifdef WINNT
 #include <direct.h>
-#include <sys/stat.h>
 #include <winsock.h>
 #define getcwd _getcwd
 #define stat _stat
