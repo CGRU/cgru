@@ -29,7 +29,6 @@ PyObject * PyAf_Cmd_getJobList( PyAf_Cmd_Object *self, PyObject *args)
 {
    int userID;
    PyArg_ParseTuple(args, "i", &userID);
-   printf("%d\n", userID);
    if (userID != 0) {
       if (!self->cmd->GetJobListUserId(userID)) Py_RETURN_FALSE;
    } else {
