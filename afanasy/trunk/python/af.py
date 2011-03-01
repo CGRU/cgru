@@ -212,7 +212,7 @@ class Cmd(pyaf.Cmd):
          return False
    
    def getJobList( self, verbose = False):
-      self.getjoblist()
+      self.getjoblist(0)
       if self._sendRequest(verbose):
          return self.decodejoblist(self.requestOutput)
       else:
