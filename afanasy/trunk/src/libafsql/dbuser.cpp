@@ -12,7 +12,7 @@ const QString DBUser::TableName("users");
 const QString DBUser::Keys("password varchar(128), administrator boolean DEFAULT FALSE, PRIMARY KEY( id)");
 const int     DBUser::KeysNum = 1;
 
-DBUser::DBUser( const QString &username, const QString &host):
+DBUser::DBUser( const QString &username, const std::string & host):
    af::User( username, host)
 {
    addDBAttributes();
@@ -30,7 +30,7 @@ void DBUser::addDBAttributes()
    dbAddAttr( new DBAttrInt32(   DBAttr::_id,                   &id                  ));
 
    dbAddAttr( new DBAttrUInt32(  DBAttr::_state,                &state               ));
-   dbAddAttr( new DBAttrQString( DBAttr::_hostname,             &hostname            ));
+   dbAddAttr( new DBAttrString ( DBAttr::_hostname,             &hostname            ));
    dbAddAttr( new DBAttrInt32(   DBAttr::_maxrunningtasks,      &maxrunningtasks     ));
    dbAddAttr( new DBAttrUInt8(   DBAttr::_priority,             &priority            ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_hostsmask,            &hostsmask           ));
@@ -42,7 +42,7 @@ void DBUser::addDBAttributes()
    dbAddAttr( new DBAttrQRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude   ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_time_register,        &time_register       ));
    dbAddAttr( new DBAttrString(  DBAttr::_annotation,           &annotation          ));
-   dbAddAttr( new DBAttrQString( DBAttr::_customdata,           &customdata          ));
+   dbAddAttr( new DBAttrString(  DBAttr::_customdata,           &customdata          ));
 
    dbAddAttr( new DBAttrQString( DBAttr::_name,                 &name                ));
 }

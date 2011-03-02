@@ -214,6 +214,7 @@ void Af::w_String( const std::string & string, Msg * msg)
    uint32_t length = string.length() + 1;
    rw_uint32_t( length, msg);
    w_data( buffer, msg, length);
+//std::cout << "Af::w_String: string = \"" << string << "\"\n";
 }
 
 void Af::rw_String( std::string & string, Msg * msg)
@@ -232,7 +233,7 @@ void Af::rw_String( std::string & string, Msg * msg)
       rw_uint32_t( length, msg);
       char * buffer = msg->writtenBuffer( length);
       if( buffer == NULL ) return;
-      string = buffer;
+      string = std::string(buffer, length-1);
    }
 //std::cout << "Af::rw_String: string = \"" << string << "\"\n";
 }
@@ -274,6 +275,41 @@ void Af::rw_QStringList( QStringList& qStringList, Msg * msg)
          qStringList << qstr;
       }
    }
+}
+
+void Af::rw_StringList( std::list<std::string> & stringList, Msg * msg)
+{
+   uint32_t length;
+   if( msg->isWriting() ) length = stringList.size();
+   rw_uint32_t( length, msg);
+   if( msg->isWriting() )
+      for( std::list<std::string>::iterator it = stringList.begin(); it != stringList.end(); it++)
+         rw_String( *it, msg);
+   else
+      for( int i = 0; i < length; i++)
+      {
+         std::string str;
+         rw_String( str, msg);
+         stringList.push_back( str);
+      }
+//std::cout << "rw_StringList: length = \"" << length << "\"\n";
+}
+
+void Af::w_StringList( const std::list<std::string> & stringList, Msg * msg)
+{
+   if( false == msg->isWriting())
+   {
+      AFERROR("Af::w_StringList: Message is not for reading.\n")
+      return;
+   }
+
+   uint32_t length = stringList.size();
+   rw_uint32_t( length, msg);
+   for( std::list<std::string>::const_iterator it = stringList.begin(); it != stringList.end(); it++)
+   {
+      w_String( *it, msg);
+   }
+//std::cout << "w_StringList: length = \"" << length << "\"\n";
 }
 
 void Af::rw_Int8_List( std::list<int8_t> &list, Msg * msg)

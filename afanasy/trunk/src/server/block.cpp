@@ -15,7 +15,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Block::Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, QStringList * log):
+Block::Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
    job( blockJob),
    data( blockData),
    tasks( NULL),
@@ -53,9 +53,9 @@ Block::~Block()
    }
 }
 
-void Block::log( const QString &message)
+void Block::log( const std::string & message)
 {
-   *joblog << QString("%1 : B[%2]: %3").arg( af::time2Qstr()).arg(data->getName()).arg(message);
+   joblog->push_back( af::time2str() + " : B[" + data->getName().toUtf8().data() + "]: %3" + message);
 }
 
 void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
@@ -68,7 +68,7 @@ void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( errorHostsAppend( render->getName())) log( render->getName() + " - AVOIDING HOST !");
+   if( errorHostsAppend( render->getName())) log( std::string(render->getName().toUtf8().data()) + " - AVOIDING HOST !");
    tasks[task]->errorHostsAppend( render->getName());
 }
 
@@ -99,15 +99,18 @@ bool Block::avoidHostsCheck( const QString & hostname) const
    return false;
 }
 
-const QStringList Block::getErrorHostsList() const
+void Block::getErrorHostsListString( std::string & str) const
 {
-   QStringList list( QString("Block['%1'] error hosts:").arg( data->getName()));
+   str += std::string("Block['") + data->getName().toUtf8().data() + "'] error hosts:";
    for( int h = 0; h < errorHosts.size(); h++)
-      list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
-         .arg( af::time2Qstr( errorHostsTime[h]))
-         .arg(((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
-   for( int t = 0; t < data->getTasksNum(); t++) list << tasks[t]->getErrorHostsList();
-   return list;
+   {
+      str += std::string(errorHosts[h].toUtf8().data()) + ": " + af::itos( errorHostsCounts[h]) + " at " + af::time2str( errorHostsTime[h]);
+      if((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
+//      list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
+//         .arg( af::time2Qstr( errorHostsTime[h]))
+//         .arg(((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
+   }
+   for( int t = 0; t < data->getTasksNum(); t++) tasks[t]->getErrorHostsListString( str);
 }
 
 void Block::errorHostsReset()
@@ -194,7 +197,7 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       for( int i = 0; i < errorHosts.size(); )
          if( currentTime - errorHostsTime[i] > getErrorsForgiveTime())
          {
-            log(QString("Forgived error host '%1' since %2.").arg(errorHosts[i]).arg(af::time2Qstr(errorHostsTime[i])));
+            log( std::string("Forgived error host \"") + errorHosts[i].toUtf8().data() + "\" since " + af::time2str(errorHostsTime[i]) + ".");
             errorHosts.removeAt(i);
             errorHostsCounts.removeAt(i);
             errorHostsTime.removeAt(i);
@@ -256,13 +259,13 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
 
    uint32_t blockchanged_type = 0;
    uint32_t jobchanged = 0;
-   QString userhost( mcgeneral.getUserName()+'@'+mcgeneral.getHostName());
+   std::string userhost( std::string( mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data());
    switch( type)
    {
    case af::Msg::TBlockErrorsAvoidHost:
    {
       data->setErrorsAvoidHost( mcgeneral.getNumber());
-      log( QString("Errors to avoid host set to \"%1\" by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Errors to avoid host set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_errors_avoidhost);
@@ -271,7 +274,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockErrorRetries:
    {
       data->setErrorsRetries( mcgeneral.getNumber());
-      log( QString("Error retries set to \"%1\" by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Error retries set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_errors_retries);
@@ -280,7 +283,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockTasksMaxRunTime:
    {
       data->setTasksMaxRunTime( mcgeneral.getNumber());
-      log( QString("Tasks maximum run time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Tasks maximum run time set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_tasksmaxruntime);
@@ -289,7 +292,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockErrorsForgiveTime:
    {
       data->setErrorsForgiveTime( mcgeneral.getNumber());
-      log( QString("Errors forgive time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Errors forgive time set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_errors_forgivetime);
@@ -298,7 +301,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockErrorsSameHost:
    {
       data->setErrorsTaskSameHost( mcgeneral.getNumber());
-      log( QString("Tasks errors to avoid host set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Tasks errors to avoid host set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_errors_tasksamehost);
@@ -307,7 +310,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockResetErrorHosts:
    {
       errorHostsReset();
-      log( QString("Error hosts reset by %1").arg(userhost));
+      log( std::string("Error hosts reset by ") + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
@@ -316,7 +319,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setDependMask( mcgeneral.getString()));
       {
-         log( QString("Depend mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         log( std::string("Depend mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_dependmask);
@@ -328,7 +331,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setTasksDependMask( mcgeneral.getString()));
       {
-         log( QString("Tasks depend mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         log( std::string("Tasks depend mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_tasksdependmask);
@@ -338,7 +341,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCommand:
    {
       data->setCommand( mcgeneral.getString());
-      log( QString("Command changed to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      log( std::string("Command changed to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocks ) blockchanged_type = af::Msg::TBlocks;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_command);
       break;
@@ -346,7 +349,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockWorkingDir:
    {
       data->setWDir( mcgeneral.getString());
-      log( QString("Working directory set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      log( std::string("Working directory set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_wdir);
       break;
@@ -354,7 +357,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockFiles:
    {
       data->setFiles( mcgeneral.getString());
-      log( QString("Preview command set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      log( std::string("Files set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocks ) blockchanged_type = af::Msg::TBlocks;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_files);
       break;
@@ -362,7 +365,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCmdPost:
    {
       data->setCmdPost( mcgeneral.getString());
-      log( QString("Post Command set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      log( std::string("Post Command set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_cmd_post);
       break;
@@ -371,7 +374,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setHostsMask( mcgeneral.getString()))
       {
-         log( QString("Hosts mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         log( std::string("Hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_hostsmask);
@@ -382,7 +385,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setHostsMaskExclude( mcgeneral.getString()))
       {
-         log( QString("Exclude hosts mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         log( std::string("Exclude hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_hostsmask_exclude);
@@ -392,7 +395,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockMaxRunningTasks:
    {
       data->setMaxRunningTasks( mcgeneral.getNumber());
-      log( QString("Maximum hosts set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Maximum hosts set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_maxrunningtasks);
@@ -401,7 +404,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockService:
    {
       data->setService( mcgeneral.getString());
-      log( QString("Tasks type set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      log( std::string("Service set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_service);
       break;
@@ -409,7 +412,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockParser:
    {
       data->setParser( mcgeneral.getString());
-      log( QString("Parser type set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      log( std::string("Parser set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_parser);
       break;
@@ -417,7 +420,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockNeedMemory:
    {
       data->setNeedMemory( mcgeneral.getNumber());
-      log( QString("Needed memory set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Needed memory set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_need_memory);
@@ -426,7 +429,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockNeedHDD:
    {
       data->setNeedHDD( mcgeneral.getNumber());
-      log( QString("Needed HDD set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Needed HDD set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_need_hdd);
@@ -435,7 +438,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockNeedPower:
    {
       data->setNeedPower( mcgeneral.getNumber());
-      log( QString("Needed HDD set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Needed Power set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_need_power);
@@ -445,7 +448,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setNeedProperties( mcgeneral.getString()))
       {
-         log( QString("Need properties set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         log( std::string("Need properties set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_need_properties);
@@ -455,7 +458,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCapacity:
    {
       if( data->setCapacity( mcgeneral.getNumber()) == false) return false;
-      log( QString("Capacity set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Capacity set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_capacity);
@@ -464,7 +467,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCapacityCoeffMin:
    {
       if( data->setCapacityCoeffMin( mcgeneral.getNumber()) == false) return false;
-      log( QString("Capacity min coeff set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Capacity min coeff set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_capcoeff_min);
@@ -473,7 +476,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCapacityCoeffMax:
    {
       if( data->setCapacityCoeffMax( mcgeneral.getNumber()) == false) return false;
-      log( QString("Capacity max coeff set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Capacity max coeff set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_capcoeff_max);
@@ -482,7 +485,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockMultiHostMin:
    {
       if( data->setMultiHostMin( mcgeneral.getNumber()) == false) return false;
-      log( QString("Hosts minimum set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("Hosts minimum set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_multihost_min);
@@ -491,7 +494,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockMultiHostMax:
    {
       if( data->setMultiHostMax( mcgeneral.getNumber()) == false) return false;
-      log( QString("Hosts maximum set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("MutiHost maximum set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_multihost_max);
@@ -500,7 +503,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockMultiHostWaitMax:
    {
       data->setMultiHostWaitMax( mcgeneral.getNumber());
-      log( QString("Maximum hosts wait time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("MutiHost wait time set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_multihost_waitmax);
@@ -509,7 +512,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockMultiHostWaitSrv:
    {
       data->setMultiHostWaitSrv( mcgeneral.getNumber());
-      log( QString("Multitask service start wait time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      log( std::string("MutiHost wait time set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_multihost_waitsrv);

@@ -45,12 +45,12 @@ WndText::WndText( const QString & Name, af::Msg * msg):
          }
          case af::Msg::TStringList:
          {
-            QStringList strlist;
+            std::list<std::string> strlist;
             msg->getStringList( strlist);
-            if( strlist.isEmpty()) strlist.append("An empty list recieved.");
+            if( strlist.size() == 0) strlist.push_back("An empty list recieved.");
             int size = strlist.size();
-            for( int i = 0; i < size; i++)
-               qTextEdit->append( strlist[i]);
+            for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
+               qTextEdit->append( QString::fromUtf8((*it).c_str()));
             break;
          }
          case af::Msg::TTask:

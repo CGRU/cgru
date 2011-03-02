@@ -64,8 +64,8 @@ public:
    static bool setClientPort( uint16_t port);
 
 /// Get versions:
-   static inline int getAfanasyBuildVersion()    { return afanasy_build_version;  }
-   static inline const QString& getCGRUVersion() { return  cgru_version;          }
+   static inline int getAfanasyBuildVersion()         { return afanasy_build_version;  }
+   static inline const std::string & getCGRUVersion() { return  cgru_version;          }
 
 /// Get Afanasy server QHostAddress.
    static inline const QHostAddress* getAfServerQHostAddress()  { return qafserveraddress;}
@@ -155,10 +155,10 @@ public:
    static inline int getUserLogsRotate()    { return   user_logs_rotate; }
    static inline int getRenderLogsRotate()  { return render_logs_rotate; }
 
-   static inline const QString& getTempDirectory()       { return tempdirectory;  } ///< Get temp directory.
-   static inline const QString& getTasksStdOutDir()      { return tasksstdoutdir; } ///< Get tasks standart output directory.
-   static inline const QString& getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
-   static inline const QString& getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
+   static inline const std::string & getTempDirectory()       { return tempdirectory;  } ///< Get temp directory.
+   static inline const std::string & getTasksStdOutDir()      { return tasksstdoutdir; } ///< Get tasks standart output directory.
+   static inline const std::string & getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
+   static inline const std::string & getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
 
    static inline const QString& get_DB_Type()            { return db_type;         } ///< Get database type.
    static inline const QString& get_DB_HostName()        { return db_hostname;     } ///< Get database host name.
@@ -189,12 +189,12 @@ private:
    static bool getVars( const std::string & filename);
    static bool init( bool solveServerAddress);
 
-   static std::string afroot;         ///< Afanasy root directory.
-   static std::string home;           ///< User home directory.
-   static std::string home_afanasy;   ///< Afanasy home settings.
+   static std::string afroot;          ///< Afanasy root directory.
+   static std::string home;            ///< User home directory.
+   static std::string home_afanasy;    ///< Afanasy home settings.
 
-   static int afanasy_build_version;  ///< Afanasy build sources version, will be compiled in binaries
-   static QString cgru_version;       ///< CGRU version, will be get from environment on applications startup
+   static int afanasy_build_version;   ///< Afanasy build sources version, will be compiled in binaries
+   static std::string cgru_version;    ///< CGRU version, will be get from environment on applications startup
 
    static Address *address;             ///< Host address and port class. Point to local host adress.
    static QHostAddress * qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
@@ -294,10 +294,10 @@ private:
    static int   user_logs_rotate;
    static int render_logs_rotate;
 
-   static QString tempdirectory;
-   static QString tasksstdoutdir;
-   static QString renderslogsdir;
-   static QString userslogsdir;
+   static std::string tempdirectory;
+   static std::string tasksstdoutdir;
+   static std::string renderslogsdir;
+   static std::string userslogsdir;
 
    static QString db_type;           ///< Afanasy database QT SQL driver type
    static QString db_hostname;       ///< Database hostname

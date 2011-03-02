@@ -37,7 +37,7 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    address = Address.arg( monitor->getAddress()->generateIPString().c_str());
 
    tip = name;
-   tip += QString("\nVersion: %1").arg( monitor->getVersion());
+   tip += QString("\nVersion: %1").arg( QString::fromUtf8( monitor->getVersion().c_str()));
    tip += QString("\nBuild Revision: %1").arg( monitor->getRevision());
    tip += "\n   " + timelaunch;
    tip += "\n   " + timeregister;

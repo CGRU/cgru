@@ -4,13 +4,13 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-FileData::FileData( char * Data, int Length, const QString & FileName, int Rotate):
+FileData::FileData( const char * Data, int Length, const std::string & FileName, int Rotate):
    filename( FileName),
    length( Length),
    rotate( Rotate),
    data( NULL)
 {
-   AFINFA("FileData::FileData: \"%s\" %d bytes R(%d).\n", filename.toUtf8().data(), length, rotate);
+   AFINFA("FileData::FileData: \"%s\" %d bytes R(%d).\n", filename.c_str(), length, rotate);
 
    if( Data == NULL)
    {
@@ -27,7 +27,7 @@ FileData::FileData( char * Data, int Length, const QString & FileName, int Rotat
       AFERROR("FileData::FileData: Zero length.\n");
       return;
    }
-   if( filename.isEmpty() )
+   if( filename.size() == 0 )
    {
       AFERROR("FileData::FileData: File name is empty.\n");
       return;

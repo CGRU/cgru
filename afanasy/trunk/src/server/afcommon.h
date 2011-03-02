@@ -20,13 +20,13 @@ public:
    AFCommon();
    ~AFCommon();
 
-   static bool createDirectory( const char * name, bool verbose = false);
-   static void executeCmd( const QString & cmd);             ///< Execute command.
+//   static bool createDirectory( const char * name, bool verbose = false);
+   static void executeCmd( const std::string & cmd);             ///< Execute command.
 
 /// Save string list, perform log file rotation;
-   static void saveLog( const QStringList & log, const QString & dirname, QString filename, int rotate = 0);
+   static void saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate = 0);
 
-   static bool writeFile( const char * data, const int length, const QString & filename); ///< Write a file
+   static bool writeFile( const char * data, const int length, const std::string & filename); ///< Write a file
 
 //   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 

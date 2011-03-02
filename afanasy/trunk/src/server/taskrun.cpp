@@ -56,7 +56,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data(),
    render->setTask( exec, monitoring);
    task->monitor( monitoring );
    task->updateDatabase();
-   task->log(QString("SESSION #%1: Starting on '%2'").arg( progress->starts_count).arg(render->getName()));
+   task->log( std::string("SESSION #") + af::itos( progress->starts_count) + ": Starting on \"" + render->getName().toUtf8().data() + "\"");
 }
 
 TaskRun::~TaskRun()
@@ -98,7 +98,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 
    progress->time_done = time( NULL);
 
-   QString message;
+   std::string message;
 
    switch ( taskup.getStatus())
    {
@@ -128,23 +128,23 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       finish( "Finished success.", renders, monitoring);
       break;
    }
-   case af::TaskExec::UPFailedToStart: if( message.isEmpty()) message = "Failed to start.";
-   case af::TaskExec::UPFinishedCrash: if( message.isEmpty()) message = "Finished crashed.";
+   case af::TaskExec::UPFailedToStart: if( message.size() == 0) message = "Failed to start.";
+   case af::TaskExec::UPFinishedCrash: if( message.size() == 0) message = "Finished crashed.";
    case af::TaskExec::UPFinishedParserError:
-      if( message.isEmpty())
+      if( message.size() == 0)
       {
          message = "Parser error.";
          progress->state = progress->state | AFJOB::STATE_PARSERERROR_MASK;
       }
    case af::TaskExec::UPFinishedParserBadResult:
-      if( message.isEmpty())
+      if( message.size() == 0)
       {
          message = "Parser bad result.";
          progress->state = progress->state | AFJOB::STATE_PARSERBADRESULT_MASK;
       }
    case af::TaskExec::UPFinishedError:
    {
-      if( message.isEmpty()) message = "Finished error.";
+      if( message.size() == 0) message = "Finished error.";
       if( stopTime )
       {
          // Task was asked to be stopped before (skipped, restarted, ejected)
@@ -226,7 +226,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    return changed;
 }
 
-void TaskRun::stop( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRun::stop( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("TaskRun::stop: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
    if( zombie ) return;
@@ -248,7 +248,7 @@ void TaskRun::stop( const QString & message, RenderContainer * renders, MonitorC
    task->log( message);
 }
 
-void TaskRun::finish( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRun::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("TaskRun::finish: %s[%d][%d] HostID=%d\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId, message.toUtf8().data());
    if( zombie ) return;
@@ -270,13 +270,13 @@ void TaskRun::finish( const QString & message, RenderContainer * renders, Monito
    zombie = true;
 }
 
-void TaskRun::restart( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRun::restart( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
    if( zombie ) return;
    stop( message+" Is running.", renders, monitoring);
 }
 
-void TaskRun::skip( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRun::skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
    if( zombie ) return;
    progress->state = progress->state | AFJOB::STATE_SKIPPED_MASK;

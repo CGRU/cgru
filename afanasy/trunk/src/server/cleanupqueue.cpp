@@ -11,7 +11,7 @@
 
 CleanUpData::CleanUpData( const JobAf * job)
 {
-   tasksoutdir = job->getTasksOutputDir().toUtf8().data();
+   tasksoutdir = job->getTasksOutputDir();
 }
 
 void CleanUpData::doCleanUp()

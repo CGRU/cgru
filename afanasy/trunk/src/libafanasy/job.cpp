@@ -77,8 +77,8 @@ void Job::readwrite( Msg * msg)
    rw_uint32_t( time_done,          msg);
    rw_int32_t ( lifetime,           msg);
 
-   rw_QString ( description,        msg);
-   rw_QString ( annotation,         msg);
+   rw_String (  description,        msg);
+   rw_String (  annotation,         msg);
 
    rw_QRegExp( hostsmask,           msg);
    rw_QRegExp( hostsmask_exclude,   msg);
@@ -217,8 +217,7 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Pre command:\n" << cmd_pre.toUtf8().data();
    if( cmd_post.isEmpty() == false )
       stream << "\n Post command:\n" << cmd_post.toUtf8().data();
-   if( false == description.isEmpty())
-      stream << "\n " << description.toUtf8().data();
+   if( description.size()) stream << "\n " << description;
 /*
    if( blocksdata != NULL)
    {

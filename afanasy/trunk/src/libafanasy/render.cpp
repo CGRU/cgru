@@ -55,7 +55,7 @@ void Render::readwrite( Msg * msg)
       rw_int32_t ( capacity_used,         msg);
       rw_uint32_t( time_update,           msg);
       rw_uint32_t( time_register,         msg);
-      rw_QString ( annotation,            msg);
+      rw_String (  annotation,            msg);
 
       if( msg->isWriting())
       {
@@ -74,7 +74,7 @@ void Render::readwrite( Msg * msg)
    case Msg::TRenderRegister:
 
       rw_int32_t(  revision,              msg);
-      rw_QString(  version,               msg);
+      rw_String(   version,               msg);
       rw_QString ( name,                  msg);
       rw_QString ( username,              msg);
       rw_uint32_t( state,                 msg);
@@ -187,18 +187,28 @@ int Render::calcWeight() const
    return weight;
 }
 
-const QString Render::getResources() const
+const std::string Render::getResourcesString() const
 {
-   QString str = "Resources:";
-   str += QString("\n   CPU usage: %1% idle, %2% user, %3% user nice, %4% system, %5% i/o, %6% irq, %7% soft irq")
-         .arg(hres.cpu_idle).arg(hres.cpu_user).arg(hres.cpu_nice).arg(hres.cpu_system).arg(hres.cpu_iowait).arg(hres.cpu_irq).arg(hres.cpu_softirq);
-   str += QString("\n   Memory: free %1 Mb of total %2 Mb: unused %3 Mb, cached %4 Mb, buffers %5 Mb")
-         .arg(hres.mem_free_mb + hres.mem_cached_mb + hres.mem_buffers_mb).arg(host.mem_mb)
-         .arg(hres.mem_free_mb).arg(hres.mem_cached_mb).arg(hres.mem_buffers_mb);
-   str += QString("\n   Swap: used %1 Mb of total %2 Mb").arg(hres.swap_used_mb).arg(host.swap_mb );
-   str += QString("\n   Network: recieving %1 Kb/sec, sending %2 Kb/sec").arg(hres.net_recv_kbsec).arg(hres.net_send_kbsec );
-   str += QString("\n   HDD: free %1 Gb of total %2 Gb").arg(hres.hdd_free_gb).arg(host.hdd_gb );
-   return str;
+   std::ostringstream stream;
+   stream << "Resources:";
+   stream << "\n   CPU usage: "
+         << unsigned( hres.cpu_idle    ) << "% idle, "
+         << unsigned( hres.cpu_user    ) << "% user, "
+         << unsigned( hres.cpu_nice    ) << "% user nice, "
+         << unsigned( hres.cpu_system  ) << "% system, "
+         << unsigned( hres.cpu_iowait  ) << "% i/o, "
+         << unsigned( hres.cpu_irq     ) << "% irq, "
+         << unsigned( hres.cpu_softirq ) << "% soft irq";
+   stream << "\n   Memory:"
+         << " free " << (hres.mem_free_mb + hres.mem_cached_mb + hres.mem_buffers_mb) << " Mb of total " << host.mem_mb << " Mb"
+         << ": unused " << hres.mem_free_mb << " Mb"
+         << ", cached " << hres.mem_cached_mb << " Mb"
+         << ", buffers " << hres.mem_buffers_mb << " Mb";
+   stream << "\n   Swap: used " << hres.swap_used_mb << " Mb of total " << host.swap_mb << " Mb";
+   stream << "\n   Network: recieving " << hres.net_recv_kbsec << " Kb/sec, sending " << hres.net_send_kbsec << " Kb/sec";
+   stream << "\n   HDD: free " << hres.hdd_free_gb << " Gb of total " << host.hdd_gb << " Gb";
+
+   return stream.str();
 }
 
 void Render::generateInfoStream( std::ostringstream & stream, bool full) const
@@ -206,7 +216,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    if( full)
    {
       stream << "#" << id << ": " << name.toUtf8().data() << "@" << username.toUtf8().data();
-      stream << " (" << version.toUtf8().data() << " r" << revision << ")";
+      stream << " (" << version << " r" << revision << ")";
       stream << " :: ";
       if( address == NULL) stream << "address == NULL";
       else address->generateInfoStream( stream ,full);
@@ -226,7 +236,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    else
    {
       stream << name.toUtf8().data() << "@" << username.toUtf8().data() << "[" << id << "]";
-      stream << " (" << version.toUtf8().data() << " r" << revision << ") ";
+      stream << " (" << version << " r" << revision << ") ";
       if( address == NULL) stream << "address == NULL";
       else address->generateInfoStream( stream ,full);
 //      stream << " - " << calcWeight() << " bytes.";

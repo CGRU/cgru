@@ -25,7 +25,7 @@ RenderAf::RenderAf( af::Msg * msg, const af::Address * addr):
    init();
    if((msg->type() == af::Msg::TRenderRegister) && (addr == NULL))
    {
-      AFERROR("RenderAf::setRegisterTime: addr==NULL on register.\n");
+      AFERROR("RenderAf::RenderAf: addr==NULL on register.\n");
       appendLog("Invalid Registation: Address is NULL.");
       return;
    }
@@ -56,7 +56,8 @@ void RenderAf::setRegisterTime()
 
    taskstartfinishtime = 0;
 
-   appendLog("Registered.");
+   if( isOnline()) appendLog("Registered online.");
+   else appendLog("Registered offline.");
 }
 
 void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
@@ -65,14 +66,14 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 
    if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
 
-   appendLog( getResources());
+   appendLog( getResourcesString());
 
    if( toZombie )
    {
       AFCommon::QueueLog("Render Deleting: " + generateInfoString( false));
       appendLog("Waiting for deletion.");
       setZombie();
-      AFCommon::saveLog( log, af::Environment::getRendersLogsDir(), name, af::Environment::getRenderLogsRotate());
+      AFCommon::saveLog( loglist, af::Environment::getRendersLogsDir(), name.toUtf8().data(), af::Environment::getRenderLogsRotate());
       if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, id);
    }
    else
@@ -115,11 +116,13 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
    time_launch = render->time_launch;
    revision = render->revision;
    version = render->version;
-   setRegisterTime();
+/*   setRegisterTime();*/ taskstartfinishtime = 0;
    getFarmHost( &render->host);
    setOnline();
    update( render);
-   appendLog(QString("Online (r%1 v%2).").arg(revision).arg(version));
+   std::string str = "Online (r";
+   str += af::itos(revision) + " v" + version + ").";
+   appendLog( str);
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
    AFCommon::QueueDBUpdateItem( this);
    return true;
@@ -158,14 +161,15 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
       MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
       msg->setAddress( this);
       msg->dispatch();
-      appendLog(QString("Starting task: %1 - %2[%3][%4]")
-         .arg( taskexec->getUserName(), taskexec->getJobName(), taskexec->getBlockName(), taskexec->getName()));
+      std::string str = "Starting task: ";
+      str += taskexec->generateInfoString( false);
+      appendLog( str);
    }
    else
    {
-      appendLog(QString("Captured by task: %1 - %2[%3][%4](%5)")
-         .arg( taskexec->getUserName(), taskexec->getJobName(), taskexec->getBlockName(), taskexec->getName())
-         .arg( taskexec->getNumber()));
+      std::string str = "Captured by task: ";
+      str += taskexec->generateInfoString( false);
+      appendLog( str);
    }
 }
 
@@ -184,9 +188,9 @@ void RenderAf::startTask( af::TaskExec *taskexec)
       msg->setAddress( this);
       msg->dispatch();
 
-      appendLog(QString("Starting service: %1 - %2[%3][%4](%5)")
-         .arg( taskexec->getUserName(), taskexec->getJobName(), taskexec->getBlockName(), taskexec->getName())
-         .arg( taskexec->getNumber()));
+      std::string str = "Starting service: ";
+      str += taskexec->generateInfoString( false);
+      appendLog( str);
 
       return;
    }
@@ -203,44 +207,42 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFERROR("RenderAf::setAttr(): JobContainer pointer == NULL.\n");
       return true;
    }
-   QString userhost( mcgeneral.getUserName()+'@'+mcgeneral.getHostName());
+   std::string userhost( std::string(mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data());
    JobContainer * jobs = (JobContainer*)pointer;
    switch( type)
    {
    case af::Msg::TRenderAnnotate:
    {
-      appendLog( QString("Annotation set to '%1' by %2").arg(mcgeneral.getString()).arg(userhost));
-      annotation = mcgeneral.getString();
+      appendLog( std::string("Annotation set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      annotation = mcgeneral.getString().toUtf8().data();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
    }
    case af::Msg::TRenderPriority:
    {
-      appendLog( QString("Priority set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      appendLog( std::string("Priority set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       setPriority( mcgeneral.getNumber());
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
       break;
    }
    case af::Msg::TRenderCapacity:
    {
-      appendLog( QString("Capacity set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
+      appendLog( std::string("Capacity set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       setCapacity( mcgeneral.getNumber());
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
       break;
    }
    case af::Msg::TRenderSetService:
    {
-      appendLog( QString("Service '%1' %2 by %3")
-         .arg( mcgeneral.getString())
-         .arg( mcgeneral.getNumber() != 0 ? "enabled" : "disabled")
-         .arg(userhost));
+      appendLog( std::string("Service \"") + mcgeneral.getString().toUtf8().data() + "\" "
+                 + (mcgeneral.getNumber() != 0 ? "enabled" : "disabled") + " by " + userhost);
       setService( mcgeneral.getString(), mcgeneral.getNumber());
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
       break;
    }
    case af::Msg::TRenderRestoreDefaults:
    {
-      appendLog( QString("Default farm host settings restored by %1").arg(userhost));
+      appendLog( std::string("Default farm host settings restored by ") + userhost);
       capacity = -1;
       services_disabled.clear();
       disableServices();
@@ -250,28 +252,28 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    }
    case af::Msg::TRenderNIMBY:
    {
-      appendLog( QString("NIMBY set by %1").arg(userhost));
+      appendLog( std::string("NIMBY set by ") + userhost);
       setNIMBY();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
    case af::Msg::TRenderNimby:
    {
-      appendLog( QString("nimby set by %1").arg(userhost));
+      appendLog( std::string("nimby set by ") + userhost);
       setNimby();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
    case af::Msg::TRenderFree:
    {
-      appendLog( QString("Set free by %1").arg(userhost));
+      appendLog( std::string("Set free by ") + userhost);
       setFree();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
    case af::Msg::TRenderUser:
    {
-      appendLog( QString("User set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+      appendLog( std::string("User set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       username = mcgeneral.getString();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_username);
       break;
@@ -279,21 +281,21 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderEject:
    {
       if( isBusy() == false ) return true;
-      appendLog( QString("Task Ejected by %1").arg(userhost));
+      appendLog( std::string("Task Ejected by ") + userhost);
       ejectTasks( jobs, monitoring, af::TaskExec::UPEject);
       return true;
    }
    case af::Msg::TRenderExit:
    {
       if( false == isOnline() ) return true;
-      appendLog( QString("Exit by %1").arg(userhost));
+      appendLog( std::string("Exit by %1") + userhost);
       exitClient( af::Msg::TClientExitRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderDelete:
    {
       if( isOnline() ) return true;
-      appendLog( QString("Deleted by %1").arg(userhost));
+      appendLog( std::string("Deleted by ") + userhost);
       offline( NULL, 0, monitoring, true);
       AFCommon::QueueDBDelItem( this);
       return true;
@@ -301,28 +303,28 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderRestart:
    {
       if( false == isOnline() ) return true;
-      appendLog( QString("Restarted by %1").arg(userhost));
+      appendLog( std::string("Restarted by ") + userhost);
       exitClient( af::Msg::TClientRestartRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderStart:
    {
       if( false == isOnline() ) return true;
-      appendLog( QString("Starting another render by %1").arg(userhost));
+      appendLog( std::string("Starting another render by ") + userhost);
       exitClient( af::Msg::TClientStartRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderReboot:
    {
       if( false == isOnline() ) return true;
-      appendLog( QString("Reboot computer by %1").arg(userhost));
+      appendLog( std::string("Reboot computer by ") + userhost);
       exitClient( af::Msg::TClientRebootRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderShutdown:
    {
       if( false == isOnline() ) return true;
-      appendLog( QString("Shutdown computer by %1").arg(userhost));
+      appendLog( std::string("Shutdown computer by ") + userhost);
       exitClient( af::Msg::TClientShutdownRequest, jobs, monitoring);
       return true;
    }
@@ -389,24 +391,28 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
    if( removeTask( taskexec)) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    remService( taskexec->getServiceType());
    if( taskexec->getNumber())
-      appendLog(QString("Finished service: %1 - %2[%3][%4](%5)")
-         .arg( taskexec->getUserName(), taskexec->getJobName(), taskexec->getBlockName(), taskexec->getName())
-         .arg(taskexec->getNumber()));
+   {
+      std::string str = "Finished service: ";
+      str += taskexec->generateInfoString( false);
+      appendLog( str);
+   }
    else
-      appendLog(QString("Finished task: %1 - %2[%3][%4]")
-         .arg( taskexec->getUserName(), taskexec->getJobName(), taskexec->getBlockName(), taskexec->getName()));
+   {
+      std::string str = "Finished task: ";
+      str += taskexec->generateInfoString( false);
+      appendLog( str);
+   }
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
 }
 
 void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
 {
    if( isLocked() ) return;
-//printf("RenderAf::refresh: \"%s\"\n", getName().toUtf8().data());
    JobContainer * jobs = (JobContainer*)pointer;
    if( isOnline() && (getTimeUpdate() < (currentTime - af::Environment::getRenderZombieTime())))
    {
-      appendLog( QString("ZOMBIETIME: %1 seconds.").arg( af::Environment::getRenderZombieTime()));
-      af::printTime(); printf(" : Render \"%s\" - ZOMBIETIME\n", getName().toUtf8().data());
+      appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
+      AFCommon::QueueLog( std::string("Render: \"") + getName().toUtf8().data() + " - ZOMBIETIME");
       if( isBusy())
       {
          printf("Was busy:\n");
@@ -424,10 +430,10 @@ void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block,
    msg->dispatch();
 }
 
-void RenderAf::appendLog( const QString &message)
+void RenderAf::appendLog( const std::string & message)
 {
-   while( log.size() > af::Environment::getRenderLogLinesMax() ) log.removeFirst();
-   log << af::time2Qstr() + " : " + message;
+   while( loglist.size() > af::Environment::getRenderLogLinesMax() ) loglist.pop_front();
+   loglist.push_back( af::time2str() + " : " + message);
 }
 
 bool RenderAf::getFarmHost( af::Host * newHost)
@@ -505,29 +511,30 @@ void RenderAf::getServices( af::Msg * msg) const
       msg->setString("No services.");
       return;
    }
-   QStringList list;
+   std::string str;
    if( false == services_disabled.isEmpty())
    {
-      list << "Disabled services:";
-      list << "   " + services_disabled;
-      list << "";
+      str += "Disabled services:\n   ";
+      str += services_disabled.toUtf8().data();
    }
-   list << "Services:";
+   str += "\nServices:";
    for( int i = 0; i < servicesnum; i++)
    {
-      QString line = host.getServiceName(i) + ": ";
-      if( disabledservices[i] ) line = "DISABLED " + line;
-      if( servicescounts[i] > 0) line += QString::number( servicescounts[i]);
-      if( host.getServiceCount(i) > 0) line += " / max=" + QString::number( host.getServiceCount(i));
-      list << "   " + line;
+      std::string line("\n");
+      line += host.getServiceName(i).toUtf8().data();
+      line += ": ";
+      if( disabledservices[i] ) line = std::string("DISABLED ") + line;
+      if( servicescounts[i] > 0) line += af::itos( servicescounts[i]);
+      if( host.getServiceCount(i) > 0) line += " / max=" + af::itos( host.getServiceCount(i));
+      str += "   " + line;
    }
    std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
    if( servicelimits.size())
    {
-      list << "";
-      list << QString::fromUtf8( af::farm()->serviceLimitsInfoString( true).c_str());
+      str += "\n";
+      str += af::farm()->serviceLimitsInfoString( true).c_str();
    }
-   msg->setStringList( list);
+   msg->setString( str);
 }
 
 bool RenderAf::canRunService( const QString & type) const

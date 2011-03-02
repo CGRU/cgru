@@ -46,10 +46,10 @@ protected:
 /// Stop runnig task. Request from remote render host to stop it. Host will send message with new status back to finish session.
 /** Stop slave hosts if they run any service.
 **/
-   virtual void stop(    const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void stop(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Catch master task finishing session. Launch multi host task stopping.
-   virtual void finish(  const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void finish(  const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 private:
    void setMasterTask();

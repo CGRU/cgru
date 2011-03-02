@@ -71,7 +71,7 @@ int TaskRunMulti::calcWeight() const
 
 void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
-   task->log( QString("Host '%1' added.").arg(render->getName()));
+   task->log( std::string("Host \"") + render->getName().toUtf8().data() + "\" added.");
 
    // Getting unique minimal slave number
    int number = 0;
@@ -164,7 +164,7 @@ void TaskRunMulti::startMaster( RenderContainer * renders, MonitorContainer * mo
    masterrunning = true;
    task->monitor( monitoring );
    task->updateDatabase();
-   task->log(QString("Starting master on '%1'").arg(render->getName()));
+   task->log( std::string("Starting master on \"") + render->getName().toUtf8().data() + "\"");
 }
 
 void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
@@ -278,7 +278,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
          {
             if( progress->state & AFJOB::STATE_READY_MASK) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
             setMasterTask();
-            task->log( QString("Finished waiting for hosts.\nCaptured slaves:\n%1").arg( hostnames.join(" ")));
+            task->log( std::string("Finished waiting for hosts.\nCaptured slaves:\n") + hostnames.join(" ").toUtf8().data());
             startServices( renders);
          }
 
@@ -297,7 +297,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
    return changed;
 }
 
-void TaskRunMulti::stop( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRunMulti::stop( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("TaskRunMulti::stop: %s[%d][%d]\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, message.toUtf8().data());
 
@@ -324,7 +324,7 @@ void TaskRunMulti::stop( const QString & message, RenderContainer * renders, Mon
             return;
          }
          // Stopping service on slaves (if it was not asked to be stopped before)
-         task->log(QString("Stopping service[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
+         task->log( std::string("Stopping service[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName().toUtf8().data() + "\"");
          render->stopTask( *tIt);
          hIt++, tIt++;
       }
@@ -332,7 +332,7 @@ void TaskRunMulti::stop( const QString & message, RenderContainer * renders, Mon
       {
          // Finish tasks on slaves if there is no service
          render->taskFinished( *tIt, monitoring);
-         task->log(QString("Finished task[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
+         task->log( std::string("Finished task[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName().toUtf8().data() + "\"");
          delete *tIt;
          tIt = execs.erase( tIt);
          hIt = hostids.erase( hIt);
@@ -353,7 +353,7 @@ void TaskRunMulti::stop( const QString & message, RenderContainer * renders, Mon
    }
 }
 
-void TaskRunMulti::finish( const QString & message, RenderContainer * renders, MonitorContainer * monitoring)
+void TaskRunMulti::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
 //printf("TaskRunMulti::finish: %s[%d][%d]\n\t%s\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, message.toUtf8().data());
 
@@ -387,7 +387,7 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
       else
       {
          render->taskFinished( *tIt, monitoring);
-         task->log(QString("Releasing task[%1] on host '%2'").arg((*tIt)->getNumber()).arg(render->getName()));
+         task->log( std::string("Releasing task[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName().toUtf8().data() + "\"");
       }
       delete *tIt;
       tIt = execs.erase( tIt);

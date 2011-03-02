@@ -42,13 +42,13 @@ public:
    bool setString( const std::string & qstring);
 
 /// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
-   bool setStringList( QStringList & qstringlist);
+   bool setStringList( const std::list<std::string> & stringlist);
 
 /// Get QString ( if message type is TQString ).
-   bool getString( std::string & qstring);
+   bool getString( std::string & string);
 
 /// Get QString ( if message type is TQStringList ).
-   bool getStringList( QStringList & qstringlist);
+   bool getStringList( std::list<std::string> & stringlist);
 
 /**   IMPORTANT!
 ***   messages with (type < MText) MUST NOT have any data to be valid:

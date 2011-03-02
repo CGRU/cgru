@@ -62,20 +62,20 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
+   const std::string itos( int integer);
+
    const std::string getenv( const char * name);
+
+   const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
+   const QString time2Qstr( time_t time_sec = time( NULL));
+   const std::string time2strHMS( int time32, bool clamp = false);
 
    void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
-   const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
-
-   const QString time2Qstr( time_t time_sec = time( NULL));
-   const std::string time2strHMS( int time32, bool clamp = false);
    const QString state2str( int state);
    const QString fillNumbers( const QString & pattern, int start, int end);
 
    bool setRegExp( QRegExp & regexp, const QString & str, const QString & name);
-
-   void filterFileName( QString & filename);
 
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
@@ -98,9 +98,12 @@ namespace af
    bool  loadFarm( const std::string & filename, bool verbose = false);
    Farm * farm();
 
+//   void filterFileName( QString & filename);
+
    void pathFilterFileName( std::string & filename);
    void pathFilter( std::string & path);
    bool pathIsAbsolute( const std::string & path);
+   bool pathFileExists( const std::string & path);
    bool pathIsFolder( const std::string & path);
    const std::string pathAbsolute( const std::string & path);
    const std::string pathUp( const std::string & path);

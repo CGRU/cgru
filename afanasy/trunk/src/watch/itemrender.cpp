@@ -136,9 +136,9 @@ void ItemRender::updateValues( af::Node *node, int type)
    case af::Msg::TRendersList:
    {
       revision          = render->getRevision();
-      version           = render->getVersion();
+      version           = QString::fromUtf8( render->getVersion().c_str());
       username          = render->getUserName();
-      annotation        = render->getAnnontation();
+      annotation        = QString::fromUtf8( render->getAnnontation().c_str());
       priority          = render->getPriority();
       capacity          = render->getCapacity();
       time_launched     = render->getTimeLaunch();

@@ -55,7 +55,7 @@ void ItemJob::updateValues( af::Node *node, int type)
       return;
    }
 
-   annotation        = job->getAnnontation();
+   annotation        = QString::fromUtf8( job->getAnnontation().c_str());
    priority          = job->getPriority();
    username          = job->getUserName();
    hostname          = job->getHostName();
@@ -73,7 +73,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    need_properties   = job->getNeedProperties();
    cmd_pre           = job->getCmdPre();
    cmd_post          = job->getCmdPost();
-   description       = job->getDescription();
+   description       = QString::fromUtf8( job->getDescription().c_str());
    num_runningtasks  = job->getRunningTasksNumber();
    lifetime          = job->getLifeTime();
 

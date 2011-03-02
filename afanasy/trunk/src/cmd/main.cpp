@@ -106,7 +106,7 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    {
       printf("\n");
       printf("Afanasy build version = \"%d\"\n", af::Environment::getAfanasyBuildVersion());
-      printf("CGRU version = \"%s\"\n", af::Environment::getCGRUVersion().toUtf8().data());
+      printf("CGRU version = \"%s\"\n", af::Environment::getCGRUVersion().c_str());
       printf("\n");
       printf("Type \"afcmd h\" for help.\n");
    }

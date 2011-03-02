@@ -30,16 +30,17 @@ public:
 
    virtual void refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
-   void restart( bool onlyRunning, const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
-   void restartError( const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
-   void skip( const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   void restart( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+   void restartError( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+   void skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
-   virtual void log( const QString &message);
-   inline QStringList * getLog() { return &logStringList; }
+   virtual void log( const std::string  & message);
+   inline const std::list<std::string> & getLog() { return logStringList; }
 
    void errorHostsAppend( const QString & hostname);
    bool avoidHostsCheck( const QString & hostname) const;
-   const QStringList getErrorHostsList() const;
+   void getErrorHostsListString( std::string & str) const;
+   const std::string getErrorHostsListString() const;
    inline void errorHostsReset() { errorHosts.clear(); errorHostsCounts.clear(); errorHostsTime.clear();}
 
    int calcWeight() const;
@@ -47,12 +48,12 @@ public:
    int blackListWeight() const;
 
    virtual void writeTaskOutput( const af::MCTaskUp & taskup) const;  ///< Write task output in tasksOutputDir.
-   const QString getOutputFileName( int startcount) const;
+   const std::string getOutputFileName( int startcount) const;
 
 /// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
 /** Return \c true on success (and valid message or filename) or \c false on fail with error message for client
 **/
-   bool getOutput( int startcount, MsgAf *msg, QString & filename, RenderContainer * renders) const;
+   bool getOutput( int startcount, MsgAf *msg, std::string & filename, RenderContainer * renders) const;
 
    void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 
@@ -69,7 +70,7 @@ public:
 
 protected:
    af::TaskProgress * progress;
-   QStringList logStringList;    ///< Task log.
+   std::list<std::string> logStringList;    ///< Task log.
 
 private:
    void deleteRunningZombie();

@@ -1,7 +1,7 @@
 #include "afcommon.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QFile>
+//#include <QtCore/QDir>
+//#include <QtCore/QFile>
 
 #include <fcntl.h>
 #include <sys/errno.h>
@@ -64,7 +64,7 @@ void AFCommon::catchDetached()
       printf("AFCommon::catchDetached: Child execution finish catched, pid=%d.\n", pid);
 }
 */
-
+/*
 bool AFCommon::createDirectory( const char * name, bool verbose)
 {
    AFINFA("AFCommon::createDirectory: char=\"%s\"\n", name);
@@ -81,47 +81,46 @@ bool AFCommon::createDirectory( const char * name, bool verbose)
    }
    return true;
 }
-
-void AFCommon::executeCmd( const QString & cmd)
+*/
+void AFCommon::executeCmd( const std::string & cmd)
 {
-   af::printTime(); printf(": Executing command:\n%s\n", cmd.toUtf8().data());
-   if( system( cmd.toUtf8().data()) < 0)
+   std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;
+   if( system( cmd.c_str()))
    {
-      AFERRPE("AFCommon::executeCmd: system: ");
+      AFERRPE("AFCommon::executeCmd: system: ")
    }
 }
 
-void AFCommon::saveLog( const QStringList & log, const QString & dirname, QString filename, int rotate)
+void AFCommon::saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate)
 {
    int lines = log.size();
    if( lines < 1) return;
-   QByteArray bytes;
-   for( int i = 0; i < lines; i++)
+   std::string bytes;
+   for( std::list<std::string>::const_iterator it = log.begin(); it != log.end(); it++)
    {
-      bytes += log[i].toUtf8();
+      bytes += *it;
       bytes += "\n";
    }
 
-   af::filterFileName( filename);
-   filename = dirname + '/' + filename;
+   std::string path = filename;
+   af::pathFilterFileName( path);
+   path = dirname + '/' + path;
 
-   FileData * filedata = new FileData( bytes.data(), bytes.length(), filename, rotate);
+   FileData * filedata = new FileData( bytes.data(), bytes.length(), path, rotate);
    FileWriteQueue->pushFile( filedata);
 }
 
-bool AFCommon::writeFile( const char * data, const int length, const QString & filename)
+bool AFCommon::writeFile( const char * data, const int length, const std::string & filename)
 {
-   if( filename.isEmpty())
+   if( filename.size() == 0)
    {
       QueueLogError("AFCommon::writeFile: File name is empty.");
       return false;
    }
-   int fd = open( filename.toUtf8().data(), O_WRONLY | O_CREAT, 0777);
+   int fd = open( filename.c_str(), O_WRONLY | O_CREAT, 0777);
    if( fd == -1 )
    {
-      std::string errstr = "AFCommon::writeFile: ";
-      errstr += filename.toUtf8().data();
-      QueueLogErrno( errstr);
+      QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
       return false;
    }
    int bytes = 0;
@@ -130,16 +129,14 @@ bool AFCommon::writeFile( const char * data, const int length, const QString & f
       int written = write( fd, data+bytes, length-bytes);
       if( written == -1 )
       {
-         std::string errstr = "AFCommon::writeFile: ";
-         errstr += filename.toUtf8().data();
-         QueueLogErrno( errstr);
+         QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
          close( fd);
          return false;
       }
       bytes += written;
    }
    close( fd);
-   chmod( filename.toUtf8().data(), 0777);
+   chmod( filename.c_str(), 0777);
    AFINFA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
    return true;
 }

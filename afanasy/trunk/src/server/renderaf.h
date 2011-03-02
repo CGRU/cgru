@@ -63,7 +63,7 @@ public:
 /// Set some Render attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   inline QStringList* getLog() { return &log; }   ///< Get log.
+   inline const std::list<std::string> getLog() { return loglist; }   ///< Get log list.
    void getServices( af::Msg * msg) const;         ///< Get services information.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
@@ -88,7 +88,7 @@ private:
 
    std::vector<int> disabledservices;
 
-   QStringList log;                          ///< Log.
+   std::list<std::string> loglist;                          ///< Log.
 
 private:
    void init();
@@ -99,14 +99,14 @@ private:
    void setService( const QString srvname, bool enable);
    void disableServices();
 
-   void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus);  ///< Stop task with \c message to log.
+   void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus);  ///< Stop task with \c message to loglist.
 
    void exitClient( int type, JobContainer * jobs, MonitorContainer * monitoring);   ///< Exit Render client program.
 
 /// Set Render to Ofline. \c updateTaskState - whether to update it's state.
    void offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie = false );
 
-   void appendLog( const QString &message);  ///< Append task log with a \c message .
+   void appendLog( const std::string & message);  ///< Append task loglist with a \c message .
 
 private:
    static RenderContainer * renders;

@@ -19,7 +19,7 @@ class User : public Node
 public:
 
 /// Construct a new user from job.
-   User( const QString &username, const QString &host);
+   User( const QString &username, const std::string & host);
 
 /// Construct user from id only.
    User( int uid);
@@ -39,8 +39,8 @@ public:
    inline bool hasHostsMask()          const { return false == hostsmask.isEmpty();          }
    inline bool hasHostsMaskExclude()   const { return false == hostsmask_exclude.isEmpty();  }
 
-   inline const QString& getHostName() const { return hostname;}
-   inline void  setHostName( const QString & str) { hostname = str;}
+   inline const std::string & getHostName() const { return hostname;}
+   inline void  setHostName( const std::string & str) { hostname = str;}
 
    inline const QString getHostsMask()          const { return hostsmask.pattern();          }
    inline const QString getHostsMaskExclude()   const { return hostsmask_exclude.pattern();  }
@@ -79,9 +79,9 @@ public:
 protected:
    uint32_t state;             ///< State.
    std::string annotation;
-   QString customdata;
+   std::string customdata;
 
-   QString  hostname;          ///< User host name.
+   std::string hostname;          ///< User host name.
    int32_t  maxrunningtasks;   ///< User maximum running tasks number hosts.
 
    QRegExp hostsmask;

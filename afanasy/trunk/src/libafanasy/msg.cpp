@@ -222,12 +222,12 @@ bool Msg::setString( const std::string & str)
    return true;
 }
 
-bool Msg::setStringList( QStringList & qstringlist)
+bool Msg::setStringList( const std::list<std::string> & stringlist)
 {
    if(checkZero( true) == false ) return false;
    mtype = TStringList;
    writing = true;
-   rw_QStringList( qstringlist, this);
+   w_StringList( stringlist, this);
    mint32 = msgwrittensize;
    rw_header( true);
    return true;
@@ -244,14 +244,14 @@ bool Msg::getString( std::string & str)
    return true;
 }
 
-bool Msg::getStringList( QStringList & qstringlist)
+bool Msg::getStringList( std::list<std::string> & stringlist)
 {
    if( mtype != TStringList)
    {
       AFERROR("Msg::getStringList: type is not TQStringList.\n");
       return false;
    }
-   rw_QStringList( qstringlist, this);
+   rw_StringList( stringlist, this);
    return true;
 }
 
@@ -363,11 +363,13 @@ void Msg::stdOutData()
    }
    case Msg::TStringList:
    {
-      QStringList strlist;
-      rw_QStringList( strlist, this);
-      printf( "String List:\n");
-      for( int i = 0; i < strlist.size(); i++) printf( "%s\n", strlist[i].toUtf8().data());
-      printf( "\n");
+      std::list<std::string> strlist;
+      rw_StringList( strlist, this);
+      std::cout << "String List:";
+      std::cout << std::endl;
+      for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
+         std::cout << *it << std::endl;
+      std::cout << std::endl;
       break;
    }
    }

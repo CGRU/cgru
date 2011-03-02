@@ -154,12 +154,12 @@ void TaskExec::readwrite( Msg * msg)
 
 void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
 {
+   stream << username.toUtf8().data() << ": ";
    stream << jobname.toUtf8().data();
    stream << "[" << blockname.toUtf8().data() << "]";
    stream << "[" << name.toUtf8().data() << "]";
-   stream << "(" << number << ") - ";
-   stream << username.toUtf8().data() << ": ";
-   stream << capacity;
+   if( number != 0 ) stream << "(" << number << ")";
+   stream << ":" << capacity;
    if( capcoeff) stream << "x" << capcoeff << " ";
    if( listen_addresses )
       if( listen_addresses->getAddressesNum())

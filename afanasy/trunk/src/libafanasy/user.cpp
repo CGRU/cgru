@@ -15,7 +15,7 @@
 
 using namespace af;
 
-User::User( const QString &username, const QString &host):
+User::User( const QString &username, const std::string & host):
    hostname( host),
    maxrunningtasks(  af::Environment::getMaxRunningTasksNumber() ),
    hostsmask( af::Environment::getHostsMask()),
@@ -67,7 +67,7 @@ void User::readwrite( Msg * msg)
 
    rw_uint32_t( state,                 msg);
    rw_uint32_t( time_register,         msg);
-   rw_QString ( hostname,              msg);
+   rw_String  ( hostname,              msg);
    rw_int32_t ( maxrunningtasks,       msg);
    rw_uint8_t ( errors_retries,        msg);
    rw_uint8_t ( errors_avoidhost,      msg);
@@ -82,6 +82,7 @@ void User::readwrite( Msg * msg)
    rw_QRegExp ( hostsmask,             msg);
    rw_QRegExp ( hostsmask_exclude,     msg);
    rw_String  ( annotation,            msg);
+//   rw_String  ( customdata,            msg);
 }
 
 void User::setPermanent( bool value)
@@ -120,10 +121,11 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"";
       stream << "\n Registration time = " << time2str( time_register);
       stream << "\n Online time = " << time2str( time_online);
-      if( false == hostname.isEmpty()) stream << "\n Last host = " << hostname.toUtf8().data();
+      if( hostname.size() != 0) stream << "\n Last host = " << hostname;
 //      stream << "\n Memory = " << calcWeight() << " bytes.";
       if( isPermanent()) stream << "\n User is permanent."; else stream << "\n (user is temporal)";
       if( annotation.size()) stream << "\n" << annotation;
+      if( customdata.size()) stream << "\nCustom Data:\n" << customdata;
    }
    else
    {
@@ -132,7 +134,7 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
             << " j" << numjobs << "/" << numrunningjobs
             << " r" << runningtasksnumber << "/" << maxrunningtasks
             << " " << time2str( time_online)
-            << " " <<  hostname.toUtf8().data()
+            << " " <<  hostname
             << " " << (isPermanent() == 1 ? "P" : "T")
             << " - " << calcWeight() << " bytes.";
    }

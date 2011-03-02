@@ -18,7 +18,7 @@ ItemTalk::ItemTalk( af::Talk *talk):
 {
    tip += "Launched at "   + af::time2Qstr( talk->getTimeLaunch()    );
    tip += "\nRegistered at " + af::time2Qstr( talk->getTimeRegister()  );
-   tip += QString("\nVersion: %1").arg( talk->getVersion());
+   tip += QString("\nVersion: %1").arg( QString::fromUtf8( talk->getVersion().c_str()));
    tip += QString("\nBuild Revision: %1").arg( talk->getRevision());
    tip += QString("\n%1").arg(talk->generateInfoString().c_str());
    tip += "\nLast update ";

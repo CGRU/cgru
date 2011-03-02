@@ -37,20 +37,20 @@ public:
    void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
 /// Get job log.
-   QStringList* getLog() { return &joblog;}
+   inline const std::list<std::string> & getLog() { return joblog;}
 
-   const QStringList getErrorHostsList() const; /// Get avoid hosts list.
-   const QStringList getErrorHostsList( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
+   const std::string getErrorHostsListString() const; /// Get avoid hosts list.
+   const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
-   QStringList* getTaskLog( int block, int task);
+   const std::list<std::string> & getTaskLog( int block, int task);
 
    virtual af::TaskExec * generateTask( int block, int task);
 
 /// Construct message for retrieveing output from running remote host or filename if task is not running
 /** return \c true in success, or \c false with error message to send back to client.
 **/
-   bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, QString & filename, RenderContainer * renders);
+   bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders);
 
 /// Solve a job. Job send ready task to Render, if any.
    virtual bool solve( RenderAf *render, MonitorContainer * monitoring);
@@ -103,14 +103,14 @@ protected:
    bool construct();
 
    /// Append task log with a \c message .
-   void log( const QString &message);
+   void log( const std::string & message);
 
    virtual Block * newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
 
 protected:
    Block ** blocks;              ///< Blocks.
    bool fromdatabase;            ///< Whether job constructed from database.
-   QStringList joblog;           ///< Job log.
+   std::list<std::string> joblog;           ///< Job log.
 
 private:
    bool constructed;             ///< Whether the job was constructed successfully.
@@ -139,10 +139,10 @@ private:
    void checkDepends();
 
 /// Restart tasks, can restart only running tasks.
-   void restartTasks( bool onlyRunning, const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   void restartTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Restart tasks with errors
-   void restartErrors( const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   void restartErrors( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
    af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 

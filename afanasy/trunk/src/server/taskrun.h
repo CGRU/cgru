@@ -41,10 +41,10 @@ public:
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
 /// Restrart running task, it generate 'stop' message to remote host and send it (do nothing if it is already a zombie).
-   virtual void restart( const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void restart( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Same as 'retart' function but with switch to 'skipped' state.
-   virtual void skip(    const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void skip(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Request to remote host to send output to specified address (or request not to do it).
    void listen( af::MCListenAddress & mclisten, RenderContainer * renders);
@@ -64,10 +64,10 @@ public:
 protected:
 
 /// Stop runnig task. Request from remote render host to stop it. Host will send message with new status back to finish session.
-   virtual void stop(    const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void stop(    const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Finish running task session. Release task from render and became a zombie (ready to be deleted).
-   virtual void finish(  const QString & message, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void finish(  const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 protected:
    Task * task;
@@ -79,7 +79,7 @@ protected:
 
 private:
    int * counter;
-   QStringList * logStingList;
+//   QStringList * logStingList;
    uint32_t stopTime;         ///< Time, when running task was asked to stop.
    bool zombie;
 };

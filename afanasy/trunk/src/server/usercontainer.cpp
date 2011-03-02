@@ -30,7 +30,7 @@ UserContainer::~UserContainer()
 AFINFO("UserContainer::~UserContainer:\n");
 }
 
-UserAf* UserContainer::addUser( const QString &username, const QString &hostname, MonitorContainer * monitoring)
+UserAf* UserContainer::addUser( const QString &username, const std::string & hostname, MonitorContainer * monitoring)
 {
    {
       UserContainerIt usersIt( this);
@@ -70,7 +70,7 @@ void UserContainer::addUser( UserAf * user)
 void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, MonitorContainer * monitoring)
 {
    QString username( usr.getName());
-   QString hostname( usr.getHostName());
+   std::string hostname( usr.getHostName().toUtf8().data());
 
    //
    // Try to find user with provided name in container to edit permanent property

@@ -66,12 +66,12 @@ public:
    inline uint32_t getTasksStartFinishTime() const { return taskstartfinishtime; }///< Get tasks start or finish time.
    inline const std::list<TaskExec*> & getTasks() { return tasks;}
 
-   const QString getResources() const;
+   const std::string getResourcesString() const;
 
    bool addTask( TaskExec * taskexec);
    bool removeTask( const TaskExec * taskexec);
 
-   inline const QString & getAnnontation() const { return annotation;}
+   inline const std::string & getAnnontation() const { return annotation;}
 
 public:
 
@@ -95,8 +95,8 @@ protected:
 
    int32_t capacity;
    QString services_disabled;
-   QString customdata;
-   QString annotation;
+   std::string customdata;
+   std::string annotation;
 
    Host     host;
    HostRes  hres;

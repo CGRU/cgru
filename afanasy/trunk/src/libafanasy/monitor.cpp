@@ -54,7 +54,7 @@ void Monitor::readwrite( Msg * msg)
    rw_QString ( name,          msg);
    rw_QString ( username,      msg);
    rw_int32_t(  revision,      msg);
-   rw_QString(  version,       msg);
+   rw_String(   version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
 
@@ -82,7 +82,7 @@ bool Monitor::hasEvent( int type) const
 void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << name.toUtf8().data() << "[" << id << "]";
-   stream << " (" << version.toUtf8().data() << " r" << revision << ") ";
+   stream << " (" << version << " r" << revision << ") ";
    address->generateInfoStream( stream);
 
    if( full == false ) return;

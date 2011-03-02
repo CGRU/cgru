@@ -14,7 +14,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-UserAf::UserAf( const QString &username, const QString &host):
+UserAf::UserAf( const QString &username, const std::string & host):
    afsql::DBUser( username, host)
 {
    construct();
@@ -40,13 +40,13 @@ UserAf::~UserAf()
 
 bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   QString userhost( mcgeneral.getUserName()+'@'+mcgeneral.getHostName());
+   std::string userhost( std::string(mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data());
    switch( type)
    {
    case af::Msg::TUserAnnotate:
    {
       annotation = mcgeneral.getString().toUtf8().data();
-      appendLog( QString("Annotation set to '%1'' by %2").arg( mcgeneral.getString(), userhost));
+      appendLog( std::string("Annotation set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
    }
@@ -54,7 +54,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
       if( setHostsMask( mcgeneral.getString()))
       {
-         appendLog( QString("Hosts mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         appendLog( std::string("Hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
       }
       break;
@@ -63,57 +63,57 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
       if( setHostsMaskExclude( mcgeneral.getString()))
       {
-         appendLog( QString("Hosts mask set to \"%1\" by %2").arg(mcgeneral.getString(), userhost));
+         appendLog( std::string("Exclude hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
          if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask_exclude);
       }
       break;
    }
    case af::Msg::TUserMaxRunningTasks:
    {
-      appendLog( QString("Maximum hosts set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       maxrunningtasks = mcgeneral.getNumber();
+      appendLog( std::string("Max running tasks set to ") + af::itos( maxrunningtasks) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
       break;
    }
    case af::Msg::TUserPriority:
    {
-      appendLog( QString("Priority set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       priority = mcgeneral.getNumber();
+      appendLog( std::string("Priority set to ") + af::itos( priority) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
       break;
    }
    case af::Msg::TUserErrorsAvoidHost:
    {
-      appendLog( QString("Errors to avoid host set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_avoidhost = mcgeneral.getNumber();
+      appendLog( std::string("Errors to avoid host set to ") + af::itos( errors_avoidhost) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_avoidhost);
       break;
    }
    case af::Msg::TUserErrorRetries:
    {
-      appendLog( QString("Errors retries set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_retries = mcgeneral.getNumber();
+      appendLog( std::string("Errors retries set to ") + af::itos( errors_retries) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_retries);
       break;
    }
    case af::Msg::TUserErrorsTaskSameHost:
    {
-      appendLog( QString("Errors for task on same host set to %1 by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_tasksamehost = mcgeneral.getNumber();
+      appendLog( std::string("Errors for task on the same host set to ") + af::itos( errors_tasksamehost) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_tasksamehost);
       break;
    }
    case af::Msg::TUserErrorsForgiveTime:
    {
-      appendLog( QString("Errors forgive time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
       errors_forgivetime = mcgeneral.getNumber();
+      appendLog( std::string("Errors forgive time set to ") + af::itos( errors_forgivetime) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_forgivetime);
       break;
    }
    case af::Msg::TUserJobsLifeTime:
    {
-      appendLog( QString("Jobs life time set to %1 seconds by %2").arg(mcgeneral.getNumber()).arg(userhost));
       jobs_lifetime = mcgeneral.getNumber();
+      appendLog( std::string("Jobs life time set to ") + af::itos( jobs_lifetime) + " seconds by %2" + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
       break;
    }
@@ -121,7 +121,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
       if( false == isPermanent())
       {
-         appendLog( QString("Added by %1").arg(userhost));
+         appendLog( std::string("Added by ") + userhost);
          setPermanent( true );
          AFCommon::QueueDBAddItem( this);
       }
@@ -129,7 +129,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    }
    case af::Msg::TUserDel:
    {
-      appendLog( QString("Deleted by %1").arg(userhost));
+      appendLog( std::string("Deleted by ") + userhost);
       setPermanent( false);
       AFCommon::QueueDBDelItem( this);
       break;
@@ -148,12 +148,12 @@ void UserAf::setZombie()
    AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
    af::Node::setZombie();
    appendLog( "Became a zombie.");
-   AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());
+   AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name.toUtf8().data(), af::Environment::getUserLogsRotate());
 }
 
 int UserAf::addJob( JobAf *job)
 {
-   appendLog( QString("Adding a job: %1").arg(job->getName()));
+   appendLog( std::string("Adding a job: ") + job->getName().toUtf8().data());
    zombietime = 0;
    int userlistorder = jobs.addJob( job );
    numjobs++;
@@ -187,7 +187,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
       {
          if( (currentTime-zombietime) > af::Environment::getUserZombieTime() )
          {
-            appendLog( QString("ZOMBIETIME: %1 seconds with no job.").arg( af::Environment::getUserZombieTime()));
+            appendLog( std::string("ZOMBIETIME: " + af::itos( af::Environment::getUserZombieTime()) + " seconds with no job."));
             setZombie();
             if( monitoring ) monitoring->addEvent( af::Msg::TMonitorUsersDel, id);
             return;
@@ -296,10 +296,10 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
    updateJobsOrder();
 }
 
-void UserAf::appendLog( const QString &message)
+void UserAf::appendLog( const std::string & message)
 {
-   while( log.size() > af::Environment::getUserLogLinesMax() ) log.removeFirst();
-   log << af::time2Qstr() + " : " + message;
+   log.push_back( af::time2str() + " : " + message);
+   while( log.size() > af::Environment::getUserLogLinesMax() ) log.pop_front();
 }
 
 void UserAf::generateJobsIds( af::MCGeneral & ids) const

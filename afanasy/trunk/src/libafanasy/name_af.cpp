@@ -169,7 +169,7 @@ bool af::setRegExp( QRegExp & regexp, const QString & str, const QString & name)
    regexp.setPattern( str);
    return true;
 }
-
+/*
 void af::filterFileName( QString & filename)
 {
    static const char InvalidCharacters[] = "\"\\ /|!$&?()[]{}*^`',:;";
@@ -181,7 +181,7 @@ void af::filterFileName( QString & filename)
 
    if( filename.size() > af::Environment::getFileNameSizeMax()) filename.resize( af::Environment::getFileNameSizeMax());
 }
-
+*/
 void af::rw_int32( int32_t& integer, char * data, bool write)
 {
    int32_t bytes;
@@ -314,6 +314,13 @@ void af::pathFilterFileName( std::string & filename)
       }
 }
 
+bool af::pathFileExists( const std::string & path)
+{
+   struct stat st;
+   int retval = stat( path.c_str(), &st);
+   return (retval == 0);
+}
+
 bool af::pathIsFolder( const std::string & path)
 {
    struct stat st;
@@ -351,4 +358,11 @@ bool af::pathMakeDir( const std::string & path, bool verbose)
 #endif
    }
    return true;
+}
+
+const std::string af::itos( int integer)
+{
+   std::ostringstream stream;
+   stream << integer;
+   return stream.str();
 }

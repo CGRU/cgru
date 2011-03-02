@@ -34,7 +34,7 @@ void Talk::readwrite( Msg * msg)
    rw_QString ( name,          msg);
    rw_QString ( username,      msg);
    rw_int32_t(  revision,      msg);
-   rw_QString(  version,       msg);
+   rw_String(   version,       msg);
    if( msg->isWriting() ) address->write( msg);
    else address = new Address( msg);
 }
@@ -42,6 +42,6 @@ void Talk::readwrite( Msg * msg)
 void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << name.toUtf8().data() << "[" << id << "]";
-   stream << " (" << version.toUtf8().data() << " r" << revision << ") ";
+   stream << " (" << version << " r" << revision << ") ";
    address->generateInfoStream( stream, full);
 }

@@ -8,19 +8,20 @@ class FileData: public AfQueueItem
 {
 public:
 
-// Rotate =  0: no ratation
-// Rotate = -1: add time to name
-   FileData( char * Data, int Length, const QString & FileName, int Rotate = 0);
+/// Rotate =  0: no rotation
+/** Rotate = -1: add time to name
+**/
+   FileData( const char * Data, int Length, const std::string & FileName, int Rotate = 0);
    ~FileData();
 
-   inline const char *    getData()     const { return data;     }
-   inline const QString & getFileName() const { return filename; }
+   inline const char *        getData()     const { return data;     }
+   inline const std::string & getFileName() const { return filename; }
 
    inline int getLength() const { return length; }
    inline int getRotate() const { return rotate; }
 
 private:
-   QString filename;
+   std::string filename;
    int length;
    int rotate;
    char * data;

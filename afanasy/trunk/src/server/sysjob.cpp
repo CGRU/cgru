@@ -50,21 +50,22 @@ void SysTask::monitor( MonitorContainer * monitoring) const {}
 void SysTask::updateDatabase() const {}
 void SysTask::writeTaskOutput( const af::MCTaskUp& taskup) const {}
 
-void SysTask::log( const QString &message)
+void SysTask::log( const std::string & message)
 {
-   SysBlock::logCmdPost( QString("#%1: %2: %3: \"%4\":\n%5")
-                         .arg(getNumber()).arg(message).arg(syscmd->username).arg(syscmd->jobname).arg(syscmd->command));
+   SysBlock::logCmdPost( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
+                         + syscmd->username.toUtf8().data() + ": \"" + syscmd->jobname.toUtf8().data() + "\":\n"
+                         + syscmd->command.toUtf8().data());
 }
 
-void SysTask::appendSysJobLog( const QString &message)
+void SysTask::appendSysJobLog( const std::string & message)
 {
-   SysJob::appendLog( QString("Task[%1]: %2: %3: \"%4\":\n%5")
-                         .arg(getNumber()).arg(message).arg(syscmd->username).arg(syscmd->jobname).arg(syscmd->command));
+   SysJob::appendLog( std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
+                      + syscmd->username.toUtf8().data() + ": \"" + syscmd->jobname.toUtf8().data() + "\":\n"
+                      + syscmd->command.toUtf8().data());
 }
 
 void SysTask::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-//printf("SysTask::start:\n");
    taskexec->setCommand(      syscmd->command               );
    taskexec->setName(         syscmd->command.split(' ')[0] );
    taskexec->setUserName(     syscmd->username              );
@@ -82,7 +83,7 @@ void SysTask::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    if( birthtime == 0 ) birthtime = currentTime;
    if((currentTime - birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
    {
-      QString message = QString( QString("Error: Task age(%1) > %2").arg(currentTime - birthtime).arg(af::Environment::getSysJobTaskLife()));
+      std::string message = std::string("Error: Task age(") + af::itos( currentTime - birthtime) + ") > " + af::itos( af::Environment::getSysJobTaskLife());
       log( message);
       // Store error in job log
       appendSysJobLog( message);
@@ -99,7 +100,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 
    // Store error messages and logs:
 
-   QString message;
+   std::string message;
    switch ( taskup.getStatus())
    {
       case af::TaskExec::UPWarning:                   message = "Warning";             break;
@@ -120,7 +121,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
    {
       RenderContainerIt rendersIt( renders);
       RenderAf * render = rendersIt.getRender( taskup.getClientId());
-      if( render ) message += QString(" on '%1'").arg( render->getName());
+      if( render ) message += std::string(" on \"") + render->getName().toUtf8().data() + "\"";
    }
 
    // Store error in job log
@@ -129,11 +130,11 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
    // Store error task output in task log
    if( taskup.getDataLen() > 0)
    {
-      message = QString("Error task output:");
+      message = "Error task output:";
       message += "\n";
       message += "=======================================================";
       message += "\n";
-      message += QString::fromUtf8( taskup.getData(), taskup.getDataLen());
+      message += std::string( taskup.getData(), taskup.getDataLen());
       message += "\n";
       message += "=======================================================";
       SysBlock::logCmdPost(message);
@@ -146,7 +147,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 
 Task * SysBlock::task = NULL;
 
-SysBlock::SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, QStringList * log):
+SysBlock::SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
    Block( blockJob, blockData, progress, log)
 {
 //printf("SysBlock::SysBlock:\n");
@@ -215,8 +216,9 @@ SysTask * SysBlock::addTask( af::TaskExec * taskexec)
    }
    if( false == founded )
    {
-      AFERRAR("SysBlock::addTask: Can't find free task number (max=%d).\n", af::Environment::getSysJobTasksMax());
-      log(QString("Can't find task number (max=%1)").arg( af::Environment::getSysJobTasksMax()));
+      std::string message = std::string("Can't find task number (max=") + af::itos(af::Environment::getSysJobTasksMax()) + ")";
+      AFERRAR("SysBlock::addTask: %s.\n", message.c_str())
+      log( message);
       return NULL;
    }
 
@@ -236,7 +238,7 @@ void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( Block::errorHostsAppend( render->getName())) log( render->getName() + " - AVOIDING HOST !");
+   if( Block::errorHostsAppend( render->getName())) log( std::string(render->getName().toUtf8().data()) + " - AVOIDING HOST !");
    SysTask * systask = getTask( task, "errorHostsAppend");
    if( systask) systask->errorHostsAppend( render->getName());
 }
@@ -440,7 +442,7 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    return true;
 }
 
-void SysJob::appendLog( const QString message)
+void SysJob::appendLog( const std::string & message)
 {
    sysjob->log( message);
 }

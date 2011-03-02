@@ -37,7 +37,7 @@ void ItemUser::updateValues( af::Node *node, int type)
 
    priority             = user->getPriority();
    annotation           = QString::fromUtf8( user->getAnnontation().c_str());
-   hostname             = user->getHostName();
+   hostname             = QString::fromUtf8( user->getHostName().c_str());
    numjobs              = user->getNumJobs();
    numrunningtasks      = user->getRunningTasksNumber();
    maxrunningtasks      = user->getMaxRunningTasks();

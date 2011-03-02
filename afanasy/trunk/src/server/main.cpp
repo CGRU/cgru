@@ -284,10 +284,10 @@ int main(int argc, char *argv[])
    AFCommon afcommon;
 
    // create directories if it is not exists
-   if( AFCommon::createDirectory( ENV.getTempDirectory().toUtf8().data(),  true) == false) return 1;
-   if( AFCommon::createDirectory( ENV.getTasksStdOutDir().toUtf8().data(), true) == false) return 1;
-   if( AFCommon::createDirectory( ENV.getUsersLogsDir().toUtf8().data(),   true) == false) return 1;
-   if( AFCommon::createDirectory( ENV.getRendersLogsDir().toUtf8().data(), true) == false) return 1;
+   if( af::pathMakeDir( ENV.getTempDirectory(),  true) == false) return 1;
+   if( af::pathMakeDir( ENV.getTasksStdOutDir(), true) == false) return 1;
+   if( af::pathMakeDir( ENV.getUsersLogsDir(),   true) == false) return 1;
+   if( af::pathMakeDir( ENV.getRendersLogsDir(), true) == false) return 1;
 
 //
 // Interrupt signal catch:

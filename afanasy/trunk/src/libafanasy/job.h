@@ -41,7 +41,8 @@ public:
    inline const QString & getHostName()      const { return hostname;              }
    inline const QString & getCmdPre()        const { return cmd_pre;               }
    inline const QString & getCmdPost()       const { return cmd_post;              }
-   inline const QString & getDescription()   const { return description;           }
+   inline const std::string & getDescription() const { return description; }
+   inline const std::string & getAnnontation() const { return annotation;  }
 
    inline bool isStarted() const {return time_started != 0 ; }                ///< Whether job is started.
    inline bool isReady()   const {return state & AFJOB::STATE_READY_MASK;   }///< Whether job is ready.
@@ -91,14 +92,12 @@ public:
    inline int getRunningTasksNumber() const /// Get job running tasks.
       {int n=0;for(int b=0;b<blocksnum;b++)n+=blocksdata[b]->getRunningTasksNumber();return n;}
 
-   const QString & getTasksOutputDir() const { return tasksoutputdir; }
+   const std::string & getTasksOutputDir() const { return tasksoutputdir; }
 
 /// Get block constant pointer.
    inline BlockData* getBlock( int n) const { if(n<(blocksnum))return blocksdata[n];else return NULL;}
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
-
-   inline const QString & getAnnontation() const { return annotation;}
 
 protected:
    BlockData  ** blocksdata;    ///< Blocks pointer.
@@ -110,8 +109,8 @@ protected:
 
    uint32_t state;      ///< Job state.
 
-   QString description; ///< Job description for statistics purposes only.
-   QString annotation;
+   std::string description; ///< Job description for statistics purposes only.
+   std::string annotation;
 
    QString username;    ///< Job user ( creator ) name.
    QString hostname;    ///< Computer name, where job was created.
@@ -151,7 +150,7 @@ protected:
    QRegExp need_os;
    QRegExp need_properties;
 
-   QString tasksoutputdir;       ///< Tasks output directory.
+   std::string tasksoutputdir;       ///< Tasks output directory.
 
 private:
    void initDefaultValues();

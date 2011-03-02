@@ -26,9 +26,9 @@ Job::~Job()
 void Job::setUserName(        const char * str     )  { username     = QString::fromUtf8(str);              }
 void Job::setHostName(        const char * str     )  { hostname     = QString::fromUtf8(str);              }
 void Job::setName(            const char * str     )  { name         = QString::fromUtf8(str);              }
-void Job::setDescription(     const char * str     )  { description  = QString::fromUtf8(str);              }
 void Job::setCmdPre(          const char * str     )  { cmd_pre      = QString::fromUtf8(str);              }
 void Job::setCmdPost(         const char * str     )  { cmd_post     = QString::fromUtf8(str);              }
+void Job::setDescription(     const char * str     )  { description  = str;                                 }
 void Job::setMaxRunningTasks(       int value   )  { maxrunningtasks = value;                               }
 void Job::setPriority(              int value   )  { priority        = value;                               }
 void Job::setWaitTime(              int value   )  { time_wait       = value;                               }

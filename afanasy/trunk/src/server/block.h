@@ -12,7 +12,7 @@ class Task;
 class Block
 {
 public:
-   Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, QStringList * log);
+   Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
    virtual ~Block();
 
    inline bool isInitialized() const { return initialized;}
@@ -34,7 +34,7 @@ public:
 
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    bool avoidHostsCheck( const QString & hostname) const;
-   const QStringList getErrorHostsList() const;
+   void getErrorHostsListString( std::string & str) const;
    virtual void errorHostsReset();
 
    bool canRun( RenderAf * render);
@@ -52,12 +52,12 @@ public:
    UserAf * user;
 
 protected:
-   virtual void log( const QString &message);
+   virtual void log( const std::string & message);
    bool errorHostsAppend( const QString & hostname);
 
 private:
    af::JobProgress * jobprogress;
-   QStringList * joblog;
+   std::list<std::string> * joblog;
 
    QStringList    errorHosts;       ///< Avoid error hosts list.
    QList<int>     errorHostsCounts; ///< Number of errors on error host.

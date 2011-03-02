@@ -26,31 +26,31 @@ void DBJob::addDBAttributes()
 {
    dbAddAttr( new DBAttrInt32(  DBAttr::_id,                 &id                  ));
 
-   dbAddAttr( new DBAttrUInt32( DBAttr::_state,              &state               ));
-   dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,           &priority            ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_started,       &time_started        ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_done,          &time_done           ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_wait,          &time_wait           ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,    &maxrunningtasks     ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_userlistorder,      &userlistorder       ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_state,              &state               ));
+   dbAddAttr( new DBAttrUInt8 (  DBAttr::_priority,           &priority            ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_started,       &time_started        ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_done,          &time_done           ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_wait,          &time_wait           ));
+   dbAddAttr( new DBAttrInt32 (  DBAttr::_maxrunningtasks,    &maxrunningtasks     ));
+   dbAddAttr( new DBAttrInt32 (  DBAttr::_userlistorder,      &userlistorder       ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_hostsmask,          &hostsmask           ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_hostsmask_exclude,  &hostsmask_exclude   ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_dependmask,         &dependmask          ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_dependmask_global,  &dependmask_global   ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_lifetime,           &lifetime            ));
-   dbAddAttr( new DBAttrQString( DBAttr::_annotation,         &annotation          ));
+   dbAddAttr( new DBAttrInt32 (  DBAttr::_lifetime,           &lifetime            ));
+   dbAddAttr( new DBAttrString(  DBAttr::_annotation,         &annotation          ));
    dbAddAttr( new DBAttrQString( DBAttr::_cmd_post,           &cmd_post            ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_need_os,            &need_os             ));
    dbAddAttr( new DBAttrQRegExp( DBAttr::_need_properties,    &need_properties     ));
-   dbAddAttr( new DBAttrQString( DBAttr::_description,        &description         ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,              &flags               ));
+   dbAddAttr( new DBAttrString(  DBAttr::_description,        &description         ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_flags,              &flags               ));
 
    dbAddAttr( new DBAttrQString( DBAttr::_name,               &name                ));
    dbAddAttr( new DBAttrQString( DBAttr::_hostname,           &hostname            ));
    dbAddAttr( new DBAttrQString( DBAttr::_username,           &username            ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &blocksnum           ));
+   dbAddAttr( new DBAttrInt32 (  DBAttr::_blocksnum,          &blocksnum           ));
    dbAddAttr( new DBAttrQString( DBAttr::_cmd_pre,            &cmd_pre             ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_creation,      &time_creation       ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_creation,      &time_creation       ));
 }
 
 DBJob::~DBJob()

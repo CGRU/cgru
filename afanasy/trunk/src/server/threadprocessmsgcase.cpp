@@ -207,10 +207,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       RenderContainerIt rendersIt( renders);
       RenderAf* render = rendersIt.getRender( msg->int32());
       if( render == NULL ) break;
-      QStringList *list = render->getLog();
-      if( list == NULL ) break;
-      msg_response = new MsgAf();
-      msg_response->setStringList( *list);
+      msg_response = new MsgAf;
+      msg_response->setStringList( render->getLog());
       break;
    }
    case af::Msg::TRenderServicesRequestId:
@@ -261,10 +259,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       UserContainerIt usersIt( users);
       UserAf* user = usersIt.getUser( msg->int32());
       if( user == NULL ) break;
-      QStringList *list = user->getLog();
-      if( list == NULL ) break;
       msg_response = new MsgAf();
-      msg_response->setStringList( *user->getLog());
+      msg_response->setStringList( user->getLog());
       break;
    }
    case af::Msg::TUserJobsOrderRequestId:
@@ -307,10 +303,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
       if( job == NULL ) break;
-      QStringList *list = job->getLog();
-      if( list == NULL ) break;
       msg_response = new MsgAf();
-      msg_response->setStringList( *job->getLog());
+      msg_response->setStringList( job->getLog());
       break;
    }
    case af::Msg::TJobErrorHostsRequestId:
@@ -320,9 +314,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
       if( job == NULL ) break;
-      QStringList list( job->getErrorHostsList());
       msg_response = new MsgAf();
-      msg_response->setStringList( list);
+      msg_response->setString( job->getErrorHostsListString());
       break;
    }
    case af::Msg::TJobProgressRequestId:
@@ -416,13 +409,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          stream << "Msg::TTaskLogRequest: No job with id=" << mctaskpos.getJobId();
          msg_response->setString( stream.str());
       }
-      QStringList *list = job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask());
+      const std::list<std::string> * list = &(job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       if( list == NULL ) break;
       msg_response = new MsgAf();
-      if( list->isEmpty())
+      if( list->size() == 0)
       {
-         QStringList nolog("Task log is empty.");
-         msg_response->setStringList( nolog);
+         std::list<std::string> list;
+         list.push_back("Task log is empty.");
+         msg_response->setStringList( list);
       }
       else
          msg_response->setStringList( *list);
@@ -436,15 +430,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
       if( job == NULL ) break;
-      QStringList list( job->getErrorHostsList( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       msg_response = new MsgAf();
-      msg_response->setStringList( list);
+      msg_response->setString( job->getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       break;
    }
    case af::Msg::TTaskOutputRequest:
    {
       MsgAf * msg_request_render = NULL;
-      QString filename;
+      std::string filename;
       af::MCTaskPos mctaskpos( msg);
       msg_response = new MsgAf();
 //printf("ThreadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", mctaskpos.getJobId(), mctaskpos.getNumBlock(), mctaskpos.getNumTask(), mctaskpos.getNumber());
@@ -474,7 +467,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       //
       //    Retrieving output from file
       //
-         QFile outFile( filename);
+         QFile outFile( filename.c_str());
          if( outFile.exists() == false )
          {
             msg_response->setString("No output exists.");
@@ -482,7 +475,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          else if( outFile.open( QIODevice::ReadOnly ) == false )
          {
             std::string str = "Can't open output file ";
-            str += filename.toUtf8().data();
+            str += filename;
             msg_response->setString( str);
          }
          else

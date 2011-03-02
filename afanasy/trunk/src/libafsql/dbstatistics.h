@@ -23,8 +23,8 @@ private:
    QString username;
    QString hostname;
    QString service;
-   QString description;
-   QString annotation;
+   std::string description;
+   std::string annotation;
    uint32_t time_started;
    uint32_t time_done;
    uint32_t tasksnum;

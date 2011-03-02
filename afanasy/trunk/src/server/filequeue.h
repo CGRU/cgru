@@ -17,5 +17,5 @@ protected:
    void processItem( AfQueueItem* item) const;
 
 private:
-   void renameNext( const QString & filename, int number, int maxnumber) const;
+   void renameNext( const std::string & filename, int number, int maxnumber) const;
 };

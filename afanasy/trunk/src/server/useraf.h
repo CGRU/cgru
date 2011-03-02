@@ -15,7 +15,7 @@ class UserAf : public afsql::DBUser
 {
 public:
 /// Create a new user.
-   UserAf( const QString &username, const QString &host);
+   UserAf( const QString &username, const std::string & host);
 
 /// Create user from database.
    UserAf( int uid);
@@ -39,7 +39,7 @@ public:
 
    void moveJobs( const af::MCGeneral & mcgeneral, int type);
 
-   QStringList* getLog() { return &log; }    ///< Get log.
+   inline const std::list<std::string> & getLog() { return log; }    ///< Get log.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
@@ -47,7 +47,7 @@ public:
 
    void generateJobsIds( af::MCGeneral & ids) const;
 
-   void appendLog( const QString &message);  ///< Append task log with a \c message .
+   void appendLog( const std::string & message);  ///< Append task log with a \c message .
 
 private:
    void construct();
@@ -59,5 +59,5 @@ private:
 
    JobsList jobs; ///< Jobs list.
 
-   QStringList log;                          ///< Log.
+   std::list<std::string> log;                          ///< Log.
 };

@@ -38,12 +38,12 @@ public:
 
    virtual const QString getInfo( bool full = false) const;
 
-   virtual void log( const QString &message);
+   virtual void log( const std::string & message);
    virtual void monitor( MonitorContainer * monitoring) const;
    virtual void updateDatabase() const;
 
 private:
-   void appendSysJobLog( const QString &message);
+   void appendSysJobLog( const std::string & message);
 
 private:
    SysCmd * syscmd;
@@ -55,7 +55,7 @@ private:
 class SysBlock : public Block
 {
 public:
-   SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, QStringList * log);
+   SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
    ~SysBlock();
 
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
@@ -70,7 +70,7 @@ public:
 
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
-   inline static void logCmdPost( const QString & message) { task->log( message);}
+   inline static void logCmdPost( const std::string & message) { task->log( message);}
 
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();
@@ -118,7 +118,7 @@ public:
    virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);
    virtual void dbDelete( QStringList  * queries) const;
 
-   static void appendLog( const QString message);
+   static void appendLog( const std::string & message);
 
 protected:
    virtual Block * newBlock( int numBlock);

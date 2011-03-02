@@ -11,8 +11,8 @@ LabelVersion::LabelVersion( QWidget *parent):
 {
    setMinimumHeight(16);
    setMaximumHeight(16);
-   text = QString("AFANASY BUILD %1      CGRU VERSION %2").arg(af::Environment::getAfanasyBuildVersion()).arg(af::Environment::getCGRUVersion());
-   setToolTip(QString("Afanasy build sources revision: %1\nCGRU version: %2").arg(af::Environment::getAfanasyBuildVersion()).arg(af::Environment::getCGRUVersion()));
+   text = QString("AFANASY BUILD %1      CGRU VERSION %2").arg(af::Environment::getAfanasyBuildVersion()).arg( QString::fromUtf8( af::Environment::getCGRUVersion().c_str()));
+   setToolTip(QString("Afanasy build sources revision: %1\nCGRU version: %2").arg(af::Environment::getAfanasyBuildVersion()).arg( QString::fromUtf8( af::Environment::getCGRUVersion().c_str())));
 /*
 // Try to load user's custom logo
    QString filename = af::Environment::getHomeAfanasy() + "/logo.png";

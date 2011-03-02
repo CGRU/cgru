@@ -95,7 +95,11 @@ int     Environment::talk_zombietime =                 AFTALK::ZOMBIETIME;
 
 int     Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
 int     Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
-QString Environment::tempdirectory =                   AFSERVER::TEMP_DIRECTORY;
+
+std::string Environment::tempdirectory =               AFSERVER::TEMP_DIRECTORY;
+std::string Environment::tasksstdoutdir = "";
+std::string Environment::renderslogsdir = "";
+std::string Environment::userslogsdir = "";
 
 int     Environment::user_logs_rotate =                AFUSER::LOGS_ROTATE;
 int     Environment::render_logs_rotate =              AFRENDER::LOGS_ROTATE;
@@ -108,10 +112,6 @@ QString Environment::db_password =                     AFDATABASE::PASSWORD;
 QString Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
 int     Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
 int     Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
-
-QString        Environment::tasksstdoutdir = "";
-QString        Environment::renderslogsdir = "";
-QString        Environment::userslogsdir = "";
 
 #endif
 
@@ -140,7 +140,7 @@ QStringList    Environment::cmdarguments_usagehelp;
 bool           Environment::help_mode = false;
 
 int            Environment::afanasy_build_version = 0;
-QString        Environment::cgru_version;
+std::string    Environment::cgru_version;
 
 bool Environment::getVars( const std::string & filename)
 {
@@ -473,8 +473,8 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    afanasy_build_version = CGRU_REVISION;
 #endif
    printf("Afanasy build revision = \"%d\"\n", afanasy_build_version);
-   cgru_version = QString::fromUtf8( getenv("CGRU_VERSION").c_str());
-   printf("CGRU version = \"%s\"\n", cgru_version.toUtf8().data());
+   cgru_version = getenv("CGRU_VERSION");
+   printf("CGRU version = \"%s\"\n", cgru_version.c_str());
 //###################################################
 
    load();
