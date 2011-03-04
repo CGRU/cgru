@@ -26,13 +26,13 @@ void TaskData::readwrite( Msg * msg)
 //printf("TaskData::readwrite:\n");
    static bool name_only = false;
    rw_bool(    name_only,  msg);
-   rw_QString( name,       msg);
+   rw_String(  name,       msg);
    if( name_only) return;
 
-   rw_QString( command,    msg);
-   rw_QString( files,      msg);
-   rw_QString( dependmask, msg);
-   rw_QString( customdata, msg);
+   rw_String( command,    msg);
+   rw_String( files,      msg);
+   rw_String( dependmask, msg);
+   rw_String( customdata, msg);
 }
 
 int TaskData::calcWeight() const
@@ -52,19 +52,19 @@ void TaskData::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "Name = '" << name.toUtf8().data() << "'\n";
-      stream << "Command = '" << command.toUtf8().data() << "'\n";
-      stream << "Files = '%s'" << files.toUtf8().data() << "'\n";
-      stream << "Dependences = '" << dependmask.toUtf8().data() << "'\n";
-      stream << "Custom Data = '" << customdata.toUtf8().data() << "'\n";
+      stream << "Name = '" << name << "'\n";
+      stream << "Command = '" << command << "'\n";
+      stream << "Files = '%s'" << files << "'\n";
+      if( dependmask.size()) stream << "Dependences = '" << dependmask << "'\n";
+      if( customdata.size()) stream << "Custom Data = '" << customdata << "'\n";
       stream << "Memory: " << calcWeight() << " bytes\n";
    }
    else
    {
-      stream << "N'" << name.toUtf8().data() << "' C'" << command.toUtf8().data() << "'";
-      if( false == files.isEmpty()     ) stream << " F'" << files.toUtf8().data() << "'";
-      if( false == dependmask.isEmpty()) stream << " D'" << dependmask.toUtf8().data() << "'";
-      if( false == customdata.isEmpty()) stream << " cd'" << customdata.toUtf8().data() << "'";
+      stream << "N'" << name << "' C'" << command << "'";
+      if( files.size()     ) stream << " F'" << files << "'";
+      if( dependmask.size()) stream << " D'" << dependmask << "'";
+      if( customdata.size()) stream << " cd'" << customdata << "'";
       stream << " " << calcWeight() << " bytes";
       stream << std::endl;
    }

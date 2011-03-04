@@ -1,6 +1,7 @@
 #include "mctaskoutput.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "../name_af.h"
 #include "../msg.h"
@@ -11,7 +12,7 @@
 
 using namespace af;
 
-MCTaskOutput::MCTaskOutput(   const QString & RenderName,
+MCTaskOutput::MCTaskOutput(   const std::string & RenderName,
                               int JobId, int BlockNum, int TaskNum,
                               int DataSize, char * Data):
    jobid(      JobId       ),
@@ -54,7 +55,7 @@ void MCTaskOutput::readwrite( Msg * msg)
    rw_int32_t( tasknum,      msg);
    rw_int32_t( datasize,     msg);
 
-   rw_QString( rendername,   msg);
+   rw_String ( rendername,   msg);
 
    if( msg->isReading()) allocateData();
    if( datasize > 0 ) rw_data( data, msg, datasize);

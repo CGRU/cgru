@@ -61,7 +61,7 @@ bool WndListenJob::caseMessage( af::Msg * msg)
       af::MCTaskOutput mclass( msg);
 //mclass.stdOut( true );
       if( mclass.getJobId() != jobid ) return false;
-      qTextEdit->append( mclass.getRenderName() + ": " + QString::fromUtf8( mclass.getData(), mclass.getDataSize()));
+      qTextEdit->append( afqt::stoq( mclass.getRenderName()) + ": " + afqt::dtoq( mclass.getData(), mclass.getDataSize()));
       break;
    }
    default:

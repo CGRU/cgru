@@ -16,13 +16,11 @@ CmdNumeric::~CmdNumeric(){}
 
 bool CmdNumeric::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString command = QString::fromUtf8(argv[0]);
-   int number1, number2; bool ok;
-   number1 = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
-   number2 = (QString::fromUtf8(argv[2])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string command = argv[0];
+   int number1 = atoi(argv[1]);
+   int number2 = atoi(argv[2]);
 
-   printf( "%s\n", af::fillNumbers( command, number1, number2).toUtf8().data());
+   std::cout << af::fillNumbers( command, number1, number2);
+   std::cout << std::endl;
    return true;
 }

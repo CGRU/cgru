@@ -9,16 +9,16 @@ Passwd::Passwd()
    init();
 }
 
-Passwd::Passwd( const QString & VisorKey, const QString & GodKey)
+Passwd::Passwd( const std::string & VisorKey, const std::string & GodKey)
 {
    init();
-   QString visor_str = VisorKey;
-   QString   god_str = GodKey;
-   if( visor_str.size() > key_len) visor_str = visor_str.left(key_len);
-   if(   god_str.size() > key_len)   god_str =   god_str.left(key_len);
+   std::string visor_str = VisorKey;
+   std::string   god_str = GodKey;
+   if( visor_str.size() > key_len) visor_str.resize(key_len);
+   if(   god_str.size() > key_len)   god_str.resize(key_len);
 
-   strncpy( (char*) visor, visor_str.toAscii().data(), visor_str.size());
-   strncpy( (char*)   god,   god_str.toAscii().data(),   god_str.size());
+   strncpy( (char*) visor, visor_str.c_str(), visor_str.size());
+   strncpy( (char*)   god,   god_str.c_str(),   god_str.size());
 //write(1,visor,key_len); write(1,"\n",1);
 //write(1,  god,key_len); write(1,"\n",1);
    char ch1, ch2;

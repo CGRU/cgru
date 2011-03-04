@@ -9,7 +9,7 @@ namespace afsql
 class DBUser: public DBItem, public af::User
 {
 public:
-   DBUser( const QString &username, const std::string & host);
+   DBUser( const std::string & username, const std::string & host);
    DBUser( int uid = 0);
    virtual ~DBUser();
 

@@ -19,17 +19,17 @@ Cmd::~Cmd(){}
 
 void Cmd::printInfo() const
 {
-   printf(" \t%s", cmd.toUtf8().data());
-   if( msgtype ) printf(" \t- Msg::%s", af::Msg::TNAMES[msgtype]);
-   printf(" \t%s", info.toUtf8().data());
-   if( recieving ) printf(" [%s]", af::Msg::TNAMES[msgouttype]);
-   printf("\n");
+   std::cout << " \t" << cmd;
+   if( msgtype ) std::cout << " \t- Msg::" << af::Msg::TNAMES[msgtype];
+   std::cout << " \t" << info;
+   if( recieving ) std::cout << " [" << af::Msg::TNAMES[msgouttype] << "]";
+   std::cout << std::endl;
 }
 
 void Cmd::printHelp() const
 {
    printInfo();
-   if( help.isEmpty() == false ) printf( "%s\n", help.toUtf8().data());
+   if( false == help.empty() ) std::cout << help << std::endl;
 }
 
 void Cmd::msgOut( af::Msg& msg) {}

@@ -55,7 +55,7 @@ Block::~Block()
 
 void Block::log( const std::string & message)
 {
-   joblog->push_back( af::time2str() + " : B[" + data->getName().toUtf8().data() + "]: %3" + message);
+   joblog->push_back( af::time2str() + " : B[" + data->getName() + "]: %3" + message);
 }
 
 void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
@@ -68,44 +68,62 @@ void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( errorHostsAppend( render->getName())) log( std::string(render->getName().toUtf8().data()) + " - AVOIDING HOST !");
+   if( errorHostsAppend( render->getName())) log( render->getName()+ " - AVOIDING HOST !");
    tasks[task]->errorHostsAppend( render->getName());
 }
 
-bool Block::errorHostsAppend( const QString & hostname)
+bool Block::errorHostsAppend( const std::string & hostname)
 {
-   int index = errorHosts.indexOf( hostname);
-   if( index == -1 )
-   {
-      errorHosts << hostname;
-      errorHostsCounts << 1;
-      errorHostsTime << time( NULL);
-   }
-   else
-   {
-      errorHostsCounts[index]++;
-      errorHostsTime[index] = time( NULL);
-      if( errorHostsCounts[index] >= getErrorsAvoidHost() ) return true;
-   }
+   std::list<std::string>::iterator hIt = errorHosts.begin();
+   std::list<int>::iterator cIt = errorHostsCounts.begin();
+   std::list<time_t>::iterator tIt = errorHostsTime.begin();
+   for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
+      if( *hIt == hostname )
+      {
+         (*cIt)++;
+         *tIt = time(NULL);
+         if( *cIt >= getErrorsTaskSameHost()) return true;
+         return false;
+      }
+
+   errorHosts.push_back( hostname);
+   errorHostsCounts.push_back( 1);
+   errorHostsTime.push_back( time(NULL));
    return false;
 }
 
-bool Block::avoidHostsCheck( const QString & hostname) const
+bool Block::avoidHostsCheck( const std::string & hostname) const
 {
-   if( getErrorsAvoidHost() < 1 ) return false;
-   int index = errorHosts.indexOf( hostname);
-   if( index == -1 ) return false;
-   if( errorHostsCounts[index] >= getErrorsAvoidHost() ) return true;
+   if( getErrorsTaskSameHost() < 1 ) return false;
+   std::list<std::string>::const_iterator hIt = errorHosts.begin();
+   std::list<int>::const_iterator cIt = errorHostsCounts.begin();
+   std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
+   for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
+      if( *hIt == hostname )
+      {
+         if( *cIt >= getErrorsTaskSameHost() )
+         {
+            return true;
+         }
+         else
+         {
+            return false;
+         }
+      }
+
    return false;
 }
 
 void Block::getErrorHostsListString( std::string & str) const
 {
-   str += std::string("Block['") + data->getName().toUtf8().data() + "'] error hosts:";
-   for( int h = 0; h < errorHosts.size(); h++)
+   str += std::string("Block['") + data->getName() + "'] error hosts:";
+   std::list<std::string>::const_iterator hIt = errorHosts.begin();
+   std::list<int>::const_iterator cIt = errorHostsCounts.begin();
+   std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
+   for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
    {
-      str += std::string(errorHosts[h].toUtf8().data()) + ": " + af::itos( errorHostsCounts[h]) + " at " + af::time2str( errorHostsTime[h]);
-      if((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
+      str += std::string( *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt));
+      if(( getErrorsAvoidHost() > 0 ) && ( *cIt >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
 //      list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
 //         .arg( af::time2Qstr( errorHostsTime[h]))
 //         .arg(((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
@@ -193,26 +211,35 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
    uint32_t old_block_state = data->getState();
 
    // forgive error hosts
-   if( getErrorsForgiveTime() > 0)
-      for( int i = 0; i < errorHosts.size(); )
-         if( currentTime - errorHostsTime[i] > getErrorsForgiveTime())
+   if(( false == errorHosts.empty() ) && ( getErrorsForgiveTime() > 0 ))
+   {
+      std::list<std::string>::iterator hIt = errorHosts.begin();
+      std::list<int>::iterator cIt = errorHostsCounts.begin();
+      std::list<time_t>::iterator tIt = errorHostsTime.begin();
+      while( hIt != errorHosts.end() )
+         if( currentTime - *tIt > getErrorsForgiveTime())
          {
-            log( std::string("Forgived error host \"") + errorHosts[i].toUtf8().data() + "\" since " + af::time2str(errorHostsTime[i]) + ".");
-            errorHosts.removeAt(i);
-            errorHostsCounts.removeAt(i);
-            errorHostsTime.removeAt(i);
-            block_changed = true;
-            blockProgress_changed = true;
+            log( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
+            hIt = errorHosts.erase( hIt);
+            cIt = errorHostsCounts.erase( cIt);
+            tIt = errorHostsTime.erase( tIt);
          }
-         else i++;
+         else
+         {
+            hIt++;
+            cIt++;
+            tIt++;
+         }
+    }
+
 
    // calculate number of error and avoid hosts for monitoring
    {
       int avoidhostsnum = 0;
       int errorhostsnum = errorHosts.size();
-      if( getErrorsAvoidHost() > 0)
-         for( int i = 0; i < errorhostsnum; i++)
-            if( errorHostsCounts[i] >= getErrorsAvoidHost())
+      if(( errorhostsnum != 0 ) && ( getErrorsAvoidHost() > 0 ))
+         for( std::list<int>::const_iterator cIt = errorHostsCounts.begin(); cIt != errorHostsCounts.end(); cIt++)
+            if( *cIt >= getErrorsAvoidHost())
                avoidhostsnum++;
 
       if(( data->getProgressErrorHostsNum() != errorhostsnum ) ||
@@ -259,7 +286,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
 
    uint32_t blockchanged_type = 0;
    uint32_t jobchanged = 0;
-   std::string userhost( std::string( mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data());
+   std::string userhost( mcgeneral.getUserName() + '@' + mcgeneral.getHostName());
    switch( type)
    {
    case af::Msg::TBlockErrorsAvoidHost:
@@ -319,7 +346,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setDependMask( mcgeneral.getString()));
       {
-         log( std::string("Depend mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_dependmask);
@@ -331,7 +358,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setTasksDependMask( mcgeneral.getString()));
       {
-         log( std::string("Tasks depend mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Tasks depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_tasksdependmask);
@@ -341,7 +368,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCommand:
    {
       data->setCommand( mcgeneral.getString());
-      log( std::string("Command changed to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      log( std::string("Command changed to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocks ) blockchanged_type = af::Msg::TBlocks;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_command);
       break;
@@ -349,7 +376,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockWorkingDir:
    {
       data->setWDir( mcgeneral.getString());
-      log( std::string("Working directory set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      log( std::string("Working directory set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_wdir);
       break;
@@ -357,7 +384,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockFiles:
    {
       data->setFiles( mcgeneral.getString());
-      log( std::string("Files set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      log( std::string("Files set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocks ) blockchanged_type = af::Msg::TBlocks;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_files);
       break;
@@ -365,7 +392,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockCmdPost:
    {
       data->setCmdPost( mcgeneral.getString());
-      log( std::string("Post Command set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      log( std::string("Post Command set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_cmd_post);
       break;
@@ -374,7 +401,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setHostsMask( mcgeneral.getString()))
       {
-         log( std::string("Hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_hostsmask);
@@ -385,7 +412,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setHostsMaskExclude( mcgeneral.getString()))
       {
-         log( std::string("Exclude hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Exclude hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_hostsmask_exclude);
@@ -404,7 +431,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockService:
    {
       data->setService( mcgeneral.getString());
-      log( std::string("Service set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      log( std::string("Service set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_service);
       break;
@@ -412,7 +439,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockParser:
    {
       data->setParser( mcgeneral.getString());
-      log( std::string("Parser set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      log( std::string("Parser set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_parser);
       break;
@@ -448,7 +475,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       if( data->setNeedProperties( mcgeneral.getString()))
       {
-         log( std::string("Need properties set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Need properties set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_need_properties);
@@ -563,7 +590,7 @@ int Block::logsWeight() const
 int Block::blackListWeight() const
 {
    int weight = sizeof(int) * errorHostsCounts.size();
-   for( int i = 0; i < errorHosts.size(); i++) weight += errorHosts[i].size()+1;
+   weight += af::weigh( errorHosts);
    for( int t = 0; t < data->getTasksNum(); t++) weight += tasks[t]->blackListWeight();
    return weight;
 }

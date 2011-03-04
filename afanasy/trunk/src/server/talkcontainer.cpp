@@ -40,30 +40,30 @@ MsgAf * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring)
 void TalkContainer::distributeData( MsgAf *msg)
 {
    af::MCTalkdistmessage msgdist( msg);
-   const QStringList *list = msgdist.getList();
+   const std::list<std::string> * list = msgdist.getList();
 
-   QString user, text;
+   std::string user, text;
    msgdist.getUser( user);
    msgdist.getText( text);
-   int users_quantity = list->size();
+//   int users_quantity = list->size();
 
    af::MCTalkmessage mcTalkmsg( user, text);
    MsgAf* message = new MsgAf( af::Msg::TTalkData, &mcTalkmsg);
 #ifdef _DEBUG
-printf("%s> %s\n", user.toUtf8().data(), text.toUtf8().data());
+printf("%s> %s\n", user.c_str(), text.c_str());
 #endif
    TalkContainerIt talksIt( this);
    for( af::Talk *talk = talksIt.Talk(); talk != NULL; talksIt.next(), talk = talksIt.Talk())
    {
-      for( int u = 0; u < users_quantity; u++)
+      for( std::list<std::string>::const_iterator it = list->begin(); it != list->end(); it++)
       {
 #ifdef _DEBUG
-printf("%s - %s", talk->getUserName().toUtf8().data(), (*list)[u].toUtf8().data());
+printf("%s - %s", talk->getUserName().c_str(), (*it).c_str());
 #endif
-         if( talk->getUserName() == (*list)[u])
+         if( talk->getUserName() == *it)
          {
 #ifdef _DEBUG
-printf(" - MATCH !\n", talk->getUserName().toUtf8().data());
+printf(" - MATCH !\n", talk->getUserName().c_str());
 #endif
             message->addAddress( talk);
          }

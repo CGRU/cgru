@@ -61,14 +61,14 @@ void Job::readwrite( Msg * msg)
 //printf("Job::readwrite: BEGIN\n");
    Node::readwrite( msg);
 
-   rw_QString ( username,           msg);
-   rw_QString ( hostname,           msg);
+   rw_String  ( username,           msg);
+   rw_String  ( hostname,           msg);
    rw_int32_t ( blocksnum,          msg);
    rw_uint32_t( flags,              msg);
    rw_uint32_t( state,              msg);
    rw_int32_t ( maxrunningtasks,    msg);
-   rw_QString ( cmd_pre,            msg);
-   rw_QString ( cmd_post,           msg);
+   rw_String  ( cmd_pre,            msg);
+   rw_String  ( cmd_post,           msg);
 
    rw_int32_t ( userlistorder,      msg);
    rw_uint32_t( time_creation,      msg);
@@ -77,15 +77,15 @@ void Job::readwrite( Msg * msg)
    rw_uint32_t( time_done,          msg);
    rw_int32_t ( lifetime,           msg);
 
-   rw_String (  description,        msg);
-   rw_String (  annotation,         msg);
+   rw_String  ( description,        msg);
+   rw_String  ( annotation,         msg);
 
-   rw_QRegExp( hostsmask,           msg);
-   rw_QRegExp( hostsmask_exclude,   msg);
-   rw_QRegExp( dependmask,          msg);
-   rw_QRegExp( dependmask_global,   msg);
-   rw_QRegExp( need_os,             msg);
-   rw_QRegExp( need_properties,     msg);
+   rw_QRegExp ( hostsmask,          msg);
+   rw_QRegExp ( hostsmask_exclude,  msg);
+   rw_QRegExp ( dependmask,         msg);
+   rw_QRegExp ( dependmask_global,  msg);
+   rw_QRegExp ( need_os,            msg);
+   rw_QRegExp ( need_properties,    msg);
 
    rw_blocks(  msg);
 //printf("Job::readwrite: END\n");
@@ -149,10 +149,10 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full ) stream << "Job name = ";
 
-   stream << "\"" << name.toUtf8().data() << "\"";
+   stream << "\"" << name << "\"";
    stream << "[" << id << "]: ";
-   stream << username.toUtf8().data();
-   if( false == hostname.isEmpty()) stream << "@" << hostname.toUtf8().data();
+   stream << username;
+   if( hostname.size()) stream << "@" << hostname;
    stream << "[" << userlistorder << "]";
 
    if( blocksnum == 0)
@@ -193,8 +193,7 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 
    if( lifetime > 0 ) stream << "\n Life Time " << lifetime << " seconds";
 
-   if( false == hostname.isEmpty())
-      stream << "\n Creation host = " << hostname.toUtf8().data();
+   if( hostname.size()) stream << "\n Creation host = " << hostname;
    stream << "\n Priority = " << int(priority);
    stream << "\n Maximum running tasks = " << maxrunningtasks;
    if( maxrunningtasks == -1 ) stream << " (no limit)";
@@ -213,10 +212,10 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Needed OS: \"" << need_os.pattern().toUtf8().data() << "\"";
    if( false == need_properties.isEmpty())
       stream << "\n Needed properties: \"" << need_properties.pattern().toUtf8().data() << "\"";
-   if( cmd_pre.isEmpty() == false )
-      stream << "\n Pre command:\n" << cmd_pre.toUtf8().data();
-   if( cmd_post.isEmpty() == false )
-      stream << "\n Post command:\n" << cmd_post.toUtf8().data();
+   if( cmd_pre.size() )
+      stream << "\n Pre command:\n" << cmd_pre;
+   if( cmd_post.size() )
+      stream << "\n Post command:\n" << cmd_post;
    if( description.size()) stream << "\n " << description;
 /*
    if( blocksdata != NULL)

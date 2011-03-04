@@ -85,7 +85,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       if( monitoring) AfContainerLock mLock( monitoring, AfContainer::WRITELOCK  );
 
       AFINFA("JobContainer::job_register: Checking job user '%s'\n", job->getUserName().toUtf8().data());
-      user = users->addUser( job->getUserName(), job->getHostName().toUtf8().data(), monitoring);
+      user = users->addUser( job->getUserName(), job->getHostName(), monitoring);
       if( user == NULL )
       {
          delete job;

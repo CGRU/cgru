@@ -17,7 +17,7 @@
 const int ItemJobTask::WidthInfo = 98;
 
 ItemJobTask::ItemJobTask( const af::BlockData *pBlock, int numtask):
-   Item( pBlock->genTaskName( numtask), ItemId),
+   Item( afqt::stoq( pBlock->genTaskName( numtask)), ItemId),
    blocknum( pBlock->getBlockNum()),
    tasknum( numtask),
    block( pBlock)
@@ -32,24 +32,24 @@ const QVariant ItemJobTask::getToolTip() const
 {
    QString tooltip = QString("Task #%1:").arg( tasknum);
    tooltip += QString("\nTimes started: %1 / %2 with errors").arg(taskprogress.starts_count).arg(taskprogress.errors_count);
-   if( false == taskprogress.hostname.isEmpty()) tooltip += QString("\nLast started host: %1").arg(taskprogress.hostname);
+   if( false == taskprogress.hostname.empty()) tooltip += QString("\nLast started host: %1").arg( afqt::stoq( taskprogress.hostname));
    if( taskprogress.time_start != 0)
    {
-      tooltip += QString("\nStarted at %1").arg( af::time2Qstr( taskprogress.time_start));
+      tooltip += QString("\nStarted at %1").arg( afqt::time2Qstr( taskprogress.time_start));
       if(((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
-         tooltip += QString("\nFinished at %1").arg( af::time2Qstr( taskprogress.time_done));
+         tooltip += QString("\nFinished at %1").arg( afqt::time2Qstr( taskprogress.time_done));
    }
-   if( block->hasFiles()) tooltip += "\nFiles:\n" + block->genFiles( tasknum);
+   if( block->hasFiles()) tooltip += "\nFiles:\n" + afqt::stoq( block->genFiles( tasknum));
    return tooltip;
 }
 
 const QString ItemJobTask::getSelectString() const
 {
-   return block->genTaskName( tasknum);
+   return afqt::stoq( block->genTaskName( tasknum));
 }
 
-const QString ItemJobTask::getWDir()      const { return block->getWDir();            }
-const QString ItemJobTask::genFiles()     const { return block->genFiles( tasknum);   }
+const std::string & ItemJobTask::getWDir()      const { return block->getWDir();            }
+const std::string ItemJobTask::genFiles()     const { return block->genFiles( tasknum);   }
 int           ItemJobTask::getFramesNum() const { return block->getFramePerTask();    }
 void          ItemJobTask::upProgress(    const af::TaskProgress &tp){ taskprogress = tp;}
 
@@ -74,7 +74,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    if( taskprogress.state & AFJOB::STATE_WARNING_MASK         ) rightString = "Warning! ";
    if( taskprogress.state & AFJOB::STATE_PARSERERROR_MASK     ) rightString = "Bad Output! ";
    if( taskprogress.state & AFJOB::STATE_PARSERBADRESULT_MASK ) rightString = "Bad Result! ";
-   if( false == taskprogress.hostname.isEmpty() ) rightString += taskprogress.hostname;
+   if( false == taskprogress.hostname.empty() ) rightString += afqt::stoq( taskprogress.hostname);
 
    if( taskprogress.state & (AFJOB::STATE_DONE_MASK | AFJOB::STATE_SKIPPED_MASK)) percent = 100;
    else

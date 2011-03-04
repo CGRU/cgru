@@ -36,7 +36,7 @@ public:
    bool set( int msgType, Af * afClass );
 
 /// To set zero (\c Msg::TNone ) message to data message. Return \c true on success.
-   bool setData( int size, char * msgData);
+   bool setData( int size, const char * msgData);
 
 /// To set zero (\c Msg::TNone ) message to QString message. Return \c true on success.
    bool setString( const std::string & qstring);

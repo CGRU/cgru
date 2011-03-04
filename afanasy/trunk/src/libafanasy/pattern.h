@@ -10,7 +10,7 @@ namespace af
 class Pattern
 {
 public:
-   Pattern( const QString & string);
+   Pattern( const std::string & patternName);
    ~Pattern();
 
    bool isValid() const;
@@ -18,29 +18,29 @@ public:
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
    void stdOut( bool full = false ) const;
 
-   bool setMask( const QString & string);
-   inline void setDescription( const QString & string) { description = string;}
+   bool setMask( const std::string & string);
+   inline void setDescription( const std::string & string) { description = string;}
 
-   inline const QString & getName() const { return name;}
-   inline const QString & getMask() const { return mask;}
-   inline const QString & getDescription() const { return description;}
+   inline const std::string & getName() const { return name;}
+   inline const std::string & getMask() const { return mask;}
+   inline const std::string & getDescription() const { return description;}
 
    inline void setHost( const Host & newhost) { host.copy( newhost );}
-   inline void remServices( const QStringList & names) { remservices = names;}
+   inline void remServices( const std::list<std::string> & names) { remservices = names;}
    void getHost( Host & newhost) const;
 
-   inline bool match( const QString & hostname) const { return regexp.exactMatch( hostname); }
+   inline bool match( const std::string & hostname) const { return regexp.exactMatch( QString::fromUtf8( hostname.c_str())); }
 
    Pattern * ptr_next;
 
 private:
-   QString name;
-   QString mask;
-   QString description;
+   std::string name;
+   std::string mask;
+   std::string description;
    Host host;
 
 private:
    QRegExp regexp;
-   QStringList remservices;
+   std::list<std::string> remservices;
 };
 }

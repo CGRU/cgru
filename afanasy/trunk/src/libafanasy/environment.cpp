@@ -1,5 +1,6 @@
 #include "environment.h"
 
+#include <algorithm>
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
@@ -26,7 +27,6 @@
 
 using namespace af;
 
-std::string Environment::timeformat =                  AFGENERAL::TIME_FORMAT;
 int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORITY;
 int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
@@ -36,7 +36,6 @@ int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOU
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
 int     Environment::job_log_linesmax =                AFJOB::JOB_LOG_LINESMAX;
 
-QString Environment::servername =                      AFADDR::SERVER_NAME;
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::clientport =                      AFADDR::CLIENT_PORT;
 
@@ -57,15 +56,15 @@ int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTE
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
 int     Environment::render_log_linesmax =             AFRENDER::LOG_LINESMAX;
-QString Environment::render_exec =                     AFRENDER::EXEC;
-QString Environment::render_cmd_reboot =               AFRENDER::CMD_REBOOT;
-QString Environment::render_cmd_shutdown =             AFRENDER::CMD_SHUTDOWN;
-QString Environment::render_networkif =                AFRENDER::NETWORK_IF;
-QString Environment::render_hddspace_path =            AFRENDER::HDDSPACE_PATH;
-QString Environment::render_iostat_device =            AFRENDER::IOSTAT_DEVICE;
+std::string Environment::render_exec =                     AFRENDER::EXEC;
+std::string Environment::render_cmd_reboot =               AFRENDER::CMD_REBOOT;
+std::string Environment::render_cmd_shutdown =             AFRENDER::CMD_SHUTDOWN;
+std::string Environment::render_networkif =                AFRENDER::NETWORK_IF;
+std::string Environment::render_hddspace_path =            AFRENDER::HDDSPACE_PATH;
+std::string Environment::render_iostat_device =            AFRENDER::IOSTAT_DEVICE;
 
-QString Environment::pswd_visor =                      AFUSER::PSWD_VISOR;
-QString Environment::pswd_god =                        AFUSER::PSWD_GOD;
+std::string Environment::pswd_visor =                      AFUSER::PSWD_VISOR;
+std::string Environment::pswd_god =                        AFUSER::PSWD_GOD;
 int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIME;
 int     Environment::errors_avoid_host =               AFUSER::ERRORS_AVOID_HOST;
 int     Environment::task_error_retries =              AFUSER::TASK_ERROR_RETRIES;
@@ -93,54 +92,56 @@ int     Environment::talk_zombietime =                 AFTALK::ZOMBIETIME;
 
 #ifndef WINNT
 
-int     Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
-int     Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
+int Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
+int Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
+int Environment::render_logs_rotate =              AFRENDER::LOGS_ROTATE;
+int Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
+int Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
+int Environment::user_logs_rotate =                AFUSER::LOGS_ROTATE;
 
+std::string Environment::db_type =                         AFDATABASE::DRIVER;
+std::string Environment::db_hostname =                     AFDATABASE::HOSTNAME;
+std::string Environment::db_databasename =                 AFDATABASE::DATABASENAME;
+std::string Environment::db_username =                     AFDATABASE::USERNAME;
+std::string Environment::db_password =                     AFDATABASE::PASSWORD;
+std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
 std::string Environment::tempdirectory =               AFSERVER::TEMP_DIRECTORY;
-std::string Environment::tasksstdoutdir = "";
-std::string Environment::renderslogsdir = "";
-std::string Environment::userslogsdir = "";
-
-int     Environment::user_logs_rotate =                AFUSER::LOGS_ROTATE;
-int     Environment::render_logs_rotate =              AFRENDER::LOGS_ROTATE;
-
-QString Environment::db_type =                         AFDATABASE::DRIVER;
-QString Environment::db_hostname =                     AFDATABASE::HOSTNAME;
-QString Environment::db_databasename =                 AFDATABASE::DATABASENAME;
-QString Environment::db_username =                     AFDATABASE::USERNAME;
-QString Environment::db_password =                     AFDATABASE::PASSWORD;
-QString Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
-int     Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
-int     Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
+std::string Environment::renderslogsdir;
+std::string Environment::tasksstdoutdir;
+std::string Environment::userslogsdir;
 
 #endif
 
-QString        Environment::hostsmask = "";
-QString        Environment::username = "";
-QString        Environment::computername = "";
-QString        Environment::hostname = "";
-QString        Environment::platform = "";
-std::string    Environment::afroot = "";
-std::string    Environment::home = "";
-std::string    Environment::home_afanasy = "";
-QString        Environment::render_resclasses = "";
-bool           Environment::verbose = false;
+std::string Environment::hostsmask;
+std::string Environment::render_resclasses;
+std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
+std::string Environment::servername =                 AFADDR::SERVER_NAME;
+std::string Environment::username;
+std::string Environment::computername;
+std::string Environment::hostname;
+std::string Environment::platform;
+std::string Environment::afroot;
+std::string Environment::home;
+std::string Environment::home_afanasy;
+std::string Environment::cgru_version;
+
+bool Environment::god_mode    = false;
+bool Environment::help_mode   = false;
+bool Environment::valid       = false;
+bool Environment::verbose     = false;
+bool Environment::visor_mode  = false;
+
 Address      * Environment::address = NULL;
 QHostAddress * Environment::qafserveraddress = NULL;
 Passwd       * Environment::passwd = NULL;
-bool           Environment::visor_mode = false;
-bool           Environment::god_mode = false;
-bool           Environment::valid = false;
-QStringList    Environment::previewcmds;
-QStringList    Environment::rendercmds;
 
-QStringList    Environment::cmdarguments;
-QStringList    Environment::cmdarguments_usagearg;
-QStringList    Environment::cmdarguments_usagehelp;
-bool           Environment::help_mode = false;
+std::list<std::string> Environment::cmdarguments;
+std::list<std::string> Environment::cmdarguments_usagearg;
+std::list<std::string> Environment::cmdarguments_usagehelp;
+std::list<std::string> Environment::previewcmds;
+std::list<std::string> Environment::rendercmds;
 
 int            Environment::afanasy_build_version = 0;
-std::string    Environment::cgru_version;
 
 bool Environment::getVars( const std::string & filename)
 {
@@ -282,6 +283,26 @@ bool Environment::getXMLElement( const QDomDocument & doc, const QString & name,
    return true;
 }
 
+bool Environment::getXMLElement( const QDomDocument & doc, const QString & name, std::list<std::string> & stringlist)
+{
+   QDomNodeList list = doc.elementsByTagName( name );
+   int size = list.size();
+   if( size < 1) return false;
+   for( int i = 0; i < size; i++)
+   {
+      QDomElement element = list.at(i).toElement();
+      if( element.isNull())
+      {
+         AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
+            element.lineNumber(), element.columnNumber(), name.toUtf8().data());
+         return false;
+      }
+      if( element.text().isEmpty()) stringlist.clear();
+      else stringlist.push_back( element.text().toUtf8().data());
+   }
+   return true;
+}
+
 bool Environment::getXMLAttribute( QDomElement & element, const QString & name, int & value)
 {
    if( element.isNull()) return false;
@@ -320,6 +341,18 @@ bool Environment::getVar( const QDomDocument & doc, QStringList & value, QString
 {
    if( getXMLElement( doc, name, value) == false) return false;
    PRINT("\t%s:\n\t\t%s\n", name.toUtf8().data(), value.join("\n\t\t").toUtf8().data());
+   return true;
+}
+
+bool Environment::getVar( const QDomDocument & doc, std::list<std::string> & value, QString name)
+{
+   if( getXMLElement( doc, name, value) == false) return false;
+   if( verbose )
+   {
+      printf("\t%s:\n", name.toUtf8().data());
+      for( std::list<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
+         printf("\t\t%s\n", (*it).c_str());
+   }
    return true;
 }
 
@@ -365,7 +398,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 // Init command arguments:
    initCommandArguments( argc, argv);
 
-//   QDir dir;
 //
 //############ afanasy root directory:
    afroot = getenv("AF_ROOT");
@@ -379,15 +411,9 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
       afroot = af::pathAbsolute( afroot);
       afroot = af::pathUp( afroot);
       afroot = af::pathUp( afroot);
-//      dir.setPath( exec.c_str());
-//      dir.makeAbsolute();
-//      dir.cdUp();
-//      dir.cdUp();
-//      afroot = dir.path().toUtf8().data();
       std::cout << "afroot=" << afroot;
       std::cout << std::endl;
    }
-//   if( dir.exists( afroot.c_str()) == false)
    if( af::pathIsFolder( afroot ) == false)
    {
       AFERRAR("AF_ROOT directory = '%s' does not exists.\n", afroot.c_str());
@@ -428,23 +454,25 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
 //
 //############ user name:
-   username = QString::fromUtf8( getenv("AF_USERNAME").c_str());
-   if( username.isEmpty()) username = QString::fromUtf8( getenv("USER").c_str());
-   if( username.isEmpty()) username = QString::fromUtf8( getenv("USERNAME").c_str());
-   if( username.isEmpty())
+   username = getenv("AF_USERNAME");
+   if( username.size() == 0) username = getenv("USER");
+   if( username.size() == 0) username = getenv("USERNAME");
+   if( username.size() == 0)
    {
       AFERROR("Can't get user name.\n");
       return;
    }
-   username = username.toLower();
+   // Convert to lowercase:
+   std::transform( username.begin(), username.end(), username.begin(), ::tolower);
    // cut DOMAIN/
-   int dpos = username.lastIndexOf('/');
-   if( dpos == -1) dpos = username.lastIndexOf('\\');
-   if( dpos != -1) username = username.mid( dpos + 1);
-   PRINT("Afanasy user name = '%s'\n", username.toUtf8().data());
+   size_t dpos = username.rfind('/');
+   if( dpos == std::string::npos) dpos = username.rfind('\\');
+   if( dpos != std::string::npos) username = username.substr( dpos + 1);
+   PRINT("Afanasy user name = '%s'\n", username.c_str());
 //
 //############ local host name:
-   hostname = QString::fromUtf8( getenv("AF_HOSTNAME").c_str()).toLower();
+   hostname = getenv("AF_HOSTNAME");
+   std::transform( username.begin(), username.end(), username.begin(), ::tolower);
 
 //
 //############ Platform: #############################
@@ -480,7 +508,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    load();
    valid = init( flags & SolveServerAddress);
 
-   PRINT("Render host name = '%s'\n", hostname.toUtf8().data());
+   PRINT("Render host name = '%s'\n", hostname.c_str());
 }
 
 Environment::~Environment()
@@ -537,12 +565,12 @@ bool Environment::init( bool solveServerAddress)
 //############ Afansy server QHostAddress:
    if( solveServerAddress)
    {
-      static QString serveraddrnum_arg("-srvaddrnum");
-      addUsage( QString("%1 [number]").arg(serveraddrnum_arg), "Use specified server address number.");
-      QHostInfo qhostinfo = QHostInfo::fromName( servername);
+      static std::string serveraddrnum_arg("-srvaddrnum");
+      addUsage( serveraddrnum_arg + " [number]", "Use specified server address number.");
+      QHostInfo qhostinfo = QHostInfo::fromName( QString::fromUtf8( servername.c_str()));
       QList<QHostAddress> adresses = qhostinfo.addresses();
       // Try direct IP literals, if no addresses solved
-      if( adresses.size() < 1 ) adresses << QHostAddress ( servername );
+      if( adresses.size() < 1 ) adresses << QHostAddress ( QString::fromUtf8( servername.c_str()));
       if( adresses.size() > 1 )
       {
          printf( "Solved several server addresses:\n");
@@ -552,30 +580,22 @@ bool Environment::init( bool solveServerAddress)
       // Use the first IP address, if no address number not provided
       int serveraddrnum = -1;
 
-      QString serveraddrnum_str;
+      std::string serveraddrnum_str;
       if( getArgument( serveraddrnum_arg, serveraddrnum_str))
       {
-         if( false == serveraddrnum_str.isEmpty())
+         if( false == serveraddrnum_str.empty())
          {
-            bool ok;
-            int number = serveraddrnum_str.toInt( &ok);
-            if( ok )
+            int number = atoi(serveraddrnum_str.c_str());
+            if( number >= adresses.size())
             {
-               if( number >= adresses.size())
-               {
-                  AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
-                  number = adresses.size() - 1;
-               }
-               serveraddrnum = number;
+               AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
+               number = adresses.size() - 1;
             }
-            else
-            {
-               AFERRAR("Invaid server address number: '%s'\n", serveraddrnum_str.toUtf8().data());
-            }
+            serveraddrnum = number;
          }
          else
          {
-            AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.toUtf8().data());
+            AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.c_str());
          }
       }
 
@@ -583,7 +603,7 @@ bool Environment::init( bool solveServerAddress)
       {
          serveraddrnum = 0;
          if( adresses.size() > 1 )
-            printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.toUtf8().data());
+            printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.c_str());
       }
 
       if( qafserveraddress != NULL ) delete qafserveraddress;
@@ -593,8 +613,8 @@ bool Environment::init( bool solveServerAddress)
 
 //
 //############ Local host address:
-   computername = QHostInfo::localHostName().toLower();
-   PRINT("Local computer name = '%s', adress = ", computername.toUtf8().data());
+   computername = QHostInfo::localHostName().toLower().toUtf8().data();
+   PRINT("Local computer name = '%s', adress = ", computername.c_str());
    if (address != NULL) delete address;
    address = new Address( clientport);
    if( verbose ) address->stdOut();
@@ -604,7 +624,7 @@ bool Environment::init( bool solveServerAddress)
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
    userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
 #endif
-   if( hostname.isEmpty()) hostname = computername;
+   if( hostname.size() == 0 ) hostname = computername;
 
 //
 //############ VISOR and GOD passwords:
@@ -620,21 +640,21 @@ void Environment::initCommandArguments( int argc, char** argv)
 
    for( int i = 0; i < argc; i++)
    {
-      cmdarguments << argv[i];
+      cmdarguments.push_back(argv[i]);
 
       if( help_mode ) continue;
 
-      if(( cmdarguments.last() == "-"     ) ||
-         ( cmdarguments.last() == "--"    ) ||
-         ( cmdarguments.last() == "-?"    ) ||
-         ( cmdarguments.last() == "?"     ) ||
-         ( cmdarguments.last() == "/?"    ) ||
-         ( cmdarguments.last() == "h"     ) ||
-         ( cmdarguments.last() == "-h"    ) ||
-         ( cmdarguments.last() == "--h"   ) ||
-         ( cmdarguments.last() == "help"  ) ||
-         ( cmdarguments.last() == "-help" ) ||
-         ( cmdarguments.last() == "--help")
+      if(( cmdarguments.back() == "-"     ) ||
+         ( cmdarguments.back() == "--"    ) ||
+         ( cmdarguments.back() == "-?"    ) ||
+         ( cmdarguments.back() == "?"     ) ||
+         ( cmdarguments.back() == "/?"    ) ||
+         ( cmdarguments.back() == "h"     ) ||
+         ( cmdarguments.back() == "-h"    ) ||
+         ( cmdarguments.back() == "--h"   ) ||
+         ( cmdarguments.back() == "help"  ) ||
+         ( cmdarguments.back() == "-help" ) ||
+         ( cmdarguments.back() == "--help")
          )
       {
          help_mode = true;
@@ -643,22 +663,23 @@ void Environment::initCommandArguments( int argc, char** argv)
    }
 }
 
-bool Environment::hasArgument( const QString & argument)
+bool Environment::hasArgument( const std::string & argument)
 {
-   for( int i = 0; i < cmdarguments.size(); i++)
-      if( cmdarguments[i] == argument )
+   for( std::list<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
+      if( *it == argument )
          return true;
    return false;
 }
 
-bool Environment::getArgument( const QString & argument, QString & value)
+bool Environment::getArgument( const std::string & argument, std::string & value)
 {
-   for( int i = 0; i < cmdarguments.size(); i++)
+   for( std::list<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
    {
-      if( cmdarguments[i] == argument )
+      if( *it == argument )
       {
          // check for next argument:
-         if( ++i < cmdarguments.size()) value = cmdarguments[i];
+         it++;
+         if( it != cmdarguments.end()) value = *it;
          return true;
       }
    }
@@ -668,13 +689,16 @@ bool Environment::getArgument( const QString & argument, QString & value)
 void Environment::printUsage()
 {
    if( false == help_mode ) return;
-   if( cmdarguments_usagearg.size() < 1 ) return;
-   printf("USAGE: %s [arguments]\n", cmdarguments.first().toUtf8().data());
-   for( int i = 0; i < cmdarguments_usagearg.size(); i++)
+   if( cmdarguments_usagearg.empty() ) return;
+   printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
+//   for( int i = 0; i < cmdarguments_usagearg.size(); i++)
+   std::list<std::string>::const_iterator aIt = cmdarguments.begin();
+   std::list<std::string>::const_iterator hIt = cmdarguments.begin();
+   for( ; aIt != cmdarguments.end(); aIt++, hIt++)
    {
       printf("   %s:\n      %s\n",
-             cmdarguments_usagearg[i].toUtf8().data(),
-             cmdarguments_usagehelp[i].toUtf8().data()
+             (*aIt).c_str(),
+             (*hIt).c_str()
              );
    }
 }

@@ -9,7 +9,7 @@
 class PyRes: public af::PyClass
 {
 public:
-   PyRes( const QString & className, af::HostRes * hostRes);
+   PyRes( const std::string & className, af::HostRes * hostRes);
    ~PyRes();
 
    inline bool isInitialized() const { return initialized;}
@@ -17,7 +17,7 @@ public:
    void update();
 
 private:
-   QString name;
+   std::string name;
    af::HostRes * hres;
    int index;
 

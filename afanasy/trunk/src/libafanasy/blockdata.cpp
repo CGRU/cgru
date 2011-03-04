@@ -87,21 +87,21 @@ bool BlockData::isValid() const
 {
    if( tasksnum == 0)
    {
-      AFERRAR("BlockData::isValid: #%d block[%s] zero tasks number.\n", blocknum, name.toUtf8().data());
+      AFERRAR("BlockData::isValid: #%d block[%s] zero tasks number.\n", blocknum, name.c_str());
       return false;
    }
    if( isNotNumeric())
    {
       if( tasksdata == NULL)
       {
-         AFERRAR("BlockData::isValid: #%d block[%s] tasks data is null on not numeric block.\n", blocknum, name.toUtf8().data());
+         AFERRAR("BlockData::isValid: #%d block[%s] tasks data is null on not numeric block.\n", blocknum, name.c_str());
          return false;
       }
       for( int t = 0; t < tasksnum; t++)
       {
          if(tasksdata[t] == NULL)
          {
-            AFERRAR("BlockData::isValid: #%d block[%s] task[%d] data is null on not numeric block.\n", blocknum, name.toUtf8().data(), t);
+            AFERRAR("BlockData::isValid: #%d block[%s] task[%d] data is null on not numeric block.\n", blocknum, name.c_str(), t);
             return false;
          }
       }
@@ -136,16 +136,16 @@ void BlockData::readwrite( Msg * msg)
 
    case Msg::TBlocksProperties:
       rw_int32_t ( parsercoeff,           msg);
-      rw_QString ( tasksname,             msg);
-      rw_QString ( parser,                msg);
-      rw_QString ( wdir,                  msg);
-      rw_QString ( environment,           msg);
-      rw_QString ( command,               msg);
-      rw_QString ( files,                 msg);
-      rw_QString ( cmd_pre,               msg);
-      rw_QString ( cmd_post,              msg);
-      rw_QString ( multihost_service,     msg);
-      rw_QString ( customdata,            msg);
+      rw_String  ( tasksname,             msg);
+      rw_String  ( parser,                msg);
+      rw_String  ( wdir,                  msg);
+      rw_String  ( environment,           msg);
+      rw_String  ( command,               msg);
+      rw_String  ( files,                 msg);
+      rw_String  ( cmd_pre,               msg);
+      rw_String  ( cmd_post,              msg);
+      rw_String  ( multihost_service,     msg);
+      rw_String  ( customdata,            msg);
 
    case Msg::TJobsList:
       rw_uint32_t( flags,                 msg);
@@ -167,8 +167,8 @@ void BlockData::readwrite( Msg * msg)
       rw_QRegExp ( hostsmask,             msg);
       rw_QRegExp ( hostsmask_exclude,     msg);
       rw_QRegExp ( need_properties,       msg);
-      rw_QString ( name,                  msg);
-      rw_QString ( service,               msg);
+      rw_String  ( name,                  msg);
+      rw_String  ( service,               msg);
       rw_int32_t ( tasksnum,              msg);
       rw_int8_t  ( errors_retries,        msg);
       rw_int8_t  ( errors_avoidhost,      msg);
@@ -308,30 +308,30 @@ bool BlockData::setMultiHostMax( int value)
    return true;
 }
 
-bool BlockData::checkDependMask( const QString & str)
+bool BlockData::checkDependMask( const std::string & str)
 {
    if( dependmask.isEmpty()) return false;
-   return dependmask.exactMatch( str);
+   return dependmask.exactMatch( QString::fromUtf8(str.c_str()));
 }
-bool BlockData::checkHostsMask( const QString & str)
+bool BlockData::checkHostsMask( const std::string & str)
 {
    if( hostsmask.isEmpty()) return true;
-   return hostsmask.exactMatch( str );
+   return hostsmask.exactMatch( QString::fromUtf8(str.c_str()));
 }
-bool BlockData::checkHostsMaskExclude( const QString & str)
+bool BlockData::checkHostsMaskExclude( const std::string & str)
 {
    if( hostsmask_exclude.isEmpty()) return false;
-   return hostsmask_exclude.exactMatch( str);
+   return hostsmask_exclude.exactMatch( QString::fromUtf8(str.c_str()));
 }
-bool BlockData::checkTasksDependMask( const QString & str)
+bool BlockData::checkTasksDependMask( const std::string & str)
 {
    if( tasksdependmask.isEmpty()) return false;
-   return tasksdependmask.exactMatch( str);
+   return tasksdependmask.exactMatch( QString::fromUtf8(str.c_str()));
 }
-bool BlockData::checkNeedProperties( const QString & str)
+bool BlockData::checkNeedProperties( const std::string & str)
 {
    if( need_properties.isEmpty()) return true;
-   return str.contains( need_properties);
+   return QString::fromUtf8(str.c_str()).contains( need_properties);
 }
 
 bool BlockData::setNumeric( int start, int end, int perTask, int increment)
@@ -385,9 +385,9 @@ void BlockData::setFramesPerTask( int perTask)
    frame_pertask = perTask;
 }
 
-const QString BlockData::genCommand( int num, int *frame_start, int *frame_finish) const
+const std::string BlockData::genCommand( int num, int *frame_start, int *frame_finish) const
 {
-   QString str;
+   std::string str;
    if( num > tasksnum)
    {
       AFERROR("BlockData::getCmd: n > tasksnum.\n");
@@ -408,15 +408,15 @@ const QString BlockData::genCommand( int num, int *frame_start, int *frame_finis
    }
    else
    {
-      if( command.isEmpty()) return tasksdata[num]->getCommand();
-      str = command.arg( tasksdata[num]->getCommand());
+      if( command.size() == 0 ) return tasksdata[num]->getCommand();
+      str = QString::fromUtf8( command.c_str()).arg( QString::fromUtf8(tasksdata[num]->getCommand().c_str())).toUtf8().data();
    }
    return str;
 }
 
-const QString BlockData::genFiles( int num) const
+const std::string BlockData::genFiles( int num) const
 {
-   QString str;
+   std::string str;
    if( num >= tasksnum)
    {
       AFERROR("BlockData::genCmdView: n >= tasksnum.\n");
@@ -424,7 +424,7 @@ const QString BlockData::genFiles( int num) const
    }
    if( isNumeric())
    {
-      if( false == files.isEmpty())
+      if( files.size())
       {
          int start, end;
          if( genNumbers( start, end, num)) str = fillNumbers( files, start, end);
@@ -432,8 +432,8 @@ const QString BlockData::genFiles( int num) const
    }
    else
    {
-      if( files.isEmpty()) return tasksdata[num]->getFiles();
-      str = files.arg( tasksdata[num]->getFiles());
+      if( files.size() == 0 ) return tasksdata[num]->getFiles();
+      str = QString::fromUtf8( files.c_str()).arg( QString::fromUtf8(tasksdata[num]->getFiles().c_str())).toUtf8().data();
    }
    return str;
 }
@@ -463,7 +463,7 @@ TaskExec *BlockData::genTask( int num) const
    int start = -1;
    int end = -1;
 
-   QString command = genCommand( num, &start, &end);
+   std::string command = genCommand( num, &start, &end);
 
    return new TaskExec(
          genTaskName( num),
@@ -488,29 +488,29 @@ TaskExec *BlockData::genTask( int num) const
       );
 }
 
-const QString BlockData::genTaskName( int num) const
+const std::string BlockData::genTaskName( int num) const
 {
    if( num > tasksnum)
    {
       AFERROR("BlockData::genTaskName: n > tasksnum.\n");
-      return QString("> tasksnum");
+      return std::string ("> tasksnum");
    }
 
    if( isNumeric())
    {
       int start, end;
       genNumbers( start, end, num);
-      if( tasksname.isEmpty() == false) return fillNumbers( tasksname, start, end);
+      if( tasksname.size()) return fillNumbers( tasksname, start, end);
 
       if( frame_pertask == 1 )
-         return QString::number( start);
+         return itos( start);
       else
-         return QString::number( start) + "-" + QString::number( end);
+         return itos( start) + "-" + itos( end);
    }
 
-   if( tasksname.isEmpty()) return tasksdata[num]->getName();
+   if( tasksname.size() == 0 ) return tasksdata[num]->getName();
 
-   return tasksname.arg( tasksdata[num]->getName());
+   return QString::fromUtf8( tasksname.c_str()).arg( QString::fromUtf8(tasksdata[num]->getName().c_str())).toUtf8().data();
 }
 
 void BlockData::setStateDependent( bool depend)
@@ -554,11 +554,11 @@ int BlockData::calcWeight() const
 
 void BlockData::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "Block[" << name.toUtf8().data() << "]";
-   if( false == service.isEmpty())
+   stream << "Block[" << name << "]";
+   if( service.size())
    {
-      stream << " (" << service.toUtf8().data();
-      if( false == parser.isEmpty()) stream << "-" << parser.toUtf8().data() << "[" << parsercoeff << "]";
+      stream << " (" << service;
+      if( parser.size()) stream << "-" << parser << "[" << parsercoeff << "]";
       stream << ")";
    }
    stream << " " << tasksnum << " tasks.";
@@ -602,21 +602,21 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    }
    printf("Memory: %d bytes\n", calcWeight());
    */
-   if( !           command.isEmpty()) stream << "\n Command            = \"" << command.toUtf8().data()                    << "\"";
-   if( !              wdir.isEmpty()) stream << "\n Working Directory  = \"" << wdir.toUtf8().data()                       << "\"";
-   if( !             files.isEmpty()) stream << "\n Files              = \"" << files.toUtf8().data()                      << "\"";
-   if( !        dependmask.isEmpty()) stream << "\n Depend Mask        = \"" << dependmask.pattern().toUtf8().data()       << "\"";
-   if( !   tasksdependmask.isEmpty()) stream << "\n Tasks Depend Mask  = \"" << tasksdependmask.pattern().toUtf8().data()  << "\"";
-   if( !         hostsmask.isEmpty()) stream << "\n Hosts Mask         = \"" << hostsmask.pattern().toUtf8().data()        << "\"";
-   if( ! hostsmask_exclude.isEmpty()) stream << "\n Hosts Mask Exclude = \"" << hostsmask_exclude.pattern().toUtf8().data()<< "\"";
-   if( !       environment.isEmpty()) stream << "\n Environment        = \"" << environment.toUtf8().data()                << "\"";
-   if( !           cmd_pre.isEmpty()) stream << "\n Pre Command        = \"" << cmd_pre.toUtf8().data()                    << "\"";
-   if( !          cmd_post.isEmpty()) stream << "\n Post Command       = \"" << cmd_post.toUtf8().data()                   << "\"";
-   if( !        customdata.isEmpty()) stream << "\n Custom Data        = \"" << customdata.toUtf8().data()                 << "\"";
-   if( !   need_properties.isEmpty()) stream << "\n Need Properties    = \"" << need_properties.pattern().toUtf8().data()  << "\"";
-   if(     need_power               ) stream << "\n Need Power         =  "  << need_power;
-   if(     need_memory              ) stream << "\n Need Memory        =  "  << need_memory;
-   if(     need_hdd                 ) stream << "\n Need HDD           =  "  << need_hdd;
+   if(           command.size()) stream << "\n Command            = \"" << command                                    << "\"";
+   if(              wdir.size()) stream << "\n Working Directory  = \"" << wdir                                       << "\"";
+   if(             files.size()) stream << "\n Files              = \"" << files                                      << "\"";
+   if(        !dependmask.isEmpty()) stream << "\n Depend Mask        = \"" << dependmask.pattern().toUtf8().data()       << "\"";
+   if(   !tasksdependmask.isEmpty()) stream << "\n Tasks Depend Mask  = \"" << tasksdependmask.pattern().toUtf8().data()  << "\"";
+   if(         !hostsmask.isEmpty()) stream << "\n Hosts Mask         = \"" << hostsmask.pattern().toUtf8().data()        << "\"";
+   if( !hostsmask_exclude.isEmpty()) stream << "\n Hosts Mask Exclude = \"" << hostsmask_exclude.pattern().toUtf8().data()<< "\"";
+   if(       environment.size()) stream << "\n Environment        = \"" << environment                                << "\"";
+   if(           cmd_pre.size()) stream << "\n Pre Command        = \"" << cmd_pre                                    << "\"";
+   if(          cmd_post.size()) stream << "\n Post Command       = \"" << cmd_post                                   << "\"";
+   if(        customdata.size()) stream << "\n Custom Data        = \"" << customdata                                 << "\"";
+   if(   !need_properties.isEmpty()) stream << "\n Need Properties    = \"" << need_properties.pattern().toUtf8().data()  << "\"";
+   if(     need_power          ) stream << "\n Need Power         =  "  << need_power;
+   if(     need_memory         ) stream << "\n Need Memory        =  "  << need_memory;
+   if(     need_hdd            ) stream << "\n Need HDD           =  "  << need_hdd;
 
    if( isNumeric())
       stream << "\n numeric: start = " << frame_first << ", end = " << frame_last << ", perTask = " << frame_pertask << ", increment = " << frame_inc << ".";
@@ -630,9 +630,9 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
          stream << std::endl;
          stream << "#" << t << ":";
          TaskExec * task = genTask(t);
-         stream << " [" << task->getName().toUtf8().data() << "] ";
-         stream << "'" << task->getCommand().toUtf8().data() << "'";
-         if( task->hasFiles()) stream << " (" << task->getFiles().toUtf8().data() << ")";
+         stream << " [" << task->getName() << "] ";
+         stream << "'" << task->getCommand() << "'";
+         if( task->hasFiles()) stream << " (" << task->getFiles() << ")";
          delete task;
       }
    }

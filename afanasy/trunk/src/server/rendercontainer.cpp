@@ -74,7 +74,7 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
    // Adding offline render from database:
    if( addClient( newRender))
    {
-      printf("Render offline registered - \"%s\".\n", newRender->getName().toUtf8().data());
+      std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
       newRender->getFarmHost();
    }
    else delete newRender;

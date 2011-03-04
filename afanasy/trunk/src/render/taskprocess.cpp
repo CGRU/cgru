@@ -45,8 +45,8 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    connect( &timer, SIGNAL( timeout() ), this, SLOT( sendTaskSate() ));
    timer.setInterval( af::Environment::getRenderUpdateTaskPeriod() * 1000 * (runningtasks+1));
 
-   QString command = service.getCommand();
-   QString wdir = service.getWDir();
+   QString command = afqt::stoq( service.getCommand());
+   QString wdir    = afqt::stoq( service.getWDir());
 
    parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
 

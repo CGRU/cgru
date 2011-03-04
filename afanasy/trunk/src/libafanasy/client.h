@@ -31,7 +31,7 @@ public:
    inline uint32_t getTimeUpdate()           const { return time_update;   }  ///< Get client last update time.
    inline uint32_t getRevision()             const { return revision;      }  ///< Get client revison.
    inline const std::string & getVersion()   const { return version;       }  ///< Get client version.
-   inline const QString& getUserName()       const { return username;      }  ///< Get client user name.
+   inline const std::string & getUserName()  const { return username;      }  ///< Get client user name.
 
    inline const Address* getAddress() const { return address;} ///< Get client address.
    inline bool addrEqual( const Client *other ) const          ///< Compare address with other.
@@ -50,7 +50,7 @@ protected:
    uint32_t    time_update;   ///< Client last update time.
    int32_t     revision;      ///< Client build revision.
    std::string version;       ///< Client version.
-   QString     username;      ///< Client user name.
+   std::string username;      ///< Client user name.
    Address    *address;       ///< Client computer address.
 private:
 };

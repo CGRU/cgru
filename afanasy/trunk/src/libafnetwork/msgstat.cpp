@@ -1,5 +1,6 @@
 #include "msgstat.h"
 
+#include <string.h>
 #include <time.h>
 
 using namespace com;

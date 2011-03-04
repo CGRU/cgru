@@ -20,13 +20,13 @@ MsgClassUserHost::~MsgClassUserHost(){};
 
 void MsgClassUserHost::readwrite( Msg * msg)
 {
-   rw_QString( username, msg);
-   rw_QString( hostname, msg);
+   rw_String( username, msg);
+   rw_String( hostname, msg);
 }
 
 void MsgClassUserHost::stdOut( bool full) const
 {
    if( full )
-      printf("User = \"%s\", Host = \"%s\"\n", username.toUtf8().data(), hostname.toUtf8().data());
-   else                        printf("%s@%s", username.toUtf8().data(), hostname.toUtf8().data());
+      printf("User = \"%s\", Host = \"%s\"\n", username.c_str(), hostname.c_str());
+   else                        printf("%s@%s", username.c_str(), hostname.c_str());
 }

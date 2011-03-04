@@ -157,7 +157,7 @@ bool Msg::set( int msgType, int msgInt)
    return true;
 }
 
-bool Msg::setData( int size, char * msgData)
+bool Msg::setData( int size, const char * msgData)
 {
    if(checkZero( true) == false ) return false;
 
@@ -172,7 +172,7 @@ bool Msg::setData( int size, char * msgData)
       return false;
    }
    writing = true;
-   rw_data( msgData, this, size);
+   w_data( msgData, this, size);
 
    mint32 = size;
    rw_header( true);

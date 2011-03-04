@@ -50,8 +50,8 @@ bool CmdFarmCheck::processArguments( int argc, char** argv, af::Msg &msg)
 
    for( int i = 0; i < argc; i++)
    {
-      QString hostname( argv[i]);
-      printf("%s: ", hostname.toUtf8().data());
+      std::string hostname( argv[i]);
+      std::cout << hostname << ": ";
       check( hostname);
    }
    if( argc ) return true;
@@ -66,24 +66,25 @@ bool CmdFarmCheck::processArguments( int argc, char** argv, af::Msg &msg)
          AFERRPE("Read input:");
          break;
       }
-      QString hostname = QString::fromUtf8( buffer, size-1);
+      std::string hostname( buffer, size-1);
       check( hostname);
    }
    return true;
 }
-bool CmdFarmCheck::check( const QString & hostname)
+bool CmdFarmCheck::check( const std::string & hostname)
 {
-   if( hostname.isEmpty() ) return false;
-   QString name, description;
+   if( hostname.empty() ) return false;
+   std::string name, description;
    if( af::farm()->getHost( hostname, host, name, description))
    {
-      printf("\"%s\" - %s\n", name.toUtf8().data(), description.toUtf8().data());
+      std::cout << "\"" << name << " - " << description;
+      std::cout << std::endl;
       host.stdOut( true);
       return true;
    }
    else
    {
-      printf("Does not exists in farm !\n");
+      std::cout << "Does not exists in farm !" << std::endl;
       return false;
    }
 }

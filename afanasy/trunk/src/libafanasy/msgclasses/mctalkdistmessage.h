@@ -2,31 +2,29 @@
 
 #include "msgclass.h"
 
-#include <QtCore/QStringList>
-
 namespace af
 {
 
 class MCTalkdistmessage : public MsgClass
 {
 public:
-   MCTalkdistmessage( const QString &userfrom, const QString &msgtext);
+   MCTalkdistmessage( const std::string & userfrom, const std::string & msgtext);
    MCTalkdistmessage( Msg * msg);
    ~MCTalkdistmessage();
 
-   inline void addUser( const QString &str) { if(!list.contains(str)) list<<str;}
+   inline void addUser( const std::string & str) { list.push_back( str); list.unique();}
 
-   inline void getUser( QString &str) const { str=user; }
-   inline void getText( QString &str) const { str=text; }
+   inline void getUser( std::string & str) const { str = user; }
+   inline void getText( std::string & str) const { str = text; }
 
-   inline const QStringList* getList() const { return &list; }
+   inline const std::list<std::string> * getList() const { return &list; }
 
    void stdOut( bool full = false) const;
 
 private:
-   QString user;
-   QString text;
-   QStringList list;
+   std::string user;
+   std::string text;
+   std::list<std::string> list;
    void readwrite( Msg * msg);
 };
 }

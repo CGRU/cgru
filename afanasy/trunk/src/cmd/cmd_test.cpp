@@ -19,12 +19,10 @@ CmdTest::~CmdTest(){}
 
 bool CmdTest::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString qstring( argv[0]);
-   bool ok;
-   int count = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string qstring( argv[0]);
+   int count = atoi(argv[1]);
    af::MCTest mctest( count, qstring);
-   for( int i = 0; i < count; i++) mctest.addString( QString::number(i) + ": " + qstring);
+   for( int i = 0; i < count; i++) mctest.addString( af::itos(i) + ": " + qstring);
    msg.set( af::Msg::TTESTDATA, &mctest);
    if( Verbose ) msg.stdOutData();
    return true;

@@ -21,7 +21,7 @@
 bool Verbose;
 bool Help;
 int Protocol;
-QString ServerName;
+std::string ServerName;
 int ServerPort;
 
 int main( int argc, char** argv )
@@ -56,7 +56,7 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    if( argc == 1) envflags = envflags | af::Environment::Verbose;
    af::Environment ENV( envflags, argc, argv);
    if( ENV.isValid() == false ) return 1;
-   ServerName = af::Environment::getServerName().toUtf8().data();
+   ServerName = af::Environment::getServerName();
    ServerPort = af::Environment::getServerPort();
 
    if( af::init( af::InitFarm | (argc == 1 ? af::Verbose : af::NoFlags)) == false) return 1;

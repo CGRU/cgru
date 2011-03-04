@@ -136,9 +136,9 @@ void ItemRender::updateValues( af::Node *node, int type)
    case af::Msg::TRendersList:
    {
       revision          = render->getRevision();
-      version           = QString::fromUtf8( render->getVersion().c_str());
-      username          = render->getUserName();
-      annotation        = QString::fromUtf8( render->getAnnontation().c_str());
+      version           = afqt::stoq( render->getVersion());
+      username          = afqt::stoq( render->getUserName());
+      annotation        = afqt::stoq( render->getAnnontation());
       priority          = render->getPriority();
       capacity          = render->getCapacity();
       time_launched     = render->getTimeLaunch();
@@ -177,12 +177,12 @@ void ItemRender::updateValues( af::Node *node, int type)
             plotSwp.setAutoScaleMax( 100000);
          }
 
-         if( host.os.isEmpty() == false ) hostAttrs += QString(" - %1").arg( host.os);
+         if( host.os.empty() == false ) hostAttrs += QString(" - %1").arg( afqt::stoq( host.os));
          hostAttrs += QString("; Power = %1").arg( host.power);
          if( render->getRevision() > 0)
             hostAttrs += QString("\nBuild Revision: %1   Version: %2").arg( revision).arg( version);
          hostAttrs += QString("\nCapacity = %1; Max tasks = %2").arg( capacity).arg( host.maxtasks);
-         if( host.properties.isEmpty() == false) hostAttrs += QString("\n\"%1\"").arg( host.properties);
+         if( host.properties.empty() == false) hostAttrs += QString("\n\"%1\"").arg( afqt::stoq( host.properties));
 
          hostAttrs += QString("\nCPU: %1 Mhz").arg( host.cpu_mhz);
          if( host.cpu_num > 1) hostAttrs += QString(" x %1").arg( host.cpu_num);
@@ -197,9 +197,9 @@ void ItemRender::updateValues( af::Node *node, int type)
             plots[i]->height = 0;
 
       online = render->isOnline();
-      if( time_launched) creationTime = "Launched   at " + af::time2Qstr( time_launched);
+      if( time_launched) creationTime = "Launched   at " + afqt::time2Qstr( time_launched);
       else creationTime = "Offline.";
-      if( time_registered) creationTime += "\nRegistered at " + af::time2Qstr( time_registered);
+      if( time_registered) creationTime += "\nRegistered at " + afqt::time2Qstr( time_registered);
       else creationTime = "\nNot registered.";
 
       busy = render->isBusy();
@@ -207,7 +207,7 @@ void ItemRender::updateValues( af::Node *node, int type)
       taskstartfinishtime = render->getTasksStartFinishTime();
       tasks = render->getTasks();
       for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
-         tasksicons.push_back( Watch::getServiceIconSmall( (*it)->getServiceType()));
+         tasksicons.push_back( Watch::getServiceIconSmall( QString::fromUtf8( (*it)->getServiceType().c_str())));
 
       dirty = render->isDirty();
 
@@ -312,11 +312,11 @@ void ItemRender::updateValues( af::Node *node, int type)
          plots[i]->setColor(      hres.custom[i]->graphr, hres.custom[i]->graphg, hres.custom[i]->graphb);
          plots[i]->setLabelColor( hres.custom[i]->labelr, hres.custom[i]->labelg, hres.custom[i]->labelb);
          plots[i]->addValue( 0, hres.custom[i]->value);
-         plots[i]->setLabel( hres.custom[i]->label);
+         plots[i]->setLabel( QString::fromUtf8( hres.custom[i]->label.c_str()));
          plots[i]->setLabelFontSize( hres.custom[i]->labelsize);
          plots[i]->height = hres.custom[i]->height;
          plots[i]->setBGColor( hres.custom[i]->bgcolorr, hres.custom[i]->bgcolorg, hres.custom[i]->bgcolorb);
-         hostUsage += QString("\n%1:\n%2").arg( hres.custom[i]->label, hres.custom[i]->tooltip);
+         hostUsage += QString("\n%1:\n%2").arg( QString::fromUtf8( hres.custom[i]->label.c_str()), QString::fromUtf8( hres.custom[i]->tooltip.c_str()));
       }
 
       update_counter++;
@@ -349,10 +349,11 @@ void ItemRender::updateValues( af::Node *node, int type)
    tasksusers.clear();
    for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
    {
-      if( false == tasksusers.contains((*it)->getUserName()))
+      QString tusr = QString::fromUtf8( (*it)->getUserName().c_str());
+      if( false == tasksusers.contains( tusr))
       {
          if( false == tasksusers.isEmpty()) tasksusers.append(' ');
-         tasksusers.append((*it)->getUserName());
+         tasksusers.append( tusr);
       }
    }
 }
@@ -425,11 +426,12 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       QList<int> tasks_counts;
       for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
       {
-         int pos = tasks_users.indexOf( (*it)->getUserName());
+         QString tusr = QString::fromUtf8( (*it)->getUserName().c_str());
+         int pos = tasks_users.indexOf( tusr);
          if( pos != -1) tasks_counts[pos]++;
          else
          {
-            tasks_users << (*it)->getUserName();
+            tasks_users << tusr;
             tasks_counts << 1;
          }
       }
@@ -446,12 +448,12 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       {
          QString taskstr = QString("%1").arg((*it)->getCapacity());
          if((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
-         taskstr += QString(": %1[%2][%3]").arg((*it)->getJobName()).arg((*it)->getBlockName()).arg((*it)->getName());
+         taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str())).arg(QString::fromUtf8((*it)->getBlockName().c_str())).arg(QString::fromUtf8((*it)->getName().c_str()));
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
 			QRect rect_usertime;
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
-            QString("%1 - %2").arg((*it)->getUserName()).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
+            QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
          painter->drawText( x+18, y, w-30-rect_usertime.width(), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
          painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, *(*ii));
       }

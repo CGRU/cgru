@@ -23,16 +23,8 @@ CmdStatistics::~CmdStatistics(){}
 
 bool CmdStatistics::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   if( argc >= 1 )
-   {
-      bool ok; columns = (QString::fromUtf8(argv[0])).toInt( &ok);
-      if( false == ok ) return false;
-   }
-   if( argc >= 2 )
-   {
-      bool ok; sorting = (QString::fromUtf8(argv[1])).toInt( &ok);
-      if( false == ok ) return false;
-   }
+   if( argc >= 1 ) columns = atoi(argv[0]);
+   if( argc >= 2 ) sorting = atoi(argv[1]);
    msg.set( af::Msg::TStatRequest);
    return true;
 }

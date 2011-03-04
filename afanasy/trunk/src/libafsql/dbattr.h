@@ -1,5 +1,6 @@
 #pragma once
 
+#include <QtCore/QRegExp>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
 
@@ -216,7 +217,7 @@ public:
    DBAttrQRegExp( int type, QRegExp * parameter);
    ~DBAttrQRegExp();
    inline const QString getString() const { return DBString( pointer->pattern());}
-   inline void set( const QVariant & value) {af::setRegExp( *pointer, value.toString(), "DBAttrQRegExp::set");}
+   inline void set( const QVariant & value) {af::setRegExp( *pointer, value.toString().toUtf8().data(), "DBAttrQRegExp::set");}
 private: QRegExp * pointer;
 };
 }

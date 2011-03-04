@@ -22,13 +22,13 @@ Node::Node():
 
 bool Node::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d\n", name.toUtf8().data(), id);
+   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d\n", name.c_str(), id);
    return false;
 }
 
 void Node::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d\n", name.toUtf8().data(), id);
+   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d\n", name.c_str(), id);
    return;
 }
 
@@ -42,7 +42,7 @@ void Node::readwrite( Msg * msg)
    rw_int32_t( id,        msg);
    rw_uint8_t( priority,  msg);
    rw_bool   ( locked,    msg);
-   rw_QString( name,      msg);
+   rw_String(  name,      msg);
 }
 
 int Node::calcWeight() const

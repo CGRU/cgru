@@ -314,9 +314,7 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
    }
    if( founded)
    {
-      std::string text = mcgeneral.getUserName().toUtf8().data();
-      text = text + ": " + mcgeneral.getString().toUtf8().data();
-      msg->setString( text);
+      msg->setString( mcgeneral.getUserName() + ": " + mcgeneral.getString() );
       msg->dispatch();
    }
    else delete msg;

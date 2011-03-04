@@ -8,6 +8,7 @@
 #include "cmd_regexp.h"
 #include "cmd_invalid.h"
 
+#include "cmd_string.h"
 #include "cmd_path.h"
 #include "cmd_numeric.h"
 #include "cmd_passwd.h"
@@ -79,6 +80,7 @@ void AfCmd::RegisterCommands()
 
    addCmd( new CmdTaskOutput);
 
+   addCmd( new CmdString);
    addCmd( new CmdPath);
    addCmd( new CmdNumeric);
    addCmd( new CmdPasswd);

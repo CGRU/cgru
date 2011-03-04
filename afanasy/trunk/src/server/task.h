@@ -37,8 +37,8 @@ public:
    virtual void log( const std::string  & message);
    inline const std::list<std::string> & getLog() { return logStringList; }
 
-   void errorHostsAppend( const QString & hostname);
-   bool avoidHostsCheck( const QString & hostname) const;
+   void errorHostsAppend( const std::string & hostname);
+   bool avoidHostsCheck( const std::string & hostname) const;
    void getErrorHostsListString( std::string & str) const;
    const std::string getErrorHostsListString() const;
    inline void errorHostsReset() { errorHosts.clear(); errorHostsCounts.clear(); errorHostsTime.clear();}
@@ -60,7 +60,7 @@ public:
    virtual void monitor( MonitorContainer * monitoring) const;
    virtual void updateDatabase() const;
 
-   virtual const QString getInfo( bool full = false) const;
+   virtual const std::string getInfo( bool full = false) const;
    virtual void stdOut( bool full = false) const;
 
    inline bool isReady()   const { return progress->state & AFJOB::STATE_READY_MASK;   }
@@ -81,7 +81,7 @@ private:
 
    TaskRun * run;
 
-   QStringList    errorHosts;       ///< Avoid error hosts list.
-   QList<int>     errorHostsCounts; ///< Number of errors on error host.
-   QList<time_t>  errorHostsTime;   ///< Time of the last error
+   std::list<std::string>  errorHosts;       ///< Avoid error hosts list.
+   std::list<int>          errorHostsCounts; ///< Number of errors on error host.
+   std::list<time_t>       errorHostsTime;   ///< Time of the last error
 };

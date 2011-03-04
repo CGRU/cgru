@@ -42,8 +42,8 @@ private slots:
 private:
    bool connected;
 
-   QString username;
-   QString hostname;
+   std::string username;
+   std::string hostname;
    TalkHost *talk;
 
    afqt::QThreadClientUp   *qthreadClientUp;

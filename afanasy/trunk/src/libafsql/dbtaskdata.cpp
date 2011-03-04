@@ -35,11 +35,11 @@ DBTaskData::DBTaskData( af::Msg * msg)
 
 void DBTaskData::addDBAttributes()
 {
-   dbAddAttr( new DBAttrQString( DBAttr::_name,        &name       ));
-   dbAddAttr( new DBAttrQString( DBAttr::_command,     &command    ));
-   dbAddAttr( new DBAttrQString( DBAttr::_files,       &files      ));
-   dbAddAttr( new DBAttrQString( DBAttr::_dependmask,  &dependmask ));
-   dbAddAttr( new DBAttrQString( DBAttr::_customdata,  &customdata ));
+   dbAddAttr( new DBAttrString( DBAttr::_name,        &name       ));
+   dbAddAttr( new DBAttrString( DBAttr::_command,     &command    ));
+   dbAddAttr( new DBAttrString( DBAttr::_files,       &files      ));
+   dbAddAttr( new DBAttrString( DBAttr::_dependmask,  &dependmask ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,  &customdata ));
 }
 
 DBTaskData::~DBTaskData()
@@ -58,11 +58,11 @@ void DBTaskData::dbBindInsert( QSqlQuery *query, const QVariant & id_job, const 
    query->bindValue(":id_block",    id_block    );
    query->bindValue(":id_task",     id_task     );
 
-   query->bindValue(":name",             name.size() > af::Environment::get_DB_StringNameLen() ?       name.left( af::Environment::get_DB_StringNameLen()) : name       );
-   query->bindValue(":command",       command.size() > af::Environment::get_DB_StringExprLen() ?    command.left( af::Environment::get_DB_StringExprLen()) : command    );
-   query->bindValue(":files",           files.size() > af::Environment::get_DB_StringExprLen() ?      files.left( af::Environment::get_DB_StringExprLen()) : files      );
-   query->bindValue(":dependmask", dependmask.size() > af::Environment::get_DB_StringExprLen() ? dependmask.left( af::Environment::get_DB_StringExprLen()) : dependmask );
-   query->bindValue(":customdata", customdata.size() > af::Environment::get_DB_StringExprLen() ? customdata.left( af::Environment::get_DB_StringExprLen()) : customdata );
+   query->bindValue(":name",        QString::fromUtf8( name.c_str()));
+   query->bindValue(":command",     QString::fromUtf8( command.c_str()));
+   query->bindValue(":files",       QString::fromUtf8( files.c_str()));
+   query->bindValue(":dependmask",  QString::fromUtf8( dependmask.c_str()));
+   query->bindValue(":customdata",  QString::fromUtf8( customdata.c_str()));
 }
 
 void DBTaskData::readwrite( af::Msg * msg)
@@ -73,6 +73,6 @@ void DBTaskData::readwrite( af::Msg * msg)
    {
       static bool name_only = true;
       rw_bool(    name_only,    msg);
-      rw_QString( name,         msg);
+      rw_String(  name,         msg);
    }
 }

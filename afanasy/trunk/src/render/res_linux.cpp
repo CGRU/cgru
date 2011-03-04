@@ -9,7 +9,11 @@
 #include <sys/statfs.h>
 #include <sys/statvfs.h>
 
+#include <QtCore/QRegExp>
+
 #include "../libafanasy/environment.h"
+
+#include "../libafqt/name_afqt.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -260,7 +264,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    static char path[4096];
    if( getConstants )
    {
-      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().toUtf8().data());
+      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().c_str());
       printf("HDD Space Path = '%s'\n", path);
    }
    struct statfs fsd;
@@ -277,7 +281,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    static char device[128];
    if( getConstants )
    {
-      sprintf( device, "%s", af::Environment::getRenderIOStatDevice().toUtf8().data());
+      sprintf( device, "%s", af::Environment::getRenderIOStatDevice().c_str());
       printf("IO Stat Device = '%s'\n", device);
    }
    if( readFile( filename_disk_stat))
@@ -379,7 +383,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    static QRegExp RenderNetworkIF;
    if( getConstants)
    {
-      RenderNetworkIF.setPattern( af::Environment::getRenderNetworkIF());
+      RenderNetworkIF.setPattern( afqt::stoq( af::Environment::getRenderNetworkIF()));
       if( RenderNetworkIF.isValid()) printf("Network traffic interface(s) pattern = '%s'\n", RenderNetworkIF.pattern().toUtf8().data());
       else
       {

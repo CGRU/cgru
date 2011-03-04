@@ -10,7 +10,7 @@
 
 using namespace af;
 
-MCTalkmessage::MCTalkmessage( const QString &msguser, const QString &msgtext)
+MCTalkmessage::MCTalkmessage( const std::string & msguser, const std::string & msgtext)
 {
    user = msguser;
    text = msgtext;
@@ -27,11 +27,11 @@ MCTalkmessage::~MCTalkmessage()
 
 void MCTalkmessage::readwrite( Msg * msg)
 {
-   rw_QString( user, msg);
-   rw_QString( text, msg);
+   rw_String( user, msg);
+   rw_String( text, msg);
 }
 
 void MCTalkmessage::stdOut( bool full) const
 {
-   printf("%s: %s\n", user.toUtf8().data(), text.toUtf8().data());
+   printf("%s: %s\n", user.c_str(), text.c_str());
 }

@@ -11,17 +11,17 @@ const QString DBStatistics::TableName("statistics");
 DBStatistics::DBStatistics()
 {
    dbAddAttr( new DBAttrString(  DBAttr::_annotation,        &annotation       ));
-   dbAddAttr( new DBAttrQString( DBAttr::_blockname,         &blockname        ));
-   dbAddAttr( new DBAttrQString( DBAttr::_jobname,           &jobname          ));
+   dbAddAttr( new DBAttrString(  DBAttr::_blockname,         &blockname        ));
+   dbAddAttr( new DBAttrString(  DBAttr::_jobname,           &jobname          ));
    dbAddAttr( new DBAttrString(  DBAttr::_description,       &description      ));
-   dbAddAttr( new DBAttrQString( DBAttr::_hostname,          &hostname         ));
-   dbAddAttr( new DBAttrQString( DBAttr::_service,           &service          ));
+   dbAddAttr( new DBAttrString(  DBAttr::_hostname,          &hostname         ));
+   dbAddAttr( new DBAttrString(  DBAttr::_service,           &service          ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_tasksdone,         &tasksdone        ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_tasksnum,          &tasksnum         ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_taskssumruntime,   &taskssumruntime  ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_time_done,         &time_done        ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_time_started,      &time_started     ));
-   dbAddAttr( new DBAttrQString( DBAttr::_username,          &username         ));
+   dbAddAttr( new DBAttrString(  DBAttr::_username,          &username         ));
 }
 
 DBStatistics::~DBStatistics()

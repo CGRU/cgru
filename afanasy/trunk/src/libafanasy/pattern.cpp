@@ -6,9 +6,9 @@
 
 using namespace af;
 
-Pattern::Pattern( const QString & string):
+Pattern::Pattern( const std::string & patternName):
    ptr_next( NULL),
-   name( string),
+   name( patternName),
    description("")
 {
 }
@@ -17,14 +17,14 @@ Pattern::~Pattern()
 {
 }
 
-bool Pattern::setMask( const QString & string)
+bool Pattern::setMask( const std::string & string)
 {
    mask = string;
-   if( mask.isEmpty()) return false;
-   regexp.setPattern( mask);
+   if( mask.size() == 0 ) return false;
+   regexp.setPattern( QString::fromUtf8( mask.c_str()));
    if( regexp.isValid() == false)
    {
-      AFERRAR("Pattern::setMask: \"%s\" set invalid mask \"%s\":\n", name.toUtf8().data(), mask.toUtf8().data());
+      AFERRAR("Pattern::setMask: \"%s\" set invalid mask \"%s\":\n", name.c_str(), mask.c_str());
       printf("%s\n", regexp.errorString().toUtf8().data());
       return false;
    }
@@ -33,19 +33,19 @@ bool Pattern::setMask( const QString & string)
 
 bool Pattern::isValid() const
 {
-   if( name.isEmpty() )
+   if( name.size() == 0 )
    {
       AFERROR("Pattern::isValid: name is empty.\n");
       return false;
    }
-   if( mask.isEmpty() )
+   if( mask.size() == 0 )
    {
-      AFERRAR("Pattern::isValid: \"%s\" mask is empty.\n", name.toUtf8().data());
+      AFERRAR("Pattern::isValid: \"%s\" mask is empty.\n", name.c_str());
       return false;
    }
    if( regexp.isValid() == false)
    {
-      AFERRAR("Pattern::isValid: \"%s\" mask \"%s\" is invalid:\n", name.toUtf8().data(), mask.toUtf8().data());
+      AFERRAR("Pattern::isValid: \"%s\" mask \"%s\" is invalid:\n", name.c_str(), mask.c_str());
       return false;
    }
    return true;
@@ -61,18 +61,18 @@ void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "Pattern: \"" << name.toUtf8().data() << "\" (" << description.toUtf8().data() << "):";
-      stream << " Mask =\"" << mask.toUtf8().data() << "\"";
+      stream << "Pattern: \"" << name << "\" (" << description << "):";
+      stream << " Mask =\"" << mask << "\"";
       if( remservices.size())
       {
          stream << "\n   Remove services:";
-         for( int i = 0; i < remservices.size(); i++)
-            stream << " \"" << remservices[i].toUtf8().data() << "\"";
+         for( std::list<std::string>::const_iterator it = remservices.begin(); it != remservices.end(); it++)
+            stream << " \"" << *it << "\"";
       }
    }
    else
    {
-      stream << "P:\"" << mask.toUtf8().data() << "\"-\"" << name.toUtf8().data() << "\": ";
+      stream << "P:\"" << mask << "\"-\"" << name << "\": ";
    }
    host.generateInfoStream( stream, full);
 }

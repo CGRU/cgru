@@ -10,7 +10,7 @@
 
 using namespace af;
 
-MCTest::MCTest( int Number, const QString & String):
+MCTest::MCTest( int Number, const std::string & String):
    string( String),
    number( Number),
    numberarray( NULL),
@@ -27,7 +27,7 @@ MCTest::MCTest( Msg * msg)
 bool MCTest::construct()
 {
    numberarray = new int32_t[ number];
-   stringarray = new QString[ number];
+   stringarray = new std::string[ number];
    if((numberarray == NULL) || (stringarray == NULL))
    {
       AFERROR("MCTest::MCTest: Memory allocation failed.");
@@ -48,8 +48,8 @@ void MCTest::readwrite( Msg * msg)
    MsgClassUserHost::readwrite( msg);
 
    rw_int32_t(    number,     msg);
-   rw_QString(     string,     msg);
-   rw_QStringList( stringlist, msg);
+   rw_String(     string,     msg);
+   rw_StringList( stringlist, msg);
 
    if( msg->isReading() )
       if( construct() == false)
@@ -58,33 +58,32 @@ void MCTest::readwrite( Msg * msg)
    for( int i = 0; i < number; i++)
    {
       rw_int32_t( numberarray[i], msg);
-      rw_QString(  stringarray[i], msg);
+      rw_String(  stringarray[i], msg);
    }
 }
 
-void MCTest::addString( const QString & String)
+void MCTest::addString( const std::string & String)
 {
    numberarray[ stringlist.size()] = stringlist.size();
    stringarray[ stringlist.size()] = String;
-   stringlist << String;
+   stringlist.push_back( String);
 }
 
 void MCTest::stdOut( bool full) const
 {
    MsgClassUserHost::stdOut( full);
    printf(": String = \"%s\", Number = %d.\n",
-            string.toUtf8().data(), number);
+            string.c_str(), number);
 
    if( full == false ) return;
 
    if( string[0] == '/') return;
 
-   for( int i = 0; i < number; i++)
-   {
+   std::list<std::string>::const_iterator it = stringlist.begin();
+   for( int i = 0; i < number; i++, it++)
       printf("a\"%s\" = l\"%s\" : n%d\n",
-         stringarray[i].toUtf8().data(),
-         stringlist[i].toUtf8().data(),
+         stringarray[i].c_str(),
+         (*it).c_str(),
          numberarray[i]);
-   }
 }
 

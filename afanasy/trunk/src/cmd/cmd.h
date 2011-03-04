@@ -5,7 +5,7 @@
 extern bool Verbose;
 extern bool Help;
 extern int Protocol;
-extern QString ServerName;
+extern std::string ServerName;
 extern int ServerPort;
 
 class Cmd
@@ -15,21 +15,21 @@ public:
    virtual ~Cmd();
 
    inline void setRecieving() { recieving = true; }
-   inline void setCmd(   const QString & str) { cmd    = str;   }
-   inline void setInfo(  const QString & str) { info   = str;   }
-   inline void setHelp(  const QString & str) { help   = str;   }
-   inline void setArgsCount(  int value) { argscount   = value; }
-   inline void setMsgType(    int value) { msgtype     = value; }
-   inline void setMsgOutType( int value) { msgouttype  = value; }
+   inline void setCmd(   const std::string & str) { cmd    = str;   }
+   inline void setInfo(  const std::string & str) { info   = str;   }
+   inline void setHelp(  const std::string & str) { help   = str;   }
+   inline void setArgsCount(  int value         ) { argscount   = value; }
+   inline void setMsgType(    int value         ) { msgtype     = value; }
+   inline void setMsgOutType( int value         ) { msgouttype  = value; }
 
-   inline bool isRecieving()                const { return recieving;           }
-   inline bool isCmd( const QString  & str) const { return cmd == str;          }
-   inline bool hasArgsCount( int value )    const { return argscount  <= value; }
-   inline bool isMsgOutType( int value )    const { return msgouttype == value; }
+   inline bool isRecieving()                    const { return recieving;           }
+   inline bool isCmd( const std::string & str)  const { return cmd == str;          }
+   inline bool hasArgsCount( int value )        const { return argscount  <= value; }
+   inline bool isMsgOutType( int value )        const { return msgouttype == value; }
 
-   inline const QString  & getCmd()  const { return cmd; }
-   inline const QString  & getInfo() const { return info;}
-   inline const QString  & getHelp() const { return help;}
+   inline const std::string & getCmd()  const { return cmd;  }
+   inline const std::string & getInfo() const { return info; }
+   inline const std::string & getHelp() const { return help; }
    inline int getMsgType()    const { return msgtype;    }
    inline int getArgsCount()  const { return argscount;  }
    inline int getMsgOutType() const { return msgouttype; }
@@ -49,7 +49,7 @@ private:
    int  argscount;
    bool recieving;
 
-   QString cmd;
-   QString info;
-   QString help;
+   std::string cmd;
+   std::string info;
+   std::string help;
 };

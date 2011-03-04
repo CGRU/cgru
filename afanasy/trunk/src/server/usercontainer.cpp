@@ -30,7 +30,7 @@ UserContainer::~UserContainer()
 AFINFO("UserContainer::~UserContainer:\n");
 }
 
-UserAf* UserContainer::addUser( const QString &username, const std::string & hostname, MonitorContainer * monitoring)
+UserAf* UserContainer::addUser( const std::string & username, const std::string & hostname, MonitorContainer * monitoring)
 {
    {
       UserContainerIt usersIt( this);
@@ -69,8 +69,8 @@ void UserContainer::addUser( UserAf * user)
 
 void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, MonitorContainer * monitoring)
 {
-   QString username( usr.getName());
-   std::string hostname( usr.getHostName().toUtf8().data());
+   std::string username( usr.getName());
+   std::string hostname( usr.getHostName());
 
    //
    // Try to find user with provided name in container to edit permanent property
@@ -108,7 +108,7 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
    if( permanent == false)
    {
       // Error: user to unset permanent does not exist
-      AFERRAR("UserContainer::setPermanent: No user \"%s\" founded.\n", username.toUtf8().data());
+      AFERRAR("UserContainer::setPermanent: No user \"%s\" founded.\n", username.c_str());
       return;
    }
    //
@@ -118,7 +118,7 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
    if( add((af::Node*)user) == 0)
    {
       delete user;
-      AFERRAR("UserContainer::setPermanent: Can't add user \"%s\" node to container.", username.toUtf8().data());
+      AFERRAR("UserContainer::setPermanent: Can't add user \"%s\" node to container.", username.c_str());
       return;
    }
    user->setPermanent( true);

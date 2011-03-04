@@ -211,7 +211,7 @@ printf("Processing node \"%s\"-%d\n", node->getName().toUtf8().data(), node->get
       }
       if( it_insert == it_end)
       {
-         AFERRAR("AfList::moveNodes: Lost node - \"%s\" - %d.\n", node->getName().toUtf8().data(), node->getId());
+         AFERRAR("AfList::moveNodes: Lost node - \"%s\" - %d.\n", node->getName().c_str(), node->getId());
          continue;
       }
 

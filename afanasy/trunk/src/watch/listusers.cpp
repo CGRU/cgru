@@ -215,7 +215,7 @@ void ListUsers::actAnnotate()
    QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( text);
+   af::MCGeneral mcgeneral( text.toUtf8().data());
    action( mcgeneral, af::Msg::TUserAnnotate);
 }
 
@@ -336,7 +336,7 @@ void ListUsers::actHostsMask()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask);
+   af::MCGeneral mcgeneral( mask.toUtf8().data());
    action( mcgeneral, af::Msg::TUserHostsMask);
 }
 
@@ -357,7 +357,7 @@ void ListUsers::actHostsMaskExclude()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask);
+   af::MCGeneral mcgeneral( mask.toUtf8().data());
    action( mcgeneral, af::Msg::TUserHostsMaskExclude);
 }
 

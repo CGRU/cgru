@@ -5,8 +5,6 @@
 
 #include "../../include/aftypes.h"
 
-#include <QtCore/QString>
-
 #include "msgclassuserhost.h"
 
 namespace af
@@ -15,7 +13,7 @@ namespace af
 class MCTasksPos : public MsgClassUserHost
 {
 public:
-   MCTasksPos( int job_id, const QString &Message);
+   MCTasksPos( int job_id, const std::string & Message);
    MCTasksPos( Msg * msg);
    ~MCTasksPos();
 
@@ -28,7 +26,7 @@ public:
 
    inline int getJobId() const { return jobid;          }
    inline int getCount() const { return numbloks.size();}
-   inline const QString& getMessage() const { return message; }
+   inline const std::string & getMessage() const { return message; }
 
    inline int getNumBlock( const unsigned pos) const
       { if( pos < numbloks.size()) return numbloks[pos]; else return -1; }
@@ -40,7 +38,7 @@ private:
    bool     has_tasks;
    std::vector<int32_t> numbloks;
    std::vector<int32_t> numtasks;
-   QString message;
+   std::string message;
 
    void readwrite( Msg * msg);
 };

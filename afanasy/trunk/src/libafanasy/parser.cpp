@@ -8,7 +8,7 @@ using namespace af;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Parser::Parser( const QString & type, int frames):
+Parser::Parser( const std::string & type, int frames):
    initialized( false),
    numframes( frames),
    name( type),
@@ -17,7 +17,7 @@ Parser::Parser( const QString & type, int frames):
    PyObject * args = PyTuple_New( 1);
    PyTuple_SetItem( args, 0, PyInt_FromLong( numframes));
 
-   if( PyClass::init( AFPYNAMES::PARSER_CLASSESDIR, name.toUtf8().data(), args) == false) return;
+   if( PyClass::init( AFPYNAMES::PARSER_CLASSESDIR, name, args) == false) return;
 
    //Get function
    PyObj_FuncParse = getFunction( AFPYNAMES::PARSER_FUNC_PARSE);
@@ -55,10 +55,10 @@ bool Parser::parse(  QByteArray & data,
          result = true;
       }
       else
-         AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 5\n", name.toUtf8().data());
+         AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 5\n", name.c_str());
    }
    else
-      AFERRAR("Parser::parse: type=\"%s\" value is not a tuple\n", name.toUtf8().data());
+      AFERRAR("Parser::parse: type=\"%s\" value is not a tuple\n", name.c_str());
 
    Py_DECREF( pArgs);
    Py_DECREF( pTuple);

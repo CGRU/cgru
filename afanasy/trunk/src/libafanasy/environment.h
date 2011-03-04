@@ -33,13 +33,13 @@ public:
    static inline bool isValid() { return valid; }
 
 /// Return \c true if argument exists
-   static bool hasArgument( const QString & argument);
+   static bool hasArgument( const std::string & argument);
 /// Return \c true if argument exists and return its value if it has any:
-   static bool getArgument( const QString & argument, QString & value);
+   static bool getArgument( const std::string & argument, std::string & value);
 
    static inline bool isHelpMode() { return help_mode; }
-   static inline void addUsage( const QString & arg, const QString & help)
-      { cmdarguments_usagearg << arg; cmdarguments_usagehelp << help;}
+   static inline void addUsage( const std::string & arg, const std::string & help)
+      { cmdarguments_usagearg.push_back( arg); cmdarguments_usagehelp.push_back( help);}
 
    static bool reload();
    static bool load( const std::string & filename, uint32_t flags = 0);
@@ -49,10 +49,12 @@ public:
    static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
    static bool getXMLElement( const QDomDocument & doc, const QString & name, QStringList & stringlist );
    static bool getXMLAttribute( QDomElement & element, const QString & name, int & value);
+   static bool getXMLElement( const QDomDocument & doc, const QString & name, std::list<std::string> & stringlist );
    static bool getVar( const QDomDocument & doc, std::string & value, const char * name );
    static bool getVar( const QDomDocument & doc, QString     & value, QString name );
    static bool getVar( const QDomDocument & doc, QStringList & value, QString name );
    static bool getVar( const QDomDocument & doc, int         & value, QString name );
+   static bool getVar( const QDomDocument & doc, std::list<std::string> & value, QString name );
 
 /// Check current key matching password sequence.
    static bool checkKey( const char key);
@@ -68,22 +70,21 @@ public:
    static inline const std::string & getCGRUVersion() { return  cgru_version;          }
 
 /// Get Afanasy server QHostAddress.
-   static inline const QHostAddress* getAfServerQHostAddress()  { return qafserveraddress;}
-
+   static inline const QHostAddress * getAfServerQHostAddress()  { return qafserveraddress;}
 
    static inline const std::string & getHome()        { return home;          }
    static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
    static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
-   static inline const QString& getServerName()    { return servername;    } ///< Get Afanasy server name.
-   static inline const QString& getUserName()      { return username;      } ///< Get current user name.
-   static inline const QString& getHostName()      { return hostname;      } ///< Get Render host name.
-   static inline const QString& getComputerName()  { return computername;  } ///< Get local computer name.
-   static inline const QString& getPlatform()      { return platform;      } ///< Get platform name.
+   static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
+   static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
+   static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
+   static inline const std::string & getComputerName(){ return computername;  } ///< Get local computer name.
+   static inline const std::string & getPlatform()    { return platform;      } ///< Get platform name.
 
    static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
-   static inline const QStringList& getPreviewCmds()  { return previewcmds;} ///< Get preview commands
-   static inline const QStringList& getRenderCmds()   { return rendercmds; } ///< Get render commands
+   static inline const std::list<std::string> & getPreviewCmds()  { return previewcmds;} ///< Get preview commands
+   static inline const std::list<std::string> & getRenderCmds()   { return rendercmds; } ///< Get render commands
 
    static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
    static inline int getWatchConnectRetries()         { return watch_connectretries;      }
@@ -97,9 +98,9 @@ public:
    static inline int            getClientPort()   { return clientport;      } ///< Get current client port.
    static inline const Address* getAddress()      { return address;         } ///< Return address class pointer.
 
-   static inline int            getPriority()               { return priority;         } ///< Get default host priority.
-   static inline int            getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
-   static inline const QString& getHostsMask()              { return hostsmask;        } ///< Get default host mask.
+   static inline int    getPriority()               { return priority;         } ///< Get default host priority.
+   static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
+   static inline const std::string & getHostsMask() { return hostsmask;        } ///< Get default host mask.
 
    static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
    static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
@@ -142,13 +143,13 @@ public:
    static inline int getRenderWaitForReadyRead()      { return render_waitforreadyread;     }
    static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
    static inline int getRenderLogLinesMax()           { return render_log_linesmax;         }
-   static inline const QString& getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
-   static inline const QString& getRenderCmdReboot()     { return render_cmd_reboot;      }
-   static inline const QString& getRenderCmdShutdown()   { return render_cmd_shutdown;    }
-   static inline const QString& getRenderNetworkIF()     { return render_networkif;       }
-   static inline const QString& getRenderHDDSpacePath()  { return render_hddspace_path;   }
-   static inline const QString& getRenderIOStatDevice()  { return render_iostat_device;   }
-   static inline const QString& getRenderResClasses()    { return render_resclasses;      }
+   static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
+   static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
+   static inline const std::string & getRenderCmdShutdown()   { return render_cmd_shutdown;    }
+   static inline const std::string & getRenderNetworkIF()     { return render_networkif;       }
+   static inline const std::string & getRenderHDDSpacePath()  { return render_hddspace_path;   }
+   static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
+   static inline const std::string & getRenderResClasses()    { return render_resclasses;      }
 
 #ifndef WINNT
 
@@ -160,14 +161,14 @@ public:
    static inline const std::string & getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
    static inline const std::string & getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
 
-   static inline const QString& get_DB_Type()            { return db_type;         } ///< Get database type.
-   static inline const QString& get_DB_HostName()        { return db_hostname;     } ///< Get database host name.
-   static inline const QString& get_DB_DataBaseName()    { return db_databasename; } ///< Get database name.
-   static inline const QString& get_DB_UserName()        { return db_username;     } ///< Get database user name.
-   static inline const QString& get_DB_Password()        { return db_password;     } ///< Get database user password.
-   static inline const QString& get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
-   static inline int            get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
-   static inline int            get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
+   static inline const std::string & get_DB_Type()            { return db_type;         } ///< Get database type.
+   static inline const std::string & get_DB_HostName()        { return db_hostname;     } ///< Get database host name.
+   static inline const std::string & get_DB_DataBaseName()    { return db_databasename; } ///< Get database name.
+   static inline const std::string & get_DB_UserName()        { return db_username;     } ///< Get database user name.
+   static inline const std::string & get_DB_Password()        { return db_password;     } ///< Get database user password.
+   static inline const std::string & get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
+   static inline int                 get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
+   static inline int                 get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
    static inline int getServer_SO_RCVTIMEO_SEC()  { return server_so_rcvtimeo_sec; }
    static inline int getServer_SO_SNDTIMEO_SEC()  { return server_so_sndtimeo_sec; }
@@ -178,9 +179,9 @@ private:
 
    static bool valid;       ///< \c true if environment is valid.
    static bool verbose;
-   static QStringList cmdarguments;
-   static QStringList cmdarguments_usagearg;
-   static QStringList cmdarguments_usagehelp;
+   static std::list<std::string> cmdarguments;
+   static std::list<std::string> cmdarguments_usagearg;
+   static std::list<std::string> cmdarguments_usagehelp;
    static bool help_mode;
 
    static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
@@ -202,25 +203,25 @@ private:
 /// Afanasy server computer name
 /** Try to get \c AF_SERVER_NAME environment variable at first.
 *** If there is no \c AF_SERVER_NAME variable from \c definitions.h used.**/
-   static QString servername;
+   static std::string servername;
 
 /// User name
 /** Try to get \c USERNAME or \c USER environment variable at first.
 *** If failes "unknown" user name will be used.**/
-   static QString username;
+   static std::string username;
 
 /// Local computer name
-   static QString computername;
+   static std::string computername;
 /// Render host name
-   static QString hostname;
+   static std::string hostname;
 /// Platform:
-   static QString platform;
+   static std::string platform;
 
    static int filenamesizemax;
 
    static int priority;          ///< Default priority
    static int maxrunningtasks;   ///< Default maximum running tasks number
-   static QString hostsmask;     ///< Default hosts mask
+   static std::string hostsmask;     ///< Default hosts mask
 
 /// Afanasy server port number
 /** Try to get \c AF_SERVER_PORT environment variable at first.
@@ -229,8 +230,8 @@ private:
 
    static int clientport;
 
-   static QStringList previewcmds;    ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
-   static QStringList rendercmds;     ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static std::list<std::string> previewcmds;    ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static std::list<std::string> rendercmds;     ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
    static int watch_refreshinterval;
    static int watch_connectretries;
    static int watch_waitforconnected;
@@ -255,13 +256,13 @@ private:
    static int render_waitforreadyread;
    static int render_waitforbyteswritten;
    static int render_log_linesmax;
-   static QString render_exec;       ///< How Render can execute anther Render.
-   static QString render_cmd_reboot;
-   static QString render_cmd_shutdown;
-   static QString render_hddspace_path;
-   static QString render_iostat_device;
-   static QString render_resclasses;
-   static QString render_networkif;
+   static std::string render_exec;       ///< How Render can execute anther Render.
+   static std::string render_cmd_reboot;
+   static std::string render_cmd_shutdown;
+   static std::string render_hddspace_path;
+   static std::string render_iostat_device;
+   static std::string render_resclasses;
+   static std::string render_networkif;
 
    static int errors_avoid_host;
    static int task_error_retries;
@@ -299,14 +300,14 @@ private:
    static std::string renderslogsdir;
    static std::string userslogsdir;
 
-   static QString db_type;           ///< Afanasy database QT SQL driver type
-   static QString db_hostname;       ///< Database hostname
-   static QString db_databasename;   ///< Database name
-   static QString db_username;       ///< Database user, with modification rights
-   static QString db_password;       ///< User password
-   static QString db_stringquotes;   ///< Database string quotes
-   static int     db_stringnamelen;  ///< Database string name length
-   static int     db_stringexprlen;  ///< Database string expression length
+   static std::string db_type;           ///< Afanasy database QT SQL driver type
+   static std::string db_hostname;       ///< Database hostname
+   static std::string db_databasename;   ///< Database name
+   static std::string db_username;       ///< Database user, with modification rights
+   static std::string db_password;       ///< User password
+   static std::string db_stringquotes;   ///< Database string quotes
+   static int         db_stringnamelen;  ///< Database string name length
+   static int         db_stringexprlen;  ///< Database string expression length
 
    static int  server_so_rcvtimeo_sec;
    static int  server_so_sndtimeo_sec;
@@ -315,8 +316,8 @@ private:
 
    static Passwd * passwd;
    static bool visor_mode;     ///< user is VISOR
-   static QString pswd_visor;  ///< VISOR password
+   static std::string pswd_visor;  ///< VISOR password
    static bool god_mode;       ///< user is GOD
-   static QString pswd_god;    ///< GOD password
+   static std::string pswd_god;    ///< GOD password
 };
 }

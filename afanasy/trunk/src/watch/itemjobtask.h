@@ -16,8 +16,8 @@ public:
    inline int getBlockNum() const { return blocknum; }
    inline int getTaskNum()  const { return tasknum;  }
 
-   const QString getWDir() const;
-   const QString genFiles() const;
+   const std::string & getWDir() const;
+   const std::string genFiles() const;
    int getFramesNum() const;
 
    af::TaskProgress taskprogress;

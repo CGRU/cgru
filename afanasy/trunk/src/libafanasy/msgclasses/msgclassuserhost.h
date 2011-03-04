@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QString>
-
 #include "msgclass.h"
 
 namespace af
@@ -17,15 +15,15 @@ public:
 
    void stdOut( bool full = false) const;
 
-   inline const QString & getUserName() const { return username; }
-   inline const QString & getHostName() const { return hostname; }
+   inline const std::string & getUserName() const { return username; }
+   inline const std::string & getHostName() const { return hostname; }
 
 protected:
    void readwrite( Msg * msg);
 
 private:
-   QString username;
-   QString hostname;
+   std::string username;
+   std::string hostname;
 
 private:
 };

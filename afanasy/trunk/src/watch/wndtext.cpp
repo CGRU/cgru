@@ -7,6 +7,8 @@
 #include "../libafanasy/service.h"
 #include "../libafanasy/taskexec.h"
 
+#include "../libafqt/name_afqt.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -32,7 +34,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
       {
          case af::Msg::TDATA:
          {
-            qTextEdit->setPlainText( QString::fromUtf8( msg->data(), msg->int32()));
+            qTextEdit->setPlainText( afqt::dtoq( msg->data(), msg->int32()));
             break;
          }
          case af::Msg::TString:
@@ -40,7 +42,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
             std::string str;
             msg->getString( str);
             if( str.size() == 0) str = "An empty string recieved.";
-            qTextEdit->setPlainText( QString::fromUtf8( str.c_str()));
+            qTextEdit->setPlainText( afqt::stoq( str));
             break;
          }
          case af::Msg::TStringList:
@@ -50,7 +52,7 @@ WndText::WndText( const QString & Name, af::Msg * msg):
             if( strlist.size() == 0) strlist.push_back("An empty list recieved.");
             int size = strlist.size();
             for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
-               qTextEdit->append( QString::fromUtf8((*it).c_str()));
+               qTextEdit->append( afqt::stoq(*it));
             break;
          }
          case af::Msg::TTask:
@@ -73,9 +75,9 @@ void WndText::showTask( af::Msg * msg)
 {
    af::TaskExec taskexec( msg);
    af::Service service( taskexec);
-   QString wdir = service.getWDir();
-   QString command = service.getCommand();
-   QString files = service.getFiles();
+   QString wdir      = afqt::stoq( service.getWDir());
+   QString command   = afqt::stoq( service.getCommand());
+   QString files     = afqt::stoq( service.getFiles());
 
    QTextCharFormat fParameter;
    QTextCharFormat fInfo;
@@ -84,11 +86,11 @@ void WndText::showTask( af::Msg * msg)
 
    QTextCursor c( qTextEdit->textCursor());
 
-   c.insertText( taskexec.getName(), fParameter);
+   c.insertText( afqt::stoq( taskexec.getName()), fParameter);
    c.insertText( "\n");
-   c.insertText( taskexec.getServiceType(), fParameter);
+   c.insertText( afqt::stoq( taskexec.getServiceType()), fParameter);
    c.insertText( "[", fInfo);
-   c.insertText( taskexec.getParserType(), fParameter);
+   c.insertText( afqt::stoq( taskexec.getParserType()), fParameter);
    c.insertText( "]:", fInfo);
    c.insertText( QString::number( taskexec.getCapacity()), fParameter);
    c.insertText( " frames(", fInfo);

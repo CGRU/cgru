@@ -19,7 +19,7 @@ const int ItemJobBlock::HeightHeader = 23;
 const int ItemJobBlock::HeightFooter = 14;
 
 ItemJobBlock::ItemJobBlock( const af::BlockData* block, ListTasks * list):
-   Item( block->getName(), ItemId),
+   Item( afqt::stoq( block->getName()), ItemId),
    numblock( block->getBlockNum()),
    info( this, block->getBlockNum(), block->getJobId()),
    listtasks( list)
@@ -50,19 +50,19 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       last              = block->getFrameLast();
       pertask           = block->getFramePerTask();
       inc               = block->getFrameInc();
-      multihost_service = block->getMultiHostService();
+      multihost_service = afqt::stoq( block->getMultiHostService());
 
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
-      command           = block->getCmd();
-      workingdir        = block->getWDir();
-      files             = block->getFiles();
-      cmdpre            = block->getCmdPre();
-      cmdpost           = block->getCmdPost();
-      environment       = block->getEnvironment();
-      service           = block->getService();
-      tasksname         = block->getTasksName();
-      parser            = block->getParser();
+      command           = afqt::stoq( block->getCmd());
+      workingdir        = afqt::stoq( block->getWDir());
+      files             = afqt::stoq( block->getFiles());
+      cmdpre            = afqt::stoq( block->getCmdPre());
+      cmdpost           = afqt::stoq( block->getCmdPost());
+      environment       = afqt::stoq( block->getEnvironment());
+      service           = afqt::stoq( block->getService());
+      tasksname         = afqt::stoq( block->getTasksName());
+      parser            = afqt::stoq( block->getParser());
 
       generateToolTip();
 

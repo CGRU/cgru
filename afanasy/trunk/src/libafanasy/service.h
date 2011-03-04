@@ -16,20 +16,20 @@ namespace af
 class Service: public PyClass
 {
 public:
-   Service( const QString & Type,
-            const QString & WDir,
-            const QString & Command,
-            const QString & Files = QString(),
+   Service( const std::string & Type,
+            const std::string & WDir,
+            const std::string & Command,
+            const std::string & Files = std::string(),
             int CapKoeff = 0,
-            const QStringList & Hosts = QStringList());
+            const std::list<std::string> & Hosts = std::list<std::string>());
    Service( const TaskExec & taskexec);
    ~Service();
 
    inline bool isInitialized() const { return initialized;}
 
-   const QString getWDir()    const { return wdir;    }
-   const QString getCommand() const { return command; }
-   const QString getFiles() const   { return files;   }
+   const std::string getWDir()    const { return wdir;    }
+   const std::string getCommand() const { return command; }
+   const std::string getFiles() const   { return files;   }
 
    bool checkFiles( int sizemin, int sizemax);
 
@@ -37,7 +37,7 @@ private:
    void initialize();
 
 private:
-   QString name;
+   std::string name;
 
    PyObject* PyObj_FuncGetWDir;
    PyObject* PyObj_FuncGetCommand;
@@ -46,10 +46,10 @@ private:
 
    bool initialized;
 
-   QString wdir;
-   QString command;
+   std::string wdir;
+   std::string command;
+   std::string files;
    int capkoeff;
-   QStringList hosts;
-   QString files;
+   std::list<std::string> hosts;
 };
 }

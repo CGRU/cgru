@@ -153,18 +153,18 @@ Farm::Farm( const std::string & File, bool Verbose ):
       {
          if( topDomElement.tagName() == XMLNAME_PATTERN)
          {
-            QString name = topDomElement.attribute( XMLNAME_PATTERNNAME, "");
-            QString description = "";
-            QString mask;
+            std::string name = topDomElement.attribute( XMLNAME_PATTERNNAME, "").toUtf8().data();
+            std::string description = "";
+            std::string mask;
             Host host;
-            QStringList remservices;
+            std::list<std::string> remservices;
             if( name == "")
             {
                AFERRAR("Pattern has no name [Line %d - Col %d]: \"%s\"\n",
                   topDomElement.lineNumber(), topDomElement.columnNumber(), topDomElement.tagName().toUtf8().data());
                return;
             }
-            if( Verbose) printf("name: %s\n", name.toUtf8().data());
+            if( Verbose) printf("name: %s\n", name.c_str());
             QDomNode f = topDomElement.firstChild();
             while( !f.isNull())
             {
@@ -254,11 +254,11 @@ Farm::Farm( const std::string & File, bool Verbose ):
                   else if( fieldname == XMLNAME_MASK)
                   {
                      mask = field.text().toUtf8().data();
-                     QRegExp regexp( mask);
+                     QRegExp regexp( QString::fromUtf8( mask.c_str()));
                      if( regexp.isValid() == false)
                      {
                         AFERRAR("Pattern::setMask: \"%s\" set invalid mask \"%s\":\n",
-                           name.toUtf8().data(), mask.toUtf8().data());
+                           name.c_str(), mask.c_str());
                         printf("%s\n", regexp.errorString().toUtf8().data());
                         printf("[Line %d - Col %d]: \"%s\"\n",
                            field.lineNumber(), field.columnNumber(), field.tagName().toUtf8().data());
@@ -268,7 +268,7 @@ Farm::Farm( const std::string & File, bool Verbose ):
                   }
                   else if( fieldname == XMLNAME_SERVISE)
                   {
-                     QString servicename = field.attribute( XMLNAME_SERVISENAME, "");
+                     std::string servicename = field.attribute( XMLNAME_SERVISENAME, "").toUtf8().data();
                      int servicecount = 0;
                      if( servicename == "")
                      {
@@ -289,19 +289,19 @@ Farm::Farm( const std::string & File, bool Verbose ):
                         }
                      }
                      host.setService( servicename, servicecount);
-                     if( Verbose) printf("\t%s: %d\n", servicename.toUtf8().data(), servicecount);
+                     if( Verbose) printf("\t%s: %d\n", servicename.c_str(), servicecount);
                   }
                   else if( fieldname == XMLNAME_SERVISEREMOVE)
                   {
-                     QString servicename = field.attribute( XMLNAME_SERVISENAME, "");
-                     if( servicename == "")
+                     std::string servicename = field.attribute( XMLNAME_SERVISENAME, "").toUtf8().data();
+                     if( servicename.size() == 0 )
                      {
                         AFERRAR("Service to delete has no name [Line %d - Col %d]: \"%s\"\n",
                            field.lineNumber(), field.columnNumber(), field.tagName().toUtf8().data());
                         return;
                      }
-                     if( Verbose) printf("\tRemove Service \"%s\"", servicename.toUtf8().data());
-                     remservices.append( servicename);
+                     if( Verbose) printf("\tRemove Service \"%s\"", servicename.c_str());
+                     remservices.push_back( servicename);
                   }
                }
                f = f.nextSibling();
@@ -409,7 +409,7 @@ bool Farm::addPattern( Pattern * patern)
 {
    if( patern->isValid() == false)
    {
-      AFERRAR("Farm::addPattern: invalid pattern \"%s\"\n", patern->getName().toUtf8().data());
+      AFERRAR("Farm::addPattern: invalid pattern \"%s\"\n", patern->getName().c_str());
       return false;
    }
    if( ptr_first == NULL)
@@ -454,7 +454,7 @@ void Farm::stdOut( bool full) const
    std::cout << stream.str() << std::endl;
 }
 
-bool Farm::getHost( const QString & hostname, Host & host, QString & name, QString & description) const
+bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const
 {
    Pattern * ptr = NULL;
    for( Pattern * p = ptr_first; p != NULL; p = p->ptr_next)

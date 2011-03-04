@@ -55,7 +55,7 @@ void Task::updateState( const af::MCTaskUp & taskup, RenderContainer * renders, 
    if( run == NULL)
    {
       std::ostringstream stream;
-      stream << "Task::updatestate: Task is not running: " << block->job->getName().toUtf8().data();
+      stream << "Task::updatestate: Task is not running: " << block->job->getName();
       stream << "[" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "]";
       AFCommon::QueueLogError( stream.str());
       if(( taskup.getStatus() == af::TaskExec::UPPercent  ) ||
@@ -84,16 +84,26 @@ void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContai
    bool changed = false;
 
    // forgive error hosts
-   if( block->getErrorsForgiveTime() > 0)
-      for( int i = 0; i < errorHosts.size(); )
-         if( currentTime - errorHostsTime[i] > block->getErrorsForgiveTime())
+   if(( false == errorHosts.empty() ) && ( block->getErrorsForgiveTime() > 0 ))
+   {
+      std::list<std::string>::iterator hIt = errorHosts.begin();
+      std::list<int>::iterator cIt = errorHostsCounts.begin();
+      std::list<time_t>::iterator tIt = errorHostsTime.begin();
+      while( hIt != errorHosts.end() )
+         if( currentTime - *tIt > block->getErrorsForgiveTime())
          {
-            log( std::string("Forgived error host \"") + errorHosts[i].toUtf8().data() + "\" since " + af::time2str(errorHostsTime[i]) + ".");
-            errorHosts.removeAt(i);
-            errorHostsCounts.removeAt(i);
-            errorHostsTime.removeAt(i);
+            log( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
+            hIt = errorHosts.erase( hIt);
+            cIt = errorHostsCounts.erase( cIt);
+            tIt = errorHostsTime.erase( tIt);
          }
-         else i++;
+         else
+         {
+            hIt++;
+            cIt++;
+            tIt++;
+         }
+    }
 
    if( renders != NULL )
    {
@@ -139,7 +149,7 @@ void Task::restartError( const std::string & message, RenderContainer * renders,
    if( false == ( progress->state & AFJOB::STATE_ERROR_MASK )) return;
    if( run )
    {
-      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), number);
+      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]\n", block->job->getName().c_str(), block->data->getBlockNum(), number);
       return;
    }
    progress->state = AFJOB::STATE_READY_MASK;
@@ -163,32 +173,45 @@ void Task::skip( const std::string & message, RenderContainer * renders, Monitor
    }
 }
 
-void Task::errorHostsAppend( const QString & hostname)
+void Task::errorHostsAppend( const std::string & hostname)
 {
-   int index = errorHosts.indexOf( hostname);
-   if( index == -1 )
-   {
-      errorHosts << hostname;
-      errorHostsCounts << 1;
-      errorHostsTime << time(NULL);
-   }
-   else
-   {
-      errorHostsCounts[index]++;
-      errorHostsTime[index] = time(NULL);
-      if( errorHostsCounts[index] >= block->getErrorsTaskSameHost() )
+   std::list<std::string>::iterator hIt = errorHosts.begin();
+   std::list<int>::iterator cIt = errorHostsCounts.begin();
+   std::list<time_t>::iterator tIt = errorHostsTime.begin();
+   for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
+      if( *hIt == hostname )
       {
-         log( std::string( hostname.toUtf8().data()) + " - AVOIDING HOST !");
+         (*cIt)++;
+         *tIt = time(NULL);
+         if( *cIt >= block->getErrorsTaskSameHost() )
+            log( hostname + " - AVOIDING HOST !");
+         return;
       }
-   }
+
+   errorHosts.push_back( hostname);
+   errorHostsCounts.push_back( 1);
+   errorHostsTime.push_back( time(NULL));
 }
 
-bool Task::avoidHostsCheck( const QString & hostname) const
+bool Task::avoidHostsCheck( const std::string & hostname) const
 {
    if( block->getErrorsTaskSameHost() < 1 ) return false;
-   int index = errorHosts.indexOf( hostname);
-   if( index == -1 ) return false;
-   if( errorHostsCounts[index] >= block->getErrorsTaskSameHost() ) return true;
+   std::list<std::string>::const_iterator hIt = errorHosts.begin();
+   std::list<int>::const_iterator cIt = errorHostsCounts.begin();
+   std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
+   for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
+      if( *hIt == hostname )
+      {
+         if( *cIt >= block->getErrorsTaskSameHost() )
+         {
+            return true;
+         }
+         else
+         {
+            return false;
+         }
+      }
+
    return false;
 }
 
@@ -197,10 +220,13 @@ void Task::getErrorHostsListString( std::string & str) const
    if( errorHosts.size())
    {
       str += "Task[" + af::itos(number) + "] error hosts: ";
-      for( int h = 0; h < errorHosts.size(); h++)
+      std::list<std::string>::const_iterator hIt = errorHosts.begin();
+      std::list<int>::const_iterator cIt = errorHostsCounts.begin();
+      std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
+      for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
       {
-         str += std::string( errorHosts[h].toUtf8().data()) + ": " + af::itos( errorHostsCounts[h]) + " at " + af::time2str( errorHostsTime[h]);
-         if((block->getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= block->getErrorsAvoidHost())) str += " - ! AVOIDING !";
+         str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
+         if((block->getErrorsAvoidHost() > 0) && ( *cIt >= block->getErrorsAvoidHost())) str += " - ! AVOIDING !";
 //         list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
 //            .arg( af::time2Qstr( errorHostsTime[h]))
 //            .arg(((block->getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= block->getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
@@ -249,8 +275,8 @@ const std::string Task::getOutputFileName( int startcount) const
    stream << "b"  << block->data->getBlockNum();
    stream << ".t" << number;
    stream << ".s" << startcount;
-   stream << "-" << block->data->getName().toUtf8().data();
-   stream << "." << block->data->genTaskName( number).toUtf8().data();
+   stream << "-" << block->data->getName();
+   stream << "." << block->data->genTaskName( number);
 //   QString filename = QString("b%1.t%2.s%3-%4.%5")
 //                        .arg( block->data->getBlockNum()).arg( number).arg( startcount)
 //                        .arg( block->data->getName())
@@ -292,17 +318,17 @@ bool Task::getOutput( int startcount, MsgAf *msg, std::string & filename, Render
    return true;
 }
 
-const QString Task::getInfo( bool full) const
+const std::string Task::getInfo( bool full) const
 {
-   QString info;
-   info += QString("#%1:").arg( number, 3);
-   info += QString(" %1").arg( af::state2str( progress->state), 4);
+   std::string info = "#";
+   info += af::itos( number) + " ";
+   info += af::state2str( progress->state);
    return info;
 }
 
 void Task::stdOut( bool full) const
 {
-   printf("%s\n", getInfo( full).toUtf8().data());
+   std::cout << getInfo( full) << std::endl;
 }
 
 int Task::calcWeight() const
@@ -323,6 +349,8 @@ int Task::logsWeight() const
 int Task::blackListWeight() const
 {
    int weight = sizeof(int) * errorHostsCounts.size();
-   for( int i = 0; i < errorHosts.size(); i++) weight += af::weigh(errorHosts[i]);
+   weight += sizeof(time_t) * errorHostsTime.size();
+   for( std::list<std::string>::const_iterator hIt = errorHosts.begin(); hIt != errorHosts.end(); hIt++ )
+      weight += af::weigh( *hIt);
    return weight;
 }

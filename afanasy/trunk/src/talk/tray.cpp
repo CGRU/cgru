@@ -8,14 +8,16 @@
 
 #include "../libafanasy/environment.h"
 
+#include "../libafqt/name_afqt.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 Tray::Tray( QWidget * parent, const QString & UserName):
    QSystemTrayIcon( parent),
-   icon( QString::fromUtf8( af::Environment::getAfRoot().c_str()) + "/icons/talk_tray.png"),
-   icon_msg( QString::fromUtf8( af::Environment::getAfRoot().c_str()) + "/icons/talk_tray_msg.png"),
+   icon( afqt::stoq( af::Environment::getAfRoot()) + "/icons/talk_tray.png"),
+   icon_msg( afqt::stoq( af::Environment::getAfRoot()) + "/icons/talk_tray_msg.png"),
    icon_flashing( false),
    icon_state( false),
    username( UserName),

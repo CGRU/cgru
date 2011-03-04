@@ -14,7 +14,7 @@ Job::Job():
    af::Job( 0),
    message( NULL)
 {
-   name = QString::fromUtf8( AFJOB::DEFAULT_NAME);
+   name = AFJOB::DEFAULT_NAME;
 }
 Job::~Job()
 {
@@ -23,12 +23,12 @@ Job::~Job()
    for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
 }
 
-void Job::setUserName(        const char * str     )  { username     = QString::fromUtf8(str);              }
-void Job::setHostName(        const char * str     )  { hostname     = QString::fromUtf8(str);              }
-void Job::setName(            const char * str     )  { name         = QString::fromUtf8(str);              }
-void Job::setCmdPre(          const char * str     )  { cmd_pre      = QString::fromUtf8(str);              }
-void Job::setCmdPost(         const char * str     )  { cmd_post     = QString::fromUtf8(str);              }
-void Job::setDescription(     const char * str     )  { description  = str;                                 }
+void Job::setUserName(        const char * str     )  { username     = str;   }
+void Job::setHostName(        const char * str     )  { hostname     = str;   }
+void Job::setName(            const char * str     )  { name         = str;   }
+void Job::setCmdPre(          const char * str     )  { cmd_pre      = str;   }
+void Job::setCmdPost(         const char * str     )  { cmd_post     = str;   }
+void Job::setDescription(     const char * str     )  { description  = str;   }
 void Job::setMaxRunningTasks(       int value   )  { maxrunningtasks = value;                               }
 void Job::setPriority(              int value   )  { priority        = value;                               }
 void Job::setWaitTime(              int value   )  { time_wait       = value;                               }
@@ -39,39 +39,33 @@ void Job::clearBlocksList() { blocks.clear();}
 
 bool Job::setHostsMask(    const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::Job::setHostsMask( qstr);
+   return af::Job::setHostsMask( str);
 }
 bool Job::setHostsMaskExclude(    const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::Job::setHostsMaskExclude( qstr);
+   return af::Job::setHostsMaskExclude( str);
 }
 bool Job::setDependMask( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::Job::setDependMask( qstr);
+   return af::Job::setDependMask( str);
 }
 bool Job::setDependMaskGlobal( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::Job::setDependMaskGlobal( qstr);
+   return af::Job::setDependMaskGlobal( str);
 }
 bool Job::setNeedOS( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::Job::setNeedOS( qstr);
+   return af::Job::setNeedOS( str);
 }
 bool Job::setNeedProperties( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::Job::setNeedProperties( qstr);
+   return af::Job::setNeedProperties( str);
 }
 
 void Job::setUniqueBlockName( Block * block)
 {
    int block_num = 1;
-   QString newBlockName( block->getName());
+   std::string newBlockName( block->getName());
    for(;;)
    {
       bool dubname = false;
@@ -79,7 +73,7 @@ void Job::setUniqueBlockName( Block * block)
       {
          if( newBlockName == (*it)->getName())
          {
-            newBlockName = block->getName() + QString::number( block_num++);
+            newBlockName = block->getName() + af::itos( block_num++);
             dubname = true;
             break;
          }
@@ -96,7 +90,7 @@ bool Job::appendBlock( Block * block)
    for( std::list<Block*>::const_iterator it = blocks.begin(); it != blocks.end(); it++)
       if( block == *it)
       {
-         AFERRAR("Job::appendBlock: Job already has a block '%s'. Skipping.\n", block->getName().toUtf8().data());
+         AFERRAR("Job::appendBlock: Job already has a block '%s'. Skipping.\n", block->getName().c_str())
          return false;
       }
 

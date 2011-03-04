@@ -12,7 +12,7 @@ class ParserHost
 
 public:
 
-   ParserHost( const QString & task_type, int num_frames);
+   ParserHost( const std::string & task_type, int num_frames);
    ~ParserHost();
 
    void read( QByteArray & output);
@@ -29,7 +29,7 @@ public:
 private:
    af::Parser * parser;
 
-   QString type;
+   std::string type;
    int numframes;
 
    int  percent;

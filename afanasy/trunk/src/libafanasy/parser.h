@@ -14,7 +14,7 @@ namespace af
 class Parser: public PyClass
 {
 public:
-   Parser( const QString & type, int frames = 1);
+   Parser( const std::string & type, int frames = 1);
    ~Parser();
 
    inline bool isInitialized() const { return initialized;}
@@ -26,7 +26,7 @@ public:
 private:
    bool initialized;
    int  numframes;
-   QString name;
+   std::string name;
 
    PyObject* PyObj_FuncParse;
 };

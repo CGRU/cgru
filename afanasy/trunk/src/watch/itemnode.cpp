@@ -6,12 +6,14 @@
 
 #include "../include/afjob.h"
 
+#include "../libafqt/name_afqt.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 ItemNode::ItemNode( af::Node *node):
-   Item( node->getName(), node->getId()),
+   Item( afqt::stoq( node->getName()), node->getId()),
    height( Height),
    sort_int( NULL),
    sort_uint( NULL),

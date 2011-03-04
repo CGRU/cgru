@@ -114,12 +114,12 @@ void ListTalks::actSendMessage()
    QString text = QInputDialog::getText(this, "Send Message", "Enter Text", QLineEdit::Normal, "", &ok);
    if( !ok) return;
 
-   af::MCTalkdistmessage mcdmsg( af::Environment::getUserName(), text);
+   af::MCTalkdistmessage mcdmsg( af::Environment::getUserName(), text.toUtf8().data());
 
    QList<Item*> items( getSelectedItems());
    if( items.count() < 1) return;
 
-   for( int i = 0; i < items.count(); i++) mcdmsg.addUser(((ItemTalk*)(items[i]))->getUserName());
+   for( int i = 0; i < items.count(); i++) mcdmsg.addUser(((ItemTalk*)(items[i]))->getUserName().toUtf8().data());
 
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTalkDistributeData, &mcdmsg));
 }

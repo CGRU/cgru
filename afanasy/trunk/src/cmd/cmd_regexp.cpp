@@ -1,5 +1,8 @@
 #include "cmd_regexp.h"
 
+#include <QtCore/QRegExp>
+#include <QtCore/QString>
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

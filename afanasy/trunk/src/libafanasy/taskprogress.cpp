@@ -37,7 +37,7 @@ void TaskProgress::readwrite( Msg * msg)
    rw_int32_t ( errors_count, msg);
    rw_uint32_t( time_start,   msg);
    rw_uint32_t( time_done,    msg);
-   rw_QString ( hostname,     msg);
+   rw_String  ( hostname,     msg);
 }
 
 int TaskProgress::calcWeight() const
@@ -57,5 +57,5 @@ void TaskProgress::generateInfoStream( std::ostringstream & stream, bool full ) 
    stream << " (" << af::time2str( time_start, time_format);
    stream << "-" << af::time2str( time_done, time_format);
    stream << "=" << af::time2str( time_done - time_start, time_format) << ")";
-   stream << " - " << hostname.toUtf8().data();
+   if( false == hostname.empty()) stream << " - " << hostname;
 }

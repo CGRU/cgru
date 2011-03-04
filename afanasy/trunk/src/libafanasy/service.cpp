@@ -14,12 +14,12 @@ using namespace af;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Service::Service( const QString & Type,
-            const QString & WDir,
-            const QString & Command,
-            const QString & Files,
+Service::Service( const std::string & Type,
+            const std::string & WDir,
+            const std::string & Command,
+            const std::string & Files,
             int CapKoeff,
-            const QStringList & Hosts
+            const std::list<std::string> & Hosts
 ):
    name( Type),
    wdir( WDir),
@@ -51,8 +51,8 @@ void Service::initialize()
    initialized = false;
 
    PyObject * pHostsList = PyList_New(0);
-   for( int h = 0; h < hosts.size(); h++)
-      if( PyList_Append( pHostsList , PyString_FromString( hosts[h].toUtf8().data())) != 0)
+   for( std::list<std::string>::const_iterator it = hosts.begin(); it != hosts.end(); it++)
+      if( PyList_Append( pHostsList, PyString_FromString((*it).c_str())) != 0)
       {
          AFERROR("Service::Service: PyList_Append:\n");
          PyErr_Print();
@@ -61,13 +61,13 @@ void Service::initialize()
    PyObject *pArgs;
    pArgs = PyTuple_New( 6);
    PyTuple_SetItem( pArgs, 0, PyString_FromString( af::Environment::getAfRoot().c_str()));
-   PyTuple_SetItem( pArgs, 1, PyString_FromString( wdir.toUtf8().data()));
-   PyTuple_SetItem( pArgs, 2, PyString_FromString( command.toUtf8().data()));
+   PyTuple_SetItem( pArgs, 1, PyString_FromString( wdir.c_str()));
+   PyTuple_SetItem( pArgs, 2, PyString_FromString( command.c_str()));
    PyTuple_SetItem( pArgs, 3, PyInt_FromLong( capkoeff));
    PyTuple_SetItem( pArgs, 4, pHostsList );
-   PyTuple_SetItem( pArgs, 5, PyString_FromString( files.toUtf8().data()));
+   PyTuple_SetItem( pArgs, 5, PyString_FromString( files.c_str()));
 
-   if( PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name.toUtf8().data(), pArgs) == false) return;
+   if( PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name, pArgs) == false) return;
 
    //Get functions:
    PyObj_FuncGetWDir= getFunction( AFPYNAMES::SERVICE_FUNC_GETWDIR);
@@ -85,7 +85,7 @@ void Service::initialize()
    pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
    if( PyString_Check( pResult))
    {
-      wdir = QString::fromUtf8( PyString_AsString( pResult));
+      wdir = PyString_AsString( pResult);
       Py_DECREF( pResult);
    }
    else
@@ -99,7 +99,7 @@ void Service::initialize()
    pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
    if( PyString_Check( pResult))
    {
-      command = QString::fromUtf8( PyString_AsString( pResult));
+      command = PyString_AsString( pResult);
       Py_DECREF( pResult);
    }
    else
@@ -113,7 +113,7 @@ void Service::initialize()
    pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
    if( PyString_Check( pResult))
    {
-      files = QString::fromUtf8( PyString_AsString( pResult));
+      files = PyString_AsString( pResult);
       Py_DECREF( pResult);
    }
    else

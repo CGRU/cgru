@@ -19,7 +19,7 @@ class User : public Node
 public:
 
 /// Construct a new user from job.
-   User( const QString &username, const std::string & host);
+   User( const std::string & username, const std::string & host);
 
 /// Construct user from id only.
    User( int uid);
@@ -31,9 +31,9 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline bool setHostsMask(         const QString & str  )
+   inline bool setHostsMask(         const std::string & str  )
       { return setRegExp( hostsmask, str, "user hosts mask");}
-   inline bool setHostsMaskExclude(  const QString & str  )
+   inline bool setHostsMaskExclude(  const std::string & str  )
       { return setRegExp( hostsmask_exclude, str, "user exclude hosts mask");}
 
    inline bool hasHostsMask()          const { return false == hostsmask.isEmpty();          }
@@ -42,13 +42,13 @@ public:
    inline const std::string & getHostName() const { return hostname;}
    inline void  setHostName( const std::string & str) { hostname = str;}
 
-   inline const QString getHostsMask()          const { return hostsmask.pattern();          }
-   inline const QString getHostsMaskExclude()   const { return hostsmask_exclude.pattern();  }
+   inline const std::string getHostsMask()          const { return hostsmask.pattern().toUtf8().data();          }
+   inline const std::string getHostsMaskExclude()   const { return hostsmask_exclude.pattern().toUtf8().data();  }
 
-   inline bool checkHostsMask(         const QString & str  ) const
-      { if( hostsmask.isEmpty()        ) return true;   return hostsmask.exactMatch(str); }
-   inline bool checkHostsMaskExclude(  const QString & str  ) const
-      { if( hostsmask_exclude.isEmpty()) return false;  return hostsmask_exclude.exactMatch(str); }
+   inline bool checkHostsMask(         const std::string & str  ) const
+      { if( hostsmask.isEmpty()        ) return true;   return hostsmask.exactMatch( QString::fromUtf8(str.c_str())); }
+   inline bool checkHostsMaskExclude(  const std::string & str  ) const
+      { if( hostsmask_exclude.isEmpty()) return false;  return hostsmask_exclude.exactMatch( QString::fromUtf8(str.c_str())); }
 
    inline int      getMaxRunningTasks()      const { return maxrunningtasks;     } ///< Get maximum hosts.
    inline int      getNumJobs()              const { return numjobs;             } ///< Get jobs quantity.

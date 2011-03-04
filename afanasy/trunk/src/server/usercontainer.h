@@ -17,7 +17,7 @@ public:
    ~UserContainer();
 
 /// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
-   UserAf* addUser( const QString &username, const std::string & hostname, MonitorContainer * monitoring);
+   UserAf* addUser( const std::string & username, const std::string & hostname, MonitorContainer * monitoring);
 
 /// Add user, called on start with user created from batadase.
    void    addUser( UserAf * user);

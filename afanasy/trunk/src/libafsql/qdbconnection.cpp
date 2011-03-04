@@ -25,7 +25,7 @@
 
 using namespace afsql;
 
-DBConnection::DBConnection( const QString & connection_name):
+DBConnection::DBConnection( const std::string & connection_name):
    working( false)
 {
    db = newDatabase( connection_name);

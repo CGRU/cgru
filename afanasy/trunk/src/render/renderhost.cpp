@@ -13,6 +13,8 @@
 #ifdef WINNT
 #include <QtCore/QDir>
 #include <QtCore/QFile>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
 #endif
 
 #define AFOUTPUT
@@ -36,13 +38,12 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
    host.os = af::Environment::getPlatform();
    GetResources( host, hres, true);
 
-   QStringList resclasses = af::Environment::getRenderResClasses().split(';');
-   for( int i = 0; i < resclasses.size(); i++)
+   std::list<std::string> resclasses = af::strSplit( af::Environment::getRenderResClasses(), ";");
+   for( std::list<std::string>::const_iterator it = resclasses.begin(); it != resclasses.end(); it++)
    {
-      QString classname = resclasses[i].trimmed();
-      if( classname.isEmpty() ) continue;
-      printf("Adding custom resource meter '%s'\n", classname.toUtf8().data());
-      pyres.push_back( new PyRes( classname.toUtf8().data(), &hres));
+      if( (*it).empty() ) continue;
+      printf("Adding custom resource meter '%s'\n", (*it).c_str());
+      pyres.push_back( new PyRes( *it, &hres));
    }
 
 #ifdef WINNT
@@ -51,7 +52,7 @@ RenderHost::RenderHost( int32_t State, uint8_t Priority):
    QStringList wmdfiles = QDir(af::Environment::getAfRoot().c_str()).entryList( QStringList("windowsmustdie*.txt"), QDir::Files, QDir::Name);
    for( int i = 0; i < wmdfiles.size(); i++)
    {
-      QString filename = QString("%1\\%2").arg( QString::fromUtf8( af::Environment::getAfRoot().c_str())).arg( wmdfiles[i]);
+      QString filename = QString("%1\\%2").arg( afqt::stoq( af::Environment::getAfRoot())).arg( wmdfiles[i]);
       QFile file( filename);
       if( file.open(QFile::ReadOnly))
       {

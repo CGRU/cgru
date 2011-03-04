@@ -1,11 +1,12 @@
 #include "listjobs.h"
 
-#include <QtGui/QBoxLayout>
-#include <QtGui/QMenu>
+#include <QtCore/QDateTime>
 #include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
 #include <QtCore/QTimer>
+#include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QMenu>
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
@@ -384,7 +385,7 @@ void ListJobs::actAnnotate()
    QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( text);
+   af::MCGeneral mcgeneral( text.toUtf8().data());
    action( mcgeneral, af::Msg::TJobAnnotate);
 }
 
@@ -554,7 +555,7 @@ void ListJobs::actHostsMask()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask );
+   af::MCGeneral mcgeneral( mask.toUtf8().data() );
    action( mcgeneral, af::Msg::TJobHostsMask);
    displayInfo( "Change job hosts mask.");
 }
@@ -576,7 +577,7 @@ void ListJobs::actHostsMaskExclude()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask );
+   af::MCGeneral mcgeneral( mask.toUtf8().data() );
    action( mcgeneral, af::Msg::TJobHostsMaskExclude);
    displayInfo( "Change job exclude hosts mask.");
 }
@@ -598,7 +599,7 @@ void ListJobs::actDependMask()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask );
+   af::MCGeneral mcgeneral( mask.toUtf8().data());
    action( mcgeneral, af::Msg::TJobDependMask);
    displayInfo( "Change job depend mask.");
 }
@@ -620,7 +621,7 @@ void ListJobs::actDependMaskGlobal()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask );
+   af::MCGeneral mcgeneral( mask.toUtf8().data() );
    action( mcgeneral, af::Msg::TJobDependMaskGlobal);
    displayInfo( "Change job depend mask.");
 }
@@ -642,7 +643,7 @@ void ListJobs::actNeedOS()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask );
+   af::MCGeneral mcgeneral( mask.toUtf8().data() );
    action( mcgeneral, af::Msg::TJobNeedOS);
    displayInfo( "Change job OS needed.");
 }
@@ -664,7 +665,7 @@ void ListJobs::actNeedProperties()
       return;
    }
 
-   af::MCGeneral mcgeneral( mask );
+   af::MCGeneral mcgeneral( mask.toUtf8().data() );
    action( mcgeneral, af::Msg::TJobNeedProperties);
    displayInfo( "Change job needed properties.");
 }
@@ -679,7 +680,7 @@ void ListJobs::actPostCommand()
    QString cmd = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, current, &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( cmd );
+   af::MCGeneral mcgeneral( cmd.toUtf8().data() );
    action( mcgeneral, af::Msg::TJobCmdPost);
    displayInfo( "Change post command.");
 }

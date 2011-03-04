@@ -46,7 +46,8 @@ int Client::calcWeight() const
    int weight = Node::calcWeight();
 //printf("Client::calcWeight: Node::calcWeight: %d bytes\n", weight);
    weight += sizeof(Client) - sizeof( Node);
-   weight += username.size()+1;
+   weight += weigh( username);
+   weight += weigh( version );
    if( address != NULL) weight += address->calcWeight();
 //printf("Client::calcWeight: %d bytes ( sizeof Client = %d)\n", weight, sizeof( Client));
    return weight;

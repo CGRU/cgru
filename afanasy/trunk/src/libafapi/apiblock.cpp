@@ -19,7 +19,7 @@ AFINFA("API: Block constuctor called.\n");
 
 Block::~Block()
 {
-AFINFA("API: Block['%s'] destructor called\n", name.toUtf8().data());
+AFINFA("API: Block['%s'] destructor called\n", name.c_str());
 // Do not delete tasks with block. They must be deleted manually. Python will delete them.
    if(tasksdata) for( int b = 0; b < tasksnum; b++) tasksdata[b] = NULL;
 }
@@ -39,42 +39,37 @@ void Block::setMaxRunningTasksNumber(  int value   )  { maxrunningtasks = value;
 void Block::setTasksMaxRunTime(        int value   )  { tasksmaxruntime = value; }
 void Block::setParserCoeff(            int value   )  { parsercoeff     = value; }
 
-void Block::setName(             const char * str) {  name        = QString::fromUtf8(str);  }
-void Block::setService(          const char * str) {  service     = QString::fromUtf8(str);  }
-void Block::setParser(           const char * str) {  parser      = QString::fromUtf8(str);  }
-void Block::setTasksName(        const char * str) {  tasksname   = QString::fromUtf8(str);  }
-void Block::setCmdPre(           const char * str) {  cmd_pre     = QString::fromUtf8(str);  }
-void Block::setCmdPost(          const char * str) {  cmd_post    = QString::fromUtf8(str);  }
-void Block::setCommand(          const char * str) {  command     = QString::fromUtf8(str);  }
-void Block::setFiles(            const char * str) {  files       = QString::fromUtf8(str);  }
-void Block::setWorkingDirectory( const char * str) {  wdir        = QString::fromUtf8(str);  }
-void Block::setEnvironment(      const char * str) {  environment = QString::fromUtf8(str);  }
-void Block::setCustomData(       const char * str) {  customdata  = QString::fromUtf8(str);  }
+void Block::setName(             const char * str) {  name        = str;   }
+void Block::setService(          const char * str) {  service     = str;   }
+void Block::setParser(           const char * str) {  parser      = str;   }
+void Block::setTasksName(        const char * str) {  tasksname   = str;   }
+void Block::setCmdPre(           const char * str) {  cmd_pre     = str;   }
+void Block::setCmdPost(          const char * str) {  cmd_post    = str;   }
+void Block::setCommand(          const char * str) {  command     = str;   }
+void Block::setFiles(            const char * str) {  files       = str;   }
+void Block::setWorkingDirectory( const char * str) {  wdir        = str;   }
+void Block::setEnvironment(      const char * str) {  environment = str;   }
+void Block::setCustomData(       const char * str) {  customdata  = str;   }
 
 bool Block::setDependMask( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::BlockData::setDependMask( qstr);
+   return af::BlockData::setDependMask( str);
 }
 bool Block::setTasksDependMask( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::BlockData::setTasksDependMask( qstr);
+   return af::BlockData::setTasksDependMask( str);
 }
 bool Block::setHostsMask( const char* str )
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::BlockData::setHostsMask( qstr);
+   return af::BlockData::setHostsMask( str);
 }
 bool Block::setHostsMaskExclude( const char* str)
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::BlockData::setHostsMaskExclude( qstr);
+   return af::BlockData::setHostsMaskExclude( str);
 }
 bool Block::setNeedProperties( const char* str)
 {
-   QString qstr = QString::fromUtf8( str);
-   return af::BlockData::setNeedProperties( qstr);
+   return af::BlockData::setNeedProperties( str);
 }
 
 bool Block::setNumeric( int start, int end, int perHost, int increment)
@@ -120,11 +115,10 @@ void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, co
       return;
    }
    if( sameHostMaster && service)
-      if( QString::fromUtf8(service).isEmpty() == false)
-      {
-         AFERROR("Block::setMultiHost: Block can't have multihost service if master and slave can be the same host.\n");
-         sameHostMaster = false;
-      }
+   {
+      AFERROR("Block::setMultiHost: Block can't have multihost service if master and slave can be the same host.\n");
+      sameHostMaster = false;
+   }
 
    flags = flags | FMultiHost;
    if( sameHostMaster) flags = flags | FSameHostMaster;
@@ -132,7 +126,7 @@ void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, co
    multihost_max  = max;
    multihost_waitmax = waitmax;
    multihost_waitsrv = waitsrv;
-   if( service) multihost_service = QString::fromUtf8(service);
+   if( service) multihost_service = service;
 }
 
 void Block::clearTasksList()
@@ -144,10 +138,10 @@ void Block::clearTasksList()
 
 bool Block::appendTask( Task * task)
 {
-AFINFO("API: Block::appendTask:\n");
+   AFINFO("API: Block::appendTask:\n")
    if( isNumeric())
    {
-      AFERROR("Block::appendTask: Can't add a task. Block is numeric!\n");
+      AFERROR("Block::appendTask: Can't add a task. Block is numeric!\n")
       return false;
    }
 
@@ -155,13 +149,13 @@ AFINFO("API: Block::appendTask:\n");
    for( std::list<Task*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
       if( task == *it)
       {
-         AFERRAR("Block::appendTask: Block already has a task '%s'. Skipping.\n", task->getName().toUtf8().data());
+         AFERRAR("Block::appendTask: Block already has a task '%s'. Skipping.\n", task->getName().c_str())
          return false;
       }
 
    // Get task unique name:
    int suffix_num = 1;
-   QString newName( task->getName());
+   std::string newName( task->getName());
    for(;;)
    {
       bool dubname = false;
@@ -169,7 +163,7 @@ AFINFO("API: Block::appendTask:\n");
       {
          if( newName == (*it)->getName())
          {
-            newName = task->getName() + QString::number( suffix_num++);
+            newName = task->getName() + af::itos( suffix_num++);
             dubname = true;
             break;
          }
@@ -186,7 +180,7 @@ AFINFO("API: Block::appendTask:\n");
 
 int Block::calcWeight() const
 {
-AFINFO("API: Block::calcWeight:\n");
+   AFINFO("API: Block::calcWeight:\n")
    int weight = af::BlockData::calcWeight();
    std::list<Task*>::const_iterator tasks_end = tasks.end();
    for( std::list<Task*>::const_iterator it = tasks.begin(); it != tasks_end; it++)

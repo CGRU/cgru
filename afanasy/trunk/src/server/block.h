@@ -33,7 +33,7 @@ public:
    int blackListWeight() const;
 
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
-   bool avoidHostsCheck( const QString & hostname) const;
+   bool avoidHostsCheck( const std::string & hostname) const;
    void getErrorHostsListString( std::string & str) const;
    virtual void errorHostsReset();
 
@@ -53,15 +53,15 @@ public:
 
 protected:
    virtual void log( const std::string & message);
-   bool errorHostsAppend( const QString & hostname);
+   bool errorHostsAppend( const std::string & hostname);
 
 private:
    af::JobProgress * jobprogress;
    std::list<std::string> * joblog;
 
-   QStringList    errorHosts;       ///< Avoid error hosts list.
-   QList<int>     errorHostsCounts; ///< Number of errors on error host.
-   QList<time_t>  errorHostsTime;   ///< Time of the last error
+   std::list<std::string>  errorHosts;       ///< Avoid error hosts list.
+   std::list<int>          errorHostsCounts; ///< Number of errors on error host.
+   std::list<time_t>       errorHostsTime;   ///< Time of the last error
 
    std::list<int> dependBlocks;
    bool initialized;             ///< Where the block was successfully  initialized.

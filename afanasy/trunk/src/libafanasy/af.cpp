@@ -1,5 +1,10 @@
 #include "af.h"
 
+#include <string.h>
+
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+
 #include "msg.h"
 
 #define AFOUTPUT
@@ -259,7 +264,7 @@ void Af::rw_QRegExp( QRegExp &qRegExp, Msg * msg)
       qRegExp.setPattern( pattern);
    }
 }
-
+/*
 void Af::rw_QStringList( QStringList& qStringList, Msg * msg)
 {
    uint32_t length;
@@ -275,6 +280,23 @@ void Af::rw_QStringList( QStringList& qStringList, Msg * msg)
          qStringList << qstr;
       }
    }
+}
+*/
+void Af::rw_StringVect( std::vector<std::string> & stringVect, Msg * msg)
+{
+   uint32_t length;
+   if( msg->isWriting() ) length = stringVect.size();
+   rw_uint32_t( length, msg);
+   if( msg->isWriting() )
+      for( std::vector<std::string>::iterator it = stringVect.begin(); it != stringVect.end(); it++)
+         rw_String( *it, msg);
+   else
+      for( int i = 0; i < length; i++)
+      {
+         std::string str;
+         rw_String( str, msg);
+         stringVect.push_back( str);
+      }
 }
 
 void Af::rw_StringList( std::list<std::string> & stringList, Msg * msg)

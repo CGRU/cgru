@@ -13,18 +13,18 @@ PyClass::PyClass():
 {
 }
 
-bool PyClass::init( const char * dir, const char * name, PyObject * initArgs)
+bool PyClass::init( const std::string & dir, const std::string & name, PyObject * initArgs)
 {
-   sprintf( modulename, "%s.%s", dir, name);
-   AFINFA("Instancing pyclass '%s'\n", modulename);
+   modulename = dir + "." + name;
+   AFINFA("Instancing pyclass '%s'\n", modulename.c_str());
 
    //
    // Load module
-   PyObject * _PyObj_Module_ = PyImport_ImportModule( modulename);
+   PyObject * _PyObj_Module_ = PyImport_ImportModule( modulename.c_str());
    if(_PyObj_Module_== NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to import module '%s'\n", modulename);
+      AFERRAR("Failed to import module '%s'\n", modulename.c_str());
       return false;
    }
    // Reload module
@@ -32,17 +32,17 @@ bool PyClass::init( const char * dir, const char * name, PyObject * initArgs)
    if( PyObj_Module == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to reload module '%s'\n", modulename);
+      AFERRAR("Failed to reload module '%s'\n", modulename.c_str());
       return false;
    }
    Py_DECREF( _PyObj_Module_);
 
    //Get class type
-   PyObj_Type = PyObject_GetAttrString( PyObj_Module, name);
+   PyObj_Type = PyObject_GetAttrString( PyObj_Module, name.c_str());
    if( PyObj_Type == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed find class '%s'\n", name);
+      AFERRAR("Failed find class '%s'\n", name.c_str());
       return false;
    }
 
@@ -51,7 +51,7 @@ bool PyClass::init( const char * dir, const char * name, PyObject * initArgs)
    if( PyObj_Instance == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to instance '%s'\n", name);
+      AFERRAR("Failed to instance '%s'\n", name.c_str());
       return false;
    }
    if( initArgs) Py_DECREF( initArgs);
@@ -70,14 +70,14 @@ PyClass::~PyClass()
    if( PyObj_Module     ) Py_XDECREF( PyObj_Module    );
 }
 
-PyObject * PyClass::getFunction( const char * name)
+PyObject * PyClass::getFunction( const std::string & name)
 {
    // Get attribute object:
-   PyObject * PyObj_Func = PyObject_GetAttrString( PyObj_Instance, name);
+   PyObject * PyObj_Func = PyObject_GetAttrString( PyObj_Instance, name.c_str());
    if( PyObj_Func == NULL )
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Cannot find function '%s' in '%s'\n", name, modulename);
+      AFERRAR("Cannot find function '%s' in '%s'\n", name.c_str(), modulename.c_str());
       return NULL;
    }
 
@@ -85,7 +85,7 @@ PyObject * PyClass::getFunction( const char * name)
    if( PyCallable_Check( PyObj_Func) == false)
    {
       Py_XDECREF( PyObj_Func);
-      AFERRAR("Attribute '%s' in object '%s' is not callable\n", name, modulename);
+      AFERRAR("Attribute '%s' in object '%s' is not callable\n", name.c_str(), modulename.c_str());
       return NULL;
    }
 

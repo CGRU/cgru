@@ -16,17 +16,11 @@ CmdSrvCapacity::CmdSrvCapacity()
 CmdSrvCapacity::~CmdSrvCapacity(){}
 bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok;
-   int capacity = (QString::fromUtf8(argv[2])).toInt( &ok);
-   if( false == ok )
-   {
-      AFERRAR("Invalid capacity number '%s'.\n", argv[2]);
-      return false;
-   }
-   QString wdir;
-   QString command( argv[1]);
-   QStringList hosts;
-   QString files;
+   int capacity = atoi(argv[2]);
+   std::string wdir;
+   std::string command( argv[1]);
+   std::string files;
+   std::list<std::string> hosts;
 
    af::Service service( argv[0], wdir, command, files, capacity);
    if( service.isInitialized() == false)
@@ -36,7 +30,10 @@ bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
    }
 
    command = service.getCommand();
-   printf("Result Command:\n%s\n", command.toUtf8().data());
+   std::cout << "Result Command:";
+   std::cout << std::endl;
+   std::cout << command;
+   std::cout << std::endl;
    return true;
 }
 
@@ -50,13 +47,13 @@ CmdSrvHosts::CmdSrvHosts()
 CmdSrvHosts::~CmdSrvHosts(){}
 bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString command( argv[1]);
-   QStringList hosts;
-   for( int a = 2; a < argc; a++) hosts << argv[a];
+   std::string command( argv[1]);
+   std::list<std::string> hosts;
+   for( int a = 2; a < argc; a++) hosts.push_back( argv[a]);
 
-   QString wdir;
+   std::string wdir;
    int capacity = -1;
-   QString files;
+   std::string files;
 
    af::Service service( argv[0], wdir, command, files, capacity, hosts);
    if( service.isInitialized() == false)
@@ -66,6 +63,9 @@ bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
    }
 
    command = service.getCommand();
-   printf("Result Command:\n%s\n", command.toUtf8().data());
+   std::cout << "Result Command:";
+   std::cout << std::endl;
+   std::cout << command;
+   std::cout << std::endl;
    return true;
 }

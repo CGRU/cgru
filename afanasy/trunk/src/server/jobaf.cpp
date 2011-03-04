@@ -135,7 +135,7 @@ bool JobAf::initialize( UserAf * jobOwner)
 
 //
 // Create tasks output directory ( if needed )
-   tasksoutputdir = name.toUtf8().data();
+   tasksoutputdir = name;
    af::pathFilterFileName( tasksoutputdir);
    tasksoutputdir = af::Environment::getTasksStdOutDir() + '/' + tasksoutputdir;
    if( af::pathMakeDir( tasksoutputdir) == false)
@@ -149,17 +149,17 @@ bool JobAf::initialize( UserAf * jobOwner)
 
    if( fromdatabase == false )
    {
-      if( cmd_pre.isEmpty() == false )
+      if( false == cmd_pre.empty())
       {
-         AFCommon::executeCmd( cmd_pre.toUtf8().data());
-         log( std::string("Job pre command executed:\n") + cmd_pre.toUtf8().data());
+         AFCommon::executeCmd( cmd_pre);
+         log( std::string("Job pre command executed:\n") + cmd_pre);
       }
       for( int b = 0; b < blocksnum; b++)
       {
          if( blocksdata[b]->hasCmdPre() )
          {
-            AFCommon::executeCmd( blocksdata[b]->getCmdPre().toUtf8().data());
-            log( std::string("Block[") + blocksdata[b]->getName().toUtf8().data() + "] pre command executed:\n" + blocksdata[b]->getCmdPre().toUtf8().data());
+            AFCommon::executeCmd( blocksdata[b]->getCmdPre());
+            log( std::string("Block[") + blocksdata[b]->getName() + "] pre command executed:\n" + blocksdata[b]->getCmdPre());
          }
       }
       log("Initialized.");
@@ -223,17 +223,17 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
       return;
    }
 
-   if( cmd_post.isEmpty() == false )
+   if( false == cmd_post.empty())
    {
       SysJob::addCommand( cmd_post, blocksnum > 0 ? blocksdata[0]->getWDir(): "", username, name);
-      log( std::string("Executing job post command:\n") + cmd_post.toUtf8().data());
+      log( std::string("Executing job post command:\n") + cmd_post);
    }
    for( int b = 0; b < blocksnum; b++)
    {
       if( blocksdata[b]->hasCmdPost())
       {
          SysJob::addCommand( blocksdata[b]->getCmdPost(), blocksdata[b]->getWDir(), username, name);
-         log( std::string("Executing block[") + blocksdata[b]->getName().toUtf8().data() + "] post command:\n" + blocksdata[b]->getCmdPost().toUtf8().data());
+         log( std::string("Executing block[") + blocksdata[b]->getName() + "] post command:\n" + blocksdata[b]->getCmdPost());
       }
    }
    if(( time_started != 0) && ( time_done == 0 )) time_done = time( NULL);
@@ -255,13 +255,13 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
 {
 //printf("JobAf::action: %s\n", af::Msg::TNAMES[type]);mcgeneral.stdOut();
    uint32_t jobchanged = 0;
-   std::string userhost = std::string(mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data();
+   std::string userhost = mcgeneral.getUserName() + '@' + mcgeneral.getHostName();
    switch( type)
    {
    case af::Msg::TJobAnnotate:
    {
-      annotation = mcgeneral.getString().toUtf8().data();
-      log( std::string("Annotation set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      annotation = mcgeneral.getString();
+      log( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
@@ -270,7 +270,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       if( setHostsMask( mcgeneral.getString()))
       {
-         log( std::string("Hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
       }
@@ -280,7 +280,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       if( setHostsMaskExclude( mcgeneral.getString()))
       {
-         log( std::string("Exclude hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Exclude hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask_exclude);
       }
@@ -290,7 +290,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       if( setDependMask( mcgeneral.getString()))
       {
-         log( std::string("Depend mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_dependmask);
       }
@@ -300,7 +300,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       if( setDependMaskGlobal( mcgeneral.getString()))
       {
-         log( std::string("Global depend mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Global depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_dependmask_global);
       }
@@ -343,7 +343,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       if( setNeedOS( mcgeneral.getString()))
       {
-         log( std::string("Needed OS set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Needed OS set to \"") + mcgeneral.getString() + "\" by " + userhost);
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_need_os);
       }
@@ -353,7 +353,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       if( setNeedProperties( mcgeneral.getString()))
       {
-         log( std::string("Needed properties set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         log( std::string("Needed properties set to \"") + mcgeneral.getString() + "\" by " + userhost);
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_need_properties);
       }
@@ -362,7 +362,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TJobCmdPost:
    {
       cmd_post = mcgeneral.getString();
-      log( std::string("Post command set to \"") + cmd_post.toUtf8().data() + "\" by " + userhost);
+      log( std::string("Post command set to \"") + cmd_post + "\" by " + userhost);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_cmd_post);
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
@@ -426,7 +426,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TJobDelete:
    {
       log( "Deleted by " + userhost);
-      user->appendLog( std::string("Job \"") + name.toUtf8().data() + "\" deleted by " + userhost);
+      user->appendLog( std::string("Job \"") + name + "\" deleted by " + userhost);
       setZombie( (RenderContainer*)pointer, monitoring);
       if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
       return true;
@@ -510,7 +510,7 @@ void JobAf::checkDepends()
    bool depend_global = false;
 
    // check global depends:
-   if( getDependMaskGlobal().isEmpty() == false)
+   if( hasDependMaskGlobal())
    {
       JobContainerIt jobsIt( jobs);
       for( Job *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
@@ -527,7 +527,7 @@ void JobAf::checkDepends()
    }
 
    // check local depends:
-   if( getDependMask().isEmpty() == false)
+   if( hasDependMask())
    {
       JobsListIt jobsListIt( user->getJobs());
       for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
@@ -560,7 +560,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
       {
          if( block == *bIt)
          {
-            log( std::string("Block[") + blocksdata[block]->getName().toUtf8().data() + "] appears second time while job generating a task.\nJob has a recursive blocks tasks dependence.");
+            log( std::string("Block[") + blocksdata[block]->getName() + "] appears second time while job generating a task.\nJob has a recursive blocks tasks dependence.");
             state = state | AFJOB::STATE_OFFLINE_MASK;
             if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
             return NULL;
@@ -575,7 +575,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    if( task >= blocksdata[block]->getTasksNum() )
    {
       AFERRAR("JobAf::genTask: block[%d] '%s' : %d > number of tasks = %d.\n",
-         block, blocksdata[block]->getName().toUtf8().data(), task, blocksdata[block]->getTasksNum());
+         block, blocksdata[block]->getName().c_str(), task, blocksdata[block]->getTasksNum());
       return NULL;
    }
    if( false == ( progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
@@ -865,7 +865,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
       if((result_lifetime > 0) && ((currentTime - time_creation) > result_lifetime))
       {
          log( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
-         user->appendLog( std::string("Job \"") + name.toUtf8().data() + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
+         user->appendLog( std::string("Job \"") + name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
          setZombie( renders, monitoring);
          jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
       }
@@ -920,7 +920,7 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
       std::string message;
       if( restart) message = "Restart request by ";
       else         message = "Skip request by ";
-      message += std::string(taskspos.getUserName().toUtf8().data())+'@'+taskspos.getHostName().toUtf8().data()+' '+taskspos.getMessage().toUtf8().data();
+      message += taskspos.getUserName() + '@' + taskspos.getHostName() + ' ' + taskspos.getMessage();
 
       for( int t = start; t < end; t++)
       {

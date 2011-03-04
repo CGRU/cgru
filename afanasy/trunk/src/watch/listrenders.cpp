@@ -92,7 +92,7 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
    ItemRender * render = (ItemRender*)node;
    if( af::Environment::VISOR() == false)
    {
-      if( render->getName().contains( af::Environment::getComputerName()) || render->getUserName() == af::Environment::getUserName() )
+      if( render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str())) || render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str()))
          view->selectionModel()->select( index, QItemSelectionModel::Select);
    }
 }
@@ -104,7 +104,7 @@ void ListRenders::selectionChanged( const QItemSelection & selected, const QItem
       if( qVariantCanConvert<Item*>( indexes[i].data()))
       {
          ItemRender * render = (ItemRender*)qVariantValue<Item*>( indexes[i].data());
-         if((false == render->getName().contains( af::Environment::getComputerName())) && ( render->getUserName() != af::Environment::getUserName()))
+         if((false == render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str()))) && ( render->getUserName() != QString::fromUtf8( af::Environment::getUserName().c_str())))
             view->selectionModel()->select( indexes[i], QItemSelectionModel::Deselect);
       }
 }
@@ -131,7 +131,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    ItemRender* render = (ItemRender*)getCurrentItem();
    if( render == NULL ) return;
    bool me = false;
-   if( render->getName().contains( af::Environment::getComputerName()) || ( render->getUserName() == af::Environment::getUserName())) me = true;
+   if( render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str())) || ( render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str()))) me = true;
 
    QMenu menu(this);
    QAction *action;
@@ -227,9 +227,10 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          menu.addSeparator();
 
          QMenu * submenu = new QMenu( "Custom", this);
-         for( int i = 0; i < cmdssize; i++)
+         int i = 0;
+         for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, i++)
          {
-            ActionId * actionid = new ActionId( i, QString("%1").arg( af::Environment::getRenderCmds()[i]), this);
+            ActionId * actionid = new ActionId( i, QString("%1").arg( afqt::stoq(*it)), this);
             connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
             submenu->addAction( actionid);
          }
@@ -353,13 +354,13 @@ void ListRenders::actFree()
 }
 void ListRenders::actUser()
 {
-   QString current = af::Environment::getUserName();
+   QString current = afqt::stoq( af::Environment::getUserName());
 
    bool ok;
    QString text = QInputDialog::getText(this, "Set User", "Enter User Name", QLineEdit::Normal, current, &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( text);
+   af::MCGeneral mcgeneral( afqt::qtos( text));
    action( mcgeneral, af::Msg::TRenderUser);
 }
 void ListRenders::actEject()
@@ -426,7 +427,7 @@ void ListRenders::actAnnotate()
    QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( text);
+   af::MCGeneral mcgeneral( afqt::qtos( text));
    action( mcgeneral, af::Msg::TRenderAnnotate);
 }
 
@@ -444,7 +445,7 @@ void ListRenders::setService( bool enable)
    if( !ok) return;
 
    af::MCGeneral mcgeneral;
-   mcgeneral.setString( service);
+   mcgeneral.setString( afqt::qtos( service));
    mcgeneral.setNumber( enable);
    action( mcgeneral, af::Msg::TRenderSetService);
 }
@@ -465,7 +466,17 @@ void ListRenders::actCommand( int number)
 
    QModelIndexList indexes( view->selectionModel()->selectedIndexes());
 
-   QString cmd(af::Environment::getRenderCmds()[number]);
+//   QString cmd(af::Environment::getRenderCmds()[number]);
+
+   std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin();
+   int i = 0;
+   while( i != number )
+   {
+      it++;
+      if( it == af::Environment::getPreviewCmds().end()) break;
+   }
+   QString cmd( afqt::stoq(*it));
+
    if( cmd.contains( AFWATCH::CMDS_ASKCOMMAND))
    {
       bool ok;

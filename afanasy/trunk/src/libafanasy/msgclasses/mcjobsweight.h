@@ -19,7 +19,7 @@ public:
    ~MCJobsWeight();
 
    void add(
-         const QString & Name,
+         const std::string & Name,
          int Id,
          int WeightLog,
          int WeightBlack,
@@ -29,15 +29,15 @@ public:
    void stdOut( bool full = false) const;
 
    inline int getCount()                       const { return ids.size(); }
-   inline int getId(             unsigned pos) const { if(pos<ids.size())return ids[pos];            else return -1; }
-   inline int getWeightLog(      unsigned pos) const { if(pos<ids.size())return weightLog[pos];      else return -1; }
-   inline int getWeightBlack(    unsigned pos) const { if(pos<ids.size())return weightBlack[pos];    else return -1; }
-   inline int getWeightProgress( unsigned pos) const { if(pos<ids.size())return weightProgress[pos]; else return -1; }
-   inline int getWeight(         unsigned pos) const { if(pos<ids.size())return weight[pos];         else return -1; }
-   inline const QString getName( unsigned pos) const { if(pos<ids.size())return names[pos];          else return ""; }
+   inline int getId(                 unsigned pos) const { if(pos<ids.size())return ids[pos];            else return -1; }
+   inline int getWeightLog(          unsigned pos) const { if(pos<ids.size())return weightLog[pos];      else return -1; }
+   inline int getWeightBlack(        unsigned pos) const { if(pos<ids.size())return weightBlack[pos];    else return -1; }
+   inline int getWeightProgress(     unsigned pos) const { if(pos<ids.size())return weightProgress[pos]; else return -1; }
+   inline int getWeight(             unsigned pos) const { if(pos<ids.size())return weight[pos];         else return -1; }
+   inline const std::string getName( unsigned pos) const { if(pos<ids.size())return names[pos];          else return ""; }
 
 private:
-   QStringList names;
+   std::vector<std::string> names;
    std::vector<int32_t> ids;
    std::vector<int32_t> weightLog;
    std::vector<int32_t> weightBlack;

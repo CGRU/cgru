@@ -19,7 +19,7 @@ const char* ParserHost::overload_string =
    ###########################################################   \n\
 \n\n\n";
 
-ParserHost::ParserHost( const QString & task_type, int num_frames):
+ParserHost::ParserHost( const std::string & task_type, int num_frames):
    parser( NULL),
    type( task_type),
    numframes( num_frames),
@@ -42,7 +42,7 @@ ParserHost::ParserHost( const QString & task_type, int num_frames):
       return;
    }
 
-   if( false == type.isEmpty())
+   if( false == type.empty())
    {
       parser = new af::Parser( type, numframes);
       if( parser->isInitialized() == false)

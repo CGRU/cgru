@@ -140,3 +140,24 @@ int afqt::readdata( QTcpSocket * qSocket, char* data, int len_min, int len_max)
    }
    return bytes;
 }
+
+const QString afqt::stoq( const std::string & str)
+{
+   return QString::fromUtf8( str.c_str());
+}
+
+const QString afqt::dtoq( const char * data, int size)
+{
+   if( size >= 0 ) return QString::fromUtf8( data, size);
+   else return QString::fromUtf8( data);
+}
+
+const std::string afqt::qtos( const QString & str)
+{
+   return std::string( str.toUtf8().data());
+}
+
+const QString afqt::time2Qstr( time_t time_sec)
+{
+   return stoq( af::time2str(time_sec));
+}

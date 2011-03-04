@@ -44,8 +44,8 @@ public:
 
    inline int getId()       const { return id;      } ///< Get Node id.
    inline int getPriority() const { return priority;} ///< Get Node priority.
-   inline void           getName( QString& str) const { str =  name;    } ///< Get Node name.
-   inline const QString& getName()              const { return name;    } ///< Get Node name.
+   inline void  getName( std::string & str) const { str =  name;    } ///< Get Node name.
+   inline const std::string & getName()     const { return name;    } ///< Get Node name.
 
    friend class ::AfContainer;
    friend class ::AfContainerIt;
@@ -75,7 +75,7 @@ protected:
 /** When new node added and a node with the same name is already exists in container,
 /// container change node name by adding a number.
 **/
-   QString name;
+   std::string name;
 
    mutable bool locked;    ///< Lock state.
 

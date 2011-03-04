@@ -17,26 +17,26 @@ namespace af
 class MCTest : public MsgClassUserHost
 {
 public:
-   MCTest( int Number, const QString & String );
+   MCTest( int Number, const std::string & String );
    MCTest( Msg * msg);
    ~MCTest();
 
    void stdOut( bool full = false) const;
 
-   void addString( const QString & String);
+   void addString( const std::string & String);
 
-   inline const QString & getString() const { return string; }
+   inline const std::string & getString() const { return string; }
    inline int32_t getNumber() const { return number; }
 
 private:
    bool construct();
 
-   QString  string;
+   std::string string;
    int32_t number;
 
-   QStringList stringlist;
+   std::list<std::string> stringlist;
    int32_t * numberarray;
-   QString * stringarray;
+   std::string * stringarray;
 
    void readwrite( Msg * msg);
 };

@@ -17,7 +17,7 @@ Monitor::Monitor():
    Client( Client::GetEnvironment, 0)
 {
    construct();
-   name = QString("%1@%2:%3").arg(af::Environment::getUserName(), af::Environment::getHostName()).arg( address->generatePortString().c_str());
+   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address->generatePortString().c_str();
 }
 
 Monitor::Monitor( Msg * msg, const Address * addr):
@@ -51,10 +51,10 @@ void Monitor::readwrite( Msg * msg)
    rw_uint32_t( time_launch,   msg);
    rw_uint32_t( time_register, msg);
    rw_uint32_t( time_activity, msg);
-   rw_QString ( name,          msg);
-   rw_QString ( username,      msg);
-   rw_int32_t(  revision,      msg);
-   rw_String(   version,       msg);
+   rw_String  ( name,          msg);
+   rw_String  ( username,      msg);
+   rw_int32_t ( revision,      msg);
+   rw_String  ( version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
 
@@ -81,7 +81,7 @@ bool Monitor::hasEvent( int type) const
 
 void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << name.toUtf8().data() << "[" << id << "]";
+   stream << name << "[" << id << "]";
    stream << " (" << version << " r" << revision << ") ";
    address->generateInfoStream( stream);
 

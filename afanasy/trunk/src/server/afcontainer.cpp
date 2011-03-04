@@ -2,6 +2,9 @@
 
 #include <stdio.h>
 
+#include <QtCore/QString>
+#include <QtCore/QRegExp>
+
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
 #include "aflist.h"
@@ -100,7 +103,7 @@ int AfContainer::add( af::Node *node)
 //
 // get an unique name
       {
-      QString origname = node->name;
+      std::string origname = node->name;
       int number = 1;
       for(;;)
       {
@@ -110,7 +113,7 @@ int AfContainer::add( af::Node *node)
          {
             if((!another->zombie) && (another->name == node->name))
             {
-               node->name = origname + '-' + QString::number( number++);
+               node->name = origname + '-' + af::itos( number++);
                unique = false;
                break;
             }
@@ -209,12 +212,12 @@ MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
       if( node -> zombie ) continue;
       mcNodes.addNode( node);
    }
-   if(( getcount == 0) && (false == mcgeneral.getName().isEmpty()))
+   if(( getcount == 0) && (false == mcgeneral.getName().empty()))
    {
-      QRegExp rx( mcgeneral.getName());
+      QRegExp rx( QString::fromUtf8( mcgeneral.getName().c_str()));
       if( false == rx.isValid())
       {
-         AFERRAR("Name pattern \"%s\" is invalid:\n", mcgeneral.getName().toUtf8().data());
+         AFERRAR("Name pattern \"%s\" is invalid:\n", mcgeneral.getName().c_str());
          printf("%s\n", rx.errorString().toUtf8().data());
       }
       else
@@ -224,14 +227,14 @@ MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
          {
             if( node == NULL   ) continue;
             if( node -> zombie ) continue;
-            if( rx.exactMatch( node->name))
+            if( rx.exactMatch( QString::fromUtf8( node->name.c_str())))
             {
                mcNodes.addNode( node);
                if( false == namefounded) namefounded = true;
             }
          }
          if( namefounded == false )
-         AFERRAR("AfContainer::generateList: No node matches \"%s\" founded.\n", mcgeneral.getName().toUtf8().data());
+         AFERRAR("AfContainer::generateList: No node matches \"%s\" founded.\n", mcgeneral.getName().c_str());
       }
    }
    return new MsgAf( type, &mcNodes);
@@ -304,21 +307,21 @@ void AfContainer::freeZombies()
 void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
    bool namefounded = false;
-   QString name = mcgeneral.getName();
+   std::string name = mcgeneral.getName();
    int getcount = mcgeneral.getCount();
 
    if( getcount < 1 )
    {
-      QRegExp rx( name);
+      QRegExp rx( QString::fromUtf8( name.c_str()));
       if( false == rx.isValid())
       {
-         AFERRAR("Name pattern \"%s\" is invalid:\n", name.toUtf8().data());
+         AFERRAR("Name pattern \"%s\" is invalid:\n", name.c_str())
          printf("%s\n", rx.errorString().toUtf8().data());
          return;
       }
       for( af::Node *node = first_ptr; node != NULL; node = node->next_ptr )
       {
-         if( rx.exactMatch( node->name))
+         if( rx.exactMatch( QString::fromUtf8( node->name.c_str())))
          {
             action( node, mcgeneral, type, pointer, monitoring);
             if( false == namefounded) namefounded = true;
@@ -341,8 +344,8 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
       }
    }
 
-   if((size == 0) && (namefounded == false))
-      AFERRAR("No node matches \"%s\" founded.\n", name.toUtf8().data());
+   if(( size == 0) && ( namefounded == false))
+      AFERRAR("No node matches \"%s\" founded.\n", name.c_str());
 }
 
 void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)

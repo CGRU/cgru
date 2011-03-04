@@ -12,7 +12,7 @@ const QString DBUser::TableName("users");
 const QString DBUser::Keys("password varchar(128), administrator boolean DEFAULT FALSE, PRIMARY KEY( id)");
 const int     DBUser::KeysNum = 1;
 
-DBUser::DBUser( const QString &username, const std::string & host):
+DBUser::DBUser( const std::string & username, const std::string & host):
    af::User( username, host)
 {
    addDBAttributes();
@@ -44,7 +44,7 @@ void DBUser::addDBAttributes()
    dbAddAttr( new DBAttrString(  DBAttr::_annotation,           &annotation          ));
    dbAddAttr( new DBAttrString(  DBAttr::_customdata,           &customdata          ));
 
-   dbAddAttr( new DBAttrQString( DBAttr::_name,                 &name                ));
+   dbAddAttr( new DBAttrString(  DBAttr::_name,                 &name                ));
 }
 
 DBUser::~DBUser()

@@ -139,7 +139,7 @@ void ListMonitors::actSendMessage()
    QString text = QInputDialog::getText(this, "Send Message", "Enter Text", QLineEdit::Normal, "", &ok);
    if( !ok) return;
 
-   af::MCGeneral mcgeneral( text);
+   af::MCGeneral mcgeneral( text.toUtf8().data());
    action( mcgeneral, af::Msg::TMonitorMessage);
 }
 

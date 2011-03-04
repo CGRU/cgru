@@ -15,7 +15,7 @@ class UserAf : public afsql::DBUser
 {
 public:
 /// Create a new user.
-   UserAf( const QString &username, const std::string & host);
+   UserAf( const std::string & username, const std::string & host);
 
 /// Create user from database.
    UserAf( int uid);

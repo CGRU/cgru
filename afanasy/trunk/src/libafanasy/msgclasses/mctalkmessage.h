@@ -2,26 +2,24 @@
 
 #include "msgclass.h"
 
-#include <QtCore/QString>
-
 namespace af
 {
 
 class MCTalkmessage : public MsgClass
 {
 public:
-   MCTalkmessage( const QString &msguser, const QString &msgtext);
+   MCTalkmessage( const std::string & msguser, const std::string & msgtext);
    MCTalkmessage( Msg * msg);
    ~MCTalkmessage();
 
-   inline void getUser( QString &str) const { str=user; }
-   inline void getText( QString &str) const { str=text; }
+   inline void getUser( std::string & str) const { str=user; }
+   inline void getText( std::string & str) const { str=text; }
 
    void stdOut( bool full = false) const;
 
 private:
-   QString user;
-   QString text;
+   std::string user;
+   std::string text;
    void readwrite( Msg * msg);
 };
 }

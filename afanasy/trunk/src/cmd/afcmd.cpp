@@ -25,7 +25,7 @@ AfCmd::~AfCmd()
 
 bool AfCmd::connect()
 {
-   socketfd = com::connecttomaster( Verbose, Protocol, ServerName.toUtf8().data(), ServerPort);
+   socketfd = com::connecttomaster( Verbose, Protocol, ServerName.c_str(), ServerPort);
    if( socketfd == -1)
    {
       printf("AfCmd::connect: can't connect to master.\n");
@@ -80,8 +80,9 @@ void AfCmd::addCmd( Cmd * cmd)
 
 bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
 {
-   QString arg = argv[1];
-   if((arg.isNull())||(arg.isEmpty())||(arg=="")) return true;
+   if( argc <= 1 ) return true;
+   std::string arg = argv[1];
+   if( arg.empty()) return true;
 
    bool command_founded = false;
    for( int i = 1; i < argc; i++)
@@ -89,6 +90,7 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
       arg = argv[i];
       for( CmdList::iterator it = commands.begin(); it != commands.end(); it++)
       {
+         if( i >= argc) return true;
          command = *it;
          if( command->isCmd( argv[i]))
          {

@@ -1,5 +1,8 @@
 #include "cmd_job.h"
 
+#include <QtCore/QRegExp>
+#include <QtCore/QString>
+
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -65,9 +68,8 @@ CmdJobPriority::CmdJobPriority()
 CmdJobPriority::~CmdJobPriority(){}
 bool CmdJobPriority::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string name = argv[0];
+   int number = atoi(argv[1]);
    af::MCGeneral mcgeneral( name, number);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -84,9 +86,8 @@ CmdJobRunningTasksMaximum::CmdJobRunningTasksMaximum()
 CmdJobRunningTasksMaximum::~CmdJobRunningTasksMaximum(){}
 bool CmdJobRunningTasksMaximum::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string name = argv[0];
+   int number = atoi(argv[1]);
    af::MCGeneral mcgeneral( name, number);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -103,9 +104,9 @@ CmdJobHostsMask::CmdJobHostsMask()
 CmdJobHostsMask::~CmdJobHostsMask(){}
 bool CmdJobHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   QString mask = QString::fromUtf8(argv[1]);
-   QRegExp rx( mask, Qt::CaseInsensitive);
+   std::string name = argv[0];
+   std::string mask = argv[1];
+   QRegExp rx( QString::fromUtf8( mask.c_str()), Qt::CaseInsensitive);
    if( rx.isValid() == false )
    {
       printf("QRegExp: %s\n", rx.errorString().toUtf8().data());
@@ -129,8 +130,7 @@ CmdJobId::CmdJobId()
 CmdJobId::~CmdJobId(){}
 bool CmdJobId::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok; int number = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int number = atoi(argv[1]);
    msg.set( getMsgType(), number);
    return true;
 }
@@ -152,8 +152,7 @@ CmdJobLog::CmdJobLog()
 CmdJobLog::~CmdJobLog(){}
 bool CmdJobLog::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok; int number = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int number = atoi(argv[1]);
    msg.set( getMsgType(), number);
    return true;
 }
@@ -171,8 +170,7 @@ CmdJobProgress::CmdJobProgress()
 CmdJobProgress::~CmdJobProgress(){}
 bool CmdJobProgress::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok; int number = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int number = atoi(argv[1]);
    msg.set( getMsgType(), number);
    return true;
 }
@@ -193,7 +191,7 @@ CmdJobsDelete::CmdJobsDelete()
 CmdJobsDelete::~CmdJobsDelete(){}
 bool CmdJobsDelete::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name( QString::fromUtf8(argv[0]));
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;

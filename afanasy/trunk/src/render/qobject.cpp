@@ -26,7 +26,7 @@ Object * Object::OBJECT = NULL;
 
 bool recvMessage_handler( QTcpSocket *qsocket, af::Msg *msg) { return Object::OBJECT->requestAnswer( qsocket, msg);}
 
-Object::Object( uint32_t State, uint8_t Priority, const QString & command):
+Object::Object( uint32_t State, uint8_t Priority, const std::string & command):
    connected( false),
    cmdMode( false),
    render( NULL),
@@ -42,7 +42,7 @@ Object::Object( uint32_t State, uint8_t Priority, const QString & command):
    pCLIENT = NULL;
    pRENDER = NULL;
 
-   if( command.isEmpty())
+   if( command.empty())
    {
       qServer = new afqt::QServer( this);
       qthreadClientUp = new afqt::QThreadClientUp( this, true, af::Environment::getRenderUpdateSec(), af::Environment::getRenderConnectRetries());
@@ -158,7 +158,7 @@ printf("Object::caseMessage: "); msg->stdOut();
       // Server sends back -1 id if a render with the same hostname already exists:
       if( id == -1)
       {
-         AFERRAR("Render with this hostname '%s' already registered.\n", af::Environment::getHostName().toUtf8().data());
+         AFERRAR("Render with this hostname '%s' already registered.\n", af::Environment::getHostName().c_str());
          exitRender();
       }
       // Render was trying to register (its id==0) and server has send id>0
@@ -192,28 +192,28 @@ printf("Object::caseMessage: "); msg->stdOut();
    case af::Msg::TClientRestartRequest:
    {
       exitRender();
-      printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().toUtf8().data());
-      QProcess::startDetached( af::Environment::getRenderExec());
+      printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
+      QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
       break;
    }
    case af::Msg::TClientStartRequest:
    {
-      printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().toUtf8().data());
-      QProcess::startDetached( af::Environment::getRenderExec());
+      printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
+      QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
       break;
    }
    case af::Msg::TClientRebootRequest:
    {
       exitRender();
-      printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().toUtf8().data());
-      QProcess::startDetached( af::Environment::getRenderCmdReboot());
+      printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
+      QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdReboot()));
       break;
    }
    case af::Msg::TClientShutdownRequest:
    {
       exitRender();
-      printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().toUtf8().data());
-      QProcess::startDetached( af::Environment::getRenderCmdShutdown());
+      printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
+      QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdShutdown()));
       break;
    }
    case af::Msg::TRenderStopTask:

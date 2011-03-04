@@ -2,6 +2,8 @@
 
 #include <Python.h>
 
+#include <list>
+
 #include "name_af.h"
 
 namespace af
@@ -17,15 +19,15 @@ public:
 
 protected:
    /// Import and reload module, find and instance class with provided arguments (arguments will be destoyed if not NULL)
-   bool init( const char * dir, const char * name, PyObject * initArgs);
+   bool init( const std::string & dir, const std::string & name, PyObject * initArgs);
 
    /// Get function (get attribute by name and check if it callable)
    /** All functions pointers are stored in this class and will be deleted in destructor
    **/
-   PyObject * getFunction( const char * name);
+   PyObject * getFunction( const std::string & name);
 
 private:
-   char modulename[512];           ///< Store "module.class" string to output with errors for indentitication
+   std::string modulename;           ///< Store "module.class" string to output with errors for indentitication
    PyObject * PyObj_Module;      ///< Module object
    PyObject * PyObj_Type;        ///< Class type object
    PyObject * PyObj_Instance;    ///< Class instance object

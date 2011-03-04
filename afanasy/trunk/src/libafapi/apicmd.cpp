@@ -78,7 +78,7 @@ bool Cmd::GetJobInfo(int jobID)
    return true;
 }
 
-bool Cmd::JobDelete(QString jobMask)
+bool Cmd::JobDelete( const std::string & jobMask)
 {
    if( message ) delete message;
    message = NULL;

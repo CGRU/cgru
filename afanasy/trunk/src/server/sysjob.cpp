@@ -16,7 +16,7 @@
 //////////////////////////////////////////   COMMAND    ///////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysCmd::SysCmd( const QString & Command, const QString & WorkingDirectory, const QString & UserName, const QString & JobName):
+SysCmd::SysCmd( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName):
    command( Command), workingdirectory( WorkingDirectory), username( UserName), jobname( JobName) {}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -37,12 +37,12 @@ SysTask::~SysTask()
    delete syscmd;
 }
 
-QString const SysTask::getInfo(bool full) const
+std::string const SysTask::getInfo(bool full) const
 {
-   QString info;
-   info += QString("#%1:").arg( getNumber(), 3);
-   info += QString(" %1").arg( af::state2str( progress->state), 4);
-   info += QString(": %1").arg( syscmd->command);
+   std::string info = "#";
+   info += af::itos( getNumber()) + ": ";
+   info += af::state2str( progress->state) + ": ";
+   info += syscmd->command;
    return info;
 }
 
@@ -53,25 +53,30 @@ void SysTask::writeTaskOutput( const af::MCTaskUp& taskup) const {}
 void SysTask::log( const std::string & message)
 {
    SysBlock::logCmdPost( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
-                         + syscmd->username.toUtf8().data() + ": \"" + syscmd->jobname.toUtf8().data() + "\":\n"
-                         + syscmd->command.toUtf8().data());
+                         + syscmd->username + ": \"" + syscmd->jobname + "\":\n"
+                         + syscmd->command);
 }
 
 void SysTask::appendSysJobLog( const std::string & message)
 {
    SysJob::appendLog( std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
-                      + syscmd->username.toUtf8().data() + ": \"" + syscmd->jobname.toUtf8().data() + "\":\n"
-                      + syscmd->command.toUtf8().data());
+                      + syscmd->username + ": \"" + syscmd->jobname + "\":\n"
+                      + syscmd->command);
 }
 
 void SysTask::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-   taskexec->setCommand(      syscmd->command               );
-   taskexec->setName(         syscmd->command.split(' ')[0] );
-   taskexec->setUserName(     syscmd->username              );
-   taskexec->setJobName(      syscmd->jobname               );
-   taskexec->setWDir(         syscmd->workingdirectory      );
-   taskexec->setTaskNumber(   getNumber()                   );
+   std::string name = "post_command";
+   size_t space = syscmd->command.find(' ', 1);
+   if( space != std::string::npos )
+      name = syscmd->command.substr( 0, space);
+
+   taskexec->setCommand(      syscmd->command            );
+   taskexec->setName(         name                       );
+   taskexec->setUserName(     syscmd->username           );
+   taskexec->setJobName(      syscmd->jobname            );
+   taskexec->setWDir(         syscmd->workingdirectory   );
+   taskexec->setTaskNumber(   getNumber()                );
 
    Task::start( taskexec, runningtaskscounter, render, monitoring);
 }
@@ -121,7 +126,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
    {
       RenderContainerIt rendersIt( renders);
       RenderAf * render = rendersIt.getRender( taskup.getClientId());
-      if( render ) message += std::string(" on \"") + render->getName().toUtf8().data() + "\"";
+      if( render ) message += std::string(" on \"") + render->getName() + "\"";
    }
 
    // Store error in job log
@@ -238,7 +243,7 @@ void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( Block::errorHostsAppend( render->getName())) log( std::string(render->getName().toUtf8().data()) + " - AVOIDING HOST !");
+   if( Block::errorHostsAppend( render->getName())) log( render->getName() + " - AVOIDING HOST !");
    SysTask * systask = getTask( task, "errorHostsAppend");
    if( systask) systask->errorHostsAppend( render->getName());
 }
@@ -359,7 +364,7 @@ Block * SysJob::newBlock( int numBlock)
    }
 }
 
-void SysJob::addCommand( const QString & Command, const QString & WorkingDirectory, const QString & UserName, const QString & JobName)
+void SysJob::addCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
 {
    block_cmdpost->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
 }

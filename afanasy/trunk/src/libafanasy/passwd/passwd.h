@@ -11,7 +11,7 @@ class Passwd
 {
 public:
    Passwd();
-   Passwd( const QString & VisorKey, const QString & GodKey);
+   Passwd( const std::string & VisorKey, const std::string & GodKey);
    ~Passwd();
 
 /// Check current key matching password sequence.

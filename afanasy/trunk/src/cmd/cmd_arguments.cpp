@@ -71,9 +71,7 @@ CmdServerPort::CmdServerPort()
 CmdServerPort::~CmdServerPort(){}
 bool CmdServerPort::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok;
-   int port = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int port = atoi(argv[0]);
    ServerPort = port;
    return true;
 }
@@ -88,9 +86,7 @@ CmdFork::CmdFork()
 CmdFork::~CmdFork(){}
 bool CmdFork::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok;
-   int count = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int count = atoi(argv[0]);
    for( int i = 0; i < count; i++) fork();
    return true;
 }

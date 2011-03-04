@@ -66,8 +66,8 @@ private:
    uint32_t time_servicestarted;
    uint32_t time_servicestopped;
 
-   QStringList hostnames;
-   QString hostnamemaster;
+   std::string hostnamemaster;
    std::list<af::TaskExec*> execs;
    std::list<int> hostids;
+   std::list<std::string> hostnames;
 };

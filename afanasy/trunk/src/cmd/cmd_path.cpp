@@ -9,7 +9,7 @@ CmdPath::CmdPath()
    setCmd("path");
    setArgsCount(2);
    setInfo("Path operations.");
-   setHelp("test [operation] [path] For testing purposes. Operations: abs fname fpath up home.");
+   setHelp("path [operation] [path] For testing purposes. Operations: abs fname fpath up home isdir.");
 }
 
 CmdPath::~CmdPath(){}
@@ -39,6 +39,10 @@ bool CmdPath::processArguments( int argc, char** argv, af::Msg &msg)
    else if( operation == "up")
    {
       std::cout << af::pathUp( path) << std::endl;
+   }
+   else if( operation == "isdir")
+   {
+      std::cout << af::pathIsFolder( path) << std::endl;
    }
    else
    {

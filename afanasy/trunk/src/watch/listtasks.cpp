@@ -158,18 +158,19 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          connect( action, SIGNAL( triggered() ), this, SLOT( actTaskErrorHosts() ));
          menu.addAction( action);
 
-         if( ((ItemJobTask*)(item))->genFiles().isEmpty() == false )
+         if( ((ItemJobTask*)(item))->genFiles().empty() == false )
          {
-            QStringList files = ((ItemJobTask*)(item))->genFiles().split(';');
+            QStringList files = QString::fromUtf8(((ItemJobTask*)(item))->genFiles().c_str()).split(';');
             if( af::Environment::getPreviewCmds().size() > 0 )
             {
                menu.addSeparator();
                QMenu * submenu_cmd = new QMenu( "Preview", this);
-               for( int p = 0; p < af::Environment::getPreviewCmds().size(); p++)
+               int p = 0;
+               for( std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
                {
                   if( files.size() > 1)
                   {
-                     QMenu * submenu_img = new QMenu( QString("%1").arg(af::Environment::getPreviewCmds()[p]), this);
+                     QMenu * submenu_img = new QMenu( QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
                      for( int i = 0; i < files.size(); i++)
                      {
                         QString imgname = files[i].right(99);
@@ -181,7 +182,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
                   }
                   else
                   {
-                     ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg(af::Environment::getPreviewCmds()[p]), this);
+                     ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
                      connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
                      submenu_cmd->addAction( actionid);
                   }
@@ -585,7 +586,7 @@ void ListTasks::actBlockCommand()
    QString cur = ((ItemJobBlock*)( getCurrentItem()))->command;
    QString str = QInputDialog::getText(this, "Change Command", "Enter Command", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
-   af::MCGeneral mcgeneral( str);
+   af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockCommand, mcgeneral);
 }
 void ListTasks::actBlockWorkingDir()
@@ -594,7 +595,7 @@ void ListTasks::actBlockWorkingDir()
    QString cur = ((ItemJobBlock*)( getCurrentItem()))->workingdir;
    QString str = QInputDialog::getText(this, "Change Working Directory", "Enter Directory", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
-   af::MCGeneral mcgeneral( str);
+   af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockWorkingDir, mcgeneral);
 }
 void ListTasks::actBlockFiles()
@@ -603,7 +604,7 @@ void ListTasks::actBlockFiles()
    QString cur = ((ItemJobBlock*)( getCurrentItem()))->files;
    QString str = QInputDialog::getText(this, "Change Files", "Enter Files", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
-   af::MCGeneral mcgeneral( str);
+   af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockFiles, mcgeneral);
 }
 void ListTasks::actBlockCmdPost()
@@ -612,7 +613,7 @@ void ListTasks::actBlockCmdPost()
    QString cur = ((ItemJobBlock*)( getCurrentItem()))->cmdpost;
    QString str = QInputDialog::getText(this, "Change Post Command", "Enter Command", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
-   af::MCGeneral mcgeneral( str);
+   af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockCmdPost, mcgeneral);
 }
 void ListTasks::actBlockService()
@@ -621,7 +622,7 @@ void ListTasks::actBlockService()
    QString cur = ((ItemJobBlock*)( getCurrentItem()))->service;
    QString str = QInputDialog::getText(this, "Change Service", "Enter Type", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
-   af::MCGeneral mcgeneral( str);
+   af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockService, mcgeneral);
 }
 void ListTasks::actBlockParser()
@@ -630,7 +631,7 @@ void ListTasks::actBlockParser()
    QString cur = ((ItemJobBlock*)( getCurrentItem()))->parser;
    QString str = QInputDialog::getText(this, "Change Parser", "Enter Type", QLineEdit::Normal, cur, &ok);
    if( !ok) return;
-   af::MCGeneral mcgeneral( str);
+   af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockParser, mcgeneral);
 }
 
@@ -669,16 +670,16 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
    }
 
    ItemJobTask* taskitem = (ItemJobTask*)item;
-   af::Service service( "service", taskitem->getWDir(), "", taskitem ->genFiles());
+   af::Service service( "service", taskitem->getWDir(), "", taskitem->genFiles());
 
-   QStringList images = service.getFiles().split(';');
+   QStringList images = QString::fromUtf8( service.getFiles().c_str()).split(';');
    if( num_img >= images.size())
    {
       displayError( "No such image nubmer.");
       return;
    }
    QString arg  = images[num_img];
-   QString wdir = service.getWDir();
+   QString wdir = QString::fromUtf8( service.getWDir().c_str());
 
    if( arg.isEmpty()) return;
    if( num_cmd >= af::Environment::getPreviewCmds().size())
@@ -687,7 +688,14 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
       return;
    }
 
-   QString cmd(af::Environment::getPreviewCmds()[num_cmd]);
+   std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
+   int i = 0;
+   while( i != num_cmd )
+   {
+      it++;
+      if( it == af::Environment::getPreviewCmds().end()) break;
+   }
+   QString cmd( afqt::stoq(*it));
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
    Watch::startProcess( cmd, wdir);

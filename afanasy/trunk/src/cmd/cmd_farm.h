@@ -26,6 +26,6 @@ public:
    CmdFarmCheck();
    ~CmdFarmCheck();
    bool processArguments( int argc, char** argv, af::Msg &msg);
-   bool check( const QString & hostname);
+   bool check( const std::string & hostname);
    af::Host host;
 };

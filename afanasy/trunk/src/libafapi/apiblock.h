@@ -108,7 +108,7 @@ public:
 
 public:
    inline void setBlockNumber( int value) { blocknum = value;}
-   inline void setName( const QString & str) { name = str; }
+   inline void setName( const std::string & str) { name = str; }
    virtual int calcWeight() const; ///< Calculate and return memory size.
    void fillTasksArrayFromList();
 

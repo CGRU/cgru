@@ -219,7 +219,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       RenderAf* render = rendersIt.getRender( msg->int32());
       if( render == NULL ) break;
       msg_response = new MsgAf();
-      render->getServices( msg_response);
+      render->getServicesString( msg_response);
       break;
    }
 
@@ -229,7 +229,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       AfContainerLock lock( users, AfContainer::READLOCK);
 
       af::MsgClassUserHost usr( msg);
-      QString name = usr.getUserName();
+      std::string name = usr.getUserName();
       int id = 0;
       UserContainerIt usersIt( users);
       for( af::User *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())

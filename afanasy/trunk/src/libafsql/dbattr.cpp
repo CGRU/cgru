@@ -127,11 +127,11 @@ const QString DBAttr::DBString( const QString * str) const
                size, DBLength[type],
                str->toUtf8().data(),
                dbstr.toUtf8().data());
-      dbstr = QString("%1%2%3").arg( af::Environment::get_DB_StringQuotes(), dbstr, af::Environment::get_DB_StringQuotes());
+      dbstr = QString("%1%2%3").arg( af::Environment::get_DB_StringQuotes().c_str(), dbstr, af::Environment::get_DB_StringQuotes().c_str());
    }
    else
    {
-      dbstr = QString("%1%2%3").arg( af::Environment::get_DB_StringQuotes(),  *str, af::Environment::get_DB_StringQuotes());
+      dbstr = QString("%1%2%3").arg( af::Environment::get_DB_StringQuotes().c_str(),  *str, af::Environment::get_DB_StringQuotes().c_str());
    }
 
    return dbstr;

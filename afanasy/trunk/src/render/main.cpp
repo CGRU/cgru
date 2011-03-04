@@ -65,8 +65,8 @@ int main(int argc, char *argv[])
 
    uint32_t state = af::Render::SOnline;
 
-   QString NIMBY = "-NIMBY";
-   QString nimby = "-nimby";
+   std::string NIMBY = "-NIMBY";
+   std::string nimby = "-nimby";
    ENV.addUsage( NIMBY, "Set initial state to 'NIMBY'.");
    ENV.addUsage( nimby, "Set initial state to 'nimby'.");
    if( ENV.hasArgument( NIMBY))
@@ -82,13 +82,13 @@ int main(int argc, char *argv[])
 
    uint8_t priority = ENV.getPriority();
 
-   QString cmdArgName = "-cmd";
-   ENV.addUsage( QString("%1 [command]").arg( cmdArgName), "Run command only, do not connect to server.");
-   QString command;
+   std::string cmdArgName = "-cmd";
+   ENV.addUsage( cmdArgName + " [command]", "Run command only, do not connect to server.");
+   std::string command;
    ENV.getArgument( cmdArgName, command);
 
    bool checkResourcesMode = false;
-   QString checkResourcesModeCmdArg = "-res";
+   std::string checkResourcesModeCmdArg = "-res";
    ENV.addUsage( checkResourcesModeCmdArg, "Check host resources only and quit.");
    if( ENV.hasArgument( checkResourcesModeCmdArg)) checkResourcesMode = true;
 

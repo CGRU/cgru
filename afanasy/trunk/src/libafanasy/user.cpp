@@ -15,10 +15,9 @@
 
 using namespace af;
 
-User::User( const QString &username, const std::string & host):
+User::User( const std::string & username, const std::string & host):
    hostname( host),
    maxrunningtasks(  af::Environment::getMaxRunningTasksNumber() ),
-   hostsmask( af::Environment::getHostsMask()),
    errors_retries(    af::Environment::getTaskErrorRetries() ),
    errors_avoidhost( af::Environment::getErrorsAvoidHost()  ),
    errors_tasksamehost( af::Environment::getTaskErrorsSameHost() ),
@@ -28,6 +27,7 @@ User::User( const QString &username, const std::string & host):
 {
    name = username;
    priority = af::Environment::getPriority();
+   hostsmask.setPattern( QString::fromUtf8( af::Environment::getHostsMask().c_str()));
 
    construct();
 }
@@ -111,7 +111,7 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "User name = \"" << name.toUtf8().data() << "\" (id=" << id << "):";
+      stream << "User name = \"" << name << "\" (id=" << id << "):";
       stream << "\n Priority = " << int(priority);
       stream << "\n Jobs = " << numjobs << " / active jobs = " << numrunningjobs;
       if( jobs_lifetime > 0 ) stream << "\n Jobs life time = " << af::time2strHMS( jobs_lifetime, true);
@@ -130,7 +130,7 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
    else
    {
       stream << "#" << id << ":" << int(priority)
-            << " " << name.toUtf8().data()
+            << " " << name
             << " j" << numjobs << "/" << numrunningjobs
             << " r" << runningtasksnumber << "/" << maxrunningtasks
             << " " << time2str( time_online)

@@ -18,11 +18,11 @@ protected:
    inline const QString & dbGetTableName()  const { return TableName;}
 
 private:
-   QString jobname;
-   QString blockname;
-   QString username;
-   QString hostname;
-   QString service;
+   std::string jobname;
+   std::string blockname;
+   std::string username;
+   std::string hostname;
+   std::string service;
    std::string description;
    std::string annotation;
    uint32_t time_started;

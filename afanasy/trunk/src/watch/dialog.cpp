@@ -133,7 +133,7 @@ AFINFO("Dialog::~Dialog:\n");
 void Dialog::repaintStart( int mseconds) { repaintTimer.start( mseconds);                             }
 void Dialog::repaintFinish()             { repaintTimer.stop();                                       }
 void Dialog::repaintWatch()              { Watch::repaint(); if(listitems) listitems->repaintItems(); }
-void Dialog::setDefaultWindowTitle() { setWindowTitle( "Watch - " + af::Environment::getUserName() + "@" + af::Environment::getServerName());}
+void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
 void Dialog::sendRegister(){ qThreadClientUpdate.setUpMsg( new afqt::QMsg( af::Msg::TMonitorRegister, monitor, true));}
 void Dialog::sendMsg( afqt::QMsg * msg)
 {
@@ -206,7 +206,7 @@ void Dialog::connectionLost( af::Address* address)
    connected = false;
    uid = 0;
    monitor->setId( 0);
-   setWindowTitle( "Watch - " + af::Environment::getUserName() + " (connecting...)");
+   setWindowTitle( "Watch - " + afqt::stoq( af::Environment::getUserName()) + " (connecting...)");
 
    sendRegister();
 
@@ -309,7 +309,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    {
       std::string str;
       msg->getString( str);
-      displayInfo( QString::fromUtf8( str.c_str()));
+      displayInfo( afqt::stoq( str));
       break;
    }
    default:

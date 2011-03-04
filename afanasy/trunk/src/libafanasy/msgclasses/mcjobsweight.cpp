@@ -24,14 +24,14 @@ MCJobsWeight::~MCJobsWeight()
 }
 
 void MCJobsWeight::add(
-         const QString & Name,
+         const std::string & Name,
          int Id,
          int WeightLog,
          int WeightBlack,
          int WeightProgress,
          int Weight)
 {
-   names << Name;
+   names.push_back( Name);
    ids.push_back( Id);
    weightLog.push_back( WeightLog);
    weightBlack.push_back( WeightBlack);
@@ -41,12 +41,12 @@ void MCJobsWeight::add(
 
 void MCJobsWeight::readwrite( Msg * msg)
 {
-   rw_QStringList( names,           msg);
-   rw_Int32_Vect(  ids,             msg);
-   rw_Int32_Vect(  weightLog,       msg);
-   rw_Int32_Vect(  weightBlack,     msg);
-   rw_Int32_Vect(  weightProgress,  msg);
-   rw_Int32_Vect(  weight,          msg);
+   rw_StringVect( names,           msg);
+   rw_Int32_Vect( ids,             msg);
+   rw_Int32_Vect( weightLog,       msg);
+   rw_Int32_Vect( weightBlack,     msg);
+   rw_Int32_Vect( weightProgress,  msg);
+   rw_Int32_Vect( weight,          msg);
 }
 
 void MCJobsWeight::stdOut( bool full) const
@@ -66,9 +66,8 @@ void MCJobsWeight::stdOut( bool full) const
       weightTotal          += weight[j];
       if( full )
          printf( "%d-%d: \tlog=%.3g \tblack=%.3g \tprogress=%.3g \t : %.3g kB\t - %s\n",
-                 j+1, ids[j], float(weightLog[j])/1024, float(weightBlack[j])/1024, float(weightProgress[j])/1024, float(weight[j])/1024, names[j].toUtf8().data());
+                 j+1, ids[j], float(weightLog[j])/1024, float(weightBlack[j])/1024, float(weightProgress[j])/1024, float(weight[j])/1024, names[j].c_str());
    }
    printf("Logs = %.3g, Black Lists = %.3g, Tasks Progress = %.3g, Total Jobs Weight = %.3g MB\n",
            float(weightLogTotal)/(1024*1024), float(weightBlackTotal)/(1024*1024), float(weightProgressTotal)/(1024*1024), float(weightTotal)/(1024*1024));
 }
-

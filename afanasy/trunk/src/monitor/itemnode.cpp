@@ -1,11 +1,13 @@
 #include "itemnode.h"
 
+#include "../libafqt/qmsg.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 ItemNode::ItemNode( const af::Node * node, QListWidget * parent):
-   QListWidgetItem( node->getName(), parent),
+   QListWidgetItem( afqt::stoq( node->getName()), parent),
    id( node->getId())
 {
 //AFINFO("ItemNode::ItemNode:\n");

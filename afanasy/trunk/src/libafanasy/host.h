@@ -12,8 +12,8 @@ public:
    Host();
    ~Host();
 
-   void setService( const QString & name, int count);
-   void remServices( const QStringList & names);
+   void setService(  const std::string & name, int count);
+   void remServices( const std::list<std::string> & names);
 
    void copy(  const Host & other);
    void merge( const Host & other);
@@ -22,25 +22,28 @@ public:
 
    inline int getServicesNum()        const { return servicesnum;       }
    inline int getServiceCount( int n) const { return servicescounts[n]; }
-   inline const QString & getServiceName(  int n) const { return servicesnames[n];}
 
-   int32_t  capacity;
-   int32_t  maxtasks;
-   int32_t  power;
-   int32_t  cpu_num;
-   int32_t  cpu_mhz;
-   int32_t  mem_mb;
-   int32_t  swap_mb;
-   int32_t  hdd_gb;
-   QString  os;
-   QString  properties;
-   QString  resources;
-   QString  data;
+/// TODO: check number and size
+   inline const std::string & getServiceName( int n) const { return servicesnames[n];}
+
+   int32_t capacity;
+   int32_t maxtasks;
+   int32_t power;
+   int32_t cpu_num;
+   int32_t cpu_mhz;
+   int32_t mem_mb;
+   int32_t swap_mb;
+   int32_t hdd_gb;
+
+   std::string os;
+   std::string properties;
+   std::string resources;
+   std::string data;
 
    void readwrite( Msg * msg); ///< Read or write Host in message.
 
 private:
-   QStringList servicesnames;
+   std::vector<std::string> servicesnames;
    std::vector<int32_t> servicescounts;
 
    void mergeParameters( const Host & other);
@@ -69,8 +72,8 @@ public:
    uint8_t bgcolorr;
    uint8_t bgcolorg;
    uint8_t bgcolorb;
-   QString label;
-   QString tooltip;
+   std::string label;
+   std::string tooltip;
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 

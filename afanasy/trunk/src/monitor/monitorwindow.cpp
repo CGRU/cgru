@@ -29,8 +29,8 @@ MonitorWindow::MonitorWindow():
       AFERROR("MonitorWindow::MonitorWindow: Server initialization failed.\n");
       return;
    }
-   username = af::Environment::getUserName();
-   hostname = af::Environment::getHostName();
+   username = afqt::stoq( af::Environment::getUserName());
+   hostname = afqt::stoq( af::Environment::getHostName());
    setWindowTitle("MonitorWindow::" + username + "@" + hostname + ":(connecting...)");
 
 
@@ -109,7 +109,7 @@ void MonitorWindow::connectionLost( af::Address* address)
 void MonitorWindow::connectionEstablished()
 {
    connected = true;
-   setWindowTitle( "MonitorWindow - " + af::Environment::getUserName() + '@' + af::Environment::getHostName() + ':' + QString::number(af::Environment::getClientPort()));
+   setWindowTitle( "MonitorWindow - " + afqt::stoq( af::Environment::getUserName()) + '@' + afqt::stoq( af::Environment::getHostName()) + ':' + QString::number(af::Environment::getClientPort()));
 
    for( int t = 0; t < MTLast; t++) nodesList[t]->connectionEstablished();
 }

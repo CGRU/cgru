@@ -17,28 +17,28 @@ public:
    int calcWeight() const;                         ///< Calculate and return memory size.
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline const QString& getName()        const { return name;       }
-   inline const QString& getCommand()     const { return command;    }
-   inline const QString& getFiles()       const { return files;      }
-   inline const QString& getDependMask()  const { return dependmask; }
-   inline const QString& getCustomData()  const { return customdata; }
+   inline const std::string & getName()        const { return name;       }
+   inline const std::string & getCommand()     const { return command;    }
+   inline const std::string & getFiles()       const { return files;      }
+   inline const std::string & getDependMask()  const { return dependmask; }
+   inline const std::string & getCustomData()  const { return customdata; }
 
-   inline void setFiles(      const QString & str) { files      = str;  }
-   inline void setDependMask( const QString & str) { dependmask = str;  }
-   inline void setCustomData( const QString & str) { customdata = str;  }
+   inline void setFiles(      const std::string & str) { files      = str;  }
+   inline void setDependMask( const std::string & str) { dependmask = str;  }
+   inline void setCustomData( const std::string & str) { customdata = str;  }
 
-   inline bool hasFiles()        const { return      !files.isEmpty();}  ///< Whether files are set.
-   inline bool hasDependMask()   const { return !dependmask.isEmpty();}  ///< Whether depend mask is set.
-   inline bool hasCustomData()   const { return !customdata.isEmpty();}  ///< Whether files are set.
+   inline bool hasFiles()        const { return      files.size();}  ///< Whether files are set.
+   inline bool hasDependMask()   const { return dependmask.size();}  ///< Whether depend mask is set.
+   inline bool hasCustomData()   const { return customdata.size();}  ///< Whether files are set.
 
-   bool checkDependMask( const QString & str);
+   bool checkDependMask( const std::string & str);
 
 protected:
-   QString name;        ///< Task name.
-   QString command;     ///< Command.
-   QString files;       ///< Files.
-   QString dependmask;  ///< Dependences.
-   QString customdata;  ///< Some custom data.
+   std::string name;        ///< Task name.
+   std::string command;     ///< Command.
+   std::string files;       ///< Files.
+   std::string dependmask;  ///< Dependences.
+   std::string customdata;  ///< Some custom data.
 
 protected:
 /// Read or write task data.

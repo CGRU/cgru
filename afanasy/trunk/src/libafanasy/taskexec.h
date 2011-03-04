@@ -20,21 +20,21 @@ class TaskExec : public Af
 {
 public:
    TaskExec(
-         const QString  &Name,
-         const QString  &ServiceType,
-         const QString  &ParserType,
-         const QString  &Command,
+         const std::string & Name,
+         const std::string & ServiceType,
+         const std::string & ParserType,
+         const std::string & Command,
          int Capacity,
          int fileSizeMin,
          int fileSizeMax,
-         const QString  &Files,
+         const std::string & Files,
 
          int Start_Frame,
          int End_Frame,
          int FramesNum,
 
-         const QString  &WorkingDirectory,
-         const QString  &Environment,
+         const std::string & WorkingDirectory,
+         const std::string & Environment,
 
          int numjob,
          int numblock,
@@ -42,20 +42,20 @@ public:
 
          int ParserCoeff = 1,
 
-         const QString * CustomDataBlock = NULL,
-         const QString * CustomDataTask = NULL
+         const std::string * CustomDataBlock = NULL,
+         const std::string * CustomDataTask = NULL
 );
 
-   TaskExec( const QString & Command); ///< Render test task probe (ask render to execute command from command line)
+   TaskExec( const std::string & Command); ///< Render test task probe (ask render to execute command from command line)
 
    TaskExec( Msg * msg); ///< Read task from message.
    ~TaskExec();
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline const QString& getName()        const { return name;       }///< Get task name.
-   inline const QString& getServiceType() const { return servicetype;}///< Get task parser type.
-   inline const QString& getParserType()  const { return parsertype; }///< Get task parser type.
+   inline const std::string & getName()        const { return name;       }///< Get task name.
+   inline const std::string & getServiceType() const { return servicetype;}///< Get task parser type.
+   inline const std::string & getParserType()  const { return parsertype; }///< Get task parser type.
    inline int getParserCoeff()            const { return parsercoeff;}///< Get parser koeff.
    inline int getJobId()    const { return jobid;      }///< Get task job id.
    inline int getBlockNum() const { return blocknum;   }///< Get task block number.
@@ -70,19 +70,19 @@ public:
    inline int  getFileSizeMax()   const { return filesize_max;}
    inline bool hasFileSizeCheck() const { return ((filesize_min != -1) || (filesize_max != -1));}
 
-   inline const QString& getBlockName()  const { return blockname; }///< Get task block name.
-   inline const QString& getJobName()    const { return jobname;   }///< Get task job name.
-   inline const QString& getUserName()   const { return username;  }///< Get task user name.
+   inline const std::string & getBlockName()  const { return blockname; }///< Get task block name.
+   inline const std::string & getJobName()    const { return jobname;   }///< Get task job name.
+   inline const std::string & getUserName()   const { return username;  }///< Get task user name.
 
-   inline bool hasCommand() const { return !command.isEmpty(); } ///< Whether command exists.
-   inline bool hasWDir()    const { return !wdir.isEmpty();    } ///< Whether working directory exists.
-   inline bool hasEnv()     const { return !env.isEmpty();     } ///< Whether extra environment.
-   inline bool hasFiles()   const { return !files.isEmpty();   } ///< Whether files exist.
+   inline bool hasCommand() const { return command.size(); } ///< Whether command exists.
+   inline bool hasWDir()    const { return wdir.size();    } ///< Whether working directory exists.
+   inline bool hasEnv()     const { return env.size();     } ///< Whether extra environment.
+   inline bool hasFiles()   const { return files.size();   } ///< Whether files exist.
 
-   inline const QString& getCommand()  const { return command; } ///< Get command.
-   inline const QString& getWDir()     const { return wdir;    } ///< Get working directory.
-   inline const QString& getEnv()      const { return env;     } ///< Get extra environment.
-   inline const QString& getFiles()    const { return files;   } ///< Get preview command.
+   inline const std::string & getCommand()  const { return command; } ///< Get command.
+   inline const std::string & getWDir()     const { return wdir;    } ///< Get working directory.
+   inline const std::string & getEnv()      const { return env;     } ///< Get extra environment.
+   inline const std::string & getFiles()    const { return files;   } ///< Get preview command.
 
    inline int getFramesNum()   const { return frames_num;   } ///< Get frames number.
    inline int getFrameStart()  const { return frame_start;  } ///< Get first frame.
@@ -135,42 +135,42 @@ public:
    inline int   getListenAddressesNum() const { return listen_addresses->getAddressesNum();              }
    inline const std::list<Address*> * getListenAddresses() const { return listen_addresses->getAddresses();       }
 
-   inline void setName(      const QString & str) { name      = str;}   ///< Set task name.
-   inline void setBlockName( const QString & str) { blockname = str;}   ///< Set task block name.
-   inline void setJobName(   const QString & str) { jobname   = str;}   ///< Set task job name.
-   inline void setUserName(  const QString & str) { username  = str;}   ///< Set task user name.
-   inline void setCommand(   const QString & str) { command   = str;}   ///< Set task command.
-   inline void setWDir(      const QString & str) { wdir      = str;}   ///< Set working directory.
-   inline void setTaskNumber(      int       num) { tasknum   = num;}   ///< Set task number.
-   inline void setNumber(          int       num) { number    = num;}   ///< Set task aux number.
+   inline void setName(      const std::string & str) { name      = str;}   ///< Set task name.
+   inline void setBlockName( const std::string & str) { blockname = str;}   ///< Set task block name.
+   inline void setJobName(   const std::string & str) { jobname   = str;}   ///< Set task job name.
+   inline void setUserName(  const std::string & str) { username  = str;}   ///< Set task user name.
+   inline void setCommand(   const std::string & str) { command   = str;}   ///< Set task command.
+   inline void setWDir(      const std::string & str) { wdir      = str;}   ///< Set working directory.
+   inline void setTaskNumber(      int           num) { tasknum   = num;}   ///< Set task number.
+   inline void setNumber(          int           num) { number    = num;}   ///< Set task aux number.
 
-   inline void setHostNames( const QStringList & names) { multihost_names = names;}
-   inline const QStringList & getMultiHostsNames() const { return multihost_names;}
+   inline void setHostNames( const std::list<std::string> & names)  { multihost_names = names;}
+   inline const std::list<std::string> & getMultiHostsNames() const { return multihost_names; }
 
    int calcWeight() const;
 
 private:
-   QString name;           ///< Task name.
-   QString blockname;      ///< Task block name.
-   QString jobname;        ///< Task job name.
-   QString username;       ///< Task user name.
+   std::string name;           ///< Task name.
+   std::string blockname;      ///< Task block name.
+   std::string jobname;        ///< Task job name.
+   std::string username;       ///< Task user name.
 
-   QString wdir;           ///< Working directory.
-   QString env;            ///< Extra environment.
-   QString command;        ///< Command.
-   QString files;          ///< Preview command.
-   QString servicetype;    ///< Task service type.
-   QString parsertype;     ///< Task parser type.
+   std::string wdir;           ///< Working directory.
+   std::string env;            ///< Extra environment.
+   std::string command;        ///< Command.
+   std::string files;          ///< Preview command.
+   std::string servicetype;    ///< Task service type.
+   std::string parsertype;     ///< Task parser type.
    int32_t parsercoeff;    ///< Parser koefficient.
 
-   QString customdata_block; ///< Block custom data.
-   QString customdata_task;  ///< Task custom data.
+   std::string customdata_block; ///< Block custom data.
+   std::string customdata_task;  ///< Task custom data.
 
    int32_t capacity;
    int32_t capcoeff;
    int32_t  filesize_min;
    int32_t  filesize_max;
-   QStringList multihost_names;
+   std::list<std::string> multihost_names;
 
    int32_t jobid;         ///< Job id number.
    int32_t blocknum;      ///< Block number.

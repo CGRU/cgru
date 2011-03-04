@@ -26,7 +26,7 @@ public:
    uint32_t time_start;    ///< start time.
    uint32_t time_done;     ///< Task finish time ( or last update time if still running ).
 
-   QString hostname;           ///< Host, last event occurs where.
+   std::string hostname;           ///< Host, last event occurs where.
 
 //private:
    void readwrite( Msg * msg); ///< Read or write progress in buffer.

@@ -19,7 +19,7 @@ public:
 /// Get job info from job Id
    bool GetJobInfo(int jobID);
 /// Delete job from jobmask
-   bool JobDelete(QString jobMask);
+   bool JobDelete( const std::string & jobMask);
 /// Get raw job data, to send to server socket ( call after successfull).
    char * getData();
 /// Get raw job data length.

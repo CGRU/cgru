@@ -11,7 +11,8 @@ using namespace af;
 Talk::Talk():
    Client( Client::GetEnvironment, 0)
 {
-   name = QString("%1@%2:%3").arg(af::Environment::getUserName(), af::Environment::getHostName()).arg( address->generatePortString().c_str());
+//   name = QString("%1@%2:%3").arg(af::Environment::getUserName(), af::Environment::getHostName()).arg( address->generatePortString().c_str());
+   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address->generatePortString();
 }
 
 Talk::Talk( Msg * msg, const Address * addr):
@@ -31,8 +32,8 @@ void Talk::readwrite( Msg * msg)
    rw_uint32_t( time_launch,   msg);
    rw_uint32_t( time_update,   msg);
    rw_uint32_t( time_register, msg);
-   rw_QString ( name,          msg);
-   rw_QString ( username,      msg);
+   rw_String (  name,          msg);
+   rw_String (  username,      msg);
    rw_int32_t(  revision,      msg);
    rw_String(   version,       msg);
    if( msg->isWriting() ) address->write( msg);
@@ -41,7 +42,7 @@ void Talk::readwrite( Msg * msg)
 
 void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << name.toUtf8().data() << "[" << id << "]";
+   stream << name << "[" << id << "]";
    stream << " (" << version << " r" << revision << ") ";
    address->generateInfoStream( stream, full);
 }

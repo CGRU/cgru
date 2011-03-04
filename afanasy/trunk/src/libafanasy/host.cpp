@@ -25,17 +25,24 @@ Host::Host():
 
 Host::~Host(){}
 
-void Host::setService( const QString & name, int count)
+void Host::setService( const std::string & name, int count)
 {
-   int index = servicesnames.indexOf( name);
-   if( index == -1)
+   int index = 0;
+   bool exists = false;
+   for( std::vector<std::string>::const_iterator it = servicesnames.begin(); it != servicesnames.end(); it++, index++)
+      if( *it == name )
+      {
+         exists = true;
+         break;
+      }
+   if( exists)
+      servicescounts[index] = count;
+   else
    {
-      servicesnames.append(name);
+      servicesnames.push_back(name);
       servicescounts.push_back( count);
       servicesnum++;
    }
-   else
-      servicescounts[index] = count;
 }
 
 void Host::copy( const Host & other)
@@ -56,18 +63,19 @@ void Host::merge( const Host & other)
    for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
 }
 
-void Host::remServices( const QStringList & names)
+void Host::remServices( const std::list<std::string> & names)
 {
-   for( int i = 0; i < names.size(); i++)
-      for( int j = 0; j < servicesnum; j++)
+   for( std::list<std::string>::const_iterator nIt = names.begin(); nIt != names.end(); nIt++)
+   {
+      for( std::vector<std::string>::iterator sIt = servicesnames.begin(); sIt != servicesnames.end(); sIt++)
       {
-         if( servicesnames[j] == names[i])
+         if( *sIt == *nIt)
          {
-            servicesnames.removeAt( j);
-            j--;
+            sIt = servicesnames.erase( sIt);
             servicesnum--;
          }
       }
+   }
 }
 
 void Host::mergeParameters( const Host & other)
@@ -81,10 +89,10 @@ void Host::mergeParameters( const Host & other)
    if( other.hdd_gb        ) hdd_gb   = other.hdd_gb;
    if( other.swap_mb       ) swap_mb  = other.swap_mb;
 
-   if(!other.os.isEmpty()           ) os           = other.os;
-   if(!other.properties.isEmpty()   ) properties   = other.properties;
-   if(!other.resources.isEmpty()    ) resources    = other.resources;
-   if(!other.data.isEmpty()         ) data         = other.data;
+   if( other.os.size()        ) os           = other.os;
+   if( other.properties.size()) properties   = other.properties;
+   if( other.resources.size() ) resources    = other.resources;
+   if( other.data.size()      ) data         = other.data;
 }
 
 void Host::readwrite( Msg * msg)
@@ -97,10 +105,10 @@ void Host::readwrite( Msg * msg)
    rw_int32_t( mem_mb,       msg);
    rw_int32_t( swap_mb,      msg);
    rw_int32_t( hdd_gb,       msg);
-   rw_QString( os,           msg);
-   rw_QString( properties,   msg);
-   rw_QString( resources,    msg);
-   rw_QString( data,         msg);
+   rw_String ( os,           msg);
+   rw_String ( properties,   msg);
+   rw_String ( resources,    msg);
+   rw_String ( data,         msg);
 }
 
 void Host::generateInfoStream( std::ostringstream & stream, bool full) const
@@ -112,14 +120,14 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << ", MEM = " << mem_mb << " (+" << swap_mb << " swap) Mb";
       stream << ", HDD = " << hdd_gb << " Gb";
       stream << std::endl;
-      stream << "   OS=\"" << os.toUtf8().data() << "\": ";
+      stream << "   OS=\"" << os << "\": ";
       stream << "Capacity = " << capacity;
       stream << ", Max tasks = " << maxtasks;
       stream << ", Power " << power;
       stream << std::endl;
       for( int i = 0; i < servicesnum; i++)
       {
-         stream << "   Service: \"" << servicesnames[i].toUtf8().data() << "\"";
+         stream << "   Service: \"" << servicesnames[i] << "\"";
          if( servicescounts[i]) stream << " - " << servicescounts[i];
          stream << std::endl;
       }
@@ -127,7 +135,7 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << "OS=\"" << os.toUtf8().data() << "\":";
+      stream << "OS=\"" << os << "\":";
       stream << " CAP" << capacity;
       stream << " MAX=" << maxtasks;
       stream << " P" << power;
@@ -135,7 +143,7 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << " M" << mem_mb << "+" << swap_mb << "S" << " H" << hdd_gb;
       for( int i = 0; i < servicesnum; i++)
       {
-         stream << ", \"" << servicesnames[i].toUtf8().data() << "\"";
+         stream << ", \"" << servicesnames[i] << "\"";
          if( servicescounts[i]) stream << "[" << servicescounts[i] << "]";
       }
       if( servicesnum == 0) stream << " No services.";
@@ -162,13 +170,13 @@ void HostResMeter::readwrite( Msg * msg)
    rw_uint8_t( bgcolorr,   msg);
    rw_uint8_t( bgcolorg,   msg);
    rw_uint8_t( bgcolorb,   msg);
-   rw_QString( label,      msg);
-   rw_QString( tooltip,    msg);
+   rw_String(  label,      msg);
+   rw_String(  tooltip,    msg);
 }
 
 void HostResMeter::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << label.toUtf8().data() << ": ";
+   stream << label << ": ";
    stream << value << " of " << valuemax;
    stream << " wh(" << width << "," << height << ")";
    stream << " gc(" << graphr << "," << graphg << "," << graphb << ")";
@@ -176,7 +184,7 @@ void HostResMeter::generateInfoStream( std::ostringstream & stream, bool full) c
    stream << " lc(" << labelr << "," << labelg << "," << labelb << ")";
    stream << " bgc(" << bgcolorr << "," << bgcolorg << "," << bgcolorb << ")";
    stream << std::endl;
-   stream << tooltip.toUtf8().data();
+   stream << tooltip;
 }
 
 HostRes::HostRes():

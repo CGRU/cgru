@@ -43,7 +43,7 @@ CmdRenderResoucesList::CmdRenderResoucesList()
 CmdRenderResoucesList::~CmdRenderResoucesList(){}
 bool CmdRenderResoucesList::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -70,9 +70,8 @@ CmdRenderPriority::CmdRenderPriority()
 CmdRenderPriority::~CmdRenderPriority(){}
 bool CmdRenderPriority::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   bool ok; int priority = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string name = argv[0];
+   int priority = atoi(argv[1]);
    af::MCGeneral mcgeneral( name, priority);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -89,7 +88,7 @@ CmdRenderNimby::CmdRenderNimby()
 CmdRenderNimby::~CmdRenderNimby(){}
 bool CmdRenderNimby::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -106,7 +105,7 @@ CmdRenderNIMBY::CmdRenderNIMBY()
 CmdRenderNIMBY::~CmdRenderNIMBY(){}
 bool CmdRenderNIMBY::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -123,8 +122,8 @@ CmdRenderUser::CmdRenderUser()
 CmdRenderUser::~CmdRenderUser(){}
 bool CmdRenderUser::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   QString user = QString::fromUtf8(argv[1]);
+   std::string name = argv[0];
+   std::string user = argv[1];
    af::MCGeneral mcgeneral( name, user);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -141,7 +140,7 @@ CmdRenderFree::CmdRenderFree()
 CmdRenderFree::~CmdRenderFree(){}
 bool CmdRenderFree::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -158,7 +157,7 @@ CmdRenderEject::CmdRenderEject()
 CmdRenderEject::~CmdRenderEject(){}
 bool CmdRenderEject::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -174,8 +173,8 @@ CmdRenderExit::CmdRenderExit()
 CmdRenderExit::~CmdRenderExit(){}
 bool CmdRenderExit::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name( af::Environment::getHostName());
-   if( argc > 0) name = QString::fromUtf8(argv[0]);
+   std::string name( af::Environment::getHostName());
+   if( argc > 0) name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -191,8 +190,8 @@ CmdRenderDelete::CmdRenderDelete()
 CmdRenderDelete::~CmdRenderDelete(){}
 bool CmdRenderDelete::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name( af::Environment::getHostName());
-   if( argc > 0) name = QString::fromUtf8(argv[0]);
+   std::string name( af::Environment::getHostName());
+   if( argc > 0) name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;

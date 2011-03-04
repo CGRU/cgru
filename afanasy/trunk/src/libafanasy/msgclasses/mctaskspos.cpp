@@ -10,7 +10,7 @@
 
 using namespace af;
 
-MCTasksPos::MCTasksPos( int job_id, const QString &Message):
+MCTasksPos::MCTasksPos( int job_id, const std::string & Message):
    jobid( job_id),
    has_tasks( false ),
    message( Message)
@@ -62,7 +62,7 @@ void MCTasksPos::readwrite( Msg * msg)
 
    rw_int32_t( jobid,      msg);
    rw_bool(    has_tasks,  msg);
-   rw_QString( message,    msg);
+   rw_String(  message,    msg);
 
    rw_Int32_Vect( numbloks, msg);
 
@@ -81,5 +81,5 @@ void MCTasksPos::stdOut( bool full ) const
       if( has_tasks) printf(", numtask = %d", numtasks[p]);
       printf("\n");
    }
-   printf("Message: %s\n", message.toUtf8().data());
+   printf("Message: %s\n", message.c_str());
 }

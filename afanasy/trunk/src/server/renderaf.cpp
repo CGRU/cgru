@@ -73,7 +73,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
       AFCommon::QueueLog("Render Deleting: " + generateInfoString( false));
       appendLog("Waiting for deletion.");
       setZombie();
-      AFCommon::saveLog( loglist, af::Environment::getRendersLogsDir(), name.toUtf8().data(), af::Environment::getRenderLogsRotate());
+      AFCommon::saveLog( loglist, af::Environment::getRendersLogsDir(), name, af::Environment::getRenderLogsRotate());
       if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, id);
    }
    else
@@ -207,14 +207,14 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFERROR("RenderAf::setAttr(): JobContainer pointer == NULL.\n");
       return true;
    }
-   std::string userhost( std::string(mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data());
+   std::string userhost( mcgeneral.getUserName() + '@' + mcgeneral.getHostName());
    JobContainer * jobs = (JobContainer*)pointer;
    switch( type)
    {
    case af::Msg::TRenderAnnotate:
    {
-      appendLog( std::string("Annotation set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
-      annotation = mcgeneral.getString().toUtf8().data();
+      appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
+      annotation = mcgeneral.getString();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
    }
@@ -234,7 +234,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    }
    case af::Msg::TRenderSetService:
    {
-      appendLog( std::string("Service \"") + mcgeneral.getString().toUtf8().data() + "\" "
+      appendLog( std::string("Service \"") + mcgeneral.getString() + "\" "
                  + (mcgeneral.getNumber() != 0 ? "enabled" : "disabled") + " by " + userhost);
       setService( mcgeneral.getString(), mcgeneral.getNumber());
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
@@ -273,7 +273,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    }
    case af::Msg::TRenderUser:
    {
-      appendLog( std::string("User set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      appendLog( std::string("User set to \"") + mcgeneral.getString() + "\" by " + userhost);
       username = mcgeneral.getString();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_username);
       break;
@@ -412,7 +412,7 @@ void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorConta
    if( isOnline() && (getTimeUpdate() < (currentTime - af::Environment::getRenderZombieTime())))
    {
       appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
-      AFCommon::QueueLog( std::string("Render: \"") + getName().toUtf8().data() + " - ZOMBIETIME");
+      AFCommon::QueueLog( std::string("Render: \"") + getName() + " - ZOMBIETIME");
       if( isBusy())
       {
          printf("Was busy:\n");
@@ -438,12 +438,12 @@ void RenderAf::appendLog( const std::string & message)
 
 bool RenderAf::getFarmHost( af::Host * newHost)
 {
-   std::vector<int32_t> servicescounts_old;
-   QStringList servicesnames_old;
+   std::list<int> servicescounts_old;
+   std::list<std::string> servicesnames_old;
    for( int i = 0; i < servicesnum; i++)
    {
       servicescounts_old.push_back( servicescounts[i]);
-      servicesnames_old << host.getServiceName(i);
+      servicesnames_old.push_back( host.getServiceName(i));
    }
 
    int servicesnum_old = servicesnum;
@@ -465,12 +465,14 @@ bool RenderAf::getFarmHost( af::Host * newHost)
    checkDirty();
 
    servicesnum = host.getServicesNum();
-   for( int i = 0; i < servicesnum; i++) servicescounts.push_back(0);
+   servicescounts.resize( servicesnum, 0);
 
-   for( int o = 0; o < servicesnum_old; o++)
+   std::list<std::string>::const_iterator osnIt = servicesnames_old.begin();
+   std::list<int>::const_iterator oscIt = servicescounts_old.begin();
+   for( int o = 0; o < servicesnum_old; o++, osnIt++, oscIt++)
       for( int i = 0; i < servicesnum; i++)
-         if( servicesnames_old[o] == host.getServiceName(i))
-            servicescounts[i] = servicescounts_old[o];
+         if( *osnIt == host.getServiceName(i))
+            servicescounts[i] = *oscIt;
 
    disableServices();
 
@@ -481,30 +483,30 @@ void RenderAf::disableServices()
 {
    disabledservices.clear();
    disabledservices.resize( servicesnum, 0);
-   if( false == services_disabled.isEmpty())
+   if( false == services_disabled.empty())
    {
-      QStringList dissrv = services_disabled.split(';');
-      for( int i = 0; i < servicesnum; i++)
-         if( dissrv.contains( host.getServiceName(i)))
-            disabledservices[i] = 1;
+      std::list<std::string> dissrvlist = af::strSplit( services_disabled, ";");
+      for( std::list<std::string>::const_iterator it = dissrvlist.begin(); it != dissrvlist.end(); it++)
+         for( int i = 0; i < servicesnum; i++)
+            if( *it == host.getServiceName(i))
+               disabledservices[i] = 1;
    }
    checkDirty();
 }
 
-void RenderAf::setService( const QString srvname, bool enable)
+void RenderAf::setService( const std::string & srvname, bool enable)
 {
-   QStringList dissrv = services_disabled.split(';');
-   dissrv.removeAll("");
-   if( enable) dissrv.removeAll( srvname);
-   else dissrv.append( srvname);
+   std::list<std::string> dissrvlist = af::strSplit( services_disabled, ";");
+   if( enable) dissrvlist.remove( srvname);
+   else dissrvlist.push_back( srvname);
 
-   if( dissrv.size()) services_disabled = dissrv.join(";");
+   if( dissrvlist.size()) services_disabled = af::strJoin( dissrvlist, ";");
    else services_disabled.clear();
 
    disableServices();
 }
 
-void RenderAf::getServices( af::Msg * msg) const
+void RenderAf::getServicesString( af::Msg * msg) const
 {
    if( servicesnum == 0)
    {
@@ -512,16 +514,16 @@ void RenderAf::getServices( af::Msg * msg) const
       return;
    }
    std::string str;
-   if( false == services_disabled.isEmpty())
+   if( false == services_disabled.empty())
    {
       str += "Disabled services:\n   ";
-      str += services_disabled.toUtf8().data();
+      str += services_disabled;
    }
    str += "\nServices:";
    for( int i = 0; i < servicesnum; i++)
    {
       std::string line("\n");
-      line += host.getServiceName(i).toUtf8().data();
+      line += host.getServiceName(i);
       line += ": ";
       if( disabledservices[i] ) line = std::string("DISABLED ") + line;
       if( servicescounts[i] > 0) line += af::itos( servicescounts[i]);
@@ -537,9 +539,9 @@ void RenderAf::getServices( af::Msg * msg) const
    msg->setString( str);
 }
 
-bool RenderAf::canRunService( const QString & type) const
+bool RenderAf::canRunService( const std::string & type) const
 {
-   if( false == af::farm()->serviceLimitCheck( type.toUtf8().data(), name.toUtf8().data())) return false;
+   if( false == af::farm()->serviceLimitCheck( type, name)) return false;
 
    for( int i = 0; i < servicesnum; i++)
    {
@@ -556,9 +558,9 @@ bool RenderAf::canRunService( const QString & type) const
    return false;
 }
 
-void RenderAf::addService( const QString & type)
+void RenderAf::addService( const std::string & type)
 {
-   af::farm()->serviceLimitAdd( type.toUtf8().data(), name.toUtf8().data());
+   af::farm()->serviceLimitAdd( type, name);
 
    for( int i = 0; i < servicesnum; i++)
    {
@@ -567,15 +569,15 @@ void RenderAf::addService( const QString & type)
          servicescounts[i]++;
          if((host.getServiceCount(i) > 0 ) && (servicescounts[i] > host.getServiceCount(i)))
             AFERRAR("RenderAf::addService: servicescounts > host.getServiceCount for '%s' (%d>=%d)\n",
-                    type.toUtf8().data(), servicescounts[i], host.getServiceCount(i));
+                    type.c_str(), servicescounts[i], host.getServiceCount(i));
          return;
       }
    }
 }
 
-void RenderAf::remService( const QString & type)
+void RenderAf::remService( const std::string & type)
 {
-   af::farm()->serviceLimitRelease( type.toUtf8().data(), name.toUtf8().data());
+   af::farm()->serviceLimitRelease( type, name);
 
    for( int i = 0; i < servicesnum; i++)
    {
@@ -584,7 +586,7 @@ void RenderAf::remService( const QString & type)
          if( servicescounts[i] < 1)
          {
             AFERRAR("RenderAf::remService: servicescounts < 1 for '%s' (=%d)\n",
-                    type.toUtf8().data(), servicescounts[i]);
+                    type.c_str(), servicescounts[i]);
          }
          else
             servicescounts[i]--;
@@ -607,7 +609,7 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
    if( render->isOffline()) return;
 
    std::ostringstream stream;
-   stream << "RenderAf::closeLostTask: '" << render->getName().toUtf8().data() << "': ";
+   stream << "RenderAf::closeLostTask: '" << render->getName() << "': ";
    stream << "[" << taskup.getNumJob() << "][" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "](" << taskup.getNumBlock() << ")";
    AFCommon::QueueLogError( stream.str());
 

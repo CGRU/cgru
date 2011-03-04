@@ -73,10 +73,10 @@ void Render::readwrite( Msg * msg)
 
    case Msg::TRenderRegister:
 
-      rw_int32_t(  revision,              msg);
-      rw_String(   version,               msg);
-      rw_QString ( name,                  msg);
-      rw_QString ( username,              msg);
+      rw_int32_t ( revision,              msg);
+      rw_String  ( version,               msg);
+      rw_String  ( name,                  msg);
+      rw_String  ( username,              msg);
       rw_uint32_t( state,                 msg);
       rw_uint8_t ( priority,              msg);
       rw_uint32_t( time_launch,           msg);
@@ -87,7 +87,7 @@ void Render::readwrite( Msg * msg)
          {
             if( address != NULL ) address->write( msg);
             else
-               AFERRAR("Render::readwrite: Trying to write online \"%s\" Render with NULL address.\n", name.toUtf8().data());
+               AFERRAR("Render::readwrite: Trying to write online \"%s\" Render with NULL address.\n", name.c_str());
          }
          else
          {
@@ -118,7 +118,7 @@ void Render::setCapacity( int value)
 void Render::checkDirty()
 {
    if( capacity == host.capacity ) capacity = -1;
-   if(( capacity == -1) && ( services_disabled.isEmpty()))
+   if(( capacity == -1 ) && ( services_disabled.empty() ))
       state = state | SDirty;
    else
       state = state & (~SDirty);
@@ -215,7 +215,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "#" << id << ": " << name.toUtf8().data() << "@" << username.toUtf8().data();
+      stream << "#" << id << ": " << name << "@" << username;
       stream << " (" << version << " r" << revision << ")";
       stream << " :: ";
       if( address == NULL) stream << "address == NULL";
@@ -235,7 +235,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << name.toUtf8().data() << "@" << username.toUtf8().data() << "[" << id << "]";
+      stream << name << "@" << username << "[" << id << "]";
       stream << " (" << version << " r" << revision << ") ";
       if( address == NULL) stream << "address == NULL";
       else address->generateInfoStream( stream ,full);

@@ -1,5 +1,7 @@
 #include "cmd_text.h"
 
+#include <string.h>
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -17,8 +19,8 @@ CmdText::~CmdText(){}
 
 bool CmdText::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString text = QString::fromUtf8(argv[0]);
-   msg.setData( text.size()+1, text.toUtf8().data());
+   std::string text = argv[0];
+   msg.setData( text.size()+1, text.data());
    return true;
 }
 
@@ -35,9 +37,7 @@ CmdTextGenerate::~CmdTextGenerate(){}
 
 bool CmdTextGenerate::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok;
-   int lenght = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int lenght = atoi(argv[0]);
    char* text = new char[lenght];
    char ch = '1';
    int linenum = 1;

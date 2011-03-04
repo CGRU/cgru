@@ -14,7 +14,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-UserAf::UserAf( const QString &username, const std::string & host):
+UserAf::UserAf( const std::string & username, const std::string & host):
    afsql::DBUser( username, host)
 {
    construct();
@@ -40,13 +40,13 @@ UserAf::~UserAf()
 
 bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   std::string userhost( std::string(mcgeneral.getUserName().toUtf8().data()) + '@' + mcgeneral.getHostName().toUtf8().data());
+   std::string userhost( mcgeneral.getUserName() + '@' + mcgeneral.getHostName());
    switch( type)
    {
    case af::Msg::TUserAnnotate:
    {
-      annotation = mcgeneral.getString().toUtf8().data();
-      appendLog( std::string("Annotation set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+      annotation = mcgeneral.getString();
+      appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
    }
@@ -54,7 +54,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
       if( setHostsMask( mcgeneral.getString()))
       {
-         appendLog( std::string("Hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         appendLog( std::string("Hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
       }
       break;
@@ -63,7 +63,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
       if( setHostsMaskExclude( mcgeneral.getString()))
       {
-         appendLog( std::string("Exclude hosts mask set to \"") + mcgeneral.getString().toUtf8().data() + "\" by " + userhost);
+         appendLog( std::string("Exclude hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask_exclude);
       }
       break;
@@ -148,12 +148,12 @@ void UserAf::setZombie()
    AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
    af::Node::setZombie();
    appendLog( "Became a zombie.");
-   AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name.toUtf8().data(), af::Environment::getUserLogsRotate());
+   AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());
 }
 
 int UserAf::addJob( JobAf *job)
 {
-   appendLog( std::string("Adding a job: ") + job->getName().toUtf8().data());
+   appendLog( std::string("Adding a job: ") + job->getName());
    zombietime = 0;
    int userlistorder = jobs.addJob( job );
    numjobs++;

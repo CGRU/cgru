@@ -14,10 +14,10 @@
 
 ItemTalk::ItemTalk( af::Talk *talk):
    ItemNode( (af::Talk*)talk),
-   username( talk->getUserName())
+   username( QString::fromUtf8( talk->getUserName().c_str()))
 {
-   tip += "Launched at "   + af::time2Qstr( talk->getTimeLaunch()    );
-   tip += "\nRegistered at " + af::time2Qstr( talk->getTimeRegister()  );
+   tip += "Launched at "   + afqt::time2Qstr( talk->getTimeLaunch()    );
+   tip += "\nRegistered at " + afqt::time2Qstr( talk->getTimeRegister()  );
    tip += QString("\nVersion: %1").arg( QString::fromUtf8( talk->getVersion().c_str()));
    tip += QString("\nBuild Revision: %1").arg( talk->getRevision());
    tip += QString("\n%1").arg(talk->generateInfoString().c_str());
@@ -35,7 +35,7 @@ ItemTalk::~ItemTalk()
 void ItemTalk::updateValues( af::Node *node, int type)
 {
    af::Talk * talk = (af::Talk*)node;
-   tooltip = tip + af::time2Qstr( talk->getTimeUpdate());
+   tooltip = tip + afqt::time2Qstr( talk->getTimeUpdate());
 }
 
 void ItemTalk::paint( QPainter *painter, const QStyleOptionViewItem &option) const

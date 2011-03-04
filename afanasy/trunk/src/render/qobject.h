@@ -18,7 +18,7 @@ class Object : public QObject
    Q_OBJECT
 
 public:
-   Object( uint32_t State, uint8_t Priority, const QString & command);
+   Object( uint32_t State, uint8_t Priority, const std::string & command);
    ~Object();
 
    inline bool initialized() const { return init;}

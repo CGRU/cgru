@@ -2,6 +2,11 @@
 
 #include <sys/stat.h>
 
+#include <QtCore/QRegExp>
+#include <QtCore/QString>
+#include <QtCore/QStringList>
+#include <QtCore/QDateTime>
+
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 
@@ -79,11 +84,6 @@ void af::destroy()
    if( ferma != NULL) delete ferma;
 }
 
-const QString af::time2Qstr( time_t time_sec)
-{
-   return QString( af::time2str(time_sec).c_str());
-}
-
 const std::string af::time2str( time_t time_sec, const char * time_format)
 {
    static const int timeStrLenMax = 64;
@@ -142,13 +142,13 @@ const std::string af::time2strHMS( int time32, bool clamp)
    return str;
 }
 
-const QString af::state2str( int state)
+const std::string af::state2str( int state)
 {
-   QString str;
-   if( state & AFJOB::STATE_READY_MASK    ) str += QString("%1 ").arg( AFJOB::STATE_READY_NAME_S   );
-   if( state & AFJOB::STATE_RUNNING_MASK  ) str += QString("%1 ").arg( AFJOB::STATE_RUNNING_NAME_S );
-   if( state & AFJOB::STATE_DONE_MASK     ) str += QString("%1 ").arg( AFJOB::STATE_DONE_NAME_S    );
-   if( state & AFJOB::STATE_ERROR_MASK    ) str += QString("%1 ").arg( AFJOB::STATE_ERROR_NAME_S   );
+   std::string str;
+   if( state & AFJOB::STATE_READY_MASK    ) str += std::string( AFJOB::STATE_READY_NAME_S   ) + " ";
+   if( state & AFJOB::STATE_RUNNING_MASK  ) str += std::string( AFJOB::STATE_RUNNING_NAME_S ) + " ";
+   if( state & AFJOB::STATE_DONE_MASK     ) str += std::string( AFJOB::STATE_DONE_NAME_S    ) + " ";
+   if( state & AFJOB::STATE_ERROR_MASK    ) str += std::string( AFJOB::STATE_ERROR_NAME_S   ) + " ";
    return str;
 }
 
@@ -157,16 +157,16 @@ void af::printTime( time_t time_sec, const char * time_format)
    std::cout << time2str( time_sec, time_format);
 }
 
-bool af::setRegExp( QRegExp & regexp, const QString & str, const QString & name)
+bool af::setRegExp( QRegExp & regexp, const std::string & str, const std::string & name)
 {
-   QRegExp rx( str);
+   QRegExp rx( QString::fromUtf8( str.c_str()));
    if( rx.isValid() == false )
    {
       AFERRAR("af::setRegExp: Setting '%s' to '%s' Invalid pattern: %s\n",
-              name.toUtf8().data(), str.toUtf8().data(), rx.errorString().toUtf8().data());
+              name.c_str(), str.c_str(), rx.errorString().toUtf8().data());
       return false;
    }
-   regexp.setPattern( str);
+   regexp.setPattern( QString::fromUtf8( str.c_str()));
    return true;
 }
 /*
@@ -212,13 +212,13 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
    }
 }
 
-const QString af::fillNumbers( const QString & pattern, int start, int end)
+const std::string af::fillNumbers( const std::string& pattern, int start, int end)
 {
-   QString str( pattern);
+   QString str = QString::fromUtf8( pattern.c_str());
    if( str.contains("%1")) str = str.arg( start);
    if( str.contains("%2")) str = str.arg( end);
    if( str.contains("%") && (false == str.contains("%n"))) str.sprintf( str.toUtf8().data(), start, end);
-   return str;
+   return std::string( str.toUtf8().data());
 }
 
 int af::weigh( const std::string & str)
@@ -228,12 +228,19 @@ int af::weigh( const std::string & str)
 
 int af::weigh( const QString & str)
 {
-   return str.size() + 1;
+   return str.capacity();
 }
 
 int af::weigh( const QRegExp & regexp)
 {
-   return regexp.pattern().size() + 1;
+   return regexp.pattern().capacity();
+}
+
+int af::weigh( const std::list<std::string> & strlist)
+{
+   int w = 0;
+   for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++) w += weigh( *it);
+   return w;
 }
 
 const std::string af::getenv( const char * name)
@@ -325,6 +332,7 @@ bool af::pathIsFolder( const std::string & path)
 {
    struct stat st;
    int retval = stat( path.c_str(), &st);
+   if( retval != 0 ) return false;
    if( st.st_mode & S_IFDIR ) return true;
    return false;
 }
@@ -341,9 +349,9 @@ const std::string af::pathHome()
 bool af::pathMakeDir( const std::string & path, bool verbose)
 {
    AFINFA("af::pathMakeDir: path=\"%s\"\n", path.c_str());
-   if( false == af::pathIsFolder(path))
+   if( false == af::pathIsFolder( path))
    {
-      if( verbose) printf("Creating folder:\n%s\n", path.c_str());
+      if( verbose) std::cout << "Creating folder:\n" << path << std::endl;
 #ifdef WINNT
       if( _mkdir( path.c_str()) == -1)
 #else
@@ -360,9 +368,56 @@ bool af::pathMakeDir( const std::string & path, bool verbose)
    return true;
 }
 
+const int af::stoi( const std::string str)
+{
+   return atoi( str.c_str());
+}
+
 const std::string af::itos( int integer)
 {
    std::ostringstream stream;
    stream << integer;
    return stream.str();
+}
+
+const std::string af::strJoin( const std::list<std::string> & strlist, const std::string & separator)
+{
+   std::string str;
+   for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++ )
+   {
+      if( false == str.empty()) str += separator;
+      str += *it;
+   }
+   return str;
+}
+
+const std::string af::strJoin( const std::vector<std::string> & strvect, const std::string & separator)
+{
+   std::string str;
+   for( std::vector<std::string>::const_iterator it = strvect.begin(); it != strvect.end(); it++ )
+   {
+      if( false == str.empty()) str += separator;
+      str += *it;
+   }
+   return str;
+}
+
+const std::list<std::string> af::strSplit( const std::string & str, const std::string & separators)
+{
+   std::list<std::string> strlist;
+   // Skip delimiters at beginning.
+   std::string::size_type lastPos = str.find_first_not_of( separators, 0);
+   // Find first "non-delimiter".
+   std::string::size_type pos     = str.find_first_of( separators, lastPos);
+
+   while( std::string::npos != pos || std::string::npos != lastPos)
+   {
+       // Found a token, add it to the vector.
+       strlist.push_back( str.substr( lastPos, pos - lastPos));
+       // Skip delimiters.  Note the "not_of"
+       lastPos = str.find_first_not_of( separators, pos);
+       // Find next "non-delimiter"
+       pos = str.find_first_of( separators, lastPos);
+   }
+   return strlist;
 }

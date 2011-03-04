@@ -64,11 +64,11 @@ public:
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
    inline const std::list<std::string> getLog() { return loglist; }   ///< Get log list.
-   void getServices( af::Msg * msg) const;         ///< Get services information.
+   void getServicesString( af::Msg * msg) const;         ///< Get services information.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   bool canRunService( const QString & type) const; ///< Check whether block can run a service
+   bool canRunService( const std::string & type) const; ///< Check whether block can run a service
 
    bool update( const af::Render * render);   ///< Update Render.
 
@@ -80,8 +80,8 @@ public:
    static void closeLostTask( const af::MCTaskUp &taskup);
 
 private:
-   QString hostname;
-   QString hostdescription;
+   std::string hostname;
+   std::string hostdescription;
 
    std::vector<int> servicescounts;
    int servicesnum;
@@ -93,10 +93,10 @@ private:
 private:
    void init();
 
-   void addService( const QString & type);
-   void remService( const QString & type);
+   void addService( const std::string & type);
+   void remService( const std::string & type);
 
-   void setService( const QString srvname, bool enable);
+   void setService( const std::string & srvname, bool enable);
    void disableServices();
 
    void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus);  ///< Stop task with \c message to loglist.

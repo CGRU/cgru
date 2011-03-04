@@ -41,10 +41,10 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
 {
    if( taskExec == NULL)
    {
-      AFERRAR("TaskRunMulti::TaskRunMulti: %s[%d] Task executable is NULL.\n", block->job->getName().toUtf8().data(), block->data->getBlockNum());
+      AFERRAR("TaskRunMulti::TaskRunMulti: %s[%d] Task executable is NULL.\n", block->job->getName().c_str(), block->data->getBlockNum())
       return;
    }
-   hasservice = (block->data->getMultiHostService().isEmpty() == false);
+   hasservice = ( block->data->getMultiHostService().empty() == false);
    tasknum = taskExec->getTaskNum();
    task->log("Starting to capture hosts:");
    progress->state = AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_READY_MASK;
@@ -53,10 +53,10 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
 
 TaskRunMulti::~TaskRunMulti()
 {
-AFINFA("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
+AFINFA("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
    if( execs.size() != 0)
    {
-      AFERRAR("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
    }
    for( std::list<af::TaskExec*>::iterator it = execs.begin(); it != execs.end(); it++) delete *it;
    progress->hostname = hostnamemaster;
@@ -71,7 +71,7 @@ int TaskRunMulti::calcWeight() const
 
 void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
-   task->log( std::string("Host \"") + render->getName().toUtf8().data() + "\" added.");
+   task->log( std::string("Host \"") + render->getName() + "\" added.");
 
    // Getting unique minimal slave number
    int number = 0;
@@ -95,10 +95,10 @@ void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorC
    // Append lists
    execs.push_back( taskexec);
    hostids.push_back( render->getId());
-   hostnames << render->getName();
+   hostnames.push_back( render->getName());
 
    // Set active slaves list for monitoring
-   progress->hostname = hostnames.join(" ");
+   progress->hostname = af::strJoin( hostnames, " ");
 
    // Setting task on slave, but do not starting it
    render->setTask( taskexec, monitoring, false);
@@ -146,25 +146,26 @@ void TaskRunMulti::startMaster( RenderContainer * renders, MonitorContainer * mo
    RenderAf * render = rendersIt.getRender( hostId);
    if( render == NULL)
    {
-      AFERRAR("TaskRunMulti::startMaster: %s[%d][%d] Render id=%d is NULL.\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, hostId);
+      AFERRAR("TaskRunMulti::startMaster: %s[%d][%d] Render id=%d is NULL.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum, hostId);
       return;
    }
 
    // Add a master to slaves list if needed
-   if( block->data->canMasterRunOnSlaveHost()) exec->setHostNames( hostnames << render->getName());
-   else exec->setHostNames( hostnames);
+   if( block->data->canMasterRunOnSlaveHost()) hostnames.push_back( render->getName());
+
+   exec->setHostNames( hostnames);
 
    hostnamemaster = render->getName();
    progress->state = AFJOB::STATE_RUNNING_MASK;
    progress->starts_count++;
    progress->time_start = time( NULL);
    progress->time_done = progress->time_start;
-   progress->hostname = QString("%1: %2").arg( hostnamemaster, hostnames.join(" "));
+   progress->hostname = hostnamemaster + ": " + af::strJoin( hostnames, " ");
    render->startTask( exec);
    masterrunning = true;
    task->monitor( monitoring );
    task->updateDatabase();
-   task->log( std::string("Starting master on \"") + render->getName().toUtf8().data() + "\"");
+   task->log( std::string("Starting master on \"") + render->getName() + "\"");
 }
 
 void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost)
@@ -180,12 +181,12 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
 
    if( isZombie() )
    {
-      AFERRAR("TaskRunMulti::update: ZOMBIE %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRunMulti::update: ZOMBIE %s[%d][%d]\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
       return;
    }
    if((progress->state & AFJOB::STATE_RUNNING_MASK) == false)
    {
-      AFERRAR("TaskRunMulti::update: NOT RUNNING %s[%d][%d] task is not running.\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRunMulti::update: NOT RUNNING %s[%d][%d] task is not running.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
       return;
    }
 
@@ -246,7 +247,7 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
       break;
 
    default:
-      AFERRAR("TaskRun::updateState: %s[%d][%d]: Unknown task update status = %d\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum, taskup.getStatus());
+      AFERRAR("TaskRun::updateState: %s[%d][%d]: Unknown task update status = %d\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum, taskup.getStatus());
       return;
    }
 
@@ -278,7 +279,7 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
          {
             if( progress->state & AFJOB::STATE_READY_MASK) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
             setMasterTask();
-            task->log( std::string("Finished waiting for hosts.\nCaptured slaves:\n") + hostnames.join(" ").toUtf8().data());
+            task->log( std::string("Finished waiting for hosts.\nCaptured slaves:\n") + af::strJoin( hostnames, " "));
             startServices( renders);
          }
 
@@ -320,11 +321,11 @@ void TaskRunMulti::stop( const std::string & message, RenderContainer * renders,
       {
          if( time_servicestopped )
          {
-            AFERRAR("TaskRunMulti::stop: %s[%d][%d] Services already asked to be stopped.\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
+            AFERRAR("TaskRunMulti::stop: %s[%d][%d] Services already asked to be stopped.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
             return;
          }
          // Stopping service on slaves (if it was not asked to be stopped before)
-         task->log( std::string("Stopping service[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName().toUtf8().data() + "\"");
+         task->log( std::string("Stopping service[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName() + "\"");
          render->stopTask( *tIt);
          hIt++, tIt++;
       }
@@ -332,7 +333,7 @@ void TaskRunMulti::stop( const std::string & message, RenderContainer * renders,
       {
          // Finish tasks on slaves if there is no service
          render->taskFinished( *tIt, monitoring);
-         task->log( std::string("Finished task[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName().toUtf8().data() + "\"");
+         task->log( std::string("Finished task[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName() + "\"");
          delete *tIt;
          tIt = execs.erase( tIt);
          hIt = hostids.erase( hIt);
@@ -374,7 +375,8 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
    std::list<int>::iterator hIt = hostids.begin();
    std::list<af::TaskExec*>::iterator tIt = execs.begin();
    std::list<af::TaskExec*>::const_iterator end = execs.end();
-   for( int pos = 0; tIt != end; hIt++, tIt++, pos++)
+   std::list<std::string>::iterator nIt = hostnames.begin();
+   for( ; tIt != end; hIt++, tIt++, nIt++)
    {
       if(( taskup != NULL) && ((*tIt)->equals( *taskup) == false)) continue;
 
@@ -382,18 +384,18 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
       if( render == NULL)
       {
          AFERRAR("TaskRunMulti::releaseHost: Render[%d] is NULL %s[%d][%d](%d)\n",
-           *hIt, (*tIt)->getJobName().toUtf8().data(), (*tIt)->getBlockNum(), (*tIt)->getTaskNum(), (*tIt)->getNumber());
+           *hIt, (*tIt)->getJobName().c_str(), (*tIt)->getBlockNum(), (*tIt)->getTaskNum(), (*tIt)->getNumber());
       }
       else
       {
          render->taskFinished( *tIt, monitoring);
-         task->log( std::string("Releasing task[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName().toUtf8().data() + "\"");
+         task->log( std::string("Releasing task[") + af::itos((*tIt)->getNumber()) + "] on host \"" + render->getName() + "\"");
       }
       delete *tIt;
       tIt = execs.erase( tIt);
       hIt = hostids.erase( hIt);
-      hostnames.removeAt( pos);
-      progress->hostname = hostnames.join(" ");
+      nIt = hostnames.erase( nIt);
+      progress->hostname = af::strJoin( hostnames ," ");
       if( stopping && (masterrunning == false) && (execs.size() == 0))
          TaskRun::finish( "Finish: All slaves and master finished.", renders, monitoring);
       task->monitor( monitoring );
@@ -432,10 +434,11 @@ void TaskRunMulti::stdOut( bool full) const
    std::list<int>::const_iterator hIt = hostids.begin();
    std::list<af::TaskExec*>::const_iterator tIt = execs.begin();
    std::list<af::TaskExec*>::const_iterator end = execs.end();
-   for( int pos = 0; tIt != end; hIt++, tIt++, pos++)
+   std::list<std::string>::const_iterator nIt = hostnames.begin();
+   for( ; tIt != end; hIt++, tIt++, nIt++)
    {
       if( full ) (*tIt)->stdOut( false);
       else printf("Exec=[%d][%d][%d](%d) host='%s'[%d]\n",
-         (*tIt)->getJobId(), (*tIt)->getBlockNum(), (*tIt)->getTaskNum(), (*tIt)->getNumber(), hostnames[pos].toUtf8().data(), *hIt);
+         (*tIt)->getJobId(), (*tIt)->getBlockNum(), (*tIt)->getTaskNum(), (*tIt)->getNumber(), (*nIt).c_str(), *hIt);
    }
 }

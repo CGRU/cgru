@@ -30,6 +30,6 @@ public:
    bool setDependMask( const char * str);
 
 /// Set task name.
-   inline void setName( const QString & str) { name = str; }
+   inline void setName( const std::string & str) { name = str; }
 };
 }

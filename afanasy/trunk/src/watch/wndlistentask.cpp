@@ -68,8 +68,8 @@ bool WndListenTask::caseMessage( af::Msg * msg)
       if(( mclass.getJobId()     != jobid ) ||
          ( mclass.getNumBlock()  != block ) ||
          ( mclass.getNumTask()   != task  )) return false;
-      qTextEdit->append( QString::fromUtf8( mclass.getData(), mclass.getDataSize()));
-      setWindowTitle( taskname.arg(mclass.getRenderName()));
+      qTextEdit->append( afqt::dtoq( mclass.getData(), mclass.getDataSize()));
+      setWindowTitle( taskname.arg( afqt::stoq( mclass.getRenderName())));
       break;
    }
    default:

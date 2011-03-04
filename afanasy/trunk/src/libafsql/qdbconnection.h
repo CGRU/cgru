@@ -19,7 +19,7 @@ class QSqlDatabase;
 class afsql::DBConnection
 {
 public:
-   DBConnection( const QString & connection_name = QString("AFLIBSQL"));
+   DBConnection( const std::string & connection_name = std::string("AFLIBSQL"));
    ~DBConnection();
 
    void ResetJobs();

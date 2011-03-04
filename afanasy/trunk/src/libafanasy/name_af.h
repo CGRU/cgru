@@ -1,13 +1,15 @@
 #pragma once
 
+#include <list>
+#include <string>
 #include <time.h>
-
-#include <QtCore/qregexp.h>
-#include <QtCore/QString>
-#include <QtCore/qstringlist.h>
-#include <QtCore/qdatetime.h>
+#include <vector>
 
 #include "../include/aftypes.h"
+
+class QRegExp;
+class QString;
+class QStringList;
 
 namespace af
 {
@@ -62,25 +64,27 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
+   const int stoi( const std::string str);
    const std::string itos( int integer);
-
    const std::string getenv( const char * name);
+   const std::string state2str( int state);
+   const std::string fillNumbers( const std::string& pattern, int start, int end);
+   const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
+   const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
+   const std::list<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
 
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
-   const QString time2Qstr( time_t time_sec = time( NULL));
    const std::string time2strHMS( int time32, bool clamp = false);
 
    void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
-   const QString state2str( int state);
-   const QString fillNumbers( const QString & pattern, int start, int end);
-
-   bool setRegExp( QRegExp & regexp, const QString & str, const QString & name);
+   bool setRegExp( QRegExp & regexp, const std::string& str, const std::string& name);
 
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
 
    int weigh( const std::string & str);
+   int weigh( const std::list<std::string> & strlist);
    int weigh( const QString & str);
    int weigh( const QRegExp & regexp);
 

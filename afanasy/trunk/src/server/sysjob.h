@@ -14,11 +14,11 @@ class SysJob;
 /// System job command:
 struct SysCmd
 {
-   SysCmd( const QString & Command, const QString & WorkingDirectory, const QString & UserName, const QString & JobName);
-   QString command;
-   QString workingdirectory;
-   QString username;
-   QString jobname;
+   SysCmd( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
+   std::string command;
+   std::string workingdirectory;
+   std::string username;
+   std::string jobname;
 };
 
 /// System job task:
@@ -36,7 +36,7 @@ public:
 
    virtual void writeTaskOutput( const af::MCTaskUp & taskup) const;  ///< Write task output in tasksOutputDir.
 
-   virtual const QString getInfo( bool full = false) const;
+   virtual const std::string getInfo( bool full = false) const;
 
    virtual void log( const std::string & message);
    virtual void monitor( MonitorContainer * monitoring) const;
@@ -93,7 +93,7 @@ private:
 class SysJob : public JobAf
 {
 public:
-   static void addCommand( const QString & Command, const QString & WorkingDirectory, const QString & UserName, const QString & JobName);
+   static void addCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
 
    enum CreationFlags
    {

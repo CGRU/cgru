@@ -40,11 +40,11 @@ Dialog::Dialog():
 
    username = af::Environment::getUserName();
    hostname = af::Environment::getHostName();
-   setWindowTitle("Talk::" + username + "@" + hostname + ":(connecting...)");
+   setWindowTitle((std::string("Talk::") + username + "@" + hostname + ":(connecting...)").c_str());
 
    editor = new Editor(this);
-   textView = new TextView(this, username);
-   usersList = new UsersList(this, username);
+   textView  = new TextView(  this, afqt::stoq( username));
+   usersList = new UsersList( this, afqt::stoq( username));
 
    QHBoxLayout *hlayout = new QHBoxLayout( this);
    QVBoxLayout *vlayout = new QVBoxLayout();
@@ -63,7 +63,7 @@ Dialog::Dialog():
    connect( usersList, SIGNAL( activated()), this, SLOT( activated()));
    connect( editor,    SIGNAL( activated()), this, SLOT( activated()));
 
-   tray = new Tray( this, username);
+   tray = new Tray( this, QString::fromUtf8( username.c_str()));
    connect( tray, SIGNAL( hideRaiseDialog()), this, SLOT( hideRaiseDialog()));
 
    talk = new TalkHost();
@@ -106,7 +106,7 @@ void Dialog::connectionLost( af::Address* address)
    printf("Dialog::connectionLost(): connecting...\n");
 
    usersList->clear();
-   setWindowTitle("Talk::" + username + "@" + hostname + ":(connecting...)");
+   setWindowTitle( afqt::stoq((std::string("Talk::") + username + "@" + hostname + ":(connecting...)")));
 }
 void Dialog::sendRegister(){ qthreadClientUp->setUpMsg( new afqt::QMsg( af::Msg::TTalkRegister, talk, true));}
 
@@ -155,10 +155,10 @@ void Dialog::caseMessage( af::Msg *msg)
    case af::Msg::TTalkData:
    {
       af::MCTalkmessage amsg( msg);
-      QString user, text;
+      std::string user, text;
       amsg.getUser( user);
       amsg.getText( text);
-      appendMessage( user, text);
+      appendMessage( afqt::stoq( user), afqt::stoq( text));
       break;
    }
    default:
@@ -173,7 +173,8 @@ void Dialog::upOnline( af::Msg &msg)
    if( !connected)
    {
       connected = true;
-      setWindowTitle("Talk::"+af::Environment::getUserName()+"@"+af::Environment::getHostName()+":"+QString::number(af::Environment::getClientPort()));
+      std::string title = std::string("Talk::")+af::Environment::getUserName()+"@"+af::Environment::getHostName()+":";
+      setWindowTitle( afqt::stoq( title) + QString::number( af::Environment::getClientPort()));
    }
 
    af::MCAfNodes mctalks( &msg);
@@ -181,8 +182,8 @@ void Dialog::upOnline( af::Msg &msg)
    QStringList hosts;
    for( int i = 0; i < mctalks.getCount(); i++)
    {
-      users << ((af::Talk*)mctalks.getNode(i))->getUserName();
-      hosts << ((af::Talk*)mctalks.getNode(i))->getName();
+      users << afqt::stoq( ((af::Talk*)mctalks.getNode(i))->getUserName());
+      hosts << afqt::stoq( ((af::Talk*)mctalks.getNode(i))->getName());
    }
    usersList->updateOnline( users, hosts);
    tray->updateToolTip( users, hosts);
@@ -197,8 +198,8 @@ void Dialog::sendMessage()
    int count_sel = qlist.count();
    if( count_sel < 1) return;
 
-   af::MCTalkdistmessage mcdmsg( username, text);
-   for( int sel = 0; sel < count_sel; sel++) mcdmsg.addUser( qlist[sel]->text());
+   af::MCTalkdistmessage mcdmsg( username, text.toUtf8().data());
+   for( int sel = 0; sel < count_sel; sel++) mcdmsg.addUser( qlist[sel]->text().toUtf8().data());
 
    afqt::QMsg * msg = new afqt::QMsg( af::Msg::TTalkDistributeData, &mcdmsg);
    qthreadClientSend->send( msg);

@@ -16,7 +16,7 @@ AFINFA("API: Task constuctor called.\n");
 
 Task::~Task()
 {
-AFINFA("API: Task['%s'] destructor called\n", name.toUtf8().data());
+AFINFA("API: Task['%s'] destructor called\n", name.c_str());
 }
 
 void Task::stdOut( bool full) const
@@ -24,12 +24,12 @@ void Task::stdOut( bool full) const
    af::TaskData::stdOut( full);
 }
 
-void Task::setName(        const char * str) { name        = QString::fromUtf8(str);  }
-void Task::setCommand(     const char * str) { command     = QString::fromUtf8(str);  }
-void Task::setFiles(       const char * str) { files       = QString::fromUtf8(str);  }
-void Task::setCustomData(  const char * str) { customdata  = QString::fromUtf8(str);  }
+void Task::setName(        const char * str) { name        = str;  }
+void Task::setCommand(     const char * str) { command     = str;  }
+void Task::setFiles(       const char * str) { files       = str;  }
+void Task::setCustomData(  const char * str) { customdata  = str;  }
 bool Task::setDependMask(  const char * str)
 {
-   dependmask  = QString::fromUtf8(str);
+   dependmask =  str;
    return true;
 }

@@ -30,7 +30,7 @@ ItemJob::ItemJob( af::Job *job):
    for( int b = 0; b < blocksnum; b++)
    {
       const af::BlockData * block = job->getBlock(b);
-      blockinfo[b].setName( block->getName());
+      blockinfo[b].setName( afqt::stoq( block->getName()));
       blockinfo[b].setItem( this);
       blockinfo[b].setBlockNumber( b);
       blockinfo[b].setJobId( getId());
@@ -55,25 +55,25 @@ void ItemJob::updateValues( af::Node *node, int type)
       return;
    }
 
-   annotation        = QString::fromUtf8( job->getAnnontation().c_str());
+   annotation        = afqt::stoq( job->getAnnontation().c_str());
    priority          = job->getPriority();
-   username          = job->getUserName();
-   hostname          = job->getHostName();
+   username          = afqt::stoq( job->getUserName().c_str());
+   hostname          = afqt::stoq( job->getHostName().c_str());
    maxrunningtasks   = job->getMaxRunningTasks();
    state             = job->getState();
    time_creation     = job->getTimeCreation();
    time_started      = job->getTimeStarted();
    time_wait         = job->getTimeWait();
    time_done         = job->getTimeDone();
-   hostsmask         = job->getHostsMask();
-   hostsmask_exclude = job->getHostsMaskExclude();
-   dependmask        = job->getDependMask();
-   dependmask_global = job->getDependMaskGlobal();
-   need_os           = job->getNeedOS();
-   need_properties   = job->getNeedProperties();
-   cmd_pre           = job->getCmdPre();
-   cmd_post          = job->getCmdPost();
-   description       = QString::fromUtf8( job->getDescription().c_str());
+   hostsmask         = afqt::stoq( job->getHostsMask());
+   hostsmask_exclude = afqt::stoq( job->getHostsMaskExclude());
+   dependmask        = afqt::stoq( job->getDependMask());
+   dependmask_global = afqt::stoq( job->getDependMaskGlobal());
+   need_os           = afqt::stoq( job->getNeedOS());
+   need_properties   = afqt::stoq( job->getNeedProperties());
+   cmd_pre           = afqt::stoq( job->getCmdPre());
+   cmd_post          = afqt::stoq( job->getCmdPost());
+   description       = afqt::stoq( job->getDescription());
    num_runningtasks  = job->getRunningTasksNumber();
    lifetime          = job->getLifeTime();
 

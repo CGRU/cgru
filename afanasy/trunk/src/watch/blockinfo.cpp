@@ -74,12 +74,12 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       need_memory          = block->getNeedMemory();
       need_power           = block->getNeedPower();
       need_hdd             = block->getNeedHDD();
-      need_properties      = block->getNeedProperties();
-      hostsmask            = block->getHostsMask();
-      hostsmask_exclude    = block->getHostsMaskExclude();
-      need_properties      = block->getNeedProperties();
-      dependmask           = block->getDependMask();
-      tasksdependmask      = block->getTasksDependMask();
+      need_properties      = afqt::stoq( block->getNeedProperties());
+      hostsmask            = afqt::stoq(block->getHostsMask());
+      hostsmask_exclude    = afqt::stoq(block->getHostsMaskExclude());
+      need_properties      = afqt::stoq(block->getNeedProperties());
+      dependmask           = afqt::stoq(block->getDependMask());
+      tasksdependmask      = afqt::stoq(block->getTasksDependMask());
       capacity             = block->getCapacity();
       filesize_min         = block->getFileSizeMin();
       filesize_max         = block->getFileSizeMax();
@@ -89,7 +89,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost_max        = block->getMultiHostMax();
       multihost_waitmax    = block->getMultiHostWaitMax();
       multihost_waitsrv    = block->getMultiHostWaitSrv();
-      service              = block->getService();
+      service              = afqt::stoq( block->getService());
       numeric              = block->isNotNumeric();
       varcapacity          = block->canVarCapacity();
       multihost            = block->isMultiHost();
@@ -701,7 +701,7 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
          listitems->displayError( rx.errorString());
          return;
       }
-      mcgeneral.setString( set_string);
+      mcgeneral.setString( set_string.toUtf8().data());
    }
    else
       mcgeneral.setNumber( set_number);

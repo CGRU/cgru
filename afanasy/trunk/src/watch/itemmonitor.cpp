@@ -29,15 +29,15 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_launch    = monitor->getTimeLaunch();
    time_register  = monitor->getTimeRegister();
 
-   timelaunch   = TimeLaunch     .arg( af::time2str( time_launch  ).c_str());
-   timel        = TimeL          .arg( af::time2str( time_launch  ).c_str());
-   timeregister = TimeRegister   .arg( af::time2str( time_register).c_str());
-   timer        = TimeR          .arg( af::time2str( time_register).c_str());
+   timelaunch   = TimeLaunch     .arg( afqt::time2Qstr( time_launch  ));
+   timel        = TimeL          .arg( afqt::time2Qstr( time_launch  ));
+   timeregister = TimeRegister   .arg( afqt::time2Qstr( time_register));
+   timer        = TimeR          .arg( afqt::time2Qstr( time_register));
 
    address = Address.arg( monitor->getAddress()->generateIPString().c_str());
 
    tip = name;
-   tip += QString("\nVersion: %1").arg( QString::fromUtf8( monitor->getVersion().c_str()));
+   tip += QString("\nVersion: %1").arg( afqt::stoq( monitor->getVersion()));
    tip += QString("\nBuild Revision: %1").arg( monitor->getRevision());
    tip += "\n   " + timelaunch;
    tip += "\n   " + timeregister;
@@ -56,7 +56,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
    af::Monitor *monitor = (af::Monitor*)node;
 
    time_activity = monitor->getTimeActivity();
-   timea = TimeA.arg(af::time2Qstr( time_activity ));
+   timea = TimeA.arg( afqt::time2Qstr( time_activity ));
 
    events.clear();
    eventscount = 0;
@@ -94,7 +94,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
       jobsids += QString(" %1").arg( *it);
    jobsidstitle = JobsIdsName.arg( jobsidscount);
 
-   tooltip = tip.arg(af::time2Qstr( time_activity));
+   tooltip = tip.arg( afqt::time2Qstr( time_activity));
    for( int e = 0; e < af::Monitor::EventsCount; e++)
    {
       int etype = e + af::Monitor::EventsShift;

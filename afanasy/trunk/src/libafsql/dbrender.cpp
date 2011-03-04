@@ -30,13 +30,13 @@ void DBRender::addDBAttributes()
 
    dbAddAttr( new DBAttrUInt32(  DBAttr::_state,             &state               ));
    dbAddAttr( new DBAttrUInt8(   DBAttr::_priority,          &priority            ));
-   dbAddAttr( new DBAttrQString( DBAttr::_username,          &username            ));
+   dbAddAttr( new DBAttrString(  DBAttr::_username,          &username            ));
    dbAddAttr( new DBAttrInt32(   DBAttr::_capacity,          &capacity            ));
-   dbAddAttr( new DBAttrQString( DBAttr::_services_disabled, &services_disabled   ));
+   dbAddAttr( new DBAttrString(  DBAttr::_services_disabled, &services_disabled   ));
    dbAddAttr( new DBAttrString(  DBAttr::_annotation,        &annotation          ));
    dbAddAttr( new DBAttrString(  DBAttr::_customdata,        &customdata          ));
 
-   dbAddAttr( new DBAttrQString( DBAttr::_name,               &name               ));
+   dbAddAttr( new DBAttrString(  DBAttr::_name,               &name               ));
 }
 
 DBRender::~DBRender()

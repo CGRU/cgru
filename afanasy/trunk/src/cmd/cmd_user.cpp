@@ -1,5 +1,8 @@
 #include "cmd_user.h"
 
+#include <QtCore/QRegExp>
+#include <QtCore/QString>
+
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
@@ -42,8 +45,7 @@ CmdUserJobsList::CmdUserJobsList()
 CmdUserJobsList::~CmdUserJobsList(){}
 bool CmdUserJobsList::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   bool ok; int number = (QString::fromUtf8(argv[0])).toInt( &ok);
-   if( ok == false ) return false;
+   int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }
@@ -64,7 +66,7 @@ CmdUserAdd::CmdUserAdd()
 CmdUserAdd::~CmdUserAdd(){}
 bool CmdUserAdd::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 1);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -81,7 +83,7 @@ CmdUserDelete::CmdUserDelete()
 CmdUserDelete::~CmdUserDelete(){}
 bool CmdUserDelete::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
+   std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -98,9 +100,8 @@ CmdUserPriority::CmdUserPriority()
 CmdUserPriority::~CmdUserPriority(){}
 bool CmdUserPriority::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string name = argv[0];
+   int number = atoi(argv[1]);
    af::MCGeneral mcgeneral( name, number);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -117,9 +118,8 @@ CmdUserRunningTasksMaximum::CmdUserRunningTasksMaximum()
 CmdUserRunningTasksMaximum::~CmdUserRunningTasksMaximum(){}
 bool CmdUserRunningTasksMaximum::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);
-   if( ok == false ) return false;
+   std::string name = argv[0];
+   int number = atoi(argv[1]);
    af::MCGeneral mcgeneral( name, number);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -136,9 +136,9 @@ CmdUserHostsMask::CmdUserHostsMask()
 CmdUserHostsMask::~CmdUserHostsMask(){}
 bool CmdUserHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   QString name = QString::fromUtf8(argv[0]);
-   QString mask = QString::fromUtf8(argv[1]);
-   QRegExp rx( mask, Qt::CaseInsensitive);
+   std::string name = argv[0];
+   std::string mask = argv[1];
+   QRegExp rx( QString::fromUtf8( mask.c_str()), Qt::CaseInsensitive);
    if( rx.isValid() == false )
    {
       printf("QRegExp: %s\n", rx.errorString().toUtf8().data());

@@ -3,12 +3,11 @@
 #include "../include/aftypes.h"
 #include "../include/afjob.h"
 
+#include <QtCore/QRegExp>
+
 #include "af.h"
 #include "name_af.h"
 #include "taskexec.h"
-
-#include <QtCore/QString>
-#include <QtCore/QStringList>
 
 namespace af
 {
@@ -52,9 +51,9 @@ public:
 **/
    TaskExec *genTask( int num) const;
 
-   const QString genTaskName( int num) const; ///< Generate task name.
-   const QString genCommand( int num, int *frame_start = NULL, int *frame_finish = NULL) const;
-   const QString genFiles( int num) const;
+   const std::string genTaskName(   int num) const; ///< Generate task name.
+   const std::string genCommand(    int num, int *frame_start = NULL, int *frame_finish = NULL) const;
+   const std::string genFiles(      int num) const;
 
    inline bool isNumeric() const { return flags & FNumeric;} ///< Whether the block is numeric.
    inline bool isNotNumeric() const { return false == (flags & FNumeric);} ///< Whether the block is not numeric.
@@ -65,21 +64,21 @@ public:
    inline void setParserCoeff( int value ) { parsercoeff = value; }
 
 /// Set block tasks type.
-   inline void setService(          const QString  & str    ) { service          = str;   }
+   inline void setService(          const std::string & str    ) { service          = str;   }
 /// Set block tasks parser type.
-   inline void setParser(           const QString  & str    ) { parser           = str;   }
+   inline void setParser(           const std::string & str    ) { parser           = str;   }
 /// Set block tasks working directory.
-   inline void setWDir(             const QString  & str    ) { wdir             = str;   }
+   inline void setWDir(             const std::string & str    ) { wdir             = str;   }
 /// Set block tasks extra environment.
-   inline void setEnv(              const QString  & str    ) { environment      = str;   }
+   inline void setEnv(              const std::string & str    ) { environment      = str;   }
 /// Set block tasks command.
-   inline void setCommand(          const QString  & str    ) { command          = str;   }
+   inline void setCommand(          const std::string & str    ) { command          = str;   }
 /// Set block tasks veiw result command.
-   inline void setFiles(            const QString  & str    ) { files            = str;   }
+   inline void setFiles(            const std::string & str    ) { files            = str;   }
 /// Set block pre commnand.
-   inline void setCmdPre(           const QString  & str    ) { cmd_pre          = str;   }
+   inline void setCmdPre(           const std::string & str    ) { cmd_pre          = str;   }
 /// Set block post commnand.
-   inline void setCmdPost(          const QString  & str    ) { cmd_post         = str;   }
+   inline void setCmdPost(          const std::string & str    ) { cmd_post         = str;   }
 /// Set tasks maximum run time, after this time task will be restart as error task
    inline void setTasksMaxRunTime(  const uint32_t & secs   ) { tasksmaxruntime  = secs;  }
 /// Set maximum hosts
@@ -96,19 +95,19 @@ public:
    inline void setMultiHostWaitMax( int value) { multihost_waitmax = value;}
 
 /// Set block depend mask.
-   bool setDependMask(        const QString  & str)
+   bool setDependMask(        const std::string & str)
       { return setRegExp( dependmask, str, "block depend mask");}
 /// Set block hosts mask.
-   bool setHostsMask(         const QString  & str)
+   bool setHostsMask(         const std::string & str)
       { return setRegExp( hostsmask, str, "block hosts mask");}
 /// Set block hosts to exclude mask.
-   bool setHostsMaskExclude(  const QString  & str)
+   bool setHostsMaskExclude(  const std::string & str)
       { return setRegExp( hostsmask_exclude, str, "block exclude hosts mask");}
 /// Set block tasks depend mask.
-   bool setTasksDependMask(   const QString  & str)
+   bool setTasksDependMask(   const std::string & str)
       { return setRegExp( tasksdependmask, str, "block tasks depend mask");}
 
-   bool setNeedProperties(    const QString  & str)
+   bool setNeedProperties(    const std::string & str)
       { return setRegExp( need_properties, str, "block host properties needed");}
 
    inline void setNeedMemory( int memory ) { need_memory = memory;}
@@ -127,45 +126,45 @@ public:
    bool setNumeric( int start, int end, int perTask = 1, int increment = 1);
    void setFramesPerTask( int perTask); ///< For sting tasks and per tasr dependency solve
 
-   inline const QString& getName()              const { return  name;                  }  ///< Get name.
-   inline const QString& getWDir()              const { return  wdir;                  }  ///< Get working directory.
-   inline const QString& getCmd()               const { return  command;               }  ///< Get command.
-   inline bool           hasTasksName()         const { return !tasksname.isEmpty();   }  ///< Whether block has tasks name.
-   inline const QString& getTasksName()         const { return  tasksname;             }  ///< Get tasks name.
-   inline bool           hasFiles()             const { return !files.isEmpty();       }  ///< Whether block has files.
-   inline const QString& getFiles()             const { return  files;                 }  ///< Get tasks files.
-   inline bool           hasEnvironment()       const { return !environment.isEmpty(); }  ///< Whether extra environment is set.
-   inline const QString& getEnvironment()       const { return  environment;                }  ///< Get extra environment.
+   inline const std::string & getName()         const { return name;                }  ///< Get name.
+   inline const std::string & getWDir()         const { return wdir;                }  ///< Get working directory.
+   inline const std::string & getCmd()          const { return command;             }  ///< Get command.
+   inline bool                hasTasksName()    const { return tasksname.size();    }  ///< Whether block has tasks name.
+   inline const std::string & getTasksName()    const { return tasksname;           }  ///< Get tasks name.
+   inline bool                hasFiles()        const { return files.size();        }  ///< Whether block has files.
+   inline const std::string & getFiles()        const { return files;               }  ///< Get tasks files.
+   inline bool                hasEnvironment()  const { return environment.size();  }  ///< Whether extra environment is set.
+   inline const std::string & getEnvironment()  const { return environment;         }  ///< Get extra environment.
 
-   inline bool          hasDependMask()        const { return !dependmask.isEmpty();       }  ///< Whether depend mask is set.
-   inline const QString getDependMask()        const { return  dependmask.pattern();       }  ///< Get depend mask.
-   bool checkDependMask( const QString & str);
-   inline bool          hasTasksDependMask()   const { return !tasksdependmask.isEmpty();  }  ///< Whether block has tasks depend mask.
-   inline const QString getTasksDependMask()   const { return  tasksdependmask.pattern();  }  ///< Get tasks depend mask.
-   bool checkTasksDependMask( const QString & str);
-   inline bool          hasHostsMask()         const { return !hostsmask.isEmpty();        }  ///< Whether block has hostsmask.
-   inline const QString getHostsMask()         const { return  hostsmask.pattern();        }  ///< Block hosts mask.
-   bool checkHostsMask( const QString & str);
-   inline bool          hasHostsMaskExclude()  const { return !hostsmask_exclude.isEmpty();}  ///< Whether block has host exclude smask.
-   inline const QString getHostsMaskExclude()  const { return  hostsmask_exclude.pattern();}  ///< Block hosts exclude mask.
-   bool checkHostsMaskExclude( const QString & str);
-   inline bool          hasNeedProperties()    const { return !need_properties.isEmpty();  }  ///< Whether block has need_properties.
-   inline const QString getNeedProperties()    const { return  need_properties.pattern();  }  ///< Block need_properties.
-   bool checkNeedProperties( const QString & str);
+   inline bool          hasDependMask()            const { return !dependmask.isEmpty();       }  ///< Whether depend mask is set.
+   inline const std::string getDependMask()        const { return dependmask.pattern().toUtf8().data();       }  ///< Get depend mask.
+   bool checkDependMask( const std::string & str);
+   inline bool          hasTasksDependMask()       const { return !tasksdependmask.isEmpty();  }  ///< Whether block has tasks depend mask.
+   inline const std::string getTasksDependMask()   const { return tasksdependmask.pattern().toUtf8().data();  }  ///< Get tasks depend mask.
+   bool checkTasksDependMask( const std::string & str);
+   inline bool          hasHostsMask()             const { return !hostsmask.isEmpty();        }  ///< Whether block has hostsmask.
+   inline const std::string getHostsMask()         const { return hostsmask.pattern().toUtf8().data();        }  ///< Block hosts mask.
+   bool checkHostsMask( const std::string & str);
+   inline bool          hasHostsMaskExclude()      const { return !hostsmask_exclude.isEmpty();}  ///< Whether block has host exclude smask.
+   inline const std::string getHostsMaskExclude()  const { return hostsmask_exclude.pattern().toUtf8().data();}  ///< Block hosts exclude mask.
+   bool checkHostsMaskExclude( const std::string & str);
+   inline bool              hasNeedProperties()    const { return !need_properties.isEmpty();    }  ///< Whether block has need_properties.
+   inline const std::string getNeedProperties()    const { return need_properties.pattern().toUtf8().data(); }  ///< Block need_properties.
+   bool checkNeedProperties( const std::string & str);
 
    inline int getCapacity()          const { return  capacity;        }
    inline int getNeedMemory()        const { return  need_memory;     }
    inline int getNeedPower()         const { return  need_power;      }
    inline int getNeedHDD()           const { return  need_hdd;        }
 
-   inline uint32_t       getState()             const { return state;            }///< Get state.
-   inline int            getTasksNum()          const { return tasksnum;         }///< Get tasks quantity.
-   inline int            getBlockNum()          const { return blocknum;         }///< Get block number in job.
-   inline const QString& getService()           const { return service;          }///< Get tasks type description.
-   inline const QString& getParser()            const { return parser;           }///< Get tasks parser type.
-   inline uint32_t       getTasksMaxRunTime()   const { return tasksmaxruntime;  }///< Get tasks maximum run time.
-   inline int            getMaxRunningTasks()   const { return maxrunningtasks;  }///< Get block maximum number of running tasks.
-   inline const QString& getMultiHostService()  const { return multihost_service;}///< Get tasks parser type.
+   inline uint32_t            getState()             const { return state;            }///< Get state.
+   inline int                 getTasksNum()          const { return tasksnum;         }///< Get tasks quantity.
+   inline int                 getBlockNum()          const { return blocknum;         }///< Get block number in job.
+   inline const std::string & getService()           const { return service;          }///< Get tasks type description.
+   inline const std::string & getParser()            const { return parser;           }///< Get tasks parser type.
+   inline uint32_t            getTasksMaxRunTime()   const { return tasksmaxruntime;  }///< Get tasks maximum run time.
+   inline int                 getMaxRunningTasks()   const { return maxrunningtasks;  }///< Get block maximum number of running tasks.
+   inline const std::string & getMultiHostService()  const { return multihost_service;}///< Get tasks parser type.
 
 
    inline int getFrameFirst()   const { return frame_first;    }///< Get first task frame ( if numeric).
@@ -185,10 +184,10 @@ public:
    inline int getCapMinResult()      const
       { return ( canVarCapacity() && ( capcoeff_min > 0)) ? capacity * capcoeff_min : capacity;}
 
-   inline bool           hasCmdPre()  const { return !cmd_pre.isEmpty();   }///< Whether pre command is set.
-   inline const QString& getCmdPre()  const { return  cmd_pre;             }///< Get pre command.
-   inline bool           hasCmdPost() const { return !cmd_post.isEmpty();  }///< Whether post command is set.
-   inline const QString& getCmdPost() const { return  cmd_post;            }///< Get post command.
+   inline bool                hasCmdPre()  const { return cmd_pre.size();  }///< Whether pre command is set.
+   inline const std::string & getCmdPre()  const { return cmd_pre;         }///< Get pre command.
+   inline bool                hasCmdPost() const { return cmd_post.size(); }///< Whether post command is set.
+   inline const std::string & getCmdPost() const { return cmd_post;        }///< Get post command.
 
    inline int getErrorsAvoidHost()      const { return errors_avoidhost;    }
    inline int getErrorsRetries()        const { return errors_retries;      }
@@ -228,7 +227,7 @@ protected:
    int32_t jobid;   ///< Block job id.
    int32_t blocknum;   ///< Number of block in job.
 
-   QString name;  ///< Block name.
+   std::string name;  ///< Block name.
 
    uint32_t state;      ///< Currend block state flags.
 
@@ -252,21 +251,21 @@ protected:
    int32_t need_power;
    int32_t need_hdd;
 
-   QString tasksname;   ///< Tasks name pattern;
-   QString service;     ///< Tasks service name.
-   QString parser;      ///< Tasks parser type.
+   std::string tasksname;   ///< Tasks name pattern;
+   std::string service;     ///< Tasks service name.
+   std::string parser;      ///< Tasks parser type.
    int32_t parsercoeff; ///< Parser koefficient.
 
-   QString wdir;        ///< Block tasks working directory.
-   QString environment; ///< Block tasks extra environment.
+   std::string wdir;        ///< Block tasks working directory.
+   std::string environment; ///< Block tasks extra environment.
 
-   QString cmd_pre;   ///< Pre command.
-   QString cmd_post;  ///< Post command.
+   std::string cmd_pre;   ///< Pre command.
+   std::string cmd_post;  ///< Post command.
 
-   QString command;               ///< Command.
-   QString files;          ///< Command to view tasks result.
+   std::string command;               ///< Command.
+   std::string files;          ///< Command to view tasks result.
 
-   QString customdata;     ///< Custom data.
+   std::string customdata;     ///< Custom data.
 
 
 /// Maximum number of errors in task to retry it automatically
@@ -286,7 +285,7 @@ protected:
    uint8_t  multihost_max;
    uint16_t multihost_waitmax;
    uint16_t multihost_waitsrv;
-   QString  multihost_service;
+   std::string multihost_service;
 
    QRegExp dependmask;
    QRegExp tasksdependmask;

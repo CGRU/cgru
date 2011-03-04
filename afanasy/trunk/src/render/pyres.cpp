@@ -13,14 +13,14 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-PyRes::PyRes( const QString & className, af::HostRes * hostRes):
+PyRes::PyRes( const std::string & className, af::HostRes * hostRes):
    name( className),
    hres( hostRes),
    initialized( false)
 {
    index = hres->custom.size();
 
-   if( PyClass::init( AFPYNAMES::RES_CLASSESDIR, name.toUtf8().data(), NULL) == false) return;
+   if( PyClass::init( AFPYNAMES::RES_CLASSESDIR, name.c_str(), NULL) == false) return;
 
    //Get functions:
    PyObj_FuncUpdate = getFunction( AFPYNAMES::RES_FUNC_UPDATE);
@@ -61,10 +61,10 @@ void PyRes::update()
          hres->custom[index]->tooltip     = PyString_AsString( PyTuple_GetItem( pTuple, 15));
       }
       else
-         AFERRAR("PyRes::update: type=\"%s\" returned tuple size != 12\n", name.toUtf8().data());
+         AFERRAR("PyRes::update: type=\"%s\" returned tuple size != 12\n", name.c_str());
    }
    else
-      AFERRAR("PyRes::update: type=\"%s\" value is not a tuple\n", name.toUtf8().data());
+      AFERRAR("PyRes::update: type=\"%s\" value is not a tuple\n", name.c_str());
 
    Py_DECREF( pTuple);
 }

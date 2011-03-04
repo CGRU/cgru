@@ -10,21 +10,21 @@
 using namespace af;
 
 TaskExec::TaskExec(
-         const QString  &Name,
-         const QString  &ServiceType,
-         const QString  &ParserType,
-         const QString  &Command,
+         const std::string & Name,
+         const std::string & ServiceType,
+         const std::string & ParserType,
+         const std::string & Command,
          int Capacity,
          int fileSizeMin,
          int fileSizeMax,
-         const QString  &Files,
+         const std::string & Files,
 
          int Start_Frame,
          int End_Frame,
          int FramesNum,
 
-         const QString  &WorkingDirectory,
-         const QString  &Environment,
+         const std::string & WorkingDirectory,
+         const std::string & Environment,
 
          int JobId,
          int BlockNumber,
@@ -32,8 +32,8 @@ TaskExec::TaskExec(
 
          int ParserCoeff,
 
-         const QString * CustomDataBlock,
-         const QString * CustomDataTask
+         const std::string * CustomDataBlock,
+         const std::string * CustomDataTask
    ):
 
    name( Name),
@@ -67,7 +67,7 @@ AFINFA("TaskExec::TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().
    if( CustomDataTask )  customdata_task  = *CustomDataTask;
 }
 
-TaskExec::TaskExec( const QString & Command):
+TaskExec::TaskExec( const std::string & Command):
    command( Command),
    parsercoeff( 0),
    capacity( 0),
@@ -110,13 +110,13 @@ void TaskExec::readwrite( Msg * msg)
    switch( msg->type())
    {
    case Msg::TTask:
-      rw_QString ( wdir,            msg);
-      rw_QString ( env,             msg);
-      rw_QString ( command,         msg);
-      rw_QString ( files,           msg);
-      rw_QString ( parsertype,      msg);
-      rw_QString ( customdata_block,msg);
-      rw_QString ( customdata_task, msg);
+      rw_String  ( wdir,            msg);
+      rw_String  ( env,             msg);
+      rw_String  ( command,         msg);
+      rw_String  ( files,           msg);
+      rw_String  ( parsertype,      msg);
+      rw_String  ( customdata_block,msg);
+      rw_String  ( customdata_task, msg);
       rw_int32_t ( parsercoeff,     msg);
       rw_int32_t ( jobid,           msg);
       rw_int32_t ( blocknum,        msg);
@@ -127,14 +127,14 @@ void TaskExec::readwrite( Msg * msg)
       rw_int32_t ( filesize_min,    msg);
       rw_int32_t ( filesize_max,    msg);
 
-      rw_QStringList( multihost_names, msg);
+      rw_StringList( multihost_names, msg);
 
    case Msg::TRendersList:
-      rw_QString ( servicetype,     msg);
-      rw_QString ( name,            msg);
-      rw_QString ( username,        msg);
-      rw_QString ( blockname,       msg);
-      rw_QString ( jobname,         msg);
+      rw_String  ( servicetype,     msg);
+      rw_String  ( name,            msg);
+      rw_String  ( username,        msg);
+      rw_String  ( blockname,       msg);
+      rw_String  ( jobname,         msg);
       rw_int32_t ( number,          msg);
       rw_int32_t ( capacity,        msg);
       rw_int32_t ( capcoeff,        msg);
@@ -154,10 +154,10 @@ void TaskExec::readwrite( Msg * msg)
 
 void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << username.toUtf8().data() << ": ";
-   stream << jobname.toUtf8().data();
-   stream << "[" << blockname.toUtf8().data() << "]";
-   stream << "[" << name.toUtf8().data() << "]";
+   stream << username << ": ";
+   stream << jobname;
+   stream << "[" << blockname << "]";
+   stream << "[" << name << "]";
    if( number != 0 ) stream << "(" << number << ")";
    stream << ":" << capacity;
    if( capcoeff) stream << "x" << capcoeff << " ";
@@ -168,9 +168,9 @@ void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
    if(full)
    {
       stream << std::endl;
-      if( false == wdir.isEmpty()) stream << "   Working directory = \"" << wdir.toUtf8().data() << "\".\n";
-      if( false ==  env.isEmpty()) stream << "   Environment = \"" << env.toUtf8().data() << "\".\n";
-      stream << command.toUtf8().data();
+      if( wdir.size()) stream << "   Working directory = \"" << wdir << "\".\n";
+      if(  env.size()) stream << "   Environment = \""       <<  env << "\".\n";
+      stream << command;
       stream << std::endl;
    }
 }

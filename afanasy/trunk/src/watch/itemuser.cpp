@@ -41,8 +41,8 @@ void ItemUser::updateValues( af::Node *node, int type)
    numjobs              = user->getNumJobs();
    numrunningtasks      = user->getRunningTasksNumber();
    maxrunningtasks      = user->getMaxRunningTasks();
-   hostsmask            = user->getHostsMask();
-   hostsmask_exclude    = user->getHostsMaskExclude();
+   hostsmask            = QString::fromUtf8( user->getHostsMask().c_str());
+   hostsmask_exclude    = QString::fromUtf8( user->getHostsMaskExclude().c_str());
    errors_avoidhost     = user->getErrorsAvoidHost();
    errors_tasksamehost  = user->getErrorsTaskSameHost();
    errors_retries       = user->getErrorsRetries();

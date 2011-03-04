@@ -94,7 +94,7 @@ protected:
    uint32_t state;   ///< State.
 
    int32_t capacity;
-   QString services_disabled;
+   std::string services_disabled;
    std::string customdata;
    std::string annotation;
 
