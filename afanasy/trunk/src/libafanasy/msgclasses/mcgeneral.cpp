@@ -87,8 +87,8 @@ void MCGeneral::stdOut( bool full) const
 
    if( full == false ) return;
 
-   size_t count = list.size();
-   printf("ids[%u]=", count);
+   int count = int(list.size());
+   printf("ids[%d]=", count);
    for( unsigned p = 0; p < count; p++) printf(" %d", list[p]);
    printf(".\n");
 }

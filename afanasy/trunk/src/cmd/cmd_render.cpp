@@ -51,7 +51,7 @@ bool CmdRenderResoucesList::processArguments( int argc, char** argv, af::Msg &ms
 void CmdRenderResoucesList::msgOut( af::Msg& msg)
 {
    af::MCAfNodes list( &msg);
-   printf("size=%d\n", list.getCount());
+   printf("size=%zu\n", list.getCount());
    for( int i = 0; i < list.getCount(); i++)
    {
       af::Render * render = (af::Render*)(list.getNode(i));
