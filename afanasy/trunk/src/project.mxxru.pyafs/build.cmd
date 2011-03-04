@@ -8,7 +8,11 @@ popd
 SET QTS=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.1-static
 SET PYTHONS=%cgru%\utilities\python
 
+SET CGRU_PYTHON=%PYTHONS%\2.7.1
+
 if exist override.cmd call override.cmd
+
+if exist %CGRU_PYTHON% SET "PATH=%CGRU_PYTHON%;%PATH%"
 
 rem Get Afanasy sources revision:
 pushd ..
