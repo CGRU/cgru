@@ -5,6 +5,10 @@
 
 #include "../libafqt/name_afqt.h"
 
+#ifdef WINNT
+#include <QtCore/QStringList>
+#endif
+
 class QTcpSocket;
 
 class Parser;
