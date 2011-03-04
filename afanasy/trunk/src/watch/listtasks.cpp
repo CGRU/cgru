@@ -294,7 +294,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
    case af::Msg::TBlocksProgress:
    {
       af::MCAfNodes mcblocks( msg);
-      int count = mcblocks.getCount();
+      int count = int( mcblocks.getCount());
       for( int b = 0; b < count; b++)
       {
          af::BlockData * block = (af::BlockData*)mcblocks.getNode( b);
@@ -446,7 +446,7 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
 
    int firstChangedRow = -1;
    int lastChangedRow = -1;
-   int count = tasks->size();
+   int count = int( tasks->size());
    for( int i = 0; i < count; i++)
    {
       if( *bIt > blocksnum)

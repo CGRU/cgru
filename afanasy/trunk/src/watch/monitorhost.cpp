@@ -87,7 +87,7 @@ else printf("No ids.\n");
 #endif
    std::list<int32_t>::iterator jIt = jobsIds.begin();
    std::list<int32_t>::iterator cIt = jobsIds_counts.begin();
-   int counts = jobsIds_counts.size();
+   int counts = int( jobsIds_counts.size());
    bool founded = false;
    for( int j = 0; j < counts; j++, jIt++, cIt++)
    {

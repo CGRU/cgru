@@ -64,7 +64,7 @@ void MCTest::readwrite( Msg * msg)
 
 void MCTest::addString( const std::string & String)
 {
-   numberarray[ stringlist.size()] = stringlist.size();
+   numberarray[ stringlist.size()] = int( stringlist.size());
    stringarray[ stringlist.size()] = String;
    stringlist.push_back( String);
 }

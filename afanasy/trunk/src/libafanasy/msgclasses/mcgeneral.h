@@ -35,7 +35,7 @@ public:
    inline const std::string & getName()   const { return name;   }
    inline const std::string & getString() const { return string; }
 
-   inline int getCount() const { return list.size(); }
+   inline size_t getCount() const { return list.size(); }
    inline int getId( unsigned pos) const { if(pos<list.size())return list[pos]; else return -1; }
    inline int getId() const { return id; }
    bool hasId( int value);

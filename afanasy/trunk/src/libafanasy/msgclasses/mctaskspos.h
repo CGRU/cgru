@@ -24,8 +24,8 @@ public:
    void stdOut( bool full = false ) const;
 
 
-   inline int getJobId() const { return jobid;          }
-   inline int getCount() const { return numbloks.size();}
+   inline int    getJobId() const { return jobid;          }
+   inline size_t getCount() const { return numbloks.size();}
    inline const std::string & getMessage() const { return message; }
 
    inline int getNumBlock( const unsigned pos) const

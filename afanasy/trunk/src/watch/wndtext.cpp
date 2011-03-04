@@ -50,7 +50,6 @@ WndText::WndText( const QString & Name, af::Msg * msg):
             std::list<std::string> strlist;
             msg->getStringList( strlist);
             if( strlist.size() == 0) strlist.push_back("An empty list recieved.");
-            int size = strlist.size();
             for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
                qTextEdit->append( afqt::stoq(*it));
             break;

@@ -119,7 +119,7 @@ bool ItemRender::calcHeight()
    }
    else
    {
-      if( online ) height = plots_height + HeightTask * tasks.size();
+      if( online ) height = plots_height + HeightTask * int( tasks.size());
       else height = HeightOffline;
       if( false == annotation.isEmpty()) height += HeightAnnotation;
    }
@@ -475,7 +475,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    plot_x = x + 4;
    for( unsigned i = 0; i < plots.size(); i++)
    {
-      int custom_w = (w - 4) / plots.size();
+      int custom_w = (w - 4) / int( plots.size());
       int plot_y = y + HeightHost + 4;
       plots[i]->paint( painter, plot_x, plot_y, custom_w-4, plots[i]->height);
       plot_x += custom_w;

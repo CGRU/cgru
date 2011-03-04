@@ -18,7 +18,7 @@ PyRes::PyRes( const std::string & className, af::HostRes * hostRes):
    hres( hostRes),
    initialized( false)
 {
-   index = hres->custom.size();
+   index = int( hres->custom.size());
 
    if( PyClass::init( AFPYNAMES::RES_CLASSESDIR, name.c_str(), NULL) == false) return;
 

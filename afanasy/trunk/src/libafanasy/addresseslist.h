@@ -18,7 +18,7 @@ public:
 
    bool addAddress( const Address * address );
 
-   inline int getAddressesNum() const { return addresses.size(); }
+   inline size_t getAddressesNum() const { return addresses.size(); }
 
    inline const std::list<Address*> * getAddresses() const { return &addresses;}
 

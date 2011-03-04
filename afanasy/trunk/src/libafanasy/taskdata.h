@@ -27,9 +27,9 @@ public:
    inline void setDependMask( const std::string & str) { dependmask = str;  }
    inline void setCustomData( const std::string & str) { customdata = str;  }
 
-   inline bool hasFiles()        const { return      files.size();}  ///< Whether files are set.
-   inline bool hasDependMask()   const { return dependmask.size();}  ///< Whether depend mask is set.
-   inline bool hasCustomData()   const { return customdata.size();}  ///< Whether files are set.
+   inline bool hasFiles()        const { return      files.empty() == false;}  ///< Whether files are set.
+   inline bool hasDependMask()   const { return dependmask.empty() == false;}  ///< Whether depend mask is set.
+   inline bool hasCustomData()   const { return customdata.empty() == false;}  ///< Whether files are set.
 
    bool checkDependMask( const std::string & str);
 

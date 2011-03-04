@@ -73,7 +73,7 @@ bool ListNodes::updateItems( af::Msg * msg)
    af::MCAfNodes mcNodes( msg);
    std::vector<af::Af*> * list = mcNodes.getList();
 
-   int quantity = list->size();
+   int quantity = int( list->size());
    if( quantity == 0) return false;
 
 //printf("ListNodes::updateItems: message list->size() = %d:\n", quantity);

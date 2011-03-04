@@ -34,7 +34,7 @@ ParserHost::ParserHost( const std::string & task_type, int num_frames):
    overload( false)
 {
    data = new char[DataSizeMax];
-   overload_string_length = strlen(overload_string)+1;
+   overload_string_length = int(strlen(overload_string)+1);
 
    if( data == NULL )
    {

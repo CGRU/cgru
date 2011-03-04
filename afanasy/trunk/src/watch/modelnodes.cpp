@@ -164,7 +164,7 @@ void ModelNodes::sortMatch( const std::vector<int32_t> * list)
 {
    int numitems = items.size();
    if( numitems < 2 ) return;
-   int listlen = list->size();
+   int listlen = int( list->size());
    if( listlen < 2 ) return;
 
    Item ** array = new Item*[numitems];

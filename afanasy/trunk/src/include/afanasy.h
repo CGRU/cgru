@@ -17,9 +17,9 @@ namespace AFGENERAL
 #else
    const char PATH_SEPARATOR     = '/';
 #endif
-   const char FILENAME_INVALIDCHARACTERS[] = "\"\\ /|!$&?()[]{}*^`',:;";
-   const char FILENAME_INVALIDCHARACTERSLENGTH = strlen( FILENAME_INVALIDCHARACTERS);
-   const char FILENAME_INVALIDCHARACTERREPLACE = '_';
+   const char   FILENAME_INVALIDCHARACTERS[] = "\"\\ /|!$&?()[]{}*^`',:;";
+   const size_t FILENAME_INVALIDCHARACTERSLENGTH = strlen( FILENAME_INVALIDCHARACTERS);
+   const char   FILENAME_INVALIDCHARACTERREPLACE = '_';
 }
 
 /// Addresses:

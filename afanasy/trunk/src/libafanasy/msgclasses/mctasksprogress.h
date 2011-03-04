@@ -19,7 +19,7 @@ public:
    void add( int block, int task, TaskProgress * tp);
 
    inline int getJobId() const { return jobid;      }
-   inline int getCount() const { return tasks.size();}
+   inline size_t getCount() const { return tasks.size();}
 
    inline const std::list<int32_t> * getBlocks() const { return &blocks; }
    inline const std::list<int32_t> * getTasks()  const { return &tasks;  }

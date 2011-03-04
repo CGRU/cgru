@@ -78,9 +78,9 @@ int main(int argc, char *argv[])
    //
    // calculate star points:
    {
-      float r = .4;
-      float angle   = 90.0f/180*M_PI;
-      float angle_d = 36.0f/180*M_PI;
+      float r = .4f;
+      float angle   = float( 90.0/180*M_PI);
+      float angle_d = float( 36.0f/180*M_PI);
       for( int i = 0; i < 10; i++)
       {
          Item::star_pointsInit[i].setX( cosf( angle));

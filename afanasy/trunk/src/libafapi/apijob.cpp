@@ -121,7 +121,7 @@ void Job::deleteBlocksDataPointers()
 void Job::fillBlocksDataPointersFromList()
 {
    deleteBlocksDataPointers();
-   blocksnum = blocks.size();
+   blocksnum = int( blocks.size());
    if( blocksnum == 0)
    {
       AFERROR("Job::fillBlocksDataPointersFromList: Job has no blocks.");

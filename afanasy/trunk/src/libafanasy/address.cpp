@@ -8,6 +8,10 @@
 
 #include <QtNetwork/qhostaddress.h>
 
+#ifdef WINNT
+#define sprintf sprintf_s
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

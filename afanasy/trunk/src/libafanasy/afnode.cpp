@@ -48,7 +48,7 @@ void Node::readwrite( Msg * msg)
 int Node::calcWeight() const
 {
    int weight = sizeof( Node);
-   weight += name.size()+1;
+   weight += af::weigh( name);
    for( unsigned l = 0; l < lists.size(); l++) weight += sizeof(void*);
    return weight;
 }

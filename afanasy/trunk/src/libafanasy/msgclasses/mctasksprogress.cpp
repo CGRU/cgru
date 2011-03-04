@@ -44,7 +44,7 @@ void MCTasksProgress::readwrite( Msg * msg)
    }
    else
    {
-      int count = tasks.size();
+      int count = int(tasks.size());
       for( int i = 0; i < count; i++)
          tasksprogress.push_back( new TaskProgress( msg));
    }
@@ -52,7 +52,7 @@ void MCTasksProgress::readwrite( Msg * msg)
 
 void MCTasksProgress::add( int block, int task, TaskProgress * tp)
 {
-   int count = tasks.size();
+   int count = int( tasks.size());
 
    std::list<int32_t>::iterator bIt = blocks.begin();
    std::list<int32_t>::iterator tIt =  tasks.begin();
@@ -68,7 +68,7 @@ void MCTasksProgress::add( int block, int task, TaskProgress * tp)
 
 void MCTasksProgress::stdOut( bool full ) const
 {
-   int count = tasks.size();
+   int count = int( tasks.size());
 
    std::list<int32_t>::const_iterator bIt = blocks.begin();
    std::list<int32_t>::const_iterator tIt =  tasks.begin();

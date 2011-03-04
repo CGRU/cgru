@@ -22,8 +22,8 @@ public:
    bool hasEvent( int type) const;
 
    inline uint32_t getTimeActivity() const { return time_activity;       }
-   inline int getJobsUsersIdsCount() const { return jobsUsersIds.size(); }
-   inline int getJobsIdsCount()      const { return jobsIds.size();      }
+   inline size_t   getJobsUsersIdsCount() const { return jobsUsersIds.size(); }
+   inline size_t   getJobsIdsCount()      const { return jobsIds.size();      }
 
    inline const std::list<int32_t> * getJobsUsersIds() const { return &jobsUsersIds; }
    inline const std::list<int32_t> * getJobsIds()      const { return &jobsIds;      }

@@ -2,6 +2,10 @@
 
 #include <stdio.h>
 
+#ifdef WINNT
+#define spritnf spritnf_s
+#endif
+
 using namespace af;
 
 Passwd::Passwd()

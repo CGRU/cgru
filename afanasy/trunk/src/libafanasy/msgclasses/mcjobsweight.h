@@ -28,7 +28,7 @@ public:
 
    void stdOut( bool full = false) const;
 
-   inline int getCount()                       const { return ids.size(); }
+   inline size_t getCount()                        const { return ids.size(); }
    inline int getId(                 unsigned pos) const { if(pos<ids.size())return ids[pos];            else return -1; }
    inline int getWeightLog(          unsigned pos) const { if(pos<ids.size())return weightLog[pos];      else return -1; }
    inline int getWeightBlack(        unsigned pos) const { if(pos<ids.size())return weightBlack[pos];    else return -1; }

@@ -221,8 +221,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       menu.addAction( action);
 */
 
-      int cmdssize = af::Environment::getRenderCmds().size();
-      if( cmdssize > 0 )
+      if( af::Environment::getRenderCmds().size() > 0 )
       {
          menu.addSeparator();
 

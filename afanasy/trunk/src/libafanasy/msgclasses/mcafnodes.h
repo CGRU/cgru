@@ -25,7 +25,7 @@ public:
 /// Add node to collector.
    void addNode( Af * node);
 
-   inline int  getCount() const            { return list.size();  }   ///< Get number of nodes.
+   inline size_t getCount() const          { return list.size();  }   ///< Get number of nodes.
    inline Af * getNode( unsigned pos)      { return pos < list.size() ? list[pos] : NULL;}
    inline std::vector<af::Af*> * getList() { return &list;        }   ///< Get nodes list.
 

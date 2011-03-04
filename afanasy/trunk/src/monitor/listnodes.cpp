@@ -60,7 +60,7 @@ void ListNodes::setList( af::MCAfNodes & nodes)
 nodes.stdOut();
    if( subscribed == false) clear();
 
-   int newNodesCount = nodes.getCount();
+   int newNodesCount = int( nodes.getCount());
    if( newNodesCount == 0) return;
 
    for( int n = 0; n < newNodesCount; n++)
@@ -95,7 +95,7 @@ nodes.stdOut();
 
 void ListNodes::deleteNodes( af::MCGeneral & list )
 {
-   int delCount = list.getCount();
+   int delCount = int( list.getCount());
    if( delCount < 1) return;
 
    for( int d = 0; d < delCount; d++)

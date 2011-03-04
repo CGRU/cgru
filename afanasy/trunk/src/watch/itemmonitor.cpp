@@ -76,7 +76,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
    superuser = false;
    usersids.clear();
    const std::list<int32_t> * ulist = monitor->getJobsUsersIds();
-   int usersidscount = ulist->size();
+   int usersidscount = int( ulist->size());
    for( std::list<int32_t>::const_iterator it = ulist->begin(); it != ulist->end(); it++)
    {
       usersids += QString(" %1").arg( *it);
@@ -89,7 +89,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
 
    jobsids.clear();
    const std::list<int32_t> * jlist = monitor->getJobsIds();
-   int jobsidscount = jlist->size();
+   int jobsidscount = int( jlist->size());
    for( std::list<int32_t>::const_iterator it = jlist->begin(); it != jlist->end(); it++)
       jobsids += QString(" %1").arg( *it);
    jobsidstitle = JobsIdsName.arg( jobsidscount);

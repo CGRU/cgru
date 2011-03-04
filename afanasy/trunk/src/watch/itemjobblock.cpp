@@ -155,8 +155,8 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
 
    y += 1;
 
-   static const float sorting_fields_text_opacity = .7;
-   static const float sorting_fields_line_opacity = .4;
+   static const float sorting_fields_text_opacity = .7f;
+   static const float sorting_fields_line_opacity = .4f;
 
    int linex = w-ItemJobTask::WidthInfo;
 

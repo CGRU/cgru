@@ -73,7 +73,7 @@ void MCGeneral::readwrite( Msg * msg)
 
 bool MCGeneral::hasId( int value)
 {
-   int count = list.size();
+   int count = int( list.size());
    for( int i = 0; i < count; i++)
       if( list[i] == value) return true;
    return false;
@@ -87,8 +87,8 @@ void MCGeneral::stdOut( bool full) const
 
    if( full == false ) return;
 
-   int count = list.size();
-   printf("ids[%d]=", count);
-   for( int p = 0; p < count; p++) printf(" %d", list[p]);
+   size_t count = list.size();
+   printf("ids[%u]=", count);
+   for( unsigned p = 0; p < count; p++) printf(" %d", list[p]);
    printf(".\n");
 }
