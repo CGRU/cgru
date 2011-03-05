@@ -6,7 +6,11 @@
 
 using namespace af;
 
+#ifndef WINNT
 const int RegExp::compile_flags = REG_EXTENDED;
+#else
+const int RegExp::compile_flags = 0;
+#endif
 
 RegExp::RegExp():
       contain( false),
@@ -21,6 +25,11 @@ RegExp::~RegExp()
 
 bool RegExp::setPattern( const std::string & str, std::string * strError)
 {
+#ifdef WINNT
+pattern = str;
+return true;
+#else
+
    if( str.empty())
    {
       if( false == pattern.empty())
@@ -52,10 +61,16 @@ bool RegExp::setPattern( const std::string & str, std::string * strError)
          AFERRAR("REGEXP: %s\n", buffer);
       return false;
    }
+
+#endif
 }
 
 bool RegExp::match( const std::string & str)
 {
+#ifdef WINNT
+return false == exclude;
+#else
+
    if( pattern.empty()) return false == exclude;
 
    regmatch_t regmatch;
@@ -67,6 +82,8 @@ bool RegExp::match( const std::string & str)
       if( regmatch.rm_eo < str.size() ) retval = 1;
    }
    return ((retval == 0) != exclude );
+
+#endif
 }
 
 int RegExp::weigh() const

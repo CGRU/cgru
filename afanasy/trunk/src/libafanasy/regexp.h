@@ -1,6 +1,8 @@
 #pragma once
 
+#ifndef WINNT
 #include <regex.h>
+#endif
 
 #include "name_af.h"
 
@@ -22,7 +24,12 @@ public:
    bool setPattern( const std::string & str, std::string * strError = NULL);
 
    inline void setCaseSensitive()   { cflags = compile_flags; }
+#ifndef WINNT
    inline void setCaseInsensitive() { cflags = compile_flags | REG_ICASE; }
+#else
+   inline void setCaseInsensitive() { cflags = compile_flags; }
+#endif
+
    inline void setMatch()   { contain = false; }
    inline void setContain() { contain = true;  }
    inline void setInclude() { exclude = false; }
@@ -37,8 +44,10 @@ private:
    int cflags;
    bool exclude;
    bool contain;
-   regex_t regexp;
    std::string pattern;
+#ifndef WINNT
+   regex_t regexp;
+#endif
 
    static const int compile_flags;
 };
