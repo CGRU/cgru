@@ -7,5 +7,5 @@ class CmdRegExp : public Cmd
 public:
    CmdRegExp();
    ~CmdRegExp();
-   bool processArguments( int argc, char** argv, af::Msg &msg);
+   bool processArguments( int argc, char** argv, af::Msg & msg);
 };

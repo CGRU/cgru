@@ -1,7 +1,6 @@
 #include "cmd_regexp.h"
 
-#include <QtCore/QRegExp>
-#include <QtCore/QString>
+#include "../libafanasy/regexp.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -17,15 +16,16 @@ CmdRegExp::CmdRegExp()
 
 CmdRegExp::~CmdRegExp(){}
 
-bool CmdRegExp::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdRegExp::processArguments( int argc, char** argv, af::Msg & msg)
 {
-   QString str = QString::fromUtf8(argv[0]);
-   QRegExp rx( argv[1], Qt::CaseInsensitive);
-   if( rx.isValid() == false )
-   {
-      printf("QRegExp: %s\n", rx.errorString().toUtf8().data());
-      return false;
-   }
-   printf( str.contains(rx) ? " MATCH\n" : " NOT MATCH\n");
+   af::RegExp rx;
+   std::string str = argv[0];
+   std::string pattern = argv[1];
+   std::string str_error;
+//   rx.setExclude();
+//   rx.setContain();
+//   rx.setCaseInsensitive();
+   if( rx.setPattern( pattern, &str_error)) printf( rx.match( str) ? "   MATCH\n" : "   NOT MATCH\n");
+   if( false == str_error.empty()) std::cout << "RegExp Error: " << str_error << std::endl;
    return true;
 }

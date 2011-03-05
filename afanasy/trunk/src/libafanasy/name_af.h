@@ -20,6 +20,7 @@ namespace af
 
    class Environment;
 
+   class RegExp;
    class Address;
    class AddressesList;
    class Passwd;
