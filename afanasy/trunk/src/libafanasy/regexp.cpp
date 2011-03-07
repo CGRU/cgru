@@ -1,5 +1,9 @@
 #include "regexp.h"
 
+#ifdef WINNT
+#include <regex>
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -55,7 +59,8 @@ bool RegExp::setPattern( const std::string & str, std::string * strError)
 bool RegExp::match( const std::string & str) const
 {
 #ifdef WINNT
-   return true;
+   if( pattern.empty()) return true;
+   else return false == exclude;
 #else
 
    if( pattern.empty()) return true;
@@ -78,12 +83,36 @@ int RegExp::weigh() const
    return sizeof(RegExp) + af::weigh( pattern);
 }
 
-bool RegExp::Validate( const std::string & str, std::string * strError)
+bool RegExp::Validate( const std::string & str, std::string * errOutput)
 {
    if( str.empty()) return true;
 
 #ifdef WINNT
-   return true;
+
+   bool valid = true;
+   std::string errStr;
+   try 
+   {
+      std::tr1::regex rx( str); 
+   }
+   catch( const std::tr1::regex_error& rerr) 
+   {
+      errStr = rerr.what();
+      valid = false;
+   }
+   catch (...) 
+   {
+      errStr = "Unknown exception.";
+      valid = false;
+   }
+   if( false == valid )
+   {
+      if( errOutput ) *errOutput = errStr;
+      else
+         AFERRAR("%x\n", errStr.c_str());
+   }
+   return valid;
+
 #else
 
    regex_t check_re;
@@ -98,8 +127,8 @@ bool RegExp::Validate( const std::string & str, std::string * strError)
       static const int buflen = 0xff;
       char buffer[ buflen];
       regerror( retval, &check_re, buffer, buflen);
-      if( strError )
-         *strError = buffer;
+      if( errOutput )
+         *errOutput = buffer;
       else
          AFERRAR("REGEXP: %s\n", buffer);
       return false;

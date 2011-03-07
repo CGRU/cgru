@@ -26,7 +26,7 @@ public:
    inline const bool notEmpty() const { return false == pattern.empty(); }
    inline const std::string & getPattern() const { return pattern;}
 
-   static bool Validate( const std::string & str, std::string * strError = NULL);
+   static bool Validate( const std::string & str, std::string * errOutput = NULL);
 
    bool setPattern( const std::string & str, std::string * strError = NULL);
 
