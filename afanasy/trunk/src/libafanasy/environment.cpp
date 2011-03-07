@@ -4,7 +4,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+#ifndef WINNT
 #include <unistd.h>
+#endif
 
 #include <Python.h>
 

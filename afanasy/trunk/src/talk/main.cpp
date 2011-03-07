@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 {
 #ifdef WINNT
 //   CRT_INIT();
-   af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::Verbose, argc, argv);   //< Verbose environment initialization
+   af::Environment ENV( af::Environment::Verbose, argc, argv);   //< Verbose environment initialization
 #else
 //
 // interrupt signal catch:
