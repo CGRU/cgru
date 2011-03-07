@@ -76,11 +76,17 @@ void BlockData::construct()
    tasksdata = NULL;
    runningtasks_counter = 0;
 
-   dependmask.setCaseSensitivity( Qt::CaseSensitive);
-   hostsmask.setCaseSensitivity( Qt::CaseInsensitive);
-   hostsmask_exclude.setCaseSensitivity( Qt::CaseInsensitive);
-   tasksdependmask.setCaseSensitivity( Qt::CaseSensitive);
-   need_properties.setCaseSensitivity( Qt::CaseSensitive);
+   dependmask.setCaseSensitive();
+
+   hostsmask.setCaseInsensitive();
+
+   hostsmask_exclude.setCaseInsensitive();
+   hostsmask_exclude.setExclude();
+
+   tasksdependmask.setCaseSensitive();
+
+   need_properties.setCaseSensitive();
+   need_properties.setContain();
 }
 
 bool BlockData::isValid() const
@@ -162,11 +168,11 @@ void BlockData::readwrite( Msg * msg)
       rw_int32_t ( need_memory,           msg);
       rw_int32_t ( need_power,            msg);
       rw_int32_t ( need_hdd,              msg);
-      rw_QRegExp ( dependmask,            msg);
-      rw_QRegExp ( tasksdependmask,       msg);
-      rw_QRegExp ( hostsmask,             msg);
-      rw_QRegExp ( hostsmask_exclude,     msg);
-      rw_QRegExp ( need_properties,       msg);
+      rw_RegExp  ( dependmask,            msg);
+      rw_RegExp  ( tasksdependmask,       msg);
+      rw_RegExp  ( hostsmask,             msg);
+      rw_RegExp  ( hostsmask_exclude,     msg);
+      rw_RegExp  ( need_properties,       msg);
       rw_String  ( name,                  msg);
       rw_String  ( service,               msg);
       rw_int32_t ( tasksnum,              msg);
@@ -307,7 +313,7 @@ bool BlockData::setMultiHostMax( int value)
    multihost_max = value;
    return true;
 }
-
+/*
 bool BlockData::checkDependMask( const std::string & str)
 {
    if( dependmask.isEmpty()) return false;
@@ -333,7 +339,7 @@ bool BlockData::checkNeedProperties( const std::string & str)
    if( need_properties.isEmpty()) return true;
    return QString::fromUtf8(str.c_str()).contains( need_properties);
 }
-
+*/
 bool BlockData::setNumeric( int start, int end, int perTask, int increment)
 {
    if( perTask < 1)
@@ -535,11 +541,11 @@ int BlockData::calcWeight() const
 
    weight += weigh(service);
    weight += weigh(parser);
-   weight += weigh(dependmask);
-   weight += weigh(tasksdependmask);
-   weight += weigh(need_properties);
-   weight += weigh(hostsmask);
-   weight += weigh(hostsmask_exclude);
+   weight += dependmask.weigh();
+   weight += tasksdependmask.weigh();
+   weight += need_properties.weigh();
+   weight += hostsmask.weigh();
+   weight += hostsmask_exclude.weigh();
    weight += weigh(name);
    weight += weigh(wdir);
    weight += weigh(environment);
@@ -602,18 +608,18 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    }
    printf("Memory: %d bytes\n", calcWeight());
    */
-   if(           command.size()) stream << "\n Command            = \"" << command                                    << "\"";
-   if(              wdir.size()) stream << "\n Working Directory  = \"" << wdir                                       << "\"";
-   if(             files.size()) stream << "\n Files              = \"" << files                                      << "\"";
-   if(        !dependmask.isEmpty()) stream << "\n Depend Mask        = \"" << dependmask.pattern().toUtf8().data()       << "\"";
-   if(   !tasksdependmask.isEmpty()) stream << "\n Tasks Depend Mask  = \"" << tasksdependmask.pattern().toUtf8().data()  << "\"";
-   if(         !hostsmask.isEmpty()) stream << "\n Hosts Mask         = \"" << hostsmask.pattern().toUtf8().data()        << "\"";
-   if( !hostsmask_exclude.isEmpty()) stream << "\n Hosts Mask Exclude = \"" << hostsmask_exclude.pattern().toUtf8().data()<< "\"";
-   if(       environment.size()) stream << "\n Environment        = \"" << environment                                << "\"";
-   if(           cmd_pre.size()) stream << "\n Pre Command        = \"" << cmd_pre                                    << "\"";
-   if(          cmd_post.size()) stream << "\n Post Command       = \"" << cmd_post                                   << "\"";
-   if(        customdata.size()) stream << "\n Custom Data        = \"" << customdata                                 << "\"";
-   if(   !need_properties.isEmpty()) stream << "\n Need Properties    = \"" << need_properties.pattern().toUtf8().data()  << "\"";
+   if(           command.size()) stream << "\n Command            = \"" << command                             << "\"";
+   if(              wdir.size()) stream << "\n Working Directory  = \"" << wdir                                << "\"";
+   if(             files.size()) stream << "\n Files              = \"" << files                               << "\"";
+   if(        dependmask.notEmpty()) stream << "\n Depend Mask        = \"" << dependmask.getPattern()         << "\"";
+   if(   tasksdependmask.notEmpty()) stream << "\n Tasks Depend Mask  = \"" << tasksdependmask.getPattern()    << "\"";
+   if(         hostsmask.notEmpty()) stream << "\n Hosts Mask         = \"" << hostsmask.getPattern()          << "\"";
+   if( hostsmask_exclude.notEmpty()) stream << "\n Hosts Mask Exclude = \"" << hostsmask_exclude.getPattern()  << "\"";
+   if(       environment.size()) stream << "\n Environment        = \"" << environment                         << "\"";
+   if(           cmd_pre.size()) stream << "\n Pre Command        = \"" << cmd_pre                             << "\"";
+   if(          cmd_post.size()) stream << "\n Post Command       = \"" << cmd_post                            << "\"";
+   if(        customdata.size()) stream << "\n Custom Data        = \"" << customdata                          << "\"";
+   if(   need_properties.notEmpty()) stream << "\n Need Properties    = \"" << need_properties.getPattern()    << "\"";
    if(     need_power          ) stream << "\n Need Power         =  "  << need_power;
    if(     need_memory         ) stream << "\n Need Memory        =  "  << need_memory;
    if(     need_hdd            ) stream << "\n Need HDD           =  "  << need_hdd;

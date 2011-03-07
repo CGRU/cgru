@@ -26,7 +26,9 @@ void Attr::writeData()  {}
 
 bool Attr::read( const QDomDocument & doc)
 {
-   if( af::Environment::getVar( doc, str, name) == false) return false;
+   std::string value;
+   if( af::Environment::getVar( doc, value, name.toUtf8().data()) == false) return false;
+   str = afqt::stoq( value);
    return readData();
 }
 

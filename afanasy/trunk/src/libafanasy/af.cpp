@@ -2,10 +2,11 @@
 
 #include <string.h>
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
+//#include <QtCore/QString>
+//#include <QtCore/QStringList>
 
 #include "msg.h"
+#include "regexp.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -186,7 +187,7 @@ void Af::rw_float( float &floating, Msg * msg)
 {
    rw_data( (char *)(&floating), msg, sizeof(float) );
 }
-
+/*
 void Af::rw_QString(  QString& qString, Msg * msg)
 {
    uint32_t length;
@@ -207,7 +208,7 @@ void Af::rw_QString(  QString& qString, Msg * msg)
    }
 //printf("Af::rw_QString: qString = \"%s\"\n", qString.toUtf8().data());
 }
-
+*/
 void Af::w_String( const std::string & string, Msg * msg)
 {
    if( false == msg->isWriting())
@@ -243,6 +244,20 @@ void Af::rw_String( std::string & string, Msg * msg)
 //std::cout << "Af::rw_String: string = \"" << string << "\"\n";
 }
 
+void Af::rw_RegExp( RegExp & regExp, Msg * msg)
+{
+   if( msg->isWriting())
+   {
+      w_String( regExp.getPattern(), msg);
+   }
+   else
+   {
+      std::string pattern;
+      rw_String( pattern, msg);
+      regExp.setPattern( pattern);
+   }
+}
+/*
 void Af::rw_QRegExp( QRegExp &qRegExp, Msg * msg)
 {
    if( msg->isWriting())
@@ -264,7 +279,7 @@ void Af::rw_QRegExp( QRegExp &qRegExp, Msg * msg)
       qRegExp.setPattern( pattern);
    }
 }
-/*
+
 void Af::rw_QStringList( QStringList& qStringList, Msg * msg)
 {
    uint32_t length;

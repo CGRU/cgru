@@ -6,11 +6,7 @@
 
 using namespace af;
 
-#ifndef WINNT
 const int RegExp::compile_flags = REG_EXTENDED;
-#else
-const int RegExp::compile_flags = 0;
-#endif
 
 RegExp::RegExp():
       contain( false),
@@ -26,8 +22,15 @@ RegExp::~RegExp()
 bool RegExp::setPattern( const std::string & str, std::string * strError)
 {
 #ifdef WINNT
-pattern = str;
-return true;
+   if( RegExp::Validate( str, strError))
+   {
+      pattern = str;
+      return true;
+   }
+   else
+   {
+      return false;
+   }
 #else
 
    if( str.empty())
@@ -40,38 +43,22 @@ return true;
       return true;
    }
 
-   regex_t check_re;
-   int retval = regcomp( &check_re, str.c_str(), cflags);
+   if( false == RegExp::Validate( str, strError )) return false;
 
-   if( retval == 0 )
-   {
-      if( false == pattern.empty()) regfree( &regexp);
-      pattern = str;
-      regcomp( &regexp, pattern.c_str(), cflags);
-      return true;
-   }
-   else
-   {
-      static const int buflen = 0xff;
-      char buffer[ buflen];
-      regerror( retval, &regexp, buffer, buflen);
-      if( strError )
-         *strError = buffer;
-      else
-         AFERRAR("REGEXP: %s\n", buffer);
-      return false;
-   }
-
+   if( false == pattern.empty()) regfree( &regexp);
+   pattern = str;
+   regcomp( &regexp, pattern.c_str(), cflags);
+   return true;
 #endif
 }
 
-bool RegExp::match( const std::string & str)
+bool RegExp::match( const std::string & str) const
 {
 #ifdef WINNT
-return false == exclude;
+   return true;
 #else
 
-   if( pattern.empty()) return false == exclude;
+   if( pattern.empty()) return true;
 
    regmatch_t regmatch;
 
@@ -89,4 +76,34 @@ return false == exclude;
 int RegExp::weigh() const
 {
    return sizeof(RegExp) + af::weigh( pattern);
+}
+
+bool RegExp::Validate( const std::string & str, std::string * strError)
+{
+   if( str.empty()) return true;
+
+#ifdef WINNT
+   return true;
+#else
+
+   regex_t check_re;
+   int retval = regcomp( &check_re, str.c_str(), compile_flags);
+
+   if( retval == 0 )
+   {
+      return true;
+   }
+   else
+   {
+      static const int buflen = 0xff;
+      char buffer[ buflen];
+      regerror( retval, &check_re, buffer, buflen);
+      if( strError )
+         *strError = buffer;
+      else
+         AFERRAR("REGEXP: %s\n", buffer);
+      return false;
+   }
+
+#endif
 }

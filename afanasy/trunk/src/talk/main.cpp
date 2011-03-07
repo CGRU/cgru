@@ -48,9 +48,9 @@ int main(int argc, char *argv[])
 
 //
 // Silent environment initialization:
-   af::Environment ENV( af::Environment::SolveServerAddress, argc, argv);
+   af::Environment ENV( af::Environment::NoFlags, argc, argv);
 #endif
-   if( !ENV.isValid())
+   if( false == ENV.isValid())
    {
       AFERROR("main: Environment initialization failed.\n");
       exit(1);
@@ -58,7 +58,7 @@ int main(int argc, char *argv[])
 
    afqt::init( ENV.getTalkWaitForConnected(), ENV.getTalkWaitForReadyRead(), ENV.getTalkWaitForBytesWritten());
    afqt::QEnvironment QENV( "watch");
-   if( !QENV.isValid())
+   if( false == QENV.isValid())
    {
       AFERROR("main: QEnvironment initialization failed.\n");
       exit(1);

@@ -1,8 +1,10 @@
 #pragma once
 
-#include <QtCore/QRegExp>
+//#include <QtCore/QRegExp>
 #include <QtCore/QString>
 #include <QtCore/QVariant>
+
+#include "../libafanasy/regexp.h"
 
 #include "name_afsql.h"
 
@@ -190,7 +192,7 @@ public:
    inline void set( const QVariant & value){}
 private: const int32_t * pointer;
 };
-
+/*
 class DBAttrQString: public DBAttr
 {
 public:
@@ -200,7 +202,7 @@ public:
    inline void set( const QVariant & value) { *pointer = value.toString();}
 private: QString * pointer;
 };
-
+*/
 class DBAttrString: public DBAttr
 {
 public:
@@ -211,13 +213,13 @@ public:
 private: std::string * pointer;
 };
 
-class DBAttrQRegExp: public DBAttr
+class DBAttrRegExp: public DBAttr
 {
 public:
-   DBAttrQRegExp( int type, QRegExp * parameter);
-   ~DBAttrQRegExp();
-   inline const QString getString() const { return DBString( pointer->pattern());}
-   inline void set( const QVariant & value) {af::setRegExp( *pointer, value.toString().toUtf8().data(), "DBAttrQRegExp::set");}
-private: QRegExp * pointer;
+   DBAttrRegExp( int type, af::RegExp * parameter);
+   ~DBAttrRegExp();
+   inline const QString getString() const { return DBString( QString::fromUtf8( pointer->getPattern().c_str()));}
+   inline void set( const QVariant & value) { af::setRegExp( *pointer, value.toString().toUtf8().data(), "DBAttrQRegExp::set");}
+private: af::RegExp * pointer;
 };
 }

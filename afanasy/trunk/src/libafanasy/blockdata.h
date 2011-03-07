@@ -3,10 +3,11 @@
 #include "../include/aftypes.h"
 #include "../include/afjob.h"
 
-#include <QtCore/QRegExp>
+//#include <QtCore/QRegExp>
 
 #include "af.h"
 #include "name_af.h"
+#include "regexp.h"
 #include "taskexec.h"
 
 namespace af
@@ -95,20 +96,20 @@ public:
    inline void setMultiHostWaitMax( int value) { multihost_waitmax = value;}
 
 /// Set block depend mask.
-   bool setDependMask(        const std::string & str)
-      { return setRegExp( dependmask, str, "block depend mask");}
+   bool setDependMask(        const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( dependmask, str, "block depend mask", errOutput);}
 /// Set block hosts mask.
-   bool setHostsMask(         const std::string & str)
-      { return setRegExp( hostsmask, str, "block hosts mask");}
+   bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( hostsmask, str, "block hosts mask", errOutput);}
 /// Set block hosts to exclude mask.
-   bool setHostsMaskExclude(  const std::string & str)
-      { return setRegExp( hostsmask_exclude, str, "block exclude hosts mask");}
+   bool setHostsMaskExclude(  const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( hostsmask_exclude, str, "block exclude hosts mask", errOutput);}
 /// Set block tasks depend mask.
-   bool setTasksDependMask(   const std::string & str)
-      { return setRegExp( tasksdependmask, str, "block tasks depend mask");}
+   bool setTasksDependMask(   const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( tasksdependmask, str, "block tasks depend mask", errOutput);}
 
-   bool setNeedProperties(    const std::string & str)
-      { return setRegExp( need_properties, str, "block host properties needed");}
+   bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( need_properties, str, "block host properties needed", errOutput);}
 
    inline void setNeedMemory( int memory ) { need_memory = memory;}
    inline void setNeedPower(  int power  ) { need_power  = power; }
@@ -136,21 +137,23 @@ public:
    inline bool                hasEnvironment()  const { return environment.size();  }  ///< Whether extra environment is set.
    inline const std::string & getEnvironment()  const { return environment;         }  ///< Get extra environment.
 
-   inline bool          hasDependMask()            const { return !dependmask.isEmpty();       }  ///< Whether depend mask is set.
-   inline const std::string getDependMask()        const { return dependmask.pattern().toUtf8().data();       }  ///< Get depend mask.
-   bool checkDependMask( const std::string & str);
-   inline bool          hasTasksDependMask()       const { return !tasksdependmask.isEmpty();  }  ///< Whether block has tasks depend mask.
-   inline const std::string getTasksDependMask()   const { return tasksdependmask.pattern().toUtf8().data();  }  ///< Get tasks depend mask.
-   bool checkTasksDependMask( const std::string & str);
-   inline bool          hasHostsMask()             const { return !hostsmask.isEmpty();        }  ///< Whether block has hostsmask.
-   inline const std::string getHostsMask()         const { return hostsmask.pattern().toUtf8().data();        }  ///< Block hosts mask.
-   bool checkHostsMask( const std::string & str);
-   inline bool          hasHostsMaskExclude()      const { return !hostsmask_exclude.isEmpty();}  ///< Whether block has host exclude smask.
-   inline const std::string getHostsMaskExclude()  const { return hostsmask_exclude.pattern().toUtf8().data();}  ///< Block hosts exclude mask.
-   bool checkHostsMaskExclude( const std::string & str);
-   inline bool              hasNeedProperties()    const { return !need_properties.isEmpty();    }  ///< Whether block has need_properties.
-   inline const std::string getNeedProperties()    const { return need_properties.pattern().toUtf8().data(); }  ///< Block need_properties.
-   bool checkNeedProperties( const std::string & str);
+   inline bool hasDependMask()         const { return dependmask.notEmpty();        }  ///< Whether depend mask is set.
+   inline bool hasTasksDependMask()    const { return tasksdependmask.notEmpty();   }  ///< Whether block has tasks depend mask.
+   inline bool hasHostsMask()          const { return hostsmask.notEmpty();         }  ///< Whether block has hostsmask.
+   inline bool hasHostsMaskExclude()   const { return hostsmask_exclude.notEmpty(); }  ///< Whether block has host exclude smask.
+   inline bool hasNeedProperties()     const { return need_properties.notEmpty();   }  ///< Whether block has need_properties.
+
+   inline const std::string & getDependMask()        const { return dependmask.getPattern();       }  ///< Get depend mask.
+   inline const std::string & getTasksDependMask()   const { return tasksdependmask.getPattern();  }  ///< Get tasks depend mask.
+   inline const std::string & getHostsMask()         const { return hostsmask.getPattern();        }  ///< Block hosts mask.
+   inline const std::string & getHostsMaskExclude()  const { return hostsmask_exclude.getPattern();}  ///< Block hosts exclude mask.
+   inline const std::string & getNeedProperties()    const { return need_properties.getPattern();  }  ///< Block need_properties.
+
+   inline bool checkDependMask(        const std::string & str) const { return dependmask.match( str );        }
+   inline bool checkTasksDependMask(   const std::string & str) const { return tasksdependmask.match( str );   }
+   inline bool checkHostsMask(         const std::string & str) const { return hostsmask.match( str );         }
+   inline bool checkHostsMaskExclude(  const std::string & str) const { return hostsmask_exclude.match( str ); }
+   inline bool checkNeedProperties(    const std::string & str) const { return need_properties.match( str );   }
 
    inline int getCapacity()          const { return  capacity;        }
    inline int getNeedMemory()        const { return  need_memory;     }
@@ -287,11 +290,11 @@ protected:
    uint16_t multihost_waitsrv;
    std::string multihost_service;
 
-   QRegExp dependmask;
-   QRegExp tasksdependmask;
-   QRegExp hostsmask;
-   QRegExp hostsmask_exclude;
-   QRegExp need_properties;
+   RegExp dependmask;
+   RegExp tasksdependmask;
+   RegExp hostsmask;
+   RegExp hostsmask_exclude;
+   RegExp need_properties;
 
    TaskData ** tasksdata;        ///< Tasks data pointer.
 

@@ -3,6 +3,7 @@
 #include <QtGui/QColor>
 #include <QtGui/QFont>
 #include <QtGui/QPalette>
+#include <QtNetwork/QHostAddress>
 
 #include "name_afqt.h"
 #include "attr.h"
@@ -15,7 +16,7 @@ class QDomElement;
 class afqt::QEnvironment
 {
 public:
-   QEnvironment( const QString & name);
+   QEnvironment( const QString & name = QString());
    ~QEnvironment();
 
    static inline bool isValid() { return valid;}
@@ -24,7 +25,7 @@ public:
 
    static void setPalette( QPalette & palette);
 
-   static const QString getFileName() { return filename; }
+   static const QString getFileName() { return QString::fromUtf8( filename.c_str()); }
 
    static bool save();
    static void saveWndRects( QByteArray & data);
@@ -96,10 +97,25 @@ public:
    static QFont f_plotter;
    static QFont f_min;
 
+   const QString & getServerName()  const { return servername; }
+   const QString & getUserName()    const { return username;   }
+   const QString & getHostName()    const { return hostname;   }
+
+/// Get Afanasy server QHostAddress.
+   static inline const QHostAddress & getAfServerQHostAddress()  { return qafserveraddress;}
+
+private:
+   static void solveServerAddress();
 
 private:
    static bool valid;
-   static QString filename;
+
+   static QHostAddress qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
+   static QString servername;
+   static QString username;
+   static QString hostname;
+
+   static std::string filename;
    static QList<Attr*> attrs_prefs;
    static QList<AttrRect*> attrs_wndrects;
    static QList<Attr*> attrs_gui;

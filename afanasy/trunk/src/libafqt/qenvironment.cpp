@@ -1,7 +1,8 @@
 #include "qenvironment.h"
 
-#include <QtXml/QDomDocument>
 #include <QtCore/QFile>
+#include <QtNetwork/QHostInfo>
+#include <QtXml/QDomDocument>
 
 #include "../include/afanasy.h"
 #include "../include/afgui.h"
@@ -75,7 +76,7 @@ QColor QEnvironment::qclr_black(   0,   0,   0);
 QColor QEnvironment::qclr_white( 255, 255, 255);
 
 
-QString QEnvironment::filename = "";
+std::string QEnvironment::filename = "";
 
 QFont QEnvironment::f_name;
 QFont QEnvironment::f_info;
@@ -87,6 +88,10 @@ QList<Attr*>     QEnvironment::attrs_gui;
 
 bool QEnvironment::valid = false;
 
+QHostAddress QEnvironment::qafserveraddress;
+QString QEnvironment::servername;
+QString QEnvironment::username;
+QString QEnvironment::hostname;
 
 QEnvironment::QEnvironment( const QString & name)
 {
@@ -144,25 +149,33 @@ QEnvironment::QEnvironment( const QString & name)
    attrs_gui.append( &clr_textdone        );
    attrs_gui.append( &clr_textstars       );
 
-   QDomDocument doc( name);
-   filename = afqt::stoq( af::Environment::getHomeAfanasy()) + name + ".xml";
-   if( af::Environment::openXMLDomDocument( doc, filename))
+   if( false == name.isEmpty())
    {
-      for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->read( doc);
-      for( int i = 0; i < attrs_gui.size(); i++) attrs_gui[i]->read( doc);
+      QDomDocument doc( name);
+      filename = af::Environment::getHomeAfanasy() + name.toUtf8().data() + ".xml";
+      if( af::Environment::openXMLDomDocument( doc, filename))
+      {
+         for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->read( doc);
+         for( int i = 0; i < attrs_gui.size(); i++) attrs_gui[i]->read( doc);
+      }
+
+      QDomNodeList wndRectNodes = doc.elementsByTagName( AttrRect::WndTagName);
+      for( int i = 0; i < wndRectNodes.size(); i++)
+      {
+         AttrRect * attrrect = AttrRect::readNode( wndRectNodes.at(i));
+         if( attrrect == NULL) continue;
+         attrs_wndrects.append( attrrect);
+      }
    }
 
-   QDomNodeList wndRectNodes = doc.elementsByTagName( AttrRect::WndTagName);
-   for( int i = 0; i < wndRectNodes.size(); i++)
-   {
-      AttrRect * attrrect = AttrRect::readNode( wndRectNodes.at(i));
-      if( attrrect == NULL) continue;
-      attrs_wndrects.append( attrrect);
-   }
-
-   initFonts();
+   servername  = QString::fromUtf8( af::Environment::getServerName().c_str());
+   username    = QString::fromUtf8( af::Environment::getUserName().c_str());
+   hostname    = QString::fromUtf8( af::Environment::getHostName().c_str());
 
    valid = true;
+
+   initFonts();
+   solveServerAddress();
 }
 
 void QEnvironment::initFonts()
@@ -213,6 +226,8 @@ void QEnvironment::setPalette( QPalette & palette)
 
 bool QEnvironment::save()
 {
+   if( filename.empty() ) return true;
+
    QByteArray data;
 
    data.append("<!-- Created by Watch -->\n");
@@ -223,10 +238,10 @@ bool QEnvironment::save()
 
    data.append("</watch>\n");
 
-   QFile file( filename);
+   QFile file( afqt::stoq( filename));
    if( file.open( QIODevice::WriteOnly) == false)
    {
-      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'\n", filename.toUtf8().data());
+      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'\n", filename.c_str())
       return false;
    }
    file.write( data);
@@ -270,4 +285,52 @@ void QEnvironment::setRect( const QString & name, const QRect & rect)
          return;
       }
    }
+}
+
+void QEnvironment::solveServerAddress()
+{
+   static std::string serveraddrnum_arg("-srvaddrnum");
+   af::Environment::addUsage( serveraddrnum_arg + " [number]", "Use specified server address number.");
+   QHostInfo qhostinfo = QHostInfo::fromName( servername);
+   QList<QHostAddress> adresses = qhostinfo.addresses();
+   // Try direct IP literals, if no addresses solved
+   if( adresses.size() < 1 ) adresses << QHostAddress ( servername);
+   if( adresses.size() > 1 )
+   {
+      printf( "Solved several server addresses:\n");
+      for( int i = 0; i < adresses.size(); i++) printf( "%s\n", adresses[i].toString().toUtf8().data());
+   }
+
+   // Use the first IP address, if no address number not provided
+   int serveraddrnum = -1;
+
+   std::string serveraddrnum_str;
+   if( af::Environment::getArgument( serveraddrnum_arg, serveraddrnum_str))
+   {
+      if( false == serveraddrnum_str.empty())
+      {
+         int number = atoi(serveraddrnum_str.c_str());
+         if( number >= adresses.size())
+         {
+            AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
+            number = adresses.size() - 1;
+         }
+         serveraddrnum = number;
+      }
+      else
+      {
+         AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.c_str());
+         valid = false;
+      }
+   }
+
+   if( serveraddrnum == -1 )
+   {
+      serveraddrnum = 0;
+      if( adresses.size() > 1 )
+         printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.c_str());
+   }
+
+   qafserveraddress = QHostAddress( adresses[serveraddrnum]);
+   printf( "Server address = '%s:%u'\n", qafserveraddress.toString().toUtf8().data(), af::Environment::getServerPort());
 }

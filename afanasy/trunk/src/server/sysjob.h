@@ -58,8 +58,6 @@ public:
    SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
    ~SysBlock();
 
-   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
-
    void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
    void addCommand( SysCmd* syscmd);
@@ -68,12 +66,13 @@ public:
    inline int getNumSysTasks() const { return systasks.size();}
    SysTask * getReadySysTask() const;
 
+   virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
+   virtual void getErrorHostsListString( std::string & str) const;
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
-
-   inline static void logCmdPost( const std::string & message) { task->log( message);}
-
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();
+
+   inline static void logCmdPost( const std::string & message) { task->log( message);}
 
 private:
    SysTask * addTask( af::TaskExec * taskexec);

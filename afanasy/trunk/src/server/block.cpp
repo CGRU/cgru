@@ -55,7 +55,7 @@ Block::~Block()
 
 void Block::log( const std::string & message)
 {
-   joblog->push_back( af::time2str() + " : B[" + data->getName() + "]: %3" + message);
+   joblog->push_back( af::time2str() + " : B[" + data->getName() + "]: " + message);
 }
 
 void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
@@ -116,13 +116,14 @@ bool Block::avoidHostsCheck( const std::string & hostname) const
 
 void Block::getErrorHostsListString( std::string & str) const
 {
-   str += std::string("Block['") + data->getName() + "'] error hosts:";
+   str += std::string("\nBlock['") + data->getName() + "'] error hosts:";
    std::list<std::string>::const_iterator hIt = errorHosts.begin();
    std::list<int>::const_iterator cIt = errorHostsCounts.begin();
    std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
    for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
    {
-      str += std::string( *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt));
+      str += "\n";
+      str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
       if(( getErrorsAvoidHost() > 0 ) && ( *cIt >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
 //      list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
 //         .arg( af::time2Qstr( errorHostsTime[h]))
@@ -164,13 +165,9 @@ bool Block::canRun( RenderAf * render)
    // check available capacity:
    if( false == render->hasCapacity( data->getCapMinResult())) return false;
    // render services:
-   if( render->canRunService( data->getService()) == false) return false;
+   if( false == render->canRunService( data->getService())) return false;
    // check maximum hosts:
    if(( data->getMaxRunningTasks() >= 0 ) && ( data->getRunningTasksNumber() >= data->getMaxRunningTasks() )) return false;
-   // check hosts mask:
-   if( data->checkHostsMask( render->getName()) == false ) return false;
-   // check exclude hosts mask:
-   if( data->checkHostsMaskExclude( render->getName())) return false;
    // Check block avoid hosts list:
    if( avoidHostsCheck( render->getName()) ) return false;
    // Check task avoid hosts list:
@@ -179,8 +176,13 @@ bool Block::canRun( RenderAf * render)
    if( data->getNeedHDD()    > render->getHostRes().hdd_free_gb ) return false;
    // Check needed power:
    if( data->getNeedPower()  > render->getHost().power       ) return false;
+
+   // check hosts mask:
+   if( false == data->checkHostsMask( render->getName())) return false;
+   // check exclude hosts mask:
+//   if( false == data->checkHostsMaskExclude( render->getName())) return false;
    // Check needed properties:
-   if( data->checkNeedProperties( render->getHost().properties) == false ) return false;
+   if( false == data->checkNeedProperties( render->getHost().properties)) return false;
 
    return true;
 }

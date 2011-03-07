@@ -1,9 +1,12 @@
 #pragma once
 
-#include "aftypes.h"
+#include <string.h>
+
 #ifndef WINNT
 #include <unistd.h>
 #endif
+
+#include "aftypes.h"
 
 /// General:
 namespace AFGENERAL

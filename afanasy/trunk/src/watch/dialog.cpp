@@ -307,11 +307,18 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    }
    case af::Msg::TString:
    {
+      new WndText( "Message", msg);
+      break;
+   }
+/*
+   case af::Msg::TString:
+   {
       std::string str;
       msg->getString( str);
       displayInfo( afqt::stoq( str));
       break;
    }
+*/
    default:
       Watch::caseMessage( msg);
    }

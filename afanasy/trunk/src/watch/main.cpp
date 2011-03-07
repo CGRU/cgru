@@ -35,7 +35,7 @@ void sig_int(int signum)
 int main(int argc, char *argv[])
 {
    Py_InitializeEx(0);
-   uint32_t env_flags = af::Environment::SolveServerAddress | af::Environment::AppendPythonPath;
+   uint32_t env_flags = af::Environment::AppendPythonPath;
 #ifdef WINNT
    env_flags = env_flags | af::Environment::Verbose; // Verbose environment initialization
 #else

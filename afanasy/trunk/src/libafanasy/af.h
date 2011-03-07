@@ -51,8 +51,10 @@ protected:
    static void  w_StringList( const std::list<std::string> & stringList, Msg * msg);
    static void rw_StringVect(     std::vector<std::string> & stringVect, Msg * msg);
 
-   static void rw_QRegExp( QRegExp & qRegExp, Msg * msg);
-   static void rw_QString( QString & qString, Msg * msg);
+   static void rw_RegExp( RegExp & regExp, Msg * msg);
+
+//   static void rw_QRegExp( QRegExp & qRegExp, Msg * msg);
+//   static void rw_QString( QString & qString, Msg * msg);
 //   static void rw_QStringList(  QStringList & qStringList, Msg * msg);
 
    static void rw_data(       char * data, Msg * msg, int size);

@@ -4,15 +4,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <memory.h>
+#include <unistd.h>
 
 #include <Python.h>
 
-#include <QtXml/QDomDocument>
 #include <QtCore/QDir>
-#include <QtNetwork/QHostInfo>
 #include <QtCore/QFile>
-#include <QtNetwork/QHostAddress>
 #include <QtCore/QRegExp>
+#include <QtXml/QDomDocument>
 
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
@@ -131,9 +130,8 @@ bool Environment::valid       = false;
 bool Environment::verbose     = false;
 bool Environment::visor_mode  = false;
 
-Address      * Environment::address = NULL;
-QHostAddress * Environment::qafserveraddress = NULL;
-Passwd       * Environment::passwd = NULL;
+Address  * Environment::address = NULL;
+Passwd   * Environment::passwd = NULL;
 
 std::list<std::string> Environment::cmdarguments;
 std::list<std::string> Environment::cmdarguments_usagearg;
@@ -146,7 +144,7 @@ int            Environment::afanasy_build_version = 0;
 bool Environment::getVars( const std::string & filename)
 {
    QDomDocument doc("afanasy");
-   if( openXMLDomDocument( doc, filename.c_str()) == false) return false;
+   if( openXMLDomDocument( doc, filename) == false) return false;
    if( verbose) printf("Parsing XML file '%s':\n", filename.c_str());
 
    getVar( doc, filenamesizemax,                   "filenamesizemax"                   );
@@ -243,29 +241,29 @@ bool Environment::getVars( const std::string & filename)
    return true;
 }
 
-bool Environment::getXMLElement( const QDomDocument & doc, const QString & name, QString & text)
+bool Environment::getXMLElement( const QDomDocument & doc, const char * name, std::string & text)
 {
-   QDomNodeList list = doc.elementsByTagName( name );
+   QDomNodeList list = doc.elementsByTagName( name);
    int size = list.size();
    if( size < 1) return false;
    if( size > 1)
    {
-      AFERRAR("Found %d '%s' elements in document, using the last.\n", size, name.toUtf8().data());
+      AFERRAR("Found %d '%s' elements in document, using the last.\n", size, name)
    }
    QDomElement element = list.at(size-1).toElement();
    if( element.isNull())
    {
       AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
-         element.lineNumber(), element.columnNumber(), name.toUtf8().data());
+         element.lineNumber(), element.columnNumber(), name)
       return false;
    }
-   text = element.text();
+   text = element.text().toUtf8().data();
    return true;
 }
 
-bool Environment::getXMLElement( const QDomDocument & doc, const QString & name, QStringList & stringlist)
+bool Environment::getXMLElement( const QDomDocument & doc, const char * name, std::list<std::string> & stringlist)
 {
-   QDomNodeList list = doc.elementsByTagName( name );
+   QDomNodeList list = doc.elementsByTagName( name);
    int size = list.size();
    if( size < 1) return false;
    for( int i = 0; i < size; i++)
@@ -274,27 +272,7 @@ bool Environment::getXMLElement( const QDomDocument & doc, const QString & name,
       if( element.isNull())
       {
          AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
-            element.lineNumber(), element.columnNumber(), name.toUtf8().data());
-         return false;
-      }
-      if( element.text().isEmpty()) stringlist.clear();
-      else stringlist << element.text();
-   }
-   return true;
-}
-
-bool Environment::getXMLElement( const QDomDocument & doc, const QString & name, std::list<std::string> & stringlist)
-{
-   QDomNodeList list = doc.elementsByTagName( name );
-   int size = list.size();
-   if( size < 1) return false;
-   for( int i = 0; i < size; i++)
-   {
-      QDomElement element = list.at(i).toElement();
-      if( element.isNull())
-      {
-         AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
-            element.lineNumber(), element.columnNumber(), name.toUtf8().data());
+            element.lineNumber(), element.columnNumber(), name)
          return false;
       }
       if( element.text().isEmpty()) stringlist.clear();
@@ -303,86 +281,72 @@ bool Environment::getXMLElement( const QDomDocument & doc, const QString & name,
    return true;
 }
 
-bool Environment::getXMLAttribute( QDomElement & element, const QString & name, int & value)
+bool Environment::getXMLAttribute( QDomElement & element, const char * name, int & value)
 {
    if( element.isNull()) return false;
-   QDomAttr attribute = element.attributeNode(name);
+   QDomAttr attribute = element.attributeNode( name);
    if( attribute.isNull()) return false;
    bool ok;
    int number = attribute.value().toInt( &ok);
    if( false == ok )
    {
       AFERRAR("Element '%s': attribute '%s' has not a number value '%s'\n",
-              element.text().toUtf8().data(), name.toUtf8().data(), attribute.value().toUtf8().data());
+              element.text().toUtf8().data(), name, attribute.value().toUtf8().data())
       return false;
    }
    value = number;
-   PRINT(" %s='%d'", name.toUtf8().data(), value);
-   return true;
-}
-
-bool Environment::getVar( const QDomDocument & doc, QString & value, QString name)
-{
-   if( getXMLElement( doc, name, value) == false) return false;
-   PRINT("\t%s = '%s'\n", name.toUtf8().data(), value.toUtf8().data());
+   PRINT(" %s='%d'", name, value);
    return true;
 }
 
 bool Environment::getVar( const QDomDocument & doc, std::string & value, const char * name)
 {
-   QString qstr;
-   if( getXMLElement( doc, name, qstr) == false) return false;
-   value = qstr.toUtf8().data();
+   std::string str;
+   if( getXMLElement( doc, name, str) == false) return false;
+   value = str;
    PRINT("\t%s = '%s'\n", name, value.c_str());
    return true;
 }
 
-bool Environment::getVar( const QDomDocument & doc, QStringList & value, QString name)
-{
-   if( getXMLElement( doc, name, value) == false) return false;
-   PRINT("\t%s:\n\t\t%s\n", name.toUtf8().data(), value.join("\n\t\t").toUtf8().data());
-   return true;
-}
-
-bool Environment::getVar( const QDomDocument & doc, std::list<std::string> & value, QString name)
+bool Environment::getVar( const QDomDocument & doc, std::list<std::string> & value, const char * name)
 {
    if( getXMLElement( doc, name, value) == false) return false;
    if( verbose )
    {
-      printf("\t%s:\n", name.toUtf8().data());
+      printf("\t%s:\n", name);
       for( std::list<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
          printf("\t\t%s\n", (*it).c_str());
    }
    return true;
 }
 
-bool Environment::getVar( const QDomDocument & doc, int & value, QString name)
+bool Environment::getVar( const QDomDocument & doc, int & value, const char * name)
 {
-   QString text;
+   std::string text;
    if( getXMLElement( doc, name, text) == false) return false;
-   bool ok; int number = text.toInt( &ok);
+   bool ok; int number = af::stoi( text, ok);
    if( ok == false)
    {
-      AFERRAR("Invalid number in '%s' element.\n", name.toUtf8().data());
+      AFERRAR("Invalid number in '%s' element.\n", name);
       return false;
    }
    value = number;
-   PRINT("\t%s = %d\n", name.toUtf8().data(), value);
+   PRINT("\t%s = %d\n", name, value);
    return true;
 }
 
-bool Environment::openXMLDomDocument( QDomDocument & doc, const QString & filename)
+bool Environment::openXMLDomDocument( QDomDocument & doc, const std::string & filename)
 {
-   QFile file( filename);
+   QFile file( filename.c_str());
    if( file.open(QIODevice::ReadOnly) == false)
    {
-      PRINT("Unable to open '%s'.\n", filename.toUtf8().data());
+      PRINT("Unable to open '%s'.\n", filename.c_str());
       return false;
    }
    QString errorMsg; int errorLine = 0; int errorColumn = 0;
    if( doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
    {
-      AFERRAR("Parse error '%s' [Line %d - Col %d]:\n", filename.toUtf8().data(), errorLine, errorColumn);
+      AFERRAR("Parse error '%s' [Line %d - Col %d]:\n", filename.c_str(), errorLine, errorColumn);
       printf("%s\n", errorMsg.toUtf8().data());
       file.close();
       return false;
@@ -468,11 +432,11 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    size_t dpos = username.rfind('/');
    if( dpos == std::string::npos) dpos = username.rfind('\\');
    if( dpos != std::string::npos) username = username.substr( dpos + 1);
+   std::transform( username.begin(), username.end(), username.begin(), ::tolower);
    PRINT("Afanasy user name = '%s'\n", username.c_str());
 //
 //############ local host name:
    hostname = getenv("AF_HOSTNAME");
-   std::transform( username.begin(), username.end(), username.begin(), ::tolower);
 
 //
 //############ Platform: #############################
@@ -497,16 +461,16 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
 //
 //############ Version: ########################
-#ifdef CGRU_REVISION
+//#ifdef CGRU_REVISION
    afanasy_build_version = CGRU_REVISION;
-#endif
+//#endif
    printf("Afanasy build revision = \"%d\"\n", afanasy_build_version);
    cgru_version = getenv("CGRU_VERSION");
    printf("CGRU version = \"%s\"\n", cgru_version.c_str());
 //###################################################
 
    load();
-   valid = init( flags & SolveServerAddress);
+   valid = init();
 
    PRINT("Render host name = '%s'\n", hostname.c_str());
 }
@@ -514,7 +478,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 Environment::~Environment()
 {
    if( address != NULL) delete address;
-   if( qafserveraddress != NULL) delete qafserveraddress;
    if( passwd != NULL) delete passwd;
    printUsage();
 }
@@ -538,7 +501,7 @@ void Environment::load()
 bool Environment::load( const std::string & filename, uint32_t flags)
 {
    verbose = flags & Verbose;
-   if( getVars( filename)) return init( flags & SolveServerAddress);
+   if( getVars( filename)) return init();
    return false;
 }
 
@@ -546,7 +509,7 @@ bool Environment::reload()
 {
    verbose = true;
    load();
-   valid = init( false);
+   valid = init();
    return valid;
 }
 
@@ -559,8 +522,9 @@ bool Environment::setClientPort( uint16_t port)
 
 bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
 
-bool Environment::init( bool solveServerAddress)
+bool Environment::init()
 {
+   /*
 //
 //############ Afansy server QHostAddress:
    if( solveServerAddress)
@@ -610,11 +574,26 @@ bool Environment::init( bool solveServerAddress)
       qafserveraddress = new QHostAddress( adresses[serveraddrnum]);
       printf( "Server address = '%s:%u'\n", qafserveraddress->toString().toUtf8().data(), serverport);
    }
-
+*/
+//
+//############ Local host name:
+//   computername = QHostInfo::localHostName().toLower().toUtf8().data();
+   {
+      static const int buflen = 256;
+      static char buffer[buflen];
+      if( gethostname( buffer, buflen) != 0 )
+      {
+         AFERRPE("Can't get local host name.\n")
+         return false;
+      }
+      computername = buffer;
+   }
+   if( hostname.size() == 0 ) hostname = computername;
+   std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+   std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
+   PRINT("Local computer name = '%s', adress = ", computername.c_str());
 //
 //############ Local host address:
-   computername = QHostInfo::localHostName().toLower().toUtf8().data();
-   PRINT("Local computer name = '%s', adress = ", computername.c_str());
    if (address != NULL) delete address;
    address = new Address( clientport);
    if( verbose ) address->stdOut();
@@ -624,7 +603,6 @@ bool Environment::init( bool solveServerAddress)
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
    userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
 #endif
-   if( hostname.size() == 0 ) hostname = computername;
 
 //
 //############ VISOR and GOD passwords:

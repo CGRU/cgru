@@ -137,24 +137,24 @@ const QString DBAttr::DBString( const QString * str) const
    return dbstr;
 }
 
-DBAttrInt8  ::DBAttrInt8   ( int type,   int8_t * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrInt8  ::~DBAttrInt8  (){}
-DBAttrUInt8 ::DBAttrUInt8  ( int type,  uint8_t * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrUInt8 ::~DBAttrUInt8(){}
-DBAttrInt16 ::DBAttrInt16  ( int type,  int16_t * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrInt16 ::~DBAttrInt16 (){}
-DBAttrUInt16::DBAttrUInt16 ( int type, uint16_t * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrUInt16::~DBAttrUInt16(){}
-DBAttrInt32 ::DBAttrInt32  ( int type,  int32_t * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrInt32 ::~DBAttrInt32 (){}
-DBAttrUInt32::DBAttrUInt32 ( int type, uint32_t * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrUInt32::~DBAttrUInt32(){}
-DBAttrQString::DBAttrQString ( int type,  QString * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrQString::~DBAttrQString(){}
-DBAttrString::DBAttrString ( int type, std::string * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrString::~DBAttrString(){}
-DBAttrQRegExp::DBAttrQRegExp ( int type,  QRegExp * parameter): DBAttr( type), pointer( parameter) {}
-DBAttrQRegExp::~DBAttrQRegExp(){}
+DBAttrInt8  ::DBAttrInt8      ( int type,   int8_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrInt8  ::~DBAttrInt8     (){}
+DBAttrUInt8 ::DBAttrUInt8     ( int type,  uint8_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrUInt8 ::~DBAttrUInt8    (){}
+DBAttrInt16 ::DBAttrInt16     ( int type,  int16_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrInt16 ::~DBAttrInt16    (){}
+DBAttrUInt16::DBAttrUInt16    ( int type, uint16_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrUInt16::~DBAttrUInt16   (){}
+DBAttrInt32 ::DBAttrInt32     ( int type,  int32_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrInt32 ::~DBAttrInt32    (){}
+DBAttrUInt32::DBAttrUInt32    ( int type, uint32_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrUInt32::~DBAttrUInt32   (){}
+//DBAttrQString::DBAttrQString  ( int type,  QString * parameter):     DBAttr( type), pointer( parameter) {}
+//DBAttrQString::~DBAttrQString (){}
+DBAttrString::DBAttrString    ( int type, std::string * parameter):  DBAttr( type), pointer( parameter) {}
+DBAttrString::~DBAttrString   (){}
+DBAttrRegExp::DBAttrRegExp    ( int type, af::RegExp * parameter):   DBAttr( type), pointer( parameter) {}
+DBAttrRegExp::~DBAttrRegExp   (){}
 
 DBAttrInt32Const::DBAttrInt32Const( int type, const int32_t * parameter): DBAttr( type), pointer( parameter) {}
 DBAttrInt32Const::~DBAttrInt32Const(){}

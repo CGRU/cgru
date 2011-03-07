@@ -219,12 +219,13 @@ void Task::getErrorHostsListString( std::string & str) const
 {
    if( errorHosts.size())
    {
-      str += "Task[" + af::itos(number) + "] error hosts: ";
+      str += "\nTask[" + af::itos(number) + "] error hosts: ";
       std::list<std::string>::const_iterator hIt = errorHosts.begin();
       std::list<int>::const_iterator cIt = errorHostsCounts.begin();
       std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
       for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
       {
+         str += "\n";
          str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
          if((block->getErrorsAvoidHost() > 0) && ( *cIt >= block->getErrorsAvoidHost())) str += " - ! AVOIDING !";
 //         list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
@@ -292,7 +293,7 @@ bool Task::getOutput( int startcount, MsgAf *msg, std::string & filename, Render
 //printf("Task::getOutput:\n");
    if( progress->starts_count < 1 )
    {
-      msg->setString("Task was not started.");
+      msg->setString("Task is not started.");
       return false;
    }
    if( startcount > progress->starts_count )

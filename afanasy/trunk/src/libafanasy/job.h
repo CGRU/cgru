@@ -5,8 +5,9 @@
 
 #include "afnode.h"
 #include "blockdata.h"
+#include "regexp.h"
 
-#include <QtCore/QString>
+//#include <QtCore/QString>
 
 namespace af
 {
@@ -49,45 +50,39 @@ public:
    inline bool isRunning() const {return state & AFJOB::STATE_RUNNING_MASK; }///< Whether job is running.
    inline bool isDone()    const {return state & AFJOB::STATE_DONE_MASK;    }///< Whether job is done.
 
-   inline bool setHostsMask(         const std::string & str  )
-      { return setRegExp( hostsmask, str, "job hosts mask");}
-   inline bool setHostsMaskExclude(  const std::string & str  )
-      { return setRegExp( hostsmask_exclude, str, "job exclude hosts mask");}
-   inline bool setDependMask(        const std::string & str  )
-      { return setRegExp( dependmask, str, "job depend mask");}
-   inline bool setDependMaskGlobal(  const std::string & str  )
-      { return setRegExp( dependmask_global, str, "job global depend mask");}
-   inline bool setNeedOS(            const std::string & str  )
-      { return setRegExp( need_os, str, "job need os mask");}
-   inline bool setNeedProperties(    const std::string & str  )
-      { return setRegExp( need_properties, str, "job need properties mask");}
+   inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( hostsmask, str, "job hosts mask", errOutput);}
+   inline bool setHostsMaskExclude(  const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( hostsmask_exclude, str, "job exclude hosts mask", errOutput);}
+   inline bool setDependMask(        const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( dependmask, str, "job depend mask", errOutput);}
+   inline bool setDependMaskGlobal(  const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( dependmask_global, str, "job global depend mask", errOutput);}
+   inline bool setNeedOS(            const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( need_os, str, "job need os mask", errOutput);}
+   inline bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( need_properties, str, "job need properties mask", errOutput);}
 
-   inline const std::string getHostsMask()          const { return hostsmask.pattern().toUtf8().data();          }
-   inline const std::string getHostsMaskExclude()   const { return hostsmask_exclude.pattern().toUtf8().data();  }
-   inline const std::string getDependMask()         const { return dependmask.pattern().toUtf8().data();         }
-   inline const std::string getDependMaskGlobal()   const { return dependmask_global.pattern().toUtf8().data();  }
-   inline const std::string getNeedOS()             const { return need_os.pattern().toUtf8().data();            }
-   inline const std::string getNeedProperties()     const { return need_properties.pattern().toUtf8().data();    }
+   inline bool hasHostsMask()          const { return hostsmask.notEmpty();          }
+   inline bool hasHostsMaskExclude()   const { return hostsmask_exclude.notEmpty();  }
+   inline bool hasDependMask()         const { return dependmask.notEmpty();         }
+   inline bool hasDependMaskGlobal()   const { return dependmask_global.notEmpty();  }
+   inline bool hasNeedOS()             const { return need_os.notEmpty();            }
+   inline bool hasNeedProperties()     const { return need_properties.notEmpty();    }
 
-   inline bool hasHostsMask()          const { return false == hostsmask.isEmpty();          }
-   inline bool hasHostsMaskExclude()   const { return false == hostsmask_exclude.isEmpty();  }
-   inline bool hasDependMask()         const { return false == dependmask.isEmpty();         }
-   inline bool hasDependMaskGlobal()   const { return false == dependmask_global.isEmpty();  }
-   inline bool hasNeedOS()             const { return false == need_os.isEmpty();            }
-   inline bool hasNeedProperties()     const { return false == need_properties.isEmpty();    }
+   inline const std::string & getHostsMask()          const { return hostsmask.getPattern();          }
+   inline const std::string & getHostsMaskExclude()   const { return hostsmask_exclude.getPattern();  }
+   inline const std::string & getDependMask()         const { return dependmask.getPattern();         }
+   inline const std::string & getDependMaskGlobal()   const { return dependmask_global.getPattern();  }
+   inline const std::string & getNeedOS()             const { return need_os.getPattern();            }
+   inline const std::string & getNeedProperties()     const { return need_properties.getPattern();    }
 
-   inline bool checkHostsMask(         const std::string & str  ) const
-      { if( hostsmask.isEmpty()        ) return true;   return hostsmask.exactMatch( QString::fromUtf8( str.c_str())); }
-   inline bool checkHostsMaskExclude(  const std::string & str  ) const
-      { if( hostsmask_exclude.isEmpty()) return false;  return hostsmask_exclude.exactMatch( QString::fromUtf8( str.c_str())); }
-   inline bool checkDependMask(        const std::string & str  ) const
-      { if( dependmask.isEmpty()       ) return false;  return dependmask.exactMatch( QString::fromUtf8( str.c_str())); }
-   inline bool checkDependMaskGlobal(  const std::string & str  ) const
-      { if( dependmask_global.isEmpty()) return false;  return dependmask_global.exactMatch( QString::fromUtf8( str.c_str())); }
-   inline bool checkNeedOS(            const std::string & str  ) const
-      { if( need_os.isEmpty()          ) return true;   return  QString::fromUtf8( str.c_str()).contains( need_os); }
-   inline bool checkNeedProperties(    const std::string & str  ) const
-      { if( need_properties.isEmpty()  ) return true;   return  QString::fromUtf8( str.c_str()).contains( need_properties); }
+   inline bool checkHostsMask(         const std::string & str ) const { return hostsmask.match( str );        }
+   inline bool checkHostsMaskExclude(  const std::string & str ) const { return hostsmask_exclude.match( str); }
+   inline bool checkDependMask(        const std::string & str ) const { return dependmask.match( str);        }
+   inline bool checkDependMaskGlobal(  const std::string & str ) const { return dependmask_global.match( str );}
+   inline bool checkNeedOS(            const std::string & str ) const { return need_os.match( str);           }
+   inline bool checkNeedProperties(    const std::string & str ) const { return need_properties.match( str);   }
 
    inline int getRunningTasksNumber() const /// Get job running tasks.
       {int n=0;for(int b=0;b<blocksnum;b++)n+=blocksdata[b]->getRunningTasksNumber();return n;}
@@ -140,15 +135,15 @@ protected:
    uint32_t time_done;
 
 /// Job hosts mask ( huntgroup ).
-   QRegExp hostsmask;
+   RegExp hostsmask;
 /// Job hosts exclude mask ( huntgroup ).
-   QRegExp hostsmask_exclude;
+   RegExp hostsmask_exclude;
 /// Jobs names mask current job depends on ( wait until they will be done).
-   QRegExp dependmask;
+   RegExp dependmask;
 /// Jobs names mask current job depends on ( wait until they will be done).
-   QRegExp dependmask_global;
-   QRegExp need_os;
-   QRegExp need_properties;
+   RegExp dependmask_global;
+   RegExp need_os;
+   RegExp need_properties;
 
    std::string tasksoutputdir;       ///< Tasks output directory.
 

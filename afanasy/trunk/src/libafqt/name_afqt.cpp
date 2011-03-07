@@ -6,6 +6,8 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 
+#include "../libafqt/qenvironment.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -28,7 +30,7 @@ bool afqt::connectAfanasy( QTcpSocket * qSocket)
 #ifdef AFOUTPUT
 printf("afqt::connectAfanasy: %s : %d\n", af::Environment::getAfServerQHostAddress()->toString().toUtf8().data(), af::Environment::getServerPort());
 #endif
-      qSocket->connectToHost( *(af::Environment::getAfServerQHostAddress()), af::Environment::getServerPort());
+      qSocket->connectToHost( afqt::QEnvironment::getAfServerQHostAddress(), af::Environment::getServerPort());
       if( qSocket->waitForConnected( WAITFORCONNECTED) == false)
       {
          AFINFO("qtnet::connectAfanasy: can't connect to server.\n");

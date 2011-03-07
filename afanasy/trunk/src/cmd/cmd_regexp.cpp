@@ -11,7 +11,11 @@ CmdRegExp::CmdRegExp()
    setCmd("rx");
    setArgsCount(2);
    setInfo("Test a regular expression.");
-   setHelp("rx [string] [expression] Whether string matches specified regular expression.");
+   setHelp("rx [string] [expression] [eci] Whether string matches specified regular expression\n"
+           "Optional mode [eci]: exclude, contain, case insensitive.\n"
+           "Examples:\n"
+           "afcmd rx ubuntu \"u.*\"\n"
+           "afcmd rx ubuntu \"UBU\" eci");
 }
 
 CmdRegExp::~CmdRegExp(){}
@@ -22,10 +26,25 @@ bool CmdRegExp::processArguments( int argc, char** argv, af::Msg & msg)
    std::string str = argv[0];
    std::string pattern = argv[1];
    std::string str_error;
-//   rx.setExclude();
-//   rx.setContain();
-//   rx.setCaseInsensitive();
-   if( rx.setPattern( pattern, &str_error)) printf( rx.match( str) ? "   MATCH\n" : "   NOT MATCH\n");
-   if( false == str_error.empty()) std::cout << "RegExp Error: " << str_error << std::endl;
+   if( false == af::RegExp::Validate( pattern, &str_error))
+   {
+      std::cout << "RegExp Error: " << str_error << std::endl;
+   }
+   else
+   {
+      if( argc >= 3 )
+      {
+         char * mode = argv[2];
+         int pos = -1;
+         while( mode[++pos] != '\0')
+         {
+            if( mode[pos] == 'e') rx.setExclude();
+            if( mode[pos] == 'c') rx.setContain();
+            if( mode[pos] == 'i') rx.setCaseInsensitive();
+         }
+      }
+      if( rx.setPattern( pattern, &str_error)) printf( rx.match( str) ? "   MATCH\n" : "   NOT MATCH\n");
+      if( false == str_error.empty()) std::cout << "RegExp Error: " << str_error << std::endl;
+   }
    return true;
 }

@@ -27,24 +27,24 @@ DBUser::DBUser( int uid):
 
 void DBUser::addDBAttributes()
 {
-   dbAddAttr( new DBAttrInt32(   DBAttr::_id,                   &id                  ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_id,                   &id                  ));
 
-   dbAddAttr( new DBAttrUInt32(  DBAttr::_state,                &state               ));
-   dbAddAttr( new DBAttrString ( DBAttr::_hostname,             &hostname            ));
-   dbAddAttr( new DBAttrInt32(   DBAttr::_maxrunningtasks,      &maxrunningtasks     ));
-   dbAddAttr( new DBAttrUInt8(   DBAttr::_priority,             &priority            ));
-   dbAddAttr( new DBAttrQRegExp( DBAttr::_hostsmask,            &hostsmask           ));
-   dbAddAttr( new DBAttrUInt8(   DBAttr::_errors_retries,       &errors_retries      ));
-   dbAddAttr( new DBAttrUInt8(   DBAttr::_errors_avoidhost,     &errors_avoidhost    ));
-   dbAddAttr( new DBAttrUInt8(   DBAttr::_errors_tasksamehost,  &errors_tasksamehost ));
-   dbAddAttr( new DBAttrInt32(   DBAttr::_errors_forgivetime,   &errors_forgivetime  ));
-   dbAddAttr( new DBAttrInt32(   DBAttr::_lifetime,             &jobs_lifetime       ));
-   dbAddAttr( new DBAttrQRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude   ));
-   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_register,        &time_register       ));
-   dbAddAttr( new DBAttrString(  DBAttr::_annotation,           &annotation          ));
-   dbAddAttr( new DBAttrString(  DBAttr::_customdata,           &customdata          ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_state,                &state               ));
+   dbAddAttr( new DBAttrString( DBAttr::_hostname,             &hostname            ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_maxrunningtasks,      &maxrunningtasks     ));
+   dbAddAttr( new DBAttrUInt8(  DBAttr::_priority,             &priority            ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask           ));
+   dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_retries,       &errors_retries      ));
+   dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_avoidhost,     &errors_avoidhost    ));
+   dbAddAttr( new DBAttrUInt8(  DBAttr::_errors_tasksamehost,  &errors_tasksamehost ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_errors_forgivetime,   &errors_forgivetime  ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_lifetime,             &jobs_lifetime       ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude   ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_time_register,        &time_register       ));
+   dbAddAttr( new DBAttrString( DBAttr::_annotation,           &annotation          ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &customdata          ));
 
-   dbAddAttr( new DBAttrString(  DBAttr::_name,                 &name                ));
+   dbAddAttr( new DBAttrString( DBAttr::_name,                 &name                ));
 }
 
 DBUser::~DBUser()

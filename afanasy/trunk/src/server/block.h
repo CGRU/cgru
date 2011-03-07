@@ -34,7 +34,7 @@ public:
 
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    bool avoidHostsCheck( const std::string & hostname) const;
-   void getErrorHostsListString( std::string & str) const;
+   virtual void getErrorHostsListString( std::string & str) const;
    virtual void errorHostsReset();
 
    bool canRun( RenderAf * render);

@@ -7,6 +7,7 @@
 #include "../libafanasy/render.h"
 
 #include "../libafqt/name_afqt.h"
+#include "../libafqt/qenvironment.h"
 
 #include "qobject.h"
 #include "res.h"
@@ -32,7 +33,7 @@ void sig_int(int signum)
 int main(int argc, char *argv[])
 {
    Py_InitializeEx(0);
-   uint32_t env_flags = af::Environment::SolveServerAddress | af::Environment::AppendPythonPath;
+   uint32_t env_flags = af::Environment::AppendPythonPath;
 #ifdef WINNT
    if( argc <= 1 ) env_flags = env_flags | af::Environment::Verbose; // Verbose environment initialization
    signal( SIGINT,  sig_int);
@@ -93,6 +94,13 @@ int main(int argc, char *argv[])
    if( ENV.hasArgument( checkResourcesModeCmdArg)) checkResourcesMode = true;
 
    int retval = 0;
+
+   afqt::QEnvironment QENV;
+   if( false == QENV.isValid())
+   {
+      AFERROR("main: QEnvironment initialization failed.\n")
+      exit(1);
+   }
 
    if(( false == ENV.isHelpMode()) &&
       ( false == checkResourcesMode ))

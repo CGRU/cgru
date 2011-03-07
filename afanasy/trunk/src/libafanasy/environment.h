@@ -7,7 +7,6 @@
 
 class QDomDocument;
 class QDomElement;
-class QHostAddress;
 
 namespace af
 {
@@ -25,8 +24,7 @@ public:
    {
       NoFlags              = 0,
       Verbose              = 1,
-      SolveServerAddress   = 1 << 1,
-      AppendPythonPath     = 1 << 2
+      AppendPythonPath     = 1 << 1
    };
 
 /// Return \c true if address environment is valid.
@@ -45,16 +43,13 @@ public:
    static bool load( const std::string & filename, uint32_t flags = 0);
 
    static void setVerbose( bool value = true) { verbose = value;}
-   static bool openXMLDomDocument( QDomDocument & doc, const QString & filename);
-   static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
-   static bool getXMLElement( const QDomDocument & doc, const QString & name, QStringList & stringlist );
-   static bool getXMLAttribute( QDomElement & element, const QString & name, int & value);
-   static bool getXMLElement( const QDomDocument & doc, const QString & name, std::list<std::string> & stringlist );
+   static bool openXMLDomDocument(  QDomDocument & doc, const std::string & filename);
+   static bool getXMLAttribute(  QDomElement & element, const char * name, int & value);
+   static bool getXMLElement( const QDomDocument & doc, const char * name, std::string & text );
+   static bool getXMLElement( const QDomDocument & doc, const char * name, std::list<std::string> & stringlist );
    static bool getVar( const QDomDocument & doc, std::string & value, const char * name );
-   static bool getVar( const QDomDocument & doc, QString     & value, QString name );
-   static bool getVar( const QDomDocument & doc, QStringList & value, QString name );
-   static bool getVar( const QDomDocument & doc, int         & value, QString name );
-   static bool getVar( const QDomDocument & doc, std::list<std::string> & value, QString name );
+   static bool getVar( const QDomDocument & doc, int         & value, const char * name );
+   static bool getVar( const QDomDocument & doc, std::list<std::string> & value, const char * name );
 
 /// Check current key matching password sequence.
    static bool checkKey( const char key);
@@ -68,9 +63,6 @@ public:
 /// Get versions:
    static inline int getAfanasyBuildVersion()         { return afanasy_build_version;  }
    static inline const std::string & getCGRUVersion() { return  cgru_version;          }
-
-/// Get Afanasy server QHostAddress.
-   static inline const QHostAddress * getAfServerQHostAddress()  { return qafserveraddress;}
 
    static inline const std::string & getHome()        { return home;          }
    static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
@@ -188,7 +180,7 @@ private:
    static void printUsage(); ///< Output command usage
    static void load();
    static bool getVars( const std::string & filename);
-   static bool init( bool solveServerAddress);
+   static bool init();
 
    static std::string afroot;          ///< Afanasy root directory.
    static std::string home;            ///< User home directory.
@@ -198,7 +190,6 @@ private:
    static std::string cgru_version;    ///< CGRU version, will be get from environment on applications startup
 
    static Address *address;             ///< Host address and port class. Point to local host adress.
-   static QHostAddress * qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
 
 /// Afanasy server computer name
 /** Try to get \c AF_SERVER_NAME environment variable at first.

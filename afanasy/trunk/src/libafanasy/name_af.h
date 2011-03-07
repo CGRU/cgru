@@ -7,9 +7,9 @@
 
 #include "../include/aftypes.h"
 
-class QRegExp;
-class QString;
-class QStringList;
+//class QRegExp;
+//class QString;
+//class QStringList;
 
 namespace af
 {
@@ -65,7 +65,7 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
-   const int stoi( const std::string str);
+   const int stoi( const std::string & str, bool & ok);
    const std::string itos( int integer);
    const std::string getenv( const char * name);
    const std::string state2str( int state);
@@ -79,15 +79,15 @@ namespace af
 
    void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
-   bool setRegExp( QRegExp & regexp, const std::string& str, const std::string& name);
+   bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
 
    int weigh( const std::string & str);
    int weigh( const std::list<std::string> & strlist);
-   int weigh( const QString & str);
-   int weigh( const QRegExp & regexp);
+//   int weigh( const QString & str);
+//   int weigh( const QRegExp & regexp);
 
 
    bool  init( uint32_t flags );

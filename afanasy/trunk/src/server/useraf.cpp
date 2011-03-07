@@ -240,10 +240,11 @@ bool UserAf::canRun( RenderAf *render)
 
 // check maximum hosts:
    if(( maxrunningtasks >= 0 ) && ( runningtasksnumber >= maxrunningtasks )) return false;
+
 // check hosts mask:
    if( false == checkHostsMask( render->getName())) return false;
 // check exclude hosts mask:
-   if( true == checkHostsMaskExclude( render->getName())) return false;
+//   if( false == checkHostsMaskExclude( render->getName())) return false;
 
    return true;
 }

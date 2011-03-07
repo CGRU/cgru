@@ -2,10 +2,10 @@
 
 #include <sys/stat.h>
 
-#include <QtCore/QRegExp>
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#include <QtCore/QDateTime>
+//#include <QtCore/QRegExp>
+//#include <QtCore/QString>
+//#include <QtCore/QStringList>
+//#include <QtCore/QDateTime>
 
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
@@ -22,6 +22,7 @@
 
 #include "environment.h"
 #include "farm.h"
+#include "regexp.h"
 
 af::Farm* ferma = NULL;
 
@@ -157,8 +158,9 @@ void af::printTime( time_t time_sec, const char * time_format)
    std::cout << time2str( time_sec, time_format);
 }
 
-bool af::setRegExp( QRegExp & regexp, const std::string & str, const std::string & name)
+bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
 {
+   /*
    QRegExp rx( QString::fromUtf8( str.c_str()));
    if( rx.isValid() == false )
    {
@@ -166,8 +168,14 @@ bool af::setRegExp( QRegExp & regexp, const std::string & str, const std::string
               name.c_str(), str.c_str(), rx.errorString().toUtf8().data());
       return false;
    }
-   regexp.setPattern( QString::fromUtf8( str.c_str()));
-   return true;
+   */
+   std::string errString;
+   if( regexp.setPattern( str, &errString)) return true;
+
+   if( errOutput ) *errOutput = std::string("REGEXP: '") + name + "': " + errString;
+   else AFERRAR("REGEXP: '%s': %s\n", name.c_str(), errString.c_str());
+
+   return false;
 }
 /*
 void af::filterFileName( QString & filename)
@@ -225,7 +233,7 @@ int af::weigh( const std::string & str)
 {
    return str.capacity();
 }
-
+/*
 int af::weigh( const QString & str)
 {
    return str.capacity();
@@ -235,7 +243,7 @@ int af::weigh( const QRegExp & regexp)
 {
    return regexp.pattern().capacity();
 }
-
+*/
 int af::weigh( const std::list<std::string> & strlist)
 {
    int w = 0;
@@ -368,8 +376,9 @@ bool af::pathMakeDir( const std::string & path, bool verbose)
    return true;
 }
 
-const int af::stoi( const std::string str)
+const int af::stoi( const std::string & str, bool & ok)
 {
+   ok = true;
    return atoi( str.c_str());
 }
 

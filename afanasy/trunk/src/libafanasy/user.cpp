@@ -3,7 +3,7 @@
 #include <stdio.h>
 #include <memory.h>
 
-#include <QtCore/QDateTime>
+//#include <QtCore/QDateTime>
 
 #include "msg.h"
 #include "address.h"
@@ -27,7 +27,7 @@ User::User( const std::string & username, const std::string & host):
 {
    name = username;
    priority = af::Environment::getPriority();
-   hostsmask.setPattern( QString::fromUtf8( af::Environment::getHostsMask().c_str()));
+   hostsmask.setPattern( af::Environment::getHostsMask());
 
    construct();
 }
@@ -52,8 +52,10 @@ void User::construct()
    runningtasksnumber = 0;
    time_online = 0;
 
-   hostsmask.setCaseSensitivity( Qt::CaseInsensitive);
-   hostsmask_exclude.setCaseSensitivity( Qt::CaseInsensitive);
+   hostsmask.setCaseInsensitive();
+
+   hostsmask_exclude.setCaseInsensitive();
+   hostsmask_exclude.setExclude();
 }
 
 User::~User()
@@ -79,8 +81,8 @@ void User::readwrite( Msg * msg)
    rw_int32_t ( numrunningjobs,        msg);
    rw_int32_t ( runningtasksnumber,    msg);
    rw_float   ( need,                  msg);
-   rw_QRegExp ( hostsmask,             msg);
-   rw_QRegExp ( hostsmask_exclude,     msg);
+   rw_RegExp  ( hostsmask,             msg);
+   rw_RegExp  ( hostsmask_exclude,     msg);
    rw_String  ( annotation,            msg);
 //   rw_String  ( customdata,            msg);
 }
@@ -101,8 +103,8 @@ int User::calcWeight() const
    int weight = Node::calcWeight();
    weight += sizeof(User) - sizeof( Node);
    weight += weigh(hostname);
-   weight += weigh(hostsmask);
-   weight += weigh(hostsmask_exclude);
+   weight += hostsmask.weigh();
+   weight += hostsmask_exclude.weigh();
    weight += weigh(annotation);
    return weight;
 }
@@ -117,8 +119,8 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       if( jobs_lifetime > 0 ) stream << "\n Jobs life time = " << af::time2strHMS( jobs_lifetime, true);
       stream << "\n Maximum Running Tasks Number = " << maxrunningtasks;
       stream << "\n Running Tasks Number = " << runningtasksnumber;
-      if( hasHostsMask())        stream << "\n Hosts Mask = \"" << hostsmask.pattern().toUtf8().data() << "\"";
-      if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"";
+      if( hasHostsMask())        stream << "\n Hosts Mask = \"" << hostsmask.getPattern() << "\"";
+      if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.getPattern() << "\"";
       stream << "\n Registration time = " << time2str( time_register);
       stream << "\n Online time = " << time2str( time_online);
       if( hostname.size() != 0) stream << "\n Last host = " << hostname;

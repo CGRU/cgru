@@ -26,10 +26,11 @@ MonitorWindow * pMONITOR;
 
 int main(int argc, char *argv[])
 {
+   uint32_t env_flags = af::Environment::NoFlags;
 #ifdef WINNT
-   af::Environment ENV( af::Environment::SolveServerAddress | af::Environment::Verbose, argc, argv);   // Verbose environment initialization
+   af::Environment ENV( env_flags | af::Environment::Verbose, argc, argv);   // Verbose environment initialization
 #else
-   af::Environment ENV( af::Environment::SolveServerAddress, argc, argv);  // Silent environment initialization
+   af::Environment ENV( env_flags, argc, argv);  // Silent environment initialization
 //
 // interrupt signal catch:
    struct sigaction actint;

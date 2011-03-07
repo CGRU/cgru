@@ -38,12 +38,20 @@ void Job::initDefaultValues()
 {
    blocksdata = NULL;
 
-   hostsmask.setCaseSensitivity( Qt::CaseInsensitive);
-   hostsmask_exclude.setCaseSensitivity( Qt::CaseInsensitive);
-   dependmask.setCaseSensitivity( Qt::CaseSensitive);
-   dependmask_global.setCaseSensitivity( Qt::CaseSensitive);
-   need_os.setCaseSensitivity( Qt::CaseInsensitive);
-   need_properties.setCaseSensitivity( Qt::CaseSensitive);
+   hostsmask.setCaseInsensitive();
+
+   hostsmask_exclude.setCaseInsensitive();
+   hostsmask_exclude.setExclude();
+
+   dependmask.setCaseSensitive();
+
+   dependmask_global.setCaseSensitive();
+
+   need_os.setCaseInsensitive();
+   need_os.setContain();
+
+   need_properties.setCaseSensitive();
+   need_os.setContain();
 }
 
 Job::~Job()
@@ -80,12 +88,12 @@ void Job::readwrite( Msg * msg)
    rw_String  ( description,        msg);
    rw_String  ( annotation,         msg);
 
-   rw_QRegExp ( hostsmask,          msg);
-   rw_QRegExp ( hostsmask_exclude,  msg);
-   rw_QRegExp ( dependmask,         msg);
-   rw_QRegExp ( dependmask_global,  msg);
-   rw_QRegExp ( need_os,            msg);
-   rw_QRegExp ( need_properties,    msg);
+   rw_RegExp  ( hostsmask,          msg);
+   rw_RegExp  ( hostsmask_exclude,  msg);
+   rw_RegExp  ( dependmask,         msg);
+   rw_RegExp  ( dependmask_global,  msg);
+   rw_RegExp  ( need_os,            msg);
+   rw_RegExp  ( need_properties,    msg);
 
    rw_blocks(  msg);
 //printf("Job::readwrite: END\n");
@@ -136,12 +144,12 @@ int Job::calcWeight() const
    weight += weigh( description);
    weight += weigh( username);
    weight += weigh( hostname);
-   weight += weigh( hostsmask);
-   weight += weigh( hostsmask_exclude);
-   weight += weigh( dependmask);
-   weight += weigh( dependmask_global);
-   weight += weigh( need_os);
-   weight += weigh( need_properties);
+   weight += hostsmask.weigh();
+   weight += hostsmask_exclude.weigh();
+   weight += dependmask.weigh();
+   weight += dependmask_global.weigh();
+   weight += need_os.weigh();
+   weight += need_properties.weigh();
    return weight;
 }
 
@@ -197,25 +205,16 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "\n Priority = " << int(priority);
    stream << "\n Maximum running tasks = " << maxrunningtasks;
    if( maxrunningtasks == -1 ) stream << " (no limit)";
-   stream << "\n Hosts mask: \"" << hostsmask.pattern().toUtf8().data() << "\"";
-   if( hostsmask.isEmpty())
-      stream << " (any host)";
-   if( false == hostsmask_exclude.isEmpty())
-      stream << "\n Exclude hosts mask: \"" << hostsmask_exclude.pattern().toUtf8().data() << "\"";
-   if( false == dependmask.isEmpty())
-      stream << "\n Depend mask = \"" << dependmask.pattern().toUtf8().data() << "\"";
-   if( false == dependmask_global.isEmpty())
-      stream << "\n Global depend mask = \"" << dependmask_global.pattern().toUtf8().data() << "\"";
-   if( time_wait )
-      stream << "\n Wait time = " << af::time2str( time_wait);
-   if( false == need_os.isEmpty())
-      stream << "\n Needed OS: \"" << need_os.pattern().toUtf8().data() << "\"";
-   if( false == need_properties.isEmpty())
-      stream << "\n Needed properties: \"" << need_properties.pattern().toUtf8().data() << "\"";
-   if( cmd_pre.size() )
-      stream << "\n Pre command:\n" << cmd_pre;
-   if( cmd_post.size() )
-      stream << "\n Post command:\n" << cmd_post;
+   stream << "\n Hosts mask: \"" << hostsmask.getPattern() << "\"";
+   if( hostsmask.empty()) stream << " (any host)";
+   if( hostsmask_exclude.notEmpty()) stream << "\n Exclude hosts mask: \"" << hostsmask_exclude.getPattern() << "\"";
+   if( dependmask.notEmpty()) stream << "\n Depend mask = \"" << dependmask.getPattern() << "\"";
+   if( dependmask_global.notEmpty()) stream << "\n Global depend mask = \"" << dependmask_global.getPattern() << "\"";
+   if( time_wait ) stream << "\n Wait time = " << af::time2str( time_wait);
+   if( need_os.notEmpty()) stream << "\n Needed OS: \"" << need_os.getPattern() << "\"";
+   if( need_properties.notEmpty()) stream << "\n Needed properties: \"" << need_properties.getPattern() << "\"";
+   if( cmd_pre.size()) stream << "\n Pre command:\n" << cmd_pre;
+   if( cmd_post.size()) stream << "\n Post command:\n" << cmd_post;
    if( description.size()) stream << "\n " << description;
 /*
    if( blocksdata != NULL)

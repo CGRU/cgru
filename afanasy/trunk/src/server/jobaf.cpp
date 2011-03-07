@@ -692,7 +692,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 // check hosts mask:
    if( false == checkHostsMask( render->getName())) return false;
 // check exclude hosts mask:
-   if( true == checkHostsMaskExclude( render->getName())) return false;
+   if( false == checkHostsMaskExclude( render->getName())) return false;
 // check needed os:
    if( false == checkNeedOS( render->getHost().os)) return false;
 // check needed properties:
@@ -973,7 +973,8 @@ af::TaskExec * JobAf::generateTask( int block, int task)
 
 const std::string JobAf::getErrorHostsListString() const
 {
-   std::string str;
+   std::string str("Job \"");
+   str += name + "\" error hosts:";
    for( int block = 0; block < blocksnum; block++) blocks[block]->getErrorHostsListString( str);
    return str;
 }
