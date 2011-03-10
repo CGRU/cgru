@@ -29,7 +29,7 @@ public:
    inline Af * getNode( unsigned pos)      { return pos < list.size() ? list[pos] : NULL;}
    inline std::vector<af::Af*> * getList() { return &list;        }   ///< Get nodes list.
 
-   void stdOut( bool full = false) const; ///< Call af::Node::stdOut( \c full ) of every node.
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 protected:
    af::Af* newNode( Msg * msg );

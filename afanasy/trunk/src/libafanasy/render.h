@@ -20,7 +20,7 @@ public:
    Render( int Id);
 
 /// Read Render data from message.
-   Render( Msg * msg, const af::Address * addr = NULL );
+   Render( Msg * msg);
 
    virtual ~Render();
 

@@ -14,6 +14,9 @@ namespace afqt
 /// Connect to Afanasy server.
    bool connectAfanasy( QTcpSocket * qSocket);
 
+/// Construct QHostAddress from af::Address.
+   const QHostAddress toQAddress( const af::Address & address);
+
 /// Connect to some adress.
    bool connect( const af::Address * address, QTcpSocket * qSocket);
 

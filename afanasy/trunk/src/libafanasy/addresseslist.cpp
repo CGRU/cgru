@@ -38,25 +38,23 @@ void AddressesList::readwrite( Msg * msg)
    }
 }
 
-bool AddressesList::addAddress( const Address * address )
+bool AddressesList::addAddress( const Address & address )
 {
    for( std::list<Address*>::const_iterator it = addresses.begin(); it != addresses.end(); it++)
-      if( address->equal( *it)) return false;
+      if( address.equal(*(*it))) return false;
 
    addresses.push_back( new Address( address));
 
    return true;
 }
 
-bool AddressesList::removeAddress( const Address * address)
+bool AddressesList::removeAddress( const Address & address)
 {
-   if( address == NULL) return false;
-
    for( std::list<Address*>::iterator it = addresses.begin(); it != addresses.end(); it++)
    {
-      if( address->equal( *it))
+      if( address.equal(*(*it)))
       {
-         addresses.remove( *it);
+         addresses.remove(*it);
          return true;
       }
    }

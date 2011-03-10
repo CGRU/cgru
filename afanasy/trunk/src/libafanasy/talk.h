@@ -15,7 +15,7 @@ public:
    Talk();
 
 /// Construct Talk data from buffer.
-   Talk( Msg * msg, const af::Address * addr = NULL);
+   Talk( Msg * msg);
 
    virtual ~Talk();
 

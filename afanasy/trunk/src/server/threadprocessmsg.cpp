@@ -69,19 +69,11 @@ void ThreadReadMsg::run() {}
 
 bool ThreadReadMsg::process( const struct T_processClient__args* theadArgs)
 {
-//   theadArgs->printAddress();
-/*
-   af::Address * addr = new af::Address( &(theadArgs->ss));
-   printf("Address = '");
-   addr->stdOut();
-   printf("'\n");
-   delete addr;
-*/
    int client_sd = theadArgs->sd;
    AFINFO( "ThreadReadMsg::msgProcess: trying to recieve message...\n");
-   MsgAf* msg_request = new MsgAf;
+   MsgAf* msg_request = new MsgAf( theadArgs->ss);
 
-   msg_request->setAddress( new af::Address( &(theadArgs->ss)));
+//   msg_request->setAddress( new af::Address( &(theadArgs->ss)));
 
    //
    // set socket maximum time to wait for an input operation to complete
@@ -109,11 +101,14 @@ bool ThreadReadMsg::process( const struct T_processClient__args* theadArgs)
    //
    // proseccing message from client socket
    AFINFO( "ThreadReadMsg::msgProcess: message recieved.\n");
-#ifdef _DEBUG
-   msg_request->stdOut();
+#ifdef AFOUTPUT
+printf("Request: ");msg_request->stdOut();
 #endif
    MsgAf *msg_response = msgCase( msg_request);
    if( msg_response == NULL) return true;
+#ifdef AFOUTPUT
+printf("Response: ");msg_response->stdOut();
+#endif
    //
    // set socket maximum time to wait for an output operation to complete
    if( setsockopt( client_sd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)

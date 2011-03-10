@@ -39,8 +39,7 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    setWindowTitle( taskname);
    taskname += " %1:";
 
-   af::MCListenAddress mclass( af::MCListenAddress::TOLISTEN | af::MCListenAddress::JUSTTASK,
-      af::Environment::getAddress(), jobid, block, task);
+   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, Watch::getClientAddress(), jobid, block, task);
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
 }
 
@@ -50,8 +49,7 @@ WndListenTask::~WndListenTask()
 
 void WndListenTask::closeEvent( QCloseEvent * event)
 {
-   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK,
-      af::Environment::getAddress(), jobid, block, task);
+   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, Watch::getClientAddress(), jobid, block, task);
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
    Wnd::closeEvent( event);
 }

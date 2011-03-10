@@ -17,15 +17,14 @@ Monitor::Monitor():
    Client( Client::GetEnvironment, 0)
 {
    construct();
-   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address->generatePortString().c_str();
+   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address.generatePortString().c_str();
 }
 
-Monitor::Monitor( Msg * msg, const Address * addr):
+Monitor::Monitor( Msg * msg):
    Client( Client::DoNotGetAnyValues, 0)
 {
    if( construct() == false) return;
    read( msg);
-   if( addr != NULL) address->setIP( addr);
 }
 
 bool Monitor::construct()
@@ -61,8 +60,7 @@ void Monitor::readwrite( Msg * msg)
    rw_Int32_List( jobsUsersIds, msg);
    rw_Int32_List( jobsIds,      msg);
 
-   if( msg->isWriting() ) address->write( msg);
-   else address = new Address( msg);
+   address.readwrite( msg);
 }
 
 bool Monitor::hasEvent( int type) const
@@ -83,7 +81,7 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << name << "[" << id << "]";
    stream << " (" << version << " r" << revision << ") ";
-   address->generateInfoStream( stream);
+   address.generateInfoStream( stream);
 
    if( full == false ) return;
 

@@ -6,7 +6,7 @@ class MonitorAf: public af::Monitor
 {
 public:
 
-   MonitorAf( af::Msg * msg, const af::Address * addr = NULL);
+   MonitorAf( af::Msg * msg);
 
    ~MonitorAf();
 

@@ -16,13 +16,13 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   bool addAddress( const Address * address );
+   bool addAddress( const Address & address );
 
    inline size_t getAddressesNum() const { return addresses.size(); }
 
    inline const std::list<Address*> * getAddresses() const { return &addresses;}
 
-   bool removeAddress( const Address * address);
+   bool removeAddress( const Address & address);
 
    int calcWeight() const;
    inline int getWeight() const { return weight;}

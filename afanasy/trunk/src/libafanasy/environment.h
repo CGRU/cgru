@@ -2,8 +2,9 @@
 
 #include "../include/aftypes.h"
 
-#include "name_af.h"
 #include "address.h"
+#include "name_af.h"
+#include "netif.h"
 
 class QDomDocument;
 class QDomElement;
@@ -88,7 +89,6 @@ public:
 
    static inline int            getServerPort()   { return serverport;      } ///< Get afanasy server port.
    static inline int            getClientPort()   { return clientport;      } ///< Get current client port.
-   static inline const Address* getAddress()      { return address;         } ///< Return address class pointer.
 
    static inline int    getPriority()               { return priority;         } ///< Get default host priority.
    static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
@@ -188,8 +188,6 @@ private:
 
    static int afanasy_build_version;   ///< Afanasy build sources version, will be compiled in binaries
    static std::string cgru_version;    ///< CGRU version, will be get from environment on applications startup
-
-   static Address *address;             ///< Host address and port class. Point to local host adress.
 
 /// Afanasy server computer name
 /** Try to get \c AF_SERVER_NAME environment variable at first.

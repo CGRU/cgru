@@ -15,13 +15,12 @@ Client::Client( int flags, int Id):
    time_launch( 0),
    time_register( 0),
    time_update( 0),
-   revision( 0),
-   address( NULL)
+   revision( 0)
 {
    id = Id;
    if( flags & GetEnvironment )
    {
-      address = new Address( af::Environment::getAddress());
+      address.setPort( af::Environment::getClientPort());
       time_launch = time(NULL);
       username = af::Environment::getUserName();
       name = af::Environment::getHostName();
@@ -32,7 +31,7 @@ Client::Client( int flags, int Id):
 
 Client::~Client()
 {
-   if( address != NULL ) delete address;
+   for( int i = 0; i < netIFs.size(); i++) if( netIFs[i]) delete netIFs[i];
 }
 
 void Client::setRegisterTime()
@@ -48,7 +47,8 @@ int Client::calcWeight() const
    weight += sizeof(Client) - sizeof( Node);
    weight += weigh( username);
    weight += weigh( version );
-   if( address != NULL) weight += address->calcWeight();
+   weight += address.calcWeight();
+   for( int i = 0; i < netIFs.size(); i++) weight += netIFs[i]->weigh();
 //printf("Client::calcWeight: %d bytes ( sizeof Client = %d)\n", weight, sizeof( Client));
    return weight;
 }

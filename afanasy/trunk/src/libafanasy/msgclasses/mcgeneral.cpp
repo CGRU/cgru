@@ -79,16 +79,15 @@ bool MCGeneral::hasId( int value)
    return false;
 }
 
-void MCGeneral::stdOut( bool full) const
+void MCGeneral::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::stdOut( false);
+   MsgClassUserHost::generateInfoStream( stream, false);
 
-   printf("\nName = \"%s\", Id = %d, String = \"%s\", Number = %d.\n", name.c_str(), id, string.c_str(), number);
+   stream << "\nName = \"" << name << "\"" << ", Id = " << id << ", String = \"" << string << "\"" << ", Number = " << number;
 
    if( full == false ) return;
 
    int count = int(list.size());
-   printf("ids[%d]=", count);
-   for( unsigned p = 0; p < count; p++) printf(" %d", list[p]);
-   printf(".\n");
+   stream << "\n   ids[" << count << "]=";
+   for( unsigned p = 0; p < count; p++) stream << " " << list[p];
 }

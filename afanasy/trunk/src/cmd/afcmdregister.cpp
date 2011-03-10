@@ -10,6 +10,7 @@
 
 #include "cmd_string.h"
 #include "cmd_path.h"
+#include "cmd_network.h"
 #include "cmd_numeric.h"
 #include "cmd_passwd.h"
 #include "cmd_parse.h"
@@ -82,6 +83,7 @@ void AfCmd::RegisterCommands()
 
    addCmd( new CmdString);
    addCmd( new CmdPath);
+   addCmd( new CmdNetwork);
    addCmd( new CmdNumeric);
    addCmd( new CmdPasswd);
    addCmd( new CmdParse);

@@ -17,7 +17,7 @@ class RenderAf: public afsql::DBRender
 {
 public:
 /// Construct Render from message and provided address.
-   RenderAf( af::Msg * msg, const af::Address * addr = NULL);
+   RenderAf( af::Msg * msg);
    ~RenderAf();
 
 /// Construct offline render for database.

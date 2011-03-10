@@ -35,7 +35,7 @@ void MCTaskPos::readwrite( Msg * msg)
    rw_int32_t( number,   msg);
 }
 
-void MCTaskPos::stdOut(bool full) const
+void MCTaskPos::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("Job id = %d, numblock = %d, numtask = %d:\n", jobid, blocknum, tasknum);
+   stream << "Job id = " << jobid << ", numblock = " << blocknum << ", numtask = " << tasknum;
 }

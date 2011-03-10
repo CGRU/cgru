@@ -31,7 +31,7 @@ void MCTalkmessage::readwrite( Msg * msg)
    rw_String( text, msg);
 }
 
-void MCTalkmessage::stdOut( bool full) const
+void MCTalkmessage::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("%s: %s\n", user.c_str(), text.c_str());
+   stream << user << ": " << text;
 }

@@ -49,10 +49,10 @@ void MCJobsWeight::readwrite( Msg * msg)
    rw_Int32_Vect( weight,          msg);
 }
 
-void MCJobsWeight::stdOut( bool full) const
+void MCJobsWeight::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("Jobs memory: ");
-   if( full ) printf("\n");
+   stream << "Jobs memory: ";
+   if( full ) stream << std::endl;
 
    int weightLogTotal = 0;
    int weightBlackTotal = 0;
@@ -65,9 +65,15 @@ void MCJobsWeight::stdOut( bool full) const
       weightProgressTotal  += weightProgress[j];
       weightTotal          += weight[j];
       if( full )
-         printf( "%d-%d: \tlog=%.3g \tblack=%.3g \tprogress=%.3g \t : %.3g kB\t - %s\n",
-                 j+1, ids[j], float(weightLog[j])/1024, float(weightBlack[j])/1024, float(weightProgress[j])/1024, float(weight[j])/1024, names[j].c_str());
+         stream << "\n" << j+1 << ids[j]
+               << ": \tlog=" << float(weightLog[j])/1024
+               << " \tblack=" << float(weightBlack[j])/1024
+               << " \tprogress=" << float(weightProgress[j])/1024
+               << " \t : " << float(weight[j])/1024 << " kB"
+               << " \t - " << names[j];
    }
-   printf("Logs = %.3g, Black Lists = %.3g, Tasks Progress = %.3g, Total Jobs Weight = %.3g MB\n",
-           float(weightLogTotal)/(1024*1024), float(weightBlackTotal)/(1024*1024), float(weightProgressTotal)/(1024*1024), float(weightTotal)/(1024*1024));
+   stream << "\nLogs = " << float(weightLogTotal)/(1024*1024)
+         << ", Black Lists = " << float(weightBlackTotal)/(1024*1024)
+         << ", Tasks Progress = " << float(weightProgressTotal)/(1024*1024)
+         << ", Total Jobs Weight = " << float(weightTotal)/(1024*1024) << " MB";
 }

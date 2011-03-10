@@ -2,11 +2,6 @@
 
 #include <sys/stat.h>
 
-//#include <QtCore/QRegExp>
-//#include <QtCore/QString>
-//#include <QtCore/QStringList>
-//#include <QtCore/QDateTime>
-
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 
@@ -135,11 +130,6 @@ const std::string af::time2strHMS( int time32, bool clamp)
       str += buffer;
    }
 
-//   if( clamp == false)  return QString("%1:%2.%3").arg( hours  ).arg( minutes, 2, 10, z).arg( seconds, 2, 10, z);
-//   if(hours && minutes) return QString("%1:%2"   ).arg( hours  ).arg( minutes, 2, 10, z);
-//   if( minutes )        return QString("%1.%2"   ).arg( minutes).arg( seconds, 2, 10, z);
-//   else                 return QString("%1"      ).arg( seconds);
-
    return str;
 }
 
@@ -160,15 +150,6 @@ void af::printTime( time_t time_sec, const char * time_format)
 
 bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
 {
-   /*
-   QRegExp rx( QString::fromUtf8( str.c_str()));
-   if( rx.isValid() == false )
-   {
-      AFERRAR("af::setRegExp: Setting '%s' to '%s' Invalid pattern: %s\n",
-              name.c_str(), str.c_str(), rx.errorString().toUtf8().data());
-      return false;
-   }
-   */
    std::string errString;
    if( regexp.setPattern( str, &errString)) return true;
 
@@ -177,19 +158,7 @@ bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string 
 
    return false;
 }
-/*
-void af::filterFileName( QString & filename)
-{
-   static const char InvalidCharacters[] = "\"\\ /|!$&?()[]{}*^`',:;";
-   static const char ReplaceCharacter = '_';
-   static const char InvCharsLength = strlen( InvalidCharacters);
 
-   for( int c = 0; c < AFGENERAL::FILENAME_INVALIDCHARACTERSLENGTH; c++)
-      filename.replace( AFGENERAL::FILENAME_INVALIDCHARACTERS[c], AFGENERAL::FILENAME_INVALIDCHARACTERREPLACE);
-
-   if( filename.size() > af::Environment::getFileNameSizeMax()) filename.resize( af::Environment::getFileNameSizeMax());
-}
-*/
 void af::rw_int32( int32_t& integer, char * data, bool write)
 {
    int32_t bytes;
@@ -233,17 +202,7 @@ int af::weigh( const std::string & str)
 {
    return str.capacity();
 }
-/*
-int af::weigh( const QString & str)
-{
-   return str.capacity();
-}
 
-int af::weigh( const QRegExp & regexp)
-{
-   return regexp.pattern().capacity();
-}
-*/
 int af::weigh( const std::list<std::string> & strlist)
 {
    int w = 0;

@@ -19,16 +19,10 @@
 
 RenderContainer * RenderAf::renders = NULL;
 
-RenderAf::RenderAf( af::Msg * msg, const af::Address * addr):
-   DBRender( msg, addr)
+RenderAf::RenderAf( af::Msg * msg):
+   DBRender( msg)
 {
    init();
-   if((msg->type() == af::Msg::TRenderRegister) && (addr == NULL))
-   {
-      AFERROR("RenderAf::RenderAf: addr==NULL on register.\n");
-      appendLog("Invalid Registation: Address is NULL.");
-      return;
-   }
 }
 
 RenderAf::RenderAf( int Id):
@@ -85,8 +79,8 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    }
 
-   if( address) delete address;
-   address = NULL;
+//   if( address) delete address;
+//   address = NULL;
 }
 
 bool RenderAf::update( const af::Render * render)
@@ -111,8 +105,8 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
       AFERROR("RenderAf::online: Render is already online.\n");
       return false;
    }
-   if( address) delete address;
-   address = new af::Address( render->getAddress());
+//   if( address) delete address;
+   address.copy( render->getAddress());
    time_launch = render->time_launch;
    revision = render->revision;
    version = render->version;

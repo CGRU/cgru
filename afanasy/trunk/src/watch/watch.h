@@ -72,6 +72,7 @@ public:
    static void listenTask( int jobid, int block, int task, const QString & name);
 
    inline static Dialog * getDialog()  { return d;}
+   static const af::Address & getClientAddress();
    static void keyPressEvent( QKeyEvent * event);
 
    static void   subscribe( const QList<int> & events);

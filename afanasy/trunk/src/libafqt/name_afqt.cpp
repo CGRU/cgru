@@ -48,9 +48,10 @@ bool afqt::connect( const af::Address * address, QTcpSocket * qSocket)
 {
    if( qSocket->state() != QAbstractSocket::ConnectedState)
    {
-      QHostAddress addr;
-      address->setQAddress( addr);
-      qSocket->connectToHost( addr, address->getPortHBO());
+//      QHostAddress addr;
+//      address->setQAddress( addr);
+//      qSocket->connectToHost( addr, address->getPortHBO());
+      qSocket->connectToHost( afqt::toQAddress( address), address->getPortHBO());
       if( qSocket->waitForConnected( WAITFORCONNECTED) == false)
       {
          AFERROR("qtnet::connect: Can't connect to address ");
@@ -63,6 +64,26 @@ bool afqt::connect( const af::Address * address, QTcpSocket * qSocket)
       AFERROR("qtcom::connect: Socket seems to be already connected.\n");
    }
    return true;
+}
+
+const QHostAddress afqt::toQAddress( const af::Address & address)
+{
+   QHostAddress qaddr;
+   switch( address.getFamily())
+   {
+      case af::Address::IPv4:
+      {
+         quint32 ipv4;
+         memcpy( &ipv4, address.getAddrData(), 4);
+         qaddr.setAddress( ipv4);
+      }
+      case af::Address::IPv6:
+         qaddr.setAddress( (quint8*)(address.getAddrData()));
+         break;
+      default:
+         AFERROR("Address::setQAddress: Unknown address family.\n");
+   }
+   return qaddr;
 }
 
 bool afqt::sendMessage( QTcpSocket * qSocket, const af::Msg * msg)

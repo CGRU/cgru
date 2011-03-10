@@ -94,6 +94,8 @@ bool Watch::isConnected()   { if(d) return d->isConnected();   else return false
 int  Watch::getUid()        { if(d) return d->getUid();        else return 0;      }
 int  Watch::getId()         { if(m) return m->getId();         else return 0;      }
 
+const af::Address & Watch::getClientAddress() { return m->getAddress();}
+
 void Watch::subscribe(   const QList<int> & events) { if(m) m->  subscribe( events );}
 void Watch::unsubscribe( const QList<int> & events) { if(m) m->unsubscribe( events );}
 void Watch::addJobId( int jId ) { if(m) m->addJobId( jId );}

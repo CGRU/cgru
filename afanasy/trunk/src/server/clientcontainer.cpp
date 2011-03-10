@@ -3,10 +3,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../libafanasy/address.h"
+
+#include "afcommon.h"
 #include "msgaf.h"
 #include "monitorcontainer.h"
-
-#include "../libafanasy/address.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -45,9 +46,7 @@ int ClientContainer::addClient( af::Client *newClient, bool deleteSameAddress, M
             }
             else
             {
-               AFERROR("ClientContainer::addClient: Client with this address already exists: ");
-               newClient->getAddress()->stdOut();
-               printf( "\n");
+               AFCommon::QueueLogError( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
                delete newClient;
                return 0;
             }

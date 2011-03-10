@@ -25,12 +25,11 @@ Render::Render( int Id):
    construct();
 }
 
-Render::Render( Msg * msg, const af::Address * addr):
+Render::Render( Msg * msg):
    Client( Client::DoNotGetAnyValues, 0)
 {
    construct();
    read( msg);
-   if((addr != NULL) && (address != NULL)) address->setIP( addr);
 }
 
 void Render::construct()
@@ -83,7 +82,8 @@ void Render::readwrite( Msg * msg)
       host.readwrite( msg);
       if( isOnline())
       {
-         if( msg->isWriting())
+         address.readwrite( msg);
+/*         if( msg->isWriting())
          {
             if( address != NULL ) address->write( msg);
             else
@@ -93,7 +93,7 @@ void Render::readwrite( Msg * msg)
          {
             if( address ) delete address;
             address = new Address( msg);
-         }
+         }*/
       }
 
    case Msg::TRenderUpdate:
@@ -218,8 +218,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "#" << id << ": " << name << "@" << username;
       stream << " (" << version << " r" << revision << ")";
       stream << " :: ";
-      if( address == NULL) stream << "address == NULL";
-      else address->generateInfoStream( stream ,full);
+      address.generateInfoStream( stream ,full);
       stream << " - " << calcWeight() << " bytes.";
 
       stream << std::endl;
@@ -237,8 +236,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    {
       stream << name << "@" << username << "[" << id << "]";
       stream << " (" << version << " r" << revision << ") ";
-      if( address == NULL) stream << "address == NULL";
-      else address->generateInfoStream( stream ,full);
+      address.generateInfoStream( stream ,full);
 //      stream << " - " << calcWeight() << " bytes.";
    }
 }

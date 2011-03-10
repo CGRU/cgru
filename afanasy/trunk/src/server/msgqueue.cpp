@@ -33,33 +33,38 @@ void MsgQueue::processItem( AfQueueItem* item) const
 {
    MsgAf * msg = (MsgAf*)item;
 
-   const af::Address *address = msg->getAddress();
-   if( address != NULL) send( msg, address);
+   if( false == msg->addressIsEmpty()) send( msg, msg->getAddress());
 
-   const std::list<af::Address*> * addresses = msg->getAddresses();
+   const std::list<af::Address> * addresses = msg->getAddresses();
    if( addresses->size() < 1 ) return;
 
-   std::list<af::Address*>::const_iterator it = addresses->begin();
-   std::list<af::Address*>::const_iterator it_end = addresses->end();
+   std::list<af::Address>::const_iterator it = addresses->begin();
+   std::list<af::Address>::const_iterator it_end = addresses->end();
    while( it != it_end)
    {
-      if( *it != NULL ) send( msg, *it);
+      send( msg, *it);
       it++;
    }
 }
 
-void MsgQueue::send( const MsgAf * msg, const af::Address * address) const
+void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
 {
+   if( address.isEmpty() )
+   {
+      AFERROR("MsgQueue::send: Address is empty.\n")
+      return;
+   }
+
 //printf("MsgQueue::send:\n"); msg->stdOut();
    int socketfd;
    struct sockaddr_storage client_addr;
 
-   address->setSocketAddress( &client_addr);
+   if( false == address.setSocketAddress( client_addr)) return;
 
    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
    {
       AFERRPE("MsgQueue::processItem: socket");
-      address->stdOut(); printf("\n");
+      address.stdOut(); printf("\n");
       return;
    }
 
@@ -71,7 +76,7 @@ void MsgQueue::send( const MsgAf * msg, const af::Address * address) const
    if( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
    {
       AFERRPE("MsgQueue::processItem: connect");
-      address->stdOut(); printf("\n");
+      address.stdOut(); printf("\n");
       close(socketfd);
       alarm(0);
       return;
@@ -85,7 +90,7 @@ void MsgQueue::send( const MsgAf * msg, const af::Address * address) const
    if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
    {
       AFERRPE("MsgQueue::processItem: set socket SO_SNDTIMEO option failed");
-      address->stdOut(); printf("\n");
+      address.stdOut(); printf("\n");
       close(socketfd);
       return;
    }
@@ -94,7 +99,7 @@ void MsgQueue::send( const MsgAf * msg, const af::Address * address) const
    if( false == com::msgsend( socketfd, msg))
    {
       AFERROR("MsgQueue::processItem: can't send message to client.\n");
-      address->stdOut(); printf("\n");
+      address.stdOut(); printf("\n");
    }
 
    close(socketfd);

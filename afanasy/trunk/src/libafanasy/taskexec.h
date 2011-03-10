@@ -8,8 +8,6 @@
 #include "render.h"
 #include "msgclasses/mctaskup.h"
 
-#include <QtCore/QString>
-
 namespace af
 {
 /// Afanasy job task.
@@ -130,8 +128,8 @@ public:
       UPLAST
    };
 
-   inline bool         addListenAddress( const Address * address) { return listen_addresses->addAddress( address);     }
-   inline bool      removeListenAddress( const Address * address) { return listen_addresses->removeAddress( address);  }
+   inline bool         addListenAddress( const Address & address) { return listen_addresses->addAddress( address);     }
+   inline bool      removeListenAddress( const Address & address) { return listen_addresses->removeAddress( address);  }
    inline size_t getListenAddressesNum() const { return listen_addresses->getAddressesNum();              }
    inline const std::list<Address*> * getListenAddresses() const { return listen_addresses->getAddresses();       }
 
@@ -183,7 +181,7 @@ private:
 
    uint32_t time_start;
 
-   AddressesList * listen_addresses;     ///> Addresses to send task output to.
+   AddressesList * listen_addresses;     ///< Addresses to send task output to.
 
 private:
    bool onClient;

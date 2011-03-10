@@ -57,15 +57,15 @@ int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTE
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
 int     Environment::render_log_linesmax =             AFRENDER::LOG_LINESMAX;
-std::string Environment::render_exec =                     AFRENDER::EXEC;
-std::string Environment::render_cmd_reboot =               AFRENDER::CMD_REBOOT;
-std::string Environment::render_cmd_shutdown =             AFRENDER::CMD_SHUTDOWN;
-std::string Environment::render_networkif =                AFRENDER::NETWORK_IF;
-std::string Environment::render_hddspace_path =            AFRENDER::HDDSPACE_PATH;
-std::string Environment::render_iostat_device =            AFRENDER::IOSTAT_DEVICE;
+std::string Environment::render_exec =                 AFRENDER::EXEC;
+std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
+std::string Environment::render_cmd_shutdown =         AFRENDER::CMD_SHUTDOWN;
+std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
+std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
+std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
 
-std::string Environment::pswd_visor =                      AFUSER::PSWD_VISOR;
-std::string Environment::pswd_god =                        AFUSER::PSWD_GOD;
+std::string Environment::pswd_visor =                  AFUSER::PSWD_VISOR;
+std::string Environment::pswd_god =                    AFUSER::PSWD_GOD;
 int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIME;
 int     Environment::errors_avoid_host =               AFUSER::ERRORS_AVOID_HOST;
 int     Environment::task_error_retries =              AFUSER::TASK_ERROR_RETRIES;
@@ -132,8 +132,7 @@ bool Environment::valid       = false;
 bool Environment::verbose     = false;
 bool Environment::visor_mode  = false;
 
-Address  * Environment::address = NULL;
-Passwd   * Environment::passwd = NULL;
+Passwd * Environment::passwd = NULL;
 
 std::list<std::string> Environment::cmdarguments;
 std::list<std::string> Environment::cmdarguments_usagearg;
@@ -370,10 +369,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    if( afroot.size() == 0 )
    {
       afroot = argv[0];
-//#ifndef WINNT
-//      std::string link = QFile::symLinkTarget( exec);
-//      if( link.isEmpty() == false ) exec = link;
-//#endif
       afroot = af::pathAbsolute( afroot);
       afroot = af::pathUp( afroot);
       afroot = af::pathUp( afroot);
@@ -413,7 +408,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    PRINT("User home directory = '%s'\n", home.c_str());
    home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy" + AFGENERAL::PATH_SEPARATOR;
    PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
-//   if( dir.mkpath( home_afanasy.c_str()) == false)
    if( af::pathMakeDir( home_afanasy, true) == false)
    {
       AFERRAR("Can't make home directory '%s'\n", home_afanasy.c_str());
@@ -479,7 +473,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 Environment::~Environment()
 {
-   if( address != NULL) delete address;
    if( passwd != NULL) delete passwd;
    printUsage();
 }
@@ -518,7 +511,6 @@ bool Environment::reload()
 bool Environment::setClientPort( uint16_t port)
 {
    clientport = port;
-   address->setPort( port);
    return true;
 }
 
@@ -526,64 +518,11 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 
 bool Environment::init()
 {
-   /*
-//
-//############ Afansy server QHostAddress:
-   if( solveServerAddress)
-   {
-      static std::string serveraddrnum_arg("-srvaddrnum");
-      addUsage( serveraddrnum_arg + " [number]", "Use specified server address number.");
-      QHostInfo qhostinfo = QHostInfo::fromName( QString::fromUtf8( servername.c_str()));
-      QList<QHostAddress> adresses = qhostinfo.addresses();
-      // Try direct IP literals, if no addresses solved
-      if( adresses.size() < 1 ) adresses << QHostAddress ( QString::fromUtf8( servername.c_str()));
-      if( adresses.size() > 1 )
-      {
-         printf( "Solved several server addresses:\n");
-         for( int i = 0; i < adresses.size(); i++) printf( "%s\n", adresses[i].toString().toUtf8().data());
-      }
-
-      // Use the first IP address, if no address number not provided
-      int serveraddrnum = -1;
-
-      std::string serveraddrnum_str;
-      if( getArgument( serveraddrnum_arg, serveraddrnum_str))
-      {
-         if( false == serveraddrnum_str.empty())
-         {
-            int number = atoi(serveraddrnum_str.c_str());
-            if( number >= adresses.size())
-            {
-               AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
-               number = adresses.size() - 1;
-            }
-            serveraddrnum = number;
-         }
-         else
-         {
-            AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.c_str());
-         }
-      }
-
-      if( serveraddrnum == -1 )
-      {
-         serveraddrnum = 0;
-         if( adresses.size() > 1 )
-            printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.c_str());
-      }
-
-      if( qafserveraddress != NULL ) delete qafserveraddress;
-      qafserveraddress = new QHostAddress( adresses[serveraddrnum]);
-      printf( "Server address = '%s:%u'\n", qafserveraddress->toString().toUtf8().data(), serverport);
-   }
-*/
-//
 //############ Local host name:
 //   computername = QHostInfo::localHostName().toLower().toUtf8().data();
    {
-      static const int buflen = 256;
-      static char buffer[buflen];
-      if( gethostname( buffer, buflen) != 0 )
+      static char buffer[256];
+      if( gethostname( buffer, sizeof(buffer)) != 0 )
       {
          AFERRPE("Can't get local host name.\n")
          return false;
@@ -594,12 +533,7 @@ bool Environment::init()
    std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
    std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
    PRINT("Local computer name = '%s', adress = ", computername.c_str());
-//
-//############ Local host address:
-   if (address != NULL) delete address;
-   address = new Address( clientport);
-   if( verbose ) address->stdOut();
-   PRINT("\n");
+
 #ifndef WINNT
    tasksstdoutdir = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
@@ -638,7 +572,7 @@ void Environment::initCommandArguments( int argc, char** argv)
          )
       {
          help_mode = true;
-         addUsage("-h --help", "Display this help.");
+//         addUsage("-h --help", "Display this help.");
       }
    }
 }
@@ -671,10 +605,9 @@ void Environment::printUsage()
    if( false == help_mode ) return;
    if( cmdarguments_usagearg.empty() ) return;
    printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
-//   for( int i = 0; i < cmdarguments_usagearg.size(); i++)
-   std::list<std::string>::const_iterator aIt = cmdarguments.begin();
-   std::list<std::string>::const_iterator hIt = cmdarguments.begin();
-   for( ; aIt != cmdarguments.end(); aIt++, hIt++)
+   std::list<std::string>::const_iterator aIt = cmdarguments_usagearg.begin();
+   std::list<std::string>::const_iterator hIt = cmdarguments_usagehelp.begin();
+   for( ; aIt != cmdarguments_usagearg.end(); aIt++, hIt++)
    {
       printf("   %s:\n      %s\n",
              (*aIt).c_str(),

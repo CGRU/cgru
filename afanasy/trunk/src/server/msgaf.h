@@ -13,30 +13,35 @@ class MsgAf: public af::Msg, public AfQueueItem
 {
 public:
 
-/// Constructor.
+/// Construct an empty or non data message
    MsgAf( int msgType = 0, int msgInt = 0);
 
-/// Constructor.
+/// Construct a message from class
    MsgAf( int msgType, af::Af * afClass );
+
+/// Construct a message and set an address
+   MsgAf( const struct sockaddr_storage & ss);
 
    ~MsgAf();
 
+   inline bool addressIsEmpty() const { return address.isEmpty();}
+
 /// Set message address to \c client .
    inline void setAddress( const af::Client* client)
-      { if(address) delete address; const af::Address *addr = client->getAddress(); if(addr) address = new af::Address(addr); else address = NULL;}
+      { address = client->getAddress();}
 
 /// Add dispatch address.
    inline void addAddress( const af::Client* client)
-      { const af::Address *addr = client->getAddress(); if( addr) addresses.push_back( new af::Address( addr));}
+      { addresses.push_back( client->getAddress());}
 
-/// Set new address to message.
-   inline void setAddress( af::Address* newAddress) { address = newAddress;}
+//// Set address to message, used to get address from socket.
+//   inline void setAddress( af::Address* newAddress) { if( address ) delete address; address = newAddress;}
 
 /// Get address constant pointer.
-   inline const af::Address* getAddress() const { return address;}
+   inline const af::Address & getAddress() const { return address;}
 
 /// Get addresses constant list pointer.
-   inline const std::list<af::Address*> * getAddresses() const { return &addresses;}
+   inline const std::list<af::Address> * getAddresses() const { return &addresses;}
 
 /// Set message to it's address, it stores in msgDispatchQueue, waiting for special thread.
    void dispatch();
@@ -45,7 +50,7 @@ public:
    bool request( MsgAf *answer);
 
 private:
-   af::Address *address;               ///< Address, where message came from or will be send.
+   af::Address address;               ///< Address, where message came from or will be send.
 
-   std::list<af::Address*> addresses;
+   std::list<af::Address> addresses;
 };

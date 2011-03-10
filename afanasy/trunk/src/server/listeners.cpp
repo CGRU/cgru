@@ -15,7 +15,7 @@ Listeners::~Listeners()
 bool Listeners::process( af::MCListenAddress & mclass)
 {
    bool listen = mclass.toListen();
-   const af::Address * address = mclass.getAddress();
+   const af::Address * address = & mclass.getAddress();
    if( mclass.justTask())
    {
       int block = mclass.getNumBlock();

@@ -46,7 +46,7 @@ public:
    inline int getDataLen()       const { return datalen;       }
    inline char * getData()       const { return data;          }
 
-   void stdOut( bool full = false ) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 private:
    int32_t clientid;

@@ -13,7 +13,7 @@ public:
 
    virtual ~MsgClassUserHost();
 
-   void stdOut( bool full = false) const;
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline const std::string & getUserName() const { return username; }
    inline const std::string & getHostName() const { return hostname; }

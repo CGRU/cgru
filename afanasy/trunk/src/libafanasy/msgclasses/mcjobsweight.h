@@ -26,7 +26,7 @@ public:
          int WeightProgress,
          int Weight);
 
-   void stdOut( bool full = false) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline size_t getCount()                        const { return ids.size(); }
    inline int getId(                 unsigned pos) const { if(pos<ids.size())return ids[pos];            else return -1; }

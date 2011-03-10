@@ -8,7 +8,7 @@ class TalkAf: public af::Talk
 {
 public:
 
-   TalkAf( af::Msg * msg, const af::Address * addr = NULL);
+   TalkAf( af::Msg * msg);
 
    ~TalkAf();
 

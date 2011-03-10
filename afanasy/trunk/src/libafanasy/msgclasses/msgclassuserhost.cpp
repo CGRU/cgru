@@ -24,9 +24,14 @@ void MsgClassUserHost::readwrite( Msg * msg)
    rw_String( hostname, msg);
 }
 
-void MsgClassUserHost::stdOut( bool full) const
+void MsgClassUserHost::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full )
-      printf("User = \"%s\", Host = \"%s\"\n", username.c_str(), hostname.c_str());
-   else                        printf("%s@%s", username.c_str(), hostname.c_str());
+   {
+      stream << "User = \"" << username << "\", Host = \"" << hostname << "\"";
+   }
+   else
+   {
+      stream << username << "@" << hostname;
+   }
 }

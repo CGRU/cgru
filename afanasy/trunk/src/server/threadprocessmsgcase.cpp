@@ -86,7 +86,9 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    {
       AfContainerLock lock( monitors, AfContainer::WRITELOCK);
 
-      msg_response = monitors->addMonitor( new MonitorAf( msg, msg->getAddress()));
+      MonitorAf * newMonitor = new MonitorAf( msg);
+      newMonitor->setAddressIP( msg->getAddress());
+      msg_response = monitors->addMonitor( newMonitor);
       break;
    }
    case af::Msg::TMonitorUpdateId:
@@ -119,7 +121,9 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       AfContainerLock tlock( talks,    AfContainer::WRITELOCK);
       AfContainerLock mlock( monitors, AfContainer::WRITELOCK);
 
-      msg_response = talks->addTalk( new TalkAf( msg, msg->getAddress()), monitors);
+      TalkAf * newTalk = new TalkAf( msg);
+      newTalk->setAddressIP( msg->getAddress());
+      msg_response = talks->addTalk( newTalk, monitors);
       break;
    }
    case af::Msg::TTalksListRequest:
@@ -160,7 +164,9 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       AfContainerLock rLock( renders,  AfContainer::WRITELOCK);
       AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
 
-      msg_response = renders->addRender( new RenderAf( msg, msg->getAddress()), monitors);
+      RenderAf * newRender = new RenderAf( msg);
+      newRender->setAddressIP( msg->getAddress());
+      msg_response = renders->addRender( newRender, monitors);
       break;
    }
    case af::Msg::TRenderUpdate:

@@ -32,7 +32,7 @@ void MCTalkdistmessage::readwrite( Msg * msg)
    rw_StringList( list, msg);
 }
 
-void MCTalkdistmessage::stdOut( bool full) const
+void MCTalkdistmessage::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   std::cout << user << ": " << text << std::endl;
+   stream << user << ": " << text;
 }

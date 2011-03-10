@@ -7,10 +7,6 @@
 
 #include "../include/aftypes.h"
 
-//class QRegExp;
-//class QString;
-//class QStringList;
-
 namespace af
 {
    class Attr;
@@ -21,6 +17,7 @@ namespace af
    class Environment;
 
    class RegExp;
+   class NetIF;
    class Address;
    class AddressesList;
    class Passwd;
@@ -86,8 +83,6 @@ namespace af
 
    int weigh( const std::string & str);
    int weigh( const std::list<std::string> & strlist);
-//   int weigh( const QString & str);
-//   int weigh( const QRegExp & regexp);
 
 
    bool  init( uint32_t flags );
@@ -103,8 +98,6 @@ namespace af
    bool  loadFarm( const std::string & filename, bool verbose = false);
    Farm * farm();
 
-//   void filterFileName( QString & filename);
-
    void pathFilterFileName( std::string & filename);
    void pathFilter( std::string & path);
    bool pathIsAbsolute( const std::string & path);
@@ -114,4 +107,6 @@ namespace af
    const std::string pathUp( const std::string & path);
    const std::string pathHome();
    bool pathMakeDir( const std::string & path, bool verbose = false);
+
+   void getMacAddr();
 }

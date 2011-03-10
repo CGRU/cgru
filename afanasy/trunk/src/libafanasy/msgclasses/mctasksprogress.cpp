@@ -62,11 +62,9 @@ void MCTasksProgress::add( int block, int task, TaskProgress * tp)
    blocks.push_back(    block    );
    tasks.push_back(     task     );
    tasksprogress.push_back(  tp  );
-
-//printf("MCTasksProgress::add (new): "); stdOut();
 }
 
-void MCTasksProgress::stdOut( bool full ) const
+void MCTasksProgress::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    int count = int( tasks.size());
 
@@ -75,10 +73,10 @@ void MCTasksProgress::stdOut( bool full ) const
 
    std::list<TaskProgress*>::const_iterator trIt = tasksprogress.begin();
 
-   printf("Job id = %d\n", jobid);
+   stream << "Job id = " << jobid;
    for( int i = 0; i < count; i++)
    {
-      printf("#[b%d,t%d]:", *(bIt++), *(tIt++));
-      (*(trIt++))->stdOut( full);
+      stream << "\n#[" << *(bIt++) << ",t" << *(tIt++) << "]:";
+      (*(trIt++))->generateInfoStream( stream, full);
    }
 }

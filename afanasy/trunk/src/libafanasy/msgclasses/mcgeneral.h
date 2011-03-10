@@ -30,7 +30,7 @@ public:
    inline void addId( int ID) { list.push_back( ID);}
    inline void setId( int ID) { id = ID;}
 
-   void stdOut( bool full = false) const;
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline const std::string & getName()   const { return name;   }
    inline const std::string & getString() const { return string; }

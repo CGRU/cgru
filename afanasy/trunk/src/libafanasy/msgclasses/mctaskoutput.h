@@ -16,7 +16,7 @@ public:
    MCTaskOutput( Msg * msg);
    ~MCTaskOutput();
 
-   void stdOut( bool full = false ) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline const std::string & getRenderName() const { return rendername; }
    inline int getJobId()         const { return jobid;      }

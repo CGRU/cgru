@@ -4,10 +4,11 @@
 
 #include "../include/aftypes.h"
 
-#include "name_af.h"
-#include "msg.h"
-#include "afnode.h"
 #include "address.h"
+#include "afnode.h"
+#include "msg.h"
+#include "name_af.h"
+#include "netif.h"
 
 namespace af
 {
@@ -33,9 +34,11 @@ public:
    inline const std::string & getVersion()   const { return version;       }  ///< Get client version.
    inline const std::string & getUserName()  const { return username;      }  ///< Get client user name.
 
-   inline const Address* getAddress() const { return address;} ///< Get client address.
-   inline bool addrEqual( const Client *other ) const          ///< Compare address with other.
-               {if( address) return address->equal(other->address); else return false;}
+   inline const Address & getAddress() const { return address;} ///< Get client address.
+   inline bool addrEqual( const Client * other ) const          ///< Compare address with other.
+               { address.equal(other->address);}
+
+   inline void setAddressIP( const Address & other) { address.setIP( other);}
 
 /// Set registration time ( and update time).
    virtual void setRegisterTime();
@@ -51,7 +54,10 @@ protected:
    int32_t     revision;      ///< Client build revision.
    std::string version;       ///< Client version.
    std::string username;      ///< Client user name.
-   Address    *address;       ///< Client computer address.
+   Address     address;       ///< Client computer address.
+
+   std::vector<NetIF*> netIFs;
+
 private:
 };
 }

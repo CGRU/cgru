@@ -71,15 +71,14 @@ void MCTasksPos::readwrite( Msg * msg)
    rw_Int32_Vect( numtasks, msg);
 }
 
-void MCTasksPos::stdOut( bool full ) const
+void MCTasksPos::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::stdOut( full);
-   printf("\nJob id = %d:\n", jobid);
+   MsgClassUserHost::generateInfoStream( stream, full);
+   stream << "\nJob id = " << jobid;
    for( unsigned p = 0; p < numbloks.size(); p++)
    {
-      printf("   numblock = %d", numbloks[p] );
-      if( has_tasks) printf(", numtask = %d", numtasks[p]);
-      printf("\n");
+      stream << "\n   numblock = " << numbloks[p];
+      if( has_tasks) stream << ", numtask = " << numtasks[p];
    }
-   printf("Message: %s\n", message.c_str());
+   stream << "\nMessage: " + message;
 }

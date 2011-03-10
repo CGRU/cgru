@@ -17,7 +17,7 @@ public:
    MCTaskPos( Msg * msg);
    ~MCTaskPos();
 
-   void stdOut( bool full = false ) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline int getJobId()    const { return jobid;    }
    inline int getNumBlock() const { return blocknum; }

@@ -53,10 +53,6 @@ protected:
 
    static void rw_RegExp( RegExp & regExp, Msg * msg);
 
-//   static void rw_QRegExp( QRegExp & qRegExp, Msg * msg);
-//   static void rw_QString( QString & qString, Msg * msg);
-//   static void rw_QStringList(  QStringList & qStringList, Msg * msg);
-
    static void rw_data(       char * data, Msg * msg, int size);
    static void  w_data( const char * data, Msg * msg, int size);
 

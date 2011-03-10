@@ -96,10 +96,16 @@ void MCTaskUp::readwrite( Msg * msg)
    }
 }
 
-void MCTaskUp::stdOut( bool full ) const
+void MCTaskUp::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("TaskUp: client=%d, job=%d, block=%d, task=%d, number=%d, datalen=%d, status=%d, percent=%d\n",
-                    clientid, numjob, numblock, numtask, number, datalen, status, percent);
+   stream << "TaskUp: client=" << clientid
+         << ", job=" << numjob
+         << ", block=" << numblock
+         << ", task=" << numtask
+         << ", number=" << number
+         << ", datalen=" << datalen
+         << ", status=" << status
+         << ", percent=" << percent;
 
-   if( full && datalen && data) printf("data:\n%s\n", data);
+   if( full && datalen && data) stream << "\ndata:\n" << std::string( data, datalen) << std::endl;
 }

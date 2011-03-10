@@ -11,15 +11,13 @@ using namespace af;
 Talk::Talk():
    Client( Client::GetEnvironment, 0)
 {
-//   name = QString("%1@%2:%3").arg(af::Environment::getUserName(), af::Environment::getHostName()).arg( address->generatePortString().c_str());
-   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address->generatePortString();
+   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address.generatePortString();
 }
 
-Talk::Talk( Msg * msg, const Address * addr):
+Talk::Talk( Msg * msg):
    Client( Client::DoNotGetAnyValues, 0)
 {
    read( msg);
-   if( addr != NULL) address->setIP( addr);
 }
 
 Talk::~Talk()
@@ -36,13 +34,12 @@ void Talk::readwrite( Msg * msg)
    rw_String (  username,      msg);
    rw_int32_t(  revision,      msg);
    rw_String(   version,       msg);
-   if( msg->isWriting() ) address->write( msg);
-   else address = new Address( msg);
+   address.readwrite( msg);
 }
 
 void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    stream << name << "[" << id << "]";
    stream << " (" << version << " r" << revision << ") ";
-   address->generateInfoStream( stream, full);
+   address.generateInfoStream( stream, full);
 }

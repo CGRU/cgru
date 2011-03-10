@@ -21,7 +21,7 @@ public:
    MCTest( Msg * msg);
    ~MCTest();
 
-   void stdOut( bool full = false) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    void addString( const std::string & String);
 

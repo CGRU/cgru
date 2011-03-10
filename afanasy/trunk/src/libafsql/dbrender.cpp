@@ -18,8 +18,8 @@ DBRender::DBRender( int Id):
    addDBAttributes();
 }
 
-DBRender::DBRender( af::Msg * msg, const af::Address * addr):
-   af::Render( msg, addr)
+DBRender::DBRender( af::Msg * msg):
+   af::Render( msg)
 {
    addDBAttributes();
 }

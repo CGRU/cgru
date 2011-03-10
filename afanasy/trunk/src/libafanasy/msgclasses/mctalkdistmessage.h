@@ -19,7 +19,7 @@ public:
 
    inline const std::list<std::string> * getList() const { return &list; }
 
-   void stdOut( bool full = false) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 private:
    std::string user;

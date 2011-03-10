@@ -7,8 +7,8 @@
 #include "afcommon.h"
 #include "monitorcontainer.h"
 
-TalkAf::TalkAf( af::Msg * msg, const af::Address * addr):
-   af::Talk( msg, addr)
+TalkAf::TalkAf( af::Msg * msg):
+   af::Talk( msg)
 {
 }
 

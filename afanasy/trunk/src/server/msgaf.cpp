@@ -22,25 +22,30 @@
 #include "../include/macrooutput.h"
 
 MsgAf::MsgAf( int msgType, int msgInt):
-   Msg( msgType, msgInt),
-   address( NULL)
+      Msg( msgType, msgInt)
 {
 }
 
 MsgAf::MsgAf( int msgType, Af * afClass ):
-   Msg( msgType, afClass),
-   address( NULL)
+      Msg( msgType, afClass)
+{
+}
+
+MsgAf::MsgAf( const struct sockaddr_storage & ss):
+      address( ss)
 {
 }
 
 MsgAf::~MsgAf()
 {
+   /*
    if( address != NULL) delete address;
    while( addresses.size())
    {
       delete addresses.front();
       addresses.pop_front();
    }
+   */
 }
 /*
 void MsgAf::setAddress( const af::Client* client)
@@ -59,22 +64,22 @@ void MsgAf::dispatch()
 
 bool MsgAf::request( MsgAf *answer)
 {
-   if( address == NULL )
+   if( address.isEmpty() )
    {
-      AFERROR("MsgAf::dispatch: address == NULL\n");
+      AFERROR("MsgAf::dispatch: Address is empty\n")
       return false;
    }
 
    int socketfd;
    struct sockaddr_storage client_addr;
 
-   address->setSocketAddress( &client_addr);
+   address.setSocketAddress( client_addr);
    //
    // get socket descriptor
    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, IPPROTO_TCP)) < 0 )
    {
       AFERRPE("MsgAf::request: socket");
-      address->stdOut(); printf("\n");
+      address.stdOut(); printf("\n");
       return false;
    }
    //
@@ -82,7 +87,7 @@ bool MsgAf::request( MsgAf *answer)
    if ( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
    {
       AFERRPE("MsgAf::request: connect");
-      address->stdOut(); printf("\n");
+      address.stdOut(); printf("\n");
       close(socketfd);
       return false;
    }

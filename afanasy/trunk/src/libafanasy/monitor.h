@@ -15,7 +15,7 @@ public:
    Monitor();
 
 /// Construct Monitor from buffer.
-   Monitor( Msg * msg, const af::Address * addr = NULL);
+   Monitor( Msg * msg);
 
    virtual ~Monitor();
 

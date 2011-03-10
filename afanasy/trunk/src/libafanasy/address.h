@@ -2,18 +2,18 @@
 
 #include "af.h"
 
-class QHostAddress;
-
 namespace af
 {
 
 class Address : public Af
 {
 public:
-   Address( int first_port);           ///< Construct local address with port, in host byte order (zero IP).
-   Address( const Address * other);    ///< Copy given address.
+   Address( int Port = 0);                      ///< Construct an empty address.
+   Address( const Address & other);             ///< Copy given address.
+   Address( const Address * other);             ///< Copy given address.
+   Address & operator=( const Address & other);   ///< Assignment operator
 #ifndef WINNT
-   Address( const struct sockaddr_storage * ss);  ///< Set address from address storage structure.
+   Address( const struct sockaddr_storage & ss);  ///< Set address from address storage structure.
 #endif
    Address( Msg * msg);                   ///< Construct address using raw data.
    ~Address();
@@ -21,24 +21,34 @@ public:
    enum Family
    {
       IPv4,
-      IPv6
+      IPv6,
+      Empty
    };
 
+   void copy( const Address & other);
+
+   void clear();
+
+   inline bool  isEmpty()    const  { return family == Empty;}
+   inline bool notEmpty()    const  { return family != Empty;}
+
+   inline int getFamily()    const  { return family;      }
    inline int getPortHBO()   const  { return port;        } ///< Get address port in host byte order.
    inline int getPortNBO()   const  { return htons(port); } ///< Get address port in network byte order.
+   inline const char * getAddrData() const { return addr; }
+
    inline void setPort( int value ) { port = value;       } ///< Set address port in host byte order.
 
+   bool equal( const Address & other ) const;   ///< Compare address with other.
    bool equal( const Address * other ) const;   ///< Compare address with other.
-
-   void setQAddress( QHostAddress &qhostaddress) const;      ///< Set QHostAddress class address.
 
 #ifndef WINNT
 /// Set sockaddr_in structure address.
-   void setSocketAddress( struct sockaddr_storage * ss) const;
+   bool setSocketAddress( struct sockaddr_storage & ss) const;
 #endif
 
 /// Set new IP address.
-   void setIP( const Address * other);
+   void setIP( const Address & other);
 
 
    void generateIPStream( std::ostringstream & stream) const;
@@ -49,12 +59,11 @@ public:
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
-protected:
+//protected:
 /// Read or write address in buffer.
    void readwrite( Msg * msg);
 
 private:
-   static uint16_t firtstClientPort;      ///< First allowed client port.
 
    static const int AddrDataLength = 16;
 

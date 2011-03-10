@@ -14,7 +14,7 @@ public:
    MCTasksProgress( Msg * msg);
    ~MCTasksProgress();
 
-   void stdOut( bool full = false ) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    void add( int block, int task, TaskProgress * tp);
 

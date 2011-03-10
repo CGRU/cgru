@@ -21,8 +21,8 @@ public:
    bool addTask(  int numblock, int numtask);
 
    inline bool hasTasks() const { return has_tasks;}
-   void stdOut( bool full = false ) const;
 
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    inline int    getJobId() const { return jobid;          }
    inline size_t getCount() const { return numbloks.size();}

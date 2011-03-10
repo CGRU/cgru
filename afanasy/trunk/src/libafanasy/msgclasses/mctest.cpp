@@ -69,11 +69,10 @@ void MCTest::addString( const std::string & String)
    stringlist.push_back( String);
 }
 
-void MCTest::stdOut( bool full) const
+void MCTest::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::stdOut( full);
-   printf(": String = \"%s\", Number = %d.\n",
-            string.c_str(), number);
+   MsgClassUserHost::stdOut( stream);
+   stream << ": String = \"" << string << "\", Number = " << number << ".";
 
    if( full == false ) return;
 
@@ -81,9 +80,6 @@ void MCTest::stdOut( bool full) const
 
    std::list<std::string>::const_iterator it = stringlist.begin();
    for( int i = 0; i < number; i++, it++)
-      printf("a\"%s\" = l\"%s\" : n%d\n",
-         stringarray[i].c_str(),
-         (*it).c_str(),
-         numberarray[i]);
+      stream << "\na\"" << stringarray[i] << "\" = l\"" << *it << "\" : n" << numberarray[i];
 }
 

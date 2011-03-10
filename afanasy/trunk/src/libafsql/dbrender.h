@@ -10,7 +10,7 @@ class DBRender: public DBItem, public af::Render
 {
 public:
    DBRender( int Id = 0);
-   DBRender( af::Msg * msg, const af::Address * addr = NULL );
+   DBRender( af::Msg * msg);
 
    virtual ~DBRender();
 

@@ -90,7 +90,7 @@ bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)
       arg = argv[i];
       for( CmdList::iterator it = commands.begin(); it != commands.end(); it++)
       {
-         if( i >= argc) return true;
+         if( i >= argc) break;
          command = *it;
          if( command->isCmd( argv[i]))
          {

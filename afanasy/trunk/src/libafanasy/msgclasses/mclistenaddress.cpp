@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "../environment.h"
 #include "../name_af.h"
 
 #define AFOUTPUT
@@ -10,14 +11,14 @@
 
 using namespace af;
 
-MCListenAddress::MCListenAddress( uint8_t Flags, const Address * address, int JobId, int BlockNum, int TaskNum, int Number):
+MCListenAddress::MCListenAddress( uint8_t Flags, const Address & lAddress, int JobId, int BlockNum, int TaskNum, int Number):
    jobid(      JobId       ),
    blocknum(   BlockNum    ),
    tasknum(    TaskNum     ),
    number(     Number      ),
+   address(    lAddress    ),
    flags(Flags)
 {
-   address_ptr = new Address( address);
 }
 
 MCListenAddress::MCListenAddress( Msg * msg)
@@ -27,7 +28,6 @@ MCListenAddress::MCListenAddress( Msg * msg)
 
 MCListenAddress::~MCListenAddress()
 {
-   if( address_ptr != NULL) delete address_ptr;
 }
 
 void MCListenAddress::readwrite( Msg * msg)
@@ -40,16 +40,16 @@ void MCListenAddress::readwrite( Msg * msg)
    rw_int32_t( number,       msg);
    rw_uint8_t( flags,        msg);
 
-   if( msg->isWriting() ) address_ptr->write( msg);
-   else address_ptr = new Address( msg);
+   address.readwrite( msg);
 }
 
-void MCListenAddress::stdOut(bool full) const
+void MCListenAddress::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("Listen(j%d,b%d,t%d,n%d): %s-%s-%s: ", jobid, blocknum, tasknum, number,
-      (flags&TOLISTEN)?"ON":"OFF",(flags&JUSTTASK)?"TASK":"JOB",(flags&FROMRENDER)?"RENDER":"CLIENT");
-   address_ptr->stdOut();
-   printf(" - ");
+   stream << "Listen";
+   stream << " j" << jobid << " b" << blocknum << " t" << tasknum << " n" << number;
+   stream << ": " << ((flags&TOLISTEN)?"ON":"OFF") << "-" << ((flags&JUSTTASK)?"TASK":"JOB") << "-" << ((flags&FROMRENDER)?"RENDER":"CLIENT");
+   stream << " ";
+   address.generateInfoStream( stream, full);
+   stream << " - ";
    MsgClassUserHost::stdOut();
-   printf("\n");
 }

@@ -35,7 +35,7 @@ WndListenJob::WndListenJob( int JobId, const QString & Name):
    qTextEdit->setWordWrapMode( QTextOption::NoWrap);
    setWindowTitle( jobname);
 
-   af::MCListenAddress mclass( af::MCListenAddress::TOLISTEN, af::Environment::getAddress(), jobid);
+   af::MCListenAddress mclass( af::MCListenAddress::TOLISTEN, Watch::getClientAddress(), jobid);
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
 }
 
@@ -46,7 +46,7 @@ WndListenJob::~WndListenJob()
 
 void WndListenJob::closeEvent( QCloseEvent * event)
 {
-   af::MCListenAddress mclass( 0, af::Environment::getAddress(), jobid);
+   af::MCListenAddress mclass( 0, Watch::getClientAddress(), jobid);
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
    Wnd::closeEvent( event);
 }

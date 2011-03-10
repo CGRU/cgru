@@ -6,8 +6,6 @@
 
 #include "environment.h"
 
-#include <QtNetwork/qhostaddress.h>
-
 #ifdef WINNT
 #define sprintf sprintf_s
 #endif
@@ -18,24 +16,47 @@
 
 using namespace af;
 
-uint16_t Address::firtstClientPort  = 0;
-
-Address::Address( const Address* other)
+Address::Address( int Port):
+      port( Port),
+      family( Empty)
 {
-   port = other->port;
-   family = other->family;
-   memcpy( &addr, &other->addr, AddrDataLength);
+   // There is no need to find out local host address.
+   // Server will look at connected client address to register.
+   memset( addr, 0, AddrDataLength);
+}
+
+Address::Address( const Address & other)
+{
+   copy( other);
+}
+
+Address::Address( const Address * other)
+{
+   if( other ) copy( *other);
+}
+
+Address & Address::operator=( const Address & other)
+{
+   if( this != &other) copy( other);
+   return *this;
+}
+
+void Address::copy( const Address & other)
+{
+   port = other.port;
+   family = other.family;
+   memcpy( &addr, &other.addr, AddrDataLength);
 }
 
 #ifndef WINNT
-Address::Address( const struct sockaddr_storage * ss)
+Address::Address( const struct sockaddr_storage & ss)
 {
    bzero( addr, AddrDataLength);
-   switch( ss->ss_family)
+   switch( ss.ss_family)
    {
    case AF_INET:
    {
-      struct sockaddr_in * sa = (struct sockaddr_in*)ss;
+      struct sockaddr_in * sa = (struct sockaddr_in*)(&ss);
       family = IPv4;
       port = ntohs( sa->sin_port);
       memcpy( addr, &(sa->sin_addr), 4);
@@ -43,7 +64,7 @@ Address::Address( const struct sockaddr_storage * ss)
    }
    case AF_INET6:
    {
-      struct sockaddr_in6 * sa = (struct sockaddr_in6*)ss;
+      struct sockaddr_in6 * sa = (struct sockaddr_in6*)(&ss);
 
       // Check for mapped IPv4 address: 1-80 bits == 0, 81-96 bits == 1 and last 32 bits == IPv4
       family = IPv4;
@@ -69,7 +90,7 @@ Address::Address( const struct sockaddr_storage * ss)
       }
       else
       {
-         struct sockaddr_in * sa = (struct sockaddr_in*)ss;
+         struct sockaddr_in * sa = (struct sockaddr_in*)(&ss);
          port = ntohs( sa->sin_port);
          memcpy( addr, &(data[12]), 4);
       }
@@ -82,25 +103,19 @@ Address::Address( const struct sockaddr_storage * ss)
 }
 #endif
 
-Address::Address( int first_port)
+bool Address::equal( const af::Address & other ) const
 {
-   firtstClientPort = first_port;
-
-   port = first_port;
-   family = 0;
-   // There is no need to find out local host address.
-   // Server will look at connected client address to register.
-   memset( addr, 0, AddrDataLength);
-}
-
-bool Address::equal( const af::Address * other ) const
-{
-   if( other == NULL ) return false;
-   if(( family == other->family) && ( port == other->port ))
+   if(( family == other.family) && ( port == other.port ))
    {
-      if( memcmp( &addr, &(other->addr), AddrDataLength) == 0)
+      if( memcmp( &addr, &(other.addr), AddrDataLength) == 0)
       return true;
    }
+   return false;
+}
+
+bool Address::equal( const Address * other ) const
+{
+   if( other ) return equal( *other);
    return false;
 }
 
@@ -120,15 +135,22 @@ Address::~Address()
 {
 }
 
-#ifndef WINNT
-void Address::setSocketAddress( struct sockaddr_storage * ss) const
+void Address::clear()
 {
-   bzero( ss, sizeof(sockaddr_storage));
+   port = 0,
+   family = Empty;
+   memset( addr, 0, AddrDataLength);
+}
+
+#ifndef WINNT
+bool Address::setSocketAddress( struct sockaddr_storage & ss) const
+{
+   bzero( &ss, sizeof(sockaddr_storage));
    switch( family)
    {
       case IPv4:
       {
-         struct sockaddr_in * sa = (struct sockaddr_in*)ss;
+         struct sockaddr_in * sa = (struct sockaddr_in*)(&ss);
          sa->sin_family = AF_INET;
          sa->sin_port = htons( port);
          memcpy( &(sa->sin_addr), addr, 4);
@@ -136,25 +158,29 @@ void Address::setSocketAddress( struct sockaddr_storage * ss) const
       }
       case IPv6:
       {
-         struct sockaddr_in6 * sa = (struct sockaddr_in6*)ss;
+         struct sockaddr_in6 * sa = (struct sockaddr_in6*)(&ss);
          sa->sin6_family = AF_INET6;
          sa->sin6_port = htons( port);
          memcpy( &(sa->sin6_addr), addr, 16);
          break;
       }
+      case Empty:
+         AFERROR("Address::setSocketAddress: Address is empty.\n");
+         return false;
       default:
          AFERROR("Address::setSocketAddress: Unknown address family.\n");
-         break;
+         return false;
    }
+   return true;
 }
 #endif
 
-void Address::setIP( const af::Address * other)
+void Address::setIP( const af::Address & other)
 {
-   family = other->family;
-   memcpy( &addr, &other->addr, AddrDataLength);
+   family = other.family;
+   memcpy( &addr, &other.addr, AddrDataLength);
 }
-
+/*
 void Address::setQAddress( QHostAddress & qhostaddress) const
 {
    switch( family)
@@ -172,7 +198,7 @@ void Address::setQAddress( QHostAddress & qhostaddress) const
          AFERROR("Address::setQAddress: Unknown address family.\n");
    }
 }
-
+*/
 void Address::generateIPStream( std::ostringstream & stream) const
 {
    switch( family)
@@ -198,6 +224,9 @@ void Address::generateIPStream( std::ostringstream & stream) const
          }
          break;
       }
+      case Empty:
+         stream << "Empty address";
+         break;
       default:
          stream << "Unknown address family";
          break;
@@ -226,8 +255,11 @@ const std::string Address::generatePortString() const
 void Address::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    generateIPStream( stream);
-   stream << ":";
-   generatePortStream( stream);
+   if( notEmpty())
+   {
+      stream << ":";
+      generatePortStream( stream);
+   }
 }
 
 int Address::calcWeight() const

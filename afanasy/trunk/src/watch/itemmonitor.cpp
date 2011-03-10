@@ -34,7 +34,7 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    timeregister = TimeRegister   .arg( afqt::time2Qstr( time_register));
    timer        = TimeR          .arg( afqt::time2Qstr( time_register));
 
-   address = Address.arg( monitor->getAddress()->generateIPString().c_str());
+   address = Address.arg( monitor->getAddress().generateIPString().c_str());
 
    tip = name;
    tip += QString("\nVersion: %1").arg( afqt::stoq( monitor->getVersion()));

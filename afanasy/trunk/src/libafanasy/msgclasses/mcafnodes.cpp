@@ -107,9 +107,9 @@ void MCAfNodes::addNode( Af * node)
    list.push_back( node );
 }
 
-void MCAfNodes::stdOut( bool full) const
+void MCAfNodes::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   if( readonly == true) for( unsigned i = 0; i < list.size(); i++) list[i]->stdOut( full);
+   if( readonly == true) for( unsigned i = 0; i < list.size(); i++) list[i]->generateInfoStream( stream, full);
 
-   printf("Quantity = %d\n", (int)list.size());
+   stream << "Quantity = " << list.size();
 }

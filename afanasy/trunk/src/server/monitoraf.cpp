@@ -10,8 +10,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-MonitorAf::MonitorAf( af::Msg * msg, const af::Address * addr):
-   af::Monitor( msg, addr)
+MonitorAf::MonitorAf( af::Msg * msg):
+   af::Monitor( msg)
 {
 }
 

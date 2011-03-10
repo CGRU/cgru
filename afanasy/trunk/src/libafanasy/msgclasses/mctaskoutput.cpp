@@ -61,21 +61,12 @@ void MCTaskOutput::readwrite( Msg * msg)
    if( datasize > 0 ) rw_data( data, msg, datasize);
 }
 
-#ifdef WINNT
-#include <io.h>
-#endif
-void MCTaskOutput::stdOut(bool full) const
+void MCTaskOutput::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   printf("Job id = %d, numblock = %d, numtask = %d, data size=%d", jobid, blocknum, tasknum, datasize);
+   stream << "Job id = " << jobid << ", numblock = " << blocknum << ", numtask = " << tasknum << ", data size= " << datasize;
    if( full )
    {
-      printf("\n");
-      int integer = 0;
-#ifdef WINNT
-      integer = ::_write( 1, data, datasize);
-#else
-      integer = ::write( 1, data, datasize);
-#endif
+      stream << std::endl;
+      stream << std::string( data, datasize);
    }
-   printf("\n");
 }

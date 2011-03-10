@@ -11,7 +11,7 @@ public:
    MsgClass();
    virtual ~MsgClass();
 
-   virtual void stdOut( bool full = false) const = 0;
+   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const = 0;
 
 protected:
 

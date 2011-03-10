@@ -20,5 +20,5 @@ protected:
    void processItem( AfQueueItem* item) const;
 
 private:
-   void send( const MsgAf * msg, const af::Address * address) const;
+   void send( const af::Msg * msg, const af::Address & address) const;
 };

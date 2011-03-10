@@ -2,9 +2,6 @@
 
 #include <string.h>
 
-//#include <QtCore/QString>
-//#include <QtCore/QStringList>
-
 #include "msg.h"
 #include "regexp.h"
 
