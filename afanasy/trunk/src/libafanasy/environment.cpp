@@ -519,12 +519,23 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 bool Environment::init()
 {
 //############ Local host name:
-//   computername = QHostInfo::localHostName().toLower().toUtf8().data();
+#ifndef WINNT
+   computername = getenv("HOSTNAME");
+#else
+   computername = getenv("COMPUTERNAME");
+#endif
+   if( computername.empty())
    {
-      static char buffer[256];
-      if( gethostname( buffer, sizeof(buffer)) != 0 )
+      static const int buflen = 256;
+      static char buffer[buflen];
+#ifndef WINNT
+      if( gethostname( buffer, buflen) != 0 )
+#else
+      DWORD win_buflen = buflen;
+      if( GetComputerName( buffer, &win_buflen) != 0 )
+#endif
       {
-         AFERRPE("Can't get local host name.\n")
+         AFERRPE("Can't get local host name")
          return false;
       }
       computername = buffer;

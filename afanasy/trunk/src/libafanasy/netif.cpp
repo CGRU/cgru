@@ -1,10 +1,13 @@
 #include "netif.h"
 
+#include <string.h>
+
+#ifdef LINUX
 #include <arpa/inet.h>
 #include <ifaddrs.h>
 #include <net/if.h>
-#include <string.h>
 #include <sys/ioctl.h>
+#endif
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -43,6 +46,7 @@ int NetIF::weigh() const
 
 void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
 {
+#ifdef LINUX
 #ifndef SIOCGIFADDR
    // The kernel does not support the required ioctls
    return;
@@ -160,4 +164,5 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
       }
       ifAddrStruct=ifAddrStruct->ifa_next;
    }
+#endif
 }
