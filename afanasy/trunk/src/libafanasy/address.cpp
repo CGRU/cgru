@@ -180,25 +180,7 @@ void Address::setIP( const af::Address & other)
    family = other.family;
    memcpy( &addr, &other.addr, AddrDataLength);
 }
-/*
-void Address::setQAddress( QHostAddress & qhostaddress) const
-{
-   switch( family)
-   {
-      case IPv4:
-      {
-         quint32 ipv4;
-         memcpy( &ipv4, addr, 4);
-         qhostaddress.setAddress( ipv4);
-      }
-      case IPv6:
-         qhostaddress.setAddress( (quint8*)addr);
-         break;
-      default:
-         AFERROR("Address::setQAddress: Unknown address family.\n");
-   }
-}
-*/
+
 void Address::generateIPStream( std::ostringstream & stream) const
 {
    switch( family)
@@ -254,6 +236,18 @@ const std::string Address::generatePortString() const
 
 void Address::generateInfoStream( std::ostringstream & stream, bool full) const
 {
+   if( full )
+   {
+      switch (family)
+      {
+         case IPv4:
+            stream << "IPv4 Address: ";
+            break;
+         case IPv6:
+            stream << "IPv6 Address: ";
+            break;
+      }
+   }
    generateIPStream( stream);
    if( notEmpty())
    {

@@ -20,19 +20,17 @@ public:
 
    inline size_t getAddressesNum() const { return addresses.size(); }
 
-   inline const std::list<Address*> * getAddresses() const { return &addresses;}
+   inline const std::list<Address> * getAddresses() const { return &addresses;}
 
    bool removeAddress( const Address & address);
 
    int calcWeight() const;
    inline int getWeight() const { return weight;}
 
-private:
-   std::list<Address*> addresses;
-   mutable int weight;
-
-private:
-
    void readwrite( Msg * msg); ///< Read or write task in message buffer.
+
+private:
+   std::list<Address> addresses;
+   mutable int weight;
 };
 }

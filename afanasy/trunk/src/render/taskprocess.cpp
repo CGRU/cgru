@@ -151,13 +151,13 @@ void TaskProcess::p_readyRead()
 printf("Sending output to addresses:");
 #endif
       af::MCTaskOutput mctaskoutput( pRENDER->getName(), exec->getJobId(), exec->getBlockNum(), exec->getTaskNum(), output.size(), output.data());
-      const std::list<af::Address*> * addresses = exec->getListenAddresses();
-      for( std::list<af::Address*>::const_iterator it = addresses->begin(); it != addresses->end(); it++)
+      const std::list<af::Address> * addresses = exec->getListenAddresses();
+      for( std::list<af::Address>::const_iterator it = addresses->begin(); it != addresses->end(); it++)
       {
 #ifdef AFOUTPUT
-printf(" ");(*it)->stdOut();
+printf(" ");(*it).stdOut();
 #endif
-         if( pCLIENT) pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, *it));
+         if( pCLIENT) pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, &(*it)));
       }
 #ifdef AFOUTPUT
 printf("\n");

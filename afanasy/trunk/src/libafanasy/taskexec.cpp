@@ -62,7 +62,6 @@ TaskExec::TaskExec(
    onClient( false)
 {
 AFINFA("TaskExec::TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().data(), name.toUtf8().data());
-   listen_addresses = new AddressesList();
    if( CustomDataBlock ) customdata_block = *CustomDataBlock;
    if( CustomDataTask )  customdata_task  = *CustomDataTask;
 }
@@ -86,8 +85,6 @@ TaskExec::TaskExec( const std::string & Command):
 
    time_start( time(NULL)),
 
-   listen_addresses( NULL),
-
    onClient( true)
 {
 }
@@ -95,11 +92,9 @@ TaskExec::TaskExec( const std::string & Command):
 TaskExec::~TaskExec()
 {
 AFINFA("TaskExec:: ~ TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().data(), name.toUtf8().data());
-   if( listen_addresses) delete listen_addresses;
 }
 
 TaskExec::TaskExec( Msg * msg):
-   listen_addresses( NULL ),
    onClient( true)
 {
    read( msg);
@@ -148,8 +143,7 @@ void TaskExec::readwrite( Msg * msg)
       return;
    }
 
-   if( msg->isReading()) listen_addresses = new AddressesList( msg);
-   else listen_addresses->write( msg);
+   listen_addresses.readwrite( msg);
 }
 
 void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
@@ -161,9 +155,8 @@ void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
    if( number != 0 ) stream << "(" << number << ")";
    stream << ":" << capacity;
    if( capcoeff) stream << "x" << capcoeff << " ";
-   if( listen_addresses )
-      if( listen_addresses->getAddressesNum())
-         listen_addresses->stdOut( false);
+   if( listen_addresses.getAddressesNum())
+      listen_addresses.generateInfoStream( stream, false);
 
    if(full)
    {
@@ -171,7 +164,7 @@ void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
       if( wdir.size()) stream << "   Working directory = \"" << wdir << "\".\n";
       if(  env.size()) stream << "   Environment = \""       <<  env << "\".\n";
       stream << command;
-      stream << std::endl;
+//      stream << std::endl;
    }
 }
 
@@ -190,6 +183,6 @@ int TaskExec::calcWeight() const
    weight += weigh( parsertype);
    weight += weigh( customdata_block);
    weight += weigh( customdata_task);
-   if( listen_addresses ) weight += listen_addresses->calcWeight();
+   weight += listen_addresses.calcWeight();
    return weight;
 }

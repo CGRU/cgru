@@ -128,10 +128,10 @@ public:
       UPLAST
    };
 
-   inline bool         addListenAddress( const Address & address) { return listen_addresses->addAddress( address);     }
-   inline bool      removeListenAddress( const Address & address) { return listen_addresses->removeAddress( address);  }
-   inline size_t getListenAddressesNum() const { return listen_addresses->getAddressesNum();              }
-   inline const std::list<Address*> * getListenAddresses() const { return listen_addresses->getAddresses();       }
+   inline bool         addListenAddress( const Address & address) { return listen_addresses.addAddress( address);     }
+   inline bool      removeListenAddress( const Address & address) { return listen_addresses.removeAddress( address);  }
+   inline size_t getListenAddressesNum() const { return listen_addresses.getAddressesNum();              }
+   inline const std::list<Address> * getListenAddresses() const { return listen_addresses.getAddresses();       }
 
    inline void setName(      const std::string & str) { name      = str;}   ///< Set task name.
    inline void setBlockName( const std::string & str) { blockname = str;}   ///< Set task block name.
@@ -181,7 +181,7 @@ private:
 
    uint32_t time_start;
 
-   AddressesList * listen_addresses;     ///< Addresses to send task output to.
+   AddressesList listen_addresses;     ///< Addresses to send task output to.
 
 private:
    bool onClient;

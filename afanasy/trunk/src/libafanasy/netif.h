@@ -1,6 +1,7 @@
 #pragma once
 
 #include "af.h"
+#include "address.h"
 #include "name_af.h"
 
 namespace af
@@ -11,7 +12,7 @@ class NetIF : public Af
 public:
 
 /// Constructor.
-   NetIF( const char * Name, const unsigned char * MacAddr);
+   NetIF( const char * Name, const unsigned char * MacAddr, const std::vector<Address> ifAddresses);
 
    ~NetIF();
 
@@ -19,10 +20,14 @@ public:
 
    const std::string getName() const { return name;}
 
-   int weigh() const;
+   int calcWeight() const;
 
    static const int MacAddrLen = 6;
 
+   /// Network interface addresses
+   std::vector<Address> addresses;
+
+   /// Search for interfaces and assinged addresses
    static void getNetIFs( std::vector<NetIF*> & netIFs, bool verbose = false);
 
 private:

@@ -187,7 +187,7 @@ public:
 
 
 /*- Render messages -*/
-/** Sent by Render on start, when it's server begin to listen post.
+/** Sent by Render on start, when it's server begin to listen port.
 And when Render can't connect to Afanasy. Afanasy register new Render and send back it's id \c TRenderId. **/
 /**/TRenderRegister/**/,
 /**/TRenderUpdate/**/,              ///< Update Render, message contains its resources.

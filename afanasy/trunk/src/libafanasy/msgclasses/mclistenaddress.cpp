@@ -51,5 +51,5 @@ void MCListenAddress::generateInfoStream( std::ostringstream & stream, bool full
    stream << " ";
    address.generateInfoStream( stream, full);
    stream << " - ";
-   MsgClassUserHost::stdOut();
+   MsgClassUserHost::generateInfoStream( stream, false);
 }

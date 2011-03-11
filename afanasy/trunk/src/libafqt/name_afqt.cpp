@@ -54,14 +54,16 @@ bool afqt::connect( const af::Address * address, QTcpSocket * qSocket)
       qSocket->connectToHost( afqt::toQAddress( address), address->getPortHBO());
       if( qSocket->waitForConnected( WAITFORCONNECTED) == false)
       {
-         AFERROR("qtnet::connect: Can't connect to address ");
-         address->stdOut(); printf("\n");
+         AFERROR("afqt::connect: Can't connect to address:")
+         printf(" %s", address->generateInfoString().c_str());
+         printf(" Q = %s", afqt::toQAddress( address).toString().toUtf8().data());
+         printf("\n");
          return false;
       }
    }
    else
    {
-      AFERROR("qtcom::connect: Socket seems to be already connected.\n");
+      AFERROR("afqt::connect: Socket seems to be already connected.\n")
    }
    return true;
 }
@@ -73,9 +75,10 @@ const QHostAddress afqt::toQAddress( const af::Address & address)
    {
       case af::Address::IPv4:
       {
-         quint32 ipv4;
+         uint32_t ipv4;
          memcpy( &ipv4, address.getAddrData(), 4);
-         qaddr.setAddress( ipv4);
+         qaddr.setAddress( htonl(ipv4));
+         break;
       }
       case af::Address::IPv6:
          qaddr.setAddress( (quint8*)(address.getAddrData()));

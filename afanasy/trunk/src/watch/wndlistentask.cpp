@@ -35,7 +35,6 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    cursor.setBlockFormat( blockFormat);
    qTextEdit->setTextCursor( cursor);
    qTextEdit->setWordWrapMode( QTextOption::NoWrap);
-   taskname = QString("%1[%2,%3]").arg(taskname).arg(block).arg(task);
    setWindowTitle( taskname);
    taskname += " %1:";
 

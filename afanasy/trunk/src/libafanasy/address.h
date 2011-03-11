@@ -55,9 +55,9 @@ public:
    const std::string generateIPString() const;
    void generatePortStream( std::ostringstream & stream) const;
    const std::string generatePortString() const;
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
-   virtual int calcWeight() const;                   ///< Calculate and return memory size.
+   int calcWeight() const;                   ///< Calculate and return memory size.
 
 //protected:
 /// Read or write address in buffer.

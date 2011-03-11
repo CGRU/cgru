@@ -48,7 +48,7 @@ int Client::calcWeight() const
    weight += weigh( username);
    weight += weigh( version );
    weight += address.calcWeight();
-   for( int i = 0; i < netIFs.size(); i++) weight += netIFs[i]->weigh();
+   for( int i = 0; i < netIFs.size(); i++) weight += netIFs[i]->calcWeight();
 //printf("Client::calcWeight: %d bytes ( sizeof Client = %d)\n", weight, sizeof( Client));
    return weight;
 }
