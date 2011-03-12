@@ -105,17 +105,14 @@ Address::Address( const struct sockaddr_storage & ss)
 
 bool Address::equal( const af::Address & other ) const
 {
+   if( isEmpty()) return false;
+   if( other.isEmpty()) return false;
+
    if(( family == other.family) && ( port == other.port ))
    {
       if( memcmp( &addr, &(other.addr), AddrDataLength) == 0)
       return true;
    }
-   return false;
-}
-
-bool Address::equal( const Address * other ) const
-{
-   if( other ) return equal( *other);
    return false;
 }
 

@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QCoreApplication>
-
 #include "../libafanasy/msg.h"
 #include "../libafanasy/talk.h"
 
@@ -36,7 +34,6 @@ private:
    inline MsgQueue            *getMsgQueue()         { return msgQueue;         }
 
 private:
-//   af::Environment* pENV;
 
    MsgQueue *msgQueue;
 

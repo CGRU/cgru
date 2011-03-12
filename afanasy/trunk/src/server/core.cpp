@@ -79,6 +79,7 @@ Core::Core():
 //
 // Get Renders from database:
 //
+   AFINFO("Core::Core: Getting renders from database...\n")
    std::list<int> rids;
    afDB_JobRegister.getRendersIds( rids);
    for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
@@ -91,6 +92,7 @@ Core::Core():
 //
 // Get Users from database:
 //
+   AFINFO("Core::Core: Getting users from database...\n")
    std::list<int> uids;
    afDB_JobRegister.getUsersIds( uids);
    for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
@@ -103,6 +105,7 @@ Core::Core():
 //
 // Get Jobs from database:
 //
+   AFINFO("Core::Core: Getting jobs from database...\n")
    bool hasSystemJob = false;
    std::list<int> jids;
    afDB_JobRegister.getJobsIds( jids);

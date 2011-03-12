@@ -144,6 +144,8 @@ int            Environment::afanasy_build_version = 0;
 
 bool Environment::getVars( const std::string & filename)
 {
+//   if( false == pathFileExists( filename)) return false;
+
    QDomDocument doc("afanasy");
    if( openXMLDomDocument( doc, filename) == false) return false;
    if( verbose) printf("Parsing XML file '%s':\n", filename.c_str());
@@ -325,7 +327,7 @@ bool Environment::getVar( const QDomDocument & doc, int & value, const char * na
 {
    std::string text;
    if( getXMLElement( doc, name, text) == false) return false;
-   bool ok; int number = af::stoi( text, ok);
+   bool ok; int number = af::stoi( text, &ok);
    if( ok == false)
    {
       AFERRAR("Invalid number in '%s' element.\n", name);

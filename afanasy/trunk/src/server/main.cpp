@@ -16,6 +16,8 @@
 
 #include <Python.h>
 
+#include <QtCore/QCoreApplication>
+
 #include "../include/afjob.h"
 #include "../libafanasy/environment.h"
 #include "../libafnetwork/communications.h"

@@ -477,6 +477,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       //    Retrieving output from file
       //
 //printf("Trying to read file \"%s\"\n", filename.c_str());
+         /*
          struct stat st;
          int fd = -1;
          int retval = stat( filename.c_str(), &st);
@@ -527,6 +528,16 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
             msg_response->setData( size, buffer);
             delete buffer;
          }
+         */
+         std::string err;
+         int readsize = -1;
+         char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &err);
+         if( data )
+         {
+            msg_response->setData( readsize, data);
+            delete data;
+         }
+         if( err.size()) AFCommon::QueueLogError( err);
       }
       else
       {

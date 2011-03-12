@@ -40,7 +40,6 @@ public:
    inline void setPort( int value ) { port = value;       } ///< Set address port in host byte order.
 
    bool equal( const Address & other ) const;   ///< Compare address with other.
-   bool equal( const Address * other ) const;   ///< Compare address with other.
 
 #ifndef WINNT
 /// Set sockaddr_in structure address.

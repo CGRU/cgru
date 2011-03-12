@@ -62,7 +62,7 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
-   const int stoi( const std::string & str, bool & ok);
+   const int stoi( const std::string & str, bool * ok = NULL);
    const std::string itos( int integer);
    const std::string getenv( const char * name);
    const std::string state2str( int state);
@@ -107,6 +107,8 @@ namespace af
    const std::string pathUp( const std::string & path);
    const std::string pathHome();
    bool pathMakeDir( const std::string & path, bool verbose = false);
+
+   char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
    void getMacAddr();
 }
