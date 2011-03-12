@@ -1,6 +1,8 @@
 #include "threadprocessmsg.h"
 
-#include <QtCore/QFile>
+#include <errno.h>
+#include <fcntl.h>
+#include <sys/stat.h>
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -10,6 +12,7 @@
 
 #include "../libafnetwork/communications.h"
 
+#include "afcommon.h"
 #include "msgaf.h"
 #include "monitoraf.h"
 
@@ -473,27 +476,56 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       //
       //    Retrieving output from file
       //
-         QFile outFile( filename.c_str());
-         if( outFile.exists() == false )
+//printf("Trying to read file \"%s\"\n", filename.c_str());
+         struct stat st;
+         int fd = -1;
+         int retval = stat( filename.c_str(), &st);
+         if( retval != 0 )
          {
-            msg_response->setString("No output exists.");
+            msg_response->setString( std::string("Can't get output file:\n") + filename + "\n" + strerror( errno));
          }
-         else if( outFile.open( QIODevice::ReadOnly ) == false )
+         else if( false == (st.st_mode & S_IFREG))
          {
-            std::string str = "Can't open output file ";
+            msg_response->setString( std::string("Output is not a regular file:\n") + filename);
+         }
+         else if( st.st_size < 1 )
+         {
+            msg_response->setString( "Output is empty.\n");
+         }
+         else
+            fd = open( filename.c_str(), O_RDONLY);
+
+         if( fd == -1 )
+         {
+            std::string str = "Can't open task output file:\n";
             str += filename;
+            AFCommon::QueueLogErrno( str);
             msg_response->setString( str);
          }
          else
          {
-            QByteArray output = outFile.readAll();
-            int output_length = output.size();
-            if( output_length == 0)
+            int maxsize = st.st_size;
+            if( maxsize > af::Msg::SizeDataMax )
             {
-               msg_response->setString("Output is empty.");
+               maxsize = af::Msg::SizeDataMax;
+               AFCommon::QueueLogError("Task output file size overflow.");
             }
-            else
-               msg_response->setData( output_length, output.data());
+            char * buffer = new char[maxsize+1];
+            int size = 0;
+            while( maxsize > 0 )
+            {
+               int bytes = read( fd, buffer+size, maxsize);
+               if( bytes == -1 )
+               {
+                  AFCommon::QueueLogErrno( std::string("Reading output file failed:\n") + filename);
+                  break;
+               }
+               if( bytes == 0 ) break;
+               maxsize -= bytes;
+               size += bytes;
+            }
+            msg_response->setData( size, buffer);
+            delete buffer;
          }
       }
       else

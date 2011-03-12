@@ -1,8 +1,5 @@
 #include "afcommon.h"
 
-//#include <QtCore/QDir>
-//#include <QtCore/QFile>
-
 #include <fcntl.h>
 #include <sys/errno.h>
 #include <sys/stat.h>
@@ -64,24 +61,7 @@ void AFCommon::catchDetached()
       printf("AFCommon::catchDetached: Child execution finish catched, pid=%d.\n", pid);
 }
 */
-/*
-bool AFCommon::createDirectory( const char * name, bool verbose)
-{
-   AFINFA("AFCommon::createDirectory: char=\"%s\"\n", name);
-   struct stat st;
-   if(( stat( name, &st)) == -1 && ( errno == ENOENT ))
-   {
-      if( verbose) printf("Directory does not exists, trying to create it - \"%s\".\n", name);
-      if( mkdir( name, 0777) == -1)
-      {
-         AFERRPA("AFCommon::createDirectory - \"%s\".\n", name);
-         return false;
-      }
-      chmod( name, 0777);
-   }
-   return true;
-}
-*/
+
 void AFCommon::executeCmd( const std::string & cmd)
 {
    std::cout << af::time2str() << ": Executing command:\n" << cmd.c_str() << std::endl;

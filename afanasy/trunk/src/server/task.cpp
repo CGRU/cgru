@@ -271,8 +271,6 @@ void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rende
 const std::string Task::getOutputFileName( int startcount) const
 {
    std::ostringstream stream;
-   stream << block->job->getTasksOutputDir();
-   stream << "/";
    stream << "b"  << block->data->getBlockNum();
    stream << ".t" << number;
    stream << ".s" << startcount;
@@ -284,6 +282,7 @@ const std::string Task::getOutputFileName( int startcount) const
 //                        .arg( block->data->genTaskName( number));
    std::string filename = stream.str();
    af::pathFilterFileName( filename);
+   filename = block->job->getTasksOutputDir() + "/" + filename;
 //   return QString("%1/%2").arg( block->job->getTasksOutputDir(), filename);
    return filename;
 }

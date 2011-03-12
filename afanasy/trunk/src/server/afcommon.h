@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-
 #include "../libafanasy/name_af.h"
 
 #include "../libafsql/name_afsql.h"
@@ -20,7 +17,6 @@ public:
    AFCommon();
    ~AFCommon();
 
-//   static bool createDirectory( const char * name, bool verbose = false);
    static void executeCmd( const std::string & cmd);             ///< Execute command.
 
 /// Save string list, perform log file rotation;
