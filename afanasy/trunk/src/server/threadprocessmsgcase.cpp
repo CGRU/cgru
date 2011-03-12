@@ -476,59 +476,6 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       //
       //    Retrieving output from file
       //
-//printf("Trying to read file \"%s\"\n", filename.c_str());
-         /*
-         struct stat st;
-         int fd = -1;
-         int retval = stat( filename.c_str(), &st);
-         if( retval != 0 )
-         {
-            msg_response->setString( std::string("Can't get output file:\n") + filename + "\n" + strerror( errno));
-         }
-         else if( false == (st.st_mode & S_IFREG))
-         {
-            msg_response->setString( std::string("Output is not a regular file:\n") + filename);
-         }
-         else if( st.st_size < 1 )
-         {
-            msg_response->setString( "Output is empty.\n");
-         }
-         else
-            fd = open( filename.c_str(), O_RDONLY);
-
-         if( fd == -1 )
-         {
-            std::string str = "Can't open task output file:\n";
-            str += filename;
-            AFCommon::QueueLogErrno( str);
-            msg_response->setString( str);
-         }
-         else
-         {
-            int maxsize = st.st_size;
-            if( maxsize > af::Msg::SizeDataMax )
-            {
-               maxsize = af::Msg::SizeDataMax;
-               AFCommon::QueueLogError("Task output file size overflow.");
-            }
-            char * buffer = new char[maxsize+1];
-            int size = 0;
-            while( maxsize > 0 )
-            {
-               int bytes = read( fd, buffer+size, maxsize);
-               if( bytes == -1 )
-               {
-                  AFCommon::QueueLogErrno( std::string("Reading output file failed:\n") + filename);
-                  break;
-               }
-               if( bytes == 0 ) break;
-               maxsize -= bytes;
-               size += bytes;
-            }
-            msg_response->setData( size, buffer);
-            delete buffer;
-         }
-         */
          std::string err;
          int readsize = -1;
          char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &err);
