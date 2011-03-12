@@ -537,7 +537,16 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
             msg_response->setData( readsize, data);
             delete data;
          }
-         if( err.size()) AFCommon::QueueLogError( err);
+         if( err.size())
+         {
+            err = std::string("Getting task output: ") + err;
+            AFCommon::QueueLogError( err);
+            if( msg_response->isNull())
+            {
+               err = std::string("ERROR: ") + err;
+               msg_response->setString( err);
+            }
+         }
       }
       else
       {
