@@ -5,7 +5,7 @@ pushd ..\..\..\..
 set cgru=%CD%
 popd
 
-SET QTS=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.1-static
+SET QTS=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.1
 SET PYTHONS=%cgru%\utilities\python
 
 SET CGRU_PYTHON=%PYTHONS%\2.7.1
