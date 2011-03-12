@@ -9,8 +9,11 @@
 
 #ifdef WINNT
 #include <direct.h>
+#include <io.h>
 #include <winsock.h>
 #define getcwd _getcwd
+#define open _open
+#define read _read
 #define stat _stat
 #else
 #include <unistd.h>
