@@ -36,7 +36,7 @@ public:
 
    inline const Address & getAddress() const { return address;} ///< Get client address.
    inline bool addrEqual( const Client * other ) const          ///< Compare address with other.
-               { address.equal(other->address);}
+               { return address.equal(other->address);}
 
    inline void setAddressIP( const Address & other) { address.setIP( other);}
 
