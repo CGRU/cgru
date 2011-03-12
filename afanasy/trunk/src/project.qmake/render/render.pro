@@ -4,7 +4,6 @@ DESTDIR = ../../../bin
 TEMPLATE = app
 
 CONFIG += qt release
-QT -= gui
 QT += xml network
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
