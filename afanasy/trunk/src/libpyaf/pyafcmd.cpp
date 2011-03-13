@@ -55,7 +55,16 @@ PyObject * PyAf_Cmd_decodeJobList( PyAf_Cmd_Object *self, PyObject *args)
       PyDict_SetItemString (jobInfo, "state", PyString_FromString(af::state2str( job->getState()).c_str()));
       PyDict_SetItemString (jobInfo, "offline", PyBool_FromLong(job->getState() & AFJOB::STATE_OFFLINE_MASK));
       PyDict_SetItemString (jobInfo, "username", PyString_FromString(job->getUserName().c_str()));
-
+      PyObject *blocks = PyList_New(0);
+      for (int i = 0; i < job->getBlocksNum(); i++) {
+         PyObject *blockInfo = PyDict_New();
+         af::BlockData * blockData = job->getBlock(i);
+         PyDict_SetItemString (blockInfo, "name", PyString_FromString(blockData->getName().c_str()));
+         PyDict_SetItemString (blockInfo, "service", PyString_FromString(blockData->getService().c_str()));
+         PyDict_SetItemString (blockInfo, "progress", PyInt_FromLong(blockData->getProgressPercentage()));
+         PyDict_SetItemString (blockInfo, "cmd", PyString_FromString(blockData->getCmd().c_str()));
+         PyList_Append(blocks, blockInfo);
+      }
       PyList_Append(list, jobInfo);
    }
    return list;
