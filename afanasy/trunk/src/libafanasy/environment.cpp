@@ -401,6 +401,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //#endif
    printf("Afanasy build revision = \"%d\"\n", afanasy_build_version);
    cgru_version = getenv("CGRU_VERSION");
+	printf("Python version = %d.%d.%d\n", PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
    printf("CGRU version = \"%s\"\n", cgru_version.c_str());
 //###################################################
 

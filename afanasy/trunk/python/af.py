@@ -5,6 +5,7 @@ import os
 import sys
 
 import pyaf
+print 'Python module = "%s"' % pyaf.__file__
 
 import afenv
 import afnetwork
