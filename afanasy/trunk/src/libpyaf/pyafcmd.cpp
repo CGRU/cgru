@@ -65,6 +65,7 @@ PyObject * PyAf_Cmd_decodeJobList( PyAf_Cmd_Object *self, PyObject *args)
          PyDict_SetItemString (blockInfo, "cmd", PyString_FromString(blockData->getCmd().c_str()));
          PyList_Append(blocks, blockInfo);
       }
+      PyDict_SetItemString (jobInfo, "blocks", blocks);
       PyList_Append(list, jobInfo);
    }
    return list;
