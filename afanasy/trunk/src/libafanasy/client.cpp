@@ -20,6 +20,8 @@ Client::Client( int flags, int Id):
    id = Id;
    if( flags & GetEnvironment )
    {
+      af::NetIF::getNetIFs( netIFs, true);
+
       address.setPort( af::Environment::getClientPort());
       time_launch = time(NULL);
       username = af::Environment::getUserName();

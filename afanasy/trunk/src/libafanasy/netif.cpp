@@ -1,6 +1,13 @@
-#include "netif.h"
-
-#include <string.h>
+#ifdef WINNT
+#include <winsock2.h>
+#include <iphlpapi.h>
+//#include <stdio.h>
+#include <limits.h>
+#include <ws2tcpip.h>
+#pragma comment(lib, "IPHLPAPI.lib")
+#define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
+#define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+#endif
 
 #ifdef LINUX
 #include <arpa/inet.h>
@@ -8,6 +15,10 @@
 #include <net/if.h>
 #include <sys/ioctl.h>
 #endif
+
+#include <string.h>
+
+#include "netif.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -193,4 +204,124 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
    close( sd );
 
 #endif
+
+#ifdef WINNT
+
+   /* Declare and initialize variables */
+
+   // Set the flags to pass to GetAdaptersAddresses
+   ULONG flags = GAA_FLAG_INCLUDE_PREFIX;
+   ULONG outBufLen = sizeof(IP_ADAPTER_ADDRESSES);
+   PIP_ADAPTER_ADDRESSES pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+
+   // Make an initial call to GetAdaptersAddresses to get the 
+   // size needed into the outBufLen variable
+   // AF_UNSPEC to unspecified address family (both)
+   if( GetAdaptersAddresses( AF_UNSPEC, flags, NULL, pAddresses, &outBufLen) == ERROR_BUFFER_OVERFLOW)
+   {
+      FREE(pAddresses);
+      pAddresses = (IP_ADAPTER_ADDRESSES *) MALLOC(outBufLen);
+   }
+
+   if( pAddresses == NULL)
+   {
+      AFERROR("Memory allocation failed for IP_ADAPTER_ADDRESSES struct\n");
+      return;
+   }
+   // Make a second call to GetAdapters Addresses to get the
+   // actual data we want
+
+   DWORD dwRetVal = GetAdaptersAddresses( AF_UNSPEC, flags, NULL, pAddresses, &outBufLen);
+
+   if( dwRetVal == NO_ERROR)
+   {
+      // If successful, output some information from the data we received
+      for( PIP_ADAPTER_ADDRESSES pCurrAddresses = pAddresses; pCurrAddresses != NULL; pCurrAddresses = pCurrAddresses->Next)
+      {
+         printf("Adapter name: %s\n", pCurrAddresses->AdapterName);
+
+         if( pCurrAddresses->PhysicalAddressLength != 0)
+         {
+            printf("\tPhysical address: ");
+            for( unsigned i = 0; i < pCurrAddresses->PhysicalAddressLength; i++)
+            {
+               if( i == (pCurrAddresses->PhysicalAddressLength - 1))
+                  printf("%.2X\n", (int) pCurrAddresses->PhysicalAddress[i]);
+               else
+                  printf("%.2X-", (int) pCurrAddresses->PhysicalAddress[i]);
+            }
+         }
+
+         // Skip some interfaces:
+         if((( pCurrAddresses->Flags & IP_ADAPTER_IPV4_ENABLED) == false)
+            && (( pCurrAddresses->Flags & IP_ADAPTER_IPV6_ENABLED) == false))
+         {
+            printf("\tSkipping interface without IP address(es) configured.\n");
+            continue;
+         }
+         if( pCurrAddresses->OperStatus != IfOperStatusUp )
+         {
+            printf("\tSkipping down interface.\n");
+            continue;
+         }
+
+         IP_ADAPTER_PREFIX * pPrefix = pCurrAddresses->FirstPrefix;
+         if( pPrefix)
+         {
+            for( unsigned i = 0; pPrefix != NULL; i++)
+            {
+               char szAddress[NI_MAXHOST];
+	            if( getnameinfo( pPrefix->Address.lpSockaddr,
+			         pPrefix->Address.iSockaddrLength,
+			         szAddress, sizeof(szAddress), NULL, 0,
+			         NI_NUMERICHOST))
+               {
+		            fprintf(stderr, "can't convert network format to presentation format");
+	            }
+               else
+               {
+                  switch((pPrefix->Address.lpSockaddr)->sa_family)
+                  {
+                     case AF_INET:
+                        printf("\t\tFamily=IPv4, Addr=%s\n", szAddress);
+                        break;
+                     case AF_INET6:
+                        printf("\t\tFamily=IPv6, Addr=%s/64\n", szAddress);
+                        break;
+                     default:
+                        printf("\t\tFamily=Unknown, Addr=%s\n", szAddress);
+                  }
+               }
+               pPrefix = pPrefix->Next;
+            }
+         }
+         else
+            printf("\tNo IP Adapter Prefix entries\n");
+
+         // skip a software loopback network interface
+         if( pCurrAddresses->IfType == IF_TYPE_SOFTWARE_LOOPBACK )
+         {
+            printf("\tSkipping software loopback network interface.\n");
+            continue;
+         }
+      }
+   }
+   else
+   {
+      AFERRAR("Call to GetAdaptersAddresses failed with error(%d):\n", dwRetVal);
+      if( dwRetVal == ERROR_NO_DATA)
+         printf("\tNo addresses were found for the requested parameters\n");
+      else
+      {
+         LPVOID lpMsgBuf = NULL;
+         if( FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS, NULL, dwRetVal, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR) & lpMsgBuf, 0, NULL))
+         {
+            printf("%s\n", lpMsgBuf);
+            LocalFree(lpMsgBuf);
+         }
+      }
+   }
+   FREE(pAddresses);
+#endif
+
 }
