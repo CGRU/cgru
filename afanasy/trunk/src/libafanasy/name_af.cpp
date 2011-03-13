@@ -14,6 +14,7 @@
 #define getcwd _getcwd
 #define open _open
 #define read _read
+#define snprintf _snprintf
 #define sprintf sprintf_s
 #define stat _stat
 #else
@@ -93,7 +94,21 @@ const std::string af::time2str( time_t time_sec, const char * time_format)
 
    const char * format = time_format;
    if( format == NULL ) format = af::Environment::getTimeFormat();
-   strftime( buffer, timeStrLenMax, format, localtime( &time_sec));
+   struct tm time_struct;
+   struct tm * p_time_struct = NULL;
+#ifndef WINNT
+   p_time_struct = localtime_r( &time_sec, &time_struct);
+#else
+   if( localtime_s( &time_struct, &time_sec) == 0 )
+      p_time_struct = &time_struct;
+   else
+      p_time_struct = NULL;
+#endif
+   if( p_time_struct == NULL )
+   {
+      return std::string("Invalid time: ") + itos( time_sec);
+   }
+   strftime( buffer, timeStrLenMax, format, p_time_struct);
    return std::string( buffer);
 }
 
@@ -220,7 +235,7 @@ const std::string af::fillNumbers( const std::string& pattern, int start, int en
    }
    if(( str.find("%") != std::string::npos ) && ( str.find("%n") == std::string::npos ))
    {
-      int buflen = str.size() * 2 + 256;
+      int buflen = int( str.size()) * 2 + 256;
       for(;;)
       {
          char * buffer = new char[buflen];
@@ -242,7 +257,7 @@ const std::string af::fillNumbers( const std::string& pattern, int start, int en
 
 int af::weigh( const std::string & str)
 {
-   return str.capacity();
+   return int( str.capacity());
 }
 
 int af::weigh( const std::list<std::string> & strlist)
