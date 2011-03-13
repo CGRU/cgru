@@ -197,11 +197,47 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
 
 const std::string af::fillNumbers( const std::string& pattern, int start, int end)
 {
+/*
    QString str = QString::fromUtf8( pattern.c_str());
    if( str.contains("%1")) str = str.arg( start);
    if( str.contains("%2")) str = str.arg( end);
    if( str.contains("%") && (false == str.contains("%n"))) str.sprintf( str.toUtf8().data(), start, end);
    return std::string( str.toUtf8().data());
+*/
+   std::string str( pattern);
+   size_t pos;
+   pos = str.find("%1");
+   while( pos != std::string::npos )
+   {
+      str.replace( pos, 2, itos( start));
+      pos = str.find("%1");
+   }
+   pos = str.find("%2");
+   while( pos != std::string::npos )
+   {
+      str.replace( pos, 2, itos( end));
+      pos = str.find("%2");
+   }
+   if(( str.find("%") != std::string::npos ) && ( str.find("%n") == std::string::npos ))
+   {
+      int buflen = str.size() * 2 + 256;
+      for(;;)
+      {
+         char * buffer = new char[buflen];
+         int retval = snprintf( buffer, buflen, str.c_str(), start, end);
+         if( retval >= buflen )
+         {
+            buflen = buflen * 2;
+         }
+         else
+         {
+            str = buffer;
+            break;
+         }
+         delete buffer;
+      }
+   }
+   return str;
 }
 
 int af::weigh( const std::string & str)
