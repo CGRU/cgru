@@ -6,6 +6,7 @@
 
 class QByteArray;
 class QDomDocument;
+class QDomElement;
 
 class afqt::Attr
 {
@@ -24,6 +25,10 @@ public:
 
 public:
    QString str;
+
+protected:
+   static bool getXMLAttribute(  QDomElement & element, const QString & name, int & value);
+   static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
 
 private:
    QString name;

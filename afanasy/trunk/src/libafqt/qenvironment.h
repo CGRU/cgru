@@ -107,6 +107,8 @@ public:
 private:
    static void solveServerAddress();
 
+   static bool openXMLDomDocument(  QDomDocument & doc, const std::string & filename);
+
 private:
    static bool valid;
 

@@ -10,10 +10,12 @@
 
 #include <Python.h>
 
+/*
 #include <QtCore/QDir>
 #include <QtCore/QFile>
 #include <QtCore/QRegExp>
 #include <QtXml/QDomDocument>
+*/
 
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
@@ -142,219 +144,154 @@ std::list<std::string> Environment::rendercmds;
 
 int            Environment::afanasy_build_version = 0;
 
-bool Environment::getVars( const std::string & filename)
+void Environment::getVars( const rapidxml::xml_node<> * pnode)
 {
-//   if( false == pathFileExists( filename)) return false;
+   getVar( pnode, filenamesizemax,                   "filenamesizemax"                   );
+   getVar( pnode, timeformat,                        "timeformat"                        );
+   getVar( pnode, priority,                          "priority"                          );
+   getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
+   getVar( pnode, hostsmask,                         "hostsmask"                         );
 
-   QDomDocument doc("afanasy");
-   if( openXMLDomDocument( doc, filename) == false) return false;
-   if( verbose) printf("Parsing XML file '%s':\n", filename.c_str());
-
-   getVar( doc, filenamesizemax,                   "filenamesizemax"                   );
-   getVar( doc, timeformat,                        "timeformat"                        );
-   getVar( doc, priority,                          "priority"                          );
-   getVar( doc, maxrunningtasks,                   "maxrunningtasks"                   );
-   getVar( doc, hostsmask,                         "hostsmask"                         );
-
-   getVar( doc, servername,                        "servername"                        );
-   getVar( doc, serverport,                        "serverport"                        );
-   getVar( doc, clientport,                        "clientport"                        );
+   getVar( pnode, servername,                        "servername"                        );
+   getVar( pnode, serverport,                        "serverport"                        );
+   getVar( pnode, clientport,                        "clientport"                        );
 
 #ifndef WINNT
 
-   getVar( doc, user_logs_rotate,                  "user_logs_rotate"                  );
-   getVar( doc, render_logs_rotate,                "render_logs_rotate"                );
+   getVar( pnode, user_logs_rotate,                  "user_logs_rotate"                  );
+   getVar( pnode, render_logs_rotate,                "render_logs_rotate"                );
 
-   getVar( doc, tempdirectory,                     "tempdirectory"                     );
+   getVar( pnode, tempdirectory,                     "tempdirectory"                     );
 
-   getVar( doc, db_type,                           "db_type"                           );
-   getVar( doc, db_hostname,                       "db_hostname"                       );
-   getVar( doc, db_databasename,                   "db_databasename"                   );
-   getVar( doc, db_username,                       "db_username"                       );
-   getVar( doc, db_password,                       "db_password"                       );
-   getVar( doc, db_stringquotes,                   "db_stringquotes"                   );
-   getVar( doc, db_stringnamelen,                  "db_stringnamelen"                  );
-   getVar( doc, db_stringexprlen,                  "db_stringexprlen"                  );
+   getVar( pnode, db_type,                           "db_type"                           );
+   getVar( pnode, db_hostname,                       "db_hostname"                       );
+   getVar( pnode, db_databasename,                   "db_databasename"                   );
+   getVar( pnode, db_username,                       "db_username"                       );
+   getVar( pnode, db_password,                       "db_password"                       );
+   getVar( pnode, db_stringquotes,                   "db_stringquotes"                   );
+   getVar( pnode, db_stringnamelen,                  "db_stringnamelen"                  );
+   getVar( pnode, db_stringexprlen,                  "db_stringexprlen"                  );
 
-   getVar( doc, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
-   getVar( doc, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
+   getVar( pnode, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
+   getVar( pnode, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
 
 #endif
 
-   getVar( doc, task_default_capacity,             "task_default_capacity"             );
-   getVar( doc, task_update_timeout,               "task_update_timeout"               );
-   getVar( doc, task_log_linesmax,                 "task_log_linesmax"                 );
-   getVar( doc, job_log_linesmax,                  "job_log_linesmax"                  );
+   getVar( pnode, task_default_capacity,             "task_default_capacity"             );
+   getVar( pnode, task_update_timeout,               "task_update_timeout"               );
+   getVar( pnode, task_log_linesmax,                 "task_log_linesmax"                 );
+   getVar( pnode, job_log_linesmax,                  "job_log_linesmax"                  );
 
-   getVar( doc, render_default_capacity,           "render_default_capacity"           );
-   getVar( doc, render_default_maxtasks,           "render_default_maxtasks"           );
-   getVar( doc, render_exec,                       "render_exec"                       );
-   getVar( doc, render_cmd_reboot,                 "render_cmd_reboot"                 );
-   getVar( doc, render_cmd_shutdown,               "render_cmd_shutdown"               );
-   getVar( doc, render_hddspace_path,              "render_hddspace_path"              );
-   getVar( doc, render_networkif,                  "render_networkif"                  );
-   getVar( doc, render_iostat_device,              "render_iostat_device"              );
-   getVar( doc, render_resclasses,                 "render_resclasses"                 );
-   getVar( doc, render_nice,                       "render_nice"                       );
-   getVar( doc, render_update_sec,                 "render_update_sec"                 );
-   getVar( doc, render_updatetaskperiod,           "render_updatetaskperiod"           );
-   getVar( doc, render_zombietime,                 "render_zombietime"                 );
-   getVar( doc, render_connectretries,             "render_connectretries"             );
-   getVar( doc, render_waitforconnected,           "render_waitforconnected"           );
-   getVar( doc, render_waitforreadyread,           "render_waitforreadyread"           );
-   getVar( doc, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
-   getVar( doc, render_log_linesmax,               "render_log_linesmax"               );
+   getVar( pnode, render_default_capacity,           "render_default_capacity"           );
+   getVar( pnode, render_default_maxtasks,           "render_default_maxtasks"           );
+   getVar( pnode, render_exec,                       "render_exec"                       );
+   getVar( pnode, render_cmd_reboot,                 "render_cmd_reboot"                 );
+   getVar( pnode, render_cmd_shutdown,               "render_cmd_shutdown"               );
+   getVar( pnode, render_hddspace_path,              "render_hddspace_path"              );
+   getVar( pnode, render_networkif,                  "render_networkif"                  );
+   getVar( pnode, render_iostat_device,              "render_iostat_device"              );
+   getVar( pnode, render_resclasses,                 "render_resclasses"                 );
+   getVar( pnode, render_nice,                       "render_nice"                       );
+   getVar( pnode, render_update_sec,                 "render_update_sec"                 );
+   getVar( pnode, render_updatetaskperiod,           "render_updatetaskperiod"           );
+   getVar( pnode, render_zombietime,                 "render_zombietime"                 );
+   getVar( pnode, render_connectretries,             "render_connectretries"             );
+   getVar( pnode, render_waitforconnected,           "render_waitforconnected"           );
+   getVar( pnode, render_waitforreadyread,           "render_waitforreadyread"           );
+   getVar( pnode, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
+   getVar( pnode, render_log_linesmax,               "render_log_linesmax"               );
 
-   getVar( doc, previewcmds,                       "previewcmds"                       );
-   getVar( doc, rendercmds,                        "rendercmds"                        );
-   getVar( doc, watch_refreshinterval,             "watch_refreshinterval"             );
-   getVar( doc, watch_connectretries,              "watch_connectretries"              );
-   getVar( doc, watch_waitforconnected,            "watch_waitforconnected"            );
-   getVar( doc, watch_waitforreadyread,            "watch_waitforreadyread"            );
-   getVar( doc, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
+   getVar( pnode, previewcmds,                       "previewcmds"                       );
+   getVar( pnode, rendercmds,                        "rendercmds"                        );
+   getVar( pnode, watch_refreshinterval,             "watch_refreshinterval"             );
+   getVar( pnode, watch_connectretries,              "watch_connectretries"              );
+   getVar( pnode, watch_waitforconnected,            "watch_waitforconnected"            );
+   getVar( pnode, watch_waitforreadyread,            "watch_waitforreadyread"            );
+   getVar( pnode, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
 
-   getVar( doc, pswd_visor,                        "pswd_visor"                        );
-   getVar( doc, pswd_god,                          "pswd_god"                          );
+   getVar( pnode, pswd_visor,                        "pswd_visor"                        );
+   getVar( pnode, pswd_god,                          "pswd_god"                          );
 
-   getVar( doc, errors_forgivetime,                "errors_forgivetime"                );
-   getVar( doc, errors_avoid_host,                 "errors_avoid_host"                 );
-   getVar( doc, task_error_retries,                "task_error_retries"                );
-   getVar( doc, task_errors_same_host,             "task_errors_same_host"             );
+   getVar( pnode, errors_forgivetime,                "errors_forgivetime"                );
+   getVar( pnode, errors_avoid_host,                 "errors_avoid_host"                 );
+   getVar( pnode, task_error_retries,                "task_error_retries"                );
+   getVar( pnode, task_errors_same_host,             "task_errors_same_host"             );
 
-   getVar( doc, sysjob_tasklife,                   "sysjob_tasklife"                   );
-   getVar( doc, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
+   getVar( pnode, sysjob_tasklife,                   "sysjob_tasklife"                   );
+   getVar( pnode, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
 
-   getVar( doc, user_zombietime,                   "user_zombietime"                   );
-   getVar( doc, user_log_linesmax,                 "user_log_linesmax"                 );
+   getVar( pnode, user_zombietime,                   "user_zombietime"                   );
+   getVar( pnode, user_log_linesmax,                 "user_log_linesmax"                 );
 
-   getVar( doc, talk_updateperiod,                 "talk_updateperiod"                 );
-   getVar( doc, talk_zombietime,                   "talk_zombietime"                   );
-   getVar( doc, talk_connectretries,               "talk_connectretries"               );
-   getVar( doc, talk_waitforconnected,             "talk_waitforconnected"             );
-   getVar( doc, talk_waitforreadyread,             "talk_waitforreadyread"             );
-   getVar( doc, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
+   getVar( pnode, talk_updateperiod,                 "talk_updateperiod"                 );
+   getVar( pnode, talk_zombietime,                   "talk_zombietime"                   );
+   getVar( pnode, talk_connectretries,               "talk_connectretries"               );
+   getVar( pnode, talk_waitforconnected,             "talk_waitforconnected"             );
+   getVar( pnode, talk_waitforreadyread,             "talk_waitforreadyread"             );
+   getVar( pnode, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
 
-   getVar( doc, monitor_updateperiod,              "monitor_updateperiod"              );
-   getVar( doc, monitor_zombietime,                "monitor_zombietime"                );
-   getVar( doc, monitor_connectretries,            "monitor_connectretries"            );
-   getVar( doc, monitor_waitforconnected,          "monitor_waitforconnected"          );
-   getVar( doc, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
-   getVar( doc, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
-
-   return true;
+   getVar( pnode, monitor_updateperiod,              "monitor_updateperiod"              );
+   getVar( pnode, monitor_zombietime,                "monitor_zombietime"                );
+   getVar( pnode, monitor_connectretries,            "monitor_connectretries"            );
+   getVar( pnode, monitor_waitforconnected,          "monitor_waitforconnected"          );
+   getVar( pnode, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
+   getVar( pnode, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
 }
 
-bool Environment::getXMLElement( const QDomDocument & doc, const char * name, std::string & text)
+bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name)
 {
-   QDomNodeList list = doc.elementsByTagName( name);
-   int size = list.size();
-   if( size < 1) return false;
-   if( size > 1)
+   rapidxml::xml_node<> * node = pnode->first_node( name);
+   if( node == NULL ) return false;
+   char * data = node->value();
+   if( data )
    {
-      AFERRAR("Found %d '%s' elements in document, using the last.\n", size, name)
+      value = data;
+      PRINT("\t%s = '%s'\n", name, value.c_str());
+      return true;
    }
-   QDomElement element = list.at(size-1).toElement();
-   if( element.isNull())
-   {
-      AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
-         element.lineNumber(), element.columnNumber(), name)
-      return false;
-   }
-   text = element.text().toUtf8().data();
-   return true;
+   return false;
 }
 
-bool Environment::getXMLElement( const QDomDocument & doc, const char * name, std::list<std::string> & stringlist)
-{
-   QDomNodeList list = doc.elementsByTagName( name);
-   int size = list.size();
-   if( size < 1) return false;
-   for( int i = 0; i < size; i++)
-   {
-      QDomElement element = list.at(i).toElement();
-      if( element.isNull())
-      {
-         AFERRAR("Invalid element [Line %d - Col %d]: '%s'\n",
-            element.lineNumber(), element.columnNumber(), name)
-         return false;
-      }
-      if( element.text().isEmpty()) stringlist.clear();
-      else stringlist.push_back( element.text().toUtf8().data());
-   }
-   return true;
-}
-
-bool Environment::getXMLAttribute( QDomElement & element, const char * name, int & value)
-{
-   if( element.isNull()) return false;
-   QDomAttr attribute = element.attributeNode( name);
-   if( attribute.isNull()) return false;
-   bool ok;
-   int number = attribute.value().toInt( &ok);
-   if( false == ok )
-   {
-      AFERRAR("Element '%s': attribute '%s' has not a number value '%s'\n",
-              element.text().toUtf8().data(), name, attribute.value().toUtf8().data())
-      return false;
-   }
-   value = number;
-   PRINT(" %s='%d'", name, value);
-   return true;
-}
-
-bool Environment::getVar( const QDomDocument & doc, std::string & value, const char * name)
+bool Environment::getVar( const rapidxml::xml_node<> * pnode, int & value, const char * name)
 {
    std::string str;
-   if( getXMLElement( doc, name, str) == false) return false;
-   value = str;
-   PRINT("\t%s = '%s'\n", name, value.c_str());
-   return true;
+   if( getVar( pnode, str, name))
+   {
+      bool ok; int number = af::stoi( str, &ok);
+      if( ok == false)
+      {
+         AFERRAR("Invalid number in '%s' element.\n", name)
+         return false;
+      }
+      value = number;
+      PRINT("\t%s = %d\n", name, value);
+      return true;
+   }
+   return false;
 }
 
-bool Environment::getVar( const QDomDocument & doc, std::list<std::string> & value, const char * name)
+bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::string> & value, const char * name)
 {
-   if( getXMLElement( doc, name, value) == false) return false;
+   rapidxml::xml_node<> * node = pnode->first_node( name);
+   if( node == NULL ) return false;
+   while( node != NULL )
+   {
+      char * data = node->value();
+      if( data == NULL ) value.clear();
+      else
+      {
+         std::string str = data;
+         if( str.empty() ) value.clear();
+         else value.push_back( str);
+      }
+      node = node->next_sibling( name);
+   }
    if( verbose )
    {
       printf("\t%s:\n", name);
       for( std::list<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
          printf("\t\t%s\n", (*it).c_str());
    }
-   return true;
-}
-
-bool Environment::getVar( const QDomDocument & doc, int & value, const char * name)
-{
-   std::string text;
-   if( getXMLElement( doc, name, text) == false) return false;
-   bool ok; int number = af::stoi( text, &ok);
-   if( ok == false)
-   {
-      AFERRAR("Invalid number in '%s' element.\n", name);
-      return false;
-   }
-   value = number;
-   PRINT("\t%s = %d\n", name, value);
-   return true;
-}
-
-bool Environment::openXMLDomDocument( QDomDocument & doc, const std::string & filename)
-{
-   QFile file( filename.c_str());
-   if( file.open(QIODevice::ReadOnly) == false)
-   {
-      PRINT("Unable to open '%s'.\n", filename.c_str());
-      return false;
-   }
-   QString errorMsg; int errorLine = 0; int errorColumn = 0;
-   if( doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
-   {
-      AFERRAR("Parse error '%s' [Line %d - Col %d]:\n", filename.c_str(), errorLine, errorColumn);
-      printf("%s\n", errorMsg.toUtf8().data());
-      file.close();
-      return false;
-   }
-   file.close();
    return true;
 }
 
@@ -483,23 +420,67 @@ void Environment::load()
 {
    std::string filename;
    filename = ( afroot + "/config_default.xml");
-   getVars( filename);
+   load( filename, false, verbose);
    filename = ( afroot + "/config.xml");
-   getVars( filename);
+   load( filename, false, verbose);
    filename = ( home_afanasy + "config.xml");
-   getVars( filename);
-   bool tverbose=verbose;
+   load( filename, false, verbose);
+   bool _verbose=verbose;
    verbose = false;
    filename = ( afroot + "/config_shadow.xml");
-   getVars( filename);
-   verbose=tverbose;
+   load( filename, false, verbose);
+   verbose=_verbose;
 }
 
-bool Environment::load( const std::string & filename, uint32_t flags)
+bool Environment::load( const std::string & filename, bool initialize, bool Verbose)
 {
-   verbose = flags & Verbose;
-   if( getVars( filename)) return init();
-   return false;
+   bool retval = false;
+   verbose = Verbose;
+
+   if( false == pathFileExists( filename)) return retval;
+
+   if( verbose) printf("Parsing XML file '%s':\n", filename.c_str());
+
+   int filesize = -1;
+   char * buffer = fileRead( filename, filesize);
+   if( buffer != NULL )
+   {
+      rapidxml::xml_document<> xmldoc;
+
+      bool parse_error = false;
+
+      try
+      {
+         xmldoc.parse<0>( buffer);
+      }
+      catch ( rapidxml::parse_error err)
+      {
+         AFERRAR("Parsing error: %s.\n", err.what())
+         parse_error = true;
+      }
+      catch ( ... )
+      {
+         AFERROR("Unknown exeption.\n")
+         parse_error = true;
+      }
+
+      if( false == parse_error )
+      {
+         rapidxml::xml_node<> * root_node = xmldoc.first_node("afanasy");
+         if( root_node == NULL )
+         {
+            AFERRAR("Can't find document root \"afanasy\": node:\n%s\n", filename.c_str())
+         }
+         else
+         {
+            getVars( root_node);
+            if( initialize ) retval = init();
+            else retval = true;
+         }
+      }
+      delete buffer;
+   }
+   return retval;
 }
 
 bool Environment::reload()

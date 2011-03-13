@@ -153,7 +153,7 @@ QEnvironment::QEnvironment( const QString & name)
    {
       QDomDocument doc( name);
       filename = af::Environment::getHomeAfanasy() + name.toUtf8().data() + ".xml";
-      if( af::Environment::openXMLDomDocument( doc, filename))
+      if( openXMLDomDocument( doc, filename))
       {
          for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->read( doc);
          for( int i = 0; i < attrs_gui.size(); i++) attrs_gui[i]->read( doc);
@@ -176,6 +176,23 @@ QEnvironment::QEnvironment( const QString & name)
 
    initFonts();
    solveServerAddress();
+}
+
+bool QEnvironment::openXMLDomDocument( QDomDocument & doc, const std::string & filename)
+{
+   QFile file( filename.c_str());
+   if( file.open(QIODevice::ReadOnly) == false) return false;
+
+   QString errorMsg; int errorLine = 0; int errorColumn = 0;
+   if( doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
+   {
+      AFERRAR("Parse error '%s' [Line %d - Col %d]:\n", filename.c_str(), errorLine, errorColumn)
+      printf("%s\n", errorMsg.toUtf8().data());
+      file.close();
+      return false;
+   }
+   file.close();
+   return true;
 }
 
 void QEnvironment::initFonts()

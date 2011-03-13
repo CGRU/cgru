@@ -467,11 +467,13 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
       {
          std::string err = std::string("Reading file failed:\n") + filename + "\n" + strerror( errno);
          if( errOutput ) *errOutput = err; else AFERROR( err)
+         buffer[readsize] = '\0';
          break;
       }
       if( bytes == 0 ) break;
       maxsize -= bytes;
       readsize += bytes;
    }
+   buffer[readsize] = '\0';
    return buffer;
 }

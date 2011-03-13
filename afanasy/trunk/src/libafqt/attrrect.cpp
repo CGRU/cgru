@@ -29,10 +29,10 @@ AttrRect * AttrRect::readNode( QDomNode node)
    int x, y, w, h;
    element = node.toElement();
    if( element.isNull()) return NULL;
-   if( af::Environment::getXMLAttribute( element, "x", x) == false) return NULL;
-   if( af::Environment::getXMLAttribute( element, "y", y) == false) return NULL;
-   if( af::Environment::getXMLAttribute( element, "w", w) == false) return NULL;
-   if( af::Environment::getXMLAttribute( element, "h", h) == false) return NULL;
+   if( getXMLAttribute( element, "x", x) == false) return NULL;
+   if( getXMLAttribute( element, "y", y) == false) return NULL;
+   if( getXMLAttribute( element, "w", w) == false) return NULL;
+   if( getXMLAttribute( element, "h", h) == false) return NULL;
    AFINFA("AttrRect::readNode: %s %d %d %d %d\n", element.text().toUtf8().data(), x,y,w,h);
    return new AttrRect( element.text(), QRect( x, y, w, h));
 }

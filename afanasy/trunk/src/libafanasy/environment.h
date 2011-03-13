@@ -6,8 +6,7 @@
 #include "name_af.h"
 #include "netif.h"
 
-class QDomDocument;
-class QDomElement;
+#include "rapidxml/rapidxml.hpp"
 
 namespace af
 {
@@ -41,16 +40,12 @@ public:
       { cmdarguments_usagearg.push_back( arg); cmdarguments_usagehelp.push_back( help);}
 
    static bool reload();
-   static bool load( const std::string & filename, uint32_t flags = 0);
+   static bool load( const std::string & filename, bool initialize, bool Verbose);
 
    static void setVerbose( bool value = true) { verbose = value;}
-   static bool openXMLDomDocument(  QDomDocument & doc, const std::string & filename);
-   static bool getXMLAttribute(  QDomElement & element, const char * name, int & value);
-   static bool getXMLElement( const QDomDocument & doc, const char * name, std::string & text );
-   static bool getXMLElement( const QDomDocument & doc, const char * name, std::list<std::string> & stringlist );
-   static bool getVar( const QDomDocument & doc, std::string & value, const char * name );
-   static bool getVar( const QDomDocument & doc, int         & value, const char * name );
-   static bool getVar( const QDomDocument & doc, std::list<std::string> & value, const char * name );
+   static bool getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name );
+   static bool getVar( const rapidxml::xml_node<> * pnode, int         & value, const char * name );
+   static bool getVar( const rapidxml::xml_node<> * pnode, std::list<std::string> & value, const char * name );
 
 /// Check current key matching password sequence.
    static bool checkKey( const char key);
@@ -179,7 +174,7 @@ private:
    static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
    static void printUsage(); ///< Output command usage
    static void load();
-   static bool getVars( const std::string & filename);
+   static void getVars( const rapidxml::xml_node<> * pnode);
    static bool init();
 
    static std::string afroot;          ///< Afanasy root directory.

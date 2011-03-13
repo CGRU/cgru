@@ -17,7 +17,7 @@ CmdConfig::~CmdConfig(){}
 bool CmdConfig::processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string filename( argv[0]);
-   af::Environment::load( filename, af::Environment::Verbose);
+   af::Environment::load( filename, true, af::Environment::Verbose);
    return true;
 }
 
