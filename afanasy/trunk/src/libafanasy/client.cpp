@@ -20,7 +20,18 @@ Client::Client( int flags, int Id):
    id = Id;
    if( flags & GetEnvironment )
    {
-      af::NetIF::getNetIFs( netIFs, true);
+      bool verbose = false;
+#ifdef WINNT
+      verbose = true;
+#endif
+      af::NetIF::getNetIFs( netIFs, verbose);
+
+      std::cout << "Network Interfaces:" << std::endl;
+      for( int i = 0; i < netIFs.size(); i++)
+      {
+         std::cout << "   ";
+         netIFs[i]->stdOut(true);
+      }
 
       address.setPort( af::Environment::getClientPort());
       time_launch = time(NULL);
