@@ -214,7 +214,7 @@ void Af::w_String( const std::string & string, Msg * msg)
       return;
    }
    const char * buffer = string.c_str();
-   uint32_t length = string.length() + 1;
+   uint32_t length = uint32_t( string.length()) + 1;
    rw_uint32_t( length, msg);
    w_data( buffer, msg, length);
 //std::cout << "Af::w_String: string = \"" << string << "\"\n";
@@ -227,7 +227,7 @@ void Af::rw_String( std::string & string, Msg * msg)
    if( msg->isWriting())
    {
       const char * buffer = string.c_str();
-      length = string.length() + 1;
+      length = uint32_t( string.length()) + 1;
       rw_uint32_t( length, msg);
       w_data( buffer, msg, length);
    }
@@ -303,7 +303,7 @@ void Af::rw_StringVect( std::vector<std::string> & stringVect, Msg * msg)
       for( std::vector<std::string>::iterator it = stringVect.begin(); it != stringVect.end(); it++)
          rw_String( *it, msg);
    else
-      for( int i = 0; i < length; i++)
+      for( unsigned i = 0; i < length; i++)
       {
          std::string str;
          rw_String( str, msg);
@@ -314,13 +314,13 @@ void Af::rw_StringVect( std::vector<std::string> & stringVect, Msg * msg)
 void Af::rw_StringList( std::list<std::string> & stringList, Msg * msg)
 {
    uint32_t length;
-   if( msg->isWriting() ) length = stringList.size();
+   if( msg->isWriting() ) length = uint32_t(stringList.size());
    rw_uint32_t( length, msg);
    if( msg->isWriting() )
       for( std::list<std::string>::iterator it = stringList.begin(); it != stringList.end(); it++)
          rw_String( *it, msg);
    else
-      for( int i = 0; i < length; i++)
+      for( unsigned i = 0; i < length; i++)
       {
          std::string str;
          rw_String( str, msg);
@@ -337,7 +337,7 @@ void Af::w_StringList( const std::list<std::string> & stringList, Msg * msg)
       return;
    }
 
-   uint32_t length = stringList.size();
+   uint32_t length = uint32_t(stringList.size());
    rw_uint32_t( length, msg);
    for( std::list<std::string>::const_iterator it = stringList.begin(); it != stringList.end(); it++)
    {
@@ -351,7 +351,7 @@ void Af::rw_Int8_List( std::list<int8_t> &list, Msg * msg)
    uint32_t count;
    if( msg->isWriting())
    {
-      count = list.size();
+      count = uint32_t( list.size());
       rw_uint32_t( count, msg);
       if( count < 1 ) return;
       std::list<int8_t>::iterator it = list.begin();
@@ -375,7 +375,7 @@ void Af::rw_Int32_List( std::list<int32_t> &list, Msg * msg)
    uint32_t count;
    if( msg->isWriting())
    {
-      count = list.size();
+      count = uint32_t( list.size());
       rw_uint32_t( count, msg);
       if( count < 1 ) return;
       std::list<int32_t>::iterator it = list.begin();
@@ -399,7 +399,7 @@ void Af::rw_Int32_Vect( std::vector<int32_t> &vect, Msg * msg)
    uint32_t count;
    if( msg->isWriting() )
    {
-      count = vect.size();
+      count = uint32_t( vect.size());
       rw_uint32_t( count, msg);
       for( unsigned p = 0; p < count; p++) rw_int32_t( vect[p], msg);
    }
@@ -420,7 +420,7 @@ void Af::rw_UInt32_List( std::list<uint32_t> &list, Msg * msg)
    uint32_t count;
    if( msg->isWriting())
    {
-      count = list.size();
+      count = uint32_t( list.size());
       rw_uint32_t( count, msg);
       if( count < 1 ) return;
       std::list<uint32_t>::iterator it = list.begin();
@@ -444,7 +444,7 @@ void Af::rw_UInt32_Vect( std::vector<uint32_t> &vect, Msg * msg)
    uint32_t count;
    if( msg->isWriting() )
    {
-      count = vect.size();
+      count = uint32_t( vect.size());
       rw_uint32_t( count, msg);
       for( unsigned p = 0; p < count; p++) rw_uint32_t( vect[p], msg);
    }

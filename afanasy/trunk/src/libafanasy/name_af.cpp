@@ -14,6 +14,7 @@
 #define getcwd _getcwd
 #define open _open
 #define read _read
+#define sprintf sprintf_s
 #define stat _stat
 #else
 #include <unistd.h>
@@ -351,7 +352,7 @@ const int af::stoi( const std::string & str, bool * ok)
    if( ok !=  NULL )
    {
       const char * buffer = str.data();
-      const int buflen = str.size();
+      const int buflen = int(str.size());
       for( int i = 0; i < buflen; i++ )
       {
          if(( i == 0) && ( buffer[i] == '-')) continue;

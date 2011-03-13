@@ -24,7 +24,7 @@ AddressesList::AddressesList( Msg * msg)
 void AddressesList::readwrite( Msg * msg)
 {
    uint32_t size;
-   if( msg->isWriting()) size = addresses.size();
+   if( msg->isWriting()) size = uint32_t( addresses.size());
    rw_uint32_t( size, msg);
    if( size )
    {

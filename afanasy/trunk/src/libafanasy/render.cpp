@@ -58,7 +58,7 @@ void Render::readwrite( Msg * msg)
 
       if( msg->isWriting())
       {
-         uint32_t taskscount = tasks.size();
+         uint32_t taskscount = uint32_t(tasks.size());
          rw_uint32_t( taskscount, msg);
          std::list<TaskExec*>::iterator it = tasks.begin();
          for( unsigned t = 0; t < taskscount; t++) (*(it++))->write( msg);

@@ -281,7 +281,7 @@ void HostRes::readwrite( Msg * msg)
    rw_int32_t( net_recv_kbsec,   msg);
    rw_int32_t( net_send_kbsec,   msg);
 
-   uint8_t custom_count = custom.size();
+   uint8_t custom_count = uint8_t(custom.size());
 
    if( msg->isReading())
    {

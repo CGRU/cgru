@@ -41,7 +41,7 @@ AFINFO("MCAfNodes::~MCAfNodes: deleing nodes.\n");
 
 void MCAfNodes::readwrite( Msg * msg)
 {
-   uint32_t count = list.size();
+   uint32_t count = uint32_t(list.size());
    rw_uint32_t( count, msg);
    if( count < 1) return;
    if( msg->isWriting() )
