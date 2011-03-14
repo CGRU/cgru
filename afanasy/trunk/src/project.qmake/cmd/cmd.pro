@@ -5,7 +5,7 @@ TEMPLATE = app
 
 CONFIG += qt release
 QT -= gui
-QT += xml network sql
+QT += sql
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
 

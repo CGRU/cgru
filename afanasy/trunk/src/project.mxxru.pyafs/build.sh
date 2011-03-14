@@ -11,7 +11,6 @@ cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 pythondir=$cgru_utils/python
-qt=$cgru_utils/qt/4.7.1
 
 # Setup Version:
 pushd .. > /dev/null
@@ -22,9 +21,6 @@ popd > /dev/null
 
 export AF_LFLAGS="-lrt -lz -lgthread -lglib"
 # on CentOS 5 with Python2.5 try "-lrt -lz -lgthread-2.0 -lglib-2.0"
-
-export QTDIR=$qt
-export PATH=$qt/bin:$PATH
 
 [ -f override.sh ] && source override.sh
 

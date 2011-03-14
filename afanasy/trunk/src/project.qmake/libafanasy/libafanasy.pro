@@ -3,9 +3,6 @@ TARGET = afanasy
 TEMPLATE = lib
 CONFIG = staticlib
 
-CONFIG += qt
-QT -= gui
-
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
 
 DIR = ../../libafanasy
