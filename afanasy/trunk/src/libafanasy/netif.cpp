@@ -252,58 +252,57 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
             }
          }
 
-         // Skip some interfaces:
+         // Skipping interface without IP address(es) configured:
          if((( pCurrAddresses->Flags & IP_ADAPTER_IPV4_ENABLED) == false)
             && (( pCurrAddresses->Flags & IP_ADAPTER_IPV6_ENABLED) == false))
          {
             printf("\tSkipping interface without IP address(es) configured.\n");
             continue;
          }
+
+         // Skipping down interface:
          if( pCurrAddresses->OperStatus != IfOperStatusUp )
          {
             printf("\tSkipping down interface.\n");
             continue;
          }
 
-         IP_ADAPTER_PREFIX * pPrefix = pCurrAddresses->FirstPrefix;
-         if( pPrefix)
+         std::vector<Address> addresses;
+         for( IP_ADAPTER_PREFIX * pPrefix = pCurrAddresses->FirstPrefix; pPrefix != NULL; pPrefix = pPrefix->Next)
          {
-            for( unsigned i = 0; pPrefix != NULL; i++)
+            addresses.push_back( Address(*((struct sockaddr_storage *)(pPrefix->Address.lpSockaddr))));
+            char szAddress[NI_MAXHOST];
+            if( getnameinfo( pPrefix->Address.lpSockaddr,
+		         pPrefix->Address.iSockaddrLength,
+		         szAddress, sizeof(szAddress), NULL, 0,
+		         NI_NUMERICHOST))
             {
-               char szAddress[NI_MAXHOST];
-	            if( getnameinfo( pPrefix->Address.lpSockaddr,
-			         pPrefix->Address.iSockaddrLength,
-			         szAddress, sizeof(szAddress), NULL, 0,
-			         NI_NUMERICHOST))
+	            fprintf(stderr, "can't convert network format to presentation format");
+            }
+            else
+            {
+               switch((pPrefix->Address.lpSockaddr)->sa_family)
                {
-		            fprintf(stderr, "can't convert network format to presentation format");
-	            }
-               else
-               {
-                  switch((pPrefix->Address.lpSockaddr)->sa_family)
-                  {
-                     case AF_INET:
-                        printf("\t\tFamily=IPv4, Addr=%s\n", szAddress);
-                        break;
-                     case AF_INET6:
-                        printf("\t\tFamily=IPv6, Addr=%s/64\n", szAddress);
-                        break;
-                     default:
-                        printf("\t\tFamily=Unknown, Addr=%s\n", szAddress);
-                  }
+                  case AF_INET:
+                     printf("\t\tFamily=IPv4, Addr=%s\n", szAddress);
+                     break;
+                  case AF_INET6:
+                     printf("\t\tFamily=IPv6, Addr=%s/64\n", szAddress);
+                     break;
+                  default:
+                     printf("\t\tFamily=Unknown, Addr=%s\n", szAddress);
                }
-               pPrefix = pPrefix->Next;
             }
          }
-         else
-            printf("\tNo IP Adapter Prefix entries\n");
 
-         // skip a software loopback network interface
+         // Skipping software loopback network interface:
          if( pCurrAddresses->IfType == IF_TYPE_SOFTWARE_LOOPBACK )
          {
             printf("\tSkipping software loopback network interface.\n");
             continue;
          }
+
+         netIFs.push_back( new NetIF( pCurrAddresses->AdapterName, pCurrAddresses->PhysicalAddress, addresses));
       }
    }
    else

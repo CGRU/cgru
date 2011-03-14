@@ -2,20 +2,23 @@
 
 #include "af.h"
 
+#ifdef WINNT
+struct sockaddr_storage;
+#endif
+
 namespace af
 {
 
 class Address : public Af
 {
 public:
-   Address( int Port = 0);                      ///< Construct an empty address.
-   Address( const Address & other);             ///< Copy given address.
-   Address( const Address * other);             ///< Copy given address.
-   Address & operator=( const Address & other);   ///< Assignment operator
-#ifndef WINNT
-   Address( const struct sockaddr_storage & ss);  ///< Set address from address storage structure.
-#endif
-   Address( Msg * msg);                   ///< Construct address using raw data.
+   Address( int Port = 0);                         ///< Construct an empty address.
+   Address( const Address & other);                ///< Copy given address.
+   Address( const Address * other);                ///< Copy given address.
+   Address & operator=( const Address & other);    ///< Assignment operator
+   Address( const struct sockaddr_storage & ss);   ///< Set address from address storage structure.
+   Address( Msg * msg);                            ///< Construct address using raw data.
+
    ~Address();
 
    enum Family

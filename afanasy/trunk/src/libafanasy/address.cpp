@@ -1,3 +1,8 @@
+#ifdef WINNT
+#include <winsock2.h>
+#include <ws2tcpip.h>
+#endif
+
 #include "address.h"
 
 #include <memory.h>
@@ -48,10 +53,9 @@ void Address::copy( const Address & other)
    memcpy( &addr, &other.addr, AddrDataLength);
 }
 
-#ifndef WINNT
 Address::Address( const struct sockaddr_storage & ss)
 {
-   bzero( addr, AddrDataLength);
+   memset( addr, 0, AddrDataLength);
    switch( ss.ss_family)
    {
    case AF_INET:
@@ -97,11 +101,10 @@ Address::Address( const struct sockaddr_storage & ss)
       break;
    }
    default:
-      AFERROR("Address::Address: Unknown address family.\n");
+      AFERROR("Address::Address: Unknown address family.");
       break;
    }
 }
-#endif
 
 bool Address::equal( const af::Address & other ) const
 {
@@ -162,10 +165,10 @@ bool Address::setSocketAddress( struct sockaddr_storage & ss) const
          break;
       }
       case Empty:
-         AFERROR("Address::setSocketAddress: Address is empty.\n");
+         AFERROR("Address::setSocketAddress: Address is empty.");
          return false;
       default:
-         AFERROR("Address::setSocketAddress: Unknown address family.\n");
+         AFERROR("Address::setSocketAddress: Unknown address family.");
          return false;
    }
    return true;
