@@ -38,7 +38,7 @@ public:
 
    virtual const std::string getInfo( bool full = false) const;
 
-   virtual void log( const std::string & message);
+   virtual void appendLog( const std::string & message);
    virtual void monitor( MonitorContainer * monitoring) const;
    virtual void updateDatabase() const;
 
@@ -72,7 +72,7 @@ public:
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();
 
-   inline static void logCmdPost( const std::string & message) { task->log( message);}
+   inline static void logCmdPost( const std::string & message) { task->appendLog( message);}
 
 private:
    SysTask * addTask( af::TaskExec * taskexec);
@@ -92,7 +92,7 @@ private:
 class SysJob : public JobAf
 {
 public:
-   static void addCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
+   static void addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
 
    enum CreationFlags
    {

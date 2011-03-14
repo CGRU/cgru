@@ -43,7 +43,7 @@ void Task::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf *
    }
    if( run)
    {
-      AFERROR("Task is already running.\n");
+      AFERROR("Task is already running.")
       delete taskexec;
       return;
    }
@@ -92,7 +92,7 @@ void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContai
       while( hIt != errorHosts.end() )
          if( currentTime - *tIt > block->getErrorsForgiveTime())
          {
-            log( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
+            appendLog( std::string("Forgived error host \"") + *hIt + "\" since " + af::time2str(*tIt) + ".");
             hIt = errorHosts.erase( hIt);
             cIt = errorHostsCounts.erase( cIt);
             tIt = errorHostsTime.erase( tIt);
@@ -115,7 +115,7 @@ void Task::refresh( time_t currentTime, RenderContainer * renders, MonitorContai
          {
             progress->state = progress->state |   AFJOB::STATE_READY_MASK;
             progress->state = progress->state & (~AFJOB::STATE_ERROR_MASK);
-            log( std::string("Automatically retrying error task") + af::itos( progress->errors_count) + " of " + af::itos( block->getErrorsRetries()) + ".");
+            appendLog( std::string("Automatically retrying error task") + af::itos( progress->errors_count) + " of " + af::itos( block->getErrorsRetries()) + ".");
             if( changed == false) changed = true;
          }
       }
@@ -141,7 +141,7 @@ void Task::restart( bool onlyRunning, const std::string & message, RenderContain
    progress->errors_count = 0;
    updateDatabase();
    monitor( monitoring);
-   log( message);
+   appendLog( message);
 }
 
 void Task::restartError( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -149,14 +149,14 @@ void Task::restartError( const std::string & message, RenderContainer * renders,
    if( false == ( progress->state & AFJOB::STATE_ERROR_MASK )) return;
    if( run )
    {
-      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]\n", block->job->getName().c_str(), block->data->getBlockNum(), number);
+      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]", block->job->getName().c_str(), block->data->getBlockNum(), number)
       return;
    }
    progress->state = AFJOB::STATE_READY_MASK;
    progress->errors_count = 0;
    updateDatabase();
    monitor( monitoring);
-   log( message);
+   appendLog( message);
 }
 
 void Task::skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -169,7 +169,7 @@ void Task::skip( const std::string & message, RenderContainer * renders, Monitor
       progress->errors_count = 0;
       updateDatabase();
       monitor( monitoring);
-      log( message);
+      appendLog( message);
    }
 }
 
@@ -184,7 +184,7 @@ void Task::errorHostsAppend( const std::string & hostname)
          (*cIt)++;
          *tIt = time(NULL);
          if( *cIt >= block->getErrorsTaskSameHost() )
-            log( hostname + " - AVOIDING HOST !");
+            appendLog( hostname + " - AVOIDING HOST !");
          return;
       }
 
@@ -228,9 +228,6 @@ void Task::getErrorHostsListString( std::string & str) const
          str += "\n";
          str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
          if((block->getErrorsAvoidHost() > 0) && ( *cIt >= block->getErrorsAvoidHost())) str += " - ! AVOIDING !";
-//         list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
-//            .arg( af::time2Qstr( errorHostsTime[h]))
-//            .arg(((block->getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= block->getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
       }
    }
 }
@@ -252,7 +249,7 @@ void Task::updateDatabase() const
    AFCommon::QueueDBUpdateTask( block->job->getId(), block->data->getBlockNum(), number, progress);
 }
 
-void Task::log( const std::string & message)
+void Task::appendLog( const std::string & message)
 {
    logStringList.push_back( af::time2str() + " : " + message);
    while( logStringList.size() > af::Environment::getTaskLogLinesMax() ) logStringList.pop_front();
@@ -276,14 +273,9 @@ const std::string Task::getOutputFileName( int startcount) const
    stream << ".s" << startcount;
    stream << "-" << block->data->getName();
    stream << "." << block->data->genTaskName( number);
-//   QString filename = QString("b%1.t%2.s%3-%4.%5")
-//                        .arg( block->data->getBlockNum()).arg( number).arg( startcount)
-//                        .arg( block->data->getName())
-//                        .arg( block->data->genTaskName( number));
    std::string filename = stream.str();
    af::pathFilterFileName( filename);
    filename = block->job->getTasksOutputDir() + "/" + filename;
-//   return QString("%1/%2").arg( block->job->getTasksOutputDir(), filename);
    return filename;
 }
 

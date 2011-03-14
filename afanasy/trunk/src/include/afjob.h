@@ -77,6 +77,7 @@ namespace AFJOB
    const int  SYSJOB_TASKMAXRUNTIME       = 60;    // Maximum time of system task running
    const int  SYSJOB_TASKLIFE             = 1800;  // Tasks life: older tasks will be deleted
    const int  SYSJOB_TASKSMAX             = 10000; // Maximum number of tasks in system job
+   const int  SYSJOB_TASKSNAMEMAX         = 32;    // Maximum number of characters in system task name (it is constructed from command)
    const int  SYSJOB_ERRORS_AVIODHOST     = 3;
    const int  SYSJOB_ERRORS_TASKSAMEHOST  = 1;
    const int  SYSJOB_ERRORS_RETRIES       = 9;

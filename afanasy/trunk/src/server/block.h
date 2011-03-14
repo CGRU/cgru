@@ -52,7 +52,7 @@ public:
    UserAf * user;
 
 protected:
-   virtual void log( const std::string & message);
+   void appendJobLog( const std::string & message);
    bool errorHostsAppend( const std::string & hostname);
 
 private:

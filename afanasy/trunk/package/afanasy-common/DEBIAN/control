@@ -3,7 +3,6 @@ Version: @VERSION@
 Architecture: @ARCHITECTURE@
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: libqt4-core, libqt4-network, libqt4-xml
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/

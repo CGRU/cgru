@@ -6,6 +6,7 @@
 
 #include "../libafsql/dbjobprogress.h"
 
+#include "afcommon.h"
 #include "rendercontainer.h"
 
 #define AFOUTPUT
@@ -50,7 +51,7 @@ void SysTask::monitor( MonitorContainer * monitoring) const {}
 void SysTask::updateDatabase() const {}
 void SysTask::writeTaskOutput( const af::MCTaskUp& taskup) const {}
 
-void SysTask::log( const std::string & message)
+void SysTask::appendLog( const std::string & message)
 {
    SysBlock::logCmdPost( std::string("#") + af::itos( getNumber()) + ": " + message + ": "
                          + syscmd->username + ": \"" + syscmd->jobname + "\":\n"
@@ -66,10 +67,10 @@ void SysTask::appendSysJobLog( const std::string & message)
 
 void SysTask::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-   std::string name = "post_command";
-   size_t space = syscmd->command.find(' ', 1);
+   std::string name = syscmd->command.substr( 0, AFJOB::SYSJOB_TASKSNAMEMAX);
+   size_t space = name.find(' ', 1);
    if( space != std::string::npos )
-      name = syscmd->command.substr( 0, space);
+      name = name.substr( 0, space);
 
    taskexec->setCommand(      syscmd->command            );
    taskexec->setName(         name                       );
@@ -89,7 +90,7 @@ void SysTask::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    if((currentTime - birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
    {
       std::string message = std::string("Error: Task age(") + af::itos( currentTime - birthtime) + ") > " + af::itos( af::Environment::getSysJobTaskLife());
-      log( message);
+      appendLog( message);
       // Store error in job log
       appendSysJobLog( message);
       progress->state = AFJOB::STATE_ERROR_MASK;
@@ -196,7 +197,7 @@ SysTask * SysBlock::addTask( af::TaskExec * taskexec)
 //printf("SysBlock::addTask:\n");
    if( commands.size() == 0)
    {
-      AFERROR("SysBlock::addTask: commands.size() == 0\n");
+      AFCommon::QueueLogError("SysBlock::addTask: commands.size() == 0");
       return NULL;
    }
 
@@ -222,8 +223,8 @@ SysTask * SysBlock::addTask( af::TaskExec * taskexec)
    if( false == founded )
    {
       std::string message = std::string("Can't find task number (max=") + af::itos(af::Environment::getSysJobTasksMax()) + ")";
-      AFERRAR("SysBlock::addTask: %s.\n", message.c_str())
-      log( message);
+      AFCommon::QueueLogError( std::string("SysBlock::addTask: %s") + message.c_str());
+      appendJobLog( message);
       return NULL;
    }
 
@@ -243,7 +244,7 @@ void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders
    RenderContainerIt rendersIt( renders);
    RenderAf* render = rendersIt.getRender( hostId);
    if( render == NULL ) return;
-   if( Block::errorHostsAppend( render->getName())) log( render->getName() + " - AVOIDING HOST !");
+   if( Block::errorHostsAppend( render->getName())) appendJobLog( render->getName() + " - AVOIDING HOST !");
    SysTask * systask = getTask( task, "errorHostsAppend");
    if( systask) systask->errorHostsAppend( render->getName());
 }
@@ -298,8 +299,8 @@ SysTask * SysBlock::getTask( int tasknum, const char * errorMessage)
 {
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
       if( tasknum == (*it)->getNumber()) return *it;
-   if( errorMessage ) { AFERRAR("SysJob::getTask: %s: Invalid task number = %d\n", errorMessage, tasknum);}
-   else { AFERRAR("SysJob::getTask: Invalid task number = %d\n", tasknum);}
+   if( errorMessage ) AFCommon::QueueLogError( std::string("SysJob::getTask: ") + errorMessage + ": Invalid task number = " + af::itos(tasknum));
+   else               AFCommon::QueueLogError( std::string("SysJob::getTask: Invalid task number = ") + af::itos(tasknum));
 }
 
 void SysBlock::errorHostsReset()
@@ -349,12 +350,12 @@ SysJob::~SysJob()
 
 void SysJob::dbDelete( QStringList  * queries) const
 {
-   AFERROR("Trying to delete system job from database.\n");
+   AFCommon::QueueLogError("Trying to delete system job from database.");
 }
 
 void SysJob::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 {
-   AFERROR("Trying to make system job a zomibe.\n");
+   AFCommon::QueueLogError("Trying to make system job a zomibe.");
 }
 
 Block * SysJob::newBlock( int numBlock)
@@ -371,7 +372,7 @@ Block * SysJob::newBlock( int numBlock)
    }
 }
 
-void SysJob::addCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
+void SysJob::addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
 {
    block_cmdpost->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
 }
@@ -400,7 +401,7 @@ void SysJob::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * ren
       break;
    }
    default:
-      AFERRAR("SysJob::updateTaskState: Invalid block number = %d\n", taskup.getNumBlock());
+      AFCommon::QueueLogError("SysJob::updateTaskState: Invalid block number = " + af::itos(taskup.getNumBlock()));
    }
 }
 

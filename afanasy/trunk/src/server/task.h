@@ -34,7 +34,7 @@ public:
    void restartError( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
    void skip( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
-   virtual void log( const std::string  & message);
+   virtual void appendLog( const std::string  & message);
    inline const std::list<std::string> & getLog() { return logStringList; }
 
    void errorHostsAppend( const std::string & hostname);

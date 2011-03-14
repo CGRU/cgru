@@ -35,7 +35,7 @@ TaskRun::TaskRun( Task * runningTask,
    stopTime( 0),
    zombie( false)
 {
-AFINFA("TaskRun::TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
+AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum)
    (*counter)++;
 
    progress->percent = -1;
@@ -56,13 +56,13 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data(),
    render->setTask( exec, monitoring);
    task->monitor( monitoring );
    task->updateDatabase();
-   task->log( std::string("SESSION #") + af::itos( progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
+   task->appendLog( std::string("SESSION #") + af::itos( progress->starts_count) + ": Starting on \"" + render->getName() + "\"");
 }
 
 TaskRun::~TaskRun()
 {
-AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
-   if   ( *counter == 0) { AFERRAR("Tasks counter is negative ! (%d)\n", *counter); }
+AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum)
+   if   ( *counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *counter)
    else ( *counter )--;
    if( exec) delete exec;
 
@@ -77,22 +77,22 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
 {
    if( zombie )
    {
-      AFERRAR("TaskRun::update: task is zombie: %d\n", tasknum);
+      AFERRAR("TaskRun::update: task is zombie: %d", tasknum)
       return;
    }
    if( taskup.getClientId() != hostId)
    {
-      AFERRAR("TaskRun::update: taskup.getClientId() != hostId (%d != %d)\n", taskup.getClientId(), hostId);
+      AFERRAR("TaskRun::update: taskup.getClientId() != hostId (%d != %d)", taskup.getClientId(), hostId)
       return;
    }
    if((progress->state & AFJOB::STATE_RUNNING_MASK) == false)
    {
-      AFERRAR("TaskRun::update: %s[%d][%d] task is not running.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRun::update: %s[%d][%d] task is not running.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
       return;
    }
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::update: %s[%d][%d] Task executable is NULL.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRun::update: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
       return;
    }
 
@@ -184,7 +184,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    }
    default:
    {
-      AFERRAR("TaskRun::update: Unknown task update status = %d\n", taskup.getStatus());
+      AFERRAR("TaskRun::update: Unknown task update status = %d", taskup.getStatus())
       return;
    }
    }
@@ -194,7 +194,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 {
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::refresh: %s[%d][%d] Task executable is NULL.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRun::refresh: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
       return false;
    }
 //printf("TaskRun::refresh: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
@@ -233,7 +233,7 @@ void TaskRun::stop( const std::string & message, RenderContainer * renders, Moni
    if( stopTime ) return;
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
       return;
    }
    stopTime = time( NULL);
@@ -245,7 +245,7 @@ void TaskRun::stop( const std::string & message, RenderContainer * renders, Moni
       if( render ) render->stopTask( exec);
    }
 
-   task->log( message);
+   task->appendLog( message);
 }
 
 void TaskRun::finish( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
@@ -266,7 +266,7 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
    task->monitor( monitoring );
    task->updateDatabase();
 
-   task->log( message);
+   task->appendLog( message);
    zombie = true;
 }
 
@@ -290,7 +290,7 @@ void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
    if( hostId == 0 ) return;
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.\n", block->job->getName().c_str(), block->data->getBlockNum(), tasknum);
+      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
       return;
    }
    RenderContainerIt rendersIt( renders);
