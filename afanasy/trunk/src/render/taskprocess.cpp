@@ -141,7 +141,7 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 
 void TaskProcess::p_readyRead()
 {
-   QByteArray output = readAll();
+   std::string output = readAll().data();
    if( output.size() == 0 ) return;
    parser->read( output);
 

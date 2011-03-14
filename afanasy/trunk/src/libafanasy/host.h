@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QString>
-
 #include "af.h"
 
 namespace af
@@ -13,7 +11,7 @@ public:
    ~Host();
 
    void setService(  const std::string & name, int count);
-   void remServices( const std::list<std::string> & names);
+   void remServices( const std::list<std::string> & remNames);
 
    void copy(  const Host & other);
    void merge( const Host & other);

@@ -12,7 +12,7 @@ class MCTaskOutput : public MsgClass
 public:
    MCTaskOutput(  const std::string & RenderName,
                   int JobId, int BlockNum, int TaskNum,
-                  int DataSize, char * Data);
+                  int DataSize, const char * Data);
    MCTaskOutput( Msg * msg);
    ~MCTaskOutput();
 

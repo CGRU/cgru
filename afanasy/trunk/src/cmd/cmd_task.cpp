@@ -19,13 +19,13 @@ CmdTaskOutput::~CmdTaskOutput(){}
 bool CmdTaskOutput::processArguments( int argc, char** argv, af::Msg &msg)
 {
    bool ok; int job; int block; int task; int number;
-   job    = (QString::fromUtf8(argv[0])).toInt( &ok);
+   job    = af::stoi(argv[0], &ok);
    if( ok == false ) return false;
-   block  = (QString::fromUtf8(argv[1])).toInt( &ok);
+   block  = af::stoi(argv[1], &ok);
    if( ok == false ) return false;
-   task   = (QString::fromUtf8(argv[2])).toInt( &ok);
+   task   = af::stoi(argv[2], &ok);
    if( ok == false ) return false;
-   number = (QString::fromUtf8(argv[3])).toInt( &ok);
+   number = af::stoi(argv[3], &ok);
    if( ok == false ) return false;
    af::MCTaskPos mctaskpos( job, block, task, number);
    msg.set( getMsgType(), &mctaskpos);

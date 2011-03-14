@@ -1,6 +1,7 @@
 #include "passwd.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #ifdef WINNT
 #define spritnf spritnf_s

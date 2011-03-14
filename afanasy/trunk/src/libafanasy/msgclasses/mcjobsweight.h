@@ -4,8 +4,6 @@
 
 #include "../../include/aftypes.h"
 
-#include <QtCore/QStringList>
-
 #include "msgclass.h"
 
 namespace af

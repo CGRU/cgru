@@ -1,6 +1,5 @@
 #pragma once
 
-#include <QtCore/QString>
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "api.h"

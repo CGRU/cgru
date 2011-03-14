@@ -1,12 +1,8 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../talk/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../talk/*.h")
 
-find_package(Qt4 COMPONENTS QtCore QtXml QtGui REQUIRED)
-
+find_package(Qt4 COMPONENTS QtGui REQUIRED)
 include(${QT_USE_FILE})
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../talk/")
-#include_directories("${afanasy_SOURCE_DIR}/../libafanasy/src")
-#include_directories("${afanasy_SOURCE_DIR}/../libafqt/src")
 
 set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../talk/dialog.h"

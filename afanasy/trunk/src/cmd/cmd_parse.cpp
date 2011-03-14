@@ -19,7 +19,7 @@ bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
    int numframes = 1;
    if( argc > 0)
    {
-      bool ok; int number = (QString::fromUtf8(argv[1])).toInt( &ok);
+      bool ok; int number = af::stoi( argv[1], &ok);
       if( ok ) numframes = number;
    }
 
@@ -49,7 +49,7 @@ bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
       bool error = false;
       bool warning = false;
       bool badresult = false;
-      QByteArray output( buffer, size);
+      std::string output( buffer, size);
       if( parser.parse( output, percent, frame, percentframe, error, warning, badresult))
       {
          printf("PERCENT: %d%%", percent);

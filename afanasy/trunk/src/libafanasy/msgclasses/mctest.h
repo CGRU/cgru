@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <vector>
 
-#include <QtCore/QString>
-
 #include "../../include/aftypes.h"
 
 #include "../name_af.h"

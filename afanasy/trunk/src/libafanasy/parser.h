@@ -2,8 +2,6 @@
 
 #include <Python.h>
 
-#include <QtCore/QString>
-
 #include "../include/aftypes.h"
 
 #include "name_af.h"
@@ -19,7 +17,7 @@ public:
 
    inline bool isInitialized() const { return initialized;}
 
-   bool parse( QByteArray & data,
+   bool parse( std::string & data,
                int & percent, int & frame, int & percentframe,
                bool & warning, bool & error, bool & badresult) const;
 

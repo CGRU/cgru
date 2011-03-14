@@ -1,6 +1,7 @@
 #include "apicmd.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #define AFOUTPUT
 #undef AFOUTPUT

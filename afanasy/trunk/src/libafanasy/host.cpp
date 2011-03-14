@@ -63,17 +63,19 @@ void Host::merge( const Host & other)
    for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
 }
 
-void Host::remServices( const std::list<std::string> & names)
+void Host::remServices( const std::list<std::string> & remNames)
 {
-   for( std::list<std::string>::const_iterator nIt = names.begin(); nIt != names.end(); nIt++)
+   for( std::list<std::string>::const_iterator remIt = remNames.begin(); remIt != remNames.end(); remIt++)
    {
-      for( std::vector<std::string>::iterator sIt = servicesnames.begin(); sIt != servicesnames.end(); sIt++)
+      std::vector<std::string>::iterator srvIt = servicesnames.begin();
+      while( srvIt != servicesnames.end())
       {
-         if( *sIt == *nIt)
+         if( *srvIt == *remIt)
          {
-            sIt = servicesnames.erase( sIt);
+            srvIt = servicesnames.erase( srvIt);
             servicesnum--;
          }
+         else srvIt++;
       }
    }
 }

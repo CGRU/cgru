@@ -59,11 +59,11 @@ ParserHost::~ParserHost()
    if( data   != NULL) delete [] data;
 }
 
-void ParserHost::read( QByteArray & output)
+void ParserHost::read( std::string & output)
 {
    parse( output);
-   char* out_data = output.data();
-   int   out_size = output.size();
+   const char * out_data = output.data();
+   int          out_size = output.size();
 
 #ifdef AFOUTPUT
 printf("\"");for(int c=0;c<out_size;c++)if(out_data[c]>=32)printf("%c", out_data[c]);printf("\":\n");
@@ -72,14 +72,14 @@ printf("\"");for(int c=0;c<out_size;c++)if(out_data[c]>=32)printf("%c", out_data
    // writing output in buffer
    //
 //printf("\nParser::read: size = %d ( datasize = %d )\n", size, datasize);
-   char* copy_data = out_data;
-   int   copy_size = out_size;
+   const char * copy_data = out_data;
+   int          copy_size = out_size;
    if( (datasize+output.size()) > DataSizeMax )
    {
 //printf("(datasize+size) > DataSizeMax : (%d+%d)>%d\n", datasize, size, DataSizeMax);
       if( datasize < DataSizeHalf )
       {
-         memcpy( data+datasize, output, DataSizeHalf-datasize);
+         memcpy( data+datasize, out_data, DataSizeHalf-datasize);
          copy_data = out_data + DataSizeHalf - datasize ;
          copy_size = out_size - ( DataSizeHalf - datasize);
          datasize = DataSizeHalf;
@@ -136,7 +136,7 @@ void ParserHost::setOverload()
    overload = true;
 }
 
-void ParserHost::parse( QByteArray & output)
+void ParserHost::parse( std::string & output)
 {
    if( parser )
    {

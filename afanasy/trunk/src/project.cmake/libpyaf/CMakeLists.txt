@@ -1,15 +1,6 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../libpyaf/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../libpyaf/*.h")
 
-find_package(Qt4 COMPONENTS QtCore QtXml REQUIRED)
-
-include(${QT_USE_FILE})
-#include_directories(${PYTHON_INCLUDE_PATH})
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libpyaf/src/")
-#include_directories("${afanasy_SOURCE_DIR}/../libafanasy/src")
-#include_directories("${afanasy_SOURCE_DIR}/../libafapi/src")
-
-
 add_library(pyaf SHARED ${src} ${inc})
 
 target_link_libraries(pyaf afapi)

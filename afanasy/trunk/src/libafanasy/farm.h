@@ -2,6 +2,8 @@
 
 #include <map>
 
+#include "rapidxml/rapidxml.hpp"
+
 #include "pattern.h"
 
 namespace af
@@ -67,6 +69,7 @@ private:
    std::map< std::string, ServiceLimit * > servicelimits;
 
 private:
+   bool getPatterns( const rapidxml::xml_node<> * pnode);
    void addServiceLimit( const std::string & name, int maxcount, int maxhosts);
 };
 }

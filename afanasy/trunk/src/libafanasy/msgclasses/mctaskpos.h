@@ -4,9 +4,6 @@
 
 #include "msgclass.h"
 
-#include <QtCore/QString>
-
-
 namespace af
 {
 

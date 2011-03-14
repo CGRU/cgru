@@ -22,7 +22,7 @@ bool CmdPasswd::processArguments( int argc, char** argv, af::Msg &msg)
    if( argc > 1)
    {
       bool ok;
-      int num = QString( argv[1]).toInt( &ok);
+      int num = af::stoi( argv[1], &ok);
       if( ok ) times = num;
    }
    af::Passwd passwd;

@@ -10,13 +10,6 @@
 
 #include <Python.h>
 
-/*
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QRegExp>
-#include <QtXml/QDomDocument>
-*/
-
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
 

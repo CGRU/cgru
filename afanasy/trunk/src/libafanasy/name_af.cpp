@@ -212,13 +212,6 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
 
 const std::string af::fillNumbers( const std::string& pattern, int start, int end)
 {
-/*
-   QString str = QString::fromUtf8( pattern.c_str());
-   if( str.contains("%1")) str = str.arg( start);
-   if( str.contains("%2")) str = str.arg( end);
-   if( str.contains("%") && (false == str.contains("%n"))) str.sprintf( str.toUtf8().data(), start, end);
-   return std::string( str.toUtf8().data());
-*/
    std::string str( pattern);
    size_t pos;
    pos = str.find("%1");
@@ -252,6 +245,21 @@ const std::string af::fillNumbers( const std::string& pattern, int start, int en
          delete buffer;
       }
    }
+   return str;
+}
+
+const std::string af::replaceArgs( const std::string & pattern, const std::string & arg)
+{
+   if( pattern.empty()) return arg;
+
+   std::string str( pattern);
+   size_t pos = str.find("%1");
+   while( pos != std::string::npos )
+   {
+      str.replace( pos, 2, arg);
+      pos = str.find("%1");
+   }
+
    return str;
 }
 

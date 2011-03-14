@@ -3,8 +3,6 @@
 #include <list>
 #include <algorithm>
 
-#include <QtCore/QString>
-
 #include "../include/aftypes.h"
 
 #include "af.h"

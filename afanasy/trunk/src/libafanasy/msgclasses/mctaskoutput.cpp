@@ -14,7 +14,7 @@ using namespace af;
 
 MCTaskOutput::MCTaskOutput(   const std::string & RenderName,
                               int JobId, int BlockNum, int TaskNum,
-                              int DataSize, char * Data):
+                              int DataSize, const char * Data):
    jobid(      JobId       ),
    blocknum(   BlockNum    ),
    tasknum(    TaskNum     ),

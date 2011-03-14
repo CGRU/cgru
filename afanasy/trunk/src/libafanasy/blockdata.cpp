@@ -93,21 +93,21 @@ bool BlockData::isValid() const
 {
    if( tasksnum == 0)
    {
-      AFERRAR("BlockData::isValid: #%d block[%s] zero tasks number.\n", blocknum, name.c_str());
+      AFERRAR("BlockData::isValid: #%d block[%s] zero tasks number.", blocknum, name.c_str())
       return false;
    }
    if( isNotNumeric())
    {
       if( tasksdata == NULL)
       {
-         AFERRAR("BlockData::isValid: #%d block[%s] tasks data is null on not numeric block.\n", blocknum, name.c_str());
+         AFERRAR("BlockData::isValid: #%d block[%s] tasks data is null on not numeric block.", blocknum, name.c_str())
          return false;
       }
       for( int t = 0; t < tasksnum; t++)
       {
          if(tasksdata[t] == NULL)
          {
-            AFERRAR("BlockData::isValid: #%d block[%s] task[%d] data is null on not numeric block.\n", blocknum, name.c_str(), t);
+            AFERRAR("BlockData::isValid: #%d block[%s] task[%d] data is null on not numeric block.", blocknum, name.c_str(), t)
             return false;
          }
       }
@@ -202,7 +202,7 @@ void BlockData::readwrite( Msg * msg)
    break;
 
    default:
-      AFERRAR("BlockData::readwrite: invalid type = %s.\n", Msg::TNAMES[msg->type()]);
+      AFERRAR("BlockData::readwrite: invalid type = %s.", Msg::TNAMES[msg->type()])
    }
 //printf("BlockData::readwrite: END\n");
 }
@@ -211,13 +211,13 @@ void BlockData::rw_tasks( Msg * msg)
 {
    if( isNumeric())
    {
-      AFERROR("BlockData::rw_tasks: block is numeric.\n");
+      AFERROR("BlockData::rw_tasks: block is numeric.")
       return;
    }
    rw_int32_t( tasksnum, msg);
    if( tasksnum < 1)
    {
-      AFERRAR("BlockData::rw_tasks: invalid number of tasks = %d.\n", tasksnum);
+      AFERRAR("BlockData::rw_tasks: invalid number of tasks = %d.", tasksnum)
       return;
    }
 
@@ -236,7 +236,7 @@ void BlockData::rw_tasks( Msg * msg)
          tasksdata[b] = createTask( msg);
          if( tasksdata[b] == NULL)
          {
-            AFERROR("BlockData::rw_tasks: Can not allocate memory for new task.\n");
+            AFERROR("BlockData::rw_tasks: Can not allocate memory for new task.")
             return;
          }
       }
@@ -256,7 +256,7 @@ bool BlockData::setCapacity( int value)
       capacity = value;
       return true;
    }
-   AFERRAR("BlockData::setCapacity: invalid capacity = %d\n", value);
+   AFERRAR("BlockData::setCapacity: invalid capacity = %d", value)
    return false;
 }
 
@@ -264,7 +264,7 @@ bool BlockData::setCapacityCoeffMin( int value)
 {
    if( canVarCapacity() == false)
    {
-      AFERROR("BlockData::setCapacityCoeffMin: Block can't variate capacity.\n");
+      AFERROR("BlockData::setCapacityCoeffMin: Block can't variate capacity.")
       return false;
    }
    capcoeff_min = value;
@@ -275,7 +275,7 @@ bool BlockData::setCapacityCoeffMax( int value)
 {
    if( canVarCapacity() == false)
    {
-      AFERROR("BlockData::setCapacityCoeffMax: Block can't variate capacity.\n");
+      AFERROR("BlockData::setCapacityCoeffMax: Block can't variate capacity.")
       return false;
    }
    capcoeff_max = value;
@@ -286,12 +286,12 @@ bool BlockData::setMultiHostMin( int value)
 {
    if( isMultiHost() == false)
    {
-      AFERROR("BlockData::setMultiHostMin: Block is not multihost.\n");
+      AFERROR("BlockData::setMultiHostMin: Block is not multihost.")
       return false;
    }
    if( value < 1)
    {
-      AFERROR("BlockData::setMultiHostMin: Hosts minimum can't be less than one.\n");
+      AFERROR("BlockData::setMultiHostMin: Hosts minimum can't be less than one.")
       return false;
    }
    multihost_min = value;
@@ -302,64 +302,38 @@ bool BlockData::setMultiHostMax( int value)
 {
    if( isMultiHost() == false)
    {
-      AFERROR("BlockData::setMultiHostMax: Block is not multihost.\n");
+      AFERROR("BlockData::setMultiHostMax: Block is not multihost.")
       return false;
    }
    if( value < multihost_min)
    {
-      AFERROR("BlockData::setMultiHostMax: Hosts maximum can't be less than minimum.\n");
+      AFERROR("BlockData::setMultiHostMax: Hosts maximum can't be less than minimum.")
       return false;
    }
    multihost_max = value;
    return true;
 }
-/*
-bool BlockData::checkDependMask( const std::string & str)
-{
-   if( dependmask.isEmpty()) return false;
-   return dependmask.exactMatch( QString::fromUtf8(str.c_str()));
-}
-bool BlockData::checkHostsMask( const std::string & str)
-{
-   if( hostsmask.isEmpty()) return true;
-   return hostsmask.exactMatch( QString::fromUtf8(str.c_str()));
-}
-bool BlockData::checkHostsMaskExclude( const std::string & str)
-{
-   if( hostsmask_exclude.isEmpty()) return false;
-   return hostsmask_exclude.exactMatch( QString::fromUtf8(str.c_str()));
-}
-bool BlockData::checkTasksDependMask( const std::string & str)
-{
-   if( tasksdependmask.isEmpty()) return false;
-   return tasksdependmask.exactMatch( QString::fromUtf8(str.c_str()));
-}
-bool BlockData::checkNeedProperties( const std::string & str)
-{
-   if( need_properties.isEmpty()) return true;
-   return QString::fromUtf8(str.c_str()).contains( need_properties);
-}
-*/
+
 bool BlockData::setNumeric( int start, int end, int perTask, int increment)
 {
    if( perTask < 1)
    {
-      AFERRAR("BlockData::setNumeric(): Frames per task = %d < 1 ( setting to 1).\n", perTask);
+      AFERRAR("BlockData::setNumeric(): Frames per task = %d < 1 ( setting to 1).", perTask)
       perTask = 1;
    }
    if( tasksdata)
    {
-      AFERROR("BlockData::setNumeric(): this block already has tasks.\n");
+      AFERROR("BlockData::setNumeric(): this block already has tasks.")
       return false;
    }
    if( isNumeric())
    {
-      AFERROR("BlockData::setNumeric(): this block is already numeric and numbers are set.\n");
+      AFERROR("BlockData::setNumeric(): this block is already numeric and numbers are set.")
       return false;
    }
    if( start > end)
    {
-      AFERRAR("BlockData::setNumeric(): start > end ( %d > %d - setting end to %d)\n", start, end, start);
+      AFERRAR("BlockData::setNumeric(): start > end ( %d > %d - setting end to %d)", start, end, start)
       end = start;
    }
    flags = flags | FNumeric;
@@ -380,12 +354,12 @@ void BlockData::setFramesPerTask( int perTask)
 {
    if( isNumeric())
    {
-      AFERROR("BlockData::setFramesPerHost: this block is numeric.\n");
+      AFERROR("BlockData::setFramesPerHost: this block is numeric.")
       return;
    }
    if( perTask == 0)
    {
-      AFERROR("BlockData::setFramesPerHost: Frames per task can't be zero.\n");
+      AFERROR("BlockData::setFramesPerHost: Frames per task can't be zero.")
       return;
    }
    frame_pertask = perTask;
@@ -396,7 +370,7 @@ const std::string BlockData::genCommand( int num, int *frame_start, int *frame_f
    std::string str;
    if( num > tasksnum)
    {
-      AFERROR("BlockData::getCmd: n > tasksnum.\n");
+      AFERROR("BlockData::getCmd: n > tasksnum.")
       return str;
    }
    if( isNumeric())
@@ -414,8 +388,7 @@ const std::string BlockData::genCommand( int num, int *frame_start, int *frame_f
    }
    else
    {
-      if( command.size() == 0 ) return tasksdata[num]->getCommand();
-      str = QString::fromUtf8( command.c_str()).arg( QString::fromUtf8(tasksdata[num]->getCommand().c_str())).toUtf8().data();
+      str = af::replaceArgs( command, tasksdata[num]->getCommand());
    }
    return str;
 }
@@ -425,7 +398,7 @@ const std::string BlockData::genFiles( int num) const
    std::string str;
    if( num >= tasksnum)
    {
-      AFERROR("BlockData::genCmdView: n >= tasksnum.\n");
+      AFERROR("BlockData::genCmdView: n >= tasksnum.")
       return str;
    }
    if( isNumeric())
@@ -438,8 +411,7 @@ const std::string BlockData::genFiles( int num) const
    }
    else
    {
-      if( files.size() == 0 ) return tasksdata[num]->getFiles();
-      str = QString::fromUtf8( files.c_str()).arg( QString::fromUtf8(tasksdata[num]->getFiles().c_str())).toUtf8().data();
+      str = af::replaceArgs( files, tasksdata[num]->getFiles());
    }
    return str;
 }
@@ -448,7 +420,7 @@ bool BlockData::genNumbers( int &start, int &end, int num) const
 {
    if( num > tasksnum)
    {
-      AFERROR("BlockData::genNumbers: n > tasksnum.\n");
+      AFERROR("BlockData::genNumbers: n > tasksnum.")
       return false;
    }
    start = frame_first + num * frame_pertask;
@@ -462,7 +434,7 @@ TaskExec *BlockData::genTask( int num) const
 {
    if( num > tasksnum)
    {
-      AFERROR("BlockData::genTask: n > tasksnum.\n");
+      AFERROR("BlockData::genTask: n > tasksnum.")
       return NULL;
    }
 
@@ -498,7 +470,7 @@ const std::string BlockData::genTaskName( int num) const
 {
    if( num > tasksnum)
    {
-      AFERROR("BlockData::genTaskName: n > tasksnum.\n");
+      AFERROR("BlockData::genTaskName: n > tasksnum.")
       return std::string ("> tasksnum");
    }
 
@@ -514,9 +486,7 @@ const std::string BlockData::genTaskName( int num) const
          return itos( start) + "-" + itos( end);
    }
 
-   if( tasksname.size() == 0 ) return tasksdata[num]->getName();
-
-   return QString::fromUtf8( tasksname.c_str()).arg( QString::fromUtf8(tasksdata[num]->getName().c_str())).toUtf8().data();
+   return af::replaceArgs( tasksname, tasksdata[num]->getName());
 }
 
 void BlockData::setStateDependent( bool depend)
@@ -568,46 +538,7 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
       stream << ")";
    }
    stream << " " << tasksnum << " tasks.";
-/*
-   printf("BLOCK = \"%s\" ( %s-%s[%d] ), %d tasks.\n",
-      name.toUtf8().data(), service.toUtf8().data(), parser.toUtf8().data(), parsercoeff, tasksnum);
 
-                                      printf("Command            = \"%s\"\n",           command.toUtf8().data());
-                                      printf("Working Directory  = \"%s\"\n",              wdir.toUtf8().data());
-   if( !             files.isEmpty()) printf("Files              = \"%s\"\n",             files.toUtf8().data());
-   if( !        dependmask.isEmpty()) printf("Depend Mask        = \"%s\"\n",        dependmask.pattern().toUtf8().data());
-   if( !   tasksdependmask.isEmpty()) printf("Tasks Depend Mask  = \"%s\"\n",   tasksdependmask.pattern().toUtf8().data());
-   if( !         hostsmask.isEmpty()) printf("Hosts Mask         = \"%s\"\n",         hostsmask.pattern().toUtf8().data());
-   if( ! hostsmask_exclude.isEmpty()) printf("Hosts Mask Exclude = \"%s\"\n", hostsmask_exclude.pattern().toUtf8().data());
-   if( !       environment.isEmpty()) printf("Environment        = \"%s\"\n",       environment.toUtf8().data());
-   if( !           cmd_pre.isEmpty()) printf("Pre Command        = \"%s\"\n",           cmd_pre.toUtf8().data());
-   if( !          cmd_post.isEmpty()) printf("Post Command       = \"%s\"\n",          cmd_post.toUtf8().data());
-   if( !        customdata.isEmpty()) printf("Custom Data        = \"%s\"\n",        customdata.toUtf8().data());
-   if( !   need_properties.isEmpty()) printf("Need Properties    = \"%s\"\n",   need_properties.pattern().toUtf8().data());
-   if(     need_power               ) printf("Need Power         =  %u\n"   ,   need_power  );
-   if(     need_memory              ) printf("Need Memory        =  %u\n"   ,   need_memory );
-   if(     need_hdd                 ) printf("Need HDD           =  %u\n"   ,   need_hdd    );
-
-   if( isNumeric())
-      printf("numeric: start = %d, end = %d, perTask = %d, increment = %d.\n", frame_first, frame_last, frame_pertask, frame_inc);
-   else if( tasksdata == NULL ) return;
-   // Not numeric block not filled with tasks will exit here
-
-   if( full )
-   {
-      for( int t = 0; t < tasksnum; t++)
-      {
-         printf("#%d:", t);
-         TaskExec * task = genTask(t);
-         printf(" N'%s'", task->getName().toUtf8().data());
-         printf(" C'%s'", task->getCommand().toUtf8().data());
-         if( task->hasFiles()) printf(" F'%s'", task->getFiles().toUtf8().data());
-         delete task;
-         printf("\n");
-      }
-   }
-   printf("Memory: %d bytes\n", calcWeight());
-   */
    if(           command.size()) stream << "\n Command            = \"" << command                             << "\"";
    if(              wdir.size()) stream << "\n Working Directory  = \"" << wdir                                << "\"";
    if(             files.size()) stream << "\n Files              = \"" << files                               << "\"";

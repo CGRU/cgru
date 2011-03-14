@@ -5,8 +5,6 @@
 
 #include "../../include/aftypes.h"
 
-#include <QtCore/QString>
-
 #include "msgclassuserhost.h"
 
 namespace af

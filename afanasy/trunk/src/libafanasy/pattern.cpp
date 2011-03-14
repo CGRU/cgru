@@ -17,35 +17,16 @@ Pattern::~Pattern()
 {
 }
 
-bool Pattern::setMask( const std::string & string)
-{
-   mask = string;
-   if( mask.size() == 0 ) return false;
-   regexp.setPattern( QString::fromUtf8( mask.c_str()));
-   if( regexp.isValid() == false)
-   {
-      AFERRAR("Pattern::setMask: \"%s\" set invalid mask \"%s\":\n", name.c_str(), mask.c_str());
-      printf("%s\n", regexp.errorString().toUtf8().data());
-      return false;
-   }
-   return true;
-}
-
 bool Pattern::isValid() const
 {
    if( name.size() == 0 )
    {
-      AFERROR("Pattern::isValid: name is empty.\n");
+      AFERROR("Pattern::isValid: name is empty.\n")
       return false;
    }
-   if( mask.size() == 0 )
+   if( regexp.empty())
    {
-      AFERRAR("Pattern::isValid: \"%s\" mask is empty.\n", name.c_str());
-      return false;
-   }
-   if( regexp.isValid() == false)
-   {
-      AFERRAR("Pattern::isValid: \"%s\" mask \"%s\" is invalid:\n", name.c_str(), mask.c_str());
+      AFERRAR("Pattern::isValid: \"%s\" mask is empty.\n", name.c_str())
       return false;
    }
    return true;
@@ -59,10 +40,12 @@ void Pattern::getHost( Host & newhost) const
 
 void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 {
+   host.generateInfoStream( stream, full);
    if( full)
    {
+      stream << std::endl;
       stream << "Pattern: \"" << name << "\" (" << description << "):";
-      stream << " Mask =\"" << mask << "\"";
+      stream << " Mask =\"" << regexp.getPattern() << "\"";
       if( remservices.size())
       {
          stream << "\n   Remove services:";
@@ -72,9 +55,8 @@ void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << "P:\"" << mask << "\"-\"" << name << "\": ";
+      stream << "P:\"" << regexp.getPattern() << "\"-\"" << name << "\": ";
    }
-   host.generateInfoStream( stream, full);
 }
 
 void Pattern::stdOut( bool full) const

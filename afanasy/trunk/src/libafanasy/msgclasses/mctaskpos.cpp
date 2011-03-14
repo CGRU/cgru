@@ -1,7 +1,5 @@
 #include "mctaskpos.h"
 
-#include <stdio.h>
-
 #include "../name_af.h"
 
 #define AFOUTPUT

@@ -72,7 +72,7 @@ void MonitorHost::connectionEstablished(){}
 
 void MonitorHost::setJobId( int type, int jId)
 {
-AFINFA("MonitorHost::setJobId: type=[%s], id=%d\n", af::Msg::TNAMES[type], jId);
+AFINFA("MonitorHost::setJobId: type=[%s], id=%d", af::Msg::TNAMES[type], jId);
    af::MCGeneral ids;
    ids.setId( Watch::getId());
 #ifdef AFOUTPUT
@@ -133,7 +133,7 @@ else printf("R: No ids.\n");
 
 void MonitorHost::setUid( int uid)
 {
-AFINFO("MonitorHost::setUid:\n");
+AFINFO("MonitorHost::setUid:");
    jobsUsersIds.clear();
    jobsUsersIds.push_back( uid);
    af::MCGeneral ids;

@@ -2,9 +2,6 @@
 
 #include <Python.h>
 
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-
 #include "../include/aftypes.h"
 
 #include "name_af.h"

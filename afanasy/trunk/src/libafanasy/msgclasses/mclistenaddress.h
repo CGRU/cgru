@@ -7,8 +7,6 @@
 
 #include "msgclassuserhost.h"
 
-#include <QtCore/QString>
-
 namespace af
 {
 

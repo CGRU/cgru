@@ -1,5 +1,7 @@
 #pragma once
 
+#include <QtCore/QList>
+
 #include "../libafanasy/monitor.h"
 
 class MonitorHost: public af::Monitor

@@ -66,10 +66,12 @@ namespace af
    const std::string itos( int integer);
    const std::string getenv( const char * name);
    const std::string state2str( int state);
-   const std::string fillNumbers( const std::string& pattern, int start, int end);
    const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
    const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
    const std::list<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
+
+   const std::string fillNumbers( const std::string & pattern, int start, int end);
+   const std::string replaceArgs( const std::string & pattern, const std::string & arg);
 
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
    const std::string time2strHMS( int time32, bool clamp = false);

@@ -1,11 +1,8 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/*.h")
 
-find_package(Qt4 COMPONENTS QtCore QtGui QtXml REQUIRED)
-
+find_package(Qt4 COMPONENTS QtCore QtGui QtNetwork QtXml REQUIRED)
 include(${QT_USE_FILE})
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/src/")
-#include_directories("${CMAKE_CURRENT_SOURCE_DIR}/../../libafanasy/src")
 
 set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../libafqt/qserver.h"

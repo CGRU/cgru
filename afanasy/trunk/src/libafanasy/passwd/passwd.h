@@ -1,9 +1,9 @@
 #ifndef AF_PASSWD_H
 #define AF_PASSWD_H
 
-#include "md5.h"
+#include <string>
 
-#include <QtCore/QString>
+#include "md5.h"
 
 namespace af
 {

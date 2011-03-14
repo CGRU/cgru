@@ -2,8 +2,6 @@
 
 #include <Python.h>
 
-#include <list>
-
 #include "name_af.h"
 
 namespace af

@@ -4,8 +4,6 @@
 #include "host.h"
 #include "client.h"
 
-#include <QtCore/QString>
-
 namespace af
 {
 /// Afanasy render slave.

@@ -3,8 +3,6 @@
 #include "../include/aftypes.h"
 #include "../include/afjob.h"
 
-//#include <QtCore/QRegExp>
-
 #include "af.h"
 #include "name_af.h"
 #include "regexp.h"

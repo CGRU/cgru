@@ -1,6 +1,7 @@
 #include "apijob.h"
 
 #include <stdio.h>
+#include <string.h>
 
 #include "apiblock.h"
 
@@ -90,7 +91,7 @@ bool Job::appendBlock( Block * block)
    for( std::list<Block*>::const_iterator it = blocks.begin(); it != blocks.end(); it++)
       if( block == *it)
       {
-         AFERRAR("Job::appendBlock: Job already has a block '%s'. Skipping.\n", block->getName().c_str())
+         AFERRAR("Job::appendBlock: Job already has a block '%s'. Skipping.", block->getName().c_str())
          return false;
       }
 
@@ -124,7 +125,7 @@ void Job::fillBlocksDataPointersFromList()
    blocksnum = int( blocks.size());
    if( blocksnum == 0)
    {
-      AFERROR("Job::fillBlocksDataPointersFromList: Job has no blocks.");
+      AFERROR("Job::fillBlocksDataPointersFromList: Job has no blocks.")
       return;
    }
    blocksdata = new af::BlockData*[blocksnum];
@@ -144,7 +145,7 @@ bool Job::construct()
 
    if( blocks.size() == 0)
    {
-      AFERROR("Job::construct: Job has no blocks.\n");
+      AFERROR("Job::construct: Job has no blocks.")
       return false;
    }
    fillBlocksDataPointersFromList();
@@ -153,7 +154,7 @@ bool Job::construct()
    message = new af::Msg( af::Msg::TJobRegister, this);
    if( message == NULL)
    {
-      AFERROR("Job::construct: Can't allocate memory for data.\n");
+      AFERROR("Job::construct: Can't allocate memory for data.")
       return false;
    }
    return true;

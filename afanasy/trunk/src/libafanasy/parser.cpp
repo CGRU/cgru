@@ -30,7 +30,7 @@ Parser::~Parser()
 {
 }
 
-bool Parser::parse(  QByteArray & data,
+bool Parser::parse(  std::string & data,
                      int & percent, int & frame, int & percentframe,
                      bool & warning, bool & error, bool & badresult) const
 {

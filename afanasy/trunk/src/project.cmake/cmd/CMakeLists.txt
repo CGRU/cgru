@@ -1,7 +1,7 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../cmd/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../cmd/*.h")
 
-find_package(Qt4 COMPONENTS QtCore QtXml QtNetwork QtSql REQUIRED)
+find_package(Qt4 COMPONENTS QtCore QtSql REQUIRED)
 
 include(${QT_USE_FILE})
 

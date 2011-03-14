@@ -15,7 +15,7 @@ public:
    ParserHost( const std::string & task_type, int num_frames);
    ~ParserHost();
 
-   void read( QByteArray & output);
+   void read( std::string & output);
 
    inline int getPercent()      const { return percent      ;}
    inline int getFrame()        const { return frame        ;}
@@ -51,5 +51,5 @@ private:
 private:
    void setOverload();
    bool shiftData( int offset);
-   void parse( QByteArray & output);
+   void parse( std::string & output);
 };
