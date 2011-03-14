@@ -10,13 +10,9 @@ for python in os.listdir( pythons):
    print 'Python = "%s"' % python
 
    pythonlib = 'python' + python[:3].replace('.','').replace('_','')
-   qt = os.environ['QTS']
    arch = 'amd64'
-   if python.find('-32') > 0 or python.find('_32') > 0:
-      qt += '-32'
-      arch = 'x86'
+   if python.find('-32') > 0 or python.find('_32') > 0: arch = 'x86'
 
-   os.environ['QTDIR'] = qt
    os.environ['AF_PYAFVER'] = python
    os.environ['PYTHONDIR'] = pythondir
    os.environ['PYTHONLIB'] = pythonlib
