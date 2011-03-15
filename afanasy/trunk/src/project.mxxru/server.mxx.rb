@@ -11,7 +11,7 @@ Mxx_ru::Cpp::exe_target{
    required_prj "libafsql.mxx.rb"
 
    qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )
-   qt.use_modules QT_CORE, QT_SQL, QT_XML, QT_NETWORK
+   qt.use_modules QT_CORE, QT_SQL
 
    case toolset.tag( "target_os" )
       when "unix"

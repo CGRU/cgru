@@ -8,6 +8,7 @@
 
 #include "afcommon.h"
 #include "rendercontainer.h"
+#include "sysjob_cmdpost.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -329,12 +330,9 @@ SysJob::SysJob( int flags):
    priority          = AFGENERAL::DEFAULT_PRIORITY;
    maxrunningtasks   = AFGENERAL::MAXRUNNINGTASKS;
 
-   blocksnum = 1;
+   blocksnum = BlockLastIndex;
    blocksdata = new af::BlockData*[blocksnum];
-   for( int b = 0; b < blocksnum; b++)
-   {
-      blocksdata[b] = new SysBlockData( b, id);
-   }
+   blocksdata[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, id);
 
    progress = new afsql::DBJobProgress( this);
 
@@ -364,7 +362,7 @@ Block * SysJob::newBlock( int numBlock)
    {
    case BlockPostCmdIndex:
    {
-      block_cmdpost = new SysBlock( this, blocksdata[numBlock], progress, &joblog);
+      block_cmdpost = new SysBlock_CmdPost( this, blocksdata[numBlock], progress, &joblog);
       return block_cmdpost;
    }
    default:
@@ -471,7 +469,8 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
 
    capacity = af::Environment::getTaskDefaultCapacity();
 
-   name = "post_commands";
+   name = "system_commands";
+   /*
    service = AFJOB::SYSJOB_BLOCKSERVICE;
 
    tasksmaxruntime = AFJOB::SYSJOB_TASKMAXRUNTIME;
@@ -484,7 +483,7 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
    errors_retries = AFJOB::SYSJOB_ERRORS_RETRIES;
 /// Time from last error to remove host from error list
    errors_forgivetime = AFJOB::SYSJOB_ERRORS_FORGIVETIME;
-
+*/
    tasksnum = 1;
 
    tasksdata = new af::TaskData*[tasksnum];

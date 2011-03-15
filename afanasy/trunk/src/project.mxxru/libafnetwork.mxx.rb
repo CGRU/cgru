@@ -1,15 +1,10 @@
 #!/usr/bin/env ruby
 
-require 'mxx_ru/cpp/qt4_via_pkg_config'
-
 Mxx_ru::Cpp::lib_target{
 
    target "afnetwork"
 
    required_prj "libafanasy.mxx.rb"
-
-   qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )
-   qt.use_modules QT_CORE, QT_NETWORK, QT_XML
 
    case toolset.tag( "target_os" )
       when "unix"

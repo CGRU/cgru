@@ -56,7 +56,7 @@ class SysBlock : public Block
 {
 public:
    SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
-   ~SysBlock();
+   virtual ~SysBlock();
 
    void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
@@ -132,7 +132,7 @@ class SysBlockData : public afsql::DBBlockData
 {
 public:
    SysBlockData ( int BlockNum, int JobId);
-   ~SysBlockData ();
+   virtual ~SysBlockData ();
 };
 
 /// System job task data:

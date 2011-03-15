@@ -9,7 +9,7 @@ Mxx_ru::Cpp::lib_target{
    required_prj "libafanasy.mxx.rb"
 
    qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )
-   qt.use_modules QT_CORE, QT_NETWORK, QT_XML, QT_SQL
+   qt.use_modules QT_CORE, QT_SQL
 
    case toolset.tag( "target_os" )
       when "unix"

@@ -1,13 +1,8 @@
 #!/usr/bin/env ruby
 
-require 'mxx_ru/cpp/qt4_via_pkg_config'
-
 Mxx_ru::Cpp::lib_target{
 
    target "afanasy"
-
-   qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )
-   qt.use_modules QT_CORE, QT_NETWORK, QT_XML
 
    define "CGRU_REVISION=#{ENV['CGRU_REVISION']}"
 
@@ -30,8 +25,6 @@ Mxx_ru::Cpp::lib_target{
          end
       when "mswin"
          define "WINNT"
-         include_path("#{ENV['QTDIR']}/include",     MxxRu::Cpp::Target::OPT_UPSPREAD)
-         lib_path(    "#{ENV['QTDIR']}/lib")
          include_path("#{ENV['PYTHONDIR']}/include", MxxRu::Cpp::Target::OPT_UPSPREAD )
          lib_path "#{ENV['PYTHONDIR']}/libs"
          lib "#{ENV['PYTHONLIB']}"

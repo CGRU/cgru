@@ -1,7 +1,5 @@
 #!/usr/bin/env ruby
 
-require 'mxx_ru/cpp/qt4_via_pkg_config'
-
 Mxx_ru::Cpp::exe_target {
 
    target "afrender"
