@@ -75,8 +75,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
 #endif
 
    struct ifreq sIfReq;                      // Interface request
-   struct if_nameindex *pIfList     = NULL;  // Ptr to interface name index
-   struct if_nameindex *pIfListHead = NULL;  // Ptr to interface name index (not to eterate, always will point to list head, for structure deletion)
+   struct if_nameindex *pIfListHead = NULL;  // Ptr to interface name index (not to iterate, always will point to list head, for structure deletion)
    struct ifaddrs * ifAddrStruct    = NULL;  // Interfaces addresses structure pointer
 
    // Create a socket that we can use for all of our ioctls
@@ -96,12 +95,12 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
    }
 
    // Obtain a list of dynamically allocated structures
-   pIfList = pIfListHead = if_nameindex();
+   pIfListHead = if_nameindex();
 
    if( verbose) printf("Searching for network interfaces:\n");
 
    // Walk thru the array returned and query for each interface's address
-   for ( pIfList; *(char *)pIfList != 0; pIfList++ )
+   for( struct if_nameindex *pIfList = pIfListHead; *(char *)pIfList != 0; pIfList++ )
    {
       strncpy( sIfReq.ifr_name, pIfList->if_name, IF_NAMESIZE );
 
@@ -166,7 +165,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
             case AF_INET:
             case AF_INET6:
             {
-               addresses.push_back( Address(*((struct sockaddr_storage *)(ifa->ifa_addr))));
+               addresses.push_back( Address(*ss));
                break;
             }
          }
@@ -175,7 +174,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
             {
                case AF_INET:
                {
-                  void * tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+                  void * tmpAddrPtr=&((struct sockaddr_in *)ss)->sin_addr;
                   char addressBuffer[INET_ADDRSTRLEN];
                   inet_ntop( AF_INET, tmpAddrPtr, addressBuffer, INET_ADDRSTRLEN);
                   printf("                  ");
@@ -184,7 +183,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
                }
                case AF_INET6:
                {
-                  void * tmpAddrPtr=&((struct sockaddr_in *)ifa->ifa_addr)->sin_addr;
+                  void * tmpAddrPtr=&((struct sockaddr_in *)ss)->sin_addr;
                   char addressBuffer[INET6_ADDRSTRLEN];
                   inet_ntop( AF_INET6, tmpAddrPtr, addressBuffer, INET6_ADDRSTRLEN);
                   printf("                  ");
