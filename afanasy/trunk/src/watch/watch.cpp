@@ -63,7 +63,7 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
       QPixmap icon( files[i].filePath());
       if( icon.isNull())
       {
-         AFERRAR("Invalid service icon:\n%s\n", files[i].filePath().toUtf8().data());
+         AFERRAR("Invalid service icon:\n%s", files[i].filePath().toUtf8().data())
          continue;
       }
       services_icons_large[ files[i].completeBaseName()] = new QPixmap( icon.scaledToHeight( BlockInfo::Height,        Qt::SmoothTransformation));
@@ -106,7 +106,7 @@ void Watch::addWindow( Wnd * wnd)
 {
    if( windows.contains( wnd))
    {
-      AFERROR("Watch::addWindow: Window already exists.");
+      AFERROR("Watch::addWindow: Window already exists.")
    }
    else windows.append( wnd);
 }
@@ -114,7 +114,7 @@ void Watch::addReciever( Reciever * reciever)
 {
    if( recievers.contains( reciever))
    {
-      AFERROR("Watch::addReciever: Reciever already exists.");
+      AFERROR("Watch::addReciever: Reciever already exists.")
    }
    else recievers.append( reciever);
 }
@@ -132,7 +132,7 @@ void Watch::caseMessage( af::Msg * msg)
    }
    if( false == recieved)
    {
-      AFERROR("Watch::caseMessage: Unknown message recieved:\n");
+      AFERROR("Watch::caseMessage: Unknown message recieved:")
       msg->stdOut();
    }
 }
@@ -155,7 +155,7 @@ void Watch::listenTask( int jobid, int block, int task, const QString & name)
 
 void Watch::watchTasks( int id, const QString & name)
 {
-AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.\n", name.toUtf8().data(), id);
+AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.", name.toUtf8().data(), id)
    QLinkedList<int>::const_iterator iIt = watchtasksjobids.begin();
    QLinkedList<QWidget*>::iterator wIt = watchtaskswindows.begin();
    while( iIt != watchtasksjobids.end())
@@ -175,7 +175,7 @@ AFINFA("Watch::watchTasks: trying to open job \"%s\"[%d] tasks window.\n", name.
    watchtasksjobids.append( id);
    watchtaskswindows.append( wnd);
    displayInfo(QString("Opening '%1' tasks window.").arg(name));
-AFINFA("Watch::watchTasks: \"%s\" window opened.\n", name.toUtf8().data());
+AFINFA("Watch::watchTasks: \"%s\" window opened.", name.toUtf8().data())
 }
 
 void Watch::watchTasks_rem( int id)
@@ -224,13 +224,13 @@ bool Watch::openMonitor( int type, bool open)
 
 void Watch::raiseWindow( QWidget * wnd, const QString * name)
 {
-AFINFO("Watch::raiseWindow: trying to raise a window.\n");
+AFINFO("Watch::raiseWindow: trying to raise a window.")
    if((wnd == NULL) || (name == NULL)) return;
    if( wnd->isMinimized()) wnd->showNormal();
    wnd->activateWindow();
    wnd->raise();
    if( name ) displayInfo(QString("Raising '%1' window.").arg(*name));
-AFINFA("Watch::raiseWindow: \"%s\" window raised.\n", name->toUtf8().data());
+AFINFA("Watch::raiseWindow: \"%s\" window raised.", name->toUtf8().data())
 }
 
 void Watch::repaint()
@@ -266,7 +266,7 @@ void Watch::startProcess( const QString & cmd, const QString & wdir)
    {
       if( false == QDir( wdir).exists())
       {
-         AFERROR("Working directory does not exists.\n");
+         AFERROR("Working directory does not exists.")
       }
       else
       {

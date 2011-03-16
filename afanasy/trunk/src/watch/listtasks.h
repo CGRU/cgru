@@ -72,7 +72,7 @@ private:
    void construct();
    void updateJob();
 
-   bool updateProgress( bool blocksOnly = false);
+   bool updateProgress( bool blocksOnly);
    bool updateTasks( af::MCTasksProgress * mctasksprogress);
 
    int getRow( int block, int task = -1);

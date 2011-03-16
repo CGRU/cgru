@@ -200,10 +200,7 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       if( errorHostId != -1 ) errorHostsAppend( t, errorHostId, renders);
    }
 
-   // For block in block and tasks list monitoring
-   bool block_changed = false;
-
-   // For block in jobs list monitoring
+   // For block progress monitoring in jobs list and in tasks list
    bool blockProgress_changed = false;
 
    // store old state to know if monitoring and database udate needed
@@ -244,7 +241,6 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       if(( data->getProgressErrorHostsNum() != errorhostsnum ) ||
          ( data->getProgressAvoidHostsNum() != avoidhostsnum ) )
       {
-         block_changed = true;
          blockProgress_changed = true;
       }
 
@@ -267,13 +263,15 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       }
       //printf("Block::refresh: checking '%s': %s\n", data->getName().toUtf8().data(), data->state & AFJOB::STATE_READY_MASK ? "READY" : "NOT ready");
 
-   if( old_block_state != data->getState()) block_changed = true;
+   if( old_block_state != data->getState()) blockProgress_changed = true;
 
    // update block monitoring and database if needed
-   if( block_changed && monitoring )
+   if( blockProgress_changed && monitoring )
    {
       if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, data);
-//      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
+
+      // No need to update state in database, state is calculated attribute
+      // AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_state);
    }
 
    return blockProgress_changed;

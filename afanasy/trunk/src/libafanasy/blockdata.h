@@ -210,6 +210,7 @@ public:
    inline uint32_t getProgressTasksSumRunTime() const { return p_taskssumruntime;   }
 
    inline void setProgressTasksReady(    int value) { p_tasksready    = value; }
+   inline void setProgressTasksError(    int value) { p_taskserror    = value; }
    inline void setProgressErrorHostsNum( int value) { p_errorhostsnum = value; }
    inline void setProgressAvoidHostsNum( int value) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);

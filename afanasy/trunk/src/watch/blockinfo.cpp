@@ -201,7 +201,7 @@ void BlockInfo::refresh()
             .arg( runningtasksnumber)
             .arg( tasksdone)
             .arg( taskserror);
-   if( false == injobslist ) str_progress += QString(" rdy%1").arg( tasksready);
+   if( jobid == AFJOB::SYSJOB_ID ) str_progress += QString(" ready:%1").arg( tasksready);
 
    if( false == depends.isEmpty())
    {
@@ -286,7 +286,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    Item::drawPercent
    (
       painter, x+xoffset, y+y_bars, w-progress_w_offset-xoffset, 4,
-      tasksnum,
+      jobid == AFJOB::SYSJOB_ID ?  runningtasksnumber + tasksready + taskserror: tasksnum,
       tasksdone, runningtasksnumber, taskserror,
       false
    );

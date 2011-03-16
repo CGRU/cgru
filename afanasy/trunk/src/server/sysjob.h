@@ -60,8 +60,8 @@ public:
 
    void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
-   void addCommand( SysCmd* syscmd, MonitorContainer * monitoring = NULL);
-   bool isReady( MonitorContainer * monitoring = NULL) const;
+   void addCommand( SysCmd* syscmd);
+   bool isReady() const;
 
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
    virtual void getErrorHostsListString( std::string & str) const;
@@ -93,7 +93,7 @@ private:
 class SysJob : public JobAf
 {
 public:
-   static void addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName, MonitorContainer * monitoring = NULL);
+   static void addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
 
    enum CreationFlags
    {

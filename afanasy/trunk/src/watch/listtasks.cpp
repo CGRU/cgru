@@ -255,7 +255,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
       if( progress ) delete progress;
       progress = new_progress;
 
-      if( updateProgress() == false)
+      if( updateProgress( false) == false)
       {
          printf("Tasks update error. Closing tasks window.\n");
          displayWarning( "Tasks update error.");
@@ -474,7 +474,7 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
 
    if( firstChangedRow != -1 ) model->emit_dataChanged( firstChangedRow, lastChangedRow);
 
-   updateProgress( true);
+//   updateProgress( true);
 
    return true;
 }

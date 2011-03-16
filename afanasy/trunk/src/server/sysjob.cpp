@@ -168,18 +168,14 @@ SysBlock::~SysBlock()
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++) delete *it;
 }
 
-void SysBlock::addCommand( SysCmd * syscmd, MonitorContainer * monitoring)
+void SysBlock::addCommand( SysCmd * syscmd)
 {
    commands.push_back( syscmd);
-   uint32_t task_old_state = taskprogress->state;
    taskprogress->state |= AFJOB::STATE_READY_MASK;
-   if(( task_old_state != taskprogress->state ) && monitoring ) tasks[0]->monitor( monitoring);
 }
 
-bool SysBlock::isReady( MonitorContainer * monitoring) const
+bool SysBlock::isReady() const
 {
-   uint32_t task_old_state = taskprogress->state;
-
    bool ready = true;
 
    if( getReadySysTask() == NULL )
@@ -191,8 +187,6 @@ bool SysBlock::isReady( MonitorContainer * monitoring) const
       }
    }
    if( ready ) taskprogress->state |= AFJOB::STATE_READY_MASK;
-
-   if(( task_old_state != taskprogress->state ) && monitoring ) tasks[0]->monitor( monitoring);
 
    return ready;
 }
@@ -306,7 +300,9 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
 
    uint32_t taskstate_old = taskprogress->state;
    int tasksready_old = data->getProgressTasksReady();
+   int taskserror_old = data->getProgressTasksError();
    int tasksready_new = 0;
+   int taskserror_new = 0;
 
 
    taskprogress->state &= ~AFJOB::STATE_RUNNING_MASK;
@@ -321,7 +317,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       if((*it)->isReady()  )
       {
          taskprogress->state |= AFJOB::STATE_READY_MASK;
-         tasksready_new ++;
+         taskserror_new ++;
       }
    }
 
@@ -330,22 +326,20 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    if( commands.size())
    {
       taskprogress->state |= AFJOB::STATE_READY_MASK;
-      tasksready_new += commands.size();
+      tasksready_new = commands.size();
    }
 
    if( taskstate_old  != taskprogress->state ) taskchanged = true;
-   if( tasksready_old != tasksready_new      )
-   {
-      taskchanged = true;
-      blockProgress_changed = true;
-   }
+   if(( tasksready_old != tasksready_new ) ||
+      ( taskserror_old != taskserror_new )  ) blockProgress_changed = true;
 
    if( taskchanged && monitoring) tasks[0]->monitor( monitoring);
 
    // For block in jobs list monitoring
-   if( Block::refresh( currentTime, renders, monitoring) == true ) blockProgress_changed = true;
+   if( Block::refresh( currentTime, renders, monitoring)) blockProgress_changed = true;
 
    data->setProgressTasksReady( tasksready_new);
+   data->setProgressTasksError( taskserror_new);
 
    return blockProgress_changed;
 }
@@ -438,9 +432,9 @@ Block * SysJob::newBlock( int numBlock)
    }
 }
 
-void SysJob::addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName, MonitorContainer * monitoring)
+void SysJob::addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
 {
-   block_cmdpost->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName), monitoring);
+   block_cmdpost->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
 }
 
 bool SysJob::solve( RenderAf *render, MonitorContainer * monitoring)
