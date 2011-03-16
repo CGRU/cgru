@@ -42,6 +42,7 @@ parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', de
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
 parser.add_option(      '--pause',        dest='pause',        type='int',    default=0,  help='start job paused')
+parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
 (options, args) = parser.parse_args()
 jobname     = options.jobname
 labels      = options.labels
@@ -69,6 +70,9 @@ mhwaitsrv   = options.mhwaitsrv
 mhsame      = options.mhsame
 mhservice   = options.mhservice
 parser      = options.parser
+xcopy       = options.xcopy
+
+if xcopy < 1: xcopy = 1
 
 if jobname == '': jobname = '_empty_'
 job = af.Job( jobname)
@@ -155,8 +159,10 @@ if output:
 
 exit_status = 0
 if sendjob:
-   if job.send( verbose) == False:
-      print 'Error: Job was not sent.'
-      exit_status = 1
+   for x in range(xcopy):
+      if job.send( verbose) == False:
+         print 'Error: Job was not sent.'
+         exit_status = 1
+         break
 
 sys.exit( exit_status)

@@ -113,6 +113,7 @@ private:
    Item * item;
    int blocknum;
    int jobid;
+   bool injobslist;
 
    void drawProgress(
          QPainter * painter,

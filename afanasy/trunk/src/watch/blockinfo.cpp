@@ -48,8 +48,11 @@ BlockInfo::BlockInfo( Item * qItem, int BlockNumber, int JobId):
 
    item( qItem),
    blocknum( BlockNumber),
-   jobid(JobId)
+   jobid(JobId),
+
+   injobslist( false)
 {
+   if(( blocknum == -1 ) && ( jobid == -1 )) injobslist = true;
 }
 
 BlockInfo::~BlockInfo()
@@ -124,7 +127,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       break;
 
    default:
-      AFERRAR("BlockInfo::update: Invalid message type = %s\n", af::Msg::TNAMES[type]);
+      AFERRAR("BlockInfo::update: Invalid message type = %s", af::Msg::TNAMES[type])
       return false;
    }
 
@@ -198,6 +201,7 @@ void BlockInfo::refresh()
             .arg( runningtasksnumber)
             .arg( tasksdone)
             .arg( taskserror);
+   if( false == injobslist ) str_progress += QString(" rdy%1").arg( tasksready);
 
    if( false == depends.isEmpty())
    {
@@ -228,7 +232,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
 {
    if( item == NULL)
    {
-      AFERROR("BlockInfo::drawBars: Item is not set.\n");
+      AFERROR("BlockInfo::drawBars: Item is not set.")
       return;
    }
 
@@ -685,7 +689,7 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
          break;
 
       default:
-         AFERRAR("BlockInfo::blockAction: invalid action number = %d\n", id_action);
+         AFERRAR("BlockInfo::blockAction: invalid action number = %d", id_action)
          return;
    }
 

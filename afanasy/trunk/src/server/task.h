@@ -39,7 +39,7 @@ public:
 
    void errorHostsAppend( const std::string & hostname);
    bool avoidHostsCheck( const std::string & hostname) const;
-   void getErrorHostsListString( std::string & str) const;
+   virtual void getErrorHostsListString( std::string & str) const;
    const std::string getErrorHostsListString() const;
    inline void errorHostsReset() { errorHosts.clear(); errorHostsCounts.clear(); errorHostsTime.clear();}
 
@@ -71,12 +71,12 @@ public:
 protected:
    af::TaskProgress * progress;
    std::list<std::string> logStringList;    ///< Task log.
+   const Block * block;
 
 private:
    void deleteRunningZombie();
 
 private:
-   const Block * block;
    int number;
 
    TaskRun * run;

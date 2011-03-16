@@ -40,7 +40,7 @@ public:
    inline const std::list<std::string> & getLog() { return joblog;}
 
    const std::string getErrorHostsListString() const; /// Get avoid hosts list.
-   const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
+   virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
    const std::list<std::string> & getTaskLog( int block, int task);

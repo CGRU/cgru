@@ -70,20 +70,20 @@ bool JobAf::construct()
 //printf("JobAf::construct:\n");
    if( constructed )
    {
-      AFERROR("JobAf::construct: Already constructed.\n");
+      AFERROR("JobAf::construct: Already constructed.")
       return true;
    }
 
    if( blocksnum < 1 )
    {
-      AFERRAR("JobAf::construct: invalid number of blocks = %d\n", blocksnum);
+      AFERRAR("JobAf::construct: invalid number of blocks = %d", blocksnum)
       return false;
    }
 
    blocks = new Block*[blocksnum];
    if( blocks == NULL )
    {
-      AFERROR("JobAf::construct: Can't allocate memory for blocks.\n");
+      AFERROR("JobAf::construct: Can't allocate memory for blocks.")
       return false;
    }
    for( int b = 0; b < blocksnum; b++) blocks[b] = NULL;
@@ -93,7 +93,7 @@ bool JobAf::construct()
       blocks[b] = newBlock(b);
       if( blocks[b] == NULL )
       {
-         AFERRAR("JobAf::construct: Can't create block %d of %d.\n", b, blocksnum);
+         AFERRAR("JobAf::construct: Can't create block %d of %d.", b, blocksnum)
          return false;
       }
    }
@@ -120,7 +120,7 @@ bool JobAf::initialize( UserAf * jobOwner)
 {
    if( isConstructed() == false)
    {
-      AFERROR("JobAf::initialize: Job is not constructed.\n");
+      AFERROR("JobAf::initialize: Job is not constructed.")
       return 0;
    }
 
@@ -219,20 +219,20 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    }
    if( getRunningTasksNumber() )
    {
-      AFERRAR("JobAf::setZombie: runningtaskscounter = %d\n", getRunningTasksNumber());
+      AFERRAR("JobAf::setZombie: runningtaskscounter = %d", getRunningTasksNumber())
       return;
    }
 
    if( false == cmd_post.empty())
    {
-      SysJob::addPostCommand( cmd_post, blocksnum > 0 ? blocksdata[0]->getWDir(): "", username, name);
+      SysJob::addPostCommand( cmd_post, blocksnum > 0 ? blocksdata[0]->getWDir(): "", username, name, monitoring);
       log( std::string("Executing job post command:\n") + cmd_post);
    }
    for( int b = 0; b < blocksnum; b++)
    {
       if( blocksdata[b]->hasCmdPost())
       {
-         SysJob::addPostCommand( blocksdata[b]->getCmdPost(), blocksdata[b]->getWDir(), username, name);
+         SysJob::addPostCommand( blocksdata[b]->getCmdPost(), blocksdata[b]->getWDir(), username, name, monitoring);
          log( std::string("Executing block[") + blocksdata[b]->getName() + "] post command:\n" + blocksdata[b]->getCmdPost());
       }
    }
@@ -413,7 +413,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    }
    case af::Msg::TJobRestartPause:
    {
-      log(            "Restarted ( and paused ) by " + userhost );
+      log( "Restarted ( and paused ) by " + userhost );
       restartTasks( false, "Job restarted ( and paused ) by " + userhost, (RenderContainer*)pointer, monitoring);
       checkDepends();
       state = state | AFJOB::STATE_OFFLINE_MASK;
@@ -574,8 +574,8 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    if( false == ( blocksdata[block]->getState() & AFJOB::STATE_READY_MASK ) ) return NULL;
    if( task >= blocksdata[block]->getTasksNum() )
    {
-      AFERRAR("JobAf::genTask: block[%d] '%s' : %d > number of tasks = %d.\n",
-         block, blocksdata[block]->getName().c_str(), task, blocksdata[block]->getTasksNum());
+      AFERRAR("JobAf::genTask: block[%d] '%s' : %d > number of tasks = %d.",
+         block, blocksdata[block]->getName().c_str(), task, blocksdata[block]->getTasksNum())
       return NULL;
    }
    if( false == ( progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
@@ -662,7 +662,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 // check validness:
    if( blocksnum < 1)
    {
-      AFERROR("JobAf::solve: job has no blocks.\n");
+      AFERROR("JobAf::solve: job has no blocks.")
       return false;
    }
 
@@ -896,7 +896,7 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
       int b = taskspos.getNumBlock(p);
       if( b >= blocksnum)
       {
-         AFERRAR("JobAf::skipTasks: b >= blocksnum ( %d >= %d )\n", b, blocksnum);
+         AFERRAR("JobAf::skipTasks: b >= blocksnum ( %d >= %d )", b, blocksnum)
          continue;
       }
       bool has_tasks = taskspos.hasTasks();
@@ -906,7 +906,7 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
          start = taskspos.getNumTask( p);
          if( start >= blocksdata[b]->getTasksNum())
          {
-            AFERRAR("JobAf::skipTasks: taskspos.getNumTask() >= numTasks , ( %d >= %d )\n", start, blocksdata[b]->getTasksNum());
+            AFERRAR("JobAf::skipTasks: taskspos.getNumTask() >= numTasks , ( %d >= %d )", start, blocksdata[b]->getTasksNum())
             continue;
          }
          end = start+1;
@@ -985,21 +985,23 @@ const std::string JobAf::getErrorHostsListString( int b, int t) const
    {
       return std::string("Invalid task[") + af::itos(b) + "][" + af::itos(t) + "].";
    }
-   return blocks[b]->tasks[t]->getErrorHostsListString();
+   std::string str = blocks[b]->tasks[t]->getErrorHostsListString();
+   if( str.empty()) str = "The task has no error hosts.";
+   return str;
 }
 
 bool JobAf::checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str) const
 {
    if( BlockNum >= blocksnum)
    {
-      if( str ) {AFERRAR("JobAf::checkBlockTaskNumbers: %s: numblock >= blocksnum ( %d >= %d )\n", str, BlockNum, blocksnum);}
-      else      {AFERRAR("JobAf::checkBlockTaskNumbers: numblock >= blocksnum ( %d >= %d )\n", BlockNum, blocksnum);}
+      if( str ) AFERRAR("JobAf::checkBlockTaskNumbers: %s: numblock >= blocksnum ( %d >= %d )", str, BlockNum, blocksnum)
+      else      AFERRAR("JobAf::checkBlockTaskNumbers: numblock >= blocksnum ( %d >= %d )", BlockNum, blocksnum)
       return false;
    }
    if( TaskNum >= blocksdata[BlockNum]->getTasksNum())
    {
-      if( str ) {AFERRAR("JobAf::checkBlockTaskNumbers: %s: numtask >= numTasks ( %d >= %d )\n", str, TaskNum, blocksdata[BlockNum]->getTasksNum());}
-      else      {AFERRAR("JobAf::checkBlockTaskNumbers: numtask >= numTasks ( %d >= %d )\n", TaskNum, blocksdata[BlockNum]->getTasksNum());}
+      if( str ) AFERRAR("JobAf::checkBlockTaskNumbers: %s: numtask >= numTasks ( %d >= %d )", str, TaskNum, blocksdata[BlockNum]->getTasksNum())
+      else      AFERRAR("JobAf::checkBlockTaskNumbers: numtask >= numTasks ( %d >= %d )", TaskNum, blocksdata[BlockNum]->getTasksNum())
       return false;
    }
    return true;

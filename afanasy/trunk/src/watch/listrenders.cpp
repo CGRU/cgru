@@ -84,7 +84,7 @@ Press RMB for Options.\
 
 ListRenders::~ListRenders()
 {
-AFINFO("ListRenders::~ListRenders.\n");
+AFINFO("ListRenders::~ListRenders.")
 }
 
 void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
@@ -249,9 +249,8 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
 bool ListRenders::caseMessage( af::Msg * msg)
 {
-//AFINFO("void ListRenders::caseMessage( Msg msg)\n");
 #ifdef AFOUTPUT
-//   msg->stdOut();
+   msg->stdOut();
 #endif
    switch( msg->type())
    {
@@ -465,15 +464,8 @@ void ListRenders::actCommand( int number)
 
    QModelIndexList indexes( view->selectionModel()->selectedIndexes());
 
-//   QString cmd(af::Environment::getRenderCmds()[number]);
-
    std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin();
-   int i = 0;
-   while( i != number )
-   {
-      it++;
-      if( it == af::Environment::getPreviewCmds().end()) break;
-   }
+   for( int i = 0; i < number; i++ ) it++;
    QString cmd( afqt::stoq(*it));
 
    if( cmd.contains( AFWATCH::CMDS_ASKCOMMAND))

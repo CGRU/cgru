@@ -60,11 +60,8 @@ public:
 
    void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
 
-   void addCommand( SysCmd* syscmd);
-
-   inline int getNumCommands() const { return commands.size();}
-   inline int getNumSysTasks() const { return systasks.size();}
-   SysTask * getReadySysTask() const;
+   void addCommand( SysCmd* syscmd, MonitorContainer * monitoring = NULL);
+   bool isReady( MonitorContainer * monitoring = NULL) const;
 
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
    virtual void getErrorHostsListString( std::string & str) const;
@@ -72,7 +69,11 @@ public:
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();
 
-   inline static void logCmdPost( const std::string & message) { task->appendLog( message);}
+   inline int getNumCommands() const { return commands.size();}
+   inline int getNumSysTasks() const { return systasks.size();}
+   SysTask * getReadySysTask() const;
+
+   inline void appendTaskLog( const std::string & message) const { tasks[0]->appendLog( message);}
 
 private:
    SysTask * addTask( af::TaskExec * taskexec);
@@ -80,7 +81,7 @@ private:
    void deleteFinishedTasks();
 
 private:
-   static Task * task;
+   af::TaskProgress * taskprogress;
 
 private:
    std::list<SysCmd*> commands;
@@ -92,7 +93,7 @@ private:
 class SysJob : public JobAf
 {
 public:
-   static void addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
+   static void addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName, MonitorContainer * monitoring = NULL);
 
    enum CreationFlags
    {
@@ -114,6 +115,7 @@ public:
    virtual void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
+   virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
    virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);
    virtual void dbDelete( QStringList  * queries) const;
 

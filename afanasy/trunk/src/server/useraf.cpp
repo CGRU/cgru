@@ -244,7 +244,7 @@ bool UserAf::canRun( RenderAf *render)
 // check hosts mask:
    if( false == checkHostsMask( render->getName())) return false;
 // check exclude hosts mask:
-//   if( false == checkHostsMaskExclude( render->getName())) return false;
+   if( false == checkHostsMaskExclude( render->getName())) return false;
 
    return true;
 }
@@ -290,7 +290,7 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
       }
       default:
       {
-         AFERRAR("UserAf::moveJobs: Invalid type = %d.\n", type);
+         AFERRAR("UserAf::moveJobs: Invalid type = %d.", type)
          return;
       }
    }

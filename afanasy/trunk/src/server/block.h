@@ -41,6 +41,7 @@ public:
 
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
+   /// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
    uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);

@@ -205,7 +205,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
       }
       default:
       {
-         AFERRAR("ListTasks::contextMenuEvent: unknown item id = %d.\n", id);
+         AFERRAR("ListTasks::contextMenuEvent: unknown item id = %d.", id)
          return;
       }
    }
@@ -363,7 +363,7 @@ int ListTasks::getRow( int block, int task)
    {
       if((task != -1) && (task >= tasksnum[block]))
       {
-         AFERRAR("ListTasks::getRow: task >= tasksnum[block] : (%d>=%d[%d])\n", task, tasksnum[block], block);
+         AFERRAR("ListTasks::getRow: task >= tasksnum[block] : (%d>=%d[%d])", task, tasksnum[block], block)
       }
       else
       {
@@ -373,7 +373,7 @@ int ListTasks::getRow( int block, int task)
       }
    }
    else
-      AFERRAR("ListTasks::getRow: block >= blocksnum : (%d>=%d)\n", block, blocksnum);
+      AFERRAR("ListTasks::getRow: block >= blocksnum : (%d>=%d)", block, blocksnum)
 //printf("ListTasks::getRow: b[%d] t[%d] = %d\n", block, task, row);
    return row;
 }
@@ -384,7 +384,7 @@ void ListTasks::updateJob()
    if( blocksnum == 0 ) return;
    if( blocksnum != job->getBlocksNum())
    {
-      AFERRAR("ListTasks::updateJob: blocksnum != job->getBlocksNum() ( %d != %d )\n", blocksnum, job->getBlocksNum());
+      AFERRAR("ListTasks::updateJob: blocksnum != job->getBlocksNum() ( %d != %d )", blocksnum, job->getBlocksNum())
       return;
    }
    for( int b = 0; b < blocksnum; b++)
@@ -399,7 +399,7 @@ bool ListTasks::updateProgress(  bool blocksOnly)
    if( progress == NULL ) return true;
    if( blocksnum != progress->getBlocksNum())
    {
-      AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).\n", blocksnum, progress->getBlocksNum());
+      AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", blocksnum, progress->getBlocksNum())
       return false;
    }
 
@@ -416,8 +416,7 @@ bool ListTasks::updateProgress(  bool blocksOnly)
 
       if( tasksnum[b] != progress->getTasksNum(b))
       {
-         AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d).\n",
-            b, tasksnum[b], progress->getTasksNum(b));
+         AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, tasksnum[b], progress->getTasksNum(b))
          return false;
       }
 
@@ -451,12 +450,12 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
    {
       if( *bIt > blocksnum)
       {
-         AFERRAR("ListTasks::updateTasks: block > blocksnum (%d>%d)\n", *bIt, blocksnum);
+         AFERRAR("ListTasks::updateTasks: block > blocksnum (%d>%d)", *bIt, blocksnum)
          return false;
       }
       if( *tIt > tasksnum[*bIt])
       {
-         AFERRAR("ListTasks::updateTasks: task > tasksnum[%d] (%d>%d)\n", *bIt, *tIt, tasksnum[*bIt]);
+         AFERRAR("ListTasks::updateTasks: task > tasksnum[%d] (%d>%d)", *bIt, *tIt, tasksnum[*bIt])
          return false;
       }
       wtasks[*bIt][*tIt]->upProgress( **trIt );
@@ -544,7 +543,7 @@ void ListTasks::do_Skip_Restart( int type, int itemid)
          }
          default:
          {
-            AFERRAR("ListTasks::do_Skip_Restart: Invalid item id = %d.\n", id);
+            AFERRAR("ListTasks::do_Skip_Restart: Invalid item id = %d.", id)
          }
       }
    }
@@ -672,14 +671,14 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
    ItemJobTask* taskitem = (ItemJobTask*)item;
    af::Service service( "service", taskitem->getWDir(), "", taskitem->genFiles());
 
-   QStringList images = QString::fromUtf8( service.getFiles().c_str()).split(';');
+   QStringList images = afqt::stoq( service.getFiles()).split(';');
    if( num_img >= images.size())
    {
       displayError( "No such image nubmer.");
       return;
    }
    QString arg  = images[num_img];
-   QString wdir = QString::fromUtf8( service.getWDir().c_str());
+   QString wdir( afqt::stoq( service.getWDir()));
 
    if( arg.isEmpty()) return;
    if( num_cmd >= af::Environment::getPreviewCmds().size())
@@ -687,14 +686,9 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
       displayError( "No such command number.");
       return;
    }
-
    std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
-   int i = 0;
-   while( i != num_cmd )
-   {
-      it++;
-      if( it == af::Environment::getPreviewCmds().end()) break;
-   }
+   for( int i = 0; i < num_cmd; i++ ) it++;
+
    QString cmd( afqt::stoq(*it));
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
@@ -712,7 +706,7 @@ void ListTasks::blockAction( int id_block, int id_action)
 {
    if( id_block >= blocksnum)
    {
-      AFERRAR("ListTasks::blockAction: id_block >= blocksnum (%d>=%d)\n", id_block, blocksnum);
+      AFERRAR("ListTasks::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return;
    }
    wblocks[id_block]->blockAction( id_block, id_action, this);
@@ -734,7 +728,7 @@ void ListTasks::sortBlock( int numblock)
 {
    if( numblock >= blocksnum )
    {
-      AFERRAR("ListTasks::sortBlock: numblock >= blocksnum (%d>=%d)\n", numblock, blocksnum);
+      AFERRAR("ListTasks::sortBlock: numblock >= blocksnum (%d>=%d)", numblock, blocksnum)
       return;
    }
 

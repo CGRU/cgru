@@ -27,7 +27,7 @@ Block::Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * p
    tasks = new Task*[ data->getTasksNum()];
    if( tasks == NULL )
    {
-      AFERROR("Blocl::Block: Can't allocate memory for tasks.\n");
+      AFERROR("Blocl::Block: Can't allocate memory for tasks.")
       return;
    }
    for( int t = 0; t < data->getTasksNum(); t++) tasks[t] = NULL;
@@ -36,7 +36,7 @@ Block::Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * p
       tasks[t] = new Task( this, progress->tp[ data->getBlockNum()][t], t);
       if( tasks == NULL )
       {
-         AFERRAR("Blocl::Block: Can't allocate memory for task %d of %d.\n", t, data->getTasksNum());
+         AFERRAR("Blocl::Block: Can't allocate memory for task %d of %d.", t, data->getTasksNum())
          return;
       }
    }
@@ -62,7 +62,7 @@ void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)
 {
    if( task >= data->getTasksNum())
    {
-      AFERRAR("Block::errorHostsAppend: task >= tasksnum (%d>=%d)\n", task, data->getTasksNum());
+      AFERRAR("Block::errorHostsAppend: task >= tasksnum (%d>=%d)", task, data->getTasksNum())
       return;
    }
    RenderContainerIt rendersIt( renders);
@@ -125,9 +125,6 @@ void Block::getErrorHostsListString( std::string & str) const
       str += "\n";
       str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
       if(( getErrorsAvoidHost() > 0 ) && ( *cIt >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
-//      list << QString("%1: %2 at %3%4").arg(errorHosts[h]).arg( QString::number( errorHostsCounts[h]))
-//         .arg( af::time2Qstr( errorHostsTime[h]))
-//         .arg(((getErrorsAvoidHost() > 0) && (errorHostsCounts[h] >= getErrorsAvoidHost())) ? " - ! AVOIDING !" : "");
    }
    for( int t = 0; t < data->getTasksNum(); t++) tasks[t]->getErrorHostsListString( str);
 }
@@ -148,7 +145,7 @@ void Block::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContai
       int cap_coeff = render->getCapacityFree() / taskexec->getCapacity();
       if( cap_coeff < data->getCapCoeffMin())
       {
-         AFERRAR("Block::startTask: cap_coeff < data->getCapCoeffMin(%d<%d)\n", cap_coeff, data->getCapCoeffMin());
+         AFERRAR("Block::startTask: cap_coeff < data->getCapCoeffMin(%d<%d)", cap_coeff, data->getCapCoeffMin())
       }
       else
       {
@@ -180,7 +177,7 @@ bool Block::canRun( RenderAf * render)
    // check hosts mask:
    if( false == data->checkHostsMask( render->getName())) return false;
    // check exclude hosts mask:
-//   if( false == data->checkHostsMaskExclude( render->getName())) return false;
+   if( false == data->checkHostsMaskExclude( render->getName())) return false;
    // Check needed properties:
    if( false == data->checkNeedProperties( render->getHost().properties)) return false;
 
@@ -191,7 +188,7 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
 {
    if( user == NULL)
    {
-      AFERROR("Block::refresh: User is not set.");
+      AFERROR("Block::refresh: User is not set.")
       return false;
    }
 
@@ -549,7 +546,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    }
    default:
    {
-      AFERRAR("Block::action: Invalid type = '%s'\n", af::Msg::TNAMES[type]);
+      AFERRAR("Block::action: Invalid type = \"%s\"", af::Msg::TNAMES[type])
       mcgeneral.stdOut();
       return 0;
    }
