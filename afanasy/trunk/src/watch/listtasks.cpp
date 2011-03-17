@@ -283,7 +283,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
       af::JobProgress * progress = new af::JobProgress( msg);
       if( jobid == progress->getJobId())
       {
-         if( updateProgress( progress /*false*/) == false)
+         if( updateProgress( progress ) == false)
          {
             printf("Tasks update error. Closing tasks window.\n");
             displayWarning( "Tasks update error.");

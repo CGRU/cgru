@@ -67,8 +67,6 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       generateToolTip();
 
    case af::Msg::TBlocksProgress:
-   case 0:
-      // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
 
       state = block->getState();
 
