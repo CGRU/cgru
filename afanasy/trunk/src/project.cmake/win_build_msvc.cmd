@@ -6,7 +6,7 @@ set cgru=%CD%
 popd
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-set cgru_qt=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.1
+set cgru_qt=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.2
 if exist %cgru_qt% SET "PATH=%cgru_qt%\bin;%PATH%"
 
 rem Specify Python:
