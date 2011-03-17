@@ -28,6 +28,7 @@ function debianArch(){
 # Common for RedHat distributives:
 function redhatArch(){
    packages="$packages gcc-c++"
+   packages="$packages rpm-build"
    packages="$packages libzip libzip-devel"
    # ImageMagick:
    packages="$packages libjpeg libjpeg-devel"
