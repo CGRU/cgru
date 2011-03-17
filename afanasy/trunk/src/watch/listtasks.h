@@ -58,8 +58,6 @@ private slots:
 private:
    int jobid;
    QString jobname;
-   af::Job * job;
-   af::JobProgress * progress;
 
    int blocksnum;
    ItemJobBlock **wblocks;
@@ -69,10 +67,9 @@ private:
    bool constructed;
 
 private:
-   void construct();
-   void updateJob();
+   void construct( af::Job * job);
 
-   bool updateProgress( bool blocksOnly);
+   bool updateProgress( const af::JobProgress * progress);
    bool updateTasks( af::MCTasksProgress * mctasksprogress);
 
    int getRow( int block, int task = -1);

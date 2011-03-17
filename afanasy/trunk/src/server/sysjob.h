@@ -29,15 +29,10 @@ public:
    virtual ~SysTask();
 
    virtual void start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
-
    virtual void refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
-
    virtual void updateState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring, bool & errorHost);
-
    virtual void writeTaskOutput( const af::MCTaskUp & taskup) const;  ///< Write task output in tasksOutputDir.
-
    virtual const std::string getInfo( bool full = false) const;
-
    virtual void appendLog( const std::string & message);
    virtual void monitor( MonitorContainer * monitoring) const;
    virtual void updateDatabase() const;
@@ -115,11 +110,14 @@ public:
    virtual void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
-   virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
    virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);
    virtual void dbDelete( QStringList  * queries) const;
 
    static void appendLog( const std::string & message);
+
+   // Functions than informate that it is a system task, and this info is not abailable:
+   virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders);
+   virtual const std::string getErrorHostsListString( int b, int t) const;
 
 protected:
    virtual Block * newBlock( int numBlock);

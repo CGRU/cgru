@@ -39,8 +39,6 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
    ListItems( parent),
    jobid( JobId),
    jobname( JobName),
-   job( NULL),
-   progress( NULL),
    blocksnum(0),
    wblocks( NULL),
    tasksnum( NULL),
@@ -60,17 +58,51 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
    parentWindow->setWindowTitle( jobname);
 }
 
+void ListTasks::construct( af::Job * job)
+{
+   constructed = true;
+   view->viewport()->hide();
+
+   blocksnum = job->getBlocksNum();
+   if( blocksnum == 0 ) return;
+
+   tasksnum = new int[blocksnum];
+   wblocks = new ItemJobBlock*[blocksnum];
+   wtasks = new ItemJobTask**[blocksnum];
+   int row = 0;
+   for( int b = 0; b < blocksnum; b++)
+   {
+      const af::BlockData* block = job->getBlock( b);
+      ItemJobBlock *wblock = new ItemJobBlock( block, this);
+      wblock->tasksHidded = blocksnum > 1;
+      wblocks[b] = wblock;
+      model->addItem( wblock);
+      row++;
+      tasksnum[b] = block->getTasksNum();
+      wtasks[b] = new ItemJobTask*[tasksnum[b]];
+      for( int t = 0; t < tasksnum[b]; t++)
+      {
+         ItemJobTask *wtask =  new ItemJobTask( block, t);
+         model->addItem( wtask);
+         if( blocksnum > 1) view->setRowHidden( row , true);
+         row++;
+         wtasks[b][t] = wtask;
+      }
+   }
+
+   view->viewport()->show();
+}
+
 ListTasks::~ListTasks()
 {
    Watch::delJobId( jobid);
 
-   if( tasksnum != NULL ) delete [] tasksnum;
-   if( wblocks != NULL ) delete [] wblocks;
-   if( wtasks != NULL ) delete [] wtasks;
-   if( job ) delete job;
-   if( progress ) delete progress;
+   for( int b = 0; b < blocksnum; b++) delete [] wtasks[b];
+   delete [] tasksnum;
+   delete [] wblocks;
+   delete [] wtasks;
 
-   Watch::watchTasks_rem( jobid);
+   Watch::watchJodTasksWindowRem( jobid);
 }
 
 void ListTasks::connectionLost()
@@ -222,45 +254,43 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
    {
    case af::Msg::TJob:
    {
-      af::Job * new_job = new af::Job( msg);
-      if( new_job->getId() != jobid )
+      af::Job * job = new af::Job( msg);
+      if( job->getId() != jobid )
       {
-         delete new_job;
+         AFERROR(     "ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.")
+         displayError("ListTasks::caseMessage: af::Msg::TJob: Jobs ids mismatch.");
+         delete job;
          break;
       }
 
-      if( job ) delete job;
-      job = new_job;
-
       if( constructed == false)
       {
-         construct();
+         construct( job);
          Watch::sendMsg( new afqt::QMsg( af::Msg::TJobProgressRequestId, jobid, true));
          Watch::addJobId( jobid);
       }
-      else updateJob();
+      else
+      {
+         AFERROR(     "ListTasks::caseMessage: af::Msg::TJob: Job is already constructed.")
+         displayError("ListTasks::caseMessage: af::Msg::TJob: Job is already constructed.");
+      }
       break;
    }
    case af::Msg::TJobProgress:
    {
       if( constructed == false ) break;
 
-      af::JobProgress * new_progress = new af::JobProgress( msg);
-      if( jobid != new_progress->getJobId())
+      af::JobProgress * progress = new af::JobProgress( msg);
+      if( jobid == progress->getJobId())
       {
-         delete new_progress;
-         break;
+         if( updateProgress( progress /*false*/) == false)
+         {
+            printf("Tasks update error. Closing tasks window.\n");
+            displayWarning( "Tasks update error.");
+            parentWindow->close();
+         }
       }
-
-      if( progress ) delete progress;
-      progress = new_progress;
-
-      if( updateProgress( false) == false)
-      {
-         printf("Tasks update error. Closing tasks window.\n");
-         displayWarning( "Tasks update error.");
-         parentWindow->close();
-      }
+      delete progress;
       break;
    }
    case af::Msg::TTasksRun:
@@ -321,41 +351,6 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
    return true;
 }
 
-void ListTasks::construct()
-{
-   constructed = true;
-   view->viewport()->hide();
-
-   blocksnum = job->getBlocksNum();
-   if( blocksnum == 0 ) return;
-
-   tasksnum = new int[blocksnum];
-   wblocks = new ItemJobBlock*[blocksnum];
-   wtasks = new ItemJobTask**[blocksnum];
-   int row = 0;
-   for( int b = 0; b < blocksnum; b++)
-   {
-      const af::BlockData* block = job->getBlock( b);
-      ItemJobBlock *wblock = new ItemJobBlock( block, this);
-      wblock->tasksHidded = blocksnum > 1;
-      wblocks[b] = wblock;
-      model->addItem( wblock);
-      row++;
-      tasksnum[b] = block->getTasksNum();
-      wtasks[b] = new ItemJobTask*[tasksnum[b]];
-      for( int t = 0; t < tasksnum[b]; t++)
-      {
-         ItemJobTask *wtask =  new ItemJobTask( block, t);
-         model->addItem( wtask);
-         if( blocksnum > 1) view->setRowHidden( row , true);
-         row++;
-         wtasks[b][t] = wtask;
-      }
-   }
-
-   view->viewport()->show();
-}
-
 int ListTasks::getRow( int block, int task)
 {
    int row = -1;
@@ -378,25 +373,8 @@ int ListTasks::getRow( int block, int task)
    return row;
 }
 
-void ListTasks::updateJob()
+bool ListTasks::updateProgress( const af::JobProgress * progress/*bool blocksOnly = false*/)
 {
-//printf("ListTasks::updateJob:\n");
-   if( blocksnum == 0 ) return;
-   if( blocksnum != job->getBlocksNum())
-   {
-      AFERRAR("ListTasks::updateJob: blocksnum != job->getBlocksNum() ( %d != %d )", blocksnum, job->getBlocksNum())
-      return;
-   }
-   for( int b = 0; b < blocksnum; b++)
-   {
-      const af::BlockData* block = job->getBlock( b);
-      wblocks[b]->update( block, af::Msg::TJob);
-   }
-}
-
-bool ListTasks::updateProgress(  bool blocksOnly)
-{
-   if( progress == NULL ) return true;
    if( blocksnum != progress->getBlocksNum())
    {
       AFERRAR("ListTasks::updateProgress: Blocks number mismatch (%d!=%d).", blocksnum, progress->getBlocksNum())
@@ -405,15 +383,6 @@ bool ListTasks::updateProgress(  bool blocksOnly)
 
    for( int b = 0; b < blocksnum; b++)
    {
-      af::BlockData * blockdata = job->getBlock(b);
-      blockdata->updateProgress( progress);
-      // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
-      wblocks[b]->update( blockdata, 0);
-      int row = getRow( b);
-      if( row != -1 ) model->emit_dataChanged( row);
-
-      if( blocksOnly ) continue;
-
       if( tasksnum[b] != progress->getTasksNum(b))
       {
          AFERRAR("ListTasks::updateProgress: Tasks number mismatch in block #%d (%d!=%d)", b, tasksnum[b], progress->getTasksNum(b))
@@ -433,8 +402,6 @@ bool ListTasks::updateProgress(  bool blocksOnly)
 
 bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
 {
-   if( progress == NULL) return true;
-
    const std::list<int32_t> * tasks  = mctasksprogress->getTasks();
    const std::list<int32_t> * blocks = mctasksprogress->getBlocks();
    std::list<af::TaskProgress*> * tasksprogress = mctasksprogress->getTasksRun();
@@ -467,14 +434,10 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
          if(  lastChangedRow < row) lastChangedRow = row;
       }
 
-      *(progress->tp[*bIt][*tIt]) = **trIt;
-
       tIt++; bIt++; trIt++;
    }
 
    if( firstChangedRow != -1 ) model->emit_dataChanged( firstChangedRow, lastChangedRow);
-
-//   updateProgress( true);
 
    return true;
 }

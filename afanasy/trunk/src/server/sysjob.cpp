@@ -519,6 +519,12 @@ const std::string SysJob::getErrorHostsListString( int b, int t) const
    return "This is an empty dummy task in s system job block.\nGet job error hosts list to see its tasks error hosts.";
 }
 
+bool SysJob::getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders)
+{
+   msg->setString("This is an empty dummy task in s system job block.\nGet log to see error tasks output.");
+   return false;
+}
+
 void SysJob::appendLog( const std::string & message)
 {
    sysjob->log( message);

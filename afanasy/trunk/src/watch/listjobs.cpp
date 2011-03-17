@@ -703,7 +703,7 @@ void ListJobs::actLifeTime()
 
 void ListJobs::doubleClicked( Item * item)
 {
-   if( item ) Watch::watchTasks( item->getId(), item->getName());
+   if( item ) Watch::watchJodTasksWindowAdd( item->getId(), item->getName());
 }
 
 void ListJobs::actListenJob()

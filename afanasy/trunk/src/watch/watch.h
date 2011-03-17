@@ -67,8 +67,8 @@ public:
 
    static void listenJob(  int id, const QString & name);
    inline static void listenJob_rem(  int id) { listenjobids.removeAll(id);}
-   static void watchTasks( int id, const QString & name);
-   static void watchTasks_rem( int id);
+   static void watchJodTasksWindowAdd( int id, const QString & name);
+   static void watchJodTasksWindowRem( int id);
    static void listenTask( int jobid, int block, int task, const QString & name);
 
    inline static Dialog * getDialog()  { return d;}
