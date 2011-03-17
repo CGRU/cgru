@@ -1,11 +1,7 @@
 #!/bin/bash
 
 pythonver=$1
-if [ -z "$pythonver" ]; then
-   echo "Error: No python version specified."
-   echo "Usage: $0 [python version]"
-   exit 1
-fi
+[ -z "$pythonver" ] && pythonver=2.7.1
 
 pythonsrc=Python-$pythonver
 if [ ! -d "$pythonsrc" ]; then
