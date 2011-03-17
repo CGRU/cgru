@@ -7,59 +7,54 @@ class Afanasy
 
 public function Display()
 {
+$action=$_GET['action'];
+if( $action == '') $action = 'stat';
+
 $this->DisplayHeader();
 
-$action=$_GET['action'];
+switch ($action)
+{
+case 'jobs':
+   display_jobs();
+   break;
+case 'tasks':
+   display_tasks();
+   break;
+case 'users':
+   display_users();
+   break;
+case 'renders':
+   display_renders();
+   break;
+case 'user':
+   display_user();
+   break;
+case 'stat':
+   display_stat();
+   break;
+case 'stat_chart':
+   display_stat_chart();
+   break;
+case 'cabinet':
+   display_cabinet();
+   break;
+case 'login':
+   $this->DisplayLogin();
+   break;
+case 'logout':
+   $this->DisplayLogout();
+   break;
+case 'AddAdmin':
+   $this->AddAdmin();
+   break;
+case 'AddAdmin_register':
+   $this->AddAdmin_register();
+   break;
+default:
+   echo "action '<b><i>$action</i></b>' is not supported.";
+   break;
+}
 
-if( $action != '')
-{
-   switch ($action)
-   {
-   case 'jobs':
-      display_jobs();
-      break;
-   case 'tasks':
-      display_tasks();
-      break;
-   case 'users':
-      display_users();
-      break;
-   case 'renders':
-      display_renders();
-      break;
-   case 'user':
-      display_user();
-      break;
-   case 'stat':
-      display_stat();
-      break;
-   case 'stat_chart':
-      display_stat_chart();
-      break;
-   case 'cabinet':
-      display_cabinet();
-      break;
-   case 'login':
-      $this->DisplayLogin();
-      break;
-   case 'logout':
-      $this->DisplayLogout();
-      break;
-   case 'AddAdmin':
-      $this->AddAdmin();
-      break;
-   case 'AddAdmin_register':
-      $this->AddAdmin_register();
-      break;
-   default:
-      echo "action '<b><i>$action</i></b>' is not supported.";
-      break;
-   }
-}
-else
-{
-   echo 'no action';
-}
 $this->DisplayFooter();
 }
 
@@ -227,10 +222,37 @@ else
    echo '<a href="index.php?action=login" ><img src="images/login.png"  alt="Login"  border="0"/></a>';
 ?>
 </td>
-<td width=10%><a href="index.php?action=users"  ><img src="images/users.png"      alt="Users"      border="0"/></a></td>
-<td width=10%><a href="index.php?action=jobs"   ><img src="images/jobs.png"       alt="Jobs"       border="0"/></a></td>
-<td width=10%><a href="index.php?action=renders"><img src="images/renders.png"    alt="Renders"    border="0"/></a></td>
-<td width=10%><a href="index.php?action=stat"   ><img src="images/statistics.png" alt="Statistics" border="0"/></a></td>
+<?php
+$action=$_GET['action'];
+if( $action == '') $action = 'stat';
+$row_actions = array( 0 => 'users', 1 => 'jobs', 2 => 'renders', 3 => 'stat');
+$row_images  = array( 0 => 'users.png', 1 => 'jobs.png', 2 => 'renders.png', 3 => 'statistics.png');
+for( $i = 0; $i < 4; $i++)
+{
+   $current = 0;
+   if( $action == $row_actions[$i]) $current = 1;
+
+   echo '   ';
+   echo '<td width=10%';
+   if( $current ) echo ' style="background-color:#D0D080"';
+   echo '>';
+   if( false == $current )
+   {
+      echo '<a href="index.php?action=';
+      echo $row_actions[$i];
+      echo '">';
+   }
+   echo '<img src="images/';
+   echo $row_images[$i];
+   echo '" alt="';
+   echo $row_images[$i];
+   echo '" border="0"/>';
+   if( false == $current ) echo '</a>';
+
+   echo '</td>';
+   echo "\n";
+}
+?>
 </tr>
 <tr><td colspan=6 align=center><p>
 
