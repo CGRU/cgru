@@ -529,6 +529,9 @@ bool ItemRender::setSortType(   int type )
       case CtrlSortFilter::TVERSION:
          sort_str = &version;
          break;
+      case CtrlSortFilter::TADDRESS:
+         sort_str = &address_str;
+         break;
       default:
          AFERRAR("ItemRender::setSortType: Invalid type number = %d\n", type);
          return false;
@@ -551,6 +554,12 @@ bool ItemRender::setFilterType( int type )
          break;
       case CtrlSortFilter::TTASKUSER:
          filter_str = &tasksusers;
+         break;
+      case CtrlSortFilter::TVERSION:
+         filter_str = &version;
+         break;
+      case CtrlSortFilter::TADDRESS:
+         filter_str = &address_str;
          break;
       default:
          AFERRAR("ItemRender::setFilterType: Invalid type number = %d\n", type);

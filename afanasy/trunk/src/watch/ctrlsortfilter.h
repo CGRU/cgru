@@ -48,6 +48,7 @@ public:
       TTIMEFINISHED,
       TTIMERUN,
       TVERSION,
+      TADDRESS,
       TLAST
    };
    static const char * TNAMES[];

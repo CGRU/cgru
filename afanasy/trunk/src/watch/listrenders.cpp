@@ -49,10 +49,13 @@ ListRenders::ListRenders( QWidget* parent):
    ctrl->addSortType(   CtrlSortFilter::TTASKUSER);
    ctrl->addSortType(   CtrlSortFilter::TUSERNAME);
    ctrl->addSortType(   CtrlSortFilter::TVERSION);
+   ctrl->addSortType(   CtrlSortFilter::TADDRESS);
    ctrl->addFilterType( CtrlSortFilter::TNONE);
    ctrl->addFilterType( CtrlSortFilter::TNAME);
    ctrl->addFilterType( CtrlSortFilter::TUSERNAME);
    ctrl->addFilterType( CtrlSortFilter::TTASKUSER);
+   ctrl->addFilterType( CtrlSortFilter::TVERSION);
+   ctrl->addFilterType( CtrlSortFilter::TADDRESS);
    initSortFilterCtrl();
 
    CtrlRenders * control = new CtrlRenders( ctrl, this);
