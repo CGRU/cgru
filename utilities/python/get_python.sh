@@ -8,6 +8,6 @@ archive_ext="tar.bz2"
 archive="$foldername.$archive_ext"
 link="$location/$ver/$archive"
 
-wget $link
+[ -f $archive ] || wget $link
 
 [ -f $archive ] && tar -xvjf $archive
