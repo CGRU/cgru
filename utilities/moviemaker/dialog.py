@@ -28,9 +28,12 @@ Parser.add_option('--draw235',               dest='draw235',         type  ='int
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='',             help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--fff',                   dest='fffirst',         action='store_true', default=False,          help='Draw first frame as first, and not actual first frame number.')
-Parser.add_option('--logopath',         		dest='logopath',    		type  ='string',     default='',             help='Add a specified image')
-Parser.add_option('--logosize',         		dest='logosize',    		type  ='int',        default=20,   	         help='Logotype size, percent of image')
-Parser.add_option('--logograv',         		dest='logograv',    		type  ='string',     default='southeast', 	help='Logotype positioning gravity')
+Parser.add_option('--lgspath',         		dest='lgspath',    		type  ='string',     default='',             help='Slate logo')
+Parser.add_option('--lgssize',         		dest='lgssize',    		type  ='int',        default=20,   	         help='Slate logo size, percent of image')
+Parser.add_option('--lgsgrav',         		dest='lgsgrav',    		type  ='string',     default='southeast', 	help='Slate logo positioning gravity')
+Parser.add_option('--lgfpath',         		dest='lgfpath',    		type  ='string',     default='',             help='Frame logo')
+Parser.add_option('--lgfsize',         		dest='lgfsize',    		type  ='int',        default=10,   	         help='Frame logo size, percent of image')
+Parser.add_option('--lgfgrav',         		dest='lgfgrav',    		type  ='string',     default='north',        help='Frame logo positioning gravity')
 Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
 Parser.add_option(      '--afpriority',      dest='afpriority',      type  ='int',        default=-1,             help='Afanasy job priority')
 Parser.add_option(      '--afmaxhosts',      dest='afmaxhosts',      type  ='int',        default=-1,             help='Afanasy job maximum hosts')
@@ -492,41 +495,66 @@ Example "255,255,0" - yellow.')
       QtCore.QObject.connect( self.editLine235, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.lDrawing.addLayout( self.lLines)
 
-      # Logo
-      self.lLogo = QtGui.QHBoxLayout()
-      self.tLogoPath = QtGui.QLabel('Logo:', self)
-      self.lLogo.addWidget( self.tLogoPath)
-
-      self.editLogoPath = QtGui.QLineEdit( Options.logopath, self)
-      self.lLogo.addWidget( self.editLogoPath)
-      QtCore.QObject.connect( self.editLogoPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-
-      self.btnBrowseLogo = QtGui.QPushButton('Browse', self)
-      QtCore.QObject.connect( self.btnBrowseLogo, QtCore.SIGNAL('pressed()'), self.browseLogo)
-      self.lLogo.addWidget( self.btnBrowseLogo)
-
-      self.tLogoSize = QtGui.QLabel('Size:', self)
-      self.lLogo.addWidget( self.tLogoSize)
-      self.sbLogoSize = QtGui.QSpinBox( self)
-      self.sbLogoSize.setRange( 1, 100)
-      self.sbLogoSize.setValue( Options.logosize)
-      QtCore.QObject.connect( self.sbLogoSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.lLogo.addWidget( self.sbLogoSize)
-
-      self.tLogoGravity = QtGui.QLabel('%  Position:', self)
-      self.lLogo.addWidget( self.tLogoGravity)
-      self.cbLogoGravity = QtGui.QComboBox( self)
+      # Logos:
+      # Slate logo:
+      self.lLgs = QtGui.QHBoxLayout()
+      self.tLgsPath = QtGui.QLabel('Slate Logo:', self)
+      self.lLgs.addWidget( self.tLgsPath)
+      self.editLgsPath = QtGui.QLineEdit( Options.lgspath, self)
+      self.lLgs.addWidget( self.editLgsPath)
+      QtCore.QObject.connect( self.editLgsPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.btnBrowseLgs = QtGui.QPushButton('Browse', self)
+      QtCore.QObject.connect( self.btnBrowseLgs, QtCore.SIGNAL('pressed()'), self.browseLgs)
+      self.lLgs.addWidget( self.btnBrowseLgs)
+      self.tLgsSize = QtGui.QLabel('Size:', self)
+      self.lLgs.addWidget( self.tLgsSize)
+      self.sbLgsSize = QtGui.QSpinBox( self)
+      self.sbLgsSize.setRange( 1, 100)
+      self.sbLgsSize.setValue( Options.lgssize)
+      QtCore.QObject.connect( self.sbLgsSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lLgs.addWidget( self.sbLgsSize)
+      self.tLgsGravity = QtGui.QLabel('%  Position:', self)
+      self.lLgs.addWidget( self.tLgsGravity)
+      self.cbLgsGravity = QtGui.QComboBox( self)
       i = 0
       for grav in Gravity:
-         self.cbLogoGravity.addItem( grav)
-         if grav.lower() == Options.logograv: self.cbLogoGravity.setCurrentIndex( i)
+         self.cbLgsGravity.addItem( grav)
+         if grav.lower() == Options.lgsgrav: self.cbLgsGravity.setCurrentIndex( i)
          i += 1
-      self.lLogo.addWidget( self.cbLogoGravity)
-      QtCore.QObject.connect( self.cbLogoGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lLgs.addWidget( self.cbLgsGravity)
+      QtCore.QObject.connect( self.cbLgsGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lDrawing.addLayout( self.lLgs)
 
-      self.lDrawing.addLayout( self.lLogo)
+      # Frame logo:
+      self.lLgf = QtGui.QHBoxLayout()
+      self.tLgfPath = QtGui.QLabel('Frame Logo:', self)
+      self.lLgf.addWidget( self.tLgfPath)
+      self.editLgfPath = QtGui.QLineEdit( Options.lgfpath, self)
+      self.lLgf.addWidget( self.editLgfPath)
+      QtCore.QObject.connect( self.editLgfPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.btnBrowseLgf = QtGui.QPushButton('Browse', self)
+      QtCore.QObject.connect( self.btnBrowseLgf, QtCore.SIGNAL('pressed()'), self.browseLgf)
+      self.lLgf.addWidget( self.btnBrowseLgf)
+      self.tLgfSize = QtGui.QLabel('Size:', self)
+      self.lLgf.addWidget( self.tLgfSize)
+      self.sbLgfSize = QtGui.QSpinBox( self)
+      self.sbLgfSize.setRange( 1, 100)
+      self.sbLgfSize.setValue( Options.lgfsize)
+      QtCore.QObject.connect( self.sbLgfSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.lLgf.addWidget( self.sbLgfSize)
+      self.tLgfGravity = QtGui.QLabel('%  Position:', self)
+      self.lLgf.addWidget( self.tLgfGravity)
+      self.cbLgfGravity = QtGui.QComboBox( self)
+      i = 0
+      for grav in Gravity:
+         self.cbLgfGravity.addItem( grav)
+         if grav.lower() == Options.lgfgrav: self.cbLgfGravity.setCurrentIndex( i)
+         i += 1
+      self.lLgf.addWidget( self.cbLgfGravity)
+      QtCore.QObject.connect( self.cbLgfGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lDrawing.addLayout( self.lLgf)
 
-
+      # Font:
       self.lFont = QtGui.QHBoxLayout()
       self.tFont = QtGui.QLabel('Annotations Text Font:', self)
       self.lFont.addWidget( self.tFont)
@@ -849,15 +877,26 @@ Example "255,255,0" - yellow.')
       self.editFont.setText( self.cbFont.currentText())
       self.evaluate()
 
-   def browseLogo( self):
-      logopath = LogosPath
-      oldlogo = '%s' % self.editLogoPath.text()
+   def browseLgs( self):
+      lgspath = LogosPath
+      oldlogo = '%s' % self.editLgsPath.text()
       if oldlogo != '':
          dirname = os.path.dirname( oldlogo)
-         if dirname != '': logopath = dirname
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', logopath)
+         if dirname != '': lgspath = dirname
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgspath)
       if afile.isEmpty(): return
-      self.editLogoPath.setText( '%s' % afile)
+      self.editLgsPath.setText( '%s' % afile)
+      self.evaluate()
+
+   def browseLgf( self):
+      lgfpath = LogosPath
+      oldlogo = '%s' % self.editLgfPath.text()
+      if oldlogo != '':
+         dirname = os.path.dirname( oldlogo)
+         if dirname != '': lgfpath = dirname
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgfpath)
+      if afile.isEmpty(): return
+      self.editLgfPath.setText( '%s' % afile)
       self.evaluate()
 
    def browseOutputFolder( self):
@@ -1102,11 +1141,18 @@ Example "255,255,0" - yellow.')
          outname = outname.replace('(U)', artist.upper())
          self.editOutputName.setText( outname)
 
-      logopath = '%s' % self.editLogoPath.text()
-      if logopath != '':
-         if not os.path.isfile( logopath):
-            if not os.path.isfile( os.path.join( LogosPath, logopath)):
-               self.cmdField.setText('No logo file founded')
+      lgspath = '%s' % self.editLgsPath.text()
+      if lgspath != '':
+         if not os.path.isfile( lgspath):
+            if not os.path.isfile( os.path.join( LogosPath, lgspath)):
+               self.cmdField.setText('No slate logo file founded')
+               return
+
+      lgfpath = '%s' % self.editLgfPath.text()
+      if lgfpath != '':
+         if not os.path.isfile( lgfpath):
+            if not os.path.isfile( os.path.join( LogosPath, lgfpath)):
+               self.cmdField.setText('No frame logo file founded')
                return
 
       cmd = 'mavishky.py'
@@ -1139,10 +1185,14 @@ Example "255,255,0" - yellow.')
          if cacher != '0': cmd += ' --draw235 %s' % cacher
          if not self.editLine169.text().isEmpty(): cmd += ' --line169 "%s"' % self.editLine169.text()
          if not self.editLine235.text().isEmpty(): cmd += ' --line235 "%s"' % self.editLine235.text()
-         if logopath != '':
-            cmd += ' --logopath "%s"' % logopath
-            cmd += ' --logosize %d' % self.sbLogoSize.value()
-            cmd += ' --logograv %s' % self.cbLogoGravity.currentText()
+         if lgspath != '':
+            cmd += ' --lgspath "%s"' % lgspath
+            cmd += ' --lgssize %d' % self.sbLgsSize.value()
+            cmd += ' --lgsgrav %s' % self.cbLgsGravity.currentText()
+         if lgfpath != '':
+            cmd += ' --lgfpath "%s"' % lgfpath
+            cmd += ' --lgfsize %d' % self.sbLgfSize.value()
+            cmd += ' --lgfgrav %s' % self.cbLgfGravity.currentText()
       if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
       if self.StereoDuplicate and self.inputPattern2 is None:

@@ -64,9 +64,12 @@ Parser.add_option('--artist',           dest='artist',      type  ='string',    
 Parser.add_option('--activity',         dest='activity',    type  ='string',     default='',          help='Draw activity')
 Parser.add_option('--comments',         dest='comments',    type  ='string',     default='',          help='Draw comments')
 Parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
-Parser.add_option('--logopath',         dest='logopath',    type  ='string',     default='',          help='Add a specified image')
-Parser.add_option('--logosize',         dest='logosize',    type  ='int',        default=20,   	      help='Logotype size, percent of image')
-Parser.add_option('--logograv',         dest='logograv',    type  ='string',     default='southeast', help='Logotype positioning gravity')
+Parser.add_option('--lgspath',          dest='lgspath',     type  ='string',     default='',          help='Slate logotype path')
+Parser.add_option('--lgssize',          dest='lgssize',     type  ='int',        default=20,   	      help='Slate logotype size, percent of image')
+Parser.add_option('--lgsgrav',          dest='lgsgrav',     type  ='string',     default='southeast', help='Slate logotype positioning gravity')
+Parser.add_option('--lgfpath',          dest='lgfpath',     type  ='string',     default='',          help='Flrame logotype path')
+Parser.add_option('--lgfsize',          dest='lgfsize',     type  ='int',        default=10,   	      help='Flrame logotype size, percent of image')
+Parser.add_option('--lgfgrav',          dest='lgfgrav',     type  ='string',     default='southeast', help='Flrame logotype positioning gravity')
 Parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',          dest='line169',     type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
@@ -93,7 +96,6 @@ if len(args) > 2:
 
 Codec       = Options.codec
 Resolution  = Options.resolution
-Options.logopath    = Options.logopath
 Datesuffix  = Options.datesuffix
 Timesuffix  = Options.timesuffix
 
@@ -111,11 +113,11 @@ if Debug: print 'DEBUG MODE:'
 
 # Definitions:
 tmpname   = 'img'
-tmplogo   = 'logo.tga'
+tmplgs    = 'logo_slate.tga'
+tmplgf    = 'logo_frame.tga'
 
 need_convert = False
 if Stereo: need_convert = True
-need_logo = False
 
 # Check frame range:
 if Options.framestart != -1 and Options.frameend != -1:
@@ -344,30 +346,34 @@ imgCount = 0
 cmd_precomp = []
 name_precomp = []
 
-# Reformat logo command:
-if Options.logopath != '':
-   if need_convert:
-      need_logo = True
-      logopath = Options.logopath
-      if not os.path.isfile( logopath):
-         logopath = os.path.join( LOGOSDIR, logopath)
-         if not os.path.isfile( logopath):
-            print 'Can`t find logo "%s".' % logopath
-            exit(1)
-      logow = int( Width  * Options.logosize / 100 )
-      logoh = int( Height * Options.logosize / 100 )
-      tmplogo = os.path.join( TmpDir, tmplogo)
-      cmd = 'convert'
-      cmd += ' "%s"' % logopath
-      cmd += ' -gravity %s -background black' % Options.logograv
-      cmd += ' -resize %dx%d' % ( logow, logoh)
-      cmd += ' -extent %dx%d' % ( Width-Width/15, Height-Height/15)
-      cmd += ' "%s"' % tmplogo
-   else:
-      print 'Can\'t add logo if output resolution is not specified.'
-      exit(1)
-   cmd_precomp.append(cmd)
-   name_precomp.append('Reformat logo')
+# Reformat logo:
+logopath = [ Options.lgspath, Options.lgfpath ]
+logosize = [ Options.lgssize, Options.lgfsize ]
+logograv = [ Options.lgsgrav, Options.lgfgrav ]
+tmplogo  = [          tmplgs,          tmplgf ]
+logoname = [         'slate',         'frame' ]
+for i in range(2):
+   if logopath[i] != '':
+      if need_convert:
+         if not os.path.isfile( logopath[i]):
+            logopath[i] = os.path.join( LOGOSDIR, logopath[i])
+            if not os.path.isfile( logopath[i]):
+               print 'Can`t find logo "%s".' % logopath[i]
+               exit(1)
+         logow = int( Width  * logosize[i] / 100 )
+         logoh = int( Height * logosize[i] / 100 )
+         cmd = 'convert'
+         cmd += ' "%s"' % logopath[i]
+         cmd += ' -gravity %s -background black' % logograv[i]
+         cmd += ' -resize %dx%d' % ( logow, logoh)
+         cmd += ' -extent %dx%d' % ( Width-Width/15, Height-Height/15)
+         tmplogo[i] = os.path.join( TmpDir, tmplogo[i])
+         cmd += ' "%s"' % tmplogo[i]
+      else:
+         print 'Can\'t add logo if output resolution is not specified.'
+         exit(1)
+      cmd_precomp.append(cmd)
+      name_precomp.append('Reformat %s logo' % logoname[i])
 
 # Generate convert commands lists:
 cmd_convert = []
@@ -376,7 +382,7 @@ name_convert = []
 # Generate header:
 if need_convert and Options.slate != '':
    cmd = cmd_makeframe + cmd_args
-   if need_logo: cmd += ' --logopath "%s"' % tmplogo
+   if Options.lgspath != '': cmd += ' --logopath "%s"' % tmplogo[0]
    cmd += ' --drawcolorbars' + cmd_args
    cmd += ' -t "%s"' % Options.slate
    cmd += ' "%s"' % images1[int(len(images1)/2)]
@@ -396,6 +402,7 @@ if need_convert:
       if Options.draw235   >  0: cmd += ' --draw235 %d'    % Options.draw235
       if Options.line169  != '': cmd += ' --line169 "%s"'  % Options.line169
       if Options.line235  != '': cmd += ' --line235 "%s"'  % Options.line235
+      if Options.lgfpath  != '': cmd += ' --logopath "%s"' % tmplogo[1]
       if Options.fffirst:
          if FramePadding > 1:
             framestring = '%0' + str(FramePadding) + 'd'
@@ -489,7 +496,7 @@ if Options.afanasy:
          t.setCommand( cmd)
          n += 1
       bc.setCapacity( Options.afconvcap)
-      if need_logo: bc.setDependMask('precomp')
+      if len(cmd_precomp): bc.setDependMask('precomp')
       bc.setTasksMaxRunTime(11)
 
    be = af.Block( 'encode', 'movgen')
