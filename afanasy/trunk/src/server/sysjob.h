@@ -58,6 +58,8 @@ public:
    void addCommand( SysCmd* syscmd);
    bool isReady() const;
 
+   void clearCommands();
+
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
    virtual void getErrorHostsListString( std::string & str) const;
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
@@ -73,7 +75,7 @@ public:
 private:
    SysTask * addTask( af::TaskExec * taskexec);
    SysTask * getTask( int tasknum, const char * errorMessage = NULL);
-   void deleteFinishedTasks();
+   bool deleteFinishedTasks();
 
 private:
    af::TaskProgress * taskprogress;
@@ -112,6 +114,7 @@ public:
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
    virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);
    virtual void dbDelete( QStringList  * queries) const;
+   virtual void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
    static void appendLog( const std::string & message);
 

@@ -1,6 +1,14 @@
 #!/bin/bash
 
-afanasy=$1
+exitStatus=0
+exitStatusError=1
+for arg in "$@"; do
+   if [ $arg == "--exitsuccess" ]; then
+      exitStatusError=0
+   else
+      afanasy=$arg
+   fi
+done
 [ -z "$afanasy" ] && afanasy="afanasy/trunk"
 
 cgru=`dirname $0`/..
@@ -26,11 +34,11 @@ for dir in $dirs_nonempty; do
    dir="$cgru/$dir"
    if [ ! -d $dir ]; then
       echo "Folder '$dir' does not exist."
-      exit 1
+      exitStatus=$exitStatusError
    fi
    if [ -z "`ls $dir`" ]; then
       echo "Folder '$dir' is empty."
-      exit 1
+      exitStatus=$exitStatusError
    fi
 done
 
@@ -42,8 +50,8 @@ for bin in $utilities_bins; do bins="$cgru/utilities/$bin $bins"; done
 for bin in $bins; do
    if [ ! -x "$bin" ]; then
       echo "No binary '$bin'."
-      exit 1
+      exitStatus=$exitStatusError
    fi
 done
 
-exit 0
+exit $exitStatus

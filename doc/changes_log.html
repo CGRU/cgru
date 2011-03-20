@@ -63,7 +63,31 @@ You can use this command to perform it:<br/>
 <b>1.4.1</b> 2011.02.28 <i>(rev1366 af)</i>
 </p>
 <p>
-<a href="../afanasy/doc/server_farm.html">Farm services limits</a> to describe a number of software licenses.
+<a href="../afanasy/doc/server_farm.html">Farm Services Limits</a> to describe a number of software licenses.
+</p>
+<p>
+Movie Maker can draw a logo on an images sequence.
+</p>
+<p>
+Watch renders list can sort and filter renders addresses.
+</p>
+<p>
+Technical:
+</p>
+<p>
+Default Python version is 2.7.1. Default Qt version is 4.7.2.<br/>
+XML parser moved from Qt to <a href="http://rapidxml.sourceforge.net">RapidXML</a>. No library needed, they are realized by headers only.<br/>
+Regular expressions moved from Qt to <a href="http://en.wikipedia.org/wiki/Regular_expression">POSIX</a>, they are almost the same. No library needed. They are in C standard, already realized in GCC and MSVC>=2008SP1.<br/>
+No Qt needed for <i>libafanasy</i> and so for <i>libafapi</i> and <i>libpyaf</i> too. No errors can happen importing Python module in other software using Qt.<br/>
+Windows version moved to static Qt libraries. No errors can happen with various Qt "dll"s in PATH.<br/>
+If parsing is no needed, parser should have an empty string name. Render do not tries to import parser module with an empty name, no error happen.
+</p>
+<p>
+Bugs Fixed:
+</p>
+<p>
+Nuke render script: A try to delete moved temporary image removed.<br/>
+Listen job and task output connection error fixed.<br/>
 </p>
 
 <br/>

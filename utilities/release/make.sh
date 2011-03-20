@@ -1,16 +1,24 @@
 #!/bin/bash
 
+for arg in "$@"; do
+   if [ $arg == "--nocheck" ]; then
+      check="--exitsuccess"
+   else
+      afanasy="$1"
+   fi
+done
+
 # Location:
 cgruRoot="../.."
 
 function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' $1 $2; }
 
-# Afanasy branch:
-afanasy="trunk"
-
 # Check:
-../check.sh "afanasy/$afanasy"
-[ "$?" != "0" ] && exit 1
+../check.sh $check "afanasy/$afanasy"
+if [ "$?" != "0" ]; then
+   echo "Some required binaries not founded. Use \"--nocheck\" argument to skip it."
+   exit 1
+fi
 
 # Version and revision:
 packsver=`cat $cgruRoot/version.txt`
@@ -36,8 +44,8 @@ function usage(){
 }
 
 # Afanasy location:
-[ ! -z "$1" ] && afanasy=$1
-afanasy="afanasy/${afanasy}"
+[ -z "$afanasy" ] && afanasy="trunk"
+afanasy="afanasy/$afanasy"
 if [ ! -d $cgruRoot/$afanasy ]; then
    ErrorMessage="Afanasy directory '$cgruRoot/$afanasy' does not exists."
    usage

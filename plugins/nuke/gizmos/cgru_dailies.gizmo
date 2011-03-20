@@ -41,12 +41,16 @@ Gizmo {
    addUserKnob {  6 fffirst  l "Draw First Frame As First" -STARTLINE }
    addUserKnob {  2 template l "Template"        +STARTLINE }
    addUserKnob {  2 slate    l "Slate"           +STARTLINE }
+   addUserKnob {  2 lgspath  l "Slate Logo"      +STARTLINE }
+   addUserKnob {  3 lgssize  l "Size"            -STARTLINE }
+   addUserKnob {  4 lgsgrav M {"SouthEast" "South" "SouthWest" "West" "NorthWest" "North" "NorthEast" "East" "Center"}  l "Gravity" -STARTLINE }
+   addUserKnob {  2 lgfpath  l "Frame Logo"      +STARTLINE }
+   addUserKnob {  3 lgfsize  l "Size"            -STARTLINE }
+   addUserKnob {  4 lgfgrav M {"SouthEast" "South" "SouthWest" "West" "NorthWest" "North" "NorthEast" "East" "Center"}  l "Gravity" -STARTLINE }
    addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
    addUserKnob {  1 draw235  l "Cacher 2.35"     -STARTLINE }
    addUserKnob {  1 line169  l "Line 16:9 Color" +STARTLINE }
    addUserKnob {  1 line235  l "line 2.35 Color" -STARTLINE }
-   addUserKnob {  2 logopath l "Logo"            +STARTLINE }
-   addUserKnob {  3 logosize l "Size"            -STARTLINE }
 
 
    name dailies
@@ -66,10 +70,14 @@ Gizmo {
    draw235     ""
    line169     ""
    line235     ""
-   logopath    ""
-   logosize    0
+   lgspath     ""
+   lgssize     0
+   lgsgrav     "SouthEast"
+   lgfpath     ""
+   lgfsize     0
+   lgfgrav     "North"
 
-   help "Wee All Die!"
+   help "0 God, help me with dailies!"
 
    knobChanged "cgru.dailiesEvaluate( nuke.thisNode())"
 }

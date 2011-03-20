@@ -212,7 +212,7 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
       if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
       {
 //printf("JobAf::setZombie: runningtaskscounter = %d\n", runningtaskscounter);
-         restartTasks( true, "Job deletion.", renders, monitoring);
+         restartAllTasks( true, "Job deletion.", renders, monitoring);
          if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
          return;
       }
@@ -378,7 +378,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TJobStop:
    {
       log("Stopped by " + userhost);
-      restartTasks( true, "Job stopped by " + userhost, (RenderContainer*)pointer, monitoring);
+      restartAllTasks( true, "Job stopped by " + userhost, (RenderContainer*)pointer, monitoring);
       state = state | AFJOB::STATE_OFFLINE_MASK;
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       jobchanged = af::Msg::TMonitorJobsChanged;
@@ -388,7 +388,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    {
       log(            "Restarted by " + userhost );
 //printf("Msg::TJobRestart:\n");
-      restartTasks( false, "Job restarted by " + userhost, (RenderContainer*)pointer, monitoring);
+      restartAllTasks( false, "Job restarted by " + userhost, (RenderContainer*)pointer, monitoring);
 //printf("Msg::TJobRestart: tasks restarted.\n");
       checkDepends();
       time_started = 0;
@@ -414,7 +414,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TJobRestartPause:
    {
       log( "Restarted ( and paused ) by " + userhost );
-      restartTasks( false, "Job restarted ( and paused ) by " + userhost, (RenderContainer*)pointer, monitoring);
+      restartAllTasks( false, "Job restarted ( and paused ) by " + userhost, (RenderContainer*)pointer, monitoring);
       checkDepends();
       state = state | AFJOB::STATE_OFFLINE_MASK;
       time_started = 0;
@@ -931,7 +931,7 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
    AFCommon::QueueDBUpdateTask_end();
 }
 
-void JobAf::restartTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
+void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
 {
    AFCommon::QueueDBUpdateTask_begin();
    for( int b = 0; b < blocksnum; b++)

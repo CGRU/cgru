@@ -175,6 +175,7 @@ while frame <= flast:
          if item.rfind('.nk') == len(item)-3: continue
          src  = os.path.join( tmpdir, item)
          dest = os.path.join( imagesdirs[view_num], item)
+
          # Delete old image if any:
          if os.path.isfile( dest):
             try:
@@ -185,6 +186,7 @@ while frame <= flast:
                print 'Unable to remove destination file:'
                print dest
                exitcode = 1
+
          # Move temporary image:
          try:
             print 'Moving "%s"' % dest
@@ -194,26 +196,18 @@ while frame <= flast:
             print str(sys.exc_info()[1])
             print src
             print dest
+
          # Check destination image:
          if not os.path.isfile( dest):
             print 'Error: Destination file does not exist.'
             exitcode = 1
          else:
             moveditems += 1
-         # Remove temporary image:
-         try:
-            os.remove( src)
-         except:
-            print 'Failed to remove temporary image:'
-            print str(sys.exc_info()[1])
-            print src
 
       if moveditems < 1:
          print 'Error: No images generated.'
          exitcode = 1
-#      elif moveditems < views_num:
-#         print 'Error: Not enough images generated (%d instead of %d).' % (moveditems,views_num)
-#         exitcode = 1
+
       else:
          print 'Images generated: %d' % moveditems
       sys.stdout.flush()

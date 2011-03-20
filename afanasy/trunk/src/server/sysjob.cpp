@@ -204,11 +204,10 @@ void SysBlock::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCon
 
    systask->start( taskexec, data->getRunningTasksCounter(), render, monitoring);
 
-   uint32_t task_old_state = taskprogress->state;
-
    taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
+   taskprogress->starts_count++;
 
-   if(( task_old_state != taskprogress->state ) && monitoring ) tasks[0]->monitor( monitoring);
+   if( monitoring ) tasks[0]->monitor( monitoring);
 }
 
 SysTask * SysBlock::getReadySysTask() const
@@ -265,6 +264,13 @@ SysTask * SysBlock::addTask( af::TaskExec * taskexec)
    return systask;
 }
 
+void SysBlock::clearCommands()
+{
+//printf("SysBlock::clearCommands:\n");
+   for( std::list<SysCmd *>::iterator it = commands.begin(); it != commands.end(); it++) delete *it;
+   commands.clear();
+}
+
 void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders)
 {
    RenderContainerIt rendersIt( renders);
@@ -289,7 +295,7 @@ void SysBlock::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * r
    if( systask == NULL ) return;
    bool errorHost = false;
    systask->updateState( taskup, renders, monitoring, errorHost);
-   if( errorHost) errorHostsAppend( 0, taskup.getClientId(), renders);
+   if( errorHost) errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
 }
 
 bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
@@ -321,7 +327,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       }
    }
 
-   deleteFinishedTasks();
+   if( deleteFinishedTasks()) taskchanged = true;
 
    if( commands.size())
    {
@@ -344,17 +350,24 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    return blockProgress_changed;
 }
 
-void SysBlock::deleteFinishedTasks()
+bool SysBlock::deleteFinishedTasks()
 {
+   bool has_errors = false;
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end();)
    {
       if(( false == (*it)->isRunning()) && ((*it)->isError() || (*it)->isDone()))
       {
+         if((*it)->isError())
+         {
+            taskprogress->errors_count++;
+            has_errors = true;
+         }
          delete *it;
          it = systasks.erase( it);
       }
       else it++;
    }
+   return has_errors;
 }
 
 SysTask * SysBlock::getTask( int tasknum, const char * errorMessage)
@@ -512,6 +525,22 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    }
 
    return true;
+}
+
+void SysJob::restartTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
+{
+//printf("SysJob::restartTasks:\n");
+   for( int p = 0; p < taskspos.getCount(); p++)
+   {
+      int b = taskspos.getNumBlock(p);
+      if( b >= blocksnum)
+      {
+         AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, blocksnum)
+         continue;
+      }
+      ((SysBlock*)(blocks[b]))->clearCommands();
+   }
+   JobAf::restartTasks( taskspos, renders, monitoring);
 }
 
 const std::string SysJob::getErrorHostsListString( int b, int t) const

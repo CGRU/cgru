@@ -41,19 +41,35 @@ def dailiesEvaluate( node):
       slate.replace('\\','/')
       node.knob('slate').setValue( slate)
 
-   # Logo:
-   logosize = node.knob('logosize').value()
-   if logosize < 1:
-      logosize = os.getenv('CGRU_DAILIES_LOGOSIZE', '20')
-      node.knob('logosize').setValue( float(logosize))
+   # Logo slate:
+   lgssize = node.knob('lgssize').value()
+   if lgssize < 1:
+      lgssize = os.getenv('CGRU_DAILIES_LGSSIZE', '20')
+      node.knob('lgssize').setValue( float(lgssize))
+      lgsgrav = os.getenv('CGRU_DAILIES_LGSGRAV', 'SouthEast')
+      node.knob('lgsgrav').setValue( lgsgrav)
+   # Logo frame:
+   lgfsize = node.knob('lgfsize').value()
+   if lgfsize < 1:
+      lgfsize = os.getenv('CGRU_DAILIES_LGFSIZE', '10')
+      node.knob('lgfsize').setValue( float(lgfsize))
+      lgfgrav = os.getenv('CGRU_DAILIES_LGFGRAV', 'North')
+      node.knob('lgfgrav').setValue( lgfgrav)
 
    if newNode:
 
-      logopath = node.knob('logopath').value()
-      if logopath == None or logopath == '' or not os.path.isfile( logopath):
-         logopath = os.getenv('CGRU_DAILIES_LOGOPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
-         logopath.replace('\\','/')
-         node.knob('logopath').setValue( logopath)
+      # Logo slate:
+      lgspath = node.knob('lgspath').value()
+      if lgspath == None or lgspath == '' or not os.path.isfile( lgspath):
+         lgspath = os.getenv('CGRU_DAILIES_LGSPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
+         lgspath.replace('\\','/')
+         node.knob('lgspath').setValue( lgspath)
+      # Logo frame:
+      lgfpath = node.knob('lgfpath').value()
+      if lgfpath == None or lgfpath == '' or not os.path.isfile( lgfpath):
+         lgfpath = os.getenv('CGRU_DAILIES_LGFPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
+         lgfpath.replace('\\','/')
+         node.knob('lgfpath').setValue( lgfpath)
 
       # Cacher:
       draw169 = node.knob('draw169').value()
@@ -194,8 +210,12 @@ def dailiesGenCmd( node):
    draw235  = node.knob('draw235' ).value()
    line169  = node.knob('line169' ).value()
    line235  = node.knob('line235' ).value()
-   logopath = node.knob('logopath').value()
-   logosize = int(node.knob('logosize').value())
+   lgspath  = node.knob('lgspath').value()
+   lgfpath  = node.knob('lgfpath').value()
+   lgsgrav  = node.knob('lgsgrav').value()
+   lgfgrav  = node.knob('lgfgrav').value()
+   lgssize  = int(node.knob('lgssize').value())
+   lgfsize  = int(node.knob('lgfsize').value())
    version  = int(node.knob('version').value())
    fstart   = int(node.knob('fstart').value())
    fend     = int(node.knob('fend').value())
@@ -228,9 +248,14 @@ def dailiesGenCmd( node):
    if draw235  is not None and draw235  != '': cmd += ' --draw235 "%s"'  % draw235
    if line169  is not None and line169  != '': cmd += ' --line169 "%s"'  % line169
    if line235  is not None and line235  != '': cmd += ' --line235 "%s"'  % line235
-   if logopath is not None and logopath != '':
-      cmd += ' --logopath "%s"' % logopath
-      cmd += ' --logosize %d'   % logosize
+   if lgspath  is not None and lgspath  != '':
+      cmd += ' --lgspath "%s"' % lgspath
+      cmd += ' --lgssize %d'   % lgssize
+      cmd += ' --lgsgrav %s'   % lgsgrav
+   if lgfpath  is not None and lgfpath  != '':
+      cmd += ' --lgfpath "%s"' % lgfpath
+      cmd += ' --lgfsize %d'   % lgfsize
+      cmd += ' --lgfgrav %s'   % lgfgrav
 
    # Stereo:
    if images.find('%v') != -1 or images.find('%V') != -1:

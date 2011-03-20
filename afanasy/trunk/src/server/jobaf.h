@@ -62,7 +62,7 @@ public:
    void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 
    void skipTasks(    const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Skip some tasks.
-   void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
+   virtual void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
 /// Refresh job. Calculate attributes from tasks progress.
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
@@ -121,8 +121,6 @@ private:
 
    UserAf * user;
 
-//   JobPy * py;
-
 private:
    mutable int progressWeight;
    mutable int logsWeight;
@@ -139,7 +137,7 @@ private:
    void checkDepends();
 
 /// Restart tasks, can restart only running tasks.
-   void restartTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
+   void restartAllTasks( bool onlyRunning, const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);
 
 /// Restart tasks with errors
    void restartErrors( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring);

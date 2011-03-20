@@ -1,7 +1,7 @@
 #include "afcontainerit.h"
 #include "afcontainer.h"
 
-#include <stdio.h>
+#include "afcommon.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -79,12 +79,12 @@ af::Node* AfContainerIt::get( int id)
 {
    if( id < 1 )
    {
-      AFERRAR("AfContainerIt::get(): invalid id = %d\n", id);
+      AFCommon::QueueLogError("AfContainerIt::get(): invalid id = " + af::itos(id));
       return NULL;
    }
    if( id >= container->size)
    {
-      AFERRAR("AfContainerIt::get(): id=%d >= size=%d \n", id, container->size);
+      AFCommon::QueueLogError("AfContainerIt::get(): id=" + af::itos(id) + " >= size=" + af::itos(container->size));
       return NULL;
    }
 
@@ -92,12 +92,12 @@ af::Node* AfContainerIt::get( int id)
 
    if( node == NULL )
    {
-      AFERRAR("AfContainerIt::get(): node == NULL ( id = %d ) \n", id);
+      AFCommon::QueueLogError("AfContainerIt::get(): node == NULL : id = " + af::itos(id));
       return NULL;
    }
    if( node->zombie)
    {
-      AFERRAR("AfContainerIt::get(): node is zombie ( id = %d ) \n", id);
+      AFCommon::QueueLogError("AfContainerIt::get(): node is zombie ( id = %d ) \n" + af::itos(id));
       return NULL;
    }
 

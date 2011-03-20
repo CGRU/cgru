@@ -1,30 +1,30 @@
-#! /usr/local/Nuke6.1v1/Nuke6.1 -nx
-version 6.1 v1
+#! /usr/local/Nuke6.2v1/Nuke6.2 -nx
+version 6.2 v1
 define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 <layout version="1.0">
-    <window x="0" y="25" w="1366" h="718" screen="0">
+    <window x="0" y="24" w="1366" h="720" screen="0">
         <splitter orientation="1">
-            <split size="858"></split>
+            <split size="862"></split>
             <splitter orientation="1">
                 <split size="40"></split>
                 <dock id="" hideTitles="1" activePageId="Toolbar.1">
                     <page id="Toolbar.1"></page>
                 </dock>
-                <split size="814"></split>
+                <split size="818"></split>
                 <splitter orientation="2">
-                    <split size="381"></split>
+                    <split size="329"></split>
                     <dock id="" activePageId="Viewer.1">
                         <page id="Viewer.1"></page>
-                        <page id="Script Editor.2"></page>
                     </dock>
-                    <split size="277"></split>
+                    <split size="329"></split>
                     <dock id="" activePageId="DAG.1">
                         <page id="DAG.1"></page>
                         <page id="Curve Editor.1"></page>
+                        <page id="DopeSheet.1"></page>
                     </dock>
                 </splitter>
             </splitter>
-            <split size="496"></split>
+            <split size="498"></split>
             <dock id="" activePageId="Properties.1">
                 <page id="Properties.1"></page>
             </dock>
@@ -34,7 +34,7 @@ define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
 }
 Root {
  inputs 0
- name /cg/tools/cgru/examples/nuke/scene.nk
+ name /cg/data/cgru_ubuntu/examples/nuke/scene.nk
  last_frame 11
  lock_range true
  fps 25
@@ -121,7 +121,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N40d9430 [stack 0]
+set N505d570 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -136,7 +136,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N40d9430
+push $N505d570
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -144,7 +144,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N40d9430
+push $N505d570
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -411,6 +411,24 @@ afanasy {
  forceframes true
  singlejob false
 }
+Read {
+ inputs 0
+ file render/preview.%04d.jpg
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy render/final_proxy.%04d.exr
+ last 11
+ version 2
+ name Read15
+ xpos 3
+ ypos 95
+}
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 168
+ ypos 202
+}
 ColorBars {
  inputs 0
  name ColorBars1
@@ -427,7 +445,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N4565660 [stack 0]
+set N565cc00 [stack 0]
 Write {
  channels rgba
  file render/key.%04d.exr
@@ -454,7 +472,7 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N46a6710 [stack 0]
+set N569b110 [stack 0]
 Write {
  file render/back.%04d.exr
  proxy render/back_proxy.%04d.exr
@@ -495,7 +513,7 @@ Read {
  xpos 223
  ypos -165
 }
-push $N4565660
+push $N565cc00
 Switch {
  inputs 2
  which 1
@@ -514,7 +532,7 @@ Read {
  xpos 3
  ypos -166
 }
-push $N46a6710
+push $N569b110
 Switch {
  inputs 2
  which 1
@@ -535,7 +553,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N48012d0 [stack 0]
+set N56b1040 [stack 0]
 Write {
  file render/final.%04d.exr
  proxy render/final_proxy.%04d.exr
@@ -555,7 +573,7 @@ Read {
  xpos 3
  ypos -32
 }
-push $N48012d0
+push $N56b1040
 Switch {
  inputs 2
  which 1
@@ -572,7 +590,7 @@ Write {
  xpos 113
  ypos 46
 }
-set N481ee90 [stack 0]
+set N56ba2b0 [stack 0]
 afanasy {
  inputs 3
  name afanasy2
@@ -589,7 +607,7 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N481ee90
+push $N56ba2b0
 cgru_dailies {
  name dailies
  xpos 113
@@ -606,16 +624,19 @@ cgru_dailies {
  comments "cgru afanasy nuke example"
  movfolder /cg/tools/cgru/examples/nuke
  movrule (s)_(v)_(d)
- movname scene_v001_110124
+ movname scene_v001_110318
+ viewsnames "left right"
  knob_1 ""
- template /cg/tools/cgru/utilities/moviemaker/templates/dailies
+ template /cg/tools/cgru/utilities/moviemaker/templates/dailies_withlogo
  slate /cg/tools/cgru/utilities/moviemaker/templates/dailies_slate
+ lgspath /cg/data/cgru_ubuntu/utilities/moviemaker/logos/logo.png
+ lgssize 20
+ lgfpath /cg/data/cgru_ubuntu/utilities/moviemaker/logos/logo.png
+ lgfsize 10
  draw169 25
  draw235 25
  line169 200,200,200
  line235 200,200,200
- logopath /cg/tools/cgru/utilities/moviemaker/logos/logo.png
- logosize 20
 }
 afanasy {
  name afanasy3
@@ -645,22 +666,4 @@ afanasy {
  dependmask ""
  dependmaskglbl ""
  addnodes ""
-}
-Read {
- inputs 0
- file render/preview.%04d.jpg
- format "720 576 0 0 720 576 1.09 PAL"
- proxy render/final_proxy.%04d.exr
- last 11
- version 2
- name Read15
- xpos 3
- ypos 95
-}
-Viewer {
- frame 1
- input_process false
- name Viewer1
- xpos 168
- ypos 202
 }
