@@ -1,6 +1,6 @@
 #!/bin/bash
 
-v=6.6.7
+v=6.6.8
 
 im=ImageMagick
 imv=${im}-${v}
