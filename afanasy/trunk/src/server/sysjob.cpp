@@ -269,6 +269,8 @@ void SysBlock::clearCommands()
 //printf("SysBlock::clearCommands:\n");
    for( std::list<SysCmd *>::iterator it = commands.begin(); it != commands.end(); it++) delete *it;
    commands.clear();
+   taskprogress->starts_count = 0;
+   taskprogress->errors_count = 0;
 }
 
 void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders)
