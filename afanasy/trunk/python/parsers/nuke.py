@@ -1,7 +1,9 @@
 import parser
 
 key = 'Writing'
-key_len = len(key)
+   key_len = len(key)
+
+ErrorsRE = [re.compile(r'Invalid .* license key.')]
 
 class nuke(parser.parser):
    'Nuke - any 4.x and 5.x versions'
@@ -14,6 +16,12 @@ class nuke(parser.parser):
       #print data
       data_len = len(data)
       if data_len < 1: return
+
+      for errorRE in ErrorsRE:
+         if errorRE.search( data) is not None:
+            self.error = True
+            break
+
       needcalc = False
       key_pos = data.find( key)
       if key_pos > -1:

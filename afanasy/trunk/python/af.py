@@ -41,7 +41,7 @@ class Block(pyaf.Block):
       if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
       self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Block.__init__( self)
-      parser = 'none'
+      parser = ''
       if not CheckClass( self.env.Vars['afroot'], service, 'services'):
          print 'Error: Unknown service "%s", setting to "generic"' % service
          service = 'generic'
@@ -59,11 +59,12 @@ class Block(pyaf.Block):
       self.setMaxRunningTasks( int( maxhosts))
 
    def setParser( self, parser, nocheck = False):
-      if not nocheck:
-         if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
-            if parser != 'none':
-               print 'Error: Unknown parser "%s", setting to "none"' % parser
-               parser = 'none'
+      if parser != '':
+         if not nocheck:
+            if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
+               if parser != 'none':
+                  print 'Error: Unknown parser "%s", setting to "none"' % parser
+                  parser = 'none'
       pyaf.Block.setParser( self, parser)
 
    def setNumeric( self, start = 1, end = 10, perhost = 1, increment = 1):

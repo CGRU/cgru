@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import service
 
-parser='none'
+parser=''
 
 class maya(service.service):
    'Autodesk Maya'
