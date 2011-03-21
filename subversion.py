@@ -21,11 +21,7 @@ r'.*\\clear.cmd',
 r'.*subversion.cmd',
 r'.*utilities.moviemaker.sequence.*',
 r'.*utilities.moviemaker.logos.*',
-r'.*utilities.qt.4.*',
-r'.*utilities.qt.qt-everywhere-opensource.*',
 r'.*utilities.python.[\dPs].*',
-r'.*[/\\]{1,1}icons.icons',
-r'.*[/\\]{1,1}Makefile',
 r'.*[/\\]{1,1}moc_.*',
 ]
 

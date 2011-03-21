@@ -4,7 +4,7 @@
 #include <QtGui/QPainter>
 
 #include "../libafanasy/blockdata.h"
-#include "../libafanasy/jobprogress.h"
+//#include "../libafanasy/jobprogress.h"
 
 #include "../libafqt/qenvironment.h"
 
@@ -135,6 +135,10 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    int text_x = w - WidthInfo;
    painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("e%1").arg( taskprogress.errors_count));
    text_x -= ItemJobBlock::WErrors;
+
+   // Shift starts counter on a system job task:
+   if( block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 10;
+
    painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, QString("s%1").arg( taskprogress.starts_count));
    if( false == rightString.isEmpty() )
    {
@@ -143,6 +147,9 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
       painter->drawText( x+1, y+1, text_x-10, Height, Qt::AlignVCenter | Qt::AlignRight, rightString, &rect);
       text_x -= rect.width();
    }
+
+   // Shift starts counter on a system job task:
+   if( block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 40;
 
    painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 
