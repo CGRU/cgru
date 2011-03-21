@@ -1,7 +1,7 @@
 #!/bin/bash
 
 for arg in "$@"; do
-   if [ $arg == "--nocheck" ]; then
+   if [ $arg == "--skipcheck" ]; then
       check="--exitsuccess"
    else
       afanasy="$1"
@@ -12,13 +12,6 @@ done
 cgruRoot="../.."
 
 function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' $1 $2; }
-
-# Check:
-../check.sh $check "afanasy/$afanasy"
-if [ "$?" != "0" ]; then
-   echo "Some required binaries not founded. Use \"--nocheck\" argument to skip it."
-   exit 1
-fi
 
 # Version and revision:
 packsver=`cat $cgruRoot/version.txt`
@@ -49,6 +42,13 @@ afanasy="afanasy/$afanasy"
 if [ ! -d $cgruRoot/$afanasy ]; then
    ErrorMessage="Afanasy directory '$cgruRoot/$afanasy' does not exists."
    usage
+fi
+
+# Check:
+../check.sh $check "$afanasy"
+if [ "$?" != "0" ]; then
+   echo "Some required binaries not founded. Use \"--skipcheck\" argument to skip it."
+   exit 1
 fi
 
 # Packages version number:
