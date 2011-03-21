@@ -20,3 +20,17 @@ qt4_wrap_cpp(moc_src ${moc_hdr})
 
 add_executable(regexp ${src} ${inc} ${moc_src})
 target_link_libraries(regexp ${QT_LIBRARIES} )
+
+if(WIN32)
+   set_target_properties(regexp PROPERTIES WIN32_EXECUTABLE 1)
+endif(WIN32)
+
+if(UNIX)
+   add_definitions(-DUNIX)
+	if(APPLE)
+		add_definitions(-DMACOSX)
+	endif(APPLE)
+endif(UNIX)
+if(WIN32)
+	add_definitions(-DMSWIN)
+endif(WIN32)

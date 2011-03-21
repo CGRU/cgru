@@ -1,3 +1,7 @@
+#ifdef MSWIN
+#include <windows.h>
+#endif
+
 #include <QtGui/QApplication>
 #include <QtGui/QIcon>
 #include <QtCore/QDir>
@@ -25,3 +29,16 @@ int main(int argc, char *argv[])
 
    return app.exec();
 }
+#ifdef MSWIN
+int WINAPI WinMain(
+  __in  HINSTANCE hInstance,
+  __in  HINSTANCE hPrevInstance,
+  __in  LPSTR lpCmdLine,
+  __in  int nCmdShow
+)
+{
+   char * name = "aftalk";
+   char ** ptr = &name;
+   return main( 1, ptr);
+}
+#endif
