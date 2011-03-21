@@ -149,7 +149,7 @@ void ItemJobTask::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    }
 
    // Shift starts counter on a system job task:
-   if( block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 40;
+   if( block->getJobId() == AFJOB::SYSJOB_ID ) text_x -= 60;
 
    painter->drawText( x+2, y+1, text_x-20, Height, Qt::AlignVCenter | Qt::AlignLeft, leftString );
 

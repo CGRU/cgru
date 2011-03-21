@@ -160,6 +160,8 @@ SysBlock::SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgre
 //printf("SysBlock::SysBlock:\n");
    taskprogress = progress->tp[ data->getBlockNum()][0];
    taskprogress->state &= ~AFJOB::STATE_READY_MASK;
+   taskprogress->starts_count = 0;
+   taskprogress->errors_count = 0;
 }
 
 SysBlock::~SysBlock()
