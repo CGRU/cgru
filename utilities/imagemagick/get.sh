@@ -13,5 +13,3 @@ else
    url=https://www.imagemagick.org/subversion/ImageMagick/branches/$imv
    svn co $url $im
 fi
-
-ln -s $imv $im
