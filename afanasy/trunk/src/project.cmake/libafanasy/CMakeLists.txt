@@ -5,6 +5,6 @@ add_library(afanasy ${src} ${inc})
 if(UNIX AND NOT APPLE)
    set_target_properties(afanasy PROPERTIES COMPILE_FLAGS "-fPIC -std=c++0x")
 endif(UNIX AND NOT APPLE)
-target_link_libraries(afanasy ${QT_LIBRARIES} ${PYTHON_LIBRARIES})
+target_link_libraries(afanasy ${PYTHON_LIBRARIES})
 
 add_definitions(-DCGRU_REVISION=$ENV{CGRU_REVISION})
