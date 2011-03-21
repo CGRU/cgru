@@ -225,8 +225,8 @@ void ItemRender::updateValues( af::Node *node, int type)
       NIMBY = render->isNIMBY();
       nimby = render->isNimby();
 
-      if(      NIMBY ) state = "N(" + username + ")";
-      else if( nimby ) state = "n(" + username + ")";
+      if(      NIMBY ) state = "NIMBY(" + username + ")N";
+      else if( nimby ) state = "nimby(" + username + ")n";
       else             state = username;
       state += '-' + QString::number( priority);
       if( isLocked() ) state += " (LOCK)";
