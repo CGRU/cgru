@@ -181,7 +181,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    static char path[4096];
    if( getConstants )
    {
-      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().toUtf8().data());
+      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().c_str());
       printf("HDD Space Path = '%s'\n", path);
    }
    struct statfs fsd;

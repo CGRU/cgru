@@ -1,12 +1,12 @@
-#include "parserhost.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+//#include <stdio.h>
+//#include <stdlib.h>
+//#include <string.h>
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+
+#include "parserhost.h"
 
 const int ParserHost::DataSizeMax   = 1 << 20;
 const int ParserHost::DataSizeHalf  = ParserHost::DataSizeMax  >> 1;

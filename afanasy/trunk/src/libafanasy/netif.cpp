@@ -7,14 +7,28 @@
 #pragma comment(lib, "IPHLPAPI.lib")
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
-#endif
+#endif //WINNT
 
 #ifdef LINUX
+#include <sys/socket.h>
+#include <net/if.h>
+#include <netinet/in.h>
 #include <arpa/inet.h>
 #include <ifaddrs.h>
-#include <net/if.h>
+#include <netdb.h>
 #include <sys/ioctl.h>
-#endif
+#endif //LINUX
+
+#ifdef MACOSX
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <ifaddrs.h>
+#include <net/if.h>
+#include <net/if_dl.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <net/if_types.h>
+#endif //MACOSX
 
 #include <string.h>
 
@@ -69,10 +83,11 @@ int NetIF::calcWeight() const
 void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
 {
 #ifdef LINUX
+
 #ifndef SIOCGIFADDR
    // The kernel does not support the required ioctls
    return;
-#endif
+#endif //SIOCGIFADDR
 
    struct ifreq sIfReq;                      // Interface request
    struct if_nameindex *pIfListHead = NULL;  // Ptr to interface name index (not to iterate, always will point to list head, for structure deletion)
@@ -202,7 +217,10 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
 
    close( sd );
 
-#endif
+#endif //LINUX
+
+#ifdef MACOSX
+#endif //MACOSX
 
 #ifdef WINNT
 
@@ -328,6 +346,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
       }
    }
    FREE(pAddresses);
-#endif
+
+#endif //WINNT
 
 }

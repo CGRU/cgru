@@ -10,6 +10,11 @@ DIR = ../../libafnetwork
 SOURCES += $$system(ls $$DIR/*.cpp)
 HEADERS += $$system(ls $$DIR/*.h)
 
-win32:DEFINES += WINNT
-macx:DEFINES += MACOSX
-unix:DEFINES += LINUX
+win32: DEFINES += WINNT
+unix {
+   macx {
+      DEFINES += MACOSX
+   } else {
+      DEFINES += LINUX
+   }
+}

@@ -12,9 +12,14 @@ HEADERS += $$system(ls $$DIR/*.h)
 
 DEFINES += "CGRU_REVISION=$$(CGRU_REVISION)"
 
-win32:DEFINES += WINNT
-macx:DEFINES += MACOSX
-unix:DEFINES += LINUX
+win32: DEFINES += WINNT
+unix {
+   macx {
+      DEFINES += MACOSX
+   } else {
+      DEFINES += LINUX
+   }
+}
 
 DIR = ../../libafanasy/passwd
 SOURCES += $$system(ls $$DIR/*.cpp)
