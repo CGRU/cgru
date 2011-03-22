@@ -21,6 +21,9 @@ if defined NUKE_PATH (
    set NUKE_PATH=%NUKE_AF_PATH%
 )
 
+rem Add Afanasy Python module:
+set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
+
 rem Default number of threads for rendering:
 SET NUKE_AF_RENDERTHREADS=2
 
@@ -30,8 +33,9 @@ if defined CGRU_LOCATION (
    SET NUKE_AF_RENDER=%NUKE_AF_RENDER% -t %CGRU_LOCATION%\plugins\nuke\render.py
 )
 
-SET NUKE_DIR=C:\Program Files\Nuke6.1v1
-SET NUKE_EXEC=%NUKE_DIR%\Nuke6.1.exe
+SET NUKE_DIR=C:\Program Files\Nuke6.2v1
+SET NUKE_EXEC=%NUKE_DIR%\Nuke6.2.exe
 SET LM_LICENSE_FILE=%NUKE_DIR%\nuke.lic
+SET LM_LICENSE_FILE=%NUKE_DIR%\foundry.lic
 
 IF EXIST override.cmd CALL override.cmd
