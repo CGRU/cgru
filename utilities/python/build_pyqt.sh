@@ -13,7 +13,7 @@ if [ ! -d "$pythondir" ]; then
    exit 1
 fi
 
-qt=`dirname $PWD`/qt/4.7.1
+qt=`dirname $PWD`/qt/4.7.2
 
 export PATH=$pythondir/bin:$qt/bin:$PATH
 
