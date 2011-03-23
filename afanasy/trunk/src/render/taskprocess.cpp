@@ -56,17 +56,17 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
 #ifdef WINNT
       if( wdir.startsWith("/"))
       {
-         AFERROR("Working directory starts with '/'. May be it not translated from unix?\n");
+         AFERRAR("Working directory starts with '/':\n\%s\n\May be it not translated from unix?", wdir.toUtf8().data())
       }
       else if( wdir.startsWith("\\\\"))
       {
-         AFERROR("Working directory starts with '\\\\'. UNC path can't be current. May be incorrect translation?\n");
+         AFERRAR("Working directory starts with '\\\\':\n\%s\n\UNC path can't be current. May be incorrect translation?", wdir.toUtf8().data())
       }
       else
 #endif
       if( false == QDir( wdir).exists())
       {
-         AFERROR("Working directory does not exists.\n");
+         AFERRAR("Working directory does not exists:\n\%s", wdir.toUtf8().data())
       }
       else
       {
