@@ -2,7 +2,6 @@ PUSHD ..
 call setup.cmd
 POPD
 
-set PYTHONHOME=
 set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
 
 set XSI_CGRU_PATH=%CGRU_LOCATION%\plugins\xsi

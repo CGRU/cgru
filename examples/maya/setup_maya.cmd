@@ -3,7 +3,12 @@ PUSHD ..
 call setup.cmd
 POPD
 
-set PYTHONHOME=
+rem Set Maya version:
+set MAYA_VERSION=2011
+rem Set Maya architecture:
+set MAYA_ARCH=-x64
+rem For 32bit Maya uncomment next line (or put it in "override.cmd" file)
+rem set MAYA_ARCH=
 
 rem Set Maya location:
 set MAYA_LOCATION=C:\Program Files\Autodesk\Maya2011

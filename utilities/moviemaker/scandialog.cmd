@@ -4,4 +4,4 @@ popd
 
 if exist override.cmd call override.cmd
 
-python dialog.py %*
+python scandialog.py %*
