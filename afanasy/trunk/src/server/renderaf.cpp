@@ -500,13 +500,10 @@ void RenderAf::setService( const std::string & srvname, bool enable)
    disableServices();
 }
 
-void RenderAf::getServicesString( af::Msg * msg) const
+const std::string RenderAf::getServicesString() const
 {
-   if( servicesnum == 0)
-   {
-      msg->setString("No services.");
-      return;
-   }
+   if( servicesnum == 0) return "No services.";
+
    std::string str;
    if( false == services_disabled.empty())
    {
@@ -516,13 +513,15 @@ void RenderAf::getServicesString( af::Msg * msg) const
    str += "\nServices:";
    for( int i = 0; i < servicesnum; i++)
    {
-      std::string line("\n");
-      line += host.getServiceName(i);
-      line += ": ";
-      if( disabledservices[i] ) line = std::string("DISABLED ") + line;
-      if( servicescounts[i] > 0) line += af::itos( servicescounts[i]);
-      if( host.getServiceCount(i) > 0) line += " / max=" + af::itos( host.getServiceCount(i));
-      str += "   " + line;
+      str += "\n   ";
+      str += host.getServiceName(i);
+      if( disabledservices[i] ) str += " (DISABLED)";
+      if(( servicescounts[i] > 0) || ( host.getServiceCount(i) > 0))
+      {
+         str += ": ";
+         if( servicescounts[i] > 0) str += af::itos( servicescounts[i]);
+         if( host.getServiceCount(i) > 0) str += " / max=" + af::itos( host.getServiceCount(i));
+      }
    }
    std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
    if( servicelimits.size())
@@ -530,7 +529,8 @@ void RenderAf::getServicesString( af::Msg * msg) const
       str += "\n";
       str += af::farm()->serviceLimitsInfoString( true).c_str();
    }
-   msg->setString( str);
+
+   return str;
 }
 
 bool RenderAf::canRunService( const std::string & type) const

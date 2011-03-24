@@ -228,7 +228,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       RenderAf* render = rendersIt.getRender( msg->int32());
       if( render == NULL ) break;
       msg_response = new MsgAf();
-      render->getServicesString( msg_response);
+      msg_response->setString( render->getServicesString());
       break;
    }
 

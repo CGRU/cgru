@@ -63,8 +63,8 @@ public:
 /// Set some Render attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   inline const std::list<std::string> getLog() { return loglist; }   ///< Get log list.
-   void getServicesString( af::Msg * msg) const;         ///< Get services information.
+   inline const std::list<std::string> getLog() { return loglist; }  ///< Get log list.
+   const std::string getServicesString() const;                      ///< Get services information.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 

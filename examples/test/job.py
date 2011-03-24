@@ -127,8 +127,12 @@ for b in range( numblocks):
    if numeric:
       block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s %%1 -e %%2 -t %(timesec)g -r %(randtime)g -v %(verbose)d' % vars(), False)
       block.setNumeric( 1, numtasks, perhost)
-      block.setTasksName('num %1 %2')
-      block.setFiles('view %1-%2')
+      if perhost > 1:
+         block.setTasksName('num %1 %2')
+         block.setFiles('file_a.%1-file_a.%2;file_b.%1-file_b.%2')
+      else:
+         block.setTasksName('num %04d')
+         block.setFiles('file_a.%04d;file_b.%04d')
    else:
       block.setCommand('python task.py%(str_capacity)s %%1 -v %(verbose)d' % vars(), False)
       block.setTasksName('task %1')
