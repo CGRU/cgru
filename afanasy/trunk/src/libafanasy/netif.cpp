@@ -28,70 +28,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <net/if_types.h>
-
-#include <stdio.h>
-void print_ip( const char * name, struct ifaddrs * ifaddrs_ptr, void * addr_ptr)
-{
-   if (addr_ptr) {
-      /* This constant is defined in <netinet/in.h> */
-      char address[INET6_ADDRSTRLEN];
-      inet_ntop (ifaddrs_ptr->ifa_addr->sa_family,
-                 addr_ptr,
-                 address, sizeof (address));
-      printf ("%s: %s\n", name, address);
-   } else {
-      printf ("No %s\n", name);
-   }
-}
-void * get_addr_ptr( struct sockaddr * sockaddr_ptr)
-{
-   void * addr_ptr = 0;
-   if (sockaddr_ptr->sa_family == AF_INET)
-      addr_ptr = &((struct sockaddr_in *)  sockaddr_ptr)->sin_addr;
-   else if (sockaddr_ptr->sa_family == AF_INET6)
-      addr_ptr = &((struct sockaddr_in6 *) sockaddr_ptr)->sin6_addr;
-   return addr_ptr;
-}
-void print_internet_address (struct ifaddrs * ifaddrs_ptr)
-{
-   void * addr_ptr;
-   if (! ifaddrs_ptr->ifa_addr)
-      return;
-   addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_addr);
-   print_ip ("internet address", ifaddrs_ptr, addr_ptr);
-}
-void print_netmask (struct ifaddrs * ifaddrs_ptr)
-{
-   void * addr_ptr;
-   if (! ifaddrs_ptr->ifa_netmask)
-      return;
-   addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_netmask);
-   print_ip ("netmask", ifaddrs_ptr, addr_ptr);
-}
-void print_mac_address (const char * mac_address)
-{
-   int mac_addr_offset;
-   printf ("Mac address: ");
-   for (mac_addr_offset = 0; mac_addr_offset < 6; mac_addr_offset++) {
-      printf ("%02x", (unsigned char) mac_address[mac_addr_offset]);
-      if (mac_addr_offset != 5)
-         printf (":");
-   }
-   printf ("\n");
-}
-void print_internet_interface (struct ifaddrs * ifaddrs_ptr)
-{
-   print_internet_address (ifaddrs_ptr);
-   print_netmask (ifaddrs_ptr);
-   if (ifaddrs_ptr->ifa_dstaddr) {
-      void * addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_dstaddr);
-      print_ip ("destination", ifaddrs_ptr, addr_ptr);
-   }
-   if (ifaddrs_ptr->ifa_broadaddr) {
-      void * addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_broadaddr);
-      print_ip ("broadcast", ifaddrs_ptr, addr_ptr);
-   }
-}
+void print_ip( const char * name, struct ifaddrs * ifaddrs_ptr, void * addr_ptr);
+void * get_addr_ptr( struct sockaddr * sockaddr_ptr);
+void print_internet_address (struct ifaddrs * ifaddrs_ptr);
+void print_netmask (struct ifaddrs * ifaddrs_ptr);
+void print_mac_address (const char * mac_address);
+void print_internet_interface (struct ifaddrs * ifaddrs_ptr);
 #endif //MACOSX
 
 #include <string.h>
@@ -293,24 +235,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
 
    for( struct ifaddrs * ifaddrs_ptr = ifaddrs_all_ptr; ifaddrs_ptr != NULL; ifaddrs_ptr = ifaddrs_ptr->ifa_next)
    {
-      if( verbose )
-      {
-         printf("Name: %s flags: %x\n", ifaddrs_ptr->ifa_name, ifaddrs_ptr->ifa_flags);
-         if( ifaddrs_ptr->ifa_addr->sa_family == AF_INET)
-         {
-            printf("AF_INET\n");
-            print_internet_interface(ifaddrs_ptr);
-         }
-         else if( ifaddrs_ptr->ifa_addr->sa_family == AF_INET6)
-         {
-            printf("AF_INET6\n");
-            print_internet_interface(ifaddrs_ptr);
-         }
-         else if( ifaddrs_ptr->ifa_addr->sa_family == AF_LINK)
-         {
-            printf("Loopback\n");
-         }
-      }
+      if( verbose ) print_internet_interface(ifaddrs_ptr);
    }
 
    freeifaddrs (ifaddrs_all_ptr);
@@ -444,3 +369,84 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
 #endif //WINNT
 
 }
+
+#ifdef MACOSX
+#include <stdio.h>
+void print_ip( const char * name, struct ifaddrs * ifaddrs_ptr, void * addr_ptr)
+{
+   if (addr_ptr) {
+      /* This constant is defined in <netinet/in.h> */
+      char address[INET6_ADDRSTRLEN];
+      inet_ntop (ifaddrs_ptr->ifa_addr->sa_family,
+                 addr_ptr,
+                 address, sizeof (address));
+      printf ("%s: %s\n", name, address);
+   } else {
+      printf ("%s: - None\n", name);
+   }
+}
+void * get_addr_ptr( struct sockaddr * sockaddr_ptr)
+{
+   void * addr_ptr = 0;
+   if (sockaddr_ptr->sa_family == AF_INET)
+      addr_ptr = &((struct sockaddr_in *)  sockaddr_ptr)->sin_addr;
+   else if (sockaddr_ptr->sa_family == AF_INET6)
+      addr_ptr = &((struct sockaddr_in6 *) sockaddr_ptr)->sin6_addr;
+   return addr_ptr;
+}
+void print_internet_address (struct ifaddrs * ifaddrs_ptr)
+{
+   void * addr_ptr;
+   if (! ifaddrs_ptr->ifa_addr)
+      return;
+   addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_addr);
+   print_ip ("   internet address", ifaddrs_ptr, addr_ptr);
+}
+void print_netmask (struct ifaddrs * ifaddrs_ptr)
+{
+   void * addr_ptr;
+   if (! ifaddrs_ptr->ifa_netmask)
+      return;
+   addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_netmask);
+   print_ip ("   netmask", ifaddrs_ptr, addr_ptr);
+}
+void print_mac_address (const char * mac_address)
+{
+   int mac_addr_offset;
+   printf ("   Mac address: ");
+   for (mac_addr_offset = 0; mac_addr_offset < 6; mac_addr_offset++) {
+      printf ("%02x", (unsigned char) mac_address[mac_addr_offset]);
+      if (mac_addr_offset != 5)
+         printf (":");
+   }
+   printf ("\n");
+}
+void print_internet_interface (struct ifaddrs * ifaddrs_ptr)
+{
+   printf("Network Interface Name: %s flags: %x", ifaddrs_ptr->ifa_name, ifaddrs_ptr->ifa_flags);
+
+   if(      ifaddrs_ptr->ifa_addr->sa_family == AF_INET  ) printf(" AF_INET" );
+   else if( ifaddrs_ptr->ifa_addr->sa_family == AF_INET6 ) printf(" AF_INET6");
+   else if( ifaddrs_ptr->ifa_addr->sa_family == AF_LINK  ) printf(" AF_LINK" );
+   printf("\n");
+
+   if( ifaddrs_ptr->ifa_addr->sa_family == AF_LINK )
+   {
+      struct sockaddr_dl * sdl = (struct sockaddr_dl *) ifaddrs_ptr->ifa_addr;
+      if( sdl->sdl_type == IFT_ETHER) print_mac_address (LLADDR (sdl));
+   }
+   else
+   {
+      print_internet_address (ifaddrs_ptr);
+      print_netmask (ifaddrs_ptr);
+      if (ifaddrs_ptr->ifa_dstaddr) {
+         void * addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_dstaddr);
+         print_ip ("   destination", ifaddrs_ptr, addr_ptr);
+      }
+      if (ifaddrs_ptr->ifa_broadaddr) {
+         void * addr_ptr = get_addr_ptr (ifaddrs_ptr->ifa_broadaddr);
+         print_ip ("   broadcast", ifaddrs_ptr, addr_ptr);
+      }
+   }
+}
+#endif //MACOSX
