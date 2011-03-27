@@ -110,9 +110,9 @@ void WndText::showTask( af::Msg * msg)
    if( files.isEmpty() == false)
    {
       c.insertText( "\n");
-      c.insertText( "Preview:", fInfo);
+      c.insertText( "Files:", fInfo);
       c.insertText( "\n");
-      c.insertText( files, fParameter);
+      c.insertText( files.replace(";","\n"), fParameter);
    }
    if( taskexec.hasFileSizeCheck())
    {

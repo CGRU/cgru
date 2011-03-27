@@ -91,6 +91,8 @@ Bugs Fixed:
 <p>
 Nuke render script: A try to delete moved temporary image removed.<br/>
 Listen job and task output connection error fixed.<br/>
+Numeric command frame(s) replacement bug fixed. Now it replaces any number of %04d patterns with start and end frame in a cycle.
+(The bug appears for example on a composite commands: "cmd1 && cmd2" or "cmd1; cmd2". And when one task has several files for preview.)<br/>
 </p>
 
 <br/>

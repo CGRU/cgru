@@ -58,7 +58,7 @@ while [ 1 ]; do
       username="user_$usr"
       tmpfile=$tmpdir/$jobname
       echo $output > $tmpfile
-      python ./job.py --name $jobname --user $username -b 2 -n 3 --cmdpost "rm $tmpfile" > /dev/null
+      python ./job.py --name $jobname --user $username -b 2 -n 10 -p 3 --cmdpost "rm $tmpfile" > /dev/null
       if [ $? != 0 ]; then
          echo "Error creation new job, exiting."
          exit 1

@@ -109,11 +109,10 @@ void ItemJobBlock::generateToolTip()
    else
       blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(pertask);
 
-   if( files.isEmpty()       == false) blockToolTip += "\nFiles:\n"        + files;
    if( environment.isEmpty() == false) blockToolTip += "\nEnvironment:\n"  + environment;
    if( cmdpre.isEmpty()      == false) blockToolTip += "\nPre command:\n"  + cmdpre;
    if( cmdpost.isEmpty()     == false) blockToolTip += "\nPost command:\n" + cmdpost;
-
+   if( files.isEmpty()       == false) blockToolTip += "\nFiles:\n" + files.replace(";","\n");
 }
 
 void ItemJobBlock::updateToolTip()

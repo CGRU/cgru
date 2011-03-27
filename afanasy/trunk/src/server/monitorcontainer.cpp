@@ -56,14 +56,14 @@ bool MonitorContainer::setInterest( int type, af::MCGeneral & ids)
    int monitorId = ids.getId();
    if( monitorId == 0 )
    {
-      AFERROR("MonitorContainer::action: Zero monitor ID.\n");
+      AFCommon::QueueLogError("MonitorContainer::action: Zero monitor ID.");
       return false;
    }
    MonitorContainerIt mIt( this);
    MonitorAf * monitor = mIt.getMonitor( monitorId);
    if( monitor == NULL )
    {
-      AFERRAR("MonitorContainer::action: No monitor with id = %d.\n", monitorId);
+      AFCommon::QueueLogError("MonitorContainer::action: No monitor with id = " + af::itos( monitorId));
       return false;
    }
 
@@ -77,7 +77,7 @@ void MonitorContainer::addEvent( int type, int id)
 {
    if(( type <= af::Msg::TMonitorCommonEvents_BEGIN) || ( type >= af::Msg::TMonitorCommonEvents_END))
    {
-      AFERRAR("MonitorContainer::addEvent: Invalid event type = %s.\n", af::Msg::TNAMES[type]);
+      AFCommon::QueueLogError( std::string("MonitorContainer::addEvent: Invalid event type = ") + af::Msg::TNAMES[type]);
       return;
    }
 //printf("MonitorContainer::addEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
@@ -89,7 +89,7 @@ void MonitorContainer::addJobEvent( int type, int id, int uid)
 {
    if(( type <= af::Msg::TMonitorJobEvents_BEGIN) || ( type >= af::Msg::TMonitorJobEvents_END))
    {
-      AFERRAR("MonitorContainer::addJobEvent: Invalid job event type = %s.\n", af::Msg::TNAMES[type]);
+      AFCommon::QueueLogError( std::string("MonitorContainer::addJobEvent: Invalid job event type = ") + af::Msg::TNAMES[type]);
       return;
    }
 //printf("MonitorContainer::addJobEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
@@ -150,8 +150,9 @@ void MonitorContainer::dispatch()
       int eventType = af::Msg::TMonitorJobEvents_BEGIN+1 + e;
       if( jobEvents[e].size() != jobEventsUids[e].size())
       {
-         AFERRAR("MonitorContainer::dispatch: jobEvents and jobEventsUids has different sizes fo [%s] ( %d != %d ) !\n",
-                  af::Msg::TNAMES[eventType], (int)jobEvents[e].size(), (int)jobEventsUids[e].size());
+         AFCommon::QueueLogError( std::string("MonitorContainer::dispatch: \
+            jobEvents and jobEventsUids has different sizes fo [")
+            + af::Msg::TNAMES[eventType] + "] ( " + af::itos(jobEvents[e].size()) + " != " + af::itos(jobEventsUids[e].size()) + " )");
          continue;
       }
 

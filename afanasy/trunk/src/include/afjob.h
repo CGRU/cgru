@@ -11,11 +11,11 @@ namespace AFJOB
 
    const uint8_t  PROGRESS_BYTES  = 8;
 
-   const char DEFAULT_NAME[]  = "job";
-   const char BLOCK_DEFAULT_NAME[]        = "block";
-   const char BLOCK_DEFAULT_SERVICE[]     = "generic";
-   const char BLOCK_DEFAULT_PARSER[]      = "none";
-   const char TASK_DEFAULT_NAME[]         = "task";
+   const char DEFAULT_NAME[]           = "job";
+   const char BLOCK_DEFAULT_NAME[]     = "block";
+   const char BLOCK_DEFAULT_SERVICE[]  = "generic";
+   const char BLOCK_DEFAULT_PARSER[]   = "none";
+   const char TASK_DEFAULT_NAME[]      = "task";
 
    const int TASK_DEFAULT_CAPACITY = 1000;
    const int TASK_UPDATE_TIMEOUT   = 300;  ///< Seconds for task to have no update to produce error.

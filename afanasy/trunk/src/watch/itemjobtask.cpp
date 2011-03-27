@@ -39,7 +39,6 @@ const QVariant ItemJobTask::getToolTip() const
       if(((taskprogress.state & AFJOB::STATE_RUNNING_MASK) == false) && taskprogress.time_done)
          tooltip += QString("\nFinished at %1").arg( afqt::time2Qstr( taskprogress.time_done));
    }
-   if( block->hasFiles()) tooltip += "\nFiles:\n" + afqt::stoq( block->genFiles( tasknum));
    return tooltip;
 }
 

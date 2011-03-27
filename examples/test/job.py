@@ -125,14 +125,14 @@ for b in range( numblocks):
       str_hosts = ' ' + services.service.str_hosts
 
    if numeric:
-      block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s %%1 -e %%2 -t %(timesec)g -r %(randtime)g -v %(verbose)d' % vars(), False)
+      block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s %%1 -e %%2 -t %(timesec)g -r %(randtime)g -v %(verbose)d %%04d %%04d %%04d %%04d' % vars(), False)
       block.setNumeric( 1, numtasks, perhost)
       if perhost > 1:
          block.setTasksName('num %1 %2')
-         block.setFiles('file_a.%1-file_a.%2;file_b.%1-file_b.%2')
+         block.setFiles('file_a.%1.%04d-file_a.%2.%04d;file_b.%1.%04d-file_b.%2.%04d')
       else:
          block.setTasksName('num %04d')
-         block.setFiles('file_a.%04d;file_b.%04d')
+         block.setFiles('file_a.%1.%04d;file_b.%2.%04d')
    else:
       block.setCommand('python task.py%(str_capacity)s %%1 -v %(verbose)d' % vars(), False)
       block.setTasksName('task %1')

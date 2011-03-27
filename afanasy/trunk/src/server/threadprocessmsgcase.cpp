@@ -490,8 +490,15 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
             AFCommon::QueueLogError( err);
             if( msg_response->isNull())
             {
-               err = std::string("ERROR: ") + err;
-               msg_response->setString( err);
+               if( af::pathFileExists( filename))
+               {
+                  err = std::string("ERROR: ") + err;
+                  msg_response->setString( err);
+               }
+               else
+               {
+                  msg_response->setString("No output exists.");
+               }
             }
          }
       }

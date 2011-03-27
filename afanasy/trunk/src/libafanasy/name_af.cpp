@@ -214,36 +214,69 @@ const std::string af::fillNumbers( const std::string& pattern, int start, int en
 {
    std::string str( pattern);
    size_t pos;
+
+   // Find %1 and replace with the start number:
    pos = str.find("%1");
    while( pos != std::string::npos )
    {
       str.replace( pos, 2, itos( start));
       pos = str.find("%1");
    }
+
+   // Find %2 and replace with the end number:
    pos = str.find("%2");
    while( pos != std::string::npos )
    {
       str.replace( pos, 2, itos( end));
       pos = str.find("%2");
    }
+
+   // Find all %04d patterns and sprintf them:
    if(( str.find("%") != std::string::npos ) && ( str.find("%n") == std::string::npos ))
    {
-      int buflen = int( str.size()) * 2 + 256;
+      static const char digits[] = "0123456789";
+      std::string new_str;
+      size_t pos1 = 0;
+      size_t pos2 = 0;
+      // The first replacement number is the start frame
+      int number = start;
       for(;;)
       {
-         char * buffer = new char[buflen];
-         int retval = snprintf( buffer, buflen, str.c_str(), start, end);
-         if( retval >= buflen )
+         pos1 = str.find_first_of('%', pos2);
+         if( pos1 == std::string::npos ) break;
+         new_str += str.substr( pos2, pos1-pos2);
+         pos2 = pos1 + 1;
+         pos1 = str.find_first_not_of( digits, pos2);
+         if( pos1 == std::string::npos )
          {
-            buflen = buflen * 2;
-         }
-         else
-         {
-            str = buffer;
+            pos2--;
             break;
          }
-         delete buffer;
+         std::string num_str = str.substr( pos2-1, pos1-pos2+2);
+         int buflen = 32;
+         for(;;)
+         {  // Allocate buffer and double it size if it is not enough
+            char * buffer = new char[buflen];
+            int retval = snprintf( buffer, buflen, num_str.c_str(), number);
+            if( retval >= buflen )
+            {
+               buflen = buflen * 2;
+               delete buffer;
+            }
+            else
+            {
+               new_str += buffer;
+               delete buffer;
+               break;
+            }
+         }
+         pos2 = pos1 + 1;
+         // The second replacement number is the end frame
+         if( number == start ) number = end;
+         else number = start; // And a start frame again in cycle
       }
+      new_str += str.substr( pos2);
+      str = new_str;
    }
    return str;
 }

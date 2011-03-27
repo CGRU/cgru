@@ -406,7 +406,7 @@ const std::string BlockData::genFiles( int num) const
       if( files.size())
       {
          int start, end;
-         if( genNumbers( start, end, num)) str = fillNumbers( files, start, end);
+         if( genNumbers( start, end, num)) str = af::fillNumbers( files, start, end);
       }
    }
    else

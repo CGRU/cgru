@@ -140,9 +140,14 @@ Value less then '1' means no forgive. Value '-1' means take this value from user
 <br/><br/>
 </li>
 
-<li><a name="Command"/><b>Command</b> - Tasks command pattern. When block produces a task it calculates an unique command from this pattern and other parameters, depend on block type - numeric or string, replacing <kbd>%1</kbd>, <kbd>%2</kbd> and <kbd>%04d</kbd> strings using <a href="http://doc.trolltech.com/qstring.html"><code>QString::arg</code></a> and <a href="http://www.kernel.org/doc/man-pages/online/pages/man3/sprintf.3.html"><code>sprintf</code></a> functions:
+<li><a name="Command"/><b>Command</b> - Tasks command pattern.
+When block produces a task it calculates an unique command from this pattern and other parameters,
+depend on block type - numeric or string, replacing <kbd>%1</kbd>, <kbd>%2</kbd> and <kbd>%04d</kbd> strings
+using <a href="http://www.kernel.org/doc/man-pages/online/pages/man3/sprintf.3.html"><code>sprintf</code></a> function:
 <ul>
-<li><p>String: block seek for "%1" string in command and replace it by another string get from <var>Task Command</var>.</p>
+<li>
+<p>String: block seek for "%1" string in command and replace it by another string get from <var>Task Command</var>.
+</p>
 <p>Example:</p>
 <p>
 command = <kbd>myrender some.scene -camera %1</kbd><br />
@@ -155,9 +160,18 @@ Result:<br />
 </p><p>
 If block command is empty <var>Task Command</var> is simply used.
 </p></li>
-<li><p>Numeric: block calculates first and last frame for the task according to task number, <var>Frame First</var>, <var>Frame Last</var>, <var>Frame per Host</var> and <var>Frame Increment</var> values.</p>
-<p>Examples:
-</p><p>
+<li>
+<p>
+Numeric: block calculates first and last frame for the task according to task number,
+<var>Frame First</var>, <var>Frame Last</var>, <var>Frame per Host</var> and <var>Frame Increment</var> values.
+Each <kbd>%1</kbd> will be replaced with start frame number.
+Each <kbd>%2</kbd> will be replaced with end frame number.
+Then each <kbd>%04d</kbd> pairs will be replaced with the start and end numbers using sprintf function result.
+</p>
+<p>
+Examples:
+</p>
+<p>
 command = <kbd>myrender some.scene -s %1 -e %2</kbd><br />
 Frame First = <kbd>1</kbd><br />
 Frame Last = <kbd>10</kbd><br />
@@ -166,8 +180,9 @@ Result:<br />
 1st task command: <kbd>myrender some.scene -s 1 -e 4</kbd><br />
 2nd task command: <kbd>myrender some.scene -s 5 -e 8</kbd><br />
 3rd task command: <kbd>myrender some.scene -s 9 -e 10</kbd><br />
-</p><p>
-command = <kbd>myrender something.%04d.rib</kbd><br />
+</p>
+<p>
+command = <kbd>myrender something.%04d.obj</kbd><br />
 Frame First = <kbd>1</kbd><br />
 Frame Last = <kbd>10</kbd><br />
 Frame per Host = <kbd>1</kbd><br />
@@ -176,13 +191,15 @@ Result:<br />
 2nd task command: <kbd>myrender something.0002.rib</kbd><br />
 ...<br />
 last task command: <kbd>myrender something.0010.rib</kbd><br />
-</p><p>
+</p>
+<p>
 You can check numbers placing by <code><a href="cmd.html">afcmd</a> num [command] [number1] [number2]</code> command.
 </p>
 </li>
 </ul>
 </li>
-<li><p><a name="Files"/><b>Files</b> - File(s) pattern.
+<li>
+<p><a name="Files"/><b>Files</b> - File(s) pattern.
 Each task can have result file(s) pattern.
 Result file name will be constructed from this pattern by the same method as described before.
 Some another application, for example watch GUI,
@@ -201,6 +218,11 @@ Block View Command = <kbd>images/back.%1.exr</kbd><br />
 Task View Command = <kbd>0057</kbd><br />
 Preview program = <kbd>kuickshow</kbd><br />
 Result: <kbd>kuickshow images/back.0057.exr</kbd><br />
+</p>
+<p>
+Task can have several files for preview, for example on different render passes or on a stereo images pair.
+To use this files string should be "<kbd>;</kbd>" - separated:<br/>
+<kbd>img.%04d.exr;img_normals.%04d.exr</kbd>
 </p>
 <p>
 If block is not numeric and block view command is empty only task view command is used.
