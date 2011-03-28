@@ -12,7 +12,7 @@ class NetIF : public Af
 public:
 
 /// Constructor.
-   NetIF( const char * Name, const unsigned char * MacAddr, const std::vector<Address> ifAddresses);
+   NetIF( const char * Name, const unsigned char * MacAddr, const std::vector<Address> ifAddresses = std::vector<Address>());
 
    ~NetIF();
 

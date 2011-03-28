@@ -37,6 +37,7 @@ void print_internet_interface (struct ifaddrs * ifaddrs_ptr);
 #endif //MACOSX
 
 #include <string.h>
+#include <map>
 
 #include "netif.h"
 
@@ -233,12 +234,56 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
       return;
    }
 
+   std::map< std::string, std::vector<Address> > addresses_map;
+
    for( struct ifaddrs * ifaddrs_ptr = ifaddrs_all_ptr; ifaddrs_ptr != NULL; ifaddrs_ptr = ifaddrs_ptr->ifa_next)
    {
+      std::string adapter_name;
+      if( ifaddrs_ptr->ifa_name != NULL ) adapter_name = ifaddrs_ptr->ifa_name;
+      if( false == adapter_name.empty())
+      {
+         // If it is an adapter record:
+         if( ifaddrs_ptr->ifa_addr->sa_family == AF_LINK )
+         {
+            struct sockaddr_dl * sdl = (struct sockaddr_dl *) ifaddrs_ptr->ifa_addr;
+            // Adapter type should be ethernet:
+            if( sdl->sdl_type == IFT_ETHER )
+            {
+               netIFs.push_back( new NetIF( adapter_name, LLADDR (sdl)));
+            }
+         }
+         // Else if it is an IPv4 or IPv6 address record:
+         else if(( ifaddrs_ptr->ifa_addr->sa_family == AF_INET ) || ( ifaddrs_ptr->ifa_addr->sa_family == AF_INET6 ))
+         {
+            Address addr( ifaddrs_ptr->ifa_addr);
+            std::map< std::string, Address >::iterator it = addresses_map.find( adapter_name);
+            if( it != adapter_name.end())
+               (*it).second.push_back( addr);
+            else
+            {
+               std::vector<Address> addresses;
+               addresses.push_back( addr);
+               addresses_map[adapter_name] = addresses;
+            }
+         }
+      }
+
+      // Print information in verbose mode:
       if( verbose ) print_internet_interface(ifaddrs_ptr);
    }
 
    freeifaddrs (ifaddrs_all_ptr);
+
+   // Assign addresses to adapters with the same name:
+   for( int i = 0; i < netIFs.size(); i++)
+   {
+      std::map< std::string, Address >::iterator it = addresses_map.find( netIFs[i]->getName());
+      if( it != addresses_map.end() )
+      {
+         netIFs[i]->addresses = (*it).second();
+      }
+   }
+
 #endif //MACOSX
 
 #ifdef WINNT
