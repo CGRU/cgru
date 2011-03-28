@@ -22,10 +22,10 @@ Client::Client( int flags, int Id):
    {
       bool verbose = false;
 #ifdef WINNT
-      verbose = true;
+//      verbose = true;
 #endif //WINNT
 #ifdef MACOSX
-      verbose = true;
+//      verbose = true;
 #endif //MACOSX
       af::NetIF::getNetIFs( netIFs, verbose);
 

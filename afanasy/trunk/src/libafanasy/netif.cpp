@@ -70,7 +70,7 @@ void NetIF::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    if( addresses.size())
    {
-      for( int i = 0; i < addresses.size(); i++)
+      for( unsigned i = 0; i < addresses.size(); i++)
       {
          if( full ) stream << "\n      ";
          else stream << " ";
@@ -81,9 +81,9 @@ void NetIF::generateInfoStream( std::ostringstream & stream, bool full) const
 
 int NetIF::calcWeight() const
 {
-   int size = sizeof( NetIF);
+   int size = int(sizeof( NetIF));
    size += af::weigh( name);
-   for( int i = 0; i < addresses.size(); i++) size += addresses[i].calcWeight();
+   for( unsigned i = 0; i < addresses.size(); i++) size += addresses[i].calcWeight();
    return size;
 }
 
@@ -249,15 +249,16 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
             // Adapter type should be ethernet:
             if( sdl->sdl_type == IFT_ETHER )
             {
-               netIFs.push_back( new NetIF( adapter_name, LLADDR (sdl)));
+               netIFs.push_back( new NetIF( adapter_name.c_str(), (const unsigned char*)(LLADDR (sdl))));
             }
          }
          // Else if it is an IPv4 or IPv6 address record:
          else if(( ifaddrs_ptr->ifa_addr->sa_family == AF_INET ) || ( ifaddrs_ptr->ifa_addr->sa_family == AF_INET6 ))
          {
-            Address addr( ifaddrs_ptr->ifa_addr);
-            std::map< std::string, Address >::iterator it = addresses_map.find( adapter_name);
-            if( it != adapter_name.end())
+            struct sockaddr_storage * ss = ( struct sockaddr_storage *)(ifaddrs_ptr->ifa_addr);
+            Address addr(*ss);
+            std::map< std::string, std::vector<Address> >::iterator it = addresses_map.find( adapter_name);
+            if( it != addresses_map.end())
                (*it).second.push_back( addr);
             else
             {
@@ -275,12 +276,15 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
    freeifaddrs (ifaddrs_all_ptr);
 
    // Assign addresses to adapters with the same name:
-   for( int i = 0; i < netIFs.size(); i++)
+   for( unsigned i = 0; i < netIFs.size(); i++)
    {
-      std::map< std::string, Address >::iterator it = addresses_map.find( netIFs[i]->getName());
+      std::map< std::string, std::vector<Address> >::iterator it = addresses_map.find( netIFs[i]->getName());
       if( it != addresses_map.end() )
       {
-         netIFs[i]->addresses = (*it).second();
+         netIFs[i]->addresses = (*it).second;
+//         netIFs[i]->addresses.push_back((*it).second().first());
+//         (*it).second()[0].stdOut();
+//         (*it).second().push_back(Address());
       }
    }
 
