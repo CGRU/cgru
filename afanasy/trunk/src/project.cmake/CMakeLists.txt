@@ -13,9 +13,9 @@ endif( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_
 
 if(UNIX)
 	if(APPLE)
-		set(CMAKE_OSX_ARCHITECTURES "i386;x86_64;")
+		set(CMAKE_OSX_ARCHITECTURES "x86_64")
 		#Changing the order of configurations to be sure release is the first one
-		set(CMAKE_CONFIGURATION_TYPES "Release;Debug;MinSizeRel;RelWithDebInfo")
+		set(CMAKE_CONFIGURATION_TYPES "Release")
 		add_definitions(-DMACOSX)
 	else(APPLE)
 		add_definitions(-DLINUX)
