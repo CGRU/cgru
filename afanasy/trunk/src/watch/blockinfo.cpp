@@ -287,7 +287,7 @@ void BlockInfo::paint( QPainter * painter, const QStyleOptionViewItem &option,
    (
       painter, x+xoffset, y+y_bars, w-progress_w_offset-xoffset, 4,
       jobid == AFJOB::SYSJOB_ID ?  runningtasksnumber + tasksready + taskserror: tasksnum,
-      tasksdone, runningtasksnumber, taskserror,
+      tasksdone, taskserror, runningtasksnumber,
       false
    );
    Item::drawPercent

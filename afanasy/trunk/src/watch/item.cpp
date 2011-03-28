@@ -198,14 +198,14 @@ void Item::drawPercent
    if( part_b)
    {
       int w = width*part_b/whole;
-      painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
+      painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
       painter->drawRect( x, y, w, h);
       x += w;
    }
    if( part_c)
    {
       int w = width*part_c/whole;
-      painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::SolidPattern ));
+      painter->setBrush( QBrush( afqt::QEnvironment::clr_running.c, Qt::SolidPattern ));
       painter->drawRect( x, y, w, h);
       x += w;
    }
