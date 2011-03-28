@@ -6,7 +6,7 @@ source ./distribution.sh
 
 # List packages:
 
-packages="gcc yasm p7zip ruby wget inkscape"
+packages="gcc yasm p7zip ruby wget git inkscape"
 packages_noarch="rubygems"
 
 # Common for Debian distributives:
