@@ -647,7 +647,7 @@ global proc tima_AdvPlayblastShowWnd()
 
 	// Compression
 	//
-	if (`about -nt`) {
+	if (`about -windows`) {
 			button -l "Compression..." -enable true -c "playblast -options" compression;
 	}else if (`about -linux`) {
 		optionMenuGrp -l "Compression" -enable true compression;

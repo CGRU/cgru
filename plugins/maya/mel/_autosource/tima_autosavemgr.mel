@@ -263,7 +263,7 @@ global int $tima_AutoSaveSelectionsCount;
 				tima_AutoSaveDirTextField;
 			button -w 150 -en $tima_AutoSaveAnotherDir -l " browse " -c "tima_AutoSaveBrowse_globalProc(0)" autosaveDirBrowseButton;
 			separator -width 150;
-			frameLayout -l "history backup" -bs "etchedOut" -la "center";
+			frameLayout -l "history backup" -bs "etchedOut";
 				columnLayout -adj 1;
 					checkBox -label "enable backup" -align "left" -v $tima_AutoSaveHisEnabled
 							-onc "$tima_AutoSaveHisEnabled = 1; tima_SaveAutoSaveManagerSettings_globalProc;"
@@ -376,36 +376,31 @@ if ($printLog) cgruInfo("$nameBody = " + $nameBody);
 		$nameInt = "0" + $nameInt;
 	
 	$tima_AutoSaveHisCount++;
-	if( $tima_AutoSaveHisCount >= $tima_AutoSaveHisTimes)
+	if( $tima_AutoSaveHisEnabled && ($tima_AutoSaveHisCount >= $tima_AutoSaveHisTimes))
 	{
 		string $date;
 		string $time;
 		int $l;
 
-		$time = `about -os`;
-		if(`gmatch $time "l*"`)
-			$date = `system("date +%y_%m_%d__%H_%M_%S")`;
+      if(`about -windows`)
+      {
+          $date = `system("date /t")`;
+          $date += "_" + `system("time /t")`;
+          string $clean_date;
+          while( $clean_date != $date )
+          {
+              $clean_date = $date;
+              $date = `substitute "\n" $date ""`;
+              $date = `substitute "\r" $date ""`;
+              $date = `substitute " " $date "_"`;
+              $date = `substitute "/" $date "_"`;
+              $date = `substitute ":" $date "_"`;
+              $date = `substitute "\\\\" $date "_"`;
+          }
+      }
 		else
 		{
-			$time = `system("date /T")`;
-			$l = `size($time)`;
-			$date = (`substring $time 7 ($l - 3)` + "_");
-	
-			$time = `system("date /T")`;
-			$l = `size($time)`;
-			$date += (`substring $time 4 ($l - 8)` + "_");
-	
-			$time = `system("date /T")`;
-			$l = `size($time)`;
-			$date += (`substring $time 1 ($l - 11)` + "_");
-	
-			$time = `system("time /T")`;
-			$l = `size($time)`;
-			$date += (`substring $time 1 ($l - 5)` + "_");
-	
-			$time = `system("time /T")`;
-			$l = `size($time)`;
-			$date += (`substring $time 4 ($l - 2)`);
+         $date = `system("date +%y_%m_%d__%H_%M_%S")`;
 		}
 		if(`filetest -d $tima_AutoSaveHisDirectory` == 0)
 		{
