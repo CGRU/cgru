@@ -76,8 +76,7 @@ if( $DEBUG)
    $cmd += " -name "   + $jobame;
    $cmd += " -deletescene";
 
-   string $os = `about -os`;
-   if(`gmatch $os "win*"`) $cmd = "python " + $cmd;
+   if(`about -windows`) $cmd = "python " + $cmd;
    else $cmd += " &";
 
    //
