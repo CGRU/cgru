@@ -160,18 +160,20 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
          menu.addAction( actionid);
 
-         int startCount = 1;
-         startCount = ((ItemJobTask*)(item))->taskprogress.starts_count;
-         if( startCount > 1 )
+         if( jobid != AFJOB::SYSJOB_ID )
          {
-            QMenu * submenu = new QMenu( "outputs", this);
-            for( int i = 1; i < startCount; i++)
+            int startCount = ((ItemJobTask*)(item))->taskprogress.starts_count;
+            if( startCount > 1 )
             {
-               actionid = new ActionId( i, QString("session #%1").arg(i), this);
-               connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
-               submenu->addAction( actionid);
+               QMenu * submenu = new QMenu( "outputs", this);
+               for( int i = 1; i < startCount; i++)
+               {
+                  actionid = new ActionId( i, QString("session #%1").arg(i), this);
+                  connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actTaskStdOut( int ) ));
+                  submenu->addAction( actionid);
+               }
+               menu.addMenu( submenu);
             }
-            menu.addMenu( submenu);
          }
 
          action = new QAction( "Info", this);
