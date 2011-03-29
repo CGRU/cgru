@@ -5,9 +5,10 @@ im=$PWD/ImageMagick
 exr=`dirname $PWD`/openexr
 
 prefix=$PWD
-export CC="g++"
+
 export OPENEXR_CFLAGS="-I$exr/include/OpenEXR"
 export OPENEXR_LIBS="-L$exr/lib -lIlmImf -lz -lImath -lHalf -lIex -lIlmThread -lpthread"
+export LDFLAGS="-lstdc++"
 
 cd $im
 
@@ -23,10 +24,17 @@ if [ ! -f "$configure_cgru" ] ; then
    chmod a+rwx $configure
 fi
 
+configure="./configure"
+configure="$configure --prefix=$prefix"
+configure="$configure --with-openexr"
+# configure="$configure --enable-hdri"
+configure="$configure --disable-opencl"
+configure="$configure --enable-shared="
+#with-quantum-depth=32
+
 if [ -z "$1" ]; then
    #make clean
-   #with-quantum-depth=32
-   ./configure --prefix=$prefix --with-openexr --enable-hdri --disable-opencl --enable-shared=
+   $configure
    make
    make install
    cd ..

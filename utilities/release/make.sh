@@ -3,8 +3,10 @@
 for arg in "$@"; do
    if [ $arg == "--skipcheck" ]; then
       check="--exitsuccess"
+   elif [ $arg == "--releases" ]; then
+      releases="releases"
    else
-      afanasy="$1"
+      afanasy="$arg"
    fi
 done
 
@@ -165,8 +167,7 @@ cd "${curdir}"
 chmod a+rwx "${archive_name}"
 
 # Creating 7zip releazes archives:
-releases="__releases__"
-if [ -d ${releases} ]; then
+if [ ! -z "${releases}" ]; then
    for release_name in `ls "${releases}"`; do
       release_script=$releases/$release_name
       [ -d "$release_script" ] && continue

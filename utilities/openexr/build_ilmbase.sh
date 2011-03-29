@@ -2,7 +2,7 @@
 
 prefix=$PWD
 
-CPPFLAGS="-fPIC"
+export CPPFLAGS="-fPIC"
 
 cd ilmbase-1.0.2
 

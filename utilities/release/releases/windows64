@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# Make release with binaries for Windows64
+
+dest=$1
+[ -d "$dest" ] || exit 1
+
+rm -rf $dest/afanasy/bin
+rm -rf $dest/utilities/regexp/bin
+bins="convert exrjoin ffmpeg"
+for bin in $bins; do
+   rm -f $dest/bin/$bin
+done
+
+rsync -rL --inplace --exclude '.svn' `dirname $0`/windows64-files/* $dest

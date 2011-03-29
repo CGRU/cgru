@@ -1,15 +1,26 @@
 #!/bin/bash
 
-v=6.6.8
+package="ImageMagick"
+location="ftp://ftp.imagemagick.org/pub/ImageMagick"
 
-im=ImageMagick
-imv=${im}-${v}
+allfiles=`ls`
+for afile in $allfiles; do
+   [ -d "$afile" ] || continue
+   rm -rvf $afile
+done
 
-if [ -d $im ]; then
-   cd $im
-   svn up
-   cd ..
+archive="$package.tar.gz"
+if [ -f $archive ] ; then
+   echo "Archive $archive already exists. Skipping download."
 else
-   url=https://www.imagemagick.org/subversion/ImageMagick/branches/$imv
-   svn co $url $im
+   wget "$location/$archive"
 fi
+tar xvzf $archive
+
+allfiles=`ls`
+for afile in $allfiles; do
+   [ -d "$afile" ] || continue
+   [ "`echo $afile | awk '{print match( \$1, "ImageMagick")}'`" == "1" ] && ImageMagick=$afile
+done
+
+ln -svf $ImageMagick $package

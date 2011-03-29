@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Make release with Maya binaries only
+
+dest=$1
+[ -d "$dest" ] || exit 1
+
+rm -rf $dest/afanasy/bin*
+rm -rf $dest/utilities/regexp/bin
+bins="convert exrjoin ffmpeg"
+for bin in $bins; do
+   rm -f $dest/bin/$bin
+done

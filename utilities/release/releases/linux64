@@ -1,0 +1,8 @@
+#!/bin/bash
+
+# Make release with binaries for Linux64
+
+dest=$1
+[ -d "$dest" ] || exit 1
+
+rsync -rL --inplace --exclude '.svn' `dirname $0`/linux64-files/* $dest
