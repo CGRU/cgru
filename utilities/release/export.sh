@@ -8,11 +8,6 @@ if [ -z "$dest" ]; then
    exit 1
 fi
 
-[ -d $dest ] || mkdir -p $dest
-pushd $dest > /dev/null
-dest=$PWD
-popd > /dev/null
-
 function createDir(){
    [ -d $1 ] || mkdir -p $1
 }
@@ -23,6 +18,13 @@ function copy(){
 }
 
 function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' $1 $2; }
+
+createDir $dest
+pushd $dest > /dev/null
+dest=$PWD
+cd ..
+destUP=$PWD
+popd > /dev/null
 
 cd ../..
 
@@ -75,3 +77,9 @@ CGRU_VERSION=`cat version.txt`
 cd utilities
 source ./getrevision.sh ..
 echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
+
+cd release
+archives=`ls cgru*.gz`
+for archive in $archives; do
+   cp -vf $archive $destUP
+done
