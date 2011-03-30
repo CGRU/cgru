@@ -78,8 +78,6 @@ cd utilities
 source ./getrevision.sh ..
 echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
 
-cd release
-archives=`ls cgru*.gz`
-for archive in $archives; do
-   cp -vf $archive $destUP
-done
+#cd release
+#archives=`ls cgru*.gz`
+#for archive in $archives; do cp -vf $archive $destUP; done
