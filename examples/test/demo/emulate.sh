@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sleep_sec=$1
+[ -z "$sleep_sec" ] && sleep_sec=1
+
 # Process parameters:
 cleanup=0
 
@@ -32,6 +35,8 @@ if [ -z $CGRU_LOCATION ]; then
    source setup.sh
    popd >> /dev/null
 fi
+
+source $CGRU_LOCATION/utilities/python/setup.sh ""
 
 # Create temporary folder:
 mkdir $tmpdir
@@ -85,5 +90,5 @@ while [ 1 ]; do
       pp=$PausePeriod
       sleep $PauseTime
    fi
-   sleep 1
+   sleep $sleep_sec
 done

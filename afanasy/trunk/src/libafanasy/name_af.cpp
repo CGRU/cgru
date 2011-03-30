@@ -253,22 +253,33 @@ const std::string af::fillNumbers( const std::string& pattern, int start, int en
             break;
          }
          std::string num_str = str.substr( pos2-1, pos1-pos2+2);
-         int buflen = 32;
+
+         // This is the first buffer length, if will be not enough buffer length will be doubled
+         static const int first_buffer_len = 32;
+         char first_buffer[first_buffer_len];
+         int buflen = first_buffer_len;
+         // First time stack buffer is used, next time new memory will be allocated and deleted after
+         bool first_loop = true;
          for(;;)
-         {  // Allocate buffer and double it size if it is not enough
-            char * buffer = new char[buflen];
+         {
+            char * buffer;
+            if( first_loop )
+               buffer = first_buffer;
+            else
+               buffer = new char[buflen];
             int retval = snprintf( buffer, buflen, num_str.c_str(), number);
             if( retval >= buflen )
-            {
+            {  // Buffer is not enough
                buflen = buflen * 2;
-               delete buffer;
+               if( false == first_loop ) delete buffer;
             }
             else
-            {
+            {  // Buffer is enough
                new_str += buffer;
-               delete buffer;
+               if( false == first_loop ) delete buffer;
                break;
             }
+            first_loop = false;
          }
          pos2 = pos1 + 1;
          // The second replacement number is the end frame

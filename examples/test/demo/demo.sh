@@ -6,6 +6,8 @@ if [ -z $CGRU_LOCATION ]; then
    popd >> /dev/null
 fi
 
+source $CGRU_LOCATION/utilities/python/setup.sh
+
 cd ..
 
 ./Renders.sh rf0 10

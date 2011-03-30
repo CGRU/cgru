@@ -7,6 +7,8 @@ if [ -z $CGRU_LOCATION ]; then
    cd $pwd
 fi
 
+source $CGRU_LOCATION/utilities/python/setup.sh
+
 cd ..
 
 export AF_USERNAME=чёткий
