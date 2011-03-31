@@ -51,6 +51,26 @@ class CmdJobsDelete: public Cmd { public:
    ~CmdJobsDelete();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdJobsPause: public Cmd { public:
+   CmdJobsPause();
+   ~CmdJobsPause();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
+class CmdJobsStart: public Cmd { public:
+   CmdJobsStart();
+   ~CmdJobsStart();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
+class CmdJobsStop: public Cmd { public:
+   CmdJobsStop();
+   ~CmdJobsStop();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
+class CmdJobsRestart: public Cmd { public:
+   CmdJobsRestart();
+   ~CmdJobsRestart();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
 class CmdJob: public Cmd { public:
    CmdJob();
    ~CmdJob();

@@ -69,8 +69,12 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdUserHostsMask);
 
    addCmd( new CmdJobsList);
-   addCmd( new CmdJobsWeight);
+   addCmd( new CmdJobsPause);
+   addCmd( new CmdJobsStop);
+   addCmd( new CmdJobsStart);
+   addCmd( new CmdJobsRestart);
    addCmd( new CmdJobsDelete);
+   addCmd( new CmdJobsWeight);
    addCmd( new CmdJobId);
    addCmd( new CmdJobLog);
    addCmd( new CmdJobProgress);

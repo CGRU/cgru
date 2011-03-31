@@ -1,5 +1,9 @@
 #!/bin/bash
 
+for arg in "$@"; do
+   [ $arg == "--nocmdpost" ] && nocmdpost=1
+done
+
 sleep_sec=$1
 [ -z "$sleep_sec" ] && sleep_sec=1
 
@@ -62,8 +66,12 @@ while [ 1 ]; do
       jobname="job_$counter"
       username="user_$usr"
       tmpfile=$tmpdir/$jobname
-      echo $output > $tmpfile
-      python ./job.py --name $jobname --user $username -b 2 -n 10 -p 3 --cmdpost "rm $tmpfile" > /dev/null
+      if [ -z "$nocmdpost" ]; then
+         echo $output > $tmpfile
+         python ./job.py --name $jobname --user $username -b 2 -n 10 -p 3 --cmdpost "rm $tmpfile" > /dev/null
+      else
+         python ./job.py --name $jobname --user $username -b 2 -n 10 -p 3 > /dev/null
+      fi
       if [ $? != 0 ]; then
          echo "Error creation new job, exiting."
          exit 1

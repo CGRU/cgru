@@ -197,6 +197,74 @@ bool CmdJobsDelete::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
+CmdJobsPause::CmdJobsPause()
+{
+   setCmd("jpause");
+   setArgsCount(1);
+   setInfo("Pause jobs.");
+   setHelp("jpause [mask] Pause jobs which names match the mask.");
+   setMsgType( af::Msg::TJobPause);
+}
+CmdJobsPause::~CmdJobsPause(){}
+bool CmdJobsPause::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string name = argv[0];
+   af::MCGeneral mcgeneral( name, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdJobsStart::CmdJobsStart()
+{
+   setCmd("jstart");
+   setArgsCount(1);
+   setInfo("Start jobs.");
+   setHelp("jstart [mask] Start jobs which names match the mask.");
+   setMsgType( af::Msg::TJobStart);
+}
+CmdJobsStart::~CmdJobsStart(){}
+bool CmdJobsStart::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string name = argv[0];
+   af::MCGeneral mcgeneral( name, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdJobsStop::CmdJobsStop()
+{
+   setCmd("jstop");
+   setArgsCount(1);
+   setInfo("Stop jobs.");
+   setHelp("jstop [mask] Stop jobs which names match the mask.");
+   setMsgType( af::Msg::TJobStop);
+}
+CmdJobsStop::~CmdJobsStop(){}
+bool CmdJobsStop::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string name = argv[0];
+   af::MCGeneral mcgeneral( name, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdJobsRestart::CmdJobsRestart()
+{
+   setCmd("jrestart");
+   setArgsCount(1);
+   setInfo("Restart jobs.");
+   setHelp("jrestart [mask] Restart jobs which names match the mask.");
+   setMsgType( af::Msg::TJobRestart);
+}
+CmdJobsRestart::~CmdJobsRestart(){}
+bool CmdJobsRestart::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string name = argv[0];
+   af::MCGeneral mcgeneral( name, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
 CmdJob::CmdJob()
 {
    setCmd("job");
