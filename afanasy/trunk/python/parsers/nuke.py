@@ -1,7 +1,8 @@
 import parser
+import re
 
 key = 'Writing'
-   key_len = len(key)
+key_len = len(key)
 
 ErrorsRE = [re.compile(r'Invalid .* license key.')]
 
