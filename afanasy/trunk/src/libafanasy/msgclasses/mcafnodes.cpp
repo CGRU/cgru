@@ -31,12 +31,8 @@ MCAfNodes::MCAfNodes( Msg * msg )
 MCAfNodes::~MCAfNodes()
 {
    if( readonly == false) return;
-AFINFO("MCAfNodes::~MCAfNodes: deleing nodes.\n");
-   while( !list.empty() )
-   {
-      delete list.back();
-      list.pop_back();
-   }
+AFINFO("MCAfNodes::~MCAfNodes: deleing nodes.")
+   for( unsigned i = 0; i < list.size(); i++) delete list[i];
 }
 
 void MCAfNodes::readwrite( Msg * msg)
@@ -92,7 +88,7 @@ Af* MCAfNodes::newNode( Msg * msg )
          return new BlockData( msg);
 
       default:
-         AFERRAR("MCAfNodes::newNode: Unknown message type = %s:\n", Msg::TNAMES[msg->type()]);
+         AFERRAR("MCAfNodes::newNode: Unknown message type = %s", Msg::TNAMES[msg->type()])
          return NULL;
    }
 }
@@ -101,7 +97,7 @@ void MCAfNodes::addNode( Af * node)
 {
    if( readonly)
    {
-      AFERROR("MCAfNodes::addNode: this is a read only instance.\n");
+      AFERROR("MCAfNodes::addNode: this is a read only instance.")
       return;
    }
    list.push_back( node );
@@ -109,7 +105,10 @@ void MCAfNodes::addNode( Af * node)
 
 void MCAfNodes::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   if( readonly == true) for( unsigned i = 0; i < list.size(); i++) list[i]->generateInfoStream( stream, full);
-
+   if( readonly == true) for( unsigned i = 0; i < list.size(); i++)
+   {
+      list[i]->generateInfoStream( stream, full);
+      stream << std::endl;
+   }
    stream << "Quantity = " << list.size();
 }

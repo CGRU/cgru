@@ -109,6 +109,21 @@ int User::calcWeight() const
    return weight;
 }
 
+const std::string User::generateErrorsSolvingString() const
+{
+   std::ostringstream stream;
+   generateErrorsSolvingStream( stream);
+   return stream.str();
+}
+
+void User::generateErrorsSolvingStream( std::ostringstream & stream) const
+{
+   stream << "E-" << int(errors_avoidhost) << "j|"
+         << int(errors_tasksamehost) << "t|"
+         << int(errors_retries) << "r";
+   if( errors_forgivetime > 0 ) stream << " F" << af::time2strHMS( errors_forgivetime, true);
+}
+
 void User::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
@@ -121,13 +136,26 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Running Tasks Number = " << runningtasksnumber;
       if( hasHostsMask())        stream << "\n Hosts Mask = \"" << hostsmask.getPattern() << "\"";
       if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.getPattern() << "\"";
-      stream << "\n Registration time = " << time2str( time_register);
-      stream << "\n Online time = " << time2str( time_online);
+
+      stream << "\n Errors Solving: ";
+      generateErrorsSolvingStream( stream);
+      stream << "\n    Errors To Avoid Host = " << int(errors_avoidhost);
+      stream << "\n    Maximum Errors Same Task = " << int(errors_tasksamehost);
+      stream << "\n    Task Errors To Retry = " << int(errors_retries);
+      stream << "\n    Errors Forgive Time = " << af::time2strHMS( errors_forgivetime, true);
+      if( errors_forgivetime == 0 ) stream << " (infinite, no forgiving)";
+
       if( hostname.size() != 0) stream << "\n Last host = " << hostname;
-//      stream << "\n Memory = " << calcWeight() << " bytes.";
-      if( isPermanent()) stream << "\n User is permanent."; else stream << "\n (user is temporal)";
+      if( isPermanent())
+      {
+         stream << "\n User is permanent.";
+         stream << "\n Registration time = " << time2str( time_register);
+      }
+      else stream << "\n (user is temporal)";
+      stream << "\n Online time = " << time2str( time_online);
       if( annotation.size()) stream << "\n" << annotation;
       if( customdata.size()) stream << "\nCustom Data:\n" << customdata;
+      //stream << "\n Memory = " << calcWeight() << " bytes.";
    }
    else
    {

@@ -32,6 +32,9 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
+   void generateErrorsSolvingStream( std::ostringstream & stream) const;
+   const std::string generateErrorsSolvingString() const;
+
    inline bool hasHostsMask()        const { return hostsmask.notEmpty();         }
    inline bool hasHostsMaskExclude() const { return hostsmask_exclude.notEmpty(); }
 

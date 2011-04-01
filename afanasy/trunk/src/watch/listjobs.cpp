@@ -22,12 +22,19 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-int     ListJobs::SortType;
-bool    ListJobs::SortAscending;
-int     ListJobs::FilterType;
-bool    ListJobs::FilterInclude;
-bool    ListJobs::FilterMatch;
-QString ListJobs::FilterString;
+int     ListJobs::SortType       = CtrlSortFilter::TNONE;
+bool    ListJobs::SortAscending  = false;
+int     ListJobs::FilterType     = CtrlSortFilter::TNAME;
+bool    ListJobs::FilterInclude  = true;
+bool    ListJobs::FilterMatch    = false;
+QString ListJobs::FilterString   = "";
+
+int     ListJobs::SortType_SU       = CtrlSortFilter::TTIMECREATION;
+bool    ListJobs::SortAscending_SU  = false;
+int     ListJobs::FilterType_SU     = CtrlSortFilter::TUSERNAME;
+bool    ListJobs::FilterInclude_SU  = true;
+bool    ListJobs::FilterMatch_SU    = false;
+QString ListJobs::FilterString_SU = "";
 
 ListJobs::ListJobs( QWidget* parent):
    ListNodes( parent)
@@ -39,25 +46,14 @@ ListJobs::ListJobs( QWidget* parent):
    if( af::Environment::VISOR())
    {
       Watch::setUid( 0);
-
-      SortType       = CtrlSortFilter::TTIMECREATION;
-      SortAscending  = false;
-      FilterType     = CtrlSortFilter::TUSERNAME;
-      FilterInclude  = true;
-      FilterMatch    = false;
+      ctrl = new CtrlSortFilter( this, &SortType_SU, &SortAscending_SU, &FilterType_SU, &FilterInclude_SU, &FilterMatch_SU, &FilterString_SU);
    }
    else
    {
       Watch::setUid( Watch::getUid());
-
-      SortType       = CtrlSortFilter::TNONE;
-      SortAscending  = false;
-      FilterType     = CtrlSortFilter::TNAME;
-      FilterInclude  = true;
-      FilterMatch    = false;
+      ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    }
 
-   ctrl = new CtrlSortFilter( this, &SortType, &SortAscending, &FilterType, &FilterInclude, &FilterMatch, &FilterString);
    ctrl->addSortType(   CtrlSortFilter::TNONE);
    ctrl->addSortType(   CtrlSortFilter::TTIMECREATION);
    ctrl->addSortType(   CtrlSortFilter::TTIMERUN);

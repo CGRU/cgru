@@ -25,7 +25,7 @@ bool afsql::qChkErr( const QSqlQuery & q, const QString & str)
 {
    if (q.isValid())
    {
-      AFERRAR( "%s", str.toUtf8().data());
+      AFERRAR( "%s", str.toUtf8().data())
       printf( " %s", q.lastError().databaseText().toUtf8().data());
       return true;
    }

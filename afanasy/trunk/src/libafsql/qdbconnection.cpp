@@ -33,7 +33,7 @@ DBConnection::DBConnection( const std::string & connection_name):
 #ifndef MACOSX
    if( pthread_mutex_init( &mutex, NULL) != 0)
    {
-      AFERRPE("DBConnection::DBConnection: pthread_mutex_init:");
+      AFERRPE("DBConnection::DBConnection: pthread_mutex_init:")
       return;
    }
 #endif
@@ -49,7 +49,7 @@ DBConnection::~DBConnection()
 
 #ifndef MACOSX
    if( pthread_mutex_destroy( &mutex) != 0)
-      AFERRPE("DBConnection::DBConnection: pthread_mutex_destroy:");
+      AFERRPE("DBConnection::DBConnection: pthread_mutex_destroy:")
 #endif
 
    delete db;
@@ -67,7 +67,7 @@ printf("Trying to lock DB...\n");
 #else
   if( pthread_mutex_lock( &mutex) != 0)
    {
-      AFERRPE("DBConnection::DBOpen: pthread_mutex_unlock:");
+      AFERRPE("DBConnection::DBOpen: pthread_mutex_unlock:")
       return false;
    }
 #endif
@@ -77,7 +77,7 @@ printf(" - Done\n");
 #endif
    if( db->isOpen())
    {
-      AFERROR("DBConnection::DBOpen: database is already open:\n");
+      AFERROR("DBConnection::DBOpen: database is already open:")
 #ifdef MACOSX
    q_mutex.unlock();
 #else
@@ -89,7 +89,7 @@ printf(" - Done\n");
 
    if( db->open() == false )
    {
-      AFERROR("DBConnection::DBOpen: UNABLE TO OPEN DATABASE:\n");
+      AFERROR("DBConnection::DBOpen: UNABLE TO OPEN DATABASE:")
       printf( "%s\n", db->lastError().text().toUtf8().data());
 
 #ifdef MACOSX
@@ -125,7 +125,7 @@ void DBConnection::ResetUsers()
    if( working == false ) return;
    if( db->isOpen() == false )
    {
-      AFERROR("DBConnection::ResetUsers: Database connection is not open\n");
+      AFERROR("DBConnection::ResetUsers: Database connection is not open")
       return;
    }
 
@@ -139,7 +139,7 @@ void DBConnection::ResetRenders()
    if( working == false ) return;
    if( db->isOpen() == false )
    {
-      AFERROR("DBConnection::ResetRenders: Database connection is not open\n");
+      AFERROR("DBConnection::ResetRenders: Database connection is not open")
       return;
    }
 
@@ -153,7 +153,7 @@ void DBConnection::ResetJobs()
    if( working == false ) return;
    if( db->isOpen() == false )
    {
-      AFERROR("DBConnection::ResetOnline: Database connection is not open\n");
+      AFERROR("DBConnection::ResetOnline: Database connection is not open")
       return;
    }
 
@@ -178,7 +178,7 @@ void DBConnection::ResetStat()
    if( working == false ) return;
    if( db->isOpen() == false )
    {
-      AFERROR("DBConnection::ResetArchive: Database connection is not open\n")
+      AFERROR("DBConnection::ResetArchive: Database connection is not open")
       return;
    }
 
@@ -234,6 +234,7 @@ void DBConnection::addJob( DBJob * job)
 
 void DBConnection::execute( QStringList const & queries)
 {
+   if( working == false ) return;
    for( int i = 0; i < queries.size(); i++)
    {
       QSqlQuery q( queries[i], *db);

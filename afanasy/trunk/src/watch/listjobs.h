@@ -66,12 +66,22 @@ private slots:
 
 private:
    QTimer * timer;
+
+   // Sorting filtering settings ordinary user:
    static int     SortType;
    static bool    SortAscending;
    static QString FilterString;
    static int     FilterType;
    static bool    FilterInclude;
    static bool    FilterMatch;
+
+   // Sorting filtering settings for super user:
+   static int     SortType_SU;
+   static bool    SortAscending_SU;
+   static QString FilterString_SU;
+   static int     FilterType_SU;
+   static bool    FilterInclude_SU;
+   static bool    FilterMatch_SU;
 
    void calcTotals();
 };

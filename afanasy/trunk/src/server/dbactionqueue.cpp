@@ -28,6 +28,8 @@ DBActionQueue::~DBActionQueue()
 
 void DBActionQueue::processItem( AfQueueItem* item) const
 {
+   if( false == db->isOpen()) return;
+
    Queries * queries = (Queries*)item;
 
    int size = queries->size();

@@ -101,7 +101,7 @@ void DBItem::dbDelete( QStringList  * queries) const
          .arg( dbGetTableName()).arg( dbAttributes[0]->getName()).arg( dbAttributes[0]->getString());
 }
 
-void DBItem::dbUpdate( QStringList  * queries, int attr) const
+void DBItem::dbUpdate( QStringList * queries, int attr) const
 {
    QString str = QString("UPDATE %1 SET").arg( dbGetTableName());
    bool attrfounded = false;
@@ -121,14 +121,14 @@ void DBItem::dbUpdate( QStringList  * queries, int attr) const
    }
    if(( attr > 0 ) && ( false == attrfounded ))
    {
-      AFERRAR("DBItem::dbUpdate: attr=%d not founded.\n", attr);
+      AFERRAR("DBItem::dbUpdate: attr=%d not founded.", attr)
       return;
    }
    str += QString(" WHERE %1=%2").arg( dbAttributes[0]->getName()).arg( dbAttributes[0]->getString());
    for( int i = 1; i < dbGetKeysNum(); i++)
       str += QString(" AND %1=%2").arg( dbAttributes[i]->getName()).arg( dbAttributes[i]->getString());
    str += ";";
-AFINFA("DBItem::dbUpdate:\n%s\n", str.toUtf8().data());
+AFINFA("DBItem::dbUpdate:\n%s", str.toUtf8().data())
    *queries << str;
 }
 

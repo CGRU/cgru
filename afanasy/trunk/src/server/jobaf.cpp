@@ -497,8 +497,9 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
 
 void JobAf::setUserListOrder( int index, bool updateDtabase)
 {
+   int old_index = userlistorder;
    userlistorder = index;
-   if( updateDtabase) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_userlistorder);
+   if(( index != old_index ) && updateDtabase ) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_userlistorder);
 }
 
 void JobAf::checkDepends()

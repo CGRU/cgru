@@ -52,6 +52,8 @@ void DBUpdateTaskQueue::quit()
 void DBUpdateTaskQueue::processItem( AfQueueItem* item) const
 {
 //printf("DBUpdateTaskQueue::processItem:\n");
+   if( false == db->open()) return;
+
    DBTaskUpdateData * taskUp = (DBTaskUpdateData*)item;
 
    afsql::DBTaskProgress::dbBindUpdate

@@ -62,8 +62,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    if( maxrunningtasks != -1) strHCenterTop  = QString("m%1").arg( maxrunningtasks );
    if( false == hostsmask.isEmpty()       )  strHCenterTop += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" E(%1)").arg( hostsmask_exclude );
-   strHCenterTop += QString(" E-%1j|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
-   if( errors_forgivetime > 0 ) strHCenterTop += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+   strHCenterTop += QString(" %1").arg( user->generateErrorsSolvingString().c_str());
    if( jobs_lifetime      > 0 ) strHCenterTop += QString(" L%1").arg( af::time2strHMS(      jobs_lifetime, true).c_str());
 
    strRightTop = hostname;
