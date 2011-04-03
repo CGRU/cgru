@@ -52,7 +52,7 @@ void DBUpdateTaskQueue::quit()
 void DBUpdateTaskQueue::processItem( AfQueueItem* item) const
 {
 //printf("DBUpdateTaskQueue::processItem:\n");
-   if( false == db->open()) return;
+   if( false == db->isOpen()) return;
 
    DBTaskUpdateData * taskUp = (DBTaskUpdateData*)item;
 
