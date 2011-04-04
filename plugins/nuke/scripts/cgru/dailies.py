@@ -6,7 +6,7 @@ import os, sys, time
 def dailiesEvaluate( node):
 
    newNode = False
-   
+
    # Format:
    format = node.knob('format').value()
    if format == None or format == '':
@@ -278,8 +278,7 @@ def dailiesGenCmd( node):
                if stereo_images != '': stereo_images += ' '
                stereo_images += img
          images = stereo_images
-   else:
-      if node.knob('stereodub').value(): cmd += ' --stereo'
+   if node.knob('stereodub').value(): cmd += ' --stereo'
 
    cmd += ' ' + images
    cmd += ' ' + os.path.join( os.path.abspath( movfolder), movname)
