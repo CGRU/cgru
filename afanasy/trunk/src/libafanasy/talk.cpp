@@ -39,7 +39,19 @@ void Talk::readwrite( Msg * msg)
 
 void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << name << "[" << id << "]";
-   stream << " (" << version << " r" << revision << ") ";
-   address.generateInfoStream( stream, full);
+   if( full )
+   {
+      stream << name << " (id=" << getId() << "):";
+      stream << "\n Launched At: " << af::time2str( time_launch);
+      stream << "\n Registered At: " << af::time2str( time_register);
+      stream << "\n Version: " << version;
+      stream << "\n Build Revision: " << revision;
+      stream << "\n Last Update At: " << af::time2str( time_update);
+   }
+   else
+   {
+      stream << name << "[" << id << "]";
+      stream << " (" << version << " r" << revision << ") ";
+      address.generateInfoStream( stream, full);
+   }
 }

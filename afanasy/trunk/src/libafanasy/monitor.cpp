@@ -79,20 +79,35 @@ bool Monitor::hasEvent( int type) const
 
 void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << name << "[" << id << "]";
-   stream << " (" << version << " r" << revision << ") ";
-   address.generateInfoStream( stream);
+   if( full )
+   {
+      stream << "Monitor name = \"" << name << "\" (id=" << getId() << ")";
+      stream << "\n Version: " << version;
+      stream << "\n Build Revision: " << revision;
+      stream << "\n Launch Time: " + af::time2str( time_launch);
+      stream << "\n Register Time: " + af::time2str( time_register);
+      stream << "\n Time Activity: " + af::time2str( time_activity);
 
-   if( full == false ) return;
+      stream << "\n UIds[" << jobsUsersIds.size() << "]:";
+      for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
+         stream << " " << *it;
+      stream << "\n JIds[" << jobsIds.size() << "]:";
+      for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
+         stream << " " << *it;
 
-   stream << std::endl;
-   stream << " UIds[" << jobsUsersIds.size() << "]:";
-   for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)
-      stream << " " << *it;
-   stream << "; JIds[" << jobsIds.size() << "]:";
-   for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
-      stream << " " << *it;
-   stream << std::endl;
-   for( int e = 0; e < EventsCount; e++)
-      stream << "\t" << (events[e] ? Msg::TNAMES[e+EventsShift] : "-") << "\n";
+      stream << "\n System Events:";
+      for( int e = 0; e < af::Monitor::EventsCount; e++)
+      {
+         int etype = e + af::Monitor::EventsShift;
+         stream << "\n    " << af::Msg::TNAMES[etype] << " : ";
+         if( hasEvent(etype)) stream << " SUBMITTED";
+         else stream << "   ---";
+      }
+   }
+   else
+   {
+      stream << name << "[" << id << "]";
+      stream << " (" << version << " r" << revision << ") ";
+      address.generateInfoStream( stream);
+   }
 }

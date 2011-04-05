@@ -189,8 +189,7 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
       return;
    }
 
-//   const char TIME_FORMAT[] = "%a %e %b %H:%M.%S";
-//   QString timeformat("ddd hh:mm.ss");
+   if( description.size()) stream << "\n    " << description;
 
    stream << "\n Time created  = " << af::time2str( time_creation);
 
@@ -201,7 +200,7 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 
    if( lifetime > 0 ) stream << "\n Life Time " << lifetime << " seconds";
 
-   if( hostname.size()) stream << "\n Creation host = " << hostname;
+   if( hostname.size()) stream << "\n Creation host = \"" << hostname << "\"";
    stream << "\n Priority = " << int(priority);
    stream << "\n Maximum running tasks = " << maxrunningtasks;
    if( maxrunningtasks == -1 ) stream << " (no limit)";
@@ -215,8 +214,15 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    if( need_properties.notEmpty()) stream << "\n Needed properties: \"" << need_properties.getPattern() << "\"";
    if( cmd_pre.size()) stream << "\n Pre command:\n" << cmd_pre;
    if( cmd_post.size()) stream << "\n Post command:\n" << cmd_post;
-   if( description.size()) stream << "\n " << description;
-/*
+
+   if( blocksdata != NULL)
+      for( int b = 0; b < blocksnum; b++)
+      {
+         stream << std::endl;
+         blocksdata[b]->generateInfoStream( stream, false);
+      }
+   /*
+
    if( blocksdata != NULL)
    {
       if( isStarted())
@@ -238,5 +244,4 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
       }
    }
 */
-//   stream << "\n Memory: " << calcWeight() << " bytes.";
 }

@@ -555,25 +555,30 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    if(     need_memory         ) stream << "\n Need Memory        =  "  << need_memory;
    if(     need_hdd            ) stream << "\n Need HDD           =  "  << need_hdd;
 
-   if( isNumeric())
-      stream << "\n numeric: start = " << frame_first << ", end = " << frame_last << ", perTask = " << frame_pertask << ", increment = " << frame_inc << ".";
-   else if( tasksdata == NULL ) return;
-   // Not numeric block not filled with tasks will exit here
-
    if( full )
    {
-      for( int t = 0; t < tasksnum; t++)
+      if( isNumeric())
       {
-         stream << std::endl;
-         stream << "#" << t << ":";
-         TaskExec * task = genTask(t);
-         stream << " [" << task->getName() << "] ";
-         stream << "'" << task->getCommand() << "'";
-         if( task->hasFiles()) stream << " (" << task->getFiles() << ")";
-         delete task;
+         stream << "\n numeric: start = " << frame_first
+               << ", end = " << frame_last
+               << ", perTask = " << frame_pertask
+               << ", increment = " << frame_inc << ".";
       }
+      else if( tasksdata != NULL )
+      {
+         for( int t = 0; t < tasksnum; t++)
+         {
+            stream << std::endl;
+            stream << "#" << t << ":";
+            TaskExec * task = genTask(t);
+            stream << " [" << task->getName() << "] ";
+            stream << "'" << task->getCommand() << "'";
+            if( task->hasFiles()) stream << " (" << task->getFiles() << ")";
+            delete task;
+         }
+      }
+      stream << " memory: " << calcWeight() << " bytes.";
    }
-   stream << "\n Memory: " << calcWeight() << " bytes.";
 }
 
 

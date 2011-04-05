@@ -130,9 +130,11 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
    {
       stream << "User name = \"" << name << "\" (id=" << id << "):";
       stream << "\n Priority = " << int(priority);
+      stream << "\n    Each point gives 10% bonus";
       stream << "\n Jobs = " << numjobs << " / active jobs = " << numrunningjobs;
       if( jobs_lifetime > 0 ) stream << "\n Jobs life time = " << af::time2strHMS( jobs_lifetime, true);
-      stream << "\n Maximum Running Tasks Number = " << maxrunningtasks;
+      stream << "\n Maximum Running Tasks = " << maxrunningtasks;
+      if( maxrunningtasks < 1 ) stream << " (no limit)";
       stream << "\n Running Tasks Number = " << runningtasksnumber;
       if( hasHostsMask())        stream << "\n Hosts Mask = \"" << hostsmask.getPattern() << "\"";
       if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.getPattern() << "\"";
@@ -145,14 +147,17 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n    Errors Forgive Time = " << af::time2strHMS( errors_forgivetime, true);
       if( errors_forgivetime == 0 ) stream << " (infinite, no forgiving)";
 
-      if( hostname.size() != 0) stream << "\n Last host = " << hostname;
+      if( hostname.size() != 0) stream << "\n Last host = \"" << hostname << "\"";
       if( isPermanent())
       {
-         stream << "\n User is permanent.";
+         stream << "\n User is permanent (stored in database)";
          stream << "\n Registration time = " << time2str( time_register);
       }
       else stream << "\n (user is temporal)";
       stream << "\n Online time = " << time2str( time_online);
+      stream << "\n Need hosts order = " << need;
+      if( isSolved()) stream << " (solved)";
+      stream << "\n    need = pow(1.1, Priority) / (RunTasks + 1)";
       if( annotation.size()) stream << "\n" << annotation;
       if( customdata.size()) stream << "\nCustom Data:\n" << customdata;
       //stream << "\n Memory = " << calcWeight() << " bytes.";

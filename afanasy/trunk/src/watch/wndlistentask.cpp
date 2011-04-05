@@ -38,7 +38,7 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    setWindowTitle( taskname);
    taskname += " %1:";
 
-   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, Watch::getClientAddress(), jobid, block, task);
+   af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK | af::MCListenAddress::TOLISTEN, Watch::getClientAddress(), jobid, block, task);
    Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
 }
 

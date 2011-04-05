@@ -15,12 +15,9 @@
 const QString EventsName     = "Events[%1]:";
 const QString UsersIdsName   = "UsersIds[%1]:";
 const QString JobsIdsName    = "JobsIds[%1]:";
-const QString TimeLaunch     = "L: %1 - time launched";
-const QString TimeL          = "L: %1";
-const QString TimeRegister   = "R: %1 - time registered";
-const QString TimeR          = "R: %1";
-const QString TimeActivity   = "A: %1 - time last activity";
-const QString TimeA          = "A: %1";
+const QString TimeLaunch     = "L: %1";
+const QString TimeRegister   = "R: %1";
+const QString TimeActivity   = "A: %1";
 const QString Address        = "IP=%1";
 
 ItemMonitor::ItemMonitor( af::Monitor *monitor):
@@ -29,20 +26,10 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_launch    = monitor->getTimeLaunch();
    time_register  = monitor->getTimeRegister();
 
-   timelaunch   = TimeLaunch     .arg( afqt::time2Qstr( time_launch  ));
-   timel        = TimeL          .arg( afqt::time2Qstr( time_launch  ));
-   timeregister = TimeRegister   .arg( afqt::time2Qstr( time_register));
-   timer        = TimeR          .arg( afqt::time2Qstr( time_register));
+   time_launch_str   = TimeLaunch     .arg( afqt::time2Qstr( time_launch  ));
+   time_register_str = TimeRegister   .arg( afqt::time2Qstr( time_register));
 
    address = Address.arg( monitor->getAddress().generateIPString().c_str());
-
-   tip = name;
-   tip += QString("\nVersion: %1").arg( afqt::stoq( monitor->getVersion()));
-   tip += QString("\nBuild Revision: %1").arg( monitor->getRevision());
-   tip += "\n   " + timelaunch;
-   tip += "\n   " + timeregister;
-   tip += "\n   " + TimeActivity;
-   tip += "\nSystem Events:";
 
    updateValues( monitor, 0);
 }
@@ -56,7 +43,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
    af::Monitor *monitor = (af::Monitor*)node;
 
    time_activity = monitor->getTimeActivity();
-   timea = TimeA.arg( afqt::time2Qstr( time_activity ));
+   time_activity_str = TimeActivity.arg( afqt::time2Qstr( time_activity ));
 
    events.clear();
    eventscount = 0;
@@ -94,14 +81,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
       jobsids += QString(" %1").arg( *it);
    jobsidstitle = JobsIdsName.arg( jobsidscount);
 
-   tooltip = tip.arg( afqt::time2Qstr( time_activity));
-   for( int e = 0; e < af::Monitor::EventsCount; e++)
-   {
-      int etype = e + af::Monitor::EventsShift;
-      tooltip += QString("\n   %1: ").arg(af::Msg::TNAMES[etype]);
-      if( monitor->hasEvent(etype)) tooltip += " SUBMITTED";
-      else tooltip += "   ---";
-   }
+   tooltip = QString::fromUtf8( monitor->generateInfoString( true).c_str());
 }
 
 void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) const
@@ -128,9 +108,9 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    painter->setPen(   clrTextInfo( option) );
    painter->setFont(  afqt::QEnvironment::f_info);
    int i = y; int dy = 15;
-   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, timel );
-   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, timer );
-   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, timea );
+   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_launch_str );
+   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_register_str );
+   painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_activity_str );
 
    painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address );
 

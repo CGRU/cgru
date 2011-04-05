@@ -26,9 +26,9 @@ private:
    unsigned time_register;
    unsigned time_activity;
 
-   QString timelaunch,   timel;
-   QString timeregister, timer;
-   QString timeactivity, timea;
+   QString time_launch_str;
+   QString time_register_str;
+   QString time_activity_str;
 
    QString address;
 
@@ -43,6 +43,4 @@ private:
    QString jobsidstitle;
    QString jobsids;
    int jobsidscount;
-
-   QString tip;
 };

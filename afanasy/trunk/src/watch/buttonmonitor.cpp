@@ -28,18 +28,22 @@ ButtonMonitor::ButtonMonitor( int wType, QWidget *parent):
 {
    if((wType <= Watch::WNONE) || (wType >= Watch::WLAST))
    {
-      AFERRAR("ButtonMonitor::ButtonMonitor: Invalid type = %d\n", wType);
+      AFERRAR("ButtonMonitor::ButtonMonitor: Invalid type = %d", wType)
       return;
    }
    type = wType;
    if( Buttons[type] != NULL )
    {
-      AFERRAR("ButtonMonitor::ButtonMonitor: Type = %d, already exists.\n", wType);
+      AFERRAR("ButtonMonitor::ButtonMonitor: Type = %d, already exists.", wType)
       return;
    }
    Buttons[type] = this;
 
    createImage();
+
+   QString tooltip = QString("Show %1 list.").arg(Watch::WndName[wType]);
+   if( wType != Watch::WJobs ) tooltip += "\nUse RMP to open new window.";
+   setToolTip(tooltip);
 }
 
 void ButtonMonitor::createImage()
@@ -71,25 +75,25 @@ void ButtonMonitor::createImage()
    QString filename = img_filename + img_extension;
    if( img.load( filename) == false)
    {
-      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.\n", filename.toUtf8().data());
+      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.", filename.toUtf8().data())
       useimages = false;
    }
    filename = img_filename + "_h" + img_extension;
    if( img_h.load( filename) == false)
    {
-      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.\n", filename.toUtf8().data());
+      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.", filename.toUtf8().data())
       useimages = false;
    }
    filename = img_filename + "_p" + img_extension;
    if( img_p.load( filename) == false)
    {
-      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.\n", filename.toUtf8().data());
+      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.", filename.toUtf8().data())
       useimages = false;
    }
    filename = img_filename + "_t" + img_extension;
    if( img_t.load( filename) == false)
    {
-      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.\n", filename.toUtf8().data());
+      AFINFA("ButtonMonitor::ButtonMonitor: Unable to load '%s' image.", filename.toUtf8().data())
       useimages = false;
    }
 
@@ -203,7 +207,7 @@ void ButtonMonitor::pushButton( int wType)
 {
    if( Buttons[ wType] == NULL)
    {
-      AFERRAR("ButtonMonitor::pushButton: Buttons[%s] is NULL.\n", Watch::BtnName[wType].toUtf8().data());
+      AFERRAR("ButtonMonitor::pushButton: Buttons[%s] is NULL.", Watch::BtnName[wType].toUtf8().data())
       return;
    }
    Buttons[wType]->openMonitor( false);
