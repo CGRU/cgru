@@ -14,7 +14,7 @@
 
 ItemTalk::ItemTalk( af::Talk *talk):
    ItemNode( (af::Talk*)talk),
-   username( QString::fromUtf8( talk->getUserName().c_str()))
+   username( afqt::stoq( talk->getUserName()))
 {
    updateValues( talk, 0);
    height = 20;
@@ -27,7 +27,7 @@ ItemTalk::~ItemTalk()
 void ItemTalk::updateValues( af::Node *node, int type)
 {
    af::Talk * talk = (af::Talk*)node;
-   tooltip = QString::fromUtf8( talk->generateInfoString( true).c_str());
+   tooltip = afqt::stoq( talk->generateInfoString( true));
 }
 
 void ItemTalk::paint( QPainter *painter, const QStyleOptionViewItem &option) const

@@ -81,7 +81,7 @@ void ItemMonitor::updateValues( af::Node *node, int type)
       jobsids += QString(" %1").arg( *it);
    jobsidstitle = JobsIdsName.arg( jobsidscount);
 
-   tooltip = QString::fromUtf8( monitor->generateInfoString( true).c_str());
+   tooltip = afqt::stoq( monitor->generateInfoString( true));
 }
 
 void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) const

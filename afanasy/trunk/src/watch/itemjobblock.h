@@ -79,10 +79,11 @@ public:
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-private:
+/*private:
+now BlockData::generateInfoStream
    void generateToolTip();
    void updateToolTip();
-
+*/
 private:
    static const int HeightHeader;
    static const int HeightFooter;

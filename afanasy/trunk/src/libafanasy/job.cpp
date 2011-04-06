@@ -215,10 +215,10 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    if( cmd_pre.size()) stream << "\n Pre command:\n" << cmd_pre;
    if( cmd_post.size()) stream << "\n Post command:\n" << cmd_post;
 
-   if( blocksdata != NULL)
+   if(( blocksnum <=3 ) && ( blocksdata != NULL ))
       for( int b = 0; b < blocksnum; b++)
       {
-         stream << std::endl;
+         stream << std::endl << std::endl;
          blocksdata[b]->generateInfoStream( stream, false);
       }
    /*

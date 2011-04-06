@@ -64,7 +64,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       tasksname         = afqt::stoq( block->getTasksName());
       parser            = afqt::stoq( block->getParser());
 
-      generateToolTip();
+//      generateToolTip();
 
    case af::Msg::TBlocksProgress:
 
@@ -87,14 +87,15 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       description += QString(" (str:%1fpt)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
-   updateToolTip();
+   tooltip = afqt::stoq( block->generateInfoString());
+//   updateToolTip();
 }
 
 ItemJobBlock::~ItemJobBlock()
 {
 //printf("ItemJobBlock::~ItemJobBlock:\n");
 }
-
+/* now BlockData::generateInfoStream
 void ItemJobBlock::generateToolTip()
 {
    blockToolTip.clear();
@@ -121,7 +122,7 @@ void ItemJobBlock::updateToolTip()
    tooltip = info.generateToolTip();
    tooltip += "\n\n" + blockToolTip;
 }
-
+*/
 void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
    drawBack( painter, option);

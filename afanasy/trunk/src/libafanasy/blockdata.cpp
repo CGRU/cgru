@@ -133,6 +133,7 @@ void BlockData::readwrite( Msg * msg)
    case Msg::TJob:
    case Msg::TJobRegister:
    case Msg::TBlocks:
+// TODO: (VESRION) this integer parameters should be in Msg::TJobsList
       rw_int32_t ( frame_first,           msg);
       rw_int32_t ( frame_last,            msg);
       rw_int32_t ( frame_pertask,         msg);
@@ -537,23 +538,52 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
       if( parser.size()) stream << "-" << parser << "[" << parsercoeff << "]";
       stream << ")";
    }
-   stream << " " << tasksnum << " tasks.";
+   stream << " " << tasksnum << " tasks, " << " capacity = " << capacity;
 
-   if(           command.size()) stream << "\n Command            = \"" << command                             << "\"";
-   if(              wdir.size()) stream << "\n Working Directory  = \"" << wdir                                << "\"";
-   if(             files.size()) stream << "\n Files              = \"" << files                               << "\"";
-   if(        dependmask.notEmpty()) stream << "\n Depend Mask        = \"" << dependmask.getPattern()         << "\"";
-   if(   tasksdependmask.notEmpty()) stream << "\n Tasks Depend Mask  = \"" << tasksdependmask.getPattern()    << "\"";
-   if(         hostsmask.notEmpty()) stream << "\n Hosts Mask         = \"" << hostsmask.getPattern()          << "\"";
-   if( hostsmask_exclude.notEmpty()) stream << "\n Hosts Mask Exclude = \"" << hostsmask_exclude.getPattern()  << "\"";
-   if(       environment.size()) stream << "\n Environment        = \"" << environment                         << "\"";
-   if(           cmd_pre.size()) stream << "\n Pre Command        = \"" << cmd_pre                             << "\"";
-   if(          cmd_post.size()) stream << "\n Post Command       = \"" << cmd_post                            << "\"";
-   if(        customdata.size()) stream << "\n Custom Data        = \"" << customdata                          << "\"";
-   if(   need_properties.notEmpty()) stream << "\n Need Properties    = \"" << need_properties.getPattern()    << "\"";
-   if(     need_power          ) stream << "\n Need Power         =  "  << need_power;
-   if(     need_memory         ) stream << "\n Need Memory        =  "  << need_memory;
-   if(     need_hdd            ) stream << "\n Need HDD           =  "  << need_hdd;
+   if( p_tasksdone ) stream << "\n Run Time: Sum = " << af::time2strHMS( p_taskssumruntime, true)
+         << " / Average = " << af::time2strHMS( p_taskssumruntime/p_tasksdone, true);
+
+   if( maxrunningtasks     != -1 ) stream << "\n Maximum running tasks = " << maxrunningtasks;
+   if( errors_avoidhost    != -1 ) stream << "\n Errors for block avoid host = " << int(errors_avoidhost);
+   if( errors_tasksamehost != -1 ) stream << "\n Errors for task avoid host = " << int( errors_tasksamehost);
+   if( errors_retries      != -1 ) stream << "\n Error task retries = " << int( errors_retries);
+   if( errors_forgivetime  != -1 )
+   {
+      stream << "\n Errors forgive time = " << double(tasksmaxruntime)/3600.0 << " hours";
+      if( errors_forgivetime == 0) stream << " (infinite)";
+   }
+
+   if( tasksmaxruntime ) stream << "\n Tasks max run time = " << double(tasksmaxruntime)/3600 << " hours";
+   if( p_errorhostsnum ) stream << "\n Error hosts count = " << p_errorhostsnum;
+   if( p_avoidhostsnum ) stream << "\n Avoid hosts count = " << p_avoidhostsnum;
+
+/* TODO: (VESRION) no info for Msg::TJobsList
+   if( canVarCapacity()) stream << "\n Variable Capacity: coefficient = " << capcoeff_min << "-" << capcoeff_max;
+   if( isMultiHost())
+   {
+      stream << "\n MultiHost Tasks: min " << int( multihost_min) << " - " << int( multihost_max) << " - max";
+      if( multihost_waitmax         ) stream << "\n    " << int(multihost_waitmax) << " seconds wainting for maximum.";
+      if( multihost_waitsrv         ) stream << "\n    " << int(multihost_waitsrv) << " seconds wainting for service start.";
+      if( canMasterRunOnSlaveHost() ) stream << "\n    Master and slave are the same host.";
+   }
+*/
+   if(           command.size()     ) stream << "\n Command:\n"               << command;
+   if(              wdir.size()     ) stream << "\n Working Directory:\n"     << wdir;
+   if(        dependmask.notEmpty() ) stream << "\n Depend Mask = \""         << dependmask.getPattern()         << "\"";
+   if(   tasksdependmask.notEmpty() ) stream << "\n Tasks Depend Mask = \""   << tasksdependmask.getPattern()    << "\"";
+   if(         hostsmask.notEmpty() ) stream << "\n Hosts Mask = \""          << hostsmask.getPattern()          << "\"";
+   if( hostsmask_exclude.notEmpty() ) stream << "\n Exclude Hosts Mask = \""  << hostsmask_exclude.getPattern()  << "\"";
+   if(   need_properties.notEmpty() ) stream << "\n Need Properties = \""     << need_properties.getPattern()    << "\"";
+   if(   need_power                 ) stream << "\n Need Power = "            << need_power;
+   if(   need_memory                ) stream << "\n Need Memory = "           << need_memory;
+   if(   need_hdd                   ) stream << "\n Need HDD = "              << need_hdd;
+   if(       environment.size()     ) stream << "\n Environment:\n"           << environment;
+   if(           cmd_pre.size()     ) stream << "\n Pre Command:\n"           << cmd_pre;
+   if(          cmd_post.size()     ) stream << "\n Post Command:\n"          << cmd_post;
+   if(        customdata.size()     ) stream << "\n Custom Data:\n"           << customdata;
+   if(             files.size()     ) stream << "\n Files:\n"                 << files;//.replace( files.begin(), files.end(), ";", "\n");
+
+   if((filesize_min != -1) || (filesize_max != -1)) stream << "\n File Check: " << filesize_min << "-" << filesize_max;
 
    if( full )
    {

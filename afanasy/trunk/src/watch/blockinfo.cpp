@@ -359,7 +359,7 @@ void BlockInfo::drawProgress(
       }
    }
 }
-
+/* using BlockData::generateInfoStream now
 const QString BlockInfo::generateToolTip() const
 {
    QString toolTip = QString("Run Time: Sum = %1 / %2 = Average")
@@ -431,7 +431,7 @@ const QString BlockInfo::generateToolTip() const
 
    return toolTip;
 }
-
+*/
 void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 {
    ActionIdId *action;
