@@ -549,7 +549,7 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    if( errors_retries      != -1 ) stream << "\n Error task retries = " << int( errors_retries);
    if( errors_forgivetime  != -1 )
    {
-      stream << "\n Errors forgive time = " << double(tasksmaxruntime)/3600.0 << " hours";
+      stream << "\n Errors forgive time = " << double(errors_forgivetime)/3600.0 << " hours";
       if( errors_forgivetime == 0) stream << " (infinite)";
    }
 
