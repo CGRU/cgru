@@ -1,10 +1,8 @@
 #include "cmd_user.h"
 
-#include <QtCore/QRegExp>
-#include <QtCore/QString>
-
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
+#include "../libafanasy/regexp.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -138,12 +136,7 @@ bool CmdUserHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    std::string mask = argv[1];
-   QRegExp rx( QString::fromUtf8( mask.c_str()), Qt::CaseInsensitive);
-   if( rx.isValid() == false )
-   {
-      printf("QRegExp: %s\n", rx.errorString().toUtf8().data());
-      return false;
-   }
+   if( af::RegExp::Validate( mask) == false ) return false;
    af::MCGeneral mcgeneral( name, mask);
    msg.set( getMsgType(), &mcgeneral);
    return true;

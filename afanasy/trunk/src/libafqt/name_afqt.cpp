@@ -169,7 +169,8 @@ int afqt::readdata( QTcpSocket * qSocket, char* data, int len_min, int len_max)
 
 const QString afqt::stoq( const std::string & str)
 {
-   return QString::fromUtf8( str.c_str());
+//   return QString::fromUtf8( str.c_str());
+   return QString::fromUtf8( str.data(), str.size());
 }
 
 const QString afqt::dtoq( const char * data, int size)

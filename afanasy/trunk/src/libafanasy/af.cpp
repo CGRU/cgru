@@ -184,28 +184,7 @@ void Af::rw_float( float &floating, Msg * msg)
 {
    rw_data( (char *)(&floating), msg, sizeof(float) );
 }
-/*
-void Af::rw_QString(  QString& qString, Msg * msg)
-{
-   uint32_t length;
 
-   if( msg->isWriting())
-   {
-      QByteArray qbytearray = qString.toUtf8();
-      length = qbytearray.length() + 1;
-      rw_uint32_t( length, msg);
-      rw_data( qbytearray.data(), msg, length);
-   }
-   else
-   {
-      rw_uint32_t( length, msg);
-      char * buffer = msg->writtenBuffer( length);
-      if( buffer == NULL ) return;
-      qString = QString::fromUtf8( buffer);
-   }
-//printf("Af::rw_QString: qString = \"%s\"\n", qString.toUtf8().data());
-}
-*/
 void Af::w_String( const std::string & string, Msg * msg)
 {
    if( false == msg->isWriting())
@@ -254,46 +233,7 @@ void Af::rw_RegExp( RegExp & regExp, Msg * msg)
       regExp.setPattern( pattern);
    }
 }
-/*
-void Af::rw_QRegExp( QRegExp &qRegExp, Msg * msg)
-{
-   if( msg->isWriting())
-   {
-      QString pattern = qRegExp.pattern();
-      rw_QString( pattern, msg);
-   }
-   else
-   {
-      QString pattern;
-      rw_QString( pattern, msg);
-      QRegExp rx;
-      rx.setPattern( pattern);
-      if( rx.isValid() == false )
-      {
-         AFERRAR("Af::rw_QRegExp: Invalid mask: %s\n", rx.errorString().toUtf8().data());
-         return;
-      }
-      qRegExp.setPattern( pattern);
-   }
-}
 
-void Af::rw_QStringList( QStringList& qStringList, Msg * msg)
-{
-   uint32_t length;
-   if( msg->isWriting() ) length = qStringList.size();
-   rw_uint32_t( length, msg);
-   for( unsigned s = 0; s < length; s++)
-   {
-      if( msg->isWriting() ) rw_QString( qStringList[s], msg);
-      else
-      {
-         QString qstr;
-         rw_QString( qstr, msg);
-         qStringList << qstr;
-      }
-   }
-}
-*/
 void Af::rw_StringVect( std::vector<std::string> & stringVect, Msg * msg)
 {
    uint32_t length;

@@ -2,11 +2,10 @@
 
 #include <stdio.h>
 
-#include <QtCore/QString>
-#include <QtCore/QRegExp>
-
 #include "../libafanasy/msgclasses/mcafnodes.h"
+#include "../libafanasy/regexp.h"
 
+#include "afcommon.h"
 #include "aflist.h"
 #include "afcontainerit.h"
 
@@ -40,7 +39,7 @@ AfContainer::AfContainer( int maximumsize):
 
 AfContainer::~AfContainer()
 {
-AFINFO("AfContainer::~AfContainer:\n");
+AFINFO("AfContainer::~AfContainer:")
 //   pthread_rwlock_trywrlock( &rwlock);
    size = 0;
    while( first_ptr != NULL)
@@ -57,12 +56,12 @@ int AfContainer::add( af::Node *node)
 {
    if( node == NULL )
    {
-      AFERROR("AfContainer::add: node == NULL.\n");
+      AFERROR("AfContainer::add: node == NULL.")
       return 0;
    }
    if( count >= size-1)
    {
-      AFERRAR("AfContainer::add: maximum number of nodes = %d reached.\n", count);
+      AFERRAR("AfContainer::add: maximum number of nodes = %d reached.", count)
       return 0;
    }
 
@@ -73,7 +72,7 @@ int AfContainer::add( af::Node *node)
    {
       if( nodesTable[newId] != NULL )
       {
-         AFERRAR("AfContainer::add: node->id = %d already exists.\n", newId);
+         AFERRAR("AfContainer::add: node->id = %d already exists.", newId)
       }
       else
       {
@@ -168,8 +167,8 @@ int AfContainer::add( af::Node *node)
    }
 
    if( !founded )
-      AFERROR("AfContainer::add: nodes table full.\n");
-   AFINFA("AfContainer::add: new id = %u, count = %u \n", node->id, count);
+      AFERROR("AfContainer::add: nodes table full.")
+   AFINFA("AfContainer::add: new id = %u, count = %u", node->id, count)
    return newId;
 }
 
@@ -204,7 +203,7 @@ MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
       int pos = mcgeneral.getId(i);
       if( pos >= size)
       {
-         AFERRAR("AfContainer::generateList: position >= size (%d>=%d)\n", pos, size);
+         AFCommon::QueueLogError("AfContainer::generateList: position >= size");
          continue;
       }
       af::Node * node = nodesTable[ pos];
@@ -214,11 +213,12 @@ MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
    }
    if(( getcount == 0) && (false == mcgeneral.getName().empty()))
    {
-      QRegExp rx( QString::fromUtf8( mcgeneral.getName().c_str()));
-      if( false == rx.isValid())
+      std::string errMsg;
+      af::RegExp rx;
+      rx.setPattern( mcgeneral.getName(), &errMsg);
+      if( rx.empty())
       {
-         AFERRAR("Name pattern \"%s\" is invalid:\n", mcgeneral.getName().c_str());
-         printf("%s\n", rx.errorString().toUtf8().data());
+         AFCommon::QueueLogError( std::string("AfContainer::generateList: ") + errMsg);
       }
       else
       {
@@ -227,14 +227,14 @@ MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
          {
             if( node == NULL   ) continue;
             if( node -> zombie ) continue;
-            if( rx.exactMatch( QString::fromUtf8( node->name.c_str())))
+            if( rx.match( node->name))
             {
                mcNodes.addNode( node);
                if( false == namefounded) namefounded = true;
             }
          }
          if( namefounded == false )
-         AFERRAR("AfContainer::generateList: No node matches \"%s\" founded.\n", mcgeneral.getName().c_str());
+            AFCommon::QueueLog(std::string("AfContainer::generateList: No node matches \"") + mcgeneral.getName() + ("\" founded."));
       }
    }
    return new MsgAf( type, &mcNodes);
@@ -244,23 +244,23 @@ bool AfContainer::setZombie( int id)
 {
    if( id < 1 )
    {
-      AFERRAR("AfContainer::setZombie: invalid id = %d\n", id);
+      AFERRAR("AfContainer::setZombie: invalid id = %d", id)
       return false;
    }
    if( id >= size )
    {
-      AFERRAR("AfContainer::setZombie: Too big id = %d < %d = maximum.\n", id, size);
+      AFERRAR("AfContainer::setZombie: Too big id = %d < %d = maximum.", id, size)
       return false;
    }
    af::Node * node = nodesTable[ id];
    if( node == NULL )
    {
-      AFERRAR("AfContainer::setZombie: No node with id=%d.\n", id);
+      AFERRAR("AfContainer::setZombie: No node with id=%d.", id)
       return false;
    }
    if( node->isZombie())
    {
-      AFERRAR("AfContainer::setZombie: Node with id=%d already a zombie.\n", id);
+      AFERRAR("AfContainer::setZombie: Node with id=%d already a zombie.", id)
       return false;
    }
    node->setZombie();
@@ -312,16 +312,17 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
 
    if( getcount < 1 )
    {
-      QRegExp rx( QString::fromUtf8( name.c_str()));
-      if( false == rx.isValid())
+      std::string errMsg;
+      af::RegExp rx;
+      rx.setPattern( name, &errMsg);
+      if( rx.empty())
       {
-         AFERRAR("Name pattern \"%s\" is invalid:\n", name.c_str())
-         printf("%s\n", rx.errorString().toUtf8().data());
+         AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + name + ("\" is invalid: ") + errMsg);
          return;
       }
       for( af::Node *node = first_ptr; node != NULL; node = node->next_ptr )
       {
-         if( rx.exactMatch( QString::fromUtf8( node->name.c_str())))
+         if( rx.match( node->name))
          {
             action( node, mcgeneral, type, pointer, monitoring);
             if( false == namefounded) namefounded = true;
@@ -335,7 +336,7 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
          int pos = mcgeneral.getId( i);
          if( pos >= size)
          {
-            AFERRAR("AfContainer::action: position >= size (%d>=%d)\n", pos, size);
+            AFERRAR("AfContainer::action: position >= size (%d>=%d)", pos, size)
             continue;
          }
          af::Node *node = nodesTable[ pos];
@@ -353,7 +354,7 @@ void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int 
    if( node->isLocked()) return;
    if( node->action( mcgeneral, type, pointer, monitoring) == false )
    {
-      AFERRAR("AfContainer::action: Error: [%s]:\n", af::Msg::TNAMES[type]);
+      AFERRAR("AfContainer::action: Error: [%s]:", af::Msg::TNAMES[type])
       mcgeneral.stdOut( true );
       return;
    }

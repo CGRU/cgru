@@ -1,8 +1,5 @@
 #include "cmd_job.h"
 
-#include <QtCore/QRegExp>
-#include <QtCore/QString>
-
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -106,12 +103,7 @@ bool CmdJobHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    std::string mask = argv[1];
-   QRegExp rx( QString::fromUtf8( mask.c_str()), Qt::CaseInsensitive);
-   if( rx.isValid() == false )
-   {
-      printf("QRegExp: %s\n", rx.errorString().toUtf8().data());
-      return false;
-   }
+//   if( af::RegExp::Validate( mask) == false ) return false;
    af::MCGeneral mcgeneral( name, mask);
    msg.set( getMsgType(), &mcgeneral);
    return true;
@@ -191,8 +183,9 @@ CmdJobsDelete::CmdJobsDelete()
 CmdJobsDelete::~CmdJobsDelete(){}
 bool CmdJobsDelete::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   std::string name = argv[0];
-   af::MCGeneral mcgeneral( name, 0);
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
@@ -208,8 +201,9 @@ CmdJobsPause::CmdJobsPause()
 CmdJobsPause::~CmdJobsPause(){}
 bool CmdJobsPause::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   std::string name = argv[0];
-   af::MCGeneral mcgeneral( name, 0);
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
@@ -225,8 +219,9 @@ CmdJobsStart::CmdJobsStart()
 CmdJobsStart::~CmdJobsStart(){}
 bool CmdJobsStart::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   std::string name = argv[0];
-   af::MCGeneral mcgeneral( name, 0);
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
@@ -242,8 +237,9 @@ CmdJobsStop::CmdJobsStop()
 CmdJobsStop::~CmdJobsStop(){}
 bool CmdJobsStop::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   std::string name = argv[0];
-   af::MCGeneral mcgeneral( name, 0);
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
@@ -259,8 +255,9 @@ CmdJobsRestart::CmdJobsRestart()
 CmdJobsRestart::~CmdJobsRestart(){}
 bool CmdJobsRestart::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   std::string name = argv[0];
-   af::MCGeneral mcgeneral( name, 0);
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
