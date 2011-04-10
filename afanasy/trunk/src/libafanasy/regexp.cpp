@@ -21,7 +21,9 @@ RegExp::RegExp():
 
 RegExp::~RegExp()
 {
+#ifndef WINNT
    if( false == pattern.empty()) regfree( &regexp);
+#endif
 }
 
 bool RegExp::setPattern( const std::string & str, std::string * strError)
