@@ -1,5 +1,8 @@
 #include "cmd_job.h"
 
+#include <iostream>
+#include <stdio.h>
+
 #include "../libafanasy/job.h"
 #include "../libafanasy/jobprogress.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -7,6 +10,8 @@
 #include "../libafanasy/msgclasses/mcjobsweight.h"
 
 #include "../libafapi/apijob.h"
+#include "../libafapi/apiblock.h"
+#include "../libafapi/apitask.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -271,7 +276,52 @@ CmdJob::CmdJob()
 CmdJob::~CmdJob(){}
 bool CmdJob::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   afapi::Job job;
-   job.output(true);
+   int count = 30;
+   if( argc > 0 ) count = atoi( argv[0]);
+   int numblocks = 3;
+   int numtasks = 300;
+
+   afapi::Job ** jobs = new afapi::Job * [count];
+   af::JobProgress ** progresses = new af::JobProgress * [count];
+
+   std::cout << "Creating " << count << " job(s)..." << std::endl;
+   for( int i = 0; i < count; i++)
+   {
+      jobs[i] = new afapi::Job();
+      for( int b = 0; b < numblocks; b++)
+      {
+         afapi::Block * block = new afapi::Block();
+         block->setName("block name");
+         block->setCommand("block command %1");
+         block->setTasksName("block tasks %1");
+         for( int t = 0; t < numtasks; t++)
+         {
+            afapi::Task * task = new afapi::Task();
+            task->setName("task name");
+            task->setCommand("task command");
+            block->appendTask( task);
+         }
+         block->fillTasksArrayFromList();
+         jobs[i]->appendBlock( block);
+      }
+      jobs[i]->fillBlocksDataPointersFromList();
+      progresses[i] = new af::JobProgress( jobs[i]);
+   }
+
+   for( int i = 0; i < count; i++)
+   {
+      jobs[i]->stdOut();
+   }
+
+   std::cout << "Deleteing " << count << " job(s)..." << std::endl;
+   for( int i = 0; i < count; i++)
+   {
+      delete jobs[i];
+      delete progresses[i];
+   }
+
+   delete [] jobs;
+   delete [] progresses;
+
    return true;
 }

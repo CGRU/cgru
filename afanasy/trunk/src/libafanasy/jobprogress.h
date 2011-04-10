@@ -15,7 +15,7 @@ class JobProgress : public Af
 {
 public:
 /// Construct progress for given job.
-   JobProgress( Job * job);
+   JobProgress( Job * job, bool doConstruct = true);
 
 /// Construct job progress from given data buffer.
    JobProgress( Msg * msg);
@@ -39,6 +39,7 @@ public:
    TaskProgress  ***tp;
 
 protected:
+   bool construct( Job * job);               ///< Construct progress blocks and tasks data.
    bool initBlocks();                        ///< Allocate memory for blocks data.
    bool initTasks( int block, int numtasks); ///< Allocate memory for tasks  data.
 

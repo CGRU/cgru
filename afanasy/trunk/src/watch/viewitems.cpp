@@ -53,6 +53,7 @@ ViewItems::ViewItems( QWidget * parent):
 
 ViewItems::~ViewItems()
 {
+   if( itemDelegate ) delete itemDelegate;
 }
 
 void ViewItems::emitSizeHintChanged( const QModelIndex &index)

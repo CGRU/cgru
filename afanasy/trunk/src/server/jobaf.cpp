@@ -35,7 +35,7 @@ JobAf::JobAf( af::Msg * msg):
    progress = new afsql::DBJobProgress( this);
    if( progress == NULL)
    {
-      AFERROR("DBJob::DBJob: can't allocate memory for progresses.\n");
+      AFERROR("DBJob::DBJob: can't allocate memory for progresses.")
       return;
    }
    construct();

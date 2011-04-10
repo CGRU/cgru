@@ -17,7 +17,6 @@ So each path (project, asset) can have individual software setup.
 -->
    <priority>99</priority>
    <maxrunningtasks>-1</maxrunningtasks>
-   <hostsmask></hostsmask>
 
 <!-- Client & Server -->
    <servername>localhost</servername>

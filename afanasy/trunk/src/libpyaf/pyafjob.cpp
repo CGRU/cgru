@@ -7,7 +7,8 @@
 
 int PyAf_Job_init( PyAf_Job_Object *self, PyObject *args, PyObject *kwds)
 {
-   self->job = new afapi::Job();
+// Tell job not to delete blocks. Python will free all objects itself.
+   self->job = new afapi::Job( false);
    return 0;
 }
 

@@ -7,7 +7,8 @@
 
 int PyAf_Block_init( PyAf_Block_Object *self, PyObject *args, PyObject *kwds)
 {
-   self->block = new afapi::Block();
+// Tell block not to delete tasks. Python will free all objects itself.
+   self->block = new afapi::Block( false);
    return 0;
 }
 

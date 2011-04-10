@@ -108,7 +108,6 @@ std::string Environment::userslogsdir;
 
 #endif
 
-std::string Environment::hostsmask;
 std::string Environment::render_resclasses;
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
@@ -143,7 +142,6 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
    getVar( pnode, timeformat,                        "timeformat"                        );
    getVar( pnode, priority,                          "priority"                          );
    getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
-   getVar( pnode, hostsmask,                         "hostsmask"                         );
 
    getVar( pnode, servername,                        "servername"                        );
    getVar( pnode, serverport,                        "serverport"                        );
@@ -472,7 +470,7 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
             else retval = true;
          }
       }
-      delete buffer;
+      delete [] buffer;
    }
    return retval;
 }

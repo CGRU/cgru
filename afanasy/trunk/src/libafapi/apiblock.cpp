@@ -9,7 +9,8 @@
 
 using namespace afapi;
 
-Block::Block()
+Block::Block( bool DeleteTasksWithBlock):
+      deleteTasksWithBlock( DeleteTasksWithBlock)
 {
 AFINFA("API: Block constuctor called.\n");
    name     = AFJOB::BLOCK_DEFAULT_NAME;
@@ -21,7 +22,7 @@ Block::~Block()
 {
 AFINFA("API: Block['%s'] destructor called\n", name.c_str());
 // Do not delete tasks with block. They must be deleted manually. Python will delete them.
-   if(tasksdata) for( int b = 0; b < tasksnum; b++) tasksdata[b] = NULL;
+   if(( false == deleteTasksWithBlock) && tasksdata ) for( int b = 0; b < tasksnum; b++) tasksdata[b] = NULL;
 }
 
 void Block::stdOut( bool full) const

@@ -13,18 +13,20 @@
 using namespace afsql;
 
 DBJobProgress::DBJobProgress( af::Job * job):
-   af::JobProgress( job)
+   af::JobProgress( job, false)
 {
-   blocksnum = job->getBlocksNum();
+   // Construct job in this parent class to call virtual functions to create custom classes
+   construct( job);
+/*   blocksnum = job->getBlocksNum();
    if( blocksnum < 1)
    {
-      AFERRAR("DBJobProgress::JobProgress: invalid number if blocks = %d (jobid=%d)\n", blocksnum, job->getId());
+      AFERRAR("DBJobProgress::JobProgress: invalid number if blocks = %d (jobid=%d)", blocksnum, job->getId())
       return;
    }
 
    if( initBlocks() == false)
    {
-      AFERROR("DBJobProgress::JobProgress: blocks initalization failed.\n");
+      AFERROR("DBJobProgress::JobProgress: blocks initalization failed.")
       return;
    }
 
@@ -34,32 +36,32 @@ DBJobProgress::DBJobProgress( af::Job * job):
       tasksnum[b] = block->getTasksNum();
       if( tasksnum[b] < 1)
       {
-         AFERRAR("DBJobProgress::JobProgress: invalud number of tasks = %d (jobid=%d,block=%d)\n", tasksnum[b], job->getId(), b);
+         AFERRAR("DBJobProgress::JobProgress: invalud number of tasks = %d (jobid=%d,block=%d)", tasksnum[b], job->getId(), b)
          continue;
       }
 
       if( initTasks( b, tasksnum[b]) == false)
       {
-         AFERRAR("DBJobProgress::JobProgress: tasks initalization failed ( block=%d, tasks number=%d).\n", b, tasksnum[b]);
+         AFERRAR("DBJobProgress::JobProgress: tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
          continue;
       }
-   }
+   }*/
 }
 
 DBJobProgress::~DBJobProgress()
 {
-AFINFO("DBJobProgress::~DBJobProgress\n");
+AFINFO("DBJobProgress::~DBJobProgress:")
 }
 
 af::TaskProgress * DBJobProgress::newTaskProgress() const
 {
-AFINFO("DBJobProgress::newTaskProgress:\n");
+AFINFO("DBJobProgress::newTaskProgress:")
    return new DBTaskProgress;
 }
 
 void DBJobProgress::dbAdd( QSqlDatabase * db) const
 {
-AFINFO("DBJobProgress::dbAdd:\n");
+AFINFO("DBJobProgress::dbAdd:")
    QSqlQuery q( *db);
    q.prepare( DBTaskProgress::dbPrepareInsert);
 

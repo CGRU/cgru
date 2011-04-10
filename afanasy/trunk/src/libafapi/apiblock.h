@@ -11,7 +11,7 @@ class Task;
 class Block : public af::BlockData
 {
 public:
-   Block();
+   Block( bool DeleteTasksWithBlock = true);
    ~Block();
 
 /// Append tasks list
@@ -114,5 +114,6 @@ public:
 
 private:
    std::list<Task*> tasks;
+   bool deleteTasksWithBlock;
 };
 }

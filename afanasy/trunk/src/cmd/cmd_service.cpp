@@ -16,6 +16,8 @@ CmdSrvCapacity::CmdSrvCapacity()
 CmdSrvCapacity::~CmdSrvCapacity(){}
 bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
 {
+   Py_InitializeEx(0);
+
    int capacity = atoi(argv[2]);
    std::string wdir;
    std::string command( argv[1]);
@@ -34,6 +36,9 @@ bool CmdSrvCapacity::processArguments( int argc, char** argv, af::Msg &msg)
    std::cout << std::endl;
    std::cout << command;
    std::cout << std::endl;
+
+   Py_Finalize();
+
    return true;
 }
 
@@ -47,6 +52,8 @@ CmdSrvHosts::CmdSrvHosts()
 CmdSrvHosts::~CmdSrvHosts(){}
 bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
 {
+   Py_InitializeEx(0);
+
    std::string command( argv[1]);
    std::list<std::string> hosts;
    for( int a = 2; a < argc; a++) hosts.push_back( argv[a]);
@@ -67,5 +74,8 @@ bool CmdSrvHosts::processArguments( int argc, char** argv, af::Msg &msg)
    std::cout << std::endl;
    std::cout << command;
    std::cout << std::endl;
+
+   Py_Finalize();
+
    return true;
 }

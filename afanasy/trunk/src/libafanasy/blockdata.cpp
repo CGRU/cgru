@@ -117,6 +117,7 @@ bool BlockData::isValid() const
 
 BlockData::~BlockData()
 {
+//printf("BlockData::~BlockData()\n");
    if( tasksdata)
    {
       for( int t = 0; t < tasksnum; t++)

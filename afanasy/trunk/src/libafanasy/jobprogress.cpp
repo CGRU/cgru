@@ -10,9 +10,43 @@
 
 using namespace af;
 
-JobProgress::JobProgress( Job * job):
+JobProgress::JobProgress( Job * job, bool doConstruct):
    jobid( job->getId())
 {
+   if( doConstruct ) construct( job);
+}
+
+bool JobProgress::construct( Job * job)
+{
+   blocksnum = job->getBlocksNum();
+   if( blocksnum < 1)
+   {
+      AFERRAR("JobProgress::JobProgress: invalid number if blocks = %d (jobid=%d)", blocksnum, job->getId())
+      return false;
+   }
+
+   if( initBlocks() == false)
+   {
+      AFERROR("JobProgress::JobProgress: blocks initalization failed.")
+      return false;
+   }
+
+   for( int b = 0; b < blocksnum; b++)
+   {
+      const af::BlockData * block = job->getBlock( b);
+      tasksnum[b] = block->getTasksNum();
+      if( tasksnum[b] < 1)
+      {
+         AFERRAR("JobProgress::JobProgress: invalud number of tasks = %d (jobid=%d,block=%d)", tasksnum[b], job->getId(), b)
+         return false;
+      }
+
+      if( initTasks( b, tasksnum[b]) == false)
+      {
+         AFERRAR("JobProgress::JobProgress: tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
+         return false;
+      }
+   }
 }
 
 JobProgress::JobProgress( Msg * msg)
@@ -58,10 +92,10 @@ TaskProgress * JobProgress::newTaskProgress() const
 
 JobProgress::~JobProgress()
 {
-AFINFA("JobProgress::~JobProgress: Job Id = %d\n", jobid);
+AFINFA("JobProgress::~JobProgress: Job Id = %d", jobid)
    if( tp != NULL )
    {
-      AFINFO("JobProgress::~JobProgress: Deleting tasks running information.\n");
+      AFINFO("JobProgress::~JobProgress: Deleting tasks running information.")
       for( int b = 0; b < blocksnum; b++)
       {
          if( tp[b] != NULL )
@@ -87,7 +121,7 @@ void JobProgress::readwrite( Msg * msg)
    {
       if( initBlocks() == false)
       {
-         AFERROR("JobProgress::readwrite: blocks initalization failed.\n");
+         AFERROR("JobProgress::readwrite: blocks initalization failed.")
          return;
       }
    }
@@ -100,7 +134,7 @@ void JobProgress::readwrite( Msg * msg)
       {
          if( initTasks( b, tasksnum[b]) == false)
          {
-            AFERRAR("JobProgress::readwrite: tasks initalization failed ( block=%d, tasks number=%d).\n", b, tasksnum[b]);
+            AFERRAR("JobProgress::readwrite: tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
             return;
          }
       }

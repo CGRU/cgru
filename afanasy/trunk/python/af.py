@@ -123,7 +123,6 @@ class Job(pyaf.Job):
       self.setPriority(        int( self.env.Vars['priority']       ))
       self.setUserName(             self.env.Vars['username']        )
       self.setHostName(             self.env.Vars['hostname']        )
-      self.setHostsMask(            self.env.Vars['hostsmask']       )
       if jobname != None: self.setName( jobname)
       platform = sys.platform
       # looking at 'darwin' at first as its name contains 'win' sting too

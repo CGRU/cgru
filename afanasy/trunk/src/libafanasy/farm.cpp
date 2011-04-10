@@ -160,7 +160,7 @@ Farm::Farm( const std::string & File, bool Verbose ):
             valid = getPatterns( root_node);
          }
       }
-      delete buffer;
+      delete [] buffer;
    }
 }
 

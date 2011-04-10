@@ -87,7 +87,6 @@ public:
 
    static inline int    getPriority()               { return priority;         } ///< Get default host priority.
    static inline int    getMaxRunningTasksNumber()  { return maxrunningtasks;  } ///< Get default maximium hosts.
-   static inline const std::string & getHostsMask() { return hostsmask;        } ///< Get default host mask.
 
    static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
    static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
@@ -205,7 +204,6 @@ private:
 
    static int priority;          ///< Default priority
    static int maxrunningtasks;   ///< Default maximum running tasks number
-   static std::string hostsmask;     ///< Default hosts mask
 
 /// Afanasy server port number
 /** Try to get \c AF_SERVER_PORT environment variable at first.

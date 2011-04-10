@@ -13,7 +13,7 @@ class Job : public af::Job
 {
 public:
 
-   Job();
+   Job( bool DeleteBlocksWithJob = true);
    ~Job();
 
    void setUserName( const char * str);
@@ -77,13 +77,16 @@ public:
 /// Get raw job data length.
    int getDataLen();
 
+public:
+   void fillBlocksDataPointersFromList();
+
 private:
    af::Msg * message;
    std::list<Block*> blocks;
+   bool deleteBlocksWithJob;
 
 private:
    void setUniqueBlockName( Block * block);
    void deleteBlocksDataPointers();
-   void fillBlocksDataPointersFromList();
 };
 }

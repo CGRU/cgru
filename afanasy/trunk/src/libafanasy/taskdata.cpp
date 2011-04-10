@@ -19,6 +19,7 @@ TaskData::TaskData( Msg * msg)
 
 TaskData::~TaskData()
 {
+//printf("TaskData::~TaskData:\n");
 }
 
 void TaskData::readwrite( Msg * msg)

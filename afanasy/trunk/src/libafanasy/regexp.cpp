@@ -21,6 +21,7 @@ RegExp::RegExp():
 
 RegExp::~RegExp()
 {
+   if( false == pattern.empty()) regfree( &regexp);
 }
 
 bool RegExp::setPattern( const std::string & str, std::string * strError)
@@ -93,9 +94,9 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
    std::string errStr;
    try 
    {
-      std::tr1::regex rx( str); 
+      std::tr1::regex rx( str);
    }
-   catch( const std::tr1::regex_error& rerr) 
+   catch( const std::tr1::regex_error& rerr)
    {
       errStr = rerr.what();
       valid = false;
@@ -118,11 +119,7 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
    regex_t check_re;
    int retval = regcomp( &check_re, str.c_str(), compile_flags);
 
-   if( retval == 0 )
-   {
-      return true;
-   }
-   else
+   if( retval != 0 )
    {
       static const int buflen = 0xff;
       char buffer[ buflen];
@@ -131,8 +128,11 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
          *errOutput = buffer;
       else
          AFERRAR("REGEXP: %s\n", buffer);
-      return false;
    }
+
+   regfree( &check_re);
+
+   return retval == 0;
 
 #endif
 }

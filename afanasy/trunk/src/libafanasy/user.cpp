@@ -27,7 +27,6 @@ User::User( const std::string & username, const std::string & host):
 {
    name = username;
    priority = af::Environment::getPriority();
-   hostsmask.setPattern( af::Environment::getHostsMask());
 
    construct();
 }

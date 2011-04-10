@@ -482,7 +482,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          if( data )
          {
             msg_response->setData( readsize, data);
-            delete data;
+            delete [] data;
          }
          if( err.size())
          {

@@ -11,17 +11,20 @@
 
 using namespace afapi;
 
-Job::Job():
+Job::Job( bool DeleteBlocksWithJob):
    af::Job( 0),
-   message( NULL)
+   message( NULL),
+   deleteBlocksWithJob( DeleteBlocksWithJob)
 {
    name = AFJOB::DEFAULT_NAME;
 }
 Job::~Job()
 {
    if( message ) delete message;
-// Do not delete blocks with job. They must be deleted manually. Python will delete them.
-   for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
+
+   // Deleting blocks some times not needed, for example Python deletes all objects itself
+   if( false == deleteBlocksWithJob)
+      for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
 }
 
 void Job::setUserName(        const char * str     )  { username     = str;   }
