@@ -15,17 +15,17 @@ ThreadRun::ThreadRun( const ThreadPointers *ptrs, int seconds):
    ThreadAf( ptrs)
 {
    sec = seconds;
-AFINFO("ThreadRun::ThreadRun:\n");
+AFINFO("ThreadRun::ThreadRun:")
 }
 
 ThreadRun::~ThreadRun()
 {
-AFINFO("ThreadRun::~ThreadRun:\n");
+AFINFO("ThreadRun::~ThreadRun:")
 }
 
 void ThreadRun::run()
 {
-AFINFO("ThreadRun::run:\n");
+AFINFO("ThreadRun::run:")
 while( running)
 {
 #ifdef _DEBUG
@@ -36,7 +36,7 @@ printf("...................................\n");
 //
 // Lock containers:
 //
-AFINFO("ThreadRun::run: Locking containers...\n");
+AFINFO("ThreadRun::run: Locking containers...")
       AfContainerLock jLock( jobs,     AfContainer::WRITELOCK);
       AfContainerLock lLock( renders,  AfContainer::WRITELOCK);
       AfContainerLock ulock( users,    AfContainer::WRITELOCK);
@@ -46,13 +46,13 @@ AFINFO("ThreadRun::run: Locking containers...\n");
 //
 // Messages reaction:
 //
-AFINFO("ThreadRun::run: React on incoming messages:\n");
+AFINFO("ThreadRun::run: React on incoming messages:")
       for( MsgAf *msg = msgQueue->popMsg( false); msg != NULL; msg = msgQueue->popMsg( false)) msgCase( msg);
 
 //
 // Refresh data:
 //
-AFINFO("ThreadRun::run: Refreshing data:\n");
+AFINFO("ThreadRun::run: Refreshing data:")
       talks    ->refresh( NULL,    monitors);
       monitors ->refresh( NULL,    monitors);
       jobs     ->refresh( renders, monitors);
@@ -62,7 +62,7 @@ AFINFO("ThreadRun::run: Refreshing data:\n");
 //
 // Jobs sloving:
 //
-      AFINFO("ThreadRun::run: Solving jobs:\n");
+      AFINFO("ThreadRun::run: Solving jobs:")
       RenderContainerIt rendersIt( renders);
       std::list<int> rIds;
       {
@@ -79,7 +79,7 @@ AFINFO("ThreadRun::run: Refreshing data:\n");
       // cycle on renders, which produced a task
       while( rIds.size())
       {
-         AFINFA("ThreadRun::run: Renders on cycle: %d\n", int(rIds.size()));
+         AFINFA("ThreadRun::run: Renders on cycle: %d", int(rIds.size()))
          std::list<int>::iterator rIt = rIds.begin();
          while( rIt != rIds.end())
          {
@@ -100,13 +100,13 @@ AFINFO("ThreadRun::run: Refreshing data:\n");
 //
 // Dispatch events to monitors:
 //
-AFINFO("ThreadRun::run: dispatching monitor events:\n");
+AFINFO("ThreadRun::run: dispatching monitor events:")
       monitors->dispatch();
 
 //
 // Free Containers:
 //
-AFINFO("ThreadRun::run: deleting zombies:\n");
+AFINFO("ThreadRun::run: deleting zombies:")
       talks    ->freeZombies();
       monitors ->freeZombies();
       renders  ->freeZombies();
@@ -118,7 +118,7 @@ AFINFO("ThreadRun::run: deleting zombies:\n");
 //
 // Sleeping
 //
-AFINFO("ThreadRun::run: sleeping...\n");
+AFINFO("ThreadRun::run: sleeping...")
    sleep( sec);
 }
 }

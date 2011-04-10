@@ -646,13 +646,13 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TInvalid:
    {
       msg->stdOut();
-      AFERROR("ThreadReadMsg::msgCase: Invalid message recieved.\n");
+      AFERROR("ThreadReadMsg::msgCase: Invalid message recieved.")
       break;
    }
    default:
    {
       msg->stdOut();
-      AFERROR("ThreadReadMsg::msgCase: Message with unknown type recieved.\n");
+      AFERROR("ThreadReadMsg::msgCase: Message with unknown type recieved.")
       break;
    }
    }

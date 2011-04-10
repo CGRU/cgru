@@ -51,6 +51,7 @@ MCTaskUp::MCTaskUp( Msg * msg):
 
 MCTaskUp::~MCTaskUp()
 {
+   if( data ) delete [] data;
 }
 
 void MCTaskUp::readwrite( Msg * msg)
@@ -74,10 +75,9 @@ void MCTaskUp::readwrite( Msg * msg)
    {
       if( data == NULL )
       {
-         AFERROR("MCTaskUp::readwrite: data == NULL.\n");
+         AFERROR("MCTaskUp::readwrite: data == NULL.")
          return;
       }
-//      memcpy( buffer+ws, data, datalen);
       rw_data( data, msg, datalen);
    }
    else

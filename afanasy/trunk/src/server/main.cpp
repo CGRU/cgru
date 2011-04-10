@@ -14,7 +14,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-#include <Python.h>
+//#include <Python.h>
 
 #include <QtCore/QCoreApplication>
 
@@ -51,23 +51,19 @@ void sig_int(int signum)
 //######################## core thread to process client after accept #################
 void* ThreadCore_processClient(void* arg)
 {
-  T_processClient__args * threadArgs = (T_processClient__args*)arg;
+   T_processClient__args * threadArgs = (T_processClient__args*)arg;
 
-  if( core == NULL) return NULL;
-// Disassociate from parent -
-// Guarantees that thread resources are deallocated upon return.
+   // Disassociate from parent -
+   // Guarantees that thread resources are deallocated upon return.
    pthread_detach( pthread_self());
-//
-// run core function
-//   core->theadReadMsg->process((struct T_processClient__args *)arg);
-   core->threadReadMsg->process( threadArgs);
-//
-// close clien socket descriptor
-//   close(((struct T_processClient__args *)arg)->client_sd);
+
+   if( core != NULL) core->threadReadMsg->process( threadArgs);
+
+   // close clien socket descriptor
    close( threadArgs->sd);
-//
-// free process arguments data
-//   free(arg);
+
+   // free process arguments data
+   //   free(arg);
    delete threadArgs;
 
    return NULL;
@@ -75,7 +71,7 @@ void* ThreadCore_processClient(void* arg)
 //########################### main core thread #############################
 void* ThreadCore_threadRun(void* arg)
 {
-   AFINFA("Thread (id = %lu) run created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) run created.", (long unsigned)pthread_self())
    core->threadRun->run();
    return NULL;
 }
@@ -88,42 +84,42 @@ void* ThreadCommon_dispatchMessages(void* arg)
    sigaddset( &sigmask, SIGALRM);
    if( pthread_sigmask( SIG_UNBLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
 //
-   AFINFA("Thread (id = %lu) to dispatch messages created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) to dispatch messages created.", (long unsigned)pthread_self())
    AFCommon::MsgDispatchQueueRun();
    return NULL;
 }
 //########################### queued writing files thread #############################
 void* ThreadCommon_writeFiles(void* arg)
 {
-   AFINFA("Thread (id = %lu) to write files created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) to write files created.", (long unsigned)pthread_self())
    AFCommon::FileWriteQueueRun();
    return NULL;
 }
 //########################### queued job cleanup thread #############################
 void* ThreadCommon_CleanUpQueue(void* arg)
 {
-   AFINFA("Thread (id = %lu) to cleanup jobs created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) to cleanup jobs created.", (long unsigned)pthread_self())
    AFCommon::CleanUpJobQueueRun();
    return NULL;
 }
 //########################### queued output log thread #############################
 void* ThreadCommon_OutputLogQueue(void* arg)
 {
-   AFINFA("Thread (id = %lu) to output logs created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) to output logs created.", (long unsigned)pthread_self())
    AFCommon::OutputLogQueueRun();
    return NULL;
 }
 //########################### queued update tasks in database thread #############################
 void* ThreadCommon_dbTasksUpdate(void* arg)
 {
-   AFINFA("Thread (id = %lu) update jobs tasks in database created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) update jobs tasks in database created.", (long unsigned)pthread_self())
    AFCommon::DBUpTaskQueueRun();
    return NULL;
 }
 //########################### queued update database thread #############################
 void* ThreadCommon_dbUpdate(void* arg)
 {
-   AFINFA("Thread (id = %lu) update database created.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) update database created.", (long unsigned)pthread_self())
    AFCommon::DBUpdateQueueRun();
    return NULL;
 }
@@ -177,7 +173,7 @@ void* ThreadServer_accept(void* arg)
          printf("IPv4 connections addresses will be mapped to IPv6.\n");
          break;
       default:
-         AFERROR("No addresses founed.\n");
+         AFERROR("No addresses founed.")
          return NULL;
    }
 
@@ -213,14 +209,14 @@ void* ThreadServer_accept(void* arg)
    if( protocol == AF_INET6 ) value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in6, sizeof(server_sockaddr_in6));
    if( value != 0)
    {
-      AFERRPE("bind");
+      AFERRPE("bind")
       return NULL;
    }
 //
 // listen
    if( listen( server_sd, 9) != 0)
    {
-      AFERRPE("listen");
+      AFERRPE("listen")
       return NULL;
    }
    printf( "Listening %d port...\n", af::Environment::getServerPort());
@@ -241,33 +237,40 @@ void* ThreadServer_accept(void* arg)
       threadArgs->sd = accept( server_sd, (struct sockaddr*)&(threadArgs->ss), &client_sockaddr_len);
       if( threadArgs->sd < 0)
       {
-         AFERRPE("accept");
+         AFERRPE("accept")
          switch( errno )
          {
             case EMFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
-               AFERROR("The per-process limit of open file descriptors has been reached.\n")
+               AFERROR("The per-process limit of open file descriptors has been reached.")
                break;
             case ENFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
-               AFERROR("The system limit on the total number of open files has been reached.\n")
+               AFERROR("The system limit on the total number of open files has been reached.")
                break;
             case EINTR:
                printf("Server was interrupted.\n");
                running = false;
                break;
          }
-         if( false == running ) break;
+         if( false == running )
+         {
+            delete threadArgs;
+            break;
+         }
          sleep( error_wait);
          if( error_wait < error_wait_max) error_wait = error_wait << 1;
          continue;
       }
       error_wait = error_wait_min;
       if ( pthread_create(&childCore_processClient, NULL, ThreadCore_processClient, threadArgs) != 0 )
-         AFERRPE("Pthread Process creation error");
+      {
+         delete threadArgs;
+         AFERRPE("Pthread Process creation error")
+      }
 //      ThreadCore_processClient( &threadArgs);
    }
    close( server_sd);
 
-   AFINFO("ThreadServer_accept: exiting.\n");
+   AFINFO("ThreadServer_accept: exiting.")
    return NULL;
 }
 //
@@ -279,7 +282,7 @@ int main(int argc, char *argv[])
    QCoreApplication app( argc, argv);
 
    running = true;
-   Py_InitializeEx(0);
+//   Py_InitializeEx(0);
    af::Environment ENV( af::Environment::NoFlags, argc, argv);
    if( af::init( af::InitFarm) == false) return 1;
    afsql::init();
@@ -320,12 +323,12 @@ int main(int argc, char *argv[])
    core = new Core();                             // create core object
    if( core == NULL )                             // check memory allocation
    {
-      AFERROR("afanasy::main: can't allocate memory for core.\n");
+      AFERROR("afanasy::main: can't allocate memory for core.")
       return 1;
    }
    if(!core->getInit())                           // check initializing success
    {
-      AFERROR("afanasy::main: core init failed.\n");
+      AFERROR("afanasy::main: core init failed.")
       delete core;
       return 1;
    }
@@ -341,92 +344,92 @@ int main(int argc, char *argv[])
    pthread_t childCommon_dbTasksUpdate;
    pthread_t childCommon_dbUpdate;
 
-   AFINFA("Thread (id = %lu) is main, creating other threads.\n", (long unsigned)pthread_self());
+   AFINFA("Thread (id = %lu) is main, creating other threads.", (long unsigned)pthread_self())
 
    if( pthread_create( &childCommon_dispatchMessages, NULL, &ThreadCommon_dispatchMessages, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread dispatchMessages creation error");
+      AFERRPE("afanasy::main: Common thread dispatchMessages creation error")
       return 1;
    }
    if( pthread_create( &childCommon_writeFiles, NULL, &ThreadCommon_writeFiles, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread writeFiles creation error");
+      AFERRPE("afanasy::main: Common thread writeFiles creation error")
       return 1;
    }
    if( pthread_create( &childCommon_CleanupQueue, NULL, &ThreadCommon_CleanUpQueue, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread cleanup creation error");
+      AFERRPE("afanasy::main: Common thread cleanup creation error")
       return 1;
    }
    if( pthread_create( &childCommon_OutputLogQueue, NULL, &ThreadCommon_OutputLogQueue, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread output logs creation error");
+      AFERRPE("afanasy::main: Common thread output logs creation error")
       return 1;
    }
    if( pthread_create( &childCommon_dbTasksUpdate, NULL, &ThreadCommon_dbTasksUpdate, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread update tasks in database creation error");
+      AFERRPE("afanasy::main: Common thread update tasks in database creation error")
       return 1;
    }
    if( pthread_create( &childCommon_dbUpdate, NULL, &ThreadCommon_dbUpdate, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Common thread update database creation error");
+      AFERRPE("afanasy::main: Common thread update database creation error")
       return 1;
    }
    if( pthread_create( &childCore_run, NULL, &ThreadCore_threadRun, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Core thread run creation error");
+      AFERRPE("afanasy::main: Core thread run creation error")
       return 1;
    }
    if( pthread_create( &childServer_serverAccept, NULL, &ThreadServer_accept, NULL) != 0)
    {
-      AFERRPE("afanasy::main: Server thread accept creation error");
+      AFERRPE("afanasy::main: Server thread accept creation error")
       return 1;
    }
 //
 // waiting for childs (do nothing)
 
    while( running) sleep(1);
-   AFINFO("afanasy::main: Waiting child threads.\n");
+   AFINFO("afanasy::main: Waiting child threads.")
    pthread_kill( childServer_serverAccept, SIGINT);
-   AFINFO("afanasy::main: Joining accept thread.\n");
+   AFINFO("afanasy::main: Joining accept thread.")
    pthread_join( childServer_serverAccept, NULL);
 
 
-   AFINFO("afanasy::main: Joining run thread.\n");
+   AFINFO("afanasy::main: Joining run thread.")
    pthread_join( childCore_run, NULL);
 
    AFCommon::MsgDispatchQueueQuit();
-   AFINFO("afanasy::main: Joining dispatch messages thread.\n");
+   AFINFO("afanasy::main: Joining dispatch messages thread.")
    pthread_join( childCommon_dispatchMessages, NULL);
 
    AFCommon::FileWriteQueueQuit();
-   AFINFO("afanasy::main: Joining writing files thread.\n");
+   AFINFO("afanasy::main: Joining writing files thread.")
    pthread_join( childCommon_writeFiles, NULL);
 
    AFCommon::CleanUpJobQueueQuit();
-   AFINFO("afanasy::main: Joining cleanup jobs thread.\n");
+   AFINFO("afanasy::main: Joining cleanup jobs thread.")
    pthread_join( childCommon_CleanupQueue, NULL);
 
    AFCommon::DBUpTaskQueueQuit();
-   AFINFO("afanasy::main: Joining update tasks in database thread.\n");
+   AFINFO("afanasy::main: Joining update tasks in database thread.")
    pthread_join( childCommon_dbTasksUpdate, NULL);
 
    AFCommon::DBUpdateQueueQuit();
-   AFINFO("afanasy::main: Joining update database thread.\n");
+   AFINFO("afanasy::main: Joining update database thread.")
    pthread_join( childCommon_dbUpdate, NULL);
 
    AFCommon::OutputLogQueueQuit();
-   AFINFO("afanasy::main: Joining output logs thread.\n");
+   AFINFO("afanasy::main: Joining output logs thread.")
    pthread_join( childCommon_OutputLogQueue, NULL);
 
 
-   AFINFO("afanasy::main: Deleting core:\n");
+   AFINFO("afanasy::main: Deleting core:")
    if( core != NULL) delete core;
 
-   AFINFO("afanasy::main: Output messages statistics:\n");
+   AFINFO("afanasy::main: Output messages statistics:")
    af::destroy();
-   Py_Finalize();
+//   Py_Finalize();
 
    return 0;
 }

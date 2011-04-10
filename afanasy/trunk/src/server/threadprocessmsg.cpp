@@ -62,7 +62,7 @@ ThreadReadMsg::ThreadReadMsg( const ThreadPointers *ptrs):
 
 ThreadReadMsg::~ThreadReadMsg()
 {
-AFINFO("ThreadReadMsg::~ThreadReadMsg:\n");
+AFINFO("ThreadReadMsg::~ThreadReadMsg:")
 }
 
 void ThreadReadMsg::run() {}
@@ -70,7 +70,7 @@ void ThreadReadMsg::run() {}
 bool ThreadReadMsg::process( const struct T_processClient__args* theadArgs)
 {
    int client_sd = theadArgs->sd;
-   AFINFO( "ThreadReadMsg::msgProcess: trying to recieve message...\n");
+   AFINFO( "ThreadReadMsg::msgProcess: trying to recieve message...")
    MsgAf* msg_request = new MsgAf( theadArgs->ss);
 
 //   msg_request->setAddress( new af::Address( &(theadArgs->ss)));
@@ -86,7 +86,7 @@ bool ThreadReadMsg::process( const struct T_processClient__args* theadArgs)
    so_sndtimeo.tv_usec = 0;
    if( setsockopt( client_sd, SOL_SOCKET, SO_RCVTIMEO, &so_rcvtimeo, sizeof(so_rcvtimeo)) != 0)
    {
-      AFERRPE("ThreadReadMsg::msgProcess: set socket SO_RCVTIMEO option failed");
+      AFERRPE("ThreadReadMsg::msgProcess: set socket SO_RCVTIMEO option failed")
       theadArgs->printAddress();
       return false;
    }
@@ -94,13 +94,13 @@ bool ThreadReadMsg::process( const struct T_processClient__args* theadArgs)
    // reading message from client socket
    if( false == com::msgread( client_sd, msg_request))
    {
-      AFERROR("ThreadReadMsg::msgProcess: reading message failed.\n");
+      AFERROR("ThreadReadMsg::msgProcess: reading message failed.")
       theadArgs->printAddress();
       return false;
    }
    //
    // proseccing message from client socket
-   AFINFO( "ThreadReadMsg::msgProcess: message recieved.\n");
+   AFINFO( "ThreadReadMsg::msgProcess: message recieved.")
 #ifdef AFOUTPUT
 printf("Request: ");msg_request->stdOut();
 #endif
@@ -113,7 +113,7 @@ printf("Response: ");msg_response->stdOut();
    // set socket maximum time to wait for an output operation to complete
    if( setsockopt( client_sd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
    {
-      AFERRPE("ThreadReadMsg::msgProcess: set socket SO_SNDTIMEO option failed");
+      AFERRPE("ThreadReadMsg::msgProcess: set socket SO_SNDTIMEO option failed")
       theadArgs->printAddress();
       msg_response->stdOut();
       delete msg_response;
@@ -123,13 +123,13 @@ printf("Response: ");msg_response->stdOut();
    // writing message back to client socket
    if(!com::msgsend( client_sd, msg_response))
    {
-      AFERROR("ThreadReadMsg::msgProcess: can't send message to client.\n");
+      AFERROR("ThreadReadMsg::msgProcess: can't send message to client.")
       theadArgs->printAddress();
       msg_response->stdOut();
       delete msg_response;
       return false;
    }
-   AFINFO( "ThreadReadMsg::msgProcess: message sent.\n");
+   AFINFO( "ThreadReadMsg::msgProcess: message sent.")
    delete msg_response;
    return true;
 }

@@ -44,7 +44,7 @@ public:
    inline int getFrame()         const { return frame;         }
    inline int getPercentFrame()  const { return percent_frame; }
    inline int getDataLen()       const { return datalen;       }
-   inline char * getData()       const { return data;          }
+   inline const char * getData() const { return data;          }
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 

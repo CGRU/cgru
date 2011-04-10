@@ -28,7 +28,7 @@ JobContainer::JobContainer():
 
 JobContainer::~JobContainer()
 {
-AFINFO("JobContainer::~JobContainer:\n");
+AFINFO("JobContainer::~JobContainer:")
 }
 
 void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring)
@@ -52,7 +52,7 @@ void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * rend
    }
 
 // Job does not exist!
-   AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.\n", taskup.getNumJob());
+   AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
    if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
 }
 
@@ -62,19 +62,19 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 
    if( job == NULL )
    {
-      AFERROR("JobContainer::job_register: Can't allocate memory for new job.\n");
+      AFERROR("JobContainer::job_register: Can't allocate memory for new job.")
       return 0;
    }
 
    if( job->isConstructed() == false )
    {
-      AFERROR("JobContainer::job_register: Job is not constructed.\n");
+      AFERROR("JobContainer::job_register: Job is not constructed.")
       return 0;
    }
 
    if( users == NULL )
    {
-      AFERROR("JobContainer::job_register: Users container is not set.\n");
+      AFERROR("JobContainer::job_register: Users container is not set.")
       return 0;
    }
 
@@ -84,12 +84,12 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       AfContainerLock uLock( users, AfContainer::WRITELOCK  );
       if( monitoring) AfContainerLock mLock( monitoring, AfContainer::WRITELOCK  );
 
-      AFINFA("JobContainer::job_register: Checking job user '%s'\n", job->getUserName().toUtf8().data());
+      AFINFA("JobContainer::job_register: Checking job user '%s'", job->getUserName().toUtf8().data())
       user = users->addUser( job->getUserName(), job->getHostName(), monitoring);
       if( user == NULL )
       {
          delete job;
-         AFERROR("JobContainer::job_register: Can't register new user.\n");
+         AFERROR("JobContainer::job_register: Can't register new user.")
          return 0;
       }
       {  // Add job node to container.
@@ -98,28 +98,28 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
          if( add((af::Node*)job) == false )
          {
             delete job;
-            AFERROR("JobContainer::job_register: Can't add job to container.\n");
+            AFERROR("JobContainer::job_register: Can't add job to container.")
             return 0;
          }
-         AFINFO("JobContainer::job_register: locking job.\n");
+         AFINFO("JobContainer::job_register: locking job.")
          job->lock();
       }
-      AFINFO("JobContainer::job_register: locking user.\n");
+      AFINFO("JobContainer::job_register: locking user.")
       user->lock();
       user->addJob( job);
       if( monitoring )
       {
-         AFINFO("JobContainer::job_register: monitor new job events.\n");
+         AFINFO("JobContainer::job_register: monitor new job events.")
          monitoring->addJobEvent( af::Msg::TMonitorJobsAdd, job->getId(), user->getId());
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
       }
    }
 
    // initialize job ( create tasks output folder, execute "pre"commands if any)
-   AFINFO("JobContainer::job_register: initiaizing new job with user.\n");
+   AFINFO("JobContainer::job_register: initiaizing new job with user.")
    if( job->initialize( user) == false)
    {
-      AFERROR("JobContainer::job_register: Job initialization failed.\n");
+      AFERROR("JobContainer::job_register: Job initialization failed.")
 
       if( monitoring )
       {
@@ -140,10 +140,10 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
    // write job to database ( if it is not created from database)
    if( job->fromDataBase() == false )
    {
-      AFINFO("JobContainer::job_register: writing job to database.\n");
+      AFINFO("JobContainer::job_register: writing job to database.")
       if( afDB == NULL )
       {
-         AFERROR("JobContainer::job_register: Afanasy database is not set.\n");
+         AFERROR("JobContainer::job_register: Afanasy database is not set.")
       }
       else
       {
@@ -159,7 +159,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
    {
       AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
 
-      AFINFO("JobContainer::job_register: monitor unlock job and user events.\n");
+      AFINFO("JobContainer::job_register: monitor unlock job and user events.")
       monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, job->getId(), user->getId());
       monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
    }
@@ -167,7 +167,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
    AFCommon::QueueLog("Job registered: " + job->generateInfoString());
    int newJobId = job->getId();
 
-   AFINFO("JobContainer::job_register: unlocking user and job.\n");
+   AFINFO("JobContainer::job_register: unlocking user and job.")
    user->unLock();
    job->unLock();
 

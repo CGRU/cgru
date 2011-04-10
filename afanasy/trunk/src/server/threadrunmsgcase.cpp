@@ -214,7 +214,7 @@ mclass.stdOut();
    }
    default:
    {
-      AFERROR("ThreadRun::msgCase: message with unknown type recieved.\n");
+      AFERROR("ThreadRun::msgCase: message with unknown type recieved.")
       msg->stdOut();
    }
 }
