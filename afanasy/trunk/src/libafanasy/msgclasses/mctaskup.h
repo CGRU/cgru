@@ -64,6 +64,8 @@ private:
 
    char *data;
 
+   bool deleteData;
+
 private:
    void readwrite( Msg * msg);
 };

@@ -27,31 +27,33 @@ MCTaskUp::MCTaskUp
    int DataLen,
    char * Data
 ):
-   clientid        ( ClientId),
+   clientid       ( ClientId),
 
-   numjob          ( NumJob),
-   numblock        ( NumBlock),
-   numtask         ( NumTask),
-   number          ( Number),
+   numjob         ( NumJob),
+   numblock       ( NumBlock),
+   numtask        ( NumTask),
+   number         ( Number),
 
-   status          ( UpStatus),
-   percent         ( UpPercent),
-   frame           ( UpFrame),
-   percent_frame   ( UpPercentFrame),
-   datalen         ( DataLen ),
-   data            ( Data )
+   status         ( UpStatus),
+   percent        ( UpPercent),
+   frame          ( UpFrame),
+   percent_frame  ( UpPercentFrame),
+   datalen        ( DataLen ),
+   data           ( Data ),
+   deleteData     ( false) // Don not delete data on client side, as it is not copied
 {
 }
 
 MCTaskUp::MCTaskUp( Msg * msg):
-   data ( NULL )
+   data ( NULL),
+   deleteData( true)       // Delete data on server side, as it was allocated and copied from incoming message
 {
    read( msg);
 }
 
 MCTaskUp::~MCTaskUp()
 {
-   if( data ) delete [] data;
+   if( deleteData && data ) delete [] data;
 }
 
 void MCTaskUp::readwrite( Msg * msg)
@@ -82,17 +84,14 @@ void MCTaskUp::readwrite( Msg * msg)
    }
    else
    {
-//printf("MCTaskUp::readwrite: task with output data recieved: datalen = %d\n", datalen);
       data = new char[datalen];
       if( data == NULL )
       {
-         AFERROR("MCTaskUp::readwrite: Can't allocate memory for data.\n");
+         AFERROR("MCTaskUp::readwrite: Can't allocate memory for data.")
          datalen = 0;
          return;
       }
-//      memcpy( data, buffer+ws, datalen);
       rw_data( data, msg, datalen);
-//printf("MCTaskUp::readwrite: data copied.\n");
    }
 }
 
