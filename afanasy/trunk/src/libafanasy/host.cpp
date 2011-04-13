@@ -118,7 +118,8 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "Host:";
    if( full)
    {
-      if( false == os.empty()) stream << " OS=\"" << os << "\"";
+      if( false == os.empty()) stream << " OS=\"" << os << "\":";
+      stream << std::endl;
       stream << " Capacity = " << capacity;
       stream << ", Max tasks = " << maxtasks;
       stream << ", Power " << power;
@@ -137,7 +138,7 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << "OS=\"" << os << "\":";
+      if( false == os.empty()) stream << "OS=\"" << os << "\"";
       stream << " CAP" << capacity;
       stream << " MAX=" << maxtasks;
       stream << " P" << power;

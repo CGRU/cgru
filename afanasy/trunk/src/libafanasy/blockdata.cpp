@@ -565,7 +565,7 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 
       if( false == wdir.empty()) stream << "\n Working Directory:\n" << wdir;
 
-      if( false == command.empty()) stream << "\n Command:\n" << environment;
+      if( false == command.empty()) stream << "\n Command:\n" << command;
 
       if( false == environment.empty()) stream << "\n Environment = " << environment;
 
