@@ -44,10 +44,13 @@ private:
    void deletePlots();
 
 private:
+   std::string tooltip_base;
+   std::string tooltip_resources;
+
    af::Host    host;
    af::HostRes hres;
-   QString     hostAttrs;
-   QString     hostUsage;
+//   QString     hostAttrs;
+//   QString     hostUsage;
 
    int revision;
    QString  version;

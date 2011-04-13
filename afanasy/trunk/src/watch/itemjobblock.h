@@ -79,17 +79,17 @@ public:
 protected:
    virtual void paint( QPainter *painter, const QStyleOptionViewItem &option) const;
 
-/*private:
-now BlockData::generateInfoStream
-   void generateToolTip();
-   void updateToolTip();
-*/
 private:
    static const int HeightHeader;
    static const int HeightFooter;
 
 private:
    QString tooltip;
+
+   std::string tooltip_base;
+   std::string tooltip_block;
+   std::string tooltip_properties;
+   std::string tooltip_progress;
 
    int height;
    int width;

@@ -1,8 +1,8 @@
 #include "itemrender.h"
 
 #include <QtCore/QEvent>
-#include <QtNetwork/QHostAddress>
 #include <QtGui/QPainter>
+#include <QtNetwork/QHostAddress>
 
 #include "../libafanasy/taskexec.h"
 
@@ -151,7 +151,7 @@ void ItemRender::updateValues( af::Node *node, int type)
       {
          becameOnline = true;
          update_counter = 0;
-         hostAttrs = name;
+//         hostAttrs = name;
 
          host = render->getHost();
          plotMem.setScale( host.mem_mb);
@@ -175,7 +175,7 @@ void ItemRender::updateValues( af::Node *node, int type)
             plotSwp.setHotMax( 10000);
             plotSwp.setAutoScaleMax( 100000);
          }
-
+/*
          if( host.os.empty() == false ) hostAttrs += QString(" - %1").arg( afqt::stoq( host.os));
          hostAttrs += QString("; Power = %1").arg( host.power);
          if( render->getRevision() > 0)
@@ -187,7 +187,7 @@ void ItemRender::updateValues( af::Node *node, int type)
          if( host.cpu_num > 1) hostAttrs += QString(" x %1").arg( host.cpu_num);
          hostAttrs += QString("; Mem: %1 (+%2 Swap) Mb").arg( host.mem_mb).arg( host.swap_mb);
          hostAttrs += QString("; HDD: %1 Gb").arg( host.hdd_gb);
-
+*/
       }
 
       // If became offline:
@@ -231,6 +231,8 @@ void ItemRender::updateValues( af::Node *node, int type)
       state += '-' + QString::number( priority);
       if( isLocked() ) state += " (LOCK)";
 
+      tooltip_base = render->generateInfoString( true);
+
       if( false == becameOnline) break;
    }
    case af::Msg::TRendersListUpdates:
@@ -238,25 +240,25 @@ void ItemRender::updateValues( af::Node *node, int type)
       if( online == false ) break;
 
       hres.copy( render->getHostRes());
-//hres.stdOut( false);
+
+      tooltip_resources = hres.generateInfoString( true);
 
       int cpubusy = hres.cpu_user + hres.cpu_nice + hres.cpu_system + hres.cpu_iowait + hres.cpu_irq + hres.cpu_softirq;
+      int mem_used = host.mem_mb - hres.mem_free_mb;
+      int hdd_used = host.hdd_gb - hres.hdd_free_gb;
+      /*
       hostUsage = QString("CPU usage %1% - loadavg( %2 , %3 , %4 ):\n")
          .arg( cpubusy ).arg( hres.cpu_loadavg1/10.0).arg( hres.cpu_loadavg2/10.0).arg( hres.cpu_loadavg3/10.0);
       hostUsage += QString("Idle %1%, User %2%, Nice %3%, System %4%, IO %5%, IRQ %6%, sIRQ %7%")
          .arg( hres.cpu_idle   )
          .arg( hres.cpu_user   ).arg( hres.cpu_nice ).arg( hres.cpu_system  )
          .arg( hres.cpu_iowait ).arg( hres.cpu_irq  ).arg( hres.cpu_softirq );
-
-      int mem_used = host.mem_mb - hres.mem_free_mb;
       hostUsage += QString("\nMem (Mb): %1 Used - %2 Free (%3 cached + %4 buffered)")
          .arg(mem_used).arg(hres.mem_free_mb).arg(hres.mem_cached_mb).arg(hres.mem_buffers_mb);
-
-      int hdd_used = host.hdd_gb - hres.hdd_free_gb;
       hostUsage += QString("\nHDD (Gb): %1 Used - %2 Free; ").arg(hdd_used).arg(hres.hdd_free_gb);
       if( host.swap_mb)  hostUsage += QString("Swapped: %1 Mb").arg(hres.swap_used_mb);
       else               hostUsage += QString("Swapping: %1 Kb/sec").arg(hres.swap_used_mb);
-
+*/
       plotCpu.addValue( 0, hres.cpu_system + hres.cpu_iowait + hres.cpu_irq + hres.cpu_softirq);
       plotCpu.addValue( 1, hres.cpu_user + hres.cpu_nice);
       plotCpu.setLabelValue( cpubusy);
@@ -273,8 +275,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
       plotNet.addValue( 0, hres.net_recv_kbsec);
       plotNet.addValue( 1, hres.net_send_kbsec);
-      hostUsage += QString("\nNet (Kb/sec): %1 Recieved - %2 Send")
-         .arg(hres.net_recv_kbsec).arg(hres.net_send_kbsec);
+//      hostUsage += QString("\nNet (Kb/sec): %1 Recieved - %2 Send").arg(hres.net_recv_kbsec).arg(hres.net_send_kbsec);
 
 
       int plotIO_r_r = plotIO_rn_r * (100-hres.hdd_busy) / 100 + plotIO_rh_r * hres.hdd_busy / 100;
@@ -292,8 +293,8 @@ void ItemRender::updateValues( af::Node *node, int type)
       plotIO.addValue( 1, hres.hdd_wr_kbsec);
 //      if( hres.hdd_busy != -1 ) plotIO.addLabelText( QString("\n%1%").arg(hres.hdd_busy));
 
-      hostUsage += QString("\nHDD IO (Kb/sec): %1 Read - %2 Write").arg(hres.hdd_rd_kbsec).arg(hres.hdd_wr_kbsec);
-      if( hres.hdd_busy != -1 ) hostUsage += QString(": %3% Busy").arg(hres.hdd_busy);
+//      hostUsage += QString("\nHDD IO (Kb/sec): %1 Read - %2 Write").arg(hres.hdd_rd_kbsec).arg(hres.hdd_wr_kbsec);
+//      if( hres.hdd_busy != -1 ) hostUsage += QString(": %3% Busy").arg(hres.hdd_busy);
 
       // Create custom plots:
       if( plots.size() != hres.custom.size())
@@ -315,7 +316,7 @@ void ItemRender::updateValues( af::Node *node, int type)
          plots[i]->setLabelFontSize( hres.custom[i]->labelsize);
          plots[i]->height = hres.custom[i]->height;
          plots[i]->setBGColor( hres.custom[i]->bgcolorr, hres.custom[i]->bgcolorg, hres.custom[i]->bgcolorb);
-         hostUsage += QString("\n%1:\n%2").arg( QString::fromUtf8( hres.custom[i]->label.c_str()), QString::fromUtf8( hres.custom[i]->tooltip.c_str()));
+//         hostUsage += QString("\n%1:\n%2").arg( QString::fromUtf8( hres.custom[i]->label.c_str()), QString::fromUtf8( hres.custom[i]->tooltip.c_str()));
       }
 
       update_counter++;
@@ -336,7 +337,7 @@ void ItemRender::updateValues( af::Node *node, int type)
    else taskstartfinishtime_str = "NEW";
 
    calcHeight();
-
+/*
    tooltip = hostAttrs;
    if( dirty ) tooltip = "Dirty! Capacity changed, or service(s) disabled.\n" + tooltip;
    if( online ) tooltip += "\n" + hostUsage;
@@ -344,7 +345,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
    tooltip += "\n" + creationTime;
    if( online ) tooltip += "\nAddress = " + address_str;
-
+*/
    tasksusers.clear();
    for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
    {
@@ -355,6 +356,8 @@ void ItemRender::updateValues( af::Node *node, int type)
          tasksusers.append( tusr);
       }
    }
+
+   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_resources);
 }
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const

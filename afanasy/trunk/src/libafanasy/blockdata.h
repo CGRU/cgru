@@ -40,7 +40,11 @@ public:
    bool isValid() const;
    inline  void setJobId( int value) { jobid = value;}   ///< Set id of block job.
    inline  int  getJobId() const { return jobid;}        ///< Get id of block job.
+
    virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+   void generateInfoStreamTyped( std::ostringstream & stream, int type, bool full = false) const;
+   const std::string generateInfoStringTyped( int type, bool full = false) const;
+
    virtual int  calcWeight() const;                      ///< Calculate and return memory size.
 
 /// Generate task.

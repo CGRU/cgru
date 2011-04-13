@@ -34,7 +34,7 @@ public:
 
    inline int getCapacity()     const { return (capacity == -1 ? host.capacity : capacity);}
    inline int getCapacityUsed() const { return capacity_used;}
-   inline int getCapacityFree() const { return host.capacity - capacity_used;}
+   inline int getCapacityFree() const { return (capacity == -1 ? host.capacity : capacity) - capacity_used;}
    inline bool hasCapacity( int value) const { return capacity_used + value <= (capacity == -1 ? host.capacity : capacity );}
 
 /// Whether Render is ready to render tasks.

@@ -39,8 +39,6 @@ public:
    void setName( const QString & str) { name = str;}
    inline const QString & getName() const { return name;}
 
-//   const QString generateToolTip() const; // now BlockData::generateInfoStream
-
    static const int Height;
    static const int HeightCompact;
 

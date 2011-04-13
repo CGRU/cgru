@@ -40,7 +40,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
    switch( type)
    {
    case af::Msg::TJob:
-   case af::Msg::TJobRegister:
+//   case af::Msg::TJobRegister:
    case af::Msg::TBlocks:
 
       numeric           = block->isNumeric();
@@ -51,6 +51,9 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       pertask           = block->getFramePerTask();
       inc               = block->getFrameInc();
       multihost_service = afqt::stoq( block->getMultiHostService());
+
+      tooltip_base      = std::string("Block[") + block->getName() + "]:";
+      tooltip_block     = block->generateInfoStringTyped( af::Msg::TBlocks, true);
 
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
@@ -64,11 +67,13 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       tasksname         = afqt::stoq( block->getTasksName());
       parser            = afqt::stoq( block->getParser());
 
-//      generateToolTip();
+      tooltip_properties = block->generateInfoStringTyped( af::Msg::TBlocksProperties, true);
 
    case af::Msg::TBlocksProgress:
 
       state = block->getState();
+
+      tooltip_progress = block->generateInfoStringTyped( af::Msg::TBlocksProgress, true);
 
       break;
 
@@ -87,42 +92,14 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       description += QString(" (str:%1fpt)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
-   tooltip = afqt::stoq( block->generateInfoString());
-//   updateToolTip();
+   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties + "\n" + tooltip_block);
 }
 
 ItemJobBlock::~ItemJobBlock()
 {
 //printf("ItemJobBlock::~ItemJobBlock:\n");
 }
-/* now BlockData::generateInfoStream
-void ItemJobBlock::generateToolTip()
-{
-   blockToolTip.clear();
-   if( tasksname.isEmpty() == false) blockToolTip += QString("Tasks Name = '%1'\n").arg( tasksname);
-   blockToolTip += QString("Command:\n") + command;
-   blockToolTip += QString("\nWorking directory:\n") + workingdir;
-   blockToolTip += QString("\nService = '%1'").arg(service);
-      if( parser.isEmpty()) blockToolTip += " (no parser)";
-      else blockToolTip += QString(" Parser = '%1'").arg( parser);
-   if( numeric)
-      blockToolTip += QString("\nNumeric: from %1 to %2: %3 per task").arg(first).arg(last).arg(pertask);
-   else
-      blockToolTip += QString("\nArray of string commands (per host multiplier = %1)").arg(pertask);
 
-   if( environment.isEmpty() == false) blockToolTip += "\nEnvironment:\n"  + environment;
-   if( cmdpre.isEmpty()      == false) blockToolTip += "\nPre command:\n"  + cmdpre;
-   if( cmdpost.isEmpty()     == false) blockToolTip += "\nPost command:\n" + cmdpost;
-   if( files.isEmpty()       == false) blockToolTip += "\nFiles:\n" + files.replace(";","\n");
-}
-
-void ItemJobBlock::updateToolTip()
-{
-//printf("ItemJobBlock::updateToolTip:\n");
-   tooltip = info.generateToolTip();
-   tooltip += "\n\n" + blockToolTip;
-}
-*/
 void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
    drawBack( painter, option);

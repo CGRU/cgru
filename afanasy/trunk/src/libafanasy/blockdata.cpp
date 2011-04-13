@@ -530,62 +530,128 @@ int BlockData::calcWeight() const
    return weight;
 }
 
+const std::string BlockData::generateInfoStringTyped( int type, bool full) const
+{
+   std::ostringstream stream;
+   generateInfoStreamTyped( stream, type, full);
+   return stream.str();
+}
+
+void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, bool full) const
+{
+   switch( type)
+   {
+   case Msg::TJob:
+   case Msg::TJobRegister:
+   case Msg::TBlocks:
+// TODO: (VESRION) this integer parameters should be in Msg::TJobsList
+      if( isNumeric())
+      {
+         stream << "\n Frames: " << frame_first << " - " << frame_last << ": Per Task =" << frame_pertask;
+//         stream << "\n    Frame Increment = " << frame_inc;
+      }
+      break;
+
+   case Msg::TBlocksProperties:
+
+      if( full ) stream << "\nProperties:";
+
+      if( full && ( parsercoeff != 1 )) stream << "\n Parser Coefficient = " << parsercoeff;
+
+      if( false == tasksname.empty()) stream << "\n Tasks Name Pattern = " << tasksname;
+
+      if( full || ( ! parser.empty())) stream << "\n Parser = " << parser;
+      if( full && (   parser.empty())) stream << " is empty (no parser)";
+
+      if( false == wdir.empty()) stream << "\n Working Directory:\n" << wdir;
+
+      if( false == command.empty()) stream << "\n Command:\n" << environment;
+
+      if( false == environment.empty()) stream << "\n Environment = " << environment;
+
+      if( false == files.empty()) stream << "\n Files:\n" << af::strReplace( files, ';', '\n');
+
+      if( false == cmd_pre.empty()) stream << "\n Pre Command:\n" << cmd_pre;
+      if( false == cmd_post.empty()) stream << "\n Post Command:\n" << cmd_post;
+
+      if( false == multihost_service.empty()) stream << "\n MultiHost Service = " << multihost_service;
+
+      if( false == customdata.empty()) stream << "\n Custom Data:\n" << customdata;
+
+//      break;
+//   case Msg::TJobsList:
+
+      if(( filesize_min != -1 ) && ( filesize_max != -1 )) stream << "Files Size: " << filesize_min << " - " << filesize_max;
+
+      if( full ) stream << "\n Capacity = " << capacity;
+      if( canVarCapacity()) stream << " x" << capcoeff_min << " - x" << capcoeff_max;
+
+      if( isMultiHost() )
+      {
+         stream << "\n MultiHost: x" << multihost_min << " -x" << multihost_max;
+         stream << "\n    Wait service start = " << multihost_waitsrv;
+         stream << "\n    Wait service start maximum = " << multihost_waitmax;
+      }
+
+      if( full || ( maxrunningtasks != -1 )) stream << "\n Max Running Tasks = " << maxrunningtasks;
+      if( full && ( maxrunningtasks == -1 )) stream << " (no limit)";
+
+      if( need_memory > 0           ) stream << "\n Needed Memory = "   << need_memory;
+      if( need_power  > 0           ) stream << "\n Need Power = "      << need_power;
+      if( need_hdd    > 0           ) stream << "\n Need HDD = "        << need_hdd;
+      if( need_properties.notEmpty()) stream << "\n Need Properties = " << need_properties.getPattern();
+
+      if(        dependmask.notEmpty()) stream << "\n Depend Mask = "         << dependmask.getPattern();
+      if(   tasksdependmask.notEmpty()) stream << "\n Tasks Depend Mask = "   << tasksdependmask.getPattern();
+      if(         hostsmask.notEmpty()) stream << "\n Hosts Mask = "          << hostsmask.getPattern();
+      if( hostsmask_exclude.notEmpty()) stream << "\n Exclude Hosts Mask = "  << hostsmask_exclude.getPattern();
+
+      if( full ) stream << "\n Service = " << service;
+      if( full ) stream << "\n Tasks Number = " << tasksnum;
+
+      if( full ) stream << "\nErrors solving:";
+      if( full || ( maxrunningtasks     != -1 )) stream << "\n Maximum running tasks = " << maxrunningtasks;
+      if( full && ( maxrunningtasks     == -1 )) stream << " (no limit)";
+      if( full || ( errors_avoidhost    != -1 )) stream << "\n Errors for block avoid host = " << int(errors_avoidhost);
+      if( full && ( errors_avoidhost    == -1 )) stream << " (user settings used)";
+      if( full || ( errors_tasksamehost != -1 )) stream << "\n Errors for task avoid host = " << int( errors_tasksamehost);
+      if( full && ( errors_tasksamehost == -1 )) stream << " (user settings used)";
+      if( full || ( errors_retries      != -1 )) stream << "\n Error task retries = " << int( errors_retries);
+      if( full && ( errors_retries      == -1 )) stream << " (user settings used)";
+      if( full || ( errors_forgivetime  != -1 )) stream << "\n Errors forgive time = " << errors_forgivetime << " seconds";
+      if( full && ( errors_forgivetime  == -1 )) stream << " (infinite)";
+
+      break;
+
+   case Msg::TBlocksProgress:
+
+      if( full ) stream << "\nRunning Progress:";
+
+      if( p_tasksdone ) stream << "\n Run Time: Sum = " << af::time2strHMS( p_taskssumruntime, true)
+            << " / Average = " << af::time2strHMS( p_taskssumruntime/p_tasksdone, true);
+
+      if( full ) stream << "\n Tasks Ready = " << p_tasksready;
+      if( full ) stream << "\n Tasks Done = " << p_tasksdone;
+      if( full ) stream << "\n Tasks Error = " << p_taskserror;
+
+      if( p_errorhostsnum ) stream << "\n Error hosts count = " << p_errorhostsnum;
+      if( p_avoidhostsnum ) stream << "\n Avoid hosts count = " << p_avoidhostsnum;
+
+      break;
+
+   default:
+      stream << "Can not generate type info for type = " << Msg::TNAMES[type];
+      break;
+   }
+}
+
 void BlockData::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "Block[" << name << "]";
-   if( service.size())
-   {
-      stream << " (" << service;
-      if( parser.size()) stream << "-" << parser << "[" << parsercoeff << "]";
-      stream << ")";
-   }
-   stream << " " << tasksnum << " tasks, " << " capacity = " << capacity;
-
-   if( p_tasksdone ) stream << "\n Run Time: Sum = " << af::time2strHMS( p_taskssumruntime, true)
-         << " / Average = " << af::time2strHMS( p_taskssumruntime/p_tasksdone, true);
-
-   if( maxrunningtasks     != -1 ) stream << "\n Maximum running tasks = " << maxrunningtasks;
-   if( errors_avoidhost    != -1 ) stream << "\n Errors for block avoid host = " << int(errors_avoidhost);
-   if( errors_tasksamehost != -1 ) stream << "\n Errors for task avoid host = " << int( errors_tasksamehost);
-   if( errors_retries      != -1 ) stream << "\n Error task retries = " << int( errors_retries);
-   if( errors_forgivetime  != -1 )
-   {
-      stream << "\n Errors forgive time = " << double(errors_forgivetime)/3600.0 << " hours";
-      if( errors_forgivetime == 0) stream << " (infinite)";
-   }
-
-   if( tasksmaxruntime ) stream << "\n Tasks max run time = " << double(tasksmaxruntime)/3600 << " hours";
-   if( p_errorhostsnum ) stream << "\n Error hosts count = " << p_errorhostsnum;
-   if( p_avoidhostsnum ) stream << "\n Avoid hosts count = " << p_avoidhostsnum;
-
-/* TODO: (VESRION) no info for Msg::TJobsList
-   if( canVarCapacity()) stream << "\n Variable Capacity: coefficient = " << capcoeff_min << "-" << capcoeff_max;
-   if( isMultiHost())
-   {
-      stream << "\n MultiHost Tasks: min " << int( multihost_min) << " - " << int( multihost_max) << " - max";
-      if( multihost_waitmax         ) stream << "\n    " << int(multihost_waitmax) << " seconds wainting for maximum.";
-      if( multihost_waitsrv         ) stream << "\n    " << int(multihost_waitsrv) << " seconds wainting for service start.";
-      if( canMasterRunOnSlaveHost() ) stream << "\n    Master and slave are the same host.";
-   }
-*/
-   if(           command.size()     ) stream << "\n Command:\n"               << command;
-   if(              wdir.size()     ) stream << "\n Working Directory:\n"     << wdir;
-   if(        dependmask.notEmpty() ) stream << "\n Depend Mask = \""         << dependmask.getPattern()         << "\"";
-   if(   tasksdependmask.notEmpty() ) stream << "\n Tasks Depend Mask = \""   << tasksdependmask.getPattern()    << "\"";
-   if(         hostsmask.notEmpty() ) stream << "\n Hosts Mask = \""          << hostsmask.getPattern()          << "\"";
-   if( hostsmask_exclude.notEmpty() ) stream << "\n Exclude Hosts Mask = \""  << hostsmask_exclude.getPattern()  << "\"";
-   if(   need_properties.notEmpty() ) stream << "\n Need Properties = \""     << need_properties.getPattern()    << "\"";
-   if(   need_power                 ) stream << "\n Need Power = "            << need_power;
-   if(   need_memory                ) stream << "\n Need Memory = "           << need_memory;
-   if(   need_hdd                   ) stream << "\n Need HDD = "              << need_hdd;
-   if(       environment.size()     ) stream << "\n Environment:\n"           << environment;
-   if(           cmd_pre.size()     ) stream << "\n Pre Command:\n"           << cmd_pre;
-   if(          cmd_post.size()     ) stream << "\n Post Command:\n"          << cmd_post;
-   if(        customdata.size()     ) stream << "\n Custom Data:\n"           << customdata;
-   if(             files.size()     ) stream << "\n Files:\n"                 << files;//.replace( files.begin(), files.end(), ";", "\n");
-
-   if((filesize_min != -1) || (filesize_max != -1)) stream << "\n File Check: " << filesize_min << "-" << filesize_max;
-
+   stream << "Block[" << name << "] " << service << "[" << capacity << "] " << tasksnum << " tasks";
+   generateInfoStreamTyped( stream, Msg::TBlocksProgress,   full);
+   generateInfoStreamTyped( stream, Msg::TBlocksProperties, full);
+   if( full ) generateInfoStreamTyped( stream, Msg::TBlocks, full);
+/*
    if( full )
    {
       if( isNumeric())
@@ -610,6 +676,7 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
       }
       stream << " memory: " << calcWeight() << " bytes.";
    }
+*/
 }
 
 

@@ -109,13 +109,11 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       icon_small = Watch::getServiceIconSmall( service);
 
    case af::Msg::TBlocksProgress:
+
+      state                = block->getState();
       avoidhostsnum        = block->getProgressAvoidHostsNum();
       errorhostsnum        = block->getProgressErrorHostsNum();
       runningtasksnumber   = block->getRunningTasksNumber();
-
-   case 0:
-      // Update block with ZERO type, to notify that block progress locally calculated based on job progess tasks run
-      state                = block->getState();
       taskssumruntime      = block->getProgressTasksSumRunTime();
       tasksready           = block->getProgressTasksReady();
       tasksdone            = block->getProgressTasksDone();
@@ -359,79 +357,7 @@ void BlockInfo::drawProgress(
       }
    }
 }
-/* using BlockData::generateInfoStream now
-const QString BlockInfo::generateToolTip() const
-{
-   QString toolTip = QString("Run Time: Sum = %1 / %2 = Average")
-                     .arg( af::time2strHMS( taskssumruntime, true).c_str())
-                     .arg( af::time2strHMS( tasksdone ? taskssumruntime/tasksdone : 0, true).c_str());
 
-   toolTip += "\nCapacity = "                +  QString::number( capacity);
-
-   toolTip += "\nErrors:";
-   toolTip += "\nBlock avoid host = "        +  QString::number( errors_avoidhost);
-      if( errors_avoidhost == -1) toolTip += " (user settings used)";
-   toolTip += "\nTask errors avoid host = "  +  QString::number( errors_tasksamehost);
-      if( errors_tasksamehost == -1) toolTip += " (user settings used)";
-   toolTip += "\nRetry task errors = "       +  QString::number( errors_retries);
-      if( errors_retries == -1) toolTip += " (user settings used)";
-   toolTip += "\nErrors forgive time = ";
-   if( errors_forgivetime >= 0)
-   {
-      toolTip += QString::number( double(tasksmaxruntime)/3600) + " hours";
-      if( errors_forgivetime == 0) toolTip += QString(" (infinite)");
-   }
-   else toolTip += " = -1 (user settings used)";
-
-   toolTip += "\nTasks max run time = "      +  QString::number( double(tasksmaxruntime)/3600) + " hours";
-   if( tasksmaxruntime == 0 ) toolTip        += QString(" (infinite)");
-   toolTip += "\nError hosts count = "       +  QString::number( errorhostsnum);
-   toolTip += "\nAvoid hosts count = "       +  QString::number( avoidhostsnum);
-
-   toolTip += "\n";
-
-   toolTip += "\nDepend mask";
-   if( dependmask.isEmpty() == false)  toolTip += ": \"" + dependmask + "\"";
-   else                                toolTip += " is empty (block is independent).";
-
-   toolTip += "\nTasks depend mask ";
-   if( tasksdependmask.isEmpty() == false)   toolTip += " = " + tasksdependmask;
-   else                                      toolTip += "is empty (tasks are independent).";
-
-   toolTip += "\nHosts mask: ";
-   if( hostsmask.isEmpty() == false)   toolTip += " \"" + hostsmask + "\"";
-   else                                toolTip += " is empty (any host).";
-
-   if( hostsmask_exclude.isEmpty() == false) toolTip += QString("\nExclude hosts masks: \"%1\"").arg( hostsmask_exclude);
-
-   toolTip += "\nMaximum running tasks = " + maxrunningtasks_str;
-   if( maxrunningtasks == -1 ) toolTip += " (infinite)";
-
-   QString need;
-   if( need_memory   ) need += QString(" Mem: %1 Mb;" ).arg( need_memory);
-   if( need_hdd      ) need += QString(" HDD: %1 Gb;" ).arg( need_hdd);
-   if( need_power    ) need += QString(" Power: %1;"  ).arg( need_power);
-   if( false == need_properties.isEmpty()) need += QString("\nProperties: \"%1\"").arg( need_properties);
-   if( false == need.isEmpty())
-   {
-      need = "\nNeeded:" + need;
-      toolTip += need;
-   }
-
-   if( varcapacity   ) toolTip += QString("\nVariable Capacity: coefficient = %1-%2").arg( capcoeff_min).arg( capcoeff_max);
-   if( multihost     )
-   {
-      toolTip += QString("\nMultiHost Tasks: min %1 - %2 - max").arg( multihost_min).arg( multihost_max);
-      if( multihost_waitmax) toolTip += QString("\n%1 seconds wainting for maximum.").arg( multihost_waitmax);
-      if( multihost_waitsrv) toolTip += QString("\n%1 seconds wainting for service start.").arg( multihost_waitsrv);
-      if( multihost_samemaster) toolTip += "\nMaster and slave are the same host.";
-   }
-   if((filesize_min != -1) || (filesize_max != -1))
-      toolTip += QString("\nFile Check: %1-%2").arg( filesize_min).arg( filesize_max);
-
-   return toolTip;
-}
-*/
 void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 {
    ActionIdId *action;

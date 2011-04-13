@@ -499,6 +499,14 @@ const std::string af::strJoin( const std::vector<std::string> & strvect, const s
    return str;
 }
 
+const std::string af::strReplace( const std::string & str, char before, char after)
+{
+   std::string replaced( str);
+   for( std::string::iterator it = replaced.begin(); it != replaced.end(); it++)
+      if( *it == before ) *it = after;
+   return replaced;
+}
+
 const std::list<std::string> af::strSplit( const std::string & str, const std::string & separators)
 {
    std::list<std::string> strlist;

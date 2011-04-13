@@ -80,21 +80,9 @@ void Render::readwrite( Msg * msg)
       rw_uint8_t ( priority,              msg);
       rw_uint32_t( time_launch,           msg);
       host.readwrite( msg);
-      if( isOnline())
-      {
-         address.readwrite( msg);
-/*         if( msg->isWriting())
-         {
-            if( address != NULL ) address->write( msg);
-            else
-               AFERRAR("Render::readwrite: Trying to write online \"%s\" Render with NULL address.\n", name.c_str());
-         }
-         else
-         {
-            if( address ) delete address;
-            address = new Address( msg);
-         }*/
-      }
+
+// TODO: VERSION: Always write address
+      if( isOnline()) address.readwrite( msg);
 
    case Msg::TRenderUpdate:
    case Msg::TRendersListUpdates:
@@ -215,22 +203,30 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "#" << id << ": " << name << "@" << username;
-      stream << " (" << version << " r" << revision << ")";
-      stream << " :: ";
-      address.generateInfoStream( stream ,full);
-      stream << " - " << calcWeight() << " bytes.";
+      stream << "Render " << name << "@" << username << " (id=" << id << "):";
+      stream << "\n Version = \"" << version << "\" Build Revision = " << revision;
+
+      if( isDirty()) stream << "\nDirty! Capacity|Max Tasks changed, or service(s) disabled.";
 
       stream << std::endl;
+      address.generateInfoStream( stream ,full);
 
-      host.generateInfoStream( stream ,full);
-      hres.generateInfoStream( stream ,full);
-      stream << "\n Ready = " << ( isReady() ? "TRUE" : "FALSE" );
-      stream << "\n Busy  = " << ( isBusy()  ? "true" : "false" );
-      stream << "\n NIMBY = " << ( isNIMBY() ? "true" : "false" );
-      stream << "\n Nimby = " << ( isNimby() ? "true" : "false" );
+      stream << "\n Priority = " << int(priority);
+      stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
+
+      stream << "\n Status: ";
+      if( isOnline()) stream << " Online";
+      if( isOffline()) stream << " Offline";
+      if( isFree()) stream << " Free";
+      if( isBusy()) stream << " Busy";
+      if( isNimby()) stream << " (nimby)";
+      if( isNIMBY()) stream << " (NIMBY)";
       if( time_launch   ) stream << "\n Launched at   = " << time2str( time_launch   );
       if( time_register ) stream << "\n Registered at = " << time2str( time_register );
+
+      stream << std::endl;
+      host.generateInfoStream( stream ,full);
+//      hres.generateInfoStream( stream ,full);
    }
    else
    {

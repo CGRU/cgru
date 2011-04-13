@@ -115,25 +115,25 @@ void Host::readwrite( Msg * msg)
 
 void Host::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "Host: ";
+   stream << "Host:";
    if( full)
    {
-      stream << "CPU = " << cpu_mhz << " MHz x " << cpu_num;
-      stream << ", MEM = " << mem_mb << " (+" << swap_mb << " swap) Mb";
-      stream << ", HDD = " << hdd_gb << " Gb";
-      stream << std::endl;
-      stream << "   OS=\"" << os << "\": ";
-      stream << "Capacity = " << capacity;
+      if( false == os.empty()) stream << " OS=\"" << os << "\"";
+      stream << " Capacity = " << capacity;
       stream << ", Max tasks = " << maxtasks;
       stream << ", Power " << power;
-      stream << std::endl;
+      if( cpu_mhz || cpu_num || mem_mb || swap_mb || hdd_gb )
+      {
+         stream << std::endl;
+         stream << " CPU = " << cpu_mhz << " MHz" << " x" << cpu_num;
+         stream << ", MEM = " << mem_mb << " (+" << swap_mb << " Swap) Mb";
+         stream << ", HDD = " << hdd_gb << " Gb";
+      }
       for( int i = 0; i < servicesnum; i++)
       {
-         stream << "   Service: \"" << servicesnames[i] << "\"";
+         stream << "\n Service: \"" << servicesnames[i] << "\"";
          if( servicescounts[i]) stream << " - " << servicescounts[i];
-         stream << std::endl;
       }
-      if( servicesnum == 0) stream << "   No services descripion.";
    }
    else
    {
@@ -303,27 +303,22 @@ void HostRes::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "Resources: ";
    if( full)
    {
-      stream << "Load average: " << cpu_loadavg1/10.0 << " " << cpu_loadavg2/10.0 << " " << cpu_loadavg3/10.0;
-      stream << std::endl;
-
-      stream << "   CPU usage: ";
-      stream << int( cpu_user    ) << "% usr, ";
-      stream << int( cpu_nice    ) << "% nice, ";
-      stream << int( cpu_system  ) << "% sys, ";
-      stream << int( cpu_idle    ) << "% idle, ";
-      stream << int( cpu_iowait  ) << "% iow, ";
-      stream << int( cpu_irq     ) << "% irq, ";
-      stream << int( cpu_softirq ) << "% sirq, ";
-      stream << std::endl;
-      stream << "   Memory: Free " << mem_free_mb
+      stream << "\n   CPU usage: "
+            << int( cpu_user    ) << "% usr, "
+            << int( cpu_nice    ) << "% nice, "
+            << int( cpu_system  ) << "% sys, "
+            << int( cpu_idle    ) << "% idle, "
+            << int( cpu_iowait  ) << "% iow, "
+            << int( cpu_irq     ) << "% irq, "
+            << int( cpu_softirq ) << "% sirq";
+      stream << "\n   Load average:   " << cpu_loadavg1/10.0 << "   " << cpu_loadavg2/10.0 << "   " << cpu_loadavg3/10.0;
+      stream << "\n   Memory: Free " << mem_free_mb
             << " Mb, Cached " << mem_cached_mb
             << " Mb, Buffers " << mem_buffers_mb
-            << " Mb, Swap " << swap_used_mb
-            << " Mb and HDD Free " << hdd_free_gb  << " Gb";
-      stream << std::endl;
-      stream << "   Network: Recieved " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
-      stream << std::endl;
-      stream << "   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
+            << " Mb, Swap " << swap_used_mb << " Mb";
+      stream << "\n   Network: Recieved " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
+      stream << "\n   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
+      stream << "\n   HDD: " << hdd_free_gb  << " Gb Free";
    }
    else
    {
