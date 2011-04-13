@@ -119,54 +119,6 @@ void Render::restoreDefaults()
    state = state & (~SDirty);
 }
 
-bool Render::addTask( TaskExec * taskexec)
-{
-   bool becamebusy = false;
-   if( tasks.size() == 0)
-   {
-      setBusy( true);
-      becamebusy = true;
-      taskstartfinishtime = time( NULL);
-   }
-   tasks.push_back( taskexec);
-
-   capacity_used += taskexec->getCapResult();
-
-   if( capacity_used > getCapacity() )
-      AFERRAR("Render::addTask(): capacity_used > host.capacity (%d>%d)\n", capacity_used, host.capacity);
-
-   return becamebusy;
-}
-
-bool Render::removeTask( const TaskExec * taskexec)
-{
-   bool becamefree = false;
-   for( std::list<TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
-   {
-      if( *it == taskexec)
-      {
-         it = tasks.erase( it);
-         continue;
-      }
-   }
-
-   if( capacity_used < taskexec->getCapResult())
-   {
-      AFERRAR("Render::removeTask(): capacity_used < taskdata->getCapResult() (%d<%d)\n", capacity_used, taskexec->getCapResult());
-      capacity_used = 0;
-   }
-   else capacity_used -= taskexec->getCapResult();
-
-   if( tasks.size() == 0)
-   {
-      setBusy( false);
-      becamefree = true;
-      taskstartfinishtime = time( NULL);
-   }
-
-   return becamefree;
-}
-
 int Render::calcWeight() const
 {
    int weight = Client::calcWeight();
@@ -217,7 +169,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Status: ";
       if( isOnline()) stream << " Online";
       if( isOffline()) stream << " Offline";
-      if( isFree()) stream << " Free";
+//      if( isFree()) stream << " Free";
       if( isBusy()) stream << " Busy";
       if( isNimby()) stream << " (nimby)";
       if( isNIMBY()) stream << " (NIMBY)";

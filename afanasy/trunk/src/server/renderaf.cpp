@@ -78,9 +78,6 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
       if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    }
-
-//   if( address) delete address;
-//   address = NULL;
 }
 
 bool RenderAf::update( const af::Render * render)
@@ -88,7 +85,7 @@ bool RenderAf::update( const af::Render * render)
    if( isOffline()) return false;
    if( render == NULL )
    {
-      AFERROR("Render::update( Render * render): render == NULL");
+      AFERROR("Render::update( Render * render): render == NULL")
       return false;
    }
 
@@ -102,15 +99,14 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
 {
    if( isOnline())
    {
-      AFERROR("RenderAf::online: Render is already online.\n");
+      AFERROR("RenderAf::online: Render is already online.")
       return false;
    }
-//   if( address) delete address;
    address.copy( render->getAddress());
    time_launch = render->time_launch;
    revision = render->revision;
    version = render->version;
-/*   setRegisterTime();*/ taskstartfinishtime = 0;
+   taskstartfinishtime = 0;
    getFarmHost( &render->host);
    setOnline();
    update( render);
@@ -137,16 +133,16 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 {
   if( isOffline())
    {
-      AFERROR("RenderAf::setTask: Render is offline.\n");
+      AFERROR("RenderAf::setTask: Render is offline.")
       return;
    }
    if( taskexec == NULL)
    {
-      AFERROR("RenderAf::setTask: taskexec == NULL.\n");
+      AFERROR("RenderAf::setTask: taskexec == NULL.")
       return;
    }
 
-   if( addTask( taskexec)) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+   addTask( taskexec);
    addService( taskexec->getServiceType());
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
 
@@ -171,7 +167,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 {
    if( isOffline())
    {
-      AFERROR("RenderAf::startTask: Render is offline.\n");
+      AFERROR("RenderAf::startTask: Render is offline.")
       return;
    }
    for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
@@ -189,7 +185,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
       return;
    }
 
-   AFERROR("RenderAf::startTask: No such task.\n");
+   AFERROR("RenderAf::startTask: No such task.")
    taskexec->stdOut( false);
 }
 
@@ -198,7 +194,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
 //printf("RenderAf::action: type = [%s]\n", af::Msg::TNAMES[type]);
    if( pointer == NULL)
    {
-      AFERROR("RenderAf::setAttr(): JobContainer pointer == NULL.\n");
+      AFERROR("RenderAf::setAttr(): JobContainer pointer == NULL.")
       return true;
    }
    std::string userhost( mcgeneral.getUserName() + '@' + mcgeneral.getHostName());
@@ -382,7 +378,7 @@ void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
 
 void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring)
 {
-   if( removeTask( taskexec)) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+   removeTask( taskexec);
    remService( taskexec->getServiceType());
    if( taskexec->getNumber())
    {
@@ -397,6 +393,43 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
       appendLog( str);
    }
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+}
+
+void RenderAf::addTask( af::TaskExec * taskexec)
+{
+   // If render was not busy it has become busy now
+   //   if( tasks.size() == 0)
+   if( false == isBusy()) // the same
+   {
+      setBusy( true);
+      taskstartfinishtime = time( NULL);
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+   }
+   tasks.push_back( taskexec);
+
+   capacity_used += taskexec->getCapResult();
+
+   if( capacity_used > getCapacity() )
+      AFERRAR("RenderAf::addTask(): capacity_used > host.capacity (%d>%d)", capacity_used, host.capacity)
+}
+
+void RenderAf::removeTask( const af::TaskExec * taskexec)
+{
+   for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
+   {
+      if( *it == taskexec)
+      {
+         it = tasks.erase( it);
+         continue;
+      }
+   }
+
+   if( capacity_used < taskexec->getCapResult())
+   {
+      AFERRAR("RenderAf::removeTask(): capacity_used < taskdata->getCapResult() (%d<%d)", capacity_used, taskexec->getCapResult())
+      capacity_used = 0;
+   }
+   else capacity_used -= taskexec->getCapResult();
 }
 
 void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
@@ -414,6 +447,17 @@ void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorConta
       }
       offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
       return;
+   }
+}
+
+void RenderAf::notSolved()
+{
+   // If render was busy but has no tasks after solve it is not busy now
+   if( isBusy() && ( tasks.size() == 0))
+   {
+      setBusy( false);
+      taskstartfinishtime = time( NULL);
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    }
 }
 

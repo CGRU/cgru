@@ -66,9 +66,6 @@ public:
 
    const std::string getResourcesString() const;
 
-   bool addTask( TaskExec * taskexec);
-   bool removeTask( const TaskExec * taskexec);
-
    inline const std::string & getAnnontation() const { return annotation;}
 
 public:
@@ -92,6 +89,8 @@ protected:
    uint32_t state;   ///< State.
 
    int32_t capacity;
+   int32_t capacity_used;
+
    std::string services_disabled;
    std::string customdata;
    std::string annotation;
@@ -104,9 +103,6 @@ protected:
 
 private:
    void construct();
-
-private:
-   int32_t capacity_used;
 
 protected:
    void readwrite( Msg * msg); ///< Read or write Render in message.

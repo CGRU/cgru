@@ -49,8 +49,6 @@ private:
 
    af::Host    host;
    af::HostRes hres;
-//   QString     hostAttrs;
-//   QString     hostUsage;
 
    int revision;
    QString  version;

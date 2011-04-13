@@ -73,6 +73,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
             {
                // store render Id if it produced a task
                if( users->genTask( render, monitors)) rIds.push_back( render->getId());
+               else render->notSolved(); // Render not solved, needed to update render status
             }
          }
       }

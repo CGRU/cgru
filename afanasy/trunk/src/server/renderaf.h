@@ -72,6 +72,9 @@ public:
 
    bool update( const af::Render * render);   ///< Update Render.
 
+   // Called directly from solve cycle if it was not solved.
+   void notSolved();
+
 public:
    /// Set jobs container.
    inline static void setRenderContainer( RenderContainer *Rendercontainer){ renders = Rendercontainer;}
@@ -92,6 +95,9 @@ private:
 
 private:
    void init();
+
+   void addTask( af::TaskExec * taskexec);
+   void removeTask( const af::TaskExec * taskexec);
 
    void addService( const std::string & type);
    void remService( const std::string & type);
