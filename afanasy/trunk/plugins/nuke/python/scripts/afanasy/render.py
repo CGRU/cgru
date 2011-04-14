@@ -219,6 +219,7 @@ class BlockParameters:
          cmd = cgru.dailiesGenCmd( self.wnode)
          if cmd is None or cmd == '': return
          block = af.Block( os.path.basename( cmd.split(' ')[-1]), DailiesServiceType)
+         if self.capacity != -1: block.setCapacity( self.capacity)
          task = af.Task('dailies')
          task.setCommand( cmd, False) # Prefix don`t needed
          block.tasks.append( task)
