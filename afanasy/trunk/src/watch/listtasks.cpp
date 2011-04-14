@@ -441,6 +441,8 @@ bool ListTasks::updateTasks( af::MCTasksProgress * mctasksprogress)
 
    if( firstChangedRow != -1 ) model->emit_dataChanged( firstChangedRow, lastChangedRow);
 
+   setWindowTitleProgress();
+
    return true;
 }
 
@@ -451,7 +453,11 @@ void ListTasks::setWindowTitleProgress()
    for( int b = 0; b < blocksnum; b++)
       for( int t = 0; t < tasksnum[b]; t++)
       {
-         total_percent += wtasks[b][t]->taskprogress.percent;
+         if(( wtasks[b][t]->taskprogress.state & AFJOB::STATE_DONE_MASK) ||
+            ( wtasks[b][t]->taskprogress.state & AFJOB::STATE_SKIPPED_MASK))
+            total_percent += 100;
+         else if ( wtasks[b][t]->taskprogress.state & AFJOB::STATE_RUNNING_MASK )
+            total_percent += wtasks[b][t]->taskprogress.percent;
          total_tasks++;
       }
 
