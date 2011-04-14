@@ -209,20 +209,6 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
       if( getSelectedItemsCount() == 1) action->setEnabled(false == render->isOnline());
       menu.addAction( action);
-      action = new QAction( "Restart Render", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
-      connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
-      menu.addAction( action);
-      action = new QAction( "Reboot Computer", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
-      connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
-      menu.addAction( action);
-
-/* Do not needed since multitask renders, but can be used in future.
-      action = new QAction( "Start another Render", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actStart() ));
-      menu.addAction( action);
-*/
 
       if( af::Environment::getRenderCmds().size() > 0 )
       {
@@ -241,10 +227,39 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
       menu.addSeparator();
 
-      action = new QAction( "Shutdown Computer", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
-      connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
+      {
+         QMenu * submenu = new QMenu( "Restart", this);
+
+         action = new QAction( "Render", this);
+         if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+         connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+         submenu->addAction( action);
+         action = new QAction( "Computer", this);
+         if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+         connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
+         submenu->addAction( action);
+
+         menu.addMenu( submenu);
+      }
+
+/* Do not needed since multitask renders, but can be used in future.
+      action = new QAction( "Start another Render", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actStart() ));
       menu.addAction( action);
+*/
+
+      menu.addSeparator();
+
+      {
+         QMenu * submenu = new QMenu( "Shutdown", this);
+
+         action = new QAction( "Shutdown Computer", this);
+         if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+         connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
+         submenu->addAction( action);
+
+         menu.addMenu( submenu);
+      }
    }
 
    menu.exec( event->globalPos());

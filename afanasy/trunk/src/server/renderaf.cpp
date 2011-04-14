@@ -38,6 +38,7 @@ void RenderAf::init()
    servicesnum = 0;
    if( host.capacity == 0 ) host.capacity = af::Environment::getRenderDefaultCapacity();
    if( host.maxtasks == 0 ) host.maxtasks = af::Environment::getRenderDefaultMaxTasks();
+   setBusy( false);
 }
 
 RenderAf::~RenderAf()
@@ -57,6 +58,7 @@ void RenderAf::setRegisterTime()
 void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie )
 {
    setOffline();
+   setBusy( false);
 
    if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
 
@@ -398,8 +400,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 void RenderAf::addTask( af::TaskExec * taskexec)
 {
    // If render was not busy it has become busy now
-   //   if( tasks.size() == 0)
-   if( false == isBusy()) // the same
+   if( false == isBusy())
    {
       setBusy( true);
       taskstartfinishtime = time( NULL);
@@ -415,6 +416,9 @@ void RenderAf::addTask( af::TaskExec * taskexec)
 
 void RenderAf::removeTask( const af::TaskExec * taskexec)
 {
+   // Do not set free status here, even if this task was last.
+   // May it will take another task in this run cycle
+
    for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
    {
       if( *it == taskexec)
@@ -453,6 +457,8 @@ void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorConta
 void RenderAf::notSolved()
 {
    // If render was busy but has no tasks after solve it is not busy now
+   // Needed not to reset busy render status if it run one task after other
+
    if( isBusy() && ( tasks.size() == 0))
    {
       setBusy( false);

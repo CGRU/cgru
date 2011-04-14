@@ -179,13 +179,17 @@ void HostResMeter::readwrite( Msg * msg)
 
 void HostResMeter::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << label << ": ";
-   stream << value << " of " << valuemax;
-   stream << " wh(" << width << "," << height << ")";
-   stream << " gc(" << graphr << "," << graphg << "," << graphb << ")";
-   stream << " ls" << labelsize;
-   stream << " lc(" << labelr << "," << labelg << "," << labelb << ")";
-   stream << " bgc(" << bgcolorr << "," << bgcolorg << "," << bgcolorb << ")";
+   stream << label   << ": ";
+   stream << value   << " of " << valuemax;
+   if( full)
+   {
+      stream << std::endl;
+      stream << " WH(" << int(width)     << "," << int(height)   << ")";
+      stream << " GC(" << int(graphr)    << "," << int(graphg)   << "," << int(graphb)   << ")";
+      stream << " LS"  << int(labelsize);
+      stream << " LC(" << int(labelr)    << "," << int(labelg)   << "," << int(labelb)   << ")";
+      stream << " BC(" << int(bgcolorr)  << "," << int(bgcolorg) << "," << int(bgcolorb) << ")";
+   }
    stream << std::endl;
    stream << tooltip;
 }

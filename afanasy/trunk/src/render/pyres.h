@@ -1,9 +1,5 @@
 #pragma once
 
-#include <Python.h>
-
-#include <QtCore/QString>
-
 #include "../libafanasy/pyclass.h"
 
 class PyRes: public af::PyClass
