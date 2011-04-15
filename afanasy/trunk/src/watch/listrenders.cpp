@@ -234,6 +234,13 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
          submenu->addAction( action);
+
+         menu.addMenu( submenu);
+      }
+
+      {
+         QMenu * submenu = new QMenu( "Reboot", this);
+
          action = new QAction( "Computer", this);
          if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
