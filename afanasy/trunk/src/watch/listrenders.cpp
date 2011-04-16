@@ -260,7 +260,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       {
          QMenu * submenu = new QMenu( "Shutdown", this);
 
-         action = new QAction( "Shutdown Computer", this);
+         action = new QAction( "Computer", this);
          if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
          submenu->addAction( action);
