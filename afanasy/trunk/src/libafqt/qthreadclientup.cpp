@@ -16,7 +16,7 @@ QThreadClientUp::QThreadClientUp( QObject * Parent, bool Blocking, int Seconds, 
    toQuit( false)
 {
    setObjectName("QObj_QThreadClientUp");
-   AFINFA("QThreadClientUp::QThreadClientUp: blocking=%d, seconds=%d, numconnlost=%d\n", blocking, seconds, NumConnLost);
+   AFINFA("QThreadClientUp::QThreadClientUp: blocking=%d, seconds=%d, numconnlost=%d", blocking, seconds, NumConnLost)
    if( ! blocking )
    {
       timer.setInterval( 1000 * seconds);
@@ -26,7 +26,7 @@ QThreadClientUp::QThreadClientUp( QObject * Parent, bool Blocking, int Seconds, 
 
 QThreadClientUp::~QThreadClientUp()
 {
-AFINFO("QThreadClientUp::~QThreadClientUp() \n");
+AFINFO("QThreadClientUp::~QThreadClientUp()")
    toQuit = true;
    timer.stop();
    cond.wakeOne();
@@ -79,7 +79,7 @@ QMsg * afqt::QThreadClientUp::getMessage()
 
 void QThreadClientUp::run()
 {
-AFINFO("QThreadClientUp::run() \n");
+AFINFO("QThreadClientUp::run()")
    QTcpSocket socket;
 
    if( blocking)

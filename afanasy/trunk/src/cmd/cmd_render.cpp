@@ -1,9 +1,10 @@
 #include "cmd_render.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/render.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
+#include "../libafanasy/regexp.h"
+#include "../libafanasy/render.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -193,6 +194,42 @@ bool CmdRenderDelete::processArguments( int argc, char** argv, af::Msg &msg)
    std::string name( af::Environment::getHostName());
    if( argc > 0) name = argv[0];
    af::MCGeneral mcgeneral( name, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdRenderWOLSleep::CmdRenderWOLSleep()
+{
+   setCmd("rsleep");
+   setInfo("Ask render(s) to sleep.");
+   setHelp("rsleep [name] Ask render(s) to sleep.");
+   setArgsCount(1);
+   setMsgType( af::Msg::TRenderWOLSleep);
+}
+CmdRenderWOLSleep::~CmdRenderWOLSleep(){}
+bool CmdRenderWOLSleep::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdRenderWOLWake::CmdRenderWOLWake()
+{
+   setCmd("rwake");
+   setInfo("Ask sleeping render(s) to wake up.");
+   setHelp("rwake [name] Ask render(s) to wake up.");
+   setArgsCount(1);
+   setMsgType( af::Msg::TRenderWOLWake);
+}
+CmdRenderWOLWake::~CmdRenderWOLWake(){}
+bool CmdRenderWOLWake::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string mask = argv[0];
+   if( af::RegExp::Validate( mask) == false ) return false;
+   af::MCGeneral mcgeneral( mask, 0);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }

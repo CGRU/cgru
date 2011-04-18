@@ -7,6 +7,7 @@
 #include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 
+#include "afcommon.h"
 #include "msgaf.h"
 
 #define AFOUTPUT
@@ -72,6 +73,8 @@ switch ( msg->type())
    case af::Msg::TRenderReboot:
    case af::Msg::TRenderShutdown:
    case af::Msg::TRenderExit:
+   case af::Msg::TRenderWOLSleep:
+   case af::Msg::TRenderWOLWake:
    {
       af::MCGeneral mcgeneral( msg);
       renders->action( mcgeneral, msg->type(), jobs, monitors);
@@ -209,13 +212,13 @@ mclass.stdOut();
    }
    case af::Msg::TConfirm:
    {
-      printf("Thread run: af::Msg::TConfirm: %d\n", msg->int32());
+      AFCommon::QueueLog( std::string("af::Msg::TConfirm: ") + af::itos( msg->int32()));
       break;
    }
    default:
    {
-      AFERROR("ThreadRun::msgCase: message with unknown type recieved.")
-      msg->stdOut();
+      AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + msg->generateInfoString( false));
+      break;
    }
 }
 delete msg;

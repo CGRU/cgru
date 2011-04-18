@@ -19,7 +19,8 @@ Host::Host():
    hdd_gb(0),
    os(""),
    properties(""),
-   servicesnum(0)
+   servicesnum(0),
+   wol_idlesleep_time(0)
 {
 }
 
@@ -95,6 +96,8 @@ void Host::mergeParameters( const Host & other)
    if( other.properties.size()) properties   = other.properties;
    if( other.resources.size() ) resources    = other.resources;
    if( other.data.size()      ) data         = other.data;
+
+   if( other.wol_idlesleep_time ) wol_idlesleep_time = other.wol_idlesleep_time;
 }
 
 void Host::readwrite( Msg * msg)
@@ -123,6 +126,9 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << " Capacity = " << capacity;
       stream << ", Max tasks = " << maxtasks;
       stream << ", Power " << power;
+
+      if( wol_idlesleep_time ) stream << "\n WOL Sleep Idle Time = " << time2strHMS( wol_idlesleep_time, true );
+
       if( cpu_mhz || cpu_num || mem_mb || swap_mb || hdd_gb )
       {
          stream << std::endl;
@@ -130,11 +136,11 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
          stream << ", MEM = " << mem_mb << " (+" << swap_mb << " Swap) Mb";
          stream << ", HDD = " << hdd_gb << " Gb";
       }
-      for( int i = 0; i < servicesnum; i++)
+/*      for( int i = 0; i < servicesnum; i++)
       {
          stream << "\n Service: \"" << servicesnames[i] << "\"";
          if( servicescounts[i]) stream << " - " << servicescounts[i];
-      }
+      }*/
    }
    else
    {
@@ -144,12 +150,13 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << " P" << power;
       stream << " CPU" << cpu_mhz << "x" << cpu_num;
       stream << " M" << mem_mb << "+" << swap_mb << "S" << " H" << hdd_gb;
-      for( int i = 0; i < servicesnum; i++)
+      stream << " WOL" << time2str( wol_idlesleep_time );
+/*      for( int i = 0; i < servicesnum; i++)
       {
          stream << ", \"" << servicesnames[i] << "\"";
          if( servicescounts[i]) stream << "[" << servicescounts[i] << "]";
       }
-      if( servicesnum == 0) stream << " No services.";
+      if( servicesnum == 0) stream << " No services.";*/
    }
 }
 

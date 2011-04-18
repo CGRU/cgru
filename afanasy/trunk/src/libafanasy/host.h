@@ -38,6 +38,8 @@ public:
    std::string resources;
    std::string data;
 
+   int32_t wol_idlesleep_time;
+
    void readwrite( Msg * msg); ///< Read or write Host in message.
 
 private:

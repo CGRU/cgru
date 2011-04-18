@@ -36,7 +36,7 @@ private slots:
    void actFree();
    void actUser();
    void actRequestLog();
-   void actRequestServices();
+   void actRequestInfo();
    void actEnableService();
    void actDisableService();
    void actRestoreDefaults();

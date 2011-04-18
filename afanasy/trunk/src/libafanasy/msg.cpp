@@ -85,21 +85,21 @@ bool Msg::allocateBuffer( int size, int to_copy_len)
    if( mtype == Msg::TInvalid) return false;
    if( size > Msg::SizeBufferLimit)
    {
-      AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)\n", size, Msg::SizeBufferLimit);
+      AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)", size, Msg::SizeBufferLimit)
       setInvalid();
       return false;
    }
    char * old_buffer = mbuffer;
    mbuffer_size = size;
-AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)\n", size, written, old_buffer);
+AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", size, written, old_buffer)
    mbuffer = new char[mbuffer_size];
    if( mbuffer == NULL )
    {
-      AFERRAR("Msg::allocateBuffer: can't allocate %d bytes for buffer.\n", mbuffer_size);
+      AFERRAR("Msg::allocateBuffer: can't allocate %d bytes for buffer.", mbuffer_size)
       setInvalid();
       return false;
    }
-AFINFA("Msg::allocateBuffer: new buffer at %p\n", mbuffer);
+AFINFA("Msg::allocateBuffer: new buffer at %p", mbuffer)
    mdata         = mbuffer      + Msg::SizeHeader;
    mdata_maxsize = mbuffer_size - Msg::SizeHeader;
 
@@ -135,7 +135,7 @@ bool Msg::checkZero( bool outerror )
    {
       if( outerror )
       {
-         AFERROR("Msg::checkZero(): message is non zero ( or with data).\n");
+         AFERROR("Msg::checkZero(): message is non zero ( or with data).")
       }
       setInvalid();
       return false;
@@ -147,7 +147,7 @@ bool Msg::set( int msgType, int msgInt)
 {
    if( msgType >= Msg::TDATA)
    {
-      AFERROR("Msg::set: Trying to set data message with no data.\n");
+      AFERROR("Msg::set: Trying to set data message with no data.")
       setInvalid();
       return false;
    }
@@ -167,7 +167,7 @@ bool Msg::setData( int size, const char * msgData)
       ( size    >  Msg::SizeDataMax ) ||
       ( msgData == NULL             ) )
    {
-      AFERROR("Msg::setData(): invalid arguments.\n");
+      AFERROR("Msg::setData(): invalid arguments.")
       setInvalid();
       return false;
    }
@@ -186,7 +186,7 @@ bool Msg::set( int msgType, Af * afClass )
    mtype = msgType;
    if( mtype < TDATA)
    {
-      AFERROR("Msg::set: trying to set Af class with nondata type message.\n");
+      AFERROR("Msg::set: trying to set Af class with nondata type message.")
       mtype = Msg::TInvalid;
       rw_header( true);
       return false;
@@ -237,7 +237,7 @@ bool Msg::getString( std::string & str)
 {
    if( mtype != TString)
    {
-      AFERROR("Msg::getString: type is not TString.\n");
+      AFERROR("Msg::getString: type is not TString.")
       return false;
    }
    rw_String( str, this);
@@ -248,7 +248,7 @@ bool Msg::getStringList( std::list<std::string> & stringlist)
 {
    if( mtype != TStringList)
    {
-      AFERROR("Msg::getStringList: type is not TQStringList.\n");
+      AFERROR("Msg::getStringList: type is not TQStringList.")
       return false;
    }
    rw_StringList( stringlist, this);
@@ -268,7 +268,7 @@ bool Msg::readHeader( int bytes)
 
 void Msg::readwrite( Msg * msg)
 {
-AFERROR("Msg::readwrite( Msg * msg): - Invalid call, use Msg::readwrite( bool write )\n");
+AFERROR("Msg::readwrite( Msg * msg): - Invalid call, use Msg::readwrite( bool write )")
 }
 
 void Msg::rw_header( bool write )
@@ -283,7 +283,7 @@ printf("Msg::readwrite: at %p: ", mbuffer); stdOut();
 #endif
    if( checkValidness() == false)
    {
-      AFERROR("Msg::readwrite: Message is invalid.\n");
+      AFERROR("Msg::readwrite: Message is invalid.")
    }
 //   writing = false;
    msgwrittensize = 0;
@@ -293,14 +293,14 @@ bool Msg::checkValidness()
 {
    if( mversion != Msg::Version)
    {
-      AFERRAR("Msg::checkValidness: Version mismatch: Recieved(%d) != Library(%d)\n", mversion, Msg::Version);
+      AFERRAR("Msg::checkValidness: Version mismatch: Recieved(%d) != Library(%d)", mversion, Msg::Version)
       mtype = Msg::TVersionMismatch;
       mint32 = 0;
       return true;
    }
    if( mtype >= Msg::TLAST)
    {
-      AFERRAR("Msg::checkValidness: type >= Msg::TLAST ( %d >= %d )\n", mtype, Msg::TLAST);
+      AFERRAR("Msg::checkValidness: type >= Msg::TLAST ( %d >= %d )", mtype, Msg::TLAST)
       setInvalid();
       return false;
    }
@@ -308,13 +308,13 @@ bool Msg::checkValidness()
    {
       if( mint32 == 0 )
       {
-         AFERROR("Msg::checkValidness: data type with zero length\n");
+         AFERROR("Msg::checkValidness: data type with zero length")
          setInvalid();
          return false;
       }
       if( mint32 > Msg::SizeDataMax )
       {
-         AFERRAR("Msg::checkValidness: message with data length > Msg::SizeDataMax ( %d > %d )\n", mint32, Msg::SizeDataMax);
+         AFERRAR("Msg::checkValidness: message with data length > Msg::SizeDataMax ( %d > %d )", mint32, Msg::SizeDataMax)
          setInvalid();
          return false;
       }
@@ -328,13 +328,19 @@ void Msg::setInvalid()
    mint32 = 0;
    rw_header( true);
 }
-
-
+/*
 void Msg::stdOut( bool full) const
 {
    printf("length=%d, type=%d - ", writeSize(), mtype);
    if( mtype <= Msg::TLAST) printf("\"%s\"\n", Msg::TNAMES[mtype]);
    else printf(" ! UNKNOWN !\n");
+}
+*/
+void Msg::generateInfoStream( std::ostringstream & stream, bool full) const
+{
+   if( mtype <= Msg::TLAST) stream << Msg::TNAMES[mtype];
+   else stream << "!UNKNOWN!";
+   stream << ": Length=" << writeSize() << ", type=" << mtype;
 }
 
 void Msg::stdOutData()
@@ -418,7 +424,7 @@ const char * Msg::TNAMES[]=
    "TRenderId",
    "TRendersListRequest",        ///< Request online Renders list message.
    "TRenderLogRequestId",        ///< Request a log of Render with given id.
-   "TRenderServicesRequestId",   ///< Request a list of services of Render with given id.
+   "TRenderInfoRequestId",       ///< Request a string information about a Render with given id.
    "TRenderDeregister",          ///< Deregister Render with given id.
 
 
@@ -632,6 +638,10 @@ const char * Msg::TNAMES[]=
    "TTaskListenOutput",          ///< Request to send task output to provided address.
    "TTaskOutput",                ///< Job task output data.
    "TTasksRun",                  ///< Job tasks run data.
+
+   // TODO: VERSION: new messages types:
+   "TRenderWOLSleep",            ///< Ask online render(s) to fall into sleep
+   "TRenderWOLWake",             ///< Ask sleeping render(s) to wake up
 
    "TLAST"                       ///< The last type number.
 };

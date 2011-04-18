@@ -32,6 +32,14 @@ public:
    inline bool isOffline() const { return !(state & SOnline );}///< Whether Render is offline.
    inline bool isDirty()   const { return !(state & SDirty);}  ///< Whether Render is dirty.
 
+   inline bool isWOLFalling()   const { return state & SWOLFalling;  }
+   inline bool isWOLSleeping()  const { return state & SWOLSleeping; }
+   inline bool isWOLWaking()    const { return state & SWOLWaking;   }
+   inline uint32_t getWOLTime() const { return wol_operation_time;   }
+   inline void setWOLFalling(   bool value) { if( value ) state = state | SWOLFalling;  else state = state & (~SWOLFalling); }
+   inline void setWOLSleeping(  bool value) { if( value ) state = state | SWOLSleeping; else state = state & (~SWOLSleeping);}
+   inline void setWOLWaking(    bool value) { if( value ) state = state | SWOLWaking;   else state = state & (~SWOLWaking);  }
+
    inline int getCapacity()     const { return (capacity == -1 ? host.capacity : capacity);}
    inline int getCapacityUsed() const { return capacity_used;}
    inline int getCapacityFree() const { return (capacity == -1 ? host.capacity : capacity) - capacity_used;}
@@ -43,7 +51,8 @@ public:
             ( false == ( state & SNIMBY )) &&
             ( priority > 0 ) &&
             ( capacity_used < getCapacity() ) &&
-            ( (int)tasks.size() < host.maxtasks )
+            ( (int)tasks.size() < host.maxtasks ) &&
+            ( false == isWOLFalling())
          );}
 
    inline const Host    & getHost()    const { return host;}
@@ -76,7 +85,10 @@ public:
       Snimby  = 1<<1,
       SNIMBY  = 1<<2,
       SBusy   = 1<<3,
-      SDirty  = 1<<4
+      SDirty  = 1<<4,
+      SWOLFalling = 1<<5,
+      SWOLSleeping = 1<<6,
+      SWOLWaking = 1<<7
    };
 
 protected:
@@ -90,6 +102,8 @@ protected:
 
    int32_t capacity;
    int32_t capacity_used;
+
+   uint32_t wol_operation_time;   ///< Last WOL operation time (to slepp or to wake).
 
    std::string services_disabled;
    std::string customdata;

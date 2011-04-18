@@ -19,7 +19,7 @@ RenderContainer::RenderContainer():
 
 RenderContainer::~RenderContainer()
 {
-AFINFO("RenderContainer::~RenderContainer:\n");
+AFINFO("RenderContainer::~RenderContainer:")
 }
 
 MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * monitoring)
@@ -36,12 +36,12 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
             // Online render with the same hostname founded:
             if( render->isOnline())
             {
-               AFERROR("Online render with the same name exists:\n");
-               printTime();
-               printf("\nNew render:\n");
-               newRender->stdOut( false);
-               printf("\nExisting render:\n");
-               render->stdOut( false);
+               std::string errLog = "Online render with the same name exists:";
+               errLog += "\nNew render:\n";
+               errLog += newRender->generateInfoString( false);
+               errLog += "\nExisting render:\n";
+               errLog += render->generateInfoString( false);
+               AFCommon::QueueLogError( errLog);
                delete newRender;
                // Return -1 ID to render to tell that there is already registered render with the same name:
                return new MsgAf( Msg::TRenderId, -1);

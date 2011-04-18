@@ -59,6 +59,11 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 {
    setOffline();
    setBusy( false);
+   if( isWOLFalling())
+   {
+      setWOLFalling( false);
+      setWOLSleeping( true);
+   }
 
    if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
 
@@ -104,7 +109,11 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
       AFERROR("RenderAf::online: Render is already online.")
       return false;
    }
+   setBusy( false);
+   setWOLSleeping( false);
+   setWOLWaking( false);
    address.copy( render->getAddress());
+   grabNetIFs( render->netIFs);
    time_launch = render->time_launch;
    revision = render->revision;
    version = render->version;
@@ -320,6 +329,18 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       exitClient( af::Msg::TClientShutdownRequest, jobs, monitoring);
       return true;
    }
+   case af::Msg::TRenderWOLSleep:
+   {
+      appendLog( std::string("Ask to fall asleep by ") + userhost);
+      wolSleep( monitoring);
+      return true;
+   }
+   case af::Msg::TRenderWOLWake:
+   {
+      appendLog( std::string("Ask to wake up by ") + userhost);
+      wolWake( monitoring);
+      return true;
+   }
    default:
    {
       return false;
@@ -367,6 +388,32 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
    msg->setAddress( this);
    msg->dispatch();
    if( type != af::Msg::TClientStartRequest ) offline( jobs, af::TaskExec::UPRenderExit, monitoring);
+}
+
+void RenderAf::wolSleep( MonitorContainer * monitoring)
+{
+   if( isOffline()      ) return;
+   if( isWOLSleeping()  ) return;
+   if( isWOLWaking()    ) return;
+   if( isWOLFalling()   ) return;
+   if( isBusy()         ) return;
+
+   setWOLFalling( true);
+   wol_operation_time = time( NULL);
+   AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+}
+
+void RenderAf::wolWake(  MonitorContainer * monitoring)
+{
+   if( isOnline()       ) return;
+   if( isWOLFalling()   ) return;
+   if( isWOLWaking()    ) return;
+
+   setWOLWaking( true);
+   wol_operation_time = time( NULL);
+   AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
 }
 
 void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
@@ -443,7 +490,7 @@ void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorConta
    if( isOnline() && (getTimeUpdate() < (currentTime - af::Environment::getRenderZombieTime())))
    {
       appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
-      AFCommon::QueueLog( std::string("Render: \"") + getName() + " - ZOMBIETIME");
+      AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
       if( isBusy())
       {
          printf("Was busy:\n");
@@ -554,13 +601,7 @@ const std::string RenderAf::getServicesString() const
 {
    if( servicesnum == 0) return "No services.";
 
-   std::string str;
-   if( false == services_disabled.empty())
-   {
-      str += "Disabled services:\n   ";
-      str += services_disabled;
-   }
-   str += "\nServices:";
+   std::string str = "Services:";
    for( int i = 0; i < servicesnum; i++)
    {
       str += "\n   ";
@@ -573,11 +614,10 @@ const std::string RenderAf::getServicesString() const
          if( host.getServiceCount(i) > 0) str += " / max=" + af::itos( host.getServiceCount(i));
       }
    }
-   std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
-   if( servicelimits.size())
+   if( false == services_disabled.empty())
    {
-      str += "\n";
-      str += af::farm()->serviceLimitsInfoString( true).c_str();
+      str += "\nDisabled services:\n   ";
+      str += services_disabled;
    }
 
    return str;

@@ -14,6 +14,9 @@ public:
 /// Constructor.
    NetIF( const char * Name, const unsigned char * MacAddr, const std::vector<Address> ifAddresses = std::vector<Address>());
 
+/// Construct from message.
+   NetIF( Msg * msg);
+
    ~NetIF();
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
@@ -29,6 +32,8 @@ public:
 
    /// Search for interfaces and assinged addresses
    static void getNetIFs( std::vector<NetIF*> & netIFs, bool verbose = false);
+
+   void readwrite( Msg * msg);
 
 private:
 

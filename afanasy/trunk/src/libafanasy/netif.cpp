@@ -39,6 +39,7 @@ void print_internet_interface (struct ifaddrs * ifaddrs_ptr);
 #include <string.h>
 #include <map>
 
+#include "msg.h"
 #include "netif.h"
 
 #define AFOUTPUT
@@ -54,8 +55,25 @@ NetIF::NetIF( const char * Name, const unsigned char * MacAddr, const std::vecto
    addresses = ifAddresses;
 }
 
+NetIF::NetIF( Msg * msg)
+{
+   read( msg);
+}
+
 NetIF::~NetIF()
 {
+}
+
+void NetIF::readwrite( Msg * msg)
+{
+   rw_String(  name,    msg);
+   rw_data(    (char*)macaddr, msg, MacAddrLen);
+
+   int8_t addrs = addresses.size();
+   rw_int8_t( addrs, msg);
+   for( int i = 0; i < addrs; i++)
+      if( msg->isWriting()) addresses[i].write( msg);
+      else addresses.push_back( Address( msg));
 }
 
 void NetIF::generateInfoStream( std::ostringstream & stream, bool full) const

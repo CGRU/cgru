@@ -48,6 +48,10 @@ public:
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
 protected:
+   void clearNetIFs();
+   void grabNetIFs( std::vector<NetIF*> & otherNetIFs);
+
+protected:
    uint32_t    time_launch;   ///< Client launch time.
    uint32_t    time_register; ///< Client registration on server time.
    uint32_t    time_update;   ///< Client last update time.

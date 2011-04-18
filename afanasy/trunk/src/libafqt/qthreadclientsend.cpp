@@ -18,7 +18,7 @@ QThreadClientSend::~QThreadClientSend()
 {
    queue.push( NULL);
    wait();
-AFINFO("QThreadClientSend::~QThreadClientSend() \n");
+AFINFO("QThreadClientSend::~QThreadClientSend()")
 }
 
 void QThreadClientSend::send( QMsg * msg)
@@ -31,7 +31,7 @@ printf("QThreadClientSend::send: "); msg->stdOut();
 
 void QThreadClientSend::run()
 {
-AFINFO("QThreadClientSend::run() \n");
+AFINFO("QThreadClientSend::run()")
    QTcpSocket socket;
 
    for(;;)

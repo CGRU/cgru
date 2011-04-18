@@ -59,6 +59,8 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdRenderExit);
    addCmd( new CmdRenderDelete);
    addCmd( new CmdRenderResoucesList);
+   addCmd( new CmdRenderWOLSleep);
+   addCmd( new CmdRenderWOLWake);
 
    addCmd( new CmdUserList);
    addCmd( new CmdUserJobsList);

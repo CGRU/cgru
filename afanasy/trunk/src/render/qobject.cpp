@@ -50,7 +50,7 @@ Object::Object( uint32_t State, uint8_t Priority, const std::string & command):
       qthreadClientSendOutput = new afqt::QThreadClientSend( this, af::Environment::getRenderConnectRetries());
       if( qServer->isInitialized() == false )
       {
-         AFERROR("ChatDialog::ChatDialog: Server initialization failed.\n");
+         AFERROR("Object::Object: Server initialization failed.")
          return;
       }
       qServer->set_recvMessage_handler( recvMessage_handler);
@@ -95,7 +95,7 @@ Object::~Object()
    }
    for( int t = 0; t < tasks.size(); t++) delete tasks[t];
    if( render != NULL  ) delete render;
-AFINFO("Object:~Object()\n");
+AFINFO("Object:~Object()")
 }
 
 void Object::connectionLost( af::Address * address)
@@ -118,7 +118,7 @@ void Object::connectionLostOutput( af::Address * address)
    if( cmdMode ) return;
    if( address == NULL)
    {
-      AFERROR("Object::connectionLostOutput: Address == NULL.\n");
+      AFERROR("Object::connectionLostOutput: Address == NULL.")
       return;
    }
    printf("Connection lost with listening address: "); address->stdOut(); printf("\n");
@@ -146,7 +146,7 @@ printf("Object::caseMessage: "); msg->stdOut();
    }
    if( msg == NULL)
    {
-      AFERROR("Object::caseMessage: msg == NULL\n");
+      AFERROR("Object::caseMessage: msg == NULL")
       return;
    }
 
@@ -158,7 +158,7 @@ printf("Object::caseMessage: "); msg->stdOut();
       // Server sends back -1 id if a render with the same hostname already exists:
       if( id == -1)
       {
-         AFERRAR("Render with this hostname '%s' already registered.\n", af::Environment::getHostName().c_str());
+         AFERRAR("Render with this hostname '%s' already registered.", af::Environment::getHostName().c_str())
          exitRender();
       }
       // Render was trying to register (its id==0) and server has send id>0
@@ -250,7 +250,7 @@ printf("Object::caseMessage: "); msg->stdOut();
    }
    default:
    {
-      AFERROR("Object::caseMessage Unknown: message recieved.\n");
+      AFERROR("Object::caseMessage Unknown: message recieved.")
       msg->stdOut();
       break;
    }

@@ -20,7 +20,7 @@ public:
    MCGeneral( const std::string & Name, const std::string & String);
 
    MCGeneral( Msg * msg);
-   ~MCGeneral();
+   virtual ~MCGeneral();
 
    inline void setNumber( int Number) { number = Number;}
    inline void setString( const std::string & String) { string = String;}

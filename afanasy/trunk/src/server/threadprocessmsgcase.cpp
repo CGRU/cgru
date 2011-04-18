@@ -5,6 +5,7 @@
 #include <sys/stat.h>
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/farm.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
@@ -220,7 +221,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       msg_response->setStringList( render->getLog());
       break;
    }
-   case af::Msg::TRenderServicesRequestId:
+   case af::Msg::TRenderInfoRequestId:
    {
       AfContainerLock lock( renders,  AfContainer::READLOCK);
 
@@ -228,7 +229,18 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       RenderAf* render = rendersIt.getRender( msg->int32());
       if( render == NULL ) break;
       msg_response = new MsgAf();
-      msg_response->setString( render->getServicesString());
+
+      std::string str = render->generateInfoString( true);
+      str += "\n";
+      str += render->getServicesString();
+      std::string servicelimits = af::farm()->serviceLimitsInfoString( true);
+      if( servicelimits.size())
+      {
+         str += "\n";
+         str += servicelimits;
+      }
+
+      msg_response->setString( str);
       break;
    }
 
@@ -603,6 +615,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderShutdown:
    case af::Msg::TRenderDeregister:
    case af::Msg::TRenderExit:
+   case af::Msg::TRenderWOLSleep:
+   case af::Msg::TRenderWOLWake:
    case af::Msg::TUserAnnotate:
    case af::Msg::TUserAdd:
    case af::Msg::TUserDel:
@@ -635,24 +649,21 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       msgQueue->pushMsg( msg);
       return msg_response;
    }
-
 // -------------------------------------------------------------------------//
    case af::Msg::TVersionMismatch:
    {
-      msg->stdOut();
+      AFCommon::QueueLogError( msg->generateInfoString( false));
       msg_response = new MsgAf( af::Msg::TVersionMismatch, 1);
       break;
    }
    case af::Msg::TInvalid:
    {
-      msg->stdOut();
-      AFERROR("ThreadReadMsg::msgCase: Invalid message recieved.")
+      AFCommon::QueueLogError( std::string("Invalid message recieved: ") + msg->generateInfoString( false));
       break;
    }
    default:
    {
-      msg->stdOut();
-      AFERROR("ThreadReadMsg::msgCase: Message with unknown type recieved.")
+      AFCommon::QueueLogError( std::string("Unknown message recieved: ") + msg->generateInfoString( false));
       break;
    }
    }

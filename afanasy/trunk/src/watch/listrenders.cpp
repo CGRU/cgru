@@ -143,8 +143,8 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
    menu.addAction( action);
 
-   action = new QAction( "Show Services", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actRequestServices() ));
+   action = new QAction( "Show Info", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actRequestInfo() ));
    menu.addAction( action);
 
    if( me || af::Environment::VISOR())
@@ -431,12 +431,12 @@ void ListRenders::actRequestLog()
    Watch::sendMsg( msg);
 }
 
-void ListRenders::actRequestServices()
+void ListRenders::actRequestInfo()
 {
    Item* item = getCurrentItem();
    if( item == NULL ) return;
-   displayInfo( "Render services request.");
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderServicesRequestId, item->getId(), true);
+   displayInfo( "Render info request.");
+   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderInfoRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }
 

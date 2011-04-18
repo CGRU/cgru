@@ -181,7 +181,7 @@ void Address::setIP( const af::Address & other)
    memcpy( &addr, &other.addr, AddrDataLength);
 }
 
-void Address::generateIPStream( std::ostringstream & stream) const
+void Address::generateIPStream( std::ostringstream & stream, bool full) const
 {
    switch( family)
    {
@@ -207,7 +207,7 @@ void Address::generateIPStream( std::ostringstream & stream) const
          break;
       }
       case Empty:
-         stream << "Empty address";
+         if( full ) stream << "Empty address";
          break;
       default:
          stream << "Unknown address family";
@@ -215,22 +215,22 @@ void Address::generateIPStream( std::ostringstream & stream) const
    }
 }
 
-const std::string Address::generateIPString() const
+const std::string Address::generateIPString( bool full) const
 {
    std::ostringstream stream;
-   generateIPStream( stream);
+   generateIPStream( stream, full);
    return stream.str();
 }
 
-void Address::generatePortStream( std::ostringstream & stream) const
+void Address::generatePortStream( std::ostringstream & stream, bool full) const
 {
    stream << port;
 }
 
-const std::string Address::generatePortString() const
+const std::string Address::generatePortString( bool full) const
 {
    std::ostringstream stream;
-   generatePortStream( stream);
+   generatePortStream( stream, full);
    return stream.str();
 }
 
@@ -248,11 +248,11 @@ void Address::generateInfoStream( std::ostringstream & stream, bool full) const
             break;
       }
    }
-   generateIPStream( stream);
+   generateIPStream( stream, full);
    if( notEmpty())
    {
       stream << ":";
-      generatePortStream( stream);
+      generatePortStream( stream, full);
    }
 }
 

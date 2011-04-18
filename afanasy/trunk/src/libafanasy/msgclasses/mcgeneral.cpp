@@ -88,6 +88,6 @@ void MCGeneral::generateInfoStream( std::ostringstream & stream, bool full) cons
    if( full == false ) return;
 
    int count = int(list.size());
-   stream << "\n   ids[" << count << "]=";
+   stream << ", ids[" << count << "]=";
    for( int p = 0; p < count; p++) stream << " " << list[p];
 }

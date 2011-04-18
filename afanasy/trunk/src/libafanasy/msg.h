@@ -29,6 +29,8 @@ public:
 
    ~Msg();///< Destructor.
 
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+
 /// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
    bool set( int msgType, int msgInt = 0);
 
@@ -98,7 +100,7 @@ public:
 /**/TRenderId/**/,
 /**/TRendersListRequest/**/,        ///< Request online Renders list message.
 /**/TRenderLogRequestId/**/,        ///< Request a log of Render with given id.
-/**/TRenderServicesRequestId/**/,   ///< Request a list of services of Render with given id.
+/**/TRenderInfoRequestId/**/,       ///< Request a string information about a Render with given id.
 /**/TRenderDeregister/**/,          ///< Deregister Render with given id.
 
 
@@ -122,6 +124,17 @@ public:
 /// Request a job progress with given id. The answer is TJobProgress. If there is no job with such id the answer is TJobProgressRequestId.
 /**/TJobProgressRequestId/**/,
 
+
+// TODO: VERSION: reserved types:
+/*
+TRESERVED01,
+TRESERVED02,
+TRESERVED03,
+TRESERVED04,
+TRESERVED05,
+TRESERVED06,
+TRESERVED07,
+*/
 
 /*---------------------------------------------------------------------------------------------------------*/
 /*--------------------------------- DATA MESSAGES ---------------------------------------------------------*/
@@ -313,6 +326,10 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTaskOutput/**/,                ///< Job task output data.
 /**/TTasksRun/**/,                  ///< Job tasks run data.
 
+// TODO: VERSION: new messages types:
+/**/TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
+/**/TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
+
 /**/TLAST/**/                       ///< The last type number.
 };
 
@@ -338,7 +355,7 @@ static const char * TNAMES[]; ///< Type names.
    inline bool      isNull() const { return mtype == TNULL;    }///< Whether message is null.
    inline bool   isInvalid() const { return mtype == TInvalid; }///< Whether message is invalid.
 
-   void stdOut( bool full = false) const;
+//   void stdOut( bool full = false) const;
    void stdOutData();
 
    static const int SizeHeader;     ///< size of message header.

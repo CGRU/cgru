@@ -36,6 +36,7 @@ void Render::construct()
 {
    capacity = -1;
    capacity_used = 0;
+   wol_operation_time = 0;
 }
 
 Render::~Render()
@@ -94,7 +95,18 @@ void Render::readwrite( Msg * msg)
       AFERROR("Render::readwrite(): invalid type.\n");
    }
 
+   // Always send ID
    rw_int32_t( id, msg);
+
+   // Send network interfaces information only when register
+   if( msg->type() == Msg::TRenderRegister)
+   {
+      int8_t netIfs_size = netIFs.size();
+      rw_int8_t( netIfs_size, msg);
+      for( int i = 0; i < netIfs_size; i++)
+         if( msg->isWriting()) netIFs[i]->write( msg);
+         else netIFs.push_back( new NetIF( msg));
+   }
 }
 
 void Render::setCapacity( int value)
@@ -173,11 +185,27 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       if( isBusy()) stream << " Busy";
       if( isNimby()) stream << " (nimby)";
       if( isNIMBY()) stream << " (NIMBY)";
+      if( isWOLFalling()) stream << " WOL-Falling";
+      if( isWOLSleeping()) stream << " WOL-Sleeping";
+      if( isWOLWaking()) stream << " WOL-Waking";
+
+      if( wol_operation_time ) stream << "\n WOL operation time = " << time2str( wol_operation_time);
       if( time_launch   ) stream << "\n Launched at   = " << time2str( time_launch   );
       if( time_register ) stream << "\n Registered at = " << time2str( time_register );
 
       stream << std::endl;
-      host.generateInfoStream( stream ,full);
+      host.generateInfoStream( stream, full);
+
+      if( netIFs.size())
+      {
+         stream << "\nNetwork Interfaces:";
+         for( int i = 0; i < netIFs.size(); i++)
+         {
+            stream << "\n   ";
+            netIFs[i]->generateInfoStream( stream, true);
+         }
+      }
+
 //      hres.generateInfoStream( stream ,full);
    }
    else

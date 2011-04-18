@@ -47,7 +47,23 @@ Client::Client( int flags, int Id):
 
 Client::~Client()
 {
+   clearNetIFs();
+}
+
+void Client::clearNetIFs()
+{
    for( int i = 0; i < netIFs.size(); i++) if( netIFs[i]) delete netIFs[i];
+   netIFs.clear();
+}
+
+void Client::grabNetIFs( std::vector<NetIF*> & otherNetIFs)
+{
+   clearNetIFs();
+   for( int i = 0; i < otherNetIFs.size(); i++)
+   {
+      netIFs.push_back( otherNetIFs[i]);
+      otherNetIFs[i] = NULL;
+   }
 }
 
 void Client::setRegisterTime()

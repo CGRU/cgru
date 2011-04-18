@@ -19,7 +19,7 @@ QThreadClient::QThreadClient( QObject * parent, int NumConnLost):
 
 QThreadClient::~QThreadClient()
 {
-AFINFO("QThreadClient::~QThreadClient() \n");
+AFINFO("QThreadClient::~QThreadClient()")
 }
 
 void QThreadClient::sendMessage( QMsg * msg, QTcpSocket * socket)
@@ -51,7 +51,7 @@ printf("QThreadClient::sendMessage: "); msg->stdOut();
          }
          else
          {
-            AFERROR("QThreadClient::run: recieving message failed.\n");
+            AFERROR("QThreadClient::run: recieving message failed.")
             delete answer;
          }
       }
@@ -64,11 +64,11 @@ printf("QThreadClient::sendMessage: "); msg->stdOut();
       if((numconnlost != 0) && (connlostcount <= numconnlost)) connlostcount++;
       if((numconnlost  > 1) && (connlostcount <= numconnlost))
       {
-         AFERRAR("%s: Connection lost count = %d (of %d)\n", objectName().toUtf8().data(), connlostcount, numconnlost);
+         AFERRAR("%s: Connection lost count = %d (of %d)", objectName().toUtf8().data(), connlostcount, numconnlost)
       }
       if( connlostcount == numconnlost )
       {
-         AFERRAR("%s: Connection Lost !\n", objectName().toUtf8().data());
+         AFERRAR("%s: Connection Lost!", objectName().toUtf8().data())
          if( msg->getAddress() )  emit connectionLost( new af::Address( msg->getAddress()));
          else                     emit connectionLost( NULL);
       }

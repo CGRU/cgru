@@ -53,10 +53,10 @@ public:
    void setIP( const Address & other);
 
 
-   void generateIPStream( std::ostringstream & stream) const;
-   const std::string generateIPString() const;
-   void generatePortStream( std::ostringstream & stream) const;
-   const std::string generatePortString() const;
+   void generateIPStream( std::ostringstream & stream, bool full = false) const;
+   const std::string generateIPString( bool full = false) const;
+   void generatePortStream( std::ostringstream & stream, bool full = false) const;
+   const std::string generatePortString( bool full = false) const;
    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
    int calcWeight() const;                   ///< Calculate and return memory size.

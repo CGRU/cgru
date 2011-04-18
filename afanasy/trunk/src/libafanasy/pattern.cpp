@@ -21,12 +21,12 @@ bool Pattern::isValid() const
 {
    if( name.size() == 0 )
    {
-      AFERROR("Pattern::isValid: name is empty.\n")
+      AFERROR("Pattern::isValid: name is empty.")
       return false;
    }
    if( regexp.empty())
    {
-      AFERRAR("Pattern::isValid: \"%s\" mask is empty.\n", name.c_str())
+      AFERRAR("Pattern::isValid: \"%s\" mask is empty.", name.c_str())
       return false;
    }
    return true;

@@ -345,8 +345,8 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
       }
    }
 
-   if(( size == 0) && ( namefounded == false))
-      AFERRAR("No node matches \"%s\" founded.\n", name.c_str());
+   if(( getcount == 0) && ( namefounded == false))
+      AFCommon::QueueLogError( std::string("No node matches \"") + name + "\" founded.");
 }
 
 void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
@@ -354,8 +354,7 @@ void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int 
    if( node->isLocked()) return;
    if( node->action( mcgeneral, type, pointer, monitoring) == false )
    {
-      AFERRAR("AfContainer::action: Error: [%s]:", af::Msg::TNAMES[type])
-      mcgeneral.stdOut( true );
+      AFCommon::QueueLogError( std::string("Unknown  action: ") + af::Msg::TNAMES[type]);
       return;
    }
    switch( type)

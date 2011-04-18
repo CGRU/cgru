@@ -60,6 +60,7 @@ private:
 
    unsigned time_registered;
    unsigned time_launched;
+   unsigned wol_operation_time;
 
    QString  address_str;      ///< Client address
 
@@ -68,6 +69,9 @@ private:
    bool NIMBY;
    bool nimby;
    bool dirty;
+   bool wolFalling;
+   bool wolSleeping;
+   bool wolWaking;
 
    int capacity_used;
    QString capacity_usage;
@@ -77,7 +81,7 @@ private:
    std::list<const QPixmap*> tasksicons;
    uint32_t taskstartfinishtime;
    QString  taskstartfinishtime_str;
-
+   QString offlineState;
    QString creationTime;
 
    Plotter plotCpu;

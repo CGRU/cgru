@@ -112,6 +112,9 @@ private:
 /// Set Render to Ofline. \c updateTaskState - whether to update it's state.
    void offline( JobContainer * jobs, uint32_t updateTaskState, MonitorContainer * monitoring, bool toZombie = false );
 
+   void wolSleep( MonitorContainer * monitoring);
+   void wolWake(  MonitorContainer * monitoring);
+
    void appendLog( const std::string & message);  ///< Append task loglist with a \c message .
 
 private:

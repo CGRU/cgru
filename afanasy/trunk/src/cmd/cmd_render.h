@@ -54,3 +54,13 @@ class CmdRenderDelete : public Cmd { public:
    ~CmdRenderDelete();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdRenderWOLSleep : public Cmd { public:
+   CmdRenderWOLSleep ();
+   ~CmdRenderWOLSleep ();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
+class CmdRenderWOLWake : public Cmd { public:
+   CmdRenderWOLWake ();
+   ~CmdRenderWOLWake ();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};

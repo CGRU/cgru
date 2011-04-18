@@ -25,6 +25,7 @@ const char XMLNAME_SERVISENAME[]      = "name";
 const char XMLNAME_SERVISECOUNT[]     = "count";
 const char XMLNAME_SERVISEMAXHOSTS[]  = "maxhosts";
 const char XMLNAME_SERVISEMAXCOUNT[]  = "maxcount";
+const char XMLNAME_WOLIDLESLEEPTIME[] = "wolidlesleeptime";
 
 ServiceLimit::ServiceLimit( int MaxCount, int MaxHosts):
    maxcount( MaxCount),
@@ -281,6 +282,15 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                      return false;
                   }
                   host.power = number;
+               }
+               else if( cnode_name == XMLNAME_WOLIDLESLEEPTIME)
+               {
+                  if( false == numberOk )
+                  {
+                     AFERRAR("Invalid machine WOL idle sleep time \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
+                     return false;
+                  }
+                  host.wol_idlesleep_time = number;
                }
             }
          }

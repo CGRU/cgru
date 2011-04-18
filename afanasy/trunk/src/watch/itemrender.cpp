@@ -209,6 +209,11 @@ void ItemRender::updateValues( af::Node *node, int type)
          setNotRunning();
       }
 
+      wolFalling  = render->isWOLFalling();
+      wolSleeping = render->isWOLSleeping();
+      wolWaking   = render->isWOLWaking();
+      wol_operation_time = render->getWOLTime();
+
       NIMBY = render->isNIMBY();
       nimby = render->isNimby();
 
@@ -314,6 +319,10 @@ void ItemRender::updateValues( af::Node *node, int type)
       }
    }
 
+   if( wolWaking ) offlineState = "Waking Up";
+   else if( wolSleeping ) offlineState = "Sleeping";
+   else offlineState = "Offline";
+
    tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_resources);
 }
 
@@ -359,7 +368,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       painter->setFont(  afqt::QEnvironment::f_info);
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
 		QRect rect_center;
-      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, "offline", &rect_center);
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState, &rect_center);
       painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + version );
       painter->drawText( x+5, y+2, w-10, HeightOffline-4 + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
       drawPost( painter, option);
@@ -453,6 +462,13 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       {
          drawStar( 8, x+13, y+13, painter);
       }
+   }
+
+   if( wolFalling)
+   {
+      painter->setFont( afqt::QEnvironment::f_name);
+      painter->setPen( afqt::QEnvironment::clr_star.c);
+      painter->drawText( x, y, w, h, Qt::AlignCenter, "Sleeping...");
    }
 
    drawPost( painter, option);
