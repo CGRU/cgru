@@ -311,7 +311,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
    if( af::pathIsFolder( afroot ) == false)
    {
-      AFERRAR("AF_ROOT directory = '%s' does not exists.\n", afroot.c_str());
+      AFERRAR("AF_ROOT directory = '%s' does not exists.", afroot.c_str())
       return;
    }
    PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
@@ -344,7 +344,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
    if( af::pathMakeDir( home_afanasy, true) == false)
    {
-      AFERRAR("Can't make home directory '%s'", home_afanasy.c_str());
+      AFERRAR("Can't make home directory '%s'", home_afanasy.c_str())
    }
 //
 //############ user name:
@@ -353,7 +353,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    if( username.size() == 0) username = getenv("USERNAME");
    if( username.size() == 0)
    {
-      AFERROR("Can't get user name.\n");
+      AFERROR("Can't get user name.")
       return;
    }
    // Convert to lowercase:

@@ -11,7 +11,7 @@ CmdNetwork::CmdNetwork()
    setCmd("net");
    setArgsCount(1);
    setInfo("Network operations.");
-   setHelp("net [operation] For testing purposes. Operations: if.");
+   setHelp("net [operation] For testing purposes. Operations: [if,ip].");
 }
 
 CmdNetwork::~CmdNetwork(){}
@@ -29,6 +29,13 @@ bool CmdNetwork::processArguments( int argc, char** argv, af::Msg &msg)
          std::cout << "   ";
          netIFs[i]->stdOut(true);
       }
+   }
+   if( operation == "ip")
+   {
+      if( argc < 1 ) return false;
+      std::string addr( argv[1]);
+      if( af::netIsIpAddr( addr)) printf("IP address string.\n");
+      else printf("Not an IP address string.\n");
    }
    else
    {

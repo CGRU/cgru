@@ -186,7 +186,7 @@ bool QEnvironment::openXMLDomDocument( QDomDocument & doc, const std::string & f
    QString errorMsg; int errorLine = 0; int errorColumn = 0;
    if( doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
    {
-      AFERRAR("Parse error '%s' [Line %d - Col %d]:\n", filename.c_str(), errorLine, errorColumn)
+      AFERRAR("Parse error '%s' [Line %d - Col %d]:", filename.c_str(), errorLine, errorColumn)
       printf("%s\n", errorMsg.toUtf8().data());
       file.close();
       return false;
@@ -258,7 +258,7 @@ bool QEnvironment::save()
    QFile file( afqt::stoq( filename));
    if( file.open( QIODevice::WriteOnly) == false)
    {
-      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'\n", filename.c_str())
+      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'", filename.c_str())
       return false;
    }
    file.write( data);
@@ -308,10 +308,18 @@ void QEnvironment::solveServerAddress()
 {
    static std::string serveraddrnum_arg("-srvaddrnum");
    af::Environment::addUsage( serveraddrnum_arg + " [number]", "Use specified server address number.");
-   QHostInfo qhostinfo = QHostInfo::fromName( servername);
-   QList<QHostAddress> adresses = qhostinfo.addresses();
-   // Try direct IP literals, if no addresses solved
-   if( adresses.size() < 1 ) adresses << QHostAddress ( servername);
+   QList<QHostAddress> adresses;
+   if( af::netIsIpAddr( af::Environment::getServerName()))
+   {
+      printf("Server address IP direct literals specified.\n");
+      adresses << QHostAddress ( servername);
+   }
+   else
+   {
+      printf("Looking up server name \"%s\"...\n", af::Environment::getServerName().c_str());
+      QHostInfo qhostinfo = QHostInfo::fromName( servername);
+      adresses = qhostinfo.addresses();
+   }
    if( adresses.size() > 1 )
    {
       printf( "Solved several server addresses:\n");
@@ -329,14 +337,14 @@ void QEnvironment::solveServerAddress()
          int number = atoi(serveraddrnum_str.c_str());
          if( number >= adresses.size())
          {
-            AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.\n", number, adresses.size());
+            AFERRAR("Server address number >= server addresses size (%d>=%d), using the last.", number, adresses.size())
             number = adresses.size() - 1;
          }
          serveraddrnum = number;
       }
       else
       {
-         AFERRAR("No argument provided to: '%s'\n", serveraddrnum_arg.c_str());
+         AFERRAR("No argument provided to: '%s'", serveraddrnum_arg.c_str())
          valid = false;
       }
    }

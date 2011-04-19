@@ -589,3 +589,39 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
    buffer[readsize] = '\0';
    return buffer;
 }
+
+bool isDec( char c)
+{
+   if(( c >= '0' ) && ( c <= '9' )) return true;
+   return false;
+}
+bool isHex( char c)
+{
+   if(( c >= '0' ) && ( c <= '9' )) return true;
+   if(( c >= 'a' ) && ( c <= 'f' )) return true;
+   if(( c >= 'A' ) && ( c <= 'F' )) return true;
+   return false;
+}
+bool af::netIsIpAddr( const std::string & addr)
+{
+   bool isIPv4 = false;
+   bool isIPv6 = false;
+   for( int i = 0; i < addr.size(); i++)
+   {
+      if(( isIPv6 == false ) && ( addr[i] == '.' ))
+      {
+         isIPv4 = true;
+         continue;
+      }
+      if(( isIPv4 == false ) && ( addr[i] == ':' ))
+      {
+         isIPv6 = true;
+         continue;
+      }
+      if( isDec( addr[i])) continue;
+      if( isIPv4 ) return false;
+      if( false == isHex( addr[i])) return false;
+   }
+   if(( isIPv4 == false ) && ( isIPv6 == false )) return false;
+   return true;
+}
