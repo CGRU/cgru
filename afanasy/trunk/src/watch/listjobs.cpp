@@ -188,7 +188,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
    if( jobitem->getBlocksNum() > 1)
    {
-      submenu = new QMenu( "Blocks", this);
+      submenu = new QMenu( "Tasks Blocks", this);
       for( int b = -1; b < jobitem->getBlocksNum(); b++)
       {
          QMenu * subsubmenu = new QMenu( b == -1 ? QString("_to_all_") : jobitem->getBlockName(b), this);
@@ -198,7 +198,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
    }
    else
    {
-      submenu = new QMenu( "Block", this);
+      submenu = new QMenu( "Tasks Block", this);
       jobitem->generateMenu( 0, submenu, this);
    }
    menu.addMenu( submenu);

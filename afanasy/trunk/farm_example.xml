@@ -19,6 +19,7 @@ Mask ".*" will match any render name. So here defined some default settings for 
       <capacity>1100</capacity>
       <maxtasks>10</maxtasks>
       <power>1000</power>
+      <wolidlesleeptime>0</wolidlesleeptime>
 <!--
 "resources" and "data" for test only (will play role in future)
 -->

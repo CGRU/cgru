@@ -55,6 +55,8 @@ int     Environment::render_log_linesmax =             AFRENDER::LOG_LINESMAX;
 std::string Environment::render_exec =                 AFRENDER::EXEC;
 std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
 std::string Environment::render_cmd_shutdown =         AFRENDER::CMD_SHUTDOWN;
+std::string Environment::render_cmd_wolsleep =         AFRENDER::CMD_WOLSLEEP;
+std::string Environment::render_cmd_wolwake =          AFRENDER::CMD_WOLWAKE;
 std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
@@ -178,6 +180,8 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
    getVar( pnode, render_exec,                       "render_exec"                       );
    getVar( pnode, render_cmd_reboot,                 "render_cmd_reboot"                 );
    getVar( pnode, render_cmd_shutdown,               "render_cmd_shutdown"               );
+   getVar( pnode, render_cmd_wolsleep,               "render_cmd_wolsleep"               );
+   getVar( pnode, render_cmd_wolwake,                "render_cmd_wolwake"                );
    getVar( pnode, render_hddspace_path,              "render_hddspace_path"              );
    getVar( pnode, render_networkif,                  "render_networkif"                  );
    getVar( pnode, render_iostat_device,              "render_iostat_device"              );

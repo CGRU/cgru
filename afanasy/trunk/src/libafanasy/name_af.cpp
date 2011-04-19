@@ -416,6 +416,9 @@ bool af::pathIsFolder( const std::string & path)
 const std::string af::pathHome()
 {
 #ifdef WINNT
+   std::string home_path = getenv("HOMEPATH");
+   if( home_path[1] != ':' )
+      home_path = getenv("HOMEDRIVE") + home_path;
    return getenv("HOMEPATH");
 #else
    return getenv("HOME");

@@ -132,6 +132,8 @@ public:
    static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
    static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
    static inline const std::string & getRenderCmdShutdown()   { return render_cmd_shutdown;    }
+   static inline const std::string & getRenderCmdWolSleep()   { return render_cmd_wolsleep;    }
+   static inline const std::string & getRenderCmdWolWake()    { return render_cmd_wolwake;     }
    static inline const std::string & getRenderNetworkIF()     { return render_networkif;       }
    static inline const std::string & getRenderHDDSpacePath()  { return render_hddspace_path;   }
    static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
@@ -241,6 +243,8 @@ private:
    static std::string render_exec;       ///< How Render can execute anther Render.
    static std::string render_cmd_reboot;
    static std::string render_cmd_shutdown;
+   static std::string render_cmd_wolsleep;
+   static std::string render_cmd_wolwake;
    static std::string render_hddspace_path;
    static std::string render_iostat_device;
    static std::string render_resclasses;

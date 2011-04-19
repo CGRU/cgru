@@ -90,6 +90,8 @@ namespace AFRENDER
    const char LOGS_DIRECTORY[]    = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
    const char CMD_REBOOT[]        = "reboot";   ///< How to reboot a computer.
    const char CMD_SHUTDOWN[]      = "shutdown"; ///< How to shutdown a computer.
+   const char CMD_WOLSLEEP[]      = "wolsleep"; ///< How to sleep computer.
+   const char CMD_WOLWAKE[]       = "wolwake";  ///< How to wake computer.
    const char EXEC[]              = "afrender"; ///< How Render to execute another Render.
    const char NETWORK_IF[]        = ".*";       ///< Network interface(s) pattern to measure traffic on.
    const char HDDSPACE_PATH[]     = "/";        ///< Path to query total and free space.
