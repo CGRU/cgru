@@ -301,20 +301,19 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBDelItem( this);
       return true;
    }
-   case af::Msg::TRenderRestart:
    {
       if( false == isOnline() ) return true;
       appendLog( std::string("Restarted by ") + userhost);
       exitClient( af::Msg::TClientRestartRequest, jobs, monitoring);
       return true;
    }
-   case af::Msg::TRenderStart:
+/*   case af::Msg::TRenderStart:
    {
       if( false == isOnline() ) return true;
       appendLog( std::string("Starting another render by ") + userhost);
       exitClient( af::Msg::TClientStartRequest, jobs, monitoring);
       return true;
-   }
+   }*/
    case af::Msg::TRenderReboot:
    {
       if( false == isOnline() ) return true;
@@ -387,7 +386,8 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
    MsgAf* msg = new MsgAf( type);
    msg->setAddress( this);
    msg->dispatch();
-   if( type != af::Msg::TClientStartRequest ) offline( jobs, af::TaskExec::UPRenderExit, monitoring);
+//   if( type != af::Msg::TClientStartRequest )
+   offline( jobs, af::TaskExec::UPRenderExit, monitoring);
 }
 
 void RenderAf::wolSleep( MonitorContainer * monitoring)

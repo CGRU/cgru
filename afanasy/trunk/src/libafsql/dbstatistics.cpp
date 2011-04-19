@@ -30,18 +30,25 @@ DBStatistics::~DBStatistics()
 
 void DBStatistics::addJob( const af::Job * job, QStringList * queries)
 {
+   // Get job parameters:
+   jobname        = job->getName();
+   description    = job->getDescription();
+   annotation     = job->getAnnontation();
+   username       = job->getUserName();
+   hostname       = job->getHostName();
+   time_started   = job->getTimeStarted();
+   time_done      = job->getTimeDone();
+
+   // Skip not started job:
+   if( time_started == 0 ) return;
+   // Skip job with no running time:
+   if( time_started == time_done ) return;
+   // Set done time to current time, if job was not done:
+   if( time_done < time_started ) time_done = time( NULL);
+
    // Inserting each block in table:
    for( int b = 0; b < job->getBlocksNum(); b++)
    {
-      // Get job parameters:
-      jobname        = job->getName();
-      description    = job->getDescription();
-      annotation     = job->getAnnontation();
-      username       = job->getUserName();
-      hostname       = job->getHostName();
-      time_started   = job->getTimeStarted();
-      time_done      = job->getTimeDone();
-
       // Get block parameters:
       af::BlockData * block = job->getBlock(b);
       blockname = block->getName();

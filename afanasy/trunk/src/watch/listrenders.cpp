@@ -228,6 +228,21 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       menu.addSeparator();
 
       {
+         QMenu * submenu = new QMenu( "Wake-On-Lan", this);
+
+         action = new QAction( "Sleep", this);
+         if( getSelectedItemsCount() == 1) action->setEnabled(0);
+//         connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+         submenu->addAction( action);
+         action = new QAction( "Wake", this);
+         if( getSelectedItemsCount() == 1) action->setEnabled(0);
+//         connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+         submenu->addAction( action);
+
+         menu.addMenu( submenu);
+      }
+
+      {
          QMenu * submenu = new QMenu( "Restart", this);
 
          action = new QAction( "Render", this);
@@ -406,11 +421,11 @@ void ListRenders::actRestart()
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderRestart);
 }
-void ListRenders::actStart()
+/*void ListRenders::actStart()
 {
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderStart);
-}
+}*/
 void ListRenders::actReboot()
 {
    af::MCGeneral mcgeneral;

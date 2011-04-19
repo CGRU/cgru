@@ -21,12 +21,15 @@ public:
    bool setSortType(   int type );
    bool setFilterType( int type );
 
-   inline bool isOnline() const { return online;}
-   inline bool isBusy()   const { return busy;  }
-   inline bool isnimby()  const { return nimby; }
-   inline bool isNIMBY()  const { return NIMBY; }
-   inline bool isDirty()  const { return dirty; }
-   inline bool hasTasks() const { return tasks.size() > 0; }
+   inline bool isOnline()        const { return online;           }
+   inline bool isBusy()          const { return busy;             }
+   inline bool isnimby()         const { return nimby;            }
+   inline bool isNIMBY()         const { return NIMBY;            }
+   inline bool isDirty()         const { return dirty;            }
+   inline bool isWOLFalling()    const { return wolFalling;       }
+   inline bool isWOLSleeping()   const { return wolSleeping;      }
+   inline bool isWOLWaking()     const { return wolWaking;        }
+   inline bool hasTasks()        const { return tasks.size() > 0; }
 
    bool calcHeight();
 

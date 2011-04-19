@@ -46,7 +46,7 @@ private slots:
    void actExit();
    void actDelete();
    void actRestart();
-   void actStart();
+//   void actStart();
 
    void actCommand( int number);
    void actReboot();

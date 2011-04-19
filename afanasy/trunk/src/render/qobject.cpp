@@ -196,12 +196,12 @@ printf("Object::caseMessage: "); msg->stdOut();
       QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
       break;
    }
-   case af::Msg::TClientStartRequest:
+/*   case af::Msg::TClientStartRequest:
    {
       printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
       QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
       break;
-   }
+   }*/
    case af::Msg::TClientRebootRequest:
    {
       exitRender();

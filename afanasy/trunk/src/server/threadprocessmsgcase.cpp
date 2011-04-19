@@ -610,7 +610,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderEject:
    case af::Msg::TRenderDelete:
    case af::Msg::TRenderRestart:
-   case af::Msg::TRenderStart:
+//   case af::Msg::TRenderStart:
    case af::Msg::TRenderReboot:
    case af::Msg::TRenderShutdown:
    case af::Msg::TRenderDeregister:

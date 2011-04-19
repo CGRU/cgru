@@ -124,6 +124,7 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 
    echo "\t</tr>\n";
 }
+pg_free_result($result);
 
 echo '<tr align=center>';
 echo "<td></td>";
@@ -135,9 +136,29 @@ echo "<td><a href='index.php?action=stat_chart&type=jobssumruntime'>Chart</a></t
 echo "<td><a href='index.php?action=stat_chart&type=jobsavgruntime'>Chart</a></td>";
 echo '</tr>';
 
-echo "</table>\n";
-
+$query="
+SELECT
+sum(1) AS numjobs,
+sum(time_done-time_started) AS sumonlinetime,
+avg(time_done-time_started) AS avgonlinetime,
+sum(taskssumruntime) AS sumruntime,
+avg(taskssumruntime) AS avgruntime
+FROM statistics;
+";
+$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+echo '<tr align=center>';
+echo "<td></td>";
+echo "<td><i>total</i></td>";
+echo "<td><i>".$line["numjobs"]."</i></td>";
+echo "<td><i>".time_strDHMS($line["sumonlinetime"])."</i></td>";
+echo "<td><i>".time_strHMS($line["avgonlinetime"])."</i></td>";
+echo "<td><i>".time_strDHMS($line["sumruntime"])."</i></td>";
+echo "<td><i>".time_strHMS($line["avgruntime"])."</i></td>";
+echo '</tr>';
 pg_free_result($result);
+
+echo "</table>\n";
 
 
 echo '<h3>Services:</h3>';
@@ -218,15 +239,15 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    echo "</td>\n";
 
    echo "\t\t<td align=center>";
-//   echo  ((string)((int)(100*($line["tasksdone"]/$line["tasksquantity"]))))."%";
    echo $line["tasksdone"]."%";
    echo "</td>\n";
 
    echo "\t</tr>\n";
 }
+pg_free_result($result);
 
 echo '<tr align=center>';
-echo "<td></td>";
+echo "<td/>";
 echo "<td></td>";
 echo "<td><a href='index.php?action=stat_chart&type=servicequantity'>Chart</a></td>";
 echo "<td><a href='index.php?action=stat_chart&type=tasksquantity'>Chart</a></td>";
@@ -235,9 +256,29 @@ echo "<td><a href='index.php?action=stat_chart&type=tasksavgruntime'>Chart</a></
 echo "<td><a href='index.php?action=stat_chart&type=tasksdone'>Chart</a></td>";
 echo '</tr>';
 
-echo "</table>\n";
-
+$query="
+SELECT
+sum(1) AS servicequantity,
+sum(tasksnum) AS tasksquantity,
+sum(taskssumruntime) AS taskssumruntime,
+avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
+round(avg(100*tasksdone/tasksnum),2) AS tasksdone
+FROM statistics;
+";
+$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+echo '<tr align=center>';
+echo "<td/>";
+echo "<td><i>total</i></td>";
+echo "<td><i>".$line["servicequantity"]."</i></td>";
+echo "<td><i>".$line["tasksquantity"]."</i></td>";
+echo "<td><i>".time_strDHMS($line["taskssumruntime"])."</i></td>";
+echo "<td><i>".time_strHMS($line["tasksavgruntime"])."</i></td>";
+echo "<td><i>".$line["tasksdone"]."%</i></td>";
+echo '</tr>';
 pg_free_result($result);
+
+echo "</table>\n";
 }
 
 ?>

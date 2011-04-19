@@ -236,11 +236,7 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
          log( std::string("Executing block[") + blocksdata[b]->getName() + "] post command:\n" + blocksdata[b]->getCmdPost());
       }
    }
-   if(( time_started != 0) && ( time_done == 0 )) time_done = time( NULL);
    Node::setZombie();
-
-   // Rotate = -1: no rotate, but add time to name
-//   AFCommon::saveLog( joblog, af::Environment::getJobsLogsDir(), name, -1);
 
    // Queue job cleanup:
    AFCommon::QueueJobCleanUp( this);
