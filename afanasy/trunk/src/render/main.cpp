@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
    afqt::QEnvironment QENV;
    if( false == QENV.isValid())
    {
-      AFERROR("main: QEnvironment initialization failed.\n")
+      AFERROR("main: QEnvironment initialization failed.")
       exit(1);
    }
 

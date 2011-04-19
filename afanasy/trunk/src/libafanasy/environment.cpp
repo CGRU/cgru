@@ -340,11 +340,11 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //############ home directory:
    home = af::pathHome();
    PRINT("User home directory = '%s'\n", home.c_str());
-   home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy" + AFGENERAL::PATH_SEPARATOR;
+   home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy";
    PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
    if( af::pathMakeDir( home_afanasy, true) == false)
    {
-      AFERRAR("Can't make home directory '%s'\n", home_afanasy.c_str());
+      AFERRAR("Can't make home directory '%s'", home_afanasy.c_str());
    }
 //
 //############ user name:
@@ -419,7 +419,7 @@ void Environment::load()
    load( filename, false, verbose);
    filename = ( afroot + "/config.xml");
    load( filename, false, verbose);
-   filename = ( home_afanasy + "config.xml");
+   filename = ( home_afanasy + "/config.xml");
    load( filename, false, verbose);
    bool _verbose=verbose;
    verbose = false;
@@ -451,12 +451,12 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
       }
       catch ( rapidxml::parse_error err)
       {
-         AFERRAR("Parsing error: %s.\n", err.what())
+         AFERRAR("Parsing error: %s.", err.what())
          parse_error = true;
       }
       catch ( ... )
       {
-         AFERROR("Unknown exeption.\n")
+         AFERROR("Unknown exeption.")
          parse_error = true;
       }
 
@@ -465,7 +465,7 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
          rapidxml::xml_node<> * root_node = xmldoc.first_node("afanasy");
          if( root_node == NULL )
          {
-            AFERRAR("Can't find document root \"afanasy\": node:\n%s\n", filename.c_str())
+            AFERRAR("Can't find document root \"afanasy\": node:\n%s", filename.c_str())
          }
          else
          {

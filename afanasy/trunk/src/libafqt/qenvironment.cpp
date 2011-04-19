@@ -152,7 +152,7 @@ QEnvironment::QEnvironment( const QString & name)
    if( false == name.isEmpty())
    {
       QDomDocument doc( name);
-      filename = af::Environment::getHomeAfanasy() + name.toUtf8().data() + ".xml";
+      filename = af::Environment::getHomeAfanasy() + AFGENERAL::PATH_SEPARATOR + name.toUtf8().data() + ".xml";
       if( openXMLDomDocument( doc, filename))
       {
          for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->read( doc);
