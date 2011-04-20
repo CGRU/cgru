@@ -108,6 +108,7 @@ namespace AFWATCH
    const int  REFRESHINTERVAL          = 5;        ///< Node items update interval time in seconds.
 
    const char CMDS_ARGUMENT[]          = "@ARG@";     ///< Commands argument.
+   const char CMDS_IPADDRESS[]         = "@IP@";      ///< Commands argument will be replaced with selected render ip address.
    const char CMDS_ASKCOMMAND[]        = "@ASK@";     ///< Ask a command, dialog will be raised.
 }
 

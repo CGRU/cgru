@@ -529,17 +529,21 @@ void ListRenders::actCommand( int number)
 
    if( indexes.count() < 1 )
    {
-      Item* item = getCurrentItem();
-      Watch::startProcess( cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName()));
+      ItemRender * item = (ItemRender*)(getCurrentItem());
+      cmd.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
+      cmd.replace( AFWATCH::CMDS_IPADDRESS, item->getIPString());
+      Watch::startProcess( cmd);
       return;
    }
 
    for( int i = 0; i < indexes.count(); i++)
    {
       if( false == qVariantCanConvert<Item*>( indexes[i].data())) continue;
-      Item* item = qVariantValue<Item*>( indexes[i].data());
+      ItemRender * item = (ItemRender*)(qVariantValue<Item*>( indexes[i].data()));
       if( item == NULL ) continue;
       QString final_command(cmd);
-      Watch::startProcess( final_command.replace( AFWATCH::CMDS_ARGUMENT, item->getName()));
+      final_command.replace( AFWATCH::CMDS_ARGUMENT, item->getName());
+      final_command.replace( AFWATCH::CMDS_IPADDRESS, item->getIPString());
+      Watch::startProcess( final_command);
    }
 }

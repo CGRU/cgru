@@ -45,13 +45,10 @@
 <hr />
 <p>
 This is an utility to create movie file from image sequence. It consists of some scripts and GUI for it.
-GUI is written on PyQt, so python and PyQt must be installed. Scrits are written on python.
-It uses other utilities: <a href="http://www.imagemagick.org">ImageMagick<a>
-to draw annotations and <a href="http://www.ffmpeg.org">ffmpeg<a> to encode.
-On Linux and Windows ImageMagick must be installed.
-To encode 'H.264' codec it uses ffmpeg with <a href="http://www.videolan.org/developers/x264.html">x264<a> library.
-On Windows ImageMagick contains ffmpeg binary compiled with x264 library.
-Linux releases contains ffmpeg binary compiled with x264 library.
+Scripts are written on Python and GUI is written on PyQt, so Python and PyQt must be installed.
+Scripts use other utilities:
+<a href="http://www.imagemagick.org">ImageMagick<a> to draw annotations and
+<a href="http://www.ffmpeg.org">ffmpeg<a> to encode.
 </p>
 <p>
 Mavishky dialog constructs and launches <kbd>mavishky.py</kbd> script. It is a GUI for this command.
@@ -102,7 +99,7 @@ You can choose preset in GUI or specify it in command argument.
 <a name="scan"/>
 <h2>Scan Scan</h2>
 <p>
-It is an utility to scan folder and its subfolders for an images sequences, and to create moves from them.
+It is an utility to scan folder and its sub-folders for an images sequences, and to create moves from them.
 It consists of a <kbd>scanscan.py</kbd> command and a <kbd>scandialog.py</kbd> GUI for it.
 Both are Python scripts, GUI is on PyQt.
 Command script scans folders for images and launches <kbd>mavishky.py</kbd> for each sequence.

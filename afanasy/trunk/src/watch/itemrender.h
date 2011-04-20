@@ -13,8 +13,9 @@ public:
 
    void updateValues( af::Node *node, int type);
 
-   inline const QString & getUserName()   const { return username;   }
-   inline const QString & getAnnotation() const { return annotation; }
+   inline const QString & getUserName()   const { return username;      }
+   inline const QString & getAnnotation() const { return annotation;    }
+   inline const QString & getIPString()   const { return address_ip_str;}
    inline int getPriority() const { return priority;  }
    inline int getCapacity() const { return capacity;  }
 
@@ -66,6 +67,7 @@ private:
    unsigned time_launched;
    unsigned wol_operation_time;
 
+   QString  address_ip_str;
    QString  address_str;      ///< Client address
 
    bool online;

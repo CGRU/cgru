@@ -319,6 +319,12 @@ void QEnvironment::solveServerAddress()
       printf("Looking up server name \"%s\"...\n", af::Environment::getServerName().c_str());
       QHostInfo qhostinfo = QHostInfo::fromName( servername);
       adresses = qhostinfo.addresses();
+      if( adresses.size() < 1 )
+      {
+         AFERRAR("Can't solve server name.", serveraddrnum_arg.c_str())
+         valid = false;
+         return;
+      }
    }
    if( adresses.size() > 1 )
    {
