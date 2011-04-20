@@ -111,7 +111,7 @@ namespace af
    const std::string pathHome();
    bool pathMakeDir( const std::string & path, bool verbose = false);
 
-   bool netIsIpAddr( const std::string & addr);
+   bool netIsIpAddr( const std::string & addr, bool verbose = false);
 
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 }

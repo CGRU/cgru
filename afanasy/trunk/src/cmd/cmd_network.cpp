@@ -32,10 +32,13 @@ bool CmdNetwork::processArguments( int argc, char** argv, af::Msg &msg)
    }
    if( operation == "ip")
    {
-      if( argc < 1 ) return false;
+      if( argc < 2 )
+      {
+         printf("Specify an address to check.\n");
+         return false;
+      }
       std::string addr( argv[1]);
-      if( af::netIsIpAddr( addr)) printf("IP address string.\n");
-      else printf("Not an IP address string.\n");
+      af::netIsIpAddr( addr, true);
    }
    else
    {

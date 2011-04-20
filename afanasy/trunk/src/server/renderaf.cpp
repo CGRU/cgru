@@ -402,6 +402,10 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
    wol_operation_time = time( NULL);
    AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+
+   MsgAf* msg = new MsgAf( af::Msg::TClientWOLSleepRequest);
+   msg->setAddress( this);
+   msg->dispatch();
 }
 
 void RenderAf::wolWake(  MonitorContainer * monitoring)

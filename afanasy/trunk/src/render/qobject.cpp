@@ -216,6 +216,12 @@ printf("Object::caseMessage: "); msg->stdOut();
       QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdShutdown()));
       break;
    }
+   case af::Msg::TClientWOLSleepRequest:
+   {
+      printf("Sleep request, executing command:\n%s\n", af::Environment::getRenderCmdWolSleep().c_str());
+      QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdWolSleep()));
+      break;
+   }
    case af::Msg::TRenderStopTask:
    {
       af::MCTaskPos taskpos( msg);

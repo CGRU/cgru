@@ -22,6 +22,7 @@ public:
    bool setFilterType( int type );
 
    inline bool isOnline()        const { return online;           }
+   inline bool isOffline()       const { return false == online;  }
    inline bool isBusy()          const { return busy;             }
    inline bool isnimby()         const { return nimby;            }
    inline bool isNIMBY()         const { return NIMBY;            }

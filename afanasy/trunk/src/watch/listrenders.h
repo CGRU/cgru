@@ -51,6 +51,8 @@ private slots:
    void actCommand( int number);
    void actReboot();
    void actShutdown();
+   void actWOLSleep();
+   void actWOLWake();
 
    void requestResources();
 

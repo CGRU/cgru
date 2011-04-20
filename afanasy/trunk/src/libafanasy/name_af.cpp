@@ -602,7 +602,7 @@ bool isHex( char c)
    if(( c >= 'A' ) && ( c <= 'F' )) return true;
    return false;
 }
-bool af::netIsIpAddr( const std::string & addr)
+bool af::netIsIpAddr( const std::string & addr, bool verbose)
 {
    bool isIPv4 = false;
    bool isIPv6 = false;
@@ -619,8 +619,22 @@ bool af::netIsIpAddr( const std::string & addr)
          continue;
       }
       if( isDec( addr[i])) continue;
-      if( isIPv4 ) return false;
-      if( false == isHex( addr[i])) return false;
+      if( isIPv4 )
+      {
+         isIPv4 = false;
+         break;
+      }
+      if( false == isHex( addr[i]))
+      {
+         isIPv6 = false;
+         break;
+      }
+   }
+   if( verbose)
+   {
+      if( isIPv4 ) printf("IPv4 address.\n");
+      else if ( isIPv6 ) printf("IPv6 address.\n");
+      else printf("Not an IP adress.\n");
    }
    if(( isIPv4 == false ) && ( isIPv6 == false )) return false;
    return true;

@@ -231,12 +231,12 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          QMenu * submenu = new QMenu( "Wake-On-Lan", this);
 
          action = new QAction( "Sleep", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled(0);
-//         connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOnline() && ( false == render->isWOLFalling()));
+         connect( action, SIGNAL( triggered() ), this, SLOT( actWOLSleep()));
          submenu->addAction( action);
          action = new QAction( "Wake", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled(0);
-//         connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOffline() && ( false == render->isWOLWaking()));
+         connect( action, SIGNAL( triggered() ), this, SLOT( actWOLWake()));
          submenu->addAction( action);
 
          menu.addMenu( submenu);
@@ -435,6 +435,16 @@ void ListRenders::actShutdown()
 {
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderShutdown);
+}
+void ListRenders::actWOLSleep()
+{
+   af::MCGeneral mcgeneral;
+   action( mcgeneral, af::Msg::TRenderWOLSleep);
+}
+void ListRenders::actWOLWake()
+{
+   af::MCGeneral mcgeneral;
+   action( mcgeneral, af::Msg::TRenderWOLWake);
 }
 
 void ListRenders::actRequestLog()
