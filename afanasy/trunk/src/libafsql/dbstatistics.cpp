@@ -57,6 +57,11 @@ void DBStatistics::addJob( const af::Job * job, QStringList * queries)
       tasksdone = block->getProgressTasksDone();
       taskssumruntime = job->getBlock(b)->getProgressTasksSumRunTime();
 
+      // Skip blocks with no run time:
+      if( tasksnum == 0 ) continue;
+      if( tasksdone == 0 ) continue;
+      if( taskssumruntime == 0 ) continue;
+
       // Insert row:
       dbInsert( queries);
    }
