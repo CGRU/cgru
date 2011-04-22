@@ -118,14 +118,35 @@ Core::Core():
          job = new JobAf( *it);
       if( afDB_JobRegister.getItem( job))
       {
-         jobs->job_register( job, users, NULL);
          if( *it == AFJOB::SYSJOB_ID )
          {
-            printf("System job retrieved from database.\n");
-            hasSystemJob = true;
+            SysJob * sysjob = (SysJob*)job;
+            if( false == sysjob->isValid() )
+            {
+               printf("System job retrieved from database is obsolete. Deleting it...\n");
+               QStringList queries;
+               job->dbDeleteNoStatistics( &queries);
+               delete job;
+               afDB_JobRegister.execute( queries);
+               continue;
+            }
+            else
+            {
+               printf("System job retrieved from database.\n");
+               hasSystemJob = true;
+            }
          }
+         jobs->job_register( job, users, NULL);
       }
-      else delete job;
+      else
+      {
+         printf("Deleting invalid job from database...\n");
+         QStringList queries;
+         job->dbDeleteNoStatistics( &queries);
+         job->stdOut();
+         delete job;
+         afDB_JobRegister.execute( queries);
+      }
    }
 
 //
@@ -151,25 +172,25 @@ Core::~Core()
    if( core == NULL) return;
    core = NULL;
 
-   AFINFO("Core::~Core: Destructor begin:\n");
+   AFINFO("Core::~Core: Destructor begin:")
 
-   AFINFO("Core::~Core: Deleting read messages thread.\n");
+   AFINFO("Core::~Core: Deleting read messages thread.")
    if( threadReadMsg    != NULL ) delete threadReadMsg;
-   AFINFO("Core::~Core: Deleting run messages thread.\n");
+   AFINFO("Core::~Core: Deleting run messages thread.")
    if( threadRun        != NULL ) delete threadRun;
-   AFINFO("Core::~Core: Deleting messages queue.\n");
+   AFINFO("Core::~Core: Deleting messages queue.")
    if( msgQueue      != NULL ) delete msgQueue;
-   AFINFO("Core::~Core: Deleting Talks container.\n");
+   AFINFO("Core::~Core: Deleting Talks container.")
    if( talks            != NULL ) delete talks;
-   AFINFO("Core::~Core: Deleting Monitors container.\n");
+   AFINFO("Core::~Core: Deleting Monitors container.")
    if( monitors         != NULL ) delete monitors;
-   AFINFO("Core::~Core: Deleting Users container.\n");
+   AFINFO("Core::~Core: Deleting Users container.")
    if( users            != NULL ) delete users;
-   AFINFO("Core::~Core: Deleting Renders container.\n");
+   AFINFO("Core::~Core: Deleting Renders container.")
    if( renders          != NULL ) delete renders;
-   AFINFO("Core::~Core: Deleting Jobs container.\n");
+   AFINFO("Core::~Core: Deleting Jobs container.")
    if( jobs             != NULL ) delete jobs;
 
-   AFINFO("Core::~Core: Destructed.\n");
+   AFINFO("Core::~Core: Destructed.")
 
 }

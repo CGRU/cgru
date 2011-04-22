@@ -9,6 +9,7 @@
 #include "afcommon.h"
 #include "rendercontainer.h"
 #include "sysjob_cmdpost.h"
+#include "sysjob_wol.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -310,8 +311,10 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
 
    uint32_t taskstate_old = taskprogress->state;
    int tasksready_old = data->getProgressTasksReady();
+   int tasksdone_old  = data->getProgressTasksDone();
    int taskserror_old = data->getProgressTasksError();
    int tasksready_new = 0;
+   int tasksdone_new  = tasksdone_old;
    int taskserror_new = 0;
 
 
@@ -331,7 +334,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       }
    }
 
-   if( deleteFinishedTasks()) taskchanged = true;
+   tasksdone_new += deleteFinishedTasks( taskchanged);
 
    if( commands.size())
    {
@@ -341,6 +344,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
 
    if( taskstate_old  != taskprogress->state ) taskchanged = true;
    if(( tasksready_old != tasksready_new ) ||
+      ( tasksdone_old  != tasksdone_new  ) ||
       ( taskserror_old != taskserror_new )  ) blockProgress_changed = true;
 
    if( taskchanged && monitoring) tasks[0]->monitor( monitoring);
@@ -348,15 +352,17 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    // For block in jobs list monitoring
    if( Block::refresh( currentTime, renders, monitoring)) blockProgress_changed = true;
 
-   data->setProgressTasksReady( tasksready_new);
-   data->setProgressTasksError( taskserror_new);
+   data->setProgressTasksReady( tasksready_new  );
+   data->setProgressTasksDone(  tasksdone_new   );
+   data->setProgressTasksError( taskserror_new  );
 
    return blockProgress_changed;
 }
 
-bool SysBlock::deleteFinishedTasks()
+int SysBlock::deleteFinishedTasks( bool & taskProgressChanged)
 {
-   bool has_errors = false;
+   int done_tasks = 0;
+   taskProgressChanged = false;
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end();)
    {
       if(( false == (*it)->isRunning()) && ((*it)->isError() || (*it)->isDone()))
@@ -364,14 +370,15 @@ bool SysBlock::deleteFinishedTasks()
          if((*it)->isError())
          {
             taskprogress->errors_count++;
-            has_errors = true;
+            taskProgressChanged = true;
          }
+         else done_tasks++;
          delete *it;
          it = systasks.erase( it);
       }
       else it++;
    }
-   return has_errors;
+   return done_tasks;
 }
 
 SysTask * SysBlock::getTask( int tasknum, const char * errorMessage)
@@ -394,8 +401,9 @@ void SysBlock::errorHostsReset()
 //////////////////////////////////////////   JOB    ///////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+SysJob   * SysJob::sysjob        = NULL;
 SysBlock * SysJob::block_cmdpost = NULL;
-SysJob * SysJob::sysjob = NULL;
+SysBlock * SysJob::block_wol     = NULL;
 
 SysJob::SysJob( int flags):
    JobAf( AFJOB::SYSJOB_ID)
@@ -412,6 +420,7 @@ SysJob::SysJob( int flags):
    blocksnum = BlockLastIndex;
    blocksdata = new af::BlockData*[blocksnum];
    blocksdata[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, id);
+   blocksdata[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     id);
 
    progress = new afsql::DBJobProgress( this);
 
@@ -425,7 +434,7 @@ SysJob::~SysJob()
 {
 }
 
-void SysJob::dbDelete( QStringList  * queries) const
+void SysJob::dbDelete( QStringList * queries) const
 {
    AFCommon::QueueLogError("Trying to delete system job from database.");
 }
@@ -444,14 +453,23 @@ Block * SysJob::newBlock( int numBlock)
       block_cmdpost = new SysBlock_CmdPost( this, blocksdata[numBlock], progress, &joblog);
       return block_cmdpost;
    }
+   case BlockWOLIndex:
+   {
+      block_wol = new SysBlock_WOL( this, blocksdata[numBlock], progress, &joblog);
+      return block_wol;
+   }
    default:
       AFERRAR("SysJob::createBlock: Invalid block number = %d", numBlock)
    }
 }
 
-void SysJob::addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
+void SysJob::AddPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
 {
    block_cmdpost->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
+}
+void SysJob::AddWOLCommand(  const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
+{
+   block_wol->addCommand( new SysCmd( Command, WorkingDirectory, UserName, JobName));
 }
 
 bool SysJob::solve( RenderAf *render, MonitorContainer * monitoring)
@@ -469,16 +487,13 @@ void SysJob::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * ren
 //printf("SysJob::updateTaskState:\n");
 //   JobAf::updateTaskState( taskup, renders, monitoring)
 
-   switch( taskup.getNumBlock())
+   if( taskup.getNumBlock() >= BlockLastIndex )
    {
-   case BlockPostCmdIndex:
-   {
-      block_cmdpost->updateTaskState( taskup, renders, monitoring);
-      break;
-   }
-   default:
       AFCommon::QueueLogError("SysJob::updateTaskState: Invalid block number = " + af::itos(taskup.getNumBlock()));
+      return;
    }
+
+   ((SysBlock*)(blocks[taskup.getNumBlock()]))->updateTaskState( taskup, renders, monitoring);
 }
 
 void SysJob::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -563,6 +578,12 @@ void SysJob::appendLog( const std::string & message)
    sysjob->log( message);
 }
 
+bool SysJob::isValid() const
+{
+   if( blocksnum != BlockLastIndex ) return false;
+   return true;
+}
+
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////   BLOCK DATA   //////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -570,7 +591,8 @@ void SysJob::appendLog( const std::string & message)
 SysBlockData::SysBlockData( int BlockNum, int JobId):
    afsql::DBBlockData( BlockNum, JobId)
 {
-   initDefaults();
+//   initDefaults();
+AFINFA("DBBlockData::DBBlockData: JobId=%d, BlockNum=%d", JobId, blocknum)
 
    capacity = af::Environment::getTaskDefaultCapacity();
 

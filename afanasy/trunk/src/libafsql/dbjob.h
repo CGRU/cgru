@@ -20,6 +20,7 @@ public:
 
    virtual bool dbSelect( QSqlDatabase * db, const QString * where = NULL);
    virtual void dbDelete( QStringList  * queries) const;
+   virtual void dbDeleteNoStatistics( QStringList  * queries) const;
 
 protected:
    inline const QString & dbGetTableName()  const { return TableName;}

@@ -34,7 +34,7 @@ Gizmo {
    addUserKnob { 26 "" l "" }
    addUserKnob {  6 independent l "Connected nodes are independent" }
    addUserKnob { 26 "" l "" }
-   addUserKnob {  6 reversedeps l "Reverse dependences on connected nodes" }
+   addUserKnob {  6 reversedeps l "Reverse dependence on connected nodes" }
    addUserKnob { 26 "" l "" }
    addUserKnob {  6 fullrange   l "Down stream will wait for whole frame range rendered" }
    addUserKnob { 26 "" l "" }

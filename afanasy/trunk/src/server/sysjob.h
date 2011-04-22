@@ -75,7 +75,7 @@ public:
 private:
    SysTask * addTask( af::TaskExec * taskexec);
    SysTask * getTask( int tasknum, const char * errorMessage = NULL);
-   bool deleteFinishedTasks();
+   int deleteFinishedTasks( bool & taskProgressChanged);
 
 private:
    af::TaskProgress * taskprogress;
@@ -90,7 +90,8 @@ private:
 class SysJob : public JobAf
 {
 public:
-   static void addPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
+   static void AddPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
+   static void AddWOLCommand(  const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName);
 
    enum CreationFlags
    {
@@ -101,12 +102,15 @@ public:
    enum BlocksEnum
    {
       BlockPostCmdIndex,
+      BlockWOLIndex,
       BlockLastIndex
    };
 
 public:
    SysJob( int flags);
    virtual ~SysJob();
+
+   bool isValid() const;
 
    virtual bool solve( RenderAf *render, MonitorContainer * monitoring);
    virtual void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);
@@ -128,6 +132,7 @@ protected:
 private:
    static SysJob * sysjob;
    static SysBlock * block_cmdpost;
+   static SysBlock * block_wol;
 };
 
 /// System job block data:

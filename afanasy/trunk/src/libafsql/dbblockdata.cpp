@@ -23,6 +23,7 @@ DBBlockData::DBBlockData( af::Msg * msg):
 DBBlockData::DBBlockData( int BlockNum, int JobId):
    af::BlockData( BlockNum, JobId)
 {
+AFINFA("DBBlockData::DBBlockData(): JobId=%d, BlockNum=%d", jobid, blocknum)
    addDBAttributes();
 }
 
@@ -95,11 +96,17 @@ af::TaskData * DBBlockData::createTask( af::Msg * msg)
 
 void DBBlockData::dbAdd( QSqlDatabase * db) const
 {
-AFINFA("DBBlockData::dbAdd: tasksnum = %d\n", tasksnum);
+AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", blocknum, tasksnum)
    QStringList queries;
    dbInsert( &queries);
    QSqlQuery q( *db);
-   for( int i = 0; i < queries.size(); i++) q.exec( queries[i]);
+   for( int i = 0; i < queries.size(); i++)
+   {
+#ifdef AFOUTPUT
+printf("%s\n", queries[i].toUtf8().data());
+#endif
+      q.exec( queries[i]);
+   }
    if( isNumeric()) return;
 
    q.prepare( DBTaskData::dbPrepareInsert);

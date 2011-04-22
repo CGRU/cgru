@@ -248,11 +248,14 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
       data->setProgressAvoidHostsNum( avoidhostsnum);
    }
 
-   // update block tasks progress and bars
-   if( data->updateProgress( jobprogress)) blockProgress_changed = true;
+   // No need to update progress in sys job block, it will be updated in virtual function customly
+   // ( if it will be updated here, it will always return that it changes )
+   if( job->getId() != AFJOB::SYSJOB_ID )
+   // Update block tasks progress and bars
+      if( data->updateProgress( jobprogress)) blockProgress_changed = true;
 
    //
-   // blocksdata depend check
+   // Blocksdata depend check
    data->setStateDependent( false);
    if( dependBlocks.size())
       for( std::list<int>::const_iterator bIt = dependBlocks.begin(); bIt != dependBlocks.end(); bIt++)

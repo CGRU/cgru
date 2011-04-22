@@ -21,7 +21,8 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
-   const std::string getName() const { return name;}
+   const std::string getMACAddrString( bool withSeparators = false) const;
+   const std::string & getName() const { return name;}
 
    int calcWeight() const;
 

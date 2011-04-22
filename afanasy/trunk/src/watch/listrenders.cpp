@@ -524,7 +524,7 @@ void ListRenders::actCommand( int number)
       QString text = QInputDialog::getText(this, "Launch Command",
          QString("Entrer string to replace %1 in\n%2").arg(AFWATCH::CMDS_ASKCOMMAND).arg(cmd), QLineEdit::Normal, "", &ok);
       if( !ok) return;
-      cmd = cmd.replace( AFWATCH::CMDS_ASKCOMMAND, text);
+      cmd.replace( AFWATCH::CMDS_ASKCOMMAND, text);
    }
 
    if( indexes.count() < 1 )

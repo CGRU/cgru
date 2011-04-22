@@ -51,7 +51,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
 {
    if( address.isEmpty() )
    {
-      AFERROR("MsgQueue::send: Address is empty.\n")
+      AFERROR("MsgQueue::send: Address is empty.")
       return;
    }
 
@@ -63,20 +63,19 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
 
    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
    {
-      AFERRPE("MsgQueue::processItem: socket");
+      AFERRPE("MsgQueue::processItem: socket")
       address.stdOut(); printf("\n");
       return;
    }
 
-   AFINFO("MsgQueue::processItem: tying to connect to client.\n");
+   AFINFO("MsgQueue::processItem: tying to connect to client.")
    // Use SIGALRM to unblock
    if( alarm(2) != 0 )
       AFERROR("MsgQueue::send: alarm was already set.\n");
 
    if( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
    {
-      AFERRPE("MsgQueue::processItem: connect");
-      address.stdOut(); printf("\n");
+      AFERRPA("MsgQueue::processItem: connect: %s", address.generateInfoString().c_str())
       close(socketfd);
       alarm(0);
       return;
@@ -89,7 +88,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
    so_sndtimeo.tv_usec = 0;
    if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
    {
-      AFERRPE("MsgQueue::processItem: set socket SO_SNDTIMEO option failed");
+      AFERRPE("MsgQueue::processItem: set socket SO_SNDTIMEO option failed")
       address.stdOut(); printf("\n");
       close(socketfd);
       return;
@@ -98,8 +97,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
    // send
    if( false == com::msgsend( socketfd, msg))
    {
-      AFERROR("MsgQueue::processItem: can't send message to client.\n");
-      address.stdOut(); printf("\n");
+      AFERRAR("MsgQueue::processItem: can't send message to client: %s", address.generateInfoString().c_str())
    }
 
    close(socketfd);

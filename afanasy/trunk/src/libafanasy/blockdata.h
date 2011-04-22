@@ -214,6 +214,7 @@ public:
    inline uint32_t getProgressTasksSumRunTime() const { return p_taskssumruntime;   }
 
    inline void setProgressTasksReady(    int value) { p_tasksready    = value; }
+   inline void setProgressTasksDone(     int value) { p_tasksdone     = value; }
    inline void setProgressTasksError(    int value) { p_taskserror    = value; }
    inline void setProgressErrorHostsNum( int value) { p_errorhostsnum = value; }
    inline void setProgressAvoidHostsNum( int value) { p_avoidhostsnum = value; }
@@ -227,8 +228,6 @@ public:
 protected:
    /// Read or write block.
    virtual void readwrite( Msg * msg);
-
-   void initDefaults();  ///< Initialize default values
 
 protected:
    int32_t jobid;   ///< Block job id.
@@ -303,6 +302,7 @@ protected:
    TaskData ** tasksdata;        ///< Tasks data pointer.
 
 private:
+   void initDefaults();  ///< Initialize default values
    void construct();
 
 /// Generate fisrt and last frame numbers for \c num task.

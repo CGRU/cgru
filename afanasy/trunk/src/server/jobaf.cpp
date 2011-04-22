@@ -225,14 +225,14 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 
    if( false == cmd_post.empty())
    {
-      SysJob::addPostCommand( cmd_post, blocksnum > 0 ? blocksdata[0]->getWDir(): "", username, name);
+      SysJob::AddPostCommand( cmd_post, blocksnum > 0 ? blocksdata[0]->getWDir(): "", username, name);
       log( std::string("Executing job post command:\n") + cmd_post);
    }
    for( int b = 0; b < blocksnum; b++)
    {
       if( blocksdata[b]->hasCmdPost())
       {
-         SysJob::addPostCommand( blocksdata[b]->getCmdPost(), blocksdata[b]->getWDir(), username, name);
+         SysJob::AddPostCommand( blocksdata[b]->getCmdPost(), blocksdata[b]->getWDir(), username, name);
          log( std::string("Executing block[") + blocksdata[b]->getName() + "] post command:\n" + blocksdata[b]->getCmdPost());
       }
    }

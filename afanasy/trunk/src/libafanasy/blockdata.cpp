@@ -14,7 +14,9 @@
 
 using namespace af;
 
-BlockData::BlockData()
+BlockData::BlockData():
+   jobid( 0),
+   blocknum(0)
 {
    initDefaults();
    construct();
@@ -29,8 +31,7 @@ void BlockData::initDefaults()
    p_tasksdone = 0;
    p_taskserror = 0;
    p_taskssumruntime = 0;
-   jobid = 0;
-   blocknum = 0;
+   state = AFJOB::STATE_READY_MASK;
    flags = 0;
    frame_first = 0;
    frame_last = 0;
@@ -55,6 +56,9 @@ void BlockData::initDefaults()
    multihost_waitmax = 0;
    multihost_waitsrv = 0;
    parsercoeff = 1;
+
+   memset( p_bar_running, 0, AFJOB::PROGRESS_BYTES);
+   memset( p_bar_done,    0, AFJOB::PROGRESS_BYTES);
 }
 
 BlockData::BlockData( Msg * msg)
@@ -67,6 +71,8 @@ BlockData::BlockData( int BlockNum, int JobId):
    jobid( JobId),
    blocknum( BlockNum)
 {
+AFINFA("BlockData::BlockData(): JobId=%d, BlockNum=%d", jobid, blocknum)
+   initDefaults();
    construct();
 }
 

@@ -22,7 +22,7 @@ ItemJob::ItemJob( af::Job *job):
 {
    if( blocksnum == 0)
    {
-      AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): blocksnum == 0\n");
+      AFERROR("ItemJob::ItemJob( Job *job, QWidget *parent): blocksnum == 0")
       return;
    }
 
@@ -50,7 +50,7 @@ void ItemJob::updateValues( af::Node *node, int type)
 
    if( blocksnum != job->getBlocksNum())
    {
-      AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.\n");
+      AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.")
       resetId();
       return;
    }
@@ -265,7 +265,7 @@ bool ItemJob::setFilterType( int type )
          filter_str = &hostname;
          break;
       default:
-         AFERRAR("ItemJob::setFilterType: Invalid type number = %d\n", type);
+         AFERRAR("ItemJob::setFilterType: Invalid type number = %d", type)
          return false;
    }
    return true;
@@ -275,7 +275,7 @@ void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 {
    if((id_block >= 0) && (id_block >= blocksnum))
    {
-      AFERRAR("ListJobs::generateMenu: id_block >= blocksnum (%d>=%d)\n", id_block, blocksnum);
+      AFERRAR("ListJobs::generateMenu: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return;
    }
    blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
@@ -285,7 +285,7 @@ void ItemJob::blockAction( int id_block, int id_action, ListItems * listitems)
 {
    if((id_block >= 0) && (id_block >= blocksnum))
    {
-      AFERRAR("ListJobs::blockAction: id_block >= blocksnum (%d>=%d)\n", id_block, blocksnum);
+      AFERRAR("ListJobs::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return;
    }
    blockinfo[ id_block >= 0 ? id_block : 0].blockAction( id_block, id_action, listitems);

@@ -12,6 +12,7 @@
 #include "msgaf.h"
 #include "msgqueue.h"
 #include "rendercontainer.h"
+#include "sysjob.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -398,6 +399,12 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
    if( isWOLFalling()   ) return;
    if( isBusy()         ) return;
 
+   if( netIFs.size() < 1)
+   {
+      appendLog("Can't perform Wake-On-Line operations. No network interfaces information.");
+      return;
+   }
+
    setWOLFalling( true);
    wol_operation_time = time( NULL);
    AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
@@ -414,10 +421,21 @@ void RenderAf::wolWake(  MonitorContainer * monitoring)
    if( isWOLFalling()   ) return;
    if( isWOLWaking()    ) return;
 
+   if( netIFs.size() < 1)
+   {
+      appendLog("Can't perform Wake-On-Line operations. No network interfaces information.");
+      return;
+   }
+
    setWOLWaking( true);
    wol_operation_time = time( NULL);
    AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+
+   std::string cmd = af::Environment::getRenderCmdWolWake();
+   for( int i = 0; i < netIFs.size(); i++) cmd += " " + netIFs[i]->getMACAddrString( false);
+
+   SysJob::AddWOLCommand( cmd, "", name, name);
 }
 
 void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)

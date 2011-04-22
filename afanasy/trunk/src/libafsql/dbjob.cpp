@@ -68,7 +68,7 @@ void DBJob::getIds( std::list<int32_t> & uids, QSqlDatabase * db)
 {
    if( db->isOpen() == false )
    {
-      AFERROR("DBJob::getIds: Database connection is not open\n");
+      AFERROR("DBJob::getIds: Database connection is not open.")
       return;
    }
    QSqlQuery q( *db);
@@ -95,7 +95,7 @@ bool DBJob::dbSelect( QSqlDatabase * db, const QString * where)
    if( DBItem::dbSelect( db) == false) return false;
    if( blocksnum == 0)
    {
-      AFERROR("DBJob::dbSelect: blocksnum == 0\n");
+      AFERROR("DBJob::dbSelect: blocksnum == 0")
       return false;
    }
    blocksdata = new af::BlockData*[blocksnum];
@@ -113,7 +113,7 @@ bool DBJob::dbSelect( QSqlDatabase * db, const QString * where)
    progress = new DBJobProgress( this);
    if( progress == NULL)
    {
-      AFERROR("DBJob::dbSelect: can't allocate memory for tasks progress.\n");
+      AFERROR("DBJob::dbSelect: can't allocate memory for tasks progress.")
       return false;
    }
    if( progress->dbSelect( db) == false) return false;
@@ -125,4 +125,9 @@ void DBJob::dbDelete( QStringList  * queries) const
 {
    DBItem::dbDelete( queries);
    statistics.addJob( this, queries);
+}
+
+void DBJob::dbDeleteNoStatistics( QStringList  * queries) const
+{
+   DBItem::dbDelete( queries);
 }

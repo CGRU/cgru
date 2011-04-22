@@ -235,9 +235,13 @@ void DBConnection::addJob( DBJob * job)
 void DBConnection::execute( QStringList const & queries)
 {
    if( working == false ) return;
+   AFINFO("Executing queries:")
    for( int i = 0; i < queries.size(); i++)
    {
       QSqlQuery q( queries[i], *db);
       q.exec();
+#ifdef AFOUTPUT
+printf("%s\n", queries[i].toUtf8().data());
+#endif
    }
 }
