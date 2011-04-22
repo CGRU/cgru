@@ -124,7 +124,8 @@ bool DBJob::dbSelect( QSqlDatabase * db, const QString * where)
 void DBJob::dbDelete( QStringList  * queries) const
 {
    DBItem::dbDelete( queries);
-   statistics.addJob( this, queries);
+   if( id != AFJOB::SYSJOB_ID) // Do not add system job to statistics
+      statistics.addJob( this, queries);
 }
 
 void DBJob::dbDeleteNoStatistics( QStringList  * queries) const
