@@ -279,6 +279,14 @@ echo '</tr>';
 pg_free_result($result);
 
 echo "</table>\n";
+
+// Find the earliest record to display statistics start time:
+$query="
+SELECT min(time_done) AS time_done FROM statistics WHERE time_done > 0;";
+$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+echo '<p><b><i>First record date: '.date( 'j F Y', $line["time_done"]).'</i></b></p>';
+pg_free_result($result);
 }
 
 ?>
