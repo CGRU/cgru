@@ -36,11 +36,11 @@ Gizmo {
    addUserKnob { 26 "" l "" }
    addUserKnob {  6 reversedeps l "Reverse dependence on connected nodes" }
    addUserKnob { 26 "" l "" }
-   addUserKnob {  6 fullrange   l "Down stream will wait for whole frame range rendered" }
+   addUserKnob {  6 fullrange   l "Wait whole frame range rendered" }
    addUserKnob { 26 "" l "" }
-   addUserKnob {  6 forceframes l "Force upstream frame settings" }
+   addUserKnob {  6 forceframes l "Force frame range" }
    addUserKnob { 26 "" l "" }
-   addUserKnob {  6 singlejob   l "Construct single job from all connected nodes" }
+   addUserKnob {  6 singlejob   l "Construct single job" }
 
    name afanasy
 

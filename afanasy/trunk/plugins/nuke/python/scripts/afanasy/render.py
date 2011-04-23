@@ -105,6 +105,7 @@ class BlockParameters:
       self.capacitymax       = -1
       self.hostsmask         = None
       self.hostsmaskexclude  = None
+      self.fullrangedepend   = 0
       if afnode is not None:
          self.framefirst        = int( afnode.knob('framefirst').value())
          self.framelast         = int( afnode.knob('framelast').value())
@@ -278,13 +279,13 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
    # Process input nodes:
    for node in nodes:
       newparams = []
-      fullrangedepend = 0
       if node.Class() == AfanasyNodeClassName:
          # Recursion if input node class is "afanasy" too
          newparams = getBlocksParameters( node, True, prefix, fparams)
+         # Get fullrangedepend only if afanasy connected to afanasy node
+         for newparam in newparams: newparam.fullrangedepend = int( node.knob('fullrange').value())
          if newparams is None: return
          if len( newparams) == 0: continue
-         fullrangedepend = int( node.knob('fullrange').value())
       else:
          # Get block parameters from node:
          bparams = BlockParameters( afnode, node, subblock, prefix, fparams)
@@ -300,7 +301,7 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
                else:
                   mask = newparams[0].name
                for ppar in prevparams: 
-                  if fullrangedepend:
+                  if newparams[0].fullrangedepend:
                      ppar.addDependMask( mask)
                   else:
                      ppar.addTasksDependMask( mask)
@@ -310,15 +311,15 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
                else:
                   mask = prevparams[0].name
                for nparam in newparams:
-                  if fullrangedepend:
-                     nparam.addDependmask( mask)
+                  if prevparams[0].fullrangedepend:
+                     nparam.addDependMask( mask)
                   else:
                      nparam.addTasksDependMask( mask)
 
       # Store previous parameters for dependences:
       prevparams = newparams
 
-      # Append paramerets array:
+      # Append parameters array:
       blocksparams.extend( newparams)
 
    return blocksparams

@@ -56,7 +56,7 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
 #ifdef WINNT
       if( wdir.startsWith("/"))
       {
-         AFERRAR("Working directory starts with '/':\n\%s\n\May be it not translated from unix?", wdir.toUtf8().data())
+         AFERRAR("Working directory starts with '/':\n\%s\n\May be it is not translated from unix?", wdir.toUtf8().data())
       }
       else if( wdir.startsWith("\\\\"))
       {
