@@ -42,23 +42,21 @@
 <h2 align="center">Afanasy in Blender</h2>
 <hr />
 
-<table>
-   <caption>Afanasy menu item in main menu</caption>
+<table width="99%">
    <tr>
-      <td align="center" width="20%">
+      <td align="center" width="50%">
+         <p>Afanasy menu item in main menu</p>
          <img src="images/afanasy_menu.png" alt="afanasy_menu" />
-      </td><li>
-   </tr>
-</table>
-
-<table>
-   <caption>Create job dialog</caption>
-   <tr>
-      <td align="center" width="20%">
+         <p>Create job dialog</p>
          <img src="images/afanasy_dialog.png" alt="afanasy_dialog" />
+      </td>
+      <td align="center" width="50%">
+         <p>Job GUI</p>
+         <img src="images/afwatch_job.png" alt="afwatch_job" />
       </td>
    </tr>
 </table>
+
 <ul>
 <li><b>Start Frame</b> - First frame to render.</li>
 <li><b>End Frame</b> - Last frame to render.</li>
@@ -71,6 +69,7 @@
 <li><b>Properties</b> - Hosts properties pattern job tasks can not run on.</li>
 <li><b>Start Paused</b> - Start job paused (set off-line state).</li>
 </ul>
+
 <p>
 Script detects Blender rendering engine (internal or Yafray) and set special service and parser to get correct task progress. Parser (and service) will be '<kbd>blender_internal</kbd>' or '<kbd>blender_yafray</kbd>' (parsers and services are python scripts too, located in afanasy). They parse and blender and renderer output, so if task consists of several frames, output will be correct too.
 </b>
@@ -88,6 +87,8 @@ Launch example:<br/>
    <tr>
       <td align="center" width="20%">
          <img src="images/afanasy_job.png" alt="afanasy_job" />
+         <br/>
+         (Old GUI)
       </td>
    </tr>
 </table>
