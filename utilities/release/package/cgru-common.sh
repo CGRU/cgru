@@ -17,6 +17,8 @@ cp $src/version.txt $pack/$installdir
 cp -r $src/doc/images $pack/$installdir/doc
 cp $src/bin/*.py $pack/$installdir/bin
 cp $src/bin/deletefiles $pack/$installdir/bin
+cp $src/bin/wolsleep $pack/$installdir/bin
+cp $src/bin/wolwake $pack/$installdir/bin
 cp $src/lib/python/*.py $pack/$installdir/lib/python
 cp $src/config_default.xml $pack/$installdir
 
