@@ -1,0 +1,7 @@
+#!/bin/bash
+
+if [ -z "$CGRU_LOCATION" ]; then
+   python `dirname $0`/wolwake.py "$@"
+else
+   python $CGRU_LOCATION/bin/wolwake.py "$@"
+fi

@@ -99,6 +99,8 @@ void Render::readwrite( Msg * msg)
    rw_int32_t( id, msg);
 
    // Send network interfaces information only when register
+   // TODO: VERSION:
+   if( revision >= 1529 )
    if( msg->type() == Msg::TRenderRegister)
    {
       int8_t netIfs_size = netIFs.size();

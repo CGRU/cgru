@@ -30,6 +30,7 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_register_str = TimeRegister   .arg( afqt::time2Qstr( time_register));
 
    address = Address.arg( monitor->getAddress().generateIPString().c_str());
+   version = monitor->getVersion().c_str();
 
    updateValues( monitor, 0);
 }
@@ -107,18 +108,20 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
 
    painter->setPen(   clrTextInfo( option) );
    painter->setFont(  afqt::QEnvironment::f_info);
-   int i = y; int dy = 15;
+   int i = y+2; int dy = 15;
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_launch_str );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_register_str );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_activity_str );
 
    painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address );
 
-   i = y;
+   i = y+2;
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, usersidstitle );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, usersids );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsidstitle );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, jobsids );
+
+   painter->drawText( x, y+2, w-5, h, Qt::AlignTop | Qt::AlignRight, version );
 
    drawPost( painter, option);
 }
