@@ -227,7 +227,7 @@ void Task::getErrorHostsListString( std::string & str) const
       {
          str += "\n";
          str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
-         if((block->getErrorsAvoidHost() > 0) && ( *cIt >= block->getErrorsAvoidHost())) str += " - ! AVOIDING !";
+         if((block->getErrorsTaskSameHost() > 0) && ( *cIt >= block->getErrorsTaskSameHost())) str += " - ! AVOIDING !";
       }
    }
 }

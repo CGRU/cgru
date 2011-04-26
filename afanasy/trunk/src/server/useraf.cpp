@@ -113,7 +113,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    case af::Msg::TUserJobsLifeTime:
    {
       jobs_lifetime = mcgeneral.getNumber();
-      appendLog( std::string("Jobs life time set to ") + af::itos( jobs_lifetime) + " seconds by %2" + userhost);
+      appendLog( std::string("Jobs life time set to ") + af::time2strHMS( jobs_lifetime, true) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
       break;
    }

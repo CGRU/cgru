@@ -321,7 +321,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TJobLifeTime:
    {
       lifetime = mcgeneral.getNumber();
-      log( std::string("Life time set to ") + af::itos( lifetime) + " by " + userhost);
+      log( std::string("Life time set to ") + af::time2strHMS( lifetime, true) + " by " + userhost);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;

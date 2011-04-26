@@ -276,16 +276,18 @@ echo "<td><i>".time_strDHMS($line["taskssumruntime"])."</i></td>";
 echo "<td><i>".time_strHMS($line["tasksavgruntime"])."</i></td>";
 echo "<td><i>".$line["tasksdone"]."%</i></td>";
 echo '</tr>';
+$taskssumruntime = $line["taskssumruntime"];
 pg_free_result($result);
 
 echo "</table>\n";
 
 // Find the earliest record to display statistics start time:
 $query="
-SELECT min(time_done) AS time_done FROM statistics WHERE time_done > 0;";
+SELECT min(time_started) AS time_started FROM statistics WHERE time_started > 0;";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-echo '<p><b><i>First record date: '.date( 'j F Y', $line["time_done"]).'</i></b></p>';
+echo '<p><b><i>First job date: '.date( 'j F Y', $line["time_started"]).'</i></b></p>';
+echo '<p><i>Farm average usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$line["time_started"])).' hosts</i></p>';
 pg_free_result($result);
 }
 

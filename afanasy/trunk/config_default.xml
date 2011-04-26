@@ -136,5 +136,8 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
 <!-- System job -->
    <sysjob_tasklife>1800</sysjob_tasklife>
    <sysjob_tasksmax>1000</sysjob_tasksmax>
-
+<!-- default services names in any system block is "system"
+   <sysjob_wol_service>wakeonlan</sysjob_wol_service>
+   <sysjob_postcmd_service>postcmd</sysjob_postcmd_service>
+-->
 </afanasy>

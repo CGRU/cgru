@@ -36,8 +36,12 @@ ListMonitors::ListMonitors( QWidget* parent):
    ctrl->addSortType(   CtrlSortFilter::TTIMELAUNCHED);
    ctrl->addSortType(   CtrlSortFilter::TTIMEREGISTERED);
    ctrl->addSortType(   CtrlSortFilter::TTIMEACTIVITY);
+   ctrl->addSortType(   CtrlSortFilter::TVERSION);
+   ctrl->addSortType(   CtrlSortFilter::TADDRESS);
    ctrl->addFilterType( CtrlSortFilter::TNONE);
    ctrl->addFilterType( CtrlSortFilter::TNAME);
+   ctrl->addFilterType( CtrlSortFilter::TVERSION);
+   ctrl->addFilterType( CtrlSortFilter::TADDRESS);
    initSortFilterCtrl();
 
    eventsShowHide << af::Msg::TMonitorMonitorsAdd;

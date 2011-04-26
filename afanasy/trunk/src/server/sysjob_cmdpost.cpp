@@ -1,5 +1,7 @@
 #include "sysjob_cmdpost.h"
 
+#include "../libafanasy/environment.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -29,7 +31,7 @@ SysBlockData_CmdPost::SysBlockData_CmdPost( int BlockNum, int JobId):
 AFINFO("SysBlockData_CmdPost::SysBlockData_CmdPost:")
 
    name = "post_commands";
-   service = AFJOB::SYSJOB_BLOCKSERVICE;
+   service = af::Environment::getSysPostCmdService();
 
    tasksmaxruntime = AFJOB::SYSJOB_TASKMAXRUNTIME;
 

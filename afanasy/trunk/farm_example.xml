@@ -26,6 +26,10 @@ Mask ".*" will match any render name. So here defined some default settings for 
       <resources>{'c':1000,'m':3000}</resources>
       <data>{'c':'render','m':10}</data>
       <service name="system" />
+<!--
+      <service name="wakeonlan" />
+      <service name="postcmd" />
+-->
       <service name="generic" />
       <service name="movgen" />
       <service name="shake" />
@@ -48,7 +52,7 @@ Comment it if you agree with build in os detection (names)
 You can specify several platforms, if host can take tasks for diffent platforms.
 -->
    </pattern>
-   <pattern name="Movies">
+   <pattern name="Render">
       <mask>lrf.*</mask>
       <description>Linux render farm.</description>
       <os>linux</os>

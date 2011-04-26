@@ -1,5 +1,7 @@
 #include "sysjob_wol.h"
 
+#include "../libafanasy/environment.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -29,7 +31,7 @@ SysBlockData_WOL::SysBlockData_WOL( int BlockNum, int JobId):
 AFINFA("SysBlockData_WOL::SysBlockData_WOL: BlockNum=%d, JobId=%d", BlockNum, JobId)
 
    name = "wake-on-lan";
-   service = AFJOB::SYSJOB_BLOCKSERVICE;
+   service = af::Environment::getSysWolService();
 
    tasksmaxruntime = AFJOB::SYSJOB_TASKMAXRUNTIME;
 

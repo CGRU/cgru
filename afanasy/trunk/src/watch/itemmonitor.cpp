@@ -145,6 +145,12 @@ bool ItemMonitor::setSortType(   int type )
       case CtrlSortFilter::TTIMEACTIVITY:
          sort_uint = &time_activity;
          break;
+      case CtrlSortFilter::TVERSION:
+         sort_str = &version;
+         break;
+      case CtrlSortFilter::TADDRESS:
+         sort_str = &address;
+         break;
       default:
          AFERRAR("ItemMonitor::setSortType: Invalid type number = %d\n", type);
          return false;
@@ -161,6 +167,12 @@ bool ItemMonitor::setFilterType( int type )
          return false;
       case CtrlSortFilter::TNAME:
          filter_str = &name;
+         break;
+      case CtrlSortFilter::TVERSION:
+         filter_str = &version;
+         break;
+      case CtrlSortFilter::TADDRESS:
+         filter_str = &address;
          break;
       default:
          AFERRAR("ItemMonitor::setFilterType: Invalid type number = %d\n", type);

@@ -68,8 +68,10 @@ int     Environment::errors_avoid_host =               AFUSER::ERRORS_AVOID_HOST
 int     Environment::task_error_retries =              AFUSER::TASK_ERROR_RETRIES;
 int     Environment::task_errors_same_host =           AFUSER::TASK_ERRORS_SAME_HOST;
 
-int     Environment::sysjob_tasklife =                 AFJOB::SYSJOB_TASKLIFE;
-int     Environment::sysjob_tasksmax =                 AFJOB::SYSJOB_TASKSMAX;
+int         Environment::sysjob_tasklife =            AFJOB::SYSJOB_TASKLIFE;
+int         Environment::sysjob_tasksmax =            AFJOB::SYSJOB_TASKSMAX;
+std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_BLOCKSERVICE;
+std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_BLOCKSERVICE;
 
 int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
 int     Environment::user_log_linesmax =               AFUSER::LOG_LINESMAX;
@@ -214,6 +216,8 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
 
    getVar( pnode, sysjob_tasklife,                   "sysjob_tasklife"                   );
    getVar( pnode, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
+   getVar( pnode, sysjob_postcmd_service,            "sysjob_postcmd_service"            );
+   getVar( pnode, sysjob_wol_service,                "sysjob_wol_service"                );
 
    getVar( pnode, user_zombietime,                   "user_zombietime"                   );
    getVar( pnode, user_log_linesmax,                 "user_log_linesmax"                 );

@@ -98,8 +98,10 @@ public:
    static inline int getTaskErrorRetries()              { return task_error_retries;           }
    static inline int getTaskErrorsSameHost()            { return task_errors_same_host;        }
 
-   static inline int getSysJobTasksMax()                { return sysjob_tasksmax;              }
-   static inline int getSysJobTaskLife()                { return sysjob_tasklife;              }
+   static inline int getSysJobTasksMax()                    { return sysjob_tasksmax;           }
+   static inline int getSysJobTaskLife()                    { return sysjob_tasklife;           }
+   static inline const std::string & getSysWolService()     { return sysjob_wol_service;        }
+   static inline const std::string & getSysPostCmdService() { return sysjob_postcmd_service;    }
 
    static inline int getUserZombieTime()                { return user_zombietime;              }
    static inline int getUserLogLinesMax()               { return user_log_linesmax;            }
@@ -257,6 +259,8 @@ private:
 
    static int sysjob_tasksmax;
    static int sysjob_tasklife;
+   static std::string sysjob_wol_service;
+   static std::string sysjob_postcmd_service;
 
    static int user_zombietime;
    static int user_log_linesmax;
