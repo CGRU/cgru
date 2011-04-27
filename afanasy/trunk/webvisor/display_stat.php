@@ -126,15 +126,15 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 }
 pg_free_result($result);
 
-echo '<tr align=center>';
-echo "<td></td>";
-echo "<td></td>";
-echo "<td><a href='index.php?action=stat_chart&type=jobsnum'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=jobssumonlinetime'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=jobsavgonlinetime'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=jobssumruntime'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=jobsavgruntime'>Chart</a></td>";
-echo '</tr>';
+echo "<tr align=center>\n";
+echo "<td></td>\n";
+echo "<td></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=jobsnum'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=jobssumonlinetime'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=jobsavgonlinetime'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=jobssumruntime'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=jobsavgruntime'>Chart</a></td>\n";
+echo "</tr>\n";
 
 $query="
 SELECT
@@ -147,15 +147,15 @@ FROM statistics;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-echo '<tr align=center>';
-echo "<td></td>";
-echo "<td><i>total</i></td>";
-echo "<td><i>".$line["numjobs"]."</i></td>";
-echo "<td><i>".time_strDHMS($line["sumonlinetime"])."</i></td>";
-echo "<td><i>".time_strHMS($line["avgonlinetime"])."</i></td>";
-echo "<td><i>".time_strDHMS($line["sumruntime"])."</i></td>";
-echo "<td><i>".time_strHMS($line["avgruntime"])."</i></td>";
-echo '</tr>';
+echo "<tr align=center>\n";
+echo "<td></td>\n";
+echo "<td><i>total</i></td>\n";
+echo "<td><i>".$line["numjobs"]."</i></td>\n";
+echo "<td><i>".time_strDHMS($line["sumonlinetime"])."</i></td>\n";
+echo "<td><i>".time_strHMS($line["avgonlinetime"])."</i></td>\n";
+echo "<td><i>".time_strDHMS($line["sumruntime"])."</i></td>\n";
+echo "<td><i>".time_strHMS($line["avgruntime"])."</i></td>\n";
+echo "</tr>\n";
 pg_free_result($result);
 
 echo "</table>\n";
@@ -246,15 +246,15 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 }
 pg_free_result($result);
 
-echo '<tr align=center>';
-echo "<td/>";
-echo "<td></td>";
-echo "<td><a href='index.php?action=stat_chart&type=servicequantity'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=tasksquantity'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=taskssumruntime'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=tasksavgruntime'>Chart</a></td>";
-echo "<td><a href='index.php?action=stat_chart&type=tasksdone'>Chart</a></td>";
-echo '</tr>';
+echo "<tr align=center>\n";
+echo "<td/>\n";
+echo "<td></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=servicequantity'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=tasksquantity'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=taskssumruntime'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=tasksavgruntime'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=tasksdone'>Chart</a></td>\n";
+echo "</tr>\n";
 
 $query="
 SELECT
@@ -267,27 +267,37 @@ FROM statistics;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-echo '<tr align=center>';
-echo "<td/>";
-echo "<td><i>total</i></td>";
-echo "<td><i>".$line["servicequantity"]."</i></td>";
-echo "<td><i>".$line["tasksquantity"]."</i></td>";
-echo "<td><i>".time_strDHMS($line["taskssumruntime"])."</i></td>";
-echo "<td><i>".time_strHMS($line["tasksavgruntime"])."</i></td>";
-echo "<td><i>".$line["tasksdone"]."%</i></td>";
-echo '</tr>';
+echo "<tr align=center>\n";
+echo "<td/>\n";
+echo "<td><i>total</i></td>\n";
+echo "<td><i>".$line["servicequantity"]."</i></td>\n";
+echo "<td><i>".$line["tasksquantity"]."</i></td>\n";
+echo "<td><i>".time_strDHMS($line["taskssumruntime"])."</i></td>\n";
+echo "<td><i>".time_strHMS($line["tasksavgruntime"])."</i></td>\n";
+echo "<td><i>".$line["tasksdone"]."%</i></td>\n";
+echo "</tr>\n";
 $taskssumruntime = $line["taskssumruntime"];
 pg_free_result($result);
 
 echo "</table>\n";
+
+echo "<br/>\n";
 
 // Find the earliest record to display statistics start time:
 $query="
 SELECT min(time_started) AS time_started FROM statistics WHERE time_started > 0;";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-echo '<p><b><i>First job date: '.date( 'j F Y', $line["time_started"]).'</i></b></p>';
-echo '<p><i>Farm average usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$line["time_started"])).' hosts</i></p>';
+echo "<table width=99%>\n";
+echo "<tr align=center>\n";
+echo "<td>\n";
+echo '<p><i>First job date: '.date( 'j F Y', $line["time_started"]).'</i></p>';
+echo "</td>\n";
+echo "<td>\n";
+echo '<p><i>Average farm usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$line["time_started"])).' tasks</i></p>';
+echo "</td>\n";
+echo "</tr>\n";
+echo "</table>\n";
 pg_free_result($result);
 }
 

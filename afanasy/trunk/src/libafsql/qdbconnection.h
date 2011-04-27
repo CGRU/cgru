@@ -13,7 +13,6 @@
 
 #include "name_afsql.h"
 
-class QCoreApplication;
 class QSqlDatabase;
 
 class afsql::DBConnection

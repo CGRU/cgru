@@ -1,8 +1,8 @@
 #include "dbitem.h"
 
-#include <QtSql/qsqldatabase.h>
-#include <QtSql/qsqlerror.h>
-#include <QtSql/qsqlquery.h>
+#include <QtSql/QSqlDatabase>
+#include <QtSql/QSqlError>
+#include <QtSql/QSqlQuery>
 
 #include "dbattr.h"
 
@@ -27,7 +27,7 @@ void DBItem::dbDropTable( QSqlDatabase * db) const
 {
    if( db->isOpen() == false )
    {
-      AFERROR("DBItem::dbDropTable: Database connection is not open\n");
+      AFERROR("DBItem::dbDropTable: Database connection is not open.")
       return;
    }
    QStringList tables = db->tables();
@@ -35,13 +35,13 @@ void DBItem::dbDropTable( QSqlDatabase * db) const
    {
       QSqlQuery q( *db);
       QString str = QString("DROP TABLE %1;").arg( dbGetTableName());
-      AFINFA("DBItem::dbDropTable: executing query:\n%s\n", str.toUtf8().data());
+      AFINFA("DBItem::dbDropTable: executing query:\n%s", str.toUtf8().data())
       q.exec( str);
       qChkErr(q, QString("DBItem::dbDropTable %1:\n").arg( dbGetTableName()));
    }
    else
    {
-      AFINFA("DBItem::dbDropTable: no table '%s' founded.\n", dbGetTableName().toUtf8().data());
+      AFINFA("DBItem::dbDropTable: no table '%s' founded.", dbGetTableName().toUtf8().data())
    }
 }
 
@@ -49,13 +49,13 @@ void DBItem::dbCreateTable( QSqlDatabase * db) const
 {
    if( db->isOpen() == false )
    {
-      AFERROR("DBItem::dbCreateTable: Database connection is not open\n");
+      AFERROR("DBItem::dbCreateTable: Database connection is not open.")
       return;
    }
    QStringList tables = db->tables();
    if( tables.contains( dbGetTableName()))
    {
-      AFERRAR("DBItem::dbCreateTable: Table '%s' already exists.\n", dbGetTableName().toUtf8().data());
+      AFERRAR("DBItem::dbCreateTable: Table '%s' already exists.", dbGetTableName().toUtf8().data())
       return;
    }
 
@@ -71,7 +71,7 @@ void DBItem::dbCreateTable( QSqlDatabase * db) const
    str += "\n)";
 
    QSqlQuery q( *db);
-   AFINFA("DBItem::dbCreateTable: executing query:\n%s\n", str.toUtf8().data());
+   AFINFA("DBItem::dbCreateTable: executing query:\n%s", str.toUtf8().data())
    q.exec( str);
    qChkErr(q, QString("DBItem::dbCreateTable %1:\n").arg( dbGetTableName()));
 }
@@ -91,7 +91,7 @@ void DBItem::dbInsert( QStringList  * queries) const
       str += dbAttributes[i]->getString();
    }
    str += ");";
-AFINFA("DBItem::dbInsert:\n%s\n", str.toUtf8().data());
+   AFINFA("DBItem::dbInsert:\n%s", str.toUtf8().data())
    *queries << str;
 }
 
@@ -128,7 +128,7 @@ void DBItem::dbUpdate( QStringList * queries, int attr) const
    for( int i = 1; i < dbGetKeysNum(); i++)
       str += QString(" AND %1=%2").arg( dbAttributes[i]->getName()).arg( dbAttributes[i]->getString());
    str += ";";
-AFINFA("DBItem::dbUpdate:\n%s", str.toUtf8().data())
+   AFINFA("DBItem::dbUpdate:\n%s", str.toUtf8().data())
    *queries << str;
 }
 
@@ -155,7 +155,7 @@ bool DBItem::dbSelect( QSqlDatabase * db, const QString * where)
    AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s\n", q.size(), str.toUtf8().data())
    if( q.size() != 1)
    {
-      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s\n", q.size(), str.toUtf8().data())
+      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s", q.size(), str.toUtf8().data())
       return false;
    }
    q.next();
