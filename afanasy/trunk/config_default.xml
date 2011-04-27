@@ -60,6 +60,11 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
    <render_exec>afrender</render_exec>
    <render_cmd_reboot>reboot</render_cmd_reboot>
    <render_cmd_shutdown>shutdown -P 1 afrequest</render_cmd_shutdown>
+<!-- On UNIX sleep command usually needs root privileges,
+try to use "sudo wolsleep" and add a line in /etc/sudoers:
+render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep
+Or configure your own way to sleep.
+-->
    <render_cmd_wolsleep>wolsleep</render_cmd_wolsleep>
    <render_cmd_wolwake>wolwake</render_cmd_wolwake>
 <!-- Reboot and Shutdown for MS Windows:
