@@ -393,12 +393,27 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
 
 void RenderAf::wolSleep( MonitorContainer * monitoring)
 {
-   if( isOffline()      ) return;
+   //if( isWOLFalling()   ) return;
    if( isWOLSleeping()  ) return;
-   if( isWOLWaking()    ) return;
-   if( isWOLFalling()   ) return;
-   if( isBusy()         ) return;
-
+   {
+      appendLog("Render is already sleeping.");
+      return;
+   }
+   if( isWOLWaking())
+   {
+      appendLog("Can't sleep waking up render.");
+      return;
+   }
+   if( isOffline())
+   {
+      appendLog("Can't sleep offline render.");
+      return;
+   }
+   if( isBusy())
+   {
+      appendLog("Can't perform Wake-On-Line operations. Render is busy.");
+      return;
+   }
    if( netIFs.size() < 1)
    {
       appendLog("Can't perform Wake-On-Line operations. No network interfaces information.");
@@ -417,9 +432,17 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 
 void RenderAf::wolWake(  MonitorContainer * monitoring)
 {
-   if( isOnline()       ) return;
-   if( isWOLFalling()   ) return;
-   if( isWOLWaking()    ) return;
+   //if( isWOLWaking()    ) return;
+   if( isOnline())
+   {
+      appendLog("Can't wake up online render.");
+      return;
+   }
+   if( isWOLFalling())
+   {
+      appendLog("Can't wake up render which is just falling a sleep.");
+      return;
+   }
 
    if( netIFs.size() < 1)
    {

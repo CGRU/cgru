@@ -69,7 +69,7 @@ Client falls a sleep.
 Server does not receives updates from client and make it offline.
 </li>
 <li>
-Server "decide" to wake a render.
+Server "decides" to wake a render up.
 </li>
 <li>
 Sever add task <b><i>wolwake mac1 .. macN</i></b> to system job wake-on-lan block.
@@ -77,6 +77,10 @@ Sever add task <b><i>wolwake mac1 .. macN</i></b> to system job wake-on-lan bloc
 </li>
 <li>
 Another online and ready render executes the task.
+</li>
+<li>
+This task sends magic packet for each mac address of a sleeping render to a broadcast address.
+It is a small Python script provided with CGRU.
 </li>
 <li>
 Render wakes up.

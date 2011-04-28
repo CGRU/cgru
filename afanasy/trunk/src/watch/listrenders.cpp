@@ -231,11 +231,11 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          QMenu * submenu = new QMenu( "Wake-On-Lan", this);
 
          action = new QAction( "Sleep", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOnline() && ( false == render->isWOLFalling()));
+         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOnline() && ( false == render->isBusy()) && ( false == render->isWOLFalling()));
          connect( action, SIGNAL( triggered() ), this, SLOT( actWOLSleep()));
          submenu->addAction( action);
          action = new QAction( "Wake", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOffline() && ( false == render->isWOLWaking()));
+         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOffline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actWOLWake()));
          submenu->addAction( action);
 
