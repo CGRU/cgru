@@ -17,6 +17,8 @@ Parser.add_option('-s', '--slate',           dest='slate',           type  ='str
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies',      help='Frame paint template')
 Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576',      help='Resolution')
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
+Parser.add_option('--noautocorr',            dest='noautocorr',      action='store_true', default=False,          help='Disable auto color correction for Cineon and EXR')
+Parser.add_option('--correction',            dest='correction',      type  ='string',     default='',             help='Add custom color correction parameters')
 Parser.add_option('--stereo',                dest='stereo',          action='store_true', default=False,          help='Stereo mode by default')
 Parser.add_option('--fps',                   dest='fps',             type  ='string',     default='25',           help='Frames per second')
 Parser.add_option('--company',               dest='company',         type  ='string',     default='',             help='Company name')
@@ -65,7 +67,7 @@ FPS = ['23.976','24','25','30']
 
 Activities = ['comp','render','anim','dyn','sim','stereo','cloth','part','skin','setup','clnup','mtpnt','rnd','test']
 FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
-Encoders = ['ffmpeg', 'mencoder']
+Encoders = ['ffmpeg', 'mencoder', 'nuke']
 Gravity = ['SouthEast','South','SouthWest','West','NorthWest','North','NorthEast','East','Center']
 
 Namings = [
@@ -569,18 +571,36 @@ Example "255,255,0" - yellow.')
 
       self.parameterslayout.addWidget( self.gDrawing)
 
+      # Image Correction:
       self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
-      self.lCorr = QtGui.QHBoxLayout()
+      self.lCorr = QtGui.QVBoxLayout()
       self.gCorrectionSettings.setLayout( self.lCorr)
-      self.tGamma = QtGui.QLabel('Gamma:', self)
-      self.dsbGamma = QtGui.QDoubleSpinBox( self)
-      self.dsbGamma.setRange( 0.1, 10.0)
-      self.dsbGamma.setDecimals( 1)
-      self.dsbGamma.setSingleStep( 0.1)
-      self.dsbGamma.setValue( 1.0)
-      QtCore.QObject.connect( self.dsbGamma, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      self.lCorr.addWidget( self.tGamma)
-      self.lCorr.addWidget( self.dsbGamma)
+
+      self.cCorrAuto = QtGui.QCheckBox('Auto Correct Cineon and EXR', self)
+      self.cCorrAuto.setChecked( not Options.noautocorr)
+      QtCore.QObject.connect( self.cCorrAuto, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.lCorr.addWidget( self.cCorrAuto)
+
+      self.lCorrAux = QtGui.QHBoxLayout()
+      self.tCorrAux = QtGui.QLabel('Custom correction:', self)
+      self.eCorrAux = QtGui.QLineEdit( Options.correction, self)
+      QtCore.QObject.connect( self.eCorrAux, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lCorrAux.addWidget( self.tCorrAux)
+      self.lCorrAux.addWidget( self.eCorrAux)
+      self.lCorr.addLayout( self.lCorrAux)
+
+      self.lCorrGamma = QtGui.QHBoxLayout()
+      self.tCorrGamma = QtGui.QLabel('Gamma:', self)
+      self.dsbCorrGamma = QtGui.QDoubleSpinBox( self)
+      self.dsbCorrGamma.setRange( 0.1, 10.0)
+      self.dsbCorrGamma.setDecimals( 1)
+      self.dsbCorrGamma.setSingleStep( 0.1)
+      self.dsbCorrGamma.setValue( 1.0)
+      QtCore.QObject.connect( self.dsbCorrGamma, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      self.lCorrGamma.addWidget( self.tCorrGamma)
+      self.lCorrGamma.addWidget( self.dsbCorrGamma)
+      self.lCorr.addLayout( self.lCorrGamma)
+
       self.parameterslayout.addWidget( self.gCorrectionSettings)
 
       self.dateTimeLayout = QtGui.QHBoxLayout()
@@ -1167,7 +1187,7 @@ Example "255,255,0" - yellow.')
          ts = self.cbTemplateS.currentText()
          tf = self.cbTemplateF.currentText()
          cmd += ' -r %s' % format
-         cmd += ' -g %.2f' % self.dsbGamma.value()
+         cmd += ' -g %.2f' % self.dsbCorrGamma.value()
          if ts != '': cmd += ' -s "%s"' % ts
          if tf != '': cmd += ' -t "%s"' % tf
          if project  != '': cmd += ' --project "%s"'  % project
@@ -1178,6 +1198,8 @@ Example "255,255,0" - yellow.')
          if activity != '': cmd += ' --activity "%s"' % activity
          if comments != '': cmd += ' --comments "%s"' % comments
          if font     != '': cmd += ' --font "%s"'     % font
+         if not self.cCorrAuto.isChecked():     cmd += ' --noautocorr'
+         if not self.eCorrAux.text().isEmpty(): cmd += ' --correction "%s"' % self.eCorrAux.text()
          if self.cTime.isChecked(): cmd += ' --addtime'
          cacher = self.cbCacher169.itemData( self.cbCacher169.currentIndex()).toString()
          if cacher != '0': cmd += ' --draw169 %s' % cacher

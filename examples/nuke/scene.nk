@@ -121,7 +121,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N4fdcfc0 [stack 0]
+set N4655bd0 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -136,7 +136,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N4fdcfc0
+push $N4655bd0
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -144,7 +144,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N4fdcfc0
+push $N4655bd0
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -445,7 +445,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N55e8d50 [stack 0]
+set N4c61910 [stack 0]
 Write {
  channels rgba
  file render/key.%04d.exr
@@ -472,7 +472,7 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N5603560 [stack 0]
+set N4c7c120 [stack 0]
 Write {
  file render/back.%04d.exr
  proxy render/back_proxy.%04d.exr
@@ -513,7 +513,7 @@ Read {
  xpos 223
  ypos -165
 }
-push $N55e8d50
+push $N4c61910
 Switch {
  inputs 2
  which 1
@@ -532,7 +532,7 @@ Read {
  xpos 3
  ypos -166
 }
-push $N5603560
+push $N4c7c120
 Switch {
  inputs 2
  which 1
@@ -553,7 +553,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N576a030 [stack 0]
+set N4de2c10 [stack 0]
 Write {
  file render/final.%04d.exr
  proxy render/final_proxy.%04d.exr
@@ -573,7 +573,7 @@ Read {
  xpos 3
  ypos -32
 }
-push $N576a030
+push $N4de2c10
 Switch {
  inputs 2
  which 1
@@ -581,6 +581,7 @@ Switch {
  xpos 113
  ypos -2
 }
+set N4dffad0 [stack 0]
 Write {
  file render/preview.%04d.jpg
  proxy render/preview_proxy.%04d.jpg
@@ -590,7 +591,7 @@ Write {
  xpos 113
  ypos 46
 }
-set N578aff0 [stack 0]
+set N4e03b90 [stack 0]
 afanasy {
  inputs 3
  name afanasy2
@@ -607,7 +608,7 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N578aff0
+push $N4e03b90
 cgru_dailies {
  name dailies
  xpos 113
@@ -624,7 +625,7 @@ cgru_dailies {
  comments "cgru afanasy nuke example"
  movfolder /cgru/examples/nuke
  movrule (s)_(v)_(d)
- movname scene_v001_110411
+ movname scene_v001_110428
  viewsnames "left right"
  knob_1 ""
  template /cgru/utilities/moviemaker/templates/dailies
@@ -666,4 +667,14 @@ afanasy {
  dependmask ""
  dependmaskglbl ""
  addnodes ""
+}
+push $N4dffad0
+Write {
+ file render/output.%04d.dpx
+ file_type dpx
+ checkHashOnRead false
+ version 2
+ name dpx
+ xpos 223
+ ypos -9
 }

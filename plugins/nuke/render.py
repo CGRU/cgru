@@ -30,7 +30,7 @@ def errorExit( msg, deletetemp):
       shutil.rmtree( tmpdir)
    exit(1)
 
-# Parse argumets:
+# Parse arguments:
 parser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
 parser.add_option('-x', '--xscene', dest='xscene', type='string', default='', help='Path to scene to execute')
 parser.add_option('-X', '--xnode',  dest='xnode',  type='string', default='', help='The name of node to execute')
@@ -70,7 +70,7 @@ if pos > 1:
 if flast < ffirst: errorExit('First frame (%(ffirst)d) must be grater or equal last frame (%(flast)d)' % vars(), False)
 if fby < 1: errorExit('By frame (%(fby)d) must be grater or equal 1' % vars(), False)
 
-# Check scene file for existance:
+# Check scene file for existence:
 if not os.path.isfile( xscene): errorExit('File "%s" not founded.' % xscene, False)
 
 # Get Afanasy root directory:
@@ -82,7 +82,7 @@ tmpdir = tempfile.mkdtemp('.afrender.nuke')
 if os.path.exists( tmpdir): print 'Temp directory = "%s"' % tmpdir
 else: errorExit('Error creating temp directory.', False)
 
-# Transfer scene pathes
+# Transfer scene paths
 pm = PathMap( afroot, UnixSeparators = True, Verbose = True)
 if pm.initialized:
    pmscene = os.path.basename(xscene)
@@ -98,7 +98,7 @@ except: errorExit('Scene open error:\n' + str(sys.exc_info()[1]), True)
 # Try to process write node:
 writenode = nuke.toNode( xnode)
 if writenode is None: errorExit('Node "%s" not founded.' % xnode, True)
-if writenode.Class() != 'Write': errorExit('Node "%s" is not "Write".' % xnode, True)
+if writenode.Class() != 'Write': errorExit('Node "%s" class is not "Write".' % xnode, True)
 try:
    if nuke.toNode('root').knob('proxy').value():
       fileknob = writenode['proxy']

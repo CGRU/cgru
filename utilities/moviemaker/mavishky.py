@@ -56,6 +56,8 @@ Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',    
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 Parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
 Parser.add_option('-q', '--quality',    dest='quality',     type  ='string',     default='',          help='Temporary image quality, or format options')
+Parser.add_option('--noautocorr',       dest='noautocorr',  action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
+Parser.add_option('--correction',       dest='correction',  type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
 Parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
 Parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
@@ -336,6 +338,7 @@ if Options.shotversion  != '': cmd_args += ' --ver "%s"'       % Options.shotver
 if Options.font         != '': cmd_args += ' --font "%s"'      % Options.font
 if Options.activity     != '': cmd_args += ' --activity "%s"'  % Options.activity
 if Options.comments     != '': cmd_args += ' --comments "%s"'  % Options.comments
+if Options.correction   != '': cmd_args += ' --correction "%s"' % Options.correction
 if FrameRange           != '': cmd_args += ' --framerange "%s"'  % FrameRange
 if Stereo: cmd_args += ' --stereo'
 cmd_args += ' -d "%s"' % datetimestring
@@ -392,6 +395,7 @@ if need_convert and Options.slate != '':
    name_convert.append('Generate header')
    imgCount += 1
 
+# Generate sequence frames:
 if need_convert:
    i = 0
    for afile in images1:
@@ -403,6 +407,7 @@ if need_convert:
       if Options.line169  != '': cmd += ' --line169 "%s"'  % Options.line169
       if Options.line235  != '': cmd += ' --line235 "%s"'  % Options.line235
       if Options.lgfpath  != '': cmd += ' --logopath "%s"' % tmplogo[1]
+      if Options.noautocorr    : cmd += ' --noautocorr'
       if Options.fffirst:
          if FramePadding > 1:
             framestring = '%0' + str(FramePadding) + 'd'
@@ -424,10 +429,10 @@ if need_convert:
 
 # Encode commands:
 auxargs = ''
-if Codec != 'ffmpeg':
+if encoder == 'ffmpeg' or encoder == 'nuke':
    inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
-elif Codec == 'mencoder':
+elif encoder == 'mencoder':
    inputmask = os.path.join( inputdir, prefix+'*'+suffix)
    if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.*.'+TmpFormat)
 else:

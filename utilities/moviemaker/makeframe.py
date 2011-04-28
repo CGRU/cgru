@@ -27,6 +27,8 @@ parser.add_option('-t', '--template',   dest='template',       type  ='string', 
 parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='720x576',   help='Format: 720x576')
 parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
 parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='',          help='Output image quality')
+parser.add_option('--noautocorr',       dest='noautocorr',     action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
+parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
 parser.add_option('--stereo',           dest='stereo',         action='store_true', default=False,       help='Stereo mode')
 parser.add_option('--drawcolorbars',    dest='drawcolorbars',  action='store_true', default=False,       help='Draw file name')
 parser.add_option('--draw169',          dest='draw169',        type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
@@ -138,12 +140,16 @@ def reformatAnnotate( infile, outfile):
       if Verbose: print 'Images type = "%s"' % imgtype
       # Input file correction:
       correction = ''
-      corr_sRGB = '-set colorspace sRGB'
-      corr_Log = '-set colorspace Log -set gamma 0.15' # -level 9%,67%,.6'
-      # if sys.platform.find('win') == 0: corr_Log = '-set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
-      if   imgtype == 'exr': correction = corr_sRGB
-      elif imgtype == 'dpx': correction = corr_Log
-      elif imgtype == 'cin': correction = corr_Log
+      if not options.noautocorr:
+         corr_sRGB = '-set colorspace sRGB'
+         corr_Log = '-set colorspace Log -set gamma 0.15' # -level 9%,67%,.6'
+         # if sys.platform.find('win') == 0: corr_Log = '-set gamma 1.7 -set film-gamma 5.6 -set reference-black 95 -set reference-white 685 -colorspace srgb'
+         if   imgtype == 'exr': correction = corr_sRGB
+         elif imgtype == 'dpx': correction = corr_Log
+         elif imgtype == 'cin': correction = corr_Log
+      if options.correction != '':
+         if correction != '': correction += ' '
+         correction += options.correction
       # Get frame number if not specified:
       if FRAME == '':
          digits = re.findall(r'\d+', FILEIN)

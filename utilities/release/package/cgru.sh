@@ -10,6 +10,8 @@ installdir=$3
 mkdir -p $pack/$installdir/doc
 mkdir -p $pack/$installdir/bin
 mkdir -p $pack/$installdir/utilities/regexp/bin
+mkdir -p $pack/$installdir/utilities/release
+mkdir -p $pack/$installdir/utilities/site
 
 # Moving icons to standart linux location:
 cp -r $src/doc/icons/icons $pack/usr/local/share
@@ -24,6 +26,8 @@ doc/rus_doklad \
 utilities/doc \
 utilities/moviemaker \
 utilities/regexp/doc \
+utilities/release/doc \
+utilities/site/doc \
 "
 
 # Copying files:
