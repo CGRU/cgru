@@ -9,6 +9,12 @@ def errorExit( msg):
    print 'Error: %s' % msg
    exit(1)
 
+# Correct arguments for Nuke UNIX slaches:
+def pathToUNIX( path):
+   path = path.replace('\\','/')
+   path = path[:1] + path[1:].replace('//','/')
+   return path
+
 # Parse arguments:
 parser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
 parser.add_option('-x', '--xscene',       dest='xscene',       type='string', default='encode.nk', help='Path to scene to execute.')
@@ -60,15 +66,11 @@ for afile in allfiles:
 if frame_first == -1 or frame_last == -1: errorExit('Error: Invalid input sequence.')
 
 # Correct arguments for Nuke UNIX slaches:
-sequence = sequence.replace('\\','/')
-sequence = sequence.replace('//','/')
-inputdir = inputdir.replace('\\','/')
-inputdir = inputdir.replace('//','/')
-output = output.replace('\\','/')
-output = output.replace('//','/')
+sequence = pathToUNIX( sequence)
+output = pathToUNIX( output)
 print 'Input:'
 print sequence
-print inputdir + '/' + imagesname + '.[' + str(frame_first) + ' - ' + str(frame_last) + '].' + imagesext
+print os.path.join(inputdir, imagesname) + '.[' + str(frame_first) + ' - ' + str(frame_last) + '].' + imagesext
 print 'Output:'
 print output
 
