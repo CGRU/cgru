@@ -394,7 +394,7 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
 void RenderAf::wolSleep( MonitorContainer * monitoring)
 {
    //if( isWOLFalling()   ) return;
-   if( isWOLSleeping()  ) return;
+   if( isWOLSleeping())
    {
       appendLog("Render is already sleeping.");
       return;
