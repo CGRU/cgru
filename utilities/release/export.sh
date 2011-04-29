@@ -53,6 +53,9 @@ createDir $dest/utilities/release
 rcopy utilities/release/doc $dest/utilities/release
 rcopy utilities/release/icons $dest/utilities/release
 
+createDir $dest/utilities/site
+rcopy utilities/site/doc $dest/utilities/site
+
 rcopy utilities/moviemaker $dest/utilities
 
 createDir $dest/utilities/regexp
