@@ -51,11 +51,11 @@ Parser.add_option('--afenccap',         dest='afenccap',    type  ='int',       
 Parser.add_option('--afuser',           dest='afuser',      type  ='string',     default='',          help='Change Afanasy job user, ''=current')
 Parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makemovie+date will be used')
 Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='tga',       help='Temporary images format')
+Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
 
 # Options to makeframe:
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 Parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
-Parser.add_option('-q', '--quality',    dest='quality',     type  ='string',     default='',          help='Temporary image quality, or format options')
 Parser.add_option('--noautocorr',       dest='noautocorr',  action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
 Parser.add_option('--correction',       dest='correction',  type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
@@ -329,7 +329,7 @@ else:
 # Construct frame conversion command arguments:
 cmd_args = ''
 if Options.resolution   != '': cmd_args += ' -r %s' % Options.resolution
-if Options.quality      != '': cmd_args += ' -q %s' % Options.quality
+if Options.tmpquality   != '': cmd_args += ' -q %s' % Options.tmpquality
 if Options.company      != '': cmd_args += ' -c "%s"' % Options.company
 if Options.project      != '': cmd_args += ' -p "%s"' % Options.project
 if Options.artist       != '': cmd_args += ' -a "%s"' % Options.artist

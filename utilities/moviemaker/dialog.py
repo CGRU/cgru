@@ -17,6 +17,8 @@ Parser.add_option('-s', '--slate',           dest='slate',           type  ='str
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies',      help='Frame paint template')
 Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576',      help='Resolution')
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
+Parser.add_option('--tmpformat',             dest='tmpformat',       type  ='string',     default='tga',          help='Temporary images format')
+Parser.add_option('--tmpquality',            dest='tmpquality',      type  ='string',     default='',             help='Temporary images format quality options')
 Parser.add_option('--noautocorr',            dest='noautocorr',      action='store_true', default=False,          help='Disable auto color correction for Cineon and EXR')
 Parser.add_option('--correction',            dest='correction',      type  ='string',     default='',             help='Add custom color correction parameters')
 Parser.add_option('--stereo',                dest='stereo',          action='store_true', default=False,          help='Stereo mode by default')
@@ -120,6 +122,10 @@ FormatValues.append('')
 if not Options.format in FormatValues:
    FormatValues.append( Options.format)
    FormatNames.append( Options.format)
+
+# Process temporary images format:
+TmpImgFormats = ['tga','jpg']
+if Options.tmpformat not in TmpImgFormats: TmpImgFormats.append( Options.tmpformat)
 
 # Process templates:
 Templates = ['']
@@ -573,21 +579,15 @@ Example "255,255,0" - yellow.')
 
       # Image Correction:
       self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
-      self.lCorr = QtGui.QVBoxLayout()
+      self.lCorr = QtGui.QHBoxLayout()
       self.gCorrectionSettings.setLayout( self.lCorr)
 
-      self.cCorrAuto = QtGui.QCheckBox('Auto Correct Cineon and EXR', self)
+      self.cCorrAuto = QtGui.QCheckBox('Auto Colorspace', self)
+      self.cCorrAuto.setToolTip('\
+Automatically convert colors of Linear(EXR) and Cineon(dpx,cin) images to sRGB.')
       self.cCorrAuto.setChecked( not Options.noautocorr)
       QtCore.QObject.connect( self.cCorrAuto, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       self.lCorr.addWidget( self.cCorrAuto)
-
-      self.lCorrAux = QtGui.QHBoxLayout()
-      self.tCorrAux = QtGui.QLabel('Custom correction:', self)
-      self.eCorrAux = QtGui.QLineEdit( Options.correction, self)
-      QtCore.QObject.connect( self.eCorrAux, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lCorrAux.addWidget( self.tCorrAux)
-      self.lCorrAux.addWidget( self.eCorrAux)
-      self.lCorr.addLayout( self.lCorrAux)
 
       self.lCorrGamma = QtGui.QHBoxLayout()
       self.tCorrGamma = QtGui.QLabel('Gamma:', self)
@@ -601,8 +601,47 @@ Example "255,255,0" - yellow.')
       self.lCorrGamma.addWidget( self.dsbCorrGamma)
       self.lCorr.addLayout( self.lCorrGamma)
 
+      self.lCorrAux = QtGui.QHBoxLayout()
+      self.tCorrAux = QtGui.QLabel('Custom Options:', self)
+      self.tCorrAux.setToolTip('\
+Add this options to convert command.')
+      self.eCorrAux = QtGui.QLineEdit( Options.correction, self)
+      QtCore.QObject.connect( self.eCorrAux, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lCorrAux.addWidget( self.tCorrAux)
+      self.lCorrAux.addWidget( self.eCorrAux)
+      self.lCorr.addLayout( self.lCorrAux)
+
       self.parameterslayout.addWidget( self.gCorrectionSettings)
 
+
+      # Temporary format options:
+      self.gTempFormat = QtGui.QGroupBox('Intermediate Images')
+      self.lTempFormat = QtGui.QHBoxLayout()
+      self.gTempFormat.setLayout( self.lTempFormat)
+
+      self.tTempFormat = QtGui.QLabel('Format:', self)
+      self.cbTempFormat = QtGui.QComboBox( self)
+      i = 0
+      for format in TmpImgFormats:
+         self.cbTempFormat.addItem( format)
+         if format == Options.tmpformat: self.cbTempFormat.setCurrentIndex( i)
+         i += 1
+      QtCore.QObject.connect( self.cbTempFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lTempFormat.addWidget( self.tTempFormat)
+      self.lTempFormat.addWidget( self.cbTempFormat)
+
+      self.tTempFormatOptions = QtGui.QLabel('Quality Options:', self)
+      self.tTempFormatOptions.setToolTip('\
+Add this options to temporary image saving.')
+      self.eTempFormatOptions = QtGui.QLineEdit( Options.tmpquality, self)
+      QtCore.QObject.connect( self.eTempFormatOptions, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lTempFormat.addWidget( self.tTempFormatOptions)
+      self.lTempFormat.addWidget( self.eTempFormatOptions)
+
+      self.parameterslayout.addWidget( self.gTempFormat)
+
+
+      # Auto append output filename:
       self.dateTimeLayout = QtGui.QHBoxLayout()
       self.cDateOutput = QtGui.QCheckBox('Append Movie File Name With Date', self)
       self.cDateOutput.setChecked( False)
@@ -1198,6 +1237,8 @@ Example "255,255,0" - yellow.')
          if activity != '': cmd += ' --activity "%s"' % activity
          if comments != '': cmd += ' --comments "%s"' % comments
          if font     != '': cmd += ' --font "%s"'     % font
+         cmd += ' --tmpformat %s' % self.cbTempFormat.currentText()
+         if not self.eTempFormatOptions.text().isEmpty(): cmd += ' --tmpquality "%s"' % self.eTempFormatOptions.text()
          if not self.cCorrAuto.isChecked():     cmd += ' --noautocorr'
          if not self.eCorrAux.text().isEmpty(): cmd += ' --correction "%s"' % self.eCorrAux.text()
          if self.cTime.isChecked(): cmd += ' --addtime'
