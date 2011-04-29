@@ -12,7 +12,7 @@ def errorExit( msg):
 # Parse arguments:
 parser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
 parser.add_option('-x', '--xscene',       dest='xscene',       type='string', default='encode.nk', help='Path to scene to execute.')
-parser.add_option('-f', '--fps',          dest='fps',          type='int',    default=24,          help='Frame rate.')
+parser.add_option('-f', '--fps',          dest='fps',          type='float',  default=24,          help='Frame rate.')
 parser.add_option('-s', '--colorspace',   dest='colorspace',   type='string', default='',          help='Set color space.')
 parser.add_option('-r', '--rnode',        dest='rnode',        type='string', default='Read1',     help='Node(s) to read a sequence.')
 parser.add_option('-X', '--xnode',        dest='xnode',        type='string', default='Write1',    help='The name of node to execute.')
@@ -58,7 +58,19 @@ for afile in allfiles:
    if frame_first == -1: frame_first = number
    frame_last = number
 if frame_first == -1 or frame_last == -1: errorExit('Error: Invalid input sequence.')
-print 'Sequence: ' + sequence + ' = ' + inputdir + '/' + imagesname + '.[' + str(frame_first) + ' - ' + str(frame_last) + '].' + imagesext
+
+# Correct arguments for Nuke UNIX slaches:
+sequence = sequence.replace('\\','/')
+sequence = sequence.replace('//','/')
+inputdir = inputdir.replace('\\','/')
+inputdir = inputdir.replace('//','/')
+output = output.replace('\\','/')
+output = output.replace('//','/')
+print 'Input:'
+print sequence
+print inputdir + '/' + imagesname + '.[' + str(frame_first) + ' - ' + str(frame_last) + '].' + imagesext
+print 'Output:'
+print output
 
 # Try to open scene:
 if not os.path.isfile( options.xscene): errorExit('File "%s" not founded.' % options.xscene)
