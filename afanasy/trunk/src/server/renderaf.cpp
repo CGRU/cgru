@@ -574,6 +574,7 @@ void RenderAf::appendLog( const std::string & message)
 
 bool RenderAf::getFarmHost( af::Host * newHost)
 {
+   // Store old services usage:
    std::list<int> servicescounts_old;
    std::list<std::string> servicesnames_old;
    for( int i = 0; i < servicesnum; i++)
@@ -581,8 +582,10 @@ bool RenderAf::getFarmHost( af::Host * newHost)
       servicescounts_old.push_back( servicescounts[i]);
       servicesnames_old.push_back( host.getServiceName(i));
    }
-
    int servicesnum_old = servicesnum;
+
+   // Clear services and services usage:
+   host.clear();
    servicescounts.clear();
    servicesnum = 0;
 

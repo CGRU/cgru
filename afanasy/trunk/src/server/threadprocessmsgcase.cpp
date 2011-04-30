@@ -67,7 +67,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       AfContainerLock rlock( renders,  AfContainer::WRITELOCK);
       AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
 
-      printf("\nRELOADING FARM\n");
+      printf("\n   ========= RELOADING FARM =========\n\n");
       std::string message;
       if( af::loadFarm( true))
       {
@@ -78,8 +78,13 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
             monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
          }
          message = "Reloaded successfully.";
+         printf("\n   ========= FARM RELOADED SUCCESSFULLY =========\n\n");
       }
-      else message = "Failed, see server logs fo details.";
+      else
+      {
+         message = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
+         printf("\n   ========= FARM RELOADING FAILED =========\n\n");
+      }
       msg_response = new MsgAf();
       msg_response->setString( message);
       break;

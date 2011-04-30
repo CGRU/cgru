@@ -13,10 +13,14 @@ public:
    void setService(  const std::string & name, int count);
    void remServices( const std::list<std::string> & remNames);
 
+   void clear();
    void copy(  const Host & other);
    void merge( const Host & other);
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+
+   void generateServicesStream( std::ostringstream & stream) const; /// Generate services information.
+   void printServices() const;
 
    inline int getServicesNum()        const { return servicesnum;       }
    inline int getServiceCount( int n) const { return servicescounts[n]; }

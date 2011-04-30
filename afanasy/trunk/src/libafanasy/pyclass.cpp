@@ -16,7 +16,7 @@ PyClass::PyClass():
 bool PyClass::init( const std::string & dir, const std::string & name, PyObject * initArgs)
 {
    modulename = dir + "." + name;
-   AFINFA("Instancing pyclass '%s'\n", modulename.c_str());
+   AFINFA("Instancing pyclass '%s'", modulename.c_str())
 
    //
    // Load module
@@ -24,7 +24,6 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    if(_PyObj_Module_== NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to import module '%s'\n", modulename.c_str());
       return false;
    }
    // Reload module
@@ -32,7 +31,6 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    if( PyObj_Module == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to reload module '%s'\n", modulename.c_str());
       return false;
    }
    Py_DECREF( _PyObj_Module_);
@@ -42,7 +40,6 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    if( PyObj_Type == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed find class '%s'\n", name.c_str());
       return false;
    }
 
@@ -51,10 +48,11 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    if( PyObj_Instance == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Failed to instance '%s'\n", name.c_str());
       return false;
    }
    if( initArgs) Py_DECREF( initArgs);
+
+   std::cout << "Module \"" << modulename << "\" imported." << std::endl;
 
    return true;
 }
@@ -77,7 +75,7 @@ PyObject * PyClass::getFunction( const std::string & name)
    if( PyObj_Func == NULL )
    {
       if( PyErr_Occurred()) PyErr_Print();
-      AFERRAR("Cannot find function '%s' in '%s'\n", name.c_str(), modulename.c_str());
+      AFERRAR("Cannot find function '%s' in '%s'", name.c_str(), modulename.c_str())
       return NULL;
    }
 
@@ -85,7 +83,7 @@ PyObject * PyClass::getFunction( const std::string & name)
    if( PyCallable_Check( PyObj_Func) == false)
    {
       Py_XDECREF( PyObj_Func);
-      AFERRAR("Attribute '%s' in object '%s' is not callable\n", name.c_str(), modulename.c_str());
+      AFERRAR("Attribute '%s' in object '%s' is not callable.", name.c_str(), modulename.c_str())
       return NULL;
    }
 

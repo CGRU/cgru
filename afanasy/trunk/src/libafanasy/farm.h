@@ -52,7 +52,7 @@ public:
    /// Release service limit.
    bool serviceLimitRelease( const std::string & service, const std::string & hostname);
 
-   void servicesLimitsGet( const Farm & other);
+   void servicesLimitsGetUsage( const Farm & other);
 
    const std::string serviceLimitsInfoString( bool full = false) const; /// Generate services limits information.
 

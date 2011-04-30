@@ -41,6 +41,8 @@ void Pattern::getHost( Host & newhost) const
 void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    host.generateInfoStream( stream, full);
+   stream << std::endl;
+   host.generateServicesStream( stream);
    if( full)
    {
       stream << std::endl;

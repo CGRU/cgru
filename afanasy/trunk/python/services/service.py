@@ -8,7 +8,7 @@ str_hostsprefix = '-H '
 str_hostseparator = ','
 
 class service:
-   "This is base class, not to be instanced"
+   "This is base service class."
    def __init__( self, afroot, wdir, command, capacity, hosts, files = ''):
       self.wdir = wdir
       self.command = command

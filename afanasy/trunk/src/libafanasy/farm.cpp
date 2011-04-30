@@ -428,7 +428,6 @@ bool Farm::addPattern( Pattern * patern)
 
 void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   if( full) stream << std::endl;
    stream << "Farm filename = \"" << filename << "\":";
    Pattern * patern = ptr_first;
    while( patern != NULL)
@@ -437,6 +436,9 @@ void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
       patern->generateInfoStream( stream, full);
       patern = patern->ptr_next;
    }
+
+   if( servicelimits.empty()) return;
+
    if( full ) stream << "\nServices Limits:";
    else stream << " limits:";
    for( std::map<std::string, ServiceLimit*>::const_iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
@@ -503,7 +505,7 @@ bool Farm::serviceLimitRelease( const std::string & service, const std::string &
    return (*it).second->releaseHost( hostname);
 }
 
-void Farm::servicesLimitsGet( const Farm & other)
+void Farm::servicesLimitsGetUsage( const Farm & other)
 {
    for( std::map<std::string, ServiceLimit*>::iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
    {

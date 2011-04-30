@@ -64,7 +64,7 @@ bool af::loadFarm( const std::string & filename, bool verbose )
    af::Farm * new_farm = new Farm( filename);//, verbose);
    if( new_farm == NULL)
    {
-      AFERROR("af::loadServices: Can't allocate memory for farm settings");
+      AFERROR("af::loadServices: Can't allocate memory for farm settings")
       return false;
    }
    if( false == new_farm->isValid())
@@ -74,7 +74,7 @@ bool af::loadFarm( const std::string & filename, bool verbose )
    }
    if( ferma != NULL)
    {
-      new_farm->servicesLimitsGet( *ferma);
+      new_farm->servicesLimitsGetUsage( *ferma);
       delete ferma;
    }
    ferma = new_farm;

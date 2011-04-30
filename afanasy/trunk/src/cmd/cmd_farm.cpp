@@ -63,7 +63,7 @@ bool CmdFarmCheck::processArguments( int argc, char** argv, af::Msg &msg)
       if( size == 0) break;
       if( size < 0)
       {
-         AFERRPE("Read input:");
+         AFERRPE("Read input:")
          break;
       }
       std::string hostname( buffer, size-1);
@@ -80,6 +80,7 @@ bool CmdFarmCheck::check( const std::string & hostname)
       std::cout << "\"" << name << " - " << description;
       std::cout << std::endl;
       host.stdOut( true);
+      host.printServices();
       return true;
    }
    else

@@ -4,6 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../include/afanasy.h"
 #include "../include/afpynames.h"
 
 #include "../libafanasy/environment.h"
@@ -54,7 +55,7 @@ void Service::initialize()
    for( std::list<std::string>::const_iterator it = hosts.begin(); it != hosts.end(); it++)
       if( PyList_Append( pHostsList, PyString_FromString((*it).c_str())) != 0)
       {
-         AFERROR("Service::Service: PyList_Append:\n");
+         AFERROR("Service::Service: PyList_Append:")
          PyErr_Print();
       }
 
@@ -67,7 +68,13 @@ void Service::initialize()
    PyTuple_SetItem( pArgs, 4, pHostsList );
    PyTuple_SetItem( pArgs, 5, PyString_FromString( files.c_str()));
 
-   if( PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name, pArgs) == false) return;
+   // Try to import service class
+   if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name, pArgs))
+      // If failed and imported class was not the base class
+      if( name != AFPYNAMES::SERVICE_CLASSESBASE)
+         // Try to import base service
+         if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, AFPYNAMES::SERVICE_CLASSESBASE, pArgs))
+            return;
 
    //Get functions:
    PyObj_FuncGetWDir= getFunction( AFPYNAMES::SERVICE_FUNC_GETWDIR);
@@ -90,7 +97,7 @@ void Service::initialize()
    }
    else
    {
-      AFERROR("Service:FuncGetWDir: Returned object is not a string.\n");
+      AFERROR("Service:FuncGetWDir: Returned object is not a string.")
       Py_DECREF( pResult);
       return;
    }
@@ -104,7 +111,7 @@ void Service::initialize()
    }
    else
    {
-      AFERROR("Service:FuncGetCommand: Returned object is not a string.\n");
+      AFERROR("Service:FuncGetCommand: Returned object is not a string.")
       Py_DECREF( pResult);
       return;
    }
@@ -118,7 +125,7 @@ void Service::initialize()
    }
    else
    {
-      AFERROR("Service:FuncGetCommand: Returned object is not a string.\n");
+      AFERROR("Service:FuncGetCommand: Returned object is not a string.")
       Py_DECREF( pResult);
       return;
    }

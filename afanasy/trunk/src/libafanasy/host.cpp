@@ -46,21 +46,22 @@ void Host::setService( const std::string & name, int count)
    }
 }
 
-void Host::copy( const Host & other)
+void Host::clear()
 {
-   mergeParameters( other);
-
    servicesnames.clear();
    servicescounts.clear();
    servicesnum = 0;
+}
 
-   for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
+void Host::copy( const Host & other)
+{
+   clear();
+   merge( other);
 }
 
 void Host::merge( const Host & other)
 {
    mergeParameters( other);
-
    for( int i = 0; i < other.servicesnum; i++) setService( other.servicesnames[i], other.servicescounts[i]);
 }
 
@@ -136,11 +137,6 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
          stream << ", MEM = " << mem_mb << " (+" << swap_mb << " Swap) Mb";
          stream << ", HDD = " << hdd_gb << " Gb";
       }
-/*      for( int i = 0; i < servicesnum; i++)
-      {
-         stream << "\n Service: \"" << servicesnames[i] << "\"";
-         if( servicescounts[i]) stream << " - " << servicescounts[i];
-      }*/
    }
    else
    {
@@ -151,15 +147,25 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << " CPU" << cpu_mhz << "x" << cpu_num;
       stream << " M" << mem_mb << "+" << swap_mb << "S" << " H" << hdd_gb;
       stream << " WOL" << time2str( wol_idlesleep_time );
-/*      for( int i = 0; i < servicesnum; i++)
-      {
-         stream << ", \"" << servicesnames[i] << "\"";
-         if( servicescounts[i]) stream << "[" << servicescounts[i] << "]";
-      }
-      if( servicesnum == 0) stream << " No services.";*/
    }
 }
 
+void Host::generateServicesStream( std::ostringstream & stream) const
+{
+   for( int i = 0; i < servicesnum; i++)
+   {
+      if( i ) stream << std::endl;
+      stream << "Service: \"" << servicesnames[i] << "\"";
+      if( servicescounts[i]) stream << " - " << servicescounts[i];
+   }
+}
+
+void Host::printServices() const
+{
+   std::ostringstream stream;
+   generateServicesStream( stream);
+   std::cout << stream << std::endl;
+}
 
 HostResMeter::HostResMeter(){}
 HostResMeter::HostResMeter( Msg * msg){ read( msg);}
