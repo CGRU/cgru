@@ -362,19 +362,31 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 {
    ActionIdId *action;
 
-   action = new ActionIdId( id_block, af::Msg::TBlockResetErrorHosts, "Reset Error Hosts", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
+   // There is no need to reset error hosts for all job blocks here.
+   // Job item has a special menuitem for it.
+   if( id_block != -1 )
+   {
+      action = new ActionIdId( id_block, af::Msg::TBlockResetErrorHosts, "Reset Error Hosts", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TTasksSkip, "Skip Block", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
+      menu->addSeparator();
+   }
 
-   action = new ActionIdId( id_block, af::Msg::TTasksRestart, "Restart Block", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
+   // There is no way to skip and restart all job bloks.
+   if( id_block != -1 )
+   {
 
-   menu->addSeparator();
+      action = new ActionIdId( id_block, af::Msg::TTasksSkip, "Skip Block", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      menu->addAction( action);
+
+      action = new ActionIdId( id_block, af::Msg::TTasksRestart, "Restart Block", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      menu->addAction( action);
+
+      menu->addSeparator();
+   }
 
    action = new ActionIdId( id_block, af::Msg::TBlockErrorsAvoidHost, "Set Errors Avoid Host", qwidget);
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
@@ -475,11 +487,11 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    menu->addAction( action);
 }
 
-void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
+af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems) const
 {
 //printf("BlockInfo::blockAction: jobid=%d blocknum=%d id_block=%d id_action=%d\n", jobid, blocknum, id_block, id_action);
 
-   af::MCGeneral mcgeneral;
+   af::MCGeneral * mcgeneral = new af::MCGeneral();
    bool ok = true;
    int cur_number = 0;
    QString cur_string;
@@ -492,12 +504,12 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
       case af::Msg::TTasksRestart:
       {
          af::MCTasksPos taskspos( jobid, " (watch) ");
-         if( taskspos.addBlock( id_block) == false) return;
+         if( taskspos.addBlock( id_block) == false) return NULL;
          afqt::QMsg * msg = new afqt::QMsg( id_action, &taskspos);
          Watch::sendMsg( msg);
          if( id_action== af::Msg::TTasksSkip) listitems->displayInfo( "Skip blocks.");
          else listitems->displayInfo( "Restart blocks.");
-         return;
+         return NULL;
       }
 
       case af::Msg::TBlockErrorRetries:
@@ -616,12 +628,12 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
 
       default:
          AFERRAR("BlockInfo::blockAction: invalid action number = %d", id_action)
-         return;
+         return NULL;
    }
 
 //printf("BlockInfo::blockAction: %s\n", af::Msg::TNAMES[id_action]);
 
-   if( ok == false) return;
+   if( ok == false) return NULL;
 
    if( set_string.isEmpty() == false)
    {
@@ -629,15 +641,14 @@ void BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems)
       if( rx.isValid() == false)
       {
          listitems->displayError( rx.errorString());
-         return;
+         return NULL;
       }
-      mcgeneral.setString( set_string.toUtf8().data());
+      mcgeneral->setString( set_string.toUtf8().data());
    }
    else
-      mcgeneral.setNumber( set_number);
+      mcgeneral->setNumber( set_number);
 
-   mcgeneral.addId( jobid);
-   mcgeneral.setId( id_block);
-   afqt::QMsg * msg = new afqt::QMsg( id_action, &mcgeneral);
-   Watch::sendMsg( msg);
+   mcgeneral->setId( id_block);
+
+   return mcgeneral;
 }

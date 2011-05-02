@@ -51,7 +51,7 @@ public:
 
    inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget) { info.generateMenu( id_block, menu, qwidget);}
 
-   inline void blockAction( int id_block, int id_action, ListItems * listitems) { info.blockAction( id_block, id_action, listitems);}
+   inline af::MCGeneral * blockAction( int id_block, int id_action, ListItems * listitems) const { return info.blockAction( id_block, id_action, listitems);}
 
    bool mousePressed( const QPoint & pos,const QRect & rect);
 

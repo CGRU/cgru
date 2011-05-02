@@ -89,12 +89,15 @@ QList<Attr*>     QEnvironment::attrs_gui;
 bool QEnvironment::valid = false;
 
 QHostAddress QEnvironment::qafserveraddress;
+QString QEnvironment::name;
 QString QEnvironment::servername;
 QString QEnvironment::username;
 QString QEnvironment::hostname;
 
-QEnvironment::QEnvironment( const QString & name)
+QEnvironment::QEnvironment( const QString & Name)
 {
+   name = Name;
+
    attrs_prefs.append( &savePrefsOnExit   );
    attrs_prefs.append( &saveWndRectsOnExit);
    attrs_prefs.append( &saveGUIOnExit     );
@@ -247,7 +250,7 @@ bool QEnvironment::save()
 
    QByteArray data;
 
-   data.append("<!-- Created by Watch -->\n");
+   data.append(QByteArray("<!-- Created by ") + name.toUtf8() + " -->\n");
    data.append("<watch>\n");
    for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->write( data);
    if( saveGUIOnExit.n != 0) saveGUI( data);

@@ -135,6 +135,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    if( render == NULL ) return;
    bool me = false;
    if( render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str())) || ( render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str()))) me = true;
+   int selectedItemsCount = getSelectedItemsCount();
 
    QMenu menu(this);
    QAction *action;
@@ -155,15 +156,15 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
       menu.addAction( action);
       action = new QAction( "Set NIMBY", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(false == render->isNIMBY());
+      if( selectedItemsCount == 1) action->setEnabled(false == render->isNIMBY());
       connect( action, SIGNAL( triggered() ), this, SLOT( actNIMBY() ));
       menu.addAction( action);
       action = new QAction( "Set nimby", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(false == render->isnimby());
+      if( selectedItemsCount == 1) action->setEnabled(false == render->isnimby());
       connect( action, SIGNAL( triggered() ), this, SLOT( actNimby() ));
       menu.addAction( action);
       action = new QAction( "Set Free", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->isnimby() || render->isNIMBY());
+      if( selectedItemsCount == 1) action->setEnabled(render->isnimby() || render->isNIMBY());
       connect( action, SIGNAL( triggered() ), this, SLOT( actFree() ));
       menu.addAction( action);
       action = new QAction( "Set User", this);
@@ -185,14 +186,14 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       connect( action, SIGNAL( triggered() ), this, SLOT( actDisableService() ));
       menu.addAction( action);
       action = new QAction( "Restore Defaults", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->isDirty());
+      if( selectedItemsCount == 1) action->setEnabled(render->isDirty());
       connect( action, SIGNAL( triggered() ), this, SLOT( actRestoreDefaults() ));
       menu.addAction( action);
 
       menu.addSeparator();
 
       action = new QAction( "Eject Tasks", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->hasTasks());
+      if( selectedItemsCount == 1) action->setEnabled(render->hasTasks());
       connect( action, SIGNAL( triggered() ), this, SLOT( actEject() ));
       menu.addAction( action);
    }
@@ -202,12 +203,12 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       menu.addSeparator();
 
       action = new QAction( "Exit Render", this);
-      if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+      if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
       connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
       menu.addAction( action);
       action = new QAction( "Delete Render", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
-      if( getSelectedItemsCount() == 1) action->setEnabled(false == render->isOnline());
+      if( selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
       menu.addAction( action);
 
       if( af::Environment::getRenderCmds().size() > 0 )
@@ -231,11 +232,11 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          QMenu * submenu = new QMenu( "Wake-On-Lan", this);
 
          action = new QAction( "Sleep", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOnline() && ( false == render->isBusy()) && ( false == render->isWOLFalling()));
+         if( selectedItemsCount == 1) action->setEnabled( render->isOnline() && ( false == render->isBusy()) && ( false == render->isWOLFalling()));
          connect( action, SIGNAL( triggered() ), this, SLOT( actWOLSleep()));
          submenu->addAction( action);
          action = new QAction( "Wake", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled( render->isOffline());
+         if( selectedItemsCount == 1) action->setEnabled( render->isOffline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actWOLWake()));
          submenu->addAction( action);
 
@@ -246,7 +247,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          QMenu * submenu = new QMenu( "Restart", this);
 
          action = new QAction( "Render", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+         if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
          submenu->addAction( action);
 
@@ -257,7 +258,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          QMenu * submenu = new QMenu( "Reboot", this);
 
          action = new QAction( "Computer", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+         if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actReboot() ));
          submenu->addAction( action);
 
@@ -276,7 +277,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          QMenu * submenu = new QMenu( "Shutdown", this);
 
          action = new QAction( "Computer", this);
-         if( getSelectedItemsCount() == 1) action->setEnabled(render->isOnline());
+         if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
          connect( action, SIGNAL( triggered() ), this, SLOT( actShutdown() ));
          submenu->addAction( action);
 

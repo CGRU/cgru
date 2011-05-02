@@ -891,19 +891,28 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
    for( int p = 0; p < taskspos.getCount(); p++)
    {
       int b = taskspos.getNumBlock(p);
-      if( b >= blocksnum)
+      if( b < 0)
       {
-         AFERRAR("JobAf::skipTasks: b >= blocksnum ( %d >= %d )", b, blocksnum)
+         AFERROR("JobAf::tasks_Skip_Restart: b < 0")
          continue;
       }
-      bool has_tasks = taskspos.hasTasks();
+      if( b >= blocksnum)
+      {
+         AFERRAR("JobAf::tasks_Skip_Restart: b >= blocksnum ( %d >= %d )", b, blocksnum)
+         continue;
+      }
       int start, end;
-      if( has_tasks )
+      if( taskspos.hasTasks())
       {
          start = taskspos.getNumTask( p);
          if( start >= blocksdata[b]->getTasksNum())
          {
-            AFERRAR("JobAf::skipTasks: taskspos.getNumTask() >= numTasks , ( %d >= %d )", start, blocksdata[b]->getTasksNum())
+            AFERRAR("JobAf::tasks_Skip_Restart: taskspos.getNumTask() >= numTasks, ( %d >= %d )", start, blocksdata[b]->getTasksNum())
+            continue;
+         }
+         if( start < 0)
+         {
+            AFERROR("JobAf::tasks_Skip_Restart: taskspos.getNumTask() < 0")
             continue;
          }
          end = start+1;

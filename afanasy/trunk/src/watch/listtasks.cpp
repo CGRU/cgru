@@ -680,7 +680,14 @@ void ListTasks::blockAction( int id_block, int id_action)
       AFERRAR("ListTasks::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return;
    }
-   wblocks[id_block]->blockAction( id_block, id_action, this);
+   af::MCGeneral * mcgeneral = wblocks[id_block]->blockAction( id_block, id_action, this);
+   if( mcgeneral != NULL )
+   {
+      mcgeneral->addId( jobid);
+      afqt::QMsg * msg = new afqt::QMsg( id_action, mcgeneral);
+      Watch::sendMsg( msg);
+      delete mcgeneral;
+   }
 }
 
 bool ListTasks::mousePressed( QMouseEvent * event)

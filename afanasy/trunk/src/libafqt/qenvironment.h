@@ -16,7 +16,7 @@ class QDomElement;
 class afqt::QEnvironment
 {
 public:
-   QEnvironment( const QString & name = QString());
+   QEnvironment( const QString & Name = QString());
    ~QEnvironment();
 
    static inline bool isValid() { return valid;}
@@ -111,6 +111,7 @@ private:
 
 private:
    static bool valid;
+   static QString name;
 
    static QHostAddress qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
    static QString servername;

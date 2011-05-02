@@ -2,6 +2,8 @@
 
 #include "../libafanasy/environment.h"
 
+#include "../libafqt/qenvironment.h"
+
 #include "monitorwindow.h"
 
 #define AFOUTPUT
@@ -13,7 +15,7 @@
 #include <signal.h>
 void sig_pipe(int signum)
 {
-   AFERROR("afanasy:: SIGPIPE:\n");
+   AFERROR("afanasy:: SIGPIPE:")
 }
 void sig_int(int signum)
 {
@@ -47,10 +49,16 @@ int main(int argc, char *argv[])
 #endif
    if( !ENV.isValid())
    {
-      AFERROR("main: Environment initialization failed.\n");
+      AFERROR("main: Environment initialization failed.")
       exit(1);
    }
    afqt::init( ENV.getMonitorWaitForConnected(), ENV.getMonitorWaitForReadyRead(), ENV.getMonitorWaitForBytesWritten());
+   afqt::QEnvironment QENV( "monitor");
+   if( !QENV.isValid())
+   {
+      AFERROR("main: QEnvironment initialization failed.")
+      exit(1);
+   }
 
    QApplication app(argc, argv);
 
@@ -58,7 +66,7 @@ int main(int argc, char *argv[])
    pMONITOR = &monitor;
    if( !monitor.isInitialized())
    {
-      AFERROR("main: ChatDialog initialization failed.\n");
+      AFERROR("main: Monitor initialization failed.")
       exit(1);
    }
    monitor.show();

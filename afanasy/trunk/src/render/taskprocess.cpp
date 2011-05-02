@@ -101,7 +101,7 @@ TaskProcess::~TaskProcess()
    if( exec    != NULL  ) delete exec;
    if( parser  != NULL  ) delete parser;
 
-   AFINFO("TaskProcess:~TaskProcess()\n");
+   AFINFO("TaskProcess:~TaskProcess()")
 }
 
 void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
@@ -135,7 +135,6 @@ void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
          printf("Success: exitcode = %d.\n", exitCode);
       }
    }
-   printf("\n");
    sendTaskSate();
 }
 

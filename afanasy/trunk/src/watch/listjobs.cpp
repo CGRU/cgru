@@ -111,6 +111,7 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
    ItemJob* jobitem = (ItemJob*)getCurrentItem();
    if( jobitem == NULL ) return;
+   int selectedItemsCount = getSelectedItemsCount();
 
    action = new QAction( "Show Log", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
@@ -186,20 +187,28 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
    menu.addSeparator();
 
-   if( jobitem->getBlocksNum() > 1)
+   if( selectedItemsCount == 1)
    {
-      submenu = new QMenu( "Tasks Blocks", this);
-      for( int b = -1; b < jobitem->getBlocksNum(); b++)
+      if( jobitem->getBlocksNum() > 1)
       {
-         QMenu * subsubmenu = new QMenu( b == -1 ? QString("_to_all_") : jobitem->getBlockName(b), this);
-         jobitem->generateMenu( b, subsubmenu , this);
-         submenu->addMenu( subsubmenu);
+         submenu = new QMenu( "Tasks Blocks", this);
+         for( int b = -1; b < jobitem->getBlocksNum(); b++)
+         {
+            QMenu * subsubmenu = new QMenu( b == -1 ? QString("_to_all_") : jobitem->getBlockName(b), this);
+            jobitem->generateMenu( b, subsubmenu , this);
+            submenu->addMenu( subsubmenu);
+         }
+      }
+      else
+      {
+         submenu = new QMenu( "Tasks Block", this);
+         jobitem->generateMenu( 0, submenu, this);
       }
    }
    else
    {
-      submenu = new QMenu( "Tasks Block", this);
-      jobitem->generateMenu( 0, submenu, this);
+      submenu = new QMenu( "All Selected Blocks", this);
+      jobitem->generateMenu( -1, submenu, this);
    }
    menu.addMenu( submenu);
 
@@ -207,26 +216,32 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
    action = new QAction( "Start", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actStart()   ));
+   if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_OFFLINE_MASK);
    menu.addAction( action);
 
    action = new QAction( "Pause", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actPause()   ));
+   if( selectedItemsCount == 1) action->setEnabled( false == (jobitem->state & AFJOB::STATE_OFFLINE_MASK));
    menu.addAction( action);
 
    action = new QAction( "Restart Errors", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
+   if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
    menu.addAction( action);
 
    action = new QAction( "Stop", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actStop()    ));
+   if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_RUNNING_MASK);
    menu.addAction( action);
 
    action = new QAction( "Restart", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actRestart() ));
+   if( selectedItemsCount == 1) action->setEnabled( jobitem->time_started != 0);
    menu.addAction( action);
 
    action = new QAction( "Restart&&Pause", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actRestartPause() ));
+   if( selectedItemsCount == 1) action->setEnabled( jobitem->time_started != 0);
    menu.addAction( action);
 
    menu.addSeparator();
@@ -714,5 +729,10 @@ void ListJobs::blockAction( int id_block, int id_action)
 {
    ItemJob* jobitem = (ItemJob*)getCurrentItem();
    if( jobitem == NULL ) return;
-   jobitem->blockAction( id_block, id_action, this);
+   af::MCGeneral * mcgeneral = jobitem->blockAction( id_block, id_action, this);
+   if( mcgeneral != NULL)
+   {
+      action( *mcgeneral, id_action);
+      delete mcgeneral;
+   }
 }

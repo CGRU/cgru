@@ -23,7 +23,7 @@
 #include <signal.h>
 void sig_pipe(int signum)
 {
-   AFERROR("afanasy:: SIGPIPE:\n");
+   AFERROR("afanasy:: SIGPIPE:")
 }
 void sig_int(int signum)
 {
@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
 
    if( !ENV.isValid())
    {
-      AFERROR("main: Environment initialization failed.\n");
+      AFERROR("main: Environment initialization failed.")
       exit(1);
    }
 
@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
    afqt::QEnvironment QENV( "watch");
    if( !QENV.isValid())
    {
-      AFERROR("main: QEnvironment initialization failed.\n");
+      AFERROR("main: QEnvironment initialization failed.")
       exit(1);
    }
 
@@ -96,7 +96,7 @@ int main(int argc, char *argv[])
    Dialog dialog;
    if( !dialog.isInitialized())
    {
-      AFERROR("main: Dialog initialization failed.\n");
+      AFERROR("main: Dialog initialization failed.")
       exit(1);
    }
 
@@ -110,7 +110,7 @@ int main(int argc, char *argv[])
    af::destroy();
    Py_Finalize();
 
-   AFINFA("main: QApplication::exec: returned status = %d\n", status);
+   AFINFA("main: QApplication::exec: returned status = %d", status)
 
    return status;
 }

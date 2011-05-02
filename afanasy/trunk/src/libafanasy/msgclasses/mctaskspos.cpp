@@ -32,7 +32,7 @@ bool MCTasksPos::addBlock(int numblock)
    {
       if( has_tasks )
       {
-         AFERROR("MCTasksPos::addBlock: Message has tasks.\n");
+         AFERROR("MCTasksPos::addBlock: Message has tasks.")
          return false;
       }
    }
@@ -47,7 +47,7 @@ bool MCTasksPos::addTask( int numblock, int numtask)
    {
       if( has_tasks == false )
       {
-         AFERROR("MCTasksPos::addTask: Message has blocks only.\n");
+         AFERROR("MCTasksPos::addTask: Message has blocks only.")
          return false;
       }
    }

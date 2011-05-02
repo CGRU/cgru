@@ -4,10 +4,13 @@
 #include <QtGui/QPainter>
 
 #include "../libafanasy/msg.h"
+#include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "../libafqt/qenvironment.h"
+#include "../libafqt/qmsg.h"
 
 #include "ctrlsortfilter.h"
+#include "watch.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -281,12 +284,12 @@ void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
 }
 
-void ItemJob::blockAction( int id_block, int id_action, ListItems * listitems)
+af::MCGeneral * ItemJob::blockAction( int id_block, int id_action, ListItems * listitems) const
 {
    if((id_block >= 0) && (id_block >= blocksnum))
    {
       AFERRAR("ListJobs::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
-      return;
+      return NULL;
    }
-   blockinfo[ id_block >= 0 ? id_block : 0].blockAction( id_block, id_action, listitems);
+   return blockinfo[ id_block >= 0 ? id_block : 0].blockAction( id_block, id_action, listitems);
 }

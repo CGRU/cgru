@@ -290,7 +290,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderExit:
    {
       if( false == isOnline() ) return true;
-      appendLog( std::string("Exit by %1") + userhost);
+      appendLog( std::string("Exit by ") + userhost);
       exitClient( af::Msg::TClientExitRequest, jobs, monitoring);
       return true;
    }

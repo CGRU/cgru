@@ -53,7 +53,7 @@ public:
 
    void generateMenu( int id_block, QMenu * menu, QWidget * qwidget);
 
-   void blockAction( int id_block, int id_action, ListItems * listitems);
+   af::MCGeneral * blockAction( int id_block, int id_action, ListItems * listitems) const;
 
    inline const QString & getBlockName( int num) const { return blockinfo[num].getName();}
 
