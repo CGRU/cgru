@@ -245,11 +245,23 @@ printf("Object::caseMessage: "); msg->stdOut();
       af::MCListenAddress mcaddr( msg);
       for( int t = 0; t < tasks.size(); t++)
       {
-         if( tasks[t]->is( mcaddr.getJobId(), mcaddr.getNumBlock(), mcaddr.getNumTask(), 0))
+         if( mcaddr.justTask())
          {
-            if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
-            else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
-            mcaddr.stdOut();
+            if( tasks[t]->is( mcaddr.getJobId(), mcaddr.getNumBlock(), mcaddr.getNumTask(), 0))
+            {
+               if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
+               else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
+               mcaddr.stdOut();
+            }
+         }
+         else
+         {
+            if( tasks[t]->exec->getJobId() == mcaddr.getJobId())
+            {
+               if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
+               else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
+               mcaddr.stdOut();
+            }
          }
       }
       break;

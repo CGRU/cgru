@@ -148,7 +148,7 @@ void TaskExec::readwrite( Msg * msg)
 
 void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << username << ": ";
+   stream << "[" << servicetype << "] " << username << ": ";
    stream << jobname;
    stream << "[" << blockname << "]";
    stream << "[" << name << "]";

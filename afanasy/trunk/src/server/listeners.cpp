@@ -23,7 +23,7 @@ bool Listeners::process( af::MCListenAddress & mclass)
       int size  = task_addresses.size();
       if( size )
       {
-         std::list<af::Address*>::iterator aIt = task_addresses.begin();
+         std::list<af::Address>::iterator aIt = task_addresses.begin();
          std::list<int>::iterator bIt = task_blocks.begin();
          std::list<int>::iterator tIt = task_numbers.begin();
          for( int i = 0; i < size; i++, aIt++, bIt++, tIt++)
@@ -42,7 +42,7 @@ bool Listeners::process( af::MCListenAddress & mclass)
          }
       }
       if( listen == false ) return false;
-      task_addresses.push_back( new af::Address( address));
+      task_addresses.push_back( af::Address( address));
       task_blocks.push_back( block);
       task_numbers.push_back( task);
    }
@@ -51,7 +51,7 @@ bool Listeners::process( af::MCListenAddress & mclass)
       int size  = job_addresses.size();
       if( size )
       {
-         std::list<af::Address*>::iterator jIt = job_addresses.begin();
+         std::list<af::Address>::iterator jIt = job_addresses.begin();
          for( int i = 0; i < size; i++, jIt++)
          {
             if( address->equal( *jIt))
@@ -66,7 +66,7 @@ bool Listeners::process( af::MCListenAddress & mclass)
          }
       }
       if( listen == false ) return false;
-      job_addresses.push_back( new af::Address( address));
+      job_addresses.push_back( af::Address( address));
    }
    return true;
 }
@@ -76,7 +76,7 @@ void Listeners::process( af::TaskExec & task) const
    int size = job_addresses.size();
    if( size )
    {
-      std::list<af::Address*>::const_iterator jIt = job_addresses.begin();
+      std::list<af::Address>::const_iterator jIt = job_addresses.begin();
       for( int i = 0; i < size; i++, jIt++)
          task.addListenAddress( *jIt);
    }
@@ -85,7 +85,7 @@ void Listeners::process( af::TaskExec & task) const
    {
       int blocknum = task.getBlockNum();
       int tasknum  = task.getTaskNum();
-      std::list<af::Address*>::const_iterator aIt = task_addresses.begin();
+      std::list<af::Address>::const_iterator aIt = task_addresses.begin();
       std::list<int>::const_iterator bIt = task_blocks.begin();
       std::list<int>::const_iterator tIt = task_numbers.begin();
       for( int i = 0; i < size; i++, aIt++, bIt++, tIt++)

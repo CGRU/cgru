@@ -682,6 +682,7 @@ Write {
 }
 cgru_dailies {
  name dailies_dpx
+ selected true
  xpos -107
  ypos 81
  format 720x576
