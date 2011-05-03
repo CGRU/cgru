@@ -33,6 +33,9 @@ case 'servicequantity':
 case 'tasksquantity':
    echo 'Service / Tasks Quantity';
    break;
+case 'tasksquantityavg':
+   echo 'Service / Tasks Average Quantity';
+   break;
 case 'taskssumruntime':
    echo 'Service / Tasks Total Run Time';
    break;

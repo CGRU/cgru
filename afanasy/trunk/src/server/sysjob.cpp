@@ -7,6 +7,8 @@
 #include "../libafsql/dbjobprogress.h"
 
 #include "afcommon.h"
+#include "afcommon.h"
+#include "monitorcontainer.h"
 #include "rendercontainer.h"
 #include "sysjob_cmdpost.h"
 #include "sysjob_wol.h"
@@ -309,6 +311,8 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    bool blockProgress_changed = false;
    bool taskchanged = false;
 
+   uint32_t blockstate_new = data->getState();
+   uint32_t blockstate_old = blockstate_new;
    uint32_t taskstate_old = taskprogress->state;
    int tasksready_old = data->getProgressTasksReady();
    int tasksdone_old  = data->getProgressTasksDone();
@@ -317,9 +321,12 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    int tasksdone_new  = tasksdone_old;
    int taskserror_new = 0;
 
-
+   blockstate_new &= ~AFJOB::STATE_RUNNING_MASK;
    taskprogress->state &= ~AFJOB::STATE_RUNNING_MASK;
    taskprogress->state &= ~AFJOB::STATE_READY_MASK;
+
+   if( data->getRunningTasksNumber() > 0 ) blockstate_new |= AFJOB::STATE_RUNNING_MASK;
+   data->setState( blockstate_new);
 
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
    {
@@ -342,15 +349,25 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       tasksready_new = commands.size();
    }
 
-   if( taskstate_old  != taskprogress->state ) taskchanged = true;
-   if(( tasksready_old != tasksready_new ) ||
+   if(  taskstate_old  != taskprogress->state ) taskchanged = true;
+   if(( blockstate_old != blockstate_new ) ||
+      ( tasksready_old != tasksready_new ) ||
       ( tasksdone_old  != tasksdone_new  ) ||
       ( taskserror_old != taskserror_new )  ) blockProgress_changed = true;
 
    if( taskchanged && monitoring) tasks[0]->monitor( monitoring);
 
    // For block in jobs list monitoring
-   if( Block::refresh( currentTime, renders, monitoring)) blockProgress_changed = true;
+   if( Block::refresh( currentTime, renders, monitoring))
+   {
+      // If block progress changed there, the function will add block in monitoring itself
+      blockProgress_changed = true;
+   }
+   else
+   {
+      // Add block to monitoring if it was not, but has changes
+      if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, data);
+   }
 
    data->setProgressTasksReady( tasksready_new  );
    data->setProgressTasksDone(  tasksdone_new   );

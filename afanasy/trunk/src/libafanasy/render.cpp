@@ -154,7 +154,7 @@ const std::string Render::getResourcesString() const
          << unsigned( hres.cpu_irq     ) << "% irq, "
          << unsigned( hres.cpu_softirq ) << "% soft irq";
    stream << "\n   Memory:"
-         << " free " << (hres.mem_free_mb + hres.mem_cached_mb + hres.mem_buffers_mb) << " Mb of total " << host.mem_mb << " Mb"
+         << " free " << hres.mem_free_mb << " Mb of total " << host.mem_mb << " Mb"
          << ": unused " << hres.mem_free_mb << " Mb"
          << ", cached " << hres.mem_cached_mb << " Mb"
          << ", buffers " << hres.mem_buffers_mb << " Mb";

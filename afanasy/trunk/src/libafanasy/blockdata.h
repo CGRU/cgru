@@ -213,11 +213,12 @@ public:
    inline int      getProgressTasksError()      const { return p_taskserror;        }
    inline uint32_t getProgressTasksSumRunTime() const { return p_taskssumruntime;   }
 
-   inline void setProgressTasksReady(    int value) { p_tasksready    = value; }
-   inline void setProgressTasksDone(     int value) { p_tasksdone     = value; }
-   inline void setProgressTasksError(    int value) { p_taskserror    = value; }
-   inline void setProgressErrorHostsNum( int value) { p_errorhostsnum = value; }
-   inline void setProgressAvoidHostsNum( int value) { p_avoidhostsnum = value; }
+   inline void setState(           uint32_t  value ) { state           = value; }
+   inline void setProgressTasksReady(    int value ) { p_tasksready    = value; }
+   inline void setProgressTasksDone(     int value ) { p_tasksdone     = value; }
+   inline void setProgressTasksError(    int value ) { p_taskserror    = value; }
+   inline void setProgressErrorHostsNum( int value ) { p_errorhostsnum = value; }
+   inline void setProgressAvoidHostsNum( int value ) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);
 
 /// Generate progress bits info string.

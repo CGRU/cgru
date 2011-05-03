@@ -178,10 +178,13 @@ void ItemRender::updateValues( af::Node *node, int type)
          }
       }
 
-      // If became offline:
+      // It became offline:
       if( online && ( render->isOnline() == false))
+      {
+         tooltip_resources.clear();
          for( unsigned i = 0; i < plots.size(); i++)
             plots[i]->height = 0;
+      }
 
       online = render->isOnline();
       if( time_launched) creationTime = "Launched   at " + afqt::time2Qstr( time_launched);
@@ -234,7 +237,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
       hres.copy( render->getHostRes());
 
-      tooltip_resources = hres.generateInfoString( true);
+      tooltip_resources = hres.generateInfoString( &host, true);
 
       int cpubusy = hres.cpu_user + hres.cpu_nice + hres.cpu_system + hres.cpu_iowait + hres.cpu_irq + hres.cpu_softirq;
       int mem_used = host.mem_mb - hres.mem_free_mb;
@@ -324,7 +327,9 @@ void ItemRender::updateValues( af::Node *node, int type)
    else if( wolSleeping ) offlineState = "Sleeping";
    else offlineState = "Offline";
 
-   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_resources);
+   tooltip = afqt::stoq( tooltip_base);
+   if( false == tooltip_resources.empty())
+      tooltip += "\n" + afqt::stoq( tooltip_resources);
 }
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const

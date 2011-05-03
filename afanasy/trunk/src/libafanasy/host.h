@@ -117,7 +117,12 @@ public:
    int32_t net_recv_kbsec;
    int32_t net_send_kbsec;
 
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+   /// Generate information.
+   void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+
+   /// Generate information. Host pointer needed to show totall values.
+   void generateInfoStream( const Host * host, std::ostringstream & stream, bool full = false) const;
+   const std::string generateInfoString( const Host * host, bool full = false) const;
 
    void copy( const HostRes & other);
 

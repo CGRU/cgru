@@ -819,10 +819,8 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    else
       time_done = 0;
 
-   // Reset started time if job was started (for "some" time) but now no tasks are running or done
-//   static int check_started_time = 11; // This peroid needed not to update started time every cycle
+   // Reset started time if job was started, but now no tasks are running or done
    if(( time_started != 0 ) &&
-//      ( currentTime - time_started > check_started_time  ) &&
       ( false == (state & AFJOB::STATE_RUNNING_MASK)     ) &&
       ( false == (state & AFJOB::STATE_DONE_MASK)        )  )
    {
@@ -837,12 +835,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
          }
       }
       // If the job has done task(s) we not reset started time in any case
-      if( false == has_done_tasks )
-      {
-         time_started = currentTime;
-//         jobchanged = af::Msg::TMonitorJobsChanged;
-//         AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_started);
-      }
+      if( false == has_done_tasks ) time_started = currentTime;
    }
 
    // If it is no job monitoring, job just came to server and it is first it refresh,

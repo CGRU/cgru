@@ -23,6 +23,7 @@ switch($order_s)
 case "service": break;
 case "servicequantity": break;
 case "tasksquantity": break;
+case "tasksquantityavg": break;
 case "taskssumruntime": break;
 case "tasksavgruntime": break;
 case "tasksdone": break;
@@ -168,6 +169,7 @@ $query="
 SELECT service,
 sum(1) AS servicequantity,
 sum(tasksnum) AS tasksquantity,
+sum(tasksnum)/sum(1) AS tasksquantityavg,
 sum(taskssumruntime) AS taskssumruntime,
 avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
 round(avg(100*tasksdone/tasksnum),2) AS tasksdone
@@ -192,6 +194,10 @@ echo "</td>\n";
 
 echo "\t\t<td>";
 echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=tasksquantity'>Tasks Quantity</a></b>";
+echo "</td>\n";
+
+echo "\t\t<td>";
+echo "<b><a href='index.php?action=$action&order_u=$order_u&order_s=tasksquantityavg'>Avg Quantity</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
@@ -231,6 +237,10 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    echo "</td>\n";
 
    echo "\t\t<td align=center>";
+   echo $line["tasksquantityavg"];
+   echo "</td>\n";
+
+   echo "\t\t<td align=center>";
    echo time_strDHMS($line["taskssumruntime"]);
    echo "</td>\n";
 
@@ -251,6 +261,7 @@ echo "<td/>\n";
 echo "<td></td>\n";
 echo "<td><a href='index.php?action=stat_chart&type=servicequantity'>Chart</a></td>\n";
 echo "<td><a href='index.php?action=stat_chart&type=tasksquantity'>Chart</a></td>\n";
+echo "<td><a href='index.php?action=stat_chart&type=tasksquantityavg'>Chart</a></td>\n";
 echo "<td><a href='index.php?action=stat_chart&type=taskssumruntime'>Chart</a></td>\n";
 echo "<td><a href='index.php?action=stat_chart&type=tasksavgruntime'>Chart</a></td>\n";
 echo "<td><a href='index.php?action=stat_chart&type=tasksdone'>Chart</a></td>\n";
@@ -260,6 +271,7 @@ $query="
 SELECT
 sum(1) AS servicequantity,
 sum(tasksnum) AS tasksquantity,
+sum(tasksnum)/sum(1) AS tasksquantityavg,
 sum(taskssumruntime) AS taskssumruntime,
 avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
 round(avg(100*tasksdone/tasksnum),2) AS tasksdone
@@ -272,6 +284,7 @@ echo "<td/>\n";
 echo "<td><i>total</i></td>\n";
 echo "<td><i>".$line["servicequantity"]."</i></td>\n";
 echo "<td><i>".$line["tasksquantity"]."</i></td>\n";
+echo "<td><i>".$line["tasksquantityavg"]."</i></td>\n";
 echo "<td><i>".time_strDHMS($line["taskssumruntime"])."</i></td>\n";
 echo "<td><i>".time_strHMS($line["tasksavgruntime"])."</i></td>\n";
 echo "<td><i>".$line["tasksdone"]."%</i></td>\n";

@@ -89,6 +89,9 @@ case 'servicequantity':
 case 'tasksquantity':
    $query="SELECT service AS name,sum(tasksnum) AS value FROM statistics GROUP BY service;";
    break;
+case 'tasksquantityavg':
+   $query="SELECT service AS name,sum(tasksnum)/sum(1) AS value FROM statistics GROUP BY service;";
+   break;
 case 'taskssumruntime':
    $query="SELECT service AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY service;";
    break;

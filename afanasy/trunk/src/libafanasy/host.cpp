@@ -318,6 +318,18 @@ void HostRes::readwrite( Msg * msg)
 
 void HostRes::generateInfoStream( std::ostringstream & stream, bool full) const
 {
+   generateInfoStream( NULL, stream, full);
+}
+
+const std::string HostRes::generateInfoString( const Host * host, bool full) const
+{
+   std::ostringstream stream;
+   generateInfoStream( host, stream, full);
+   return stream.str();
+}
+
+void HostRes::generateInfoStream( const Host * host, std::ostringstream & stream, bool full) const
+{
    stream << "Resources: ";
    if( full)
    {
@@ -330,10 +342,15 @@ void HostRes::generateInfoStream( std::ostringstream & stream, bool full) const
             << int( cpu_irq     ) << "% irq, "
             << int( cpu_softirq ) << "% sirq";
       stream << "\n   Load average:   " << cpu_loadavg1/10.0 << "   " << cpu_loadavg2/10.0 << "   " << cpu_loadavg3/10.0;
-      stream << "\n   Memory: Free " << mem_free_mb
-            << " Mb, Cached " << mem_cached_mb
-            << " Mb, Buffers " << mem_buffers_mb
-            << " Mb, Swap " << swap_used_mb << " Mb";
+      stream << "\n   Memory Free: " << mem_free_mb << " Mb";
+      if( mem_cached_mb || mem_buffers_mb )
+      {
+         stream << " (Cache " << mem_cached_mb << " Mb";
+         stream << ", Buffers " << mem_buffers_mb << " Mb)";
+      }
+      stream << std::endl;
+      if( host) stream << "   Memory Used: " << host->mem_mb - mem_free_mb << " Mb,";
+      stream << "   Swapped: " << swap_used_mb << " Mb";
       stream << "\n   Network: Recieved " << net_recv_kbsec << " Kb/sec, Send " << net_send_kbsec  << " Kb/sec",
       stream << "\n   IO: Read " << hdd_rd_kbsec << " Kb/sec, Write " << hdd_wr_kbsec << " Kb/sec, Busy = " << int(hdd_busy) << "%";
       stream << "\n   HDD: " << hdd_free_gb  << " Gb Free";
