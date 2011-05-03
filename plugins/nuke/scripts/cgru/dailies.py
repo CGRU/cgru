@@ -221,6 +221,12 @@ def dailiesGenCmd( node):
    fend     = int(node.knob('fend').value())
    fffirst  = int(node.knob('fffirst').value())
 
+   tmpformat      = node.knob('tmpformat').value()
+   tmpquality     = node.knob('tmpquality').value()
+   autocolorspace = int(node.knob('autocolorspace').value())
+   gamma          = float(node.knob('gamma').value())
+
+
    # Command Construction:
    cmd = os.environ['CGRU_LOCATION']
    cmd = os.path.join( cmd, 'utilities')
@@ -234,9 +240,16 @@ def dailiesGenCmd( node):
    cmd += ' -t "%s"' % template
    cmd += ' -s "%s"' % slate
 
-   if fstart != -1: cmd += ' --fs %d ' % fstart
-   if fend   != -1: cmd += ' --fe %d ' % fend
-   if fffirst     : cmd += ' --fff'
+
+   if tmpformat  is not None and tmpformat  != '': cmd += ' --tmpformat "%s"'   % tmpformat
+   if tmpquality is not None and tmpquality != '': cmd += ' --tmpquality "%s"'  % tmpquality
+   if not autocolorspace: cmd += ' --noautocorr'
+   if gamma  != 1.0: cmd += ' -g %03f' % gamma
+
+   if fstart !=  -1: cmd += ' --fs %d' % fstart
+   if fend   !=  -1: cmd += ' --fe %d' % fend
+   if fffirst      : cmd += ' --fff'
+
    if company  is not None and company  != '': cmd += ' --company "%s"'  % company
    if project  is not None and project  != '': cmd += ' --project "%s"'  % project
    if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot

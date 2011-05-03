@@ -52,6 +52,10 @@ Gizmo {
    addUserKnob {  1 line169  l "Line 16:9 Color" +STARTLINE }
    addUserKnob {  1 line235  l "line 2.35 Color" -STARTLINE }
 
+   addUserKnob {  1 tmpformat  l "Temporary Frormat" +STARTLINE }
+   addUserKnob {  1 tmpquality l "Quality Settings"  -STARTLINE }
+   addUserKnob {  6 autocolorspace l "Auto Color Space" +STARTLINE }
+   addUserKnob {  7 gamma l "Gamma" R 0.0 2.0 -STARTLINE }
 
    name dailies
 
@@ -76,6 +80,10 @@ Gizmo {
    lgfpath     ""
    lgfsize     0
    lgfgrav     "North"
+
+   tmpformat   "tga"
+   autocolorspace 1
+   gamma          1
 
    help "0 God, help me with dailies!"
 

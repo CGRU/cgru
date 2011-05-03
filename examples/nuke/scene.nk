@@ -121,7 +121,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N4655bd0 [stack 0]
+set N3d741f0 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -136,7 +136,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N4655bd0
+push $N3d741f0
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -144,7 +144,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N4655bd0
+push $N3d741f0
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -445,7 +445,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N4c61910 [stack 0]
+set N43782a0 [stack 0]
 Write {
  channels rgba
  file render/key.%04d.exr
@@ -472,7 +472,7 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N4c7c120 [stack 0]
+set N439a7e0 [stack 0]
 Write {
  file render/back.%04d.exr
  proxy render/back_proxy.%04d.exr
@@ -513,7 +513,7 @@ Read {
  xpos 223
  ypos -165
 }
-push $N4c61910
+push $N43782a0
 Switch {
  inputs 2
  which 1
@@ -532,7 +532,7 @@ Read {
  xpos 3
  ypos -166
 }
-push $N4c7c120
+push $N439a7e0
 Switch {
  inputs 2
  which 1
@@ -553,7 +553,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N4de2c10 [stack 0]
+set N45016c0 [stack 0]
 Write {
  file render/final.%04d.exr
  proxy render/final_proxy.%04d.exr
@@ -573,7 +573,8 @@ Read {
  xpos 3
  ypos -32
 }
-push $N4de2c10
+set N4513730 [stack 0]
+push $N45016c0
 Switch {
  inputs 2
  which 1
@@ -581,7 +582,6 @@ Switch {
  xpos 113
  ypos -2
 }
-set N4dffad0 [stack 0]
 Write {
  file render/preview.%04d.jpg
  proxy render/preview_proxy.%04d.jpg
@@ -591,7 +591,7 @@ Write {
  xpos 113
  ypos 46
 }
-set N4e03b90 [stack 0]
+set N4522640 [stack 0]
 afanasy {
  inputs 3
  name afanasy2
@@ -608,7 +608,7 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N4e03b90
+push $N4522640
 cgru_dailies {
  name dailies
  xpos 113
@@ -625,7 +625,7 @@ cgru_dailies {
  comments "cgru afanasy nuke example"
  movfolder /cgru/examples/nuke
  movrule (s)_(v)_(d)
- movname scene_v001_110428
+ movname scene_v001_110503
  viewsnames "left right"
  knob_1 ""
  template /cgru/utilities/moviemaker/templates/dailies
@@ -638,6 +638,8 @@ cgru_dailies {
  draw235 25
  line169 200,200,200
  line235 200,200,200
+ tmpformat tga
+ tmpquality ""
 }
 afanasy {
  name afanasy3
@@ -668,13 +670,46 @@ afanasy {
  dependmaskglbl ""
  addnodes ""
 }
-push $N4dffad0
+push $N4513730
 Write {
  file render/output.%04d.dpx
  file_type dpx
  checkHashOnRead false
- version 2
+ version 3
  name dpx
- xpos 223
+ xpos -107
  ypos -9
+}
+cgru_dailies {
+ name dailies_dpx
+ xpos -107
+ ypos 81
+ format 720x576
+ fps 24
+ codec /cgru/utilities/moviemaker/codecs/scene.nuke
+ company ""
+ project Nuke
+ shot scene
+ version 1
+ artist Afanasy
+ activity comp
+ comments "cgru afanasy nuke example"
+ movfolder /cgru/examples/nuke
+ movrule (s)_(v)_(d)
+ movname scene_v001_110503
+ viewsnames "left right"
+ knob_1 ""
+ template /cgru/utilities/moviemaker/templates/dailies
+ slate /cgru/utilities/moviemaker/templates/dailies_slate
+ lgspath /cgru/utilities/moviemaker/logos/logo.png
+ lgssize 20
+ lgfpath /cgru/utilities/moviemaker/logos/logo.png
+ lgfsize 10
+ draw169 25
+ draw235 25
+ line169 200,200,200
+ line235 200,200,200
+ tmpformat dpx
+ tmpquality ""
+ autocolorspace false
 }

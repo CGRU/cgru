@@ -73,18 +73,17 @@ void ListTasks::construct( af::Job * job)
    for( int b = 0; b < blocksnum; b++)
    {
       const af::BlockData* block = job->getBlock( b);
-      ItemJobBlock *wblock = new ItemJobBlock( block, this);
-      wblock->tasksHidded = blocksnum > 1;
-      wblocks[b] = wblock;
-      model->addItem( wblock);
-      row++;
+      wblocks[b] = new ItemJobBlock( block, this);
       tasksnum[b] = block->getTasksNum();
+      wblocks[b]->tasksHidded = ((blocksnum > 1) && (tasksnum[b] > 1));
+      model->addItem( wblocks[b]);
+      row++;
       wtasks[b] = new ItemJobTask*[tasksnum[b]];
       for( int t = 0; t < tasksnum[b]; t++)
       {
          ItemJobTask *wtask =  new ItemJobTask( block, t);
          model->addItem( wtask);
-         if( blocksnum > 1) view->setRowHidden( row , true);
+         if( wblocks[b]->tasksHidded) view->setRowHidden( row , true);
          row++;
          wtasks[b][t] = wtask;
       }
