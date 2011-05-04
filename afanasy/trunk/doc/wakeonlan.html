@@ -95,10 +95,11 @@ If is a new feature. Not well tested.
 You can wake and sleep renders by <code>afwatch</code> GUI and <code>afcmd</code> command.
 </p>
 
+<table width="99%">
+<tr>
+<td>
 <h3>Configuration</h3>
-
 <p>See <a href="server_config.html">server configuration</a> about XML configuration files.</p>
-
 <ul>
 <li><p>
 <code>render_cmd_wolsleep</code> = wolsleep<br/>
@@ -108,7 +109,20 @@ Sleep command performed by a render client.
 <code>render_cmd_wolwake</code> = wolwake<br/>
 Wake command constructed by a server and performed on a online client by the system job.
 </p></li>
+<li><p>
+<code>sysjob_wol_service</code> = wakeonlan<br/>
+Service type for Wake-On-LAN system block.
+This parameter is commented in default configuration, "system" name used.
+</p></li>
 </ul>
+</td>
+<td width="3%">
+</td>
+<td>
+<img src="images/watch/wol_job.png" alt="wol_job"/>
+</td>
+</tr>
+</table>
 
 <!--FOOTER-->
 </td></tr></table>
