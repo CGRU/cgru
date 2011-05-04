@@ -122,7 +122,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N3437b50 [stack 0]
+set N5111a10 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -137,7 +137,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N3437b50
+push $N5111a10
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -145,7 +145,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N3437b50
+push $N5111a10
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -446,7 +446,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N3a3bbc0 [stack 0]
+set N5715a70 [stack 0]
 Write {
  channels rgba
  file render/key.%04d.exr
@@ -473,7 +473,7 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N3a5e0e0 [stack 0]
+set N5737f90 [stack 0]
 Write {
  file render/back.%04d.exr
  proxy render/back_proxy.%04d.exr
@@ -514,7 +514,7 @@ Read {
  xpos 223
  ypos -165
 }
-push $N3a3bbc0
+push $N5715a70
 Switch {
  inputs 2
  which 1
@@ -533,7 +533,7 @@ Read {
  xpos 3
  ypos -166
 }
-push $N3a5e0e0
+push $N5737f90
 Switch {
  inputs 2
  which 1
@@ -554,7 +554,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N3bc4b60 [stack 0]
+set N589ea30 [stack 0]
 Write {
  file render/final.%04d.exr
  proxy render/final_proxy.%04d.exr
@@ -574,8 +574,8 @@ Read {
  xpos 3
  ypos -32
 }
-set N3bd6bd0 [stack 0]
-push $N3bc4b60
+set N58b0aa0 [stack 0]
+push $N589ea30
 Switch {
  inputs 2
  which 1
@@ -592,7 +592,7 @@ Write {
  xpos 113
  ypos 46
 }
-set N3be5b00 [stack 0]
+set N58bf9d0 [stack 0]
 afanasy {
  inputs 3
  name afanasy2
@@ -609,7 +609,7 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N3be5b00
+push $N58bf9d0
 cgru_dailies {
  name dailies
  xpos 113
@@ -671,7 +671,7 @@ afanasy {
  dependmaskglbl ""
  addnodes ""
 }
-push $N3bd6bd0
+push $N58b0aa0
 Write {
  file render/output.%04d.dpx
  file_type dpx
