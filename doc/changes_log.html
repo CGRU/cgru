@@ -60,7 +60,7 @@ You can use this command to perform it:<br/>
 
 <p>
 <a name="release144"/>
-<b>1.4.4</b> 2011.04.30 <i>(rev1563 af1562)</i>
+<b>1.4.4</b> 2011.04.30 <i>(rev1564 af1562)</i>
 </p>
 <p>
 <a href="../afanasy/doc/wakeonlan.html">Wake-On-LAN</a>
@@ -90,7 +90,7 @@ Nuke client-server-client paths map interface in <a href="../plugins/nuke/doc/ma
 Bugs Fixed:
 </p>
 <p>
-Render busy time calculation (it affects GUI only) corrected.<br/>
+Render busy time calculation corrected (it affects GUI counter only).<br/>
 Watch job tasks list window title - job total percentage fixed.<br/>
 Watch job tasks list - block item tool-tip corrected.<br/>
 Nuke dailies node - job (block) custom capacity not ignored.<br/>
@@ -98,8 +98,9 @@ Nuke afanasy node - "Wait whole frame range rendered" behavior corrected.<br/>
 Client does not try to lookup Afanasy server if direct IP literals specified.<br/>
 MS Windows 7 clients does not try to create Afanasy home folder if it is already exists.<br/>
 Server reload farm setup on-the-fly fixed when new host has less services.<br/>
-Server hung when user tries to restart or skip all job blocks (but not restart entire job menuitem) fixed.<br/>
-Listen entire job when some tasks are already running corrected (they begin to sent output too).
+Server hung when user tries to restart or skip all job blocks (but not restart entire job menu item) fixed.<br/>
+Listen entire job when some tasks are already running corrected. They begin to sent output too.<br/>
+Fixed ffmpeg presets end-of-line for UNIX. On Linux they cause an error with Windows end-of-line.<br/>
 </p>
 
 <br/>
