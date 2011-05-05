@@ -192,20 +192,33 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
       menu.addSeparator();
 
-      action = new QAction( "Eject Tasks", this);
-      if( selectedItemsCount == 1) action->setEnabled(render->hasTasks());
-      connect( action, SIGNAL( triggered() ), this, SLOT( actEject() ));
-      menu.addAction( action);
+      {
+         QMenu * submenu = new QMenu( "Eject", this);
+
+         action = new QAction( "Tasks", this);
+         if( selectedItemsCount == 1) action->setEnabled(render->hasTasks());
+         connect( action, SIGNAL( triggered() ), this, SLOT( actEject() ));
+         submenu->addAction( action);
+
+         menu.addMenu( submenu);
+      }
    }
 
    if( af::Environment::GOD())
    {
       menu.addSeparator();
 
-      action = new QAction( "Exit Render", this);
-      if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
-      connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
-      menu.addAction( action);
+      {
+         QMenu * submenu = new QMenu( "Exit", this);
+
+         action = new QAction( "Render", this);
+         if( selectedItemsCount == 1) action->setEnabled(render->isOnline());
+         connect( action, SIGNAL( triggered() ), this, SLOT( actExit() ));
+         submenu->addAction( action);
+
+         menu.addMenu( submenu);
+      }
+
       action = new QAction( "Delete Render", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
       if( selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
