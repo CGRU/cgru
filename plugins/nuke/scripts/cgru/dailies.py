@@ -57,18 +57,27 @@ def dailiesEvaluate( node):
       node.knob('lgfgrav').setValue( lgfgrav)
    # Logo slate file:
    lgspath = node.knob('lgspath').value()
-   if lgspath == None or lgspath == '' or not os.path.isfile( lgspath):
+   if lgspath != None and lgspath != '' and not os.path.isfile( lgspath):
       lgspath = os.getenv('CGRU_DAILIES_LGSPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
       lgspath = lgspath.replace('\\','/')
       node.knob('lgspath').setValue( lgspath)
    # Logo frame file:
    lgfpath = node.knob('lgfpath').value()
-   if lgfpath == None or lgfpath == '' or not os.path.isfile( lgfpath):
+   if lgfpath != None and lgfpath != '' and not os.path.isfile( lgfpath):
       lgfpath = os.getenv('CGRU_DAILIES_LGFPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
       lgfpath = lgfpath.replace('\\','/')
       node.knob('lgfpath').setValue( lgfpath)
 
    if newNode:
+
+      # Logo slate file:
+      lgspath = os.getenv('CGRU_DAILIES_LGSPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
+      lgspath = lgspath.replace('\\','/')
+      node.knob('lgspath').setValue( lgspath)
+      # Logo frame file:
+      lgfpath = os.getenv('CGRU_DAILIES_LGFPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
+      lgfpath = lgfpath.replace('\\','/')
+      node.knob('lgfpath').setValue( lgfpath)
 
       # Cacher:
       draw169 = node.knob('draw169').value()
