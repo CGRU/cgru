@@ -38,7 +38,7 @@ def pmOpenFromServer():
    scenename_client = scenename_server
    clientname = CLIENT_PATHS_SUFFIX
    clientname += '-' + socket.gethostname()
-   if scenename_client.find( SERVER_PATHS_SUFFIX):
+   if scenename_client.find( SERVER_PATHS_SUFFIX) != -1:
       scenename_client = scenename_client.replace( SERVER_PATHS_SUFFIX, clientname)
    else:
       scenename_client += '.' + clientname + '.nk'
