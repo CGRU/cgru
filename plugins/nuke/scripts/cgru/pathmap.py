@@ -19,12 +19,20 @@ def pmSaveToServer():
    scenename_server = scenename + '.' + SERVER_PATHS_SUFFIX + '.nk'
 
    # Map paths from client to server:
+   error_msg = ''
    if pm.initialized:
       pm.toServerFile( scenename, scenename_server, Verbose = True)
    else:
       print 'No paths map preset. Just copying scene to:'
       print scenename_server
-      shutil.copy( scenename, scenename_server)
+      try:
+         shutil.copy( scenename, scenename_server)
+      except:
+         error_msg = str(sys.exc_info()[1])
+         print 'File copied with error:'
+         print error_msg
+
+   if error_msg != '': nuke.message('Server scene copy error:\n' + error_msg)
 
 def pmOpenFromServer():
    print 'Opening scene with server paths...'
@@ -44,12 +52,24 @@ def pmOpenFromServer():
       scenename_client += '.' + clientname + '.nk'
 
    # Map paths from server to client:
+   error_msg = ''
    if pm.initialized:
       pm.toClientFile( scenename_server, scenename_client, Verbose = True)
    else:
       print 'No paths map preset. Just copying scene to:'
       print scenename_client
-      shutil.copy( scenename_server, scenename_client)
+      try:
+         shutil.copy( scenename_server, scenename_client)
+      except:
+         error_msg = str(sys.exc_info()[1])
+         print 'File copied with error:'
+         print error_msg
+         error_msg = '\n' + error_msg
+
+   # Check if new scene exists:
+   if not os.path.isfile(scenename_client):
+      nuke.message('Client scene was not created.' + error_msg)
+      return
 
    # Open client scene:
    nuke.scriptOpen( scenename_client)
