@@ -11,16 +11,15 @@ CmdText::CmdText()
    setCmd("txt");
    setArgsCount(1);
    setInfo("Print text in server stdout.");
-   setHelp("txt [text] Simple text message. For debug purposes.");
-   setMsgType( af::Msg::TDATA);
+   setHelp("txt [text] Simple string message. For debug purposes.");
+   setMsgType( af::Msg::TString);
 }
 
 CmdText::~CmdText(){}
 
 bool CmdText::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   std::string text = argv[0];
-   msg.setData( text.size()+1, text.data());
+   msg.setString( argv[0]);
    return true;
 }
 

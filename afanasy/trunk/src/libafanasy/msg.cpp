@@ -241,6 +241,8 @@ bool Msg::getString( std::string & str)
       return false;
    }
    rw_String( str, this);
+   // Reset written size to let to get string again.
+   resetWrittenSize();
    return true;
 }
 
@@ -252,6 +254,8 @@ bool Msg::getStringList( std::list<std::string> & stringlist)
       return false;
    }
    rw_StringList( stringlist, this);
+   // Reset written size to let to get strings again.
+   resetWrittenSize();
    return true;
 }
 
@@ -351,7 +355,7 @@ void Msg::stdOutData()
    {
    case Msg::TDATA:
    {
-      if( mdata[0] != '/') printf( "Text:\n%s\n", mdata);
+      if( mdata[0] != '/') printf( "%s\n", mdata);
       break;
    }
    case Msg::TTESTDATA:

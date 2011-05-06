@@ -86,7 +86,8 @@ Dialog::Dialog():
    infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
    vlayout_b->addWidget( infoline);
 
-   vlayout_b->addWidget( new LabelVersion(this));
+   labelversion = new LabelVersion(this);
+   vlayout_b->addWidget( labelversion);
 
    hlayout_b->addStretch();
    btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
@@ -307,7 +308,12 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    }
    case af::Msg::TString:
    {
-      new WndText( "Message", msg);
+      std::string str;
+      msg->getString( str);
+      if(( str.find("ALARM") == 0 ) || ( str.find("ACHTUNG") == 0 ))
+         labelversion->showMessage( str);
+      else
+         new WndText( "Message", msg);
       break;
    }
 /*

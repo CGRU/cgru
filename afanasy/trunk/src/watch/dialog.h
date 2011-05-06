@@ -19,6 +19,7 @@ class ButtonOut;
 class ButtonMonitor;
 class ListItems;
 class OfflineScreen;
+class LabelVersion;
 
 class QHBoxLayout;
 class QVBoxLayout;
@@ -85,6 +86,7 @@ private:
    ListItems * listitems;
    OfflineScreen * offlinescreen;
    InfoLine * infoline;
+   LabelVersion * labelversion;
 
    QHBoxLayout *hlayout_a;
    QVBoxLayout *vlayout_a;
