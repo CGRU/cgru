@@ -1,0 +1,27 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   <title>CGRU - AFANASY</title>
+   <link>http://cgru.sourceforge.net/</link>
+   <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
+   <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
+   <language>en-us</language>
+   <pubDate>Sat, 7 May 2011 00:00:00 GMT</pubDate>
+   <lastBuildDate>Sat, 7 May 2011 00:00:00 GMT</lastBuildDate>
+   <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
+   <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.4.4 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release144</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release144</guid>
+      <description>New features. Bug fixes.</description>
+      <pubDate>Sat, 7 May 2011 00:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.4.3 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release143</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release143</guid>
+      <description>Server memory leak fixed.</description>
+      <pubDate>Mon, 11 Apr 2011 00:00:00 GMT</pubDate>
+   </item>
+</channel>
+</rss>

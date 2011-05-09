@@ -7,7 +7,7 @@ if [ -d $cgru_python ]; then
 fi
 
 export DIRS_EXLUDE_FINDSUB="tmp;svn;doxygen;webvisor;trunk;branches;tags;icons/icons;imagemagick"
-export DIRS_INLUDE_FILEEXT=".html;.php;.css;.js;.jpg;.gif;.png"
+export DIRS_INLUDE_FILEEXT=".html;.php;.css;.js;.jpg;.gif;.png;.xml"
 
 export HEADER_MARKER="<!--HEADER-->"
 export FOOTER_MARKER="<!--FOOTER-->"
