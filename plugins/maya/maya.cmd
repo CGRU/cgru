@@ -1,5 +1,5 @@
 rem Set Maya version:
-set MAYA_VERSION=2011
+set MAYA_VERSION=2012
 rem Set Maya architecture:
 set MAYA_ARCH=-x64
 rem For 32bit Maya uncomment next line (or put it in "override.cmd" file)
