@@ -46,10 +46,11 @@ public:
 /// To set zero (\c Msg::TNone ) message to QStringList message. Return \c true on success.
    bool setStringList( const std::list<std::string> & stringlist);
 
-/// Get QString ( if message type is TQString ).
+/// Get String ( if message type is TString ).
    bool getString( std::string & string);
+   const std::string getString();
 
-/// Get QString ( if message type is TQStringList ).
+/// Get String ( if message type is TStringList ).
    bool getStringList( std::list<std::string> & stringlist);
 
 /**   IMPORTANT!

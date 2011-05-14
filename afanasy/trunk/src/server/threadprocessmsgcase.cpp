@@ -32,10 +32,19 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TNULL:
    case af::Msg::TDATA:
    case af::Msg::TTESTDATA:
-   case af::Msg::TString:
    case af::Msg::TStringList:
    {
       msg->stdOutData();
+      break;
+   }
+   case af::Msg::TString:
+   {
+      std::string str = msg->getString();
+      if( str.empty()) break;
+
+      AFCommon::QueueLog( str);
+      AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+      monitors->sendMessage( str);
       break;
    }
    case af::Msg::TStatRequest:

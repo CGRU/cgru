@@ -12,8 +12,7 @@ set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlsortfilter.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/dialog.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/fontwidget.h"
- "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/modelnodes.h"
- "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/numberwidget.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/labelversion.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listitems.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listjobs.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listmonitors.h"
@@ -22,6 +21,8 @@ set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listtalks.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listtasks.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/listusers.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/modelnodes.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/numberwidget.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/wndcustomizegui.h"
 )
 

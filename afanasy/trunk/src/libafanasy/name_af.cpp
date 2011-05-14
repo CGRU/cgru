@@ -424,7 +424,7 @@ const std::string af::pathHome()
 
 bool af::pathMakeDir( const std::string & path, bool verbose)
 {
-   AFINFA("af::pathMakeDir: path=\"%s\"", path.c_str());
+   AFINFA("af::pathMakeDir: path=\"%s\"", path.c_str())
    if( false == af::pathIsFolder( path))
    {
       if( verbose) std::cout << "Creating folder:\n" << path << std::endl;
@@ -434,7 +434,7 @@ bool af::pathMakeDir( const std::string & path, bool verbose)
       if( mkdir( path.c_str(), 0777) == -1)
 #endif
       {
-         AFERRPA("af::pathMakeDir - \"%s\"", path.c_str());
+         AFERRPA("af::pathMakeDir - \"%s\"", path.c_str())
          return false;
       }
 #ifndef WINNT

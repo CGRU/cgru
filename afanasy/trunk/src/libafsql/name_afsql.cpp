@@ -21,12 +21,12 @@ void afsql::init()
    DBAttr::init();
 }
 
-bool afsql::qChkErr( const QSqlQuery & q, const QString & str)
+bool afsql::qChkErr( const QSqlQuery & q, const std::string & str)
 {
-   if (q.isValid())
+   if( q.lastError().isValid())
    {
-      AFERRAR( "%s", str.toUtf8().data())
-      printf( " %s", q.lastError().databaseText().toUtf8().data());
+      AFERRAR("%s: Query check:", str.c_str())
+      printf("%s\n", q.lastError().databaseText().toUtf8().data());
       return true;
    }
    return false;
@@ -34,18 +34,26 @@ bool afsql::qChkErr( const QSqlQuery & q, const QString & str)
 
 QSqlDatabase * afsql::newDatabase( const std::string & connection_name)
 {
-#ifdef _DEBUG
-printf("Trying to create new DB connection to \"%s\" as \"%s\"\n", pENV->get_DB_Type().toUtf8().data(), connection_name.toUtf8().data());
-printf(" host=\"%s\"", pENV->get_DB_HostName().toUtf8().data());
-printf(", database=\"%s\"", pENV->get_DB_DataBaseName().toUtf8().data());
-printf(", user=\"%s\"", pENV->get_DB_UserName().toUtf8().data());
-printf(", passwd=\"%s\"", pENV->get_DB_Password().toUtf8().data());
-printf("\n");
+#ifdef AFOUTPUT
+printf("Trying to create new DB connection to \"%s\" as \"%s\"\n", af::Environment::get_DB_Type().c_str(), connection_name.c_str());
 #endif
    QSqlDatabase * db = new QSqlDatabase( QSqlDatabase::addDatabase( QString::fromUtf8( af::Environment::get_DB_Type().c_str()), QString::fromUtf8( connection_name.c_str())));
+   setDatabase( db);
+   return db;
+}
+
+void afsql::setDatabase( QSqlDatabase * db)
+{
+#ifdef AFOUTPUT
+printf("Trying to setup DB connection \"%s\"\n", db->connectionName().toUtf8().data());
+printf(" host=\"%s\"",        af::Environment::get_DB_HostName().c_str());
+printf(", database=\"%s\"",   af::Environment::get_DB_DataBaseName().c_str());
+printf(", user=\"%s\"",       af::Environment::get_DB_UserName().c_str());
+printf(", passwd=\"%s\"",     af::Environment::get_DB_Password().c_str());
+printf("\n");
+#endif
    db->setHostName(      QString::fromUtf8( af::Environment::get_DB_HostName().c_str()       ));
    db->setDatabaseName(  QString::fromUtf8( af::Environment::get_DB_DataBaseName().c_str()   ));
    db->setUserName(      QString::fromUtf8( af::Environment::get_DB_UserName().c_str()       ));
    db->setPassword(      QString::fromUtf8( af::Environment::get_DB_Password().c_str()       ));
-   return db;
 }

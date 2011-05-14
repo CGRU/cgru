@@ -1,8 +1,6 @@
 #pragma once
 
-#include <QtCore/QString>
-
-#include "afqueueitem.h"
+#include "afqueue.h"
 
 class FileData: public AfQueueItem
 {

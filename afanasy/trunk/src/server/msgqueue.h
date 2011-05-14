@@ -17,7 +17,7 @@ public:
    inline bool pushMsg( MsgAf* msg) { if(msg) msg->resetWrittenSize(); return push( msg);}
 
 protected:
-   void processItem( AfQueueItem* item) const;
+   void processItem( AfQueueItem* item);
 
 private:
    void send( const af::Msg * msg, const af::Address & address) const;

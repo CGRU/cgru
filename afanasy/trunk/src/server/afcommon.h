@@ -11,10 +11,12 @@
 #include "cleanupqueue.h"
 #include "logqueue.h"
 
+class Core;
+
 class AFCommon
 {
 public:
-   AFCommon();
+   AFCommon( Core * core);
    ~AFCommon();
 
    static void executeCmd( const std::string & cmd);             ///< Execute command.

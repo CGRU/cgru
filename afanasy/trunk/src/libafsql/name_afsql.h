@@ -11,9 +11,10 @@ namespace afsql
 
 /** Check whether QSqlQuery is valid, output error if invalid and return true.
 *** If QSqlQuery is correct function will return false and do nothing. **/
-   bool qChkErr( const QSqlQuery & q, const QString & str = QString("DB Text:"));
+   bool qChkErr( const QSqlQuery & q, const std::string & str = std::string("DB Query:"));
 
    QSqlDatabase * newDatabase( const std::string & connection_name);
+   void setDatabase( QSqlDatabase * db);
 
    class DBAttr;
    class DBAttrUInt8;

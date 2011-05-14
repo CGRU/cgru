@@ -68,6 +68,7 @@ namespace AFDATABASE
    const char STRINGQUOTES[] = "$$";
    const int  STRINGNAMELEN  = 512;       ///< Maximum name lenght (for job, user, render, block, task, service, parser etc...).
    const int  STRINGEXPRLEN  = 4096;      ///< Maximum lenght for expression (command, dependmask, hostsmask,view command etc...).
+   const int  RECONNECTAFTER = 60;        ///< If connection lost, try to reconnect every RECONNECTAFTER seconds.
 }
 
 /// Render options:

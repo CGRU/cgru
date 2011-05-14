@@ -245,6 +245,12 @@ bool Msg::getString( std::string & str)
    resetWrittenSize();
    return true;
 }
+const std::string Msg::getString()
+{
+   std::string str;
+   getString( str);
+   return str;
+}
 
 bool Msg::getStringList( std::list<std::string> & stringlist)
 {

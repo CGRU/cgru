@@ -78,6 +78,20 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       return 0;
    }
 
+   // Check database connection if it is working and if it is a new job:
+   if( afDB->isWorking() && ( job->fromDataBase() == false ))
+   {
+      afsql::DBConnection dbcheck("AFANASY_check");
+      if( false == dbcheck.isWorking())
+      {
+         std::string str("ALARM! Server database connection error. Contact your system administrator.");
+         AFCommon::QueueLog( str);
+         AfContainerLock mLock( monitoring, AfContainer::WRITELOCK);
+         monitoring->sendMessage( str);
+         return 0;
+      }
+   }
+
    UserAf *user;
 
    {  // Register new user if job has a new user name.

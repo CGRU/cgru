@@ -23,38 +23,37 @@ DBTaskUpdateData::DBTaskUpdateData( int JobId, int BlockNum, int TaskNum, const 
    starts_count(  Progress->starts_count  ),
    errors_count(  Progress->errors_count  )
 {
+AFINFA("DBTaskUpdateData::DBTaskUpdateData: %d[%d][%d]", jobid, blocknum, tasknum)
 }
 
 DBTaskUpdateData::~DBTaskUpdateData(){}
 
-DBUpdateTaskQueue::DBUpdateTaskQueue( const std::string & QueueName):
-   AfQueue( QueueName)
+DBUpdateTaskQueue::DBUpdateTaskQueue( const std::string & QueueName, MonitorContainer * monitorcontainer):
+   DBActionQueue( QueueName, monitorcontainer),
+   query( NULL)
 {
-   db = afsql::newDatabase( QueueName.c_str());
-   db->open();
-   query = new QSqlQuery( *db);
-   query->prepare( afsql::DBTaskProgress::dbPrepareUpdate);
+   if( isWorking()) connectionEstablished();
 }
 
 DBUpdateTaskQueue::~DBUpdateTaskQueue()
 {
    delete query;
-   db->close();
-   delete db;
 }
 
-void DBUpdateTaskQueue::quit()
+void DBUpdateTaskQueue::connectionEstablished()
 {
-   db->close();
-   AfQueue::quit();
+AFINFA("DBUpdateTaskQueue::connectionEstablished: %s", name.c_str())
+
+   if( query ) delete query;
+   query = new QSqlQuery( *db);
+   query->prepare( afsql::DBTaskProgress::dbPrepareUpdate);
 }
 
-void DBUpdateTaskQueue::processItem( AfQueueItem* item) const
+bool DBUpdateTaskQueue::writeItem( AfQueueItem* item)
 {
-//printf("DBUpdateTaskQueue::processItem:\n");
-   if( false == db->isOpen()) return;
-
    DBTaskUpdateData * taskUp = (DBTaskUpdateData*)item;
+
+AFINFA("DBUpdateTaskQueue::writeItem: %d[%d][%d]", taskUp->jobid, taskUp->blocknum, taskUp->tasknum)
 
    afsql::DBTaskProgress::dbBindUpdate
    (
@@ -69,6 +68,8 @@ void DBUpdateTaskQueue::processItem( AfQueueItem* item) const
       taskUp->tasknum
    );
 
+   if( false == db->isOpen()) return false;
    query->exec();
-   afsql::qChkErr( *query," UPDATE ...tasks:\n");
+   if( afsql::qChkErr( *query, name)) return false;
+   return true;
 }

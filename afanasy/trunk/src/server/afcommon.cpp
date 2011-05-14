@@ -9,6 +9,8 @@
 
 #include "../libafanasy/environment.h"
 
+#include "core.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -20,14 +22,14 @@ DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
 CleanUpQueue      * AFCommon::CleanUpJobQueue   = NULL;
 LogQueue          * AFCommon::OutputLogQueue    = NULL;
 
-AFCommon::AFCommon()
+AFCommon::AFCommon( Core * core)
 {
-   MsgDispatchQueue = new MsgQueue(          "Sheduled sending messages queue.");
-   FileWriteQueue   = new FileQueue(         "Sheduled writing files queue.");
-   CleanUpJobQueue  = new CleanUpQueue(      "Sheduled jobs cleanup queue.");
-   OutputLogQueue   = new LogQueue(          "Sheduled log output quere.");
-   DBUpTaskQueue    = new DBUpdateTaskQueue( "Sheduled database update task queue.");
-   DBUpdateQueue    = new DBActionQueue(     "Sheduled database update queue.");
+   MsgDispatchQueue = new MsgQueue(          "Sending Messages");
+   FileWriteQueue   = new FileQueue(         "Writing Files");
+   CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
+   OutputLogQueue   = new LogQueue(          "Log Output");
+   DBUpTaskQueue    = new DBUpdateTaskQueue( "AFDB_update_task",   core->getMonitors());
+   DBUpdateQueue    = new DBActionQueue(     "AFDB_update",        core->getMonitors());
 }
 
 AFCommon::~AFCommon()
@@ -117,6 +119,6 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
    }
    close( fd);
    chmod( filename.c_str(), 0777);
-   AFINFA("AFCommon::writeFile - \"%s\"\n", filename.toUtf8().data());
+   AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
    return true;
 }

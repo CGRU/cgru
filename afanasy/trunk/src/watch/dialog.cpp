@@ -1,10 +1,10 @@
 #include "dialog.h"
 
-#include <QtGui/QBoxLayout>
 #include <QtCore/QEvent>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QContextMenuEvent>
 #include <QtGui/QMenu>
 #include <QtGui/QScrollArea>
-#include <QtGui/QContextMenuEvent>
 
 #include "../include/afanasy.h"
 
@@ -50,7 +50,7 @@ Dialog::Dialog():
 {
    if( qServer.isInitialized() == false )
    {
-      AFERROR("Dialog::Dialog: Server initialization failed.\n");
+      AFERROR("Dialog::Dialog: Server initialization failed.")
       return;
    }
 
@@ -125,7 +125,7 @@ void Dialog::closeEvent( QCloseEvent * event) { afqt::QEnvironment::setRect( "Ma
 
 Dialog::~Dialog()
 {
-AFINFO("Dialog::~Dialog:\n");
+   AFINFO("Dialog::~Dialog:")
    Watch::destroy();
    qThreadSend.send( new afqt::QMsg( af::Msg::TMonitorDeregister, monitor->getId()));
    delete monitor;
@@ -233,7 +233,7 @@ void Dialog::newMessage( af::Msg *msg)
 {
    if( msg == NULL)
    {
-      AFERROR("Dialog::caseMessage: msg == NULL\n");
+      AFERROR("Dialog::caseMessage: msg == NULL")
       return;
    }
 #ifdef AFOUTPUT
@@ -310,7 +310,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    {
       std::string str;
       msg->getString( str);
-      if(( str.find("ALARM") == 0 ) || ( str.find("ACHTUNG") == 0 ))
+      if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
          labelversion->showMessage( str);
       else
          new WndText( "Message", msg);
@@ -328,9 +328,9 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    default:
       Watch::caseMessage( msg);
    }
-AFINFO("Dialog::newMessage: Reaction finished deleting message.\n");
+   AFINFO("Dialog::newMessage: Reaction finished deleting message.")
    delete msg;
-AFINFO("Dialog::newMessage: Message successfully deleted.\n");
+   AFINFO("Dialog::newMessage: Message successfully deleted.")
 }
 
 void Dialog::closeList()
@@ -342,11 +342,11 @@ void Dialog::closeList()
 
 bool Dialog::openMonitor( int type, bool open)
 {
-AFINFA("Dialog::openMonitor: %s[%d]\n", Watch::WndName[type].toUtf8().data(), open);
+   AFINFA("Dialog::openMonitor: %s[%d]", Watch::WndName[type].toUtf8().data(), open)
 
    if( open && (type == Watch::WJobs))
    {
-      AFERROR("Dialog::openMonitor: Jobs monitor can't be opened is separate window.\n");
+      AFERROR("Dialog::openMonitor: Jobs monitor can't be opened is separate window.")
       return false;
    }
 
@@ -405,7 +405,7 @@ AFINFA("Dialog::openMonitor: %s[%d]\n", Watch::WndName[type].toUtf8().data(), op
       break;
    }
    default:
-      AFERRAR("Dialog::changeMonitor: unknown type = %d.\n", type);
+      AFERRAR("Dialog::changeMonitor: unknown type = %d", type)
       if( false == open ) monitorType = Watch::WNONE;
       return false;
    }

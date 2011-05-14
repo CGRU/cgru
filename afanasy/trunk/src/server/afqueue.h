@@ -12,7 +12,17 @@
 
 #include <QtCore/QString>
 
-class AfQueueItem;
+/// Queue item
+class AfQueueItem
+{
+public:
+/// Constructor.
+   AfQueueItem();
+   virtual ~AfQueueItem();
+   friend class AfQueue;
+private:
+   mutable AfQueueItem * next_ptr;  ///< Next item pointer.
+};
 
 /// Simple FIFO items queue, with pthread mutex and semaphore counter for \c push() and \c pop() operations.
 class AfQueue
@@ -34,13 +44,14 @@ protected:
 /// Return first item from queue. BLOCKING FUNCTION if \c block==true .
    AfQueueItem* pop( bool block = true);
 
-   bool push( AfQueueItem* item);   ///< Push items to queue back.
+   bool push( AfQueueItem* item, bool front = false);   ///< Push items to queue back.
 
-   virtual void processItem( AfQueueItem* item) const;
+   /// Called from run thead to process item just poped from queue
+   virtual void processItem( AfQueueItem* item) = 0;
 
-private:
    std::string name;
 
+private:
 #ifdef MACOSX
    QMutex      q_mutex;      ///< Mutex for \c push() and \c pop() operations.
    QSemaphore  q_semaphore;  ///< Messages count semaphore

@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include "afcommon.h"
 #include "msgaf.h"
 #include "sysjob.h"
 
@@ -29,11 +30,11 @@ Core::Core():
    renders(       NULL ),
    jobs(          NULL ),
    users(         NULL ),
-   afDB_JobRegister( "AFANASY_JobRegister"),
-   init(false)
+   afDB_JobRegister( "AFDB_JobRegister"),
+   initialized( false)
 {
    core = this;
-   AFINFO("Core::Core:\n");
+   AFINFO("Core::Core:")
 
    // containers initialization
    jobs = new JobContainer();
@@ -163,7 +164,7 @@ Core::Core():
       jobs->job_register( job, users, NULL);
    }
 
-   init = true;
+   initialized = true;
 }
 
 Core::~Core()

@@ -11,15 +11,15 @@ CmdText::CmdText()
    setCmd("txt");
    setArgsCount(1);
    setInfo("Print text in server stdout.");
-   setHelp("txt [text] Simple string message. For debug purposes.");
-   setMsgType( af::Msg::TString);
+   setHelp("txt [text] Simple text message. For debug purposes.");
+   setMsgType( af::Msg::TDATA);
 }
 
 CmdText::~CmdText(){}
 
 bool CmdText::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   msg.setString( argv[0]);
+   msg.setData( strlen(argv[0]), argv[0]);
    return true;
 }
 

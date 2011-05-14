@@ -1,12 +1,6 @@
 #pragma once
 
-#include <QtSql/QSqlQuery>
-#include <QtSql/QSqlDatabase>
-
-#include "../libafanasy/name_af.h"
-
-#include "afqueue.h"
-#include "afqueueitem.h"
+#include "dbactionqueue.h"
 
 class DBTaskUpdateData: public AfQueueItem
 {
@@ -28,21 +22,22 @@ public:
 };
 
 /// Simple FIFO update tast in database queue
-class DBUpdateTaskQueue : public AfQueue
+class DBUpdateTaskQueue : public DBActionQueue
 {
 public:
-   DBUpdateTaskQueue( const std::string & QueueName);
+   DBUpdateTaskQueue( const std::string & QueueName, MonitorContainer * monitorcontainer);
    virtual ~DBUpdateTaskQueue();
 
 /// Push task update data to queue back.
    inline bool pushTaskUp(  int JobId, int BlockNum, int TaskNum, const af::TaskProgress * Progress)
-      { if(db->isOpen()) return push( new DBTaskUpdateData( JobId, BlockNum, TaskNum, Progress)); else return false;}
-
-   void quit();
+      { if(isWorking()) return push( new DBTaskUpdateData( JobId, BlockNum, TaskNum, Progress)); else return false;}
 
 protected:
-   void processItem( AfQueueItem* item) const;
+   /// Called when database connection opened (or reopened)
+   virtual void connectionEstablished();
 
-   QSqlDatabase * db;
+   /// Queries execution function
+   virtual bool writeItem( AfQueueItem* item);
+
    QSqlQuery * query;
 };

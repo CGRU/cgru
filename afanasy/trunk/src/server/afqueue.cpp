@@ -2,13 +2,14 @@
 
 #include <stdio.h>
 
-#include "afqueueitem.h"
-
 extern bool running;
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+
+AfQueueItem::AfQueueItem(): next_ptr( NULL) {}
+AfQueueItem::~AfQueueItem() {}
 
 AfQueue::AfQueue( const std::string & QueueName):
    name( QueueName),
@@ -21,12 +22,12 @@ AfQueue::AfQueue( const std::string & QueueName):
 #ifndef MACOSX
    if( pthread_mutex_init( &mutex, NULL) != 0)
    {
-      AFERRPE("AfQueue::AfQueue(): pthread_mutex_init:");
+      AFERRPE("AfQueue::AfQueue(): pthread_mutex_init:")
       return;
    }
    if( sem_init( &semcount, 0, 0) != 0)
    {
-      AFERRPE("AfQueue::AfQueue(): sem_init:");
+      AFERRPE("AfQueue::AfQueue(): sem_init:")
       return;
    }
 #endif
@@ -35,7 +36,7 @@ AfQueue::AfQueue( const std::string & QueueName):
 
 AfQueue::~AfQueue()
 {
-AFINFO("AfQueue::~AfQueue():\n");
+   AFINFA("AfQueue::~AfQueue(): %s", name.c_str())
    while( firstPtr != NULL)
    {
       AfQueueItem* item = firstPtr;
@@ -48,7 +49,7 @@ void AfQueue::lock()
 {
    if( locked )
    {
-      AFERRAR("AfQueue::lock: '%s' already locked.\n", name.c_str());
+      AFERRAR("AfQueue::lock: '%s' already locked.", name.c_str())
       return;
    }
 #ifdef MACOSX
@@ -63,7 +64,7 @@ void AfQueue::unlock()
 {
    if( false == locked )
    {
-      AFERRAR("AfQueue::lock: '%s' not locked.\n", name.c_str());
+      AFERRAR("AfQueue::lock: '%s' not locked.", name.c_str())
       return;
    }
 #ifdef MACOSX
@@ -74,7 +75,7 @@ void AfQueue::unlock()
    locked = false;
 }
 
-bool AfQueue::push( AfQueueItem* item)
+bool AfQueue::push( AfQueueItem* item, bool front)
 {
    if( item == NULL)
    {
@@ -86,6 +87,7 @@ bool AfQueue::push( AfQueueItem* item)
       return false;
    }
    item->next_ptr = NULL;
+
 //BEGIN mutex
 #ifdef MACOSX
    if( false == locked ) q_mutex.lock();
@@ -93,9 +95,18 @@ bool AfQueue::push( AfQueueItem* item)
    if( false == locked ) pthread_mutex_lock( &mutex);
 #endif
    {
-      if( count == 0) firstPtr = item;
-      else lastPtr->next_ptr = item;
-      lastPtr = item;
+      if( front)
+      {
+         item->next_ptr = firstPtr;
+         if( count == 0) lastPtr = item;
+         firstPtr = item;
+      }
+      else
+      {
+         if( count == 0) firstPtr = item;
+         else lastPtr->next_ptr = item;
+         lastPtr = item;
+      }
       count++;
    }
 #ifdef MACOSX
@@ -104,12 +115,13 @@ bool AfQueue::push( AfQueueItem* item)
 #else
    if( sem_post( &semcount) != 0)
    {
-      AFERRPE("AfQueue::push: sem_post:");
+      AFERRPE("AfQueue::push: sem_post:")
    }
    if( false == locked ) pthread_mutex_unlock( &mutex);
 #endif
 //END mutex
-AFINFA("Msg* AfQueue::push: item=%p, count=%d\n", item, count);
+
+   AFINFA("Msg* AfQueue::push: item=%p, count=%d", item, count)
    return true;
 }
 
@@ -146,7 +158,8 @@ AfQueueItem* AfQueue::pop( bool block)
    pthread_mutex_unlock( &mutex);
 #endif
 //END mutex
-AFINFA("Msg* AfQueue::pop: item=%p, count=%d\n", item, count);
+
+   AFINFA("Msg* AfQueue::pop: item=%p, count=%d", item, count)
    return item;
 }
 
@@ -162,19 +175,19 @@ while( running)
    }
    if( item == NULL) continue;
 
+   // If item not needed any more it must be deleted in this virtual function:
    processItem( item);
-
-   delete item;
 }
-AFINFO("AfQueue::run: finished.\n");
+AFINFO("AfQueue::run: finished.")
 }
 
 void AfQueue::quit()
 {
    push( NULL);
 }
-
-void AfQueue::processItem( AfQueueItem* item) const
+/*
+void AfQueue::processItem( AfQueueItem* item)
 {
-   AFERRAR("AfQueue::processItem: \"%s\" - Invalid call\n", name.c_str());
+   AFERRAR("AfQueue::processItem: \"%s\" - Invalid call", name.c_str())
 }
+*/

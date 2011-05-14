@@ -37,7 +37,7 @@ void DBItem::dbDropTable( QSqlDatabase * db) const
       QString str = QString("DROP TABLE %1;").arg( dbGetTableName());
       AFINFA("DBItem::dbDropTable: executing query:\n%s", str.toUtf8().data())
       q.exec( str);
-      qChkErr(q, QString("DBItem::dbDropTable %1:\n").arg( dbGetTableName()));
+      qChkErr(q, std::string("DBItem::dbDropTable:") + dbGetTableName().toUtf8().data());
    }
    else
    {
@@ -73,7 +73,7 @@ void DBItem::dbCreateTable( QSqlDatabase * db) const
    QSqlQuery q( *db);
    AFINFA("DBItem::dbCreateTable: executing query:\n%s", str.toUtf8().data())
    q.exec( str);
-   qChkErr(q, QString("DBItem::dbCreateTable %1:\n").arg( dbGetTableName()));
+   qChkErr(q, std::string("DBItem::dbCreateTable:") + dbGetTableName().toUtf8().data());
 }
 
 void DBItem::dbInsert( QStringList  * queries) const

@@ -1,9 +1,6 @@
 #pragma once
 
-#include <QtCore/QString>
-
 #include "afqueue.h"
-#include "afqueueitem.h"
 
 class LogData: public AfQueueItem
 {
@@ -32,5 +29,5 @@ public:
    inline bool pushLog( const std::string & log, int flags) { return push( new LogData(log, flags));}
 
 protected:
-   void processItem( AfQueueItem* item) const;
+   void processItem( AfQueueItem* item);
 };

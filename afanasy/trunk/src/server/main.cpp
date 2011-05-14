@@ -194,7 +194,7 @@ void* ThreadServer_accept(void* arg)
    int server_sd = socket( protocol, SOCK_STREAM, 0);
    if( server_sd == -1)
    {
-      AFERRPE("socket");
+      AFERRPE("socket")
       return NULL;
    }
 //
@@ -286,7 +286,6 @@ int main(int argc, char *argv[])
    af::Environment ENV( af::Environment::NoFlags, argc, argv);
    if( af::init( af::InitFarm) == false) return 1;
    afsql::init();
-   AFCommon afcommon;
 
    // create directories if it is not exists
    if( af::pathMakeDir( ENV.getTempDirectory(),  true) == false) return 1;
@@ -326,12 +325,14 @@ int main(int argc, char *argv[])
       AFERROR("afanasy::main: can't allocate memory for core.")
       return 1;
    }
-   if(!core->getInit())                           // check initializing success
+   if(!core->isInitialized())                      // check initialization success
    {
       AFERROR("afanasy::main: core init failed.")
       delete core;
       return 1;
    }
+   AFCommon afcommon( core);
+
 //
 // spawn child threads
    // child threads ids

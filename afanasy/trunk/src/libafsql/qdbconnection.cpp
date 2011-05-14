@@ -2,7 +2,6 @@
 
 #include <stdio.h>
 
-#include <QtCore/QVariant>
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -24,9 +23,10 @@
 using namespace afsql;
 
 DBConnection::DBConnection( const std::string & connection_name):
+   name( connection_name),
    working( false)
 {
-   db = newDatabase( connection_name);
+   db = newDatabase( name);
 
 #ifndef MACOSX
    if( pthread_mutex_init( &mutex, NULL) != 0)
@@ -51,14 +51,13 @@ DBConnection::~DBConnection()
 #endif
 
    delete db;
+   QSqlDatabase::removeDatabase( name.c_str());
 }
 
 bool DBConnection::DBOpen()
 {
    if( working == false ) return false;
-#ifdef _DEBUG
-printf("Trying to lock DB...\n");
-#endif
+   AFINFO("Trying to lock DB...")
 
 #ifdef MACOSX
    q_mutex.lock();
@@ -70,21 +69,23 @@ printf("Trying to lock DB...\n");
    }
 #endif
 
-#ifdef _DEBUG
-printf(" - Done\n");
-#endif
+   AFINFO(" - Done")
+
    if( db->isOpen())
    {
       AFERROR("DBConnection::DBOpen: database is already open:")
+
 #ifdef MACOSX
    q_mutex.unlock();
 #else
       if( pthread_mutex_unlock( &mutex) != 0)
          AFERRPE("DBConnection::DBOpen: pthread_mutex_unlock:");
 #endif
+
       return false;
    }
 
+   afsql::setDatabase( db);
    if( db->open() == false )
    {
       AFERROR("DBConnection::DBOpen: UNABLE TO OPEN DATABASE:")
@@ -113,9 +114,7 @@ void DBConnection::DBClose()
       AFERRPE("DBConnection::close: pthread_mutex_unlock:");
 #endif
 
-#ifdef _DEBUG
-printf("DB Unlocked.");
-#endif
+   AFINFO("DB Unlocked.")
 }
 
 void DBConnection::ResetUsers()

@@ -6,9 +6,11 @@
 #include "../libafanasy/environment.h"
 #include "../libafqt/qenvironment.h"
 
+#include "watch.h"
+
 LabelVersion::LabelVersion( QWidget *parent):
    QWidget( parent),
-   alarm( false)
+   status( SS_None)
 {
    setMinimumHeight(16);
    setMaximumHeight(16);
@@ -34,6 +36,9 @@ LabelVersion::LabelVersion( QWidget *parent):
    font.setPointSize( 8);
    font.setBold( true);
    setToolTip( tooltip);
+
+   connect( &timer, SIGNAL( timeout()), this, SLOT( refreshMessage() ));
+   timer.setInterval( 32);
 }
 
 LabelVersion::~LabelVersion()
@@ -44,12 +49,40 @@ void LabelVersion::paintEvent( QPaintEvent * event)
 {
    QPainter p( this);
 
-   if( alarm)
+   if( status != SS_None)
    {
-      p.fillRect( rect(), afqt::QEnvironment::clr_error.c);
+      if( status == SS_Info )
+         p.fillRect( rect(), afqt::QEnvironment::clr_Window.c);
+      else
+         p.fillRect( rect(), afqt::QEnvironment::clr_error.c);
       p.setPen( afqt::QEnvironment::qclr_black);
       p.setFont( font);
-      p.drawText( rect(), Qt::AlignCenter, message);
+
+      static int offset = 0;
+      static const int add_offset = 50;
+      static int msg_width = 0;
+      QRect border( 0, 0, 0, 0);
+      offset = phase * 2;
+      if( msg_width != 0)
+         offset = offset % (msg_width + add_offset);
+      int offset_cur = -offset;
+      int counter = 0;
+//printf("\noffset=%d width=%d\n", offset, rect().width());
+      while( offset_cur <= rect().width())
+      {
+         p.drawText( rect().x() + offset_cur,
+                     rect().y(),
+                     rect().width() - border.x(),
+                     rect().height(),
+                     Qt::AlignVCenter | Qt::AlignLeft,
+                     message,
+                     &border);
+         msg_width = border.width();
+//printf("offset_cur=%d border.x=%d border.w=%d\n", offset_cur, border.x(), border.width());
+         offset_cur += border.width() + add_offset;
+         counter ++;
+         if( counter > 20 ) break;
+      }
       return;
    }
 
@@ -68,17 +101,43 @@ void LabelVersion::paintEvent( QPaintEvent * event)
 
 void LabelVersion::showMessage( const std::string & str)
 {
+   std::cout << str << std::endl;
+   if(( status != SS_None ) && ( message == afqt::stoq(str) )) return;
+   phase = 0;
    message = afqt::stoq( str);
-   alarm = true;
+   status = getStringStatus( str);
+   if( status == SS_None ) return;
    setToolTip( message);
-   printf("%s\n", message.toUtf8().data());
+   repaint();
+   timer.start();
+}
+
+void LabelVersion::refreshMessage()
+{
+   if( false == alarm )
+   {
+      timer.stop();
+      return;
+   }
+   phase++;
    repaint();
 }
 
-void LabelVersion::mousePressEvent( QMouseEvent * event)
+void LabelVersion::resetMessage()
 {
-printf("%s\n", message.toUtf8().data());
+   timer.stop();
    setToolTip( tooltip);
-   alarm = false;
+   status = SS_None;
    repaint();
+   Watch::displayInfo( message);
+}
+
+void LabelVersion::mousePressEvent( QMouseEvent * event) { resetMessage();}
+
+int LabelVersion::getStringStatus( const std::string & str)
+{
+   if( str.find("AFANASY") == 0 ) return SS_Info;
+   if( str.find("ALARM")   == 0 ) return SS_Alarm;
+   if( str.find("ACHTUNG") == 0 ) return SS_Alarm;
+   return SS_None;
 }

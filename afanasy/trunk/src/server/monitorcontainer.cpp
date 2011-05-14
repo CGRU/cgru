@@ -321,6 +321,19 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
    else delete msg;
 }
 
+void MonitorContainer::sendMessage( const std::string & str)
+{
+   MsgAf * msg = new MsgAf;
+   msg->setString( str);
+   MonitorContainerIt mIt( this);
+
+   for( MonitorAf * monitor = mIt.monitor(); monitor != NULL; mIt.next(), monitor = mIt.monitor())
+      msg->addAddress( monitor);
+   if( msg->addressesCount() )
+      msg->dispatch();
+   else delete msg;
+}
+
 void MonitorContainer::addTask( int jobid, int block, int task, af::TaskProgress * tp)
 {
    af::MCTasksProgress * t = NULL;

@@ -4,7 +4,7 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/client.h"
 
-#include "afqueueitem.h"
+#include "afqueue.h"
 
 class MsgQueue;
 
@@ -25,6 +25,8 @@ public:
    ~MsgAf();
 
    inline bool addressIsEmpty() const { return address.isEmpty();}
+
+   inline const size_t addressesCount() const { return addresses.size();}
 
 /// Set message address to \c client .
    inline void setAddress( const af::Client* client)

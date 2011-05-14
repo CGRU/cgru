@@ -15,10 +15,10 @@ FileQueue::~FileQueue()
 {
 }
 
-void FileQueue::processItem( AfQueueItem* item) const
+void FileQueue::processItem( AfQueueItem* item)
 {
    FileData * filedata = (FileData*)item;
-   AFINFA("FileQueue::processItem: \"%s\"\n", filedata->getFileName().toUtf8().data());
+   AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().toUtf8().data())
    int rotate = filedata->getRotate();
    std::string filename( filedata->getFileName());
    if( rotate > 0)
@@ -38,6 +38,7 @@ printf("FileQueue::processItem: rotating \"%s\" %d times:\n", filename.c_str(), 
       filename = filename + "." + af::time2str( time(NULL), "%y%m%d_%H%M%S");
    }
    AFCommon::writeFile( filedata->getData(), filedata->getLength(), filename);
+   delete filedata;
 }
 
 void FileQueue::renameNext( const std::string & filename, int number, int maxnumber) const

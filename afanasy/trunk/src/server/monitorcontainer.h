@@ -20,6 +20,8 @@ public:
 
    void sendMessage( const af::MCGeneral & mcgeneral);
 
+   void sendMessage( const std::string & str);
+
    bool setInterest( int type, af::MCGeneral & ids);
 
    void addEvent( int type, int id);

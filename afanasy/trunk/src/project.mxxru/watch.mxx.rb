@@ -20,8 +20,7 @@ Mxx_ru::Cpp::exe_target {
    qt.h2moc "../watch/ctrlsortfilter.h"
    qt.h2moc "../watch/dialog.h"
    qt.h2moc "../watch/fontwidget.h"
-   qt.h2moc "../watch/modelnodes.h"
-   qt.h2moc "../watch/numberwidget.h"
+   qt.h2moc "../watch/labelversion.h"
    qt.h2moc "../watch/listitems.h"
    qt.h2moc "../watch/listjobs.h"
    qt.h2moc "../watch/listmonitors.h"
@@ -30,6 +29,8 @@ Mxx_ru::Cpp::exe_target {
    qt.h2moc "../watch/listtalks.h"
    qt.h2moc "../watch/listtasks.h"
    qt.h2moc "../watch/listusers.h"
+   qt.h2moc "../watch/modelnodes.h"
+   qt.h2moc "../watch/numberwidget.h"
    qt.h2moc "../watch/wndcustomizegui.h"
 
    case toolset.tag("target_os")

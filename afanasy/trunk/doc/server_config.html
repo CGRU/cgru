@@ -202,7 +202,19 @@ Names length limit. It is a name of job, block, task, user, host e.t.c.
 Expressions length limit. It is an expression of hosts mask, depend mask and command, working directory.
 </p></li>
 </ul>
+<p>
 You can check database connection by <kbd>afcmd db_check</kbd> command.
+</p>
+<p>
+When server loose connection with database it tries to reconnect.
+Each reconnect try it refresh connection settings from configuration, so you can reconfigure database connection settings "on-the-fly".
+When server loose connection it stops to execute queries queue, so they will not be lost but they store in memory.
+To prevent RAM usage growth server will no accept any new jobs until successful reconnect.
+</p>
+<p>
+If server fails to connect to database for the first time on start, it will ignore database at all.
+It will work normally but will loose all data on restart.
+</p>
 
 <!--FOOTER-->
 </td></tr></table>

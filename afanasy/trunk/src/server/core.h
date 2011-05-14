@@ -18,11 +18,12 @@ public:
    Core();
    ~Core();
 
-   inline bool getInit() {return init;}
+   inline bool isInitialized() {return initialized;}
 
    ThreadRun *threadRun;
    ThreadReadMsg *threadReadMsg;
 
+   friend class AFCommon;
    friend class ThreadPointers;
 
 private:
@@ -44,5 +45,5 @@ private:
    UserContainer    *users;
 
    afsql::DBConnection afDB_JobRegister;
-   bool init;
+   bool initialized;
 };

@@ -14,7 +14,7 @@ public:
    inline bool pushFile( FileData* filedata) { return push( filedata);}
 
 protected:
-   void processItem( AfQueueItem* item) const;
+   void processItem( AfQueueItem* item);
 
 private:
    void renameNext( const std::string & filename, int number, int maxnumber) const;

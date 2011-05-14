@@ -43,6 +43,7 @@ public:
    void DBClose();
 
 private:
+   std::string name;
    bool working;
 
 #ifdef MACOSX

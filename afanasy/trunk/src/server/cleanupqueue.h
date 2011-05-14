@@ -1,7 +1,6 @@
 #pragma once
 
 #include "afqueue.h"
-#include "afqueueitem.h"
 
 class JobAf;
 
@@ -24,5 +23,5 @@ public:
    inline bool pushJob( const JobAf * job) { return push( new CleanUpData(job));}
 
 protected:
-   void processItem( AfQueueItem* item) const;
+   void processItem( AfQueueItem* item);
 };

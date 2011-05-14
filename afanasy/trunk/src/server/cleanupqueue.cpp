@@ -56,8 +56,9 @@ CleanUpQueue::CleanUpQueue( const std::string & QueueName):  AfQueue( QueueName)
 
 CleanUpQueue::~CleanUpQueue() {}
 
-void CleanUpQueue::processItem( AfQueueItem* item) const
+void CleanUpQueue::processItem( AfQueueItem* item)
 {
    CleanUpData * data = (CleanUpData*)item;
    data->doCleanUp();
+   delete data;
 }

@@ -8,7 +8,8 @@
 #include "../libafsql/name_afsql.h"
 
 #include "afqueue.h"
-#include "afqueueitem.h"
+
+class MonitorContainer;
 
 class Queries: public QStringList, public AfQueueItem {};
 
@@ -16,8 +17,10 @@ class Queries: public QStringList, public AfQueueItem {};
 class DBActionQueue : public AfQueue
 {
 public:
-   DBActionQueue( const std::string & QueueName);
+   DBActionQueue( const std::string & QueueName, MonitorContainer * monitorcontainer);
    virtual ~DBActionQueue();
+
+   inline bool isWorking() const { return working;}
 
    void addItem(    const afsql::DBItem * item);
    void delItem(    const afsql::DBItem * item);
@@ -26,10 +29,26 @@ public:
    void quit();
 
 /// Push queries to queue back.
-   inline bool pushQueries( Queries * queries) { if(db->isOpen()) return push( queries); else return false;}
+   inline bool pushQueries( Queries * queries) { if( working ) return push( queries); else return false;}
 
 protected:
-   void processItem( AfQueueItem* item) const;
+
+   /// Called from run thead to process item just poped from queue
+   virtual void processItem( AfQueueItem* item);
+
+   /// Called when database connection opened (or reopened)
+   virtual void connectionEstablished();
+
+   /// Queries execution function
+   virtual bool writeItem(   AfQueueItem* item);
 
    QSqlDatabase * db;
+
+private:
+   void sendAlarm();
+   void sendConnected();
+
+private:
+   MonitorContainer * monitors;
+   bool working;
 };
