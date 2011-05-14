@@ -114,7 +114,7 @@ void LabelVersion::showMessage( const std::string & str)
 
 void LabelVersion::refreshMessage()
 {
-   if( false == alarm )
+   if( status == SS_None )
    {
       timer.stop();
       return;
