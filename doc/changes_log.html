@@ -75,13 +75,15 @@ You can use this command to perform it:<br/>
 
 <br/>
 
-<p>
-<a name="release145"/>
-<b>1.4.5</b> 2011.05.13 <i>(rev1571 af1571)</i>
-</p>
+<p><a id="release145">
+<b>1.4.5</b></a> 2011.05.13 <i>(rev1573 af1572)</i></p>
+
 <p>
 Server tries to reconnect to database when connection failed.
 <a href="../afanasy/doc/server_config.html#ConfDatabase">Database configuration documentation.</a>
+</p>
+<p>
+Web visor statistics favorite user and favorite service column.
 </p>
 <p>
 Bugs Fixed:
@@ -92,10 +94,9 @@ Bugs Fixed:
 
 <br/>
 
-<p>
-<a name="release144"/>
-<b>1.4.4</b> 2011.05.07 <i>(rev1566 af1565)</i>
-</p>
+<p><a id="release144">
+<b>1.4.4</b></a> 2011.05.07 <i>(rev1566 af1565)</i></p>
+
 <p>
 <a href="../afanasy/doc/wakeonlan.html">Wake-On-LAN</a>
 </p>
@@ -139,13 +140,9 @@ Fixed ffmpeg presets end-of-line for UNIX. On Linux they cause an error with Win
 
 <br/>
 
-<p>
-<a name="release143"/>
-<b>1.4.3</b> 2011.04.11 <i>(rev1502 af1502)</i>
-</p>
-<p>
+<p><a id="release143">
+<b>1.4.3</b></a> 2011.04.11 <i>(rev1502 af1502)</i></p>
 
-</p>
 <p>
 Bugs Fixed:
 </p>
@@ -156,10 +153,9 @@ Watch listen just one task bug fixed.<br/>
 
 <br/>
 
-<p>
-<a name="release142"/>
-<b>1.4.2</b> 2011.04.03 <i>(rev1491 af1490)</i>
-</p>
+<p><a id="release142">
+<b>1.4.2</b></a> 2011.04.03 <i>(rev1491 af1490)</i></p>
+
 <p>
 Added <code>afcmd</code> commands to control jobs: start, stop, pause, restart.
 </p>
@@ -174,10 +170,9 @@ Nuke parser bug fixed (error could appear in Nuke 6.2).<br/>
 
 <br/>
 
-<p>
-<a name="release141"/>
-<b>1.4.1</b> 2011.03.30 <i>(rev1479 af1476)</i>
-</p>
+<p><a id="release141">
+<b>1.4.1</b></a> 2011.03.30 <i>(rev1479 af1476)</i></p>
+
 <p>
 <a href="../afanasy/doc/server_farm.html">Farm Services Limits</a> to describe a number of software licenses.
 </p>
@@ -214,17 +209,16 @@ Maya Auto Save Manager history backup filename from date and time construct on M
 
 <br/>
 
-<p>
-<a name="release140"/>
-<b>1.4.0</b> 2011.02.20 <i>(rev1348 af1343)</i> New Afanasy network protocol version. New Afanasy database schema.
-</p>
+<p><a id="release140">
+<b>1.4.0</b></a> 2011.02.20 <i>(rev1348 af1343)</i> New Afanasy network protocol version. New Afanasy database schema.</p>
+
 <p>
 Errors forgive time for job tasks <a href="../afanasy/doc/job_block.html#ErrorsForgiveTime">block</a>
 and for <a href="../afanasy/doc/user.html#ErrorsForgiveTime">user</a>.
 It is a time form last host error to exclude it from error hosts list.
 </p>
 <p>
-<a href="../afanasy/doc/job_system.html">System job<a>.
+<a href="../afanasy/doc/job_system.html">System job</a>.
 Now job (and block) post commands are executed on a render farm by a special system job.
 <br/><b>*<i>Your farm hosts must have "system" service to execute job post commands (remove rendered scenes).</i></b>
 </p>
@@ -267,16 +261,15 @@ When parser on render finds an error, and than rapidly finds a warning, error st
 
 <br/>
 
+<p><a id="release131">
+<b>1.3.1</b></a> 2010.12.14 <i>(rev1257 af1255)</i></p>
+
 <p>
-<a name="release131"/>
-<b>1.3.1</b> 2010.12.14 <i>(rev1257 af1255)</i>
-</p>
-<p>
-<a href="../utilities/moviemaker/doc/index.html">Movie Maker<a> output file naming customizable rules.
+<a href="../utilities/moviemaker/doc/index.html">Movie Maker</a> output file naming customizable rules.
 This rules works for Nuke <a href="../plugins/nuke/doc/dailies.html">dailies</a> node too.
 </p>
 <p>
-Server <a href="../afanasy/doc/server_farm.html">Farm Setup<a> changed.
+Server <a href="../afanasy/doc/server_farm.html">Farm Setup</a> changed.
 Now host get setup form every matched pattern.
 And in each pattern you can concretize host settings.
 </p>
@@ -292,10 +285,9 @@ Watch job tasks window: Task item: Task host name string may overlap task name s
 
 <br/>
 
-<p>
-<a name="release130"/>
-<b>1.3.0</b> 2010.12.06 <i>(rev1247 af1244)</i> New Afanasy network protocol version. New Afanasy database schema.
-</p>
+<p><a id="release130">
+<b>1.3.0</b></a> 2010.12.06 <i>(rev1247 af1244)</i> New Afanasy network protocol version. New Afanasy database schema.</p>
+
 <p>
 AfWatch shows services icons, it is common programs icons for users to recognize jobs type.
 </p>
@@ -330,7 +322,7 @@ Houdini mantra filter (af_separate_render ROP) does not filter null images now (
 Watch can ask and launch a custom command with render items and has more sort&filter parameters. 
 </p>
 <p>
-<a href="../utilities/moviemaker/doc/index.html">Movie Maker<a> stereo mode, DNxHD codec ffmpeg preset and Utf-8 full support.
+<a href="../utilities/moviemaker/doc/index.html">Movie Maker</a> stereo mode, DNxHD codec ffmpeg preset and Utf-8 full support.
 Linear float EXR and logarithm DPX to sRGB conversion bug fixed.
 H264 ffmpeg preset updated: good size&quality and frame navigation on MS Windows QuickTime player.
 </p>
@@ -353,7 +345,7 @@ Houdini parsers total percentage calculation bug fixed.
 <b>1.2.2</b> 2010.08.17
 </p>
 <p>
-<a href="../utilities/moviemaker/doc/index.html">Movie Maker<a> works with folders with spaces.
+<a href="../utilities/moviemaker/doc/index.html">Movie Maker</a> works with folders with spaces.
 </p>
 <p>
 MS Windows:<br/>
@@ -394,7 +386,7 @@ A parser can produce <i>warning</i> to notify user, <i>error</i> to stop task wi
 <i>bad result</i> to finish task like with bad exit status (with error in any way).
 </p>
 <p>
-Afanasy render client "<a href="../afanasy/doc/windowsmustdie.html">Windows Must Die<a/>" function.
+Afanasy render client "<a href="../afanasy/doc/windowsmustdie.html">Windows Must Die</a>" function.
 It finds and kills windows with specified names.
 When process crashes, MS Windows can raise a window with apologizes.
 This can hang process until someone closes the window.<br/>
@@ -418,10 +410,10 @@ Submit jobs on Windows or Linux (MacOSX) to render and on Windows and on Linux (
 Every client can have individual a paths map file to translate paths to server and from server.
 </p>
 <p>
-<a href="../utilities/moviemaker/doc/index.html">Movie Maker<a> works on MS Windows.
-Linux releases has <a href="http://www.ffmpeg.org">'ffmpeg'<a> binary compiled with
-<a href="http://www.videolan.org/developers/x264.html">'x264'<a> library to encode 'H.264' codec.
-Windows users need to install <a href="http://www.imagemagick.org">ImageMagick<a>, which contains 'ffmpeg' with 'x264'.
+<a href="../utilities/moviemaker/doc/index.html">Movie Maker</a> works on MS Windows.
+Linux releases has <a href="http://www.ffmpeg.org">'ffmpeg'</a> binary compiled with
+<a href="http://www.videolan.org/developers/x264.html">'x264'</a> library to encode 'H.264' codec.
+Windows users need to install <a href="http://www.imagemagick.org">ImageMagick</a>, which contains 'ffmpeg' with 'x264'.
 </p>
 <p>
 <a href="../afanasy/plugins/xsi/doc/afanasy.html">Softimage XSI submit to Afanasy scripts</a>. XSI Afanasy service and parser.
@@ -445,7 +437,7 @@ Afanasy supports IPv6. Server needs to support new protocol, as it stores client
 Nuke render network: 'afanasy' nodes can be connected to describe 'Write' nodes dependency.
 </p>
 <p>
-<a href="../utilities/moviemaker/doc/index.html">Movie Maker<a> - Dialog and command line utility to make movie file from image sequence on Linux.
+<a href="../utilities/moviemaker/doc/index.html">Movie Maker</a> - Dialog and command line utility to make movie file from image sequence on Linux.
 </p>
 <p>
 RPM build scripts (tested on openSUSE, Fedora, CentOS).

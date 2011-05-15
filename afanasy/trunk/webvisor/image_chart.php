@@ -69,37 +69,37 @@ imagefill( $im, 0, 0, $bg);
 switch ($type)
 {
 case 'jobsnum':
-   $query="SELECT username AS name,sum(1) AS value FROM statistics GROUP BY username;";
-   break;
-case 'jobssumonlinetime':
-   $query="SELECT username AS name,sum(time_done-time_started) AS value FROM statistics GROUP BY username;";
-   break;
-case 'jobsavgonlinetime':
-   $query="SELECT username AS name,avg(time_done-time_started) AS value FROM statistics GROUP BY username;";
+   $query="SELECT username AS name,sum(1) AS value FROM statistics GROUP BY username ORDER BY value;";
    break;
 case 'jobssumruntime':
-   $query="SELECT username AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY username;";
+   $query="SELECT username AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY username ORDER BY value;";
    break;
 case 'jobsavgruntime':
-   $query="SELECT username AS name,avg(taskssumruntime) AS value FROM statistics GROUP BY username;";
+   $query="SELECT username AS name,avg(taskssumruntime) AS value FROM statistics GROUP BY username ORDER BY value;";
+   break;
+case 'usertasksnum':
+   $query="SELECT username AS name,sum(tasksnum) AS value FROM statistics GROUP BY username ORDER BY value;";
+   break;
+case 'usertasksavg':
+   $query="SELECT username AS name,avg(tasksnum) AS value FROM statistics GROUP BY username ORDER BY value;";
    break;
 case 'servicequantity':
-   $query="SELECT service AS name,sum(1) AS value FROM statistics GROUP BY service;";
+   $query="SELECT service AS name,sum(1) AS value FROM statistics GROUP BY service ORDER BY value;";
    break;
 case 'tasksquantity':
-   $query="SELECT service AS name,sum(tasksnum) AS value FROM statistics GROUP BY service;";
+   $query="SELECT service AS name,sum(tasksnum) AS value FROM statistics GROUP BY service ORDER BY value;";
    break;
 case 'tasksquantityavg':
-   $query="SELECT service AS name,sum(tasksnum)/sum(1) AS value FROM statistics GROUP BY service;";
+   $query="SELECT service AS name,sum(tasksnum)/sum(1) AS value FROM statistics GROUP BY service ORDER BY value;";
    break;
 case 'taskssumruntime':
-   $query="SELECT service AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY service;";
+   $query="SELECT service AS name,sum(taskssumruntime) AS value FROM statistics GROUP BY service ORDER BY value;";
    break;
 case 'tasksavgruntime':
-   $query="SELECT service AS name,avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS value FROM statistics GROUP BY service;";
+   $query="SELECT service AS name,avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS value FROM statistics GROUP BY service ORDER BY value;";
    break;
 case 'tasksdone':
-   $query="SELECT service AS name,round(avg(100*tasksdone/tasksnum),2) AS value FROM statistics GROUP BY service;";
+   $query="SELECT service AS name,round(avg(100*tasksdone/tasksnum),2) AS value FROM statistics GROUP BY service ORDER BY value;";
    break;
 default:
    imagestring( $im, 5, $size/2, 0,  "Type '$type' is invalid.", imagecolorallocate( $im, 0,  32, 0));

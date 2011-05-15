@@ -63,9 +63,9 @@ You need at least to override <code>servername</code> (if you want other compute
 Generate keys using <code>afcmd passwd</code> command for your own passwords and put them into <kbd>cgru/afanasy/config_shadow.xml</kbd>.
 </p>
 
-<h3><a name="Configuration"/>Configuration Elements:</h3>
+<h3><a id="Configuration">Configuration Elements</a>:</h3>
 
-<h4><a name="ConfGeneral"/>General:</h4>
+<h4><a id="ConfGeneral">General</a>:</h4>
 <ul>
 <li><p>
 <code>timeformat</code> = ddd dMMM hh:mm.ss<br/>
@@ -94,7 +94,7 @@ Default hosts mask number for users and jobs. Empty means that users and jobs ca
 </p></li>
 </ul>
 
-<h4><a name="ConfClientServer"/>Client &amp; Server:</h4>
+<h4><a id="ConfClientServer">Client &amp; Server</a>:</h4>
 <ul>
 <li><p>
 <code>servername</code> = localhost<br/>
@@ -122,7 +122,7 @@ Directory for sever to store logs and tasks outputs.
 </p></li>
 </ul>
 
-<h4><a name="ConfJob"/>Job:</h4>
+<h4><a id="ConfJob">Job</a>:</h4>
 <ul>
 <li><p>
 <code>task_default_capacity</code> = 1000<br/>
@@ -138,7 +138,7 @@ Server store logs of a jobs with the same name by renaming old. It adds a number
 </p></li>
 </ul>
 
-<h4><a name="ConfUser"/>User:</h4>
+<h4><a id="ConfUser">User</a>:</h4>
 <ul>
 <li><p>
 <code>errors_avoid_host</code> = 3<br/>
@@ -166,7 +166,7 @@ Server store logs of users with the same name by renaming old. It adds a number 
 </p></li>
 </ul>
 
-<h4><a name="ConfDatabase"/>Database:</h4>
+<h4><a id="ConfDatabase">Database</a>:</h4>
 Try to keep this default values.
 <ul>
 <li><p>
@@ -206,9 +206,9 @@ Expressions length limit. It is an expression of hosts mask, depend mask and com
 You can check database connection by <kbd>afcmd db_check</kbd> command.
 </p>
 <p>
-When server loose connection with database it tries to reconnect.
-Each reconnect try it refresh connection settings from configuration, so you can reconfigure database connection settings "on-the-fly".
-When server loose connection it stops to execute queries queue, so they will not be lost but they store in memory.
+When server looses connection with database it tries to reconnect.
+Each reconnection try it refreshes connection settings from configuration, so you can reconfigure database connection settings "on-the-fly".
+When server looses connection it stops to execute queries queue, so they will not be lost but they store in memory.
 To prevent RAM usage growth server will no accept any new jobs until successful reconnect.
 </p>
 <p>

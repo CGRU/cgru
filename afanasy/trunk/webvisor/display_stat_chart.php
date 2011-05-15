@@ -15,17 +15,17 @@ switch ($type)
 case 'jobsnum':
    echo 'User / Jobs Number';
    break;
-case 'jobssumonlinetime':
-   echo 'User / Jobs Total Online Time';
-   break;
-case 'jobsavgonlinetime':
-   echo 'User / Jobs Average Online Time';
-   break;
 case 'jobssumruntime':
    echo 'User / Jobs Total Run Time';
    break;
 case 'jobsavgruntime':
    echo 'User / Jobs Average Run Time';
+   break;
+case 'usertasksnum':
+   echo 'User / Total Tasks Quantity';
+   break;
+case 'usertasksavg':
+   echo 'User / Average Tasks Quantity';
    break;
 case 'servicequantity':
    echo 'Service / Quantity';
