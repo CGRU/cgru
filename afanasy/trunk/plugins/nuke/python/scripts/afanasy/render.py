@@ -208,7 +208,7 @@ class BlockParameters:
 
          threads = os.getenv('NUKE_AF_RENDERTHREADS', '2')
          cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i -m %(threads)s')
-         cmdargs = ' -X %s -F%%1-%%2x1 -x %s' % ( self.writename, scenename)
+         cmdargs = ' -X %s -F%%1-%%2x1 -x \"%s\"' % ( self.writename, scenename)
          if self.capacitymin != -1 or self.capacitymax != -1:
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             threads = services.service.str_capacity

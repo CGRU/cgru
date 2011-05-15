@@ -163,7 +163,19 @@ void Plotter::addValue( int grp, int val, bool store)
 
       // Calculate scale:
       scale = 1;
-      while((scale < maxvalue) && (scale < autoscale_maxscale)) scale *= 10;
+      int scale_add = 1;
+      int loop = 1;
+      while( scale < autoscale_maxscale )
+      {
+         if( loop >= 10 )
+         {
+            scale_add *= 10;
+            loop = 1;
+         }
+         scale += scale_add;
+         if( scale >= maxvalue) break;
+         loop ++;
+      }
 
       // Append label text by autoscale value:
       float scale_val = float(scale) / (label_value != 0 ? label_value : 1);
