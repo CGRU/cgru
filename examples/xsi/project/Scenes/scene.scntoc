@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="iso-8859-1"?>
 
-<xsi_file type="SceneTOC" xsi_version="9.5.184.0" syntax_version="2.0">
+<xsi_file type="SceneTOC" xsi_version="10.0.422.0" syntax_version="2.0">
    <Models></Models>
    <Sources>
       <Image name="noIcon_pic">$XSI_HOME/Application/rsrc/noIcon.pic</Image>
@@ -54,6 +54,11 @@
          <RasterizerMotionSamples>1</RasterizerMotionSamples>
          <RasterizerMotionFactor>0</RasterizerMotionFactor>
          <RasterizerMaxDepth>0</RasterizerMaxDepth>
+         <UnifiedSampling>0</UnifiedSampling>
+         <UnifiedSamplesMin>0.5</UnifiedSamplesMin>
+         <UnifiedSamplesMax>4</UnifiedSamplesMax>
+         <UnifiedSamplesQuality>0.8</UnifiedSamplesQuality>
+         <UnifiedSamplesErrorCutoff>0</UnifiedSamplesErrorCutoff>
          <Trace>1</Trace>
          <MotionSamples>5</MotionSamples>
          <SamplesFilterType>2</SamplesFilterType>

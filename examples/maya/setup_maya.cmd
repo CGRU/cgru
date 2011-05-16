@@ -4,14 +4,14 @@ call setup.cmd
 POPD
 
 rem Set Maya version:
-set MAYA_VERSION=2011
+set MAYA_VERSION=2012
 rem Set Maya architecture:
 set MAYA_ARCH=-x64
 rem For 32bit Maya uncomment next line (or put it in "override.cmd" file)
 rem set MAYA_ARCH=
 
 rem Set Maya location:
-set MAYA_LOCATION=C:\Program Files\Autodesk\Maya2011
+set MAYA_LOCATION=C:\Program Files\Autodesk\Maya%MAYA_VERSION%
 
 rem Set CGRU Maya scripts location:
 set MAYA_CGRU_LOCATION=%CGRU_LOCATION%\plugins\maya
@@ -35,7 +35,7 @@ rem Add Afanasy scripts:
 set MAYA_SCRIPT_PATH=%AF_ROOT%\plugins\maya;%MAYA_SCRIPT_PATH%
 
 rem Add Maya to PATH:
-set PATH=%MAYA_LOCATION%\bin;%PATH%
+set "PATH=%MAYA_LOCATION%\bin;%PATH%"
 
 IF [%1]==[] (
 set TOSTART=start
