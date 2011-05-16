@@ -163,6 +163,10 @@ void* ThreadServer_accept(void* arg)
       }
    }
    freeaddrinfo( res);
+#ifdef MACOSX
+// FIXME: Current MAX OS can't listen IPv6?
+   protocol = AF_INET;
+#endif
    switch( protocol)
    {
       case AF_INET:
