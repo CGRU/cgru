@@ -14,7 +14,8 @@ public:
    void setColor(    int r, int g, int b, int grp = 0);
    void setColorHot( int r, int g, int b, int grp = 0);
    inline void setScale( int Scale) { scale = Scale; if( scale < 1) autoscale = true; else autoscale = false;}
-   inline void setAutoScaleMax( int MaxScale) { autoscale_maxscale = MaxScale; }
+   inline void setAutoScaleMax( int MaxScale) { autoscale_maxscale = MaxScale; autoscale_maxbgc = MaxScale;}
+   inline void setAutoScaleMaxBGC( int MaxScale) { autoscale_maxbgc = MaxScale;}
    inline void setAutoScaleLines( int Lines)  { autoscale_lines = Lines; }
    inline void setLabel( const QString & Label) { label = Label; }
    inline void setBGColor(    int r, int g, int b) { bgc_r=r; bgc_g=g; bgc_b=b; }
@@ -39,6 +40,7 @@ private:
    bool  autoscale;
    int   autoscale_lines;
    int   autoscale_maxscale;
+   int   autoscale_maxbgc;
    int * hot_min;
    int * hot_max;
 

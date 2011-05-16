@@ -62,7 +62,7 @@ ItemRender::ItemRender( af::Render *render):
    plotNet.setHotMin(   10000, 1);
    plotNet.setHotMax(  100000, 1);
    plotNet.setColorHot(   255, 0, 90, 1);
-//   plotNet.setAutoScaleMax( 100000);
+   plotNet.setAutoScaleMaxBGC( 100000);
 
 
    plotIO_rn_r =  90;
@@ -83,7 +83,7 @@ ItemRender::ItemRender( af::Render *render):
 
    plotIO.setLabel("D%1");
    plotIO.setLabelValue( 1000);
-//   plotIO.setAutoScaleMax( 100000);
+   plotIO.setAutoScaleMaxBGC( 100000);
 
    updateValues( render, 0);
 }
@@ -174,7 +174,7 @@ void ItemRender::updateValues( af::Node *node, int type)
             plotSwp.setLabelValue( 1000);
             plotSwp.setHotMin( 100);
             plotSwp.setHotMax( 10000);
-//            plotSwp.setAutoScaleMax( 100000);
+            plotSwp.setAutoScaleMaxBGC( 100000);
          }
       }
 
@@ -544,7 +544,7 @@ bool ItemRender::setFilterType( int type )
          filter_str = &address_str;
          break;
       default:
-         AFERRAR("ItemRender::setFilterType: Invalid type number = %d\n", type);
+         AFERRAR("ItemRender::setFilterType: Invalid type number = %d", type)
          return false;
    }
    return true;

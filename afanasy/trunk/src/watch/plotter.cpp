@@ -22,12 +22,12 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
 {
    if( graphs < 1)
    {
-      AFERRAR("Plotter::Plotter: NumGraphs < 1 ( %d < 1 )\n", graphs);
+      AFERRAR("Plotter::Plotter: NumGraphs < 1 ( %d < 1 )", graphs)
       return;
    }
    if( lines < 1)
    {
-      AFERRAR("Plotter::Plotter: NumLinesWidth < 1 ( %d < 1 )\n", lines);
+      AFERRAR("Plotter::Plotter: NumLinesWidth < 1 ( %d < 1 )", lines)
       return;
    }
    if( scale < 1) autoscale = true;
@@ -40,6 +40,7 @@ Plotter::Plotter( int NumGraphs, int Scale, int NumLinesWidth):
    clrG_cur_hot = new int [ graphs];
    clrB_cur     = new int [ graphs];
    clrB_cur_hot = new int [ graphs];
+   autoscale_maxbgc =  autoscale_maxscale;
 
    values = new int*[ graphs];
    clr_r  = new int*[ graphs];
@@ -98,7 +99,7 @@ void Plotter::setColor( int r, int g, int b, int grp)
 {
    if( grp >= graphs)
    {
-      AFERRAR("Plotter::setColor: num >= graphs ( %d >= %d)\n", grp, graphs);
+      AFERRAR("Plotter::setColor: num >= graphs ( %d >= %d)", grp, graphs)
       return;
    }
    clrR_cur[grp] = r;
@@ -110,7 +111,7 @@ void Plotter::setColorHot( int r, int g, int b, int grp)
 {
    if( grp >= graphs)
    {
-      AFERRAR("Plotter::setColor: grp >= graphs ( %d >= %d)\n", grp, graphs);
+      AFERRAR("Plotter::setColor: grp >= graphs ( %d >= %d)", grp, graphs)
       return;
    }
    clrR_cur_hot[grp] = r;
@@ -122,7 +123,7 @@ void Plotter::addValue( int grp, int val, bool store)
 {
    if( grp >= graphs)
    {
-      AFERRAR("Plotter::addValue: grp >= graphs ( %d >= %d)\n", grp, graphs);
+      AFERRAR("Plotter::addValue: grp >= graphs ( %d >= %d)", grp, graphs)
       return;
    }
 
@@ -167,13 +168,13 @@ void Plotter::addValue( int grp, int val, bool store)
       int loop = 1;
       while( scale < autoscale_maxscale )
       {
+         if( scale >= maxvalue) break;
          if( loop >= 10 )
          {
             scale_add *= 10;
             loop = 1;
          }
          scale += scale_add;
-         if( scale >= maxvalue) break;
          loop ++;
       }
 
@@ -186,7 +187,7 @@ void Plotter::addValue( int grp, int val, bool store)
       // Calculate blue backgroud color:
       int value = scale;
       bgc_b = 128;
-      while( value < autoscale_maxscale ) { value *= 10; bgc_b = bgc_b >> 1;}
+      while( value < autoscale_maxbgc ) { value *= 10; bgc_b = bgc_b >> 1;}
       if( bgc_b <   0 ) bgc_b = 0;
       if( bgc_b > 255 ) bgc_b = 255;
    }
