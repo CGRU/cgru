@@ -127,21 +127,22 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    printf("kernelTime = %u\n", cpu_now->kernel.QuadPart);
    printf("userTime   = %u\n", cpu_now->user.QuadPart);
 */
-   int idle   = cpu_now->idle.QuadPart   - cpu_last->idle.QuadPart;
-   int kernel = cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart;
-   int user   = cpu_now->user.QuadPart   - cpu_last->user.QuadPart;
+   static const int cpu_times_koeff = 100;
+   int idle   = ( cpu_now->idle.QuadPart   - cpu_last->idle.QuadPart   ) / cpu_times_koeff;
+   int kernel = ( cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart ) / cpu_times_koeff;
+   int user   = ( cpu_now->user.QuadPart   - cpu_last->user.QuadPart   ) / cpu_times_koeff;
    int system   =  kernel - idle;
-   int total100 = (kernel + user) / 100;
+   int total100 = ( kernel + user ) / 100;
    if( total100 < 1 ) total100 = 1;
 /*
-   printf("idle   = %9d\n", idle);
-   printf("kernel = %9d\n", kernel);
-   printf("user   = %9d\n", user);
-   printf("total  = %9d\n", total);
+   printf("idle     = %9d\n", idle);
+   printf("kernel   = %9d\n", kernel);
+   printf("user     = %9d\n", user);
+   printf("total100 = %9d\n", total100);
 */
-   hres.cpu_user    = user   / ( total100 );
-   hres.cpu_system  = system / ( total100 );
-   hres.cpu_idle    = idle   / ( total100 );
+   hres.cpu_user    = user   / total100;
+   hres.cpu_system  = system / total100;
+   hres.cpu_idle    = idle   / total100;
    hres.cpu_nice    = 0;
    hres.cpu_iowait  = 0;
    hres.cpu_irq     = 0;
@@ -233,13 +234,15 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          io_now->SplitCount   = dp.SplitCount;
          io_now->QueryTime    = dp.QueryTime;
 
-         LONGLONG ReadTime  = io_now->ReadTime.QuadPart  - io_last->ReadTime.QuadPart;
-         LONGLONG WriteTime = io_now->WriteTime.QuadPart - io_last->WriteTime.QuadPart;
-         LONGLONG IdleTime  = io_now->IdleTime.QuadPart  - io_last->IdleTime.QuadPart;
-         LONGLONG TotalTime = ReadTime + WriteTime + IdleTime;
-         //printf("ReadTime = %9d   WriteTime = %9d   IdleTime = %9d   TotalTime=%9d\n", ReadTime, WriteTime, IdleTime, TotalTime);
+         static const int io_times_koeff = 100;
+         int ReadTime  = ( io_now->ReadTime.QuadPart  - io_last->ReadTime.QuadPart  ) / io_times_koeff;
+         int WriteTime = ( io_now->WriteTime.QuadPart - io_last->WriteTime.QuadPart ) / io_times_koeff;
+         int IdleTime  = ( io_now->IdleTime.QuadPart  - io_last->IdleTime.QuadPart  ) / io_times_koeff;
+         int TotalTime100 = ( ReadTime + WriteTime + IdleTime ) / 100;
+         if( TotalTime100 < 1 ) TotalTime100 = 1;
+         //printf("ReadTime  = %9d\nWriteTime = %9d\nIdleTime  = %9d\nTotalTime = %9d\n", ReadTime, WriteTime, IdleTime, TotalTime100);
 
-         int busy = 100 * (TotalTime - IdleTime) / TotalTime;
+         int busy = ReadTime + WriteTime / TotalTime100;
          if( busy < 0   ) busy = 0;
          if( busy > 100 ) busy = 100;
 
