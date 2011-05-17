@@ -23,6 +23,7 @@ const char filename_cpu_info[]   = "/proc/cpuinfo";
 const char filename_cpu_stat[]   = "/proc/stat";
 const char filename_mem_info[]   = "/proc/meminfo";
 const char filename_disk_stat[]  = "/proc/diskstats";
+const char filename_net_stat[]   = "/proc/net/dev";
 
 const char CpuMHz[]     = "cpu MHz";
 const char MemTotal[]   = "MemTotal:";
@@ -107,26 +108,26 @@ bool nextWord( int & pos)
 
 struct res
 {
-   int user;
-   int nice;
-   int system;
-   int idle;
-   int iowait;
-   int irq;
-   int softirq;
+   unsigned long long user;
+   unsigned long long nice;
+   unsigned long long system;
+   unsigned long long idle;
+   unsigned long long iowait;
+   unsigned long long irq;
+   unsigned long long softirq;
 } r0, r1;
 
 struct io{
-   unsigned int rd_ios;             // Read I/O operations
-   unsigned int rd_merges;          // Reads merged
-   unsigned int rd_sectors;         // Sectors read
-   unsigned int rd_ticks;           // Time in queue + service for read
-   unsigned int wr_ios;             // Write I/O operations
-   unsigned int wr_merges;          // Writes merged
-   unsigned int wr_sectors;         // Sectors written
-   unsigned int wr_ticks;           // Time in queue + service for write
-   unsigned int ticks;              // Time of requests in queue
-   unsigned int aveq;               // Average queue length
+   unsigned long long rd_ios;             // Read I/O operations
+   unsigned long long rd_merges;          // Reads merged
+   unsigned long long rd_sectors;         // Sectors read
+   unsigned long long rd_ticks;           // Time in queue + service for read
+   unsigned long long wr_ios;             // Write I/O operations
+   unsigned long long wr_merges;          // Writes merged
+   unsigned long long wr_sectors;         // Sectors written
+   unsigned long long wr_ticks;           // Time in queue + service for write
+   unsigned long long ticks;              // Time of requests in queue
+   unsigned long long aveq;               // Average queue length
 } io0, io1;
 
 struct net
@@ -169,7 +170,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       }
       else
       {
-         AFERRAR("Can't read '%s'\n", filename_cpu_info);
+         AFERRAR("Can't read \"%s\"", filename_cpu_info)
       }
    }
 
@@ -198,20 +199,32 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    }
    else
    {
-      AFERRAR("Can't read '%s'\n", filename_mem_info);
+      AFERRAR("Can't read \"%s\"", filename_mem_info)
    }
    //memory
 
    //
    // CPU usage:
    //
-   unsigned cpu_ticks_total;
+   int cpu_ticks_total;
    if( readFile( filename_cpu_stat))
    {
             res * rl = &r0; res * rn = &r1;
       if( now ) { rl = &r1;       rn = &r0; }
       bool verbose = false;
       int pos = 0;
+      nextWord( pos);
+      static const char scan_fmt[] = "%llu %llu %llu %llu %llu %llu %llu";
+      sscanf( fbuffer + pos, scan_fmt,
+              &(rn->user),
+              &(rn->nice),
+              &(rn->system),
+              &(rn->idle),
+              &(rn->iowait),
+              &(rn->irq),
+              &(rn->softirq)
+         );
+      /*
       pos += scan( rn->user,     fbuffer+pos, verbose);
       pos += scan( rn->nice,     fbuffer+pos, verbose);
       pos += scan( rn->system,   fbuffer+pos, verbose);
@@ -219,26 +232,53 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       pos += scan( rn->iowait,   fbuffer+pos, verbose);
       pos += scan( rn->irq,      fbuffer+pos, verbose);
       pos += scan( rn->softirq,  fbuffer+pos, verbose);
-
-      unsigned user    = rn->user     - rl->user;
-      unsigned nice    = rn->nice     - rl->nice;
-      unsigned system  = rn->system   - rl->system;
-      unsigned idle    = rn->idle     - rl->idle;
-      unsigned iowait  = rn->iowait   - rl->iowait;
-      unsigned irq     = rn->irq      - rl->irq;
-      unsigned softirq = rn->softirq  - rl->softirq;
-      unsigned total = user + nice + system + idle + iowait + irq + softirq;
-      if( total == 0 ) total = 1;
-
-      cpu_ticks_total = total;
-
-      hres.cpu_user    = ( 100 * user    ) / total;
-      hres.cpu_nice    = ( 100 * nice    ) / total;
-      hres.cpu_system  = ( 100 * system  ) / total;
-      hres.cpu_idle    = ( 100 * idle    ) / total;
-      hres.cpu_iowait  = ( 100 * iowait  ) / total;
-      hres.cpu_irq     = ( 100 * irq     ) / total;
-      hres.cpu_softirq = ( 100 * softirq ) / total;
+*/
+      // Check for counters overflow:
+      if(( rn->user    >= rl->user   ) &&
+         ( rn->nice    >= rl->nice   ) &&
+         ( rn->system  >= rl->system ) &&
+         ( rn->idle    >= rl->idle   ) &&
+         ( rn->iowait  >= rl->iowait ) &&
+         ( rn->irq     >= rl->irq    ) &&
+         ( rn->softirq >= rl->softirq))
+      {
+         int user    = int( rn->user     - rl->user   );
+         int nice    = int( rn->nice     - rl->nice   );
+         int system  = int( rn->system   - rl->system );
+         int idle    = int( rn->idle     - rl->idle   );
+         int iowait  = int( rn->iowait   - rl->iowait );
+         int irq     = int( rn->irq      - rl->irq    );
+         int softirq = int( rn->softirq  - rl->softirq);
+         cpu_ticks_total = user + nice + system + idle + iowait + irq + softirq;
+   /*
+         printf("CPU user     = %d\n", rn->user);
+         printf("CPU nice     = %d\n", rn->nice);
+         printf("CPU system   = %d\n", rn->system);
+         printf("CPU idle     = %d\n", rn->idle);
+         printf("CPU iowait   = %d\n", rn->iowait);
+         printf("CPU irq      = %d\n", rn->irq);
+         printf("CPU softirq  = %d\n", rn->softirq);
+         printf("user     = %d\n", user);
+         printf("nice     = %d\n", nice);
+         printf("system   = %d\n", system);
+         printf("idle     = %d\n", idle);
+         printf("iowait   = %d\n", iowait);
+         printf("irq      = %d\n", irq);
+         printf("softirq  = %d\n", softirq);
+         printf("total    = %d\n", cpu_ticks_total);
+   */
+         // Check for counters overflow:
+         if( cpu_ticks_total > 0)
+         {
+            hres.cpu_user    = ( 100 * user    ) / cpu_ticks_total;
+            hres.cpu_nice    = ( 100 * nice    ) / cpu_ticks_total;
+            hres.cpu_system  = ( 100 * system  ) / cpu_ticks_total;
+            hres.cpu_idle    = ( 100 * idle    ) / cpu_ticks_total;
+            hres.cpu_iowait  = ( 100 * iowait  ) / cpu_ticks_total;
+            hres.cpu_irq     = ( 100 * irq     ) / cpu_ticks_total;
+            hres.cpu_softirq = ( 100 * softirq ) / cpu_ticks_total;
+         }
+      }
 
       double loadavg[3] = { 0, 0, 0 };
       int nelem = getloadavg( loadavg, 3);
@@ -253,7 +293,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    }
    else
    {
-      AFERRAR("Can't read '%s'\n", filename_cpu_stat);
+      AFERRAR("Can't read \"%s\"", filename_cpu_stat)
    }//cpu
 
    //
@@ -294,7 +334,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          char name[64];
          int part_major, part_minor;
 
-         const char scan_fmt[] = "%4d %4d %s %u %u %llu %u %u %u %llu %u %*u %u %u";
+         static const char scan_fmt[] = "%4d %4d %s %u %u %llu %u %u %u %llu %u %*u %u %u";
 
          int items = sscanf( fbuffer + pos, scan_fmt,
                    &part_major,
@@ -315,43 +355,44 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          if( items != 13 ) continue;
          if( strcmp( name, device) == 0 )
          {
-            unsigned rd_ios      = ion->rd_ios      - iol->rd_ios;
-            unsigned rd_merges   = ion->rd_merges   - iol->rd_merges;
-            unsigned rd_sectors  = ion->rd_sectors  - iol->rd_sectors;
-            unsigned rd_ticks    = ion->rd_ticks    - iol->rd_ticks;
-            unsigned wr_ios      = ion->wr_ios      - iol->wr_ios;
-            unsigned wr_merges   = ion->wr_merges   - iol->wr_merges;
-            unsigned wr_sectors  = ion->wr_sectors  - iol->wr_sectors;
-            unsigned wr_ticks    = ion->wr_ticks    - iol->wr_ticks;
-            unsigned ticks       = ion->ticks       - iol->ticks;
-            unsigned aveq        = ion->aveq        - iol->aveq;
-
-//printf("tiks=%u cpu_ticks_total=%u HZ=%u CPUs=%u\n", ticks, cpu_ticks_total, HZ, host.cpu_num);
-//            unsigned n_ios  = rd_ios + wr_ios;                     // Number of requests
-//            unsigned n_ticks = rd_ticks + wr_ticks;                // Total service time
-//            unsigned n_mbytes = (rd_sectors + wr_sectors) >> 11;   // Total MBytes transferred
-//            float fdeltams = 1000.0 * cpu_ticks_total / host.cpu_num / HZ;
-//            float queue = aveq / fdeltams;                 // Average queue
-//            float size = n_ios ? n_mbytes / n_ios : 0.0;  // Average request size
-//            float wait = n_ios ? n_ticks / n_ios : 0.0;   // Average wait
-//            float svc_t = n_ios ? ticks / n_ios : 0.0;    // Average disk service time
-//            float busyf = 100.0 * ticks / fdeltams;       // percentage!
-            int busy = -1;
-            int deltams = 1000 * cpu_ticks_total / host.cpu_num / HZ;
-            if( deltams > 0)
+/*
+            printf("IO rd_sectors = %llu\n", ion->rd_sectors);
+            printf("IO wr_sectors = %llu\n", ion->wr_sectors);
+            printf("IO ticks      = %llu\n", ion->ticks);
+*/
+            // Check for counters overflow:
+            if(( ion->rd_sectors >= iol->rd_sectors) &&
+               ( ion->wr_sectors >= iol->wr_sectors) &&
+               ( ion->ticks      >= iol->ticks))
             {
-               busy = 100 * ticks / deltams;
-               if( busy > 100) busy = 100;
-               if( busy <   0) busy = 0;
+               int rd_sectors  = int( ion->rd_sectors  - iol->rd_sectors );
+               int wr_sectors  = int( ion->wr_sectors  - iol->wr_sectors );
+               int ticks       = int( ion->ticks       - iol->ticks      );
+/*
+               printf("rd_sectors = %d\n", rd_sectors);
+               printf("wr_sectors = %d\n", wr_sectors);
+               printf("ticks      = %d\n", ticks);
+*/
+               int busy = 0;
+               if( cpu_ticks_total > 0 )
+               {
+                  int deltams = 1000 * cpu_ticks_total / host.cpu_num / HZ;
+                  if( deltams > 0 )
+                  {
+                     busy = 100 * ticks / deltams;
+                     if( busy > 100) busy = 100;
+                     if( busy <   0) busy = 0;
+                     hres.hdd_busy = busy;
+                  }
+               }
+
+   //            printf("\n%-6s: R %d MB/S   W %d MB/S   B %d%%\n", name, rd_sectors >> 11, wr_sectors >> 11, busy);
+
+               // Standart sector is 512 bytes
+   //TODO:  Get device sector size.
+               hres.hdd_rd_kbsec = ( rd_sectors / af::Environment::getRenderUpdateSec()) >> 1;
+               hres.hdd_wr_kbsec = ( wr_sectors / af::Environment::getRenderUpdateSec()) >> 1;
             }
-
-//            printf("\n%-6s: R %d MB/S   W %d MB/S   B %d%%\n", name, rd_sectors >> 11, wr_sectors >> 11, busy);
-
-            // Standart sector is 512 bytes
-//TODO:  Get device sector size.
-            hres.hdd_rd_kbsec = ( rd_sectors / af::Environment::getRenderUpdateSec()) >> 1;
-            hres.hdd_wr_kbsec = ( wr_sectors / af::Environment::getRenderUpdateSec()) >> 1;
-            hres.hdd_busy = busy;
 
             break;
          }
@@ -363,7 +404,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    }
    else
    {
-      AFERRAR("Can't read '%s'\n", filename_disk_stat);
+      AFERRAR("Can't read \"%s\"", filename_disk_stat)
    }
    }//hdd
 
@@ -374,7 +415,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          net * nl = &n0; net * nn = &n1;
    if( now ) { nl = &n1;       nn = &n0; }
    bool verbose = false;
-   readFile("/proc/net/dev");
+   //verbose = true;
+   readFile( filename_net_stat);
    static int b_recv = 0;
    static int b_trans = 0;
    static int ifBytes_len = strlen( ifBytes);
@@ -387,7 +429,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       if( RenderNetworkIF.isValid()) printf("Network traffic interface(s) pattern = '%s'\n", RenderNetworkIF.pattern().toUtf8().data());
       else
       {
-         AFERRAR("Render network interfaces mask is invalid:\n%s\n%s\n", RenderNetworkIF.pattern().toUtf8().data(), RenderNetworkIF.errorString().toUtf8().data());
+         AFERRAR("Render network interfaces mask is invalid:\n%s\n%s", RenderNetworkIF.pattern().toUtf8().data(), RenderNetworkIF.errorString().toUtf8().data())
       }
       printf("Network interfaces founded:\n");
    }
@@ -433,12 +475,18 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          // Getting interface traffic:
          if( RenderNetworkIF.isValid() && ( RenderNetworkIF.exactMatch( ifname))) // search for specified interfaces:
          {
+            unsigned long long net_recv, net_send;
             for( int w = 0; w < b_recv;  w++) if( !nextWord( pos)) break; // to bytes recieve
-            if( verbose) printf("Recieve  bytes = %d\n", atoi( fbuffer+pos));
-            net_recv_kb += atoi( fbuffer+pos) >> 10;
+            sscanf( fbuffer+pos, "%llu", &net_recv);
             for( int w = 0; w < b_trans; w++) if( !nextWord( pos)) break; // to bytes transmit
-            if( verbose) printf("Transmit bytes = %d\n", atoi( fbuffer+pos));
-            net_send_kb += atoi( fbuffer+pos) >> 10;
+            sscanf( fbuffer+pos, "%llu", &net_send);
+            net_recv_kb += net_recv >> 10;
+            net_send_kb += net_send >> 10;
+            if( verbose )
+            {
+               printf("Recieved   bytes = %llu\n", net_recv);
+               printf("Transmited bytes = %llu\n", net_send);
+            }
          }
          if( !nextLine( pos)) break; // to next interface
       }
