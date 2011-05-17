@@ -163,16 +163,16 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
       MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
       msg->setAddress( this);
       msg->dispatch();
-      std::string str = "Starting task: ";
+/*      std::string str = "Starting task: ";
       str += taskexec->generateInfoString( false);
-      appendLog( str);
+      appendLog( str);*/
    }
-   else
+/*   else
    {
       std::string str = "Captured by task: ";
       str += taskexec->generateInfoString( false);
       appendLog( str);
-   }
+   }*/
 }
 
 void RenderAf::startTask( af::TaskExec *taskexec)
@@ -283,7 +283,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderEject:
    {
       if( isBusy() == false ) return true;
-      appendLog( std::string("Task Ejected by ") + userhost);
+      appendLog( std::string("Task(s) ejected by ") + userhost);
       ejectTasks( jobs, monitoring, af::TaskExec::UPEject);
       return true;
    }
@@ -363,6 +363,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
       id_blocks.push_back( (*it)->getBlockNum());
       id_tasks.push_back( (*it)->getTaskNum());
       numbers.push_back( (*it)->getNumber());
+      appendLog( std::string("Ejecting task: ") + (*it)->generateInfoString( false));
    }
    JobContainerIt jobsIt( jobs);
    std::list<int>::const_iterator jIt = id_jobs.begin();
@@ -474,7 +475,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 {
    removeTask( taskexec);
    remService( taskexec->getServiceType());
-   if( taskexec->getNumber())
+/*   if( taskexec->getNumber())
    {
       std::string str = "Finished service: ";
       str += taskexec->generateInfoString( false);
@@ -485,7 +486,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
       std::string str = "Finished task: ";
       str += taskexec->generateInfoString( false);
       appendLog( str);
-   }
+   }*/
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
 }
 
@@ -536,11 +537,11 @@ void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorConta
    {
       appendLog( std::string("ZOMBIETIME: ") + af::itos(af::Environment::getRenderZombieTime()) + " seconds.");
       AFCommon::QueueLog( std::string("Render: \"") + getName() + "\" - ZOMBIETIME");
-      if( isBusy())
+/*      if( isBusy())
       {
          printf("Was busy:\n");
          for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++) (*it)->stdOut();
-      }
+      }*/
       offline( jobs, af::TaskExec::UPRenderZombie, monitoring);
       return;
    }

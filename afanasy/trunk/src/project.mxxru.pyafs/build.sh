@@ -19,8 +19,7 @@ cd $cgru/utilities
 source ./getrevision.sh $folder
 popd > /dev/null
 
-export AF_LFLAGS="-lrt -lz -lgthread -lglib"
-# on CentOS 5 with Python2.5 try "-lrt -lz -lgthread-2.0 -lglib-2.0"
+export AF_LFLAGS="-lrt -lz -lgthread-2.0 -lglib-2.0"
 
 [ -f override.sh ] && source override.sh
 

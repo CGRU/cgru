@@ -206,6 +206,8 @@ void Plotter::paint( QPainter * painter, int x, int y, int w, int h) const
    {
       painter->setBrush( QBrush( QColor( clr_r[grp][lines-1],clr_g[grp][lines-1],clr_b[grp][lines-1]), Qt::SolidPattern ));
       int line_h = (h*values[grp][lines-1]) / (scale != 0 ? scale : 1);
+      if( line_y - line_h < y ) line_h = line_y - y;
+      if( line_h < 1 ) break;
       painter->drawRect( x+w-width, line_y - line_h, width, line_h);
       line_y -= line_h;
    }
