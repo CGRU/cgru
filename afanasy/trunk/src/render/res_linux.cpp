@@ -73,7 +73,7 @@ bool readAttr( const char * name, const char * data, int &pos, int & value, bool
    }
    return false;
 }
-int scan( int & value, const char * data, bool verbose = false)
+/*int scan( int & value, const char * data, bool verbose = false)
 {
    int pos = 0;
    while( data[pos] != ' ') pos++;
@@ -81,7 +81,7 @@ int scan( int & value, const char * data, bool verbose = false)
    value = atoi( data + pos);
    if( verbose) printf("value = %d\n", value);
    return pos;
-}
+}*/
 bool nextLine( int & pos)
 {
    while( pos < fdata_len ) if( fbuffer[pos++] == '\n') return true;
@@ -206,7 +206,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    //
    // CPU usage:
    //
-   int cpu_ticks_total;
+   unsigned long long cpu_ticks_total;
    if( readFile( filename_cpu_stat))
    {
             res * rl = &r0; res * rn = &r1;
@@ -242,41 +242,41 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          ( rn->irq     >= rl->irq    ) &&
          ( rn->softirq >= rl->softirq))
       {
-         int user    = int( rn->user     - rl->user   );
-         int nice    = int( rn->nice     - rl->nice   );
-         int system  = int( rn->system   - rl->system );
-         int idle    = int( rn->idle     - rl->idle   );
-         int iowait  = int( rn->iowait   - rl->iowait );
-         int irq     = int( rn->irq      - rl->irq    );
-         int softirq = int( rn->softirq  - rl->softirq);
+         unsigned long long user    = rn->user     - rl->user;
+         unsigned long long nice    = rn->nice     - rl->nice;
+         unsigned long long system  = rn->system   - rl->system;
+         unsigned long long idle    = rn->idle     - rl->idle;
+         unsigned long long iowait  = rn->iowait   - rl->iowait;
+         unsigned long long irq     = rn->irq      - rl->irq;
+         unsigned long long softirq = rn->softirq  - rl->softirq;
          cpu_ticks_total = user + nice + system + idle + iowait + irq + softirq;
-   /*
-         printf("CPU user     = %d\n", rn->user);
-         printf("CPU nice     = %d\n", rn->nice);
-         printf("CPU system   = %d\n", rn->system);
-         printf("CPU idle     = %d\n", rn->idle);
-         printf("CPU iowait   = %d\n", rn->iowait);
-         printf("CPU irq      = %d\n", rn->irq);
-         printf("CPU softirq  = %d\n", rn->softirq);
-         printf("user     = %d\n", user);
-         printf("nice     = %d\n", nice);
-         printf("system   = %d\n", system);
-         printf("idle     = %d\n", idle);
-         printf("iowait   = %d\n", iowait);
-         printf("irq      = %d\n", irq);
-         printf("softirq  = %d\n", softirq);
-         printf("total    = %d\n", cpu_ticks_total);
-   */
+#ifdef AFOUTPUT
+         printf("Total CPU user     = %llu\n", rn->user);
+         printf("Total CPU nice     = %llu\n", rn->nice);
+         printf("Total CPU system   = %llu\n", rn->system);
+         printf("Total CPU idle     = %llu\n", rn->idle);
+         printf("Total CPU iowait   = %llu\n", rn->iowait);
+         printf("Total CPU irq      = %llu\n", rn->irq);
+         printf("Total CPU softirq  = %llu\n", rn->softirq);
+         printf("Delta CPU user     = %llu\n", user);
+         printf("Delta CPU nice     = %llu\n", nice);
+         printf("Delta CPU system   = %llu\n", system);
+         printf("Delta CPU idle     = %llu\n", idle);
+         printf("Delta CPU iowait   = %llu\n", iowait);
+         printf("Delta CPU irq      = %llu\n", irq);
+         printf("Delta CPU softirq  = %llu\n", softirq);
+         printf("Delta CPU total    = %llu\n", cpu_ticks_total);
+#endif //AFOUTPUT
          // Check for counters overflow:
          if( cpu_ticks_total > 0)
          {
-            hres.cpu_user    = ( 100 * user    ) / cpu_ticks_total;
-            hres.cpu_nice    = ( 100 * nice    ) / cpu_ticks_total;
-            hres.cpu_system  = ( 100 * system  ) / cpu_ticks_total;
-            hres.cpu_idle    = ( 100 * idle    ) / cpu_ticks_total;
-            hres.cpu_iowait  = ( 100 * iowait  ) / cpu_ticks_total;
-            hres.cpu_irq     = ( 100 * irq     ) / cpu_ticks_total;
-            hres.cpu_softirq = ( 100 * softirq ) / cpu_ticks_total;
+            hres.cpu_user    = ( user    * 100 ) / cpu_ticks_total;
+            hres.cpu_nice    = ( nice    * 100 ) / cpu_ticks_total;
+            hres.cpu_system  = ( system  * 100 ) / cpu_ticks_total;
+            hres.cpu_idle    = ( idle    * 100 ) / cpu_ticks_total;
+            hres.cpu_iowait  = ( iowait  * 100 ) / cpu_ticks_total;
+            hres.cpu_irq     = ( irq     * 100 ) / cpu_ticks_total;
+            hres.cpu_softirq = ( softirq * 100 ) / cpu_ticks_total;
          }
       }
 
@@ -355,29 +355,29 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          if( items != 13 ) continue;
          if( strcmp( name, device) == 0 )
          {
-/*
-            printf("IO rd_sectors = %llu\n", ion->rd_sectors);
-            printf("IO wr_sectors = %llu\n", ion->wr_sectors);
-            printf("IO ticks      = %llu\n", ion->ticks);
-*/
+#ifdef AFOUTPUT
+            printf("Total rd_sectors = %llu\n", ion->rd_sectors);
+            printf("Total wr_sectors = %llu\n", ion->wr_sectors);
+            printf("Total ticks      = %llu\n", ion->ticks);
+#endif //AFOUTPUT
             // Check for counters overflow:
             if(( ion->rd_sectors >= iol->rd_sectors) &&
                ( ion->wr_sectors >= iol->wr_sectors) &&
                ( ion->ticks      >= iol->ticks))
             {
-               int rd_sectors  = int( ion->rd_sectors  - iol->rd_sectors );
-               int wr_sectors  = int( ion->wr_sectors  - iol->wr_sectors );
-               int ticks       = int( ion->ticks       - iol->ticks      );
-/*
-               printf("rd_sectors = %d\n", rd_sectors);
-               printf("wr_sectors = %d\n", wr_sectors);
-               printf("ticks      = %d\n", ticks);
-*/
+               unsigned long long rd_sectors  = ion->rd_sectors  - iol->rd_sectors;
+               unsigned long long wr_sectors  = ion->wr_sectors  - iol->wr_sectors;
+               unsigned long long ticks       = ion->ticks       - iol->ticks;
+#ifdef AFOUTPUT
+               printf("Delta rd_sectors = %llu\n", rd_sectors);
+               printf("Delta wr_sectors = %llu\n", wr_sectors);
+               printf("Delta ticks      = %llu\n", ticks);
+#endif //AFOUTPUT
                int busy = 0;
-               if( cpu_ticks_total > 0 )
+               if( cpu_ticks_total != 0 )
                {
-                  int deltams = 1000 * cpu_ticks_total / host.cpu_num / HZ;
-                  if( deltams > 0 )
+                  unsigned long long deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
+                  if( deltams != 0 )
                   {
                      busy = 100 * ticks / deltams;
                      if( busy > 100) busy = 100;

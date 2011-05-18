@@ -7,7 +7,7 @@
 #include "../libafanasy/environment.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
@@ -43,11 +43,14 @@ struct io
 int now = 0;
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
 {
+#ifdef AFOUTPUT
+printf("\nGetResources:\n");
+#endif //AFOUTPUT
    //
    // CPU info:
    //
@@ -119,34 +122,38 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    cpu_now->kernel.LowPart   = kernelTime.dwLowDateTime;
    cpu_now->user.HighPart    = userTime.dwHighDateTime;
    cpu_now->user.LowPart     = userTime.dwLowDateTime;
-/*
-   printf("idleTime   = %u %u\n", idleTime.dwHighDateTime, idleTime.dwLowDateTime);
-   printf("kernelTime = %u %u\n", kernelTime.dwHighDateTime, kernelTime.dwLowDateTime);
-   printf("userTime   = %u %u\n", userTime.dwHighDateTime, userTime.dwLowDateTime);
-   printf("idleTime   = %u\n", cpu_now->idle.QuadPart);
-   printf("kernelTime = %u\n", cpu_now->kernel.QuadPart);
-   printf("userTime   = %u\n", cpu_now->user.QuadPart);
-*/
-   static const int cpu_times_koeff = 100;
-   int idle   = ( cpu_now->idle.QuadPart   - cpu_last->idle.QuadPart   ) / cpu_times_koeff;
-   int kernel = ( cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart ) / cpu_times_koeff;
-   int user   = ( cpu_now->user.QuadPart   - cpu_last->user.QuadPart   ) / cpu_times_koeff;
-   int system   =  kernel - idle;
-   int total100 = ( kernel + user ) / 100;
-   if( total100 < 1 ) total100 = 1;
-/*
-   printf("idle     = %9d\n", idle);
-   printf("kernel   = %9d\n", kernel);
-   printf("user     = %9d\n", user);
-   printf("total100 = %9d\n", total100);
-*/
-   hres.cpu_user    = user   / total100;
-   hres.cpu_system  = system / total100;
-   hres.cpu_idle    = idle   / total100;
-   hres.cpu_nice    = 0;
-   hres.cpu_iowait  = 0;
-   hres.cpu_irq     = 0;
-   hres.cpu_softirq = 0;
+#ifdef AFOUTPUT
+   printf("idleTime   = %llu\n", (unsigned long long)(cpu_now->idle.QuadPart));
+   printf("kernelTime = %llu\n", (unsigned long long)(cpu_now->kernel.QuadPart));
+   printf("userTime   = %llu\n", (unsigned long long)(cpu_now->user.QuadPart));
+#endif //AFOUTPUT
+   // Check counters overflow:
+   if(( cpu_now->idle.QuadPart   >= cpu_last->idle.QuadPart    ) &&
+      ( cpu_now->kernel.QuadPart >= cpu_last->kernel.QuadPart  ) &&
+      ( cpu_now->user.QuadPart   >= cpu_last->user.QuadPart    ))
+   {
+      unsigned long long idle   = cpu_now->idle.QuadPart   - cpu_last->idle.QuadPart;
+      unsigned long long kernel = cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart;
+      unsigned long long user   = cpu_now->user.QuadPart   - cpu_last->user.QuadPart;
+      unsigned long long system = kernel - idle;
+      unsigned long long total  = kernel + user
+#ifdef AFOUTPUT
+      printf("idle   = %9llu\n", idle);
+      printf("kernel = %9llu\n", kernel);
+      printf("user   = %9llu\n", user);
+      printf("total  = %9llu\n", total);
+#endif //AFOUTPUT
+      if( total != 0 )
+      {
+         hres.cpu_user    = ( user   * 100) / total;
+         hres.cpu_system  = ( system * 100) / total;
+         hres.cpu_idle    = ( idle   * 100) / total;
+         hres.cpu_nice    = 0;
+         hres.cpu_iowait  = 0;
+         hres.cpu_irq     = 0;
+         hres.cpu_softirq = 0;
+      }
+   }
 
    double loadavg[3] = { 0, 0, 0 };
 //   int nelem = getloadavg( loadavg, 3);
@@ -233,22 +240,45 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          io_now->QueueDepth   = dp.QueueDepth;
          io_now->SplitCount   = dp.SplitCount;
          io_now->QueryTime    = dp.QueryTime;
+#ifdef AFOUTPUT
+         printf("Total BytesRead    = %llu\n", (unsigned long long)(io_now->BytesRead.QuadPart));
+         printf("Total BytesWritten = %llu\n", (unsigned long long)(io_now->BytesWritten.QuadPart));
+#endif //AFOUTPUT
+         // Check for bytes counters overflow:
+         if(( io_now->BytesRead.QuadPart     >= io_last->BytesRead.QuadPart   ) &&
+            ( io_now->BytesWritten.QuadPart  >= io_last->BytesWritten.QuadPart))
+         {
+            unsigned long long BytesRead    = io_now->BytesRead.QuadPart    - io_last->BytesRead.QuadPart;
+            unsigned long long BytesWritten = io_now->BytesWritten.QuadPart - io_last->BytesWritten.QuadPart;
+#ifdef AFOUTPUT
+            printf("Delta BytesRead    = %llu\n", BytesRead);
+            printf("Delta BytesWritten = %llu\n", BytesWritten);
+#endif //AFOUTPUT
+            hres.hdd_rd_kbsec = ( BytesRead    >> 10) / af::Environment::getRenderUpdateSec();
+            hres.hdd_wr_kbsec = ( BytesWritten >> 10) / af::Environment::getRenderUpdateSec();
+         }
 
-         static const int io_times_koeff = 100;
-         int ReadTime  = ( io_now->ReadTime.QuadPart  - io_last->ReadTime.QuadPart  ) / io_times_koeff;
-         int WriteTime = ( io_now->WriteTime.QuadPart - io_last->WriteTime.QuadPart ) / io_times_koeff;
-         int IdleTime  = ( io_now->IdleTime.QuadPart  - io_last->IdleTime.QuadPart  ) / io_times_koeff;
-         int TotalTime100 = ( ReadTime + WriteTime + IdleTime ) / 100;
-         if( TotalTime100 < 1 ) TotalTime100 = 1;
-         //printf("ReadTime  = %9d\nWriteTime = %9d\nIdleTime  = %9d\nTotalTime = %9d\n", ReadTime, WriteTime, IdleTime, TotalTime100);
+         // Check for time counters overflow:
+         if(( io_now->ReadTime.QuadPart  >= io_last->ReadTime.QuadPart  ) &&
+            ( io_now->WriteTime.QuadPart >= io_last->WriteTime.QuadPart ) &&
+            ( io_now->IdleTime.QuadPart  >= io_last->IdleTime.QuadPart  ))
+         {
+            unsigned long long ReadTime  = io_now->ReadTime.QuadPart  - io_last->ReadTime.QuadPart;
+            unsigned long long WriteTime = io_now->WriteTime.QuadPart - io_last->WriteTime.QuadPart;
+            unsigned long long IdleTime  = io_now->IdleTime.QuadPart  - io_last->IdleTime.QuadPart;
+            unsigned long long TotalTime = ReadTime + WriteTime + IdleTime;
+            if( TotalTime != 0 )
+            {
+#ifdef AFOUTPUT
+               printf("ReadTime  = %9llu\nWriteTime = %9llu\nIdleTime  = %9llu\nTotalTime = %9llu\n", ReadTime, WriteTime, IdleTime, TotalTime);
+#endif //AFOUTPUT
+               int busy = ((ReadTime + WriteTime) * 100) / TotalTime;
+               if( busy < 0   ) busy = 0;
+               if( busy > 100 ) busy = 100;
 
-         int busy = ReadTime + WriteTime / TotalTime100;
-         if( busy < 0   ) busy = 0;
-         if( busy > 100 ) busy = 100;
-
-         hres.hdd_rd_kbsec = (( io_now->BytesRead.QuadPart     - io_last->BytesRead.QuadPart    ) >> 10) / af::Environment::getRenderUpdateSec();
-         hres.hdd_wr_kbsec = (( io_now->BytesWritten.QuadPart  - io_last->BytesWritten.QuadPart ) >> 10) / af::Environment::getRenderUpdateSec();
-         hres.hdd_busy = busy;
+               hres.hdd_busy = busy;
+            }
+         }
 
       }
 
