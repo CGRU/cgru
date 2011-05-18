@@ -7,7 +7,7 @@
 #include "../libafanasy/environment.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
@@ -41,10 +41,6 @@ struct io
 } io0, io1;
 
 int now = 0;
-
-#define AFOUTPUT
-//#undef AFOUTPUT
-#include "../include/macrooutput.h"
 
 void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
 {
@@ -99,13 +95,13 @@ printf("\nGetResources:\n");
    GlobalMemoryStatusEx( &statex);
    if( getConstants )
    {
-      host.mem_mb  = statex.ullTotalPhys >> 20;
-      host.swap_mb = statex.ullTotalPageFile >> 20;
+      host.mem_mb  = int( statex.ullTotalPhys     >> 20 );
+      host.swap_mb = int( statex.ullTotalPageFile >> 20 );
    }
-   hres.mem_free_mb    = statex.ullAvailPhys >> 20;
+   hres.mem_free_mb    = int( statex.ullAvailPhys >> 20 );
    hres.mem_cached_mb  = 0;
    hres.mem_buffers_mb = 0;
-   hres.swap_used_mb   = ( statex.ullTotalPageFile - statex.ullAvailPageFile ) >> 20;
+   hres.swap_used_mb   = int(( statex.ullTotalPageFile - statex.ullAvailPageFile ) >> 20);
    }//memory
 
    //
@@ -136,7 +132,7 @@ printf("\nGetResources:\n");
       unsigned long long kernel = cpu_now->kernel.QuadPart - cpu_last->kernel.QuadPart;
       unsigned long long user   = cpu_now->user.QuadPart   - cpu_last->user.QuadPart;
       unsigned long long system = kernel - idle;
-      unsigned long long total  = kernel + user
+      unsigned long long total  = kernel + user;
 #ifdef AFOUTPUT
       printf("idle   = %9llu\n", idle);
       printf("kernel = %9llu\n", kernel);
@@ -145,9 +141,9 @@ printf("\nGetResources:\n");
 #endif //AFOUTPUT
       if( total != 0 )
       {
-         hres.cpu_user    = ( user   * 100) / total;
-         hres.cpu_system  = ( system * 100) / total;
-         hres.cpu_idle    = ( idle   * 100) / total;
+         hres.cpu_user    = uint8_t(( user   * 100) / total);
+         hres.cpu_system  = uint8_t(( system * 100) / total);
+         hres.cpu_idle    = uint8_t(( idle   * 100) / total);
          hres.cpu_nice    = 0;
          hres.cpu_iowait  = 0;
          hres.cpu_irq     = 0;
@@ -182,8 +178,8 @@ printf("\nGetResources:\n");
    ULARGE_INTEGER totalNumberOfBytes, totalNumberOfFreeBytes;
    if( GetDiskFreeSpaceEx( directory, NULL, &totalNumberOfBytes, &totalNumberOfFreeBytes))
    {
-      if( getConstants) host.hdd_gb = totalNumberOfBytes.QuadPart >> 30;
-      hres.hdd_free_gb  = totalNumberOfFreeBytes.QuadPart >> 30;
+      if( getConstants) host.hdd_gb = int( totalNumberOfBytes.QuadPart >> 30 );
+      hres.hdd_free_gb  = int( totalNumberOfFreeBytes.QuadPart >> 30 );
    }
    else
    {
@@ -254,8 +250,8 @@ printf("\nGetResources:\n");
             printf("Delta BytesRead    = %llu\n", BytesRead);
             printf("Delta BytesWritten = %llu\n", BytesWritten);
 #endif //AFOUTPUT
-            hres.hdd_rd_kbsec = ( BytesRead    >> 10) / af::Environment::getRenderUpdateSec();
-            hres.hdd_wr_kbsec = ( BytesWritten >> 10) / af::Environment::getRenderUpdateSec();
+            hres.hdd_rd_kbsec = int(( BytesRead    >> 10) / af::Environment::getRenderUpdateSec());
+            hres.hdd_wr_kbsec = int(( BytesWritten >> 10) / af::Environment::getRenderUpdateSec());
          }
 
          // Check for time counters overflow:
@@ -272,7 +268,7 @@ printf("\nGetResources:\n");
 #ifdef AFOUTPUT
                printf("ReadTime  = %9llu\nWriteTime = %9llu\nIdleTime  = %9llu\nTotalTime = %9llu\n", ReadTime, WriteTime, IdleTime, TotalTime);
 #endif //AFOUTPUT
-               int busy = ((ReadTime + WriteTime) * 100) / TotalTime;
+               int busy = int((( ReadTime + WriteTime ) * 100 ) / TotalTime );
                if( busy < 0   ) busy = 0;
                if( busy > 100 ) busy = 100;
 
