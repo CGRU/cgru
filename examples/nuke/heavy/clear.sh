@@ -1,6 +1,6 @@
 #!/bin/bash
 
-scenes="scene.nk scene_stereo.nk"
+scenes="scene.nk"
 for scene in $scenes; do
    for tmpscene in `ls ${scene}*`; do
       [ $tmpscene == $scene ] && continue
