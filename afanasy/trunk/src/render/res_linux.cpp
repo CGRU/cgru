@@ -206,7 +206,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    //
    // CPU usage:
    //
-   unsigned long long cpu_ticks_total;
+   unsigned long long cpu_ticks_total = 0;
    if( readFile( filename_cpu_stat))
    {
             res * rl = &r0; res * rn = &r1;
@@ -268,7 +268,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          printf("Delta CPU total    = %llu\n", cpu_ticks_total);
 #endif //AFOUTPUT
          // Check for counters overflow:
-         if( cpu_ticks_total > 0)
+         if( cpu_ticks_total != 0)
          {
             hres.cpu_user    = ( user    * 100 ) / cpu_ticks_total;
             hres.cpu_nice    = ( nice    * 100 ) / cpu_ticks_total;
@@ -373,13 +373,12 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
                printf("Delta wr_sectors = %llu\n", wr_sectors);
                printf("Delta ticks      = %llu\n", ticks);
 #endif //AFOUTPUT
-               int busy = 0;
                if( cpu_ticks_total != 0 )
                {
                   unsigned long long deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
                   if( deltams != 0 )
                   {
-                     busy = 100 * ticks / deltams;
+                     int busy = 100 * ticks / deltams;
                      if( busy > 100) busy = 100;
                      if( busy <   0) busy = 0;
                      hres.hdd_busy = busy;
