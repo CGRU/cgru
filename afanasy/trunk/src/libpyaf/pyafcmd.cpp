@@ -8,12 +8,7 @@
 #define _DEBUG
 #undef _DEBUG
 #include "../include/macrooutput.h"
-/*
-PyObject * PyString_FromQstring(QString input)
-{
-   return PyString_FromString(input.toUtf8().data());
-}
-*/
+
 int PyAf_Cmd_init( PyAf_Cmd_Object *self, PyObject *args)
 {
 	self->cmd = new afapi::Cmd();
@@ -22,7 +17,10 @@ int PyAf_Cmd_init( PyAf_Cmd_Object *self, PyObject *args)
 
 void PyAf_Cmd_dealloc( PyAf_Cmd_Object * self)
 {
+//   delete self->cmd;
+#if PY_MAJOR_VERSION < 3
    self->ob_type->tp_free((PyObject*)self);
+#endif
 }
 
 PyObject * PyAf_Cmd_getJobList( PyAf_Cmd_Object *self, PyObject *args)
@@ -50,19 +48,19 @@ PyObject * PyAf_Cmd_decodeJobList( PyAf_Cmd_Object *self, PyObject *args)
    for( unsigned i = 0 ; i < nodeList->getCount(); i++) {
       af::Job * job = (af::Job*)(nodeList->getNode(i));
       PyObject *jobInfo = PyDict_New();
-      PyDict_SetItemString (jobInfo, "id", PyInt_FromLong(job->getId()));
-      PyDict_SetItemString (jobInfo, "name", PyString_FromString( job->getName().c_str()));
-      PyDict_SetItemString (jobInfo, "state", PyString_FromString(af::state2str( job->getState()).c_str()));
+      PyDict_SetItemString (jobInfo, "id", PyLong_FromLong(job->getId()));
+      PyDict_SetItemString (jobInfo, "name", PyBytes_FromString( job->getName().c_str()));
+      PyDict_SetItemString (jobInfo, "state", PyBytes_FromString(af::state2str( job->getState()).c_str()));
       PyDict_SetItemString (jobInfo, "offline", PyBool_FromLong(job->getState() & AFJOB::STATE_OFFLINE_MASK));
-      PyDict_SetItemString (jobInfo, "username", PyString_FromString(job->getUserName().c_str()));
+      PyDict_SetItemString (jobInfo, "username", PyBytes_FromString(job->getUserName().c_str()));
       PyObject *blocks = PyList_New(0);
       for (int i = 0; i < job->getBlocksNum(); i++) {
          PyObject *blockInfo = PyDict_New();
          af::BlockData * blockData = job->getBlock(i);
-         PyDict_SetItemString (blockInfo, "name", PyString_FromString(blockData->getName().c_str()));
-         PyDict_SetItemString (blockInfo, "service", PyString_FromString(blockData->getService().c_str()));
-         PyDict_SetItemString (blockInfo, "progress", PyInt_FromLong(blockData->getProgressPercentage()));
-         PyDict_SetItemString (blockInfo, "cmd", PyString_FromString(blockData->getCmd().c_str()));
+         PyDict_SetItemString (blockInfo, "name", PyBytes_FromString(blockData->getName().c_str()));
+         PyDict_SetItemString (blockInfo, "service", PyBytes_FromString(blockData->getService().c_str()));
+         PyDict_SetItemString (blockInfo, "progress", PyLong_FromLong(blockData->getProgressPercentage()));
+         PyDict_SetItemString (blockInfo, "cmd", PyBytes_FromString(blockData->getCmd().c_str()));
          PyList_Append(blocks, blockInfo);
       }
       PyDict_SetItemString (jobInfo, "blocks", blocks);
@@ -100,19 +98,19 @@ PyObject * PyAf_Cmd_decodeJobInfo( PyAf_Cmd_Object *self, PyObject *args)
    PyObject *jobInfo = PyDict_New();
    af::Job * job = new af::Job(message);
 
-   PyDict_SetItemString (jobInfo, "id", PyInt_FromLong(job->getId()));
-   PyDict_SetItemString (jobInfo, "name", PyString_FromString( job->getName().c_str()));
-   PyDict_SetItemString (jobInfo, "state", PyString_FromString( af::state2str(job->getState()).c_str()));
+   PyDict_SetItemString (jobInfo, "id", PyLong_FromLong(job->getId()));
+   PyDict_SetItemString (jobInfo, "name", PyBytes_FromString( job->getName().c_str()));
+   PyDict_SetItemString (jobInfo, "state", PyBytes_FromString( af::state2str(job->getState()).c_str()));
    PyDict_SetItemString (jobInfo, "offline", PyBool_FromLong( job->getState() & AFJOB::STATE_OFFLINE_MASK));
-   PyDict_SetItemString (jobInfo, "username", PyString_FromString( job->getUserName().c_str()));
+   PyDict_SetItemString (jobInfo, "username", PyBytes_FromString( job->getUserName().c_str()));
    PyObject *blocks = PyList_New(0);
    for (int i = 0; i < job->getBlocksNum(); i++) {
       PyObject *blockInfo = PyDict_New();
       af::BlockData * blockData = job->getBlock(i);
-      PyDict_SetItemString (blockInfo, "name", PyString_FromString(blockData->getName().c_str()));
-      PyDict_SetItemString (blockInfo, "service", PyString_FromString(blockData->getService().c_str()));
-      PyDict_SetItemString (blockInfo, "progress", PyInt_FromLong(blockData->getProgressPercentage()));
-      PyDict_SetItemString (blockInfo, "cmd", PyString_FromString(blockData->getCmd().c_str()));
+      PyDict_SetItemString (blockInfo, "name", PyBytes_FromString(blockData->getName().c_str()));
+      PyDict_SetItemString (blockInfo, "service", PyBytes_FromString(blockData->getService().c_str()));
+      PyDict_SetItemString (blockInfo, "progress", PyLong_FromLong(blockData->getProgressPercentage()));
+      PyDict_SetItemString (blockInfo, "cmd", PyBytes_FromString(blockData->getCmd().c_str()));
       PyList_Append(blocks, blockInfo);
    }
    PyDict_SetItemString (jobInfo, "blocks", blocks);
@@ -121,14 +119,14 @@ PyObject * PyAf_Cmd_decodeJobInfo( PyAf_Cmd_Object *self, PyObject *args)
 
 PyObject * PyAf_Cmd_getDataLen( PyAf_Cmd_Object *self)
 {
-   PyObject * result = PyInt_FromLong( self->cmd->getDataLen());
+   PyObject * result = PyLong_FromLong( self->cmd->getDataLen());
    Py_INCREF( result);
    return result;
 }
 
 PyObject * PyAf_Cmd_getData( PyAf_Cmd_Object *self)
 {
-   PyObject * result = PyString_FromStringAndSize( self->cmd->getData(), self->cmd->getDataLen());
+   PyObject * result = PyBytes_FromStringAndSize( self->cmd->getData(), self->cmd->getDataLen());
    Py_INCREF( result);
    return result;
 }

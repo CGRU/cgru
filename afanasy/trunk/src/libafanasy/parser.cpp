@@ -15,7 +15,7 @@ Parser::Parser( const std::string & type, int frames):
    PyObj_FuncParse( NULL)
 {
    PyObject * args = PyTuple_New( 1);
-   PyTuple_SetItem( args, 0, PyInt_FromLong( numframes));
+   PyTuple_SetItem( args, 0, PyLong_FromLong( numframes));
 
    if( PyClass::init( AFPYNAMES::PARSER_CLASSESDIR, name, args) == false) return;
 
@@ -38,20 +38,20 @@ bool Parser::parse(  std::string & data,
    if( data.size() < 1) return result;
 
    PyObject * pArgs = PyTuple_New( 1);
-   PyTuple_SetItem( pArgs, 0, PyString_FromStringAndSize( data.data(), data.size()));
+   PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( data.data(), data.size()));
    PyObject * pTuple = PyObject_CallObject( PyObj_FuncParse, pArgs);
    if( PyTuple_Check( pTuple))
    {
       if( PyTuple_Size( pTuple) == 7)
       {
-         percent        = PyInt_AsLong(    PyTuple_GetItem( pTuple, 1));
-         frame          = PyInt_AsLong(    PyTuple_GetItem( pTuple, 2));
-         percentframe   = PyInt_AsLong(    PyTuple_GetItem( pTuple, 3));
+         percent        = PyLong_AsLong(   PyTuple_GetItem( pTuple, 1));
+         frame          = PyLong_AsLong(   PyTuple_GetItem( pTuple, 2));
+         percentframe   = PyLong_AsLong(   PyTuple_GetItem( pTuple, 3));
          warning        = PyObject_IsTrue( PyTuple_GetItem( pTuple, 4));
          error          = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
          badresult      = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
          PyObject * output = PyTuple_GetItem( pTuple, 0);
-         if( PyString_Check( output)) data = PyString_AsString( output);
+         if( PyBytes_Check( output)) data = PyBytes_AsString( output);
          result = true;
       }
       else

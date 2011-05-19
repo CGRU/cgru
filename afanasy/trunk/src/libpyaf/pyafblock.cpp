@@ -15,7 +15,11 @@ int PyAf_Block_init( PyAf_Block_Object *self, PyObject *args, PyObject *kwds)
 void PyAf_Block_dealloc( PyAf_Block_Object * self)
 {
    delete self->block;
+#if PY_MAJOR_VERSION < 3
    self->ob_type->tp_free((PyObject*)self);
+#else
+   Py_TYPE(self)->tp_free((PyObject*)self);
+#endif
 }
 
 PyObject * PyAf_Block_appendTask( PyAf_Block_Object *self, PyObject *arg)
@@ -26,145 +30,177 @@ PyObject * PyAf_Block_appendTask( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setName( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setName( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setName")) Py_RETURN_FALSE;
+   self->block->setName( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setTasksName( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setTasksName( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setTasksName")) Py_RETURN_FALSE;
+   self->block->setTasksName( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setService( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setService( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setService")) Py_RETURN_FALSE;
+   self->block->setService( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setParser( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setParser( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setParser")) Py_RETURN_FALSE;
+   self->block->setParser( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setWorkingDirectory( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setWorkingDirectory( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setWorkingDirectory")) Py_RETURN_FALSE;
+   self->block->setWorkingDirectory( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setEnvironment( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setEnvironment( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setEnvironment")) Py_RETURN_FALSE;
+   self->block->setEnvironment( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setCommand( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setCommand( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setCommand")) Py_RETURN_FALSE;
+   self->block->setCommand( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setFiles( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setFiles( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setFiles")) Py_RETURN_FALSE;
+   self->block->setFiles( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setCustomData( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setCustomData( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setCustomData")) Py_RETURN_FALSE;
+   self->block->setCustomData( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setCmdPre( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setCmdPre( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setCmdPre")) Py_RETURN_FALSE;
+   self->block->setCmdPre( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setCmdPost( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setCmdPost( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setCmdPost")) Py_RETURN_FALSE;
+   self->block->setCmdPost( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setHostsMask( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setHostsMask( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setHostsMask")) Py_RETURN_FALSE;
+   if( self->block->setHostsMask( str)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setHostsMaskExclude( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setHostsMaskExclude( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setHostsMaskExclude")) Py_RETURN_FALSE;
+   if( self->block->setHostsMaskExclude( str)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setDependMask( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setDependMask( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setDependMask")) Py_RETURN_FALSE;
+   if( self->block->setDependMask( str)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setTasksDependMask( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setTasksDependMask( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setTasksDependMask")) Py_RETURN_FALSE;
+   if( self->block->setTasksDependMask( str)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setNeedProperties( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setNeedProperties( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setNeedProperties")) Py_RETURN_FALSE;
+   if( self->block->setNeedProperties( str)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setCapacity( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setCapacity( PyInt_AsLong( arg))) Py_RETURN_TRUE;
+   if( self->block->setCapacity( PyLong_AsLong( arg))) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setMaxRunningTasks( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setMaxRunningTasks( PyInt_AsLong( arg));
+   self->block->setMaxRunningTasks( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setTasksMaxRunTime( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setTasksMaxRunTime( PyInt_AsLong( arg));
+   self->block->setTasksMaxRunTime( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setNeedMemory( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setNeedMemory( PyInt_AsLong( arg));
+   self->block->setNeedMemory( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setNeedPower( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setNeedPower( PyInt_AsLong( arg));
+   self->block->setNeedPower( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setNeedHDD( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setNeedHDD( PyInt_AsLong( arg));
+   self->block->setNeedHDD( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setParserCoeff( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setParserCoeff( PyInt_AsLong( arg));
+   self->block->setParserCoeff( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setFramesPerTask( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setFramesPerTask( PyInt_AsLong( arg));
+   self->block->setFramesPerTask( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
@@ -209,6 +245,6 @@ PyObject * PyAf_Block_clearTasksList( PyAf_Block_Object *self)
 
 PyObject * PyAf_Block_output( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->stdOut( PyInt_AsLong( arg));
+   self->block->stdOut( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }

@@ -1,8 +1,8 @@
 #define PYAFJOB
 #include "pyafjob.h"
 
-#define _DEBUG
-#undef _DEBUG
+#define AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 int PyAf_Job_init( PyAf_Job_Object *self, PyObject *args, PyObject *kwds)
@@ -15,7 +15,11 @@ int PyAf_Job_init( PyAf_Job_Object *self, PyObject *args, PyObject *kwds)
 void PyAf_Job_dealloc( PyAf_Job_Object * self)
 {
    delete self->job;
+#if PY_MAJOR_VERSION < 3
    self->ob_type->tp_free((PyObject*)self);
+#else
+   Py_TYPE(self)->tp_free((PyObject*)self);
+#endif
 }
 
 PyObject * PyAf_Job_appendBlock( PyAf_Job_Object *self, PyObject *arg)
@@ -26,97 +30,121 @@ PyObject * PyAf_Job_appendBlock( PyAf_Job_Object *self, PyObject *arg)
 
 PyObject * PyAf_Job_setName( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setName( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setName")) Py_RETURN_FALSE;
+   self->job->setName( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setDescription( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setDescription( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setDescription")) Py_RETURN_FALSE;
+   self->job->setDescription( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setUserName( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setUserName( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setUserName")) Py_RETURN_FALSE;
+   self->job->setUserName( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setHostName( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setHostName( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setHostName")) Py_RETURN_FALSE;
+   self->job->setHostName( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setCmdPre( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setCmdPre( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setCmdPre")) Py_RETURN_FALSE;
+   self->job->setCmdPre( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setCmdPost( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setCmdPost( PyString_AsString( arg));
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setCmdPost")) Py_RETURN_FALSE;
+   self->job->setCmdPost( str);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setHostsMask( PyAf_Job_Object *self, PyObject *arg)
 {
-   if( self->job->setHostsMask( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setHostsMask")) Py_RETURN_FALSE;
+   if( self->job->setHostsMask( str)) Py_RETURN_TRUE;
    else Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Job_setHostsMaskExclude( PyAf_Job_Object *self, PyObject *arg)
 {
-   if( self->job->setHostsMaskExclude( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setHostsMaskExclude")) Py_RETURN_FALSE;
+   if( self->job->setHostsMaskExclude( str)) Py_RETURN_TRUE;
    else Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Job_setDependMask( PyAf_Job_Object *self, PyObject *arg)
 {
-   if( self->job->setDependMask( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setDependMask")) Py_RETURN_FALSE;
+   if( self->job->setDependMask( str)) Py_RETURN_TRUE;
    else Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Job_setDependMaskGlobal( PyAf_Job_Object *self, PyObject *arg)
 {
-   if( self->job->setDependMaskGlobal( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setDependMaskGlobal")) Py_RETURN_FALSE;
+   if( self->job->setDependMaskGlobal( str)) Py_RETURN_TRUE;
    else Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Job_setNeedOS( PyAf_Job_Object *self, PyObject *arg)
 {
-   if( self->job->setNeedOS( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setNeedOS")) Py_RETURN_FALSE;
+   if( self->job->setNeedOS( str)) Py_RETURN_TRUE;
    else Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Job_setNeedProperties( PyAf_Job_Object *self, PyObject *arg)
 {
-   if( self->job->setNeedProperties( PyString_AsString( arg))) Py_RETURN_TRUE;
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Job_setNeedProperties")) Py_RETURN_FALSE;
+   if( self->job->setNeedProperties( str)) Py_RETURN_TRUE;
    else Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Job_setMaxRunningTasks( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setMaxRunningTasks( PyInt_AsLong( arg));
+   self->job->setMaxRunningTasks( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setPriority( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setPriority( PyInt_AsLong( arg));
+   self->job->setPriority( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_setWaitTime( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->setWaitTime( PyInt_AsLong( arg));
+   self->job->setWaitTime( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Job_output( PyAf_Job_Object *self, PyObject *arg)
 {
-   self->job->output( PyInt_AsLong( arg));
+   self->job->output( PyLong_AsLong( arg));
    Py_RETURN_TRUE;
 }
 
@@ -140,14 +168,14 @@ PyObject * PyAf_Job_construct( PyAf_Job_Object *self)
 
 PyObject * PyAf_Job_getDataLen( PyAf_Job_Object *self)
 {
-   PyObject * result = PyInt_FromLong( self->job->getDataLen());
+   PyObject * result = PyLong_FromLong( self->job->getDataLen());
    Py_INCREF( result);
    return result;
 }
 
 PyObject * PyAf_Job_getData( PyAf_Job_Object *self)
 {
-   PyObject * result = PyString_FromStringAndSize( self->job->getData(), self->job->getDataLen());
+   PyObject * result = PyBytes_FromStringAndSize( self->job->getData(), self->job->getDataLen());
    Py_INCREF( result);
    return result;
 }

@@ -53,7 +53,7 @@ void Service::initialize()
 
    PyObject * pHostsList = PyList_New(0);
    for( std::list<std::string>::const_iterator it = hosts.begin(); it != hosts.end(); it++)
-      if( PyList_Append( pHostsList, PyString_FromString((*it).c_str())) != 0)
+      if( PyList_Append( pHostsList, PyBytes_FromString((*it).c_str())) != 0)
       {
          AFERROR("Service::Service: PyList_Append:")
          PyErr_Print();
@@ -61,12 +61,12 @@ void Service::initialize()
 
    PyObject *pArgs;
    pArgs = PyTuple_New( 6);
-   PyTuple_SetItem( pArgs, 0, PyString_FromString( af::Environment::getAfRoot().c_str()));
-   PyTuple_SetItem( pArgs, 1, PyString_FromString( wdir.c_str()));
-   PyTuple_SetItem( pArgs, 2, PyString_FromString( command.c_str()));
-   PyTuple_SetItem( pArgs, 3, PyInt_FromLong( capkoeff));
+   PyTuple_SetItem( pArgs, 0, PyBytes_FromString( af::Environment::getAfRoot().c_str()));
+   PyTuple_SetItem( pArgs, 1, PyBytes_FromString( wdir.c_str()));
+   PyTuple_SetItem( pArgs, 2, PyBytes_FromString( command.c_str()));
+   PyTuple_SetItem( pArgs, 3, PyLong_FromLong( capkoeff));
    PyTuple_SetItem( pArgs, 4, pHostsList );
-   PyTuple_SetItem( pArgs, 5, PyString_FromString( files.c_str()));
+   PyTuple_SetItem( pArgs, 5, PyBytes_FromString( files.c_str()));
 
    // Try to import service class
    if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name, pArgs))
@@ -90,9 +90,9 @@ void Service::initialize()
 
    // Process working directory:
    pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
-   if( PyString_Check( pResult))
+   if( PyBytes_Check( pResult))
    {
-      wdir = PyString_AsString( pResult);
+      wdir = PyBytes_AsString( pResult);
       Py_DECREF( pResult);
    }
    else
@@ -104,9 +104,9 @@ void Service::initialize()
 
    // Process command:
    pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
-   if( PyString_Check( pResult))
+   if( PyBytes_Check( pResult))
    {
-      command = PyString_AsString( pResult);
+      command = PyBytes_AsString( pResult);
       Py_DECREF( pResult);
    }
    else
@@ -118,9 +118,9 @@ void Service::initialize()
 
    // Process files:
    pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
-   if( PyString_Check( pResult))
+   if( PyBytes_Check( pResult))
    {
-      files = PyString_AsString( pResult);
+      files = PyBytes_AsString( pResult);
       Py_DECREF( pResult);
    }
    else

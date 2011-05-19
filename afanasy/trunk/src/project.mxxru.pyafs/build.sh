@@ -30,11 +30,16 @@ for python in `ls "$pythondir"`; do
    # Skip folder name does not starts with a digit and a dot:
    [ "`echo $python | awk '{print match( \$1, "[0-9]\\\.")}'`" == "1" ] || continue
 
-   echo "Building for Python${python}"
-
    export PATH=$pythondir/$python/bin:$syspath
    export AF_PYAFVER=$python
    export AF_PYTHON="python"
+
+   if [ "`echo $python | awk '{print match( \$1, "3")}'`" == "1" ]; then
+      echo "Python major version is 3"
+      export AF_PYTHON="python3"
+   fi
+
+   echo "Building for ${AF_PYTHON} ${python}"
 
    ruby afanasy.mxw.rb $*
 

@@ -29,8 +29,12 @@ static PyMethodDef PyAf_Task_methods[] = {
 };
 
 static PyTypeObject PyAf_Task_Type = {
+#if PY_MAJOR_VERSION >= 3
+    PyVarObject_HEAD_INIT(NULL, 0)
+#else
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
+#endif
     "pyaf.Task",             /*tp_name*/
     sizeof(PyAf_Task_Object), /*tp_basicsize*/
     0,                         /*tp_itemsize*/

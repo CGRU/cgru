@@ -44,7 +44,9 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    }
 
    // Get class instance
+#if PY_MAJOR_VERSION < 3
    PyObj_Instance = PyInstance_New( PyObj_Type, initArgs, NULL);
+#endif
    if( PyObj_Instance == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();

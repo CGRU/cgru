@@ -12,7 +12,7 @@ using namespace afapi;
 Block::Block( bool DeleteTasksWithBlock):
       deleteTasksWithBlock( DeleteTasksWithBlock)
 {
-AFINFA("API: Block constuctor called.\n");
+AFINFA("API: Block constuctor called.")
    name     = AFJOB::BLOCK_DEFAULT_NAME;
    service  = AFJOB::BLOCK_DEFAULT_SERVICE;
    parser   = AFJOB::BLOCK_DEFAULT_PARSER;
@@ -20,7 +20,7 @@ AFINFA("API: Block constuctor called.\n");
 
 Block::~Block()
 {
-AFINFA("API: Block['%s'] destructor called\n", name.c_str());
+AFINFA("API: Block['%s'] destructor called.", name.c_str())
 // Do not delete tasks with block. They must be deleted manually. Python will delete them.
    if(( false == deleteTasksWithBlock) && tasksdata ) for( int b = 0; b < tasksnum; b++) tasksdata[b] = NULL;
 }
@@ -40,35 +40,35 @@ void Block::setMaxRunningTasksNumber(  int value   )  { maxrunningtasks = value;
 void Block::setTasksMaxRunTime(        int value   )  { tasksmaxruntime = value; }
 void Block::setParserCoeff(            int value   )  { parsercoeff     = value; }
 
-void Block::setName(             const char * str) {  name        = str;   }
-void Block::setService(          const char * str) {  service     = str;   }
-void Block::setParser(           const char * str) {  parser      = str;   }
-void Block::setTasksName(        const char * str) {  tasksname   = str;   }
-void Block::setCmdPre(           const char * str) {  cmd_pre     = str;   }
-void Block::setCmdPost(          const char * str) {  cmd_post    = str;   }
-void Block::setCommand(          const char * str) {  command     = str;   }
-void Block::setFiles(            const char * str) {  files       = str;   }
-void Block::setWorkingDirectory( const char * str) {  wdir        = str;   }
-void Block::setEnvironment(      const char * str) {  environment = str;   }
-void Block::setCustomData(       const char * str) {  customdata  = str;   }
+void Block::setName(             const std::string & str) {  name        = str;   }
+void Block::setService(          const std::string & str) {  service     = str;   }
+void Block::setParser(           const std::string & str) {  parser      = str;   }
+void Block::setTasksName(        const std::string & str) {  tasksname   = str;   }
+void Block::setCmdPre(           const std::string & str) {  cmd_pre     = str;   }
+void Block::setCmdPost(          const std::string & str) {  cmd_post    = str;   }
+void Block::setCommand(          const std::string & str) {  command     = str;   }
+void Block::setFiles(            const std::string & str) {  files       = str;   }
+void Block::setWorkingDirectory( const std::string & str) {  wdir        = str;   }
+void Block::setEnvironment(      const std::string & str) {  environment = str;   }
+void Block::setCustomData(       const std::string & str) {  customdata  = str;   }
 
-bool Block::setDependMask( const char* str )
+bool Block::setDependMask( const std::string & str )
 {
    return af::BlockData::setDependMask( str);
 }
-bool Block::setTasksDependMask( const char* str )
+bool Block::setTasksDependMask( const std::string & str )
 {
    return af::BlockData::setTasksDependMask( str);
 }
-bool Block::setHostsMask( const char* str )
+bool Block::setHostsMask( const std::string & str )
 {
    return af::BlockData::setHostsMask( str);
 }
-bool Block::setHostsMaskExclude( const char* str)
+bool Block::setHostsMaskExclude( const std::string & str)
 {
    return af::BlockData::setHostsMaskExclude( str);
 }
-bool Block::setNeedProperties( const char* str)
+bool Block::setNeedProperties( const std::string & str)
 {
    return af::BlockData::setNeedProperties( str);
 }
@@ -98,26 +98,26 @@ void Block::setVariableCapacity( int min, int max)
    capcoeff_max = max;
 }
 
-void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const char * service, int waitsrv)
+void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const std::string & service, int waitsrv)
 {
    if( min < 1)
    {
-      AFERROR("Block::setMultiHost: Minimum must be greater then zero.\n");
+      AFERROR("Block::setMultiHost: Minimum must be greater then zero.")
       return;
    }
    if( max < min)
    {
-      AFERROR("Block::setMultiHost: Maximum must be greater or equal then minimum.\n");
+      AFERROR("Block::setMultiHost: Maximum must be greater or equal then minimum.")
       return;
    }
    if((min > AFJOB::TASK_MULTIHOSTMAXHOSTS) || (max > AFJOB::TASK_MULTIHOSTMAXHOSTS))
    {
-      AFERRAR("Block::setMultiHost: Maximum hosts number is limited to %d.\n", AFJOB::TASK_MULTIHOSTMAXHOSTS);
+      AFERRAR("Block::setMultiHost: Maximum hosts number is limited to %d.", AFJOB::TASK_MULTIHOSTMAXHOSTS)
       return;
    }
-   if( sameHostMaster && service)
+   if( sameHostMaster && ( false == service.empty() ))
    {
-      AFERROR("Block::setMultiHost: Block can't have multihost service if master and slave can be the same host.\n");
+      AFERROR("Block::setMultiHost: Block can't have multihost service if master and slave can be the same host.")
       sameHostMaster = false;
    }
 
@@ -127,7 +127,7 @@ void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, co
    multihost_max  = max;
    multihost_waitmax = waitmax;
    multihost_waitsrv = waitsrv;
-   if( service) multihost_service = service;
+   if( false == service.empty()) multihost_service = service;
 }
 
 void Block::clearTasksList()

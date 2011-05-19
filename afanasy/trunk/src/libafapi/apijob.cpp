@@ -27,41 +27,41 @@ Job::~Job()
       for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
 }
 
-void Job::setUserName(        const char * str     )  { username     = str;   }
-void Job::setHostName(        const char * str     )  { hostname     = str;   }
-void Job::setName(            const char * str     )  { name         = str;   }
-void Job::setCmdPre(          const char * str     )  { cmd_pre      = str;   }
-void Job::setCmdPost(         const char * str     )  { cmd_post     = str;   }
-void Job::setDescription(     const char * str     )  { description  = str;   }
-void Job::setMaxRunningTasks(       int value   )  { maxrunningtasks = value;                               }
-void Job::setPriority(              int value   )  { priority        = value;                               }
-void Job::setWaitTime(              int value   )  { time_wait       = value;                               }
-void Job::offline()                                { state           = state | AFJOB::STATE_OFFLINE_MASK;   }
+void Job::setUserName(     const std::string & str )  { username     = str;   }
+void Job::setHostName(     const std::string & str )  { hostname     = str;   }
+void Job::setName(         const std::string & str )  { name         = str;   }
+void Job::setCmdPre(       const std::string & str )  { cmd_pre      = str;   }
+void Job::setCmdPost(      const std::string & str )  { cmd_post     = str;   }
+void Job::setDescription(  const std::string & str )  { description  = str;   }
+void Job::setMaxRunningTasks(       int value      )  { maxrunningtasks = value;                               }
+void Job::setPriority(              int value      )  { priority        = value;                               }
+void Job::setWaitTime(              int value      )  { time_wait       = value;                               }
+void Job::offline()                                   { state           = state | AFJOB::STATE_OFFLINE_MASK;   }
 
 int  Job::getDataLen() { if( message) return message->writeSize(); else return -1;}
 void Job::clearBlocksList() { blocks.clear();}
 
-bool Job::setHostsMask(    const char* str )
+bool Job::setHostsMask( const std::string & str )
 {
    return af::Job::setHostsMask( str);
 }
-bool Job::setHostsMaskExclude(    const char* str )
+bool Job::setHostsMaskExclude( const std::string & str )
 {
    return af::Job::setHostsMaskExclude( str);
 }
-bool Job::setDependMask( const char* str )
+bool Job::setDependMask( const std::string & str )
 {
    return af::Job::setDependMask( str);
 }
-bool Job::setDependMaskGlobal( const char* str )
+bool Job::setDependMaskGlobal( const std::string & str )
 {
    return af::Job::setDependMaskGlobal( str);
 }
-bool Job::setNeedOS( const char* str )
+bool Job::setNeedOS( const std::string & str )
 {
    return af::Job::setNeedOS( str);
 }
-bool Job::setNeedProperties( const char* str )
+bool Job::setNeedProperties( const std::string & str )
 {
    return af::Job::setNeedProperties( str);
 }

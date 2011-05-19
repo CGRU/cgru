@@ -88,7 +88,7 @@ void Item::drawBack( QPainter *painter, const QStyleOptionViewItem &option) cons
       painter->fillRect( option.rect, afqt::QEnvironment::clr_item.c);
 }
 
-void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option) const
+void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option, float alpha) const
 {
    painter->setRenderHint( QPainter::Antialiasing, false);
 
@@ -98,17 +98,17 @@ void Item::drawPost( QPainter *painter, const QStyleOptionViewItem &option) cons
    int h = option.rect.height();
 
    painter->setPen( afqt::QEnvironment::qclr_black );
-   painter->setOpacity( 0.7);
+   painter->setOpacity( 0.7 * alpha);
 
    painter->drawLine( x, y+h, x+w-1, y+h);
 
-   painter->setOpacity( 0.2);
+   painter->setOpacity( 0.2 * alpha);
 
    painter->drawLine( x, y+1, x, y+h-1);
    painter->drawLine( x+w-1, y+1, x+w-1, y+h-1);
 
    painter->setPen( afqt::QEnvironment::qclr_white );
-   painter->setOpacity( 0.5);
+   painter->setOpacity( 0.5 * alpha);
 
    painter->drawLine( x, y, x+w-1, y);
 

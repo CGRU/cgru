@@ -23,28 +23,28 @@ public:
    void stdOut( bool full = false ) const;
 
 /// Set name.
-   void setName( const char * str);
+   void setName( const std::string & str);
 
 /// Set tasks service type name.
-   void setService( const char * str);
+   void setService( const std::string & str);
 
 /// Set tasks name.
-   void setTasksName( const char * str);
+   void setTasksName( const std::string & str);
 
 /// Set tasks parser type ( if parser type name does not match tasks type ).
-   void setParser( const char * str);
+   void setParser( const std::string & str);
 
 /// Set current block tasks working directory.
-   void setWorkingDirectory( const char * str);
+   void setWorkingDirectory( const std::string & str);
 
 /// Set block tasks extra environment.
-   void setEnvironment( const char * str);
+   void setEnvironment( const std::string & str);
 
 /// Set block command.
-   void setCommand( const char * str);
+   void setCommand( const std::string & str);
 
 /// Set block tasks view result command.
-   void setFiles( const char * str);
+   void setFiles( const std::string & str);
 
 /// Set block command type to numeric. %1 and %2 arguments in command will be replaced for each task.
    bool setNumeric( int start, int end, int perHost = 1, int incement = 1);
@@ -53,10 +53,10 @@ public:
    void setFramesPerTask( int perTask);
 
 /// Set block pre register command, witch will be executed before job register.
-   void setCmdPre(  const char * str);
+   void setCmdPre(  const std::string & str);
 
 /// Set block post deletion command, witch will be executed before job register.
-   void setCmdPost( const char * str);
+   void setCmdPost( const std::string & str);
 
 /// Set tasks maximum run time, after this time task will be restart as error task
    void setTasksMaxRunTime( int value);
@@ -65,22 +65,22 @@ public:
    void setMaxRunningTasksNumber( int value);
 
 /// Set block hosts mask.
-   bool setHostsMask( const char * str);
+   bool setHostsMask( const std::string & str);
 
 /// Set block hosts to exclude mask.
-   bool setHostsMaskExclude( const char * str);
+   bool setHostsMaskExclude( const std::string & str);
 
 /// Set block depend mask.
-   bool setDependMask( const char * str);
+   bool setDependMask( const std::string & str);
 
 /// Set tasks depend mask.
-   bool setTasksDependMask( const char * str);
+   bool setTasksDependMask( const std::string & str);
 
 /// Set tasks capacity.
    bool setCapacity( int value );
 
 /// Set needed properties.
-   bool setNeedProperties( const char * str);
+   bool setNeedProperties( const std::string & str);
 
 /// Set needed memory.
    void setNeedMemory( int value );
@@ -101,14 +101,13 @@ public:
    void setVariableCapacity( int min, int max);
 
 /// Set block tasks to multihost
-   void setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const char * service, int waitsrv);
+   void setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const std::string & service, int waitsrv);
 
 /// Set task custom data.
-   void setCustomData( const char * str);
+   void setCustomData( const std::string & str);
 
 public:
    inline void setBlockNumber( int value) { blocknum = value;}
-   inline void setName( const std::string & str) { name = str; }
    virtual int calcWeight() const; ///< Calculate and return memory size.
    void fillTasksArrayFromList();
 

@@ -79,8 +79,12 @@ static PyMethodDef PyAf_Block_methods[] = {
 };
 
 static PyTypeObject PyAf_Block_Type = {
+#if PY_MAJOR_VERSION >= 3
+    PyVarObject_HEAD_INIT(NULL, 0)
+#else
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
+#endif
     "pyaf.Block",             /*tp_name*/
     sizeof(PyAf_Block_Object), /*tp_basicsize*/
     0,                         /*tp_itemsize*/

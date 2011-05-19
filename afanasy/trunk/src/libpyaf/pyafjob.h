@@ -57,12 +57,20 @@ static PyMethodDef PyAf_Job_methods[] = {
    {"construct",           (PyCFunction) PyAf_Job_construct,            METH_NOARGS,   "Construct job data."         },
    {"getDataLen",          (PyCFunction) PyAf_Job_getDataLen,           METH_NOARGS,   "Get job data length."        },
    {"getData",             (PyCFunction) PyAf_Job_getData,              METH_NOARGS,   "Get job data."               },
+#if PY_MAJOR_VERSION >= 3
+   { NULL } // Sentinel
+#else
    { NULL, NULL, 0, NULL } // Sentinel
+#endif
 };
 
 static PyTypeObject PyAf_Job_Type = {
+#if PY_MAJOR_VERSION >= 3
+    PyVarObject_HEAD_INIT(NULL, 0)
+#else
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
+#endif
     "pyaf.Job",             /*tp_name*/
     sizeof(PyAf_Job_Object), /*tp_basicsize*/
     0,                         /*tp_itemsize*/

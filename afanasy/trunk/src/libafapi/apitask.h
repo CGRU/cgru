@@ -15,21 +15,18 @@ public:
    void stdOut( bool full = false ) const;
 
 /// Set task name.
-   void setName( const char * str);
+   void setName( const std::string & str);
 
 /// Set task command.
-   void setCommand( const char * str);
+   void setCommand( const std::string & str);
 
 /// Set task view result command.
-   void setFiles( const char * str);
+   void setFiles( const std::string & str);
 
 /// Set task custom data.
-   void setCustomData( const char * str);
+   void setCustomData( const std::string & str);
 
 /// Set task depend mask.
-   bool setDependMask( const char * str);
-
-/// Set task name.
-   inline void setName( const std::string & str) { name = str; }
+   bool setDependMask( const std::string & str);
 };
 }

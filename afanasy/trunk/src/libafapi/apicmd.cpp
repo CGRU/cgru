@@ -42,7 +42,7 @@ bool Cmd::GetJobListUserId(int userID)
    message = new af::Msg( af::Msg::TJobsListRequestUserId, userID );
    if( message == NULL)
    {
-      AFERROR("Cmd::GetJobList: Can't allocate memory for data.\n");
+      AFERROR("Cmd::GetJobList: Can't allocate memory for data.")
       return false;
    }
 
@@ -57,7 +57,7 @@ bool Cmd::GetJobList()
    message = new af::Msg( af::Msg::TJobsListRequest );
    if( message == NULL)
    {
-      AFERROR("Cmd::GetJobList: Can't allocate memory for data.\n");
+      AFERROR("Cmd::GetJobList: Can't allocate memory for data.")
       return false;
    }
 
@@ -72,7 +72,7 @@ bool Cmd::GetJobInfo(int jobID)
    message = new af::Msg( af::Msg::TJobRequestId, jobID );
    if( message == NULL)
    {
-      AFERROR("Cmd::TJobRequestId: Can't allocate memory for data.\n");
+      AFERROR("Cmd::TJobRequestId: Can't allocate memory for data.")
       return false;
    }
 
@@ -90,7 +90,7 @@ bool Cmd::JobDelete( const std::string & jobMask)
    message->set( af::Msg::TJobDelete, &mcgeneral);
    if( message == NULL)
    {
-      AFERROR("Cmd::TJobDelete: Can't allocate memory for data.\n");
+      AFERROR("Cmd::TJobDelete: Can't allocate memory for data.")
       return false;
    }
 

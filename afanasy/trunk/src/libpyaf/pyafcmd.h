@@ -31,6 +31,48 @@ static PyMethodDef PyAf_Cmd_methods[] = {
    { NULL, NULL, 0, NULL } // Sentinel
 };
 
+#if PY_MAJOR_VERSION >= 3
+static PyTypeObject PyAf_Cmd_Type = {
+    PyVarObject_HEAD_INIT(NULL, 0)
+    "pyaf.Cmd",             /*tp_name*/
+    sizeof(PyAf_Cmd_Object), /*tp_basicsize*/
+    0,                         /*tp_itemsize*/
+   (destructor)PyAf_Cmd_dealloc, /*tp_dealloc*/
+    0,                         /*tp_print*/
+    0,                         /*tp_getattr*/
+    0,                         /*tp_setattr*/
+    0,                         /*tp_compare*/
+    0,                         /*tp_repr*/
+    0,                         /*tp_as_number*/
+    0,                         /*tp_as_sequence*/
+    0,                         /*tp_as_mapping*/
+    0,                         /*tp_hash */
+    0,                         /*tp_call*/
+    0,                         /*tp_str*/
+    0,                         /*tp_getattro*/
+    0,                         /*tp_setattro*/
+    0,                         /*tp_as_buffer*/
+    Py_TPFLAGS_DEFAULT | Py_TPFLAGS_BASETYPE,        /*tp_flags*/
+    "Node objects",           /* tp_doc */
+    0,                         /* tp_traverse */
+    0,                         /* tp_clear */
+    0,                         /* tp_richcompare */
+    0,                         /* tp_weaklistoffset */
+    0,                         /* tp_iter */
+    0,                         /* tp_iternext */
+    PyAf_Cmd_methods,             /* tp_methods */
+    0,                           /* tp_members */
+    0,                         /* tp_getset */
+    0,                         /* tp_base */
+    0,                         /* tp_dict */
+    0,                         /* tp_descr_get */
+    0,                         /* tp_descr_set */
+    0,                         /* tp_dictoffset */
+    (initproc)PyAf_Cmd_init,      /* tp_init */
+    0,                         /* tp_alloc */
+    0,                        /* tp_new */
+};
+#else //PY3K
 static PyTypeObject PyAf_Cmd_Type = {
     PyObject_HEAD_INIT(NULL)
     0,                         /*ob_size*/
@@ -72,4 +114,5 @@ static PyTypeObject PyAf_Cmd_Type = {
     0,                         /* tp_alloc */
     0,                        /* tp_new */
 };
+#endif //PY3K
 #endif

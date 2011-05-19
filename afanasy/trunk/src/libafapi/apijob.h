@@ -16,45 +16,45 @@ public:
    Job( bool DeleteBlocksWithJob = true);
    ~Job();
 
-   void setUserName( const char * str);
-   void setHostName( const char * str);
+   void setUserName( const std::string & str);
+   void setHostName( const std::string & str);
 
 /// Print main job information.
    void output( bool full = false);
 
 /// Set new job name.
-   void setName( const char* str);
+   void setName( const std::string & str);
 
 /// Set job description ( for statistics purposes only).
-   void setDescription( const char* str);
+   void setDescription( const std::string & str);
 
 /// Set job pre command ( executed by server on job registration )
-   void setCmdPre( const char * str);
+   void setCmdPre( const std::string & str);
 
 /// Set job post command ( executed by server on job deletion )
-   void setCmdPost( const char * str);
+   void setCmdPost( const std::string & str);
 
 /// Set job maximum hosts.
    void setMaxRunningTasks( int value);
 
 /// Set job hosts mask.
 /** See http://doc.trolltech.com/main-snapshot/qregexp.html#introduction .**/
-   bool setHostsMask( const char* str);
+   bool setHostsMask( const std::string & str);
 
 /// Set job exclude hosts mask.
-   bool setHostsMaskExclude( const char* str);
+   bool setHostsMaskExclude( const std::string & str);
 
 /// Set job depend mask.
-   bool setDependMask( const char* str);
+   bool setDependMask( const std::string & str);
 
 /// Set job global depend mask ( job will depend on job not from the same user).
-   bool setDependMaskGlobal( const char* str);
+   bool setDependMaskGlobal( const std::string & str);
 
 /// Set needed OS.
-   bool setNeedOS( const char* str);
+   bool setNeedOS( const std::string & str);
 
 /// Set needed properties.
-   bool setNeedProperties( const char* str);
+   bool setNeedProperties( const std::string & str);
 
 /// Set job priorityhttp://html.manual.ru/book/info/basecolors.phptv.
    void setPriority( int value);
