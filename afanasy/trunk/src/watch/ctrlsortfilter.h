@@ -6,6 +6,8 @@
 class QLabel;
 class QHBoxLayout;
 
+class ListItems;
+
 class CtrlSortFilter : public QWidget
 {
 Q_OBJECT
@@ -77,6 +79,8 @@ private:
 
    bool sortsarray[TLAST];
    bool filtersarray[TLAST];
+
+   ListItems * parernlist;
 
    QHBoxLayout * layout;
 

@@ -11,7 +11,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "actionid.h"
-#include "watch.h"
+#include "listitems.h"
 
 const char * CtrlSortFilter::TNAMES[] = {
 "Disabled",
@@ -67,6 +67,8 @@ CtrlSortFilter::CtrlSortFilter( QWidget * parent,
    filterinclude( FilterInclude  ),
    filtermatch(   FilterMatch    )
 {
+   parernlist = (ListItems *)(parent);
+
    for( int i = 0; i < TLAST; i++)
    {
       sortsarray[i] = false;
@@ -223,10 +225,10 @@ void CtrlSortFilter::actFilter( const QString & str)
    QRegExp rx( str);
    if( rx.isValid() == false)
    {
-      Watch::displayError( rx.errorString() );
+      parernlist->displayError( rx.errorString() );
       return;
    }
-   Watch::displayInfo("Filter pattern changed.");
+   parernlist->displayInfo("Filter pattern changed.");
    *filter = str;
    selLabel();
    emit filterChanged();
