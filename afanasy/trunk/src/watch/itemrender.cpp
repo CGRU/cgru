@@ -2,7 +2,6 @@
 
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
-#include <QtNetwork/QHostAddress>
 
 #include "../libafanasy/taskexec.h"
 
@@ -144,8 +143,11 @@ void ItemRender::updateValues( af::Node *node, int type)
       time_launched     = render->getTimeLaunch();
       time_registered   = render->getTimeRegister();
 
-      address_ip_str = render->getAddress().generateIPString().c_str();
-      address_str = render->getAddress().generateInfoString().c_str();
+      if( render->getAddress().notEmpty())
+      {
+         address_ip_str = render->getAddress().generateIPString().c_str();
+         address_str = render->getAddress().generateInfoString().c_str();
+      }
 
       bool becameOnline = false;
       if(((online == false) && (render->isOnline())) || (type == 0))

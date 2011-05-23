@@ -28,10 +28,12 @@ bool CmdRegExp::processArguments( int argc, char** argv, af::Msg & msg)
    std::string str_error;
    if( false == af::RegExp::Validate( pattern, &str_error))
    {
-      std::cout << "RegExp Error: " << str_error << std::endl;
+      std::cout << "RegExp Error: \"" << pattern << "\"" << std::endl << str_error << std::endl;
    }
    else
    {
+      std::cout << "String:     \"" << str     << "\"" << std::endl;
+      std::cout << "Expression: \"" << pattern << "\"" << std::endl;
       if( argc >= 3 )
       {
          char * mode = argv[2];

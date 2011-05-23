@@ -136,13 +136,13 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    int linex = w-ItemJobTask::WidthInfo;
 
    painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == STime) painter->fillRect( linex+2, y, WTime-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+   if( sort_type == STime) painter->fillRect( linex, y, WTime, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex, y, WTime, HeightFooter-1, Qt::AlignCenter, "time");
    linex += WTime;
    painter->setOpacity( sorting_fields_line_opacity);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
    painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SState) painter->fillRect( linex+1, y, ItemJobTask::WidthInfo-2, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
+   if( sort_type == SState) painter->fillRect( linex+1, y, ItemJobTask::WidthInfo-WTime-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex, y, ItemJobTask::WidthInfo - WTime, HeightFooter-1, Qt::AlignCenter, "state");
 
    linex = w-ItemJobTask::WidthInfo-1;
@@ -153,21 +153,21 @@ void ItemJobBlock::paint( QPainter *painter, const QStyleOptionViewItem &option)
    painter->drawText( x+3, y, ItemJobTask::WidthInfo, HeightFooter-1, Qt::AlignLeft | Qt::AlignVCenter, "Tasks:");
 
    painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   if( sort_type == SErrors) painter->fillRect( linex-WErrors+1, y, WErrors-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WErrors, y, WErrors, HeightFooter-1, Qt::AlignCenter, "errors");
    linex -= WErrors;
    painter->setOpacity( sorting_fields_line_opacity);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
 
    painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   if( sort_type == SStarts) painter->fillRect( linex-WStarts+1, y, WStarts-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WStarts, y, WStarts, HeightFooter-1, Qt::AlignCenter, "starts");
    linex -= WStarts;
    painter->setOpacity( sorting_fields_line_opacity);
    painter->drawLine( linex, y, linex, y+HeightFooter-2);
 
    painter->setOpacity( sorting_fields_text_opacity);
-   if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost+1, HeightFooter-3, afqt::QEnvironment::clr_Link.c);
+   if( sort_type == SHost) painter->fillRect( linex-WHost+1, y, WHost-1, HeightFooter-1, afqt::QEnvironment::clr_Link.c);
    painter->drawText( linex - WHost, y, WHost, HeightFooter-1, Qt::AlignCenter, "host");
    linex -= WHost;
    painter->setOpacity( sorting_fields_line_opacity);

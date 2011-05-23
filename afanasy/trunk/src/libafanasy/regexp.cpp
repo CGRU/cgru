@@ -129,7 +129,7 @@ bool RegExp::Validate( const std::string & str, std::string * errOutput)
       if( errOutput )
          *errOutput = buffer;
       else
-         AFERRAR("REGEXP: %s\n", buffer);
+         AFERRAR("REGEXP: %s", buffer);
    }
 
    regfree( &check_re);
