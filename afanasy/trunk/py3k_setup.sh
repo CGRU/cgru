@@ -1,6 +1,7 @@
 #!/bin/bash
 
-pyver=3.2
+pyver=$1
+[ -z "$pyver" ] && pyver=3.2
 
 # Check CGRU & Afanasy:
 if [ -z "$CGRU_LOCATION" ]; then

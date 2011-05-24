@@ -12,20 +12,44 @@ void outError( const char * errMsg, const char * baseMsg = NULL)
       AFERRAR("%s", errMsg)
 }
 
+bool PyAf::GetInteger( PyObject * obj, int & value, const char * errMsg)
+{
+   if( PyLong_Check( obj))
+   {
+      value = PyLong_AsLong( obj);
+      return true;
+   }
+#if PY_MAJOR_VERSION < 3
+   if( PyInt_Check( obj))
+   {
+      value = PyInt_AsLong( obj);
+      return true;
+   }
+#endif
+   outError("Object is not a number.", errMsg);
+   return false;
+}
+
 bool PyAf::GetString( PyObject * obj, std::string & str, const char * errMsg)
 {
+#if PY_MAJOR_VERSION < 3
+   if( PyString_Check(obj))
+   {
+      str = PyString_AsString( obj);
+      return true;
+   }
+#else
    if( PyBytes_Check(obj))
    {
       str = PyBytes_AsString( obj);
       return true;
    }
-#if PY_MAJOR_VERSION >= 3
    else if( PyUnicode_Check(obj))
    {
       obj = PyUnicode_AsUTF8String( obj);
       if( obj == NULL )
       {
-         outError("String object unt8 encoding problems.", errMsg);
+         outError("PyUnicode object encoding problems.", errMsg);
          return false;
       }
       str = PyBytes_AsString( obj);

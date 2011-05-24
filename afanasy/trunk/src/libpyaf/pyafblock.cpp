@@ -158,49 +158,73 @@ PyObject * PyAf_Block_setNeedProperties( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setCapacity( PyAf_Block_Object *self, PyObject *arg)
 {
-   if( self->block->setCapacity( PyLong_AsLong( arg))) Py_RETURN_TRUE;
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setCapacity")) Py_RETURN_FALSE;
+   if( self->block->setCapacity( value)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }
 
 PyObject * PyAf_Block_setMaxRunningTasks( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setMaxRunningTasks( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setMaxRunningTasks")) Py_RETURN_FALSE;
+   self->block->setMaxRunningTasks( value);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setTasksMaxRunTime( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setTasksMaxRunTime( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setTasksMaxRunTime")) Py_RETURN_FALSE;
+   self->block->setTasksMaxRunTime( value);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setNeedMemory( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setNeedMemory( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setNeedMemory")) Py_RETURN_FALSE;
+   self->block->setNeedMemory( value);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setNeedPower( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setNeedPower( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setNeedPower")) Py_RETURN_FALSE;
+   self->block->setNeedPower( value);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setNeedHDD( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setNeedHDD( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setNeedHDD")) Py_RETURN_FALSE;
+   self->block->setNeedHDD( value);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setParserCoeff( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setParserCoeff( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setParserCoeff")) Py_RETURN_FALSE;
+   self->block->setParserCoeff( value);
    Py_RETURN_TRUE;
 }
 
 PyObject * PyAf_Block_setFramesPerTask( PyAf_Block_Object *self, PyObject *arg)
 {
-   self->block->setFramesPerTask( PyLong_AsLong( arg));
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setFramesPerTask")) Py_RETURN_FALSE;
+   self->block->setFramesPerTask( value);
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Block_output( PyAf_Block_Object *self, PyObject *arg)
+{
+   int value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_output")) Py_RETURN_FALSE;
+   self->block->stdOut( value);
    Py_RETURN_TRUE;
 }
 
@@ -241,10 +265,4 @@ PyObject * PyAf_Block_clearTasksList( PyAf_Block_Object *self)
 {
    self->block->clearTasksList();
    Py_RETURN_NONE;
-}
-
-PyObject * PyAf_Block_output( PyAf_Block_Object *self, PyObject *arg)
-{
-   self->block->stdOut( PyLong_AsLong( arg));
-   Py_RETURN_TRUE;
 }
