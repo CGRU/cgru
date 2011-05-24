@@ -30,18 +30,47 @@ case "tasksdone": break;
 default: $order_s = 'taskssumruntime';
 }
 
-echo '<h3>Users:</h3>';
-
 $dbconn = db_connect();
+
+$time_min=$_GET['time_min'];
+$time_max=$_GET['time_max'];
+$query="SELECT min(time_done) AS time_done FROM statistics WHERE time_done > 0;";
+$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+$time_begin = $line["time_done"];
+pg_free_result($result);
+
+if( $time_min != '') $time_min = strtotime($time_min);
+else $time_min = $time_begin;
+if( $time_max != '') $time_max = strtotime($time_max);
+else $time_max = time();
+
+echo '<form method="get" action="index.php">';
+echo "<br/>\n";
+echo '<table align="center" width="99%"><tr align="center"><td>';
+echo 'From Date: ';
+echo '<input type="text" name="time_min" value="'.date( 'Y-m-j', $time_min).'">';
+#echo '<br/>time_min='.$time_min;
+echo '</td><td>';
+echo 'To Date: ';
+echo '<input type="text" name="time_max" value="'.date( 'Y-m-j', $time_max).'">';
+#echo '<br/>time_max='.$time_max;
+echo '</td><td><input type="submit" value="Refresh Time"/>';
+echo '<td></tr></table>';
+echo '</form>';
+
+echo '<h3>Users:</h3>';
 
 $query="
 SELECT username,
-sum(1) AS numjobs,
-sum(taskssumruntime) AS sumruntime,
-avg(taskssumruntime) AS avgruntime,
-sum(tasksnum) AS usertasksnum,
-avg(tasksnum) AS usertasksavg
-FROM statistics GROUP BY username ORDER BY $order_u DESC;
+ sum(1) AS numjobs,
+ sum(taskssumruntime) AS sumruntime,
+ avg(taskssumruntime) AS avgruntime,
+ sum(tasksnum) AS usertasksnum,
+ avg(tasksnum) AS usertasksavg
+ FROM statistics
+ WHERE time_done BETWEEN $time_min and $time_max
+ GROUP BY username ORDER BY $order_u DESC;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 echo "<table border=1 width=99%>\n";
@@ -143,7 +172,10 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    $sub_query="
    SELECT service,
    sum(taskssumruntime) AS sumruntime
-   FROM statistics WHERE username='".$username."' GROUP BY service ORDER BY sumruntime DESC;
+   FROM statistics
+   WHERE username='".$username."'
+   AND time_done BETWEEN $time_min and $time_max
+   GROUP BY service ORDER BY sumruntime DESC;
    ";
    $sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
    $sub_total = 0;
@@ -179,12 +211,14 @@ echo "</tr>\n";
 
 $query="
 SELECT
-sum(1) AS numjobs,
-sum(taskssumruntime) AS sumruntime,
-avg(taskssumruntime) AS avgruntime,
-sum(tasksnum) AS usertasksnum,
-avg(tasksnum) AS usertasksavg
-FROM statistics;
+ sum(1) AS numjobs,
+ sum(taskssumruntime) AS sumruntime,
+ avg(taskssumruntime) AS avgruntime,
+ sum(tasksnum) AS usertasksnum,
+ avg(tasksnum) AS usertasksavg
+ FROM statistics
+ WHERE time_done BETWEEN $time_min and $time_max
+;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
@@ -201,8 +235,10 @@ pg_free_result($result);
 # Get favorite service:
 $sub_query="
 SELECT service,
-sum(taskssumruntime) AS sumruntime
-FROM statistics GROUP BY service ORDER BY sumruntime DESC;
+ sum(taskssumruntime) AS sumruntime
+ FROM statistics
+ WHERE time_done BETWEEN $time_min and $time_max
+ GROUP BY service ORDER BY sumruntime DESC;
 ";
 $sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
 $sub_total = 0;
@@ -229,13 +265,15 @@ echo '<h3>Services:</h3>';
 //sum(tasksdone) AS tasksdone
 $query="
 SELECT service,
-sum(1) AS servicequantity,
-sum(tasksnum) AS tasksquantity,
-sum(tasksnum)/sum(1) AS tasksquantityavg,
-sum(taskssumruntime) AS taskssumruntime,
-avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
-round(avg(100*tasksdone/tasksnum),2) AS tasksdone
-FROM statistics GROUP BY service ORDER BY $order_s DESC;
+ sum(1) AS servicequantity,
+ sum(tasksnum) AS tasksquantity,
+ sum(tasksnum)/sum(1) AS tasksquantityavg,
+ sum(taskssumruntime) AS taskssumruntime,
+ avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
+ round(avg(100*tasksdone/tasksnum),2) AS tasksdone
+ FROM statistics
+ WHERE time_done BETWEEN $time_min and $time_max
+ GROUP BY service ORDER BY $order_s DESC;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 echo "<table border=1 width=99%>\n";
@@ -336,7 +374,10 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    $sub_query="
    SELECT username,
    sum(taskssumruntime) AS sumruntime
-   FROM statistics WHERE service='".$line["service"]."' GROUP BY username ORDER BY sumruntime DESC;
+   FROM statistics
+   WHERE service='".$line["service"]."'
+   AND time_done BETWEEN $time_min and $time_max
+   GROUP BY username ORDER BY sumruntime DESC;
    ";
    $sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
    $sub_total = 0;
@@ -373,13 +414,14 @@ echo "</tr>\n";
 
 $query="
 SELECT
-sum(1) AS servicequantity,
-sum(tasksnum) AS tasksquantity,
-sum(tasksnum)/sum(1) AS tasksquantityavg,
-sum(taskssumruntime) AS taskssumruntime,
-avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
-round(avg(100*tasksdone/tasksnum),2) AS tasksdone
-FROM statistics;
+ sum(1) AS servicequantity,
+ sum(tasksnum) AS tasksquantity,
+ sum(tasksnum)/sum(1) AS tasksquantityavg,
+ sum(taskssumruntime) AS taskssumruntime,
+ avg(CASE WHEN tasksdone>0 THEN taskssumruntime/tasksdone ELSE 0 END) AS tasksavgruntime,
+ round(avg(100*tasksdone/tasksnum),2) AS tasksdone
+ FROM statistics
+ WHERE time_done BETWEEN $time_min and $time_max;
 ";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
@@ -397,8 +439,10 @@ echo "<td><i>".sprintf("%01.0f", $line["tasksdone"])."%</i></td>\n";
 # Get favorite user:
 $sub_query="
 SELECT username,
-sum(taskssumruntime) AS sumruntime
-FROM statistics GROUP BY username ORDER BY sumruntime DESC;
+ sum(taskssumruntime) AS sumruntime
+ FROM statistics
+ WHERE time_done BETWEEN $time_min and $time_max
+ GROUP BY username ORDER BY sumruntime DESC;
 ";
 $sub_result = pg_query($sub_query) or die('Query failed: ' . pg_last_error());
 $sub_total = 0;
@@ -427,22 +471,17 @@ echo "</table>\n";
 
 echo "<br/>\n";
 
-// Find the earliest record to display statistics start time:
-$query="
-SELECT min(time_started) AS time_started FROM statistics WHERE time_started > 0;";
-$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+// Find the earliest statistics record day and average tasks number:
 echo "<table width=99%>\n";
 echo "<tr align=center>\n";
-echo "<td>\n";
-echo '<p><i>First job date: '.date( 'j F Y', $line["time_started"]).'</i></p>';
+echo "<td width=\"50%\">\n";
+echo '<p><i>Average farm usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$time_begin)).' tasks</i></p>';
 echo "</td>\n";
 echo "<td>\n";
-echo '<p><i>Average farm usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$line["time_started"])).' tasks</i></p>';
-echo "</td>\n";
+echo '<p><i>The earliest statistics date: '.date( 'j F Y', $time_begin).'</i></p>';
+echo "</td width=\"50%\">\n";
 echo "</tr>\n";
 echo "</table>\n";
-pg_free_result($result);
 }
 
 ?>
