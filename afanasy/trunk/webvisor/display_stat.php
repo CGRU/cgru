@@ -55,7 +55,7 @@ echo '</td><td>';
 echo 'To Date: ';
 echo '<input type="text" name="time_max" value="'.date( 'Y-m-j', $time_max).'">';
 #echo '<br/>time_max='.$time_max;
-echo '</td><td><input type="submit" value="Refresh Time"/>';
+echo '</td><td><input type="submit" value="Refresh Dates"/>';
 echo '<td></tr></table>';
 echo '</form>';
 
