@@ -21,6 +21,4 @@ afanasy/init \
 "
 for f in $files; do cp -r $src/$f $pack/$installdir/$f; done
 
-cp -r $src/afanasy/bin_pyaf $pack/$installdir/afanasy
-
 cp $src/afanasy/setup*.sh $pack/$installdir/afanasy

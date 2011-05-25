@@ -9,3 +9,5 @@ installdir=$3
 # Copying files:
 mkdir -p $pack/$installdir/afanasy
 cp -r $src/afanasy/plugins $pack/$installdir/afanasy
+
+cp -r $src/afanasy/bin_pyaf $pack/$installdir/afanasy
