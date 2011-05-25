@@ -3,6 +3,8 @@ ButtonText:"Afanasy..."
 category:"CGRU"
 toolTip:"Render by Afanasy..."
 (
+-- Set render time type to "User specified range"
+rendTimeType = 3
 
 -- Set initial parameters:
 local jobname = maxFileName
@@ -125,6 +127,9 @@ rollout AfanasyDialog "Afanasy"
    
    on renderButton pressed do
    (
+-- Set render time type to "User specified range"
+      rendTimeType = 3
+
 -- Save scene:
       checkForSave()
 
