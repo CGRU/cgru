@@ -136,8 +136,6 @@ class PARAMETERS_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
       layout.prop(ore, 'dependmaskglobal')
       layout.prop(ore, 'hostsmask')
       layout.prop(ore, 'hostsmaskexclude')
-      layout.separator()
-      layout.prop(ore, 'engines', text='Render Engines')
 
 class ORE_Submit(bpy.types.Operator):
    bl_idname = "ore.submit"
