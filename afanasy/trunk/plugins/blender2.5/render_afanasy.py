@@ -174,7 +174,16 @@ class ORE_Submit(bpy.types.Operator):
       if fpertask < 1: fpertask = 1
       if fend < fstart: fend = fstart
 
-      #  Create a job:
+      # Check and add Afanasy module in system path:
+      afpython = os.getenv('AF_PYTHON')
+      if afpython is not None and afpython != '':
+         if afpython.find(';') != -1: afpython = afpython.split(';')
+         else: afpython = afpython.split(':')
+         for folder in afpython:
+            if folder not in sys.path:
+               sys.path.append( folder)
+
+      # Import Afanasy module:
       try:
          af = __import__('af', globals(), locals(), [])
       except:
@@ -183,6 +192,8 @@ class ORE_Submit(bpy.types.Operator):
          self.report(set(['ERROR']), 'An error occurred while sending submission to Afanasy')
          return {'CANCELLED'}
       imp.reload(af)
+
+      # Create a job:
       job = af.Job( jobname)
       servicename = 'blender'
       block = af.Block( ore.engine, servicename)
