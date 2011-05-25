@@ -14,13 +14,11 @@ if [ -z "$AF_ROOT" ]; then
    exit 1
 fi
 
-# Init Python:
+# Init Python if exists:
 AF_PYTHON="${CGRU_LOCATION}/utilities/python/${pyver}"
-if [ ! -d "${AF_PYTHON}" ]; then
-   echo "ERROR: '${AF_PYTHON}' does not exist."
-   exit 1
+if [ -d "${AF_PYTHON}" ]; then
+   export PATH=$AF_PYTHON/bin:$PATH
 fi
-export PATH=$AF_PYTHON/bin:$PATH
 
 # Python modules path:
 AF_PYTHON="${AF_ROOT}/bin_pyaf/${pyver}:${AF_ROOT}/python3"
