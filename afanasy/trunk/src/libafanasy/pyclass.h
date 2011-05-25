@@ -6,6 +6,7 @@
 #define PyBytes_Check PyString_Check
 #define PyBytes_AsString PyString_AsString
 #define PyBytes_FromString PyString_FromString
+#define PyBytes_FromStringAndSize PyString_FromStringAndSize
 #define PyLong_AsLong PyInt_AsLong
 #define PyLong_FromLong PyInt_FromLong
 #endif

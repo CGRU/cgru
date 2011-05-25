@@ -183,7 +183,11 @@ PyObject * PyAf_Job_getDataLen( PyAf_Job_Object *self)
 
 PyObject * PyAf_Job_getData( PyAf_Job_Object *self)
 {
+#if PY_MAJOR_VERSION < 3
+   PyObject * result = PyString_FromStringAndSize( self->job->getData(), self->job->getDataLen());
+#else
    PyObject * result = PyBytes_FromStringAndSize( self->job->getData(), self->job->getDataLen());
+#endif
    Py_INCREF( result);
    return result;
 }
