@@ -185,7 +185,7 @@ class ORE_Submit(bpy.types.Operator):
       imp.reload(af)
       job = af.Job( jobname)
       servicename = 'blender'
-      block = af.Block( 'blender_internal', servicename)
+      block = af.Block( ore.engine, servicename)
       job.blocks.append( block)
       # Set block command and frame range:
       block.setCommand('blender -b %s -s %%1 -e %%2 -a'  % renderscenefile)
