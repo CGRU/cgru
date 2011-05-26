@@ -2,4 +2,4 @@
 
 source ./setup_blender.sh
 
-blender "$@"
+"${BLENDER_LOCATION}/blender" "$@"
