@@ -12,8 +12,10 @@ class Env:
       self.valid = False
       afroot = os.getenv('AF_ROOT')
       if afroot == None:
-         print('Error: AF_ROOT is not defined.')
-         return
+         afroot = '/opt/cgru/afanasy'
+         if not os.path.isdir( afroot):
+            print('Error: AF_ROOT does not exist.')
+            return
       home = os.getenv('HOME', os.getenv('HOMEPATH'))
       if home == None: home = 'None'
       username = os.getenv('AF_USERNAME', os.getenv('USER', os.getenv('USERNAME')))

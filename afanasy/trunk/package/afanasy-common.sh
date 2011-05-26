@@ -12,6 +12,7 @@ mkdir -p $pack/$installdir/afanasy/launch
 files="\
 afanasy/launch/setup.sh \
 afanasy/python \
+afanasy/python3 \
 afanasy/bin/pyaf.so \
 afanasy/config_default.xml \
 afanasy/pathmap.txt \
@@ -21,4 +22,4 @@ afanasy/init \
 "
 for f in $files; do cp -r $src/$f $pack/$installdir/$f; done
 
-cp $src/afanasy/setup*.sh $pack/$installdir/afanasy
+cp $src/afanasy/*.sh $pack/$installdir/afanasy
