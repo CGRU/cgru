@@ -34,7 +34,7 @@ Render::Render( Msg * msg):
 
 void Render::construct()
 {
-   maxrunningtasks = -1;
+   maxtasks = -1;
    capacity = -1;
    capacity_used = 0;
    wol_operation_time = 0;
@@ -52,7 +52,7 @@ void Render::readwrite( Msg * msg)
 
       rw_bool   ( locked,              msg);
       rw_int64_t( taskstartfinishtime, msg);
-      rw_int32_t( maxrunningtasks,     msg);
+      rw_int32_t( maxtasks,            msg);
       rw_int32_t( capacity,            msg);
       rw_int32_t( capacity_used,       msg);
       rw_int64_t( time_update,         msg);
@@ -179,6 +179,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 
       stream << "\n Priority = " << int(priority);
       stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
+      stream << "\n Max Tasks = " << getMaxTasks();
 
       stream << "\n Status:";
       if( isOnline()) stream << " Online";

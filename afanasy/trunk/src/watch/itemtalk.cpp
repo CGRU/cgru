@@ -51,10 +51,10 @@ bool ItemTalk::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         sort_str = &name;
+         sort_str = name;
          break;
       default:
-         AFERRAR("ItemTalk::setSortType: Invalid type number = %d\n", type);
+         AFERRAR("ItemTalk::setSortType: Invalid type number = %d", type)
          return false;
    }
    return true;
@@ -68,10 +68,10 @@ bool ItemTalk::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = &name;
+         filter_str = name;
          break;
       default:
-         AFERRAR("ItemTalk::setFilterType: Invalid type number = %d\n", type);
+         AFERRAR("ItemTalk::setFilterType: Invalid type number = %d", type)
          return false;
    }
    return true;

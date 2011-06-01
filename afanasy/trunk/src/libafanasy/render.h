@@ -40,6 +40,7 @@ public:
    inline void setWOLSleeping(  bool value) { if( value ) state = state | SWOLSleeping; else state = state & (~SWOLSleeping);}
    inline void setWOLWaking(    bool value) { if( value ) state = state | SWOLWaking;   else state = state & (~SWOLWaking);  }
 
+   inline int getMaxTasks()     const { return (maxtasks == -1 ? host.maxtasks : maxtasks);}
    inline int getCapacity()     const { return (capacity == -1 ? host.capacity : capacity);}
    inline int getCapacityUsed() const { return capacity_used;}
    inline int getCapacityFree() const { return (capacity == -1 ? host.capacity : capacity) - capacity_used;}
@@ -103,7 +104,7 @@ protected:
 
    int32_t capacity;
    int32_t capacity_used;
-   int32_t maxrunningtasks;
+   int32_t maxtasks;
 
    std::string services_disabled;
    std::string customdata;

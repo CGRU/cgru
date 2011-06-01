@@ -18,6 +18,7 @@ public:
    inline const QString & getIPString()   const { return address_ip_str;}
    inline int getPriority() const { return priority;  }
    inline int getCapacity() const { return capacity;  }
+   inline int getMaxTasks() const { return maxtasks;  }
 
    bool setSortType(   int type );
    bool setFilterType( int type );
@@ -62,10 +63,11 @@ private:
    QString  annotation;
    int priority;
    int capacity;
+   int maxtasks;
 
-   unsigned time_registered;
-   unsigned time_launched;
-   unsigned wol_operation_time;
+   long long time_registered;
+   long long time_launched;
+   long long wol_operation_time;
 
    QString  address_ip_str;
    QString  address_str;      ///< Client address
@@ -85,7 +87,7 @@ private:
    QString  state;
    std::list<af::TaskExec*> tasks;
    std::list<const QPixmap*> tasksicons;
-   uint32_t taskstartfinishtime;
+   long long taskstartfinishtime;
    QString  taskstartfinishtime_str;
    QString offlineState;
    QString creationTime;

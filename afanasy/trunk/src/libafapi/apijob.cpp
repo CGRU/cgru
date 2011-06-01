@@ -35,7 +35,7 @@ void Job::setCmdPost(      const std::string & str )  { cmd_post     = str;   }
 void Job::setDescription(  const std::string & str )  { description  = str;   }
 void Job::setMaxRunningTasks(       int value      )  { maxrunningtasks = value;                               }
 void Job::setPriority(              int value      )  { priority        = value;                               }
-void Job::setWaitTime(              int value      )  { time_wait       = value;                               }
+void Job::setWaitTime(        long long value      )  { time_wait       = value;                               }
 void Job::offline()                                   { state           = state | AFJOB::STATE_OFFLINE_MASK;   }
 
 int  Job::getDataLen() { if( message) return message->writeSize(); else return -1;}

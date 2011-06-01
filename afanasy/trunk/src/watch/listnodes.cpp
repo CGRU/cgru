@@ -105,16 +105,12 @@ bool ListNodes::updateItems( af::Msg * msg)
             int oldheight = itemnode->getHeight();
 
             // strore sorting parameters
-            const QString * sort_str_ptr = NULL;
-            const int     * sort_int_ptr = NULL;
             QString  sort_str_val;
             int      sort_int_val = 0;
             if( sorting )
             {
-               sort_str_ptr = itemnode->getSortStr();
-               sort_int_ptr = itemnode->getSortInt();
-               if(      sort_int_ptr ) sort_int_val = *sort_int_ptr;
-               else if( sort_str_ptr ) sort_str_val = *sort_str_ptr;
+               sort_int_val = itemnode->getSortInt();
+               sort_str_val = itemnode->getSortStr();
             }
 
             // update node values
@@ -133,14 +129,9 @@ bool ListNodes::updateItems( af::Msg * msg)
             // sort node if sorting parameters changed
             if( sorting )
             {
-               if( sort_int_ptr )
-               {
-                  if( sort_int_val != *(itemnode->getSortInt())) itemsToSort << itemnode;
-               }
-               else if( sort_str_ptr )
-               {
-                  if( sort_str_val != *(itemnode->getSortStr())) itemsToSort << itemnode;
-               }
+               itemnode->setSortType( ctrl->getSortType());
+               if( sort_int_val != itemnode->getSortInt()) itemsToSort << itemnode;
+               if( sort_str_val != itemnode->getSortStr()) itemsToSort << itemnode;
             }
 
             break;

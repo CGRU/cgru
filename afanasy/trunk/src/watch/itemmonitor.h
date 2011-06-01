@@ -22,15 +22,15 @@ protected:
 
 private:
 
-   unsigned time_launch;
-   unsigned time_register;
-   unsigned time_activity;
+   long long time_launch;
+   long long time_register;
+   long long time_activity;
 
    QString time_launch_str;
    QString time_register_str;
    QString time_activity_str;
 
-   QString address;
+   QString address_str;
    QString version;
 
    QString eventstitle;

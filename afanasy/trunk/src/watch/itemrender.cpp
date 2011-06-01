@@ -134,14 +134,16 @@ void ItemRender::updateValues( af::Node *node, int type)
    case 0: // The item was just created
    case af::Msg::TRendersList:
    {
-      revision          = render->getRevision();
-      version           = afqt::stoq( render->getVersion());
-      username          = afqt::stoq( render->getUserName());
-      annotation        = afqt::stoq( render->getAnnontation());
-      priority          = render->getPriority();
-      capacity          = render->getCapacity();
-      time_launched     = render->getTimeLaunch();
-      time_registered   = render->getTimeRegister();
+      revision           = render->getRevision();
+      version            = afqt::stoq( render->getVersion());
+      username           = afqt::stoq( render->getUserName());
+      annotation         = afqt::stoq( render->getAnnontation());
+      priority           = render->getPriority();
+      capacity           = render->getCapacity();
+      maxtasks           = render->getMaxTasks();
+      time_launched      = render->getTimeLaunch();
+      time_registered    = render->getTimeRegister();
+      wol_operation_time = render->getWOLTime();
 
       if( render->getAddress().notEmpty())
       {
@@ -490,34 +492,34 @@ bool ItemRender::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TPRIORITY:
-         sort_int = &priority;
+         sort_int = priority;
          break;
       case CtrlSortFilter::TCAPACITY:
-         sort_int = &capacity;
+         sort_int = capacity;
          break;
       case CtrlSortFilter::TTIMELAUNCHED:
-         sort_uint = &time_launched;
+         sort_int = time_launched;
          break;
       case CtrlSortFilter::TTIMEREGISTERED:
-         sort_uint = &time_registered;
+         sort_int = time_registered;
          break;
       case CtrlSortFilter::TNAME:
-         sort_str = &name;
+         sort_str = name;
          break;
       case CtrlSortFilter::TUSERNAME:
-         sort_str = &username;
+         sort_str = username;
          break;
       case CtrlSortFilter::TTASKUSER:
-         sort_str = &tasksusers;
+         sort_str = tasksusers;
          break;
       case CtrlSortFilter::TVERSION:
-         sort_str = &version;
+         sort_str = version;
          break;
       case CtrlSortFilter::TADDRESS:
-         sort_str = &address_str;
+         sort_str = address_str;
          break;
       default:
-         AFERRAR("ItemRender::setSortType: Invalid type number = %d\n", type);
+         AFERRAR("ItemRender::setSortType: Invalid type number = %d", type);
          return false;
    }
    return true;
@@ -531,19 +533,19 @@ bool ItemRender::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = &name;
+         filter_str = name;
          break;
       case CtrlSortFilter::TUSERNAME:
-         filter_str = &username;
+         filter_str = username;
          break;
       case CtrlSortFilter::TTASKUSER:
-         filter_str = &tasksusers;
+         filter_str = tasksusers;
          break;
       case CtrlSortFilter::TVERSION:
-         filter_str = &version;
+         filter_str = version;
          break;
       case CtrlSortFilter::TADDRESS:
-         filter_str = &address_str;
+         filter_str = address_str;
          break;
       default:
          AFERRAR("ItemRender::setFilterType: Invalid type number = %d", type)

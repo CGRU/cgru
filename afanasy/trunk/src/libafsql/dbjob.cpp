@@ -4,8 +4,6 @@
 #include "dbblockdata.h"
 #include "dbjobprogress.h"
 
-#include <QtCore/QVariant>
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

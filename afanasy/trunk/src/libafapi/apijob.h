@@ -60,7 +60,7 @@ public:
    void setPriority( int value);
 
 /// Set job start wait time.
-   void setWaitTime( int value);
+   void setWaitTime( long long value);
 
 /// Set job state to offline. Afanasy will not solve it.
    void offline();

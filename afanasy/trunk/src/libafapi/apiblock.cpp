@@ -73,17 +73,17 @@ bool Block::setNeedProperties( const std::string & str)
    return af::BlockData::setNeedProperties( str);
 }
 
-bool Block::setNumeric( int start, int end, int perHost, int increment)
+bool Block::setNumeric( long long start, long long end, long long perHost, long long increment)
 {
    return af::BlockData::setNumeric(  start, end, perHost, increment);
 }
 
-void Block::setFramesPerTask( int perTask)
+void Block::setFramesPerTask( long long perTask)
 {
    af::BlockData::setFramesPerTask( perTask);
 }
 
-void Block::setFileSizeCheck( int min, int max)
+void Block::setFileSizeCheck( long long min, long long max)
 {
    filesize_min = min;
    filesize_max = max;
@@ -139,10 +139,10 @@ void Block::clearTasksList()
 
 bool Block::appendTask( Task * task)
 {
-   AFINFO("API: Block::appendTask:\n")
+   AFINFO("API: Block::appendTask:")
    if( isNumeric())
    {
-      AFERROR("Block::appendTask: Can't add a task. Block is numeric!\n")
+      AFERROR("Block::appendTask: Can't add a task. Block is numeric!")
       return false;
    }
 
@@ -150,7 +150,7 @@ bool Block::appendTask( Task * task)
    for( std::list<Task*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
       if( task == *it)
       {
-         AFERRAR("Block::appendTask: Block already has a task '%s'. Skipping.\n", task->getName().c_str())
+         AFERRAR("Block::appendTask: Block already has a task '%s'. Skipping.", task->getName().c_str())
          return false;
       }
 
@@ -181,7 +181,7 @@ bool Block::appendTask( Task * task)
 
 int Block::calcWeight() const
 {
-   AFINFO("API: Block::calcWeight:\n")
+   AFINFO("API: Block::calcWeight:")
    int weight = af::BlockData::calcWeight();
    std::list<Task*>::const_iterator tasks_end = tasks.end();
    for( std::list<Task*>::const_iterator it = tasks.begin(); it != tasks_end; it++)
@@ -195,10 +195,10 @@ void Block::fillTasksArrayFromList()
 
    if( tasksdata )
    {
-AFINFO("API: Block::readwrite: Deleting old tasks data array.\n");
+      AFINFO("API: Block::readwrite: Deleting old tasks data array.")
       delete [] tasksdata;
    }
-AFINFO("API: Block::readwrite: Creating tasks data array.\n");
+   AFINFO("API: Block::readwrite: Creating tasks data array.")
    tasksdata = new af::TaskData*[tasksnum];
    std::list<Task*>::iterator it = tasks.begin();
    for( int t = 0; t < tasksnum; t++, it++) tasksdata[t] = *it;

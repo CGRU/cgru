@@ -16,6 +16,6 @@ typedef struct { PyObject_HEAD afapi::Cmd * cmd;    } PyAf_Cmd_Object;
 
 namespace PyAf
 {
-   bool GetInteger( PyObject * obj, int & value, const char * errMsg = NULL);
-   bool GetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
+   bool GetInteger( PyObject * obj, long long & value, const char * errMsg = NULL);
+   bool GetString(  PyObject * obj, std::string & str, const char * errMsg = NULL);
 }

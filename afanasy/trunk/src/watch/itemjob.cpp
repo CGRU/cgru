@@ -218,34 +218,34 @@ bool ItemJob::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         sort_str = &name;
+         sort_str = name;
          break;
       case CtrlSortFilter::TPRIORITY:
-         sort_int = &priority;
+         sort_int = priority;
          break;
       case CtrlSortFilter::TUSERNAME:
-         sort_str = &username;
+         sort_str = username;
          break;
       case CtrlSortFilter::TNUMRUNNINGTASKS:
-         sort_int = &num_runningtasks;
+         sort_int = num_runningtasks;
          break;
       case CtrlSortFilter::THOSTNAME:
-         sort_str = &hostname;
+         sort_str = hostname;
          break;
       case CtrlSortFilter::TTIMECREATION:
-         sort_uint = &time_creation;
+         sort_int = time_creation;
          break;
       case CtrlSortFilter::TTIMESTARTED:
-         sort_uint = &time_started;
+         sort_int = time_started;
          break;
       case CtrlSortFilter::TTIMEFINISHED:
-         sort_uint = &time_done;
+         sort_int = time_done;
          break;
       case CtrlSortFilter::TTIMERUN:
-         sort_uint = &time_run;
+         sort_int = time_run;
          break;
       default:
-         AFERRAR("ItemJob::setSortType: Invalid type number = %d\n", type);
+         AFERRAR("ItemJob::setSortType: Invalid type number = %d", type)
          return false;
    }
    return true;
@@ -259,13 +259,13 @@ bool ItemJob::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = &name;
+         filter_str = name;
          break;
       case CtrlSortFilter::TUSERNAME:
-         filter_str = &username;
+         filter_str = username;
          break;
       case CtrlSortFilter::THOSTNAME:
-         filter_str = &hostname;
+         filter_str = hostname;
          break;
       default:
          AFERRAR("ItemJob::setFilterType: Invalid type number = %d", type)

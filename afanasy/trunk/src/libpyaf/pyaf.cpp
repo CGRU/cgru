@@ -12,11 +12,11 @@ void outError( const char * errMsg, const char * baseMsg = NULL)
       AFERRAR("%s", errMsg)
 }
 
-bool PyAf::GetInteger( PyObject * obj, int & value, const char * errMsg)
+bool PyAf::GetInteger( PyObject * obj, long long & value, const char * errMsg)
 {
    if( PyLong_Check( obj))
    {
-      value = PyLong_AsLong( obj);
+      value = PyLong_AsLongLong( obj);
       return true;
    }
 #if PY_MAJOR_VERSION < 3

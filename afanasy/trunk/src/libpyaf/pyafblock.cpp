@@ -158,7 +158,7 @@ PyObject * PyAf_Block_setNeedProperties( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setCapacity( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setCapacity")) Py_RETURN_FALSE;
    if( self->block->setCapacity( value)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
@@ -166,7 +166,7 @@ PyObject * PyAf_Block_setCapacity( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setMaxRunningTasks( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setMaxRunningTasks")) Py_RETURN_FALSE;
    self->block->setMaxRunningTasks( value);
    Py_RETURN_TRUE;
@@ -174,7 +174,7 @@ PyObject * PyAf_Block_setMaxRunningTasks( PyAf_Block_Object *self, PyObject *arg
 
 PyObject * PyAf_Block_setTasksMaxRunTime( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setTasksMaxRunTime")) Py_RETURN_FALSE;
    self->block->setTasksMaxRunTime( value);
    Py_RETURN_TRUE;
@@ -182,7 +182,7 @@ PyObject * PyAf_Block_setTasksMaxRunTime( PyAf_Block_Object *self, PyObject *arg
 
 PyObject * PyAf_Block_setNeedMemory( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setNeedMemory")) Py_RETURN_FALSE;
    self->block->setNeedMemory( value);
    Py_RETURN_TRUE;
@@ -190,7 +190,7 @@ PyObject * PyAf_Block_setNeedMemory( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setNeedPower( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setNeedPower")) Py_RETURN_FALSE;
    self->block->setNeedPower( value);
    Py_RETURN_TRUE;
@@ -198,7 +198,7 @@ PyObject * PyAf_Block_setNeedPower( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setNeedHDD( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setNeedHDD")) Py_RETURN_FALSE;
    self->block->setNeedHDD( value);
    Py_RETURN_TRUE;
@@ -206,7 +206,7 @@ PyObject * PyAf_Block_setNeedHDD( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setParserCoeff( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setParserCoeff")) Py_RETURN_FALSE;
    self->block->setParserCoeff( value);
    Py_RETURN_TRUE;
@@ -214,7 +214,7 @@ PyObject * PyAf_Block_setParserCoeff( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setFramesPerTask( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setFramesPerTask")) Py_RETURN_FALSE;
    self->block->setFramesPerTask( value);
    Py_RETURN_TRUE;
@@ -222,7 +222,7 @@ PyObject * PyAf_Block_setFramesPerTask( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_output( PyAf_Block_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Block_output")) Py_RETURN_FALSE;
    self->block->stdOut( value);
    Py_RETURN_TRUE;
@@ -230,8 +230,8 @@ PyObject * PyAf_Block_output( PyAf_Block_Object *self, PyObject *arg)
 
 PyObject * PyAf_Block_setFileSizeCheck( PyAf_Block_Object *self, PyObject *args)
 {
-   int min, max;
-   if( false == PyArg_ParseTuple( args, "ii", &min, &max)) Py_RETURN_FALSE;
+   long long min, max;
+   if( false == PyArg_ParseTuple( args, "LL", &min, &max)) Py_RETURN_FALSE;
    self->block->setFileSizeCheck( min, max);
    Py_RETURN_TRUE;
 }
@@ -255,8 +255,8 @@ PyObject * PyAf_Block_setMultiHost( PyAf_Block_Object *self, PyObject *args)
 
 PyObject * PyAf_Block_setNumeric( PyAf_Block_Object *self, PyObject *args)
 {
-   int start, end, perHost, incement;
-   if( false == PyArg_ParseTuple( args, "iiii", &start, &end, &perHost, &incement)) Py_RETURN_FALSE;
+   long long start, end, perHost, incement;
+   if( false == PyArg_ParseTuple( args, "LLLL", &start, &end, &perHost, &incement)) Py_RETURN_FALSE;
    if( self->block->setNumeric( start, end, perHost, incement)) Py_RETURN_TRUE;
    Py_RETURN_FALSE;
 }

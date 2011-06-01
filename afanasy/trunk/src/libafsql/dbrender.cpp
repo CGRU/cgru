@@ -34,7 +34,7 @@ void DBRender::addDBAttributes()
    dbAddAttr( new DBAttrUInt8(   DBAttr::_priority,          &priority            ));
    dbAddAttr( new DBAttrString(  DBAttr::_username,          &username            ));
    dbAddAttr( new DBAttrInt32(   DBAttr::_capacity,          &capacity            ));
-   dbAddAttr( new DBAttrInt32(   DBAttr::_maxrunningtasks,   &maxrunningtasks     ));
+   dbAddAttr( new DBAttrInt32(   DBAttr::_maxrunningtasks,   &maxtasks            ));
    dbAddAttr( new DBAttrString(  DBAttr::_services_disabled, &services_disabled   ));
    dbAddAttr( new DBAttrString(  DBAttr::_annotation,        &annotation          ));
    dbAddAttr( new DBAttrString(  DBAttr::_customdata,        &customdata          ));

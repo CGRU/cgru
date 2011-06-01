@@ -29,7 +29,7 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_launch_str   = TimeLaunch     .arg( afqt::time2Qstr( time_launch  ));
    time_register_str = TimeRegister   .arg( afqt::time2Qstr( time_register));
 
-   address = Address.arg( monitor->getAddress().generateIPString().c_str());
+   address_str = Address.arg( monitor->getAddress().generateIPString().c_str());
    version = monitor->getVersion().c_str();
 
    updateValues( monitor, 0);
@@ -113,7 +113,7 @@ void ItemMonitor::paint( QPainter *painter, const QStyleOptionViewItem &option) 
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_register_str );
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignRight, time_activity_str );
 
-   painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address );
+   painter->drawText( x, y, w-5, h, Qt::AlignBottom | Qt::AlignRight, address_str );
 
    i = y+2;
    painter->drawText( x, i+=dy, w-5, h, Qt::AlignTop | Qt::AlignHCenter, usersidstitle );
@@ -134,22 +134,22 @@ bool ItemMonitor::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         sort_str = &name;
+         sort_str = name;
          break;
       case CtrlSortFilter::TTIMELAUNCHED:
-         sort_uint = &time_launch;
+         sort_int = time_launch;
          break;
       case CtrlSortFilter::TTIMEREGISTERED:
-         sort_uint = &time_register;
+         sort_int = time_register;
          break;
       case CtrlSortFilter::TTIMEACTIVITY:
-         sort_uint = &time_activity;
+         sort_int = time_activity;
          break;
       case CtrlSortFilter::TVERSION:
-         sort_str = &version;
+         sort_str = version;
          break;
       case CtrlSortFilter::TADDRESS:
-         sort_str = &address;
+         sort_str = address_str;
          break;
       default:
          AFERRAR("ItemMonitor::setSortType: Invalid type number = %d\n", type);
@@ -166,13 +166,13 @@ bool ItemMonitor::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = &name;
+         filter_str = name;
          break;
       case CtrlSortFilter::TVERSION:
-         filter_str = &version;
+         filter_str = version;
          break;
       case CtrlSortFilter::TADDRESS:
-         filter_str = &address;
+         filter_str = address_str;
          break;
       default:
          AFERRAR("ItemMonitor::setFilterType: Invalid type number = %d\n", type);

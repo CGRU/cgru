@@ -32,8 +32,8 @@ public:
    virtual bool setSortType(   int type ) = 0;
    virtual bool setFilterType( int type ) = 0;
 
-   inline void resetSorting()   { sort_int = NULL; sort_uint = NULL; sort_str = NULL; }
-   inline void resetFiltering() { filter_str = NULL; }
+   inline void resetSorting()   { sort_int = 0; sort_str.clear(); }
+   inline void resetFiltering() { filter_str.clear(); }
    bool filter( const QRegExp & regexp, const bool & filtermatch);
 
    bool compare( const ItemNode & other, int operation) const;
@@ -46,16 +46,14 @@ public:
       NOTEQUAL
    };
 
-   inline const int      * getSortInt()  const { return sort_int; }
-   inline const unsigned * getSortUInt() const { return sort_uint;}
-   inline const QString  * getSortStr()  const { return sort_str; }
+   inline const long long & getSortInt() const { return sort_int; }
+   inline const QString   & getSortStr() const { return sort_str; }
 
 protected:
    int height;
    QString tooltip;
 
-   int      * sort_int;     ///< For sorting by some signed number
-   unsigned * sort_uint;    ///< For sorting by some unsigned number
-   QString  * sort_str;     ///< For sorting by some string
-   QString  * filter_str;   ///< For filtering by some string
+   long long sort_int;    ///< For sorting by some number
+   QString  sort_str;     ///< For sorting by some string
+   QString  filter_str;   ///< For filtering by some string
 };

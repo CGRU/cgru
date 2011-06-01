@@ -46,11 +46,11 @@ public:
 /// Set block tasks view result command.
    void setFiles( const std::string & str);
 
-/// Set block command type to numeric. %1 and %2 arguments in command will be replaced for each task.
-   bool setNumeric( int start, int end, int perHost = 1, int incement = 1);
+/// Set block command type to numeric.
+   bool setNumeric( long long start, long long end, long long perHost = 1, long long incement = 1);
 
 /// Set not numeric block frames per host number (for dependicies and parsers)
-   void setFramesPerTask( int perTask);
+   void setFramesPerTask( long long perTask);
 
 /// Set block pre register command, witch will be executed before job register.
    void setCmdPre(  const std::string & str);
@@ -95,7 +95,7 @@ public:
    void setParserCoeff( int value );
 
 /// Set file parameters to check
-   void setFileSizeCheck( int min, int max);
+   void setFileSizeCheck( long long min, long long max);
 
 /// Set variable capacity
    void setVariableCapacity( int min, int max);

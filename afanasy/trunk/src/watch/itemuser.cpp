@@ -36,13 +36,13 @@ void ItemUser::updateValues( af::Node *node, int type)
    else        setNotRunning();
 
    priority             = user->getPriority();
-   annotation           = QString::fromUtf8( user->getAnnontation().c_str());
-   hostname             = QString::fromUtf8( user->getHostName().c_str());
+   annotation           = afqt::stoq( user->getAnnontation());
+   hostname             = afqt::stoq( user->getHostName());
    numjobs              = user->getNumJobs();
    numrunningtasks      = user->getRunningTasksNumber();
    maxrunningtasks      = user->getMaxRunningTasks();
-   hostsmask            = QString::fromUtf8( user->getHostsMask().c_str());
-   hostsmask_exclude    = QString::fromUtf8( user->getHostsMaskExclude().c_str());
+   hostsmask            = afqt::stoq( user->getHostsMask());
+   hostsmask_exclude    = afqt::stoq( user->getHostsMaskExclude());
    errors_avoidhost     = user->getErrorsAvoidHost();
    errors_tasksamehost  = user->getErrorsTaskSameHost();
    errors_retries       = user->getErrorsRetries();
@@ -152,22 +152,22 @@ bool ItemUser::setSortType(   int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TPRIORITY:
-         sort_int = &priority;
+         sort_int = priority;
          break;
       case CtrlSortFilter::TNAME:
-         sort_str = &name;
+         sort_str = name;
          break;
       case CtrlSortFilter::THOSTNAME:
-         sort_str = &hostname;
+         sort_str = hostname;
          break;
       case CtrlSortFilter::TNUMJOBS:
-         sort_int = &numjobs;
+         sort_int = numjobs;
          break;
       case CtrlSortFilter::TNUMRUNNINGTASKS:
-         sort_int = &numrunningtasks;
+         sort_int = numrunningtasks;
          break;
       default:
-         AFERRAR("ItemUser::setSortType: Invalid type number = %d\n", type);
+         AFERRAR("ItemUser::setSortType: Invalid type number = %d", type)
          return false;
    }
    return true;
@@ -181,13 +181,13 @@ bool ItemUser::setFilterType( int type )
       case CtrlSortFilter::TNONE:
          return false;
       case CtrlSortFilter::TNAME:
-         filter_str = &name;
+         filter_str = name;
          break;
       case CtrlSortFilter::THOSTNAME:
-         filter_str = &hostname;
+         filter_str = hostname;
          break;
       default:
-         AFERRAR("ItemUser::setFilterType: Invalid type number = %d\n", type);
+         AFERRAR("ItemUser::setFilterType: Invalid type number = %d", type)
          return false;
    }
    return true;

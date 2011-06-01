@@ -25,10 +25,10 @@ public:
    int priority;
    int maxrunningtasks;
    uint32_t state;
-   uint32_t time_creation;
-   uint32_t time_started;
-   uint32_t time_wait;
-   uint32_t time_done;
+   int64_t time_creation;
+   int64_t time_started;
+   int64_t time_wait;
+   int64_t time_done;
    uint32_t time_run;
    int lifetime;
    QString annotation;

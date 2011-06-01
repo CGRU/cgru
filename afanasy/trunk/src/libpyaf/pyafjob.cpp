@@ -126,7 +126,7 @@ PyObject * PyAf_Job_setNeedProperties( PyAf_Job_Object *self, PyObject *arg)
 
 PyObject * PyAf_Job_setMaxRunningTasks( PyAf_Job_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Job_setMaxRunningTasks")) Py_RETURN_FALSE;
    self->job->setMaxRunningTasks( value);
    Py_RETURN_TRUE;
@@ -134,7 +134,7 @@ PyObject * PyAf_Job_setMaxRunningTasks( PyAf_Job_Object *self, PyObject *arg)
 
 PyObject * PyAf_Job_setPriority( PyAf_Job_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Job_setPriority")) Py_RETURN_FALSE;
    self->job->setPriority( value);
    Py_RETURN_TRUE;
@@ -142,7 +142,7 @@ PyObject * PyAf_Job_setPriority( PyAf_Job_Object *self, PyObject *arg)
 
 PyObject * PyAf_Job_setWaitTime( PyAf_Job_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Job_setWaitTime")) Py_RETURN_FALSE;
    self->job->setWaitTime( value);
    Py_RETURN_TRUE;
@@ -150,7 +150,7 @@ PyObject * PyAf_Job_setWaitTime( PyAf_Job_Object *self, PyObject *arg)
 
 PyObject * PyAf_Job_output( PyAf_Job_Object *self, PyObject *arg)
 {
-   int value;
+   long long value;
    if( false == PyAf::GetInteger(arg, value, "PyAf_Job_output")) Py_RETURN_FALSE;
    self->job->output( value);
    Py_RETURN_TRUE;
