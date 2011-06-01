@@ -9,3 +9,10 @@ public:
    ~CmdNumeric();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdNumericCmd : public Cmd
+{
+public:
+   CmdNumericCmd();
+   ~CmdNumericCmd();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};

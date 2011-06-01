@@ -52,11 +52,12 @@ public:
 \param num task number.
 @return a pointer to new task generated.
 **/
-   TaskExec *genTask( int num) const;
+   TaskExec * genTask( int num) const;
 
-   const std::string genTaskName(   int num) const; ///< Generate task name.
-   const std::string genCommand(    int num, long long * frame_start = NULL, long long * frame_finish = NULL) const;
-   const std::string genFiles(      int num) const;
+   bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL) const; ///< Generate fisrt and last frame numbers for \c num task.
+   const std::string genTaskName(   int num, long long * fstart = NULL, long long * fend = NULL) const;
+   const std::string genCommand(    int num, long long * fstart = NULL, long long * fend = NULL) const;
+   const std::string genFiles(      int num, long long * fstart = NULL, long long * fend = NULL) const;
 
    inline bool isNumeric() const { return flags & FNumeric;} ///< Whether the block is numeric.
    inline bool isNotNumeric() const { return false == (flags & FNumeric);} ///< Whether the block is not numeric.
@@ -308,9 +309,6 @@ protected:
 private:
    void initDefaults();  ///< Initialize default values
    void construct();
-
-/// Generate fisrt and last frame numbers for \c num task.
-   bool genNumbers( long long & start, long long & end, int num) const;
 
    virtual TaskData * createTask( Msg * msg);
    void rw_tasks( Msg * msg); ///< Read & write tasks data.

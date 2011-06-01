@@ -30,7 +30,7 @@ bool MCTest::construct()
    stringarray = new std::string[ number];
    if((numberarray == NULL) || (stringarray == NULL))
    {
-      AFERROR("MCTest::MCTest: Memory allocation failed.");
+      AFERROR("MCTest::MCTest: Memory allocation failed.")
       number = 0;
       return false;
    }
@@ -71,7 +71,7 @@ void MCTest::addString( const std::string & String)
 
 void MCTest::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   MsgClassUserHost::stdOut( stream);
+   MsgClassUserHost::generateInfoStream( stream);
    stream << ": String = \"" << string << "\", Number = " << number << ".";
 
    if( full == false ) return;

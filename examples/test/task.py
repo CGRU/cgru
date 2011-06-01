@@ -7,8 +7,6 @@ import signal
 import sys
 import time
 
-import parsers.parser
-
 def interrupt( signum, frame):
    exit('\nInterrupt signal received...')
 
@@ -24,6 +22,7 @@ from optparse import OptionParser
 parser = OptionParser(usage='usage: %prog [options]', version='%prog 1.0')
 parser.add_option('-s', '--start',     dest='start',     type='int',    default=1,  help='start frame number')
 parser.add_option('-e', '--end',       dest='end',       type='int',    default=2,  help='end frame number')
+parser.add_option('-i', '--increment', dest='increment', type='int',    default=1,  help='frame increment')
 parser.add_option('-t', '--time',      dest='timesec',   type='float',  default=2,  help='time per frame in seconds')
 parser.add_option('-r', '--randtime',  dest='randtime',  type='float',  default=0,  help='random time per frame in seconds')
 parser.add_option('-f', '--file',      dest='filename',  type='string', default='', help='file name to open and print in stdout')
@@ -33,6 +32,7 @@ parser.add_option('-H', '--HOSTS',     dest='hosts',     type='string', default=
 (options, args) = parser.parse_args()
 frame_start = options.start
 frame_end   = options.end
+frame_inc   = options.increment
 timesec     = options.timesec
 randtime    = options.randtime
 filename    = options.filename
@@ -44,6 +44,17 @@ print sys.argv
 print 'WORKING DIRECTORY:'
 print os.getcwd()
 
+# Check frame range settings:
+if frame_end < frame_start:
+   print 'Error: frame_end(%d) < frame_start(%d)' % (frame_end, frame_start)
+   frame_end = frame_start
+   print '[ PARSER WARNING ]'
+if frame_inc < 1:
+   print 'Error: frame_inc(%d) < 1' % frame_inc
+   frame_inc = 1
+   print '[ PARSER WARNING ]'
+
+# Open some filename if specified:
 if( filename != ''):
    print 'FILE:'
    print filename
@@ -56,20 +67,19 @@ if( filename != ''):
 
 sleepsec = (timesec + randtime*random.random()) / 100 / (verbose+1)
 
-for f in range( frame_start, frame_end + 1):
-   print 'FRAME: ' + str(f)
+frame = frame_start
+while frame <= frame_end:
+   print 'FRAME: ' + str(frame)
    time.sleep(sleepsec)
    for p in range(100):
       print 'PROGRESS: ' + str(p+1)+'%'
       for v in range( verbose):
-         print str(f) + ': ' + str(p) + ': ' + str(v) + ': QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm'
+         print str(frame) + ': ' + str(p) + ': ' + str(v) + ': QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm'
 #         sys.stdout.flush()
          time.sleep(sleepsec)
       time.sleep(sleepsec)
       sys.stdout.flush()
+   frame += frame_inc
 
-#print parsers.parser.str_warning
-#print parsers.parser.str_error
-#print parsers.parser.str_badresult
 sys.stdout.flush()
 print 'Finished at ' + strftime('%A %d %B %H:%M:%S')

@@ -329,6 +329,11 @@ bool BlockData::setNumeric( long long start, long long end, long long perTask, l
       AFERRAR("BlockData::setNumeric(): Frames per task = %lld < 1 ( setting to 1).", perTask)
       perTask = 1;
    }
+   if( increment < 1)
+   {
+      AFERRAR("BlockData::setNumeric(): Frames increment = %lld < 1 ( setting to 1).", increment)
+      increment = 1;
+   }
    if( tasksdata)
    {
       AFERROR("BlockData::setNumeric(): this block already has tasks.")
@@ -351,9 +356,37 @@ bool BlockData::setNumeric( long long start, long long end, long long perTask, l
    frame_pertask  = perTask;
    frame_inc      = increment;
 
-   long long numframes = frame_last - frame_first + 1;
+   long long numframes = (frame_last - frame_first) / frame_inc + 1;
    tasksnum = numframes / frame_pertask;
    if((numframes%perTask) != 0) tasksnum++;
+
+   return true;
+}
+
+bool BlockData::genNumbers( long long & start, long long & end, int num, long long * frames_num) const
+{
+   if( num > tasksnum)
+   {
+      AFERROR("BlockData::genNumbers: n > tasksnum.")
+      return false;
+   }
+
+   long long offset = num * frame_pertask * frame_inc;
+   if( frame_inc > 1 ) offset -= offset % frame_inc;
+   start = frame_first + offset;
+
+   offset = frame_pertask * frame_inc - 1;
+   if(( start + offset ) > frame_last ) offset = frame_last - start;
+   if( frame_inc > 1 ) offset -= offset % frame_inc;
+   end = start + offset;
+
+   if( frames_num )
+   {
+      if( frame_inc > 1 )
+         *frames_num = ( end - start ) / frame_inc + 1;
+      else
+         *frames_num = end - start + 1;
+   }
 
    return true;
 }
@@ -365,15 +398,15 @@ void BlockData::setFramesPerTask( long long perTask)
       AFERROR("BlockData::setFramesPerHost: this block is numeric.")
       return;
    }
-   if( perTask == 0)
+   if( perTask < 1)
    {
-      AFERROR("BlockData::setFramesPerHost: Frames per task can't be zero.")
+      AFERROR("BlockData::setFramesPerHost: Frames per task can't be less than 1.")
       return;
    }
    frame_pertask = perTask;
 }
 
-const std::string BlockData::genCommand( int num, long long * frame_start, long long * frame_finish) const
+const std::string BlockData::genCommand( int num, long long * fstart, long long * fend) const
 {
    std::string str;
    if( num > tasksnum)
@@ -384,15 +417,17 @@ const std::string BlockData::genCommand( int num, long long * frame_start, long 
    if( isNumeric())
    {
       long long start, end;
-      if( genNumbers( start, end, num))
+      bool ok = true;
+      if( fstart && fend )
       {
-         str = fillNumbers( command, start, end);
-
-         if( frame_start  != NULL) *frame_start  = start;
-         if( frame_finish != NULL) *frame_finish = end;
+         start = *fstart;
+         end   = *fend;
       }
       else
-         return str;
+         ok = genNumbers( start, end, num);
+
+      if( ok)
+         str = fillNumbers( command, start, end);
    }
    else
    {
@@ -401,7 +436,7 @@ const std::string BlockData::genCommand( int num, long long * frame_start, long 
    return str;
 }
 
-const std::string BlockData::genFiles( int num) const
+const std::string BlockData::genFiles( int num, long long * fstart, long long * fend) const
 {
    std::string str;
    if( num >= tasksnum)
@@ -414,7 +449,17 @@ const std::string BlockData::genFiles( int num) const
       if( files.size())
       {
          long long start, end;
-         if( genNumbers( start, end, num)) str = af::fillNumbers( files, start, end);
+         bool ok = true;
+         if( fstart && fend )
+         {
+            start = *fstart;
+            end   = *fend;
+         }
+         else
+            ok = genNumbers( start, end, num);
+
+         if( ok)
+            str = af::fillNumbers( files, start, end);
       }
    }
    else
@@ -424,21 +469,7 @@ const std::string BlockData::genFiles( int num) const
    return str;
 }
 
-bool BlockData::genNumbers( long long & start, long long & end, int num) const
-{
-   if( num > tasksnum)
-   {
-      AFERROR("BlockData::genNumbers: n > tasksnum.")
-      return false;
-   }
-   start = frame_first + num * frame_pertask;
-   end = start + frame_pertask  - 1;
-   if( end > frame_last) end = frame_last;
-
-   return true;
-}
-
-TaskExec *BlockData::genTask( int num) const
+TaskExec * BlockData::genTask( int num) const
 {
    if( num > tasksnum)
    {
@@ -448,22 +479,23 @@ TaskExec *BlockData::genTask( int num) const
 
    long long start = -1;
    long long end = -1;
+   long long frames_num = -1;
 
-   std::string command = genCommand( num, &start, &end);
+   if( false == genNumbers( start, end, num, &frames_num)) return NULL;
 
    return new TaskExec(
-         genTaskName( num),
+         genTaskName( num, &start, &end),
          service,
          parser,
-         command,
+         genCommand( num, &start, &end),
          capacity,
          filesize_min,
          filesize_max,
-         genFiles( num),
+         genFiles( num, &start, &end),
 
          start,
          end,
-         end-start+1,
+         frames_num,
 
          wdir,
          environment,
@@ -474,7 +506,7 @@ TaskExec *BlockData::genTask( int num) const
       );
 }
 
-const std::string BlockData::genTaskName( int num) const
+const std::string BlockData::genTaskName( int num, long long * fstart, long long * fend) const
 {
    if( num > tasksnum)
    {
@@ -485,7 +517,17 @@ const std::string BlockData::genTaskName( int num) const
    if( isNumeric())
    {
       long long start, end;
-      genNumbers( start, end, num);
+      bool ok = true;
+      if( fstart && fend )
+      {
+         start = *fstart;
+         end   = *fend;
+      }
+      else
+         ok = genNumbers( start, end, num);
+
+      if( false == ok) return std::string("Error generating numbers.");
+
       if( tasksname.size()) return fillNumbers( tasksname, start, end);
 
       if( frame_pertask == 1 )
@@ -558,7 +600,8 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 
       if( isNumeric())
       {
-         stream << "\n Frames: " << frame_first << " - " << frame_last << ": Per Task =" << frame_pertask;
+         stream << "\n Frames: " << frame_first << " - " << frame_last << ": Per Task = " << frame_pertask;
+         if( frame_inc > 1 ) stream << ", Increment = " << frame_inc;
       }
 
       if( full && ( parsercoeff != 1 )) stream << "\n Parser Coefficient = " << parsercoeff;
@@ -695,13 +738,13 @@ bool BlockData::updateProgress( JobProgress * progress)
    if( updateBars( progress))
       changed = true;
 
-   uint32_t new_state                  = 0;
-   int32_t  new_tasksready             = 0;
-   int32_t  new_tasksdone              = 0;
-   int32_t  new_taskserror             = 0;
-   int32_t  new_percentage             = 0;
-   bool     new_tasksskipped           = false;
-   uint32_t new_taskssumruntime        = 0;
+   uint32_t  new_state                  = 0;
+   int32_t   new_tasksready             = 0;
+   int32_t   new_tasksdone              = 0;
+   int32_t   new_taskserror             = 0;
+   int32_t   new_percentage             = 0;
+   bool      new_tasksskipped           = false;
+   long long new_taskssumruntime        = 0;
 
    for( int t = 0; t < tasksnum; t++)
    {

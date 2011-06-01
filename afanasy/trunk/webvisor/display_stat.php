@@ -476,7 +476,7 @@ echo "<br/>\n";
 echo "<table width=99%>\n";
 echo "<tr align=center>\n";
 echo "<td width=\"50%\">\n";
-echo '<p><i>Average farm usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$time_min)).' tasks</i></p>';
+echo '<p><i>Average farm usage = '.sprintf("%01.2f",$taskssumruntime/($time_max-$time_min)).' tasks</i></p>';
 echo "</td>\n";
 echo "<td width=\"50%\">\n";
 if( $time_begin != 0 ) echo '<p><i>The earliest statistics date: '.date( 'j F Y', $time_begin).'</i></p>';

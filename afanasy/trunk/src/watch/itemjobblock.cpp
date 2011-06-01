@@ -53,7 +53,6 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       multihost_service = afqt::stoq( block->getMultiHostService());
 
       tooltip_base      = std::string("Block[") + block->getName() + "]:";
-      tooltip_block     = block->generateInfoStringTyped( af::Msg::TBlocks, true);
 
    case af::Msg::TBlocksProperties:
 //printf("Changing block properties.\n");
@@ -92,7 +91,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       description += QString(" (str:%1fpt)").arg(pertask);
    if( multihost && (multihost_service.isEmpty() == false)) description += QString(" MHS='%1'").arg( multihost_service);
 
-   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties + "\n" + tooltip_block);
+   tooltip = afqt::stoq( tooltip_base + "\n" + tooltip_progress + "\n" + tooltip_properties);
 }
 
 ItemJobBlock::~ItemJobBlock()

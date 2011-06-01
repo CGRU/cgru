@@ -65,7 +65,17 @@ private:
    int tasksdone;
    int taskserror;
    int percentage;
-   uint32_t taskssumruntime;
+   long long taskssumruntime;
+
+   bool numeric;              ///< Whether the block is numeric.
+   bool varcapacity;
+   bool multihost;
+   bool multihost_samemaster;
+
+   long long frame_first;     ///< First tasks frame.
+   long long frame_last;      ///< Last tasks frame.
+   long long frame_pertask;   ///< Tasks frames per task.
+   long long frame_inc;       ///< Tasks frames increment.
 
    int avoidhostsnum;
    int errorhostsnum;
@@ -87,12 +97,8 @@ private:
    int     need_hdd;
    QString need_properties;
 
-   bool numeric;
-   bool varcapacity;
-   bool multihost;
-   bool multihost_samemaster;
-   int  filesize_min;
-   int  filesize_max;
+   long long filesize_min;
+   long long filesize_max;
    int  capcoeff_min;
    int  capcoeff_max;
    uint8_t  multihost_min;

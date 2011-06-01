@@ -67,6 +67,17 @@ bool BlockInfo::update( const af::BlockData* block, int type)
    case af::Msg::TJobsList:
    case af::Msg::TBlocks:
    case af::Msg::TBlocksProperties:
+      multihost            = block->isMultiHost();
+      multihost_samemaster = block->canMasterRunOnSlaveHost();
+      multihost            = block->isMultiHost();
+      varcapacity          = block->canVarCapacity();
+      numeric              = block->isNumeric();
+
+      frame_first          = block->getFrameFirst();
+      frame_last           = block->getFrameLast();
+      frame_pertask        = block->getFramePerTask();
+      frame_inc            = block->getFrameInc();
+
       tasksnum             = block->getTasksNum();
       tasksmaxruntime      = block->getTasksMaxRunTime();
       errors_retries       = block->getErrorsRetries();
@@ -93,10 +104,6 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost_waitmax    = block->getMultiHostWaitMax();
       multihost_waitsrv    = block->getMultiHostWaitSrv();
       service              = afqt::stoq( block->getService());
-      numeric              = block->isNotNumeric();
-      varcapacity          = block->canVarCapacity();
-      multihost            = block->isMultiHost();
-      multihost_samemaster = block->canMasterRunOnSlaveHost();
 
       maxrunningtasks_str = QString::number( maxrunningtasks);
 
@@ -187,15 +194,28 @@ void BlockInfo::refresh()
    if( errorhostsnum ) str_avoiderrors  = QString( "e%1").arg( errorhostsnum);
    if( avoidhostsnum ) str_avoiderrors += QString(" %1A").arg( avoidhostsnum);
 
-   str_compact = QString("t%1: ").arg( tasksnum);
+   QString tasksinfo = QString("t%1").arg( tasksnum);
+   if( numeric )
+   {
+      tasksinfo += QString("(%1-%2").arg( frame_first).arg( frame_last);
+      if(( frame_pertask > 1 ) || ( frame_inc > 1 ))
+      {
+         tasksinfo += QString("/%1").arg( frame_pertask);
+         if( frame_inc > 1 )
+            tasksinfo += QString(":%1").arg( frame_inc);
+      }
+      tasksinfo += ")";
+   }
+
+   str_compact = QString("%1: ").arg( tasksinfo);
    if( tasksdone) str_compact += QString("%1: ").arg( str_runtime);
    str_compact += name;
 
    str_percent = QString::number( percentage) + "%";
    if( false == name.isEmpty()) str_percent += ' ' + name;
 
-   str_progress = QString("t%1: r%3 d%5 e%6")
-            .arg( tasksnum)
+   str_progress = QString("%1: r%3 d%5 e%6")
+            .arg( tasksinfo)
             .arg( runningtasksnumber)
             .arg( tasksdone)
             .arg( taskserror);

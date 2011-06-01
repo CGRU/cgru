@@ -37,11 +37,11 @@ public:
    bool     multuhost_samemaster;
    QString  multihost_service;
 
-   bool numeric;    ///< Whether the block is numeric.
-   int  first;      ///< First tasks frame.
-   int  last;       ///< Last tasks frame.
-   int  pertask;    ///< Tasks frames per task.
-   int  inc;        ///< Tasks frames increment.
+   bool numeric;        ///< Whether the block is numeric.
+   long long first;     ///< First tasks frame.
+   long long last;      ///< Last tasks frame.
+   long long pertask;   ///< Tasks frames per task.
+   long long inc;       ///< Tasks frames increment.
 
    QString description;
 
@@ -87,7 +87,6 @@ private:
    QString tooltip;
 
    std::string tooltip_base;
-   std::string tooltip_block;
    std::string tooltip_properties;
    std::string tooltip_progress;
 

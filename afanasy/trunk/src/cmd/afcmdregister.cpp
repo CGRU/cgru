@@ -93,6 +93,7 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdPath);
    addCmd( new CmdNetwork);
    addCmd( new CmdNumeric);
+   addCmd( new CmdNumericCmd);
    addCmd( new CmdPasswd);
    addCmd( new CmdParse);
    addCmd( new CmdSrvCapacity);

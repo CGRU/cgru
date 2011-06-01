@@ -23,8 +23,8 @@ public:
    int8_t   percentframe;  ///< frame percent per block per task.
    int32_t  starts_count;  ///< number of starts per block per task.
    int32_t  errors_count;  ///< Number of times task finished with errors .
-   int64_t time_start;     ///< start time.
-   int64_t time_done;      ///< Task finish time ( or last update time if still running ).
+   int64_t  time_start;    ///< start time.
+   int64_t  time_done;     ///< Task finish time ( or last update time if still running ).
 
    std::string hostname;           ///< Host, last event occurs where.
 
