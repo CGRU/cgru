@@ -8,13 +8,13 @@
 
 using namespace afsql;
 
-QString DBAttr::DBName[_LAST_];
-QString DBAttr::DBType[_LAST_];
+std::string DBAttr::DBName[_LAST_];
+std::string DBAttr::DBType[_LAST_];
 int DBAttr::DBLength[_LAST_];
 
 void DBAttr::init()
 {
-   AFINFO("DBAttr::init:\n");
+   AFINFO("DBAttr::init:")
 
    for( int i = 0 + 1; i < _LAST_; i++)
    {
@@ -23,6 +23,7 @@ void DBAttr::init()
       DBLength[i] = 0;
    }
 
+//   DBName[_administrator         ] = "administrator";
    DBName[_annotation            ] = "annotation";
    DBName[_blockname             ] = "blockname";
    DBName[_blocksnum             ] = "blocksnum";
@@ -56,9 +57,11 @@ void DBAttr::init()
    DBName[_id                    ] = "id";
    DBName[_id_block              ] = "id_block";
    DBName[_id_job                ] = "id_job";
-   DBName[_id_task               ] = "id_task";
+//   DBName[_id_task               ] = "id_task";
    DBName[_jobname               ] = "jobname";
+   DBName[_lifetime              ] = "lifetime";
    DBName[_maxrunningtasks       ] = "maxrunningtasks";
+   DBName[_maxruntasksperhost    ] = "maxruntasksperhost";
    DBName[_multihost_max         ] = "multihost_max";
    DBName[_multihost_min         ] = "multihost_min";
    DBName[_multihost_service     ] = "multihost_service";
@@ -72,6 +75,7 @@ void DBAttr::init()
    DBName[_need_os               ] = "need_os";
    DBName[_parser                ] = "parser";
    DBName[_parsercoeff           ] = "parsercoeff";
+   DBName[_password              ] = "password";
    DBName[_priority              ] = "priority";
    DBName[_service               ] = "service";
    DBName[_services_disabled     ] = "services_disabled";
@@ -93,45 +97,49 @@ void DBAttr::init()
    DBName[_wdir                  ] = "wdir";
 
    for( int i =    _INTEGER_BEGIN_ + 1; i <    _INTEGER_END_; i++) DBType[i] = "integer DEFAULT 0";
+
+   for( int i =    _BIGINT_BEGIN_ + 1; i <    _BIGINT_END_; i++) DBType[i] = "bigint DEFAULT 0";
+
    for( int i = _STRINGNAME_BEGIN_ + 1; i < _STRINGNAME_END_; i++)
    {
       DBLength[i] = af::Environment::get_DB_StringNameLen();
-      DBType[i] = QString("varchar(%1)").arg(DBLength[i]);
+      DBType[i] = std::string("varchar(") + af::itos( DBLength[i]) + ")";
    }
    for( int i = _STRINGEXPR_BEGIN_ + 1; i < _STRINGEXPR_END_; i++)
    {
       DBLength[i] = af::Environment::get_DB_StringExprLen();
-      DBType[i] = QString("varchar(%1)").arg(DBLength[i]);
+      DBType[i] = std::string("varchar(") + af::itos( DBLength[i]) + ")";
    }
 }
 
 DBAttr::DBAttr( int Type): type( Type){}
 DBAttr::~DBAttr(){}
 
-const QString DBAttr::createLine() const
+const std::string DBAttr::createLine() const
 {
-   return QString("%1 %2").arg(DBName[type], DBType[type]);
+   return DBName[type] + " " + DBType[type];
 }
 
-const QString DBAttr::DBString( const QString * str) const
+const std::string DBAttr::DBString( const std::string * str) const
 {
-   if( str->isEmpty()) return "''";
-   QString dbstr;
+   if( str->empty()) return "''";
+   std::string dbstr;
    if(( str->size() > DBLength[type] ) && ( DBLength[type] != 0))
    {
       int size = str->size();
-      dbstr = str->left(DBLength[type]);
-      AFERRAR("DBAttr::DBString: Attribute '%s' of type '%s' with lenght=%d clampled to %d.\n\tOriginal Value:\n%s\n\tClamped Value:\n%s\n",
-               DBName[type].toUtf8().data(),
-               DBType[type].toUtf8().data(),
+      dbstr = *str;
+      dbstr.resize(DBLength[type]);
+      AFERRAR("DBAttr::DBString: Attribute '%s' of type '%s' with lenght=%d clampled to %d.\n\tOriginal Value:\n%s\n\tClamped Value:\n%s",
+               DBName[type].c_str(),
+               DBType[type].c_str(),
                size, DBLength[type],
-               str->toUtf8().data(),
-               dbstr.toUtf8().data());
-      dbstr = QString("%1%2%3").arg( af::Environment::get_DB_StringQuotes().c_str(), dbstr, af::Environment::get_DB_StringQuotes().c_str());
+               str->c_str(),
+               dbstr.c_str())
+      dbstr = af::Environment::get_DB_StringQuotes() + dbstr + af::Environment::get_DB_StringQuotes();
    }
    else
    {
-      dbstr = QString("%1%2%3").arg( af::Environment::get_DB_StringQuotes().c_str(),  *str, af::Environment::get_DB_StringQuotes().c_str());
+      dbstr = af::Environment::get_DB_StringQuotes() + *str + af::Environment::get_DB_StringQuotes();
    }
 
    return dbstr;
@@ -147,10 +155,10 @@ DBAttrUInt16::DBAttrUInt16    ( int type, uint16_t * parameter):     DBAttr( typ
 DBAttrUInt16::~DBAttrUInt16   (){}
 DBAttrInt32 ::DBAttrInt32     ( int type,  int32_t * parameter):     DBAttr( type), pointer( parameter) {}
 DBAttrInt32 ::~DBAttrInt32    (){}
+DBAttrInt64 ::DBAttrInt64     ( int type,  int64_t * parameter):     DBAttr( type), pointer( parameter) {}
+DBAttrInt64 ::~DBAttrInt64    (){}
 DBAttrUInt32::DBAttrUInt32    ( int type, uint32_t * parameter):     DBAttr( type), pointer( parameter) {}
 DBAttrUInt32::~DBAttrUInt32   (){}
-//DBAttrQString::DBAttrQString  ( int type,  QString * parameter):     DBAttr( type), pointer( parameter) {}
-//DBAttrQString::~DBAttrQString (){}
 DBAttrString::DBAttrString    ( int type, std::string * parameter):  DBAttr( type), pointer( parameter) {}
 DBAttrString::~DBAttrString   (){}
 DBAttrRegExp::DBAttrRegExp    ( int type, af::RegExp * parameter):   DBAttr( type), pointer( parameter) {}

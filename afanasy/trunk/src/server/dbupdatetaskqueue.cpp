@@ -46,7 +46,7 @@ AFINFA("DBUpdateTaskQueue::connectionEstablished: %s", name.c_str())
 
    if( query ) delete query;
    query = new QSqlQuery( *db);
-   query->prepare( afsql::DBTaskProgress::dbPrepareUpdate);
+   query->prepare( afsql::stoq(afsql::DBTaskProgress::dbPrepareUpdate));
 }
 
 bool DBUpdateTaskQueue::writeItem( AfQueueItem* item)

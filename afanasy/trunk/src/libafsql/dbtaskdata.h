@@ -15,23 +15,23 @@ public:
    DBTaskData( af::Msg * msg);
    virtual ~DBTaskData();
 
-   static const QString dbPrepareInsert;
-   static const QString dbWhereSelect( int id_job, int id_block, int id_task);
+   inline const std::string & dbGetTableName() const { return TableName;}
+   static const std::string dbPrepareInsert;
+   static const std::string dbWhereSelect( int id_job, int id_block, int id_task);
 
-   void dbBindInsert( QSqlQuery *query, const QVariant & id_job, const QVariant & id_block, const QVariant & id_task) const;
+   void dbBindInsert( QSqlQuery *query, int id_job, int id_block, int id_task) const;
 
 protected:
-   inline const QString & dbGetTableName() const { return TableName;}
-   inline const QString & dbGetIDs()       const { return IDs;      }
-   inline const QString & dbGetKeys()      const { return Keys;     }
+   inline const std::string & dbGetIDsString()  const { return IDs;      }
+   inline const std::string & dbGetKeysString() const { return Keys;     }
 
 protected:
    virtual void readwrite( af::Msg * msg);
 
 private:
-   static const QString TableName;
-   static const QString Keys;
-   static const QString IDs;
+   static const std::string TableName;
+   static const std::string Keys;
+   static const std::string IDs;
 
 private:
    void addDBAttributes();

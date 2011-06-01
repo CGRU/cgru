@@ -58,7 +58,7 @@ void JobAf::initializeValues()
    blackListsWeight  = 0;
 }
 
-bool JobAf::dbSelect( QSqlDatabase * db, const QString * where)
+bool JobAf::dbSelect( QSqlDatabase * db, const std::string * where)
 {
 //printf("JobAf::dbSelect:\n");
    if( afsql::DBJob::dbSelect( db) == false) return false;
@@ -67,7 +67,7 @@ bool JobAf::dbSelect( QSqlDatabase * db, const QString * where)
 
 bool JobAf::construct()
 {
-//printf("JobAf::construct:\n");
+AFINFA("JobAf::construct: \"%s\":", name.c_str())
    if( constructed )
    {
       AFERROR("JobAf::construct: Already constructed.")

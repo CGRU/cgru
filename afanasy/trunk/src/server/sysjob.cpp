@@ -451,7 +451,7 @@ SysJob::~SysJob()
 {
 }
 
-void SysJob::dbDelete( QStringList * queries) const
+void SysJob::dbDelete( std::list<std::string> * queries) const
 {
    AFCommon::QueueLogError("Trying to delete system job from database.");
 }

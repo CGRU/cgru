@@ -45,7 +45,7 @@ bool CmdDBResetUsers::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetUsers");
    DB.DBOpen();
-   DB.ResetUsers();
+   afsql::ResetUsers( &DB);
    DB.DBClose();
    return true;
 }
@@ -60,7 +60,7 @@ bool CmdDBResetRenders::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetRenders");
    DB.DBOpen();
-   DB.ResetRenders();
+   afsql::ResetRenders( &DB);
    DB.DBClose();
    return true;
 }
@@ -75,7 +75,7 @@ bool CmdDBResetJobs::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetOnline");
    DB.DBOpen();
-   DB.ResetJobs();
+   afsql::ResetJobs( &DB);
    DB.DBClose();
    return true;
 }
@@ -90,7 +90,7 @@ bool CmdDBResetStat::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetArchive");
    DB.DBOpen();
-   DB.ResetStat();
+   afsql::ResetStat( &DB);
    DB.DBClose();
    return true;
 }
@@ -105,7 +105,7 @@ bool CmdDBResetAll::processArguments( int argc, char** argv, af::Msg &msg)
 {
    afsql::DBConnection DB( "afanasy.cmd.ResetAll");
    DB.DBOpen();
-   DB.ResetAll();
+   afsql::ResetAll( &DB);
    DB.DBClose();
    return true;
 }
@@ -121,8 +121,7 @@ bool CmdDBJobsList::processArguments( int argc, char** argv, af::Msg &msg)
    afsql::DBConnection DB( "afanasy.cmd.JobsList");
    DB.DBOpen();
 
-   std::list<int> jids;
-   DB.getJobsIds( jids);
+   std::list<int> jids = DB.getIntegers( afsql::DBJob::dbGetIDsCmd());
    for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
    {
       afsql::DBJob job( *it);
@@ -145,17 +144,16 @@ bool CmdDBJobsClean::processArguments( int argc, char** argv, af::Msg &msg)
    afsql::DBConnection DB( "afanasy.cmd.JobsClean");
    DB.DBOpen();
 
-   std::list<int> jids;
-   DB.getJobsIds( jids);
+   std::list<int> jids = DB.getIntegers( afsql::DBJob::dbGetIDsCmd());
    for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
    {
       afsql::DBJob job( *it);
       if( DB.getItem( &job) == false)
       {
          job.stdOut( false);
-         QStringList queries;
+         std::list<std::string> queries;
          job.dbDelete( &queries);
-         DB.execute( queries);
+         DB.execute( &queries);
       }
    }
 
@@ -174,9 +172,7 @@ bool CmdDBSysJobDel::processArguments( int argc, char** argv, af::Msg &msg)
    afsql::DBConnection DB( "afanasy.cmd.SysJobDel");
    DB.DBOpen();
 
-   std::list<int> jids;
-   DB.getJobsIds( jids);
-
+   std::list<int> jids = DB.getIntegers( afsql::DBJob::dbGetIDsCmd());;
    bool has_system_job = false;
    for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
    {
@@ -192,9 +188,9 @@ bool CmdDBSysJobDel::processArguments( int argc, char** argv, af::Msg &msg)
       afsql::DBJob job( AFJOB::SYSJOB_ID);
       DB.getItem( &job);
       job.stdOut( false);
-      QStringList queries;
+      std::list<std::string> queries;
       job.dbDelete( &queries);
-      DB.execute( queries);
+      DB.execute( &queries);
    }
    else
    {
@@ -202,6 +198,24 @@ bool CmdDBSysJobDel::processArguments( int argc, char** argv, af::Msg &msg)
       printf("System job not founded.\n");
    }
 
+   DB.DBClose();
+   return true;
+}
+
+CmdDBUpdateTables::CmdDBUpdateTables()
+{
+   setCmd("db_updatetables");
+   setInfo("Update all database tables.");
+   setHelp("db_updatetables [any_arg]"
+"\nAlter tables to add all needed columns and delete spare."
+"\nWith any argument will show sql commands only without execution.");
+}
+CmdDBUpdateTables::~CmdDBUpdateTables(){}
+bool CmdDBUpdateTables::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   afsql::DBConnection DB( "afanasy.cmd.UpdateTables");
+   DB.DBOpen();
+   afsql::UpdateTables( &DB, argc > 0);
    DB.DBClose();
    return true;
 }

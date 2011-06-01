@@ -103,10 +103,13 @@ bool DBActionQueue::writeItem( AfQueueItem* item)
    if( size < 1) return true;
 
    QSqlQuery query( *db);
-   for( int i  = 0; i < size; i++)
+//   for( int i  = 0; i < size; i++)
+   for( std::list<std::string>::const_iterator it = queries->begin(); it != queries->end(); it++)
    {
       if( false == db->isOpen()) return false;
-      query.exec( (*queries)[i]);
+//      query.exec( (*queries)[i]);
+      AFINFA("DBActionQueue::writeItem: %s: Executing query:\n%s", name.c_str(), (*it).c_str())
+      query.exec( afsql::stoq(*it));
       if( afsql::qChkErr( query, name)) return false;
    }
    return true;

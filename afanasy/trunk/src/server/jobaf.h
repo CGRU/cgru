@@ -70,7 +70,7 @@ public:
 /// Set some attributes.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   bool dbSelect( QSqlDatabase * db, const QString * where = NULL);
+   virtual bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
 
 /// Initialize new job, came to Afanasy container.
    bool initialize( UserAf * jobOwner);

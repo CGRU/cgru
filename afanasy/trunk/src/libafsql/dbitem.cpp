@@ -1,5 +1,8 @@
 #include "dbitem.h"
 
+#include <QtCore/QStringList>
+#include <QtCore/QVariant>
+
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
@@ -12,7 +15,7 @@
 
 using namespace afsql;
 
-const QString DBItem::empty;
+const std::string DBItem::empty;
 
 DBItem::DBItem()
 {
@@ -23,62 +26,26 @@ DBItem::~DBItem()
    for( int i = 0; i < dbAttributes.size(); i++) delete dbAttributes[i];
 }
 
-void DBItem::dbDropTable( QSqlDatabase * db) const
+void DBItem::dbCreateTable( std::list<std::string> * queries) const
 {
-   if( db->isOpen() == false )
-   {
-      AFERROR("DBItem::dbDropTable: Database connection is not open.")
-      return;
-   }
-   QStringList tables = db->tables();
-   if( tables.contains( dbGetTableName()))
-   {
-      QSqlQuery q( *db);
-      QString str = QString("DROP TABLE %1;").arg( dbGetTableName());
-      AFINFA("DBItem::dbDropTable: executing query:\n%s", str.toUtf8().data())
-      q.exec( str);
-      qChkErr(q, std::string("DBItem::dbDropTable:") + dbGetTableName().toUtf8().data());
-   }
-   else
-   {
-      AFINFA("DBItem::dbDropTable: no table '%s' founded.", dbGetTableName().toUtf8().data())
-   }
-}
-
-void DBItem::dbCreateTable( QSqlDatabase * db) const
-{
-   if( db->isOpen() == false )
-   {
-      AFERROR("DBItem::dbCreateTable: Database connection is not open.")
-      return;
-   }
-   QStringList tables = db->tables();
-   if( tables.contains( dbGetTableName()))
-   {
-      AFERRAR("DBItem::dbCreateTable: Table '%s' already exists.", dbGetTableName().toUtf8().data())
-      return;
-   }
-
-   QString str(QString("CREATE TABLE %1\n(\n").arg( dbGetTableName()));
-   if( dbGetIDs().isEmpty() == false) str += QString("%1,\n").arg( dbGetIDs());
+   std::string str = std::string("CREATE TABLE ") + dbGetTableName() + "\n(\n";
+   if( dbGetIDsString().empty() == false )
+      str += dbGetIDsString() + ",\n";
    for( int i = 0; i < dbAttributes.size(); i++)
    {
       if( i != 0 ) str += ",\n";
-      str += QString("   %1").arg( dbAttributes[i]->createLine());
+      str += "   " + dbAttributes[i]->createLine();
    }
-   if( dbGetKeys().isEmpty() == false)
-      str += QString(",\n %1").arg( dbGetKeys());
+   if( dbGetKeysString().empty() == false)
+      str += ",\n " + dbGetKeysString();
    str += "\n)";
 
-   QSqlQuery q( *db);
-   AFINFA("DBItem::dbCreateTable: executing query:\n%s", str.toUtf8().data())
-   q.exec( str);
-   qChkErr(q, std::string("DBItem::dbCreateTable:") + dbGetTableName().toUtf8().data());
+   queries->push_back( str);
 }
 
-void DBItem::dbInsert( QStringList  * queries) const
+void DBItem::dbInsert( std::list<std::string> * queries) const
 {
-   QString str = QString("INSERT INTO %1 (").arg( dbGetTableName());
+   std::string str = std::string("INSERT INTO ") + dbGetTableName() + " (";
    for( int i = 0; i < dbAttributes.size(); i++)
    {
       if( i != 0 ) str += ",\n";
@@ -91,20 +58,21 @@ void DBItem::dbInsert( QStringList  * queries) const
       str += dbAttributes[i]->getString();
    }
    str += ");";
-   AFINFA("DBItem::dbInsert:\n%s", str.toUtf8().data())
-   *queries << str;
+   AFINFA("DBItem::dbInsert:\n%s", str.c_str())
+   queries->push_back( str);
 }
 
-void DBItem::dbDelete( QStringList  * queries) const
+void DBItem::dbDelete( std::list<std::string> * queries) const
 {
-  *queries << QString("DELETE FROM %1 WHERE %2=%3;")
-         .arg( dbGetTableName()).arg( dbAttributes[0]->getName()).arg( dbAttributes[0]->getString());
+   queries->push_back( std::string("DELETE FROM ") + dbGetTableName()
+                       + " WHERE " + dbAttributes.front()->getName() + "=" + dbAttributes.front()->getString() + ";");
 }
 
-void DBItem::dbUpdate( QStringList * queries, int attr) const
+void DBItem::dbUpdate( std::list<std::string> * queries, int attr) const
 {
-   QString str = QString("UPDATE %1 SET").arg( dbGetTableName());
+   std::string str = std::string("UPDATE ") + dbGetTableName() + " SET";
    bool attrfounded = false;
+   int i = 0;
    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
    {
       if( attr > 0 )
@@ -112,7 +80,7 @@ void DBItem::dbUpdate( QStringList * queries, int attr) const
          if( dbAttributes[i]->getType() != attr ) continue;
       }
       else if( i != dbGetKeysNum()) str += ",";
-      str += QString(" %1=%2").arg( dbAttributes[i]->getName()).arg( dbAttributes[i]->getString());
+      str += " " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
       if( attr > 0 )
       {
          attrfounded = true;
@@ -124,46 +92,99 @@ void DBItem::dbUpdate( QStringList * queries, int attr) const
       AFERRAR("DBItem::dbUpdate: attr=%d not founded.", attr)
       return;
    }
-   str += QString(" WHERE %1=%2").arg( dbAttributes[0]->getName()).arg( dbAttributes[0]->getString());
+   str += " WHERE " + dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();
    for( int i = 1; i < dbGetKeysNum(); i++)
-      str += QString(" AND %1=%2").arg( dbAttributes[i]->getName()).arg( dbAttributes[i]->getString());
+      str += " AND " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
    str += ";";
-   AFINFA("DBItem::dbUpdate:\n%s", str.toUtf8().data())
-   *queries << str;
+   AFINFA("DBItem::dbUpdate:\n%s", str.c_str())
+   queries->push_back( str);
 }
 
-bool DBItem::dbSelect( QSqlDatabase * db, const QString * where)
+bool DBItem::dbSelect( QSqlDatabase * db, const std::string * where)
 {
    QSqlQuery q( *db);
-   QString str = QString("SELECT");
+   std::string str = "SELECT";
    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
    {
       if( i != dbGetKeysNum()) str += ",";
-      str += QString(" %1").arg( dbAttributes[i]->getName());
+      str += " " + dbAttributes[i]->getName();
    }
-   str += QString(" FROM %1\n WHERE ").arg( dbGetTableName());
+   str += " FROM " + dbGetTableName() + "\n WHERE ";
    if( where )
       str += *where;
    else
    {
-      str += QString("%1=%2").arg( dbAttributes[0]->getName()).arg( dbAttributes[0]->getString());
+      str += dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();
       for( int i = 1; i < dbGetKeysNum(); i++)
-         str += QString(" AND %1=%2").arg( dbAttributes[i]->getName()).arg( dbAttributes[i]->getString());
+         str += " AND " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
    }
    str += ";";
-   q.exec( str);
-   AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s\n", q.size(), str.toUtf8().data())
+   q.exec( afsql::stoq( str));
+   AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s", q.size(), str.c_str())
    if( q.size() != 1)
    {
-      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s", q.size(), str.toUtf8().data())
+      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s", q.size(), str.c_str())
       return false;
    }
    q.next();
    int a = 0;
    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++, a++)
-      dbAttributes[i]->set( q.value(a));
+   {
+      if( dbAttributes[i]->getType() <= DBAttr::_NUMERIC_END_)
+         dbAttributes[i]->set( q.value(a).toLongLong());
+      else
+         dbAttributes[i]->set( afsql::qtos( q.value(a).toString()));
+   }
 
    return true;
+}
+
+void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<std::string> & columns) const
+{
+   // Check for spare columns:
+   for( std::list<std::string>::const_iterator it = columns.begin(); it != columns.end(); it++)
+   {
+      if( (*it).find("id_") == 0 ) continue;
+      bool column_exists = false;
+      for( int i = 0; i < dbAttributes.size(); i++)
+      {
+         if( *it == dbAttributes[i]->getName())
+         {
+            column_exists = true;
+            break;
+         }
+      }
+      if( column_exists ) continue;
+
+      std::string cmd("ALTER TABLE ");
+      cmd += dbGetTableName();
+      cmd += " DROP COLUMN ";
+      cmd += *it;
+      std::cout << cmd << std::endl;
+      queries->push_back( cmd);
+   }
+
+   // Check for new columns:
+   for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
+   {
+      bool column_exists = false;
+      for( std::list<std::string>::const_iterator it = columns.begin(); it != columns.end(); it++)
+      {
+         if( *it == dbAttributes[i]->getName())
+         {
+            column_exists = true;
+            break;
+         }
+      }
+      if( column_exists ) continue;
+
+      std::string cmd("ALTER TABLE ");
+      cmd += dbGetTableName();
+      cmd += " ADD COLUMN ";
+      cmd += dbAttributes[i]->createLine();
+      std::cout << cmd << std::endl;
+      queries->push_back( cmd);
+   }
 }
 
 int DBItem::calcWeight() const

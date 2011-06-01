@@ -19,9 +19,9 @@ TaskExec::TaskExec(
          int fileSizeMax,
          const std::string & Files,
 
-         int Start_Frame,
-         int End_Frame,
-         int FramesNum,
+         long long Start_Frame,
+         long long End_Frame,
+         long long FramesNum,
 
          const std::string & WorkingDirectory,
          const std::string & Environment,
@@ -61,7 +61,7 @@ TaskExec::TaskExec(
    time_start( time(NULL)),
    onClient( false)
 {
-AFINFA("TaskExec::TaskExec: %s:\n", jobname.toUtf8().data(), blockname.toUtf8().data(), name.toUtf8().data());
+AFINFA("TaskExec::TaskExec: %s:", jobname.toUtf8().data(), blockname.toUtf8().data(), name.toUtf8().data())
    if( CustomDataBlock ) customdata_block = *CustomDataBlock;
    if( CustomDataTask )  customdata_task  = *CustomDataTask;
 }
@@ -116,11 +116,11 @@ void TaskExec::readwrite( Msg * msg)
       rw_int32_t ( jobid,           msg);
       rw_int32_t ( blocknum,        msg);
       rw_int32_t ( tasknum,         msg);
-      rw_int32_t ( frames_num,      msg);
-      rw_int32_t ( frame_start,     msg);
-      rw_int32_t ( frame_finish,    msg);
-      rw_int32_t ( filesize_min,    msg);
-      rw_int32_t ( filesize_max,    msg);
+      rw_int64_t ( frames_num,      msg);
+      rw_int64_t ( frame_start,     msg);
+      rw_int64_t ( frame_finish,    msg);
+      rw_int64_t ( filesize_min,    msg);
+      rw_int64_t ( filesize_max,    msg);
 
       rw_StringList( multihost_names, msg);
 
@@ -133,7 +133,7 @@ void TaskExec::readwrite( Msg * msg)
       rw_int32_t ( number,          msg);
       rw_int32_t ( capacity,        msg);
       rw_int32_t ( capcoeff,        msg);
-      rw_uint32_t( time_start,      msg);
+      rw_int64_t ( time_start,      msg);
 
       break;
 

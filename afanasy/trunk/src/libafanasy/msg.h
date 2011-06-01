@@ -80,7 +80,6 @@ public:
 /**/TClientExitRequest/**/,         ///< Request to client to exit,
 /**/TClientRestartRequest/**/,      ///< Restart client application,
 /**/TClientWOLSleepRequest/**/,     ///< Request to client to fall a sleep,
-//**/TClientStartRequest/**/,        ///< Start client application,
 /**/TClientRebootRequest/**/,       ///< Reboot client host computer,
 /**/TClientShutdownRequest/**/,     ///< Shutdown client host computer,
 
@@ -126,9 +125,6 @@ public:
 /// Request a job progress with given id. The answer is TJobProgress. If there is no job with such id the answer is TJobProgressRequestId.
 /**/TJobProgressRequestId/**/,
 
-
-// TODO: VERSION: reserved types:
-/*
 TRESERVED00,
 TRESERVED01,
 TRESERVED02,
@@ -139,7 +135,6 @@ TRESERVED06,
 TRESERVED07,
 TRESERVED08,
 TRESERVED09,
-*/
 
 /*---------------------------------------------------------------------------------------------------------*/
 /*--------------------------------- DATA MESSAGES ---------------------------------------------------------*/
@@ -213,23 +208,22 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRendersUpdateRequestIds/**/,   ///< Request a list of resources of Renders with given ids.
 /**/TRendersList/**/,               ///< Message with a list of Renders.
 /**/TRendersListUpdates/**/,        ///< Message with a list of resources of Renders.
-/**/TRenderPriority/**/,            ///< Set Render priority,
-/**/TRenderCapacity/**/,            ///< Set Render capacity,
+/**/TRenderSetPriority/**/,         ///< Set Render priority,
+/**/TRenderSetCapacity/**/,         ///< Set Render capacity,
+/**/TRenderSetMaxTasks/**/,         ///< Set Render maximum tasks,
 /**/TRenderSetService/**/,          ///< Enable or disable Render service,
 /**/TRenderRestoreDefaults/**/,     ///< Restore default Render settings,
-/**/TRenderNIMBY/**/,               ///< Set Render NIMBY,
-/**/TRenderUser/**/,                ///< Set Render user,
-/**/TRenderNimby/**/,               ///< Set Render nimby,
-/**/TRenderFree/**/,                ///< Set Render free,
+/**/TRenderSetNIMBY/**/,            ///< Set Render NIMBY,
+/**/TRenderSetUser/**/,             ///< Set Render user,
+/**/TRenderSetNimby/**/,            ///< Set Render nimby,
+/**/TRenderSetFree/**/,             ///< Set Render free,
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
 /**/TRenderEject/**/,               ///< Stop all tasks on Render,
 /**/TRenderDelete/**/,              ///< Delete Render from afanasy server container and database,
 /**/TRenderRestart/**/,             ///< Restart Render client program,
-
-// TODO: VERSION: not used:
-/**/TRenderStart/**/,               ///< Start Render client program,
-
+/**/TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
+/**/TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
 /**/TRenderReboot/**/,              ///< Reboot Render host computer,
 /**/TRenderShutdown/**/,            ///< Shutdown Render host computer,
 /**/TRenderAnnotate/**/,            ///< Set Render annotation,
@@ -294,6 +288,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TBlockHostsMask/**/,            ///< Set block hosts mask.
 /**/TBlockHostsMaskExclude/**/,     ///< Set block exclude hosts mask.
 /**/TBlockMaxRunningTasks/**/,      ///< Set block maximum running tasks number.
+/**/TBlockMaxRunTasksPerHost/**/,   ///< Set block maximum running tasks number on the same host.
 /**/TBlockCommand/**/,              ///< Set block command.
 /**/TBlockWorkingDir/**/,           ///< Set block working directory.
 /**/TBlockFiles/**/,                ///< Set block files.
@@ -334,12 +329,6 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTaskOutput/**/,                ///< Job task output data.
 /**/TTasksRun/**/,                  ///< Job tasks run data.
 
-// TODO: VERSION: new messages types:
-/**/TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
-/**/TRenderWOLWake/**/,             ///< Ask sleeping render(s) to wake up
-
-// TODO: VERSION: reserved types:
-/*
 TRESERVED10,
 TRESERVED11,
 TRESERVED12,
@@ -350,7 +339,6 @@ TRESERVED16,
 TRESERVED17,
 TRESERVED18,
 TRESERVED19,
-*/
 
 /**/TLAST/**/                       ///< The last type number.
 };

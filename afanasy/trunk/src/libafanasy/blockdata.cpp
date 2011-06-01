@@ -38,6 +38,7 @@ void BlockData::initDefaults()
    frame_pertask = 1;
    frame_inc = 1;
    maxrunningtasks = -1;
+   maxruntasksperhost = -1;
    tasksmaxruntime = 0;
    capacity = AFJOB::TASK_DEFAULT_CAPACITY;
    need_memory = 0;
@@ -140,11 +141,6 @@ void BlockData::readwrite( Msg * msg)
    case Msg::TJob:
    case Msg::TJobRegister:
    case Msg::TBlocks:
-// TODO: (VESRION) this integer parameters should be in Msg::TJobsList
-      rw_int32_t ( frame_first,           msg);
-      rw_int32_t ( frame_last,            msg);
-      rw_int32_t ( frame_pertask,         msg);
-      rw_int32_t ( frame_inc,             msg);
       rw_uint32_t( flags,                 msg);
       if( isNotNumeric()) rw_tasks(       msg);
 
@@ -163,8 +159,12 @@ void BlockData::readwrite( Msg * msg)
 
    case Msg::TJobsList:
       rw_uint32_t( flags,                 msg);
-      rw_int32_t ( filesize_min,          msg);
-      rw_int32_t ( filesize_max,          msg);
+      rw_int64_t ( frame_first,           msg);
+      rw_int64_t ( frame_last,            msg);
+      rw_int64_t ( frame_pertask,         msg);
+      rw_int64_t ( frame_inc,             msg);
+      rw_int64_t ( filesize_min,          msg);
+      rw_int64_t ( filesize_max,          msg);
       rw_int32_t ( capcoeff_min,          msg);
       rw_int32_t ( capcoeff_max,          msg);
       rw_uint8_t ( multihost_min,         msg);
@@ -201,7 +201,7 @@ void BlockData::readwrite( Msg * msg)
       rw_int32_t ( p_tasksready,          msg);
       rw_int32_t ( p_tasksdone,           msg);
       rw_int32_t ( p_taskserror,          msg);
-      rw_uint32_t( p_taskssumruntime,     msg);
+      rw_int64_t ( p_taskssumruntime,     msg);
 
       rw_uint32_t( state,                 msg);
       rw_int32_t ( jobid,                 msg);
@@ -322,11 +322,11 @@ bool BlockData::setMultiHostMax( int value)
    return true;
 }
 
-bool BlockData::setNumeric( int start, int end, int perTask, int increment)
+bool BlockData::setNumeric( long long start, long long end, long long perTask, long long increment)
 {
    if( perTask < 1)
    {
-      AFERRAR("BlockData::setNumeric(): Frames per task = %d < 1 ( setting to 1).", perTask)
+      AFERRAR("BlockData::setNumeric(): Frames per task = %lld < 1 ( setting to 1).", perTask)
       perTask = 1;
    }
    if( tasksdata)
@@ -341,7 +341,7 @@ bool BlockData::setNumeric( int start, int end, int perTask, int increment)
    }
    if( start > end)
    {
-      AFERRAR("BlockData::setNumeric(): start > end ( %d > %d - setting end to %d)", start, end, start)
+      AFERRAR("BlockData::setNumeric(): start > end ( %lld > %lld - setting end to %lld)", start, end, start)
       end = start;
    }
    flags = flags | FNumeric;
@@ -351,14 +351,14 @@ bool BlockData::setNumeric( int start, int end, int perTask, int increment)
    frame_pertask  = perTask;
    frame_inc      = increment;
 
-   int numframes = frame_last - frame_first + 1;
+   long long numframes = frame_last - frame_first + 1;
    tasksnum = numframes / frame_pertask;
    if((numframes%perTask) != 0) tasksnum++;
 
    return true;
 }
 
-void BlockData::setFramesPerTask( int perTask)
+void BlockData::setFramesPerTask( long long perTask)
 {
    if( isNumeric())
    {
@@ -373,7 +373,7 @@ void BlockData::setFramesPerTask( int perTask)
    frame_pertask = perTask;
 }
 
-const std::string BlockData::genCommand( int num, int *frame_start, int *frame_finish) const
+const std::string BlockData::genCommand( int num, long long * frame_start, long long * frame_finish) const
 {
    std::string str;
    if( num > tasksnum)
@@ -383,7 +383,7 @@ const std::string BlockData::genCommand( int num, int *frame_start, int *frame_f
    }
    if( isNumeric())
    {
-      int start, end;
+      long long start, end;
       if( genNumbers( start, end, num))
       {
          str = fillNumbers( command, start, end);
@@ -413,7 +413,7 @@ const std::string BlockData::genFiles( int num) const
    {
       if( files.size())
       {
-         int start, end;
+         long long start, end;
          if( genNumbers( start, end, num)) str = af::fillNumbers( files, start, end);
       }
    }
@@ -424,7 +424,7 @@ const std::string BlockData::genFiles( int num) const
    return str;
 }
 
-bool BlockData::genNumbers( int &start, int &end, int num) const
+bool BlockData::genNumbers( long long & start, long long & end, int num) const
 {
    if( num > tasksnum)
    {
@@ -446,8 +446,8 @@ TaskExec *BlockData::genTask( int num) const
       return NULL;
    }
 
-   int start = -1;
-   int end = -1;
+   long long start = -1;
+   long long end = -1;
 
    std::string command = genCommand( num, &start, &end);
 
@@ -484,7 +484,7 @@ const std::string BlockData::genTaskName( int num) const
 
    if( isNumeric())
    {
-      int start, end;
+      long long start, end;
       genNumbers( start, end, num);
       if( tasksname.size()) return fillNumbers( tasksname, start, end);
 
@@ -547,20 +547,19 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 {
    switch( type)
    {
-   case Msg::TJob:
+/*   case Msg::TJob:
    case Msg::TJobRegister:
    case Msg::TBlocks:
-// TODO: (VESRION) this integer parameters should be in Msg::TJobsList
-      if( isNumeric())
-      {
-         stream << "\n Frames: " << frame_first << " - " << frame_last << ": Per Task =" << frame_pertask;
-//         stream << "\n    Frame Increment = " << frame_inc;
-      }
-      break;
+      break;*/
 
    case Msg::TBlocksProperties:
 
       if( full ) stream << "\nProperties:";
+
+      if( isNumeric())
+      {
+         stream << "\n Frames: " << frame_first << " - " << frame_last << ": Per Task =" << frame_pertask;
+      }
 
       if( full && ( parsercoeff != 1 )) stream << "\n Parser Coefficient = " << parsercoeff;
 
@@ -656,7 +655,7 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    stream << "Block[" << name << "] " << service << "[" << capacity << "] " << tasksnum << " tasks";
    generateInfoStreamTyped( stream, Msg::TBlocksProgress,   full);
    generateInfoStreamTyped( stream, Msg::TBlocksProperties, full);
-   if( full ) generateInfoStreamTyped( stream, Msg::TBlocks, full);
+//   if( full ) generateInfoStreamTyped( stream, Msg::TBlocks, full);
 /*
    if( full )
    {

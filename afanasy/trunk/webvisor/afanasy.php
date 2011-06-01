@@ -91,7 +91,13 @@ if (isset($_POST['user']) && isset($_POST['password']))
 $user = $_POST['user'];
 $password = $_POST['password'];
 $dbconn = db_connect();
-$query = "UPDATE users SET password='".sha1($password)."', administrator=TRUE WHERE name='$user';";
+$query = "SELECT flags FROM users WHERE name='$user';";
+$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+$flags = $line["flags"];
+pg_free_result($result);
+$flags = userSetAdmin( $flags);
+$query = "UPDATE users SET password='".sha1($password)."', flags=$flags WHERE name='$user';";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 pg_free_result($result);
 echo "user $user is admin now.</br>";
@@ -102,7 +108,7 @@ public function DisplayLogin()
 {
 $dbconn = db_connect();
 
-$query="SELECT COUNT(*) FROM users WHERE password IS NOT NULL;";
+$query="SELECT COUNT(*) FROM users WHERE password <> '';";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
 $passcount = (int)($line['count']);

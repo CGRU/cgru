@@ -17,35 +17,6 @@ DBJobProgress::DBJobProgress( af::Job * job):
 {
    // Construct job in this parent class to call virtual functions to create custom classes
    construct( job);
-/*   blocksnum = job->getBlocksNum();
-   if( blocksnum < 1)
-   {
-      AFERRAR("DBJobProgress::JobProgress: invalid number if blocks = %d (jobid=%d)", blocksnum, job->getId())
-      return;
-   }
-
-   if( initBlocks() == false)
-   {
-      AFERROR("DBJobProgress::JobProgress: blocks initalization failed.")
-      return;
-   }
-
-   for( int b = 0; b < blocksnum; b++)
-   {
-      const af::BlockData * block = job->getBlock( b);
-      tasksnum[b] = block->getTasksNum();
-      if( tasksnum[b] < 1)
-      {
-         AFERRAR("DBJobProgress::JobProgress: invalud number of tasks = %d (jobid=%d,block=%d)", tasksnum[b], job->getId(), b)
-         continue;
-      }
-
-      if( initTasks( b, tasksnum[b]) == false)
-      {
-         AFERRAR("DBJobProgress::JobProgress: tasks initalization failed ( block=%d, tasks number=%d).", b, tasksnum[b])
-         continue;
-      }
-   }*/
 }
 
 DBJobProgress::~DBJobProgress()
@@ -63,17 +34,17 @@ void DBJobProgress::dbAdd( QSqlDatabase * db) const
 {
 AFINFO("DBJobProgress::dbAdd:")
    QSqlQuery q( *db);
-   q.prepare( DBTaskProgress::dbPrepareInsert);
+   q.prepare( afsql::stoq( DBTaskProgress::dbPrepareInsert));
 
-   QVariant job( getJobId());
+   int id_job = getJobId();
    for( int b = 0; b < blocksnum; b++)
    {
-      QVariant block(b);
+      int id_block(b);
       for( int t = 0; t < tasksnum[b]; t++)
       {
-         DBTaskProgress::dbBindInsert( &q, job, block, QVariant(t));
+         DBTaskProgress::dbBindInsert( &q, id_job, id_block, t);
          q.exec();
-         if( qChkErr(q, "DBJobProgress::dbAdd:\n")) break;
+         if( qChkErr(q, "DBJobProgress::dbAdd:")) break;
       }
    }
 }
@@ -84,7 +55,7 @@ bool DBJobProgress::dbSelect( QSqlDatabase * db)
    {
       for( int t = 0; t < tasksnum[b]; t++)
       {
-         QString where = DBTaskProgress::dbWhereSelect( getJobId(), b, t);
+         std::string where = DBTaskProgress::dbWhereSelect( getJobId(), b, t);
          if( ((DBTaskProgress*)(tp[b][t]))->dbSelect( db, &where) == false) return false;
       }
    }

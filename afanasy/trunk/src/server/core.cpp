@@ -73,87 +73,93 @@ Core::Core():
    if( threadReadMsg == NULL){ AFERROR("Core::Core: Can't allocate memory for read messages thread."); return; }
 
 
+   bool hasSystemJob = false;
 //
 // Open database to get nodes:
 //
    afDB_JobRegister.DBOpen();
-//
-// Get Renders from database:
-//
-   AFINFO("Core::Core: Getting renders from database...\n")
-   std::list<int> rids;
-   afDB_JobRegister.getRendersIds( rids);
-   for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
+   if( afDB_JobRegister.isOpen())
    {
-      RenderAf * render = new RenderAf( *it);
-      if( afDB_JobRegister.getItem( render)) renders->addRender( render);
-      else delete render;
-   }
+      // Update database tables:
+      afsql::UpdateTables( &afDB_JobRegister);
 
-//
-// Get Users from database:
-//
-   AFINFO("Core::Core: Getting users from database...\n")
-   std::list<int> uids;
-   afDB_JobRegister.getUsersIds( uids);
-   for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
-   {
-      UserAf * user = new UserAf( *it);
-      if( afDB_JobRegister.getItem( user)) users->addUser( user);
-      else delete user;
-   }
-
-//
-// Get Jobs from database:
-//
-   AFINFO("Core::Core: Getting jobs from database...\n")
-   bool hasSystemJob = false;
-   std::list<int> jids;
-   afDB_JobRegister.getJobsIds( jids);
-   for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
-   {
-      JobAf * job = NULL;
-      if( *it == AFJOB::SYSJOB_ID )
-         job = new SysJob( SysJob::FromDataBase);
-      else
-         job = new JobAf( *it);
-      if( afDB_JobRegister.getItem( job))
+      //
+      // Get Renders from database:
+      //
+      printf("Getting renders from database...\n");
+      std::list<int> rids = afDB_JobRegister.getIntegers( afsql::DBRender::dbGetIDsCmd());
+      for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
       {
+         RenderAf * render = new RenderAf( *it);
+         if( afDB_JobRegister.getItem( render)) renders->addRender( render);
+         else delete render;
+      }
+      printf("%d renders founded.\n", (int)rids.size());
+
+      //
+      // Get Users from database:
+      //
+      printf("Getting users from database...\n");
+      std::list<int> uids = afDB_JobRegister.getIntegers( afsql::DBUser::dbGetIDsCmd());
+      for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
+      {
+         UserAf * user = new UserAf( *it);
+         if( afDB_JobRegister.getItem( user)) users->addUser( user);
+         else delete user;
+      }
+      printf("%d users founded.\n", (int)uids.size());
+
+      //
+      // Get Jobs from database:
+      //
+      printf("Getting jobs from database...\n");
+      std::list<int> jids = afDB_JobRegister.getIntegers( afsql::DBJob::dbGetIDsCmd());
+      for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
+      {
+         JobAf * job = NULL;
          if( *it == AFJOB::SYSJOB_ID )
+            job = new SysJob( SysJob::FromDataBase);
+         else
+            job = new JobAf( *it);
+         if( afDB_JobRegister.getItem( job))
          {
-            SysJob * sysjob = (SysJob*)job;
-            if( false == sysjob->isValid() )
+            if( *it == AFJOB::SYSJOB_ID )
             {
-               printf("System job retrieved from database is obsolete. Deleting it...\n");
-               QStringList queries;
-               job->dbDeleteNoStatistics( &queries);
-               delete job;
-               afDB_JobRegister.execute( queries);
-               continue;
+               SysJob * sysjob = (SysJob*)job;
+               if( false == sysjob->isValid() )
+               {
+                  printf("System job retrieved from database is obsolete. Deleting it...\n");
+                  std::list<std::string> queries;
+                  job->dbDeleteNoStatistics( &queries);
+                  delete job;
+                  afDB_JobRegister.execute( &queries);
+                  continue;
+               }
+               else
+               {
+                  printf("System job retrieved from database.\n");
+                  hasSystemJob = true;
+               }
             }
-            else
-            {
-               printf("System job retrieved from database.\n");
-               hasSystemJob = true;
-            }
+            jobs->job_register( job, users, NULL);
          }
-         jobs->job_register( job, users, NULL);
+         else
+         {
+            printf("Deleting invalid job from database...\n");
+            std::list<std::string> queries;
+            job->dbDeleteNoStatistics( &queries);
+            job->stdOut();
+            delete job;
+            afDB_JobRegister.execute( &queries);
+         }
       }
-      else
-      {
-         printf("Deleting invalid job from database...\n");
-         QStringList queries;
-         job->dbDeleteNoStatistics( &queries);
-         job->stdOut();
-         delete job;
-         afDB_JobRegister.execute( queries);
-      }
-   }
+      printf("%d jobs founded.\n", (int)jids.size());
 
-//
-// Close database:
-//
-   afDB_JobRegister.DBClose();
+      //
+      // Close database:
+      //
+      afDB_JobRegister.DBClose();
+   }
 
 //
 // Create system maintenance job if it was not in database:

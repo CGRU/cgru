@@ -9,9 +9,9 @@
 
 using namespace afsql;
 
-const QString DBBlockData::TableName("blocks");
-const QString DBBlockData::Keys("FOREIGN KEY (id_job) REFERENCES jobs(id) ON DELETE CASCADE, PRIMARY KEY (id_job, id_block)");
-const int     DBBlockData::KeysNum = 2;
+const std::string DBBlockData::TableName("blocks");
+const std::string DBBlockData::Keys("FOREIGN KEY (id_job) REFERENCES jobs(id) ON DELETE CASCADE, PRIMARY KEY (id_job, id_block)");
+const int         DBBlockData::KeysNum = 2;
 
 DBBlockData::DBBlockData( af::Msg * msg):
    af::BlockData( 0, 0)
@@ -49,12 +49,13 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_min,         &capcoeff_min           ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_max,         &capcoeff_max           ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_maxrunningtasks,      &maxrunningtasks        ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_maxruntasksperhost,   &maxruntasksperhost     ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,           &dependmask             ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_tasksdependmask,      &tasksdependmask        ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask              ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude      ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_filesize_min,         &filesize_min           ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_filesize_max,         &filesize_max           ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_min,         &filesize_min           ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_max,         &filesize_max           ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_min,        &multihost_min          ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_max,        &multihost_max          ));
    dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitmax,    &multihost_waitmax      ));
@@ -75,10 +76,10 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_name,                 &name                   ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,              &cmd_pre                ));
    dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &flags                  ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_frame_pertask,        &frame_pertask          ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_frame_first,          &frame_first            ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_frame_last,           &frame_last             ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_frame_inc,            &frame_inc              ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_pertask,        &frame_pertask          ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_first,          &frame_first            ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_last,           &frame_last             ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_inc,            &frame_inc              ));
    dbAddAttr( new DBAttrString( DBAttr::_multihost_service,    &multihost_service      ));
    dbAddAttr( new DBAttrString( DBAttr::_tasksname,            &tasksname              ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_tasksnum,             &tasksnum               ));
@@ -97,30 +98,29 @@ af::TaskData * DBBlockData::createTask( af::Msg * msg)
 void DBBlockData::dbAdd( QSqlDatabase * db) const
 {
 AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", blocknum, tasksnum)
-   QStringList queries;
+   std::list<std::string> queries;
    dbInsert( &queries);
    QSqlQuery q( *db);
-   for( int i = 0; i < queries.size(); i++)
+//   for( int i = 0; i < queries.size(); i++)
+   for( std::list<std::string>::const_iterator it = queries.begin(); it != queries.end(); it++)
    {
 #ifdef AFOUTPUT
-printf("%s\n", queries[i].toUtf8().data());
+printf("%s\n", (*it).c_str());
 #endif
-      q.exec( queries[i]);
+      q.exec( afsql::stoq(*it));
    }
    if( isNumeric()) return;
 
-   q.prepare( DBTaskData::dbPrepareInsert);
-   QVariant job( jobid);
-   QVariant block( blocknum);
+   q.prepare( afsql::stoq(DBTaskData::dbPrepareInsert));
    for( int t = 0; t < tasksnum; t++)
    {
-      ((DBTaskData*)(tasksdata[t]))->dbBindInsert( &q, job, block, QVariant(t));
+      ((DBTaskData*)(tasksdata[t]))->dbBindInsert( &q, jobid, blocknum, t);
       q.exec();
-      if( qChkErr(q, "DBBlockData::dbAdd:\n")) break;
+      if( qChkErr(q, "DBBlockData::dbAdd:")) break;
    }
 }
 
-bool DBBlockData::dbSelect( QSqlDatabase * db, const QString * where)
+bool DBBlockData::dbSelect( QSqlDatabase * db, const std::string * where)
 {
    if( DBItem::dbSelect( db) == false) return false;
    if( isNumeric() || (tasksnum == 0)) return true;
@@ -130,7 +130,7 @@ bool DBBlockData::dbSelect( QSqlDatabase * db, const QString * where)
    for( int t = 0; t < tasksnum; t++)
    {
       DBTaskData * dbtaskdata = new DBTaskData;
-      QString where = DBTaskData::dbWhereSelect( jobid, blocknum, t);
+      std::string where = DBTaskData::dbWhereSelect( jobid, blocknum, t);
       if( dbtaskdata->dbSelect( db, &where) == false)
       {
          delete dbtaskdata;

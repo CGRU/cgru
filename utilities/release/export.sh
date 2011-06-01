@@ -17,7 +17,7 @@ function copy(){
    cp $1/* $2/ 2>&1 | grep -v omitting
 }
 
-function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' --exclude 'doxygen/output' $1 $2; }
+function rcopy(){ rsync -rL --exclude '.svn' --exclude 'override.sh' --exclude 'override.cmd' --exclude '*.pyc' --exclude 'doxygen/output' $1 $2; }
 
 createDir $dest
 pushd $dest > /dev/null

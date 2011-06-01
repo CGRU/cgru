@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <memory.h>
 
-//#include <QtCore/QDateTime>
-
 #include "msg.h"
 #include "address.h"
 #include "environment.h"
@@ -44,6 +42,7 @@ User::User( Msg * msg)
 
 void User::construct()
 {
+   flags = 0;
    state = 0;
    numjobs = 0;
    numrunningjobs = 0;
@@ -59,7 +58,7 @@ void User::construct()
 
 User::~User()
 {
-AFINFO("User::~User:\n");
+AFINFO("User::~User:")
 }
 
 void User::readwrite( Msg * msg)
@@ -67,14 +66,15 @@ void User::readwrite( Msg * msg)
    Node::readwrite( msg);
 
    rw_uint32_t( state,                 msg);
-   rw_uint32_t( time_register,         msg);
+   rw_uint32_t( flags,                 msg);
+   rw_int64_t ( time_register,         msg);
    rw_String  ( hostname,              msg);
    rw_int32_t ( maxrunningtasks,       msg);
    rw_uint8_t ( errors_retries,        msg);
    rw_uint8_t ( errors_avoidhost,      msg);
    rw_uint8_t ( errors_tasksamehost,   msg);
    rw_int32_t ( errors_forgivetime,    msg);
-   rw_uint32_t( time_online,           msg);
+   rw_int64_t ( time_online,           msg);
    rw_int32_t ( jobs_lifetime,         msg);
    rw_int32_t ( numjobs,               msg);
    rw_int32_t ( numrunningjobs,        msg);
@@ -83,7 +83,7 @@ void User::readwrite( Msg * msg)
    rw_RegExp  ( hostsmask,             msg);
    rw_RegExp  ( hostsmask_exclude,     msg);
    rw_String  ( annotation,            msg);
-//   rw_String  ( customdata,            msg);
+   rw_String  ( customdata,            msg);
 }
 
 void User::setPermanent( bool value)

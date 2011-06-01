@@ -12,10 +12,9 @@ public:
    DBStatistics();
    virtual ~DBStatistics();
 
-   void addJob( const af::Job * job, QStringList * queries);
+   void addJob( const af::Job * job, std::list<std::string> * queries);
 
-protected:
-   inline const QString & dbGetTableName()  const { return TableName;}
+   inline const std::string & dbGetTableName()  const { return TableName;}
 
 private:
    std::string jobname;
@@ -25,13 +24,13 @@ private:
    std::string service;
    std::string description;
    std::string annotation;
-   uint32_t time_started;
-   uint32_t time_done;
    uint32_t tasksnum;
    uint32_t tasksdone;
-   uint32_t taskssumruntime;
+   int64_t  taskssumruntime;
+   int64_t  time_started;
+   int64_t  time_done;
 
 private:
-   static const QString TableName;
+   static const std::string TableName;
 };
 }

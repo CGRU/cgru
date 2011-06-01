@@ -21,26 +21,23 @@ public:
    DBConnection( const std::string & connection_name = std::string("AFLIBSQL"));
    ~DBConnection();
 
-   void ResetJobs();
-   void ResetStat();
-   void ResetUsers();
-   void ResetRenders();
-   void ResetAll();
+   inline bool isWorking() const { return working;       }
+   inline bool isOpen()    const { return db->isOpen();  }
 
-   void getUsersIds(   std::list<int32_t> & ids);
-   void getRendersIds( std::list<int32_t> & ids);
-   void getJobsIds(    std::list<int32_t> & ids);
+   void execute( const std::list<std::string> * queries);
+
+   const std::list<int> getIntegers( const std::string & query);
 
    bool getItem( DBItem * item);
 
    void addJob( DBJob * job);
 
-   inline bool isWorking() const { return working;}
-
-   void execute( QStringList const & queries);
-
    bool DBOpen();
    void DBClose();
+
+   const std::list<std::string> getTableColumnsNames( const std::string & tableName);
+   void dropTable( const std::string & tableName);
+   void dropAllTables();
 
 private:
    std::string name;

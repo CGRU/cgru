@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-//#include <QtCore/QStringList>
-
 #include "../include/aftypes.h"
 
 #include "afnode.h"
@@ -80,6 +78,7 @@ public:
 
 protected:
    uint32_t state;             ///< State.
+   uint32_t flags;             ///< Flags.
    std::string annotation;
    std::string customdata;
 
@@ -98,14 +97,15 @@ protected:
 /// Time from last error to remove host from error list
    int32_t errors_forgivetime;
 
-   uint32_t time_register;      ///< User registration time (when he become permanent).
-
    int32_t jobs_lifetime;        ///< User jobs default life time.
 
    int32_t numjobs;              ///< User jobs quantity.
    int32_t numrunningjobs;       ///< User active jobs quantity.
    int32_t runningtasksnumber;   ///< User jobs hosts number.
-   uint32_t time_online;         ///< User online (server registration) time.
+
+   int64_t time_register;        ///< User registration time (when he become permanent).
+   int64_t time_online;          ///< User online (server registration) time.
+
    float need;                   ///< User need for hosts.
 
 private:

@@ -26,14 +26,14 @@ Talk::~Talk()
 
 void Talk::readwrite( Msg * msg)
 {
-   rw_int32_t ( id,            msg);
-   rw_uint32_t( time_launch,   msg);
-   rw_uint32_t( time_update,   msg);
-   rw_uint32_t( time_register, msg);
-   rw_String (  name,          msg);
-   rw_String (  username,      msg);
-   rw_int32_t(  revision,      msg);
-   rw_String(   version,       msg);
+   rw_int32_t( id,            msg);
+   rw_int64_t( time_launch,   msg);
+   rw_int64_t( time_update,   msg);
+   rw_int64_t( time_register, msg);
+   rw_String ( name,          msg);
+   rw_String ( username,      msg);
+   rw_int32_t( revision,      msg);
+   rw_String ( version,       msg);
    address.readwrite( msg);
 }
 

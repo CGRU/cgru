@@ -66,7 +66,7 @@ CmdRenderPriority::CmdRenderPriority()
    setArgsCount(2);
    setInfo("Change render priority.");
    setHelp("rpri [name] [priority] Set render priority.");
-   setMsgType( af::Msg::TRenderPriority);
+   setMsgType( af::Msg::TRenderSetPriority);
 }
 CmdRenderPriority::~CmdRenderPriority(){}
 bool CmdRenderPriority::processArguments( int argc, char** argv, af::Msg &msg)
@@ -84,7 +84,7 @@ CmdRenderNimby::CmdRenderNimby()
    setArgsCount(1);
    setInfo("Set render nimby.");
    setHelp("rnimby [name] Set render to nimby state.");
-   setMsgType( af::Msg::TRenderNimby);
+   setMsgType( af::Msg::TRenderSetNimby);
 }
 CmdRenderNimby::~CmdRenderNimby(){}
 bool CmdRenderNimby::processArguments( int argc, char** argv, af::Msg &msg)
@@ -101,7 +101,7 @@ CmdRenderNIMBY::CmdRenderNIMBY()
    setArgsCount(1);
    setInfo("Set render NIMBY.");
    setHelp("rNIMBY [name] Set render to NIMBY state.");
-   setMsgType( af::Msg::TRenderNIMBY);
+   setMsgType( af::Msg::TRenderSetNIMBY);
 }
 CmdRenderNIMBY::~CmdRenderNIMBY(){}
 bool CmdRenderNIMBY::processArguments( int argc, char** argv, af::Msg &msg)
@@ -118,7 +118,7 @@ CmdRenderUser::CmdRenderUser()
    setArgsCount(2);
    setInfo("Set render user.");
    setHelp("ruser [name] [user] Set render for specified user.");
-   setMsgType( af::Msg::TRenderUser);
+   setMsgType( af::Msg::TRenderSetUser);
 }
 CmdRenderUser::~CmdRenderUser(){}
 bool CmdRenderUser::processArguments( int argc, char** argv, af::Msg &msg)
@@ -136,7 +136,7 @@ CmdRenderFree::CmdRenderFree()
    setArgsCount(1);
    setInfo("Set render free.");
    setHelp("rfree [name] Set render free - unset nimby and NIMBY state.");
-   setMsgType( af::Msg::TRenderFree);
+   setMsgType( af::Msg::TRenderSetFree);
 }
 CmdRenderFree::~CmdRenderFree(){}
 bool CmdRenderFree::processArguments( int argc, char** argv, af::Msg &msg)

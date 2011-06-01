@@ -79,10 +79,10 @@ void Job::readwrite( Msg * msg)
    rw_String  ( cmd_post,           msg);
 
    rw_int32_t ( userlistorder,      msg);
-   rw_uint32_t( time_creation,      msg);
-   rw_uint32_t( time_wait,          msg);
-   rw_uint32_t( time_started,       msg);
-   rw_uint32_t( time_done,          msg);
+   rw_int64_t ( time_creation,      msg);
+   rw_int64_t ( time_wait,          msg);
+   rw_int64_t ( time_started,       msg);
+   rw_int64_t ( time_done,          msg);
    rw_int32_t ( lifetime,           msg);
 
    rw_String  ( description,        msg);
@@ -103,7 +103,7 @@ void Job::rw_blocks( Msg * msg)
 {
    if( blocksnum < 1)
    {
-      AFERRAR("Job::rw_blocks: invalid blocks number = %d\n", blocksnum);
+      AFERRAR("Job::rw_blocks: invalid blocks number = %d", blocksnum)
       return;
    }
 

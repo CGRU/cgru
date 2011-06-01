@@ -117,7 +117,7 @@ public:
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
    virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);
-   virtual void dbDelete( QStringList  * queries) const;
+   virtual void dbDelete( std::list<std::string> * queries) const;
    virtual void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
    static void appendLog( const std::string & message);

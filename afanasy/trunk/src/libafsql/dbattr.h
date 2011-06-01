@@ -1,9 +1,5 @@
 #pragma once
 
-//#include <QtCore/QRegExp>
-#include <QtCore/QString>
-#include <QtCore/QVariant>
-
 #include "../libafanasy/regexp.h"
 
 #include "name_afsql.h"
@@ -21,7 +17,10 @@ public:
 
    enum AFTypes
    {
+      _NUMERIC_BEGIN_,
+
       _INTEGER_BEGIN_,
+//         _administrator, // temp, should be in _flags
          _blocksnum,
          _capacity,
          _capcoeff_max,
@@ -33,17 +32,13 @@ public:
          _errors_tasksamehost,
          _filesize_max,
          _filesize_min,
-         _flags,
-         _frame_first,
-         _frame_inc,
-         _frame_last,
-         _frame_pertask,
          _id,
          _id_block,
          _id_job,
-         _id_task,
+//         _id_task,
          _lifetime,
          _maxrunningtasks,
+         _maxruntasksperhost,
          _multihost_max,
          _multihost_min,
          _multihost_waitmax,
@@ -54,18 +49,30 @@ public:
          _parsercoeff,
          _priority,
          _starts_count,
-         _state,
          _tasksdone,
          _tasksmaxruntime,
          _tasksnum,
+         _userlistorder,
+      _INTEGER_END_,
+
+      _BIGINT_BEGIN_,
+         _flags,
+         _frame_first,
+         _frame_inc,
+         _frame_last,
+         _frame_pertask,
+         _state,
          _taskssumruntime,
          _time_creation,
          _time_done,
          _time_register,
          _time_started,
          _time_wait,
-         _userlistorder,
-      _INTEGER_END_,
+      _BIGINT_END_,
+
+      _NUMERIC_END_,
+
+      _TEXT_BEGIN_,
 
       _STRINGNAME_BEGIN_,
          _annotation,
@@ -75,6 +82,7 @@ public:
          _multihost_service,
          _name,
          _parser,
+         _password,
          _service,
          _tasksname,
          _username,
@@ -99,24 +107,27 @@ public:
          _wdir,
       _STRINGEXPR_END_,
 
+      _TEXT_END_,
+
       _LAST_
    };
 
-   virtual const QString getString() const = 0;
-   virtual void set( const QVariant & value) = 0;
+   virtual const std::string getString() const = 0;
+   inline virtual void set( long long value) {};
+   inline virtual void set( const std::string & value) {};
 
    inline int getType() const { return type;}
 
-   inline const QString & getName() const { return DBName[type];}
-   const QString createLine() const;
+   inline const std::string & getName() const { return DBName[type];}
+   const std::string createLine() const;
 
 protected:
-   const QString DBString( const QString * str) const;
-   inline const QString DBString( const QString str)  const { return DBString( &str);}
+   const std::string DBString( const std::string * str) const;
+   inline const std::string DBString( const std::string str)  const { return DBString( &str);}
 
 private:
-   static QString DBName[_LAST_];
-   static QString DBType[_LAST_];
+   static std::string DBName[_LAST_];
+   static std::string DBType[_LAST_];
    static int DBLength[_LAST_];
 
 private:
@@ -128,8 +139,8 @@ class DBAttrInt8: public DBAttr
 public:
    DBAttrInt8( int type, int8_t * parameter);
    ~DBAttrInt8();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toUInt();}
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
 private: int8_t * pointer;
 };
 
@@ -138,8 +149,8 @@ class DBAttrUInt8: public DBAttr
 public:
    DBAttrUInt8( int type, uint8_t * parameter);
    ~DBAttrUInt8();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toUInt();}
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
 private: uint8_t * pointer;
 };
 
@@ -148,8 +159,8 @@ class DBAttrInt16: public DBAttr
 public:
    DBAttrInt16( int type, int16_t * parameter);
    ~DBAttrInt16();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toInt();}
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
 private: int16_t * pointer;
 };
 
@@ -158,8 +169,8 @@ class DBAttrUInt16: public DBAttr
 public:
    DBAttrUInt16( int type, uint16_t * parameter);
    ~DBAttrUInt16();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toUInt();}
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
 private: uint16_t * pointer;
 };
 
@@ -168,9 +179,19 @@ class DBAttrInt32: public DBAttr
 public:
    DBAttrInt32( int type, int32_t * parameter);
    ~DBAttrInt32();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toInt();}
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
 private: int32_t * pointer;
+};
+
+class DBAttrInt64: public DBAttr
+{
+public:
+   DBAttrInt64( int type, int64_t * parameter);
+   ~DBAttrInt64();
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
+private: int64_t * pointer;
 };
 
 class DBAttrUInt32: public DBAttr
@@ -178,8 +199,8 @@ class DBAttrUInt32: public DBAttr
 public:
    DBAttrUInt32( int type, uint32_t * parameter);
    ~DBAttrUInt32();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toUInt();}
+   inline const std::string getString() const { return af::itos(*pointer);}
+   inline void set( long long value) { *pointer = value;}
 private: uint32_t * pointer;
 };
 
@@ -188,28 +209,17 @@ class DBAttrInt32Const: public DBAttr
 public:
    DBAttrInt32Const( int type, const int32_t * parameter);
    ~DBAttrInt32Const();
-   inline const QString getString() const { return QString::number(*pointer);}
-   inline void set( const QVariant & value){}
+   inline const std::string getString() const { return af::itos(*pointer);}
 private: const int32_t * pointer;
 };
-/*
-class DBAttrQString: public DBAttr
-{
-public:
-   DBAttrQString( int type, QString * parameter);
-   ~DBAttrQString();
-   inline const QString getString() const { return DBString( pointer);}
-   inline void set( const QVariant & value) { *pointer = value.toString();}
-private: QString * pointer;
-};
-*/
+
 class DBAttrString: public DBAttr
 {
 public:
    DBAttrString( int type, std::string * parameter);
    ~DBAttrString();
-   inline const QString getString() const { return DBString( QString::fromUtf8( pointer->c_str()));}
-   inline void set( const QVariant & value) { *pointer = value.toString().toUtf8().data();}
+   inline const std::string getString() const { return DBString( pointer);}
+   inline void set( const std::string & value) { *pointer = value;}
 private: std::string * pointer;
 };
 
@@ -218,8 +228,8 @@ class DBAttrRegExp: public DBAttr
 public:
    DBAttrRegExp( int type, af::RegExp * parameter);
    ~DBAttrRegExp();
-   inline const QString getString() const { return DBString( QString::fromUtf8( pointer->getPattern().c_str()));}
-   inline void set( const QVariant & value) { af::setRegExp( *pointer, value.toString().toUtf8().data(), "DBAttrQRegExp::set");}
+   inline const std::string getString() const { return DBString( pointer->getPattern());}
+   inline void set( const std::string & value) { af::setRegExp( *pointer, value, "DBAttrQRegExp::set");}
 private: af::RegExp * pointer;
 };
 }

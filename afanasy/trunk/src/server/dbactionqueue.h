@@ -11,7 +11,7 @@
 
 class MonitorContainer;
 
-class Queries: public QStringList, public AfQueueItem {};
+class Queries: public std::list<std::string>, public AfQueueItem {};
 
 /// Simple FIFO database action queue
 class DBActionQueue : public AfQueue

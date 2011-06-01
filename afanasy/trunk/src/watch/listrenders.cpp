@@ -375,7 +375,7 @@ void ListRenders::actPriority()
    uint8_t priority = QInputDialog::getInteger(this, "Change Priority", "Enter New Priority", current, 0, 250, 1, &ok);
    if( !ok) return;
    af::MCGeneral mcgeneral( priority);
-   action( mcgeneral, af::Msg::TRenderPriority);
+   action( mcgeneral, af::Msg::TRenderSetPriority);
 }
 void ListRenders::actCapacity()
 {
@@ -387,22 +387,22 @@ void ListRenders::actCapacity()
    int32_t capacity = QInputDialog::getInteger(this, "Change Capacity", "Enter New Capacity", current, 0, 1000000, 1, &ok);
    if( !ok) return;
    af::MCGeneral mcgeneral( capacity);
-   action( mcgeneral, af::Msg::TRenderCapacity);
+   action( mcgeneral, af::Msg::TRenderSetCapacity);
 }
 void ListRenders::actNIMBY()
 {
    af::MCGeneral mcgeneral;
-   action( mcgeneral, af::Msg::TRenderNIMBY);
+   action( mcgeneral, af::Msg::TRenderSetNIMBY);
 }
 void ListRenders::actNimby()
 {
    af::MCGeneral mcgeneral;
-   action( mcgeneral, af::Msg::TRenderNimby);
+   action( mcgeneral, af::Msg::TRenderSetNimby);
 }
 void ListRenders::actFree()
 {
    af::MCGeneral mcgeneral;
-   action( mcgeneral, af::Msg::TRenderFree);
+   action( mcgeneral, af::Msg::TRenderSetFree);
 }
 void ListRenders::actUser()
 {
@@ -413,7 +413,7 @@ void ListRenders::actUser()
    if( !ok) return;
 
    af::MCGeneral mcgeneral( afqt::qtos( text));
-   action( mcgeneral, af::Msg::TRenderUser);
+   action( mcgeneral, af::Msg::TRenderSetUser);
 }
 void ListRenders::actEject()
 {

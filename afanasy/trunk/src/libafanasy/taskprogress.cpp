@@ -31,12 +31,12 @@ void TaskProgress::readwrite( Msg * msg)
 {
    rw_uint32_t( state,        msg);
    rw_int8_t  ( percent,      msg);
-   rw_int32_t ( frame,        msg);
+   rw_int64_t ( frame,        msg);
    rw_int8_t  ( percentframe, msg);
    rw_int32_t ( starts_count, msg);
    rw_int32_t ( errors_count, msg);
-   rw_uint32_t( time_start,   msg);
-   rw_uint32_t( time_done,    msg);
+   rw_int64_t ( time_start,   msg);
+   rw_int64_t ( time_done,    msg);
    rw_String  ( hostname,     msg);
 }
 

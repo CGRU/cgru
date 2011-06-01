@@ -27,12 +27,12 @@ public:
 
    virtual ~Client();
 
-   inline uint32_t getTimeLaunch()           const { return time_launch;   }  ///< Get client launch time.
-   inline uint32_t getTimeRegister()         const { return time_register; }  ///< Get client register time.
-   inline uint32_t getTimeUpdate()           const { return time_update;   }  ///< Get client last update time.
-   inline uint32_t getRevision()             const { return revision;      }  ///< Get client revison.
-   inline const std::string & getVersion()   const { return version;       }  ///< Get client version.
-   inline const std::string & getUserName()  const { return username;      }  ///< Get client user name.
+   inline long long getTimeLaunch()         const { return time_launch;   }  ///< Get client launch time.
+   inline long long getTimeRegister()       const { return time_register; }  ///< Get client register time.
+   inline long long getTimeUpdate()         const { return time_update;   }  ///< Get client last update time.
+   inline int       getRevision()           const { return revision;      }  ///< Get client revison.
+   inline const std::string & getVersion()  const { return version;       }  ///< Get client version.
+   inline const std::string & getUserName() const { return username;      }  ///< Get client user name.
 
    inline const Address & getAddress() const { return address;} ///< Get client address.
    inline bool addrEqual( const Client * other ) const          ///< Compare address with other.
@@ -52,9 +52,9 @@ protected:
    void grabNetIFs( std::vector<NetIF*> & otherNetIFs);
 
 protected:
-   uint32_t    time_launch;   ///< Client launch time.
-   uint32_t    time_register; ///< Client registration on server time.
-   uint32_t    time_update;   ///< Client last update time.
+   int64_t     time_launch;   ///< Client launch time.
+   int64_t     time_register; ///< Client registration on server time.
+   int64_t     time_update;   ///< Client last update time.
    int32_t     revision;      ///< Client build revision.
    std::string version;       ///< Client version.
    std::string username;      ///< Client user name.

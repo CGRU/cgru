@@ -6,7 +6,7 @@
 
 using namespace afsql;
 
-const QString DBStatistics::TableName("statistics");
+const std::string DBStatistics::TableName("statistics");
 
 DBStatistics::DBStatistics()
 {
@@ -18,9 +18,9 @@ DBStatistics::DBStatistics()
    dbAddAttr( new DBAttrString(  DBAttr::_service,           &service          ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_tasksdone,         &tasksdone        ));
    dbAddAttr( new DBAttrUInt32(  DBAttr::_tasksnum,          &tasksnum         ));
-   dbAddAttr( new DBAttrUInt32(  DBAttr::_taskssumruntime,   &taskssumruntime  ));
-   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_done,         &time_done        ));
-   dbAddAttr( new DBAttrUInt32(  DBAttr::_time_started,      &time_started     ));
+   dbAddAttr( new DBAttrInt64 (  DBAttr::_taskssumruntime,   &taskssumruntime  ));
+   dbAddAttr( new DBAttrInt64 (  DBAttr::_time_done,         &time_done        ));
+   dbAddAttr( new DBAttrInt64 (  DBAttr::_time_started,      &time_started     ));
    dbAddAttr( new DBAttrString(  DBAttr::_username,          &username         ));
 }
 
@@ -28,7 +28,7 @@ DBStatistics::~DBStatistics()
 {
 }
 
-void DBStatistics::addJob( const af::Job * job, QStringList * queries)
+void DBStatistics::addJob( const af::Job * job, std::list<std::string> * queries)
 {
    // Get job parameters:
    jobname        = job->getName();

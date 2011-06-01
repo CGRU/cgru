@@ -220,14 +220,14 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
    }
-   case af::Msg::TRenderPriority:
+   case af::Msg::TRenderSetPriority:
    {
       appendLog( std::string("Priority set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       setPriority( mcgeneral.getNumber());
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
       break;
    }
-   case af::Msg::TRenderCapacity:
+   case af::Msg::TRenderSetCapacity:
    {
       appendLog( std::string("Capacity set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       setCapacity( mcgeneral.getNumber());
@@ -252,28 +252,28 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
       break;
    }
-   case af::Msg::TRenderNIMBY:
+   case af::Msg::TRenderSetNIMBY:
    {
       appendLog( std::string("NIMBY set by ") + userhost);
       setNIMBY();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
-   case af::Msg::TRenderNimby:
+   case af::Msg::TRenderSetNimby:
    {
       appendLog( std::string("nimby set by ") + userhost);
       setNimby();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
-   case af::Msg::TRenderFree:
+   case af::Msg::TRenderSetFree:
    {
       appendLog( std::string("Set free by ") + userhost);
       setFree();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
-   case af::Msg::TRenderUser:
+   case af::Msg::TRenderSetUser:
    {
       appendLog( std::string("User set to \"") + mcgeneral.getString() + "\" by " + userhost);
       username = mcgeneral.getString();

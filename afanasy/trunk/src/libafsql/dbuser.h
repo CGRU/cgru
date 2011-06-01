@@ -13,19 +13,27 @@ public:
    DBUser( int uid = 0);
    virtual ~DBUser();
 
-   static void getIds(  std::list<int32_t> & uids, QSqlDatabase * db);
-   bool dbSelect( QSqlDatabase * db, const QString * where = NULL);
+   static const std::string dbGetIDsCmd();
 
+   inline const std::string & dbGetTableName()  const { return TableName;}
+   static void getIds(  std::list<int32_t> & uids, QSqlDatabase * db);
+   bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
 
 protected:
-   inline const QString & dbGetTableName()  const { return TableName;}
-   inline const QString & dbGetKeys()       const { return Keys;     }
-   inline       int       dbGetKeysNum()    const { return KeysNum;  }
+   inline const std::string & dbGetKeysString() const { return Keys;     }
+   inline       int           dbGetKeysNum()    const { return KeysNum;  }
 
 private:
-   static const QString TableName;
-   static const QString Keys;
-   static const int KeysNum;
    void addDBAttributes();
+
+private:
+// Unused by server, but used in vebvisor:
+   std::string password;
+
+private:
+   static const std::string TableName;
+   static const std::string Keys;
+   static const int KeysNum;
+
 };
 }

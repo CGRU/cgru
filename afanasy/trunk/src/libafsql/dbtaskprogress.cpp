@@ -8,18 +8,18 @@
 
 using namespace afsql;
 
-const QString DBTaskProgress::TableName("progress");
-const QString DBTaskProgress::IDs("id_job int, id_block int, id_task int");
-const QString DBTaskProgress::Keys
+const std::string DBTaskProgress::TableName("progress");
+const std::string DBTaskProgress::IDs("id_job int, id_block int, id_task int");
+const std::string DBTaskProgress::Keys
 ("FOREIGN KEY ( id_job, id_block)\
  REFERENCES blocks ( id_job, id_block) ON DELETE CASCADE,\
  PRIMARY KEY ( id_job, id_block, id_task)\
 ");
-const QString DBTaskProgress::dbPrepareInsert
+const std::string DBTaskProgress::dbPrepareInsert
 ("INSERT INTO progress (id_job,id_block,id_task)\
  VALUES(:id_job,:id_block,:id_task);\
 ");
-const QString DBTaskProgress::dbPrepareUpdate
+const std::string DBTaskProgress::dbPrepareUpdate
 ("UPDATE progress SET \
  state = ?,\
  starts_count = ?,\
@@ -37,13 +37,13 @@ DBTaskProgress::DBTaskProgress():
    dbAddAttr( new DBAttrUInt32( DBAttr::_state,              &state        ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_starts_count,       &starts_count ));
    dbAddAttr( new DBAttrInt32(  DBAttr::_errors_count,       &errors_count ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_started,       &time_start   ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_done,          &time_done    ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_time_started,       &time_start   ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_time_done,          &time_done    ));
 }
 
 DBTaskProgress::~DBTaskProgress()
 {
-AFINFO("DBTaskProgress::~DBTaskProgress\n");
+AFINFO("DBTaskProgress::~DBTaskProgress")
 }
 
 int DBTaskProgress::calcWeight() const

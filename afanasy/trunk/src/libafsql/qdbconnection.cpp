@@ -5,6 +5,7 @@
 #include <QtSql/QSqlDatabase>
 #include <QtSql/QSqlError>
 #include <QtSql/QSqlQuery>
+#include <QtSql/QSqlRecord>
 
 #include "../libafanasy/environment.h"
 
@@ -89,7 +90,7 @@ bool DBConnection::DBOpen()
    if( db->open() == false )
    {
       AFERROR("DBConnection::DBOpen: UNABLE TO OPEN DATABASE:")
-      printf( "%s\n", db->lastError().text().toUtf8().data());
+      std::cout << afsql::qtos(db->lastError().text()) << std::endl;
 
 #ifdef MACOSX
       q_mutex.unlock();
@@ -117,106 +118,25 @@ void DBConnection::DBClose()
    AFINFO("DB Unlocked.")
 }
 
-void DBConnection::ResetUsers()
+void DBConnection::dropAllTables()
 {
    if( working == false ) return;
    if( db->isOpen() == false )
    {
-      AFERROR("DBConnection::ResetUsers: Database connection is not open")
+      AFERROR("DBConnection::dropAllTables: Database connection is not open.")
       return;
    }
-
-   DBUser user;
-   user.dbDropTable( db);
-   user.dbCreateTable( db);
-}
-
-void DBConnection::ResetRenders()
-{
-   if( working == false ) return;
-   if( db->isOpen() == false )
-   {
-      AFERROR("DBConnection::ResetRenders: Database connection is not open")
-      return;
-   }
-
-   DBRender render;
-   render.dbDropTable( db);
-   render.dbCreateTable( db);
-}
-
-void DBConnection::ResetJobs()
-{
-   if( working == false ) return;
-   if( db->isOpen() == false )
-   {
-      AFERROR("DBConnection::ResetOnline: Database connection is not open")
-      return;
-   }
-
-   DBJob job;
-   DBBlockData block;
-   DBTaskData task;
-   DBTaskProgress progress;
-
-   progress.dbDropTable( db);
-   task.dbDropTable( db);
-   block.dbDropTable( db);
-   job.dbDropTable( db);
-
-   job.dbCreateTable( db);
-   block.dbCreateTable( db);
-   task.dbCreateTable( db);
-   progress.dbCreateTable( db);
-}
-
-void DBConnection::ResetStat()
-{
-   if( working == false ) return;
-   if( db->isOpen() == false )
-   {
-      AFERROR("DBConnection::ResetArchive: Database connection is not open")
-      return;
-   }
-
-   DBStatistics statistics;
-   statistics.dbDropTable( db);
-   statistics.dbCreateTable( db);
-}
-
-void DBConnection::ResetAll()
-{
    QStringList tables = db->tables();
    for( int i = 0; i < tables.size(); i++)
    {
-      QString query = QString("DROP TABLE %1;").arg( tables[i]);
-      printf("%s\n", query.toUtf8().data());
+      QString query = QString("DROP TABLE %1 CASCADE;").arg( tables[i]);
+      std::cout << afsql::qtos( query) << std::endl;
       QSqlQuery q( query, *db);
       q.exec();
-      qChkErr(q, "DBConnection::ResetAll:\n");
+      //qChkErr( q, "DBConnection::dropAllTables:");
    }
-
-   ResetStat();
-   ResetUsers();
-   ResetRenders();
-   ResetJobs();
 }
 
-void DBConnection::getUsersIds( std::list<int32_t> & ids)
-{
-   if( working == false ) return;
-   DBUser::getIds( ids, db);
-}
-void DBConnection::getRendersIds( std::list<int32_t> & ids)
-{
-   if( working == false ) return;
-   DBRender::getIds( ids, db);
-}
-void DBConnection::getJobsIds( std::list<int32_t> & ids)
-{
-   if( working == false ) return;
-   DBJob::getIds( ids, db);
-}
 bool DBConnection::getItem( DBItem * item)
 {
    if( working == false ) return false;
@@ -229,16 +149,78 @@ void DBConnection::addJob( DBJob * job)
    job->dbAdd( db);
 }
 
-void DBConnection::execute( QStringList const & queries)
+void DBConnection::execute( const std::list<std::string> * queries)
 {
    if( working == false ) return;
    AFINFO("Executing queries:")
-   for( int i = 0; i < queries.size(); i++)
+   for( std::list<std::string>::const_iterator it = queries->begin(); it != queries->end(); it++)
    {
-      QSqlQuery q( queries[i], *db);
+      QSqlQuery q( afsql::stoq(*it), *db);
       q.exec();
 #ifdef AFOUTPUT
-printf("%s\n", queries[i].toUtf8().data());
+printf("%s\n", (*it).c_str());
 #endif
+   }
+}
+
+const std::list<int> DBConnection::getIntegers( const std::string & query)
+{
+   std::list<int> intlinst;
+   if( working == false ) return intlinst;
+   if( db->isOpen() == false )
+   {
+      AFERROR("DBConnection::getIntegers: Database connection is not open.")
+      return intlinst;
+   }
+   QSqlQuery q( *db);
+   q.exec( afsql::stoq( query));
+#ifdef AFOUTPUT
+printf("%s\n", query.c_str());
+#endif
+   while( q.next()) intlinst.push_back( q.value(0).toInt());
+   return intlinst;
+}
+
+void DBConnection::dropTable( const std::string & tableName)
+{
+   if( db->isOpen() == false )
+   {
+      AFERROR("DBConnection::dropTable: Database connection is not open.")
+      return;
+   }
+   QStringList tables = db->tables();
+   if( tables.contains( afsql::stoq( tableName)))
+   {
+      QSqlQuery q( *db);
+      std::string str = std::string("DROP TABLE ") + tableName + ";";
+      AFINFA("DBConnection::dropTable: executing query:\n%s", str.c_str())
+      q.exec( afsql::stoq(str));
+      qChkErr(q, std::string("DBItem::dbDropTable: ") + tableName );
+   }
+   else
+   {
+      printf("DBConnection::dropTable: no table \"%s\" founded.", tableName .c_str());
+   }
+}
+
+const std::list<std::string> DBConnection::getTableColumnsNames( const std::string & tableName)
+{
+   std::list<std::string> columns;
+   if( db->isOpen() == false )
+   {
+      AFERROR("DBConnection::getTableColumnsNames: Database connection is not open.")
+      return columns;
+   }
+   QSqlQuery q( *db);
+   q.exec( QString("SELECT * FROM ") + afsql::stoq(tableName));
+
+   if( qChkErr(q, std::string("DBItem::getTableColumnsNames: ") + tableName )) return columns;
+
+   QSqlRecord qrecord = q.record();
+   for( int i = 0; i < qrecord.count(); i++)
+   {
+      QString fieldname = qrecord.fieldName( i);
+      if( false == fieldname.isEmpty())
+         columns.push_back( afsql::qtos( fieldname));
    }
 }

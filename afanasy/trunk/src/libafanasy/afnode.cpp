@@ -22,19 +22,19 @@ Node::Node():
 
 bool Node::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d\n", name.c_str(), id);
+   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d", name.c_str(), id)
    return false;
 }
 
 void Node::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d\n", name.c_str(), id);
+   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d", name.c_str(), id)
    return;
 }
 
 Node::~Node()
 {
-AFINFO("Node::~Node():\n");
+AFINFO("Node::~Node():")
 }
 
 void Node::readwrite( Msg * msg)

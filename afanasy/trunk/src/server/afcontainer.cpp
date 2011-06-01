@@ -359,7 +359,7 @@ void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int 
    }
    switch( type)
    {
-      case af::Msg::TRenderPriority:
+      case af::Msg::TRenderSetPriority:
       case af::Msg::TJobPriority:
       case af::Msg::TUserPriority:
          sortPriority( node);

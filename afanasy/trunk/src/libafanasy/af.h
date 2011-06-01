@@ -43,6 +43,7 @@ protected:
    static void rw_int8_t (    int8_t   & integer,  Msg * msg);
    static void rw_int16_t(    int16_t  & integer,  Msg * msg);
    static void rw_int32_t(    int32_t  & integer,  Msg * msg);
+   static void rw_int64_t(    int64_t  & integer,  Msg * msg);
    static void rw_float(      float    & floating, Msg * msg);
 
    static void rw_String(           std::string & string,                Msg * msg);

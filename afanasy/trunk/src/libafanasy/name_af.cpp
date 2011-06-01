@@ -183,7 +183,7 @@ bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string 
    if( regexp.setPattern( str, &errString)) return true;
 
    if( errOutput ) *errOutput = std::string("REGEXP: '") + name + "': " + errString;
-   else AFERRAR("REGEXP: '%s': %s\n", name.c_str(), errString.c_str());
+   else AFERRAR("REGEXP: '%s': %s", name.c_str(), errString.c_str())
 
    return false;
 }
@@ -218,7 +218,7 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
    }
 }
 
-const std::string af::fillNumbers( const std::string& pattern, int start, int end)
+const std::string af::fillNumbers( const std::string& pattern, long long start, long long end)
 {
    std::string str( pattern);
    size_t pos;
@@ -247,7 +247,7 @@ const std::string af::fillNumbers( const std::string& pattern, int start, int en
       size_t pos1 = 0;
       size_t pos2 = 0;
       // The first replacement number is the start frame
-      int number = start;
+      long long number = start;
       for(;;)
       {
          pos1 = str.find_first_of('%', pos2);
@@ -452,7 +452,7 @@ bool af::pathMakeDir( const std::string & path, bool verbose)
    return true;
 }
 
-const int af::stoi( const std::string & str, bool * ok)
+const long long af::stoi( const std::string & str, bool * ok)
 {
    if( str.empty())
    {
@@ -478,7 +478,7 @@ const int af::stoi( const std::string & str, bool * ok)
    return atoi( str.c_str());
 }
 
-const std::string af::itos( int integer)
+const std::string af::itos( long long integer)
 {
    std::ostringstream stream;
    stream << integer;

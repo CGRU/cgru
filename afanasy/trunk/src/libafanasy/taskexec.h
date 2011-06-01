@@ -27,9 +27,9 @@ public:
          int fileSizeMax,
          const std::string & Files,
 
-         int Start_Frame,
-         int End_Frame,
-         int FramesNum,
+         long long Start_Frame,
+         long long End_Frame,
+         long long FramesNum,
 
          const std::string & WorkingDirectory,
          const std::string & Environment,
@@ -64,9 +64,6 @@ public:
    inline int  getCapCoeff()      const { return capcoeff;   }///< Get task capacity koeff.
    inline void setCapCoeff( int value ) { capcoeff = value;  }///< Set task capacity koeff.
    inline int  getCapResult()     const { return capcoeff ? capacity*capcoeff : capacity;}
-   inline int  getFileSizeMin()   const { return filesize_min;}
-   inline int  getFileSizeMax()   const { return filesize_max;}
-   inline bool hasFileSizeCheck() const { return ((filesize_min != -1) || (filesize_max != -1));}
 
    inline const std::string & getBlockName()  const { return blockname; }///< Get task block name.
    inline const std::string & getJobName()    const { return jobname;   }///< Get task job name.
@@ -82,11 +79,16 @@ public:
    inline const std::string & getEnv()      const { return env;     } ///< Get extra environment.
    inline const std::string & getFiles()    const { return files;   } ///< Get preview command.
 
-   inline int getFramesNum()   const { return frames_num;   } ///< Get frames number.
-   inline int getFrameStart()  const { return frame_start;  } ///< Get first frame.
-   inline int getFrameFinish() const { return frame_finish; } ///< Get last frame.
+   inline bool hasFileSizeCheck() const { return ((filesize_min != -1) || (filesize_max != -1));}
 
-   inline uint32_t getTimeStart()  const { return time_start;   } ///< Get task started time.
+   inline long long getFileSizeMin()   const { return filesize_min;}
+   inline long long getFileSizeMax()   const { return filesize_max;}
+
+   inline long long getFramesNum()   const { return frames_num;   } ///< Get frames number.
+   inline long long getFrameStart()  const { return frame_start;  } ///< Get first frame.
+   inline long long getFrameFinish() const { return frame_finish; } ///< Get last frame.
+
+   inline long long getTimeStart()  const { return time_start;   } ///< Get task started time.
 
    inline bool equals( const MCTaskUp & up) const
       {return ((jobid == up.getNumJob()) && (blocknum == up.getNumBlock()) && (tasknum == up.getNumTask()) && (number == up.getNumber()));}
@@ -159,15 +161,15 @@ private:
    std::string files;          ///< Preview command.
    std::string servicetype;    ///< Task service type.
    std::string parsertype;     ///< Task parser type.
-   int32_t parsercoeff;    ///< Parser koefficient.
+   int32_t parsercoeff;        ///< Parser koefficient.
 
    std::string customdata_block; ///< Block custom data.
    std::string customdata_task;  ///< Task custom data.
 
    int32_t capacity;
    int32_t capcoeff;
-   int32_t  filesize_min;
-   int32_t  filesize_max;
+   int64_t filesize_min;
+   int64_t filesize_max;
    std::list<std::string> multihost_names;
 
    int32_t jobid;         ///< Job id number.
@@ -175,11 +177,11 @@ private:
    int32_t tasknum;       ///< Task number in block.
    int32_t number;        ///< Task number (aux).
 
-   int32_t frame_start;   ///< First frame.
-   int32_t frame_finish;  ///< Last frame.
-   int32_t frames_num;    ///< Number of frames.
+   int64_t frame_start;   ///< First frame.
+   int64_t frame_finish;  ///< Last frame.
+   int64_t frames_num;    ///< Number of frames.
 
-   uint32_t time_start;
+   int64_t time_start;
 
    AddressesList listen_addresses;     ///< Addresses to send task output to.
 

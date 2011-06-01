@@ -21,9 +21,9 @@ public:
 
    bool hasEvent( int type) const;
 
-   inline uint32_t getTimeActivity() const { return time_activity;       }
-   inline size_t   getJobsUsersIdsCount() const { return jobsUsersIds.size(); }
-   inline size_t   getJobsIdsCount()      const { return jobsIds.size();      }
+   inline long long getTimeActivity()      const { return time_activity;       }
+   inline size_t    getJobsUsersIdsCount() const { return jobsUsersIds.size(); }
+   inline size_t    getJobsIdsCount()      const { return jobsIds.size();      }
 
    inline const std::list<int32_t> * getJobsUsersIds() const { return &jobsUsersIds; }
    inline const std::list<int32_t> * getJobsIds()      const { return &jobsIds;      }
@@ -37,7 +37,7 @@ protected:
    bool  *  events;
    std::list<int32_t> jobsUsersIds;
    std::list<int32_t> jobsIds;
-   uint32_t time_activity;     ///< Last activity
+   int64_t time_activity;     ///< Last activity
 
 private:
    bool construct();

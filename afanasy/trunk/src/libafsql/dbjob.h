@@ -14,18 +14,19 @@ public:
    DBJob( int Id = 0);
    virtual ~DBJob();
 
-   static void getIds(  std::list<int32_t> & uids, QSqlDatabase * db);
+   static const std::string dbGetIDsCmd();
 
    void dbAdd( QSqlDatabase * db) const;
 
-   virtual bool dbSelect( QSqlDatabase * db, const QString * where = NULL);
-   virtual void dbDelete( QStringList  * queries) const;
-   virtual void dbDeleteNoStatistics( QStringList  * queries) const;
+   virtual bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
+   virtual void dbDelete( std::list<std::string> * queries) const;
+   virtual void dbDeleteNoStatistics( std::list<std::string> * queries) const;
+
+   inline const std::string & dbGetTableName()  const { return TableName;}
 
 protected:
-   inline const QString & dbGetTableName()  const { return TableName;}
-   inline const QString & dbGetKeys()       const { return Keys;     }
-   inline       int       dbGetKeysNum()    const { return KeysNum;  }
+   inline const std::string & dbGetKeysString() const { return Keys;     }
+   inline       int           dbGetKeysNum()    const { return KeysNum;  }
 
 protected:
    DBJobProgress * progress;    ///< Tasks progress.
@@ -35,8 +36,8 @@ private:
    virtual af::BlockData * newBlockData( af::Msg * msg);
 
 private:
-   static const QString TableName;
-   static const QString Keys;
+   static const std::string TableName;
+   static const std::string Keys;
    static const int KeysNum;
    static DBStatistics statistics;
 };

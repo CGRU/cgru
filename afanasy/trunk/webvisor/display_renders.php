@@ -12,6 +12,7 @@ case "name": break;
 case "priority": break;
 case "username": break;
 case "state": break;
+case "capacity": break;
 default: $order = 'priority';
 }
 
@@ -24,6 +25,7 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    $uname_uid[$line["name"]] = $line["id"];
    $uid_uname[$line["id"]] = $line["name"];
 }
+pg_free_result($result);
 
 $query="SELECT * FROM renders ORDER BY $order DESC, name DESC;";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -42,6 +44,10 @@ echo "</td>\n";
 
 echo "\t\t<td>";
 echo "<b><a href='index.php?action=$action&order=priority'>Priority</a></b>";
+echo "</td>\n";
+
+echo "\t\t<td>";
+echo "<b><a href='index.php?action=$action&order=priority'>Capacity</a></b>";
 echo "</td>\n";
 
 echo "\t\t<td>";
@@ -94,6 +100,10 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 
    echo "\t\t<td align=center>$boldOn";
    echo $line["priority"];
+   echo "$boldOff</td>\n";
+
+   echo "\t\t<td align=center>$boldOn";
+   echo $line["capacity"];
    echo "$boldOff</td>\n";
 
    echo "\t\t<td align=center>$boldOn";

@@ -14,6 +14,27 @@ using namespace af;
 Af::Af()  {};
 Af::~Af() {};
 
+/* Solution from:
+http://stackoverflow.com/questions/3022552/is-there-any-standard-htonl-like-function-for-64-bits-integers-in-c
+( 2011-05-31 )*/
+int64_t swap64( int64_t value)
+{
+    // The answer is 42
+    static const int num = 42;
+
+    // Check the endianness
+    if (*reinterpret_cast<const char*>(&num) == num)
+    {
+        const uint32_t high_part = htonl(static_cast<uint32_t>(value >> 32));
+        const uint32_t low_part = htonl(static_cast<uint32_t>(value & 0xFFFFFFFFLL));
+
+        return (static_cast<int64_t>(low_part) << 32) | high_part;
+    } else
+    {
+        return value;
+    }
+}
+
 void Af::write( Msg * msg )
 {
    readwrite( msg);
@@ -177,6 +198,25 @@ void Af::rw_int32_t( int32_t& integer, Msg * msg)
    {
       memcpy( &bytes, buffer, size);
       integer = ntohl( bytes);
+   }
+}
+
+void Af::rw_int64_t( int64_t  & integer, Msg * msg)
+{
+   const int size = 8;
+   char * buffer = msg->writtenBuffer( size);
+   if( buffer == NULL) return;
+
+   int64_t bytes;
+   if( msg->isWriting() )
+   {
+      bytes = swap64( integer);
+      memcpy( buffer, &bytes, size);
+   }
+   else
+   {
+      memcpy( &bytes, buffer, size);
+      integer = swap64( bytes);
    }
 }
 

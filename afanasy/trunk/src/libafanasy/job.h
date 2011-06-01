@@ -7,8 +7,6 @@
 #include "blockdata.h"
 #include "regexp.h"
 
-//#include <QtCore/QString>
-
 namespace af
 {
 /// Job class. Main structure Afanasy was written for.
@@ -27,16 +25,18 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-//   inline uint32_t getFlags()                const { return flags;                 }
-   inline uint32_t getState()             const { return state;            }
-   inline int      getBlocksNum()         const { return blocksnum;        }
-   inline uint32_t getTimeCreation()      const { return time_creation;    }
-   inline uint32_t getTimeStarted()       const { return time_started;     }
-   inline uint32_t getTimeWait()          const { return time_wait;        }
-   inline uint32_t getTimeDone()          const { return time_done;        }
-   inline int      getLifeTime()          const { return lifetime;         }
-   inline int      getUserListOrder()     const { return userlistorder;    }
-   inline int      getMaxRunningTasks()   const { return maxrunningtasks;  }
+   inline unsigned getFlags() const { return flags;}
+   inline unsigned getState() const { return state;}
+
+   inline int getBlocksNum()         const { return blocksnum;        }
+   inline int getLifeTime()          const { return lifetime;         }
+   inline int getUserListOrder()     const { return userlistorder;    }
+   inline int getMaxRunningTasks()   const { return maxrunningtasks;  }
+
+   inline long long getTimeCreation()      const { return time_creation;    }
+   inline long long getTimeStarted()       const { return time_started;     }
+   inline long long getTimeWait()          const { return time_wait;        }
+   inline long long getTimeDone()          const { return time_done;        }
 
    inline const std::string & getUserName()     const { return username;    }
    inline const std::string & getHostName()     const { return hostname;    }
@@ -123,16 +123,16 @@ protected:
    int32_t lifetime;
 
 /// set in this constructor
-   uint32_t time_creation;
+   int64_t time_creation;
 
 /// time to wait to start
-   uint32_t time_wait;
+   int64_t time_wait;
 
 /// set in JobAf::refresh(): if job is running or done, but was not started, we set job header time_started
-   uint32_t time_started;
+   int64_t time_started;
 
 /// set in JobAf::refresh(): if job was not done, but now is done we set job header time_done
-   uint32_t time_done;
+   int64_t time_done;
 
 /// Job hosts mask ( huntgroup ).
    RegExp hostsmask;

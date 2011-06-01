@@ -39,6 +39,7 @@ $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
 $time_begin = $line["time_done"];
 pg_free_result($result);
+if( $time_begin == '') $time_begin = 0;
 
 if( $time_min != '') $time_min = strtotime($time_min);
 else $time_min = $time_begin;
@@ -477,8 +478,8 @@ echo "<tr align=center>\n";
 echo "<td width=\"50%\">\n";
 echo '<p><i>Average farm usage = '.sprintf("%01.2f",$taskssumruntime/(time()-$time_min)).' tasks</i></p>';
 echo "</td>\n";
-echo "<td>\n";
-echo '<p><i>The earliest statistics date: '.date( 'j F Y', $time_begin).'</i></p>';
+echo "<td width=\"50%\">\n";
+if( $time_begin != 0 ) echo '<p><i>The earliest statistics date: '.date( 'j F Y', $time_begin).'</i></p>';
 echo "</td width=\"50%\">\n";
 echo "</tr>\n";
 echo "</table>\n";

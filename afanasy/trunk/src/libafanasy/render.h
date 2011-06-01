@@ -35,7 +35,7 @@ public:
    inline bool isWOLFalling()   const { return state & SWOLFalling;  }
    inline bool isWOLSleeping()  const { return state & SWOLSleeping; }
    inline bool isWOLWaking()    const { return state & SWOLWaking;   }
-   inline uint32_t getWOLTime() const { return wol_operation_time;   }
+   inline long long getWOLTime()const { return wol_operation_time;   }
    inline void setWOLFalling(   bool value) { if( value ) state = state | SWOLFalling;  else state = state & (~SWOLFalling); }
    inline void setWOLSleeping(  bool value) { if( value ) state = state | SWOLSleeping; else state = state & (~SWOLSleeping);}
    inline void setWOLWaking(    bool value) { if( value ) state = state | SWOLWaking;   else state = state & (~SWOLWaking);  }
@@ -70,7 +70,7 @@ public:
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   inline uint32_t getTasksStartFinishTime() const { return taskstartfinishtime; }///< Get tasks start or finish time.
+   inline long long getTasksStartFinishTime() const { return taskstartfinishtime; }///< Get tasks start or finish time.
    inline const std::list<TaskExec*> & getTasks() { return tasks;}
 
    const std::string getResourcesString() const;
@@ -99,11 +99,11 @@ protected:
 protected:
 
    uint32_t state;   ///< State.
+   uint32_t flags;   ///< Flags.
 
    int32_t capacity;
    int32_t capacity_used;
-
-   uint32_t wol_operation_time;   ///< Last WOL operation time (to slepp or to wake).
+   int32_t maxrunningtasks;
 
    std::string services_disabled;
    std::string customdata;
@@ -113,7 +113,10 @@ protected:
    HostRes  hres;
 
    std::list<TaskExec*> tasks;
-   uint32_t taskstartfinishtime; ///< Task start or finish time.
+
+   int64_t taskstartfinishtime; ///< Task start or finish time.
+
+   int64_t wol_operation_time;   ///< Last WOL operation time (to sleep or to wake).
 
 private:
    void construct();

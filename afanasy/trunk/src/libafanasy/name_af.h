@@ -62,8 +62,8 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
-   const int stoi( const std::string & str, bool * ok = NULL);
-   const std::string itos( int integer);
+   const long long stoi( const std::string & str, bool * ok = NULL);
+   const std::string itos( long long integer);
    const std::string getenv( const char * name);
    const std::string state2str( int state);
    const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
@@ -71,7 +71,7 @@ namespace af
    const std::string strReplace( const std::string & str, char before, char after);
    const std::list<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
 
-   const std::string fillNumbers( const std::string & pattern, int start, int end);
+   const std::string fillNumbers( const std::string & pattern, long long start, long long end);
    const std::string replaceArgs( const std::string & pattern, const std::string & arg);
 
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);

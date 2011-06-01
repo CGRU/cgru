@@ -34,6 +34,7 @@ Render::Render( Msg * msg):
 
 void Render::construct()
 {
+   maxrunningtasks = -1;
    capacity = -1;
    capacity_used = 0;
    wol_operation_time = 0;
@@ -49,13 +50,15 @@ void Render::readwrite( Msg * msg)
    {
    case Msg::TRendersList:
 
-      rw_bool    ( locked,                msg);
-      rw_uint32_t( taskstartfinishtime,   msg);
-      rw_int32_t ( capacity,              msg);
-      rw_int32_t ( capacity_used,         msg);
-      rw_uint32_t( time_update,           msg);
-      rw_uint32_t( time_register,         msg);
-      rw_String (  annotation,            msg);
+      rw_bool   ( locked,              msg);
+      rw_int64_t( taskstartfinishtime, msg);
+      rw_int32_t( maxrunningtasks,     msg);
+      rw_int32_t( capacity,            msg);
+      rw_int32_t( capacity_used,       msg);
+      rw_int64_t( time_update,         msg);
+      rw_int64_t( time_register,       msg);
+      rw_int64_t( wol_operation_time,  msg);
+      rw_String ( annotation,          msg);
 
       if( msg->isWriting())
       {
@@ -78,12 +81,11 @@ void Render::readwrite( Msg * msg)
       rw_String  ( name,                  msg);
       rw_String  ( username,              msg);
       rw_uint32_t( state,                 msg);
+      rw_uint32_t( flags,                 msg);
       rw_uint8_t ( priority,              msg);
-      rw_uint32_t( time_launch,           msg);
+      rw_int64_t ( time_launch,           msg);
       host.readwrite( msg);
-
-// TODO: VERSION: Always write address
-      if( isOnline()) address.readwrite( msg);
+      address.readwrite( msg);
 
    case Msg::TRenderUpdate:
    case Msg::TRendersListUpdates:
@@ -99,8 +101,6 @@ void Render::readwrite( Msg * msg)
    rw_int32_t( id, msg);
 
    // Send network interfaces information only when register
-   // TODO: VERSION:
-   if( revision >= 1529 )
    if( msg->type() == Msg::TRenderRegister)
    {
       int8_t netIfs_size = netIFs.size();

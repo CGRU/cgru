@@ -32,7 +32,7 @@ bool Monitor::construct()
    events = new bool[EventsCount];
    if( events == NULL)
    {
-      AFERROR("Monitor::construct(): Can't allocate memory for events table.\n");
+      AFERROR("Monitor::construct(): Can't allocate memory for events table.")
       return false;
    }
    for( int e = 0; e < EventsCount; e++) events[e] = false;
@@ -46,14 +46,14 @@ Monitor::~Monitor()
 
 void Monitor::readwrite( Msg * msg)
 {
-   rw_int32_t ( id,            msg);
-   rw_uint32_t( time_launch,   msg);
-   rw_uint32_t( time_register, msg);
-   rw_uint32_t( time_activity, msg);
-   rw_String  ( name,          msg);
-   rw_String  ( username,      msg);
-   rw_int32_t ( revision,      msg);
-   rw_String  ( version,       msg);
+   rw_int32_t( id,            msg);
+   rw_int64_t( time_launch,   msg);
+   rw_int64_t( time_register, msg);
+   rw_int64_t( time_activity, msg);
+   rw_String ( name,          msg);
+   rw_String ( username,      msg);
+   rw_int32_t( revision,      msg);
+   rw_String ( version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
 
@@ -72,7 +72,7 @@ bool Monitor::hasEvent( int type) const
    }
    else
    {
-      AFERRAR("MonitorAf::hasEvent: Invalid event: [%s]\n", af::Msg::TNAMES[type]);
+      AFERRAR("MonitorAf::hasEvent: Invalid event: [%s]", af::Msg::TNAMES[type])
       return false;
    }
 }

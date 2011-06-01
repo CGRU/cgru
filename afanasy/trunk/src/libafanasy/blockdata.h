@@ -55,7 +55,7 @@ public:
    TaskExec *genTask( int num) const;
 
    const std::string genTaskName(   int num) const; ///< Generate task name.
-   const std::string genCommand(    int num, int *frame_start = NULL, int *frame_finish = NULL) const;
+   const std::string genCommand(    int num, long long * frame_start = NULL, long long * frame_finish = NULL) const;
    const std::string genFiles(      int num) const;
 
    inline bool isNumeric() const { return flags & FNumeric;} ///< Whether the block is numeric.
@@ -126,8 +126,8 @@ public:
 /// Set time to forgive error host
    inline void setErrorsForgiveTime(     int value) { errors_forgivetime  = value; }
 
-   bool setNumeric( int start, int end, int perTask = 1, int increment = 1);
-   void setFramesPerTask( int perTask); ///< For sting tasks and per tasr dependency solve
+   bool setNumeric( long long start, long long end, long long perTask = 1, long long increment = 1);
+   void setFramesPerTask( long long perTask); ///< For sting tasks and per tasr dependency solve
 
    inline const std::string & getName()         const { return name;                }  ///< Get name.
    inline const std::string & getWDir()         const { return wdir;                }  ///< Get working directory.
@@ -172,14 +172,14 @@ public:
    inline const std::string & getMultiHostService()  const { return multihost_service;}///< Get tasks parser type.
 
 
-   inline int getFrameFirst()   const { return frame_first;    }///< Get first task frame ( if numeric).
-   inline int getFrameLast()    const { return frame_last;     }///< Get last task frame  ( if numeric).
-   inline int getFrameInc()     const { return frame_inc;      }///< Get frame increment  ( if numeric).
-   inline int getFramePerTask() const { return frame_pertask;  }///< Get frames per task.
+   inline long long getFrameFirst()   const { return frame_first;    }///< Get first task frame ( if numeric).
+   inline long long getFrameLast()    const { return frame_last;     }///< Get last task frame  ( if numeric).
+   inline long long getFrameInc()     const { return frame_inc;      }///< Get frame increment  ( if numeric).
+   inline long long getFramePerTask() const { return frame_pertask;  }///< Get frames per task.
 
 
-   inline int getFileSizeMin()       const { return filesize_min;     }
-   inline int getFileSizeMax()       const { return filesize_max;     }
+   inline long long getFileSizeMin()       const { return filesize_min;     }
+   inline long long getFileSizeMax()       const { return filesize_max;     }
    inline int getCapCoeffMin()       const { return capcoeff_min;     }
    inline int getCapCoeffMax()       const { return capcoeff_max;     }
    inline int getMultiHostMin()      const { return multihost_min;    }
@@ -211,7 +211,7 @@ public:
    inline int      getProgressTasksReady()      const { return p_tasksready;        }
    inline int      getProgressTasksDone()       const { return p_tasksdone;         }
    inline int      getProgressTasksError()      const { return p_taskserror;        }
-   inline uint32_t getProgressTasksSumRunTime() const { return p_taskssumruntime;   }
+   inline long long getProgressTasksSumRunTime() const { return p_taskssumruntime;   }
 
    inline void setState(           uint32_t  value ) { state           = value; }
    inline void setProgressTasksReady(    int value ) { p_tasksready    = value; }
@@ -241,15 +241,18 @@ protected:
    uint32_t flags;            ///< Block type flags.
 
    int32_t  tasksnum;         ///< Number of tasks in block.
-   int32_t  frame_first;      ///< First tasks frame.
-   int32_t  frame_last;       ///< Last tasks frame.
-   int32_t  frame_pertask;    ///< Tasks frames per task.
-   int32_t  frame_inc;        ///< Tasks frames increment.
+   int64_t  frame_first;      ///< First tasks frame.
+   int64_t  frame_last;       ///< Last tasks frame.
+   int64_t  frame_pertask;    ///< Tasks frames per task.
+   int64_t  frame_inc;        ///< Tasks frames increment.
 
    int32_t  runningtasks_counter; ///< Number of running tasks counter.
 
    /// Maximum number of running tasks
    int32_t maxrunningtasks;
+
+   /// Maximum number of running tasks on the same host
+   int32_t maxruntasksperhost;
 
    uint32_t tasksmaxruntime;  ///< Tasks maximum run time.
 
@@ -284,8 +287,8 @@ protected:
 /// Time from last error to remove host from error list
    int32_t errors_forgivetime;
 
-   int32_t  filesize_min;
-   int32_t  filesize_max;
+   int64_t  filesize_min;
+   int64_t  filesize_max;
    int32_t  capcoeff_min;
    int32_t  capcoeff_max;
    uint8_t  multihost_min;
@@ -307,7 +310,7 @@ private:
    void construct();
 
 /// Generate fisrt and last frame numbers for \c num task.
-   bool genNumbers( int &start, int &end, int num) const;
+   bool genNumbers( long long & start, long long & end, int num) const;
 
    virtual TaskData * createTask( Msg * msg);
    void rw_tasks( Msg * msg); ///< Read & write tasks data.
@@ -330,6 +333,6 @@ private:
    int32_t  p_tasksready;        ///< Number of ready tasks.
    int32_t  p_tasksdone;         ///< Number of done tasks.
    int32_t  p_taskserror;        ///< Number of error (failed) tasks.
-   uint32_t p_taskssumruntime;   ///< Tasks run time summ.
+   int64_t  p_taskssumruntime;   ///< Tasks run time summ.
 };
 }

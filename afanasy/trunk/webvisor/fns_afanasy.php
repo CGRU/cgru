@@ -16,6 +16,8 @@ $STATE_Rnimby  = 1<<1;
 $STATE_RNIMBY  = 1<<2;
 $STATE_RBusy   = 1<<3;
 
+$FLAGS_UAdmin  = 1<<0;
+
 function stateIsReady( $state )
 {
    global $STATE_READY;
@@ -125,6 +127,18 @@ function renderIsBusy( $state )
 {
    global $STATE_RBusy;
    return $state & $STATE_RBusy;
+}
+
+function userIsAdmin( $flags )
+{
+   global $FLAGS_UAdmin;
+   return $flags & $FLAGS_UAdmin;
+}
+
+function userSetAdmin( $flags )
+{
+   global $FLAGS_UAdmin;
+   return $flags | $FLAGS_UAdmin;
 }
 
 function renderStyle( $state)

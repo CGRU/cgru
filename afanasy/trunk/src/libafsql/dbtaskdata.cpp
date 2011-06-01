@@ -11,11 +11,11 @@
 
 using namespace afsql;
 
-const QString DBTaskData::TableName("tasks");
-const QString DBTaskData::IDs("id_job int, id_block int, id_task int");
-const QString DBTaskData::Keys("FOREIGN KEY (id_job, id_block) REFERENCES blocks (id_job, id_block) ON DELETE CASCADE, PRIMARY KEY (id_job, id_block, id_task)");
+const std::string DBTaskData::TableName("tasks");
+const std::string DBTaskData::IDs("id_job int, id_block int, id_task int");
+const std::string DBTaskData::Keys("FOREIGN KEY (id_job, id_block) REFERENCES blocks (id_job, id_block) ON DELETE CASCADE, PRIMARY KEY (id_job, id_block, id_task)");
 
-const QString DBTaskData::dbPrepareInsert
+const std::string DBTaskData::dbPrepareInsert
 ("INSERT INTO tasks (id_job,id_block,id_task,name,command,files,dependmask,customdata)\
  VALUES(:id_job,:id_block,:id_task,:name,:command,:files,:dependmask,:customdata);\
 ");
@@ -44,25 +44,26 @@ void DBTaskData::addDBAttributes()
 
 DBTaskData::~DBTaskData()
 {
-AFINFO("DBTaskData::~DBTaskData\n");
+AFINFO("DBTaskData::~DBTaskData")
 }
 
-const QString DBTaskData::dbWhereSelect( int id_job, int id_block, int id_task)
+const std::string DBTaskData::dbWhereSelect( int id_job, int id_block, int id_task)
 {
-   return QString("id_job=%1 AND id_block=%2 AND id_task=%3").arg(id_job).arg(id_block).arg(id_task);
+//   return QString("id_job=%1 AND id_block=%2 AND id_task=%3").arg(id_job).arg(id_block).arg(id_task);
+   return std::string("id_job=") + af::itos(id_job) + " AND id_block=" + af::itos(id_block) + " AND id_task=" + af::itos(id_task);
 }
 
-void DBTaskData::dbBindInsert( QSqlQuery *query, const QVariant & id_job, const QVariant & id_block, const QVariant & id_task) const
+void DBTaskData::dbBindInsert( QSqlQuery *query, int id_job, int id_block, int id_task) const
 {
-   query->bindValue(":id_job",      id_job      );
-   query->bindValue(":id_block",    id_block    );
-   query->bindValue(":id_task",     id_task     );
+   query->bindValue(":id_job",      QVariant(id_job   ));
+   query->bindValue(":id_block",    QVariant(id_block ));
+   query->bindValue(":id_task",     QVariant(id_task  ));
 
-   query->bindValue(":name",        QString::fromUtf8( name.c_str()));
-   query->bindValue(":command",     QString::fromUtf8( command.c_str()));
-   query->bindValue(":files",       QString::fromUtf8( files.c_str()));
-   query->bindValue(":dependmask",  QString::fromUtf8( dependmask.c_str()));
-   query->bindValue(":customdata",  QString::fromUtf8( customdata.c_str()));
+   query->bindValue(":name",        afsql::stoq( name       ));
+   query->bindValue(":command",     afsql::stoq( command    ));
+   query->bindValue(":files",       afsql::stoq( files      ));
+   query->bindValue(":dependmask",  afsql::stoq( dependmask ));
+   query->bindValue(":customdata",  afsql::stoq( customdata ));
 }
 
 void DBTaskData::readwrite( af::Msg * msg)

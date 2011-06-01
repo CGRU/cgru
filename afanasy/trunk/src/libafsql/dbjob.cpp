@@ -4,16 +4,18 @@
 #include "dbblockdata.h"
 #include "dbjobprogress.h"
 
+#include <QtCore/QVariant>
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 using namespace afsql;
 
-const QString DBJob::TableName("jobs");
-const QString DBJob::Keys("PRIMARY KEY( id)");
-const int     DBJob::KeysNum = 1;
-DBStatistics  DBJob::statistics;
+const std::string DBJob::TableName("jobs");
+const std::string DBJob::Keys("PRIMARY KEY( id)");
+const int         DBJob::KeysNum = 1;
+DBStatistics      DBJob::statistics;
 
 DBJob::DBJob( int Id):
    af::Job( Id),
@@ -28,9 +30,9 @@ void DBJob::addDBAttributes()
 
    dbAddAttr( new DBAttrUInt32( DBAttr::_state,              &state               ));
    dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,           &priority            ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_started,       &time_started        ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_done,          &time_done           ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_wait,          &time_wait           ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_started,       &time_started        ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,          &time_done           ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_wait,          &time_wait           ));
    dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,    &maxrunningtasks     ));
    dbAddAttr( new DBAttrInt32 ( DBAttr::_userlistorder,      &userlistorder       ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,          &hostsmask           ));
@@ -50,7 +52,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_username,           &username            ));
    dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &blocksnum           ));
    dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,            &cmd_pre             ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_time_creation,      &time_creation       ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_creation,      &time_creation       ));
 }
 
 DBJob::~DBJob()
@@ -64,32 +66,24 @@ af::BlockData * DBJob::newBlockData( af::Msg * msg)
    return new DBBlockData( msg);
 }
 
-void DBJob::getIds( std::list<int32_t> & uids, QSqlDatabase * db)
+const std::string DBJob::dbGetIDsCmd()
 {
-   if( db->isOpen() == false )
-   {
-      AFERROR("DBJob::getIds: Database connection is not open.")
-      return;
-   }
-   QSqlQuery q( *db);
-   q.exec(QString("SELECT id FROM %1 ORDER BY userlistorder").arg( TableName));
-   while (q.next()) uids.push_back( q.value(0).toUInt());
-printf("DBJob::getIds: %u jobs founded.\n", unsigned(uids.size()));
+   return std::string("SELECT id FROM ") + TableName + " ORDER BY userlistorder";
 }
 
 void DBJob::dbAdd( QSqlDatabase * db) const
 {
-   QStringList queries;
+   std::list<std::string> queries;
    dbInsert( &queries);
    QSqlQuery q( *db);
-   for( int i = 0; i < queries.size(); i++) q.exec( queries[i]);
+   for( std::list<std::string>::const_iterator it = queries.begin(); it != queries.end(); it++) q.exec( afsql::stoq(*it));
 
    for( int b = 0; b < blocksnum; b++) ((DBBlockData*)(blocksdata[b]))->dbAdd( db);
 
    progress->dbAdd( db);
 }
 
-bool DBJob::dbSelect( QSqlDatabase * db, const QString * where)
+bool DBJob::dbSelect( QSqlDatabase * db, const std::string * where)
 {
 //printf("DBJob::dbSelect:\n");
    if( DBItem::dbSelect( db) == false) return false;
@@ -121,14 +115,14 @@ bool DBJob::dbSelect( QSqlDatabase * db, const QString * where)
    return true;
 }
 
-void DBJob::dbDelete( QStringList  * queries) const
+void DBJob::dbDelete( std::list<std::string> * queries) const
 {
    DBItem::dbDelete( queries);
    if( id != AFJOB::SYSJOB_ID) // Do not add system job to statistics
       statistics.addJob( this, queries);
 }
 
-void DBJob::dbDeleteNoStatistics( QStringList  * queries) const
+void DBJob::dbDeleteNoStatistics( std::list<std::string> * queries) const
 {
    DBItem::dbDelete( queries);
 }

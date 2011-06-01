@@ -613,18 +613,17 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TJobRestartPause:
    case af::Msg::TJobDelete:
    case af::Msg::TRenderAnnotate:
-   case af::Msg::TRenderPriority:
-   case af::Msg::TRenderCapacity:
+   case af::Msg::TRenderSetPriority:
+   case af::Msg::TRenderSetCapacity:
    case af::Msg::TRenderSetService:
    case af::Msg::TRenderRestoreDefaults:
-   case af::Msg::TRenderNIMBY:
-   case af::Msg::TRenderNimby:
-   case af::Msg::TRenderUser:
-   case af::Msg::TRenderFree:
+   case af::Msg::TRenderSetNIMBY:
+   case af::Msg::TRenderSetNimby:
+   case af::Msg::TRenderSetUser:
+   case af::Msg::TRenderSetFree:
    case af::Msg::TRenderEject:
    case af::Msg::TRenderDelete:
    case af::Msg::TRenderRestart:
-//   case af::Msg::TRenderStart:
    case af::Msg::TRenderReboot:
    case af::Msg::TRenderShutdown:
    case af::Msg::TRenderDeregister:
