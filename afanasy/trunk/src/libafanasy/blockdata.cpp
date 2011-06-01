@@ -521,7 +521,7 @@ const std::string BlockData::genTaskName( int num, long long * fstart, long long
 
    if( isNumeric())
    {
-      long long start, end;
+      long long start, end, fnum;
       bool ok = true;
       if( fstart && fend )
       {
@@ -535,10 +535,14 @@ const std::string BlockData::genTaskName( int num, long long * fstart, long long
 
       if( tasksname.size()) return fillNumbers( tasksname, start, end);
 
-      if( frame_pertask == 1 )
-         return itos( start);
-      else
-         return itos( start) + "-" + itos( end);
+      std::string str("frame ");
+      str += itos( start);
+      if( start != end )
+      {
+         str += std::string("-") + itos( end);
+         if( frame_inc > 1 ) str += std::string(" / ") + itos( frame_inc);
+      }
+      return str;
    }
 
    return af::replaceArgs( tasksname, tasksdata[num]->getName());

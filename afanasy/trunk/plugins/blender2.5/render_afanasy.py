@@ -203,11 +203,6 @@ class ORE_Submit(bpy.types.Operator):
       # Set block command and frame range:
       block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
       block.setNumeric( fstart, fend, fpertask, finc)
-      tasksnames = 'frame @#@'
-      if fpertask > 1:
-         tasksnames += '-@#@'
-         if finc > 1: tasksnames += ' / ' + str(finc)
-      block.setTasksName( tasksnames)
       # Set job running parameters:
       if ore.maxruntasks       > -1: job.setMaxRunningTasks( ore.maxruntasks )
       if ore.priority          > -1: job.setPriority( ore.priority )

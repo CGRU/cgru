@@ -128,13 +128,8 @@ for b in range( numblocks):
       block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars(), False)
       block.setNumeric( 1, numtasks, perhost, increment)
       if perhost > 1:
-         if increment > 1:
-            block.setTasksName('num @#@-@#@ / ' + str(increment))
-         else:
-            block.setTasksName('num @#@-@#@')
          block.setFiles('file_a.@#@.@###@-file_a.@#@.@###@;file_b.@#@.@###@-file_b.@#@.@###@')
       else:
-         block.setTasksName('num @####@')
          block.setFiles('file_a.@#@.@####@;file_b.@#@.@####@')
    else:
       block.setCommand('python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(), False)

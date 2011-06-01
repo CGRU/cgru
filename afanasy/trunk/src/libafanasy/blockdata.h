@@ -54,10 +54,10 @@ public:
 **/
    TaskExec * genTask( int num) const;
 
-   bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL) const; ///< Generate fisrt and last frame numbers for \c num task.
-   const std::string genTaskName(   int num, long long * fstart = NULL, long long * fend = NULL) const;
-   const std::string genCommand(    int num, long long * fstart = NULL, long long * fend = NULL) const;
-   const std::string genFiles(      int num, long long * fstart = NULL, long long * fend = NULL) const;
+   bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL ) const; ///< Generate fisrt and last frame numbers for \c num task.
+   const std::string genTaskName(   int num, long long * fstart = NULL, long long * fend = NULL ) const;
+   const std::string genCommand(    int num, long long * fstart = NULL, long long * fend = NULL ) const;
+   const std::string genFiles(      int num, long long * fstart = NULL, long long * fend = NULL ) const;
 
    inline bool isNumeric() const { return flags & FNumeric;} ///< Whether the block is numeric.
    inline bool isNotNumeric() const { return false == (flags & FNumeric);} ///< Whether the block is not numeric.

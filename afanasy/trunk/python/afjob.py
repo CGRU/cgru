@@ -318,7 +318,7 @@ blockname = node
 # Shake:
 if   ext == 'shk':
    scenetype = 'shake'
-   cmd = 'shake' + cmdextension + ' -exec ' + scene + ' -vv -t %1-%2'
+   cmd = 'shake' + cmdextension + ' -exec ' + scene + ' -vv -t @#@-@#@'
 
 # Nuke:
 elif ext == 'nk':
@@ -326,7 +326,7 @@ elif ext == 'nk':
    cmd = 'nuke' + cmdextension + ' -i'
    if capmin != -1 or capmax != -1: cmd += ' -m '+ services.service.str_capacity
    if node != '': cmd += ' -X ' + node
-   cmd += ' -x "' + scene + '" %1,%2'
+   cmd += ' -x "' + scene + '" @#@-@#@x' + str(by)
 
 # Houdini:
 elif ext == 'hip':
@@ -336,7 +336,7 @@ elif ext == 'hip':
    cmd = 'hrender_af' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' --numcpus '+ services.service.str_capacity
    if ignoreinputs: cmd += ' -i'
-   cmd += ' -s %%1 -e %%2 --by %(by)d -t %(take)s "%(scene)s" %(node)s' % vars()
+   cmd += ' -s @#@ -e @#@ --by %(by)d -t %(take)s "%(scene)s" %(node)s' % vars()
 
 # Maya:
 elif ext == 'mb':
@@ -351,7 +351,7 @@ elif ext == 'scn':
    cmd = 'xsibatch' + cmdextension + ' -script %s' % cmd
    cmd += ' -lang Python -main afRender -args'
    cmd += ' -scene "%s"' % scene
-   cmd += ' -start %1 -end %2 -step ' + str(by)
+   cmd += ' -start @#@ -end @#@ -step ' + str(by)
    cmd += ' -simulate'
    if simulate:   cmd += ' 1'
    else:          cmd += ' 0'
@@ -368,7 +368,7 @@ elif ext == 'scn':
 # 3D MAX:
 elif ext == 'max':
    scenetype = 'max'
-   cmd = '3dsmaxcmd' + cmdextension + ' "' + scene + '" -start:%1 -end:%2 -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
+   cmd = '3dsmaxcmd' + cmdextension + ' "' + scene + '" -start:@#@ -end:@#@ -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
    if node != '': cmd += ' -cam:"%s"' % node
    if take != '':
       cmd += ' -batchrender'
@@ -382,7 +382,7 @@ elif ext == 'max':
 # simple generic:
 else:
    scenetype = 'generic'
-   cmd = scene + ' %1 %2'
+   cmd = scene + ' @#@ @#@'
 
 #
 # Creating a Job:
@@ -398,7 +398,7 @@ i = 0
 for cmd in cmds:
    block = af.Block( blocknames[i], blocktype)
    block.setWorkingDirectory( pwd )
-   block.setNumeric( s, e, fpt)
+   block.setNumeric( s, e, fpt, by)
    if scenetype == 'max': block.setCommand( cmd, False, False )
    else: block.setCommand( cmd )
    block.setCapacity( capacity)
