@@ -35,9 +35,10 @@ class ORESettings(bpy.types.PropertyGroup):
    # General:
    jobname  = StringProperty( name='Job Name', description='Job Name. Scene name if empty.', maxlen=512, default='')
    engine   = StringProperty( name='Use Engine', description='Engine to render scene with.', maxlen=512, default='BLENDER_RENDER')
-   fstart   = IntProperty(    name='Start Frame', description='Start Frame', default=1)
-   fend     = IntProperty(    name='End Frame', description='End Frame', default=11)
-   fpertask = IntProperty(    name='Per Task', description='Frames Per One Task', default=1)
+   fstart   = IntProperty(    name='Start', description='Start Frame', default=1)
+   fend     = IntProperty(    name='End', description='End Frame', default=11)
+   finc     = IntProperty(    name='By', description='Frames Increment', min=1, default=1)
+   fpertask = IntProperty(    name='Per Task', description='Frames Per One Task', min=1, default=1)
    pause    = BoolProperty(   name='Start Job Paused', description='Send job in offline state.', default=0)
 
    # Paramerets:
@@ -106,6 +107,7 @@ class RENDER_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
       row = layout.row()
       row.prop(ore, 'fstart')
       row.prop(ore, 'fend')
+      row.prop(ore, 'finc')
       row.prop(ore, 'fpertask')
 
       layout.separator()
@@ -167,6 +169,7 @@ class ORE_Submit(bpy.types.Operator):
       # Get frames settings:
       fstart   = ore.fstart
       fend     = ore.fend
+      finc     = ore.finc
       fpertask = ore.fpertask
       # Check frames settings:
       if fpertask < 1: fpertask = 1
@@ -198,8 +201,13 @@ class ORE_Submit(bpy.types.Operator):
       block = af.Block( ore.engine, servicename)
       job.blocks.append( block)
       # Set block command and frame range:
-      block.setCommand('blender -b %s -s %%1 -e %%2 -a'  % renderscenefile)
-      block.setNumeric( fstart, fend, fpertask)
+      block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
+      block.setNumeric( fstart, fend, fpertask, finc)
+      tasksnames = 'frame @#@'
+      if fpertask > 1:
+         tasksnames += '-@#@'
+         if finc > 1: tasksnames += ' / ' + str(finc)
+      block.setTasksName( tasksnames)
       # Set job running parameters:
       if ore.maxruntasks       > -1: job.setMaxRunningTasks( ore.maxruntasks )
       if ore.priority          > -1: job.setPriority( ore.priority )

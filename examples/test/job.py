@@ -125,18 +125,21 @@ for b in range( numblocks):
       str_hosts = ' ' + services.service.str_hosts
 
    if not options.stringtype:
-      block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s %%1 -e %%2 -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d %%04d %%04d %%04d %%04d' % vars(), False)
+      block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars(), False)
       block.setNumeric( 1, numtasks, perhost, increment)
       if perhost > 1:
-         block.setTasksName('num %1-%2')
-         block.setFiles('file_a.%1.%04d-file_a.%2.%04d;file_b.%1.%04d-file_b.%2.%04d')
+         if increment > 1:
+            block.setTasksName('num @#@-@#@ / ' + str(increment))
+         else:
+            block.setTasksName('num @#@-@#@')
+         block.setFiles('file_a.@#@.@###@-file_a.@#@.@###@;file_b.@#@.@###@-file_b.@#@.@###@')
       else:
-         block.setTasksName('num %04d')
-         block.setFiles('file_a.%1.%04d;file_b.%2.%04d')
+         block.setTasksName('num @####@')
+         block.setFiles('file_a.@#@.@####@;file_b.@#@.@####@')
    else:
-      block.setCommand('python task.py%(str_capacity)s %%1 -v %(verbose)d' % vars(), False)
-      block.setTasksName('task %1')
-      block.setFiles('view %1')
+      block.setCommand('python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(), False)
+      block.setTasksName('task @#@')
+      block.setFiles('view @#@')
       for t in range( numtasks):
          timesec_task = timesec + randtime * random.random()
          task = af.Task('#' + str(t))

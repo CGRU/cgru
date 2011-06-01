@@ -217,7 +217,7 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
       integer = ntohl( bytes);
    }
 }
-
+/*
 const std::string af::fillNumbers( const std::string& pattern, long long start, long long end)
 {
    std::string str( pattern);
@@ -299,17 +299,62 @@ const std::string af::fillNumbers( const std::string& pattern, long long start, 
    }
    return str;
 }
+*/
+const std::string af::fillNumbers( const std::string & pattern, long long start, long long end)
+{
+   std::string str;
+   int pos = 0;
+   int nstart = -1;
+   int part = 0;
+   long long number = start;
+
+   while( pos < pattern.size())
+   {
+      if( pattern[pos] == '@')
+      {
+         if(( nstart != -1) && (( pos - nstart ) > 1))
+         {
+            str += std::string( pattern.data()+part, nstart-part);
+            std::string number_str = af::itos( number);
+            if( number_str.size() < ( pos - nstart - 1))
+               number_str = std::string( pos - nstart - 1 - number_str.size(), '0') + number_str;
+            str += number_str;
+            if( number == start ) number = end;
+            else number = start;
+            part = pos + 1;
+            nstart = -1;
+         }
+         else
+            nstart = pos;
+      }
+      else if( nstart != -1)
+      {
+         if( pattern[pos] != '#')
+         {
+            nstart = -1;
+         }
+      }
+      pos++;
+   }
+
+   if( str.empty() ) return pattern;
+
+   if(( part > 0 ) && ( part < pattern.size()))
+      str += std::string( pattern.data()+part, pattern.size()-part);
+
+   return str;
+}
 
 const std::string af::replaceArgs( const std::string & pattern, const std::string & arg)
 {
    if( pattern.empty()) return arg;
 
    std::string str( pattern);
-   size_t pos = str.find("%1");
+   size_t pos = str.find("@#@");
    while( pos != std::string::npos )
    {
-      str.replace( pos, 2, arg);
-      pos = str.find("%1");
+      str.replace( pos, 3, arg);
+      pos = str.find("@#@");
    }
 
    return str;

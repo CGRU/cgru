@@ -370,6 +370,11 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
       AFERROR("BlockData::genNumbers: n > tasksnum.")
       return false;
    }
+   if( isNotNumeric() )
+   {
+      if( frames_num ) *frames_num = frame_pertask;
+      return true;
+   }
 
    long long offset = num * frame_pertask * frame_inc;
    if( frame_inc > 1 ) offset -= offset % frame_inc;

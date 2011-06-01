@@ -33,12 +33,11 @@ def sendServer( data, datalen, host, port, verbose = False):
 
    if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)
    s.sendall( data)
-   data = []
+   data = b''
    while True:
       buffer = s.recv(4096)
       if not buffer:
          break
-      data.append(buffer)
-   output = ''.join(data)
+      data += buffer
    s.close()
-   return True, output
+   return True, data
