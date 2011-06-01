@@ -77,7 +77,7 @@ void ItemJobBlock::update( const af::BlockData* block, int type)
       break;
 
    default:
-      AFERRAR("ItemJobBlock::update: Invalid type = %s\n", af::Msg::TNAMES[type]);
+      AFERRAR("ItemJobBlock::update: Invalid type = %s", af::Msg::TNAMES[type])
       return;
    }
 
