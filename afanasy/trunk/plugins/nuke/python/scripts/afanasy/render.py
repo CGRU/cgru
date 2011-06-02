@@ -20,10 +20,13 @@ af = None
 
 def getNodeName( node): return node.name()
 
-def checkFrameRange( framefirst, framelast, framespertask, string = ''):
+def checkFrameRange( framefirst, framelast, frameinc, framespertask, string = ''):
    if string != '': string = ' on "%s"' % string
    if framefirst > framelast:
       nuke.message('First frame > Last frame' + string)
+      return False
+   if frameinc < 1:
+      nuke.message('Frame increment must be >= 1' + string)
       return False
    if framespertask < 1:
       nuke.message('Frames per task must be >= 1' + string)
@@ -98,6 +101,7 @@ class BlockParameters:
 
       self.framefirst        = nuke.root().firstFrame()
       self.framelast         = nuke.root().lastFrame()
+      self.frameinc          =  1
       self.framespertask     =  1
       self.maxhosts          = -1
       self.capacity          = -1
@@ -109,6 +113,7 @@ class BlockParameters:
       if afnode is not None:
          self.framefirst        = int( afnode.knob('framefirst').value())
          self.framelast         = int( afnode.knob('framelast').value())
+         self.frameinc          = int( afnode.knob('frameinc').value())
          self.framespertask     = int( afnode.knob('framespertask').value())
          self.maxhosts          = int( afnode.knob('maxhosts').value())
          self.capacity          = int( afnode.knob('capacity').value())
@@ -208,7 +213,7 @@ class BlockParameters:
 
          threads = os.getenv('NUKE_AF_RENDERTHREADS', '2')
          cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i -m %(threads)s')
-         cmdargs = ' -X %s -F%%1-%%2x1 -x \"%s\"' % ( self.writename, scenename)
+         cmdargs = ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
          if self.capacitymin != -1 or self.capacitymax != -1:
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             threads = services.service.str_capacity
@@ -251,13 +256,14 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
    # Get parameters:
    framefirst        = int( afnode.knob('framefirst').value())
    framelast         = int( afnode.knob('framelast').value())
+   frameinc          = int( afnode.knob('frameinc').value())
    framespertask     = int( afnode.knob('framespertask').value())
    independent       = int( afnode.knob('independent').value())
    reversedepends    = int( afnode.knob('reversedeps').value())
    forceframes       = int( afnode.knob('forceframes').value())
-   if checkFrameRange( framefirst, framelast, framespertask, afnode.name()) == False: return
+   if checkFrameRange( framefirst, framelast, frameinc, framespertask, afnode.name()) == False: return
    if forceframes:
-      fparams = dict({'framefirst':framefirst, 'framelast':framelast, 'framespertask':framespertask})
+      fparams = dict({'framefirst':framefirst, 'framelast':framelast, 'frameinc':frameinc, 'framespertask':framespertask})
 
    # MutiWrite parameters:
    if subblock:
@@ -443,6 +449,7 @@ def getJobsParameters( afnode, prefix, fparams):
    # Get parameters:
    framefirst        = int( afnode.knob('framefirst').value())
    framelast         = int( afnode.knob('framelast').value())
+   frameinc          = int( afnode.knob('frameinc').value())
    framespertask     = int( afnode.knob('framespertask').value())
    independent       = int( afnode.knob('independent').value())
    reversedepends    = int( afnode.knob('reversedeps').value())
@@ -452,7 +459,7 @@ def getJobsParameters( afnode, prefix, fparams):
    if jobname == None or jobname == '':
       jobname = afnode.name()
    jobname = prefix + '-' + jobname
-   if checkFrameRange( framefirst, framelast, framespertask, afnode.name()) == False: return
+   if checkFrameRange( framefirst, framelast, frameinc, framespertask, afnode.name()) == False: return
    if forceframes:
       fparams = dict({'framefirst':framefirst, 'framelast':framelast, 'framespertask':framespertask})
 
@@ -698,7 +705,7 @@ def render( node = None):
          nuke.message('Invalid frames per task "%s"' % sframespertask)
          return
       fparams['framespertask'] = framespertask
-   if checkFrameRange( framefirst, framelast, framespertask) == False: return
+   if checkFrameRange( framefirst, framelast, 1, framespertask) == False: return
 
    # Render selected nodes:
    renderNodes( nodes, fparams, storeframes)

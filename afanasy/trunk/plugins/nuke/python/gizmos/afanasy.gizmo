@@ -12,6 +12,7 @@ Gizmo {
    }
    addUserKnob {  3 framefirst      l "First Frame"      }
    addUserKnob {  3 framelast       l "Last Frame"       }
+   addUserKnob {  3 frameinc        l "Frame Increment"  }
    addUserKnob {  3 framespertask   l "Frames Per Task"  }
    addUserKnob { 26 "" l ""}
    addUserKnob { 22 knob_1 l RENDER T "afanasy.render( nuke.toNode(\"this\"))"}
@@ -47,6 +48,8 @@ Gizmo {
    jobname          ""
    framefirst      1
    framelast      11
+   frameinc        1
+   framespertask   1
    framespertask   1
    startpaused     0
 
