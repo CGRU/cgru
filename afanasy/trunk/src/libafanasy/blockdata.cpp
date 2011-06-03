@@ -516,7 +516,7 @@ const std::string BlockData::genTaskName( int num, long long * fstart, long long
 
    if( isNumeric())
    {
-      long long start, end, fnum;
+      long long start, end;
       bool ok = true;
       if( fstart && fend )
       {

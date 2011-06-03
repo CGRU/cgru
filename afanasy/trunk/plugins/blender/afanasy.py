@@ -68,12 +68,13 @@ def main():
    job = af.Job( job_name.val)
 
    # Set block service type:
+   blockname = 'blender'
    servicename = 'blender'
-   if enginename != '': servicename += '_' + enginename
-   block = af.Block( servicename + '_block', servicename)
+   if enginename != '': blockname = 'engine:' + enginename
+   block = af.Block( blockname, servicename)
    job.blocks.append( block)
    # Set block command and frame range:
-   block.setCommand('blender -b %(tmpname)s -s %%1 -e %%2 -a'  % vars())
+   block.setCommand('blender -b %(tmpname)s -s @#@ -e @#@ -a'  % vars())
    block.setNumeric( start_frame.val, end_frame.val, per_host.val)
    # Set job running parameters:
    job.setMaxHosts( max_hosts.val )
@@ -91,4 +92,3 @@ def main():
    job.send()
 
 main()
-

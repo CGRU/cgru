@@ -206,6 +206,14 @@ void BlockInfo::refresh()
       }
       tasksinfo += ")";
    }
+   else if( frame_pertask > 1)
+   {
+      tasksinfo += QString("*%1").arg( frame_pertask);
+   }
+   else if( frame_pertask < 0)
+   {
+      tasksinfo += QString("/%1").arg( -frame_pertask);
+   }
 
    str_compact = QString("%1: ").arg( tasksinfo);
    if( tasksdone) str_compact += QString("%1: ").arg( str_runtime);

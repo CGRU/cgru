@@ -108,7 +108,7 @@ if not join_render:
       command += 'c %(divx)d %(divy)d' % vars()
       b_render.setCommand( command + ' @#@')
       b_render.setFramesPerTask( -tiles)
-      for frame in range( f_start, f_finish + 1):
+      for frame in range( f_start, f_finish + 1, f_inc):
          arguments = afnode.parm('arguments').evalAsStringAtFrame( frame)
          for tile in range( 0, tiles):
             task = af.Task('%d tile %d' % ( frame, tile))
@@ -120,7 +120,7 @@ if not join_render:
       arguments = afcommon.patternFromPaths( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
       b_render.setCommand( command + arguments)
       b_render.setFiles( images)
-      b_render.setNumeric( f_start, f_finish)
+      b_render.setNumeric( f_start, f_finish, 1, f_inc)
 
 if tile_render:
    cmd = 'exrjoin %(divx)d %(divy)d %(images)s d' % vars()
@@ -129,7 +129,7 @@ if tile_render:
    b_join.setTasksDependMask('render')
    b_join.setCommand( cmd, False)
    b_join.setFiles( images)
-   b_join.setNumeric( f_start, f_finish)
+   b_join.setNumeric( f_start, f_finish, 1, f_inc)
 
 if read_rop:
    afnode.parm('images').set('')
