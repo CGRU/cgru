@@ -73,3 +73,27 @@ def patternFromStdC( path, verbose = False):
          if verbose: print 'No pattern.'
          pos += posp+posd
    return paths
+
+def patternFromDigits( path, verbose = False):
+   pos = 0
+   posd = 0
+   while pos < len(path):
+      posd = path[pos:].find('#')
+      if posd == -1: break
+      # Check if it is an already formatted pattern:
+      if pos+posd > 0 and path[pos+posd-1] == '@':
+         cab = path[pos+posd:].find('@')
+         if cab != -1:
+            # Shift and continue:
+            pos = pos+posd+cab
+            continue
+      posd += pos
+      pos = posd
+      # Shift to the last #:
+      for d in path[posd:]:
+         if d != '#': break
+         pos += 1
+      if verbose: print 'path[%d:%d] = "%s"' % (posd, pos, path[posd:pos])
+      path = path[:posd] + '@' + path[posd:pos] + '@' + path[pos:]
+      pos += 2
+   return path

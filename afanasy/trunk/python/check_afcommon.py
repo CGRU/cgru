@@ -20,5 +20,10 @@ elif sys.argv[1] == 'patc':
       print 'Usage: ' + sys.argv[0] + ' ' + sys.argv[1] + ' str'
    else:
       print afcommon.patternFromStdC( sys.argv[2], True)
+elif sys.argv[1] == 'patd':
+   if len(sys.argv) < 3:
+      print 'Usage: ' + sys.argv[0] + ' ' + sys.argv[1] + ' str'
+   else:
+      print afcommon.patternFromDigits( sys.argv[2], True)
 else:
    print 'Unknown command: "%s"' % sys.argv[1]

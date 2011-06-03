@@ -5,7 +5,7 @@ import os
 import re
 import time
 
-import afhoudini
+import afcommon
 
 genParms = {
     'trange'                     : SohoParm('trange'                    ,'int'   , [0],          False),
@@ -98,6 +98,8 @@ if trange == 0:
     f[2] = 1
 
 start,end,by = f
+if end < start: end = start
+if by < 1: by = 1
 
 ftime = time.time()
 tmphip = hip + '/' + jobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
@@ -112,7 +114,7 @@ if drivertypename == 'ifd':
    taskstype = 'hbatch_mantra'
    vm_picture = driver.parm('vm_picture')
    if vm_picture != None:
-      preview = afhoudini.pathToC( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
+      preview = afcommon.patternFromPaths( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
 elif drivertypename == 'rib':
    taskstype = 'hbatch_prman'
 elif drivertypename == 'afanasy':
@@ -131,7 +133,7 @@ if cmd == '':
 else:
    cmd = os.path.join( cmd, 'python')
    cmd = os.path.join( cmd, 'afjob.py')
-cmd += ' %(tmphip)s %(start)d %(end)d -fpr %(fpr)d -node %(hdriver)s -type %(taskstype)s -take %(take)s -name %(jobname)s -deletescene' % vars()
+cmd += ' %(tmphip)s %(start)d %(end)d -by %(by)d -fpr %(fpr)d -node %(hdriver)s -type %(taskstype)s -take %(take)s -name %(jobname)s -deletescene' % vars()
 
 if platform           != '': cmd += ' -os '           + platform
 if priority           != -1: cmd += ' -priority '     + str(priority)

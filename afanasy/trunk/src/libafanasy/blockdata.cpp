@@ -403,11 +403,6 @@ void BlockData::setFramesPerTask( long long perTask)
       AFERROR("BlockData::setFramesPerHost: this block is numeric.")
       return;
    }
-   if( perTask < 1)
-   {
-      AFERROR("BlockData::setFramesPerHost: Frames per task can't be less than 1.")
-      return;
-   }
    frame_pertask = perTask;
 }
 

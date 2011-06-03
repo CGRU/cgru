@@ -5,6 +5,7 @@ import os
 import sys
 
 import af
+import afcommon
 import cgruutils
 import services.service
 
@@ -324,9 +325,10 @@ if   ext == 'shk':
 elif ext == 'nk':
    scenetype = 'nuke'
    cmd = 'nuke' + cmdextension + ' -i'
-   if capmin != -1 or capmax != -1: cmd += ' -m '+ services.service.str_capacity
-   if node != '': cmd += ' -X ' + node
-   cmd += ' -x "' + scene + '" @#@-@#@x' + str(by)
+   cmd += ' -F @#@-@#@x' + str(by)
+   if capmin != -1 or capmax != -1: cmd += ' -m ' + services.service.str_capacity
+   if node != '': cmd += ' -X %s' % node
+   cmd += ' -x "%s"' % scene
 
 # Houdini:
 elif ext == 'hip':
@@ -404,7 +406,7 @@ for cmd in cmds:
    block.setCapacity( capacity)
    block.setVariableCapacity( capmin, capmax)
    if maxruntime != 0: block.setTasksMaxRunTime( maxruntime)
-   if images != '': block.setFiles( images)
+   if images != '': block.setFiles( afcommon.patternFromDigits( afcommon.patternFromStdC( images)))
    blocks.append( block)
    i += 1
 

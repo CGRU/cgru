@@ -2,18 +2,18 @@ import hou
 import os
 
 import af
-import afhoudini
+import afcommon
 
 pwd=hou.pwd()
 asset = os.getenv('ASSET', os.getcwd())
 path = pwd.parm('files').eval()
 start_frame = int(pwd.parm('f1').eval())
 end_frame = int(pwd.parm('f2').eval())
-#step_frame = int(pwd.parm('f3').eval())
-command = afhoudini.pathToC( pwd.parm('command').evalAsStringAtFrame(start_frame), pwd.parm('command').evalAsStringAtFrame(end_frame))
+step_frame = int(pwd.parm('f3').eval())
+command = afcommon.patternFromPaths( pwd.parm('command').evalAsStringAtFrame(start_frame), pwd.parm('command').evalAsStringAtFrame(end_frame))
 job_name = pwd.parm('jobname').eval()
 depend_mask = pwd.parm('depend_mask').eval()
-preview = afhoudini.pathToC( pwd.parm('preview').evalAsStringAtFrame(start_frame), pwd.parm('preview').evalAsStringAtFrame(end_frame))
+preview = afcommon.patternFromPaths( pwd.parm('preview').evalAsStringAtFrame(start_frame), pwd.parm('preview').evalAsStringAtFrame(end_frame))
 
 start_paused = pwd.parm('start_paused').eval()
 platform = pwd.parm('platform').eval()
@@ -40,7 +40,7 @@ block = af.Block( block_type, block_type)
 block.setWorkingDirectory( asset )
 block.setCommand( command)
 if preview != '': block.setFiles( preview)
-block.setNumeric( start_frame, end_frame, 1)
+block.setNumeric( start_frame, end_frame, 1, step_frame)
 job.blocks.append( block)
 
 job.setDependMask( depend_mask)
@@ -59,4 +59,3 @@ if start_paused:
 
 # Send job to Afanasy server.
 job.send()
-

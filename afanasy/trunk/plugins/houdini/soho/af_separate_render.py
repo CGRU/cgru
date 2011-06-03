@@ -3,13 +3,13 @@ import os
 import time
 
 import af
-import afhoudini
+import afcommon
 
 afnode = hou.pwd()
 f_start = int( afnode.parm('f1').eval())
 f_finish = int( afnode.parm('f2').eval())
+f_inc = int(afnode.parm('f3').eval())
 take = afnode.parm('take').eval()
-#step_frame = int(pwd.parm('f3').eval())
 job_name = afnode.parm('jobname').eval()
 rop = afnode.parm('rop').eval()
 run_rop = afnode.parm('run_rop').eval()
@@ -70,8 +70,8 @@ if read_rop:
    afnode.parm('images').set(images.unexpandedString())
    afnode.parm('files' ).set( files.unexpandedString())
 
-images = afhoudini.pathToC( afnode.parm('images').evalAsStringAtFrame(f_start), afnode.parm('images').evalAsStringAtFrame(f_finish))
-files  = afhoudini.pathToC( afnode.parm('files' ).evalAsStringAtFrame(f_start), afnode.parm('files' ).evalAsStringAtFrame(f_finish))
+images = afcommon.patternFromPaths( afnode.parm('images').evalAsStringAtFrame(f_start), afnode.parm('images').evalAsStringAtFrame(f_finish))
+files  = afcommon.patternFromPaths( afnode.parm('files' ).evalAsStringAtFrame(f_start), afnode.parm('files' ).evalAsStringAtFrame(f_finish))
 
 if run_rop:
    # Calculate temporary hip name:
@@ -92,8 +92,8 @@ if run_rop:
 
    job.setCmdPost('deletefiles "%s"' % tmphip)
    b_generate = af.Block( rop, blocktype)
-   b_generate.setCommand( cmd + ' -s %1 -e %2 --by 1 -t '+take+' '+tmphip+' '+rop)
-   b_generate.setNumeric( f_start, f_finish)
+   b_generate.setCommand( cmd + ' -s @#@ -e @#@ --by %(f_inc)d -t %(take)s %(tmphip)s %(rop)s' % vars())
+   b_generate.setNumeric( f_start, f_finish, 1, f_inc)
    if join_render: b_generate.setFiles( images)
 
 if not join_render:
@@ -106,7 +106,7 @@ if not join_render:
    if temp_images: command += 't'
    if tile_render:
       command += 'c %(divx)d %(divy)d' % vars()
-      b_render.setCommand( command + ' %1')
+      b_render.setCommand( command + ' @#@')
       b_render.setFramesPerTask( -tiles)
       for frame in range( f_start, f_finish + 1):
          arguments = afnode.parm('arguments').evalAsStringAtFrame( frame)
@@ -117,7 +117,7 @@ if not join_render:
    else:
       if delete_files or temp_images: command += ' -R '
       else: command +=  ' -V a '
-      arguments = afhoudini.pathToC( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
+      arguments = afcommon.patternFromPaths( afnode.parm('arguments').evalAsStringAtFrame(f_start), afnode.parm('arguments').evalAsStringAtFrame(f_finish))
       b_render.setCommand( command + arguments)
       b_render.setFiles( images)
       b_render.setNumeric( f_start, f_finish)

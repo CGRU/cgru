@@ -5,9 +5,6 @@ import os
 import re
 import time
 
-import services.service
-from afpathmap import PathMap
-
 RenderNodeClassName = 'Write'
 DailiesNodeClassName = 'cgru_dailies'
 AfanasyNodeClassName = 'afanasy'
@@ -208,6 +205,8 @@ class BlockParameters:
       if self.wnode.Class() == RenderNodeClassName:
          block = af.Block( self.name, AfanasyServiceType)
          block.setNumeric( self.framefirst, self.framelast, self.framespertask)
+         afcommon = __import__('afcommon', globals(), locals(), [])
+         self.imgfile = afcommon.patternFromDigits( afcommon.patternFromStdC( self.imgfile))
          block.setFiles( self.imgfile)
          if self.capacity != -1: block.setCapacity( self.capacity)
 
@@ -216,6 +215,7 @@ class BlockParameters:
          cmdargs = ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
          if self.capacitymin != -1 or self.capacitymax != -1:
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
+            services = __import__('services.service', globals(), locals(), [])
             threads = services.service.str_capacity
          cmd = cmd.replace('AF_THREADS', threads)
          block.setCommand( cmd + cmdargs)
@@ -566,7 +566,9 @@ def renderNodes( nodes, fparams, storeframes):
       nuke.message('No jobs generated.')
       return
 
-   pm = PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
+   
+   afpathmap = __import__('afpathmap', globals(), locals(), [])
+   pm = afpathmap.PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
 
    changed = nuke.modified()
    for i in range(len(jobs)):

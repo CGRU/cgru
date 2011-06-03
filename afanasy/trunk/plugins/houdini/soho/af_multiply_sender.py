@@ -6,7 +6,7 @@ import re
 import time
 
 import af
-import afhoudini
+import afcommon
 
 genParms = {
     'trange'                     : SohoParm('trange'                    ,'int'   , [0],          False),
@@ -68,6 +68,8 @@ if job_trange == 0:
    f[2] = 1
 
 job_start, job_end, job_by = f
+if job_end < job_start: job_end = job_start
+if job_by < 1: job_by = 1
 
 ftime = time.time()
 tmphip = hip + '/' + job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
@@ -115,7 +117,7 @@ for i in xrange(0,lenInputs):
       block_end   = int(node.parm('f2').eval())
       block_by    = int(node.parm('f3').eval())
 #   print name+' %(block_start)d %(block_end)d %(block_by)d' % vars()
-   block_cmd  = 'hrender_af -s %%1 -e %%2 --by 1 -t %(take)s %(tmphip)s %(block_driver)s' % vars()
+   block_cmd  = 'hrender_af -s @#@ -e @#@ --by 1 -t %(take)s %(tmphip)s %(block_driver)s' % vars()
    block_type = 'hbatch'
    preview = ''
 
@@ -143,13 +145,13 @@ for i in xrange(0,lenInputs):
 
    if nodeType == 'ifd':
       block_type += '_mantra'
-      preview = afhoudini.pathToC( node.parm('vm_picture').evalAsStringAtFrame(block_start), node.parm('vm_picture').evalAsStringAtFrame(block_end))
+      preview = afcommon.patternFromPaths( node.parm('vm_picture').evalAsStringAtFrame(block_start), node.parm('vm_picture').evalAsStringAtFrame(block_end))
    elif nodeType == 'rib':
       block_type += '_prman'
-      preview = afhoudini.pathToC( node.parm('ri_display').evalAsStringAtFrame(block_start), node.parm('ri_display').evalAsStringAtFrame(block_end))
+      preview = afcommon.patternFromPaths( node.parm('ri_display').evalAsStringAtFrame(block_start), node.parm('ri_display').evalAsStringAtFrame(block_end))
    elif nodeType == 'af_cmd_sender':
-      preview  =  afhoudini.pathToC( node.parm('preview').evalAsStringAtFrame(block_start), node.parm('preview').evalAsStringAtFrame(block_end))
-      block_cmd = afhoudini.pathToC( node.parm('command').evalAsStringAtFrame(block_start), node.parm('command').evalAsStringAtFrame(block_end))
+      preview  =  afcommon.patternFromPaths( node.parm('preview').evalAsStringAtFrame(block_start), node.parm('preview').evalAsStringAtFrame(block_end))
+      block_cmd = afcommon.patternFromPaths( node.parm('command').evalAsStringAtFrame(block_start), node.parm('command').evalAsStringAtFrame(block_end))
       if block_cmd.find('mantra') > -1:
          block_type = 'mantra'
       elif  block_cmd.find('prman') > -1:

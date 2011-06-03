@@ -6,7 +6,7 @@ import re
 import time
 
 import af
-import afhoudini
+import afcommon
 import services.service
 
 genParms = {
@@ -105,6 +105,8 @@ if trange == 0:
     f[2] = 1
 
 start,end,by = f
+if end < start: end = start
+if by < 1: by = 1
 
 ftime = time.time()
 tmphip = hip + '/' + jobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
@@ -114,7 +116,7 @@ hou.hscript('mwrite -n %s' % tmphip)
 
 jobcmd = 'hrender_af'
 if ignore_inputs: jobcmd += ' -i'
-jobargs = ' -s %%1 -e %%2 --by %(by)d -t %(take)s %(tmphip)s %(hdriver)s' % vars()
+jobargs = ' -s @#@ -e @#@ --by %(by)d -t %(take)s %(tmphip)s %(hdriver)s' % vars()
 
 blocktype = 'hbatch'
 preview = ''
@@ -123,7 +125,7 @@ if drivertypename == 'ifd':
    blocktype = 'hbatch_mantra'
    vm_picture = driver.parm('vm_picture')
    if vm_picture != None:
-      preview = afhoudini.pathToC( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
+      preview = afcommon.patternFromPaths( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
 elif drivertypename == 'rib':
    blocktype = 'hbatch_prman'
 elif drivertypename == 'afanasy':
@@ -147,7 +149,7 @@ if platform != '':
 
 block = af.Block( hdriver, blocktype)
 block.setWorkingDirectory( os.getenv('PWD', os.getcwd()))
-block.setNumeric( start, end, fpr)
+block.setNumeric( start, end, fpr, by)
 if preview != '': block.setFiles( preview)
 job.blocks.append( block)
 

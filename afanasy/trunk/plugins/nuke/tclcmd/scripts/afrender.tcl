@@ -12,19 +12,20 @@ proc afrender {args} {
 
    set first         [lindex $args  1]
    set last          [lindex $args  2]
-   set fpr           [lindex $args  3]
-   set startpaused   [lindex $args  4]
-   set priority      [lindex $args  5]
-   set maxhosts      [lindex $args  6]
-   set hostsmask     [lindex $args  7]
-   set hostsexcl     [lindex $args  8]
-   set dependmask    [lindex $args  9]
-   set dependglbl    [lindex $args 10]
-   set jobname       [lindex $args 11]
-   set capacity      [lindex $args 12]
-   set capmin        [lindex $args 13]
-   set capmax        [lindex $args 14]
-   set platform      [lindex $args 15]
+   set inc           [lindex $args  3]
+   set fpr           [lindex $args  4]
+   set startpaused   [lindex $args  5]
+   set priority      [lindex $args  6]
+   set maxhosts      [lindex $args  7]
+   set hostsmask     [lindex $args  8]
+   set hostsexcl     [lindex $args  9]
+   set dependmask    [lindex $args 10]
+   set dependglbl    [lindex $args 11]
+   set jobname       [lindex $args 12]
+   set capacity      [lindex $args 13]
+   set capmin        [lindex $args 14]
+   set capmax        [lindex $args 15]
+   set platform      [lindex $args 16]
 
    if {$first > $last} {
       alert "First frame > Last frame"
@@ -55,7 +56,7 @@ proc afrender {args} {
    set cmd [file join $cmd "python"]
    set cmd [file join $cmd "afjob.py"]
    set cmd "python $cmd"
-   append cmd " $namesctmp $first $last -fpr $fpr -node $namewrite -name \"$jobname\" -images \"$images\" -deletescene"
+   append cmd " $namesctmp $first $last -fpr $fpr -by $inc -node $namewrite -name \"$jobname\" -images \"$images\" -deletescene"
 
    if { $startpaused      } { append cmd " -pause"                      }
    if { $platform == "Any"} { append cmd " -os any"                     }

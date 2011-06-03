@@ -200,9 +200,9 @@ void BlockInfo::refresh()
       tasksinfo += QString("(%1-%2").arg( frame_first).arg( frame_last);
       if(( frame_pertask > 1 ) || ( frame_inc > 1 ))
       {
-         tasksinfo += QString("/%1").arg( frame_pertask);
+         tasksinfo += QString(":%1").arg( frame_pertask);
          if( frame_inc > 1 )
-            tasksinfo += QString(":%1").arg( frame_inc);
+            tasksinfo += QString("/%1").arg( frame_inc);
       }
       tasksinfo += ")";
    }
