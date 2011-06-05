@@ -76,6 +76,9 @@ public:
 /// Set tasks depend mask.
    bool setTasksDependMask( const std::string & str);
 
+/// Set sub task depend mask.
+   bool setSubTaskDependMask( const std::string & str);
+
 /// Set tasks capacity.
    bool setCapacity( int value );
 

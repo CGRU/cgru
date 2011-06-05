@@ -178,6 +178,7 @@ void BlockData::readwrite( Msg * msg)
       rw_int32_t ( need_hdd,              msg);
       rw_RegExp  ( dependmask,            msg);
       rw_RegExp  ( tasksdependmask,       msg);
+      rw_RegExp  ( subtaskdependmask,     msg);
       rw_RegExp  ( hostsmask,             msg);
       rw_RegExp  ( hostsmask_exclude,     msg);
       rw_RegExp  ( need_properties,       msg);

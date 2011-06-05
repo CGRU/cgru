@@ -60,6 +60,10 @@ bool Block::setTasksDependMask( const std::string & str )
 {
    return af::BlockData::setTasksDependMask( str);
 }
+bool Block::setSubTaskDependMask( const std::string & str )
+{
+   return af::BlockData::setSubTaskDependMask( str);
+}
 bool Block::setHostsMask( const std::string & str )
 {
    return af::BlockData::setHostsMask( str);

@@ -148,6 +148,14 @@ PyObject * PyAf_Block_setTasksDependMask( PyAf_Block_Object *self, PyObject *arg
    Py_RETURN_FALSE;
 }
 
+PyObject * PyAf_Block_setSubTaskDependMask( PyAf_Block_Object *self, PyObject *arg)
+{
+   std::string str;
+   if( false == PyAf::GetString(arg, str, "PyAf_Block_setSubTaskDependMask")) Py_RETURN_FALSE;
+   if( self->block->setSubTaskDependMask( str)) Py_RETURN_TRUE;
+   Py_RETURN_FALSE;
+}
+
 PyObject * PyAf_Block_setNeedProperties( PyAf_Block_Object *self, PyObject *arg)
 {
    std::string str;

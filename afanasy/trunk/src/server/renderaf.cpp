@@ -163,16 +163,16 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
       MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
       msg->setAddress( this);
       msg->dispatch();
-/*      std::string str = "Starting task: ";
+      std::string str = "Starting task: ";
       str += taskexec->generateInfoString( false);
-      appendLog( str);*/
+      appendTasksLog( str);
    }
-/*   else
+   else
    {
       std::string str = "Captured by task: ";
       str += taskexec->generateInfoString( false);
-      appendLog( str);
-   }*/
+      appendTasksLog( str);
+   }
 }
 
 void RenderAf::startTask( af::TaskExec *taskexec)
@@ -475,18 +475,18 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
 {
    removeTask( taskexec);
    remService( taskexec->getServiceType());
-/*   if( taskexec->getNumber())
+   if( taskexec->getNumber())
    {
       std::string str = "Finished service: ";
       str += taskexec->generateInfoString( false);
-      appendLog( str);
+      appendTasksLog( str);
    }
    else
    {
       std::string str = "Finished task: ";
       str += taskexec->generateInfoString( false);
-      appendLog( str);
-   }*/
+      appendTasksLog( str);
+   }
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
 }
 
@@ -571,6 +571,12 @@ void RenderAf::appendLog( const std::string & message)
 {
    while( loglist.size() > af::Environment::getRenderLogLinesMax() ) loglist.pop_front();
    loglist.push_back( af::time2str() + " : " + message);
+}
+
+void RenderAf::appendTasksLog( const std::string & message)
+{
+   while( tasksloglist.size() > af::Environment::getRenderLogLinesMax() ) tasksloglist.pop_front();
+   tasksloglist.push_back( af::time2str() + " : " + message);
 }
 
 bool RenderAf::getFarmHost( af::Host * newHost)
@@ -701,8 +707,8 @@ void RenderAf::addService( const std::string & type)
       {
          servicescounts[i]++;
          if((host.getServiceCount(i) > 0 ) && (servicescounts[i] > host.getServiceCount(i)))
-            AFERRAR("RenderAf::addService: servicescounts > host.getServiceCount for '%s' (%d>=%d)\n",
-                    type.c_str(), servicescounts[i], host.getServiceCount(i));
+            AFERRAR("RenderAf::addService: servicescounts > host.getServiceCount for '%s' (%d>=%d)",
+                    type.c_str(), servicescounts[i], host.getServiceCount(i))
          return;
       }
    }
@@ -718,8 +724,7 @@ void RenderAf::remService( const std::string & type)
       {
          if( servicescounts[i] < 1)
          {
-            AFERRAR("RenderAf::remService: servicescounts < 1 for '%s' (=%d)\n",
-                    type.c_str(), servicescounts[i]);
+            AFERRAR("RenderAf::remService: servicescounts < 1 for '%s' (=%d)", type.c_str(), servicescounts[i])
          }
          else
             servicescounts[i]--;

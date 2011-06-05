@@ -101,6 +101,7 @@ public:
 /**/TRenderId/**/,
 /**/TRendersListRequest/**/,        ///< Request online Renders list message.
 /**/TRenderLogRequestId/**/,        ///< Request a log of Render with given id.
+/**/TRenderTasksLogRequestId/**/,   ///< Request a log of Render with given id.
 /**/TRenderInfoRequestId/**/,       ///< Request a string information about a Render with given id.
 /**/TRenderDeregister/**/,          ///< Deregister Render with given id.
 
@@ -284,6 +285,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 
 /**/TBlockDependMask/**/,           ///< Set block depend mask.
 /**/TBlockTasksDependMask/**/,      ///< Set block tasks depend mask.
+/**/TBlockSubTaskDependMask/**/,    ///< Set block sub task depend mask.
 /**/TBlockTasksMaxRunTime/**/,      ///< Set block tasks maximum run time.
 /**/TBlockHostsMask/**/,            ///< Set block hosts mask.
 /**/TBlockHostsMaskExclude/**/,     ///< Set block exclude hosts mask.

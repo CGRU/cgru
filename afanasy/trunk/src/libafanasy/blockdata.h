@@ -110,6 +110,9 @@ public:
 /// Set block tasks depend mask.
    bool setTasksDependMask(   const std::string & str, std::string * errOutput = NULL)
       { return setRegExp( tasksdependmask, str, "block tasks depend mask", errOutput);}
+/// Set block sub task depend mask.
+   bool setSubTaskDependMask(   const std::string & str, std::string * errOutput = NULL)
+      { return setRegExp( subtaskdependmask, str, "block sub task depend mask", errOutput);}
 
    bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
       { return setRegExp( need_properties, str, "block host properties needed", errOutput);}
@@ -148,6 +151,7 @@ public:
 
    inline const std::string & getDependMask()        const { return dependmask.getPattern();       }  ///< Get depend mask.
    inline const std::string & getTasksDependMask()   const { return tasksdependmask.getPattern();  }  ///< Get tasks depend mask.
+   inline const std::string & getSubTaskDependMask() const { return subtaskdependmask.getPattern();}  ///< Get sub task depend mask.
    inline const std::string & getHostsMask()         const { return hostsmask.getPattern();        }  ///< Block hosts mask.
    inline const std::string & getHostsMaskExclude()  const { return hostsmask_exclude.getPattern();}  ///< Block hosts exclude mask.
    inline const std::string & getNeedProperties()    const { return need_properties.getPattern();  }  ///< Block need_properties.
@@ -300,6 +304,7 @@ protected:
 
    RegExp dependmask;
    RegExp tasksdependmask;
+   RegExp subtaskdependmask;
    RegExp hostsmask;
    RegExp hostsmask_exclude;
    RegExp need_properties;

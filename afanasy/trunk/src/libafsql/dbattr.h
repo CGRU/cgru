@@ -103,6 +103,7 @@ public:
          _need_os,
          _need_properties,
          _services_disabled,
+         _subtaskdependmask,
          _tasksdependmask,
          _wdir,
       _STRINGEXPR_END_,

@@ -235,6 +235,17 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       msg_response->setStringList( render->getLog());
       break;
    }
+   case af::Msg::TRenderTasksLogRequestId:
+   {
+      AfContainerLock lock( renders,  AfContainer::READLOCK);
+
+      RenderContainerIt rendersIt( renders);
+      RenderAf* render = rendersIt.getRender( msg->int32());
+      if( render == NULL ) break;
+      msg_response = new MsgAf;
+      msg_response->setStringList( render->getTasksLog());
+      break;
+   }
    case af::Msg::TRenderInfoRequestId:
    {
       AfContainerLock lock( renders,  AfContainer::READLOCK);
