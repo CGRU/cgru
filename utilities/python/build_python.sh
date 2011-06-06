@@ -23,13 +23,22 @@ fi
 
 cd $pythonsrc
 
+flags="$flags --prefix=$pythondir"
+flags="$flags --exec-prefix=$pythondir"
+if [ "$options" != "-utf16" ]; then
+   if [[ "$pythonver" > "3" ]]; then
+      flags="$flags --with-wide-unicode"
+   else
+      flags="$flags --enable-unicode=ucs4"
+   fi
+fi
+flags="$flags $extra"
+
 if [ "$2" == "-h" ]; then
    ./configure -h
+   echo "FLAGS = \"$flags\""
 else
-   flags="$flags --prefix=$pythondir"
-   flags="$flags --exec-prefix=$pythondir"
-   [ "$options" == "-utf32" ] && flags="$flags --with-wide-unicode"
-   flags="$flags $extra"
+   echo "FLAGS = \"$flags\""
    ./configure $flags
    make
    make install
