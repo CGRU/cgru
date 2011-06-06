@@ -44,7 +44,8 @@ bool PyAf::GetString( PyObject * obj, std::string & str, const char * errMsg)
       str = PyBytes_AsString( obj);
       return true;
    }
-   else if( PyUnicode_Check(obj))
+#endif
+   if( PyUnicode_Check(obj))
    {
       obj = PyUnicode_AsUTF8String( obj);
       if( obj == NULL )
@@ -56,8 +57,7 @@ bool PyAf::GetString( PyObject * obj, std::string & str, const char * errMsg)
       Py_DECREF( obj);
       return true;
    }
-#endif
-   outError("Object is not a bytes array or string.", errMsg);
+   outError("Object is not a bytes array, string or unicode.", errMsg);
 
    return false;
 }

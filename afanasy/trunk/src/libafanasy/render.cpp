@@ -120,7 +120,8 @@ void Render::setCapacity( int value)
 void Render::checkDirty()
 {
    if( capacity == host.capacity ) capacity = -1;
-   if(( capacity == -1 ) && ( services_disabled.empty() ))
+   if( maxtasks == host.maxtasks ) maxtasks = -1;
+   if(( capacity == -1 ) && ( maxtasks == -1 ) && ( services_disabled.empty() ))
       state = state | SDirty;
    else
       state = state & (~SDirty);
@@ -129,6 +130,7 @@ void Render::checkDirty()
 void Render::restoreDefaults()
 {
    capacity = host.capacity;
+   maxtasks = host.maxtasks;
    services_disabled.clear();
    state = state & (~SDirty);
 }
