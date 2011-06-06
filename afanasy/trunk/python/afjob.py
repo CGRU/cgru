@@ -343,7 +343,7 @@ elif ext == 'hip':
 # Maya:
 elif ext == 'mb':
    scenetype = 'maya'
-   cmd = 'maya' + cmdextension + ' -batch -file "' + scene + '" -command "afanasyBatch(%1,%2,1,1)"'
+   cmd = 'maya' + cmdextension + ' -batch -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1)"'
 
 # XSI:
 elif ext == 'scn':
