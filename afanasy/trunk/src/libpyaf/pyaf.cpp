@@ -53,7 +53,11 @@ bool PyAf::GetString( PyObject * obj, std::string & str, const char * errMsg)
          outError("PyUnicode object encoding problems.", errMsg);
          return false;
       }
+#if PY_MAJOR_VERSION < 3
+      str = PyString_AsString( obj);
+#else
       str = PyBytes_AsString( obj);
+#endif
       Py_DECREF( obj);
       return true;
    }
