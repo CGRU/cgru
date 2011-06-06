@@ -169,8 +169,6 @@ if Timesuffix:
 Output = Output.strip('" ')
 afjobname = os.path.basename( Output)
 if datetimesuffix != '': Output += '_' + datetimesuffix
-if Codec.find('xvid') != -1: Output += '.avi'
-else: Output += '.mov'
 if Verbose: print 'Output = ' + Output
 
 # Resolution:
@@ -369,7 +367,7 @@ for i in range(2):
          cmd += ' "%s"' % logopath[i]
          cmd += ' -gravity %s -background black' % logograv[i]
          cmd += ' -resize %dx%d' % ( logow, logoh)
-         cmd += ' -extent %dx%d' % ( Width-Width/15, Height-Height/15)
+         cmd += ' -extent %dx%d' % ( Width, Height)
          tmplogo[i] = os.path.join( TmpDir, tmplogo[i])
          cmd += ' "%s"' % tmplogo[i]
       else:

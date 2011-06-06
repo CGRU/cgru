@@ -1,2 +1,2 @@
 QuickTime H.264 Good
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_common.ffpreset" -crf 18 "@OUTPUT@"
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_common.ffpreset" -crf 18 "@OUTPUT@.mov"

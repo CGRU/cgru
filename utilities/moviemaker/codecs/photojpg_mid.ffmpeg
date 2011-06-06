@@ -1,2 +1,2 @@
 QuickTime PhotoJPG (mid)
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec mjpeg -qmin 2 -qmax 4 "@OUTPUT@"
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec mjpeg -qmin 2 -qmax 4 "@OUTPUT@.mov"

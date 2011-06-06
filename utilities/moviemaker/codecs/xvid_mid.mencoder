@@ -1,2 +1,2 @@
 MPEG 4 XVID (mid)
-mencoder mf://@INPUT@ -mf fps=@FPS@ -o @OUTPUT@ -ovc xvid -xvidencopts bitrate=16000
+mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.avi" -ovc xvid -xvidencopts bitrate=16000
