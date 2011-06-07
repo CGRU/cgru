@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=4.7.2
+ver=4.7.3
 qtsrc=qt-everywhere-opensource-src-$ver
 qtdir=$PWD/$ver
 

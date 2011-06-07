@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=4.7.2
+ver=4.7.3
 lcation="http://get.qt.nokia.com/qt/source"
 foldername="qt-everywhere-opensource-src-$ver"
 archive_ext="tar.gz"
