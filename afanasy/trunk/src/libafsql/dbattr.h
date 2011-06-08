@@ -20,7 +20,6 @@ public:
       _NUMERIC_BEGIN_,
 
       _INTEGER_BEGIN_,
-//         _administrator, // temp, should be in _flags
          _blocksnum,
          _capacity,
          _capcoeff_max,
@@ -98,8 +97,10 @@ public:
          _description,
          _environment,
          _files,
+         _ipaddresses,
          _hostsmask,
          _hostsmask_exclude,
+         _macaddresses,
          _need_os,
          _need_properties,
          _services_disabled,

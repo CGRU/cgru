@@ -243,7 +243,10 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       RenderAf* render = rendersIt.getRender( msg->int32());
       if( render == NULL ) break;
       msg_response = new MsgAf;
-      msg_response->setStringList( render->getTasksLog());
+      if( render->getTasksLog().empty())
+         msg_response->setString("No tasks execution log.");
+      else
+         msg_response->setStringList( render->getTasksLog());
       break;
    }
    case af::Msg::TRenderInfoRequestId:
@@ -582,9 +585,11 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockResetErrorHosts:
    case af::Msg::TBlockDependMask:
    case af::Msg::TBlockTasksDependMask:
+   case af::Msg::TBlockSubTaskDependMask:
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:
    case af::Msg::TBlockMaxRunningTasks:
+   case af::Msg::TBlockMaxRunTasksPerHost:
    case af::Msg::TBlockCommand:
    case af::Msg::TBlockWorkingDir:
    case af::Msg::TBlockFiles:
@@ -626,6 +631,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderAnnotate:
    case af::Msg::TRenderSetPriority:
    case af::Msg::TRenderSetCapacity:
+   case af::Msg::TRenderSetMaxTasks:
    case af::Msg::TRenderSetService:
    case af::Msg::TRenderRestoreDefaults:
    case af::Msg::TRenderSetNIMBY:

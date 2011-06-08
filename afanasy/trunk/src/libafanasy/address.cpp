@@ -119,6 +119,37 @@ bool Address::equal( const af::Address & other ) const
    return false;
 }
 
+Address::Address( const std::string & str)
+{
+   clear();
+   if( str.empty()) return;
+
+   unsigned int ip6[8];
+   int fields6 = sscanf( str.c_str(), "%x:%x:%x:%x:%x:%x:%x:%x", &(ip6[0]),&(ip6[1]),&(ip6[2]),&(ip6[3]),&(ip6[4]),&(ip6[5]),&(ip6[6]),&(ip6[7]));
+   if( fields6 == 8 )
+   {
+      family = IPv6;
+      for( int i = 0; i < 8; i++)
+      {
+         uint8_t byte0 = ip6[i] >> 8;
+         uint8_t byte1 = ip6[i] - (byte0 << 8);
+         addr[2*i+0]   = byte0;
+         addr[2*i+1]   = byte1;
+      }
+      return;
+   }
+
+   unsigned int ip4[4];
+   int fields4 = sscanf( str.c_str(), "%u.%u.%u.%u", &(ip4[0]),&(ip4[1]),&(ip4[2]),&(ip4[3]));
+   if( fields4 == 4 )
+   {
+      family = IPv4;
+      for( int i = 0; i < 4; i++) addr[i] = ip4[i];
+      return;
+   }
+   AFERRAR("String \"%s\" is not an IP address.", str.c_str())
+}
+
 Address::Address( Msg * msg)
 {
    read( msg);
@@ -200,9 +231,17 @@ void Address::generateIPStream( std::ostringstream & stream, bool full) const
             if( i != 0 ) stream << ':';
             uint8_t byte0 = uint8_t(addr[2*i]);
             uint8_t byte1 = uint8_t(addr[2*i+1]);
-            if( byte0 ) sprintf( buffer, "%x%02x", byte0, byte1);
-            else if( byte1 ) sprintf( buffer, "%x", byte1);
-            if( byte0 || byte1 ) stream << buffer;
+            if( full )
+            {
+               if( byte0 ) sprintf( buffer, "%x%02x", byte0, byte1);
+               else if( byte1 ) sprintf( buffer, "%x", byte1);
+               if( byte0 || byte1 ) stream << buffer;
+            }
+            else
+            {
+               sprintf( buffer, "%02x%02x", byte0, byte1);
+               stream << buffer;
+            }
          }
          break;
       }
@@ -210,7 +249,8 @@ void Address::generateIPStream( std::ostringstream & stream, bool full) const
          if( full ) stream << "Empty address";
          break;
       default:
-         stream << "Unknown address family";
+         if( full ) stream << "Unknown address family";
+         else stream << "AF=" << family;
          break;
    }
 }
@@ -249,7 +289,7 @@ void Address::generateInfoStream( std::ostringstream & stream, bool full) const
       }
    }
    generateIPStream( stream, full);
-   if( notEmpty())
+   if( notEmpty() && ( port != 0))
    {
       stream << ":";
       generatePortStream( stream, full);

@@ -11,11 +11,14 @@ class NetIF : public Af
 {
 public:
 
-/// Constructor.
+/// Constructor:
    NetIF( const char * Name, const unsigned char * MacAddr, const std::vector<Address> ifAddresses = std::vector<Address>());
 
-/// Construct from message.
+/// Construct from message:
    NetIF( Msg * msg);
+
+/// Construct from string:
+   NetIF( const std::string & str);
 
    ~NetIF();
 
@@ -23,6 +26,8 @@ public:
 
    const std::string getMACAddrString( bool withSeparators = false) const;
    const std::string & getName() const { return name;}
+
+   inline bool isNull() const { for( int i = 0; i < MacAddrLen; i++) if( macaddr[i] != 0 ) return false; return true; }
 
    int calcWeight() const;
 
@@ -33,6 +38,9 @@ public:
 
    /// Search for interfaces and assinged addresses
    static void getNetIFs( std::vector<NetIF*> & netIFs, bool verbose = false);
+
+   /// Parse string to get mac addresses
+   static void getNetIFs( std::string str, std::vector<NetIF*> & netIFs);
 
    void readwrite( Msg * msg);
 

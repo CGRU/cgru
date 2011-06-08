@@ -139,7 +139,10 @@ void Block::errorHostsReset()
 
 void Block::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
+   // Store block name in task executable:
    taskexec->setBlockName( data->getName());
+
+   // Set variable capacity to maximum value:
    if( data->canVarCapacity() && (taskexec->getCapacity() > 0))
    {
       int cap_coeff = render->getCapacityFree() / taskexec->getCapacity();
@@ -154,11 +157,22 @@ void Block::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContai
       }
    }
 
+   // Store render pointer:
+   addRenderCounts( render);
+
    tasks[taskexec->getTaskNum()]->start( taskexec, data->getRunningTasksCounter(), render, monitoring);
+}
+
+void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
+{
+   remRenderCounts( render);
 }
 
 bool Block::canRun( RenderAf * render)
 {
+   // check max running tasks on the same host:
+   if(  data->getMaxRunTasksPerHost() == 0 ) return false;
+   if(( data->getMaxRunTasksPerHost()  > 0 ) && ( getRenderCounts(render) >= data->getMaxRunTasksPerHost() )) return false;
    // check available capacity:
    if( false == render->hasCapacity( data->getCapMinResult())) return false;
    // render services:
@@ -182,6 +196,47 @@ bool Block::canRun( RenderAf * render)
    if( false == data->checkNeedProperties( render->getHost().properties)) return false;
 
    return true;
+}
+
+void Block::addRenderCounts( RenderAf * render)
+{
+   std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
+   std::list<int>::iterator cit = renders_counts.begin();
+   for( ; rit != renders_ptrs.end(); rit++, cit++)
+      if( render == *rit )
+      {
+         (*cit)++;
+         return;
+      }
+   renders_ptrs.push_back( render);
+   renders_counts.push_back( 1);
+}
+
+int Block::getRenderCounts( RenderAf * render) const
+{
+   std::list<RenderAf*>::const_iterator rit = renders_ptrs.begin();
+   std::list<int>::const_iterator cit = renders_counts.begin();
+   for( ; rit != renders_ptrs.end(); rit++, cit++)
+      if( render == *rit ) return *cit;
+   return 0;
+}
+
+void Block::remRenderCounts( RenderAf * render)
+{
+   std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
+   std::list<int>::iterator cit = renders_counts.begin();
+   for( ; rit != renders_ptrs.end(); rit++, cit++)
+      if( render == *rit )
+      {
+         if( *cit > 1 )
+            (*cit)--;
+         else
+         {
+            renders_ptrs.erase( rit);
+            renders_counts.erase( cit);
+         }
+         return;
+      }
 }
 
 bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
@@ -365,6 +420,17 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
       }
       break;
    }
+   case af::Msg::TBlockSubTaskDependMask:
+   {
+      if( data->setSubTaskDependMask( mcgeneral.getString()));
+      {
+         appendJobLog( std::string("Sub task depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
+         if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
+         jobchanged = af::Msg::TMonitorJobsChanged;
+         AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_subtaskdependmask);
+      }
+      break;
+   }
    case af::Msg::TBlockCommand:
    {
       data->setCommand( mcgeneral.getString());
@@ -422,10 +488,19 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    case af::Msg::TBlockMaxRunningTasks:
    {
       data->setMaxRunningTasks( mcgeneral.getNumber());
-      appendJobLog( std::string("Maximum hosts set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
+      appendJobLog( std::string("Maximum running tasks set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_maxrunningtasks);
+      break;
+   }
+   case af::Msg::TBlockMaxRunTasksPerHost:
+   {
+      data->setMaxRunTasksPerHost( mcgeneral.getNumber());
+      appendJobLog( std::string("Maximum running tasks on the same host set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
+      if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
+      jobchanged = af::Msg::TMonitorJobsChanged;
+      AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_maxruntasksperhost);
       break;
    }
    case af::Msg::TBlockService:

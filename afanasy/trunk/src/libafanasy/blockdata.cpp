@@ -84,13 +84,13 @@ void BlockData::construct()
    runningtasks_counter = 0;
 
    dependmask.setCaseSensitive();
+   tasksdependmask.setCaseSensitive();
+   subtaskdependmask.setCaseSensitive();
 
    hostsmask.setCaseInsensitive();
 
    hostsmask_exclude.setCaseInsensitive();
    hostsmask_exclude.setExclude();
-
-   tasksdependmask.setCaseSensitive();
 
    need_properties.setCaseSensitive();
    need_properties.setContain();
@@ -173,6 +173,7 @@ void BlockData::readwrite( Msg * msg)
       rw_uint16_t( multihost_waitmax,     msg);
       rw_int32_t ( capacity,              msg);
       rw_int32_t ( maxrunningtasks,       msg);
+      rw_int32_t ( maxruntasksperhost,    msg);
       rw_int32_t ( need_memory,           msg);
       rw_int32_t ( need_power,            msg);
       rw_int32_t ( need_hdd,              msg);
@@ -656,6 +657,7 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 
       if(        dependmask.notEmpty()) stream << "\n Depend Mask = "         << dependmask.getPattern();
       if(   tasksdependmask.notEmpty()) stream << "\n Tasks Depend Mask = "   << tasksdependmask.getPattern();
+      if( subtaskdependmask.notEmpty()) stream << "\n Sub Task Depend Mask = "<< subtaskdependmask.getPattern();
       if(         hostsmask.notEmpty()) stream << "\n Hosts Mask = "          << hostsmask.getPattern();
       if( hostsmask_exclude.notEmpty()) stream << "\n Exclude Hosts Mask = "  << hostsmask_exclude.getPattern();
 

@@ -85,6 +85,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       errors_tasksamehost  = block->getErrorsTaskSameHost();
       errors_forgivetime   = block->getErrorsForgiveTime();
       maxrunningtasks      = block->getMaxRunningTasks();
+      maxruntasksperhost   = block->getMaxRunTasksPerHost();
       need_memory          = block->getNeedMemory();
       need_power           = block->getNeedPower();
       need_hdd             = block->getNeedHDD();
@@ -94,6 +95,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       need_properties      = afqt::stoq(block->getNeedProperties());
       dependmask           = afqt::stoq(block->getDependMask());
       tasksdependmask      = afqt::stoq(block->getTasksDependMask());
+      subtaskdependmask    = afqt::stoq(block->getSubTaskDependMask());
       capacity             = block->getCapacity();
       filesize_min         = block->getFileSizeMin();
       filesize_max         = block->getFileSizeMax();
@@ -105,12 +107,12 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost_waitsrv    = block->getMultiHostWaitSrv();
       service              = afqt::stoq( block->getService());
 
-      maxrunningtasks_str = QString::number( maxrunningtasks);
 
       depends.clear();
       if( false == dependmask.isEmpty()) depends += QString(" D(%1)").arg( dependmask);
-      if( false == tasksdependmask.isEmpty()) depends += QString(" TD[%1]").arg( tasksdependmask);
-      if( false == depends.isEmpty()) if( name.isEmpty()) depends = " Depends: " + depends;
+      if( false == tasksdependmask.isEmpty()) depends += QString(" T[%1]").arg( tasksdependmask);
+      if( false == subtaskdependmask.isEmpty()) depends += QString(" S[%1]").arg( subtaskdependmask);
+//      if( false == depends.isEmpty()) if( name.isEmpty()) depends = " Depends: " + depends;
 
       icon_large = Watch::getServiceIconLarge( service);
       icon_small = Watch::getServiceIconSmall( service);
@@ -170,7 +172,8 @@ void BlockInfo::refresh()
 
    if( tasksmaxruntime) str_properties += QString(" Max%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
 
-   if( maxrunningtasks != -1 ) str_properties += QString(" m%1").arg(maxrunningtasks_str);
+   if( maxrunningtasks    != -1 ) str_properties += QString(" m%1").arg( maxrunningtasks);
+   if( maxruntasksperhost != -1 ) str_properties += QString(" mph%1").arg( maxruntasksperhost);
    if( false == hostsmask.isEmpty()          ) str_properties += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()  ) str_properties += QString(" E(%1)").arg( hostsmask_exclude );
    if( false == need_properties.isEmpty()    ) str_properties += QString(" P(%1)").arg( need_properties   );
@@ -446,6 +449,10 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
    menu->addAction( action);
 
+   action = new ActionIdId( id_block, af::Msg::TBlockSubTaskDependMask, "Set Sub Task Depend Mask", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   menu->addAction( action);
+
    action = new ActionIdId( id_block, af::Msg::TBlockHostsMask, "Set Hosts Mask", qwidget);
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
    menu->addAction( action);
@@ -455,6 +462,10 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    menu->addAction( action);
 
    action = new ActionIdId( id_block, af::Msg::TBlockMaxRunningTasks, "Set Max Running Tasks", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdId( id_block, af::Msg::TBlockMaxRunTasksPerHost, "Set Max Tasks Per Host", qwidget);
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
    menu->addAction( action);
 
@@ -584,6 +595,11 @@ af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, ListItems *
          set_string = QInputDialog::getText( listitems, "Change Tasks Depend Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
          break;
 
+      case af::Msg::TBlockSubTaskDependMask:
+         if( id_block == blocknum ) cur_string = subtaskdependmask;
+         set_string = QInputDialog::getText( listitems, "Change Sub Task Depend Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
+         break;
+
       case af::Msg::TBlockHostsMask:
          if( id_block == blocknum ) cur_string = hostsmask;
          set_string = QInputDialog::getText( listitems, "Change Hosts Mask", "Enter Mask", QLineEdit::Normal, cur_string, &ok);
@@ -597,6 +613,11 @@ af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, ListItems *
       case af::Msg::TBlockMaxRunningTasks:
          if( id_block == blocknum ) cur_number = maxrunningtasks;
          set_number = QInputDialog::getInteger( listitems, "Change Maximum Running Tasks", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
+         break;
+
+      case af::Msg::TBlockMaxRunTasksPerHost:
+         if( id_block == blocknum ) cur_number = maxruntasksperhost;
+         set_number = QInputDialog::getInteger( listitems, "Change Maximum Running Tasks Per Host", "Enter Number", cur_number, -1, INT_MAX, 1, &ok);
          break;
 
       case af::Msg::TBlockNeedProperties:

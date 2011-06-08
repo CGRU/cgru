@@ -52,7 +52,7 @@ public:
             ( false == ( state & SNIMBY )) &&
             ( priority > 0 ) &&
             ( capacity_used < getCapacity() ) &&
-            ( (int)tasks.size() < host.maxtasks ) &&
+            ( (int)tasks.size() < getMaxTasks() ) &&
             ( false == isWOLFalling())
          );}
 
@@ -67,7 +67,9 @@ public:
    inline void setOffline() { state = state & (~SOnline);}
 
    inline void setPriority( int value) { priority = value; }///< Set priority.
-   void setCapacity( int value); ///< Set capacity.
+
+   void setCapacity( int value) { capacity = value; checkDirty();}
+   void setMaxTasks( int value) { maxtasks = value; checkDirty();}
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 

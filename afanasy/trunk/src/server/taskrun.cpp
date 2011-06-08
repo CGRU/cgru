@@ -20,7 +20,7 @@
 TaskRun::TaskRun( Task * runningTask,
                   af::TaskExec* taskExec,
                   af::TaskProgress * taskProgress,
-                  const Block * taskBlock,
+                  Block * taskBlock,
                   RenderAf * render,
                   MonitorContainer * monitoring,
                   int * runningtaskscounter
@@ -260,7 +260,11 @@ void TaskRun::finish( const std::string & message, RenderContainer * renders, Mo
    {
       RenderContainerIt rendersIt( renders);
       RenderAf * render = rendersIt.getRender( hostId);
-      if( render ) render->taskFinished( exec, monitoring);
+      if( render )
+      {
+         render->taskFinished( exec, monitoring);
+         block->taskFinished( exec, render, monitoring);
+      }
    }
 
    task->monitor( monitoring );

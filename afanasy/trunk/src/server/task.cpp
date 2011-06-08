@@ -18,7 +18,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Task::Task( const Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
+Task::Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber):
    block( taskBlock),
    number( taskNumber),
    progress( taskProgress),

@@ -17,6 +17,7 @@ public:
    Address( const Address * other);                ///< Copy given address.
    Address & operator=( const Address & other);    ///< Assignment operator
    Address( const struct sockaddr_storage & ss);   ///< Set address from address storage structure.
+   Address( const std::string & str);              ///< Construct address parsing a string.
    Address( Msg * msg);                            ///< Construct address using raw data.
 
    ~Address();

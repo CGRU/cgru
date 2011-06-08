@@ -60,6 +60,27 @@ NetIF::NetIF( Msg * msg)
    read( msg);
 }
 
+NetIF::NetIF( const std::string & str)
+{
+   memset( macaddr, 0, MacAddrLen);
+   if( str.empty()) return;
+
+   unsigned int num[MacAddrLen];
+   int fields = sscanf( str.c_str(), "%x:%x:%x:%x:%x:%x", &(num[0]),&(num[1]),&(num[2]),&(num[3]),&(num[4]),&(num[5]));
+
+   bool valid = true;
+   for( int i = 0; i < MacAddrLen; i++)
+      if( num[i] > 0xff )
+         valid = false;
+
+   if( valid && ( fields == MacAddrLen ))
+   {
+      for( int i = 0; i < MacAddrLen; i++) macaddr[i] = (unsigned char)(num[i]);
+      return;
+   }
+   AFERRAR("String \"%s\" is not a mac address.", str.c_str())
+}
+
 NetIF::~NetIF()
 {
 }
@@ -91,7 +112,7 @@ const std::string NetIF::getMACAddrString( bool withSeparators) const
 
 void NetIF::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << name << ": ";
+   if( false == name.empty()) stream << name << ": ";
    stream << getMACAddrString( true);
    if( addresses.size())
    {
@@ -110,6 +131,18 @@ int NetIF::calcWeight() const
    size += af::weigh( name);
    for( unsigned i = 0; i < addresses.size(); i++) size += addresses[i].calcWeight();
    return size;
+}
+
+void NetIF::getNetIFs( std::string str, std::vector<NetIF*> & netIFs)
+{
+   std::list<std::string> strings = af::strSplit( str, " ");
+   std::list<std::string>::const_iterator it = strings.begin();
+   for( ; it != strings.end(); it++)
+   {
+      NetIF * netif = new NetIF(*it);
+      if( false == netif->isNull())
+         netIFs.push_back( netif);
+   }
 }
 
 void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)

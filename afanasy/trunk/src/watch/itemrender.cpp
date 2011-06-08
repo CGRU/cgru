@@ -143,7 +143,6 @@ void ItemRender::updateValues( af::Node *node, int type)
       maxtasks           = render->getMaxTasks();
       time_launched      = render->getTimeLaunch();
       time_registered    = render->getTimeRegister();
-      wol_operation_time = render->getWOLTime();
 
       if( render->getAddress().notEmpty())
       {
@@ -206,7 +205,7 @@ void ItemRender::updateValues( af::Node *node, int type)
       dirty = render->isDirty();
 
       capacity_used = render->getCapacityUsed();
-      capacity_usage = QString("%1/%2 (%3/%4)").arg( capacity_used).arg( render->getCapacity()).arg( tasks.size()).arg( host.maxtasks);
+      capacity_usage = QString("%1/%2 (%3/%4)").arg( capacity_used).arg( capacity).arg( tasks.size()).arg( maxtasks);
 
       if( busy )
       {
@@ -330,6 +329,8 @@ void ItemRender::updateValues( af::Node *node, int type)
    if( wolWaking ) offlineState = "Waking Up";
    else if( wolSleeping ) offlineState = "Sleeping";
    else offlineState = "Offline";
+   if( wol_operation_time > 0 )
+      offlineState += " " + afqt::stoq( af::time2strHMS( time(NULL) - wol_operation_time ));
 
    tooltip = afqt::stoq( tooltip_base);
    if( false == tooltip_resources.empty())

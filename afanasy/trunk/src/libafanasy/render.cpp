@@ -111,12 +111,6 @@ void Render::readwrite( Msg * msg)
    }
 }
 
-void Render::setCapacity( int value)
-{
-   capacity = value;
-   checkDirty();
-}
-
 void Render::checkDirty()
 {
    if( capacity == host.capacity ) capacity = -1;
@@ -129,8 +123,8 @@ void Render::checkDirty()
 
 void Render::restoreDefaults()
 {
-   capacity = host.capacity;
-   maxtasks = host.maxtasks;
+   capacity = -1;//host.capacity;
+   maxtasks = -1;//host.maxtasks;
    services_disabled.clear();
    state = state & (~SDirty);
 }

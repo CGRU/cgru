@@ -91,7 +91,7 @@ private:
 
    int     capacity;
    int     maxrunningtasks;
-   QString maxrunningtasks_str;
+   int     maxruntasksperhost;
    int     need_memory;
    int     need_power;
    int     need_hdd;
@@ -108,6 +108,7 @@ private:
 
    QString dependmask;
    QString tasksdependmask;
+   QString subtaskdependmask;
    QString hostsmask;
    QString hostsmask_exclude;
 

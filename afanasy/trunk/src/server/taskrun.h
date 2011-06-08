@@ -23,7 +23,7 @@ public:
    TaskRun( Task * runningTask,
             af::TaskExec * taskExec,
             af::TaskProgress * taskProgress,
-            const Block * taskBlock,
+            Block * taskBlock,
             RenderAf * render,
             MonitorContainer * monitoring,
             int * runningtaskscounter
@@ -71,7 +71,7 @@ protected:
 
 protected:
    Task * task;
-   const Block * block;
+   Block * block;
    af::TaskExec * exec;
    af::TaskProgress * progress;
    int tasknum;

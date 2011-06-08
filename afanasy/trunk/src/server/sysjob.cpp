@@ -28,7 +28,7 @@ SysCmd::SysCmd( const std::string & Command, const std::string & WorkingDirector
 //////////////////////////////////////////   TASK    //////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysTask::SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, const Block * block, int taskNumber):
+SysTask::SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, Block * block, int taskNumber):
    Task( block, &taskProgress, taskNumber),
    syscmd( SystemCommand),
    birthtime(0)
@@ -64,7 +64,7 @@ void SysTask::appendLog( const std::string & message)
 
 void SysTask::appendSysJobLog( const std::string & message)
 {
-   SysJob::appendLog( std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
+   SysJob::appendJobLog( std::string("Task[") + af::itos( getNumber()) + "]: " + message + ": "
                       + syscmd->username + ": \"" + syscmd->jobname + "\":\n"
                       + syscmd->command);
 }
@@ -467,12 +467,12 @@ Block * SysJob::newBlock( int numBlock)
    {
    case BlockPostCmdIndex:
    {
-      block_cmdpost = new SysBlock_CmdPost( this, blocksdata[numBlock], progress, &joblog);
+      block_cmdpost = new SysBlock_CmdPost( this, blocksdata[numBlock], progress, &loglist);
       return block_cmdpost;
    }
    case BlockWOLIndex:
    {
-      block_wol = new SysBlock_WOL( this, blocksdata[numBlock], progress, &joblog);
+      block_wol = new SysBlock_WOL( this, blocksdata[numBlock], progress, &loglist);
       return block_wol;
    }
    default:
@@ -561,7 +561,7 @@ bool SysJob::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       case af::Msg::TBlockCapacityCoeffMax:
          return JobAf::action( mcgeneral, type, pointer, monitoring);
       default:
-         log(std::string("Action \"") + af::Msg::TNAMES[type] + "\" is not available for the system job.");
+         appendLog(std::string("Action \"") + af::Msg::TNAMES[type] + "\" is not available for the system job.");
    }
 
    return true;
@@ -594,9 +594,9 @@ bool SysJob::getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::strin
    return false;
 }
 
-void SysJob::appendLog( const std::string & message)
+void SysJob::appendJobLog( const std::string & message)
 {
-   sysjob->log( message);
+   sysjob->appendLog( message);
 }
 
 bool SysJob::isValid() const

@@ -85,8 +85,10 @@ public:
    inline void setCmdPost(          const std::string & str    ) { cmd_post         = str;   }
 /// Set tasks maximum run time, after this time task will be restart as error task
    inline void setTasksMaxRunTime(  const uint32_t & secs   ) { tasksmaxruntime  = secs;  }
-/// Set maximum hosts
+/// Set maximum running tasks
    inline void setMaxRunningTasks(  const int32_t  & value  ) { maxrunningtasks  = value; }
+/// Set maximum running tasks on the same host
+   inline void setMaxRunTasksPerHost(  const int32_t  & value  ) { maxruntasksperhost  = value; }
 
 /// Set block tasks capacity.
    bool setCapacity( int value);
@@ -167,14 +169,15 @@ public:
    inline int getNeedPower()         const { return  need_power;      }
    inline int getNeedHDD()           const { return  need_hdd;        }
 
-   inline uint32_t            getState()             const { return state;            }///< Get state.
-   inline int                 getTasksNum()          const { return tasksnum;         }///< Get tasks quantity.
-   inline int                 getBlockNum()          const { return blocknum;         }///< Get block number in job.
-   inline const std::string & getService()           const { return service;          }///< Get tasks type description.
-   inline const std::string & getParser()            const { return parser;           }///< Get tasks parser type.
-   inline uint32_t            getTasksMaxRunTime()   const { return tasksmaxruntime;  }///< Get tasks maximum run time.
-   inline int                 getMaxRunningTasks()   const { return maxrunningtasks;  }///< Get block maximum number of running tasks.
-   inline const std::string & getMultiHostService()  const { return multihost_service;}///< Get tasks parser type.
+   inline uint32_t            getState()              const { return state;              } ///< Get state.
+   inline int                 getTasksNum()           const { return tasksnum;           } ///< Get tasks quantity.
+   inline int                 getBlockNum()           const { return blocknum;           } ///< Get block number in job.
+   inline const std::string & getService()            const { return service;            } ///< Get tasks type description.
+   inline const std::string & getParser()             const { return parser;             } ///< Get tasks parser type.
+   inline uint32_t            getTasksMaxRunTime()    const { return tasksmaxruntime;    } ///< Get tasks maximum run time.
+   inline int                 getMaxRunningTasks()    const { return maxrunningtasks;    } ///< Get block maximum number of running tasks.
+   inline int                 getMaxRunTasksPerHost() const { return maxruntasksperhost; } ///< Get block maximum number of running tasks on the same host.
+   inline const std::string & getMultiHostService()   const { return multihost_service;  } ///< Get tasks parser type.
 
 
    inline long long getFrameFirst()   const { return frame_first;    }///< Get first task frame ( if numeric).

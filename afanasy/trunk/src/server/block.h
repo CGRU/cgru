@@ -41,6 +41,8 @@ public:
 
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 
+   void taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
+
    /// Refresh block. Retrun true if block progress changed, needed for jobs monitoring (watch jobs list).
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
 
@@ -64,9 +66,16 @@ private:
    std::list<int>          errorHostsCounts; ///< Number of errors on error host.
    std::list<time_t>       errorHostsTime;   ///< Time of the last error
 
+   std::list<RenderAf*> renders_ptrs;
+   std::list<int> renders_counts;
+
    std::list<int> dependBlocks;
    bool initialized;             ///< Where the block was successfully  initialized.
 
 private:
    void constructDependBlocks();
+
+   void addRenderCounts( RenderAf * render);
+   int  getRenderCounts( RenderAf * render) const;
+   void remRenderCounts( RenderAf * render);
 };

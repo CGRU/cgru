@@ -16,7 +16,7 @@ class RenderContainer;
 class Task
 {
 public:
-   Task( const Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber);
+   Task( Block * taskBlock, af::TaskProgress * taskProgress, int taskNumber);
    virtual ~Task();
 
 public:
@@ -71,7 +71,7 @@ public:
 protected:
    af::TaskProgress * progress;
    std::list<std::string> logStringList;    ///< Task log.
-   const Block * block;
+   Block * block;
 
 private:
    void deleteRunningZombie();

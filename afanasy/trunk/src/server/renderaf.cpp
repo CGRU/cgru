@@ -234,6 +234,13 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
       break;
    }
+   case af::Msg::TRenderSetMaxTasks:
+   {
+      appendLog( std::string("Max tasks set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);
+      setMaxTasks( mcgeneral.getNumber());
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
+      break;
+   }
    case af::Msg::TRenderSetService:
    {
       appendLog( std::string("Service \"") + mcgeneral.getString() + "\" "

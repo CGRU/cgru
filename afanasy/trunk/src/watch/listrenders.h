@@ -20,6 +20,8 @@ public:
 protected:
    void contextMenuEvent( QContextMenuEvent *event);
 
+   void doubleClicked( Item * item);
+
 public:
    static bool ConstHeight;
 
@@ -31,11 +33,13 @@ private slots:
    void actAnnotate();
    void actPriority();
    void actCapacity();
+   void actMaxTasks();
    void actNIMBY();
    void actNimby();
    void actFree();
    void actUser();
    void actRequestLog();
+   void actRequestTasksLog();
    void actRequestInfo();
    void actEnableService();
    void actDisableService();
@@ -46,7 +50,6 @@ private slots:
    void actExit();
    void actDelete();
    void actRestart();
-//   void actStart();
 
    void actCommand( int number);
    void actReboot();

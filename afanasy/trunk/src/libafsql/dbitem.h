@@ -16,6 +16,7 @@ public:
 
    void dbCreateTable(    std::list<std::string> * queries) const;
    void dbDropTable(      std::list<std::string> * queries) const;
+
    virtual void dbInsert( std::list<std::string> * queries) const;
    virtual void dbDelete( std::list<std::string> * queries) const;
    virtual void dbUpdate( std::list<std::string> * queries, int attr = -1) const;

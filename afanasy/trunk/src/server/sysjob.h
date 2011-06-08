@@ -25,7 +25,7 @@ struct SysCmd
 class SysTask : public Task
 {
 public:
-   SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, const Block * block, int taskNumber);
+   SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, Block * block, int taskNumber);
    virtual ~SysTask();
 
    virtual void start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring);
@@ -120,7 +120,7 @@ public:
    virtual void dbDelete( std::list<std::string> * queries) const;
    virtual void restartTasks( const af::MCTasksPos & taskspos, RenderContainer * renders, MonitorContainer * monitoring);  ///< Restart some tasks.
 
-   static void appendLog( const std::string & message);
+   static void appendJobLog( const std::string & message);
 
    // Functions than informate that it is a system task, and this info is not abailable:
    virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders);

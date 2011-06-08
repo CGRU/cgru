@@ -20,7 +20,7 @@
 TaskRunMulti::TaskRunMulti( Task * runningTask,
                   af::TaskExec* taskExec,
                   af::TaskProgress * taskProgress,
-                  const Block * taskBlock,
+                  Block * taskBlock,
                   RenderAf * render,
                   MonitorContainer * monitoring,
                   int * runningtaskscounter

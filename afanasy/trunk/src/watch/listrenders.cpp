@@ -144,6 +144,10 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
    menu.addAction( action);
 
+   action = new QAction( "Tasks Log", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actRequestTasksLog() ));
+   menu.addAction( action);
+
    action = new QAction( "Show Info", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestInfo() ));
    menu.addAction( action);
@@ -178,6 +182,9 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       menu.addAction( action);
       action = new QAction( "Change Capacity", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actCapacity() ));
+      menu.addAction( action);
+      action = new QAction( "Change Max Tasks", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actMaxTasks() ));
       menu.addAction( action);
       action = new QAction( "Enable Service", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actEnableService() ));
@@ -278,12 +285,6 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          menu.addMenu( submenu);
       }
 
-/* Do not needed since multitask renders, but can be used in future.
-      action = new QAction( "Start another Render", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actStart() ));
-      menu.addAction( action);
-*/
-
       menu.addSeparator();
 
       {
@@ -299,6 +300,11 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    }
 
    menu.exec( event->globalPos());
+}
+
+void ListRenders::doubleClicked( Item * item)
+{
+   actRequestInfo();
 }
 
 bool ListRenders::caseMessage( af::Msg * msg)
@@ -384,10 +390,22 @@ void ListRenders::actCapacity()
    int current = item->getCapacity();
 
    bool ok;
-   int32_t capacity = QInputDialog::getInteger(this, "Change Capacity", "Enter New Capacity", current, 0, 1000000, 1, &ok);
+   int32_t capacity = QInputDialog::getInteger(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
    if( !ok) return;
    af::MCGeneral mcgeneral( capacity);
    action( mcgeneral, af::Msg::TRenderSetCapacity);
+}
+void ListRenders::actMaxTasks()
+{
+   ItemRender* item = (ItemRender*)getCurrentItem();
+   if( item == NULL ) return;
+   int current = item->getMaxTasks();
+
+   bool ok;
+   int32_t maxtasks = QInputDialog::getInteger(this, "Change Capacity", "Enter New Capacity", current, -1, 1000000, 1, &ok);
+   if( !ok) return;
+   af::MCGeneral mcgeneral( maxtasks);
+   action( mcgeneral, af::Msg::TRenderSetMaxTasks);
 }
 void ListRenders::actNIMBY()
 {
@@ -435,11 +453,6 @@ void ListRenders::actRestart()
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderRestart);
 }
-/*void ListRenders::actStart()
-{
-   af::MCGeneral mcgeneral;
-   action( mcgeneral, af::Msg::TRenderStart);
-}*/
 void ListRenders::actReboot()
 {
    af::MCGeneral mcgeneral;
@@ -467,6 +480,15 @@ void ListRenders::actRequestLog()
    if( item == NULL ) return;
    displayInfo( "Render log request.");
    afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderLogRequestId, item->getId(), true);
+   Watch::sendMsg( msg);
+}
+
+void ListRenders::actRequestTasksLog()
+{
+   Item* item = getCurrentItem();
+   if( item == NULL ) return;
+   displayInfo( "Render tasks log request.");
+   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderTasksLogRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }
 

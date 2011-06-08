@@ -23,7 +23,6 @@ void DBAttr::init()
       DBLength[i] = 0;
    }
 
-//   DBName[_administrator         ] = "administrator";
    DBName[_annotation            ] = "annotation";
    DBName[_blockname             ] = "blockname";
    DBName[_blocksnum             ] = "blocksnum";
@@ -58,8 +57,10 @@ void DBAttr::init()
    DBName[_id_block              ] = "id_block";
    DBName[_id_job                ] = "id_job";
 //   DBName[_id_task               ] = "id_task";
+   DBName[_ipaddresses           ] = "ipaddresses";
    DBName[_jobname               ] = "jobname";
    DBName[_lifetime              ] = "lifetime";
+   DBName[_macaddresses          ] = "macaddresses";
    DBName[_maxrunningtasks       ] = "maxrunningtasks";
    DBName[_maxruntasksperhost    ] = "maxruntasksperhost";
    DBName[_multihost_max         ] = "multihost_max";
