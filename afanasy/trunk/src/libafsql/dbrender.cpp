@@ -80,10 +80,12 @@ bool DBRender::dbSelect( QSqlDatabase * db, const std::string * where)
 
 void DBRender::updateNetIFs() const
 {
+   macaddresses.clear();
    for( int i = 0; i < netIFs.size(); i++)
    {
       if( i != 0 ) macaddresses += " ";
       macaddresses += netIFs[i]->getMACAddrString( true /* with separators */);
    }
+   ipaddresses.clear();
    ipaddresses = address.generateIPString( false);
 }
