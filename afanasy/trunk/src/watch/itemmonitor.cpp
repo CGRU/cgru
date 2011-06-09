@@ -29,7 +29,7 @@ ItemMonitor::ItemMonitor( af::Monitor *monitor):
    time_launch_str   = TimeLaunch     .arg( afqt::time2Qstr( time_launch  ));
    time_register_str = TimeRegister   .arg( afqt::time2Qstr( time_register));
 
-   address_str = Address.arg( monitor->getAddress().generateIPString().c_str());
+   address_str = Address.arg( monitor->getAddress().generateIPString( true).c_str());
    version = monitor->getVersion().c_str();
 
    updateValues( monitor, 0);

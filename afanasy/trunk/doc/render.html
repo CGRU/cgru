@@ -59,78 +59,85 @@ Launch command (when Afanasy environment set):<br/>
 
 <h3>Render Attributes:</h3>
 <ul>
-<li><a name="Name"/><b>Name</b> - Each render has an unique name.
+<li><a name="Name"><b>Name</b></a> - Each render has an unique name.
 If new render comes to server with the name which already exists, server will not register it.
 Users and jobs hosts masks (huntgroup) are based on render names
 and <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).
 <br/>
 To launch another render on the same host use <kbd>AF_HOSTNAME</kbd> environment variable to override render name.
 <br/><br/></li>
-<li><a name="Address"/><b>Address</b> - IP address and port that render listen.
+<li><a name="Address"><b>Address</b></a> - IP address and port that render listening, if online.
+<li><a name="NetworkInterfaces"><b>Network Interfaces</b></a> - Network interfaces information (name, mac and ips).
 <br/><br/></li>
-<li><a name="TimeLaunch"/><b>Launch Time</b> - Time the application was launched.</li>
-<li><a name="TimeRegister"/><b>Registration Time</b> - Time the render was registered on server.</li>
-<li><a name="TimeUpdate"/><b>Last Update Time</b> - Last time the render has update its resources usage.
+<li><a name="TimeLaunch"><b>Launch Time</b></a> - Time the application was launched.</li>
+<li><a name="TimeRegister"><b>Registration Time</b></a> - Time the render was registered on server.</li>
+<li><a name="TimeUpdate"><b>Last Update Time</b></a> - Last time the render has update its resources usage.
+<li><a name="WOLOprerationTime"><b>WOL Opreration Time</b></a> - Time the last any WOL operation was performed.
 <br/><br/></li>
-<li><a name="Tasks"/><b>Tasks</b> - Running tasks number and some its attributes (user, job, etc.).</li>
-<li><a name="CapacityUsed"/><b>Capacity Used</b> - Capacity used by running tasks.</li>
+<li><a name="Tasks"><b>Tasks</b></a> - Running tasks number and some its attributes (user, job, etc.).</li>
+<li><a name="CapacityUsed"><b>Capacity Used</b></a> - Capacity used by running tasks.</li>
 </ul>
 
 <h3>Render Editable Parameters:</h3>
 <ul>
-<li><a name="UserName"/><b>Render User</b> - Who launched a render. Can be changed only by administrators. Note that process do not change uid. This value for afanasy only.</li>
-<li><a name="Priority"/><b>Priority</b> - Render with greater priority get task first.</li>
-<li><a name="Capacity"/><b>Capacity</b> - You can override host farm setup (see below) capacity.</li>
-<li><a name="DisabledServices"/><b>Disabled Services</b> - You can disable host farm setup (see below) service.</li>
-<li><a name="State"/><b>Render State:</b>
+<li><a name="UserName"><b>Render User</b></a> - Who launched a render. Can be changed only by administrators. Note that process do not change uid. This value for afanasy only.</li>
+<li><a name="Priority"><b>Priority</b></a> - Render with greater priority get task first.</li>
+<li><a name="Capacity"><b>Capacity</b></a> - You can override host farm setup (see below) capacity.</li>
+<li><a name="MaxTasks"><b>Max Tasks</b></a> - You can override host farm setup (see below) maximum running tasks.</li>
+<li><a name="DisabledServices"><b>Disabled Services</b></a> - You can disable host farm setup (see below) service.</li>
+<li><a name="State"><b>Render State:</b></a>
    <ul>
-   <li><b><i> Free  </i></b> - Render is not captured by anybody.</li>
-   <li><b><i> nimby </i></b> - Render is taken by his user. Only render user can render on it.</li>
-   <li><b><i> NIMBY </i></b> - Render is taken by his user and he don't want to render on it.</li>
-   <li><b><i> Dirty </i></b> - Render capacity changed or some service disabled.</li>
+   <li><b><i> Online       </i></b> - Render is online.</li>
+   <li><b><i> nimby        </i></b> - Render is taken by his user. Only render user can render on it.</li>
+   <li><b><i> NIMBY        </i></b> - Render is taken by his user and he don't want to render on it.</li>
+   <li><b><i> Busy         </i></b> - Render executing one or more tasks.</li>
+   <li><b><i> Dirty        </i></b> - Render capacity changed or some service disabled.</li>
+   <li><b><i> WOLFalling   </i></b> - Render is falling a sleep. It was asked to sleep, but still online.</li>
+   <li><b><i> SWOLSleeping </i></b> - Render is sleeping.</li>
+   <li><b><i> SWOLWaking   </i></b> - Render is waking up. It was asked to wake up but still is not online.</li>
    </ul>
 </li>
-<li><a name="Annotation"/><b>Annotation</b> - Annotate render GUI item.</li>
+<li><a name="Annotation"><b>Annotation</b></a> - Annotate render GUI item.</li>
 </ul>
 
 <h3>Render Host Attributes:</h3>
 <ul>
-<li><a name="Capacity"/><b>Capacity</b> - Total capacity value (each running task takes some capacity).</li>
-<li><a name="MaxTasks"/><b>Max Tasks</b> - Maximum number of tasks can be running the same time.</li>
-<li><a name="CpuNum"/><b>Number of CPUs</b> - Processors number.</li>
-<li><a name="MHz"/><b>CPUs MHz</b> - Fist Processor frequency.</li>
-<li><a name="MemoryMb"/><b>Memory Megabytes</b> - Total memory in megabytes.</li>
-<li><a name="SwapMb"/><b>Swap Megabytes</b> - Total swap space in megabytes.</li>
-<li><a name="HddGb"/><b>HDD Gigabytes</b> - Total disk space in gigabytes.
+<li><a name="Capacity"><b>Capacity</b></a> - Total capacity value (each running task takes some capacity).</li>
+<li><a name="MaxTasks"><b>Max Tasks</b></a> - Maximum number of tasks can be running the same time.</li>
+<li><a name="CpuNum"><b>Number of CPUs</b></a> - Processors number.</li>
+<li><a name="MHz"><b>CPUs MHz</b></a> - Fist Processor frequency.</li>
+<li><a name="MemoryMb"><b>Memory Megabytes</b></a> - Total memory in megabytes.</li>
+<li><a name="SwapMb"><b>Swap Megabytes</b></a> - Total swap space in megabytes.</li>
+<li><a name="HddGb"><b>HDD Gigabytes</b></a> - Total disk space in gigabytes.
 <br/><br/></li>
-<li><a name="OS"/><b>OS</b> - OS name described in farm setup.</li>
-<li><a name="Power"/><b>Power</b> - Custom number described in farm setup.</li>
-<li><a name="Properties"/><b>Properties</b> - Custom string described in farm setup.
+<li><a name="OS"><b>OS</b></a> - OS name described in farm setup.</li>
+<li><a name="Power"><b>Power</b></a> - Custom number described in farm setup.</li>
+<li><a name="Properties"><b>Properties</b></a> - Custom string described in farm setup.
 <br/><br/></li>
-<li><a name="ServicesNames"/><b>Services Names</b> - List of type names of available services.</li>
+<li><a name="ServicesNames"><b>Services Names</b></a> - List of type names of available services.</li>
 </ul>
 
 <h3>Render Host Resources Usage:</h3>
 <ul>
-<li><a name="CpuLoadavg"/><b>CPU Loadavg[3]</b> - Load average.</li>
-<li><a name="CpuUser"/><b>CPU User</b> - User usage percentage.</li>
-<li><a name="CpuNice"/><b>CPU Nice</b> - User 'nice' usage percentage (low priority processes).</li>
-<li><a name="CpuSystem"/><b>CPU System</b> - System usage percentage.</li>
-<li><a name="CpuIdle"/><b>CPU Idle</b> - Idle percentage (CPU free).</li>
-<li><a name="CpuIOWait"/><b>CPU IO Wait</b> - Waiting for I/O complete percentage.</li>
-<li><a name="CpuIRQ"/><b>CPU IRQ</b> - Interrupts servicing percentage.</li>
-<li><a name="CpuIRQ"/><b>CPU Soft-IRQ</b> - Soft interrupts servicing percentage.
+<li><a name="CpuLoadavg"><b>CPU Loadavg[3]</b></a> - Load average.</li>
+<li><a name="CpuUser"><b>CPU User</b></a> - User usage percentage.</li>
+<li><a name="CpuNice"><b>CPU Nice</b></a> - User 'nice' usage percentage (low priority processes).</li>
+<li><a name="CpuSystem"><b>CPU System</b></a> - System usage percentage.</li>
+<li><a name="CpuIdle"><b>CPU Idle</b></a> - Idle percentage (CPU free).</li>
+<li><a name="CpuIOWait"><b>CPU IO Wait</b></a> - Waiting for I/O complete percentage.</li>
+<li><a name="CpuIRQ"><b>CPU IRQ</b></a> - Interrupts servicing percentage.</li>
+<li><a name="CpuIRQ"><b>CPU Soft-IRQ</b></a> - Soft interrupts servicing percentage.
 <br/><br/></li>
-<li><a name="MemoryFreeMb"/><b>Memory Free Mb</b> - Free memory in megabytes.</li>
-<li><a name="MemoryCachedMb"/><b>Memory Cached Mb</b> - Cached memory in megabytes.</li>
-<li><a name="MemoryCachedMb"/><b>Memory Buffers Mb</b> - Buffered memory in megabytes.</li>
-<li><a name="SwapUsedMb"/><b>Swap Used Mb</b> - Used swap in megabytes.</li>
-<li><a name="HDDFreeGb"/><b>HDD Free Gb</b> - Available free disk space in gigabytes (in root - '/').</li>
-<li><a name="NetRecvKbSec"/><b>Net Received Kb/Sec</b> - Network receiving traffic in kilobytes per second.</li>
-<li><a name="NetSendKbSec"/><b>Net Send Kb/Sec</b> - Network sending traffic in kilobytes per second.</li>
-<li><a name="DiskRdKbSec"/><b>Disk Read Kb/Sec</b> - Disk reading in kilobytes per second.</li>
-<li><a name="DiskWrKbSec"/><b>Disk Write Kb/Sec</b> - Disk writing in kilobytes per second.</li>
-<li><a name="DiskBusy"/><b>Disk Busy</b> - Percentage of system ticks spend for the disk IO.</li>
+<li><a name="MemoryFreeMb"><b>Memory Free Mb</b></a> - Free memory in megabytes.</li>
+<li><a name="MemoryCachedMb"><b>Memory Cached Mb</b></a> - Cached memory in megabytes.</li>
+<li><a name="MemoryCachedMb"><b>Memory Buffers Mb</b></a> - Buffered memory in megabytes.</li>
+<li><a name="SwapUsedMb"><b>Swap Used Mb</b></a> - Used swap in megabytes.</li>
+<li><a name="HDDFreeGb"><b>HDD Free Gb</b></a> - Available free disk space in gigabytes (in root - '/').</li>
+<li><a name="NetRecvKbSec"><b>Net Received Kb/Sec</b></a> - Network receiving traffic in kilobytes per second.</li>
+<li><a name="NetSendKbSec"><b>Net Send Kb/Sec</b></a> - Network sending traffic in kilobytes per second.</li>
+<li><a name="DiskRdKbSec"><b>Disk Read Kb/Sec</b></a> - Disk reading in kilobytes per second.</li>
+<li><a name="DiskWrKbSec"><b>Disk Write Kb/Sec</b></a> - Disk writing in kilobytes per second.</li>
+<li><a name="DiskBusy"><b>Disk Busy</b></a> - Percentage of system ticks spend for the disk IO.</li>
 </ul>
 
 <p>To register a render already in [nimby|NIMBY] state use command:</p>

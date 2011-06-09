@@ -76,8 +76,28 @@ You can use this command to perform it:<br/>
 <br/>
 
 <p><a id="release150">
-<b>1.5.0</b></a> 2011.06.03 <i>(rev1620 af1620)</i> New Afanasy network protocol version.</p>
+<b>1.5.0</b></a> 2011.06.09 <i>(rev1631 af1631)</i> New Afanasy network protocol version.</p>
 
+<p>
+
+</p>
+<p>
+New job block parameter <a href="../afanasy/doc/job_block#MaxRunTasksPerHost">Maximum running tasks per host</a>.
+</p>
+<p>
+You can override render "Max Tasks" parameter directly from Watch in super user mode.
+</p>
+<p>
+<a href="../afanasy/doc/job_block#Command">New numeric pattern replacement rules.</a>
+<br/><b><i>You should delete all jobs on server as their tasks commands can be invalid.</i></b><br/>
+Jobs created by your custom submission scripts probably will generate invalid numeric tasks too.
+But it is very simple to fix them.
+<br/><b><i>You should to fix your custom submission scripts.</i></b><br/>
+</p>
+<p>
+Server stores renders IP and MAC addresses in database.
+So you can perform some operations with off-line renders after server restart (for example wake-on-lan).
+</p>
 <p>
 On start, server checks all database tables, and adds (removes) needed columns.
 </p>
