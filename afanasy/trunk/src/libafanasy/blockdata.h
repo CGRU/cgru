@@ -84,11 +84,11 @@ public:
 /// Set block post commnand.
    inline void setCmdPost(          const std::string & str    ) { cmd_post         = str;   }
 /// Set tasks maximum run time, after this time task will be restart as error task
-   inline void setTasksMaxRunTime(  const uint32_t & secs   ) { tasksmaxruntime  = secs;  }
+   inline void setTasksMaxRunTime(     const int secs   ) { tasksmaxruntime      = secs;  }
 /// Set maximum running tasks
-   inline void setMaxRunningTasks(  const int32_t  & value  ) { maxrunningtasks  = value; }
+   inline void setMaxRunningTasks(     const int value  ) { maxrunningtasks      = value; }
 /// Set maximum running tasks on the same host
-   inline void setMaxRunTasksPerHost(  const int32_t  & value  ) { maxruntasksperhost  = value; }
+   inline void setMaxRunTasksPerHost(  const int value  ) { maxruntasksperhost   = value; }
 
 /// Set block tasks capacity.
    bool setCapacity( int value);

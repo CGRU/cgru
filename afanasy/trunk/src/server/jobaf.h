@@ -94,6 +94,10 @@ public:
 
    void setUserListOrder( int index, bool updateDtabase);
 
+   void addRenderCounts( RenderAf * render);
+   int  getRenderCounts( RenderAf * render) const;
+   void remRenderCounts( RenderAf * render);
+
 public:
    /// Set Jobs Container.
    inline static void setJobContainer( JobContainer *Jobs){ jobs = Jobs;}
@@ -116,6 +120,9 @@ private:
    bool constructed;             ///< Whether the job was constructed successfully.
    bool initialized;             ///< Whether the job was initialized successfully.
    bool deletion;                ///< Whether the job is deleting.
+
+   std::list<RenderAf*> renders_ptrs;
+   std::list<int> renders_counts;
 
    Listeners listeners;     ///> Addresses to send task output to.
 

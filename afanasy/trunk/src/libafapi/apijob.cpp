@@ -33,10 +33,11 @@ void Job::setName(         const std::string & str )  { name         = str;   }
 void Job::setCmdPre(       const std::string & str )  { cmd_pre      = str;   }
 void Job::setCmdPost(      const std::string & str )  { cmd_post     = str;   }
 void Job::setDescription(  const std::string & str )  { description  = str;   }
-void Job::setMaxRunningTasks(       int value      )  { maxrunningtasks = value;                               }
-void Job::setPriority(              int value      )  { priority        = value;                               }
-void Job::setWaitTime(        long long value      )  { time_wait       = value;                               }
-void Job::offline()                                   { state           = state | AFJOB::STATE_OFFLINE_MASK;   }
+void Job::setMaxRunningTasks(       int value      )  { maxrunningtasks    = value; }
+void Job::setMaxRunTasksPerHost(    int value      )  { maxruntasksperhost = value; }
+void Job::setPriority(              int value      )  { priority           = value; }
+void Job::setWaitTime(        long long value      )  { time_wait          = value; }
+void Job::offline()                                   { state              = state | AFJOB::STATE_OFFLINE_MASK;   }
 
 int  Job::getDataLen() { if( message) return message->writeSize(); else return -1;}
 void Job::clearBlocksList() { blocks.clear();}

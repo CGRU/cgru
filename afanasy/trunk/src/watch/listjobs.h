@@ -40,6 +40,7 @@ private slots:
    void actHostsMask();
    void actHostsMaskExclude();
    void actMaxRunningTasks();
+   void actMaxRunTasksPerHost();
    void actDependMask();
    void actDependMaskGlobal();
    void actWaitTime();

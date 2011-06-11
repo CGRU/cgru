@@ -28,10 +28,11 @@ public:
    inline unsigned getFlags() const { return flags;}
    inline unsigned getState() const { return state;}
 
-   inline int getBlocksNum()         const { return blocksnum;        }
-   inline int getLifeTime()          const { return lifetime;         }
-   inline int getUserListOrder()     const { return userlistorder;    }
-   inline int getMaxRunningTasks()   const { return maxrunningtasks;  }
+   inline int getBlocksNum()           const { return blocksnum;           }
+   inline int getLifeTime()            const { return lifetime;            }
+   inline int getUserListOrder()       const { return userlistorder;       }
+   inline int getMaxRunningTasks()     const { return maxrunningtasks;     }
+   inline int getMaxRunTasksPerHost()  const { return maxruntasksperhost;  }
 
    inline long long getTimeCreation()      const { return time_creation;    }
    inline long long getTimeStarted()       const { return time_started;     }
@@ -118,6 +119,9 @@ protected:
 
 /// Maximum number of running tasks
    int32_t maxrunningtasks;
+
+/// Maximum number of running tasks per host
+   int32_t maxruntasksperhost;
 
 /// Life time, after this time job will be automatically deleted.
    int32_t lifetime;

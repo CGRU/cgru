@@ -17,6 +17,7 @@ Job::Job( int Id):
    state( 0),
    blocksnum( 0),
    maxrunningtasks(  -1 ),
+   maxruntasksperhost(  -1 ),
    time_creation( time( NULL)),
    time_wait( 0),
    time_started( 0),
@@ -75,6 +76,7 @@ void Job::readwrite( Msg * msg)
    rw_uint32_t( flags,              msg);
    rw_uint32_t( state,              msg);
    rw_int32_t ( maxrunningtasks,    msg);
+   rw_int32_t ( maxruntasksperhost, msg);
    rw_String  ( cmd_pre,            msg);
    rw_String  ( cmd_post,           msg);
 
@@ -204,6 +206,8 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "\n Priority = " << int(priority);
    stream << "\n Maximum running tasks = " << maxrunningtasks;
    if( maxrunningtasks == -1 ) stream << " (no limit)";
+   stream << "\n Maximum running tasks per host = " << maxruntasksperhost;
+   if( maxruntasksperhost == -1 ) stream << " (no limit)";
    stream << "\n Hosts mask: \"" << hostsmask.getPattern() << "\"";
    if( hostsmask.empty()) stream << " (any host)";
    if( hostsmask_exclude.notEmpty()) stream << "\n Exclude hosts mask: \"" << hostsmask_exclude.getPattern() << "\"";

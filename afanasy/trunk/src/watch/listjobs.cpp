@@ -152,6 +152,9 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
    action = new QAction( "Max Running Tasks", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
    submenu->addAction( action);
+   action = new QAction( "Max Run Tasks Per Host", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunTasksPerHost() ));
+   submenu->addAction( action);
    action = new QAction( "Hosts Mask", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
    submenu->addAction( action);
@@ -547,6 +550,21 @@ void ListJobs::actMaxRunningTasks()
    af::MCGeneral mcgeneral( max);
    action( mcgeneral, af::Msg::TJobMaxRunningTasks);
    displayInfo( "Change job maximum running tasks.");
+}
+
+void ListJobs::actMaxRunTasksPerHost()
+{
+   ItemJob* jobitem = (ItemJob*)getCurrentItem();
+   if( jobitem == NULL ) return;
+   int current = jobitem->maxruntasksperhost;
+
+   bool ok;
+   int max = QInputDialog::getInteger(this, "Change Maximum Running Tasks Per Host", "Enter Number", current, -1, 999999, 1, &ok);
+   if( !ok) return;
+
+   af::MCGeneral mcgeneral( max);
+   action( mcgeneral, af::Msg::TJobMaxRunTasksPerHost);
+   displayInfo( "Change job maximum running tasks pet host.");
 }
 
 void ListJobs::actHostsMask()

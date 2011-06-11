@@ -15,7 +15,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Block::Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
+Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
    job( blockJob),
    data( blockData),
    tasks( NULL),
@@ -200,6 +200,7 @@ bool Block::canRun( RenderAf * render)
 
 void Block::addRenderCounts( RenderAf * render)
 {
+   job->addRenderCounts( render);
    std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
    std::list<int>::iterator cit = renders_counts.begin();
    for( ; rit != renders_ptrs.end(); rit++, cit++)
@@ -223,6 +224,7 @@ int Block::getRenderCounts( RenderAf * render) const
 
 void Block::remRenderCounts( RenderAf * render)
 {
+   job->remRenderCounts( render);
    std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
    std::list<int>::iterator cit = renders_counts.begin();
    for( ; rit != renders_ptrs.end(); rit++, cit++)

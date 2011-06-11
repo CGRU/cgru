@@ -10,53 +10,55 @@
 int  PyAf_Job_init(    PyAf_Job_Object * self, PyObject *args, PyObject *kwds);
 void PyAf_Job_dealloc( PyAf_Job_Object * self);
 
-PyObject * PyAf_Job_appendBlock(          PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setName(              PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setDescription(       PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setUserName(          PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setHostName(          PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setHostsMask(         PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setHostsMaskExclude(  PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setDependMask(        PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setDependMaskGlobal(  PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setNeedOS(            PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setNeedProperties(    PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setCmdPre(            PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setCmdPost(           PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setMaxRunningTasks(   PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setPriority(          PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_setWaitTime(          PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_output(               PyAf_Job_Object *self, PyObject *arg);
-PyObject * PyAf_Job_offline(              PyAf_Job_Object *self);
-PyObject * PyAf_Job_clearBlocksList(      PyAf_Job_Object *self);
-PyObject * PyAf_Job_construct(            PyAf_Job_Object *self);
-PyObject * PyAf_Job_getDataLen(           PyAf_Job_Object *self);
-PyObject * PyAf_Job_getData(              PyAf_Job_Object *self);
+PyObject * PyAf_Job_appendBlock(             PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setName(                 PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setDescription(          PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setUserName(             PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setHostName(             PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setHostsMask(            PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setHostsMaskExclude(     PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setDependMask(           PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setDependMaskGlobal(     PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setNeedOS(               PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setNeedProperties(       PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setCmdPre(               PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setCmdPost(              PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setMaxRunningTasks(      PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setMaxRunTasksPerHost(   PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setPriority(             PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_setWaitTime(             PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_output(                  PyAf_Job_Object *self, PyObject *arg);
+PyObject * PyAf_Job_offline(                 PyAf_Job_Object *self);
+PyObject * PyAf_Job_clearBlocksList(         PyAf_Job_Object *self);
+PyObject * PyAf_Job_construct(               PyAf_Job_Object *self);
+PyObject * PyAf_Job_getDataLen(              PyAf_Job_Object *self);
+PyObject * PyAf_Job_getData(                 PyAf_Job_Object *self);
 
 #ifndef PYAFJOB
 static PyMethodDef PyAf_Job_methods[] = {
-   {"appendBlock",         (PyCFunction) PyAf_Job_appendBlock,          METH_O,        "Append block."               },
-   {"setName",             (PyCFunction) PyAf_Job_setName,              METH_O,        "Set name."                   },
-   {"setDescription",      (PyCFunction) PyAf_Job_setDescription,       METH_O,        "Set description."            },
-   {"setUserName",         (PyCFunction) PyAf_Job_setUserName,          METH_O,        "Set user name."              },
-   {"setHostName",         (PyCFunction) PyAf_Job_setHostName,          METH_O,        "Set host name."              },
-   {"setHostsMask",        (PyCFunction) PyAf_Job_setHostsMask,         METH_O,        "Set hosts mask."             },
-   {"setHostsMaskExclude", (PyCFunction) PyAf_Job_setHostsMaskExclude,  METH_O,        "Set exclude hosts mask."     },
-   {"setDependMask",       (PyCFunction) PyAf_Job_setDependMask,        METH_O,        "Set depend mask."            },
-   {"setDependMaskGlobal", (PyCFunction) PyAf_Job_setDependMaskGlobal,  METH_O,        "Set global depend mask."     },
-   {"setNeedOS",           (PyCFunction) PyAf_Job_setNeedOS,            METH_O,        "Set need os."                },
-   {"setNeedProperties",   (PyCFunction) PyAf_Job_setNeedProperties,    METH_O,        "Set need properties."        },
-   {"setCmdPre",           (PyCFunction) PyAf_Job_setCmdPre,            METH_O,        "Set pre command."            },
-   {"setCmdPost",          (PyCFunction) PyAf_Job_setCmdPost,           METH_O,        "Set post command."           },
-   {"setMaxRunningTasks",  (PyCFunction) PyAf_Job_setMaxRunningTasks,   METH_O,        "Set maximum running tasks."  },
-   {"setPriority",         (PyCFunction) PyAf_Job_setPriority,          METH_O,        "Set priority."               },
-   {"setWaitTime",         (PyCFunction) PyAf_Job_setWaitTime,          METH_O,        "Set wait time."              },
-   {"output",              (PyCFunction) PyAf_Job_output,               METH_O,        "Print information."          },
-   {"offline",             (PyCFunction) PyAf_Job_offline,              METH_NOARGS,   "Start job paused."           },
-   {"clearBlocksList",     (PyCFunction) PyAf_Job_clearBlocksList,      METH_NOARGS,   "Clear blocks list."          },
-   {"construct",           (PyCFunction) PyAf_Job_construct,            METH_NOARGS,   "Construct job data."         },
-   {"getDataLen",          (PyCFunction) PyAf_Job_getDataLen,           METH_NOARGS,   "Get job data length."        },
-   {"getData",             (PyCFunction) PyAf_Job_getData,              METH_NOARGS,   "Get job data."               },
+   {"appendBlock",            (PyCFunction) PyAf_Job_appendBlock,             METH_O,        "Append block."},
+   {"setName",                (PyCFunction) PyAf_Job_setName,                 METH_O,        "Set name."},
+   {"setDescription",         (PyCFunction) PyAf_Job_setDescription,          METH_O,        "Set description."},
+   {"setUserName",            (PyCFunction) PyAf_Job_setUserName,             METH_O,        "Set user name."},
+   {"setHostName",            (PyCFunction) PyAf_Job_setHostName,             METH_O,        "Set host name."},
+   {"setHostsMask",           (PyCFunction) PyAf_Job_setHostsMask,            METH_O,        "Set hosts mask."},
+   {"setHostsMaskExclude",    (PyCFunction) PyAf_Job_setHostsMaskExclude,     METH_O,        "Set exclude hosts mask."},
+   {"setDependMask",          (PyCFunction) PyAf_Job_setDependMask,           METH_O,        "Set depend mask."},
+   {"setDependMaskGlobal",    (PyCFunction) PyAf_Job_setDependMaskGlobal,     METH_O,        "Set global depend mask."},
+   {"setNeedOS",              (PyCFunction) PyAf_Job_setNeedOS,               METH_O,        "Set need os."},
+   {"setNeedProperties",      (PyCFunction) PyAf_Job_setNeedProperties,       METH_O,        "Set need properties."},
+   {"setCmdPre",              (PyCFunction) PyAf_Job_setCmdPre,               METH_O,        "Set pre command."},
+   {"setCmdPost",             (PyCFunction) PyAf_Job_setCmdPost,              METH_O,        "Set post command."},
+   {"setMaxRunningTasks",     (PyCFunction) PyAf_Job_setMaxRunningTasks,      METH_O,        "Set maximum running tasks."},
+   {"setMaxRunTasksPerHost",  (PyCFunction) PyAf_Job_setMaxRunTasksPerHost,   METH_O,        "Set maximum running tasks per host."},
+   {"setPriority",            (PyCFunction) PyAf_Job_setPriority,             METH_O,        "Set priority."   },
+   {"setWaitTime",            (PyCFunction) PyAf_Job_setWaitTime,             METH_O,        "Set wait time."},
+   {"output",                 (PyCFunction) PyAf_Job_output,                  METH_O,        "Print information."},
+   {"offline",                (PyCFunction) PyAf_Job_offline,                 METH_NOARGS,   "Start job paused."},
+   {"clearBlocksList",        (PyCFunction) PyAf_Job_clearBlocksList,         METH_NOARGS,   "Clear blocks list."},
+   {"construct",              (PyCFunction) PyAf_Job_construct,               METH_NOARGS,   "Construct job data."},
+   {"getDataLen",             (PyCFunction) PyAf_Job_getDataLen,              METH_NOARGS,   "Get job data length."},
+   {"getData",                (PyCFunction) PyAf_Job_getData,                 METH_NOARGS,   "Get job data."},
 #if PY_MAJOR_VERSION >= 3
    { NULL } // Sentinel
 #else

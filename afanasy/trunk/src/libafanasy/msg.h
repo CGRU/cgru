@@ -273,6 +273,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TJobDependMask/**/,             ///< Set job depend mask.
 /**/TJobDependMaskGlobal/**/,       ///< Set job global depend mask.
 /**/TJobMaxRunningTasks/**/,        ///< Set job maximum running tasks number.
+/**/TJobMaxRunTasksPerHost/**/,     ///< Set job maximum running tasks per host.
 /**/TJobWaitTime/**/,               ///< Set job wait time.
 /**/TJobLifeTime/**/,               ///< Set job life time.
 /**/TJobPriority/**/,               ///< Set job priority.

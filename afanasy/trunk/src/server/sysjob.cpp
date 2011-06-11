@@ -157,7 +157,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 
 //Task * SysBlock::task = NULL;
 
-SysBlock::SysBlock( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
+SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
    Block( blockJob, blockData, progress, log)
 {
 //printf("SysBlock::SysBlock:\n");

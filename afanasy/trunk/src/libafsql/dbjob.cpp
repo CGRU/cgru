@@ -32,6 +32,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,          &time_done           ));
    dbAddAttr( new DBAttrInt64 ( DBAttr::_time_wait,          &time_wait           ));
    dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,    &maxrunningtasks     ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxruntasksperhost, &maxruntasksperhost  ));
    dbAddAttr( new DBAttrInt32 ( DBAttr::_userlistorder,      &userlistorder       ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,          &hostsmask           ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,  &hostsmask_exclude   ));

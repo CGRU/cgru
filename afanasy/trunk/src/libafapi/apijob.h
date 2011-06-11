@@ -37,6 +37,9 @@ public:
 /// Set job maximum hosts.
    void setMaxRunningTasks( int value);
 
+/// Set job maximum hosts per host.
+   void setMaxRunTasksPerHost( int value);
+
 /// Set job hosts mask.
 /** See http://doc.trolltech.com/main-snapshot/qregexp.html#introduction .**/
    bool setHostsMask( const std::string & str);

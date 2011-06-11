@@ -61,9 +61,6 @@ public:
 /// Set tasks maximum run time, after this time task will be restart as error task
    void setTasksMaxRunTime( int value);
 
-/// Set block maximum hosts.
-   void setMaxRunningTasksNumber( int value);
-
 /// Set block hosts mask.
    bool setHostsMask( const std::string & str);
 

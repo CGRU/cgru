@@ -10,7 +10,7 @@
 //////////////////////////////////////////   BLOCK    /////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysBlock_CmdPost::SysBlock_CmdPost( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
+SysBlock_CmdPost::SysBlock_CmdPost( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
    SysBlock( blockJob, blockData, progress, log)
 {
 AFINFO("SysBlock_CmdPost::SysBlock_CmdPost:")

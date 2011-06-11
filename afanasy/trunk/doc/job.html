@@ -45,48 +45,49 @@
 
 <h3>Job Attributes:</h3>
 <ul>
-<li><a name="Name"/><b>Name</b> - Each job has an unique name. If new job comes to server with the name which already exists, server change it's name by adding a number. Jobs dependence bases on their names and depend masks to match it. Afanasy uses <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).</li>
-<li><a name="NameUser"/><b>User Name</b> - User name who has created the Job.</li>
-<li><a name="NameHost"/><b>Host Name</b> - Host name where job was created.</li>
-<li><a name="TimeCreation"/><b>Creation Time</b> - Time when the job was created.</li>
-<li><a name="TimeStarted"/><b>Started Time</b> - Time when the job was started (produced first task).</li>
-<li><a name="TimeDone"/><b>Time Done</b> - Time when the job was done (last task finished).</li>
-<li><a name="Description"/><b>Description</b> - Any custom description. For database statistics queries only.</li>
-<li><a name="Blocks"/><b>Blocks</b> - Jobs consist of block which can produce tasks.</li>
+<li><a name="Name"><b>Name</b></a> - Each job has an unique name. If new job comes to server with the name which already exists, server change it's name by adding a number. Jobs dependence bases on their names and depend masks to match it. Afanasy uses <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).</li>
+<li><a name="NameUser"><b>User Name</b></a> - User name who has created the Job.</li>
+<li><a name="NameHost"><b>Host Name</b></a> - Host name where job was created.</li>
+<li><a name="TimeCreation"><b>Creation Time</b></a> - Time when the job was created.</li>
+<li><a name="TimeStarted"><b>Started Time</b></a> - Time when the job was started (produced first task).</li>
+<li><a name="TimeDone"><b>Time Done</b></a> - Time when the job was done (last task finished).</li>
+<li><a name="Description"><b>Description</b></a> - Any custom description. For database statistics queries only.</li>
+<li><a name="Blocks"><b>Blocks</b></a> - Jobs consist of block which can produce tasks.</li>
 </ul>
 
 <h3>Job Editable Parameters:</h3>
 <ul>
-<li><a name="Priority"/><b>Priority</b> - Jobs with greater priority run first.</li>
-<li><a name="MaxHosts"/><b>Maximum Hosts</b> - Maximum number of hosts job can run on.</li>
-<li><a name="HostsMask"/><b>Hosts Mask</b> - Job run only on renders which host name matches this mask.</li>
-<li><a name="HostsMaskExclude"/><b>Exclude Hosts Mask</b> - Job can not run on renders which host name matches this mask.</li>
-<li><a name="DependMask"/><b>Depend Mask</b> - Job will wait other user jobs which name matches this mask.</li>
-<li><a name="DependMaskGlobal"/><b>Global Depend Mask</b> - Job will wait other jobs from any user which name matches this mask.</li>
-<li><a name="WaitTime"/><b>Wait Time</b> - Time to wait to start a job.</li>
-<li><a name="NeedOS"/><b>OS Needed</b> - Mask to much render host OS name to run on it.</li>
-<li><a name="NeedProperties"/><b>Properties Needed</b> - Mask to much render host properties to run on it. It's custom host parameter can be defined in farm description.</li>
+<li><a name="Priority"><b>Priority</b></a> - Jobs with greater priority run first.</li>
+<li><a name="MaxRunningTasks"><b>Maximum Running Tasks</b></a> - Maximum number of running tasks at the same time.</li>
+<li><a name="MaxRunTasksPerHost"><b>Maximum Running Tasks Per Host</b></a> - Maximum number of running tasks at the same time at the same host.</li>
+<li><a name="HostsMask"><b>Hosts Mask</b></a> - Job run only on renders which host name matches this mask.</li>
+<li><a name="HostsMaskExclude"><b>Exclude Hosts Mask</b></a> - Job can not run on renders which host name matches this mask.</li>
+<li><a name="DependMask"><b>Depend Mask</b></a> - Job will wait other user jobs which name matches this mask.</li>
+<li><a name="DependMaskGlobal"><b>Global Depend Mask</b></a> - Job will wait other jobs from any user which name matches this mask.</li>
+<li><a name="WaitTime"><b>Wait Time</b></a> - Time to wait to start a job.</li>
+<li><a name="NeedOS"><b>OS Needed</b></a> - Mask to much render host OS name to run on it.</li>
+<li><a name="NeedProperties"><b>Properties Needed</b></a> - Mask to much render host properties to run on it. It's custom host parameter can be defined in farm description.</li>
 
-<li><a name="CmdPre"/><b>Pre Command</b> - Command to execute on job registration.
+<li><a name="CmdPre"><b>Pre Command</b></a> - Command to execute on job registration.
 Note, that this <b><i>command is executed by server</i></b>, and not from tasks working directory.
 Use absolute paths here or even transfer paths if you server has another file system than renders.<br/>
 Commands are executed in a special thread with commands queue.
 This means if somebody executes 'sleep 1000', other commands execution (and jobs registration) will be delayed on 1000 seconds (only delayed, not lost).<br/>
 Try not use Pre Command at all. You always can create one more task(block) and make other tasks(blocks) depend on it.
 </li>
-<li><a name="CmdPost"/><b>Post Command</b> - Command executed on job deletion.
+<li><a name="CmdPost"><b>Post Command</b></a> - Command executed on job deletion.
 This commands are executed on render farm hosts by special system job.
 Working directory of such system task will be the first block working folder.
 </li>
-<li><a name="LifeTime"/><b>Life Time</b> - Maximum job age in seconds.
+<li><a name="LifeTime"><b>Life Time</b></a> - Maximum job age in seconds.
 When job age becomes greater then life time if will be automatically deleted in any case.
 It is useful for some technical jobs to prevent their amount rise.
 You can user default <a href="user.html#JobsLifeTime">life time</a> value for all its jobs.
 </li>
-<li><a name="Annotation"/><b>Annotation</b> - Job annotation. Does not influence anything. This string will be shown in GUI item.</li>
+<li><a name="Annotation"><b>Annotation</b></a> - Job annotation. Does not influence anything. This string will be shown in GUI item.</li>
 </ul>
 
-<h3><a name="State"/>Job State:</h3>
+<h3><a name="State">Job State:</h3></a>
 <ul>
 <li><b><i> Ready                </i> <small><code> RDY </code></small></b> - Job is ready to produce a task.</li>
 <li><b><i> Running              </i> <small><code> RUN </code></small></b> - Job has running tasks.</li>

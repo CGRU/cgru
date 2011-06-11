@@ -6,7 +6,7 @@
 class SysBlock_CmdPost : public SysBlock
 {
 public:
-   SysBlock_CmdPost( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
+   SysBlock_CmdPost( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
    ~SysBlock_CmdPost();
 
 };

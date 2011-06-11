@@ -310,6 +310,14 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
    }
+   case af::Msg::TJobMaxRunTasksPerHost:
+   {
+      maxruntasksperhost = mcgeneral.getNumber();
+      appendLog( std::string("Max running tasks per host set to ") + af::itos( maxruntasksperhost) + " by " + userhost);
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxruntasksperhost);
+      jobchanged = af::Msg::TMonitorJobsChanged;
+      break;
+   }
    case af::Msg::TJobWaitTime:
    {
       time_wait = mcgeneral.getNumber();
@@ -545,6 +553,47 @@ void JobAf::checkDepends()
    if( depend_local || depend_global ) state = state | AFJOB::STATE_WAITDEP_MASK;
 }
 
+void JobAf::addRenderCounts( RenderAf * render)
+{
+   std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
+   std::list<int>::iterator cit = renders_counts.begin();
+   for( ; rit != renders_ptrs.end(); rit++, cit++)
+      if( render == *rit )
+      {
+         (*cit)++;
+         return;
+      }
+   renders_ptrs.push_back( render);
+   renders_counts.push_back( 1);
+}
+
+int JobAf::getRenderCounts( RenderAf * render) const
+{
+   std::list<RenderAf*>::const_iterator rit = renders_ptrs.begin();
+   std::list<int>::const_iterator cit = renders_counts.begin();
+   for( ; rit != renders_ptrs.end(); rit++, cit++)
+      if( render == *rit ) return *cit;
+   return 0;
+}
+
+void JobAf::remRenderCounts( RenderAf * render)
+{
+   std::list<RenderAf*>::iterator rit = renders_ptrs.begin();
+   std::list<int>::iterator cit = renders_counts.begin();
+   for( ; rit != renders_ptrs.end(); rit++, cit++)
+      if( render == *rit )
+      {
+         if( *cit > 1 )
+            (*cit)--;
+         else
+         {
+            renders_ptrs.erase( rit);
+            renders_counts.erase( cit);
+         }
+         return;
+      }
+}
+
 af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring)
 {
    if( state & AFJOB::STATE_OFFLINE_MASK ) return NULL;
@@ -672,8 +721,12 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
    if(            state & AFJOB::STATE_OFFLINE_MASK ) return false;
    if( false == ( state & AFJOB::STATE_READY_MASK  )) return false;
 
-// check maximum hosts:
+// check maximum running tasks:
    if(( maxrunningtasks >= 0 ) && ( getRunningTasksNumber() >= maxrunningtasks )) return false;
+
+// check maximum running tasks per host:
+   if(  maxruntasksperhost == 0 ) return false;
+   if(( maxruntasksperhost  > 0 ) && ( getRenderCounts(render) >= maxruntasksperhost )) return false;
 
 // check blocks with enough capacity
    bool enoughCapacity = false;

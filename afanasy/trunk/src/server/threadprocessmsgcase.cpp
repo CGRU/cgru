@@ -614,6 +614,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TJobDependMask:
    case af::Msg::TJobDependMaskGlobal:
    case af::Msg::TJobMaxRunningTasks:
+   case af::Msg::TJobMaxRunTasksPerHost:
    case af::Msg::TJobWaitTime:
    case af::Msg::TJobLifeTime:
    case af::Msg::TJobPriority:

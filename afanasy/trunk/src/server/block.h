@@ -12,7 +12,7 @@ class Task;
 class Block
 {
 public:
-   Block( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
+   Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
    virtual ~Block();
 
    inline bool isInitialized() const { return initialized;}
@@ -49,7 +49,7 @@ public:
    uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 public:
-   const af::Job * job;
+   JobAf * job;
    af::BlockData * data;
    Task ** tasks;                 ///< Tasks.
    UserAf * user;

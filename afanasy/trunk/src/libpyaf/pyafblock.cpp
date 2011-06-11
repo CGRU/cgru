@@ -180,6 +180,14 @@ PyObject * PyAf_Block_setMaxRunningTasks( PyAf_Block_Object *self, PyObject *arg
    Py_RETURN_TRUE;
 }
 
+PyObject * PyAf_Block_setMaxRunTasksPerHost( PyAf_Block_Object *self, PyObject *arg)
+{
+   long long value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setMaxRunTasksPerHost")) Py_RETURN_FALSE;
+   self->block->setMaxRunTasksPerHost( value);
+   Py_RETURN_TRUE;
+}
+
 PyObject * PyAf_Block_setTasksMaxRunTime( PyAf_Block_Object *self, PyObject *arg)
 {
    long long value;

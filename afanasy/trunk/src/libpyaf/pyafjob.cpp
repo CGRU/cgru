@@ -132,6 +132,14 @@ PyObject * PyAf_Job_setMaxRunningTasks( PyAf_Job_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
+PyObject * PyAf_Job_setMaxRunTasksPerHost( PyAf_Job_Object *self, PyObject *arg)
+{
+   long long value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Job_setMaxRunTasksPerHost")) Py_RETURN_FALSE;
+   self->job->setMaxRunTasksPerHost( value);
+   Py_RETURN_TRUE;
+}
+
 PyObject * PyAf_Job_setPriority( PyAf_Job_Object *self, PyObject *arg)
 {
    long long value;

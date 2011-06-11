@@ -58,27 +58,28 @@ void ItemJob::updateValues( af::Node *node, int type)
       return;
    }
 
-   annotation        = afqt::stoq( job->getAnnontation().c_str());
-   priority          = job->getPriority();
-   username          = afqt::stoq( job->getUserName().c_str());
-   hostname          = afqt::stoq( job->getHostName().c_str());
-   maxrunningtasks   = job->getMaxRunningTasks();
-   state             = job->getState();
-   time_creation     = job->getTimeCreation();
-   time_started      = job->getTimeStarted();
-   time_wait         = job->getTimeWait();
-   time_done         = job->getTimeDone();
-   hostsmask         = afqt::stoq( job->getHostsMask());
-   hostsmask_exclude = afqt::stoq( job->getHostsMaskExclude());
-   dependmask        = afqt::stoq( job->getDependMask());
-   dependmask_global = afqt::stoq( job->getDependMaskGlobal());
-   need_os           = afqt::stoq( job->getNeedOS());
-   need_properties   = afqt::stoq( job->getNeedProperties());
-   cmd_pre           = afqt::stoq( job->getCmdPre());
-   cmd_post          = afqt::stoq( job->getCmdPost());
-   description       = afqt::stoq( job->getDescription());
-   num_runningtasks  = job->getRunningTasksNumber();
-   lifetime          = job->getLifeTime();
+   annotation           = afqt::stoq( job->getAnnontation().c_str());
+   priority             = job->getPriority();
+   username             = afqt::stoq( job->getUserName().c_str());
+   hostname             = afqt::stoq( job->getHostName().c_str());
+   maxrunningtasks      = job->getMaxRunningTasks();
+   maxruntasksperhost   = job->getMaxRunTasksPerHost();
+   state                = job->getState();
+   time_creation        = job->getTimeCreation();
+   time_started         = job->getTimeStarted();
+   time_wait            = job->getTimeWait();
+   time_done            = job->getTimeDone();
+   hostsmask            = afqt::stoq( job->getHostsMask());
+   hostsmask_exclude    = afqt::stoq( job->getHostsMaskExclude());
+   dependmask           = afqt::stoq( job->getDependMask());
+   dependmask_global    = afqt::stoq( job->getDependMaskGlobal());
+   need_os              = afqt::stoq( job->getNeedOS());
+   need_properties      = afqt::stoq( job->getNeedProperties());
+   cmd_pre              = afqt::stoq( job->getCmdPre());
+   cmd_post             = afqt::stoq( job->getCmdPost());
+   description          = afqt::stoq( job->getDescription());
+   num_runningtasks     = job->getRunningTasksNumber();
+   lifetime             = job->getLifeTime();
 
    compact_display   = true;
    for( int b = 0; b < blocksnum; b++)
@@ -102,6 +103,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    if( false == hostsmask_exclude.isEmpty()) properties += QString(" E(%1)" ).arg( hostsmask_exclude   );
    if( false == need_properties.isEmpty()  ) properties += QString(" P(%1)" ).arg( need_properties     );
    if( maxrunningtasks != -1 ) properties += QString(" m%1").arg( maxrunningtasks);
+   if( maxruntasksperhost != -1 ) properties += QString(" mph%1").arg( maxruntasksperhost);
    properties += QString(" p%2").arg( priority);
 
    user_time = username;

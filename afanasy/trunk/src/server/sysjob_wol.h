@@ -6,7 +6,7 @@
 class SysBlock_WOL : public SysBlock
 {
 public:
-   SysBlock_WOL( af::Job * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
+   SysBlock_WOL( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
    ~SysBlock_WOL();
 
 };
