@@ -31,67 +31,6 @@ void Block::stdOut( bool full) const
    if( full ) for( std::list<Task*>::const_iterator it = tasks.begin(); it != tasks.end(); it++) (*it)->stdOut( false);
 }
 
-bool Block::setCapacity( int value) { return af::BlockData::setCapacity( value); }
-
-void Block::setNeedMemory(             int value   )  { need_memory     = value; }
-void Block::setNeedPower(              int value   )  { need_power      = value; }
-void Block::setNeedHDD(                int value   )  { need_hdd        = value; }
-void Block::setTasksMaxRunTime(        int value   )  { tasksmaxruntime = value; }
-void Block::setParserCoeff(            int value   )  { parsercoeff     = value; }
-
-void Block::setName(             const std::string & str) {  name        = str;   }
-void Block::setService(          const std::string & str) {  service     = str;   }
-void Block::setParser(           const std::string & str) {  parser      = str;   }
-void Block::setTasksName(        const std::string & str) {  tasksname   = str;   }
-void Block::setCmdPre(           const std::string & str) {  cmd_pre     = str;   }
-void Block::setCmdPost(          const std::string & str) {  cmd_post    = str;   }
-void Block::setCommand(          const std::string & str) {  command     = str;   }
-void Block::setFiles(            const std::string & str) {  files       = str;   }
-void Block::setWorkingDirectory( const std::string & str) {  wdir        = str;   }
-void Block::setEnvironment(      const std::string & str) {  environment = str;   }
-void Block::setCustomData(       const std::string & str) {  customdata  = str;   }
-
-bool Block::setDependMask( const std::string & str )
-{
-   return af::BlockData::setDependMask( str);
-}
-bool Block::setTasksDependMask( const std::string & str )
-{
-   return af::BlockData::setTasksDependMask( str);
-}
-bool Block::setSubTaskDependMask( const std::string & str )
-{
-   return af::BlockData::setSubTaskDependMask( str);
-}
-bool Block::setHostsMask( const std::string & str )
-{
-   return af::BlockData::setHostsMask( str);
-}
-bool Block::setHostsMaskExclude( const std::string & str)
-{
-   return af::BlockData::setHostsMaskExclude( str);
-}
-bool Block::setNeedProperties( const std::string & str)
-{
-   return af::BlockData::setNeedProperties( str);
-}
-
-bool Block::setNumeric( long long start, long long end, long long perHost, long long increment)
-{
-   return af::BlockData::setNumeric(  start, end, perHost, increment);
-}
-
-void Block::setFramesPerTask( long long perTask)
-{
-   af::BlockData::setFramesPerTask( perTask);
-}
-
-void Block::setFileSizeCheck( long long min, long long max)
-{
-   filesize_min = min;
-   filesize_max = max;
-}
-
 void Block::setVariableCapacity( int min, int max)
 {
    if( min < 0 ) min = 0;

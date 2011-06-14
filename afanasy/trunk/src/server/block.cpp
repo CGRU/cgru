@@ -422,17 +422,6 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
       }
       break;
    }
-   case af::Msg::TBlockSubTaskDependMask:
-   {
-      if( data->setSubTaskDependMask( mcgeneral.getString()));
-      {
-         appendJobLog( std::string("Sub task depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
-         if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
-         jobchanged = af::Msg::TMonitorJobsChanged;
-         AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_subtaskdependmask);
-      }
-      break;
-   }
    case af::Msg::TBlockCommand:
    {
       data->setCommand( mcgeneral.getString());

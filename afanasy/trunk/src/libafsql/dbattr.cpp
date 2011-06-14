@@ -82,7 +82,6 @@ void DBAttr::init()
    DBName[_services_disabled     ] = "services_disabled";
    DBName[_starts_count          ] = "starts_count";
    DBName[_state                 ] = "state";
-   DBName[_subtaskdependmask     ] = "subtaskdependmask";
    DBName[_tasksdependmask       ] = "tasksdependmask";
    DBName[_tasksdone             ] = "tasksdone";
    DBName[_tasksmaxruntime       ] = "tasksmaxruntime";

@@ -585,7 +585,6 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TBlockResetErrorHosts:
    case af::Msg::TBlockDependMask:
    case af::Msg::TBlockTasksDependMask:
-   case af::Msg::TBlockSubTaskDependMask:
    case af::Msg::TBlockHostsMask:
    case af::Msg::TBlockHostsMaskExclude:
    case af::Msg::TBlockMaxRunningTasks:

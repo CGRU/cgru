@@ -2,7 +2,6 @@ import soho
 from soho import SohoParm
 import hou
 import os
-import re
 import time
 
 import af
@@ -80,12 +79,12 @@ if not isinstance( driver, hou.RopNode):
    soho.error('%s is not a ROP node' % hdriver)
 tr = driver.parm('trange')
 blockSet = False
-sf = driver.parm('soho_foreground')
+soho_foreground = driver.parm('soho_foreground')
 if tr != None and tr.eval() == 0:
-   if sf != None:
-      if sf.eval() == 0:
+   if soho_foreground != None:
+      if soho_foreground.eval() == 0:
          try:
-            sf.set( 1)
+            soho_foreground.set( 1)
             blockSet = True
          except:
             soho.error('Set "Block Until Render Complete" on %s node' % hdriver)
@@ -171,4 +170,4 @@ job.setCmdPost('deletefiles "%s"' % tmphip)
 
 job.send()
 
-if blockSet: sf.set( 0)
+if blockSet: soho_foreground.set( 0)

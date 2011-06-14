@@ -85,7 +85,6 @@ void BlockData::construct()
 
    dependmask.setCaseSensitive();
    tasksdependmask.setCaseSensitive();
-   subtaskdependmask.setCaseSensitive();
 
    hostsmask.setCaseInsensitive();
 
@@ -179,7 +178,6 @@ void BlockData::readwrite( Msg * msg)
       rw_int32_t ( need_hdd,              msg);
       rw_RegExp  ( dependmask,            msg);
       rw_RegExp  ( tasksdependmask,       msg);
-      rw_RegExp  ( subtaskdependmask,     msg);
       rw_RegExp  ( hostsmask,             msg);
       rw_RegExp  ( hostsmask_exclude,     msg);
       rw_RegExp  ( need_properties,       msg);
@@ -374,6 +372,9 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
    }
    if( isNotNumeric() )
    {
+      start = num * frame_pertask;
+      end = (num + 1) * frame_last;
+      if( end > tasksnum ) end = tasksnum;
       if( frames_num ) *frames_num = frame_pertask;
       return true;
    }
@@ -647,6 +648,8 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
          stream << "\n    Wait service start maximum = " << multihost_waitmax;
       }
 
+      if( isDependSubTask() ) stream << "\n   Sub Task Dependence.";
+
       if( full || ( maxrunningtasks != -1 )) stream << "\n Max Running Tasks = " << maxrunningtasks;
       if( full && ( maxrunningtasks == -1 )) stream << " (no limit)";
 
@@ -657,7 +660,6 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 
       if(        dependmask.notEmpty()) stream << "\n Depend Mask = "         << dependmask.getPattern();
       if(   tasksdependmask.notEmpty()) stream << "\n Tasks Depend Mask = "   << tasksdependmask.getPattern();
-      if( subtaskdependmask.notEmpty()) stream << "\n Sub Task Depend Mask = "<< subtaskdependmask.getPattern();
       if(         hostsmask.notEmpty()) stream << "\n Hosts Mask = "          << hostsmask.getPattern();
       if( hostsmask_exclude.notEmpty()) stream << "\n Exclude Hosts Mask = "  << hostsmask_exclude.getPattern();
 

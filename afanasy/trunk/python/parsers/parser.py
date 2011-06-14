@@ -10,7 +10,7 @@ class parser:
       self.numframes = frames
       if self.numframes < 1: self.numframes = 1
       self.percent = 0
-      self.frame = 1
+      self.frame = 0
       self.percentframe = 0
       self.error = False
       self.warning = False
@@ -35,12 +35,12 @@ class parser:
       return result, self.percent, self.frame, self.percentframe, self.warning, self.error, self.badresult
 
    def calculate( self):
-      if self.frame < 1: self.frame = 1
+      if self.frame < 0: self.frame = 0
       if self.frame > self.numframes: self.frame = self.numframes
       if self.percentframe < 0: self.percentframe = 0
       if self.percentframe > 100: self.percentframe = 100
       if self.numframes > 1:
-         self.percent = int((100.0*(self.frame-1) + self.percentframe)/self.numframes)
+         self.percent = int((100.0*self.frame + self.percentframe)/self.numframes)
       else:
          self.percent = self.percentframe
       if self.percent < 0: self.percent = 0

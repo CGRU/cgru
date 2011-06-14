@@ -28,7 +28,6 @@ PyObject * PyAf_Block_setHostsMask(          PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setHostsMaskExclude(   PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setDependMask(         PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setTasksDependMask(    PyAf_Block_Object *self, PyObject *arg);
-PyObject * PyAf_Block_setSubTaskDependMask(  PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedProperties(     PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setMaxRunningTasks(    PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setMaxRunTasksPerHost( PyAf_Block_Object *self, PyObject *arg);
@@ -42,6 +41,7 @@ PyObject * PyAf_Block_setVariableCapacity(   PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setMultiHost(          PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setNumeric(            PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setFramesPerTask(      PyAf_Block_Object *self, PyObject *args);
+PyObject * PyAf_Block_setDependSubTask(      PyAf_Block_Object *self);
 PyObject * PyAf_Block_clearTasksList(        PyAf_Block_Object *self);
 
 #ifndef PYAFBLOCK
@@ -64,7 +64,6 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setHostsMaskExclude",    (PyCFunction) PyAf_Block_setHostsMaskExclude,   METH_O,        "Set exclude hosts mask."},
    {"setDependMask",          (PyCFunction) PyAf_Block_setDependMask,         METH_O,        "Set depend mask."},
    {"setTasksDependMask",     (PyCFunction) PyAf_Block_setTasksDependMask,    METH_O,        "Set tasks depend mask."},
-   {"setSubTaskDependMask",   (PyCFunction) PyAf_Block_setSubTaskDependMask,  METH_O,        "Set sub task depend mask."},
    {"setNeedProperties",      (PyCFunction) PyAf_Block_setNeedProperties,     METH_O,        "Set needed properties."},
    {"setMaxRunningTasks",     (PyCFunction) PyAf_Block_setMaxRunningTasks,    METH_O,        "Set maximum running tasks."},
    {"setMaxRunTasksPerHost",  (PyCFunction) PyAf_Block_setMaxRunTasksPerHost, METH_O,        "Set maximum running tasks per host."},
@@ -78,6 +77,7 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setVariableCapacity",    (PyCFunction) PyAf_Block_setVariableCapacity,   METH_VARARGS,  "Set variable capacity."},
    {"setMultiHost",           (PyCFunction) PyAf_Block_setMultiHost,          METH_VARARGS,  "Set multi hosts tasks."},
    {"setNumeric",             (PyCFunction) PyAf_Block_setNumeric,            METH_VARARGS,  "Set block type to numeric."},
+   {"setDependSubTask",       (PyCFunction) PyAf_Block_setDependSubTask,      METH_NOARGS,   "Set sub task block dependence."},
    {"clearTasksList",         (PyCFunction) PyAf_Block_clearTasksList,        METH_NOARGS,   "Clear tasks list."},
    { NULL, NULL, 0, NULL } // Sentinel
 };

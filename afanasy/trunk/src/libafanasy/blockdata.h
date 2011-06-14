@@ -34,7 +34,8 @@ public:
       FNumeric          = 1 << 0,
       FVarCapacity      = 1 << 1,
       FMultiHost        = 1 << 2,
-      FSameHostMaster   = 1 << 3
+      FSameHostMaster   = 1 << 3,
+      FDependSubTask    = 1 << 4
    };
 
    bool isValid() const;
@@ -64,8 +65,14 @@ public:
    inline bool canVarCapacity() const { return flags & FVarCapacity;} ///< Whether the block can variate tasks capacity.
    inline bool isMultiHost() const { return flags & FMultiHost;} ///< Whether the one block task can run on several hosts.
    inline bool canMasterRunOnSlaveHost() const { return flags & FSameHostMaster;} ///< Can multihost task run master host on slave machines.
+   inline bool isDependSubTask() const { return flags & FDependSubTask;} ///< Other block can depend this block sub task
+
+   inline void setDependSubTask( bool value = true) { if(value) flags |= FDependSubTask; else flags &= (~FDependSubTask);}
 
    inline void setParserCoeff( int value ) { parsercoeff = value; }
+
+   inline void setName(  const std::string & str) {  name        = str;   }
+   inline void setTasksName(  const std::string & str) {  tasksname   = str;   }
 
 /// Set block tasks type.
    inline void setService(          const std::string & str    ) { service          = str;   }
@@ -112,9 +119,6 @@ public:
 /// Set block tasks depend mask.
    bool setTasksDependMask(   const std::string & str, std::string * errOutput = NULL)
       { return setRegExp( tasksdependmask, str, "block tasks depend mask", errOutput);}
-/// Set block sub task depend mask.
-   bool setSubTaskDependMask(   const std::string & str, std::string * errOutput = NULL)
-      { return setRegExp( subtaskdependmask, str, "block sub task depend mask", errOutput);}
 
    bool setNeedProperties(    const std::string & str, std::string * errOutput = NULL)
       { return setRegExp( need_properties, str, "block host properties needed", errOutput);}
@@ -122,6 +126,12 @@ public:
    inline void setNeedMemory( int memory ) { need_memory = memory;}
    inline void setNeedPower(  int power  ) { need_power  = power; }
    inline void setNeedHDD(    int hdd    ) { need_hdd    = hdd;   }
+
+   inline void setWorkingDirectory( const std::string & str) {  wdir        = str;   }
+   inline void setEnvironment(      const std::string & str) {  environment = str;   }
+   inline void setCustomData( const std::string & str) {  customdata  = str;  }
+   inline void setFileSizeCheck( long long min, long long max) { filesize_min = min; filesize_max = max; }
+
 
 /// Set maximum number or errors on same host for job NOT to avoid host
    inline void setErrorsAvoidHost(    int8_t value) { errors_avoidhost    = value; }
@@ -153,7 +163,6 @@ public:
 
    inline const std::string & getDependMask()        const { return dependmask.getPattern();       }  ///< Get depend mask.
    inline const std::string & getTasksDependMask()   const { return tasksdependmask.getPattern();  }  ///< Get tasks depend mask.
-   inline const std::string & getSubTaskDependMask() const { return subtaskdependmask.getPattern();}  ///< Get sub task depend mask.
    inline const std::string & getHostsMask()         const { return hostsmask.getPattern();        }  ///< Block hosts mask.
    inline const std::string & getHostsMaskExclude()  const { return hostsmask_exclude.getPattern();}  ///< Block hosts exclude mask.
    inline const std::string & getNeedProperties()    const { return need_properties.getPattern();  }  ///< Block need_properties.
@@ -307,7 +316,6 @@ protected:
 
    RegExp dependmask;
    RegExp tasksdependmask;
-   RegExp subtaskdependmask;
    RegExp hostsmask;
    RegExp hostsmask_exclude;
    RegExp need_properties;

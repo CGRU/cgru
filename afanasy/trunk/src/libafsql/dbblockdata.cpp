@@ -52,7 +52,6 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrInt32(  DBAttr::_maxruntasksperhost,   &maxruntasksperhost     ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,           &dependmask             ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_tasksdependmask,      &tasksdependmask        ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_subtaskdependmask,    &subtaskdependmask      ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask              ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude      ));
    dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_min,         &filesize_min           ));

@@ -449,7 +449,6 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TBlockResetErrorHosts:
    case af::Msg::TBlockDependMask:
    case af::Msg::TBlockTasksDependMask:
-   case af::Msg::TBlockSubTaskDependMask:
    case af::Msg::TBlockCommand:
    case af::Msg::TBlockWorkingDir:
    case af::Msg::TBlockFiles:
@@ -650,11 +649,12 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          if( b == block ) continue;
          if( blocksdata[block]->checkTasksDependMask( blocksdata[b]->getName()) == false ) continue;
 
-         int fpt = blocksdata[block]->getFramePerTask();
-         int fpt_dep = blocksdata[b]->getFramePerTask();
+         long long fpt = blocksdata[block]->getFramePerTask();
+         long long fpt_dep = blocksdata[b]->getFramePerTask();
          if(( fpt == 0 ) || ( fpt_dep == 0 )) continue;
 
-         int firstdependframe, lastdependframe, firstdependtask, lastdependtask;
+         long long firstdependframe, lastdependframe;
+         int firstdependtask, lastdependtask;
          if( fpt > 0 )
          {
             firstdependframe = task * fpt;
@@ -686,6 +686,15 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          {
 //printf("Dep['%s':%d-'%s']: checking '%s':%d - %s\n", blocksdata[block]->getName().toUtf8().data(), task, blocksdata[b]->getName().toUtf8().data(), blocksdata[b]->getName().toUtf8().data(), t, (progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK) ? "DONE" : "NOT Done");
             if( progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK ) continue;
+            if( blocksdata[b]->isDependSubTask() && ( progress->tp[b][t]->state & AFJOB::STATE_RUNNING_MASK ))
+            {
+               long long f_start, f_end, f_start_dep, f_end_dep;
+               blocksdata[block]->genNumbers( f_start, f_end, task);
+               blocksdata[b]->genNumbers( f_start_dep, f_end_dep, t);
+               long long frame_run = f_start_dep + progress->tp[b][t]->frame;
+//printf("Dep['%s': #%d '%s']: f_s=%lld f_d=%lld\n", blocksdata[block]->getName().c_str(), task, blocksdata[b]->getName().c_str(), f_start, frame_run);
+               if( frame_run > f_start ) continue;
+            }
             af::TaskExec * task_ptr = genTask( render, b, t, (t == firstdependtask ? blocksIds : NULL), monitoring);
             if( state & AFJOB::STATE_OFFLINE_MASK )
             {

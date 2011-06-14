@@ -108,7 +108,6 @@ private:
 
    QString dependmask;
    QString tasksdependmask;
-   QString subtaskdependmask;
    QString hostsmask;
    QString hostsmask_exclude;
 
