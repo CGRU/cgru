@@ -67,7 +67,7 @@ Parser.add_option('--activity',         dest='activity',    type  ='string',    
 Parser.add_option('--comments',         dest='comments',    type  ='string',     default='',          help='Draw comments')
 Parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
 Parser.add_option('--lgspath',          dest='lgspath',     type  ='string',     default='',          help='Slate logotype path')
-Parser.add_option('--lgssize',          dest='lgssize',     type  ='int',        default=20,   	      help='Slate logotype size, percent of image')
+Parser.add_option('--lgssize',          dest='lgssize',     type  ='int',        default=25,   	      help='Slate logotype size, percent of image')
 Parser.add_option('--lgsgrav',          dest='lgsgrav',     type  ='string',     default='southeast', help='Slate logotype positioning gravity')
 Parser.add_option('--lgfpath',          dest='lgfpath',     type  ='string',     default='',          help='Flrame logotype path')
 Parser.add_option('--lgfsize',          dest='lgfsize',     type  ='int',        default=10,   	      help='Flrame logotype size, percent of image')

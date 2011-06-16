@@ -33,7 +33,7 @@ Parser.add_option('--line169',               dest='line169',         type  ='str
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='',             help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--fff',                   dest='fffirst',         action='store_true', default=False,          help='Draw first frame as first, and not actual first frame number.')
 Parser.add_option('--lgspath',         		dest='lgspath',    		type  ='string',     default='',             help='Slate logo')
-Parser.add_option('--lgssize',         		dest='lgssize',    		type  ='int',        default=20,   	         help='Slate logo size, percent of image')
+Parser.add_option('--lgssize',         		dest='lgssize',    		type  ='int',        default=25,   	         help='Slate logo size, percent of image')
 Parser.add_option('--lgsgrav',         		dest='lgsgrav',    		type  ='string',     default='southeast', 	help='Slate logo positioning gravity')
 Parser.add_option('--lgfpath',         		dest='lgfpath',    		type  ='string',     default='',             help='Frame logo')
 Parser.add_option('--lgfsize',         		dest='lgfsize',    		type  ='int',        default=10,   	         help='Frame logo size, percent of image')
