@@ -11,7 +11,7 @@ AfanasyNodeClassName = 'afanasy'
 AfanasyServiceType = 'nuke'
 DailiesServiceType = 'movgen'
 
-VERBOSE = 2
+VERBOSE = 0
 
 af = None
 
@@ -214,6 +214,7 @@ class BlockParameters:
          cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i -m %(threads)s')
          cmdargs = ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
          if self.capacitymin != -1 or self.capacitymax != -1:
+
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             services = __import__('services.service', globals(), locals(), [])
             threads = services.service.str_capacity

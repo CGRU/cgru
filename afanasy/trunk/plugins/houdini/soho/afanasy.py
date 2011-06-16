@@ -2,172 +2,133 @@ import soho
 from soho import SohoParm
 import hou
 import os
+import sys
 import time
 
 import af
 import afcommon
 import services.service
 
-genParms = {
-    'trange'                     : SohoParm('trange'                    ,'int'   , [0],          False),
-    'f'                          : SohoParm('f'                         ,'int'   , [1,1,1],      False),
-    'hdriver'                    : SohoParm('hdriver'                   ,'string', [''],         False),
-    'fpr'                        : SohoParm('fpr'                       ,'int'   , [1],          False),
-    'jobname'                    : SohoParm('jobname'                   ,'string', [''],         False),
-    'ignore_inputs'              : SohoParm('ignore_inputs'             ,'int'   , [0],          False),
-    'take'                       : SohoParm('take'                      ,'string', ['_current_'],False),
+VERBOSE = 2
 
-    'gen_name'                   : SohoParm('object:name'               ,'string', [''], False, key='gen_name'),
-    'now'                        : SohoParm('state:time'                ,'real'  , [0],  False, key='now'),
-    'fps'                        : SohoParm('state:fps'                 ,'real'  , [24], False, key='fps'),
-    'hip'                        : SohoParm('$HIP'                      ,'string', [''], False, key='hip'),
-    'hipname'                    : SohoParm('$HIPNAME'                  ,'string', [''], False, key='hipname'),
+class BlockParameters:
+   def __init__( self, afnode, ropnode, subblock, prefix):
+      if VERBOSE==2: print 'Initializing block parameters for "%s" from "%s"' % (ropnode.name(), afnode.name())
 
-    'enable_extended_parameters' : SohoParm('enable_extended_parameters','int'   , [0]    , False),
-    'depend_mask'                : SohoParm('depend_mask'               ,'string', ['']   , False),
-    'depend_mask_global'         : SohoParm('depend_mask_global'        ,'string', ['']   , False),
-    'priority'                   : SohoParm('priority'                  ,'int'   , [-1]   , False),
-    'maximum_hosts'              : SohoParm('maximum_hosts'             ,'int'   , [-1]   , False),
-    'capacity'                   : SohoParm('capacity'                  ,'int'   , [-1]   , False),
-    'capacity_coefficient'       : SohoParm('capacity_coefficient'      ,'int'   , [-1,-1], False),
-    'hosts_mask'                 : SohoParm('hosts_mask'                ,'string', ['']   , False),
-    'hosts_mask_exclude'         : SohoParm('hosts_mask_exclude'        ,'string', ['']   , False),
-    'start_paused'               : SohoParm('start_paused'              ,'int'   , [0]    , False),
-    'platform'                   : SohoParm('platform'                  ,'string', ['']   , False),
-}
-plist = soho.evaluate(genParms)
+      self.ropnode   = ropnode
+      self.ropname   = str( ropnode.name())
+      self.valid     = True
+      self.subblock  = subblock
+      self.prefix    = prefix
+      self.fullrangedepend = 0
 
-hdriver        = plist['hdriver'].Value[0]
-trange         = plist['trange'].Value[0]
-f              = plist['f'].Value
-gen_name       = plist['gen_name'].Value[0]
-fpr            = plist['fpr'].Value[0]
-jobname        = plist['jobname'].Value[0]
-ignore_inputs  = plist['ignore_inputs'].Value[0]
-take           = plist['take'].Value[0]
-FPS            = plist['fps'].Value[0]
-now            = plist['now'].Value[0]
-hip            = plist['hip'].Value[0]
-hipname        = plist['hipname'].Value[0]
+      if afnode.parm('f1') is not None: self.framefirst = int( afnode.parm('f1').eval())
+      if afnode.parm('f2') is not None: self.framelast  = int( afnode.parm('f2').eval())
+      if afnode.parm('f3') is not None: self.frameinc   = int( afnode.parm('f3').eval())
 
-platform                   = plist['platform'].Value[0]
-start_paused               = plist['start_paused'].Value[0]
-enable_extended_parameters = plist['enable_extended_parameters'].Value[0]
-depend_mask                = plist['depend_mask'].Value[0]
-depend_mask_global         = plist['depend_mask_global'].Value[0]
-priority                   = plist['priority'].Value[0]
-capacity                   = plist['capacity'].Value[0]
-capacity_coefficient       = plist['capacity_coefficient'].Value
-maximum_hosts              = plist['maximum_hosts'].Value[0]
-hosts_mask                 = plist['hosts_mask'].Value[0]
-hosts_mask_exclude         = plist['hosts_mask_exclude'].Value[0]
+      self.take              = str( afnode.parm('take').eval())
+      self.jobname           = str( afnode.parm('jobname').eval())
 
+      self.start_paused      = int( afnode.parm('start_paused').eval())
+      self.priority          = int( afnode.parm('priority').eval())
+      self.framefirst        = int( afnode.parm('f1').eval())
+      self.framelast         = int( afnode.parm('f2').eval())
+      self.frameinc          = int( afnode.parm('f3').eval())
+      self.framespertask     = int( afnode.parm('fpr').eval())
+      self.maxhosts          = int( afnode.parm('maximum_hosts').eval())
+      self.capacity          = int( afnode.parm('capacity').eval())
+      self.capacitymin       = int( afnode.parm('capacity_coefficient1').eval())
+      self.capacitymax       = int( afnode.parm('capacity_coefficient2').eval())
+      self.hostsmask         = str( afnode.parm('hosts_mask').eval())
+      self.hostsmaskexclude  = str( afnode.parm('hosts_mask_exclude').eval())
+      self.platform          = str( afnode.parm('platform').eval())
 
-# Initialize soho
-soho.initialize(now, '')
-soho.lockObjects(now)
+      # Find the output driver to process
+      ropnode = gen.node(hdriver)
+      if not ropnode:
+         soho.error('Can\'t find %s for processing' % ropname)
+      if not isinstance( ropnode, hou.RopNode):
+         soho.error('%s is not a ROP node' % ropname)
+      tr = ropnode.parm('trange')
+      blockSet = False
+      soho_foreground = driver.parm('soho_foreground')
+      if tr != None and tr.eval() == 0:
+         if soho_foreground != None:
+            if soho_foreground.eval() == 0:
+               try:
+                  soho_foreground.set( 1)
+                  blockSet = True
+               except:
+                  soho.error('Set "Block Until Render Complete" on %s node' % ropname)
 
-# First, we find the name of the output driver being called
-rop = soho.getOutputDriver()
-gen = hou.node(gen_name)
+   def genJob( self):
+      if VERBOSE: print 'Generating job on "%s"' % self.jobname
 
-# Find the output driver to process
-driver = gen.node(hdriver)
-if not driver:
-   soho.error('Can\'t find %s for processing' % hdriver)
-if not isinstance( driver, hou.RopNode):
-   soho.error('%s is not a ROP node' % hdriver)
-tr = driver.parm('trange')
-blockSet = False
-soho_foreground = driver.parm('soho_foreground')
-if tr != None and tr.eval() == 0:
-   if soho_foreground != None:
-      if soho_foreground.eval() == 0:
-         try:
-            soho_foreground.set( 1)
-            blockSet = True
-         except:
-            soho.error('Set "Block Until Render Complete" on %s node' % hdriver)
+      if not os.path.isdir(hip): soho.error('Unable to find spool directory "%"' % hip)
+      ftime = time.time()
+      tmphip = hip + '/' + jobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
+      # use mwrite, because hou.hipFile.save(tmphip)
+      # changes current scene file name to tmphip, at least in version 9.1.115
+      hou.hscript('mwrite -n %s' % tmphip)
 
-if not os.path.isdir(hip):
-   soho.error('Unable to find spool directory "%"' % hip)
+      jobcmd = 'hrender_af'
+      if ignore_inputs: jobcmd += ' -i'
+      jobargs = ' -s @#@ -e @#@ --by %d -t %s %s %s' % (self.frameinc, self.take, tmphip, self.ropname)
 
-# Get the frame range
-# Ensure the frame range is at least three values
-if len(f) == 1: f.append(f[0])
-if len(f) == 2: f.append(1)
+      blocktype = 'hbatch'
+      preview = ''
+      drivertypename = self.ropnode.type().name()
+      if drivertypename == 'ifd':
+         blocktype = 'hbatch_mantra'
+         vm_picture = driver.parm('vm_picture')
+         if vm_picture != None:
+            preview = afcommon.patternFromPaths( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
+      elif drivertypename == 'rib':
+         blocktype = 'hbatch_prman'
 
-# No frame range specified, just render the current frame
-if trange == 0:
-    f[0] = hou.frame()
-    f[1] = f[0]
-    f[2] = 1
+      job = af.Job()
+      job.setName( jobname )
+      if start_paused:
+         job.offLine()
 
-start,end,by = f
-if end < start: end = start
-if by < 1: by = 1
+      if platform != '':
+         if platform == 'any': job.setNeedOS('')
+         else: job.setNeedOS( platform)
 
-ftime = time.time()
-tmphip = hip + '/' + jobname + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
-# use mwrite, because hou.hipFile.save(tmphip)
-# changes current scene file name to tmphip, at least in version 9.1.115
-hou.hscript('mwrite -n %s' % tmphip)
+      block = af.Block( hdriver, blocktype)
+      block.setWorkingDirectory( os.getenv('PWD', os.getcwd()))
+      block.setNumeric( start, end, fpertask, by)
+      if preview != '': block.setFiles( preview)
+      job.blocks.append( block)
 
-jobcmd = 'hrender_af'
-if ignore_inputs: jobcmd += ' -i'
-jobargs = ' -s @#@ -e @#@ --by %(by)d -t %(take)s %(tmphip)s %(hdriver)s' % vars()
+      job.setPriority( self.priority)
+      if self.depend_mask != '': job.setDependMask( self.depend_mask)
+      if self.depend_mask_global != '': job.setDependMaskGlobal( self.depend_mask_global)
+      if self.maximum_hosts > -1: job.setMaxHosts( self.maximum_hosts)
+      if self.hosts_mask != '': job.setHostsMask( self.hosts_mask)
+      if self.hosts_mask_exclude != '': job.setHostsMaskExclude( self.hosts_mask_exclude)
+      block.setCapacity( self.capacity)
+      if self.capacity_min != -1 or self.capacity_max != -1 :
+         block.setVariableCapacity( self.capacity_min, self.capacity_max)
+         jobcmd += ' --numcpus '+ services.service.str_capacity
 
-blocktype = 'hbatch'
-preview = ''
-drivertypename = driver.type().name()
-if drivertypename == 'ifd':
-   blocktype = 'hbatch_mantra'
-   vm_picture = driver.parm('vm_picture')
-   if vm_picture != None:
-      preview = afcommon.patternFromPaths( vm_picture.evalAsStringAtFrame(start), vm_picture.evalAsStringAtFrame(end))
-elif drivertypename == 'rib':
-   blocktype = 'hbatch_prman'
-elif drivertypename == 'afanasy':
-   soho.error('Render "afanasy" ROP will cycle process.')
-elif drivertypename == 'af_cmd_sender':
-   soho.error('ROP "af_cmd_sender" can send commands itself.')
-elif drivertypename == 'af_multiply_sender':
-   soho.error('ROP "af_multiply_sender" sends job itself.')
+      block.setCommand( jobcmd + jobargs)
 
-if len(capacity_coefficient) == 1: capacity_coefficient.append(-1)
-capacity_min,capacity_max = capacity_coefficient
+      job.setCmdPost('deletefiles "%s"' % tmphip)
 
-job = af.Job()
-job.setName( jobname )
-if start_paused:
-   job.offLine()
+      if VERBOSE: job.stdout( True)
 
-if platform != '':
-   if platform == 'any': job.setNeedOS('')
-   else: job.setNeedOS( platform)
+#      job.send()
 
-block = af.Block( hdriver, blocktype)
-block.setWorkingDirectory( os.getenv('PWD', os.getcwd()))
-block.setNumeric( start, end, fpr, by)
-if preview != '': block.setFiles( preview)
-job.blocks.append( block)
+      if blockSet: soho_foreground.set( 0)
 
-if enable_extended_parameters:
-   job.setPriority( priority)
-   if depend_mask != '': job.setDependMask( depend_mask)
-   if depend_mask_global != '': job.setDependMaskGlobal( depend_mask_global)
-   if maximum_hosts > -1: job.setMaxHosts( maximum_hosts)
-   if hosts_mask != '': job.setHostsMask( hosts_mask)
-   if hosts_mask_exclude != '': job.setHostsMaskExclude( hosts_mask_exclude)
-   block.setCapacity( capacity)
-   if capacity_min != -1 or capacity_max != -1 :
-      block.setVariableCapacity( capacity_min, capacity_max)
-      jobcmd += ' --numcpus '+ services.service.str_capacity
+def getJobParameters( afnode):
+   inputs = []
+   inputs.extend( hou.pwd().inputs())
+   inputs.reverse()
+   for i in inputs:
+      if i.isBypassed(): continue
+      print i
 
-block.setCommand( jobcmd + jobargs)
-
-job.setCmdPost('deletefiles "%s"' % tmphip)
-
-job.send()
-
-if blockSet: soho_foreground.set( 0)
+afnode = hou.pwd()
+getJobParemeters( afnode)

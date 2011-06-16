@@ -288,7 +288,7 @@ void Address::generateInfoStream( std::ostringstream & stream, bool full) const
             break;
       }
    }
-   generateIPStream( stream, full);
+   generateIPStream( stream, true);
    if( notEmpty() && ( port != 0))
    {
       stream << ":";

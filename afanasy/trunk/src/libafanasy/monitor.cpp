@@ -108,6 +108,6 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
    {
       stream << name << "[" << id << "]";
       stream << " (" << version << " r" << revision << ") ";
-      address.generateInfoStream( stream);
+      address.generateInfoStream( stream, full);
    }
 }
