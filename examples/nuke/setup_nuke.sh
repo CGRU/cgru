@@ -6,7 +6,7 @@ source ./setup.sh
 popd >> /dev/null
 
 # Setup special Python module:
-export PYTHONPATH="$AF_ROOT/bin_pyaf/2.6.6:$PYTHONPATH"
+export PYTHONPATH="$AF_ROOT/bin_pyaf/2.6.7:$PYTHONPATH"
 
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then

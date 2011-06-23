@@ -34,10 +34,10 @@ popd $pwd >> /dev/null
 # Setup CGRU houdini scripts location:
 export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 
-# Set Afanasy houdini scripts location:
+# Set Afanasy houdini scripts and otls location:
 export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini
-
-export HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH/otls:$HH/otls
+export PYTHONPATH=$HOUDINI_AF_PATH:$PYTHONPATH
+export HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH:$HH/otls
 
 if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
    export HOUDINI_OTLSCAN_PATH="${HOUDINI_AF_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
@@ -46,10 +46,10 @@ else
 fi
 
 # Try CGRU 2.6 Python (Houdini 11 uses 2.6 Python):
-cgru_python="$CGRU_LOCATION/utilities/python/2.6.6"
+cgru_python="$CGRU_LOCATION/utilities/python/2.6.7"
 if [ -d $cgru_python ]; then
    echo "Using CGRU Python = '$cgru_python'"
    export PYTHONHOME=$cgru_python
    export PATH=$cgru_python/bin:$PATH
-   export PYTHONPATH=$AF_ROOT/bin_pyaf/2.6.6:$PYTHONPATH
+   export PYTHONPATH=$AF_ROOT/bin_pyaf/2.6.7:$PYTHONPATH
 fi

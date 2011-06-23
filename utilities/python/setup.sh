@@ -3,9 +3,9 @@
 pyversion=$1
 
 if [ -z "$pyversion" ] ; then
-    pyversion="2.7.1"
+    pyversion="2.7.2"
 else
-   bin_pyaf=$AF_ROOT/bin_pyaf/$python_ver
+   bin_pyaf=$AF_ROOT/bin_pyaf/$pyversion
    if [ -d "$bin_pyaf" ]; then
       if [ -z "$PYTHONPATH" ]; then
          export PYTHONPATH=$bin_pyaf
