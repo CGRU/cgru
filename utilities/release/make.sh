@@ -66,6 +66,9 @@ fi
 mkdir -p $tmpdir
 chmod a+rwx $tmpdir
 
+# Processing icons:
+./process_icons.sh $afanasy
+
 # Exporting CGRU:
 cgruExp="cgru_export"
 cgruExp=$tmpdir/$cgruExp
@@ -75,9 +78,6 @@ if [ -d $cgruExp ]; then
 fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
 ./export.sh $cgruExp $afanasy
-
-# Processing icons:
-./process_icons.sh $afanasy
 
 #
 # Creating Packages:
