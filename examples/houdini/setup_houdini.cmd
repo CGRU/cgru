@@ -4,7 +4,7 @@ POPD
 
 set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
 
-set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 11.0.658
+set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 11.0.775
 
 if exist override.cmd call override.cmd
 
