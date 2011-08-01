@@ -13,9 +13,7 @@ if [ "" != "$1" ]; then
    HOST=$1
 fi
 
-pushd .. >> /dev/null
 source ./setup.sh
-popd >> /dev/null
 
 source $CGRU_LOCATION/utilities/python/setup.sh ""
 

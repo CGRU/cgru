@@ -649,38 +649,13 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          if( b == block ) continue;
          if( blocksdata[block]->checkTasksDependMask( blocksdata[b]->getName()) == false ) continue;
 
-         long long fpt = blocksdata[block]->getFramePerTask();
-         long long fpt_dep = blocksdata[b]->getFramePerTask();
-         if(( fpt == 0 ) || ( fpt_dep == 0 )) continue;
-
          long long firstdependframe, lastdependframe;
          int firstdependtask, lastdependtask;
-         if( fpt > 0 )
-         {
-            firstdependframe = task * fpt;
-            lastdependframe  = firstdependframe + fpt - 1;
-         }
-         else
-         {
-            firstdependframe = task / (-fpt);
-            lastdependframe  = ( task + 1 ) / (-fpt);
-         }
-         if( fpt_dep > 0)
-         {
-            firstdependtask  = firstdependframe / fpt_dep;
-            lastdependtask   = lastdependframe  / fpt_dep;
-         }
-         else
-         {
-            firstdependtask  = firstdependframe * (-fpt_dep);
-            lastdependtask   = ( lastdependframe + 1 ) * (-fpt_dep) - 1;
-         }
+         blocksdata[block]->genNumbers( firstdependframe, lastdependframe, task);
+         blocksdata[b]->calcTaskNumber( firstdependframe, firstdependtask);
+         blocksdata[b]->calcTaskNumber(  lastdependframe,  lastdependtask);
 
-         if( firstdependtask >= blocksdata[b]->getTasksNum()) firstdependtask = blocksdata[b]->getTasksNum() - 1;
-         if( lastdependtask  >= blocksdata[b]->getTasksNum())  lastdependtask = blocksdata[b]->getTasksNum() - 1;
-         if( firstdependtask < 0 ) firstdependtask = 0;
-         if( lastdependtask  < 0 )  lastdependtask = 0;
-//printf("Dep['%s': #%d '%s'] = %d - %d (%d, %d): %d - %d)\n", blocksdata[block]->getName().toUtf8().data(), task, blocksdata[b]->getName().toUtf8().data(), firstdependframe, lastdependframe, fpt, fpt_dep, firstdependtask, lastdependtask);
+//printf("Dep['%s': #%d '%s'] = frames %llu - %llu: tasks %d - %d\n", blocksdata[block]->getName().c_str(), task, blocksdata[b]->getName().c_str(), firstdependframe, lastdependframe, firstdependtask, lastdependtask);
 
          for( int t = firstdependtask; t <= lastdependtask; t++)
          {

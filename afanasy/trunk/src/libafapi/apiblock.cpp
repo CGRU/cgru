@@ -118,6 +118,7 @@ bool Block::appendTask( Task * task)
 
    tasks.push_back( task);
    tasksnum++;
+   frame_last = tasksnum;
    return true;
 }
 

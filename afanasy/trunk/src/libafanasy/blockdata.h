@@ -56,6 +56,7 @@ public:
    TaskExec * genTask( int num) const;
 
    bool genNumbers(  long long & start, long long & end, int num, long long * frames_num = NULL ) const; ///< Generate fisrt and last frame numbers for \c num task.
+   bool calcTaskNumber( long long frame, int & tasknum) const;
    const std::string genTaskName(   int num, long long * fstart = NULL, long long * fend = NULL ) const;
    const std::string genCommand(    int num, long long * fstart = NULL, long long * fend = NULL ) const;
    const std::string genFiles(      int num, long long * fstart = NULL, long long * fend = NULL ) const;

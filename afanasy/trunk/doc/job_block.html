@@ -54,7 +54,7 @@
 
 <li><a name="FrameLast"><b>Frame Last</b></a> - Last block frame.</li>
 
-<li><a name="FrameInc"><b>Frames Increment</b></a> - Frames increment.<br/>
+<li><a name="FrameInc"><b>Frames Increment</b></a> - Frames increment.</li>
 
 <li><a name="FramesPerTask"><b>Frames Per Task</b></a> - Frames per task.
 In numeric blocks used to compute command first and last frame, parser percentage.
@@ -63,6 +63,11 @@ Negative values means sub-frame dependency. For example you can render tiles or 
 and generate mantra 'ifd' files in another with 1 frame per task.
 And if task has 4 shadows or 2x2 tiles you can set -4 frames per task for depended block.
 </li>
+
+<li><a name="SubTaskDepend"><b>Sub Task Depend</b></a> - For tasks with several frames calculate sub task dependence.
+Useful for simulation and render when not all frames simulated.
+</li>
+
 </ul>
 
 Read <var>Command</var> description for details.
@@ -72,8 +77,8 @@ Read <var>Command</var> description for details.
 <li><a name="TasksName"><b>Tasks Name</b></a> - Block tasks names pattern.<br/>
 Block - numeric, pattern - not empty: generated task will fill this pattern with its first and last frames numbers<br/>
 Block - numeric, pattern - empty: tasks will take <var>first_frame - last_frame</var> name.<br/>
-Block - not numeric, patern - not empty: task fill this pettern with it name.<br/>
-Block - not numeric, patern - not empty: task simply take its name.<br/>
+Block - not numeric, pattern - not empty: task fill this pattern with it name.<br/>
+Block - not numeric, pattern - not empty: task simply take its name.<br/>
 </li>
 
 <li><a name="TasksType"><b>Tasks Type</b></a> - Block tasks service name.</li>
@@ -182,7 +187,7 @@ Result:<br />
 3rd task command: <kbd>myrender some.scene -s 9 -e 10</kbd><br />
 </p>
 <p>
-command = <kbd>myrender something.@###@.obj</kbd><br />
+command = <kbd>myrender something.@####@.obj</kbd><br />
 Frame First = <kbd>1</kbd><br />
 Frame Last = <kbd>10</kbd><br />
 Frame per Host = <kbd>1</kbd><br />

@@ -365,17 +365,35 @@ bool BlockData::setNumeric( long long start, long long end, long long perTask, l
 
 bool BlockData::genNumbers( long long & start, long long & end, int num, long long * frames_num) const
 {
+   start = 0;
+   end = 0;
+   if( frames_num ) *frames_num = 1;
+
    if( num > tasksnum)
    {
       AFERROR("BlockData::genNumbers: n > tasksnum.")
       return false;
    }
+   if( frame_pertask == 0)
+   {
+      AFERROR("BlockData::genNumbers: frame_pertask == 0.")
+      return false;
+   }
+
    if( isNotNumeric() )
    {
-      start = num * frame_pertask;
-      end = (num + 1) * frame_last;
-      if( end > tasksnum ) end = tasksnum;
-      if( frames_num ) *frames_num = frame_pertask;
+      if( frame_pertask > 0 )
+      {
+         start = num * frame_pertask;
+         end = start + frame_pertask - 1;
+         if( frames_num ) *frames_num = frame_pertask;
+      }
+      else
+      {
+         start = num / (-frame_pertask);
+         end = ( num + 1 ) / (-frame_pertask);
+         if( frames_num ) *frames_num = -frame_pertask;
+      }
       return true;
    }
 
@@ -396,6 +414,21 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
          *frames_num = end - start + 1;
    }
 
+   return true;
+}
+
+bool BlockData::calcTaskNumber( long long frame, int & tasknum) const
+{
+   tasknum = frame - frame_first;
+
+   if( frame_pertask > 0 ) tasknum = tasknum / frame_pertask;
+   else tasknum = tasknum * (-frame_pertask);
+
+   if( frame_inc > 1 ) tasknum = tasknum / frame_inc;
+
+   if( tasknum < 0 ) tasknum = 0;
+   if( tasknum > tasksnum ) tasknum = tasksnum - 1;
+   if(( frame < frame_first ) || ( frame > frame_last )) return false;
    return true;
 }
 

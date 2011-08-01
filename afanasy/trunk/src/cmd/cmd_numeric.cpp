@@ -66,3 +66,33 @@ bool CmdNumericCmd::processArguments( int argc, char** argv, af::Msg &msg)
 
    return true;
 }
+
+CmdNumericCalcTask::CmdNumericCalcTask()
+{
+   setCmd("numcalc");
+   setArgsCount(5);
+   setInfo("Calculate task number using fame number.");
+   setHelp("numcalc [start] [end] [pertask] [increment(by)] [frame] Calculate task number by frame.");
+}
+
+CmdNumericCalcTask::~CmdNumericCalcTask(){}
+
+bool CmdNumericCalcTask::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   long long start = af::stoi(argv[0]);
+   long long end   = af::stoi(argv[1]);
+   long long fpt   = af::stoi(argv[2]);
+   long long inc   = af::stoi(argv[3]);
+   long long frame = af::stoi(argv[4]);
+
+   af::BlockData block;
+   block.setNumeric( start, end, fpt, inc);
+   int tasknum;
+   bool in_range = block.calcTaskNumber( frame, tasknum);
+
+   std::cout << "Tasks Number = " << tasknum;
+   if( false == in_range ) std::cout << " (out of range)";
+   std::cout << std::endl;
+
+   return true;
+}

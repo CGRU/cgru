@@ -20,6 +20,7 @@ parser.add_option('-t', '--time',         dest='timesec',      type='float',  de
 parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
 parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
 parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
+parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1-20-2-3,1-20-2-3"')
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--perhost',      dest='perhost',      type='int',    default=1,  help='number of tasks per host')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
@@ -41,9 +42,10 @@ parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', de
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
 parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
 parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
-parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False,  help='send job')
-parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False,  help='output job information')
-parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False,  help='start job paused')
+parser.add_option(      '--sub',          dest='subdep',       action='store_true', default=False, help='sub task dependence')
+parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False, help='generate not numeric blocks')
+parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
+parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
 (options, args) = parser.parse_args()
 jobname     = options.jobname
 labels      = options.labels
@@ -71,6 +73,9 @@ mhsame      = options.mhsame
 mhservice   = options.mhservice
 parser      = options.parser
 xcopy       = options.xcopy
+frames      = options.frames.split(',')
+
+if options.frames != '': numblocks = len(frames)
 
 if xcopy < 1: xcopy = 1
 
@@ -104,7 +109,9 @@ for b in range( numblocks):
 
    if parser != '': block.setParser( parsertype)
 
-   if b > 0: job.blocks[b-1].setTasksDependMask( blockname)
+   if b > 0:
+      job.blocks[b-1].setTasksDependMask( blockname)
+      if options.subdep: job.blocks[b].setDependSubTask()
 
    if maxtime: block.setTasksMaxRunTime( maxtime)
 
@@ -126,7 +133,11 @@ for b in range( numblocks):
 
    if not options.stringtype:
       block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars(), False)
-      block.setNumeric( 1, numtasks, perhost, increment)
+      if options.frames != '':
+         fr = frames[b].split('-')
+         block.setNumeric( int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
+      else:
+         block.setNumeric( 1, numtasks, perhost, increment)
       if perhost > 1:
          block.setFiles('file_a.@#@.@###@-file_a.@#@.@###@;file_b.@#@.@###@-file_b.@#@.@###@')
       else:
