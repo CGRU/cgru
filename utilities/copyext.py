@@ -3,10 +3,12 @@
 import os, shutil, sys
 
 extensions = ['doc','pdf',
-'blend','nk','psd','hip','otl','mb','ma','max','xsi','scn','flw','fbx',
+'blend','psd','hip','otl','mb','ma','max','xsi','scn','flw','fbx',
+'nk','aep','comp','shk',
 'bpj','ptp','3de',
 'obj','3dl','chan','bclip',
 'sh','bat','cmd','py','mel','ms']
+#'dpx',
 
 from optparse import OptionParser
 parser = OptionParser(usage="%prog [options] sorce dest\ntype \"%prog -h\" for help", version="%prog 1.  0")
@@ -59,7 +61,10 @@ for src in files:
    dst = os.path.join( dest_folder, os.path.basename(src))
    if not os.path.isfile( dst):
       print src + ' -> ' + dst
-      shutil.copy( src, dst)
+      try:
+         shutil.copy( src, dst)
+      except:
+         print 'Error: ' + str(sys.exc_info()[1])
    size_copy += sizes[counter]
    print str(100 * size_copy / size_total) + ' %'
    counter += 1
