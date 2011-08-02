@@ -77,7 +77,7 @@ def main():
    block.setCommand('blender -b %(tmpname)s -s @#@ -e @#@ -a'  % vars())
    block.setNumeric( start_frame.val, end_frame.val, per_host.val)
    # Set job running parameters:
-   job.setMaxHosts( max_hosts.val )
+   job.setMaxRunningTasks( max_hosts.val )
    job.setPriority( priority.val )
    job.setDependMask( depend_mask.val )
    job.setHostsMask( hosts_mask.val )
