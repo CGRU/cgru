@@ -1,4 +1,4 @@
-set filename=cmake-2.8.4-win32-x86.exe
+set filename=cmake-2.8.5-win32-x86.exe
 
 set location=http://www.cmake.org/files/v2.8
 
