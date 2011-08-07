@@ -391,7 +391,7 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
       else
       {
          start = num / (-frame_pertask);
-         end = ( num + 1 ) / (-frame_pertask);
+         end = start;//( num + 1 ) / (-frame_pertask);
          if( frames_num ) *frames_num = -frame_pertask;
       }
       return true;
@@ -427,16 +427,21 @@ bool BlockData::calcTaskNumber( long long frame, int & tasknum) const
    if( frame_inc > 1 ) tasknum = tasknum / frame_inc;
 
    if( tasknum < 0 ) tasknum = 0;
-   if( tasknum > tasksnum ) tasknum = tasksnum - 1;
+   if( tasknum >= tasksnum ) tasknum = tasksnum - 1;
    if(( frame < frame_first ) || ( frame > frame_last )) return false;
    return true;
 }
 
 void BlockData::setFramesPerTask( long long perTask)
 {
+   if( perTask == 0)
+   {
+      AFERROR("BlockData::setFramesPerTask: Can't set frames per task to zero.")
+      return;
+   }
    if( isNumeric())
    {
-      AFERROR("BlockData::setFramesPerHost: this block is numeric.")
+      AFERROR("BlockData::setFramesPerTask: The block is numeric.")
       return;
    }
    frame_pertask = perTask;

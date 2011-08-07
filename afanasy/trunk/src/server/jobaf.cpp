@@ -595,6 +595,7 @@ void JobAf::remRenderCounts( RenderAf * render)
 
 af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring)
 {
+   // Job can set offline itself on some error in this recursive function
    if( state & AFJOB::STATE_OFFLINE_MASK ) return NULL;
 
    //
@@ -621,7 +622,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    if( false == ( blocksdata[block]->getState() & AFJOB::STATE_READY_MASK ) ) return NULL;
    if( task >= blocksdata[block]->getTasksNum() )
    {
-      AFERRAR("JobAf::genTask: block[%d] '%s' : %d > number of tasks = %d.",
+      AFERRAR("JobAf::genTask: block[%d] '%s' : %d >= number of tasks = %d.",
          block, blocksdata[block]->getName().c_str(), task, blocksdata[block]->getTasksNum())
       return NULL;
    }
@@ -652,10 +653,12 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          long long firstdependframe, lastdependframe;
          int firstdependtask, lastdependtask;
          blocksdata[block]->genNumbers( firstdependframe, lastdependframe, task);
+         if( blocksdata[b]->getFramePerTask() < 0 ) lastdependframe++; // For several frames in task
          blocksdata[b]->calcTaskNumber( firstdependframe, firstdependtask);
          blocksdata[b]->calcTaskNumber(  lastdependframe,  lastdependtask);
+         if( blocksdata[b]->getFramePerTask() < 0 ) lastdependtask--;
 
-//printf("Dep['%s': #%d '%s'] = frames %llu - %llu: tasks %d - %d\n", blocksdata[block]->getName().c_str(), task, blocksdata[b]->getName().c_str(), firstdependframe, lastdependframe, firstdependtask, lastdependtask);
+//printf("Dep['%s'[%d]/(%lld) <- '%s'/(%lld)]: DepFrames = %lld - %lld: DepTasks = %d - %d\n", blocksdata[block]->getName().c_str(), task, blocksdata[block]->getFramePerTask(), blocksdata[b]->getName().c_str(), blocksdata[b]->getFramePerTask(), firstdependframe, lastdependframe, firstdependtask, lastdependtask);
 
          for( int t = firstdependtask; t <= lastdependtask; t++)
          {

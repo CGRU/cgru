@@ -20,7 +20,7 @@ parser.add_option('-t', '--time',         dest='timesec',      type='float',  de
 parser.add_option('-r', '--randtime',     dest='randtime',     type='float',  default=2,  help='random time per frame in seconds')
 parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    default=1,  help='number of blocks')
 parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
-parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1-20-2-3,1-20-2-3"')
+parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
 parser.add_option('-p', '--perhost',      dest='perhost',      type='int',    default=1,  help='number of tasks per host')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
@@ -134,7 +134,7 @@ for b in range( numblocks):
    if not options.stringtype:
       block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars(), False)
       if options.frames != '':
-         fr = frames[b].split('-')
+         fr = frames[b].split('/')
          block.setNumeric( int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
       else:
          block.setNumeric( 1, numtasks, perhost, increment)
@@ -146,6 +146,10 @@ for b in range( numblocks):
       block.setCommand('python task.py%(str_capacity)s @#@ -v %(verbose)d' % vars(), False)
       block.setTasksName('task @#@')
       block.setFiles('view @#@')
+      if options.frames != '':
+         fr = frames[b].split('/')
+         block.setFramesPerTask( int(fr[2]))
+         numtasks = int(fr[1]) - int(fr[0]) + 1
       for t in range( numtasks):
          timesec_task = timesec + randtime * random.random()
          task = af.Task('#' + str(t))
