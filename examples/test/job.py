@@ -131,7 +131,12 @@ for b in range( numblocks):
       block.setMultiHost( mhmin, mhmax, mhwaitmax, mhsame, cmdservice, mhwaitsrv)
       str_hosts = ' ' + services.service.str_hosts
 
-   if not options.stringtype:
+   negative_pertask = False
+   if options.frames != '':
+      fr = frames[b].split('/')
+      if int(fr[2]) < 0: negative_pertask = True
+
+   if not options.stringtype and not negative_pertask:
       block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars(), False)
       if options.frames != '':
          fr = frames[b].split('/')
