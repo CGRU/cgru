@@ -426,10 +426,19 @@ bool BlockData::calcTaskNumber( long long frame, int & tasknum) const
 
    if( frame_inc > 1 ) tasknum = tasknum / frame_inc;
 
-   if( tasknum < 0 ) tasknum = 0;
-   if( tasknum >= tasksnum ) tasknum = tasksnum - 1;
-   if(( frame < frame_first ) || ( frame > frame_last )) return false;
-   return true;
+   bool retval = true;
+   if( tasknum < 0 )
+   { 
+      tasknum = 0;
+      retval = false;
+   }
+   if( tasknum >= tasksnum )
+   {
+      tasknum = tasksnum - 1;
+      retval = false;
+   }
+   if(( frame < frame_first ) || ( frame > frame_last )) retval = false;
+   return retval;
 }
 
 void BlockData::setFramesPerTask( long long perTask)

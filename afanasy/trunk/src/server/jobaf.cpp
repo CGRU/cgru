@@ -655,8 +655,8 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          blocksdata[block]->genNumbers( firstdependframe, lastdependframe, task);
          if( blocksdata[b]->getFramePerTask() < 0 ) lastdependframe++; // For several frames in task
          blocksdata[b]->calcTaskNumber( firstdependframe, firstdependtask);
-         blocksdata[b]->calcTaskNumber(  lastdependframe,  lastdependtask);
-         if( blocksdata[b]->getFramePerTask() < 0 ) lastdependtask--;
+         if( blocksdata[b]->calcTaskNumber(  lastdependframe,  lastdependtask))
+            if( blocksdata[b]->getFramePerTask() < 0 ) lastdependtask--;
 
 //printf("Dep['%s'[%d]/(%lld) <- '%s'/(%lld)]: DepFrames = %lld - %lld: DepTasks = %d - %d\n", blocksdata[block]->getName().c_str(), task, blocksdata[block]->getFramePerTask(), blocksdata[b]->getName().c_str(), blocksdata[b]->getFramePerTask(), firstdependframe, lastdependframe, firstdependtask, lastdependtask);
 
