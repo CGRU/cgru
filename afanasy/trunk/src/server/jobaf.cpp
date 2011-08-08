@@ -653,10 +653,15 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          long long firstdependframe, lastdependframe;
          int firstdependtask, lastdependtask;
          blocksdata[block]->genNumbers( firstdependframe, lastdependframe, task);
-         if( blocksdata[b]->isNotNumeric())
+         if( blocksdata[block]->isNumeric() && blocksdata[b]->isNotNumeric())
          {
             firstdependframe -= blocksdata[block]->getFrameFirst();
             lastdependframe  -= blocksdata[block]->getFrameFirst();
+         }
+         else if( blocksdata[block]->isNotNumeric() && blocksdata[b]->isNumeric())
+         {
+            firstdependframe += blocksdata[b]->getFrameFirst();
+            lastdependframe  += blocksdata[b]->getFrameFirst();
          }
          if( blocksdata[b]->getFramePerTask() < 0 ) lastdependframe++; // For several frames in task
          blocksdata[b]->calcTaskNumber( firstdependframe, firstdependtask);
