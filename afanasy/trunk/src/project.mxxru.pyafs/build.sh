@@ -19,7 +19,8 @@ cd $cgru/utilities
 source ./getrevision.sh $folder
 popd > /dev/null
 
-export AF_LFLAGS="-lrt -lz -lgthread-2.0 -lglib-2.0"
+export AF_LFLAGS="-lrt -lz"
+#export AF_LFLAGS="-lrt -lz -lgthread-2.0 -lglib-2.0"
 
 [ -f override.sh ] && source override.sh
 

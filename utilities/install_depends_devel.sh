@@ -6,13 +6,13 @@ source ./distribution.sh
 
 # List packages:
 
-packages="gcc yasm p7zip ruby wget git inkscape"
+packages="gcc yasm p7zip ruby wget inkscape"
 packages_noarch="rubygems"
 
 # Common for Debian distributives:
 function debianArch(){
    packages="$packages g++"
-   packages="$packages p7zip-full"
+   packages="$packages p7zip-full git-core"
    packages="$packages libzip1 libzip-dev"
    # ImageMagick:
    packages="$packages libjpeg62 libjpeg62-dev"
@@ -28,7 +28,7 @@ function debianArch(){
 # Common for RedHat distributives:
 function redhatArch(){
    packages="$packages gcc-c++"
-   packages="$packages rpm-build"
+   packages="$packages rpm-build git"
    packages="$packages libzip libzip-devel"
    # ImageMagick:
    packages="$packages libjpeg libjpeg-devel"
@@ -44,7 +44,7 @@ function redhatArch(){
 # Common for SUSE distributives:
 function suseArch(){
    packages="$packages gcc-c++"
-   packages="$packages libzip1 libzip-devel"
+   packages="$packages libzip1 libzip-devel git"
    # ImageMagick:
    packages="$packages libjpeg6 libjpeg-devel"
    packages="$packages libtiff3 libtiff-devel"
