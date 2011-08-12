@@ -25,6 +25,7 @@ xcopy afanasy\%afanasy%\plugins %dest%\afanasy\plugins\ /ys
 xcopy afanasy\%afanasy%\python %dest%\afanasy\python\ /ys
 xcopy afanasy\%afanasy%\python3 %dest%\afanasy\python3\ /ys
 xcopy afanasy\%afanasy%\doc %dest%\afanasy\doc\ /ys
+xcopy afanasy\%afanasy%\launch %dest%\afanasy\launch\ /y
 
 xcopy utilities\ %dest%\utilities\ /y
 xcopy utilities\doc %dest%\utilities\doc\ /ys
