@@ -23,10 +23,10 @@ rowLayout -nc 4 -cw4 80 180 80 110;
 	textField -ed 0 -w 110 -tx (`nodeType $cur`);
 setParent $newLine;
 text - l ("___attributes list: _________(childs count)______________(numbre of attributes = " + `size($lAttr)` + ")___");
-int $cw1 = 150;
+int $cw1 = 250;
 int $cw2 = 32;
 int $cw3 = 110;
-int $cw4 = 160;
+int $cw4 = 250;
 int $cwd = 3;
 rowLayout -nc 4 -cw4 $cw1 $cw2 $cw3 $cw4;
 	textField -ed 0 -w ($cw1 - $cwd) -tx " [______NAME______] ";
@@ -48,15 +48,15 @@ $ATTR_COUNTER ++;
 	int $mutliAttr = false;
 //print("\n" + $cAttr);
 //type:
-	if (`attributeQuery -node $cur -exists $cAttr` == 0) $aType = "! ? !";
+	if (`attributeQuery -node $cur -exists $cAttr` == 0) $aType = "( can't query )";
 	else
 	{
-		if(catchQuiet(`getAttr -type -silent ($cur + "." + $cAttr)`)) $aType = "! ?? !";
+		if(catchQuiet(`getAttr -type -silent ($cur + "." + $cAttr)`)) $aType = "( can't get )";
 		else
 		{
 //print("   ***   ");
 			$aType = `getAttr -type -silent ($cur + "." + $cAttr)`;
-			if(`size($aType)` == 0) $aType = "! empty !";
+			if(`size($aType)` == 0) $aType = "( empty type )";
 			else
 			{
 				$hasChilds = true;
@@ -78,16 +78,18 @@ $ATTR_COUNTER ++;
 	$aVal = "";
 	if($hasVal)
 	{
-		if ($aType == "TdataCompound") $aVal = "! compound with mixed types !";
-		else if ((`attributeQuery -n $cur -m $cAttr`) || ($aType == "matrix") || (`gmatch $aType "*[0-9]"`))
+		if( $aType == "TdataCompound") $aVal = "Compound with mixed types.";
+      else if( $aType == "message") $aVal = "Message.";
+		else if(( $aType == "matrix") || (`gmatch $aType "*[0-9]"`))
 		{
 			$ma = `getAttr -sl ($cur + "." + $cAttr)`;
 			for($cv in $ma) $aVal += ($cv + " ");
 			$editAble = true;
 			$mutliAttr = true;
 		}
-		else if(catch($aVal = `getAttr -sl ($cur + "." + $cAttr)`))
-			$aVal += ("! can`t get value !");
+		else if(`attributeQuery -n $cur -m $cAttr`) $aVal = "Multi-Attribute.";
+		else if( catch($aVal = `getAttr -sl ($cur + "." + $cAttr)`))
+			$aVal += ("Can`t get value.");
 		else $editAble = true;
 //print("-" + $aVal);
 	}
