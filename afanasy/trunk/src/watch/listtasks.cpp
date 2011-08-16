@@ -175,12 +175,12 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
             }
          }
 
-         action = new QAction( "Info", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actTaskInfo() ));
-         menu.addAction( action);
-
          action = new QAction( "Log", this);
          connect( action, SIGNAL( triggered() ), this, SLOT( actTaskLog() ));
+         menu.addAction( action);
+
+         action = new QAction( "Info", this);
+         connect( action, SIGNAL( triggered() ), this, SLOT( actTaskInfo() ));
          menu.addAction( action);
 
          action = new QAction( "Listen", this);
@@ -474,7 +474,7 @@ void ListTasks::actTaskStdOut( int number ){ do_Info_StdOut(  af::Msg::TTaskOutp
 void ListTasks::doubleClicked( Item * item)
 {
    if( item->getId() == ItemJobTask ::ItemId )
-      do_Info_StdOut(  af::Msg::TTaskLogRequest, 0, item);
+      do_Info_StdOut(  af::Msg::TTaskRequest, 0, item);
    else if( item->getId() == ItemJobBlock::ItemId )
    {
       ItemJobBlock * block = (ItemJobBlock*)item;
