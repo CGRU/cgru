@@ -36,9 +36,14 @@ export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 
 # Set Afanasy houdini scripts and otls location:
 export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini
-export PYTHONPATH=$HOUDINI_AF_PATH:$PYTHONPATH
-export HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH:$HH/otls
 
+# Set Python path to afanasy submission script:
+export PYTHONPATH=$HOUDINI_AF_PATH:$PYTHONPATH
+
+# Define OTL scan path:
+HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH:$HH/otls
+
+# Create or add to exist OTL scan path:
 if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
    export HOUDINI_OTLSCAN_PATH="${HOUDINI_AF_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
 else

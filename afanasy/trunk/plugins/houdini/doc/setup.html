@@ -42,8 +42,11 @@
 <h2 align="center">Houdini Afanasy Setup</h2>
 <hr />
 
-Afanasy houdini operator libraries located in <kbd>afanasy/plugins/houdini/houdini[version]</kbd> directory. You can add it automatically by
-adding this directory to <kbd>HOUDINI_OTLSCAN_PATH</kbd> variable.
+CGRU and Afanasy must be setuped before.
+To do this you can source <kbd>setup.sh</kbd> script in CGRU folder.
+Afanasy houdini operator library located in <kbd>afanasy/plugins/houdini</kbd> directory.
+You can add it automatically by adding the folder to <kbd>HOUDINI_OTLSCAN_PATH</kbd> variable.
+Also you need to point PYTHONPATH to the folder too, to import Afafansy submission script.
 
 <p>
 Houdini setup example:
@@ -52,44 +55,29 @@ Houdini setup example:
 
    #!/bin/bash
 
-   # Setup Afanasy if was not
-   if [ -z $AF_ROOT ]; then
-      pwd=$PWD
-      cd ../..
-      source setup.sh
-      cd $pwd
-   fi
 
-   # directory where Houdini installed (default value):
-   export HOUDINI_LOCATION=/cg/soft/houdini-10
+   # Setup CGRU houdini scripts location:
+   export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
 
-   # to launch commands from current directory:
-   export AF_CMD_PREFIX="./"
+   # Set Afanasy houdini scripts and otls location:
+   export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini
 
-   # overrides (set custom values there):
-   [ -f override.sh ] && source override.sh
+   # Set Python path to afanasy submission script:
+   export PYTHONPATH=$HOUDINI_AF_PATH:$PYTHONPATH
 
-   pwd=$PWD
-   cd $HOUDINI_LOCATION
-   source houdini_setup_bash
-   cd $pwd
+   # Define OTL scan path:
+   HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH:$HH/otls
 
-   # Set Afanasy houdini scripts version
-   export HOUDINI_CGRU_VERSION="10"
-   # Set Afanasy houdini scripts location
-   export HOUDINI_CGRU_PATH=$AF_ROOT/plugins/houdini/houdini$HOUDINI_CGRU_VERSION
-
-   export HOUDINI_CGRU_OTLSCAN_PATH=$HIH/otls:$HOUDINI_CGRU_PATH/otls:$HH/otls
-
+   # Create or add to exist OTL scan path:
    if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
-      export HOUDINI_OTLSCAN_PATH="${HOUDINI_CGRU_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"   
+      export HOUDINI_OTLSCAN_PATH="${HOUDINI_AF_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
    else
-      export HOUDINI_OTLSCAN_PATH=$HOUDINI_CGRU_OTLSCAN_PATH
+      export HOUDINI_OTLSCAN_PATH=$HOUDINI_AF_OTLSCAN_PATH
    fi
 
 </pre></td></tr></table>
 <p>
-This code located in <kbd>afanasy/examples/houdini/setup_houdini.sh</kbd>:
+Setup example is located in <kbd>cgru/examples/houdini</kbd>:
 </p>
 <p>
 MS Windows script example is also provided, it do the same.

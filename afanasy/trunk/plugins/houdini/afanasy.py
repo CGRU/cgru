@@ -116,7 +116,7 @@ class BlockParameters:
             self.name = 'cmd'
             cmd = self.afnode.parm('cmd_cmd')
             self.cmd = afcommon.patternFromPaths( cmd.evalAsStringAtFrame( self.frame_first), cmd.evalAsStringAtFrame( self.frame_last))
-            self.type = cmd.split(' ')[0]
+            self.type = self.cmd.split(' ')[0]
             self.name = self.name + '_' + self.type
          else:
             hou.ui.displayMessage('Can\'t process "%s"' % str(afnode.name()))
@@ -209,6 +209,7 @@ class BlockParameters:
       job.send()
 
    def doPost( self):
+      if self.ropnode is None: return
       if VERBOSE: print 'doPost: "%s"' % self.ropnode.name()
       if self.soho_foreground is not None: self.ropnode.parm('soho_foreground').set(self.soho_foreground)
       if self.soho_outputmode is not None:
@@ -223,7 +224,7 @@ class BlockParameters:
 
 def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
    params = []
-   if ropnode.type().name() == 'ifd' and afnode.parm('sep_enable').eval():
+   if ropnode is not None and ropnode.type().name() == 'ifd' and afnode.parm('sep_enable').eval():
 
       # Mantra separate render:
       block_generate = BlockParameters( afnode, ropnode, subblock, prefix, frame_range)
