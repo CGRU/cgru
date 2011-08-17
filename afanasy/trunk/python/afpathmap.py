@@ -162,20 +162,27 @@ class PathMap:
    def toServer( self, path, Verbose = False): return self.translatePath( path, True , Verbose)
    def toClient( self, path, Verbose = False): return self.translatePath( path, False, Verbose)
 
-   def translateFile( self, infile, outfile, toserver , Verbose):
+   def translateFile( self, infile, outfile, toserver, SearchString, Verbose):
       if not self.initialized: return True
       if Verbose:
          print 'TranslateFile:'
          print 'Input file: "%s"' % infile
          print 'Output file: "%s"' % outfile
       filein = open( infile, 'r')
-      fileout = open( outfile, 'w')
-      for linein in filein:
-         lineout = self.translatePath( linein, toserver , Verbose)
-         fileout.write(lineout)
+      inlines = filein.readlines()
       filein.close()
+      outdata = ''
+      for line in inlines:
+         if SearchString != '':
+            if line.find( SearchString) == -1:
+               outdata += line + '\n'
+               continue
+         lineout = self.translatePath( line, toserver , Verbose)
+         outdata += lineout + '\n'
+      fileout = open( outfile, 'w')
+      fileout.write(outdata)
       fileout.close()
       return True
 
-   def toServerFile( self, infile, outfile, Verbose = False): return self.translateFile( infile, outfile, True , Verbose)
-   def toClientFile( self, infile, outfile, Verbose = False): return self.translateFile( infile, outfile, False , Verbose)
+   def toServerFile( self, infile, outfile, SearchString = '', Verbose = False): return self.translateFile( infile, outfile, True,  SearchString, Verbose)
+   def toClientFile( self, infile, outfile, SearchString = '', Verbose = False): return self.translateFile( infile, outfile, False, SearchString, Verbose)

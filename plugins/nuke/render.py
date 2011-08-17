@@ -87,7 +87,7 @@ pm = PathMap( afroot, UnixSeparators = True, Verbose = True)
 if pm.initialized:
    pmscene = os.path.basename(xscene)
    pmscene = os.path.join( tmpdir, pmscene)
-   pm.toClientFile( xscene, pmscene, Verbose = False)
+   pm.toClientFile( xscene, pmscene, SearchString = 'file ', Verbose = False)
    xscene = pmscene
    print 'Scene pathes mapped: "%s"' % xscene
 
