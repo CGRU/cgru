@@ -76,11 +76,13 @@ You can use this command to perform it:<br/>
 <br/>
 
 <p><a id="release150">
-<b>1.5.0</b></a> 2011.08.10 <i>(rev1651 af1651)</i> New Afanasy network protocol version.</p>
+<b>1.5.0</b></a> 2011.08.17 <i>(rev1655 af1655)</i> New Afanasy network protocol version.</p>
 
 <p>
-
+<a href="http://localhost/cgru/afanasy/plugins/houdini/doc/afanasy.html#Afanasy">Houdini submission improvements.</a>
+You can connect several Afanasy and other ROP nodes together to describe a complex job with dependences between ROPs.
 </p>
+
 <p>
 Block tasks can depend on other <a href="../afanasy/doc/job_block.html#SubTaskDepend">subtask task</a> progress.
 </p>
@@ -112,8 +114,8 @@ All numeric types has BIGINT SQL type.
 </p>
 <p>
 Numeric tasks block "frame increment" (or "by frame") parameter plays role in tasks generation.
-It means that blocks with this parameter grater then one will can have less tasks number.
-<br/>So <b><i>you should delete all jobs on server before upgrade to this version.</i></b>
+It means that blocks with this parameter grater then one will have less tasks number.
+So <b><i>you should delete all jobs on server before upgrade to this version.</i></b>
 </p>
 <p>
 Bugs Fixed:

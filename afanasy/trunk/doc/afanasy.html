@@ -97,7 +97,7 @@ for example to generate something, which use only one CPU, and 'mantra -j 3').
 Hosts capacity values described in 'Farm Setup' ('xml' file).
 </p>
 
-<h4>Paths Map.</h4>
+<h4>Paths Map</h4>
 <p>
 Every host can has different paths and a map to translate paths to server and from server.
 With this feature you can setup a multi-OS render.
@@ -111,6 +111,12 @@ Job will wait other jobs to be done matching this mask regular expression (Afana
 </p><p>
 Job Block can wait other block(s) to be done (<i>depend mask</i>).
 Block tasks can wait other block tasks to be done (<i>tasks depend mask</i>).
+</p>
+<h5>Sub Task Dependence</h5>
+<p>
+Tasks can wait only some part of other task to be done.
+Useful to render simulations.
+First frames of a simulation can be started to render without waiting the whole simulation to be done.
 </p>
 
 <h4>Errors Solving</h4>
@@ -152,6 +158,10 @@ Users and Jobs can have a hosts names mask to be able to run on and exclude mask
 <h4>Maximum Running Tasks Number</h4>
 <p>
 Users and Jobs can have a limit for maximum running tasks number - no new tasks will be started above this limit.
+</p>
+<h5>Maximum Running Tasks Per Host</h5>
+<p>
+You can limit job (and block) to start tasks on the same host.
 </p>
 
 <h4>Python API</h4>
