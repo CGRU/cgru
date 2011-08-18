@@ -48,110 +48,63 @@ You can connect several other ROP nodes to Afanasy ROP to render.
 You can connect several Afanasy ROP nodes to Afanasy ROP to setup render parameters.
 </p>
 
-<h4>General Parameters</h4>
 <table width="99%">
 <tr align="center">
-   <td><img src="images/afanasy_general.png" alt="afanasy_general.png" /></td>
-   <td><img src="images/afanasy_jobparams.png" alt="afanasy_jobparams.png" /></td>
+   <td><b>General Parameters</b><br/><img src="images/afanasy_general.png" alt="afanasy_general.png" /></td>
+   <td><b>Job Parameters</b><br/><img src="images/afanasy_jobparams.png" alt="afanasy_jobparams.png" /></td>
 </tr>
 <tr align="center">
-   <td><img src="images/afanasy_separate.png" alt="afanasy_separate.png" /></td>
-   <td><img src="images/afanasy_command.png" alt="afanasy_command.png" /></td>
+   <td><b>Separate Render</b><br/><img src="images/afanasy_separate.png" alt="afanasy_separate.png" /></td>
+   <td><b>Custom Command</b><br/><img src="images/afanasy_command.png" alt="afanasy_command.png" /></td>
 </tr>
 </table>
 
 <ul>
-<li><b>Output Driver</b> - path to another ROP to execute.</li>
-<li><b>FPR</b> - <i>'Frames Per Renderer'</i> - number of frames in each task.</li>
-<li><b>Job Name</b> - afanasy job name (default is [scene name].[take name]).</li>
-<li><b>Ignore Inputs</b> - not to execute 'Output Driver' input ROPs.</li>
+<li><b>Submit</b> - Generate a job and send it to server.</li>
+<li><b>Start Paused</b> - Send a job in off-line state.</li>
 </ul>
 
-<p align="center">Extended parameters:<br/>
-<img src="images/afanasy_extended.png" alt="afanasy_extended" /></p>
+<h4>General Parameters</h4>
 <ul>
-<li><b>Start Paused</b> - Set job to 'Offline' state.</li>
+<li><b>Job Name</b> - Afanasy job name. Default is $HIPNAME.$OS = [hip scene name].[afanasy ROP name].</li>
+<li><b>Connected Nodes Are Independent</b> - Allow run the same frames of all connected nodes at the same time.</li>
+<li><b>Valid Frame Range:</b>
+   <ul>
+   <li><b>Render Any Frame</b> - Use frame range form downstream node. Or render current frame if no range in network defined.</li>
+   <li><b>Render Frame Range</b> - Render this specified frame range.</li>
+   <li><b>Render Frame Range Only (Strict)</b> - Render this specified frame range. Other ROPs will wait this whole frame range rendered.</li>
+   </ul>
+</li>
+<li><b>Frames Per Task</b> - Number of frames in each task.</li>
+<li><b>Allow Sub-Task Dependence</b> - Tasks can wait other tasks to be done partially.</li>
+<li><b>Render With Take</b> - Specify take to render.</li>
+<li><b>Ignore ROP Inputs</b> - Do not execute input ROPs.</li>
+</ul>
+
+<h4>Job Parameters</h4>
+<ul>
 <li><b>Platform</b> - OS type the job can launch tasks on: 'any' - any OS, 'Native' - the same as the script was launched on.</li>
 <li><b>Enable Extended Parameters</b> - To 'switch on|off' it fast.</li>
 <li><b>Depend Mask</b> - Same user jobs names pattern to wait to be done to start (empty value means not to wait any job).</li>
 <li><b>Global Depend Mask</b> - Same as <i>Depend Mask</i>, but waits for a jobs from any user.</li>
-<li><b>Job Priority</b> - Job order in user jobs list ('-1' means to keep this value default).</li>
-<li><b>Maximum Hosts</b> - Maximum hosts job tasks can run on ('-1' means no limit - default value).</li>
+<li><b>Priority</b> - Job order in user jobs list ('-1' means to keep this value default).</li>
+<li><b>Maximum Running Tasks</b> - Maximum tasks job can run at the same time ('-1' means no limit - default value).</li>
 <li><b>Capacity</b> - Tasks capacity value ('-1' means to keep this value default). Render must have enough free capacity to run it.</li>
-<li><b>Capacity Coefficient</b> - Tasks capacity variation minimum and maximum coefficients. If at least one of it not '-1' block can variate capacity ('-1' and '0' values means no limit for maximum). Afanasy will change render command if there is enough free capacity on render. Works only with 'Mantra' ROP through changing command by specifying number of threads to use ('mantra -j').</li>
+<li><b>Capacity Coefficient</b> - Tasks capacity variation minimum and maximum coefficients.
+If at least one of it not '-1' block can variate capacity ('-1' and '0' values means no limit for maximum).
+Afanasy will change render command if there is enough free capacity on render.
+Works only with 'Mantra' ROP through changing command by specifying number of threads to use ('mantra -j').</li>
 <li><b>Hosts Mask</b> - Hosts names pattern where job can run on (empty value means that job can run on host with any name).</li>
 <li><b>Hosts Mask Exclude</b> - Hosts names pattern where job can not run on.</li>
 </ul>
-<p>Extended parameters are the same for all CGRU Afanasy ROP nodes.</p>
 
-<h3>Cmd Sender</h3>
+<h4>Separate Render</h4>
 <p>
-You can construct a command to render <kbd>ifd</kbd> or <kbd>rib</kbd> files and send it to afanasy.<br/>
-<kbd>Files</kbd> parameter used only to help to construct a <kbd>Command</kbd> which has a menu with some templates to render with <kbd>mantra</kbd> and <kbd>prman</kbd>.
-</p>
-<p align="center">af_cmd_sender ROP:<br/>
-<img src="images/af_cmd_sender.png" alt="af_cmd_sender" /></p>
-<ul>
-<li><b>Job Name</b> - Customize job name here.</li>
-<li><b>Depend Mask</b> - Specify job depend mask (if needed). For <kbd>af_multiply_sender</kbd> it will be block or tasks depend mask (see below).</li>
-</ul>
-<p>With this ROP you can send any array of numeric (with %04d) commands to afanasy to do anything (RenderMan and Mantra are just templates).</p>
-<p>If command contains some <kbd>service</kbd> name that will be the block service (and its tasks output will be parsed with the service default <kbd>parser</kbd>).</p>
-
-<h3>Multiply Sender</h3>
-<p>
-<kbd>af_multiply_sender</kbd> constructs one multi-block job from several ROPs with various dependences between connected ROPs (job blocks).
-</p>
-<p>
-Every connected block will depend on previous or if ROP has <kbd>depend_mask</kbd> parameter this will be used. This dependence can be per entire block or per task.<br/>
-Previous ROP <kbd>Valid Frame Range</kbd> parameter describes dependence type and frame range to use:<br/>
-</p>
-<ul>
-<li><b>Render Any Frame</b>: dependence will be per task, frame range from <kbd>af_multiply_sender</kbd> ROP will be used.</li>
-<li><b>Render Frame Range</b>: dependence will be per task, this ROP frame range will be used.</li>
-<li><b>Render Frame Range Only (Strict)</b>: entire block dependence (all tasks must be done to continue to render other dependent ROPs). This ROP frame range will be used (of course).</li>
-</ul>
-<p>
-To make independent block create <kbd>depend_mask</kbd> parameter on it and leave it empty.
-</p>
-<p align="center">af_multiply_sender ROP and its network:<br/>
-<img src="images/af_multiply_sender.png" alt="af_multiply_sender" /></p>
-<p>
-<kbd>af_multiply_sender</kbd> will reverse connected inputs to construct job. Usually most depended ROP generates final result (image). So if it will be the first, it will run as soon as possible.
-</p>
-
-<p>
-This is from CGRU examples:<br/>
-<code>
-$ cd cgru/examples/houdini<br/>
-$ ./houdini scene.hip<br/>
-</code>
-</p>
-<p align="center">Multiply blocks job example:<br/>
-<img src="images/af_multiply_job.png" alt="af_multiply_job" /></p>
-<p>
-In this example 'mantra' commands waits shadows and 'ifd' files generation.
-</p>
-<ul>
-<li>The first <kbd>af_cmd_sender1</kbd> block constructed from <kbd>af_cmd_sender1</kbd> ROP.
-It renders by Mantra the sequence of 'ifd' files generated by <kbd>ifd</kbd> block (ROP).
-This block has tasks dependence. Its tasks waits shadows and ifd files generation (per task dependence).
-</li>
-<li>Second <kbd>ifd</kbd> block constructed from <kbd>ifd</kbd> ROP. It generates 'ifd' files for Mantra.
-This block has no dependence.
-</li>
-<li>Last block <kbd>shadows</kbd> constructed from <kbd>shadows</kbd> ROP.
-It generates shadows. This block has no dependence.
-</li>
-</ul>
-
-<h3>Separate Render</h3>
-<p>
-This ROP allows to separate render process on 'ifd' files generation and render it by 'mantra'.
+Separate Render allows to separate render process on IFD files generation and render it by 'mantra'.
 It can give several advantages on some 'heavy' scenes.
 </p>
 <p>
-This ROP can generate a job which can:
+It generates a job which can:
 </p>
 <ul>
    <li>
@@ -168,7 +121,7 @@ This ROP can generate a job which can:
       And also it can reduce memory needed to render a frame.
    </li>
    <li>
-      Cleanup renderer IFD and joined tiles files.
+      Cleanup rendered IFD files and joined tiles images.
    </li>
 </ul>
 <p>
@@ -176,41 +129,24 @@ An utility to join EXR file tiles is provided with CGRU.
 It can join EXR files with any number of custom channels.
 </p>
 
-<p align="center">af Separate Render parameters:<br/>
-<img src="images/af_separate_render.png" alt="af_separate_render" />
-</p>
 <ul>
-<li><b>Run ROP</b> - Run ROP to generate files to render. Houdini will generate 'ifd' files for mantra.
-</li>
-<li><b>ROP</b> - ROP to run and to take parameters from, if needed.
-</li>
-<li><b>Job Name</b> - Job name.
-</li>
-<li><b>Depend Mask</b> - Jobs to wait pattern.
-</li>
-<li><b>Join Render Stages</b> - Generate IDF files and render in the same task.
-In this case IFD file will be generated to local temporary folder.
+<li><b>Enable Separate Render</b> - Turn this feature on.</li>
+<li><b>Run ROP</b> - Run ROP to generate files to render. Houdini will generate IFD files for mantra.</li>
+<li><b>Read Parameters from ROP</b> - Read files to generate and images to render parameters from specified ROP.</li>
+<li><b>Render Arguments</b> - Arguments for render command. Usually files and may be some other options.</li>
+<li><b>Files</b> - Files to generate.</li>
+<li><b>Images</b> - Images which render will produce. Needed for tile render, AfWatch preview.</li>
+<li><b>Use Temp Images Folder</b> - Render locally in temp directory and then copy entire image in destination folder.</li>
+<li><b>Delete ROP Files</b> - Delete ROP generated files (IFD) after render.</li>
+<li><b>Tile Render</b> - Enable rendering tiles and then combine them.</li>
+<li><b>Divisions</b> - Tiles divisions.</li>
+<li><b>Join Render Stages</b> - Generate IFD files and render in the same task.
+In this case IFD files will be generated to local temporary folder.
 It can save and memory usage and network traffic.
-</li>
-<li><b>Tile Render</b> - Enable rendering tiles and then combine them.
-</li>
-<li><b>Divisions</b> - Tiles divisions.
-</li>
-<li><b>Arguments</b> - Arguments for render command. Usually files and may be some options.
-</li>
-<li><b>Read Parameters from ROP</b> - Read files to render and images to render parameters from specified ROP.
-</li>
-<li><b>Files</b> - Files to render.
-</li>
-<li><b>Images</b> - Images which render will produce. Needed for tile render, watch preview.
-</li>
-<li><b>Use Temp Images Directory</b> - Render locally in temp directory and then copy entire image in destination folder.
-</li>
-<li><b>Delete ROP Files</b> - Delete files after render ('ifd' files, not images, of course).
 </li>
 </ul>
 <p>
-Tile job from examples:
+Tile job from example:
 </p>
 <table width="99%">
 <tr align="center">
@@ -234,6 +170,18 @@ If tiles were successfully joined they will be removed.
 And at this stage, after all, IFD will be removed, if it was asked.</li>
 </ol>
 </p>
+
+<h4>Custom Command</h4>
+<p>
+Run any custom command.
+For example you can render IFD files using 'mantra' command.
+</p>
+<ul>
+<li><b>Add Custom Command</b> - Add custom command tasks block to a job.</li>
+<li><b>Command</b> - The command.</li>
+<li><b>Files</b> - Some files you can point to use in command.</li>
+<li><b>Preview</b> - Specify result picture here to enable tasks preview.</li>
+</ul>
 
 <!--FOOTER-->
 </td></tr></table>

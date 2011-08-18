@@ -108,8 +108,9 @@ class BlockParameters:
          self.cmd = 'hrender_af'
          if afnode.parm('ignore_inputs').eval(): self.cmd += ' -i'
          if self.capacity_min != -1 or self.capacity_max != -1: self.cmd += ' --numcpus '+ services.service.str_capacity
-         self.cmd += ' -s @#@ -e @#@ --by %d -t %s' % (self.frame_inc, afnode.parm('take').eval())
-         self.cmd += ' %(hipfilename)s ' + ropnode.name()
+         self.cmd += ' -s @#@ -e @#@ --by %d -t "%s"' % (self.frame_inc, afnode.parm('take').eval())
+         self.cmd += ' "%(hipfilename)s"'
+         self.cmd += ' "%s"' % ropnode.name()
       else:
          # Custom command driver:
          if int( afnode.parm('cmd_add').eval()):
@@ -178,10 +179,10 @@ class BlockParameters:
 
       # Calculate temporary hip name:
       ftime = time.time()
-      tmphip = hou.hipFile.name() + '_' + self.job_name + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
+      tmphip = hou.hipFile.name() + '_' + afcommon.filterFileName(self.job_name) + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
       # use mwrite, because hou.hipFile.save(tmphip)
       # changes current scene file name to tmphip, at least in version 9.1.115
-      hou.hscript('mwrite -n %s' % tmphip)
+      hou.hscript('mwrite -n "%s"' % tmphip)
 
       job = af.Job()
       job.setName( self.job_name )

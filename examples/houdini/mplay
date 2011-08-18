@@ -2,4 +2,4 @@
 
 source ./setup_houdini.sh
 
-mplay $*
+mplay "$@"

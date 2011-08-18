@@ -2,6 +2,13 @@
 
 import string
 
+def filterFileName( filename):
+   chars = ' ~`!@#$%^&*()+[]{};:\'",<>/?\\|'
+   newfilename = filename
+   for c in chars:
+      newfilename = newfilename.replace( c, '_')
+   return newfilename
+
 def patternFromPaths( path_a, path_b):
    path = path_a
 
