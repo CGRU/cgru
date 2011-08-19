@@ -577,7 +577,7 @@ def renderNodes( nodes, fparams, storeframes):
       if pm.initialized:
          pm_scenename = scenename + '.pm'
          nuke.scriptSave( pm_scenename)
-         pm.toServerFile( pm_scenename, scenename, Verbose = False)
+         pm.toServerFile( pm_scenename, scenename, SearchString = 'file ', Verbose = False)
          os.remove( pm_scenename)
       else:
          nuke.scriptSave( scenename)
