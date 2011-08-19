@@ -145,9 +145,52 @@ In this case IFD files will be generated to local temporary folder.
 It can save and memory usage and network traffic.
 </li>
 </ul>
+
+<h4>Custom Command</h4>
 <p>
-Tile job from example:
+Run any custom command.
+For example you can render IFD files using 'mantra' command.
 </p>
+<ul>
+<li><b>Add Custom Command</b> - Add custom command tasks block to a job.</li>
+<li><b>Command</b> - The command.</li>
+<li><b>Files</b> - Some files you can point to use in command.</li>
+<li><b>Preview</b> - Specify result picture here to enable tasks preview.</li>
+</ul>
+
+
+<h2>Examples:</h2>
+
+<h3>Simple Run ROP:</h3>
+<table width="99%">
+<tr align="center">
+<td>
+   ROP Network Parameters:<br/>
+   <img src="images/simple_houdini.png" alt="simple_houdini" />
+</td>
+</tr>
+<table>
+
+<h3>Command Render:</h3>
+<table width="99%">
+<tr align="center">
+<td>
+   ROP Network Parameters:<br/>
+   <img src="images/command_houdini.png" alt="command_houdini" />
+</td>
+</tr>
+<table>
+
+<h3>Tile Render:</h3>
+<table width="99%">
+<tr align="center">
+<td>
+   ROP Network Parameters:<br/>
+   <img src="images/tilerender_houdini.png" alt="tilerender_houdini" />
+</td>
+</tr>
+<table>
+
 <table width="99%">
 <tr align="center">
 <td>
@@ -171,17 +214,16 @@ And at this stage, after all, IFD will be removed, if it was asked.</li>
 </ol>
 </p>
 
-<h4>Custom Command</h4>
-<p>
-Run any custom command.
-For example you can render IFD files using 'mantra' command.
-</p>
-<ul>
-<li><b>Add Custom Command</b> - Add custom command tasks block to a job.</li>
-<li><b>Command</b> - The command.</li>
-<li><b>Files</b> - Some files you can point to use in command.</li>
-<li><b>Preview</b> - Specify result picture here to enable tasks preview.</li>
-</ul>
+
+<h3>Sub Task Dependence:</h3>
+<table width="99%">
+<tr align="center">
+<td>
+   ROP Network Parameters:<br/>
+   <img src="images/subtask_houdini.png" alt="subtask_houdini" />
+</td>
+</tr>
+<table>
 
 <!--FOOTER-->
 </td></tr></table>
