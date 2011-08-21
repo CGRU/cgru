@@ -77,7 +77,6 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
       std::cout << "Render offline registered - \"" << newRender->getName() << "\"." << std::endl;
       newRender->getFarmHost();
    }
-   else delete newRender;
 
    return NULL;
 }

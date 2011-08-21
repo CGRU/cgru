@@ -135,7 +135,6 @@ bool DBItem::dbSelect( QSqlDatabase * db, const std::string * where)
       else
          dbAttributes[i]->set( afsql::qtos( q.value(a).toString()));
    }
-
    return true;
 }
 

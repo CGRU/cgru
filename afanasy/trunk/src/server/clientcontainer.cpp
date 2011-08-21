@@ -33,6 +33,7 @@ int ClientContainer::addClient( af::Client *newClient, bool deleteSameAddress, M
       return 0;
    }
 
+   if( newClient->isOnline())
    {
       ClientContainerIt clientsIt( this);
       for( af::Client *client = clientsIt.Client(); client != NULL; clientsIt.next(), client = clientsIt.Client())
@@ -47,7 +48,9 @@ int ClientContainer::addClient( af::Client *newClient, bool deleteSameAddress, M
             else
             {
                AFCommon::QueueLogError( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
+               AFINFO( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
                delete newClient;
+               AFINFO("ClientContainer::addClient: Client deleted. Returning zero...");
                return 0;
             }
          }
@@ -55,6 +58,7 @@ int ClientContainer::addClient( af::Client *newClient, bool deleteSameAddress, M
    }
 
    id = add( newClient);
+   AFINFA("ClientContainer::addClient: id = %d.", id);
    if( id == 0)
    {
       delete newClient;

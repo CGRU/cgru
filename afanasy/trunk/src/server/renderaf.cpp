@@ -29,6 +29,7 @@ RenderAf::RenderAf( af::Msg * msg):
 RenderAf::RenderAf( int Id):
    DBRender( Id)
 {
+   AFINFA("RenderAf::RenderAf(%d)", id);
    init();
 }
 

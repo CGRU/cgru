@@ -43,6 +43,8 @@ public:
 /// Set registration time ( and update time).
    virtual void setRegisterTime();
 
+   inline virtual bool isOnline() const { return true; }///< Whether the client is online.
+
    inline void updateTime() {  time_update   = time( NULL );} ///< Update client last update time.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
