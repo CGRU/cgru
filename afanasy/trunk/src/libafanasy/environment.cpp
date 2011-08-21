@@ -141,6 +141,7 @@ int         Environment::version_afanasy = 0;
 std::string Environment::version_cgru;
 std::string Environment::version_python;
 std::string Environment::version_gcc;
+std::string Environment::version_date;
 
 void Environment::getVars( const rapidxml::xml_node<> * pnode)
 {
@@ -416,6 +417,11 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
    printf("GCC version = \"%s\"\n", version_gcc.c_str());
 #endif
+
+   // Date:
+   version_date = std::string(__DATE__) + " " __TIME__;
+   printf("Compilation date = \"%s\"\n", version_date.c_str());
+
 //###################################################
 
    load();

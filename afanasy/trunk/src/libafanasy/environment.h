@@ -61,6 +61,7 @@ public:
    static inline const std::string & getVersionCGRU()    { return version_cgru;     }
    static inline const std::string & getVersionPython()  { return version_python;   }
    static inline const std::string & getVersionGCC()     { return version_gcc;      }
+   static inline const std::string & getVersionDate()    { return version_date;     }
 
    static inline const std::string & getHome()        { return home;          }
    static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
@@ -190,6 +191,7 @@ private:
    static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup
    static std::string version_python;  ///< Compiled Python version
    static std::string version_gcc;     ///< GCC version
+   static std::string version_date;    ///< Version date
 
 /// Afanasy server computer name
 /** Try to get \c AF_SERVER_NAME environment variable at first.

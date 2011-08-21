@@ -15,17 +15,19 @@ LabelVersion::LabelVersion( QWidget *parent):
    setMinimumHeight(16);
    setMaximumHeight(16);
    text = QString("CGRU VERSION %1").arg(af::Environment::getVersionCGRU().c_str());
-   tooltip = QString("CGRU version: %1\n"
-                     "Afanasy build sources revision: %2\n"
-                     "Python version: %3\n"
-                     "Qt version: %4")
+   tooltip = QString("CGRU version: %1"
+                     "\nAfanasy build sources revision: %2"
+                     "\nPython version: %3"
+                     "\nQt version: %4")
          .arg( QString::fromUtf8( af::Environment::getVersionCGRU().c_str()))
          .arg( af::Environment::getVersionAfanasy())
          .arg( af::Environment::getVersionPython().c_str())
          .arg( qVersion());
    if( false == af::Environment::getVersionGCC().empty())
       tooltip += QString("\nGCC version: %1").arg( af::Environment::getVersionGCC().c_str());
-/*
+
+   tooltip += QString("\nBuild at %1").arg( af::Environment::getVersionDate().c_str());
+   /*
 // Try to load user's custom logo
    QString filename = af::Environment::getHomeAfanasy() + "/logo.png";
 //printf("Logo = '%s'\n", filename.toUtf8().data());
