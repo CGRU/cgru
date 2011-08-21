@@ -122,7 +122,6 @@ std::string Environment::platform;
 std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
-std::string Environment::cgru_version;
 
 bool Environment::god_mode    = false;
 bool Environment::help_mode   = false;
@@ -138,7 +137,10 @@ std::list<std::string> Environment::cmdarguments_usagehelp;
 std::list<std::string> Environment::previewcmds;
 std::list<std::string> Environment::rendercmds;
 
-int            Environment::afanasy_build_version = 0;
+int         Environment::version_afanasy = 0;
+std::string Environment::version_cgru;
+std::string Environment::version_python;
+std::string Environment::version_gcc;
 
 void Environment::getVars( const rapidxml::xml_node<> * pnode)
 {
@@ -394,14 +396,26 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
    }
 //
-//############ Version: ########################
+//############ Versions: ########################
+   // CGRU:
+   version_cgru = getenv("CGRU_VERSION");
+   printf("CGRU version = \"%s\"\n", version_cgru.c_str());
+
+   // Build Revision:
 //#ifdef CGRU_REVISION
-   afanasy_build_version = CGRU_REVISION;
+   version_afanasy = CGRU_REVISION;
 //#endif
-   printf("Afanasy build revision = \"%d\"\n", afanasy_build_version);
-   cgru_version = getenv("CGRU_VERSION");
-	printf("Python version = %d.%d.%d\n", PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
-   printf("CGRU version = \"%s\"\n", cgru_version.c_str());
+   printf("Afanasy build revision = \"%d\"\n", version_afanasy);
+
+   // Python:
+   version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);
+   printf("Python version = \"%s\"\n", version_python.c_str());
+
+   // GCC:
+#ifdef __GNUC__
+   version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
+   printf("GCC version = \"%s\"\n", version_gcc.c_str());
+#endif
 //###################################################
 
    load();

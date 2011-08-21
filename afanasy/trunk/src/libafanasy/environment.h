@@ -57,8 +57,10 @@ public:
    static bool setClientPort( uint16_t port);
 
 /// Get versions:
-   static inline int getAfanasyBuildVersion()         { return afanasy_build_version;  }
-   static inline const std::string & getCGRUVersion() { return  cgru_version;          }
+   static inline int                 getVersionAfanasy() { return version_afanasy;  }
+   static inline const std::string & getVersionCGRU()    { return version_cgru;     }
+   static inline const std::string & getVersionPython()  { return version_python;   }
+   static inline const std::string & getVersionGCC()     { return version_gcc;      }
 
    static inline const std::string & getHome()        { return home;          }
    static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
@@ -184,8 +186,10 @@ private:
    static std::string home;            ///< User home directory.
    static std::string home_afanasy;    ///< Afanasy home settings.
 
-   static int afanasy_build_version;   ///< Afanasy build sources version, will be compiled in binaries
-   static std::string cgru_version;    ///< CGRU version, will be get from environment on applications startup
+   static int version_afanasy;         ///< Afanasy build sources version, will be compiled in binaries
+   static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup
+   static std::string version_python;  ///< Compiled Python version
+   static std::string version_gcc;     ///< GCC version
 
 /// Afanasy server computer name
 /** Try to get \c AF_SERVER_NAME environment variable at first.

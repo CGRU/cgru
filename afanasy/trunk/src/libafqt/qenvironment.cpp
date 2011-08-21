@@ -179,6 +179,8 @@ QEnvironment::QEnvironment( const QString & Name)
 
    initFonts();
    solveServerAddress();
+
+   printf("Qt version = \"%s\"\n", qVersion());
 }
 
 bool QEnvironment::openXMLDomDocument( QDomDocument & doc, const std::string & filename)

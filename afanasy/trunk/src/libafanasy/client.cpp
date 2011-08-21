@@ -40,8 +40,8 @@ Client::Client( int flags, int Id):
       time_launch = time(NULL);
       username = af::Environment::getUserName();
       name = af::Environment::getHostName();
-      revision = af::Environment::getAfanasyBuildVersion();
-      version = af::Environment::getCGRUVersion();
+      revision = af::Environment::getVersionAfanasy();
+      version = af::Environment::getVersionCGRU();
    }
 }
 

@@ -108,8 +108,8 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    if( argc == 1)
    {
       printf("\n");
-      printf("Afanasy build version = \"%d\"\n", af::Environment::getAfanasyBuildVersion());
-      printf("CGRU version = \"%s\"\n", af::Environment::getCGRUVersion().c_str());
+      printf("CGRU Version = \"%s\"\n", af::Environment::getVersionCGRU().c_str());
+      printf("Afanasy Revision = \"%d\"\n", af::Environment::getVersionAfanasy());
       printf("\n");
       printf("Type \"afcmd h\" for help.\n");
    }

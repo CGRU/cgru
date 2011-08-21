@@ -14,8 +14,21 @@ LabelVersion::LabelVersion( QWidget *parent):
 {
    setMinimumHeight(16);
    setMaximumHeight(16);
-   text = QString("AFANASY BUILD %1      CGRU VERSION %2").arg(af::Environment::getAfanasyBuildVersion()).arg( QString::fromUtf8( af::Environment::getCGRUVersion().c_str()));
-   tooltip = QString("Afanasy build sources revision: %1\nCGRU version: %2").arg(af::Environment::getAfanasyBuildVersion()).arg( QString::fromUtf8( af::Environment::getCGRUVersion().c_str()));
+   text = QString("CGRU VERSION %1").arg(af::Environment::getVersionCGRU().c_str());
+   tooltip = QString("CGRU version: %1\n"
+                     "Afanasy build sources revision: %2\n"
+                     "Python version: %3\n"
+                     "Qt version: %4\n"
+                     "GCC version: %5")
+         .arg( QString::fromUtf8( af::Environment::getVersionCGRU().c_str()))
+         .arg( af::Environment::getVersionAfanasy())
+         .arg( af::Environment::getVersionPython().c_str())
+         .arg( qVersion())
+         .arg( af::Environment::getVersionGCC().c_str());
+//   tooltip = QString("CGRU version: %1\n"
+//                     "Afanasy build sources revision: %2\n")
+//            .arg( af::Environment::getVersionCGRU().c_str())
+//            .arg( af::Environment::getVersionAfanasy());
 /*
 // Try to load user's custom logo
    QString filename = af::Environment::getHomeAfanasy() + "/logo.png";
