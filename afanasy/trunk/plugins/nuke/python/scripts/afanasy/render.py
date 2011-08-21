@@ -215,6 +215,7 @@ class BlockParameters:
          cmdargs = ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
          if self.capacitymin != -1 or self.capacitymax != -1:
 
+
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             services = __import__('services.service', globals(), locals(), [])
             threads = services.service.str_capacity
@@ -402,7 +403,8 @@ class JobParameters:
          if VERBOSE: print 'No blocks parameters generated on "%s"' % self.nodename
          return
 
-      self.scenename = renderscenename + ('.%s.nk' % self.jobname)
+      afcommon = __import__('afcommon', globals(), locals(), [])
+      self.scenename = renderscenename + afcommon.filterFileName('.%s.nk' % self.jobname)
 
       blocks = []
       for bparams in self.blocksparameters:
