@@ -105,13 +105,13 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    af::destroy();
 //   Py_Finalize();
 
-   if( argc == 1)
-   {
-      printf("\n");
-      printf("CGRU Version = \"%s\"\n", af::Environment::getVersionCGRU().c_str());
-      printf("Afanasy Revision = \"%d\"\n", af::Environment::getVersionAfanasy());
-      printf("\n");
-      printf("Type \"afcmd h\" for help.\n");
-   }
+//   if( argc == 1)
+//   {
+//      printf("\n");
+//      printf("CGRU Version = \"%s\"\n", af::Environment::getVersionCGRU().c_str());
+//      printf("Afanasy Revision = \"%d\"\n", af::Environment::getVersionAfanasy());
+//      printf("\n");
+//      printf("Type \"afcmd h\" for help.\n");
+//   }
    return return_value;
 }
