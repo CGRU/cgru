@@ -16,12 +16,10 @@ LabelVersion::LabelVersion( QWidget *parent):
    setMaximumHeight(16);
    text = QString("CGRU VERSION %1").arg(af::Environment::getVersionCGRU().c_str());
    tooltip = QString("Build at %1"
-                     "\nCGRU version: %2"
-                     "\nAfanasy build sources revision: %3"
-                     "\nPython version: %4"
-                     "\nQt version: %5")
+                     "\nAfanasy sources revision: %2"
+                     "\nPython version: %3"
+                     "\nQt version: %4")
          .arg( af::Environment::getVersionDate().c_str())
-         .arg( QString::fromUtf8( af::Environment::getVersionCGRU().c_str()))
          .arg( af::Environment::getVersionAfanasy())
          .arg( af::Environment::getVersionPython().c_str())
          .arg( qVersion());

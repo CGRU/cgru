@@ -161,6 +161,7 @@ For example you can render IFD files using 'mantra' command.
 
 <h2>Examples:</h2>
 
+<hr />
 <h3>Simple Run ROP:</h3>
 <table width="99%">
 <tr align="center">
@@ -181,6 +182,7 @@ For example you can render IFD files using 'mantra' command.
 </tr>
 </table>
 
+<hr />
 <h3>Command Render:</h3>
 <table width="99%">
 <tr align="center">
@@ -201,6 +203,7 @@ For example you can render IFD files using 'mantra' command.
 </tr>
 </table>
 
+<hr />
 <h3>Tile Render:</h3>
 <table width="99%">
 <tr align="center">
@@ -233,7 +236,14 @@ And at this stage, after all, IFD will be removed, if it was asked.</li>
 </p>
 
 
+<hr />
 <h3>Sub Task Dependence:</h3>
+<p>
+This option "Allow Sub-Task Dependence" can be useful with simulations.
+Simulation calculations runs as one task.
+So render tasks need to wait whole frame range simulated.
+With this option frames begin to render as they already simulated while the entire simulation task is not finished at all.
+</p>
 <table width="99%">
 <tr align="center">
 <td colspan="2">
@@ -254,6 +264,24 @@ And at this stage, after all, IFD will be removed, if it was asked.</li>
 </table>
 
 
+<hr />
+<h3>Complex Example:</h3>
+You can connect any number of ROP nodes to construct a complex job.
+<table width="99%">
+<tr align="center">
+<td>
+   ROP Network:<br/>
+   <img src="images/complex_houdini.png" alt="complex_houdini" />
+</td>
+<td>
+   Afanasy Job:<br/>
+   <img src="images/complex_job.png" alt="complex_job" />
+</td>
+</tr>
+</table>
+
+
+<hr />
 <p>
 This examples are provided with CGRU.
 </p>
