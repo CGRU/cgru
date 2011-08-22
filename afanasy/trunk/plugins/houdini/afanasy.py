@@ -140,7 +140,11 @@ class BlockParameters:
       self.valid = True
 
    def genBlock( self, hipfilename):
-      if VERBOSE: print 'Generating block on "%s"' % self.job_name
+      if VERBOSE:
+         if self.ropnode:
+            print 'Generating block for "%s" from "%s"' % (self.ropnode.name(), self.afnode.name())
+         else:
+            print 'Generating command block from "%s"' % (self.afnode.name())
 
       block = af.Block( self.name, self.type)
       block.setCommand( self.cmd % vars(), self.cmd_useprefix)
@@ -324,7 +328,7 @@ def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
    return params
 
 def getJobParameters( afnode, subblock = False, frame_range = None, prefix = ''):
-   if VERBOSE: 'getJobParameters: "%s"' % afnode.name()
+   if VERBOSE: print 'Getting Job Parameters from "%s":' % afnode.name()
 
    # Process frame range:
    if frame_range is None:
@@ -353,7 +357,7 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
       if node and node.isBypassed(): continue
       newparams = []
       if node and node.type().name() == 'afanasy':
-         newprefix = afnode.name()
+         newprefix = node.name()
          if prefix != '': newprefix = prefix + '_' + newprefix
          newparams = getJobParameters( node, True, frame_range, newprefix)
          dependmask = newprefix + '_.*'
@@ -376,7 +380,7 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
    return params
 
 def render( afnode):
-   if VERBOSE: print 'render: "%s"' % afnode.name()
+   if VERBOSE: print '\nRendering "%s":' % afnode.name()
    params = getJobParameters( afnode)
    if params is not None:
       if len(params) == 1:

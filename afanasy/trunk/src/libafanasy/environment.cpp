@@ -398,6 +398,11 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
 //
 //############ Versions: ########################
+
+   // Date:
+   version_date = std::string(__DATE__) + " " __TIME__;
+   printf("Compilation date = \"%s\"\n", version_date.c_str());
+
    // CGRU:
    version_cgru = getenv("CGRU_VERSION");
    printf("CGRU version = \"%s\"\n", version_cgru.c_str());
@@ -417,10 +422,6 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
    printf("GCC version = \"%s\"\n", version_gcc.c_str());
 #endif
-
-   // Date:
-   version_date = std::string(__DATE__) + " " __TIME__;
-   printf("Compilation date = \"%s\"\n", version_date.c_str());
 
 //###################################################
 
