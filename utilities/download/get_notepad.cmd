@@ -1,4 +1,4 @@
-set ver=5.8.7
+set ver=5.9.3
 
 set location=http://download.tuxfamily.org/notepadplus/%ver%
 set filename=npp.%ver%.Installer.exe
