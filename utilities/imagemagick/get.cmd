@@ -10,7 +10,7 @@ if exist %filename% (
 
 7z x %filename%
 
-set config=ImageMagick-6.6.9\VisualMagick\magick\magick-config.h.in
+set config=ImageMagick-6.7.1\VisualMagick\magick\magick-config.h.in
 if not exist %config% (
    echo Config file "%config%" not founded.
    exit
