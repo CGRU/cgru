@@ -163,6 +163,9 @@ For example you can render IFD files using 'mantra' command.
 
 <hr />
 <h3>Simple Run ROP:</h3>
+<p>
+The simplest way to render with Afanasy is to connect 'afanasy' ROP to your render ROP.
+</p>
 <table width="99%">
 <tr align="center">
 <td colspan="2">
@@ -181,9 +184,18 @@ For example you can render IFD files using 'mantra' command.
 </td>
 </tr>
 </table>
+<p>
+The job consists of single tasks block.
+Each task represents a frame or several number of frames, specified in 'Frames Per Task' parameter.
+</p>
+
 
 <hr />
 <h3>Command Render:</h3>
+<p>
+You can send any custom command to your farm.
+Usually you need separate IFD files generation and run 'mantra' as a standalone process.
+</p>
 <table width="99%">
 <tr align="center">
 <td colspan="2">
@@ -202,9 +214,20 @@ For example you can render IFD files using 'mantra' command.
 </td>
 </tr>
 </table>
+<p>
+This job consists of two blocks of tasks.
+The first block produced by 'mantra_ifd' node, with 'Disk File' parameter turned on.
+Next block runs 'mantra' with 'files' parameter pointing to the generated files.
+</p>
+
 
 <hr />
 <h3>Tile Render:</h3>
+<p>
+You can split single image to render on several hosts.
+Each host (task) will produce a 'tile' - some part of an image.
+Tiles will be combined in a single image.
+</p>
 <table width="99%">
 <tr align="center">
 <td colspan="2">
@@ -223,16 +246,18 @@ For example you can render IFD files using 'mantra' command.
 </td>
 </tr>
 </table>
-
 <p>
 Tile job consists of three blocks:
 <ol>
 <li><b>Generate</b> - Generate IFD files.</li>
-<li><b>Render</b> - Render Tiles.</li>
+<li><b>Render</b> - Render tiles with 'mantra' standalone process.</li>
 <li><b>Join</b> - Join tiles to assemble an image.
 If tiles were successfully joined they will be removed.
-And at this stage, after all, IFD will be removed, if it was asked.</li>
+At the end of this stage, IFD will be removed, if it was asked.</li>
 </ol>
+</p>
+<p>
+An utility to join EXR files is provided with CGRU.
 </p>
 
 
@@ -262,6 +287,11 @@ With this option frames begin to render as they already simulated while the enti
 </td>
 </tr>
 </table>
+<p>
+The first block of a job is a simulation. It consists of a single task ('Frames Per Task' parameter is set to the whole frame range).
+The second block set to wait the first one with sub-task dependence.
+So it begins to render as first frames of a simulation completed, while the simulation task is still running.
+</p>
 
 
 <hr />
@@ -279,6 +309,11 @@ You can connect any number of ROP nodes to construct a complex job.
 </td>
 </tr>
 </table>
+<p>
+This job consists of a simulation with sub-task dependence.
+Two caches waiting the simulation, but cat run independently from each other.
+Mantra tile render which produces three blocks which wait all cache.
+</p>
 
 
 <hr />

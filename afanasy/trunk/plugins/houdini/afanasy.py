@@ -7,7 +7,7 @@ import af
 import afcommon
 import services.service
 
-VERBOSE = 2
+VERBOSE = 0
 
 class BlockParameters:
    def __init__( self, afnode, ropnode, subblock, prefix, frame_range):
