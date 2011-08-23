@@ -2,9 +2,7 @@
 
 pythonver=$1
 if [ -z "$pythonver" ]; then
-   echo "Error: No python version specified."
-   echo "Usage: $0 [python version]"
-   exit 1
+   pythonver="2.7.2"
 fi
 
 pythondir=$PWD/$pythonver
@@ -18,7 +16,7 @@ export PATH=$pythondir/bin:$PATH
 export CFLAGS=-fPIC
 export CPPFLAGS=$CFLAGS
 
-cd sip-4.12.1
+cd sip-4.12.4
 
 if [ ! -z "$2" ]; then
    python configure.py -h

@@ -2,9 +2,7 @@
 
 pythonver=$1
 if [ -z "$pythonver" ]; then
-   echo "Error: No python version specified."
-   echo "Usage: $0 [python version]"
-   exit 1
+   pythonver="2.7.2"
 fi
 
 pythondir=$PWD/$pythonver
@@ -13,11 +11,11 @@ if [ ! -d "$pythondir" ]; then
    exit 1
 fi
 
-qt=`dirname $PWD`/qt/4.7.2
+qt=`dirname $PWD`/qt/4.7.3
 
 export PATH=$pythondir/bin:$qt/bin:$PATH
 
-cd PyQt-x11-gpl-4.8.3
+cd PyQt-x11-gpl-4.8.5
 
 if [ ! -z "$2" ]; then
    python configure.py -h
