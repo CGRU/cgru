@@ -10,7 +10,7 @@ import services.service
 VERBOSE = 0
 
 class BlockParameters:
-   def __init__( self, afnode, ropnode, subblock, prefix, frame_range):
+   def __init__( self, afnode, ropnode, subblock, prefix, frame_range, for_job_only = False):
       if VERBOSE == 2:
          if ropnode:
             print 'Initializing block parameters for "%s" from "%s"' % (ropnode.name(), afnode.name())
@@ -114,12 +114,18 @@ class BlockParameters:
       else:
          # Custom command driver:
          if int( afnode.parm('cmd_add').eval()):
-            self.name = 'cmd'
+            # Command:
             cmd = self.afnode.parm('cmd_cmd')
             self.cmd = afcommon.patternFromPaths( cmd.evalAsStringAtFrame( self.frame_first), cmd.evalAsStringAtFrame( self.frame_last))
-            self.type = self.cmd.split(' ')[0]
-            self.name = self.name + '_' + self.type
-         else:
+            # Name:
+            self.name = self.afnode.parm('cmd_name').eval()
+            if self.name is None or self.name == '': self.name = self.cmd.split(' ')[0]
+            # Service:
+            self.type = self.afnode.parm('cmd_service').eval()
+            if self.type is None or self.type == '': self.type = self.cmd.split(' ')[0]
+            # Prefix:
+            self.cmd_useprefix = int( self.afnode.parm('cmd_use_afcmdprefix').eval())
+         elif not for_job_only:
             hou.ui.displayMessage('Can\'t process "%s"' % str(afnode.name()))
             return
 
@@ -178,7 +184,7 @@ class BlockParameters:
 
       return block
 
-   def genJob( self, blockparams = None):
+   def genJob( self, blockparams):
       if VERBOSE: print 'Generating job on "%s"' % self.job_name
 
       # Calculate temporary hip name:
@@ -202,10 +208,8 @@ class BlockParameters:
       if self.hosts_mask != '': job.setHostsMask( self.hosts_mask)
       if self.hosts_mask_exclude != '': job.setHostsMaskExclude( self.hosts_mask_exclude)
 
-      job.blocks.append( self.genBlock( tmphip))
-      if blockparams is not None:
-         for blockparam in blockparams:
-            job.blocks.append( blockparam.genBlock( tmphip))
+      for blockparam in blockparams:
+         job.blocks.append( blockparam.genBlock( tmphip))
 
       job.setCmdPost('deletefiles "%s"' % tmphip)
 
@@ -233,6 +237,8 @@ def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
 
       # Mantra separate render:
       block_generate = BlockParameters( afnode, ropnode, subblock, prefix, frame_range)
+      blockname = block_generate.name
+      block_generate.name += '-G'
       if not block_generate.valid: return None
 
       run_rop = afnode.parm('sep_run_rop').eval()
@@ -281,7 +287,7 @@ def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
       if not join_render:
          tiles = tile_divx * tile_divy
          block_render = BlockParameters( afnode, ropnode, subblock, prefix, frame_range)
-         block_render.name = 'render'
+         block_render.name = blockname + '-R'
          block_render.cmd = 'mantra'
          block_render.type = block_render.cmd
          if run_rop: block_render.dependmask = block_generate.name
@@ -308,9 +314,9 @@ def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
          cmd = 'exrjoin %(tile_divx)d %(tile_divy)d %(images)s d' % vars()
          if del_rop_files: cmd += ' && deletefiles -s "%s"' % files
          block_join = BlockParameters( afnode, ropnode, subblock, prefix, frame_range)
-         block_join.name = 'join'
+         block_join.name = blockname + '-J'
          block_join.type = 'generic'
-         block_join.dependmask = 'render'
+         block_join.dependmask = block_render.name
          block_join.cmd = cmd
          block_join.cmd_useprefix = False
          block_join.preview = images
@@ -365,9 +371,9 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
       else:
          newparams = getBlockParameters( afnode, node, subblock, prefix, frame_range)
          if newparams is None: return None
+         dependmask = newparams[0].name
          for param in newparams:
             if not param.valid: return None
-            dependmask = param.name
       if len(newparams): params.extend(newparams)
       else: return None
       
@@ -377,14 +383,14 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
 
       prevparams = newparams
 
+   # Last parameter needed to generate job.
+   if not subblock: params.append( BlockParameters( afnode, None, False, '', frame_range, True))
+   
    return params
 
 def render( afnode):
    if VERBOSE: print '\nRendering "%s":' % afnode.name()
    params = getJobParameters( afnode)
    if params is not None:
-      if len(params) == 1:
-         params[0].genJob()
-      elif len(params) > 1:
-         params[0].genJob( params[1:])
+      params[-1].genJob( params[:-1])
       for parm in params: parm.doPost()

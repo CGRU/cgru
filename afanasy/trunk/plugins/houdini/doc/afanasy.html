@@ -153,9 +153,13 @@ For example you can render IFD files using 'mantra' command.
 </p>
 <ul>
 <li><b>Add Custom Command</b> - Add custom command tasks block to a job.</li>
+<li><b>Name</b> - Tasks block name. If empty the first word of the command will be used.</li>
 <li><b>Command</b> - The command.</li>
+<li><b>Service</b> - Tasks block service. If empty the first word of the command will be used.</li>
 <li><b>Files</b> - Some files you can point to use in command.</li>
 <li><b>Preview</b> - Specify result picture here to enable tasks preview.</li>
+<li><b>Prefix with $AF_CMD_PREFIX</b> - Add <kbd>$AF_CMD_PREFIX</kbd> environment variable value to the beginning of the command.
+This may be needed for some software (evironment) setup.</li>
 </ul>
 
 
@@ -312,7 +316,9 @@ You can connect any number of ROP nodes to construct a complex job.
 <p>
 This job consists of a simulation with sub-task dependence.
 Two caches waiting the simulation, but cat run independently from each other.
-Mantra tile render which produces three blocks which wait all cache.
+Mantra tile render which produces three blocks which wait all the cache.
+Two blocks for preview which can run independently but wait tile render tasks.
+One to convert EXR files to JPEGs and one to generate a preview movie form EXRs.
 </p>
 
 
