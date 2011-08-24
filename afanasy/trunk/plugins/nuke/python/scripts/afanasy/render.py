@@ -216,6 +216,7 @@ class BlockParameters:
          if self.capacitymin != -1 or self.capacitymax != -1:
 
 
+
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             services = __import__('services.service', globals(), locals(), [])
             threads = services.service.str_capacity
@@ -433,8 +434,7 @@ class JobParameters:
          self.dependmaskglobal = str( self.dependmaskglobal)
          if self.dependmaskglobal != '': job.setDependMaskGlobal( self.dependmaskglobal)
       if self.startpaused: job.offLine()
-      if self.platform != None:
-         if self.platform == 'Any': job.setNeedOS('')
+      if self.platform is None or self.platform == 'Any': job.setNeedOS('')
       job.setCmdPost('deletefiles "%s"' % self.scenename)
       job.blocks = blocks
 
@@ -690,7 +690,7 @@ def render( node = None):
    sframespertask = str(panel.value('Frames Per Task:'))
    storeframes = False
    if hasafanasynodes: storeframes = int(panel.value('Store Frames Settings'))
-   fparams['startpaused'] = int(panel.value('Start Paused'))
+   if panel.value('Start Paused'): fparams['startpaused'] = 1
    # Check frame range was set:
    if sframefirst.find('..') == -1:
       try: framefirst = int(sframefirst)
