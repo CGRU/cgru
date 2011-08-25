@@ -76,7 +76,7 @@ Read {
  xpos 3
  ypos -32
 }
-set N5796c90 [stack 0]
+set N45c2ca0 [stack 0]
 Write {
  file render/output.####.dpx
  proxy render/output_proxy.####.dpx
@@ -103,7 +103,7 @@ cgru_dailies {
  comments "cgru afanasy nuke example"
  movfolder /cgru/examples/nuke
  movrule (s)_(v)_(d)
- movname scene_v001_110802
+ movname scene_v001_110826
  viewsnames "left right"
  knob_1 ""
  template /cgru/utilities/moviemaker/templates/dailies
@@ -166,240 +166,6 @@ Write {
  xpos 726
  ypos -16
 }
-ColorBars {
- inputs 0
- name ColorBars1
- xpos 223
- ypos -334
-}
-Transform {
- translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
- rotate {{180*noise(4.56+.05*frame) i}}
- scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
- center {320 240}
- motionblur 1
- name Transform1
- xpos 223
- ypos -222
-}
-set N55fb950 [stack 0]
-Write {
- channels rgba
- file render/key.####.exr
- proxy render/key_proxy.####.exr
- file_type exr
- name key
- xpos 333
- ypos -229
-}
-Constant {
- inputs 0
- channels rgb
- color {0.0443748 0.0548952 0.205 0.35}
- name Constant1
- xpos 3
- ypos -335
-}
-Ramp {
- opacity {{.6+.4*noise(3.1+.4*frame)}}
- p0 {480 -95}
- p1 {230 625}
- color {1 0.829351 0.381265 1}
- name Ramp1
- xpos 3
- ypos -259
-}
-set N561de70 [stack 0]
-Write {
- file render/back.####.exr
- proxy render/back_proxy.####.exr
- file_type exr
- name back
- xpos 113
- ypos -266
-}
-Dot {
- name Dot2
- xpos 433
- ypos -254
-}
-afanasy {
- inputs 2
- name afanasy1
- label raw
- xpos 399
- ypos -163
- jobname raw
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
- independent true
-}
-Read {
- inputs 0
- file render/key.####.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/key_proxy.####.exr
- last 9999
- origlast 9999
- origset true
- version 11
- name Read3
- xpos 223
- ypos -165
-}
-push $N55fb950
-Switch {
- inputs 2
- which 1
- name Switch2
- xpos 223
- ypos -193
-}
-Read {
- inputs 0
- file render/back.####.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/back_proxy.####.exr
- last 9999
- origlast 9999
- origset true
- version 9
- name Read2
- xpos 3
- ypos -166
-}
-push $N561de70
-Switch {
- inputs 2
- which 1
- name Switch1
- xpos 3
- ypos -194
-}
-Merge2 {
- inputs 2
- name Merge1
- xpos 113
- ypos -194
-}
-Crop {
- box {0 0 720 576}
- crop false
- name Crop1
- xpos 113
- ypos -58
-}
-set N5784c20 [stack 0]
-Write {
- file render/final.####.exr
- proxy render/final_proxy.####.exr
- file_type exr
- name final
- xpos 223
- ypos -65
-}
-push $N5796c90
-push $N5784c20
-Switch {
- inputs 2
- which 1
- name Switch3
- xpos 113
- ypos -2
-}
-Write {
- file render/preview.####.jpg
- proxy render/preview_proxy.####.jpg
- file_type jpeg
- checkHashOnRead false
- name preview
- xpos 113
- ypos 46
-}
-set N57a5ba0 [stack 0]
-afanasy {
- inputs 3
- name afanasy2
- label comp
- xpos 399
- ypos 46
- jobname comp
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
- fullrange true
-}
-push $N57a5ba0
-cgru_dailies {
- name dailies
- xpos 113
- ypos 125
- format 720x576
- fps 24
- codec /cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg
- company ""
- project Nuke
- shot scene
- version 1
- artist Afanasy
- activity comp
- comments "cgru afanasy nuke example"
- movfolder /cgru/examples/nuke
- movrule (s)_(v)_(d)
- movname scene_v001_110802
- viewsnames "left right"
- knob_1 ""
- template /cgru/utilities/moviemaker/templates/dailies
- slate /cgru/utilities/moviemaker/templates/dailies_slate
- lgspath /cgru/utilities/moviemaker/logos/logo.png
- lgssize 20
- lgfpath /cgru/utilities/moviemaker/logos/logo.png
- lgfsize 10
- draw169 25
- draw235 25
- line169 200,200,200
- line235 200,200,200
- tmpformat tga
- tmpquality ""
-}
-afanasy {
- name afanasy3
- label dailies
- xpos 289
- ypos 118
- jobname dailies
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask scene.nk.*
- dependmaskglbl ""
- addnodes ""
-}
-afanasy {
- inputs 2
- name afanasy
- label all
- xpos 399
- ypos 118
- jobname all
- knob ""
- knob_1 ""
- hostsmask ""
- hostsmaskexcl ""
- dependmask ""
- dependmaskglbl ""
- addnodes ""
-}
 afanasy {
  inputs 0
  name ab
@@ -433,7 +199,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N4ff6e20 [stack 0]
+set N4c7ca00 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -448,7 +214,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N4ff6e20
+push $N4c7ca00
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -456,7 +222,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N4ff6e20
+push $N4c7ca00
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -710,7 +476,6 @@ Write {
 afanasy {
  inputs 3
  name ia0
- selected true
  xpos 578
  ypos -552
  jobname ""
@@ -722,4 +487,238 @@ afanasy {
  dependmaskglbl ""
  addnodes ""
  forceframes true
+}
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos 223
+ ypos -334
+}
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform1
+ xpos 223
+ ypos -222
+}
+set N4625f90 [stack 0]
+Write {
+ channels rgba
+ file render/key.####.exr
+ proxy render/key_proxy.####.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -229
+}
+Constant {
+ inputs 0
+ channels rgb
+ color {0.0443748 0.0548952 0.205 0.35}
+ name Constant1
+ xpos 3
+ ypos -335
+}
+Ramp {
+ opacity {{.6+.4*noise(3.1+.4*frame)}}
+ p0 {480 -95}
+ p1 {230 625}
+ color {1 0.829351 0.381265 1}
+ name Ramp1
+ xpos 3
+ ypos -259
+}
+set N46410a0 [stack 0]
+Write {
+ file render/back.####.exr
+ proxy render/back_proxy.####.exr
+ file_type exr
+ name back
+ xpos 113
+ ypos -266
+}
+Dot {
+ name Dot2
+ xpos 433
+ ypos -254
+}
+afanasy {
+ inputs 2
+ name afanasy1
+ label raw
+ xpos 399
+ ypos -163
+ jobname raw
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ independent true
+}
+Read {
+ inputs 0
+ file render/key.####.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/key_proxy.####.exr
+ last 9999
+ origlast 9999
+ origset true
+ version 11
+ name Read3
+ xpos 223
+ ypos -165
+}
+push $N4625f90
+Switch {
+ inputs 2
+ which 1
+ name Switch2
+ xpos 223
+ ypos -193
+}
+Read {
+ inputs 0
+ file render/back.####.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/back_proxy.####.exr
+ last 9999
+ origlast 9999
+ origset true
+ version 9
+ name Read2
+ xpos 3
+ ypos -166
+}
+push $N46410a0
+Switch {
+ inputs 2
+ which 1
+ name Switch1
+ xpos 3
+ ypos -194
+}
+Merge2 {
+ inputs 2
+ name Merge1
+ xpos 113
+ ypos -194
+}
+Crop {
+ box {0 0 720 576}
+ crop false
+ name Crop1
+ xpos 113
+ ypos -58
+}
+set N47a8e20 [stack 0]
+Write {
+ file render/final.####.exr
+ proxy render/final_proxy.####.exr
+ file_type exr
+ name final
+ xpos 223
+ ypos -65
+}
+push $N45c2ca0
+push $N47a8e20
+Switch {
+ inputs 2
+ which 1
+ name Switch3
+ xpos 113
+ ypos -2
+}
+Write {
+ file render/preview.####.jpg
+ proxy render/preview_proxy.####.jpg
+ file_type jpeg
+ checkHashOnRead false
+ name preview
+ xpos 113
+ ypos 46
+}
+set N47bf2f0 [stack 0]
+afanasy {
+ inputs 3
+ name afanasy2
+ label comp
+ xpos 399
+ ypos 46
+ jobname comp
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ fullrange true
+}
+push $N47bf2f0
+cgru_dailies {
+ name dailies
+ xpos 113
+ ypos 125
+ format 720x576
+ fps 24
+ codec /cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg
+ company ""
+ project Nuke
+ shot scene
+ version 1
+ artist Afanasy
+ activity comp
+ comments "cgru afanasy nuke example"
+ movfolder /cgru/examples/nuke
+ movrule (s)_(v)_(d)
+ movname scene_v001_110826
+ viewsnames "left right"
+ knob_1 ""
+ template /cgru/utilities/moviemaker/templates/dailies_withlogo
+ slate /cgru/utilities/moviemaker/templates/dailies_slate
+ lgspath /cgru/utilities/moviemaker/logos/logo.png
+ lgssize 20
+ lgfpath /cgru/utilities/moviemaker/logos/logo.png
+ lgfsize 10
+ draw169 25
+ draw235 25
+ line169 200,200,200
+ line235 200,200,200
+ tmpformat tga
+ tmpquality ""
+}
+afanasy {
+ name afanasy3
+ label dailies
+ xpos 289
+ ypos 118
+ jobname dailies
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask scene.nk.*
+ dependmaskglbl ""
+ addnodes ""
+}
+afanasy {
+ inputs 2
+ name afanasy
+ label all
+ xpos 399
+ ypos 118
+ jobname all
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
 }

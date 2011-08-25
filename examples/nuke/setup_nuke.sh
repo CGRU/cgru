@@ -66,7 +66,7 @@ fi
 
 # Setup Dailies:
 moviemaker=$CGRU_LOCATION/utilities/moviemaker
-export CGRU_DAILIES_TEMPLATE="$moviemaker/templates/dailies"
+export CGRU_DAILIES_TEMPLATE="$moviemaker/templates/dailies_withlogo"
 export CGRU_DAILIES_SLATE="$moviemaker/templates/dailies_slate"
 export CGRU_DAILIES_CODEC="$moviemaker/codecs/photojpg_best.ffmpeg"
 export CGRU_DAILIES_LGSPATH="$moviemaker/logos/logo.png"

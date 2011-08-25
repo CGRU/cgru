@@ -30,7 +30,7 @@ def dailiesEvaluate( node):
    # Template:
    template = node.knob('template').value()
    if template == None or template == '' or not os.path.isfile( template):
-      template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies')
+      template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_withlogo')
       template = template.replace('\\','/')
       node.knob('template').setValue( template)
 

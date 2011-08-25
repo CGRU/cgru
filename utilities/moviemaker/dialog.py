@@ -14,9 +14,9 @@ from PyQt4 import QtCore, QtGui
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] [file]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
-Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies',      help='Frame paint template')
-Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576',      help='Resolution')
+Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies_withlogo', help='Sequence frame template')
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
+Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576',      help='Resolution')
 Parser.add_option('--tmpformat',             dest='tmpformat',       type  ='string',     default='tga',          help='Temporary images format')
 Parser.add_option('--tmpquality',            dest='tmpquality',      type  ='string',     default='',             help='Temporary images format quality options')
 Parser.add_option('--noautocorr',            dest='noautocorr',      action='store_true', default=False,          help='Disable auto color correction for Cineon and EXR')
@@ -32,10 +32,10 @@ Parser.add_option('--draw235',               dest='draw235',         type  ='int
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='',             help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--fff',                   dest='fffirst',         action='store_true', default=False,          help='Draw first frame as first, and not actual first frame number.')
-Parser.add_option('--lgspath',         		dest='lgspath',    		type  ='string',     default='',             help='Slate logo')
+Parser.add_option('--lgspath',         		dest='lgspath',    		type  ='string',     default='logo.png',     help='Slate logo')
 Parser.add_option('--lgssize',         		dest='lgssize',    		type  ='int',        default=25,   	         help='Slate logo size, percent of image')
 Parser.add_option('--lgsgrav',         		dest='lgsgrav',    		type  ='string',     default='southeast', 	help='Slate logo positioning gravity')
-Parser.add_option('--lgfpath',         		dest='lgfpath',    		type  ='string',     default='',             help='Frame logo')
+Parser.add_option('--lgfpath',         		dest='lgfpath',    		type  ='string',     default='logo.png',     help='Frame logo')
 Parser.add_option('--lgfsize',         		dest='lgfsize',    		type  ='int',        default=10,   	         help='Frame logo size, percent of image')
 Parser.add_option('--lgfgrav',         		dest='lgfgrav',    		type  ='string',     default='north',        help='Frame logo positioning gravity')
 Parser.add_option('-A', '--afanasy',         dest='afanasy',         action='store_true', default=False,          help='Send Afanasy job')
@@ -165,6 +165,7 @@ class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
       self.evaluated = False
+      self.running   = False
 
       self.setWindowTitle('Mavishky   ' + os.getenv('CGRU_VERSION', ''))
       self.mainLayout = QtGui.QVBoxLayout( self)
@@ -880,6 +881,7 @@ Add this options to temporary image saving.')
       self.evaluate()
 
    def evalStereo( self):
+      if self.running: return
       if self.inputPattern2 is None:
          self.cStereoDuplicate.setEnabled( True)
          if self.cStereoDuplicate.isChecked():
@@ -975,6 +977,7 @@ Add this options to temporary image saving.')
       self.inputFileChanged2()
 
    def inputFileChanged( self):
+      if self.running: return
       self.editInputFilesCount.clear()
       self.editInputFilesPattern.clear()
       self.editIdentify.clear()
@@ -992,6 +995,7 @@ Add this options to temporary image saving.')
       self.evaluate()
 
    def inputFileChanged2( self):
+      if self.running: return
       self.editInputFilesCount2.clear()
       self.editInputFilesPattern2.clear()
       self.editIdentify2.clear()
@@ -1131,6 +1135,7 @@ Add this options to temporary image saving.')
    def evaluate( self):
       self.evaluated = False
       self.btnStart.setEnabled( False)
+      if self.running: return
 
       if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9'): return
       if not self.validateEditColor( str(self.editLine235.text()), 'line 2.35'): return
@@ -1275,6 +1280,7 @@ Add this options to temporary image saving.')
       self.btnStart.setEnabled( True)
 
    def execute( self):
+#      self.evaluate()
       if not self.evaluated: return
       command = "%s" % self.cmdField.toPlainText()
       if len(command) == 0: return
@@ -1315,8 +1321,10 @@ Add this options to temporary image saving.')
          else:          self.cmdField.setText('Unable to send job to Afanasy server.')
       else:
          self.btnStart.setEnabled( False)
+         self.btnRefresh.setEnabled( False)
          self.btnStop.setEnabled( True)
          self.cmdField.clear()
+         self.running = True
          self.process = QtCore.QProcess( self)
          self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
@@ -1326,6 +1334,8 @@ Add this options to temporary image saving.')
    def processfinished( self, exitCode):
       print 'Exit code = %d' % exitCode
       self.btnStop.setEnabled( False)
+      self.btnRefresh.setEnabled( True)
+      self.running = False
       if exitCode != 0: return
       self.cmdField.setText('Finished.')
 
