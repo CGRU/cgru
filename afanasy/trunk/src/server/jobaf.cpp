@@ -992,6 +992,7 @@ void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, Rend
          blocks[b]->tasks[t]->restart( onlyRunning, message, renders, monitoring);
    }
    AFCommon::QueueDBUpdateTask_end();
+   refresh( time(NULL), renders, monitoring);
 }
 
 void JobAf::restartErrors( const std::string & message, RenderContainer * renders, MonitorContainer * monitoring)
