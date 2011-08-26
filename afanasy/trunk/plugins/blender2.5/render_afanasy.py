@@ -154,7 +154,7 @@ class ORE_Submit(bpy.types.Operator):
       bpy.ops.wm.save_mainfile()
       rd.engine = engine
       scenefile = bpy.data.filepath
-      renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(time.time() - int(time.time()))[2:5]
+      renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(time.time() - int(time.time()))[2:5] + '.blend'
 
       # Get job name:
       jobname = ore.jobname
