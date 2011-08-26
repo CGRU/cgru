@@ -71,7 +71,7 @@ Parser.add_option('--lgssize',          dest='lgssize',     type  ='int',       
 Parser.add_option('--lgsgrav',          dest='lgsgrav',     type  ='string',     default='southeast', help='Slate logotype positioning gravity')
 Parser.add_option('--lgfpath',          dest='lgfpath',     type  ='string',     default='',          help='Flrame logotype path')
 Parser.add_option('--lgfsize',          dest='lgfsize',     type  ='int',        default=10,   	      help='Flrame logotype size, percent of image')
-Parser.add_option('--lgfgrav',          dest='lgfgrav',     type  ='string',     default='southeast', help='Flrame logotype positioning gravity')
+Parser.add_option('--lgfgrav',          dest='lgfgrav',     type  ='string',     default='north',     help='Flrame logotype positioning gravity')
 Parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',          dest='line169',     type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
