@@ -253,11 +253,13 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderRestoreDefaults:
    {
       appendLog( std::string("Default farm host settings restored by ") + userhost);
+      maxtasks = -1;
       capacity = -1;
       services_disabled.clear();
       disableServices();
-      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
+      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_services_disabled);
       break;
    }
    case af::Msg::TRenderSetNIMBY:
