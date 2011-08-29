@@ -5,10 +5,17 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Thu, 26 May 2011 10:00:00 GMT</pubDate>
-   <lastBuildDate>Thu, 26 May 2011 10:00:00 GMT</lastBuildDate>
+   <pubDate>Mon, 29 Aug 2011 12:00:00 GMT</pubDate>
+   <lastBuildDate>Mon, 29 Aug 2011 12:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.5.0 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release150</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release150</guid>
+      <description>Sub-task dependences to start render during simulation. Houdini submission major improvements. Technical changes.</description>
+      <pubDate>Mon, 29 Aug 2011 12:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.4.5 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release145</link>
