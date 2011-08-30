@@ -230,7 +230,7 @@ class BlockParameters:
          block = af.Block( os.path.basename( cmd.split(' ')[-1]), DailiesServiceType)
          if self.capacity != -1: block.setCapacity( self.capacity)
          task = af.Task('dailies')
-         task.setCommand( cmd, False) # Prefix don`t needed
+         task.setCommand( cmd)
          block.tasks.append( task)
       else:
          print 'Invalid block node class = "%s"' % self.wnode.Class()
