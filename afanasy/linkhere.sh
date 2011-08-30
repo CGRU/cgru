@@ -3,7 +3,7 @@
 src=$1
 
 # Folders to link:
-folders="doc icons plugins webvisor"
+folders="doc icons plugins src webvisor"
 
 # Removing links and exit if no argumets provided:
 if [ -z $src ]; then

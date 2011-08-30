@@ -37,7 +37,7 @@ int WINAPI WinMain(
   __in  int nCmdShow
 )
 {
-   char * name = "aftalk";
+   char * name = "regexp";
    char ** ptr = &name;
    return main( 1, ptr);
 }
