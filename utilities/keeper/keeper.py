@@ -1,5 +1,16 @@
 import os, sys
 
+# Write qt.conf file:
+if sys.platform.find('win') == 0:
+   qtconf=os.getenv('PYTHON') + '/qt.conf'
+   pyqt4dir=os.getenv('PYTHON').replace('\\','/') + '/Lib/site-packages/PyQt4'
+   if os.path.isfile( qtconf): os.remove( qtconf)
+   qtconf_file = open(qtconf, mode='w')
+   print('[Paths]', file=qtconf_file)
+   print('Prefix = ' + pyqt4dir, file=qtconf_file)
+   print('Binaries = ' + pyqt4dir, file=qtconf_file)
+   qtconf_file.close()
+
 from PyQt4 import QtCore, QtGui
 
 class Dialog( QtGui.QWidget):
@@ -33,4 +44,3 @@ tray = Tray( app)
 dialog = Dialog()
 dialog.show()
 app.exec_()
-
