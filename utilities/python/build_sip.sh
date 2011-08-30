@@ -16,12 +16,18 @@ export PATH=$pythondir/bin:$PATH
 export CFLAGS=-fPIC
 export CPPFLAGS=$CFLAGS
 
+if [[ "$pythonver" > "3" ]]; then
+   python="python3"
+else
+   python="python"
+fi
+
 cd sip-4.12.4
 
 if [ ! -z "$2" ]; then
-   python configure.py -h
+   $python configure.py -h
 else
-   python configure.py
+   $python configure.py
    make
    make install
 fi

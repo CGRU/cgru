@@ -15,12 +15,18 @@ qt=`dirname $PWD`/qt/4.7.3
 
 export PATH=$pythondir/bin:$qt/bin:$PATH
 
+if [[ "$pythonver" > "3" ]]; then
+   python="python3"
+else
+   python="python"
+fi
+
 cd PyQt-x11-gpl-4.8.5
 
 if [ ! -z "$2" ]; then
-   python configure.py -h
+   $python configure.py -h
 else
-   python configure.py -g --confirm-license
+   $python configure.py -g --confirm-license
    make
    make install
 fi
