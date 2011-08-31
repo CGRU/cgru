@@ -76,7 +76,7 @@ ListJobs::ListJobs( QWidget* parent):
 
    init();
 
-   timer = new QTimer(this);
+   QTimer * timer = new QTimer(this);
    timer->start( 1000 * af::Environment::getWatchRefreshInterval());
    connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 

@@ -63,8 +63,8 @@ public:
    inline void setNIMBY()  { state = state |   SNIMBY;  state = state & (~Snimby);}///< Set NIMBY.
    inline void setNimby()  { state = state |   Snimby;  state = state & (~SNIMBY);}///< Set nimby.
 
-   inline void setOnline()  { state = state |   SOnline ;}
-   inline void setOffline() { state = state & (~SOnline);}
+   inline void setOnline()  { state = state |   SOnline ; wol_operation_time = time(NULL);}
+   inline void setOffline() { state = state & (~SOnline); wol_operation_time = time(NULL);}
 
    inline void setPriority( int value) { priority = value; }///< Set priority.
 

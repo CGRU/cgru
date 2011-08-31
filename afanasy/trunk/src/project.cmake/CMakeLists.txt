@@ -12,6 +12,7 @@ else( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_L
 endif( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_LIBRARIES} STREQUAL "" ) )
 
 if(UNIX)
+	add_definitions(-DUNIX)
 	if(APPLE)
 		set(CMAKE_OSX_ARCHITECTURES "x86_64")
 		#Changing the order of configurations to be sure release is the first one

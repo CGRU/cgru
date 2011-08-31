@@ -10,6 +10,3 @@ done
 rm -fv render/*
 rm -fv *.mov
 
-cd heavy
-./clear.sh
-cd ..

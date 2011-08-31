@@ -327,10 +327,8 @@ void ItemRender::updateValues( af::Node *node, int type)
    }
 
    if( wolWaking ) offlineState = "Waking Up";
-   else if( wolSleeping ) offlineState = "Sleeping";
+   else if( wolSleeping || wolFalling) offlineState = "Sleeping";
    else offlineState = "Offline";
-   if( wol_operation_time > 0 )
-      offlineState += " " + afqt::stoq( af::time2strHMS( time(NULL) - wol_operation_time ));
 
    tooltip = afqt::stoq( tooltip_base);
    if( false == tooltip_resources.empty())
@@ -366,6 +364,10 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    if((option.state & QStyle::State_Selected) == false)
       painter->fillRect( option.rect, *itemColor );
 
+   QString offlineState_time = offlineState;
+   if( wol_operation_time > 0 )
+      offlineState_time = offlineState + " " + afqt::stoq( af::time2strHMS( time(NULL) - wol_operation_time ));
+
    if( dirty )
    {
       painter->setBrush( QBrush( afqt::QEnvironment::clr_error.c, Qt::NoBrush ));
@@ -379,7 +381,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       painter->setFont(  afqt::QEnvironment::f_info);
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
 		QRect rect_center;
-      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState, &rect_center);
+      painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
       painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + version );
       painter->drawText( x+5, y+2, w-10, HeightOffline-4 + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
       drawPost( painter, option);
@@ -479,7 +481,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    {
       painter->setFont( afqt::QEnvironment::f_name);
       painter->setPen( afqt::QEnvironment::clr_star.c);
-      painter->drawText( x, y, w, h, Qt::AlignCenter, "Sleeping...");
+      painter->drawText( x, y, w, h, Qt::AlignCenter, offlineState_time);
    }
 
    drawPost( painter, option);

@@ -83,6 +83,10 @@ Press RMB for Options.\
    if( false == af::Environment::VISOR())
       connect( view->selectionModel(), SIGNAL( selectionChanged( const QItemSelection &, const QItemSelection &)),
                                  this,   SLOT( selectionChanged( const QItemSelection &, const QItemSelection &)));
+
+   QTimer * timer = new QTimer(this);
+   timer->start( 1900 * af::Environment::getWatchRefreshInterval());
+   connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
 }
 
 ListRenders::~ListRenders()

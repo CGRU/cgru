@@ -66,8 +66,6 @@ private slots:
    void actListenJob();
 
 private:
-   QTimer * timer;
-
    // Sorting filtering settings ordinary user:
    static int     SortType;
    static bool    SortAscending;

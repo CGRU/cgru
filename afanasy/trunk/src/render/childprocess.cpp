@@ -6,7 +6,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-#if defined Q_OS_UNIX
+#ifdef UNIX
 #include <signal.h>
 #else
 #include <winbase.h>
@@ -35,11 +35,11 @@ ChildProcess::~ChildProcess()
 
 void ChildProcess::setupChildProcess()
 {
-#if defined Q_OS_UNIX
+#ifdef UNIX
+//printf("void ChildProcess::setupChildProcess():\n");
    ::setsid();
    int nicenew = ::nice( af::Environment::getRenderNice());
-   if( nicenew == -1)
-      AFERRPE("nice");
+   if( nicenew == -1) AFERRPE("nice")
 #else
    process_info = pid();
    SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
@@ -51,7 +51,7 @@ void ChildProcess::setupChildProcess()
 
 void ChildProcess::kill()
 {
-#if defined Q_OS_UNIX
+#ifdef UNIX
    ::killpg(::getpgid(pid()), SIGKILL);
 #else
    CloseHandle( hJob );
@@ -61,7 +61,7 @@ void ChildProcess::kill()
 
 void ChildProcess::terminate()
 {
-#if defined Q_OS_UNIX
+#ifdef UNIX
    ::killpg(::getpgid(pid()), SIGTERM);
 #else
    CloseHandle( hJob );
