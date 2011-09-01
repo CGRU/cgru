@@ -33,13 +33,15 @@ ChildProcess::~ChildProcess()
 {
 }
 
+#include <sys/prctl.h>
 void ChildProcess::setupChildProcess()
 {
 #ifdef UNIX
 //printf("void ChildProcess::setupChildProcess():\n");
-   ::setsid();
-   int nicenew = ::nice( af::Environment::getRenderNice());
+   if( setsid() == -1) AFERRPE("setsid")
+   int nicenew = nice( af::Environment::getRenderNice());
    if( nicenew == -1) AFERRPE("nice")
+//   prctl( PR_SET_PDEATHSIG, SIGTERM);
 #else
    process_info = pid();
    SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
@@ -49,22 +51,22 @@ void ChildProcess::setupChildProcess()
 #endif
 }
 
-void ChildProcess::kill()
-{
-#ifdef UNIX
-   ::killpg(::getpgid(pid()), SIGKILL);
-#else
-   CloseHandle( hJob );
-//   QProcess::kill();
-#endif
-}
-
 void ChildProcess::terminate()
 {
 #ifdef UNIX
-   ::killpg(::getpgid(pid()), SIGTERM);
+   killpg( getpgid(pid()), SIGTERM);
 #else
    CloseHandle( hJob );
 //   QProcess::terminate();
+#endif
+}
+
+void ChildProcess::kill()
+{
+#ifdef UNIX
+   killpg( getpgid(pid()), SIGKILL);
+#else
+   CloseHandle( hJob );
+//   QProcess::kill();
 #endif
 }

@@ -10,16 +10,21 @@ import nuke
 
 from afpathmap import PathMap
 
+tmpdir = None
+
 # Interrupt function to delete temp directory:
 def interrupt( signum, frame):
-   shutil.rmtree( tmpdir)
-   exit('\nInterrupt received...')
+   print '\nInterrupt received...'
+   if tmpdir is not None and os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
+   exit(1)
 
 # Set interrupt function:
-signal.signal( signal.SIGTERM, interrupt)
-signal.signal( signal.SIGABRT, interrupt)
-if sys.platform.find('win') != 0: signal.signal( signal.SIGQUIT, interrupt)
-signal.signal( signal.SIGINT,  interrupt)
+#signal.signal( signal.SIGINT,  interrupt)
+#signal.signal( signal.SIGTERM, interrupt)
+#signal.signal( signal.SIGABRT, interrupt)
+#if sys.platform.find('win') != 0:
+#   signal.signal( signal.SIGQUIT, interrupt)
+#   signal.signal( signal.SIGHUP,  interrupt)
 
 # Error function to print message and delete temp directory:
 def errorExit( msg, deletetemp):

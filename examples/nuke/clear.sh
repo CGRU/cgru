@@ -9,4 +9,3 @@ for scene in $scenes; do
 done
 rm -fv render/*
 rm -fv *.mov
-
