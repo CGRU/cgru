@@ -8,6 +8,7 @@
 
 #ifdef UNIX
 #include <signal.h>
+//#include <sys/prctl.h>
 #else
 #include <winbase.h>
 /*
@@ -33,7 +34,6 @@ ChildProcess::~ChildProcess()
 {
 }
 
-#include <sys/prctl.h>
 void ChildProcess::setupChildProcess()
 {
 #ifdef UNIX
