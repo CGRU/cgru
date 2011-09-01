@@ -23,10 +23,9 @@ class Dialog( QtGui.QWidget):
       self.mainLayout = QtGui.QVBoxLayout( self)
 
 app = QtGui.QApplication( sys.argv)
+app.setQuitOnLastWindowClosed ( False)
 icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), 'keeper.svg'))
 app.setWindowIcon( icon)
 tray = Tray( app)
-#dialog = Dialog()
-#dialog.show()
 
 app.exec_()

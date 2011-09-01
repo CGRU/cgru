@@ -3,11 +3,13 @@ import os, sys
 import cgrudocs
 import cgruconfig
 
+from dialog_nimby import DialogNimby
+
 from PyQt4 import QtCore, QtGui
 
 class Tray( QtGui.QSystemTrayIcon):
    def __init__( self, parent = None):
-      QtCore.QObject.__init__( self, parent)
+      QtGui.QSystemTrayIcon.__init__( self, parent)
 
       self.menu = QtGui.QMenu()
       quitAction = QtGui.QAction('Edit Nimby...', self)
@@ -32,17 +34,10 @@ class Tray( QtGui.QSystemTrayIcon):
       self.show()
 
    def editCGRUConfig( self):
-      print('editCGRUConfig( self): START:')
-      config = cgruconfig.VARS['HOME_CONFIGFILE']
       edit = 'gedit'
       if sys.platform.find('win') == 0: edit == 'notepad'
-      print('editCGRUConfig( self): EXEC:')
-#      QtCore.QProcess.startDetached( edit + ' ' + config)
-      if QtCore.QProcess.execute( edit + ' ' + config) == 0: cgruconfig.Config()
-      print('editCGRUConfig( self): END')
+      if QtCore.QProcess.execute( edit + ' ' + cgruconfig.VARS['HOME_CONFIGFILE']) == 0: cgruconfig.Config()
 
-   def cgruDocs( self):
-      cgrudocs.show()
-
+   def cgruDocs( self): cgrudocs.show()
    def editNimby( self):
-      print('edit Nimby !')
+      self.dialog_nimby = DialogNimby()
