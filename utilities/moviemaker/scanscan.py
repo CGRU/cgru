@@ -88,6 +88,7 @@ if options.afanasy != 0:
    block.setCapacity( options.afanasy)
    job.blocks.append( block)
    if options.maxhosts != -1: job.setMaxHosts( options.maxhosts)
+   job.setNeedOS('')
 
 for dirpath, dirnames, filenames in os.walk( Folder):
    patterns = getPatterns(filenames)
