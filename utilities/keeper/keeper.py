@@ -16,11 +16,12 @@ from PyQt4 import QtCore, QtGui
 import cgruconfig
 from tray import Tray
 
-class Dialog( QtGui.QWidget):
-   def __init__( self, parent = None):
-      QtGui.QWidget.__init__( self, parent)
-      self.setWindowTitle('CGRU Keeper ' + os.getenv('CGRU_VERSION', ''))
-      self.mainLayout = QtGui.QVBoxLayout( self)
+# Check for a text editor, it always must be defined:
+if 'editor' not in cgruconfig.VARS:
+   if sys.platform.find('win') == 0:
+      cgruconfig.VARS['editor'] = 'notepad "%s"'
+   else:
+      cgruconfig.VARS['editor'] = 'xterm -e vi "%s"'
 
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)

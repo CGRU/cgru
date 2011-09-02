@@ -71,3 +71,29 @@ class Config:
       self.element_hasdata = True
 
 Config()
+
+def writeVars( variables):
+   file = open(VARS['HOME_CONFIGFILE'],'r')
+   lines = file.readlines()
+   file.close()
+   for var in variables:
+      tofind = '<'+var+'>'
+      toinsert = '<'+var+'>' + VARS[var] + '</'+var+'>   <!--Modified at '+time.ctime()+'-->\n'
+      founded = False
+      num = -1
+      for line in lines:
+         num += 1
+         if line.find( tofind) == -1: continue
+         founded = True
+         lines[num] = toinsert
+         break
+      if not founded:
+         num = 0
+         for line in lines:
+            num += 1
+            if line.find('<cgru>') != -1: continue
+            lines[num] = '<cgru>\n' + toinsert
+            break
+   file = open(VARS['HOME_CONFIGFILE'],'w')
+   for line in lines: file.write( line)
+   file.close()
