@@ -18,7 +18,7 @@ Cmd::Cmd():
 
 Cmd::~Cmd()
 {
-
+   if( message ) delete message;
 }
 
 int  Cmd::getDataLen() { if( message) return message->writeSize(); else return -1;}
@@ -95,4 +95,33 @@ bool Cmd::JobDelete( const std::string & jobMask)
    }
 
    return true;
+}
+
+void Cmd::setNimby( const std::string & renderMask)
+{
+   if( message ) delete message;
+   message = new af::Msg();
+   af::MCGeneral mcgeneral( renderMask, 0);
+   message->set( af::Msg::TRenderSetNimby, &mcgeneral);
+}
+void Cmd::setNIMBY( const std::string & renderMask)
+{
+   if( message ) delete message;
+   message = new af::Msg();
+   af::MCGeneral mcgeneral( renderMask, 0);
+   message->set( af::Msg::TRenderSetNIMBY, &mcgeneral);
+}
+void Cmd::setFree( const std::string & renderMask)
+{
+   if( message ) delete message;
+   message = new af::Msg();
+   af::MCGeneral mcgeneral( renderMask, 0);
+   message->set( af::Msg::TRenderSetFree, &mcgeneral);
+}
+void Cmd::ejectTasks( const std::string & renderMask)
+{
+   if( message ) delete message;
+   message = new af::Msg();
+   af::MCGeneral mcgeneral( renderMask, 0);
+   message->set( af::Msg::TRenderEject, &mcgeneral);
 }

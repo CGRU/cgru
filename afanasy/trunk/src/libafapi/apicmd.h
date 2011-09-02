@@ -20,6 +20,12 @@ public:
 /// Delete job from jobmask
    bool JobDelete( const std::string & jobMask);
 /// Get raw job data, to send to server socket ( call after successfull).
+
+   void setNimby(    const std::string & renderMask); ///< Set "nimby"
+   void setNIMBY(    const std::string & renderMask); ///< Set "NIMBY"
+   void setFree(     const std::string & renderMask); ///< Set render free
+   void ejectTasks(  const std::string & renderMask); ///< Eject running tasks
+
    char * getData();
 /// Get raw job data length.
    int getDataLen();

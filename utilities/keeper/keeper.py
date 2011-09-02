@@ -14,7 +14,10 @@ if sys.platform.find('win') == 0:
 from PyQt4 import QtCore, QtGui
 
 import cgruconfig
+import refresh
 from tray import Tray
+
+refresh.refresh()
 
 # Check for a text editor, it always must be defined:
 if 'editor' not in cgruconfig.VARS:
@@ -28,5 +31,9 @@ app.setQuitOnLastWindowClosed ( False)
 icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), 'keeper.svg'))
 app.setWindowIcon( icon)
 tray = Tray( app)
+timer = QtCore.QTimer( app)
+timer.setInterval(1000)
+QtCore.QObject.connect( timer, QtCore.SIGNAL('timeout()'), refresh.refresh)
+timer.start()
 
 app.exec_()

@@ -96,18 +96,6 @@ class Block(pyaf.Block):
       if TransferToServer: cmd = self.pm.toServer( cmd)
       pyaf.Block.setFiles(  self, cmd)
 
-###### DEPRECATED: ######
-   def setCommandView(  self, cmd, TransferToServer = True):
-      print('Warning: Method "Block.setCommandView" is deprecated, use "Block.setFiles" instead.')
-      self.setFiles( cmd , TransferToServer)
-   def addTask( self, taskname = ''):
-      print('Warning: Method "Job.addTask" is deprecated, use "Block.tasks" list instead.')
-      if taskname == '': taskname = 'task #%d' % len(self.tasks)
-      task = Task( taskname)
-      self.tasks.append( task)
-      return task
-#########################
-
    def fillTasks( self):
       self.clearTasksList()
       t = 0
@@ -186,14 +174,6 @@ class Job(pyaf.Job):
       self.fillBlocks()
       if self.construct() == False: return False
       return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)[0]
-
-###### DEPRECATED: ######
-   def addBlock( self, blockname = 'block', blocktype = 'generic'):
-      print('Warning: Method "Job::addBlock" is deprecated, use job "blocks" list instead.')
-      block = Block( blockname, blocktype)
-      self.blocks.append( block)
-      return block
-#########################
 
    def pause(      self): self.offline()
    def setPaused(  self): self.offline()

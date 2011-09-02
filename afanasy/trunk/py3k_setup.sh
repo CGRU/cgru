@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pyver=$1
-[ -z "$pyver" ] && pyver=3.2
+[ -z "$pyver" ] && pyver=3.2.1
 
 # Check CGRU:
 if [ -z "$CGRU_LOCATION" ]; then
@@ -31,7 +31,7 @@ else
          else
             export AF_PYTHON="${pyafdir}:${afpython3}"
             export PYTHONPATH="${AF_PYTHON}:${PYTHONPATH}"
-            echo "PYTHONPATH=${PYTHONPATH}"
+            #echo "PYTHONPATH=${PYTHONPATH}"
             echo "Python3 setup sourced."
          fi
       fi

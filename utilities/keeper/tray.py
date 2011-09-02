@@ -4,6 +4,8 @@ import subprocess
 import cgrudocs
 import cgruconfig
 
+import nimby
+
 from dialog_nimby import DialogNimby
 
 from PyQt4 import QtCore, QtGui
@@ -24,29 +26,47 @@ class Tray( QtGui.QSystemTrayIcon):
       # Menu:
       self.menu = QtGui.QMenu()
 
-      self.submenu = QtGui.QMenu('Configure...')
+      self.menu_af = QtGui.QMenu('AFANASY')
+
+      action = QtGui.QAction('Set nibmy', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
+      self.menu_af.addAction( action)
+
+      action = QtGui.QAction('Set NIMBY', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setNIMBY)
+      self.menu_af.addAction( action)
+
+      action = QtGui.QAction('Set Free', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setFree)
+      self.menu_af.addAction( action)
+
+      action = QtGui.QAction('Nimby Schedule...', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
+      self.menu_af.addAction( action)
+
+      self.menu.addMenu( self.menu_af)
+
+      self.menu.addSeparator()
+
+      self.menu_conf = QtGui.QMenu('Configure...')
 
       action = QtGui.QAction('Reload', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.confReload)
-      self.submenu.addAction( action)
+      self.menu_conf.addAction( action)
 
       action = QtGui.QAction('Set Docs URL...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setDocsURL)
-      self.submenu.addAction( action)
-
-      action = QtGui.QAction('Edit Nimby...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
-      self.submenu.addAction( action)
+      self.menu_conf.addAction( action)
 
       action = QtGui.QAction('Edit CRGU Config...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editCGRUConfig)
-      self.submenu.addAction( action)
+      self.menu_conf.addAction( action)
 
       action = QtGui.QAction('Set Text Editor...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setTextEditor)
-      self.submenu.addAction( action)
+      self.menu_conf.addAction( action)
 
-      self.menu.addMenu( self.submenu)
+      self.menu.addMenu( self.menu_conf)
 
       self.menu.addSeparator()
 

@@ -2,6 +2,7 @@ import os
 import sys
 import time
 import xml.parsers.expat
+import socket
 
 VARS = dict()
 
@@ -9,6 +10,8 @@ class Config:
    def __init__( self, variables = VARS, configfiles = None, Verbose = False):
       self.verbose = Verbose
       self.Vars = variables
+
+      self.Vars['hostname'] = socket.gethostname()
 
       cgrulocation =  os.getenv('CGRU_LOCATION')
       if cgrulocation is None or cgrulocation == '': return
@@ -77,8 +80,9 @@ def writeVars( variables):
    lines = file.readlines()
    file.close()
    for var in variables:
+#      if var not in VARS: continue
       tofind = '<'+var+'>'
-      toinsert = '<'+var+'>' + VARS[var] + '</'+var+'>   <!--Modified at '+time.ctime()+'-->\n'
+      toinsert = '   <'+var+'>' + VARS[var] + '</'+var+'>   <!-- Modified at '+time.ctime()+' -->\n'
       founded = False
       num = -1
       for line in lines:
@@ -88,11 +92,11 @@ def writeVars( variables):
          lines[num] = toinsert
          break
       if not founded:
-         num = 0
+         num = 1
          for line in lines:
             num += 1
             if line.find('<cgru>') != -1: continue
-            lines[num] = '<cgru>\n' + toinsert
+            lines.insert( num, toinsert)
             break
    file = open(VARS['HOME_CONFIGFILE'],'w')
    for line in lines: file.write( line)

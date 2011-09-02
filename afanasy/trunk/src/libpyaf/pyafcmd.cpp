@@ -126,6 +126,35 @@ PyObject * PyAf_Cmd_decodeJobInfo( PyAf_Cmd_Object *self, PyObject *args)
    return jobInfo;
 }
 
+PyObject * PyAf_Cmd_setNimby( PyAf_Cmd_Object * self, PyObject * arg)
+{
+   std::string str;
+   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
+   self->cmd->setNimby( str);
+   Py_RETURN_TRUE;
+}
+PyObject * PyAf_Cmd_setNIMBY( PyAf_Cmd_Object * self, PyObject * arg)
+{
+   std::string str;
+   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setNIMBY")) Py_RETURN_FALSE;
+   self->cmd->setNIMBY( str);
+   Py_RETURN_TRUE;
+}
+PyObject * PyAf_Cmd_setFree( PyAf_Cmd_Object * self, PyObject * arg)
+{
+   std::string str;
+   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
+   self->cmd->setFree( str);
+   Py_RETURN_TRUE;
+}
+PyObject * PyAf_Cmd_ejectTasks( PyAf_Cmd_Object * self, PyObject * arg)
+{
+   std::string str;
+   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
+   self->cmd->ejectTasks( str);
+   Py_RETURN_TRUE;
+}
+
 PyObject * PyAf_Cmd_getDataLen( PyAf_Cmd_Object *self)
 {
    PyObject * result = PyLong_FromLong( self->cmd->getDataLen());
