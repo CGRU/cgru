@@ -57,6 +57,7 @@ rcopy utilities/release/icons $dest/utilities/release
 createDir $dest/utilities/site
 rcopy utilities/site/doc $dest/utilities/site
 
+rcopy utilities/keeper $dest/utilities
 rcopy utilities/moviemaker $dest/utilities
 
 createDir $dest/utilities/regexp
@@ -81,7 +82,3 @@ CGRU_VERSION=`cat version.txt`
 cd utilities
 source ./getrevision.sh ..
 echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
-
-#cd release
-#archives=`ls cgru*.gz`
-#for archive in $archives; do cp -vf $archive $destUP; done
