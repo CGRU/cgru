@@ -23,10 +23,13 @@ fi
 
 cd PyQt-x11-gpl-4.8.5
 
+flags="-g --confirm-license"
+flags="$flags -e QtCore -e QtGui -e QtSvg"
+
 if [ ! -z "$2" ]; then
    $python configure.py -h
 else
-   $python configure.py -g --confirm-license
+   $python configure.py $flags
    make
    make install
 fi

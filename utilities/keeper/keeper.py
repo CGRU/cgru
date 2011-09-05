@@ -28,8 +28,6 @@ if 'editor' not in cgruconfig.VARS:
 
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
-icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), 'keeper.svg'))
-app.setWindowIcon( icon)
 tray = Tray( app)
 timer = QtCore.QTimer( app)
 timer.setInterval(1000)

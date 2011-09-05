@@ -9,7 +9,11 @@ if [ ! -d $qtsrc ]; then
    exit 1
 fi
 
-flags="-prefix $qtdir -v -opensource -release -static -qt-sql-psql -nomake examples -nomake demos -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-webkit -no-javascript-jit -no-script -no-scripttools -no-declarative -no-gif -no-openssl"
+flags="-prefix $qtdir -v -opensource -release -static"
+flags="$flags -qt-sql-psql"
+flags="$flags -nomake examples -nomake demos"
+flags="$flags -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-webkit -no-javascript-jit -no-script -no-scripttools -no-declarative -no-gif -no-openssl"
+
 if [ `uname` == "Darwin" ]; then
    echo "Darwin framework disabled."
    flags="$flags -no-framework -arch x86_64"

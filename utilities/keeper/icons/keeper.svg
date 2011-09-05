@@ -13,11 +13,11 @@
    height="48"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47pre4 r22446"
-   sodipodi:docname="cgru.svg"
+   inkscape:version="0.47 r22583"
+   sodipodi:docname="keeper.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
-   inkscape:export-filename="/cg/tools/cgru/afanasy/icons/watch_dialog.png"
+   inkscape:export-filename="/cgru/utilities/keeper/icons/keeper.png"
    inkscape:export-xdpi="90"
    inkscape:export-ydpi="90">
   <defs
@@ -56,10 +56,10 @@
      inkscape:snap-global="true"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="1278"
-     inkscape:window-height="724"
-     inkscape:window-x="0"
-     inkscape:window-y="25"
+     inkscape:window-width="872"
+     inkscape:window-height="544"
+     inkscape:window-x="472"
+     inkscape:window-y="89"
      width="100px"
      inkscape:showpageshadow="false"
      inkscape:window-maximized="0">
@@ -103,7 +103,7 @@
      style="display:inline">
     <path
        sodipodi:type="star"
-       style="fill:#efcd4a;fill-opacity:1;stroke:#f4802d;stroke-width:9.70875071999999939;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;stroke-linejoin:miter"
+       style="fill:#929e8f;fill-opacity:1;stroke:#6f7b66;stroke-width:9.70875071999999939;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;stroke-linejoin:miter"
        id="path5065"
        sodipodi:sides="5"
        sodipodi:cx="50"
@@ -119,7 +119,7 @@
        transform="matrix(0.28712464,0,0,-0.30185385,9.646651,41.050086)" />
     <text
        xml:space="preserve"
-       style="font-size:25.12597275px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#183e00;fill-opacity:1;stroke:none;display:inline;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       style="font-size:25.12597274999999897px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1c2c12;fill-opacity:1;stroke:none;display:inline;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
        x="0.72545242"
        y="20.46567"
        id="text5194"
