@@ -28,6 +28,12 @@ class Tray( QtGui.QSystemTrayIcon):
 
       self.menu_af = QtGui.QMenu('AFANASY')
 
+      action = QtGui.QAction('Start Watch', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.startAfWatch)
+      self.menu_af.addAction( action)
+
+      self.menu_af.addSeparator()
+
       action = QtGui.QAction('Set nibmy', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
       self.menu_af.addAction( action)
@@ -39,6 +45,12 @@ class Tray( QtGui.QSystemTrayIcon):
       action = QtGui.QAction('Set Free', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setFree)
       self.menu_af.addAction( action)
+
+      action = QtGui.QAction('Eject Tasks', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.ejectTasks)
+      self.menu_af.addAction( action)
+
+      self.menu_af.addSeparator()
 
       action = QtGui.QAction('Nimby Schedule...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
@@ -95,6 +107,7 @@ class Tray( QtGui.QSystemTrayIcon):
    def editNimby( self): self.dialog_nimby = DialogNimby()
    def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
+   def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
 
    def editCGRUConfig( self):
       if QtCore.QProcess.execute( cgruconfig.VARS['editor'] % cgruconfig.VARS['HOME_CONFIGFILE']) == 0:

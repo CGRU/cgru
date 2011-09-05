@@ -7,7 +7,6 @@ def setnimby():
    cmd._sendRequest()
 
 def setNIMBY():
-   print(cgruconfig.VARS['hostname'])
    cmd = af.Cmd()
    cmd.setNIMBY( cgruconfig.VARS['hostname'] + '.*')
    cmd._sendRequest()
