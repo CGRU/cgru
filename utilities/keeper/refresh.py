@@ -27,7 +27,7 @@ def refreshNimby():
    if var_y in cgruconfig.VARS and time < time_begin:
       time_end_y = cgruconfig.VARS[var_y].split(' ')[1]
       if time_end_y < time_begin and not free_set:
-         nimby.setFree()
+         nimby.setFree('(keeper nimby schedule)')
          free_set = True
 
 #   print('nimby.nimby():','(',yesterday,time_end_y,')',day,time,cgruconfig.VARS[var])
@@ -40,12 +40,12 @@ def refreshNimby():
       if 'a' in values[2]: allow = True
       if 'e' in values[2]: eject = True
    if time > time_end and not free_set:
-      nimby.setFree()
+      nimby.setFree('(keeper nimby schedule)')
       free_set = True
    elif time > time_begin and not nimby_set:
-      if allow: nimby.setnimby()
-      else: nimby.setNIMBY()
-      if eject: nimby.ejectTasks()
+      if allow: nimby.setnimby('(keeper nimby schedule)')
+      else: nimby.setNIMBY('(keeper nimby schedule)')
+      if eject: nimby.ejectTasks('(keeper nimby schedule)')
       nimby_set = True
 
 def refresh():

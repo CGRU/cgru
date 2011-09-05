@@ -30,7 +30,7 @@ app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
 tray = Tray( app)
 timer = QtCore.QTimer( app)
-timer.setInterval(1000)
+timer.setInterval(10000)
 QtCore.QObject.connect( timer, QtCore.SIGNAL('timeout()'), refresh.refresh)
 timer.start()
 

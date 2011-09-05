@@ -52,6 +52,7 @@ void RenderAf::setRegisterTime()
    af::Client::setRegisterTime();
 
    taskstartfinishtime = 0;
+   wol_operation_time = 0;
 
    if( isOnline()) appendLog("Registered online.");
    else appendLog("Registered offline.");
@@ -211,6 +212,8 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       return true;
    }
    std::string userhost( mcgeneral.getUserName() + '@' + mcgeneral.getHostName());
+   std::string userhost_string = userhost;
+   if( false == mcgeneral.getString().empty()) userhost_string += " " + mcgeneral.getString();
    JobContainer * jobs = (JobContainer*)pointer;
    switch( type)
    {
@@ -264,21 +267,21 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    }
    case af::Msg::TRenderSetNIMBY:
    {
-      appendLog( std::string("NIMBY set by ") + userhost);
+      appendLog( std::string("NIMBY set by ") + userhost_string);
       setNIMBY();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
    case af::Msg::TRenderSetNimby:
    {
-      appendLog( std::string("nimby set by ") + userhost);
+      appendLog( std::string("nimby set by ") + userhost_string);
       setNimby();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
    }
    case af::Msg::TRenderSetFree:
    {
-      appendLog( std::string("Set free by ") + userhost);
+      appendLog( std::string("Set free by ") + userhost_string);
       setFree();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
       break;
@@ -293,61 +296,62 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderEject:
    {
       if( isBusy() == false ) return true;
-      appendLog( std::string("Task(s) ejected by ") + userhost);
+      appendLog( std::string("Task(s) ejected by ") + userhost_string);
       ejectTasks( jobs, monitoring, af::TaskExec::UPEject);
       return true;
    }
    case af::Msg::TRenderExit:
    {
       if( false == isOnline() ) return true;
-      appendLog( std::string("Exit by ") + userhost);
+      appendLog( std::string("Exit by ") + userhost_string);
       exitClient( af::Msg::TClientExitRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderDelete:
    {
       if( isOnline() ) return true;
-      appendLog( std::string("Deleted by ") + userhost);
+      appendLog( std::string("Deleted by ") + userhost_string);
       offline( NULL, 0, monitoring, true);
       AFCommon::QueueDBDelItem( this);
       return true;
    }
+/*   case af::Msg::TClientRestartRequest:
    {
       if( false == isOnline() ) return true;
-      appendLog( std::string("Restarted by ") + userhost);
+      appendLog( std::string("Restarted by ") + userhost_string);
       exitClient( af::Msg::TClientRestartRequest, jobs, monitoring);
       return true;
    }
-/*   case af::Msg::TRenderStart:
+   case af::Msg::TRenderStart:
    {
       if( false == isOnline() ) return true;
-      appendLog( std::string("Starting another render by ") + userhost);
+      appendLog( std::string("Starting another render by ") + userhost_string);
       exitClient( af::Msg::TClientStartRequest, jobs, monitoring);
       return true;
    }*/
    case af::Msg::TRenderReboot:
    {
       if( false == isOnline() ) return true;
-      appendLog( std::string("Reboot computer by ") + userhost);
+      appendLog( std::string("Reboot computer by ") + userhost_string);
       exitClient( af::Msg::TClientRebootRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderShutdown:
    {
       if( false == isOnline() ) return true;
-      appendLog( std::string("Shutdown computer by ") + userhost);
+      appendLog( std::string("Shutdown computer by ") + userhost_string);
       exitClient( af::Msg::TClientShutdownRequest, jobs, monitoring);
       return true;
    }
    case af::Msg::TRenderWOLSleep:
    {
-      appendLog( std::string("Ask to fall asleep by ") + userhost);
+      appendLog( std::string("Ask to fall asleep by ") + userhost_string);
       wolSleep( monitoring);
       return true;
    }
    case af::Msg::TRenderWOLWake:
    {
-      appendLog( std::string("Ask to wake up by ") + userhost);
+      appendLog( std::string("Ask to wake up by ") + userhost_string);
       wolWake( monitoring);
       return true;
    }

@@ -1,22 +1,22 @@
 import af
 import cgruconfig
 
-def setnimby():
+def setnimby( text = '(keeper)'):
    cmd = af.Cmd()
-   cmd.setNimby( cgruconfig.VARS['hostname'] + '.*', 'From keeper menu')
+   cmd.setNimby( cgruconfig.VARS['hostname'] + '.*', text)
    cmd._sendRequest()
 
-def setNIMBY():
+def setNIMBY( text = '(keeper)'):
    cmd = af.Cmd()
-   cmd.setNIMBY( cgruconfig.VARS['hostname'] + '.*', 'From keeper menu')
+   cmd.setNIMBY( cgruconfig.VARS['hostname'] + '.*', text)
    cmd._sendRequest()
 
-def setFree():
+def setFree( text = '(keeper)'):
    cmd = af.Cmd()
-   cmd.setFree( cgruconfig.VARS['hostname'] + '.*', 'From keeper menu')
+   cmd.setFree( cgruconfig.VARS['hostname'] + '.*', text)
    cmd._sendRequest()
 
-def ejectTasks():
+def ejectTasks( text = '(keeper)'):
    cmd = af.Cmd()
-   cmd.ejectTasks( cgruconfig.VARS['hostname'] + '.*', 'From keeper menu')
+   cmd.ejectTasks( cgruconfig.VARS['hostname'] + '.*', text)
    cmd._sendRequest()
