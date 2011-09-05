@@ -3,6 +3,7 @@
 #include <Python.h>
 
 #include <string>
+#include <vector>
 
 #include "../libafapi/api.h"
 
@@ -18,4 +19,5 @@ namespace PyAf
 {
    bool GetInteger( PyObject * obj, long long & value, const char * errMsg = NULL);
    bool GetString(  PyObject * obj, std::string & str, const char * errMsg = NULL);
+   bool GetStrings( PyObject * obj, std::vector<std::string> & list, int min = -1, int max = -1, const char * errMsg = NULL);
 }

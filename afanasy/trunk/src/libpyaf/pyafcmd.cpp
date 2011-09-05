@@ -32,6 +32,21 @@ void PyAf_Cmd_dealloc( PyAf_Cmd_Object * self)
 #endif
 }
 
+PyObject * PyAf_Cmd_setUserName( PyAf_Cmd_Object * self, PyObject * arg)
+{
+   std::string str;
+   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setUserName")) Py_RETURN_FALSE;
+   self->cmd->setUserName( str);
+   Py_RETURN_TRUE;
+}
+PyObject * PyAf_Cmd_setHostName( PyAf_Cmd_Object * self, PyObject * arg)
+{
+   std::string str;
+   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setHostName")) Py_RETURN_FALSE;
+   self->cmd->setHostName( str);
+   Py_RETURN_TRUE;
+}
+
 PyObject * PyAf_Cmd_getJobList( PyAf_Cmd_Object *self, PyObject *args)
 {
    int userID;
@@ -128,30 +143,34 @@ PyObject * PyAf_Cmd_decodeJobInfo( PyAf_Cmd_Object *self, PyObject *args)
 
 PyObject * PyAf_Cmd_setNimby( PyAf_Cmd_Object * self, PyObject * arg)
 {
-   std::string str;
-   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
-   self->cmd->setNimby( str);
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->setNimby( list[0]);
+   else self->cmd->setNimby( list[0], list[1]);
    Py_RETURN_TRUE;
 }
 PyObject * PyAf_Cmd_setNIMBY( PyAf_Cmd_Object * self, PyObject * arg)
 {
-   std::string str;
-   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setNIMBY")) Py_RETURN_FALSE;
-   self->cmd->setNIMBY( str);
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setNIMBY")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->setNIMBY( list[0]);
+   else self->cmd->setNIMBY( list[0], list[1]);
    Py_RETURN_TRUE;
 }
 PyObject * PyAf_Cmd_setFree( PyAf_Cmd_Object * self, PyObject * arg)
 {
-   std::string str;
-   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
-   self->cmd->setFree( str);
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->setFree( list[0]);
+   else self->cmd->setFree( list[0], list[1]);
    Py_RETURN_TRUE;
 }
 PyObject * PyAf_Cmd_ejectTasks( PyAf_Cmd_Object * self, PyObject * arg)
 {
-   std::string str;
-   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
-   self->cmd->ejectTasks( str);
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->ejectTasks( list[0]);
+   else self->cmd->ejectTasks( list[0], list[1]);
    Py_RETURN_TRUE;
 }
 

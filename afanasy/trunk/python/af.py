@@ -172,9 +172,12 @@ class Job(pyaf.Job):
 class Cmd(pyaf.Cmd):
    def __init__( self ):
       self.env = afenv.Env()
-      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      if self.env.valid == False:
+         print 'ERROR: Invalid environment, may be some problems.'
       self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Cmd.__init__( self, self.env.Vars['servername'], self.env.Vars['serverport'])
+      pyaf.Cmd.setUserName( self, self.env.Vars['username'])
+      pyaf.Cmd.setHostName( self, self.env.Vars['hostname'])
       self.requestOutput = None
    
    def _sendRequest(self, verbose = False):

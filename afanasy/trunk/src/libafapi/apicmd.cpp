@@ -97,31 +97,36 @@ bool Cmd::JobDelete( const std::string & jobMask)
    return true;
 }
 
-void Cmd::setNimby( const std::string & renderMask)
+void Cmd::setNimby( const std::string & renderMask, const std::string & string)
 {
-   if( message ) delete message;
-   message = new af::Msg();
    af::MCGeneral mcgeneral( renderMask, 0);
-   message->set( af::Msg::TRenderSetNimby, &mcgeneral);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TRenderSetNimby, mcgeneral);
 }
-void Cmd::setNIMBY( const std::string & renderMask)
+void Cmd::setNIMBY( const std::string & renderMask, const std::string & string)
 {
-   if( message ) delete message;
-   message = new af::Msg();
    af::MCGeneral mcgeneral( renderMask, 0);
-   message->set( af::Msg::TRenderSetNIMBY, &mcgeneral);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TRenderSetNIMBY, mcgeneral);
 }
-void Cmd::setFree( const std::string & renderMask)
+void Cmd::setFree( const std::string & renderMask, const std::string & string)
 {
-   if( message ) delete message;
-   message = new af::Msg();
    af::MCGeneral mcgeneral( renderMask, 0);
-   message->set( af::Msg::TRenderSetFree, &mcgeneral);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TRenderSetFree, mcgeneral);
 }
-void Cmd::ejectTasks( const std::string & renderMask)
+void Cmd::ejectTasks( const std::string & renderMask, const std::string & string)
 {
+   af::MCGeneral mcgeneral( renderMask, 0);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TRenderEject, mcgeneral);
+}
+
+void Cmd::action( int type, af::MCGeneral & mcgeneral)
+{
+   mcgeneral.setUserName( username);
+   mcgeneral.setHostName( hostname);
    if( message ) delete message;
    message = new af::Msg();
-   af::MCGeneral mcgeneral( renderMask, 0);
-   message->set( af::Msg::TRenderEject, &mcgeneral);
+   message->set( type, &mcgeneral);
 }

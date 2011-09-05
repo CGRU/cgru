@@ -188,6 +188,8 @@ class Cmd(pyaf.Cmd):
          print('ERROR: Invalid environment, may be some problems.')
       self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Cmd.__init__( self, self.env.Vars['servername'], self.env.Vars['serverport'])
+      pyaf.Cmd.setUserName( self, self.env.Vars['username'])
+      pyaf.Cmd.setHostName( self, self.env.Vars['hostname'])
       self.requestOutput = None
    
    def _sendRequest(self, verbose = False):

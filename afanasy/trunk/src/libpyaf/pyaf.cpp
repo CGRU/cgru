@@ -65,3 +65,40 @@ bool PyAf::GetString( PyObject * obj, std::string & str, const char * errMsg)
 
    return false;
 }
+
+bool PyAf::GetStrings( PyObject * obj, std::vector<std::string> & list, int min, int max, const char * errMsg)
+{
+   if( false == PyTuple_Check( obj))
+   {
+      outError("Object is not a tuple.", errMsg);
+      return false;
+   }
+   int size = PyTuple_GET_SIZE( obj);
+   for( int i = 0; i < size; i++)
+   {
+      PyObject * obj_str = PyTuple_GetItem( obj, i);
+      if( obj_str == NULL)
+      {
+         outError("Invalid object in a tuple.", errMsg);
+         return false;
+      }
+      std::string str;
+      if( false == PyAf::GetString( obj_str, str, errMsg))
+      {
+         outError("Invalid object in a tuple.", errMsg);
+         return false;
+      }
+      list.push_back( str);
+   }
+   if(( min > -1 ) && ( list.size() < min ))
+   {
+      outError("Tuple size less than a minimum.", errMsg);
+      return false;
+   }
+   if(( max > -1 ) && ( list.size() > max ))
+   {
+      outError("Tuple size greater than a maximum.", errMsg);
+      return false;
+   }
+   return true;
+}
