@@ -29,6 +29,7 @@ class ActionCommand( QtGui.QAction):
 class Tray( QtGui.QSystemTrayIcon):
    def __init__( self, parent = None):
       QtGui.QSystemTrayIcon.__init__( self, parent)
+      self.parent = parent
 
       # Menu:
       self.menu = dict()
@@ -95,6 +96,9 @@ class Tray( QtGui.QSystemTrayIcon):
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.cgruDocs)
       self.menu['menu'].addAction( action)
       self.menu['menu'].addSeparator()
+      action = QtGui.QAction('Restart', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.restart)
+      self.menu['menu'].addAction( action)            
       action = QtGui.QAction('Quit', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), parent.quit)
       self.menu['menu'].addAction( action)            
@@ -115,6 +119,9 @@ class Tray( QtGui.QSystemTrayIcon):
    def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
    def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
+   def restart( self):
+      self.parent.quit()
+      QtCore.QProcess.startDetached( os.path.join( os.getenv('CGRU_KEEPER'), 'keeper.sh'), [])
 
    def editCGRUConfig( self):
       if QtCore.QProcess.execute( cgruconfig.VARS['editor'] % cgruconfig.VARS['HOME_CONFIGFILE']) == 0:
