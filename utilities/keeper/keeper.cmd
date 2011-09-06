@@ -7,7 +7,7 @@ popd
 
 call %AF_ROOT%\py3k_setup.cmd 3.2.1
 
-set PYTHON=%CGRU_KEEPER%\Python3
+set PYTHON=%CGRU_KEEPER%\Python
 
 rem start %PYTHON%\pythonw keeper.py
 %PYTHON%\python keeper.py
