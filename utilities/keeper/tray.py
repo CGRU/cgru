@@ -43,6 +43,7 @@ class Tray( QtGui.QSystemTrayIcon):
          if menuname not in self.menu:
             self.menu[menuname] = QtGui.QMenu( menuname)
             self.menu['menu'].addMenu( self.menu[menuname])
+         filenames.sort()
          for filename in filenames:
             if filename[0] == '.': continue
             if sys.platform[:3] == 'win':
