@@ -1,6 +1,6 @@
 set pyver=%1
 
-if not defined %1 set pyver=3.2.1
+if not defined %1 set pyver=3.2.2
 
 rem Check CGRU:
 if not exist %CGRU_LOCATION% (
