@@ -19,81 +19,79 @@ def getVar( var, title = 'Set Variable', label = 'Enter new value:'):
    variables = [var]
    cgruconfig.writeVars(variables)
 
+def runCommand( cmd):
+   print('runCommand:')
+   print( cmd)
+
 class Tray( QtGui.QSystemTrayIcon):
    def __init__( self, parent = None):
       QtGui.QSystemTrayIcon.__init__( self, parent)
 
       # Menu:
-      self.menu = QtGui.QMenu()
+      self.menu = dict()
+      self.menu['menu'] = QtGui.QMenu()
+      # Load menu:
+      menudir = os.path.join( os.environ['CGRU_KEEPER'], 'menu')
+      for dirpath, dirnames, filenames in os.walk( menudir, True, None, True):
+         menuname = os.path.basename( dirpath)
+         if menuname not in self.menu:
+            self.menu[menuname] = QtGui.QMenu( menuname)
+            self.menu['menu'].addMenu( self.menu[menuname])
+         for filename in filenames:
+            action = QtGui.QAction( filename, self)
+            self.menu[menuname].addAction( action)
+            QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), runCommand)
 
-      self.menu_af = QtGui.QMenu('AFANASY')
-
-      action = QtGui.QAction('Start Watch', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.startAfWatch)
-      self.menu_af.addAction( action)
-
-      self.menu_af.addSeparator()
-
+      # Add permanent items:
+#      action = QtGui.QAction('Start Watch', self)
+#      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.startAfWatch)
+#      self.menu['AFANASY'].addAction( action)
+      self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Set nibmy', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
-      self.menu_af.addAction( action)
-
+      self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Set NIMBY', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setNIMBY)
-      self.menu_af.addAction( action)
-
+      self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Set Free', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setFree)
-      self.menu_af.addAction( action)
-
+      self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Eject Tasks', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.ejectTasks)
-      self.menu_af.addAction( action)
-
-      self.menu_af.addSeparator()
-
+      self.menu['AFANASY'].addAction( action)
+      self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Nimby Schedule...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
-      self.menu_af.addAction( action)
+      self.menu['AFANASY'].addAction( action)
 
-      self.menu.addMenu( self.menu_af)
+      self.menu['menu'].addSeparator()
 
-      self.menu.addSeparator()
-
-      self.menu_conf = QtGui.QMenu('Configure...')
-
-      action = QtGui.QAction('Reload', self)
+      self.menu['Configure'].addSeparator()
+      action = QtGui.QAction('Reload CRGU Config', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.confReload)
-      self.menu_conf.addAction( action)
-
+      self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Docs URL...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setDocsURL)
-      self.menu_conf.addAction( action)
-
+      self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Edit CRGU Config...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editCGRUConfig)
-      self.menu_conf.addAction( action)
-
+      self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Text Editor...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setTextEditor)
-      self.menu_conf.addAction( action)
+      self.menu['Configure'].addAction( action)
 
-      self.menu.addMenu( self.menu_conf)
+      self.menu['menu'].addSeparator()
 
-      self.menu.addSeparator()
-
-      action = QtGui.QAction('CGRU Documentation...', self)
+      action = QtGui.QAction('CGRU Documentation', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.cgruDocs)
-      self.menu.addAction( action)
-
-      self.menu.addSeparator()
-
+      self.menu['menu'].addAction( action)
+      self.menu['menu'].addSeparator()
       action = QtGui.QAction('Quit', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), parent.quit)
-      self.menu.addAction( action)
+      self.menu['menu'].addAction( action)            
 
       # Decorate and show:
-      self.setContextMenu( self.menu)
+      self.setContextMenu( self.menu['menu'])
       self.icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), 'keeper.png'))
       self.setIcon( self.icon)
       parent.setWindowIcon( self.icon)
