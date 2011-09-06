@@ -45,7 +45,7 @@ class Tray( QtGui.QSystemTrayIcon):
          for filename in filenames:
             if filename[0] == '.': continue
             if sys.platform[:3] == 'win':
-               if filename[-3:] != '.cmd': continue
+               if filename[-4:] != '.cmd': continue
                itemname = filename[:-4]
             else:
                if filename[-3:] != '.sh': continue

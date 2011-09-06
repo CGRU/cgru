@@ -1,0 +1,1 @@
+%AF_ROOT%\launch\afwatch.cmd
