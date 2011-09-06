@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pyver=$1
-[ -z "$pyver" ] && pyver=3.2.1
+[ -z "$pyver" ] && pyver=3.2.2
 
 # Check CGRU:
 if [ -z "$CGRU_LOCATION" ]; then

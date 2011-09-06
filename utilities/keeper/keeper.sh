@@ -6,7 +6,7 @@ cd ../..
 [ -f "./setup.sh" ] && source ./setup.sh
 popd > /dev/null
 
-pyver="3.2.1"
+pyver="3.2.2"
 source $AF_ROOT/py3k_setup.sh $pyver
 
 python=$CGRU_KEEPER/Python
