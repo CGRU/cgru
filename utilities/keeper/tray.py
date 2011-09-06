@@ -19,9 +19,12 @@ def getVar( var, title = 'Set Variable', label = 'Enter new value:'):
    variables = [var]
    cgruconfig.writeVars(variables)
 
-def runCommand( cmd):
-   print('runCommand:')
-   print( cmd)
+class ActionCommand( QtGui.QAction):
+   def __init__( self, parent, name, command):
+      QtGui.QAction.__init__( self, name, parent)
+      self.name = name
+      self.cmd = command
+   def runCommand( self): QtCore.QProcess.startDetached( self.cmd, [])
 
 class Tray( QtGui.QSystemTrayIcon):
    def __init__( self, parent = None):
@@ -33,19 +36,25 @@ class Tray( QtGui.QSystemTrayIcon):
       # Load menu:
       menudir = os.path.join( os.environ['CGRU_KEEPER'], 'menu')
       for dirpath, dirnames, filenames in os.walk( menudir, True, None, True):
+         if dirpath.find('/.') != -1: continue
+         if dirpath.find('\\.') != -1: continue
          menuname = os.path.basename( dirpath)
          if menuname not in self.menu:
             self.menu[menuname] = QtGui.QMenu( menuname)
             self.menu['menu'].addMenu( self.menu[menuname])
          for filename in filenames:
-            action = QtGui.QAction( filename, self)
+            if filename[0] == '.': continue
+            if sys.platform[:3] == 'win':
+               if filename[-3:] != '.cmd': continue
+               itemname = filename[:-4]
+            else:
+               if filename[-3:] != '.sh': continue
+               itemname = filename[:-3]
+            action = ActionCommand( self, itemname, os.path.join( dirpath, filename))
             self.menu[menuname].addAction( action)
-            QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), runCommand)
+            QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
 
       # Add permanent items:
-#      action = QtGui.QAction('Start Watch', self)
-#      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.startAfWatch)
-#      self.menu['AFANASY'].addAction( action)
       self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Set nibmy', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
