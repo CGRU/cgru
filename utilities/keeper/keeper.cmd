@@ -5,7 +5,7 @@ pushd ..\..
 if exist setup.cmd call setup.cmd
 popd
 
-call %AF_ROOT%\py3k_setup.cmd 3.2.1
+call %AF_ROOT%\py3k_setup.cmd 3.2.2
 
 set PYTHON=%CGRU_KEEPER%\Python
 
