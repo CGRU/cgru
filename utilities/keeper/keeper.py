@@ -34,6 +34,9 @@ if keeper is None:
    keeper = os.path.join( os.getenv('CGRU_KEEPER'), keeper)
 cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper
 
+# Include CGRU_UPDATE_CMD:
+cgruconfig.VARS['CGRU_UPDATE_CMD'] = os.getenv('CGRU_UPDATE_CMD')
+
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
 tray = Tray( app)

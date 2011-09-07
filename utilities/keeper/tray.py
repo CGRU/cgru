@@ -35,6 +35,14 @@ class Tray( QtGui.QSystemTrayIcon):
       # Menu:
       self.menu = dict()
       self.menu['menu'] = QtGui.QMenu()
+
+      # Update item only if CGRU_UPDATE_CMD defined:
+      if cgruconfig.VARS['CGRU_UPDATE_CMD'] is not None:
+         action = QtGui.QAction('Update', self)
+         QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.update)
+         self.menu['menu'].addAction( action)
+         self.menu['menu'].addSeparator()
+         
       # Load menu:
       menudir = os.path.join( os.environ['CGRU_KEEPER'], 'menu')
       for dirpath, dirnames, filenames in os.walk( menudir, True, None, True):
@@ -128,6 +136,10 @@ class Tray( QtGui.QSystemTrayIcon):
    def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
    def restart( self):
       QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_KEEPER_CMD'])
+      self.parent.quit()
+
+   def update( self):
+      QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_UPDATE_CMD'])
       self.parent.quit()
 
    def editCGRUConfig( self):
