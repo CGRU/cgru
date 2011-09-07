@@ -1,1 +1,1 @@
-%CGRU_LOCATION%\utilities\regexp\bin\regexp
+start %CGRU_LOCATION%\utilities\regexp\bin\regexp
