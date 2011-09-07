@@ -127,9 +127,7 @@ class Tray( QtGui.QSystemTrayIcon):
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
    def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
    def restart( self):
-      if sys.platform[:3] == 'win': keeper = 'keeper.cmd'
-      else: keeper = 'keeper.sh'
-      QtCore.QProcess.startDetached( os.path.join( os.getenv('CGRU_KEEPER'), keeper), [])
+      QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_KEEPER_CMD'])
       self.parent.quit()
 
    def editCGRUConfig( self):

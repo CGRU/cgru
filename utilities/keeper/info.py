@@ -1,6 +1,6 @@
 import cgruconfig
 
-import os
+import os, sys
 
 from PyQt4 import QtCore, QtGui
 
@@ -17,10 +17,11 @@ class Window( QtGui.QTextEdit ):
       self.fundefined = QtGui.QTextCharFormat()
       self.fundefined.setFontItalic( True)
 
-      self.textCursor().insertText( 'Variables:\n', self.ftitle)
+      self.textCursor().insertText('Variables:\n', self.ftitle)
 
       self.appendVars( cgruconfig.VARS)
 
+      self.textCursor().insertText('\nAFANASY Environment:\n', self.ftitle)
       self.appendEnvVar('AF_ROOT')
       self.appendEnvVar('AF_RENDER_CMD')
       self.appendEnvVar('AF_WATCH_CMD')
@@ -28,9 +29,11 @@ class Window( QtGui.QTextEdit ):
       self.appendConfigFile( cgruconfig.VARS['CONFIGFILE'])
       self.appendConfigFile( cgruconfig.VARS['HOME_CONFIGFILE'])
 
+      cmd = ''
+      for arg in sys.argv: cmd += ' ' + arg
+      self.setWindowTitle('Configuration:' + cmd)
       self.resize( self.viewport().size())
       self.moveCursor( QtGui.QTextCursor.Start)
-      self.setWindowTitle('Configuration:')
       self.setReadOnly( True)
       self.show()
 
@@ -39,7 +42,6 @@ class Window( QtGui.QTextEdit ):
       variables = dict()
       cgruconfig.Config( variables, [filename])
       self.appendVars( variables)
-
 
    def appendVars( self, variables):
       keys = []

@@ -26,6 +26,14 @@ if 'editor' not in cgruconfig.VARS:
    else:
       cgruconfig.VARS['editor'] = 'xterm -e vi "%s"'
 
+# Define keeper launch command if was not:
+keeper = os.getenv('CGRU_KEEPER_CMD')
+if keeper is None:
+   if sys.platform[:3] == 'win': keeper = 'keeper.cmd'
+   else: keeper = 'keeper.sh'
+   keeper = os.path.join( os.getenv('CGRU_KEEPER'), keeper)
+cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper
+
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
 tray = Tray( app)
