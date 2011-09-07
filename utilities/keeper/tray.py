@@ -4,6 +4,7 @@ import subprocess
 import cgrudocs
 import cgruconfig
 
+import info
 import nimby
 
 from dialog_nimby import DialogNimby
@@ -78,13 +79,13 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['menu'].addSeparator()
 
       self.menu['Configure'].addSeparator()
-      action = QtGui.QAction('Reload CRGU Config', self)
+      action = QtGui.QAction('Reload Config', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.confReload)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Docs URL...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setDocsURL)
       self.menu['Configure'].addAction( action)
-      action = QtGui.QAction('Edit CRGU Config...', self)
+      action = QtGui.QAction('Edit Config...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editCGRUConfig)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Text Editor...', self)
@@ -93,7 +94,11 @@ class Tray( QtGui.QSystemTrayIcon):
 
       self.menu['menu'].addSeparator()
 
-      action = QtGui.QAction('CGRU Documentation', self)
+      action = QtGui.QAction('Show Info', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.cgruInfo)
+      self.menu['menu'].addAction( action)
+      self.menu['menu'].addSeparator()
+      action = QtGui.QAction('Documentation', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.cgruDocs)
       self.menu['menu'].addAction( action)
       self.menu['menu'].addSeparator()
@@ -116,6 +121,7 @@ class Tray( QtGui.QSystemTrayIcon):
 
    def confReload( self): cgruconfig.Config()
    def cgruDocs( self): cgrudocs.show()
+   def cgruInfo( self): self.dialog_info = info.Window()
    def editNimby( self): self.dialog_nimby = DialogNimby()
    def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')

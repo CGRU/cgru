@@ -11,29 +11,29 @@ class Config:
       self.verbose = Verbose
       self.Vars = variables
 
-      self.Vars['hostname'] = socket.gethostname()
-
-      cgrulocation =  os.getenv('CGRU_LOCATION')
-      if cgrulocation is None or cgrulocation == '': return
-
-      self.Vars['CGRU_LOCATION'] = cgrulocation
-
-      self.Vars['CONFIGFILE'] = os.path.join( cgrulocation, 'config.xml')
-      home = os.getenv('HOME', os.getenv('HOMEPATH'))
-      self.Vars['HOME'] = home
-      self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
-      if not os.path.isdir( self.Vars['HOME_CGRU']):
-         os.mkdir( self.Vars['HOME_CGRU'])
-      self.Vars['HOME_CONFIGFILE'] = os.path.join( self.Vars['HOME_CGRU'], 'config.xml')
-      # Create home config file if not preset
-      if not os.path.isfile( self.Vars['HOME_CONFIGFILE']):
-         cfile = open( self.Vars['HOME_CONFIGFILE'], 'w')
-         cfile.write('<!-- Created at ' + time.ctime() + ' -->\n')
-         cfile.write('<cgru>\n')
-         cfile.write('</cgru>\n')
-         cfile.close()
-
       if configfiles is None:
+         self.Vars['hostname'] = socket.gethostname()
+
+         cgrulocation =  os.getenv('CGRU_LOCATION')
+         if cgrulocation is None or cgrulocation == '': return
+
+         self.Vars['CGRU_LOCATION'] = cgrulocation
+
+         self.Vars['CONFIGFILE'] = os.path.join( cgrulocation, 'config.xml')
+         home = os.getenv('HOME', os.getenv('HOMEPATH'))
+         self.Vars['HOME'] = home
+         self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
+         if not os.path.isdir( self.Vars['HOME_CGRU']):
+            os.mkdir( self.Vars['HOME_CGRU'])
+         self.Vars['HOME_CONFIGFILE'] = os.path.join( self.Vars['HOME_CGRU'], 'config.xml')
+         # Create home config file if not preset
+         if not os.path.isfile( self.Vars['HOME_CONFIGFILE']):
+            cfile = open( self.Vars['HOME_CONFIGFILE'], 'w')
+            cfile.write('<!-- Created at ' + time.ctime() + ' -->\n')
+            cfile.write('<cgru>\n')
+            cfile.write('</cgru>\n')
+            cfile.close()
+
          configfiles = []
          configfiles.append( os.path.join( cgrulocation, 'config_default.xml'))
          configfiles.append( self.Vars['CONFIGFILE'])
