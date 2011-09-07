@@ -19,6 +19,9 @@ from tray import Tray
 
 refresh.refresh()
 
+# Set a default keeper trat icon if not defined:
+if 'tray_icon' not in cgruconfig.VARS: cgruconfig.VARS['tray_icon'] = None
+
 # Check for a text editor, it always must be defined:
 if 'editor' not in cgruconfig.VARS:
    if sys.platform.find('win') == 0:

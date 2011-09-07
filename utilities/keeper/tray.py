@@ -118,8 +118,10 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['menu'].addAction( action)            
 
       # Decorate and show:
+      self.icon_name = cgruconfig.VARS['tray_icon']
+      if self.icon_name is None: self.icon_name = 'keeper'
       self.setContextMenu( self.menu['menu'])
-      self.icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), 'keeper.png'))
+      self.icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), self.icon_name + '.png'))
       self.setIcon( self.icon)
       parent.setWindowIcon( self.icon)
    
