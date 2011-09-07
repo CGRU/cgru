@@ -125,7 +125,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.setIcon( self.icon)
       parent.setWindowIcon( self.icon)
    
-      self.setToolTip('CGRU Keeper ' + os.getenv('CGRU_VERSION', ''))
+      self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))
 
       self.show()
 

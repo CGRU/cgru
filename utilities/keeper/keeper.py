@@ -19,7 +19,10 @@ from tray import Tray
 
 refresh.refresh()
 
-# Set a default keeper trat icon if not defined:
+# Default company is CGRU:
+if 'company' not in cgruconfig.VARS: cgruconfig.VARS['company'] = 'CGRU'
+
+# Set a default keeper tray icon if not defined:
 if 'tray_icon' not in cgruconfig.VARS: cgruconfig.VARS['tray_icon'] = None
 
 # Check for a text editor, it always must be defined:
