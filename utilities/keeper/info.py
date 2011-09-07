@@ -42,7 +42,8 @@ class Window( QtGui.QTextEdit ):
 
 
    def appendVars( self, variables):
-      keys = variables.keys()
+      keys = []
+      for key in variables.keys(): keys.append( key)
       keys.sort()
       for var in keys:
          self.appendVar( var, variables[var])
