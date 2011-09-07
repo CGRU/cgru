@@ -14,7 +14,7 @@ def refreshNimby():
    # Get today:
    datetime = QtCore.QDateTime.currentDateTime()
    time = datetime.toString('hh:mm')
-   day = datetime.toString('ddd').toLower()
+   day = str(datetime.toString('ddd')).lower()
    var = 'nimby_' + day
    if var not in cgruconfig.VARS: return
    values = cgruconfig.VARS[var].split(' ')
@@ -22,7 +22,7 @@ def refreshNimby():
    time_end = values[1]
 
    # Check yesterday:
-   yesterday = datetime.addDays(-1).toString('ddd').toLower()
+   yesterday = str(datetime.addDays(-1).toString('ddd')).lower()
    var_y = 'nimby_' + yesterday
    if var_y in cgruconfig.VARS and time < time_begin:
       time_end_y = cgruconfig.VARS[var_y].split(' ')[1]
