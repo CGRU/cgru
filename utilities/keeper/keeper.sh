@@ -7,13 +7,12 @@ cd ../..
 popd > /dev/null
 
 python="python"
-pyver="3.2.2"
-pythondir=$CGRU_KEEPER/Python
-[ -d $pythondir ] || pythondir=$CGRU_LOCATION/utilities/python/$pyver
-if [ -d $pythondir ]; then
+python3=$CGRU_KEEPER/Python3
+if [ -d $python3 ]; then
+   pyver="3.2.2"
    source $AF_ROOT/py3k_setup.sh $pyver
-   echo "Using CGRU Python: $pythondir"
-   export PATH="$pythondir/bin:$PATH"
+   echo "Using CGRU Python: $python3"
+   export PATH="$python3/bin:$PATH"
    python="python3"
 fi
 

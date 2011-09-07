@@ -57,7 +57,6 @@ rcopy utilities/release/icons $dest/utilities/release
 createDir $dest/utilities/site
 rcopy utilities/site/doc $dest/utilities/site
 
-utilities/keeper/clear_python.sh
 rcopy utilities/keeper $dest/utilities
 
 rcopy utilities/moviemaker $dest/utilities
