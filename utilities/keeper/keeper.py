@@ -6,9 +6,9 @@ if sys.platform.find('win') == 0:
    pyqt4dir=os.getenv('PYTHON').replace('\\','/') + '/Lib/site-packages/PyQt4'
    if os.path.isfile( qtconf): os.remove( qtconf)
    qtconf_file = open(qtconf, mode='w')
-   print('[Paths]', file=qtconf_file)
-   print('Prefix = ' + pyqt4dir, file=qtconf_file)
-   print('Binaries = ' + pyqt4dir, file=qtconf_file)
+   qtconf_file.write('[Paths]\n')
+   qtconf_file.write('Prefix = ' + pyqt4dir + '\n')
+   qtconf_file.write('Binaries = ' + pyqt4dir + '\n')
    qtconf_file.close()
 
 from PyQt4 import QtCore, QtGui

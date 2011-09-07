@@ -6,13 +6,15 @@ cd ../..
 [ -f "./setup.sh" ] && source ./setup.sh
 popd > /dev/null
 
+python="python"
 pyver="3.2.2"
-source $AF_ROOT/py3k_setup.sh $pyver
+pythondir=$CGRU_KEEPER/Python
+[ -d $pythondir ] || pythondir=$CGRU_LOCATION/utilities/python/$pyver
+if [ -d $pythondir ]; then
+   source $AF_ROOT/py3k_setup.sh $pyver
+   echo "Using CGRU Python: $pythondir"
+   export PATH="$pythondir/bin:$PATH"
+   python="python3"
+fi
 
-python=$CGRU_KEEPER/Python
-[ -d $python ] || python=$CGRU_LOCATION/utilities/python/$pyver
-echo Python=$python
-
-export PATH="$python/bin:$PATH"
-
-python3 $CGRU_KEEPER/keeper.py
+"$python" "$CGRU_KEEPER/keeper.py"
