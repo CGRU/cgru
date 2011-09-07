@@ -12,7 +12,7 @@ class Config:
       self.Vars = variables
 
       if configfiles is None:
-         self.Vars['hostname'] = socket.gethostname()
+         self.Vars['hostname'] = socket.gethostname().lower()
 
          cgrulocation =  os.getenv('CGRU_LOCATION')
          if cgrulocation is None or cgrulocation == '': return
