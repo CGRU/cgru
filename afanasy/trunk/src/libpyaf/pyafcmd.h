@@ -17,11 +17,11 @@ PyObject * PyAf_Cmd_getJobList(              PyAf_Cmd_Object *self,     PyObject
 PyObject * PyAf_Cmd_decodeJobList(           PyAf_Cmd_Object *self,     PyObject *args);
 PyObject * PyAf_Cmd_getJobInfo(              PyAf_Cmd_Object *self,     PyObject *args);
 PyObject * PyAf_Cmd_decodeJobInfo(           PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_deleteJob(               PyAf_Cmd_Object *self, 		PyObject *args);
-PyObject * PyAf_Cmd_setNimby(                PyAf_Cmd_Object *self, 		PyObject *arg );
-PyObject * PyAf_Cmd_setNIMBY(                PyAf_Cmd_Object *self, 		PyObject *arg );
-PyObject * PyAf_Cmd_setFree(                 PyAf_Cmd_Object *self, 		PyObject *arg );
-PyObject * PyAf_Cmd_ejectTasks(              PyAf_Cmd_Object *self, 		PyObject *arg );
+PyObject * PyAf_Cmd_deleteJob(               PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_rendersetnimby(          PyAf_Cmd_Object *self, 	PyObject *arg );
+PyObject * PyAf_Cmd_rendersetNIMBY(          PyAf_Cmd_Object *self, 	PyObject *arg );
+PyObject * PyAf_Cmd_rendersetfree(           PyAf_Cmd_Object *self, 	PyObject *arg );
+PyObject * PyAf_Cmd_renderejecttasks(        PyAf_Cmd_Object *self, 	PyObject *arg );
 PyObject * PyAf_Cmd_getDataLen(              PyAf_Cmd_Object *self);
 PyObject * PyAf_Cmd_getData(                 PyAf_Cmd_Object *self);
 
@@ -34,10 +34,10 @@ static PyMethodDef PyAf_Cmd_methods[] = {
    {"getjobinfo",             (PyCFunction) PyAf_Cmd_getJobInfo,              METH_VARARGS,  "Get job info."               },
    {"decodejobinfo",          (PyCFunction) PyAf_Cmd_decodeJobInfo,           METH_VARARGS,  "Decode job info."            },
    {"deletejob",              (PyCFunction) PyAf_Cmd_deleteJob,               METH_VARARGS,  "Delete Job(s)."              },
-   {"setNimby",               (PyCFunction) PyAf_Cmd_setNimby,                METH_VARARGS,  "Set 'nimby'."                },
-   {"setNIMBY",               (PyCFunction) PyAf_Cmd_setNIMBY,                METH_VARARGS,  "Set 'NIMBY'."                },
-   {"setFree",                (PyCFunction) PyAf_Cmd_setFree,                 METH_VARARGS,  "Free render(s)."             },
-   {"ejectTasks",             (PyCFunction) PyAf_Cmd_ejectTasks,              METH_VARARGS,  "Eject running tasks"         },
+   {"rendersetnimby",         (PyCFunction) PyAf_Cmd_rendersetnimby,          METH_VARARGS,  "Set render 'nimby'."         },
+   {"rendersetNIMBY",         (PyCFunction) PyAf_Cmd_rendersetNIMBY,          METH_VARARGS,  "Set render 'NIMBY'."         },
+   {"rendersetfree",          (PyCFunction) PyAf_Cmd_rendersetfree,           METH_VARARGS,  "Free render(s)."             },
+   {"renderejecttasks",       (PyCFunction) PyAf_Cmd_renderejecttasks,        METH_VARARGS,  "Eject render running tasks"  },
    {"getDataLen",             (PyCFunction) PyAf_Cmd_getDataLen,              METH_NOARGS,   "Get job data length."        },
    {"getData",                (PyCFunction) PyAf_Cmd_getData,                 METH_NOARGS,   "Get job data."               },
    { NULL, NULL, 0, NULL } // Sentinel

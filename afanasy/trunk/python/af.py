@@ -209,3 +209,19 @@ class Cmd(pyaf.Cmd):
          return self.decodejobinfo(self.requestOutput)
       else:
          return False
+
+   def renderSetNimby( self, text):
+      self.rendersetnimby( self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()
+
+   def renderSetNIMBY( self, text):
+      self.rendersetNIMBY( self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()
+
+   def renderSetFree( self, text):
+      self.rendersetfree( self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()
+
+   def renderEjectTasks( self, text):
+      self.renderejecttasks( self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()

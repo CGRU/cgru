@@ -11,13 +11,11 @@ if sys.platform.find('win') == 0:
    qtconf_file.write('Binaries = ' + pyqt4dir + '\n')
    qtconf_file.close()
 
-from PyQt4 import QtCore, QtGui
+from PyQt4 import QtGui
 
 import cgruconfig
-import refresh
+from refresh import Refresh
 from tray import Tray
-
-refresh.refresh()
 
 # Default company is CGRU:
 if 'company' not in cgruconfig.VARS: cgruconfig.VARS['company'] = 'CGRU'
@@ -43,12 +41,12 @@ cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper
 # Include CGRU_UPDATE_CMD:
 cgruconfig.VARS['CGRU_UPDATE_CMD'] = os.getenv('CGRU_UPDATE_CMD')
 
+# Set a default refresh interval in seconds:
+if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = '36'
+
+# Create tray application with refresh:
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
+refresh = Refresh( app)
 tray = Tray( app)
-timer = QtCore.QTimer( app)
-timer.setInterval( 1000 * refresh.Interval)
-QtCore.QObject.connect( timer, QtCore.SIGNAL('timeout()'), refresh.refresh)
-timer.start()
-
 app.exec_()

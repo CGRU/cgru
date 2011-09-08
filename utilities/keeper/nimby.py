@@ -6,25 +6,10 @@ from datetime import datetime,timedelta
 nimby_set = False
 free_set = False
 
-def setnimby( text = '(keeper)'):
-   cmd = af.Cmd()
-   cmd.setNimby( cgruconfig.VARS['hostname'] + '.*', text)
-   cmd._sendRequest()
-
-def setNIMBY( text = '(keeper)'):
-   cmd = af.Cmd()
-   cmd.setNIMBY( cgruconfig.VARS['hostname'] + '.*', text)
-   cmd._sendRequest()
-
-def setFree( text = '(keeper)'):
-   cmd = af.Cmd()
-   cmd.setFree( cgruconfig.VARS['hostname'] + '.*', text)
-   cmd._sendRequest()
-
-def ejectTasks( text = '(keeper)'):
-   cmd = af.Cmd()
-   cmd.ejectTasks( cgruconfig.VARS['hostname'] + '.*', text)
-   cmd._sendRequest()
+def setnimby(   text = '(keeper)'): cmd = af.Cmd().renderSetNimby(   text)
+def setNIMBY(   text = '(keeper)'): cmd = af.Cmd().renderSetNIMBY(   text)
+def setFree(    text = '(keeper)'): cmd = af.Cmd().renderSetFree(    text)
+def ejectTasks( text = '(keeper)'): cmd = af.Cmd().renderEjectTasks( text)
 
 def refresh():
 
@@ -47,7 +32,7 @@ def refresh():
    if var_y in cgruconfig.VARS and time < time_begin:
       time_end_y = cgruconfig.VARS[var_y].split(' ')[1]
       if time_end_y < time_begin and not free_set:
-         setFree('(keeper nimby schedule)')
+         setFree('(keeper nimby yesterday schedule)')
          free_set = True
          nimby_set = False
 

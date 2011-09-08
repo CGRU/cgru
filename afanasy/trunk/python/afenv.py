@@ -24,7 +24,7 @@ class Env:
       if dpos == -1: dpos = username.rfind('\\')
       if dpos != -1: username = username[dpos+1:]
 
-      hostname = os.getenv('AF_HOSTNAME', socket.gethostname())
+      hostname = os.getenv('AF_HOSTNAME', socket.gethostname()).lower()
       if self.verbose:
          print 'Afanasy root = "%s"' % afroot
          print 'Host name = "%s"' % hostname

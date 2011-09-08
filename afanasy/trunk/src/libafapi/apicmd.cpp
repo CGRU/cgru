@@ -97,25 +97,25 @@ bool Cmd::JobDelete( const std::string & jobMask)
    return true;
 }
 
-void Cmd::setNimby( const std::string & renderMask, const std::string & string)
+void Cmd::renderSetNimby( const std::string & renderMask, const std::string & string)
 {
    af::MCGeneral mcgeneral( renderMask, 0);
    if( false == string.empty()) mcgeneral.setString( string);
    action( af::Msg::TRenderSetNimby, mcgeneral);
 }
-void Cmd::setNIMBY( const std::string & renderMask, const std::string & string)
+void Cmd::renderSetNIMBY( const std::string & renderMask, const std::string & string)
 {
    af::MCGeneral mcgeneral( renderMask, 0);
    if( false == string.empty()) mcgeneral.setString( string);
    action( af::Msg::TRenderSetNIMBY, mcgeneral);
 }
-void Cmd::setFree( const std::string & renderMask, const std::string & string)
+void Cmd::renderSetFree( const std::string & renderMask, const std::string & string)
 {
    af::MCGeneral mcgeneral( renderMask, 0);
    if( false == string.empty()) mcgeneral.setString( string);
    action( af::Msg::TRenderSetFree, mcgeneral);
 }
-void Cmd::ejectTasks( const std::string & renderMask, const std::string & string)
+void Cmd::renderEjectTasks( const std::string & renderMask, const std::string & string)
 {
    af::MCGeneral mcgeneral( renderMask, 0);
    if( false == string.empty()) mcgeneral.setString( string);

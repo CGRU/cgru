@@ -141,36 +141,36 @@ PyObject * PyAf_Cmd_decodeJobInfo( PyAf_Cmd_Object *self, PyObject *args)
    return jobInfo;
 }
 
-PyObject * PyAf_Cmd_setNimby( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_rendersetnimby( PyAf_Cmd_Object * self, PyObject * arg)
 {
    std::vector<std::string> list;
    if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
-   if( list.size() == 1 ) self->cmd->setNimby( list[0]);
-   else self->cmd->setNimby( list[0], list[1]);
+   if( list.size() == 1 ) self->cmd->renderSetNimby( list[0]);
+   else self->cmd->renderSetNimby( list[0], list[1]);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_setNIMBY( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_rendersetNIMBY( PyAf_Cmd_Object * self, PyObject * arg)
 {
    std::vector<std::string> list;
    if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setNIMBY")) Py_RETURN_FALSE;
-   if( list.size() == 1 ) self->cmd->setNIMBY( list[0]);
-   else self->cmd->setNIMBY( list[0], list[1]);
+   if( list.size() == 1 ) self->cmd->renderSetNIMBY( list[0]);
+   else self->cmd->renderSetNIMBY( list[0], list[1]);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_setFree( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_rendersetfree( PyAf_Cmd_Object * self, PyObject * arg)
 {
    std::vector<std::string> list;
    if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
-   if( list.size() == 1 ) self->cmd->setFree( list[0]);
-   else self->cmd->setFree( list[0], list[1]);
+   if( list.size() == 1 ) self->cmd->renderSetFree( list[0]);
+   else self->cmd->renderSetFree( list[0], list[1]);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_ejectTasks( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_renderejecttasks( PyAf_Cmd_Object * self, PyObject * arg)
 {
    std::vector<std::string> list;
    if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
-   if( list.size() == 1 ) self->cmd->ejectTasks( list[0]);
-   else self->cmd->ejectTasks( list[0], list[1]);
+   if( list.size() == 1 ) self->cmd->renderEjectTasks( list[0]);
+   else self->cmd->renderEjectTasks( list[0], list[1]);
    Py_RETURN_TRUE;
 }
 
