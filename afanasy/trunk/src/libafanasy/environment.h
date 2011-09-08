@@ -2,7 +2,6 @@
 
 #include "../include/aftypes.h"
 
-#include "address.h"
 #include "name_af.h"
 #include "netif.h"
 
@@ -27,7 +26,7 @@ public:
       AppendPythonPath     = 1 << 1
    };
 
-/// Return \c true if address environment is valid.
+/// Return \c true if environment is valid.
    static inline bool isValid() { return valid; }
 
 /// Return \c true if argument exists

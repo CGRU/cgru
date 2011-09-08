@@ -100,7 +100,7 @@ int com::connecttomaster( bool verbose, int type, const char * servername, int s
    int e = getaddrinfo( servername, service_port, &hints, &res);
    if( e != 0)
    {
-      printf("failure %s\n", gai_strerror(e));
+      AFERRAR("com::connecttomaster:\n%s", gai_strerror(e));
       return socketfd;
    }
    for( struct addrinfo *r = res; r != NULL; r = r->ai_next)
