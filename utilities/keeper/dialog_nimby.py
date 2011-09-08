@@ -77,8 +77,8 @@ class DialogNimby( QtGui.QWidget):
       variables = []
       for day in self.days:
          variables.append('nimby_' + day)
-         line = self.te_begin[day].time().toString( self.time_format) + ' '
-         line += self.te_end[day].time().toString( self.time_format) + ' '
+         line =  str( self.te_begin[day].time().toString( self.time_format)) + ' '
+         line += str( self.te_end[day].time().toString( self.time_format)) + ' '
          if self.cb_allow[day].isChecked(): line += 'a'
          if self.cb_eject[day].isChecked(): line += 'e'
          line = line.strip()
