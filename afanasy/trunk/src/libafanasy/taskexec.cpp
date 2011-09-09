@@ -148,12 +148,11 @@ void TaskExec::readwrite( Msg * msg)
 
 void TaskExec::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "[" << servicetype << "] " << username << ": ";
+   stream << "[" << servicetype << ":" << capacity << "] " << username << ": ";
    stream << jobname;
    stream << "[" << blockname << "]";
    stream << "[" << name << "]";
    if( number != 0 ) stream << "(" << number << ")";
-   stream << ":" << capacity;
    if( capcoeff) stream << "x" << capcoeff << " ";
    if( listen_addresses.getAddressesNum())
       listen_addresses.generateInfoStream( stream, false);

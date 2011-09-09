@@ -173,10 +173,6 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << std::endl;
       address.generateInfoStream( stream ,full);
 
-      stream << "\n Priority = " << int(priority);
-      stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
-      stream << "\n Max Tasks = " << getMaxTasks();
-
       stream << "\n Status:";
       if( isOnline()) stream << " Online";
       if( isOffline()) stream << " Offline";
@@ -187,6 +183,10 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       if( isWOLFalling()) stream << " WOL-Falling";
       if( isWOLSleeping()) stream << " WOL-Sleeping";
       if( isWOLWaking()) stream << " WOL-Waking";
+
+      stream << "\n Priority = " << int(priority);
+      stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
+      stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
       if( wol_operation_time ) stream << "\n WOL operation time = " << time2str( wol_operation_time);
       if( time_launch   ) stream << "\n Launched at: " << time2str( time_launch   );

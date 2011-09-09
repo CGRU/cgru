@@ -17,6 +17,5 @@ class Refresh:
       if self.counter > 0: cgruconfig.Config()
       if self.timer.interval() != 1000 * int(cgruconfig.VARS['keeper_refresh']):
          self.timer.setInterval( 1000 * int(cgruconfig.VARS['keeper_refresh']))
-      render.refresh()
       nimby.refresh()
       self.counter += 1

@@ -4,6 +4,8 @@ import subprocess
 import cgrudocs
 import cgruconfig
 
+import af
+
 import info
 import nimby
 import render
@@ -80,6 +82,9 @@ class Tray( QtGui.QSystemTrayIcon):
       action = QtGui.QAction('Eject Tasks', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.ejectTasks)
       self.menu['AFANASY'].addAction( action)
+      action = QtGui.QAction('Render info', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.renderInfo)
+      self.menu['AFANASY'].addAction( action)
       self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Nimby Schedule...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
@@ -131,8 +136,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.show()
 
    def activated_slot( self, reason):
-      if reason == QtGui.QSystemTrayIcon.Trigger:
-         print('Trigger')
+      if reason == QtGui.QSystemTrayIcon.Trigger: return
       elif reason == QtGui.QSystemTrayIcon.DoubleClick:
          render.refresh()
          print('DoubleClick')
@@ -141,6 +145,7 @@ class Tray( QtGui.QSystemTrayIcon):
       elif reason == QtGui.QSystemTrayIcon.Context: return 
       elif reason == QtGui.QSystemTrayIcon.Unknown: return
 
+   def renderInfo( self): render.showInfo( self)
    def confReload( self): cgruconfig.Config()
    def cgruDocs( self): cgrudocs.show()
    def cgruInfo( self): self.dialog_info = info.Window()
@@ -148,6 +153,7 @@ class Tray( QtGui.QSystemTrayIcon):
    def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
    def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
+
    def restart( self):
       QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_KEEPER_CMD'])
       self.parent.quit()
