@@ -5,12 +5,12 @@ pushd ..\..
 if exist setup.cmd call setup.cmd
 popd
 
-call %AF_ROOT%\py3k_setup.cmd 3.2.2
+set PYTHONPATH=%AF_ROOT%\bin_pyaf\3.2.2;%PYTHONPATH%
 
-set PYTHON=%CGRU_KEEPER%\Python
+set python=%CGRU_KEEPER%\Python
 
 if [%1] == [] (
-   start %PYTHON%\pythonw keeper.py
+   start %python%\pythonw keeper.py
 ) else (
-   %PYTHON%\python keeper.py
+   %python%\python keeper.py
 )

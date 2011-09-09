@@ -36,7 +36,7 @@ def findSeparator( path):
          if seppos2 < seppos1: sep = path[seppos2]
       else: sep = path[seppos1]
    elif seppos2 != -1: sep = path[seppos2]
-#   print 'Separator for "%s" = "%s"' % ( path, sep)
+#   print('Separator for "%s" = "%s"' % ( path, sep))
    return sep
 
 def replaceSeperators( path, path_from, path_to):
@@ -46,7 +46,7 @@ def replaceSeperators( path, path_from, path_to):
    if sep_from == sep_to: return newpath
    if sep_from == '' or sep_to == '': return newpath
    pathend = findPathEnd( newpath)
-#   print 'Path end for "%s" = %d' % (newpath, pathend)
+#   print('Path end for "%s" = %d' % (newpath, pathend))
    if pathend > 1 and pathend <= len(newpath):
       part1 = newpath[:pathend]
       part2 = newpath[pathend:]
@@ -82,7 +82,7 @@ class PathMap:
 
       for filename in pathmap_files:
          if Verbose:
-            print 'Opening file: "%s"' % filename
+            print('Opening file: "%s"' % filename)
 
          file = open( filename, 'r')
          for line in file:
@@ -92,8 +92,8 @@ class PathMap:
             if line[0] == '#': continue
             pos = line.rfind(' ')
             if pos <= 2 or pos >= linelen:
-               print 'Error: Ivalid line in "%s":' % filename
-               print line
+               print('Error: Ivalid line in "%s":' % filename)
+               print(line)
                continue
             path_client = line[:pos].strip()
             path_server = line[pos:].strip()
@@ -109,10 +109,10 @@ class PathMap:
          file.close()
 
       if Verbose:
-         print 'Pathes map:'
+         print('Pathes map:')
          n = 0
          for path in self.PathClient:
-            print '   "%s" <-> "%s"' % (path, self.PathServer[n])
+            print('   "%s" <-> "%s"' % (path, self.PathServer[n]))
             n += 1
 
    def translatePath( self, path, toserver, Verbose):
@@ -123,7 +123,7 @@ class PathMap:
 #      for position in positions:
       while position != -1:
          path_search = newpath[position:]
-#         print 'position # %d : "%s"' % (position, path_search)
+#         print('position # %d : "%s"' % (position, path_search))
          for i in range( 0, len( self.PathServer)):
             if toserver:
                path_from = self.PathClient[i]
@@ -142,7 +142,7 @@ class PathMap:
                   if path_search.find(path_from) == 0:
                      pathfounded = True
             else:
-#               print 'finding "%s" in "%s"' % (path_from,path_search)
+#               print('finding "%s" in "%s"' % (path_from,path_search))
                if path_search.find(path_from) == 0:
                   pathfounded = True
             if pathfounded:
@@ -152,9 +152,9 @@ class PathMap:
                   part2 = replaceSeperators( part2, path_from, path_to)
                newpath = part1 + path_to + part2
                if Verbose:
-                  print 'Pathes mapped:'
-                  print path
-                  print newpath
+                  print('Pathes mapped:')
+                  print(path)
+                  print(newpath)
                break
          position = findNextPosition( position, newpath)
       return newpath
@@ -165,9 +165,9 @@ class PathMap:
    def translateFile( self, infile, outfile, toserver, SearchString, Verbose):
       if not self.initialized: return True
       if Verbose:
-         print 'TranslateFile:'
-         print 'Input file: "%s"' % infile
-         print 'Output file: "%s"' % outfile
+         print('TranslateFile:')
+         print('Input file: "%s"' % infile)
+         print('Output file: "%s"' % outfile)
       filein = open( infile, 'r')
       inlines = filein.readlines()
       filein.close()

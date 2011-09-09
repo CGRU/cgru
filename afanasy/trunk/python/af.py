@@ -103,7 +103,7 @@ class Job(pyaf.Job):
    def __init__( self, jobname = None, verbose = False):
       pyaf.Job.__init__( self)
       self.env = afenv.Env( verbose)
-      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      if self.env.valid == False: print('ERROR: Invalid environment, may be some problems.')
       self.pm = PathMap(            self.env.Vars['afroot'], False, verbose)
       self.setPriority(        int( self.env.Vars['priority']       ))
       self.setUserName(             self.env.Vars['username']        )

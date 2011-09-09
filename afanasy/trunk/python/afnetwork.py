@@ -14,13 +14,13 @@ def sendServer( data, datalen, host, port, verbose = False):
       if verbose: print('Trying to connect to "%s"' % str(sa[0]))
       try:
          s = socket.socket(af, socktype, proto)
-      except socket.error, msg:
+      except:
          print(str(sys.exc_info()[1]))
          s = None
          continue
       try:
          s.connect(sa)
-      except socket.error, msg:
+      except:
          print(str(sys.exc_info()[1]))
          s.close()
          s = None
@@ -33,12 +33,11 @@ def sendServer( data, datalen, host, port, verbose = False):
 
    if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)
    s.sendall( data)
-   data = []
+   data = b''
    while True:
       buffer = s.recv(4096)
       if not buffer:
          break
-      data.append(buffer)
-   output = ''.join(data)
+      data += buffer
    s.close()
-   return True, output
+   return True, data
