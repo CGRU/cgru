@@ -6,6 +6,7 @@ import cgruconfig
 
 import info
 import nimby
+import render
 
 from dialog_nimby import DialogNimby
 
@@ -124,10 +125,21 @@ class Tray( QtGui.QSystemTrayIcon):
       self.icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), self.icon_name + '.png'))
       self.setIcon( self.icon)
       parent.setWindowIcon( self.icon)
-   
       self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))
+      QtCore.QObject.connect( self, QtCore.SIGNAL('activated( QSystemTrayIcon::ActivationReason)'), self.activated_slot)
 
       self.show()
+
+   def activated_slot( self, reason):
+      if reason == QtGui.QSystemTrayIcon.Trigger:
+         print('Trigger')
+      elif reason == QtGui.QSystemTrayIcon.DoubleClick:
+         render.refresh()
+         print('DoubleClick')
+      elif reason == QtGui.QSystemTrayIcon.MiddleClick:
+         print('MiddleClick')
+      elif reason == QtGui.QSystemTrayIcon.Context: return 
+      elif reason == QtGui.QSystemTrayIcon.Unknown: return
 
    def confReload( self): cgruconfig.Config()
    def cgruDocs( self): cgrudocs.show()

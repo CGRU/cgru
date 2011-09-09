@@ -1,4 +1,9 @@
 import af
 
+Renders = []
+
 def refresh():
-   print('render.refresh():')
+   global Render
+   Renders = af.Cmd().renderGetLocal()
+   print( Renders)
+

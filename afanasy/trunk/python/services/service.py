@@ -41,8 +41,8 @@ class service:
 
    def applycmdcapacity( self, command):
       command = command.replace( self.str_capacity, str( self.capacity))
-      print 'Capacity coefficient %s applied:' % str( self.capacity)
-      print command
+      print('Capacity coefficient %s applied:' % str( self.capacity))
+      print(command)
       return command
 
    def applycmdhosts( self, command):
@@ -55,13 +55,13 @@ class service:
             hosts += self.str_hostseparator
          hosts += host
       command = command.replace( self.str_hosts, hosts)
-      print 'Hosts list "%s" applied:' % str( hosts)
-      print command
+      print('Hosts list "%s" applied:' % str( hosts))
+      print(command)
       return command
 
    def checkfiles( self, sizemin, sizemax):
-      print 'Checking for "'+self.files+'" '+str(sizemin)+'-'+str(sizemax)
+      print('Checking for "'+self.files+'" '+str(sizemin)+'-'+str(sizemax))
       if self.files == '':
-         print 'Error: service::checkfiles: Files not set!'
+         print('Error: service::checkfiles: Files not set!')
          return False
       return True

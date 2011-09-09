@@ -5,7 +5,7 @@ import os
 import sys
 
 import pyaf
-print 'Python module = "%s"' % pyaf.__file__
+print('Python module = "%s"' % pyaf.__file__)
 
 import afenv
 import afnetwork
@@ -25,7 +25,7 @@ class Task(pyaf.Task):
       pyaf.Task.__init__( self)
       if taskname != '': self.setName( taskname) 
       self.env = afenv.Env()
-      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      if self.env.valid == False: print('ERROR: Invalid environment, may be some problems.')
       self.pm = PathMap( self.env.Vars['afroot'])
 
    def setCommand( self, cmd, TransferToServer = True):
@@ -38,12 +38,12 @@ class Task(pyaf.Task):
 class Block(pyaf.Block):
    def __init__( self, blockname = 'block', service = 'generic'):
       self.env = afenv.Env()
-      if self.env.valid == False: print 'ERROR: Invalid environment, may be some problems.'
+      if self.env.valid == False: print('ERROR: Invalid environment, may be some problems.')
       self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Block.__init__( self)
       parser = ''
       if not CheckClass( self.env.Vars['afroot'], service, 'services'):
-         print 'Error: Unknown service "%s", setting to "generic"' % service
+         print('Error: Unknown service "%s", setting to "generic"' % service)
          service = 'generic'
       else:
          __import__("services", globals(), locals(), [service])
@@ -60,7 +60,7 @@ class Block(pyaf.Block):
          if not nocheck:
             if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
                if parser != 'none':
-                  print 'Error: Unknown parser "%s", setting to "none"' % parser
+                  print('Error: Unknown parser "%s", setting to "none"' % parser)
                   parser = 'none'
       pyaf.Block.setParser( self, parser)
 
@@ -95,8 +95,8 @@ class Block(pyaf.Block):
          if isinstance( task, Task):
             self.appendTask( task)
          else:
-            print 'Warning: Skipping element[%d] of list "tasks" which is not an instance of "Task" class:' % t
-            print repr(task)
+            print('Warning: Skipping element[%d] of list "tasks" which is not an instance of "Task") class:' % t)
+            print(repr(task))
          t += 1
 
 class Job(pyaf.Job):
@@ -119,7 +119,7 @@ class Job(pyaf.Job):
    def setUserName( self, username):
       if username == None or username == '':
          username = 'none'
-         print 'Error: Username is empty.'
+         print('Error: Username is empty.')
       username = username.lower()
       pyaf.Job.setUserName( self, username)
 
@@ -127,7 +127,7 @@ class Job(pyaf.Job):
       if priority < 0: return
       if priority > 250:
          priority = 250
-         print 'Warning: priority clamped to maximum = %d' % priority
+         print('Warning: priority clamped to maximum = %d' % priority)
       pyaf.Job.setPriority( self, priority)
 
    def setCmdPre(  self, cmd, TransferToServer = True):
@@ -145,19 +145,19 @@ class Job(pyaf.Job):
             block.fillTasks()
             self.appendBlock( block)
          else:
-            print 'Warning: Skipping element[%d] of list "blocks" which is not an instance of "Block" class:' % b
-            print repr(block)
+            print('Warning: Skipping element[%d] of list "blocks" which is not an instance of "Block" class:' % b)
+            print(repr(block))
          b += 1
 
    def output( self, full = False):
       self.fillBlocks()
-      if full: print 'Job information:'
-      else:    print 'Job: ',
+      if full: print('Job information:')
+      else:    print('Job: ',)
       pyaf.Job.output( self, full)
 
    def send( self, verbose = False):
       if len( self.blocks) == 0:
-         print 'Error: Job has no blocks'
+         print('Error: Job has no blocks')
          return False
       self.fillBlocks()
       if self.construct() == False: return False
@@ -169,11 +169,11 @@ class Job(pyaf.Job):
    def setOffline( self): self.offline()
 
 
-class Cmd(pyaf.Cmd):
+class Cmd( pyaf.Cmd):
    def __init__( self ):
       self.env = afenv.Env()
       if self.env.valid == False:
-         print 'ERROR: Invalid environment, may be some problems.'
+         print('ERROR: Invalid environment, may be some problems.')
       self.pm = PathMap( self.env.Vars['afroot'])
       pyaf.Cmd.__init__( self, self.env.Vars['servername'], self.env.Vars['serverport'])
       pyaf.Cmd.setUserName( self, self.env.Vars['username'])
@@ -181,6 +181,9 @@ class Cmd(pyaf.Cmd):
       self.requestOutput = None
    
    def _sendRequest(self, verbose = False):
+      if self.getDataLen() < 1:
+         print('ERROR: Request message is not set.')
+         return False
       output = afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)
       if output[0] == True:
          self.requestOutput = output[1]
@@ -188,21 +191,21 @@ class Cmd(pyaf.Cmd):
       else:
          self.requestOutput = None
          return False
-   
+
    def getJobList( self, verbose = False):
       self.getjoblist(0)
       if self._sendRequest(verbose):
          return self.decodejoblist(self.requestOutput)
       else:
          return False
-   
+
    def deleteJob(self, jobName, verbose = False):
       self.deletejob(jobName)
       if self._sendRequest(verbose):
          return True
       else:
          return False
-   
+
    def getJobInfo(self, jobId, verbose = False):
       self.getjobinfo(jobId)
       if self._sendRequest(verbose):
@@ -226,7 +229,8 @@ class Cmd(pyaf.Cmd):
       self.renderejecttasks( self.env.Vars['hostname'] + '.*', text)
       self._sendRequest()
 
-   def getRenderList( self, mask):
-      self.getjobinfo(jobId)
-      if self._sendRequest(verbose):
-         return self.decodejobinfo(self.requestOutput)
+   def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'] + '.*')
+   def renderGetList( self, mask = '.*'):
+      if not self.renderlistget( mask): return
+      if self._sendRequest():
+         return self.renderlistdecode( self.requestOutput)

@@ -150,10 +150,9 @@ PyObject * PyAf_Cmd_renderlistget( PyAf_Cmd_Object * self, PyObject * args)
 }
 PyObject * PyAf_Cmd_renderlistdecode( PyAf_Cmd_Object * self, PyObject * args)
 {
-   int len;
-   char * buffer;
-   PyArg_ParseTuple(args, "s#", &buffer, &len);
-   af::Msg * message = new af::Msg( buffer, len);
+   Py_ssize_t length;
+   char * buffer = PyAf::GetData( length, args, "PyAf_Cmd_renderlistdecode");
+   af::Msg * message = new af::Msg( buffer, length);
    af::MCAfNodes mcNodes( message);
    delete message;
 
@@ -239,8 +238,8 @@ PyObject * PyAf_Cmd_getDataLen( PyAf_Cmd_Object *self)
 
 PyObject * PyAf_Cmd_getData( PyAf_Cmd_Object *self)
 {
+   if( self->cmd->getDataLen() < 1 ) Py_RETURN_NONE;
    PyObject * result = PyBytes_FromStringAndSize( self->cmd->getData(), self->cmd->getDataLen());
    Py_INCREF( result);
    return result;
 }
-

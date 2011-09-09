@@ -1,4 +1,4 @@
 from dailies import *
-from delcurdir import *
 from docs import *
+from pathcurdir import *
 from pathmap import *

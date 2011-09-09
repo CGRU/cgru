@@ -40,8 +40,7 @@ class Config:
          configfiles.append( self.Vars['HOME_CONFIGFILE'])
 
       for filename in configfiles:
-#         if self.verbose: print 'Trying to open %s' % filename
-#         print('Trying to open %s' % filename)
+         if self.verbose: print('Trying to open %s' % filename)
          if os.path.isfile( filename):
             file = open( filename, 'r')
             filedata = file.read()
@@ -50,12 +49,11 @@ class Config:
             parser.StartElementHandler    = self.parser_start_element
             parser.EndElementHandler      = self.parser_end_element
             parser.CharacterDataHandler   = self.parser_char_data
-#            if self.verbose: print 'Parsing %s' % filename
-            parser.Parse( filedata)
-#            try:
-#               parser.Parse( filedata)
-#            except xml.parsers.expat.ExpatError as err:
-#               print("Error:", xml.parsers.expat.errors.messages[err.code], ': line', err.lineno, ', column', err.offset)
+            if self.verbose: print('Parsing %s' % filename)
+            try:
+               parser.Parse( filedata)
+            except xml.parsers.expat.ExpatError as err:
+               print("Error:", xml.parsers.expat.errors.messages[err.code], ': line', err.lineno, ', column', err.offset)
 
    def parser_start_element( self, name, attrs ):
       self.element_hasdata = False
@@ -65,7 +63,7 @@ class Config:
    def parser_end_element( self, name ):
       if self.element == '': return
       if self.element_hasdata == False: self.Vars[self.element] = ''
-#      if self.verbose: print '\t' + self.element + ' = "%s"' % self.Vars[self.element]
+      if self.verbose: print('\t' + self.element + ' = "%s"' % self.Vars[self.element])
       self.element = ''
 
    def parser_char_data( self, data ):

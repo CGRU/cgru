@@ -102,3 +102,54 @@ bool PyAf::GetStrings( PyObject * obj, std::vector<std::string> & list, int min,
    }
    return true;
 }
+
+char * PyAf::GetData( Py_ssize_t & length, PyObject * obj, const char * errMsg)
+{
+   char * data = NULL;
+#if PY_MAJOR_VERSION < 3
+   if( PyString_Check(obj))
+   {
+      int result = PyString_AsStringAndSize( obj, &data, &length);
+      if( result != -1 ) return data;
+      outError("PyString object decoding problems.", errMsg);
+      return NULL;
+   }
+#else
+   if( PyBytes_Check(obj))
+   {
+      int result = PyBytes_AsStringAndSize( obj, &data, &length);
+      if( result != -1 ) return data;
+      outError("PyBytes object decoding problems.", errMsg);
+      return NULL;
+   }
+#endif
+   if( PyUnicode_Check(obj))
+   {
+      obj = PyUnicode_AsUTF8String( obj);
+      if( obj == NULL )
+      {
+         outError("PyUnicode object encoding problems.", errMsg);
+         return false;
+      }
+#if PY_MAJOR_VERSION < 3
+      int result = PyString_AsStringAndSize( obj, &data, &length);
+      if( result == -1 )
+      {
+         outError("PyString from PyUnicode object decoding problems.", errMsg);
+         return NULL;
+      }
+#else
+      int result = PyBytes_AsStringAndSize( obj, &data, &length);
+      if( result == -1 )
+      {
+         outError("PyBytes from PyUnicode object decoding problems.", errMsg);
+         return NULL;
+      }
+#endif
+      Py_DECREF( obj);
+      return data;
+   }
+   outError("Object is not a bytes array, string or unicode.", errMsg);
+
+   return NULL;
+}

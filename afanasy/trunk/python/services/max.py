@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import service
+from services import service
 
 parser='max'
 
