@@ -20,8 +20,8 @@
 
 int PyAf_Cmd_init( PyAf_Cmd_Object *self, PyObject *args)
 {
-	self->cmd = new afapi::Cmd();
-	return 0;
+        self->cmd = new afapi::Cmd();
+        return 0;
 }
 
 void PyAf_Cmd_dealloc( PyAf_Cmd_Object * self)
@@ -32,17 +32,17 @@ void PyAf_Cmd_dealloc( PyAf_Cmd_Object * self)
 #endif
 }
 
-PyObject * PyAf_Cmd_setUserName( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_setUserName( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::string str;
-   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setUserName")) Py_RETURN_FALSE;
+   if( false == PyAf::GetString( args, str, "PyAf_Cmd_setUserName")) Py_RETURN_FALSE;
    self->cmd->setUserName( str);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_setHostName( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_setHostName( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::string str;
-   if( false == PyAf::GetString( arg, str, "PyAf_Cmd_setHostName")) Py_RETURN_FALSE;
+   if( false == PyAf::GetString( args, str, "PyAf_Cmd_setHostName")) Py_RETURN_FALSE;
    self->cmd->setHostName( str);
    Py_RETURN_TRUE;
 }
@@ -141,34 +141,90 @@ PyObject * PyAf_Cmd_decodeJobInfo( PyAf_Cmd_Object *self, PyObject *args)
    return jobInfo;
 }
 
-PyObject * PyAf_Cmd_rendersetnimby( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_renderlistget( PyAf_Cmd_Object * self, PyObject * args)
+{
+   std::string str;
+   if( false == PyAf::GetString( args, str, "PyAf_Cmd_renderlistget")) Py_RETURN_FALSE;
+   self->cmd->renderGetList( str);
+   Py_RETURN_TRUE;
+}
+PyObject * PyAf_Cmd_renderlistdecode( PyAf_Cmd_Object * self, PyObject * args)
+{
+   int len;
+   char * buffer;
+   PyArg_ParseTuple(args, "s#", &buffer, &len);
+   af::Msg * message = new af::Msg( buffer, len);
+   af::MCAfNodes mcNodes( message);
+   delete message;
+
+   PyObject * pylist = PyList_New(0);
+   for( unsigned i = 0 ; i < mcNodes.getCount(); i++)
+   {
+      af::Render * render = (af::Render*)(mcNodes.getNode(i));
+      PyObject * pydict = PyDict_New();
+      PyDict_SetItemString( pydict, "id", PyLong_FromLong( render->getId()));
+      PyDict_SetItemString( pydict, "name", PyBytes_FromString( render->getName().c_str()));
+      PyDict_SetItemString( pydict, "username", PyBytes_FromString( render->getUserName().c_str()));
+      PyDict_SetItemString( pydict, "revision", PyLong_FromLong( render->getRevision()));
+      PyDict_SetItemString( pydict, "version", PyBytes_FromString( render->getVersion().c_str()));
+      PyDict_SetItemString( pydict, "annotation", PyBytes_FromString( render->getAnnontation().c_str()));
+      PyDict_SetItemString( pydict, "online", PyBool_FromLong( render->isOnline()));
+      PyDict_SetItemString( pydict, "busy", PyBool_FromLong( render->isBusy()));
+      PyDict_SetItemString( pydict, "free", PyBool_FromLong( render->isFree()));
+      PyDict_SetItemString( pydict, "nimby", PyBool_FromLong( render->isNimby()));
+      PyDict_SetItemString( pydict, "NIMBY", PyBool_FromLong( render->isNIMBY()));
+      PyDict_SetItemString( pydict, "address", PyBytes_FromString( render->getAddress().generateInfoString().c_str()));
+      PyDict_SetItemString( pydict, "time_launched", PyLong_FromLong( render->getTimeLaunch()));
+      PyDict_SetItemString( pydict, "time_registered", PyLong_FromLong( render->getTimeRegister()));
+      PyDict_SetItemString( pydict, "time_taskstartfinish", PyLong_FromLong( render->getTasksStartFinishTime()));
+      PyDict_SetItemString( pydict, "info", PyBytes_FromString( render->generateInfoString( true).c_str()));
+      PyDict_SetItemString( pydict, "resources", PyBytes_FromString( render->getHostRes().generateInfoString( &render->getHost(), true).c_str()));
+      PyObject * pylist_tasks = PyList_New(0);
+      std::list<af::TaskExec*> tasks;
+      for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
+      {
+         PyObject * taskInfo = PyDict_New();
+         PyDict_SetItemString( taskInfo, "name", PyBytes_FromString((*it)->getName().c_str()));
+         PyDict_SetItemString( taskInfo, "service", PyBytes_FromString((*it)->getServiceType().c_str()));
+         PyDict_SetItemString( taskInfo, "name_user", PyBytes_FromString((*it)->getUserName().c_str()));
+         PyDict_SetItemString( taskInfo, "name_job", PyBytes_FromString((*it)->getJobName().c_str()));
+         PyDict_SetItemString( taskInfo, "name_block", PyBytes_FromString((*it)->getBlockName().c_str()));
+         PyList_Append( pylist_tasks, taskInfo);
+      }
+      PyDict_SetItemString( pydict, "tasks", pylist_tasks);
+      PyList_Append( pylist, pydict);
+   }
+   return pylist;
+}
+
+PyObject * PyAf_Cmd_rendersetnimby( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderSetNimby( list[0]);
    else self->cmd->renderSetNimby( list[0], list[1]);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_rendersetNIMBY( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_rendersetNIMBY( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setNIMBY")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setNIMBY")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderSetNIMBY( list[0]);
    else self->cmd->renderSetNIMBY( list[0], list[1]);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_rendersetfree( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_rendersetfree( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderSetFree( list[0]);
    else self->cmd->renderSetFree( list[0], list[1]);
    Py_RETURN_TRUE;
 }
-PyObject * PyAf_Cmd_renderejecttasks( PyAf_Cmd_Object * self, PyObject * arg)
+PyObject * PyAf_Cmd_renderejecttasks( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( arg, list, 1, 2, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderEjectTasks( list[0]);
    else self->cmd->renderEjectTasks( list[0], list[1]);
    Py_RETURN_TRUE;

@@ -380,7 +380,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       painter->setPen(   afqt::QEnvironment::qclr_black );
       painter->setFont(  afqt::QEnvironment::f_info);
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignRight,   state    );
-		QRect rect_center;
+                QRect rect_center;
       painter->drawText( x+5, y, w-10, HeightOffline, Qt::AlignVCenter | Qt::AlignHCenter, offlineState_time, &rect_center);
       painter->drawText( x+5, y, (w>>1)-10-(rect_center.width()>>1), HeightOffline, Qt::AlignVCenter | Qt::AlignLeft,    name + ' ' + version );
       painter->drawText( x+5, y+2, w-10, HeightOffline-4 + HeightOffline, Qt::AlignBottom | Qt::AlignHCenter, annotation);
@@ -432,7 +432,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str())).arg(QString::fromUtf8((*it)->getBlockName().c_str())).arg(QString::fromUtf8((*it)->getName().c_str()));
          if((*it)->getNumber()) taskstr += QString("(%1)").arg((*it)->getNumber());
 
-			QRect rect_usertime;
+         QRect rect_usertime;
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
             QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
          painter->drawText( x+18, y, w-30-rect_usertime.width(), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);

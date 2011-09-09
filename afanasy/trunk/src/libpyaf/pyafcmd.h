@@ -18,10 +18,12 @@ PyObject * PyAf_Cmd_decodeJobList(           PyAf_Cmd_Object *self,     PyObject
 PyObject * PyAf_Cmd_getJobInfo(              PyAf_Cmd_Object *self,     PyObject *args);
 PyObject * PyAf_Cmd_decodeJobInfo(           PyAf_Cmd_Object *self,     PyObject *args);
 PyObject * PyAf_Cmd_deleteJob(               PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_rendersetnimby(          PyAf_Cmd_Object *self, 	PyObject *arg );
-PyObject * PyAf_Cmd_rendersetNIMBY(          PyAf_Cmd_Object *self, 	PyObject *arg );
-PyObject * PyAf_Cmd_rendersetfree(           PyAf_Cmd_Object *self, 	PyObject *arg );
-PyObject * PyAf_Cmd_renderejecttasks(        PyAf_Cmd_Object *self, 	PyObject *arg );
+PyObject * PyAf_Cmd_renderlistget(           PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_renderlistdecode(        PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_rendersetnimby(          PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_rendersetNIMBY(          PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_rendersetfree(           PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_renderejecttasks(        PyAf_Cmd_Object *self, 	PyObject *args);
 PyObject * PyAf_Cmd_getDataLen(              PyAf_Cmd_Object *self);
 PyObject * PyAf_Cmd_getData(                 PyAf_Cmd_Object *self);
 
@@ -34,6 +36,8 @@ static PyMethodDef PyAf_Cmd_methods[] = {
    {"getjobinfo",             (PyCFunction) PyAf_Cmd_getJobInfo,              METH_VARARGS,  "Get job info."               },
    {"decodejobinfo",          (PyCFunction) PyAf_Cmd_decodeJobInfo,           METH_VARARGS,  "Decode job info."            },
    {"deletejob",              (PyCFunction) PyAf_Cmd_deleteJob,               METH_VARARGS,  "Delete Job(s)."              },
+   {"renderlistget",          (PyCFunction) PyAf_Cmd_renderlistget,           METH_VARARGS,  "Get render(s)."              },
+   {"renderlistdecode",       (PyCFunction) PyAf_Cmd_renderlistdecode,        METH_VARARGS,  "Decode renders list."        },
    {"rendersetnimby",         (PyCFunction) PyAf_Cmd_rendersetnimby,          METH_VARARGS,  "Set render 'nimby'."         },
    {"rendersetNIMBY",         (PyCFunction) PyAf_Cmd_rendersetNIMBY,          METH_VARARGS,  "Set render 'NIMBY'."         },
    {"rendersetfree",          (PyCFunction) PyAf_Cmd_rendersetfree,           METH_VARARGS,  "Free render(s)."             },

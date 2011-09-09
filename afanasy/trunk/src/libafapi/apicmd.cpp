@@ -97,6 +97,11 @@ bool Cmd::JobDelete( const std::string & jobMask)
    return true;
 }
 
+void Cmd::renderGetList( const std::string & renderMask)
+{
+   af::MCGeneral mcgeneral( renderMask, 0);
+   action( af::Msg::TRendersListRequestIds, mcgeneral);
+}
 void Cmd::renderSetNimby( const std::string & renderMask, const std::string & string)
 {
    af::MCGeneral mcgeneral( renderMask, 0);

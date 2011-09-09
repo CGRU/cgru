@@ -225,3 +225,8 @@ class Cmd(pyaf.Cmd):
    def renderEjectTasks( self, text):
       self.renderejecttasks( self.env.Vars['hostname'] + '.*', text)
       self._sendRequest()
+
+   def getRenderList( self, mask):
+      self.getjobinfo(jobId)
+      if self._sendRequest(verbose):
+         return self.decodejobinfo(self.requestOutput)
