@@ -45,9 +45,9 @@ void QThreadClientUp::setUpMsg( QMsg * msg)
 
    queue.push( msg);
 
-   if( ! blocking )
+   if( false == blocking )
    {
-      if( ! timer.isActive() )
+      if( false == timer.isActive() )
       {
          send();
          timer.start();
@@ -55,7 +55,7 @@ void QThreadClientUp::setUpMsg( QMsg * msg)
    }
    else
    {
-      if( ! isRunning() )            start();
+      if( false == isRunning() ) start();
    }
 }
 

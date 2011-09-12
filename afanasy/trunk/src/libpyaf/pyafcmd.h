@@ -11,19 +11,22 @@
 int  PyAf_Cmd_init(    PyAf_Cmd_Object * self, PyObject *args);
 void PyAf_Cmd_dealloc( PyAf_Cmd_Object * self);
 
-PyObject * PyAf_Cmd_setUserName(             PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_setHostName(             PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_getJobList(              PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_decodeJobList(           PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_getJobInfo(              PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_decodeJobInfo(           PyAf_Cmd_Object *self,     PyObject *args);
-PyObject * PyAf_Cmd_deleteJob(               PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_renderlistget(           PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_renderlistdecode(        PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_rendersetnimby(          PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_rendersetNIMBY(          PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_rendersetfree(           PyAf_Cmd_Object *self, 	PyObject *args);
-PyObject * PyAf_Cmd_renderejecttasks(        PyAf_Cmd_Object *self, 	PyObject *args);
+PyObject * PyAf_Cmd_setUserName(             PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_setHostName(             PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_getJobList(              PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_decodeJobList(           PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_getJobInfo(              PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_decodeJobInfo(           PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_deleteJob(               PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_renderlistget(           PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_renderlistdecode(        PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_rendersetnimby(          PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_rendersetNIMBY(          PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_rendersetfree(           PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_renderejecttasks(        PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_renderexit(              PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_talkexit(                PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_monitorexit(             PyAf_Cmd_Object *self, PyObject *args);
 PyObject * PyAf_Cmd_getDataLen(              PyAf_Cmd_Object *self);
 PyObject * PyAf_Cmd_getData(                 PyAf_Cmd_Object *self);
 
@@ -42,6 +45,9 @@ static PyMethodDef PyAf_Cmd_methods[] = {
    {"rendersetNIMBY",         (PyCFunction) PyAf_Cmd_rendersetNIMBY,          METH_VARARGS,  "Set render 'NIMBY'."         },
    {"rendersetfree",          (PyCFunction) PyAf_Cmd_rendersetfree,           METH_VARARGS,  "Free render(s)."             },
    {"renderejecttasks",       (PyCFunction) PyAf_Cmd_renderejecttasks,        METH_VARARGS,  "Eject render running tasks"  },
+   {"renderexit",             (PyCFunction) PyAf_Cmd_renderexit,              METH_VARARGS,  "Exit render (by server)"     },
+   {"talkexit",               (PyCFunction) PyAf_Cmd_talkexit,                METH_VARARGS,  "Exit talk (by server)"       },
+   {"monitorexit",            (PyCFunction) PyAf_Cmd_monitorexit,             METH_VARARGS,  "Exit monitor (by server)"    },
    {"getDataLen",             (PyCFunction) PyAf_Cmd_getDataLen,              METH_NOARGS,   "Get job data length."        },
    {"getData",                (PyCFunction) PyAf_Cmd_getData,                 METH_NOARGS,   "Get job data."               },
    { NULL, NULL, 0, NULL } // Sentinel

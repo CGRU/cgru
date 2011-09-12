@@ -199,7 +199,7 @@ PyObject * PyAf_Cmd_renderlistdecode( PyAf_Cmd_Object * self, PyObject * args)
 PyObject * PyAf_Cmd_rendersetnimby( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setNimby")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setnimby")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderSetNimby( list[0]);
    else self->cmd->renderSetNimby( list[0], list[1]);
    Py_RETURN_TRUE;
@@ -215,7 +215,7 @@ PyObject * PyAf_Cmd_rendersetNIMBY( PyAf_Cmd_Object * self, PyObject * args)
 PyObject * PyAf_Cmd_rendersetfree( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setFree")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_setfree")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderSetFree( list[0]);
    else self->cmd->renderSetFree( list[0], list[1]);
    Py_RETURN_TRUE;
@@ -223,9 +223,36 @@ PyObject * PyAf_Cmd_rendersetfree( PyAf_Cmd_Object * self, PyObject * args)
 PyObject * PyAf_Cmd_renderejecttasks( PyAf_Cmd_Object * self, PyObject * args)
 {
    std::vector<std::string> list;
-   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_ejectTasks")) Py_RETURN_FALSE;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_ejecttasks")) Py_RETURN_FALSE;
    if( list.size() == 1 ) self->cmd->renderEjectTasks( list[0]);
    else self->cmd->renderEjectTasks( list[0], list[1]);
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Cmd_renderexit( PyAf_Cmd_Object * self, PyObject * args)
+{
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_renderexit")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->renderExit( list[0]);
+   else self->cmd->renderExit( list[0], list[1]);
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Cmd_talkexit( PyAf_Cmd_Object * self, PyObject * args)
+{
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_talkexit")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->talkExit( list[0]);
+   else self->cmd->talkExit( list[0], list[1]);
+   Py_RETURN_TRUE;
+}
+
+PyObject * PyAf_Cmd_monitorexit( PyAf_Cmd_Object * self, PyObject * args)
+{
+   std::vector<std::string> list;
+   if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_monitorexit")) Py_RETURN_FALSE;
+   if( list.size() == 1 ) self->cmd->monitorExit( list[0]);
+   else self->cmd->monitorExit( list[0], list[1]);
    Py_RETURN_TRUE;
 }
 

@@ -30,6 +30,11 @@ public:
    void renderSetNIMBY(    const std::string & renderMask, const std::string & string = std::string()); ///< Set "NIMBY"
    void renderSetFree(     const std::string & renderMask, const std::string & string = std::string()); ///< Set render free
    void renderEjectTasks(  const std::string & renderMask, const std::string & string = std::string()); ///< Eject running tasks
+   void renderExit(        const std::string & renderMask, const std::string & string = std::string()); ///< Exit render (will ask server to shutdown it)
+
+   void talkExit( const std::string & renderMask, const std::string & string = std::string()); ///< Exit task (will ask server to shutdown it)
+
+   void monitorExit( const std::string & renderMask, const std::string & string = std::string()); ///< Exit monitor(afwatch) (will ask server to shutdown it)
 
    char * getData();
 /// Get raw job data length.

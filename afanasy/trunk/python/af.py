@@ -229,6 +229,18 @@ class Cmd( pyaf.Cmd):
       self.renderejecttasks( self.env.Vars['hostname'] + '.*', text)
       self._sendRequest()
 
+   def renderExit( self, text):
+      self.renderexit( self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()
+
+   def talkExit( self, text):
+      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()
+
+   def monitorExit( self, text):
+      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + '.*', text)
+      self._sendRequest()
+
    def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'] + '.*')
    def renderGetList( self, mask = '.*'):
       if not self.renderlistget( mask): return

@@ -126,6 +126,26 @@ void Cmd::renderEjectTasks( const std::string & renderMask, const std::string & 
    if( false == string.empty()) mcgeneral.setString( string);
    action( af::Msg::TRenderEject, mcgeneral);
 }
+void Cmd::renderExit( const std::string & renderMask, const std::string & string)
+{
+   af::MCGeneral mcgeneral( renderMask, 0);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TRenderExit, mcgeneral);
+}
+
+void Cmd::talkExit( const std::string & renderMask, const std::string & string)
+{
+   af::MCGeneral mcgeneral( renderMask, 0);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TTalkExit, mcgeneral);
+}
+
+void Cmd::monitorExit( const std::string & renderMask, const std::string & string)
+{
+   af::MCGeneral mcgeneral( renderMask, 0);
+   if( false == string.empty()) mcgeneral.setString( string);
+   action( af::Msg::TMonitorExit, mcgeneral);
+}
 
 void Cmd::action( int type, af::MCGeneral & mcgeneral)
 {
