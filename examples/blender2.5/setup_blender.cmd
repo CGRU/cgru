@@ -4,6 +4,7 @@ POPD
 
 set BLENDER_LOCATION="C:\Program Files\Blender Foundation\Blender"
 
-call %AF_ROOT%\py3k_setup.cmd 3.2
+rem Setup special Python module:
+set PYTHONPATH=%AF_ROOT%\bin_pyaf\3.2;%PYTHONPATH%
 
 if exist override.cmd call override.cmd
