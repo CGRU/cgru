@@ -88,6 +88,12 @@ class Tray( QtGui.QSystemTrayIcon):
 
       self.menu['AFANASY'].addSeparator()
 
+      action = QtGui.QAction('Nimby Schedule...', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
+      self.menu['AFANASY'].addAction( action)
+
+      self.menu['AFANASY'].addSeparator()
+
       action = QtGui.QAction('Exit Render', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exit)
       self.menu['AFANASY'].addAction( action)
@@ -96,12 +102,6 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Exit Talk', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exittalk)
-      self.menu['AFANASY'].addAction( action)
-
-      self.menu['AFANASY'].addSeparator()
-
-      action = QtGui.QAction('Nimby Schedule...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editNimby)
       self.menu['AFANASY'].addAction( action)
 
       self.menu['menu'].addSeparator()
