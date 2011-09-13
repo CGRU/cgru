@@ -45,6 +45,15 @@ class Tray( QtGui.QSystemTrayIcon):
          QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.update)
          self.menu['menu'].addAction( action)
          self.menu['menu'].addSeparator()
+
+      # Software menu:
+      self.menu['Software'] = QtGui.QMenu('Software')
+      self.menu['menu'].addMenu( self.menu['Software'])
+      action = QtGui.QAction('Nuke', self)
+#      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.update)
+      self.menu['Software'].addAction( action)
+      self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
+      self.menu['Software'].addMenu( self.menu['Setup Soft'])
          
       # Load menu:
       menudir = os.path.join( os.environ['CGRU_KEEPER'], 'menu')
@@ -52,7 +61,7 @@ class Tray( QtGui.QSystemTrayIcon):
          if dirpath.find('/.') != -1: continue
          if dirpath.find('\\.') != -1: continue
          menuname = os.path.basename( dirpath)
-         if menuname not in self.menu:
+         if menuname != 'menu':
             self.menu[menuname] = QtGui.QMenu( menuname)
             self.menu['menu'].addMenu( self.menu[menuname])
          filenames.sort()
