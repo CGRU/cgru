@@ -44,7 +44,6 @@ rcopy afanasy/$afanasy/init $dest/afanasy
 rcopy afanasy/$afanasy/launch $dest/afanasy
 rcopy afanasy/$afanasy/plugins $dest/afanasy
 rcopy afanasy/$afanasy/python $dest/afanasy
-rcopy afanasy/$afanasy/python3 $dest/afanasy
 rcopy afanasy/$afanasy/webvisor $dest/afanasy
 
 copy utilities $dest/utilities
