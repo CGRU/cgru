@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source $CGRU_LOCATION/software_setup/setup_nuke.sh
+
+$APP_EXE "$@"

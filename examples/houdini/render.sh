@@ -1,5 +1,8 @@
 #!/bin/bash
 
-source ./setup_houdini.sh
+pushd ../.. >> /dev/null
+source ./setup.sh
+popd
 
-python ./render.py $*
+# Launch render script:
+python ./render.py

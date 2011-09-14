@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source ./setup_houdini.sh
-
-hython "$@"

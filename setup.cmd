@@ -20,3 +20,6 @@ echo CGRU_VERSION %CGRU_VERSION%
 
 rem Call custom setup scripts:
 For /F "Tokens=*" %%I in ('dir /b setup_*.cmd') Do call %%I
+
+rem Add software to PATH:
+SET "PATH=%CGRU_LOCATION%\software_setup\bin;%PATH%"

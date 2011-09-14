@@ -27,3 +27,6 @@ if [ ! -z "$setup_files" ] ; then
       source ./$setup_file ""
    done
 fi
+
+# Add software to PATH:
+export PATH="${CGRU_LOCATION}/software_setup/bin:${PATH}"

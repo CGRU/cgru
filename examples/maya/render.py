@@ -7,7 +7,7 @@ import af
 job = af.Job('Maya Example')
 
 block = af.Block('render', 'maya')
-block.setCommand('./maya -batch -file ' + os.getcwd() + '/scene.mb -command "afanasyBatch(%1,%2,1,1)"')
+block.setCommand('maya -batch -file ' + os.getcwd() + '/scene.mb -command "afanasyBatch(@#@,@#@,1,1)"')
 block.setNumeric( 1, 5, 2)
 
 job.blocks.append(block)
