@@ -187,10 +187,12 @@ void* ThreadServer_accept(void* arg)
    bzero( &server_sockaddr_in4, sizeof(server_sockaddr_in4));
    server_sockaddr_in4.sin_port = htons( af::Environment::getServerPort());
    server_sockaddr_in4.sin_addr.s_addr = INADDR_ANY;
+   server_sockaddr_in4.sin_family = AF_INET;
 
    struct sockaddr_in6 server_sockaddr_in6;
    bzero( &server_sockaddr_in6, sizeof(server_sockaddr_in6));
    server_sockaddr_in6.sin6_port = htons( af::Environment::getServerPort());
+   server_sockaddr_in6.sin6_family = AF_INET6;
 //   server_sockaddr_in6.sin6_addr = IN6ADDR_ANY_INIT; // This is default value, it is zeros
 
 //
