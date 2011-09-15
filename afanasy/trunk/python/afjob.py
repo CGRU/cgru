@@ -307,7 +307,7 @@ if fpt < 1:
    print 'fpt - frames per task - must be > 0 ( setting to 1)'
    fpt = 1
 
-if images == '' and image != '': images = cgruutils.cPathFrom1(image)
+if images == '' and image != '': images = afcommon.patternFromDigits( image)
 
 if tempscene:
    scene = cgruutils.copyJobFile( scene, name, ext)
@@ -379,7 +379,7 @@ elif ext == 'max':
       else: blockname = take
    if output != '':
       cmd += ' -o:"%s"' % output
-      images = cgruutils.cPathFrom1(output)
+      images = afcommon.patternFromDigits( output)
 
 # simple generic:
 else:

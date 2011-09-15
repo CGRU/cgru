@@ -1,4 +1,4 @@
-PUSHD ..
+PUSHD ..\..
 call setup.cmd
 POPD
 

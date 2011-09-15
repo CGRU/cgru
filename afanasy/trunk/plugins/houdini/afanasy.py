@@ -71,11 +71,11 @@ class BlockParameters:
          opname = ropnode.name()
          trange = ropnode.parm('trange')
          if trange is not None:
-            if trange.eval() > 0:
+            if int(trange.eval()) > 0:
                if ropnode.parm('f1') is not None: self.frame_first = int( ropnode.parm('f1').eval())
                if ropnode.parm('f2') is not None: self.frame_last  = int( ropnode.parm('f2').eval())
                if ropnode.parm('f3') is not None: self.frame_inc   = int( ropnode.parm('f3').eval())
-            if trange.eval() > 1: self.fullrangedepend = True
+            if int(trange.eval()) > 1: self.fullrangedepend = True
       if self.frame_last < self.frame_first:
          hou.ui.displayMessage('Last frame < first frame for "%s"' % opname)
          return
@@ -133,7 +133,7 @@ class BlockParameters:
       if ropnode:
          trange = ropnode.parm('trange')
          soho_foreground = ropnode.parm('soho_foreground')
-         if trange != None and trange.eval() == 0:
+         if trange != None and int(trange.eval()) == 0:
             if soho_foreground != None:
                if soho_foreground.eval() == 0:
                   try:
@@ -345,7 +345,7 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
    else:
       frame_first, frame_last, frame_inc, frame_pertask = frame_range
    trange = afnode.parm('trange')
-   if trange.eval() > 0:
+   if int(trange.eval()) > 0:
       frame_first   = int( afnode.parm('f1').eval())
       frame_last    = int( afnode.parm('f2').eval())
       frame_inc     = int( afnode.parm('f3').eval())

@@ -1,7 +1,3 @@
-PUSHD ..
-call setup.cmd
-POPD
-
 set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
 
 set XSI_CGRU_PATH=%CGRU_LOCATION%\plugins\xsi
@@ -22,3 +18,6 @@ if defined PYTHONPATH (
 ) else (
    set PYTHONPATH=%XSI_AF_PATH%
 )
+
+set APP_DIR=%XSI_LOCATION%
+set APP_EXE=%XSI_LOCATION%\Application\bin\XSI.bat

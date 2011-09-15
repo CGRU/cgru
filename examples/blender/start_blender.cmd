@@ -1,1 +1,1 @@
-..\..\software_setup\start_blender.cmd %*
+..\..\software_setup\start_blender.cmd scene.blend

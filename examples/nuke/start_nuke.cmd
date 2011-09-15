@@ -1,1 +1,1 @@
-..\..\software_setup\start_nuke.cmd %*
+..\..\software_setup\start_nuke.cmd scene.nk

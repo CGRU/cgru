@@ -1,7 +1,0 @@
-#!/bin/bash
-
-pushd .. >> /dev/null
-source ./setup_houdini.sh
-popd >> /dev/null
-
-$HOUDINI_CGRU_PATH/hrender_af.py $*

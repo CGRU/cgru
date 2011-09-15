@@ -1,4 +1,6 @@
-call setup_max.cmd
+pushd ..\..
+call setup.cmd
+popd
 
 python render.py
 

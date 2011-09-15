@@ -178,7 +178,7 @@ class ORE_Submit(bpy.types.Operator):
       # Check and add Afanasy module in system path:
       afpython = os.getenv('AF_PYTHON')
       if afpython is None or afpython == '':
-         afpython = '/opt/cgru/afanasy/python3:/opt/cgru/afanasy/bin_pyaf/3.2'
+         afpython = '/opt/cgru/afanasy/python:/opt/cgru/afanasy/bin_pyaf/3.2.2'
       if afpython.find(';') != -1: afpython = afpython.split(';')
       else: afpython = afpython.split(':')
       for folder in afpython:
