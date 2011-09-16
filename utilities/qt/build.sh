@@ -1,6 +1,7 @@
 #!/bin/bash
 
 ver=4.7.4
+[ -z "$1" ] || ver=$1
 qtsrc=qt-everywhere-opensource-src-$ver
 qtdir=$PWD/$ver
 
@@ -26,7 +27,7 @@ cd $qtsrc
 if [ "$1" == "-h" ]; then
    ./configure -h
 else
-   ./configure $flags "$@"
+   ./configure $flags
    make
    make install
 fi
