@@ -13,10 +13,8 @@ if [ ! -z "${CGRU_LOCATION}" ]; then
    fi
 fi
 
-# Set Afanasy scripts version to use
-export NUKE_AF_VERSION="python"
 # Set Afanasy scripts location to use
-export NUKE_AF_PATH=$AF_ROOT/plugins/nuke/$NUKE_AF_VERSION
+export NUKE_AF_PATH=$AF_ROOT/plugins/nuke
 # Add Afanasy scripts to Nuke path
 if [ -z "${NUKE_PATH}" ]; then
    export NUKE_PATH="${NUKE_AF_PATH}"

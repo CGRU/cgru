@@ -9,8 +9,7 @@ if defined CGRU_LOCATION (
 )
 
 rem Setup afanasy addons:
-SET NUKE_AF_VERSION=python
-SET NUKE_AF_PATH=%AF_ROOT%\plugins\nuke\%NUKE_AF_VERSION%
+SET NUKE_AF_PATH=%AF_ROOT%\plugins\nuke
 if defined NUKE_PATH (
    set NUKE_PATH=%NUKE_AF_PATH%;%NUKE_PATH%
 ) else (

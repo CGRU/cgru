@@ -9,6 +9,7 @@ import af
 import info
 import nimby
 import render
+import software
 
 from dialog_nimby import DialogNimby
 
@@ -49,9 +50,20 @@ class Tray( QtGui.QSystemTrayIcon):
       # Software menu:
       self.menu['Software'] = QtGui.QMenu('Software')
       self.menu['menu'].addMenu( self.menu['Software'])
-      action = QtGui.QAction('Nuke', self)
-#      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.update)
+
+      action = QtGui.QAction('Blender', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startBlender)
       self.menu['Software'].addAction( action)
+      action = QtGui.QAction('Houdini', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startHoudini)
+      self.menu['Software'].addAction( action)
+      action = QtGui.QAction('Maya', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startMaya)
+      self.menu['Software'].addAction( action)
+      action = QtGui.QAction('Nuke', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startNuke)
+      self.menu['Software'].addAction( action)
+
       self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
       self.menu['Software'].addMenu( self.menu['Setup Soft'])
          
