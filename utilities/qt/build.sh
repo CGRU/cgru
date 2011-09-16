@@ -2,6 +2,11 @@
 
 ver=4.7.4
 [ -z "$1" ] || ver=$1
+
+for arg in $*; do
+   [ "$arg" == "--nosql" ] && nosql=1
+done
+
 qtsrc=qt-everywhere-opensource-src-$ver
 qtdir=$PWD/$ver
 
@@ -11,7 +16,7 @@ if [ ! -d $qtsrc ]; then
 fi
 
 flags="-prefix $qtdir -v -opensource -release -static"
-flags="$flags -qt-sql-psql"
+[ -z "$nosql" ] && flags="$flags -qt-sql-psql"
 flags="$flags -nomake examples -nomake demos"
 flags="$flags -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-webkit -no-javascript-jit -no-script -no-scripttools -no-declarative -no-gif -no-openssl"
 
