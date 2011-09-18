@@ -14,8 +14,10 @@ class Dialog( QtGui.QWidget):
       self.outputField.setReadOnly( True)
       self.layout.addWidget( self.outputField)
 
-      command = sys.argv[1]
-      arguments = sys.argv[2:]
+      command = QtCore.QString.fromUtf8( sys.argv[1])
+      arguments = []
+      for arg in sys.argv[2:]:
+         arguments.append( QtCore.QString.fromUtf8( arg))
 
       self.process = QtCore.QProcess( self)
       self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
