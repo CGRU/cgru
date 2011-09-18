@@ -7,7 +7,8 @@ cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
-cgru_qt=$cgru_utils/qt/4.7.3
+cgru_qt=$cgru_utils/qt/4.7.4
+[ -d $cgru_qt ] || cgru_qt=$cgru_utils/qt/4.8.0
 cgru_python=$cgru_utils/python/2.7.2
 
 # Setup Version:

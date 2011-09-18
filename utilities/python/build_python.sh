@@ -16,10 +16,10 @@ pythondir=$PWD/$pythonver$options
 export CFLAGS=-fPIC
 export CPPFLAGS=$CFLAGS
 
-if [ `uname` == "Darwin" ]; then
-   extra="--enable-framework"
-   echo "Darwin framework enabled."
-fi
+#if [ `uname` == "Darwin" ]; then
+#   extra="--enable-framework"
+#   echo "Darwin framework enabled."
+#fi
 
 cd $pythonsrc
 
