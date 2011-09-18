@@ -151,7 +151,7 @@ const std::string af::time2strHMS( int time32, bool clamp)
          else str += "m";
       }
       else if( seconds ) { sprintf( buffer, "%ds", seconds); str += buffer;}
-      else str += "0";
+//      else str += "0";
    }
    else
    {

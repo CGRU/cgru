@@ -162,7 +162,7 @@ class PathMap:
    def toServer( self, path, Verbose = False): return self.translatePath( path, True , Verbose)
    def toClient( self, path, Verbose = False): return self.translatePath( path, False, Verbose)
 
-   def translateFile( self, infile, outfile, toserver, SearchString, Verbose):
+   def translateFile( self, infile, outfile, toserver, SearchStrings, Verbose):
       if not self.initialized: return True
       if Verbose:
          print('TranslateFile:')
@@ -173,16 +173,21 @@ class PathMap:
       filein.close()
       outdata = ''
       for line in inlines:
-         if SearchString != '':
-            if line.find( SearchString) == -1:
-               outdata += line + '\n'
+         toskip = False
+         if len( SearchStrings): toskip = True
+         for searchstr in SearchStrings:
+            if line.find( searchstr) != -1:
+               toskip = False
                continue
-         lineout = self.translatePath( line, toserver , Verbose)
+         if toskip:
+            lineout = line
+         else:
+            lineout = self.translatePath( line, toserver , Verbose)
          outdata += lineout + '\n'
       fileout = open( outfile, 'w')
       fileout.write(outdata)
       fileout.close()
       return True
 
-   def toServerFile( self, infile, outfile, SearchString = '', Verbose = False): return self.translateFile( infile, outfile, True,  SearchString, Verbose)
-   def toClientFile( self, infile, outfile, SearchString = '', Verbose = False): return self.translateFile( infile, outfile, False, SearchString, Verbose)
+   def toServerFile( self, infile, outfile, SearchStrings = [], Verbose = False): return self.translateFile( infile, outfile, True,  SearchStrings, Verbose)
+   def toClientFile( self, infile, outfile, SearchStrings = [], Verbose = False): return self.translateFile( infile, outfile, False, SearchStrings, Verbose)

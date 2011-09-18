@@ -63,7 +63,7 @@ void ItemUser::updateValues( af::Node *node, int type)
    if( false == hostsmask.isEmpty()       )  strHCenterTop += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()) strHCenterTop += QString(" E(%1)").arg( hostsmask_exclude );
    strHCenterTop += QString(" %1").arg( user->generateErrorsSolvingString().c_str());
-   if( jobs_lifetime      > 0 ) strHCenterTop += QString(" L%1").arg( af::time2strHMS(      jobs_lifetime, true).c_str());
+   if( jobs_lifetime > 0 ) strHCenterTop += QString(" L%1").arg( af::time2strHMS( jobs_lifetime, true).c_str());
 
    strRightTop = hostname;
 

@@ -18,6 +18,7 @@ DEFINES += "CGRU_REVISION=$$(CGRU_REVISION)"
 
 win32: DEFINES += WINNT
 unix {
+   DEFINES += UNIX
    macx {
       DEFINES += MACOSX
    } else {

@@ -9,6 +9,15 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
 
+#if PY_MAJOR_VERSION < 3
+#define PyBytes_Check PyString_Check
+#define PyBytes_AsString PyString_AsString
+#define PyBytes_FromString PyString_FromString
+#define PyBytes_FromStringAndSize PyString_FromStringAndSize
+#define PyLong_AsLong PyLong_AsLong
+#define PyLong_FromLong PyInt_FromLong
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -43,22 +52,22 @@ void PyRes::update()
    {
       if( PyTuple_Size( pTuple) == 16)
       {
-         hres->custom[index]->value       = PyInt_AsLong(      PyTuple_GetItem( pTuple,  0));
-         hres->custom[index]->valuemax    = PyInt_AsLong(      PyTuple_GetItem( pTuple,  1));
-         hres->custom[index]->width       = PyInt_AsLong(      PyTuple_GetItem( pTuple,  2));
-         hres->custom[index]->height      = PyInt_AsLong(      PyTuple_GetItem( pTuple,  3));
-         hres->custom[index]->graphr      = PyInt_AsLong(      PyTuple_GetItem( pTuple,  4));
-         hres->custom[index]->graphg      = PyInt_AsLong(      PyTuple_GetItem( pTuple,  5));
-         hres->custom[index]->graphb      = PyInt_AsLong(      PyTuple_GetItem( pTuple,  6));
-         hres->custom[index]->label       = PyString_AsString( PyTuple_GetItem( pTuple,  7));
-         hres->custom[index]->labelsize   = PyInt_AsLong(      PyTuple_GetItem( pTuple,  8));
-         hres->custom[index]->labelr      = PyInt_AsLong(      PyTuple_GetItem( pTuple,  9));
-         hres->custom[index]->labelg      = PyInt_AsLong(      PyTuple_GetItem( pTuple, 10));
-         hres->custom[index]->labelb      = PyInt_AsLong(      PyTuple_GetItem( pTuple, 11));
-         hres->custom[index]->bgcolorr    = PyInt_AsLong(      PyTuple_GetItem( pTuple, 12));
-         hres->custom[index]->bgcolorg    = PyInt_AsLong(      PyTuple_GetItem( pTuple, 13));
-         hres->custom[index]->bgcolorb    = PyInt_AsLong(      PyTuple_GetItem( pTuple, 14));
-         hres->custom[index]->tooltip     = PyString_AsString( PyTuple_GetItem( pTuple, 15));
+         hres->custom[index]->value       = PyLong_AsLong(     PyTuple_GetItem( pTuple,  0));
+         hres->custom[index]->valuemax    = PyLong_AsLong(     PyTuple_GetItem( pTuple,  1));
+         hres->custom[index]->width       = PyLong_AsLong(     PyTuple_GetItem( pTuple,  2));
+         hres->custom[index]->height      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  3));
+         hres->custom[index]->graphr      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  4));
+         hres->custom[index]->graphg      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  5));
+         hres->custom[index]->graphb      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  6));
+         hres->custom[index]->label       = PyBytes_AsString(  PyTuple_GetItem( pTuple,  7));
+         hres->custom[index]->labelsize   = PyLong_AsLong(     PyTuple_GetItem( pTuple,  8));
+         hres->custom[index]->labelr      = PyLong_AsLong(     PyTuple_GetItem( pTuple,  9));
+         hres->custom[index]->labelg      = PyLong_AsLong(     PyTuple_GetItem( pTuple, 10));
+         hres->custom[index]->labelb      = PyLong_AsLong(     PyTuple_GetItem( pTuple, 11));
+         hres->custom[index]->bgcolorr    = PyLong_AsLong(     PyTuple_GetItem( pTuple, 12));
+         hres->custom[index]->bgcolorg    = PyLong_AsLong(     PyTuple_GetItem( pTuple, 13));
+         hres->custom[index]->bgcolorb    = PyLong_AsLong(     PyTuple_GetItem( pTuple, 14));
+         hres->custom[index]->tooltip     = PyBytes_AsString(  PyTuple_GetItem( pTuple, 15));
       }
       else
          AFERRAR("PyRes::update: type=\"%s\" returned tuple size != 12\n", name.c_str());

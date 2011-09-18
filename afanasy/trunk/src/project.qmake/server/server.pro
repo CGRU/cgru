@@ -20,6 +20,7 @@ HEADERS += $$system(ls $$DIR/*.h)
 
 win32: DEFINES += WINNT
 unix {
+   DEFINES += UNIX
    macx {
       DEFINES += MACOSX
    } else {

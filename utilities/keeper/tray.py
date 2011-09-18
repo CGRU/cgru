@@ -50,22 +50,22 @@ class Tray( QtGui.QSystemTrayIcon):
       # Software menu:
       self.menu['Software'] = QtGui.QMenu('Software')
       self.menu['menu'].addMenu( self.menu['Software'])
-
-      action = QtGui.QAction('Blender', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startBlender)
-      self.menu['Software'].addAction( action)
-      action = QtGui.QAction('Houdini', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startHoudini)
-      self.menu['Software'].addAction( action)
-      action = QtGui.QAction('Maya', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startMaya)
-      self.menu['Software'].addAction( action)
-      action = QtGui.QAction('Nuke', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.startNuke)
-      self.menu['Software'].addAction( action)
-
+      for soft in software.Names:
+         action = QtGui.QAction( soft, self)
+         eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.start%s)" % soft)
+         self.menu['Software'].addAction( action)
       self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
       self.menu['Software'].addMenu( self.menu['Setup Soft'])
+      for soft in software.Names:
+         action = QtGui.QAction( soft, self)
+         eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.locate%s)" % soft)
+         self.menu['Setup Soft'].addAction( action)
+      self.menu['Examples'] = QtGui.QMenu('Examples')
+      self.menu['Software'].addMenu( self.menu['Examples'])
+      for soft in software.Names:
+         action = QtGui.QAction( soft, self)
+         eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.example%s)" % soft)
+         self.menu['Examples'].addAction( action)
          
       # Load menu:
       menudir = os.path.join( os.environ['CGRU_KEEPER'], 'menu')
