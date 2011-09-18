@@ -17,6 +17,8 @@ Parser.add_option('-s', '--slate',           dest='slate',           type  ='str
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies_withlogo', help='Sequence frame template')
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
 Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576',      help='Resolution')
+Parser.add_option('--aspect',                dest='aspect',          type  ='float',      default=-1.0,           help='Image aspect, -1 = no changes')
+Parser.add_option('--autoaspect',            dest='autoaspect',      type  ='float',      default=-1.0,           help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
 Parser.add_option('--tmpformat',             dest='tmpformat',       type  ='string',     default='tga',          help='Temporary images format')
 Parser.add_option('--tmpquality',            dest='tmpquality',      type  ='string',     default='',             help='Temporary images format quality options')
 Parser.add_option('--noautocorr',            dest='noautocorr',      action='store_true', default=False,          help='Disable auto color correction for Cineon and EXR')
@@ -175,6 +177,10 @@ class Dialog( QtGui.QWidget):
       self.generalwidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.generalwidget,'General')
       self.generallayout = QtGui.QVBoxLayout( self.generalwidget)
+
+      self.drawingwidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.drawingwidget,'Drawing')
+      self.drawinglayout = QtGui.QVBoxLayout( self.drawingwidget)
 
       self.parameterswidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.parameterswidget,'Parameters')
@@ -427,7 +433,7 @@ Use Naming Rule.')
       self.generallayout.addWidget( self.gOutputSettings)
 
 
-      # Parameters:
+      # Drawing:
 
       self.lTemplates = QtGui.QHBoxLayout()
       self.tTemplateS = QtGui.QLabel('Slate Template:', self)
@@ -453,16 +459,12 @@ Templates are located in\n\
       self.lTemplates.addWidget( self.cbTemplateS)
       self.lTemplates.addWidget( self.tTemplateF)
       self.lTemplates.addWidget( self.cbTemplateF)
-      self.parameterslayout.addLayout( self.lTemplates)
-
-      self.gDrawing = QtGui.QGroupBox('Drawing')
-      self.lDrawing = QtGui.QVBoxLayout()
-      self.gDrawing.setLayout( self.lDrawing)
+      self.drawinglayout.addLayout( self.lTemplates)
 
       self.cTime = QtGui.QCheckBox('Add Time To Date', self)
       self.cTime.setChecked( False)
       QtCore.QObject.connect( self.cTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.lDrawing.addWidget( self.cTime)
+      self.drawinglayout.addWidget( self.cTime)
 
       self.lCacher = QtGui.QHBoxLayout()
       self.tCacher169 = QtGui.QLabel('16:9 Cacher:', self)
@@ -485,7 +487,7 @@ Templates are located in\n\
       self.lCacher.addWidget( self.cbCacher169)
       self.lCacher.addWidget( self.tCacher235)
       self.lCacher.addWidget( self.cbCacher235)
-      self.lDrawing.addLayout( self.lCacher)
+      self.drawinglayout.addLayout( self.lCacher)
 
       self.lLines = QtGui.QHBoxLayout()
       self.tLine169 = QtGui.QLabel('Line 16:9 Color:', self)
@@ -502,7 +504,7 @@ Example "255,255,0" - yellow.')
       self.editLine235 = QtGui.QLineEdit( Options.line235, self)
       self.lLines.addWidget( self.editLine235)
       QtCore.QObject.connect( self.editLine235, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lDrawing.addLayout( self.lLines)
+      self.drawinglayout.addLayout( self.lLines)
 
       # Logos:
       # Slate logo:
@@ -532,7 +534,7 @@ Example "255,255,0" - yellow.')
          i += 1
       self.lLgs.addWidget( self.cbLgsGravity)
       QtCore.QObject.connect( self.cbLgsGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.lDrawing.addLayout( self.lLgs)
+      self.drawinglayout.addLayout( self.lLgs)
 
       # Frame logo:
       self.lLgf = QtGui.QHBoxLayout()
@@ -561,7 +563,7 @@ Example "255,255,0" - yellow.')
          i += 1
       self.lLgf.addWidget( self.cbLgfGravity)
       QtCore.QObject.connect( self.cbLgfGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.lDrawing.addLayout( self.lLgf)
+      self.drawinglayout.addLayout( self.lLgf)
 
       # Font:
       self.lFont = QtGui.QHBoxLayout()
@@ -574,9 +576,39 @@ Example "255,255,0" - yellow.')
       for font in FontsList: self.cbFont.addItem( font)
       self.lFont.addWidget( self.cbFont)
       QtCore.QObject.connect( self.cbFont, QtCore.SIGNAL('currentIndexChanged(int)'), self.fontChanged)
-      self.lDrawing.addLayout( self.lFont)
+      self.drawinglayout.addLayout( self.lFont)
 
-      self.parameterslayout.addWidget( self.gDrawing)
+
+      # Parameters
+
+      # Image Aspect:
+      self.gAspect = QtGui.QGroupBox('Input Image Aspect')
+      self.glAspect = QtGui.QVBoxLayout()
+      self.gAspect.setLayout( self.glAspect)
+
+      self.lAspect = QtGui.QHBoxLayout()
+      self.lAspect.addWidget( QtGui.QLabel('Aspect', self))
+      self.dsbAspect = QtGui.QDoubleSpinBox( self)
+      self.dsbAspect.setRange( -1.0, 10.0)
+      self.dsbAspect.setDecimals( 6)
+      self.dsbAspect.setValue( Options.aspect)
+      QtCore.QObject.connect( self.dsbAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      self.lAspect.addWidget( self.dsbAspect)
+      self.lAspect.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
+      self.glAspect.addLayout( self.lAspect)
+
+      self.lAutoAspect = QtGui.QHBoxLayout()
+      self.lAutoAspect.addWidget( QtGui.QLabel('Auto Aspect', self))
+      self.dsbAutoAspect = QtGui.QDoubleSpinBox( self)
+      self.dsbAutoAspect.setRange( -1.0, 10.0)
+      self.dsbAutoAspect.setDecimals( 3)
+      self.dsbAutoAspect.setValue( Options.autoaspect)
+      QtCore.QObject.connect( self.dsbAutoAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      self.lAutoAspect.addWidget( self.dsbAutoAspect)
+      self.lAutoAspect.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
+      self.glAspect.addLayout( self.lAutoAspect)
+
+      self.parameterslayout.addWidget( self.gAspect)
 
       # Image Correction:
       self.gCorrectionSettings = QtGui.QGroupBox('Image Correction')
@@ -1244,6 +1276,8 @@ Add this options to temporary image saving.')
          if font     != '': cmd += ' --font "%s"'     % font
          cmd += ' --tmpformat %s' % self.cbTempFormat.currentText()
          if not self.eTempFormatOptions.text().isEmpty(): cmd += ' --tmpquality "%s"' % self.eTempFormatOptions.text()
+         if self.dsbAspect.value()     > 0: cmd +=     ' --aspect %f' % self.dsbAspect.value()
+         if self.dsbAutoAspect.value() > 0: cmd += ' --autoaspect %f' % self.dsbAutoAspect.value()
          if not self.cCorrAuto.isChecked():     cmd += ' --noautocorr'
          if not self.eCorrAux.text().isEmpty(): cmd += ' --correction "%s"' % self.eCorrAux.text()
          if self.cTime.isChecked(): cmd += ' --addtime'

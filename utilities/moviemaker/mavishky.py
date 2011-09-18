@@ -11,16 +11,16 @@ import subprocess
 
 TmpDir = ''
 def rmdir( signum, frame):
-   print '\nInterrupt received...'
+   print('\nInterrupt received...')
    if not Debug:
       if os.path.isdir( TmpDir):
          shutil.rmtree( TmpDir)
          if os.path.isdir( TmpDir):
-            print 'Warning: Temporary directory still exsists:'
-            print TmpDir
+            print('Warning: Temporary directory still exsists:')
+            print( TmpDir)
       else:
-         print 'Warning: Temporary directory does not exsist:'
-         print TmpDir
+         print('Warning: Temporary directory does not exsist:')
+         print( TmpDir)
    exit(0)
 
 signal.signal(signal.SIGTERM, rmdir)
@@ -32,8 +32,8 @@ Parser = OptionParser(usage="%prog [Options] input_files_pattern(s)] output\n\
    Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
    Type \"%prog -h\" for help", version="%prog 1.0")
 
-Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='aphotojpg.ffmpeg',  help='File with encode command line in last line')
-Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default=25,          help='Frames per second')
+Parser.add_option('-c', '--codec',      dest='codec',       type  ='string',     default='photojpg_best.ffmpeg', help='File with encode command line in last line')
+Parser.add_option('-f', '--fps',        dest='fps',         type  ='string',     default='25',        help='Frames per second')
 Parser.add_option('-t', '--template',   dest='template',    type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',     default='',          help='Specify slate frame template')
 Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first founded')
@@ -56,6 +56,8 @@ Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',    
 # Options to makeframe:
 Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 Parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
+Parser.add_option('--aspect',           dest='aspect',      type  ='float',      default=-1.0,        help='Image aspect, -1 = no changes')
+Parser.add_option('--autoaspect',       dest='autoaspect',  type  ='float',      default=-1.0,        help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
 Parser.add_option('--noautocorr',       dest='noautocorr',  action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
 Parser.add_option('--correction',       dest='correction',  type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
@@ -98,6 +100,7 @@ if len(args) > 2:
 
 Codec       = Options.codec
 Resolution  = Options.resolution
+Aspect      = Options.aspect
 Datesuffix  = Options.datesuffix
 Timesuffix  = Options.timesuffix
 
@@ -109,8 +112,8 @@ TmpFormat   = Options.tmpformat
 
 # Parameters initialization:
 if Debug: Verbose = True
-if Verbose: print 'VERBOSE MODE:'
-if Debug: print 'DEBUG MODE:'
+if Verbose: print('VERBOSE MODE:')
+if Debug: print('DEBUG MODE:')
 
 
 # Definitions:
@@ -124,13 +127,13 @@ if Stereo: need_convert = True
 # Check frame range:
 if Options.framestart != -1 and Options.frameend != -1:
    if Options.framestart > Options.frameend:
-      print 'Error: First frame %d > last frame %d' % (Options.framestart, Options.frameend)
+      print('Error: First frame %d > last frame %d' % (Options.framestart, Options.frameend))
       sys.exit(1)
 
 # Check output folder:
-if not os.path.isdir( os.path.dirname( Output)):
-   print 'Output folder does not exist:'
-   print Output
+if os.path.dirname( Output) != '' and not os.path.isdir( os.path.dirname( Output)):
+   print('Output folder does not exist:')
+   print( os.path.dirname( Output))
    sys.exit(1)
 
 # Encode command:
@@ -140,18 +143,18 @@ if len(encoder) < 2:
    encoder = 'ffmpeg'
    Codec += '.' + encoder
 else: encoder = encoder[-1]
-if Verbose: print 'Encoder engine = "%s"' % encoder
+if Verbose: print('Encoder engine = "%s"' % encoder)
 if os.path.dirname( Codec) == '': Codec = os.path.join( CODECSDIR, Codec)
 if not os.path.isfile( Codec):
-   print 'Can`t find codec "%s"' % Codec
+   print('Can`t find codec "%s"' % Codec)
    sys.exit(1)
 file = open( Codec)
 lines = file.readlines()
 cmd_encode = lines[len(lines)-1].strip()
 if len(cmd_encode) < 2:
-   print 'Invalid encode file "%s"' % Codec
+   print('Invalid encode file "%s"' % Codec)
    sys.exit(1)
-if Verbose: print 'Encode command = "%s"' % cmd_encode
+if Verbose: print('Encode command = "%s"' % cmd_encode)
 
 # Date and time:
 #datetimestring = '`date +%y-%m-%d_%H-%M`'
@@ -169,7 +172,7 @@ if Timesuffix:
 Output = Output.strip('" ')
 afjobname = os.path.basename( Output)
 if datetimesuffix != '': Output += '_' + datetimesuffix
-if Verbose: print 'Output = ' + Output
+if Verbose: print('Output = ' + Output)
 
 # Resolution:
 Width = 0
@@ -178,11 +181,11 @@ if Resolution != '':
    need_convert = True
    pos = Resolution.find('x')
    if pos <= 0:
-      print 'Invalid resolution specified.'
+      print('Invalid resolution specified.')
       sys.exit(1)
    Width = int(Resolution[ : pos ])
    Height = int(Resolution[ pos + 1 : ])
-   if Verbose: print 'Output Resolution = %(Width)d x %(Height)d' % vars()
+   if Verbose: print('Output Resolution = %(Width)d x %(Height)d' % vars())
    afjobname += ' %s' % Resolution
 
 
@@ -192,9 +195,9 @@ def getImages( inpattern):
 
    # Input directory:
    inputdir = os.path.dirname( inpattern)
-   if Verbose: print 'InputDir = "%s"' % inputdir
+   if Verbose: print('InputDir = "%s"' % inputdir)
    if not os.path.isdir( inputdir):
-      print 'Can\'t find input directory "%s"' % inputdir
+      print('Can\'t find input directory "%s"' % inputdir)
       sys.exit(1)
 
    # Input files pattern processing:
@@ -205,15 +208,15 @@ def getImages( inpattern):
       # Process %04d pattern:
       digitspos = pattern.rfind('%0')
       if digitspos < 0:
-         print 'Can\'t find #### or %04d in input files pattern.'
+         print('Can\'t find #### or %04d in input files pattern.')
          sys.exit(1)
       if pattern[digitspos+3] != 'd':
-         print 'Invalid %04d pattern.'
+         print('Invalid %04d pattern.')
          sys.exit(1)
       try:
          digitsnum = int(pattern[digitspos+2])
       except:
-         print 'Unable to find number in %04d pattern.'
+         print('Unable to find number in %04d pattern.')
          sys.exit(1)
       digitslen = 4
    else:
@@ -234,7 +237,7 @@ def getImages( inpattern):
    eprefix = re.escape( prefix)
    esuffix = re.escape( suffix)
    expr = r'%(eprefix)s([0-9]{%(digitsnum)s,%(digitsnum)s})%(esuffix)s' % vars()
-   if Verbose: print 'Expression = ' + expr
+   if Verbose: print('Expression = ' + expr)
    expr = re.compile( expr)
    allItems = os.listdir( inputdir)
    for item in allItems:
@@ -245,15 +248,15 @@ def getImages( inpattern):
          if frame < Options.framestart or frame > Options.frameend: continue
       allFiles.append( os.path.join( inputdir, item))
    if len(allFiles) <= 1:
-      print 'None or only one file founded matching pattern.'
-      print 'Input directory:'
-      print inputdir
-      print '  prefix, digits, suffix = %(prefix)s, %(digitsnum)d, %(suffix)s' % vars()
-      print 'Expression:'
-      print expr.pattern
+      print('None or only one file founded matching pattern.')
+      print('Input directory:')
+      print( inputdir)
+      print('  prefix, digits, suffix = %(prefix)s, %(digitsnum)d, %(suffix)s' % vars())
+      print('Expression:')
+      print( expr.pattern)
       sys.exit(1)
    allFiles.sort()
-   if Verbose: print 'Files fonded: %d' % len(allFiles)
+   if Verbose: print('Files fonded: %d' % len(allFiles))
 
    # Input files indentify:
    afile = allFiles[0]
@@ -265,15 +268,28 @@ def getImages( inpattern):
    identify = identify.replace( afile, '')
    identify = identify.strip()
    if len(identify) < 1:
-      print 'Invalid image "%s"' % afile
+      print('Invalid image "%s"' % afile)
       sys.exit(1)
    identify = identify.split(' ')
    if len(identify) < 1:
-      print 'Invalid image "%s"' % afile
+      print('Invalid image "%s"' % afile)
       sys.exit(1)
-   if Verbose: print 'Identify: %s' % identify
+   if Verbose: print('Identify: %s' % identify)
    imgtype = identify[0]
-   if Verbose: print 'Images type = "%s"' % imgtype
+   imgres = identify[1]
+   imgres = imgres.split('x')
+   imgresx = int(imgres[0])
+   imgresy = int(imgres[1])
+   if Verbose:
+      print('Images type = "%s"' % imgtype)
+      print('Images resolution = %dx%d' % (imgresx , imgresy))
+   global Aspect
+   if Options.autoaspect > 0:
+      if float(imgresx) / float(imgresy) < Options.autoaspect:
+         Aspect = 2.0
+         print('Auto Aspect = %f (%f)' % (Aspect, float(imgresx) / float(imgresy)))
+   elif Verbose:
+      print('Aspect = %f' % Aspect)
 
    return allFiles, inputdir, prefix, digitsnum, suffix
 
@@ -284,7 +300,7 @@ images1, inputdir, prefix, digitsnum, suffix = getImages( Inpattern1)
 if Inpattern2 != '':
    images2, inputdir, prefix, digitsnum, suffix = getImages( Inpattern2)
    if len(images1) != len(images2):
-      print 'Error: Sequences lenght is not the same'
+      print('Error: Sequences lenght is not the same')
       sys.exit(1)
 
 # Temporary directory:
@@ -303,8 +319,8 @@ if not Debug:
    if os.path.isdir( TmpDir): shutil.rmtree( TmpDir)
 else:
    TmpDir = os.path.dirname( os.path.dirname( Inpattern1))
-print 'Temporary Directory:'
-print TmpDir
+print('Temporary Directory:')
+print( TmpDir)
 
 # Commands construction:
 cmd_makeframe = os.path.join( os.path.dirname(sys.argv[0]), 'makeframe.py')
@@ -327,6 +343,7 @@ else:
 # Construct frame conversion command arguments:
 cmd_args = ''
 if Options.resolution   != '': cmd_args += ' -r %s' % Options.resolution
+if Aspect                >  0: cmd_args += ' --aspect %f' % Aspect
 if Options.tmpquality   != '': cmd_args += ' -q %s' % Options.tmpquality
 if Options.company      != '': cmd_args += ' -c "%s"' % Options.company
 if Options.project      != '': cmd_args += ' -p "%s"' % Options.project
@@ -359,7 +376,7 @@ for i in range(2):
          if not os.path.isfile( logopath[i]):
             logopath[i] = os.path.join( LOGOSDIR, logopath[i])
             if not os.path.isfile( logopath[i]):
-               print 'Can`t find logo "%s".' % logopath[i]
+               print('Can`t find logo "%s".' % logopath[i])
                exit(1)
          logow = int( Width  * logosize[i] / 100 )
          logoh = int( Height * logosize[i] / 100 )
@@ -371,7 +388,7 @@ for i in range(2):
          tmplogo[i] = os.path.join( TmpDir, tmplogo[i])
          cmd += ' "%s"' % tmplogo[i]
       else:
-         print 'Can\'t add logo if output resolution is not specified.'
+         print('Can\'t add logo if output resolution is not specified.')
          exit(1)
       cmd_precomp.append(cmd)
       name_precomp.append('Reformat %s logo' % logoname[i])
@@ -414,7 +431,7 @@ if need_convert:
             framestring = str(i+1)
          cmd += ' -f "%s"' % framestring
 
-         print i, FramePadding, framestring
+         print( i, FramePadding, framestring)
 
       cmd += ' "%s"' % afile
       if Inpattern2 != '': cmd += ' "%s"' % images2[i]
@@ -434,7 +451,7 @@ elif encoder == 'mencoder':
    inputmask = os.path.join( inputdir, prefix+'*'+suffix)
    if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.*.'+TmpFormat)
 else:
-   print 'Unknown encoder = "%s"' % encoder
+   print('Unknown encoder = "%s"' % encoder)
    exit(1)
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
 cmd_encode = cmd_encode.replace('@CODECS@',     CODECSDIR)
@@ -446,30 +463,26 @@ cmd_encode = cmd_encode.replace('@ARGS@',       auxargs)
 # Print commands:
 if Debug:
    if len(cmd_precomp):
-      print 'Precomp  first and last commands:'
-      print
-      print cmd_precomp[0]
+      print('Precomp  first and last commands:\n')
+      print(cmd_precomp[0])
       os.system( cmd_precomp[0])
       if len(cmd_precomp) > 1:
-         print '...'
-         print cmd_precomp[-1]
+         print('...')
+         print( cmd_precomp[-1])
          os.system( cmd_precomp[-1])
       print
    if need_convert:
-      print 'Convert first and last commands:'
-      print
-      print cmd_convert[0]
+      print('Convert first and last commands:\n')
+      print( cmd_convert[0])
       os.system( cmd_convert[0])
-      print '...'
-      print cmd_convert[-1]
+      print('...')
+      print( cmd_convert[-1])
       os.system( cmd_convert[-1])
       print
-   print 'Encode command:'
-   print
-   print cmd_encode
-   print
+   print('Encode command:\n')
+   print( cmd_encode + '\n')
    os.system( cmd_encode)
-   print
+   print('\n')
    sys.exit(0)
 
 # Construct Afanasy job:
@@ -521,31 +534,31 @@ else:
    if len(cmd_precomp) or need_convert: os.mkdir(TmpDir, 0777)
    if len(cmd_precomp):
       n = 0
-      print 'Precomositing...'
+      print('Precomositing...')
       for cmd in cmd_precomp:
-         print name_precomp[n]
+         print( name_precomp[n])
          os.system( cmd)
          n += 1
-      print
+      print('')
    if need_convert:
       n = 0
-      print 'Converting...',
+      print('Converting...',)
       for cmd in cmd_convert:
-         print name_convert[n]
+         print( name_convert[n])
          os.system( cmd)
          n += 1
-         print 'PROGRESS: %d' % (100.0 * n / imgCount) + '%'
+         print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
          sys.stdout.flush()
-      print
+      print('')
    os.system( cmd_encode)
    if not Debug:
       if os.path.isdir( TmpDir):
          shutil.rmtree( TmpDir)
          if os.path.isdir( TmpDir):
-            print 'Warning: Temporary directory still exsists:'
-            print TmpDir
+            print('Warning: Temporary directory still exsists:')
+            print( TmpDir)
       else:
-         print 'Warning: Temporary directory does not exsist:'
-         print TmpDir
-   print
-   print 'Done'
+         print('Warning: Temporary directory does not exsist:')
+         print( TmpDir)
+   print('')
+   print('Done')

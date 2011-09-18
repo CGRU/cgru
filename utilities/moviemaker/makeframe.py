@@ -17,6 +17,7 @@ parser.add_option('-s', '--shot',       dest='shot',           type  ='string', 
 parser.add_option('-a', '--artist',     dest='artist',         type  ='string',     default='',          help='Draw artist')
 parser.add_option('-f', '--frame',      dest='frame',          type  ='string',     default='',          help='Draw frame')
 parser.add_option('-m', '--moviename',  dest='moviename',      type  ='string',     default='movie',     help='Draw final movie name')
+parser.add_option('--aspect',           dest='aspect',         type  ='float',      default='-1.0',      help='Image aspect, "-1" = no changes')
 parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='version',   help='Draw shot version')
 parser.add_option('--activity',         dest='activity',       type  ='string',     default='',          help='Draw activity')
 parser.add_option('--comments',         dest='comments',       type  ='string',     default='',          help='Draw comments')
@@ -78,8 +79,8 @@ if ARTIST == '': ARTIST = os.getenv('USER',os.getenv('USERNAME','user'))
 
 Verbose = options.verbose
 if options.debug: Verbose = True
-if options.debug: print 'DEBUG MODE:'
-if Verbose: print 'VERBOSE MODE:'
+if options.debug: print('DEBUG MODE:')
+if Verbose: print('VERBOSE MODE:')
 
 # Read all commands from template:
 cmdlines = []
@@ -91,7 +92,7 @@ if template != '':
       cmdlines = file.readlines()
       file.close()
    else:
-      print 'Error: template file "%s" not founded' % template
+      print('Error: template file "%s" not founded' % template)
 
 # Resolution:
 Width = 0
@@ -101,7 +102,7 @@ if options.resolution != '':
    if pos <= 0: parser.error('Invalid resolution specified.')
    Width = int(options.resolution[: pos ])
    Height = int(options.resolution[ pos + 1 :])
-   if Verbose: print 'Output resolution = %(Width)d x %(Height)d' % vars()
+   if Verbose: print('Output resolution = %(Width)d x %(Height)d' % vars())
 
 # Cacher:
 draw169_a = 0.01 * options.draw169
@@ -131,13 +132,13 @@ def reformatAnnotate( infile, outfile):
          if digits is not None:
             if len(digits):
                FRAME = digits[-1]
-               if Verbose: print 'Frame = "%s"' % FRAME
+               if Verbose: print('Frame = "%s"' % FRAME)
 
       # Get input file type:
       imgtype = ''
       lastdotpos = FILEIN.rfind('.')
       if lastdotpos > 1: imgtype = FILEIN[lastdotpos+1:].lower()
-      if Verbose: print 'Images type = "%s"' % imgtype
+      if Verbose: print('Images type = "%s"' % imgtype)
       # Input file correction:
       correction = ''
       if not options.noautocorr:
@@ -156,10 +157,12 @@ def reformatAnnotate( infile, outfile):
          if digits is not None:
             if len(digits):
                FRAME = digits[-1]
-               if Verbose: print 'Frame = "%s"' % FRAME
+               if Verbose: print('Frame = "%s"' % FRAME)
 
       cmd = 'convert "%s" +matte' % infile
-      cmd += ' -resize %(Width)d -gravity center -background black -extent %(Width)dx%(Height)d +repage' % globals()
+      cmd += ' -resize %d' % Width
+      if options.aspect > 0: cmd += ' -resize 100x%f%%' % ( 100.0 / options.aspect )
+      cmd += ' -gravity center -background black -extent %(Width)dx%(Height)d +repage' % globals()
       if correction != '': cmd += ' %s' % correction
       if options.gamma > 0: cmd += ' -gamma %.2f' % options.gamma
       # Draw cacher:
@@ -207,7 +210,7 @@ def reformatAnnotate( infile, outfile):
                         size1 = int(line[pos1+1:pos2])
                         size2 = int(line[pos2+1:pos3-1])
                      except:
-                        print str(sys.exc_info()[1])
+                        print( str(sys.exc_info()[1]))
                         size1 = -1
                         size2 = -1
                      if size1 != -1:
@@ -216,9 +219,9 @@ def reformatAnnotate( infile, outfile):
                         size = str(int(size*size1/size2))
                         line = line[:pos]+size+line[pos3+1:]
                         continue
-         print 'Invalid size syntax in line:'
-         print line
-         print 'Examples: "@SIZE_2/5X@" or "@SIZE_2/5Y@" means 2/5 part of X or Y dimension of a final image.'
+         print('Invalid size syntax in line:')
+         print( line)
+         print('Examples: "@SIZE_2/5X@" or "@SIZE_2/5Y@" means 2/5 part of X or Y dimension of a final image.')
          sys.exit(1)
       # Add line with replaced variables:
       cmd += ' ' + (line % globals())
@@ -250,9 +253,7 @@ def reformatAnnotate( infile, outfile):
    cmd += ' -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
    # Set output file name and launch:
    cmd += ' "%s"' % outfile
-   if Verbose:
-      print cmd
-      print
+   if Verbose: print( cmd + '\n')
    if not options.debug: os.system(cmd)
 
 
@@ -273,7 +274,5 @@ if Stereo:
    cmd += ' "%s" -compose over -gravity East -composite' % Annotate2
    cmd += ' -alpha Off -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
    cmd += ' "%s"' % FileOut
-   if Verbose:
-      print cmd
-      print
+   if Verbose: print( cmd + '\n')
    if not options.debug: os.system(cmd)

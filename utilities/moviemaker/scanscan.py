@@ -3,31 +3,33 @@
 import re, os, sys
 
 from optparse import OptionParser
-parser = OptionParser(usage="%prog [options] scan_folder result_folder\ntype \"%prog -h\" for help", version="%prog 1.  0")
+Parser = OptionParser(usage="%prog [options] scan_folder result_folder\ntype \"%prog -h\" for help", version="%prog 1.  0")
 
 Extensions = ['jpg','dpx','cin','exr','tga','tif','png']
 
 BadFileCaracters = '. \\/:;`~!@#$%^&*()[]|,\'"{}'
 
-parser.add_option('-c', '--codec',        dest='codec',        type  ='string',     default='aphotojpg.ffmpeg', help='File with encode command line in last line')
-parser.add_option('-f', '--fps',          dest='fps',          type  ='int',        default=25,          help='Frames per second')
-parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='Movie resolution')
-parser.add_option('-e', '--extensions',   dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
-parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
-parser.add_option('-g', '--gamma',        dest='gamma',        type  ='float',      default=-1.0,        help='Apply gamma correction')
-parser.add_option('-a', '--abspath',      dest='abspath',      action='store_true', default=False,       help='Prefix movies with images absolute path')
-parser.add_option('-A', '--afanasy',      dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
-parser.add_option('-m', '--maxhosts',     dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
-parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,       help='Verbose mode')
-parser.add_option('-D', '--debug',        dest='debug',        action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
+Parser.add_option('-c', '--codec',        dest='codec',        type  ='string',     default='aphotojpg.ffmpeg', help='File with encode command line in last line')
+Parser.add_option('-f', '--fps',          dest='fps',          type  ='int',        default=25,          help='Frames per second')
+Parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='Movie resolution')
+Parser.add_option('-e', '--extensions',   dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
+Parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
+Parser.add_option('-g', '--gamma',        dest='gamma',        type  ='float',      default=-1.0,        help='Apply gamma correction')
+Parser.add_option('-a', '--abspath',      dest='abspath',      action='store_true', default=False,       help='Prefix movies with images absolute path')
+Parser.add_option('-A', '--afanasy',      dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
+Parser.add_option('-m', '--maxhosts',     dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
+Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,       help='Verbose mode')
+Parser.add_option('--aspect',             dest='aspect',       type  ='float',      default=-1.0,        help='Image aspect, -1 = no changes')
+Parser.add_option('--autoaspect',         dest='autoaspect',   type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
+Parser.add_option('-D', '--debug',        dest='debug',        action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 
-(options, args) = parser.parse_args()
+(options, args) = Parser.parse_args()
 
-if len(args) != 2: parser.error('Not enough or too many arguments provided.')
+if len(args) != 2: Parser.error('Not enough or too many arguments provided.')
 Folder = args[0]
 Output = args[1]
-if not os.path.isdir(Folder): parser.error('Scan folder "%s" does not exist.' % Folder)
-if not os.path.isdir(Output): parser.error('Scan folder "%s" does not exist.' % Output)
+if not os.path.isdir(Folder): Parser.error('Scan folder "%s" does not exist.' % Folder)
+if not os.path.isdir(Output): Parser.error('Scan folder "%s" does not exist.' % Output)
 
 Verbose = options.verbose
 if options.debug: Verbose = True
@@ -108,6 +110,8 @@ for dirpath, dirnames, filenames in os.walk( Folder):
       cmd += ' -f %d' % options.fps
       cmd += ' -c %s' % options.codec
       if options.gamma > 0: cmd += ' -g %.2f' % options.gamma
+      if options.aspect > 0: cmd += ' --aspect %f' % options.aspect
+      if options.autoaspect > 0: cmd += ' --autoaspect %f' % options.autoaspect
       if options.template != '': cmd += ' -t "%s"' % options.template
       cmd += ' "%s"' % pattern
       cmd += ' "%s"' % movname
