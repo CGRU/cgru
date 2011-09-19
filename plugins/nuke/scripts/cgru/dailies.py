@@ -214,6 +214,7 @@ def dailiesGenCmd( node):
    artist   = node.knob('artist'  ).value()
    activity = node.knob('activity').value()
    comments = node.knob('comments').value()
+   cach_op  = node.knob('cach_op' ).value()
    draw169  = node.knob('draw169' ).value()
    draw235  = node.knob('draw235' ).value()
    line169  = node.knob('line169' ).value()
@@ -232,7 +233,9 @@ def dailiesGenCmd( node):
    tmpformat      = node.knob('tmpformat').value()
    tmpquality     = node.knob('tmpquality').value()
    autocolorspace = int(node.knob('autocolorspace').value())
+   asp_in         = float(node.knob('asp_in' ).value())
    gamma          = float(node.knob('gamma').value())
+   cach_as        = float(node.knob('cach_as' ).value())
 
 
    # Command Construction:
@@ -253,6 +256,7 @@ def dailiesGenCmd( node):
    if tmpquality is not None and tmpquality != '': cmd += ' --tmpquality "%s"'  % tmpquality
    if not autocolorspace: cmd += ' --noautocorr'
    if gamma  != 1.0: cmd += ' -g %03f' % gamma
+   if asp_in  > 0.0: cmd += ' --aspect %f' % asp_in
 
    if fstart !=  -1: cmd += ' --fs %d' % fstart
    if fend   !=  -1: cmd += ' --fe %d' % fend
@@ -269,6 +273,9 @@ def dailiesGenCmd( node):
    if draw235  is not None and draw235  != '': cmd += ' --draw235 "%s"'  % draw235
    if line169  is not None and line169  != '': cmd += ' --line169 "%s"'  % line169
    if line235  is not None and line235  != '': cmd += ' --line235 "%s"'  % line235
+   if cach_op  is not None and cach_op  != '':
+      cmd += ' --cacher_aspect %f' % cach_as
+      cmd += ' --cacher_opacity "%s"' % cach_op
    if lgspath  is not None and lgspath  != '':
       cmd += ' --lgspath "%s"' % lgspath
       cmd += ' --lgssize %d'   % lgssize

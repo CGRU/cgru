@@ -36,6 +36,7 @@ Gizmo {
 
    addUserKnob { 20 "" Parameters }
 
+   addUserKnob {  7 asp_in   l "Input Aspect" R -1.0 9.0 +STARTLINE }
    addUserKnob {  3 fstart   l "Frame Range"     +STARTLINE }
    addUserKnob {  3 fend     l " -  "            -STARTLINE }
    addUserKnob {  6 fffirst  l "Draw First Frame As First" -STARTLINE }
@@ -47,6 +48,8 @@ Gizmo {
    addUserKnob {  2 lgfpath  l "Frame Logo"      +STARTLINE }
    addUserKnob {  3 lgfsize  l "Size"            -STARTLINE }
    addUserKnob {  4 lgfgrav M {"SouthEast" "South" "SouthWest" "West" "NorthWest" "North" "NorthEast" "East" "Center"}  l "Gravity" -STARTLINE }
+   addUserKnob {  7 cach_as  l "Cacher Aspect" R 1.0 9.0 +STARTLINE }
+   addUserKnob {  1 cach_op  l "Cacher Opacity"  -STARTLINE }
    addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
    addUserKnob {  1 draw235  l "Cacher 2.35"     -STARTLINE }
    addUserKnob {  1 line169  l "Line 16:9 Color" +STARTLINE }
@@ -68,8 +71,11 @@ Gizmo {
    forceviews  0
    viewsnames  "left right"
 
+   asp_in      -1
    fstart      -1
    fend        -1
+   cach_as     1.85
+   cach_op     ""
    draw169     ""
    draw235     ""
    line169     ""
