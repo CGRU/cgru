@@ -29,6 +29,10 @@ Parser.add_option('--company',               dest='company',         type  ='str
 Parser.add_option('--project',               dest='project',         type  ='string',     default='',             help='Project name')
 Parser.add_option('--artist',                dest='artist',          type  ='string',     default='',             help='Artist name')
 Parser.add_option('--naming',                dest='naming',          type  ='string',     default='',             help='Auto movie naming rule: [s]_[v]_[d]')
+Parser.add_option('--cacher_aspect',         dest='cacher_aspect',   type  ='float',      default=1.85,           help='Cacher aspect')
+Parser.add_option('--cacher_opacity',        dest='cacher_opacity',  type  ='int',        default=0,              help='Cacher opacity')
+Parser.add_option('--line_aspect',           dest='line_aspect',     type  ='float',      default=1.85,           help='Cacher line aspect')
+Parser.add_option('--line_color',            dest='line_color',      type  ='string',     default='',             help='Cacher line opacity')
 Parser.add_option('--draw169',               dest='draw169',         type  ='int',        default=0,              help='Draw 16:9 cacher opacity')
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=0,              help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
@@ -467,6 +471,42 @@ Templates are located in\n\
       self.drawinglayout.addWidget( self.cTime)
 
       self.lCacher = QtGui.QHBoxLayout()
+      self.lCacher.addWidget( QtGui.QLabel('Cacher Aspect:', self))
+      self.dsbCacherAspect = QtGui.QDoubleSpinBox( self)
+      self.dsbCacherAspect.setRange( 0.1, 10.0)
+      self.dsbCacherAspect.setDecimals( 6)
+      self.dsbCacherAspect.setValue( Options.cacher_aspect)
+      QtCore.QObject.connect( self.dsbCacherAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      self.lCacher.addWidget( self.dsbCacherAspect)
+      self.lCacher.addWidget( QtGui.QLabel('Cacher Opacity:', self))
+      self.cbCacherOpacity = QtGui.QComboBox( self)
+      i = 0
+      for cacher in CacherNames:
+         self.cbCacherOpacity.addItem( cacher, QtCore.QVariant( CacherValues[i]))
+         if CacherValues[i] == str(Options.cacher_opacity): self.cbCacherOpacity.setCurrentIndex( i)
+         i += 1
+      QtCore.QObject.connect( self.cbCacherOpacity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lCacher.addWidget( self.cbCacherOpacity)
+      self.drawinglayout.addLayout( self.lCacher)
+
+      self.lCacherLine = QtGui.QHBoxLayout()
+      self.lCacherLine.addWidget( QtGui.QLabel('Cacher Line Aspect:', self))
+      self.dsbCacherLineAspect = QtGui.QDoubleSpinBox( self)
+      self.dsbCacherLineAspect.setRange( 0.1, 10.0)
+      self.dsbCacherLineAspect.setDecimals( 6)
+      self.dsbCacherLineAspect.setValue( Options.line_aspect)
+      QtCore.QObject.connect( self.dsbCacherLineAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      self.lCacherLine.addWidget( self.dsbCacherLineAspect)
+      self.tCacherLine = QtGui.QLabel('Cacher Line Color:', self)
+      self.tCacherLine.setToolTip('\
+Example "255,255,0" - yellow.')
+      self.lCacherLine.addWidget( self.tCacherLine)
+      self.editCacherLine = QtGui.QLineEdit( Options.line_color, self)
+      QtCore.QObject.connect( self.editCacherLine, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lCacherLine.addWidget( self.editCacherLine)
+      self.drawinglayout.addLayout( self.lCacherLine)
+
+      self.lCacher169235 = QtGui.QHBoxLayout()
       self.tCacher169 = QtGui.QLabel('16:9 Cacher:', self)
       self.cbCacher169 = QtGui.QComboBox( self)
       i = 0
@@ -483,11 +523,11 @@ Templates are located in\n\
          if CacherValues[i] == str(Options.draw235): self.cbCacher235.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCacher235, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      self.lCacher.addWidget( self.tCacher169)
-      self.lCacher.addWidget( self.cbCacher169)
-      self.lCacher.addWidget( self.tCacher235)
-      self.lCacher.addWidget( self.cbCacher235)
-      self.drawinglayout.addLayout( self.lCacher)
+      self.lCacher169235.addWidget( self.tCacher169)
+      self.lCacher169235.addWidget( self.cbCacher169)
+      self.lCacher169235.addWidget( self.tCacher235)
+      self.lCacher169235.addWidget( self.cbCacher235)
+      self.drawinglayout.addLayout( self.lCacher169235)
 
       self.lLines = QtGui.QHBoxLayout()
       self.tLine169 = QtGui.QLabel('Line 16:9 Color:', self)
@@ -1281,6 +1321,13 @@ Add this options to temporary image saving.')
          if not self.cCorrAuto.isChecked():     cmd += ' --noautocorr'
          if not self.eCorrAux.text().isEmpty(): cmd += ' --correction "%s"' % self.eCorrAux.text()
          if self.cTime.isChecked(): cmd += ' --addtime'
+         cacher = self.cbCacherOpacity.itemData( self.cbCacherOpacity.currentIndex()).toString()
+         if cacher != '0':
+            cmd += ' --cacher_aspect %f' % self.dsbCacherAspect.value()
+            cmd += ' --cacher_opacity %s' % cacher
+         if not self.editCacherLine.text().isEmpty():
+            cmd += ' --line_aspect "%s"' % self.dsbCacherLineAspect.value()
+            cmd += ' --line_color "%s"' % self.editCacherLine.text()
          cacher = self.cbCacher169.itemData( self.cbCacher169.currentIndex()).toString()
          if cacher != '0': cmd += ' --draw169 %s' % cacher
          cacher = self.cbCacher235.itemData( self.cbCacher235.currentIndex()).toString()

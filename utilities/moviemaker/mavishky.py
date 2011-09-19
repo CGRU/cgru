@@ -54,31 +54,35 @@ Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',    
 Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
 
 # Options to makeframe:
-Parser.add_option('-r', '--resolution', dest='resolution',  type  ='string',     default='',          help='Format: 768x576, if empty images format used')
-Parser.add_option('-g', '--gamma',      dest='gamma',       type  ='float',      default=-1.0,        help='Apply gamma correction')
-Parser.add_option('--aspect',           dest='aspect',      type  ='float',      default=-1.0,        help='Image aspect, -1 = no changes')
-Parser.add_option('--autoaspect',       dest='autoaspect',  type  ='float',      default=-1.0,        help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
-Parser.add_option('--noautocorr',       dest='noautocorr',  action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
-Parser.add_option('--correction',       dest='correction',  type  ='string',     default='',          help='Add custom color correction parameters')
-Parser.add_option('--company',          dest='company',     type  ='string',     default='',          help='Draw company')
-Parser.add_option('--project',          dest='project',     type  ='string',     default='',          help='Draw project')
-Parser.add_option('--shot',             dest='shot',        type  ='string',     default='',          help='Draw shot')
-Parser.add_option('--ver',              dest='shotversion', type  ='string',     default='',          help='Draw shot version')
-Parser.add_option('--artist',           dest='artist',      type  ='string',     default='',          help='Draw artist')
-Parser.add_option('--activity',         dest='activity',    type  ='string',     default='',          help='Draw activity')
-Parser.add_option('--comments',         dest='comments',    type  ='string',     default='',          help='Draw comments')
-Parser.add_option('--font',             dest='font',        type  ='string',     default='',          help='Specify font)')
-Parser.add_option('--lgspath',          dest='lgspath',     type  ='string',     default='',          help='Slate logotype path')
-Parser.add_option('--lgssize',          dest='lgssize',     type  ='int',        default=25,   	      help='Slate logotype size, percent of image')
-Parser.add_option('--lgsgrav',          dest='lgsgrav',     type  ='string',     default='southeast', help='Slate logotype positioning gravity')
-Parser.add_option('--lgfpath',          dest='lgfpath',     type  ='string',     default='',          help='Flrame logotype path')
-Parser.add_option('--lgfsize',          dest='lgfsize',     type  ='int',        default=10,   	      help='Flrame logotype size, percent of image')
-Parser.add_option('--lgfgrav',          dest='lgfgrav',     type  ='string',     default='north',     help='Flrame logotype positioning gravity')
-Parser.add_option('--draw169',          dest='draw169',     type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
-Parser.add_option('--draw235',          dest='draw235',     type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
-Parser.add_option('--line169',          dest='line169',     type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
-Parser.add_option('--line235',          dest='line235',     type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
-Parser.add_option('--stereo',           dest='stereo',      action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
+Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='',          help='Format: 768x576, if empty images format used')
+Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
+Parser.add_option('--aspect',           dest='aspect',         type  ='float',      default=-1.0,        help='Image aspect, -1 = no changes')
+Parser.add_option('--autoaspect',       dest='autoaspect',     type  ='float',      default=-1.0,        help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
+Parser.add_option('--noautocorr',       dest='noautocorr',     action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
+Parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
+Parser.add_option('--company',          dest='company',        type  ='string',     default='',          help='Draw company')
+Parser.add_option('--project',          dest='project',        type  ='string',     default='',          help='Draw project')
+Parser.add_option('--shot',             dest='shot',           type  ='string',     default='',          help='Draw shot')
+Parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='',          help='Draw shot version')
+Parser.add_option('--artist',           dest='artist',         type  ='string',     default='',          help='Draw artist')
+Parser.add_option('--activity',         dest='activity',       type  ='string',     default='',          help='Draw activity')
+Parser.add_option('--comments',         dest='comments',       type  ='string',     default='',          help='Draw comments')
+Parser.add_option('--font',             dest='font',           type  ='string',     default='',          help='Specify font)')
+Parser.add_option('--lgspath',          dest='lgspath',        type  ='string',     default='',          help='Slate logotype path')
+Parser.add_option('--lgssize',          dest='lgssize',        type  ='int',        default=25,   	      help='Slate logotype size, percent of image')
+Parser.add_option('--lgsgrav',          dest='lgsgrav',        type  ='string',     default='southeast', help='Slate logotype positioning gravity')
+Parser.add_option('--lgfpath',          dest='lgfpath',        type  ='string',     default='',          help='Flrame logotype path')
+Parser.add_option('--lgfsize',          dest='lgfsize',        type  ='int',        default=10,   	      help='Flrame logotype size, percent of image')
+Parser.add_option('--lgfgrav',          dest='lgfgrav',        type  ='string',     default='north',     help='Flrame logotype positioning gravity')
+Parser.add_option('--cacher_aspect',    dest='cacher_aspect',  type  ='float',      default=1.85,        help='Cacher aspect')
+Parser.add_option('--cacher_opacity',   dest='cacher_opacity', type  ='int',        default=0,           help='Cacher opacity')
+Parser.add_option('--line_aspect',      dest='line_aspect',    type  ='float',      default=1.85,        help='Cacher line aspect')
+Parser.add_option('--line_color',       dest='line_color',     type  ='string',     default='',          help='Cacher line opacity')
+Parser.add_option('--draw169',          dest='draw169',        type  ='int',        default=0,           help='Draw 16:9 cacher opacity')
+Parser.add_option('--draw235',          dest='draw235',        type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
+Parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
+Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
+Parser.add_option('--stereo',           dest='stereo',         action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
 
 (Options, args) = Parser.parse_args()
 
@@ -355,6 +359,12 @@ if Options.activity     != '': cmd_args += ' --activity "%s"'  % Options.activit
 if Options.comments     != '': cmd_args += ' --comments "%s"'  % Options.comments
 if Options.correction   != '': cmd_args += ' --correction "%s"' % Options.correction
 if FrameRange           != '': cmd_args += ' --framerange "%s"'  % FrameRange
+if Options.cacher_opacity > 0:
+   cmd_args += ' --cacher_aspect %f' % Options.cacher_aspect
+   cmd_args += ' --cacher_opacity %d' % Options.cacher_opacity
+if Options.line_color != '':
+   cmd_args += ' --line_aspect %f' % Options.line_aspect
+   cmd_args += ' --line_color "%s"' % Options.line_color
 if Stereo: cmd_args += ' --stereo'
 cmd_args += ' -d "%s"' % datetimestring
 cmd_args += ' -m "%s"' % os.path.basename(Output)
@@ -542,7 +552,7 @@ else:
       print('')
    if need_convert:
       n = 0
-      print('Converting...',)
+      print('Converting...')
       for cmd in cmd_convert:
          print( name_convert[n])
          os.system( cmd)
