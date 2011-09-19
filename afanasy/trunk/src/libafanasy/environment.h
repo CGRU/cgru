@@ -73,8 +73,9 @@ public:
 
    static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
-   static inline const std::list<std::string> & getPreviewCmds()  { return previewcmds;} ///< Get preview commands
-   static inline const std::list<std::string> & getRenderCmds()   { return rendercmds; } ///< Get render commands
+   static inline const std::list<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get preview commands
+   static inline const std::list<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
+   static inline const std::list<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
 
    static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
    static inline int getWatchConnectRetries()         { return watch_connectretries;      }
@@ -221,8 +222,9 @@ private:
 
    static int clientport;
 
-   static std::list<std::string> previewcmds;    ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
-   static std::list<std::string> rendercmds;     ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static std::list<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static std::list<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+   static std::list<std::string> rendercmds_admin; ///< Render commannds for admin only
    static int watch_refreshinterval;
    static int watch_connectretries;
    static int watch_waitforconnected;

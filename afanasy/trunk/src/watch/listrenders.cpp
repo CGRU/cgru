@@ -234,24 +234,43 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
       if( selectedItemsCount == 1) action->setEnabled(false == render->isOnline());
       menu.addAction( action);
+   }
 
-      if( af::Environment::getRenderCmds().size() > 0 )
+   QMenu * custom_submenu = NULL;
+   if(af::Environment::getRenderCmds().size() > 0)
+   {
+      menu.addSeparator();
+      custom_submenu = new QMenu( "Custom", this);
+      int i = 0;
+      for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, i++)
+      {
+         ActionId * actionid = new ActionId( i, QString("%1").arg( afqt::stoq(*it)), this);
+         connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
+         custom_submenu->addAction( actionid);
+      }
+      menu.addMenu( custom_submenu);
+   }
+   if( af::Environment::GOD() && ( af::Environment::getRenderCmdsAdmin().size() > 0 ))
+   {
+      if( custom_submenu == NULL)
       {
          menu.addSeparator();
-
-         QMenu * submenu = new QMenu( "Custom", this);
-         int i = 0;
-         for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, i++)
-         {
-            ActionId * actionid = new ActionId( i, QString("%1").arg( afqt::stoq(*it)), this);
-            connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
-            submenu->addAction( actionid);
-         }
-         menu.addMenu( submenu);
+         custom_submenu = new QMenu( "Custom", this);
       }
+      int i = 0;
+      for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++, i++)
+      {
+         ActionId * actionid = new ActionId( i, QString("%1").arg( afqt::stoq(*it)), this);
+         connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
+         custom_submenu->addAction( actionid);
+      }
+      menu.addMenu( custom_submenu);
+   }
 
-      menu.addSeparator();
+   menu.addSeparator();
 
+   if( af::Environment::GOD())
+   {
       {
          QMenu * submenu = new QMenu( "Wake-On-Lan", this);
 

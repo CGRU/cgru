@@ -13,22 +13,24 @@ def startNuke():      QtCore.QProcess.startDetached('nuke')
 def start3DSMax():    QtCore.QProcess.startDetached('3dsmax')
 def startSoftimage(): QtCore.QProcess.startDetached('xsi')
 
-def exampleSoftware( soft):
+def exampleSoftware( folder, script):
    cmd = os.environ['CGRU_LOCATION']
    cmd = os.path.join( cmd, 'examples')
-   cmd = os.path.join( cmd, 'start_' + soft)
+   cmd = os.path.join( cmd, folder)
+   cmd = os.path.join( cmd, script)
    if sys.platform.find('win') == 0:
       cmd += '.cmd'
    else:
       cmd += '.sh'
+   print(cmd)
    QtCore.QProcess.startDetached( cmd)
 
-def exampleBlender():   exampleSoftware('Blender')
-def exampleHoudini():   exampleSoftware('Houdini')
-def exampleMaya():      exampleSoftware('Maya')
-def exampleNuke():      exampleSoftware('Nuke')
-def example3DSMax():    exampleSoftware('3DSMax')
-def exampleSoftimage(): exampleSoftware('xsi')
+def exampleBlender():   exampleSoftware('blender','start_blender')
+def exampleHoudini():   exampleSoftware('houdini','start_houdini')
+def exampleMaya():      exampleSoftware('maya','start_maya')
+def exampleNuke():      exampleSoftware('nuke','start_nuke')
+def example3DSMax():    exampleSoftware('3D Studio Max','start_3dsmax')
+def exampleSoftimage(): exampleSoftware('softimage','start_softimage')
 
 def locateSoftware( soft):
    filename = QtGui.QFileDialog.getOpenFileName( None, 'Select %s executabe:' % soft)

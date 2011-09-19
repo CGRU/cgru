@@ -136,6 +136,7 @@ std::list<std::string> Environment::cmdarguments_usagearg;
 std::list<std::string> Environment::cmdarguments_usagehelp;
 std::list<std::string> Environment::previewcmds;
 std::list<std::string> Environment::rendercmds;
+std::list<std::string> Environment::rendercmds_admin;
 
 int         Environment::version_afanasy = 0;
 std::string Environment::version_cgru;
@@ -203,6 +204,7 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
 
    getVar( pnode, previewcmds,                       "previewcmds"                       );
    getVar( pnode, rendercmds,                        "rendercmds"                        );
+   getVar( pnode, rendercmds_admin,                  "rendercmds_admin"                  );
    getVar( pnode, watch_refreshinterval,             "watch_refreshinterval"             );
    getVar( pnode, watch_connectretries,              "watch_connectretries"              );
    getVar( pnode, watch_waitforconnected,            "watch_waitforconnected"            );
@@ -339,7 +341,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
          "   sys.path.append( afpython)\n"
          ;
          PyRun_SimpleString( script.c_str());
-	  }
+          }
    }
 
 

@@ -105,10 +105,10 @@ On MS Windows it should be something like:
      To clear a list specify an empty element text.
 -->
    <rendercmds>vncviewer @ARG@</rendercmds>
-   <rendercmds>xterm -e "ssh @ARG@; read -s -n 1"</rendercmds>
-   <rendercmds>xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1"</rendercmds>
    <rendercmds>xterm -e "ping @ARG@; read -s -n 1"</rendercmds>
    <rendercmds>xterm -e "ping @IP@; read -s -n 1"</rendercmds>
+   <rendercmds_admin>xterm -e "ssh @ARG@; read -s -n 1"</rendercmds_admin>
+   <rendercmds_admin>xterm -e "ssh @ARG@ \"@ASK@\"; read -s -n 1"</rendercmds_admin>
    <watch_connectretries>3</watch_connectretries>
    <watch_waitforconnected>8000</watch_waitforconnected>
    <watch_waitforreadyread>8000</watch_waitforreadyread>
