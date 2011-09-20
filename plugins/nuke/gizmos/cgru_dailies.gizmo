@@ -50,6 +50,8 @@ Gizmo {
    addUserKnob {  4 lgfgrav M {"SouthEast" "South" "SouthWest" "West" "NorthWest" "North" "NorthEast" "East" "Center"}  l "Gravity" -STARTLINE }
    addUserKnob {  7 cach_as  l "Cacher Aspect" R 1.0 9.0 +STARTLINE }
    addUserKnob {  1 cach_op  l "Cacher Opacity"  -STARTLINE }
+   addUserKnob {  7 line_as  l "Cacher Line Aspect" R 1.0 9.0 +STARTLINE }
+   addUserKnob {  1 line_clr l "Cacher Line Color" -STARTLINE }
    addUserKnob {  1 draw169  l "Cacher 16:9"     +STARTLINE }
    addUserKnob {  1 draw235  l "Cacher 2.35"     -STARTLINE }
    addUserKnob {  1 line169  l "Line 16:9 Color" +STARTLINE }
@@ -76,6 +78,8 @@ Gizmo {
    fend        -1
    cach_as     1.85
    cach_op     ""
+   line_as     1.85
+   line_clr    ""
    draw169     ""
    draw235     ""
    line169     ""

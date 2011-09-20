@@ -19,8 +19,8 @@ Parser.add_option('-a', '--abspath',      dest='abspath',      action='store_tru
 Parser.add_option('-A', '--afanasy',      dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 Parser.add_option('-m', '--maxhosts',     dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,       help='Verbose mode')
-Parser.add_option('--aspect',             dest='aspect',       type  ='float',      default=-1.0,        help='Image aspect, -1 = no changes')
-Parser.add_option('--autoaspect',         dest='autoaspect',   type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
+Parser.add_option('--aspect_in',          dest='aspect_in',    type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
+Parser.add_option('--aspect_auto',        dest='aspect_auto',  type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('-D', '--debug',        dest='debug',        action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 
 (options, args) = Parser.parse_args()
@@ -110,8 +110,8 @@ for dirpath, dirnames, filenames in os.walk( Folder):
       cmd += ' -f %d' % options.fps
       cmd += ' -c %s' % options.codec
       if options.gamma > 0: cmd += ' -g %.2f' % options.gamma
-      if options.aspect > 0: cmd += ' --aspect %f' % options.aspect
-      if options.autoaspect > 0: cmd += ' --autoaspect %f' % options.autoaspect
+      if options.aspect_in > 0: cmd += ' --aspect_in %f' % options.aspect_in
+      if options.aspect_auto > 0: cmd += ' --aspect_auto %f' % options.aspect_auto
       if options.template != '': cmd += ' -t "%s"' % options.template
       cmd += ' "%s"' % pattern
       cmd += ' "%s"' % movname

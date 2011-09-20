@@ -215,14 +215,15 @@ def dailiesGenCmd( node):
    activity = node.knob('activity').value()
    comments = node.knob('comments').value()
    cach_op  = node.knob('cach_op' ).value()
+   line_clr = node.knob('line_clr').value()
    draw169  = node.knob('draw169' ).value()
    draw235  = node.knob('draw235' ).value()
    line169  = node.knob('line169' ).value()
    line235  = node.knob('line235' ).value()
-   lgspath  = node.knob('lgspath').value()
-   lgfpath  = node.knob('lgfpath').value()
-   lgsgrav  = node.knob('lgsgrav').value()
-   lgfgrav  = node.knob('lgfgrav').value()
+   lgspath  = node.knob('lgspath' ).value()
+   lgfpath  = node.knob('lgfpath' ).value()
+   lgsgrav  = node.knob('lgsgrav' ).value()
+   lgfgrav  = node.knob('lgfgrav' ).value()
    lgssize  = int(node.knob('lgssize').value())
    lgfsize  = int(node.knob('lgfsize').value())
    version  = int(node.knob('version').value())
@@ -236,6 +237,7 @@ def dailiesGenCmd( node):
    asp_in         = float(node.knob('asp_in' ).value())
    gamma          = float(node.knob('gamma').value())
    cach_as        = float(node.knob('cach_as' ).value())
+   line_as        = float(node.knob('line_as' ).value())
 
 
    # Command Construction:
@@ -273,6 +275,9 @@ def dailiesGenCmd( node):
    if draw235  is not None and draw235  != '': cmd += ' --draw235 "%s"'  % draw235
    if line169  is not None and line169  != '': cmd += ' --line169 "%s"'  % line169
    if line235  is not None and line235  != '': cmd += ' --line235 "%s"'  % line235
+   if line_clr is not None and line_clr != '':
+      cmd += ' --line_aspect %f' % line_as
+      cmd += ' --line_color "%s"' % line_clr
    if cach_op  is not None and cach_op  != '':
       cmd += ' --cacher_aspect %f' % cach_as
       cmd += ' --cacher_opacity "%s"' % cach_op

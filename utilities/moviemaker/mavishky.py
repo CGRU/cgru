@@ -56,8 +56,9 @@ Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',    
 # Options to makeframe:
 Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='',          help='Format: 768x576, if empty images format used')
 Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',      default=-1.0,        help='Apply gamma correction')
-Parser.add_option('--aspect',           dest='aspect',         type  ='float',      default=-1.0,        help='Image aspect, -1 = no changes')
-Parser.add_option('--autoaspect',       dest='autoaspect',     type  ='float',      default=-1.0,        help='Auto image aspect (2 if w/h <= autoaspect), -1 = no changes')
+Parser.add_option('--aspect_in',        dest='aspect_in',      type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
+Parser.add_option('--aspect_auto',      dest='aspect_auto',    type  ='float',      default=-1.0,        help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
+Parser.add_option('--aspect_out',       dest='aspect_out',     type  ='float',      default=-1.0,        help='Output movie aspect, "-1" = no changes')
 Parser.add_option('--noautocorr',       dest='noautocorr',     action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
 Parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
 Parser.add_option('--company',          dest='company',        type  ='string',     default='',          help='Draw company')
@@ -103,8 +104,7 @@ if len(args) > 2:
    Stereo     = True
 
 Codec       = Options.codec
-Resolution  = Options.resolution
-Aspect      = Options.aspect
+AspectIn    = Options.aspect_in
 Datesuffix  = Options.datesuffix
 Timesuffix  = Options.timesuffix
 
@@ -178,20 +178,18 @@ afjobname = os.path.basename( Output)
 if datetimesuffix != '': Output += '_' + datetimesuffix
 if Verbose: print('Output = ' + Output)
 
-# Resolution:
+# Options.resolution:
 Width = 0
 Height = 0
-if Resolution != '':
+if Options.resolution != '':
    need_convert = True
-   pos = Resolution.find('x')
-   if pos <= 0:
-      print('Invalid resolution specified.')
-      sys.exit(1)
-   Width = int(Resolution[ : pos ])
-   Height = int(Resolution[ pos + 1 : ])
-   if Verbose: print('Output Resolution = %(Width)d x %(Height)d' % vars())
-   afjobname += ' %s' % Resolution
-
+   res = Options.resolution.split('x')
+   if len(res) < 2: Parser.error('Invalid resolution specified.')
+   Width = int(res[0])
+   Height = int(res[1])
+   if len(res) > 2 and Options.aspect_out < 0: Options.aspect_out = float(res[2])
+   if Verbose: print('Output Resolution = %dx%dx%f' % ( Width, Height, Options.aspect_out))
+   afjobname += ' %s' % Options.resolution
 
 
 # Get images function:
@@ -287,13 +285,13 @@ def getImages( inpattern):
    if Verbose:
       print('Images type = "%s"' % imgtype)
       print('Images resolution = %dx%d' % (imgresx , imgresy))
-   global Aspect
-   if Options.autoaspect > 0:
-      if float(imgresx) / float(imgresy) < Options.autoaspect:
-         Aspect = 2.0
-         print('Auto Aspect = %f (%f)' % (Aspect, float(imgresx) / float(imgresy)))
+   global AspectIn
+   if Options.aspect_auto > 0:
+      if float(imgresx) / float(imgresy) < Options.aspect_auto:
+         AspectIn = 2.0
+         print('Auto AspectIn = %f (%f)' % (AspectIn, float(imgresx) / float(imgresy)))
    elif Verbose:
-      print('Aspect = %f' % Aspect)
+      print('AspectIn = %f' % AspectIn)
 
    return allFiles, inputdir, prefix, digitsnum, suffix
 
@@ -347,7 +345,8 @@ else:
 # Construct frame conversion command arguments:
 cmd_args = ''
 if Options.resolution   != '': cmd_args += ' -r %s' % Options.resolution
-if Aspect                >  0: cmd_args += ' --aspect %f' % Aspect
+if AspectIn              >  0: cmd_args += ' --aspect_in %f' % AspectIn
+if Options.aspect_out    >  0: cmd_args += ' --aspect_out %f' % Options.aspect_out
 if Options.tmpquality   != '': cmd_args += ' -q %s' % Options.tmpquality
 if Options.company      != '': cmd_args += ' -c "%s"' % Options.company
 if Options.project      != '': cmd_args += ' -p "%s"' % Options.project

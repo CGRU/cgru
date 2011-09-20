@@ -17,7 +17,8 @@ Parser.add_option('-s', '--shot',       dest='shot',           type  ='string', 
 Parser.add_option('-a', '--artist',     dest='artist',         type  ='string',     default='',          help='Draw artist')
 Parser.add_option('-f', '--frame',      dest='frame',          type  ='string',     default='',          help='Draw frame')
 Parser.add_option('-m', '--moviename',  dest='moviename',      type  ='string',     default='movie',     help='Draw final movie name')
-Parser.add_option('--aspect',           dest='aspect',         type  ='float',      default='-1.0',      help='Image aspect, "-1" = no changes')
+Parser.add_option('--aspect_in',        dest='aspect_in',      type  ='float',      default=-1.0,        help='Input image aspect, "-1" = no changes')
+Parser.add_option('--aspect_out',       dest='aspect_out',     type  ='float',      default=-1.0,        help='Output image aspect, "-1" = no changes')
 Parser.add_option('--ver',              dest='shotversion',    type  ='string',     default='version',   help='Draw shot version')
 Parser.add_option('--activity',         dest='activity',       type  ='string',     default='',          help='Draw activity')
 Parser.add_option('--comments',         dest='comments',       type  ='string',     default='',          help='Draw comments')
@@ -102,26 +103,34 @@ if template != '':
 Width = 0
 Height = 0
 if Options.resolution != '':
-   pos = Options.resolution.find('x')
-   if pos <= 0: Parser.error('Invalid resolution specified.')
-   Width = int(Options.resolution[: pos ])
-   Height = int(Options.resolution[ pos + 1 :])
-   if Verbose: print('Output resolution = %(Width)d x %(Height)d' % vars())
+   res = Options.resolution.split('x')
+   if len(res) < 2: Parser.error('Invalid resolution specified.')
+   Width = int(res[0])
+   Height = int(res[1])
+   if len(res) > 2 and Options.aspect_out < 0: Options.aspect_out = float(res[2])
+   if Verbose: print('Output Resolution = %dx%dx%f' % ( Width, Height, Options.aspect_out))
 
 # Cacher:
+cacher169 = 16.0 / 9.0
+cacher235 = 2.35
+if Options.aspect_out > 0:
+   Options.cacher_aspect = Options.cacher_aspect / Options.aspect_out
+   Options.line_aspect = Options.line_aspect / Options.aspect_out
+   cacher169 = cacher169 / Options.aspect_out
+   cacher235 = cacher235 / Options.aspect_out
 cacher_alpha = 0.01 * Options.cacher_opacity
 if cacher_alpha > 1.0: cacher_alpha = 1.0
-cacher_y = int((Height - Width/Options.cacher_aspect) / 2)
+cacher_y = int((Height - float(Width)/Options.cacher_aspect) / 2)
 cacher_h = Height - cacher_y
 cacherline_y = int((Height - Width/Options.line_aspect) / 2)
 cacherline_h = Height - cacherline_y
 draw169_alpha = 0.01 * Options.draw169
 if draw169_alpha > 1.0: draw169_alpha = 1.0
-draw169_y = int((Height - Width*9/16) / 2)
+draw169_y = int((Height - Width/cacher169) / 2)
 draw169_h = Height - draw169_y
 draw235_alpha = 0.01 * Options.draw235
 if draw235_alpha > 1.0: draw235_alpha = 1.0
-draw235_y = int((Height - Width/2.35) / 2)
+draw235_y = int((Height - Width/cacher235) / 2)
 draw235_h = Height - draw235_y
 
 # Frame manipulate function:
@@ -171,7 +180,11 @@ def reformatAnnotate( infile, outfile):
 
       cmd = 'convert "%s" +matte' % infile
       cmd += ' -resize %d' % Width
-      if Options.aspect > 0: cmd += ' -resize 100x%f%%' % ( 100.0 / Options.aspect )
+      if Options.aspect_in > 0 or Options.aspect_out > 0:
+         scale = 100.0
+         if Options.aspect_in  > 0: scale /= Options.aspect_in
+         if Options.aspect_out > 0: scale *= Options.aspect_out
+         cmd += ' -resize 100x%f%%' % scale
       cmd += ' -gravity center -background black -extent %(Width)dx%(Height)d +repage' % globals()
       if correction != '': cmd += ' %s' % correction
       if Options.gamma > 0: cmd += ' -gamma %.2f' % Options.gamma
@@ -230,8 +243,11 @@ def reformatAnnotate( infile, outfile):
                         size1 = -1
                         size2 = -1
                      if size1 != -1:
-                        if vertical: size = Height
-                        else: size = Width
+                        if vertical:
+                           size = float(Height)
+# Not needed, font size should not be changed with output aspect
+#                           if Options.aspect_out > 0: size *= Options.aspect_out
+                        else: size = float(Width)
                         size = str(int(size*size1/size2))
                         line = line[:pos]+size+line[pos3+1:]
                         continue
@@ -243,14 +259,21 @@ def reformatAnnotate( infile, outfile):
       cmd += ' ' + (line % globals())
    # Draw color bars:
    if Options.drawcolorbars:
-      cmd += ' -fill "rgb(255,0,0)" -draw "rectangle  0,0 10,10"'
-      cmd += ' -fill "rgb(0,255,0)" -draw "rectangle 10,0 20,10"'
-      cmd += ' -fill "rgb(0,0,255)" -draw "rectangle 20,0 30,10"'
+      box_h = 10
+# Output aspect not changing drawing now:
+#      if Options.aspect_out > 0: box_h *= Options.aspect_out
+      cmd += ' -fill "rgb(255,0,0)" -draw "rectangle  0,0 10,%d"' % box_h
+      cmd += ' -fill "rgb(0,255,0)" -draw "rectangle 10,0 20,%d"' % box_h
+      cmd += ' -fill "rgb(0,0,255)" -draw "rectangle 20,0 30,%d"' % box_h
       rect_num = 10
       rect_w = Width / (rect_num + 2)
       rect_c = 0
       rect_y1 = 30
       rect_y2 = 70
+# Output aspect not changing drawing now:
+#      if Options.aspect_out > 0:
+#         rect_y1 *= Options.aspect_out
+#         rect_y2 *= Options.aspect_out
       rect_x1 = rect_w
       rect_x2 = rect_x1 + rect_w
       for r in range( 0, rect_num):
