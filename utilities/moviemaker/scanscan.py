@@ -48,7 +48,7 @@ def isRightFile(afile):
 
 REdigits = re.compile(r'\d+')
 
-Command = os.path.join( os.path.dirname(sys.argv[0]), 'mavishky.py')
+Command = os.path.join( os.path.dirname(sys.argv[0]), 'makemovie.py')
 Command = 'python ' + Command
 
 def getPatterns(filenames):

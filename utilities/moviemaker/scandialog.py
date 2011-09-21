@@ -8,10 +8,10 @@ from PyQt4 import QtCore, QtGui
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] InputFolder OutputFolder\ntype \"%prog -h\" for help", version="%prog 1.0")
-Parser.add_option('-f', '--format',    dest='format',       type  ='string',     default='720x576',   help='Resolution')
 Parser.add_option('-c', '--codec',     dest='codec',        type  ='string',     default='photojpg_best.ffmpeg',help='Default codec preset')
+Parser.add_option('-f', '--format',    dest='format',       type  ='string',     default='768x576',   help='Resolution')
 Parser.add_option('-t', '--template',  dest='template',     type  ='string',     default='scandpx',   help='Frame paint template')
-Parser.add_option('-e', '--extensions',dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
+Parser.add_option('-e', '--extensions',dest='extensions',   type  ='string',     default='dpx,cin',   help='Files extensions, comma searated')
 Parser.add_option('-a', '--abspath',   dest='abspath',      action='store_true', default=False,       help='Prefix movies with images absolute path')
 Parser.add_option('-A', '--afanasy',   dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 Parser.add_option('-m', '--maxhosts',  dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
@@ -87,7 +87,7 @@ class Dialog( QtGui.QWidget):
       QtGui.QWidget.__init__( self)
       self.evaluated = False
 
-      self.setWindowTitle('Scan Scan   ' + os.getenv('CGRU_VERSION', ''))
+      self.setWindowTitle('Scan Scan - CGRU ' + os.getenv('CGRU_VERSION', ''))
       self.mainLayout = QtGui.QVBoxLayout( self)
 
       self.tabwidget = QtGui.QTabWidget( self)
@@ -131,7 +131,7 @@ Frame rate.')
       self.cbFPS.addItem('24')
       self.cbFPS.addItem('25')
       self.cbFPS.addItem('30')
-      self.cbFPS.setCurrentIndex( 1)
+      self.cbFPS.setCurrentIndex( 0)
       QtCore.QObject.connect( self.cbFPS, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.lFormat.addWidget( self.tFormat)
       self.lFormat.addWidget( self.cbFormat)

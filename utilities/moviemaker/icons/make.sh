@@ -1,6 +1,6 @@
 #!/bin/bash
 
-appnames="mavishky scanscan"
+appnames="makemovie scanscan"
 iconsdir="icons/hicolor"
 svgdir="$iconsdir/scalable/apps"
 

@@ -82,7 +82,7 @@ bool Block::errorHostsAppend( const std::string & hostname)
       {
          (*cIt)++;
          *tIt = time(NULL);
-         if( *cIt >= getErrorsTaskSameHost()) return true;
+         if( *cIt >= getErrorsAvoidHost()) return true;
          return false;
       }
 
@@ -94,14 +94,14 @@ bool Block::errorHostsAppend( const std::string & hostname)
 
 bool Block::avoidHostsCheck( const std::string & hostname) const
 {
-   if( getErrorsTaskSameHost() < 1 ) return false;
+   if( getErrorsAvoidHost() < 1 ) return false;
    std::list<std::string>::const_iterator hIt = errorHosts.begin();
    std::list<int>::const_iterator cIt = errorHostsCounts.begin();
    std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
    for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
       if( *hIt == hostname )
       {
-         if( *cIt >= getErrorsTaskSameHost() )
+         if( *cIt >= getErrorsAvoidHost() )
          {
             return true;
          }

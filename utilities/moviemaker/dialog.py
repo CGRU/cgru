@@ -174,7 +174,7 @@ class Dialog( QtGui.QWidget):
       self.evaluated = False
       self.running   = False
 
-      self.setWindowTitle('Mavishky   ' + os.getenv('CGRU_VERSION', ''))
+      self.setWindowTitle('Make Movie - CGRU ' + os.getenv('CGRU_VERSION', ''))
       self.mainLayout = QtGui.QVBoxLayout( self)
       self.tabwidget = QtGui.QTabWidget( self)
       self.mainLayout.addWidget( self.tabwidget)
@@ -1306,7 +1306,7 @@ Add this options to temporary image saving.')
                self.cmdField.setText('No frame logo file founded')
                return
 
-      cmd = 'mavishky.py'
+      cmd = 'makemovie.py'
       cmd = 'python ' + os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
       cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
       cmd += ' -f %s' % self.cbFPS.currentText()
@@ -1449,7 +1449,7 @@ Add this options to temporary image saving.')
          self.process.kill()
 
 app = QtGui.QApplication( sys.argv)
-icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'mavishky.png'))
+icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'makemovie.png'))
 app.setWindowIcon( icon)
 dialog = Dialog()
 dialog.show()
