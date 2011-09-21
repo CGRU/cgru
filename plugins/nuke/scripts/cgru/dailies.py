@@ -244,7 +244,7 @@ def dailiesGenCmd( node):
    cmd = os.environ['CGRU_LOCATION']
    cmd = os.path.join( cmd, 'utilities')
    cmd = os.path.join( cmd, 'moviemaker')
-   cmd = os.path.join( cmd, 'mavishky.py')
+   cmd = os.path.join( cmd, 'makemovie.py')
    cmd = 'python ' + cmd
 
    cmd += ' -r "%s"' % format
