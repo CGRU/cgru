@@ -13,17 +13,21 @@ Parser.add_option('-c', '--codec',        dest='codec',        type  ='string', 
 Parser.add_option('-f', '--fps',          dest='fps',          type  ='int',        default=25,          help='Frames per second')
 Parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='Movie resolution')
 Parser.add_option('-e', '--extensions',   dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
+Parser.add_option(      '--include',      dest='include',      type  ='string',     default='',          help='Include path pattern')
+Parser.add_option(      '--exclude',      dest='exclude',      type  ='string',     default='',          help='Exclude path pattern')
 Parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
 Parser.add_option('-g', '--gamma',        dest='gamma',        type  ='float',      default=-1.0,        help='Apply gamma correction')
 Parser.add_option('-a', '--abspath',      dest='abspath',      action='store_true', default=False,       help='Prefix movies with images absolute path')
 Parser.add_option('-A', '--afanasy',      dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 Parser.add_option('-m', '--maxhosts',     dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
+Parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False,       help='Start Afanasy job paused.')
 Parser.add_option('-V', '--verbose',      dest='verbose',      action='store_true', default=False,       help='Verbose mode')
 Parser.add_option('--aspect_in',          dest='aspect_in',    type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
 Parser.add_option('--aspect_auto',        dest='aspect_auto',  type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('-D', '--debug',        dest='debug',        action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
+Parser.add_option(      '--test',         dest='test',         action='store_true', default=False,       help='Test mode, only show founded sequences.')
 
-(options, args) = Parser.parse_args()
+(Options, args) = Parser.parse_args()
 
 if len(args) != 2: Parser.error('Not enough or too many arguments provided.')
 Folder = args[0]
@@ -31,14 +35,13 @@ Output = args[1]
 if not os.path.isdir(Folder): Parser.error('Scan folder "%s" does not exist.' % Folder)
 if not os.path.isdir(Output): Parser.error('Scan folder "%s" does not exist.' % Output)
 
-Verbose = options.verbose
-if options.debug: Verbose = True
-if options.debug: print 'DEBUG MODE:'
-if Verbose: print 'VERBOSE MODE:'
+if Options.debug: Options.verbose = True
+if Options.test: Options.verbose = True
+if Options.debug: print('DEBUG MODE:')
 
-if options.extensions != '':
+if Options.extensions != '':
    Extensions = []
-   Extensions.extend(options.extensions.split(','))
+   Extensions.extend(Options.extensions.split(','))
 
 def isRightFile(afile):
    for ext in Extensions:
@@ -47,6 +50,10 @@ def isRightFile(afile):
    return False
 
 REdigits = re.compile(r'\d+')
+REinclude = None
+REexclude = None
+if Options.include != '': REinclude = re.compile( Options.include)
+if Options.exclude != '': REexclude = re.compile( Options.exclude)
 
 Command = os.path.join( os.path.dirname(sys.argv[0]), 'makemovie.py')
 Command = 'python ' + Command
@@ -83,46 +90,56 @@ def genMovieName( path):
    while path.find('__') != -1: path = path.replace('__', '_')
    return path
 
-if options.afanasy != 0:
+if Options.afanasy != 0:
    af = __import__('af', globals(), locals(), [])
    job = af.Job('Scan ' + Folder)
    block = af.Block('movgen', 'movgen')
-   block.setCapacity( options.afanasy)
+   block.setCapacity( Options.afanasy)
    job.blocks.append( block)
-   if options.maxhosts != -1: job.setMaxHosts( options.maxhosts)
+   if Options.maxhosts != -1: job.setMaxHosts( Options.maxhosts)
+   if Options.pause: job.offline()
    job.setNeedOS('')
 
 for dirpath, dirnames, filenames in os.walk( Folder):
+   if REinclude is not None:
+      includes = REinclude.findall( dirpath)
+      if includes is None: continue
+      if len(includes) == 0: continue
+   if REexclude is not None:
+      excludes = REexclude.findall( dirpath)
+      if excludes is None: continue
+      if len(excludes) != 0: continue
    patterns = getPatterns(filenames)
    for pattern in patterns:
       pattern = os.path.join( dirpath, pattern)
-      if Verbose: print pattern
+      if Options.verbose: print( pattern)
+      if Options.test: continue
 
       movname = pattern
-      if not options.abspath:
+      if not Options.abspath:
          movname = movname.replace( Folder, '')
          movname = movname.strip('/\\')
       movname = genMovieName(movname)
       movname = os.path.join( Output, movname)
 
       cmd = Command
-      cmd += ' -r %s' % options.resolution
-      cmd += ' -f %d' % options.fps
-      cmd += ' -c %s' % options.codec
-      if options.gamma > 0: cmd += ' -g %.2f' % options.gamma
-      if options.aspect_in > 0: cmd += ' --aspect_in %f' % options.aspect_in
-      if options.aspect_auto > 0: cmd += ' --aspect_auto %f' % options.aspect_auto
-      if options.template != '': cmd += ' -t "%s"' % options.template
+      cmd += ' -r %s' % Options.resolution
+      cmd += ' -f %d' % Options.fps
+      cmd += ' -c %s' % Options.codec
+      if Options.gamma > 0: cmd += ' -g %.2f' % Options.gamma
+      if Options.aspect_in > 0: cmd += ' --aspect_in %f' % Options.aspect_in
+      if Options.aspect_auto > 0: cmd += ' --aspect_auto %f' % Options.aspect_auto
+      if Options.template != '': cmd += ' -t "%s"' % Options.template
       cmd += ' "%s"' % pattern
       cmd += ' "%s"' % movname
 
-      if Verbose: print cmd
+      if Options.verbose: print( cmd)
 
-      if not options.debug:
-         if options.afanasy != 0:
+      if not Options.debug:
+         if Options.afanasy != 0:
             task = af.Task( os.path.basename(movname))
             task.setCommand( cmd)
             block.tasks.append( task)
          else: os.system(cmd)
 
-if not options.debug and options.afanasy != 0: job.send()
+if not Options.debug and not Options.test and Options.afanasy != 0: job.send()

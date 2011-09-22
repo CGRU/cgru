@@ -12,9 +12,12 @@ Parser.add_option('-c', '--codec',     dest='codec',        type  ='string',    
 Parser.add_option('-f', '--format',    dest='format',       type  ='string',     default='768x576',   help='Resolution')
 Parser.add_option('-t', '--template',  dest='template',     type  ='string',     default='scandpx',   help='Frame paint template')
 Parser.add_option('-e', '--extensions',dest='extensions',   type  ='string',     default='dpx,cin',   help='Files extensions, comma searated')
+Parser.add_option(      '--include',   dest='include',      type  ='string',     default='',          help='Include path pattern')
+Parser.add_option(      '--exclude',   dest='exclude',      type  ='string',     default='',          help='Exclude path pattern')
 Parser.add_option('-a', '--abspath',   dest='abspath',      action='store_true', default=False,       help='Prefix movies with images absolute path')
 Parser.add_option('-A', '--afanasy',   dest='afanasy',      type  ='int',        default=0,           help='Send commands to Afanasy with specitied capacity')
 Parser.add_option('-m', '--maxhosts',  dest='maxhosts',     type  ='int',        default=-1,          help='Afanasy maximum hosts parameter.')
+Parser.add_option(      '--pause',     dest='pause',        action='store_true', default=False,       help='Start Afanasy job paused.')
 Parser.add_option('--aspect_in',       dest='aspect_in',    type  ='float',      default=-1.0,        help='Input image aspect, -1 = no changes')
 Parser.add_option('--aspect_auto',     dest='aspect_auto',  type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('-D', '--debug',     dest='debug',        action='store_true', default=False,       help='Debug mode')
@@ -24,6 +27,8 @@ InputFolder  = ''
 OutputFolder = ''
 if len(args) > 0: InputFolder  = args[0]
 if len(args) > 1: OutputFolder = args[1]
+
+Extensions = ['jpg','dpx','cin','exr','tga','tif','png']
 
 # Initializations:
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -86,6 +91,7 @@ class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
       self.evaluated = False
+      self.test = False
 
       self.setWindowTitle('Scan Scan - CGRU ' + os.getenv('CGRU_VERSION', ''))
       self.mainLayout = QtGui.QVBoxLayout( self)
@@ -99,7 +105,9 @@ class Dialog( QtGui.QWidget):
       self.parameterslayout = QtGui.QVBoxLayout( self.parameterswidget)
       self.mainLayout.addWidget( self.tabwidget)
 
+
       # General:
+
       self.lFormat = QtGui.QHBoxLayout()
       self.tFormat = QtGui.QLabel('Format:', self)
       self.tFormat.setToolTip('\
@@ -152,6 +160,35 @@ Frame rate.')
       self.lInput.addWidget( self.btnInputBrowse)
       self.generallayout.addLayout( self.lInput)
 
+      self.lExtensions = QtGui.QHBoxLayout()
+      self.tExtensions = QtGui.QLabel('Search extensions:', self)
+      tooltip = '\
+Comma separated list.\n\
+Leave empty to find all known:\n'
+      for ext in Extensions: tooltip += ext + ' '
+      self.tExtensions.setToolTip( tooltip)
+      self.lExtensions.addWidget( self.tExtensions)
+      self.editExtensions = QtGui.QLineEdit( Options.extensions, self)
+      QtCore.QObject.connect( self.editExtensions, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.lExtensions.addWidget( self.editExtensions)
+      self.generallayout.addLayout( self.lExtensions)
+
+      self.lInclude = QtGui.QHBoxLayout()
+      self.tInclude = QtGui.QLabel('Include pattern:', self)
+      self.lInclude.addWidget( self.tInclude)
+      self.editInclude = QtGui.QLineEdit( Options.include, self)
+      QtCore.QObject.connect( self.editInclude, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.lInclude.addWidget( self.editInclude)
+      self.generallayout.addLayout( self.lInclude)
+
+      self.lExclude = QtGui.QHBoxLayout()
+      self.tExclude = QtGui.QLabel('Exclude pattern:', self)
+      self.lExclude.addWidget( self.tExclude)
+      self.editExclude = QtGui.QLineEdit( Options.exclude, self)
+      QtCore.QObject.connect( self.editExclude, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.lExclude.addWidget( self.editExclude)
+      self.generallayout.addLayout( self.lExclude)
+
       self.lOutput = QtGui.QHBoxLayout()
       self.tOutput = QtGui.QLabel('Output Folder:', self)
       self.lOutput.addWidget( self.tOutput)
@@ -163,12 +200,14 @@ Frame rate.')
       self.lOutput.addWidget( self.btnOutputBrowse)
       self.generallayout.addLayout( self.lOutput)
 
+
+      # Parameters:
+
       self.cAbsPath = QtGui.QCheckBox('Prefix movies names with images absolute input files path', self)
       self.cAbsPath.setChecked( Options.abspath)
       QtCore.QObject.connect( self.cAbsPath, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.generallayout.addWidget( self.cAbsPath)
+      self.parameterslayout.addWidget( self.cAbsPath)
 
-      # Parameters:
       self.lTemplates = QtGui.QHBoxLayout()
       self.tTemplate = QtGui.QLabel('Frame Template:', self)
       self.tTemplate.setToolTip('\
@@ -182,16 +221,6 @@ Templates are located in\n\
       self.lTemplates.addWidget( self.cbTemplate)
       QtCore.QObject.connect( self.cbTemplate, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.parameterslayout.addLayout( self.lTemplates)
-
-      self.lExtensions = QtGui.QHBoxLayout()
-      self.tExtensions1 = QtGui.QLabel('Search extensions:', self)
-      self.lExtensions.addWidget( self.tExtensions1)
-      self.editExtensions = QtGui.QLineEdit( Options.extensions, self)
-      QtCore.QObject.connect( self.editExtensions, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.lExtensions.addWidget( self.editExtensions)
-      self.tExtensions2 = QtGui.QLabel('(comma separated list, empty - find all known)', self)
-      self.lExtensions.addWidget( self.tExtensions2)
-      self.parameterslayout.addLayout( self.lExtensions)
 
       self.lAspect = QtGui.QHBoxLayout()
       self.lAspect.addWidget( QtGui.QLabel('Input Images Aspect', self))
@@ -232,6 +261,9 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.lCorr.addWidget( self.dsbGamma)
       self.parameterslayout.addWidget( self.gCorrectionSettings)
 
+
+      # Bottom tab:
+
       self.cmdField = QtGui.QTextEdit( self)
       self.cmdField.setReadOnly( True)
       self.mainLayout.addWidget( self.cmdField)
@@ -243,8 +275,12 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.btnStop = QtGui.QPushButton('Stop', self)
       self.btnStop.setEnabled( False)
       QtCore.QObject.connect( self.btnStop, QtCore.SIGNAL('pressed()'), self.processStop)
-      self.lProcess.addWidget( self.btnStop)
+      self.btnTest = QtGui.QPushButton('Test', self)
+      self.btnTest.setEnabled( False)
+      QtCore.QObject.connect( self.btnTest, QtCore.SIGNAL('pressed()'), self.executeTest)
+      self.lProcess.addWidget( self.btnTest)
       self.lProcess.addWidget( self.btnStart)
+      self.lProcess.addWidget( self.btnStop)
       self.mainLayout.addLayout( self.lProcess)
 
       self.lAfanasy = QtGui.QHBoxLayout()
@@ -261,11 +297,13 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.sbAfMaxHosts.setRange( -1, 1000000)
       self.sbAfMaxHosts.setValue( Options.maxhosts)
       QtCore.QObject.connect( self.sbAfMaxHosts, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.cAfPause = QtGui.QCheckBox('Pause', self)
       self.lAfanasy.addWidget( self.cAfanasy)
       self.lAfanasy.addWidget( self.tAfCapacity)
       self.lAfanasy.addWidget( self.sbAfCapacity)
       self.lAfanasy.addWidget( self.tAfMaxHosts)
       self.lAfanasy.addWidget( self.sbAfMaxHosts)
+      self.lAfanasy.addWidget( self.cAfPause)
       self.mainLayout.addLayout( self.lAfanasy)
 
       self.afanasy()
@@ -293,6 +331,9 @@ Images with width/height ratio > this value will be treated as 2:1.')
 
    def evaluate( self):
       self.evaluated = False
+      self.btnStart.setEnabled( False)
+      self.btnStop.setEnabled( False)
+      self.btnTest.setEnabled( False)
 
       input = str( self.editInput.text())
       output = str( self.editOutput.text())
@@ -311,6 +352,8 @@ Images with width/height ratio > this value will be treated as 2:1.')
          return
 
       extensions = str( self.editExtensions.text())
+      include = str( self.editInclude.text())
+      exclude = str( self.editExclude.text())
       format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
       template = self.cbTemplate.currentText()
 
@@ -322,12 +365,16 @@ Images with width/height ratio > this value will be treated as 2:1.')
       if self.dsbGamma.value() != 1.0: cmd += ' -g %.2f' % self.dsbGamma.value()
       if template != '': cmd += ' -t "%s"' % template
       if extensions != '': cmd += ' -e "%s"' % extensions
+      if include != '': cmd += ' --include "%s"' % include
+      if exclude != '': cmd += ' --exclude "%s"' % exclude
       if self.cAbsPath.isChecked(): cmd += ' -a'
       if self.cAfanasy.isChecked():
          cmd += ' -A %d' % self.sbAfCapacity.value()
          cmd += ' -m %d' % self.sbAfMaxHosts.value()
+         if self.cAfPause.isChecked(): cmd += ' --pause'
       if self.dsbAspect.value()     > 0: cmd += ' --aspect_in %f' % self.dsbAspect.value()
       if self.dsbAutoAspect.value() > 0: cmd += ' --aspect_auto %f' % self.dsbAutoAspect.value()
+      if self.test: cmd += ' --test'
 
       cmd += ' "%s"' % self.editInput.text()
       cmd += ' "%s"' % self.editOutput.text()
@@ -335,13 +382,21 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.cmdField.setText( cmd)
       self.evaluated = True
       self.btnStart.setEnabled( True)
+      self.btnTest.setEnabled( True)
+
+   def executeTest( self):
+      if not self.evaluated: return
+      self.test = True
+      self.execute()
 
    def execute( self):
       if not self.evaluated: return
+      self.evaluate()
       self.command = str( self.cmdField.toPlainText())
       if len( self.command) == 0: return
       self.btnStart.setEnabled( False)
       self.btnStop.setEnabled( True)
+      self.btnTest.setEnabled( False)
       self.cmdField.clear()
       self.process = QtCore.QProcess( self)
       self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
@@ -350,15 +405,16 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.process.start( self.command)
 
    def processfinished( self, exitCode):
-      print 'Exit code = %d' % exitCode
+      print('Exit code = %d' % exitCode)
       self.btnStop.setEnabled( False)
       if exitCode != 0: return
-      self.cmdField.setText( self.command)
+      if not self.test: self.cmdField.setText( self.command)
+      else: self.test = False
       self.btnStart.setEnabled( True)
 
    def processoutput( self):
       output = str( self.process.readAll())
-      print output,
+      print(output)
       self.cmdField.insertPlainText( output)
       self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
