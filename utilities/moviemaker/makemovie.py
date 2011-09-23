@@ -238,7 +238,7 @@ def getImages( inpattern):
    allFiles = []
    eprefix = re.escape( prefix)
    esuffix = re.escape( suffix)
-   expr = r'%(eprefix)s([0-9]{%(digitsnum)s,%(digitsnum)s})%(esuffix)s' % vars()
+   expr = r'%(eprefix)s([0-9]{%(digitsnum)s,%(digitsnum)s})%(esuffix)s$' % vars()
    if Verbose: print('Expression = ' + expr)
    expr = re.compile( expr)
    allItems = os.listdir( inputdir)

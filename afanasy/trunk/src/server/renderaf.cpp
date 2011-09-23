@@ -606,7 +606,7 @@ bool RenderAf::getFarmHost( af::Host * newHost)
    int servicesnum_old = servicesnum;
 
    // Clear services and services usage:
-   host.clear();
+   host.clearServices();
    servicescounts.clear();
    servicesnum = 0;
 

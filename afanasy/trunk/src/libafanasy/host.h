@@ -12,8 +12,8 @@ public:
 
    void setService(  const std::string & name, int count);
    void remServices( const std::list<std::string> & remNames);
+   void clearServices();
 
-   void clear();
    void copy(  const Host & other);
    void merge( const Host & other);
 

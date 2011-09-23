@@ -25,6 +25,7 @@ public:
 
    inline void setHost( const Host & newhost) { host.copy( newhost );}
    inline void remServices( const std::list<std::string> & names) { remservices = names;}
+   inline void clearServices() { clear_services = true; }
    void getHost( Host & newhost) const;
 
    inline bool match( const std::string & hostname) const { return regexp.match( hostname); }
@@ -39,5 +40,6 @@ private:
 private:
    RegExp regexp;
    std::list<std::string> remservices;
+   bool clear_services;
 };
 }

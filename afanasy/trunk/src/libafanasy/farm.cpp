@@ -19,12 +19,13 @@ const char XMLNAME_RESOURCES[]        = "resources";
 const char XMLNAME_DATA[]             = "data";
 const char XMLNAME_CAPACITY[]         = "capacity";
 const char XMLNAME_MAXTASKS[]         = "maxtasks";
-const char XMLNAME_SERVISE[]          = "service";
-const char XMLNAME_SERVISEREMOVE[]    = "remservice";
-const char XMLNAME_SERVISENAME[]      = "name";
-const char XMLNAME_SERVISECOUNT[]     = "count";
-const char XMLNAME_SERVISEMAXHOSTS[]  = "maxhosts";
-const char XMLNAME_SERVISEMAXCOUNT[]  = "maxcount";
+const char XMLNAME_SERVICE[]          = "service";
+const char XMLNAME_SERVICEREMOVE[]    = "remservice";
+const char XMLNAME_SERVICESCLEAR[]    = "clearservices";
+const char XMLNAME_SERVICENAME[]      = "name";
+const char XMLNAME_SERVICECOUNT[]     = "count";
+const char XMLNAME_SERVICEMAXHOSTS[]  = "maxhosts";
+const char XMLNAME_SERVICEMAXCOUNT[]  = "maxcount";
 const char XMLNAME_WOLIDLESLEEPTIME[] = "wolidlesleeptime";
 
 ServiceLimit::ServiceLimit( int MaxCount, int MaxHosts):
@@ -175,6 +176,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
          std::string patname, description, mask;
          Host host;
          std::list<std::string> remservices;
+         bool clear_services = false;
 
          rapidxml::xml_attribute<> * attr;
 
@@ -197,12 +199,12 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                return false;
             }
 
-            if( cnode_name == XMLNAME_SERVISE )
+            if( cnode_name == XMLNAME_SERVICE )
             {
                std::string servicename, servicecount_str;
                int servicecount = 0;
 
-               attr = cnode->first_attribute( XMLNAME_SERVISENAME);
+               attr = cnode->first_attribute( XMLNAME_SERVICENAME);
                if( attr != NULL ) servicename = attr->value();
                if( servicename.empty())
                {
@@ -210,7 +212,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                   return false;
                }
 
-               attr = cnode->first_attribute( XMLNAME_SERVISECOUNT);
+               attr = cnode->first_attribute( XMLNAME_SERVICECOUNT);
                if( attr != NULL ) servicecount_str = attr->value();
                if( false == servicecount_str.empty())
                {
@@ -225,10 +227,10 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
 
                host.setService( servicename, servicecount);
             }
-            else if( cnode_name == XMLNAME_SERVISEREMOVE )
+            else if( cnode_name == XMLNAME_SERVICEREMOVE )
             {
                std::string servicename;
-               attr = cnode->first_attribute( XMLNAME_SERVISENAME);
+               attr = cnode->first_attribute( XMLNAME_SERVICENAME);
                if( attr != NULL ) servicename = attr->value();
                if( servicename.empty())
                {
@@ -236,6 +238,10 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                   return false;
                }
                remservices.push_back( servicename);
+            }
+            else if( cnode_name == XMLNAME_SERVICESCLEAR)
+            {
+               clear_services = true;
             }
             else
             {
@@ -298,8 +304,15 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
          Pattern * pat = new Pattern( patname);
          pat->setMask( mask);
          pat->setDescription( description);
+         if( clear_services )
+         {
+            pat->clearServices();
+         }
+         else
+         {
+            pat->remServices( remservices);
+         }
          pat->setHost( host);
-         pat->remServices( remservices);
          if( addPattern( pat) == false)
          {
             delete pat;
@@ -307,12 +320,12 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
          }
 
       }
-      if( strcmp( XMLNAME_SERVISE, node->name()) ==  0)
+      if( strcmp( XMLNAME_SERVICE, node->name()) ==  0)
       {
          rapidxml::xml_attribute<> * attr;
 
          std::string servicename;
-         attr = node->first_attribute( XMLNAME_SERVISENAME);
+         attr = node->first_attribute( XMLNAME_SERVICENAME);
          if( attr != NULL ) servicename = attr->value();
          if( servicename.empty() == 1)
          {
@@ -325,7 +338,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
          int servicemaxhosts = -1;
          bool ok = false;
 
-         attr = node->first_attribute( XMLNAME_SERVISEMAXCOUNT);
+         attr = node->first_attribute( XMLNAME_SERVICEMAXCOUNT);
          if( attr != NULL ) servicemaxcount_str = attr->value();
          if( false == servicemaxcount_str.empty())
          {
@@ -337,7 +350,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
             }
          }
 
-         attr = node->first_attribute( XMLNAME_SERVISEMAXHOSTS);
+         attr = node->first_attribute( XMLNAME_SERVICEMAXHOSTS);
          if( attr != NULL ) servicemaxhosts_str = attr->value();
          if( false == servicemaxhosts_str.empty())
          {

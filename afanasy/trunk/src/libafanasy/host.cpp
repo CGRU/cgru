@@ -28,6 +28,7 @@ Host::~Host(){}
 
 void Host::setService( const std::string & name, int count)
 {
+//printf("Host::setService: '%s':%d\n", name.c_str(), count);
    int index = 0;
    bool exists = false;
    for( std::vector<std::string>::const_iterator it = servicesnames.begin(); it != servicesnames.end(); it++, index++)
@@ -46,7 +47,7 @@ void Host::setService( const std::string & name, int count)
    }
 }
 
-void Host::clear()
+void Host::clearServices()
 {
    servicesnames.clear();
    servicescounts.clear();
@@ -55,7 +56,7 @@ void Host::clear()
 
 void Host::copy( const Host & other)
 {
-   clear();
+   clearServices();
    merge( other);
 }
 
@@ -164,7 +165,7 @@ void Host::printServices() const
 {
    std::ostringstream stream;
    generateServicesStream( stream);
-   std::cout << stream << std::endl;
+   std::cout << stream.str() << std::endl;
 }
 
 HostResMeter::HostResMeter(){}

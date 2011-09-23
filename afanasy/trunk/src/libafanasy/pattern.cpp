@@ -9,6 +9,7 @@ using namespace af;
 Pattern::Pattern( const std::string & patternName):
    ptr_next( NULL),
    name( patternName),
+   clear_services( false),
    description("")
 {
 }
@@ -34,8 +35,9 @@ bool Pattern::isValid() const
 
 void Pattern::getHost( Host & newhost) const
 {
+   if( clear_services) newhost.clearServices();
+   else if( remservices.size()) newhost.remServices( remservices);
    newhost.merge( host);
-   if( remservices.size()) newhost.remServices( remservices);
 }
 
 void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
@@ -48,7 +50,8 @@ void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << std::endl;
       stream << "Pattern: \"" << name << "\" (" << description << "):";
       stream << " Mask =\"" << regexp.getPattern() << "\"";
-      if( remservices.size())
+      if( clear_services ) stream << "\n   Clear services.\n";
+      else if( remservices.size())
       {
          stream << "\n   Remove services:";
          for( std::list<std::string>::const_iterator it = remservices.begin(); it != remservices.end(); it++)
