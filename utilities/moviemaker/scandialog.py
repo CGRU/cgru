@@ -30,6 +30,8 @@ if len(args) > 1: OutputFolder = args[1]
 
 Extensions = ['jpg','dpx','cin','exr','tga','tif','png']
 
+DateTimeFormat = 'yy.MM.dd HH:mm'
+
 # Initializations:
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
 TemplatesPath = os.path.join( DialogPath, 'templates')
@@ -189,6 +191,17 @@ Leave empty to find all known:\n'
       self.lExclude.addWidget( self.editExclude)
       self.generallayout.addLayout( self.lExclude)
 
+      self.lDateTime = QtGui.QHBoxLayout()
+      self.cDateTime = QtGui.QCheckBox('Skip folders ealier than:', self)
+      QtCore.QObject.connect( self.cDateTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.lDateTime.addWidget( self.cDateTime)
+      self.eDateTime = QtGui.QDateTimeEdit( QtCore.QDateTime.currentDateTime(), self)
+      self.eDateTime.setCalendarPopup( True)
+      self.eDateTime.setDisplayFormat( DateTimeFormat)
+      QtCore.QObject.connect( self.cDateTime, QtCore.SIGNAL('dateTimeChanged( QDateTime)'), self.evaluate)
+      self.lDateTime.addWidget( self.eDateTime)
+      self.generallayout.addLayout( self.lDateTime)
+
       self.lOutput = QtGui.QHBoxLayout()
       self.tOutput = QtGui.QLabel('Output Folder:', self)
       self.lOutput.addWidget( self.tOutput)
@@ -347,9 +360,6 @@ Images with width/height ratio > this value will be treated as 2:1.')
       if output == '':
          output = input
          self.editOutput.setText( output)
-      if not os.path.isdir( output):
-         self.cmdField.setText('Ouput folder does not exist.')
-         return
 
       extensions = str( self.editExtensions.text())
       include = str( self.editInclude.text())
@@ -367,6 +377,7 @@ Images with width/height ratio > this value will be treated as 2:1.')
       if extensions != '': cmd += ' -e "%s"' % extensions
       if include != '': cmd += ' --include "%s"' % include
       if exclude != '': cmd += ' --exclude "%s"' % exclude
+      if self.cDateTime.isChecked(): cmd += ' --after %d' % self.eDateTime.dateTime().toTime_t()
       if self.cAbsPath.isChecked(): cmd += ' -a'
       if self.cAfanasy.isChecked():
          cmd += ' -A %d' % self.sbAfCapacity.value()
@@ -410,6 +421,7 @@ Images with width/height ratio > this value will be treated as 2:1.')
       if exitCode != 0: return
       if not self.test: self.cmdField.setText( self.command)
       else: self.test = False
+      self.btnTest.setEnabled( True)
       self.btnStart.setEnabled( True)
 
    def processoutput( self):

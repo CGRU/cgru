@@ -83,6 +83,7 @@ Parser.add_option('--draw169',          dest='draw169',        type  ='int',    
 Parser.add_option('--draw235',          dest='draw235',        type  ='int',        default=0,           help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
+Parser.add_option('--createoutdir',     dest='createoutdir',   action='store_true', default=False,       help='Create output folder if it not exists')
 Parser.add_option('--stereo',           dest='stereo',         action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
 
 (Options, args) = Parser.parse_args()
@@ -136,9 +137,12 @@ if Options.framestart != -1 and Options.frameend != -1:
 
 # Check output folder:
 if os.path.dirname( Output) != '' and not os.path.isdir( os.path.dirname( Output)):
-   print('Output folder does not exist:')
-   print( os.path.dirname( Output))
-   sys.exit(1)
+   if Options.createoutdir:
+      os.makedirs( os.path.dirname( Output))
+   else:
+      print('Output folder does not exist:')
+      print( os.path.dirname( Output))
+      sys.exit(1)
 
 # Encode command:
 Codec = Codec.lower()

@@ -13,6 +13,7 @@ Parser.add_option('-c', '--codec',        dest='codec',        type  ='string', 
 Parser.add_option('-f', '--fps',          dest='fps',          type  ='int',        default=25,          help='Frames per second')
 Parser.add_option('-r', '--resolution',   dest='resolution',   type  ='string',     default='768x576',   help='Movie resolution')
 Parser.add_option('-e', '--extensions',   dest='extensions',   type  ='string',     default='',          help='Files extensions, comma searated')
+Parser.add_option(      '--after',        dest='after',        type  ='int',        default=0,           help='Search for folder with time after')
 Parser.add_option(      '--include',      dest='include',      type  ='string',     default='',          help='Include path pattern')
 Parser.add_option(      '--exclude',      dest='exclude',      type  ='string',     default='',          help='Exclude path pattern')
 Parser.add_option('-t', '--template',     dest='template',     type  ='string',     default='',          help='Specify frame template to use')
@@ -33,7 +34,6 @@ if len(args) != 2: Parser.error('Not enough or too many arguments provided.')
 Folder = args[0]
 Output = args[1]
 if not os.path.isdir(Folder): Parser.error('Scan folder "%s" does not exist.' % Folder)
-if not os.path.isdir(Output): Parser.error('Scan folder "%s" does not exist.' % Output)
 
 if Options.debug: Options.verbose = True
 if Options.test: Options.verbose = True
@@ -109,18 +109,22 @@ for dirpath, dirnames, filenames in os.walk( Folder):
       excludes = REexclude.findall( dirpath)
       if excludes is None: continue
       if len(excludes) != 0: continue
-   patterns = getPatterns(filenames)
+   if Options.after > 0:
+      if os.path.getmtime( dirpath) < Options.after: continue
+   patterns = getPatterns( filenames)
    for pattern in patterns:
       pattern = os.path.join( dirpath, pattern)
       if Options.verbose: print( pattern)
       if Options.test: continue
+
+      outdir = os.path.join( dirpath, Output)
 
       movname = pattern
       if not Options.abspath:
          movname = movname.replace( Folder, '')
          movname = movname.strip('/\\')
       movname = genMovieName(movname)
-      movname = os.path.join( Output, movname)
+      movname = os.path.join( outdir, movname)
 
       cmd = Command
       cmd += ' -r %s' % Options.resolution
@@ -130,6 +134,7 @@ for dirpath, dirnames, filenames in os.walk( Folder):
       if Options.aspect_in > 0: cmd += ' --aspect_in %f' % Options.aspect_in
       if Options.aspect_auto > 0: cmd += ' --aspect_auto %f' % Options.aspect_auto
       if Options.template != '': cmd += ' -t "%s"' % Options.template
+      cmd += ' --createoutdir'
       cmd += ' "%s"' % pattern
       cmd += ' "%s"' % movname
 
