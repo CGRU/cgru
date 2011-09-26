@@ -30,6 +30,7 @@ xcopy utilities\ %dest%\utilities\ /y
 xcopy utilities\doc %dest%\utilities\doc\ /ys
 xcopy utilities\keeper %dest%\utilities\keeper\ /ys
 xcopy utilities\moviemaker %dest%\utilities\moviemaker\ /ys
+xcopy utilities\afstarter %dest%\utilities\afstarter\ /ys
 
 if not exist %dest%\utilities\regexp mkdir %dest%\utilities\regexp
 xcopy utilities\regexp\bin %dest%\utilities\regexp\bin\ /y
