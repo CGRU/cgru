@@ -56,8 +56,8 @@ rcopy utilities/release/icons $dest/utilities/release
 createDir $dest/utilities/site
 rcopy utilities/site/doc $dest/utilities/site
 
+rcopy utilities/afstarter $dest/utilities
 rcopy utilities/keeper $dest/utilities
-
 rcopy utilities/moviemaker $dest/utilities
 
 createDir $dest/utilities/regexp
