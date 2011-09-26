@@ -91,6 +91,10 @@ class Tray( QtGui.QSystemTrayIcon):
 
       # Add permanent items:
       self.menu['AFANASY'].addSeparator()
+      action = QtGui.QAction('Start Job...', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.startjob)
+      self.menu['AFANASY'].addAction( action)
+      self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Set nibmy', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
       self.menu['AFANASY'].addAction( action)
@@ -188,6 +192,12 @@ class Tray( QtGui.QSystemTrayIcon):
    def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
    def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
+
+   def startjob( self):
+      cmd = os.path.join('afstarter','afstarter.py')
+      cmd = os.path.join('utilities', cmd)
+      cmd = os.path.join( os.environ['CGRU_LOCATION'], cmd)
+      QtCore.QProcess.startDetached('python', [cmd])
 
    def restart( self):
       QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_KEEPER_CMD'])
