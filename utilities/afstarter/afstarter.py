@@ -53,6 +53,13 @@ class Dialog( QtGui.QWidget):
       QtCore.QObject.connect( self.cbWDir, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
       lWDir.addWidget( self.cbWDir)
 
+      # Output images:
+      lImages = QtGui.QHBoxLayout()
+      generallayout.addLayout( lImages)
+      lImages.addWidget( QtGui.QLabel('Output images:', self))
+      self.leOutImages = QtGui.QLineEdit( self)
+      lImages.addWidget( self.leOutImages)
+      QtCore.QObject.connect( self.leOutImages, QtCore.SIGNAL('editingFinished()'), self.evaluate)
 
       # Frames:
       lFrames = QtGui.QHBoxLayout()
@@ -229,6 +236,7 @@ SoftImage pass\n\
       cmd += ' -fpt %d' % self.sbFramePT.value()
       if not str( self.leNode.text()) == '': cmd += ' -node "%s"' % self.leNode.text()
       if not str( self.leTake.text()) == '': cmd += ' -take "%s"' % self.leTake.text()
+      if not str( self.leOutImages.text()) == '': cmd += ' -output "%s"' % self.leOutImages.text()
       cmd += ' -pwd "%s"' % self.leWDir.text()
       if self.sbCapacity.value() > 0: cmd += ' -capacity %d' % self.sbCapacity.value()
       if self.sbMaxRunTasks.value() > 0: cmd += ' -maxruntasks %d' % self.sbMaxRunTasks.value()

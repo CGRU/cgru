@@ -354,7 +354,16 @@ elif ext == 'hip':
 # Maya:
 elif ext == 'mb':
    scenetype = 'maya'
-   cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
+#   cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
+   cmd = 'mayarender' + cmdextension
+   cmd += ' -s @#@ -e @#@ -b %d' % by
+   if node != '': cmd += ' -cam "%s"' % node
+   if output != '':
+      cmd += ' -rd "%s"' % os.path.dirname( output)
+      cmd += ' -im "%s"' % os.path.basename( output)
+      images = afcommon.patternFromDigits( output)
+   cmd += ' -proj "%s"' % pwd
+   cmd += ' "%s"' % scene
 
 # XSI:
 elif ext == 'scn':
