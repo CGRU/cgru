@@ -310,8 +310,6 @@ if fpt < 1:
    print('fpt - frames per task - must be > 0 ( setting to 1)')
    fpt = 1
 
-if images == '' and image != '': images = afcommon.patternFromDigits( image)
-
 if tempscene:
    scene = cgruutils.copyJobFile( scene, name, ext)
    if scene == '': sys.exit(1)
@@ -360,8 +358,13 @@ elif ext == 'mb':
    if node != '': cmd += ' -cam "%s"' % node
    if output != '':
       cmd += ' -rd "%s"' % os.path.dirname( output)
-      cmd += ' -im "%s"' % os.path.basename( output)
-      images = afcommon.patternFromDigits( output)
+      im = os.path.basename( output)
+      of = im[im.rfind('.')+1:]
+      im = im[:im.rfind('.')]
+      im = im[:im.rfind('.')]
+      cmd += ' -im "%s"' % os.path.basename( im)
+      cmd += ' -of "%s"' % os.path.basename( of)
+      images = output
    cmd += ' -proj "%s"' % pwd
    cmd += ' "%s"' % scene
 
@@ -399,7 +402,7 @@ elif ext == 'max':
       else: blockname = take
    if output != '':
       cmd += ' -o:"%s"' % output
-      images = afcommon.patternFromDigits( output)
+      images = output
 
 # simple generic:
 else:

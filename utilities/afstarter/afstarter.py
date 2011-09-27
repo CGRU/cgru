@@ -44,7 +44,7 @@ class Dialog( QtGui.QWidget):
       # Working Directory:
       lWDir = QtGui.QHBoxLayout()
       generallayout.addLayout( lWDir)
-      lWDir.addWidget( QtGui.QLabel('Working Directory:', self))
+      lWDir.addWidget( QtGui.QLabel('Working Directory/Project:', self))
       self.leWDir = QtGui.QLineEdit( self)
       lWDir.addWidget( self.leWDir)
       QtCore.QObject.connect( self.leWDir, QtCore.SIGNAL('editingFinished()'), self.evaluate)
