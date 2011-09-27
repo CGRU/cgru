@@ -5,4 +5,4 @@ pushd ../.. > /dev/null
 source "./setup.sh"
 popd > /dev/null
 
-python ./afstarter.py
+python ./afstarter.py "$@"

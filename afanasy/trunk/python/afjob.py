@@ -24,16 +24,16 @@ afjob path/scene.hip 1 100 -fpt 3 -pwd projects/test -node /out/mantra1 -take ba
 \n\
 arguments:\n\
 \n\
-path/scene.shk       -   (R) scene, which file extension determinate run command and task type\n\
-1                    -   (R) first frame to render\n\
-100                  -   (R) last frame to render\n\
--by 1                -   frames increment\n\
--fpt 3               -   frames per task\n\
+path/scene.shk       -   (R) Scene, which file extension determinate run command and task type\n\
+1                    -   (R) First frame to render\n\
+100                  -   (R) Last frame to render\n\
+-by 1                -   Frames increment, default = 1\n\
+-fpt 1               -   Frames per task, default = 1\n\
 -pwd projects/test   -   Working directory, if not set current will be used.\n\
--name my_job         -   job name\n\
--node                -   node to render ( houdini driver, nuke write, max camera )\n\
--type                -   service type\n\
--take                -   take to use ( houdini take, xsi pass, max batch )\n\
+-name my_job         -   Job name, if not set scene name will be used.\n\
+-node                -   Node to render ( houdini driver, nuke write, max camera )\n\
+-type                -   Service type\n\
+-take                -   Take to use ( houdini take, xsi pass, max batch )\n\
 -ignoreinputs        -   not to render input nodes ( houdini ignore inputs ROP parameter )\n\
 -tempscene           -   copy scene to temporary file to render\n\
 -deletescene         -   delete scene when job deleted\n\
@@ -41,7 +41,7 @@ path/scene.shk       -   (R) scene, which file extension determinate run command
 -os                  -   OS needed mask, "any" to render on any platform\n\
 -hostsmask           -   job render hosts mask\n\
 -hostsexcl           -   job render hosts to exclude mask\n\
--maxhosts            -   maximum number of hosts to use\n\
+-maxruntasks         -   maximum number of hosts to use\n\
 -maxruntime          -   maximum run time for task in seconds\n\
 -priority            -   job priority\n\
 -capacity            -   tasks capacity\n\
@@ -96,7 +96,7 @@ startpaused    = False
 hostsmask      = ''
 hostsexcl      = ''
 maxruntime     = 0
-maxhosts       = -1
+maxruntasks    = -1
 priority       = -1
 capacity       = -1
 capmin         = -1
@@ -201,10 +201,10 @@ for i in range( argsl):
       hostsexcl = argsv[i]
       continue
 
-   if arg == '-maxhosts':
+   if arg == '-maxruntasks' or arg == '-maxhosts':
       i += 1
       if i == argsl: break
-      maxhosts = integer(argsv[i])
+      maxruntasks = integer(argsv[i])
       continue
 
    if arg == '-maxruntime':
@@ -317,9 +317,15 @@ if tempscene:
 blockname = node
 
 # Shake:
-if   ext == 'shk':
+if ext == 'shk':
    scenetype = 'shake'
    cmd = 'shake' + cmdextension + ' -exec ' + scene + ' -vv -t @#@-@#@'
+
+# Blender:
+if ext == 'blend':
+   scenetype = 'blender'
+   cmd = 'blender' + cmdextension + (' -b "%s"' % scene)
+   cmd += ' -s @#@ -e @#@ -j %d -a' % by
 
 # Nuke:
 elif ext == 'nk':
@@ -338,7 +344,9 @@ elif ext == 'hip':
    cmd = 'hrender_af' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' --numcpus '+ services.service.str_capacity
    if ignoreinputs: cmd += ' -i'
-   cmd += ' -s @#@ -e @#@ --by %(by)d -t %(take)s "%(scene)s" %(node)s' % vars()
+   cmd += ' -s @#@ -e @#@ --by %d' % by
+   if take != '': cmd += ' -t "%s"' % take
+   cmd += ' "%s" "%s"' % (scene,node)
 
 # Maya:
 elif ext == 'mb':
@@ -413,7 +421,7 @@ for cmd in cmds:
 # Create a Job:
 job = af.Job( name)
 job.setPriority( priority)
-if maxhosts       != -1: job.setMaxHosts( maxhosts)
+if maxruntasks    != -1: job.setMaxRunningTasks( maxruntasks)
 if hostsmask      != '': job.setHostsMask( hostsmask)
 if hostsexcl      != '': job.setHostsMaskExclude( hostsexcl)
 if dependmask     != '': job.setDependMask( dependmask)

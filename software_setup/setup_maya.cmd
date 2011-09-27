@@ -32,11 +32,6 @@ set MAYA_SCRIPT_PATH=%AF_ROOT%\plugins\maya;%MAYA_SCRIPT_PATH%
 rem Add Maya to PATH:
 set "PATH=%MAYA_LOCATION%\bin;%PATH%"
 
-IF [%1]==[] (
-set TOSTART=start
-) ELSE (
-set TOSTART=
-)
 
 set APP_DIR=%MAYA_LOCATION%
-set APP_EXE=maya.exe
+set APP_EXE=%MAYA_LOCATION%\bin\maya.exe
