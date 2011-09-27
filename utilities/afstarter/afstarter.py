@@ -184,8 +184,8 @@ SoftImage pass\n\
       self.evaluate()
 
    def browseScene( self):
-      scene = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.leScene.text())
-      if scene.isEmpty(): return
+      scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.leScene.text()))
+      if scene == '': return
       self.leScene.setText( scene)
       self.evaluate()
 
@@ -227,18 +227,18 @@ SoftImage pass\n\
       cmd += ' %d' % self.sbFrameEnd.value()
       cmd += ' -by %d' % self.sbFrameBy.value()
       cmd += ' -fpt %d' % self.sbFramePT.value()
-      if not self.leNode.text().isEmpty(): cmd += ' -node "%s"' % self.leNode.text()
-      if not self.leTake.text().isEmpty(): cmd += ' -take "%s"' % self.leTake.text()
+      if not str( self.leNode.text()) == '': cmd += ' -node "%s"' % self.leNode.text()
+      if not str( self.leTake.text()) == '': cmd += ' -take "%s"' % self.leTake.text()
       cmd += ' -pwd "%s"' % self.leWDir.text()
       if self.sbCapacity.value() > 0: cmd += ' -capacity %d' % self.sbCapacity.value()
       if self.sbMaxRunTasks.value() > 0: cmd += ' -maxruntasks %d' % self.sbMaxRunTasks.value()
       if self.sbPriority.value() > -1: cmd += ' -priority %d' % self.sbPriority.value()
-      if not self.leDependMask.text().isEmpty(): cmd += ' -depmask "%s"' % self.leDependMask.text()
-      if not self.leDependGlobal.text().isEmpty(): cmd += ' -depglbl "%s"' % self.leDependGlobal.text()
-      if not self.leHostsMask.text().isEmpty(): cmd += ' -hostsmask "%s"' % self.leHostsMask.text()
-      if not self.leHostsExclude.text().isEmpty(): cmd += ' -hostsexcl "%s"' % self.leHostsExclude.text()
+      if not str( self.leDependMask.text()) == '': cmd += ' -depmask "%s"' % self.leDependMask.text()
+      if not str( self.leDependGlobal.text()) == '': cmd += ' -depglbl "%s"' % self.leDependGlobal.text()
+      if not str( self.leHostsMask.text()) == '': cmd += ' -hostsmask "%s"' % self.leHostsMask.text()
+      if not str( self.leHostsExclude.text()) == '': cmd += ' -hostsexcl "%s"' % self.leHostsExclude.text()
       if self.cbPaused.isChecked(): cmd += ' -pause'
-      if not self.cbJobName.isChecked() and not self.leJobName.text().isEmpty(): cmd += ' -name "%s"' % self.leJobName.text()
+      if not self.cbJobName.isChecked() and not str( self.leJobName.text()) == '': cmd += ' -name "%s"' % self.leJobName.text()
 
       # Evaluated:
       self.teCmd.setText( cmd)

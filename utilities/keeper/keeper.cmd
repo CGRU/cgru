@@ -11,7 +11,7 @@ set python=%CGRU_KEEPER%\Python
 if not exist %python% set python=%CGRU_LOCATION%\utilities\python\%pyver%
 
 if [%1] == [] (
-   start %python%\pythonw keeper.py
+   start "Keeper" %python%\pythonw keeper.py
 ) else (
    %python%\python keeper.py
 )
