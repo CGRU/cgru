@@ -62,7 +62,7 @@ def patternFromStdC( path, verbose = False):
          pattern = '@#@'
       else:
          digits = path[pos+posp+1:pos+posp+posd]
-         if verbose: print 'digits = "%s"' % digits
+         if verbose: print('digits = "%s"' % digits)
          digits_ok = True
          for d in digits:
             if d not in string.digits:
@@ -71,13 +71,13 @@ def patternFromStdC( path, verbose = False):
          if digits_ok:
             number = int(digits)
             pattern = '@' + '#'*number + '@'
-            if verbose: print 'number = %d' % number
+            if verbose: print('number = %d' % number)
       if pattern is not None:
-         if verbose: print 'pattern = "%s"' % pattern
+         if verbose: print('pattern = "%s"' % pattern)
          path = path[:pos+posp] + pattern + path[pos+posp+posd+1:]
          pos = pos+posp + len(pattern)
       else:
-         if verbose: print 'No pattern.'
+         if verbose: print('No pattern.')
          pos += posp+posd
    return paths
 
@@ -100,7 +100,7 @@ def patternFromDigits( path, verbose = False):
       for d in path[posd:]:
          if d != '#': break
          pos += 1
-      if verbose: print 'path[%d:%d] = "%s"' % (posd, pos, path[posd:pos])
+      if verbose: print('path[%d:%d] = "%s"' % (posd, pos, path[posd:pos]))
       path = path[:posd] + '@' + path[posd:pos] + '@' + path[pos:]
       pos += 2
    return path

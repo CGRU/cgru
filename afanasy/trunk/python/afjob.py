@@ -10,12 +10,12 @@ import cgruutils
 import services.service
 
 def error_exit( error_str = None):
-   if error_str is not None: print error_str
+   if error_str is not None: print( error_str)
    sys.stdout.flush()
    sys.exit(1)
 
 def usage_exit():
-   print '\n\
+   print('\n\
 examples:\n\
 \n\
 afjob path/scene.shk 1 100\n\
@@ -56,7 +56,7 @@ path/scene.shk       -   (R) Scene, which file extension determinate run command
 -simulate            -   enable simulation\n\
 (R)                  -   REQUIRED arguments\n\
 \n\
-'
+')
    error_exit()
 
 def integer( string):
@@ -136,7 +136,7 @@ for i in range( argsl):
       continue
 
    if arg == '-fpr':
-      print '"-fpr" (frame per render) is absolete, use "-fpt" (frame per task) instead.'
+      print('"-fpr" (frame per render) is absolete, use "-fpt" (frame per task) instead.')
       arg = '-fpt'
    if arg == '-fpt':
       i += 1
@@ -201,7 +201,10 @@ for i in range( argsl):
       hostsexcl = argsv[i]
       continue
 
-   if arg == '-maxruntasks' or arg == '-maxhosts':
+   if arg == '-maxhosts':
+      print('"-maxhosts" (maximum hosts) is absolete, use "-maxruntasks" (maximum running tasks) instead.')
+      arg = '-maxruntasks'
+   if arg == '-maxruntasks':
       i += 1
       if i == argsl: break
       maxruntasks = integer(argsv[i])
@@ -304,7 +307,7 @@ cmdextension = os.getenv('AF_CMDEXTENSION', '')
 
 # Check some parameters:
 if fpt < 1:
-   print 'fpt - frames per task - must be > 0 ( setting to 1)'
+   print('fpt - frames per task - must be > 0 ( setting to 1)')
    fpt = 1
 
 if images == '' and image != '': images = afcommon.patternFromDigits( image)
