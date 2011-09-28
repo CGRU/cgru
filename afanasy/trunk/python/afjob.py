@@ -356,14 +356,18 @@ elif ext == 'mb':
    cmd = 'mayarender' + cmdextension
    cmd += ' -s @#@ -e @#@ -b %d' % by
    if node != '': cmd += ' -cam "%s"' % node
+   if take != '': cmd += ' -rl "%s"' % take
    if output != '':
-      cmd += ' -rd "%s"' % os.path.dirname( output)
-      im = os.path.basename( output)
-      of = im[im.rfind('.')+1:]
-      im = im[:im.rfind('.')]
-      im = im[:im.rfind('.')]
-      cmd += ' -im "%s"' % os.path.basename( im)
-      cmd += ' -of "%s"' % os.path.basename( of)
+      if os.path.isdir( output):
+         cmd += ' -rd "%s"' % output
+      else:
+         cmd += ' -rd "%s"' % os.path.dirname( output)
+         im = os.path.basename( output)
+         of = im[im.rfind('.')+1:]
+         im = im[:im.rfind('.')]
+         im = im[:im.rfind('.')]
+         cmd += ' -im "%s"' % os.path.basename( im)
+         cmd += ' -of "%s"' % os.path.basename( of)
       images = output
    cmd += ' -proj "%s"' % pwd
    cmd += ' "%s"' % scene

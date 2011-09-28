@@ -10,7 +10,7 @@
 if(`optionVar -exists "cgru_afanasy__start_frame_ov"`   == false ) optionVar -iv "cgru_afanasy__start_frame_ov"   1;
 if(`optionVar -exists "cgru_afanasy__end_frame_ov"`     == false ) optionVar -iv "cgru_afanasy__end_frame_ov"     2;
 if(`optionVar -exists "cgru_afanasy__frames_render_ov"` == false ) optionVar -iv "cgru_afanasy__frames_render_ov" 1;
-//if(`optionVar -exists "cgru_afanasy__by_frame_ov"`      == false ) optionVar -iv "cgru_afanasy__by_frame_ov"      1;
+if(`optionVar -exists "cgru_afanasy__by_frame_ov"`      == false ) optionVar -iv "cgru_afanasy__by_frame_ov"      1;
 
 global proc afanasy_launch()
 {
@@ -22,7 +22,7 @@ global proc afanasy_launch()
    int $start_frame     = `intField -q -v cgru_afanasy__start_frame`;
    int $end_frame       = `intField -q -v cgru_afanasy__end_frame`;
    int $frames_render   = `intField -q -v cgru_afanasy__frames_render`;
-//   int $by_frame        = `intField -q -v cgru_afanasy__by_frame`;
+   int $by_frame        = `intField -q -v cgru_afanasy__by_frame`;
    // check values
    if( $start_frame > $end_frame)
    {
@@ -33,7 +33,7 @@ global proc afanasy_launch()
    optionVar -iv "cgru_afanasy__start_frame_ov"   $start_frame;
    optionVar -iv "cgru_afanasy__end_frame_ov"     $end_frame;
    optionVar -iv "cgru_afanasy__frames_render_ov" $frames_render;
-//   optionVar -iv "cgru_afanasy__by_frame_ov"      $by_frame;
+   optionVar -iv "cgru_afanasy__by_frame_ov"      $by_frame;
 
    //
    // get pathes
@@ -43,8 +43,8 @@ global proc afanasy_launch()
    string $datetime = `python( "time.strftime('%y%m%d-%H%M%S-') + str(time.time()-int(time.time()))[2:5]")`;
    string $file  = $scene + "." + $datetime + ".mb";
 
-//   string $asset = `workspace -q -directory`;
-//   string $asset = `workspace -q -rootDirectory`;
+   string $project = `workspace -q -rootDirectory`;
+   string $outdir  = `workspace -en "images"`;
 
    string $jobame = `substitute ".*/" $scene ""`;
 
@@ -56,10 +56,11 @@ int $DEBUG = false;
 if( $DEBUG)
 {
    print($start_frame + "s " + $end_frame + "e " + $frames_render + "r ");// + $by_frame + "b\n");
-   print("scene  = " + $scene   + "\n");
-   print("file   = " + $file    + "\n");
-   print("jobame = " + $jobame  + "\n");
-//   print("asset = " + $asset + "\n");
+   print("scene   = " + $scene   + "\n");
+   print("file    = " + $file    + "\n");
+   print("jobame  = " + $jobame  + "\n");
+   print("project = " + $project + "\n");
+   print("outdir  = " + $outdir  + "\n");
 }
 //
    //
@@ -67,17 +68,20 @@ if( $DEBUG)
    //
    if(`checkBox -q -v cgru_afanasy__close`) deleteUI cgru_afanasy_wnd;
 
-   string $cmd = `getenv AF_ROOT` + "/python/afjob.py ";
-   $cmd += $file;
-   $cmd += " "          + $start_frame;
-   $cmd += " "          + $end_frame;
-//   $cmd += " -b "       + $by_frame;
+   string $cmd = $file;
+   $cmd += " "         + $start_frame;
+   $cmd += " "         + $end_frame;
+   $cmd += " -by "     + $by_frame;
    $cmd += " -fpr "    + $frames_render;
-   $cmd += " -name "   + $jobame;
+   $cmd += " -name \"" + $jobame + "\"";
+   $cmd += " -pwd \""  + $project + "\"";
+   $cmd += " -output \"" + $outdir + "\"";
    $cmd += " -deletescene";
 
-   if(`about -windows`) $cmd = "python " + $cmd;
-   else $cmd += " &";
+   if(`about -windows`)
+      $cmd = "python " + `getenv AF_ROOT` + "/python/afjob.py " + $cmd;
+   else
+      $cmd = `getenv AF_ROOT` + "/python/afjob.sh " + $cmd +  " &";
 
    //
    // if debug mode print command and return
@@ -115,10 +119,10 @@ global proc afanasy()
          text -l "   F P R";
          intField -v `optionVar -q "cgru_afanasy__frames_render_ov"` cgru_afanasy__frames_render;
          setParent ..;
-/*      rowLayout -nc 2 -adj 2 -cw2 $labelsWidth 50;
+      rowLayout -nc 2 -adj 2 -cw2 $labelsWidth 50;
          text -l "   By Frame";
          intField -v `optionVar -q "cgru_afanasy__by_frame_ov"`      cgru_afanasy__by_frame;
-         setParent ..;*/
+         setParent ..;
       button -l "   LAUNCH   " -c "afanasy_launch()";
       checkBox -l " close after " -v 1 cgru_afanasy__close;
 

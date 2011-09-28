@@ -60,6 +60,9 @@ class Dialog( QtGui.QWidget):
       self.leOutImages = QtGui.QLineEdit( self)
       lImages.addWidget( self.leOutImages)
       QtCore.QObject.connect( self.leOutImages, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      bBrowseOutImages = QtGui.QPushButton('Browse', self)
+      lImages.addWidget( bBrowseOutImages)
+      QtCore.QObject.connect( bBrowseOutImages, QtCore.SIGNAL('pressed()'), self.browseOutImages)
 
       # Frames:
       lFrames = QtGui.QHBoxLayout()
@@ -95,15 +98,17 @@ class Dialog( QtGui.QWidget):
       labelNode.setToolTip('\
 Houdini ROP\n\
 Nuke write node\n\
+Maya camera\n\
 3DSMAX camera')
       self.leNode = QtGui.QLineEdit( self)
       lNode.addWidget( self.leNode)
       QtCore.QObject.connect( self.leNode, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
-      labelTake = QtGui.QLabel('Take/Pass/Batch:')
+      labelTake = QtGui.QLabel('Take/Layer/Pass/Batch:')
       lNode.addWidget( labelTake)
       labelTake.setToolTip('\
 Houdini take\n\
 SoftImage pass\n\
+Maya layer\n\
 3DSMAX batch')
       self.leTake = QtGui.QLineEdit( self)
       lNode.addWidget( self.leTake)
@@ -194,6 +199,12 @@ SoftImage pass\n\
       scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.leScene.text()))
       if scene == '': return
       self.leScene.setText( scene)
+      self.evaluate()
+
+   def browseOutImages( self):
+      path = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.leOutImages.text()))
+      if path == '': return
+      self.leOutImages.setText( path)
       self.evaluate()
 
    def evaluate( self):
