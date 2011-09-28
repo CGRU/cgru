@@ -23,12 +23,12 @@ global proc afanasy_launch()
    int $end_frame       = `intField -q -v cgru_afanasy__end_frame`;
    int $frames_render   = `intField -q -v cgru_afanasy__frames_render`;
    int $by_frame        = `intField -q -v cgru_afanasy__by_frame`;
+
    // check values
-   if( $start_frame > $end_frame)
-   {
-      error("End Frame must be greater then Start Frame\n");
-      return;
-   }
+   if( $start_frame > $end_frame) $end_frame = $start_frame
+   if( $frames_render < 1) $frames_render = 1
+   if( $by_frame < 1) $by_frame = 1
+
    // store fields values
    optionVar -iv "cgru_afanasy__start_frame_ov"   $start_frame;
    optionVar -iv "cgru_afanasy__end_frame_ov"     $end_frame;
@@ -77,6 +77,7 @@ if( $DEBUG)
    $cmd += " -pwd \""  + $project + "\"";
    $cmd += " -output \"" + $outdir + "\"";
    $cmd += " -deletescene";
+   if(`checkBox -q -v cgru_afanasy__paused`) $cmd += " -pause";
 
    if(`about -windows`)
       $cmd = "python " + `getenv AF_ROOT` + "/python/afjob.py " + $cmd;
@@ -123,8 +124,9 @@ global proc afanasy()
          text -l "   By Frame";
          intField -v `optionVar -q "cgru_afanasy__by_frame_ov"`      cgru_afanasy__by_frame;
          setParent ..;
+      checkBox -l " Start Paused " -v 0 cgru_afanasy__paused;
       button -l "   LAUNCH   " -c "afanasy_launch()";
-      checkBox -l " close after " -v 1 cgru_afanasy__close;
+      checkBox -l " Close After " -v 1 cgru_afanasy__close;
 
    showWindow cgru_afanasy_wnd;
 }

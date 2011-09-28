@@ -309,6 +309,9 @@ cmdextension = os.getenv('AF_CMDEXTENSION', '')
 if fpt < 1:
    print('fpt - frames per task - must be > 0 ( setting to 1)')
    fpt = 1
+if by < 1:
+   print('by - frames step (by frame) - must be > 0 ( setting to 1)')
+   by = 1
 
 if tempscene:
    scene = cgruutils.copyJobFile( scene, name, ext)
