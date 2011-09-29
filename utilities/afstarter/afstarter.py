@@ -2,6 +2,8 @@ import os, sys, time
 
 from PyQt4 import QtCore, QtGui
 
+import cgruconfig
+
 from optparse import OptionParser
 Parser = OptionParser(usage="usage: %prog [options] hip_name rop_name", version="%prog 1.0")
 Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', default=False, help='Verbose mode')
@@ -10,12 +12,16 @@ Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', def
 # Initializations:
 Scene = ''
 if len(Args) > 0: Scene = Args[0]
+FilesPrefix = 'afstarter.'
+FilesSuffix = '.txt'
+FileLast = 'last'
 
 # Dialog class
 class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
       self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
+      self.fields = dict()
       
       topLayout = QtGui.QVBoxLayout( self)
       tabwidget = QtGui.QTabWidget( self)
@@ -34,9 +40,9 @@ class Dialog( QtGui.QWidget):
       lScene = QtGui.QHBoxLayout()
       generallayout.addLayout( lScene)
       lScene.addWidget( QtGui.QLabel('File:', self))
-      self.leScene = QtGui.QLineEdit( Scene, self)
-      lScene.addWidget( self.leScene)
-      QtCore.QObject.connect( self.leScene, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['scenefile'] = QtGui.QLineEdit( Scene, self)
+      lScene.addWidget( self.fields['scenefile'])
+      QtCore.QObject.connect( self.fields['scenefile'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
       bBrowseScene = QtGui.QPushButton('Browse', self)
       lScene.addWidget( bBrowseScene)
       QtCore.QObject.connect( bBrowseScene, QtCore.SIGNAL('pressed()'), self.browseScene)
@@ -45,21 +51,21 @@ class Dialog( QtGui.QWidget):
       lWDir = QtGui.QHBoxLayout()
       generallayout.addLayout( lWDir)
       lWDir.addWidget( QtGui.QLabel('Working Directory/Project:', self))
-      self.leWDir = QtGui.QLineEdit( self)
-      lWDir.addWidget( self.leWDir)
-      QtCore.QObject.connect( self.leWDir, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cbWDir = QtGui.QCheckBox('Use Scene Folder', self)
-      self.cbWDir.setChecked( True)
-      QtCore.QObject.connect( self.cbWDir, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      lWDir.addWidget( self.cbWDir)
+      self.fields['wdir'] = QtGui.QLineEdit( self)
+      lWDir.addWidget( self.fields['wdir'])
+      QtCore.QObject.connect( self.fields['wdir'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['scenewdir'] = QtGui.QCheckBox('Use Scene Folder', self)
+      self.fields['scenewdir'].setChecked( True)
+      QtCore.QObject.connect( self.fields['scenewdir'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      lWDir.addWidget( self.fields['scenewdir'])
 
       # Output images:
       lImages = QtGui.QHBoxLayout()
       generallayout.addLayout( lImages)
       lImages.addWidget( QtGui.QLabel('Output images:', self))
-      self.leOutImages = QtGui.QLineEdit( self)
-      lImages.addWidget( self.leOutImages)
-      QtCore.QObject.connect( self.leOutImages, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['outimages'] = QtGui.QLineEdit( self)
+      lImages.addWidget( self.fields['outimages'])
+      QtCore.QObject.connect( self.fields['outimages'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
       bBrowseOutImages = QtGui.QPushButton('Browse', self)
       lImages.addWidget( bBrowseOutImages)
       QtCore.QObject.connect( bBrowseOutImages, QtCore.SIGNAL('pressed()'), self.browseOutImages)
@@ -68,26 +74,26 @@ class Dialog( QtGui.QWidget):
       lFrames = QtGui.QHBoxLayout()
       generallayout.addLayout( lFrames)
       lFrames.addWidget( QtGui.QLabel('Frames:', self))
-      self.sbFrameStart = QtGui.QSpinBox( self)
-      self.sbFrameStart.setRange( -1000000000, 1000000000)
-      self.sbFrameStart.setValue(1)
-      QtCore.QObject.connect( self.sbFrameStart, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lFrames.addWidget( self.sbFrameStart)
-      self.sbFrameEnd = QtGui.QSpinBox( self)
-      self.sbFrameEnd.setRange( -1000000000, 1000000000)
-      self.sbFrameEnd.setValue(1)
-      QtCore.QObject.connect( self.sbFrameEnd, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lFrames.addWidget( self.sbFrameEnd)
+      self.fields['framestart'] = QtGui.QSpinBox( self)
+      self.fields['framestart'].setRange( -1000000000, 1000000000)
+      self.fields['framestart'].setValue(1)
+      QtCore.QObject.connect( self.fields['framestart'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      lFrames.addWidget( self.fields['framestart'])
+      self.fields['frameend'] = QtGui.QSpinBox( self)
+      self.fields['frameend'].setRange( -1000000000, 1000000000)
+      self.fields['frameend'].setValue(1)
+      QtCore.QObject.connect( self.fields['frameend'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      lFrames.addWidget( self.fields['frameend'])
       lFrames.addWidget( QtGui.QLabel('by', self))
-      self.sbFrameBy = QtGui.QSpinBox( self)
-      lFrames.addWidget( self.sbFrameBy)
-      QtCore.QObject.connect( self.sbFrameBy, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.sbFrameBy.setRange( 1, 1000000000)
+      self.fields['frameby'] = QtGui.QSpinBox( self)
+      lFrames.addWidget( self.fields['frameby'])
+      QtCore.QObject.connect( self.fields['frameby'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.fields['frameby'].setRange( 1, 1000000000)
       lFrames.addWidget( QtGui.QLabel('per task', self))
-      self.sbFramePT = QtGui.QSpinBox( self)
-      lFrames.addWidget( self.sbFramePT)
-      QtCore.QObject.connect( self.sbFramePT, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.sbFramePT.setRange( 1, 1000000000)
+      self.fields['framespt'] = QtGui.QSpinBox( self)
+      lFrames.addWidget( self.fields['framespt'])
+      QtCore.QObject.connect( self.fields['framespt'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.fields['framespt'].setRange( 1, 1000000000)
 
 
       # Node / Camera / Take:
@@ -100,9 +106,9 @@ Houdini ROP\n\
 Nuke write node\n\
 Maya camera\n\
 3DSMAX camera')
-      self.leNode = QtGui.QLineEdit( self)
-      lNode.addWidget( self.leNode)
-      QtCore.QObject.connect( self.leNode, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['node'] = QtGui.QLineEdit( self)
+      lNode.addWidget( self.fields['node'])
+      QtCore.QObject.connect( self.fields['node'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
       labelTake = QtGui.QLabel('Take/Layer/Pass/Batch:')
       lNode.addWidget( labelTake)
       labelTake.setToolTip('\
@@ -110,68 +116,68 @@ Houdini take\n\
 SoftImage pass\n\
 Maya layer\n\
 3DSMAX batch')
-      self.leTake = QtGui.QLineEdit( self)
-      lNode.addWidget( self.leTake)
-      QtCore.QObject.connect( self.leTake, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['take'] = QtGui.QLineEdit( self)
+      lNode.addWidget( self.fields['take'])
+      QtCore.QObject.connect( self.fields['take'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
 
       # Job:
       lJobName = QtGui.QHBoxLayout()
       joblayout.addLayout( lJobName)
       lJobName.addWidget( QtGui.QLabel('Name:', self))
-      self.leJobName = QtGui.QLineEdit( self)
-      lJobName.addWidget( self.leJobName)
-      QtCore.QObject.connect( self.leJobName, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
-      self.cbJobName = QtGui.QCheckBox('Use Scene Name', self)
-      lJobName.addWidget( self.cbJobName)
-      self.cbJobName.setChecked( True)
-      QtCore.QObject.connect( self.cbJobName, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.fields['jobname'] = QtGui.QLineEdit( self)
+      lJobName.addWidget( self.fields['jobname'])
+      QtCore.QObject.connect( self.fields['jobname'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['jobnamescene'] = QtGui.QCheckBox('Use Scene Name', self)
+      lJobName.addWidget( self.fields['jobnamescene'])
+      self.fields['jobnamescene'].setChecked( True)
+      QtCore.QObject.connect( self.fields['jobnamescene'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
 
       # Capacity, max run tasks, priority:
       lCapMax = QtGui.QHBoxLayout()
       joblayout.addLayout( lCapMax)
       lCapMax.addWidget( QtGui.QLabel('Capacity:', self))
-      self.sbCapacity = QtGui.QSpinBox( self)
-      lCapMax.addWidget( self.sbCapacity)
-      self.sbCapacity.setRange(-1, 1000000)
-      self.sbCapacity.setValue(-1)
-      QtCore.QObject.connect( self.sbCapacity, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.fields['capacity'] = QtGui.QSpinBox( self)
+      lCapMax.addWidget( self.fields['capacity'])
+      self.fields['capacity'].setRange(-1, 1000000)
+      self.fields['capacity'].setValue(-1)
+      QtCore.QObject.connect( self.fields['capacity'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       lCapMax.addWidget( QtGui.QLabel('Maximum Running Tasks:', self))
-      self.sbMaxRunTasks = QtGui.QSpinBox( self)
-      lCapMax.addWidget( self.sbMaxRunTasks)
-      self.sbMaxRunTasks.setRange(-1, 1000000)
-      self.sbMaxRunTasks.setValue(-1)
-      QtCore.QObject.connect( self.sbMaxRunTasks, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.fields['maxruntasks'] = QtGui.QSpinBox( self)
+      lCapMax.addWidget( self.fields['maxruntasks'])
+      self.fields['maxruntasks'].setRange(-1, 1000000)
+      self.fields['maxruntasks'].setValue(-1)
+      QtCore.QObject.connect( self.fields['maxruntasks'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       lCapMax.addWidget( QtGui.QLabel('Priority:', self))
-      self.sbPriority = QtGui.QSpinBox( self)
-      lCapMax.addWidget( self.sbPriority)
-      self.sbPriority.setRange(-1, 250)
-      self.sbPriority.setValue(-1)
-      QtCore.QObject.connect( self.sbPriority, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.fields['priority'] = QtGui.QSpinBox( self)
+      lCapMax.addWidget( self.fields['priority'])
+      self.fields['priority'].setRange(-1, 250)
+      self.fields['priority'].setValue(-1)
+      QtCore.QObject.connect( self.fields['priority'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
 
       # Depend Masks:
       lDepends = QtGui.QHBoxLayout()
       joblayout.addLayout( lDepends)
       lDepends.addWidget( QtGui.QLabel('Depend Mask:', self))
-      self.leDependMask = QtGui.QLineEdit( self)
-      lDepends.addWidget( self.leDependMask)
-      QtCore.QObject.connect( self.leDependMask, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['dependmask'] = QtGui.QLineEdit( self)
+      lDepends.addWidget( self.fields['dependmask'])
+      QtCore.QObject.connect( self.fields['dependmask'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
       lDepends.addWidget( QtGui.QLabel('Global:', self))
-      self.leDependGlobal = QtGui.QLineEdit( self)
-      lDepends.addWidget( self.leDependGlobal)
-      QtCore.QObject.connect( self.leDependGlobal, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['dependglobal'] = QtGui.QLineEdit( self)
+      lDepends.addWidget( self.fields['dependglobal'])
+      QtCore.QObject.connect( self.fields['dependglobal'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
       # Host Masks:
       lHostMasks = QtGui.QHBoxLayout()
       joblayout.addLayout( lHostMasks)
       lHostMasks.addWidget( QtGui.QLabel('Hosts Mask:', self))
-      self.leHostsMask = QtGui.QLineEdit( self)
-      lHostMasks.addWidget( self.leHostsMask)
-      QtCore.QObject.connect( self.leHostsMask, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['hostsmask'] = QtGui.QLineEdit( self)
+      lHostMasks.addWidget( self.fields['hostsmask'])
+      QtCore.QObject.connect( self.fields['hostsmask'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
       lHostMasks.addWidget( QtGui.QLabel('Exclude:', self))
-      self.leHostsExclude = QtGui.QLineEdit( self)
-      lHostMasks.addWidget( self.leHostsExclude)
-      QtCore.QObject.connect( self.leHostsExclude, QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.fields['hostsexclude'] = QtGui.QLineEdit( self)
+      lHostMasks.addWidget( self.fields['hostsexclude'])
+      QtCore.QObject.connect( self.fields['hostsexclude'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
       # Command Field:
 
@@ -192,19 +198,60 @@ Maya layer\n\
       self.bRefresh = QtGui.QPushButton('Refresh', self)
       buttonsLayout.addWidget( self.bRefresh)
       QtCore.QObject.connect( self.bRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
+      self.bQuitSave = QtGui.QPushButton('&Quit&&Save', self)
+      buttonsLayout.addWidget( self.bQuitSave)
+      QtCore.QObject.connect( self.bQuitSave, QtCore.SIGNAL('pressed()'), self.quitsave)
 
-      self.evaluate()
+      # Load last settings:
+      self.load( FileLast)
 
    def browseScene( self):
-      scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.leScene.text()))
+      scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['scenefile'].text()))
       if scene == '': return
-      self.leScene.setText( scene)
+      self.fields['scenefile'].setText( scene)
       self.evaluate()
 
    def browseOutImages( self):
-      path = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.leOutImages.text()))
+      path = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['outimages'].text()))
       if path == '': return
-      self.leOutImages.setText( path)
+      self.fields['outimages'].setText( path)
+      self.evaluate()
+
+   def quitsave( self):
+      self.save( FileLast)
+      self.close()
+
+   def save( self, filename):
+      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilesPrefix) + filename + FilesSuffix
+      file = open( filename,'w')
+      for key in self.fields:
+         value = ''
+         if isinstance( self.fields[key], QtGui.QLineEdit):
+            value = str( self.fields[key].text())
+         elif isinstance( self.fields[key], QtGui.QSpinBox):
+            value = str( self.fields[key].value())
+         elif isinstance( self.fields[key], QtGui.QCheckBox):
+            value = str( int( self.fields[key].isChecked()))
+         line = key + '=' + value
+         file.write( line + '\n')
+      file.close()
+
+   def load( self, filename):
+      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilesPrefix) + filename + FilesSuffix
+      file = open( filename,'r')
+      lines = file.readlines()
+      file.close()
+      for line in lines:
+         pos = line.find('=')
+         if pos < 1: continue
+         key = line[:pos]
+         value = line[pos+1:].strip()         
+         if isinstance( self.fields[key], QtGui.QLineEdit):
+            self.fields[key].setText( value)
+         elif isinstance( self.fields[key], QtGui.QSpinBox):
+            self.fields[key].setValue( int(value))
+         elif isinstance( self.fields[key], QtGui.QCheckBox):
+            self.fields[key].setChecked( int(value))
       self.evaluate()
 
    def evaluate( self):
@@ -212,52 +259,52 @@ Maya layer\n\
       self.bStart.setEnabled( False)
 
       # Check parameters:
-      if self.sbFrameStart.value() > self.sbFrameEnd.value(): self.sbFrameEnd.setValue( self.sbFrameStart.value())
-      if self.cbWDir.isChecked(): self.leWDir.setEnabled( False)
-      else: self.leWDir.setEnabled( True)
-      if self.cbJobName.isChecked():
-         self.leJobName.setText( os.path.basename( str( self.leScene.text())))
-         self.leJobName.setEnabled( False)
+      if self.fields['framestart'].value() > self.fields['frameend'].value(): self.fields['frameend'].setValue( self.fields['framestart'].value())
+      if self.fields['scenewdir'].isChecked(): self.fields['wdir'].setEnabled( False)
+      else: self.fields['wdir'].setEnabled( True)
+      if self.fields['jobnamescene'].isChecked():
+         self.fields['jobname'].setText( os.path.basename( str( self.fields['scenefile'].text())))
+         self.fields['jobname'].setEnabled( False)
       else:
-         self.leJobName.setEnabled( True)
+         self.fields['jobname'].setEnabled( True)
 
       # Check scene:
-      if len( self.leScene.text()) == 0: return
-      if not os.path.isfile( self.leScene.text()):
+      if len( self.fields['scenefile'].text()) == 0: return
+      if not os.path.isfile( self.fields['scenefile'].text()):
          self.teCmd.setText('Scene file does not exist.')
          return
-      self.leScene.setText( os.path.abspath( str( self.leScene.text())))
+      self.fields['scenefile'].setText( os.path.abspath( str( self.fields['scenefile'].text())))
 
       # Check working directory:
-      if self.cbWDir.isChecked(): self.leWDir.setText( os.path.dirname( str( self.leScene.text())))
-      if not os.path.isdir( self.leWDir.text()):
+      if self.fields['scenewdir'].isChecked(): self.fields['wdir'].setText( os.path.dirname( str( self.fields['scenefile'].text())))
+      if not os.path.isdir( self.fields['wdir'].text()):
          self.teCmd.setText('Working directory does not exist.')
          return
-      self.leWDir.setText( os.path.abspath( str( self.leWDir.text())))
+      self.fields['wdir'].setText( os.path.abspath( str( self.fields['wdir'].text())))
 
       # Construct command:
       cmd = os.environ['AF_ROOT']
       cmd = os.path.join( cmd, 'python')
       cmd = os.path.join( cmd, 'afjob.py')
       cmd = 'python ' + cmd
-      cmd += ' "%s"' % self.leScene.text()
-      cmd += ' %d' % self.sbFrameStart.value()
-      cmd += ' %d' % self.sbFrameEnd.value()
-      cmd += ' -by %d' % self.sbFrameBy.value()
-      cmd += ' -fpt %d' % self.sbFramePT.value()
-      if not str( self.leNode.text()) == '': cmd += ' -node "%s"' % self.leNode.text()
-      if not str( self.leTake.text()) == '': cmd += ' -take "%s"' % self.leTake.text()
-      if not str( self.leOutImages.text()) == '': cmd += ' -output "%s"' % self.leOutImages.text()
-      cmd += ' -pwd "%s"' % self.leWDir.text()
-      if self.sbCapacity.value() > 0: cmd += ' -capacity %d' % self.sbCapacity.value()
-      if self.sbMaxRunTasks.value() > 0: cmd += ' -maxruntasks %d' % self.sbMaxRunTasks.value()
-      if self.sbPriority.value() > -1: cmd += ' -priority %d' % self.sbPriority.value()
-      if not str( self.leDependMask.text()) == '': cmd += ' -depmask "%s"' % self.leDependMask.text()
-      if not str( self.leDependGlobal.text()) == '': cmd += ' -depglbl "%s"' % self.leDependGlobal.text()
-      if not str( self.leHostsMask.text()) == '': cmd += ' -hostsmask "%s"' % self.leHostsMask.text()
-      if not str( self.leHostsExclude.text()) == '': cmd += ' -hostsexcl "%s"' % self.leHostsExclude.text()
+      cmd += ' "%s"' % self.fields['scenefile'].text()
+      cmd += ' %d' % self.fields['framestart'].value()
+      cmd += ' %d' % self.fields['frameend'].value()
+      cmd += ' -by %d' % self.fields['frameby'].value()
+      cmd += ' -fpt %d' % self.fields['framespt'].value()
+      if not str( self.fields['node'].text()) == '': cmd += ' -node "%s"' % self.fields['node'].text()
+      if not str( self.fields['take'].text()) == '': cmd += ' -take "%s"' % self.fields['take'].text()
+      if not str( self.fields['outimages'].text()) == '': cmd += ' -output "%s"' % self.fields['outimages'].text()
+      cmd += ' -pwd "%s"' % self.fields['wdir'].text()
+      if self.fields['capacity'].value() > 0: cmd += ' -capacity %d' % self.fields['capacity'].value()
+      if self.fields['maxruntasks'].value() > 0: cmd += ' -maxruntasks %d' % self.fields['maxruntasks'].value()
+      if self.fields['priority'].value() > -1: cmd += ' -priority %d' % self.fields['priority'].value()
+      if not str( self.fields['dependmask'].text()) == '': cmd += ' -depmask "%s"' % self.fields['dependmask'].text()
+      if not str( self.fields['dependglobal'].text()) == '': cmd += ' -depglbl "%s"' % self.fields['dependglobal'].text()
+      if not str( self.fields['hostsmask'].text()) == '': cmd += ' -hostsmask "%s"' % self.fields['hostsmask'].text()
+      if not str( self.fields['hostsexclude'].text()) == '': cmd += ' -hostsexcl "%s"' % self.fields['hostsexclude'].text()
       if self.cbPaused.isChecked(): cmd += ' -pause'
-      if not self.cbJobName.isChecked() and not str( self.leJobName.text()) == '': cmd += ' -name "%s"' % self.leJobName.text()
+      if not self.fields['jobnamescene'].isChecked() and not str( self.fields['jobname'].text()) == '': cmd += ' -name "%s"' % self.fields['jobname'].text()
 
       # Evaluated:
       self.teCmd.setText( cmd)
