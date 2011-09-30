@@ -12,9 +12,10 @@ Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', def
 # Initializations:
 Scene = ''
 if len(Args) > 0: Scene = Args[0]
-FilesPrefix = 'afstarter.'
-FilesSuffix = '.txt'
+FilePrefix = 'afstarter.'
+FileSuffix = '.txt'
 FileLast = 'last'
+FileRecent = 'recent'
 
 # Dialog class
 class Dialog( QtGui.QWidget):
@@ -179,31 +180,47 @@ Maya layer\n\
       lHostMasks.addWidget( self.fields['hostsexclude'])
       QtCore.QObject.connect( self.fields['hostsexclude'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
-      # Command Field:
+      # Presets:
+      presetsLayout = QtGui.QHBoxLayout()
+      topLayout.addLayout( presetsLayout)
+      presetsLayout.addWidget( QtGui.QLabel('Recent:', self))
+      self.cbRecent = QtGui.QComboBox( self)
+      presetsLayout.addWidget( self.cbRecent)
+      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
+      self.bLoad = QtGui.QPushButton('Load', self)
+      presetsLayout.addWidget( self.bLoad)
+#      QtCore.QObject.connect( self.bLoad, QtCore.SIGNAL('pressed()'), self.start)
+      self.bSave = QtGui.QPushButton('Save', self)
+      presetsLayout.addWidget( self.bSave)
+#      QtCore.QObject.connect( self.bSave, QtCore.SIGNAL('pressed()'), self.start)
 
+
+      # Command Field:
       self.teCmd = QtGui.QTextEdit( self)
       topLayout.addWidget( self.teCmd)
 
 
       # Buttons:
-
       buttonsLayout = QtGui.QHBoxLayout()
       topLayout.addLayout( buttonsLayout)
-      self.bStart = QtGui.QPushButton('Start', self)
+      self.bStart = QtGui.QPushButton('&Start', self)
       buttonsLayout.addWidget( self.bStart)
       QtCore.QObject.connect( self.bStart, QtCore.SIGNAL('pressed()'), self.start)
-      self.cbPaused = QtGui.QCheckBox('Paused', self)
-      buttonsLayout.addWidget( self.cbPaused)
-      QtCore.QObject.connect( self.cbPaused, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.bRefresh = QtGui.QPushButton('Refresh', self)
+      self.fields['paused'] = QtGui.QCheckBox('Paused', self)
+      buttonsLayout.addWidget( self.fields['paused'])
+      QtCore.QObject.connect( self.fields['paused'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.bRefresh = QtGui.QPushButton('&Refresh', self)
       buttonsLayout.addWidget( self.bRefresh)
       QtCore.QObject.connect( self.bRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
-      self.bQuitSave = QtGui.QPushButton('&Quit&&Save', self)
+      self.bQuitSave = QtGui.QPushButton('&Quit&&Store', self)
       buttonsLayout.addWidget( self.bQuitSave)
       QtCore.QObject.connect( self.bQuitSave, QtCore.SIGNAL('pressed()'), self.quitsave)
 
+      # Refresh recent:
+      self.refreshRecent()
+
       # Load last settings:
-      self.load( FileLast)
+      if not self.load( FileLast): self.evaluate()
 
    def browseScene( self):
       scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['scenefile'].text()))
@@ -222,7 +239,7 @@ Maya layer\n\
       self.close()
 
    def save( self, filename):
-      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilesPrefix) + filename + FilesSuffix
+      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
       file = open( filename,'w')
       for key in self.fields:
          value = ''
@@ -236,8 +253,46 @@ Maya layer\n\
          file.write( line + '\n')
       file.close()
 
+   def getRecentFilesList( self):
+      allfiles = os.listdir( cgruconfig.VARS['HOME_CGRU'])
+      recfiles = []
+      for afile in allfiles:
+         if afile.find( FilePrefix + FileRecent) >= 0: recfiles.append( afile)
+      recfiles.sort()
+      recfiles.reverse()
+      return recfiles
+
+   def saveRecent( self):
+      for afile in self.getRecentFilesList():
+         pos = afile.find( FilePrefix + FileRecent)
+         if pos < 0: continue
+         pos = len(FilePrefix + FileRecent)
+         num = int(afile[pos])
+         if num == 9:
+            os.remove( os.path.join( cgruconfig.VARS['HOME_CGRU'], afile))
+            continue
+         nextfile = afile[:pos] + str(num + 1) + afile[pos+1:]
+         afile = os.path.join( cgruconfig.VARS['HOME_CGRU'], afile)
+         nextfile = os.path.join( cgruconfig.VARS['HOME_CGRU'], nextfile)
+         os.rename( afile, nextfile)
+         print( 'os.rename: %s -> %s' % (afile, nextfile))
+      afile = FileRecent + '0.' + self.fields['jobname'].text()
+      self.save( afile)
+
+   def refreshRecent( self):
+      for afile in self.getRecentFilesList():
+         afile = afile.replace( FilePrefix,'')
+         afile = afile.replace( FileSuffix,'')
+         short = afile.replace( FileRecent,'')
+         if len(short) > 20: short = short[:10] + ' .. ' + short[-10:]
+         self.cbRecent.addItem( short, afile)
+
+   def loadRecent( self):
+      if self.load( str( self.cbRecent.itemData( self.cbRecent.currentIndex()).toString())): self.evaluate()
+
    def load( self, filename):
-      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilesPrefix) + filename + FilesSuffix
+      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+      if not os.path.isfile( filename): return False
       file = open( filename,'r')
       lines = file.readlines()
       file.close()
@@ -253,6 +308,7 @@ Maya layer\n\
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             self.fields[key].setChecked( int(value))
       self.evaluate()
+      return True
 
    def evaluate( self):
       self.evaluated = False
@@ -282,6 +338,11 @@ Maya layer\n\
          return
       self.fields['wdir'].setText( os.path.abspath( str( self.fields['wdir'].text())))
 
+      # Check job name:
+      if str( self.fields['jobname'].text()) == '':
+         self.teCmd.setText('Job name is empty.')
+         return
+
       # Construct command:
       cmd = os.environ['AF_ROOT']
       cmd = os.path.join( cmd, 'python')
@@ -303,8 +364,8 @@ Maya layer\n\
       if not str( self.fields['dependglobal'].text()) == '': cmd += ' -depglbl "%s"' % self.fields['dependglobal'].text()
       if not str( self.fields['hostsmask'].text()) == '': cmd += ' -hostsmask "%s"' % self.fields['hostsmask'].text()
       if not str( self.fields['hostsexclude'].text()) == '': cmd += ' -hostsexcl "%s"' % self.fields['hostsexclude'].text()
-      if self.cbPaused.isChecked(): cmd += ' -pause'
-      if not self.fields['jobnamescene'].isChecked() and not str( self.fields['jobname'].text()) == '': cmd += ' -name "%s"' % self.fields['jobname'].text()
+      if self.fields['paused'].isChecked(): cmd += ' -pause'
+      cmd += ' -name "%s"' % self.fields['jobname'].text()
 
       # Evaluated:
       self.teCmd.setText( cmd)
@@ -330,6 +391,7 @@ Maya layer\n\
       print('Exit code = %d' % exitCode)
       if exitCode != 0: return
       self.bStart.setEnabled( True)
+      self.saveRecent()
 
    def processoutput( self):
       output = str( self.process.readAll())
