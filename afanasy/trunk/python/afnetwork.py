@@ -7,7 +7,6 @@ import sys
 
 def sendServer( data, datalen, host, port, verbose = False):
    s = None
-   output = None
    for res in socket.getaddrinfo( host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
 #      print(res)
       af, socktype, proto, canonname, sa = res
@@ -29,7 +28,7 @@ def sendServer( data, datalen, host, port, verbose = False):
 
    if s is None:
       print('Could not open socket.')
-      return False, output
+      return False, None
 
    if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)
    s.sendall( data)

@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Source general for all soft directives:
+source "$CGRU_LOCATION/software_setup/setup__all.sh"
+
+
 # Setup special Python module:
 export PYTHONPATH="$AF_ROOT/bin_pyaf/2.6.7:$PYTHONPATH"
 

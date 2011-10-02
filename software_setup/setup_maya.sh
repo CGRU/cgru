@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Source general for all soft directives:
+source "$CGRU_LOCATION/software_setup/setup__all.sh"
+
+
 # CGRU for Maya add-ons location, override it, or simple launch from current folder as an example
 export MAYA_CGRU_LOCATION=$CGRU_LOCATION/plugins/maya
 

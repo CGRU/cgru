@@ -6,6 +6,7 @@ import cgruconfig
 
 import af
 
+import cmd
 import info
 import nimby
 import render
@@ -92,7 +93,7 @@ class Tray( QtGui.QSystemTrayIcon):
       # Add permanent items:
       self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Start Job...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.startjob)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.startjob)
       self.menu['AFANASY'].addAction( action)
       self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Set nibmy', self)
@@ -139,7 +140,7 @@ class Tray( QtGui.QSystemTrayIcon):
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setDocsURL)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Edit Config...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.editCGRUConfig)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.editCGRUConfig)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Text Editor...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setTextEditor)
@@ -156,10 +157,10 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['menu'].addAction( action)
       self.menu['menu'].addSeparator()
       action = QtGui.QAction('Restart', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.restart)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.restart)
       self.menu['menu'].addAction( action)            
       action = QtGui.QAction('Quit', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), parent.quit)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.quit)
       self.menu['menu'].addAction( action)            
 
       # Decorate and show:
@@ -192,21 +193,3 @@ class Tray( QtGui.QSystemTrayIcon):
    def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
    def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
    def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
-
-   def startjob( self):
-      cmd = os.path.join('afstarter','afstarter.py')
-      cmd = os.path.join('utilities', cmd)
-      cmd = os.path.join( os.environ['CGRU_LOCATION'], cmd)
-      QtCore.QProcess.startDetached('python', [cmd])
-
-   def restart( self):
-      QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_KEEPER_CMD'])
-      self.parent.quit()
-
-   def update( self):
-      QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_UPDATE_CMD'])
-      self.parent.quit()
-
-   def editCGRUConfig( self):
-      if QtCore.QProcess.execute( cgruconfig.VARS['editor'] % cgruconfig.VARS['HOME_CONFIGFILE']) == 0:
-         cgruconfig.Config()

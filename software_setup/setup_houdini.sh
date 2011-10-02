@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Source general for all soft directives:
+source "$CGRU_LOCATION/software_setup/setup__all.sh"
+
 # Search directory where Houdini installed:
 HOUDINI_INSTALL_DIR="/opt"
 for folder in `ls "$HOUDINI_INSTALL_DIR"`; do

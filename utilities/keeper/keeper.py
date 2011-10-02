@@ -14,8 +14,10 @@ if sys.platform.find('win') == 0:
 from PyQt4 import QtGui
 
 import cgruconfig
+import cmd
 from refresh import Refresh
 from tray import Tray
+from server import Server
 
 # Default company is CGRU:
 if 'company' not in cgruconfig.VARS: cgruconfig.VARS['company'] = 'CGRU'
@@ -47,6 +49,8 @@ if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = 
 # Create tray application with refresh:
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
-refresh = Refresh( app)
-tray = Tray( app)
+cmd.application = app
+Tray( app)
+Refresh( app)
+Server( app)
 app.exec_()

@@ -30,7 +30,7 @@ fi
 cd PyQt-x11-gpl-4.8.5
 
 flags="-g --confirm-license"
-flags="$flags -e QtCore -e QtGui -e QtSvg"
+flags="$flags -e QtCore -e QtGui -e QtNetwork -e QtSvg"
 
 if [ ! -z "$3" ]; then
    $python configure.py -h

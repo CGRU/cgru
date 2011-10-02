@@ -17,7 +17,10 @@ class Window( QtGui.QTextEdit ):
       self.fundefined = QtGui.QTextCharFormat()
       self.fundefined.setFontItalic( True)
 
-      self.textCursor().insertText('Variables:\n', self.ftitle)
+      self.appendVar('Python', os.getenv('CGRU_PYTHONEXE'))
+      self.appendVar('Python version', sys.version)
+
+      self.textCursor().insertText('\nVariables:\n', self.ftitle)
 
       self.appendVars( cgruconfig.VARS)
 
@@ -25,6 +28,15 @@ class Window( QtGui.QTextEdit ):
       self.appendEnvVar('AF_ROOT')
       self.appendEnvVar('AF_RENDER_CMD')
       self.appendEnvVar('AF_WATCH_CMD')
+
+      self.textCursor().insertText('\nPython Environment:\n', self.ftitle)
+      self.appendEnvVar('PYTHONHOME')
+      self.appendEnvVar('PYTHONPATH')
+      self.appendEnvVar('CGRU_PYTHON')
+      self.appendEnvVar('AF_PYTHON')
+
+      self.textCursor().insertText('\nSystem Environment:\n', self.ftitle)
+      self.appendEnvVar('PATH')
 
       self.appendConfigFile( cgruconfig.VARS['CONFIGFILE'])
       self.appendConfigFile( cgruconfig.VARS['HOME_CONFIGFILE'])
