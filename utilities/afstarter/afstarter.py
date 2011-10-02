@@ -187,12 +187,12 @@ Maya layer\n\
       self.cbRecent = QtGui.QComboBox( self)
       presetsLayout.addWidget( self.cbRecent)
       QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
-      self.bLoad = QtGui.QPushButton('Load', self)
-      presetsLayout.addWidget( self.bLoad)
-#      QtCore.QObject.connect( self.bLoad, QtCore.SIGNAL('pressed()'), self.start)
-      self.bSave = QtGui.QPushButton('Save', self)
-      presetsLayout.addWidget( self.bSave)
-#      QtCore.QObject.connect( self.bSave, QtCore.SIGNAL('pressed()'), self.start)
+      self.bBrowseLoad = QtGui.QPushButton('Load', self)
+      presetsLayout.addWidget( self.bBrowseLoad)
+      QtCore.QObject.connect( self.bBrowseLoad, QtCore.SIGNAL('pressed()'), self.browseLoad)
+      self.bBrowseSave = QtGui.QPushButton('Save', self)
+      presetsLayout.addWidget( self.bBrowseSave)
+      QtCore.QObject.connect( self.bBrowseSave, QtCore.SIGNAL('pressed()'), self.browseSave)
 
 
       # Command Field:
@@ -238,8 +238,8 @@ Maya layer\n\
       self.save( FileLast)
       self.close()
 
-   def save( self, filename):
-      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+   def save( self, filename, fullPath = False):
+      if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
       file = open( filename,'w')
       for key in self.fields:
          value = ''
@@ -259,39 +259,53 @@ Maya layer\n\
       for afile in allfiles:
          if afile.find( FilePrefix + FileRecent) >= 0: recfiles.append( afile)
       recfiles.sort()
-      recfiles.reverse()
       return recfiles
 
    def saveRecent( self):
-      for afile in self.getRecentFilesList():
-         pos = afile.find( FilePrefix + FileRecent)
-         if pos < 0: continue
-         pos = len(FilePrefix + FileRecent)
-         num = int(afile[pos])
-         if num == 9:
-            os.remove( os.path.join( cgruconfig.VARS['HOME_CGRU'], afile))
-            continue
-         nextfile = afile[:pos] + str(num + 1) + afile[pos+1:]
-         afile = os.path.join( cgruconfig.VARS['HOME_CGRU'], afile)
-         nextfile = os.path.join( cgruconfig.VARS['HOME_CGRU'], nextfile)
-         os.rename( afile, nextfile)
-         print( 'os.rename: %s -> %s' % (afile, nextfile))
+      recfiles = self.getRecentFilesList()
+      if len(recfiles) > 0:
+         for afile in recfiles:
+            if afile.find( self.fields['jobname'].text()) > len(FilePrefix + FileRecent):
+#               print('os.remove("%s")' % os.path.join( cgruconfig.VARS['HOME_CGRU'], afile))
+               os.remove( os.path.join( cgruconfig.VARS['HOME_CGRU'], afile))
+               recfiles.remove( afile)
+         numfiles = len(recfiles)
+         if numfiles > 9:
+#            print('os.remove("%s")' % os.path.join( cgruconfig.VARS['HOME_CGRU'], recfiles[-1]))
+            os.remove( os.path.join( cgruconfig.VARS['HOME_CGRU'], recfiles[-1]))
+            del recfiles[-1]
+         recfiles.reverse()
+         index = len(recfiles)
+         for afile in recfiles:
+            pos = afile.find( FilePrefix + FileRecent)
+            if pos < 0: continue
+            pos = len(FilePrefix + FileRecent)
+            num = int(afile[pos])
+            if num != index:
+               nextfile = afile[:pos] + str(index) + afile[pos+1:]
+               afile = os.path.join( cgruconfig.VARS['HOME_CGRU'], afile)
+               nextfile = os.path.join( cgruconfig.VARS['HOME_CGRU'], nextfile)
+#               print('os.rename("%s"->"%s")' % ( afile, nextfile))
+               os.rename( afile, nextfile)
+            index -= 1
       afile = FileRecent + '0.' + self.fields['jobname'].text()
       self.save( afile)
+      self.refreshRecent()
 
    def refreshRecent( self):
+      self.cbRecent.clear()
       for afile in self.getRecentFilesList():
          afile = afile.replace( FilePrefix,'')
          afile = afile.replace( FileSuffix,'')
-         short = afile.replace( FileRecent,'')
+         short = afile.replace( FileRecent,'')[2:]
          if len(short) > 20: short = short[:10] + ' .. ' + short[-10:]
          self.cbRecent.addItem( short, afile)
 
    def loadRecent( self):
       if self.load( str( self.cbRecent.itemData( self.cbRecent.currentIndex()).toString())): self.evaluate()
 
-   def load( self, filename):
-      filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+   def load( self, filename, fullPath = False):
+      if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
       if not os.path.isfile( filename): return False
       file = open( filename,'r')
       lines = file.readlines()
@@ -300,6 +314,7 @@ Maya layer\n\
          pos = line.find('=')
          if pos < 1: continue
          key = line[:pos]
+         if key not in self.fields: continue
          value = line[pos+1:].strip()         
          if isinstance( self.fields[key], QtGui.QLineEdit):
             self.fields[key].setText( value)
@@ -309,6 +324,14 @@ Maya layer\n\
             self.fields[key].setChecked( int(value))
       self.evaluate()
       return True
+
+   def browseLoad( self):
+      filename = str( QtGui.QFileDialog.getOpenFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU']))
+      self.load( filename, True)
+
+   def browseSave( self):
+      filename = str( QtGui.QFileDialog.getSaveFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU']))
+      self.save( filename, True)
 
    def evaluate( self):
       self.evaluated = False
