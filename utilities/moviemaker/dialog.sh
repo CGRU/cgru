@@ -1,4 +1,4 @@
 #!/bin/bash
 
 source `dirname $0`/setup.sh
-python `dirname $0`/dialog.py "$@"
+"$CGRU_PYTHONEXE" `dirname $0`/dialog.py "$@"
