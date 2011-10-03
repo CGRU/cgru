@@ -11,7 +11,7 @@ class MsgAf;
 class ClientContainer : public AfContainer
 {
 public:
-   ClientContainer( int maxcount);
+   ClientContainer( std::string ContainerName, int MaximumSize);
    ~ClientContainer();
 
    bool updateId( int id);

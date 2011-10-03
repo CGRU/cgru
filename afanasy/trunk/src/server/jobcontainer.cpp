@@ -22,7 +22,7 @@
 afsql::DBConnection * JobContainer::afDB = NULL;
 
 JobContainer::JobContainer():
-   AfContainer( AFJOB::MAXQUANTITY)
+   AfContainer( "Jobs", AFJOB::MAXQUANTITY)
 {
 }
 

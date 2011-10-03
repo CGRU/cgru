@@ -14,7 +14,7 @@
 #include "../include/macrooutput.h"
 
 TalkContainer::TalkContainer():
-   ClientContainer( AFTALK::MAXCOUNT)
+   ClientContainer( "Talks", AFTALK::MAXCOUNT)
 {
 }
 

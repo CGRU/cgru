@@ -13,9 +13,10 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfContainer::AfContainer( int maximumsize):
+AfContainer::AfContainer(  std::string ContainerName, int MaximumSize):
    count( 0),
-   size( maximumsize),
+   size( MaximumSize),
+   name( ContainerName),
    first_ptr( NULL),
    last_ptr( NULL),
    initialized( false)
@@ -307,17 +308,17 @@ void AfContainer::freeZombies()
 void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
    bool namefounded = false;
-   std::string name = mcgeneral.getName();
+   std::string pattern = mcgeneral.getName();
    int getcount = mcgeneral.getCount();
 
    if( getcount < 1 )
    {
       std::string errMsg;
       af::RegExp rx;
-      rx.setPattern( name, &errMsg);
+      rx.setPattern( pattern, &errMsg);
       if( rx.empty())
       {
-         AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + name + ("\" is invalid: ") + errMsg);
+         AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + pattern + ("\" is invalid: ") + errMsg);
          return;
       }
       for( af::Node *node = first_ptr; node != NULL; node = node->next_ptr )
@@ -346,7 +347,7 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
    }
 
    if(( getcount == 0) && ( namefounded == false))
-      AFCommon::QueueLogError( std::string("No node matches \"") + name + "\" founded.");
+      AFCommon::QueueLog( name + ": " + af::Msg::TNAMES[type] + ": No node matches \"" + pattern + "\" founded.");
 }
 
 void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)

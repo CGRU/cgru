@@ -19,7 +19,7 @@
 using namespace af;
 
 UserContainer::UserContainer():
-   AfContainer( AFUSER::MAXCOUNT),
+   AfContainer( "Users", AFUSER::MAXCOUNT),
    currentUserId( 0),
    currentPriority( -1)
 {

@@ -13,8 +13,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-ClientContainer::ClientContainer( int maxcount):
-   AfContainer( maxcount)
+ClientContainer::ClientContainer( std::string ContainerName, int MaximumSize):
+   AfContainer( ContainerName, MaximumSize)
 {
 }
 

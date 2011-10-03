@@ -15,7 +15,7 @@ class AfContainer
 {
 public:
 /// Initialize container for \c maximumsize nodes.
-   AfContainer( int maximumsize);
+   AfContainer( std::string ContainerName, int MaximumSize);
    ~AfContainer();
 
    inline bool isInitialized() {  return initialized;}///< Whether container was successfully initialized.
@@ -59,6 +59,7 @@ private:
    af::Node * last_ptr;       ///< Pointer to last node.
    af::Node ** nodesTable;          ///< Nodes pointers.
    bool initialized;          ///< Whether container was successfully initialized.
+   std::string name;          ///< Container name.
 
 private:
 /// Set some node attribute that came from message class.

@@ -13,7 +13,7 @@
 using namespace af;
 
 RenderContainer::RenderContainer():
-   ClientContainer( AFRENDER::MAXCOUNT)
+   ClientContainer( "Renders", AFRENDER::MAXCOUNT)
 {
 }
 
