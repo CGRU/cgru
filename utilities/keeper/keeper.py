@@ -2,8 +2,8 @@ import os, sys
 
 # Write qt.conf file on MS Windows before importing PyQt:
 if sys.platform.find('win') == 0:
-   qtconf=os.getenv('PYTHON') + '/qt.conf'
-   pyqt4dir=os.getenv('PYTHON').replace('\\','/') + '/Lib/site-packages/PyQt4'
+   qtconf=sys.prefix + '/qt.conf'
+   pyqt4dir=sys.prefix.replace('\\','/') + '/Lib/site-packages/PyQt4'
    if os.path.isfile( qtconf): os.remove( qtconf)
    qtconf_file = open(qtconf, mode='w')
    qtconf_file.write('[Paths]\n')

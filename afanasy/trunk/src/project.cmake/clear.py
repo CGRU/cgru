@@ -11,10 +11,10 @@ DEBUG = False
 
 def delete( item):
    if os.path.isdir( item):
-      print 'Deleting directory "%s"' % item
+      print('Deleting directory "%s"' % item)
       if not DEBUG: shutil.rmtree( item)
    else:
-      print 'Deleting file "%s"' % item
+      print('Deleting file "%s"' % item)
       if not DEBUG: os.remove( item)
 
 for item in os.listdir('.'):

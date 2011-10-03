@@ -2,28 +2,26 @@ rem @echo off
 set CMAKE_GENERATOR=Visual Studio 9 2008 Win64
 
 pushd ..\..\..\..
-set cgru=%CD%
+call setup.cmd
 popd
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-set cgru_qt=%cgru%\utilities\qt\qt-everywhere-opensource-src-4.7.4
+set cgru_qt=%CGRU_LOCATION%\utilities\qt\qt-everywhere-opensource-src-4.7.4
 if exist %cgru_qt% SET "PATH=%cgru_qt%\bin;%PATH%"
 
-rem Specify Python:
-set cgru_python=%cgru%\utilities\python\3.2.2
-if exist %cgru_python% (
-   echo Using CGRU Python: %cgru_python%
-   SET AF_PYTHON_INCLUDE_PATH=%cgru_python%\include
-   SET AF_PYTHON_LIBRARIES=%cgru_python%\libs\python32.lib
-   SET "PATH=%cgru_python%;%PATH%"
-)
-
 if exist override.cmd call override.cmd
+
+rem Specify Python:
+if defined CGRU_PYTHONDIR (
+   echo Building with CGRU Python: %CGRU_PYTHONDIR%
+   SET AF_PYTHON_INCLUDE_PATH=%CGRU_PYTHONDIR%\include
+   SET AF_PYTHON_LIBRARIES=%CGRU_PYTHONDIR%\libs\python32.lib
+)
 
 rem Get Afanasy sources revision:
 pushd ..
 set folder=%CD%
-cd %cgru%\utilities
+cd %CGRU_LOCATION%\utilities
 call getrevision.cmd %folder%
 popd
 

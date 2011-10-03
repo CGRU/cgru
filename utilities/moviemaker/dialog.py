@@ -1190,11 +1190,14 @@ Add this options to temporary image saving.')
       if sys.platform.find('win') == 0: identify += ' nul'
       else: identify += ' /dev/null'
       pipe = subprocess.Popen( identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
-      Identify = pipe.read()
+      Identify = str( pipe.read())
       if len(Identify) < len(afile):
          self.cmdField.setText('Invalid image.\n%s' % afile)
          return InputFile, InputPattern, FilesCount, Identify
       Identify = Identify.replace( afile, '')
+      Identify = Identify.replace('b\'','').replace('\\n','').replace('\\r','')
+      Identify = Identify.replace('\\n','').replace('\\r','')
+      Identify = Identify.strip('\'')
 
       InputPattern = os.path.join( inputdir, pattern)
 

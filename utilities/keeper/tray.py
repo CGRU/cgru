@@ -44,7 +44,7 @@ class Tray( QtGui.QSystemTrayIcon):
       # Update item only if CGRU_UPDATE_CMD defined:
       if cgruconfig.VARS['CGRU_UPDATE_CMD'] is not None:
          action = QtGui.QAction('Update', self)
-         QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.update)
+         QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.update)
          self.menu['menu'].addAction( action)
          self.menu['menu'].addSeparator()
 

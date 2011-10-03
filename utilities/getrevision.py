@@ -12,7 +12,7 @@ if pos != -1:
    pos += len(str)
    verlen = 0
    while output[pos+verlen] in '0123456789': verlen += 1
-   print( output[pos:pos+verlen],)
+   print( output[pos:pos+verlen])
    sys.exit(0)
 
 print('0')
