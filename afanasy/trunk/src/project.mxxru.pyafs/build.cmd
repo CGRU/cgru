@@ -2,24 +2,20 @@ echo off
 SET MSVCPATH="C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC"
 
 pushd ..\..\..\..
-set cgru=%CD%
+call setup.cmd
 popd
 
-SET PYTHONS=%cgru%\utilities\python
-
-SET CGRU_PYTHON=%PYTHONS%\2.7.1
+SET PYTHONS=%CGRU_LOCATION%\utilities\python
 
 if exist override.cmd call override.cmd
-
-if exist %CGRU_PYTHON% SET "PATH=%CGRU_PYTHON%;%PATH%"
 
 rem Get Afanasy sources revision:
 pushd ..
 set folder=%CD%
-cd %cgru%\utilities
+cd %CGRU_LOCATION%\utilities
 call getrevision.cmd %folder%
 popd
 
-python build.py
+%CGRU_PYTHONEXE% build.py
 
 pause

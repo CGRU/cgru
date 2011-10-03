@@ -1,17 +1,14 @@
-@echo off
+rem echo off
 
+cd %0\..
 set CGRU_KEEPER=%CD%
+echo %CGRU_PYTHONEXE%
 pushd ..\..
 if exist setup.cmd call setup.cmd
 popd
 
-set pyver=3.2.2
-set PYTHONPATH=%AF_ROOT%\bin_pyaf\%pyver%;%PYTHONPATH%
-set python=%CGRU_KEEPER%\Python
-if not exist %python% set python=%CGRU_LOCATION%\utilities\python\%pyver%
-
 if [%1] == [] (
-   start "Keeper" %python%\pythonw keeper.py
+   start "Keeper" "%CGRU_PYTHONDIR%\pythonw.exe" keeper.py
 ) else (
-   %python%\python keeper.py
+   "%CGRU_PYTHONEXE%" keeper.py
 )

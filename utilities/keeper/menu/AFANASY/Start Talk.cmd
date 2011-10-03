@@ -1,1 +1,1 @@
-%AF_ROOT%\launch\aftalk.cmd
+start "Talk Afanasy" "%AF_ROOT%\bin\aftalk.exe"

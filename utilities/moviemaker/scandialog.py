@@ -119,7 +119,7 @@ Format presets located in\n\
       self.cbFormat = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
-         self.cbFormat.addItem( FormatNames[i], QtCore.QVariant( format))
+         self.cbFormat.addItem( FormatNames[i], format)
          if format == Options.format: self.cbFormat.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -130,7 +130,7 @@ Codec presets located in\n\
       self.cbCodec = QtGui.QComboBox( self)
       i = 0
       for name in CodecNames:
-         self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
+         self.cbCodec.addItem( name, CodecFiles[i])
          if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex(i)
          i = i + 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)

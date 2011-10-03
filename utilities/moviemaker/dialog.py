@@ -212,7 +212,7 @@ Format presets located in\n\
       self.cbFormat = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
-         self.cbFormat.addItem( FormatNames[i], QtCore.QVariant( format))
+         self.cbFormat.addItem( FormatNames[i], format)
          if format == Options.format: self.cbFormat.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -239,7 +239,7 @@ Codec presets located in\n\
       self.cbCodec = QtGui.QComboBox( self)
       i = 0
       for name in CodecNames:
-         self.cbCodec.addItem( name, QtCore.QVariant( CodecFiles[i]))
+         self.cbCodec.addItem( name, CodecFiles[i])
          if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -483,7 +483,7 @@ Templates are located in\n\
       self.cbCacherOpacity = QtGui.QComboBox( self)
       i = 0
       for cacher in CacherNames:
-         self.cbCacherOpacity.addItem( cacher, QtCore.QVariant( CacherValues[i]))
+         self.cbCacherOpacity.addItem( cacher, CacherValues[i])
          if CacherValues[i] == str(Options.cacher_opacity): self.cbCacherOpacity.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCacherOpacity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -512,7 +512,7 @@ Example "255,255,0" - yellow.')
       self.cbCacher169 = QtGui.QComboBox( self)
       i = 0
       for cacher in CacherNames:
-         self.cbCacher169.addItem( cacher, QtCore.QVariant( CacherValues[i]))
+         self.cbCacher169.addItem( cacher, CacherValues[i])
          if CacherValues[i] == str(Options.draw169): self.cbCacher169.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCacher169, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -520,7 +520,7 @@ Example "255,255,0" - yellow.')
       self.cbCacher235 = QtGui.QComboBox( self)
       i = 0
       for cacher in CacherNames:
-         self.cbCacher235.addItem( cacher, QtCore.QVariant( CacherValues[i]))
+         self.cbCacher235.addItem( cacher, CacherValues[i])
          if CacherValues[i] == str(Options.draw235): self.cbCacher235.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCacher235, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
@@ -1120,7 +1120,7 @@ Add this options to temporary image saving.')
       if os.path.isdir( InputFile):
          dirfiles = os.listdir( InputFile)
          if len( dirfiles) == 0:
-            print 'Folder "%s" is empty.' % InputFile
+            print('Folder "%s" is empty.' % InputFile)
             return InputFile, InputPattern, FilesCount, Identify
          InputFile = os.path.join( InputFile, dirfiles[0])
 
@@ -1388,7 +1388,7 @@ Add this options to temporary image saving.')
             af = __import__('af', globals(), locals(), [])
          except:
             error = str(sys.exc_info()[1])
-            print error
+            print( error)
             self.cmdField.setText('Unable to import Afanasy Python module:\n' + error)
             return
          reload(af)
@@ -1429,7 +1429,7 @@ Add this options to temporary image saving.')
          self.process.start( command)
 
    def processfinished( self, exitCode):
-      print 'Exit code = %d' % exitCode
+      print('Exit code = %d' % exitCode)
       self.btnStop.setEnabled( False)
       self.btnRefresh.setEnabled( True)
       self.running = False
@@ -1438,7 +1438,7 @@ Add this options to temporary image saving.')
 
    def processoutput( self):
       output = self.process.readAll()
-      print ('%s' % output),
+      print('%s' % output),
       self.cmdField.insertPlainText( QtCore.QString( output))
       self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
