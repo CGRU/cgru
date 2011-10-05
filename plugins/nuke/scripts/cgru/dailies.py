@@ -258,7 +258,7 @@ def dailiesGenCmd( node):
    if tmpquality is not None and tmpquality != '': cmd += ' --tmpquality "%s"'  % tmpquality
    if not autocolorspace: cmd += ' --noautocorr'
    if gamma  != 1.0: cmd += ' -g %03f' % gamma
-   if asp_in  > 0.0: cmd += ' --aspect %f' % asp_in
+   if asp_in  > 0.0: cmd += ' --aspect_in %f' % asp_in
 
    if fstart !=  -1: cmd += ' --fs %d' % fstart
    if fend   !=  -1: cmd += ' --fe %d' % fend
