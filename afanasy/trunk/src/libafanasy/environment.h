@@ -34,14 +34,15 @@ public:
 /// Return \c true if argument exists and return its value if it has any:
    static bool getArgument( const std::string & argument, std::string & value);
 
-   static inline bool isHelpMode() { return help_mode; }
+   static inline bool isHelpMode()    { return help_mode;   }
+   static inline bool isVerboseMode() { return verbose_mode;}
    static inline void addUsage( const std::string & arg, const std::string & help)
       { cmdarguments_usagearg.push_back( arg); cmdarguments_usagehelp.push_back( help);}
 
    static bool reload();
    static bool load( const std::string & filename, bool initialize, bool Verbose);
 
-   static void setVerbose( bool value = true) { verbose = value;}
+   static void setVerboseInit( bool value = true) { verbose_init = value;}
    static bool getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name );
    static bool getVar( const rapidxml::xml_node<> * pnode, int         & value, const char * name );
    static bool getVar( const rapidxml::xml_node<> * pnode, std::list<std::string> & value, const char * name );
@@ -171,7 +172,8 @@ public:
 private:
 
    static bool valid;       ///< \c true if environment is valid.
-   static bool verbose;
+   static bool verbose_init;///< Verbose environment initialization
+   static bool verbose_mode;///< Application verbose mode
    static std::list<std::string> cmdarguments;
    static std::list<std::string> cmdarguments_usagearg;
    static std::list<std::string> cmdarguments_usagehelp;

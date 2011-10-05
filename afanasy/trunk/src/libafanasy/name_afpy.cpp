@@ -11,6 +11,11 @@ bool af::PyGetString( PyObject * obj, std::string & str, const char * errMsg)
       outError("af::PyGetString: Object is NULL.", errMsg);
       return false;
    }
+   if( obj == Py_None)
+   {
+      outError("af::PyGetString: Object is None.", errMsg);
+      return false;
+   }
 #if PY_MAJOR_VERSION < 3
    if( PyString_Check(obj))
    {

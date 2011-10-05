@@ -53,7 +53,19 @@ bool Parser::parse(  std::string & data,
             error          = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
             badresult      = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
             PyObject * output = PyTuple_GetItem( pTuple, 0);
-            if( af::PyGetString( output, data, "Parser::parse")) result = true;
+            if( output == NULL)
+            {
+               if( PyErr_Occurred()) PyErr_Print();
+            }
+            else if( output == Py_None)
+            {
+               result = true;
+            }
+            else
+            {
+               if( af::PyGetString( output, data, "Parser::parse"))
+                  result = true;
+            }
          }
          else
          {

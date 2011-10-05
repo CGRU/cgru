@@ -19,7 +19,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-#define PRINT if(verbose)printf
+#define PRINT if(verbose_init)printf
 
 using namespace af;
 
@@ -123,11 +123,12 @@ std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
 
-bool Environment::god_mode    = false;
-bool Environment::help_mode   = false;
-bool Environment::valid       = false;
-bool Environment::verbose     = false;
-bool Environment::visor_mode  = false;
+bool Environment::god_mode       = false;
+bool Environment::help_mode      = false;
+bool Environment::valid          = false;
+bool Environment::verbose_init   = false;
+bool Environment::verbose_mode   = false;
+bool Environment::visor_mode     = false;
 
 Passwd * Environment::passwd = NULL;
 
@@ -290,7 +291,7 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::str
       }
       node = node->next_sibling( name);
    }
-   if( verbose )
+   if( verbose_init )
    {
       printf("\t%s:\n", name);
       for( std::list<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
@@ -301,7 +302,7 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::str
 
 Environment::Environment( uint32_t flags, int argc, char** argv )
 {
-   verbose = flags & Verbose;
+   verbose_init = flags & Verbose;
 //
 // Init command arguments:
    initCommandArguments( argc, argv);
@@ -443,26 +444,26 @@ void Environment::load()
 {
    std::string filename;
    filename = ( afroot + "/config_default.xml");
-   load( filename, false, verbose);
+   load( filename, false, verbose_init);
    filename = ( afroot + "/config.xml");
-   load( filename, false, verbose);
+   load( filename, false, verbose_init);
    filename = ( home_afanasy + "/config.xml");
-   load( filename, false, verbose);
-   bool _verbose=verbose;
-   verbose = false;
+   load( filename, false, verbose_init);
+   bool _verbose_init=verbose_init;
+   verbose_init = false;
    filename = ( afroot + "/config_shadow.xml");
-   load( filename, false, verbose);
-   verbose=_verbose;
+   load( filename, false, verbose_init);
+   verbose_init=_verbose_init;
 }
 
 bool Environment::load( const std::string & filename, bool initialize, bool Verbose)
 {
    bool retval = false;
-   verbose = Verbose;
+   verbose_init = Verbose;
 
    if( false == pathFileExists( filename)) return retval;
 
-   if( verbose) printf("Parsing XML file '%s':\n", filename.c_str());
+   if( verbose_init) printf("Parsing XML file '%s':\n", filename.c_str());
 
    int filesize = -1;
    char * buffer = fileRead( filename, filesize);
@@ -508,7 +509,7 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
 
 bool Environment::reload()
 {
-   verbose = true;
+   verbose_init = true;
    load();
    valid = init();
    return valid;
@@ -573,8 +574,17 @@ void Environment::initCommandArguments( int argc, char** argv)
    {
       cmdarguments.push_back(argv[i]);
 
-      if( help_mode ) continue;
+      if( false == verbose_mode)
+      if(( cmdarguments.back() == "-V"    ) ||
+         ( cmdarguments.back() == "--V"   ) ||
+         ( cmdarguments.back() == "--Verbose")
+        )
+      {
+         printf("Verbose is on.\n");
+         verbose_mode = true;
+      }
 
+      if( false == help_mode)
       if(( cmdarguments.back() == "-"     ) ||
          ( cmdarguments.back() == "--"    ) ||
          ( cmdarguments.back() == "-?"    ) ||
@@ -589,9 +599,10 @@ void Environment::initCommandArguments( int argc, char** argv)
          )
       {
          help_mode = true;
-//         addUsage("-h --help", "Display this help.");
       }
    }
+   addUsage("-h --help", "Display this help.");
+   addUsage("-V --Verbose", "Verbose mode.");
 }
 
 bool Environment::hasArgument( const std::string & argument)
