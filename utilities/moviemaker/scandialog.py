@@ -24,7 +24,7 @@ Parser.add_option('-D', '--debug',     dest='debug',        action='store_true',
 
 (Options, args) = Parser.parse_args()
 InputFolder  = ''
-OutputFolder = ''
+OutputFolder = '..'
 if len(args) > 0: InputFolder  = args[0]
 if len(args) > 1: OutputFolder = args[1]
 
@@ -332,15 +332,15 @@ Images with width/height ratio > this value will be treated as 2:1.')
 
    def inputBrowse( self):
       folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a folder', self.editInput.text())
-      if folder.isEmpty(): return
-      self.editInput.setText( folder)
-      self.evaluate()
+      if len( folder):
+         self.editInput.setText( folder)
+         self.evaluate()
 
    def browseOutput( self):
       folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a folder', self.editOutput.text())
-      if folder.isEmpty(): return
-      self.editOutput.setText( folder)
-      self.evaluate()
+      if len( folder):
+         self.editOutput.setText( folder)
+         self.evaluate()
 
    def evaluate( self):
       self.evaluated = False
@@ -364,12 +364,13 @@ Images with width/height ratio > this value will be treated as 2:1.')
       extensions = str( self.editExtensions.text())
       include = str( self.editInclude.text())
       exclude = str( self.editExclude.text())
-      format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
+      format = getComboBoxString( self.cbFormat)
       template = self.cbTemplate.currentText()
 
       cmd = 'scanscan.py'
-      cmd = 'python ' + os.path.join( DialogPath, cmd)
-      cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
+      cmd = os.path.join( DialogPath, cmd)
+      cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
+      cmd += ' -c %s' % getComboBoxString( self.cbCodec)
       cmd += ' -f %s' % self.cbFPS.currentText()
       cmd += ' -r %s' % format
       if self.dsbGamma.value() != 1.0: cmd += ' -g %.2f' % self.dsbGamma.value()
@@ -425,13 +426,23 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.btnStart.setEnabled( True)
 
    def processoutput( self):
-      output = str( self.process.readAll())
+      output = self.process.readAll().data()
+      if not isinstance( output, str): output = str( output, 'utf-8')
+      output = output.strip()
       print(output)
-      self.cmdField.insertPlainText( output)
+      self.cmdField.insertPlainText( output + '\n')
       self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
    def processStop( self):
       self.process.terminate()
+
+
+def getComboBoxString( comboBox):
+   data = comboBox.itemData( comboBox.currentIndex())
+   if data is None: return ''
+   if isinstance( data, str): return data
+   return comboBox.itemData( comboBox.currentIndex()).toString()
+
 
 app = QtGui.QApplication( sys.argv)
 icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'scanscan.png'))

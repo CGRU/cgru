@@ -1,16 +1,6 @@
 #pragma once
 
-#include <Python.h>
-
-#if PY_MAJOR_VERSION < 3
-#define PyBytes_Check PyString_Check
-#define PyBytes_AsString PyString_AsString
-#define PyBytes_FromString PyString_FromString
-#define PyBytes_FromStringAndSize PyString_FromStringAndSize
-#define PyLong_AsLong PyInt_AsLong
-#define PyLong_FromLong PyInt_FromLong
-#endif
-
+//#include <Python.h>
 #include "name_af.h"
 
 namespace af

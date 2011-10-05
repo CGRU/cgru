@@ -1,7 +1,7 @@
 #include <QtGui/QApplication>
 #include <QtGui/QIcon>
 
-#include <Python.h>
+//#include <Python.h>
 
 #define _USE_MATH_DEFINES
 #include <math.h>

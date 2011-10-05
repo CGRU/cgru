@@ -1,4 +1,4 @@
-import parser
+from parsers import parser
 
 import re
 

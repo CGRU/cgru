@@ -183,7 +183,7 @@ exit_status = 0
 if sendjob:
    for x in range(xcopy):
       if job.send( verbose) == False:
-         print 'Error: Job was not sent.'
+         print('Error: Job was not sent.')
          exit_status = 1
          break
 

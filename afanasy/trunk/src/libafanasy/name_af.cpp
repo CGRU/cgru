@@ -32,6 +32,14 @@ af::Farm* ferma = NULL;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+void af::outError( const char * errMsg, const char * baseMsg)
+{
+   if( baseMsg )
+      AFERRAR("%s: %s", baseMsg, errMsg)
+   else
+      AFERRAR("%s", errMsg)
+}
+
 bool af::init( uint32_t flags)
 {
    AFINFO("af::init:\n");
@@ -217,89 +225,7 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
       integer = ntohl( bytes);
    }
 }
-/*
-const std::string af::fillNumbers( const std::string& pattern, long long start, long long end)
-{
-   std::string str( pattern);
-   size_t pos;
 
-   // Find %1 and replace with the start number:
-   pos = str.find("%1");
-   while( pos != std::string::npos )
-   {
-      str.replace( pos, 2, itos( start));
-      pos = str.find("%1");
-   }
-
-   // Find %2 and replace with the end number:
-   pos = str.find("%2");
-   while( pos != std::string::npos )
-   {
-      str.replace( pos, 2, itos( end));
-      pos = str.find("%2");
-   }
-
-   // Find all %04d patterns and sprintf them:
-   if(( str.find("%") != std::string::npos ) && ( str.find("%n") == std::string::npos ))
-   {
-      static const char digits[] = "0123456789";
-      std::string new_str;
-      size_t pos1 = 0;
-      size_t pos2 = 0;
-      // The first replacement number is the start frame
-      long long number = start;
-      for(;;)
-      {
-         pos1 = str.find_first_of('%', pos2);
-         if( pos1 == std::string::npos ) break;
-         new_str += str.substr( pos2, pos1-pos2);
-         pos2 = pos1 + 1;
-         pos1 = str.find_first_not_of( digits, pos2);
-         if( pos1 == std::string::npos )
-         {
-            pos2--;
-            break;
-         }
-         std::string num_str = str.substr( pos2-1, pos1-pos2+2);
-
-         // This is the first buffer length, if will be not enough buffer length will be doubled
-         static const int first_buffer_len = 32;
-         char first_buffer[first_buffer_len];
-         int buflen = first_buffer_len;
-         // First time stack buffer is used, next time new memory will be allocated and deleted after
-         bool first_loop = true;
-         for(;;)
-         {
-            char * buffer;
-            if( first_loop )
-               buffer = first_buffer;
-            else
-               buffer = new char[buflen];
-            int retval = snprintf( buffer, buflen, num_str.c_str(), number);
-            if( retval >= buflen )
-            {  // Buffer is not enough
-               buflen = buflen * 2;
-               if( false == first_loop ) delete buffer;
-            }
-            else
-            {  // Buffer is enough
-               new_str += buffer;
-               if( false == first_loop ) delete buffer;
-               break;
-            }
-            first_loop = false;
-         }
-         pos2 = pos1 + 1;
-         // The second replacement number is the end frame
-         if( number == start ) number = end;
-         else number = start; // And a start frame again in cycle
-      }
-      new_str += str.substr( pos2);
-      str = new_str;
-   }
-   return str;
-}
-*/
 const std::string af::fillNumbers( const std::string & pattern, long long start, long long end)
 {
    std::string str;

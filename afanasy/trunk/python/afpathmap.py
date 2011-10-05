@@ -3,25 +3,24 @@
 import os
 import sys
 
+PathSeparators = ' ";=:,\''
+
 def findPathEnd( path):
-   PathEnd = ' ";'
    position = 0
    pathlen = len(path)
    if pathlen <= 1: return 1
    while position < pathlen:
       position += 1
       if position >= pathlen: break
-      if path[position] in PathEnd: break
+      if path[position] in PathSeparators: break
    return position
 
 def findNextPosition( position, path):
-   PathBegin = ' ";'
- #  founded = False
    pathlen = len(path)
    if position >= pathlen: return -1
    if path[position] != ' ': position += findPathEnd(path[position:])
    while position < pathlen:
-      if path[position] in PathBegin: position += 1
+      if path[position] in PathSeparators: position += 1
       else: break
    if position >= pathlen: return -1
    return position
@@ -58,9 +57,11 @@ def findPathMapFiles( folder):
    PathMapFile = 'pathmap'
    pathmap_files = []
    if folder is not None:
+      if not isinstance( folder, str): folder = str( folder,'utf-8')
       if os.path.isdir( folder):
          files = os.listdir( folder)
          for afile in files:
+            if not isinstance( afile, str): folder = str( afile,'utf-8')
             if afile.find( PathMapFile) != 0: continue
             filename = os.path.join( folder, afile)
             if not os.path.isfile( filename): continue
@@ -86,6 +87,7 @@ class PathMap:
 
          file = open( filename, 'r')
          for line in file:
+            if not isinstance( line, str): line = str( line,'utf-8')
             line = line.strip()
             linelen = len(line)
             if linelen <= 3: continue
@@ -115,12 +117,16 @@ class PathMap:
             print('   "%s" <-> "%s"' % (path, self.PathServer[n]))
             n += 1
 
+
    def translatePath( self, path, toserver, Verbose):
       newpath = path
+      if not isinstance( newpath, str): newpath = str( newpath,'utf-8')
+      if len(newpath) < 1: return newpath
       if not self.initialized: return newpath
-#      positions = findPositions( newpath)
       position = 0
-#      for position in positions:
+      while newpath[position] in PathSeparators:
+         position += 1
+         if position >= len(newpath): return newpath
       while position != -1:
          path_search = newpath[position:]
 #         print('position # %d : "%s"' % (position, path_search))
@@ -173,6 +179,7 @@ class PathMap:
       filein.close()
       outdata = ''
       for line in inlines:
+         if not isinstance( line, str): line = str( line,'utf-8')
          toskip = False
          if len( SearchStrings): toskip = True
          for searchstr in SearchStrings:

@@ -90,45 +90,48 @@ void Service::initialize()
 
    // Process working directory:
    pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
-   if( PyBytes_Check( pResult))
+   if( pResult == NULL)
    {
-      wdir = PyBytes_AsString( pResult);
-      Py_DECREF( pResult);
+      if( PyErr_Occurred()) PyErr_Print();
+      return;
    }
-   else
+   if( false == af::PyGetString( pResult, wdir))
    {
       AFERROR("Service:FuncGetWDir: Returned object is not a string.")
       Py_DECREF( pResult);
       return;
    }
+   Py_DECREF( pResult);
 
    // Process command:
    pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
-   if( PyBytes_Check( pResult))
+   if( pResult == NULL)
    {
-      command = PyBytes_AsString( pResult);
-      Py_DECREF( pResult);
+      if( PyErr_Occurred()) PyErr_Print();
+      return;
    }
-   else
+   if( false == af::PyGetString( pResult, command))
    {
       AFERROR("Service:FuncGetCommand: Returned object is not a string.")
       Py_DECREF( pResult);
       return;
    }
+   Py_DECREF( pResult);
 
    // Process files:
    pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
-   if( PyBytes_Check( pResult))
+   if( pResult == NULL)
    {
-      files = PyBytes_AsString( pResult);
-      Py_DECREF( pResult);
+      if( PyErr_Occurred()) PyErr_Print();
+      return;
    }
-   else
+   if( false == af::PyGetString( pResult, files))
    {
       AFERROR("Service:FuncGetCommand: Returned object is not a string.")
       Py_DECREF( pResult);
       return;
    }
+   Py_DECREF( pResult);
 
    initialized = true;
 }

@@ -1,6 +1,5 @@
-#import parser
-import hbatch
-import prman
+from parsers import hbatch
+from parsers import prman
 
 class hbatch_prman( hbatch.hbatch, prman.prman):
    'Houdini9.x batch + catch rib node output'

@@ -5,6 +5,20 @@
 #include <time.h>
 #include <vector>
 
+#ifdef _XOPEN_SOURCE
+#undef _XOPEN_SOURCE
+#endif
+#ifdef _POSIX_C_SOURCE
+#undef _POSIX_C_SOURCE
+#endif
+#include <Python.h>
+//#ifdef _XOPEN_SOURCE
+//#undef _XOPEN_SOURCE
+//#endif
+//#ifdef _POSIX_C_SOURCE
+//#undef _POSIX_C_SOURCE
+//#endif
+
 #include "../include/aftypes.h"
 
 namespace af
@@ -62,6 +76,8 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
+   void outError( const char * errMsg, const char * baseMsg = NULL);
+
    const long long stoi( const std::string & str, bool * ok = NULL);
    const std::string itos( long long integer);
    const std::string getenv( const char * name);
@@ -114,4 +130,7 @@ namespace af
    bool netIsIpAddr( const std::string & addr, bool verbose = false);
 
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
+
+
+   bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
 }

@@ -996,7 +996,7 @@ Add this options to temporary image saving.')
 
    def copyInput( self):
       files1 = self.editInputFiles.text()
-      if not files1.isEmpty():
+      if len( files1):
          self.editInputFiles2.setText( files1)
       self.inputFileChanged2()
 
@@ -1032,9 +1032,9 @@ Add this options to temporary image saving.')
          dirname = os.path.dirname( oldlogo)
          if dirname != '': lgspath = dirname
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgspath)
-      if afile.isEmpty(): return
-      self.editLgsPath.setText( '%s' % afile)
-      self.evaluate()
+      if len( afile):
+         self.editLgsPath.setText( '%s' % afile)
+         self.evaluate()
 
    def browseLgf( self):
       lgfpath = LogosPath
@@ -1043,25 +1043,25 @@ Add this options to temporary image saving.')
          dirname = os.path.dirname( oldlogo)
          if dirname != '': lgfpath = dirname
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgfpath)
-      if afile.isEmpty(): return
-      self.editLgfPath.setText( '%s' % afile)
-      self.evaluate()
+      if len( afile):
+         self.editLgfPath.setText( '%s' % afile)
+         self.evaluate()
 
    def browseOutputFolder( self):
       folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.editOutputDir.text()))
-      if not folder.isEmpty(): self.editOutputDir.setText( folder)
+      if len( folder): self.editOutputDir.setText( folder)
 
    def browseInput( self):
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles.text())
-      if afile.isEmpty(): return
-      self.editInputFiles.setText( afile)
-      self.inputFileChanged()
+      if len( afile):
+         self.editInputFiles.setText( afile)
+         self.inputFileChanged()
 
    def browseInput2( self):
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles2.text())
-      if afile.isEmpty(): return
-      self.editInputFiles2.setText( afile)
-      self.inputFileChanged2()
+      if len( afile):
+         self.editInputFiles2.setText( afile)
+         self.inputFileChanged2()
 
    def inputFileChanged( self):
       if self.running: return
@@ -1190,15 +1190,13 @@ Add this options to temporary image saving.')
       if sys.platform.find('win') == 0: identify += ' nul'
       else: identify += ' /dev/null'
       pipe = subprocess.Popen( identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
-      Identify = str( pipe.read())
+      Identify = pipe.read()
       if len(Identify) < len(afile):
          self.cmdField.setText('Invalid image.\n%s' % afile)
          return InputFile, InputPattern, FilesCount, Identify
+      if not isinstance( Identify, str): Identify = str( Identify, 'utf-8')
+      Identify = Identify.strip()
       Identify = Identify.replace( afile, '')
-      Identify = Identify.replace('b\'','').replace('\\n','').replace('\\r','')
-      Identify = Identify.replace('\\n','').replace('\\r','')
-      Identify = Identify.strip('\'')
-
       InputPattern = os.path.join( inputdir, pattern)
 
       return InputFile, InputPattern, FilesCount, Identify
@@ -1310,13 +1308,14 @@ Add this options to temporary image saving.')
                return
 
       cmd = 'makemovie.py'
-      cmd = 'python ' + os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
-      cmd += ' -c %s' % self.cbCodec.itemData( self.cbCodec.currentIndex()).toString()
+      cmd = os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
+      cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
+      cmd += ' -c "%s"' % getComboBoxString( self.cbCodec)
       cmd += ' -f %s' % self.cbFPS.currentText()
-      cmd += ' --fs %d ' % self.sbFrameFirst.value()
-      cmd += ' --fe %d ' % self.sbFrameLast.value()
-      format = self.cbFormat.itemData( self.cbFormat.currentIndex()).toString()
-      if not format.isEmpty():
+      cmd += ' --fs %d' % self.sbFrameFirst.value()
+      cmd += ' --fe %d' % self.sbFrameLast.value()
+      format = getComboBoxString( self.cbFormat)
+      if format != '':
          if self.cFFFirst.isChecked(): cmd += ' --fff'
          ts = self.cbTemplateS.currentText()
          tf = self.cbTemplateF.currentText()
@@ -1333,26 +1332,26 @@ Add this options to temporary image saving.')
          if comments != '': cmd += ' --comments "%s"' % comments
          if font     != '': cmd += ' --font "%s"'     % font
          cmd += ' --tmpformat %s' % self.cbTempFormat.currentText()
-         if not self.eTempFormatOptions.text().isEmpty(): cmd += ' --tmpquality "%s"' % self.eTempFormatOptions.text()
+         if len( self.eTempFormatOptions.text()): cmd += ' --tmpquality "%s"' % self.eTempFormatOptions.text()
          if self.dsbAspectIn.value()   > 0: cmd += ' --aspect_in %f' % self.dsbAspectIn.value()
          if self.dsbAutoAspect.value() > 0: cmd += ' --aspect_auto %f' % self.dsbAutoAspect.value()
          if self.dsbAspectOut.value()  > 0: cmd += ' --aspect_out %f' % self.dsbAspectOut.value()
          if not self.cCorrAuto.isChecked():     cmd += ' --noautocorr'
-         if not self.eCorrAux.text().isEmpty(): cmd += ' --correction "%s"' % self.eCorrAux.text()
+         if len( self.eCorrAux.text()): cmd += ' --correction "%s"' % self.eCorrAux.text()
          if self.cTime.isChecked(): cmd += ' --addtime'
-         cacher = self.cbCacherOpacity.itemData( self.cbCacherOpacity.currentIndex()).toString()
+         cacher = getComboBoxString( self.cbCacherOpacity)
          if cacher != '0':
             cmd += ' --cacher_aspect %f' % self.dsbCacherAspect.value()
             cmd += ' --cacher_opacity %s' % cacher
-         if not self.editCacherLine.text().isEmpty():
+         if len( self.editCacherLine.text()):
             cmd += ' --line_aspect "%s"' % self.dsbCacherLineAspect.value()
             cmd += ' --line_color "%s"' % self.editCacherLine.text()
-         cacher = self.cbCacher169.itemData( self.cbCacher169.currentIndex()).toString()
+         cacher = getComboBoxString( self.cbCacher169)
          if cacher != '0': cmd += ' --draw169 %s' % cacher
-         cacher = self.cbCacher235.itemData( self.cbCacher235.currentIndex()).toString()
+         cacher = getComboBoxString( self.cbCacher235)
          if cacher != '0': cmd += ' --draw235 %s' % cacher
-         if not self.editLine169.text().isEmpty(): cmd += ' --line169 "%s"' % self.editLine169.text()
-         if not self.editLine235.text().isEmpty(): cmd += ' --line235 "%s"' % self.editLine235.text()
+         if len( self.editLine169.text()): cmd += ' --line169 "%s"' % self.editLine169.text()
+         if len( self.editLine235.text()): cmd += ' --line235 "%s"' % self.editLine235.text()
          if lgspath != '':
             cmd += ' --lgspath "%s"' % lgspath
             cmd += ' --lgssize %d' % self.sbLgsSize.value()
@@ -1394,7 +1393,6 @@ Add this options to temporary image saving.')
             print( error)
             self.cmdField.setText('Unable to import Afanasy Python module:\n' + error)
             return
-         reload(af)
          job = af.Job(('%s' % self.editOutputName.text()).encode('utf-8'))
          block = af.Block('Make Movie', 'movgen')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
@@ -1440,9 +1438,11 @@ Add this options to temporary image saving.')
       self.cmdField.setText('Finished.')
 
    def processoutput( self):
-      output = self.process.readAll()
-      print('%s' % output),
-      self.cmdField.insertPlainText( QtCore.QString( output))
+      output = self.process.readAll().data()
+      if not isinstance( output, str): output = str( output, 'utf-8')
+      output = output.strip()
+      print('%s' % output)
+      self.cmdField.insertPlainText( output + '\n')
       self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
    def processStop( self):
@@ -1450,6 +1450,12 @@ Add this options to temporary image saving.')
       self.process.terminate()
       if sys.platform.find('win') == 0:
          self.process.kill()
+
+def getComboBoxString( comboBox):
+   data = comboBox.itemData( comboBox.currentIndex())
+   if data is None: return ''
+   if isinstance( data, str): return data
+   return comboBox.itemData( comboBox.currentIndex()).toString()
 
 app = QtGui.QApplication( sys.argv)
 icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'makemovie.png'))

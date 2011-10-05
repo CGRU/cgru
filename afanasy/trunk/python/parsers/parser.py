@@ -17,9 +17,10 @@ class parser:
       self.badresult = False
 
    def do( self, data):
-      print 'Erorr: parser.do: Invalid call, this method must be implemented.'
+      print('Erorr: parser.do: Invalid call, this method must be implemented.')
 
    def parse( self, data):
+      if not isinstance( data, str): data = str( data,'utf-8')
       self.warning = False
       self.error = False
       self.badresult = False
@@ -30,8 +31,8 @@ class parser:
       try:
          result = self.do( data)
       except:
-         print 'Error parsing output:'
-         print str(sys.exc_info()[1])
+         print('Error parsing output:')
+         print( str(sys.exc_info()[1]))
       return result, self.percent, self.frame, self.percentframe, self.warning, self.error, self.badresult
 
    def calculate( self):

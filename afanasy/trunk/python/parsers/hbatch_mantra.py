@@ -1,6 +1,5 @@
-#import parser
-import hbatch
-import mantra
+from parsers import hbatch
+from parsers import mantra
 
 class hbatch_mantra( hbatch.hbatch, mantra.mantra):
    'Houdini9.x batch + catch mantra node output'

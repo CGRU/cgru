@@ -8,7 +8,7 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"
-
+/*
 #if PY_MAJOR_VERSION < 3
 #define PyBytes_Check PyString_Check
 #define PyBytes_AsString PyString_AsString
@@ -17,7 +17,7 @@
 #define PyLong_AsLong PyLong_AsLong
 #define PyLong_FromLong PyInt_FromLong
 #endif
-
+*/
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

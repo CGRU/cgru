@@ -2,4 +2,4 @@
 
 source ./setup.sh
 
-python job.py "$@"
+"${CGRU_PYTHONEXE}" job.py "$@"

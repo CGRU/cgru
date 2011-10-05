@@ -40,27 +40,37 @@ bool Parser::parse(  std::string & data,
    PyObject * pArgs = PyTuple_New( 1);
    PyTuple_SetItem( pArgs, 0, PyBytes_FromStringAndSize( data.data(), data.size()));
    PyObject * pTuple = PyObject_CallObject( PyObj_FuncParse, pArgs);
-   if( PyTuple_Check( pTuple))
+   if( pTuple != NULL)
    {
-      if( PyTuple_Size( pTuple) == 7)
+      if( PyTuple_Check( pTuple))
       {
-         percent        = PyLong_AsLong(   PyTuple_GetItem( pTuple, 1));
-         frame          = PyLong_AsLong(   PyTuple_GetItem( pTuple, 2));
-         percentframe   = PyLong_AsLong(   PyTuple_GetItem( pTuple, 3));
-         warning        = PyObject_IsTrue( PyTuple_GetItem( pTuple, 4));
-         error          = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
-         badresult      = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
-         PyObject * output = PyTuple_GetItem( pTuple, 0);
-         if( PyBytes_Check( output)) data = PyBytes_AsString( output);
-         result = true;
+         if( PyTuple_Size( pTuple) == 7)
+         {
+            percent        = PyLong_AsLong(   PyTuple_GetItem( pTuple, 1));
+            frame          = PyLong_AsLong(   PyTuple_GetItem( pTuple, 2));
+            percentframe   = PyLong_AsLong(   PyTuple_GetItem( pTuple, 3));
+            warning        = PyObject_IsTrue( PyTuple_GetItem( pTuple, 4));
+            error          = PyObject_IsTrue( PyTuple_GetItem( pTuple, 5));
+            badresult      = PyObject_IsTrue( PyTuple_GetItem( pTuple, 6));
+            PyObject * output = PyTuple_GetItem( pTuple, 0);
+            if( af::PyGetString( output, data, "Parser::parse")) result = true;
+         }
+         else
+         {
+            AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 5\n", name.c_str());
+         }
       }
       else
-         AFERRAR("Parser::parse: type=\"%s\" returned tuple size != 5\n", name.c_str());
+      {
+         AFERRAR("Parser::parse: type=\"%s\" value is not a tuple\n", name.c_str());
+      }
+      Py_DECREF( pTuple);
    }
    else
-      AFERRAR("Parser::parse: type=\"%s\" value is not a tuple\n", name.c_str());
-
+   {
+      if( PyErr_Occurred()) PyErr_Print();
+   }
    Py_DECREF( pArgs);
-   Py_DECREF( pTuple);
+
    return result;
 }

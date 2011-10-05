@@ -35,9 +35,8 @@ class service:
       return command
 
    def getFiles( self):
-      files = ''
-      if self.files != '': files = self.pm.toClient( self.files)
-      return files
+      if len(self.files) < 1: return self.files
+      return self.pm.toClient( self.files)
 
    def applycmdcapacity( self, command):
       command = command.replace( self.str_capacity, str( self.capacity))

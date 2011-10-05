@@ -1,6 +1,6 @@
 #include <QtCore/QCoreApplication>
 
-#include <Python.h>
+//#include <Python.h>
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/host.h"

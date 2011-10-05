@@ -1,7 +1,16 @@
 #include "pyclass.h"
 
 using namespace af;
-
+/*
+#if PY_MAJOR_VERSION < 3
+#define PyBytes_Check PyString_Check
+#define PyBytes_AsString PyString_AsString
+#define PyBytes_FromString PyString_FromString
+#define PyBytes_FromStringAndSize PyString_FromStringAndSize
+#define PyLong_AsLong PyInt_AsLong
+#define PyLong_FromLong PyInt_FromLong
+#endif
+*/
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -44,9 +53,10 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    }
 
    // Get class instance
-#if PY_MAJOR_VERSION < 3
-   PyObj_Instance = PyInstance_New( PyObj_Type, initArgs, NULL);
-#endif
+//#if PY_MAJOR_VERSION < 3
+//   PyObj_Instance = PyInstance_New( PyObj_Type, initArgs, NULL);
+   PyObj_Instance = PyObject_CallObject( PyObj_Type, initArgs);
+//#endif
    if( PyObj_Instance == NULL)
    {
       if( PyErr_Occurred()) PyErr_Print();

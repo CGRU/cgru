@@ -1,7 +1,7 @@
 #pragma once
 
-#include <Python.h>
-#include <structmember.h>
+//#include <Python.h>
+//#include <structmember.h>
 
 #include "../libafapi/apitask.h"
 

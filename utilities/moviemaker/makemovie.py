@@ -271,12 +271,14 @@ def getImages( inpattern):
    else: identify += ' /dev/null'
    pipe = subprocess.Popen(identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
    identify = pipe.read()
+   if not isinstance( identify, str): identify = str( identify, 'utf-8')
    identify = identify.replace( afile, '')
    identify = identify.strip()
    if len(identify) < 1:
       print('Invalid image "%s"' % afile)
       sys.exit(1)
    identify = identify.split(' ')
+   print( identify)
    if len(identify) < 1:
       print('Invalid image "%s"' % afile)
       sys.exit(1)
@@ -330,7 +332,7 @@ print( TmpDir)
 
 # Commands construction:
 cmd_makeframe = os.path.join( os.path.dirname(sys.argv[0]), 'makeframe.py')
-cmd_makeframe = 'python ' + cmd_makeframe
+cmd_makeframe = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd_makeframe)
 
 # Calculate frame range:
 FrameRange = ''
@@ -544,7 +546,8 @@ if Options.afanasy:
 # Commands execution:
 if Options.afanasy: j.send( Verbose)
 else:
-   if len(cmd_precomp) or need_convert: os.mkdir(TmpDir, 0777)
+   if len(cmd_precomp) or need_convert:
+      os.mkdir( TmpDir, 0o777)
    if len(cmd_precomp):
       n = 0
       print('Precomositing...')

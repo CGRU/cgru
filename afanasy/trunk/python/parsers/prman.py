@@ -1,4 +1,4 @@
-import parser
+from parsers import parser
 
 class prman(parser.parser):
    'PIXAR\'s RenderMan'

@@ -75,6 +75,7 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
    }
 
    printf("\nStarting[%d]: ", runningtasks); exec->stdOut( false);
+//   printf("%s\n", command.toUtf8().data());
 
 #ifdef WINNT
 //   args << "/c" << command;

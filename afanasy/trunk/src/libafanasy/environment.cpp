@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-#include <Python.h>
+//#include <Python.h>
 
 #include "../include/afanasy.h"
 #include "../include/afjob.h"
