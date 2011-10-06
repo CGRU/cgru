@@ -561,7 +561,10 @@ else:
       print('Converting...')
       for cmd in cmd_convert:
          print( name_convert[n])
-         os.system( cmd)
+#         print(cmd)
+#         output = subprocess.Popen( cmd, stdout=subprocess.PIPE).communicate()[0]
+         subprocess.Popen( cmd).communicate()
+#         print( output)
          n += 1
          print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
          sys.stdout.flush()
