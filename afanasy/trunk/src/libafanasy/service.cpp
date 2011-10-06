@@ -89,6 +89,7 @@ void Service::initialize()
    PyObject * pResult;
 
    // Process working directory:
+   AFINFA("Service::initialize: Processing working dirctory:\n%s", wdir.c_str())
    pResult = PyObject_CallObject( PyObj_FuncGetWDir, NULL);
    if( pResult == NULL)
    {
@@ -102,8 +103,10 @@ void Service::initialize()
       return;
    }
    Py_DECREF( pResult);
+   AFINFA("Service::initialize: Working dirctory:\n%s", wdir.c_str())
 
    // Process command:
+   AFINFA("Service::initialize: Processing command:\n%s", command.c_str())
    pResult = PyObject_CallObject( PyObj_FuncGetCommand, NULL);
    if( pResult == NULL)
    {
@@ -117,8 +120,10 @@ void Service::initialize()
       return;
    }
    Py_DECREF( pResult);
+   AFINFA("Service::initialize: Command:\n%s", command.c_str())
 
    // Process files:
+   AFINFA("Service::initialize: Processing files:\n%s", files.c_str())
    pResult = PyObject_CallObject( PyObj_FuncGetFiles, NULL);
    if( pResult == NULL)
    {
@@ -132,6 +137,7 @@ void Service::initialize()
       return;
    }
    Py_DECREF( pResult);
+   AFINFA("Service::initialize: Files:\n%s", files.c_str())
 
    initialized = true;
 }

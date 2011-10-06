@@ -1,5 +1,4 @@
-#import parser
-import blender
+from parsers import blender
 
 keyframe = 'Part '
 keyframe_len = len(keyframe)

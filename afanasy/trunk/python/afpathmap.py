@@ -3,7 +3,9 @@
 import os
 import sys
 
-PathSeparators = ' ";=:,\''
+#PathSeparators = ' ";=,\''
+PathSeparators = ' ";=,\':'
+#if sys.platform.find('win') != 0: PathSeparators += ':'
 
 def findPathEnd( path):
    position = 0
@@ -127,9 +129,11 @@ class PathMap:
       while newpath[position] in PathSeparators:
          position += 1
          if position >= len(newpath): return newpath
+      maxcycles = len(newpath)
+      cycle = 0
       while position != -1:
          path_search = newpath[position:]
-#         print('position # %d : "%s"' % (position, path_search))
+#         print('position # %d/%d : "%s"' % (position, len(newpath), path_search))
          for i in range( 0, len( self.PathServer)):
             if toserver:
                path_from = self.PathClient[i]
@@ -157,12 +161,22 @@ class PathMap:
                if not self.UnixSeparators:
                   part2 = replaceSeperators( part2, path_from, path_to)
                newpath = part1 + path_to + part2
+               position = len(part1 + path_to)
+               newpath = part1 + path_to + part2
                if Verbose:
                   print('Pathes mapped:')
                   print(path)
                   print(newpath)
                break
+         old_position = position
          position = findNextPosition( position, newpath)
+         if position != -1 and position <= old_position:
+            print('Path translation error: Eldless cycle, position = %d.' % position)
+            break
+         cycle += 1
+         if cycle > maxcycles:
+            print('Path translation error: Cycle > maxcycles (%d>%d).' % (cycle, maxcycles))
+            break
       return newpath
 
    def toServer( self, path, Verbose = False): return self.translatePath( path, True , Verbose)

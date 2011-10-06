@@ -1,6 +1,5 @@
-#import parser
-import blender
-import yafray
+from parsers import blender
+from parsers import yafray
 
 class blender_yafray( blender.blender, yafray.yafray):
    'Blender batch + catch yafray output'
