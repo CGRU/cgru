@@ -28,7 +28,7 @@ bool afqt::connectAfanasy( QTcpSocket * qSocket)
    if( qSocket->state() != QAbstractSocket::ConnectedState)
    {
 #ifdef AFOUTPUT
-printf("afqt::connectAfanasy: %s : %d\n", af::Environment::getAfServerQHostAddress()->toString().toUtf8().data(), af::Environment::getServerPort());
+printf("afqt::connectAfanasy: %s : %d\n", afqt::QEnvironment::getAfServerQHostAddress().toString().toUtf8().data(), af::Environment::getServerPort());
 #endif
       qSocket->connectToHost( afqt::QEnvironment::getAfServerQHostAddress(), af::Environment::getServerPort());
       if( qSocket->waitForConnected( WAITFORCONNECTED) == false)
