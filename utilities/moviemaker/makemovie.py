@@ -563,7 +563,11 @@ else:
          print( name_convert[n])
 #         print(cmd)
 #         output = subprocess.Popen( cmd, stdout=subprocess.PIPE).communicate()[0]
-         subprocess.Popen( cmd).communicate()
+         cmd_array = []
+#         if os.platform.find('win')
+         subprocess.Popen( cmd, shell=True).communicate()
+#         subprocess.Popen(['bash','-c',cmd]).communicate()
+#         os.system( cmd)
 #         print( output)
          n += 1
          print('PROGRESS: %d' % (100.0 * n / imgCount) + '%')
