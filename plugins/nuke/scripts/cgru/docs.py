@@ -36,7 +36,6 @@ def docsAfanasy():
    if cgru is None: return
    path = getenv('NUKE_AF_PATH')
    if path is None: return 
-   path = os.path.dirname( path)
    path = path.replace( cgru, '')
    path = os.path.join( path, 'doc')
    path = os.path.join( path, 'afanasy.html')
