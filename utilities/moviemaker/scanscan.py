@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import re, os, sys
+import re, os, sys, subprocess
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] scan_folder result_folder\ntype \"%prog -h\" for help", version="%prog 1.  0")
@@ -145,6 +145,7 @@ for dirpath, dirnames, filenames in os.walk( Folder):
             task = af.Task( os.path.basename(movname))
             task.setCommand( cmd)
             block.tasks.append( task)
-         else: os.system(cmd)
+         else:
+            subprocess.Popen( cmd, shell=True).communicate()
 
 if not Options.debug and not Options.test and Options.afanasy != 0: job.send()
