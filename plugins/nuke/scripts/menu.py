@@ -14,5 +14,5 @@ cgru_submenu.addCommand('Open Scene From Server Paths', 'cgru.pmOpenFromServer()
 
 cgru_menu.addCommand("-", "", "")
 
-cgru_menu.addCommand('Afanasy Help', 'cgru.docsAfanasy()')
+#cgru_menu.addCommand('Afanasy Help', 'cgru.docsAfanasy()')
 cgru_menu.addCommand('Documentation', 'cgru.docsNuke()')
