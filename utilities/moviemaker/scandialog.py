@@ -2,6 +2,8 @@
 
 import os, sys
 
+import cgruconfig
+
 from PyQt4 import QtCore, QtGui
 
 # Command arguments:
@@ -95,7 +97,7 @@ class Dialog( QtGui.QWidget):
       self.evaluated = False
       self.test = False
 
-      self.setWindowTitle('Scan Scan - CGRU ' + os.getenv('CGRU_VERSION', ''))
+      self.setWindowTitle('Scan Scan - CGRU ' + cgruconfig.VARS['CGRU_VERSION'])
       self.mainLayout = QtGui.QVBoxLayout( self)
 
       self.tabwidget = QtGui.QTabWidget( self)
@@ -445,8 +447,7 @@ def getComboBoxString( comboBox):
 
 
 app = QtGui.QApplication( sys.argv)
-icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'scanscan.png'))
-app.setWindowIcon( icon)
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], 'scanscan.png')))
 dialog = Dialog()
 dialog.show()
 app.exec_()

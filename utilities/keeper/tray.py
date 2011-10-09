@@ -130,6 +130,12 @@ class Tray( QtGui.QSystemTrayIcon):
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exittalk)
       self.menu['AFANASY'].addAction( action)
 
+      self.menu['AFANASY'].addSeparator()
+
+      action = QtGui.QAction('Check RegExp...', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.checkregexp)
+      self.menu['AFANASY'].addAction( action)
+
       self.menu['menu'].addSeparator()
 
       self.menu['Configure'].addSeparator()
@@ -167,7 +173,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.icon_name = cgruconfig.VARS['tray_icon']
       if self.icon_name is None: self.icon_name = 'keeper'
       self.setContextMenu( self.menu['menu'])
-      self.icon = QtGui.QIcon( os.path.join( os.path.join( os.getenv('CGRU_KEEPER', ''), 'icons'), self.icon_name + '.png'))
+      self.icon = QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], self.icon_name + '.png'))
       self.setIcon( self.icon)
       parent.setWindowIcon( self.icon)
       self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))

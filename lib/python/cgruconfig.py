@@ -20,6 +20,7 @@ class Config:
          self.Vars['CGRU_LOCATION'] = cgrulocation
          self.Vars['CGRU_VERSION'] = os.getenv('CGRU_VERSION','')
          self.Vars['CGRU_ICONSDIR'] = os.path.join( cgrulocation, 'icons')
+         self.Vars['CGRU_PYTHONEXE'] = os.getenv('CGRU_PYTHONEXE','python')
 
          self.Vars['CONFIGFILE'] = os.path.join( cgrulocation, 'config.xml')
          home = os.getenv('HOME', os.getenv('HOMEPATH'))

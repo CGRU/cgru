@@ -7,6 +7,8 @@ import subprocess
 import sys
 import time
 
+import cgruconfig
+
 from PyQt4 import QtCore, QtGui
 
 # Command arguments:
@@ -174,7 +176,7 @@ class Dialog( QtGui.QWidget):
       self.evaluated = False
       self.running   = False
 
-      self.setWindowTitle('Make Movie - CGRU ' + os.getenv('CGRU_VERSION', ''))
+      self.setWindowTitle('Make Movie - CGRU ' + cgruconfig.VARS['CGRU_VERSION'])
       self.mainLayout = QtGui.QVBoxLayout( self)
       self.tabwidget = QtGui.QTabWidget( self)
       self.mainLayout.addWidget( self.tabwidget)
@@ -1458,8 +1460,7 @@ def getComboBoxString( comboBox):
    return comboBox.itemData( comboBox.currentIndex()).toString()
 
 app = QtGui.QApplication( sys.argv)
-icon = QtGui.QIcon( os.path.join( os.path.join (DialogPath, 'icons'), 'makemovie.png'))
-app.setWindowIcon( icon)
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], 'makemovie.png')))
 dialog = Dialog()
 dialog.show()
 app.exec_()
