@@ -52,7 +52,7 @@ Watch::Watch( Dialog * pDialog, QApplication * pApplication)
    m = d->getMonitor();
 
 // Get services icons:
-   QDir dir( afqt::stoq( af::Environment::getAfRoot()) + "/icons/watch/services");
+   QDir dir( afqt::stoq( af::Environment::getCGRULocation()) + "/icons/services");
    if( false == dir.exists()) return;
    QFileInfoList files = dir.entryInfoList();
    if( files.size() == 0) return;

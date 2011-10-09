@@ -65,6 +65,7 @@ public:
 
    static inline const std::string & getHome()        { return home;          }
    static inline const std::string & getHomeAfanasy() { return home_afanasy;  }
+   static inline const std::string & getCGRULocation(){ return cgrulocation;  } ///< Get CGRU root directory.
    static inline const std::string & getAfRoot()      { return afroot;        } ///< Get Afanasy root directory.
    static inline const std::string & getServerName()  { return servername;    } ///< Get Afanasy server name.
    static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
@@ -185,6 +186,7 @@ private:
    static void getVars( const rapidxml::xml_node<> * pnode);
    static bool init();
 
+   static std::string cgrulocation;    ///< CGRU root directory.
    static std::string afroot;          ///< Afanasy root directory.
    static std::string home;            ///< User home directory.
    static std::string home_afanasy;    ///< Afanasy home settings.

@@ -119,6 +119,7 @@ std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
 std::string Environment::platform;
+std::string Environment::cgrulocation;
 std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
@@ -325,6 +326,26 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
       return;
    }
    PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
+
+//
+//############ cgru root directory:
+   cgrulocation = getenv("CGRU_LOCATION");
+   if( cgrulocation.size() == 0 )
+   {
+      cgrulocation = afroot;
+      cgrulocation = af::pathUp( cgrulocation);
+      std::cout << "cgrulocation=" << cgrulocation;
+      std::cout << std::endl;
+   }
+   else
+   {
+      PRINT("CGRU_LOCATION = '%s'\n", cgrulocation.c_str());
+   }
+   if( af::pathIsFolder( cgrulocation) == false)
+   {
+      AFERRAR("CGRU_LOCATION directory = '%s' does not exists.", cgrulocation.c_str())
+      return;
+   }
 
 //
 // Afanasy python path:
