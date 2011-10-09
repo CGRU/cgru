@@ -411,6 +411,19 @@ elif ext == 'max':
       cmd += ' -o:"%s"' % output
       images = output
 
+# After FX:
+elif ext == 'aep':
+   scenetype = 'afterfx'
+   cmd = 'aerender' + cmdextension + ' -project "%s"' % scene
+   cmd += ' -mp -s @#@ -e @#@ -i %d -mp' % by
+   if node != '': cmd += ' -comp "%s"' % node
+   if take != '':
+      cmd += ' -RStemplate "%s"' % take
+   if output != '':
+      output = os.path.join( os.getcwd(), output)
+      cmd += ' -output "%s"' % output
+      images = os.path.join( os.path.dirname( output), os.path.basename( output).replace('[','@').replace(']','@'))
+
 # simple generic:
 else:
    scenetype = 'generic'
