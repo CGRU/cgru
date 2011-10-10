@@ -447,7 +447,7 @@ def getComboBoxString( comboBox):
 
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], 'scanscan.png')))
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], 'scanscan.png')))
 dialog = Dialog()
 dialog.show()
 app.exec_()

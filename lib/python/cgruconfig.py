@@ -17,21 +17,31 @@ class Config:
          cgrulocation =  os.getenv('CGRU_LOCATION')
          if cgrulocation is None or cgrulocation == '': return
 
+         # Definitions which always must preset:
          self.Vars['CGRU_LOCATION'] = cgrulocation
          self.Vars['CGRU_VERSION'] = os.getenv('CGRU_VERSION','')
-         self.Vars['CGRU_ICONSDIR'] = os.path.join( cgrulocation, 'icons')
          self.Vars['CGRU_PYTHONEXE'] = os.getenv('CGRU_PYTHONEXE','python')
+         self.Vars['CGRU_UPDATE_CMD'] = os.getenv('CGRU_UPDATE_CMD')
 
-         self.Vars['CONFIGFILE'] = os.path.join( cgrulocation, 'config.xml')
+         self.Vars['company'] = 'CGRU'
+         self.Vars['menu'] = os.path.join( cgrulocation,'start')
+         self.Vars['tray_icon'] = None
+         self.Vars['icons_dir'] = os.path.join( cgrulocation, 'icons')
+         if sys.platform.find('win') == 0:
+            self.Vars['editor'] = 'notepad "%s"'
+         else:
+            self.Vars['editor'] = 'xterm -e vi "%s"'
+
+         self.Vars['config_file'] = os.path.join( cgrulocation, 'config.xml')
          home = os.getenv('HOME', os.getenv('HOMEPATH'))
          self.Vars['HOME'] = home
          self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
          if not os.path.isdir( self.Vars['HOME_CGRU']):
             os.mkdir( self.Vars['HOME_CGRU'])
-         self.Vars['HOME_CONFIGFILE'] = os.path.join( self.Vars['HOME_CGRU'], 'config.xml')
+         self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.xml')
          # Create home config file if not preset
-         if not os.path.isfile( self.Vars['HOME_CONFIGFILE']):
-            cfile = open( self.Vars['HOME_CONFIGFILE'], 'w')
+         if not os.path.isfile( self.Vars['config_file_home']):
+            cfile = open( self.Vars['config_file_home'], 'w')
             cfile.write('<!-- Created at ' + time.ctime() + ' -->\n')
             cfile.write('<cgru>\n')
             cfile.write('</cgru>\n')
@@ -39,8 +49,8 @@ class Config:
 
          configfiles = []
          configfiles.append( os.path.join( cgrulocation, 'config_default.xml'))
-         configfiles.append( self.Vars['CONFIGFILE'])
-         configfiles.append( self.Vars['HOME_CONFIGFILE'])
+         configfiles.append( self.Vars['config_file'])
+         configfiles.append( self.Vars['config_file_home'])
 
       for filename in configfiles:
          if self.verbose: print('Trying to open %s' % filename)
@@ -77,7 +87,7 @@ class Config:
 Config()
 
 def writeVars( variables):
-   file = open(VARS['HOME_CONFIGFILE'],'r')
+   file = open(VARS['config_file_home'],'r')
    lines = file.readlines()
    file.close()
    for var in variables:
@@ -99,6 +109,6 @@ def writeVars( variables):
             if line.find('<cgru>') != -1: continue
             lines.insert( num, toinsert)
             break
-   file = open(VARS['HOME_CONFIGFILE'],'w')
+   file = open(VARS['config_file_home'],'w')
    for line in lines: file.write( line)
    file.close()

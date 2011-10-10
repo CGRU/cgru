@@ -1460,7 +1460,7 @@ def getComboBoxString( comboBox):
    return comboBox.itemData( comboBox.currentIndex()).toString()
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], 'makemovie.png')))
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], 'makemovie.png')))
 dialog = Dialog()
 dialog.show()
 app.exec_()

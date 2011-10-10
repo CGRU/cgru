@@ -8,6 +8,8 @@ class Window( QtGui.QTextEdit ):
    def __init__( self, parent = None):
       QtGui.QWidget.__init__( self, parent)
 
+      self.setWindowTitle('Configuration: %s version %s' % (cgruconfig.VARS['company'], cgruconfig.VARS['CGRU_VERSION']))
+
       self.ftitle = QtGui.QTextCharFormat()
       self.ftitle.setFontWeight( QtGui.QFont.Bold)
       self.ftitle.setFontItalic( True)
@@ -17,7 +19,11 @@ class Window( QtGui.QTextEdit ):
       self.fundefined = QtGui.QTextCharFormat()
       self.fundefined.setFontItalic( True)
 
-      self.textCursor().insertText('Python:\n', self.ftitle)
+      cmd = ''
+      for arg in sys.argv: cmd += ' ' + arg
+      self.appendVar('Command', cmd)
+
+      self.textCursor().insertText('\nPython:\n', self.ftitle)
       self.appendVar('sys.prefix', sys.prefix)
       self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))
       self.appendVar('Version', sys.version)
@@ -40,12 +46,9 @@ class Window( QtGui.QTextEdit ):
       self.textCursor().insertText('\nSystem Environment:\n', self.ftitle)
       self.appendEnvVar('PATH')
 
-      self.appendConfigFile( cgruconfig.VARS['CONFIGFILE'])
-      self.appendConfigFile( cgruconfig.VARS['HOME_CONFIGFILE'])
+      self.appendConfigFile( cgruconfig.VARS['config_file'])
+      self.appendConfigFile( cgruconfig.VARS['config_file_home'])
 
-      cmd = ''
-      for arg in sys.argv: cmd += ' ' + arg
-      self.setWindowTitle('Configuration:' + cmd)
       self.resize( self.viewport().size())
       self.moveCursor( QtGui.QTextCursor.Start)
       self.setReadOnly( True)

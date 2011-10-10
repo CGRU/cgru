@@ -69,12 +69,11 @@ class Tray( QtGui.QSystemTrayIcon):
          self.menu['Examples'].addAction( action)
          
       # Load menu:
-      menudir = os.path.join( os.environ['CGRU_KEEPER'], 'menu')
-      for dirpath, dirnames, filenames in os.walk( menudir, True, None, True):
+      for dirpath, dirnames, filenames in os.walk( cgruconfig.VARS['menu'], True, None, True):
          if dirpath.find('/.') != -1: continue
          if dirpath.find('\\.') != -1: continue
          menuname = os.path.basename( dirpath)
-         if menuname != 'menu':
+         if menuname != os.path.basename( cgruconfig.VARS['menu']):
             self.menu[menuname] = QtGui.QMenu( menuname)
             self.menu['menu'].addMenu( self.menu[menuname])
          filenames.sort()
@@ -90,7 +89,10 @@ class Tray( QtGui.QSystemTrayIcon):
             self.menu[menuname].addAction( action)
             QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
 
-      # Add permanent items:
+      # Add permanent items to 'Afanasy':
+      if not 'AFANASY' in self.menu:
+         self.menu['AFANASY'] = QtGui.QMenu('AFANASY')
+         self.menu['menu'].addMenu( self.menu['AFANASY'])
       self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Start Job...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.startjob)
@@ -138,6 +140,10 @@ class Tray( QtGui.QSystemTrayIcon):
 
       self.menu['menu'].addSeparator()
 
+      # Add permanent items to 'Configure':
+      if not 'Configure' in self.menu:
+         self.menu['Configure'] = QtGui.QMenu('Configure')
+         self.menu['menu'].addMenu( self.menu['Configure'])
       self.menu['Configure'].addSeparator()
       action = QtGui.QAction('Reload Config', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.confReload)
@@ -173,7 +179,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.icon_name = cgruconfig.VARS['tray_icon']
       if self.icon_name is None: self.icon_name = 'keeper'
       self.setContextMenu( self.menu['menu'])
-      self.icon = QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], self.icon_name + '.png'))
+      self.icon = QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], self.icon_name + '.png'))
       self.setIcon( self.icon)
       parent.setWindowIcon( self.icon)
       self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))

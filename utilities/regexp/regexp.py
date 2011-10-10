@@ -39,6 +39,6 @@ class Dialog( QtGui.QWidget):
          self.leResult.setText('NOT MATCH')
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['CGRU_ICONSDIR'], 'regexp.png')))
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], 'regexp.png')))
 dialog = Dialog()
 app.exec_()
