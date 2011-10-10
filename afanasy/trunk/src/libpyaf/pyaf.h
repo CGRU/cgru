@@ -1,9 +1,6 @@
 #pragma once
 
-#include <Python.h>
-
-#include <string>
-#include <vector>
+#include "../libafanasy/name_af.h"
 
 #include "../libafapi/api.h"
 

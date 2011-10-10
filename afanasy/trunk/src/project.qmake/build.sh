@@ -38,7 +38,11 @@ fi
 export AF_PYTHON_INC="`python-config --cflags` -fPIC"
 export AF_PYTHON_LIB="`python-config --ldflags`"
 # Extra libs for linking python module ("libpyaf" project "pyaf.so" target):
-export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz"
+if [ `uname` == "Darwin" ]; then
+   export AF_PYTHON_MODULE_EXTRA_LIBS=""
+else
+   export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz"
+fi
 # export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz -lgthread -lglib"
 # export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz -lgthread-2.0 -lglib-2.0"
 

@@ -1,6 +1,3 @@
-//#include <Python.h>
-//#include <structmember.h>
-
 #include "pyafjob.h"
 
 #include "pyafblock.h"

@@ -1,7 +1,5 @@
 #pragma once
 
-//#include <Python.h>
-
 #include "../include/aftypes.h"
 
 #include "name_af.h"

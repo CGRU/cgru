@@ -1,7 +1,5 @@
 #include "af.h"
 
-#include <string.h>
-
 #include "msg.h"
 #include "regexp.h"
 

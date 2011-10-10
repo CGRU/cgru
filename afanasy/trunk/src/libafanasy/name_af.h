@@ -1,6 +1,12 @@
 #pragma once
 
+#include <algorithm>
+#include <iostream>
 #include <list>
+#include <memory.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <sstream>
 #include <string>
 #include <time.h>
 #include <vector>
@@ -12,12 +18,6 @@
 #undef _POSIX_C_SOURCE
 #endif
 #include <Python.h>
-//#ifdef _XOPEN_SOURCE
-//#undef _XOPEN_SOURCE
-//#endif
-//#ifdef _POSIX_C_SOURCE
-//#undef _POSIX_C_SOURCE
-//#endif
 
 #include "../include/aftypes.h"
 
