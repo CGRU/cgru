@@ -9,6 +9,6 @@ if [ -z "${CGRU_PYTHONEXE}" ]; then
       export PATH="$python/bin:${PATH}"
       export CGRU_PYTHONDIR="${python}"
       pythonexe="${python}/bin/python3"
-      [ -f "${pythonexe}" ] && export CGRU_PYTHONEXE="${python}/bin/python3"
+      [ -x "${pythonexe}" ] && export CGRU_PYTHONEXE="${python}/bin/python3"
    fi
 fi

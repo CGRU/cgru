@@ -33,6 +33,8 @@ copy . $dest
 rcopy bin $dest
 rcopy lib $dest
 rcopy doc $dest
+rcopy icons $dest
+rcopy start $dest
 rcopy examples $dest
 
 copy afanasy/$afanasy $dest/afanasy
@@ -51,7 +53,6 @@ rcopy utilities/doc $dest/utilities
 
 createDir $dest/utilities/release
 rcopy utilities/release/doc $dest/utilities/release
-rcopy utilities/release/icons $dest/utilities/release
 
 createDir $dest/utilities/site
 rcopy utilities/site/doc $dest/utilities/site
@@ -59,11 +60,7 @@ rcopy utilities/site/doc $dest/utilities/site
 rcopy utilities/afstarter $dest/utilities
 rcopy utilities/keeper $dest/utilities
 rcopy utilities/moviemaker $dest/utilities
-
-createDir $dest/utilities/regexp
-rcopy utilities/regexp/doc $dest/utilities/regexp
-rcopy utilities/regexp/icons $dest/utilities/regexp
-rcopy utilities/regexp/bin $dest/utilities/regexp
+rcopy utilities/regexp $dest/utilities
 
 createDir $dest/plugins
 rcopy plugins/nuke $dest/plugins
