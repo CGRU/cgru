@@ -1,3 +1,4 @@
+rem Name=Start Watch...
 if defined AF_WATCH_CMD (
    "%AF_WATCH_CMD%"
 ) else (
