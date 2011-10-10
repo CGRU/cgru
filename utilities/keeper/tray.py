@@ -80,14 +80,21 @@ class Tray( QtGui.QSystemTrayIcon):
             self.menu['menu'].addMenu( self.menu[menuname])
          filenames.sort()
          for filename in filenames:
-            if filename[0] == '.': continue
+            if filename[0] == '.' or filename[0] == '_': continue
             if sys.platform[:3] == 'win':
                if filename[-4:] != '.cmd': continue
                itemname = filename[:-4]
             else:
                if filename[-3:] != '.sh': continue
                itemname = filename[:-3]
-            action = ActionCommand( self, itemname, os.path.join( dirpath, filename))
+            filename = os.path.join( dirpath, filename)
+            file = open( filename,'r')
+            lines = file.readlines()
+            file.close()
+            for line in lines:
+               if line.find('Name=') != -1:
+                  itemname = line.split('Name=')[-1]
+            action = ActionCommand( self, itemname, filename)
             self.menu[menuname].addAction( action)
             QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
 
@@ -95,10 +102,6 @@ class Tray( QtGui.QSystemTrayIcon):
       if not 'AFANASY' in self.menu:
          self.menu['AFANASY'] = QtGui.QMenu('AFANASY')
          self.menu['menu'].addMenu( self.menu['AFANASY'])
-      self.menu['AFANASY'].addSeparator()
-      action = QtGui.QAction('Start Job...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.startjob)
-      self.menu['AFANASY'].addAction( action)
       self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Set nibmy', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
@@ -132,12 +135,6 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Exit Talk', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exittalk)
-      self.menu['AFANASY'].addAction( action)
-
-      self.menu['AFANASY'].addSeparator()
-
-      action = QtGui.QAction('Check RegExp...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.checkregexp)
       self.menu['AFANASY'].addAction( action)
 
       self.menu['menu'].addSeparator()
