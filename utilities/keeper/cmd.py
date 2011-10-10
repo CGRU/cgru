@@ -8,7 +8,7 @@ application = None
 from PyQt4 import QtCore
 
 def editCGRUConfig():
-   if QtCore.QProcess.execute( cgruconfig.VARS['editor'] % cgruconfig.VARS['HOME_CONFIGFILE']) == 0:
+   if QtCore.QProcess.execute( cgruconfig.VARS['editor'] % cgruconfig.VARS['config_file_home']) == 0:
       cgruconfig.Config()
 
 def startjob():

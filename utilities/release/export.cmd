@@ -12,6 +12,8 @@ xcopy . %dest%\ /y
 
 xcopy bin %dest%\bin\ /ys
 xcopy lib %dest%\lib\ /ys
+xcopy icons %dest%\icons\ /ys
+xcopy start %dest%\start\ /ys
 
 xcopy doc %dest%\doc\ /y
 xcopy doc\icons %dest%\doc\icons\ /ys
@@ -31,11 +33,7 @@ xcopy utilities\doc %dest%\utilities\doc\ /ys
 xcopy utilities\keeper %dest%\utilities\keeper\ /ys
 xcopy utilities\moviemaker %dest%\utilities\moviemaker\ /ys
 xcopy utilities\afstarter %dest%\utilities\afstarter\ /ys
-
-if not exist %dest%\utilities\regexp mkdir %dest%\utilities\regexp
-xcopy utilities\regexp\bin %dest%\utilities\regexp\bin\ /y
-xcopy utilities\regexp\doc %dest%\utilities\regexp\doc\ /ys
-xcopy utilities\regexp\icons %dest%\utilities\regexp\icons\ /ys
+xcopy utilities\regexp %dest%\utilities\regexp\ /ys
 
 xcopy plugins %dest%\plugins\ /y
 xcopy plugins\nuke %dest%\plugins\nuke\ /ys

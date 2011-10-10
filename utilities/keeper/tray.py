@@ -73,7 +73,9 @@ class Tray( QtGui.QSystemTrayIcon):
          if dirpath.find('/.') != -1: continue
          if dirpath.find('\\.') != -1: continue
          menuname = os.path.basename( dirpath)
-         if menuname != os.path.basename( cgruconfig.VARS['menu']):
+         if menuname == os.path.basename( cgruconfig.VARS['menu']):
+            menuname = 'menu'
+         else:
             self.menu[menuname] = QtGui.QMenu( menuname)
             self.menu['menu'].addMenu( self.menu[menuname])
          filenames.sort()
