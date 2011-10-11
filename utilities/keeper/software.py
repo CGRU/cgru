@@ -4,7 +4,7 @@ from PyQt4 import QtCore, QtGui
 
 Names = ['Blender','Houdini','Maya','Nuke']
 if sys.platform.find('win') == 0:
-   Names.extend(['3DSMax','Softimage'])
+   Names.extend(['3DSMax','Softimage','AfterFX'])
 
 def startDetached( command):
    if sys.platform.find('win') == 0:
@@ -18,6 +18,7 @@ def startMaya():      startDetached('maya')
 def startNuke():      startDetached('nuke')
 def start3DSMax():    startDetached('3dsmax')
 def startSoftimage(): startDetached('xsi')
+def startAfterFX():   startDetached('afterfx')
 
 def exampleSoftware( folder, script):
    cmd = os.environ['CGRU_LOCATION']
@@ -37,6 +38,7 @@ def exampleMaya():      exampleSoftware('maya','start_maya')
 def exampleNuke():      exampleSoftware('nuke','start_nuke')
 def example3DSMax():    exampleSoftware('3D Studio Max','start_3dsmax')
 def exampleSoftimage(): exampleSoftware('softimage','start_softimage')
+def exampleAfterFX():   exampleSoftware('After FX','start_afterfx')
 
 def locateSoftware( soft):
    filename = QtGui.QFileDialog.getOpenFileName( None, 'Select %s executabe:' % soft)
@@ -73,3 +75,4 @@ def locateMaya():       locateSoftware('Maya')
 def locateNuke():       locateSoftware('Nuke')
 def locate3DSMax():     locateSoftware('3DSMax')
 def locateSoftimage():  locateSoftware('Softimage')
+def locateAfterFX():    locateSoftware('AfterFX')
