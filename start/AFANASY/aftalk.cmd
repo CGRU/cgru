@@ -1,2 +1,3 @@
 rem Name=Start Talk...
-start "Talk Afanasy" "%AF_ROOT%\bin\aftalk.exe"
+call %0\..\_setup.cmd
+start "Talk Afanasy" "%AF_ROOT%\bin\aftalk.exe" %*

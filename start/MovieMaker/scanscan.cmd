@@ -1,4 +1,3 @@
 rem Name=Scan Scan...
-set moviemaker=%CGRU_LOCATION%\utilities\moviemaker
-cd %moviemaker%
-scandialog.cmd
+call %0\..\_setup.cmd
+"%CGRU_PYTHONEXE%" "%CGRU_LOCATION%\utilities\moviemaker\scandialog.py" %*

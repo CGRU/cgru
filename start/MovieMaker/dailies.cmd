@@ -1,4 +1,3 @@
 rem Name=Dailies...
-set moviemaker=%CGRU_LOCATION%\utilities\moviemaker
-cd %moviemaker%
-dialog.cmd
+call %0\..\_setup.cmd
+"%CGRU_PYTHONEXE%" "%CGRU_LOCATION%\utilities\moviemaker\dialog.py" %*
