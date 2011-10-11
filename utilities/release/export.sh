@@ -43,7 +43,6 @@ copy afanasy/$afanasy/bin $dest/afanasy/bin
 rcopy afanasy/$afanasy/doc $dest/afanasy
 rcopy afanasy/$afanasy/icons $dest/afanasy
 rcopy afanasy/$afanasy/init $dest/afanasy
-rcopy afanasy/$afanasy/launch $dest/afanasy
 rcopy afanasy/$afanasy/plugins $dest/afanasy
 rcopy afanasy/$afanasy/python $dest/afanasy
 rcopy afanasy/$afanasy/webvisor $dest/afanasy
