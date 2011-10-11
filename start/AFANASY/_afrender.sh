@@ -1,3 +1,3 @@
 #!/bin/bash
 source "`dirname "$0"`/_setup.sh"
-$AF_ROOT/bin/afrender
+"$AF_ROOT/bin/afrender" "$@"

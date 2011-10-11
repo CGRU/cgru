@@ -20,12 +20,10 @@ from tray import Tray
 from server import Server
 
 # Define keeper launch command if was not:
-keeper = os.getenv('CGRU_KEEPER_CMD')
-if keeper is None:
-   if sys.platform[:3] == 'win': keeper = 'keeper.cmd'
-   else: keeper = 'keeper.sh'
-   keeper = os.path.join( os.getenv('CGRU_KEEPER'), keeper)
-cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper
+keeper_cmd = os.getenv('CGRU_KEEPER_CMD')
+if keeper_cmd is None:
+   keeper_cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE'), sys.argv[0])
+cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper_cmd
 
 # Set a default refresh interval in seconds:
 if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = '36'

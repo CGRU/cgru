@@ -19,11 +19,7 @@ class Window( QtGui.QTextEdit ):
       self.fundefined = QtGui.QTextCharFormat()
       self.fundefined.setFontItalic( True)
 
-      cmd = ''
-      for arg in sys.argv: cmd += ' ' + arg
-      self.appendVar('Command', cmd)
-
-      self.textCursor().insertText('\nPython:\n', self.ftitle)
+      self.textCursor().insertText('Python:\n', self.ftitle)
       self.appendVar('sys.prefix', sys.prefix)
       self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))
       self.appendVar('Version', sys.version)
