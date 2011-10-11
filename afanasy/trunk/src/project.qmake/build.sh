@@ -77,5 +77,7 @@ $QMAKE
 make
 
 # Copy python library:
-pyaf=libpyaf/libpyaf.so
-[ -f $pyaf ] && cp -fv libpyaf/libpyaf.so ../../bin/pyaf.so
+pyaf="libpyaf/libpyaf.so"
+[ -f $pyaf ] && cp -fv $pyaf ../../bin/pyaf.so
+pyaf="libpyaf/libpyaf.dylib.1.0.0"
+[ -f $pyaf ] && cp -fv $pyaf ../../bin/pyaf.so

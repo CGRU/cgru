@@ -1,33 +1,38 @@
 #!/bin/bash
 
+sip="sip-4.12.4"
+
+if [ "$1" == "-h" ]; then
+   cd $sip
+   python configure.py -h
+   exit 0
+fi
+
+python="python"
 pythonver=$1
-if [ -z "$pythonver" ]; then
-   pythonver="2.7.2"
+if [ ! -z "$pythonver" ]; then
+   pythondir=$PWD/$pythonver
+   if [ ! -d "$pythondir" ]; then
+      echo "Error: No python '$pythondir' founded."
+      exit 1
+   fi
+   export PATH=$pythondir/bin:$PATH
+   if [[ "$pythonver" > "3" ]]; then
+      python="python3"
+   fi
+else
+   dir="$PWD/sip"
+   flags="$flags --bindir=$dir"
+   flags="$flags --destdir=$dir"
+   flags="$flags --incdir=$dir"
+   flags="$flags --sipdir=$dir"
 fi
-
-pythondir=$PWD/$pythonver
-if [ ! -d "$pythondir" ]; then
-   echo "Error: No python '$pythondir' founded."
-   exit 1
-fi
-
-export PATH=$pythondir/bin:$PATH
 
 export CFLAGS=-fPIC
 export CPPFLAGS=$CFLAGS
 
-if [[ "$pythonver" > "3" ]]; then
-   python="python3"
-else
-   python="python"
-fi
+cd $sip
 
-cd sip-4.12.4
-
-if [ ! -z "$2" ]; then
-   $python configure.py -h
-else
-   $python configure.py
-   make
-   make install
-fi
+$python configure.py $flags
+make
+make install

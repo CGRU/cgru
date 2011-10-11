@@ -12,3 +12,9 @@ if [ -z "${CGRU_PYTHONEXE}" ]; then
       [ -x "${pythonexe}" ] && export CGRU_PYTHONEXE="${python}/bin/python3"
    fi
 fi
+
+sip="$CGRU_LOCATION/utilities/python/sip"
+[ -d "$sip" ] && export PYTHONPATH="$sip:$PYTHONPATH"
+
+pyqt="$CGRU_LOCATION/utilities/python/pyqt"
+[ -d "$pyqt" ] && export PYTHONPATH="$pyqt:$PYTHONPATH"

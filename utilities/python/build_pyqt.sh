@@ -1,41 +1,52 @@
 #!/bin/bash
 
-pythonver=$1
-if [ -z "$pythonver" ]; then
-   pythonver="2.7.2"
+pyqt="PyQt-x11-gpl-4.8.5"
+export PYTHONPATH="$PWD/sip"
+
+if [ "$1" == "-h" ]; then
+   cd $pyqt
+   python configure.py -h
+   exit 0
 fi
 
-qtver=$2
+flags="-g --confirm-license --no-sip-files"
+
+# Qt:
+qtver=$1
 if [ -z "$qtver" ]; then
-qtver="4.7.4"
+   qtver="4.7.4"
 fi
-
-pythondir=$PWD/$pythonver
-if [ ! -d "$pythondir" ]; then
-   echo "Error: No python '$pythondir' founded."
+qt=`dirname $PWD`/qt/$qtver
+if [ ! -d "$qt" ]; then
+   echo "Error: No Qt '$qt' founded."
    exit 1
 fi
+export PATH=$qt/bin:$PATH
 
-qt=`dirname $PWD`/qt/$qtver
-
-export PATH=$pythondir/bin:$qt/bin:$PATH
-echo "PATH=$PATH"
-
-if [[ "$pythonver" > "3" ]]; then
-   python="python3"
+# Python:
+python="python"
+pythonver=$2
+if [ ! -z "$pythonver" ]; then
+   pythondir=$PWD/$pythonver
+   if [ ! -d "$pythondir" ]; then
+      echo "Error: No python '$pythondir' founded."
+      exit 1
+   fi
+   export PATH=$pythondir/bin:$PATH
+   if [[ "$pythonver" > "3" ]]; then
+      python="python3"
+   fi
 else
-   python="python"
+   dir="$PWD/pyqt"
+   flags="$flags --bindir=$dir"
+   flags="$flags --destdir=$dir"
+   flags="$flags --plugin-destdir=$dir"
 fi
 
-cd PyQt-x11-gpl-4.8.5
+cd $pyqt
 
-flags="-g --confirm-license"
 flags="$flags -e QtCore -e QtGui -e QtNetwork -e QtSvg"
 
-if [ ! -z "$3" ]; then
-   $python configure.py -h
-else
-   $python configure.py $flags
-   make
-   make install
-fi
+$python configure.py $flags
+make
+make install
