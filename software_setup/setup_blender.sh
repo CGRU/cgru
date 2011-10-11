@@ -13,5 +13,4 @@ export APP_EXE="${BLENDER_LOCATION}/blender"
 
 # Define location:
 locate_file="$CGRU_LOCATION/software_setup/locate_blender.sh"
-echo "locate_file=$locate_file"
 [ -f "${locate_file}" ] && source "${locate_file}"

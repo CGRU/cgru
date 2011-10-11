@@ -6,12 +6,18 @@ Names = ['Blender','Houdini','Maya','Nuke']
 if sys.platform.find('win') == 0:
    Names.extend(['3DSMax','Softimage'])
 
-def startBlender():   QtCore.QProcess.startDetached('blender')
-def startHoudini():   QtCore.QProcess.startDetached('houdini')
-def startMaya():      QtCore.QProcess.startDetached('maya')
-def startNuke():      QtCore.QProcess.startDetached('nuke')
-def start3DSMax():    QtCore.QProcess.startDetached('3dsmax')
-def startSoftimage(): QtCore.QProcess.startDetached('xsi')
+def startDetached( command):
+   if sys.platform.find('win') == 0:
+      QtCore.QProcess.startDetached( 'cmd.exe', ['/c', command])
+   else:
+      QtCore.QProcess.startDetached( '/bin/bash', ['-c', command])
+
+def startBlender():   startDetached('blender')
+def startHoudini():   startDetached('houdini')
+def startMaya():      startDetached('maya')
+def startNuke():      startDetached('nuke')
+def start3DSMax():    startDetached('3dsmax')
+def startSoftimage(): startDetached('xsi')
 
 def exampleSoftware( folder, script):
    cmd = os.environ['CGRU_LOCATION']
@@ -37,11 +43,15 @@ def locateSoftware( soft):
    if filename is None: return
    filename = str( filename)
    if filename == '': return
+   filename = os.path.normpath( filename)
    setup_folder = os.path.join( os.environ['CGRU_LOCATION'], 'software_setup')
    setup_file = 'locate_' + soft.lower()
    setup_file = os.path.join( setup_folder, setup_file)
    app_dir = os.path.dirname( filename)
    app_exe = os.path.basename( filename)
+   if os.path.basename( app_dir) == 'bin':
+      app_dir = os.path.dirname( app_dir)
+      app_exe = os.path.join('bin', app_exe)
    lines = ['Created by Keeper at ' + time.ctime()]
    if sys.platform.find('win') == 0:
       setup_file += '.cmd'

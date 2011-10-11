@@ -1,3 +1,6 @@
+rem Source general for all soft directives:
+call %CGRU_LOCATION%\software_setup\setup__all.cmd
+
 rem Set Maya version:
 set MAYA_VERSION=2012
 rem Set Maya architecture:
@@ -7,6 +10,15 @@ rem set MAYA_ARCH=
 
 rem Set Maya location:
 set MAYA_LOCATION=C:\Program Files\Autodesk\Maya%MAYA_VERSION%
+
+set APP_DIR=%MAYA_LOCATION%
+set APP_EXE=%MAYA_LOCATION%\bin\maya.exe
+
+rem Define location:
+set locate_file=%CGRU_LOCATION%\software_setup\locate_maya.cmd
+if exist %locate_file% call %locate_file%
+
+set MAYA_LOCATION=%APP_DIR%
 
 rem Set CGRU Maya scripts location:
 set MAYA_CGRU_LOCATION=%CGRU_LOCATION%\plugins\maya
@@ -31,7 +43,3 @@ set MAYA_SCRIPT_PATH=%AF_ROOT%\plugins\maya;%MAYA_SCRIPT_PATH%
 
 rem Add Maya to PATH:
 set "PATH=%MAYA_LOCATION%\bin;%PATH%"
-
-
-set APP_DIR=%MAYA_LOCATION%
-set APP_EXE=%MAYA_LOCATION%\bin\maya.exe

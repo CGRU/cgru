@@ -1,3 +1,6 @@
+rem Source general for all soft directives:
+call %CGRU_LOCATION%\software_setup\setup__all.cmd
+
 rem Setup CGRU common scripts if location provided
 set NUKE_CGRU_PATH=%CGRU_LOCATION%\plugins\nuke
 if defined CGRU_LOCATION (
@@ -28,11 +31,17 @@ if defined CGRU_LOCATION (
    SET NUKE_AF_RENDER=%NUKE_AF_RENDER% -t %CGRU_LOCATION%\plugins\nuke\render.py
 )
 
-SET NUKE_DIR=C:\Program Files\Nuke6.2v1
-SET NUKE_EXEC=%NUKE_DIR%\Nuke6.2.exe
-SET LM_LICENSE_FILE=%NUKE_DIR%\nuke.lic
-SET LM_LICENSE_FILE=%NUKE_DIR%\foundry.lic
-
+SET NUKE_DIR=C:\Program Files\Nuke6.3v3
+SET NUKE_EXEC=%NUKE_DIR%\Nuke6.3.exe
 
 SET APP_DIR=%NUKE_DIR%
 SET APP_EXE=%NUKE_EXEC%
+
+rem Locate:
+set locate_file=%CGRU_LOCATION%\software_setup\locate_nuke.cmd
+if exist %locate_file% call %locate_file%
+
+SET NUKE_DIR=%APP_DIR%
+
+SET LM_LICENSE_FILE=%NUKE_DIR%\nuke.lic
+SET LM_LICENSE_FILE=%NUKE_DIR%\foundry.lic

@@ -1,8 +1,18 @@
+rem Source general for all soft directives:
+call %CGRU_LOCATION%\software_setup\setup__all.cmd
+
 set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
 
-set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 11.0.775
+set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 11.1.67
 
-if exist override.cmd call override.cmd
+set APP_DIR=%HOUDINI_LOCATION%
+set APP_EXE=%HOUDINI_LOCATION%\bin\houdini.exe
+
+rem Define location:
+set locate_file=%CGRU_LOCATION%\software_setup\locate_houdini.cmd
+if exist %locate_file% call %locate_file%
+
+set HOUDINI_LOCATION=%APP_DIR%
 
 set HOUDINI_CGRU_PATH=%CGRU_LOCATION%\plugins\houdini
 
@@ -18,8 +28,4 @@ IF DEFINED HOUDINI_OTLSCAN_PATH (
    set HOUDINI_OTLSCAN_PATH=%HOUDINI_AF_OTLSCAN_PATH%
 )
 
-set PATH=%HOUDINI_LOCATION%/bin;%PATH%
-
-
-set APP_DIR=%HOUDINI_LOCATION%
-set APP_EXE=houdini
+set "PATH=%HOUDINI_LOCATION%\bin;%PATH%"

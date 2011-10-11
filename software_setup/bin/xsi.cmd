@@ -1,3 +1,3 @@
 call %CGRU_LOCATION%\software_setup\setup_softimage.cmd
 
-"%XSI_LOCATION%\Application\bin\XSI.bat" %*
+"%XSI_LOCATION%\bin\XSI.bat" %*
