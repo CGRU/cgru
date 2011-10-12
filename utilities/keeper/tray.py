@@ -26,8 +26,14 @@ def getVar( var, title = 'Set Variable', label = 'Enter new value:'):
    cgruconfig.writeVars(variables)
 
 class ActionCommand( QtGui.QAction):
-   def __init__( self, parent, name, command):
+   def __init__( self, parent, name, command, iconpath = None):
       QtGui.QAction.__init__( self, name, parent)
+      if iconpath is not None:
+         iconpath = os.path.join( cgruconfig.VARS['icons_dir'], iconpath)
+         if os.path.isfile( iconpath):
+            self.setIcon( QtGui.QIcon( iconpath))
+         else:
+            print('WARNING: Icon "%s" does not exist.' % iconpath)
       self.name = name
       self.cmd = command
    def runCommand( self): QtCore.QProcess.startDetached( self.cmd, [])
@@ -52,7 +58,11 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['Software'] = QtGui.QMenu('Software')
       self.menu['menu'].addMenu( self.menu['Software'])
       for soft in software.Names:
-         action = QtGui.QAction( soft, self)
+         icon = software.getIcon( soft)
+         if icon is None:
+            action = QtGui.QAction( soft, self)
+         else:
+            action = QtGui.QAction( icon, soft, self)
          eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.start%s)" % soft)
          self.menu['Software'].addAction( action)
       self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
@@ -91,10 +101,13 @@ class Tray( QtGui.QSystemTrayIcon):
             file = open( filename,'r')
             lines = file.readlines()
             file.close()
+            iconpath = None
             for line in lines:
                if line.find('Name=') != -1:
-                  itemname = line.split('Name=')[-1]
-            action = ActionCommand( self, itemname, filename)
+                  itemname = line.split('Name=')[-1].strip()
+               if line.find('Icon=') != -1:
+                  iconpath = line.split('Icon=')[-1].strip()
+            action = ActionCommand( self, itemname, filename, iconpath)
             self.menu[menuname].addAction( action)
             QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
 

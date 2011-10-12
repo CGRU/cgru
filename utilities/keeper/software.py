@@ -1,5 +1,7 @@
 import os, sys, time
 
+import cgruconfig
+
 from PyQt4 import QtCore, QtGui
 
 Names = ['Blender','Houdini','Maya','Nuke']
@@ -19,6 +21,10 @@ def startNuke():      startDetached('nuke')
 def start3DSMax():    startDetached('3dsmax')
 def startSoftimage(): startDetached('xsi')
 def startAfterFX():   startDetached('afterfx')
+
+def getIcon( soft):
+   iconpath = os.path.join( cgruconfig.VARS['icons_dir'], os.path.join('software', soft.lower() + '.png'))
+   if os.path.isfile( iconpath): return QtGui.QIcon( iconpath)
 
 def exampleSoftware( folder, script):
    cmd = os.environ['CGRU_LOCATION']
