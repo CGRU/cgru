@@ -74,7 +74,7 @@ TemplatesPath = os.path.join( DialogPath, 'templates')
 LogosPath = os.path.join( DialogPath, 'logos')
 CodecsPath = os.path.join( DialogPath, 'codecs')
 FormatsPath = os.path.join( DialogPath, 'formats')
-FPS = ['23.976','24','25','30']
+FPS = ['23.976','24','25','30','48','50']
 
 Activities = ['comp','render','anim','dyn','sim','stereo','cloth','part','skin','setup','clnup','mtpnt','rnd','test']
 FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
