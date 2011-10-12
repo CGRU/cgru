@@ -344,13 +344,20 @@ elif ext == 'nk':
 elif ext == 'hip':
    if node == '':
       error_exit( 'no houdini driver to render specified')
-   scenetype = 'hbatch'
+   scenetype = 'hbatch_mantra'
    cmd = 'hrender_af' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' --numcpus '+ services.service.str_capacity
    if ignoreinputs: cmd += ' -i'
    cmd += ' -s @#@ -e @#@ --by %d' % by
    if take != '': cmd += ' -t "%s"' % take
    cmd += ' "%s" "%s"' % (scene,node)
+
+# Mantra:
+elif ext == 'ifd':
+   scenetype = 'mantra'
+   cmd = 'mantra' + cmdextension
+   if capmin != -1 or capmax != -1: cmd += ' -j '+ services.service.str_capacity
+   cmd += ' -V a -f "%s"' % scene
 
 # Maya:
 elif ext == 'mb':

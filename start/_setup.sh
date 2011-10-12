@@ -1,6 +1,9 @@
 if [ -z "$CGRU_LOCATION" ]; then
-   pushd `dirname "$0"` > /dev/null
+   if [ -d `dirname "$0"` ]; then
+      pushd `dirname "$0"` > /dev/null
+      pushed="1"
+   fi
    cd ..
    source "./setup.sh"
-   popd > /dev/null
+   [ -z "$pushed" ] || popd > /dev/null
 fi

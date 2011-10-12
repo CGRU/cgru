@@ -2,12 +2,26 @@
 
 import string
 
+Digits = '01234567890'
+
 def filterFileName( filename):
    chars = ' ~`!@#$%^&*()+[]{};:\'",<>/?\\|'
    newfilename = filename
    for c in chars:
       newfilename = newfilename.replace( c, '_')
    return newfilename
+
+def patternFromFile( path):
+   pos = path.rfind('.')
+   if pos < 1: return path
+   pos_ext = pos
+   pos -= 1
+   while pos >= 0:
+      if not path[pos] in Digits: break
+      pos -= 1
+   pos += 1
+   if pos == pos_ext: return path
+   return path[:pos] + '@' + '#'*(pos_ext-pos) + '@' + path[pos_ext:]
 
 def patternFromPaths( path_a, path_b):
    path = path_a

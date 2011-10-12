@@ -4,6 +4,8 @@ from PyQt4 import QtCore, QtGui
 
 import cgruconfig
 
+import afcommon
+
 from optparse import OptionParser
 Parser = OptionParser(usage="usage: %prog [options] hip_name rop_name", version="%prog 1.0")
 Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', default=False, help='Verbose mode')
@@ -348,11 +350,16 @@ Maya layer\n\
          self.fields['jobname'].setEnabled( True)
 
       # Check scene:
-      if len( self.fields['scenefile'].text()) == 0: return
-      if not os.path.isfile( self.fields['scenefile'].text()):
+      scene = str( self.fields['scenefile'].text())
+      if len( scene) == 0: return
+      if scene[-4:] == '.ifd':
+         scene = afcommon.patternFromFile( scene)
+      elif not os.path.isfile( scene):
          self.teCmd.setText('Scene file does not exist.')
          return
-      self.fields['scenefile'].setText( os.path.abspath( str( self.fields['scenefile'].text())))
+      scene = os.path.normpath( scene)
+      scene = os.path.abspath( scene)
+      self.fields['scenefile'].setText( scene)
 
       # Check working directory:
       if self.fields['scenewdir'].isChecked(): self.fields['wdir'].setText( os.path.dirname( str( self.fields['scenefile'].text())))
