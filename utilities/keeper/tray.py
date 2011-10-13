@@ -86,8 +86,11 @@ class Tray( QtGui.QSystemTrayIcon):
          if menuname == os.path.basename( cgruconfig.VARS['menu']):
             menuname = 'menu'
          else:
-            self.menu[menuname] = QtGui.QMenu( menuname)
-            self.menu['menu'].addMenu( self.menu[menuname])
+            iconpath = os.path.join( cgruconfig.VARS['icons_dir'], menuname.lower() + '.png')
+            if os.path.isfile( iconpath):
+               self.menu[menuname] = self.menu['menu'].addMenu( QtGui.QIcon( iconpath), menuname)
+            else:
+               self.menu[menuname] = self.menu['menu'].addMenu( menuname)
          filenames.sort()
          for filename in filenames:
             if filename[0] == '.' or filename[0] == '_': continue

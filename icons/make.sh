@@ -1,6 +1,6 @@
 #!/bin/bash
 
-icons="keeper regexp makemovie scanscan"
+icons="keeper regexp dailies scanscan"
 size="128"
 
 iconslinux="dir"
