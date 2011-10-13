@@ -9,6 +9,11 @@ if [ "$1" == "-h" ]; then
 fi
 
 python="python"
+if [ ! -z `which python3` ]; then
+   echo "Using Python 3."
+   python="python3"
+fi
+
 pythonver=$1
 if [ ! -z "$pythonver" ]; then
    pythondir=$PWD/$pythonver

@@ -25,6 +25,10 @@ export PATH=$qt/bin:$PATH
 
 # Python:
 python="python"
+if [ ! -z `which python3` ]; then
+   echo "Using Python 3."
+   python="python3"
+fi
 pythonver=$2
 if [ ! -z "$pythonver" ]; then
    pythondir=$PWD/$pythonver

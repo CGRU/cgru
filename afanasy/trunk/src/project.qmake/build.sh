@@ -28,15 +28,19 @@ if [ -e $cgru_qmake ]; then
 fi
 
 # Setup Python:
-python=python
+python="python"
 # Use CGRU Python if presets:
 if [ -e $cgru_python/bin/python ]; then
    export PATH=$cgru_python/bin:$PATH
    echo "Using CGRU Python = '$cgru_python'"
 fi
+if [ ! -z `which python3` ]; then
+   echo "Using Python 3."
+   python="python3"
+fi
 
-export AF_PYTHON_INC="`python-config --cflags` -fPIC"
-export AF_PYTHON_LIB="`python-config --ldflags`"
+export AF_PYTHON_INC="`${python}-config --cflags` -fPIC"
+export AF_PYTHON_LIB="`${python}-config --ldflags`"
 # Extra libs for linking python module ("libpyaf" project "pyaf.so" target):
 if [ `uname` == "Darwin" ]; then
    export AF_PYTHON_MODULE_EXTRA_LIBS=""
