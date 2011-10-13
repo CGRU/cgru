@@ -353,7 +353,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
          "import sys\n"
          "afpython = os.path.join( '" + afroot + "', 'python')\n"
          "if not afpython in sys.path:\n"
-         "   print 'PYTHONPATH: appending \"%s\"' % afpython\n"
+         "   print('PYTHONPATH: appending \"%s\"' % afpython)\n"
          "   sys.path.append( afpython)\n"
          ;
          PyRun_SimpleString( script.c_str());
