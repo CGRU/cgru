@@ -30,7 +30,7 @@ def Main():
    defaultSimulate = False
    defaultStartPaused = False
    defaultMaxHosts = -1
-   defaultMaxRunTime = 0
+   defaultMaxRunTime = 0.0
    defaultCapacity = -1
    defaultHostsMask = ''
    defaultHostsMaskExclude = ''
@@ -69,7 +69,7 @@ def Main():
       defaultPriority         = int(   GetOpSetValue( opSet, 'afPriority',          defaultPriority ))
       defaultCapacity         = int(   GetOpSetValue( opSet, 'afCapacity',          defaultCapacity ))
       defaultMaxHosts         = int(   GetOpSetValue( opSet, 'afMaxHosts',          defaultMaxHosts ))
-      defaultMaxRunTime       = int(   GetOpSetValue( opSet, 'afMaxRunTime',        defaultMaxRunTime ))
+      defaultMaxRunTime       = float( GetOpSetValue( opSet, 'afMaxRunTime',        defaultMaxRunTime ))
       defaultHostsMask        =        GetOpSetValue( opSet, 'afHostsMask',         defaultHostsMask )
       defaultHostsMaskExclude =        GetOpSetValue( opSet, 'afHostsMaskExclude',  defaultHostsMaskExclude )
       defaultDependMask       =        GetOpSetValue( opSet, 'afDependMask',        defaultDependMask )
@@ -98,7 +98,7 @@ def Main():
    opSet.AddParameter3('afPriority',         constants.siInt2,    defaultPriority, -1, 99, False)
    opSet.AddParameter3('afCapacity',         constants.siInt2,    defaultCapacity, -1, 10000, False)
    opSet.AddParameter3('afMaxHosts',         constants.siInt2,    defaultMaxHosts, -1, 10000, False)
-   opSet.AddParameter3('afMaxRunTime',       constants.siInt4,    defaultMaxRunTime, 0,  1000000, False)
+   opSet.AddParameter3('afMaxRunTime',       constants.siFloat,   defaultMaxRunTime, 0,  1000, False)
    opSet.AddParameter3('afHostsMask',        constants.siString,  defaultHostsMask)
    opSet.AddParameter3('afHostsMaskExclude', constants.siString,  defaultHostsMaskExclude)
    opSet.AddParameter3('afDependMask',       constants.siString,  defaultDependMask)
@@ -141,7 +141,7 @@ def Main():
    oPPGLayout.AddItem('afPriority',          'Priority',             constants.siControlNumber)
    oPPGLayout.AddItem('afCapacity',          'Capacity',             constants.siControlNumber)
    oPPGLayout.AddItem('afMaxHosts',          'Max Hosts',            constants.siControlNumber)
-   oPPGLayout.AddItem('afMaxRunTime',        'Task Max Run Time',    constants.siControlNumber)
+   oPPGLayout.AddItem('afMaxRunTime',        'Task Max Run Time (hours)', constants.siControlNumber)
    oPPGLayout.AddItem('afHostsMask',         'Hosts Mask',           constants.siControlString)
    oPPGLayout.AddItem('afHostsMaskExclude',  'Exclude Hosts Mask',   constants.siControlString)
    oPPGLayout.AddItem('afDependMask',        'Depend Mask',          constants.siControlString)

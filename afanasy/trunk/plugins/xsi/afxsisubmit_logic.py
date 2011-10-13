@@ -174,7 +174,7 @@ def SubmitButton_OnClicked():
             images_str += img
  
       job=af.Job( curjobname)
-      job.setCmdPost('deletefiles "%s"' % os.path.abspath(tmpscene))
+      job.setCmdPost( str('deletefiles "%s"' % os.path.abspath(tmpscene)))
       if priority  != -1: job.setPriority( priority)
       if maxhosts  != -1: job.setMaxHosts( maxhosts)
       if hostsmask         != None and hostsmask         != '': job.setHostsMask( hostsmask)
@@ -191,11 +191,11 @@ def SubmitButton_OnClicked():
       i = 0
       for blockname in blocknames:
          block = af.Block( blockname, 'xsi')
-         block.setCommand( blockcmds[i])
-         block.setFiles( blockimages[i])
+         block.setCommand( str( blockcmds[i]))
+         block.setFiles( str( blockimages[i]))
          block.setNumeric( cp_frame_start, cp_frame_end, frame_fpt, cp_frame_by)
          if capacity   != -1: block.setCapacity( capacity)
-         if maxruntime !=  0: block.setTasksMaxRunTime( maxruntime)
+         if maxruntime !=  0: block.setTasksMaxRunTime( int( maxruntime * 3600))
          job.blocks.append( block)
          i += 1
 
