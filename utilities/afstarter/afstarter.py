@@ -19,6 +19,12 @@ FileSuffix = '.txt'
 FileLast = 'last'
 FileRecent = 'recent'
 
+def getComboBoxString( comboBox):
+   data = comboBox.itemData( comboBox.currentIndex())
+   if data is None: return ''
+   if isinstance( data, str): return data
+   return comboBox.itemData( comboBox.currentIndex()).toString()
+
 # Dialog class
 class Dialog( QtGui.QWidget):
    def __init__( self):
@@ -304,7 +310,7 @@ Maya layer\n\
          self.cbRecent.addItem( short, afile)
 
    def loadRecent( self):
-      if self.load( str( self.cbRecent.itemData( self.cbRecent.currentIndex()).toString())): self.evaluate()
+      if self.load( getComboBoxString( self.cbRecent)): self.evaluate()
 
    def load( self, filename, fullPath = False):
       if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
@@ -424,7 +430,8 @@ Maya layer\n\
       self.saveRecent()
 
    def processoutput( self):
-      output = str( self.process.readAll())
+      output = self.process.readAll()
+      if not isinstance( output, str): output = str( output, 'utf-8')
       print( output)
       self.teCmd.insertPlainText( output)
       self.teCmd.moveCursor( QtGui.QTextCursor.End)
