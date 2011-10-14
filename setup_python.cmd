@@ -4,7 +4,8 @@ if exist %python% (
    set PYTHONHOME=%python%
    set "PATH=%python%;%PATH%"
    set CGRU_PYTHONDIR=%python%
-   set CGRU_PYTHONEXE=%python%\python.exe
+rem   set CGRU_PYTHONEXE=%python%\python.exe
+   set CGRU_PYTHONEXE=python
 ) else (
    set CGRU_PYTHONEXE=python
 )

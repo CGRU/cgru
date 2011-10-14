@@ -144,7 +144,7 @@ def SubmitButton_OnClicked():
       cmd = os.path.join( cmd, 'afrender.py')
       cmd = 'xsibatch -script %s' % cmd
       cmd += ' -lang Python -main afRender -args'
-      cmd += ' -scene %s' % tmpscene
+      cmd += ' -scene "%s"' % tmpscene
       cmd += ' -start @#@ -end @#@ -step ' + str(cp_frame_by)
       cmd += ' -simulate'
       if simulate:   cmd += ' 1'
