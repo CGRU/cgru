@@ -7,6 +7,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "watch.h"
+#include "wndtext.h"
 
 LabelVersion::LabelVersion( QWidget *parent):
    QWidget( parent),
@@ -143,6 +144,11 @@ void LabelVersion::resetMessage()
 }
 
 void LabelVersion::mousePressEvent( QMouseEvent * event) { resetMessage();}
+
+void LabelVersion::mouseDoubleClickEvent( QMouseEvent * event )
+{
+   new WndText("Info");
+}
 
 int LabelVersion::getStringStatus( const std::string & str)
 {

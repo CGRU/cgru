@@ -25,6 +25,7 @@ public:
 protected:
    void paintEvent( QPaintEvent * event);
    void mousePressEvent( QMouseEvent * event);
+   void mouseDoubleClickEvent( QMouseEvent * event );
 
 private slots:
    void refreshMessage();

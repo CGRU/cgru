@@ -71,13 +71,14 @@ def getPatterns(filenames):
          digits = digits[-1]
          digitslen = len(digits)
          pos = afile.rfind(digits)
+         another_file_founded = False
          for other in filenames:
             if other == afile: continue
             if other[:pos] == afile[:pos] and other[pos+digitslen:] == afile[pos+digitslen:]:
                processedfiles.append(other)
-         pattern = afile[:pos]
-         for i in range(0,digitslen): pattern += '#'
-         pattern += afile[pos+digitslen:]
+               another_file_founded = True
+         if not another_file_founded: continue
+         pattern = afile[:pos] + '#'*digitslen + afile[pos+digitslen:]
          patterns.append(pattern)
    return patterns
 
@@ -114,7 +115,9 @@ for dirpath, dirnames, filenames in os.walk( Folder):
    patterns = getPatterns( filenames)
    for pattern in patterns:
       pattern = os.path.join( dirpath, pattern)
-      if Options.verbose: print( pattern)
+      if Options.verbose:
+         print( pattern)
+         sys.stdout.flush()
       if Options.test: continue
 
       outdir = os.path.join( dirpath, Output)
