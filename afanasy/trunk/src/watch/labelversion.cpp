@@ -29,7 +29,7 @@ LabelVersion::LabelVersion( QWidget *parent):
       tooltip += QString("\nGCC version: %1").arg( af::Environment::getVersionGCC().c_str());
 
    tooltip += QString("\nCGRU_LOCATION=%1"
-                      "\nAFANSY:"
+                      "\nAFANASY:"
                       "\nAF_ROOT=%2"
                       "\nHome: %3"
                       "\nServer: %4")
