@@ -123,3 +123,9 @@ void WndText::showTask( af::Msg * msg)
       c.insertText( QString::number( taskexec.getFileSizeMax()), fParameter);
    }
 }
+
+void WndText::insertText( const QString text)
+{
+   QTextCursor c( qTextEdit->textCursor());
+   c.insertText( text);
+}

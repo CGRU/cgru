@@ -13,6 +13,8 @@ public:
    WndText( const QString & Name, af::Msg * msg = NULL);
    ~WndText();
 
+   void insertText( const QString text);
+
 protected:
    QVBoxLayout * layout;
    QTextEdit * qTextEdit;

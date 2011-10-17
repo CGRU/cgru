@@ -7,6 +7,9 @@ source ./distribution.sh
 # List packages:
 
 packages="gcc yasm p7zip ruby wget inkscape"
+packages="$packages cmake python-dev"
+packages="$packages qt4-dev-tools"
+packages="$packages python-qt4"
 packages_noarch="rubygems"
 
 # Common for Debian distributives:

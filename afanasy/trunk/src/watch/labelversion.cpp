@@ -2,6 +2,7 @@
 
 #include <QtCore/QFile>
 #include <QtGui/QPainter>
+#include <QtGui/QTextEdit>
 
 #include "../libafanasy/environment.h"
 #include "../libafqt/qenvironment.h"
@@ -26,6 +27,16 @@ LabelVersion::LabelVersion( QWidget *parent):
          .arg( qVersion());
    if( false == af::Environment::getVersionGCC().empty())
       tooltip += QString("\nGCC version: %1").arg( af::Environment::getVersionGCC().c_str());
+
+   tooltip += QString("\nCGRU_LOCATION=%1"
+                      "\nAFANSY:"
+                      "\nAF_ROOT=%2"
+                      "\nHome: %3"
+                      "\nServer: %4")
+         .arg( af::Environment::getCGRULocation().c_str())
+         .arg( af::Environment::getAfRoot().c_str())
+         .arg( af::Environment::getHomeAfanasy().c_str())
+         .arg( af::Environment::getServerName().c_str());
 
 /*
 // Try to load user's custom logo
@@ -145,15 +156,16 @@ void LabelVersion::resetMessage()
 
 void LabelVersion::mousePressEvent( QMouseEvent * event) { resetMessage();}
 
-void LabelVersion::mouseDoubleClickEvent( QMouseEvent * event )
-{
-   new WndText("Info");
-}
-
 int LabelVersion::getStringStatus( const std::string & str)
 {
    if( str.find("AFANASY") == 0 ) return SS_Info;
    if( str.find("ALARM")   == 0 ) return SS_Alarm;
    if( str.find("ACHTUNG") == 0 ) return SS_Alarm;
    return SS_None;
+}
+
+void LabelVersion::mouseDoubleClickEvent( QMouseEvent * event )
+{
+   WndText * wnd = new WndText("Info");
+   wnd->insertText( tooltip);
 }
