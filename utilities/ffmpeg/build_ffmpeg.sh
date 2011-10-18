@@ -3,17 +3,7 @@
 x264="${PWD}/x264"
 export CFLAGS="-I${x264}"
 export LDFLAGS="-L${x264}"
-
-#dirs="input output filters"
-#for dir in $dirs; do
-#   objs=`ls $x264/$dir/*.o`
-#   for obj in $objs; do
-#      export LDFLAGS="$LDFLAGS $obj"
-#   done
-#done
-#echo $LDFLAGS
-
-#exit
+export LDFLAGS="$LDFLAGS -B/usr/lib/gold-ld/"
 
 cd ffmpeg
 
