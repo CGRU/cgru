@@ -41,6 +41,7 @@ class Window( QtGui.QTextEdit ):
 
       self.textCursor().insertText('\nSystem Environment:\n', self.ftitle)
       self.appendEnvVar('PATH')
+      self.appendVar('PWD', os.getcwd())
 
       self.appendConfigFile( cgruconfig.VARS['config_file'])
       self.appendConfigFile( cgruconfig.VARS['config_file_home'])
