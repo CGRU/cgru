@@ -40,7 +40,7 @@ $cmd
 
 [ $? != "0" ] && exit 1
 
-cmd="g++ -s -o ${output} ${name}.o $LDFLAGS"
+cmd="g++ -s -B/usr/lib/gold-ld/ -o ${output} ${name}.o $LDFLAGS"
 echo $cmd
 $cmd
 
