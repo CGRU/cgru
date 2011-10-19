@@ -4,7 +4,7 @@
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
 # Setup special Python module:
-export PYTHONPATH="$AF_ROOT/bin_pyaf/3.2:$PYTHONPATH"
+export PYTHONPATH="$AF_ROOT/bin_pyaf/3.2.2:$PYTHONPATH"
 
 export BLENDER_LOCATION="/opt/blender-2.57b-linux-glibc27-x86_64"
 export BLENDER_LOCATION="/usr/bin"
