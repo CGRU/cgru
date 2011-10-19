@@ -21,7 +21,7 @@ def pmSaveToServer():
    # Map paths from client to server:
    error_msg = ''
    if pm.initialized:
-      pm.toServerFile( scenename, scenename_server, SearchString = 'file ', Verbose = True)
+      pm.toServerFile( scenename, scenename_server, SearchStrings = ['file '], Verbose = True)
    else:
       print 'No paths map preset. Just copying scene to:'
       print scenename_server
@@ -54,7 +54,7 @@ def pmOpenFromServer():
    # Map paths from server to client:
    error_msg = ''
    if pm.initialized:
-      pm.toClientFile( scenename_server, scenename_client, SearchString = 'file ', Verbose = True)
+      pm.toClientFile( scenename_server, scenename_client, SearchStrings = ['file '], Verbose = True)
    else:
       print 'No paths map preset. Just copying scene to:'
       print scenename_client
