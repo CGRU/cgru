@@ -24,6 +24,7 @@ Parser.add_option('--aspect_auto',           dest='aspect_auto',     type  ='flo
 Parser.add_option('--aspect_out',            dest='aspect_out',      type  ='float',      default=-1.0,           help='Output movie aspect, "-1" = no changes')
 Parser.add_option('--tmpformat',             dest='tmpformat',       type  ='string',     default='tga',          help='Temporary images format')
 Parser.add_option('--tmpquality',            dest='tmpquality',      type  ='string',     default='',             help='Temporary images format quality options')
+Parser.add_option('--noidentify',            dest='noidentify',      action='store_true', default=False,          help='Disable image identification')
 Parser.add_option('--noautocorr',            dest='noautocorr',      action='store_true', default=False,          help='Disable auto color correction for Cineon and EXR')
 Parser.add_option('--correction',            dest='correction',      type  ='string',     default='',             help='Add custom color correction parameters')
 Parser.add_option('--stereo',                dest='stereo',          action='store_true', default=False,          help='Stereo mode by default')
@@ -378,14 +379,15 @@ Draw first frame number as one.')
       self.lInputSettings.addLayout( self.lBrowseInput)
 
       self.lIdentify = QtGui.QHBoxLayout()
-      self.tIdentify = QtGui.QLabel('Identify:', self)
-      self.tIdentify.setToolTip('\
+      self.cbIdentify = QtGui.QCheckBox('Identify:', self)
+      self.cbIdentify.setChecked( not Options.noidentify)
+      self.cbIdentify.setToolTip('\
 Input file identification.')
       self.editIdentify = QtGui.QLineEdit( self)
       self.editIdentify.setEnabled( False)
       self.btnIdentify = QtGui.QPushButton('Refresh', self)
       QtCore.QObject.connect( self.btnIdentify, QtCore.SIGNAL('pressed()'), self.inputFileChanged)
-      self.lIdentify.addWidget( self.tIdentify)
+      self.lIdentify.addWidget( self.cbIdentify)
       self.lIdentify.addWidget( self.editIdentify)
       self.lIdentify.addWidget( self.btnIdentify)
       self.lInputSettings.addLayout( self.lIdentify)
@@ -1187,18 +1189,18 @@ Add this options to temporary image saving.')
       self.sbFrameLast.setRange(  framefirst, framelast)
       self.sbFrameLast.setValue(  framelast)
       if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
-      afile = os.path.join( inputdir, afile)
-      identify = 'convert -identify "%s"'
-      if sys.platform.find('win') == 0: identify += ' nul'
-      else: identify += ' /dev/null'
-      pipe = subprocess.Popen( identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout
-      Identify = pipe.read()
-      if len(Identify) < len(afile):
-         self.cmdField.setText('Invalid image.\n%s' % afile)
-         return InputFile, InputPattern, FilesCount, Identify
-      if not isinstance( Identify, str): Identify = str( Identify, 'utf-8')
-      Identify = Identify.strip()
-      Identify = Identify.replace( afile, '')
+      if self.cbIdentify.isChecked():
+         afile = os.path.join( inputdir, afile)
+         identify = 'convert -identify "%s"'
+         if sys.platform.find('win') == 0: identify += ' nul'
+         else: identify += ' /dev/null'
+         Identify = subprocess.Popen( identify % afile, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout.read()
+         if len(Identify) < len(afile):
+            self.cmdField.setText('Invalid image.\n%s' % afile)
+            return InputFile, InputPattern, FilesCount, Identify
+         if not isinstance( Identify, str): Identify = str( Identify, 'utf-8')
+         Identify = Identify.strip()
+         Identify = Identify.replace( afile, '')
       InputPattern = os.path.join( inputdir, pattern)
 
       return InputFile, InputPattern, FilesCount, Identify
