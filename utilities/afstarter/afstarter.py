@@ -233,13 +233,13 @@ Maya layer\n\
    def browseScene( self):
       scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['scenefile'].text()))
       if scene == '': return
-      self.fields['scenefile'].setText( scene)
+      self.fields['scenefile'].setText( os.path.normpath( scene))
       self.evaluate()
 
    def browseOutImages( self):
-      path = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['outimages'].text()))
+      path = str( QtGui.QFileDialog.getSaveFileName( self,'Choose a file', self.fields['outimages'].text()))
       if path == '': return
-      self.fields['outimages'].setText( path)
+      self.fields['outimages'].setText( os.path.normpath( path))
       self.evaluate()
 
    def quitsave( self):
