@@ -9,6 +9,7 @@ if sys.platform.find('win') == 0:
    Names.extend(['3DSMax','Softimage','AfterFX'])
 
 def startDetached( command):
+   print( command)
    if sys.platform.find('win') == 0:
       QtCore.QProcess.startDetached( 'cmd.exe', ['/c', command])
    else:
@@ -47,14 +48,16 @@ def exampleSoftimage(): exampleSoftware('softimage','start_softimage')
 def exampleAfterFX():   exampleSoftware('After FX','start_afterfx')
 
 def browse():
-   cmd = "browse"
-   if sys.platform.find('win') == 0: cmd += '.cmd'
-   else: cmd += '.sh'
-   cmd = os.path.join('utilities', cmd)
-   cmd = os.path.join( os.environ['CGRU_LOCATION'], cmd)
    folder = os.path.join( os.environ['CGRU_LOCATION'],'software_setup')
-   cmd = '"%s" "%s"' % ( cmd, folder)
-   startDetached( cmd)
+   if sys.platform.find('win') == 0:
+      print('Opening "%s"' % folder)
+      QtCore.QProcess.startDetached( 'cmd.exe', ['/c', 'start', folder])
+   else:
+      cmd = 'browse.sh'
+      cmd = os.path.join('utilities', cmd)
+      cmd = os.path.join( os.environ['CGRU_LOCATION'], cmd)
+      cmd = '"%s" "%s"' % ( cmd, folder)
+      startDetached( cmd)
 
 def locateSoftware( soft):
    filename = QtGui.QFileDialog.getOpenFileName( None, 'Select %s executabe:' % soft)
