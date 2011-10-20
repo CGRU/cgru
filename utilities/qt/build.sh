@@ -1,13 +1,15 @@
 #!/bin/bash
 
 ver=4.7.4
-[ -z "$1" ] || ver=$1
+qtsrc=qt-everywhere-opensource-src-$ver
+[ -d $qtsrc ] || ver=4.8.0
+qtsrc=qt-everywhere-opensource-src-$ver
 
 for arg in $*; do
    [ "$arg" == "--nosql" ] && nosql=1
+   [ "$arg" == "-h" ] && help=1
 done
 
-qtsrc=qt-everywhere-opensource-src-$ver
 qtdir=$PWD/$ver
 
 if [ ! -d $qtsrc ]; then
@@ -15,9 +17,9 @@ if [ ! -d $qtsrc ]; then
    exit 1
 fi
 
-flags="-prefix $qtdir -v -opensource -release -static"
+flags="-prefix $qtdir -v -opensource -release -static -silent"
 [ -z "$nosql" ] && flags="$flags -qt-sql-psql"
-flags="$flags -nomake examples -nomake demos"
+flags="$flags -nomake examples -nomake demos -nomake designer"
 flags="$flags -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-webkit -no-javascript-jit -no-script -no-scripttools -no-declarative -no-gif -no-openssl"
 
 if [ `uname` == "Darwin" ]; then
@@ -25,13 +27,13 @@ if [ `uname` == "Darwin" ]; then
    flags="$flags -no-framework -arch x86_64"
 fi
 
-echo "Flags: $flags"
-
 cd $qtsrc
 
-if [ "$1" == "-h" ]; then
+if [ ! -z "$help" ]; then
    ./configure -h
+   echo "Flags: $flags"
 else
+   echo "Flags: $flags"
    ./configure $flags
    make
    make install
