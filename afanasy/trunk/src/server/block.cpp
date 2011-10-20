@@ -401,7 +401,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    }
    case af::Msg::TBlockDependMask:
    {
-      if( data->setDependMask( mcgeneral.getString()));
+      if( data->setDependMask( mcgeneral.getString()))
       {
          appendJobLog( std::string("Depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
@@ -413,7 +413,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    }
    case af::Msg::TBlockTasksDependMask:
    {
-      if( data->setTasksDependMask( mcgeneral.getString()));
+      if( data->setTasksDependMask( mcgeneral.getString()))
       {
          appendJobLog( std::string("Tasks depend mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
