@@ -91,3 +91,11 @@ pyaf="libpyaf/libpyaf.so"
 [ -f $pyaf ] && cp -fv $pyaf ../../bin/pyaf.so
 pyaf="libpyaf/libpyaf.dylib.1.0.0"
 [ -f $pyaf ] && cp -fv $pyaf ../../bin/pyaf.so
+
+# Copy binaries from apps on mac:
+if [ `uname` == "Darwin" ]; then
+   cd ../../bin
+   for app in `find . -name "*.app"`; do
+      cp -v $app/Contents/MacOS/* .
+   done
+fi
