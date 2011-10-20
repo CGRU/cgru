@@ -18,6 +18,10 @@ if [ -z "$qtver" ]; then
 fi
 qt=`dirname $PWD`/qt/$qtver
 if [ ! -d "$qt" ]; then
+   qtver="4.8.0"
+   qt=`dirname $PWD`/qt/$qtver
+fi
+if [ ! -d "$qt" ]; then
    echo "Error: No Qt '$qt' founded."
    exit 1
 fi
