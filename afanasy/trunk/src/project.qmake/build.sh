@@ -44,6 +44,8 @@ export AF_PYTHON_LIB="`${python}-config --ldflags`"
 # Extra libs for linking python module ("libpyaf" project "pyaf.so" target):
 if [ `uname` == "Darwin" ]; then
    export AF_PYTHON_MODULE_EXTRA_LIBS=""
+   export QMAKESPEC="macx-g++"
+   export AF_PYTHON_LIB="-L/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/config-3.2m -lpython3.2"
 else
    export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz"
 fi
@@ -55,6 +57,10 @@ fi
 
 # Add all python symbols to let user to use to use dynamic python modules
 export AF_PYTHON_LIB="-rdynamic ${AF_PYTHON_LIB}"
+
+echo "AF_PYTHON_INC=$AF_PYTHON_INC"
+echo "AF_PYTHON_LIB=$AF_PYTHON_LIB"
+echo "AF_PYTHON_MODULE_EXTRA_LIBS=$AF_PYTHON_MODULE_EXTRA_LIBS"
 
 # Setup Qt if qmake not specified (try qt4 first):
 if [ -z "$QMAKE" ]; then
