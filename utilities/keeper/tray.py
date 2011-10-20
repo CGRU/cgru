@@ -57,6 +57,9 @@ class Tray( QtGui.QSystemTrayIcon):
       # Software menu:
       self.menu['Software'] = QtGui.QMenu('Software')
       self.menu['menu'].addMenu( self.menu['Software'])
+      action = QtGui.QAction('[ browse ]', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.browse)
+      self.menu['Software'].addAction( action)
       for soft in software.Names:
          icon = software.getIcon( soft)
          if icon is None:
@@ -65,12 +68,14 @@ class Tray( QtGui.QSystemTrayIcon):
             action = QtGui.QAction( icon, soft, self)
          eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.start%s)" % soft)
          self.menu['Software'].addAction( action)
+      # Software setup:
       self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
       self.menu['Software'].addMenu( self.menu['Setup Soft'])
       for soft in software.Names:
          action = QtGui.QAction( soft, self)
          eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.locate%s)" % soft)
          self.menu['Setup Soft'].addAction( action)
+      # Software examples:
       self.menu['Examples'] = QtGui.QMenu('Examples')
       self.menu['Software'].addMenu( self.menu['Examples'])
       for soft in software.Names:

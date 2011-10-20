@@ -46,6 +46,16 @@ def example3DSMax():    exampleSoftware('3D Studio Max','start_3dsmax')
 def exampleSoftimage(): exampleSoftware('softimage','start_softimage')
 def exampleAfterFX():   exampleSoftware('After FX','start_afterfx')
 
+def browse():
+   cmd = "browse"
+   if sys.platform.find('win') == 0: cmd += '.cmd'
+   else: cmd += '.sh'
+   cmd = os.path.join('utilities', cmd)
+   cmd = os.path.join( os.environ['CGRU_LOCATION'], cmd)
+   folder = os.path.join( os.environ['CGRU_LOCATION'],'software_setup')
+   cmd = '"%s" "%s"' % ( cmd, folder)
+   startDetached( cmd)
+
 def locateSoftware( soft):
    filename = QtGui.QFileDialog.getOpenFileName( None, 'Select %s executabe:' % soft)
    if filename is None: return
