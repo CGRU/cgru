@@ -75,7 +75,8 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
    if( alarm(2) != 0 )
       AFERROR("MsgQueue::send: alarm was already set.\n");
 
-   if( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
+//   if( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
+   if( connect( socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
       AFERRPA("MsgQueue::send: connect: %s", address.generateInfoString().c_str())
       close(socketfd);

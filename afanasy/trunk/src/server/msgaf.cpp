@@ -84,7 +84,8 @@ bool MsgAf::request( MsgAf *answer)
    }
    //
    // connect
-   if ( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
+//   if ( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
+   if ( connect( socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
       AFERRPE("MsgAf::request: connect");
       address.stdOut(); printf("\n");

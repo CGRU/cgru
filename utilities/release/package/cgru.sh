@@ -9,14 +9,11 @@ installdir=$3
 # Creating directories:
 mkdir -p $pack/$installdir/doc
 mkdir -p $pack/$installdir/bin
-mkdir -p $pack/$installdir/utilities/regexp/bin
 mkdir -p $pack/$installdir/utilities/release
 mkdir -p $pack/$installdir/utilities/site
 
 # Moving icons to standart linux location:
-cp -r $src/doc/icons/icons $pack/usr/local/share
-cp -r $src/utilities/moviemaker/icons/icons $pack/usr/local/share
-cp -r $src/utilities/regexp/icons/icons $pack/usr/local/share
+cp -r $src/icons/icons $pack/usr/local/share
 
 files="\
 index.html \
@@ -25,7 +22,7 @@ examples \
 doc/rus_doklad \
 utilities/doc \
 utilities/moviemaker \
-utilities/regexp/doc \
+utilities/regexp \
 utilities/release/doc \
 utilities/site/doc \
 "

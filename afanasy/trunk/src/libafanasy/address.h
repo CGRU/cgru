@@ -53,6 +53,16 @@ public:
 /// Set new IP address.
    void setIP( const Address & other);
 
+/// return the correct size of a 'sockaddr'. This size is needed by "connect" for example.
+   inline size_t sizeofAddr( void ) const
+   {
+      if( family == IPv6 )
+         return sizeof(sockaddr_in6);
+      /// Assume IPv4. if family is empty nothing works anyway.
+      return sizeof(sockaddr_in);
+   }
+
+
 
    void generateIPStream( std::ostringstream & stream, bool full = false) const;
    const std::string generateIPString( bool full = false) const;

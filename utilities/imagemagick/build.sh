@@ -7,7 +7,7 @@ exr=`dirname $PWD`/openexr
 prefix=$PWD
 
 export OPENEXR_CFLAGS="-I$exr/include/OpenEXR"
-export OPENEXR_LIBS="-L$exr/lib -lIlmImf -lz -lImath -lHalf -lIex -lIlmThread -lpthread"
+export OPENEXR_LIBS="-B/usr/lib/gold-ld/ -L$exr/lib -lIlmImf -lz -lImath -lHalf -lIex -lIlmThread -lpthread"
 export LDFLAGS="-lstdc++"
 
 cd $im
