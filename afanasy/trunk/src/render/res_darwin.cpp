@@ -10,6 +10,13 @@
 #include <sys/mount.h>
 #include <sys/sysctl.h>
 
+/* WARNING: from gataddrs man pages on Mac Os X
+   If both <net/if.h> and <ifaddrs.h> are being included, <net/if.h> must be
+   included before <ifaddrs.h>.
+*/
+#include <net/if.h>
+#include <ifaddrs.h>
+
 #include "../libafanasy/environment.h"
 
 #define AFOUTPUT
@@ -26,14 +33,6 @@ int pagesize   =  0;
 int swappgsin  = -1;
 int swappgsout = -1;
 
-const char netstat[] = "netstat -i";
-const int buffer_len = 1024;
-char buffer[buffer_len];
-char find_net[] = "Address";
-const int find_net_len = 7;
-char iname[buffer_len];
-int  iname_len = 0;
-
 struct res
 {
    int user;
@@ -44,11 +43,12 @@ struct res
    int irq;
    int softirq;
 }r0,r1;
+
 struct net
 {
    int recv;
    int send;
-}n0,n1;
+} network_statistics[2] = { {0,0}, {0,0} };
 
 unsigned int memtotal, memfree, membuffers, memcached, swaptotal, swapfree;
 
@@ -196,61 +196,61 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       }
    }//hdd
 
-   //
-   // Network:
-   //
+   /*
+      Network.
+
+      We sum the statistics of all AF_LINK interfaces.
+   */
+
+   hres.net_recv_kbsec = 0;
+   hres.net_send_kbsec = 0;
+
    {
-      net * nl = &n0; net * nn = &n1;
-      if( now ) {     nl = &n1;       nn = &n0; }
-      bool verbose = false;
+      net *nl = &network_statistics[now];
+      net *nn = &network_statistics[1-now];
 
-      int net_recv_kb = 0; int net_send_kb = 0;
-      FILE *f = NULL;
-      f = popen( netstat, "r");
-      if( fgets( buffer, buffer_len, f) != NULL )
+      struct ifaddrs *addr;
+      if( getifaddrs( &addr ) != 0 )
+         return;
+
+      unsigned net_recv = 0,  net_send = 0;
+
+      for( struct ifaddrs *it = addr; it; it = it->ifa_next )
       {
-         static int start;
-         if( getConstants )
-         {
-            start = 0;
-            while( strncmp( buffer+(start++), find_net, find_net_len) != 0);
-            start += find_net_len;
-            if( verbose) printf("start=%d\n", start);
-         }
-         while( fgets( buffer, buffer_len, f))
-         {
-            int pos = 0;
-            if( iname_len && (strncmp( buffer, iname, iname_len) == 0)) continue;
+         /* We're looking for a link level address. */
+         if( !it->ifa_addr || it->ifa_addr->sa_family != AF_LINK )
+            continue;
 
-            while( buffer[++pos] != ' ');
-            iname_len = pos;
-            strncpy( iname, buffer, iname_len);
-            iname[iname_len+1] = '\0';
+         /* This should not happen but there are some pretty wild stuff
+            out there so better be careful. */
+         if( !it->ifa_name || !it->ifa_data )
+            continue;
 
-            while( buffer[++pos] == ' ');
-            unsigned int mtu = atoi( buffer+pos);
-            pos = start;
-            while( buffer[++pos] != ' '); while( buffer[++pos] == ' ');
-            unsigned int Ipkts = atoi( buffer+pos);
-            while( buffer[++pos] != ' '); while( buffer[++pos] == ' ');
-            while( buffer[++pos] != ' '); while( buffer[++pos] == ' ');
-            unsigned int Opkts = atoi( buffer+pos);
-            net_recv_kb += (Ipkts * mtu) >> 10;
-            net_send_kb += (Opkts * mtu) >> 10;
-         }
+         /* ifa_data holds statistics for AF_LINK interfaces. */
+         struct if_data *stats = (struct if_data *) it->ifa_data;
+
+         net_recv += stats->ifi_ibytes;
+         net_send += stats->ifi_obytes;
       }
-      pclose( f);
-      nn->recv = net_recv_kb;
-      nn->send = net_send_kb;
-      net_recv_kb = nn->recv - nl->recv;
-      net_send_kb = nn->send - nl->send;
-      if( verbose) printf("net_recv_kb=%d net_send_kb=%d\n", net_recv_kb, net_send_kb);
-      if( net_recv_kb >= 0 ) hres.net_recv_kbsec = net_recv_kb / af::Environment::getRenderUpdateSec();
-      if( net_send_kb >= 0 ) hres.net_send_kbsec = net_send_kb / af::Environment::getRenderUpdateSec();
-   }//network
 
-   now = 1 - now;
+      nn->recv = net_recv;
+      nn->send = net_send;
+      net_recv = nn->recv - nl->recv;
+      net_send = nn->send - nl->send;
 
-   //hres.stdOut(false);
+      if( net_recv >= 0 )
+      {
+         hres.net_recv_kbsec = net_recv / af::Environment::getRenderUpdateSec();
+         hres.net_recv_kbsec /= 1024;
+      }
+
+      if( net_send >= 0 )
+      {
+         hres.net_send_kbsec = net_send / af::Environment::getRenderUpdateSec();
+         hres.net_send_kbsec /= 1024;
+      }
+
+      now = 1 - now;
+   }
 }
 #endif
