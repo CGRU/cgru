@@ -120,23 +120,24 @@ void Host::readwrite( Msg * msg)
 
 void Host::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "Host:";
-   if( full)
-   {
-      if( false == os.empty()) stream << " OS=\"" << os << "\":";
-      stream << std::endl;
-      stream << " Capacity = " << capacity;
-      stream << ", Max tasks = " << maxtasks;
-      stream << ", Power " << power;
+   stream << "Host: ";
 
-      if( wol_idlesleep_time ) stream << "\n WOL Sleep Idle Time = " << time2strHMS( wol_idlesleep_time, true );
+   if(full)
+   {
+      if( false == os.empty()) stream << "\n   OS=\"" << os << "\":";
+
+      stream << std::endl;
+      stream << "   capacity = " << capacity << ", max tasks = " << maxtasks << ", power " << power;
+
+      if( wol_idlesleep_time )
+         stream << "\n   WOL Sleep Idle Time = " << time2strHMS( wol_idlesleep_time, true );
 
       if( cpu_mhz || cpu_num || mem_mb || swap_mb || hdd_gb )
       {
          stream << std::endl;
-         stream << " CPU = " << cpu_mhz << " MHz" << " x" << cpu_num;
-         stream << ", MEM = " << mem_mb << " (+" << swap_mb << " Swap) Mb";
-         stream << ", HDD = " << hdd_gb << " Gb";
+         stream << "   CPU = " << cpu_mhz << " MHz" << " x" << cpu_num;
+         stream << ", Memory = " << mem_mb << " (+" << swap_mb << " Swap) Mb";
+         stream << ", Disk = " << hdd_gb << " Gb";
       }
    }
    else
