@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../../../doc/styles.css" rel="stylesheet" type="text/css" />
+<title>Houdini Afanasy Setup</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h2 align="center">Houdini Afanasy Setup</h2>
+<hr />
+
+CGRU and Afanasy must be setuped before.
+To do this you can source <kbd>setup.sh</kbd> script in CGRU folder.
+Afanasy houdini operator library located in <kbd>afanasy/plugins/houdini</kbd> directory.
+You can add it automatically by adding the folder to <kbd>HOUDINI_OTLSCAN_PATH</kbd> variable.
+Also you need to point PYTHONPATH to the folder too, to import Afafansy submission script.
+
+<p>
+Houdini setup example:
+</p>
+<table><tr><td><pre>
+
+   #!/bin/bash
+
+
+   # Setup CGRU houdini scripts location:
+   export HOUDINI_CGRU_PATH=$CGRU_LOCATION/plugins/houdini
+
+   # Set Afanasy houdini scripts and otls location:
+   export HOUDINI_AF_PATH=$AF_ROOT/plugins/houdini
+
+   # Set Python path to afanasy submission script:
+   export PYTHONPATH=$HOUDINI_AF_PATH:$PYTHONPATH
+
+   # Define OTL scan path:
+   HOUDINI_AF_OTLSCAN_PATH=$HIH/otls:$HOUDINI_AF_PATH:$HH/otls
+
+   # Create or add to exist OTL scan path:
+   if [ "$HOUDINI_OTLSCAN_PATH" != "" ]; then
+      export HOUDINI_OTLSCAN_PATH="${HOUDINI_AF_OTLSCAN_PATH}:${HOUDINI_OTLSCAN_PATH}"
+   else
+      export HOUDINI_OTLSCAN_PATH=$HOUDINI_AF_OTLSCAN_PATH
+   fi
+
+</pre></td></tr></table>
+<p>
+Setup example is located in <kbd>cgru/examples/houdini</kbd>:
+</p>
+<p>
+MS Windows script example is also provided, it do the same.
+</p>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<!-- Copy this file into "farm.xml" and describe you own -->
+<!--
+This is commented text.
+-->
+<farm>
+<!--
+You can limit service on your farm:
+maxhosts - maximum number if various hosts (renders) service can run on
+maxcount - total maximum number of service starts, no matter on the same host or not
+   <service name="service_to_limit" maxhosts="10" maxcount="20"/>
+-->
+
+   <pattern name="Some Host">
+      <mask>.*</mask>
+<!--
+Mask ".*" will match any render name. So here defined some default settings for any host.
+-->
+      <description>Default machine</description>
+      <capacity>1100</capacity>
+      <maxtasks>10</maxtasks>
+      <power>1000</power>
+      <wolidlesleeptime>0</wolidlesleeptime>
+<!--
+"resources" and "data" for test only (will play role in future)
+-->
+      <resources>{'c':1000,'m':3000}</resources>
+      <data>{'c':'render','m':10}</data>
+      <service name="system" />
+<!--
+      <service name="wakeonlan" />
+      <service name="postcmd" />
+-->
+      <service name="generic" />
+      <service name="movgen" />
+      <service name="shake" />
+      <service name="nuke" />
+      <service name="hbatch" />
+      <service name="prman"/>
+      <service name="mantra" />
+      <service name="hbatch_prman" />
+      <service name="hbatch_mantra" />
+      <service name="maya" />
+      <service name="blender" />
+      <service name="blender_internal" />
+      <service name="blender_yafray" />
+      <service name="yafray" />
+      <service name="xsi" />
+      <service name="max" />
+<!--
+Comment it if you agree with build in os detection (names)
+      <os>linux mac windows</os>
+You can specify several platforms, if host can take tasks for diffent platforms.
+-->
+   </pattern>
+   <pattern name="Render">
+      <mask>lrf.*</mask>
+      <description>Linux render farm.</description>
+      <os>linux</os>
+      <capacity>8800</capacity>
+      <maxtasks>80</maxtasks>
+      <power>8000</power>
+      <remservice name="max" />
+      <remservice name="xsi" />
+      <service name="prman" count="2"/>
+   </pattern>
+</farm>

@@ -1,0 +1,12 @@
+Package: afanasy-plugins
+Version: @VERSION@
+Architecture: all
+Maintainer: Timur Hairulin <timurhai@gmail.com>
+Installed-Size: @SIZE@
+Depends: afanasy-common (= @VERSION@), cgru-common (= @VERSION@)
+Section: graphics
+Priority: extra
+Homepage: http://sourceforge.net/projects/cgru/
+Description: Afanasy Plugins for other software
+ Afanasy plugins jobs launch scripts for:
+ Houdini, Nuke, Blender, Maya, 3DSMAX.

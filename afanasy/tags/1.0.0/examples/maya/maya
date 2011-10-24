@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source ./setup_maya.sh
-
-${MAYA_EXEC} $*

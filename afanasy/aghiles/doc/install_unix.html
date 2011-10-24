@@ -1,0 +1,264 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Unix Install</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+<h2 align="center">Afanasy Unix Install</h2>
+<hr />
+<p>
+<i>
+All packages names can slightly vary from one distribution to another, or even does not exists at all.
+For example on Cent-OS there is no choice whether to install Qt XML module or not,
+you can to install or not the whole Qt.
+</i>
+</p>
+
+<ol>
+<li><h4>You Need UNIX</h4>
+   Any Linux or Mac or other UNIX (any <a href="http://en.wikipedia.org/wiki/POSIX">POSIX</a>, so may be MS Windows with emulators, if you are brave).<br/>
+</li>
+
+<li><h4>Install Required Packages:</h4>
+   <kbd>
+   libqt4-core libqt4-gui libqt4-xml libqt4-network libqt4-sql libqt4-sql-psql<br/>
+   python<br/>
+   </kbd>
+</li>
+
+<li><h4>Install CGRU and Afanasy Server</h4>
+   <p>
+      You can download install <kbd>RPM</kbd> or <kbd>deb</kbd> packages.
+      Or build CGRU and Afanasy yourself.
+   </p>
+   <ul>
+   <li><h4>Linux Packages</h4>
+      See <a href="../../doc/install_linuxpackages.html">Linux Packages</a> page for description.
+      <ul>
+      <li>
+         Download packages from <a href="http://sourceforge.net/projects/cgru/files/">SourceForge</a> and unpack.<br/>
+      </li>
+      <li>
+         You need to install <kbd>cgru</kbd> and <kbd>afanasy-server</kbd> package.<br/>
+         The simples way is to launch install scripts:<br/>
+         <code>
+         # ./install_cgru.sh
+         </code>
+         <br/>
+         Only on server machine install Afanasy server package:<br/>
+         <code>
+         # ./install_afserver.sh
+         </code>
+         <br/>
+         It is better to install render client on server machine too, to watch its resources.<br/>
+      </li>
+      </ul>
+   </li>
+   <li><h4>Manual Build</h4>
+      <ul>
+      <li>Install develop packages.<br/>
+         <p>
+         There are three ways ( projects / build systems ) to build Afanasy:
+         <a href="http://www.cmake.org/">CMake</a>,
+         <a href="http://doc.trolltech.com/qmake-manual.html">QMake</a>,
+         <a href="http://rubyforge.org/projects/mxx-ru">Mxx_ru</a>.<br/>
+         Choose one, and install.
+         </p>
+         <p>
+         Install additional developers packages:<br/>
+         <kbd>
+         g++<br/>
+         subversion<br/>
+         qt4 - development<br/>
+         python - development<br/>
+         </kbd>
+         </p>
+      </li>
+      <li>
+
+      Download CGRU sources.<br/>
+      <code>
+      $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
+      </code>
+
+
+      Go to Afanasy sources.
+      Launch a build script.<br/>
+      <code>
+      $ cd cgru/afanasy/[tag|branch|trunk]/src/project.cmake<br/>
+      $ ./build.sh<br/>
+      </code>
+      </li>
+      </ul>
+      <p>
+      See <a href="setup_launch.html">Setup & Launch</a> page
+      to launch afanasy applications and to use Python module to send jobs.
+      </p>
+   </li>
+   </ul>
+</li>
+
+<li><h4>Postgre SQL</h4>
+<p>
+You don't need to install it on clients.
+SQL database server is needed for Afanasy server only.
+It is better to install it on the same host as Afanasy server.
+</p>
+<p>
+Database server needed to store jobs, renders, users state.
+Afanasy reads information from database on start.
+You can use Afanasy without any database, but server will start with no data.
+So you can skip this stage if you want just to try Afanasy.
+</p>
+<p>
+You can install database using package manager, and its the best way.
+But if Qt and PostgreSQL versions are incompatible in your distributive,
+you can download and install some previous version of PostgreSQL.
+</p>
+<h5>Database Setup</h5>
+<ul>
+   <li>
+      Edit Postgre SQL client authentication configuration file <kbd>pg_hba.conf</kbd>.<br/>
+      Its location depends on Linux distributive. For example:<br/>
+      Debian, Ubuntu: <kbd>/etc/postgresql/ [version] /main/pg_hba.conf</kbd><br/>
+      CentOS, Fedora, openSUSE: <kbd>/var/lib/pgsql/data/pg_hba.conf</kbd><br/>
+      <i>make install</i>:<kbd>/usr/local/pgsql/data/pg_hba.conf</kbd><br/>
+      Add this line<br/>
+      <kbd>local afanasy afadmin password</kbd><br/>
+      Read comments in this file to know what does it mean.<br/>
+      (If problems with authentication try <kbd>trust</kbd> for all methods.)
+   </li>
+   <li>
+      Restart database<br/>
+   </li>
+   <li>
+      Create afanasy database and user<br/>
+      <code>
+      # su - postgres<br/>
+      $ createdb afanasy<br/>
+      $ psql afanasy<br/>
+      CREATE USER afadmin PASSWORD 'AfPassword';<br/>
+      </code>
+   </li>
+</ul>
+<h5>Create Tables</h5>
+<ul>
+   <li>
+      Go into CGRU commands directory:<br />
+      <code>$ cd cgru/afanasy/bin</code><br />
+   </li>
+   <li>
+      Get a list of available QT database drivers:<br />
+      <code>$ ./afcmd db_drivers</code><br />
+      QPSQL must be preset in list, or check QT installation.<br />
+   </li>
+   <li>
+      Check database connection:<br />
+      <code>$ ./afcmd db_check</code><br />
+      Program will output error or print "Database connection is working" if everything is ok.<br />
+   </li>
+   <li>
+      Create required tables:<br />
+      <code>$ ./afcmd db_resetall</code><br />
+      This command also delete old tables if they exists.<br />
+   </li>
+</ul>
+<p>
+<h5>Example script for automatic setup:</h5>
+There is an example script to install Postgre SQL using <kbd>apt-get</kbd> and configure it for Afanasy. It works on <kbd>Ubuntu</kbd>, <kbd>Debian</kbd> and other debian-like distributives.<br/>
+Launch under <kbd>root</kbd>:<br/>
+<code>
+# cd cgru/examples/scripts<br/>
+# ./setup_pgsql.sh<br/>
+</code>
+</p>
+</li>
+
+<li><h4>Web Server</h4>
+<p>
+Web server is needed to browse Afanasy SQL database only.
+So you can skip this stage if you want just to try Afanasy.
+You don't need to install it on clients.
+It is better to install it a host with the database.
+</p>
+<p>
+If you use Linux packages install <kbd>afanasy-webvisor</kbd> package.
+</p>
+<p>Install additional  packages:</p>
+<p><kbd>apache2 libapache2-mod-php5 php5 php5-pgsql php5-gd</kbd></p>
+<p>The site root directory is located in <i>afanasy/webvisor</i> directory.</p>
+</li>
+</ol>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

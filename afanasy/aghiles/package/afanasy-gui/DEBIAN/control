@@ -1,0 +1,16 @@
+Package: afanasy-gui
+Version: @VERSION@
+Architecture: @ARCHITECTURE@
+Maintainer: Timur Hairulin <timurhai@gmail.com>
+Installed-Size: @SIZE@
+Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), libqt4-core, libqt4-gui, libqt4-network, libqt4-xml
+Section: graphics
+Priority: extra
+Homepage: http://sourceforge.net/projects/cgru/
+Description: Afanasy GUI
+ Includes afwatch, aftalk, afmonitor and afqtregexp
+ afwatch - Afanasy Watch GUI client.
+ aftalk - Afanasy chat Talk client.
+ afmonitor - Afanasy Monitor GUI client.
+ Mark additional GUI libraries dependences.
+ Create icons for Afanasy GUI applications.

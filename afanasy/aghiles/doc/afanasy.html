@@ -1,0 +1,375 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Features</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h2 align="center">
+<img src="../../doc/images/freeopensource.png" alt="FREE AND OPEN SOURCE" />
+<br/><br/>
+<img src="../../doc/images/afanasy.png" alt="AFANASY" />
+<br/><br/>
+<img src="../../doc/images/renderfarmmanager.png" alt="RENDER FARM MANAGER" />
+</h2>
+
+<hr />
+
+<table><tr><td valign="top">
+
+<p>
+Afanasy is a free and open source tool to control remote computing.
+You can compute something more quickly using render farm - remote computers connected by network.
+Afanasy designed for computer graphics (3d rendering and 2d compositing) parallel calculation.
+It can compute different frames (or even parts of frames) on several computers simultaneously.
+</p>
+<p>
+Afanasy provides render farm monitoring.
+It is very important to watch computers resources during render process.
+You can see what kind of resource (CPU, memory, network etc.) is more needed to render.
+It is very useful to know what are farm hosts doing.
+</p>
+<p>
+Afanasy engine simple runs different command lines on hosts and controls processes running.
+You can use Afanasy to parallel calculate anything you can describe (split) through command lines.
+</p>
+
+<h4>Render computer resources monitoring.</h4>
+<p>
+You can monitor CPU usage: User, Nice, System, I/O Wait and Load Average.
+Memory, Swap and HDD usage. Network traffic.
+Disk I/O operations speed and utilization percentage.
+This can help you to diagnose what slows rendering process.
+Especially swap, I/O wait and network traffic.
+</p><p>
+You can write your own custom resource(s) meter(s) on python. And Watch will plot their graphs.
+</p>
+
+<h4>Multiply Tasks Renders (clients, slaves, hosts)</h4>
+<p>
+Render can run several tasks at the same time.<br/>
+</p><p>
+Useful for "powerful" hosts with several CPUs.
+Render and Task has a capacity attribute, each task checks available capacity on render, and if its enough,
+task launches and take its capacity value from render.<br/>
+</p>
+<h5>Tasks can variate capacity 'on-the-fly'</h5>
+Capacity variation can be described through its minimum and maximum coefficients.
+If task with 1000 capacity units runs on render with 4000 free capacity, task can take capacity coefficient 4.
+This coefficient can be caught in task command line
+(so Mantra can be launched 'mantra -j 4 ...', or 3000 capacity can be used by one 'houdini' task,
+for example to generate something, which use only one CPU, and 'mantra -j 3').
+Hosts capacity values described in 'Farm Setup' ('xml' file).
+</p>
+
+<h4>Paths Map</h4>
+<p>
+Every host can has different paths and a map to translate paths to server and from server.
+With this feature you can setup a multi-OS render.
+You can use different operating systems on farm hosts and to submit jobs from any OS to render it on any OS.
+</p>
+
+<h4>Dependencies</h4>
+<p>
+Job can depends on other job(s) of the same user (<i>depend mask</i>) or on some job(s) from any user (<i>global depend mask</i>).
+Job will wait other jobs to be done matching this mask regular expression (Afanasy uses Qt Regular Expressions, they are Perl-like).
+</p><p>
+Job Block can wait other block(s) to be done (<i>depend mask</i>).
+Block tasks can wait other block tasks to be done (<i>tasks depend mask</i>).
+</p>
+<h5>Sub Task Dependence</h5>
+<p>
+Tasks can wait only some part of other task to be done.
+Useful to render simulations.
+First frames of a simulation can be started to render without waiting the whole simulation to be done.
+</p>
+
+<h4>Errors Solving</h4>
+<p>
+Job Errors Hosts List - block store host names where error was occurred and number of errors for each host.
+If this number greater it's limit, block will 'avoid' this host (not to run tasks on render with such hostname).<br/>
+</p><p>
+Tasks Errors Hosts List - the same as described above, but for each task.<br/>
+</p><p>
+Tasks Auto Retry - maximum number of errors to retry task automatically.
+</p><p>
+Tasks Maximum Run Time - the time after running considered as an error task.
+</p><p>
+Errors Forgive Time - time from last host error to forgive all it's errors (remove from error hosts list).
+</p><p>
+User define this default values for his new jobs and can to override them in each job, watch and reset any error hosts list.
+</p>
+
+<h4>Services Limits - Software Licenses Setup</h4>
+<p>
+You can describe various services (tasks) limits:<br/>
+- Maximum number of total service starts on an entire farm.<br/>
+- Maximum number of hosts which started a service (each host can start several tasks of a service).<br/>
+- Maximum number of service starts on each host.<br/>
+</p>
+
+<h4>Priorities</h4>
+<p>
+User priority - user with greater priority can get more hosts.
+</p><p>
+Job priority - to simple sort user jobs queue.
+</p>
+
+<h4>Hosts Masks</h4>
+<p>
+Users and Jobs can have a hosts names mask to be able to run on and exclude mask for hosts to avoid.
+</p>
+
+<h4>Maximum Running Tasks Number</h4>
+<p>
+Users and Jobs can have a limit for maximum running tasks number - no new tasks will be started above this limit.
+</p>
+<h5>Maximum Running Tasks Per Host</h5>
+<p>
+You can limit job (and block) to start tasks on the same host.
+</p>
+
+<h4>Python API</h4>
+<p>
+You can create and send job using python.
+</p><p>
+Setup services and parsers through python classes inherited from base service and parser.<br/>
+</p>
+
+<h4>Services and Parsers</h4>
+<p>
+Service - 'block tasks type', for example: 'hbatch', 'mantra', 'prman', 'nuke', 'maya'.<br/>
+</p>
+<p>
+Service setups a default task output parser type (which can be overridden later). Services are python classes. They all inherits a base 'service' class. Service class describes command line manipulations, such as task capacity (how to specify how much CPUs to use ('mantra - j @AF_CAPACITY@')).
+</p>
+<p>
+Parser - read task output to calculate running progress.
+Parsers are python classes and can be combined (multiply inheritance),
+for example: 'hbatch_mantra' - inherits 'hbatch' and 'mantra' parsers to listen to tasks when Houdini generates a files for mantra,
+such parser listen for frames switching (when several frames per render set) and calculates valid percentage.<br/>
+Parser can produce errors or warnings if it founds "bad" text.
+So render can stop task with error if it produced bad output.
+</p>
+
+<h4>Job - Block - Task</h4>
+<p>
+Job consists of blocks, which produce tasks.
+There are two types of blocks <i>numeric</i> and not.
+Numeric block don't store tasks data, it generates tasks 'on-the-fly' by some rules.
+Not numeric blocks contains data for each task.
+Task inherits most attributes from block (for example all block tasks has the same working directory).
+But some other attributes individual (commands for example).
+</p>
+<h5>1 000 000 Tasks Job !</h5>
+As Tasks are generated by job blocks "on demand",
+Afanasy (and Server and GUI) can handle <i>numeric</i> blocks with huge tasks number.
+</p>
+
+<h4>Farm setup</h4>
+<p>
+Map hosts names and their abilities through patterns described in XML file.
+You can describe job and block '<i>need</i>' properties to be able to run only on hosts which satisfy this needs(OS, free memory etc.).
+Server can reload this file (and reconfigure itself) "on-the-fly", without restart and keep tasks running.
+</p>
+
+<h4>Watch - minimalistic GUI to afanasy</h4>
+<p>
+Watch - afanasy monitor. It can be in three modes - USER, VISOR and GOD.<br/>
+<i>USER</i> ( common mode ) - user can change any his and any his job parameter.
+He can manipulate render host which was registered with it's user name or if it contains user computer name<br/>
+<i>VISOR</i> ( super user mode ) - can do same as user but he change or remove job of any user.<br/>
+<i>GOD</i> ( super user mode ) - can do anything.
+Change any parameter of any user, job or host. Add or delete users. Start, stop, restart any render host.<br/>
+</p>
+
+<h4>Web Visor</h4>
+<p>
+Web interface to afanasy database to show current state tables or draw history usage statistics diagrams.
+</p><p>
+All calculations and database queries are on the server side, simple HTML text and PNG images provided to client.
+So client needs no libraries or plug-ins for it, any browser will be enough.
+</p>
+
+<h4>SQL Database Connection</h4>
+<p>
+Afanasy server can connect SQL database.
+It process it through Qt classes, you can query available SQL drivers for your system by <code>afcmd</code> command line utility.
+Postgre SQL, MySQL and SQLite are available for most common systems. It can be chosen in configuration file.
+Postgre SQL (QPSQL) is set as default. <br/>
+Afanasy stores jobs and users information in database. It get this information back on start.
+So you can shut down afanasy, and it will restore it's state on start again.
+Also you can type any SQL query to get some afanasy information yourself.
+</p>
+
+<h4>Command Line Interface</h4>
+<p>
+Afanasy has a command line interface for various purposes.
+It can connect to Afanasy server from remote Linux machine.
+You can set some server parameter "on-the-fly".
+Change some user, job and host attributes.
+Query users, jobs, hosts attributes and traffic statistics.
+</p>
+<h4>Job Example</h4>
+<pre>
+
+   #!/usr/bin/env python
+
+   import af
+
+   job = af.Job('example job')
+
+   block = af.Block('block of tasks')  
+   block.setWorkingDirectory('/home')  
+
+   task = af.Task('simple task')
+   task.setCommand('ls -l')
+
+   block.tasks.append(task)
+   job.blocks.append(block)
+
+   job.send()
+
+</pre>
+
+<p>
+You can write any custom job directly in python, or use some GUI to generate jobs. Use some already written job generators (see <i>'Software Integration'</i> chapter) or write your own.
+</p>
+
+<h4>Farm Patterns Example</h4>
+<pre>
+
+   &lt;farm&gt;
+      &lt;pattern name="Some Host"&gt;
+         &lt;mask&gt;.*&lt;/mask&gt;
+         &lt;description&gt;Unrecognized machine&lt;/description&gt;
+         &lt;capacity&gt;1200&lt;/capacity&gt;
+         &lt;maxtasks&gt;2&lt;/maxtasks&gt;
+         &lt;power&gt;100&lt;/power&gt;
+         &lt;service name="generic" /&gt;
+      &lt;/pattern&gt;
+      &lt;pattern name="Render Host"&gt;
+         &lt;mask&gt;r.*&lt;/mask&gt;
+         &lt;description&gt;Some render machine&lt;/description&gt;
+         &lt;os&gt;linux&lt;/os&gt;
+         &lt;capacity&gt;2400&lt;/capacity&gt;
+         &lt;maxtasks&gt;4&lt;/maxtasks&gt;
+         &lt;power&gt;1000&lt;/power&gt;
+         &lt;properties&gt;intel nvidiagpu&lt;/properties&gt;
+         &lt;service name="generic" /&gt;
+         &lt;service name="nuke" /&gt;
+         &lt;service name="hbatch" /&gt;
+         &lt;service name="prman" /&gt;
+         &lt;service name="mantra" /&gt;
+         &lt;service name="hbatch_prman" /&gt;
+         &lt;service name="hbatch_mantra" /&gt;
+         &lt;service name="maya" /&gt;
+      &lt;/pattern&gt;
+   &lt;/farm&gt;
+
+</pre>
+<p>
+When some machine registers on server, it finds last pattern with mask that match it's hostname. So '.*' first mask put at the top to give any machine some properties.
+</p>
+
+<h4>See <a href="index.html">full documentation</a> for details.</h4>
+
+</td><td align="center" valign="middle">
+<p>
+<b>
+Watch Renders<br/>
+<img hspace="10" vspace="10" src="images/watch/renders_features.png" alt="watch/renders.png"/><br/>
+<br/><br/>
+Watch Jobs<br/>
+<img hspace="10" vspace="10" src="images/watch/jobs.png" alt="watch/jobs.png"/><br/>
+<br/><br/>
+1 000 000 Tasks Job:<br/>
+<img hspace="10" vspace="10" src="images/watch/million_job.png" alt="watch/million_job.png"/><br/>
+<br/><br/>
+Watch Job Tasks<br/>
+<img hspace="10" vspace="10" src="images/watch/job_tasks_block.png" alt="watch/job_tasks_block.png"/><br/>
+<br/><br/>
+Watch Users<br/>
+<img hspace="10" vspace="10" src="images/watch/users.png" alt="watch/users.png"/><br/>
+<br/><br/>
+Web Visor Statistics Chart - Service Type / Tasks Number<br/>
+<img hspace="10" vspace="10" width="400" height="300" src="images/visor/chart_service_tasks.png" alt="visor/chart_service_tasks.png"/><br/>
+<br/><br/>
+Web Visor Statistics Chart - User Name / Jobs Quantity<br/>
+<img hspace="10" vspace="10" width="400" height="300"  src="images/visor/chart_user_jobs.png" alt="visor/chart_user_jobs.png"/><br/>
+</b>
+</p>
+</td></tr></table>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Watch
-Comment=Afanasy Watch GUI
-Exec=/opt/cgru/afanasy/bin/afwatch
-Icon=afwatch
-Terminal=false
-Type=Application
-Categories=X-CGRU

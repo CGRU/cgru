@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Render Configuration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h2 align="center">Afanasy Render Configuration</h2>
+<hr />
+
+<p>See <a href="server_config.html">server configuration</a> about XML configuration files.</p>
+
+<ul>
+<li><p>
+<code>render_default_capacity</code> = 1000<br/>
+Default render capacity value, if not set in farm config.
+</p></li>
+<li><p>
+<code>render_default_maxtasks</code> = 5<br/>
+Maximum allowed simultaneously running tasks on render, if not set in farm config.
+</p></li>
+<li><p>
+<code>render_hddspace_path</code> = /<br/>
+Path to measure free disk space ('/' - for MS Windows means the root of the system disk).
+</p></li>
+<li><p>
+<code>render_networkif</code> = (?!lo$).*<br/>
+Network interface(s) name pattern to measure network traffic on.
+It will be a sum of traffic if several interfaces matching pattern are founded.
+Specified above default pattern matches any name except <i>lo</i> (loopback interface name).
+</p></li>
+<li><p>
+<code>render_iostat_device</code> = sda<br/>
+Device to measure disk IO statistics (for MS Windows - statistics only for first disk available).
+</p></li>
+<li><p>
+<code>render_resclasses</code> = example;iostat<br/>
+Custom resources meter(s). Python class name(s), if several - list separated with ';' character.
+</p></li>
+<li><p>
+<code>render_customiostat_devices</code> = sda<br/>
+Device(s) for custom python resource meter "<i>iostat</i>".
+To watch several devices use regular expression, for example "<i>sda[2-4]</i>".
+If several devices matching pattern are founded,
+it calculates the sum of traffic parameters and maximum of utilization parameters.
+</p></li>
+<li><p>
+<code>render_nice</code> = 10<br/>
+Renice task command process on render.
+</p></li>
+<li><p>
+<code>render_update_sec</code> = 5 (seconds)<br/>
+Render resources update interval.
+</p></li>
+<li><p>
+<code>render_updatetaskperiod</code> = 1 (seconds)<br/>
+Period to render to update task state or percentage (even if there is no parser).
+</p></li>
+<li><p>
+<code>render_zombietime</code> = 60 (seconds)<br/>
+Time to server to delete render if there is no update (resources usage) for this period.
+</p></li>
+<li><p>
+<code>render_connectretries</code> = 3<br/>
+Connection fails times to consider to render that there is no connection to server.
+</p></li>
+<li><p>
+<code>render_waitforconnected</code> = 15000 (milliseconds)<br/>
+Time to wait for connection establishing to consider that connection is available.
+</p></li>
+<li><p>
+<code>render_waitforreadyread</code> = 15000 (milliseconds)<br/>
+Time to wait for incoming data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>render_waitforbyteswritten</code> = 15000 (milliseconds)<br/>
+Time to wait for writing data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>render_logs_linesmax</code> = 100<br/>
+Server truncates log above this limit.
+</p></li>
+<li><p>
+<code>render_logs_rotate</code> = 10<br/>
+Server store logs of renders with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
+</p></li>
+<!--
+<li><p>
+<code>render_exec</code> = afrender<br/>
+Command for render to execute another render or to restart.
+</p></li>
+-->
+<li><p>
+<code>render_cmd_reboot</code> = reboot<br/>
+Command for render to reboot a machine. For MS Windows you can use "shutdown /r".
+</p></li>
+<li><p>
+<code>render_cmd_shutdown</code> = shutdown -P 1 afrequest<br/>
+Command for render to shutdown a machine. For MS Windows you can use "shutdown /s".
+</p></li>
+</ul>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

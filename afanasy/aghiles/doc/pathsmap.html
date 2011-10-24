@@ -1,0 +1,171 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Paths Map</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h2 align="center">Afanasy Paths Map</h2>
+<hr />
+
+<p>
+Afanasy has an ability to map paths.
+Every client can have a paths map file to translate paths to server and from server.
+</p>
+<p>
+Paths map desribed in <kbd>pathmap*</kbd> file(s).
+</p>
+<p>
+When job constructs (on the client side) all commands and working directories are translated from client to server.
+When task starts (on the client side) all commands and working directories are translated from server to client.
+Server does know nothing about paths map.
+</p>
+<p>
+At first Afanasy searches pathsmap files at home in "~./afanasy/pathmap*", so every user can customize paths.
+Then in a current directory ".", and every client can have some paths map.
+And at last in Afanasy root directory "AF_ROOT", which can be the same (network) for everyone during job submission.
+Each next file append previous paths.
+</p>
+<p>
+Client read this file(s) each time task starts.
+If there is no such file(s), or everything in it commented, paths will not be mapped at all.
+</p>
+
+<table><tr><td>
+<h3>Paths map file example:</h3>
+<pre>
+
+   #     Client:                 Server:
+
+   \\server\projects\          /cg/projects/   
+
+</pre>
+</td></tr></table>
+
+<h3>Paths map file syntax:</h3>
+<p>
+<b> # </b> : comment<br/>
+<b>Client path</b> <b>server_path</b> : entry<br/>
+Last space(s) is separator, so sever path can't contain spaces.<br/>
+Empty or containing only spaces lines are ignored.<br/>
+Spaces an the beginning or at the end of line are ignored.<br/>
+On MS Windows platform client paths changed to lower case.<br/>
+</p>
+
+<h3>MS Windows platform issues:</h3>
+<ul>
+<li>
+When client searches a pattern it converts paths in lower case.
+So no matter how client wrote a path '\\server\projects\', '\\SERVER\PROJECTS\', '\\SERVER\projects\' or '\\server\PROJECTS\'.
+</li>
+<li>
+All separators in client path are translated to '<b>\</b>' even if application uses Unix slashes.
+Some applications allows client to use and '<b>\</b>' and '<b>/</b>' slashes,
+so pattern will be matched in any case, even in mixed slashes.
+</li>
+<li>
+Module (Python Class) can works in 'UnixSeparators' mode.
+During translation from server to client it uses '<b>\</b>' slashes for client paths.
+For example NUKE uses only '<b>\</b>' slashes on any platform.
+</li>
+</ul>
+
+<h3>Real working paths map file:</h3>
+<table><tr><td>
+<pre>
+
+   #     Client:             Server:
+   
+   P:\tdh\                 /bz/prj/tdh/
+   P:\                     /bz/prj/
+   \\stor\projects\        /bz/prj/
+   \\stor\tdh\             /bz/prj/tdh/
+   
+   T:\cgru\                /bz/etc/cgru/
+   T:\                     /bz/etc/
+   \\soft\config\          /bz/etc/
+   
+   C:\bz\bin\cgru\         /bz/bin/cgru/
+   
+   # For tests:
+   C:\bz\bin\cgru\         /cg/tools/cgru/
+   C:\bz\bin\cgru\afanasy\ /cg/tools/cgru/afanasy/trunk/   
+
+</pre>
+</td></tr></table>
+<p>Notice that 'tdh' project has two windows shares: '\\stor\projects\tdh' and '\\stor\tdh'.
+Some windows users have 'STOR' and others have 'stor' as the same fileserver name.
+And it works!</p>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

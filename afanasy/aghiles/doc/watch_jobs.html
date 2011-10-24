@@ -1,0 +1,162 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Watch Jobs</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+<h2 align="center">Watch - Jobs</h2>
+<hr />
+
+<table>
+   <caption>Jobs Tab</caption>
+   <tr>
+      <td align="right" width="40%">
+         RMB Menu<br />
+         <img src="images/watch/jobs_rmb.png" alt="jobs_rmb"/>
+      </td>
+      <td align="center" width="20%">
+         <img src="images/watch/jobs.png" alt="jobs"/>
+      </td>
+      <td align="left" width="40%">
+         Tooltip<br />
+         <img src="images/watch/jobs_tooltip.png" alt="jobs_tooltip"/>
+      </td>
+   </tr>
+</table>
+
+<p>
+<font color="#FF5010" size="5">&#9733;</font> with a number means running tasks number.
+</p>
+<p><code>0:01.28 - tima</code> - Tima's job started 0 hours 1 minutes and 28 second ago.</p>
+<p><code>m-1_p99</code> - Maximum hosts = -1 (no limit), job priority = 99.</p>
+<p>
+Running Time:<br/>
+<code>RT-s12:18/46a</code><br/>
+All done tasks running time sum = 0 hours 12 minutes 18 seconds.<br/>
+Average done tasks running time = 0 hours 0 minutes 46 seconds.<br/>
+</p>
+<p>
+Errors solving:<br/>
+<code>E-2b|2t|0h|3r</code><br/>
+For block to avoid host = 2.<br/>
+For task to avoid host = 2.<br/>
+Automatic task error retries = 2.<br/>
+Tasks maximum run time = 0 hours (unlimited).<br/>
+</p>
+<p>
+Error hosts &amp Avoiding hosts:<br/>
+<code>no err hosts</code> - no hosts produced errors ( so no hosts to avoid too).<br/>
+<code>e1/0a</code> - 1 host produced error(s), no hosts to avoid.<br/>
+<code>e1/1A</code> - 1 host produced error(s), 1 host to avoid.<br/>
+</p>
+<p><code>61% infdept_87_tif</code> - in block named 'infdept_87_tif' 89% done tasks.</p>
+<p><code>b2-t18 r6/2 d10/0e</code><br/>
+block number '0' has 123 tasks.<br/>
+4 tasks running and 12 ready.<br/>
+107 tasks done and 0 errors.<br/>
+</p>
+
+<h3>Right mouse button (RMB) menu:</h3>
+<p><b>Show log</b> - request job log from server.</p>
+<p>Move Jobs:<br />
+You can move jobs in user jobs list. Note that job can move only jobs with the same priority.</p>
+<p><b>Move up</b> - move job one position up in user list.</p>
+<p><b>Move down</b> - move job one position down in user list.</p>
+<p><b>Move top</b> - move job top in user list.</p>
+<p><b>Move bottom</b> - move job bottom in user list.</p>
+<p><b>Set max hosts</b> - set <a href="job.html#MaxHosts">job maximum hosts</a>.</p>
+<p><b>Set hosts mask</b> - set <a href="job.html#HostsMask">job hosts mask</a>.</p>
+<p><b>Set hosts exclude mask</b> - set <a href="job.html#HostsMaskExclude">job exclude hosts mask</a>.</p>
+<p><b>Set priority</b> - set <a href="job.html#Priority">job priority</a>.</p>
+<p><b>Set depend mask</b> - set <a href="job.html#DependMask">job depend mask</a>.</p>
+<p><b>Set global depend mask</b> - set <a href="job.html#DependMaskGlobal">job depend mask</a>.</p>
+<p><b>Set wait time</b> - set <a href="job.html#DependMaskGlobal">job wait time</a>.</p>
+<p><b>Set OS needed</b> - set <a href="job.html#NeedOS">job needed OS</a>.</p>
+<p><b>Set properties needed</b> - set <a href="job.html#NeedProperties">job needed properties</a>.</p>
+<p><b>Start</b> - start offline (<small>OFF</small>) job.</p>
+<p><b>Pause</b> - set job offline (<small>OFF</small>).</p>
+<p><b>Restart errors</b> - restart all job error(<small>ERR</small>) tasks.</p>
+<p><b>Stop</b> - set job offline (<small>OFF</small>) and stop all running tasks.</p>
+<p><b>Restart</b> - restart all tasks.</p>
+<p><b>Restart&amp;Pause</b> - set job offline (<small>OFF</small>) and stop all tasks.</p>
+<p><b>Listen</b> - ask renders to send all job running tasks output to watch.</p>
+<p><b>Set blocks avoid errors</b> - Set <a href="job_block.html#ErrorsAvoidHost">Errors Avoid Host</a> for all job blocks.</p>
+<p><b>Set tasks avoid errors</b> - Set <a href="job_block.html#ErrorsTaskSameHost">Errors Task Same Host</a> for all job blocks.</p>
+<p><b>Set task errors retries</b> - Set <a href="job_block.html#ErrorRetries">Error Retries</a> for all job blocks.</p>
+<p><b>Set task maximum run time</b> - Set <a href="job_block.html#ErrorsTaskSameHost">Errors Task Same Host</a> for all job blocks.</p>
+<p><b>Show error hosts</b> - Show hosts list where tasks have errors.</p>
+<p><b>Reset error hosts</b> - Reset all blocks error hosts list.</p>
+<p><b>Delete</b> - Delete job (it deletes from database too, minimum information put into statistics tables).</p>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>
