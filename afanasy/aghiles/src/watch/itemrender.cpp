@@ -337,6 +337,11 @@ void ItemRender::updateValues( af::Node *node, int type)
 
 void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) const
 {
+   assert( painter );
+
+   if( !painter )
+      return;
+ 
    // Calculate some sizes:
    int x = option.rect.x(); int y = option.rect.y(); int w = option.rect.width(); int h = option.rect.height();
 
@@ -427,6 +432,14 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       std::list<const QPixmap*>::const_iterator ii = tasksicons.begin();
       for( int numtask = 1; it != tasks.end(); it++, ii++, numtask++)
       {
+         const QPixmap *pixmap_ptr = *ii;
+         if( !pixmap_ptr )
+         {
+            continue;
+         }
+
+         const QPixmap &pixmap = *pixmap_ptr;
+
          QString taskstr = QString("%1").arg((*it)->getCapacity());
          if((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
          taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str())).arg(QString::fromUtf8((*it)->getBlockName().c_str())).arg(QString::fromUtf8((*it)->getName().c_str()));
@@ -436,7 +449,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
             QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
          painter->drawText( x+18, y, w-30-rect_usertime.width(), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
-         painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, *(*ii));
+         painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, pixmap );
       }
       painter->drawText( x+5, y, w-10, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
    }
