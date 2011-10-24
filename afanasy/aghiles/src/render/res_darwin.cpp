@@ -63,11 +63,14 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    {
       // number of pocessors
       host.cpu_num = sysconf(_SC_NPROCESSORS_ONLN);
+
       // frequency of first pocessor
-      unsigned hz;
-      size_t size = sizeof( hz);
-      if( sysctlbyname("hw.cpufrequency", &hz, &size, NULL, 0) == -1) perror("sysctlbyname");
-      else host.cpu_mhz = hz >> 20;
+      uint64_t hz;
+      size_t size = sizeof(hz);
+      if( sysctlbyname("hw.cpufrequency", &hz, &size, NULL, 0) == 0)
+         host.cpu_mhz = hz >> 20;
+      else 
+         perror( "sysctlbyname" ); 
    }
    //
    // Memory & Swap total and usage:
