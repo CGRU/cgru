@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Mavishky
-Comment=Image Sequence Encoder GUI
-Exec=/opt/cgru/utilities/moviemaker/dialog.sh
-Icon=cgrumavishky
-Terminal=false
-Type=Application
-Categories=X-CGRU

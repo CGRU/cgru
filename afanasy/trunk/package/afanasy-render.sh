@@ -7,8 +7,5 @@ installdir=$3
 [ -z "$installdir" ] && exit
 
 # Copying files:
-mkdir -p $pack/$installdir/afanasy/bin
-cp -r $src/afanasy/bin/afrender $pack/$installdir/afanasy/bin
 
-mkdir -p $pack/$installdir/afanasy/launch
-cp -r $src/afanasy/launch/afrender.sh $pack/$installdir/afanasy/launch
+# No files to copy needed. Package needed only for init script.

@@ -1,7 +1,0 @@
-[Desktop Entry]
-Name=Maya
-Comment=Maya with CGRU
-Exec=bash -c "cd /opt/cgru/examples/maya && ./maya"
-Terminal=false
-Type=Application
-Categories=X-CGRU-EXAMPLES

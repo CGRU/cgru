@@ -46,6 +46,61 @@
 Linux packages will be installed in <kbd>/opt/cgru</kbd> folder.
 </p>
 
+<table border="0" width="100%">
+<tr aligh="center">
+   <td width="30%">
+      <h3>Packages Dependence Structure:</h3>
+   </td>
+   <td>
+      <h3>Description:</h3>
+   </td>
+</tr>
+<tr aligh="center">
+<td>
+<ul>
+<li>
+   cgru
+   <ul>
+   <li>
+      afanasy-render
+      <ul>
+      <li>
+         afanasy-common
+         <ul>
+         <li>
+            cgru-common
+         </li>
+         </ul>
+      </li>
+      </ul>
+   </li>
+   </ul>
+</li>
+<li>
+   afanasy-server
+   <ul>
+   <li>
+      afanasy-common
+      <ul>
+      <li>
+         cgru-common
+      </li>
+      </ul>
+   </li>
+   </ul>
+</li>
+</ul>
+</td>
+<td width="50%">
+<p><b>cgru</b>: Start menu item.</p>
+<p><b>cgru-common</b>: All files, except Afanasy binaries.<br/></p>
+<p><b>afanasy-common</b>: Afanasy binary files.</p>
+<p><b>afanasy-render</b>: Afanasy render startup script. Creates '<i>render</i>' user if does not exists.</p>
+<p><b>afanasy-server</b>: Afanasy server startup script. Creates '<i>render</i>' user if does not exists.</p>
+</td>
+</tr>
+</table>
+
 <h3>Setup Files:</h3>
 <ul>
 <li>
@@ -135,54 +190,29 @@ CGRU Examples launch software with CGRU and Afanasy tools (scripts, plugins etc)
 
 <h3>Packages Description:</h3>
 
-<h4><a name="afanasy-server"/>afanasy-server</h4>
+<h4><a name="afanasy-server">afanasy-server</a></h4>
 <p>
-Afanasy server and its startup scripts.
+Afanasy server startup script.
 </p>
 
-<h4><a name="afanasy-render"/>afanasy-render</h4>
+<h4><a name="afanasy-render">afanasy-render</a></h4>
 <p>
-Afanasy render and its startup scripts.
+Afanasy render startup script.
 </p>
 
-<h4><a name="afanasy-gui"/>afanasy-gui</h4>
+<h4><a name="afanasy-common">afanasy-common</a></h4>
 <p>
-Afanasy GUI includes Watch, Talk, Monitor and their menuitems.
+Afanasy binary files.<br/>
 </p>
 
-<h4><a name="afanasy-plugins"/>afanasy-plugins</h4>
+<h4><a name="cgru">cgru</a></h4>
 <p>
-Afanasy plugins to launch jobs directly from other applications.
+Doncumentation and start menu item.<br/>
 </p>
 
-<h4><a name="afanasy-doc"/>afanasy-doc</h4>
+<h4><a name="cgru-common">cgru-common</a></h4>
 <p>
-Afanasy documentation.
-</p>
-
-<h4><a name="afanasy-webvisor"/>afanasy-webvisor</h4>
-<p>
-Afanasy web visor.
-</p>
-
-<h4><a name="afanasy-common"/>afanasy-common</h4>
-<p>
-Afanasy common files, needed by any Afanasy package.
-</p>
-
-<h4><a name="cgru"/>cgru</h4>
-<p>
-Afanasy client packages (all except server and web visor).<br/>
-Open EXR files join utility.<br/>
-Movie Maker.<br/>
-Regular Expression Checker.<br/>
-Examples - launch scripts and scenes for applications with CGRU and Afanasy plugins setup.
-</p>
-
-<h4><a name="cgru-common"/>cgru-common</h4>
-<p>
-Common files needed by CGRU, Afanasy GUI and documentation.
-It is an applications menu, some images and styles for HTML.
+All files, exept documentation and Afanasy binaries.<br/>
 </p>
 
 <h3>Installation:</h3>

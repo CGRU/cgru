@@ -3,12 +3,14 @@
 output="$1"
 install_cgru="install_cgru.sh"
 install_afserver="install_afserver.sh"
+install_afrender="install_afrender.sh"
 uninstall="uninstall.sh"
 template="install_template"
 
-packages_cgru="afanasy-common cgru-common afanasy-plugins afanasy-render afanasy-doc afanasy-gui cgru"
-packages_afserver="afanasy-common afanasy-server"
-packages_uninstall="cgru afanasy-gui afanasy-doc afanasy-render afanasy-plugins afanasy-server cgru-common afanasy-common"
+packages_cgru="cgru-common afanasy-common afanasy-render cgru"
+packages_afrender="cgru-common afanasy-common afanasy-render"
+packages_afserver="cgru-common afanasy-common afanasy-server"
+packages_uninstall="cgru afanasy-render afanasy-server afanasy-common cgru-common"
 
 [ -z "${PACKAGE_MANAGER}" ] && source ./distribution.sh
 [ -z "${PACKAGE_MANAGER}" ] && exit 1
@@ -26,6 +28,7 @@ fi
 
 cp -f "${template}" "${output}/${install_cgru}"
 cp -f "${template}" "${output}/${install_afserver}"
+cp -f "${template}" "${output}/${install_afrender}"
 cp -f "${template}" "${output}/${uninstall}"
 
 if [ -z "$PACKAGE_MANAGER" ]; then
@@ -63,6 +66,9 @@ function writeCommands(){
 afile=${install_cgru}
 writeCommands ${packages_cgru}
 
+afile=${install_afrender}
+writeCommands ${packages_afrender}
+
 afile=${install_afserver}
 writeCommands ${packages_afserver}
 
@@ -73,5 +79,6 @@ done
 cd $curdir
 
 chmod a+rwx "${output}/${install_cgru}"
+chmod a+rwx "${output}/${install_afrender}"
 chmod a+rwx "${output}/${install_afserver}"
 chmod a+rwx "${output}/${uninstall}"

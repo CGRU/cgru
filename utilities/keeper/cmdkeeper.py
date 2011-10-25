@@ -33,7 +33,10 @@ def send( data, host = 'localhost', port = -1, verbose = False):
 
 if len( sys.argv) < 2: usageExit()
 
-cmd = bytes( sys.argv[-1],'utf-8')
+try:
+   cmd = bytes( sys.argv[-1],'utf-8')
+except:
+   cmd = bytes( sys.argv[-1])
 port = -1
 host = 'localhost'
 

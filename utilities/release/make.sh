@@ -13,7 +13,7 @@ done
 # Location:
 cgruRoot="../.."
 
-function rcopy(){ rsync -rL --exclude '.svn' --exclude '*.pyc' $1 $2; }
+function rcopy(){ rsync -rL --exclude '.svn' --exclude '__pycache__' --exclude '*.pyc' $1 $2; }
 
 # Version and revision:
 packsver=`cat $cgruRoot/version.txt`

@@ -8,25 +8,14 @@ function usage(){
       echo "ERROR: $ErrorMessage"
    fi
    echo "Usage:"
-   echo "   `basename $0` AFANASY_BRANCH [clear|rebuild]"
+   echo "   `basename $0` [clear|rebuild]"
    echo "Example:"
-   echo "   `basename $0` afanasy/trunk rebuild"
+   echo "   `basename $0` rebuild"
    exit
 }
 
-# Check Afanasy location:
-afanasy=$1
-if [ -z $afanasy ]; then
-   ErrorMessage="Afanasy branch not specitied."
-   usage
-fi
-if [ ! -d "${cgruRoot}/${afanasy}" ]; then
-   ErrorMessage="Afanasy directory '$cgruRoot/$afanasy' does not exists."
-   usage
-fi
-
 # Get action:
-action=$2
+action=$1
 if [ -z "${action}" ]; then
    echo 'Building icons...'
 elif [ "${action}" == "clear" ]; then
@@ -36,14 +25,7 @@ elif [ "${action}" == "rebuild" ]; then
 fi
 
 # Icons directories:
-iconsdirssrc="\
-doc/icons \
-utilities/release/icons \
-utilities/regexp/icons \
-utilities/moviemaker/icons \
-${afanasy}/icons \
-${afanasy}/doc/icons \
-"
+iconsdirssrc="icons"
 for iconsdir in $iconsdirssrc; do
 
    # Check icons directory:

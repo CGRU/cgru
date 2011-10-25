@@ -1,11 +1,8 @@
 #!/bin/bash
 
-echo "Afanasy common PRE REMOVE:"
+echo "Afanasy common pre remove, exiting Afanasy applications:"
 
-pkill afcmd || true
-
-if [ -d /opt/cgru/afanasy/python ]; then
-   find /opt/cgru/afanasy/python -type f -name *.pyc -exec rm -vf {} \;
-fi
+# Quit applications:
+for p in afcmd afwatch aftalk afmonitor; do pkill $p || true; done
 
 exit 0

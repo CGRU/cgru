@@ -1,10 +1,11 @@
 #!/bin/bash
 
-echo "CGRU common PRE REMOVE:"
+echo "CGRU-common PRE REMOVE:"
 
-pydir="/opt/cgru/lib/python"
-if [ -d "${pydir}" ]; then
-   rm -rf "${pydir}"
+/opt/cgru/utilities/keeper/cmdkeeper.sh quit
+if [ -d /opt/cgru ]; then
+   find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
+   find /opt/cgru -type d -name __pycache__ -exec rm -rvf {} \;
 fi
 
 exit 0

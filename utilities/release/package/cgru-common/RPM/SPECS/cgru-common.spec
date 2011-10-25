@@ -9,8 +9,10 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
+AutoReqProv:   no
+
 %description
-Description of myrpmtest.
+CGRU files.
 
 %prep
 
@@ -18,7 +20,7 @@ Description of myrpmtest.
 
 %install
 cd ../..
-dirs="etc usr opt"
+dirs="opt"
 for dir in $dirs; do
    mkdir -p $RPM_BUILD_ROOT/$dir
    mv $dir/* $RPM_BUILD_ROOT/$dir
@@ -26,22 +28,20 @@ done
 
 %files
 %defattr(-,root,root)
-/etc
-/usr
 /opt
 
 %clean
 
 %post
-echo "CGRU common POST INSTALL"
-pydir="/opt/cgru/lib/python"
-[ -d "${pydir}" ] && chmod a+rwx "${pydir}"
+echo "CGRU-common post install:"
+find /opt/cgru -type d -exec chmod a+rwx {} \;
 exit 0
 
 %preun
-echo "CGRU common PRE REMOVE: $1"
+echo "CGRU-common pre remove: $1"
 [ "$1" != "0" ] && exit 0
-echo "Cleaning cgru/lib/python"
-pydir="/opt/cgru/lib/python"
-[ -d "${pydir}" ] && rm -rf "${pydir}"
+/opt/cgru/utilities/keeper/cmdkeeper.sh quit
+echo "Cleaning CGRU"
+[ -d /opt/cgru ] && find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
+[ -d /opt/cgru ] && find /opt/cgru -type d -name __pycache__ -exec rm -rvf {} \;
 exit 0

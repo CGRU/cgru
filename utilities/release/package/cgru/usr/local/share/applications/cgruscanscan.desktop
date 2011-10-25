@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=ScanScan
-Comment=Image Sequences Search And Encode
-Exec=/opt/cgru/utilities/moviemaker/scandialog.sh
-Icon=cgruscanscan
-Terminal=false
-Type=Application
-Categories=X-CGRU

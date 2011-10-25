@@ -9,7 +9,7 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
-Requires:      cgru-common = @VERSION@, afanasy-doc = @VERSION@, afanasy-gui = @VERSION@, afanasy-render = @VERSION@, afanasy-plugins = @VERSION@
+Requires:      cgru-common = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@
 AutoReqProv:   no
 
 %description
@@ -21,7 +21,7 @@ Description of myrpmtest.
 
 %install
 cd ../..
-dirs="etc usr opt"
+dirs="usr"
 for dir in $dirs; do
    mkdir -p $RPM_BUILD_ROOT/$dir
    mv $dir/* $RPM_BUILD_ROOT/$dir
@@ -29,20 +29,10 @@ done
 
 %files
 %defattr(-,root,root)
-/etc
-/opt
 /usr
 
 %clean
 
 %post
-echo "CGRU plugins POST INSTALL"
-find /opt/cgru -type d -exec chmod a+rwx {} \;
-exit 0
 
 %preun
-echo "CGRU plugins PRE REMOVE: $1"
-[ "$1" != "0" ] && exit 0
-echo "Cleaning CGRU"
-[ -d /opt/cgru ] && find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
-exit 0

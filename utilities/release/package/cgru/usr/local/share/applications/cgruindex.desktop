@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=CGRU
-Comment=CGRU site with documentation
-Exec=/opt/cgru/bin/showdoc.py
-Icon=cgruindex
-Terminal=false
-Type=Application
-Categories=X-CGRU

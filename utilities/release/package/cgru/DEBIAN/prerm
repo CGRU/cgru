@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "CGRU plugins PRE REMOVE:"
-
-if [ -d /opt/cgru ]; then
-   find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
-fi
-
-exit 0

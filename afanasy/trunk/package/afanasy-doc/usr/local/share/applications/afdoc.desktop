@@ -1,8 +1,0 @@
-[Desktop Entry]
-Name=Afanasy
-Comment=Afanasy local HTML documentation
-Exec=/opt/cgru/bin/showdoc.py afanasy/doc/index.html
-Icon=afdoc
-Terminal=false
-Type=Application
-Categories=X-CGRU
