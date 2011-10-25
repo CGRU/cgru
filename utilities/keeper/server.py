@@ -13,7 +13,7 @@ class Server( QtNetwork.QTcpServer):
       self.setMaxPendingConnections(1)
       self.port = int( cgruconfig.VARS['keeper_port'])
       QtCore.QObject.connect( self, QtCore.SIGNAL('newConnection()'), self.connection)
-      if not self.listen( port = self.port):
+      if not self.listen( QtNetwork.QHostAddress(QtNetwork.QHostAddress.Any), self.port):
          print('Can`t listen %d port.' % self.port)
       else:
          print('Listening %d port...' % self.port)
