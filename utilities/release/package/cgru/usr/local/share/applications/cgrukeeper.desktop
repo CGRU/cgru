@@ -2,7 +2,7 @@
 Name=CGRU - Afanasy
 Comment=CGRU Keeper
 Exec=/opt/cgru/start.sh
-Icon=cgruicon
+Icon=cgrumenuitem
 Terminal=false
 Type=Application
 Categories=Graphics

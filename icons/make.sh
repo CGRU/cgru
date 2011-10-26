@@ -1,9 +1,9 @@
 #!/bin/bash
 
-icons="keeper regexp dailies scanscan"
+icons="keeper regexp dailies scanscan afwatch aftalk"
 size="128"
 
-iconslinux="cgruicon"
+iconslinux="cgrumenuitem"
 iconsdir="icons/hicolor"
 svgdir="$iconsdir/scalable/apps"
 sizes="16 22 24 32 36 48 64 72 96 128 192"
