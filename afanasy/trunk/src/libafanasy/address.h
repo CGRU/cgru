@@ -48,10 +48,6 @@ public:
 #ifndef WINNT
 /// Set sockaddr_in structure address.
    bool setSocketAddress( struct sockaddr_storage & ss) const;
-#endif
-
-/// Set new IP address.
-   void setIP( const Address & other);
 
 /// return the correct size of a 'sockaddr'. This size is needed by "connect" for example.
    inline size_t sizeofAddr( void ) const
@@ -61,8 +57,10 @@ public:
       /// Assume IPv4. if family is empty nothing works anyway.
       return sizeof(sockaddr_in);
    }
+#endif
 
-
+/// Set new IP address.
+   void setIP( const Address & other);
 
    void generateIPStream( std::ostringstream & stream, bool full = false) const;
    const std::string generateIPString( bool full = false) const;
