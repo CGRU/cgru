@@ -71,7 +71,7 @@ class Dialog( QtGui.QWidget):
       # Output images:
       lImages = QtGui.QHBoxLayout()
       generallayout.addLayout( lImages)
-      lImages.addWidget( QtGui.QLabel('Output images:', self))
+      lImages.addWidget( QtGui.QLabel('Output Images:', self))
       self.fields['outimages'] = QtGui.QLineEdit( self)
       lImages.addWidget( self.fields['outimages'])
       QtCore.QObject.connect( self.fields['outimages'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
