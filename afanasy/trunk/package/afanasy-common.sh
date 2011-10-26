@@ -10,6 +10,5 @@ installdir=$3
 mkdir -p $pack/$installdir/afanasy
 files="\
 afanasy/bin \
-afanasy/bin_pyaf \
 "
 for f in $files; do cp -r $src/$f $pack/$installdir/$f; done
