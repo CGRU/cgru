@@ -27,6 +27,6 @@ for s in $sizes; do
 done
 
 for icon in $icons; do
-   [ -f "${icon}.png" ] rm -fv "${icon}.png"
+   [ -f "${icon}.png" ] && rm -fv "${icon}.png"
    inkscape -w $size -h $size --export-png=${icon}.png ${icon}.svg
 done

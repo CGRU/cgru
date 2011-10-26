@@ -237,14 +237,14 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    }
 
    QMenu * custom_submenu = NULL;
+   int custom_cmd_index = 0;
    if(af::Environment::getRenderCmds().size() > 0)
    {
       menu.addSeparator();
       custom_submenu = new QMenu( "Custom", this);
-      int i = 0;
-      for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, i++)
+      for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, custom_cmd_index++)
       {
-         ActionId * actionid = new ActionId( i, QString("%1").arg( afqt::stoq(*it)), this);
+         ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
          custom_submenu->addAction( actionid);
       }
@@ -257,10 +257,9 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          menu.addSeparator();
          custom_submenu = new QMenu( "Custom", this);
       }
-      int i = 0;
-      for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++, i++)
+     for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++, custom_cmd_index++)
       {
-         ActionId * actionid = new ActionId( i, QString("%1").arg( afqt::stoq(*it)), this);
+         ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
          custom_submenu->addAction( actionid);
       }
@@ -565,7 +564,14 @@ void ListRenders::actRestoreDefaults()
 
 void ListRenders::actCommand( int number)
 {
-   if( number >= af::Environment::getRenderCmds().size())
+   std::list<std::string> commands;
+   // Create a list that contains and user and admin commands:
+   for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++)
+      commands.push_back( *it);
+   for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++)
+      commands.push_back( *it);
+
+   if( number >= commands.size())
    {
       displayError( "No such command.");
       return;
@@ -573,7 +579,7 @@ void ListRenders::actCommand( int number)
 
    QModelIndexList indexes( view->selectionModel()->selectedIndexes());
 
-   std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin();
+   std::list<std::string>::const_iterator it = commands.begin();
    for( int i = 0; i < number; i++ ) it++;
    QString cmd( afqt::stoq(*it));
 
@@ -581,7 +587,7 @@ void ListRenders::actCommand( int number)
    {
       bool ok;
       QString text = QInputDialog::getText(this, "Launch Command",
-         QString("Entrer string to replace %1 in\n%2").arg(AFWATCH::CMDS_ASKCOMMAND).arg(cmd), QLineEdit::Normal, "", &ok);
+         QString("Enter string to replace %1 in\n%2").arg(AFWATCH::CMDS_ASKCOMMAND).arg(cmd), QLineEdit::Normal, "", &ok);
       if( !ok) return;
       cmd.replace( AFWATCH::CMDS_ASKCOMMAND, text);
    }
