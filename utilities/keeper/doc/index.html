@@ -3,7 +3,7 @@
 <head>
 <link href="../../../doc/styles.css" rel="stylesheet" type="text/css">
 <link rel="shortcut icon" href="../icon.png" type="image/png" />
-<title>Afanasy Starter</title>
+<title>CGRU Keeper</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
@@ -40,52 +40,21 @@
 <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
 <!--HEADER-->
 
-<h1 align="center">Afanasy Starter.</h1>
+<h1 align="center">CGRU Keeper.</h1>
 
 <hr />
 
-<p>A dialog to submit a job to Afanasy.</p>
+<p>A system tray icon menu to launch and manage CGRU applications.</p>
 
-<p>
-<h3>Supported software:</h3>
-<ul>
-<li><i>Adobe After Effects</i></li>
-<li><i>Autodesk 3D Studio Max</i></li>
-<li><i>Autodesk Maya</i></li>
-<li><i>Autodesk SoftImage XSI</i></li>
-<li><i>Blender</i></li>
-<li><i>SideFX Houdini</i>
-   <ul>
-      <li><i>HBatch (hython)</i></li>
-      <li><i>Mantra (standalone)</i></li>
-   </ul>
-   </li>
-<li><i>The Foundry Nuke</i></li>
-</ul>
-</p>
+<p>Keeper designed to unify menu items and application managing on all supported platforms: Linux, MS Windows and Mac OS X.</p>
 
-<h3>Scene Settings:</h3>
-<p><img src="dialog_scene.png"/></p>
-<ul>
-<li><b>File</b>: Scene file path. IFD files sequence for <i>Mantra</i>.</li>
-<li><b>Working Directory/Project</b>: Tasks process working folder, default is scene folder. Project path for <i>Maya</i>.</li>
-<li><b>Output Images</b>: Some software allows to override output images in command line arguments.</li>
-<li><b>Frames</b>: Frame range to render, 'by' - frames step or increment, 'per task' - number of frames in one task.</li>
-<li><b>Node/Camera</b>: <i>Houdini</i> ROP, <i>Nuke</i> write node, <i>After FX</i> composition, <i>Max, Maya</i> camera to render.</li>
-<li><b>Take/Layer/Pass/Batch</b>: <i>Houdini</i> take, <i>SoftImage</i> pass, <i>Maya</i> layer, <i>Max</i> batch to render.</li>
-<li><b>Recent</b>: Store recent sent jobs settings.</li>
-<li><b>Start</b>: Submit job to Afanasy server. It can be started in off-line state ("paused").</li>
-</ul>
+<p><img src="tray_menu_linux.png" alt="tray_menu_linux.png"/></p>
 
-<h3>Afanasy Job Settings:</h3>
-<p><img src="dialog_job.png"/></p>
+<p>Launch:</p>
 <ul>
-<li><b>Name</b>: Job name. By default scene file name is used.</li>
-<li><b>Capacity</b>: Tasks capacity attribute value. '-1' means use the default.</li>
-<li><b>Priority</b>: Job order in user jobs list.</li>
-<li><b>Maximum Running Tasks</b>: Maximum number of tasks can be running at the same time.</li>
-<li><b>Depend Mask</b>: Job(s) name mask to wait to. <b>Global</b>: wait job(s) of any user.</li>
-<li><b>Hosts Mask</b>: Host(s) name mask to run on. <b>Exclude</b>: not to run on such hosts.</li>
+<li><b>MS Windows</b>: <kbd>cgru\start.cmd</kbd></li>
+<li><b>Linux</b>: <kbd>cgru/start.sh</kbd></li>
+<li><b>Mac OS X</b>: <kbd>cgru/start.sh</kbd></li>
 </ul>
 
 <!--FOOTER-->
