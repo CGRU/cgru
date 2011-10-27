@@ -13,7 +13,7 @@
    height="48"
    id="svg2"
    sodipodi:version="0.32"
-   inkscape:version="0.47 r22583"
+   inkscape:version="0.48.2 r9819"
    sodipodi:docname="keeper.svg"
    inkscape:output_extension="org.inkscape.output.svg.inkscape"
    version="1.0"
@@ -36,6 +36,30 @@
        inkscape:vp_y="0 : 1000 : 0"
        inkscape:vp_x="0 : 0.5 : 1"
        sodipodi:type="inkscape:persp3d" />
+    <filter
+       inkscape:collect="always"
+       id="filter4045"
+       x="-0.14681092"
+       width="1.2936218"
+       y="-0.11868461"
+       height="1.2373692">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.4875403"
+         id="feGaussianBlur4047" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter4157"
+       x="-0.12515932"
+       width="1.2503186"
+       y="-0.115619"
+       height="1.231238">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="2.1206791"
+         id="feGaussianBlur4159" />
+    </filter>
   </defs>
   <sodipodi:namedview
      id="base"
@@ -48,7 +72,7 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="4"
-     inkscape:cx="37.268105"
+     inkscape:cx="-6.731895"
      inkscape:cy="23.31175"
      inkscape:document-units="px"
      inkscape:current-layer="layer1"
@@ -56,13 +80,13 @@
      inkscape:snap-global="true"
      showguides="true"
      inkscape:guide-bbox="true"
-     inkscape:window-width="872"
-     inkscape:window-height="544"
-     inkscape:window-x="472"
-     inkscape:window-y="89"
+     inkscape:window-width="1366"
+     inkscape:window-height="685"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
      width="100px"
      inkscape:showpageshadow="false"
-     inkscape:window-maximized="0">
+     inkscape:window-maximized="1">
     <inkscape:grid
        type="xygrid"
        id="grid2387"
@@ -101,37 +125,41 @@
      inkscape:groupmode="layer"
      id="layer1"
      style="display:inline">
-    <path
-       sodipodi:type="star"
-       style="fill:#929e8f;fill-opacity:1;stroke:#6f7b66;stroke-width:9.70875071999999939;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;stroke-linejoin:miter"
-       id="path5065"
-       sodipodi:sides="5"
-       sodipodi:cx="50"
-       sodipodi:cy="50"
-       sodipodi:r1="68.007355"
-       sodipodi:r2="28.563089"
-       sodipodi:arg1="-0.94200004"
-       sodipodi:arg2="-0.31368151"
-       inkscape:flatsided="false"
-       inkscape:rounded="0"
-       inkscape:randomized="0"
-       d="M 90.000001,-5.0000018 77.169326,41.186499 114.66879,71.046327 66.777921,73.116043 49.967509,118.00735 33.199999,73.100001 -14.688871,70.984525 22.839108,41.160543 10.05257,-5.0381971 50.013646,21.436914 90.000001,-5.0000018 z"
-       transform="matrix(0.28712464,0,0,-0.30185385,9.646651,41.050086)" />
     <text
        xml:space="preserve"
-       style="font-size:25.12597274999999897px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:125%;writing-mode:lr-tb;text-anchor:start;fill:#1c2c12;fill-opacity:1;stroke:none;display:inline;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
-       x="0.72545242"
-       y="20.46567"
+       style="font-size:25.12597274999999897px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#ffffff;fill-opacity:1;stroke:none;display:inline;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium;filter:url(#filter4157)"
+       x="0.89530492"
+       y="23.290211"
+       id="text5194-6"
+       transform="scale(1.1159467,0.89610014)"
+       sodipodi:linespacing="100%"><tspan
+         sodipodi:role="line"
+         id="tspan5196-4"
+         x="0.89530492"
+         y="23.290211"
+         style="font-size:25.12597274999999897px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Bold;fill:#ffffff;fill-opacity:1">CG</tspan><tspan
+         sodipodi:role="line"
+         x="0.89530492"
+         y="48.416183"
+         id="tspan2817-6"
+         style="font-size:25.12597274999999897px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Bold;fill:#ffffff;fill-opacity:1">RU</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:25.12597275px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;fill:#192908;fill-opacity:1;stroke:none;display:inline;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Medium"
+       x="0.94947743"
+       y="23.255535"
        id="text5194"
-       transform="scale(1.1159467,0.89610013)"
-       sodipodi:linespacing="125%"><tspan
+       transform="scale(1.1159467,0.89610014)"
+       sodipodi:linespacing="100%"><tspan
          sodipodi:role="line"
          id="tspan5196"
-         x="0.72545242"
-         y="20.46567">CG</tspan><tspan
+         x="0.94947743"
+         y="23.255535"
+         style="font-size:25.12597275px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Bold">CG</tspan><tspan
          sodipodi:role="line"
-         x="0.72545242"
-         y="51.873135"
-         id="tspan2817">RU</tspan></text>
+         x="0.94947743"
+         y="48.381512"
+         id="tspan2817"
+         style="font-size:25.12597275px;font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;text-align:start;line-height:100%;writing-mode:lr-tb;text-anchor:start;font-family:Century Schoolbook L;-inkscape-font-specification:Century Schoolbook L Bold">RU</tspan></text>
   </g>
 </svg>

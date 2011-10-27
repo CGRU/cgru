@@ -1,6 +1,6 @@
 #!/bin/bash
 
-icons="keeper regexp dailies scanscan afwatch aftalk"
+icons="keeper regexp dailies scanscan afanasy afwatch aftalk"
 size="128"
 
 iconslinux="cgrumenuitem"
