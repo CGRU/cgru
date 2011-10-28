@@ -57,7 +57,7 @@ class Tray( QtGui.QSystemTrayIcon):
       # Software menu:
       self.menu['Software'] = QtGui.QMenu('Software')
       self.menu['menu'].addMenu( self.menu['Software'])
-      action = QtGui.QAction('[ browse ]', self)
+      action = QtGui.QAction( QtGui.QIcon( cgruconfig.VARS['icons_dir'] + '/folder.png'), '[ browse ]', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.browse)
       self.menu['Software'].addAction( action)
       for soft in software.Names:
