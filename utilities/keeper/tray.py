@@ -21,7 +21,7 @@ def getVar( var, title = 'Set Variable', label = 'Enter new value:'):
    if var in cgruconfig.VARS: oldvalue = cgruconfig.VARS[var]
    newvalue, ok = QtGui.QInputDialog.getText( None, title, label, text = oldvalue)
    if not ok: return
-   cgruconfig.VARS[var] = newvalue
+   cgruconfig.VARS[var] = str( newvalue)
    variables = [var]
    cgruconfig.writeVars(variables)
 

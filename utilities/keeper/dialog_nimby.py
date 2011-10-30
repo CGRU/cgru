@@ -23,6 +23,7 @@ class DialogNimby( QtGui.QWidget):
          vlayouts[row] = QtGui.QVBoxLayout()
          columns.addLayout( vlayouts[row])
 
+      daynum = 0
       for day in self.days:
          time_begin = '00:00'
          time_end = '00:00'
@@ -40,7 +41,7 @@ class DialogNimby( QtGui.QWidget):
                if 'a' in lines[2]: allow = True
                if 'e' in lines[2]: eject = True
 
-         vlayouts['day'].addWidget( QtGui.QLabel( day, self))
+         vlayouts['day'].addWidget( QtGui.QLabel( self.weekdays[daynum], self))
 
          self.te_begin[day] = QtGui.QTimeEdit( QtCore.QTime.fromString( time_begin, self.time_format))
          self.te_begin[day].setDisplayFormat( self.time_format)
@@ -61,6 +62,8 @@ class DialogNimby( QtGui.QWidget):
          self.cb_eject[day] = QtGui.QCheckBox('Eject Running Tasks', self)
          self.cb_eject[day].setChecked( eject)
          vlayouts['eject'].addWidget( self.cb_eject[day])
+
+         daynum += 1
 
       hlayout = QtGui.QHBoxLayout()
       b_accept = QtGui.QPushButton('Accept', self)
