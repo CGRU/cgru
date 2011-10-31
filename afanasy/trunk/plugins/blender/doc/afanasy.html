@@ -42,59 +42,44 @@
 <h2 align="center">Afanasy in Blender</h2>
 <hr />
 
+<p>
+Afanasy realised as a render engine in Blender.
+One of its parameters is a render engine name to render. Default is <i>BLENDER_RENDER</i>.
+Afanasy script will set specified render engine and save a scene with a temporary name to render.
+</p>
+
 <table width="99%">
    <tr>
       <td align="center" width="50%">
-         <p>Afanasy menu item in main menu</p>
-         <img src="images/afanasy_menu.png" alt="afanasy_menu" />
-         <p>Create job dialog</p>
-         <img src="images/afanasy_dialog.png" alt="afanasy_dialog" />
+         <p>Afanasy render engine properties</p>
+         <img src="images/afanasy_properties.png" alt="afanasy_menu" />
       </td>
       <td align="center" width="50%">
          <p>Job GUI</p>
          <img src="images/afwatch_job.png" alt="afwatch_job" />
+         <br/>
+         <p>Tasks</p>
+         <img src="images/afwatch_tasks.png" alt="afwatch_tasks" />
       </td>
    </tr>
 </table>
 
 <ul>
-<li><b>Start Frame</b> - First frame to render.</li>
-<li><b>End Frame</b> - Last frame to render.</li>
-<li><b>Per Host</b> - Number of frames in each task.</li>
-<li><b>Max Hosts</b> - Maximum number of host job can take ('-1' means no limit).</li>
+<li><b>Name</b> - Afanasy job name. If empty scene name will be used.</li>
+<li><b>Start</b> - First frame to render.</li>
+<li><b>End</b> - Last frame to render.</li>
+<li><b>By</b> - Frames "jump" or increment.</li>
+<li><b>Per</b> - Number of frames in each task.</li>
+<li><b>Submit Job</b> - Construct a job and send it to server.</li>
+<li><b>Start Job Paused</b> - Start job paused (send in <i>off-line</i> state).</li>
+
 <li><b>Priority</b> - Job priority (execution order).</li>
+<li><b>Max Run Hosts</b> - Maximum number of running at the same time tasks ('-1' means no limit).</li>
 <li><b>Depend Mask</b> - Other job(s) name pattern to wait (empty value means not wait any job).</li>
+<li><b>Global Depend</b> - Other job(s) of any user to wait.</li>
 <li><b>Hosts Mask</b> - Hosts names pattern job tasks can run on (if empty job can run on any host).</li>
-<li><b>Hosts Exclude</b> - Hosts names pattern job tasks can not run on.</li>
-<li><b>Properties</b> - Hosts properties pattern job tasks can not run on.</li>
-<li><b>Start Paused</b> - Start job paused (set off-line state).</li>
+<li><b>Exclude Hosts</b> - Hosts names pattern job tasks can not run on.</li>
 </ul>
-
-<p>
-Script detects Blender rendering engine (internal or Yafray) and set special service and parser to get correct task progress. Parser (and service) will be '<kbd>blender_internal</kbd>' or '<kbd>blender_yafray</kbd>' (parsers and services are python scripts too, located in afanasy). They parse and blender and renderer output, so if task consists of several frames, output will be correct too.
-</b>
-
-<h3>Example</h3>
-</p>
-CGRU Blender Afanasy example located in <kbd>cgru/examples/blender</kbd> directory.<br/>
-Launch example:<br/>
-<p>
-<code> $ cd cgru/examples/blender</code><br/>
-<code> $ ./blender scene.blend</code><br/>
-
-<table>
-   <caption>Afanasy example job</caption>
-   <tr>
-      <td align="center" width="20%">
-         <img src="images/afanasy_job.png" alt="afanasy_job" />
-         <br/>
-         (Old GUI)
-      </td>
-   </tr>
-</table>
-<p>
-On this image you can see two blender jobs with internal and Yafray rendering engine.
-</p>
 
 <!--FOOTER-->
 </td></tr></table>
