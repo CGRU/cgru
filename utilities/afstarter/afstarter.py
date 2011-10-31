@@ -114,7 +114,8 @@ class Dialog( QtGui.QWidget):
 Houdini ROP\n\
 Nuke write node\n\
 Maya camera\n\
-3DSMAX camera')
+3DSMAX camera\n\
+AfterFX composition')
       self.fields['node'] = QtGui.QLineEdit( self)
       lNode.addWidget( self.fields['node'])
       QtCore.QObject.connect( self.fields['node'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
@@ -124,7 +125,8 @@ Maya camera\n\
 Houdini take\n\
 SoftImage pass\n\
 Maya layer\n\
-3DSMAX batch')
+3DSMAX batch\n\
+AfterFX render settings template')
       self.fields['take'] = QtGui.QLineEdit( self)
       lNode.addWidget( self.fields['take'])
       QtCore.QObject.connect( self.fields['take'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
