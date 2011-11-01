@@ -28,6 +28,18 @@ def checkFrameRange( framefirst, framelast, frameinc, framespertask, string = ''
    if framespertask < 1:
       nuke.message('Frames per task must be >= 1' + string)
       return False
+
+   tasksnum = ( 1.0 + framelast - framefirst ) / ( 1.0 * frameinc * framespertask )
+   if tasksnum > 10000.0:
+      if not nuke.ask('Tasks number over 10 000' + string + '\nAre you sure?'):
+         return False
+   if tasksnum > 100000.0:
+      if not nuke.ask('Tasks number over 100 000' + string + '\nAre you sure?'):
+         return False
+   if tasksnum > 1000000.0:
+      nuke.message('Tasks number over 1 000 000' + string + '\nPlease contact your supervisor, administrator or TD.')
+      return False
+
    return True
 
 def getInputNodes( afnode, parent):
