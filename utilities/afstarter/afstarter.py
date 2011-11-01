@@ -337,10 +337,12 @@ AfterFX render settings template')
 
    def browseLoad( self):
       filename = str( QtGui.QFileDialog.getOpenFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU']))
+      if filename == '': return
       self.load( filename, True)
 
    def browseSave( self):
       filename = str( QtGui.QFileDialog.getSaveFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU']))
+      if filename == '': return
       self.save( filename, True)
 
    def evaluate( self):
@@ -348,9 +350,22 @@ AfterFX render settings template')
       self.bStart.setEnabled( False)
 
       # Check parameters:
+      # Frame range:
       if self.fields['framestart'].value() > self.fields['frameend'].value(): self.fields['frameend'].setValue( self.fields['framestart'].value())
+      tasksnum = (1.0 + self.fields['frameend'].value() - self.fields['framestart'].value()) / (1.0 * self.fields['frameby'].value() * self.fields['framespt'].value())
+      if tasksnum > 10000.0:
+         if QtGui.QMessageBox.warning( self, 'Warning', 'Number of tasks > 10000', QtGui.QMessageBox.Yes | QtGui.QMessageBox.Abort) != QtGui.QMessageBox.Yes:
+            return
+      if tasksnum > 100000.0:
+         if QtGui.QMessageBox.warning( self, 'Warning', 'Number of tasks > 100000', QtGui.QMessageBox.Yes | QtGui.QMessageBox.Abort) != QtGui.QMessageBox.Yes:
+            return
+      if tasksnum > 1000000.0:
+         self.teCmd.setText('The number of tasks over one million. Call you system administrator, supervisor or TD.')
+         return
+      # Check wdir:
       if self.fields['scenewdir'].isChecked(): self.fields['wdir'].setEnabled( False)
       else: self.fields['wdir'].setEnabled( True)
+      # Check job name:
       if self.fields['jobnamescene'].isChecked():
          self.fields['jobname'].setText( os.path.basename( str( self.fields['scenefile'].text())))
          self.fields['jobname'].setEnabled( False)
