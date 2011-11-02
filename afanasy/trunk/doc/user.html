@@ -45,37 +45,39 @@
 
 <h3>User Attributes:</h3>
 <ul>
-<li><a name="Name"/><b>Name</b> - Each user has an unique name. If new user comes to server with the name which already exists, server change it's name by adding a number.</li>
-<li><a name="Need"/><b>Need</b> - Not solved user with greatest need value will get next free host (if he or his jobs are able to do it). We are simply sorted by this value in solving function. Need depends on user's priority and number of running hosts.</li>
-<li><a name="Solved"/><b>Solved</b> - User successfully solved (produced a task) at last solving  cycle.</li>
-<li><a name="LastHost"/><b>Host Name</b> - Host name where last job was send from.</li>
-<li><a name="TimeRegister"/><b>Registration Time</b> - Time when user becomes permanent.</li>
-<li><a name="JobsList"/><b>Jobs List</b> - User jobs list.</li>
-<li><a name="NumJobs"/><b>Jobs Number</b> - Number of jobs user has.</li>
-<li><a name="NumRunningJobs"/><b>Running Jobs Number</b> - Number of currently running jobs user has.</li>
-<li><a name="NumHosts"/><b>Hosts Number</b> - Total number of hosts all running jobs user has.</li>
-<li><a name="TimeOnline"/><b>Online Time</b> - Time when user was registered on server.</li>
+<li><a name="Name"><b>Name</b></a> - Each user has an unique name. If new user comes to server with the name which already exists, server change it's name by adding a number.</li>
+<li><a name="Need"><b>Need</b></a> - Not solved user with greatest need value will get next free host (if he or his jobs are able to do it). We are simply sorted by this value in solving function. Need depends on user's priority and number of running hosts.</li>
+<li><a name="Solved"><b>Solved</b></a> - User successfully solved (produced a task) at last solving  cycle.</li>
+<li><a name="LastHost"><b>Host Name</b></a> - Host name where last job was send from.</li>
+<li><a name="TimeRegister"><b>Registration Time</b></a> - Time when user becomes permanent.</li>
+<li><a name="JobsList"><b>Jobs List</b></a> - User jobs list.</li>
+<li><a name="NumJobs"><b>Jobs Number</b></a> - Number of jobs user has.</li>
+<li><a name="NumRunningJobs"><b>Running Jobs Number</b></a> - Number of currently running jobs user has.</li>
+<li><a name="NumHosts"><b>Hosts Number</b></a> - Total number of hosts all running jobs user has.</li>
+<li><a name="TimeOnline"><b>Online Time</b></a> - Time when user was registered on server.</li>
 </ul>
 
 <h3>User Editable Parameters:</h3>
 <ul>
-<li><a name="Permanent"/><b>Permanent</b> - User exists in database (and his parameters are stored if server restarts). Not permanent with no jobs will be deleted.</li>
-<li><a name="Priority"/><b>Priority</b> - User with greater can have more running tasks number (get more render hosts).<br/>
+<li><a name="Permanent"><b>Permanent</b></a> - User exists in database (and his parameters are stored if server restarts). Not permanent with no jobs will be deleted.</li>
+<li><a name="Priority"><b>Priority</b></a> - User with greater can have more running tasks number (get more render hosts).<br/>
 <code>need = pow( 1.1, priority) / (runningtasksnumber + 1.0)</code><br/>
 Each priority point gives 10% hosts bonus (running tasks number).
 </li>
-<li><a name="MaxHosts"/><b>Maximum Hosts</b> - Maximum number of hosts all user jobs can take.</li>
-<li><a name="HostsMask"/><b>Hosts Mask</b> - User run only on renders which host name matches this mask.</li>
-<li><a name="HostsMaskExclude"/><b>Exclude Hosts Mask</b> - User can not run on renders which host name matches this mask.</li>
-<li><a name="ErrorRetries"/><b>Error Retries</b> - Default <a href="job_block.html#ErrorRetries">Error Retries</a> value for user jobs.</li>
-<li><a name="ErrorsAvoidHost"/><b>Errors Avoid Host</b> - Default <a href="job_block.html#ErrorsAvoidHost">Errors Avoid Host</a> value for user jobs.</li>
-<li><a name="ErrorsTaskSameHost"/><b>Errors Task Same Host</b>
+<li><a name="MaxHosts"><b>Maximum Hosts</b></a> - Maximum number of hosts all user jobs can take.</li>
+<li><a name="HostsMask"><b>Hosts Mask</b></a> - User run only on renders which host name matches this
+<a href="../../doc/regexp.html">mask</a>.</li>
+<li><a name="HostsMaskExclude"><b>Exclude Hosts Mask</b></a> - User can not run on renders which host name matches this
+<a href="../../doc/regexp.html">mask</a>.</li>
+<li><a name="ErrorRetries"><b>Error Retries</b></a> - Default <a href="job_block.html#ErrorRetries">Error Retries</a> value for user jobs.</li>
+<li><a name="ErrorsAvoidHost"><b>Errors Avoid Host</b> - Default <a href="job_block.html#ErrorsAvoidHost">Errors Avoid Host</a> value for user jobs.</li>
+<li><a name="ErrorsTaskSameHost"><b>Errors Task Same Host</b></a>
  - Default <a href="job_block.html#ErrorsTaskSameHost">Errors Task Same Host</a> value for user jobs.</li>
-<li><a name="ErrorsForgiveTime"/><b>Errors Forgive Time</b>
+<li><a name="ErrorsForgiveTime"/><b>Errors Forgive Time</b></a>
  - Default <a href="job_block.html#ErrorsForgiveTime">Errors Forgive Time</a> value for user jobs.</li>
-<li><a name="JobsLifeTime"/><b>Jobs Life Time</b>
+<li><a name="JobsLifeTime"><b>Jobs Life Time</b></a>
  - Default <a href="job.html#LifeTime">Life Time</a> value for user jobs.</li>
-<li><a name="Annotation"/><b>Annotation</b>
+<li><a name="Annotation"><b>Annotation</b></a>
  - Annotate user GUI item.</li>
 </ul>
 

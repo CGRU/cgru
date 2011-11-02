@@ -113,13 +113,13 @@ You can specify number of CPUs to use for your applications (if it supports it b
 
 <li><a name="MaxRunTasksPerHost"><b>Maximum Running Tasks Per Host</b></a> - maximum number of tasks block can run on the same time on the same host.</li>
 
-<li><a name="HostsMask"><b>Hosts Mask</b></a> - Block run only on Renders which host name matches this mask.</li>
+<li><a name="HostsMask"><b>Hosts Mask</b></a> - Block run only on Renders which host name matches this <a href="../../doc/regexp.html">mask</a>.</li>
 
-<li><a name="HostsMaskExclude"><b>Exclude Hosts Mask</b></a> - Block can not run on renders which host name matches this mask.</li>
+<li><a name="HostsMaskExclude"><b>Exclude Hosts Mask</b></a> - Block can not run on renders which host name matches this <a href="../../doc/regexp.html">mask</a>.</li>
 
-<li><a name="DependMask"><b>Depend Mask</b></a> - Block will wait previous job blocks which name matches this mask.</li>
+<li><a name="DependMask"><b>Depend Mask</b></a> - Block will wait previous job blocks which name matches this <a href="../../doc/regexp.html">mask</a>.</li>
 
-<li><a name="TasksDependMask"><b>Tasks Depend Mask</b></a> - Block task will wait other job blocks task which name matches this mask.</li>
+<li><a name="TasksDependMask"><b>Tasks Depend Mask</b></a> - Block task will wait other job blocks task which name matches this <a href="../../doc/regexp.html">mask</a>.</li>
 
 <li><a name="ErrorRetries"><b>Error Retries</b></a> - Number of task errors to retry it automatically. Value '-1' means take this value from user settings.</li>
 
@@ -143,7 +143,7 @@ Value less then '1' means no forgive. Value '-1' means take this value from user
 
 <li><a name="NeedHDD"><b>Need HDD</b></a> - Minimum render host free disk space needed.</li>
 
-<li><a name="NeedProperties"><b>Need Properties</b></a> - Mask to much render host properties to run on it. It's custom host parameter can be defined in farm description.
+<li><a name="NeedProperties"><b>Need Properties</b></a> - A <a href="../../doc/regexp.html">mask</a> to much render host properties to run on it. It's custom host parameter can be defined in farm description.
 <br/><br/>
 </li>
 
