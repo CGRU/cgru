@@ -216,7 +216,7 @@ class BlockParameters:
 
       if self.wnode.Class() == RenderNodeClassName:
          block = af.Block( self.name, AfanasyServiceType)
-         block.setNumeric( self.framefirst, self.framelast, self.framespertask)
+         block.setNumeric( self.framefirst, self.framelast, self.framespertask, self.frameinc)
          afcommon = __import__('afcommon', globals(), locals(), [])
          self.imgfile = afcommon.patternFromDigits( afcommon.patternFromStdC( self.imgfile))
          block.setFiles( self.imgfile)

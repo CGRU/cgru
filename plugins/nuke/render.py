@@ -14,7 +14,7 @@ tmpdir = None
 
 # Interrupt function to delete temp directory:
 def interrupt( signum, frame):
-   print '\nInterrupt received...'
+   print('\nInterrupt received...')
    if tmpdir is not None and os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
    exit(1)
 
@@ -26,12 +26,12 @@ def interrupt( signum, frame):
 #   signal.signal( signal.SIGQUIT, interrupt)
 #   signal.signal( signal.SIGHUP,  interrupt)
 
-# Error function to print message and delete temp directory:
+# Error function to print(message) and delete temp directory:
 def errorExit( msg, deletetemp):
-   print msg
+   print(msg)
    if deletetemp:
-      print 'Removing temp directory:'
-      print tmpdir
+      print('Removing temp directory:')
+      print(tmpdir)
       shutil.rmtree( tmpdir)
    exit(1)
 
@@ -84,7 +84,7 @@ if afroot is None: errorExit('AF_ROOT is not defined.', True)
 
 # Create and check temp directory:
 tmpdir = tempfile.mkdtemp('.afrender.nuke')
-if os.path.exists( tmpdir): print 'Temp directory = "%s"' % tmpdir
+if os.path.exists( tmpdir): print('Temp directory = "%s"' % tmpdir)
 else: errorExit('Error creating temp directory.', False)
 
 # Transfer scene paths
@@ -94,7 +94,7 @@ if pm.initialized:
    pmscene = os.path.join( tmpdir, pmscene)
    pm.toClientFile( xscene, pmscene, SearchStrings = ['file ','font '], Verbose = False)
    xscene = pmscene
-   print 'Scene pathes mapped: "%s"' % xscene
+   print('Scene pathes mapped: "%s"' % xscene)
 
 # Try to open scene:
 try: nuke.scriptOpen( xscene)
@@ -129,7 +129,7 @@ views = []
 views_num = 1
 try:
    views_str = writenode.knob('views').value()
-   print 'Views = "%s"' % views_str
+   print('Views = "%s"' % views_str)
    views = views_str.split(' ')
    views_num = len(views)
    for view in views:
@@ -143,21 +143,21 @@ except:
    views_num = 1
    imagesdirs.append( imagesdir)
    views.append('main')
-   print str(sys.exc_info()[1])
+   print(str(sys.exc_info()[1]))
 if views_num < 1: views_num = 1
-print 'Number of views = %d' % views_num
+print('Number of views = %d' % views_num)
 
 # Render frames cycle:
 exitcode = 0
 frame = ffirst
 while frame <= flast:
-   print 'Rendering frame %d:' % frame
+   print('Rendering frame %d:' % frame)
    sys.stdout.flush()
 
    # Iterate views:
    view_num = 0
    for view in views:
-      if views_num > 1: print 'Executing view "%s":' % view
+      if views_num > 1: print('Executing view "%s":' % view)
 
       # Try to execute write node:
       try:
@@ -166,11 +166,9 @@ while frame <= flast:
          else:
             nuke.execute( writenode, frame, frame, 1, [view])
       except:
-         print 'Node execution error:'
-         print str(sys.exc_info()[1])
+         print('Node execution error:')
+         print(str(sys.exc_info()[1]))
          exitcode = 1
-      print
-      sys.stdout.flush()
 
       # Copy image files from temp directory:
       allitems = os.listdir( tmpdir)
@@ -184,41 +182,44 @@ while frame <= flast:
          # Delete old image if any:
          if os.path.isfile( dest):
             try:
-               print 'Deleting old "%s"' % dest
+               print('Deleting old "%s"' % dest)
                os.remove( dest)
             except:
-               print str(sys.exc_info()[1])
-               print 'Unable to remove destination file:'
-               print dest
+               print(str(sys.exc_info()[1]))
+               print('Unable to remove destination file:')
+               print(dest)
                exitcode = 1
 
          # Move temporary image:
          try:
-            print 'Moving "%s"' % dest
+            print('Moving "%s"' % dest)
             shutil.move( src, imagesdirs[view_num])
          except:
-            print 'File moved with error:'
-            print str(sys.exc_info()[1])
-            print src
-            print dest
+            print('File moved with error:')
+            print(str(sys.exc_info()[1]))
+            print(src)
+            print(dest)
 
          # Check destination image:
          if not os.path.isfile( dest):
-            print 'Error: Destination file does not exist.'
+            print('Error: Destination file does not exist.')
             exitcode = 1
          else:
             moveditems += 1
 
       if moveditems < 1:
-         print 'Error: No images generated.'
+         print('Error: No images generated.')
          exitcode = 1
-
       else:
-         print 'Images generated: %d' % moveditems
+         print('Images generated: %d' % moveditems)
+
       sys.stdout.flush()
+
       if exitcode != 0: break
 
       view_num += 1
+
+   if exitcode != 0: break
 
    frame += fby
 
