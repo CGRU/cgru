@@ -41,6 +41,9 @@ class ORESettings(bpy.types.PropertyGroup):
    fpertask = IntProperty(    name='Per Task', description='Frames Per One Task', min=1, default=1)
    pause    = BoolProperty(   name='Start Job Paused', description='Send job in offline state.', default=0)
 
+   # Render Settings:
+   filepath = StringProperty( name='File Path', description='Set File Path.', maxlen=512, default='')
+
    # Paramerets:
    priority = IntProperty( name='Priority', description='Job order in user jobs list.', min=-1, max=250, default=-1)
    maxruntasks = IntProperty( name='Max Run Tasks', description='Maximum number of running tasks.', min=-1, max=9999, default=-1)
@@ -120,6 +123,20 @@ class RENDER_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
 #      layout.operator('ore.docs', icon='INFO')
 
 
+class PARAMETERS_PT_RenderSettings(RenderButtonsPanel, bpy.types.Panel):
+   bl_label = 'Render Settings'
+   COMPAT_ENGINES = set(['AFANASY_RENDER'])
+
+   @classmethod
+   def poll(cls, context):
+      rd = context.scene.render
+      return (rd.use_game_engine==False) and (rd.engine in cls.COMPAT_ENGINES)
+
+   def draw(self, context):
+      layout = self.layout
+      ore = context.scene.ore_render
+      layout.prop(ore, 'filepath')
+
 class PARAMETERS_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
    bl_label = 'Parameters'
    COMPAT_ENGINES = set(['AFANASY_RENDER'])
@@ -151,7 +168,16 @@ class ORE_Submit(bpy.types.Operator):
       # Save scene:
       engine = rd.engine
       rd.engine = ore.engine
+      images = rd.filepath
+      # Set Render Settings:
+      filepath = ''
+      if ore.filepath != '':
+         filepath = rd.filepath
+         rd.filepath = ore.filepath
       bpy.ops.wm.save_mainfile()
+      # Restore parameters:
+      if filepath != '':
+         rd.filepath = filepath
       rd.engine = engine
       scenefile = bpy.data.filepath
       renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(time.time() - int(time.time()))[2:5] + '.blend'
@@ -203,6 +229,7 @@ class ORE_Submit(bpy.types.Operator):
       # Set block command and frame range:
       block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
       block.setNumeric( fstart, fend, fpertask, finc)
+      #block.setFiles( images.replace('#','@#').replace('#','#@'))
       # Set job running parameters:
       if ore.maxruntasks       > -1: job.setMaxRunningTasks( ore.maxruntasks )
       if ore.priority          > -1: job.setPriority( ore.priority )

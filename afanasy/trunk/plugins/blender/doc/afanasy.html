@@ -69,16 +69,18 @@ Afanasy script will set specified render engine and save a scene with a temporar
 <li><b>Start</b> - First frame to render.</li>
 <li><b>End</b> - Last frame to render.</li>
 <li><b>By</b> - Frames "jump" or increment.</li>
-<li><b>Per</b> - Number of frames in each task.</li>
+<li><b>Per Task</b> - Number of frames in each task.</li>
 <li><b>Submit Job</b> - Construct a job and send it to server.</li>
 <li><b>Start Job Paused</b> - Start job paused (send in <i>off-line</i> state).</li>
 
+<li><b>File Path</b> - If not epmty, override output images to render.</li>
+
 <li><b>Priority</b> - Job priority (execution order).</li>
 <li><b>Max Run Hosts</b> - Maximum number of running at the same time tasks ('-1' means no limit).</li>
-<li><b>Depend Mask</b> - Other job(s) name pattern to wait (empty value means not wait any job).</li>
-<li><b>Global Depend</b> - Other job(s) of any user to wait.</li>
-<li><b>Hosts Mask</b> - Hosts names pattern job tasks can run on (if empty job can run on any host).</li>
-<li><b>Exclude Hosts</b> - Hosts names pattern job tasks can not run on.</li>
+<li><b>Depend Mask</b> - Other job(s) name <a href="../../../../doc/regexp.html">pattern</a> to wait (empty value means not wait any job).</li>
+<li><b>Global Depend</b> - Other job(s) <a href="../../../../doc/regexp.html">pattern</a> of any user to wait.</li>
+<li><b>Hosts Mask</b> - Hosts names <a href="../../../../doc/regexp.html">pattern</a> job tasks can run on (if empty job can run on any host).</li>
+<li><b>Exclude Hosts</b> - Hosts names <a href="../../../../doc/regexp.html">pattern</a> job tasks can not run on.</li>
 </ul>
 
 <!--FOOTER-->

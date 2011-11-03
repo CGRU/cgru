@@ -59,41 +59,46 @@ Some times some such expressions called "Perl-like".
 </tr>
    <td>r1|r7|r12</td>
    <td>r1 r7 r12</td>
-   <td>Only specified machines</td>
+   <td>Only specified machines, "|" - means "or".</td>
 </tr>
+<tr>
+   <td>r1.</td>
+   <td>r11-r19 r1a-r1z</td>
+   <td>Names starts with "r" plus one any character, "." - means any (one) character.</td>
+<tr>
 <tr>
    <td>r.*</td>
    <td>r0 r1 rN rnd roman ...</td>
-   <td>All computers which name starts with "r"</td>
+   <td>All computers which name starts with "r", "*" - means any number or characters.</td>
 <tr>
 </tr>
    <td>r1.*</td>
-   <td>r1 r10 r11 r102 r1b ...</td>
+   <td>r1 r10 r11 r102 r1asd ...</td>
    <td>All computers which name starts with "r1"</td>
 </tr>
 </tr>
    <td>r1[178]</td>
    <td>r11 r17 r18</td>
-   <td>Only specified machines</td>
+   <td>Only specified machines, [1 or 7 or 8]</td>
 </tr>
 </tr>
    <td>r1[1-5]</td>
    <td>r11 r12 r13 r14 r15</td>
-   <td>Only specified machines</td>
+   <td>Only specified machines, [from 1 to 5]</td>
 </tr>
-<tr>
-   <td>r1.</td>
-   <td>r11 - r19, r1a - r1z</td>
-   <td>Computers which name starts with "r" and any but only one other character</td>
-<tr>
+</tr>
+   <td>r0.|r1[1-5]</td>
+   <td>r00-r09 r11-r15</td>
+   <td>All r0# and from r11 to r15</td>
+</tr>
 </table>
 
 <h4>Detailed documentation, examples, constructors and testers:</h4>
 <ul>
 <li><a href="http://en.wikipedia.org/wiki/Regular_expression">http://en.wikipedia.org/wiki/Regular_expression</a></li>
-<li><a href="https://www.google.com/search?q=Regular+Expressions">https://www.google.com/search?q=Regular+Expressions</a></li>
-<li><a href="https://www.google.com/search?q=Regular+Expressions+Examples">https://www.google.com/search?q=Regular+Expressions+Examples</a></li>
-<li><a href="https://www.google.com/search?q=Regular+Expressions+Tester">https://www.google.com/search?q=Regular+Expressions+Tester</a></li>
+<li><a href="http://www.google.com/search?q=Regular+Expressions">http://www.google.com/search?q=Regular+Expressions</a></li>
+<li><a href="http://www.google.com/search?q=Regular+Expressions+Examples">http://www.google.com/search?q=Regular+Expressions+Examples</a></li>
+<li><a href="http://www.google.com/search?q=Regular+Expressions+Tester">http://www.google.com/search?q=Regular+Expressions+Tester</a></li>
 </ul>
 
 <b><i>Russian:</i></b>
