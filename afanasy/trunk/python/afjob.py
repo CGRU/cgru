@@ -385,7 +385,9 @@ elif ext == 'mb':
 # XSI:
 elif ext == 'scn':
    scenetype = 'xsi'
-   cmd = os.environ['XSI_CGRU_PATH']
+   cmd = os.environ['CGRU_LOCATION']
+   cmd = os.path.join( cmd, 'plugins')
+   cmd = os.path.join( cmd, 'xsi')
    cmd = os.path.join( cmd, 'afrender.py')
    cmd = 'xsibatch' + cmdextension + ' -script %s' % cmd
    cmd += ' -lang Python -main afRender -args'
