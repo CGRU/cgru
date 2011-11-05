@@ -27,39 +27,39 @@ for file in args:
 
    if '*' in file:
       # Using native OS commands for files with mask "*"
-      if not Options.quiet: print 'Deleting file(s): "%s"' % file
+      if not Options.quiet: print('Deleting file(s): "%s"' % file)
       if sys.platform.find('win') == 0:
          cmd = 'DEL /F /Q /S "%s"' % file
       else:
          file = file.replace('*','"*"')
          cmd = 'rm -rvf "%s"' % file
       if not Options.quiet:
-         print 'Executing system command:'
-         print cmd
+         print('Executing system command:')
+         print(cmd)
       if not Options.debug:
          status = os.system( cmd)
    elif os.path.isdir( file):
       # Removing folder(s):
-      if not Options.quiet: print 'Deleting directory: "%s"' % file
+      if not Options.quiet: print('Deleting directory: "%s"' % file)
       if not Options.debug:
          try:
             shutil.rmtree( file)
          except:
-            print str(sys.exc_info()[1])
+            print(str(sys.exc_info()[1]))
             status = 1
    elif os.path.isfile( file):
       # Removing file:
-      if not Options.quiet: print 'Deleting file: "%s"' % file
+      if not Options.quiet: print('Deleting file: "%s"' % file)
       if not Options.debug:
          try:
             os.remove( file)
          except:
-            print str(sys.exc_info()[1])
+            print(str(sys.exc_info()[1]))
             status = 1
    else:
       # No such file or directory:
-      print 'Error: file(s) to delete not founded:'
-      print file
+      print('Error: file(s) to delete not founded:')
+      print(file)
       status = 1
 
    # Set exit status to error if it was any:
@@ -67,6 +67,6 @@ for file in args:
 
 if Options.exitsuccess: exit_status = 0
 
-if not Options.quiet: print 'Exit status = %d' % exit_status
+if not Options.quiet: print('Exit status = %d' % exit_status)
 
 sys.exit(exit_status)
