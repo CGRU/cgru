@@ -44,7 +44,7 @@ class blender(parser.parser):
                      ok = False
                   if ok:
                      if part1 > 0:
-                        self.percentframe = 100 * part0 / part1
+                        self.percentframe = int( 100 * part0 / part1)
                         need_calc = True
 
             if need_calc: self.calculate()

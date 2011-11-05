@@ -43,24 +43,20 @@
 <hr />
 
 <p>
+   Use <a href="../../utilities/keeper/doc/index.html">Keeper</a> to launch applications.
+   Next documentation on this page shows you how to setup and launch by hands.
+</p>
+
+<p>
    If you have used Linux packages (<i>rpm</i> or <i>deb</i>)
    you already have <code>afrender</code> (and <code>afserver</code> if you have installed it)
    running automatically at system startup.
-   They run from <kbd>renderer</kbd> user by default, which was created during install.
+   They run from <kbd>render</kbd> user by default, which was created during install.
 </p>
 <p>
-   Afanasy binaries located in <kbd>.../cgru/afanasy/bin</kbd> directory.
+   Afanasy binaries located in <kbd>cgru/afanasy/bin</kbd> directory.
    To work properly they need some environment setup.
    There are some example scripts to setup environment and launch Afanasy application.
-</p>
-<p>
-   Go in <kbd>.../cgru/examples/scripts</kbd> folder.<br/>
-   <code>afrender.sh</code> - Run render. For MS Windows - <code>afrender.cmd</code>.<br/>
-   <code>afwatch.sh</code> - Run GUI. For MS Windows - <code>afwatch.cmd</code>.<br/>
-   </p>
-<p>
-   This scripts setup CGRU and Afanasy environment and run application.
-   Next documentation shows what you need to do to setup, launch, customize and automatically start Afanasy applications.
 </p>
 
 <ol>
@@ -70,22 +66,12 @@
    There are scripts to setup it.
    They based on a working directory.
    To setup CGRU you need to go to CGRU root folder and source setup scripts.
-   Afanasy setup is the same.
    </p>
-   <ul>
-      <li>
-         Setup CGRU:<br />
-         <code>$ cd .../cgru</code><br />
-         <code>$ source setup.sh</code><br/>
-         (On MS Windows <code>call setup.cmd</code>)<br/>
-      </li>
-      <li>
-         Setup Afanasy:<br />
-         <code>$ cd .../cgru/afanasy/[trunk|branch|tag]</code><br />
-         <code>$ source setup.sh</code><br/>
-         (On MS Windows <code>call setup.cmd</code>)<br/>
-      </li>
-   </ul>
+   <p>
+      <code>$ cd .../cgru</code><br />
+      <code>$ source ./setup.sh</code><br/>
+      (On MS Windows <code>call setup.cmd</code>)<br/>
+   </p>
    <p>
    Setup puts <kbd>.../cgru/bin</kbd> and <kbd>.../cgru/afanasy/bin</kbd> in <code>PATH</code>.<br/>
    Appends <code>PYTHONPATH</code> with <kbd>.../cgru/lib/python</kbd>, <kbd>.../cgru/afanasy/python</kbd> and <kbd>.../cgru/afanasy/bin</kbd>.
@@ -99,7 +85,7 @@
       </p>
       <p>
       To automate terminals setup you can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
-      <code>pwd=$PWD; cd .../cgru; source setup.sh; cd afanasy; source setup.sh; cd $pwd</code><br/>
+      <code>pushd .../cgru; source ./setup.sh; popd;</code><br/>
       </p>
    </li>
    <li>MS Windows:<br/>

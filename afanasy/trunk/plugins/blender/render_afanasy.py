@@ -164,21 +164,31 @@ class ORE_Submit(bpy.types.Operator):
       sce = context.scene
       ore = sce.ore_render
       rd = context.scene.render
+      images = None
+      orig_output = None
 
-      # Save scene:
-      engine = rd.engine
+      # Process engine parameters:
+      af_engine = rd.engine
       rd.engine = ore.engine
-      images = rd.filepath
-      # Set Render Settings:
-      filepath = ''
-      if ore.filepath != '':
-         filepath = rd.filepath
-         rd.filepath = ore.filepath
+      if rd.engine == 'BLENDER_RENDER':
+         images = rd.filepath
+         # Set Render Settings:
+         if ore.filepath != '':
+            orig_output = rd.filepath
+            rd.filepath = ore.filepath
+
+      # Save scene with changed engine paramepters:
       bpy.ops.wm.save_mainfile()
+
       # Restore parameters:
-      if filepath != '':
-         rd.filepath = filepath
-      rd.engine = engine
+      if rd.engine == 'BLENDER_RENDER':
+         if orig_output is not None:
+            rd.filepath = orig_output
+
+      # Set back AFANASY engine:
+      rd.engine = af_engine
+
+      # Calculate temporary scene path:
       scenefile = bpy.data.filepath
       renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(time.time() - int(time.time()))[2:5] + '.blend'
 
@@ -229,7 +239,8 @@ class ORE_Submit(bpy.types.Operator):
       # Set block command and frame range:
       block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
       block.setNumeric( fstart, fend, fpertask, finc)
-      #block.setFiles( images.replace('#','@#').replace('#','#@'))
+      #if images is Not None:
+      #   block.setFiles( images.replace('#','@#').replace('#','#@'))
       # Set job running parameters:
       if ore.maxruntasks       > -1: job.setMaxRunningTasks( ore.maxruntasks )
       if ore.priority          > -1: job.setPriority( ore.priority )

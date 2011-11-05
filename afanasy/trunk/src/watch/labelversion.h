@@ -35,7 +35,7 @@ private:
 
 private:
    QFont font;
-   QString text;
+   QString label;
    QString tooltip;
    QString message;
    //   QPixmap logo;
