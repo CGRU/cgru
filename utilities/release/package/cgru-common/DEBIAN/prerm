@@ -8,4 +8,6 @@ if [ -d /opt/cgru ]; then
    find /opt/cgru -type d -name __pycache__ -exec rm -rvf {} \;
 fi
 
+/opt/cgru/examples/clear.sh
+
 exit 0

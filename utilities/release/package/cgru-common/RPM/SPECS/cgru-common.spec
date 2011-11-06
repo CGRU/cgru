@@ -44,4 +44,5 @@ echo "CGRU-common pre remove: $1"
 echo "Cleaning CGRU"
 [ -d /opt/cgru ] && find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
 [ -d /opt/cgru ] && find /opt/cgru -type d -name __pycache__ -exec rm -rvf {} \;
+/opt/cgru/examples/clear.sh
 exit 0

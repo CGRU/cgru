@@ -23,6 +23,7 @@ destUP=$PWD
 popd > /dev/null
 
 cd ../..
+examples/clear.sh
 
 copy . $dest
 
@@ -30,6 +31,7 @@ rcopy bin $dest
 rcopy lib $dest
 rcopy doc $dest
 rcopy icons $dest
+rcopy software_setup $dest
 rcopy start $dest
 rcopy examples $dest
 
