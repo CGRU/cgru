@@ -42,10 +42,19 @@
 <h2 align="center">CGRU Installation</h2>
 <hr />
 
-<h3>Get CGRU</h3>
-<p>
-Download a latest release and unpack.
-</p>
+<ul>
+   <li>
+      <a href="downloads.html">Download</a> a latest release and unpack.
+      <ul>
+         <li>
+            <i>Linux</i>: See <a href="install_linuxpackages.html">packages</a> page.
+         </li>
+      </ul>
+   </li>
+   <li>Use <a href="../utilities/keeper/doc/index.html">Keeper</a> to launch applications.</li>
+</ul>
+
+<h3>Developers:</h3>
 <p>
 You can use SVN to check out latest version:
 </p>
@@ -57,13 +66,7 @@ $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
 <p>
 And build it yourself.
 </p>
-<h4>Debian and RPM Packages.</h4>
-<p>
-For Linux with Debian (Debian, Ubuntu, ...) and RMP (RedHat, CentOS, Fedora, OpenSUSE, ...)
-Afanasy has software packages.<br/>
-See this <a href="install_linuxpackages.html">Linux Packages</a> page.
-</p>
-<h3>Setup Environment</h3>
+<h4>Setup Environment:</h4>
 <p>
 You can setup you $PATH and $PYTHONPATH variables, to use Afanasy commands and to import Python module.
 </p>
@@ -72,22 +75,13 @@ To setup CGRU commands and Python module, you need to go in CGRU folder and sour
 </p>
 <code>
 $ cd cgru<br/>
-$ source setup.sh<br/>
-</code>
-<p>
-To setup Afanasy commands and Python module, you need to go in Afanasy folder and source a script:
-</p>
-<code>
-$ cd cgru/afanasy<br/>
-$ source setup.sh<br/>
+$ source ./setup.sh<br/>
 </code>
 <p>
 You can put next lines at the end of your <kbd>~/.bashrc</kbd> file:<br/>
 <code>
 # CRGU:<br/>
-pwd=$PWD; cd cgru; source ./setup.sh; cd $pwd<br/>
-# Afanasy:<br/>
-pwd=$PWD; cd cgru/afanasy; source ./setup.sh; cd $pwd<br/>
+pushd .../cgru; source ./setup.sh; popd<br/>
 </code>
 And shell will automatically source it at every launch.
 </p>
@@ -96,7 +90,7 @@ And shell will automatically source it at every launch.
  <kbd>cmd</kbd> scripts are also provided (its do the same).
 </p>
 
-<h3>Run CGRU</h3>
+<h4>Run CGRU:</h4>
 <p>
 CGRU examples are located in <kbd>cgru/examples</kbd> directory.<br/>
 General tools for specific soft are located in <kbd>cgru/plugins/[software_name]</kbd> folder.<br/>
@@ -104,21 +98,17 @@ Afanasy Tools for specific soft are located in <kbd>cgru/afanasy/plugins/[softwa
 Examples has software launching scripts to make them to run with CGRU and Afanasy setup.<br/>
 Documentation for specific soft in located in <kbd>cgru/plugins/[software_name]/doc</kbd> folder.<br/>
 Run examples by executing script from it example directory.<br/>
-For example to launch Houdini example:<br/>
+To launch Blender example:<br/>
 <code>
- $ cd cgru/examples/houdini<br/>
- $ ./houdini
+ $ cd cgru/examples/blender<br/>
+ $ ./start_blender.sh
 </code>
 </p>
 <p>
 <b>MS Windows:</b>
-You can double click application launch script in <kbd>cgru\bin</kbd> directory,
+You can double click application launch script in <kbd>cgru\start</kbd> directory,
 or create link to it, to launch example run its script.<br/>
-Example for NUKE: <kbd>cgru\examples\nuke\nuke.cmd</kbd>
-</p>
-<h3>CG - Rules</h3>
-<p>
-Do not forget to read <a href="cgrules.html">CG Rules</a> to find out what's going on.
+Example for Blender: <kbd>cgru\examples\blender\start_blender.cmd</kbd>
 </p>
 
 <!--FOOTER-->
