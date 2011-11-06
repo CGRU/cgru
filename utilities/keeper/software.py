@@ -37,7 +37,7 @@ def exampleSoftware( folder, script):
    else:
       cmd += '.sh'
    print(cmd)
-   QtCore.QProcess.startDetached( cmd)
+   QtCore.QProcess.startDetached( '"%s"' % cmd)
 
 def exampleBlender():   exampleSoftware('blender','start_blender')
 def exampleHoudini():   exampleSoftware('houdini','start_houdini')
