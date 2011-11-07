@@ -16,6 +16,11 @@ if [ ! -d "$folder" ]; then
    exit 1
 fi
 
+if [ `uname` == "Darwin" ]; then
+   open "$folder"
+   exit 0
+fi
+
 for browser in $browsers; do
    if [ `which $browser` ]; then
       [ $browser == "krusader" ] && browser="$browser --left $folder --right"
