@@ -5,10 +5,23 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Mon, 29 Aug 2011 12:00:00 GMT</pubDate>
-   <lastBuildDate>Mon, 29 Aug 2011 12:00:00 GMT</lastBuildDate>
+   <pubDate>Mon, 7 Nov 2011 12:00:00 GMT</pubDate>
+   <lastBuildDate>Mon, 7 Nov 2011 12:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.5.1 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release151</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release151</guid>
+      <description>
+         Keeper - a system tray application with menu,
+            designed launch CGRU and AFANASY tools,
+            setup and start other software applications to run with CGRU configured.
+         Standalone dialog to submit jobs.
+         Abobe After Effects support.
+      </description>
+      <pubDate>Mon, 7 Nov 2011 12:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.5.0 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release150</link>
