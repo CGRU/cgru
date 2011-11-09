@@ -16,27 +16,34 @@ class Dialog( QtGui.QWidget):
       self.setWindowTitle( sys.argv[0])
 
       layout = QtGui.QVBoxLayout( self)
-      self.cmdField = QtGui.QLineEdit( self)
+      self.cmdField = QtGui.QTextEdit( self)
       self.cmdField.setReadOnly( True)
       layout.addWidget( self.cmdField)
       self.outputField = QtGui.QTextEdit( self)
       self.outputField.setReadOnly( True)
       layout.addWidget( self.outputField)
 
-      command = QtCore.QString.fromUtf8( sys.argv[1])
-      cmdtoshow = command
-      arguments = []
-      for arg in sys.argv[2:]:
-         arguments.append( QtCore.QString.fromUtf8( arg))
-         cmdtoshow += ' ' + arg
+      command = ''
+      for arg in sys.argv[1:]:
+         if command != '': command += ' '
+         command += '"%s"' % arg
 
-      self.cmdField.setText( cmdtoshow)
+      arguments = QtCore.QStringList()
+      if sys.platform.find('win') == 0:
+         shell = 'cmd.exe'
+         arguments.append( QtCore.QString.fromUtf8( '/c'))
+      else:
+         shell = '/bin/bash'
+         arguments.append( QtCore.QString.fromUtf8( '-c'))
+      arguments.append( QtCore.QString.fromUtf8( command))
+
+      self.cmdField.setText( QtCore.QString.fromUtf8( command))
 
       self.process = QtCore.QProcess( self)
       self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
       QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
       QtCore.QObject.connect( self.process, QtCore.SIGNAL('readyRead()'), self.processoutput)
-      self.process.start( command, arguments)
+      self.process.start( QtCore.QString.fromUtf8( shell), arguments)
 
    def closeEvent( self, event):
       self.process.terminate()
@@ -52,7 +59,7 @@ class Dialog( QtGui.QWidget):
    def processoutput( self):
       output = self.process.readAll()
       print('%s' % output),
-      self.outputField.insertPlainText( QtCore.QString( output))
+      self.outputField.insertPlainText( QtCore.QString.fromUtf8( output))
       self.outputField.moveCursor( QtGui.QTextCursor.End)
 
 app = QtGui.QApplication( sys.argv)
