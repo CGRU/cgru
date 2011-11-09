@@ -15,22 +15,22 @@ signal.signal( signal.SIGTERM, interrupt)
 signal.signal( signal.SIGABRT, interrupt)
 if sys.platform.find('win') != 0: signal.signal( signal.SIGQUIT, interrupt)
 signal.signal( signal.SIGINT,  interrupt)
-
+print
 # Check environment:
 filter = os.getenv('HOUDINI_CGRU_PATH')
 if filter is None or filter == '':
-   print 'Error: HOUDINI_CGRU_PATH is not set, can`t find mantra python filer location.'
+   print('Error: HOUDINI_CGRU_PATH is not set, can`t find mantra python filer location.')
    exit(1)
 
 def UsageExit( msg = None):
-   if msg is not None: print msg
-   else: print 'Error: Invalid arguments.'
-   print 'Usage: ' + os.path.basename(sys.argv[0]) + ' [dtc] [divx divy numtile] -R [arguments to mantra]'
-   print 'd - Delete ROP file after successful render (don`t use it with tile render!).'
-   print 't - Enable render in temporary folder.'
-   print 'c - Crop render region to render one tile.'
-   print 'divx, divy, numtile - Tile render options: X, Y division and tile number.'
-   print '-R - separator for arguments to mantra ("-v A" will be added automatically).'
+   if msg is not None: print( msg)
+   else:  'Error: Invalid arguments.'
+   print('Usage: ' + os.path.basename(sys.argv[0]) + ' [dtc] [divx divy numtile] -R [arguments to mantra]')
+   print('d - Delete ROP file after successful render (don`t use it with tile render!).')
+   print('t - Enable render in temporary folder.')
+   print('c - Crop render region to render one tile.')
+   print('divx, divy, numtile - Tile render options: X, Y division and tile number.')
+   print('-R - separator for arguments to mantra ("-v A" will be added automatically).')
    exit(1)
 
 tilerender = False
@@ -58,10 +58,10 @@ if 'c' in sys.argv[1]:
 if 't' in sys.argv[1]:
    tmpdir = tempfile.mkdtemp('.afrender.mantra')
    if os.path.exists( tmpdir):
-      print 'Rendering in temporary directory:'
-      print tmpdir
+      print('Rendering in temporary directory:')
+      print(tmpdir)
    else:
-      print 'Error creating temp directory.'
+      print('Error creating temp directory.')
       sys.exit(1)
 
 # Delete files:
@@ -96,22 +96,22 @@ if tmpdir != '':
    try:
       shutil.rmtree( tmpdir)
    except:
-      print 'Unable to remove temporary directory:'
-      print tmpdir
-      print str(sys.exc_info()[1])
+      print('Unable to remove temporary directory:')
+      print(tmpdir)
+      print(str(sys.exc_info()[1]))
 
 if exitcode == 0:
    # Remove ROP file:
    if ropfile != '':
-      print 'Removing ROP file "%s"' % ropfile
+      print('Removing ROP file "%s"' % ropfile)
       if os.path.isfile( ropfile):
          try:
             os.remove( ropfile)
          except:
-            print 'Unable to remove ROP file:'
-            print ropfile
-            print str(sys.exc_info()[1])
+            print('Unable to remove ROP file:')
+            print( ropfile)
+            print( str(sys.exc_info()[1]))
       else:
-         print 'ROP file does not exist.'
+         print('ROP file does not exist.')
 
 sys.exit(exitcode)
