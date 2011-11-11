@@ -2,4 +2,4 @@
 
 call %CGRU_LOCATION%\software_setup\setup_3dsmax.cmd
 
-start "%APP_DIR%\3dsmax.exe" %*
+start "3D MAX" "%APP_DIR%\3dsmax.exe" %*
