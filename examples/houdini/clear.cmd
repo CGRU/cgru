@@ -1,11 +1,8 @@
-pushd "%0\.."
+echo Clearing Houdini examples in %CD%
 
-echo "Clearing Houdini examples in %CD%"
+For /F "Tokens=*" %%I in ('dir /b "scene.hip*"') Do if not "%%I" == "scene.hip" del "%%I"
 
-del scene.hip*.hip
-del /f /q *.mov
+if exist "*.mov" del /f /q "*.mov"
 
 cd render
 del /f /q *
-
-popd

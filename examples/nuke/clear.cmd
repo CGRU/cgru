@@ -1,11 +1,8 @@
-pushd "%0\.."
+echo Clearing Nuke examples in %CD%
 
-echo "Clearing Nuke examples in %CD%"
+For /F "Tokens=*" %%I in ('dir /b "scene.nk*"') Do if not "%%I" == "scene.nk" del "%%I"
 
-del scene.nk*.nk
-del /f /q *.mov
+if exist "*.mov" del /f /q "*.mov"
 
 cd render
 del /f /q *
-
-popd

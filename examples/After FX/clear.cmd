@@ -1,10 +1,8 @@
-pushd "%0\.."
+echo Clearing AfterFX examples in %CD%
 
-echo "Clearing AfterFX examples in %CD%"
+For /F "Tokens=*" %%I in ('dir /b "AE Project.aep*"') Do if not "%%I" == "AE Project.aep" del "%%I"
 
-del "AE Project.aep*.aep"
-rd /s /q "AE Project.aep Logs"
+if exist "AE Project.aep Logs" rd /s /q "AE Project.aep Logs"
+
 cd render
 del /f /q *
-
-popd

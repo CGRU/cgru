@@ -1,16 +1,16 @@
-pushd "%0\.."
-
-echo "Clearing XSI examples in %CD%"
+echo Clearing XSI examples in %CD%
 
 cd project
-rd /s /q Backup
+if exist Backup rd /s /q Backup
 
 cd Scenes
-del scene.scn*.scn
+For /F "Tokens=*" %%I in ('dir /b') Do if not "%%I" == "scene.scn" del "%%I"
+cd ..
+
+cd system
+For /F "Tokens=*" %%I in ('dir /b /ad') Do if not "%%I" == ".svn" rd /s /q "%%I"
 cd ..
 
 cd Render_Pictures
 del /f /q *
-rd /s /q 20 80 140 200
-
-popd
+For /F "Tokens=*" %%I in ('dir /b /ad') Do if not "%%I" == ".svn" rd /s /q "%%I"

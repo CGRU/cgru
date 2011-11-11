@@ -1,10 +1,6 @@
-pushd "%0\.."
+echo Clearing Blender examples in %CD%
 
-echo "Clearing Blender examples in %CD%"
-
-del scene.blend*.blend
+For /F "Tokens=*" %%I in ('dir /b scene.blend*') Do if not "%%I" == "scene.blend" del "%%I"
 
 cd render
 del /f /q *
-
-popd
