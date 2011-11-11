@@ -75,14 +75,20 @@ if 'd' in sys.argv[1]:
             break
 
 # Construct a command:
+mantra = 'mantra'
+app_dir = os.getenv('APP_DIR')
+if app_dir is not None:
+   app_dir = os.path.join( app_dir, 'bin')
+   mantra = os.path.join( app_dir, 'mantra')
+   if sys.platform.find('win') == 0: mantra += '.exe'
 if argspos > 1:
    filter = filter.replace('\\','/')
    filter += '/mantrafilter.py'
    if tilerender: filter += ' %d %d %d' % ( divx, divy, numtile)
    if tmpdir != '': filter += ' ' + tmpdir
-   cmd = ['mantra','-P',filter,'-V','a']
+   cmd = [ mantra,'-P',filter,'-V','a']
 else:
-   cmd = ['mantra','-V','a']
+   cmd = [ mantra,'-V','a']
 
 # Append arguments for mantra:
 for i in range( argspos+1, len(sys.argv)): cmd.append( sys.argv[i])

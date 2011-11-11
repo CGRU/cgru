@@ -13,5 +13,3 @@ set locate_file=%CGRU_LOCATION%\software_setup\locate_3dsmax.cmd
 if exist %locate_file% call %locate_file%
 
 set MAX_LOCATION=%APP_DIR%
-
-set "PATH=%MAX_LOCATION%;%PATH%"

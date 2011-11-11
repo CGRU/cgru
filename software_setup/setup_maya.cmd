@@ -40,6 +40,3 @@ set MAYA_CGRU_PLUG_INS_AUTOLOAD=1
 
 rem Add Afanasy scripts:
 set MAYA_SCRIPT_PATH=%AF_ROOT%\plugins\maya;%MAYA_SCRIPT_PATH%
-
-rem Add Maya to PATH:
-set "PATH=%MAYA_LOCATION%\bin;%PATH%"

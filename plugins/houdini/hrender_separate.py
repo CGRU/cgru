@@ -56,18 +56,25 @@ if by is None:
 
 cmd = os.getenv('HOUDINI_CGRU_PATH')
 if cmd is None:
-   print 'Error: HOUDINI_CGRU_PATH is not set.'
+   print('Error: HOUDINI_CGRU_PATH is not set.')
    exit(1)
 
 tmpdir = tempfile.mkdtemp('.afrender.houdini')
 if os.path.exists( tmpdir):
-   print 'Generating files in temporary directory:'
-   print tmpdir
+   print('Generating files in temporary directory:')
+   print(tmpdir)
 else:
-   print 'Error creating temp directory.'
+   print('Error creating temp directory.')
    sys.exit(1)
 
-cmdgen_s = ['hython', os.path.join( cmd,'hrender_af.py'),'-s']
+hython = 'hython'
+app_dir = os.getenv('APP_DIR')
+if app_dir is not None:
+   app_dir = os.path.join( app_dir, 'bin')
+   hython = os.path.join( app_dir, 'hython')
+   if sys.platform.find('win') == 0: hython += '.exe'
+
+cmdgen_s = [ hython, os.path.join( cmd,'hrender_af.py'),'-s']
 cmdgen_e = []
 if ignoreInputs: cmdgen_e.append('-i')
 if take    is not None: cmdgen_e.extend(['-t', take ])
@@ -93,9 +100,9 @@ while frame <= end:
    cmd.extend( cmdgen_e)
 
    # Run ROP command
-   print 'Launching command:'
-   for c in cmd: print c,
-   print
+   print('Launching command:')
+   for c in cmd: print(c,)
+   print('\n')
    sys.stdout.flush()
    p = subprocess.Popen( cmd)
    exitcode = p.wait()
@@ -107,9 +114,9 @@ while frame <= end:
    cmd.append( afile)
 
    # Launch render command:
-   print 'Launching command:'
-   for c in cmd: print c,
-   print
+   print('Launching command:')
+   for c in cmd: print(c,)
+   print('\n')
    sys.stdout.flush()
    p = subprocess.Popen( cmd)
    exitcode = p.wait()
@@ -122,8 +129,8 @@ if tmpdir != '':
    try:      
       shutil.rmtree( tmpdir)
    except:
-      print 'Unable to remove temporary directory:'
-      print tmpdir
-      print str(sys.exc_info()[1])
+      print('Unable to remove temporary directory:')
+      print(tmpdir)
+      print(str(sys.exc_info()[1]))
 
 sys.exit(exitcode)

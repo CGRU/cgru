@@ -2,4 +2,5 @@
 
 call %CGRU_LOCATION%\software_setup\setup_softimage.cmd
 
-"%XSI_LOCATION%\bin\XSI.bat" %*
+rem start "SoftImage" "%APP_DIR%\bin\XSI.bat" %*
+"%APP_DIR%\bin\XSI.bat" %*

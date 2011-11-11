@@ -25,7 +25,7 @@ set XBMLANGPATH=%MAYA_CGRU_LOCATION%\icons
 rem automatically load plugins located in MAYA_CGRU_LOCATION/mll/MAYA_VERSION directory
 set MAYA_CGRU_PLUG_INS_AUTOLOAD=1
 
-set PATH=%MAYA_LOCATION%\bin;%PATH%
+set "PATH=%MAYA_LOCATION%\bin;%PATH%"
 
 rem Enable Afanasy if it is set:
 IF DEFINED AF_ROOT set MAYA_SCRIPT_PATH=%AF_ROOT%\plugins\maya;%MAYA_SCRIPT_PATH%

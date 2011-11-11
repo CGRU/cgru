@@ -2,4 +2,4 @@
 
 call %CGRU_LOCATION%\software_setup\setup_houdini.cmd
 
-mplay %*
+"%APP_DIR%\bin\mplay.exe" %*
