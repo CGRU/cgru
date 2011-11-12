@@ -2,9 +2,16 @@ set dest=%1
 
 if exist override.cmd call override.cmd
 
-PUSHD ..\..
+cd ..\..
 
-if exist %dest% mkdir %dest%
+set cgru=%CD%
+
+cd examples
+call clear.cmd
+
+cd "%cgru%"
+
+if not exist %dest% mkdir %dest%
 
 set afanasy=trunk
 
@@ -13,6 +20,8 @@ xcopy . %dest%\ /y
 xcopy bin %dest%\bin\ /ys
 xcopy lib %dest%\lib\ /ys
 xcopy icons %dest%\icons\ /ys
+xcopy examples %dest%\examples\ /ys
+xcopy software_setup %dest%\software_setup\ /ys
 xcopy start %dest%\start\ /ys
 
 xcopy doc %dest%\doc\ /y
@@ -52,6 +61,4 @@ For /F "Tokens=*" %%I in ('type version.txt') Do Set CGRU_VERSION=%%I
 cd utilities
 call getrevision.cmd ..
 echo CGRU_REVISION %CGRU_REVISION%
-echo %CGRU_VERSION% rev%CGRU_REVISION% > %dest%\version.txt
-
-POPD
+echo %CGRU_VERSION%_rev%CGRU_REVISION% > %dest%\version.txt
