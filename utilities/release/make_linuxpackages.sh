@@ -3,8 +3,6 @@
 for arg in "$@"; do
    if [ $arg == "--skipcheck" ]; then
       check="--exitsuccess"
-   elif [ $arg == "--releases" ]; then
-      releases="releases"
    else
       afanasy="$arg"
    fi
@@ -165,35 +163,6 @@ tar -cvzf "${archive_name}" *
 mv "${archive_name}" "${curdir}/"
 cd "${curdir}"
 chmod a+rwx "${archive_name}"
-
-# Creating 7zip releazes archives:
-if [ ! -z "${releases}" ]; then
-   for release_name in `ls "${releases}"`; do
-      release_script=$releases/$release_name
-      [ -d "$release_script" ] && continue
-      [ -f "$release_script" ] || continue
-      [ -x "$release_script" ] || continue
-      echo "Creating CGRU archive for ${release_name}..."
-      tmp="$tmpdir/${release_name}/cgru"
-      mkdir -p $tmp
-      cp -rp $cgruExp/* $tmp
-      $release_script $tmp
-      if [ $? != 0 ]; then
-         echo "Failed making release."
-         exit 1
-      fi
-      pushd $tmpdir/${release_name} > /dev/null
-      acrhivename="../../${releases}/cgru.${VERSION_NUMBER}.${release_name}.7z"
-      [ -f $acrhivename ] && rm -fv $acrhivename
-      7za a -r -y -t7z "${acrhivename}" "cgru" > /dev/null
-      if [ $? != 0 ]; then
-         echo "Error creating archive."
-         exit 1
-      fi
-      chmod a+rw "${acrhivename}"
-      popd > /dev/null
-   done
-fi
 
 # Copmleted.
 chmod -R a+rwx "${tmpdir}"
