@@ -28,9 +28,9 @@ for archive in `ls`; do
    fi
 
    # Cleanup files:
-   find $PWD -type f -name *.pyc -exec rm -vf {} \;
-   find $PWD -type d -name .svn -exec rm -rvf {} \;
-   find $PWD -type d -name __pycache__ -exec rm -rvf {} \;
+   find ${archive} -type f -name *.pyc -exec rm -vf {} \;
+   find ${archive} -type d -name .svn -exec rm -rvf {} \;
+   find ${archive} -type d -name __pycache__ -exec rm -rvf {} \;
 
    # Archivate:
    archivefile="cgru.${version}.${archive}.7z"

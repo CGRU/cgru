@@ -5,4 +5,10 @@
 dest=$1
 [ -d "$dest" ] || exit 1
 
-# Nothing special to do
+# Clear Python:
+python=$dest/python
+cd $python
+echo "Clearing python in '$PWD'"
+find -type f -name *.pyc -exec rm -vf {} \;
+find -type d -name __pycache__ -exec rm -rvf {} \;
+exit 0
