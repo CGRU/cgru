@@ -9,6 +9,8 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
+Requires:      cgru-common = @VERSION@
+
 %description
 Afanasy binary files.
 
