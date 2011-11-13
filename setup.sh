@@ -6,6 +6,9 @@ export CGRU_LOCATION=$PWD
 # Add CGRU bin to path:
 export PATH="${CGRU_LOCATION}/bin:${PATH}"
 
+# Add software to PATH:
+export PATH="${CGRU_LOCATION}/software_setup/bin:${PATH}"
+
 # Python module path:
 export CGRU_PYTHON="${CGRU_LOCATION}/lib/python"
 if [ "$PYTHONPATH" != "" ]; then
@@ -27,6 +30,3 @@ if [ ! -z "$setup_files" ] ; then
       source ./$setup_file ""
    done
 fi
-
-# Add software to PATH:
-export PATH="${CGRU_LOCATION}/software_setup/bin:${PATH}"
