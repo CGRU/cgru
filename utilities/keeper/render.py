@@ -16,8 +16,12 @@ def showInfo( tray = None):
    WndInfo = QtGui.QTextEdit()
    msg = ''
    for rinfo in renders:
-      msg += rinfo['info']
-      msg += rinfo['resources']
+      if isinstance(rinfo['info'], str):
+         msg += rinfo['info']
+         msg += rinfo['resources']
+      else:
+         msg += str(rinfo['info'], 'utf-8')
+         msg += str(rinfo['resources'], 'utf-8')
    WndInfo.setPlainText( msg)
    WndInfo.setReadOnly( True)
    WndInfo.resize( WndInfo.viewport().size())
