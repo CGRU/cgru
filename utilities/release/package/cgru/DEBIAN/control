@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: all
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), afanasy-render (= @VERSION@)
+Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), afanasy-render (= @VERSION@), python-qt4
 Suggests: mencoder
 Section: graphics
 Priority: extra

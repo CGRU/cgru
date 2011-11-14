@@ -5,8 +5,8 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Mon, 7 Nov 2011 12:00:00 GMT</pubDate>
-   <lastBuildDate>Mon, 7 Nov 2011 12:00:00 GMT</lastBuildDate>
+   <pubDate>Mon, 14 Nov 2011 12:00:00 GMT</pubDate>
+   <lastBuildDate>Mon, 14 Nov 2011 12:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
    <item>
@@ -20,7 +20,7 @@
          Standalone dialog to submit jobs.
          Abobe After Effects support.
       </description>
-      <pubDate>Mon, 7 Nov 2011 12:00:00 GMT</pubDate>
+      <pubDate>Mon, 14 Nov 2011 12:00:00 GMT</pubDate>
    </item>
    <item>
       <title>CGRU Version 1.5.0 Released.</title>

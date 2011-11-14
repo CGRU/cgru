@@ -36,7 +36,7 @@
 </td>
 </tr>
 </table>
-<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td style="padding:6px">
 <!--HEADER-->
 
 <h2 align="center">CGRU Linux Packages</h2>
@@ -46,58 +46,111 @@
 Linux packages will be installed in <kbd>/opt/cgru</kbd> folder.
 </p>
 
-<table border="0" width="100%">
+<table border="1" width="100%">
 <tr aligh="center">
-   <td width="30%">
-      <h3>Packages Dependence Structure:</h3>
+   <td style="padding:6px">
+      <h3>Dependence<br/>Structure:</h3>
    </td>
-   <td>
+   <td style="padding:6px">
       <h3>Description:</h3>
+   </td>
+   <td style="padding:6px">
+      <h3>Depends:</h3>
+   </td>
+   <td style="padding:6px">
+      <h3>Suggests:</h3>
    </td>
 </tr>
 <tr aligh="center">
-<td>
-<ul>
-<li>
-   cgru
-   <ul>
-   <li>
-      afanasy-render
+   <td rowspan="5" style="padding:6px">
       <ul>
       <li>
-         afanasy-common
+         cgru
          <ul>
          <li>
-            cgru-common
+            afanasy-render
+            <ul>
+            <li>
+               afanasy-common
+               <ul>
+               <li>
+                  cgru-common
+               </li>
+               </ul>
+            </li>
+            </ul>
+         </li>
+         </ul>
+      </li>
+      <li>
+         afanasy-server
+         <ul>
+         <li>
+            afanasy-common
+            <ul>
+            <li>
+               cgru-common
+            </li>
+            </ul>
          </li>
          </ul>
       </li>
       </ul>
-   </li>
-   </ul>
-</li>
-<li>
-   afanasy-server
-   <ul>
-   <li>
-      afanasy-common
-      <ul>
-      <li>
-         cgru-common
-      </li>
-      </ul>
-   </li>
-   </ul>
-</li>
-</ul>
-</td>
-<td width="50%">
-<p><b>cgru</b>: Start menu item.</p>
-<p><b>cgru-common</b>: All files, except Afanasy binaries.<br/></p>
-<p><b>afanasy-common</b>: Afanasy binary files.</p>
-<p><b>afanasy-render</b>: Afanasy render startup script. Creates '<i>render</i>' user if does not exists.</p>
-<p><b>afanasy-server</b>: Afanasy server startup script. Creates '<i>render</i>' user if does not exists.</p>
-</td>
+   </td>
+   <td style="padding:6px">
+      <p><b>cgru</b>: Start menu item.</p>
+   </td>
+   <td align="center" style="padding:6px">
+      pyqt
+   </td>
+   <td align="center" style="padding:6px">
+   </td>
+</tr>
+<tr>
+   <td style="padding:6px">
+      <p><b>cgru-common</b>: All files, except Afanasy binaries.<br/></p>
+   </td>
+   <td align="center" style="padding:6px">
+   </td>
+   <td align="center" style="padding:6px">
+      mencoder
+   </td>
+</tr>
+<tr>
+   <td style="padding:6px">
+      <p><b>afanasy-common</b>: Afanasy binary files.</p>
+   </td>
+   <td align="center" style="padding:6px">
+      libqt
+   </td>
+   <td align="center" style="padding:6px">
+   </td>
+</tr>
+<tr>
+   <td style="padding:6px">
+      <p><b>afanasy-render</b>: Afanasy render startup script. Creates '<i>render</i>' user if does not exists.</p>
+   </td>
+   <td align="center" style="padding:6px">
+   </td>
+   <td align="center" style="padding:6px">
+   </td>
+</tr>
+<tr>
+   <td style="padding:6px">
+      <p><b>afanasy-server</b>: Afanasy server startup script. Creates '<i>render</i>' user if does not exists.</p>
+   </td>
+   <td align="center" style="padding:6px">
+   </td>
+   <td align="center" style="padding:6px">
+      postgresql-server apache php php-gd php-pgsql
+   </td>
+</tr>
+<tr>
+   <td style="padding:6px" colspan="2">
+   </td>
+   <td style="padding:6px" colspan="2">
+      * <i>Packages names are vary in each Linux distribution.</i>
+   </td>
 </tr>
 </table>
 
@@ -147,6 +200,18 @@ In this way Linux system solves packages dependences itself.
 <img src="../utilities/keeper/doc/linux_menu.png" alt="linux_menu">
 <p>
 This menu item launches <a href="../utilities/keeper/doc/index.html">Keeper</a>.
+</p>
+
+<h3>*Warning:</h3>
+<p>
+If packages structure changed, you should uninstall all previous packages yourself before install new version.
+For example structure changed from 1.5.1 version.
+If you install packages using script provided with CGRU archive,
+you should uninstall previous packages using script from than previous packages archive, not from new one.
+<p>
+</p>
+If you make such mistake, you always can remove all CGRU packages by hands.
+See commands in uninstall script from any version and use them to remove old 'hanging' package, which does not exist in the new version.
 </p>
 
 <!--FOOTER-->

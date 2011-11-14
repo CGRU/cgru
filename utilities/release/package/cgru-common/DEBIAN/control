@@ -3,7 +3,6 @@ Version: @VERSION@
 Architecture: all
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: python-qt4
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/

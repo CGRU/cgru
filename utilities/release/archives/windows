@@ -5,6 +5,9 @@
 dest=$1
 [ -d "$dest" ] || exit 1
 
+# Clear Software locations:
+rm -fv $dest/software_setup/locate_*
+
 # Clear Python:
 python=$dest/python
 cd $python

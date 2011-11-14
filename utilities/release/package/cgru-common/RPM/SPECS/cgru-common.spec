@@ -9,8 +9,6 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
-Requires:      PyQt4
-
 AutoReqProv:   no
 
 %description

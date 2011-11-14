@@ -5,4 +5,5 @@
 dest=$1
 [ -d "$dest" ] || exit 1
 
-# Nothing special to do
+# Clear Software locations:
+rm -fv $dest/software_setup/locate_*

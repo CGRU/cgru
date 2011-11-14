@@ -9,7 +9,7 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
-Requires:      cgru-common = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@
+Requires:      cgru-common = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@, PyQt4
 AutoReqProv:   no
 
 %description
