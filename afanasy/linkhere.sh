@@ -10,9 +10,10 @@ if [ -z $src ]; then
    echo "Removing links..."
    for folder in $folders
    do
-      [ -d "${folder}" ] && rm -v $folder
+      [ -d "${folder}" ] && rm -fv $folder
    done
    echo "Done"
+   echo "To make lings run:'$0 [branch]'"
    exit 0
 fi
 
