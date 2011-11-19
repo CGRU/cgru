@@ -2,17 +2,19 @@
 
 echo "Detecting linux distribution..."
 
-knowndistrs="Debian Ubuntu CentOS Fedora openSUSE"
+distskeys="Debian Ubuntu CentOS Fedora openSUSE Simply"
+knowndists="Debian Ubuntu CentOS Fedora openSUSE AltLinux"
 
 # Load issue file:
-issuefile="/etc/issue"
+issuefile="/etc/system-release"
+[ -f "${issuefile}" ] || issuefile="/etc/issue"
 if [ ! -f "${issuefile}" ]; then
    echo "File '${issuefile}' not founded. Can't detect distribution."
    exit 1
 fi
 
 # Search issue file:
-for distr in $knowndistrs; do
+for distr in $distskeys; do
    issue=`cat "${issuefile}" | grep "${distr}"`
    [ -z "${issue}" ] && continue
    if [ `eval "echo \"${issue}\" | awk '{ print match(\\$0,\"${distr}\")}'"` != "0" ]; then
@@ -26,7 +28,7 @@ if [ -z "${DISTRIBUTIVE}" ]; then
    echo "Unsupported distribution:"
    cat "${issuefile}"
    echo "Supported distributions:"
-   echo "${knowndistrs}"
+   echo "${knowndists}"
    exit 1
 fi
 
@@ -62,6 +64,11 @@ case ${DISTRIBUTIVE} in
    Ubuntu)
       debianArch
       export VERSION_NAME="ubuntu${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
+      ;;
+   Simply)
+      export DISTRIBUTIVE="AltLinux"
+      redhatArch
+      export VERSION_NAME="alt${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
       ;;
    *)
       redhatArch

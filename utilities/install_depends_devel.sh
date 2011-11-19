@@ -6,16 +6,17 @@ source ./distribution.sh
 
 # List packages:
 
-packages="gcc yasm p7zip ruby wget inkscape"
+packages="yasm p7zip ruby wget inkscape"
 packages="$packages cmake python-dev"
-packages="$packages qt4-dev-tools"
-packages="$packages python-qt4"
 packages_noarch="rubygems"
 
-# Common for Debian distributives:
+# Packages for Debian distributives:
 function debianArch(){
    packages="$packages g++"
-   packages="$packages p7zip-full git-core"
+   packages="$packages qt4-dev-tools"
+   packages="$packages python-qt4"
+   packages="$packages p7zip-full"
+   packages="$packages git-core"
    packages="$packages libzip1 libzip-dev"
    # ImageMagick:
    packages="$packages libjpeg62 libjpeg62-dev"
@@ -28,10 +29,13 @@ function debianArch(){
    pkg_extension=""
 }
 
-# Common for RedHat distributives:
+# Packages for RedHat distributives:
 function redhatArch(){
    packages="$packages gcc-c++"
-   packages="$packages rpm-build git"
+   packages="$packages qt4-dev-tools"
+   packages="$packages rpm-build"
+   packages="$packages git"
+   packages="$packages PyQt4"
    packages="$packages libzip libzip-devel"
    # ImageMagick:
    packages="$packages libjpeg libjpeg-devel"
@@ -44,9 +48,11 @@ function redhatArch(){
    pkg_extension=".$ARCHITECTURE"
 }
 
-# Common for SUSE distributives:
+# Packages for SUSE distributives:
 function suseArch(){
    packages="$packages gcc-c++"
+   packages="$packages qt4-dev-tools"
+   packages="$packages PyQt4"
    packages="$packages libzip1 libzip-devel git"
    # ImageMagick:
    packages="$packages libjpeg6 libjpeg-devel"
@@ -59,8 +65,30 @@ function suseArch(){
    pkg_extension=".$ARCHITECTURE"
 }
 
+# Packages for AltLinux distributives:
+function altArch(){
+   packages="$packages gcc4.5-c++"
+   packages="$packages qt4-devel"
+   packages="$packages PyQt"
+   packages="$packages git-core"
+   packages="$packages libzip libzip-devel"
+   packages="$packages rpm-build"
+   # ImageMagick:
+   packages="$packages libjpeg libjpeg-devel"
+   packages="$packages libtiff libtiff-devel"
+   packages="$packages libpng12 libpng-devel"
+   packages="$packages libfreetype libfreetype-devel"
+   packages="$packages fontconfig fontconfig-devel"
+
+   pkg_manager_cmd="apt-get install"
+   pkg_extension=""
+}
+
 # Case distribution:
 case ${DISTRIBUTIVE} in
+   AltLinux)
+      altArch
+      ;;
    Debian)
       debianArch
       ;;
