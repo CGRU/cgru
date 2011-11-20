@@ -7,12 +7,12 @@ source ./distribution.sh
 # List packages:
 
 packages="yasm p7zip ruby wget inkscape"
-packages="$packages cmake python-dev"
 packages_noarch="rubygems"
 
 # Packages for Debian distributives:
 function debianArch(){
    packages="$packages g++"
+   packages="$packages python-dev"
    packages="$packages qt4-dev-tools"
    packages="$packages python-qt4"
    packages="$packages p7zip-full"
@@ -32,6 +32,7 @@ function debianArch(){
 # Packages for RedHat distributives:
 function redhatArch(){
    packages="$packages gcc-c++"
+   packages="$packages python-dev"
    packages="$packages qt4-dev-tools"
    packages="$packages rpm-build"
    packages="$packages git"
@@ -51,7 +52,8 @@ function redhatArch(){
 # Packages for SUSE distributives:
 function suseArch(){
    packages="$packages gcc-c++"
-   packages="$packages qt4-dev-tools"
+   packages="$packages python-devel"
+   packages="$packages libqt4-devel"
    packages="$packages PyQt4"
    packages="$packages libzip1 libzip-devel git"
    # ImageMagick:
@@ -68,6 +70,7 @@ function suseArch(){
 # Packages for AltLinux distributives:
 function altArch(){
    packages="$packages gcc4.5-c++"
+   packages="$packages python-dev"
    packages="$packages qt4-devel"
    packages="$packages PyQt"
    packages="$packages git-core"
