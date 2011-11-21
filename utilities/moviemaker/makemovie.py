@@ -9,6 +9,8 @@ import shutil
 import signal
 import subprocess
 
+print('MakeMovie: "%s"' % __file__)
+
 TmpDir = ''
 def rmdir( signum, frame):
    print('\nInterrupt received...')
@@ -103,6 +105,8 @@ if len(args) > 2:
    Inpattern2 = args[1]
    Output     = args[2]
    Stereo     = True
+
+print( Inpattern1 + ' ' + Inpattern2)
 
 Codec       = Options.codec
 AspectIn    = Options.aspect_in
@@ -208,41 +212,47 @@ def getImages( inpattern):
 
    # Input files pattern processing:
    pattern = os.path.basename( inpattern)
-   digitspos = pattern.rfind('#')
-   digitslen = 0
-   if digitspos < 0:
-      # Process %04d pattern:
-      digitspos = pattern.rfind('%0')
-      if digitspos < 0:
+   # Process %d pattern:
+   digitsall = re.findall(r'%\d{,}d', pattern)
+   if len(digitsall):
+      digitsall = digitsall[-1]
+      digitspos = pattern.rfind( digitsall)
+      digitslen = len(digitsall)
+      if len(digitsall) > 2:
+         # Process %0#d pattern:
+         try:
+            padding = int(digitsall[1:-1])
+         except:
+            print('Unable to find number in %#d pattern ("'+ digitsall[1:-1] +'" not a number).')
+            sys.exit(1)
+      else:
+         # Process %d pattern:
+         padding = -1
+   else:
+      # Process # pattern:
+      digitsall = re.findall(r'#{1,}', pattern)
+      if len(digitsall):
+         digitsall = digitsall[-1]
+         digitspos = pattern.rfind( digitsall)
+         digitslen = len(digitsall)
+         padding = digitslen
+      else:
          print('Can\'t find #### or %0#d in input files pattern.')
          sys.exit(1)
-      if pattern[digitspos+3] != 'd':
-         print('Invalid %0#d pattern.')
-         sys.exit(1)
-      try:
-         digitsnum = int(pattern[digitspos+2])
-      except:
-         print('Unable to find number in %0#d pattern.')
-         sys.exit(1)
-      digitslen = 4
-   else:
-      # Process #### pattern:
-      digitsnum = 1
-      for i in range(digitspos):
-         if pattern[digitspos-digitsnum] == '#':
-            digitsnum += 1
-         else:
-            break
-      digitslen = digitsnum
-      digitspos = digitspos - digitslen + 1
+
    prefix = pattern[ : digitspos ]
    suffix = pattern[ digitspos+digitslen :]
+   
+   print('Images prefix, padding, suffix = "%s" %d "%s"' % (prefix,padding,suffix))
 
    # Input files search pattern:
    allFiles = []
    eprefix = re.escape( prefix)
    esuffix = re.escape( suffix)
-   expr = r'%(eprefix)s([0-9]{%(digitsnum)s,%(digitsnum)s})%(esuffix)s$' % vars()
+   if padding > 1:
+      expr = r'%(eprefix)s([0-9]{%(padding)s,%(padding)s})%(esuffix)s$' % vars()
+   else:
+      expr = r'%(eprefix)s([0-9]{1,})%(esuffix)s$' % vars()
    if Verbose: print('Expression = ' + expr)
    expr = re.compile( expr)
    allItems = os.listdir( inputdir)
@@ -250,14 +260,16 @@ def getImages( inpattern):
       if not os.path.isfile( os.path.join( inputdir, item)): continue
       if expr.match( item) is None: continue
       if Options.framestart != -1 or Options.frameend != -1:
-         frame = int(item[digitspos:digitspos+digitsnum])
+         if padding > 1:
+            frame = int( item[digitspos:digitspos+padding])
+         else:
+            frame = int(re.findall(r'\d{1,}', item)[-1])
          if frame < Options.framestart or frame > Options.frameend: continue
       allFiles.append( os.path.join( inputdir, item))
    if len(allFiles) <= 1:
       print('None or only one file founded matching pattern.')
       print('Input directory:')
       print( inputdir)
-      print('  prefix - digits - suffix = "%(prefix)s" - %(digitsnum)d - "%(suffix)s"' % vars())
       print('Expression:')
       print( expr.pattern)
       sys.exit(1)
@@ -299,14 +311,14 @@ def getImages( inpattern):
    elif Verbose:
       print('AspectIn = %f' % AspectIn)
 
-   return allFiles, inputdir, prefix, digitsnum, suffix
+   return allFiles, inputdir, prefix, padding, suffix
 
 
 
 # Call get images function:
-images1, inputdir, prefix, digitsnum, suffix = getImages( Inpattern1)
+images1, inputdir, prefix, padding, suffix = getImages( Inpattern1)
 if Inpattern2 != '':
-   images2, inputdir, prefix, digitsnum, suffix = getImages( Inpattern2)
+   images2, inputdir, prefix, padding, suffix = getImages( Inpattern2)
    if len(images1) != len(images2):
       print('Error: Sequences lenght is not the same')
       sys.exit(1)
@@ -460,7 +472,7 @@ if need_convert:
 # Encode commands:
 auxargs = ''
 if encoder == 'ffmpeg' or encoder == 'nuke':
-   inputmask = os.path.join( inputdir, prefix+'%0'+str(digitsnum)+'d'+suffix)
+   inputmask = os.path.join( inputdir, prefix+'%0'+str(padding)+'d'+suffix)
    if len(cmd_convert): inputmask = os.path.join( TmpDir, tmpname+'.%07d.'+TmpFormat)
 elif encoder == 'mencoder':
    inputmask = os.path.join( inputdir, prefix+'*'+suffix)
