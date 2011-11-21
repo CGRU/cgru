@@ -214,15 +214,15 @@ def getImages( inpattern):
       # Process %04d pattern:
       digitspos = pattern.rfind('%0')
       if digitspos < 0:
-         print('Can\'t find #### or %04d in input files pattern.')
+         print('Can\'t find #### or %0#d in input files pattern.')
          sys.exit(1)
       if pattern[digitspos+3] != 'd':
-         print('Invalid %04d pattern.')
+         print('Invalid %0#d pattern.')
          sys.exit(1)
       try:
          digitsnum = int(pattern[digitspos+2])
       except:
-         print('Unable to find number in %04d pattern.')
+         print('Unable to find number in %0#d pattern.')
          sys.exit(1)
       digitslen = 4
    else:
@@ -248,16 +248,16 @@ def getImages( inpattern):
    allItems = os.listdir( inputdir)
    for item in allItems:
       if not os.path.isfile( os.path.join( inputdir, item)): continue
-      if not expr.match( item): continue
+      if expr.match( item) is None: continue
       if Options.framestart != -1 or Options.frameend != -1:
-         frame = int(item[digitspos:digitspos+digitslen])
+         frame = int(item[digitspos:digitspos+digitsnum])
          if frame < Options.framestart or frame > Options.frameend: continue
       allFiles.append( os.path.join( inputdir, item))
    if len(allFiles) <= 1:
       print('None or only one file founded matching pattern.')
       print('Input directory:')
       print( inputdir)
-      print('  prefix, digits, suffix = %(prefix)s, %(digitsnum)d, %(suffix)s' % vars())
+      print('  prefix - digits - suffix = "%(prefix)s" - %(digitsnum)d - "%(suffix)s"' % vars())
       print('Expression:')
       print( expr.pattern)
       sys.exit(1)

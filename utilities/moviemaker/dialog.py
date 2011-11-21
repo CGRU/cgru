@@ -1143,30 +1143,43 @@ Add this options to temporary image saving.')
          prefix = filename[ : pos]
          suffix = filename[pos+4 : ]
       else:
-         # Search #### pattern:
-         digitsall = re.findall(r'(#{1,})', filename)
-         if len(digitsall) == 0:
-            # Search digits pattern:
-            digitsall = re.findall(r'([0-9]{1,})', filename)
+         # Search %d pattern:
+         digitsall = re.findall(r'%d', filename)
          if len(digitsall):
-            digits = digitsall[-1]
-            pos = filename.rfind(digits)
+            padstr = digitsall[-1]
+            padding = -1
+            pos = filename.rfind( padstr)
             prefix = filename[ : pos]
-            padding = len(digits)
-            suffix = filename[pos+padding : ]
-            padstr = ''
-            for d in range(padding): padstr += '#'
+            suffix = filename[pos+2 : ]
          else:
-            self.cmdField.setText('Can\'t find digits in input file name.')
-            return InputFile, InputPattern, FilesCount, Identify
+            # Search #### pattern:
+            digitsall = re.findall(r'(#{1,})', filename)
+            if len(digitsall) == 0:
+               # Search digits pattern:
+               digitsall = re.findall(r'([0-9]{1,})', filename)
+            if len(digitsall):
+               digits = digitsall[-1]
+               pos = filename.rfind(digits)
+               prefix = filename[ : pos]
+               padding = len(digits)
+               suffix = filename[pos+padding : ]
+               padstr = ''
+               for d in range(padding): padstr += '#'
+            else:
+               self.cmdField.setText('Can\'t find digits in input file name.')
+               return InputFile, InputPattern, FilesCount, Identify
 
       pattern = prefix + padstr + suffix
 
-      expr = re.compile( r'%(prefix)s([0-9]{%(padding)d,%(padding)d})%(suffix)s' % vars())
+      if padding > 1:
+         expr = re.compile( r'%(prefix)s([0-9]{%(padding)d,%(padding)d})%(suffix)s' % vars())
+      else:
+         expr = re.compile( r'%(prefix)s([0-9]{1,})%(suffix)s' % vars())
       FilesCount = 0
       framefirst = -1
       framelast  = -1
       prefixlen = len(prefix)
+      suffixlen = len(suffix)
       allItems = os.listdir( inputdir)
       for item in allItems:
          if not os.path.isfile( os.path.join( inputdir, item)): continue
@@ -1175,14 +1188,14 @@ Add this options to temporary image saving.')
          if match.group(0) != item: continue
          if FilesCount == 0: afile = item
          FilesCount += 1
-         frame = int(item[prefixlen:prefixlen+padding])
+         frame = int(item[prefixlen:-suffixlen])
          if framefirst == -1: framefirst = frame
          if framelast  == -1: framelast  = frame
          if framefirst > frame: framefirst = frame
          if framelast  < frame: framelast  = frame
       if FilesCount <= 1:
-         self.cmdField.setText('None or only one file founded matching pattern.\n\
-         prefix, padding, suffix = "%(prefix)s" %(padding)d "%(suffix)s"' % vars())
+         self.cmdField.setText(('None or only one file founded matching pattern.\n\
+         prefix, padding, suffix = "%(prefix)s" %(padding)d "%(suffix)s\n"' % vars()) + expr.pattern)
          return InputFile, InputPattern, FilesCount, Identify
       self.sbFrameFirst.setRange( framefirst, framelast)
       self.sbFrameFirst.setValue( framefirst)
