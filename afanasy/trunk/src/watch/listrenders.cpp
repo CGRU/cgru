@@ -144,6 +144,13 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    QMenu menu(this);
    QAction *action;
 
+   if( selectedItemsCount <= 1 )
+   {
+      action = new QAction( render->getName(), this);
+      action->setEnabled( false);
+      menu.addAction( action);
+   }
+
    action = new QAction( "Show Log", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
    menu.addAction( action);
