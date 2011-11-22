@@ -353,8 +353,12 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
    frame_range = frame_first, frame_last, frame_inc, frame_pertask
 
    params = []
+   connections = []
+   connections.extend( afnode.inputs())
    nodes = []
-   nodes.extend( afnode.inputs())
+   for node in connections:
+      if node is not None:
+         nodes.append( node)
    if afnode.parm('cmd_add').eval(): nodes.append(None)
    nodes.reverse()
    dependmask = ''

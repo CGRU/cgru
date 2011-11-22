@@ -59,6 +59,8 @@ Parser.add_option(      '--afcapacity',      dest='afcapacity',      type  ='int
 Parser.add_option(      '--afpause',         dest='afpause',         action='store_true', default=False,          help='Start Afanasy job paused')
 Parser.add_option('-D', '--debug',           dest='debug',           action='store_true', default=False,          help='Debug mode')
 
+Parser.add_option(      '--wndicon',         dest='wndicon',         type  ='string',     default='dailies.png',  help='Set dialog window icon.')
+
 (Options, args) = Parser.parse_args()
 
 if len(args) > 2: Parser.error('Too many arguments provided.')
@@ -1475,7 +1477,7 @@ def getComboBoxString( comboBox):
    return comboBox.itemData( comboBox.currentIndex()).toString()
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], 'dailies.png')))
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], Options.wndicon)))
 dialog = Dialog()
 dialog.show()
 app.exec_()

@@ -149,6 +149,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
       action = new QAction( render->getName(), this);
       action->setEnabled( false);
       menu.addAction( action);
+      menu.addSeparator();
    }
 
    action = new QAction( "Show Log", this);

@@ -24,6 +24,8 @@ Parser.add_option('--aspect_in',       dest='aspect_in',    type  ='float',     
 Parser.add_option('--aspect_auto',     dest='aspect_auto',  type  ='float',      default=1.2,         help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('-D', '--debug',     dest='debug',        action='store_true', default=False,       help='Debug mode')
 
+Parser.add_option(      '--wndicon',   dest='wndicon',      type  ='string',     default='scanscan.png',  help='Set dialog window icon.')
+
 (Options, args) = Parser.parse_args()
 InputFolder  = ''
 OutputFolder = '..'
@@ -447,7 +449,7 @@ def getComboBoxString( comboBox):
 
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], 'scanscan.png')))
+app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], Options.wndicon)))
 dialog = Dialog()
 dialog.show()
 app.exec_()

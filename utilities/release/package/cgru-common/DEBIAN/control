@@ -6,6 +6,4 @@ Installed-Size: @SIZE@
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/
-Description: CGRU common files
- CGRU tools pack common files.
- Needed by CGRU GUI applications and documentations.
+Description: CGRU files
