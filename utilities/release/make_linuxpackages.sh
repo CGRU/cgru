@@ -23,6 +23,8 @@ echo "CGRU $packsver rev$packsrev"
 # Disrtibutive variables:
 source ../distribution.sh
 [ -z "${DISTRIBUTIVE}" ] && exit 1
+# Disrtibutive depend packages variables:
+source ./depends.sh
 
 # Function to print usage and exit:
 function usage(){

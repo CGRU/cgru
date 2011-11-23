@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: @ARCHITECTURE@
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: cgru-common (= @VERSION@), libqt4-core, libqt4-gui, libqt4-network, libqt4-xml, libqt4-sql, libqt4-sql-psql
+Depends: cgru-common (= @VERSION@), @DEPENDS_AFANASY@
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/
