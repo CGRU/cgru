@@ -214,34 +214,34 @@ class Cmd( pyaf.Cmd):
          return False
 
    def renderSetNimby( self, text):
-      self.rendersetnimby( self.env.Vars['hostname'] + '.*', text)
+      self.rendersetnimby( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderSetNIMBY( self, text):
-      self.rendersetNIMBY( self.env.Vars['hostname'] + '.*', text)
+      self.rendersetNIMBY( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderSetFree( self, text):
-      self.rendersetfree( self.env.Vars['hostname'] + '.*', text)
+      self.rendersetfree( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderEjectTasks( self, text):
-      self.renderejecttasks( self.env.Vars['hostname'] + '.*', text)
+      self.renderejecttasks( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderExit( self, text):
-      self.renderexit( self.env.Vars['hostname'] + '.*', text)
+      self.renderexit( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def talkExit( self, text):
-      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + '.*', text)
+      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def monitorExit( self, text):
-      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + '.*', text)
+      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'], text)
       self._sendRequest()
 
-   def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'] + '.*')
+   def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'])
    def renderGetList( self, mask = '.*'):
       if not self.renderlistget( mask): return
       if self._sendRequest():

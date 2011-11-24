@@ -1,7 +1,6 @@
 import os, sys
 import subprocess
 
-import cgrudocs
 import cgruconfig
 
 import af
@@ -15,15 +14,6 @@ import software
 from dialog_nimby import DialogNimby
 
 from PyQt4 import QtCore, QtGui
-
-def getVar( var, title = 'Set Variable', label = 'Enter new value:'):
-   oldvalue = ''
-   if var in cgruconfig.VARS: oldvalue = cgruconfig.VARS[var]
-   newvalue, ok = QtGui.QInputDialog.getText( None, title, label, text = oldvalue)
-   if not ok: return
-   cgruconfig.VARS[var] = str( newvalue)
-   variables = [var]
-   cgruconfig.writeVars(variables)
 
 class ActionCommand( QtGui.QAction):
    def __init__( self, parent, name, command, iconpath = None):
@@ -148,6 +138,15 @@ class Tray( QtGui.QSystemTrayIcon):
 
       self.menu['AFANASY'].addSeparator()
 
+      action = QtGui.QAction('Set Server...', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.setAFANASYServer)
+      self.menu['AFANASY'].addAction( action)
+      action = QtGui.QAction('Edit User Config...', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.editAFANASYConfig)
+      self.menu['AFANASY'].addAction( action)
+
+      self.menu['AFANASY'].addSeparator()
+
       action = QtGui.QAction('Exit Render', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exit)
       self.menu['AFANASY'].addAction( action)
@@ -166,16 +165,16 @@ class Tray( QtGui.QSystemTrayIcon):
          self.menu['menu'].addMenu( self.menu['Configure'])
       self.menu['Configure'].addSeparator()
       action = QtGui.QAction('Reload Config', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.confReload)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.confReload)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Docs URL...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setDocsURL)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.setDocsURL)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Edit Config...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.editCGRUConfig)
       self.menu['Configure'].addAction( action)
       action = QtGui.QAction('Set Text Editor...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.setTextEditor)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.setTextEditor)
       self.menu['Configure'].addAction( action)
 
       self.menu['menu'].addSeparator()
@@ -185,7 +184,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['menu'].addAction( action)
       self.menu['menu'].addSeparator()
       action = QtGui.QAction('Documentation', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.cgruDocs)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.cgruDocs)
       self.menu['menu'].addAction( action)
       self.menu['menu'].addSeparator()
       action = QtGui.QAction('Restart', self)
@@ -210,7 +209,7 @@ class Tray( QtGui.QSystemTrayIcon):
    def activated_slot( self, reason):
       if reason == QtGui.QSystemTrayIcon.Trigger: return
       elif reason == QtGui.QSystemTrayIcon.DoubleClick:
-         render.refresh()
+#         render.refresh()
          print('DoubleClick')
       elif reason == QtGui.QSystemTrayIcon.MiddleClick:
          print('MiddleClick')
@@ -218,10 +217,5 @@ class Tray( QtGui.QSystemTrayIcon):
       elif reason == QtGui.QSystemTrayIcon.Unknown: return
 
    def renderInfo( self): render.showInfo( self)
-   def confReload( self): cgruconfig.Config()
-   def cgruDocs( self): cgrudocs.show()
    def cgruInfo( self): self.dialog_info = info.Window()
    def editNimby( self): self.dialog_nimby = DialogNimby()
-   def setDocsURL( self): getVar('docshost','Set Docs Host','Enter host name or IP address:')
-   def setTextEditor( self): getVar('editor','Set Text Editor','Enter command with "%s":')
-   def startAfWatch( self): QtCore.QProcess.startDetached( os.path.join( os.path.join( os.getenv('AF_ROOT'), 'launch'), 'afwatch.sh'))
