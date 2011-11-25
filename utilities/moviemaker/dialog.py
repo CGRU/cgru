@@ -200,6 +200,10 @@ class Dialog( QtGui.QWidget):
       self.tabwidget.addTab( self.stereowidget,'Stereo')
       self.stereolayout = QtGui.QVBoxLayout( self.stereowidget)
 
+      self.decodewidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.decodewidget,'Decode')
+      self.decodeLayout = QtGui.QVBoxLayout( self.decodewidget)
+
       self.afanasywidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.afanasywidget,'Afanasy')
       self.afanasylayout = QtGui.QVBoxLayout( self.afanasywidget)
@@ -804,6 +808,29 @@ Add this options to temporary image saving.')
       self.lStereoStatus.addWidget( self.editStereoStatus)
       self.editStereoStatus.setReadOnly( True)
 
+
+      # Decode:
+      self.decodeInputGroup = QtGui.QGroupBox('Input Movie')
+      self.decodeLayout.addWidget( self.decodeInputGroup)
+      self.decodeInputLayout = QtGui.QVBoxLayout( self.decodeInputGroup)
+      self.decodeInputFileName = QtGui.QLineEdit()
+      self.decodeInputLayout.addWidget( self.decodeInputFileName)
+      QtCore.QObject.connect( self.decodeInputFileName, QtCore.SIGNAL('textEdited(QString)'), self.decodeInputChanged)
+      self.decodeInputBrowse = QtGui.QPushButton('Browse')
+      self.decodeInputLayout.addWidget( self.decodeInputBrowse)
+      QtCore.QObject.connect( self.decodeInputBrowse, QtCore.SIGNAL('pressed()'), self.decodeBrowseInput)
+
+      self.decodeOutputGroup = QtGui.QGroupBox('Output Sequence')
+      self.decodeLayout.addWidget( self.decodeOutputGroup)
+      self.decodeOutputLayout = QtGui.QVBoxLayout( self.decodeOutputGroup)
+      self.decodeOutputSequence = QtGui.QLineEdit()
+      self.decodeOutputLayout.addWidget( self.decodeOutputSequence)
+      QtCore.QObject.connect( self.decodeOutputSequence, QtCore.SIGNAL('textEdited(QString)'), self.decodeOutputChanged)
+      self.decodeOutputBrowse = QtGui.QPushButton('Browse')
+      self.decodeOutputLayout.addWidget( self.decodeOutputBrowse)
+      QtCore.QObject.connect( self.decodeOutputBrowse, QtCore.SIGNAL('pressed()'), self.decodeBrowseOutput)
+
+
       # Afanasy:
 
       self.cAfanasy = QtGui.QCheckBox('Enable', self)
@@ -972,6 +999,55 @@ Add this options to temporary image saving.')
       self.inputFileChanged()
       self.inputFileChanged2()
       self.evaluate()
+
+
+# Decode:
+
+   def decodeBrowseInput( self):
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a movie file', self.decodeInputFileName.text())
+      if len( afile):
+         self.decodeInputFileName.setText( afile)
+         self.decodeInputChanged()
+   def decodeBrowseOutput( self):
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a sequence', self.decodeOutputSequence.text())
+      if len( afile):
+         self.decodeOutputSequence.setText( afile)
+         self.decodeOutputChanged()
+   def decodeInputChanged( self):
+      afile = "%s" % self.decodeInputFileName.text()
+      if len( afile):
+         self.decodeOutputSequence.setText( os.path.join(os.path.basename( afile) + '-png', os.path.basename( afile) + '.%07d.png'))
+         self.decodeEvaluate()
+   def decodeOutputChanged( self): self.decodeEvaluate()
+   def decodeEvaluate( self):
+      self.evaluated = False
+      self.btnStart.setEnabled( False)
+      if self.running: return False
+      self.cmdField.clear()
+
+      inputMovie = "%s" % self.decodeInputFileName.text()
+      if len( inputMovie) == 0:
+         self.cmdField.setText('Specify input movie to explode into sequence.')
+         return False
+      inputMovie = os.path.normpath( os.path.abspath( inputMovie))
+      outputSequence = "%s" % self.decodeOutputSequence.text()
+      if len( outputSequence) == 0:
+         self.cmdField.setText('Specify output sequence to explode input movie into.')
+         return False
+      outputSequence = os.path.normpath( os.path.join( os.path.dirname( inputMovie), outputSequence))
+
+      cmd = 'ffmpeg'
+      cmd += ' -i "%s"' % inputMovie
+      cmd += ' -an -f image2'
+      cmd += ' "%s"' % outputSequence
+
+      self.cmdField.setText( cmd)
+      self.evaluated = True
+      self.btnStart.setEnabled( True)
+      return True
+
+
+# Encode:
 
    def evalStereo( self):
       if self.running: return
@@ -1243,11 +1319,12 @@ Add this options to temporary image saving.')
       self.evaluated = False
       self.btnStart.setEnabled( False)
       if self.running: return
-
+      if self.decodeEvaluate(): return
+      self.cmdField.clear()
+      
       if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9'): return
       if not self.validateEditColor( str(self.editLine235.text()), 'line 2.35'): return
 
-      self.cmdField.clear()
       if self.inputPattern is None:
          self.cmdField.setText('Specify input sequence.')
          return
@@ -1402,6 +1479,12 @@ Add this options to temporary image saving.')
       if not self.evaluated: return
       command = "%s" % self.cmdField.toPlainText()
       if len(command) == 0: return
+      
+#      decodeOutput = "%s" % self.decodeOutputSequence.text()
+#      if len( decodeOutput):
+#         decodeOutput = os.path.dirname( decodeOutput)
+#         decodeOutput = os.path.normpath( decodeOutput)
+#         if len( decodeOutput):
 
       if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
          self.btnStart.setEnabled( False)
