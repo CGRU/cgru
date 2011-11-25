@@ -42,6 +42,7 @@ xcopy utilities\keeper %dest%\utilities\keeper\ /ys
 xcopy utilities\moviemaker %dest%\utilities\moviemaker\ /ys
 xcopy utilities\afstarter %dest%\utilities\afstarter\ /ys
 xcopy utilities\regexp %dest%\utilities\regexp\ /ys
+xcopy utilities\*.py %dest%\utilities\ /y
 
 xcopy plugins %dest%\plugins\ /y
 xcopy plugins\nuke %dest%\plugins\nuke\ /ys
