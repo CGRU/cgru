@@ -324,6 +324,6 @@ def dailies( node):
    if sys.platform.find('win') == 0:
       cmd = 'start ' + cmd
    else:
-      cmd = 'launchcmd.py ' + cmd + ' &'
-   print "\n%s\n" % cmd
+      cmd = 'python "%s" ' % (os.environ['CGRU_LOCATION'] + '/utilities/launchcmd.py') + cmd + ' &'
+   print('\n%s\n' % cmd)
    os.system( cmd)
