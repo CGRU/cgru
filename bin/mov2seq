@@ -1,0 +1,3 @@
+#!/bin/bash
+
+python $CGRU_LOCATION/utilities/moviemaker/mov2seq.py "$@"
