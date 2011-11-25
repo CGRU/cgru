@@ -27,4 +27,22 @@ cmd += ' -an -f image2'
 cmd += ' "%s"' % outseq
 
 print( cmd)
-os.system( cmd)
+#os.system( cmd)
+
+#process = subprocess.Popen( cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+#process = subprocess.Popen( cmd+' 2>&1', shell=True, stdout=subprocess.PIPE)
+#process = subprocess.Popen( cmd, shell=True, stderr=subprocess.PIPE)
+#process = subprocess.Popen(['ffmpeg','-i',inputmov,outseq], shell=False, stderr=subprocess.PIPE)
+process = subprocess.Popen( cmd+' | tr \\r \\n\\n', shell=True, stderr=subprocess.PIPE)
+while True:
+   stdout = ''
+#   stdout = process.stdout.readline()
+   stderr = process.stderr.readline()
+#   stderr = process.stderr.read(10)
+   if stdout is None and stderr is None: break
+   if len(stdout) < 1 and len(stderr) < 1: break
+   print('############## "%s"' % (stdout + stderr).replace('\r','\n'))
+#print(process)
+#for line in process:
+#   print('\n############## %s\n' % line)
+
