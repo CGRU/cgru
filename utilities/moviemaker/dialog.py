@@ -1033,6 +1033,11 @@ Add this options to temporary image saving.')
    def decodeInputChanged( self):
       afile = "%s" % self.decodeInputFileName.text()
       if len( afile):
+         pos = afile.rfind('file://')
+         if pos >= 0: afile = afile[ pos+7 : ]
+         afile = afile.strip()
+         afile = afile.strip('\n')
+         self.decodeInputFileName.setText( afile)
          self.decodeOutputSequence.setText( os.path.join(os.path.basename( afile) + '-png', os.path.basename( afile) + '.%07d.png'))
          self.decodeEvaluate()
    def decodeOutputChanged( self): self.decodeEvaluate()

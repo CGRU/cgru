@@ -50,14 +50,9 @@ while True:
    if data == '\n':
       output = ''
       if frame_old != frame:
-         if sys.version_info[0] < 3:
-            print('Frame = %d' % frame),
-            if frames_total != -1: print(' of %d' % frames_total),
-            print(' ')
-         else:
-            print('Frame = %d' % frame, end = '')
-            if frames_total != -1: print(' of %d' % frames_total, end = '')
-            print()
+         frame_info = 'Frame = %d' % frame
+         if frames_total != -1: frame_info += ' of %d' % frames_total
+         print( frame_info)
          if progress != -1: print('PROGRESS: %d%%' % progress)
          frame_old = frame
       sys.stdout.flush()
