@@ -1053,6 +1053,9 @@ Add this options to temporary image saving.')
          self.cmdField.setText('Specify input movie to explode into sequence.')
          return False
       inputMovie = os.path.normpath( os.path.abspath( inputMovie))
+      if not os.path.isfile( inputMovie):
+         self.cmdField.setText('Movie file to decode does not exist.')
+         return False
       outputSequence = "%s" % self.decodeOutputSequence.text()
       if len( outputSequence) == 0:
          self.cmdField.setText('Specify output sequence to explode input movie into.')
