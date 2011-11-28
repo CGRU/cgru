@@ -1055,7 +1055,12 @@ Add this options to temporary image saving.')
       outputSequence = os.path.normpath( os.path.join( os.path.dirname( inputMovie), outputSequence))
       self.decodeOutputAbs.setText( outputSequence)
 
-      self.cmdField.setText('mov2seq "%s" "%s"' % (inputMovie, outputSequence))
+      cmd = os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/mov2seq.py'
+      cmd = os.path.normpath( cmd)
+      cmd = 'python "%s"' % cmd
+      cmd = cmd + (' "%s" "%s"' % (inputMovie, outputSequence))
+
+      self.cmdField.setText( cmd)
       self.evaluated = True
       self.btnStart.setEnabled( True)
       self.decode = True
@@ -1505,7 +1510,12 @@ Add this options to temporary image saving.')
             print( error)
             self.cmdField.setText('Unable to import Afanasy Python module:\n' + error)
             return
-         job = af.Job(('%s' % self.editOutputName.text()).encode('utf-8'))
+         if self.decode:
+            jobname = '%s' % self.decodeOutputSequence.text()
+            jobname = os.path.basename( jobname)
+         else:
+            jobname = '%s' % self.editOutputName.text()
+         job = af.Job( jobname.encode('utf-8'))
          block = af.Block('Make Movie', 'movgen')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
          if self.sbAfMaxHosts.value()  != -1: job.setMaxHosts(    self.sbAfMaxHosts.value())
@@ -1541,9 +1551,16 @@ Add this options to temporary image saving.')
          self.running = True
          self.process = QtCore.QProcess( self)
          self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
+         QtCore.QObject.connect( self.process, QtCore.SIGNAL('error( int)'), self.processerror)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('readyRead()'), self.processoutput)
+         print('\n################################################\n')
+         print(command)
          self.process.start( command)
+
+   def processerror( self, error):
+      self.cmdField.setText('Failed to start a process.')
+      self.processfinished( -1)
 
    def processfinished( self, exitCode):
       print('Exit code = %d' % exitCode)
@@ -1566,7 +1583,11 @@ Add this options to temporary image saving.')
       self.cmdField.moveCursor( QtGui.QTextCursor.End)
 
    def processStop( self):
-      self.cmdField.setText('Stopping...')
+      if self.process.pid() is None or self.process.pid() == 0:
+         self.cmdField.setText('The process was not running.')
+         self.processfinished( -1)
+         return
+      self.cmdField.setText('Stopping %d ...' % self.process.pid())
       self.process.terminate()
       if sys.platform.find('win') == 0:
          self.process.kill()

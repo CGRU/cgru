@@ -11,7 +11,8 @@ if len(sys.argv) < 2:
 inputmov = sys.argv[1]
 
 if not os.path.isfile( inputmov):
-   print('ERROR: Input movie file does not exist.')
+   print('ERROR: Input movie file does not exist:')
+   print( inputmov)
    sys.exit(1)
 
 if len(sys.argv) > 2:
@@ -23,6 +24,9 @@ outdir = os.path.dirname( outseq)
 if not os.path.isdir( outdir): os.makedirs( outdir)
 
 process = subprocess.Popen(['ffmpeg','-y','-i',inputmov,'-an','-f','image2',outseq], shell=False, stderr=subprocess.PIPE)
+#cmd = 'ffmpeg -y -i "%s" -an -sn -f image2 "%s"' % ( inputmov, outseq)
+#print(cmd)
+#process = subprocess.Popen( cmd, shell=True, stderr=subprocess.PIPE)
 
 re_duration = re.compile(r'Duration: (\d\d:\d\d:\d\d)\.(\d\d)')
 re_fps = re.compile(r'Stream.*: Video:.*(\d\d) fps')
@@ -40,14 +44,20 @@ while True:
    data = process.stderr.read(1)
    if data is None: break
    if len(data) < 1: break
+   if not isinstance( data, str): data = str( data, 'ascii')
    data = data.replace('\r','\n')
    sys.stdout.write( data)
    if data == '\n':
       output = ''
       if frame_old != frame:
-         print('Frame = %d' % frame),
-         if frames_total != -1: print(' of %d' % frames_total),
-         print(' ')
+         if sys.version_info[0] < 3:
+            print('Frame = %d' % frame),
+            if frames_total != -1: print(' of %d' % frames_total),
+            print(' ')
+         else:
+            print('Frame = %d' % frame, end = '')
+            if frames_total != -1: print(' of %d' % frames_total, end = '')
+            print()
          if progress != -1: print('PROGRESS: %d%%' % progress)
          frame_old = frame
       sys.stdout.flush()
