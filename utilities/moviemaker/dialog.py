@@ -178,6 +178,7 @@ class Dialog( QtGui.QWidget):
       QtGui.QWidget.__init__( self)
       self.evaluated = False
       self.running   = False
+      self.decode    = False
 
       self.setWindowTitle('Make Movie - CGRU ' + cgruconfig.VARS['CGRU_VERSION'])
       self.mainLayout = QtGui.QVBoxLayout( self)
@@ -810,25 +811,41 @@ Add this options to temporary image saving.')
 
 
       # Decode:
+      self.decodeEnable = QtGui.QCheckBox('Enable', self)
+      self.decodeLayout.addWidget( self.decodeEnable)
+      QtCore.QObject.connect( self.decodeEnable, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.decodeEnable.setChecked( True)
       self.decodeInputGroup = QtGui.QGroupBox('Input Movie')
       self.decodeLayout.addWidget( self.decodeInputGroup)
       self.decodeInputLayout = QtGui.QVBoxLayout( self.decodeInputGroup)
-      self.decodeInputFileName = QtGui.QLineEdit()
-      self.decodeInputLayout.addWidget( self.decodeInputFileName)
+      self.decodeInputFileNameLayout = QtGui.QHBoxLayout()
+      self.decodeInputLayout.addLayout( self.decodeInputFileNameLayout)
+      self.decodeInputFileName = QtGui.QLineEdit( self)
+      self.decodeInputFileNameLayout.addWidget( self.decodeInputFileName)
       QtCore.QObject.connect( self.decodeInputFileName, QtCore.SIGNAL('textEdited(QString)'), self.decodeInputChanged)
       self.decodeInputBrowse = QtGui.QPushButton('Browse')
-      self.decodeInputLayout.addWidget( self.decodeInputBrowse)
+      self.decodeInputFileNameLayout.addWidget( self.decodeInputBrowse)
       QtCore.QObject.connect( self.decodeInputBrowse, QtCore.SIGNAL('pressed()'), self.decodeBrowseInput)
 
       self.decodeOutputGroup = QtGui.QGroupBox('Output Sequence')
       self.decodeLayout.addWidget( self.decodeOutputGroup)
       self.decodeOutputLayout = QtGui.QVBoxLayout( self.decodeOutputGroup)
-      self.decodeOutputSequence = QtGui.QLineEdit()
-      self.decodeOutputLayout.addWidget( self.decodeOutputSequence)
+      self.decodeOutputSequenceLayout = QtGui.QHBoxLayout()
+      self.decodeOutputLayout.addLayout( self.decodeOutputSequenceLayout)
+      self.decodeOutputSequence = QtGui.QLineEdit( self)
+      self.decodeOutputSequenceLayout.addWidget( self.decodeOutputSequence)
       QtCore.QObject.connect( self.decodeOutputSequence, QtCore.SIGNAL('textEdited(QString)'), self.decodeOutputChanged)
       self.decodeOutputBrowse = QtGui.QPushButton('Browse')
-      self.decodeOutputLayout.addWidget( self.decodeOutputBrowse)
+      self.decodeOutputSequenceLayout.addWidget( self.decodeOutputBrowse)
       QtCore.QObject.connect( self.decodeOutputBrowse, QtCore.SIGNAL('pressed()'), self.decodeBrowseOutput)
+      self.decodeAsbLocation = QtGui.QLabel('Absolute Location:')
+      self.decodeOutputLayout.addWidget( self.decodeAsbLocation)
+      self.decodeOutputAbs = QtGui.QLineEdit( self)
+      self.decodeOutputAbs.setReadOnly( True)
+      self.decodeOutputLayout.addWidget( self.decodeOutputAbs)
+      self.decodeEncode = QtGui.QCheckBox('Encode This Sequence', self)
+      self.decodeOutputLayout.addWidget( self.decodeEncode)
+      self.decodeEncode.setChecked( True)
 
 
       # Afanasy:
@@ -1020,6 +1037,7 @@ Add this options to temporary image saving.')
          self.decodeEvaluate()
    def decodeOutputChanged( self): self.decodeEvaluate()
    def decodeEvaluate( self):
+      if not self.decodeEnable.isChecked(): return False
       self.evaluated = False
       self.btnStart.setEnabled( False)
       if self.running: return False
@@ -1035,15 +1053,12 @@ Add this options to temporary image saving.')
          self.cmdField.setText('Specify output sequence to explode input movie into.')
          return False
       outputSequence = os.path.normpath( os.path.join( os.path.dirname( inputMovie), outputSequence))
+      self.decodeOutputAbs.setText( outputSequence)
 
-      cmd = 'ffmpeg'
-      cmd += ' -i "%s"' % inputMovie
-      cmd += ' -an -f image2'
-      cmd += ' "%s"' % outputSequence
-
-      self.cmdField.setText( cmd)
+      self.cmdField.setText('mov2seq "%s" "%s"' % (inputMovie, outputSequence))
       self.evaluated = True
       self.btnStart.setEnabled( True)
+      self.decode = True
       return True
 
 
@@ -1320,6 +1335,7 @@ Add this options to temporary image saving.')
       self.btnStart.setEnabled( False)
       if self.running: return
       if self.decodeEvaluate(): return
+      self.decode = False
       self.cmdField.clear()
       
       if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9'): return
@@ -1479,12 +1495,6 @@ Add this options to temporary image saving.')
       if not self.evaluated: return
       command = "%s" % self.cmdField.toPlainText()
       if len(command) == 0: return
-      
-#      decodeOutput = "%s" % self.decodeOutputSequence.text()
-#      if len( decodeOutput):
-#         decodeOutput = os.path.dirname( decodeOutput)
-#         decodeOutput = os.path.normpath( decodeOutput)
-#         if len( decodeOutput):
 
       if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
          self.btnStart.setEnabled( False)
@@ -1517,8 +1527,12 @@ Add this options to temporary image saving.')
          task.setCommand( command.encode('utf-8'))
 
          block.tasks.append( task)
-         if job.send(): self.cmdField.setText('Afanasy job was successfully sent.')
-         else:          self.cmdField.setText('Unable to send job to Afanasy server.')
+         if job.send():
+            self.cmdField.setText('Afanasy job was successfully sent.')
+            if self.decode and self.decodeEncode.isChecked():
+               self.editInputFiles.setText( self.decodeOutputAbs.text())
+         else:
+            self.cmdField.setText('Unable to send job to Afanasy server.')
       else:
          self.btnStart.setEnabled( False)
          self.btnRefresh.setEnabled( False)
@@ -1538,6 +1552,10 @@ Add this options to temporary image saving.')
       self.running = False
       if exitCode != 0: return
       self.cmdField.setText('Finished.')
+      if self.decode and self.decodeEncode.isChecked():
+         self.decodeEnable.setChecked( False)
+         self.editInputFiles.setText( self.decodeOutputAbs.text())
+         self.inputFileChanged()
 
    def processoutput( self):
       output = self.process.readAll().data()
