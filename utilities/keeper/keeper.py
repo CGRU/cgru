@@ -33,6 +33,6 @@ app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
 cmd.Application = app
 cmd.Tray = Tray( app)
-Refresh( app)
-Server( app)
+refresh = Refresh( app)
+server = Server( app)
 app.exec_()

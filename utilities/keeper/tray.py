@@ -209,23 +209,44 @@ class Tray( QtGui.QSystemTrayIcon):
       icon_filename = os.path.join( cgruconfig.VARS['icons_dir'], icon_filename + '.png')
       icon_epmty = QtGui.QPixmap( icon_filename)
       self.icons['empty'] = QtGui.QIcon( icon_epmty)
-      icon_render_online_free = icon_epmty
       icon_size = icon_epmty.width()
-      painter = QtGui.QPainter( icon_render_online_free)
-      painter.setFont( QtGui.QFont('Arial',icon_size/3,5))
-#      painter.fillRect(0,0,50,50,QtGui.QColor(200,200,0))
-      painter.drawText( icon_size/2, icon_size/2,'R')
+      font_render = QtGui.QFont('Arial',icon_size/3)
+      font_render.setBold( True)
+      rect_render = QtCore.QRect( icon_size/4, icon_size/4, icon_size/2, icon_size/2)
+      painter = QtGui.QPainter()
+      #  icon_render_offline_free
+      painting = icon_epmty
+      painter.begin( painting)
+      painter.setFont( font_render)
+      painter.setPen( QtGui.QColor(0,0,0))
+      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
       painter.end()
-      self.icons['render_online_free'] = QtGui.QIcon( icon_render_online_free)
+      self.icons['render_offline_free'] = QtGui.QIcon( painting)
+      #  icon_render_online_free
+      painting = icon_epmty
+      painter.begin( painting)
+      painter.setFont( font_render)
+      painter.setPen( QtGui.QColor(0,200,0))
+      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
+      painter.end()
+      self.icons['render_online_free'] = QtGui.QIcon( painting)
+      #  icon_render_online_busy
+      painting = icon_epmty
+      painter.begin( painting)
+      painter.setFont( font_render)
+      painter.setPen( QtGui.QColor(255,0,0))
+      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
+      painter.end()
+      self.icons['render_online_busy'] = QtGui.QIcon( painting)
 
       # Decorate and show:
-      self.showIcon('render_online_free')
+      self.showIcon('render_online_busy')
 #      self.showIcon()
       self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))
       QtCore.QObject.connect( self, QtCore.SIGNAL('activated( QSystemTrayIcon::ActivationReason)'), self.activated_slot)
 
       self.show()
-      
+
    def showIcon( self, name = 'empty'):
       self.setIcon( self.icons[ name])
       self.parent.setWindowIcon( self.icons[ name])
