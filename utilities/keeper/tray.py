@@ -207,49 +207,54 @@ class Tray( QtGui.QSystemTrayIcon):
       icon_filename = cgruconfig.VARS['tray_icon']
       if icon_filename is None: icon_filename = 'keeper'
       icon_filename = os.path.join( cgruconfig.VARS['icons_dir'], icon_filename + '.png')
-      icon_epmty = QtGui.QPixmap( icon_filename)
-      self.icons['empty'] = QtGui.QIcon( icon_epmty)
-      icon_size = icon_epmty.width()
-      font_render = QtGui.QFont('Arial',icon_size/3)
-      font_render.setBold( True)
-      rect_render = QtCore.QRect( icon_size/4, icon_size/4, icon_size/2, icon_size/2)
-      painter = QtGui.QPainter()
-      #  icon_render_offline_free
-      painting = icon_epmty
-      painter.begin( painting)
-      painter.setFont( font_render)
-      painter.setPen( QtGui.QColor(0,0,0))
-      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
-      painter.end()
-      self.icons['render_offline_free'] = QtGui.QIcon( painting)
-      #  icon_render_online_free
-      painting = icon_epmty
-      painter.begin( painting)
-      painter.setFont( font_render)
-      painter.setPen( QtGui.QColor(0,200,0))
-      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
-      painter.end()
-      self.icons['render_online_free'] = QtGui.QIcon( painting)
-      #  icon_render_online_busy
-      painting = icon_epmty
-      painter.begin( painting)
-      painter.setFont( font_render)
-      painter.setPen( QtGui.QColor(255,0,0))
-      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
-      painter.end()
-      self.icons['render_online_busy'] = QtGui.QIcon( painting)
+      self.icon_epmty = QtGui.QPixmap( icon_filename)
+      self.icons['empty'] = QtGui.QIcon( self.icon_epmty)
+      self.makeIcon('offline_free',       online=False, nimby=False, busy=False)
+      self.makeIcon('online_free',        online=True,  nimby=False, busy=False)
+      self.makeIcon('offline_nimby',      online=False, nimby=True,  busy=False)
+      self.makeIcon('online_nimby',       online=True,  nimby=True,  busy=False)
+      self.makeIcon('offline_free_busy',  online=False, nimby=False, busy=True )
+      self.makeIcon('online_free_busy',   online=True,  nimby=False, busy=True )
+      self.makeIcon('offline_nimby_busy', online=False, nimby=True,  busy=True )
+      self.makeIcon('online_nimby_busy',  online=True,  nimby=True,  busy=True )
 
       # Decorate and show:
-      self.showIcon('render_online_busy')
-#      self.showIcon()
+      self.showIcon()
       self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))
       QtCore.QObject.connect( self, QtCore.SIGNAL('activated( QSystemTrayIcon::ActivationReason)'), self.activated_slot)
 
       self.show()
 
+   def makeIcon( self, name, online, nimby, busy):
+      painting = self.icon_epmty
+      painter = QtGui.QPainter( painting)
+      icon_size = painting.width()
+      text_font = QtGui.QFont('Arial',icon_size/3)
+      text_font.setBold( True)
+      rect_back = QtCore.QRect( icon_size*3/10, icon_size*3/10, icon_size*2/5, icon_size*2/5)
+      text_color = QtGui.QColor( 0, 0, 0)
+      if online: text_color = QtGui.QColor(   0, 200,   0)
+      if busy:   text_color = QtGui.QColor( 255,   0,   0)
+      if nimby:  back_color = QtGui.QColor(  90,  90, 190)
+      else:      back_color = QtGui.QColor(  90,  90,  90)
+      rect_render = QtCore.QRect( icon_size/4, icon_size/4, icon_size/2, icon_size/2)      
+      painter.fillRect( rect_back, back_color)
+      painter.setFont( text_font)
+      painter.setPen( text_color)
+      painter.drawText( rect_render, QtCore.Qt.AlignCenter,'R')
+      self.icons[name] = QtGui.QIcon( painting)
+
    def showIcon( self, name = 'empty'):
       self.setIcon( self.icons[ name])
       self.parent.setWindowIcon( self.icons[ name])
+
+   def showRenderIcon( self, online, nimby, busy):
+      if online: name = 'online'
+      else: name = 'offline'
+      if nimby: name += '_nimby'
+      else: name += '_free'
+      if busy: name += '_busy'
+      self.showIcon( name)
 
    def activated_slot( self, reason):
       if reason == QtGui.QSystemTrayIcon.Trigger: return

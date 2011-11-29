@@ -1,5 +1,7 @@
 import af
 
+import cmd
+
 WndInfo = None
 
 from PyQt4 import QtGui
@@ -30,4 +32,8 @@ def showInfo( tray = None):
    
 def refresh():
    renders = af.Cmd().renderGetLocal()
-   print( renders)
+   if len( renders):
+      render = renders[0]
+      #print( render)
+      cmd.Tray.showRenderIcon( render['online'], render['nimby'] or render['NIMBY'], render['busy'])
+   else: cmd.Tray.showIcon()

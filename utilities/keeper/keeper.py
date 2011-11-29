@@ -25,9 +25,6 @@ if keeper_cmd is None:
    keeper_cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE'), sys.argv[0])
 cgruconfig.VARS['CGRU_KEEPER_CMD'] = keeper_cmd
 
-# Set a default refresh interval in seconds:
-if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = '36'
-
 # Create tray application with refresh:
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)

@@ -4,6 +4,9 @@ import render
 
 from PyQt4 import QtCore
 
+# Set a default refresh interval in seconds:
+if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = '36'
+
 class Refresh:
    def __init__( self, application):
       self.timer = QtCore.QTimer( application)
@@ -14,7 +17,6 @@ class Refresh:
       self.refresh()
 
    def refresh( self):
-      print('##################   KEEPER REFRESH   #######################')
       if self.counter > 0: cgruconfig.Config()
       if self.timer.interval() != 1000 * int(cgruconfig.VARS['keeper_refresh']):
          self.timer.setInterval( 1000 * int(cgruconfig.VARS['keeper_refresh']))
