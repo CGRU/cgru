@@ -42,26 +42,6 @@ Root {
  proxy_format "720 576 0 0 720 576 1.09 PAL"
  proxySetting always
 }
-Read {
- inputs 0
- file render/preview.####.jpg
- format "720 576 0 0 720 576 1.09 PAL"
- proxy render/final_proxy.####.exr
- last 11
- origlast 11
- origset true
- version 2
- name Read15
- xpos 3
- ypos 95
-}
-Viewer {
- frame 1
- input_process false
- name Viewer1
- xpos 168
- ypos 202
-}
 ColorBars {
  inputs 0
  name ColorBars2
@@ -139,7 +119,7 @@ Transform {
  xpos 688
  ypos -885
 }
-set N3a9b020 [stack 0]
+set N4ad9c80 [stack 0]
 Transform {
  scale 0.5
  center {1 479}
@@ -154,7 +134,7 @@ Write {
  xpos 798
  ypos -559
 }
-push $N3a9b020
+push $N4ad9c80
 Write {
  file render/test_a.%04d.exr
  file_type exr
@@ -162,7 +142,7 @@ Write {
  xpos 688
  ypos -816
 }
-push $N3a9b020
+push $N4ad9c80
 Write {
  file render/test_b.%04d.exr
  file_type exr
@@ -420,6 +400,64 @@ afanasy {
  addnodes ""
  forceframes true
 }
+Read {
+ inputs 0
+ file render/final.####.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/final_proxy.####.exr
+ last 9999
+ origlast 9999
+ origset true
+ version 2
+ name Read1
+ xpos 3
+ ypos -32
+}
+set N514e930 [stack 0]
+Write {
+ file render/output.####.dpx
+ proxy render/output_proxy.####.dpx
+ file_type dpx
+ checkHashOnRead false
+ version 3
+ name dpx
+ xpos -107
+ ypos -9
+}
+cgru_dailies {
+ name dailies_dpx
+ xpos -107
+ ypos 81
+ format 768x576
+ fps 24
+ codec /cgru/utilities/moviemaker/codecs/scene.nuke
+ company ""
+ project Nuke
+ shot scene
+ version 1
+ artist Afanasy
+ activity comp
+ comments "cgru afanasy nuke example"
+ movfolder /cgru/examples/nuke
+ movrule (s)_(v)_(d)
+ movname scene_1_111128
+ viewsnames "left right"
+ template /cgru/utilities/moviemaker/templates/dailies
+ slate /cgru/utilities/moviemaker/templates/dailies_slate
+ lgspath /cgru/utilities/moviemaker/logos/logo.png
+ lgssize 20
+ lgfpath /cgru/utilities/moviemaker/logos/logo.png
+ lgfsize 10
+ cach_op ""
+ line_clr ""
+ draw169 25
+ draw235 25
+ line169 200,200,200
+ line235 200,200,200
+ tmpformat dpx
+ tmpquality ""
+ autocolorspace false
+}
 ColorBars {
  inputs 0
  name ColorBars1
@@ -436,7 +474,7 @@ Transform {
  xpos 223
  ypos -222
 }
-set N4114c30 [stack 0]
+set N5187650 [stack 0]
 Write {
  channels rgba
  file render/key.####.exr
@@ -463,7 +501,7 @@ Ramp {
  xpos 3
  ypos -259
 }
-set N41319e0 [stack 0]
+set N51a4420 [stack 0]
 Write {
  file render/back.####.exr
  proxy render/back_proxy.####.exr
@@ -504,7 +542,7 @@ Read {
  xpos 223
  ypos -165
 }
-push $N4114c30
+push $N5187650
 Switch {
  inputs 2
  which 1
@@ -525,7 +563,7 @@ Read {
  xpos 3
  ypos -166
 }
-push $N41319e0
+push $N51a4420
 Switch {
  inputs 2
  which 1
@@ -546,7 +584,7 @@ Crop {
  xpos 113
  ypos -58
 }
-set N42b9410 [stack 0]
+set N532bec0 [stack 0]
 Write {
  file render/final.####.exr
  proxy render/final_proxy.####.exr
@@ -555,21 +593,8 @@ Write {
  xpos 223
  ypos -65
 }
-Read {
- inputs 0
- file render/final.####.exr
- format "640 480 0 0 640 480 1 PC_Video"
- proxy render/final_proxy.####.exr
- last 9999
- origlast 9999
- origset true
- version 2
- name Read1
- xpos 3
- ypos -32
-}
-set N42ccbe0 [stack 0]
-push $N42b9410
+push $N514e930
+push $N532bec0
 Switch {
  inputs 2
  which 1
@@ -586,7 +611,7 @@ Write {
  xpos 113
  ypos 46
 }
-set N42ddc40 [stack 0]
+set N5344810 [stack 0]
 afanasy {
  inputs 3
  name afanasy2
@@ -601,7 +626,7 @@ afanasy {
  addnodes ""
  fullrange true
 }
-push $N42ddc40
+push $N5344810
 cgru_dailies {
  name dailies
  xpos 113
@@ -612,13 +637,13 @@ cgru_dailies {
  company ""
  project Nuke
  shot scene
- version 1
+ version v001
  artist Afanasy
  activity comp
  comments "cgru afanasy nuke example"
  movfolder .
  movrule (s)_(v)_(d)
- movname scene_v001_111106
+ movname scene_v001_111128
  viewsnames "left right"
  template /cgru/utilities/moviemaker/templates/dailies_withlogo
  slate /cgru/utilities/moviemaker/templates/dailies_slate
@@ -660,48 +685,23 @@ afanasy {
  dependmaskglbl ""
  addnodes ""
 }
-push $N42ccbe0
-Write {
- file render/output.####.dpx
- proxy render/output_proxy.####.dpx
- file_type dpx
- checkHashOnRead false
- version 3
- name dpx
- xpos -107
- ypos -9
+Read {
+ inputs 0
+ file render/preview.####.jpg
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy render/final_proxy.####.exr
+ last 11
+ origlast 11
+ origset true
+ version 2
+ name Read15
+ xpos 3
+ ypos 95
 }
-cgru_dailies {
- name dailies_dpx
- xpos -107
- ypos 81
- format 768x576
- fps 24
- codec /cgru/utilities/moviemaker/codecs/scene.nuke
- company ""
- project Nuke
- shot scene
- version 1
- artist Afanasy
- activity comp
- comments "cgru afanasy nuke example"
- movfolder /cgru/examples/nuke
- movrule (s)_(v)_(d)
- movname scene_v001_111106
- viewsnames "left right"
- template /cgru/utilities/moviemaker/templates/dailies
- slate /cgru/utilities/moviemaker/templates/dailies_slate
- lgspath /cgru/utilities/moviemaker/logos/logo.png
- lgssize 20
- lgfpath /cgru/utilities/moviemaker/logos/logo.png
- lgfsize 10
- cach_op ""
- line_clr ""
- draw169 25
- draw235 25
- line169 200,200,200
- line235 200,200,200
- tmpformat dpx
- tmpquality ""
- autocolorspace false
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 168
+ ypos 202
 }

@@ -2,9 +2,11 @@ import os, sys
 
 import cgrudocs
 import cgruconfig
-import render
 
-application = None
+import af
+
+Application = None
+Tray = None
 
 from PyQt4 import QtCore, QtGui
 
@@ -28,10 +30,22 @@ def getAfVar( var, title = 'Set Variable', label = 'Enter new value:'):
 
 def cgruDocs(): cgrudocs.show()
 def confReload(): cgruconfig.Config()
-def quit(): application.quit()
+def quit(): Application.quit()
 def setAFANASYServer(): getAfVar('servername','Set AFANASY Server','Enter host name or IP address:')
 def setDocsURL(): getVar('docshost','Set Docs Host','Enter host name or IP address:')
 def setTextEditor(): getVar('editor','Set Text Editor','Enter command with "%s":')
+
+def exitRender(  text = '(keeper)'): af.Cmd().renderExit( text)
+def exitTalk(    text = '(keeper)'): af.Cmd().talkExit( text)
+def exitMonitor( text = '(keeper)'): af.Cmd().monitorExit( text)
+def exitClients( text = '(keeper)'):
+   exitRender( text)
+   exitTalk( text)
+   exitMonitor( text)
+
+def quitExitClients():
+   exitClients('(keeper quit)')
+   Application.quit()
 
 def editCGRUConfig():
    if QtCore.QProcess.execute( cgruconfig.VARS['editor'] % cgruconfig.VARS['config_file_home']) == 0:
@@ -43,11 +57,9 @@ def editAFANASYConfig():
 
 def restart():
    QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_KEEPER_CMD'])
-   application.quit()
+   Application.quit()
 
 def update():
-   render.exit()
-   render.exitmonitor()
-   render.exittalk()
+   exitClients('(keeper update)')
    QtCore.QProcess.startDetached( cgruconfig.VARS['CGRU_UPDATE_CMD'])
-   application.quit()
+   Application.quit()

@@ -12,7 +12,7 @@ Gizmo {
    addUserKnob {  1 project   l "Project"  -STARTLINE }
    addUserKnob {  1 shot      l "Shot"     -STARTLINE }
 
-   addUserKnob {  3 version   l "Version"  +STARTLINE }
+   addUserKnob {  1 version   l "Version"  +STARTLINE }
    addUserKnob {  1 artist    l "Artist"   -STARTLINE }
    addUserKnob {  1 activity  l "Activity" -STARTLINE }
 
@@ -67,7 +67,7 @@ Gizmo {
    company     ""
    project     ""
    activity    "comp"
-   version     0
+   version     "v001"
    movauto     1
    stereodub   0
    forceviews  0

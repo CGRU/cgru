@@ -126,7 +126,7 @@ class Tray( QtGui.QSystemTrayIcon):
       action = QtGui.QAction('Eject Tasks', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.ejectTasks)
       self.menu['AFANASY'].addAction( action)
-      action = QtGui.QAction('Render info', self)
+      action = QtGui.QAction('Render Info', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.renderInfo)
       self.menu['AFANASY'].addAction( action)
 
@@ -148,13 +148,16 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['AFANASY'].addSeparator()
 
       action = QtGui.QAction('Exit Render', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exit)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.exitRender)
       self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Exit Watch', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exitmonitor)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.exitMonitor)
       self.menu['AFANASY'].addAction( action)
       action = QtGui.QAction('Exit Talk', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), render.exittalk)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.exitTalk)
+      self.menu['AFANASY'].addAction( action)
+      action = QtGui.QAction('Exit All Clients', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.exitClients)
       self.menu['AFANASY'].addAction( action)
 
       self.menu['menu'].addSeparator()
@@ -190,29 +193,47 @@ class Tray( QtGui.QSystemTrayIcon):
       action = QtGui.QAction('Restart', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.restart)
       self.menu['menu'].addAction( action)            
+      action = QtGui.QAction('Quit && Exit Clients', self)
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.quitExitClients)
+      self.menu['menu'].addAction( action)            
       action = QtGui.QAction('Quit', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.quit)
       self.menu['menu'].addAction( action)            
 
-      # Decorate and show:
-      self.icon_name = cgruconfig.VARS['tray_icon']
-      if self.icon_name is None: self.icon_name = 'keeper'
       self.setContextMenu( self.menu['menu'])
-      self.icon = QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], self.icon_name + '.png'))
-      self.setIcon( self.icon)
-      parent.setWindowIcon( self.icon)
+
+      # Prepare Icons:
+      self.icons = dict()
+      icon_filename = cgruconfig.VARS['tray_icon']
+      if icon_filename is None: icon_filename = 'keeper'
+      icon_filename = os.path.join( cgruconfig.VARS['icons_dir'], icon_filename + '.png')
+      icon_epmty = QtGui.QPixmap( icon_filename)
+      self.icons['empty'] = QtGui.QIcon( icon_epmty)
+      icon_render_online_free = icon_epmty
+      icon_size = icon_epmty.width()
+      painter = QtGui.QPainter( icon_render_online_free)
+      painter.setFont( QtGui.QFont('Arial',icon_size/3,5))
+#      painter.fillRect(0,0,50,50,QtGui.QColor(200,200,0))
+      painter.drawText( icon_size/2, icon_size/2,'R')
+      painter.end()
+      self.icons['render_online_free'] = QtGui.QIcon( icon_render_online_free)
+
+      # Decorate and show:
+      self.showIcon('render_online_free')
+#      self.showIcon()
       self.setToolTip( cgruconfig.VARS['company'].upper() + ' Keeper ' + os.getenv('CGRU_VERSION', ''))
       QtCore.QObject.connect( self, QtCore.SIGNAL('activated( QSystemTrayIcon::ActivationReason)'), self.activated_slot)
 
       self.show()
+      
+   def showIcon( self, name = 'empty'):
+      self.setIcon( self.icons[ name])
+      self.parent.setWindowIcon( self.icons[ name])
 
    def activated_slot( self, reason):
       if reason == QtGui.QSystemTrayIcon.Trigger: return
-      elif reason == QtGui.QSystemTrayIcon.DoubleClick:
-#         render.refresh()
-         print('DoubleClick')
-      elif reason == QtGui.QSystemTrayIcon.MiddleClick:
-         print('MiddleClick')
+      elif reason == QtGui.QSystemTrayIcon.DoubleClick: render.refresh()
+      elif reason == QtGui.QSystemTrayIcon.MiddleClick: return 
       elif reason == QtGui.QSystemTrayIcon.Context: return 
       elif reason == QtGui.QSystemTrayIcon.Unknown: return
 

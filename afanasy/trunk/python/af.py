@@ -234,11 +234,11 @@ class Cmd( pyaf.Cmd):
       self._sendRequest()
 
    def talkExit( self, text):
-      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'], text)
+      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + ':.*', text)
       self._sendRequest()
 
    def monitorExit( self, text):
-      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'], text)
+      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + ':.*', text)
       self._sendRequest()
 
    def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'])

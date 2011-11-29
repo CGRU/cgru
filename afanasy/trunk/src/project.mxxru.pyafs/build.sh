@@ -47,5 +47,6 @@ for python in `ls "$pythondir"`; do
    output="../../bin_pyaf/$python"
    [ -d $output ] || mkdir -p $output
    cp -v "tmp/$python/pyaf.so" $output
+   chmod a+x $output
 
 done

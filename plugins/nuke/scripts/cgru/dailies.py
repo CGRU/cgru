@@ -144,10 +144,11 @@ def dailiesEvaluate( node):
       # Project:
       project = node.knob('project').value()
       if project is None: project = ''
-      # Version:
-      version = 'v%03d' % int(node.knob('version').value())
       # Date:
       date = time.strftime('%y%m%d')
+      # Version:
+      version = node.knob('version').value()
+      if version is None: version = ''
       # Activity:
       activity = node.knob('activity').value()
       if activity is None: activity = ''
@@ -211,6 +212,7 @@ def dailiesGenCmd( node):
    company  = node.knob('company' ).value()
    project  = node.knob('project' ).value()
    shot     = node.knob('shot'    ).value()
+   version  = node.knob('version' ).value()
    artist   = node.knob('artist'  ).value()
    activity = node.knob('activity').value()
    comments = node.knob('comments').value()
@@ -226,7 +228,6 @@ def dailiesGenCmd( node):
    lgfgrav  = node.knob('lgfgrav' ).value()
    lgssize  = int(node.knob('lgssize').value())
    lgfsize  = int(node.knob('lgfsize').value())
-   version  = int(node.knob('version').value())
    fstart   = int(node.knob('fstart').value())
    fend     = int(node.knob('fend').value())
    fffirst  = int(node.knob('fffirst').value())
@@ -267,7 +268,7 @@ def dailiesGenCmd( node):
    if company  is not None and company  != '': cmd += ' --company "%s"'  % company
    if project  is not None and project  != '': cmd += ' --project "%s"'  % project
    if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot
-   if version  is not None and version  != '': cmd += ' --ver "v%03d"'   % version
+   if version  is not None and version  != '': cmd += ' --ver "%s"'      % version
    if artist   is not None and artist   != '': cmd += ' --artist "%s"'   % artist
    if activity is not None and activity != '': cmd += ' --activity "%s"' % activity
    if comments is not None and comments != '': cmd += ' --comments "%s"' % comments

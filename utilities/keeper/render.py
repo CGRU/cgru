@@ -27,7 +27,7 @@ def showInfo( tray = None):
    WndInfo.resize( WndInfo.viewport().size())
    WndInfo.setWindowTitle('AFANASY Render Information:')
    WndInfo.show()
-
-def exit(        text = '(keeper)'): cmd = af.Cmd().renderExit( text)
-def exittalk(    text = '(keeper)'): cmd = af.Cmd().talkExit( text)
-def exitmonitor( text = '(keeper)'): cmd = af.Cmd().monitorExit( text)
+   
+def refresh():
+   renders = af.Cmd().renderGetLocal()
+   print( renders)

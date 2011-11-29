@@ -31,8 +31,8 @@ if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = 
 # Create tray application with refresh:
 app = QtGui.QApplication( sys.argv)
 app.setQuitOnLastWindowClosed ( False)
-cmd.application = app
-Tray( app)
+cmd.Application = app
+cmd.Tray = Tray( app)
 Refresh( app)
 Server( app)
 app.exec_()
