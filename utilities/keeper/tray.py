@@ -250,7 +250,7 @@ class Tray( QtGui.QSystemTrayIcon):
                text_color = QtGui.QColor(   0, 200,   0)
                back_color = QtGui.QColor(  90,  90,  90)
       elif nimby:
-         back_color = QtGui.QColor(  90,  90, 240)
+         back_color = QtGui.QColor( 140, 140, 250)
       rect_render = QtCore.QRect( icon_size/4, icon_size/4, icon_size/2, icon_size/2)      
       painter.fillRect( rect_back, back_color)
       painter.setFont( text_font)
