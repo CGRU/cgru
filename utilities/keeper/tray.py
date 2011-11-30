@@ -240,14 +240,14 @@ class Tray( QtGui.QSystemTrayIcon):
                text_color = QtGui.QColor( 255,   0,   0)
                back_color = QtGui.QColor(  50,  50, 250)
             else:
-               text_color = QtGui.QColor( 190, 190, 190)
+               text_color = QtGui.QColor(   0, 250,   0)
                back_color = QtGui.QColor(  40,  40, 240)
          else:
             if busy:
                text_color = QtGui.QColor( 255,   0,   0)
                back_color = QtGui.QColor(  90,  90,  90)
             else:
-               text_color = QtGui.QColor(   0, 200,   0)
+               text_color = QtGui.QColor(   0, 250,   0)
                back_color = QtGui.QColor(  90,  90,  90)
       elif nimby:
          back_color = QtGui.QColor( 140, 140, 250)
