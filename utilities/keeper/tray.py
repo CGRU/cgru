@@ -235,7 +235,7 @@ class Tray( QtGui.QSystemTrayIcon):
       text_color = QtGui.QColor( 0, 0, 0)
       if online: text_color = QtGui.QColor(   0, 200,   0)
       if busy:   text_color = QtGui.QColor( 255,   0,   0)
-      if nimby:  back_color = QtGui.QColor(  90,  90, 190)
+      if nimby:  back_color = QtGui.QColor(  40,  40, 240)
       else:      back_color = QtGui.QColor(  90,  90,  90)
       rect_render = QtCore.QRect( icon_size/4, icon_size/4, icon_size/2, icon_size/2)      
       painter.fillRect( rect_back, back_color)
