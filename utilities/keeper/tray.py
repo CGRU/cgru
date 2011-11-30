@@ -233,11 +233,24 @@ class Tray( QtGui.QSystemTrayIcon):
       text_font.setBold( True)
       rect_back = QtCore.QRect( icon_size*3/10, icon_size*3/10, icon_size*2/5, icon_size*2/5)
       text_color = QtGui.QColor( 0, 0, 0)
-      if online:  text_color = QtGui.QColor(   0, 200,   0)
-      if busy:    text_color = QtGui.QColor( 255,   0,   0)
-      elif nimby: text_color = QtGui.QColor( 200, 200, 200)
-      if nimby:   back_color = QtGui.QColor(  40,  40, 240)
-      else:       back_color = QtGui.QColor( 150, 150, 150)
+      back_color = QtGui.QColor( 150, 150, 150)
+      if online:
+         if nimby:
+            if busy:
+               text_color = QtGui.QColor( 255,   0,   0)
+               back_color = QtGui.QColor(  50,  50, 250)
+            else:
+               text_color = QtGui.QColor( 190, 190, 190)
+               back_color = QtGui.QColor(  40,  40, 240)
+         else:
+            if busy:
+               text_color = QtGui.QColor( 255,   0,   0)
+               back_color = QtGui.QColor(  90,  90,  90)
+            else:
+               text_color = QtGui.QColor(   0, 200,   0)
+               back_color = QtGui.QColor(  90,  90,  90)
+      elif nimby:
+         back_color = QtGui.QColor(  90,  90, 240)
       rect_render = QtCore.QRect( icon_size/4, icon_size/4, icon_size/2, icon_size/2)      
       painter.fillRect( rect_back, back_color)
       painter.setFont( text_font)
