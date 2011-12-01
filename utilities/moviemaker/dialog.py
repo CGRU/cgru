@@ -96,6 +96,9 @@ Namings = [
 ]
 if Options.naming != '' and not Options.naming in Namings: Namings.append( Options.naming)
 
+AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)',     'Vorbis', 'FLAC (Free Lossless Audio Codec)']
+AudioCodecValues = [             'libmp3lame',  'libvorbis',                             'flac']
+
 # Process Cacher:
 CacherNames  = ['None', '25%', '50%', '75%', '100%']
 CacherValues = [   '0', '25' , '50' , '75' , '100' ]
@@ -204,6 +207,10 @@ class Dialog( QtGui.QWidget):
       self.decodewidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.decodewidget,'Decode')
       self.decodeLayout = QtGui.QVBoxLayout( self.decodewidget)
+
+      self.audiowidget = QtGui.QWidget( self)
+      self.tabwidget.addTab( self.audiowidget,'Audio')
+      self.audioLayout = QtGui.QVBoxLayout( self.audiowidget)
 
       self.afanasywidget = QtGui.QWidget( self)
       self.tabwidget.addTab( self.afanasywidget,'Afanasy')
@@ -848,6 +855,53 @@ Add this options to temporary image saving.')
       self.decodeEncode.setChecked( True)
 
 
+      # Audio:
+      self.audioInputGroup = QtGui.QGroupBox('Input Movie/Sound File')
+      self.audioLayout.addWidget( self.audioInputGroup)
+      self.audioInputLayout = QtGui.QVBoxLayout( self.audioInputGroup)
+      self.audioInputFileNameLayout = QtGui.QHBoxLayout()
+      self.audioInputLayout.addLayout( self.audioInputFileNameLayout)
+      self.audioInputFileName = QtGui.QLineEdit( self)
+      self.audioInputFileNameLayout.addWidget( self.audioInputFileName)
+      QtCore.QObject.connect( self.audioInputFileName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.audioInputBrowse = QtGui.QPushButton('Browse')
+      self.audioInputFileNameLayout.addWidget( self.audioInputBrowse)
+      QtCore.QObject.connect( self.audioInputBrowse, QtCore.SIGNAL('pressed()'), self.audioBrowseInput)
+      self.audioSettingsGroup = QtGui.QGroupBox('Settings')
+      self.audioLayout.addWidget( self.audioSettingsGroup)
+      self.audioSettingsLayout = QtGui.QVBoxLayout( self.audioSettingsGroup)
+      self.audioFreqLayout = QtGui.QHBoxLayout()
+      self.audioSettingsLayout.addLayout( self.audioFreqLayout)
+      self.audioFreqLayout.addWidget( QtGui.QLabel('Sampling Frequency:'))
+      self.audioFreqSB = QtGui.QSpinBox( self)
+      self.audioFreqLayout.addWidget( self.audioFreqSB)
+      self.audioFreqSB.setRange( 1, 96)
+      self.audioFreqSB.setValue( 22)
+      self.audioFreqLayout.addWidget( QtGui.QLabel('kHz'))
+      QtCore.QObject.connect( self.audioFreqSB, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.audioBitRateLayout = QtGui.QHBoxLayout()
+      self.audioSettingsLayout.addLayout( self.audioBitRateLayout)
+      self.audioBitRateLayout.addWidget( QtGui.QLabel('Bit Rate:'))
+      self.audioBitRateSB = QtGui.QSpinBox( self)
+      self.audioBitRateLayout.addWidget( self.audioBitRateSB)
+      self.audioBitRateSB.setRange( 32, 256)
+      self.audioBitRateSB.setValue( 128)
+      self.audioBitRateLayout.addWidget( QtGui.QLabel('kB/s'))
+      QtCore.QObject.connect( self.audioBitRateSB, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      self.audioCodecLayout = QtGui.QHBoxLayout()
+      self.audioSettingsLayout.addLayout( self.audioCodecLayout)
+      self.audioCodecLayout.addWidget( QtGui.QLabel('Codec:'))
+      self.audioCodecCB = QtGui.QComboBox( self)
+      self.audioCodecLayout.addWidget( self.audioCodecCB)
+      i = 0
+      for acodec in AudioCodecNames:
+         self.audioCodecCB.addItem( acodec, AudioCodecValues[i])
+         i += 1
+      self.audioCodecCB.setCurrentIndex( 0)
+      QtCore.QObject.connect( self.audioCodecCB, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+
+
+
       # Afanasy:
 
       self.cAfanasy = QtGui.QCheckBox('Enable', self)
@@ -1076,6 +1130,12 @@ Add this options to temporary image saving.')
 
 
 # Encode:
+
+   def audioBrowseInput( self):
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose an audio or movie file with sound', self.audioInputFileName.text())
+      if len( afile):
+         self.audioInputFileName.setText( afile)
+         self.evaluate()
 
    def evalStereo( self):
       if self.running: return
@@ -1358,6 +1418,13 @@ Add this options to temporary image saving.')
          self.cmdField.setText('Specify input sequence.')
          return
 
+      audiofile = '%s' % self.audioInputFileName.text()
+      if len(audiofile):
+         audiofile = os.path.abspath( os.path.normpath( audiofile))
+         if not os.path.isfile( audiofile):
+            self.cmdField.setText('Error: Audio file does not exist.')
+            return
+
       self.StereoDuplicate = self.cStereoDuplicate.isChecked()
 
       if self.cAutoTitles.isChecked(): self.editShot.clear()
@@ -1489,6 +1556,11 @@ Add this options to temporary image saving.')
       if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
       if self.StereoDuplicate and self.inputPattern2 is None:
          cmd += ' --stereo'
+      if audiofile != '':
+         cmd += ' --audio "%s"' % audiofile
+         cmd += ' --afreq %d' % (self.audioFreqSB.value() * 1000)
+         cmd += ' --akbits %d' % self.audioBitRateSB.value()
+         cmd += ' --acodec "%s"' % getComboBoxString( self.audioCodecCB)
       if self.cAfanasy.isChecked() and not self.cAfOneTask.isChecked():
          cmd += ' -A'
          if self.sbAfCapConvert.value() != -1: cmd += ' --afconvcap %d' % self.sbAfCapConvert.value()

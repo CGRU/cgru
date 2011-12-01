@@ -30,7 +30,7 @@ signal.signal(signal.SIGABRT, rmdir)
 signal.signal(signal.SIGINT,  rmdir)
 
 from optparse import OptionParser
-Parser = OptionParser(usage="%prog [Options] input_files_pattern(s)] output\n\
+Parser = OptionParser(usage="%prog [options] input_files_pattern(s)] output\n\
    Pattern examples = \"img.####.jpg\" or \"img.%04d.jpg\".\n\
    Type \"%prog -h\" for help", version="%prog 1.0")
 
@@ -54,6 +54,10 @@ Parser.add_option('--afuser',           dest='afuser',      type  ='string',    
 Parser.add_option('--tmpdir',           dest='tmpdir',      type  ='string',     default='',          help='Temporary directory, if not specified, .makemovie+date will be used')
 Parser.add_option('--tmpformat',        dest='tmpformat',   type  ='string',     default='tga',       help='Temporary images format')
 Parser.add_option('--tmpquality',       dest='tmpquality',  type  ='string',     default='',          help='Temporary image quality, or format options')
+Parser.add_option('--audio',            dest='audio',       type  ='string',     default='',          help='Add sound from audio file')
+Parser.add_option('--afreq',            dest='afreq',       type  ='int',        default=22000,       help='Audio frequency')
+Parser.add_option('--akbits',           dest='akbits',      type  ='int',        default=128,         help='Audio kilo bits rate')
+Parser.add_option('--acodec',           dest='acodec',      type  ='string',     default='libmp3lame',help='Audio codec')
 
 # Options to makeframe:
 Parser.add_option('-r', '--resolution', dest='resolution',     type  ='string',     default='',          help='Format: 768x576, if empty images format used')
@@ -112,6 +116,7 @@ Codec       = Options.codec
 AspectIn    = Options.aspect_in
 Datesuffix  = Options.datesuffix
 Timesuffix  = Options.timesuffix
+Audio       = Options.audio
 
 Verbose     = Options.verbose
 Debug       = Options.debug
@@ -391,6 +396,18 @@ imgCount = 0
 cmd_precomp = []
 name_precomp = []
 
+# Extract audio track(s) from file to flac if it is not flac already:
+if len(Audio):
+   if not os.path.isfile( Audio):
+      print('Error: Audio file does not exist:')
+      print( Audio)
+      exit(1)
+   if len(Audio) >= 5:
+      if Audio[-5:] != '.flac':
+         cmd_precomp.append('ffmpeg -y -i "%s" -vn -acodec flac -map 0:a "%s.flac"' % (Audio,Audio))
+         name_precomp.append('Audio "%s"' % os.path.basename(Audio))
+         Audio += '.flac'
+
 # Reformat logo:
 logopath = [ Options.lgspath, Options.lgfpath ]
 logosize = [ Options.lgssize, Options.lgfsize ]
@@ -480,6 +497,12 @@ elif encoder == 'mencoder':
 else:
    print('Unknown encoder = "%s"' % encoder)
    exit(1)
+if len(Audio) and encoder == 'ffmpeg':
+   inputmask += '" -i "%s"' % Audio
+   inputmask += ' -ar %d' % Options.afreq
+   inputmask += ' -ab %dk' % Options.akbits
+   inputmask += ' -acodec "%s' % Options.acodec
+
 cmd_encode = cmd_encode.replace('@MOVIEMAKER@', MOVIEMAKER)
 cmd_encode = cmd_encode.replace('@CODECS@',     CODECSDIR)
 cmd_encode = cmd_encode.replace('@INPUT@',      inputmask)
