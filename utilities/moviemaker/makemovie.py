@@ -404,7 +404,7 @@ if len(Audio):
       exit(1)
    if len(Audio) >= 5:
       if Audio[-5:] != '.flac':
-         cmd_precomp.append('ffmpeg -y -i "%s" -vn -acodec flac -map 0:a "%s.flac"' % (Audio,Audio))
+         cmd_precomp.append('ffmpeg -y -i "%s" -vn -acodec flac "%s.flac"' % (Audio,Audio))
          name_precomp.append('Audio "%s"' % os.path.basename(Audio))
          Audio += '.flac'
 

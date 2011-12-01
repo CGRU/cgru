@@ -863,7 +863,7 @@ Add this options to temporary image saving.')
       self.audioInputLayout.addLayout( self.audioInputFileNameLayout)
       self.audioInputFileName = QtGui.QLineEdit( self)
       self.audioInputFileNameLayout.addWidget( self.audioInputFileName)
-      QtCore.QObject.connect( self.audioInputFileName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      QtCore.QObject.connect( self.audioInputFileName, QtCore.SIGNAL('textEdited(QString)'), self.audioInputChanged)
       self.audioInputBrowse = QtGui.QPushButton('Browse')
       self.audioInputFileNameLayout.addWidget( self.audioInputBrowse)
       QtCore.QObject.connect( self.audioInputBrowse, QtCore.SIGNAL('pressed()'), self.audioBrowseInput)
@@ -1135,6 +1135,17 @@ Add this options to temporary image saving.')
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose an audio or movie file with sound', self.audioInputFileName.text())
       if len( afile):
          self.audioInputFileName.setText( afile)
+         self.audioInputChanged()
+
+   def audioInputChanged( self):
+      afile = '%s' % self.audioInputFileName.text()
+      if len( afile):
+         pos = afile.rfind('file://')
+         if pos >= 0:
+            afile = afile[ pos+7 : ]
+            afile = afile.strip()
+            afile = afile.strip('\n')
+            self.audioInputFileName.setText( afile)
          self.evaluate()
 
    def evalStereo( self):
