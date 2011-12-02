@@ -5,7 +5,7 @@ lame="${PWD}/lame"
 ogg="${PWD}/libogg"
 vorbis="${PWD}/libvorbis"
 export CFLAGS="-I${x264} -I$lame/include -I$ogg/include -I$vorbis/include"
-export LDFLAGS="-L${x264} -L$lame/lib -L$ogg/lib -L$vorbis/lib"
+export LDFLAGS="-L${x264} -L$lame/lib -L$lame/lib64 -L$ogg/lib -L$ogg/lib64 -L$vorbis/lib -L$vorbis/lib64"
 export LDFLAGS="$LDFLAGS -B/usr/lib/gold-ld/"
 
 cd ffmpeg
