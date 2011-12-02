@@ -75,4 +75,4 @@ rcopy plugins/maya/mel $dest/plugins/maya
 CGRU_VERSION=`cat version.txt`
 cd utilities
 source ./getrevision.sh ..
-echo "${CGRU_VERSION}_rev${CGRU_REVISION}" > $dest/version.txt
+echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
