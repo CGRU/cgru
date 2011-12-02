@@ -20,6 +20,7 @@ case ${DISTRIBUTIVE} in
    Ubuntu)
       ;;
    Fedora)
+      export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
       ;;
    AltLinux)
       ;;

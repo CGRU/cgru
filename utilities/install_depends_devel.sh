@@ -6,7 +6,7 @@ source ./distribution.sh
 
 # List packages:
 
-packages="yasm p7zip ruby wget inkscape"
+packages="yasm p7zip ruby wget inkscape cmake"
 packages_noarch="rubygems"
 
 # Packages for Debian distributives:
@@ -32,14 +32,15 @@ function debianArch(){
 # Packages for RedHat distributives:
 function redhatArch(){
    packages="$packages gcc-c++"
-   packages="$packages python-dev"
-   packages="$packages qt4-dev-tools"
+   packages="$packages python-devel"
+   packages="$packages qt-devel"
    packages="$packages rpm-build"
    packages="$packages git"
    packages="$packages PyQt4"
    packages="$packages libzip libzip-devel"
    # ImageMagick:
    packages="$packages libjpeg libjpeg-devel"
+   packages="$packages libjpeg-turbo libjpeg-turbo-devel"
    packages="$packages libtiff libtiff-devel"
    packages="$packages libpng libpng-devel"
    packages="$packages freetype freetype-devel"
