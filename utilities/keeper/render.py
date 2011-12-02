@@ -32,7 +32,7 @@ def showInfo( tray = None):
    
 def refresh():
    renders = af.Cmd().renderGetLocal()
-   if len( renders):
+   if renders is not None and len( renders):
       render = renders[0]
       #print( render)
       cmd.Tray.showRenderIcon( render['online'], render['nimby'] or render['NIMBY'], render['busy'])
