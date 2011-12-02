@@ -5,10 +5,21 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Mon, 14 Nov 2011 12:00:00 GMT</pubDate>
-   <lastBuildDate>Mon, 14 Nov 2011 12:00:00 GMT</lastBuildDate>
+   <pubDate>Fri, 2 Dec 2011 12:00:00 GMT</pubDate>
+   <lastBuildDate>Fri, 2 Dec 2011 12:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.5.2 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release152</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release152</guid>
+      <description>
+         Movie Maker can explode movie to sequence and add sound from a file with audio.
+         Keeper displays local Afanasy render client status in a system tray icon.
+         Some important bugs fixed.
+      </description>
+      <pubDate>Fri, 2 Dec 2011 12:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.5.1 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release151</link>
