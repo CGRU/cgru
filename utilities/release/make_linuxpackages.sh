@@ -110,6 +110,7 @@ for packages_dir in $packages_dirs; do
       # check copy script:
       copy_script="${packages_dir}/${package}.sh"
       [ -f $copy_script ] || continue
+      echo "Creating package '$package':"
       # copy files for package, but not control folders:
       mkdir -p ${tmpdir}/${package}
       for folder in `ls "${packages_dir}/${package}"`; do

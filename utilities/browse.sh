@@ -1,6 +1,6 @@
 #!/bin/bash
 
-browsers="nautilus konqueror gnome-commander krusader"
+browsers="thunar nautilus konqueror gnome-commander krusader"
 
 pushd `dirname $0` > /dev/null
 cd ..
