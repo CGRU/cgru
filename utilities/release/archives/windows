@@ -9,9 +9,7 @@ dest=$1
 rm -fv $dest/software_setup/locate_*
 
 # Clear Python:
-python=$dest/python
-cd $python
-echo "Clearing python in '$PWD'"
-find -type f -name *.pyc -exec rm -vf {} \;
-find -type d -name __pycache__ -exec rm -rvf {} \;
+echo "Clearing python in '$dest'"
+find "${dest}" -type f -name *.pyc -exec rm -vf {} \;
+find "${dest}" -type d -name __pycache__ -exec rm -rvf {} \;
 exit 0
