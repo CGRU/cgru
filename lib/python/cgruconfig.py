@@ -1,10 +1,34 @@
 import os
+import socket
+import stat
 import sys
 import time
 import xml.parsers.expat
-import socket
+
+import cgruutils
 
 VARS = dict()
+
+def checkConfigFile( path, name):
+   status = True
+   if not os.path.isfile( path):
+      try:
+         cfile = open( path, 'w')
+      except:
+         print(str(sys.exc_info()[1]))
+         status = False
+      if status:
+         cfile.write('<!-- Created by CGRU Keeper at ' + time.ctime() + ' -->\n')
+         cfile.write('<'  + name + '>\n')
+         cfile.write('</' + name + '>\n')
+         cfile.close()
+   if status:
+      try:
+         os.chmod( path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+      except:
+         print(str(sys.exc_info()[1]))
+   return status
+
 
 class Config:
    def __init__( self, variables = VARS, configfiles = None, Verbose = False):
@@ -37,24 +61,14 @@ class Config:
          self.Vars['HOME'] = home
          self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
          self.Vars['HOME_AFANASY'] = os.path.join( home, '.afanasy')
-         if not os.path.isdir( self.Vars['HOME_CGRU']   ): os.mkdir( self.Vars['HOME_CGRU']   )
-         if not os.path.isdir( self.Vars['HOME_AFANASY']): os.mkdir( self.Vars['HOME_AFANASY'])
+         cgruutils.createFolder( self.Vars['HOME_CGRU']    )
+         cgruutils.createFolder( self.Vars['HOME_AFANASY'] )
          self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.xml')
          self.Vars['config_afanasy'] = os.path.join( self.Vars['HOME_AFANASY'], 'config.xml')
          # Create home config file if not preset
-         if not os.path.isfile( self.Vars['config_file_home']):
-            cfile = open( self.Vars['config_file_home'], 'w')
-            cfile.write('<!-- Created by CGRU Keeper at ' + time.ctime() + ' -->\n')
-            cfile.write('<cgru>\n')
-            cfile.write('</cgru>\n')
-            cfile.close()
+         checkConfigFile( self.Vars['config_file_home'], 'cgru')
          # Create afanasy home config file if not preset
-         if not os.path.isfile( self.Vars['config_afanasy']):
-            cfile = open( self.Vars['config_afanasy'], 'w')
-            cfile.write('<!-- Created by CGRU Keeper at ' + time.ctime() + ' -->\n')
-            cfile.write('<afanasy>\n')
-            cfile.write('</afanasy>\n')
-            cfile.close()
+         checkConfigFile( self.Vars['config_afanasy'], 'afanasy')
 
          configfiles = []
          configfiles.append( os.path.join( cgrulocation, 'config_default.xml'))
