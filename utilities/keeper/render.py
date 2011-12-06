@@ -4,7 +4,7 @@ import cmd
 
 WndInfo = None
 
-from PyQt4 import QtGui
+from PyQt4 import QtCore, QtGui
 
 def showInfo( tray = None):
    renders = af.Cmd().renderGetLocal()
@@ -17,13 +17,16 @@ def showInfo( tray = None):
 
    WndInfo = QtGui.QTextEdit()
    msg = ''
+   isstring = False
+   if isinstance( renders[0]['info'], str): isstring = True
    for rinfo in renders:
-      if isinstance(rinfo['info'], str):
+      if isstring:
          msg += rinfo['info']
          msg += rinfo['resources']
       else:
          msg += str(rinfo['info'], 'utf-8')
          msg += str(rinfo['resources'], 'utf-8')
+   if isstring: msg = QtCore.QString.fromUtf8( msg)
    WndInfo.setPlainText( msg)
    WndInfo.setReadOnly( True)
    WndInfo.resize( WndInfo.viewport().size())
