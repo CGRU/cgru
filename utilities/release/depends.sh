@@ -13,6 +13,9 @@ case ${DISTRIBUTIVE} in
    openSUSE )
       export DEPENDS_CGRU="python-qt4"
       ;;
+   AltLinux )
+      export DEPENDS_CGRU="python-module-PyQt4"
+      ;;
     *)
       export DEPENDS_CGRU="PyQt4"
       ;;

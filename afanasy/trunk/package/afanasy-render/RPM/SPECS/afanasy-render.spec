@@ -19,16 +19,18 @@ Afanasy render init sctipts. Create user "render" if does not exists.
 %build
 
 %install
+mkdir -p $RPM_BUILD_ROOT
 
 %files
+%defattr(-,root,root)
 
 %clean
 
 %pre
 echo "Afanasy render PRE INSTALL"
-if [ -e /etc/init.d/afrender ]; then
+if [ -e "/etc/init.d/afrender" ]; then
    echo "Trying to stop previously installed service..."
-   /etc/init.d/afrender stop || true
+   "/etc/init.d/afrender" stop || true
 fi
 exit 0
 
@@ -36,12 +38,12 @@ exit 0
 echo "Afanasy render POST INSTALL"
 id render || useradd render --create-home
 /opt/cgru/afanasy/init/initlinks.sh c add afrender || true
-/etc/init.d/afrender start || true
+"/etc/init.d/afrender" start || true
 exit 0
 
 %preun
 echo "Afanasy render PRE REMOVE: $1"
 [ "$1" != "0" ] && exit 0
-/etc/init.d/afrender stop || true
+"/etc/init.d/afrender stop" || true
 /opt/cgru/afanasy/init/initlinks.sh c rm afrender || true
 exit 0
