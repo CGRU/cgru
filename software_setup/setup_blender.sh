@@ -17,7 +17,7 @@ blender_home=$HOME/.blender
 if [ -d "$blender_home" ]; then
    for ver in `ls "$blender_home"`; do
       addons="$blender_home/$ver/scripts/addons"
-      [ -d "$addons" ] || continue
+      [ -d "$addons" ] || mkdir -p "$addons"
       script="render_afanasy.py"
       link="$addons/$script"
       [ -f "$link" ] || ln -svf "$AF_ROOT/plugins/blender/$script" "$link"

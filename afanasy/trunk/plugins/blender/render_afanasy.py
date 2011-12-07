@@ -170,18 +170,20 @@ class ORE_Submit(bpy.types.Operator):
       # Process engine parameters:
       af_engine = rd.engine
       rd.engine = ore.engine
-      if rd.engine == 'BLENDER_RENDER':
+      commonegines = ['BLENDER_RENDER','CYCLES']
+      if rd.engine in commonegines:
          images = rd.filepath
          # Set Render Settings:
          if ore.filepath != '':
             orig_output = rd.filepath
             rd.filepath = ore.filepath
 
+      print('Render Engine = "%s"' % rd.engine)
       # Save scene with changed engine paramepters:
       bpy.ops.wm.save_mainfile()
 
       # Restore parameters:
-      if rd.engine == 'BLENDER_RENDER':
+      if rd.engine in commonegines:
          if orig_output is not None:
             rd.filepath = orig_output
 
@@ -235,6 +237,8 @@ class ORE_Submit(bpy.types.Operator):
       job = af.Job( jobname)
       servicename = 'blender'
       block = af.Block( ore.engine, servicename)
+      if ore.engine == 'BLENDER_RENDER': block.setParser('blender_render')
+      if ore.engine == 'CYCLES': block.setParser('blender_cycles')
       job.blocks.append( block)
       # Set block command and frame range:
       block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
