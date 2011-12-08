@@ -1592,7 +1592,10 @@ Add this options to temporary image saving.')
       command = "%s" % self.cmdField.toPlainText()
       if len(command) == 0: return
 
-      if self.cAfanasy.isChecked() and self.cAfOneTask.isChecked():
+      afanasy = False
+      if self.cAfanasy.isChecked():
+         if self.cAfOneTask.isChecked() or self.decode: afanasy = True
+      if afanasy:
          self.btnStart.setEnabled( False)
          try:
             af = __import__('af', globals(), locals(), [])
