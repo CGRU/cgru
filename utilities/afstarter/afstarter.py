@@ -29,6 +29,8 @@ def getComboBoxString( comboBox):
 class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
+      self.constructed = False
+
       self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
       self.fields = dict()
       
@@ -226,6 +228,8 @@ AfterFX render settings template')
       buttonsLayout.addWidget( self.bQuitSave)
       QtCore.QObject.connect( self.bQuitSave, QtCore.SIGNAL('pressed()'), self.quitsave)
 
+      self.constructed = True
+
       # Refresh recent:
       self.refreshRecent()
 
@@ -346,6 +350,7 @@ AfterFX render settings template')
       self.save( filename, True)
 
    def evaluate( self):
+      if not self.constructed: return
       self.evaluated = False
       self.bStart.setEnabled( False)
 

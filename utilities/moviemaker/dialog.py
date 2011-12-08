@@ -179,6 +179,8 @@ for afile in CodecFiles:
 class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
+      self.constructed = False
+
       self.evaluated = False
       self.running   = False
       self.decode    = False
@@ -1062,6 +1064,7 @@ Add this options to temporary image saving.')
       self.mainLayout.addLayout( self.lProcess)
 
 
+      self.constructed = True
       self.inputPattern = None
       self.inputPattern2 = None
       self.autoTitles()
@@ -1415,6 +1418,7 @@ Add this options to temporary image saving.')
 
 
    def evaluate( self):
+      if not self.constructed: return
       self.evaluated = False
       self.btnStart.setEnabled( False)
       if self.running: return

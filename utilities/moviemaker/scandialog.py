@@ -96,6 +96,8 @@ for afile in CodecFiles:
 class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
+      self.constructed = False
+
       self.evaluated = False
       self.test = False
 
@@ -323,6 +325,8 @@ Images with width/height ratio > this value will be treated as 2:1.')
       self.lAfanasy.addWidget( self.cAfPause)
       self.mainLayout.addLayout( self.lAfanasy)
 
+      self.constructed = True
+
       self.afanasy()
       self.evaluate()
 
@@ -347,6 +351,7 @@ Images with width/height ratio > this value will be treated as 2:1.')
          self.evaluate()
 
    def evaluate( self):
+      if not self.constructed: return
       self.evaluated = False
       self.btnStart.setEnabled( False)
       self.btnStop.setEnabled( False)

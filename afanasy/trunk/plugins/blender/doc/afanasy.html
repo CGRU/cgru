@@ -46,6 +46,7 @@
 Afanasy realised as a render engine in Blender.
 One of its parameters is a render engine name to render. Default is <i>BLENDER_RENDER</i>.
 Afanasy script will set specified render engine and save a scene with a temporary name to render.
+To list all available engines type <code>blender --engine help</code>.
 </p>
 
 <table width="99%">
@@ -65,7 +66,8 @@ Afanasy script will set specified render engine and save a scene with a temporar
 </table>
 
 <ul>
-<li><b>Name</b> - Afanasy job name. If empty scene name will be used.</li>
+<li><b>Job Name</b> - Afanasy job name. If empty scene name will be used.</li>
+<li><b>Render Engine</b> - Render engine to switch to.</li>
 <li><b>Start</b> - First frame to render.</li>
 <li><b>End</b> - Last frame to render.</li>
 <li><b>By</b> - Frames "jump" or increment.</li>
@@ -82,6 +84,20 @@ Afanasy script will set specified render engine and save a scene with a temporar
 <li><b>Hosts Mask</b> - Hosts names <a href="../../../../doc/regexp.html">pattern</a> job tasks can run on (if empty job can run on any host).</li>
 <li><b>Exclude Hosts</b> - Hosts names <a href="../../../../doc/regexp.html">pattern</a> job tasks can not run on.</li>
 </ul>
+
+<p>
+<pre>
+
+   $ blender --engine help
+   Blender Engine Listing:
+	   BLENDER_RENDER
+	   BLENDER_GAME
+	   CYCLES
+	   POVRAY_RENDER
+	   AFANASY_RENDER
+
+</pre>
+</p>
 
 <!--FOOTER-->
 </td></tr></table>
