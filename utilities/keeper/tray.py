@@ -44,34 +44,6 @@ class Tray( QtGui.QSystemTrayIcon):
          self.menu['menu'].addAction( action)
          self.menu['menu'].addSeparator()
 
-      # Software menu:
-      self.addMenu( self.menu['menu'], 'Software')
-      action = QtGui.QAction( QtGui.QIcon( cgruconfig.VARS['icons_dir'] + '/folder.png'), '[ browse ]', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.browse)
-      self.menu['Software'].addAction( action)
-      for soft in software.Names:
-         icon = software.getIcon( soft)
-         if icon is None:
-            action = QtGui.QAction( soft, self)
-         else:
-            action = QtGui.QAction( icon, soft, self)
-         eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.start%s)" % soft)
-         self.menu['Software'].addAction( action)
-      # Software setup:
-      self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
-      self.menu['Software'].addMenu( self.menu['Setup Soft'])
-      for soft in software.Names:
-         action = QtGui.QAction( soft, self)
-         eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.locate%s)" % soft)
-         self.menu['Setup Soft'].addAction( action)
-      # Software examples:
-      self.menu['Examples'] = QtGui.QMenu('Examples')
-      self.menu['Software'].addMenu( self.menu['Examples'])
-      for soft in software.Names:
-         action = QtGui.QAction( soft, self)
-         eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.example%s)" % soft)
-         self.menu['Examples'].addAction( action)
-         
       # Load menu:
       for dirpath, dirnames, filenames in os.walk( cgruconfig.VARS['menu'], True, None, True):
          if dirpath.find('/.') != -1: continue
@@ -154,6 +126,36 @@ class Tray( QtGui.QSystemTrayIcon):
 
       self.menu['menu'].addSeparator()
 
+      # Add Software menu if it was not created by custom files:
+      if not 'Software' in self.menu:
+         self.addMenu( self.menu['menu'], 'Software')
+         self.menu['menu'].addSeparator()
+         action = QtGui.QAction( QtGui.QIcon( cgruconfig.VARS['icons_dir'] + '/folder.png'), '[ browse ]', self)
+         QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.browse)
+         self.menu['Software'].addAction( action)
+         for soft in software.Names:
+            icon = software.getIcon( soft)
+            if icon is None:
+               action = QtGui.QAction( soft, self)
+            else:
+               action = QtGui.QAction( icon, soft, self)
+            eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.start%s)" % soft)
+            self.menu['Software'].addAction( action)
+         # Software setup:
+         self.menu['Setup Soft'] = QtGui.QMenu('Setup Soft')
+         self.menu['Software'].addMenu( self.menu['Setup Soft'])
+         for soft in software.Names:
+            action = QtGui.QAction( soft, self)
+            eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.locate%s)" % soft)
+            self.menu['Setup Soft'].addAction( action)
+         # Software examples:
+         self.menu['Examples'] = QtGui.QMenu('Examples')
+         self.menu['Software'].addMenu( self.menu['Examples'])
+         for soft in software.Names:
+            action = QtGui.QAction( soft, self)
+            eval("QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.example%s)" % soft)
+            self.menu['Examples'].addAction( action)
+
       # Add permanent items to 'Configure':
       if not self.addMenu( self.menu['menu'], 'Configure'): self.menu['Configure'].addSeparator()
       action = QtGui.QAction('Reload Config', self)
@@ -169,25 +171,11 @@ class Tray( QtGui.QSystemTrayIcon):
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.setTextEditor)
       self.menu['Configure'].addAction( action)
 
-      self.menu['menu'].addSeparator()
-
-      action = QtGui.QAction('Show Info', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), self.cgruInfo)
-      self.menu['menu'].addAction( action)
-      self.menu['menu'].addSeparator()
-      action = QtGui.QAction('Documentation', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.cgruDocs)
-      self.menu['menu'].addAction( action)
-      self.menu['menu'].addSeparator()
-      action = QtGui.QAction('Restart', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.restart)
-      self.menu['menu'].addAction( action)            
-      action = QtGui.QAction('Quit && Exit Clients', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.quitExitClients)
-      self.menu['menu'].addAction( action)            
-      action = QtGui.QAction('Quit', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.quit)
-      self.menu['menu'].addAction( action)            
+      self.addAction('menu', True,'Show Info', self.cgruInfo)
+      self.addAction('menu', True,'Documentation', cmd.cgruDocs)
+      self.addAction('menu', True,'Restart', cmd.restart)
+      self.addAction('menu', False,'Quit && Exit Clients', cmd.quitExitClients)
+      self.addAction('menu', False,'Quit', cmd.quit)
 
       self.setContextMenu( self.menu['menu'])
 
@@ -223,6 +211,15 @@ class Tray( QtGui.QSystemTrayIcon):
       else:
          self.menu[menuname] = parentmenu.addMenu( menuname)
       return True
+
+   def addAction( self, menuname, separator, actionname, function, iconname = None):
+      if separator: self.menu[menuname].addSeparator()
+      if iconname is None: iconname = actionname.lower().replace(' ','_').replace('.','')
+      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], iconname + '.png')
+      action = QtGui.QAction( actionname, self)
+      if os.path.isfile( iconpath): action.setIcon( QtGui.QIcon( iconpath))
+      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), function)
+      self.menu[menuname].addAction( action)            
 
    def makeIcon( self, name, online, nimby, busy):
       painting = self.icon_epmty
