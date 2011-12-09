@@ -45,8 +45,7 @@ class Tray( QtGui.QSystemTrayIcon):
          self.menu['menu'].addSeparator()
 
       # Software menu:
-      self.menu['Software'] = QtGui.QMenu('Software')
-      self.menu['menu'].addMenu( self.menu['Software'])
+      self.addMenu( self.menu['menu'], 'Software')
       action = QtGui.QAction( QtGui.QIcon( cgruconfig.VARS['icons_dir'] + '/folder.png'), '[ browse ]', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.browse)
       self.menu['Software'].addAction( action)
@@ -81,11 +80,7 @@ class Tray( QtGui.QSystemTrayIcon):
          if menuname == os.path.basename( cgruconfig.VARS['menu']):
             menuname = 'menu'
          else:
-            iconpath = os.path.join( cgruconfig.VARS['icons_dir'], menuname.lower() + '.png')
-            if os.path.isfile( iconpath):
-               self.menu[menuname] = self.menu['menu'].addMenu( QtGui.QIcon( iconpath), menuname)
-            else:
-               self.menu[menuname] = self.menu['menu'].addMenu( menuname)
+            self.addMenu( self.menu['menu'], menuname)
          filenames.sort()
          for filename in filenames:
             if filename[0] == '.' or filename[0] == '_': continue
@@ -110,10 +105,7 @@ class Tray( QtGui.QSystemTrayIcon):
             QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
 
       # Add permanent items to 'Afanasy':
-      if not 'AFANASY' in self.menu:
-         self.menu['AFANASY'] = QtGui.QMenu('AFANASY')
-         self.menu['menu'].addMenu( self.menu['AFANASY'])
-      self.menu['AFANASY'].addSeparator()
+      if not self.addMenu( self.menu['menu'], 'AFANASY'): self.menu['AFANASY'].addSeparator()
       action = QtGui.QAction('Set nibmy', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), nimby.setnimby)
       self.menu['AFANASY'].addAction( action)
@@ -163,10 +155,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.menu['menu'].addSeparator()
 
       # Add permanent items to 'Configure':
-      if not 'Configure' in self.menu:
-         self.menu['Configure'] = QtGui.QMenu('Configure')
-         self.menu['menu'].addMenu( self.menu['Configure'])
-      self.menu['Configure'].addSeparator()
+      if not self.addMenu( self.menu['menu'], 'Configure'): self.menu['Configure'].addSeparator()
       action = QtGui.QAction('Reload Config', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.confReload)
       self.menu['Configure'].addAction( action)
@@ -224,6 +213,16 @@ class Tray( QtGui.QSystemTrayIcon):
       QtCore.QObject.connect( self, QtCore.SIGNAL('activated( QSystemTrayIcon::ActivationReason)'), self.activated_slot)
 
       self.show()
+
+   def addMenu( self, parentmenu, menuname, iconname = None):
+      if menuname in self.menu: return False
+      if iconname is None: iconname = menuname.lower().replace(' ','_').replace('.','')
+      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], iconname + '.png')
+      if os.path.isfile( iconpath):
+         self.menu[menuname] = parentmenu.addMenu( QtGui.QIcon( iconpath), menuname)
+      else:
+         self.menu[menuname] = parentmenu.addMenu( menuname)
+      return True
 
    def makeIcon( self, name, online, nimby, busy):
       painting = self.icon_epmty
