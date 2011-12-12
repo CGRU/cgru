@@ -171,7 +171,7 @@ class Tray( QtGui.QSystemTrayIcon):
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.setTextEditor)
       self.menu['Configure'].addAction( action)
 
-      self.addAction('menu', True,'Show Info', self.cgruInfo)
+      self.addAction('menu', True,'Show Info...', self.cgruInfo,'info')
       self.addAction('menu', True,'Documentation', cmd.cgruDocs)
       self.addAction('menu', True,'Restart', cmd.restart)
       self.addAction('menu', False,'Quit && Exit Clients', cmd.quitExitClients)
