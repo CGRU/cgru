@@ -46,6 +46,10 @@ class Window( QtGui.QTextEdit ):
       self.appendConfigFile( cgruconfig.VARS['config_file'])
       self.appendConfigFile( cgruconfig.VARS['config_file_home'])
 
+      # Set window icon:
+      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], 'info.png')
+      if os.path.isfile( iconpath): self.setWindowIcon( QtGui.QIcon( iconpath))
+
       self.resize( self.viewport().size())
       self.moveCursor( QtGui.QTextCursor.Start)
       self.setReadOnly( True)

@@ -1,5 +1,7 @@
 import cgruconfig
 
+import os
+
 from PyQt4 import QtCore, QtGui
 
 class DialogNimby( QtGui.QWidget):
@@ -73,6 +75,10 @@ class DialogNimby( QtGui.QWidget):
       toplayout.addLayout( hlayout)
       QtCore.QObject.connect( b_accept, QtCore.SIGNAL('pressed()'), self.applySettings)
       QtCore.QObject.connect( b_cancel, QtCore.SIGNAL('pressed()'), self.close)
+
+      # Set window icon:
+      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], 'afanasy.png')
+      if os.path.isfile( iconpath): self.setWindowIcon( QtGui.QIcon( iconpath))
 
       self.show()
 

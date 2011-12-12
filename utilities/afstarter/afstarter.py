@@ -46,6 +46,10 @@ class Dialog( QtGui.QWidget):
       tabwidget.addTab( jobwidget,'Job')
       joblayout = QtGui.QVBoxLayout( jobwidget)
 
+      auxwidget = QtGui.QWidget( self)
+      tabwidget.addTab( auxwidget,'Advanced')
+      advlayout = QtGui.QVBoxLayout( auxwidget)
+
 
       # Scene:
       lScene = QtGui.QHBoxLayout()
@@ -132,6 +136,19 @@ AfterFX render settings template')
       self.fields['take'] = QtGui.QLineEdit( self)
       lNode.addWidget( self.fields['take'])
       QtCore.QObject.connect( self.fields['take'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+
+
+
+      # Advanced:
+      gExecute = QtGui.QGroupBox('Customize Tasks Command')
+      advlayout.addWidget( gExecute)
+      exelayout = QtGui.QHBoxLayout( gExecute)
+      self.fields['exec'] = QtGui.QLineEdit( self)
+      exelayout.addWidget( self.fields['exec'])
+      QtCore.QObject.connect( self.fields['exec'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      self.execBrowseButton = QtGui.QPushButton('Browse', self)
+      exelayout.addWidget( self.execBrowseButton)
+      QtCore.QObject.connect( self.execBrowseButton, QtCore.SIGNAL('pressed()'), self.browseExec)
 
 
       # Job:
@@ -230,6 +247,10 @@ AfterFX render settings template')
 
       self.constructed = True
 
+      # Set window icon:
+      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], 'afanasy.png')
+      if os.path.isfile( iconpath): self.setWindowIcon( QtGui.QIcon( iconpath))
+
       # Refresh recent:
       self.refreshRecent()
 
@@ -246,6 +267,12 @@ AfterFX render settings template')
       path = str( QtGui.QFileDialog.getSaveFileName( self,'Choose a file', self.fields['outimages'].text()))
       if path == '': return
       self.fields['outimages'].setText( os.path.normpath( path))
+      self.evaluate()
+
+   def browseExec( self):
+      path = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['exec'].text()))
+      if path == '': return
+      self.fields['exec'].setText( os.path.normpath( path))
       self.evaluate()
 
    def quitsave( self):
@@ -424,6 +451,7 @@ AfterFX render settings template')
       if not str( self.fields['hostsexclude'].text()) == '': cmd += ' -hostsexcl "%s"' % self.fields['hostsexclude'].text()
       if self.fields['paused'].isChecked(): cmd += ' -pause'
       cmd += ' -name "%s"' % self.fields['jobname'].text()
+      if not str( self.fields['exec'].text()) == '': cmd += ' -exec "%s"' % self.fields['exec'].text()
 
       # Evaluated:
       self.teCmd.setText( cmd)
