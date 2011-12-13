@@ -54,6 +54,7 @@ class Tray( QtGui.QSystemTrayIcon):
          else:
             self.addMenu( self.menu['menu'], menuname)
          filenames.sort()
+         was_separator = True
          for filename in filenames:
             if filename[0] == '.' or filename[0] == '_': continue
             if sys.platform[:3] == 'win':
@@ -67,14 +68,21 @@ class Tray( QtGui.QSystemTrayIcon):
             lines = file.readlines()
             file.close()
             iconpath = None
+            separator = False
             for line in lines:
                if line.find('Name=') != -1:
                   itemname = line.split('Name=')[-1].strip()
                if line.find('Icon=') != -1:
                   iconpath = line.split('Icon=')[-1].strip()
+               if line.find('Separator') != -1: separator = True
+            if separator:
+               if not was_separator: self.menu[menuname].addSeparator()
+               was_separator = True
+            else: was_separator = False
             action = ActionCommand( self, itemname, filename, iconpath)
             self.menu[menuname].addAction( action)
             QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
+            if separator: self.menu[menuname].addSeparator()
 
       # Add permanent items to 'Afanasy':
       if not self.addMenu( self.menu['menu'], 'AFANASY'): self.menu['AFANASY'].addSeparator()
