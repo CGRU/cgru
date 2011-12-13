@@ -4,7 +4,7 @@
 
 source "`dirname "$0"`/_setup.sh"
 
-terminals="gnome-terminal konsole xterm"
+terminals="gnome-terminal konsole /Applications/Utilities/Terminal.app/Contents/MacOS/Terminal xterm"
 
 [ -d "$CGRU_LOCATION" ] && cd "$CGRU_LOCATION"
 
