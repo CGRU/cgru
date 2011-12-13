@@ -1,5 +1,6 @@
 #!/bin/bash
 # Name=Terminal
+# Icon=terminal.png
 
 source "`dirname "$0"`/_setup.sh"
 
