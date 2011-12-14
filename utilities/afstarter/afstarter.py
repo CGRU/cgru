@@ -81,9 +81,13 @@ class Dialog( QtGui.QWidget):
       self.fields['outimages'] = QtGui.QLineEdit( self)
       lImages.addWidget( self.fields['outimages'])
       QtCore.QObject.connect( self.fields['outimages'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      bBrowseOutImages = QtGui.QPushButton('Browse', self)
+      lImages.addWidget( QtGui.QLabel('Browse'))
+      bBrowseOutImages = QtGui.QPushButton('File', self)
       lImages.addWidget( bBrowseOutImages)
       QtCore.QObject.connect( bBrowseOutImages, QtCore.SIGNAL('pressed()'), self.browseOutImages)
+      bBrowseOutFolder = QtGui.QPushButton('Dir', self)
+      lImages.addWidget( bBrowseOutFolder)
+      QtCore.QObject.connect( bBrowseOutFolder, QtCore.SIGNAL('pressed()'), self.browseOutFolder)
 
       # Frames:
       lFrames = QtGui.QHBoxLayout()
@@ -140,9 +144,16 @@ AfterFX render settings template')
 
 
       # Advanced:
-      gExecute = QtGui.QGroupBox('Customize Tasks Command')
-      advlayout.addWidget( gExecute)
-      exelayout = QtGui.QHBoxLayout( gExecute)
+      osLayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( osLayout)
+      osLayout.addWidget( QtGui.QLabel('Operating System Type:'))
+      self.fields['os'] = QtGui.QLineEdit( self)
+      osLayout.addWidget( self.fields['os'])
+      QtCore.QObject.connect( self.fields['os'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+
+      exelayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( exelayout)
+      exelayout.addWidget( QtGui.QLabel('Tasks Command:'))
       self.fields['exec'] = QtGui.QLineEdit( self)
       exelayout.addWidget( self.fields['exec'])
       QtCore.QObject.connect( self.fields['exec'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
@@ -150,6 +161,12 @@ AfterFX render settings template')
       exelayout.addWidget( self.execBrowseButton)
       QtCore.QObject.connect( self.execBrowseButton, QtCore.SIGNAL('pressed()'), self.browseExec)
 
+      prvlayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( prvlayout)
+      prvlayout.addWidget( QtGui.QLabel('Preview:'))
+      self.fields['preview'] = QtGui.QLineEdit( self)
+      prvlayout.addWidget( self.fields['preview'])
+      QtCore.QObject.connect( self.fields['preview'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
       # Job:
       lJobName = QtGui.QHBoxLayout()
@@ -265,6 +282,12 @@ AfterFX render settings template')
 
    def browseOutImages( self):
       path = str( QtGui.QFileDialog.getSaveFileName( self,'Choose a file', self.fields['outimages'].text()))
+      if path == '': return
+      self.fields['outimages'].setText( os.path.normpath( path))
+      self.evaluate()
+
+   def browseOutFolder( self):
+      path = str( QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', self.fields['outimages'].text()))
       if path == '': return
       self.fields['outimages'].setText( os.path.normpath( path))
       self.evaluate()
@@ -441,6 +464,9 @@ AfterFX render settings template')
       if not str( self.fields['node'].text()) == '': cmd += ' -node "%s"' % self.fields['node'].text()
       if not str( self.fields['take'].text()) == '': cmd += ' -take "%s"' % self.fields['take'].text()
       if not str( self.fields['outimages'].text()) == '': cmd += ' -output "%s"' % self.fields['outimages'].text()
+      if not str( self.fields['preview'].text()) == '': cmd += ' -images "%s"' % self.fields['preview'].text()
+      if str( self.fields['os'].text()) == '': cmd += ' -os any'
+      else: cmd += ' -os "%s"' % self.fields['os'].text()
       cmd += ' -pwd "%s"' % self.fields['wdir'].text()
       if self.fields['capacity'].value() > 0: cmd += ' -capacity %d' % self.fields['capacity'].value()
       if self.fields['maxruntasks'].value() > 0: cmd += ' -maxruntasks %d' % self.fields['maxruntasks'].value()
