@@ -16,10 +16,11 @@ pythondir=$PWD/$pythonver$options
 export CFLAGS=-fPIC
 export CPPFLAGS=$CFLAGS
 
-#if [ `uname` == "Darwin" ]; then
+if [ `uname` == "Darwin" ]; then
+   echo "Building on Mac OS X:"
+   export CFLAGS="-DWITH_NEXT_FRAMEWORK"
 #   extra="--enable-framework"
-#   echo "Darwin framework enabled."
-#fi
+fi
 
 cd $pythonsrc
 
