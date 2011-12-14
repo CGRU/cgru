@@ -11,7 +11,7 @@ Mxx_ru::Cpp::dll_target{
    case toolset.tag('target_os')
 
       when 'unix'
-
+         define "UNIX"
          linker_option ENV['AF_LFLAGS']
 
          case ENV['UNIXTYPE']

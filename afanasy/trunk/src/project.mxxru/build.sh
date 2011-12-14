@@ -2,6 +2,11 @@
 
 export UNIXTYPE="LINUX"
 export MXX_RU_CPP_TOOLSET=gcc_linux
+if [ `uname` == "Darwin" ]; then
+   echo "Building on Mac OS X:"
+   export UNIXTYPE="MACOSX"
+   export MXX_RU_CPP_TOOLSET=gcc_darwin
+fi
 
 # Set locations:
 cgru=$PWD

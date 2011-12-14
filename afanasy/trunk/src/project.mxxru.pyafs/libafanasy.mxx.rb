@@ -8,7 +8,7 @@ Mxx_ru::Cpp::lib_target{
 
    case toolset.tag( "target_os" )
       when "unix"
-
+         define "UNIX"
          compiler_option( "-fPIC", MxxRu::Cpp::Target::OPT_UPSPREAD)
          compiler_option( "-Wall", MxxRu::Cpp::Target::OPT_UPSPREAD)
          IO.popen("#{ENV['AF_PYTHON']}-config --includes"){|f| compiler_option(f.gets.chop, MxxRu::Cpp::Target::OPT_UPSPREAD )}
