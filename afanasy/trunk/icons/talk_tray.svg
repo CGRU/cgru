@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="48"
+   height="48"
+   id="svg2"
+   sodipodi:version="0.32"
+   inkscape:version="0.48.2 r9819"
+   sodipodi:docname="talk_tray.svg"
+   inkscape:output_extension="org.inkscape.output.svg.inkscape"
+   version="1.0"
+   inkscape:export-filename="/cgru/afanasy/icons/talk_tray_msg.png"
+   inkscape:export-xdpi="240"
+   inkscape:export-ydpi="240">
+  <defs
+     id="defs4">
+    <inkscape:perspective
+       sodipodi:type="inkscape:persp3d"
+       inkscape:vp_x="0 : 24 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_z="48 : 24 : 1"
+       inkscape:persp3d-origin="24 : 16 : 1"
+       id="perspective15" />
+    <inkscape:perspective
+       id="perspective5544"
+       inkscape:persp3d-origin="0.5 : 0.33333333 : 1"
+       inkscape:vp_z="1 : 0.5 : 1"
+       inkscape:vp_y="0 : 1000 : 0"
+       inkscape:vp_x="0 : 0.5 : 1"
+       sodipodi:type="inkscape:persp3d" />
+    <filter
+       inkscape:collect="always"
+       id="filter4115"
+       x="-0.16384989"
+       width="1.3276998"
+       y="-0.17225523"
+       height="1.3445105">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="8.8313493"
+         id="feGaussianBlur4117" />
+    </filter>
+    <filter
+       inkscape:collect="always"
+       id="filter3799"
+       x="-0.18737572"
+       width="1.3747514"
+       y="-0.17269189"
+       height="1.3453838">
+      <feGaussianBlur
+         inkscape:collect="always"
+         stdDeviation="1.0552127"
+         id="feGaussianBlur3801" />
+    </filter>
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     gridtolerance="10000"
+     guidetolerance="10"
+     objecttolerance="10"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="5.5145632"
+     inkscape:cx="-29.939258"
+     inkscape:cy="26.022467"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:snap-global="false"
+     showguides="true"
+     inkscape:guide-bbox="true"
+     inkscape:window-width="1278"
+     inkscape:window-height="684"
+     inkscape:window-x="0"
+     inkscape:window-y="30"
+     width="100px"
+     inkscape:showpageshadow="false"
+     inkscape:window-maximized="0">
+    <inkscape:grid
+       type="xygrid"
+       id="grid2387"
+       visible="true"
+       enabled="true"
+       empspacing="8"
+       snapvisiblegridlinesonly="true" />
+  </sodipodi:namedview>
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <cc:license
+           rdf:resource="" />
+        <dc:title>Afanasy Talk</dc:title>
+        <dc:creator>
+          <cc:Agent>
+            <dc:title>CGRU</dc:title>
+          </cc:Agent>
+        </dc:creator>
+        <dc:subject>
+          <rdf:Bag>
+            <rdf:li>Afanasy</rdf:li>
+            <rdf:li>Talk</rdf:li>
+          </rdf:Bag>
+        </dc:subject>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     style="display:inline">
+    <path
+       sodipodi:type="star"
+       style="fill:#131610;fill-opacity:1;stroke:#131610;stroke-width:9.70797463000000072;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;stroke-linejoin:round;opacity:1;fill-rule:nonzero"
+       id="path5065"
+       sodipodi:sides="5"
+       sodipodi:cx="50"
+       sodipodi:cy="50"
+       sodipodi:r1="68.007355"
+       sodipodi:r2="28.563089"
+       sodipodi:arg1="-0.94200004"
+       sodipodi:arg2="-0.31368151"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 90.000001,-5.0000018 77.169326,41.186499 114.66879,71.046327 66.777921,73.116043 49.967509,118.00735 33.199999,73.100001 -14.688871,70.984525 22.839108,41.160543 10.05257,-5.0381971 50.013646,21.436914 90.000001,-5.0000018 z"
+       transform="matrix(0.28712464,0,0,-0.30185385,9.646651,41.050086)" />
+    <path
+       sodipodi:type="star"
+       style="fill:#899f4c;fill-opacity:1;stroke:none;stroke-width:9.70797443000000015;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1;stroke-dasharray:none;display:inline;filter:url(#filter4115)"
+       id="path5065-9"
+       sodipodi:sides="5"
+       sodipodi:cx="50"
+       sodipodi:cy="50"
+       sodipodi:r1="68.007355"
+       sodipodi:r2="28.563089"
+       sodipodi:arg1="-0.94200004"
+       sodipodi:arg2="-0.31368151"
+       inkscape:flatsided="false"
+       inkscape:rounded="0"
+       inkscape:randomized="0"
+       d="M 90.000001,-5.0000018 77.169326,41.186499 114.66879,71.046327 66.777921,73.116043 49.967509,118.00735 33.199999,73.100001 -14.688871,70.984525 22.839108,41.160543 10.05257,-5.0381971 50.013646,21.436914 z"
+       transform="matrix(0.28712464,0,0,-0.30185385,9.652812,41.183009)" />
+    <text
+       xml:space="preserve"
+       style="font-size:20.11636161999999928px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#c10000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="15.792145"
+       y="36.029354"
+       id="text3759"
+       sodipodi:linespacing="125%"
+       transform="scale(1.0529262,0.94973417)"><tspan
+         sodipodi:role="line"
+         id="tspan3761"
+         x="15.792145"
+         y="36.029354"
+         style="font-weight:bold;-inkscape-font-specification:Sans Bold;fill:#c10000;fill-opacity:1">T</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-size:20.11636161999999928px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#ff3616;fill-opacity:1;stroke:none;display:inline;font-family:Sans;filter:url(#filter3799)"
+       x="16.761711"
+       y="35.915321"
+       id="text3759-3"
+       sodipodi:linespacing="125%"
+       transform="matrix(1.1939705,0,0,1.0207272,-4.5098494,-1.4851714)"><tspan
+         sodipodi:role="line"
+         id="tspan3761-8"
+         x="16.761711"
+         y="35.915321"
+         style="font-weight:bold;-inkscape-font-specification:Sans Bold;fill:#ff3616;fill-opacity:1">T</tspan></text>
+  </g>
+</svg>

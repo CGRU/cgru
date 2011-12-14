@@ -455,7 +455,7 @@ AfterFX render settings template')
       cmd = os.environ['AF_ROOT']
       cmd = os.path.join( cmd, 'python')
       cmd = os.path.join( cmd, 'afjob.py')
-      cmd = 'python ' + cmd
+      cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
       cmd += ' "%s"' % self.fields['scenefile'].text()
       cmd += ' %d' % self.fields['framestart'].value()
       cmd += ' %d' % self.fields['frameend'].value()
