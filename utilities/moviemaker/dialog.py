@@ -8,6 +8,7 @@ import sys
 import time
 
 import cgruconfig
+import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
@@ -59,7 +60,7 @@ Parser.add_option(      '--afcapacity',      dest='afcapacity',      type  ='int
 Parser.add_option(      '--afpause',         dest='afpause',         action='store_true', default=False,          help='Start Afanasy job paused')
 Parser.add_option('-D', '--debug',           dest='debug',           action='store_true', default=False,          help='Debug mode')
 
-Parser.add_option(      '--wndicon',         dest='wndicon',         type  ='string',     default='dailies.png',  help='Set dialog window icon.')
+Parser.add_option(      '--wndicon',         dest='wndicon',         type  ='string',     default='dailies',      help='Set dialog window icon filename.')
 
 (Options, args) = Parser.parse_args()
 
@@ -1697,7 +1698,7 @@ def getComboBoxString( comboBox):
    return comboBox.itemData( comboBox.currentIndex()).toString()
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], Options.wndicon)))
+app.setWindowIcon( QtGui.QIcon( cgruutils.getIconFileName( Options.wndicon)))
 dialog = Dialog()
 dialog.show()
 app.exec_()

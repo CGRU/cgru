@@ -1,6 +1,7 @@
 import os, sys
 
 import cgruconfig
+import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
@@ -39,6 +40,6 @@ class Dialog( QtGui.QWidget):
          self.leResult.setText('NOT MATCH')
 
 app = QtGui.QApplication( sys.argv)
-app.setWindowIcon( QtGui.QIcon( os.path.join( cgruconfig.VARS['icons_dir'], 'regexp.png')))
+app.setWindowIcon( QtGui.QIcon( cgruutils.getIconFileName('regexp')))
 dialog = Dialog()
 app.exec_()

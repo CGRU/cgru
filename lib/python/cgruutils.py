@@ -6,6 +6,22 @@ import stat
 import sys
 import time
 
+import cgruconfig
+
+def getIconFileName( iconname):
+   icon_path = os.path.join( os.path.join( cgruconfig.VARS['CGRU_LOCATION'],'icons'))
+   icon_paths = cgruconfig.VARS['icons_path']
+   if icon_paths is None: icon_paths = icon_path
+   if icon_paths.find(';') != -1: icon_paths = icon_paths.split(';')
+   else: icon_paths = icon_paths.split(':')
+   if not icon_path in icon_paths: icon_paths.append( icon_path)
+   for icon_path in icon_paths:
+      icon_path = os.path.join( icon_path, iconname)
+      if os.path.isfile( icon_path): return icon_path
+      icon_path += '.png'
+      if os.path.isfile( icon_path): return icon_path
+   return None
+
 def createFolder( path, writeToAll = True):
    status = True
    if not os.path.isdir( path):

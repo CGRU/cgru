@@ -3,6 +3,7 @@ import os, sys, time
 from PyQt4 import QtCore, QtGui
 
 import cgruconfig
+import cgruutils
 
 import afcommon
 
@@ -265,8 +266,8 @@ AfterFX render settings template')
       self.constructed = True
 
       # Set window icon:
-      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], 'afanasy.png')
-      if os.path.isfile( iconpath): self.setWindowIcon( QtGui.QIcon( iconpath))
+      iconpath = cgruutils.getIconFileName('afanasy')
+      if iconpath is not None: self.setWindowIcon( QtGui.QIcon( iconpath))
 
       # Refresh recent:
       self.refreshRecent()

@@ -1,6 +1,7 @@
 import os, sys, time
 
 import cgruconfig
+import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
@@ -24,8 +25,9 @@ def startSoftimage(): startDetached('xsi')
 def startAfterFX():   startDetached('afterfx')
 
 def getIcon( soft):
-   iconpath = os.path.join( cgruconfig.VARS['icons_dir'], os.path.join('software', soft.lower() + '.png'))
-   if os.path.isfile( iconpath): return QtGui.QIcon( iconpath)
+   iconpath = cgruutils.getIconFileName( os.path.join('software', soft.lower()))
+   if iconpath is not None: return QtGui.QIcon( iconpath)
+   return None
 
 def exampleSoftware( folder, script):
    cmd = os.environ['CGRU_LOCATION']

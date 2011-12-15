@@ -1,4 +1,5 @@
 import cgruconfig
+import cgruutils
 
 import os
 
@@ -77,8 +78,8 @@ class DialogNimby( QtGui.QWidget):
       QtCore.QObject.connect( b_cancel, QtCore.SIGNAL('pressed()'), self.close)
 
       # Set window icon:
-      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], 'afanasy.png')
-      if os.path.isfile( iconpath): self.setWindowIcon( QtGui.QIcon( iconpath))
+      iconpath = cgruutils.getIconFileName('afanasy')
+      if iconpath is not None: self.setWindowIcon( QtGui.QIcon( iconpath))
 
       self.show()
 

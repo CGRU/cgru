@@ -2,6 +2,7 @@ import os, sys
 import subprocess
 
 import cgruconfig
+import cgruutils
 
 import af
 
@@ -19,8 +20,8 @@ class ActionCommand( QtGui.QAction):
    def __init__( self, parent, name, command, iconpath = None):
       QtGui.QAction.__init__( self, name, parent)
       if iconpath is not None:
-         iconpath = os.path.join( cgruconfig.VARS['icons_dir'], iconpath)
-         if os.path.isfile( iconpath):
+         iconpath = cgruutils.getIconFileName( iconpath)
+         if iconpath is not None:
             self.setIcon( QtGui.QIcon( iconpath))
          else:
             print('WARNING: Icon "%s" does not exist.' % iconpath)
@@ -52,6 +53,7 @@ class Tray( QtGui.QSystemTrayIcon):
       else: menu_paths = menu_paths.split(':')
       if not menu_path in menu_paths: menu_paths.append( menu_path)
       for menu_path in menu_paths:
+         if not os.path.isdir( menu_path): continue
          for dirpath, dirnames, filenames in os.walk( menu_path, True, None, True):
             if dirpath.find('/.') != -1: continue
             if dirpath.find('\\.') != -1: continue
@@ -145,7 +147,7 @@ class Tray( QtGui.QSystemTrayIcon):
       if not 'Software' in self.menu:
          self.addMenu( self.menu['menu'], 'Software')
          self.menu['menu'].addSeparator()
-         action = QtGui.QAction( QtGui.QIcon( cgruconfig.VARS['icons_dir'] + '/folder.png'), '[ browse ]', self)
+         action = QtGui.QAction( QtGui.QIcon( cgruutils.getIconFileName('folder')), '[ browse ]', self)
          QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), software.browse)
          self.menu['Software'].addAction( action)
          for soft in software.Names:
@@ -198,7 +200,7 @@ class Tray( QtGui.QSystemTrayIcon):
       self.icons = dict()
       icon_filename = cgruconfig.VARS['tray_icon']
       if icon_filename is None: icon_filename = 'keeper'
-      icon_filename = os.path.join( cgruconfig.VARS['icons_dir'], icon_filename + '.png')
+      icon_filename = cgruutils.getIconFileName( icon_filename)
       self.icon_epmty = QtGui.QPixmap( icon_filename)
       self.icons['empty'] = QtGui.QIcon( self.icon_epmty)
       self.makeIcon('offline_free',       online=False, nimby=False, busy=False)
@@ -220,8 +222,8 @@ class Tray( QtGui.QSystemTrayIcon):
    def addMenu( self, parentmenu, menuname, iconname = None):
       if menuname in self.menu: return False
       if iconname is None: iconname = menuname.lower().replace(' ','_').replace('.','')
-      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], iconname + '.png')
-      if os.path.isfile( iconpath):
+      iconpath = cgruutils.getIconFileName( iconname)
+      if iconpath is not None:
          self.menu[menuname] = parentmenu.addMenu( QtGui.QIcon( iconpath), menuname)
       else:
          self.menu[menuname] = parentmenu.addMenu( menuname)
@@ -230,9 +232,9 @@ class Tray( QtGui.QSystemTrayIcon):
    def addAction( self, menuname, separator, actionname, function, iconname = None):
       if separator: self.menu[menuname].addSeparator()
       if iconname is None: iconname = actionname.lower().replace(' ','_').replace('.','')
-      iconpath = os.path.join( cgruconfig.VARS['icons_dir'], iconname + '.png')
+      iconpath = cgruutils.getIconFileName( iconname)
       action = QtGui.QAction( actionname, self)
-      if os.path.isfile( iconpath): action.setIcon( QtGui.QIcon( iconpath))
+      if iconpath is not None: action.setIcon( QtGui.QIcon( iconpath))
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), function)
       self.menu[menuname].addAction( action)            
 

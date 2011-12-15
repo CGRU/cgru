@@ -50,7 +50,7 @@ class Config:
          self.Vars['company'] = 'CGRU'
          self.Vars['menu_path'] = None
          self.Vars['tray_icon'] = None
-         self.Vars['icons_dir'] = os.path.join( cgrulocation, 'icons')
+         self.Vars['icons_path'] = None
          if sys.platform.find('win') == 0:
             self.Vars['editor'] = 'notepad "%s"'
          else:
