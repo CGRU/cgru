@@ -13,7 +13,8 @@ def getIconFileName( iconname):
    icon_paths = cgruconfig.VARS['icons_path']
    if icon_paths is None: icon_paths = icon_path
    if icon_paths.find(';') != -1: icon_paths = icon_paths.split(';')
-   else: icon_paths = icon_paths.split(':')
+   elif sys.platform.find('win') == -1: icon_paths = icon_paths.split(':')
+   else: icon_paths = [icon_paths]
    if not icon_path in icon_paths: icon_paths.append( icon_path)
    for icon_path in icon_paths:
       icon_path = os.path.join( icon_path, iconname)
