@@ -45,44 +45,51 @@ class Tray( QtGui.QSystemTrayIcon):
          self.menu['menu'].addSeparator()
 
       # Load menu:
-      for dirpath, dirnames, filenames in os.walk( cgruconfig.VARS['menu'], True, None, True):
-         if dirpath.find('/.') != -1: continue
-         if dirpath.find('\\.') != -1: continue
-         menuname = os.path.basename( dirpath)
-         if menuname == os.path.basename( cgruconfig.VARS['menu']):
-            menuname = 'menu'
-         else:
-            self.addMenu( self.menu['menu'], menuname)
-         filenames.sort()
-         was_separator = True
-         for filename in filenames:
-            if filename[0] == '.' or filename[0] == '_': continue
-            if sys.platform[:3] == 'win':
-               if filename[-4:] != '.cmd': continue
-               itemname = filename[:-4]
+      menu_path = os.path.join( os.path.join( cgruconfig.VARS['CGRU_LOCATION'],'start'))
+      menu_paths = cgruconfig.VARS['menu_path']
+      if menu_paths is None: menu_paths = menu_path
+      if menu_paths.find(';') != -1: menu_paths = menu_paths.split(';')
+      else: menu_paths = menu_paths.split(':')
+      if not menu_path in menu_paths: menu_paths.append( menu_path)
+      for menu_path in menu_paths:
+         for dirpath, dirnames, filenames in os.walk( menu_path, True, None, True):
+            if dirpath.find('/.') != -1: continue
+            if dirpath.find('\\.') != -1: continue
+            menuname = os.path.basename( dirpath)
+            if menuname == os.path.basename( menu_path):
+               menuname = 'menu'
             else:
-               if filename[-3:] != '.sh': continue
-               itemname = filename[:-3]
-            filename = os.path.join( dirpath, filename)
-            file = open( filename,'r')
-            lines = file.readlines()
-            file.close()
-            iconpath = None
-            separator = False
-            for line in lines:
-               if line.find('Name=') != -1:
-                  itemname = line.split('Name=')[-1].strip()
-               if line.find('Icon=') != -1:
-                  iconpath = line.split('Icon=')[-1].strip()
-               if line.find('Separator') != -1: separator = True
-            if separator:
-               if not was_separator: self.menu[menuname].addSeparator()
-               was_separator = True
-            else: was_separator = False
-            action = ActionCommand( self, itemname, filename, iconpath)
-            self.menu[menuname].addAction( action)
-            QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
-            if separator: self.menu[menuname].addSeparator()
+               self.addMenu( self.menu['menu'], menuname)
+            filenames.sort()
+            was_separator = True
+            for filename in filenames:
+               if filename[0] == '.' or filename[0] == '_': continue
+               if sys.platform[:3] == 'win':
+                  if filename[-4:] != '.cmd': continue
+                  itemname = filename[:-4]
+               else:
+                  if filename[-3:] != '.sh': continue
+                  itemname = filename[:-3]
+               filename = os.path.join( dirpath, filename)
+               file = open( filename,'r')
+               lines = file.readlines()
+               file.close()
+               iconpath = None
+               separator = False
+               for line in lines:
+                  if line.find('Name=') != -1:
+                     itemname = line.split('Name=')[-1].strip()
+                  if line.find('Icon=') != -1:
+                     iconpath = line.split('Icon=')[-1].strip()
+                  if line.find('Separator') != -1: separator = True
+               if separator:
+                  if not was_separator: self.menu[menuname].addSeparator()
+                  was_separator = True
+               else: was_separator = False
+               action = ActionCommand( self, itemname, filename, iconpath)
+               self.menu[menuname].addAction( action)
+               QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), action.runCommand)
+               if separator: self.menu[menuname].addSeparator()
 
       # Add permanent items to 'Afanasy':
       if not self.addMenu( self.menu['menu'], 'AFANASY'): self.menu['AFANASY'].addSeparator()

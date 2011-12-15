@@ -48,7 +48,7 @@ class Config:
          self.Vars['CGRU_UPDATE_CMD'] = os.getenv('CGRU_UPDATE_CMD')
 
          self.Vars['company'] = 'CGRU'
-         self.Vars['menu'] = os.path.join( cgrulocation,'start')
+         self.Vars['menu_path'] = None
          self.Vars['tray_icon'] = None
          self.Vars['icons_dir'] = os.path.join( cgrulocation, 'icons')
          if sys.platform.find('win') == 0:
