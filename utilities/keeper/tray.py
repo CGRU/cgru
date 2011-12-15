@@ -50,7 +50,8 @@ class Tray( QtGui.QSystemTrayIcon):
       menu_paths = cgruconfig.VARS['menu_path']
       if menu_paths is None: menu_paths = menu_path
       if menu_paths.find(';') != -1: menu_paths = menu_paths.split(';')
-      else: menu_paths = menu_paths.split(':')
+      elif sys.platform.find('win') == -1: menu_paths = menu_paths.split(':')
+      else: menu_paths = [menu_paths]
       if not menu_path in menu_paths: menu_paths.append( menu_path)
       for menu_path in menu_paths:
          if not os.path.isdir( menu_path): continue
