@@ -6,6 +6,21 @@ import stat
 import sys
 import time
 
+def createFolder( path, writeToAll = True):
+   status = True
+   if not os.path.isdir( path):
+      try:
+         os.makedirs( path )
+      except:
+         print(str(sys.exc_info()[1]))
+         status = False
+   if status and writeToAll:
+      try:
+         os.chmod( path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
+      except:
+         print(str(sys.exc_info()[1]))
+   return status
+
 import cgruconfig
 
 def getIconFileName( iconname):
@@ -22,22 +37,6 @@ def getIconFileName( iconname):
       icon_path += '.png'
       if os.path.isfile( icon_path): return icon_path
    return None
-
-def createFolder( path, writeToAll = True):
-   status = True
-   if not os.path.isdir( path):
-      try:
-         os.makedirs( path )
-      except:
-         print(str(sys.exc_info()[1]))
-         status = False
-   if status and writeToAll:
-      try:
-         os.chmod( path, stat.S_IRWXU | stat.S_IRWXG | stat.S_IRWXO)
-      except:
-         print(str(sys.exc_info()[1]))
-   return status
-
 
 def copyJobFile( fileName, jobName = '', fileExtension = ''):
    copyFile = ''
