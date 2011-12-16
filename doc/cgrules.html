@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>
 <link href="styles.css" rel="stylesheet" type="text/css" />
-<title>CGRUles</title>
+<title>CG-Rules</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="author" content="Timur Hairulin" />
 <meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
@@ -39,40 +39,45 @@
 <table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
 <!--HEADER-->
 
-<h2 align="center">CGRUles</h2>
+<h2 align="center">CG-RUles:</h2>
 <hr />
 
 Most important CG Rule is turning around the way to launch software.
-<ul>
-   <li><h3>Each project (asset) has it's own software setup.</h3></li>
-   <li><h3>Use working directories and relative paths.</h3></li>
-   <li><h3>Such commands like <kbd>houdini mantra nuke prman</kbd> in $PATH which you can run anywhere can become a head ache.</h3></li>
-</ul>
+<ol>
+   <li><h3>Do not let producers to torture you much.</h3>
+      <table><tr>
+      <td><a href="fun/producers.svg"><img src="fun/producers.png" alt="bad producer" border="0"/></a></td>
+      <td width="5%"></td>
+      <td>This is the most important rule for artists!<br/>
+       At work download this graphics, print image and place it at the entrance of your room.</td>
+      </tr></table>
+   </li>
+   <li><h3>Try to use working directories and relative paths.</h3>
+      If you launch software in asset directory you can use relative paths.
+      So you can relocate asset with no need to fix paths to it's sources.
+      It's very useful if you work with another company or in different places, and to exchange scenes (assets).
+   </li>
+   <li><h3>Complex projects (assets) can have own software setup<b>*</b>.</h3>
+      Different projects and even sub-projects (assets) can use different software versions
+      at the same time (with different scripts, compiled plug-ins etc).
+      Project setup is stored with project.
+      You can restore old project and the way it launches software will be restored too.
+   </li>
+   <li><h3>Spending much time with machines do not forget that we are humans.</h3>
+      <img src="fun/shashlik.jpg" alt="shashlik" border="0"/>
+   </li>
+</ol>
 
 <p>
-The simplest way to store software setup in projects is to keep launching scripts in its assets (subprojects) root. To launch Nuke with setup for special asset user must run Nuke in asset root directory. For example:<br/>
+<b>*</b> The simplest way to store software setup in projects is to keep launching scripts in its assets (sub-projects) root.
+To launch Nuke with setup for special asset user must run Nuke in asset root directory. For example:<br/>
 <code>
- $ cd /cg/projects/[project name]/[asset name]<br/>
+ $ cd projects/[project name]/[asset name]<br/>
  $ ./nuke<br/>
 </code>
-Where <kbd>./nuke</kbd> is a script which points to special Nuke version and its scripts and plug-ins.
-</p>
-
-<h4>Advantages:</h4>
-<ul>
-<li>
-Different projects and even sub-projects (assets) can use different software versions at the same time (with different scripts, compiled plug-ins etc).
-</li>
-<li>
-You can render from assets with different software versions on the same farm machines simultaneously. Different versions can be executed even on the same machine at the same time (if you want several CPUs machines to run several tasks at once).
-</li>
-<li>
-Project setup is stored with project. You can restore old project and the way it launches software will be restored too.
-</li>
-</ul>
-
-<p>
-If you launch software in asset directory you can use relative paths. So you can relocate asset with no need to fix paths to it's sources. It's very useful if you work with another company or in different places, and to exchange scenes (assets). For example you can do some work at home, bring scene in office, and all paths to textures, 3d models will be correct.
+Where <kbd>./nuke</kbd> is a script which points to special Nuke version and its scripts and plug-ins.<br/>
+But better to have a command <kbd>nuke</kbd> in <b>PATH</b>
+which will search in parent folders from current for a special setup script.
 </p>
 
 <!--FOOTER-->
