@@ -12,46 +12,61 @@ def setFree(    text = '(keeper)'): cmd = af.Cmd().renderSetFree(    text)
 def ejectTasks( text = '(keeper)'): cmd = af.Cmd().renderEjectTasks( text)
 
 def refresh():
-
    global nimby_set
    global free_set
 
-   # Get today:
+   toset_nimby = False
+   toset_free  = False
+   toallow_tasks = False
+   toeject_tasks = False
+
+   # Get current time and day:
    daytime = datetime.now()
-   time = daytime.strftime('%H:%M')
-   day = daytime.strftime('%a').lower()
-   var = 'nimby_' + day
-   if var not in cgruconfig.VARS: return
-   values = cgruconfig.VARS[var].split(' ')
-   time_begin = values[0]
-   time_end = values[1]
+   cur_time = daytime.strftime('%H:%M')
 
-   # Check yesterday:
+   # Check yesterday free:
    yesterday = (daytime-timedelta(days=1)).strftime('%a').lower()
-   var_y = 'nimby_' + yesterday
-   if var_y in cgruconfig.VARS and time < time_begin:
-      time_end_y = cgruconfig.VARS[var_y].split(' ')[1]
-      if time_end_y < time_begin and not free_set:
-         setFree('(keeper nimby yesterday schedule)')
-         free_set = True
-         nimby_set = False
+   var = 'nimby_' + yesterday
+   if var in cgruconfig.VARS:
+      values = cgruconfig.VARS[var].split(' ')
+      time_begin = values[0]
+      time_end = values[1]
+      if time_end < time_begin and 'Enable' in values:
+         if cur_time > time_end:
+            toset_free = True
+         else:
+            toset_nimby = True
+            if 'Eject' in values: toeject_tasks = True
+            if 'nimby' in values: toallow_tasks = True
+            if 'NIMBY' in values: toallow_tasks = False
 
-   if time_begin == time_end: return
+   # Check today:
+   var = 'nimby_' + daytime.strftime('%a').lower()
+   if var in cgruconfig.VARS:
+      values = cgruconfig.VARS[var].split(' ')
+      time_begin = values[0]
+      time_end = values[1]
+      if time_begin != time_end and 'Enable' in values:
+         # Check free if it not tommorow:
+         if time_end > time_begin and cur_time > time_end:
+            toset_free = True
+         # Check Nimby:
+         elif cur_time > time_begin:
+            toset_nimby = True
+            if 'Eject' in values: toeject_tasks = True
+            if 'nimby' in values: toallow_tasks = True
+            if 'NIMBY' in values: toallow_tasks = False
 
-   allow = False
-   eject = False
-   if len(values) > 2:
-      if 'a' in values[2]: allow = True
-      if 'e' in values[2]: eject = True
-   if time > time_end:
+   # Set state:
+   if toset_nimby:
+      if not nimby_set:
+         if toallow_tasks: setnimby('(keeper nimby schedule)')
+         else: setNIMBY('(keeper nimby schedule)')
+         if toeject_tasks: ejectTasks('(keeper nimby schedule)')
+         nimby_set = True
+         free_set = False
+   elif toset_free:
       if not free_set:
          setFree('(keeper nimby schedule)')
          free_set = True
          nimby_set = False
-   elif time > time_begin:
-      if not nimby_set:
-         if allow: setnimby('(keeper nimby schedule)')
-         else: setNIMBY('(keeper nimby schedule)')
-         if eject: ejectTasks('(keeper nimby schedule)')
-         nimby_set = True
-         free_set = False

@@ -12,7 +12,7 @@ import nimby
 import render
 import software
 
-from dialog_nimby import DialogNimby
+from nimby_dialog import NimbyDialog
 
 from PyQt4 import QtCore, QtGui
 
@@ -293,4 +293,4 @@ class Tray( QtGui.QSystemTrayIcon):
 
    def renderInfo( self): render.showInfo( self)
    def cgruInfo( self): self.dialog_info = info.Window()
-   def editNimby( self): self.dialog_nimby = DialogNimby()
+   def editNimby( self): self.dialog_nimby = NimbyDialog()

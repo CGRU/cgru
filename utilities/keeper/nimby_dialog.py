@@ -5,16 +5,19 @@ import os
 
 from PyQt4 import QtCore, QtGui
 
-class DialogNimby( QtGui.QWidget):
+import nimby
+
+class NimbyDialog( QtGui.QWidget):
    def __init__( self, parent = None):
       QtGui.QWidget.__init__( self, parent)
       self.setWindowTitle('Edit Nimby')
-      rows = ['day','begin','dash','end','allow','eject']
+      rows = ['day','begin','dash','end','enable','allow','eject']
       self.weekdays = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday']
       self.days = ['mon','tue','wed','thu','fri','sat','sun']
       self.time_format = 'hh:mm'
       self.te_begin = dict()
       self.te_end = dict()
+      self.cb_enable = dict()
       self.cb_allow = dict()
       self.cb_eject = dict()
 
@@ -30,19 +33,24 @@ class DialogNimby( QtGui.QWidget):
       for day in self.days:
          time_begin = '00:00'
          time_end = '00:00'
+         enable = False
          allow = True
          eject = False
          var = 'nimby_' + day
          if var in cgruconfig.VARS:
             line = cgruconfig.VARS[var]
+            if line is None: continue
             lines = line.split(' ')
+            if len(lines) < 2: continue
             time_begin = lines[0]
             time_end = lines[1]
-            allow = False
+            enable = False
+            allow = True
             eject = False
-            if len(lines) > 2:
-               if 'a' in lines[2]: allow = True
-               if 'e' in lines[2]: eject = True
+            if 'nimby'  in lines: allow  = True
+            if 'NIMBY'  in lines: allow  = False
+            if 'Eject'  in lines: eject  = True
+            if 'Enable' in lines: enable = True
 
          vlayouts['day'].addWidget( QtGui.QLabel( self.weekdays[daynum], self))
 
@@ -57,6 +65,10 @@ class DialogNimby( QtGui.QWidget):
          self.te_end[day] = QtGui.QTimeEdit( QtCore.QTime.fromString( time_end, self.time_format))
          self.te_end[day].setDisplayFormat( self.time_format)
          vlayouts['end'].addWidget( self.te_end[day])
+
+         self.cb_enable[day] = QtGui.QCheckBox('Enable', self)
+         self.cb_enable[day].setChecked( enable)
+         vlayouts['enable'].addWidget( self.cb_enable[day])
 
          self.cb_allow[day] = QtGui.QCheckBox('Allow My Jobs', self)
          self.cb_allow[day].setChecked( allow)
@@ -88,11 +100,14 @@ class DialogNimby( QtGui.QWidget):
       for day in self.days:
          variables.append('nimby_' + day)
          line =  str( self.te_begin[day].time().toString( self.time_format)) + ' '
-         line += str( self.te_end[day].time().toString( self.time_format)) + ' '
-         if self.cb_allow[day].isChecked(): line += 'a'
-         if self.cb_eject[day].isChecked(): line += 'e'
+         line += str( self.te_end[day].time().toString( self.time_format))
+         if self.cb_enable[day].isChecked(): line += ' Enable'
+         if self.cb_allow[day].isChecked(): line += ' nimby'
+         else: line += ' NIMBY'
+         if self.cb_eject[day].isChecked(): line += ' Eject'
          line = line.strip()
          cgruconfig.VARS[variables[-1]] = line
       variables.reverse()
       cgruconfig.writeVars(variables)
+      nimby.refresh()
       self.close()
