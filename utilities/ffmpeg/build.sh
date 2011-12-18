@@ -1,5 +1,6 @@
 #!/bin/bash
 
+./build_faac.sh
 ./build_lame.sh
 ./build_vorbis.sh
 ./build_yasm.sh
