@@ -11,5 +11,6 @@ if [ ! -z "$1" ]; then
    exit
 else
    ./configure --prefix=$prefix --enable-shared=
+   ../patch_faac.py
    make && make install
 fi

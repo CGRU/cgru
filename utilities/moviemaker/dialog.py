@@ -97,8 +97,8 @@ Namings = [
 ]
 if Options.naming != '' and not Options.naming in Namings: Namings.append( Options.naming)
 
-AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)',     'Vorbis', 'FLAC (Free Lossless Audio Codec)']
-AudioCodecValues = [             'libmp3lame',  'libvorbis',                             'flac']
+AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)', 'AAC (Advanced Audio Codec)',     'Vorbis', 'FLAC (Free Lossless Audio Codec)']
+AudioCodecValues = [             'libmp3lame',                    'libfaac',  'libvorbis',                             'flac']
 
 # Process Cacher:
 CacherNames  = ['None', '25%', '50%', '75%', '100%']
