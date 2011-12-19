@@ -241,7 +241,7 @@ class ORE_Submit(bpy.types.Operator):
       if ore.engine == 'CYCLES': block.setParser('blender_cycles')
       job.blocks.append( block)
       # Set block command and frame range:
-      block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
+      block.setCommand('blender -b "%s" -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
       block.setNumeric( fstart, fend, fpertask, finc)
       #if images is Not None:
       #   block.setFiles( images.replace('#','@#').replace('#','#@'))
