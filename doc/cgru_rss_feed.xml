@@ -5,8 +5,8 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Tue, 20 Dec 2011 12:00:00 GMT</pubDate>
-   <lastBuildDate>Tue, 20 Dec 2011 12:00:00 GMT</lastBuildDate>
+   <pubDate>Wed, 21 Dec 2011 12:00:00 GMT</pubDate>
+   <lastBuildDate>Wed, 21 Dec 2011 12:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
    <item>
@@ -17,9 +17,10 @@
          AltLinux RPM packages.
          Blender Cycles render engine support.
          Nimby schedule and Afanasy Starter improvements.
+         MSVC 10 and Qt 4.8.0.
          Some important bugs fixed.
       </description>
-      <pubDate>Tue, 20 Dec 2011 12:00:00 GMT</pubDate>
+      <pubDate>Wed, 21 Dec 2011 12:00:00 GMT</pubDate>
    </item>
    <item>
       <title>CGRU Version 1.5.3 Released.</title>

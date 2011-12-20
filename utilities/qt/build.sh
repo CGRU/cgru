@@ -1,8 +1,8 @@
 #!/bin/bash
 
-ver=4.7.4
+ver=4.8.0
 qtsrc=qt-everywhere-opensource-src-$ver
-[ -d $qtsrc ] || ver=4.8.0
+[ -d $qtsrc ] || ver=4.8.1
 qtsrc=qt-everywhere-opensource-src-$ver
 
 for arg in $*; do
