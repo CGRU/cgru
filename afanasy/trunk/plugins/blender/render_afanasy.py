@@ -165,30 +165,7 @@ class ORE_Submit(bpy.types.Operator):
       ore = sce.ore_render
       rd = context.scene.render
       images = None
-      orig_output = None
-
-      # Process engine parameters:
-      af_engine = rd.engine
-      rd.engine = ore.engine
-      commonegines = ['BLENDER_RENDER','CYCLES']
-      if rd.engine in commonegines:
-         images = rd.filepath
-         # Set Render Settings:
-         if ore.filepath != '':
-            orig_output = rd.filepath
-            rd.filepath = ore.filepath
-
-      print('Render Engine = "%s"' % rd.engine)
-      # Save scene with changed engine paramepters:
       bpy.ops.wm.save_mainfile()
-
-      # Restore parameters:
-      if rd.engine in commonegines:
-         if orig_output is not None:
-            rd.filepath = orig_output
-
-      # Set back AFANASY engine:
-      rd.engine = af_engine
 
       # Calculate temporary scene path:
       scenefile = bpy.data.filepath
@@ -212,6 +189,8 @@ class ORE_Submit(bpy.types.Operator):
       # Check frames settings:
       if fpertask < 1: fpertask = 1
       if fend < fstart: fend = fstart
+      # Process images:
+      if ore.filepath != '': images = ore.filepath
 
       # Check and add Afanasy module in system path:
       afpython = os.getenv('AF_PYTHON')
@@ -241,10 +220,18 @@ class ORE_Submit(bpy.types.Operator):
       if ore.engine == 'CYCLES': block.setParser('blender_cycles')
       job.blocks.append( block)
       # Set block command and frame range:
-      block.setCommand('blender -b "%s" -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
+      cmd = 'blender -b "%s"'  % renderscenefile
+      cmd += ' -E "%s"' % ore.engine
+      if images is not None: cmd += ' -o "%s"' % images
+      cmd += ' -s @#@ -e @#@ -j %d -a' % finc
+      block.setCommand( cmd)
       block.setNumeric( fstart, fend, fpertask, finc)
-      #if images is Not None:
-      #   block.setFiles( images.replace('#','@#').replace('#','#@'))
+      if images is not None:
+         pos = images.find('#')
+         if pos > 0: images = images[:pos] + '@' + images[pos:]
+         pos = images.rfind('#')
+         if pos > 0: images = images[:pos+1] + '@' + images[pos+1:]
+         block.setFiles( images)
       # Set job running parameters:
       if ore.maxruntasks       > -1: job.setMaxRunningTasks( ore.maxruntasks )
       if ore.priority          > -1: job.setPriority( ore.priority )
