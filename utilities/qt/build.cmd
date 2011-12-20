@@ -1,6 +1,6 @@
-set VSINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio 9.0"
+set VSINSTALLDIR="C:\Program Files (x86)\Microsoft Visual Studio 10.0"
 set VCVARS=amd64
-set qt=qt-everywhere-opensource-src-4.7.4
+set qt=qt-everywhere-opensource-src-4.8.0
 
 if exist override.cmd call override.cmd
 
@@ -10,7 +10,7 @@ python patch-qprocess_win.cpp.py %qt%
 
 cd %qt%
 
-configure.exe -platform win32-msvc2008 -release -opensource -static -no-scripttools -no-multimedia -no-script -no-webkit -nomake examples -nomake demos -no-sql-sqlite -no-gif
+configure.exe -platform win32-msvc2010 -release -opensource -static -no-scripttools -no-multimedia -no-script -no-webkit -nomake examples -nomake demos -no-sql-sqlite -no-gif
 nmake
 
 pause
