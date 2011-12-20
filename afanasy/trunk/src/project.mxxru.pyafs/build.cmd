@@ -1,5 +1,5 @@
 echo off
-SET MSVCPATH="C:\Program Files (x86)\Microsoft Visual Studio 9.0\VC"
+SET MSVCPATH="C:\Program Files (x86)\Microsoft Visual Studio 10.0\VC"
 
 pushd ..\..\..\..
 call setup.cmd

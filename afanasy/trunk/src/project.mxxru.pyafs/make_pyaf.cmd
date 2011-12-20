@@ -1,5 +1,5 @@
 echo off
-SET MXX_RU_CPP_TOOLSET=vc9
+SET MXX_RU_CPP_TOOLSET=vc10
 
 set output=..\..\bin_pyaf\%AF_PYAFVER%
 set pyaf=tmp\%AF_PYAFVER%\pyaf.pyd

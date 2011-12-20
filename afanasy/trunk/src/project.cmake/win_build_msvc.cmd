@@ -1,12 +1,12 @@
 rem @echo off
-set CMAKE_GENERATOR=Visual Studio 9 2008 Win64
+set CMAKE_GENERATOR=Visual Studio 10 Win64
 
 pushd ..\..\..\..
 call setup.cmd
 popd
 
 rem Cmake finds 'Qt' by searching for 'qmake' in 'PATH'
-set cgru_qt=%CGRU_LOCATION%\utilities\qt\qt-everywhere-opensource-src-4.7.4
+set cgru_qt=%CGRU_LOCATION%\utilities\qt\qt-everywhere-opensource-src-4.8.0
 if exist %cgru_qt% SET "PATH=%cgru_qt%\bin;%PATH%"
 
 rem Specify Python:
