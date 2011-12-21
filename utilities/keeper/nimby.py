@@ -11,9 +11,13 @@ def setNIMBY(   text = '(keeper)'): cmd = af.Cmd().renderSetNIMBY(   text)
 def setFree(    text = '(keeper)'): cmd = af.Cmd().renderSetFree(    text)
 def ejectTasks( text = '(keeper)'): cmd = af.Cmd().renderEjectTasks( text)
 
-def refresh():
+def refresh( reset = False):
    global nimby_set
    global free_set
+
+   if reset:
+      nimby_set = False
+      free_set = False
 
    toset_nimby = False
    toset_free  = False

@@ -109,5 +109,5 @@ class NimbyDialog( QtGui.QWidget):
          cgruconfig.VARS[variables[-1]] = line
       variables.reverse()
       cgruconfig.writeVars(variables)
-      nimby.refresh()
+      nimby.refresh( reset = True)
       self.close()
