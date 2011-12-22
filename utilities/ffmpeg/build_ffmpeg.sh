@@ -8,7 +8,8 @@ ogg="${PWD}/libogg"
 vorbis="${PWD}/libvorbis"
 export PATH="$yasm/bin:$PATH"
 export CFLAGS="-I${x264} -I$lame/include -I$ogg/include -I$vorbis/include -I$faac/include"
-export LDFLAGS="-L${x264} -L$lame/lib -L$lame/lib64 -L$ogg/lib -L$ogg/lib64 -L$vorbis/lib -L$vorbis/lib64 -L$faac/lib"
+export LDFLAGS="-L${x264} -L$lame/lib -L$lame/lib64 -L$ogg/lib -L$ogg/lib64 -L$vorbis/lib 
+-L$vorbis/lib64 -L$faac/lib -L$faac/lib64"
 export LDFLAGS="$LDFLAGS -B/usr/lib/gold-ld/"
 
 cd ffmpeg
