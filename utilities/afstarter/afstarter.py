@@ -512,7 +512,7 @@ AfterFX render settings template')
 
    def processoutput( self):
       output = self.process.readAll()
-      if isinstance( output, QtCore.QByteArray):
+      if sys.version_info[0] < 3:
          output = str( output)
       else:
          output = str( output, 'utf-8')
