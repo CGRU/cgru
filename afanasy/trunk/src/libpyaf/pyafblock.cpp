@@ -236,6 +236,38 @@ PyObject * PyAf_Block_output( PyAf_Block_Object *self, PyObject *arg)
    Py_RETURN_TRUE;
 }
 
+PyObject * PyAf_Block_setErrorsRetries( PyAf_Block_Object *self, PyObject *arg)
+{
+   long long value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setErrorsRetries")) Py_RETURN_FALSE;
+   self->block->setErrorsRetries( value);
+   Py_RETURN_NONE;
+}
+
+PyObject * PyAf_Block_setErrorsAvoidHost( PyAf_Block_Object *self, PyObject *arg)
+{
+   long long value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setErrorsAvoidHost")) Py_RETURN_FALSE;
+   self->block->setErrorsAvoidHost( value);
+   Py_RETURN_NONE;
+}
+
+PyObject * PyAf_Block_setErrorsTaskSameHost( PyAf_Block_Object *self, PyObject *arg)
+{
+   long long value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setErrorsTaskSameHost")) Py_RETURN_FALSE;
+   self->block->setErrorsTaskSameHost( value);
+   Py_RETURN_NONE;
+}
+
+PyObject * PyAf_Block_setErrorsForgiveTime( PyAf_Block_Object *self, PyObject *arg)
+{
+   long long value;
+   if( false == PyAf::GetInteger(arg, value, "PyAf_Block_setErrorsForgiveTime")) Py_RETURN_FALSE;
+   self->block->setErrorsForgiveTime( value);
+   Py_RETURN_NONE;
+}
+
 PyObject * PyAf_Block_setFileSizeCheck( PyAf_Block_Object *self, PyObject *args)
 {
    long long min, max;

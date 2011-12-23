@@ -36,6 +36,10 @@ PyObject * PyAf_Block_setTasksMaxRunTime(    PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setNeedMemory(         PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedPower(          PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedHDD(            PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setErrorsRetries(      PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setErrorsAvoidHost(    PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setErrorsTaskSameHost( PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setErrorsForgiveTime(  PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setFileSizeCheck(      PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setVariableCapacity(   PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setMultiHost(          PyAf_Block_Object *self, PyObject *args);
@@ -73,6 +77,10 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setNeedPower",           (PyCFunction) PyAf_Block_setNeedPower,          METH_O,        "Set power needed."},
    {"setNeedHDD",             (PyCFunction) PyAf_Block_setNeedHDD,            METH_O,        "Set HDD needed."},
    {"setFramesPerTask",       (PyCFunction) PyAf_Block_setFramesPerTask,      METH_O,        "Set frames fer task."},
+   {"setErrorsRetries",       (PyCFunction) PyAf_Block_setErrorsRetries,      METH_O,        "Set maximum number of errors in task to retry it automatically."},
+   {"setErrorsAvoidHost",     (PyCFunction) PyAf_Block_setErrorsAvoidHost,    METH_O,        "Set maximum number or errors on same host for job NOT to avoid host."},
+   {"setErrorsTaskSameHost",  (PyCFunction) PyAf_Block_setErrorsTaskSameHost, METH_O,        "Set maximum number or errors on same host for task NOT to avoid host."},
+   {"setErrorsForgiveTime",   (PyCFunction) PyAf_Block_setErrorsForgiveTime,  METH_O,        "Set time to forgive error host."},
    {"setFileSizeCheck",       (PyCFunction) PyAf_Block_setFileSizeCheck,      METH_VARARGS,  "Set file size check."},
    {"setVariableCapacity",    (PyCFunction) PyAf_Block_setVariableCapacity,   METH_VARARGS,  "Set variable capacity."},
    {"setMultiHost",           (PyCFunction) PyAf_Block_setMultiHost,          METH_VARARGS,  "Set multi hosts tasks."},
