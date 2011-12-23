@@ -17,6 +17,8 @@ case ${DISTRIBUTIVE} in
       ;;
    Debian)
       ;;
+   Gentoo)
+      ;;
    Ubuntu)
       ;;
    Fedora)

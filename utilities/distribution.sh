@@ -2,15 +2,15 @@
 
 echo "Detecting UNIX distribution..."
 
-distskeys="Debian Ubuntu CentOS Fedora openSUSE Simply"
-knowndists="Debian Ubuntu CentOS Fedora openSUSE AltLinux MacOSX"
+distskeys="Debian Ubuntu CentOS Fedora openSUSE Simply Gentoo"
+knowndists="Debian Ubuntu CentOS Fedora openSUSE AltLinux MacOSX Gentoo"
 
 if [ `uname` == "Darwin" ]; then
    export DISTRIBUTIVE="MacOSX"
 else
    # Load issue file:
    issuefile="/etc/system-release"
-   [ -f "${issuefile}" ] || issuefile="/etc/issue"
+   [ -f "${issuefile}" ] || issuefile="/etc/gentoo-release" ; [ -f "${issuefile}" ] || issuefile="/etc/issue"
    if [ ! -f "${issuefile}" ]; then
       echo "File '${issuefile}' not founded. Can't detect distribution."
       exit 1
