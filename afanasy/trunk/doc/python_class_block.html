@@ -67,16 +67,6 @@ Tasks list. Not used in numeric block.<br/>
 Set block <a href="job_block.html#Capacity">Capacity</a> value.
 </p></li>
 
-<li>block.<b>setFiles(</b><i>image file name</i><b>)</b>
-<p>
-Set block <a href="job_block.html#Files">Files</a> argument.
-</p></li>
-
-<li>block.<b>setCommand(</b><i>command</i><b>)</b>
-<p>
-Set block <a href="job_block.html#Command">Command</a>.
-</p></li>
-
 <li>block.<b>setCmdPost(</b><i>command</i><b>)</b>
 <p>
 Set block <a href="job_block.html#CmdPost">Post command</a>.
@@ -87,14 +77,9 @@ Set block <a href="job_block.html#CmdPost">Post command</a>.
 Set block <a href="job_block.html#CmdPre">Pre command</a>.
 </p></li>
 
-<li>block.<b>setHostsMask(</b><i>mask</i><b>)</b>
+<li>block.<b>setCommand(</b><i>command</i><b>)</b>
 <p>
-Set block <a href="job_block.html#HostsMask">Hosts Mask</a>.
-</p></li>
-
-<li>block.<b>setHostsMaskExclude(</b><i>mask</i><b>)</b>
-<p>
-Set block <a href="job_block.html#HostsMaskExclude">Exclude Hosts Mask</a>.
+Set block <a href="job_block.html#Command">Command</a>.
 </p></li>
 
 <li>block.<b>setDependMask(</b><i>mask</i><b>)</b>
@@ -107,9 +92,44 @@ Set block <a href="job_block.html#DependMask">Depend Mask</a>.
 Allow block <a href="job_block.html#SubTaskDepend">Sub Tasks Dependence</a>.
 </p></li>
 
+<li>block.<b>setErrorsAvoidHost(</b><i>number</i><b>)</b>
+<p>
+Set block <a href="job_block.html#ErrorsAvoidHost">Errors Avoid Host</a> - maximum number or errors on same host for job NOT to avoid host.
+</p></li>
+
+<li>block.<b>setErrorsRetries(</b><i>number</i><b>)</b>
+<p>
+Set block <a href="job_block.html#ErrorRetries">Error Retries</a> - maximum number of errors in task to retry it automatically.
+</p></li>
+
+<li>block.<b>setErrorsTaskSameHost(</b><i>number</i><b>)</b>
+<p>
+Set block <a href="job_block.html#ErrorsTaskSameHost">Errors Task Same Host</a> - maximum number or errors on same host for task NOT to avoid host.
+</p></li>
+
+<li>block.<b>setErrorsForgiveTime(</b><i>number</i><b>)</b>
+<p>
+Set block <a href="job_block.html#ErrorsForgiveTime">Errors Forgive Time</a> - time to forgive error host.
+</p></li>
+
+<li>block.<b>setFiles(</b><i>image file name</i><b>)</b>
+<p>
+Set block <a href="job_block.html#Files">Files</a> argument.
+</p></li>
+
 <li>block.<b>setFramesPerTask(</b><i>number</i><b>)</b>
 <p>
 Set block <a href="job_block.html#FramesPerTask">Frames Per Task</a> number.
+</p></li>
+
+<li>block.<b>setHostsMask(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#HostsMask">Hosts Mask</a>.
+</p></li>
+
+<li>block.<b>setHostsMaskExclude(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#HostsMaskExclude">Exclude Hosts Mask</a>.
 </p></li>
 
 <li>block.<b>setMaxRunningTasks(</b><i>number</i><b>)</b>
@@ -180,26 +200,6 @@ Set block capacity to variable, through <a href="job_block.html#Capacity">Capaci
 <li>block.<b>setWorkingDirectory(</b><i>directory</i><b>)</b>
 <p>
 Set block tasks <a href="job_block.html#WorkingDirectory">Working Directory</a>.
-</p></li>
-
-<li>block.<b>setErrorsAvoidHost(</b><i>number</i><b>)</b>
-<p>
-Set block <a href="job_block.html#ErrorsAvoidHost">Errors Avoid Host</a> - maximum number or errors on same host for job NOT to avoid host.
-</p></li>
-
-<li>block.<b>setErrorsRetries(</b><i>number</i><b>)</b>
-<p>
-Set block <a href="job_block.html#ErrorRetries">Error Retries</a> - maximum number of errors in task to retry it automatically.
-</p></li>
-
-<li>block.<b>setErrorsTaskSameHost(</b><i>number</i><b>)</b>
-<p>
-Set block <a href="job_block.html#ErrorsTaskSameHost">Errors Task Same Host</a> - maximum number or errors on same host for task NOT to avoid host.
-</p></li>
-
-<li>block.<b>setErrorsForgiveTime(</b><i>number</i><b>)</b>
-<p>
-Set block <a href="job_block.html#ErrorsForgiveTime">Errors Forgive Time</a> - time to forgive error host.
 </p></li>
 
 </ul>
