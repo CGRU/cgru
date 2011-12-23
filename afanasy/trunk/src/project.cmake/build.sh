@@ -24,6 +24,8 @@ case ${DISTRIBUTIVE} in
       ;;
    AltLinux)
       ;;
+   CentOS)
+      ;;
    *)
       echo "Warning: Untested system: '${DISTRIBUTIVE}'"
       ;;

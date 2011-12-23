@@ -72,6 +72,27 @@ You need to reset old database tables and create new.
 You can use this command to perform it:<br/>
 <code>afcmd db_resetall</code>
 </p>
+<ol>
+<li>The first number in version means some major changes in the project architecture (this can never happen at all).</li>
+<li>The second number means changes in network protocol or (and) database schema.
+Clients and server with another second number are incompatible.
+You should upgrade all clients and server at the same.</li>
+<li>The third number in version can have new features and bugs fixes.
+But is fully compatible with other versions with the same first two numbers.
+You can upgrade only one client to check changes, the is no need to update all clients and server.</li>
+</ol>
+
+<br/>
+
+<p><a id="release154"><b>1.5.5</b></a> 2011.12.23 <i>(rev2033 af2025)</i></p>
+<p>
+</p>
+<p>
+Bugs Fixed:
+</p>
+<p>
+Afanasy Starter error message in console fixed, sending a job and with Python 2.x (Fedora Linux raises warning in a system tray in this case).<br/>
+</p>
 
 <br/>
 

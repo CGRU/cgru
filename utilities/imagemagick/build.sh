@@ -36,9 +36,8 @@ if [ -z "$1" ]; then
    #make clean
    $configure
    make
-   make install
-   cd ..
-   [ -f bin/convert ] && mv -vf bin/convert ../../bin
+   convert='utilities/convert'
+   [ -f $convert ] && mv -vf $convert ../../../bin
 else
    ./configure -h
 fi

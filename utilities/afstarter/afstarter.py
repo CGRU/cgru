@@ -31,6 +31,7 @@ class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
       self.constructed = False
+      self.output = ''
 
       self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
       self.fields = dict()
@@ -498,20 +499,27 @@ AfterFX render settings template')
       self.process.setProcessChannelMode( QtCore.QProcess.MergedChannels)
       QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
       QtCore.QObject.connect( self.process, QtCore.SIGNAL('readyRead()'), self.processoutput)
+      self.output = ''
       self.process.start( command)
 
    def processfinished( self, exitCode):
       print('Exit code = %d' % exitCode)
       if exitCode != 0: return
-      self.bStart.setEnabled( True)
       self.saveRecent()
+      self.output += '\n The job successfully sent.'
+      self.teCmd.setText( self.output)
+      self.bStart.setEnabled( False)
 
    def processoutput( self):
       output = self.process.readAll()
-      if not isinstance( output, str): output = str( output, 'utf-8')
+      if isinstance( output, QtCore.QByteArray):
+         output = str( output)
+      else:
+         output = str( output, 'utf-8')
       print( output)
       self.teCmd.insertPlainText( output)
       self.teCmd.moveCursor( QtGui.QTextCursor.End)
+      self.output += output
 
 app = QtGui.QApplication( sys.argv)
 dialog = Dialog()
