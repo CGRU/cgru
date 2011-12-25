@@ -16,7 +16,19 @@ def walk():
 
    dircount = 0
 
-   for dirpath, dirnames, filenames in os.walk( getenv.SRCDIR, True, None, True):
+   afanasy_branches_path = os.path.join( getenv.SRCDIR, 'afanasy')
+
+   for dirpath, dirnames, filenames in os.walk( getenv.SRCDIR, True, None, False):
+
+      # Check afanasy branch:
+      if dirpath.find( afanasy_branches_path) == 0:
+         folder = dirpath[len(afanasy_branches_path):]
+         if len(folder) < 1: continue
+         while folder[0] == '/' and len(folder): folder = folder[1:]
+         while folder != os.path.dirname( folder) and len(os.path.dirname( folder)): folder = os.path.dirname( folder)
+         if folder.find( getenv.AFANASY) == -1: continue
+
+      # Check exclude strings:
       exclude_directoty = False
       for findsub in getenv.DIRS_EXLUDE_FINDSUB:
          if dirpath.find( findsub) != -1:
@@ -24,6 +36,7 @@ def walk():
             break
       if exclude_directoty: continue
 
+      # Check include strings:
       include_directory = False
       for filename in filenames:
          filenamesize = len(filename)
