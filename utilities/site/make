@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export DIRS_EXLUDE_FINDSUB="tmp;svn;doxygen;webvisor;icons/icons;imagemagick;openexr;ffmpeg;qt;python"
+export DIRS_EXLUDE_FINDSUB="tmp;svn;doxygen;webvisor;icons/icons;imagemagick;openexr;ffmpeg;qt;python;archives"
 export DIRS_INLUDE_FILEEXT=".html;.php;.css;.js;.jpg;.gif;.png;.xml"
 
 export HEADER_MARKER="<!--HEADER-->"
@@ -26,10 +26,6 @@ if [ "$1" == "-r" ]; then
    pushd "$SRCDIR/utilities/release" > /dev/null
    "./export.sh" "$CGRUEXPORT"
    popd > /dev/null
-   cp -rp "${CGRUEXPORT}/afanasy/${AFANASY}/"* "${CGRUEXPORT}/afanasy"
-   rm -rf "${CGRUEXPORT}/afanasy/trunk"
-   rm -rf "${CGRUEXPORT}/afanasy/branches"
-   rm -rf "${CGRUEXPORT}/afanasy/tags"
    export SRCDIR="${CGRUEXPORT}"
 else
    echo "Making CGRU site."

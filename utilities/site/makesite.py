@@ -35,7 +35,7 @@ filedoctype = open( 'doctype', 'r')
 doctype = filedoctype.readlines()
 filedoctype.close()
 
-paths = walk.walk()
+paths = walk.walk( remote)
 dircount = 0
 
 for dirpath in paths[0]:
