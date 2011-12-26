@@ -210,10 +210,6 @@ void HostResMeter::generateInfoStream( std::ostringstream & stream, bool full) c
 }
 
 HostRes::HostRes():
-   cpu_loadavg1(0),
-   cpu_loadavg2(0),
-   cpu_loadavg3(0),
-
    cpu_user(0),
    cpu_nice(0),
    cpu_system(0),
@@ -237,6 +233,7 @@ HostRes::HostRes():
    net_recv_kbsec(0),
    net_send_kbsec(0)
 {
+	cpu_loadavg[0] = cpu_loadavg[1] = cpu_loadavg[2] = 0;
 }
 
 HostRes::~HostRes()
@@ -246,9 +243,10 @@ HostRes::~HostRes()
 
 void HostRes::copy( const HostRes & other)
 {
-   cpu_loadavg1     = other.cpu_loadavg1;
-   cpu_loadavg2     = other.cpu_loadavg2;
-   cpu_loadavg3     = other.cpu_loadavg3;
+   cpu_loadavg[0]   = other.cpu_loadavg[0];
+   cpu_loadavg[1]   = other.cpu_loadavg[1];
+   cpu_loadavg[2]   = other.cpu_loadavg[2];
+
    cpu_user         = other.cpu_user;
    cpu_nice         = other.cpu_nice;
    cpu_system       = other.cpu_system;
@@ -282,9 +280,9 @@ void HostRes::copy( const HostRes & other)
 
 void HostRes::readwrite( Msg * msg)
 {
-   rw_uint8_t( cpu_loadavg1,     msg);
-   rw_uint8_t( cpu_loadavg2,     msg);
-   rw_uint8_t( cpu_loadavg3,     msg);
+   rw_uint8_t( cpu_loadavg[0],     msg);
+   rw_uint8_t( cpu_loadavg[1],     msg);
+   rw_uint8_t( cpu_loadavg[2],     msg);
    rw_uint8_t( cpu_user,         msg);
    rw_uint8_t( cpu_nice,         msg);
    rw_uint8_t( cpu_system,       msg);
@@ -343,7 +341,7 @@ void HostRes::generateInfoStream( const Host * host, std::ostringstream & stream
             << int( cpu_iowait  ) << "% iow, "
             << int( cpu_irq     ) << "% irq, "
             << int( cpu_softirq ) << "% sirq";
-      stream << "\n   Load average:   " << cpu_loadavg1/10.0 << "   " << cpu_loadavg2/10.0 << "   " << cpu_loadavg3/10.0;
+      stream << "\n   Load average:   " << cpu_loadavg[0]/10.0 << "   " << cpu_loadavg[1]/10.0 << "   " << cpu_loadavg[2]/10.0;
       stream << "\n   Memory Free: " << mem_free_mb << " Mb";
       if( mem_cached_mb || mem_buffers_mb )
       {
@@ -359,7 +357,7 @@ void HostRes::generateInfoStream( const Host * host, std::ostringstream & stream
    }
    else
    {
-      stream << "la[" << cpu_loadavg1/10.0 << "," << cpu_loadavg2/10.0 << "," << cpu_loadavg3/10.0 << "]";
+      stream << "la[" << cpu_loadavg[0]/10.0 << "," << cpu_loadavg[1]/10.0 << "," << cpu_loadavg[2]/10.0 << "]";
       stream << "; C: u" << int(cpu_user)
             << "% n" << int(cpu_nice)
             << "% s" << int(cpu_system)
