@@ -43,7 +43,6 @@ struct DiskStats
 {
    uint64_t rd_sectors;         // Sectors read
    uint64_t wr_sectors;         // Sectors written
-   uint64_t ticks;              // Time of requests in queue
 } sg_diskstats = {0};
 
 struct NetStats
@@ -62,7 +61,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 {
    static unsigned s_init = 0;
 
-   static long s_sector_size = 1024;
+   static long s_sector_size = 512;
    static float s_cpu_frequency = 2000;
 
    if( !s_init )
@@ -79,7 +78,13 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       sg_current_time.tv_usec = 0; 
 
       s_cpu_frequency = get_cpu_frequency();
+#if 0
+      /* in man pages of iostat they seem to say that block size in 
+         in /proc/diskstats is always 512 on newer linux kernels so
+         it is unrelated with the block size returned by statfs,
+         go figure. (TODO: RECHECK). */
       s_sector_size = get_sector_size();
+#endif
 
       s_init = 1;
    }
@@ -233,7 +238,6 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       // io:
       FILE *diskstats_fd = fopen( "/proc/diskstats", "r" ); 
 
-      /* In case we fail. */
       hres.hdd_rd_kbsec = 0;
       hres.hdd_wr_kbsec = 0;
 
@@ -241,6 +245,13 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       {
          char buffer[200];
          buffer[sizeof(buffer)-1] = '\0';
+
+         const char *disk_to_inspect = 
+            af::Environment::getRenderIOStatDevice().c_str();
+         bool all_disks = disk_to_inspect == 0x0 || strlen(disk_to_inspect)==0 ||
+            !strcmp(disk_to_inspect,"*");
+ 
+         uint64_t total_rd_sectors=0, total_wr_sectors=0, total_ticks=0;
 
          while( fgets(buffer, sizeof(buffer)-1, diskstats_fd) )
          {
@@ -255,8 +266,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
             unsigned ticks, aveq;
 
             int items = sscanf( buffer, scan_fmt,
-                  &part_major, &part_minor,
-                  name,
+                  &part_major, &part_minor, name,
                   &rd_ios, &rd_merges, &rd_sectors, &rd_ticks,
                   &wr_ios, &wr_merges, &wr_sectors, &wr_ticks,
                   &ticks, &aveq);
@@ -264,43 +274,53 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
             if( items != 13 )
                continue;
    
-            if( strcmp(
-               name, af::Environment::getRenderIOStatDevice().c_str()) != 0 )
+            if( all_disks )
+            {
+               /* For this to work correctly we have to ignore logical partitions
+                  and only account for the whole disk. The whole disk has a
+                  minor version of 0. */
+               if( part_minor != 0 )
+                  continue;
+            }
+            else if( strcmp(name, disk_to_inspect) != 0 )
             {
                continue;
             }
 
-            uint64_t interval_rd_sectors = rd_sectors - sg_diskstats.rd_sectors;
-            uint64_t interval_wr_sectors = wr_sectors - sg_diskstats.wr_sectors;
-            uint64_t interval_ticks = ticks - sg_diskstats.ticks;
+            total_rd_sectors += rd_sectors;
+            total_wr_sectors += wr_sectors;
+            total_ticks += ticks;
 
-            sg_diskstats.rd_sectors = rd_sectors;
-            sg_diskstats.wr_sectors = wr_sectors;
-            sg_diskstats.ticks = ticks;
-
-            /* Could take this from elsewhere in this function but it it safer
-               to just re-do the addition in case we change code organisation. */
-
-            uint64_t cpu_ticks_total = sg_cpu.user + sg_cpu.system + sg_cpu.idle +
-               sg_cpu.iowait + sg_cpu.irq + sg_cpu.softirq;
-
-            uint64_t deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
-
-            if( deltams != 0 )
-            {
-               int busy = 100 * ticks / deltams;
-               if( busy > 100) busy = 100;
-               if( busy <   0) busy = 0;
-               hres.hdd_busy = busy;
-            }
-
-            fprintf( stderr, "Disk sector size: %d\n", s_sector_size );
-            hres.hdd_rd_kbsec = int32_t(interval_rd_sectors * s_sector_size / (1024*etime));
-            hres.hdd_wr_kbsec = int32_t(interval_wr_sectors * s_sector_size / (1024*etime));
-            break;
+            if( !all_disks )
+               break;
          }
 
-         if( feof(diskstats_fd) )
+         uint64_t interval_rd_sectors = total_rd_sectors - sg_diskstats.rd_sectors;
+         uint64_t interval_wr_sectors = total_wr_sectors - sg_diskstats.wr_sectors;
+
+         sg_diskstats.rd_sectors = total_rd_sectors;
+         sg_diskstats.wr_sectors = total_wr_sectors;
+
+         hres.hdd_rd_kbsec = int32_t(::ceil(interval_rd_sectors * s_sector_size / (1024*etime)));
+         hres.hdd_wr_kbsec = int32_t(::ceil(interval_wr_sectors * s_sector_size / (1024*etime)));
+
+         /* Could take this from elsewhere in this function but it it safer
+            to just re-do the addition in case we change code organisation. */
+
+         uint64_t cpu_ticks_total = sg_cpu.user + sg_cpu.system + sg_cpu.idle +
+            sg_cpu.iowait + sg_cpu.irq + sg_cpu.softirq;
+
+         uint64_t deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
+
+         if( deltams != 0 )
+         {
+            int busy = 100 * total_ticks / deltams;
+            if( busy > 100) busy = 100;
+            if( busy <   0) busy = 0;
+            hres.hdd_busy = busy;
+         }
+
+         if( !all_disks && feof(diskstats_fd) )
          {
             fprintf( stderr, "unable to find statistics about '%s' in '/proc/diskstats'.",
                af::Environment::getRenderIOStatDevice().c_str() );
