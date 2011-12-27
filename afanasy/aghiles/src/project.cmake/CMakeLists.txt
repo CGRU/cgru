@@ -3,6 +3,8 @@ project(afanasy)
 
 set(CMAKE_BUILD_TYPE "Release")
 
+set( CMAKE_CXX_OUTPUT_EXTENSION ".${CMAKE_HOST_SYSTEM_NAME}.o")
+
 if( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_LIBRARIES} STREQUAL "" ) )
 	set(PYTHON_INCLUDE_PATH $ENV{AF_PYTHON_INCLUDE_PATH})
 	set(PYTHON_LIBRARIES $ENV{AF_PYTHON_LIBRARIES})
@@ -28,8 +30,9 @@ endif(WIN32)
 
 include_directories(${PYTHON_INCLUDE_PATH})
 
-set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../bin")
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "../../../bin")
+set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../$ENV{OSTYPE}/bin")
+set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "../../../$ENV{OSTYPE}/lib")
+set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "../../../$ENV{OSTYPE}/archives")
 
 add_subdirectory(libafanasy)
 add_subdirectory(libafapi)
