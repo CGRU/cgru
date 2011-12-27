@@ -8,6 +8,7 @@
 #include <sys/param.h>
 #include <sys/statfs.h>
 #include <sys/sysinfo.h>
+#include <net/if.h>
 #include <ifaddrs.h>
 #include "../libafanasy/environment.h"
 
@@ -111,7 +112,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    }
    else
    {
-      perror( "sysinf() failed" );
+      perror( "sysinfo() failed" );
 
       host.mem_mb = hres.mem_free_mb  = host.swap_mb =
          hres.mem_buffers_mb = hres.swap_used_mb  = 
@@ -262,7 +263,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 
             if( items != 13 )
                continue;
-
+   
             if( strcmp(
                name, af::Environment::getRenderIOStatDevice().c_str()) != 0 )
             {
@@ -293,6 +294,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
                hres.hdd_busy = busy;
             }
 
+            fprintf( stderr, "Disk sector size: %d\n", s_sector_size );
             hres.hdd_rd_kbsec = int32_t(interval_rd_sectors * s_sector_size / (1024*etime));
             hres.hdd_wr_kbsec = int32_t(interval_wr_sectors * s_sector_size / (1024*etime));
             break;
@@ -314,8 +316,6 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 
    /*
       Network.
-
-      We sum the statistics of all AF_LINK interfaces.
    */
    uint64_t rx, tx;
    if( get_network_statistics(rx, tx) )
@@ -408,7 +408,10 @@ static long get_sector_size()
 /*
    get_network_statistics
 
-	Read the network statistics from /proc/net/dev
+   Read the network statistics from /proc/net/dev
+
+   NOTES
+   - We are only interested in AF_LINK interfaces.
 */
 static bool get_network_statistics(
    uint64_t &o_rx_bytes, uint64_t &o_tx_bytes )
@@ -417,9 +420,6 @@ static bool get_network_statistics(
       "can't understand /proc/net/dev format so network statistics are off.";
 
    const char *file_name = "/proc/net/dev";
-
-   /* First check if the file is a symbolic link. If it is, stop
-      everyhing, this is a clear hacking attempt. */	
 
    FILE *fd;
    if( (fd = fopen(file_name, "r")) == 0x0 )
@@ -451,16 +451,58 @@ static bool get_network_statistics(
       return false;
    }
 
+   /*
+      Now, get all the network interfaces on this machine and their
+      associated flags.  This will allow us to skip some interfaces
+      that are present in /proc/net/dev but are not valid for our
+      purposes. For example, loop back and down interfaces are not
+      useful.
+   */
+   struct ifaddrs *addr;
+   if( getifaddrs( &addr ) == -1 )
+   {
+      perror( "unable to read network confiruation so network statistic are off" );
+      return false;
+   }
+
    /* */
    uint64_t rx_bytes=0, tx_bytes=0;
 
    while( fgets(buffer, buffer_size, fd) )
    {
-      if( strstr(buffer, "eth") == 0x0 )
+      /* Check if we have this interface in our ifaddrs and make sure
+         it is a valid interface. */
+      struct ifaddrs *it = addr;
+      for( ; it; it = it->ifa_next )
       {
-         continue;
+         /* This should not happen but there are some pretty wild stuff
+            out there so better be careful. */
+         if( !it->ifa_name )
+            continue;
+
+         if( it->ifa_flags & IFF_LOOPBACK )
+            continue;
+
+         if( !(it->ifa_flags & IFF_UP) )
+            continue;
+
+         if( it->ifa_addr && it->ifa_addr->sa_family == AF_PACKET )
+         {
+            if( strstr(buffer, it->ifa_name) )
+            {
+               /* The interface listed in /proc/net/dev is also a valid
+                  AF_PACKET interface so we count it in. */
+               break;
+            }
+         }
       }
- 
+
+      if( !it )
+      {
+         /* Can't find this interface or it is not a valid interface. */
+         continue; 
+      }
+
       const int just_a_small_number = 8;
       if( strlen(buffer) < just_a_small_number )
       {
@@ -494,7 +536,10 @@ static bool get_network_statistics(
    o_rx_bytes = rx_bytes;
    o_tx_bytes = tx_bytes;
 
-	fclose( fd );
+   /* This was allocated by getifaddrs() above. */
+   freeifaddrs( addr );
+
+   fclose( fd );
 
    return true;
 }
