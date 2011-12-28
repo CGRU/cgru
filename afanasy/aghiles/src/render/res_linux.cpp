@@ -101,7 +101,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 
    /*
       Memory: we rely on sysinfo here. Used to rely on /proc/meminfo
-      but that was didn't work on at least my ubuntu system.
+      but that didn't work on at least my ubuntu system.
    */
    struct sysinfo si;
 
