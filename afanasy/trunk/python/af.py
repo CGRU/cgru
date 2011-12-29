@@ -56,7 +56,7 @@ class Block(pyaf.Block):
       self.setErrorsRetries( int( self.env.Vars['task_error_retries'] ) )
       self.setErrorsAvoidHost( int( self.env.Vars['errors_avoid_host'] ) )
       self.setErrorsTaskSameHost( int( self.env.Vars['task_errors_same_host'] ) )
-      self.setErrorsForgiveTime( int( self.env.Vars['task_error_forgive_time'] ) )
+      self.setErrorsForgiveTime( int( self.env.Vars['errors_forgivetime'] ) )
       self.tasks = []
 
    def setParser( self, parser, nocheck = False):
@@ -74,14 +74,6 @@ class Block(pyaf.Block):
       if capacity >= 0: pyaf.Block.setCapacity( self, capacity)
    def setVariableCapacity( self, capmin, capmax):
       if capmin >= 0 or capmax >= 0: pyaf.Block.setVariableCapacity( self, capmin, capmax)
-   def setErrorsRetries( self, retries):
-      if retries >= -1: pyaf.Block.setErrorsRetries( self, retries)
-   def setErrorsAvoidHost( self, avoids):
-      if avoids >= -1: pyaf.Block.setErrorsAvoidHost( self, avoids)
-   def setErrorsTaskSameHost( self, samehost):
-      if samehost >= -1: pyaf.Block.setErrorsTaskSameHost( self, samehost)
-   def setErrorsForgiveTime( self, ftime):
-      if ftime >= 0: pyaf.Block.setErrorsForgiveTime( self, ftime)
    def setWorkingDirectory( self, cmd, TransferToServer = True):
       if TransferToServer: cmd = self.pm.toServer( cmd)
       pyaf.Block.setWorkingDirectory( self, cmd)
