@@ -390,6 +390,7 @@ elif ext == 'mb':
          cmd += ' -of "%s"' % os.path.basename( of)
       images = output
    cmd += ' -proj "%s"' % pwd
+   cmd += ' "-mr:art"'
    cmd += ' "%s"' % scene
 
 # XSI:
