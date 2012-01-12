@@ -70,7 +70,10 @@ struct DlThread::ThreadData
 {
 	/* true when signaled with Cancel() */
 	bool m_must_cancel;
-	
+
+	/* true if the thread is to be started in a detached state. */
+	bool m_start_detached;
+
 #ifdef _WIN32
 	/* Event used on windows to interrupt Sleep() when cancelling. */
 	HANDLE m_cancellation_event;
@@ -104,6 +107,7 @@ DlThread::DlThread()
 	m_data = new ThreadData;
 
 	m_data->m_must_cancel = false;
+	m_data->m_start_detached = false;
 	m_data->m_handle = 0;
 
 #ifdef _WIN32
@@ -132,6 +136,22 @@ DlThread::~DlThread()
 
 	delete m_data;
 	m_data = 0x0;
+}
+
+/*
+	SetDetached
+
+	Sets the thread to start in detached mode. See .h for details.
+*/
+void DlThread::SetDetached()
+{
+	if( m_data->m_handle )
+	{
+		assert( false );
+		return;
+	}
+
+	m_data->m_start_detached = true;
 }
 
 /*
@@ -166,6 +186,12 @@ void* DlThread::thread_routine(void *i_params)
 	
 	t->Cleanup();
 
+	/* If this is a detached thread, it is our job to delete the DlThread. */
+	if( t->m_data->m_start_detached )
+	{
+		delete t;
+	}
+
 	return 0;
 }
 
@@ -175,6 +201,10 @@ void DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 
 	m_data->m_thread_func = i_thread_func;
 	m_data->m_thread_arg = i_arg;
+
+	/* Read this right now as the DlThread (this) can be deleted as soon as we
+	   start a detached thread. */
+	bool detached = m_data->m_start_detached;
 
 #ifdef _WIN32
 	/* Signal handlers are per thread on windows so copy them to new thread. */
@@ -196,14 +226,38 @@ void DlThread::Start(void (*i_thread_func)(void*), void *i_arg)
 	*/
 	unsigned thread_id;
 	
-	m_data->m_handle = (HANDLE) _beginthreadex(
+	HANDLE handle = (HANDLE) _beginthreadex(
 		0x0,
 		0,
 		&thread_routine, this,
 		0,
 		&thread_id);
+
+	if( detached )
+	{
+		CloseHandle( handle );
+	}
+	else
+	{
+		m_data->m_handle = handle;
+	}
 #else
-	pthread_create(&m_data->m_handle, 0x0, &thread_routine, this);
+	pthread_attr_t attr;
+	pthread_attr_init( &attr );
+	if( detached )
+	{
+		pthread_attr_setdetachstate( &attr, PTHREAD_CREATE_DETACHED );
+	}
+
+	pthread_t handle = 0;
+	pthread_create( &handle, &attr, &thread_routine, this );
+
+	pthread_attr_destroy( &attr );
+
+	if( !detached )
+	{
+		m_data->m_handle = handle;
+	}
 #endif
 }
 
@@ -218,6 +272,8 @@ void DlThread::Join()
 		assert(false);
 		return;
 	}
+
+	assert( !m_data->m_start_detached );
 
 #ifdef _WIN32
 	WaitForSingleObject(m_data->m_handle, INFINITE);
@@ -240,7 +296,7 @@ void DlThread::Join()
 */
 void DlThread::Cancel()
 {
-	if (!m_data->m_handle)
+	if( !m_data->m_handle || m_data->m_start_detached )
 	{
 		assert(false);
 		return;
@@ -264,6 +320,8 @@ void DlThread::Cancel()
 */
 void DlThread::TestCancel()
 {
+	assert( !m_data->m_start_detached );
+
 	if (m_data->m_must_cancel)
 	{
 		Cleanup();

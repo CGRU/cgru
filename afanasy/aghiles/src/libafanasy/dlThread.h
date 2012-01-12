@@ -27,7 +27,14 @@ class DlThread
 public:
 	DlThread();
 	~DlThread();
-	
+
+	/*
+		Sets the thread to be started in detached mode. This means it may not
+		(and must not) be joined and the DlThread will delete itself when the
+		thread function exits. Such a thread may also not use cancellation.
+	*/
+	void SetDetached();
+
 	/* Start a new thread. */
 	void Start(void (*i_thread_func)(void*), void *i_arg);
 	
