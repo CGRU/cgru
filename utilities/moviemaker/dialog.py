@@ -102,7 +102,7 @@ AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)', 'AAC (Advanced Audio Codec)',    
 AudioCodecValues = [             'libmp3lame',                    'libfaac',  'libvorbis',                             'flac']
 
 # Process Containers:
-Containers = ['mov','avi','mp4','m4v','ogg','flv','swf']
+Containers = ['mov','avi','mp4','m4v']
 if not str(Options.container) in Containers: Containers.append( str(Options.container))
 
 # Process Cacher:
