@@ -1,2 +1,2 @@
-QuickTime H.264 Best
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_common.ffpreset" -crf 10 "@OUTPUT@.mov"
+H.264 Best
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_common.ffpreset" -crf 10 "@OUTPUT@.@CONTAINER@"

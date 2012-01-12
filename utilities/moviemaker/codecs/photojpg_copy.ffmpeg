@@ -1,2 +1,2 @@
-QuickTime PhotoJPG (copy)
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec copy "@OUTPUT@.mov"
+PhotoJPG (copy)
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec copy "@OUTPUT@.@CONTAINER@"

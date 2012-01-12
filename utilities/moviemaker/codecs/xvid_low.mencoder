@@ -1,2 +1,2 @@
-MPEG 4 XVID (low)
-mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.avi" -ovc xvid -xvidencopts bitrate=4000
+XVID (low)
+mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.@CONTAINER@" -ovc xvid -xvidencopts bitrate=4000

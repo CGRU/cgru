@@ -18,8 +18,9 @@ from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] [file]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies_withlogo', help='Sequence frame template')
-Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Default codec preset')
+Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Codec preset')
 Parser.add_option('-f', '--format',          dest='format',          type  ='string',     default='720x576x1.09', help='Resolution')
+Parser.add_option('-n', '--container',       dest='container',       type  ='string',     default='mov',          help='Container')
 Parser.add_option('--aspect_in',             dest='aspect_in',       type  ='float',      default=-1.0,           help='Input image aspect, -1 = no changes')
 Parser.add_option('--aspect_auto',           dest='aspect_auto',     type  ='float',      default=-1.0,           help='Auto image aspect (2 if w/h <= aspect_auto), -1 = no changes')
 Parser.add_option('--aspect_out',            dest='aspect_out',      type  ='float',      default=-1.0,           help='Output movie aspect, "-1" = no changes')
@@ -99,6 +100,10 @@ if Options.naming != '' and not Options.naming in Namings: Namings.append( Optio
 
 AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)', 'AAC (Advanced Audio Codec)',     'Vorbis', 'FLAC (Free Lossless Audio Codec)']
 AudioCodecValues = [             'libmp3lame',                    'libfaac',  'libvorbis',                             'flac']
+
+# Process Containers:
+Containers = ['mov','avi','mp4','m4v','ogg','flv','swf']
+if not str(Options.container) in Containers: Containers.append( str(Options.container))
 
 # Process Cacher:
 CacherNames  = ['None', '25%', '50%', '75%', '100%']
@@ -265,6 +270,17 @@ Codec presets located in\n\
       QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
       self.lFormat.addWidget( self.tCodec)
       self.lFormat.addWidget( self.cbCodec)
+
+      self.tContainer = QtGui.QLabel('Container:')
+      self.lFormat.addWidget( self.tContainer)
+      self.cbContainer = QtGui.QComboBox( self)
+      i = 0
+      for cont in Containers:
+         self.cbContainer.addItem( cont)
+         if cont == Options.container: self.cbContainer.setCurrentIndex(i)
+         i += 1
+      QtCore.QObject.connect( self.cbContainer, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.lFormat.addWidget( self.cbContainer)
 
       self.generallayout.addLayout( self.lFormat)
 
@@ -1520,6 +1536,7 @@ Add this options to temporary image saving.')
       cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
       cmd += ' -c "%s"' % getComboBoxString( self.cbCodec)
       cmd += ' -f %s' % self.cbFPS.currentText()
+      cmd += ' -n %s' % self.cbContainer.currentText()
       cmd += ' --fs %d' % self.sbFrameFirst.value()
       cmd += ' --fe %d' % self.sbFrameLast.value()
       format = getComboBoxString( self.cbFormat)

@@ -1,2 +1,2 @@
-MPEG 4 XVID (best)
-mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.avi" -ovc xvid -xvidencopts fixed_quant=1
+XVID (best)
+mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.@CONTAINER@" -ovc xvid -xvidencopts fixed_quant=1
