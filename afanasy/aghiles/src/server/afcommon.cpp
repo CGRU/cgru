@@ -99,7 +99,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
       QueueLogError("AFCommon::writeFile: File name is empty.");
       return false;
    }
-   int fd = open( filename.c_str(), O_WRONLY | O_CREAT, 0777);
+   int fd = open( filename.c_str(), O_WRONLY | O_CREAT, 0644);
    if( fd == -1 )
    {
       QueueLogErrno( std::string("AFCommon::writeFile: ") + filename);
@@ -117,8 +117,12 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
       }
       bytes += written;
    }
+
    close( fd);
-   chmod( filename.c_str(), 0777);
+
+   /* FIXME: do we need this chmod() ? If so, in what case ? */
+   chmod( filename.c_str(), 0644);
+
    AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
    return true;
 }
