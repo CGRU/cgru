@@ -3,41 +3,39 @@
 #include <stdio.h>
 
 #include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/DlScopeLocker.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfList::AfList():
-   initialized( false)
-{
-   if( pthread_rwlock_init( &rwlock, NULL) != 0)
-   {
-      AFERRPE("AfList::AfList:");
-      return;
-   }
-   initialized = true;
-}
 
+/* FIXME: Using a list to manage priorities is not very good. 
+   Just use an AVL tree! An stl sorted container for example.
+*/
+   
 AfList::~AfList()
 {
-AFINFO("AfList::~AfList:\n");
    NodesList::iterator it = nodes_list.begin();
    NodesList::iterator end_it = nodes_list.end();
-   while( it != end_it) (*it++)->lists.remove( this);
+
+   while( it != end_it)
+      (*it++)->lists.remove( this);
 }
 
 int AfList::add( af::Node *node)
 {
+   m_rw_lock.WriteLock();
+
    int index = -1;
-//BEGIN mutex
-   if( pthread_rwlock_wrlock( &rwlock) != 0)
-      AFERRPE("AfList::add: pthread_rwlock_wrlock:");
-/*-------------------------------------------------------------*/
-   NodesList::iterator it = std::find( nodes_list.begin(), nodes_list.begin(), node);
+
+   NodesList::iterator it =
+      std::find( nodes_list.begin(), nodes_list.begin(), node);
+
    if( *it == node )
    {
       AFERROR("AfList::add: node already exists.\n");
+      m_rw_lock.WriteUnlock();
       return index;
    }
    else
@@ -57,7 +55,8 @@ int AfList::add( af::Node *node)
             lessPriorityFounded = true;
             break;
          }
-         if( lessPriorityFounded == false ) nodes_list.push_back( node);
+         if( lessPriorityFounded == false )
+            nodes_list.push_back( node);
       }
       else
          nodes_list.push_back( node);
@@ -65,57 +64,54 @@ int AfList::add( af::Node *node)
       index++;
       node->lists.push_back( this);
    }
-/*-------------------------------------------------------------*/
-   if( pthread_rwlock_unlock( &rwlock) != 0)
-      AFERRPE("AfList::add: pthread_rwlock_unlock:");
-//END mutex
+
+   m_rw_lock.WriteUnlock();
    return index;
 }
 
 void AfList::remove( af::Node *node)
 {
-//BEGIN mutex
-   if( pthread_rwlock_wrlock( &rwlock) != 0)
-      AFERRPE("AfList::remove: pthread_rwlock_wrlock:");
-/*-------------------------------------------------------------*/
-   nodes_list.remove( node);
-   node->lists.remove( this);
-/*-------------------------------------------------------------*/
-   if( pthread_rwlock_unlock( &rwlock) != 0)
-      AFERRPE("AfList::remove: pthread_rwlock_unlock:");
-//END mutex
+   m_rw_lock.WriteLock();
+
+   nodes_list.remove(node);
+   node->lists.remove(this);
+
+   m_rw_lock.WriteUnlock();
 }
 
 int AfList::sortPriority( af::Node * node)
 {
-   int index = -1;
-   if( nodes_list.size() < 2 ) return index;
+   m_rw_lock.WriteLock();
 
-//BEGIN mutex
-   if( pthread_rwlock_wrlock( &rwlock) != 0)
-      AFERRPE("AfList::add: pthread_rwlock_wrlock:");
-/*-------------------------------------------------------------*/
-      nodes_list.remove( node);
-      NodesList::iterator it = nodes_list.begin();
-      NodesList::iterator end_it = nodes_list.end();
-      bool lessPriorityFounded = false;
-      while( it != end_it)
-      {
-         index++;
-         if( *(*it) >= *node ) { it++; continue;}
-         nodes_list.insert( it, node);
-         lessPriorityFounded = true;
-         break;
-      }
-      if( lessPriorityFounded == false )
-      {
-         index++;
-         nodes_list.push_back( node);
-      }
-/*-------------------------------------------------------------*/
-   if( pthread_rwlock_unlock( &rwlock) != 0)
-      AFERRPE("AfList::remove: pthread_rwlock_unlock:");
-//END mutex
+   if( nodes_list.size() < 2 )
+   {
+      m_rw_lock.WriteUnlock();
+      return -1;
+   }
+
+   int index = -1;
+
+   nodes_list.remove( node);
+   NodesList::iterator it = nodes_list.begin();
+   NodesList::iterator end_it = nodes_list.end();
+   bool lessPriorityFounded = false;
+
+   while( it != end_it)
+   {
+      index++;
+      if( *(*it) >= *node ) { it++; continue;}
+      nodes_list.insert( it, node);
+      lessPriorityFounded = true;
+      break;
+   }
+
+   if( lessPriorityFounded == false )
+   {
+      index++;
+      nodes_list.push_back( node);
+   }
+
+   m_rw_lock.WriteUnlock();
 
    return index;
 }
