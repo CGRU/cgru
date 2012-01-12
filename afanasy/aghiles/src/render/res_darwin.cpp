@@ -310,6 +310,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
 
       hres.net_recv_kbsec = recv_interval / (etime*1024);
       hres.net_send_kbsec = send_interval / (etime*1024);
+
+      freeifaddrs( addr );
    }
 
    {
