@@ -86,7 +86,7 @@ void DBActionQueue::processItem( AfQueueItem* item)
       if( false == db->isOpen())
       {
          // Push item back to queue front to try it to write again next time:
-         push( item, true);
+         push( item, true );
          AFINFA("%s: Item pushed back to queue front.", name.c_str())
          return;
       }
@@ -113,12 +113,6 @@ bool DBActionQueue::writeItem( AfQueueItem* item)
       if( afsql::qChkErr( query, name)) return false;
    }
    return true;
-}
-
-void DBActionQueue::quit()
-{
-   db->close();
-   AfQueue::quit();
 }
 
 void DBActionQueue::addItem( const afsql::DBItem * item)

@@ -1,6 +1,8 @@
 #include "afqueue.h"
+#include "../libafanasy/dlScopeLocker.h"
 
 #include <stdio.h>
+#include <assert.h>
 
 extern bool running;
 
@@ -11,91 +13,98 @@ extern bool running;
 AfQueueItem::AfQueueItem(): next_ptr( NULL) {}
 AfQueueItem::~AfQueueItem() {}
 
-AfQueue::AfQueue( const std::string & QueueName):
-   name( QueueName),
-   count( 0),
-   firstPtr( NULL),
-   lastPtr( NULL),
-   locked( false),
-   initialized( false)
+/*
+   This is a simple stub to call the "Run" method in the
+   AfQueue.
+*/
+void thread_entry_point( void *i_parameter )
 {
-#ifndef MACOSX
-   if( pthread_mutex_init( &mutex, NULL) != 0)
+   AfQueue *queue = (AfQueue *) i_parameter;
+   queue->run();
+}
+
+AfQueue::AfQueue( const std::string &i_QueueName ):
+   name(i_QueueName),
+   count(0),
+   firstPtr(NULL),
+   lastPtr(NULL)
+{
+#ifdef MACOSX
+   /* We carate an exclusive semaphore and give read and write
+      persmission to this owner. */
+   semcount_ptr = sem_open( i_QueueName.c_str(), O_CREAT, 0600, 0);
+
+   if( semcount_ptr == SEM_FAILED )
    {
-      AFERRPE("AfQueue::AfQueue(): pthread_mutex_init:")
-      return;
-   }
-   if( sem_init( &semcount, 0, 0) != 0)
-   {
-      AFERRPE("AfQueue::AfQueue(): sem_init:")
+      perror( "sem_open() failing in AfQueue ctor" );
       return;
    }
 #endif
-   initialized = true;
+
+#if defined(LINUX)
+   semcount_ptr = &semcount;
+   if( sem_init( semcount_ptr, 0, 0) != 0)
+   {
+      perror( "sem_open() failed in AfQueue ctor" );
+      return;
+   }
+#endif
+
+   /* Start the thread which waits for elements in the queue. */
+   m_thread.Start( thread_entry_point, this );
 }
 
 AfQueue::~AfQueue()
 {
+   /* At this point there is only no possible concurrent calls to
+      the AfQueu so we don't need the mutex. We still try to lock
+      the mutex to perform a sanity check. */
+
+   bool locked = m_mutex.TryLock();
+   if( !locked )
+   {
+      assert( !"AfQueue dtor called while queue is locked." );
+      return;
+   }
+
+#ifndef _WIN32
+   sem_post( semcount_ptr );
+#endif
+
    AFINFA("AfQueue::~AfQueue(): %s", name.c_str())
+
    while( firstPtr != NULL)
    {
       AfQueueItem* item = firstPtr;
       firstPtr = item->next_ptr;
       delete item;
    }
+
+   sem_close( semcount_ptr );
+
+   m_mutex.Unlock();
 }
 
 void AfQueue::lock()
 {
-   if( locked )
-   {
-      AFERRAR("AfQueue::lock: '%s' already locked.", name.c_str())
-      return;
-   }
-#ifdef MACOSX
-   q_mutex.lock();
-#else
-   pthread_mutex_lock( &mutex);
-#endif
-   locked = true;
+   m_mutex.Lock();
 }
 
 void AfQueue::unlock()
 {
-   if( false == locked )
-   {
-      AFERRAR("AfQueue::lock: '%s' not locked.", name.c_str())
-      return;
-   }
-#ifdef MACOSX
-   q_mutex.unlock();
-#else
-   pthread_mutex_unlock( &mutex);
-#endif
-   locked = false;
+   m_mutex.Unlock();
 }
 
-bool AfQueue::push( AfQueueItem* item, bool front)
+bool AfQueue::push( AfQueueItem* item, bool i_front )
 {
-   if( item == NULL)
-   {
-#ifdef MACOSX
-      q_semaphore.release();
-#else
-      sem_post( &semcount);
-#endif
-      return false;
-   }
+	assert( item );
+
    item->next_ptr = NULL;
 
-//BEGIN mutex
-#ifdef MACOSX
-   if( false == locked ) q_mutex.lock();
-#else
-   if( false == locked ) pthread_mutex_lock( &mutex);
-#endif
    {
-      if( front)
+      DlScopeLocker lock( &m_mutex );
+
+      if( i_front )
       {
          item->next_ptr = firstPtr;
          if( count == 0) lastPtr = item;
@@ -109,44 +118,50 @@ bool AfQueue::push( AfQueueItem* item, bool front)
       }
       count++;
    }
-#ifdef MACOSX
-   q_semaphore.release();
-   if( false == locked ) q_mutex.unlock();
-#else
-   if( sem_post( &semcount) != 0)
-   {
-      AFERRPE("AfQueue::push: sem_post:")
-   }
-   if( false == locked ) pthread_mutex_unlock( &mutex);
-#endif
-//END mutex
 
-   AFINFA("Msg* AfQueue::push: item=%p, count=%d", item, count)
+   /*
+      Now that we added a new element to this list, we can increase
+      the semaphore count so that waiting processes can wake up.
+   */
+
+#ifndef _WIN32
+   if( sem_post(semcount_ptr) == -1 )
+   {
+      perror( "sem_post() failed in AfQueue::~AfQueue()" );
+   }
+#endif
+
+   AFINFA("Msg* AfQueue::push: item=%p, count=%d", iteueuem, count);
+
+   m_thread.Cancel();
    return true;
 }
 
-AfQueueItem* AfQueue::pop( bool block)
+AfQueueItem* AfQueue::pop( WaitMode i_mode )
 {
    AfQueueItem* item = NULL;
 
-#ifdef MACOSX
-   bool semresult = true;
-   if( block)        q_semaphore.acquire();
-   else semresult =  q_semaphore.tryAcquire();
-   if( semresult == false ) return NULL;
-#else
-   int semresult;
-   if( block)  semresult = sem_wait(    &semcount );
-   else        semresult = sem_trywait( &semcount );
-   if( semresult != 0 ) return NULL;
+#ifndef _WIN32
+   int semresult = i_mode==e_wait ?
+      sem_wait(semcount_ptr) : sem_trywait(semcount_ptr);
+
+   if( semresult == -1 )
+	{
+		if( i_mode == e_wait )
+		{
+			perror( "sem_wait() failed in AfQueue::pop" );
+			return 0x0;
+		}
+		else if( errno != EAGAIN )
+		{
+			perror( "sem_trywait() failed in AfQueue::pop" );
+			return 0x0;
+		}
+	}
+
 #endif
 
-//BEGIN mutex
-#ifdef MACOSX
-   QMutexLocker lock( &q_mutex);
-#else
-   pthread_mutex_lock( &mutex);
-#endif
+   DlScopeLocker lock( &m_mutex );
    if((count > 0) && (firstPtr != NULL))
    {
       item = firstPtr;
@@ -154,40 +169,40 @@ AfQueueItem* AfQueue::pop( bool block)
       item->next_ptr = NULL;
       count--;
    }
-#ifndef MACOSX
-   pthread_mutex_unlock( &mutex);
-#endif
-//END mutex
 
    AFINFA("Msg* AfQueue::pop: item=%p, count=%d", item, count)
    return item;
 }
 
+/*
+   This is the main method that will treat all in the incoming messages.
+   It will simply wait on the counting semaphore when no messages are 
+   available and this means we take no CPU.
+*/
 void AfQueue::run()
 {
-while( running)
-{
-   AfQueueItem * item = pop();
-   if( running == false)
+   while( running )
    {
-      if( item != NULL ) delete item;
-      return;
+      fprintf( stderr, "Queue '%s' is alive !\n", name.c_str() );
+
+      AfQueueItem * item = pop( e_wait );
+
+      if( running == false )
+      {
+         delete item;
+         return;
+      }
+
+      assert( item );
+
+      // Item must be deleted in this virtual function.
+      processItem( item );
+
+      /*
+         This is a safe concellation point.
+      */
+      m_thread.TestCancel();
    }
-   if( item == NULL) continue;
 
-   // If item not needed any more it must be deleted in this virtual function:
-   processItem( item);
+   AFINFO("AfQueue::run: finished.")
 }
-AFINFO("AfQueue::run: finished.")
-}
-
-void AfQueue::quit()
-{
-   push( NULL);
-}
-/*
-void AfQueue::processItem( AfQueueItem* item)
-{
-   AFERRAR("AfQueue::processItem: \"%s\" - Invalid call", name.c_str())
-}
-*/

@@ -22,8 +22,14 @@ DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
 CleanUpQueue      * AFCommon::CleanUpJobQueue   = NULL;
 LogQueue          * AFCommon::OutputLogQueue    = NULL;
 
+/*
+   This ctor will start the various job queues. Note that threads
+   are started inside the constructors of these queues.
+*/
 AFCommon::AFCommon( Core * core)
 {
+   assert( core );
+
    MsgDispatchQueue = new MsgQueue(          "Sending Messages");
    FileWriteQueue   = new FileQueue(         "Writing Files");
    CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
@@ -34,12 +40,12 @@ AFCommon::AFCommon( Core * core)
 
 AFCommon::~AFCommon()
 {
-   if( FileWriteQueue )   delete FileWriteQueue;
-   if( MsgDispatchQueue ) delete MsgDispatchQueue;
-   if( CleanUpJobQueue )  delete CleanUpJobQueue;
-   if( OutputLogQueue )   delete OutputLogQueue;
-   if( DBUpTaskQueue )    delete DBUpTaskQueue;
-   if( DBUpdateQueue )    delete DBUpdateQueue;
+   delete FileWriteQueue;
+   delete MsgDispatchQueue;
+   delete CleanUpJobQueue;
+   delete OutputLogQueue;
+   delete DBUpTaskQueue;
+   delete DBUpdateQueue;
 }
 
 /*
@@ -73,7 +79,8 @@ void AFCommon::executeCmd( const std::string & cmd)
    }
 }
 
-void AFCommon::saveLog( const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate)
+void AFCommon::saveLog(
+	const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate)
 {
    int lines = log.size();
    if( lines < 1) return;
