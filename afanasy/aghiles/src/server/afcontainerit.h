@@ -6,11 +6,20 @@
 
 #include "afcontainer.h"
 
-/// Afanasy nodes container read locker.
+/// Afanasy nodes container locker.
+
+/* FIXME: yes, but what is a node?? */
 class AfContainerLock
 {
 public:
-   AfContainerLock( AfContainer* afcontainer, int locktype);
+   enum LockType
+   {
+      READLOCK,
+      WRITELOCK
+   };
+
+public:
+   AfContainerLock( AfContainer* afcontainer, LockType locktype);
    ~AfContainerLock();
 private:
    AfContainer* container;
@@ -21,6 +30,7 @@ private:
 class AfContainerIt
 {
 public:
+
 /// Create an iterator for the container.
    AfContainerIt( AfContainer* afContainer, bool skipZombies);
    ~AfContainerIt();

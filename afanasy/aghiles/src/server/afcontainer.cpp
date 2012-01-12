@@ -21,11 +21,6 @@ AfContainer::AfContainer(  std::string ContainerName, int MaximumSize):
    last_ptr( NULL),
    initialized( false)
 {
-   if( pthread_rwlock_init( &rwlock, NULL) != 0)
-   {
-      AFERRPE("AfContainer::AfContainer:");
-      return;
-   }
    nodesTable = new af::Node*[size];
    if( nodesTable == NULL)
    {
@@ -41,7 +36,6 @@ AfContainer::AfContainer(  std::string ContainerName, int MaximumSize):
 AfContainer::~AfContainer()
 {
 AFINFO("AfContainer::~AfContainer:")
-//   pthread_rwlock_trywrlock( &rwlock);
    size = 0;
    while( first_ptr != NULL)
    {
@@ -50,7 +44,6 @@ AFINFO("AfContainer::~AfContainer:")
       delete last_ptr;
    }
    if( nodesTable != NULL) delete [] nodesTable;
-//   pthread_rwlock_unlock( &rwlock);
 }
 
 int AfContainer::add( af::Node *node)

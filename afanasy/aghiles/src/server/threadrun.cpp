@@ -37,11 +37,11 @@ printf("...................................\n");
 // Lock containers:
 //
 AFINFO("ThreadRun::run: Locking containers...")
-      AfContainerLock jLock( jobs,     AfContainer::WRITELOCK);
-      AfContainerLock lLock( renders,  AfContainer::WRITELOCK);
-      AfContainerLock ulock( users,    AfContainer::WRITELOCK);
-      AfContainerLock tlock( talks,    AfContainer::WRITELOCK);
-      AfContainerLock mlock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock jLock( jobs,     AfContainerLock::WRITELOCK);
+      AfContainerLock lLock( renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock ulock( users,    AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( talks,    AfContainerLock::WRITELOCK);
+      AfContainerLock mlock( monitors, AfContainerLock::WRITELOCK);
 
 //
 // Messages reaction:

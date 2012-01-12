@@ -147,7 +147,7 @@ void DBActionQueue::sendAlarm()
 
    std::string str("ALARM! Server database connection error. Contact your system administrator.");
    AFCommon::QueueLog( name + ":\n" + str);
-   AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+   AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
    monitors->sendMessage( str);
 }
 
@@ -155,6 +155,6 @@ void DBActionQueue::sendConnected()
 {
    std::string str("AFANASY: Server database connection established.");
    AFCommon::QueueLog( name + ":\n" + str);
-   AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+   AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
    monitors->sendMessage( str);
 }

@@ -86,7 +86,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       {
          std::string str("ALARM! Server database connection error. Contact your system administrator.");
          AFCommon::QueueLog( str);
-         AfContainerLock mLock( monitoring, AfContainer::WRITELOCK);
+         AfContainerLock mLock( monitoring, AfContainerLock::WRITELOCK);
          monitoring->sendMessage( str);
          return 0;
       }
@@ -95,8 +95,8 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
    UserAf *user;
 
    {  // Register new user if job has a new user name.
-      AfContainerLock uLock( users, AfContainer::WRITELOCK  );
-      if( monitoring) AfContainerLock mLock( monitoring, AfContainer::WRITELOCK  );
+      AfContainerLock uLock( users, AfContainerLock::WRITELOCK  );
+      if( monitoring) AfContainerLock mLock( monitoring, AfContainerLock::WRITELOCK  );
 
       AFINFA("JobContainer::job_register: Checking job user '%s'", job->getUserName().toUtf8().data())
       user = users->addUser( job->getUserName(), job->getHostName(), monitoring);
@@ -107,7 +107,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
          return 0;
       }
       {  // Add job node to container.
-         AfContainerLock jLock( this, AfContainer::WRITELOCK);
+         AfContainerLock jLock( this, AfContainerLock::WRITELOCK);
 
          if( add((af::Node*)job) == false )
          {
@@ -137,7 +137,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 
       if( monitoring )
       {
-         AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
+         AfContainerLock mLock( monitoring,  AfContainerLock::WRITELOCK  );
 
          monitoring->addJobEvent( af::Msg::TMonitorJobsDel, job->getId(), user->getId());
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
@@ -171,7 +171,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 
    if( monitoring )
    {
-      AfContainerLock mLock( monitoring,  AfContainer::WRITELOCK  );
+      AfContainerLock mLock( monitoring,  AfContainerLock::WRITELOCK  );
 
       AFINFO("JobContainer::job_register: monitor unlock job and user events.")
       monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, job->getId(), user->getId());
