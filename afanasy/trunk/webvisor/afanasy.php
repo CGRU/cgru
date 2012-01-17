@@ -220,7 +220,7 @@ else if (isset($_POST['user']) && isset($_POST['password']))
    <a href="../../" ><img src="images/cgru.png" alt="CGRU" border="0" width="100" height="40"/></a>
 </td>
 <td width=10%>
-<?
+<?php
 //echo 'user='.$_POST['user'].' password='.$_POST['password'].'</br>';
 if (isset($_SESSION['valid_user']))
    echo '<a href="index.php?action=logout"><img src="images/logout.png" alt="Logout" border="0"/></a>';
@@ -270,7 +270,7 @@ public function DisplayFooter()
 </p></td></tr>
 <tr align="center" height=50>
 <td colspan=6><p>
-<?
+<?php
    if (isset($_SESSION['valid_user']))
    {
       echo '<font color="#904010">★</font>';
