@@ -41,7 +41,7 @@ Parser.add_option('-s', '--slate',      dest='slate',       type  ='string',    
 Parser.add_option('-n', '--container',  dest='container',   type  ='string',     default='mov',       help='Container')
 Parser.add_option('--fs',               dest='framestart',  type  ='int',        default=-1,          help='First frame to use, -1 use the first founded')
 Parser.add_option('--fe',               dest='frameend',    type  ='int',        default=-1,          help='Last frame to use, -1 use the last founded')
-Parser.add_option('--fff',              dest='fffirst',     action='store_true', default=False,       help='Draw first frame as first and not actual frame number.')
+Parser.add_option('--fffirst',          dest='fffirst',     action='store_true', default=False,       help='Draw first frame as first and not actual frame number.')
 Parser.add_option('--thumbnail',        dest='thumbnail',   action='store_true', default=False,       help='Add a thumbnail image on slate frame')
 Parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
 Parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')

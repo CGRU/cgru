@@ -43,7 +43,7 @@ Parser.add_option('--draw169',               dest='draw169',         type  ='int
 Parser.add_option('--draw235',               dest='draw235',         type  ='int',        default=0,              help='Draw 2.35 cacher opacity')
 Parser.add_option('--line169',               dest='line169',         type  ='string',     default='',             help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',               dest='line235',         type  ='string',     default='',             help='Draw 2.35 line color: "255,255,0"')
-Parser.add_option('--fff',                   dest='fffirst',         action='store_true', default=False,          help='Draw first frame as first, and not actual first frame number.')
+Parser.add_option('--fffirst',               dest='fffirst',         action='store_true', default=False,          help='Draw first frame as first, and not actual first frame number.')
 Parser.add_option('--lgspath',         		dest='lgspath',    		type  ='string',     default='logo.png',     help='Slate logo')
 Parser.add_option('--lgssize',         		dest='lgssize',    		type  ='int',        default=25,   	         help='Slate logo size, percent of image')
 Parser.add_option('--lgsgrav',         		dest='lgsgrav',    		type  ='string',     default='southeast', 	help='Slate logo positioning gravity')
@@ -67,11 +67,11 @@ Parser.add_option(      '--wndicon',         dest='wndicon',         type  ='str
 
 if len(args) > 2: Parser.error('Too many arguments provided.')
 
+InFile0 = ''
 InFile1 = ''
-InFile2 = ''
 
-if len(args) > 0: InFile1 = os.path.abspath( args[0])
-if len(args) > 1: InFile2 = os.path.abspath( args[1])
+if len(args) > 0: InFile0 = os.path.abspath( args[0])
+if len(args) > 1: InFile1 = os.path.abspath( args[1])
 
 # Initializations:
 DialogPath = os.path.dirname(os.path.abspath(sys.argv[0]))
@@ -237,181 +237,184 @@ Movie resolution.\n\
 Format presets located in\n\
 ' + FormatsPath)
       layout.addWidget( label)
-      self.cbFormat = QtGui.QComboBox( self)
+      self.fields['format'] = QtGui.QComboBox( self)
       i = 0
       for format in FormatValues:
-         self.cbFormat.addItem( FormatNames[i], format)
-         if format == Options.format: self.cbFormat.setCurrentIndex( i)
+         self.fields['format'].addItem( FormatNames[i], format)
+         if format == Options.format: self.fields['format'].setCurrentIndex( i)
          i += 1
-      QtCore.QObject.connect( self.cbFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      layout.addWidget( self.cbFormat)
+      QtCore.QObject.connect( self.fields['format'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['format'])
 
-      self.tFPS = QtGui.QLabel('FPS:', self)
-      self.tFPS.setToolTip('\
+      label = QtGui.QLabel('FPS:', self)
+      label.setToolTip('\
 Frame rate.')
-      self.cbFPS = QtGui.QComboBox( self)
+      layout.addWidget( label)
+      self.fields['fps'] = QtGui.QComboBox( self)
       i = 0
       for fps in FPS:
-         self.cbFPS.addItem(fps)
-         if fps == Options.fps: self.cbFPS.setCurrentIndex( i)
+         self.fields['fps'].addItem(fps)
+         if fps == Options.fps: self.fields['fps'].setCurrentIndex( i)
          i += 1
-      QtCore.QObject.connect( self.cbFPS, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      layout.addWidget( self.tFPS)
-      layout.addWidget( self.cbFPS)
+      QtCore.QObject.connect( self.fields['fps'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['fps'])
 
-      tCodec = QtGui.QLabel('Codec:', self)
-      tCodec.setToolTip('\
+      label = QtGui.QLabel('Codec:', self)
+      label.setToolTip('\
 Codec presets located in\n\
 ' + CodecsPath)
-      self.cbCodec = QtGui.QComboBox( self)
+      self.fields['codec'] = QtGui.QComboBox( self)
       i = 0
       for name in CodecNames:
-         self.cbCodec.addItem( name, CodecFiles[i])
-         if os.path.basename(CodecFiles[i]) == Options.codec: self.cbCodec.setCurrentIndex( i)
+         self.fields['codec'].addItem( name, CodecFiles[i])
+         if os.path.basename(CodecFiles[i]) == Options.codec: self.fields['codec'].setCurrentIndex( i)
          i += 1
-      QtCore.QObject.connect( self.cbCodec, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      layout.addWidget( tCodec)
-      layout.addWidget( self.cbCodec)
+      QtCore.QObject.connect( self.fields['codec'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      layout.addWidget( label)
+      layout.addWidget( self.fields['codec'])
 
-      tContainer = QtGui.QLabel('Container:')
-      layout.addWidget( tContainer)
-      self.cbContainer = QtGui.QComboBox( self)
+      label = QtGui.QLabel('Container:')
+      label.setToolTip('\
+Video stream container.\n\
+Movie file name extension will be set according to it.')
+      layout.addWidget( label)
+      self.fields['container'] = QtGui.QComboBox( self)
       i = 0
       for cont in Containers:
-         self.cbContainer.addItem( cont)
-         if cont == Options.container: self.cbContainer.setCurrentIndex(i)
+         self.fields['container'].addItem( cont)
+         if cont == Options.container: self.fields['container'].setCurrentIndex(i)
          i += 1
-      QtCore.QObject.connect( self.cbContainer, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      layout.addWidget( self.cbContainer)
+      QtCore.QObject.connect( self.fields['container'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['container'])
 
       generallayout.addLayout( layout)
 
 
-      gInformation = QtGui.QGroupBox('Information')
-      lInformation = QtGui.QVBoxLayout()
-      gInformation.setLayout( lInformation)
+      group = QtGui.QGroupBox('Information')
+      grouplayout = QtGui.QVBoxLayout()
+      group.setLayout( grouplayout)
+      generallayout.addWidget( group)
 
-      lTitles = QtGui.QHBoxLayout()
-      tCompany = QtGui.QLabel('Company:', self)
-      tCompany.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      grouplayout.addLayout( layout)
+      label = QtGui.QLabel('Company:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Draw company name.\n\
 Leave empty to skip.')
-      self.editCompany = QtGui.QLineEdit( Options.company, self)
-      QtCore.QObject.connect( self.editCompany, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      tProject = QtGui.QLabel('Project:', self)
-      tProject.setToolTip('\
+      self.fields['company'] = QtGui.QLineEdit( Options.company, self)
+      layout.addWidget( self.fields['company'])
+      QtCore.QObject.connect( self.fields['company'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      label = QtGui.QLabel('Project:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Project name.')
-      self.editProject = QtGui.QLineEdit( Options.project, self)
-      QtCore.QObject.connect( self.editProject, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      tShot = QtGui.QLabel('Shot:', self)
-      tShot.setToolTip('\
+      self.fields['project'] = QtGui.QLineEdit( Options.project, self)
+      layout.addWidget( self.fields['project'])
+      QtCore.QObject.connect( self.fields['project'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      label = QtGui.QLabel('Shot:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Shot name.')
-      self.editShot = QtGui.QLineEdit('', self)
-      QtCore.QObject.connect( self.editShot, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      tVersion = QtGui.QLabel('Version:', self)
-      tVersion.setToolTip('\
+      self.fields['shot'] = QtGui.QLineEdit('', self)
+      layout.addWidget( self.fields['shot'])
+      QtCore.QObject.connect( self.fields['shot'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      label = QtGui.QLabel('Version:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Shot version.')
       self.editVersion = QtGui.QLineEdit('', self)
+      layout.addWidget( self.editVersion)
       QtCore.QObject.connect( self.editVersion, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cAutoTitles = QtGui.QCheckBox('Auto', self)
+      layout.addWidget( self.cAutoTitles)
       self.cAutoTitles.setToolTip('\
 Try to fill values automatically parsing input file name and folder.')
       self.cAutoTitles.setChecked( True)
       QtCore.QObject.connect( self.cAutoTitles, QtCore.SIGNAL('stateChanged(int)'), self.autoTitles)
-      lTitles.addWidget( tCompany)
-      lTitles.addWidget( self.editCompany)
-      lTitles.addWidget( tProject)
-      lTitles.addWidget( self.editProject)
-      lTitles.addWidget( tShot)
-      lTitles.addWidget( self.editShot)
-      lTitles.addWidget( tVersion)
-      lTitles.addWidget( self.editVersion)
-      lTitles.addWidget( self.cAutoTitles)
-      lInformation.addLayout( lTitles)
 
-      lUser = QtGui.QHBoxLayout()
-      lArtist = QtGui.QLabel('Artist:', self)
-      lArtist.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Artist:', self)
+      label.setToolTip('\
 Artist name.')
-      lUser.addWidget( lArtist)
-      self.editArtist = QtGui.QLineEdit( Artist, self)
-      lUser.addWidget( self.editArtist)
-      QtCore.QObject.connect( self.editArtist, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      lActivity = QtGui.QLabel('Activity:', self)
-      lActivity.setToolTip('\
+      layout.addWidget( label)
+      self.fields['artist'] = QtGui.QLineEdit( Artist, self)
+      layout.addWidget( self.fields['artist'])
+      QtCore.QObject.connect( self.fields['artist'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      label = QtGui.QLabel('Activity:', self)
+      label.setToolTip('\
 Shot activity to show.')
-      lUser.addWidget( lActivity)
-      self.editActivity = QtGui.QLineEdit('', self)
-      lUser.addWidget( self.editActivity)
-      QtCore.QObject.connect( self.editActivity, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout.addWidget( label)
+      self.fields['activity'] = QtGui.QLineEdit('', self)
+      layout.addWidget( self.fields['activity'])
+      QtCore.QObject.connect( self.fields['activity'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cbActivity = QtGui.QComboBox( self)
       for act in Activities: self.cbActivity.addItem( act)
-      lUser.addWidget( self.cbActivity)
+      layout.addWidget( self.cbActivity)
       QtCore.QObject.connect( self.cbActivity, QtCore.SIGNAL('currentIndexChanged(int)'), self.activityChanged)
-      lInformation.addLayout( lUser)
+      grouplayout.addLayout( layout)
 
-      lComments = QtGui.QHBoxLayout()
-      tComments = QtGui.QLabel('Comments:', self)
-      self.editComments = QtGui.QLineEdit( self)
-      QtCore.QObject.connect( self.editComments, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      lComments.addWidget( tComments)
-      lComments.addWidget( self.editComments)
-      lInformation.addLayout( lComments)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Comments:', self))
+      self.fields['comments'] = QtGui.QLineEdit( self)
+      QtCore.QObject.connect( self.fields['comments'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout.addWidget( self.fields['comments'])
+      grouplayout.addLayout( layout)
 
-      generallayout.addWidget( gInformation)
 
-      gInputSettings = QtGui.QGroupBox('Input Sequence Pattern')
-      lInputSettings = QtGui.QVBoxLayout()
-      gInputSettings.setLayout( lInputSettings)
+      group = QtGui.QGroupBox('Input Sequence Pattern')
+      grouplayout = QtGui.QVBoxLayout()
+      group.setLayout( grouplayout)
+      generallayout.addWidget( group)
 
-      self.editInputFiles = QtGui.QLineEdit( InFile1, self)
-      self.editInputFiles.setToolTip('\
+      self.fields['input0'] = QtGui.QLineEdit( InFile0, self)
+      self.fields['input0'].setToolTip('\
 Input files(s).\n\
 You put folder name, file name or files patters here.\n\
 Pattern digits can be represented by "%04d" or "####".')
-      QtCore.QObject.connect( self.editInputFiles, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
-      lInputSettings.addWidget( self.editInputFiles)
+      QtCore.QObject.connect( self.fields['input0'], QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged)
+      grouplayout.addWidget( self.fields['input0'])
 
-      lBrowseInput = QtGui.QHBoxLayout()
-      lFilesCount = QtGui.QLabel('Files count:', self)
-      lFilesCount.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Files count:', self)
+      label.setToolTip('\
 Files founded matching pattern.')
-      lBrowseInput.addWidget( lFilesCount)
+      layout.addWidget( label)
       self.editInputFilesCount = QtGui.QLineEdit( self)
       self.editInputFilesCount.setEnabled( False)
-      lBrowseInput.addWidget( self.editInputFilesCount)
-      lPattern = QtGui.QLabel('Pattern:', self)
-      lPattern.setToolTip('\
+      layout.addWidget( self.editInputFilesCount)
+      label = QtGui.QLabel('Pattern:', self)
+      label.setToolTip('\
 Recognized files pattern.')
-      lBrowseInput.addWidget( lPattern)
+      layout.addWidget( label)
       self.editInputFilesPattern = QtGui.QLineEdit( self)
       self.editInputFilesPattern.setEnabled( False)
-      lBrowseInput.addWidget( self.editInputFilesPattern)
+      layout.addWidget( self.editInputFilesPattern)
 
-      lFrameRange = QtGui.QLabel('Frames:', self)
-      lFrameRange.setToolTip('\
+      label = QtGui.QLabel('Frames:', self)
+      label.setToolTip('\
 Frame range.')
-      lBrowseInput.addWidget( lFrameRange)
-      self.sbFrameFirst = QtGui.QSpinBox( self)
-      self.sbFrameFirst.setRange( -1, -1)
-      QtCore.QObject.connect( self.sbFrameFirst, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lBrowseInput.addWidget( self.sbFrameFirst)
+      layout.addWidget( label)
+      self.fields['framestart'] = QtGui.QSpinBox( self)
+      self.fields['framestart'].setRange( -1, -1)
+      QtCore.QObject.connect( self.fields['framestart'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['framestart'])
       self.sbFrameLast = QtGui.QSpinBox( self)
       self.sbFrameLast.setRange( -1, -1)
       QtCore.QObject.connect( self.sbFrameLast, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lBrowseInput.addWidget( self.sbFrameLast)
-      self.cFFFirst = QtGui.QCheckBox('F.F.First', self)
-      self.cFFFirst.setChecked( Options.fffirst)
-      self.cFFFirst.setToolTip('\
+      layout.addWidget( self.sbFrameLast)
+      self.fields['fffirst'] = QtGui.QCheckBox('F.F.First', self)
+      self.fields['fffirst'].setChecked( Options.fffirst)
+      self.fields['fffirst'].setToolTip('\
 First Frame First:\n\
 Draw first frame number as one.')
-      QtCore.QObject.connect( self.cFFFirst, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      lBrowseInput.addWidget( self.cFFFirst)
+      QtCore.QObject.connect( self.fields['fffirst'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['fffirst'])
 
       self.btnBrowseInput = QtGui.QPushButton('Browse Sequence', self)
       QtCore.QObject.connect( self.btnBrowseInput, QtCore.SIGNAL('pressed()'), self.browseInput)
-      lBrowseInput.addWidget( self.btnBrowseInput)
-      lInputSettings.addLayout( lBrowseInput)
+      layout.addWidget( self.btnBrowseInput)
+      grouplayout.addLayout( layout)
 
       lIdentify = QtGui.QHBoxLayout()
       self.cbIdentify = QtGui.QCheckBox('Identify:', self)
@@ -425,9 +428,7 @@ Input file identification.')
       lIdentify.addWidget( self.cbIdentify)
       lIdentify.addWidget( self.editIdentify)
       lIdentify.addWidget( self.btnIdentify)
-      lInputSettings.addLayout( lIdentify)
-
-      generallayout.addWidget( gInputSettings)
+      grouplayout.addLayout( lIdentify)
 
 
       gOutputSettings = QtGui.QGroupBox('Output File')
@@ -436,6 +437,10 @@ Input file identification.')
 
       lOutputName = QtGui.QHBoxLayout()
       tOutputName = QtGui.QLabel('Name:', self)
+      tOutputName.setToolTip('\
+Result movie name.\n\
+Extension will be added according to video stream container.\n\
+It is configuted in codec preset files.')
       lOutputName.addWidget( tOutputName)
       self.editOutputName = QtGui.QLineEdit( self)
       lOutputName.addWidget( self.editOutputName)
@@ -465,6 +470,8 @@ Use Naming Rule.')
 
       lOutputDir = QtGui.QHBoxLayout()
       tOutputDir = QtGui.QLabel('Folder:', self)
+      tOutputDir.setToolTip('\
+Result movie will be placed in this directory.')
       lOutputDir.addWidget( tOutputDir)
       self.editOutputDir = QtGui.QLineEdit( self)
       QtCore.QObject.connect( self.editOutputDir, QtCore.SIGNAL('editingFinished()'), self.evaluate)
@@ -589,8 +596,7 @@ Example "255,255,0" - yellow.')
       # Logos:
       # Slate logo:
       lLgs = QtGui.QHBoxLayout()
-      tLgsPath = QtGui.QLabel('Slate Logo:', self)
-      lLgs.addWidget( tLgsPath)
+      lLgs.addWidget( QtGui.QLabel('Slate Logo:', self))
       self.editLgsPath = QtGui.QLineEdit( Options.lgspath, self)
       lLgs.addWidget( self.editLgsPath)
       QtCore.QObject.connect( self.editLgsPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
@@ -618,23 +624,20 @@ Example "255,255,0" - yellow.')
 
       # Frame logo:
       lLgf = QtGui.QHBoxLayout()
-      tLgfPath = QtGui.QLabel('Frame Logo:', self)
-      lLgf.addWidget( tLgfPath)
+      lLgf.addWidget( QtGui.QLabel('Frame Logo:', self))
       self.editLgfPath = QtGui.QLineEdit( Options.lgfpath, self)
       lLgf.addWidget( self.editLgfPath)
       QtCore.QObject.connect( self.editLgfPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.btnBrowseLgf = QtGui.QPushButton('Browse', self)
       QtCore.QObject.connect( self.btnBrowseLgf, QtCore.SIGNAL('pressed()'), self.browseLgf)
       lLgf.addWidget( self.btnBrowseLgf)
-      tLgfSize = QtGui.QLabel('Size:', self)
-      lLgf.addWidget( tLgfSize)
+      lLgf.addWidget( QtGui.QLabel('Size:', self))
       self.sbLgfSize = QtGui.QSpinBox( self)
       self.sbLgfSize.setRange( 1, 100)
       self.sbLgfSize.setValue( Options.lgfsize)
       QtCore.QObject.connect( self.sbLgfSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       lLgf.addWidget( self.sbLgfSize)
-      tLgfGravity = QtGui.QLabel('%  Position:', self)
-      lLgf.addWidget( tLgfGravity)
+      lLgf.addWidget( QtGui.QLabel('%  Position:', self))
       self.cbLgfGravity = QtGui.QComboBox( self)
       i = 0
       for grav in Gravity:
@@ -794,9 +797,9 @@ Add this options to temporary image saving.')
       lInputFileGroup2 = QtGui.QVBoxLayout()
       gInputFileGroup2.setLayout( lInputFileGroup2)
 
-      self.editInputFiles2 = QtGui.QLineEdit( InFile2, self)
-      lInputFileGroup2.addWidget( self.editInputFiles2)
-      QtCore.QObject.connect( self.editInputFiles2, QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged2)
+      self.fields['input1'] = QtGui.QLineEdit( InFile1, self)
+      lInputFileGroup2.addWidget( self.fields['input1'])
+      QtCore.QObject.connect( self.fields['input1'], QtCore.SIGNAL('textEdited(QString)'), self.inputFileChanged2)
 
       self.leditInputFileCtrl2 = QtGui.QHBoxLayout()
       self.btnInputFileCopy = QtGui.QPushButton('Copy&&Paste First Sequence', self)
@@ -1182,9 +1185,9 @@ Add this options to temporary image saving.')
          self.evaluate()
 
    def copyInput( self):
-      files1 = self.editInputFiles.text()
+      files1 = self.fields['input0'].text()
       if len( files1):
-         self.editInputFiles2.setText( files1)
+         self.fields['input1'].setText( files1)
       self.inputFileChanged2()
 
    def autoOutputName( self):
@@ -1196,12 +1199,12 @@ Add this options to temporary image saving.')
 
    def autoTitles( self):
       enable = not self.cAutoTitles.isChecked()
-      self.editProject.setEnabled( enable)
-      self.editShot.setEnabled( enable)
+      self.fields['project'].setEnabled( enable)
+      self.fields['shot'].setEnabled( enable)
       self.editVersion.setEnabled( enable)
 
    def activityChanged( self):
-      self.editActivity.setText( self.cbActivity.currentText())
+      self.fields['activity'].setText( self.cbActivity.currentText())
       self.evaluate()
 
    def namingChanged( self):
@@ -1239,15 +1242,15 @@ Add this options to temporary image saving.')
       if len( folder): self.editOutputDir.setText( folder)
 
    def browseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles.text())
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['input0'].text())
       if len( afile):
-         self.editInputFiles.setText( afile)
+         self.fields['input0'].setText( afile)
          self.inputFileChanged()
 
    def browseInput2( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.editInputFiles2.text())
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['input1'].text())
       if len( afile):
-         self.editInputFiles2.setText( afile)
+         self.fields['input1'].setText( afile)
          self.inputFileChanged2()
 
    def inputFileChanged( self):
@@ -1255,13 +1258,13 @@ Add this options to temporary image saving.')
       self.editInputFilesCount.clear()
       self.editInputFilesPattern.clear()
       self.editIdentify.clear()
-      inputfile = '%s' % self.editInputFiles.text()
+      inputfile = '%s' % self.fields['input0'].text()
       InputFile, InputPattern, FilesCount, Identify = self.calcPattern( inputfile)
 
       self.inputPattern = InputPattern
       if InputPattern == None: return
 
-      self.editInputFiles.setText( InputFile)
+      self.fields['input0'].setText( InputFile)
       self.editInputFilesPattern.setText( os.path.basename( InputPattern))
       self.editInputFilesCount.setText( '%d' % FilesCount)
       self.editIdentify.setText( Identify)
@@ -1273,12 +1276,12 @@ Add this options to temporary image saving.')
       self.editInputFilesCount2.clear()
       self.editInputFilesPattern2.clear()
       self.editIdentify2.clear()
-      inputfile = '%s' % self.editInputFiles2.text()
+      inputfile = '%s' % self.fields['input1'].text()
       InputFile, InputPattern, FilesCount, Identify = self.calcPattern( inputfile)
 
       self.inputPattern2 = InputPattern
       if InputPattern is not None:
-         self.editInputFiles2.setText( InputFile)
+         self.fields['input1'].setText( InputFile)
          self.editInputFilesPattern2.setText( os.path.basename( InputPattern))
          self.editInputFilesCount2.setText( '%d' % FilesCount)
          self.editIdentify2.setText( Identify)
@@ -1380,8 +1383,8 @@ Add this options to temporary image saving.')
          self.cmdField.setText(('None or only one file founded matching pattern.\n\
          prefix, padding, suffix = "%(prefix)s" %(padding)d "%(suffix)s\n"' % vars()) + expr.pattern)
          return InputFile, InputPattern, FilesCount, Identify
-      self.sbFrameFirst.setRange( framefirst, framelast)
-      self.sbFrameFirst.setValue( framefirst)
+      self.fields['framestart'].setRange( framefirst, framelast)
+      self.fields['framestart'].setValue( framefirst)
       self.sbFrameLast.setRange(  framefirst, framelast)
       self.sbFrameLast.setValue(  framelast)
       if sys.platform.find('win') == 0: afile = afile.replace('/','\\')
@@ -1445,11 +1448,11 @@ Add this options to temporary image saving.')
 
       self.StereoDuplicate = self.cStereoDuplicate.isChecked()
 
-      if self.cAutoTitles.isChecked(): self.editShot.clear()
+      if self.cAutoTitles.isChecked(): self.fields['shot'].clear()
       if self.cAutoOutputName.isChecked():
          self.editOutputName.clear()
 
-      project = '%s' % self.editProject.text()
+      project = '%s' % self.fields['project'].text()
       if Options.project == '':
           if self.cAutoTitles.isChecked() or project == '':
             if sys.platform.find('win') == 0:
@@ -1460,22 +1463,22 @@ Add this options to temporary image saving.')
                pat_split = self.inputPattern.upper().split('/')
                if len(pat_split) > 3: project = pat_split[3]
                else: project = pat_split[-1]
-            self.editProject.setText( project)
+            self.fields['project'].setText( project)
 
-      shot = '%s' % self.editShot.text()
+      shot = '%s' % self.fields['shot'].text()
       if self.cAutoTitles.isChecked() or shot == '':
          shot = os.path.basename( self.inputPattern)[ : os.path.basename( self.inputPattern).find('.')]
-         self.editShot.setText( shot)
+         self.fields['shot'].setText( shot)
 
       version = '%s' % self.editVersion.text()
       if self.cAutoTitles.isChecked() or version == '':
          version = os.path.basename( os.path.dirname(self.inputPattern))
          self.editVersion.setText( version)
 
-      company  = '%s' % self.editCompany.text()
-      artist   = '%s' % self.editArtist.text()
-      activity = '%s' % self.editActivity.text()
-      comments = '%s' % self.editComments.text()
+      company  = '%s' % self.fields['company'].text()
+      artist   = '%s' % self.fields['artist'].text()
+      activity = '%s' % self.fields['activity'].text()
+      comments = '%s' % self.fields['comments'].text()
       font     = '%s' % self.editFont.text()
       date     = time.strftime('%y%m%d')
 
@@ -1520,14 +1523,14 @@ Add this options to temporary image saving.')
       cmd = 'makemovie.py'
       cmd = os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
       cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
-      cmd += ' -c "%s"' % getComboBoxString( self.cbCodec)
-      cmd += ' -f %s' % self.cbFPS.currentText()
-      cmd += ' -n %s' % self.cbContainer.currentText()
-      cmd += ' --fs %d' % self.sbFrameFirst.value()
+      cmd += ' -c "%s"' % getComboBoxString( self.fields['codec'])
+      cmd += ' -f %s' % self.fields['fps'].currentText()
+      cmd += ' -n %s' % self.fields['container'].currentText()
+      cmd += ' --fs %d' % self.fields['framestart'].value()
       cmd += ' --fe %d' % self.sbFrameLast.value()
-      format = getComboBoxString( self.cbFormat)
+      format = getComboBoxString( self.fields['format'])
       if format != '':
-         if self.cFFFirst.isChecked(): cmd += ' --fff'
+         if self.fields['fffirst'].isChecked(): cmd += ' --fffirst'
          ts = self.cbTemplateS.currentText()
          tf = self.cbTemplateF.currentText()
          cmd += ' -r %s' % format
@@ -1642,7 +1645,7 @@ Add this options to temporary image saving.')
          if job.send():
             self.cmdField.setText('Afanasy job was successfully sent.')
             if self.decode and self.decodeEncode.isChecked():
-               self.editInputFiles.setText( self.decodeOutputAbs.text())
+               self.fields['input0'].setText( self.decodeOutputAbs.text())
          else:
             self.cmdField.setText('Unable to send job to Afanasy server.')
       else:
@@ -1673,7 +1676,7 @@ Add this options to temporary image saving.')
       self.cmdField.setText('Finished.')
       if self.decode and self.decodeEncode.isChecked():
          self.decodeEnable.setChecked( False)
-         self.editInputFiles.setText( self.decodeOutputAbs.text())
+         self.fields['input0'].setText( self.decodeOutputAbs.text())
          self.inputFileChanged()
 
    def processoutput( self):
