@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "../libafanasy/msgclasses/mcgeneral.h"
-#include "../libafanasy/DlScopeLocker.h"
+#include "../libafanasy/dlScopeLocker.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT

@@ -1,5 +1,7 @@
 #include "filedata.h"
 
+#include <string.h>
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

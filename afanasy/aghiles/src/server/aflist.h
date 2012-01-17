@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../libafanasy/afnode.h"
-#include "../libafanasy/DlRWLock.h"
+#include "../libafanasy/dlRWLock.h"
 
 class AfListIt;
 class AfContainer;
