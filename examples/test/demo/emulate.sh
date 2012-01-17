@@ -1,5 +1,12 @@
 #!/bin/bash
 
+if [ "$1" == "-h" ]; then
+   echo "Usage:"
+   echo "-c                Cleanup mode."
+   echo "--nocmdpost       Skip post command."
+   exit 0
+fi;
+
 for arg in "$@"; do
    [ $arg == "--nocmdpost" ] && nocmdpost=1
 done
@@ -11,7 +18,7 @@ sleep_sec=$1
 cleanup=0
 
 # Cleanup argument check:
-if [ "$1" == "c" ]; then
+if [ "$1" == "-c" ]; then
    echo "Cleanup mode:"
    cleanup=1
 fi
