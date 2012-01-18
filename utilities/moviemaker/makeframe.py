@@ -31,7 +31,7 @@ Parser.add_option('-g', '--gamma',      dest='gamma',          type  ='float',  
 Parser.add_option('-q', '--quality',    dest='quality',        type  ='string',     default='',          help='Output image quality')
 Parser.add_option('--noautocorr',       dest='noautocorr',     action='store_true', default=False,       help='Disable auto color correction for Cineon and EXR')
 Parser.add_option('--correction',       dest='correction',     type  ='string',     default='',          help='Add custom color correction parameters')
-Parser.add_option('--stereo',           dest='stereo',         action='store_true', default=False,       help='Stereo mode')
+Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Stereo dublicate mode')
 Parser.add_option('--drawcolorbars',    dest='drawcolorbars',  action='store_true', default=False,       help='Draw file name')
 Parser.add_option('--cacher_aspect',    dest='cacher_aspect',  type  ='float',      default=1.85,        help='Cacher aspect')
 Parser.add_option('--cacher_opacity',   dest='cacher_opacity', type  ='int',        default=0,           help='Cacher opacity')
@@ -54,7 +54,7 @@ if len(args) > 3: Parser.error('Too many arguments provided.')
 FILEIN1        = ''
 FILEIN2        = ''
 FileOut        = args[0]
-Stereo         = Options.stereo
+Stereo         = Options.stereodub
 if len(args) == 2:
    FILEIN1     = args[0]
    FileOut     = args[1]

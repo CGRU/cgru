@@ -91,7 +91,7 @@ Parser.add_option('--draw235',          dest='draw235',        type  ='int',    
 Parser.add_option('--line169',          dest='line169',        type  ='string',     default='',          help='Draw 16:9 line color: "255,255,0"')
 Parser.add_option('--line235',          dest='line235',        type  ='string',     default='',          help='Draw 2.35 line color: "255,255,0"')
 Parser.add_option('--createoutdir',     dest='createoutdir',   action='store_true', default=False,       help='Create output folder if it not exists')
-Parser.add_option('--stereo',           dest='stereo',         action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
+Parser.add_option('--stereodub',        dest='stereodub',      action='store_true', default=False,       help='Force stereo mode, if only one sequence provided')
 
 (Options, args) = Parser.parse_args()
 
@@ -105,7 +105,7 @@ LOGOSDIR   = os.path.join( MOVIEMAKER, 'logos')
 Inpattern1 = args[0]
 Inpattern2 = ''
 Output     = args[1]
-Stereo = Options.stereo
+Stereo = Options.stereodub
 if len(args) > 2:
    Inpattern2 = args[1]
    Output     = args[2]
@@ -388,7 +388,7 @@ if Options.cacher_opacity > 0:
 if Options.line_color != '':
    cmd_args += ' --line_aspect %f' % Options.line_aspect
    cmd_args += ' --line_color "%s"' % Options.line_color
-if Stereo: cmd_args += ' --stereo'
+if Stereo: cmd_args += ' --stereodub'
 cmd_args += ' -d "%s"' % datetimestring
 cmd_args += ' -m "%s"' % os.path.basename(Output)
 
