@@ -104,11 +104,28 @@ except: errorExit('Scene open error:\n' + str(sys.exc_info()[1]), True)
 writenode = nuke.toNode( xnode)
 if writenode is None: errorExit('Node "%s" not founded.' % xnode, True)
 if writenode.Class() != 'Write': errorExit('Node "%s" class is not "Write".' % xnode, True)
+# Get file knob which can be a proxy:
+if nuke.toNode('root').knob('proxy').value(): fileknob = writenode['proxy']
+else: fileknob = writenode['file']
+# Get views and images folders:
+imagesdirs = []
+views = []
+views_num = 1
 try:
-   if nuke.toNode('root').knob('proxy').value():
-      fileknob = writenode['proxy']
-   else:
-      fileknob = writenode['file']
+   views_str = writenode['views'].value()
+   print('Views = "%s"' % views_str)
+   views = views_str.split(' ')
+   views_num = len(views)
+   for view in views:
+      view = view.strip()
+      if view != '':
+         octx = nuke.OutputContext()
+         octx.setView( 1 + nuke.views().index( view))
+         imagesdirs.append( os.path.dirname( fileknob.getEvaluatedValue( octx)))
+except:
+   errorExit('Can`t process views on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
+# Change render forder to temporary:
+try:
    filepath   = fileknob.value()
    # Nuke paths has only unix slashes, even on MS Windows platform
    if sys.platform.find('win') == 0:
@@ -121,30 +138,8 @@ try:
       tmppath = tmppath.replace('\\','/')
    fileknob.setValue( tmppath)
 except:
-   errorExit('Write node file operations error:\n' + str(sys.exc_info()[1]), True)
+   errorExit('File operations error on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
 
-# Get views and images folders:
-imagesdirs = []
-views = []
-views_num = 1
-try:
-   views_str = writenode.knob('views').value()
-   print('Views = "%s"' % views_str)
-   views = views_str.split(' ')
-   views_num = len(views)
-   for view in views:
-      view = view.strip()
-      if view != '':
-         img = imagesdir
-         img = img.replace('%V', view)
-         img = img.replace('%v', view[0])
-         imagesdirs.append( img)
-except:
-   views_num = 1
-   imagesdirs.append( imagesdir)
-   views.append('main')
-   print(str(sys.exc_info()[1]))
-if views_num < 1: views_num = 1
 print('Number of views = %d' % views_num)
 
 # Render frames cycle:
