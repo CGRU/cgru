@@ -39,9 +39,7 @@ AfQueue::AfQueue( const std::string &i_QueueName ):
       perror( "sem_open() failing in AfQueue ctor" );
       return;
    }
-#endif
-
-#if defined(LINUX)
+#elif defined(LINUX)
    semcount_ptr = &semcount;
    if( sem_init( semcount_ptr, 0, 0) != 0)
    {
@@ -83,6 +81,9 @@ AfQueue::~AfQueue()
    sem_close( semcount_ptr );
 
    m_mutex.Unlock();
+
+   m_thread.Cancel();
+   m_thread.Join();
 }
 
 void AfQueue::lock()
@@ -133,7 +134,6 @@ bool AfQueue::push( AfQueueItem* item, bool i_front )
 
    AFINFA("Msg* AfQueue::push: item=%p, count=%d", iteueuem, count);
 
-   m_thread.Cancel();
    return true;
 }
 
@@ -181,9 +181,10 @@ AfQueueItem* AfQueue::pop( WaitMode i_mode )
 */
 void AfQueue::run()
 {
+   AFINFA( "Queue '%s' just came to life!", name.c_str() );
+
    while( running )
    {
-      fprintf( stderr, "Queue '%s' is alive !\n", name.c_str() );
 
       AfQueueItem * item = pop( e_wait );
 
@@ -203,6 +204,6 @@ void AfQueue::run()
       */
       m_thread.TestCancel();
    }
-
-   AFINFO("AfQueue::run: finished.")
+   
+   AFINFA("AfQueue::run is finished for queue '%s'.", name.c_str() )
 }
