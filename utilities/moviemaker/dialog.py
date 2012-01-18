@@ -431,32 +431,33 @@ Input file identification.')
       grouplayout.addLayout( lIdentify)
 
 
-      gOutputSettings = QtGui.QGroupBox('Output File')
-      lOutputSettings = QtGui.QVBoxLayout()
-      gOutputSettings.setLayout( lOutputSettings)
+      group = QtGui.QGroupBox('Output File')
+      grouplayout = QtGui.QVBoxLayout()
+      group.setLayout( grouplayout)
+      generallayout.addWidget( group)
 
-      lOutputName = QtGui.QHBoxLayout()
-      tOutputName = QtGui.QLabel('Name:', self)
-      tOutputName.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Name:', self)
+      label.setToolTip('\
 Result movie name.\n\
 Extension will be added according to video stream container.\n\
 It is configuted in codec preset files.')
-      lOutputName.addWidget( tOutputName)
-      self.editOutputName = QtGui.QLineEdit( self)
-      lOutputName.addWidget( self.editOutputName)
-      QtCore.QObject.connect( self.editOutputName, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cAutoOutputName = QtGui.QCheckBox('Rule:', self)
-      self.cAutoOutputName.setChecked( True)
-      self.cAutoOutputName.setToolTip('\
+      layout.addWidget( label)
+      self.fields['outputname'] = QtGui.QLineEdit( self)
+      layout.addWidget( self.fields['outputname'])
+      QtCore.QObject.connect( self.fields['outputname'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['usenamerule'] = QtGui.QCheckBox('Rule:', self)
+      self.fields['usenamerule'].setChecked( True)
+      self.fields['usenamerule'].setToolTip('\
 Use Naming Rule.')
-      QtCore.QObject.connect( self.cAutoOutputName, QtCore.SIGNAL('stateChanged(int)'), self.autoOutputName)
-      lOutputName.addWidget( self.cAutoOutputName)
+      QtCore.QObject.connect( self.fields['usenamerule'], QtCore.SIGNAL('stateChanged(int)'), self.autoOutputName)
+      layout.addWidget( self.fields['usenamerule'])
       naming = Options.naming
       if naming == '': naming = Namings[0]
-      self.editNaming = QtGui.QLineEdit( naming, self)
-      QtCore.QObject.connect( self.editNaming, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.editNaming.setMaximumWidth(150)
-      lOutputName.addWidget( self.editNaming)
+      self.fields['namerule'] = QtGui.QLineEdit( naming, self)
+      QtCore.QObject.connect( self.fields['namerule'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['namerule'].setMaximumWidth(150)
+      layout.addWidget( self.fields['namerule'])
       self.cbNaming = QtGui.QComboBox( self)
       i = 0
       for rule in Namings:
@@ -465,196 +466,190 @@ Use Naming Rule.')
          i += 1
       self.cbNaming.setMaximumWidth(120)
       QtCore.QObject.connect( self.cbNaming, QtCore.SIGNAL('currentIndexChanged(int)'), self.namingChanged)
-      lOutputName.addWidget( self.cbNaming)
-      lOutputSettings.addLayout( lOutputName)
+      layout.addWidget( self.cbNaming)
+      grouplayout.addLayout( layout)
 
-      lOutputDir = QtGui.QHBoxLayout()
-      tOutputDir = QtGui.QLabel('Folder:', self)
-      tOutputDir.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Folder:', self)
+      label.setToolTip('\
 Result movie will be placed in this directory.')
-      lOutputDir.addWidget( tOutputDir)
-      self.editOutputDir = QtGui.QLineEdit( self)
-      QtCore.QObject.connect( self.editOutputDir, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      lOutputDir.addWidget( self.editOutputDir)
+      layout.addWidget( label)
+      self.fields['outputfolder'] = QtGui.QLineEdit( self)
+      QtCore.QObject.connect( self.fields['outputfolder'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout.addWidget( self.fields['outputfolder'])
       self.btnBrowseOutputDir = QtGui.QPushButton('Browse', self)
       QtCore.QObject.connect( self.btnBrowseOutputDir, QtCore.SIGNAL('pressed()'), self.browseOutputFolder)
-      lOutputDir.addWidget( self.btnBrowseOutputDir)
-      lOutputSettings.addLayout( lOutputDir)
-
-      generallayout.addWidget( gOutputSettings)
+      layout.addWidget( self.btnBrowseOutputDir)
+      grouplayout.addLayout( layout)
 
 
       # Drawing:
 
-      lTemplates = QtGui.QHBoxLayout()
-      tTemplateS = QtGui.QLabel('Slate Template:', self)
-      tTemplateS.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Slate Template:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Slate frame template.\n\
 Templates are located in\n\
 ' + TemplatesPath)
-      tTemplateF = QtGui.QLabel('Frame Template:', self)
-      tTemplateF.setToolTip('\
+      self.fields['slate'] = QtGui.QComboBox( self)
+      layout.addWidget( self.fields['slate'])
+      label = QtGui.QLabel('Frame Template:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Frame template.\n\
 Templates are located in\n\
 ' + TemplatesPath)
-      self.cbTemplateS = QtGui.QComboBox( self)
-      self.cbTemplateF = QtGui.QComboBox( self)
+      self.fields['template'] = QtGui.QComboBox( self)
+      layout.addWidget( self.fields['template'])
       for template in Templates:
-         self.cbTemplateS.addItem(template)
-         self.cbTemplateF.addItem(template)
-      self.cbTemplateS.setCurrentIndex( TemplateS)
-      self.cbTemplateF.setCurrentIndex( TemplateF)
-      QtCore.QObject.connect( self.cbTemplateS, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      QtCore.QObject.connect( self.cbTemplateF, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      lTemplates.addWidget( tTemplateS)
-      lTemplates.addWidget( self.cbTemplateS)
-      lTemplates.addWidget( tTemplateF)
-      lTemplates.addWidget( self.cbTemplateF)
-      drawinglayout.addLayout( lTemplates)
+         self.fields['slate'].addItem(template)
+         self.fields['template'].addItem(template)
+      self.fields['slate'].setCurrentIndex( TemplateS)
+      self.fields['template'].setCurrentIndex( TemplateF)
+      QtCore.QObject.connect( self.fields['slate'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      QtCore.QObject.connect( self.fields['template'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      drawinglayout.addLayout( layout)
 
-      self.cTime = QtGui.QCheckBox('Add Time To Date', self)
-      self.cTime.setChecked( False)
-      QtCore.QObject.connect( self.cTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      drawinglayout.addWidget( self.cTime)
+      self.fields['addtime'] = QtGui.QCheckBox('Add Time To Date', self)
+      self.fields['addtime'].setChecked( False)
+      QtCore.QObject.connect( self.fields['addtime'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      drawinglayout.addWidget( self.fields['addtime'])
 
-      lCacher = QtGui.QHBoxLayout()
-      lCacher.addWidget( QtGui.QLabel('Cacher Aspect:', self))
-      self.dsbCacherAspect = QtGui.QDoubleSpinBox( self)
-      self.dsbCacherAspect.setRange( 0.1, 10.0)
-      self.dsbCacherAspect.setDecimals( 6)
-      self.dsbCacherAspect.setValue( Options.cacher_aspect)
-      QtCore.QObject.connect( self.dsbCacherAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      lCacher.addWidget( self.dsbCacherAspect)
-      lCacher.addWidget( QtGui.QLabel('Cacher Opacity:', self))
-      self.cbCacherOpacity = QtGui.QComboBox( self)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Cacher Aspect:', self))
+      self.fields['cacher_aspect'] = QtGui.QDoubleSpinBox( self)
+      self.fields['cacher_aspect'].setRange( 0.1, 10.0)
+      self.fields['cacher_aspect'].setDecimals( 6)
+      self.fields['cacher_aspect'].setValue( Options.cacher_aspect)
+      QtCore.QObject.connect( self.fields['cacher_aspect'], QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      layout.addWidget( self.fields['cacher_aspect'])
+      layout.addWidget( QtGui.QLabel('Cacher Opacity:', self))
+      self.fields['cacher_opacity'] = QtGui.QComboBox( self)
       i = 0
       for cacher in CacherNames:
-         self.cbCacherOpacity.addItem( cacher, CacherValues[i])
-         if CacherValues[i] == str(Options.cacher_opacity): self.cbCacherOpacity.setCurrentIndex( i)
+         self.fields['cacher_opacity'].addItem( cacher, CacherValues[i])
+         if CacherValues[i] == str(Options.cacher_opacity): self.fields['cacher_opacity'].setCurrentIndex( i)
          i += 1
-      QtCore.QObject.connect( self.cbCacherOpacity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      lCacher.addWidget( self.cbCacherOpacity)
-      drawinglayout.addLayout( lCacher)
+      QtCore.QObject.connect( self.fields['cacher_opacity'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['cacher_opacity'])
+      drawinglayout.addLayout( layout)
 
-      lCacherLine = QtGui.QHBoxLayout()
-      lCacherLine.addWidget( QtGui.QLabel('Cacher Line Aspect:', self))
-      self.dsbCacherLineAspect = QtGui.QDoubleSpinBox( self)
-      self.dsbCacherLineAspect.setRange( 0.1, 10.0)
-      self.dsbCacherLineAspect.setDecimals( 6)
-      self.dsbCacherLineAspect.setValue( Options.line_aspect)
-      QtCore.QObject.connect( self.dsbCacherLineAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      lCacherLine.addWidget( self.dsbCacherLineAspect)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Cacher Line Aspect:', self))
+      self.fields['line_aspect'] = QtGui.QDoubleSpinBox( self)
+      self.fields['line_aspect'].setRange( 0.1, 10.0)
+      self.fields['line_aspect'].setDecimals( 6)
+      self.fields['line_aspect'].setValue( Options.line_aspect)
+      QtCore.QObject.connect( self.fields['line_aspect'], QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      layout.addWidget( self.fields['line_aspect'])
       tCacherLine = QtGui.QLabel('Cacher Line Color:', self)
       tCacherLine.setToolTip('\
 Example "255,255,0" - yellow.')
-      lCacherLine.addWidget( tCacherLine)
-      self.editCacherLine = QtGui.QLineEdit( Options.line_color, self)
-      QtCore.QObject.connect( self.editCacherLine, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      lCacherLine.addWidget( self.editCacherLine)
-      drawinglayout.addLayout( lCacherLine)
+      layout.addWidget( tCacherLine)
+      self.fields['line_color'] = QtGui.QLineEdit( Options.line_color, self)
+      QtCore.QObject.connect( self.fields['line_color'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout.addWidget( self.fields['line_color'])
+      drawinglayout.addLayout( layout)
 
-      lCacher169235 = QtGui.QHBoxLayout()
-      tCacher169 = QtGui.QLabel('16:9 Cacher:', self)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('16:9 Cacher:', self))
       self.cbCacher169 = QtGui.QComboBox( self)
+      layout.addWidget( self.cbCacher169)
       i = 0
       for cacher in CacherNames:
          self.cbCacher169.addItem( cacher, CacherValues[i])
          if CacherValues[i] == str(Options.draw169): self.cbCacher169.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCacher169, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      tCacher235 = QtGui.QLabel('2.35 Cacher:', self)
+      layout.addWidget( QtGui.QLabel('2.35 Cacher:', self))
       self.cbCacher235 = QtGui.QComboBox( self)
+      layout.addWidget( self.cbCacher235)
       i = 0
       for cacher in CacherNames:
          self.cbCacher235.addItem( cacher, CacherValues[i])
          if CacherValues[i] == str(Options.draw235): self.cbCacher235.setCurrentIndex( i)
          i += 1
       QtCore.QObject.connect( self.cbCacher235, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      lCacher169235.addWidget( tCacher169)
-      lCacher169235.addWidget( self.cbCacher169)
-      lCacher169235.addWidget( tCacher235)
-      lCacher169235.addWidget( self.cbCacher235)
-      drawinglayout.addLayout( lCacher169235)
+      drawinglayout.addLayout( layout)
 
-      lLines = QtGui.QHBoxLayout()
-      tLine169 = QtGui.QLabel('Line 16:9 Color:', self)
-      tLine169.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Line 16:9 Color:', self)
+      label.setToolTip('\
 Example "255,255,0" - yellow.')
-      lLines.addWidget( tLine169)
-      self.editLine169 = QtGui.QLineEdit( Options.line169, self)
-      lLines.addWidget( self.editLine169)
-      QtCore.QObject.connect( self.editLine169, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      tLine235 = QtGui.QLabel('Line 2.35 Color:', self)
-      tLine235.setToolTip('\
+      layout.addWidget( label)
+      self.fields['line169'] = QtGui.QLineEdit( Options.line169, self)
+      layout.addWidget( self.fields['line169'])
+      QtCore.QObject.connect( self.fields['line169'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      label = QtGui.QLabel('Line 2.35 Color:', self)
+      label.setToolTip('\
 Example "255,255,0" - yellow.')
-      lLines.addWidget( tLine235)
-      self.editLine235 = QtGui.QLineEdit( Options.line235, self)
-      lLines.addWidget( self.editLine235)
-      QtCore.QObject.connect( self.editLine235, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      drawinglayout.addLayout( lLines)
+      layout.addWidget( label)
+      self.fields['line235'] = QtGui.QLineEdit( Options.line235, self)
+      layout.addWidget( self.fields['line235'])
+      QtCore.QObject.connect( self.fields['line235'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      drawinglayout.addLayout( layout)
 
       # Logos:
       # Slate logo:
-      lLgs = QtGui.QHBoxLayout()
-      lLgs.addWidget( QtGui.QLabel('Slate Logo:', self))
-      self.editLgsPath = QtGui.QLineEdit( Options.lgspath, self)
-      lLgs.addWidget( self.editLgsPath)
-      QtCore.QObject.connect( self.editLgsPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Slate Logo:', self))
+      self.fields['lgspath'] = QtGui.QLineEdit( Options.lgspath, self)
+      layout.addWidget( self.fields['lgspath'])
+      QtCore.QObject.connect( self.fields['lgspath'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.btnBrowseLgs = QtGui.QPushButton('Browse', self)
       QtCore.QObject.connect( self.btnBrowseLgs, QtCore.SIGNAL('pressed()'), self.browseLgs)
-      lLgs.addWidget( self.btnBrowseLgs)
-      self.tLgsSize = QtGui.QLabel('Size:', self)
-      lLgs.addWidget( self.tLgsSize)
-      self.sbLgsSize = QtGui.QSpinBox( self)
-      self.sbLgsSize.setRange( 1, 100)
-      self.sbLgsSize.setValue( Options.lgssize)
-      QtCore.QObject.connect( self.sbLgsSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lLgs.addWidget( self.sbLgsSize)
-      tLgsGravity = QtGui.QLabel('%  Position:', self)
-      lLgs.addWidget( tLgsGravity)
-      self.cbLgsGravity = QtGui.QComboBox( self)
+      layout.addWidget( self.btnBrowseLgs)
+      layout.addWidget( QtGui.QLabel('Size:', self))
+      self.fields['lgssize'] = QtGui.QSpinBox( self)
+      self.fields['lgssize'].setRange( 1, 100)
+      self.fields['lgssize'].setValue( Options.lgssize)
+      QtCore.QObject.connect( self.fields['lgssize'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['lgssize'])
+      layout.addWidget( QtGui.QLabel('%  Position:', self))
+      self.fields['lgsgrav'] = QtGui.QComboBox( self)
       i = 0
       for grav in Gravity:
-         self.cbLgsGravity.addItem( grav)
-         if grav.lower() == Options.lgsgrav: self.cbLgsGravity.setCurrentIndex( i)
+         self.fields['lgsgrav'].addItem( grav)
+         if grav.lower() == Options.lgsgrav: self.fields['lgsgrav'].setCurrentIndex( i)
          i += 1
-      lLgs.addWidget( self.cbLgsGravity)
-      QtCore.QObject.connect( self.cbLgsGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      drawinglayout.addLayout( lLgs)
+      layout.addWidget( self.fields['lgsgrav'])
+      QtCore.QObject.connect( self.fields['lgsgrav'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      drawinglayout.addLayout( layout)
 
       # Frame logo:
-      lLgf = QtGui.QHBoxLayout()
-      lLgf.addWidget( QtGui.QLabel('Frame Logo:', self))
-      self.editLgfPath = QtGui.QLineEdit( Options.lgfpath, self)
-      lLgf.addWidget( self.editLgfPath)
-      QtCore.QObject.connect( self.editLgfPath, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Frame Logo:', self))
+      self.fields['lgfpath'] = QtGui.QLineEdit( Options.lgfpath, self)
+      layout.addWidget( self.fields['lgfpath'])
+      QtCore.QObject.connect( self.fields['lgfpath'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.btnBrowseLgf = QtGui.QPushButton('Browse', self)
       QtCore.QObject.connect( self.btnBrowseLgf, QtCore.SIGNAL('pressed()'), self.browseLgf)
-      lLgf.addWidget( self.btnBrowseLgf)
-      lLgf.addWidget( QtGui.QLabel('Size:', self))
-      self.sbLgfSize = QtGui.QSpinBox( self)
-      self.sbLgfSize.setRange( 1, 100)
-      self.sbLgfSize.setValue( Options.lgfsize)
-      QtCore.QObject.connect( self.sbLgfSize, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lLgf.addWidget( self.sbLgfSize)
-      lLgf.addWidget( QtGui.QLabel('%  Position:', self))
-      self.cbLgfGravity = QtGui.QComboBox( self)
+      layout.addWidget( self.btnBrowseLgf)
+      layout.addWidget( QtGui.QLabel('Size:', self))
+      self.fields['lgfsize'] = QtGui.QSpinBox( self)
+      self.fields['lgfsize'].setRange( 1, 100)
+      self.fields['lgfsize'].setValue( Options.lgfsize)
+      QtCore.QObject.connect( self.fields['lgfsize'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      layout.addWidget( self.fields['lgfsize'])
+      layout.addWidget( QtGui.QLabel('%  Position:', self))
+      self.fields['lgfgrav'] = QtGui.QComboBox( self)
       i = 0
       for grav in Gravity:
-         self.cbLgfGravity.addItem( grav)
-         if grav.lower() == Options.lgfgrav: self.cbLgfGravity.setCurrentIndex( i)
+         self.fields['lgfgrav'].addItem( grav)
+         if grav.lower() == Options.lgfgrav: self.fields['lgfgrav'].setCurrentIndex( i)
          i += 1
-      lLgf.addWidget( self.cbLgfGravity)
-      QtCore.QObject.connect( self.cbLgfGravity, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      drawinglayout.addLayout( lLgf)
+      layout.addWidget( self.fields['lgfgrav'])
+      QtCore.QObject.connect( self.fields['lgfgrav'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      drawinglayout.addLayout( layout)
 
       # Font:
       lFont = QtGui.QHBoxLayout()
       tFont = QtGui.QLabel('Annotations Text Font:', self)
       lFont.addWidget( tFont)
-      self.editFont = QtGui.QLineEdit('', self)
-      lFont.addWidget( self.editFont)
-      QtCore.QObject.connect( self.editFont, QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['font'] = QtGui.QLineEdit('', self)
+      lFont.addWidget( self.fields['font'])
+      QtCore.QObject.connect( self.fields['font'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
       self.cbFont = QtGui.QComboBox( self)
       for font in FontsList: self.cbFont.addItem( font)
       lFont.addWidget( self.cbFont)
@@ -665,123 +660,119 @@ Example "255,255,0" - yellow.')
       # Parameters
 
       # Image Aspect:
-      gAspect = QtGui.QGroupBox('Aspect')
-      glAspect = QtGui.QVBoxLayout()
-      gAspect.setLayout( glAspect)
+      group = QtGui.QGroupBox('Aspect')
+      parameterslayout.addWidget( group)
+      grouplayout = QtGui.QVBoxLayout()
+      group.setLayout( grouplayout)
 
-      lAspectIn = QtGui.QHBoxLayout()
-      lAspectIn.addWidget( QtGui.QLabel('Input Images Aspect', self))
-      self.dsbAspectIn = QtGui.QDoubleSpinBox( self)
-      self.dsbAspectIn.setRange( -1.0, 10.0)
-      self.dsbAspectIn.setDecimals( 6)
-      self.dsbAspectIn.setValue( Options.aspect_in)
-      QtCore.QObject.connect( self.dsbAspectIn, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      lAspectIn.addWidget( self.dsbAspectIn)
-      lAspectIn.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
-      glAspect.addLayout( lAspectIn)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Input Images Aspect', self))
+      self.fields['aspect_in'] = QtGui.QDoubleSpinBox( self)
+      self.fields['aspect_in'].setRange( -1.0, 10.0)
+      self.fields['aspect_in'].setDecimals( 6)
+      self.fields['aspect_in'].setValue( Options.aspect_in)
+      QtCore.QObject.connect( self.fields['aspect_in'], QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      layout.addWidget( self.fields['aspect_in'])
+      layout.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
+      grouplayout.addLayout( layout)
 
-      lAutoAspect = QtGui.QHBoxLayout()
-      tAutoAspect = QtGui.QLabel('Auto Input Aspect', self)
-      tAutoAspect.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Auto Input Aspect', self)
+      label.setToolTip('\
 Images with width/height ratio > this value will be treated as 2:1.')
-      lAutoAspect.addWidget( tAutoAspect)
-      self.dsbAutoAspect = QtGui.QDoubleSpinBox( self)
-      self.dsbAutoAspect.setRange( -1.0, 10.0)
-      self.dsbAutoAspect.setDecimals( 3)
-      self.dsbAutoAspect.setValue( Options.aspect_auto)
-      QtCore.QObject.connect( self.dsbAutoAspect, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      lAutoAspect.addWidget( self.dsbAutoAspect)
-      lAutoAspect.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
-      glAspect.addLayout( lAutoAspect)
+      layout.addWidget( label)
+      self.fields['aspect_auto'] = QtGui.QDoubleSpinBox( self)
+      self.fields['aspect_auto'].setRange( -1.0, 10.0)
+      self.fields['aspect_auto'].setDecimals( 3)
+      self.fields['aspect_auto'].setValue( Options.aspect_auto)
+      QtCore.QObject.connect( self.fields['aspect_auto'], QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      layout.addWidget( self.fields['aspect_auto'])
+      layout.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
+      grouplayout.addLayout( layout)
 
-      lAspectOut = QtGui.QHBoxLayout()
-      lAspectOut.addWidget( QtGui.QLabel('Output Movie Aspect', self))
-      self.dsbAspectOut = QtGui.QDoubleSpinBox( self)
-      self.dsbAspectOut.setRange( -1.0, 10.0)
-      self.dsbAspectOut.setDecimals( 6)
-      self.dsbAspectOut.setValue( Options.aspect_out)
-      QtCore.QObject.connect( self.dsbAspectOut, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      lAspectOut.addWidget( self.dsbAspectOut)
-      lAspectOut.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
-      glAspect.addLayout( lAspectOut)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Output Movie Aspect', self))
+      self.fields['aspect_out'] = QtGui.QDoubleSpinBox( self)
+      self.fields['aspect_out'].setRange( -1.0, 10.0)
+      self.fields['aspect_out'].setDecimals( 6)
+      self.fields['aspect_out'].setValue( Options.aspect_out)
+      QtCore.QObject.connect( self.fields['aspect_out'], QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      layout.addWidget( self.fields['aspect_out'])
+      layout.addWidget( QtGui.QLabel(' (-1 = no changes) ', self))
+      grouplayout.addLayout( layout)
 
-      parameterslayout.addWidget( gAspect)
 
       # Image Correction:
-      gCorrectionSettings = QtGui.QGroupBox('Image Correction')
-      lCorr = QtGui.QHBoxLayout()
-      gCorrectionSettings.setLayout( lCorr)
+      group = QtGui.QGroupBox('Image Correction')
+      grouplayout = QtGui.QHBoxLayout()
+      group.setLayout( grouplayout)
+      parameterslayout.addWidget( group)
 
-      self.cCorrAuto = QtGui.QCheckBox('Auto Colorspace', self)
-      self.cCorrAuto.setToolTip('\
+      self.fields['autocolorspace'] = QtGui.QCheckBox('Auto Colorspace', self)
+      self.fields['autocolorspace'].setToolTip('\
 Automatically convert colors of Linear(EXR) and Cineon(dpx,cin) images to sRGB.')
-      self.cCorrAuto.setChecked( not Options.noautocorr)
-      QtCore.QObject.connect( self.cCorrAuto, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      lCorr.addWidget( self.cCorrAuto)
+      self.fields['autocolorspace'].setChecked( not Options.noautocorr)
+      QtCore.QObject.connect( self.fields['autocolorspace'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      grouplayout.addWidget( self.fields['autocolorspace'])
 
-      lCorrGamma = QtGui.QHBoxLayout()
-      tCorrGamma = QtGui.QLabel('Gamma:', self)
-      self.dsbCorrGamma = QtGui.QDoubleSpinBox( self)
-      self.dsbCorrGamma.setRange( 0.1, 10.0)
-      self.dsbCorrGamma.setDecimals( 1)
-      self.dsbCorrGamma.setSingleStep( 0.1)
-      self.dsbCorrGamma.setValue( 1.0)
-      QtCore.QObject.connect( self.dsbCorrGamma, QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
-      lCorrGamma.addWidget( tCorrGamma)
-      lCorrGamma.addWidget( self.dsbCorrGamma)
-      lCorr.addLayout( lCorrGamma)
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Gamma:', self))
+      self.fields['gamma'] = QtGui.QDoubleSpinBox( self)
+      self.fields['gamma'].setRange( 0.1, 10.0)
+      self.fields['gamma'].setDecimals( 1)
+      self.fields['gamma'].setSingleStep( 0.1)
+      self.fields['gamma'].setValue( 1.0)
+      QtCore.QObject.connect( self.fields['gamma'], QtCore.SIGNAL('valueChanged(double)'), self.evaluate)
+      layout.addWidget( self.fields['gamma'])
+      grouplayout.addLayout( layout)
 
-      lCorrAux = QtGui.QHBoxLayout()
-      tCorrAux = QtGui.QLabel('Custom Options:', self)
-      tCorrAux.setToolTip('\
+      layout = QtGui.QHBoxLayout()
+      label = QtGui.QLabel('Custom Options:', self)
+      layout.addWidget( label)
+      label.setToolTip('\
 Add this options to convert command.')
-      self.eCorrAux = QtGui.QLineEdit( Options.correction, self)
-      QtCore.QObject.connect( self.eCorrAux, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      lCorrAux.addWidget( tCorrAux)
-      lCorrAux.addWidget( self.eCorrAux)
-      lCorr.addLayout( lCorrAux)
-
-      parameterslayout.addWidget( gCorrectionSettings)
+      self.fields['correction'] = QtGui.QLineEdit( Options.correction, self)
+      QtCore.QObject.connect( self.fields['correction'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      layout.addWidget( self.fields['correction'])
+      grouplayout.addLayout( layout)
 
 
       # Temporary format options:
-      gTempFormat = QtGui.QGroupBox('Intermediate Images')
-      lTempFormat = QtGui.QHBoxLayout()
-      gTempFormat.setLayout( lTempFormat)
+      group = QtGui.QGroupBox('Intermediate Images')
+      parameterslayout.addWidget( group)
+      grouplayout = QtGui.QHBoxLayout()
+      group.setLayout( grouplayout)
 
-      tTempFormat = QtGui.QLabel('Format:', self)
-      self.cbTempFormat = QtGui.QComboBox( self)
+      grouplayout.addWidget( QtGui.QLabel('Format:', self))
+      self.fields['tmpformat'] = QtGui.QComboBox( self)
       i = 0
       for format in TmpImgFormats:
-         self.cbTempFormat.addItem( format)
-         if format == Options.tmpformat: self.cbTempFormat.setCurrentIndex( i)
+         self.fields['tmpformat'].addItem( format)
+         if format == Options.tmpformat: self.fields['tmpformat'].setCurrentIndex( i)
          i += 1
-      QtCore.QObject.connect( self.cbTempFormat, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
-      lTempFormat.addWidget( tTempFormat)
-      lTempFormat.addWidget( self.cbTempFormat)
+      QtCore.QObject.connect( self.fields['tmpformat'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      grouplayout.addWidget( self.fields['tmpformat'])
 
-      tTempFormatOptions = QtGui.QLabel('Quality Options:', self)
-      tTempFormatOptions.setToolTip('\
+      label = QtGui.QLabel('Quality Options:', self)
+      grouplayout.addWidget( label)
+      label.setToolTip('\
 Add this options to temporary image saving.')
-      self.eTempFormatOptions = QtGui.QLineEdit( Options.tmpquality, self)
-      QtCore.QObject.connect( self.eTempFormatOptions, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      lTempFormat.addWidget( tTempFormatOptions)
-      lTempFormat.addWidget( self.eTempFormatOptions)
-
-      parameterslayout.addWidget( gTempFormat)
+      self.fields['tmpquality'] = QtGui.QLineEdit( Options.tmpquality, self)
+      QtCore.QObject.connect( self.fields['tmpquality'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      grouplayout.addWidget( self.fields['tmpquality'])
 
 
       # Auto append output filename:
-      dateTimeLayout = QtGui.QHBoxLayout()
-      self.cDateOutput = QtGui.QCheckBox('Append Movie File Name With Date', self)
-      self.cDateOutput.setChecked( False)
-      dateTimeLayout.addWidget( self.cDateOutput)
-      QtCore.QObject.connect( self.cDateOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      self.cTimeOutput = QtGui.QCheckBox('Append Movie File Name With Time', self)
-      self.cTimeOutput.setChecked( False)
-      dateTimeLayout.addWidget( self.cTimeOutput)
-      parameterslayout.addLayout( dateTimeLayout)
-      QtCore.QObject.connect( self.cTimeOutput, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      layout = QtGui.QHBoxLayout()
+      parameterslayout.addLayout( layout)
+      self.fields['datesuffix'] = QtGui.QCheckBox('Append Movie File Name With Date', self)
+      self.fields['datesuffix'].setChecked( False)
+      layout.addWidget( self.fields['datesuffix'])
+      QtCore.QObject.connect( self.fields['datesuffix'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      self.fields['timesuffix'] = QtGui.QCheckBox('Append Movie File Name With Time', self)
+      self.fields['timesuffix'].setChecked( False)
+      layout.addWidget( self.fields['timesuffix'])
+      QtCore.QObject.connect( self.fields['timesuffix'], QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
 
 
       # Stereo:
@@ -1191,10 +1182,10 @@ Add this options to temporary image saving.')
       self.inputFileChanged2()
 
    def autoOutputName( self):
-      enable = not self.cAutoOutputName.isChecked()
-      self.editOutputName.setEnabled( enable)
+      enable = not self.fields['usenamerule'].isChecked()
+      self.fields['outputname'].setEnabled( enable)
       self.cbNaming.setEnabled( not enable)
-      self.editNaming.setEnabled( not enable)
+      self.fields['namerule'].setEnabled( not enable)
       self.evaluate()
 
    def autoTitles( self):
@@ -1208,38 +1199,38 @@ Add this options to temporary image saving.')
       self.evaluate()
 
    def namingChanged( self):
-      self.editNaming.setText( self.cbNaming.currentText())
+      self.fields['namerule'].setText( self.cbNaming.currentText())
       self.evaluate()
 
    def fontChanged( self):
-      self.editFont.setText( self.cbFont.currentText())
+      self.fields['font'].setText( self.cbFont.currentText())
       self.evaluate()
 
    def browseLgs( self):
       lgspath = LogosPath
-      oldlogo = '%s' % self.editLgsPath.text()
+      oldlogo = '%s' % self.fields['lgspath'].text()
       if oldlogo != '':
          dirname = os.path.dirname( oldlogo)
          if dirname != '': lgspath = dirname
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgspath)
       if len( afile):
-         self.editLgsPath.setText( '%s' % afile)
+         self.fields['lgspath'].setText( '%s' % afile)
          self.evaluate()
 
    def browseLgf( self):
       lgfpath = LogosPath
-      oldlogo = '%s' % self.editLgfPath.text()
+      oldlogo = '%s' % self.fields['lgfpath'].text()
       if oldlogo != '':
          dirname = os.path.dirname( oldlogo)
          if dirname != '': lgfpath = dirname
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgfpath)
       if len( afile):
-         self.editLgfPath.setText( '%s' % afile)
+         self.fields['lgfpath'].setText( '%s' % afile)
          self.evaluate()
 
    def browseOutputFolder( self):
-      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.editOutputDir.text()))
-      if len( folder): self.editOutputDir.setText( folder)
+      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.fields['outputfolder'].text()))
+      if len( folder): self.fields['outputfolder'].setText( folder)
 
    def browseInput( self):
       afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['input0'].text())
@@ -1432,8 +1423,8 @@ Add this options to temporary image saving.')
       self.decode = False
       self.cmdField.clear()
       
-      if not self.validateEditColor( str(self.editLine169.text()), 'line 16:9'): return
-      if not self.validateEditColor( str(self.editLine235.text()), 'line 2.35'): return
+      if not self.validateEditColor( str(self.fields['line169'].text()), 'line 16:9'): return
+      if not self.validateEditColor( str(self.fields['line235'].text()), 'line 2.35'): return
 
       if self.inputPattern is None:
          self.cmdField.setText('Specify input sequence.')
@@ -1449,8 +1440,8 @@ Add this options to temporary image saving.')
       self.StereoDuplicate = self.cStereoDuplicate.isChecked()
 
       if self.cAutoTitles.isChecked(): self.fields['shot'].clear()
-      if self.cAutoOutputName.isChecked():
-         self.editOutputName.clear()
+      if self.fields['usenamerule'].isChecked():
+         self.fields['outputname'].clear()
 
       project = '%s' % self.fields['project'].text()
       if Options.project == '':
@@ -1479,17 +1470,17 @@ Add this options to temporary image saving.')
       artist   = '%s' % self.fields['artist'].text()
       activity = '%s' % self.fields['activity'].text()
       comments = '%s' % self.fields['comments'].text()
-      font     = '%s' % self.editFont.text()
+      font     = '%s' % self.fields['font'].text()
       date     = time.strftime('%y%m%d')
 
-      outdir = '%s' % self.editOutputDir.text()
+      outdir = '%s' % self.fields['outputfolder'].text()
       if outdir == '':
          outdir = os.path.dirname( os.path.dirname( self.inputPattern))
-         self.editOutputDir.setText( outdir)
+         self.fields['outputfolder'].setText( outdir)
 
-      outname = '%s' % self.editOutputName.text()
-      if self.cAutoOutputName.isChecked() or outname == None or outname == '':
-         outname = '%s' % self.editNaming.text()
+      outname = '%s' % self.fields['outputname'].text()
+      if self.fields['usenamerule'].isChecked() or outname == None or outname == '':
+         outname = '%s' % self.fields['namerule'].text()
          outname = outname.replace('(p)', project)
          outname = outname.replace('(P)', project.upper())
          outname = outname.replace('(s)', shot)
@@ -1504,16 +1495,16 @@ Add this options to temporary image saving.')
          outname = outname.replace('(C)', company.upper())
          outname = outname.replace('(u)', artist)
          outname = outname.replace('(U)', artist.upper())
-         self.editOutputName.setText( outname)
+         self.fields['outputname'].setText( outname)
 
-      lgspath = '%s' % self.editLgsPath.text()
+      lgspath = '%s' % self.fields['lgspath'].text()
       if lgspath != '':
          if not os.path.isfile( lgspath):
             if not os.path.isfile( os.path.join( LogosPath, lgspath)):
                self.cmdField.setText('No slate logo file founded')
                return
 
-      lgfpath = '%s' % self.editLgfPath.text()
+      lgfpath = '%s' % self.fields['lgfpath'].text()
       if lgfpath != '':
          if not os.path.isfile( lgfpath):
             if not os.path.isfile( os.path.join( LogosPath, lgfpath)):
@@ -1531,10 +1522,10 @@ Add this options to temporary image saving.')
       format = getComboBoxString( self.fields['format'])
       if format != '':
          if self.fields['fffirst'].isChecked(): cmd += ' --fffirst'
-         ts = self.cbTemplateS.currentText()
-         tf = self.cbTemplateF.currentText()
+         ts = self.fields['slate'].currentText()
+         tf = self.fields['template'].currentText()
          cmd += ' -r %s' % format
-         cmd += ' -g %.2f' % self.dsbCorrGamma.value()
+         cmd += ' -g %.2f' % self.fields['gamma'].value()
          if ts != '': cmd += ' -s "%s"' % ts
          if tf != '': cmd += ' -t "%s"' % tf
          if project  != '': cmd += ' --project "%s"'  % project
@@ -1545,37 +1536,37 @@ Add this options to temporary image saving.')
          if activity != '': cmd += ' --activity "%s"' % activity
          if comments != '': cmd += ' --comments "%s"' % comments
          if font     != '': cmd += ' --font "%s"'     % font
-         cmd += ' --tmpformat %s' % self.cbTempFormat.currentText()
-         if len( self.eTempFormatOptions.text()): cmd += ' --tmpquality "%s"' % self.eTempFormatOptions.text()
-         if self.dsbAspectIn.value()   > 0: cmd += ' --aspect_in %f' % self.dsbAspectIn.value()
-         if self.dsbAutoAspect.value() > 0: cmd += ' --aspect_auto %f' % self.dsbAutoAspect.value()
-         if self.dsbAspectOut.value()  > 0: cmd += ' --aspect_out %f' % self.dsbAspectOut.value()
-         if not self.cCorrAuto.isChecked():     cmd += ' --noautocorr'
-         if len( self.eCorrAux.text()): cmd += ' --correction "%s"' % self.eCorrAux.text()
-         if self.cTime.isChecked(): cmd += ' --addtime'
-         cacher = getComboBoxString( self.cbCacherOpacity)
+         cmd += ' --tmpformat %s' % self.fields['tmpformat'].currentText()
+         if len( self.fields['tmpquality'].text()): cmd += ' --tmpquality "%s"' % self.fields['tmpquality'].text()
+         if self.fields['aspect_in'].value()   > 0: cmd += ' --aspect_in %f' % self.fields['aspect_in'].value()
+         if self.fields['aspect_auto'].value() > 0: cmd += ' --aspect_auto %f' % self.fields['aspect_auto'].value()
+         if self.fields['aspect_out'].value()  > 0: cmd += ' --aspect_out %f' % self.fields['aspect_out'].value()
+         if not self.fields['autocolorspace'].isChecked(): cmd += ' --noautocorr'
+         if len( self.fields['correction'].text()): cmd += ' --correction "%s"' % self.fields['correction'].text()
+         if self.fields['addtime'].isChecked(): cmd += ' --addtime'
+         cacher = getComboBoxString( self.fields['cacher_opacity'])
          if cacher != '0':
-            cmd += ' --cacher_aspect %f' % self.dsbCacherAspect.value()
+            cmd += ' --cacher_aspect %f' % self.fields['cacher_aspect'].value()
             cmd += ' --cacher_opacity %s' % cacher
-         if len( self.editCacherLine.text()):
-            cmd += ' --line_aspect "%s"' % self.dsbCacherLineAspect.value()
-            cmd += ' --line_color "%s"' % self.editCacherLine.text()
+         if len( self.fields['line_color'].text()):
+            cmd += ' --line_aspect "%s"' % self.fields['line_aspect'].value()
+            cmd += ' --line_color "%s"' % self.fields['line_color'].text()
          cacher = getComboBoxString( self.cbCacher169)
          if cacher != '0': cmd += ' --draw169 %s' % cacher
          cacher = getComboBoxString( self.cbCacher235)
          if cacher != '0': cmd += ' --draw235 %s' % cacher
-         if len( self.editLine169.text()): cmd += ' --line169 "%s"' % self.editLine169.text()
-         if len( self.editLine235.text()): cmd += ' --line235 "%s"' % self.editLine235.text()
+         if len( self.fields['line169'].text()): cmd += ' --line169 "%s"' % self.fields['line169'].text()
+         if len( self.fields['line235'].text()): cmd += ' --line235 "%s"' % self.fields['line235'].text()
          if lgspath != '':
             cmd += ' --lgspath "%s"' % lgspath
-            cmd += ' --lgssize %d' % self.sbLgsSize.value()
-            cmd += ' --lgsgrav %s' % self.cbLgsGravity.currentText()
+            cmd += ' --lgssize %d' % self.fields['lgssize'].value()
+            cmd += ' --lgsgrav %s' % self.fields['lgsgrav'].currentText()
          if lgfpath != '':
             cmd += ' --lgfpath "%s"' % lgfpath
-            cmd += ' --lgfsize %d' % self.sbLgfSize.value()
-            cmd += ' --lgfgrav %s' % self.cbLgfGravity.currentText()
-      if self.cDateOutput.isChecked(): cmd += ' --datesuffix'
-      if self.cTimeOutput.isChecked(): cmd += ' --timesuffix'
+            cmd += ' --lgfsize %d' % self.fields['lgfsize'].value()
+            cmd += ' --lgfgrav %s' % self.fields['lgfgrav'].currentText()
+      if self.fields['datesuffix'].isChecked(): cmd += ' --datesuffix'
+      if self.fields['timesuffix'].isChecked(): cmd += ' --timesuffix'
       if self.StereoDuplicate and self.inputPattern2 is None:
          cmd += ' --stereo'
       if audiofile != '':
@@ -1619,7 +1610,7 @@ Add this options to temporary image saving.')
             jobname = '%s' % self.decodeOutputSequence.text()
             jobname = os.path.basename( jobname)
          else:
-            jobname = '%s' % self.editOutputName.text()
+            jobname = '%s' % self.fields['outputname'].text()
          job = af.Job( jobname.encode('utf-8'))
          block = af.Block('Make Movie', 'movgen')
          if self.sbAfPriority.value()  != -1: job.setPriority(    self.sbAfPriority.value())
@@ -1638,7 +1629,7 @@ Add this options to temporary image saving.')
          if self.cAfPause.isChecked(): job.pause()
          job.setNeedOS('')
          job.blocks.append( block)
-         task = af.Task(('%s' % self.editOutputName.text()).encode('utf-8'))
+         task = af.Task(('%s' % self.fields['outputname'].text()).encode('utf-8'))
          task.setCommand( command.encode('utf-8'))
 
          block.tasks.append( task)
