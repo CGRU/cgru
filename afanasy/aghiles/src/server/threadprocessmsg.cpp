@@ -86,7 +86,7 @@ bool ThreadReadMsg::process( const struct T_processClient__args* theadArgs)
    so_sndtimeo.tv_usec = 0;
    if( setsockopt( client_sd, SOL_SOCKET, SO_RCVTIMEO, &so_rcvtimeo, sizeof(so_rcvtimeo)) != 0)
    {
-      AFERRPE("ThreadReadMsg::msgProcess: set socket SO_RCVTIMEO option failed")
+      perror( "setsockopt failed in ThreadReadMsg::process" );
       theadArgs->printAddress();
       return false;
    }
