@@ -8,7 +8,7 @@ import cgruutils
 import afcommon
 
 from optparse import OptionParser
-Parser = OptionParser(usage="usage: %prog [options] hip_name rop_name", version="%prog 1.0")
+Parser = OptionParser(usage="usage: %prog scene", version="%prog 1.0")
 Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', default=False, help='Verbose mode')
 (Options, Args) = Parser.parse_args()
 

@@ -12,10 +12,16 @@ import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
+# Save files settings:
+FilePrefix = 'moviemaker.'
+FileSuffix = '.txt'
+FileLast = 'last'
+FileRecent = 'recent'
+
 # Command arguments:
 
 from optparse import OptionParser
-Parser = OptionParser(usage="%prog [options] [file]\ntype \"%prog -h\" for help", version="%prog 1.0")
+Parser = OptionParser(usage="%prog [options] [file or folder]\ntype \"%prog -h\" for help", version="%prog 1.0")
 Parser.add_option('-s', '--slate',           dest='slate',           type  ='string',     default='dailies_slate',help='Slate frame template')
 Parser.add_option('-t', '--template',        dest='template',        type  ='string',     default='dailies_withlogo', help='Sequence frame template')
 Parser.add_option('-c', '--codec',           dest='codec',           type  ='string',     default='photojpg_best.ffmpeg', help='Codec preset')
@@ -182,16 +188,22 @@ for afile in CodecFiles:
    file.close()
    CodecNames.append( name)
 
+def getComboBoxString( comboBox):
+   data = comboBox.itemData( comboBox.currentIndex())
+   if data is None: return ''
+   if isinstance( data, str): return data
+   return comboBox.itemData( comboBox.currentIndex()).toString()
+
 class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
 
       self.setWindowTitle('Make Movie - CGRU ' + cgruconfig.VARS['CGRU_VERSION'])
 
-      self.constructed = False
-      self.evaluated = False
-      self.running   = False
-      self.decode    = False
+      self.constructed  = False
+      self.evaluated    = False
+      self.running      = False
+      self.decode       = False
 
       mainLayout = QtGui.QVBoxLayout( self)
       tabwidget = QtGui.QTabWidget( self)
@@ -872,9 +884,9 @@ Add this options to temporary image saving.')
       grouplayout = QtGui.QVBoxLayout( group)
       layout = QtGui.QHBoxLayout()
       grouplayout.addLayout( layout)
-      self.audioInputFileName = QtGui.QLineEdit( self)
-      layout.addWidget( self.audioInputFileName)
-      QtCore.QObject.connect( self.audioInputFileName, QtCore.SIGNAL('textEdited(QString)'), self.audioInputChanged)
+      self.fields['audiofile'] = QtGui.QLineEdit( self)
+      layout.addWidget( self.fields['audiofile'])
+      QtCore.QObject.connect( self.fields['audiofile'], QtCore.SIGNAL('textEdited(QString)'), self.audioInputChanged)
       self.audioInputBrowse = QtGui.QPushButton('Browse')
       layout.addWidget( self.audioInputBrowse)
       QtCore.QObject.connect( self.audioInputBrowse, QtCore.SIGNAL('pressed()'), self.audioBrowseInput)
@@ -885,32 +897,32 @@ Add this options to temporary image saving.')
       layout = QtGui.QHBoxLayout()
       grouplayout.addLayout( layout)
       layout.addWidget( QtGui.QLabel('Sampling Frequency:'))
-      self.fields['audiofreqkhz'] = QtGui.QSpinBox( self)
-      layout.addWidget( self.fields['audiofreqkhz'])
-      self.fields['audiofreqkhz'].setRange( 1, 96)
-      self.fields['audiofreqkhz'].setValue( 22)
+      self.fields['audiofreq'] = QtGui.QSpinBox( self)
+      layout.addWidget( self.fields['audiofreq'])
+      self.fields['audiofreq'].setRange( 1, 96)
+      self.fields['audiofreq'].setValue( 22)
       layout.addWidget( QtGui.QLabel('kHz'))
-      QtCore.QObject.connect( self.fields['audiofreqkhz'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      QtCore.QObject.connect( self.fields['audiofreq'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       layout = QtGui.QHBoxLayout()
       grouplayout.addLayout( layout)
       layout.addWidget( QtGui.QLabel('Bit Rate:'))
-      self.audioBitRateSB = QtGui.QSpinBox( self)
-      layout.addWidget( self.audioBitRateSB)
-      self.audioBitRateSB.setRange( 32, 256)
-      self.audioBitRateSB.setValue( 128)
+      self.fields['audiorate'] = QtGui.QSpinBox( self)
+      layout.addWidget( self.fields['audiorate'])
+      self.fields['audiorate'].setRange( 32, 256)
+      self.fields['audiorate'].setValue( 128)
       layout.addWidget( QtGui.QLabel('kB/s'))
-      QtCore.QObject.connect( self.audioBitRateSB, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
+      QtCore.QObject.connect( self.fields['audiorate'], QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
       layout = QtGui.QHBoxLayout()
       grouplayout.addLayout( layout)
       layout.addWidget( QtGui.QLabel('Codec:'))
-      self.audioCodecCB = QtGui.QComboBox( self)
-      layout.addWidget( self.audioCodecCB)
+      self.fields['audiocodec'] = QtGui.QComboBox( self)
+      layout.addWidget( self.fields['audiocodec'])
       i = 0
       for acodec in AudioCodecNames:
-         self.audioCodecCB.addItem( acodec, AudioCodecValues[i])
+         self.fields['audiocodec'].addItem( acodec, AudioCodecValues[i])
          i += 1
-      self.audioCodecCB.setCurrentIndex( 0)
-      QtCore.QObject.connect( self.audioCodecCB, QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
+      self.fields['audiocodec'].setCurrentIndex( 0)
+      QtCore.QObject.connect( self.fields['audiocodec'], QtCore.SIGNAL('currentIndexChanged(int)'), self.evaluate)
 
 
 
@@ -922,121 +934,117 @@ Add this options to temporary image saving.')
       afanasylayout.addWidget( self.cAfanasy)
 
       # Priority
-      lAfPriority = QtGui.QHBoxLayout()
-      lAfPriority.addWidget( QtGui.QLabel('Priority:', self))
+      layout = QtGui.QHBoxLayout()
+      layout.addWidget( QtGui.QLabel('Priority:', self))
       self.sbAfPriority = QtGui.QSpinBox( self)
       self.sbAfPriority.setRange( -1, 1000000)
       self.sbAfPriority.setValue( Options.afpriority)
       QtCore.QObject.connect( self.sbAfPriority, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfPriority.addWidget( self.sbAfPriority)
-      lAfPriority.addWidget( QtGui.QLabel('"-1" Means default value.', self))
-      afanasylayout.addLayout( lAfPriority)
+      layout.addWidget( self.sbAfPriority)
+      layout.addWidget( QtGui.QLabel('"-1" Means default value.', self))
+      afanasylayout.addLayout( layout)
 
       # Hosts
-      gAfHosts = QtGui.QGroupBox('Hosts')
-      afanasylayout.addWidget( gAfHosts)
-      lAfHosts = QtGui.QVBoxLayout()
-      gAfHosts.setLayout( lAfHosts)
+      group = QtGui.QGroupBox('Hosts')
+      afanasylayout.addWidget( group)
+      grouplayout = QtGui.QVBoxLayout()
+      group.setLayout( grouplayout)
 
-      lAfMaxHosts = QtGui.QHBoxLayout()
-      lAfHosts.addLayout( lAfMaxHosts)
-      lAfMaxHosts.addWidget( QtGui.QLabel('Maximum Number:', self))
+      layout = QtGui.QHBoxLayout()
+      grouplayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Maximum Number:', self))
       self.sbAfMaxHosts = QtGui.QSpinBox( self)
       self.sbAfMaxHosts.setRange( -1, 1000000)
       self.sbAfMaxHosts.setValue( Options.afmaxhosts)
       QtCore.QObject.connect( self.sbAfMaxHosts, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfMaxHosts.addWidget( self.sbAfMaxHosts)
-      lAfMaxHosts.addWidget( QtGui.QLabel('"-1" Means no hosts count limit.', self))
+      layout.addWidget( self.sbAfMaxHosts)
+      layout.addWidget( QtGui.QLabel('"-1" Means no hosts count limit.', self))
 
-      lAfHostsMask = QtGui.QHBoxLayout()
-      lAfHosts.addLayout( lAfHostsMask)
-      lAfHostsMask.addWidget( QtGui.QLabel('Hosts Names Mask:', self))
+      layout = QtGui.QHBoxLayout()
+      grouplayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Hosts Names Mask:', self))
       self.editAfHostsMask = QtGui.QLineEdit( Options.afhostsmask, self)
       QtCore.QObject.connect( self.editAfHostsMask, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfHostsMask.addWidget( self.editAfHostsMask)
-      lAfHostsMask.addWidget( QtGui.QLabel('Leave empty to run on any host.', self))
+      layout.addWidget( self.editAfHostsMask)
+      layout.addWidget( QtGui.QLabel('Leave empty to run on any host.', self))
 
-      lAfHostsMaskExclude = QtGui.QHBoxLayout()
-      lAfHosts.addLayout( lAfHostsMaskExclude)
-      lAfHostsMaskExclude.addWidget( QtGui.QLabel('Exclude Hosts Names Mask:', self))
+      layout = QtGui.QHBoxLayout()
+      grouplayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Exclude Hosts Names Mask:', self))
       self.editAfHostsMaskExclude = QtGui.QLineEdit( Options.afhostsmaskex, self)
       QtCore.QObject.connect( self.editAfHostsMaskExclude, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfHostsMaskExclude.addWidget( self.editAfHostsMaskExclude)
-      lAfHostsMaskExclude.addWidget( QtGui.QLabel('Leave empty not to exclude any host.', self))
+      layout.addWidget( self.editAfHostsMaskExclude)
+      layout.addWidget( QtGui.QLabel('Leave empty not to exclude any host.', self))
 
       # Depends
-      self.gAfDepends = QtGui.QGroupBox('Depends')
-      afanasylayout.addWidget( self.gAfDepends)
-      self.lAfDepends = QtGui.QVBoxLayout()
-      self.gAfDepends.setLayout( self.lAfDepends)
+      group = QtGui.QGroupBox('Depends')
+      afanasylayout.addWidget( group)
+      grouplayout = QtGui.QVBoxLayout()
+      group.setLayout( grouplayout)
 
-      self.lAfDependMask = QtGui.QHBoxLayout()
-      self.lAfDepends.addLayout( self.lAfDependMask)
-      self.tAfDependMask = QtGui.QLabel('Depend Jobs Mask:', self)
-      self.lAfDependMask.addWidget( self.tAfDependMask)
+      layout = QtGui.QHBoxLayout()
+      grouplayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Depend Jobs Mask:', self))
       self.editAfDependMask = QtGui.QLineEdit( Options.afdependmask, self)
       QtCore.QObject.connect( self.editAfDependMask, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.lAfDependMask.addWidget( self.editAfDependMask)
-      self.tAfDependMaskDef = QtGui.QLabel('Leave empty not to wait any jobs.', self)
-      self.lAfDependMask.addWidget( self.tAfDependMaskDef)
+      layout.addWidget( self.editAfDependMask)
+      layout.addWidget( QtGui.QLabel('Leave empty not to wait any jobs.', self))
 
-      self.lAfDependMaskGlobal = QtGui.QHBoxLayout()
-      self.lAfDepends.addLayout( self.lAfDependMaskGlobal)
-      self.tAfDependMaskGlobal = QtGui.QLabel('Global Depend Jobs Mask:', self)
-      self.lAfDependMaskGlobal.addWidget( self.tAfDependMaskGlobal)
+      layout = QtGui.QHBoxLayout()
+      grouplayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Global Depend Jobs Mask:', self))
       self.editAfDependMaskGlobal = QtGui.QLineEdit( Options.afdependmaskgl, self)
       QtCore.QObject.connect( self.editAfDependMaskGlobal, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      self.lAfDependMaskGlobal.addWidget( self.editAfDependMaskGlobal)
-      self.tAfDependMaskGlobalDef = QtGui.QLabel('Set mask to wait any user jobs.', self)
-      self.lAfDependMaskGlobal.addWidget( self.tAfDependMaskGlobalDef)
+      layout.addWidget( self.editAfDependMaskGlobal)
+      layout.addWidget( QtGui.QLabel('Set mask to wait any user jobs.', self))
 
       # Capacity
-      gAfCapacity = QtGui.QGroupBox('Capacity')
-      lAfCapacity = QtGui.QHBoxLayout()
-      gAfCapacity.setLayout( lAfCapacity)
+      group = QtGui.QGroupBox('Capacity')
+      layout = QtGui.QHBoxLayout()
+      group.setLayout( layout)
+      afanasylayout.addWidget( group)
 
       self.cAfOneTask = QtGui.QCheckBox('One Task', self)
       self.cAfOneTask.setChecked( True)
       QtCore.QObject.connect( self.cAfOneTask, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      lAfCapacity.addWidget( self.cAfOneTask)
+      layout.addWidget( self.cAfOneTask)
 
-      lAfCapacity.addWidget( QtGui.QLabel('Capacity:', self))
+      layout.addWidget( QtGui.QLabel('Capacity:', self))
       self.sbAfCapacity = QtGui.QSpinBox( self)
       self.sbAfCapacity.setRange( -1, 1000000)
       self.sbAfCapacity.setValue( Options.afcapacity)
       QtCore.QObject.connect( self.sbAfCapacity, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfCapacity.addWidget( self.sbAfCapacity)
+      layout.addWidget( self.sbAfCapacity)
 
-      lAfCapacity.addWidget( QtGui.QLabel('Convert:', self))
+      layout.addWidget( QtGui.QLabel('Convert:', self))
       self.sbAfCapConvert = QtGui.QSpinBox( self)
       self.sbAfCapConvert.setRange( -1, 1000000)
       self.sbAfCapConvert.setValue( Options.afcapacity)
       QtCore.QObject.connect( self.sbAfCapConvert, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfCapacity.addWidget( self.sbAfCapConvert)
+      layout.addWidget( self.sbAfCapConvert)
 
-      lAfCapacity.addWidget( QtGui.QLabel('Encode:', self))
+      layout.addWidget( QtGui.QLabel('Encode:', self))
       self.sbAfCapEncode = QtGui.QSpinBox( self)
       self.sbAfCapEncode.setRange( -1, 1000000)
       self.sbAfCapEncode.setValue( Options.afcapacity)
       QtCore.QObject.connect( self.sbAfCapEncode, QtCore.SIGNAL('valueChanged(int)'), self.evaluate)
-      lAfCapacity.addWidget( self.sbAfCapEncode)
+      layout.addWidget( self.sbAfCapEncode)
 
-      afanasylayout.addWidget( gAfCapacity)
 
       # Pause
-      lAfPause = QtGui.QHBoxLayout()
-      afanasylayout.addLayout( lAfPause)
+      layout = QtGui.QHBoxLayout()
+      afanasylayout.addLayout( layout)
 
       self.cAfPause = QtGui.QCheckBox('Start Job Paused', self)
       self.cAfPause.setChecked( Options.afpause)
       QtCore.QObject.connect( self.cAfPause, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
-      lAfPause.addWidget( self.cAfPause)
+      layout.addWidget( self.cAfPause)
 
-      lAfPause.addWidget( QtGui.QLabel('Start At Time:', self))
+      layout.addWidget( QtGui.QLabel('Start At Time:', self))
       self.editAfTime = QtGui.QDateTimeEdit( QtCore.QDateTime.currentDateTime(), self)
       self.editAfTime.setDisplayFormat('dddd d MMMM yyyy, h:mm')
       QtCore.QObject.connect( self.editAfTime, QtCore.SIGNAL('dateTimeChanged()'), self.evaluate)
-      lAfPause.addWidget( self.editAfTime)
+      layout.addWidget( self.editAfTime)
 
 
       # Output Field:
@@ -1133,20 +1141,20 @@ Add this options to temporary image saving.')
 # Encode:
 
    def audioBrowseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose an audio or movie file with sound', self.audioInputFileName.text())
+      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose an audio or movie file with sound', self.fields['audiofile'].text())
       if len( afile):
-         self.audioInputFileName.setText( afile)
+         self.fields['audiofile'].setText( afile)
          self.audioInputChanged()
 
    def audioInputChanged( self):
-      afile = '%s' % self.audioInputFileName.text()
+      afile = '%s' % self.fields['audiofile'].text()
       if len( afile):
          pos = afile.rfind('file://')
          if pos >= 0:
             afile = afile[ pos+7 : ]
             afile = afile.strip()
             afile = afile.strip('\n')
-            self.audioInputFileName.setText( afile)
+            self.fields['audiofile'].setText( afile)
          self.evaluate()
 
    def evalStereo( self):
@@ -1431,7 +1439,7 @@ Add this options to temporary image saving.')
          self.cmdField.setText('Specify input sequence.')
          return
 
-      audiofile = '%s' % self.audioInputFileName.text()
+      audiofile = '%s' % self.fields['audiofile'].text()
       if len(audiofile):
          audiofile = os.path.abspath( os.path.normpath( audiofile))
          if not os.path.isfile( audiofile):
@@ -1572,9 +1580,9 @@ Add this options to temporary image saving.')
          cmd += ' --stereodub'
       if audiofile != '':
          cmd += ' --audio "%s"' % audiofile
-         cmd += ' --afreq %d' % (self.fields['audiofreqkhz'].value() * 1000)
-         cmd += ' --akbits %d' % self.audioBitRateSB.value()
-         cmd += ' --acodec "%s"' % getComboBoxString( self.audioCodecCB)
+         cmd += ' --afreq %d' % (self.fields['audiofreq'].value() * 1000)
+         cmd += ' --akbits %d' % self.fields['audiorate'].value()
+         cmd += ' --acodec "%s"' % getComboBoxString( self.fields['audiocodec'])
       if self.cAfanasy.isChecked() and not self.cAfOneTask.isChecked():
          cmd += ' -A'
          if self.sbAfCapConvert.value() != -1: cmd += ' --afconvcap %d' % self.sbAfCapConvert.value()
@@ -1689,11 +1697,105 @@ Add this options to temporary image saving.')
       if sys.platform.find('win') == 0:
          self.process.kill()
 
-def getComboBoxString( comboBox):
-   data = comboBox.itemData( comboBox.currentIndex())
-   if data is None: return ''
-   if isinstance( data, str): return data
-   return comboBox.itemData( comboBox.currentIndex()).toString()
+   def save( self, filename, fullPath = False):
+      if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+      file = open( filename,'w')
+      for key in self.fields:
+         value = ''
+         if isinstance( self.fields[key], QtGui.QLineEdit):
+            value = str( self.fields[key].text())
+         elif isinstance( self.fields[key], QtGui.QSpinBox):
+            value = str( self.fields[key].value())
+         elif isinstance( self.fields[key], QtGui.QCheckBox):
+            value = str( int( self.fields[key].isChecked()))
+         elif isinstance( self.fields[key], QtGui.QComboBox):
+            value = str( getComboBoxString( self.fields[key]))
+         line = key + '=' + value
+         file.write( line + '\n')
+      file.close()
+
+   def load( self, filename, fullPath = False):
+      if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+      if not os.path.isfile( filename): return False
+      file = open( filename,'r')
+      lines = file.readlines()
+      file.close()
+      for line in lines:
+         pos = line.find('=')
+         if pos < 1: continue
+         key = line[:pos]
+         if key not in self.fields: continue
+         value = line[pos+1:].strip()         
+         if isinstance( self.fields[key], QtGui.QLineEdit):
+            self.fields[key].setText( value)
+         elif isinstance( self.fields[key], QtGui.QSpinBox):
+            self.fields[key].setValue( int(value))
+         elif isinstance( self.fields[key], QtGui.QCheckBox):
+            self.fields[key].setChecked( int(value))
+      self.evaluate()
+      return True
+
+   def browseSave( self):
+      filename = str( QtGui.QFileDialog.getSaveFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU']))
+      if filename == '': return
+      self.save( filename, True)
+
+   def browseLoad( self):
+      filename = str( QtGui.QFileDialog.getOpenFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU']))
+      if filename == '': return
+      self.load( filename, True)
+
+   def quitsave( self):
+      self.save( FileLast)
+      self.close()
+
+   def getRecentFilesList( self):
+      allfiles = os.listdir( cgruconfig.VARS['HOME_CGRU'])
+      recfiles = []
+      for afile in allfiles:
+         if afile.find( FilePrefix + FileRecent) >= 0: recfiles.append( afile)
+      recfiles.sort()
+      return recfiles
+
+   def saveRecent( self):
+      recfiles = self.getRecentFilesList()
+      if len(recfiles) > 0:
+         for afile in recfiles:
+            if afile.find( self.fields['outputname'].text()) > len(FilePrefix + FileRecent):
+#               print('os.remove("%s")' % os.path.join( cgruconfig.VARS['HOME_CGRU'], afile))
+               os.remove( os.path.join( cgruconfig.VARS['HOME_CGRU'], afile))
+               recfiles.remove( afile)
+         numfiles = len(recfiles)
+         if numfiles > 9:
+#            print('os.remove("%s")' % os.path.join( cgruconfig.VARS['HOME_CGRU'], recfiles[-1]))
+            os.remove( os.path.join( cgruconfig.VARS['HOME_CGRU'], recfiles[-1]))
+            del recfiles[-1]
+         recfiles.reverse()
+         index = len(recfiles)
+         for afile in recfiles:
+            pos = afile.find( FilePrefix + FileRecent)
+            if pos < 0: continue
+            pos = len(FilePrefix + FileRecent)
+            num = int(afile[pos])
+            if num != index:
+               nextfile = afile[:pos] + str(index) + afile[pos+1:]
+               afile = os.path.join( cgruconfig.VARS['HOME_CGRU'], afile)
+               nextfile = os.path.join( cgruconfig.VARS['HOME_CGRU'], nextfile)
+#               print('os.rename("%s"->"%s")' % ( afile, nextfile))
+               os.rename( afile, nextfile)
+            index -= 1
+      afile = FileRecent + '0.' + self.fields['outputname'].text()
+      self.save( afile)
+      self.refreshRecent()
+
+   def refreshRecent( self):
+      self.cbRecent.clear()
+      for afile in self.getRecentFilesList():
+         afile = afile.replace( FilePrefix,'')
+         afile = afile.replace( FileSuffix,'')
+         short = afile.replace( FileRecent,'')[2:]
+         if len(short) > 20: short = short[:10] + ' .. ' + short[-10:]
+         self.cbRecent.addItem( short, afile)
 
 app = QtGui.QApplication( sys.argv)
 app.setWindowIcon( QtGui.QIcon( cgruutils.getIconFileName( Options.wndicon)))
