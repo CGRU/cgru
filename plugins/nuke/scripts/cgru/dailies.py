@@ -2,6 +2,8 @@ import nuke
 
 import os, sys, time
 
+import afcommon
+
 def dailiesEvaluate( node):
 
    newNode = False
@@ -175,7 +177,7 @@ def dailiesEvaluate( node):
 
 
 def dailiesGenCmd( node):
-   # Process Input:
+   # Process Input Node:
    inputnode = None
    for i in range( node.inputs()):
       inputnode = node.input(i)
@@ -185,11 +187,47 @@ def dailiesGenCmd( node):
    if not inputnode.Class() in ['Read','Write']:
       nuke.message('Error:\n%s\nConnected not to Read or Write node.' % node.name())
       return
-   images = inputnode.knob('file').value()
-   if images is None or images == '':
-      nuke.message('Error:\n%s\nFiles are empty.' % inputnode.name())
-      return
-   images = os.path.abspath(images)
+
+
+   # Process Images:
+   images = ''
+   root_frame_first = nuke.Root().firstFrame()
+   root_frame_last  = nuke.Root().lastFrame()
+   if root_frame_first == root_frame_last: root_frame_last += 100
+   # Get needed views from dailies node if forced:
+   if node.knob('forceviews').value():
+      views = node.knob('viewsnames').value().split(' ')
+   else:
+      # Get needed views write node:
+      views_knob = inputnode.knob('views')
+      if views_knob is not None:
+         views = inputnode.knob('views').value().split(' ')
+      else:
+         # Get all scene views:
+         views = nuke.views()
+   # Generate input pattern from each view:
+   for view in views:
+      if not view in nuke.views():
+         nuke.message('Error:\n%s\nInvalid view:\n%s' % (inputnode.name(), view))
+         return
+      octx = nuke.OutputContext()
+      octx.setView( 1 + nuke.views().index(view))
+      octx.setFrame( root_frame_first)
+      images1 = inputnode.knob('file').getEvaluatedValue( octx)
+      if images1 is None or images1 == '':
+         nuke.message('Error:\n%s\nFiles are empty.\nView[%s] frame %d.' % (inputnode.name(), view, root_frame_first))
+         return
+      octx.setFrame( root_frame_last)
+      images2 = inputnode.knob('file').getEvaluatedValue( octx)
+      if images2 is None or images2 == '':
+         nuke.message('Error:\n%s\nFiles are empty.\nView[%s] frame %d.' % (inputnode.name(), view, root_frame_last))
+         return
+      part1, padding, part2 = afcommon.splitPathsDifference( images1, images2)
+      if padding < 1:
+         nuke.message('Error:\n%s\Invalid files pattern.\nView[%s].' % (inputnode.name(), view))
+         return
+      if len(images): images += ' '
+      images += part1 + '#'*padding + part2
 
    # Get Movie Name:
    movname  = node.knob('movname' ).value()
@@ -290,28 +328,6 @@ def dailiesGenCmd( node):
       cmd += ' --lgfpath "%s"' % lgfpath
       cmd += ' --lgfsize %d'   % lgfsize
       cmd += ' --lgfgrav %s'   % lgfgrav
-
-   # Stereo:
-   if images.find('%v') != -1 or images.find('%V') != -1:
-      if node.knob('forceviews').value():
-         views = node.knob('viewsnames').value().split(' ')
-      else:
-         views_knob = inputnode.knob('views')
-         if views_knob is not None:
-            views = inputnode.knob('views').value().split(' ')
-         else:
-            views = nuke.views()
-      if len(views) > 0:
-         stereo_images = ''
-         for view in views:
-            view = view.strip()
-            if view != '':
-               img = images
-               img = img.replace('%V', view)
-               img = img.replace('%v', view[0])
-               if stereo_images != '': stereo_images += ' '
-               stereo_images += img
-         images = stereo_images
    if node.knob('stereodub').value(): cmd += ' --stereo'
 
    cmd += ' ' + images
