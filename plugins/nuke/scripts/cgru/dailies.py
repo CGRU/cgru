@@ -207,24 +207,25 @@ def dailiesGenCmd( node):
          views = nuke.views()
    # Generate input pattern from each view:
    for view in views:
+      if not len(view): continue # skip empty view, may be after split(' ')
       if not view in nuke.views():
-         nuke.message('Error:\n%s\nInvalid view:\n%s' % (inputnode.name(), view))
+         nuke.message('Error:\n%s\nInvalid view:\n"%s"' % (inputnode.name(), view))
          return
       octx = nuke.OutputContext()
       octx.setView( 1 + nuke.views().index(view))
       octx.setFrame( root_frame_first)
       images1 = inputnode.knob('file').getEvaluatedValue( octx)
       if images1 is None or images1 == '':
-         nuke.message('Error:\n%s\nFiles are empty.\nView[%s] frame %d.' % (inputnode.name(), view, root_frame_first))
+         nuke.message('Error:\n%s\nFiles are empty.\nView "%s", frame %d.' % (inputnode.name(), view, root_frame_first))
          return
       octx.setFrame( root_frame_last)
       images2 = inputnode.knob('file').getEvaluatedValue( octx)
       if images2 is None or images2 == '':
-         nuke.message('Error:\n%s\nFiles are empty.\nView[%s] frame %d.' % (inputnode.name(), view, root_frame_last))
+         nuke.message('Error:\n%s\nFiles are empty.\nView "%s", frame %d.' % (inputnode.name(), view, root_frame_last))
          return
       part1, padding, part2 = afcommon.splitPathsDifference( images1, images2)
       if padding < 1:
-         nuke.message('Error:\n%s\Invalid files pattern.\nView[%s].' % (inputnode.name(), view))
+         nuke.message('Error:\n%s\Invalid files pattern.\nView "%s".' % (inputnode.name(), view))
          return
       if len(images): images += ' '
       images += part1 + '#'*padding + part2

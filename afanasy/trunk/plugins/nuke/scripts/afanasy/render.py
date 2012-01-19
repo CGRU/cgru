@@ -134,51 +134,71 @@ class BlockParameters:
       self.writename = str( wnode.name())
 
       if wnode.Class() == RenderNodeClassName:
+         afcommon = __import__('afcommon', globals(), locals(), [])
          # Get images files:
          self.imgfile = ''
          if nuke.toNode('root').knob('proxy').value():
-            self.imgfile = str( wnode.knob('proxy').value())
+            fileknob = wnode.knob('proxy')
          else:
-            self.imgfile = str( wnode.knob('file').value())
-
+            fileknob = wnode.knob('file')
          # Get views:
          views = wnode.knob('views')
          if views is not None:
             views = views.value()
-            if views is not None:
-               if views != '':
-                  views = views.split(' ')
-                  images = []
-                  for view in views:
-                     view = view.strip()
-                     if view != '':
-                        img = self.imgfile
-                        img = img.replace('%V', view)
-                        img = img.replace('%v', view[0])
-                        images.append( img)
-                  if len(images) > 0:
-                     self.imgfile = ''
-                     for img in images:
-                        if self.imgfile != '': self.imgfile += ';'
-                        self.imgfile += img
+            if views is None or views == '': views = nuke.views()
+            else: views = views.split(' ')
+         else: views = nuke.views()
+         # Iterate views:
+         for view in views:
+            view = view.strip()
+            if not len(view): continue # skip empty view, may be after split(' ')
+            # Check view exists:
+            if not view in nuke.views():
+               nuke.message('Error:\n%s\nInvalid view:\n%s' % ( self.writename, view))
+               self.valid = False
+               return
 
-         # Check images files:
-         if self.imgfile == '':
-            nuke.message('Write Node "%s"\nImages are empty.' % self.writename)
-            self.valid = False
-         else:
-            for imgfile in self.imgfile.split(';'):
-               folder = os.path.dirname( imgfile)
-               if folder != '':
-                  if not os.path.isdir(folder):
-                     result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
-                     if result:
-                        os.makedirs( folder)
-                        if not os.path.isdir(folder):
-                           nuke.message('Can`t create folder:\n%s' % folder)
-                           self.valid = False
-                     else:
+            if len( self.imgfile): self.imgfile += ';'
+            # Get thow files for current view and fitst and last frames:
+            octx = nuke.OutputContext()
+            octx.setView( 1 + nuke.views().index(view))
+            # If frame first and frame last are equal no sequence needed
+            if self.framefirst == self.framelast:
+               images += fileknob.getEvaluatedValue( octx)
+            else:
+               # Get files from first and last frames to calculate frames pattern:
+               octx.setFrame( self.framefirst)
+               images1 = fileknob.getEvaluatedValue( octx)
+               if images1 is None or images1 == '':
+                  nuke.message('Error:\n%s\nFiles are empty.\nView "%s", frame %d.' % ( self.writename, view, self.framefirst))
+                  self.valid = False
+                  return
+               octx.setFrame( self.framelast)
+               images2 = fileknob.getEvaluatedValue( octx)
+               if images2 is None or images2 == '':
+                  nuke.message('Error:\n%s\nFiles are empty.\nView "%s", frame %d.' % ( self.writename, view, self.framelast))
+                  self.valid = False
+                  return
+               part1, padding, part2 = afcommon.splitPathsDifference( images1, images2)
+               if padding < 1:
+                  nuke.message('Error:\n%s\nInvalid files pattern.\nView "%s".' % ( self.writename, view))
+                  self.valid = False
+                  return
+               self.imgfile += part1 + '#'*padding + part2
+
+         # Check images folders:
+         for imgfile in self.imgfile.split(';'):
+            folder = os.path.dirname( imgfile)
+            if folder != '':
+               if not os.path.isdir(folder):
+                  result = nuke.ask('Write Node "%s" Directory\n%s\ndoes not exist.\nCreate it?' % (self.writename,folder))
+                  if result:
+                     os.makedirs( folder)
+                     if not os.path.isdir(folder):
+                        nuke.message('Can`t create folder:\n%s' % folder)
                         self.valid = False
+                  else:
+                     self.valid = False
       elif wnode.Class() == DailiesNodeClassName:
          if VERBOSE: print 'Generating dailies "%s"' % self.writename
       else:
@@ -217,8 +237,6 @@ class BlockParameters:
       if self.wnode.Class() == RenderNodeClassName:
          block = af.Block( self.name, AfanasyServiceType)
          block.setNumeric( self.framefirst, self.framelast, self.framespertask, self.frameinc)
-         afcommon = __import__('afcommon', globals(), locals(), [])
-         self.imgfile = afcommon.patternFromDigits( afcommon.patternFromStdC( self.imgfile))
          block.setFiles( self.imgfile)
          if self.capacity != -1: block.setCapacity( self.capacity)
 
