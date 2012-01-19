@@ -20,17 +20,22 @@ for archive in `ls`; do
    for version in `cat "${archive_dir}/version.txt"`; do break; done
    echo "Creating CGRU archive for '${archive}': '${archive_dir}'-'${version}'"
 
+   # Cleanup archive folders:
+   echo "Clearing '${archive}':"
+   find "${archive_dir}" -type d -name .svn -exec rm -rvf {} \;
+   find "${archive_dir}" -type f -name *.pyc -exec rm -vf {} \;
+   find "${archive_dir}" -type d -name __pycache__ -exec rm -rvf {} \;
+   find "${archive_dir}" -type f -name config.xml -exec rm -vf {} \;
+   find "${archive_dir}" -type f -name pathmap_*.txt -exec rm -vf {} \;
+   rm -fv ${archive_dir}/software_setup/locate_*
+
    # Run specific script:
    "./${archive}" "${archive_dir}"
    if [ $? != 0 ]; then
       echo "Failed making archive."
       exit 1
    fi
-
-   # Cleanup files:
-   find ${archive} -type f -name *.pyc -exec rm -vf {} \;
-   find ${archive} -type d -name .svn -exec rm -rvf {} \;
-   find ${archive} -type d -name __pycache__ -exec rm -rvf {} \;
+   continue
 
    # Archivate:
    archivefile="cgru.${version}.${archive}.7z"

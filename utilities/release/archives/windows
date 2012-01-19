@@ -5,11 +5,6 @@
 dest=$1
 [ -d "$dest" ] || exit 1
 
-# Clear Software locations:
-rm -fv $dest/software_setup/locate_*
-
-# Clear Python:
-echo "Clearing python in '$dest'"
-find "${dest}" -type f -name *.pyc -exec rm -vf {} \;
-find "${dest}" -type d -name __pycache__ -exec rm -rvf {} \;
+echo "Clearing bash scripts '$dest'"
+find "${dest}" -type f -name *.sh -exec rm -vf {} \;
 exit 0

@@ -12,8 +12,23 @@ function createDir(){
    [ -d $1 ] || mkdir -p $1
 }
 
-function  copy(){ rsync -qL --exclude 'config.xml' --exclude 'override.sh' --exclude '*.cmd' --exclude '*.pyc' $1/* $2/; }
-function rcopy(){ rsync -rL --exclude 'config.xml' --exclude '.svn' --exclude 'override.sh' --exclude '*.cmd' --exclude '__pycache__' --exclude '*.pyc' --exclude 'doxygen/output' $1 $2; }
+exclude="$exclude --exclude 'config.xml'"
+exclude="$exclude --exclude 'pathmap_*.cmd'"
+exclude="$exclude --exclude 'override.sh'"
+exclude="$exclude --exclude '.svn'"
+exclude="$exclude --exclude '*.cmd'"
+exclude="$exclude --exclude '*.pyc'"
+exclude="$exclude --exclude '__pycache__'"
+exclude="$exclude --exclude 'doxygen/output'"
+
+function  copy()
+{
+   eval "rsync -qL $exclude $1/* $2/;"
+}
+function rcopy()
+{
+   eval "rsync -rL $exclude $1 $2;"
+}
 
 createDir $dest
 pushd $dest > /dev/null
