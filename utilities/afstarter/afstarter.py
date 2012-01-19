@@ -8,7 +8,7 @@ import cgruutils
 import afcommon
 
 from optparse import OptionParser
-Parser = OptionParser(usage="usage: %prog scene", version="%prog 1.0")
+Parser = OptionParser(usage="usage: %prog [scene]", version="%prog 1.0")
 Parser.add_option('-V', '--verbose',    action='store_true', dest='verbose', default=False, help='Verbose mode')
 (Options, Args) = Parser.parse_args()
 
@@ -234,7 +234,6 @@ AfterFX render settings template')
       presetsLayout.addWidget( QtGui.QLabel('Recent:', self))
       self.cbRecent = QtGui.QComboBox( self)
       presetsLayout.addWidget( self.cbRecent)
-      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
       self.bBrowseLoad = QtGui.QPushButton('Load', self)
       presetsLayout.addWidget( self.bBrowseLoad)
       QtCore.QObject.connect( self.bBrowseLoad, QtCore.SIGNAL('pressed()'), self.browseLoad)
@@ -359,6 +358,7 @@ AfterFX render settings template')
       self.refreshRecent()
 
    def refreshRecent( self):
+      QtCore.QObject.disconnect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
       self.cbRecent.clear()
       for afile in self.getRecentFilesList():
          afile = afile.replace( FilePrefix,'')
@@ -366,12 +366,15 @@ AfterFX render settings template')
          short = afile.replace( FileRecent,'')[2:]
          if len(short) > 20: short = short[:10] + ' .. ' + short[-10:]
          self.cbRecent.addItem( short, afile)
+      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
 
    def loadRecent( self):
-      if self.load( getComboBoxString( self.cbRecent)): self.evaluate()
+      self.load( getComboBoxString( self.cbRecent))
 
    def load( self, filename, fullPath = False):
+      self.constructed = False
       if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+      print('Loading "%s"' % filename)
       if not os.path.isfile( filename): return False
       file = open( filename,'r')
       lines = file.readlines()
@@ -388,6 +391,7 @@ AfterFX render settings template')
             self.fields[key].setValue( int(value))
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             self.fields[key].setChecked( int(value))
+      self.constructed = True
       self.evaluate()
       return True
 
@@ -485,6 +489,7 @@ AfterFX render settings template')
       self.teCmd.setText( cmd)
       self.evaluated = True
       self.bStart.setEnabled( True)
+      print('Evaluated')
 
 
    def start( self):

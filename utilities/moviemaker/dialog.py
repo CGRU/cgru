@@ -335,15 +335,15 @@ Shot name.')
       layout.addWidget( label)
       label.setToolTip('\
 Shot version.')
-      self.editVersion = QtGui.QLineEdit('', self)
-      layout.addWidget( self.editVersion)
-      QtCore.QObject.connect( self.editVersion, QtCore.SIGNAL('editingFinished()'), self.evaluate)
-      self.cAutoTitles = QtGui.QCheckBox('Auto', self)
-      layout.addWidget( self.cAutoTitles)
-      self.cAutoTitles.setToolTip('\
+      self.fields['version'] = QtGui.QLineEdit('', self)
+      layout.addWidget( self.fields['version'])
+      QtCore.QObject.connect( self.fields['version'], QtCore.SIGNAL('editingFinished()'), self.evaluate)
+      self.fields['autotitles'] = QtGui.QCheckBox('Auto', self)
+      layout.addWidget( self.fields['autotitles'])
+      self.fields['autotitles'].setToolTip('\
 Try to fill values automatically parsing input file name and folder.')
-      self.cAutoTitles.setChecked( True)
-      QtCore.QObject.connect( self.cAutoTitles, QtCore.SIGNAL('stateChanged(int)'), self.autoTitles)
+      self.fields['autotitles'].setChecked( True)
+      QtCore.QObject.connect( self.fields['autotitles'], QtCore.SIGNAL('stateChanged(int)'), self.autoTitles)
 
       layout = QtGui.QHBoxLayout()
       label = QtGui.QLabel('Artist:', self)
@@ -1055,22 +1055,41 @@ Add this options to temporary image saving.')
 
       # Main Buttons:
 
-      lProcess = QtGui.QHBoxLayout()
-      self.btnRefresh = QtGui.QPushButton('Refresh', self)
-      QtCore.QObject.connect( self.btnRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
-      self.btnStart = QtGui.QPushButton('Start', self)
+      layout = QtGui.QHBoxLayout()
+      mainLayout.addLayout( layout)
+
+      self.btnStart = QtGui.QPushButton('&Start', self)
+      layout.addWidget( self.btnStart)
       self.btnStart.setEnabled( False)
       QtCore.QObject.connect( self.btnStart, QtCore.SIGNAL('pressed()'), self.execute)
-      self.btnStop = QtGui.QPushButton('Stop', self)
+
+      self.btnRefresh = QtGui.QPushButton('&Refresh', self)
+      layout.addWidget( self.btnRefresh)
+      QtCore.QObject.connect( self.btnRefresh, QtCore.SIGNAL('pressed()'), self.evaluate)
+
+      self.btnStop = QtGui.QPushButton('Sto&p', self)
       self.btnStop.setEnabled( False)
       QtCore.QObject.connect( self.btnStop, QtCore.SIGNAL('pressed()'), self.processStop)
-      lProcess.addWidget( self.btnRefresh)
-      lProcess.addWidget( self.btnStart)
-      lProcess.addWidget( self.btnStop)
-      mainLayout.addLayout( lProcess)
+      layout.addWidget( self.btnStop)
 
+      layout.addItem( QtGui.QSpacerItem( 20, 20, QtGui.QSizePolicy.Expanding))
+      layout.addWidget( QtGui.QLabel('Recent:', self))
 
-      self.constructed = True
+      self.cbRecent = QtGui.QComboBox( self)
+      layout.addWidget( self.cbRecent)
+
+      self.bBrowseLoad = QtGui.QPushButton('Load', self)
+      layout.addWidget( self.bBrowseLoad)
+      QtCore.QObject.connect( self.bBrowseLoad, QtCore.SIGNAL('pressed()'), self.browseLoad)
+
+      self.bBrowseSave = QtGui.QPushButton('Save', self)
+      layout.addWidget( self.bBrowseSave)
+      QtCore.QObject.connect( self.bBrowseSave, QtCore.SIGNAL('pressed()'), self.browseSave)
+
+#      self.bQuitSave = QtGui.QPushButton('&Quit&&Store', self)
+#      layout.addWidget( self.bQuitSave)
+#      QtCore.QObject.connect( self.bQuitSave, QtCore.SIGNAL('pressed()'), self.quitsave)
+
       self.inputPattern = None
       self.inputPattern2 = None
       self.autoTitles()
@@ -1078,6 +1097,8 @@ Add this options to temporary image saving.')
       self.autoOutputName()
       self.inputFileChanged()
       self.inputFileChanged2()
+      self.refreshRecent()
+      self.constructed = True
       self.evaluate()
 
 
@@ -1198,10 +1219,10 @@ Add this options to temporary image saving.')
       self.evaluate()
 
    def autoTitles( self):
-      enable = not self.cAutoTitles.isChecked()
+      enable = not self.fields['autotitles'].isChecked()
       self.fields['project'].setEnabled( enable)
       self.fields['shot'].setEnabled( enable)
-      self.editVersion.setEnabled( enable)
+      self.fields['version'].setEnabled( enable)
 
    def activityChanged( self):
       self.fields['activity'].setText( self.cbActivity.currentText())
@@ -1448,13 +1469,13 @@ Add this options to temporary image saving.')
 
       self.StereoDuplicate = self.fields['stereodub'].isChecked()
 
-      if self.cAutoTitles.isChecked(): self.fields['shot'].clear()
+      if self.fields['autotitles'].isChecked(): self.fields['shot'].clear()
       if self.fields['usenamerule'].isChecked():
          self.fields['outputname'].clear()
 
       project = '%s' % self.fields['project'].text()
       if Options.project == '':
-          if self.cAutoTitles.isChecked() or project == '':
+          if self.fields['autotitles'].isChecked() or project == '':
             if sys.platform.find('win') == 0:
                pat_split = self.inputPattern.upper().split('\\')
                if len(pat_split) > 4: project = pat_split[4]
@@ -1466,14 +1487,14 @@ Add this options to temporary image saving.')
             self.fields['project'].setText( project)
 
       shot = '%s' % self.fields['shot'].text()
-      if self.cAutoTitles.isChecked() or shot == '':
+      if self.fields['autotitles'].isChecked() or shot == '':
          shot = os.path.basename( self.inputPattern)[ : os.path.basename( self.inputPattern).find('.')]
          self.fields['shot'].setText( shot)
 
-      version = '%s' % self.editVersion.text()
-      if self.cAutoTitles.isChecked() or version == '':
+      version = '%s' % self.fields['version'].text()
+      if self.fields['autotitles'].isChecked() or version == '':
          version = os.path.basename( os.path.dirname(self.inputPattern))
-         self.editVersion.setText( version)
+         self.fields['version'].setText( version)
 
       company  = '%s' % self.fields['company'].text()
       artist   = '%s' % self.fields['artist'].text()
@@ -1596,9 +1617,9 @@ Add this options to temporary image saving.')
       self.cmdField.setText( cmd)
       self.evaluated = True
       self.btnStart.setEnabled( True)
+      print('Evaluated.')
 
    def execute( self):
-#      self.evaluate()
       if not self.evaluated: return
       command = "%s" % self.cmdField.toPlainText()
       if len(command) == 0: return
@@ -1644,6 +1665,7 @@ Add this options to temporary image saving.')
          block.tasks.append( task)
          if job.send():
             self.cmdField.setText('Afanasy job was successfully sent.')
+            self.saveRecent()
             if self.decode and self.decodeEncode.isChecked():
                self.fields['input0'].setText( self.decodeOutputAbs.text())
          else:
@@ -1673,6 +1695,7 @@ Add this options to temporary image saving.')
       self.btnRefresh.setEnabled( True)
       self.running = False
       if exitCode != 0: return
+      self.saveRecent()
       self.cmdField.setText('Finished.')
       if self.decode and self.decodeEncode.isChecked():
          self.decodeEnable.setChecked( False)
@@ -1709,13 +1732,15 @@ Add this options to temporary image saving.')
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             value = str( int( self.fields[key].isChecked()))
          elif isinstance( self.fields[key], QtGui.QComboBox):
-            value = str( getComboBoxString( self.fields[key]))
+            value = str( self.fields[key].currentText())
          line = key + '=' + value
          file.write( line + '\n')
       file.close()
 
    def load( self, filename, fullPath = False):
+      self.constructed = False
       if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
+      print('Loading "%s"' % filename)
       if not os.path.isfile( filename): return False
       file = open( filename,'r')
       lines = file.readlines()
@@ -1732,12 +1757,22 @@ Add this options to temporary image saving.')
             self.fields[key].setValue( int(value))
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             self.fields[key].setChecked( int(value))
+         elif isinstance( self.fields[key], QtGui.QComboBox):
+            for i in range( 0, self.fields[key].count()):
+               if self.fields[key].itemText( i) == value:
+                  self.fields[key].setCurrentIndex( i)
+                  break
+      self.constructed = True
       self.evaluate()
       return True
 
    def browseSave( self):
       filename = str( QtGui.QFileDialog.getSaveFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU']))
       if filename == '': return
+      filendir = os.path.dirname( filename)
+      filename = os.path.basename( filename)
+      filename = FilePrefix + filename + FileSuffix
+      filename = os.path.join( filendir, filename)
       self.save( filename, True)
 
    def browseLoad( self):
@@ -1745,9 +1780,9 @@ Add this options to temporary image saving.')
       if filename == '': return
       self.load( filename, True)
 
-   def quitsave( self):
-      self.save( FileLast)
-      self.close()
+#   def quitsave( self):
+#      self.save( FileLast)
+#      self.close()
 
    def getRecentFilesList( self):
       allfiles = os.listdir( cgruconfig.VARS['HOME_CGRU'])
@@ -1789,6 +1824,7 @@ Add this options to temporary image saving.')
       self.refreshRecent()
 
    def refreshRecent( self):
+      QtCore.QObject.disconnect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
       self.cbRecent.clear()
       for afile in self.getRecentFilesList():
          afile = afile.replace( FilePrefix,'')
@@ -1796,6 +1832,10 @@ Add this options to temporary image saving.')
          short = afile.replace( FileRecent,'')[2:]
          if len(short) > 20: short = short[:10] + ' .. ' + short[-10:]
          self.cbRecent.addItem( short, afile)
+      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
+
+   def loadRecent( self):
+      self.load( getComboBoxString( self.cbRecent))
 
 app = QtGui.QApplication( sys.argv)
 app.setWindowIcon( QtGui.QIcon( cgruutils.getIconFileName( Options.wndicon)))
