@@ -55,22 +55,12 @@ static struct timeval s_cur_time, s_last_time;
 /* Statistics from one disk drive. */
 struct drivestats
 {
-   io_registry_entry_t driver;
-
-   char name[MAXDRIVENAME + 1];
-
-   u_int64_t blocksize;
-   u_int64_t total_read_bytes;
-   u_int64_t total_write_bytes;
-   u_int64_t total_transfers;
-   u_int64_t total_time;
-
-} s_drivestats[MAXDRIVES] = {0};
+   uint64_t read, write;
+   /* uint64_t total_time; */
+} s_disk_stats = {0};
 
 /* declarations, this is taken from iostat.h (DARWIN) . */
-static int record_all_devices(
-   mach_port_t i_master_port, drivestats *o_drivestats );
-static void get_drive_stats(long double etime, double &, double &);
+static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write);
 static double compute_etime( struct timeval cur_time, struct timeval prev_time);
 
 void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
@@ -243,10 +233,14 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
          values as 8 bit integers which is not really good. */
       for( unsigned i=0; i<nelem; i++ )
       {
-         hres.cpu_loadavg[i] = 10.0 * loadavg[0];
+         double la = 10.0 * loadavg[0];
 
-         if( hres.cpu_loadavg[i] < 0 ) hres.cpu_loadavg[i] = 0;
-         if( hres.cpu_loadavg[i] > 255 ) hres.cpu_loadavg[i] = 255;
+         if( la > 255 )
+            la = 255;
+         else if( la < 0 )
+            la = 0;
+
+         hres.cpu_loadavg[i] = la;
       }
    }
 
@@ -314,311 +308,114 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
       freeifaddrs( addr );
    }
 
+   uint64_t read=0, write=0;
+   if( get_drive_stats(read, write) ) 
    {
-      mach_port_t master_port;
+      uint64_t read_interval = read - s_disk_stats.read;
+      uint64_t write_interval = write - s_disk_stats.write;
 
-      /*
-       * Get the I/O Kit communication handle.
-       */
-      IOMasterPort(bootstrap_port, &master_port);
+      s_disk_stats.read = read;
+      s_disk_stats.write = write;
 
-      s_num_drives = 
-         record_all_devices( master_port, &s_drivestats[0] );
-
-      double read_kb_per_second, write_kb_per_second;
-      get_drive_stats( etime, read_kb_per_second, write_kb_per_second );  
-
-      hres.hdd_rd_kbsec = read_kb_per_second;
-      hres.hdd_wr_kbsec = write_kb_per_second;
+      hres.hdd_rd_kbsec = read_interval / (etime*1024);
+      hres.hdd_wr_kbsec = write_interval / (etime*1024);
+   }
+   else
+   {
+      hres.hdd_rd_kbsec = hres.hdd_wr_kbsec = 0;
    }
 }
 
-/*
-	All the followin functions were taken from iostat.c on Darwin. 
-	They were modified so not to exit when there is an error.
-*/
-
-/*
- * Determine whether an IORegistryEntry refers to a valid
- * I/O device, and if so, record it.
- */
-static int
-record_device(io_registry_entry_t drive, drivestats *o_drive_stats )
+static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write)
 {
-	io_registry_entry_t parent;
+	mach_port_t master_port;
 
-	CFDictionaryRef properties;
-	CFStringRef name;
-	CFNumberRef number;
+	/*  Get the I/O Kit communication handle.  */
+	IOMasterPort(bootstrap_port, &master_port);
 
-	kern_return_t status;
-	
-	/* get drive's parent */
-	status = IORegistryEntryGetParentEntry(drive, kIOServicePlane, &parent);
-
-	if (status != KERN_SUCCESS)
-		return 1;
-
-	if (IOObjectConformsTo(parent, "IOBlockStorageDriver"))
-	{
-		o_drive_stats->driver = parent;
-
-		/* get drive properties */
-		status = IORegistryEntryCreateCFProperties(drive,
-			(CFMutableDictionaryRef *)&properties,
-			kCFAllocatorDefault,
-			kNilOptions);
-
-		if (status != KERN_SUCCESS)
-			return 1;
-
-		/* get name from properties */
-		name = (CFStringRef)CFDictionaryGetValue(properties,
-			CFSTR(kIOBSDNameKey));
-
-		CFStringGetCString(name, o_drive_stats->name, 
-			MAXDRIVENAME, CFStringGetSystemEncoding());
-
-		/* get blocksize from properties */
-		number = (CFNumberRef)CFDictionaryGetValue(
-			properties, CFSTR(kIOMediaPreferredBlockSizeKey));
-
-		CFNumberGetValue(
-			number, kCFNumberSInt64Type, &(o_drive_stats->blocksize) );
-
-		/* clean up, return success */
-		CFRelease(properties);
-		return 0;
-	}
-
-	/* failed, don't keep parent */
-	IOObjectRelease(parent);
-	return 1;
-}
-
-/*
- * Record all "whole" IOMedia objects as being interesting.
- */
-static int record_all_devices(
-   mach_port_t i_master_port, drivestats *o_drivestats )
-{
-	io_iterator_t drivelist;
-	kern_return_t status;
-
-	/*
-	 * Get an iterator for IOMedia objects.
-	 */
+	/* Get an iterator for IOMedia objects.  */
 	CFMutableDictionaryRef match = IOServiceMatching("IOMedia");
 	CFDictionaryAddValue( match, CFSTR(kIOMediaWholeKey), kCFBooleanTrue );
 
-	status = IOServiceGetMatchingServices(i_master_port, match, &drivelist);
+	io_iterator_t drivelist;
+	kern_return_t status =
+		IOServiceGetMatchingServices(master_port, match, &drivelist);
 
 	if (status != KERN_SUCCESS)
-		return 1;
+		return false;
 
-	/*
-	 * Scan all of the IOMedia objects, and for each
-	 * object that has a parent IOBlockStorageDriver, save
-	 * the object's name and the parent (from which we can
-	 * fetch statistics).
-	 *
-	 * XXX What about RAID devices?
-	 */
-	int ndrives = 0;
+	CFNumberRef number;
+	CFDictionaryRef properties;
+	CFDictionaryRef statistics;
 
-	io_registry_entry_t drive;
+	uint64_t value;
+	uint64_t total_time = 0;
 
-	while ((drive = IOIteratorNext(drivelist)) && ndrives<MAXDRIVES )
-	{
-		if (!record_device(drive, o_drivestats + ndrives))
-		{
-			ndrives++;
-		}
+	io_registry_entry_t drive, parent;
 
-		IOObjectRelease(drive);
-	}
-	IOObjectRelease(drivelist);
-
-	return ndrives;
-}
-
-static void get_drive_stats(
-   long double etime, 
-   double &o_read_kb_per_sec,
-   double &o_write_kb_per_sec )
-{
-   CFNumberRef number;
-   CFDictionaryRef properties;
-   CFDictionaryRef statistics;
-
-   long double read_kb_per_second = 0;
-   long double write_kb_per_second = 0;
-
-   u_int64_t value;
-
-   for( unsigned i = 0; i < s_num_drives; i++)
+	while( drive = IOIteratorNext(drivelist) )
    {
-      /*
-       * If the drive goes away, we may not get any properties
-       * for it.  So take some defaults.
-       */
-      uint64_t total_read_bytes = 0;
-      uint64_t total_write_bytes = 0;
-      uint64_t total_transfers = 0;
-      uint64_t total_time = 0;
+      /* get drive's parent */
+      kern_return_t status =
+         IORegistryEntryGetParentEntry(drive, kIOServicePlane, &parent);
+
+      /* We don't need this one anymore. */
+      IOObjectRelease( drive );
+
+      if( status != KERN_SUCCESS )
+         continue;
+
+      if( !IOObjectConformsTo(parent, "IOBlockStorageDriver") )
+      {
+         /* Not a block storage device, skip. NOTE: do we need to
+            go to "more parents" if this one is not a block device ?? */
+         IOObjectRelease( parent );
+         continue;
+      }
 
       /* get drive properties */
-      kern_return_t status =
+      status =
          IORegistryEntryCreateCFProperties(
-            s_drivestats[i].driver,
-            (CFMutableDictionaryRef *)&properties,
-            kCFAllocatorDefault,
-            kNilOptions);
+               parent,
+               (CFMutableDictionaryRef *)&properties,
+               kCFAllocatorDefault,
+               kNilOptions);
 
-      if (status != KERN_SUCCESS)
+      /* We don't need this one anymore. */
+      IOObjectRelease( parent );
+
+      if( status != KERN_SUCCESS )
+      {
          continue;
+      }
 
       /* get statistics from properties */
       statistics = (CFDictionaryRef)
          CFDictionaryGetValue(
-            properties, CFSTR(kIOBlockStorageDriverStatisticsKey));
+               properties, CFSTR(kIOBlockStorageDriverStatisticsKey));
 
-      if (statistics)
+      if( !statistics )
       {
-         /*
-          * Get I/O volume.
-          */
-         if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
-                     CFSTR(kIOBlockStorageDriverStatisticsBytesReadKey))))
-         {
-            CFNumberGetValue(number, kCFNumberSInt64Type, &value);
-            total_read_bytes += value;
-         }
-
-         if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
-                     CFSTR(kIOBlockStorageDriverStatisticsBytesWrittenKey))))
-         {
-            CFNumberGetValue(number, kCFNumberSInt64Type, &value);
-            total_write_bytes += value;
-         }
-
-         /*
-          * Get I/O counts.
-          */
-         if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
-                     CFSTR(kIOBlockStorageDriverStatisticsReadsKey)))) {
-            CFNumberGetValue(number, kCFNumberSInt64Type, &value);
-            total_transfers += value;
-         }
-         if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
-                     CFSTR(kIOBlockStorageDriverStatisticsWritesKey)))) {
-            CFNumberGetValue(number, kCFNumberSInt64Type, &value);
-            total_transfers += value;
-         }
-
-         /*
-          * Get I/O time.
-          */
-         if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
-                     CFSTR(kIOBlockStorageDriverStatisticsLatentReadTimeKey)))) {
-            CFNumberGetValue(number, kCFNumberSInt64Type, &value);
-            total_time += value;
-         }
-         if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
-                     CFSTR(kIOBlockStorageDriverStatisticsLatentWriteTimeKey)))) {
-            CFNumberGetValue(number, kCFNumberSInt64Type, &value);
-            total_time += value;
-         }
+         CFRelease(properties);
+         continue;
       }
 
-      CFRelease(properties);
-
-      /*
-       * Compute delta values and stats.
-       */
-      uint64_t interval_read_bytes = total_read_bytes - s_drivestats[i].total_read_bytes;
-      uint64_t interval_write_bytes = total_write_bytes - s_drivestats[i].total_write_bytes;
-      uint64_t interval_transfers = total_transfers - s_drivestats[i].total_transfers;
-      uint64_t interval_time = total_time - s_drivestats[i].total_time;
-
-      read_kb_per_second += (interval_read_bytes / etime) / 1024;
-      write_kb_per_second += (interval_write_bytes / etime) / 1024;
-
-      /* update running totals */
-      s_drivestats[i].total_read_bytes = total_read_bytes;
-      s_drivestats[i].total_write_bytes = total_write_bytes;
-      s_drivestats[i].total_transfers = total_transfers;
-      s_drivestats[i].total_time = total_time;
-#if 0
-      long double kb_per_transfer;
-      long double transfers_per_second;
-      long double interval_mb;
-      long double blocks_per_second, ms_per_transaction;
-      u_int64_t interval_blocks;
-      u_int64_t total_blocks;
-
-      u_int64_t total_bytes = total_read_bytes + total_write_bytes;
-
-      /* Could be needed in the future. */
-      
-      interval_blocks = interval_bytes / drivestat[i].blocksize;
-      total_blocks = total_bytes / drivestat[i].blocksize;
-
-      blocks_per_second = interval_blocks / etime;
-      transfers_per_second = interval_transfers / etime;
-
-      kb_per_transfer = (interval_transfers > 0) ?
-         ((long double)interval_bytes / interval_transfers) 
-         / 1024 : 0;
-
-      /* times are in nanoseconds, convert to milliseconds */
-      ms_per_transaction = (interval_transfers > 0) ?
-         ((long double)interval_time / interval_transfers) 
-         / 1000 : 0;
-
-      if (Kflag)
-         total_blocks = total_blocks * drivestat[i].blocksize 
-            / 1024;
-
-      if (oflag > 0) {
-         int msdig = (ms_per_transaction < 100.0) ? 1 : 0;
-
-         if (Iflag == 0)
-            printf("%4.0Lf%4.0Lf%5.*Lf ",
-                  blocks_per_second,
-                  transfers_per_second,
-                  msdig,
-                  ms_per_transaction);
-         else 
-            printf("%4.1qu%4.1qu%5.*Lf ",
-                  interval_blocks,
-                  interval_transfers,
-                  msdig,
-                  ms_per_transaction);
-      } else {
-         if (Iflag == 0)
-            printf(" %5.2Lf %3.0Lf %5.2Lf ", 
-                  kb_per_transfer,
-                  transfers_per_second,
-                  mb_per_second);
-         else {
-            interval_mb = interval_bytes;
-            interval_mb /= 1024 * 1024;
-
-            printf(" %5.2Lf %3.1qu %5.2Lf ", 
-                  kb_per_transfer,
-                  interval_transfers,
-                  interval_mb);
-         }
+      if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
+                  CFSTR(kIOBlockStorageDriverStatisticsBytesReadKey))))
+      {
+         CFNumberGetValue(number, kCFNumberSInt64Type, &value);
+         o_read += value;
       }
-#endif
 
+      if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
+                  CFSTR(kIOBlockStorageDriverStatisticsBytesWrittenKey))))
+      {
+         CFNumberGetValue(number, kCFNumberSInt64Type, &value);
+         o_write += value;
+      }
    }
 
-   o_read_kb_per_sec = read_kb_per_second;
-   o_write_kb_per_sec = write_kb_per_second;
-
-   return;
+   return true;
 }
 
 static double
