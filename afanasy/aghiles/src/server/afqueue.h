@@ -35,7 +35,7 @@ public:
    };
 
 public:
-   AfQueue( const std::string & QueueName);
+   AfQueue( const std::string & QueueName, bool i_start_thread=true );
    virtual ~AfQueue();
 
    void lock();
@@ -67,6 +67,9 @@ private:
 
    /* Thread reading from the queue (and waitong on the semaphore. */
    DlThread m_thread;
+
+   /* = true if we started a thread for this queue. */
+   bool m_thread_started;
 
    /* A semaphore on which to sleep when there are no items in the queue. 
       We need a pointer and a semaphore because MacOS X systems use pointers

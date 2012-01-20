@@ -56,7 +56,8 @@ Core::Core():
    if( !monitors->isInitialized()) return;
 
    // check message queues initialization
-   msgQueue = new MsgQueue("Run thread messages queue");
+   msgQueue = new MsgQueue("Run thread messages queue", 
+		false /* do not start a thread */ );
    if( !msgQueue->isInitialized()) return;
 
    // theads initialization

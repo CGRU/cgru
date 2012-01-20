@@ -23,11 +23,12 @@ void thread_entry_point( void *i_parameter )
    queue->run();
 }
 
-AfQueue::AfQueue( const std::string &i_QueueName ):
+AfQueue::AfQueue( const std::string &i_QueueName, bool i_start_thread ):
    name(i_QueueName),
    count(0),
    firstPtr(NULL),
-   lastPtr(NULL)
+   lastPtr(NULL),
+   m_thread_started(i_start_thread)
 {
 #ifdef MACOSX
    /* We carate an exclusive semaphore and give read and write
@@ -48,8 +49,11 @@ AfQueue::AfQueue( const std::string &i_QueueName ):
    }
 #endif
 
-   /* Start the thread which waits for elements in the queue. */
-   m_thread.Start( thread_entry_point, this );
+   if( i_start_thread )
+   {
+      /* Start the thread which waits for elements in the queue. */
+      m_thread.Start( thread_entry_point, this );
+   }
 }
 
 AfQueue::~AfQueue()
@@ -82,8 +86,11 @@ AfQueue::~AfQueue()
 
    m_mutex.Unlock();
 
-   m_thread.Cancel();
-   m_thread.Join();
+   if( m_thread_started )
+   {
+      m_thread.Cancel();
+      m_thread.Join();
+   }
 }
 
 void AfQueue::lock()
@@ -202,7 +209,8 @@ void AfQueue::run()
       /*
          This is a safe concellation point.
       */
-      m_thread.TestCancel();
+      if( m_thread_started )
+         m_thread.TestCancel();
    }
    
    AFINFA("AfQueue::run is finished for queue '%s'.", name.c_str() )

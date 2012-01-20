@@ -7,7 +7,7 @@
 class MsgQueue : public AfQueue
 {
 public:
-   MsgQueue( const std::string & QueueName);
+   MsgQueue( const std::string & QueueName, bool i_start_thread=true );
    virtual ~MsgQueue();
 
 /// Return first message from queue. BLOCKING FUNCTION if \c block==AfQueue::e_wait.

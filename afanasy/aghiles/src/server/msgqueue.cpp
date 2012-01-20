@@ -20,8 +20,8 @@
 #include "../include/macrooutput.h"
 
 
-MsgQueue::MsgQueue( const std::string & QueueName):
-   AfQueue( QueueName)
+MsgQueue::MsgQueue( const std::string & QueueName, bool i_start_thread ):
+   AfQueue( QueueName, i_start_thread)
 {
 }
 
