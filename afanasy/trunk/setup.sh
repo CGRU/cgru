@@ -6,7 +6,7 @@ export AF_ROOT=$PWD
 export PATH="${AF_ROOT}/bin:${PATH}"
 
 # Python module path:
-AF_PYTHON="${AF_ROOT}/bin:${AF_ROOT}/python"
+AF_PYTHON="${AF_ROOT}/lib:${AF_ROOT}/python"
 if [ "$PYTHONPATH" != "" ]; then
    PYTHONPATH="${AF_PYTHON}:${PYTHONPATH}"
 else

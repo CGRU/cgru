@@ -26,4 +26,10 @@ if(WIN32)
    target_link_libraries(afrender Ws2_32.lib Iphlpapi.lib)
 endif(WIN32)
 
-target_link_libraries(afrender afqt)
+if(APPLE)
+   find_library(CORE_FOUNDATION CoreFoundation)
+   find_library(IOKIT IOKit)
+   set(EXTRA_LIBS ${CORE_FOUNDATION} ${IOKIT} )
+endif (APPLE)
+
+target_link_libraries(afrender afqt ${EXTRA_LIBS} )
