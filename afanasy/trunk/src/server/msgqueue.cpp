@@ -20,8 +20,8 @@
 #include "../include/macrooutput.h"
 
 
-MsgQueue::MsgQueue( const std::string & QueueName):
-   AfQueue( QueueName)
+MsgQueue::MsgQueue( const std::string & QueueName, bool i_start_thread ):
+   AfQueue( QueueName, i_start_thread)
 {
 }
 
@@ -57,7 +57,6 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
       return;
    }
 
-//printf("MsgQueue::send:\n"); msg->stdOut();
    int socketfd;
    struct sockaddr_storage client_addr;
 
@@ -65,24 +64,27 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
 
    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
    {
-      AFERRPE("MsgQueue::send: socket")
-      address.stdOut(); printf("\n");
+      perror("socket() call failed in MsgQueue::send");
       return;
    }
 
    AFINFO("MsgQueue::send: tying to connect to client.")
+
    // Use SIGALRM to unblock
    if( alarm(2) != 0 )
       AFERROR("MsgQueue::send: alarm was already set.\n");
 
-//   if( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
-   if( connect( socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
+   if( connect(socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
-      AFERRPA("MsgQueue::send: connect: %s", address.generateInfoString().c_str())
+      AFERRPA("MsgQueue::send: connect failure for msgType '%d': %s",
+			msg->type(), address.generateInfoString().c_str())
       close(socketfd);
       alarm(0);
       return;
    }
+   
+   fprintf( stderr, "Connection accepted!\n" );
+
    alarm(0);
    //
    // set socket maximum time to wait for an output operation to complete

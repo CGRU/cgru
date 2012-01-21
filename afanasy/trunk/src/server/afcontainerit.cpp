@@ -7,32 +7,36 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfContainerLock::AfContainerLock( AfContainer* afcontainer, int locktype):
+AfContainerLock::AfContainerLock( AfContainer* afcontainer, LockType locktype):
    container(afcontainer),
-   type( locktype)
+   type(locktype)
 {
-   switch( type)
+   switch( type )
    {
-      case AfContainer::READLOCK:
+      case READLOCK:
       {
-         if( pthread_rwlock_rdlock( &container->rwlock) != 0)
-            AFERRPE("AfContainerLock::AfContainerLock: pthread_rwlock_rdlock:");
+         container->ReadLock();
          break;
       }
-      case AfContainer::WRITELOCK:
+      case WRITELOCK:
       {
-         if( pthread_rwlock_wrlock( &container->rwlock) != 0)
-            AFERRPE("AfContainerLock::AfContainerLock: pthread_rwlock_wrlock:");
+         container->WriteLock();
          break;
       }
       default:
          AFERROR("AfContainerLock::AfContainerLock: invalid lock type.");
    }
 }
+
 AfContainerLock::~AfContainerLock()
 {
-   if( pthread_rwlock_unlock( &container->rwlock) != 0)
-      AFERRPE("AfContainerLock::~AfContainerLock: pthread_rwlock_unlock:");
+   if( type == READLOCK )
+      container->ReadUnlock();
+   else
+   {
+      assert( type == WRITELOCK );
+      container->WriteUnlock();
+   }
 }
 
 AfContainerIt::AfContainerIt( AfContainer* afContainer, bool skipZombies):

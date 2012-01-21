@@ -10,18 +10,13 @@ AfListIt::AfListIt( AfList* aflist):
    node( NULL),
    list( aflist)
 {
-//BEGIN mutex
-   if( pthread_rwlock_rdlock( &list->rwlock) != 0)
-      AFERRPE("AfListIt::AfListIt: pthread_rwlock_rdlock:");
-
+	aflist->ReadLock();
    reset();
 }
 
 AfListIt::~AfListIt()
 {
-   if( pthread_rwlock_unlock( &list->rwlock) != 0)
-      AFERRPE("AfListIt::~AfListIt: pthread_rwlock_unlock:");
-//END mutex
+	list->ReadUnlock();
 }
 
 void AfListIt::next()

@@ -37,17 +37,31 @@ printf("...................................\n");
 // Lock containers:
 //
 AFINFO("ThreadRun::run: Locking containers...")
-      AfContainerLock jLock( jobs,     AfContainer::WRITELOCK);
-      AfContainerLock lLock( renders,  AfContainer::WRITELOCK);
-      AfContainerLock ulock( users,    AfContainer::WRITELOCK);
-      AfContainerLock tlock( talks,    AfContainer::WRITELOCK);
-      AfContainerLock mlock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock jLock( jobs,     AfContainerLock::WRITELOCK);
+      AfContainerLock lLock( renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock ulock( users,    AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( talks,    AfContainerLock::WRITELOCK);
+      AfContainerLock mlock( monitors, AfContainerLock::WRITELOCK);
 
 //
 // Messages reaction:
 //
 AFINFO("ThreadRun::run: React on incoming messages:")
-      for( MsgAf *msg = msgQueue->popMsg( false); msg != NULL; msg = msgQueue->popMsg( false)) msgCase( msg);
+
+   /*
+      Process all messages in our message queue. We do it without
+      waiting so that the job solving below can run just after.
+      NOTE: I think this should be a waiting operation in a different
+      thread. The job solving below should be put asleep using a 
+      semaphore and woke up when something changes. We need to avoid
+      the Sleep() function below. 
+   */
+
+   MsgAf *message;
+   while( message = msgQueue->popMsg(AfQueue::e_no_wait) )
+   {
+      msgCase( message );
+   }
 
 //
 // Refresh data:
@@ -82,6 +96,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
             render->notSolved();
          }
       }
+
       // cycle on renders, which produced a task
       while( rIds.size())
       {

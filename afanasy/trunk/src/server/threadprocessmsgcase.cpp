@@ -43,7 +43,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       if( str.empty()) break;
 
       AFCommon::QueueLog( str);
-      AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
       monitors->sendMessage( str);
       break;
    }
@@ -62,8 +62,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TConfigLoad:
    {
-      AfContainerLock tlock( talks, AfContainer::WRITELOCK);   AfContainerLock rlock( renders, AfContainer::WRITELOCK);
-      AfContainerLock jlock(  jobs, AfContainer::WRITELOCK);   AfContainerLock ulock(   users, AfContainer::WRITELOCK);
+      AfContainerLock tlock( talks, AfContainerLock::WRITELOCK);   AfContainerLock rlock( renders, AfContainerLock::WRITELOCK);
+      AfContainerLock jlock(  jobs, AfContainerLock::WRITELOCK);   AfContainerLock ulock(   users, AfContainerLock::WRITELOCK);
       std::string message;
       if( af::Environment::reload()) message = "Reloaded successfully.";
       else                message = "Failed, see server logs fo details.";
@@ -73,8 +73,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TFarmLoad:
    {
-      AfContainerLock rlock( renders,  AfContainer::WRITELOCK);
-      AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock rlock( renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
 
       printf("\n   ========= RELOADING FARM =========\n\n");
       std::string message;
@@ -102,7 +102,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
 // ---------------------------------- Monitor ---------------------------------//
    case af::Msg::TMonitorRegister:
    {
-      AfContainerLock lock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock lock( monitors, AfContainerLock::WRITELOCK);
 
       MonitorAf * newMonitor = new MonitorAf( msg);
       newMonitor->setAddressIP( msg->getAddress());
@@ -111,7 +111,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TMonitorUpdateId:
    {
-      AfContainerLock lock( monitors, AfContainer::READLOCK);
+      AfContainerLock lock( monitors, AfContainerLock::READLOCK);
 
       if( monitors->updateId( msg->int32())) msg_response = new MsgAf( af::Msg::TMonitorId, msg->int32());
       else msg_response = new MsgAf( af::Msg::TMonitorId, 0);
@@ -119,14 +119,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TMonitorsListRequest:
    {
-      AfContainerLock lock( monitors, AfContainer::READLOCK);
+      AfContainerLock lock( monitors, AfContainerLock::READLOCK);
 
       msg_response = monitors->generateList( af::Msg::TMonitorsList);
       break;
    }
    case af::Msg::TMonitorsListRequestIds:
    {
-      AfContainerLock lock( monitors, AfContainer::READLOCK);
+      AfContainerLock lock( monitors, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = monitors->generateList( af::Msg::TMonitorsList, ids);
@@ -136,8 +136,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
 // ---------------------------------- Talk ---------------------------------//
    case af::Msg::TTalkRegister:
    {
-      AfContainerLock tlock( talks,    AfContainer::WRITELOCK);
-      AfContainerLock mlock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock tlock( talks,    AfContainerLock::WRITELOCK);
+      AfContainerLock mlock( monitors, AfContainerLock::WRITELOCK);
 
       TalkAf * newTalk = new TalkAf( msg);
       newTalk->setAddressIP( msg->getAddress());
@@ -146,14 +146,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TTalksListRequest:
    {
-      AfContainerLock lock( talks, AfContainer::READLOCK);
+      AfContainerLock lock( talks, AfContainerLock::READLOCK);
 
       msg_response = talks->generateList( af::Msg::TTalksList);
       break;
    }
    case af::Msg::TTalksListRequestIds:
    {
-      AfContainerLock lock( talks, AfContainer::READLOCK);
+      AfContainerLock lock( talks, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = talks->generateList( af::Msg::TTalksList, ids);
@@ -161,7 +161,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TTalkUpdateId:
    {
-      AfContainerLock lock( talks, AfContainer::READLOCK);
+      AfContainerLock lock( talks, AfContainerLock::READLOCK);
 
       if( talks->updateId( msg->int32())) msg_response = talks->generateList( af::Msg::TTalksList);
       else msg_response = new MsgAf( af::Msg::TTalkId, 0);
@@ -169,7 +169,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TTalkDistributeData:
    {
-      AfContainerLock lock( talks, AfContainer::READLOCK);
+      AfContainerLock lock( talks, AfContainerLock::READLOCK);
 
       talks->distributeData( msg);
       break;
@@ -179,8 +179,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderRegister:
    {
 //printf("case af::Msg::TRenderRegister:\n");
-      AfContainerLock rLock( renders,  AfContainer::WRITELOCK);
-      AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+      AfContainerLock rLock( renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
 
       RenderAf * newRender = new RenderAf( msg);
       newRender->setAddressIP( msg->getAddress());
@@ -190,7 +190,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderUpdate:
    {
 //printf("case af::Msg::TRenderUpdate:\n");
-      AfContainerLock lock( renders, AfContainer::READLOCK);
+      AfContainerLock lock( renders, AfContainerLock::READLOCK);
 
       af::Render render_up( msg);
 //printf("Msg::TRenderUpdate: %s - %s\n", render_up.getName().toUtf8().data(), time2Qstr( time(NULL)).toUtf8().data());
@@ -203,14 +203,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TRendersListRequest:
    {
-      AfContainerLock lock( renders, AfContainer::READLOCK);
+      AfContainerLock lock( renders, AfContainerLock::READLOCK);
 
       msg_response = renders->generateList( af::Msg::TRendersList);
       break;
    }
    case af::Msg::TRendersListRequestIds:
    {
-      AfContainerLock lock( renders, AfContainer::READLOCK);
+      AfContainerLock lock( renders, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = renders->generateList( af::Msg::TRendersList, ids);
@@ -218,7 +218,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TRendersUpdateRequestIds:
    {
-      AfContainerLock lock( renders, AfContainer::READLOCK);
+      AfContainerLock lock( renders, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = renders->generateList( af::Msg::TRendersListUpdates, ids);
@@ -226,7 +226,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TRenderLogRequestId:
    {
-      AfContainerLock lock( renders,  AfContainer::READLOCK);
+      AfContainerLock lock( renders,  AfContainerLock::READLOCK);
 
       RenderContainerIt rendersIt( renders);
       RenderAf* render = rendersIt.getRender( msg->int32());
@@ -237,7 +237,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TRenderTasksLogRequestId:
    {
-      AfContainerLock lock( renders,  AfContainer::READLOCK);
+      AfContainerLock lock( renders,  AfContainerLock::READLOCK);
 
       RenderContainerIt rendersIt( renders);
       RenderAf* render = rendersIt.getRender( msg->int32());
@@ -251,7 +251,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TRenderInfoRequestId:
    {
-      AfContainerLock lock( renders,  AfContainer::READLOCK);
+      AfContainerLock lock( renders,  AfContainerLock::READLOCK);
 
       RenderContainerIt rendersIt( renders);
       RenderAf* render = rendersIt.getRender( msg->int32());
@@ -275,7 +275,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
 // ---------------------------------- Users -------------------------------//
    case af::Msg::TUserIdRequest:
    {
-      AfContainerLock lock( users, AfContainer::READLOCK);
+      AfContainerLock lock( users, AfContainerLock::READLOCK);
 
       af::MsgClassUserHost usr( msg);
       std::string name = usr.getUserName();
@@ -288,14 +288,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TUsersListRequest:
    {
-      AfContainerLock lock( users, AfContainer::READLOCK);
+      AfContainerLock lock( users, AfContainerLock::READLOCK);
 
       msg_response = users->generateList( af::Msg::TUsersList);
       break;
    }
    case af::Msg::TUsersListRequestIds:
    {
-      AfContainerLock lock( users, AfContainer::READLOCK);
+      AfContainerLock lock( users, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = users->generateList( af::Msg::TUsersList, ids);
@@ -303,7 +303,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TUserLogRequestId:
    {
-      AfContainerLock lock( users,  AfContainer::READLOCK);
+      AfContainerLock lock( users,  AfContainerLock::READLOCK);
 
       UserContainerIt usersIt( users);
       UserAf* user = usersIt.getUser( msg->int32());
@@ -314,7 +314,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TUserJobsOrderRequestId:
    {
-      AfContainerLock lock( users,  AfContainer::READLOCK);
+      AfContainerLock lock( users,  AfContainerLock::READLOCK);
 
       UserContainerIt usersIt( users);
       UserAf* user = usersIt.getUser( msg->int32());
@@ -333,7 +333,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
@@ -347,7 +347,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobLogRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
@@ -358,7 +358,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobErrorHostsRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
@@ -369,7 +369,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobProgressRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       JobContainerIt jobsIt( jobs);
       JobAf* job = jobsIt.getJob( msg->int32());
@@ -384,14 +384,14 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobsListRequest:
    {
-      AfContainerLock lock( jobs, AfContainer::READLOCK);
+      AfContainerLock lock( jobs, AfContainerLock::READLOCK);
 
       msg_response = jobs->generateList( af::Msg::TJobsList);
       break;
    }
    case af::Msg::TJobsListRequestIds:
    {
-      AfContainerLock lock( jobs, AfContainer::READLOCK);
+      AfContainerLock lock( jobs, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = jobs->generateList( af::Msg::TJobsList, ids);
@@ -399,8 +399,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobsListRequestUserId:
    {
-      AfContainerLock jLock( jobs,  AfContainer::READLOCK);
-      AfContainerLock uLock( users, AfContainer::READLOCK);
+      AfContainerLock jLock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock uLock( users, AfContainerLock::READLOCK);
 
       msg_response = users->generateJobsList( msg->int32());
       if( msg_response == NULL ) msg_response = new MsgAf( af::Msg::TUserId, 0);
@@ -408,8 +408,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobsListRequestUsersIds:
    {
-      AfContainerLock jLock( jobs,  AfContainer::READLOCK);
-      AfContainerLock uLock( users, AfContainer::READLOCK);
+      AfContainerLock jLock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock uLock( users, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( msg);
       msg_response = users->generateJobsList( ids);
@@ -417,7 +417,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TTaskRequest:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       af::MCTaskPos mctaskpos( msg);
       JobContainerIt jobsIt( jobs);
@@ -446,7 +446,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TTaskLogRequest:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       af::MCTaskPos mctaskpos( msg);
       JobContainerIt jobsIt( jobs);
@@ -473,7 +473,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TTaskErrorHostsRequest:
    {
-      AfContainerLock lock( jobs,  AfContainer::READLOCK);
+      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
 
       af::MCTaskPos mctaskpos( msg);
       JobContainerIt jobsIt( jobs);
@@ -491,8 +491,8 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       msg_response = new MsgAf();
 //printf("ThreadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", mctaskpos.getJobId(), mctaskpos.getNumBlock(), mctaskpos.getNumTask(), mctaskpos.getNumber());
       {
-         AfContainerLock jLock( jobs,    AfContainer::READLOCK);
-         AfContainerLock rLock( renders, AfContainer::READLOCK);
+         AfContainerLock jLock( jobs,    AfContainerLock::READLOCK);
+         AfContainerLock rLock( renders, AfContainerLock::READLOCK);
 
          JobContainerIt jobsIt( jobs);
          JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
@@ -561,7 +561,7 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobsWeightRequest:
    {
-      AfContainerLock jLock( jobs,    AfContainer::READLOCK);
+      AfContainerLock jLock( jobs,    AfContainerLock::READLOCK);
 
       af::MCJobsWeight jobsWeight;
       jobs->getWeight( jobsWeight);

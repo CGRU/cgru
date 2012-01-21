@@ -86,7 +86,7 @@ void DBActionQueue::processItem( AfQueueItem* item)
       if( false == db->isOpen())
       {
          // Push item back to queue front to try it to write again next time:
-         push( item, true);
+         push( item, true );
          AFINFA("%s: Item pushed back to queue front.", name.c_str())
          return;
       }
@@ -113,12 +113,6 @@ bool DBActionQueue::writeItem( AfQueueItem* item)
       if( afsql::qChkErr( query, name)) return false;
    }
    return true;
-}
-
-void DBActionQueue::quit()
-{
-   db->close();
-   AfQueue::quit();
 }
 
 void DBActionQueue::addItem( const afsql::DBItem * item)
@@ -153,7 +147,7 @@ void DBActionQueue::sendAlarm()
 
    std::string str("ALARM! Server database connection error. Contact your system administrator.");
    AFCommon::QueueLog( name + ":\n" + str);
-   AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+   AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
    monitors->sendMessage( str);
 }
 
@@ -161,6 +155,6 @@ void DBActionQueue::sendConnected()
 {
    std::string str("AFANASY: Server database connection established.");
    AFCommon::QueueLog( name + ":\n" + str);
-   AfContainerLock mLock( monitors, AfContainer::WRITELOCK);
+   AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
    monitors->sendMessage( str);
 }

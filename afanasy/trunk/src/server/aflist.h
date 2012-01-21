@@ -1,8 +1,7 @@
 #pragma once
 
-#include <pthread.h>
-
 #include "../libafanasy/afnode.h"
+#include "../libafanasy/dlRWLock.h"
 
 class AfListIt;
 class AfContainer;
@@ -11,13 +10,19 @@ class AfContainer;
 class AfList
 {
 public:
-   AfList();   ///< Construct an empty list.
+   AfList()
+   {
+   }
+
    ~AfList();
 
-   inline bool isInitialized(){  return initialized;       }///< Whether list is successfully initialized.
-   inline int  getCount()     {  return nodes_list.size(); }///< Get nodes quantity in list.
+   int getCount()
+   {
+      return nodes_list.size();
+   }
 
    void moveNodes( const std::vector<int32_t> * list, int type);
+
    enum MoveType{
       MoveUp,
       MoveDown,
@@ -27,18 +32,21 @@ public:
 
    void generateIds( af::MCGeneral & ids) const;
 
-   friend class AfListIt;
    friend class AfContainer;
+   friend class AfListIt;
+
+   void ReadLock( void ) { m_rw_lock.ReadLock(); }
+   void ReadUnlock( void ) { m_rw_lock.ReadUnlock(); }
 
 protected:
    int add( af::Node *node);    ///< Add node to list.
    void remove( af::Node *node); ///< Remove node from list.
 
 private:
-   bool initialized;          ///< Whether list is successfully initialized.
-   pthread_rwlock_t rwlock;   ///< List mutex.
+   int sortPriority( af::Node * node);   ///< Sort nodes by priority.
+
+private:
+   DlRWLock m_rw_lock;
 
    NodesList nodes_list;      ///< Nodes list.
-
-   int sortPriority( af::Node * node);   ///< Sort nodes by priority.
 };

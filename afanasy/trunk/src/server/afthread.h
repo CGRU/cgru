@@ -1,7 +1,5 @@
 #pragma once
 
-#include <pthread.h>
-
 #include "msgqueue.h"
 #include "jobcontainer.h"
 #include "usercontainer.h"

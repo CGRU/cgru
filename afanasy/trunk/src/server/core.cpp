@@ -38,39 +38,32 @@ Core::Core():
 
    // containers initialization
    jobs = new JobContainer();
-   if(  jobs == NULL){ AFERROR("Core::Core: Can't allocate memory for Jobs container."); return; }
    if( !jobs->isInitialized()) return;
    JobContainer::setDataBase( &afDB_JobRegister);
    JobAf::setJobContainer( jobs);
 
    users = new UserContainer();
-   if(  users == NULL){ AFERROR("Core::Core: Can't allocate memory for Users container."); return; }
    if( !users->isInitialized()) return;
 
    renders = new RenderContainer();
-   if(  renders == NULL){ AFERROR("Core::Core: Can't allocate memory for Renders container."); return; }
    if( !renders->isInitialized()) return;
    RenderAf::setRenderContainer( renders);
 
    talks = new TalkContainer();
-   if( talks == NULL){ AFERROR("Core::Core: Can't allocate memory for Talks container."); return; }
    if( !talks->isInitialized()) return;
 
    monitors = new MonitorContainer();
-   if( monitors == NULL){ AFERROR("Core::Core: Can't allocate memory for Monitors container."); return; }
    if( !monitors->isInitialized()) return;
 
    // check message queues initialization
-   msgQueue = new MsgQueue("Run thread messages queue");
-   if( msgQueue == NULL){ AFERROR("Core::Core: Can't allocate memory for run thread messages queue."); return; }
+   msgQueue = new MsgQueue("Run thread messages queue", 
+		false /* do not start a thread */ );
    if( !msgQueue->isInitialized()) return;
 
    // theads initialization
    ThreadPointers ptrs( this);
    threadRun = new ThreadRun( &ptrs);
-   if( threadRun == NULL){ AFERROR("Core::Core: Can't allocate memory for run thread."); return; }
    threadReadMsg = new ThreadReadMsg( &ptrs);
-   if( threadReadMsg == NULL){ AFERROR("Core::Core: Can't allocate memory for read messages thread."); return; }
 
 
    bool hasSystemJob = false;

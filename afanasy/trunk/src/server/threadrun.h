@@ -1,7 +1,5 @@
 #pragma once
 
-#include <pthread.h>
-
 #include "../libafanasy/name_af.h"
 
 #include "afthread.h"

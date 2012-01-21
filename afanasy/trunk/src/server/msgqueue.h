@@ -7,11 +7,11 @@
 class MsgQueue : public AfQueue
 {
 public:
-   MsgQueue( const std::string & QueueName);
+   MsgQueue( const std::string & QueueName, bool i_start_thread=true );
    virtual ~MsgQueue();
 
-/// Return first message from queue. BLOCKING FUNCTION if \c block==true .
-   inline MsgAf* popMsg( bool block = true) { return (MsgAf*)pop( block);}
+/// Return first message from queue. BLOCKING FUNCTION if \c block==AfQueue::e_wait.
+   inline MsgAf* popMsg( WaitMode i_block ) { return (MsgAf*)pop(i_block);}
 
 /// Push message to queue back.
    inline bool pushMsg( MsgAf* msg) { if(msg) msg->resetWrittenSize(); return push( msg);}
