@@ -78,7 +78,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
 //   if( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
    if( connect( socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
-      AFERRPA("MsgQueue::send: connect to %s\n", address.generateInfoString().c_str())
+      AFERRPA("MsgQueue::send: connect: %s", address.generateInfoString().c_str())
       close(socketfd);
       alarm(0);
       return;
@@ -100,7 +100,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
    // send
    if( false == com::msgsend( socketfd, msg))
    {
-      AFERRAR("MsgQueue::send: can't send message to %s\n", address.generateInfoString().c_str())
+      AFERRAR("MsgQueue::send: can't send message to client: %s", address.generateInfoString().c_str())
    }
 
    close(socketfd);

@@ -4,9 +4,6 @@
 #include <memory.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <poll.h>
-#include <pthread.h>
-#include <resolv.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -14,7 +11,7 @@
 #include <sys/types.h>
 #include <time.h>
 
-//#include <Python.h>
+#include "../libafanasy/dlThread.h"
 
 #include <QtCore/QCoreApplication>
 
@@ -27,7 +24,7 @@
 #include "core.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 Core* core;
@@ -36,95 +33,68 @@ bool running;
 //####################### signal handlers ####################################
 void sig_alrm(int signum)
 {
-   printf("ALARM: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)pthread_self());
+   printf("ALARM: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)DlThread::Self());
 }
 void sig_pipe(int signum)
 {
-   printf("PIPE ERROR: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)pthread_self());
+   printf("PIPE ERROR: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)DlThread::Self());
 }
 void sig_int(int signum)
 {
+   fprintf( stderr, "SIG INT\n" );
    running = false;
 }
+
 //############################### child theads functions ################################
 //
 //######################## core thread to process client after accept #################
-void* ThreadCore_processClient(void* arg)
+void ThreadCore_processClient(void* arg)
 {
    T_processClient__args * threadArgs = (T_processClient__args*)arg;
 
+   assert( threadArgs->sd > 0 );
+
    // Disassociate from parent -
    // Guarantees that thread resources are deallocated upon return.
-   pthread_detach( pthread_self());
+   /* FIXME: why for ?? */
+   //DlThread::Self()->Detach();
 
-   if( core != NULL) core->threadReadMsg->process( threadArgs);
+   assert( core );
 
-   // close clien socket descriptor
-   close( threadArgs->sd);
+   /* The 'process' method will decode the incoming request and dispatch
+      it to the proper queue. */
+   if( core != NULL)
+      core->threadReadMsg->process( threadArgs );
 
-   // free process arguments data
-   //   free(arg);
+   close(threadArgs->sd);
    delete threadArgs;
+}
 
-   return NULL;
-}
-//########################### main core thread #############################
-void* ThreadCore_threadRun(void* arg)
+void ThreadCore_threadRun( void* arg )
 {
-   AFINFA("Thread (id = %lu) run created.", (long unsigned)pthread_self())
+   Core *core = (Core *)arg;
    core->threadRun->run();
-   return NULL;
 }
-//########################### queued writing files thread #############################
-void* ThreadCommon_dispatchMessages(void* arg)
+
+#if 0
+void ThreadCommon_dispatchMessages(void* arg)
 {
-// Unblock alarm signal.
+#ifndef _WIN32
+   /* FIXME: why do we need this for? */
    sigset_t sigmask;
    sigemptyset( &sigmask);
    sigaddset( &sigmask, SIGALRM);
-   if( pthread_sigmask( SIG_UNBLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
-//
+   if( pthread_sigmask( SIG_UNBLOCK, &sigmask, NULL) != 0)
+      perror("pthread_sigmask:");
+#endif
+
    AFINFA("Thread (id = %lu) to dispatch messages created.", (long unsigned)pthread_self())
    AFCommon::MsgDispatchQueueRun();
-   return NULL;
 }
-//########################### queued writing files thread #############################
-void* ThreadCommon_writeFiles(void* arg)
-{
-   AFINFA("Thread (id = %lu) to write files created.", (long unsigned)pthread_self())
-   AFCommon::FileWriteQueueRun();
-   return NULL;
-}
-//########################### queued job cleanup thread #############################
-void* ThreadCommon_CleanUpQueue(void* arg)
-{
-   AFINFA("Thread (id = %lu) to cleanup jobs created.", (long unsigned)pthread_self())
-   AFCommon::CleanUpJobQueueRun();
-   return NULL;
-}
-//########################### queued output log thread #############################
-void* ThreadCommon_OutputLogQueue(void* arg)
-{
-   AFINFA("Thread (id = %lu) to output logs created.", (long unsigned)pthread_self())
-   AFCommon::OutputLogQueueRun();
-   return NULL;
-}
-//########################### queued update tasks in database thread #############################
-void* ThreadCommon_dbTasksUpdate(void* arg)
-{
-   AFINFA("Thread (id = %lu) update jobs tasks in database created.", (long unsigned)pthread_self())
-   AFCommon::DBUpTaskQueueRun();
-   return NULL;
-}
-//########################### queued update database thread #############################
-void* ThreadCommon_dbUpdate(void* arg)
-{
-   AFINFA("Thread (id = %lu) update database created.", (long unsigned)pthread_self())
-   AFCommon::DBUpdateQueueRun();
-   return NULL;
-}
+#endif
+
 //###################### server thread to accept clients #################################
-void* ThreadServer_accept(void* arg)
+void ThreadServer_accept(void* arg)
 {
    int protocol = AF_UNSPEC;
 
@@ -136,7 +106,9 @@ void* ThreadServer_accept(void* arg)
    char port[16];
    sprintf( port, "%u", af::Environment::getServerPort());
    getaddrinfo( NULL, port, &hints, &res);
+
    printf("Available addresses:\n");
+
    for( struct addrinfo * ai = res; ai != NULL; ai = ai->ai_next)
    {
       switch( ai->ai_family)
@@ -163,11 +135,12 @@ void* ThreadServer_accept(void* arg)
       }
    }
    freeaddrinfo( res);
-//#ifdef MACOSX
+#ifdef MACOSX
 // FIXME: Current MAX OS can't listen IPv6?
-//   protocol = AF_INET;
-//#endif
-   switch( protocol)
+   protocol = AF_INET;
+#endif
+
+   switch(protocol)
    {
       case AF_INET:
          printf("Using IPv4 addresses family.\n");
@@ -178,7 +151,7 @@ void* ThreadServer_accept(void* arg)
          break;
       default:
          AFERROR("No addresses founed.")
-         return NULL;
+         return;
    }
 
 //
@@ -195,38 +168,50 @@ void* ThreadServer_accept(void* arg)
    server_sockaddr_in6.sin6_family = AF_INET6;
 //   server_sockaddr_in6.sin6_addr = IN6ADDR_ANY_INIT; // This is default value, it is zeros
 
-//
-// socket
+   /* */
    int server_sd = socket( protocol, SOCK_STREAM, 0);
    if( server_sd == -1)
    {
       AFERRPE("socket")
-      return NULL;
+      return;
    }
 //
 // set socket options for reuseing address immediatly after bind
    int value = 1;
    if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) != 0)
       AFERRPE("set socket SO_REUSEADDR option failed");
-//
-// bind
+
+   /* */
    value = -1;
-   if( protocol == AF_INET  ) value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in4, sizeof(server_sockaddr_in4));
-   if( protocol == AF_INET6 ) value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in6, sizeof(server_sockaddr_in6));
+   if( protocol == AF_INET  )
+   {
+      value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in4, sizeof(server_sockaddr_in4));
+   }
+   else
+   {
+#ifdef MACOSX
+      assert( false );
+#endif
+      assert( protocol == AF_INET6 );
+      value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in6, sizeof(server_sockaddr_in6));
+   }
+
    if( value != 0)
    {
-      AFERRPE("bind")
-      return NULL;
+      perror( "bind() error in ThreadServer_accept" );
+      return;
    }
-//
-// listen
+
    if( listen( server_sd, 9) != 0)
    {
-      AFERRPE("listen")
-      return NULL;
+      perror( "listen() error in ThreadServer_accept" );
+      return; 
    }
+
    printf( "Listening %d port...\n", af::Environment::getServerPort());
-   pthread_t childCore_processClient;
+
+   DlThread process_one_client;
+
 //
 //############ accepting client connections:
    int error_wait; // Timeout to pause accepting on error
@@ -235,12 +220,21 @@ void* ThreadServer_accept(void* arg)
    error_wait = error_wait_min;
    while( running )
    {
-      if( core == NULL) break;
+      assert( core );
+
+      /* FIXME: can this happen? */
+      if( core == NULL)
+         break;
 
       T_processClient__args * threadArgs = new T_processClient__args;
       socklen_t client_sockaddr_len = sizeof(threadArgs->ss);
 
       threadArgs->sd = accept( server_sd, (struct sockaddr*)&(threadArgs->ss), &client_sockaddr_len);
+
+      /* This is a cancellation point so the DlThread::Cancel can do
+         its work. */
+      DlThread::Self()->TestCancel();
+
       if( threadArgs->sd < 0)
       {
          AFERRPE("accept")
@@ -267,18 +261,20 @@ void* ThreadServer_accept(void* arg)
          continue;
       }
       error_wait = error_wait_min;
-      if ( pthread_create(&childCore_processClient, NULL, ThreadCore_processClient, threadArgs) != 0 )
-      {
-         delete threadArgs;
-         AFERRPE("Pthread Process creation error")
-      }
-//      ThreadCore_processClient( &threadArgs);
+
+      /* Start a detached thread for this connection, the "t" object will be deleted
+         automagically (check dlThread.cpp for details) and there is no need to join
+         join this thread. */
+      DlThread *t = new DlThread();
+      t->SetDetached();
+      t->Start( ThreadCore_processClient, threadArgs );
    }
+
    close( server_sd);
 
    AFINFO("ThreadServer_accept: exiting.")
-   return NULL;
 }
+
 //
 //#######################################################################################
 //
@@ -299,6 +295,9 @@ int main(int argc, char *argv[])
    if( af::pathMakeDir( ENV.getUsersLogsDir(),   true) == false) return 1;
    if( af::pathMakeDir( ENV.getRendersLogsDir(), true) == false) return 1;
 
+#ifndef _WIN32
+   /* FIXME: do we _really_ need this ?  If someone kills the process 
+      everytning will be fine anyway. */
 //
 // Interrupt signal catch:
    struct sigaction actint;
@@ -306,12 +305,12 @@ int main(int argc, char *argv[])
    actint.sa_handler = sig_int;
    sigaction( SIGINT,  &actint, NULL);
    sigaction( SIGTERM, &actint, NULL);
-   sigaction( SIGSEGV, &actint, NULL);
 // SIGPIPE signal catch
    struct sigaction actpipe;
    bzero( &actpipe, sizeof(actpipe));
    actpipe.sa_handler = sig_pipe;
    sigaction( SIGPIPE, &actpipe, NULL);
+
 // SIGALRM signal catch and block
    struct sigaction actalrm;
    bzero( &actalrm, sizeof(actalrm));
@@ -322,120 +321,61 @@ int main(int argc, char *argv[])
    sigaddset( &sigmask, SIGALRM);
    if( sigprocmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("sigprocmask:");
    if( pthread_sigmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
-//
-// init Core
-   core = NULL;
-   core = new Core();                             // create core object
-   if( core == NULL )                             // check memory allocation
-   {
-      AFERROR("afanasy::main: can't allocate memory for core.")
-      return 1;
-   }
-   if(!core->isInitialized())                      // check initialization success
+#endif
+
+   /*
+      Create a core object.
+      FIXME: explain in more details what is a core object.
+   */
+   core = new Core();
+   assert( core->isInitialized() );
+
+   if( !core->isInitialized() )
    {
       AFERROR("afanasy::main: core init failed.")
       delete core;
       return 1;
    }
-   AFCommon afcommon( core);
 
-//
-// spawn child threads
-   // child threads ids
-   pthread_t childServer_serverAccept;
-   pthread_t childCore_run;
-   pthread_t childCommon_dispatchMessages;
-   pthread_t childCommon_writeFiles;
-   pthread_t childCommon_CleanupQueue;
-   pthread_t childCommon_OutputLogQueue;
-   pthread_t childCommon_dbTasksUpdate;
-   pthread_t childCommon_dbUpdate;
+   /*
+      Creating the afcommon object will actually create many message queues
+      that will spawn thres. Have a look in the implementation of AfCommon. 
+   */ 
+   AFCommon afcommon( core );
 
-   AFINFA("Thread (id = %lu) is main, creating other threads.", (long unsigned)pthread_self())
+   AFINFA("Thread (id = %lu) is main, creating other threads.", (long unsigned)DlThread::Self())
 
-   if( pthread_create( &childCommon_dispatchMessages, NULL, &ThreadCommon_dispatchMessages, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Common thread dispatchMessages creation error")
-      return 1;
-   }
-   if( pthread_create( &childCommon_writeFiles, NULL, &ThreadCommon_writeFiles, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Common thread writeFiles creation error")
-      return 1;
-   }
-   if( pthread_create( &childCommon_CleanupQueue, NULL, &ThreadCommon_CleanUpQueue, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Common thread cleanup creation error")
-      return 1;
-   }
-   if( pthread_create( &childCommon_OutputLogQueue, NULL, &ThreadCommon_OutputLogQueue, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Common thread output logs creation error")
-      return 1;
-   }
-   if( pthread_create( &childCommon_dbTasksUpdate, NULL, &ThreadCommon_dbTasksUpdate, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Common thread update tasks in database creation error")
-      return 1;
-   }
-   if( pthread_create( &childCommon_dbUpdate, NULL, &ThreadCommon_dbUpdate, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Common thread update database creation error")
-      return 1;
-   }
-   if( pthread_create( &childCore_run, NULL, &ThreadCore_threadRun, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Core thread run creation error")
-      return 1;
-   }
-   if( pthread_create( &childServer_serverAccept, NULL, &ThreadServer_accept, NULL) != 0)
-   {
-      AFERRPE("afanasy::main: Server thread accept creation error")
-      return 1;
-   }
-//
-// waiting for childs (do nothing)
+   /*
+      Start the thread that is responsible of listening to the port
+      for incoming connections.
+   */
+   DlThread ServerAccept;
+   ServerAccept.Start( &ThreadServer_accept, 0x0);
 
-   while( running) sleep(1);
+   /* NOTE: note sure why we call this the "core" thread. */
+   DlThread CoreThread;
+   CoreThread.Start( &ThreadCore_threadRun, core ); 
+ 
+   /* Do nothing since everything is done in our threads. */
+   while( running )
+   {
+      DlThread::Self()->Sleep( 1 );
+   }
+
    AFINFO("afanasy::main: Waiting child threads.")
-   pthread_kill( childServer_serverAccept, SIGINT);
-   AFINFO("afanasy::main: Joining accept thread.")
-   pthread_join( childServer_serverAccept, NULL);
+   //alarm(1);
+   //ServerAccept.Cancel();
+   //ServerAccept.Join();
 
+   AFINFO("afanasy::main: Waiting Run.")
+   CoreThread.Cancel();
+   CoreThread.Join();
 
-   AFINFO("afanasy::main: Joining run thread.")
-   pthread_join( childCore_run, NULL);
-
-   AFCommon::MsgDispatchQueueQuit();
-   AFINFO("afanasy::main: Joining dispatch messages thread.")
-   pthread_join( childCommon_dispatchMessages, NULL);
-
-   AFCommon::FileWriteQueueQuit();
-   AFINFO("afanasy::main: Joining writing files thread.")
-   pthread_join( childCommon_writeFiles, NULL);
-
-   AFCommon::CleanUpJobQueueQuit();
-   AFINFO("afanasy::main: Joining cleanup jobs thread.")
-   pthread_join( childCommon_CleanupQueue, NULL);
-
-   AFCommon::DBUpTaskQueueQuit();
-   AFINFO("afanasy::main: Joining update tasks in database thread.")
-   pthread_join( childCommon_dbTasksUpdate, NULL);
-
-   AFCommon::DBUpdateQueueQuit();
-   AFINFO("afanasy::main: Joining update database thread.")
-   pthread_join( childCommon_dbUpdate, NULL);
-
-   AFCommon::OutputLogQueueQuit();
-   AFINFO("afanasy::main: Joining output logs thread.")
-   pthread_join( childCommon_OutputLogQueue, NULL);
-
-
-   AFINFO("afanasy::main: Deleting core:")
-   if( core != NULL) delete core;
+   delete core;
 
    AFINFO("afanasy::main: Output messages statistics:")
    af::destroy();
+
 //   Py_Finalize();
 
    return 0;
