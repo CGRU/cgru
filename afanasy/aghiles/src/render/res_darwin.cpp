@@ -159,7 +159,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
       size_t size = sizeof(vmusage);
       if( sysctlbyname("vm.swapusage", &vmusage, &size, NULL, 0)!=0 )
       {
-         perror( "unable to get swap usage by calling sysctlbyname(\"vm.sysctlbyname\",...)" ); 
+         perror( "unable to get swap usage by calling sysctlbyname(\"vm.swapusage\",...)" ); 
       }
 
       /* A convertion factor to bring us to MBs */
