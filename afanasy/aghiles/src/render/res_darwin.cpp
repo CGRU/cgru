@@ -71,7 +71,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
    /* Some variables that we should get only once. NOTE: not sure this
       really worth it. */
    static uint64_t s_hz = 0;
-   static unsigned s_physical_memory = 0;
+   static uint64_t s_physical_memory = 0;
    static unsigned s_pagesize = 0;
 
    /*
@@ -81,6 +81,10 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
       average stats since the boot of this machine when called for the first
       time.
    */
+
+   s_last_time = s_cur_time;
+   gettimeofday(&s_cur_time, NULL);
+   double etime = compute_etime(s_cur_time, s_last_time);
 
    if( !s_init ) /* not thread safe but not really important. */
    {
@@ -104,19 +108,19 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
       }
 
       size = sizeof(s_physical_memory);
-      if( sysctlbyname("hw.physmem", &s_physical_memory, &size, NULL, 0) != 0 )
+      if( sysctlbyname("hw.memsize", &s_physical_memory, &size, NULL, 0) != 0 )
       {
-         perror( "sysctlbyname(\"hw.cpufrequency\",..) failed: " );
+         perror( "sysctlbyname(\"hw.memsize\",..) failed: " );
+      }
+      else
+      {
+         s_physical_memory /= (1024*1024);
       }
 
       s_pagesize = getpagesize();
 
       s_init = 1;
    }
-
-   s_last_time = s_cur_time;
-   gettimeofday(&s_cur_time, NULL);
-   double etime = compute_etime(s_cur_time, s_last_time);
 
    //
    // CPU info:
@@ -133,51 +137,39 @@ void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
    //
    {
       vm_statistics_data_t vm_stats;
-      int pageshift  =  0;
-      int swappgsin  = -1;
-      int swappgsout = -1;
+      unsigned memtotal=0, memfree=0;
+      unsigned membuffers=0, memcached=0;
 
-      unsigned int memtotal, memfree, membuffers, memcached, swaptotal, swapfree;
+      memtotal = s_physical_memory;
+      unsigned count = HOST_VM_INFO_COUNT;
 
-      memtotal = s_physical_memory >> 10;
-      pageshift = 0;
-      while(( s_pagesize >>= 1) > 0) pageshift++;
-      pageshift -= 10;
-
-#define pagetok(size) ((size)<<pageshift)
-
-      unsigned int count = HOST_VM_INFO_COUNT;
-      if( host_statistics( mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) == KERN_SUCCESS)
+      if( host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) == KERN_SUCCESS)
       {
-         memfree    = pagetok( vm_stats.free_count);
+         memfree = vm_stats.free_count;
          membuffers = 0;
-         memcached  = pagetok( vm_stats.inactive_count);
-         if( swappgsin < 0)
-         {
-            swapfree = 0;
-         }
-         else
-         {
-            int swapin  = pagetok( vm_stats.pageins  - swappgsin );
-            int swapout = pagetok( vm_stats.pageouts - swappgsout);
-            swapfree = (swapin + swapout);// >> 10;
-         }
-
-         swappgsin  = vm_stats.pageins;
-         swappgsout = vm_stats.pageouts;
+         memcached = vm_stats.inactive_count;
       }
       else
       {
-         AFERRPE("GetResources: host_satistics( HOST_VM_INFO) failure:");
+        perror("host_satistics(HOST_VM_INFO) failed");
       }
 
-      host.mem_mb  = memtotal >> 10;
-      host.swap_mb = 0;
-      hres.mem_free_mb    = ( memfree + memcached + membuffers ) >> 10;
-      hres.mem_cached_mb  = memcached  >> 10;
-      hres.mem_buffers_mb = membuffers >> 10;
-      hres.swap_used_mb   = swapfree / af::Environment::getRenderUpdateSec();
-   } //memory
+      /* size of data in bytes. */
+      xsw_usage vmusage = {0};
+      size_t size = sizeof(vmusage);
+      if( sysctlbyname("vm.swapusage", &vmusage, &size, NULL, 0)!=0 )
+      {
+         perror( "unable to get swap usage by calling sysctlbyname(\"vm.sysctlbyname\",...)" ); 
+      }
+
+      /* A convertion factor to bring us to MBs */
+      host.mem_mb = s_physical_memory;
+      host.swap_mb = vmusage.xsu_total >> 20;
+      hres.mem_free_mb = (memfree * s_pagesize) >> 20;
+      hres.mem_cached_mb = (memcached  * s_pagesize) >> 20;
+      hres.mem_buffers_mb = (membuffers * s_pagesize) >> 20;
+      hres.swap_used_mb = vmusage.xsu_used  >> 20;
+   }
 
    //
    // CPU usage:
