@@ -1,49 +1,55 @@
-#include "threadrun.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../libafanasy/msgclasses/mcgeneral.h"
+#include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
-#include "../libafanasy/msgclasses/mclistenaddress.h"
 
 #include "afcommon.h"
+#include "jobcontainer.h"
+#include "monitorcontainer.h"
 #include "msgaf.h"
+#include "msgqueue.h"
+#include "rendercontainer.h"
+#include "talkcontainer.h"
+#include "threadargs.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void ThreadRun::msgCase( MsgAf *msg)
+void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg)
 {
-switch ( msg->type())
+switch ( i_msg->type())
 {
    case af::Msg::TTalkExit:
    {
-      af::MCGeneral mcgeneral( msg);
-      talks->action( mcgeneral, msg->type(), NULL, monitors);
+      af::MCGeneral mcgeneral( i_msg);
+      i_args->talks->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
       break;
    }
    case af::Msg::TTalkDeregister:
    {
-      if( talks->setZombie( msg->int32())) monitors->addEvent( af::Msg::TMonitorTalksDel, msg->int32());
+      if( i_args->talks->setZombie( i_msg->int32())) i_args->monitors->addEvent( af::Msg::TMonitorTalksDel, i_msg->int32());
       break;
    }
    case af::Msg::TMonitorExit:
    {
-      af::MCGeneral mcgeneral( msg);
-      monitors->action( mcgeneral, msg->type(), NULL, NULL);
+      af::MCGeneral mcgeneral( i_msg);
+      i_args->monitors->action( mcgeneral, i_msg->type(), NULL, NULL);
       break;
    }
    case af::Msg::TMonitorDeregister:
    {
-      if( monitors->setZombie( msg->int32())) monitors->addEvent( af::Msg::TMonitorMonitorsDel, msg->int32());
+      if( i_args->monitors->setZombie( i_msg->int32())) i_args->monitors->addEvent( af::Msg::TMonitorMonitorsDel, i_msg->int32());
       break;
    }
    case af::Msg::TMonitorMessage:
    {
-      af::MCGeneral mcgeneral( msg);
-      monitors->sendMessage( mcgeneral);
+      af::MCGeneral mcgeneral( i_msg);
+      i_args->monitors->sendMessage( mcgeneral);
       break;
    }
    case af::Msg::TMonitorSubscribe:
@@ -53,8 +59,8 @@ switch ( msg->type())
    case af::Msg::TMonitorJobsIdsSet:
    case af::Msg::TMonitorJobsIdsDel:
    {
-      af::MCGeneral ids( msg);
-      monitors->setInterest( msg->type(), ids);
+      af::MCGeneral ids( i_msg);
+      i_args->monitors->setInterest( i_msg->type(), ids);
       break;
    }
    case af::Msg::TRenderAnnotate:
@@ -76,15 +82,15 @@ switch ( msg->type())
    case af::Msg::TRenderWOLSleep:
    case af::Msg::TRenderWOLWake:
    {
-      af::MCGeneral mcgeneral( msg);
-      renders->action( mcgeneral, msg->type(), jobs, monitors);
+      af::MCGeneral mcgeneral( i_msg);
+      i_args->renders->action( mcgeneral, i_msg->type(), i_args->jobs, i_args->monitors);
       break;
    }
    case af::Msg::TRenderDeregister:
    {
-      RenderContainerIt rendersIt( renders);
-      RenderAf* render = rendersIt.getRender( msg->int32());
-      if( render != NULL) render->deregister( jobs, monitors);
+      RenderContainerIt rendersIt( i_args->renders);
+      RenderAf* render = rendersIt.getRender( i_msg->int32());
+      if( render != NULL) render->deregister( i_args->jobs, i_args->monitors);
       break;
    }
    case af::Msg::TUserAnnotate:
@@ -98,8 +104,8 @@ switch ( msg->type())
    case af::Msg::TUserErrorsForgiveTime:
    case af::Msg::TUserJobsLifeTime:
    {
-      af::MCGeneral mcgeneral( msg);
-      users->action( mcgeneral, msg->type(), NULL, monitors);
+      af::MCGeneral mcgeneral( i_msg);
+      i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
       break;
    }
    case af::Msg::TUserMoveJobsUp:
@@ -107,21 +113,21 @@ switch ( msg->type())
    case af::Msg::TUserMoveJobsTop:
    case af::Msg::TUserMoveJobsBottom:
    {
-      UserContainerIt usersIt( users);
-      af::MCGeneral mcgeneral( msg);
+      UserContainerIt usersIt( i_args->users);
+      af::MCGeneral mcgeneral( i_msg);
       UserAf* user = usersIt.getUser( mcgeneral.getNumber());
-      user->moveJobs( mcgeneral, msg->type());
-      monitors->addUser( user);
+      user->moveJobs( mcgeneral, i_msg->type());
+      i_args->monitors->addUser( user);
       break;
    }
    case af::Msg::TUserDel:
    case af::Msg::TUserAdd:
    {
-      af::MCGeneral mcgeneral( msg);
+      af::MCGeneral mcgeneral( i_msg);
       // If existing users IDs provided, it's simple action to change users permanent property
-      if( mcgeneral.getCount()) users->action( mcgeneral, msg->type(), NULL, monitors);
+      if( mcgeneral.getCount()) i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);
       // If user with specified name does not exisit, new user must be created and put in container
-      else users->setPermanent( mcgeneral, (msg->type()==af::Msg::TUserAdd)?true:false, monitors);
+      else i_args->users->setPermanent( mcgeneral, (i_msg->type()==af::Msg::TUserAdd)?true:false, i_args->monitors);
       break;
    }
    case af::Msg::TJobAnnotate:
@@ -175,53 +181,53 @@ switch ( msg->type())
    case af::Msg::TBlockNeedHDD:
    case af::Msg::TBlockNeedProperties:
    {
-      af::MCGeneral mcgeneral( msg);
-      jobs->action( mcgeneral, msg->type(), renders, monitors);
+      af::MCGeneral mcgeneral( i_msg);
+      i_args->jobs->action( mcgeneral, i_msg->type(), i_args->renders, i_args->monitors);
       break;
    }
    case af::Msg::TTasksSkip:
    {
-      JobContainerIt jobsIt( jobs);
-      af::MCTasksPos taskspos( msg);
+      JobContainerIt jobsIt( i_args->jobs);
+      af::MCTasksPos taskspos( i_msg);
       JobAf* job = jobsIt.getJob( taskspos.getJobId());
-      if( job != NULL) job->skipTasks( taskspos, renders, monitors);
+      if( job != NULL) job->skipTasks( taskspos, i_args->renders, i_args->monitors);
       break;
    }
    case af::Msg::TTasksRestart:
    {
-      JobContainerIt jobsIt( jobs);
-      af::MCTasksPos taskspos( msg);
+      JobContainerIt jobsIt( i_args->jobs);
+      af::MCTasksPos taskspos( i_msg);
       JobAf* job = jobsIt.getJob( taskspos.getJobId());
-      if( job != NULL) job->restartTasks( taskspos, renders, monitors);
+      if( job != NULL) job->restartTasks( taskspos, i_args->renders, i_args->monitors);
       break;
    }
    case af::Msg::TTaskListenOutput:
    {
-      af::MCListenAddress mclass( msg);
-      JobContainerIt jobsIt( jobs);
+      af::MCListenAddress mclass( i_msg);
+      JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( mclass.getJobId());
-      if( mclass.fromRender() == false ) mclass.setIP( msg->getAddress());
+      if( mclass.fromRender() == false ) mclass.setIP( i_msg->getAddress());
 mclass.stdOut();
-      if( job ) job->listenOutput( mclass, renders);
+      if( job ) job->listenOutput( mclass, i_args->renders);
       break;
    }
    case af::Msg::TTaskUpdatePercent:
    case af::Msg::TTaskUpdateState:
    {
-      af::MCTaskUp taskup( msg);
-      jobs->updateTaskState( taskup, renders, monitors);
+      af::MCTaskUp taskup( i_msg);
+      i_args->jobs->updateTaskState( taskup, i_args->renders, i_args->monitors);
       break;
    }
    case af::Msg::TConfirm:
    {
-      AFCommon::QueueLog( std::string("af::Msg::TConfirm: ") + af::itos( msg->int32()));
+      AFCommon::QueueLog( std::string("af::Msg::TConfirm: ") + af::itos( i_msg->int32()));
       break;
    }
    default:
    {
-      AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + msg->generateInfoString( false));
+      AFCommon::QueueLogError( std::string("Run: Unknown message recieved: ") + i_msg->generateInfoString( false));
       break;
    }
 }
-delete msg;
+delete i_msg;
 }

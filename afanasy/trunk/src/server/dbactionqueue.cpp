@@ -103,11 +103,9 @@ bool DBActionQueue::writeItem( AfQueueItem* item)
    if( size < 1) return true;
 
    QSqlQuery query( *db);
-//   for( int i  = 0; i < size; i++)
    for( std::list<std::string>::const_iterator it = queries->begin(); it != queries->end(); it++)
    {
       if( false == db->isOpen()) return false;
-//      query.exec( (*queries)[i]);
       AFINFA("DBActionQueue::writeItem: %s: Executing query:\n%s", name.c_str(), (*it).c_str())
       query.exec( afsql::stoq(*it));
       if( afsql::qChkErr( query, name)) return false;
@@ -138,13 +136,6 @@ void DBActionQueue::delItem( const afsql::DBItem * item)
 
 void DBActionQueue::sendAlarm()
 {
-/* Send alarm signal not every time, but after some time:
-   static time_t alarm_time = 0;
-   time_t current_time = time(NULL);
-   // Not sending database connection alarm signal too often
-   if( current_time - alarm_time < 999 ) return;
-   alarm_time = current_time;*/
-
    std::string str("ALARM! Server database connection error. Contact your system administrator.");
    AFCommon::QueueLog( name + ":\n" + str);
    AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);

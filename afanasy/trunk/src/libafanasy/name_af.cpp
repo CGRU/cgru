@@ -18,8 +18,9 @@
 #define sprintf sprintf_s
 #define stat _stat
 #else
-#include <unistd.h>
 #include <arpa/inet.h>
+#include <sys/socket.h>
+#include <unistd.h>
 #endif
 
 #include "environment.h"
@@ -183,6 +184,41 @@ const std::string af::state2str( int state)
 void af::printTime( time_t time_sec, const char * time_format)
 {
    std::cout << time2str( time_sec, time_format);
+}
+
+void af::printAddress( struct sockaddr_storage * i_ss )
+{
+   static const int buffer_len = 256;
+   char buffer[buffer_len];
+   const char * addr_str = NULL;
+   uint16_t port = 0;
+   printf("Address = ");
+   switch( i_ss->ss_family)
+   {
+   case AF_INET:
+   {
+      struct sockaddr_in * sa = (struct sockaddr_in*)(i_ss);
+      port = sa->sin_port;
+      addr_str = inet_ntoa( sa->sin_addr );
+      break;
+   }
+   case AF_INET6:
+   {
+      struct sockaddr_in6 * sa = (struct sockaddr_in6*)(i_ss);
+      port = sa->sin6_port;
+      addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
+      break;
+   }
+   default:
+      printf("Unknown protocol");
+      return;
+   }
+   if( addr_str )
+   {
+      printf("%s", addr_str);
+      printf(" Port = %d", ntohs(port));
+   }
+   printf("\n");
 }
 
 bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
@@ -401,23 +437,23 @@ const std::string af::pathHome()
 #endif
 }
 
-bool af::pathMakeDir( const std::string & path, bool verbose)
+bool af::pathMakeDir( const std::string & i_path, VerboseMode i_verbose)
 {
-   AFINFA("af::pathMakeDir: path=\"%s\"", path.c_str())
-   if( false == af::pathIsFolder( path))
+   AFINFA("af::pathMakeDir: path=\"%s\"", i_path.c_str())
+   if( false == af::pathIsFolder( i_path))
    {
-      if( verbose) std::cout << "Creating folder:\n" << path << std::endl;
+      if( i_verbose == VerboseOn) std::cout << "Creating folder:\n" << i_path << std::endl;
 #ifdef WINNT
-      if( _mkdir( path.c_str()) == -1)
+      if( _mkdir( i_path.c_str()) == -1)
 #else
-      if( mkdir( path.c_str(), 0777) == -1)
+      if( mkdir( i_path.c_str(), 0777) == -1)
 #endif
       {
-         AFERRPA("af::pathMakeDir - \"%s\"", path.c_str())
+         AFERRPA("af::pathMakeDir - \"%s\"", i_path.c_str())
          return false;
       }
 #ifndef WINNT
-      chmod( path.c_str(), 0777);
+      chmod( i_path.c_str(), 0777);
 #endif
    }
    return true;

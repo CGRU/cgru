@@ -9,7 +9,7 @@
 
 #include "../libafanasy/environment.h"
 
-#include "core.h"
+#include "threadargs.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -26,7 +26,7 @@ LogQueue          * AFCommon::OutputLogQueue    = NULL;
    This ctor will start the various job queues. Note that threads
    are started inside the constructors of these queues.
 */
-AFCommon::AFCommon( Core * core)
+AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
    assert( core );
 
@@ -34,8 +34,8 @@ AFCommon::AFCommon( Core * core)
    FileWriteQueue   = new FileQueue(         "Writing Files");
    CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
    OutputLogQueue   = new LogQueue(          "Log Output");
-   DBUpTaskQueue    = new DBUpdateTaskQueue( "AFDB_update_task",   core->getMonitors());
-   DBUpdateQueue    = new DBActionQueue(     "AFDB_update",        core->getMonitors());
+   DBUpTaskQueue    = new DBUpdateTaskQueue( "AFDB_update_task",   i_threadArgs->monitors);
+   DBUpdateQueue    = new DBActionQueue(     "AFDB_update",        i_threadArgs->monitors);
 }
 
 AFCommon::~AFCommon()
@@ -80,7 +80,7 @@ void AFCommon::executeCmd( const std::string & cmd)
 }
 
 void AFCommon::saveLog(
-	const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate)
+   const std::list<std::string> & log, const std::string & dirname, const std::string & filename, int rotate)
 {
    int lines = log.size();
    if( lines < 1) return;

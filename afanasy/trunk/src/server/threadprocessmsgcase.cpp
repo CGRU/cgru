@@ -1,5 +1,3 @@
-#include "threadprocessmsg.h"
-
 #include <errno.h>
 #include <fcntl.h>
 #include <sys/stat.h>
@@ -14,77 +12,83 @@
 #include "../libafnetwork/communications.h"
 
 #include "afcommon.h"
-#include "msgaf.h"
+#include "jobcontainer.h"
 #include "monitoraf.h"
+#include "monitorcontainer.h"
+#include "msgaf.h"
+#include "msgqueue.h"
+#include "rendercontainer.h"
+#include "talkcontainer.h"
+#include "threadargs.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-//############################################################################################################
-MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
+MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 {
-//msg->stdOut();
-   MsgAf *msg_response = NULL;
+//i_msg->stdOut();
+   MsgAf * o_msg_response = NULL;
 
-   switch( msg->type())
+   switch( i_msg->type())
    {
    case af::Msg::TNULL:
    case af::Msg::TDATA:
    case af::Msg::TTESTDATA:
    case af::Msg::TStringList:
    {
-      msg->stdOutData();
+      i_msg->stdOutData();
       break;
    }
    case af::Msg::TString:
    {
-      std::string str = msg->getString();
+      std::string str = i_msg->getString();
       if( str.empty()) break;
 
       AFCommon::QueueLog( str);
-      AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
-      monitors->sendMessage( str);
+      AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+      i_args->monitors->sendMessage( str);
       break;
    }
    case af::Msg::TStatRequest:
    {
-      msg_response = new MsgAf;
-      com::statwrite( msg_response);
+      o_msg_response = new MsgAf;
+      com::statwrite( o_msg_response);
       break;
    }
    case af::Msg::TConfirm:
    {
-      printf("Thread process message: Msg::TConfirm: %d\n", msg->int32());
-      msgQueue ->pushMsg( new MsgAf( af::Msg::TConfirm, 1));
-      msg_response = new MsgAf( af::Msg::TConfirm, 1 - msg->int32());
+      printf("Thread process message: Msg::TConfirm: %d\n", i_msg->int32());
+      i_args->msgQueue ->pushMsg( new MsgAf( af::Msg::TConfirm, 1));
+      o_msg_response = new MsgAf( af::Msg::TConfirm, 1 - i_msg->int32());
       break;
    }
    case af::Msg::TConfigLoad:
    {
-      AfContainerLock tlock( talks, AfContainerLock::WRITELOCK);   AfContainerLock rlock( renders, AfContainerLock::WRITELOCK);
-      AfContainerLock jlock(  jobs, AfContainerLock::WRITELOCK);   AfContainerLock ulock(   users, AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( i_args->talks, AfContainerLock::WRITELOCK);   AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
+      AfContainerLock jlock(  i_args->jobs, AfContainerLock::WRITELOCK);   AfContainerLock ulock(   i_args->users, AfContainerLock::WRITELOCK);
       std::string message;
       if( af::Environment::reload()) message = "Reloaded successfully.";
       else                message = "Failed, see server logs fo details.";
-      msg_response = new MsgAf();
-      msg_response->setString( message);
+      o_msg_response = new MsgAf();
+      o_msg_response->setString( message);
       break;
    }
    case af::Msg::TFarmLoad:
    {
-      AfContainerLock rlock( renders,  AfContainerLock::WRITELOCK);
-      AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
+      AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
 
       printf("\n   ========= RELOADING FARM =========\n\n");
       std::string message;
       if( af::loadFarm( true))
       {
-         RenderContainerIt rendersIt( renders);
+         RenderContainerIt rendersIt( i_args->renders);
          for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
          {
             render->getFarmHost();
-            monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
+            i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
          }
          message = "Reloaded successfully.";
          printf("\n   ========= FARM RELOADED SUCCESSFULLY =========\n\n");
@@ -94,84 +98,84 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          message = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
          printf("\n   ========= FARM RELOADING FAILED =========\n\n");
       }
-      msg_response = new MsgAf();
-      msg_response->setString( message);
+      o_msg_response = new MsgAf();
+      o_msg_response->setString( message);
       break;
    }
 
 // ---------------------------------- Monitor ---------------------------------//
    case af::Msg::TMonitorRegister:
    {
-      AfContainerLock lock( monitors, AfContainerLock::WRITELOCK);
+      AfContainerLock lock( i_args->monitors, AfContainerLock::WRITELOCK);
 
-      MonitorAf * newMonitor = new MonitorAf( msg);
-      newMonitor->setAddressIP( msg->getAddress());
-      msg_response = monitors->addMonitor( newMonitor);
+      MonitorAf * newMonitor = new MonitorAf( i_msg);
+      newMonitor->setAddressIP( i_msg->getAddress());
+      o_msg_response = i_args->monitors->addMonitor( newMonitor);
       break;
    }
    case af::Msg::TMonitorUpdateId:
    {
-      AfContainerLock lock( monitors, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 
-      if( monitors->updateId( msg->int32())) msg_response = new MsgAf( af::Msg::TMonitorId, msg->int32());
-      else msg_response = new MsgAf( af::Msg::TMonitorId, 0);
+      if( i_args->monitors->updateId( i_msg->int32())) o_msg_response = new MsgAf( af::Msg::TMonitorId, i_msg->int32());
+      else o_msg_response = new MsgAf( af::Msg::TMonitorId, 0);
       break;
    }
    case af::Msg::TMonitorsListRequest:
    {
-      AfContainerLock lock( monitors, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 
-      msg_response = monitors->generateList( af::Msg::TMonitorsList);
+      o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList);
       break;
    }
    case af::Msg::TMonitorsListRequestIds:
    {
-      AfContainerLock lock( monitors, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = monitors->generateList( af::Msg::TMonitorsList, ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList, ids);
       break;
    }
 
 // ---------------------------------- Talk ---------------------------------//
    case af::Msg::TTalkRegister:
    {
-      AfContainerLock tlock( talks,    AfContainerLock::WRITELOCK);
-      AfContainerLock mlock( monitors, AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( i_args->talks,    AfContainerLock::WRITELOCK);
+      AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
 
-      TalkAf * newTalk = new TalkAf( msg);
-      newTalk->setAddressIP( msg->getAddress());
-      msg_response = talks->addTalk( newTalk, monitors);
+      TalkAf * newTalk = new TalkAf( i_msg);
+      newTalk->setAddressIP( i_msg->getAddress());
+      o_msg_response = i_args->talks->addTalk( newTalk, i_args->monitors);
       break;
    }
    case af::Msg::TTalksListRequest:
    {
-      AfContainerLock lock( talks, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
 
-      msg_response = talks->generateList( af::Msg::TTalksList);
+      o_msg_response = i_args->talks->generateList( af::Msg::TTalksList);
       break;
    }
    case af::Msg::TTalksListRequestIds:
    {
-      AfContainerLock lock( talks, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = talks->generateList( af::Msg::TTalksList, ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->talks->generateList( af::Msg::TTalksList, ids);
       break;
    }
    case af::Msg::TTalkUpdateId:
    {
-      AfContainerLock lock( talks, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
 
-      if( talks->updateId( msg->int32())) msg_response = talks->generateList( af::Msg::TTalksList);
-      else msg_response = new MsgAf( af::Msg::TTalkId, 0);
+      if( i_args->talks->updateId( i_msg->int32())) o_msg_response = i_args->talks->generateList( af::Msg::TTalksList);
+      else o_msg_response = new MsgAf( af::Msg::TTalkId, 0);
       break;
    }
    case af::Msg::TTalkDistributeData:
    {
-      AfContainerLock lock( talks, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
 
-      talks->distributeData( msg);
+      i_args->talks->distributeData( i_msg);
       break;
    }
 
@@ -179,84 +183,84 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TRenderRegister:
    {
 //printf("case af::Msg::TRenderRegister:\n");
-      AfContainerLock rLock( renders,  AfContainerLock::WRITELOCK);
-      AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
+      AfContainerLock rLock( i_args->renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
 
-      RenderAf * newRender = new RenderAf( msg);
-      newRender->setAddressIP( msg->getAddress());
-      msg_response = renders->addRender( newRender, monitors);
+      RenderAf * newRender = new RenderAf( i_msg);
+      newRender->setAddressIP( i_msg->getAddress());
+      o_msg_response = i_args->renders->addRender( newRender, i_args->monitors);
       break;
    }
    case af::Msg::TRenderUpdate:
    {
 //printf("case af::Msg::TRenderUpdate:\n");
-      AfContainerLock lock( renders, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
-      af::Render render_up( msg);
+      af::Render render_up( i_msg);
 //printf("Msg::TRenderUpdate: %s - %s\n", render_up.getName().toUtf8().data(), time2Qstr( time(NULL)).toUtf8().data());
-      RenderContainerIt rendersIt( renders);
+      RenderContainerIt rendersIt( i_args->renders);
       RenderAf* render = rendersIt.getRender( render_up.getId());
       int id = 0;
       if((render != NULL) && ( render->update( &render_up))) id = render->getId();
-      msg_response = new MsgAf( af::Msg::TRenderId, id);
+      o_msg_response = new MsgAf( af::Msg::TRenderId, id);
       break;
    }
    case af::Msg::TRendersListRequest:
    {
-      AfContainerLock lock( renders, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
-      msg_response = renders->generateList( af::Msg::TRendersList);
+      o_msg_response = i_args->renders->generateList( af::Msg::TRendersList);
       break;
    }
    case af::Msg::TRendersListRequestIds:
    {
-      AfContainerLock lock( renders, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = renders->generateList( af::Msg::TRendersList, ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, ids);
       break;
    }
    case af::Msg::TRendersUpdateRequestIds:
    {
-      AfContainerLock lock( renders, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = renders->generateList( af::Msg::TRendersListUpdates, ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->renders->generateList( af::Msg::TRendersListUpdates, ids);
       break;
    }
    case af::Msg::TRenderLogRequestId:
    {
-      AfContainerLock lock( renders,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders,  AfContainerLock::READLOCK);
 
-      RenderContainerIt rendersIt( renders);
-      RenderAf* render = rendersIt.getRender( msg->int32());
+      RenderContainerIt rendersIt( i_args->renders);
+      RenderAf* render = rendersIt.getRender( i_msg->int32());
       if( render == NULL ) break;
-      msg_response = new MsgAf;
-      msg_response->setStringList( render->getLog());
+      o_msg_response = new MsgAf;
+      o_msg_response->setStringList( render->getLog());
       break;
    }
    case af::Msg::TRenderTasksLogRequestId:
    {
-      AfContainerLock lock( renders,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders,  AfContainerLock::READLOCK);
 
-      RenderContainerIt rendersIt( renders);
-      RenderAf* render = rendersIt.getRender( msg->int32());
+      RenderContainerIt rendersIt( i_args->renders);
+      RenderAf* render = rendersIt.getRender( i_msg->int32());
       if( render == NULL ) break;
-      msg_response = new MsgAf;
+      o_msg_response = new MsgAf;
       if( render->getTasksLog().empty())
-         msg_response->setString("No tasks execution log.");
+         o_msg_response->setString("No tasks execution log.");
       else
-         msg_response->setStringList( render->getTasksLog());
+         o_msg_response->setStringList( render->getTasksLog());
       break;
    }
    case af::Msg::TRenderInfoRequestId:
    {
-      AfContainerLock lock( renders,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->renders,  AfContainerLock::READLOCK);
 
-      RenderContainerIt rendersIt( renders);
-      RenderAf* render = rendersIt.getRender( msg->int32());
+      RenderContainerIt rendersIt( i_args->renders);
+      RenderAf* render = rendersIt.getRender( i_msg->int32());
       if( render == NULL ) break;
-      msg_response = new MsgAf();
+      o_msg_response = new MsgAf();
 
       std::string str = render->generateInfoString( true);
       str += "\n";
@@ -268,238 +272,238 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          str += servicelimits;
       }
 
-      msg_response->setString( str);
+      o_msg_response->setString( str);
       break;
    }
 
 // ---------------------------------- Users -------------------------------//
    case af::Msg::TUserIdRequest:
    {
-      AfContainerLock lock( users, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
 
-      af::MsgClassUserHost usr( msg);
+      af::MsgClassUserHost usr( i_msg);
       std::string name = usr.getUserName();
       int id = 0;
-      UserContainerIt usersIt( users);
+      UserContainerIt usersIt( i_args->users);
       for( af::User *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
          if( user->getName() == name) id = user->getId();
-      msg_response = new MsgAf( af::Msg::TUserId, id);
+      o_msg_response = new MsgAf( af::Msg::TUserId, id);
       break;
    }
    case af::Msg::TUsersListRequest:
    {
-      AfContainerLock lock( users, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
 
-      msg_response = users->generateList( af::Msg::TUsersList);
+      o_msg_response = i_args->users->generateList( af::Msg::TUsersList);
       break;
    }
    case af::Msg::TUsersListRequestIds:
    {
-      AfContainerLock lock( users, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = users->generateList( af::Msg::TUsersList, ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->users->generateList( af::Msg::TUsersList, ids);
       break;
    }
    case af::Msg::TUserLogRequestId:
    {
-      AfContainerLock lock( users,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->users,  AfContainerLock::READLOCK);
 
-      UserContainerIt usersIt( users);
-      UserAf* user = usersIt.getUser( msg->int32());
+      UserContainerIt usersIt( i_args->users);
+      UserAf* user = usersIt.getUser( i_msg->int32());
       if( user == NULL ) break;
-      msg_response = new MsgAf();
-      msg_response->setStringList( user->getLog());
+      o_msg_response = new MsgAf();
+      o_msg_response->setStringList( user->getLog());
       break;
    }
    case af::Msg::TUserJobsOrderRequestId:
    {
-      AfContainerLock lock( users,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->users,  AfContainerLock::READLOCK);
 
-      UserContainerIt usersIt( users);
-      UserAf* user = usersIt.getUser( msg->int32());
+      UserContainerIt usersIt( i_args->users);
+      UserAf* user = usersIt.getUser( i_msg->int32());
       if( user == NULL ) break;
       af::MCGeneral ids;
       user->generateJobsIds( ids);
-      msg_response = new MsgAf( af::Msg::TUserJobsOrder, &ids);
+      o_msg_response = new MsgAf( af::Msg::TUserJobsOrder, &ids);
       break;
    }
 
 // ------------------------------------- Job -------------------------------//
    case af::Msg::TJobRegister:
    {
-      jobs->job_register( new JobAf( msg), users, monitors);
+      i_args->jobs->job_register( new JobAf( i_msg), i_args->users, i_args->monitors);
       break;
    }
    case af::Msg::TJobRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      JobContainerIt jobsIt( jobs);
-      JobAf* job = jobsIt.getJob( msg->int32());
+      JobContainerIt jobsIt( i_args->jobs);
+      JobAf* job = jobsIt.getJob( i_msg->int32());
       if( job == NULL )
       {
-         msg_response = new MsgAf( af::Msg::TJobRequestId, 0);
+         o_msg_response = new MsgAf( af::Msg::TJobRequestId, 0);
          break;
       }
-      msg_response = new MsgAf( af::Msg::TJob, job);
+      o_msg_response = new MsgAf( af::Msg::TJob, job);
       break;
    }
    case af::Msg::TJobLogRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      JobContainerIt jobsIt( jobs);
-      JobAf* job = jobsIt.getJob( msg->int32());
+      JobContainerIt jobsIt( i_args->jobs);
+      JobAf* job = jobsIt.getJob( i_msg->int32());
       if( job == NULL ) break;
-      msg_response = new MsgAf();
-      msg_response->setStringList( job->getLog());
+      o_msg_response = new MsgAf();
+      o_msg_response->setStringList( job->getLog());
       break;
    }
    case af::Msg::TJobErrorHostsRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      JobContainerIt jobsIt( jobs);
-      JobAf* job = jobsIt.getJob( msg->int32());
+      JobContainerIt jobsIt( i_args->jobs);
+      JobAf* job = jobsIt.getJob( i_msg->int32());
       if( job == NULL ) break;
-      msg_response = new MsgAf();
-      msg_response->setString( job->getErrorHostsListString());
+      o_msg_response = new MsgAf();
+      o_msg_response->setString( job->getErrorHostsListString());
       break;
    }
    case af::Msg::TJobProgressRequestId:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      JobContainerIt jobsIt( jobs);
-      JobAf* job = jobsIt.getJob( msg->int32());
+      JobContainerIt jobsIt( i_args->jobs);
+      JobAf* job = jobsIt.getJob( i_msg->int32());
       if( job == NULL )
       {
-         msg_response = new MsgAf( af::Msg::TJobProgressRequestId, 0);
+         o_msg_response = new MsgAf( af::Msg::TJobProgressRequestId, 0);
          break;
       }
-      msg_response = new MsgAf;
-      job->writeProgress( *msg_response);
+      o_msg_response = new MsgAf;
+      job->writeProgress( *o_msg_response);
       break;
    }
    case af::Msg::TJobsListRequest:
    {
-      AfContainerLock lock( jobs, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 
-      msg_response = jobs->generateList( af::Msg::TJobsList);
+      o_msg_response = i_args->jobs->generateList( af::Msg::TJobsList);
       break;
    }
    case af::Msg::TJobsListRequestIds:
    {
-      AfContainerLock lock( jobs, AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = jobs->generateList( af::Msg::TJobsList, ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->jobs->generateList( af::Msg::TJobsList, ids);
       break;
    }
    case af::Msg::TJobsListRequestUserId:
    {
-      AfContainerLock jLock( jobs,  AfContainerLock::READLOCK);
-      AfContainerLock uLock( users, AfContainerLock::READLOCK);
+      AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
+      AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
 
-      msg_response = users->generateJobsList( msg->int32());
-      if( msg_response == NULL ) msg_response = new MsgAf( af::Msg::TUserId, 0);
+      o_msg_response = i_args->users->generateJobsList( i_msg->int32());
+      if( o_msg_response == NULL ) o_msg_response = new MsgAf( af::Msg::TUserId, 0);
       break;
    }
    case af::Msg::TJobsListRequestUsersIds:
    {
-      AfContainerLock jLock( jobs,  AfContainerLock::READLOCK);
-      AfContainerLock uLock( users, AfContainerLock::READLOCK);
+      AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
+      AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
 
-      af::MCGeneral ids( msg);
-      msg_response = users->generateJobsList( ids);
+      af::MCGeneral ids( i_msg);
+      o_msg_response = i_args->users->generateJobsList( ids);
       break;
    }
    case af::Msg::TTaskRequest:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      af::MCTaskPos mctaskpos( msg);
-      JobContainerIt jobsIt( jobs);
+      af::MCTaskPos mctaskpos( i_msg);
+      JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
       if( job == NULL )
       {
-         msg_response = new MsgAf();
+         o_msg_response = new MsgAf();
          std::ostringstream stream;
          stream << "Msg::TTaskRequest: No job with id=" << mctaskpos.getJobId();
-         msg_response->setString( stream.str());
+         o_msg_response->setString( stream.str());
       }
       af::TaskExec * task = job->generateTask( mctaskpos.getNumBlock(), mctaskpos.getNumTask());
       if( task )
       {
-         msg_response = new MsgAf( af::Msg::TTask, task);
+         o_msg_response = new MsgAf( af::Msg::TTask, task);
          delete task;
       }
       else
       {
-         msg_response = new MsgAf();
+         o_msg_response = new MsgAf();
          std::ostringstream stream;
          stream << "Msg::TTaskRequest: No such task[" << mctaskpos.getJobId() << "][" << mctaskpos.getNumBlock() << "][" << mctaskpos.getNumTask() << "]";
-         msg_response->setString( stream.str());
+         o_msg_response->setString( stream.str());
       }
       break;
    }
    case af::Msg::TTaskLogRequest:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      af::MCTaskPos mctaskpos( msg);
-      JobContainerIt jobsIt( jobs);
+      af::MCTaskPos mctaskpos( i_msg);
+      JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
       if( job == NULL )
       {
-         msg_response = new MsgAf();
+         o_msg_response = new MsgAf();
          std::ostringstream stream;
          stream << "Msg::TTaskLogRequest: No job with id=" << mctaskpos.getJobId();
-         msg_response->setString( stream.str());
+         o_msg_response->setString( stream.str());
       }
       const std::list<std::string> * list = &(job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       if( list == NULL ) break;
-      msg_response = new MsgAf();
+      o_msg_response = new MsgAf();
       if( list->size() == 0)
       {
          std::list<std::string> list;
          list.push_back("Task log is empty.");
-         msg_response->setStringList( list);
+         o_msg_response->setStringList( list);
       }
       else
-         msg_response->setStringList( *list);
+         o_msg_response->setStringList( *list);
       break;
    }
    case af::Msg::TTaskErrorHostsRequest:
    {
-      AfContainerLock lock( jobs,  AfContainerLock::READLOCK);
+      AfContainerLock lock( i_args->jobs,  AfContainerLock::READLOCK);
 
-      af::MCTaskPos mctaskpos( msg);
-      JobContainerIt jobsIt( jobs);
+      af::MCTaskPos mctaskpos( i_msg);
+      JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
       if( job == NULL ) break;
-      msg_response = new MsgAf();
-      msg_response->setString( job->getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
+      o_msg_response = new MsgAf();
+      o_msg_response->setString( job->getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       break;
    }
    case af::Msg::TTaskOutputRequest:
    {
       MsgAf * msg_request_render = NULL;
       std::string filename;
-      af::MCTaskPos mctaskpos( msg);
-      msg_response = new MsgAf();
+      af::MCTaskPos mctaskpos( i_msg);
+      o_msg_response = new MsgAf();
 //printf("ThreadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", mctaskpos.getJobId(), mctaskpos.getNumBlock(), mctaskpos.getNumTask(), mctaskpos.getNumber());
       {
-         AfContainerLock jLock( jobs,    AfContainerLock::READLOCK);
-         AfContainerLock rLock( renders, AfContainerLock::READLOCK);
+         AfContainerLock jLock( i_args->jobs,    AfContainerLock::READLOCK);
+         AfContainerLock rLock( i_args->renders, AfContainerLock::READLOCK);
 
-         JobContainerIt jobsIt( jobs);
+         JobContainerIt jobsIt( i_args->jobs);
          JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
          if( job != NULL )
          {
             // Trying to set message to request output from running remote host.
-            if( job->getTaskStdOut( mctaskpos, msg_response, filename, renders) == false )
+            if( job->getTaskStdOut( mctaskpos, o_msg_response, filename, i_args->renders) == false )
             {
                // If false, message contains error text to send back to client.
                break;
@@ -507,11 +511,11 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          }
          else
          {
-            msg_response->setString("Job is NULL.");
+            o_msg_response->setString("Job is NULL.");
             break;
          }
       }
-      if( msg_response->isNull() )
+      if( o_msg_response->isNull() )
       {
       //
       //    Retrieving output from file
@@ -521,23 +525,23 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
          char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &err);
          if( data )
          {
-            msg_response->setData( readsize, data);
+            o_msg_response->setData( readsize, data);
             delete [] data;
          }
          if( err.size())
          {
             err = std::string("Getting task output: ") + err;
             AFCommon::QueueLogError( err);
-            if( msg_response->isNull())
+            if( o_msg_response->isNull())
             {
                if( af::pathFileExists( filename))
                {
                   err = std::string("ERROR: ") + err;
-                  msg_response->setString( err);
+                  o_msg_response->setString( err);
                }
                else
                {
-                  msg_response->setString("No output exists.");
+                  o_msg_response->setString("No output exists.");
                }
             }
          }
@@ -547,13 +551,13 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
       //
       //    Retrieving output from render
       //
-         msg_request_render = msg_response;
-         msg_response = new MsgAf();
-         if( msg_request_render->request( msg_response) == false )
+         msg_request_render = o_msg_response;
+         o_msg_response = new MsgAf();
+         if( msg_request_render->request( o_msg_response) == false )
          {
-            delete msg_response;
-            msg_response = new MsgAf();
-            msg_response->setString("Retrieving output from render failed. See server logs for details.");
+            delete o_msg_response;
+            o_msg_response = new MsgAf();
+            o_msg_response->setString("Retrieving output from render failed. See server logs for details.");
          }
          delete msg_request_render;
       }
@@ -561,18 +565,18 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    }
    case af::Msg::TJobsWeightRequest:
    {
-      AfContainerLock jLock( jobs,    AfContainerLock::READLOCK);
+      AfContainerLock jLock( i_args->jobs,    AfContainerLock::READLOCK);
 
       af::MCJobsWeight jobsWeight;
-      jobs->getWeight( jobsWeight);
-      msg_response = new MsgAf( af::Msg::TJobsWeight, &jobsWeight);
+      i_args->jobs->getWeight( jobsWeight);
+      o_msg_response = new MsgAf( af::Msg::TJobsWeight, &jobsWeight);
       break;
    }
    case af::Msg::TTaskUpdateState:
    {
-      af::MCTaskUp taskup( msg);
+      af::MCTaskUp taskup( i_msg);
       af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
-      msg_response = new MsgAf( af::Msg::TRenderCloseTask, &taskpos);
+      o_msg_response = new MsgAf( af::Msg::TRenderCloseTask, &taskpos);
    }
    case af::Msg::TTaskUpdatePercent:
    case af::Msg::TTaskListenOutput:
@@ -675,29 +679,29 @@ MsgAf* ThreadReadMsg::msgCase( MsgAf *msg)
    case af::Msg::TMonitorExit:
    case af::Msg::TTalkExit:
    {
-//printf("ThreadReadMsg::msgCase: pushing message to run thread:\n"); msg->stdOut();
-      msgQueue->pushMsg( msg);
-      return msg_response;
+//printf("ThreadReadMsg::msgCase: pushing message to run thread:\n"); i_msg->stdOut();
+      i_args->msgQueue->pushMsg( i_msg);
+      return o_msg_response;
    }
 // -------------------------------------------------------------------------//
    case af::Msg::TVersionMismatch:
    {
-      AFCommon::QueueLogError( msg->generateInfoString( false));
-      msg_response = new MsgAf( af::Msg::TVersionMismatch, 1);
+      AFCommon::QueueLogError( i_msg->generateInfoString( false));
+      o_msg_response = new MsgAf( af::Msg::TVersionMismatch, 1);
       break;
    }
    case af::Msg::TInvalid:
    {
-      AFCommon::QueueLogError( std::string("Invalid message recieved: ") + msg->generateInfoString( false));
+      AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->generateInfoString( false));
       break;
    }
    default:
    {
-      AFCommon::QueueLogError( std::string("Unknown message recieved: ") + msg->generateInfoString( false));
+      AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->generateInfoString( false));
       break;
    }
    }
-//if(msg->type()==Msg::TJobRegister)printf("Msg::TJobRegister:returning.\n");
-   delete msg;
-   return msg_response;
+//if(i_msg->type()==Msg::TJobRegister)printf("Msg::TJobRegister:returning.\n");
+   delete i_msg;
+   return o_msg_response;
 }

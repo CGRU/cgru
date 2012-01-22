@@ -19,7 +19,31 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+#if 0 // this was in main.cpp
+void ThreadCommon_dispatchMessages(void* arg)
+{
+#ifndef _WIN32
+   /* FIXME: why do we need this for? */
+   // We need to unblok alarm ignal in dispatch messages thread.
+   // SIGALRM was blocked in main.cpp, so all childs threads will ignore it.
+   // Server uses this signal to unblock connect function - to limit connect time.
+   // Client socket malfunction can block connect function - server should prevent it.
+   sigset_t sigmask;
+   sigemptyset( &sigmask);
+   sigaddset( &sigmask, SIGALRM);
+   if( pthread_sigmask( SIG_UNBLOCK, &sigmask, NULL) != 0)
+      perror("pthread_sigmask:");
+#endif
 
+   AFINFA("Thread (id = %lu) to dispatch messages created.", (long unsigned)pthread_self())
+   AFCommon::MsgDispatchQueueRun();
+}
+#endif
+/*
+  May be afqueue can have some virtual function,
+  which will be called just after thread spawn,
+  where thread can do some setup.
+*/
 MsgQueue::MsgQueue( const std::string & QueueName, bool i_start_thread ):
    AfQueue( QueueName, i_start_thread)
 {
@@ -76,14 +100,12 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
 
    if( connect(socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
-      AFERRPA("MsgQueue::send: connect failure for msgType '%d': %s",
-			msg->type(), address.generateInfoString().c_str())
+      AFERRPA("MsgQueue::send: connect failure for msgType '%s': %s",
+         af::Msg::TNAMES[msg->type()], address.generateInfoString().c_str())
       close(socketfd);
       alarm(0);
       return;
    }
-   
-   fprintf( stderr, "Connection accepted!\n" );
 
    alarm(0);
    //
