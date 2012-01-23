@@ -21,6 +21,8 @@
 
 #include "../include/aftypes.h"
 
+struct sockaddr_storage;
+
 namespace af
 {
    class Attr;
@@ -76,6 +78,12 @@ namespace af
    class TaskProgress;
    class JobProgress;
 
+   enum VerboseMode
+   {
+      VerboseOff,
+      VerboseOn
+   };
+
    void outError( const char * errMsg, const char * baseMsg = NULL);
 
    const long long stoi( const std::string & str, bool * ok = NULL);
@@ -94,6 +102,7 @@ namespace af
    const std::string time2strHMS( int time32, bool clamp = false);
 
    void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
+   void printAddress( struct sockaddr_storage * i_ss );
 
    bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
@@ -125,7 +134,7 @@ namespace af
    const std::string pathAbsolute( const std::string & path);
    const std::string pathUp( const std::string & path);
    const std::string pathHome();
-   bool pathMakeDir( const std::string & path, bool verbose = false);
+   bool pathMakeDir( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
 
    bool netIsIpAddr( const std::string & addr, bool verbose = false);
 

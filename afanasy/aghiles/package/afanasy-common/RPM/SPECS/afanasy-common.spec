@@ -2,15 +2,17 @@
 
 %define _topdir %(echo $PWD)/RPM
 
-Summary:       Afanasy common files
+Summary:       Afanasy binary files
 License:       GPL
 Name:          afanasy-common
 Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
+Requires:      cgru-common = @VERSION@
+
 %description
-Afanasy common files.
+Afanasy binary files.
 
 %prep
 
@@ -31,14 +33,9 @@ done
 %clean
 
 %post
-echo "Afanasy common POST INSTALL"
-[ -d /opt/cgru/afanasy/python ] && find /opt/cgru/afanasy/python -type d -exec chmod a+rwx {} \;
-exit 0
 
 %preun
-echo "Afanasy common PRE REMOVE: $1"
+echo "Afanasy common pre remove, exiting Afanasy applications: $1"
 [ "$1" != "0" ] && exit 0
-pkill afcmd || true
-echo "Cleaning afanasy/python"
-[ -d /opt/cgru/afanasy/python ] && find /opt/cgru/afanasy/python -type f -name *.pyc -exec rm -vf {} \;
+for p in afcmd afwatch aftalk afmonitor; do pkill $p || true; done
 exit 0

@@ -5,21 +5,20 @@
 <link rel="shortcut icon" href="images/icon.png" type="image/png">
 <title>Afanasy Software Integration</title>
 <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="author" content="Timur Hairulin" />
-<meta name="description" content="CGRU: CG Tools, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="description" content="CGRU: CG Tools, CG Rules, Afanasy - Free Open Source Render Farm Manager" />
 <meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
 </head>
 <body>
 <table width="99%" align="center">
 <tr align="center">
 <td width="33%">
-<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+<a href="http://sourceforge.net"><img src="../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
 </td>
 <td width="33%">
-<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+<p><a href="../../../index.html" target="_top"><img src="../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
 </td>
 <td width="33%">
-<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+<a href="http://cgtalk.ru"><img src="../../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
 </td>
 </tr>
 </table>
@@ -27,13 +26,13 @@
 <table width="100%" align="center" cellpadding="0" cellspacing="0">
 <tr>
 <td width="200px">
-<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+<div style="width:100%;height:40px;background:url('../../../doc/images/header_left.png')" />
 </td>
 <td>
-<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+<div style="width:100%;height:40px;background:url('../../../doc/images/header.png') repeat-x" />
 </td>
 <td width="200px">
-<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+<div style="width:100%;height:40px;background:url('../../../doc/images/header_right.png')" />
 </td>
 </tr>
 </table>
@@ -42,6 +41,11 @@
 
 <h2 align="center">Afanasy Software Integration</h2>
 <hr />
+<p>
+You can use <a href="../../utilities/afstarter/doc/index.html">AFANASY Starter</a> to construct and submit jobs.
+It is a stand-alone dialog and so you do not need to lauch software application this way.
+It is the simples way to send jobs.
+</p>
 <p>
 If you are able to create and run python script, you can use afanasy to distribute any soft (command lines).
 </p>
@@ -65,16 +69,15 @@ It can be integrated in application node network, like Houdini ROP or Nuke Gizmo
 </ul>
 <p>
 CGRU software scripts are located in:<br/>
+<kbd>cgru/plugins/[software name]</kbd>
+</p>
+<p>
+AFANASY specific software scripts are located in:<br/>
 <kbd>cgru/afanasy/plugins/[software name]</kbd>
 </p>
 <p>
 Some examples of software integration with afanasy are located in:<br/>
-<kbd>cgru/afanasy/examples</kbd>
-</p>
-
-<h3>Required Packages:</h3>
-<p>
-<kbd>python2.5</kbd>
+<kbd>cgru/examples</kbd>
 </p>
 
 <h3>Required Environment:</h3>
@@ -82,20 +85,13 @@ Some examples of software integration with afanasy are located in:<br/>
 To setup CGRU environment you need to source setup script <i><b>in CGRU root folder</b></i>:<br/>
 <code>
 $ cd .../cgru<br/>
-$ source setup.sh<br/>
-</code>
-</p>
-<p>
-To setup Afanasy environment you need to source setup script <i><b>in Afanasy root folder</b></i>:<br/>
-<code>
-$ cd afanasy<br/>
-$ source setup.sh<br/>
+$ source ./setup.sh<br/>
 </code>
 </p>
 <p>
 For example you can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
 <code>
-pwd=$PWD; cd .../cgru; source setup.sh; cd afanasy; source setup.sh; cd $pwd
+pushd .../cgru; source ./setup.sh; popd
 </code>
 <br/>
 End your shell will automatically setup on every launch.
@@ -104,8 +100,8 @@ End your shell will automatically setup on every launch.
 CGRU examples already have a commands which setup environment and then run application.<br/>
 Example for NUKE:<br/>
 <code>
-$ cd .../cgru/examples/nuke<br/>
-$ ./nuke<br/>
+$ cd .../cgru/examples/blender<br/>
+$ ./start_blender.sh<br/>
 </code></p>
 
 <p>
@@ -118,19 +114,19 @@ You can just double-click 'nuke.cmd' example to launch it (it will start in curr
 <table width="100%" align="center" cellpadding="0" cellspacing="0">
 <tr>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+   <div style="width:100%;height:40px;background:url('../../../doc/images/footer_left.png')" />
 </td>
 <td>
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+   <div style="width:100%;height:40px;background:url('../../../doc/images/footer.png') repeat-x" />
 </td>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+   <div style="width:100%;height:40px;background:url('../../../doc/images/footer_center.png')" />
 </td>
 <td>
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+   <div style="width:100%;height:40px;background:url('../../../doc/images/footer.png') repeat-x" />
 </td>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+   <div style="width:100%;height:40px;background:url('../../../doc/images/footer_right.png')" />
 </td>
 </tr>
 </table>
@@ -138,13 +134,13 @@ You can just double-click 'nuke.cmd' example to launch it (it will start in curr
 <table width="99%" align="center">
 <tr align="center">
 <td width="33%">
-<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
+<small><i><a href="http://sourceforge.net/projects/cgru/"><img src="../../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a></i></small>
 </td>
 <td width="33%">
-<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+<p><a href="../../../index.html" target="_top"><img src="../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
 </td>
 <td width="33%">
-<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168"><img src="../../../doc/images/cgtalkforum.png" border="0" alt="cgtalkforum" /></a></i></small>
 </td>
 </tr>
 </table>

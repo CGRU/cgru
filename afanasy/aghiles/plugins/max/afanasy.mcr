@@ -153,8 +153,8 @@ rollout AfanasyDialog "Afanasy"
          AfWorkingDirectory = substring AfWorkingDirectory 1 (AfWorkingDirectory.count-1)
 
 -- Create command:
-      local cmd = "afjob.py "
-      cmd += "\"" + maxFilePath + maxFileName + "\""
+      local cmd = "\"" + systemTools.getEnvVariable("AF_ROOT") + "\\python\\" + "afjob.py\""
+      cmd += " \"" + maxFilePath + maxFileName + "\""
       cmd += " " + (startFrameControl.value as string)
       cmd += " " + (endFrameControl.value as string)
       cmd += " -fpt " + (taskFrameNumberControl.value as string)
@@ -196,7 +196,6 @@ rollout AfanasyDialog "Afanasy"
       )
 
 -- Prepare  command:
-      cmd = systemTools.getEnvVariable("AF_ROOT") + "\\python\\" + cmd
       cmd = "python " + cmd
       format "-- %\n" cmd
 

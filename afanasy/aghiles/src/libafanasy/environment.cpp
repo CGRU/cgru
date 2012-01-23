@@ -367,7 +367,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    PRINT("User home directory = '%s'\n", home.c_str());
    home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy";
    PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
-   if( af::pathMakeDir( home_afanasy, true) == false)
+   if( af::pathMakeDir( home_afanasy, af::VerboseOn ) == false)
    {
       AFERRAR("Can't make home directory '%s'", home_afanasy.c_str())
    }

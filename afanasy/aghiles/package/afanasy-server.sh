@@ -7,5 +7,5 @@ installdir=$3
 [ -z "$installdir" ] && exit
 
 # Copying files:
-mkdir -p $pack/$installdir/afanasy/bin
-cp -r $src/afanasy/bin/afserver $pack/$installdir/afanasy/bin
+
+# No files to copy needed. Package needed only for init script.

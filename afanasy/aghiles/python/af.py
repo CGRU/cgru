@@ -53,6 +53,10 @@ class Block(pyaf.Block):
       self.setParser( parser)
       self.setWorkingDirectory( os.getenv('PWD', os.getcwd()) )
       self.setCapacity( int( self.env.Vars['task_default_capacity'] ) )
+      self.setErrorsRetries( int( self.env.Vars['task_error_retries'] ) )
+      self.setErrorsAvoidHost( int( self.env.Vars['errors_avoid_host'] ) )
+      self.setErrorsTaskSameHost( int( self.env.Vars['task_errors_same_host'] ) )
+      self.setErrorsForgiveTime( int( self.env.Vars['errors_forgivetime'] ) )
       self.tasks = []
 
    def setParser( self, parser, nocheck = False):
@@ -70,7 +74,6 @@ class Block(pyaf.Block):
       if capacity >= 0: pyaf.Block.setCapacity( self, capacity)
    def setVariableCapacity( self, capmin, capmax):
       if capmin >= 0 or capmax >= 0: pyaf.Block.setVariableCapacity( self, capmin, capmax)
-
    def setWorkingDirectory( self, cmd, TransferToServer = True):
       if TransferToServer: cmd = self.pm.toServer( cmd)
       pyaf.Block.setWorkingDirectory( self, cmd)
@@ -214,34 +217,34 @@ class Cmd( pyaf.Cmd):
          return False
 
    def renderSetNimby( self, text):
-      self.rendersetnimby( self.env.Vars['hostname'] + '.*', text)
+      self.rendersetnimby( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderSetNIMBY( self, text):
-      self.rendersetNIMBY( self.env.Vars['hostname'] + '.*', text)
+      self.rendersetNIMBY( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderSetFree( self, text):
-      self.rendersetfree( self.env.Vars['hostname'] + '.*', text)
+      self.rendersetfree( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderEjectTasks( self, text):
-      self.renderejecttasks( self.env.Vars['hostname'] + '.*', text)
+      self.renderejecttasks( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def renderExit( self, text):
-      self.renderexit( self.env.Vars['hostname'] + '.*', text)
+      self.renderexit( self.env.Vars['hostname'], text)
       self._sendRequest()
 
    def talkExit( self, text):
-      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + '.*', text)
+      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + ':.*', text)
       self._sendRequest()
 
    def monitorExit( self, text):
-      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + '.*', text)
+      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + ':.*', text)
       self._sendRequest()
 
-   def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'] + '.*')
+   def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'])
    def renderGetList( self, mask = '.*'):
       if not self.renderlistget( mask): return
       if self._sendRequest():

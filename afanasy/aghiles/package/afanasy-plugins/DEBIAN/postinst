@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "Afanasy plugins POST INSTALL"
-
-if [ -d /opt/cgru/afanasy/plugins ]; then
-   find /opt/cgru/afanasy/plugins -type d -exec chmod a+rwx {} \;
-fi
-
-exit 0

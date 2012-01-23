@@ -16,7 +16,7 @@ LabelVersion::LabelVersion( QWidget *parent):
 {
    setMinimumHeight(16);
    setMaximumHeight(16);
-   text = QString("CGRU VERSION %1").arg(af::Environment::getVersionCGRU().c_str());
+   label = QString("CGRU VERSION %1").arg(af::Environment::getVersionCGRU().c_str());
    tooltip = QString("Build at %1"
                      "\nAfanasy sources revision: %2"
                      "\nPython version: %3"
@@ -118,7 +118,7 @@ void LabelVersion::paintEvent( QPaintEvent * event)
    // Draw text:
    p.setPen( afqt::QEnvironment::qclr_black);
    p.setFont( font);
-   p.drawText( rect(), Qt::AlignCenter, text);
+   p.drawText( rect(), Qt::AlignCenter, label);
 }
 
 void LabelVersion::showMessage( const std::string & str)
@@ -167,5 +167,5 @@ int LabelVersion::getStringStatus( const std::string & str)
 void LabelVersion::mouseDoubleClickEvent( QMouseEvent * event )
 {
    WndText * wnd = new WndText("Info");
-   wnd->insertText( tooltip);
+   wnd->insertText( label + "\n" + tooltip);
 }

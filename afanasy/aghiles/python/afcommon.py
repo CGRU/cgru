@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import string
-
 Digits = '01234567890'
 
+
+# Replace "bad" characters in filename on "_":
 def filterFileName( filename):
    chars = ' ~`!@#$%^&*()+[]{};:\'",<>/?\\|'
    newfilename = filename
@@ -11,59 +11,65 @@ def filterFileName( filename):
       newfilename = newfilename.replace( c, '_')
    return newfilename
 
-def patternFromFile( path):
-   pos = path.rfind('.')
-   if pos < 1: return path
-   pos_ext = pos
-   pos -= 1
-   while pos >= 0:
-      if not path[pos] in Digits: break
-      pos -= 1
-   pos += 1
-   if pos == pos_ext: return path
-   return path[:pos] + '@' + '#'*(pos_ext-pos) + '@' + path[pos_ext:]
 
-def patternFromPaths( path_a, path_b):
-   path = path_a
+# Split paths searching for diffenrence, return equal part before difference, difference length, part after difference
+def splitPathsDifference( path_a, path_b):
+   part_1 = path_a
+   part_2 = ''
+   diflength = 0
 
    len_a = len(path_a)
    len_b = len(path_b)
    len_min = len_a
    if len_min > len_b: len_min = len_b
-   if len_min < 1: return path
+   if len_min < 1: return part_1, diflen, part_2
 
    len_begin = -1
    for c in range( len_min):
       if path_a[c] == path_b[c]: continue
       len_begin = c
       break
-   if len_begin < 1: return path
+   if len_begin < 1: return part_1, diflen, part_2
 
    len_end = -1
    for c in range( len_min):
       if path_a[len_a-c-1] == path_b[len_b-c-1]: continue
       len_end = c
       break
-   if len_end < 1: return path
+   if len_end < 1: return part_1, diflen, part_2
 
    for c in range( len_begin):
-      if path_a[len_begin-c] in string.digits: continue
+      if path_a[len_begin-c] in Digits: continue
       len_begin = len_begin - c + 1
       break
 
    for c in range( len_end):
-      if path_a[len_a-len_end+c] in string.digits: continue
+      if path_a[len_a-len_end+c] in Digits: continue
       len_end = len_end - c
       break
 
-   padding = 1
-   if len_a == len_b:
-      padding = len_a - len_begin - len_end
-   
-   path = path_a[0:len_begin] + '@' + '#'*padding + '@' + path_a[len_a-len_end:len_a]
+   diflength = 1
+   if len_a == len_b: diflength = len_a - len_begin - len_end
+   part_1 = path_a[0:len_begin]
+   part_2 = path_a[len_a-len_end:len_a]
+
+   return part_1, diflength, part_2
+
+
+# Return Afanasy pattern based on paths difference (the best way):
+def patternFromPaths( path_a, path_b):
+   path = path_a
+
+   part_1, padding, part_2 = splitPathsDifference( path_a, path_b)
+
+   if padding < 1: return path
+
+   path = part_1 + '@' + '#'*padding + '@' + part_2
 
    return path
 
+
+# Return Afanasy pattern from C printf formatting (%04d):
 def patternFromStdC( path, verbose = False):
    pos = 0
    while pos < len(path):
@@ -79,7 +85,7 @@ def patternFromStdC( path, verbose = False):
          if verbose: print('digits = "%s"' % digits)
          digits_ok = True
          for d in digits:
-            if d not in string.digits:
+            if d not in Digits:
                digits_ok = False
                break
          if digits_ok:
@@ -95,6 +101,8 @@ def patternFromStdC( path, verbose = False):
          pos += posp+posd
    return paths
 
+
+# Return Afanasy pattern searching fo "#" characters:
 def patternFromDigits( path, verbose = False):
    pos = 0
    posd = 0
@@ -118,3 +126,17 @@ def patternFromDigits( path, verbose = False):
       path = path[:posd] + '@' + path[posd:pos] + '@' + path[pos:]
       pos += 2
    return path
+
+
+# Return Afanasy pattern searching for digits before last "."
+def patternFromFile( path):
+   pos = path.rfind('.')
+   if pos < 1: return path
+   pos_ext = pos
+   pos -= 1
+   while pos >= 0:
+      if not path[pos] in Digits: break
+      pos -= 1
+   pos += 1
+   if pos == pos_ext: return path
+   return path[:pos] + '@' + '#'*(pos_ext-pos) + '@' + path[pos_ext:]

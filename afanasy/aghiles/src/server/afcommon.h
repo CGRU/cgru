@@ -11,16 +11,16 @@
 #include "cleanupqueue.h"
 #include "logqueue.h"
 
-class Core;
+class ThreadArgs;
 
 /*
-	From what I understand this is just a holder for global
-	variables (aghiles).
+   From what I understand this is just a holder for global
+   variables (aghiles).
 */
 class AFCommon
 {
 public:
-   AFCommon( Core * core);
+   AFCommon( ThreadArgs * i_threadArgs);
    ~AFCommon();
 
    static void executeCmd( const std::string & cmd); ///< Execute command.

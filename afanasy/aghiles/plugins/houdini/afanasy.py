@@ -13,9 +13,9 @@ class BlockParameters:
    def __init__( self, afnode, ropnode, subblock, prefix, frame_range, for_job_only = False):
       if VERBOSE == 2:
          if ropnode:
-            print 'Initializing block parameters for "%s" from "%s"' % (ropnode.name(), afnode.name())
+            print 'Initializing block parameters for "%s" from "%s"' % (ropnode.path(), afnode.path())
          else:
-            print 'Initializing command block parameters from "%s"' % (afnode.name())
+            print 'Initializing command block parameters from "%s"' % (afnode.path())
 
       # Init parameters:
       self.valid           = False
@@ -65,10 +65,10 @@ class BlockParameters:
          self.depend_mask_global = str( afnode.parm('depend_mask_global').eval())
 
       # Process frame range:
-      opname = afnode.name()
+      opname = afnode.path()
       if afnode.parm('trange').eval() > 1: self.fullrangedepend = True
       if ropnode:
-         opname = ropnode.name()
+         opname = ropnode.path()
          trange = ropnode.parm('trange')
          if trange is not None:
             if int(trange.eval()) > 0:
@@ -90,7 +90,7 @@ class BlockParameters:
       if ropnode:
          self.type = 'hbatch'
          if not isinstance( ropnode, hou.RopNode):
-            hou.ui.displayMessage('"%s" is not a ROP node' % ropnode.name())
+            hou.ui.displayMessage('"%s" is not a ROP node' % ropnode.path())
             return
          self.ropnode = ropnode
          self.name    = str( ropnode.name())
@@ -110,7 +110,7 @@ class BlockParameters:
          if self.capacity_min != -1 or self.capacity_max != -1: self.cmd += ' --numcpus '+ services.service.str_capacity
          self.cmd += ' -s @#@ -e @#@ --by %d -t "%s"' % (self.frame_inc, afnode.parm('take').eval())
          self.cmd += ' "%(hipfilename)s"'
-         self.cmd += ' "%s"' % ropnode.name()
+         self.cmd += ' "%s"' % ropnode.path()
       else:
          # Custom command driver:
          if int( afnode.parm('cmd_add').eval()):
@@ -126,7 +126,7 @@ class BlockParameters:
             # Prefix:
             self.cmd_useprefix = int( self.afnode.parm('cmd_use_afcmdprefix').eval())
          elif not for_job_only:
-            hou.ui.displayMessage('Can\'t process "%s"' % str(afnode.name()))
+            hou.ui.displayMessage('Can\'t process "%s"' % str(afnode.path()))
             return
 
       # Try to set driver foreground mode
@@ -140,7 +140,7 @@ class BlockParameters:
                      soho_foreground.set( 1)
                      self.soho_foreground = 0
                   except:
-                     hou.ui.displayMessage('Set "Block Until Render Complete" on "%s" node' % ropnode.name())
+                     hou.ui.displayMessage('Set "Block Until Render Complete" on "%s" node' % ropnode.path())
                      return
 
       self.valid = True
@@ -148,9 +148,9 @@ class BlockParameters:
    def genBlock( self, hipfilename):
       if VERBOSE:
          if self.ropnode:
-            print 'Generating block for "%s" from "%s"' % (self.ropnode.name(), self.afnode.name())
+            print 'Generating block for "%s" from "%s"' % (self.ropnode.path(), self.afnode.path())
          else:
-            print 'Generating command block from "%s"' % (self.afnode.name())
+            print 'Generating command block from "%s"' % (self.afnode.path())
 
       block = af.Block( self.name, self.type)
       block.setCommand( self.cmd % vars(), self.cmd_useprefix)
@@ -219,7 +219,7 @@ class BlockParameters:
 
    def doPost( self):
       if self.ropnode is None: return
-      if VERBOSE: print 'doPost: "%s"' % self.ropnode.name()
+      if VERBOSE: print 'doPost: "%s"' % self.ropnode.path()
       if self.soho_foreground is not None: self.ropnode.parm('soho_foreground').set(self.soho_foreground)
       if self.soho_outputmode is not None:
          self.ropnode.parm('soho_outputmode').set(self.soho_outputmode)
@@ -252,9 +252,9 @@ def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
 
       if read_rop or run_rop:
          if not block_generate.ropnode:
-            hou.ui.displayMessage('Can`t find ROP for processing "%s"' % afnode.name())
+            hou.ui.displayMessage('Can`t find ROP for processing "%s"' % afnode.path())
          if not isinstance( ropnode, hou.RopNode):
-            hou.ui.displayMessage('"%s" is not a ROP node' % block_generate.ropnode.name())
+            hou.ui.displayMessage('"%s" is not a ROP node' % block_generate.ropnode.path())
       if not run_rop: join_render = False
       if join_render:
          tile_render = False
@@ -334,7 +334,7 @@ def getBlockParameters( afnode, ropnode, subblock, prefix, frame_range):
    return params
 
 def getJobParameters( afnode, subblock = False, frame_range = None, prefix = ''):
-   if VERBOSE: print 'Getting Job Parameters from "%s":' % afnode.name()
+   if VERBOSE: print 'Getting Job Parameters from "%s":' % afnode.path()
 
    # Process frame range:
    if frame_range is None:
@@ -353,8 +353,12 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
    frame_range = frame_first, frame_last, frame_inc, frame_pertask
 
    params = []
+   connections = []
+   connections.extend( afnode.inputs())
    nodes = []
-   nodes.extend( afnode.inputs())
+   for node in connections:
+      if node is not None:
+         nodes.append( node)
    if afnode.parm('cmd_add').eval(): nodes.append(None)
    nodes.reverse()
    dependmask = ''
@@ -389,7 +393,7 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
    return params
 
 def render( afnode):
-   if VERBOSE: print '\nRendering "%s":' % afnode.name()
+   if VERBOSE: print '\nRendering "%s":' % afnode.path()
    params = getJobParameters( afnode)
    if params is not None:
       params[-1].genJob( params[:-1])

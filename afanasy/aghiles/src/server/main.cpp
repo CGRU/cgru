@@ -1,36 +1,41 @@
-#include <arpa/inet.h>
-#include <errno.h>
-#include <fcntl.h>
 #include <memory.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
-#include <sys/types.h>
-#include <time.h>
-
-#include "../libafanasy/dlThread.h"
 
 #include <QtCore/QCoreApplication>
 
-#include "../include/afjob.h"
 #include "../libafanasy/environment.h"
-#include "../libafnetwork/communications.h"
-#include "../libafsql/name_afsql.h"
+#include "../libafanasy/dlThread.h"
+#include "../libafsql/qdbconnection.h"
 
 #include "afcommon.h"
-#include "core.h"
+#include "jobcontainer.h"
+#include "monitorcontainer.h"
+#include "msgqueue.h"
+#include "sysjob.h"
+#include "rendercontainer.h"
+#include "talkcontainer.h"
+#include "threadargs.h"
+#include "usercontainer.h"
+
 
 #define AFOUTPUT
 //#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Core* core;
 bool running;
 
+// Thread functions:
+void threadAcceptClient( void * i_arg );
+void threadRunCycle( void * i_args);
+
 //####################### signal handlers ####################################
+void sig_int(int signum)
+{
+   fprintf( stderr, "SIG INT\n" );
+   running = false;
+}
 void sig_alrm(int signum)
 {
    printf("ALARM: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)DlThread::Self());
@@ -39,279 +44,45 @@ void sig_pipe(int signum)
 {
    printf("PIPE ERROR: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)DlThread::Self());
 }
-void sig_int(int signum)
-{
-   fprintf( stderr, "SIG INT\n" );
-   running = false;
-}
 
-//############################### child theads functions ################################
-//
-//######################## core thread to process client after accept #################
-void ThreadCore_processClient(void* arg)
-{
-   T_processClient__args * threadArgs = (T_processClient__args*)arg;
-
-   assert( threadArgs->sd > 0 );
-
-   // Disassociate from parent -
-   // Guarantees that thread resources are deallocated upon return.
-   /* FIXME: why for ?? */
-   //DlThread::Self()->Detach();
-
-   assert( core );
-
-   /* The 'process' method will decode the incoming request and dispatch
-      it to the proper queue. */
-   if( core != NULL)
-      core->threadReadMsg->process( threadArgs );
-
-   close(threadArgs->sd);
-   delete threadArgs;
-}
-
-void ThreadCore_threadRun( void* arg )
-{
-   Core *core = (Core *)arg;
-   core->threadRun->run();
-}
-
-#if 0
-void ThreadCommon_dispatchMessages(void* arg)
-{
-#ifndef _WIN32
-   /* FIXME: why do we need this for? */
-   sigset_t sigmask;
-   sigemptyset( &sigmask);
-   sigaddset( &sigmask, SIGALRM);
-   if( pthread_sigmask( SIG_UNBLOCK, &sigmask, NULL) != 0)
-      perror("pthread_sigmask:");
-#endif
-
-   AFINFA("Thread (id = %lu) to dispatch messages created.", (long unsigned)pthread_self())
-   AFCommon::MsgDispatchQueueRun();
-}
-#endif
-
-//###################### server thread to accept clients #################################
-void ThreadServer_accept(void* arg)
-{
-   int protocol = AF_UNSPEC;
-
-// Check for available local network addresses
-   struct addrinfo hints, *res;
-   bzero( &hints, sizeof(hints));
-   hints.ai_socktype = SOCK_STREAM;
-   hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
-   char port[16];
-   sprintf( port, "%u", af::Environment::getServerPort());
-   getaddrinfo( NULL, port, &hints, &res);
-
-   printf("Available addresses:\n");
-
-   for( struct addrinfo * ai = res; ai != NULL; ai = ai->ai_next)
-   {
-      switch( ai->ai_family)
-      {
-         case AF_INET:
-         {
-            if( protocol == AF_UNSPEC ) protocol = AF_INET;
-            const char * addr_str = inet_ntoa( ((sockaddr_in*)(ai->ai_addr))->sin_addr );
-            printf("IP = '%s'\n", addr_str);
-            break;
-         }
-         case AF_INET6:
-         {
-            if(( protocol == AF_UNSPEC ) || ( protocol == AF_INET )) protocol = AF_INET6;
-            static const int buffer_len = 256;
-            char buffer[buffer_len];
-            const char * addr_str = inet_ntop( AF_INET6, &(((sockaddr_in6*)(ai->ai_addr))->sin6_addr), buffer, buffer_len);
-            printf("IPv6 = '%s'\n", addr_str);
-            break;
-         }
-         default:
-            printf("Unsupported address family, skipping.\n");
-            continue;
-      }
-   }
-   freeaddrinfo( res);
-#ifdef MACOSX
-// FIXME: Current MAX OS can't listen IPv6?
-   protocol = AF_INET;
-#endif
-
-   switch(protocol)
-   {
-      case AF_INET:
-         printf("Using IPv4 addresses family.\n");
-         break;
-      case AF_INET6:
-         printf("Using IPv6 addresses family.\n");
-         printf("IPv4 connections addresses will be mapped to IPv6.\n");
-         break;
-      default:
-         AFERROR("No addresses founed.")
-         return;
-   }
-
-//
-// initializing server socket address:
-   struct sockaddr_in server_sockaddr_in4;
-   bzero( &server_sockaddr_in4, sizeof(server_sockaddr_in4));
-   server_sockaddr_in4.sin_port = htons( af::Environment::getServerPort());
-   server_sockaddr_in4.sin_addr.s_addr = INADDR_ANY;
-   server_sockaddr_in4.sin_family = AF_INET;
-
-   struct sockaddr_in6 server_sockaddr_in6;
-   bzero( &server_sockaddr_in6, sizeof(server_sockaddr_in6));
-   server_sockaddr_in6.sin6_port = htons( af::Environment::getServerPort());
-   server_sockaddr_in6.sin6_family = AF_INET6;
-//   server_sockaddr_in6.sin6_addr = IN6ADDR_ANY_INIT; // This is default value, it is zeros
-
-   /* */
-   int server_sd = socket( protocol, SOCK_STREAM, 0);
-   if( server_sd == -1)
-   {
-      AFERRPE("socket")
-      return;
-   }
-//
-// set socket options for reuseing address immediatly after bind
-   int value = 1;
-   if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) != 0)
-      AFERRPE("set socket SO_REUSEADDR option failed");
-
-   /* */
-   value = -1;
-   if( protocol == AF_INET  )
-   {
-      value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in4, sizeof(server_sockaddr_in4));
-   }
-   else
-   {
-#ifdef MACOSX
-      assert( false );
-#endif
-      assert( protocol == AF_INET6 );
-      value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in6, sizeof(server_sockaddr_in6));
-   }
-
-   if( value != 0)
-   {
-      perror( "bind() error in ThreadServer_accept" );
-      return;
-   }
-
-   if( listen( server_sd, 9) != 0)
-   {
-      perror( "listen() error in ThreadServer_accept" );
-      return; 
-   }
-
-   printf( "Listening %d port...\n", af::Environment::getServerPort());
-
-   DlThread process_one_client;
-
-//
-//############ accepting client connections:
-   int error_wait; // Timeout to pause accepting on error
-   static const int error_wait_max = 1 << 30;   // Maximum timeout value
-   static const int error_wait_min = 1 << 3;    // Minimum timeout value
-   error_wait = error_wait_min;
-   while( running )
-   {
-      assert( core );
-
-      /* FIXME: can this happen? */
-      if( core == NULL)
-         break;
-
-      T_processClient__args * threadArgs = new T_processClient__args;
-      socklen_t client_sockaddr_len = sizeof(threadArgs->ss);
-
-      threadArgs->sd = accept( server_sd, (struct sockaddr*)&(threadArgs->ss), &client_sockaddr_len);
-
-      /* This is a cancellation point so the DlThread::Cancel can do
-         its work. */
-      DlThread::Self()->TestCancel();
-
-      if( threadArgs->sd < 0)
-      {
-         AFERRPE("accept")
-         switch( errno )
-         {
-            case EMFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
-               AFERROR("The per-process limit of open file descriptors has been reached.")
-               break;
-            case ENFILE: // Very bad, probably main reading thread is locked, most likely server mutexes bug
-               AFERROR("The system limit on the total number of open files has been reached.")
-               break;
-            case EINTR:
-               printf("Server was interrupted.\n");
-               running = false;
-               break;
-         }
-         if( false == running )
-         {
-            delete threadArgs;
-            break;
-         }
-         sleep( error_wait);
-         if( error_wait < error_wait_max) error_wait = error_wait << 1;
-         continue;
-      }
-      error_wait = error_wait_min;
-
-      /* Start a detached thread for this connection, the "t" object will be deleted
-         automagically (check dlThread.cpp for details) and there is no need to join
-         join this thread. */
-      DlThread *t = new DlThread();
-      t->SetDetached();
-      t->Start( ThreadCore_processClient, threadArgs );
-   }
-
-   close( server_sd);
-
-   AFINFO("ThreadServer_accept: exiting.")
-}
-
-//
-//#######################################################################################
-//
 //######################################## main #########################################
 int main(int argc, char *argv[])
 {
    QCoreApplication app( argc, argv);
 
    running = true;
-//   Py_InitializeEx(0);
    af::Environment ENV( af::Environment::NoFlags, argc, argv);
    if( af::init( af::InitFarm) == false) return 1;
    afsql::init();
 
    // create directories if it is not exists
-   if( af::pathMakeDir( ENV.getTempDirectory(),  true) == false) return 1;
-   if( af::pathMakeDir( ENV.getTasksStdOutDir(), true) == false) return 1;
-   if( af::pathMakeDir( ENV.getUsersLogsDir(),   true) == false) return 1;
-   if( af::pathMakeDir( ENV.getRendersLogsDir(), true) == false) return 1;
+   if( af::pathMakeDir( ENV.getTempDirectory(),  af::VerboseOn ) == false) return 1;
+   if( af::pathMakeDir( ENV.getTasksStdOutDir(), af::VerboseOn ) == false) return 1;
+   if( af::pathMakeDir( ENV.getUsersLogsDir(),   af::VerboseOn ) == false) return 1;
+   if( af::pathMakeDir( ENV.getRendersLogsDir(), af::VerboseOn ) == false) return 1;
 
+// Server for windows can be me more simple and not use signals at all.
+// Windows is not a server platform, so it designed for individual tests or very small companies with easy load.
 #ifndef _WIN32
-   /* FIXME: do we _really_ need this ?  If someone kills the process 
-      everytning will be fine anyway. */
-//
-// Interrupt signal catch:
+// Interrupt signals catch.
+// We need to catch interrupt signals to let threads to finish running function themselves.
+// This needed mostly fot queues to let them to finish to process last item.
    struct sigaction actint;
    bzero( &actint, sizeof(actint));
    actint.sa_handler = sig_int;
    sigaction( SIGINT,  &actint, NULL);
    sigaction( SIGTERM, &actint, NULL);
-// SIGPIPE signal catch
+
+// SIGPIPE signal catch.
+// This is not an error for our application.
    struct sigaction actpipe;
    bzero( &actpipe, sizeof(actpipe));
    actpipe.sa_handler = sig_pipe;
    sigaction( SIGPIPE, &actpipe, NULL);
 
-// SIGALRM signal catch and block
+// SIGALRM signal catch and block.
+// Special threads use alarm signal to unblock connect function.
+// Other threads should ignore this signal.
    struct sigaction actalrm;
    bzero( &actalrm, sizeof(actalrm));
    actalrm.sa_handler = sig_alrm;
@@ -323,25 +94,152 @@ int main(int argc, char *argv[])
    if( pthread_sigmask( SIG_BLOCK, &sigmask, NULL) != 0) perror("pthread_sigmask:");
 #endif
 
-   /*
-      Create a core object.
-      FIXME: explain in more details what is a core object.
-   */
-   core = new Core();
-   assert( core->isInitialized() );
+   // Create a separate database connection to register jobs.
+   //  ( Job registration is can be long on heavy jobs.
+   //    Server should use another connection for it not to stop
+   //    database update on heavy job registration.
+   //    WARINING!
+   //    Server new jobs accept speed = database jobs fill-in speed!
+   //    It is near 1000 tasks per second on common systems where
+   //    PostgreSQL and Afanasy server are on the same host. )
+   // Also use it now to restore all containers state from database.
+   afsql::DBConnection afDB_JobRegister("AFDB_JobRegister");
 
-   if( !core->isInitialized() )
+   // containers initialization
+   JobContainer jobs;
+   if( false == jobs.isInitialized()) return 1;
+   JobContainer::setDataBase( &afDB_JobRegister);
+   JobAf::setJobContainer( &jobs);
+
+   UserContainer users;
+   if( false == users.isInitialized()) return 1;
+
+   RenderContainer renders;
+   if( false == renders.isInitialized()) return 1;
+   RenderAf::setRenderContainer( &renders);
+
+   TalkContainer talks;
+   if( false == talks.isInitialized()) return 1;
+
+   MonitorContainer monitors;
+   if( false == monitors.isInitialized()) return 1;
+
+   // Message Queue initialization, but without thread start.
+   // Run cycle queue will read this messages itself.
+   MsgQueue msgQueue("Run cycle thread messages queue", false /* do not start a thread */ );
+   if( false == msgQueue.isInitialized()) return 1;
+
+   bool hasSystemJob = false;
+//
+// Open database to get nodes:
+//
+   afDB_JobRegister.DBOpen();
+   if( afDB_JobRegister.isOpen())
    {
-      AFERROR("afanasy::main: core init failed.")
-      delete core;
-      return 1;
+      // Update database tables:
+      afsql::UpdateTables( &afDB_JobRegister);
+
+      //
+      // Get Renders from database:
+      //
+      printf("Getting renders from database...\n");
+      std::list<int> rids = afDB_JobRegister.getIntegers( afsql::DBRender::dbGetIDsCmd());
+      for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
+      {
+         RenderAf * render = new RenderAf( *it);
+         if( afDB_JobRegister.getItem( render)) renders.addRender( render);
+         else delete render;
+      }
+      printf("%d renders founded.\n", (int)rids.size());
+
+      //
+      // Get Users from database:
+      //
+      printf("Getting users from database...\n");
+      std::list<int> uids = afDB_JobRegister.getIntegers( afsql::DBUser::dbGetIDsCmd());
+      for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
+      {
+         UserAf * user = new UserAf( *it);
+         if( afDB_JobRegister.getItem( user)) users.addUser( user);
+         else delete user;
+      }
+      printf("%d users founded.\n", (int)uids.size());
+
+      //
+      // Get Jobs from database:
+      //
+      printf("Getting jobs from database...\n");
+      std::list<int> jids = afDB_JobRegister.getIntegers( afsql::DBJob::dbGetIDsCmd());
+      for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
+      {
+         JobAf * job = NULL;
+         if( *it == AFJOB::SYSJOB_ID )
+            job = new SysJob( SysJob::FromDataBase);
+         else
+            job = new JobAf( *it);
+         if( afDB_JobRegister.getItem( job))
+         {
+            if( *it == AFJOB::SYSJOB_ID )
+            {
+               SysJob * sysjob = (SysJob*)job;
+               if( false == sysjob->isValid() )
+               {
+                  printf("System job retrieved from database is obsolete. Deleting it...\n");
+                  std::list<std::string> queries;
+                  job->dbDeleteNoStatistics( &queries);
+                  delete job;
+                  afDB_JobRegister.execute( &queries);
+                  continue;
+               }
+               else
+               {
+                  printf("System job retrieved from database.\n");
+                  hasSystemJob = true;
+               }
+            }
+            jobs.job_register( job, &users, NULL);
+         }
+         else
+         {
+            printf("Deleting invalid job from database...\n");
+            std::list<std::string> queries;
+            job->dbDeleteNoStatistics( &queries);
+            job->stdOut();
+            delete job;
+            afDB_JobRegister.execute( &queries);
+         }
+      }
+      printf("%d jobs founded.\n", (int)jids.size());
+
+      //
+      // Close database:
+      //
+      afDB_JobRegister.DBClose();
    }
+
+//
+// Create system maintenance job if it was not in database:
+// (must be created after close of database connection to prevent mutex lock)
+   if( hasSystemJob == false )
+   {
+      SysJob* job = new SysJob( SysJob::New);
+      jobs.job_register( job, &users, NULL);
+   }
+
+   // Thread aruguments.
+   ThreadArgs threadArgs;
+   threadArgs.jobs      = &jobs;
+   threadArgs.renders   = &renders;
+   threadArgs.users     = &users;
+   threadArgs.talks     = &talks;
+   threadArgs.monitors  = &monitors;
+   threadArgs.msgQueue  = &msgQueue;
 
    /*
       Creating the afcommon object will actually create many message queues
-      that will spawn thres. Have a look in the implementation of AfCommon. 
-   */ 
-   AFCommon afcommon( core );
+      that will spawn threads. Have a look in the implementation of AfCommon.
+   */
+   AFCommon afcommon( &threadArgs );
 
    AFINFA("Thread (id = %lu) is main, creating other threads.", (long unsigned)DlThread::Self())
 
@@ -350,12 +248,13 @@ int main(int argc, char *argv[])
       for incoming connections.
    */
    DlThread ServerAccept;
-   ServerAccept.Start( &ThreadServer_accept, 0x0);
+   ServerAccept.Start( &threadAcceptClient, &threadArgs);
 
-   /* NOTE: note sure why we call this the "core" thread. */
-   DlThread CoreThread;
-   CoreThread.Start( &ThreadCore_threadRun, core ); 
- 
+   // Run cycle thread.
+   // All 'brains' are there.
+   DlThread RunCycleThread;
+   RunCycleThread.Start( &threadRunCycle, &threadArgs);
+
    /* Do nothing since everything is done in our threads. */
    while( running )
    {
@@ -364,19 +263,17 @@ int main(int argc, char *argv[])
 
    AFINFO("afanasy::main: Waiting child threads.")
    //alarm(1);
+   /*FIXME: Why we don`t need to join accent thread? */
    //ServerAccept.Cancel();
    //ServerAccept.Join();
 
    AFINFO("afanasy::main: Waiting Run.")
-   CoreThread.Cancel();
-   CoreThread.Join();
+   // No need to chanel run cycle thread as
+   // every new cycle it checks running external valiable
+//   RunCycleThread.Cancel();
+   RunCycleThread.Join();
 
-   delete core;
-
-   AFINFO("afanasy::main: Output messages statistics:")
    af::destroy();
-
-//   Py_Finalize();
 
    return 0;
 }

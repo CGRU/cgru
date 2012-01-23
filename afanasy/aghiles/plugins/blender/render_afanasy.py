@@ -41,6 +41,9 @@ class ORESettings(bpy.types.PropertyGroup):
    fpertask = IntProperty(    name='Per Task', description='Frames Per One Task', min=1, default=1)
    pause    = BoolProperty(   name='Start Job Paused', description='Send job in offline state.', default=0)
 
+   # Render Settings:
+   filepath = StringProperty( name='File Path', description='Set File Path.', maxlen=512, default='')
+
    # Paramerets:
    priority = IntProperty( name='Priority', description='Job order in user jobs list.', min=-1, max=250, default=-1)
    maxruntasks = IntProperty( name='Max Run Tasks', description='Maximum number of running tasks.', min=-1, max=9999, default=-1)
@@ -120,6 +123,20 @@ class RENDER_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
 #      layout.operator('ore.docs', icon='INFO')
 
 
+class PARAMETERS_PT_RenderSettings(RenderButtonsPanel, bpy.types.Panel):
+   bl_label = 'Render Settings'
+   COMPAT_ENGINES = set(['AFANASY_RENDER'])
+
+   @classmethod
+   def poll(cls, context):
+      rd = context.scene.render
+      return (rd.use_game_engine==False) and (rd.engine in cls.COMPAT_ENGINES)
+
+   def draw(self, context):
+      layout = self.layout
+      ore = context.scene.ore_render
+      layout.prop(ore, 'filepath')
+
 class PARAMETERS_PT_Afanasy(RenderButtonsPanel, bpy.types.Panel):
    bl_label = 'Parameters'
    COMPAT_ENGINES = set(['AFANASY_RENDER'])
@@ -147,12 +164,10 @@ class ORE_Submit(bpy.types.Operator):
       sce = context.scene
       ore = sce.ore_render
       rd = context.scene.render
-
-      # Save scene:
-      engine = rd.engine
-      rd.engine = ore.engine
+      images = None
       bpy.ops.wm.save_mainfile()
-      rd.engine = engine
+
+      # Calculate temporary scene path:
       scenefile = bpy.data.filepath
       renderscenefile = scenefile + time.strftime('.%m%d-%H%M%S-') + str(time.time() - int(time.time()))[2:5] + '.blend'
 
@@ -174,6 +189,8 @@ class ORE_Submit(bpy.types.Operator):
       # Check frames settings:
       if fpertask < 1: fpertask = 1
       if fend < fstart: fend = fstart
+      # Process images:
+      if ore.filepath != '': images = ore.filepath
 
       # Check and add Afanasy module in system path:
       afpython = os.getenv('AF_PYTHON')
@@ -199,10 +216,22 @@ class ORE_Submit(bpy.types.Operator):
       job = af.Job( jobname)
       servicename = 'blender'
       block = af.Block( ore.engine, servicename)
+      if ore.engine == 'BLENDER_RENDER': block.setParser('blender_render')
+      if ore.engine == 'CYCLES': block.setParser('blender_cycles')
       job.blocks.append( block)
       # Set block command and frame range:
-      block.setCommand('blender -b %s -s @#@ -e @#@ -j %d -a'  % (renderscenefile, finc))
+      cmd = 'blender -b "%s"'  % renderscenefile
+      cmd += ' -E "%s"' % ore.engine
+      if images is not None: cmd += ' -o "%s"' % images
+      cmd += ' -s @#@ -e @#@ -j %d -a' % finc
+      block.setCommand( cmd)
       block.setNumeric( fstart, fend, fpertask, finc)
+      if images is not None:
+         pos = images.find('#')
+         if pos > 0: images = images[:pos] + '@' + images[pos:]
+         pos = images.rfind('#')
+         if pos > 0: images = images[:pos+1] + '@' + images[pos+1:]
+         block.setFiles( images)
       # Set job running parameters:
       if ore.maxruntasks       > -1: job.setMaxRunningTasks( ore.maxruntasks )
       if ore.priority          > -1: job.setPriority( ore.priority )

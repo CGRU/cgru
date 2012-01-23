@@ -52,6 +52,7 @@ path/scene.shk       -   (R) Scene, which file extension determinate run command
 -output              -   override output filename\n\
 -images              -   images to preview (img.%04d.jpg)\n\
 -image               -   image to preview (img.0000.jpg)\n\
+-exec                -   customuze command executable.\n\
 -varirender attr start step count - variate parameter\n\
 -simulate            -   enable simulation\n\
 (R)                  -   REQUIRED arguments\n\
@@ -111,7 +112,7 @@ platform       = ''
 varirender     = False
 simulate       = False
 
-cmd = ''
+cmd = None
 cmds = []
 blocknames = []
 
@@ -148,6 +149,12 @@ for i in range( argsl):
       i += 1
       if i == argsl: break
       pwd = argsv[i]
+      continue
+
+   if arg == '-exec':
+      i += 1
+      if i == argsl: break
+      cmd = '"%s"' % argsv[i]
       continue
 
    if arg == '-file':
@@ -323,18 +330,21 @@ blockname = node
 # Shake:
 if ext == 'shk':
    scenetype = 'shake'
-   cmd = 'shake' + cmdextension + ' -exec ' + scene + ' -vv -t @#@-@#@'
+   if cmd is None: cmd = 'shake' + cmdextension
+   cmd += ' -exec ' + scene + ' -vv -t @#@-@#@'
 
 # Blender:
 if ext == 'blend':
    scenetype = 'blender'
-   cmd = 'blender' + cmdextension + (' -b "%s"' % scene)
+   if cmd is None: cmd = 'blender' + cmdextension
+   cmd += ' -b "%s"' % scene
    cmd += ' -s @#@ -e @#@ -j %d -a' % by
 
 # Nuke:
 elif ext == 'nk':
    scenetype = 'nuke'
-   cmd = 'nuke' + cmdextension + ' -i'
+   if cmd is None: cmd = 'nuke' + cmdextension
+   cmd += ' -i'
    cmd += ' -F @#@-@#@x' + str(by)
    if capmin != -1 or capmax != -1: cmd += ' -m ' + services.service.str_capacity
    if node != '': cmd += ' -X %s' % node
@@ -345,7 +355,7 @@ elif ext == 'hip':
    if node == '':
       error_exit( 'no houdini driver to render specified')
    scenetype = 'hbatch_mantra'
-   cmd = 'hrender_af' + cmdextension
+   if cmd is None: cmd = 'hrender_af' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' --numcpus '+ services.service.str_capacity
    if ignoreinputs: cmd += ' -i'
    cmd += ' -s @#@ -e @#@ --by %d' % by
@@ -355,7 +365,7 @@ elif ext == 'hip':
 # Mantra:
 elif ext == 'ifd':
    scenetype = 'mantra'
-   cmd = 'mantra' + cmdextension
+   if cmd is None: cmd = 'mantra' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' -j '+ services.service.str_capacity
    cmd += ' -V a -f "%s"' % scene
 
@@ -363,7 +373,7 @@ elif ext == 'ifd':
 elif ext == 'mb':
    scenetype = 'maya'
 #   cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
-   cmd = 'mayarender' + cmdextension
+   if cmd is None: cmd = 'mayarender' + cmdextension
    cmd += ' -s @#@ -e @#@ -b %d' % by
    if node != '': cmd += ' -cam "%s"' % node
    if take != '': cmd += ' -rl "%s"' % take
@@ -380,14 +390,18 @@ elif ext == 'mb':
          cmd += ' -of "%s"' % os.path.basename( of)
       images = output
    cmd += ' -proj "%s"' % pwd
+   cmd += ' "-mr:art"'
    cmd += ' "%s"' % scene
 
 # XSI:
 elif ext == 'scn':
    scenetype = 'xsi'
-   cmd = os.environ['XSI_CGRU_PATH']
-   cmd = os.path.join( cmd, 'afrender.py')
-   cmd = 'xsibatch' + cmdextension + ' -script %s' % cmd
+   xsirenderscript = os.environ['CGRU_LOCATION']
+   xsirenderscript = os.path.join( xsirenderscript, 'plugins')
+   xsirenderscript = os.path.join( xsirenderscript, 'xsi')
+   xsirenderscript = os.path.join( xsirenderscript, 'afrender.py')
+   if cmd is None: cmd = 'xsibatch' + cmdextension
+   cmd += ' -script %s' % xsirenderscript
    cmd += ' -lang Python -main afRender -args'
    cmd += ' -scene "%s"' % scene
    cmd += ' -start @#@ -end @#@ -step ' + str(by)
@@ -407,7 +421,8 @@ elif ext == 'scn':
 # 3D MAX:
 elif ext == 'max':
    scenetype = 'max'
-   cmd = '3dsmaxcmd' + cmdextension + ' "' + scene + '" -start:@#@ -end:@#@ -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
+   if cmd is None: cmd = '3dsmaxcmd' + cmdextension
+   cmd += ' "' + scene + '" -start:@#@ -end:@#@ -nthFrame:' + str(by) + ' -v:5  -continueOnError -showRFW:0'
    if node != '': cmd += ' -cam:"%s"' % node
    if take != '':
       cmd += ' -batchrender'
@@ -421,7 +436,8 @@ elif ext == 'max':
 # After FX:
 elif ext == 'aep':
    scenetype = 'afterfx'
-   cmd = 'aerender' + cmdextension + ' -project "%s"' % scene
+   if cmd is None: cmd = 'aerender' + cmdextension
+   cmd += ' -project "%s"' % scene
    cmd += ' -mp -s @#@ -e @#@ -i %d -mp' % by
    if node != '': cmd += ' -comp "%s"' % node
    if take != '':
@@ -434,7 +450,8 @@ elif ext == 'aep':
 # simple generic:
 else:
    scenetype = 'generic'
-   cmd = scene + ' @#@ @#@'
+   if cmd is None: cmd = scene
+   cmd += ' @#@ @#@'
 
 #
 # Creating a Job:

@@ -15,12 +15,14 @@ def sendServer( data, datalen, host, port, verbose = False):
          s = socket.socket(af, socktype, proto)
       except:
          print(str(sys.exc_info()[1]))
+         print(str(sa[0]))
          s = None
          continue
       try:
          s.connect(sa)
       except:
          print(str(sys.exc_info()[1]))
+         print(str(sa[0]))
          s.close()
          s = None
          continue

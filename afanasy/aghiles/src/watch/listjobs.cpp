@@ -16,6 +16,7 @@
 #include "itemjob.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
+#include "viewitems.h"
 #include "watch.h"
 
 #define AFOUTPUT
@@ -285,6 +286,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
       if( updateItems( msg) && (af::Environment::VISOR() == false))
          Watch::sendMsg( new afqt::QMsg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
       subscribe();
+      if( af::Environment::VISOR() == false) view->scrollToBottom();
       break;
    }
    case af::Msg::TMonitorJobsDel:

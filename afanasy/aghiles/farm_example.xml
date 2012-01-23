@@ -41,26 +41,42 @@ Mask ".*" will match any render name. So here defined some default settings for 
       <service name="hbatch_mantra" />
       <service name="maya" />
       <service name="blender" />
-      <service name="blender_internal" />
-      <service name="blender_yafray" />
       <service name="yafray" />
       <service name="xsi" />
       <service name="max" />
+      <service name="afterfx" />
 <!--
 Comment it if you agree with build in os detection (names)
       <os>linux mac windows</os>
 You can specify several platforms, if host can take tasks for diffent platforms.
 -->
    </pattern>
+
    <pattern name="Render">
       <mask>lrf.*</mask>
       <description>Linux render farm.</description>
-      <os>linux</os>
       <capacity>8800</capacity>
       <maxtasks>80</maxtasks>
       <power>8000</power>
+      <remservice name="afterfx" />
       <remservice name="max" />
       <remservice name="xsi" />
       <service name="prman" count="2"/>
    </pattern>
+   
+   <pattern name="Server">
+      <mask>server.*|srv.*|cap.*</mask>
+      <description>Machines Captain.</description>
+      <capacity>1100</capacity>
+      <maxtasks>2</maxtasks>
+      <power>1000</power>
+      <clearservices/>
+      <service name="system" />
+      <service name="movgen" />
+<!--
+      <service name="wakeonlan" />
+      <service name="postcmd" />
+-->
+   </pattern>
+
 </farm>

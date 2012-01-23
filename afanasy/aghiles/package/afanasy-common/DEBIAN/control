@@ -3,10 +3,9 @@ Version: @VERSION@
 Architecture: @ARCHITECTURE@
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
+Depends: cgru-common (= @VERSION@), @DEPENDS_AFANASY@
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/
-Description: Afanasy common files
- Afanasy configuration files, python scripts and CLI.
- afcmd - afanasy server commad line interface.
- Needed by any Afanasy package.
+Description: Afanasy binary files
+ Afanasy binary files.

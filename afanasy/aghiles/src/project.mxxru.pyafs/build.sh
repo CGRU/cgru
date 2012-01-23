@@ -2,6 +2,11 @@
 
 export UNIXTYPE="LINUX"
 export MXX_RU_CPP_TOOLSET=gcc_linux
+if [ `uname` == "Darwin" ]; then
+   echo "Building on Mac OS X:"
+   export UNIXTYPE="MACOSX"
+   export MXX_RU_CPP_TOOLSET=gcc_darwin
+fi
 
 # Set locations:
 cgru=$PWD
@@ -21,6 +26,9 @@ popd > /dev/null
 
 export AF_LFLAGS="-lrt -lz"
 #export AF_LFLAGS="-lrt -lz -lgthread-2.0 -lglib-2.0"
+if [ `uname` == "Darwin" ]; then
+   unset AF_LFLAGS
+fi
 
 [ -f override.sh ] && source override.sh
 
@@ -47,5 +55,6 @@ for python in `ls "$pythondir"`; do
    output="../../bin_pyaf/$python"
    [ -d $output ] || mkdir -p $output
    cp -v "tmp/$python/pyaf.so" $output
+   chmod a+x $output
 
 done

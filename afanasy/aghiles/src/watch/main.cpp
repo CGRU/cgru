@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
    }
 
    QApplication app(argc, argv);
-   app.setWindowIcon( QIcon( afqt::stoq( ENV.getAfRoot()) + "/icons/watch_dialog_22.png"));
+   app.setWindowIcon( QIcon( afqt::stoq( ENV.getCGRULocation()) + "/icons/afwatch.png"));
    QPalette palette = app.palette();
    QENV.setPalette( palette);
    app.setPalette( palette);

@@ -1,9 +1,13 @@
-#include "threadrun.h"
-
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../libafsql/qdbconnection.h"
+#include "jobcontainer.h"
+#include "monitorcontainer.h"
+#include "msgqueue.h"
+#include "rendercontainer.h"
+#include "talkcontainer.h"
+#include "threadargs.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -11,20 +15,14 @@
 
 extern bool running;
 
-ThreadRun::ThreadRun( const ThreadPointers *ptrs, int seconds):
-   ThreadAf( ptrs)
-{
-   sec = seconds;
-AFINFO("ThreadRun::ThreadRun:")
-}
+// Messages reaction case function
+void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg);
 
-ThreadRun::~ThreadRun()
+/** This is a main run cycle thread entry point
+**/
+void threadRunCycle( void * i_args)
 {
-AFINFO("ThreadRun::~ThreadRun:")
-}
-
-void ThreadRun::run()
-{
+   ThreadArgs * a = (ThreadArgs*)i_args;
 AFINFO("ThreadRun::run:")
 while( running)
 {
@@ -37,11 +35,11 @@ printf("...................................\n");
 // Lock containers:
 //
 AFINFO("ThreadRun::run: Locking containers...")
-      AfContainerLock jLock( jobs,     AfContainerLock::WRITELOCK);
-      AfContainerLock lLock( renders,  AfContainerLock::WRITELOCK);
-      AfContainerLock ulock( users,    AfContainerLock::WRITELOCK);
-      AfContainerLock tlock( talks,    AfContainerLock::WRITELOCK);
-      AfContainerLock mlock( monitors, AfContainerLock::WRITELOCK);
+      AfContainerLock jLock( a->jobs,     AfContainerLock::WRITELOCK);
+      AfContainerLock lLock( a->renders,  AfContainerLock::WRITELOCK);
+      AfContainerLock ulock( a->users,    AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( a->talks,    AfContainerLock::WRITELOCK);
+      AfContainerLock mlock( a->monitors, AfContainerLock::WRITELOCK);
 
 //
 // Messages reaction:
@@ -52,32 +50,32 @@ AFINFO("ThreadRun::run: React on incoming messages:")
       Process all messages in our message queue. We do it without
       waiting so that the job solving below can run just after.
       NOTE: I think this should be a waiting operation in a different
-      thread. The job solving below should be put asleep using a 
+      thread. The job solving below should be put asleep using a
       semaphore and woke up when something changes. We need to avoid
-      the Sleep() function below. 
+      the Sleep() function below.
    */
 
    MsgAf *message;
-   while( message = msgQueue->popMsg(AfQueue::e_no_wait) )
+   while( message = a->msgQueue->popMsg(AfQueue::e_no_wait) )
    {
-      msgCase( message );
+      threadRunCycleCase( a, message );
    }
 
 //
 // Refresh data:
 //
 AFINFO("ThreadRun::run: Refreshing data:")
-      talks    ->refresh( NULL,    monitors);
-      monitors ->refresh( NULL,    monitors);
-      jobs     ->refresh( renders, monitors);
-      renders  ->refresh( jobs,    monitors);
-      users    ->refresh( NULL,    monitors);
+      a->talks    ->refresh( NULL,        a->monitors);
+      a->monitors ->refresh( NULL,        a->monitors);
+      a->jobs     ->refresh( a->renders,  a->monitors);
+      a->renders  ->refresh( a->jobs,     a->monitors);
+      a->users    ->refresh( NULL,        a->monitors);
 
 //
 // Jobs sloving:
 //
       AFINFO("ThreadRun::run: Solving jobs:")
-      RenderContainerIt rendersIt( renders);
+      RenderContainerIt rendersIt( a->renders);
       std::list<int> rIds;
       {
          // ask every ready render to produce a task
@@ -86,7 +84,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
             if( render->isReady())
             {
                // store render Id if it produced a task
-               if( users->genTask( render, monitors))
+               if( a->users->genTask( render, a->monitors))
                {
                   rIds.push_back( render->getId());
                   continue;
@@ -107,7 +105,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
             RenderAf * render = rendersIt.getRender( *rIt);
             if( render->isReady())
             {
-               if( users->genTask( render, monitors))
+               if( a->users->genTask( render, a->monitors))
                {
                   rIt++;
                   continue;
@@ -122,17 +120,17 @@ AFINFO("ThreadRun::run: Refreshing data:")
 // Dispatch events to monitors:
 //
 AFINFO("ThreadRun::run: dispatching monitor events:")
-      monitors->dispatch();
+      a->monitors->dispatch();
 
 //
 // Free Containers:
 //
 AFINFO("ThreadRun::run: deleting zombies:")
-      talks    ->freeZombies();
-      monitors ->freeZombies();
-      renders  ->freeZombies();
-      jobs     ->freeZombies();
-      users    ->freeZombies();
+      a->talks    ->freeZombies();
+      a->monitors ->freeZombies();
+      a->renders  ->freeZombies();
+      a->jobs     ->freeZombies();
+      a->users    ->freeZombies();
 
    }
 
@@ -140,6 +138,6 @@ AFINFO("ThreadRun::run: deleting zombies:")
 // Sleeping
 //
 AFINFO("ThreadRun::run: sleeping...")
-   sleep( sec);
+   sleep( 1);
 }
 }

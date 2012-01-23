@@ -45,7 +45,7 @@ global proc afanasy_launch()
    string $file  = $scene + "." + $datetime + ".mb";
 
    string $project = `workspace -q -rootDirectory`;
-   string $outdir  = `workspace -en "images"`;
+   string $outdir  = `workspace -fre "images"`;
 
    string $jobame = `substitute ".*/" $scene ""`;
 
@@ -69,7 +69,7 @@ if( $DEBUG)
    //
    if(`checkBox -q -v cgru_afanasy__close`) deleteUI cgru_afanasy_wnd;
 
-   string $cmd = $file;
+   string $cmd = "\"" + $file + "\"";
    $cmd += " "         + $start_frame;
    $cmd += " "         + $end_frame;
    $cmd += " -by "     + $by_frame;
@@ -81,7 +81,7 @@ if( $DEBUG)
    if( $pause) $cmd += " -pause";
 
    if(`about -windows`)
-      $cmd = "python " + `getenv AF_ROOT` + "/python/afjob.py " + $cmd;
+      $cmd = "python \"" + `getenv AF_ROOT` + "/python/afjob.py\" " + $cmd;
    else
       $cmd = `getenv AF_ROOT` + "/python/afjob.sh " + $cmd +  " &";
 
