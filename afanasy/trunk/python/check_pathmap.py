@@ -18,7 +18,7 @@ if len(sys.argv) <= 1:
 if len(sys.argv) > 1:
    path = sys.argv[1]
    if os.path.isfile( path):
-      pm = PathMap( afroot, True, True)
+      pm = PathMap( afroot, UnixSeparators = True, Verbose = True)
       path_server = path + '_server'
       path_client = path + '_client'
       print('To server filename = "%s"' % path_server)
@@ -30,7 +30,7 @@ if len(sys.argv) > 1:
       for arg in range( 1, len( sys.argv)):
          if arg != 1: path += ' '
          path += sys.argv[arg]
-      pm = PathMap( afroot, False, True)
+      pm = PathMap( afroot, UnixSeparators = False, Verbose = True)
       print('                  1         2         3         4         5         6         7')
       print('        012345678901234567890123456789012345678901234567890123456789012345678901234567890')
       print('Origin: ' + path)

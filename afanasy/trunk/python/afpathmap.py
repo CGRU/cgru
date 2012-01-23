@@ -118,6 +118,7 @@ class PathMap:
          for path in self.PathClient:
             print('   "%s" <-> "%s"' % (path, self.PathServer[n]))
             n += 1
+         if self.UnixSeparators: print('Using UNIX separators.')
 
 
    def translatePath( self, path, toserver, Verbose):
@@ -142,13 +143,13 @@ class PathMap:
                path_from = self.PathServer[i]
                path_to   = self.PathClient[i]
             pathfounded = False
-            if sys.platform.find('win') == 0:
+            if sys.platform.find('win') == 0 and toserver:
                path_search = path_search.lower()
-               path_search = path_search.replace('\\','/')
+               path_search = path_search.replace('/','\\')
                if path_search.find(path_from) == 0:
                   pathfounded = True
                else:
-                  path_search = path_search.replace('/','\\')
+                  path_search = path_search.replace('\\','/')
                   if path_search.find(path_from) == 0:
                      pathfounded = True
             else:
