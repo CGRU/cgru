@@ -95,6 +95,13 @@ int main(int argc, char *argv[])
 #endif
 
    // Create a separate database connection to register jobs.
+   //  ( Job registration is can be long on heavy jobs.
+   //    Server should use another connection for it not to stop
+   //    database update on heavy job registration.
+   //    WARINING!
+   //    Server new jobs accept speed = database jobs fill-in speed!
+   //    It is near 1000 tasks per second on common systems where
+   //    PostgreSQL and Afanasy server are on the same host. )
    // Also use it now to restore all containers state from database.
    afsql::DBConnection afDB_JobRegister("AFDB_JobRegister");
 
@@ -119,7 +126,7 @@ int main(int argc, char *argv[])
 
    // Message Queue initialization, but without thread start.
    // Run cycle queue will read this messages itself.
-   MsgQueue msgQueue("Run thread messages queue", false /* do not start a thread */ );
+   MsgQueue msgQueue("Run cycle thread messages queue", false /* do not start a thread */ );
    if( false == msgQueue.isInitialized()) return 1;
 
    bool hasSystemJob = false;

@@ -87,7 +87,7 @@ MsgAf * readMessage( ThreadArgs * i_args)
 {
    assert( i_args->sd > 0 );
 
-   AFINFO( "ThreadReadMsg::msgProcess: trying to recieve message...")
+   AFINFO("ThreadReadMsg::msgProcess: trying to recieve message...")
 
    // set max allowed time to block recieveing data from client socket
    timeval so_rcvtimeo;
@@ -96,12 +96,15 @@ MsgAf * readMessage( ThreadArgs * i_args)
 
    if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, &so_rcvtimeo, sizeof(so_rcvtimeo)) != 0)
    {
-      perror( "setsockopt failed in ThreadReadMsg::process" );
+      AFERRPE("setsockopt failed in threadProcessMsg");
       af::printAddress( &(i_args->ss));
       return NULL;
    }
 
-   // reading message from client socket
+   // Reading message from client socket.
+   // (using a constructor that stores client address in message,
+   // this client address will be used for a new client,
+   // if it is a new client registration request)
    MsgAf * o_msg_request = new MsgAf( i_args->ss);
    if( false == com::msgread( i_args->sd, o_msg_request))
    {
@@ -111,7 +114,7 @@ MsgAf * readMessage( ThreadArgs * i_args)
       return NULL;
    }
 
-   AFINFO( "ThreadReadMsg::msgProcess: message recieved.")
+   AFINFO("ThreadReadMsg::msgProcess: message recieved.")
 
    return o_msg_request;
 }
@@ -139,5 +142,5 @@ void writeMessage( ThreadArgs * i_args, MsgAf * i_msg)
       return;
    }
 
-   AFINFO( "ThreadReadMsg::msgProcess: message sent.")
+   AFINFO("ThreadReadMsg::msgProcess: message sent.")
 }
