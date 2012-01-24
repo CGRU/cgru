@@ -131,21 +131,31 @@ bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("\nUserContainer::genTask: render - %s\n", render->getName().toUtf8().data());
    UserContainerIt usersIt( this);        // initialize users iterator
-   QList<UserAf*> users;
+   std::vector<UserAf*> users;
 
    //
-   // Calculate all users need value and push them into the list
+   // Push nodes into the list
    for( UserAf *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
+   {
       if( user->canRun( render)) users.push_back(user);
-
-   int count = users.count();
+   }
+   int count = users.size();
 
    //
-   // Sort users list by need value
+   // Sort nodes list by need value
    for( int pos = count; pos > 1; pos--)
+   {
       for( int u = 1; u < pos; u++)
+      {
          if( (users[u-1]->getNeed()) < (users[u]->getNeed()) )
-            users.swap( u-1, u);
+         {
+            // Swap two nodes:
+            UserAf * user = users[u-1];
+            users[u-1] = users[u];
+            users[u] = user;
+         }
+      }
+   }
 
 //printf("\n");for(int u=0;u<count;u++){printf("%s - %g\n",users[u]->getName().toUtf8().data(),users[u]->getNeed());}printf("\n");
 
@@ -176,8 +186,14 @@ bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
          bool shift = false;                                   // Whether shift to next unsolved user with the same need
          for( ; usameneed < count; usameneed++)                // Search for unsolved user with the same need
          {
-            if( need != users[usameneed]->getNeed() ) break;   // No more users with the same need
-            if( users[usameneed]->isSolved() ) continue;       // Search next unsolved user
+            if( need != users[usameneed]->getNeed() )
+            {
+               break;   // No more users with the same need
+            }
+            if( users[usameneed]->isSolved() )
+            {
+               continue;       // Search next unsolved user
+            }
             shift = true;                                      // This is unsolved user with the same need
 //printf("UserContainer::genTask: shifting - %s ( u=%d -> %d )\n", users[usameneed]->getName().toUtf8().data(), u, usameneed);
             break;
@@ -188,7 +204,10 @@ bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
 //printf("UserContainer::genTask: reset solving for need = %g\n", need);
             for( usameneed = u; usameneed < count; usameneed++)// Set users with the same need to unsolved
             {
-               if( need != users[usameneed]->getNeed() ) break;
+               if( need != users[usameneed]->getNeed() )
+               {
+                  break;
+               }
                users[usameneed]->setSolved( false);
             }
          }
@@ -215,10 +234,16 @@ bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
                   userfirstneed = u;
                   for( ; u >= 0; u-- ) //for( ; u--; u >= 0 )
                   {
-                     if( users[u]->getNeed() != need ) break;
+                     if( users[u]->getNeed() != need )
+                     {
+                        break;
+                     }
                      userfirstneed = u;
                   }
-                  for( u = userfirstneed; u < userlastneed; u++) users[u]->setSolved( false);
+                  for( u = userfirstneed; u < userlastneed; u++)
+                  {
+                     users[u]->setSolved( false);
+                  }
                   u = userfirstneed-1;
                   firstlap = false;
 //printf("UserContainer::genTask: second lap: userfirstneed = %d, userlastneed %d\n", userfirstneed, userlastneed);

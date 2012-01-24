@@ -759,7 +759,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
       // Push message for run cycle thread.
       i_args->msgQueue->pushMsg( i_msg);
       // Need to return here to not to delete input message (i_msg) later.
-      return NULL;
+      return o_msg_response;
+      //  ( o_msg_response is NULL in all cases except Msg::TTaskUpdateState,
+      //    in that case render should recieve an answer to close task
+      //    and finish sending any updates for the task )
    }
 // -------------------------------------------------------------------------//
    case af::Msg::TVersionMismatch:

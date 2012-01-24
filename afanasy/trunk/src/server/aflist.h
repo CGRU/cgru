@@ -1,7 +1,7 @@
 #pragma once
 
 #include "../libafanasy/afnode.h"
-#include "../libafanasy/dlRWLock.h"
+//#include "../libafanasy/dlRWLock.h"
 
 class AfListIt;
 class AfContainer;
@@ -35,8 +35,8 @@ public:
    friend class AfContainer;
    friend class AfListIt;
 
-   void ReadLock( void ) { m_rw_lock.ReadLock(); }
-   void ReadUnlock( void ) { m_rw_lock.ReadUnlock(); }
+//   void ReadLock( void ) { m_rw_lock.ReadLock(); }
+//   void ReadUnlock( void ) { m_rw_lock.ReadUnlock(); }
 
 protected:
    int add( af::Node *node);    ///< Add node to list.
@@ -46,7 +46,7 @@ private:
    int sortPriority( af::Node * node);   ///< Sort nodes by priority.
 
 private:
-   DlRWLock m_rw_lock;
+//   DlRWLock m_rw_lock;
 
    NodesList nodes_list;      ///< Nodes list.
 };

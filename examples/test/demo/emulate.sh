@@ -75,9 +75,9 @@ while [ 1 ]; do
       tmpfile=$tmpdir/$jobname
       if [ -z "$nocmdpost" ]; then
          echo $output > $tmpfile
-         python ./job.py --name $jobname --user $username -b 2 -n 10 -p 3 --cmdpost "rm $tmpfile" > /dev/null
+         python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 --cmdpost "rm $tmpfile" > /dev/null
       else
-         python ./job.py --name $jobname --user $username -b 2 -n 10 -p 3 > /dev/null
+         python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 > /dev/null
       fi
       if [ $? != 0 ]; then
          echo "Error creation new job, exiting."

@@ -10,10 +10,10 @@
 #include "../include/macrooutput.h"
 
 
-/* FIXME: Using a list to manage priorities is not very good. 
+/* FIXME: Using a list to manage priorities is not very good.
    Just use an AVL tree! An stl sorted container for example.
 */
-   
+
 AfList::~AfList()
 {
    NodesList::iterator it = nodes_list.begin();
@@ -25,7 +25,7 @@ AfList::~AfList()
 
 int AfList::add( af::Node *node)
 {
-   m_rw_lock.WriteLock();
+//   m_rw_lock.WriteLock();
 
    int index = -1;
 
@@ -35,7 +35,7 @@ int AfList::add( af::Node *node)
    if( *it == node )
    {
       AFERROR("AfList::add: node already exists.\n");
-      m_rw_lock.WriteUnlock();
+//      m_rw_lock.WriteUnlock();
       return index;
    }
    else
@@ -65,27 +65,27 @@ int AfList::add( af::Node *node)
       node->lists.push_back( this);
    }
 
-   m_rw_lock.WriteUnlock();
+//   m_rw_lock.WriteUnlock();
    return index;
 }
 
 void AfList::remove( af::Node *node)
 {
-   m_rw_lock.WriteLock();
+//   m_rw_lock.WriteLock();
 
    nodes_list.remove(node);
    node->lists.remove(this);
 
-   m_rw_lock.WriteUnlock();
+//   m_rw_lock.WriteUnlock();
 }
 
 int AfList::sortPriority( af::Node * node)
 {
-   m_rw_lock.WriteLock();
+//   m_rw_lock.WriteLock();
 
    if( nodes_list.size() < 2 )
    {
-      m_rw_lock.WriteUnlock();
+//      m_rw_lock.WriteUnlock();
       return -1;
    }
 
@@ -111,7 +111,7 @@ int AfList::sortPriority( af::Node * node)
       nodes_list.push_back( node);
    }
 
-   m_rw_lock.WriteUnlock();
+//   m_rw_lock.WriteUnlock();
 
    return index;
 }

@@ -10,13 +10,13 @@ AfListIt::AfListIt( AfList* aflist):
    node( NULL),
    list( aflist)
 {
-	aflist->ReadLock();
+//	aflist->ReadLock();
    reset();
 }
 
 AfListIt::~AfListIt()
 {
-	list->ReadUnlock();
+//	list->ReadUnlock();
 }
 
 void AfListIt::next()
