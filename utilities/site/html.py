@@ -1,12 +1,19 @@
 #!/usr/bin/env python
 
+import os
+
 import getenv
 
-def relativePath( verbose, srcdir, dirpath):
+afanasy_branches_path = os.path.join( getenv.SRCDIR, 'afanasy')
+
+def relativePath( verbose, srcdir, dirpath, remote):
    path_end=dirpath[len(srcdir):len(dirpath)]
    relative_path=''
    if len(path_end) > 1: 
       relative_count=path_end.count('/')
+      # Check afanasy branch if not remote:
+      if not remote and dirpath.find( afanasy_branches_path) == 0:
+         relative_count -= 1
       for c in range(relative_count):
          relative_path += '../'
    if verbose >= 3: print 'srcdir=%(srcdir)s, dirpath=%(dirpath)s, path_end=%(path_end)s: %(relative_path)s' % vars()

@@ -57,7 +57,7 @@ for dirpath in paths[0]:
          shutil.copy( afile, newdir)
 
    # Find relative to top path:
-   relative_path=html.relativePath( verbose, getenv.SRCDIR, dirpath)
+   relative_path=html.relativePath( verbose, getenv.SRCDIR, dirpath, remote)
 
    for filename in fileshtml:
       filepath = os.path.join( dirpath, filename)
