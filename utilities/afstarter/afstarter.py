@@ -31,6 +31,7 @@ class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
       self.constructed = False
+      self.evaluated = False
       self.output = ''
 
       self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
