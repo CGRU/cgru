@@ -25,6 +25,7 @@
 #include "../include/macrooutput.h"
 
 bool running;
+int g_cycle;
 
 // Thread functions:
 void threadAcceptClient( void * i_arg );

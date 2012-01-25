@@ -34,6 +34,9 @@ public:
    inline bool operator == ( const af::Node &other) const { return priority == other.priority;}
    inline bool operator != ( const af::Node &other) const { return priority != other.priority;}
 
+/// Compare nodes solving need:
+   bool greaterNeed( const af::Node & i_other) const;
+
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
@@ -68,6 +71,12 @@ protected:
 
 /// Node priority. When new node added to container or a priority changed, container sort nodes by priority.
    uint8_t priority;
+
+/// A node with maximum need value will take next free host.
+   float m_solve_need;
+
+/// Last solved cycle. Needed to jobs (users) solving.
+   int m_solve_cycle;
 
 /// Node name. Name is unique for nodes stored in container.
 /** When new node added and a node with the same name is already exists in container,

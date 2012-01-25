@@ -96,7 +96,10 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
             else AFCommon::QueueDBDelItem( user);
          }
 
-         if( changed && monitoring) monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+         if( changed && monitoring)
+         {
+            monitoring->addEvent( af::Msg::TMonitorUsersChanged, user->getId());
+         }
 
          // return if user exists in container
          return;
@@ -198,7 +201,10 @@ bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
 //printf("UserContainer::genTask: shifting - %s ( u=%d -> %d )\n", users[usameneed]->getName().toUtf8().data(), u, usameneed);
             break;
          }
-         if( shift ) u = usameneed;                            // Unsolved user with the same need founded
+         if( shift )
+         {
+            u = usameneed;                            // Unsolved user with the same need founded
+         }
          else
          {
 //printf("UserContainer::genTask: reset solving for need = %g\n", need);

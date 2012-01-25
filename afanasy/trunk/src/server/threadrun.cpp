@@ -14,6 +14,7 @@
 #include "../include/macrooutput.h"
 
 extern bool running;
+extern int g_cycle;
 
 // Messages reaction case function
 void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg);
@@ -22,8 +23,9 @@ void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg);
 **/
 void threadRunCycle( void * i_args)
 {
+   AFINFO("ThreadRun::run:")
    ThreadArgs * a = (ThreadArgs*)i_args;
-AFINFO("ThreadRun::run:")
+   g_cycle = 0;
 while( running)
 {
 #ifdef _DEBUG
@@ -139,5 +141,8 @@ AFINFO("ThreadRun::run: deleting zombies:")
 //
 AFINFO("ThreadRun::run: sleeping...")
    sleep( 1);
+
+// Increment cycle number
+   g_cycle++;
 }
 }

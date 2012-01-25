@@ -11,8 +11,16 @@
 using namespace af;
 
 Node::Node():
+   /// Containers does not use zero id, just created node has no container.
    id( 0),
+
    priority( 0),
+
+   /// Just created node (need was not calculated) has no need.
+   m_solve_need(0.0),
+   /// -1 means that it was not solved at all
+   m_solve_cycle(-1),
+
    locked( false),
    zombie( false),
    prev_ptr( NULL),
@@ -43,6 +51,28 @@ void Node::readwrite( Msg * msg)
    rw_uint8_t( priority,  msg);
    rw_bool   ( locked,    msg);
    rw_String(  name,      msg);
+}
+
+/// Compare nodes need for solve:
+bool Node::greaterNeed( const af::Node & i_other) const
+{
+   if( m_solve_need > i_other.m_solve_need )
+   {
+      return true;
+   }
+   if( m_solve_need < i_other.m_solve_need )
+   {
+      return false;
+   }
+
+   /// If need parameters are equal:
+   if( m_solve_cycle == -1 )
+   {
+      /// If node was not solved at all it has a greater priority.
+      return true;
+   }
+   /// Greater node is a node that was solver earlier
+   return m_solve_cycle < i_other.m_solve_cycle;
 }
 
 int Node::calcWeight() const
