@@ -35,7 +35,7 @@ public:
    inline bool operator != ( const af::Node &other) const { return priority != other.priority;}
 
 /// Compare nodes solving need:
-   bool greaterNeed( const af::Node & i_other) const;
+    bool greaterNeed( const af::Node & i_other) const;
 
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -65,6 +65,20 @@ public:
    virtual void setZombie() { zombie = true; } ///< Request to kill a node.
 
 protected:
+   virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
+
+/// General need calculation function,
+/** Some resources should be passed to its algorithm.**/
+    void calcNeedResouces( int i_resourcesquantity);
+
+/// Virtual function to calculate need.
+/** Node should define what resources shoud be passed for need calculation.**/
+    virtual void calcNeed() { calcNeedResouces( -1);}
+
+/// Set node solved at specified run cycle.
+    void setSolved( int i_runcycle);
+
+protected:
 
 /// Node id, unique for nodes of the same type. It is a position in container where node is stoted.
    int32_t id;
@@ -72,27 +86,24 @@ protected:
 /// Node priority. When new node added to container or a priority changed, container sort nodes by priority.
    uint8_t priority;
 
-/// A node with maximum need value will take next free host.
-   float m_solve_need;
-
-/// Last solved cycle. Needed to jobs (users) solving.
-   int m_solve_cycle;
-
 /// Node name. Name is unique for nodes stored in container.
 /** When new node added and a node with the same name is already exists in container,
-/// container change node name by adding a number.
+*** container change node name by adding a number.
 **/
    std::string name;
 
    mutable bool locked;    ///< Lock state.
 
-protected:
-   virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
-
 private:
 
 /// When node is ready to be deleted from container its becames a zombie and wait for a deletion by special thread.
    bool zombie;
+
+/// A node with maximum need value will take next free host.
+  float m_solve_need;
+
+/// Last solved cycle. Needed to jobs (users) solving.
+  int m_solve_cycle;
 
 /// Previous node pointer. Previous container node has a greater or equal priority.
    Node * prev_ptr;

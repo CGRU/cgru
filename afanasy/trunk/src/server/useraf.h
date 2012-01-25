@@ -26,13 +26,11 @@ public:
 
    bool canRun( RenderAf *render); ///< Whether the user can produce a task.
 
-   bool genTask( RenderAf *render, MonitorContainer * monitoring); ///< Generate task for \c render host, return \c true if task generated.
+   bool solve( RenderAf *render, MonitorContainer * monitoring); ///< Generate task for \c render host, return \c true if task generated.
 
    void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 
    void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);///< Refresh user attributes corresponding on jobs information.
-
-   void calcNeed();  ///< Calculate user need for hosts.
 
 ///< Set some user attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -48,6 +46,9 @@ public:
    void generateJobsIds( af::MCGeneral & ids) const;
 
    void appendLog( const std::string & message);  ///< Append task log with a \c message .
+
+protected:
+   void calcNeed();
 
 private:
    void construct();

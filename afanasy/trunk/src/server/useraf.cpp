@@ -10,6 +10,8 @@
 #include "renderaf.h"
 #include "monitorcontainer.h"
 
+extern int g_runcycle;
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -215,13 +217,13 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
       }
    }
 
-   float _need = need;
+//   float _need = need;
    calcNeed();
 
    if((( _numrunningjobs      != numrunningjobs       ) ||
        ( _numjobs             != numjobs              ) ||
-       ( _runningtasksnumber  != runningtasksnumber   ) ||
-       ( _need                != need                 )) &&
+//       ( _need                != need                 ) ||
+       ( _runningtasksnumber  != runningtasksnumber   )) &&
          monitoring )
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, id);
 
@@ -234,7 +236,7 @@ bool UserAf::canRun( RenderAf *render)
 {
    if( priority == 0) return false;
 
-   if( need == 0.0) return false;
+   if( numjobs < 1 ) return false;
 
    if( render->isNimby() && (name != render->getUserName())) return false;
 
@@ -249,15 +251,17 @@ bool UserAf::canRun( RenderAf *render)
    return true;
 }
 
-bool UserAf::genTask( RenderAf *render, MonitorContainer * monitoring)
+bool UserAf::solve( RenderAf *render, MonitorContainer * monitoring)
 {
 // search for ready job:
+//printf("UserAf::solve: '%s'\n", name.c_str());
    JobsListIt jobsListIt( &jobs);
    for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
    {
       if( job->solve( render, monitoring))
       {
          runningtasksnumber++;
+         setSolved( g_runcycle);
          return true;
       }
    }
@@ -321,15 +325,15 @@ int UserAf::calcWeight() const
 
 void UserAf::calcNeed()
 {
-   if( priority == 0)
-   {
-      need = 0;
-      return;
-   }
-   if( numjobs == 0)
-   {
-      need = 0;
-      return;
-   }
-   need = pow( 1.1, priority) / (runningtasksnumber + 1.0);
+    // Negative resources means that need calculation does not needed at all.
+    int resourcesquantity = -1;
+
+    // Need calculation needed if user has some jobs.
+    if( numjobs > 0 )
+    {
+        resourcesquantity = runningtasksnumber;
+    }
+
+    // Need calculation function call
+    calcNeedResouces( resourcesquantity);
 }

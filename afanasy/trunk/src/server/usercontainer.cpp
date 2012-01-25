@@ -130,11 +130,11 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
    return;
 }
 
-bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
+bool UserContainer::solve( RenderAf *render, MonitorContainer * monitoring)
 {
-//printf("\nUserContainer::genTask: render - %s\n", render->getName().toUtf8().data());
+//printf("\nUserContainer::genTask: render - %s\n", render->getName().c_str());
    UserContainerIt usersIt( this);        // initialize users iterator
-   std::vector<UserAf*> users;
+   std::vector<UserAf*> users( getCount());
 
    //
    // Push nodes into the list
@@ -144,122 +144,32 @@ bool UserContainer::genTask( RenderAf *render, MonitorContainer * monitoring)
    }
    int count = users.size();
 
-   //
-   // Sort nodes list by need value
-   for( int pos = count; pos > 1; pos--)
-   {
-      for( int u = 1; u < pos; u++)
-      {
-         if( (users[u-1]->getNeed()) < (users[u]->getNeed()) )
-         {
-            // Swap two nodes:
-            UserAf * user = users[u-1];
-            users[u-1] = users[u];
-            users[u] = user;
-         }
-      }
-   }
+    //
+    // Sort nodes list by need value
+    for( int pos = count; pos > 1; pos--)
+    {
+        for( int u = 1; u < pos; u++)
+        {
+            if( users[u]->greaterNeed( *users[u-1]))
+            {
+                // Swap two nodes:
+                UserAf * user = users[u-1];
+                users[u-1] = users[u];
+                users[u] = user;
+            }
+        }
+    }
 
-//printf("\n");for(int u=0;u<count;u++){printf("%s - %g\n",users[u]->getName().toUtf8().data(),users[u]->getNeed());}printf("\n");
+    // Try to solve most needed node
+    for( int u = 0; u < count; u++)
+    {
+        if( users[u]->solve( render, monitoring))
+        {
+           return true;
+        }
+    }
 
-   //
-   // Ask user with most need value to generate a task
-   bool  firstlap = true;
-   int   userlastneed = -1;
-   int   userfirstneed = -1;
-   float prevneed = -1;
-   for( int u = 0; u < count; u++)
-   {
-//printf("\nUserContainer::genTask: trying - %s - %g (u=%d)\n", users[u]->getName().toUtf8().data(), users[u]->getNeed(), u);
-/*      if( render->isNimby())    // If owner captured a render
-      {
-         if( users[u]->getName() != render->getUserName() ) continue; // Skip if user is not render owner
-      }*/
-      float need = users[u]->getNeed();                        // Get user need
-      if( need != prevneed)                                    // If current need has new value
-      {
-//printf("UserContainer::genTask: this is first lap for need = %g ( pevious need = %g)\n", need, prevneed);
-         firstlap = true;                                      // This is first lap
-         prevneed = need;                                      // Store need value
-      }
-      if( users[u]->isSolved() )                               // If user is sloved
-      {
-//printf("UserContainer::genTask: user is solved - %s - %g (u=%d)\n", users[u]->getName().toUtf8().data(), need, u);
-         int usameneed = u + 1;                                // Get next user index
-         bool shift = false;                                   // Whether shift to next unsolved user with the same need
-         for( ; usameneed < count; usameneed++)                // Search for unsolved user with the same need
-         {
-            if( need != users[usameneed]->getNeed() )
-            {
-               break;   // No more users with the same need
-            }
-            if( users[usameneed]->isSolved() )
-            {
-               continue;       // Search next unsolved user
-            }
-            shift = true;                                      // This is unsolved user with the same need
-//printf("UserContainer::genTask: shifting - %s ( u=%d -> %d )\n", users[usameneed]->getName().toUtf8().data(), u, usameneed);
-            break;
-         }
-         if( shift )
-         {
-            u = usameneed;                            // Unsolved user with the same need founded
-         }
-         else
-         {
-//printf("UserContainer::genTask: reset solving for need = %g\n", need);
-            for( usameneed = u; usameneed < count; usameneed++)// Set users with the same need to unsolved
-            {
-               if( need != users[usameneed]->getNeed() )
-               {
-                  break;
-               }
-               users[usameneed]->setSolved( false);
-            }
-         }
-      }
-      users[u]->setSolved( true);                              // Set user solved
-//printf("UserContainer::genTask: try to generate - %s (u=%d)\n", users[u]->getName().toUtf8().data(), u);
-      if( users[u]->genTask( render, monitoring))                          // Generate user task if any
-      {
-//printf("UserContainer::genTask: generated - %s (u=%d)\n\n\n", users[u]->getName().toUtf8().data(), u);
-         users[u]->calcNeed();
-         return true;
-      }
-      else
-      {
-//printf("UserContainer::genTask: not generated - %s (u=%d)\n\n\n", users[u]->getName().toUtf8().data(), u);
-         if( u < count-1)                                      // If we have some more users
-         {
-            if( users[u+1]->getNeed() != need)                 // If next need has a new value
-            {                                                  // and we are on the first lap
-               if( firstlap )                                  // we run the second lap
-               {
-//printf("UserContainer::genTask: this is last user for first lap for need = %g\n", need);
-                  userlastneed = u;                            // This is the last user for current need
-                  userfirstneed = u;
-                  for( ; u >= 0; u-- ) //for( ; u--; u >= 0 )
-                  {
-                     if( users[u]->getNeed() != need )
-                     {
-                        break;
-                     }
-                     userfirstneed = u;
-                  }
-                  for( u = userfirstneed; u < userlastneed; u++)
-                  {
-                     users[u]->setSolved( false);
-                  }
-                  u = userfirstneed-1;
-                  firstlap = false;
-//printf("UserContainer::genTask: second lap: userfirstneed = %d, userlastneed %d\n", userfirstneed, userlastneed);
-               }
-            }
-         }
-      }
-   }
-//printf("UserContainer::genTask: no task generated for render - %s\n\n\n\n\n", render->getName().toUtf8().data());
-   return false;
+    return false;
 }
 
 MsgAf* UserContainer::generateJobsList( int id)

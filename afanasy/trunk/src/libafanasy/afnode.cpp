@@ -71,8 +71,38 @@ bool Node::greaterNeed( const af::Node & i_other) const
       /// If node was not solved at all it has a greater priority.
       return true;
    }
-   /// Greater node is a node that was solver earlier
+   /// Greater node is a node that was solved earlier
    return m_solve_cycle < i_other.m_solve_cycle;
+}
+
+void Node::setSolved( int i_runcycle)
+{
+    m_solve_cycle = i_runcycle;
+    calcNeed();
+//printf("Node::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
+}
+
+void Node::calcNeedResouces( int i_resourcesquantity)
+{
+//printf("Node::calcNeedResouces: '%s': resourcesquantity = %d\n", name.c_str(), i_resourcesquantity);
+
+    // Need calculation no need as there is no need at all for some reason.
+    if( i_resourcesquantity < 0)
+    {
+        m_solve_need = 0.0;
+        return;
+    }
+
+    // No need at all if zero priority
+    if( priority == 0)
+    {
+        m_solve_need = 0.0;
+        return;
+    }
+
+    // Main solving function:
+    // ( each priority point gives 10% more resources )
+    m_solve_need = pow( 1.1, priority) / (i_resourcesquantity + 1.0);
 }
 
 int Node::calcWeight() const

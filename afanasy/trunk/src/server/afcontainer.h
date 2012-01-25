@@ -49,6 +49,8 @@ public:
    friend class AfList;
    friend class AfListIt;
 
+   inline int getCount() const { return count; }
+
 protected:
    int add( af::Node *node);   ///< Add node to container.
 
