@@ -14,9 +14,6 @@ class AfList;
 class AfListIt;
 class MonitorContainer;
 
-typedef std::list<af::Node*> NodesList;
-typedef std::list<AfList*> AfListsList;
-
 namespace af
 {
 /// Afanasy Node.
@@ -64,6 +61,9 @@ public:
 
    virtual void setZombie() { zombie = true; } ///< Request to kill a node.
 
+   /// Sort nodes list by need value
+   static void sortListNeed( std::list<af::Node*> & list);
+
 protected:
    virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
 
@@ -76,7 +76,7 @@ protected:
     virtual void calcNeed() { calcNeedResouces( -1);}
 
 /// Set node solved at specified run cycle.
-    void setSolved( int i_runcycle);
+    void setSolved( unsigned long long i_solve_cycle);
 
 protected:
 
@@ -100,10 +100,11 @@ private:
    bool zombie;
 
 /// A node with maximum need value will take next free host.
-  float m_solve_need;
+    float m_solve_need;
 
-/// Last solved cycle. Needed to jobs (users) solving.
-  int m_solve_cycle;
+/// Last solved cycle.
+/** Needed to jobs (users) solving, to store what node was solved first ot last.**/
+    unsigned long long m_solve_cycle;
 
 /// Previous node pointer. Previous container node has a greater or equal priority.
    Node * prev_ptr;
@@ -112,6 +113,6 @@ private:
    Node * next_ptr;
 
 /// List of lists which have this node ( for a exapmle: each user has some jobs).
-   AfListsList lists;
+   std::list<AfList*> lists;
 };
 }

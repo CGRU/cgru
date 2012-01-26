@@ -34,6 +34,9 @@ private slots:
    void actJobsLifeTime();
    void actRequestLog();
 
+   void actSolveJobsByOrder();
+   void actSolveJobsParallel();
+
    void actAdd();
    void actDelete();
 

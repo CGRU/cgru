@@ -10,8 +10,6 @@
 #include "renderaf.h"
 #include "monitorcontainer.h"
 
-extern int g_runcycle;
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -119,6 +117,21 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
       break;
    }
+    case af::Msg::TUserJobsSolveMethod:
+    {
+        setJobsSolveMethod( mcgeneral.getNumber());
+        switch( mcgeneral.getNumber())
+        {
+        case 0:
+         appendLog( std::string("Set jobs solving by order by " + userhost));
+         break;
+        case 1:
+         appendLog( std::string("Jobs parallel jobs solving by " + userhost));
+         break;
+        }
+        if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
+        break;
+    }
    case af::Msg::TUserAdd:
    {
       if( false == isPermanent())
@@ -251,21 +264,38 @@ bool UserAf::canRun( RenderAf *render)
    return true;
 }
 
-bool UserAf::solve( RenderAf *render, MonitorContainer * monitoring)
+bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-// search for ready job:
-//printf("UserAf::solve: '%s'\n", name.c_str());
-   JobsListIt jobsListIt( &jobs);
-   for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
-   {
-      if( job->solve( render, monitoring))
-      {
-         runningtasksnumber++;
-         setSolved( g_runcycle);
-         return true;
-      }
-   }
-   return false;
+    // Zero solve cycle variable in nodes is initial,
+    // it means that node was not solved at all.
+    static unsigned long long s_solve_cycle = 1;
+
+    JobsListIt jobsListIt( &jobs);
+
+    if( solveJobsParrallel())
+    {
+
+    }
+    else
+    {
+        for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+        {
+            if( false == job->canRun( i_render))
+            {
+                continue;
+            }
+            if( job->solve( i_render, i_monitoring))
+            {
+                runningtasksnumber++;
+                setSolved( s_solve_cycle);
+                s_solve_cycle++;
+                return true;
+            }
+        }
+    }
+
+    // Return that user was not solved
+    return false;
 }
 
 void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)

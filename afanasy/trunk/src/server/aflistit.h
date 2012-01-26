@@ -21,6 +21,6 @@ protected:
 
 private:
    AfList* list;                 ///< Iterator's list.
-   NodesList::iterator it;       ///< First node iterator.
-   NodesList::iterator it_end;   ///< Last node iterator.
+   std::list<af::Node*>::iterator it;       ///< First node iterator.
+   std::list<af::Node*>::iterator it_end;   ///< Last node iterator.
 };

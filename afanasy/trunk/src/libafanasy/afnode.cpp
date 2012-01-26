@@ -18,8 +18,8 @@ Node::Node():
 
    /// Just created node (need was not calculated) has no need.
    m_solve_need(0.0),
-   /// -1 means that it was not solved at all
-   m_solve_cycle(-1),
+   /// 0 means that it was not solved at all
+   m_solve_cycle(0),
 
    locked( false),
    zombie( false),
@@ -66,7 +66,7 @@ bool Node::greaterNeed( const af::Node & i_other) const
    }
 
    /// If need parameters are equal:
-   if( m_solve_cycle == -1 )
+   if( m_solve_cycle == 0 )
    {
       /// If node was not solved at all it has a greater priority.
       return true;
@@ -75,9 +75,9 @@ bool Node::greaterNeed( const af::Node & i_other) const
    return m_solve_cycle < i_other.m_solve_cycle;
 }
 
-void Node::setSolved( int i_runcycle)
+void Node::setSolved( unsigned long long i_solve_cycle)
 {
-    m_solve_cycle = i_runcycle;
+    m_solve_cycle = i_solve_cycle;
     calcNeed();
 //printf("Node::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
 }
@@ -103,6 +103,24 @@ void Node::calcNeedResouces( int i_resourcesquantity)
     // Main solving function:
     // ( each priority point gives 10% more resources )
     m_solve_need = pow( 1.1, priority) / (i_resourcesquantity + 1.0);
+}
+
+void Node::sortListNeed( std::list<af::Node*> & list)
+{
+/*    for( int pos = count; pos > 1; pos--)
+    {
+        for( int u = 1; u < pos; u++)
+        {
+            if( users[u]->greaterNeed( *users[u-1]))
+            {
+                // Swap two nodes:
+                UserAf * user = users[u-1];
+                users[u-1] = users[u];
+                users[u] = user;
+            }
+        }
+    }
+    */
 }
 
 int Node::calcWeight() const

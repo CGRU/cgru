@@ -68,6 +68,10 @@ public:
    inline bool  isPermanent() const      { return state & Permanent; } ///< Wheter the user is permanent.
    void setPermanent( bool value);
 
+    inline bool solveJobsParrallel() const { return state & SolveJobsParrallel; }
+
+    void setJobsSolveMethod( int i_method );
+
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
    inline const std::string & getAnnontation() const { return annotation;}
@@ -75,6 +79,7 @@ public:
 protected:
    uint32_t state;             ///< State.
    uint32_t flags;             ///< Flags.
+
    std::string annotation;
    std::string customdata;
 
@@ -105,7 +110,8 @@ protected:
 private:
    enum State
    {
-      Permanent   = 1
+      Permanent            = 1,
+      SolveJobsParrallel   = 2
    };
 
 private:

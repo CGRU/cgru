@@ -67,7 +67,14 @@ void ItemUser::updateValues( af::Node *node, int type)
 
    strRightTop = hostname;
 
-   strRightBottom = "Ord";
+    if( user->solveJobsParrallel())
+    {
+        strRightBottom = "Par";
+    }
+    else
+    {
+        strRightBottom = "Ord";
+    }
 
    tooltip = user->generateInfoString( true).c_str();
 

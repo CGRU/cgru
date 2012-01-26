@@ -97,6 +97,19 @@ void User::setPermanent( bool value)
       state = state & (~Permanent);
 }
 
+void User::setJobsSolveMethod( int i_method )
+{
+    switch( i_method)
+    {
+    case 0:
+        state = state & (~SolveJobsParrallel);
+        break;
+    case 1:
+        state = state | SolveJobsParrallel;
+        break;
+    }
+}
+
 int User::calcWeight() const
 {
    int weight = Node::calcWeight();

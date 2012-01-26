@@ -134,36 +134,22 @@ bool UserContainer::solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("\nUserContainer::genTask: render - %s\n", render->getName().c_str());
    UserContainerIt usersIt( this);        // initialize users iterator
-   std::vector<UserAf*> users( getCount());
+   std::list<af::Node*> users;
 
-   //
    // Push nodes into the list
    for( UserAf *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
    {
       if( user->canRun( render)) users.push_back(user);
    }
-   int count = users.size();
 
-    //
     // Sort nodes list by need value
-    for( int pos = count; pos > 1; pos--)
-    {
-        for( int u = 1; u < pos; u++)
-        {
-            if( users[u]->greaterNeed( *users[u-1]))
-            {
-                // Swap two nodes:
-                UserAf * user = users[u-1];
-                users[u-1] = users[u];
-                users[u] = user;
-            }
-        }
-    }
+    af::Node::sortListNeed( users);
 
     // Try to solve most needed node
-    for( int u = 0; u < count; u++)
+    for( std::list<af::Node*>::iterator it = users.begin(); it != users.end(); it++)
     {
-        if( users[u]->solve( render, monitoring))
+        UserAf * user = (UserAf*)*it;
+        if( user->solve( render, monitoring))
         {
            return true;
         }

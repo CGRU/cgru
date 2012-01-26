@@ -735,6 +735,7 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    case af::Msg::TUserMaxRunningTasks:
    case af::Msg::TUserPriority:
    case af::Msg::TUserJobsLifeTime:
+   case af::Msg::TUserJobsSolveMethod:
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
    case af::Msg::TUserErrorsTaskSameHost:

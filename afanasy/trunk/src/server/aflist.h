@@ -48,5 +48,5 @@ private:
 private:
 //   DlRWLock m_rw_lock;
 
-   NodesList nodes_list;      ///< Nodes list.
+   std::list<af::Node*> nodes_list;      ///< Nodes list.
 };

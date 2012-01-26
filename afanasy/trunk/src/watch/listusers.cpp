@@ -119,19 +119,25 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
       action = new QAction( "Set Jobs Life Time", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actJobsLifeTime() ));
       menu.addAction( action);
-   }
 
-//   if( af::Environment::VISOR())
-   {
+      menu.addSeparator();
+
+      action = new QAction( "Solve Jobs By Order", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByOrder() ));
+      menu.addAction( action);
+
+      action = new QAction( "Solve Jobs Parallel", this);
+      connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsParallel() ));
+      menu.addAction( action);
+
+      menu.addSeparator();
+
       menu.addSeparator();
       action = new QAction( "Set Permanent", this);
       action->setEnabled( false == useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actAdd() ));
       menu.addAction( action);
-   }
-//   if( af::Environment::GOD())
-   {
-//      menu.addSeparator();
+
       action = new QAction( "Delete From Database", this);
       action->setEnabled( useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
@@ -371,6 +377,17 @@ void ListUsers::actDelete()
 {
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TUserDel);
+}
+
+void ListUsers::actSolveJobsByOrder()
+{
+   af::MCGeneral mcgeneral(0);
+   action( mcgeneral, af::Msg::TUserJobsSolveMethod);
+}
+void ListUsers::actSolveJobsParallel()
+{
+   af::MCGeneral mcgeneral(1);
+   action( mcgeneral, af::Msg::TUserJobsSolveMethod);
 }
 
 void ListUsers::actRequestLog()

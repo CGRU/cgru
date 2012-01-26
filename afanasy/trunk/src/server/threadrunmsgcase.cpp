@@ -103,6 +103,7 @@ switch ( i_msg->type())
    case af::Msg::TUserErrorsTaskSameHost:
    case af::Msg::TUserErrorsForgiveTime:
    case af::Msg::TUserJobsLifeTime:
+   case af::Msg::TUserJobsSolveMethod:
    {
       af::MCGeneral mcgeneral( i_msg);
       i_args->users->action( mcgeneral, i_msg->type(), NULL, i_args->monitors);

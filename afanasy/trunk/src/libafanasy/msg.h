@@ -331,16 +331,16 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTaskOutput/**/,                ///< Job task output data.
 /**/TTasksRun/**/,                  ///< Job tasks run data.
 
-TRESERVED10,
-TRESERVED11,
-TRESERVED12,
-TRESERVED13,
-TRESERVED14,
-TRESERVED15,
-TRESERVED16,
-TRESERVED17,
-TRESERVED18,
-TRESERVED19,
+/**/TUserJobsSolveMethod/**/,       ///< Set jobs solving mode.
+/**/TRESERVED11/**/,
+/**/TRESERVED12/**/,
+/**/TRESERVED13/**/,
+/**/TRESERVED14/**/,
+/**/TRESERVED15/**/,
+/**/TRESERVED16/**/,
+/**/TRESERVED17/**/,
+/**/TRESERVED18/**/,
+/**/TRESERVED19/**/,
 
 /**/TLAST/**/                       ///< The last type number.
 };

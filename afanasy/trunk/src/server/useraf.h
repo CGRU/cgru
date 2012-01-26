@@ -24,9 +24,11 @@ public:
 
    int addJob( JobAf *job);     ///< Add job to user.
 
-   bool canRun( RenderAf *render); ///< Whether the user can produce a task.
+   /// Whether the user can produce a task
+   /** Used to limit nodes for heavy solve algorithm **/
+   bool canRun( RenderAf * i_render);
 
-   bool solve( RenderAf *render, MonitorContainer * monitoring); ///< Generate task for \c render host, return \c true if task generated.
+   bool solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
 
    void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 
