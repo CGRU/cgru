@@ -11,8 +11,12 @@ for folder in `ls "$HOUDINI_INSTALL_DIR"`; do
    fi
 done
 
-# Overrides (set custom values there):
-[ -f override.sh ] && source override.sh
+#Override houdini location based on locate_houdini.sh
+locate_houdini="$CGRU_LOCATION/software_setup/locate_houdini.sh"
+if [ -f $locate_houdini ]; then
+	source $locate_houdini
+	HOUDINI_LOCATION="$APP_DIR"
+fi
 
 # Check Houdini location:
 if [ -z "$HOUDINI_LOCATION" ]; then
@@ -56,3 +60,5 @@ fi
 
 export APP_DIR="$HOUDINI_LOCATION"
 export APP_EXE="houdini"
+
+
