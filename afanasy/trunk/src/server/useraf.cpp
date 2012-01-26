@@ -7,6 +7,8 @@
 #include "../libafsql/dbattr.h"
 
 #include "afcommon.h"
+#include "aflistit.h"
+#include "jobaf.h"
 #include "renderaf.h"
 #include "monitorcontainer.h"
 
@@ -122,10 +124,10 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
         setJobsSolveMethod( mcgeneral.getNumber());
         switch( mcgeneral.getNumber())
         {
-        case 0:
+        case af::Node::SolveByOrder:
          appendLog( std::string("Set jobs solving by order by " + userhost));
          break;
-        case 1:
+        case af::Node::SolveByPriority:
          appendLog( std::string("Jobs parallel jobs solving by " + userhost));
          break;
         }
@@ -170,7 +172,7 @@ int UserAf::addJob( JobAf *job)
 {
    appendLog( std::string("Adding a job: ") + job->getName());
    zombietime = 0;
-   int userlistorder = jobs.addJob( job );
+   int userlistorder = m_jobslist.add( job );
    numjobs++;
    updateJobsOrder( job);
    return userlistorder;
@@ -178,16 +180,16 @@ int UserAf::addJob( JobAf *job)
 
 void UserAf::updateJobsOrder( af::Job * newJob)
 {
-   JobsListIt jobsListIt( &jobs);
+   AfListIt jobsListIt( &m_jobslist);
    int userlistorder = 0;
-   for( af::Job *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+   for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       ((JobAf*)(job))->setUserListOrder( userlistorder++, job != newJob);
 }
 
 void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 {
-   JobsListIt jobsListIt( &jobs);
-   for( af::Job *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+   AfListIt jobsListIt( &m_jobslist);
+   for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       mcjobs.addNode( job);
 }
 
@@ -195,7 +197,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
 {
    if( isLocked() ) return;
 //printf("UserAf::refresh: \"%s\"\n", getName().toUtf8().data());
-   int _numjobs = jobs.getCount();
+   int _numjobs = m_jobslist.getCount();
    if(( _numjobs == 0) && ( false == isPermanent()))
    {
       if( zombietime )
@@ -219,23 +221,19 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    int _numrunningjobs = 0;
    int _runningtasksnumber = 0;
    {
-      JobsListIt jobsListIt( &jobs);
-      for( af::Job *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+      AfListIt jobsListIt( &m_jobslist);
+      for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       {
-         if( job->isRunning())
+         if( ((JobAf*)job)->isRunning())
          {
             _numrunningjobs++;
-            _runningtasksnumber += job->getRunningTasksNumber();
+            _runningtasksnumber += ((JobAf*)job)->getRunningTasksNumber();
          }
       }
    }
 
-//   float _need = need;
-   calcNeed();
-
    if((( _numrunningjobs      != numrunningjobs       ) ||
        ( _numjobs             != numjobs              ) ||
-//       ( _need                != need                 ) ||
        ( _runningtasksnumber  != runningtasksnumber   )) &&
          monitoring )
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, id);
@@ -243,58 +241,71 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    numjobs = _numjobs;
    numrunningjobs = _numrunningjobs;
    runningtasksnumber = _runningtasksnumber;
+
+   calcNeed();
 }
 
-bool UserAf::canRun( RenderAf *render)
+bool UserAf::canRun()
 {
-   if( priority == 0) return false;
+    if( priority == 0)
+    {
+        // Zero priority - turns user jobs solving off
+        return false;
+    }
 
-   if( numjobs < 1 ) return false;
+    if( numjobs < 1 )
+    {
+        // Nothing to run
+        return false;
+    }
 
-   if( render->isNimby() && (name != render->getUserName())) return false;
+    // Check maximum running tasks:
+    if(( maxrunningtasks >= 0 ) && ( runningtasksnumber >= maxrunningtasks ))
+    {
+        return false;
+    }
 
-// check maximum hosts:
-   if(( maxrunningtasks >= 0 ) && ( runningtasksnumber >= maxrunningtasks )) return false;
+   return true;
+}
+
+bool UserAf::canRunOn( RenderAf * i_render)
+{
+    if( false == canRun())
+    {
+        // Unable to run at all
+        return false;
+    }
+
+// Check nimby:
+   if( i_render->isNimby() && (name != i_render->getUserName())) return false;
 
 // check hosts mask:
-   if( false == checkHostsMask( render->getName())) return false;
+   if( false == checkHostsMask( i_render->getName())) return false;
 // check exclude hosts mask:
-   if( false == checkHostsMaskExclude( render->getName())) return false;
+   if( false == checkHostsMaskExclude( i_render->getName())) return false;
 
    return true;
 }
 
 bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-    // Zero solve cycle variable in nodes is initial,
-    // it means that node was not solved at all.
-    static unsigned long long s_solve_cycle = 1;
-
-    JobsListIt jobsListIt( &jobs);
+    af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
 
     if( solveJobsParrallel())
     {
-
+        solve_method = af::Node::SolveByPriority;
     }
-    else
+
+    if( m_jobslist.solve( solve_method, i_render, i_monitoring))
     {
-        for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
-        {
-            if( false == job->canRun( i_render))
-            {
-                continue;
-            }
-            if( job->solve( i_render, i_monitoring))
-            {
-                runningtasksnumber++;
-                setSolved( s_solve_cycle);
-                s_solve_cycle++;
-                return true;
-            }
-        }
+        // Increase running tasks counter;
+        runningtasksnumber++;
+
+        // Return true - that node was solved
+        return true;
     }
 
-    // Return that user was not solved
+    // Return false - that node was not solved
     return false;
 }
 
@@ -304,22 +315,22 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
    {
       case af::Msg::TUserMoveJobsUp:
       {
-         jobs.moveNodes( mcgeneral.getList(), AfList::MoveUp);
+         m_jobslist.moveNodes( mcgeneral.getList(), AfList::MoveUp);
          break;
       }
       case af::Msg::TUserMoveJobsDown:
       {
-         jobs.moveNodes( mcgeneral.getList(), AfList::MoveDown);
+         m_jobslist.moveNodes( mcgeneral.getList(), AfList::MoveDown);
          break;
       }
       case af::Msg::TUserMoveJobsTop:
       {
-         jobs.moveNodes( mcgeneral.getList(), AfList::MoveTop);
+         m_jobslist.moveNodes( mcgeneral.getList(), AfList::MoveTop);
          break;
       }
       case af::Msg::TUserMoveJobsBottom:
       {
-         jobs.moveNodes( mcgeneral.getList(), AfList::MoveBottom);
+         m_jobslist.moveNodes( mcgeneral.getList(), AfList::MoveBottom);
          break;
       }
       default:
@@ -341,7 +352,7 @@ void UserAf::generateJobsIds( af::MCGeneral & ids) const
 {
    if( ids.getCount()) ids.clearIds();
    ids.setId( id);
-   jobs.generateIds( ids);
+   m_jobslist.generateIds( ids);
 }
 
 int UserAf::calcWeight() const
@@ -355,15 +366,6 @@ int UserAf::calcWeight() const
 
 void UserAf::calcNeed()
 {
-    // Negative resources means that need calculation does not needed at all.
-    int resourcesquantity = -1;
-
-    // Need calculation needed if user has some jobs.
-    if( numjobs > 0 )
-    {
-        resourcesquantity = runningtasksnumber;
-    }
-
-    // Need calculation function call
-    calcNeedResouces( resourcesquantity);
+    // Need calculation based on running tasks number
+    calcNeedResouces( runningtasksnumber);
 }

@@ -13,6 +13,7 @@ class AfContainerIt;
 class AfList;
 class AfListIt;
 class MonitorContainer;
+class RenderAf;
 
 namespace af
 {
@@ -30,9 +31,6 @@ public:
    inline bool operator >= ( const af::Node &other) const { return priority >= other.priority;}
    inline bool operator == ( const af::Node &other) const { return priority == other.priority;}
    inline bool operator != ( const af::Node &other) const { return priority != other.priority;}
-
-/// Compare nodes solving need:
-    bool greaterNeed( const af::Node & i_other) const;
 
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -61,22 +59,44 @@ public:
 
    virtual void setZombie() { zombie = true; } ///< Request to kill a node.
 
-   /// Sort nodes list by need value
-   static void sortListNeed( std::list<af::Node*> & list);
+   // Just interesting - good to show server load
+   static unsigned long long getSolvesCount() { return sm_solve_cycle; }
+
+   //Solving:
+
+   enum SolvingMethod{
+      SolveByOrder     = 0,
+      SolveByPriority  = 1
+   };
+
+   /// Can node run
+   /** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
+   virtual bool canRun();
+
+   /// Can node run on specified render
+   /** Needed to limit nodes quantinity for solving algorithm, which can be heavy. **/
+   virtual bool canRunOn( RenderAf * i_render);
+
+   /// Solve nodes list:
+   static bool solveList( std::list<af::Node*> & i_list, SolvingMethod i_method, RenderAf * i_render,
+                          MonitorContainer * i_monitoring);
+
+   /// Main solving function should be implemented in child classes (if solving needed):
+   virtual bool solve( RenderAf * i_render, MonitorContainer * i_monitoring);
+
+   /// Compare nodes solving need:
+   bool greaterNeed( const af::Node * i_other) const;
 
 protected:
-   virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
-
 /// General need calculation function,
 /** Some resources should be passed to its algorithm.**/
     void calcNeedResouces( int i_resourcesquantity);
 
 /// Virtual function to calculate need.
-/** Node should define what resources shoud be passed for need calculation.**/
-    virtual void calcNeed() { calcNeedResouces( -1);}
+/** Node should define what resource shoud be passed for need calculation.**/
+    virtual void calcNeed();
 
-/// Set node solved at specified run cycle.
-    void setSolved( unsigned long long i_solve_cycle);
+    virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
 
 protected:
 
@@ -95,15 +115,21 @@ protected:
    mutable bool locked;    ///< Lock state.
 
 private:
+/// Try to solve a node
+    bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
+
+private:
 
 /// When node is ready to be deleted from container its becames a zombie and wait for a deletion by special thread.
    bool zombie;
+
+    static unsigned long long sm_solve_cycle;
 
 /// A node with maximum need value will take next free host.
     float m_solve_need;
 
 /// Last solved cycle.
-/** Needed to jobs (users) solving, to store what node was solved first ot last.**/
+/** Needed to jobs (users) solving, to compare nodes solving order.**/
     unsigned long long m_solve_cycle;
 
 /// Previous node pointer. Previous container node has a greater or equal priority.

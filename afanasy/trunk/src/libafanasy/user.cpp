@@ -101,10 +101,10 @@ void User::setJobsSolveMethod( int i_method )
 {
     switch( i_method)
     {
-    case 0:
+    case af::Node::SolveByOrder:
         state = state & (~SolveJobsParrallel);
         break;
-    case 1:
+    case af::Node::SolveByPriority:
         state = state | SolveJobsParrallel;
         break;
     }

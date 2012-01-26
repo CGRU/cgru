@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../libafanasy/blockdata.h"
 #include "../libafanasy/name_af.h"
 
 #include "useraf.h"

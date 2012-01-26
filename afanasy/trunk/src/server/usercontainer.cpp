@@ -19,9 +19,7 @@
 using namespace af;
 
 UserContainer::UserContainer():
-   AfContainer( "Users", AFUSER::MAXCOUNT),
-   currentUserId( 0),
-   currentPriority( -1)
+   AfContainer( "Users", AFUSER::MAXCOUNT)
 {
 }
 
@@ -58,6 +56,7 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
 
    if( monitoring) monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
 
+   m_userslist.add( user);
    AFCommon::QueueLog("User registered: " + user->generateInfoString( false));
    return user;
 }
@@ -65,6 +64,7 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
 void UserContainer::addUser( UserAf * user)
 {
    add((af::Node*)user);
+   m_userslist.add( user);
 }
 
 void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, MonitorContainer * monitoring)
@@ -130,32 +130,10 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
    return;
 }
 
-bool UserContainer::solve( RenderAf *render, MonitorContainer * monitoring)
+bool UserContainer::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
 //printf("\nUserContainer::genTask: render - %s\n", render->getName().c_str());
-   UserContainerIt usersIt( this);        // initialize users iterator
-   std::list<af::Node*> users;
-
-   // Push nodes into the list
-   for( UserAf *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
-   {
-      if( user->canRun( render)) users.push_back(user);
-   }
-
-    // Sort nodes list by need value
-    af::Node::sortListNeed( users);
-
-    // Try to solve most needed node
-    for( std::list<af::Node*>::iterator it = users.begin(); it != users.end(); it++)
-    {
-        UserAf * user = (UserAf*)*it;
-        if( user->solve( render, monitoring))
-        {
-           return true;
-        }
-    }
-
-    return false;
+   return m_userslist.solve( af::Node::SolveByPriority, i_render, i_monitoring);
 }
 
 MsgAf* UserContainer::generateJobsList( int id)

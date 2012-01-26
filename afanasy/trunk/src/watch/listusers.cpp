@@ -70,6 +70,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 
    QMenu menu(this);
+   QMenu * submenu;
    QAction *action;
 
    action = new QAction( "Show Log", this);
@@ -122,13 +123,17 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
       menu.addSeparator();
 
-      action = new QAction( "Solve Jobs By Order", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByOrder() ));
-      menu.addAction( action);
+      submenu = new QMenu("Jobs Solving Method", this);
 
-      action = new QAction( "Solve Jobs Parallel", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsParallel() ));
-      menu.addAction( action);
+          action = new QAction("By Order", this);
+          connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByOrder() ));
+          submenu->addAction( action);
+
+          action = new QAction("Parallel", this);
+          connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsParallel() ));
+          submenu->addAction( action);
+
+      menu.addMenu( submenu);
 
       menu.addSeparator();
 
@@ -381,12 +386,12 @@ void ListUsers::actDelete()
 
 void ListUsers::actSolveJobsByOrder()
 {
-   af::MCGeneral mcgeneral(0);
+   af::MCGeneral mcgeneral( af::Node::SolveByOrder );
    action( mcgeneral, af::Msg::TUserJobsSolveMethod);
 }
 void ListUsers::actSolveJobsParallel()
 {
-   af::MCGeneral mcgeneral(1);
+   af::MCGeneral mcgeneral( af::Node::SolveByPriority);
    action( mcgeneral, af::Msg::TUserJobsSolveMethod);
 }
 

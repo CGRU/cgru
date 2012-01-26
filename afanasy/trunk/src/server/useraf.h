@@ -5,7 +5,7 @@
 
 #include "../libafsql/dbuser.h"
 
-#include "jobslist.h"
+#include "aflist.h"
 
 class JobAf;
 class RenderAf;
@@ -26,7 +26,11 @@ public:
 
    /// Whether the user can produce a task
    /** Used to limit nodes for heavy solve algorithm **/
-   bool canRun( RenderAf * i_render);
+   bool canRun();
+
+   /// Whether the user can produce a task
+   /** Used to limit nodes for heavy solve algorithm **/
+   bool canRunOn( RenderAf * i_render);
 
    bool solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
 
@@ -43,7 +47,7 @@ public:
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   inline JobsList * getJobs() { return &jobs; }
+   inline AfList * getJobsList() { return &m_jobslist; }
 
    void generateJobsIds( af::MCGeneral & ids) const;
 
@@ -60,7 +64,7 @@ private:
 private:
    uint32_t zombietime; ///< User zombie time - time to have no jobs before deletion.
 
-   JobsList jobs; ///< Jobs list.
+   AfList m_jobslist; ///< Jobs list.
 
    std::list<std::string> log;                          ///< Log.
 };

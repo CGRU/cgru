@@ -10,6 +10,10 @@
 
 using namespace af;
 
+// Zero solve cycle variable in nodes is initial,
+// it means that node was not solved at all.
+unsigned long long af::Node::sm_solve_cycle = 1;
+
 Node::Node():
    /// Containers does not use zero id, just created node has no container.
    id( 0),
@@ -53,50 +57,82 @@ void Node::readwrite( Msg * msg)
    rw_String(  name,      msg);
 }
 
-/// Compare nodes need for solve:
-bool Node::greaterNeed( const af::Node & i_other) const
+int Node::calcWeight() const
 {
-   if( m_solve_need > i_other.m_solve_need )
+   int weight = sizeof( Node);
+   weight += af::weigh( name);
+   for( unsigned l = 0; l < lists.size(); l++) weight += sizeof(void*);
+   return weight;
+}
+
+/// Main solving functions should be implemented in child classes (if solving needed):
+bool Node::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
+{
+    AFERRAR("af::Node::solve(): Did not implemented on '%s'.", name.c_str())
+    return false;
+}
+void Node::calcNeed()
+{
+    AFERRAR("af::Node::calcNeed(): Did not implememted on '%s'.\n", name.c_str())
+}
+bool Node::canRun()
+{
+    AFERRAR("af::Node::canRun(): Did not implememted on '%s'.\n", name.c_str())
+}
+bool Node::canRunOn( RenderAf * i_render)
+{
+    AFERRAR("af::Node::canRunOn(): Did not implememted on '%s'.\n", name.c_str())
+}
+
+/// Compare nodes need for solve:
+bool Node::greaterNeed( const af::Node * i_other) const
+{
+   if( m_solve_need > i_other->m_solve_need )
    {
       return true;
    }
-   if( m_solve_need < i_other.m_solve_need )
+   if( m_solve_need < i_other->m_solve_need )
    {
       return false;
    }
 
-   /// If need parameters are equal:
-   if( m_solve_cycle == 0 )
-   {
-      /// If node was not solved at all it has a greater priority.
-      return true;
-   }
+   /// If need parameters are equal,
    /// Greater node is a node that was solved earlier
-   return m_solve_cycle < i_other.m_solve_cycle;
+   return m_solve_cycle < i_other->m_solve_cycle;
 }
 
-void Node::setSolved( unsigned long long i_solve_cycle)
+/// Try so solve a Node
+bool Node::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-    m_solve_cycle = i_solve_cycle;
+    if( false == solve( i_render, i_monitoring))
+    {
+        return false;
+    }
+
+    m_solve_cycle = sm_solve_cycle;
+
     calcNeed();
+
+    sm_solve_cycle++;
+
+    return true;
 //printf("Node::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
 }
 
 void Node::calcNeedResouces( int i_resourcesquantity)
 {
 //printf("Node::calcNeedResouces: '%s': resourcesquantity = %d\n", name.c_str(), i_resourcesquantity);
+    m_solve_need = 0.0;
+
+    if( false == canRun())
+    {
+        // Cannot run at all - no solving needed
+        return;
+    }
 
     // Need calculation no need as there is no need at all for some reason.
     if( i_resourcesquantity < 0)
     {
-        m_solve_need = 0.0;
-        return;
-    }
-
-    // No need at all if zero priority
-    if( priority == 0)
-    {
-        m_solve_need = 0.0;
         return;
     }
 
@@ -105,28 +141,57 @@ void Node::calcNeedResouces( int i_resourcesquantity)
     m_solve_need = pow( 1.1, priority) / (i_resourcesquantity + 1.0);
 }
 
-void Node::sortListNeed( std::list<af::Node*> & list)
+// Functor for sorting algorithm
+struct GreaterNeed : public std::binary_function<af::Node*,af::Node*,bool>
 {
-/*    for( int pos = count; pos > 1; pos--)
+    inline bool operator()(const af::Node * a, const af::Node * b)
     {
-        for( int u = 1; u < pos; u++)
+        return a->greaterNeed( b);
+    }
+};
+
+/// Static function to solve nodes list:
+bool Node::solveList( std::list<af::Node*> & i_list, SolvingMethod i_method,
+                      RenderAf * i_render, MonitorContainer * i_monitoring)
+{
+    if( i_list.size() == 0 )
+    {
+        // No nodes - no solve needed
+        return false;
+    }
+
+    std::list<af::Node*> solvelist;
+    for( std::list<af::Node*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
+    {
+        if((*it)->canRunOn( i_render))
+       {
+           solvelist.push_back(*it);
+       }
+    }
+
+    if( solvelist.size() == 0 )
+    {
+        // No nodes to solve
+        return false;
+    }
+
+    // Zero means no solving algorithm, just do it by order.
+    if( i_method != SolveByOrder )
+    {
+        // Sort nodes by need
+        solvelist.sort( GreaterNeed());
+    }
+
+    // Try to solve most needed node
+    for( std::list<af::Node*>::iterator it = solvelist.begin(); it != solvelist.end(); it++)
+    {
+        if((*it)->trySolve( i_render, i_monitoring))
         {
-            if( users[u]->greaterNeed( *users[u-1]))
-            {
-                // Swap two nodes:
-                UserAf * user = users[u-1];
-                users[u-1] = users[u];
-                users[u] = user;
-            }
+            // Return true - that some node was solved
+           return true;
         }
     }
-    */
-}
 
-int Node::calcWeight() const
-{
-   int weight = sizeof( Node);
-   weight += af::weigh( name);
-   for( unsigned l = 0; l < lists.size(); l++) weight += sizeof(void*);
-   return weight;
+    // Return false - that no nodes was not solved
+    return false;
 }

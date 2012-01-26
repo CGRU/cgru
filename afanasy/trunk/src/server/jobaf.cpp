@@ -10,6 +10,7 @@
 #include "../libafsql/dbjobprogress.h"
 
 #include "afcommon.h"
+#include "aflistit.h"
 #include "block.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -535,12 +536,12 @@ void JobAf::checkDepends()
    // check local depends:
    if( hasDependMask())
    {
-      JobsListIt jobsListIt( user->getJobs());
-      for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+      AfListIt jobsListIt( user->getJobsList());
+      for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       {
          if( job == this ) continue;
 //printf("JobAf::checkDepends: name2=%s\n", job->getName().toUtf8().data());
-         if(( job->isDone() == false ) && ( checkDependMask( job->getName()) ))
+         if(( ((JobAf*)job)->isDone() == false ) && ( checkDependMask( job->getName()) ))
          {
             depend_local = true;
 //printf("Set.\n");
@@ -700,7 +701,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    return blocksdata[block]->genTask( task);
 }
 
-bool JobAf::canRun( RenderAf * i_render)
+bool JobAf::canRun()
 {
     if( isLocked() )
     {
@@ -743,6 +744,19 @@ bool JobAf::canRun( RenderAf * i_render)
     {
         return false;
     }
+
+    return true;
+}
+
+bool JobAf::canRunOn( RenderAf * i_render)
+{
+    if( false == canRun())
+    {
+        // Unable to run at all
+        return false;
+    }
+
+    // check maximum running tasks per host:
     if(( maxruntasksperhost  > 0 ) && ( getRenderCounts(i_render) >= maxruntasksperhost ))
     {
         return false;
@@ -957,6 +971,8 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    }
 
    if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
+
+   calcNeed();
 }
 
 void JobAf::skipTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
@@ -1129,6 +1145,12 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
          for( int t = 0; t < blocksdata[b]->getTasksNum(); t++)
             blocks[b]->tasks[t]->listenOutput( mclisten, renders);
    }
+}
+
+void JobAf::calcNeed()
+{
+    // Need calculation based on running tasks number
+    calcNeedResouces( getRunningTasksNumber());
 }
 
 void JobAf::appendLog( const std::string & message)

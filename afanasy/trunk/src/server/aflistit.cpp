@@ -6,9 +6,9 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfListIt::AfListIt( AfList* aflist):
-   node( NULL),
-   list( aflist)
+AfListIt::AfListIt( AfList* i_aflist):
+   m_node( NULL),
+   m_list( i_aflist)
 {
 //	aflist->ReadLock();
    reset();
@@ -21,29 +21,38 @@ AfListIt::~AfListIt()
 
 void AfListIt::next()
 {
-   node = NULL;
-   it++;
-   if( it == it_end)
+   m_node = NULL;
+   m_it++;
+   if( m_it == m_it_end)
    {
 //printf("AfListIt::next: it == it_end\n");
       return;
    }
-   while( (*it)->zombie )
+   while( (*m_it)->zombie )
    {
-      if( ++it == it_end )
+      if( ++m_it == m_it_end )
       {
 //printf("AfListIt::next: ++it == it_end\n");
          return;
       }
    }
-   node = *it;
+   m_node = *m_it;
 }
 
 void AfListIt::reset()
 {
-   it = list->nodes_list.begin();
-   it_end = list->nodes_list.end();
-   if( it == it_end) return;
-   while( (*it)->zombie ) if( ++it == it_end ) return;
-   node = *it;
+   m_it = m_list->nodes_list.begin();
+   m_it_end = m_list->nodes_list.end();
+   if( m_it == m_it_end)
+   {
+       return;
+   }
+   while( (*m_it)->zombie )
+   {
+       if( ++m_it == m_it_end )
+       {
+           return;
+       }
+   }
+   m_node = *m_it;
 }

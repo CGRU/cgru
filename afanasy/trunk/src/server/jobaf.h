@@ -52,9 +52,13 @@ public:
 **/
    virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders);
 
-/// Whether the user can produce a task
+/// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/
-    bool canRun( RenderAf * i_render);
+    bool canRun();
+
+/// Whether the job can produce a task
+/** Used to limit nodes for heavy solve algorithm **/
+    bool canRunOn( RenderAf * i_render);
 
 /// Solve a job. Job send ready task to Render, if any.
    virtual bool solve( RenderAf *render, MonitorContainer * monitoring);
@@ -114,6 +118,8 @@ protected:
    void appendLog( const std::string & message);
 
    virtual Block * newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
+
+   void calcNeed();
 
 protected:
    Block ** blocks;              ///< Blocks.
