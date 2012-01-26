@@ -74,14 +74,17 @@ bool Node::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 void Node::calcNeed()
 {
     AFERRAR("af::Node::calcNeed(): Did not implememted on '%s'.\n", name.c_str())
+    calcNeedResouces(-1);
 }
 bool Node::canRun()
 {
     AFERRAR("af::Node::canRun(): Did not implememted on '%s'.\n", name.c_str())
+    return false;
 }
 bool Node::canRunOn( RenderAf * i_render)
 {
     AFERRAR("af::Node::canRunOn(): Did not implememted on '%s'.\n", name.c_str())
+    return false;
 }
 
 /// Compare nodes need for solve:
@@ -106,15 +109,23 @@ bool Node::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
     if( false == solve( i_render, i_monitoring))
     {
+        // Returning that node was not solved
         return false;
     }
 
+    // Node solved successfully:
+
+    // Store solve cycle
     m_solve_cycle = sm_solve_cycle;
 
+    // Calculace new need value as node got some more resource
+    // ( nodes shoud increment resource value in solve function )
     calcNeed();
 
+    // Icrement solve cycle
     sm_solve_cycle++;
 
+    // Returning that node was solved
     return true;
 //printf("Node::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
 }
@@ -124,15 +135,15 @@ void Node::calcNeedResouces( int i_resourcesquantity)
 //printf("Node::calcNeedResouces: '%s': resourcesquantity = %d\n", name.c_str(), i_resourcesquantity);
     m_solve_need = 0.0;
 
-    if( false == canRun())
-    {
-        // Cannot run at all - no solving needed
-        return;
-    }
-
     // Need calculation no need as there is no need at all for some reason.
     if( i_resourcesquantity < 0)
     {
+        return;
+    }
+
+    if( false == canRun())
+    {
+        // Cannot run at all - no solving needed
         return;
     }
 

@@ -972,7 +972,14 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
 
    if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
 
+   // Update solving parameters:
    calcNeed();
+}
+
+void JobAf::calcNeed()
+{
+    // Need calculation based on running tasks number
+    calcNeedResouces( getRunningTasksNumber());
 }
 
 void JobAf::skipTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)
@@ -1145,12 +1152,6 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
          for( int t = 0; t < blocksdata[b]->getTasksNum(); t++)
             blocks[b]->tasks[t]->listenOutput( mclisten, renders);
    }
-}
-
-void JobAf::calcNeed()
-{
-    // Need calculation based on running tasks number
-    calcNeedResouces( getRunningTasksNumber());
 }
 
 void JobAf::appendLog( const std::string & message)

@@ -242,7 +242,14 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    numrunningjobs = _numrunningjobs;
    runningtasksnumber = _runningtasksnumber;
 
+   // Update solving parameters:
    calcNeed();
+}
+
+void UserAf::calcNeed()
+{
+    // Need calculation based on running tasks number
+    calcNeedResouces( runningtasksnumber);
 }
 
 bool UserAf::canRun()
@@ -265,7 +272,8 @@ bool UserAf::canRun()
         return false;
     }
 
-   return true;
+    // Returning that node is able run
+    return true;
 }
 
 bool UserAf::canRunOn( RenderAf * i_render)
@@ -284,6 +292,7 @@ bool UserAf::canRunOn( RenderAf * i_render)
 // check exclude hosts mask:
    if( false == checkHostsMaskExclude( i_render->getName())) return false;
 
+// Returning that user is able to run on specified render
    return true;
 }
 
@@ -298,7 +307,7 @@ bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 
     if( m_jobslist.solve( solve_method, i_render, i_monitoring))
     {
-        // Increase running tasks counter;
+        // Increase running tasks counter
         runningtasksnumber++;
 
         // Return true - that node was solved
@@ -362,10 +371,4 @@ int UserAf::calcWeight() const
    weight += sizeof(UserAf) - sizeof( User);
 //printf("UserAf::calcWeight: %d bytes ( sizeof UserAf = %d)\n", weight, sizeof( UserAf));
    return weight;
-}
-
-void UserAf::calcNeed()
-{
-    // Need calculation based on running tasks number
-    calcNeedResouces( runningtasksnumber);
 }

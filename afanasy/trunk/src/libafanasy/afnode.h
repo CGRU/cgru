@@ -123,7 +123,12 @@ private:
 /// When node is ready to be deleted from container its becames a zombie and wait for a deletion by special thread.
    bool zombie;
 
+/// Will be incremented on each solve on any node
+/** 2^64 / ( seconds_in_year * million_solves_persecond ) ~ 600 thousands of years to work with no overflow
+*** million solves per second is unreachable parameter **/
     static unsigned long long sm_solve_cycle;
+/*  If you are able to produce and solve 117 tasks per second all day long and every day,
+    you have a chance to overflow it before the sun will finish to shine in 5 billions years */
 
 /// A node with maximum need value will take next free host.
     float m_solve_need;
