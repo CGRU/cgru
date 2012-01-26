@@ -144,32 +144,35 @@ int main(int argc, char *argv[])
       //
       printf("Getting renders from database...\n");
       std::list<int> rids = afDB_JobRegister.getIntegers( afsql::DBRender::dbGetIDsCmd());
+      printf("%d renders founded.\n", (int)rids.size());
       for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
       {
          RenderAf * render = new RenderAf( *it);
          if( afDB_JobRegister.getItem( render)) renders.addRender( render);
          else delete render;
       }
-      printf("%d renders founded.\n", (int)rids.size());
+      printf("%d renders registered.\n", renders.getCount());
 
       //
       // Get Users from database:
       //
       printf("Getting users from database...\n");
       std::list<int> uids = afDB_JobRegister.getIntegers( afsql::DBUser::dbGetIDsCmd());
+      printf("%d users founded.\n", (int)uids.size());
       for( std::list<int>::const_iterator it = uids.begin(); it != uids.end(); it++)
       {
          UserAf * user = new UserAf( *it);
          if( afDB_JobRegister.getItem( user)) users.addUser( user);
          else delete user;
       }
-      printf("%d users founded.\n", (int)uids.size());
+      printf("%d permanent users registered.\n", users.getCount());
 
       //
       // Get Jobs from database:
       //
       printf("Getting jobs from database...\n");
       std::list<int> jids = afDB_JobRegister.getIntegers( afsql::DBJob::dbGetIDsCmd());
+      printf("%d jobs founded.\n", (int)jids.size());
       for( std::list<int>::const_iterator it = jids.begin(); it != jids.end(); it++)
       {
          JobAf * job = NULL;
@@ -204,12 +207,12 @@ int main(int argc, char *argv[])
             printf("Deleting invalid job from database...\n");
             std::list<std::string> queries;
             job->dbDeleteNoStatistics( &queries);
-            job->stdOut();
+            std::cout << queries.back() << std::endl;
             delete job;
             afDB_JobRegister.execute( &queries);
          }
       }
-      printf("%d jobs founded.\n", (int)jids.size());
+      printf("%d jobs registered.\n", jobs.getCount());
 
       //
       // Close database:

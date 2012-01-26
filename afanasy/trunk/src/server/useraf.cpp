@@ -195,7 +195,10 @@ void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 
 void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   if( isLocked() ) return;
+/*    if( isLocked() )
+    {
+        return;
+    }*/
 //printf("UserAf::refresh: \"%s\"\n", getName().toUtf8().data());
    int _numjobs = m_jobslist.getCount();
    if(( _numjobs == 0) && ( false == isPermanent()))
@@ -254,6 +257,11 @@ void UserAf::calcNeed()
 
 bool UserAf::canRun()
 {
+/*    if( isLocked() )
+    {
+        return false;
+    }*/
+
     if( priority == 0)
     {
         // Zero priority - turns user jobs solving off
