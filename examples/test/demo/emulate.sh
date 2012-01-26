@@ -70,7 +70,7 @@ while [ 1 ]; do
    for(( jp=0; jp<$JobsPack; jp++)); do
       output="Job = $counter, user = $usr, pause = $pp, deletion = $del, period = $del_period"
       echo $output
-      jobname="job_$counter"
+      jobname="emulate_job_$counter"
       username="user_$usr"
       tmpfile=$tmpdir/$jobname
       if [ -z "$nocmdpost" ]; then
@@ -90,7 +90,7 @@ while [ 1 ]; do
    let del=$del-1
    if [ $del == 0 ]; then
       echo "Deleting Jobs."
-      $AF_ROOT/bin/afcmd jdel ".*"
+      $AF_ROOT/bin/afcmd jdel "emulate_job_.*"
       del=$Deletion
       let del_period=$del_period-1
       if [ $del_period == 0 ]; then
@@ -105,5 +105,4 @@ while [ 1 ]; do
       pp=$PausePeriod
       sleep $PauseTime
    fi
-   sleep $sleep_sec
 done
