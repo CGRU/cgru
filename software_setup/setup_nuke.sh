@@ -50,7 +50,7 @@ do
    fi
 done
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
-echo "NUKE = '${NUKE_EXEC}'"
+#echo "NUKE = '${NUKE_EXEC}'"
 
 LM_LICENSE_FILE="`dirname $NUKE_EXEC`/nuke.lic"
 if [ -f $LM_LICENSE_FILE ]; then
@@ -77,5 +77,12 @@ export CGRU_DAILIES_LINE169="200,200,200"
 export CGRU_DAILIES_LINE235="200,200,200"
 export CGRU_DAILIES_NAMING="(s)_(v)_(d)"
 
+
 export APP_DIR=$NUKE_LOCATION
 export APP_EXE=$NUKE_EXEC
+
+#override nuke location based on locate_nuke.sh
+locate_nuke="$CGRU_LOCATION/software_setup/locate_nuke.sh"
+[ -f $locate_nuke ] && source $locate_nuke
+
+echo "NUKE = '${APP_EXE}'"
