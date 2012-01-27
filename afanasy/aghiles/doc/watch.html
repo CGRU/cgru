@@ -44,11 +44,12 @@
 
 <p>
 Watch - afanasy monitor. It can be in three modes - USER, VISOR and GOD.<br/>
-<i>USER</i> ( common mode ) - user can change any his and any his job parameter.
-He can manipulate render host which was registered with it's user name or if it contains user computer name<br/>
-<i>VISOR</i> ( super user mode ) - can do same as user but he change or remove job of any user.<br/>
-<i>GOD</i> ( super user mode ) - can do anything.
-Change any parameter of any user, job or host. Add or delete users. Start, stop, restart any render host.<br/>
+<ul>
+<li><b>USER</b> ( common mode ) - user can change parameters only of its own nodes - jobs, user and render(s).</li>
+<li><b>VISOR</b> ( super user mode ) - can do same as user but he change jobs of any user.</li>
+<li><b>GOD</b> ( super user mode ) - can do anything.
+Change any parameter of any user, job or host. Add or delete hosts, users. Restart, shutdown any render host.</li>
+</ul>
 
 To switch user mode you need to type password in active Watch window (you do not need to relogin to switch between modes).
 To reset super user mode you can type password again.
