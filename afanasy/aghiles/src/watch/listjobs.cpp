@@ -284,9 +284,17 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
    case af::Msg::TJobsList:
    {
       if( updateItems( msg) && (af::Environment::VISOR() == false))
+      {
          Watch::sendMsg( new afqt::QMsg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
-      subscribe();
-      if( af::Environment::VISOR() == false) view->scrollToBottom();
+      }
+      if( false == isSubscribed() )
+      {
+         if( af::Environment::VISOR() == false )
+         {
+            view->scrollToBottom();
+         }
+         subscribe();
+      }
       break;
    }
    case af::Msg::TMonitorJobsDel:

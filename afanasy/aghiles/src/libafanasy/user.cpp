@@ -97,6 +97,19 @@ void User::setPermanent( bool value)
       state = state & (~Permanent);
 }
 
+void User::setJobsSolveMethod( int i_method )
+{
+    switch( i_method)
+    {
+    case af::Node::SolveByOrder:
+        state = state & (~SolveJobsParrallel);
+        break;
+    case af::Node::SolveByPriority:
+        state = state | SolveJobsParrallel;
+        break;
+    }
+}
+
 int User::calcWeight() const
 {
    int weight = Node::calcWeight();
@@ -154,9 +167,6 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       }
       else stream << "\n (user is temporal)";
       stream << "\n Online time = " << time2str( time_online);
-      stream << "\n Need hosts order = " << need;
-      if( isSolved()) stream << " (solved)";
-      stream << "\n    need = pow(1.1, Priority) / (RunTasks + 1)";
       if( annotation.size()) stream << "\n" << annotation;
       if( customdata.size()) stream << "\nCustom Data:\n" << customdata;
       //stream << "\n Memory = " << calcWeight() << " bytes.";

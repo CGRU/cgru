@@ -22,8 +22,9 @@ void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg);
 **/
 void threadRunCycle( void * i_args)
 {
+   AFINFO("ThreadRun::run:")
    ThreadArgs * a = (ThreadArgs*)i_args;
-AFINFO("ThreadRun::run:")
+
 while( running)
 {
 #ifdef _DEBUG
@@ -84,7 +85,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
             if( render->isReady())
             {
                // store render Id if it produced a task
-               if( a->users->genTask( render, a->monitors))
+               if( a->users->solve( render, a->monitors))
                {
                   rIds.push_back( render->getId());
                   continue;
@@ -105,7 +106,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
             RenderAf * render = rendersIt.getRender( *rIt);
             if( render->isReady())
             {
-               if( a->users->genTask( render, a->monitors))
+               if( a->users->solve( render, a->monitors))
                {
                   rIt++;
                   continue;

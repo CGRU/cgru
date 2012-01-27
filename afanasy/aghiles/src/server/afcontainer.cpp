@@ -283,8 +283,8 @@ void AfContainer::freeZombies()
          }
          nodesTable[ z_node->id] = NULL;
 
-         AfListsList::iterator it = z_node->lists.begin();
-         AfListsList::iterator end_it = z_node->lists.end();
+         std::list<AfList*>::iterator it = z_node->lists.begin();
+         std::list<AfList*>::iterator end_it = z_node->lists.end();
          while( it != end_it) (*it++)->remove( z_node);
 
          delete z_node;
@@ -399,7 +399,7 @@ void AfContainer::sortPriority( af::Node * node)
       last_ptr = node;
    }
 
-   AfListsList::iterator it = node->lists.begin();
-   AfListsList::iterator end_it = node->lists.end();
+   std::list<AfList*>::iterator it = node->lists.begin();
+   std::list<AfList*>::iterator end_it = node->lists.end();
    while( it != end_it) (*it++)->sortPriority( node);
 }

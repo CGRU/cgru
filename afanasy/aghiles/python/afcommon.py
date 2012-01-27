@@ -22,21 +22,21 @@ def splitPathsDifference( path_a, path_b):
    len_b = len(path_b)
    len_min = len_a
    if len_min > len_b: len_min = len_b
-   if len_min < 1: return part_1, diflen, part_2
+   if len_min < 1: return part_1, diflength, part_2
 
    len_begin = -1
    for c in range( len_min):
       if path_a[c] == path_b[c]: continue
       len_begin = c
       break
-   if len_begin < 1: return part_1, diflen, part_2
+   if len_begin < 1: return part_1, diflength, part_2
 
    len_end = -1
    for c in range( len_min):
       if path_a[len_a-c-1] == path_b[len_b-c-1]: continue
       len_end = c
       break
-   if len_end < 1: return part_1, diflen, part_2
+   if len_end < 1: return part_1, diflength, part_2
 
    for c in range( len_begin):
       if path_a[len_begin-c] in Digits: continue
@@ -52,7 +52,6 @@ def splitPathsDifference( path_a, path_b):
    if len_a == len_b: diflength = len_a - len_begin - len_end
    part_1 = path_a[0:len_begin]
    part_2 = path_a[len_a-len_end:len_a]
-
    return part_1, diflength, part_2
 
 

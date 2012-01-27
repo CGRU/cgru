@@ -345,6 +345,12 @@ elif ext == 'nk':
    scenetype = 'nuke'
    if cmd is None: cmd = 'nuke' + cmdextension
    cmd += ' -i'
+#   That the Nuke-Render-Script runs which rewrites the Script
+   nukerenderscript = os.environ['CGRU_LOCATION']
+   nukerenderscript = os.path.join( nukerenderscript, 'plugins')
+   nukerenderscript = os.path.join( nukerenderscript, 'nuke')
+   nukerenderscript = os.path.join( nukerenderscript, 'render.py')
+   cmd += ' -t %s' % nukerenderscript
    cmd += ' -F @#@-@#@x' + str(by)
    if capmin != -1 or capmax != -1: cmd += ' -m ' + services.service.str_capacity
    if node != '': cmd += ' -X %s' % node

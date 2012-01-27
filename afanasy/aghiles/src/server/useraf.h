@@ -5,7 +5,7 @@
 
 #include "../libafsql/dbuser.h"
 
-#include "jobslist.h"
+#include "aflist.h"
 
 class JobAf;
 class RenderAf;
@@ -24,15 +24,19 @@ public:
 
    int addJob( JobAf *job);     ///< Add job to user.
 
-   bool canRun( RenderAf *render); ///< Whether the user can produce a task.
+   /// Whether the user can produce a task
+   /** Used to limit nodes for heavy solve algorithm **/
+   bool canRun();
 
-   bool genTask( RenderAf *render, MonitorContainer * monitoring); ///< Generate task for \c render host, return \c true if task generated.
+   /// Whether the user can produce a task
+   /** Used to limit nodes for heavy solve algorithm **/
+   bool canRunOn( RenderAf * i_render);
+
+   bool solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
 
    void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
 
    void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);///< Refresh user attributes corresponding on jobs information.
-
-   void calcNeed();  ///< Calculate user need for hosts.
 
 ///< Set some user attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -43,11 +47,14 @@ public:
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   inline JobsList * getJobs() { return &jobs; }
+   inline AfList * getJobsList() { return &m_jobslist; }
 
    void generateJobsIds( af::MCGeneral & ids) const;
 
    void appendLog( const std::string & message);  ///< Append task log with a \c message .
+
+protected:
+   void calcNeed();
 
 private:
    void construct();
@@ -57,7 +64,7 @@ private:
 private:
    uint32_t zombietime; ///< User zombie time - time to have no jobs before deletion.
 
-   JobsList jobs; ///< Jobs list.
+   AfList m_jobslist; ///< Jobs list.
 
    std::list<std::string> log;                          ///< Log.
 };

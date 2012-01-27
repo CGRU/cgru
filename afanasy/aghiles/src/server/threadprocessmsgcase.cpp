@@ -66,11 +66,19 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    }
    case af::Msg::TConfigLoad:
    {
-      AfContainerLock tlock( i_args->talks, AfContainerLock::WRITELOCK);   AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
-      AfContainerLock jlock(  i_args->jobs, AfContainerLock::WRITELOCK);   AfContainerLock ulock(   i_args->users, AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( i_args->talks,   AfContainerLock::WRITELOCK);
+      AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
+      AfContainerLock jlock( i_args->jobs,    AfContainerLock::WRITELOCK);
+      AfContainerLock ulock( i_args->users,   AfContainerLock::WRITELOCK);
       std::string message;
-      if( af::Environment::reload()) message = "Reloaded successfully.";
-      else                message = "Failed, see server logs fo details.";
+      if( af::Environment::reload())
+      {
+         message = "Reloaded successfully.";
+      }
+      else
+      {
+         message = "Failed, see server logs fo details.";
+      }
       o_msg_response = new MsgAf();
       o_msg_response->setString( message);
       break;
@@ -117,8 +125,14 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    {
       AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
 
-      if( i_args->monitors->updateId( i_msg->int32())) o_msg_response = new MsgAf( af::Msg::TMonitorId, i_msg->int32());
-      else o_msg_response = new MsgAf( af::Msg::TMonitorId, 0);
+      if( i_args->monitors->updateId( i_msg->int32()))
+      {
+         o_msg_response = new MsgAf( af::Msg::TMonitorId, i_msg->int32());
+      }
+      else
+      {
+         o_msg_response = new MsgAf( af::Msg::TMonitorId, 0);
+      }
       break;
    }
    case af::Msg::TMonitorsListRequest:
@@ -167,8 +181,14 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    {
       AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
 
-      if( i_args->talks->updateId( i_msg->int32())) o_msg_response = i_args->talks->generateList( af::Msg::TTalksList);
-      else o_msg_response = new MsgAf( af::Msg::TTalkId, 0);
+      if( i_args->talks->updateId( i_msg->int32()))
+      {
+         o_msg_response = i_args->talks->generateList( af::Msg::TTalksList);
+      }
+      else
+      {
+         o_msg_response = new MsgAf( af::Msg::TTalkId, 0);
+      }
       break;
    }
    case af::Msg::TTalkDistributeData:
@@ -200,8 +220,14 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 //printf("Msg::TRenderUpdate: %s - %s\n", render_up.getName().toUtf8().data(), time2Qstr( time(NULL)).toUtf8().data());
       RenderContainerIt rendersIt( i_args->renders);
       RenderAf* render = rendersIt.getRender( render_up.getId());
+
       int id = 0;
-      if((render != NULL) && ( render->update( &render_up))) id = render->getId();
+      // If there is not such render, a zero id will be send.
+      // It is a signal for client to register again (may be server was restarted).
+      if((render != NULL) && ( render->update( &render_up)))
+      {
+         id = render->getId();
+      }
       o_msg_response = new MsgAf( af::Msg::TRenderId, id);
       break;
    }
@@ -234,7 +260,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       RenderContainerIt rendersIt( i_args->renders);
       RenderAf* render = rendersIt.getRender( i_msg->int32());
-      if( render == NULL ) break;
+      if( render == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf;
       o_msg_response->setStringList( render->getLog());
       break;
@@ -245,12 +274,19 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       RenderContainerIt rendersIt( i_args->renders);
       RenderAf* render = rendersIt.getRender( i_msg->int32());
-      if( render == NULL ) break;
+      if( render == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf;
       if( render->getTasksLog().empty())
+      {
          o_msg_response->setString("No tasks execution log.");
+      }
       else
+      {
          o_msg_response->setStringList( render->getTasksLog());
+      }
       break;
    }
    case af::Msg::TRenderInfoRequestId:
@@ -259,7 +295,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       RenderContainerIt rendersIt( i_args->renders);
       RenderAf* render = rendersIt.getRender( i_msg->int32());
-      if( render == NULL ) break;
+      if( render == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf();
 
       std::string str = render->generateInfoString( true);
@@ -286,7 +325,12 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
       int id = 0;
       UserContainerIt usersIt( i_args->users);
       for( af::User *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
-         if( user->getName() == name) id = user->getId();
+      {
+         if( user->getName() == name)
+         {
+            id = user->getId();
+         }
+      }
       o_msg_response = new MsgAf( af::Msg::TUserId, id);
       break;
    }
@@ -311,7 +355,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       UserContainerIt usersIt( i_args->users);
       UserAf* user = usersIt.getUser( i_msg->int32());
-      if( user == NULL ) break;
+      if( user == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf();
       o_msg_response->setStringList( user->getLog());
       break;
@@ -322,7 +369,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       UserContainerIt usersIt( i_args->users);
       UserAf* user = usersIt.getUser( i_msg->int32());
-      if( user == NULL ) break;
+      if( user == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       af::MCGeneral ids;
       user->generateJobsIds( ids);
       o_msg_response = new MsgAf( af::Msg::TUserJobsOrder, &ids);
@@ -332,6 +382,9 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 // ------------------------------------- Job -------------------------------//
    case af::Msg::TJobRegister:
    {
+      // No containers locks needed here.
+      // Job registration is a complex procedure.
+      // It locks and unlocks needed containers itself.
       i_args->jobs->job_register( new JobAf( i_msg), i_args->users, i_args->monitors);
       break;
    }
@@ -355,7 +408,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( i_msg->int32());
-      if( job == NULL ) break;
+      if( job == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf();
       o_msg_response->setStringList( job->getLog());
       break;
@@ -366,7 +422,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
 
       JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( i_msg->int32());
-      if( job == NULL ) break;
+      if( job == NULL )
+      { // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf();
       o_msg_response->setString( job->getErrorHostsListString());
       break;
@@ -379,6 +438,7 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
       JobAf* job = jobsIt.getJob( i_msg->int32());
       if( job == NULL )
       {
+         // FIXME: Send back the same message on error - is it good?
          o_msg_response = new MsgAf( af::Msg::TJobProgressRequestId, 0);
          break;
       }
@@ -407,7 +467,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
       AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
 
       o_msg_response = i_args->users->generateJobsList( i_msg->int32());
-      if( o_msg_response == NULL ) o_msg_response = new MsgAf( af::Msg::TUserId, 0);
+      if( o_msg_response == NULL )
+      {
+         o_msg_response = new MsgAf( af::Msg::TUserId, 0);
+      }
       break;
    }
    case af::Msg::TJobsListRequestUsersIds:
@@ -432,6 +495,7 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
          std::ostringstream stream;
          stream << "Msg::TTaskRequest: No job with id=" << mctaskpos.getJobId();
          o_msg_response->setString( stream.str());
+         break;
       }
       af::TaskExec * task = job->generateTask( mctaskpos.getNumBlock(), mctaskpos.getNumTask());
       if( task )
@@ -461,9 +525,14 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
          std::ostringstream stream;
          stream << "Msg::TTaskLogRequest: No job with id=" << mctaskpos.getJobId();
          o_msg_response->setString( stream.str());
+         break;
       }
       const std::list<std::string> * list = &(job->getTaskLog( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
-      if( list == NULL ) break;
+      if( list == NULL )
+      {
+         // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf();
       if( list->size() == 0)
       {
@@ -472,7 +541,9 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
          o_msg_response->setStringList( list);
       }
       else
+      {
          o_msg_response->setStringList( *list);
+      }
       break;
    }
    case af::Msg::TTaskErrorHostsRequest:
@@ -482,7 +553,11 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
       af::MCTaskPos mctaskpos( i_msg);
       JobContainerIt jobsIt( i_args->jobs);
       JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
-      if( job == NULL ) break;
+      if( job == NULL )
+      {
+         // FIXME: Better to return some message in any case.
+         break;
+      }
       o_msg_response = new MsgAf();
       o_msg_response->setString( job->getErrorHostsListString( mctaskpos.getNumBlock(), mctaskpos.getNumTask()));
       break;
@@ -578,6 +653,7 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
       af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
       o_msg_response = new MsgAf( af::Msg::TRenderCloseTask, &taskpos);
    }
+   // Cases for run cycle thread:
    case af::Msg::TTaskUpdatePercent:
    case af::Msg::TTaskListenOutput:
    case af::Msg::TTasksSkip:
@@ -659,6 +735,7 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    case af::Msg::TUserMaxRunningTasks:
    case af::Msg::TUserPriority:
    case af::Msg::TUserJobsLifeTime:
+   case af::Msg::TUserJobsSolveMethod:
    case af::Msg::TUserErrorsAvoidHost:
    case af::Msg::TUserErrorRetries:
    case af::Msg::TUserErrorsTaskSameHost:
@@ -680,8 +757,13 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    case af::Msg::TTalkExit:
    {
 //printf("ThreadReadMsg::msgCase: pushing message to run thread:\n"); i_msg->stdOut();
+      // Push message for run cycle thread.
       i_args->msgQueue->pushMsg( i_msg);
+      // Need to return here to not to delete input message (i_msg) later.
       return o_msg_response;
+      //  ( o_msg_response is NULL in all cases except Msg::TTaskUpdateState,
+      //    in that case render should recieve an answer to close task
+      //    and finish sending any updates for the task )
    }
 // -------------------------------------------------------------------------//
    case af::Msg::TVersionMismatch:
@@ -702,6 +784,10 @@ MsgAf* threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg)
    }
    }
 //if(i_msg->type()==Msg::TJobRegister)printf("Msg::TJobRegister:returning.\n");
+
+   // Deleting input message as it not needed any more.
    delete i_msg;
+
+   // Returning an answer
    return o_msg_response;
 }

@@ -10,6 +10,7 @@
 #include "../libafsql/dbjobprogress.h"
 
 #include "afcommon.h"
+#include "aflistit.h"
 #include "block.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -535,12 +536,12 @@ void JobAf::checkDepends()
    // check local depends:
    if( hasDependMask())
    {
-      JobsListIt jobsListIt( user->getJobs());
-      for( JobAf *job = jobsListIt.job(); job != NULL; jobsListIt.next(), job = jobsListIt.job())
+      AfListIt jobsListIt( user->getJobsList());
+      for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       {
          if( job == this ) continue;
 //printf("JobAf::checkDepends: name2=%s\n", job->getName().toUtf8().data());
-         if(( job->isDone() == false ) && ( checkDependMask( job->getName()) ))
+         if(( ((JobAf*)job)->isDone() == false ) && ( checkDependMask( job->getName()) ))
          {
             depend_local = true;
 //printf("Set.\n");
@@ -700,54 +701,110 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    return blocksdata[block]->genTask( task);
 }
 
+bool JobAf::canRun()
+{
+    if( isLocked() )
+    {
+        return false;
+    }
+
+//printf("JobAf::solve( RenderAf *render): %s - %s\n", name.toUtf8().data(), render->getName().toUtf8().data());
+
+    // Check some validness:
+    if( blocksnum < 1)
+    {
+        AFERROR("JobAf::solve: job has no blocks.")
+        return false;
+    }
+
+    // check job state:
+    if( state & AFJOB::STATE_OFFLINE_MASK )
+    {
+        return false;
+    }
+    if( false == ( state & AFJOB::STATE_READY_MASK  ))
+    {
+        return false;
+    }
+
+    // Zero priority turns job off:
+    if( priority == 0 )
+    {
+        return false;
+    }
+
+    // check maximum running tasks:
+    if(( maxrunningtasks >= 0 ) && ( getRunningTasksNumber() >= maxrunningtasks ))
+    {
+        return false;
+    }
+
+    // check maximum running tasks per host:
+    if(  maxruntasksperhost == 0 )
+    {
+        return false;
+    }
+
+    return true;
+}
+
+bool JobAf::canRunOn( RenderAf * i_render)
+{
+    if( false == canRun())
+    {
+        // Unable to run at all
+        return false;
+    }
+
+    // check maximum running tasks per host:
+    if(( maxruntasksperhost  > 0 ) && ( getRenderCounts(i_render) >= maxruntasksperhost ))
+    {
+        return false;
+    }
+
+    // check blocks with enough capacity
+    bool enoughCapacity = false;
+    for( int b = 0; b < blocksnum; b++)
+    {
+        if( i_render->hasCapacity( blocksdata[b]->getCapMinResult()))
+        {
+            enoughCapacity = true;
+            break;
+        }
+    }
+    if( false == enoughCapacity) return false;
+
+
+
+    // check hosts mask:
+    if( false == checkHostsMask( i_render->getName()))
+    {
+        return false;
+    }
+
+    // check exclude hosts mask:
+    if( false == checkHostsMaskExclude( i_render->getName()))
+    {
+        return false;
+    }
+
+    // check needed os:
+    if( false == checkNeedOS( i_render->getHost().os))
+    {
+        return false;
+    }
+
+    // check needed properties:
+    if( false == checkNeedProperties( i_render->getHost().properties))
+    {
+        return false;
+    }
+
+    return true;
+}
+
 bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 {
-   if( isLocked() ) return false;
-//printf("JobAf::solve( RenderAf *render): %s - %s\n", name.toUtf8().data(), render->getName().toUtf8().data());
-// check validness:
-   if( blocksnum < 1)
-   {
-      AFERROR("JobAf::solve: job has no blocks.")
-      return false;
-   }
-
-// check priority:
-   if( priority == 0 ) return false;
-
-// check job state:
-   if(            state & AFJOB::STATE_OFFLINE_MASK ) return false;
-   if( false == ( state & AFJOB::STATE_READY_MASK  )) return false;
-
-// check maximum running tasks:
-   if(( maxrunningtasks >= 0 ) && ( getRunningTasksNumber() >= maxrunningtasks )) return false;
-
-// check maximum running tasks per host:
-   if(  maxruntasksperhost == 0 ) return false;
-   if(( maxruntasksperhost  > 0 ) && ( getRenderCounts(render) >= maxruntasksperhost )) return false;
-
-// check blocks with enough capacity
-   bool enoughCapacity = false;
-   for( int b = 0; b < blocksnum; b++)
-   {
-      if( render->hasCapacity( blocksdata[b]->getCapMinResult()))
-      {
-         enoughCapacity = true;
-         break;
-      }
-   }
-   if( false == enoughCapacity) return false;
-
-
-// check hosts mask:
-   if( false == checkHostsMask( render->getName())) return false;
-// check exclude hosts mask:
-   if( false == checkHostsMaskExclude( render->getName())) return false;
-// check needed os:
-   if( false == checkNeedOS( render->getHost().os)) return false;
-// check needed properties:
-   if( false == checkNeedProperties( render->getHost().properties)) return false;
-
-// search for ready task:
    for( int b = 0; b < blocksnum; b++)
    {
       if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
@@ -914,6 +971,15 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    }
 
    if(( monitoring ) &&  ( jobchanged )) monitoring->addJobEvent( jobchanged, getId(), getUid());
+
+   // Update solving parameters:
+   calcNeed();
+}
+
+void JobAf::calcNeed()
+{
+    // Need calculation based on running tasks number
+    calcNeedResouces( getRunningTasksNumber());
 }
 
 void JobAf::skipTasks( const af::MCTasksPos &taskspos, RenderContainer * renders, MonitorContainer * monitoring)

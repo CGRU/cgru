@@ -54,7 +54,6 @@ public:
    inline int      getNumJobs()              const { return numjobs;             } ///< Get jobs quantity.
    inline int      getNumRunningJobs()       const { return numrunningjobs;      } ///< Get active jobs quantity.
    inline int      getRunningTasksNumber()   const { return runningtasksnumber;  } ///< Get number of hosts used by user jobs.
-   inline float    getNeed()                 const { return need;                } ///< Get user need for hosts.
    inline uint32_t getTimeRegister()         const { return time_register;       } ///< Get register time.
    inline uint32_t getTimeOnline()           const { return time_online;         } ///< Get online time.
    inline int      getJobsLifeTime()         const { return jobs_lifetime;       } ///< Get jobs default life time.
@@ -69,8 +68,9 @@ public:
    inline bool  isPermanent() const      { return state & Permanent; } ///< Wheter the user is permanent.
    void setPermanent( bool value);
 
-   inline bool  isSolved() const      { return state & Solved; }
-   inline void setSolved( bool value) { if(value) state = state | Solved; else state = state & (~Solved);}
+    inline bool solveJobsParrallel() const { return state & SolveJobsParrallel; }
+
+    void setJobsSolveMethod( int i_method );
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
@@ -79,6 +79,7 @@ public:
 protected:
    uint32_t state;             ///< State.
    uint32_t flags;             ///< Flags.
+
    std::string annotation;
    std::string customdata;
 
@@ -106,17 +107,18 @@ protected:
    int64_t time_register;        ///< User registration time (when he become permanent).
    int64_t time_online;          ///< User online (server registration) time.
 
-   float need;                   ///< User need for hosts.
-
 private:
    enum State
    {
-      Permanent   = 1,
-      Solved      = 1 << 1
+      Permanent            = 1,
+      SolveJobsParrallel   = 2
    };
 
 private:
    void construct();
    void readwrite( Msg * msg);   ///< Read or write user in buffer.
+
+// DEPRECATED:
+   float need;                   ///< User need for hosts.
 };
 }

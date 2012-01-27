@@ -64,6 +64,8 @@ protected:
    virtual void subscribe();
    virtual void unSubscribe();
 
+   inline bool isSubscribed() const { return subscribed;}
+
    virtual void connectionLost();
    virtual void connectionEstablished();
 

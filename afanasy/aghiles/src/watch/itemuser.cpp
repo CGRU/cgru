@@ -67,8 +67,14 @@ void ItemUser::updateValues( af::Node *node, int type)
 
    strRightTop = hostname;
 
-   strRightBottom = 'n' + QString::number( user->getNeed(), 'g', 5);
-   if( user->isSolved()) strRightBottom += "_S";
+    if( user->solveJobsParrallel())
+    {
+        strRightBottom = "Par";
+    }
+    else
+    {
+        strRightBottom = "Ord";
+    }
 
    tooltip = user->generateInfoString( true).c_str();
 

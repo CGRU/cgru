@@ -4,6 +4,7 @@
 
 #include "afcontainer.h"
 #include "afcontainerit.h"
+#include "aflist.h"
 #include "useraf.h"
 
 class MsgAf;
@@ -32,11 +33,10 @@ public:
    MsgAf* generateJobsList( const af::MCGeneral & ids);
 
 /// Generate task for \c render , return \c true on success.
-   bool genTask( RenderAf *render, MonitorContainer * monitoring);
+   bool solve( RenderAf *render, MonitorContainer * monitoring);
 
 private:
-   int currentUserId;       ///< \c id of last user generated task.
-   int currentPriority;     ///< Priority of last user generated task.
+   AfList m_userslist; ///< Users list.
 };
 
 //########################## Iterator ##############################

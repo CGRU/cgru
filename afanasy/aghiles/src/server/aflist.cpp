@@ -10,14 +10,14 @@
 #include "../include/macrooutput.h"
 
 
-/* FIXME: Using a list to manage priorities is not very good. 
+/* FIXME: Using a list to manage priorities is not very good.
    Just use an AVL tree! An stl sorted container for example.
 */
-   
+
 AfList::~AfList()
 {
-   NodesList::iterator it = nodes_list.begin();
-   NodesList::iterator end_it = nodes_list.end();
+   std::list<af::Node*>::iterator it = nodes_list.begin();
+   std::list<af::Node*>::iterator end_it = nodes_list.end();
 
    while( it != end_it)
       (*it++)->lists.remove( this);
@@ -25,25 +25,25 @@ AfList::~AfList()
 
 int AfList::add( af::Node *node)
 {
-   m_rw_lock.WriteLock();
+//   m_rw_lock.WriteLock();
 
    int index = -1;
 
-   NodesList::iterator it =
+   std::list<af::Node*>::iterator it =
       std::find( nodes_list.begin(), nodes_list.begin(), node);
 
    if( *it == node )
    {
       AFERROR("AfList::add: node already exists.\n");
-      m_rw_lock.WriteUnlock();
+//      m_rw_lock.WriteUnlock();
       return index;
    }
    else
    {
       if( nodes_list.size() != 0 )
       {
-         NodesList::iterator it = nodes_list.begin();
-         NodesList::iterator end_it = nodes_list.end();
+         std::list<af::Node*>::iterator it = nodes_list.begin();
+         std::list<af::Node*>::iterator end_it = nodes_list.end();
          bool lessPriorityFounded = false;
          while( it != end_it)
          {
@@ -65,35 +65,35 @@ int AfList::add( af::Node *node)
       node->lists.push_back( this);
    }
 
-   m_rw_lock.WriteUnlock();
+//   m_rw_lock.WriteUnlock();
    return index;
 }
 
 void AfList::remove( af::Node *node)
 {
-   m_rw_lock.WriteLock();
+//   m_rw_lock.WriteLock();
 
    nodes_list.remove(node);
    node->lists.remove(this);
 
-   m_rw_lock.WriteUnlock();
+//   m_rw_lock.WriteUnlock();
 }
 
 int AfList::sortPriority( af::Node * node)
 {
-   m_rw_lock.WriteLock();
+//   m_rw_lock.WriteLock();
 
    if( nodes_list.size() < 2 )
    {
-      m_rw_lock.WriteUnlock();
+//      m_rw_lock.WriteUnlock();
       return -1;
    }
 
    int index = -1;
 
    nodes_list.remove( node);
-   NodesList::iterator it = nodes_list.begin();
-   NodesList::iterator end_it = nodes_list.end();
+   std::list<af::Node*>::iterator it = nodes_list.begin();
+   std::list<af::Node*>::iterator end_it = nodes_list.end();
    bool lessPriorityFounded = false;
 
    while( it != end_it)
@@ -111,7 +111,7 @@ int AfList::sortPriority( af::Node * node)
       nodes_list.push_back( node);
    }
 
-   m_rw_lock.WriteUnlock();
+//   m_rw_lock.WriteUnlock();
 
    return index;
 }
@@ -143,11 +143,11 @@ printf("AfList::moveNodes:\n");
 //
 //    creating move nodes list
 //
-   NodesList move_list;
-   NodesList::iterator it_begin = nodes_list.begin();
-//   NodesList::iterator it_back  = nodes_list.back();
-   NodesList::iterator it_end   = nodes_list.end();
-   NodesList::iterator it = it_begin;
+   std::list<af::Node*> move_list;
+   std::list<af::Node*>::iterator it_begin = nodes_list.begin();
+//   std::list<af::Node*>::iterator it_back  = nodes_list.back();
+   std::list<af::Node*>::iterator it_end   = nodes_list.end();
+   std::list<af::Node*>::iterator it = it_begin;
    while( it != it_end)
    {
       for( unsigned n = 0; n < list->size(); n++)
@@ -175,9 +175,9 @@ printf("Founded a node \"%s\"-%d\n", (*it)->getName().toUtf8().data(), (*it)->ge
 //
 //    moving nodes in move list
 //
-   NodesList::iterator it_move_begin = move_list.begin();
-   NodesList::iterator it_move_end   = move_list.end();
-   NodesList::iterator it_move;
+   std::list<af::Node*>::iterator it_move_begin = move_list.begin();
+   std::list<af::Node*>::iterator it_move_end   = move_list.end();
+   std::list<af::Node*>::iterator it_move;
    if((type == MoveDown) || (type == MoveTop)) it_move = it_move_end;
    else it_move = it_move_begin;
 
@@ -199,7 +199,7 @@ printf("Founded a node \"%s\"-%d\n", (*it)->getName().toUtf8().data(), (*it)->ge
 #ifdef AFOUTPUT
 printf("Processing node \"%s\"-%d\n", node->getName().toUtf8().data(), node->getId());
 #endif
-      NodesList::iterator it_insert = nodes_list.begin();
+      std::list<af::Node*>::iterator it_insert = nodes_list.begin();
       while( it_insert != it_end)
       {
          if((*it_insert) == node) break;
@@ -339,6 +339,6 @@ printf("Inserting at \"%s\"-%d\n", node_move->getName().toUtf8().data(), node_mo
 
 void AfList::generateIds( af::MCGeneral & ids) const
 {
-   NodesList::const_iterator it = nodes_list.begin();
+   std::list<af::Node*>::const_iterator it = nodes_list.begin();
    while( it != nodes_list.end()) ids.addId( (*(it++))->getId());
 }

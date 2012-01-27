@@ -6,6 +6,7 @@
 #include "../libafsql/dbblockdata.h"
 
 #include "afcommon.h"
+#include "jobaf.h"
 #include "monitorcontainer.h"
 #include "rendercontainer.h"
 #include "renderaf.h"

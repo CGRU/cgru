@@ -7,6 +7,7 @@
 
 #include "afcommon.h"
 #include "block.h"
+#include "jobaf.h"
 #include "monitorcontainer.h"
 #include "msgaf.h"
 #include "renderaf.h"

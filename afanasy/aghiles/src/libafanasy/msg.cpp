@@ -665,7 +665,7 @@ const char * Msg::TNAMES[]=
    "TTaskOutput",                ///< Job task output data.
    "TTasksRun",                  ///< Job tasks run data.
 
-   "TRESERVED10",
+   "TUserJobsSolveMethod",       ///< Set jobs solving mode.
    "TRESERVED11",
    "TRESERVED12",
    "TRESERVED13",

@@ -70,6 +70,7 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
 
 
    QMenu menu(this);
+   QMenu * submenu;
    QAction *action;
 
    action = new QAction( "Show Log", this);
@@ -119,19 +120,29 @@ void ListUsers::contextMenuEvent(QContextMenuEvent *event)
       action = new QAction( "Set Jobs Life Time", this);
       connect( action, SIGNAL( triggered() ), this, SLOT( actJobsLifeTime() ));
       menu.addAction( action);
-   }
 
-//   if( af::Environment::VISOR())
-   {
+      menu.addSeparator();
+
+      submenu = new QMenu("Jobs Solving Method", this);
+
+          action = new QAction("By Order", this);
+          connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsByOrder() ));
+          submenu->addAction( action);
+
+          action = new QAction("Parallel", this);
+          connect( action, SIGNAL( triggered() ), this, SLOT( actSolveJobsParallel() ));
+          submenu->addAction( action);
+
+      menu.addMenu( submenu);
+
+      menu.addSeparator();
+
       menu.addSeparator();
       action = new QAction( "Set Permanent", this);
       action->setEnabled( false == useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actAdd() ));
       menu.addAction( action);
-   }
-//   if( af::Environment::GOD())
-   {
-//      menu.addSeparator();
+
       action = new QAction( "Delete From Database", this);
       action->setEnabled( useritem->isPermanent());
       connect( action, SIGNAL( triggered() ), this, SLOT( actDelete() ));
@@ -371,6 +382,17 @@ void ListUsers::actDelete()
 {
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TUserDel);
+}
+
+void ListUsers::actSolveJobsByOrder()
+{
+   af::MCGeneral mcgeneral( af::Node::SolveByOrder );
+   action( mcgeneral, af::Msg::TUserJobsSolveMethod);
+}
+void ListUsers::actSolveJobsParallel()
+{
+   af::MCGeneral mcgeneral( af::Node::SolveByPriority);
+   action( mcgeneral, af::Msg::TUserJobsSolveMethod);
 }
 
 void ListUsers::actRequestLog()
