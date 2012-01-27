@@ -28,15 +28,6 @@ DBConnection::DBConnection( const std::string & connection_name):
    working( false)
 {
    db = newDatabase( name);
-
-#ifndef MACOSX
-   if( pthread_mutex_init( &mutex, NULL) != 0)
-   {
-      AFERRPE("DBConnection::DBConnection: pthread_mutex_init:")
-      return;
-   }
-#endif
-
    working = true;
    working = DBOpen();
    DBClose();
@@ -45,12 +36,6 @@ DBConnection::DBConnection( const std::string & connection_name):
 DBConnection::~DBConnection()
 {
    db->close();
-
-#ifndef MACOSX
-   if( pthread_mutex_destroy( &mutex) != 0)
-      AFERRPE("DBConnection::DBConnection: pthread_mutex_destroy:")
-#endif
-
    delete db;
    QSqlDatabase::removeDatabase( name.c_str());
 }
@@ -60,15 +45,7 @@ bool DBConnection::DBOpen()
    if( working == false ) return false;
    AFINFO("Trying to lock DB...")
 
-#ifdef MACOSX
-   q_mutex.lock();
-#else
-  if( pthread_mutex_lock( &mutex) != 0)
-   {
-      AFERRPE("DBConnection::DBOpen: pthread_mutex_unlock:")
-      return false;
-   }
-#endif
+   m_mutex.Lock();
 
    AFINFO(" - Done")
 
@@ -76,12 +53,7 @@ bool DBConnection::DBOpen()
    {
       AFERROR("DBConnection::DBOpen: database is already open:")
 
-#ifdef MACOSX
-   q_mutex.unlock();
-#else
-      if( pthread_mutex_unlock( &mutex) != 0)
-         AFERRPE("DBConnection::DBOpen: pthread_mutex_unlock:");
-#endif
+        m_mutex.Unlock();
 
       return false;
    }
@@ -92,12 +64,7 @@ bool DBConnection::DBOpen()
       AFERROR("DBConnection::DBOpen: UNABLE TO OPEN DATABASE:")
       std::cout << afsql::qtos(db->lastError().text()) << std::endl;
 
-#ifdef MACOSX
-      q_mutex.unlock();
-#else
-      if( pthread_mutex_unlock( &mutex) != 0)
-         AFERRPE("DBConnection::DBOpen: pthread_mutex_unlock:");
-#endif
+      m_mutex.Unlock();
 
       return false;
    }
@@ -106,16 +73,11 @@ bool DBConnection::DBOpen()
 
 void DBConnection::DBClose()
 {
-   db->close();
+    db->close();
 
-#ifdef MACOSX
-      q_mutex.unlock();
-#else
-   if( pthread_mutex_unlock( &mutex) != 0)
-      AFERRPE("DBConnection::close: pthread_mutex_unlock:");
-#endif
+    m_mutex.Unlock();
 
-   AFINFO("DB Unlocked.")
+    AFINFO("DB Unlocked.")
 }
 
 void DBConnection::dropAllTables()

@@ -1,14 +1,9 @@
 #pragma once
 
-#ifdef MACOSX
-#include <QtCore/QMutex>
-#else
-#include <pthread.h>
-#endif
-
 #include <QtCore/QString>
 #include <QtCore/QStringList>
 
+#include "../libafanasy/dlMutex.h"
 #include "../libafanasy/name_af.h"
 
 #include "name_afsql.h"
@@ -43,11 +38,7 @@ private:
    std::string name;
    bool working;
 
-#ifdef MACOSX
-   QMutex        q_mutex;
-#else
-   pthread_mutex_t mutex;
-#endif
+   DlMutex m_mutex;
 
    QSqlDatabase * db;
 };
