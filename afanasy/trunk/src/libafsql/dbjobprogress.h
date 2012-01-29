@@ -16,9 +16,9 @@ public:
 
    virtual ~DBJobProgress();
 
-   void dbAdd( QSqlDatabase * db) const;
+   bool dbAdd( PGconn * i_conn) const;
 
-   bool dbSelect( QSqlDatabase * db);
+   bool dbSelect( PGconn * i_conn);
 
 private:
    virtual af::TaskProgress * newTaskProgress() const;

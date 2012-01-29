@@ -60,11 +60,7 @@ namespace AFSERVER
 /// Database options:
 namespace AFDATABASE
 {
-   const char DRIVER[]       = "QPSQL";
-   const char HOSTNAME[]     = "localhost";
-   const char DATABASENAME[] = "afanasy";
-   const char USERNAME[]     = "afadmin";
-   const char PASSWORD[]     = "AfPassword";
+   const char CONNINFO[]     = "host=localhost dbname=afanasy user=afadmin password=AfPassword";
    const char STRINGQUOTES[] = "$$";
    const int  STRINGNAMELEN  = 512;       ///< Maximum name lenght (for job, user, render, block, task, service, parser etc...).
    const int  STRINGEXPRLEN  = 4096;      ///< Maximum lenght for expression (command, dependmask, hostsmask,view command etc...).

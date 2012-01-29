@@ -6,26 +6,31 @@ class DBTaskUpdateData: public AfQueueItem
 {
 public:
 
-   DBTaskUpdateData( int JobId, int BlockNum, int TaskNum, const af::TaskProgress * Progress);
+   DBTaskUpdateData( int i_id_job, int i_id_block, int i_id_task, const af::TaskProgress * i_taskprogress);
    ~DBTaskUpdateData();
 
-   int jobid;
-   int blocknum;
-   int tasknum;
+   static bool prepare( PGconn * i_conn);
+   bool prepareExec( PGconn * i_conn) const;
 
-   uint32_t state;
-   uint32_t time_start;
-   uint32_t time_done;
-   int      starts_count;
-   int      errors_count;
+private:
+    int m_id_job;
+    int m_id_block;
+    int m_id_task;
 
+    uint32_t m_state;
+    int64_t  m_time_start;
+    int64_t  m_time_done;
+    int32_t  m_starts_count;
+    int32_t  m_errors_count;
+
+    static char ms_db_prepare_name[];
 };
 
 /// Simple FIFO update tast in database queue
 class DBUpdateTaskQueue : public DBActionQueue
 {
 public:
-   DBUpdateTaskQueue( const std::string & QueueName, MonitorContainer * monitorcontainer);
+   DBUpdateTaskQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer);
    virtual ~DBUpdateTaskQueue();
 
 /// Push task update data to queue back.
@@ -39,5 +44,5 @@ protected:
    /// Queries execution function
    virtual bool writeItem( AfQueueItem* item);
 
-   QSqlQuery * query;
+   bool m_db_prepared;
 };

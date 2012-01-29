@@ -1,25 +1,11 @@
 #include "cmd_database.h"
 
-#include "../libafsql/qdbconnection.h"
+#include "../libafsql/dbconnection.h"
 #include "../libafsql/dbjob.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
-
-CmdDBDrivers::CmdDBDrivers()
-{
-   setCmd("db_drivers");
-   setInfo("Get list of available database Qt drivers.");
-}
-CmdDBDrivers::~CmdDBDrivers(){}
-bool CmdDBDrivers::processArguments( int argc, char** argv, af::Msg &msg)
-{
-   QStringList driverNames = QSqlDatabase::drivers();
-   printf("\nAvailable drivers: (%d)\n", driverNames.size());
-   for( int i = 0; i < driverNames.size(); i++) printf("%d: \"%s\"\n", i, driverNames[i].toUtf8().data());
-   return true;
-}
 
 CmdDBCheck::CmdDBCheck()
 {

@@ -16,9 +16,9 @@ public:
 
    static const std::string dbGetIDsCmd();
 
-   void dbAdd( QSqlDatabase * db) const;
+   bool dbAdd( PGconn * i_conn) const;
 
-   virtual bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
+   virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
    virtual void dbDelete( std::list<std::string> * queries) const;
    virtual void dbDeleteNoStatistics( std::list<std::string> * queries) const;
 

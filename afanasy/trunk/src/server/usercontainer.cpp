@@ -5,7 +5,7 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafsql/qdbconnection.h"
+#include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
 #include "msgaf.h"

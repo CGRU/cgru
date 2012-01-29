@@ -6,7 +6,7 @@
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 
 #include "../libafsql/dbattr.h"
-#include "../libafsql/qdbconnection.h"
+#include "../libafsql/dbconnection.h"
 #include "../libafsql/dbjobprogress.h"
 
 #include "afcommon.h"
@@ -59,10 +59,10 @@ void JobAf::initializeValues()
    blackListsWeight  = 0;
 }
 
-bool JobAf::dbSelect( QSqlDatabase * db, const std::string * where)
+bool JobAf::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
 //printf("JobAf::dbSelect:\n");
-   if( afsql::DBJob::dbSelect( db) == false) return false;
+   if( afsql::DBJob::dbSelect( i_conn) == false) return false;
    return construct();
 }
 

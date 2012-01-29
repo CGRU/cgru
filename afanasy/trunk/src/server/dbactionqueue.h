@@ -1,8 +1,5 @@
 #pragma once
 
-#include <QtSql/QSqlDatabase>
-#include <QtCore/QStringList>
-
 #include "../libafanasy/name_af.h"
 
 #include "../libafsql/name_afsql.h"
@@ -17,17 +14,17 @@ class Queries: public std::list<std::string>, public AfQueueItem {};
 class DBActionQueue : public AfQueue
 {
 public:
-   DBActionQueue( const std::string & QueueName, MonitorContainer * monitorcontainer);
+   DBActionQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer);
    virtual ~DBActionQueue();
 
-   inline bool isWorking() const { return working;}
+   inline bool isWorking() const { return m_working;}
 
    void addItem(    const afsql::DBItem * item);
    void delItem(    const afsql::DBItem * item);
    void updateItem( const afsql::DBItem * item, int attr = -1);
 
 /// Push queries to queue back.
-   inline bool pushQueries( Queries * queries) { if( working ) return push( queries); else return false;}
+   inline bool pushQueries( Queries * queries) { if( m_working ) return push( queries); else return false;}
 
 protected:
 
@@ -40,13 +37,13 @@ protected:
    /// Queries execution function
    virtual bool writeItem(   AfQueueItem* item);
 
-   QSqlDatabase * db;
+   PGconn * m_conn;
 
 private:
    void sendAlarm();
    void sendConnected();
 
 private:
-   MonitorContainer * monitors;
-   bool working;
+   MonitorContainer * m_monitors;
+   bool m_working;
 };

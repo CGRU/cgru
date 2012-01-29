@@ -3,11 +3,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <QtCore/QCoreApplication>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/dlThread.h"
-#include "../libafsql/qdbconnection.h"
+#include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
@@ -48,8 +46,6 @@ void sig_pipe(int signum)
 //######################################## main #########################################
 int main(int argc, char *argv[])
 {
-   QCoreApplication app( argc, argv);
-
    running = true;
    af::Environment ENV( af::Environment::NoFlags, argc, argv);
    if( af::init( af::InitFarm) == false) return 1;

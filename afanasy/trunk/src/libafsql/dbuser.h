@@ -16,8 +16,8 @@ public:
    static const std::string dbGetIDsCmd();
 
    inline const std::string & dbGetTableName()  const { return TableName;}
-   static void getIds(  std::list<int32_t> & uids, QSqlDatabase * db);
-   bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
+   static void getIds(  std::list<int32_t> & uids, PGconn * i_conn);
+   bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
 protected:
    inline const std::string & dbGetKeysString() const { return Keys;     }

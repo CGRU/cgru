@@ -1,9 +1,8 @@
 #include "dbactionqueue.h"
 
-#include <QtCore/QVariant>
-#include <QtSql/QSqlQuery>
-
 #include "../include/afanasy.h"
+
+#include "../libafanasy/environment.h"
 
 #include "../libafsql/dbjob.h"
 #include "../libafsql/dbrender.h"
@@ -18,27 +17,29 @@ extern bool running;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-DBActionQueue::DBActionQueue( const std::string & QueueName, MonitorContainer * monitorcontainer):
-   AfQueue( QueueName),
-   monitors( monitorcontainer)
+DBActionQueue::DBActionQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer):
+   AfQueue( i_name),
+   m_monitors( i_monitorcontainer)
 {
-   db = afsql::newDatabase( QueueName.c_str());
-   working = db->open();
-   if( false == working )
-   {
-      printf("Database connection \"%s\" is not working.\n", name.c_str());
-   }
-   else
-   {
-      connectionEstablished();
-   }
+    m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
+    if( PQstatus( m_conn) != CONNECTION_OK)
+    {
+        printf("Database connection \"%s\" is not working.\n", name.c_str());
+        m_working = false;
+    }
+    else
+    {
+        connectionEstablished();
+        m_working = true;
+    }
 }
 
 DBActionQueue::~DBActionQueue()
 {
-   db->close();
-   delete db;
-   QSqlDatabase::removeDatabase( name.c_str());
+    if( m_conn )
+    {
+        PQfinish( m_conn);
+    }
 }
 
 void DBActionQueue::connectionEstablished()
@@ -49,49 +50,60 @@ void DBActionQueue::connectionEstablished()
 void DBActionQueue::processItem( AfQueueItem* item)
 {
 //printf("DBActionQueue::processItem: %s:\n", name.c_str());
-   if( false == working )
-   {
-      delete item;
-      return;
-   }
-   if( false == db->isOpen())
-   {
-      for(;;)
-      {
-         if( false == running )
-         {
-            delete item;
-            return;
-         }
-         if( db )
-         {
-            afsql::setDatabase( db);
-            db->open();
-            if( db->isOpen())
+    if( false == m_working )
+    {
+        delete item;
+        return;
+    }
+    if( PQstatus( m_conn) != CONNECTION_OK)
+    {
+        if( m_conn != NULL )
+        {
+            PQfinish( m_conn);
+            m_conn = NULL;
+        }
+        for(;;)
+        {
+            if( false == running )
             {
-               connectionEstablished();
-               sendConnected();
-               break;
+                delete item;
+                return;
             }
-         }
-         sendAlarm();
-         sleep( AFDATABASE::RECONNECTAFTER);
-      }
-   }
+            m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
+            if( PQstatus( m_conn) == CONNECTION_OK)
+            {
+                connectionEstablished();
+                sendConnected();
+                break;
+            }
+            if( m_conn != NULL )
+            {
+                PQfinish( m_conn);
+                m_conn = NULL;
+            }
+            sendAlarm();
+            sleep( AFDATABASE::RECONNECTAFTER);
+        }
+    }
 
-   // Writing an item and check if error:
-   if( false == writeItem( item))
-   {
-      // Check if database has just closed:
-      if( false == db->isOpen())
-      {
-         // Push item back to queue front to try it to write again next time:
-         push( item, true );
-         AFINFA("%s: Item pushed back to queue front.", name.c_str())
-         return;
-      }
-   }
-   delete item;
+    // Writing an item and check if error:
+    if( false == writeItem( item))
+    {
+        // Check if database has just closed:
+        if( PQstatus( m_conn) != CONNECTION_OK)
+        {
+            if( m_conn != NULL )
+            {
+                PQfinish( m_conn);
+                m_conn = NULL;
+            }
+            // Push item back to queue front to try it to write again next time:
+            push( item, true );
+            AFINFA("%s: Item pushed back to queue front.", name.c_str())
+            return;
+        }
+    }
+    delete item;
 }
 
 bool DBActionQueue::writeItem( AfQueueItem* item)
@@ -102,15 +114,7 @@ bool DBActionQueue::writeItem( AfQueueItem* item)
    int size = queries->size();
    if( size < 1) return true;
 
-   QSqlQuery query( *db);
-   for( std::list<std::string>::const_iterator it = queries->begin(); it != queries->end(); it++)
-   {
-      if( false == db->isOpen()) return false;
-      AFINFA("DBActionQueue::writeItem: %s: Executing query:\n%s", name.c_str(), (*it).c_str())
-      query.exec( afsql::stoq(*it));
-      if( afsql::qChkErr( query, name)) return false;
-   }
-   return true;
+   return afsql::execute( m_conn, queries);
 }
 
 void DBActionQueue::addItem( const afsql::DBItem * item)
@@ -138,14 +142,14 @@ void DBActionQueue::sendAlarm()
 {
    std::string str("ALARM! Server database connection error. Contact your system administrator.");
    AFCommon::QueueLog( name + ":\n" + str);
-   AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
-   monitors->sendMessage( str);
+   AfContainerLock mLock( m_monitors, AfContainerLock::WRITELOCK);
+   m_monitors->sendMessage( str);
 }
 
 void DBActionQueue::sendConnected()
 {
    std::string str("AFANASY: Server database connection established.");
    AFCommon::QueueLog( name + ":\n" + str);
-   AfContainerLock mLock( monitors, AfContainerLock::WRITELOCK);
-   monitors->sendMessage( str);
+   AfContainerLock mLock( m_monitors, AfContainerLock::WRITELOCK);
+   m_monitors->sendMessage( str);
 }

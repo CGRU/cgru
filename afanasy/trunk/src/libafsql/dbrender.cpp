@@ -2,8 +2,6 @@
 
 #include "dbattr.h"
 
-#include <QtCore/QVariant>
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -63,10 +61,10 @@ void DBRender::dbUpdate( std::list<std::string> * queries, int attr) const
    updateNetIFs();
    DBItem::dbUpdate( queries, attr);
 }
-bool DBRender::dbSelect( QSqlDatabase * db, const std::string * where)
+bool DBRender::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
 //printf("DBRender::dbSelect:\n");
-   if( DBItem::dbSelect( db, where) == false) return false;
+   if( DBItem::dbSelect( i_conn, i_where) == false) return false;
 
 // This render came from database on core init, it can't be online or busy
    setOffline();

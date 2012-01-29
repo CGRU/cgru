@@ -1,12 +1,5 @@
 #include "dbitem.h"
 
-#include <QtCore/QStringList>
-#include <QtCore/QVariant>
-
-#include <QtSql/QSqlDatabase>
-#include <QtSql/QSqlError>
-#include <QtSql/QSqlQuery>
-
 #include "dbattr.h"
 
 #define AFOUTPUT
@@ -100,42 +93,69 @@ void DBItem::dbUpdate( std::list<std::string> * queries, int attr) const
    queries->push_back( str);
 }
 
-bool DBItem::dbSelect( QSqlDatabase * db, const std::string * where)
+bool DBItem::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
-   QSqlQuery q( *db);
-   std::string str = "SELECT";
-   for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
-   {
-      if( i != dbGetKeysNum()) str += ",";
-      str += " " + dbAttributes[i]->getName();
-   }
-   str += " FROM " + dbGetTableName() + "\n WHERE ";
-   if( where )
-      str += *where;
-   else
-   {
-      str += dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();
-      for( int i = 1; i < dbGetKeysNum(); i++)
-         str += " AND " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
-   }
-   str += ";";
-   q.exec( afsql::stoq( str));
-   AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s", q.size(), str.c_str())
-   if( q.size() != 1)
-   {
-      AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s", q.size(), str.c_str())
-      return false;
-   }
-   q.next();
-   int a = 0;
-   for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++, a++)
-   {
-      if( dbAttributes[i]->getType() <= DBAttr::_NUMERIC_END_)
-         dbAttributes[i]->set( q.value(a).toLongLong());
-      else
-         dbAttributes[i]->set( afsql::qtos( q.value(a).toString()));
-   }
-   return true;
+    std::string query = "SELECT";
+    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++)
+    {
+        if( i != dbGetKeysNum())
+        {
+            query += ",";
+        }
+        query += " " + dbAttributes[i]->getName();
+    }
+    query += " FROM " + dbGetTableName() + "\n WHERE ";
+    if( i_where )
+    {
+        query += *i_where;
+    }
+    else
+    {
+        query += dbAttributes[0]->getName() + "=" + dbAttributes[0]->getString();
+        for( int i = 1; i < dbGetKeysNum(); i++)
+            query += " AND " + dbAttributes[i]->getName() + "=" + dbAttributes[i]->getString();
+    }
+    query += ";";
+    PGresult * res = PQexec( i_conn, query.c_str());
+    if( PQresultStatus(res) != PGRES_TUPLES_OK)
+    {
+        AFERRAR("SQL Selecting node faild:%s\n%s", query.c_str(), PQerrorMessage( i_conn));
+        return false;
+    }
+
+    int num_rows = PQntuples( res);
+    AFINFA("DBItem::dbSelect: Returned query size=%d:\n%s", num_rows, query.c_str())
+
+    if( num_rows != 1)
+    {
+        AFERRAR("DBItem::dbSelect: Not one (%d) item returned on query:\n%s", num_rows, query.c_str())
+        return false;
+    }
+
+    int columns_size = PQnfields( res);
+
+    if( columns_size != int( dbAttributes.size() - dbGetKeysNum()))
+    {
+        AFERRAR("DBItem::dbSelect: Invalid number of columns ( %d != %d ) returned on query:\n%s",
+                columns_size, int( dbAttributes.size() - dbGetKeysNum()), query.c_str())
+        return false;
+    }
+
+    int a = 0;
+    for( int i = dbGetKeysNum(); i < dbAttributes.size(); i++, a++)
+    {
+        const char * value = PQgetvalue( res, 0, a);
+        if( dbAttributes[i]->getType() <= DBAttr::_NUMERIC_END_)
+        {
+            dbAttributes[i]->set( af::stoi( value));
+        }
+        else
+        {
+            dbAttributes[i]->set( value);
+        }
+    }
+
+    return true;
 }
 
 void DBItem::dbUpdateTable( std::list<std::string> * queries, const std::list<std::string> & columns) const
