@@ -100,7 +100,6 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdSrvCapacity);
    addCmd( new CmdSrvHosts);
 
-   addCmd( new CmdDBDrivers);
    addCmd( new CmdDBCheck);
    addCmd( new CmdDBResetUsers);
    addCmd( new CmdDBResetRenders);

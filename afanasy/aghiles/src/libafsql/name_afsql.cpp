@@ -1,7 +1,5 @@
 #include "name_afsql.h"
 
-#include <QtSql/qsqlerror.h>
-
 #include <stdio.h>
 
 #include "../libafanasy/environment.h"
@@ -12,13 +10,13 @@
 
 #include "dbattr.h"
 #include "dbblockdata.h"
+#include "dbconnection.h"
 #include "dbjob.h"
 #include "dbrender.h"
 #include "dbstatistics.h"
 #include "dbtaskdata.h"
 #include "dbtaskprogress.h"
 #include "dbuser.h"
-#include "qdbconnection.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -29,45 +27,29 @@ void afsql::init()
    DBAttr::init();
 }
 
-bool afsql::qChkErr( const QSqlQuery & q, const std::string & str)
+bool afsql::execute( PGconn * i_conn, const std::list<std::string> * i_queries)
 {
-   if( q.lastError().isValid())
-   {
-      AFERRAR("%s: Query check:", str.c_str())
-      std::cout << afsql::qtos( q.lastError().databaseText()) << std::endl;
-      return true;
-   }
-   return false;
-}
+    if( i_queries->size() < 1 )
+    {
+        AFERROR("No queries to execute.\n");
+        return false;
+    }
 
-const std::string afsql::qtos( const QString & str ){ return std::string( str.toUtf8().data()); }
-const QString afsql::stoq( const std::string & str ){ return QString::fromUtf8(str.c_str());    }
-
-QSqlDatabase * afsql::newDatabase( const std::string & connection_name)
-{
-#ifdef AFOUTPUT
-printf("Trying to create new DB connection to \"%s\" as \"%s\"\n", af::Environment::get_DB_Type().c_str(), connection_name.c_str());
-#endif
-   QSqlDatabase * db = new QSqlDatabase( QSqlDatabase::addDatabase( afsql::stoq( af::Environment::get_DB_Type()),
-                                                                    afsql::stoq( connection_name)));
-   setDatabase( db);
-   return db;
-}
-
-void afsql::setDatabase( QSqlDatabase * db)
-{
-#ifdef AFOUTPUT
-printf("Trying to setup DB connection \"%s\"\n", afsql::qtos( db->connectionName()).c_str());
-printf(" host=\"%s\"",        af::Environment::get_DB_HostName().c_str());
-printf(", database=\"%s\"",   af::Environment::get_DB_DataBaseName().c_str());
-printf(", user=\"%s\"",       af::Environment::get_DB_UserName().c_str());
-printf(", passwd=\"%s\"",     af::Environment::get_DB_Password().c_str());
-printf("\n");
-#endif
-   db->setHostName(      afsql::stoq( af::Environment::get_DB_HostName()      ));
-   db->setDatabaseName(  afsql::stoq( af::Environment::get_DB_DataBaseName()  ));
-   db->setUserName(      afsql::stoq( af::Environment::get_DB_UserName()      ));
-   db->setPassword(      afsql::stoq( af::Environment::get_DB_Password()      ));
+    bool o_result = true;
+    for( std::list<std::string>::const_iterator it = i_queries->begin(); it != i_queries->end(); it++)
+    {
+        #ifdef AFOUTPUT
+        printf("%s\n", (*it).c_str());
+        #endif
+        PGresult * res = PQexec( i_conn, (*it).c_str());
+        if( PQresultStatus(res) != PGRES_COMMAND_OK)
+        {
+            AFERRAR("SQL command execution faled:\n%s\n%s", (*it).c_str(), PQerrorMessage( i_conn));
+            o_result = false;
+        }
+        PQclear( res);
+    }
+    return o_result;
 }
 
 void afsql::ResetUsers( DBConnection * dbconnenction)
@@ -170,32 +152,32 @@ void afsql::UpdateTables( DBConnection * dbconnenction, bool showOnly )
    std::list<std::string> queries;
 
    DBTaskData taskdata;
-   columns = dbconnenction->getTableColumnsNames( taskdata.dbGetTableName());
+   columns = dbconnenction->getTableColumns( taskdata.dbGetTableName());
    taskdata.dbUpdateTable( &queries, columns);
 
    DBTaskProgress taskprogress;
-   columns = dbconnenction->getTableColumnsNames( taskprogress.dbGetTableName());
+   columns = dbconnenction->getTableColumns( taskprogress.dbGetTableName());
    taskprogress.dbUpdateTable( &queries, columns);
 
    DBBlockData blockdata;
-   columns = dbconnenction->getTableColumnsNames( blockdata.dbGetTableName());
+   columns = dbconnenction->getTableColumns( blockdata.dbGetTableName());
    blockdata.dbUpdateTable( &queries, columns);
 
    DBJob job;
-   columns = dbconnenction->getTableColumnsNames( job.dbGetTableName());
+   columns = dbconnenction->getTableColumns( job.dbGetTableName());
    job.dbUpdateTable( &queries, columns);
 
    DBUser user;
-   columns = dbconnenction->getTableColumnsNames( user.dbGetTableName());
+   columns = dbconnenction->getTableColumns( user.dbGetTableName());
    user.dbUpdateTable( &queries, columns);
 
    DBRender render;
-   columns = dbconnenction->getTableColumnsNames( render.dbGetTableName());
+   columns = dbconnenction->getTableColumns( render.dbGetTableName());
    render.dbUpdateTable( &queries, columns);
 
    DBStatistics statistics;
-   columns = dbconnenction->getTableColumnsNames( statistics.dbGetTableName());
+   columns = dbconnenction->getTableColumns( statistics.dbGetTableName());
    statistics.dbUpdateTable( &queries, columns);
 
-   if( false == showOnly ) dbconnenction->execute( &queries);
+   if(( queries.size()) && ( false == showOnly )) dbconnenction->execute( &queries);
 }

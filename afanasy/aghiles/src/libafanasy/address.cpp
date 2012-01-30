@@ -21,13 +21,15 @@
 
 using namespace af;
 
+std::list<AddressMask> Address::ms_addr_masks;
+
 Address::Address( int Port):
       port( Port),
       family( Empty)
 {
    // There is no need to find out local host address.
    // Server will look at connected client address to register.
-   memset( addr, 0, AddrDataLength);
+   memset( addr, 0, ms_addrdatalength);
 }
 
 Address::Address( const Address & other)
@@ -50,12 +52,12 @@ void Address::copy( const Address & other)
 {
    port = other.port;
    family = other.family;
-   memcpy( &addr, &other.addr, AddrDataLength);
+   memcpy( &addr, &other.addr, ms_addrdatalength);
 }
 
 Address::Address( const struct sockaddr_storage & ss)
 {
-   memset( addr, 0, AddrDataLength);
+   memset( addr, 0, ms_addrdatalength);
    switch( ss.ss_family)
    {
    case AF_INET:
@@ -113,7 +115,7 @@ bool Address::equal( const af::Address & other ) const
 
    if(( family == other.family) && ( port == other.port ))
    {
-      if( memcmp( &addr, &(other.addr), AddrDataLength) == 0)
+      if( memcmp( &addr, &(other.addr), ms_addrdatalength) == 0)
       return true;
    }
    return false;
@@ -159,7 +161,7 @@ void Address::readwrite( Msg * msg)
 {
    rw_int8_t(   family, msg);
    rw_uint16_t( port,   msg);
-   rw_data(     addr,   msg, AddrDataLength);
+   rw_data(     addr,   msg, ms_addrdatalength);
 }
 
 Address::~Address()
@@ -170,7 +172,7 @@ void Address::clear()
 {
    port = 0,
    family = Empty;
-   memset( addr, 0, AddrDataLength);
+   memset( addr, 0, ms_addrdatalength);
 }
 
 #ifndef WINNT
@@ -209,7 +211,7 @@ bool Address::setSocketAddress( struct sockaddr_storage & ss) const
 void Address::setIP( const af::Address & other)
 {
    family = other.family;
-   memcpy( &addr, &other.addr, AddrDataLength);
+   memcpy( &addr, &other.addr, ms_addrdatalength);
 }
 
 void Address::generateIPStream( std::ostringstream & stream, bool full) const
@@ -300,4 +302,166 @@ int Address::calcWeight() const
 {
    int weight = sizeof( Address);
    return weight;
+}
+
+bool Address::readIpMask( const std::string & i_serveripmask)
+{
+    printf("Server IP Mask = '%s'\n", i_serveripmask.c_str());
+    std::list<std::string> masks = strSplit( i_serveripmask, " ");
+    for( std::list<std::string>::const_iterator it = masks.begin(); it != masks.end(); it++)
+    {
+        int mask_len = 0;
+        char mask_bytes[ms_addrdatalength];
+        Address::Family mask_family = Address::Empty;
+
+        if(((*it).find('.') != std::string::npos) && ((*it).find(':') != std::string::npos))
+        {
+            AFERRAR("Invalid Server IP Mask: '%s' - and '.' and ':' characters preset.", (*it).c_str());
+            return false;
+        }
+        if((*it).find('.') != std::string::npos )
+        {
+            // IPv4
+            mask_family = Address::IPv4;
+
+            std::list<std::string> byte_strs = strSplit( *it, ".");
+            if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 4 ))
+            {
+                AFERRAR("Invalid Server IPv4 Mask: '%s' - should be 2 - 4 entries separated with '.'", (*it).c_str());
+                return false;
+            }
+
+            for( std::list<std::string>::const_iterator bit = byte_strs.begin(); bit != byte_strs.end(); bit++)
+            {
+                if( *bit == "*")
+                {
+                    break;
+                }
+                bool ok;
+                unsigned byte = af::stoi( *bit, &ok);
+                if( false == ok )
+                {
+                    AFERRAR("Invalid Server IP Mask: '%s': Invalid decimal number '%s'.", (*it).c_str(), (*bit).c_str());
+                    return false;
+                }
+                if( byte > 0xff )
+                {
+                    AFERRAR("Invalid Server IP Mask: '%s': Too big decimal number '%s'.", (*it).c_str(), (*bit).c_str());
+                    return false;
+                }
+                mask_bytes[mask_len] = byte;
+                mask_len++;
+            }
+        }
+        else if((*it).find(':') != std::string::npos )
+        {
+            // IPv6
+            mask_family = Address::IPv6;
+
+            std::list<std::string> byte_strs = strSplit( *it, ":");
+            if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 8 ))
+            {
+                AFERRAR("Invalid Server IPv6 Mask: '%s' - should be 2 - 8 entries separated with ':'", (*it).c_str());
+                return false;
+            }
+
+            for( std::list<std::string>::const_iterator bit = byte_strs.begin(); bit != byte_strs.end(); bit++)
+            {
+                if( *bit == "*")
+                {
+                    break;
+                }
+
+                unsigned byte;
+                sscanf( (*bit).c_str(), "%x", &byte);
+                uint8_t hi = byte >> 8;
+                uint8_t lo = byte - (int(hi) << 8);
+                mask_bytes[mask_len++] = hi;
+                mask_bytes[mask_len++] = lo;
+            }
+        }
+        else
+        {
+            AFERRAR("Invalid Server IP Mask: '%s' - no '.' or ':' characters preset.", (*it).c_str());
+            return false;
+        }
+
+        ms_addr_masks.push_back( AddressMask( mask_len, mask_bytes, mask_family));
+    }
+    return true;
+}
+
+bool Address::matchIpMask() const
+{
+    if( ms_addr_masks.size() == 0)
+    {
+        // No masks exists - any address allowed
+        return true;
+    }
+
+    for( std::list<AddressMask>::const_iterator it = ms_addr_masks.begin(); it != ms_addr_masks.end(); it++)
+    {
+        if( family != it->m_family)
+        {
+            // Skip if family not equal
+            continue;
+        }
+
+        if( it->m_len == 0 )
+        {
+            // Mask has no length - any address match
+            return true;
+        }
+
+        if( memcmp( addr, it->m_bytes, it->m_len ) == 0 )
+        {
+            // Return that mask is matched
+            return true;
+        }
+    }
+
+    // Return that mask is NOT matched
+    return false;
+}
+
+AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_family):
+    m_len( i_len),
+    m_family( i_family)
+{
+    if( m_len > 0 )
+    {
+        memcpy( m_bytes, i_bytes, i_len);
+    }
+
+    printf("Server Mask");
+
+    switch( m_family )
+    {
+    case Address::IPv4:
+    {
+        printf(" IPv4: ");
+        if( m_len == 0 ) printf("any");
+        for( int i = 0; i < m_len; i++)
+        {
+            if(i) printf(".");
+            uint8_t byte = m_bytes[i];
+            printf("%u", byte);
+        }
+        break;
+    }
+    case Address::IPv6:
+    {
+        printf(" IPv6: ");
+        if( m_len == 0 ) printf("any");
+        for( int i = 0; i < m_len; i++)
+        {
+            if(( i > 0 ) && ( i%2 == 0 )) printf(":");
+            uint8_t byte = m_bytes[i];
+            printf("%02x", byte);
+        }
+        break;
+    }
+    }
+
+    printf("\n");
 }

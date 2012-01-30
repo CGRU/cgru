@@ -6,7 +6,7 @@
 
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
-#include "../libafsql/qdbconnection.h"
+#include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
 #include "msgaf.h"
@@ -163,7 +163,10 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
       {
          if( afDB->DBOpen())
          {
-            afDB->addJob( job);
+            if( false == afDB->addJob( job))
+            {
+                AFERRAR("Failed to add job to database: name = '%s', id = %d", job->getName().c_str(), job->getId())
+            }
             afDB->DBClose();
          }
       }

@@ -15,8 +15,8 @@ public:
    virtual ~DBBlockData();
 
    inline const std::string & dbGetTableName()  const { return TableName;}
-   void dbAdd( QSqlDatabase * db) const;
-   virtual bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
+   bool dbAdd( PGconn * i_conn) const;
+   virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
 protected:
    inline const std::string & dbGetKeysString() const { return Keys;     }

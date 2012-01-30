@@ -492,6 +492,65 @@ const std::string af::itos( long long integer)
    return stream.str();
 }
 
+const std::string af::strStrip( const std::string & i_str, const std::string & i_characters)
+{
+    std::string o_str = strStripLeft( i_str, i_characters);
+    o_str = strStripRight( o_str, i_characters);
+    return o_str;
+}
+
+const std::string af::strStripLeft( const std::string & i_str, const std::string & i_characters)
+{
+    std::string o_str = strStrip( i_str, af::Left, i_characters);
+    return o_str;
+}
+
+const std::string af::strStripRight( const std::string & i_str, const std::string & i_characters)
+{
+    std::string o_str = strStrip( i_str, af::Right, i_characters);
+    return o_str;
+}
+
+const std::string af::strStrip( const std::string & i_str, Direction i_dir, const std::string & i_characters)
+{
+    std::string o_str( i_str);
+    if( o_str.size() < 1 )
+        return o_str;
+    std::string::iterator it;
+    if( i_dir == af::Left )
+        it = o_str.begin();
+    else
+        it = o_str.end();
+    for( ;; )
+    {
+        if(( i_dir == af::Left  ) && ( it == o_str.end()   ))
+        {
+            break;
+        }
+        if( i_dir == af::Right )
+        {
+            if( it == o_str.begin() )
+                break;
+            it--;
+        }
+        bool erased = false;
+        for( std::string::const_iterator cit = i_characters.begin(); cit != i_characters.end(); cit++)
+        {
+            if( *it == *cit )
+            {
+                it = o_str.erase( it);
+                erased = true;
+                break;
+            }
+        }
+        if( false == erased )
+        {
+            break;
+        }
+    }
+    return o_str;
+}
+
 const std::string af::strJoin( const std::list<std::string> & strlist, const std::string & separator)
 {
    std::string str;
@@ -566,7 +625,9 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
       return NULL;
    }
    else
-      fd = open( filename.c_str(), O_RDONLY);
+   {
+      fd = ::open( filename.c_str(), O_RDONLY);
+   }
 
    if( fd == -1 )
    {
@@ -589,7 +650,7 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
    readsize = 0;
    while( maxsize > 0 )
    {
-      int bytes = read( fd, buffer+readsize, maxsize);
+      int bytes = ::read( fd, buffer+readsize, maxsize);
       if( bytes == -1 )
       {
          std::string err = std::string("Reading file failed:\n") + filename + "\n" + strerror( errno);
@@ -601,6 +662,7 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
       maxsize -= bytes;
       readsize += bytes;
    }
+   ::close( fd);
    buffer[readsize] = '\0';
    return buffer;
 }

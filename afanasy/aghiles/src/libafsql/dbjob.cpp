@@ -70,22 +70,49 @@ const std::string DBJob::dbGetIDsCmd()
    return std::string("SELECT id FROM ") + TableName + " ORDER BY userlistorder";
 }
 
-void DBJob::dbAdd( QSqlDatabase * db) const
+bool DBJob::dbAdd( PGconn * i_conn) const
 {
-   std::list<std::string> queries;
-   dbInsert( &queries);
-   QSqlQuery q( *db);
-   for( std::list<std::string>::const_iterator it = queries.begin(); it != queries.end(); it++) q.exec( afsql::stoq(*it));
+    AFINFA("DBJob::dbAdd: name = '%s', id = %d", name.c_str(), id);
 
-   for( int b = 0; b < blocksnum; b++) ((DBBlockData*)(blocksdata[b]))->dbAdd( db);
+    std::list<std::string> queries;
+    dbInsert( &queries);
+    if( false == execute( i_conn, &queries))
+    {
+        AFERROR("Adding job to database failed.\n")
+        return false;
+    }
 
-   progress->dbAdd( db);
+    bool o_result = true;
+
+    for( int b = 0; b < blocksnum; b++)
+    {
+        if( false == ((DBBlockData*)(blocksdata[b]))->dbAdd( i_conn))
+        {
+            o_result = false;
+            break;
+        }
+    }
+
+    if( o_result )
+    {
+        o_result = progress->dbAdd( i_conn);
+    }
+
+    if( false == o_result )
+    {
+        std::list<std::string> queries;
+        dbDeleteNoStatistics( &queries);
+        execute( i_conn, &queries);
+    }
+
+    return o_result;
 }
 
-bool DBJob::dbSelect( QSqlDatabase * db, const std::string * where)
+bool DBJob::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
-//printf("DBJob::dbSelect:\n");
-   if( DBItem::dbSelect( db) == false) return false;
+    AFINFA("DBJob::dbSelect: id = %d", id);
+
+   if( DBItem::dbSelect( i_conn) == false) return false;
    if( blocksnum == 0)
    {
       AFERROR("DBJob::dbSelect: blocksnum == 0")
@@ -96,7 +123,7 @@ bool DBJob::dbSelect( QSqlDatabase * db, const std::string * where)
    for( int b = 0; b < blocksnum; b++)
    {
       DBBlockData * dbBlock = new DBBlockData( b, id);
-      if( dbBlock->dbSelect( db) == false)
+      if( dbBlock->dbSelect( i_conn) == false)
       {
          delete dbBlock;
          return false;
@@ -109,7 +136,7 @@ bool DBJob::dbSelect( QSqlDatabase * db, const std::string * where)
       AFERROR("DBJob::dbSelect: can't allocate memory for tasks progress.")
       return false;
    }
-   if( progress->dbSelect( db) == false) return false;
+   if( progress->dbSelect( i_conn) == false) return false;
 
    return true;
 }

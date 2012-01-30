@@ -1,8 +1,4 @@
-//#include <Python.h>
-
 #include <stdio.h>
-
-#include <QtCore/QCoreApplication>
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
@@ -26,7 +22,6 @@ int ServerPort;
 
 int main( int argc, char** argv )
 {
-   QCoreApplication app( argc, argv);
    if ( argc == 1)
    {
       printf("afcmd = '%s'\n", argv[0]);
@@ -52,8 +47,6 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
 //
 // initialize environment variables
 
-//   Py_InitializeEx(0);
-//   uint32_t envflags = af::Environment::AppendPythonPath;
    uint32_t envflags = 0;
 
    if( argc == 1) envflags = envflags | af::Environment::Verbose;
@@ -103,15 +96,8 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    else return_value = 1;
 
    af::destroy();
-//   Py_Finalize();
 
-//   if( argc == 1)
-//   {
-//      printf("\n");
-//      printf("CGRU Version = \"%s\"\n", af::Environment::getVersionCGRU().c_str());
-//      printf("Afanasy Revision = \"%d\"\n", af::Environment::getVersionAfanasy());
-//      printf("\n");
-//      printf("Type \"afcmd h\" for help.\n");
-//   }
+   AFINFA("afcmd main: return value = %d\n", return_value)
+
    return return_value;
 }

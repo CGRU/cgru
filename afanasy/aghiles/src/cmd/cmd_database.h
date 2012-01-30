@@ -4,11 +4,6 @@
 
 #include "cmd.h"
 
-class CmdDBDrivers : public Cmd { public:
-   CmdDBDrivers();
-   ~CmdDBDrivers();
-   bool processArguments( int argc, char** argv, af::Msg &msg);
-};
 class CmdDBCheck : public Cmd { public:
    CmdDBCheck();
    ~CmdDBCheck();

@@ -95,34 +95,39 @@ af::TaskData * DBBlockData::createTask( af::Msg * msg)
    return new DBTaskData( msg);
 }
 
-void DBBlockData::dbAdd( QSqlDatabase * db) const
+bool DBBlockData::dbAdd( PGconn * i_conn) const
 {
 AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", blocknum, tasksnum)
    std::list<std::string> queries;
    dbInsert( &queries);
-   QSqlQuery q( *db);
-//   for( int i = 0; i < queries.size(); i++)
-   for( std::list<std::string>::const_iterator it = queries.begin(); it != queries.end(); it++)
-   {
-#ifdef AFOUTPUT
-printf("%s\n", (*it).c_str());
-#endif
-      q.exec( afsql::stoq(*it));
-   }
-   if( isNumeric()) return;
 
-   q.prepare( afsql::stoq(DBTaskData::dbPrepareInsert));
+   if( false == execute( i_conn, &queries))
+   {
+       AFERROR("Failed to add job block to database.\n");
+       return false;
+   }
+
+   if( isNumeric())
+   {
+       return true;
+   }
+
+   DBTaskData::dbPrepareInsert( i_conn);
    for( int t = 0; t < tasksnum; t++)
    {
-      ((DBTaskData*)(tasksdata[t]))->dbBindInsert( &q, jobid, blocknum, t);
-      q.exec();
-      if( qChkErr(q, "DBBlockData::dbAdd:")) break;
+      if( false == ((DBTaskData*)(tasksdata[t]))->dbPrepareInsertExec( jobid, blocknum, t, i_conn))
+      {
+          AFERROR("Failed to add task data to database.\n")
+          return false;
+      }
    }
+
+   return true;
 }
 
-bool DBBlockData::dbSelect( QSqlDatabase * db, const std::string * where)
+bool DBBlockData::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
-   if( DBItem::dbSelect( db) == false) return false;
+   if( DBItem::dbSelect( i_conn) == false) return false;
    if( isNumeric() || (tasksnum == 0)) return true;
 
    tasksdata = new af::TaskData*[tasksnum];
@@ -131,7 +136,7 @@ bool DBBlockData::dbSelect( QSqlDatabase * db, const std::string * where)
    {
       DBTaskData * dbtaskdata = new DBTaskData;
       std::string where = DBTaskData::dbWhereSelect( jobid, blocknum, t);
-      if( dbtaskdata->dbSelect( db, &where) == false)
+      if( dbtaskdata->dbSelect( i_conn, &where) == false)
       {
          delete dbtaskdata;
          return false;

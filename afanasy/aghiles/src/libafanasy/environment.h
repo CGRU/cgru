@@ -146,8 +146,6 @@ public:
    static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
    static inline const std::string & getRenderResClasses()    { return render_resclasses;      }
 
-#ifndef WINNT
-
    static inline int getUserLogsRotate()    { return   user_logs_rotate; }
    static inline int getRenderLogsRotate()  { return render_logs_rotate; }
 
@@ -156,19 +154,13 @@ public:
    static inline const std::string & getRendersLogsDir()      { return renderslogsdir; } ///< Get renders logs directory.
    static inline const std::string & getUsersLogsDir()        { return userslogsdir;   } ///< Get users logs directory.
 
-   static inline const std::string & get_DB_Type()            { return db_type;         } ///< Get database type.
-   static inline const std::string & get_DB_HostName()        { return db_hostname;     } ///< Get database host name.
-   static inline const std::string & get_DB_DataBaseName()    { return db_databasename; } ///< Get database name.
-   static inline const std::string & get_DB_UserName()        { return db_username;     } ///< Get database user name.
-   static inline const std::string & get_DB_Password()        { return db_password;     } ///< Get database user password.
+   static inline const std::string & get_DB_ConnInfo()        { return db_conninfo;     } ///< Get database connection information.
    static inline const std::string & get_DB_StringQuotes()    { return db_stringquotes; } ///< Get database string quotes.
    static inline int                 get_DB_StringNameLen()   { return db_stringnamelen;} ///< Get database string name length.
    static inline int                 get_DB_StringExprLen()   { return db_stringexprlen;} ///< Get database string expression length.
 
    static inline int getServer_SO_RCVTIMEO_SEC()  { return server_so_rcvtimeo_sec; }
    static inline int getServer_SO_SNDTIMEO_SEC()  { return server_so_sndtimeo_sec; }
-
-#endif
 
 private:
 
@@ -197,10 +189,10 @@ private:
    static std::string version_gcc;     ///< GCC version
    static std::string version_date;    ///< Version date
 
-/// Afanasy server computer name
-/** Try to get \c AF_SERVER_NAME environment variable at first.
-*** If there is no \c AF_SERVER_NAME variable from \c definitions.h used.**/
+/// Afanasy server name
    static std::string servername;
+
+   static std::string serveripmask;
 
 /// User name
 /** Try to get \c USERNAME or \c USER environment variable at first.
@@ -290,8 +282,6 @@ private:
    static int talk_waitforreadyread;
    static int talk_waitforbyteswritten;
 
-#ifndef WINNT
-
    /// Temp directory
    static int   user_logs_rotate;
    static int render_logs_rotate;
@@ -301,19 +291,13 @@ private:
    static std::string renderslogsdir;
    static std::string userslogsdir;
 
-   static std::string db_type;           ///< Afanasy database QT SQL driver type
-   static std::string db_hostname;       ///< Database hostname
-   static std::string db_databasename;   ///< Database name
-   static std::string db_username;       ///< Database user, with modification rights
-   static std::string db_password;       ///< User password
+   static std::string db_conninfo;       ///< Database connection info
    static std::string db_stringquotes;   ///< Database string quotes
    static int         db_stringnamelen;  ///< Database string name length
    static int         db_stringexprlen;  ///< Database string expression length
 
    static int  server_so_rcvtimeo_sec;
    static int  server_so_sndtimeo_sec;
-
-#endif
 
    static Passwd * passwd;
    static bool visor_mode;     ///< user is VISOR

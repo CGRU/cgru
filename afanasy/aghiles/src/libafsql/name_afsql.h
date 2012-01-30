@@ -1,6 +1,6 @@
 #pragma once
 
-#include <QtSql/QSqlQuery>
+#include <libpq-fe.h>
 
 #include "../libafanasy/name_af.h"
 
@@ -8,16 +8,6 @@ namespace afsql
 {
 /// Init environment variables.
    void init();
-
-/** Check whether QSqlQuery is valid, output error if invalid and return true.
-*** If QSqlQuery is correct function will return false and do nothing. **/
-   bool qChkErr( const QSqlQuery & q, const std::string & str = std::string("DB Query:"));
-
-   const std::string qtos( const QString & str );
-   const QString stoq( const std::string & str );
-
-   QSqlDatabase * newDatabase( const std::string & connection_name);
-   void setDatabase( QSqlDatabase * db);
 
    class DBAttr;
    class DBAttrUInt8;
@@ -33,6 +23,10 @@ namespace afsql
    class DBTaskData;
    class DBUser;
    class DBRender;
+
+
+    bool connect( PGconn * i_conn);
+    bool execute( PGconn * i_conn, const std::list<std::string> * i_queries);
 
 /// Database comlex procedures interface.
    class DBConnection;

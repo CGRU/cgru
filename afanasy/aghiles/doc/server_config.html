@@ -45,7 +45,8 @@
 <h3>General Configuration:</h3>
 <p>
 Afanasy configuration stored in XML files. It reads them on launch.
-</p><p>
+</p>
+<p>
 Default configuration:<br/>
 <kbd>cgru/afanasy/config_default.xml</kbd><br/>
 Configuration overrides:<br/>
@@ -67,8 +68,10 @@ Generate keys using <code>afcmd passwd</code> command for your own passwords and
 <h4><a id="ConfGeneral">General</a>:</h4>
 <ul>
 <li><p>
-<code>timeformat</code> = ddd dMMM hh:mm.ss<br/>
-Time format for afanasy logs. See <a href="http://doc.trolltech.com/qdatetime.html#toString">QDateTime::toString</a> for time format documentation.
+<code>timeformat</code> = %a %d %b %H:%M.%S<br/>
+Time format for afanasy logs.
+See C library <a href="http://www.cplusplus.com/reference/clibrary/ctime/strftime">strftime</a>
+function for time format documentation.
 </p></li>
 <li><p>
 <code>filenamesizemax</code> = 250<br/>
@@ -98,6 +101,13 @@ Default hosts mask number for users and jobs. Empty means that users and jobs ca
 <li><p>
 <code>servername</code> = localhost<br/>
 Command for render to execute another render or to restart.
+</p></li>
+<li><p>
+<code>serveripmask</code> = *.* 127.0.0.1 192.168.* *:* 0:0:0:0:0:0:0:1 FC00:* FD00:*<br/>
+Acceptable connections IP addresses mask.
+Connections form addresses not matching this masks will be ignored by server.
+Mask should have at least one '.' for IPv4 or one ':' for IPv6.
+There are some useful examples in the default value.
 </p></li>
 <li><p>
 <code>serverport</code> = 51000<br/>

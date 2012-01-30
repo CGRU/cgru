@@ -13,8 +13,6 @@ switch($sort)
 {
 case "name": break;
 case "user": $sort = 'username'; break;
-case "creation": $sort = 'time_creation'; break;
-case "started": $sort = 'time_started'; break;
 case "done": $sort = 'time_done'; break;
 case "duration": break;
 case "state": break;
@@ -52,9 +50,9 @@ if( $uid > 0 )
 else $uidstr = '';
 
 $query = '
-SELECT name,username,state,time_creation,time_started,time_done,time_wait,maxrunningtasks,hostsmask,id,
+SELECT name,username,state,time_creation,time_started,time_done,time_wait,id,
 sum(time_done-time_started) AS duration FROM jobs'.$uidstr.' GROUP BY
- jobs.name,jobs.username,jobs.state,jobs.time_creation,jobs.time_started,jobs.time_done,jobs.time_wait,jobs.maxrunningtasks,jobs.hostsmask,jobs.id
+ jobs.name,jobs.username,jobs.state,jobs.time_creation,jobs.time_started,jobs.time_done,jobs.time_wait,jobs.id
 '.$sort.';';
 
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
@@ -78,13 +76,13 @@ if( $uid < 1)
    echo "</td>\n";
 }
 
-echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&uid=$uid&sort=created&order=".(1-$order)."'>Time Created</a></b>";
-echo "</td>\n";
+//echo "\t\t<td>";
+//echo "<b><a href='index.php?action=$action&uid=$uid&sort=created&order=".(1-$order)."'>Time Created</a></b>";
+//echo "</td>\n";
 
-echo "\t\t<td>";
-echo "<b><a href='index.php?action=$action&uid=$uid&sort=started&order=".(1-$order)."'>Time Started</a></b>";
-echo "</td>\n";
+//echo "\t\t<td>";
+//echo "<b><a href='index.php?action=$action&uid=$uid&sort=started&order=".(1-$order)."'>Time Started</a></b>";
+//echo "</td>\n";
 
 echo "\t\t<td>";
 echo "<b><a href='index.php?action=$action&uid=$uid&sort=done&order=".(1-$order)."'>Time Done</a></b>";
@@ -95,20 +93,12 @@ echo "<b><a href='index.php?action=$action&uid=$uid&sort=duration&order=".(1-$or
 echo "</td>\n";
 
 echo "\t\t<td>";
-echo 'Max';
-echo "</td>\n";
-
-echo "\t\t<td>";
-echo 'Mask';
-echo "</td>\n";
-
-echo "\t\t<td>";
 echo "<b><a href='index.php?action=$action&uid=$uid&sort=state&order=".(1-$order)."'>State</a></b>";
 echo "</td>\n";
 
-echo "\t\t<td>";
-echo 'Wait';
-echo "</td>\n";
+//echo "\t\t<td>";
+//echo 'Wait';
+//echo "</td>\n";
 
 echo "\t\t<td>";
 echo 'id';
@@ -127,6 +117,8 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    $state = $line["state"];
    $state_str = stateToStr( $state);
    $style = stateToStyle( $state);
+   $time_started = $line["time_started"];
+   $time_done = $line["time_done"];
    if( $style != '') $style = ' class="state_'.$style.'"';
 
    $markOn  = '';
@@ -162,47 +154,38 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
       echo "$markOff</td>\n";
    }
 
-   echo "\t\t<td align=center>$markOn";
-   echo date( $timeformat, $line["time_creation"]);
-   echo "$markOff</td>\n";
+//   echo "\t\t<td align=center>$markOn";
+//   echo date( $timeformat, $line["time_creation"]);
+//   echo "$markOff</td>\n";
+
+//   echo "\t\t<td align=center>$markOn";
+//   if( $time_started )
+//      echo date( $timeformat, $time_started);
+//   else
+//      echo 'not started';
+//   echo "$markOff</td>\n";
 
    echo "\t\t<td align=center>$markOn";
-   $time_started = $line["time_started"];
-   if( $time_started )
-      echo date( $timeformat, $time_started);
-   else
-      echo 'not started';
-   echo "$markOff</td>\n";
-
-   echo "\t\t<td align=center>$markOn";
-   $time_done = $line["time_done"];
    if( stateIsDone($state) )
       echo date( $timeformat, $time_done);
    else if( $time_started) echo 'running';
-   else echo '-';
+   else echo 'not started';
+//   echo '<br/>'.date( $timeformat, $time_started);
    echo "$markOff</td>\n";
 
    echo "\t\t<td align=center>$markOn";
    if( stateIsDone($state)) echo time_strHMS($line["duration"]);
-   else if( $time_started ) echo time_strHMS( time() - $line["time_started"]);
+   else if( $time_started ) echo time_strHMS( time() - $time_started);
    else echo '-';
-   echo "$markOff</td>\n";
-
-   echo "\t\t<td>$markOn";
-   if( $line["maxhosts"] != -1) echo $line["maxhosts"];
-   echo "$markOff</td>\n";
-
-   echo "\t\t<td>$markOn";
-   echo $line["hostsmask"];
    echo "$markOff</td>\n";
 
    echo "\t\t<td>$markOn";
    echo $state_str;
    echo "$markOff</td>\n";
 
-   echo "\t\t<td>$markOn";
-   if( stateIsWaittime($state)) echo time_strHMS( $line["time_wait"] - time());
-   echo "$markOff</td>\n";
+//   echo "\t\t<td>$markOn";
+//   if( stateIsWaittime($state)) echo time_strHMS( $line["time_wait"] - time());
+//   echo "$markOff</td>\n";
 
    echo "\t\t<td>$markOn";
    echo $line["id"];

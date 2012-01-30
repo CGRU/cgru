@@ -84,31 +84,25 @@ int     Environment::talk_waitforreadyread =           AFTALK::WAITFORREADYREAD;
 int     Environment::talk_waitforbyteswritten =        AFTALK::WAITFORBYTESWRITTEN;
 int     Environment::talk_zombietime =                 AFTALK::ZOMBIETIME;
 
-#ifndef WINNT
-
-int Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
-int Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
 int Environment::render_logs_rotate =              AFRENDER::LOGS_ROTATE;
 int Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
 int Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
 int Environment::user_logs_rotate =                AFUSER::LOGS_ROTATE;
 
-std::string Environment::db_type =                         AFDATABASE::DRIVER;
-std::string Environment::db_hostname =                     AFDATABASE::HOSTNAME;
-std::string Environment::db_databasename =                 AFDATABASE::DATABASENAME;
-std::string Environment::db_username =                     AFDATABASE::USERNAME;
-std::string Environment::db_password =                     AFDATABASE::PASSWORD;
+std::string Environment::db_conninfo =                     AFDATABASE::CONNINFO;
 std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
+int Environment::db_stringnamelen =                AFDATABASE::STRINGNAMELEN;
+int Environment::db_stringexprlen =                AFDATABASE::STRINGEXPRLEN;
+
 std::string Environment::tempdirectory =               AFSERVER::TEMP_DIRECTORY;
 std::string Environment::renderslogsdir;
 std::string Environment::tasksstdoutdir;
 std::string Environment::userslogsdir;
 
-#endif
-
 std::string Environment::render_resclasses;
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
+std::string Environment::serveripmask =                 AFADDR::SERVER_IPMASK;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
@@ -148,29 +142,22 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
    getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
 
    getVar( pnode, servername,                        "servername"                        );
+   getVar( pnode, serveripmask,                      "serveripmask"                      );
    getVar( pnode, serverport,                        "serverport"                        );
    getVar( pnode, clientport,                        "clientport"                        );
-
-#ifndef WINNT
 
    getVar( pnode, user_logs_rotate,                  "user_logs_rotate"                  );
    getVar( pnode, render_logs_rotate,                "render_logs_rotate"                );
 
    getVar( pnode, tempdirectory,                     "tempdirectory"                     );
 
-   getVar( pnode, db_type,                           "db_type"                           );
-   getVar( pnode, db_hostname,                       "db_hostname"                       );
-   getVar( pnode, db_databasename,                   "db_databasename"                   );
-   getVar( pnode, db_username,                       "db_username"                       );
-   getVar( pnode, db_password,                       "db_password"                       );
+   getVar( pnode, db_conninfo,                       "db_conninfo"                       );
    getVar( pnode, db_stringquotes,                   "db_stringquotes"                   );
    getVar( pnode, db_stringnamelen,                  "db_stringnamelen"                  );
    getVar( pnode, db_stringexprlen,                  "db_stringexprlen"                  );
 
    getVar( pnode, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
    getVar( pnode, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
-
-#endif
 
    getVar( pnode, task_default_capacity,             "task_default_capacity"             );
    getVar( pnode, task_update_timeout,               "task_update_timeout"               );
@@ -245,7 +232,7 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::string & valu
    char * data = node->value();
    if( data )
    {
-      value = data;
+      value = strStrip( data);
       PRINT("\t%s = '%s'\n", name, value.c_str());
       return true;
    }
@@ -264,7 +251,6 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, int & value, const
          return false;
       }
       value = number;
-      PRINT("\t%s = %d\n", name, value);
       return true;
    }
    return false;
@@ -565,16 +551,21 @@ bool Environment::init()
    if( hostname.size() == 0 ) hostname = computername;
    std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
    std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
-   PRINT("Local computer name = '%s', adress = ", computername.c_str());
+   PRINT("Local computer name = '%s'\n", computername.c_str());
 
-#ifndef WINNT
    tasksstdoutdir = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
    userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
-#endif
 
-//
-//############ VISOR and GOD passwords:
+   //
+   //############ Server Accept IP Addresses Mask:
+   if( false == Address::readIpMask( serveripmask))
+   {
+       return false;
+   }
+
+   //
+   //############ VISOR and GOD passwords:
    if( passwd != NULL) delete passwd;
    passwd = new Passwd( pswd_visor, pswd_god);
 

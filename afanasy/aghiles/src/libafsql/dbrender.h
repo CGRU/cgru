@@ -17,11 +17,11 @@ public:
    static const std::string dbGetIDsCmd();
 
    inline const std::string & dbGetTableName()  const { return TableName;}
-   static void getIds(  std::list<int32_t> & uids, QSqlDatabase * db);
+   static void getIds(  std::list<int32_t> & uids, PGconn * i_conn);
 
    virtual void dbInsert( std::list<std::string> * queries) const;
    virtual void dbUpdate( std::list<std::string> * queries, int attr = -1) const;
-   virtual bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
+   virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
 protected:
    inline const std::string & dbGetKeysString() const { return Keys;     }

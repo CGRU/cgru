@@ -2,8 +2,6 @@
 
 #include "name_afsql.h"
 
-class QSqlDatabase;
-
 namespace afsql
 {
 class DBItem
@@ -20,7 +18,7 @@ public:
    virtual void dbInsert( std::list<std::string> * queries) const;
    virtual void dbDelete( std::list<std::string> * queries) const;
    virtual void dbUpdate( std::list<std::string> * queries, int attr = -1) const;
-   virtual bool dbSelect( QSqlDatabase * db, const std::string * where = NULL);
+   virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
    void dbUpdateTable( std::list<std::string> * queries, const std::list<std::string> & columns) const;
 

@@ -1,7 +1,5 @@
 #include "dbjobprogress.h"
 
-#include <QtCore/qvariant.h>
-
 #include "../libafanasy/job.h"
 
 #include "dbtaskprogress.h"
@@ -30,33 +28,37 @@ AFINFO("DBJobProgress::newTaskProgress:")
    return new DBTaskProgress;
 }
 
-void DBJobProgress::dbAdd( QSqlDatabase * db) const
+bool DBJobProgress::dbAdd( PGconn * i_conn) const
 {
-AFINFO("DBJobProgress::dbAdd:")
-   QSqlQuery q( *db);
-   q.prepare( afsql::stoq( DBTaskProgress::dbPrepareInsert));
+    AFINFO("DBJobProgress::dbAdd:")
 
-   int id_job = getJobId();
-   for( int b = 0; b < blocksnum; b++)
-   {
-      int id_block(b);
-      for( int t = 0; t < tasksnum[b]; t++)
-      {
-         DBTaskProgress::dbBindInsert( &q, id_job, id_block, t);
-         q.exec();
-         if( qChkErr(q, "DBJobProgress::dbAdd:")) break;
-      }
-   }
+    DBTaskProgress::dbPrepareInsert( i_conn);
+
+    int id_job = getJobId();
+    for( int b = 0; b < blocksnum; b++)
+    {
+        int id_block(b);
+        for( int t = 0; t < tasksnum[b]; t++)
+        {
+            if( false == DBTaskProgress::dbPrepareInsertExec( id_job, id_block, t, i_conn))
+            {
+                AFERROR("Failed to add task progress in database.\n");
+                return false;
+            }
+        }
+    }
+
+    return true;
 }
 
-bool DBJobProgress::dbSelect( QSqlDatabase * db)
+bool DBJobProgress::dbSelect( PGconn * i_conn)
 {
    for( int b = 0; b < blocksnum; b++)
    {
       for( int t = 0; t < tasksnum[b]; t++)
       {
          std::string where = DBTaskProgress::dbWhereSelect( getJobId(), b, t);
-         if( ((DBTaskProgress*)(tp[b][t]))->dbSelect( db, &where) == false) return false;
+         if( ((DBTaskProgress*)(tp[b][t]))->dbSelect( i_conn, &where) == false) return false;
       }
    }
    return true;

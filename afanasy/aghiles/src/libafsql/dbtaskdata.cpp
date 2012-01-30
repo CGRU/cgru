@@ -14,11 +14,14 @@ using namespace afsql;
 const std::string DBTaskData::TableName("tasks");
 const std::string DBTaskData::IDs("id_job int, id_block int, id_task int");
 const std::string DBTaskData::Keys("FOREIGN KEY (id_job, id_block) REFERENCES blocks (id_job, id_block) ON DELETE CASCADE, PRIMARY KEY (id_job, id_block, id_task)");
-
+/*
 const std::string DBTaskData::dbPrepareInsert
 ("INSERT INTO tasks (id_job,id_block,id_task,name,command,files,dependmask,customdata)\
  VALUES(:id_job,:id_block,:id_task,:name,:command,:files,:dependmask,:customdata);\
 ");
+*/
+const char DBTaskData::ms_db_prepare_name[] = "tasks_data_insert";
+
 
 DBTaskData::DBTaskData():
    af::TaskData()
@@ -49,21 +52,53 @@ AFINFO("DBTaskData::~DBTaskData")
 
 const std::string DBTaskData::dbWhereSelect( int id_job, int id_block, int id_task)
 {
-//   return QString("id_job=%1 AND id_block=%2 AND id_task=%3").arg(id_job).arg(id_block).arg(id_task);
    return std::string("id_job=") + af::itos(id_job) + " AND id_block=" + af::itos(id_block) + " AND id_task=" + af::itos(id_task);
 }
 
-void DBTaskData::dbBindInsert( QSqlQuery *query, int id_job, int id_block, int id_task) const
+bool DBTaskData::dbPrepareInsert( PGconn * i_conn)
 {
-   query->bindValue(":id_job",      QVariant(id_job   ));
-   query->bindValue(":id_block",    QVariant(id_block ));
-   query->bindValue(":id_task",     QVariant(id_task  ));
+    PGresult * res = PQprepare( i_conn, ms_db_prepare_name,
+    "INSERT INTO tasks"
+    " (id_job,id_block,id_task,name,command,files,dependmask,customdata)"
+    " VALUES($1,$2,$3,$4,$5,$6,$7,$8);",
+    8, NULL);
+    bool o_result = true;
+    if( PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        AFERRAR("SQL Preparing tasks data insertion failed: %s", PQerrorMessage( i_conn));
+        o_result = false;
+    }
+    PQclear( res);
+    return o_result;
+}
 
-   query->bindValue(":name",        afsql::stoq( name       ));
-   query->bindValue(":command",     afsql::stoq( command    ));
-   query->bindValue(":files",       afsql::stoq( files      ));
-   query->bindValue(":dependmask",  afsql::stoq( dependmask ));
-   query->bindValue(":customdata",  afsql::stoq( customdata ));
+bool DBTaskData::dbPrepareInsertExec( int id_job, int id_block, int id_task, PGconn * i_conn) const
+{
+    std::string id_job_str(   af::itos( id_job    ));
+    std::string id_block_str( af::itos( id_block  ));
+    std::string id_task_str(  af::itos( id_task   ));
+
+    const char * data_pointers[8];
+    data_pointers[0] = id_job_str.c_str();
+    data_pointers[1] = id_block_str.c_str();
+    data_pointers[2] = id_task_str.c_str();
+    data_pointers[3] = name.c_str();
+    data_pointers[4] = command.c_str();
+    data_pointers[5] = files.c_str();
+    data_pointers[6] = dependmask.c_str();
+    data_pointers[7] = customdata.c_str();
+
+    PGresult * res = PQexecPrepared( i_conn, ms_db_prepare_name,
+                                     8, data_pointers,
+                                     NULL, NULL, 0);
+    bool o_result = true;
+    if( PQresultStatus(res) != PGRES_COMMAND_OK)
+    {
+        AFERRAR("SQL Executing prepared tasks data insertion failed: %s", PQerrorMessage( i_conn));
+        o_result = false;
+    }
+    PQclear( res);
+    return o_result;
 }
 
 void DBTaskData::readwrite( af::Msg * msg)
