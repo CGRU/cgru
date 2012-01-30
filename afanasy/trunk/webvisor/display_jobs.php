@@ -117,6 +117,8 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    $state = $line["state"];
    $state_str = stateToStr( $state);
    $style = stateToStyle( $state);
+   $time_started = $line["time_started"];
+   $time_done = $line["time_done"];
    if( $style != '') $style = ' class="state_'.$style.'"';
 
    $markOn  = '';
@@ -157,7 +159,6 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 //   echo "$markOff</td>\n";
 
 //   echo "\t\t<td align=center>$markOn";
-//   $time_started = $line["time_started"];
 //   if( $time_started )
 //      echo date( $timeformat, $time_started);
 //   else
@@ -165,16 +166,16 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 //   echo "$markOff</td>\n";
 
    echo "\t\t<td align=center>$markOn";
-   $time_done = $line["time_done"];
    if( stateIsDone($state) )
       echo date( $timeformat, $time_done);
    else if( $time_started) echo 'running';
    else echo 'not started';
+//   echo '<br/>'.date( $timeformat, $time_started);
    echo "$markOff</td>\n";
 
    echo "\t\t<td align=center>$markOn";
    if( stateIsDone($state)) echo time_strHMS($line["duration"]);
-   else if( $time_started ) echo time_strHMS( time() - $line["time_started"]);
+   else if( $time_started ) echo time_strHMS( time() - $time_started);
    else echo '-';
    echo "$markOff</td>\n";
 
