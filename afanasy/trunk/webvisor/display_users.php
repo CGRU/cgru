@@ -18,12 +18,12 @@ default: $order = 'jobsnum';
 $dbconn = db_connect();
 
 $query="
-SELECT   users.name,users.priority,users.maxrunningtasks,users.hostsmask,
+SELECT   users.name,users.priority,
          sum(CASE WHEN jobs.id>0 THEN 1 ELSE 0 END) AS jobsnum,
          sum(CASE WHEN jobs.time_done=0 THEN 1 ELSE 0 END) AS jobsrunning,
          users.id
       FROM users LEFT JOIN jobs ON jobs.username=users.name
-      GROUP BY users.name,users.id,users.priority,users.maxrunningtasks,users.hostsmask
+      GROUP BY users.name,users.id,users.priority
       ORDER BY $order DESC;";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
@@ -49,14 +49,6 @@ echo "</td>\n";
 
 echo "\t\t<td>";
 echo "<b><a href='index.php?action=$action&order=jobsrunning'>Running Jobs</a></b>";
-echo "</td>\n";
-
-echo "\t\t<td>";
-echo "Max";
-echo "</td>\n";
-
-echo "\t\t<td>";
-echo "Mask";
 echo "</td>\n";
 
 echo "\t\t<td>";
@@ -105,14 +97,6 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 
    echo "\t\t<td align=center>$boldOn";
    echo $line["jobsrunning"];
-   echo "$boldOff</td>\n";
-
-   echo "\t\t<td align=center>$boldOn";
-   if( $line["maxhosts"] != -1) echo $line["maxhosts"];
-   echo "$boldOff</td>\n";
-
-   echo "\t\t<td align=center>$boldOn";
-   echo $line["hostsmask"];
    echo "$boldOff</td>\n";
 
    echo "\t\t<td>$boldOn";
