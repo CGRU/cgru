@@ -9,6 +9,8 @@ struct sockaddr_storage;
 namespace af
 {
 
+struct AddressMask;
+
 class Address : public Af
 {
 public:
@@ -74,12 +76,27 @@ public:
 /// Read or write address in buffer.
    void readwrite( Msg * msg);
 
+   static bool readIpMask( const std::string & i_serveripmask);
+
+   bool matchIpMask() const;
+
+   static const int ms_addrdatalength = 16;
+
 private:
 
-   static const int AddrDataLength = 16;
+   static std::list<AddressMask> ms_addr_masks;
 
    int8_t   family;                  ///< Address family.
    uint16_t port;                    ///< Address port.
-   char     addr[AddrDataLength];    ///< Address IP.
+   char     addr[ms_addrdatalength];    ///< Address IP.
+};
+
+struct AddressMask
+{
+    AddressMask( int i_len, const char * i_bytes, Address::Family i_family);
+
+    Address::Family m_family;
+    int  m_len;
+    char m_bytes[Address::ms_addrdatalength];    ///< IP Mask.
 };
 }

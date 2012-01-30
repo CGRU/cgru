@@ -28,7 +28,7 @@
 
 void processMessage( ThreadArgs * i_args);
 
-MsgAf * readMessage( ThreadArgs * i_args);
+bool readMessage( ThreadArgs * i_args, MsgAf * i_msg);
 
 MsgAf * threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg);
 
@@ -51,21 +51,37 @@ void threadProcessMsg( void * i_args)
 
 void processMessage( ThreadArgs * i_args)
 {
-   // Read message from socket
-   MsgAf * msg_request = readMessage( i_args);
+    // Construct a new message to read.
+    // Using a constructor that stores client address in message,
+    // this client address will be used for a new client,
+    // if it is a new client registration request.
+    MsgAf * msg_request = new MsgAf( i_args->ss);
 
-   if( msg_request == NULL )
-   {
-      // There was some error reading message
-      return;
-   }
+    // Check message IP mask:
+    if( false == msg_request->getAddress().matchIpMask())
+    {
+        // IP address does not match mask, no other operation allowed
+        AFCommon::QueueLogError( std::string("Not allowed incoming message IP address: "
+                                             + msg_request->getAddress().generateInfoString()));
+        delete msg_request;
+        return;
+    }
+
+    // Read message data from socket
+    if( false == readMessage( i_args, msg_request))
+    {
+        // There was some error reading message
+        delete msg_request;
+        return;
+    }
 
 #ifdef AFOUTPUT
 printf("Request: ");msg_request->stdOut();
 #endif
 
-   // React on message, may be with response to the same opened socket
+   // React on message, may be with response to the same opened socket.
    MsgAf * msg_response = threadProcessMsgCase( i_args, msg_request);
+   // If request not needed any more it will be deleted there.
 
    if( msg_response == NULL)
    {
@@ -83,10 +99,8 @@ printf("Response: ");msg_response->stdOut();
    delete msg_response;
 }
 
-MsgAf * readMessage( ThreadArgs * i_args)
+bool readMessage( ThreadArgs * i_args, MsgAf * io_msg)
 {
-   assert( i_args->sd > 0 );
-
    AFINFO("ThreadReadMsg::msgProcess: trying to recieve message...")
 
    // set max allowed time to block recieveing data from client socket
@@ -98,25 +112,20 @@ MsgAf * readMessage( ThreadArgs * i_args)
    {
       AFERRPE("setsockopt failed in threadProcessMsg");
       af::printAddress( &(i_args->ss));
-      return NULL;
+      return false;
    }
 
    // Reading message from client socket.
-   // (using a constructor that stores client address in message,
-   // this client address will be used for a new client,
-   // if it is a new client registration request)
-   MsgAf * o_msg_request = new MsgAf( i_args->ss);
-   if( false == com::msgread( i_args->sd, o_msg_request))
+   if( false == com::msgread( i_args->sd, io_msg))
    {
       AFERROR("ThreadReadMsg::msgProcess: reading message failed.")
       af::printAddress( &(i_args->ss));
-      delete o_msg_request;
-      return NULL;
+      return false;
    }
 
    AFINFO("ThreadReadMsg::msgProcess: message recieved.")
 
-   return o_msg_request;
+   return true;
 }
 
 void writeMessage( ThreadArgs * i_args, MsgAf * i_msg)

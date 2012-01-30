@@ -83,7 +83,7 @@ You can upgrade only one client to check changes, the is no need to update all c
 
 <br/>
 
-<p><a id="release155"><b>1.5.5</b></a> 2012.01.19 <i>(rev2100 af2038)</i></p>
+<p><a id="release155"><b>1.5.5</b></a> 2012.01.30 <i>(rev2126 af2126)</i></p>
 <p>
 Movie Maker allow user to specify container to encode movie to (mov, avi, ...), through GUI dialog or command line argument.
 </p>
@@ -97,10 +97,25 @@ Nuke submit and render scripts can handle write node file expressions.
 Python Class Block - added following functions: setErrorsAvoidHost, setErrorsForgiveTime, setErrorsRetries, setErrorsTaskSameHost.
 </p>
 <p>
+Server has acceptable <a href="../afanasy/doc/server_config.html#ConfClientServer">IP Addresses Mask</a>.
+Connections form addresses not matching specified masks will be ignored by server.
+</p>
+<p>
+User can set jobs solving method to parallel.
+</p>
+<p>
+Afanasy now supports only PostgreSQL database engine.
+QtSql library replaced with native PostgreSQL libpq in libafsql module.
+So there is no Qt in afserver in afcmd applications.
+(Later Qt was removed from libafanasy).
+</p>
+<p>
+</p>
+<p>
 Bugs Fixed:
 </p>
 <p>
-Afanasy Starter error message in console fixed, sending a job and with Python 2.x (Fedora Linux raises warning in a system tray in this case).<br/>
+Afanasy Starter error message in console fixed, sending a job and with Python 2.x (Fedora Linux raises a warning in system tray in this case).<br/>
 Paths map works in lower case mode on windows and only in client -> server direction (So you can use paths with uppercase letters with UNIX clients and MS Windows).<br/>
 </p>
 

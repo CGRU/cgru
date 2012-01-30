@@ -84,12 +84,22 @@ namespace af
       VerboseOn
    };
 
+   enum Direction
+   {
+      Left,
+      Right
+   };
+
    void outError( const char * errMsg, const char * baseMsg = NULL);
 
    const long long stoi( const std::string & str, bool * ok = NULL);
    const std::string itos( long long integer);
    const std::string getenv( const char * name);
    const std::string state2str( int state);
+   const std::string strStrip( const std::string & i_str, const std::string & i_characters = " \n");
+   const std::string strStripLeft( const std::string & i_str, const std::string & i_characters = " \n");
+   const std::string strStripRight( const std::string & i_str, const std::string & i_characters = " \n");
+   const std::string strStrip( const std::string & i_str, Direction i_dir, const std::string & i_characters = " \n");
    const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
    const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
    const std::string strReplace( const std::string & str, char before, char after);

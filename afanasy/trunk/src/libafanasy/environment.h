@@ -189,10 +189,10 @@ private:
    static std::string version_gcc;     ///< GCC version
    static std::string version_date;    ///< Version date
 
-/// Afanasy server computer name
-/** Try to get \c AF_SERVER_NAME environment variable at first.
-*** If there is no \c AF_SERVER_NAME variable from \c definitions.h used.**/
+/// Afanasy server name
    static std::string servername;
+
+   static std::string serveripmask;
 
 /// User name
 /** Try to get \c USERNAME or \c USER environment variable at first.

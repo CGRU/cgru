@@ -102,6 +102,7 @@ std::string Environment::userslogsdir;
 std::string Environment::render_resclasses;
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
+std::string Environment::serveripmask =                 AFADDR::SERVER_IPMASK;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
@@ -141,6 +142,7 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
    getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
 
    getVar( pnode, servername,                        "servername"                        );
+   getVar( pnode, serveripmask,                      "serveripmask"                      );
    getVar( pnode, serverport,                        "serverport"                        );
    getVar( pnode, clientport,                        "clientport"                        );
 
@@ -230,7 +232,7 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::string & valu
    char * data = node->value();
    if( data )
    {
-      value = data;
+      value = strStrip( data);
       PRINT("\t%s = '%s'\n", name, value.c_str());
       return true;
    }
@@ -249,7 +251,6 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, int & value, const
          return false;
       }
       value = number;
-      PRINT("\t%s = %d\n", name, value);
       return true;
    }
    return false;
@@ -550,14 +551,21 @@ bool Environment::init()
    if( hostname.size() == 0 ) hostname = computername;
    std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
    std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
-   PRINT("Local computer name = '%s', adress = ", computername.c_str());
+   PRINT("Local computer name = '%s'\n", computername.c_str());
 
    tasksstdoutdir = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
    userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
 
-//
-//############ VISOR and GOD passwords:
+   //
+   //############ Server Accept IP Addresses Mask:
+   if( false == Address::readIpMask( serveripmask))
+   {
+       return false;
+   }
+
+   //
+   //############ VISOR and GOD passwords:
    if( passwd != NULL) delete passwd;
    passwd = new Passwd( pswd_visor, pswd_god);
 
