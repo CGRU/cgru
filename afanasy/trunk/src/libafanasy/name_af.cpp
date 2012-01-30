@@ -566,7 +566,9 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
       return NULL;
    }
    else
-      fd = open( filename.c_str(), O_RDONLY);
+   {
+      fd = ::open( filename.c_str(), O_RDONLY);
+   }
 
    if( fd == -1 )
    {
@@ -589,7 +591,7 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
    readsize = 0;
    while( maxsize > 0 )
    {
-      int bytes = read( fd, buffer+readsize, maxsize);
+      int bytes = ::read( fd, buffer+readsize, maxsize);
       if( bytes == -1 )
       {
          std::string err = std::string("Reading file failed:\n") + filename + "\n" + strerror( errno);
@@ -601,6 +603,7 @@ char * af::fileRead( const std::string & filename, int & readsize, int maxfilesi
       maxsize -= bytes;
       readsize += bytes;
    }
+   ::close( fd);
    buffer[readsize] = '\0';
    return buffer;
 }
