@@ -53,10 +53,10 @@ class Block(pyaf.Block):
       self.setParser( parser)
       self.setWorkingDirectory( os.getenv('PWD', os.getcwd()) )
       self.setCapacity( int( self.env.Vars['task_default_capacity'] ) )
-      self.setErrorsRetries( int( self.env.Vars['task_error_retries'] ) )
-      self.setErrorsAvoidHost( int( self.env.Vars['errors_avoid_host'] ) )
-      self.setErrorsTaskSameHost( int( self.env.Vars['task_errors_same_host'] ) )
-      self.setErrorsForgiveTime( int( self.env.Vars['errors_forgivetime'] ) )
+#      self.setErrorsRetries( int( self.env.Vars['task_error_retries'] ) )
+#      self.setErrorsAvoidHost( int( self.env.Vars['errors_avoid_host'] ) )
+#      self.setErrorsTaskSameHost( int( self.env.Vars['task_errors_same_host'] ) )
+#      self.setErrorsForgiveTime( int( self.env.Vars['errors_forgivetime'] ) )
       self.tasks = []
 
    def setParser( self, parser, nocheck = False):
