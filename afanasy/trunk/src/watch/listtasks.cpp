@@ -2,6 +2,7 @@
 
 #include <QtCore/QDir>
 #include <QtCore/QEvent>
+#include <QtCore/QProcess>
 #include <QtCore/QTimer>
 #include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
@@ -629,21 +630,33 @@ void ListTasks::actBlockBrowseFiles()
         return;
 
     af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", afqt::qtos( itemBlock->files));
+    QString wdir = afqt::stoq( service.getWDir());
     QString image = afqt::stoq( service.getFiles()).split(';')[0];
     QString folder = image.left( image.lastIndexOf('/'));
-    folder = image.left( image.lastIndexOf('\\'));
+    folder = folder.left( image.lastIndexOf('\\'));
     if( folder == image )
-        folder = itemBlock->workingdir;
+        folder = wdir;
+    
+    QDir dir( wdir);
+    if( dir.exists())
+        dir.cd( folder);
+    else
+        dir.setPath( folder);
 
-    QString cmd;
+    if( false == dir.exists())
+    {
+        Watch::displayError( QString("Folder '%1' does not exist.").arg( dir.path()));
+        return;
+    }
+
 #ifdef WINNT
-    cmd = "cmd.exe";
-	QStringList args;
-	args << "/c" << "start" << "\"Open\"" << folder;
-    Watch::startProcess( cmd, args, itemBlock->workingdir);
+    Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
+    QStringList args;
+    args << "/c" << "start" << "Open Images Folder" << dir.path();
+    QProcess::startDetached( "cmd.exe", args);
 #else
-    cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
-    Watch::startProcess( cmd + " \"" + folder + "\"", itemBlock->workingdir);
+    QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
+    Watch::startProcess( cmd + " \"" + folder + "\"", wdir);
 #endif
 }
 
