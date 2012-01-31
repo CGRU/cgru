@@ -53,6 +53,7 @@ path/scene.shk       -   (R) Scene, which file extension determinate run command
 -images              -   images to preview (img.%04d.jpg)\n\
 -image               -   image to preview (img.0000.jpg)\n\
 -exec                -   customuze command executable.\n\
+-extrargs            -   add to command extra arguments.\n\
 -varirender attr start step count - variate parameter\n\
 -simulate            -   enable simulation\n\
 (R)                  -   REQUIRED arguments\n\
@@ -107,6 +108,7 @@ dependglobal   = ''
 output         = ''
 images         = ''
 image          = ''
+extrargs       = ''
 blocktype      = ''
 platform       = ''
 varirender     = False
@@ -173,6 +175,12 @@ for i in range( argsl):
       i += 1
       if i == argsl: break
       node = argsv[i]
+      continue
+
+   if arg == '-extrargs':
+      i += 1
+      if i == argsl: break
+      extrargs = argsv[i]
       continue
 
    if arg == '-take':
@@ -331,7 +339,7 @@ blockname = node
 if ext == 'shk':
    scenetype = 'shake'
    if cmd is None: cmd = 'shake' + cmdextension
-   cmd += ' -exec ' + scene + ' -vv -t @#@-@#@'
+   cmd += ' -exec ' + scene + ' ' + extrargs + ' -vv -t @#@-@#@'
 
 # Blender:
 if ext == 'blend':
@@ -355,6 +363,7 @@ elif ext == 'nk':
    if capmin != -1 or capmax != -1: cmd += ' -m ' + services.service.str_capacity
    if node != '': cmd += ' -X %s' % node
    cmd += ' -x "%s"' % scene
+   if extrargs != '': cmd += ' ' + extrargs
 
 # Houdini:
 elif ext == 'hip':
@@ -366,6 +375,7 @@ elif ext == 'hip':
    if ignoreinputs: cmd += ' -i'
    cmd += ' -s @#@ -e @#@ --by %d' % by
    if take != '': cmd += ' -t "%s"' % take
+   if extrargs != '': cmd += ' ' + extrargs
    cmd += ' "%s" "%s"' % (scene,node)
 
 # Mantra:
@@ -373,6 +383,7 @@ elif ext == 'ifd':
    scenetype = 'mantra'
    if cmd is None: cmd = 'mantra' + cmdextension
    if capmin != -1 or capmax != -1: cmd += ' -j '+ services.service.str_capacity
+   if extrargs != '': cmd += ' ' + extrargs
    cmd += ' -V a -f "%s"' % scene
 
 # Maya:
@@ -397,6 +408,7 @@ elif ext == 'mb':
       images = output
    cmd += ' -proj "%s"' % pwd
    cmd += ' "-mr:art"'
+   if extrargs != '': cmd += ' ' + extrargs
    cmd += ' "%s"' % scene
 
 # XSI:
@@ -412,6 +424,7 @@ elif ext == 'scn':
    cmd += ' -scene "%s"' % scene
    cmd += ' -start @#@ -end @#@ -step ' + str(by)
    cmd += ' -simulate'
+   if extrargs != '': cmd += ' ' + extrargs
    if simulate:   cmd += ' 1'
    else:          cmd += ' 0'
    if take != '': cmd += ' -renderPass ' + take
@@ -438,6 +451,7 @@ elif ext == 'max':
    if output != '':
       cmd += ' -o:"%s"' % output
       images = output
+   if extrargs != '': cmd += ' ' + extrargs
 
 # After FX:
 elif ext == 'aep':
@@ -452,11 +466,13 @@ elif ext == 'aep':
       output = os.path.join( os.getcwd(), output)
       cmd += ' -output "%s"' % output
       images = os.path.join( os.path.dirname( output), os.path.basename( output).replace('[','@').replace(']','@'))
+   if extrargs != '': cmd += ' ' + extrargs
 
 # simple generic:
 else:
    scenetype = 'generic'
    if cmd is None: cmd = scene
+   if extrargs != '': cmd += ' ' + extrargs
    cmd += ' @#@ @#@'
 
 #

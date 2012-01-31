@@ -49,7 +49,8 @@ public:
 
    bool tasksHidded;
 
-   inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget) { info.generateMenu( id_block, menu, qwidget);}
+   inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL)
+        { info.generateMenu( id_block, menu, qwidget, submenu);}
 
    inline af::MCGeneral * blockAction( int id_block, int id_action, ListItems * listitems) const { return info.blockAction( id_block, id_action, listitems);}
 

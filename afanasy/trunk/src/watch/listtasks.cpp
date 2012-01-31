@@ -1,5 +1,6 @@
 #include "listtasks.h"
 
+#include <QtCore/QDir>
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 #include <QtGui/QBoxLayout>
@@ -119,40 +120,53 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 
    int id = item->getId();
    switch( id)
-   {
-      case ItemJobBlock::ItemId:
-      {
-         ItemJobBlock *itemBlock = (ItemJobBlock*)item;
-         itemBlock->generateMenu( itemBlock->getNumBlock(), &menu, this);
+    {
+        case ItemJobBlock::ItemId:
+        {
+            ItemJobBlock *itemBlock = (ItemJobBlock*)item;
+            if( false == itemBlock->files.isEmpty() )
+            {
+                action = new QAction( "Browse Files...", this);
+                connect( action, SIGNAL( triggered() ), this, SLOT( actBlockBrowseFiles() ));
+                menu.addAction( action);
+                menu.addSeparator();
+            }
 
-         menu.addSeparator();
+            QMenu * submenu = new QMenu( "Change Block", this);
+            itemBlock->generateMenu( itemBlock->getNumBlock(), &menu, this, submenu);
 
-         action = new QAction( "Set Command", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCommand() ));
-         menu.addAction( action);
+            menu.addMenu( submenu);
+            menu.addSeparator();
 
-         action = new QAction( "Set Working Directory", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockWorkingDir() ));
-         menu.addAction( action);
+            submenu = new QMenu( "Change Tasks", this);
+            menu.addMenu( submenu);
 
-         action = new QAction( "Set Post Command", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCmdPost() ));
-         menu.addAction( action);
+            action = new QAction( "Set Command", this);
+            connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCommand() ));
+            submenu->addAction( action);
 
-         action = new QAction( "Set Files", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockFiles() ));
-         menu.addAction( action);
+            action = new QAction( "Set Working Directory", this);
+            connect( action, SIGNAL( triggered() ), this, SLOT( actBlockWorkingDir() ));
+            submenu->addAction( action);
 
-         action = new QAction( "Set Service Type", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockService() ));
-         menu.addAction( action);
+            action = new QAction( "Set Post Command", this);
+            connect( action, SIGNAL( triggered() ), this, SLOT( actBlockCmdPost() ));
+            submenu->addAction( action);
 
-         action = new QAction( "Set Parser Type", this);
-         connect( action, SIGNAL( triggered() ), this, SLOT( actBlockParser() ));
-         menu.addAction( action);
+            action = new QAction( "Set Files", this);
+            connect( action, SIGNAL( triggered() ), this, SLOT( actBlockFiles() ));
+            submenu->addAction( action);
 
-         break;
-      }
+            action = new QAction( "Set Service Type", this);
+            connect( action, SIGNAL( triggered() ), this, SLOT( actBlockService() ));
+            submenu->addAction( action);
+
+            action = new QAction( "Set Parser Type", this);
+            connect( action, SIGNAL( triggered() ), this, SLOT( actBlockParser() ));
+            submenu->addAction( action);
+
+            break;
+        }
       case ItemJobTask::ItemId:
       {
          ActionId * actionid = new ActionId( 0, "Output", this);
@@ -602,6 +616,33 @@ void ListTasks::actBlockParser()
    if( !ok) return;
    af::MCGeneral mcgeneral( str.toUtf8().data());
    setBlockProperty( af::Msg::TBlockParser, mcgeneral);
+}
+
+void ListTasks::actBlockBrowseFiles()
+{
+    Item* item = getCurrentItem();
+    if( item == NULL )
+        return;
+
+    ItemJobBlock *itemBlock = (ItemJobBlock*)item;
+    if( itemBlock->files.isEmpty())
+        return;
+
+    af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", afqt::qtos( itemBlock->files));
+    QString image = afqt::stoq( service.getFiles()).split(';')[0];
+    QString folder = image.left( image.lastIndexOf('/'));
+    folder = image.left( image.lastIndexOf('\\'));
+    if( folder == image )
+        folder = itemBlock->workingdir;
+
+    QString cmd;
+#ifdef WINNT
+    cmd = "start";
+#else
+    cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
+#endif
+
+    Watch::startProcess( cmd + " " + folder, itemBlock->workingdir);
 }
 
 void ListTasks::setBlockProperty( int type, af::MCGeneral & mcgeneral)

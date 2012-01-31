@@ -387,7 +387,7 @@ void BlockInfo::drawProgress(
    }
 }
 
-void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
+void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu)
 {
    ActionIdId *action;
 
@@ -416,6 +416,9 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
 
       menu->addSeparator();
    }
+
+   if( submenu != NULL )
+       menu = submenu;
 
    action = new ActionIdId( id_block, af::Msg::TBlockErrorsAvoidHost, "Set Errors Avoid Host", qwidget);
    QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));

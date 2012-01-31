@@ -43,6 +43,7 @@ private slots:
    void actBlockCmdPost();
    void actBlockService();
    void actBlockParser();
+   void actBlockBrowseFiles();
 
    void blockAction( int id_block, int id_action);
 

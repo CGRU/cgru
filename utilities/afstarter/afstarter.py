@@ -147,28 +147,35 @@ AfterFX render settings template')
 
 
       # Advanced:
-      osLayout = QtGui.QHBoxLayout()
-      advlayout.addLayout( osLayout)
-      osLayout.addWidget( QtGui.QLabel('Operating System Type:'))
+      layout = QtGui.QHBoxLayout()
+      advlayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Operating System Type:'))
       self.fields['os'] = QtGui.QLineEdit( self)
-      osLayout.addWidget( self.fields['os'])
+      layout.addWidget( self.fields['os'])
       QtCore.QObject.connect( self.fields['os'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
-      exelayout = QtGui.QHBoxLayout()
-      advlayout.addLayout( exelayout)
-      exelayout.addWidget( QtGui.QLabel('Tasks Command:'))
+      layout = QtGui.QHBoxLayout()
+      advlayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Tasks Command:'))
       self.fields['exec'] = QtGui.QLineEdit( self)
-      exelayout.addWidget( self.fields['exec'])
+      layout.addWidget( self.fields['exec'])
       QtCore.QObject.connect( self.fields['exec'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
       self.execBrowseButton = QtGui.QPushButton('Browse', self)
-      exelayout.addWidget( self.execBrowseButton)
+      layout.addWidget( self.execBrowseButton)
       QtCore.QObject.connect( self.execBrowseButton, QtCore.SIGNAL('pressed()'), self.browseExec)
 
-      prvlayout = QtGui.QHBoxLayout()
-      advlayout.addLayout( prvlayout)
-      prvlayout.addWidget( QtGui.QLabel('Preview:'))
+      layout = QtGui.QHBoxLayout()
+      advlayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Extra Arguments:'))
+      self.fields['extrargs'] = QtGui.QLineEdit( self)
+      layout.addWidget( self.fields['extrargs'])
+      QtCore.QObject.connect( self.fields['extrargs'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+
+      layout = QtGui.QHBoxLayout()
+      advlayout.addLayout( layout)
+      layout.addWidget( QtGui.QLabel('Preview:'))
       self.fields['preview'] = QtGui.QLineEdit( self)
-      prvlayout.addWidget( self.fields['preview'])
+      layout.addWidget( self.fields['preview'])
       QtCore.QObject.connect( self.fields['preview'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
       # Job:
@@ -427,7 +434,7 @@ AfterFX render settings template')
       # Check wdir:
       if self.fields['scenewdir'].isChecked(): self.fields['wdir'].setEnabled( False)
       else: self.fields['wdir'].setEnabled( True)
-      # Check job name:
+      # Set job name:
       if self.fields['jobnamescene'].isChecked():
          self.fields['jobname'].setText( os.path.basename( str( self.fields['scenefile'].text())))
          self.fields['jobname'].setEnabled( False)
@@ -472,6 +479,7 @@ AfterFX render settings template')
       if not str( self.fields['take'].text()) == '': cmd += ' -take "%s"' % self.fields['take'].text()
       if not str( self.fields['outimages'].text()) == '': cmd += ' -output "%s"' % self.fields['outimages'].text()
       if not str( self.fields['preview'].text()) == '': cmd += ' -images "%s"' % self.fields['preview'].text()
+      if not str( self.fields['extrargs'].text()) == '': cmd += ' -extrargs "%s"' % self.fields['extrargs'].text()
       if str( self.fields['os'].text()) == '': cmd += ' -os any'
       else: cmd += ' -os "%s"' % self.fields['os'].text()
       cmd += ' -pwd "%s"' % self.fields['wdir'].text()
