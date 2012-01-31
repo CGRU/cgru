@@ -94,7 +94,7 @@ function stateToStr( $state)
 
 function stateToStyle( $state)
 {
-   $style = '';
+   $style = 'empty';
    if(      stateIsError(    $state)) $style = 'error';
    else if( stateIsOffline(  $state)) $style = 'offline';
    else if( stateIsRunning(  $state)) $style = 'running';

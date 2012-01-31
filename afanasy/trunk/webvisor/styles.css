@@ -19,6 +19,10 @@ a:active {
    color: #D00000;
 }
 
+.state_empty
+{
+}
+
 .state_error
 {
  background-color: #FF7777;
@@ -41,6 +45,7 @@ a:active {
 
 .state_done
 {
+ background-color: #779966;
 }
 
 .state_offline

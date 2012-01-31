@@ -73,7 +73,7 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
       $boldOff = '</b>';
    }
 
-   $style = 'done';
+   $style = 'empty';
    if( $line["jobsrunning"] > 0) $style = 'running';
    $style = ' class="state_'.$style.'"';
 
