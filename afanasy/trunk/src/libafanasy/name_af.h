@@ -112,8 +112,9 @@ namespace af
    const std::string time2strHMS( int time32, bool clamp = false);
 
    void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
+#ifndef WINNT
    void printAddress( struct sockaddr_storage * i_ss );
-
+#endif
    bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
    void rw_int32 (  int32_t &integer, char * data, bool write);

@@ -637,12 +637,14 @@ void ListTasks::actBlockBrowseFiles()
 
     QString cmd;
 #ifdef WINNT
-    cmd = "start";
+    cmd = "cmd.exe";
+	QStringList args;
+	args << "/c" << "start" << "\"Open\"" << folder;
+    Watch::startProcess( cmd, args, itemBlock->workingdir);
 #else
     cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
+    Watch::startProcess( cmd + " \"" + folder + "\"", itemBlock->workingdir);
 #endif
-
-    Watch::startProcess( cmd + " " + folder, itemBlock->workingdir);
 }
 
 void ListTasks::setBlockProperty( int type, af::MCGeneral & mcgeneral)

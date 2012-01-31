@@ -185,7 +185,7 @@ void af::printTime( time_t time_sec, const char * time_format)
 {
    std::cout << time2str( time_sec, time_format);
 }
-
+#ifndef WINNT
 void af::printAddress( struct sockaddr_storage * i_ss )
 {
    static const int buffer_len = 256;
@@ -220,7 +220,7 @@ void af::printAddress( struct sockaddr_storage * i_ss )
    }
    printf("\n");
 }
-
+#endif
 bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
 {
    std::string errString;
