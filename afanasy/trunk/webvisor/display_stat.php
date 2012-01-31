@@ -90,7 +90,7 @@ echo "</td>\n";
 
 echo "\t\t<td>";
 if( $order_u == 'numjobs' ) echo '<b>';
-echo "<a href='index.php?action=$action&order_u=numjobs&order_s=$order_s'>Jobs<br/>Quantity</a>";
+echo "<a href='index.php?action=$action&order_u=numjobs&order_s=$order_s'>Job Blocks<br/>Quantity</a>";
 if( $order_u == 'numjobs' ) echo '</b>';
 echo "</td>\n";
 

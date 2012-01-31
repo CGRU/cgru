@@ -100,7 +100,7 @@ Default hosts mask number for users and jobs. Empty means that users and jobs ca
 <ul>
 <li><p>
 <code>servername</code> = localhost<br/>
-Command for render to execute another render or to restart.
+Afanasy server name to lookup or IP address.
 </p></li>
 <li><p>
 <code>serveripmask</code> = *.* 127.0.0.1 192.168.* *:* 0:0:0:0:0:0:0:1 FC00:* FD00:*<br/>
@@ -176,27 +176,11 @@ Server store logs of users with the same name by renaming old. It adds a number 
 </ul>
 
 <h4><a id="ConfDatabase">Database</a>:</h4>
-Try to keep this default values.
 <ul>
 <li><p>
-<code>db_type</code> = QPSQL<br/>
-Database type. You can query available database drivers by <kbd>afcmd db_drivers</kbd> command.
-</p></li>
-<li><p>
-<code>db_hostname</code> = localhost<br/>
-Host to connect to database.
-</p></li>
-<li><p>
-<code>db_databasename</code> = afanasy<br/>
-Database name.
-</p></li>
-<li><p>
-<code>db_username</code> = afadmin<br/>
-Database user name.
-</p></li>
-<li><p>
-<code>db_password</code> = AfPassword<br/>
-Database password.
+<code>db_conninfo</code> = host=localhost dbname=afanasy user=afadmin password=AfPassword<br/>
+It is a database connection options,
+string to pass to <a href="http://www.postgresql.org/docs/current/static/libpq-connect.html">PQconnectdb</a> function.
 </p></li>
 <li><p>
 <code>db_stringquotes</code> = $$<br/>

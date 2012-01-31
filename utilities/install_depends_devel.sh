@@ -13,6 +13,7 @@ packages_noarch="rubygems"
 function debianArch(){
    packages="$packages g++"
    packages="$packages python-dev"
+   packages="$packages libpq-dev"
    packages="$packages qt4-dev-tools"
    packages="$packages python-qt4"
    packages="$packages p7zip-full"
@@ -33,6 +34,7 @@ function debianArch(){
 function redhatArch(){
    packages="$packages gcc-c++"
    packages="$packages python-devel"
+   packages="$packages libpq-devel"
    packages="$packages qt-devel"
    packages="$packages rpm-build"
    packages="$packages git"
@@ -54,6 +56,7 @@ function redhatArch(){
 function suseArch(){
    packages="$packages gcc-c++"
    packages="$packages python-devel"
+   packages="$packages libpq-devel"
    packages="$packages libqt4-devel"
    packages="$packages PyQt4"
    packages="$packages libzip1 libzip-devel git"

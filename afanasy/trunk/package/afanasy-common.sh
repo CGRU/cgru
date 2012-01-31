@@ -10,5 +10,6 @@ installdir=$3
 mkdir -p $pack/$installdir/afanasy
 files="\
 afanasy/bin \
+afanasy/lib \
 "
 for f in $files; do cp -r $src/$f $pack/$installdir/$f; done

@@ -283,7 +283,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
       }
       else
       {
-         displayWarning("You have registered.");
+         displayInfo("You have registered.");
          if( monitorType == Watch::WNONE )
          {
             ButtonMonitor::pushButton( Watch::WJobs);
