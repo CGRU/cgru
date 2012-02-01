@@ -14,3 +14,4 @@ cp -r $src/* $pack/$installdir
 
 # Remove Afanasy binaries:
 rm -rf $pack/$installdir/afanasy/bin
+rm -rf $pack/$installdir/afanasy/lib

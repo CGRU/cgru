@@ -23,7 +23,8 @@ fi
 
 dirs_nonempty="$afanasy/bin_pyaf plugins/maya/mll"
 cgru_bins="convert ffmpeg exrjoin"
-afanasy_bins="afserver afcmd afrender aftalk afwatch pyaf.so"
+afanasy_bins="afserver afcmd afrender aftalk afwatch"
+afanasy_libs="pyaf.so"
 #utilities_bins="regexp/bin/regexp"
 
 cgru_bin="$cgru/bin"
@@ -46,6 +47,7 @@ done
 bins=""
 for bin in $cgru_bins; do bins="$cgru/bin/$bin $bins"; done
 for bin in $afanasy_bins; do bins="$cgru/$afanasy/bin/$bin $bins"; done
+for lib in $afanasy_libs; do bins="$cgru/$afanasy/lib/$lib $bins"; done
 #for bin in $utilities_bins; do bins="$cgru/utilities/$bin $bins"; done
 for bin in $bins; do
    if [ ! -x "$bin" ]; then

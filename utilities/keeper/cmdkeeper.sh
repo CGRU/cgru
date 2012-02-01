@@ -8,3 +8,5 @@ fi
 popd > /dev/null
 
 "$CGRU_PYTHONEXE" "$CGRU_LOCATION/utilities/keeper/cmdkeeper.py" "$@"
+
+exit 0

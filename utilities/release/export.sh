@@ -52,6 +52,7 @@ rcopy examples $dest
 
 copy afanasy/$afanasy $dest/afanasy
 rcopy afanasy/$afanasy/bin $dest/afanasy
+rcopy afanasy/$afanasy/lib $dest/afanasy
 [ -d afanasy/$afanasy/bin_pyaf ] && rcopy afanasy/$afanasy/bin_pyaf $dest/afanasy
 rcopy afanasy/$afanasy/doc $dest/afanasy
 rcopy afanasy/$afanasy/icons $dest/afanasy
