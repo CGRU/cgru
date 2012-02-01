@@ -107,7 +107,8 @@ private:
    void setService( const std::string & srvname, bool enable);
    void disableServices();
 
-   void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus);  ///< Stop task with \c message to loglist.
+   /// Stop tasks.
+   void ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username = NULL);
 
    void exitClient( int type, JobContainer * jobs, MonitorContainer * monitoring);   ///< Exit Render client program.
 

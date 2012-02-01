@@ -57,7 +57,8 @@ void AfCmd::RegisterCommands()
    addCmd( new CmdRenderNIMBY);
    addCmd( new CmdRenderUser);
    addCmd( new CmdRenderFree);
-   addCmd( new CmdRenderEject);
+    addCmd( new CmdRenderEjectTasks);
+    addCmd( new CmdRenderEjectNotMyTasks);
    addCmd( new CmdRenderExit);
    addCmd( new CmdRenderDelete);
    addCmd( new CmdRenderResoucesList);

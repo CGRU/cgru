@@ -39,9 +39,14 @@ class CmdRenderFree : public Cmd { public:
    ~CmdRenderFree();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
-class CmdRenderEject : public Cmd { public:
-   CmdRenderEject();
-   ~CmdRenderEject();
+class CmdRenderEjectTasks : public Cmd { public:
+   CmdRenderEjectTasks();
+   ~CmdRenderEjectTasks();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
+class CmdRenderEjectNotMyTasks : public Cmd { public:
+   CmdRenderEjectNotMyTasks();
+   ~CmdRenderEjectNotMyTasks();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 class CmdRenderExit : public Cmd { public:

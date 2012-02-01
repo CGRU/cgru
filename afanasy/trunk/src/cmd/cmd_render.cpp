@@ -147,16 +147,33 @@ bool CmdRenderFree::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-CmdRenderEject::CmdRenderEject()
+CmdRenderEjectTasks::CmdRenderEjectTasks()
 {
    setCmd("reject");
    setArgsCount(1);
-   setInfo("Eject task from render.");
-   setHelp("reject [name] Eject task from specified render.");
-   setMsgType( af::Msg::TRenderEject);
+   setInfo("Eject tasks from render.");
+   setHelp("reject [name] Eject tasks from specified render.");
+   setMsgType( af::Msg::TRenderEjectTasks);
 }
-CmdRenderEject::~CmdRenderEject(){}
-bool CmdRenderEject::processArguments( int argc, char** argv, af::Msg &msg)
+CmdRenderEjectTasks::~CmdRenderEjectTasks(){}
+bool CmdRenderEjectTasks::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string name = argv[0];
+   af::MCGeneral mcgeneral( name, 0);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdRenderEjectNotMyTasks::CmdRenderEjectNotMyTasks()
+{
+   setCmd("rejnotmy");
+   setArgsCount(1);
+   setInfo("Eject not my tasks from render.");
+   setHelp("rejnotmy [name] Eject not my tasks from specified render.");
+   setMsgType( af::Msg::TRenderEjectNotMyTasks);
+}
+CmdRenderEjectNotMyTasks::~CmdRenderEjectNotMyTasks(){}
+bool CmdRenderEjectNotMyTasks::processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    af::MCGeneral mcgeneral( name, 0);

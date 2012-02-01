@@ -25,12 +25,13 @@ public:
    bool JobDelete( const std::string & jobMask);
 /// Get raw job data, to send to server socket ( call after successfull).
 
-   void renderGetList(     const std::string & renderMask); ///< Get render(s) by names mask
-   void renderSetNimby(    const std::string & renderMask, const std::string & string = std::string()); ///< Set "nimby"
-   void renderSetNIMBY(    const std::string & renderMask, const std::string & string = std::string()); ///< Set "NIMBY"
-   void renderSetFree(     const std::string & renderMask, const std::string & string = std::string()); ///< Set render free
-   void renderEjectTasks(  const std::string & renderMask, const std::string & string = std::string()); ///< Eject running tasks
-   void renderExit(        const std::string & renderMask, const std::string & string = std::string()); ///< Exit render (will ask server to shutdown it)
+    void renderGetList(         const std::string & renderMask); ///< Get render(s) by names mask
+    void renderSetNimby(        const std::string & renderMask, const std::string & string = std::string()); ///< Set "nimby"
+    void renderSetNIMBY(        const std::string & renderMask, const std::string & string = std::string()); ///< Set "NIMBY"
+    void renderSetFree(         const std::string & renderMask, const std::string & string = std::string()); ///< Set render free
+    void renderEjectTasks(      const std::string & renderMask, const std::string & string = std::string()); ///< Eject running tasks
+    void renderEjectNotMyTasks( const std::string & renderMask, const std::string & string = std::string()); ///< Eject running tasks
+    void renderExit(            const std::string & renderMask, const std::string & string = std::string()); ///< Exit render (will ask server to shutdown it)
 
    void talkExit( const std::string & renderMask, const std::string & string = std::string()); ///< Exit task (will ask server to shutdown it)
 

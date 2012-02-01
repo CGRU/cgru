@@ -293,13 +293,20 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_username);
       break;
    }
-   case af::Msg::TRenderEject:
+   case af::Msg::TRenderEjectTasks:
    {
       if( isBusy() == false ) return true;
       appendLog( std::string("Task(s) ejected by ") + userhost_string);
       ejectTasks( jobs, monitoring, af::TaskExec::UPEject);
       return true;
    }
+    case af::Msg::TRenderEjectNotMyTasks:
+    {
+        if( isBusy() == false ) return true;
+        appendLog( std::string("Task(s) ejected by ") + userhost_string);
+        ejectTasks( jobs, monitoring, af::TaskExec::UPEject, &mcgeneral.getUserName());
+        return true;
+    }
    case af::Msg::TRenderExit:
    {
       if( false == isOnline() ) return true;
@@ -364,7 +371,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    return true;
 }
 
-void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus)
+void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )
 {
    if( tasks.size() < 1) return;
    std::list<int>id_jobs;
@@ -373,6 +380,10 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
    std::list<int>numbers;
    for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
    {
+       // Skip if username to keep tasks provided:
+       if( i_keeptasks_username != NULL )
+           if( *i_keeptasks_username == (*it)->getUserName())
+               continue;
       id_jobs.push_back( (*it)->getJobId());
       id_blocks.push_back( (*it)->getBlockNum());
       id_tasks.push_back( (*it)->getTaskNum());

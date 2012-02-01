@@ -73,7 +73,8 @@ switch ( i_msg->type())
    case af::Msg::TRenderSetNIMBY:
    case af::Msg::TRenderSetNimby:
    case af::Msg::TRenderSetFree:
-   case af::Msg::TRenderEject:
+    case af::Msg::TRenderEjectTasks:
+    case af::Msg::TRenderEjectNotMyTasks:
    case af::Msg::TRenderDelete:
    case af::Msg::TRenderRestart:
    case af::Msg::TRenderReboot:

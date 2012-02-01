@@ -45,7 +45,8 @@ private slots:
    void actDisableService();
    void actRestoreDefaults();
 
-   void actEject();
+   void actEjectTasks();
+   void actEjectNotMyTasks();
 
    void actExit();
    void actDelete();

@@ -220,7 +220,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRenderSetFree/**/,             ///< Set Render free,
 /**/TRenderStopTask/**/,            ///< Signal from Afanasy to Render to stop task.
 /**/TRenderCloseTask/**/,           ///< Signal from Afanasy to Render to close (delete) finished (stopped) task.
-/**/TRenderEject/**/,               ///< Stop all tasks on Render,
+/**/TRenderEjectTasks/**/,          ///< Stop all tasks on Render,
 /**/TRenderDelete/**/,              ///< Delete Render from afanasy server container and database,
 /**/TRenderRestart/**/,             ///< Restart Render client program,
 /**/TRenderWOLSleep/**/,            ///< Ask online render(s) to fall into sleep
@@ -332,7 +332,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TTasksRun/**/,                  ///< Job tasks run data.
 
 /**/TUserJobsSolveMethod/**/,       ///< Set jobs solving mode.
-/**/TRESERVED11/**/,
+/**/TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
 /**/TRESERVED12/**/,
 /**/TRESERVED13/**/,
 /**/TRESERVED14/**/,

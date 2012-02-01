@@ -211,16 +211,21 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
       menu.addSeparator();
 
-      {
-         QMenu * submenu = new QMenu( "Eject", this);
+        {
+            QMenu * submenu = new QMenu( "Eject", this);
 
-         action = new QAction( "Tasks", this);
-         if( selectedItemsCount == 1) action->setEnabled(render->hasTasks());
-         connect( action, SIGNAL( triggered() ), this, SLOT( actEject() ));
-         submenu->addAction( action);
+            action = new QAction( "All Tasks", this);
+            if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
+            connect( action, SIGNAL( triggered() ), this, SLOT( actEjectTasks() ));
+            submenu->addAction( action);
 
-         menu.addMenu( submenu);
-      }
+            action = new QAction( "Not My Tasks", this);
+            if( selectedItemsCount == 1) action->setEnabled( render->hasTasks());
+            connect( action, SIGNAL( triggered() ), this, SLOT( actEjectNotMyTasks() ));
+            submenu->addAction( action);
+
+            menu.addMenu( submenu);
+        }
    }
 
    if( af::Environment::GOD())
@@ -463,10 +468,15 @@ void ListRenders::actUser()
    af::MCGeneral mcgeneral( afqt::qtos( text));
    action( mcgeneral, af::Msg::TRenderSetUser);
 }
-void ListRenders::actEject()
+void ListRenders::actEjectTasks()
 {
    af::MCGeneral mcgeneral;
-   action( mcgeneral, af::Msg::TRenderEject);
+   action( mcgeneral, af::Msg::TRenderEjectTasks);
+}
+void ListRenders::actEjectNotMyTasks()
+{
+   af::MCGeneral mcgeneral;
+   action( mcgeneral, af::Msg::TRenderEjectNotMyTasks);
 }
 void ListRenders::actExit()
 {
