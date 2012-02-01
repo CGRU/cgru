@@ -228,6 +228,14 @@ PyObject * PyAf_Cmd_renderejecttasks( PyAf_Cmd_Object * self, PyObject * args)
    else self->cmd->renderEjectTasks( list[0], list[1]);
    Py_RETURN_TRUE;
 }
+PyObject * PyAf_Cmd_renderejectnotmytasks( PyAf_Cmd_Object * self, PyObject * args)
+{
+    std::vector<std::string> list;
+    if( false == PyAf::GetStrings( args, list, 1, 2, "PyAf_Cmd_renderejectnotmytasks")) Py_RETURN_FALSE;
+    if( list.size() == 1 ) self->cmd->renderEjectNotMyTasks( list[0]);
+    else self->cmd->renderEjectNotMyTasks( list[0], list[1]);
+    Py_RETURN_TRUE;
+}
 
 PyObject * PyAf_Cmd_renderexit( PyAf_Cmd_Object * self, PyObject * args)
 {

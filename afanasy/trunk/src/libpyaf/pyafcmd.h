@@ -24,6 +24,7 @@ PyObject * PyAf_Cmd_rendersetnimby(          PyAf_Cmd_Object *self, PyObject *ar
 PyObject * PyAf_Cmd_rendersetNIMBY(          PyAf_Cmd_Object *self, PyObject *args);
 PyObject * PyAf_Cmd_rendersetfree(           PyAf_Cmd_Object *self, PyObject *args);
 PyObject * PyAf_Cmd_renderejecttasks(        PyAf_Cmd_Object *self, PyObject *args);
+PyObject * PyAf_Cmd_renderejectnotmytasks(   PyAf_Cmd_Object *self, PyObject *args);
 PyObject * PyAf_Cmd_renderexit(              PyAf_Cmd_Object *self, PyObject *args);
 PyObject * PyAf_Cmd_talkexit(                PyAf_Cmd_Object *self, PyObject *args);
 PyObject * PyAf_Cmd_monitorexit(             PyAf_Cmd_Object *self, PyObject *args);
@@ -32,25 +33,26 @@ PyObject * PyAf_Cmd_getData(                 PyAf_Cmd_Object *self);
 
 #ifndef PYAFCMD
 static PyMethodDef PyAf_Cmd_methods[] = {
-   {"setUserName",            (PyCFunction) PyAf_Cmd_setUserName,             METH_O,        "Set action user name."       },
-   {"setHostName",            (PyCFunction) PyAf_Cmd_setHostName,             METH_O,        "Set action host name."       },
-   {"getjoblist",             (PyCFunction) PyAf_Cmd_getJobList,              METH_VARARGS,  "Get Job List."               },
-   {"decodejoblist",          (PyCFunction) PyAf_Cmd_decodeJobList,           METH_VARARGS,  "Decode Job List."            },
-   {"getjobinfo",             (PyCFunction) PyAf_Cmd_getJobInfo,              METH_VARARGS,  "Get job info."               },
-   {"decodejobinfo",          (PyCFunction) PyAf_Cmd_decodeJobInfo,           METH_VARARGS,  "Decode job info."            },
-   {"deletejob",              (PyCFunction) PyAf_Cmd_deleteJob,               METH_VARARGS,  "Delete Job(s)."              },
-   {"renderlistget",          (PyCFunction) PyAf_Cmd_renderlistget,           METH_O,        "Get render(s)."              },
-   {"renderlistdecode",       (PyCFunction) PyAf_Cmd_renderlistdecode,        METH_O,        "Decode renders list."        },
-   {"rendersetnimby",         (PyCFunction) PyAf_Cmd_rendersetnimby,          METH_VARARGS,  "Set render 'nimby'."         },
-   {"rendersetNIMBY",         (PyCFunction) PyAf_Cmd_rendersetNIMBY,          METH_VARARGS,  "Set render 'NIMBY'."         },
-   {"rendersetfree",          (PyCFunction) PyAf_Cmd_rendersetfree,           METH_VARARGS,  "Free render(s)."             },
-   {"renderejecttasks",       (PyCFunction) PyAf_Cmd_renderejecttasks,        METH_VARARGS,  "Eject render running tasks"  },
-   {"renderexit",             (PyCFunction) PyAf_Cmd_renderexit,              METH_VARARGS,  "Exit render (by server)"     },
-   {"talkexit",               (PyCFunction) PyAf_Cmd_talkexit,                METH_VARARGS,  "Exit talk (by server)"       },
-   {"monitorexit",            (PyCFunction) PyAf_Cmd_monitorexit,             METH_VARARGS,  "Exit monitor (by server)"    },
-   {"getDataLen",             (PyCFunction) PyAf_Cmd_getDataLen,              METH_NOARGS,   "Get job data length."        },
-   {"getData",                (PyCFunction) PyAf_Cmd_getData,                 METH_NOARGS,   "Get job data."               },
-   { NULL, NULL, 0, NULL } // Sentinel
+    {"setUserName",            (PyCFunction) PyAf_Cmd_setUserName,             METH_O,        "Set action user name."       },
+    {"setHostName",            (PyCFunction) PyAf_Cmd_setHostName,             METH_O,        "Set action host name."       },
+    {"getjoblist",             (PyCFunction) PyAf_Cmd_getJobList,              METH_VARARGS,  "Get Job List."               },
+    {"decodejoblist",          (PyCFunction) PyAf_Cmd_decodeJobList,           METH_VARARGS,  "Decode Job List."            },
+    {"getjobinfo",             (PyCFunction) PyAf_Cmd_getJobInfo,              METH_VARARGS,  "Get job info."               },
+    {"decodejobinfo",          (PyCFunction) PyAf_Cmd_decodeJobInfo,           METH_VARARGS,  "Decode job info."            },
+    {"deletejob",              (PyCFunction) PyAf_Cmd_deleteJob,               METH_VARARGS,  "Delete Job(s)."              },
+    {"renderlistget",          (PyCFunction) PyAf_Cmd_renderlistget,           METH_O,        "Get render(s)."              },
+    {"renderlistdecode",       (PyCFunction) PyAf_Cmd_renderlistdecode,        METH_O,        "Decode renders list."        },
+    {"rendersetnimby",         (PyCFunction) PyAf_Cmd_rendersetnimby,          METH_VARARGS,  "Set render 'nimby'."         },
+    {"rendersetNIMBY",         (PyCFunction) PyAf_Cmd_rendersetNIMBY,          METH_VARARGS,  "Set render 'NIMBY'."         },
+    {"rendersetfree",          (PyCFunction) PyAf_Cmd_rendersetfree,           METH_VARARGS,  "Free render(s)."             },
+    {"renderejecttasks",       (PyCFunction) PyAf_Cmd_renderejecttasks,        METH_VARARGS,  "Eject render running tasks"  },
+    {"renderejectnotmytasks",  (PyCFunction) PyAf_Cmd_renderejectnotmytasks,   METH_VARARGS,  "Eject render running tasks, except owner"  },
+    {"renderexit",             (PyCFunction) PyAf_Cmd_renderexit,              METH_VARARGS,  "Exit render (by server)"     },
+    {"talkexit",               (PyCFunction) PyAf_Cmd_talkexit,                METH_VARARGS,  "Exit talk (by server)"       },
+    {"monitorexit",            (PyCFunction) PyAf_Cmd_monitorexit,             METH_VARARGS,  "Exit monitor (by server)"    },
+    {"getDataLen",             (PyCFunction) PyAf_Cmd_getDataLen,              METH_NOARGS,   "Get job data length."        },
+    {"getData",                (PyCFunction) PyAf_Cmd_getData,                 METH_NOARGS,   "Get job data."               },
+    { NULL, NULL, 0, NULL } // Sentinel
 };
 
 #if PY_MAJOR_VERSION >= 3

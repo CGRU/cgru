@@ -232,6 +232,10 @@ class Cmd( pyaf.Cmd):
       self.renderejecttasks( self.env.Vars['hostname'], text)
       self._sendRequest()
 
+   def renderEjectNotMyTasks( self, text):
+      self.renderejectnotmytasks( self.env.Vars['hostname'], text)
+      self._sendRequest()
+
    def renderExit( self, text):
       self.renderexit( self.env.Vars['hostname'], text)
       self._sendRequest()

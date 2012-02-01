@@ -6,10 +6,11 @@ from datetime import datetime,timedelta
 nimby_set = False
 free_set = False
 
-def setnimby(   text = '(keeper)'): cmd = af.Cmd().renderSetNimby(   text)
-def setNIMBY(   text = '(keeper)'): cmd = af.Cmd().renderSetNIMBY(   text)
-def setFree(    text = '(keeper)'): cmd = af.Cmd().renderSetFree(    text)
-def ejectTasks( text = '(keeper)'): cmd = af.Cmd().renderEjectTasks( text)
+def setnimby(        text = '(keeper)'): cmd = af.Cmd().renderSetNimby(        text )
+def setNIMBY(        text = '(keeper)'): cmd = af.Cmd().renderSetNIMBY(        text )
+def setFree(         text = '(keeper)'): cmd = af.Cmd().renderSetFree(         text )
+def ejectTasks(      text = '(keeper)'): cmd = af.Cmd().renderEjectTasks(      text )
+def ejectNotMyTasks( text = '(keeper)'): cmd = af.Cmd().renderEjectNotMyTasks( text )
 
 def refresh( reset = False):
    global nimby_set
@@ -64,9 +65,12 @@ def refresh( reset = False):
    # Set state:
    if toset_nimby:
       if not nimby_set:
-         if toallow_tasks: setnimby('(keeper nimby schedule)')
-         else: setNIMBY('(keeper nimby schedule)')
-         if toeject_tasks: ejectTasks('(keeper nimby schedule)')
+         if toallow_tasks:
+            setnimby('(keeper nimby schedule)')
+            if toeject_tasks: ejectNotMyTasks('(keeper nimby schedule)')
+         else:
+            setNIMBY('(keeper nimby schedule)')
+            if toeject_tasks: ejectTasks('(keeper nimby schedule)')
          nimby_set = True
          free_set = False
    elif toset_free:
