@@ -47,7 +47,7 @@ if [ ! -d $cgruRoot/$afanasy ]; then
 fi
 
 # Check:
-../check.sh $check "$afanasy"
+./check.sh $check "$afanasy"
 if [ "$?" != "0" ]; then
    echo "Some required binaries not founded. Use \"--skipcheck\" argument to skip it."
    exit 1

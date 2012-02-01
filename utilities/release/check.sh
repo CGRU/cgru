@@ -11,7 +11,7 @@ for arg in "$@"; do
 done
 [ -z "$afanasy" ] && afanasy="afanasy/trunk"
 
-cgru=`dirname $0`/..
+cgru=`dirname $0`/../..
 pushd $cgru > /dev/null
 cgru=$PWD
 popd > /dev/null
@@ -22,9 +22,20 @@ if [ ! -d $cgru/$afanasy ]; then
 fi
 
 dirs_nonempty="$afanasy/bin_pyaf plugins/maya/mll"
-cgru_bins="convert ffmpeg exrjoin"
+cgru_bins="exrjoin"
 afanasy_bins="afserver afcmd afrender aftalk afwatch"
 afanasy_libs="pyaf.so"
+[ -z "$DISTRIBUTIVE" ] && source "$cgru/utilities/distribution.sh"
+if [ ! -z "$DISTRIBUTIVE" ]; then
+    case ${DISTRIBUTIVE} in
+        Fedora )
+            cgru_bins="$cgru_bins ffmpeg"
+            ;;
+        *)
+            cgru_bins="$cgru_bins ffmpeg convert"
+            ;;
+    esac
+fi
 #utilities_bins="regexp/bin/regexp"
 
 cgru_bin="$cgru/bin"

@@ -128,7 +128,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
             if( false == itemBlock->files.isEmpty() )
             {
                 action = new QAction( "Browse Files...", this);
-                connect( action, SIGNAL( triggered() ), this, SLOT( actBlockBrowseFiles() ));
+                connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
                 menu.addAction( action);
                 menu.addSeparator();
             }
@@ -212,6 +212,11 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
             if( af::Environment::getPreviewCmds().size() > 0 )
             {
                menu.addSeparator();
+
+               action = new QAction( "Browse Files...", this);
+               connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
+               menu.addAction( action);
+
                QMenu * submenu_cmd = new QMenu( "Preview", this);
                int p = 0;
                for( std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
@@ -619,24 +624,46 @@ void ListTasks::actBlockParser()
    setBlockProperty( af::Msg::TBlockParser, mcgeneral);
 }
 
-void ListTasks::actBlockBrowseFiles()
+void ListTasks::actBrowseFolder()
 {
     Item* item = getCurrentItem();
     if( item == NULL )
         return;
 
-    ItemJobBlock *itemBlock = (ItemJobBlock*)item;
-    if( itemBlock->files.isEmpty())
+    QString image;
+    QString wdir;
+
+    int id = item->getId();
+    switch( id)
+    {
+    case ItemJobBlock::ItemId:
+    {
+        ItemJobBlock *itemBlock = (ItemJobBlock*)item;
+        af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", afqt::qtos( itemBlock->files));
+        image = afqt::stoq( service.getFiles()).split(';')[0];
+        wdir = afqt::stoq( service.getWDir());
+        break;
+    }
+    case ItemJobTask::ItemId:
+    {
+        ItemJobTask* taskitem = (ItemJobTask*)item;
+        af::Service service("service", taskitem->getWDir(), "", taskitem->genFiles());
+        image = afqt::stoq( service.getFiles()).split(';')[0];
+        wdir = afqt::stoq( service.getWDir());
+        break;
+    }
+    default:
+        return;
+    }
+
+    if( image.isEmpty())
         return;
 
-    af::Service service( "service", afqt::qtos( itemBlock->workingdir), "", afqt::qtos( itemBlock->files));
-    QString wdir = afqt::stoq( service.getWDir());
-    QString image = afqt::stoq( service.getFiles()).split(';')[0];
     QString folder = image.left( image.lastIndexOf('/'));
     folder = folder.left( image.lastIndexOf('\\'));
     if( folder == image )
         folder = wdir;
-    
+
     QDir dir( wdir);
     if( dir.exists())
         dir.cd( folder);
