@@ -4,7 +4,7 @@ prefix=$PWD
 
 CPPFLAGS="-fPIC -I$prefix/include -include string.h"
 
-LDFLAGS="-L/lib64 -L/usr/lib64 -L$prefix/lib -lpthread"
+LDFLAGS="-L/lib64 -L/usr/lib64 -L$prefix/lib -L$prefix/lib64 -lpthread"
 
 export CPPFLAGS
 export LDFLAGS

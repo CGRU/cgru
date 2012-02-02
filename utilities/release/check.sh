@@ -28,7 +28,7 @@ afanasy_libs="pyaf.so"
 [ -z "$DISTRIBUTIVE" ] && source "$cgru/utilities/distribution.sh"
 if [ ! -z "$DISTRIBUTIVE" ]; then
     case ${DISTRIBUTIVE} in
-        Fedora )
+        Fedora | openSUSE )
             cgru_bins="$cgru_bins ffmpeg"
             ;;
         *)

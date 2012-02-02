@@ -14,10 +14,11 @@ else
    CPPFLAGS="-I/usr/include/OpenEXR"
 fi
 
-if [ -d $openexr_lib ] ; then
+if [ -d $openexr_inc ] ; then
    # Custom libs:
    LDFLAGS="-L/lib64 -L/usr/lib64"
    LDFLAGS="$LDFLAGS -L${openexr_lib}"
+   LDFLAGS="$LDFLAGS -L${openexr_lib}64"
    LDFLAGS="$LDFLAGS -Wl,--start-group"
    LDFLAGS="$LDFLAGS -lz"
    LDFLAGS="$LDFLAGS -lpthread"
