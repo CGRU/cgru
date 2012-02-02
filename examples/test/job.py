@@ -48,30 +48,12 @@ parser.add_option('-o', '--output',       dest='output',       action='store_tru
 parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
 (options, args) = parser.parse_args()
 jobname     = options.jobname
-labels      = options.labels
-services    = options.services
 timesec     = options.timesec
 randtime    = options.randtime
 numblocks   = options.numblocks
 numtasks    = options.numtasks
 increment   = options.increment
-perhost     = options.perhost
 verbose     = options.verbose
-maxtime     = options.maxtime
-sendjob     = options.sendjob
-waittime    = options.waittime
-capacity    = options.capacity
-capmin      = options.capmin
-capmax      = options.capmax
-filemin     = options.filemin
-filemax     = options.filemax
-mhmin       = options.mhmin
-mhmax       = options.mhmax
-mhwaitmax   = options.mhwaitmax
-mhwaitsrv   = options.mhwaitsrv
-mhsame      = options.mhsame
-mhservice   = options.mhservice
-parser      = options.parser
 xcopy       = options.xcopy
 frames      = options.frames.split(',')
 
@@ -84,11 +66,11 @@ job = af.Job( jobname)
 job.setDescription('afanasy test - empty tasks')
 
 blocknames = []
-if labels != '': blocknames = labels.split(':')
+if options.labels != '': blocknames = options.labels.split(':')
 else: blocknames.append('block')
 
 blocktypes = []
-if services != '': blocktypes = services.split(':')
+if options.services != '': blocktypes = options.services.split(':')
 else: blocktypes.append('generic')
 
 if numblocks < len( blocknames): numblocks = len( blocknames)
@@ -107,28 +89,28 @@ for b in range( numblocks):
    block = af.Block( blockname, blocktype)
    job.blocks.append( block)
 
-   if parser != '': block.setParser( parsertype)
+   if options.parser != '': block.setParser( options.parser)
 
    if b > 0:
       job.blocks[b-1].setTasksDependMask( blockname)
       if options.subdep: job.blocks[b].setDependSubTask()
 
-   if maxtime: block.setTasksMaxRunTime( maxtime)
+   if options.maxtime: block.setTasksMaxRunTime( options.maxtime)
 
-   if capacity != 0 : block.setCapacity( capacity)
+   if options.capacity != 0 : block.setCapacity( options.capacity)
 
    str_capacity = ''
-   if capmin != -1 or capmax != -1:
-      block.setVariableCapacity( capmin, capmax)
+   if options.capmin != -1 or options.capmax != -1:
+      block.setVariableCapacity( options.capmin, options.capmax)
       str_capacity = ' -c ' + services.service.str_capacity
 
-   if filemin != -1 or filemax != -1: block.setFileSizeCheck( filemin, filemax)
+   if options.filemin != -1 or options.filemax != -1: block.setFileSizeCheck( options.filemin, options.filemax)
 
    str_hosts = ''
-   if mhmin != -1 or mhmax != -1:
+   if options.mhmin != -1 or options.mhmax != -1:
       cmdservice = ''
-      if mhservice != -1: cmdservice = 'sleep ' + str(mhservice)
-      block.setMultiHost( mhmin, mhmax, mhwaitmax, mhsame, cmdservice, mhwaitsrv)
+      if options.mhservice != -1: cmdservice = 'sleep ' + str(options.mhservice)
+      block.setMultiHost( options.mhmin, options.mhmax, options.mhwaitmax, options.mhsame, cmdservice, options.mhwaitsrv)
       str_hosts = ' ' + services.service.str_hosts
 
    negative_pertask = False
@@ -142,8 +124,8 @@ for b in range( numblocks):
          fr = frames[b].split('/')
          block.setNumeric( int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
       else:
-         block.setNumeric( 1, numtasks, perhost, increment)
-      if perhost > 1:
+         block.setNumeric( 1, numtasks, options.perhost, increment)
+      if options.perhost > 1:
          block.setFiles('file_a.@#@.@###@-file_a.@#@.@###@;file_b.@#@.@###@-file_b.@#@.@###@')
       else:
          block.setFiles('file_a.@#@.@####@;file_b.@#@.@####@')
@@ -167,8 +149,8 @@ if options.cmdpre  != '':
 if options.cmdpost != '':
    job.setCmdPost( options.cmdpost)
 
-if waittime:
-   job.setWaitTime( int(time.time()) + waittime)
+if options.waittime:
+   job.setWaitTime( int(time.time()) + options.waittime)
 
 if options.user != '':
    job.setUserName( options.user)
@@ -180,7 +162,7 @@ if options.output:
    job.output( 1)
 
 exit_status = 0
-if sendjob:
+if options.sendjob:
    for x in range(xcopy):
       if job.send( verbose) == False:
          print('Error: Job was not sent.')

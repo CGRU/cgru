@@ -4,7 +4,7 @@ pushd .. > /dev/null
 folder=$PWD
 cd ../../../utilities
 source ./getrevision.sh $folder
-source ./distribution.sh > /dev/null
+[ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh > /dev/null
 popd > /dev/null
 
 export AF_ADD_CFLAGS=""
