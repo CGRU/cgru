@@ -67,7 +67,7 @@ def integer( string):
    except:
       error_exit( str(sys.exc_info()[1]))
    return number
-   
+
 argsv = sys.argv
 argsl = len( argsv)
 
@@ -471,6 +471,7 @@ elif ext == 'aep':
 # simple generic:
 else:
    scenetype = 'generic'
+   images = output
    if cmd is None: cmd = scene
    if extrargs != '': cmd += ' ' + extrargs
    cmd += ' @#@ @#@'
@@ -485,7 +486,7 @@ if blocktype == '': blocktype = scenetype
 if len( cmds) == 0:
    cmds.append( cmd)
    blocknames.append( blockname)
-i = 0   
+i = 0
 for cmd in cmds:
    block = af.Block( blocknames[i], blocktype)
    block.setWorkingDirectory( pwd )
