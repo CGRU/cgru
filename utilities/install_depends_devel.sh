@@ -58,8 +58,8 @@ function suseArch(){
    packages="$packages python-devel"
    packages="$packages postgresql-devel"
    packages="$packages libqt4-devel"
-   packages="$packages PyQt4"
-   packages="$packages libzip1 libzip-devel git"
+   packages="$packages python-qt4"
+   packages="$packages libzip libzip-devel git"
    # ImageMagick:
    packages="$packages libjpeg6 libjpeg-devel"
    packages="$packages libtiff3 libtiff-devel"
