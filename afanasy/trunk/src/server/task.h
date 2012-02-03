@@ -68,6 +68,8 @@ public:
    inline bool isDone()    const { return progress->state & AFJOB::STATE_DONE_MASK;    }
    inline bool isError()   const { return progress->state & AFJOB::STATE_ERROR_MASK;   }
 
+   bool m_solved;
+
 protected:
    af::TaskProgress * progress;
    std::list<std::string> logStringList;    ///< Task log.

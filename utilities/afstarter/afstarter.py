@@ -380,13 +380,13 @@ AfterFX render settings template')
       self.load( getComboBoxString( self.cbRecent))
 
    def load( self, filename, fullPath = False):
-      self.constructed = False
       if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
       print('Loading "%s"' % filename)
       if not os.path.isfile( filename): return False
       file = open( filename,'r')
       lines = file.readlines()
       file.close()
+      self.constructed = False
       for line in lines:
          pos = line.find('=')
          if pos < 1: continue

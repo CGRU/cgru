@@ -315,8 +315,8 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
    //
    // Blocksdata depend check
    data->setStateDependent( false);
-   if( dependBlocks.size())
-      for( std::list<int>::const_iterator bIt = dependBlocks.begin(); bIt != dependBlocks.end(); bIt++)
+   if( m_dependBlocks.size())
+      for( std::list<int>::const_iterator bIt = m_dependBlocks.begin(); bIt != m_dependBlocks.end(); bIt++)
       {
          if( job->getBlock(*bIt)->getState() & AFJOB::STATE_DONE_MASK) continue;
          data->setStateDependent( true);
@@ -420,6 +420,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
          if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
          jobchanged = af::Msg::TMonitorJobsChanged;
          AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_tasksdependmask);
+         constructDependBlocks();
       }
       break;
    }
@@ -625,19 +626,47 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
 
 void Block::constructDependBlocks()
 {
-   if(( job->getBlocksNum() > 1 ) && ( data->hasDependMask() ))
-   {
-      dependBlocks.clear();
-      for( int bd = 0; bd < job->getBlocksNum(); bd++)
-      {
-         // skip if it is the same block
-         if( bd == data->getBlockNum() ) continue;
+    if( job->getBlocksNum() <= 1 )
+    {
+        // There is only one block, no one other to denend on
+        return;
+    }
 
-         // store block if name match mask
-         if( data->checkDependMask( job->getBlock(bd)->getName()))
-            dependBlocks.push_back( bd);
-      }
-   }
+    if( data->hasDependMask())
+    {
+        m_dependBlocks.clear();
+        for( int bd = 0; bd < job->getBlocksNum(); bd++)
+        {
+            // skip if it is the same block
+            if( bd == data->getBlockNum() ) continue;
+
+            // store block if name match mask
+            if( data->checkDependMask( job->getBlock(bd)->getName()))
+            m_dependBlocks.push_back( bd);
+        }
+    }
+
+    if( data->hasTasksDependMask())
+    {
+        m_dependTasksBlocks.clear();
+        for( int bd = 0; bd < job->getBlocksNum(); bd++)
+        {
+            // skip if it is the same block
+            if( bd == data->getBlockNum() ) continue;
+
+            // store block if name match mask
+            if( data->checkTasksDependMask( job->getBlock(bd)->getName()))
+            m_dependTasksBlocks.push_back( bd);
+        }
+    }
+}
+
+bool Block::tasksDependsOn( int block)
+{
+    for( std::list<int>::const_iterator it = m_dependTasksBlocks.begin(); it != m_dependTasksBlocks.end(); it++)
+        if( *it == block )
+            return true;
+    return false;
 }
 
 int Block::calcWeight() const

@@ -597,7 +597,12 @@ void JobAf::remRenderCounts( RenderAf * render)
 af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring)
 {
    // Job can set offline itself on some error in this recursive function
-   if( state & AFJOB::STATE_OFFLINE_MASK ) return NULL;
+    if( state & AFJOB::STATE_OFFLINE_MASK )
+        return NULL;
+
+    if( blocks[block]->tasks[task]->m_solved )
+        return NULL;
+    blocks[block]->tasks[task]->m_solved = true;
 
    //
    // Recursive dependence check, only if needed
@@ -649,7 +654,10 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
       for( int b = 0; b < blocksnum; b++)
       {
          if( b == block ) continue;
-         if( blocksdata[block]->checkTasksDependMask( blocksdata[b]->getName()) == false ) continue;
+
+ //         if( blocksdata[block]->checkTasksDependMask( blocksdata[b]->getName()) == false ) continue;
+         if( blocks[block]->tasksDependsOn( b) == false )
+             continue;
 
          long long firstdependframe, lastdependframe;
          int firstdependtask, lastdependtask;
@@ -805,6 +813,15 @@ bool JobAf::canRunOn( RenderAf * i_render)
 
 bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 {
+    for( int b = 0; b < blocksnum; b++)
+    {
+        int numtasks = blocksdata[b]->getTasksNum();
+        for( int t = 0; t < numtasks; t++)
+        {
+            blocks[b]->tasks[t]->m_solved = false;
+        }
+    }
+
    for( int b = 0; b < blocksnum; b++)
    {
       if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;

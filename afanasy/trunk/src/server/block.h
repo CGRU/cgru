@@ -49,6 +49,8 @@ public:
 
    uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
+   bool tasksDependsOn( int block);
+
 public:
    JobAf * job;
    af::BlockData * data;
@@ -70,7 +72,8 @@ private:
    std::list<RenderAf*> renders_ptrs;
    std::list<int> renders_counts;
 
-   std::list<int> dependBlocks;
+   std::list<int> m_dependBlocks;
+   std::list<int> m_dependTasksBlocks;
    bool initialized;             ///< Where the block was successfully  initialized.
 
 private:
