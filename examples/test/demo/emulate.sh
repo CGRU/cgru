@@ -40,19 +40,17 @@ if [ $cleanup == "1" ]; then
    exit 0
 fi
 
+cd ..
+
 # Source CGRU setup:
 if [ -z $CGRU_LOCATION ]; then
    pushd ../.. >> /dev/null
-   source setup.sh
+   source ./setup.sh
    popd >> /dev/null
 fi
 
-source $CGRU_LOCATION/utilities/python/setup.sh ""
-
 # Create temporary folder:
 mkdir $tmpdir
-
-cd ..
 
 JobsPack=10
 Users=5
