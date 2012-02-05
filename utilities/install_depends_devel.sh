@@ -75,6 +75,7 @@ function suseArch(){
 function altArch(){
    packages="$packages gcc4.5-c++"
    packages="$packages python-dev"
+   packages="$packages postgresql-devel"
    packages="$packages qt4-devel"
    packages="$packages PyQt"
    packages="$packages git-core"

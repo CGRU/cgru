@@ -114,6 +114,7 @@ find_path(PostgreSQL_INCLUDE_DIR
    ${PostgreSQL_ROOT_DIRECTORIES}
   PATH_SUFFIXES
     postgresql
+    pgsql
     include
   # Help the user find it if we cannot.
   DOC "The ${PostgreSQL_INCLUDE_DIR_MESSAGE}"
