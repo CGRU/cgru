@@ -46,7 +46,11 @@ for NUKE_FOLDER in $NUKE_FOLDERS ;
 do
    if [ "`echo $NUKE_FOLDER | awk '{print match( \$1, "Nuke")}'`" == "1" ]; then
       NUKE_LOCATION="${NUKE_INSTALL_DIR}/${NUKE_FOLDER}"
-      NUKE_EXEC="`echo $NUKE_FOLDER | awk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
+      if [ "`uname`" == "Darwin" ]; then
+        NUKE_EXEC="`echo $NUKE_FOLDER | awk '{print substr( \$1, 1, 1+match( \$1, "v.*"))}'`.app/$NUKE_FOLDER"
+      else
+        NUKE_EXEC="`echo $NUKE_FOLDER | awk '{print substr( \$1, 1, -1+match( \$1, "v.*"))}'`"
+      fi
    fi
 done
 export NUKE_EXEC="${NUKE_LOCATION}/${NUKE_EXEC}"
