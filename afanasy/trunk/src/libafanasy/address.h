@@ -76,7 +76,7 @@ public:
 /// Read or write address in buffer.
    void readwrite( Msg * msg);
 
-   static bool readIpMask( const std::string & i_serveripmask);
+   static bool readIpMask( const std::string & i_serveripmask, bool i_verbose);
 
    bool matchIpMask() const;
 
@@ -93,7 +93,7 @@ private:
 
 struct AddressMask
 {
-    AddressMask( int i_len, const char * i_bytes, Address::Family i_family);
+    AddressMask( int i_len, const char * i_bytes, Address::Family i_family, bool i_verbose);
 
     Address::Family m_family;
     int  m_len;

@@ -13,7 +13,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-#define PRINT if(verbose_init)printf
+#define PRINT if(m_verbose_init)printf
 
 using namespace af;
 
@@ -114,9 +114,9 @@ std::string Environment::home_afanasy;
 
 bool Environment::god_mode       = false;
 bool Environment::help_mode      = false;
-bool Environment::valid          = false;
-bool Environment::verbose_init   = false;
-bool Environment::verbose_mode   = false;
+bool Environment::m_valid        = false;
+bool Environment::m_verbose_init = false;
+bool Environment::m_verbose_mode = false;
 bool Environment::visor_mode     = false;
 
 Passwd * Environment::passwd = NULL;
@@ -272,7 +272,7 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::str
       }
       node = node->next_sibling( name);
    }
-   if( verbose_init )
+   if( m_verbose_init )
    {
       printf("\t%s:\n", name);
       for( std::list<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
@@ -283,7 +283,7 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::str
 
 Environment::Environment( uint32_t flags, int argc, char** argv )
 {
-   verbose_init = flags & Verbose;
+   m_verbose_init = flags & Verbose;
 //
 // Init command arguments:
    initCommandArguments( argc, argv);
@@ -430,7 +430,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //###################################################
 
    load();
-   valid = init();
+   m_valid = init();
 
    PRINT("Render host name = '%s'\n", hostname.c_str());
 }
@@ -445,26 +445,26 @@ void Environment::load()
 {
    std::string filename;
    filename = ( afroot + "/config_default.xml");
-   load( filename, false, verbose_init);
+   load( filename, false, m_verbose_init);
    filename = ( afroot + "/config.xml");
-   load( filename, false, verbose_init);
+   load( filename, false, m_verbose_init);
    filename = ( home_afanasy + "/config.xml");
-   load( filename, false, verbose_init);
-   bool _verbose_init=verbose_init;
-   verbose_init = false;
+   load( filename, false, m_verbose_init);
+   bool _verbose_init = m_verbose_init;
+   m_verbose_init = false;
    filename = ( afroot + "/config_shadow.xml");
-   load( filename, false, verbose_init);
-   verbose_init=_verbose_init;
+   load( filename, false, m_verbose_init);
+   m_verbose_init=_verbose_init;
 }
 
 bool Environment::load( const std::string & filename, bool initialize, bool Verbose)
 {
    bool retval = false;
-   verbose_init = Verbose;
+   m_verbose_init = Verbose;
 
    if( false == pathFileExists( filename)) return retval;
 
-   if( verbose_init) printf("Parsing XML file '%s':\n", filename.c_str());
+   if( m_verbose_init) printf("Parsing XML file '%s':\n", filename.c_str());
 
    int filesize = -1;
    char * buffer = fileRead( filename, filesize);
@@ -510,10 +510,10 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
 
 bool Environment::reload()
 {
-   verbose_init = true;
+   m_verbose_init = true;
    load();
-   valid = init();
-   return valid;
+   m_valid = init();
+   return m_valid;
 }
 
 bool Environment::setClientPort( uint16_t port)
@@ -559,7 +559,7 @@ bool Environment::init()
 
    //
    //############ Server Accept IP Addresses Mask:
-   if( false == Address::readIpMask( serveripmask))
+   if( false == Address::readIpMask( serveripmask, m_verbose_init))
    {
        return false;
    }
@@ -580,14 +580,14 @@ void Environment::initCommandArguments( int argc, char** argv)
    {
       cmdarguments.push_back(argv[i]);
 
-      if( false == verbose_mode)
+      if( false == m_verbose_mode)
       if(( cmdarguments.back() == "-V"    ) ||
          ( cmdarguments.back() == "--V"   ) ||
          ( cmdarguments.back() == "--Verbose")
         )
       {
          printf("Verbose is on.\n");
-         verbose_mode = true;
+         m_verbose_mode = true;
       }
 
       if( false == help_mode)

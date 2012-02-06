@@ -127,7 +127,7 @@ CmdJobId::CmdJobId()
 CmdJobId::~CmdJobId(){}
 bool CmdJobId::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   int number = atoi(argv[1]);
+   int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }
@@ -144,12 +144,13 @@ CmdJobLog::CmdJobLog()
    setInfo("Get job log.");
    setHelp("jlog [id] Get job log with given id.");
    setMsgType( af::Msg::TJobLogRequestId);
+//   setMsgOutType( af::Msg::TData);
    setRecieving();
 }
 CmdJobLog::~CmdJobLog(){}
 bool CmdJobLog::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   int number = atoi(argv[1]);
+   int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }
@@ -167,7 +168,7 @@ CmdJobProgress::CmdJobProgress()
 CmdJobProgress::~CmdJobProgress(){}
 bool CmdJobProgress::processArguments( int argc, char** argv, af::Msg &msg)
 {
-   int number = atoi(argv[1]);
+   int number = atoi(argv[0]);
    msg.set( getMsgType(), number);
    return true;
 }

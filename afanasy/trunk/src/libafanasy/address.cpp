@@ -304,9 +304,9 @@ int Address::calcWeight() const
    return weight;
 }
 
-bool Address::readIpMask( const std::string & i_serveripmask)
+bool Address::readIpMask( const std::string & i_serveripmask, bool i_verbose)
 {
-    printf("Server IP Mask = '%s'\n", i_serveripmask.c_str());
+    if( i_verbose ) printf("Server IP Mask = '%s'\n", i_serveripmask.c_str());
     std::list<std::string> masks = strSplit( i_serveripmask, " ");
     for( std::list<std::string>::const_iterator it = masks.begin(); it != masks.end(); it++)
     {
@@ -386,7 +386,7 @@ bool Address::readIpMask( const std::string & i_serveripmask)
             return false;
         }
 
-        ms_addr_masks.push_back( AddressMask( mask_len, mask_bytes, mask_family));
+        ms_addr_masks.push_back( AddressMask( mask_len, mask_bytes, mask_family, i_verbose));
     }
     return true;
 }
@@ -424,7 +424,7 @@ bool Address::matchIpMask() const
     return false;
 }
 
-AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_family):
+AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_family, bool i_verbose):
     m_len( i_len),
     m_family( i_family)
 {
@@ -433,6 +433,10 @@ AddressMask::AddressMask( int i_len, const char * i_bytes, Address::Family i_fam
         memcpy( m_bytes, i_bytes, i_len);
     }
 
+    if( false == i_verbose )
+        return;
+
+    // Print mask:
     printf("Server Mask");
 
     switch( m_family )
