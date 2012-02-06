@@ -38,7 +38,12 @@ fi
 # Path to save 'Untitled' scene to render, if not set 'tmp' name in current folder will be used
 # export NUKE_AF_TMPSCENE="compositing/tmp"
 
-NUKE_INSTALL_DIR="/usr/local"
+if [ "`uname`" == "Darwin" ]; then
+    NUKE_INSTALL_DIR="/Applications"
+else
+    NUKE_INSTALL_DIR="/usr/local"
+fi
+
 NUKE_FOLDERS=`ls "$NUKE_INSTALL_DIR"`
 NUKE_LOCATION=""
 NUKE_EXEC=""
