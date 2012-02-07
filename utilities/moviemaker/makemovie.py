@@ -155,6 +155,7 @@ if os.path.dirname( Output) != '' and not os.path.isdir( os.path.dirname( Output
       sys.exit(1)
 
 # Encode command:
+# Codec = Codec.lower()
 encoder = Codec.split('.')
 if len(encoder) < 2:
    encoder = 'ffmpeg'
