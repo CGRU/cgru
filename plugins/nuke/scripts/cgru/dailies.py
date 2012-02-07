@@ -29,20 +29,6 @@ def dailiesEvaluate( node):
       codec = codec.replace('\\','/')
       node.knob('codec').setValue( codec)
 
-   # Template:
-   template = node.knob('template').value()
-   if template == None or template == '' or not os.path.isfile( template):
-      template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_withlogo')
-      template = template.replace('\\','/')
-      node.knob('template').setValue( template)
-
-   # Slate:
-   slate = node.knob('slate').value()
-   if slate == None or slate == '' or not os.path.isfile( slate):
-      slate = os.getenv('CGRU_DAILIES_SLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_slate')
-      slate = slate.replace('\\','/')
-      node.knob('slate').setValue( slate)
-
    # Logo slate:
    lgssize = node.knob('lgssize').value()
    if lgssize < 1:
@@ -71,6 +57,19 @@ def dailiesEvaluate( node):
       node.knob('lgfpath').setValue( lgfpath)
 
    if newNode:
+      # Template:
+      template = node.knob('template').value()
+      if template == None or template == '' or not os.path.isfile( template):
+         template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_withlogo')
+         template = template.replace('\\','/')
+         node.knob('template').setValue( template)
+
+      # Slate:
+      slate = node.knob('slate').value()
+      if slate == None or slate == '' or not os.path.isfile( slate):
+         slate = os.getenv('CGRU_DAILIES_SLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_slate')
+         slate = slate.replace('\\','/')
+         node.knob('slate').setValue( slate)
 
       # Logo slate file:
       lgspath = os.getenv('CGRU_DAILIES_LGSPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
@@ -271,6 +270,7 @@ def dailiesGenCmd( node):
    fend     = int(node.knob('fend').value())
    fffirst  = int(node.knob('fffirst').value())
 
+   encodeonly     = node.knob('encodeonly').value()
    tmpformat      = node.knob('tmpformat').value()
    tmpquality     = node.knob('tmpquality').value()
    autocolorspace = int(node.knob('autocolorspace').value())
@@ -287,12 +287,11 @@ def dailiesGenCmd( node):
    cmd = os.path.join( cmd, 'makemovie.py')
    cmd = 'python ' + cmd
 
-   cmd += ' -r "%s"' % format
+   # cmd += ' -r "%s"' % format #OHadd
    cmd += ' -f "%s"' % fps
    cmd += ' -c "%s"' % codec
-   cmd += ' -t "%s"' % template
-   cmd += ' -s "%s"' % slate
-
+   # cmd += ' -t "%s"' % template #OHadd
+   # cmd += ' -s "%s"' % slate	#OHadd
 
    if tmpformat  is not None and tmpformat  != '': cmd += ' --tmpformat "%s"'   % tmpformat
    if tmpquality is not None and tmpquality != '': cmd += ' --tmpquality "%s"'  % tmpquality
@@ -303,32 +302,35 @@ def dailiesGenCmd( node):
    if fstart !=  -1: cmd += ' --fs %d' % fstart
    if fend   !=  -1: cmd += ' --fe %d' % fend
    if fffirst      : cmd += ' --fff'
-
-   if company  is not None and company  != '': cmd += ' --company "%s"'  % company
-   if project  is not None and project  != '': cmd += ' --project "%s"'  % project
-   if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot
-   if version  is not None and version  != '': cmd += ' --ver "%s"'      % version
-   if artist   is not None and artist   != '': cmd += ' --artist "%s"'   % artist
-   if activity is not None and activity != '': cmd += ' --activity "%s"' % activity
-   if comments is not None and comments != '': cmd += ' --comments "%s"' % comments
-   if draw169  is not None and draw169  != '': cmd += ' --draw169 "%s"'  % draw169
-   if draw235  is not None and draw235  != '': cmd += ' --draw235 "%s"'  % draw235
-   if line169  is not None and line169  != '': cmd += ' --line169 "%s"'  % line169
-   if line235  is not None and line235  != '': cmd += ' --line235 "%s"'  % line235
-   if line_clr is not None and line_clr != '':
-      cmd += ' --line_aspect %f' % line_as
-      cmd += ' --line_color "%s"' % line_clr
-   if cach_op  is not None and cach_op  != '':
-      cmd += ' --cacher_aspect %f' % cach_as
-      cmd += ' --cacher_opacity "%s"' % cach_op
-   if lgspath  is not None and lgspath  != '':
-      cmd += ' --lgspath "%s"' % lgspath
-      cmd += ' --lgssize %d'   % lgssize
-      cmd += ' --lgsgrav %s'   % lgsgrav
-   if lgfpath  is not None and lgfpath  != '':
-      cmd += ' --lgfpath "%s"' % lgfpath
-      cmd += ' --lgfsize %d'   % lgfsize
-      cmd += ' --lgfgrav %s'   % lgfgrav
+   if not encodeonly: #OHadd
+	   cmd += ' -r "%s"' % format #OHadd
+	   cmd += ' -t "%s"' % template #OHadd
+	   cmd += ' -s "%s"' % slate	#OHadd
+	   if company  is not None and company  != '': cmd += ' --company "%s"'  % company
+	   if project  is not None and project  != '': cmd += ' --project "%s"'  % project
+	   if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot
+	   if version  is not None and version  != '': cmd += ' --ver "%s"'      % version
+	   if artist   is not None and artist   != '': cmd += ' --artist "%s"'   % artist
+	   if activity is not None and activity != '': cmd += ' --activity "%s"' % activity
+	   if comments is not None and comments != '': cmd += ' --comments "%s"' % comments
+	   if draw169  is not None and draw169  != '': cmd += ' --draw169 "%s"'  % draw169
+	   if draw235  is not None and draw235  != '': cmd += ' --draw235 "%s"'  % draw235
+	   if line169  is not None and line169  != '': cmd += ' --line169 "%s"'  % line169
+	   if line235  is not None and line235  != '': cmd += ' --line235 "%s"'  % line235
+	   if line_clr is not None and line_clr != '':
+	      cmd += ' --line_aspect %f' % line_as
+	      cmd += ' --line_color "%s"' % line_clr
+	   if cach_op  is not None and cach_op  != '':
+	      cmd += ' --cacher_aspect %f' % cach_as
+	      cmd += ' --cacher_opacity "%s"' % cach_op
+	   if lgspath  is not None and lgspath  != '':
+	      cmd += ' --lgspath "%s"' % lgspath
+	      cmd += ' --lgssize %d'   % lgssize
+	      cmd += ' --lgsgrav %s'   % lgsgrav
+	   if lgfpath  is not None and lgfpath  != '':
+	      cmd += ' --lgfpath "%s"' % lgfpath
+	      cmd += ' --lgfsize %d'   % lgfsize
+	      cmd += ' --lgfgrav %s'   % lgfgrav
    if node.knob('stereodub').value(): cmd += ' --stereo'
 
    cmd += ' ' + images
