@@ -15,44 +15,44 @@ $this->DisplayHeader();
 switch ($action)
 {
 case 'jobs':
-   display_jobs();
-   break;
+    display_jobs();
+    break;
 case 'tasks':
-   display_tasks();
-   break;
+    display_tasks();
+    break;
 case 'users':
-   display_users();
-   break;
+    display_users();
+    break;
 case 'renders':
-   display_renders();
-   break;
+    display_renders();
+    break;
 case 'user':
-   display_user();
-   break;
+    display_user();
+    break;
 case 'stat':
-   display_stat();
-   break;
+    display_stat();
+    break;
 case 'stat_chart':
-   display_stat_chart();
-   break;
+    display_stat_chart();
+    break;
 case 'cabinet':
-   display_cabinet();
-   break;
+    display_cabinet();
+    break;
 case 'login':
-   $this->DisplayLogin();
-   break;
+    $this->DisplayLogin();
+    break;
 case 'logout':
-   $this->DisplayLogout();
-   break;
+    $this->DisplayLogout();
+    break;
 case 'AddAdmin':
-   $this->AddAdmin();
-   break;
+    $this->AddAdmin();
+    break;
 case 'AddAdmin_register':
-   $this->AddAdmin_register();
-   break;
+    $this->AddAdmin_register();
+    break;
 default:
-   echo "action '<b><i>$action</i></b>' is not supported.";
-   break;
+    echo "action '<b><i>$action</i></b>' is not supported.";
+    break;
 }
 
 $this->DisplayFooter();

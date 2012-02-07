@@ -142,7 +142,7 @@ while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
    echo "$markOff</td>\n";
 
    echo "\t\t<td>$markOn";
-   echo "<a href='index.php?action=tasks&jobid=".$line["id"]."'>".$line["name"]."</a>";
+   echo "<a href='index.php?action=tasks&jid=".$line["id"]."'>".$line["name"]."</a>";
    echo "$markOff</td>\n";
 
    if( $uid < 1)
