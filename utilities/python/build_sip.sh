@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sip="sip-4.12.4"
+sip="sip-4.13.1"
 
 if [ "$1" == "-h" ]; then
    cd $sip

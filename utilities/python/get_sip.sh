@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=4.12.4
+ver=4.13.1
 location="http://www.riverbankcomputing.co.uk/static/Downloads/sip4"
 foldername="sip-$ver"
 archive_ext="tar.gz"

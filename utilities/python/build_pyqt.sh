@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pyqt="PyQt-x11-gpl-4.8.5"
+pyqt="PyQt-x11-gpl-4.9"
 export PYTHONPATH="$PWD/sip"
 
 if [ "$1" == "-h" ]; then
