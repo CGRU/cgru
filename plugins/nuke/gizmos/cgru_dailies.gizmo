@@ -8,6 +8,8 @@ Gizmo {
  
    addUserKnob {  2 codec     l "Codec Preset" +STARTLINE}
 
+   addUserKnob {  6 encodeonly    l "Encode only" +STARTLINE }
+
    addUserKnob {  1 company   l "Company"  +STARTLINE }
    addUserKnob {  1 project   l "Project"  -STARTLINE }
    addUserKnob {  1 shot      l "Shot"     -STARTLINE }
