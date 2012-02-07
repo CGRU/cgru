@@ -468,6 +468,19 @@ elif ext == 'aep':
       images = os.path.join( os.path.dirname( output), os.path.basename( output).replace('[','@').replace(']','@'))
    if extrargs != '': cmd += ' ' + extrargs
 
+# C4D:
+elif ext == 'c4d':
+   scenetype = 'c4d'
+   if cmd is None: cmd = 'c4drender' + cmdextension
+   # Here i get the information in there that the normal c4d and not the special
+   # c4drender command should get used (which copies all the stuff locally)
+   if extrargs == 'no_copy': cmd = 'c4d' + cmdextension
+   cmd += ' -nogui -render "' + scene + '" -frame @#@ @#@ ' + str(by)
+   if output != '':
+      cmd += ' -oimage "%s"' % output
+      images = output
+
+
 # simple generic:
 else:
    scenetype = 'generic'

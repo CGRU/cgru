@@ -5,7 +5,7 @@ import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
-Names = ['Blender','Houdini','Maya','Nuke']
+Names = ['Blender','C4D', 'Houdini','Maya','Nuke']
 if sys.platform.find('win') == 0:
    Names.extend(['3DSMax','Softimage','AfterFX'])
 
@@ -17,6 +17,7 @@ def startDetached( command):
       QtCore.QProcess.startDetached( '/bin/bash', ['-c', command])
 
 def startBlender():   startDetached('blender')
+def startC4D():       startDetached('c4d')
 def startHoudini():   startDetached('houdini')
 def startMaya():      startDetached('maya')
 def startNuke():      startDetached('nuke')
@@ -42,6 +43,7 @@ def exampleSoftware( folder, script):
    QtCore.QProcess.startDetached( '"%s"' % cmd)
 
 def exampleBlender():   exampleSoftware('blender','start_blender')
+def exampleC4D():       exampleSoftware('c4d','start_c4d')
 def exampleHoudini():   exampleSoftware('houdini','start_houdini')
 def exampleMaya():      exampleSoftware('maya','start_maya')
 def exampleNuke():      exampleSoftware('nuke','start_nuke')
@@ -91,6 +93,7 @@ def locateSoftware( soft):
    file.close()
 
 def locateBlender():    locateSoftware('Blender')
+def locateC4D():        locateSoftware('C4D')
 def locateHoudini():    locateSoftware('Houdini')
 def locateMaya():       locateSoftware('Maya')
 def locateNuke():       locateSoftware('Nuke')
