@@ -5,9 +5,11 @@ import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
-Names = ['Blender','C4D', 'Houdini','Maya','Nuke']
+Names = ['Blender','Houdini','Maya','Nuke']
 if sys.platform.find('win') == 0:
    Names.extend(['3DSMax','Softimage','AfterFX'])
+if sys.platform.find('darwin') == 0:
+   Names.extend(['C4D'])
 
 def startDetached( command):
    print( command)
