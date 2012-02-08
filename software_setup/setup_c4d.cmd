@@ -17,6 +17,8 @@ REM CGRU for C4D add-ons location, override it, or simple launch from current fo
 set C4D_CGRU_LOCATION=%CGRU_LOCATION%\plugins\c4d
 set C4D_CGRU_SCRIPTS_LOCATION=%C4D_CGRU_LOCATION%\scripts
 
+set C4D_AF_SCRIPTS_LOCATION=%AF_ROOT%\plugins\c4d
+
 REM Define that the c4d-render-script can get found
 set C4D_RENDER_SCRIPT="%C4D_CGRU_LOCATION%\render.py"
 
