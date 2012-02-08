@@ -48,8 +48,6 @@ if afroot is None: error_exit('AF_ROOT is not defined.')
 
 # Create and check the c4d-temp directory:
 my_temp_directory = cgruTempFolder.cgruTempFolder(scene_file, service = 'c4d', type = 'render', debug = True)
-# Remove old temp-directoriess
-my_temp_directory.deleteOldTempFolders()
 temp_directory = my_temp_directory.folderPath
 
 
@@ -176,6 +174,9 @@ if copied_files == 0:
 elif copied_files < len(rendered_frames):
     error_exit('Not all rendered Images got copied') 
 
+
+# Now lets tell the temp-folder that we do not need it any more
+my_temp_directory.closeTempFolder()
 
 # If we did get till here it means everything went well    
 print("FINISHED WITH SCRIPT")

@@ -243,8 +243,8 @@ class RenderOnFarm(plugins.CommandData):
         
         
         # The default Frame-Range
-        self.startFrame = thisDoc.GetLoopMinTime().GetFrame(thisDoc.GetFps())
-        self.endFrame = thisDoc.GetLoopMaxTime().GetFrame(thisDoc.GetFps())
+        self.startFrame = thisDoc.GetMinTime().GetFrame(thisDoc.GetFps())
+        self.endFrame = thisDoc.GetMaxTime().GetFrame(thisDoc.GetFps())
         self.byFrame = 1
                 
         self.priority = 50
