@@ -368,7 +368,7 @@ static const char * TNAMES[]; ///< Type names.
    inline bool   isInvalid() const { return mtype == TInvalid; }///< Whether message is invalid.
 
 //   void stdOut( bool full = false) const;
-   void stdOutData();
+   void stdOutData( bool withHeader = true);
 
    static const int SizeHeader;     ///< size of message header.
    static const int SizeBuffer;     ///< message reading buffer size.

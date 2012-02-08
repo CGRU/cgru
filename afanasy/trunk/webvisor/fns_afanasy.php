@@ -92,6 +92,20 @@ function stateToStr( $state)
    return $state_str;
 }
 
+function stateToString( $state)
+{
+   $state_str = '';
+   if( stateIsReady(    $state)) $state_str = $state_str.' Ready';
+   if( stateIsRunning(  $state)) $state_str = $state_str.' Running';
+   if( stateIsDone(     $state)) $state_str = $state_str.' Done';
+   if( stateIsError(    $state)) $state_str = $state_str.' Error';
+   if( stateIsWaitdep(  $state)) $state_str = $state_str.' Waiting Dependences';
+   if( stateIsWaittime( $state)) $state_str = $state_str.' Waiting Time';
+   if( stateIsSkipped(  $state)) $state_str = $state_str.' Skipped';
+   if( stateIsOffline(  $state)) $state_str = $state_str.' Offline';
+   return $state_str;
+}
+
 function stateToStyle( $state)
 {
    $style = 'empty';

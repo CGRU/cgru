@@ -144,7 +144,7 @@ void AfCmd::msgOutput( af::Msg &msg)
          case af::Msg::TDATA:
          case af::Msg::TString:
          case af::Msg::TStringList:
-            msg.stdOutData();
+            msg.stdOutData( false);
             break;
          case af::Msg::TConfirm:
             printf("Confirm(%d) message recieved.\n", msg.int32());

@@ -25,11 +25,9 @@ void sig_int(int signum)
 //#####################################################################################
 #endif
 
-//#pragma comment(linker,"/ENTRY:main")
 int main(int argc, char *argv[])
 {
 #ifdef WINNT
-//   CRT_INIT();
    af::Environment ENV( af::Environment::Verbose, argc, argv);   //< Verbose environment initialization
 #else
 //
@@ -48,7 +46,7 @@ int main(int argc, char *argv[])
 
 //
 // Silent environment initialization:
-   af::Environment ENV( af::Environment::NoFlags, argc, argv);
+   af::Environment ENV( af::Environment::Normal, argc, argv);
 #endif
    if( false == ENV.isValid())
    {

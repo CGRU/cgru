@@ -118,7 +118,6 @@ Farm::Farm( const std::string & File, bool Verbose ):
 {
    if( false == pathFileExists( filename))
    {
-      printf("Farm file \"%s\" does not esxist.\n", filename.c_str());
       return;
    }
 

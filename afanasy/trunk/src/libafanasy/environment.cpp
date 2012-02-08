@@ -1,6 +1,7 @@
 #include "environment.h"
 
 #ifndef WINNT
+#include <pwd.h>
 #include <unistd.h>
 #endif
 
@@ -14,6 +15,7 @@
 #include "../include/macrooutput.h"
 
 #define PRINT if(m_verbose_init)printf
+#define QUIET if(!m_quiet_init)printf
 
 using namespace af;
 
@@ -116,6 +118,7 @@ bool Environment::god_mode       = false;
 bool Environment::help_mode      = false;
 bool Environment::m_valid        = false;
 bool Environment::m_verbose_init = false;
+bool Environment::m_quiet_init   = false;
 bool Environment::m_verbose_mode = false;
 bool Environment::visor_mode     = false;
 
@@ -283,7 +286,9 @@ bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::str
 
 Environment::Environment( uint32_t flags, int argc, char** argv )
 {
-   m_verbose_init = flags & Verbose;
+    m_verbose_init = flags & Verbose;
+    m_quiet_init = flags & Quiet;
+    if( m_quiet_init ) m_verbose_init = false;
 //
 // Init command arguments:
    initCommandArguments( argc, argv);
@@ -297,8 +302,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
       afroot = af::pathAbsolute( afroot);
       afroot = af::pathUp( afroot);
       afroot = af::pathUp( afroot);
-      std::cout << "afroot=" << afroot;
-      std::cout << std::endl;
+      QUIET("Setting Afanasy root to \"%s\"\n", afroot.c_str());
    }
    if( af::pathIsFolder( afroot ) == false)
    {
@@ -314,8 +318,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    {
       cgrulocation = afroot;
       cgrulocation = af::pathUp( cgrulocation);
-      std::cout << "cgrulocation=" << cgrulocation;
-      std::cout << std::endl;
+      QUIET("Setting CRGU location to \"%s\"\n", cgrulocation.c_str());
    }
    else
    {
@@ -359,22 +362,31 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    }
 //
 //############ user name:
-   username = getenv("AF_USERNAME");
-   if( username.size() == 0) username = getenv("USER");
-   if( username.size() == 0) username = getenv("USERNAME");
-   if( username.size() == 0)
-   {
-      AFERROR("Can't get user name.")
-      return;
-   }
-   // Convert to lowercase:
-   std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-   // cut DOMAIN/
-   size_t dpos = username.rfind('/');
-   if( dpos == std::string::npos) dpos = username.rfind('\\');
-   if( dpos != std::string::npos) username = username.substr( dpos + 1);
-   std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-   PRINT("Afanasy user name = '%s'\n", username.c_str());
+    username = getenv("AF_USERNAME");
+    if( username.size() == 0) username = getenv("USER");
+    if( username.size() == 0) username = getenv("USERNAME");
+    if( username.size() == 0)
+    {
+#ifdef WINNT
+        char acUserName[256];
+        DWORD nUserName = sizeof(acUserName);
+        if( GetUserName(acUserName, &nUserName)) username = acUserName;
+#else
+        uid_t uid = geteuid ();
+        struct passwd * pw = getpwuid (uid);
+        if( pw ) username = pw->pw_name;
+#endif
+    }
+    if( username.size() == 0) username = "unknown";
+
+    // Convert to lowercase:
+    std::transform( username.begin(), username.end(), username.begin(), ::tolower);
+    // cut DOMAIN/
+    size_t dpos = username.rfind('/');
+    if( dpos == std::string::npos) dpos = username.rfind('\\');
+    if( dpos != std::string::npos) username = username.substr( dpos + 1);
+    std::transform( username.begin(), username.end(), username.begin(), ::tolower);
+    PRINT("Afanasy user name = '%s'\n", username.c_str());
 //
 //############ local host name:
    hostname = getenv("AF_HOSTNAME");
@@ -405,26 +417,26 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
    // Date:
    version_date = std::string(__DATE__) + " " __TIME__;
-   printf("Compilation date = \"%s\"\n", version_date.c_str());
+   QUIET("Compilation date = \"%s\"\n", version_date.c_str());
 
    // CGRU:
    version_cgru = getenv("CGRU_VERSION");
-   printf("CGRU version = \"%s\"\n", version_cgru.c_str());
+   QUIET("CGRU version = \"%s\"\n", version_cgru.c_str());
 
    // Build Revision:
 //#ifdef CGRU_REVISION
    version_afanasy = CGRU_REVISION;
 //#endif
-   printf("Afanasy build revision = \"%d\"\n", version_afanasy);
+   QUIET("Afanasy build revision = \"%d\"\n", version_afanasy);
 
    // Python:
    version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);
-   printf("Python version = \"%s\"\n", version_python.c_str());
+   QUIET("Python version = \"%s\"\n", version_python.c_str());
 
    // GCC:
 #ifdef __GNUC__
    version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
-   printf("GCC version = \"%s\"\n", version_gcc.c_str());
+   QUIET("GCC version = \"%s\"\n", version_gcc.c_str());
 #endif
 
 //###################################################

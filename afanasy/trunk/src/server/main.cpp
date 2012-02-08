@@ -47,7 +47,7 @@ void sig_pipe(int signum)
 int main(int argc, char *argv[])
 {
    running = true;
-   af::Environment ENV( af::Environment::NoFlags, argc, argv);
+   af::Environment ENV( af::Environment::Normal, argc, argv);
    if( af::init( af::InitFarm) == false) return 1;
    afsql::init();
 

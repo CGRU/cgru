@@ -59,13 +59,17 @@ af::Farm * af::farm()
 
 bool af::loadFarm( bool verbose)
 {
-   std::string filename = af::Environment::getAfRoot() + "/farm.xml";
-   if( loadFarm( filename,  verbose) == false)
-   {
-      filename = af::Environment::getAfRoot() + "/farm_example.xml";
-      if( loadFarm( filename,  verbose) == false) return false;
-   }
-   return true;
+    std::string filename = af::Environment::getAfRoot() + "/farm.xml";
+    if( loadFarm( filename,  verbose) == false)
+    {
+        filename = af::Environment::getAfRoot() + "/farm_example.xml";
+        if( loadFarm( filename,  verbose) == false)
+        {
+            AFERRAR("Can't load default farm settings file:\n%s\n", filename.c_str());
+            return false;
+        }
+    }
+    return true;
 }
 
 bool af::loadFarm( const std::string & filename, bool verbose )
@@ -430,11 +434,18 @@ bool af::pathIsFolder( const std::string & path)
 
 const std::string af::pathHome()
 {
+    std::string home;
 #ifdef WINNT
-   return getenv("HOMEPATH");
+    home = af::getenv("HOMEPATH");
+    if( false == af::pathIsFolder( home ))
+        home = "c:\\temp";
 #else
-   return getenv("HOME");
+    home = af::getenv("HOME");
+    if( false == af::pathIsFolder( home ))
+        home = "/tmp";
 #endif
+    af::pathMakeDir( home, VerboseOn);
+    return home;
 }
 
 bool af::pathMakeDir( const std::string & i_path, VerboseMode i_verbose)
@@ -449,7 +460,7 @@ bool af::pathMakeDir( const std::string & i_path, VerboseMode i_verbose)
       if( mkdir( i_path.c_str(), 0777) == -1)
 #endif
       {
-         AFERRPA("af::pathMakeDir - \"%s\"", i_path.c_str())
+         AFERRPA("af::pathMakeDir - \"%s\": ", i_path.c_str())
          return false;
       }
 #ifndef WINNT

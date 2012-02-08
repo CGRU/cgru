@@ -47,9 +47,8 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
 //
 // initialize environment variables
 
-   uint32_t envflags = 0;
-
-   if( argc == 1) envflags = envflags | af::Environment::Verbose;
+   uint32_t envflags = af::Environment::Quiet;
+   if( argc == 1) envflags = af::Environment::Verbose;
    af::Environment ENV( envflags, argc, argv);
    if( ENV.isValid() == false ) return 1;
    ServerName = af::Environment::getServerName();

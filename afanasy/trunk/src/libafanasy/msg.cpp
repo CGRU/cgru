@@ -353,9 +353,9 @@ void Msg::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << ": Length=" << writeSize() << ", type=" << mtype;
 }
 
-void Msg::stdOutData()
+void Msg::stdOutData( bool withHeader)
 {
-   stdOut( true);
+   if( withHeader) stdOut( true);
 
    switch( mtype)
    {
@@ -381,11 +381,8 @@ void Msg::stdOutData()
    {
       std::list<std::string> strlist;
       rw_StringList( strlist, this);
-      std::cout << "String List:";
-      std::cout << std::endl;
       for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
          std::cout << *it << std::endl;
-      std::cout << std::endl;
       break;
    }
    }

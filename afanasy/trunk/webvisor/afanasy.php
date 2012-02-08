@@ -17,6 +17,9 @@ switch ($action)
 case 'jobs':
     display_jobs();
     break;
+case 'task':
+    display_task();
+    break;
 case 'tasks':
     display_tasks();
     break;

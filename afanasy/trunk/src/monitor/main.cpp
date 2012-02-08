@@ -28,7 +28,7 @@ MonitorWindow * pMONITOR;
 
 int main(int argc, char *argv[])
 {
-   uint32_t env_flags = af::Environment::NoFlags;
+   uint32_t env_flags = af::Environment::Normal;
 #ifdef WINNT
    af::Environment ENV( env_flags | af::Environment::Verbose, argc, argv);   // Verbose environment initialization
 #else
