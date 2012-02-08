@@ -110,20 +110,28 @@ else: fileknob = writenode['file']
 # Get views and images folders:
 imagesdirs = []
 views = []
-views_num = 1
+views_num = 0
 try:
-   views_str = writenode['views'].value()
-   print('Views = "%s"' % views_str)
-   views = views_str.split(' ')
-   views_num = len(views)
-   for view in views:
-      view = view.strip()
-      if view != '':
-         octx = nuke.OutputContext()
-         octx.setView( 1 + nuke.views().index( view))
-         imagesdirs.append( os.path.dirname( fileknob.getEvaluatedValue( octx)))
+    views_str = writenode['views'].value()
+    print('Views = "%s"' % views_str)
+    views = views_str.split(' ')
+    views_num = len(views)
+    for view in views:
+        view = view.strip()
+        if view != '':
+            if not view in nuke.views():
+                print('Error: Skipping invalid view: "%s"' % view)
+                continue
+            views_num += 1
+            octx = nuke.OutputContext()
+            octx.setView( 1 + nuke.views().index( view))
+            imagesdirs.append( os.path.dirname( fileknob.getEvaluatedValue( octx)))
 except:
-   errorExit('Can`t process views on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
+    errorExit('Can`t process views on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
+# Check for valid view founded:
+if views_num < 1:
+    errorExit('Can`t find valid views on "%s" write node.' % xnode, True)
+
 # Change render forder to temporary:
 try:
    filepath   = fileknob.value()

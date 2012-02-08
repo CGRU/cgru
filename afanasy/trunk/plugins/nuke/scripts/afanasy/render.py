@@ -154,9 +154,8 @@ class BlockParameters:
             if not len(view): continue # skip empty view, may be after split(' ')
             # Check view exists:
             if not view in nuke.views():
-               nuke.message('Error:\n%s\nInvalid view:\n%s' % ( self.writename, view))
-               self.valid = False
-               return
+               print('Error: Skipping invalid view: "%s"' % view)
+               continue
 
             if len( self.imgfile): self.imgfile += ';'
             # Get thow files for current view and fitst and last frames:

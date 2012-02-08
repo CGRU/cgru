@@ -208,8 +208,8 @@ def dailiesGenCmd( node):
    for view in views:
       if not len(view): continue # skip empty view, may be after split(' ')
       if not view in nuke.views():
-         nuke.message('Error:\n%s\nInvalid view:\n"%s"' % (inputnode.name(), view))
-         return
+         print('Error: Skipping invalid view: "%s"' % view)
+         continue
       octx = nuke.OutputContext()
       octx.setView( 1 + nuke.views().index(view))
       octx.setFrame( root_frame_first)
@@ -228,6 +228,10 @@ def dailiesGenCmd( node):
          return
       if len(images): images += ' '
       images += part1 + '#'*padding + part2
+
+   if images == '':
+      nuke.message('Error:\n%s\No valid views founded.' % inputnode.name())
+      return
 
    # Get Movie Name:
    movname  = node.knob('movname' ).value()
