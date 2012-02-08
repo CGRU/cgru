@@ -9,7 +9,7 @@ cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 cgru_qt=$cgru_utils/qt/4.8.0
 [ -d $cgru_qt ] || cgru_qt=$cgru_utils/qt/4.8.1
-cgru_python=$cgru_utils/python/2.7.2
+cgru_python=$cgru_utils/python/3.2.2
 
 # Setup Version:
 pushd .. > /dev/null
@@ -30,7 +30,7 @@ fi
 # Setup Python:
 python="python"
 # Use CGRU Python if presets:
-if [ -e $cgru_python/bin/python ]; then
+if [ -d $cgru_python/bin ]; then
    export PATH=$cgru_python/bin:$PATH
    echo "Using CGRU Python = '$cgru_python'"
 fi
@@ -87,10 +87,11 @@ $QMAKE
 make
 
 # Copy python library:
+[ -d ../../lib ] || mkdir -pv ../../lib
 pyaf="libpyaf/libpyaf.so"
-[ -f $pyaf ] && cp -fv $pyaf ../../bin/pyaf.so
+[ -f $pyaf ] && cp -fv $pyaf ../../lib/pyaf.so
 pyaf="libpyaf/libpyaf.dylib.1.0.0"
-[ -f $pyaf ] && cp -fv $pyaf ../../bin/pyaf.so
+[ -f $pyaf ] && cp -fv $pyaf ../../lib/pyaf.so
 
 # Copy binaries from apps on mac:
 if [ `uname` == "Darwin" ]; then

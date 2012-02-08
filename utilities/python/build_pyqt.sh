@@ -1,7 +1,11 @@
 #!/bin/bash
 
 pyqt="PyQt-x11-gpl-4.9"
-export PYTHONPATH="$PWD/sip"
+sip="$PWD/sip"
+export PYTHONPATH="$sip"
+pybin="$PWD/3.2.2/bin"
+export PATH="$sip:$PATH"
+[ -d $pybin ] && export PATH="$pybin:$PATH"
 
 if [ "$1" == "-h" ]; then
    cd $pyqt

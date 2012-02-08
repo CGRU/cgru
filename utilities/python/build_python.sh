@@ -1,7 +1,7 @@
 #!/bin/bash
 
 pythonver=$1
-[ -z "$pythonver" ] && pythonver=2.7.2
+[ -z "$pythonver" ] && pythonver=3.2.2
 
 [ "$2" != "-h" ] && options=$2
 

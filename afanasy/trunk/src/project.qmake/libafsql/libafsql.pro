@@ -3,10 +3,6 @@ TARGET = afsql
 TEMPLATE = lib
 CONFIG = staticlib
 
-CONFIG += qt
-QT -= gui
-QT += sql
-
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
 
 DIR = ../../libafsql

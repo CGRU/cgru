@@ -8,6 +8,9 @@ if [ "$1" == "-h" ]; then
    exit 0
 fi
 
+pypath="$PWD/3.2.2/bin"
+[ -d $pypath ] && export PATH="$pypath:$PATH"
+
 python="python"
 if [ ! -z `which python3` ]; then
    echo "Using Python 3."

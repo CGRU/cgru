@@ -3,13 +3,12 @@ DESTDIR = ../../../bin
 
 TEMPLATE = app
 
-CONFIG += qt thread release
-QT -= gui
-QT += sql
+CONFIG += thread release
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
 
 DIR = ../../server
+LIBS += -lpq
 LIBS += -L../libafsql -lafsql
 LIBS += -L../libafnetwork -lafnetwork
 LIBS += -L../libafanasy -lafanasy

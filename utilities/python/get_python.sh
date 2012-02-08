@@ -1,7 +1,7 @@
 #!/bin/bash
 
 ver=$1
-[ -z "$ver" ] && ver=2.7.2
+[ -z "$ver" ] && ver=3.2.2
 location="http://www.python.org/ftp/python"
 foldername="Python-$ver"
 archive_ext="tar.bz2"
