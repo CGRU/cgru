@@ -22,6 +22,7 @@ int ServerPort;
 
 int main( int argc, char** argv )
 {
+#ifdef AFOUTPUT
    if ( argc == 1)
    {
       printf("afcmd = '%s'\n", argv[0]);
@@ -41,6 +42,8 @@ printf("Msg::SizeBufferLimit  = %d\n", Msg::SizeBufferLimit );
 printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
 */
    }
+#endif
+
    Verbose = false;
    Help = false;
    Protocol = AF_UNSPEC;

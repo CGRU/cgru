@@ -295,40 +295,46 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 
 //
 //############ afanasy root directory:
-   afroot = getenv("AF_ROOT");
-   if( afroot.size() == 0 )
-   {
-      afroot = argv[0];
-      afroot = af::pathAbsolute( afroot);
-      afroot = af::pathUp( afroot);
-      afroot = af::pathUp( afroot);
-      QUIET("Setting Afanasy root to \"%s\"\n", afroot.c_str());
-   }
-   if( af::pathIsFolder( afroot ) == false)
-   {
-      AFERRAR("AF_ROOT directory = '%s' does not exists.", afroot.c_str())
-      return;
-   }
-   PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
+    afroot = getenv("AF_ROOT");
+    if( afroot.size() == 0 )
+    {
+        afroot = argv[0];
+        afroot = af::pathAbsolute( afroot);
+        afroot = af::pathUp( afroot);
+        afroot = af::pathUp( afroot);
+        QUIET("Setting Afanasy root to \"%s\"\n", afroot.c_str());
+    }
+    else
+    {
+        PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
+    }
+    if( af::pathIsFolder( afroot ) == false)
+    {
+        AFERRAR("AF_ROOT directory = '%s' does not exists.", afroot.c_str())
+        return;
+    }
 
 //
 //############ cgru root directory:
-   cgrulocation = getenv("CGRU_LOCATION");
-   if( cgrulocation.size() == 0 )
-   {
-      cgrulocation = afroot;
-      cgrulocation = af::pathUp( cgrulocation);
-      QUIET("Setting CRGU location to \"%s\"\n", cgrulocation.c_str());
-   }
-   else
-   {
-      PRINT("CGRU_LOCATION = '%s'\n", cgrulocation.c_str());
-   }
-   if( af::pathIsFolder( cgrulocation) == false)
-   {
-      AFERRAR("CGRU_LOCATION directory = '%s' does not exists.", cgrulocation.c_str())
-      return;
-   }
+    cgrulocation = getenv("CGRU_LOCATION");
+    if( cgrulocation.size() == 0 )
+    {
+        cgrulocation = afroot;
+        cgrulocation = af::pathUp( cgrulocation);
+        std::string version_txt = cgrulocation + AFGENERAL::PATH_SEPARATOR + "version.txt";
+        if( false == af::pathFileExists( version_txt))
+            cgrulocation = af::pathUp( cgrulocation);
+        QUIET("Setting CRGU location to \"%s\"\n", cgrulocation.c_str());
+    }
+    else
+    {
+        PRINT("CGRU_LOCATION = '%s'\n", cgrulocation.c_str());
+    }
+    if( af::pathIsFolder( cgrulocation) == false)
+    {
+        AFERRAR("CGRU_LOCATION directory = '%s' does not exists.", cgrulocation.c_str())
+        return;
+    }
 
 //
 // Afanasy python path:

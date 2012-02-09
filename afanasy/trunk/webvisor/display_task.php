@@ -44,6 +44,14 @@ if( $tid < 0)
 
 $taskaction=$_POST['taskaction'];
 echo $taskaction;
+//unset($_POST['taskaction']);
+//header("Cache-Control: no-cache, must-revalidate");
+
+$afcmd_dir = dirname( getcwd()).'/bin';
+$afcmd = $afcmd_dir.'/afcmd';
+echo "<br/>\n";
+echo $afcmd;
+echo "<br/>\n";
 
 echo '<form method="post" action="index.php?action=task&jid='.$jid.'&bid='.$bid.'&tid='.$tid.'">';
 echo "<br/>\n";
@@ -94,9 +102,8 @@ echo '<td style="padding:10px">';
        1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
        2 => array("file", "/tmp/error-output.txt", "a") // stderr is a file to write to
     );
-    $cmd = '/cgru/afanasy/trunk/bin/afcmd tlog '.$jid_str.' '.$bid_str.' '.$tid_str.' 0';
-    $cwd = '/cgru/afanasy/trunk/bin/';
-    $process = proc_open( $cmd, $descriptorspec, $pipes, $cwd);
+    $cmd = $afcmd.' tlog '.$jid_str.' '.$bid_str.' '.$tid_str.' 0';
+    $process = proc_open( $cmd, $descriptorspec, $pipes, $afcmd_dir);
     fclose($pipes[0]);
     $output = stream_get_contents($pipes[1]);
     fclose($pipes[1]);
@@ -115,9 +122,8 @@ $descriptorspec = array(
    1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
    2 => array("file", "/tmp/error-output.txt", "a") // stderr is a file to write to
 );
-$cmd = '/cgru/afanasy/trunk/bin/afcmd tout '.$jid_str.' '.$bid_str.' '.$tid_str.' 0';
-$cwd = '/cgru/afanasy/trunk/bin/';
-$process = proc_open( $cmd, $descriptorspec, $pipes, $cwd);
+$cmd = $afcmd.' tout '.$jid_str.' '.$bid_str.' '.$tid_str.' 0';
+$process = proc_open( $cmd, $descriptorspec, $pipes, $afcmd_dir);
 fclose($pipes[0]);
 $output = stream_get_contents($pipes[1]);
 fclose($pipes[1]);
