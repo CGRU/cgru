@@ -94,7 +94,7 @@ function stateToStr( $state)
 
 function stateToString( $state)
 {
-   $state_str = '';
+   $state_str = ' None';
    if( stateIsReady(    $state)) $state_str = $state_str.' Ready';
    if( stateIsRunning(  $state)) $state_str = $state_str.' Running';
    if( stateIsDone(     $state)) $state_str = $state_str.' Done';

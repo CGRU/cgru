@@ -84,31 +84,31 @@ progress.starts_count,progress.errors_count,progress.state,progress.time_started
     echo "<tr>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=number&order=".(1-$order)."'>#</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=number&order=".(1-$order)."'>#</a></b>";
     echo "</td>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=starts&order=".(1-$order)."'>Starts</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=starts&order=".(1-$order)."'>Starts</a></b>";
     echo "</td>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=started&order=".(1-$order)."'>Started Time</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=started&order=".(1-$order)."'>Started Time</a></b>";
     echo "</td>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=done&order=".(1-$order)."'>Done Time</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=done&order=".(1-$order)."'>Done Time</a></b>";
     echo "</td>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=errors&order=".(1-$order)."'>Errors</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=errors&order=".(1-$order)."'>Errors</a></b>";
     echo "</td>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=state&order=".(1-$order)."'>State</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=state&order=".(1-$order)."'>State</a></b>";
     echo "</td>\n";
 
     echo "\t\t<td>";
-    echo "<b><a href='index.php?action=$action&jobid=$jid&sort=run&order=".(1-$order)."'>Runing Time</a></b>";
+    echo "<b><a href='index.php?action=$action&jid=$jid&sort=run&order=".(1-$order)."'>Runing Time</a></b>";
     echo "</td>\n";
 
     echo "</tr>\n";
