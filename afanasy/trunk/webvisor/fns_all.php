@@ -2,6 +2,7 @@
     include_once('fns_db.php');
     include_once('fns_time.php');
     include_once('fns_afanasy.php');
+    include_once('fns_cmd.php');
 
     include_once('display_jobs.php');
     include_once('display_task.php');

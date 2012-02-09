@@ -90,6 +90,7 @@ void AfCmd::RegisterCommands()
 
     addCmd( new CmdTaskLog);
     addCmd( new CmdTaskOutput);
+    addCmd( new CmdTaskRestart);
 
     addCmd( new CmdString);
     addCmd( new CmdPath);

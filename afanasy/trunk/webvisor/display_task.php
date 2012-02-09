@@ -17,6 +17,7 @@ if( $jid <= 0)
     echo 'Invalid Job ID = "'.$jid_str.'"';
     return;
 }
+echo '<h3><a href="index.php?action=tasks&jid='.$jid_str.'">Goto Job</a></h3>';
 $bid_str=$_GET['bid'];
 if( $bid_str == '')
 {
@@ -42,25 +43,20 @@ if( $tid < 0)
     return;
 }
 
-$taskaction=$_POST['taskaction'];
-echo $taskaction;
-//unset($_POST['taskaction']);
-//header("Cache-Control: no-cache, must-revalidate");
-
 $afcmd_dir = dirname( getcwd()).'/bin';
 $afcmd = $afcmd_dir.'/afcmd';
-echo "<br/>\n";
-echo $afcmd;
-echo "<br/>\n";
 
-echo '<form method="post" action="index.php?action=task&jid='.$jid.'&bid='.$bid.'&tid='.$tid.'">';
-echo "<br/>\n";
-echo '<table align="center" width="99%"><tr align="center"><td>';
-echo '<input type="text" name="taskaction" value="restart">';
-echo '</td><td><input type="submit" value="Restart"/>';
-echo '<td></tr></table>';
-echo '</form>';
-
+// Restart task request:
+if( isset($_POST['taskaction']))
+{
+    if($_POST['taskaction'] == 'restart')
+    {
+        echo launchAfCmd('trestart '.$jid_str.' '.$bid_str.' '.$tid_str);
+        echo '<h2>Restarting Task...</h2>';
+        echo '<h3><a href="index.php?action=task&jid='.$jid.'&bid='.$bid.'&tid='.$tid.'">Refresh</a></h3>';
+        return;
+    }
+}
 
 // Connect to database:
 $dbconn = db_connect();
@@ -97,18 +93,7 @@ echo '<td style="padding:10px">';
     }
 echo '</td>';
 echo '<td style="padding:10px">';
-    $descriptorspec = array(
-       0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-       1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-       2 => array("file", "/tmp/error-output.txt", "a") // stderr is a file to write to
-    );
-    $cmd = $afcmd.' tlog '.$jid_str.' '.$bid_str.' '.$tid_str.' 0';
-    $process = proc_open( $cmd, $descriptorspec, $pipes, $afcmd_dir);
-    fclose($pipes[0]);
-    $output = stream_get_contents($pipes[1]);
-    fclose($pipes[1]);
-    echo str_replace("\n","<br/>\n",$output);
-    if( proc_close($process) != 0 ) echo '<br/>Error onexecuting:<br/>'.$cmd;
+    echo launchAfCmd('tlog '.$jid_str.' '.$bid_str.' '.$tid_str.' 0');
 echo '</td>';
 echo '</tr>';
 echo '</table>';
@@ -117,21 +102,17 @@ echo '<h3>Task Last Session Output</h3>';
 echo '<table border="1">';
 echo '<tr>';
 echo '<td style="padding:10px">';
-$descriptorspec = array(
-   0 => array("pipe", "r"),  // stdin is a pipe that the child will read from
-   1 => array("pipe", "w"),  // stdout is a pipe that the child will write to
-   2 => array("file", "/tmp/error-output.txt", "a") // stderr is a file to write to
-);
-$cmd = $afcmd.' tout '.$jid_str.' '.$bid_str.' '.$tid_str.' 0';
-$process = proc_open( $cmd, $descriptorspec, $pipes, $afcmd_dir);
-fclose($pipes[0]);
-$output = stream_get_contents($pipes[1]);
-fclose($pipes[1]);
-echo str_replace("\n","<br/>\n",$output);
-if( proc_close($process) != 0 ) echo '<br/>Error onexecuting:<br/>'.$cmd;
+echo launchAfCmd('tout '.$jid_str.' '.$bid_str.' '.$tid_str.' 0');
 echo '</td>';
 echo '</tr>';
 echo '</table>';
+
+// Restart task form:
+echo "\n<br/>\n";
+echo '<form method="post" action="index.php?action=task&jid='.$jid.'&bid='.$bid.'&tid='.$tid.'">';
+echo '<input type="text" hidden=1 name="taskaction" value="restart">';
+echo '<input type="submit" value="Restart Task"/>';
+echo '</form>';
 
 }
 ?>

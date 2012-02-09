@@ -34,18 +34,24 @@ $query = "SELECT name,id FROM users;";
 $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
 {
-   $uname_uid[$line["name"]] = $line["id"];
-   $uid_uname[$line["id"]] = $line["name"];
+    $uname_uid[$line["name"]] = $line["id"];
+    $uid_uname[$line["id"]] = $line["name"];
 }
-if( $uid > 0 )
+if( isset($_GET["user"]))
 {
-   if( isset($uid_uname[$uid]))
-      $uidstr = " WHERE username='$uid_uname[$uid]'";
-   else
-   {
-      $uidstr = '';
-      $uid = 0;
-   }
+    $user = $_GET["user"];
+    $uidstr = " WHERE username='$user'";
+    $uid = $uname_uid[$user];
+}
+else if( $uid > 0 )
+{
+    if( isset($uid_uname[$uid]))
+        $uidstr = " WHERE username='$uid_uname[$uid]'";
+    else
+    {
+        $uidstr = '';
+        $uid = 0;
+    }
 }
 else $uidstr = '';
 

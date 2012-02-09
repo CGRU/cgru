@@ -12,3 +12,8 @@ class CmdTaskOutput: public Cmd { public:
    ~CmdTaskOutput();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdTaskRestart: public Cmd { public:
+   CmdTaskRestart();
+   ~CmdTaskRestart();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};

@@ -94,7 +94,7 @@ function stateToStr( $state)
 
 function stateToString( $state)
 {
-   $state_str = ' None';
+   $state_str = '';
    if( stateIsReady(    $state)) $state_str = $state_str.' Ready';
    if( stateIsRunning(  $state)) $state_str = $state_str.' Running';
    if( stateIsDone(     $state)) $state_str = $state_str.' Done';
@@ -103,6 +103,7 @@ function stateToString( $state)
    if( stateIsWaittime( $state)) $state_str = $state_str.' Waiting Time';
    if( stateIsSkipped(  $state)) $state_str = $state_str.' Skipped';
    if( stateIsOffline(  $state)) $state_str = $state_str.' Offline';
+   if( $state_str == '') $state_str = ' None';
    return $state_str;
 }
 
