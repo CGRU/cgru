@@ -115,7 +115,6 @@ try:
     views_str = writenode['views'].value()
     print('Views = "%s"' % views_str)
     views = views_str.split(' ')
-    views_num = len(views)
     for view in views:
         view = view.strip()
         if view != '':
