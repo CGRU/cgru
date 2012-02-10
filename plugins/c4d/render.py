@@ -47,7 +47,7 @@ if afroot is None: error_exit('AF_ROOT is not defined.')
 
 
 # Create and check the c4d-temp directory:
-my_temp_directory = cgruTempFolder.cgruTempFolder(scene_file, service = 'c4d', type = 'render', debug = True)
+my_temp_directory = cgruTempFolder.cgruTempFolder(scene_file, service = 'c4d', type = 'render', debug = debug)
 temp_directory = my_temp_directory.folderPath
 
 

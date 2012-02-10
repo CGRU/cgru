@@ -109,10 +109,8 @@ class cgruTempFolder():
             folder_to_check = self.folderPath
         
         this_lock_directory = os.path.join(folder_to_check, ".lock")
-        print("in check: %s" % (this_lock_directory))
         if os.path.isdir(this_lock_directory):
             num_lock_files = len(os.listdir(this_lock_directory))
-            print("in delete: %s" % (this_lock_directory))
             if num_lock_files == 0:
                 return False
             else:
