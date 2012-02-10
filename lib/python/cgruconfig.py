@@ -61,14 +61,15 @@ class Config:
          self.Vars['HOME'] = home
          self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
          self.Vars['HOME_AFANASY'] = os.path.join( home, '.afanasy')
-         cgruutils.createFolder( self.Vars['HOME_CGRU']    )
-         cgruutils.createFolder( self.Vars['HOME_AFANASY'] )
          self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.xml')
          self.Vars['config_afanasy'] = os.path.join( self.Vars['HOME_AFANASY'], 'config.xml')
-         # Create home config file if not preset
-         checkConfigFile( self.Vars['config_file_home'], 'cgru')
-         # Create afanasy home config file if not preset
-         checkConfigFile( self.Vars['config_afanasy'], 'afanasy')
+         if sys.platform.find('win') == 0 or os.geteuid() != 0:
+            cgruutils.createFolder( self.Vars['HOME_CGRU']    )
+            cgruutils.createFolder( self.Vars['HOME_AFANASY'] )
+            # Create cgru home config file if not preset
+            checkConfigFile( self.Vars['config_file_home'], 'cgru')
+            # Create afanasy home config file if not preset
+            checkConfigFile( self.Vars['config_afanasy'], 'afanasy')
 
          configfiles = []
          configfiles.append( os.path.join( cgrulocation, 'config_default.xml'))
