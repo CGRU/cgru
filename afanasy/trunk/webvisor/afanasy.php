@@ -7,146 +7,146 @@ class Afanasy
 
 public function Display()
 {
-$action=$_GET['action'];
-if( $action == '') $action = 'stat';
+    $action=$_GET['action'];
+    if( $action == '') $action = 'stat';
 
-$this->DisplayHeader();
+    $this->DisplayHeader();
 
-switch ($action)
-{
-case 'jobs':
-    display_jobs();
-    break;
-case 'task':
-    display_task();
-    break;
-case 'tasks':
-    display_tasks();
-    break;
-case 'users':
-    display_users();
-    break;
-case 'renders':
-    display_renders();
-    break;
-case 'user':
-    display_user();
-    break;
-case 'stat':
-    display_stat();
-    break;
-case 'stat_chart':
-    display_stat_chart();
-    break;
-case 'cabinet':
-    display_cabinet();
-    break;
-case 'login':
-    $this->DisplayLogin();
-    break;
-case 'logout':
-    $this->DisplayLogout();
-    break;
-case 'AddAdmin':
-    $this->AddAdmin();
-    break;
-case 'AddAdmin_register':
-    $this->AddAdmin_register();
-    break;
-default:
-    echo "action '<b><i>$action</i></b>' is not supported.";
-    break;
-}
+    switch ($action)
+    {
+    case 'jobs':
+        display_jobs();
+        break;
+    case 'task':
+        display_task();
+        break;
+    case 'tasks':
+        display_tasks();
+        break;
+    case 'users':
+        display_users();
+        break;
+    case 'renders':
+        display_renders();
+        break;
+    case 'user':
+        display_user();
+        break;
+    case 'stat':
+        display_stat();
+        break;
+    case 'stat_chart':
+        display_stat_chart();
+        break;
+    case 'cabinet':
+        display_cabinet();
+        break;
+    case 'login':
+        $this->DisplayLogin();
+        break;
+    case 'logout':
+        $this->DisplayLogout();
+        break;
+    case 'AddAdmin':
+        $this->AddAdmin();
+        break;
+    case 'AddAdmin_register':
+        $this->AddAdmin_register();
+        break;
+    default:
+        echo "action '<b><i>$action</i></b>' is not supported.";
+        break;
+    }
 
-$this->DisplayFooter();
+    $this->DisplayFooter();
 }
 
 public function AddAdmin()
 {
-$dbconn = db_connect();
-$query="SELECT name FROM users;";
-$result = pg_query($query) or die('Query failed: ' . pg_last_error());
+    $dbconn = db_connect();
+    $query="SELECT name FROM users;";
+    $result = pg_query($query) or die('Query failed: ' . pg_last_error());
 
-echo '<h3>AddAdmin<h3>';
-echo '<form method="post" action="index.php?action=AddAdmin_register">';
-echo '<table>';
-echo '<tr><td>User:</td>';
-echo '<td><select name="user">';
-while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
-{
-   echo '<option value="';
-   echo $line["name"];
-   echo '">';
-   echo $line["name"];
-}
-echo '</select></td>';
-echo '<tr><td>Password:</td>';
-echo '<td><input type="password" name="password"></td></tr>';
-echo '<tr><td colspan="2" align="center">';
-echo '<input type="submit" value="Registrer"></td></tr>';
-echo '</table></form>';
+    echo '<h3>AddAdmin<h3>';
+    echo '<form method="post" action="index.php?action=AddAdmin_register">';
+    echo '<table>';
+    echo '<tr><td>User:</td>';
+    echo '<td><select name="user">';
+    while ( $line = pg_fetch_array( $result, null, PGSQL_ASSOC))
+    {
+        echo '<option value="';
+        echo $line["name"];
+        echo '">';
+        echo $line["name"];
+    }
+    echo '</select></td>';
+    echo '<tr><td>Password:</td>';
+    echo '<td><input type="password" name="password"></td></tr>';
+    echo '<tr><td colspan="2" align="center">';
+    echo '<input type="submit" value="Registrer"></td></tr>';
+    echo '</table></form>';
 }
 
 public function AddAdmin_register()
 {
-if (isset($_POST['user']) && isset($_POST['password']))
-{
-$user = $_POST['user'];
-$password = $_POST['password'];
-$dbconn = db_connect();
-$query = "SELECT flags FROM users WHERE name='$user';";
-$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-$flags = $line["flags"];
-pg_free_result($result);
-$flags = userSetAdmin( $flags);
-$query = "UPDATE users SET password='".sha1($password)."', flags=$flags WHERE name='$user';";
-$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-pg_free_result($result);
-echo "user $user is admin now.</br>";
-}
+    if ( false == isset($_POST['user'])) continue;
+    if ( false == isset($_POST['password'])) continue;
+
+    $user = $_POST['user'];
+    $password = $_POST['password'];
+    $dbconn = db_connect();
+    $query = "SELECT flags FROM users WHERE name='$user';";
+    $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+    $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+    $flags = $line["flags"];
+    pg_free_result($result);
+    $flags = userSetAdmin( $flags);
+    $query = "UPDATE users SET password='".sha1($password)."', flags=$flags WHERE name='$user';";
+    $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+    pg_free_result($result);
+    echo "User '$user' is admin now.</br>";
 }
 
 public function DisplayLogin()
 {
-$dbconn = db_connect();
+    $dbconn = db_connect();
 
-$query="SELECT COUNT(*) FROM users WHERE password <> '';";
-$result = pg_query($query) or die('Query failed: ' . pg_last_error());
-$line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-$passcount = (int)($line['count']);
-pg_free_result($result);
-if( $passcount < 1)
-{
-   $query="SELECT COUNT(*) FROM users;";
-   $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-   $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-   $userscount = (int)($line['count']);
-   if( $userscount < 1)
-   {
-      echo '<h3>No users in database found. Login is impossible.</h3>';
-   }
-   else
-   {
-      echo '<h3>No users with password</h3>';
-      echo '<p><a href="index.php?action=AddAdmin">create an administrator</a></p>';
-   }
-   pg_free_result($result);
-   return;
+    $query="SELECT COUNT(*) FROM users WHERE password <> '';";
+    $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+    $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+    $passcount = (int)($line['count']);
+    pg_free_result($result);
+    if( $passcount < 1)
+    {
+        $query="SELECT COUNT(*) FROM users;";
+        $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+        $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+        $userscount = (int)($line['count']);
+        if( $userscount < 1)
+        {
+            echo '<h3>No users in database found. Login is impossible.</h3>';
+        }
+        else
+        {
+            echo '<h3>No users with password</h3>';
+            echo '<p><a href="index.php?action=AddAdmin">create an administrator</a></p>';
+        }
+        pg_free_result($result);
+        return;
+    }
+
+    echo '<h3>Login<h3>';
+    echo '<form method="post" action="index.php">';
+    echo '<table>';
+    echo '<tr><td>User:</td>';
+    echo '<td><input type="text" name="user">';
+    echo '<tr><td>Password:</td>';
+    echo '<td><input type="password" name="password"></td></tr>';
+    echo '<tr><td colspan="2" align="center">';
+    echo '<input type="submit" value="Login"></td></tr>';
+    echo '</table></form>';
 }
 
-echo '<h3>Login<h3>';
-echo '<form method="post" action="index.php">';
-echo '<table>';
-echo '<tr><td>User:</td>';
-echo '<td><input type="text" name="user">';
-echo '<tr><td>Password:</td>';
-echo '<td><input type="password" name="password"></td></tr>';
-echo '<tr><td colspan="2" align="center">';
-echo '<input type="submit" value="Login"></td></tr>';
-echo '</table></form>';
-
-}
 public function DisplayLogout()
 {
    if($this->old_user!='')
@@ -160,6 +160,7 @@ public function DisplayLogout()
       echo 'You were not logged in, and so have not been logged out.<br />'; 
    }
 }
+
 private $old_user;
 public function DisplayHeader()
 {

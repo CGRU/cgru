@@ -48,7 +48,7 @@ $query='SELECT * FROM jobs WHERE id='.$jid_str.';';
 $resjob = pg_query($query) or die('Query failed: ' . pg_last_error());
 $linejob = pg_fetch_array( $resjob, null, PGSQL_ASSOC);
 
-echo '<h3><a href="index.php?action=jobs&user='.$linejob["username"].'">Goto <b><i>\''.$linejob["username"].'\'</i></b> jobs.</a></h3>';
+echo '<h3><a href="index.php?action=jobs&user='.$linejob["username"].'">Goto user <b><i>\''.$linejob["username"].'\'</i></b> jobs.</a></h3>';
 
 // Display job information:
 echo '<p>';
