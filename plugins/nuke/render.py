@@ -8,6 +8,7 @@ import re
 
 import nuke
 
+from parsers import parser
 from afpathmap import PathMap
 
 tmpdir = None
@@ -36,11 +37,11 @@ def errorExit( msg, deletetemp):
    exit(1)
 
 # Parse arguments:
-parser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
-parser.add_option('-x', '--xscene', dest='xscene', type='string', default='', help='Path to scene to execute')
-parser.add_option('-X', '--xnode',  dest='xnode',  type='string', default='', help='The name of node to execute')
-parser.add_option('-F', '--frange', dest='frange', type='string', default='', help='Frame range to render (Nuke syntax)')
-(options, args) = parser.parse_args()
+ArgsParser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
+ArgsParser.add_option('-x', '--xscene', dest='xscene', type='string', default='', help='Path to scene to execute')
+ArgsParser.add_option('-X', '--xnode',  dest='xnode',  type='string', default='', help='The name of node to execute')
+ArgsParser.add_option('-F', '--frange', dest='frange', type='string', default='', help='Frame range to render (Nuke syntax)')
+(options, args) = ArgsParser.parse_args()
 xscene = options.xscene
 xnode  = options.xnode
 srange = options.frange
@@ -118,7 +119,8 @@ try:
         view = view.strip()
         if view != '':
             if not view in nuke.views():
-                print('Error: Skipping invalid view: "%s"' % view)
+                print('Warning: Skipping invalid view: "%s"' % view)
+                print( parser.str_warning)
                 continue
             views_num += 1
             views.append( view)
