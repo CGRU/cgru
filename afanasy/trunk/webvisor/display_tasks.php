@@ -132,8 +132,16 @@ progress.starts_count,progress.errors_count,progress.state,progress.time_started
         $time_done = $linetask["time_done"];
         $time_run = $linetask["duration"];
 
-        echo "\t<td><a href=\"index.php?action=task&jid=".$jid_str."&bid=".$bid_str."&tid=".$linetask["id_task"]."\">";
-        echo $linetask["id_task"]."</a></td>\n";
+        if( $_SESSION['valid_user'])
+        {
+            // Show task number with a link to task for registered users only:
+            echo "\t<td><a href=\"index.php?action=task&jid=".$jid_str."&bid=".$bid_str."&tid=".$linetask["id_task"]."\">";
+            echo $linetask["id_task"]."</a></td>\n";
+        }
+        else
+        {
+            echo "\t<td>".$linetask["id_task"]."</td>\n";
+        }
 
         echo "\t<td>".$linetask["starts_count"]."</td>\n";
 

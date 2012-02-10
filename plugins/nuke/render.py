@@ -114,14 +114,14 @@ views_num = 0
 try:
     views_str = writenode['views'].value()
     print('Views = "%s"' % views_str)
-    views = views_str.split(' ')
-    for view in views:
+    for view in views_str.split(' '):
         view = view.strip()
         if view != '':
             if not view in nuke.views():
                 print('Error: Skipping invalid view: "%s"' % view)
                 continue
             views_num += 1
+            views.append( view)
             octx = nuke.OutputContext()
             octx.setView( 1 + nuke.views().index( view))
             imagesdirs.append( os.path.dirname( fileknob.getEvaluatedValue( octx)))
