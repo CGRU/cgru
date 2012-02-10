@@ -5,10 +5,22 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Thu, 22 Dec 2011 12:00:00 GMT</pubDate>
-   <lastBuildDate>Thu, 22 Dec 2011 12:00:00 GMT</lastBuildDate>
+   <pubDate>Sat, 11 Feb 2011 00:00:00 GMT</pubDate>
+   <lastBuildDate>Sat, 11 Feb 2011 00:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.5.5 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release155</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release155</guid>
+      <description>
+         Server has customizable acceptable IP addresses mask.
+         Movie Maker custom container and ability to save settings.
+         User can set jobs solving to parallel.
+         Only PostgreSQL database is supported as native library is used instead of QtSql.
+      </description>
+      <pubDate>Sat, 11 Feb 2011 00:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.5.4 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release154</link>

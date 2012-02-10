@@ -68,6 +68,12 @@ void threadAcceptClient( void * i_arg )
 // FIXME: Current MAX OS can't listen IPv6?
    protocol = AF_INET;
 #endif
+    if( af::Environment::hasArgument("-noIPv6"))
+    {
+        printf("IPv6 is disabled.\n");
+        protocol = AF_INET;
+    }
+
 
    switch(protocol)
    {

@@ -7,6 +7,7 @@ import sys
 
 def sendServer( data, datalen, host, port, verbose = False):
    s = None
+   err_msg = ''
    for res in socket.getaddrinfo( host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
 #      print(res)
       af, socktype, proto, canonname, sa = res
@@ -14,15 +15,15 @@ def sendServer( data, datalen, host, port, verbose = False):
       try:
          s = socket.socket(af, socktype, proto)
       except:
-         print(str(sys.exc_info()[1]))
-         print(str(sa[0]))
+         if err_msg != '': err_msg += '\n'
+         err_msg += str(sa[0]) + ' : ' + str(sys.exc_info()[1])
          s = None
          continue
       try:
          s.connect(sa)
       except:
-         print(str(sys.exc_info()[1]))
-         print(str(sa[0]))
+         if err_msg != '': err_msg += '\n'
+         err_msg += str(sa[0]) + ' : ' + str(sys.exc_info()[1])
          s.close()
          s = None
          continue
@@ -30,6 +31,7 @@ def sendServer( data, datalen, host, port, verbose = False):
 
    if s is None:
       print('Could not open socket.')
+      print( err_msg)
       return False, None
 
    if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)

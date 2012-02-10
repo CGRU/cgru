@@ -46,9 +46,19 @@ void sig_pipe(int signum)
 //######################################## main #########################################
 int main(int argc, char *argv[])
 {
+   // Now sever is running!
    running = true;
+
+   // Initialize environment:
    af::Environment ENV( af::Environment::Normal, argc, argv);
+   ENV.addUsage("-noIPv6", "Disable IPv6.");
+   // Environment aready printed usage and we can exit.
+   if( ENV.isHelpMode()) return 0;
+
+   // Initialize general library:
    if( af::init( af::InitFarm) == false) return 1;
+
+   // Initialize database:
    afsql::init();
 
    // create directories if it is not exists
