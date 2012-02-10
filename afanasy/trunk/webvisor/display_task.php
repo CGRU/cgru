@@ -2,6 +2,13 @@
 
 function display_task()
 {
+
+if( false == $_SESSION['valid_user'])
+{
+    echo 'Only registered users can watch tasks.';
+    return;
+}
+
 $action=$_GET['action'];
 if( $action == '') $action = 'task';
 

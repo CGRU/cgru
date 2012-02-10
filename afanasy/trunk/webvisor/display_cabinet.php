@@ -25,7 +25,7 @@ switch ($operation)
 case '': break;
 
 case 'changepassword':
-/*    echo 'Changing password:<br/>';
+    echo 'Changing password:<br/>';
 
     if( false == isset($_POST['password']))
     {
@@ -42,10 +42,10 @@ case 'changepassword':
     }
 
     $dbconn = db_connect();
-    $query = "UPDATE users SET password='".sha1($password)."', flags=1 WHERE name='$user_session';";
+    $query = "UPDATE users SET password='".sha1($password)."' WHERE name='$user_session';";
     $result = pg_query($query) or die('Query failed: ' . pg_last_error());
     pg_free_result($result);
-    echo 'Password Changed.</br>';*/
+    echo 'Password Changed.</br>';
     break;
 
 case 'setuserpassword':
@@ -79,10 +79,10 @@ case 'setuserpassword':
     }
 
     $dbconn = db_connect();
-    $query = "UPDATE users SET password='".sha1($password)."', flags=0 WHERE name='$user';";
-/*    $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+    $query = "UPDATE users SET password='".sha1($password)."' WHERE name='$user';";
+    $result = pg_query($query) or die('Query failed: ' . pg_last_error());
     pg_free_result($result);
-*/
+
     echo "User '$user' set.</br>\n";
     break;
 

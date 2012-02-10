@@ -149,179 +149,181 @@ public function DisplayLogin()
 
 public function DisplayLogout()
 {
-   if($this->old_user!='')
-   {
-      echo 'Logged out <b> '.$this->old_user.' </b> <br />';
-      $this->old_user='';
-   }
-   else
-   {
-      // if they weren't logged in but came to this page somehow
-      echo 'You were not logged in, and so have not been logged out.<br />'; 
-   }
+    if($this->old_user!='')
+    {
+        echo 'Logged out <b> '.$this->old_user.' </b> <br />';
+        $this->old_user='';
+    }
+    else
+    {
+        // if they weren't logged in but came to this page somehow
+        echo 'You were not logged in, and so have not been logged out.<br />'; 
+    }
 }
 
 private $old_user;
 public function DisplayHeader()
 {
-session_start();
-//echo "session_start() ";
-if( $_GET['action'] == 'logout')
-{
-   $this->old_user = $_SESSION['valid_user'];
-   unset($_SESSION['valid_user']);
-   session_destroy();
-}
-else if (isset($_POST['user']) && isset($_POST['password']))
-{
-   // if the user has just tried to log in
-   $user = $_POST['user'];
-   $password = $_POST['password'];
+    session_start();
+    //echo "session_start() ";
+    if( $_GET['action'] == 'logout')
+    {
+        $this->old_user = $_SESSION['valid_user'];
+        unset($_SESSION['valid_user']);
+        session_destroy();
+    }
+    else if (isset($_POST['user']) && isset($_POST['password']))
+    {
+        // if the user has just tried to log in
+        $user = $_POST['user'];
+        $password = $_POST['password'];
 
-   $dbconn = db_connect();
-   $query = "SELECT count(*) FROM users WHERE name='$user' AND password='".sha1($password)."';";
-   $result = pg_query($query) or die('Query failed: ' . pg_last_error());
-   $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
-   if((int)($line['count']))
-   {
-     // if they are in the database register the user id
-      $_SESSION['valid_user'] = $user;
-   }
-}
-?>
-<html>
-<head>
-<title>Afanasy Web Visor</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<link rel="shortcut icon" href="../doc/images/icon.png" type="image/png">
-<link href="styles.css" rel="stylesheet" type="text/css">
-</head>
-<body>
+        $dbconn = db_connect();
+        $query = "SELECT count(*) FROM users WHERE name='$user' AND password='".sha1($password)."';";
+        $result = pg_query($query) or die('Query failed: ' . pg_last_error());
+        $line = pg_fetch_array( $result, null, PGSQL_ASSOC);
+        if((int)($line['count']))
+        {
+            // if they are in the database register the user id
+            $_SESSION['valid_user'] = $user;
+        }
+    }
+    ?>
+    <html>
+    <head>
+    <title>Afanasy Web Visor</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <link rel="shortcut icon" href="../doc/images/icon.png" type="image/png">
+    <link href="styles.css" rel="stylesheet" type="text/css">
+    </head>
+    <body>
 
-<table width="50%" align="center"><tr align="center">
-   <td><img src="images/star01.png" alt="★" /></td>
-   <td><img src="images/afanasy.png" border="0" alt="AFANASY" /></td>
-   <td><img src="images/star02.png" alt="★" /></td>
-</tr></table>
+    <table width="50%" align="center"><tr align="center">
+        <td><img src="images/star01.png" alt="★" /></td>
+        <td><img src="images/afanasy.png" border="0" alt="AFANASY" /></td>
+        <td><img src="images/star02.png" alt="★" /></td>
+    </tr></table>
 
-<table width="100%" align="center" cellpadding="0" cellspacing="0">
-<tr>
-<td width="200px">
-<div style="width:100%;height:40px;background:url('images/header_left.png')" />
-</td>
-<td>
-<div style="width:100%;height:40px;background:url('images/header.png') repeat-x" />
-</td>
-<td width="200px">
-<div style="width:100%;height:40px;background:url('images/header_right.png')" />
-</td>
-</tr>
-</table>
+    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+    <tr>
+    <td width="200px">
+    <div style="width:100%;height:40px;background:url('images/header_left.png')" />
+    </td>
+    <td>
+    <div style="width:100%;height:40px;background:url('images/header.png') repeat-x" />
+    </td>
+    <td width="200px">
+    <div style="width:100%;height:40px;background:url('images/header_right.png')" />
+    </td>
+    </tr>
+    </table>
 
-<table width="90%" height="80%" border="1" align="center">
-<tr align="center" height="50">
-<td width=10%>
-   <a href="../../" ><img src="images/cgru.png" alt="CGRU" border="0" width="100" height="40"/></a>
-</td>
-<td width=10%>
-<?php
-//echo 'user='.$_POST['user'].' password='.$_POST['password'].'</br>';
-if (isset($_SESSION['valid_user']))
-   echo '<a href="index.php?action=logout"><img src="images/logout.png" alt="Logout" border="0"/></a>';
-else
-   echo '<a href="index.php?action=login" ><img src="images/login.png"  alt="Login"  border="0"/></a>';
-?>
-</td>
-<?php
-$action=$_GET['action'];
-if( $action == '') $action = 'stat';
-$row_actions = array( 0 => 'users', 1 => 'jobs', 2 => 'renders', 3 => 'stat');
-$row_images  = array( 0 => 'users.png', 1 => 'jobs.png', 2 => 'renders.png', 3 => 'statistics.png');
-for( $i = 0; $i < 4; $i++)
-{
-   $current = 0;
-   if( $action == $row_actions[$i]) $current = 1;
+    <table width="90%" height="80%" border="1" align="center">
+    <tr align="center" height="50">
+    <td width=10%>
+        <a href="../../" ><img src="images/cgru.png" alt="CGRU" border="0" width="100" height="40"/></a>
+    </td>
+    <td width=10%>
+    <?php
+    //echo 'user='.$_POST['user'].' password='.$_POST['password'].'</br>';
+    if (isset($_SESSION['valid_user']))
+        echo '<a href="index.php?action=logout"><img src="images/logout.png" alt="Logout" border="0"/></a>';
+    else
+        echo '<a href="index.php?action=login" ><img src="images/login.png"  alt="Login"  border="0"/></a>';
+    ?>
+    </td>
+    <?php
+    $action=$_GET['action'];
+    if( $action == '') $action = 'stat';
+    $row_actions = array( 0 => 'users', 1 => 'jobs', 2 => 'renders', 3 => 'stat');
+    $row_images  = array( 0 => 'users.png', 1 => 'jobs.png', 2 => 'renders.png', 3 => 'statistics.png');
+    for( $i = 0; $i < 4; $i++)
+    {
+        $current = 0;
+        if( $action == $row_actions[$i]) $current = 1;
 
-   echo '   ';
-   echo '<td width=10%';
-   if( $current ) echo ' style="background-color:#D0D080"';
-   echo '>';
-   if( false == $current )
-   {
-      echo '<a href="index.php?action=';
-      echo $row_actions[$i];
-      echo '">';
-   }
-   echo '<img src="images/';
-   echo $row_images[$i];
-   echo '" alt="';
-   echo $row_images[$i];
-   echo '" border="0"/>';
-   if( false == $current ) echo '</a>';
+        echo '   ';
+        echo '<td width=10%';
+        if( $current ) echo ' style="background-color:#D0D080"';
+        echo '>';
+        if( false == $current )
+        {
+            echo '<a href="index.php?action=';
+            echo $row_actions[$i];
+            echo '">';
+        }
+        echo '<img src="images/';
+        echo $row_images[$i];
+        echo '" alt="';
+        echo $row_images[$i];
+        echo '" border="0"/>';
+        if( false == $current ) echo '</a>';
 
-   echo '</td>';
-   echo "\n";
-}
-?>
-</tr>
-<tr><td colspan=6 align=center><p>
+        echo '</td>';
+        echo "\n";
+    }
+    ?>
+    </tr>
+    <tr><td colspan=6 align=center><p>
 
-<?php
-}
+    <?php
+} // function DisplayHeader
+
 public function DisplayFooter()
 {
-?>
-</p></td></tr>
-<tr align="center" height=50>
-<td colspan=6><p>
-<?php
-   if (isset($_SESSION['valid_user']))
-   {
-      echo '<font color="#904010">★</font>';
-      echo '<a href="index.php?action=cabinet"><b> '.$_SESSION['valid_user'].' </b></a>';
-      echo '<font color="#904010">★</font>';
-   }
-   else
-   {
-      if (isset($user))
-      {
-         // if they've tried and failed to log in
-         echo 'Invalid login';
-      }
-      else
-      {
-         // they have not tried to log in yet or have logged out
-         echo ' (guest) ';
-      }
-   }
-?>
-</p></td>
-</tr>
-</table>
+    ?>
+    </p></td></tr>
+    <tr align="center" height=50>
+    <td colspan=6><p>
+    <?php
+        if (isset($_SESSION['valid_user']))
+        {
+            echo '<font color="#904010">★</font>';
+            echo '<a href="index.php?action=cabinet"><b> '.$_SESSION['valid_user'].' </b></a>';
+            echo '<font color="#904010">★</font>';
+        }
+        else
+        {
+            if (isset($user))
+            {
+                // if they've tried and failed to log in
+                echo 'Invalid login';
+            }
+            else
+            {
+                // they have not tried to log in yet or have logged out
+                echo ' (guest) ';
+            }
+        }
+    ?>
+    </p></td>
+    </tr>
+    </table>
 
-<table width="100%" align="center" cellpadding="0" cellspacing="0">
-<tr>
-<td width="200px">
-   <div style="width:100%;height:40px;background:url('images/footer_left.png')" />
-</td>
-<td>
-   <div style="width:100%;height:40px;background:url('images/footer.png') repeat-x" />
-</td>
-<td width="200px">
-   <div style="width:100%;height:40px;background:url('images/footer_center.png')" />
-</td>
-<td>
-   <div style="width:100%;height:40px;background:url('images/footer.png') repeat-x" />
-</td>
-<td width="200px">
-   <div style="width:100%;height:40px;background:url('images/footer_right.png')" />
-</td>
-</tr>
-</table>
+    <table width="100%" align="center" cellpadding="0" cellspacing="0">
+    <tr>
+    <td width="200px">
+       <div style="width:100%;height:40px;background:url('images/footer_left.png')" />
+    </td>
+    <td>
+       <div style="width:100%;height:40px;background:url('images/footer.png') repeat-x" />
+    </td>
+    <td width="200px">
+       <div style="width:100%;height:40px;background:url('images/footer_center.png')" />
+    </td>
+    <td>
+       <div style="width:100%;height:40px;background:url('images/footer.png') repeat-x" />
+    </td>
+    <td width="200px">
+       <div style="width:100%;height:40px;background:url('images/footer_right.png')" />
+    </td>
+    </tr>
+    </table>
 
-</body>
-</html>
-<?php
-}
-}
+    </body>
+    </html>
+    <?php
+} // function DisplayFooter
+
+} // class Afanasy
 ?>
