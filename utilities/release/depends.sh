@@ -10,6 +10,9 @@ case ${DISTRIBUTIVE} in
       export DEPENDS_AFANASY="libqt4-core, libqt4-gui, libqt4-network, libqt4-xml, libpq5"
       export DEPENDS_CGRU="python-qt4"
       ;;
+   Fedora )
+      export DEPENDS_CGRU="PyQt4 ImageMagick"
+      ;;
    openSUSE )
       export DEPENDS_CGRU="python-qt4 ImageMagick"
       ;;
