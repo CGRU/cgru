@@ -81,6 +81,7 @@ rcopy plugins/houdini $dest/plugins
 rcopy plugins/xsi $dest/plugins
 rcopy plugins/blender $dest/plugins
 rcopy plugins/max $dest/plugins
+rcopy plugins/c4d $dest/plugins
 
 copy plugins/maya $dest/plugins/maya
 rcopy plugins/maya/doc $dest/plugins/maya

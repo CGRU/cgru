@@ -35,7 +35,6 @@ for archive in `ls`; do
       echo "Failed making archive."
       exit 1
    fi
-   continue
 
    # Archivate:
    archivefile="cgru.${version}.${archive}.7z"
