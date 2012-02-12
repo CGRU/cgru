@@ -30,11 +30,12 @@ def getComboBoxString( comboBox):
 class Dialog( QtGui.QWidget):
    def __init__( self):
       QtGui.QWidget.__init__( self)
-      self.constructed = False
-      self.evaluated = False
-      self.output = ''
+      self.setWindowTitle('Afanasy Starter   CGRU ' + cgruconfig.VARS['CGRU_VERSION'])
 
-      self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
+      self.constructed    = False
+      self.evaluated      = False
+      self.output         = ''
+
       self.fields = dict()
       
       topLayout = QtGui.QVBoxLayout( self)
@@ -366,23 +367,28 @@ AfterFX render settings template')
       self.refreshRecent()
 
    def refreshRecent( self):
-      QtCore.QObject.disconnect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
+#      QtCore.QObject.disconnect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
+      QtCore.QObject.disconnect( self.cbRecent, QtCore.SIGNAL(          'activated(int)'), self.loadRecent)
       self.cbRecent.clear()
       for afile in self.getRecentFilesList():
-         afile = afile.replace( FilePrefix,'')
-         afile = afile.replace( FileSuffix,'')
-         short = afile.replace( FileRecent,'')[2:]
+         if afile[ : len(FilePrefix)] == FilePrefix: afile = afile[ len(FilePrefix) :]
+         if afile[ -len(FileSuffix) : ] == FileSuffix: afile = afile[ : -len(FileSuffix)]
+         short = afile
+         if short[ : len(FileRecent)] == FileRecent: short = short[ len(FileRecent) :]
+         short = short[2:]
          if len(short) > 20: short = short[:10] + ' .. ' + short[-10:]
          self.cbRecent.addItem( short, afile)
-      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
+#      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL('currentIndexChanged(int)'), self.loadRecent)
+      QtCore.QObject.connect( self.cbRecent, QtCore.SIGNAL(       'activated(int)'), self.loadRecent)
 
    def loadRecent( self):
       self.load( getComboBoxString( self.cbRecent))
 
    def load( self, filename, fullPath = False):
       if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
-      print('Loading "%s"' % filename)
       if not os.path.isfile( filename): return False
+      print('Loading "%s"' % filename)
+
       file = open( filename,'r')
       lines = file.readlines()
       file.close()
@@ -520,6 +526,7 @@ AfterFX render settings template')
       print('Exit code = %d' % exitCode)
       if exitCode != 0: return
       self.saveRecent()
+      self.save( FileLast)
       self.output += '\n The job successfully sent.'
       self.teCmd.setText( self.output)
       self.bStart.setEnabled( False)
