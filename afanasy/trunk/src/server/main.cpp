@@ -23,7 +23,7 @@
 //#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-bool running;
+extern bool AFRunning;
 
 // Thread functions:
 void threadAcceptClient( void * i_arg );
@@ -33,7 +33,7 @@ void threadRunCycle( void * i_args);
 void sig_int(int signum)
 {
    fprintf( stderr, "SIG INT\n" );
-   running = false;
+   AFRunning = false;
 }
 void sig_alrm(int signum)
 {
@@ -47,9 +47,6 @@ void sig_pipe(int signum)
 //######################################## main #########################################
 int main(int argc, char *argv[])
 {
-   // Now sever is running!
-   running = true;
-
    // Initialize environment:
    af::Environment ENV( af::Environment::Normal, argc, argv);
    ENV.addUsage("-noIPv6", "Disable IPv6.");
@@ -133,7 +130,7 @@ int main(int argc, char *argv[])
 
    // Message Queue initialization, but without thread start.
    // Run cycle queue will read this messages itself.
-   MsgQueue msgQueue("Run cycle thread messages queue", false /* do not start a thread */ );
+   af::MsgQueue msgQueue("Run cycle thread messages queue", false /* do not start a thread */ );
    if( false == msgQueue.isInitialized()) return 1;
 
    bool hasSystemJob = false;
@@ -266,7 +263,7 @@ int main(int argc, char *argv[])
    RunCycleThread.Start( &threadRunCycle, &threadArgs);
 
    /* Do nothing since everything is done in our threads. */
-   while( running )
+   while( AFRunning )
    {
       DlThread::Self()->Sleep( 1 );
    }

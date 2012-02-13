@@ -18,7 +18,7 @@
 //#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-extern bool running;
+extern bool AFRunning;
 
 void threadProcessMsg( void * i_args);
 
@@ -151,7 +151,7 @@ void threadAcceptClient( void * i_arg )
    static const int error_wait_max = 1 << 30;   // Maximum timeout value
    static const int error_wait_min = 1 << 3;    // Minimum timeout value
    error_wait = error_wait_min;
-   while( running )
+   while( AFRunning )
    {
       ThreadArgs * newThreadArgs = new ThreadArgs(*threadArgs);
       socklen_t client_sockaddr_len = sizeof(newThreadArgs->ss);
@@ -175,10 +175,10 @@ void threadAcceptClient( void * i_arg )
                break;
             case EINTR:
                printf("Server was interrupted.\n");
-               running = false;
+               AFRunning = false;
                break;
          }
-         if( false == running )
+         if( false == AFRunning )
          {
             delete threadArgs;
             break;

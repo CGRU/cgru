@@ -11,14 +11,14 @@
 #include "afcommon.h"
 #include "monitorcontainer.h"
 
-extern bool running;
+extern bool AFRunning;
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 DBActionQueue::DBActionQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer):
-   AfQueue( i_name),
+   af::AfQueue( i_name),
    m_monitors( i_monitorcontainer)
 {
     m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
@@ -47,7 +47,7 @@ void DBActionQueue::connectionEstablished()
    AFINFA("DBActionQueue::connectionEstablished: %s", name.c_str())
 }
 
-void DBActionQueue::processItem( AfQueueItem* item)
+void DBActionQueue::processItem( af::AfQueueItem* item)
 {
 //printf("DBActionQueue::processItem: %s:\n", name.c_str());
     if( false == m_working )
@@ -64,7 +64,7 @@ void DBActionQueue::processItem( AfQueueItem* item)
         }
         for(;;)
         {
-            if( false == running )
+            if( false == AFRunning )
             {
                 delete item;
                 return;
@@ -106,7 +106,7 @@ void DBActionQueue::processItem( AfQueueItem* item)
     delete item;
 }
 
-bool DBActionQueue::writeItem( AfQueueItem* item)
+bool DBActionQueue::writeItem( af::AfQueueItem* item)
 {
 //printf("DBActionQueue::writeItem:\n");
    Queries * queries = (Queries*)item;

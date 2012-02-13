@@ -18,7 +18,9 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-#if 0 // this was in main.cpp
+using namespace af;
+
+#if 0 // this was in server main.cpp
 void ThreadCommon_dispatchMessages(void* arg)
 {
 #ifndef _WIN32
@@ -54,7 +56,7 @@ MsgQueue::~MsgQueue()
 
 void MsgQueue::processItem( AfQueueItem* item)
 {
-   MsgAf * msg = (MsgAf*)item;
+   Msg * msg = (Msg*)item;
 
    if( false == msg->addressIsEmpty()) send( msg, msg->getAddress());
 
@@ -72,7 +74,7 @@ void MsgQueue::processItem( AfQueueItem* item)
    delete msg;
 }
 
-void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
+void MsgQueue::send( const Msg * msg, const Address & address) const
 {
    if( address.isEmpty() )
    {
@@ -100,7 +102,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
    if( connect(socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
       AFERRPA("MsgQueue::send: connect failure for msgType '%s': %s",
-         af::Msg::TNAMES[msg->type()], address.generateInfoString().c_str())
+         Msg::TNAMES[msg->type()], address.generateInfoString().c_str())
       close(socketfd);
       alarm(0);
       return;
@@ -110,7 +112,7 @@ void MsgQueue::send( const af::Msg * msg, const af::Address & address) const
    //
    // set socket maximum time to wait for an output operation to complete
    timeval so_sndtimeo;
-   so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
+   so_sndtimeo.tv_sec = Environment::getServer_SO_SNDTIMEO_SEC();
    so_sndtimeo.tv_usec = 0;
    if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
    {

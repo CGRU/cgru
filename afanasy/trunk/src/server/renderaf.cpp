@@ -1,7 +1,7 @@
 #include "renderaf.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/farm.h"
@@ -162,7 +162,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
    if( start)
    {
-      MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
+      af::Msg* msg = new af::Msg( af::Msg::TTask, taskexec);
       msg->setAddress( this);
       AFCommon::QueueMsgDispatch( msg);
       std::string str = "Starting task: ";
@@ -188,7 +188,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
    {
       if( taskexec != *it) continue;
 
-      MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
+      af::Msg* msg = new af::Msg( af::Msg::TTask, taskexec);
       msg->setAddress( this);
       AFCommon::QueueMsgDispatch( msg);
 
@@ -410,7 +410,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
 void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * monitoring)
 {
    if( false == isOnline() ) return;
-   MsgAf* msg = new MsgAf( type);
+   af::Msg* msg = new af::Msg( type);
    msg->setAddress( this);
    AFCommon::QueueMsgDispatch( msg);
 //   if( type != af::Msg::TClientStartRequest )
@@ -451,7 +451,7 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
    AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
 
-   MsgAf* msg = new MsgAf( af::Msg::TClientWOLSleepRequest);
+   af::Msg* msg = new af::Msg( af::Msg::TClientWOLSleepRequest);
    msg->setAddress( this);
    AFCommon::QueueMsgDispatch( msg);
 }
@@ -491,7 +491,7 @@ void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
 {
    if( isOffline()) return;
    af::MCTaskPos taskpos( jobid, blocknum, tasknum, number);
-   MsgAf* msg = new MsgAf( af::Msg::TRenderStopTask, &taskpos);
+   af::Msg* msg = new af::Msg( af::Msg::TRenderStopTask, &taskpos);
    msg->setAddress( this);
    AFCommon::QueueMsgDispatch( msg);
 }
@@ -587,7 +587,7 @@ void RenderAf::notSolved()
 
 void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block, int Task)
 {
-   MsgAf * msg = new MsgAf( af::Msg::TTaskListenOutput, &mclisten);
+   af::Msg * msg = new af::Msg( af::Msg::TTaskListenOutput, &mclisten);
    msg->setAddress( this);
    AFCommon::QueueMsgDispatch( msg);
 }
@@ -777,7 +777,7 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
    AFCommon::QueueLogError( stream.str());
 
    af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
-   MsgAf* msg = new MsgAf( af::Msg::TRenderCloseTask, &taskpos);
+   af::Msg* msg = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
    msg->setAddress( render);
    AFCommon::QueueMsgDispatch( msg);
 }

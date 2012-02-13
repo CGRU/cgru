@@ -14,10 +14,10 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-extern bool running;
+extern bool AFRunning;
 
 // Messages reaction case function
-void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg);
+void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg);
 
 /** This is a main run cycle thread entry point
 **/
@@ -26,7 +26,7 @@ void threadRunCycle( void * i_args)
    AFINFO("ThreadRun::run:")
    ThreadArgs * a = (ThreadArgs*)i_args;
 
-while( running)
+while( AFRunning)
 {
 #ifdef _DEBUG
 printf("...................................\n");
@@ -57,8 +57,8 @@ AFINFO("ThreadRun::run: React on incoming messages:")
       the Sleep() function below.
    */
 
-   MsgAf *message;
-   while( message = a->msgQueue->popMsg(AfQueue::e_no_wait) )
+   af::Msg *message;
+   while( message = a->msgQueue->popMsg( af::AfQueue::e_no_wait) )
    {
       threadRunCycleCase( a, message );
    }

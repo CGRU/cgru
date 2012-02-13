@@ -1142,7 +1142,7 @@ bool JobAf::checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str) 
    return true;
 }
 
-bool JobAf::getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders)
+bool JobAf::getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::string & filename, RenderContainer * renders)
 {
 //printf("JobAf::getTaskStdOut:\n");
    if( false == checkBlockTaskNumbers( taskpos.getNumBlock(), taskpos.getNumTask(), "getTaskStdOut"))

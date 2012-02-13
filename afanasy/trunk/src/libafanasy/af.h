@@ -1,14 +1,5 @@
 #pragma once
 
-//#include <Python.h>
-//#include <list>
-//#include <string>
-//#include <iostream>
-//#include <sstream>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <vector>
-
 #ifndef WINNT
 #include <netinet/in.h>
 #include <netdb.h>

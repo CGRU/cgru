@@ -1,7 +1,7 @@
 #include "monitor.h"
 
-#include "environment.h"
 #include "address.h"
+#include "environment.h"
 #include "msg.h"
 
 #define AFOUTPUT

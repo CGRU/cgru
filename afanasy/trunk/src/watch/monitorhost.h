@@ -3,6 +3,7 @@
 #include <QtCore/QList>
 
 #include "../libafanasy/monitor.h"
+#include "../libafanasy/msg.h"
 
 class MonitorHost: public af::Monitor
 {

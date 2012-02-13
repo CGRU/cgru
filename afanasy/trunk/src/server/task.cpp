@@ -3,7 +3,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/blockdata.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
 #include "afcommon.h"
@@ -280,7 +280,7 @@ const std::string Task::getOutputFileName( int startcount) const
    return filename;
 }
 
-bool Task::getOutput( int startcount, MsgAf *msg, std::string & filename, RenderContainer * renders) const
+bool Task::getOutput( int startcount, af::Msg *msg, std::string & filename, RenderContainer * renders) const
 {
 //printf("Task::getOutput:\n");
    if( progress->starts_count < 1 )

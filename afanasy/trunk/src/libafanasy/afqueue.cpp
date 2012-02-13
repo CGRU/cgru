@@ -1,27 +1,29 @@
 #include "afqueue.h"
-#include "../libafanasy/dlScopeLocker.h"
+#include "dlScopeLocker.h"
 
 #include <stdio.h>
 #include <assert.h>
-
-extern bool running;
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-AfQueueItem::AfQueueItem(): next_ptr( NULL) {}
-AfQueueItem::~AfQueueItem() {}
+bool AFRunning = true;
+
+using namespace af;
 
 /*
    This is a simple stub to call the "Run" method in the
    AfQueue.
 */
-void thread_entry_point( void *i_parameter )
+void af::thread_entry_point( void *i_parameter )
 {
-   AfQueue *queue = (AfQueue *) i_parameter;
+   af::AfQueue *queue = (af::AfQueue *) i_parameter;
    queue->run();
 }
+
+AfQueueItem::AfQueueItem(): next_ptr( NULL) {}
+AfQueueItem::~AfQueueItem() {}
 
 AfQueue::AfQueue( const std::string &i_QueueName, bool i_start_thread ):
    name(i_QueueName),
@@ -190,12 +192,12 @@ void AfQueue::run()
 {
    AFINFA( "Queue '%s' just came to life!", name.c_str() );
 
-   while( running )
+   while( AFRunning )
    {
 
       AfQueueItem * item = pop( e_wait );
 
-      if( running == false )
+      if( AFRunning == false )
       {
          delete item;
          return;

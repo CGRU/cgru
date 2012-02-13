@@ -23,21 +23,21 @@ TalkContainer::~TalkContainer()
 AFINFO("TalkContainer::~TalkContainer:\n");
 }
 
-MsgAf * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring)
+af::Msg * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring)
 {
    int id = addClient( newTalk, true, monitoring, af::Msg::TMonitorTalksDel);
    if( id != 0 )
    {
       AFCommon::QueueLog("Talk registered: " + newTalk->generateInfoString( false));
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksAdd, id);
-      MsgAf* msg = generateList( af::Msg::TTalksList);
+      af::Msg* msg = generateList( af::Msg::TTalksList);
       msg->setAddress( newTalk);
       AFCommon::QueueMsgDispatch( msg);
    }
-   return new MsgAf( af::Msg::TTalkId, id);
+   return new af::Msg( af::Msg::TTalkId, id);
 }
 
-void TalkContainer::distributeData( MsgAf *msg)
+void TalkContainer::distributeData( af::Msg *msg)
 {
    af::MCTalkdistmessage msgdist( msg);
    const std::list<std::string> * list = msgdist.getList();
@@ -48,7 +48,7 @@ void TalkContainer::distributeData( MsgAf *msg)
 //   int users_quantity = list->size();
 
    af::MCTalkmessage mcTalkmsg( user, text);
-   MsgAf* message = new MsgAf( af::Msg::TTalkData, &mcTalkmsg);
+   af::Msg * message = new af::Msg( af::Msg::TTalkData, &mcTalkmsg);
 #ifdef _DEBUG
 printf("%s> %s\n", user.c_str(), text.c_str());
 #endif

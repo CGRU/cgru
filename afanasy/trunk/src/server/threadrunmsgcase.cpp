@@ -5,7 +5,7 @@
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 #include "../libafanasy/msgclasses/mctaskspos.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 
 #include "afcommon.h"
@@ -20,7 +20,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-void threadRunCycleCase( ThreadArgs * i_args, MsgAf * i_msg)
+void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
 switch ( i_msg->type())
 {

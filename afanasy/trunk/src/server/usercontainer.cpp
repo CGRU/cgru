@@ -136,7 +136,7 @@ bool UserContainer::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
    return m_userslist.solve( af::Node::SolveByPriority, i_render, i_monitoring);
 }
 
-MsgAf* UserContainer::generateJobsList( int id)
+af::Msg* UserContainer::generateJobsList( int id)
 {
    UserContainerIt usersIt( this);
    UserAf* user = usersIt.getUser( id);
@@ -145,10 +145,10 @@ MsgAf* UserContainer::generateJobsList( int id)
    MCAfNodes mcjobs;
    user->jobsinfo( mcjobs);
 
-   return new MsgAf( Msg::TJobsList, &mcjobs);
+   return new af::Msg( af::Msg::TJobsList, &mcjobs);
 }
 
-MsgAf* UserContainer::generateJobsList( const af::MCGeneral & ids)
+af::Msg* UserContainer::generateJobsList( const af::MCGeneral & ids)
 {
    UserContainerIt usersIt( this);
    MCAfNodes mcjobs;
@@ -161,7 +161,7 @@ MsgAf* UserContainer::generateJobsList( const af::MCGeneral & ids)
       user->jobsinfo( mcjobs);
    }
 
-   return new MsgAf( Msg::TJobsList, &mcjobs);
+   return new af::Msg( af::Msg::TJobsList, &mcjobs);
 }
 
 //############################################################################

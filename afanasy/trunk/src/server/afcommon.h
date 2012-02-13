@@ -32,7 +32,7 @@ public:
 
 //   static void catchDetached(); ///< Try to wait any child ( to prevent Zombie processes).
 
-   inline static bool QueueMsgDispatch( MsgAf* msg)       { if( MsgDispatchQueue ) return MsgDispatchQueue->pushMsg( msg);     else return false;}
+   inline static bool QueueMsgDispatch( af::Msg* msg)       { if( MsgDispatchQueue ) return MsgDispatchQueue->pushMsg( msg);     else return false;}
    inline static bool QueueFileWrite( FileData* filedata) { if( FileWriteQueue   ) return FileWriteQueue->pushFile( filedata); else return false;}
    inline static bool QueueJobCleanUp( const JobAf * job) { if( CleanUpJobQueue  ) return CleanUpJobQueue->pushJob( job);      else return false;}
 
@@ -50,7 +50,7 @@ public:
    inline static void QueueDBUpdateTask_end() { DBUpTaskQueue->unlock(); }
 
 private:
-   static MsgQueue          * MsgDispatchQueue;
+   static af::MsgQueue      * MsgDispatchQueue;
    static FileQueue         * FileWriteQueue;
    static CleanUpQueue      * CleanUpJobQueue;
    static LogQueue          * OutputLogQueue;

@@ -4,6 +4,8 @@
 #include <QtNetwork/QHostAddress>
 #include <QtGui/QPainter>
 
+#include "../libafanasy/msg.h"
+
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"

@@ -304,7 +304,7 @@ printf("Listening running task:"); mclisten.stdOut();
    if( render != NULL) render->sendOutput( mclisten, block->job->getId(), block->data->getBlockNum(), tasknum);
 }
 
-bool TaskRun::getOutput( int startcount, MsgAf *msg, RenderContainer * renders) const
+bool TaskRun::getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const
 {
    if( exec == NULL)
    {

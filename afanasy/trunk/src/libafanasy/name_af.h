@@ -27,8 +27,11 @@ namespace af
 {
    class Attr;
    class Af;
+   class AfQueue;
+   class AfQueueItem;
 
    class Msg;
+   class MsgQueue;
 
    class Environment;
 
@@ -151,6 +154,8 @@ namespace af
 
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
+    /// Set message to it's address and wait for an \c answer, \c return true on success.
+    bool msgRequest( const Msg * i_request, Msg * o_answer);
 
    bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
 }

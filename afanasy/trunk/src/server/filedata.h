@@ -2,7 +2,7 @@
 
 #include "../libafanasy/msgqueue.h"
 
-class FileData: public AfQueueItem
+class FileData: public af::AfQueueItem
 {
 public:
 

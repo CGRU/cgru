@@ -4,7 +4,7 @@
 
 class JobAf;
 
-class CleanUpData: public AfQueueItem
+class CleanUpData: public af::AfQueueItem
 {
 public:
    CleanUpData( const JobAf * job);
@@ -13,7 +13,7 @@ private:
    std::string tasksoutdir;
 };
 
-class CleanUpQueue : public AfQueue
+class CleanUpQueue : public af::AfQueue
 {
 public:
    CleanUpQueue( const std::string & QueueName);
@@ -23,5 +23,5 @@ public:
    inline bool pushJob( const JobAf * job) { return push( new CleanUpData(job));}
 
 protected:
-   void processItem( AfQueueItem* item);
+   void processItem( af::AfQueueItem* item);
 };

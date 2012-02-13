@@ -22,7 +22,7 @@ bool TalkAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
    case af::Msg::TTalkExit:
    {
-      MsgAf* msg = new MsgAf( af::Msg::TClientExitRequest);
+      af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
       msg->setAddress( this);
       AFCommon::QueueMsgDispatch( msg);
       return true;

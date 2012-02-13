@@ -7,7 +7,7 @@
 #include "../include/macrooutput.h"
 
 FileQueue::FileQueue( const std::string & QueueName):
-   AfQueue( QueueName)
+   af::AfQueue( QueueName)
 {
 }
 
@@ -15,7 +15,7 @@ FileQueue::~FileQueue()
 {
 }
 
-void FileQueue::processItem( AfQueueItem* item)
+void FileQueue::processItem( af::AfQueueItem* item)
 {
    FileData * filedata = (FileData*)item;
    AFINFA("FileQueue::processItem: \"%s\"", filedata->getFileName().toUtf8().data())

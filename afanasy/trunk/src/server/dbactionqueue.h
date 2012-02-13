@@ -6,10 +6,10 @@
 
 class MonitorContainer;
 
-class Queries: public std::list<std::string>, public AfQueueItem {};
+class Queries: public std::list<std::string>, public af::AfQueueItem {};
 
 /// Simple FIFO database action queue
-class DBActionQueue : public AfQueue
+class DBActionQueue : public af::AfQueue
 {
 public:
    DBActionQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer);
@@ -27,13 +27,13 @@ public:
 protected:
 
    /// Called from run thead to process item just poped from queue
-   virtual void processItem( AfQueueItem* item);
+   virtual void processItem( af::AfQueueItem* item);
 
    /// Called when database connection opened (or reopened)
    virtual void connectionEstablished();
 
    /// Queries execution function
-   virtual bool writeItem(   AfQueueItem* item);
+   virtual bool writeItem(   af::AfQueueItem* item);
 
    PGconn * m_conn;
 

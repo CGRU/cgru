@@ -37,7 +37,7 @@ public:
 /// Set null message to special message for request output from its running render.
 /** Return \c true and constuct valid message on success. On fail return \c false and message with error text for client
 **/
-   virtual bool getOutput( int startcount, MsgAf *msg, RenderContainer * renders) const;
+   virtual bool getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const;
 
    virtual void stdOut( bool full = false) const;
 

@@ -26,6 +26,8 @@ void sig_int(int signum)
 
 MonitorWindow * pMONITOR;
 
+bool running = true;
+
 int main(int argc, char *argv[])
 {
    uint32_t env_flags = af::Environment::Normal;

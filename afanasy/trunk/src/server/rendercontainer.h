@@ -6,8 +6,6 @@
 
 #include "../libafanasy/msgclasses/mctaskup.h"
 
-class MsgAf;
-
 /// Renders container.
 class RenderContainer : public ClientContainer
 {
@@ -16,7 +14,7 @@ public:
    ~RenderContainer();
 
 /// Add new Render to container, new id returned on success, else return 0.
-   MsgAf * addRender( RenderAf *newRender, MonitorContainer * monitoring = NULL);
+   af::Msg * addRender( RenderAf *newRender, MonitorContainer * monitoring = NULL);
 
 /// Set Render with \c id zombie, by calling RenderAf::setZombie( \c updateTaskState ) function.
 

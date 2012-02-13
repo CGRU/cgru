@@ -50,7 +50,7 @@ public:
 /// Construct message for retrieveing output from running remote host or filename if task is not running
 /** return \c true in success, or \c false with error message to send back to client.
 **/
-   virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, MsgAf *msg, std::string & filename, RenderContainer * renders);
+   virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::string & filename, RenderContainer * renders);
 
 /// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/

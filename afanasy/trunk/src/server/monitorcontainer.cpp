@@ -6,7 +6,7 @@
 #include "../libafanasy/job.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 
 #include "afcommon.h"
 #include "monitoraf.h"
@@ -40,7 +40,7 @@ AFINFO("MonitorContainer::~MonitorContainer:\n");
    if( jobEventsUids != NULL ) delete [] jobEventsUids;
 }
 
-MsgAf * MonitorContainer::addMonitor( MonitorAf *newMonitor)
+af::Msg * MonitorContainer::addMonitor( MonitorAf *newMonitor)
 {
    int id = addClient( newMonitor, true, this, af::Msg::TMonitorMonitorsDel);
    if( id != 0 )
@@ -48,7 +48,7 @@ MsgAf * MonitorContainer::addMonitor( MonitorAf *newMonitor)
       AFCommon::QueueLog("Monitor registered: " + newMonitor->generateInfoString( false));
       addEvent( af::Msg::TMonitorMonitorsAdd, id);
    }
-   return new MsgAf( af::Msg::TMonitorId, id);
+   return new af::Msg( af::Msg::TMonitorId, id);
 }
 
 bool MonitorContainer::setInterest( int type, af::MCGeneral & ids)
@@ -117,8 +117,8 @@ void MonitorContainer::dispatch()
 
       int eventType = af::Msg::TMonitorCommonEvents_BEGIN+1 + e;
 //printf("MonitorContainer::dispatch: [%s]\n", af::Msg::TNAMES[eventType]);
-      MsgAf * msg = NULL;
-//      MsgAf * msg = new MsgAf( eventType, &mcIds );
+      af::Msg * msg = NULL;
+//      af::Msg * msg = new af::Msg( eventType, &mcIds );
 //      bool founded = false;
       MonitorContainerIt monitorsIt( this);
       for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
@@ -129,7 +129,7 @@ void MonitorContainer::dispatch()
             {
                af::MCGeneral mcIds;
                collectIds( events[e], mcIds );
-               msg = new MsgAf( eventType, &mcIds );
+               msg = new af::Msg( eventType, &mcIds );
             }
             msg->addAddress( monitor);
          }
@@ -178,7 +178,7 @@ void MonitorContainer::dispatch()
          }
          if( ! founded ) continue;
 
-         MsgAf * msg = new MsgAf( eventType, &mcIds );
+         af::Msg * msg = new af::Msg( eventType, &mcIds );
          msg->setAddress( monitor);
          AFCommon::QueueMsgDispatch( msg);
       }
@@ -190,7 +190,7 @@ void MonitorContainer::dispatch()
    std::list<af::MCTasksProgress*>::const_iterator tIt = tasks.begin();
    while( tIt != tasks.end())
    {
-      MsgAf * msg = NULL;
+      af::Msg * msg = NULL;
       MonitorContainerIt monitorsIt( this);
       for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
       {
@@ -198,7 +198,7 @@ void MonitorContainer::dispatch()
          {
             if( msg == NULL)
             {
-               msg = new MsgAf( af::Msg::TTasksRun, *tIt);
+               msg = new af::Msg( af::Msg::TTasksRun, *tIt);
             }
             msg->addAddress( monitor);
          }
@@ -231,7 +231,7 @@ void MonitorContainer::dispatch()
       }
       if( mcblocks.getCount() < 1) continue;
 
-      MsgAf * msg = new MsgAf( type, &mcblocks);
+      af::Msg * msg = new af::Msg( type, &mcblocks);
       msg->setAddress( monitor);
       AFCommon::QueueMsgDispatch( msg);
    }
@@ -251,7 +251,7 @@ void MonitorContainer::dispatch()
          {
             af::MCGeneral ids;
             (*uIt)->generateJobsIds( ids);
-            MsgAf * msg = new MsgAf( af::Msg::TUserJobsOrder, &ids);
+            af::Msg * msg = new af::Msg( af::Msg::TUserJobsOrder, &ids);
             msg->setAddress( monitor);
             AFCommon::QueueMsgDispatch( msg);
          }
@@ -306,7 +306,7 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
    int idscount = mcgeneral.getCount();
    if( idscount < 1 ) return;
 
-   MsgAf * msg = new MsgAf;
+   af::Msg * msg = new af::Msg;
    bool founded = false;
    MonitorContainerIt mIt( this);
    for( int i = 0; i < idscount; i++)
@@ -326,7 +326,7 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
 
 void MonitorContainer::sendMessage( const std::string & str)
 {
-   MsgAf * msg = new MsgAf;
+   af::Msg * msg = new af::Msg;
    msg->setString( str);
    MonitorContainerIt mIt( this);
 

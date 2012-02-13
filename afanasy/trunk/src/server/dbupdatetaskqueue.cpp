@@ -125,7 +125,7 @@ void DBUpdateTaskQueue::connectionEstablished()
     m_db_prepared = DBTaskUpdateData::prepare( m_conn);
 }
 
-bool DBUpdateTaskQueue::writeItem( AfQueueItem* item)
+bool DBUpdateTaskQueue::writeItem( af::AfQueueItem* item)
 {
     if( false == m_db_prepared )
     {

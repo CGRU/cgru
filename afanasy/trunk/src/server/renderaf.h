@@ -7,7 +7,6 @@
 
 #include "../libafsql/dbrender.h"
 
-class MsgAf;
 class MsgQueue;
 class JobContainer;
 class RenderContainer;

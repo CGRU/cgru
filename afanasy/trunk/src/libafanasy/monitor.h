@@ -1,8 +1,6 @@
 #pragma once
 
-#include "name_af.h"
 #include "client.h"
-#include "address.h"
 
 namespace af
 {

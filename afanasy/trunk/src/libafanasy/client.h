@@ -6,8 +6,6 @@
 
 #include "address.h"
 #include "afnode.h"
-#include "msg.h"
-#include "name_af.h"
 #include "netif.h"
 
 namespace af

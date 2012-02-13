@@ -5,8 +5,6 @@
 #include "afcontainer.h"
 #include "afcontainerit.h"
 
-class MsgAf;
-
 /// Clients container (abstact class, clients are Render, Talk, Monitor).
 class ClientContainer : public AfContainer
 {

@@ -5,7 +5,6 @@
 #include "../libafanasy/taskprogress.h"
 
 class MonitorAf;
-class MsgAf;
 class UserAf;
 
 /// Monitors container.
@@ -16,7 +15,7 @@ public:
    ~MonitorContainer();
 
 /// Add new Monitor to container.
-   MsgAf* addMonitor( MonitorAf *newMonitor);
+   af::Msg* addMonitor( MonitorAf *newMonitor);
 
    void sendMessage( const af::MCGeneral & mcgeneral);
 

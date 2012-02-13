@@ -2,7 +2,7 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 
 #include "afcommon.h"
 #include "monitorcontainer.h"
@@ -23,7 +23,7 @@ RenderContainer::~RenderContainer()
 AFINFO("RenderContainer::~RenderContainer:")
 }
 
-MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * monitoring)
+af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * monitoring)
 {
    // Online render register request, from client, not from database:
    if( newRender->isOnline())
@@ -45,7 +45,7 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
                AFCommon::QueueLogError( errLog);
                delete newRender;
                // Return -1 ID to render to tell that there is already registered render with the same name:
-               return new MsgAf( Msg::TRenderId, -1);
+               return new af::Msg( af::Msg::TRenderId, -1);
             }
             // Offline render with the same hostname founded:
             else if( render->online( newRender, monitoring))
@@ -54,7 +54,7 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
                AFCommon::QueueLog("Render online: " + render->generateInfoString( false));
                delete newRender;
                // Return new render ID to render to tell that it was successfully registered:
-               return new MsgAf( Msg::TRenderId, id);
+               return new af::Msg( af::Msg::TRenderId, id);
             }
          }
       }
@@ -69,7 +69,7 @@ MsgAf * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * moni
          if( newRender->isOnline()) AFCommon::QueueDBAddItem( newRender);
       }
       // Return new render ID to render to tell that it was successfully registered:
-      return new MsgAf( Msg::TRenderId, id);
+      return new af::Msg( af::Msg::TRenderId, id);
    }
 
    // Adding offline render from database:

@@ -2,7 +2,7 @@
 
 #include "dbactionqueue.h"
 
-class DBTaskUpdateData: public AfQueueItem
+class DBTaskUpdateData: public af::AfQueueItem
 {
 public:
 
@@ -42,7 +42,7 @@ protected:
    virtual void connectionEstablished();
 
    /// Queries execution function
-   virtual bool writeItem( AfQueueItem* item);
+   virtual bool writeItem( af::AfQueueItem* item);
 
    bool m_db_prepared;
 };

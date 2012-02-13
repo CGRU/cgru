@@ -3,7 +3,7 @@
 #include "../libafanasy/dlRWLock.h"
 
 #include "../libafanasy/afnode.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 class AfContainer;
@@ -20,10 +20,10 @@ public:
    inline bool isInitialized() {  return initialized;}///< Whether container was successfully initialized.
 
 /// Generate MCAfNodes message with all stored Nodes.
-   MsgAf* generateList( int type);
+   af::Msg* generateList( int type);
 
 /// Generate MCAfNodes message with Nodes with provided ids.
-   MsgAf* generateList( int type, const af::MCGeneral & mcgeneral);
+   af::Msg* generateList( int type, const af::MCGeneral & mcgeneral);
 
    bool setZombie( int id);
 

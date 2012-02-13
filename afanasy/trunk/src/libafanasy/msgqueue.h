@@ -1,7 +1,10 @@
 #pragma once
 
 #include "afqueue.h"
-#include "msgaf.h"
+#include "msg.h"
+
+namespace af
+{
 
 /// Simple FIFO message queue
 class MsgQueue : public AfQueue
@@ -11,14 +14,16 @@ public:
    virtual ~MsgQueue();
 
 /// Return first message from queue. BLOCKING FUNCTION if \c block==AfQueue::e_wait.
-   inline MsgAf* popMsg( WaitMode i_block ) { return (MsgAf*)pop(i_block);}
+   inline Msg* popMsg( WaitMode i_block ) { return (Msg*)pop(i_block);}
 
 /// Push message to queue back.
-   inline bool pushMsg( MsgAf* msg) { if(msg) msg->resetWrittenSize(); return push( msg);}
+   inline bool pushMsg( Msg* msg) { if(msg) msg->resetWrittenSize(); return push( msg);}
 
 protected:
    void processItem( AfQueueItem* item);
 
 private:
-   void send( const af::Msg * msg, const af::Address & address) const;
+   void send( const Msg * msg, const Address & address) const;
 };
+
+} // namespace af

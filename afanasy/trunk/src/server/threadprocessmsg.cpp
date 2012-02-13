@@ -8,7 +8,7 @@
 
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 
 #include "../libafnetwork/communications.h"
@@ -28,11 +28,11 @@
 
 void processMessage( ThreadArgs * i_args);
 
-bool readMessage( ThreadArgs * i_args, MsgAf * i_msg);
+bool readMessage( ThreadArgs * i_args, af::Msg * i_msg);
 
-MsgAf * threadProcessMsgCase( ThreadArgs * i_args, MsgAf * i_msg);
+af::Msg * threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg);
 
-void writeMessage( ThreadArgs * i_args, MsgAf * i_msg);
+void writeMessage( ThreadArgs * i_args, af::Msg * i_msg);
 
 // Accepted client thread entry point
 void threadProcessMsg( void * i_args)
@@ -55,7 +55,7 @@ void processMessage( ThreadArgs * i_args)
     // Using a constructor that stores client address in message,
     // this client address will be used for a new client,
     // if it is a new client registration request.
-    MsgAf * msg_request = new MsgAf( i_args->ss);
+    af::Msg * msg_request = new af::Msg( i_args->ss);
 
     // Check message IP mask:
     if( false == msg_request->getAddress().matchIpMask())
@@ -80,7 +80,7 @@ printf("Request: ");msg_request->stdOut();
 #endif
 
    // React on message, may be with response to the same opened socket.
-   MsgAf * msg_response = threadProcessMsgCase( i_args, msg_request);
+   af::Msg * msg_response = threadProcessMsgCase( i_args, msg_request);
    // If request not needed any more it will be deleted there.
 
    if( msg_response == NULL)
@@ -99,7 +99,7 @@ printf("Response: ");msg_response->stdOut();
    delete msg_response;
 }
 
-bool readMessage( ThreadArgs * i_args, MsgAf * io_msg)
+bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 {
    AFINFO("ThreadReadMsg::msgProcess: trying to recieve message...")
 
@@ -128,7 +128,7 @@ bool readMessage( ThreadArgs * i_args, MsgAf * io_msg)
    return true;
 }
 
-void writeMessage( ThreadArgs * i_args, MsgAf * i_msg)
+void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
 {
    // set socket maximum time to wait for an output operation to complete
    timeval so_sndtimeo;

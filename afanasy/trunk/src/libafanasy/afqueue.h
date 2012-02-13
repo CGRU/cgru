@@ -1,13 +1,17 @@
 #pragma once
 
-#include "../libafanasy/dlMutex.h"
-#include "../libafanasy/dlThread.h"
+#include "dlMutex.h"
+#include "dlThread.h"
 
 #ifndef _WIN32
 #include <semaphore.h>
 #endif
 
 #include <string>
+
+namespace af
+{
+void thread_entry_point( void *i_parameter );
 
 /// Queue item
 class AfQueueItem
@@ -86,4 +90,4 @@ private:
    AfQueueItem* lastPtr;   ///< Pointer to last item in queue.
 };
 
-//#undef MACOSX
+} // namespace af

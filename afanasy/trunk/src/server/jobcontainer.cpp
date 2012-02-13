@@ -5,7 +5,6 @@
 #include <memory.h>
 
 #include "../libafanasy/msgclasses/mcafnodes.h"
-#include "../libafanasy/msgaf.h"
 
 #include "../libafsql/dbconnection.h"
 

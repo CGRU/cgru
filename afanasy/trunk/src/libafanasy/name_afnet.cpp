@@ -1,4 +1,4 @@
-#include "msgaf.h"
+#include "name_af.h"
 
 #include <arpa/inet.h>
 #include <netdb.h>
@@ -11,7 +11,7 @@
 
 #include "address.h"
 #include "environment.h"
-#include "msgqueue.h"
+#include "msg.h"
 
 #include "../libafnetwork/communications.h"
 
@@ -19,69 +19,33 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-MsgAf::MsgAf( int msgType, int msgInt):
-      Msg( msgType, msgInt)
+bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
 {
-}
-
-MsgAf::MsgAf( int msgType, Af * afClass ):
-      Msg( msgType, afClass)
-{
-}
-
-MsgAf::MsgAf( const struct sockaddr_storage & ss):
-      address( ss)
-{
-}
-
-MsgAf::~MsgAf()
-{
-   /*
-   if( address != NULL) delete address;
-   while( addresses.size())
+   if( i_request->addressIsEmpty() )
    {
-      delete addresses.front();
-      addresses.pop_front();
-   }
-   */
-}
-/*
-void MsgAf::setAddress( const af::Client* client)
-{
-   if( address != NULL) delete address;
-   address = new af::Address( client->getAddress());
-   if( address == NULL )
-      AFERROR("MsgAf::setAddr( const Client* client): memory allocation failed.\n");
-}
-*/
-
-bool MsgAf::request( MsgAf *answer)
-{
-   if( address.isEmpty() )
-   {
-      AFERROR("MsgAf::dispatch: Address is empty\n")
+      AFERROR("af::msgRequest: Request address is empty.")
       return false;
    }
 
    int socketfd;
    struct sockaddr_storage client_addr;
 
-   address.setSocketAddress( client_addr);
+   i_request->getAddress().setSocketAddress( client_addr);
    //
    // get socket descriptor
    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, IPPROTO_TCP)) < 0 )
    {
       AFERRPE("MsgAf::request: socket");
-      address.stdOut(); printf("\n");
+      i_request->getAddress().stdOut(); printf("\n");
       return false;
    }
    //
    // connect
 //   if ( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
-   if ( connect( socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
+   if ( connect( socketfd, (struct sockaddr*)&client_addr, i_request->getAddress().sizeofAddr()) != 0 )
    {
       AFERRPE("MsgAf::request: connect");
-      address.stdOut(); printf("\n");
+      i_request->getAddress().stdOut(); printf("\n");
       close(socketfd);
       return false;
    }
@@ -101,16 +65,16 @@ bool MsgAf::request( MsgAf *answer)
    }
    //
    // send request
-   if( false == com::msgsend( socketfd, this))
+   if( false == com::msgsend( socketfd, i_request))
    {
       AFERROR("MsgAf::request: can't send message to client.\n");
-      stdOut();
+      i_request->stdOut();
       close( socketfd);
       return false;
    }
    //
    // read answer
-   if( false == com::msgread( socketfd, answer))
+   if( false == com::msgread( socketfd, o_answer))
    {
       AFERROR("MsgAf::request: reading message failed.\n");
       close( socketfd);

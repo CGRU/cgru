@@ -2,7 +2,7 @@
 
 #include "../libafanasy/afqueue.h"
 
-class LogData: public AfQueueItem
+class LogData: public af::AfQueueItem
 {
 public:
    LogData( const std::string & str, int flags = Info);
@@ -19,7 +19,7 @@ private:
    std::string text;
 };
 
-class LogQueue : public AfQueue
+class LogQueue : public af::AfQueue
 {
 public:
    LogQueue ( const std::string & QueueName);
@@ -29,5 +29,5 @@ public:
    inline bool pushLog( const std::string & log, int flags) { return push( new LogData(log, flags));}
 
 protected:
-   void processItem( AfQueueItem* item);
+   void processItem( af::AfQueueItem* item);
 };

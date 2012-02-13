@@ -4,8 +4,6 @@
 
 #include "talkaf.h"
 
-class MsgAf;
-
 /// Talks container.
 class TalkContainer : public ClientContainer
 {
@@ -14,10 +12,10 @@ public:
    ~TalkContainer();
 
 /// Add new Talk to container, new id returned on success, else return 0.
-   MsgAf* addTalk( TalkAf *newTalk, MonitorContainer * monitoring);
+   af::Msg * addTalk( TalkAf *newTalk, MonitorContainer * monitoring);
 
 /// Dispatch Talk message to clients.
-   void distributeData( MsgAf *msg);
+   void distributeData( af::Msg *msg);
 
 private:
 

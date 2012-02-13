@@ -4,7 +4,8 @@
 
 #include "../include/aftypes.h"
 
-#include "af.h"
+#include "afqueue.h"
+#include "client.h"
 
 namespace af
 {
@@ -16,7 +17,7 @@ namespace af
 ***   Messages with type less than \c Msg::TDATA must not have any data to be valid.
 ***   They must have NULL data poiner.
 **/
-class Msg : public Af
+class Msg : public Af, public AfQueueItem
 {
 public:
 /// Default constructor.
@@ -25,7 +26,10 @@ public:
 /// Constructor from \c Af class.
    Msg( int msgType, Af * afClass );
 
-   Msg( const char * rawData, int rawDataLen);
+    /// Construct a message and set an address
+    Msg( const struct sockaddr_storage & ss);
+
+    Msg( const char * rawData, int rawDataLen);
 
    ~Msg();///< Destructor.
 
@@ -380,6 +384,24 @@ static const char * TNAMES[]; ///< Type names.
 
    inline void resetWrittenSize() { msgwrittensize = 0; }
 
+   inline bool addressIsEmpty() const { return address.isEmpty();}
+
+   inline const size_t addressesCount() const { return addresses.size();}
+
+/// Set message address to \c client .
+   inline void setAddress( const Client* client)
+      { address = client->getAddress();}
+
+/// Add dispatch address.
+   inline void addAddress( const Client* client)
+      { addresses.push_back( client->getAddress());}
+
+/// Get address constant pointer.
+   inline const Address & getAddress() const { return address;}
+
+/// Get addresses constant list pointer.
+   inline const std::list<Address> * getAddresses() const { return &addresses;}
+
 private:
 
 // header:
@@ -396,6 +418,9 @@ private:
    int  mbuffer_size;               ///< Buffer size.
    int  mdata_maxsize;              ///< Data maximum size ( = buffer size - header size).
    int  msgwrittensize;             ///< Number of bytes already written in message buffer.
+
+   Address address;               ///< Address, where message came from or will be send.
+   std::list<Address> addresses;  ///< Addresses to dispatch message to.
 
 private:
 

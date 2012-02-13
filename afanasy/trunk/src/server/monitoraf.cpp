@@ -41,7 +41,7 @@ bool MonitorAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
    case af::Msg::TMonitorExit:
    {
-      MsgAf* msg = new MsgAf( af::Msg::TClientExitRequest);
+      af::Msg * msg = new af::Msg( af::Msg::TClientExitRequest);
       msg->setAddress( this);
       AFCommon::QueueMsgDispatch( msg);
       return true;

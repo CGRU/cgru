@@ -27,10 +27,10 @@ public:
    void setPermanent( const af::MCGeneral & usr, bool permanent, MonitorContainer * monitoring);
 
 /// Generate MCJobs message for user with \c id , return NULL if no such \c id exists.
-   MsgAf* generateJobsList( int id);
+   af::Msg* generateJobsList( int id);
 
 /// Generate MCJobs message for users with provided ids.
-   MsgAf* generateJobsList( const af::MCGeneral & ids);
+   af::Msg* generateJobsList( const af::MCGeneral & ids);
 
 /// Generate task for \c render , return \c true on success.
    bool solve( RenderAf *render, MonitorContainer * monitoring);

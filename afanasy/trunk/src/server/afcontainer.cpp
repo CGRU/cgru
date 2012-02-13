@@ -176,7 +176,7 @@ void AfContainer::refresh( AfContainer * pointer, MonitorContainer * monitoring)
    }
 }
 
-MsgAf* AfContainer::generateList( int type)
+af::Msg* AfContainer::generateList( int type)
 {
    af::MCAfNodes mcNodes;
    for( af::Node * node = first_ptr; node != NULL; node = node->next_ptr)
@@ -184,10 +184,10 @@ MsgAf* AfContainer::generateList( int type)
       if( node->zombie ) continue;
       mcNodes.addNode( node);
    }
-   return new MsgAf( type, &mcNodes);
+   return new af::Msg( type, &mcNodes);
 }
 
-MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
+af::Msg* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
 {
    af::MCAfNodes mcNodes;
    int getcount = mcgeneral.getCount();
@@ -231,7 +231,7 @@ MsgAf* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
             AFCommon::QueueLog(std::string("AfContainer::generateList: No node matches \"") + mcgeneral.getName() + ("\" founded."));
       }
    }
-   return new MsgAf( type, &mcNodes);
+   return new af::Msg( type, &mcNodes);
 }
 
 bool AfContainer::setZombie( int id)

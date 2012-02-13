@@ -5,7 +5,7 @@
 #include "filedata.h"
 
 /// Simple FIFO filedata queue
-class FileQueue : public AfQueue
+class FileQueue : public af::AfQueue
 {
 public:
    FileQueue( const std::string & QueueName);
@@ -15,7 +15,7 @@ public:
    inline bool pushFile( FileData* filedata) { return push( filedata);}
 
 protected:
-   void processItem( AfQueueItem* item);
+   void processItem( af::AfQueueItem* item);
 
 private:
    void renameNext( const std::string & filename, int number, int maxnumber) const;

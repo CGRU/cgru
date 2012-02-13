@@ -15,8 +15,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+af::MsgQueue      * AFCommon::MsgDispatchQueue  = NULL;
 FileQueue         * AFCommon::FileWriteQueue    = NULL;
-MsgQueue          * AFCommon::MsgDispatchQueue  = NULL;
 DBUpdateTaskQueue * AFCommon::DBUpTaskQueue     = NULL;
 DBActionQueue     * AFCommon::DBUpdateQueue     = NULL;
 CleanUpQueue      * AFCommon::CleanUpJobQueue   = NULL;
@@ -30,7 +30,7 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
    assert( core );
 
-   MsgDispatchQueue = new MsgQueue(          "Sending Messages");
+   MsgDispatchQueue = new af::MsgQueue(      "Sending Messages");
    FileWriteQueue   = new FileQueue(         "Writing Files");
    CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
    OutputLogQueue   = new LogQueue(          "Log Output");

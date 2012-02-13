@@ -40,7 +40,7 @@ LogQueue::LogQueue( const std::string & QueueName):  AfQueue( QueueName) {}
 
 LogQueue::~LogQueue() {}
 
-void LogQueue::processItem( AfQueueItem* item)
+void LogQueue::processItem( af::AfQueueItem* item)
 {
    LogData * data = (LogData*)item;
    data->output();

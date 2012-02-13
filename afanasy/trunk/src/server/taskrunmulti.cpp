@@ -5,7 +5,7 @@
 #include "../libafanasy/job.h"
 #include "../libafanasy/taskexec.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
-#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msg.h"
 
 #include "block.h"
 #include "jobaf.h"
@@ -415,7 +415,7 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
    }
 }
 
-bool TaskRunMulti::getOutput( int startcount, MsgAf *msg, RenderContainer * renders) const
+bool TaskRunMulti::getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const
 {
    if( progress->state & AFJOB::STATE_READY_MASK)
    {

@@ -37,6 +37,13 @@ Msg::Msg( int msgType, Af * afClass )
    set( msgType, afClass);
 }
 
+Msg::Msg( const struct sockaddr_storage & ss):
+    address( ss)
+{
+    construct();
+    set( TNULL);
+}
+
 Msg::Msg( const char * rawData, int rawDataLen):
    mbuffer( NULL),
    // This message not for write any more data. All data will be written in this constuctor.

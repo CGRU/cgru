@@ -5,7 +5,6 @@
 #include "../libafanasy/name_af.h"
 #include "../libafanasy/taskprogress.h"
 
-class MsgAf;
 class JobAf;
 class RenderAf;
 class Block;
@@ -53,7 +52,7 @@ public:
 /// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
 /** Return \c true on success (and valid message or filename) or \c false on fail with error message for client
 **/
-   bool getOutput( int startcount, MsgAf *msg, std::string & filename, RenderContainer * renders) const;
+   bool getOutput( int startcount, af::Msg *msg, std::string & filename, RenderContainer * renders) const;
 
    void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 
