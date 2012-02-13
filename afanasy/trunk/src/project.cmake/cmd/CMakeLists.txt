@@ -15,4 +15,4 @@ if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
    set_target_properties(afcmd PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
-target_link_libraries(afcmd afapi afnetwork afsql)
+target_link_libraries(afcmd afapi afsql)

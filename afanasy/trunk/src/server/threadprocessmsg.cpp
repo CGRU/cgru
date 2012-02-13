@@ -11,8 +11,6 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgqueue.h"
 
-#include "../libafnetwork/communications.h"
-
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitoraf.h"
@@ -116,7 +114,7 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
    }
 
    // Reading message from client socket.
-   if( false == com::msgread( i_args->sd, io_msg))
+   if( false == af::msgread( i_args->sd, io_msg))
    {
       AFERROR("ThreadReadMsg::msgProcess: reading message failed.")
       af::printAddress( &(i_args->ss));
@@ -143,7 +141,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    }
 
    // writing message back to client socket
-   if( false == com::msgsend( i_args->sd, i_msg))
+   if( false == af::msgsend( i_args->sd, i_msg))
    {
       AFERROR("ThreadReadMsg::msgProcess: can't send message to client.")
       af::printAddress( &(i_args->ss));

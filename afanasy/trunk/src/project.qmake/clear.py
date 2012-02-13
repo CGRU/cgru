@@ -5,7 +5,7 @@ import shutil
 import sys
 
 store = ['.svn','build.sh','override.sh','clear.py','project.pro','win_build_mingw.cmd','win_build_msvc.cmd']
-projects = ['libafanasy','libafnetwork','libafapi','libafqt','libafsql','libpyaf','cmd','server','render','talk','watch','monitor']
+projects = ['libafanasy','libafapi','libafqt','libafsql','libpyaf','cmd','server','render','talk','watch','monitor']
 
 folders = []
 if len(sys.argv) > 1:

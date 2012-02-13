@@ -17,8 +17,6 @@
 #include "address.h"
 #include "environment.h"
 
-#include "../libafnetwork/communications.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -104,7 +102,7 @@ void MsgQueue::send( const Msg * msg, const Address & address) const
 #ifndef WINNT
    if( alarm(2) != 0 )
       AFERROR("MsgQueue::send: alarm was already set.\n");
-#endif WINNT
+#endif //WINNT
 
    if( connect(socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
@@ -113,13 +111,13 @@ void MsgQueue::send( const Msg * msg, const Address & address) const
       close(socketfd);
 #ifndef WINNT
       alarm(0);
-#endif WINNT
+#endif //WINNT
       return;
    }
 
 #ifndef WINNT
     alarm(0);
-#endif WINNT
+#endif //WINNT
    //
    // set socket maximum time to wait for an output operation to complete
 #ifndef WINNT
@@ -133,10 +131,10 @@ void MsgQueue::send( const Msg * msg, const Address & address) const
       close(socketfd);
       return;
    }
-#endif WINNT
+#endif //WINNT
    //
    // send
-   if( false == com::msgsend( socketfd, msg))
+   if( false == msgsend( socketfd, msg))
    {
       AFERRAR("MsgQueue::send: can't send message to client: %s", address.generateInfoString().c_str())
    }

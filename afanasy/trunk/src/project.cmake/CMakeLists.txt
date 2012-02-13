@@ -41,7 +41,6 @@ add_subdirectory(libafapi)
 if(NOT DEFINED PYAF_ONLY)
    #These projects are not currently supported for Windows platform
    if(NOT WIN32)
-      add_subdirectory(libafnetwork)
       add_subdirectory(libafsql)
       add_subdirectory(cmd)
       add_subdirectory(server)

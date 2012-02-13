@@ -1,7 +1,5 @@
 #include "cmd_statistics.h"
 
-#include "../libafnetwork/communications.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -31,6 +29,6 @@ bool CmdStatistics::processArguments( int argc, char** argv, af::Msg &msg)
 
 void CmdStatistics::msgOut( af::Msg& msg)
 {
-   com::statread( &msg);
-   com::statout( columns, sorting);
+   af::statread( &msg);
+   af::statout( columns, sorting);
 }

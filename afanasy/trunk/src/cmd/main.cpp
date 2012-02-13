@@ -4,8 +4,6 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/afattr.h"
 
-#include "../libafnetwork/communications.h"
-
 #include "../libafsql/name_afsql.h"
 
 #define AFOUTPUT

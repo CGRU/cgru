@@ -11,8 +11,6 @@
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/msgclasses/mcjobsweight.h"
 
-#include "../libafnetwork/communications.h"
-
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitoraf.h"
@@ -54,7 +52,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
    case af::Msg::TStatRequest:
    {
       o_msg_response = new af::Msg;
-      com::statwrite( o_msg_response);
+      af::statwrite( o_msg_response);
       break;
    }
    case af::Msg::TConfirm:

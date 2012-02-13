@@ -3,8 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../libafnetwork/communications.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -25,7 +23,7 @@ AfCmd::~AfCmd()
 
 bool AfCmd::connect()
 {
-   socketfd = com::connecttomaster( Verbose, Protocol, ServerName.c_str(), ServerPort);
+   socketfd = af::connecttomaster( Verbose, Protocol, ServerName.c_str(), ServerPort);
    if( socketfd == -1)
    {
       printf("AfCmd::connect: can't connect to master.\n");
@@ -37,14 +35,14 @@ bool AfCmd::connect()
 bool AfCmd::msgSend( af::Msg& msg)
 {
    if( Verbose) { printf("AfCmd::msgSend: "); msg.stdOut();}
-   if( com::msgsend( socketfd, &msg)) return true;
+   if( af::msgsend( socketfd, &msg)) return true;
    printf("AfCmd::msgSend: can't send message to master.\n");
    return false;
 }
 
 bool AfCmd::msgReceive( af::Msg& msg)
 {
-   if(!com::msgread( socketfd, &msg))
+   if( false == af::msgread( socketfd, &msg))
    {
       printf("AfCmd::msgSend: reading ansswer failed.\n");
       return false;
@@ -56,7 +54,7 @@ bool AfCmd::msgReceive( af::Msg& msg)
 af::Msg * AfCmd::msgReceive()
 {
    int rawdata_len = 0;
-   char * rawdata = com::readdata( socketfd, rawdata_len);
+   char * rawdata = af::readdata( socketfd, rawdata_len);
    if(( rawdata_len < 1 ) || ( rawdata == NULL ))
    {
       AFERRAR("AfCmd::msgReceive(): Receivind message failed (%d at %p)\n.", rawdata_len, rawdata);

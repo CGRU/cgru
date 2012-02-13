@@ -6,15 +6,15 @@
 #include "../libafanasy/af.h"
 #include "../libafanasy/msg.h"
 
-namespace com
-{
-
 /// Messages store structure.
 struct MSGS
 {
    int32_t    count;
    int32_t    size;
 };
+
+namespace af
+{
 
 /// Class to collect, store, calculate messages statistics and write and read it from buffer.
 class MsgStat : public af::Af

@@ -3,7 +3,7 @@
 #include <string.h>
 #include <time.h>
 
-using namespace com;
+using namespace af;
 
 #define AFOUTPUT
 #undef AFOUTPUT
