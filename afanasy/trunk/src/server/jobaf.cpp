@@ -1,9 +1,10 @@
 #include "jobaf.h"
 
-#include "../libafanasy/environment.h"
-#include "../libafanasy/blockdata.h"
 #include "../libafanasy/addresseslist.h"
+#include "../libafanasy/blockdata.h"
+#include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
+#include "../libafanasy/msgqueue.h"
 
 #include "../libafsql/dbattr.h"
 #include "../libafsql/dbconnection.h"
@@ -14,7 +15,6 @@
 #include "block.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
-#include "msgqueue.h"
 #include "renderaf.h"
 #include "rendercontainer.h"
 #include "sysjob.h"

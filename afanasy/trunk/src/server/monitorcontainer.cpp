@@ -2,14 +2,14 @@
 
 #include "../include/afanasy.h"
 
-#include "../libafanasy/job.h"
 #include "../libafanasy/blockdata.h"
+#include "../libafanasy/job.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
+#include "../libafanasy/msgaf.h"
 
 #include "afcommon.h"
 #include "monitoraf.h"
-#include "msgaf.h"
 #include "useraf.h"
 
 #define AFOUTPUT
@@ -136,7 +136,7 @@ void MonitorContainer::dispatch()
       }
       if( msg )
       {
-         msg->dispatch();
+          AFCommon::QueueMsgDispatch( msg);
 //printf("MonitorContainer::dispatch: ");msg->stdOut();
       }
    }
@@ -180,7 +180,7 @@ void MonitorContainer::dispatch()
 
          MsgAf * msg = new MsgAf( eventType, &mcIds );
          msg->setAddress( monitor);
-         msg->dispatch();
+         AFCommon::QueueMsgDispatch( msg);
       }
    }
 
@@ -203,7 +203,10 @@ void MonitorContainer::dispatch()
             msg->addAddress( monitor);
          }
       }
-      if( msg ) msg->dispatch();
+      if( msg )
+      {
+          AFCommon::QueueMsgDispatch( msg);
+      }
       tIt++;
    }
 
@@ -230,7 +233,7 @@ void MonitorContainer::dispatch()
 
       MsgAf * msg = new MsgAf( type, &mcblocks);
       msg->setAddress( monitor);
-      msg->dispatch();
+      AFCommon::QueueMsgDispatch( msg);
    }
    }
 
@@ -250,7 +253,7 @@ void MonitorContainer::dispatch()
             (*uIt)->generateJobsIds( ids);
             MsgAf * msg = new MsgAf( af::Msg::TUserJobsOrder, &ids);
             msg->setAddress( monitor);
-            msg->dispatch();
+            AFCommon::QueueMsgDispatch( msg);
          }
          uIt++;
       }
@@ -316,7 +319,7 @@ void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
    if( founded)
    {
       msg->setString( mcgeneral.getUserName() + ": " + mcgeneral.getString() );
-      msg->dispatch();
+      AFCommon::QueueMsgDispatch( msg);
    }
    else delete msg;
 }
@@ -330,7 +333,7 @@ void MonitorContainer::sendMessage( const std::string & str)
    for( MonitorAf * monitor = mIt.monitor(); monitor != NULL; mIt.next(), monitor = mIt.monitor())
       msg->addAddress( monitor);
    if( msg->addressesCount() )
-      msg->dispatch();
+       AFCommon::QueueMsgDispatch( msg);
    else delete msg;
 }
 

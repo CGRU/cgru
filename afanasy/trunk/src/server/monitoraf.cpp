@@ -43,7 +43,7 @@ bool MonitorAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
    {
       MsgAf* msg = new MsgAf( af::Msg::TClientExitRequest);
       msg->setAddress( this);
-      msg->dispatch();
+      AFCommon::QueueMsgDispatch( msg);
       return true;
    }
    default:

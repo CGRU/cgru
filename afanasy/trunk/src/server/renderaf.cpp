@@ -1,16 +1,16 @@
 #include "renderaf.h"
 
 #include "../libafanasy/environment.h"
-#include "../libafanasy/farm.h"
+#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
+#include "../libafanasy/farm.h"
 
 #include "../libafsql/dbattr.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
-#include "msgaf.h"
-#include "msgqueue.h"
 #include "rendercontainer.h"
 #include "sysjob.h"
 
@@ -164,7 +164,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
    {
       MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
       msg->setAddress( this);
-      msg->dispatch();
+      AFCommon::QueueMsgDispatch( msg);
       std::string str = "Starting task: ";
       str += taskexec->generateInfoString( false);
       appendTasksLog( str);
@@ -190,7 +190,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 
       MsgAf* msg = new MsgAf( af::Msg::TTask, taskexec);
       msg->setAddress( this);
-      msg->dispatch();
+      AFCommon::QueueMsgDispatch( msg);
 
       std::string str = "Starting service: ";
       str += taskexec->generateInfoString( false);
@@ -412,7 +412,7 @@ void RenderAf::exitClient( int type, JobContainer * jobs, MonitorContainer * mon
    if( false == isOnline() ) return;
    MsgAf* msg = new MsgAf( type);
    msg->setAddress( this);
-   msg->dispatch();
+   AFCommon::QueueMsgDispatch( msg);
 //   if( type != af::Msg::TClientStartRequest )
    offline( jobs, af::TaskExec::UPRenderExit, monitoring);
 }
@@ -453,7 +453,7 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
 
    MsgAf* msg = new MsgAf( af::Msg::TClientWOLSleepRequest);
    msg->setAddress( this);
-   msg->dispatch();
+   AFCommon::QueueMsgDispatch( msg);
 }
 
 void RenderAf::wolWake(  MonitorContainer * monitoring)
@@ -493,7 +493,7 @@ void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
    af::MCTaskPos taskpos( jobid, blocknum, tasknum, number);
    MsgAf* msg = new MsgAf( af::Msg::TRenderStopTask, &taskpos);
    msg->setAddress( this);
-   msg->dispatch();
+   AFCommon::QueueMsgDispatch( msg);
 }
 
 void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * monitoring)
@@ -589,7 +589,7 @@ void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block,
 {
    MsgAf * msg = new MsgAf( af::Msg::TTaskListenOutput, &mclisten);
    msg->setAddress( this);
-   msg->dispatch();
+   AFCommon::QueueMsgDispatch( msg);
 }
 
 void RenderAf::appendLog( const std::string & message)
@@ -779,7 +779,7 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
    af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
    MsgAf* msg = new MsgAf( af::Msg::TRenderCloseTask, &taskpos);
    msg->setAddress( render);
-   msg->dispatch();
+   AFCommon::QueueMsgDispatch( msg);
 }
 
 int RenderAf::calcWeight() const

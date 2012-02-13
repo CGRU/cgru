@@ -1,6 +1,6 @@
 #pragma once
 
-#include "afqueue.h"
+#include "../libafanasy/msgqueue.h"
 
 class FileData: public AfQueueItem
 {

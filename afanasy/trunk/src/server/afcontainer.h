@@ -3,9 +3,8 @@
 #include "../libafanasy/dlRWLock.h"
 
 #include "../libafanasy/afnode.h"
+#include "../libafanasy/msgaf.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
-
-#include "msgaf.h"
 
 class AfContainer;
 class AfContainerIt;

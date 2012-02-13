@@ -1,9 +1,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../libafanasy/msgqueue.h"
+
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
-#include "msgqueue.h"
 #include "rendercontainer.h"
 #include "talkcontainer.h"
 #include "threadargs.h"

@@ -9,9 +9,8 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include "../libafanasy/address.h"
-#include "../libafanasy/environment.h"
-#include "../libafanasy/msg.h"
+#include "address.h"
+#include "environment.h"
 
 #include "../libafnetwork/communications.h"
 

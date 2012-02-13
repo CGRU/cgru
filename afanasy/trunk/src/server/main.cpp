@@ -5,12 +5,13 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/dlThread.h"
+#include "../libafanasy/msgqueue.h"
+
 #include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
-#include "msgqueue.h"
 #include "sysjob.h"
 #include "rendercontainer.h"
 #include "talkcontainer.h"

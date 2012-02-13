@@ -8,6 +8,8 @@
 
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
+#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msgqueue.h"
 
 #include "../libafnetwork/communications.h"
 
@@ -15,8 +17,6 @@
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
-#include "msgaf.h"
-#include "msgqueue.h"
 #include "rendercontainer.h"
 #include "talkcontainer.h"
 #include "threadargs.h"

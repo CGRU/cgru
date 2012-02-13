@@ -5,11 +5,11 @@
 #include <memory.h>
 
 #include "../libafanasy/msgclasses/mcafnodes.h"
+#include "../libafanasy/msgaf.h"
 
 #include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
-#include "msgaf.h"
 #include "useraf.h"
 #include "usercontainer.h"
 #include "rendercontainer.h"

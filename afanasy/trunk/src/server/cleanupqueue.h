@@ -1,6 +1,6 @@
 #pragma once
 
-#include "afqueue.h"
+#include "../libafanasy/afqueue.h"
 
 class JobAf;
 

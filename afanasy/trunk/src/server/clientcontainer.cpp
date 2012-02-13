@@ -4,9 +4,9 @@
 #include <stdlib.h>
 
 #include "../libafanasy/address.h"
+#include "../libafanasy/msgqueue.h"
 
 #include "afcommon.h"
-#include "msgaf.h"
 #include "monitorcontainer.h"
 
 #define AFOUTPUT

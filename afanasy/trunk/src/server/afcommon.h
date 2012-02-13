@@ -1,10 +1,10 @@
 #pragma once
 
+#include "../libafanasy/msgqueue.h"
 #include "../libafanasy/name_af.h"
 
 #include "../libafsql/name_afsql.h"
 
-#include "msgqueue.h"
 #include "filequeue.h"
 #include "dbupdatetaskqueue.h"
 #include "dbactionqueue.h"

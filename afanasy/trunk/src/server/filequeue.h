@@ -1,6 +1,7 @@
 #pragma once
 
-#include "afqueue.h"
+#include "../libafanasy/afqueue.h"
+
 #include "filedata.h"
 
 /// Simple FIFO filedata queue

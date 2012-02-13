@@ -2,8 +2,9 @@
 
 #include "../include/afanasy.h"
 
+#include "../libafanasy/msgaf.h"
+
 #include "afcommon.h"
-#include "msgaf.h"
 #include "monitorcontainer.h"
 
 #define AFOUTPUT

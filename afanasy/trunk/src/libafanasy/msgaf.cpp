@@ -9,13 +9,11 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
-#include "../libafanasy/address.h"
-#include "../libafanasy/environment.h"
+#include "address.h"
+#include "environment.h"
+#include "msgqueue.h"
 
 #include "../libafnetwork/communications.h"
-
-#include "afcommon.h"
-#include "msgqueue.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -56,11 +54,6 @@ void MsgAf::setAddress( const af::Client* client)
       AFERROR("MsgAf::setAddr( const Client* client): memory allocation failed.\n");
 }
 */
-void MsgAf::dispatch()
-{
-   AFCommon::QueueMsgDispatch( this);
-   AFINFO("MsgAf::dispatch(): Message pushed into dispatch queue.\n");
-}
 
 bool MsgAf::request( MsgAf *answer)
 {

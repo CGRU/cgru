@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../libafanasy/af.h"
-#include "../libafanasy/msg.h"
-#include "../libafanasy/client.h"
-
 #include "afqueue.h"
+#include "client.h"
+#include "msg.h"
 
 class MsgQueue;
 

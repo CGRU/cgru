@@ -4,11 +4,11 @@
 #include <string.h>
 
 #include "../include/afanasy.h"
+#include "../libafanasy/msgqueue.h"
 
 #include "../libafsql/dbconnection.h"
 
 #include "afcommon.h"
-#include "msgaf.h"
 #include "renderaf.h"
 #include "monitorcontainer.h"
 

@@ -4,6 +4,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/job.h"
 #include "../libafanasy/taskexec.h"
+#include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 
 #include "block.h"
@@ -11,7 +12,6 @@
 #include "renderaf.h"
 #include "rendercontainer.h"
 #include "monitorcontainer.h"
-#include "msgaf.h"
 #include "task.h"
 
 #define AFOUTPUT

@@ -4,6 +4,8 @@
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/farm.h"
+#include "../libafanasy/msgaf.h"
+#include "../libafanasy/msgqueue.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
@@ -15,8 +17,6 @@
 #include "jobcontainer.h"
 #include "monitoraf.h"
 #include "monitorcontainer.h"
-#include "msgaf.h"
-#include "msgqueue.h"
 #include "rendercontainer.h"
 #include "talkcontainer.h"
 #include "threadargs.h"

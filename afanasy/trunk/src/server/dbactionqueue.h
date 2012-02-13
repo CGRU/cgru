@@ -1,10 +1,8 @@
 #pragma once
 
-#include "../libafanasy/name_af.h"
+#include "../libafanasy/afqueue.h"
 
 #include "../libafsql/name_afsql.h"
-
-#include "afqueue.h"
 
 class MonitorContainer;
 

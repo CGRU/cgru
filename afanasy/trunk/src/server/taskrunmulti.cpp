@@ -5,13 +5,13 @@
 #include "../libafanasy/job.h"
 #include "../libafanasy/taskexec.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
+#include "../libafanasy/msgaf.h"
 
 #include "block.h"
 #include "jobaf.h"
 #include "renderaf.h"
 #include "rendercontainer.h"
 #include "monitorcontainer.h"
-#include "msgaf.h"
 #include "task.h"
 
 #define AFOUTPUT

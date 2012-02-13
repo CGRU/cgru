@@ -4,9 +4,9 @@
 
 #include "../libafanasy/msgclasses/mctalkmessage.h"
 #include "../libafanasy/msgclasses/mctalkdistmessage.h"
+#include "../libafanasy/msgqueue.h"
 
 #include "afcommon.h"
-#include "msgaf.h"
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
@@ -30,9 +30,9 @@ MsgAf * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring)
    {
       AFCommon::QueueLog("Talk registered: " + newTalk->generateInfoString( false));
       if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksAdd, id);
-      MsgAf* tmp = generateList( af::Msg::TTalksList);
-      tmp->setAddress( newTalk);
-      tmp->dispatch();
+      MsgAf* msg = generateList( af::Msg::TTalksList);
+      msg->setAddress( newTalk);
+      AFCommon::QueueMsgDispatch( msg);
    }
    return new MsgAf( af::Msg::TTalkId, id);
 }
@@ -72,7 +72,7 @@ else printf("\n");
 #endif
       }
    }
-   message->dispatch();
+   AFCommon::QueueMsgDispatch( msg);
 }
 
 //##############################################################################
