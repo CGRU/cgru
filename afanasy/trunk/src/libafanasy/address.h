@@ -3,7 +3,8 @@
 #include "af.h"
 
 #ifdef WINNT
-struct sockaddr_storage;
+#include <ws2tcpip.h>
+#include <winsock2.h>
 #endif
 
 namespace af
@@ -47,7 +48,7 @@ public:
 
    bool equal( const Address & other ) const;   ///< Compare address with other.
 
-#ifndef WINNT
+//#ifndef WINNT
 /// Set sockaddr_in structure address.
    bool setSocketAddress( struct sockaddr_storage & ss) const;
 
@@ -59,7 +60,7 @@ public:
       /// Assume IPv4. if family is empty nothing works anyway.
       return sizeof(sockaddr_in);
    }
-#endif
+//#endif
 
 /// Set new IP address.
    void setIP( const Address & other);

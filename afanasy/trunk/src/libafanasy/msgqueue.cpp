@@ -1,5 +1,6 @@
 #include "msgqueue.h"
 
+#ifndef WINNT
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -8,6 +9,10 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#else
+#include <winsock2.h>
+#define close _close
+#endif
 
 #include "address.h"
 #include "environment.h"
@@ -96,21 +101,28 @@ void MsgQueue::send( const Msg * msg, const Address & address) const
    AFINFO("MsgQueue::send: tying to connect to client.")
 
    // Use SIGALRM to unblock
+#ifndef WINNT
    if( alarm(2) != 0 )
       AFERROR("MsgQueue::send: alarm was already set.\n");
+#endif WINNT
 
    if( connect(socketfd, (struct sockaddr*)&client_addr, address.sizeofAddr()) != 0 )
    {
       AFERRPA("MsgQueue::send: connect failure for msgType '%s': %s",
          Msg::TNAMES[msg->type()], address.generateInfoString().c_str())
       close(socketfd);
+#ifndef WINNT
       alarm(0);
+#endif WINNT
       return;
    }
 
-   alarm(0);
+#ifndef WINNT
+    alarm(0);
+#endif WINNT
    //
    // set socket maximum time to wait for an output operation to complete
+#ifndef WINNT
    timeval so_sndtimeo;
    so_sndtimeo.tv_sec = Environment::getServer_SO_SNDTIMEO_SEC();
    so_sndtimeo.tv_usec = 0;
@@ -121,6 +133,7 @@ void MsgQueue::send( const Msg * msg, const Address & address) const
       close(socketfd);
       return;
    }
+#endif WINNT
    //
    // send
    if( false == com::msgsend( socketfd, msg))

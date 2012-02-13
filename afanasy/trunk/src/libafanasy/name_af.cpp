@@ -10,7 +10,7 @@
 #ifdef WINNT
 #include <direct.h>
 #include <io.h>
-#include <winsock.h>
+#include <winsock2.h>
 #define getcwd _getcwd
 #define open _open
 #define read _read

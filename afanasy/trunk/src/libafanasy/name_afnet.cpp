@@ -1,5 +1,6 @@
 #include "name_af.h"
 
+#ifndef WINNT
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
@@ -8,6 +9,9 @@
 #include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#else
+#include <winsock2.h>
+#endif
 
 #include "address.h"
 #include "environment.h"
@@ -51,6 +55,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    }
    //
    // set socket maximum time to wait for an output operation to complete
+#ifndef WINNT
    timeval so_sndtimeo;
    so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
    so_sndtimeo.tv_usec = 0;
@@ -63,6 +68,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    {
       AFERRPE("MsgAf::request: set socket TCP_NODELAY option failed");
    }
+#endif WINNT
    //
    // send request
    if( false == com::msgsend( socketfd, i_request))

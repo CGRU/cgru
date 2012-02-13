@@ -4,7 +4,7 @@
 #include <netinet/in.h>
 #include <netdb.h>
 #else
-#include <winsock.h>
+#include <winsock2.h>
 #endif
 
 #include "name_af.h"
