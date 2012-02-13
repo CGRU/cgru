@@ -12,12 +12,6 @@ using namespace af;
 MsgStat::MsgStat():
    initialized( false)
 {
-   if( pthread_rwlock_init( &rwlock, NULL) != 0)
-   {
-      AFERRPE("MsgStat::MsgStat:");
-      return;
-   }
-
    uint32_t time_cur = time( NULL);
    for( int s = 1; s < STORE; s++)
    {
@@ -56,8 +50,7 @@ void MsgStat::put( int type, int size)
    }
 
 //BEGIN mutex WRITE
-   if( pthread_rwlock_wrlock( &rwlock) != 0)
-      AFERRPE("MsgStat::put:");
+    m_mutex.Lock();;
 /*-------------------------------------------------------------*/
 
    msgs_T[type].size += size;
@@ -106,8 +99,7 @@ void MsgStat::put( int type, int size)
    }
 
 /*-------------------------------------------------------------*/
-   if( pthread_rwlock_unlock( &rwlock) != 0)
-      AFERRPE("AfContainer::add: pthread_rwlock_unlock:");
+   m_mutex.Unlock();;
 //END mutex WRITE
 
 }
@@ -115,8 +107,7 @@ void MsgStat::put( int type, int size)
 void MsgStat::writeStat( af::Msg * msg)
 {
 //BEGIN mutex
-   if( pthread_rwlock_rdlock( &rwlock) != 0)
-      AFERRPE("AfContainerIt::AfContainerIt: pthread_rwlock_rdlock:");
+    m_mutex.Lock();
 /*-------------------------------------------------------------*/
 
    for( int s = 0; s < STORE; s++)
@@ -134,8 +125,7 @@ void MsgStat::writeStat( af::Msg * msg)
    }
 
 /*-------------------------------------------------------------*/
-   if( pthread_rwlock_unlock( &rwlock) != 0)
-      AFERRPE("AfContainerIt::~AfContainerIt: pthread_rwlock_unlock:");
+   m_mutex.Unlock();
 //END mutex
 
    if( msg == NULL ) return;

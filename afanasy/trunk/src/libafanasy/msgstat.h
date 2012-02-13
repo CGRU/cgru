@@ -1,9 +1,9 @@
 #pragma once
 
 #include <stdint.h>
-#include <pthread.h>
 
 #include "../libafanasy/af.h"
+#include "../libafanasy/dlMutex.h"
 #include "../libafanasy/msg.h"
 
 /// Messages store structure.
@@ -45,7 +45,7 @@ private:
 private:
 
    bool initialized;          ///< Whether statistics successfully initialized ( memory was allocated ).
-   pthread_rwlock_t rwlock;   ///< Mutex locker.
+   DlMutex m_mutex;             ///< Mutex locker.
 
    MSGS msgs_T[af::Msg::TLAST];                       ///< Initial store ( minimal time ).
    MSGS msgs_STD[STORE][af::Msg::TLAST][DIVISIONS];   ///< General store.
