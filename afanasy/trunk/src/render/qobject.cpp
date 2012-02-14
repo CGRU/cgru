@@ -54,7 +54,7 @@ Object::Object( uint32_t State, uint8_t Priority, const std::string & command):
          return;
       }
       qServer->set_recvMessage_handler( recvMessage_handler);
-      qthreadClientUp->set_update_handler( update_handler_ptr);
+//      qthreadClientUp->set_update_handler( update_handler_ptr);
       //
       // connect network objects
       connect( qServer,           SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*) ));

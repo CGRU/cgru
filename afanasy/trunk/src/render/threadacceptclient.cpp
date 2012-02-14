@@ -13,7 +13,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/dlThread.h"
 
-#include "rglobal.h"
+#include "renderhost.h"
 
 #define AFOUTPUT
 //#undef AFOUTPUT
@@ -200,7 +200,7 @@ void threadAcceptClient( void * i_arg )
             continue;
         }
 
-        RGlobal::acceptMessage( msg_request);
+        RenderHost::acceptMessage( msg_request);
         close(sd);
         continue;
 

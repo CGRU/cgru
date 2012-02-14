@@ -13,10 +13,9 @@
 //#include "qobject.h"
 #include "res.h"
 #include "renderhost.h"
-#include "rglobal.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
@@ -29,6 +28,8 @@ void sig_pipe(int signum)
 }
 void sig_int(int signum)
 {
+    if( AFRunning )
+        fprintf( stderr,"\nInterrupt signal catched.\n");
     AFRunning = false;
 }
 //#####################################################################################
@@ -117,16 +118,17 @@ int main(int argc, char *argv[])
     }
     uint8_t priority = ENV.getPriority();
 
-    RGlobal rGlobal;
     RenderHost render( state, priority);
 
     DlThread ServerAccept;
     ServerAccept.Start( &threadAcceptClient, NULL);
 
+    uint64_t cycle = 0;
     while( AFRunning)
     {
-        af::Msg * msg = RGlobal::acceptTry();
-        if( msg ) msgCase( msg);
+        cycle++;
+        msgCase( RenderHost::acceptTry());
+        RenderHost::update();
         sleep(1);
     }
 //    QCoreApplication app( argc, argv);
@@ -137,22 +139,24 @@ int main(int argc, char *argv[])
 
     Py_Finalize();
 
+    printf("Exiting render.\n");
+
     return 0;
 }
 
 void msgCase( af::Msg * msg)
 {
-#ifdef AFOUTPUT
-printf("msgCase: "); msg->stdOut();
-#endif
     if( msg == NULL)
     {
         return;
     }
+#ifdef AFOUTPUT
+printf("msgCase: "); msg->stdOut();
+#endif
 
-    if( false == RGlobal::isConnected())
+    if( false == RenderHost::isConnected())
     {
-        RGlobal::setConnected();
+        RenderHost::connectionEstablished();
     }
 
     switch( msg->type())
@@ -168,32 +172,33 @@ printf("msgCase: "); msg->stdOut();
         }
         // Render was trying to register (its id==0) and server has send id>0
         // This is the situation when client was sucessfully registered
-        else if((new_id > 0) && (render->getId() == 0))
+        else if((new_id > 0) && (RenderHost::getId() == 0))
         {
-            render->setId( new_id);
-//         setUpMsg( af::Msg::TRenderUpdate);
+            RenderHost::setId( new_id);
+            RenderHost::setUpdateMsgType( af::Msg::TRenderUpdate);
         }
         // Server sends back zero id on any error
         // May be server was restarted and knows nothing about this render, so render must register first
-        else if ( render->getId() != new_id )
-            connectionLost( NULL);
+        else if ( RenderHost::getId() != new_id )
+            RenderHost::connectionLost();
         break;
     }
-    case af::Msg::TTask:
-    {
-        runTask( msg);
-        break;
-    }
-/*   case af::Msg::TRenderTaskStdOutRequest:
-   {
-      break;
-   }*/
     case af::Msg::TVersionMismatch:
     case af::Msg::TClientExitRequest:
     {
         AFRunning = false;
         break;
     }
+        /*
+    case af::Msg::TTask:
+    {
+        runTask( msg);
+        break;
+    }
+//   case af::Msg::TRenderTaskStdOutRequest:
+//   {
+//      break;
+//   }
     case af::Msg::TClientRestartRequest:
     {
         printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
@@ -201,12 +206,12 @@ printf("msgCase: "); msg->stdOut();
         AFRunning = false;
         break;
     }
-/*   case af::Msg::TClientStartRequest:
-   {
-      printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-      QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
-      break;
-   }*/
+//   case af::Msg::TClientStartRequest:
+//   {
+//      printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
+//      QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
+//      break;
+//   }
    case af::Msg::TClientRebootRequest:
    {
       exitRender();
@@ -271,9 +276,9 @@ printf("msgCase: "); msg->stdOut();
       }
       break;
    }
-   default:
+*/   default:
    {
-      AFERROR("Object::caseMessage Unknown: message recieved.")
+      AFERROR("Unknown message recieved.")
       msg->stdOut();
       break;
    }
