@@ -52,7 +52,9 @@ void CleanUpData::doCleanUp()
    }
 }
 
-CleanUpQueue::CleanUpQueue( const std::string & QueueName):  AfQueue( QueueName) {}
+CleanUpQueue::CleanUpQueue( const std::string & QueueName):
+    AfQueue( QueueName, af::AfQueue::e_start_thread)
+{}
 
 CleanUpQueue::~CleanUpQueue() {}
 

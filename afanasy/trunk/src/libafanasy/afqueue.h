@@ -32,6 +32,12 @@ class AfQueue
    friend void thread_entry_point( void *i_parameter );
 
 public:
+   enum StartTread
+   {
+      e_start_thread,
+      e_no_thread
+   };
+
    enum WaitMode
    {
       e_wait,
@@ -39,7 +45,7 @@ public:
    };
 
 public:
-   AfQueue( const std::string & QueueName, bool i_start_thread=true );
+   AfQueue( const std::string & QueueName, StartTread i_start_thread);
    virtual ~AfQueue();
 
    void lock();

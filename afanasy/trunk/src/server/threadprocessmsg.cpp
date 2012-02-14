@@ -99,7 +99,7 @@ printf("Response: ");msg_response->stdOut();
 
 bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 {
-   AFINFO("ThreadReadMsg::msgProcess: trying to recieve message...")
+   AFINFO("Trying to recieve message...")
 
    // set max allowed time to block recieveing data from client socket
    timeval so_rcvtimeo;
@@ -108,7 +108,7 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
 
    if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, &so_rcvtimeo, sizeof(so_rcvtimeo)) != 0)
    {
-      AFERRPE("setsockopt failed in threadProcessMsg");
+      AFERRPE("readMessage: setsockopt failed.");
       af::printAddress( &(i_args->ss));
       return false;
    }
@@ -116,12 +116,12 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
    // Reading message from client socket.
    if( false == af::msgread( i_args->sd, io_msg))
    {
-      AFERROR("ThreadReadMsg::msgProcess: reading message failed.")
+      AFERROR("readMessage: Reading message failed.")
       af::printAddress( &(i_args->ss));
       return false;
    }
 
-   AFINFO("ThreadReadMsg::msgProcess: message recieved.")
+   AFINFO("readMessage: Message recieved.")
 
    return true;
 }
@@ -134,7 +134,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    so_sndtimeo.tv_usec = 0;
    if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
    {
-      AFERRPE("ThreadReadMsg::msgProcess: set socket SO_SNDTIMEO option failed")
+      AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
       af::printAddress( &(i_args->ss));
       i_msg->stdOut();
       return;
@@ -143,11 +143,11 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    // writing message back to client socket
    if( false == af::msgsend( i_args->sd, i_msg))
    {
-      AFERROR("ThreadReadMsg::msgProcess: can't send message to client.")
+      AFERROR("writeMessage: can't send message to client.")
       af::printAddress( &(i_args->ss));
       i_msg->stdOut();
       return;
    }
 
-   AFINFO("ThreadReadMsg::msgProcess: message sent.")
+   AFINFO("writeMessage: message sent.")
 }

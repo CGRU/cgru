@@ -7,7 +7,7 @@
 #include "../include/macrooutput.h"
 
 FileQueue::FileQueue( const std::string & QueueName):
-   af::AfQueue( QueueName)
+   af::AfQueue( QueueName, af::AfQueue::e_start_thread)
 {
 }
 

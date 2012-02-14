@@ -36,7 +36,9 @@ void LogData::output()
    std::cout.flush();
 }
 
-LogQueue::LogQueue( const std::string & QueueName):  AfQueue( QueueName) {}
+LogQueue::LogQueue( const std::string & QueueName):
+    AfQueue( QueueName, af::AfQueue::e_start_thread)
+{}
 
 LogQueue::~LogQueue() {}
 

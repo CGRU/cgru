@@ -10,7 +10,7 @@ namespace af
 class MsgQueue : public AfQueue
 {
 public:
-   MsgQueue( const std::string & QueueName, bool i_start_thread=true );
+   MsgQueue( const std::string & QueueName, StartTread i_start_thread);
    virtual ~MsgQueue();
 
 /// Return first message from queue. BLOCKING FUNCTION if \c block==AfQueue::e_wait.

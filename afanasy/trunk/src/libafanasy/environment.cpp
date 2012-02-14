@@ -534,12 +534,6 @@ bool Environment::reload()
    return m_valid;
 }
 
-bool Environment::setClientPort( uint16_t port)
-{
-   clientport = port;
-   return true;
-}
-
 bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
 
 bool Environment::init()

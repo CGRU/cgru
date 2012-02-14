@@ -48,7 +48,7 @@ void ThreadCommon_dispatchMessages(void* arg)
   which will be called just after thread spawn,
   where thread can do some setup.
 */
-MsgQueue::MsgQueue( const std::string & QueueName, bool i_start_thread ):
+MsgQueue::MsgQueue( const std::string & QueueName, StartTread i_start_thread ):
    AfQueue( QueueName, i_start_thread)
 {
 }

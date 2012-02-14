@@ -18,7 +18,7 @@ extern bool AFRunning;
 #include "../include/macrooutput.h"
 
 DBActionQueue::DBActionQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer):
-   af::AfQueue( i_name),
+   af::AfQueue( i_name, af::AfQueue::e_start_thread),
    m_monitors( i_monitorcontainer)
 {
     m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());

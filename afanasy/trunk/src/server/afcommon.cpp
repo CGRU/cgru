@@ -30,7 +30,7 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
    assert( core );
 
-   MsgDispatchQueue = new af::MsgQueue(      "Sending Messages");
+   MsgDispatchQueue = new af::MsgQueue(      "Sending Messages", af::AfQueue::e_start_thread);
    FileWriteQueue   = new FileQueue(         "Writing Files");
    CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
    OutputLogQueue   = new LogQueue(          "Log Output");

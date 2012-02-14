@@ -25,7 +25,7 @@ void af::thread_entry_point( void *i_parameter )
 AfQueueItem::AfQueueItem(): next_ptr( NULL) {}
 AfQueueItem::~AfQueueItem() {}
 
-AfQueue::AfQueue( const std::string &i_QueueName, bool i_start_thread ):
+AfQueue::AfQueue( const std::string &i_QueueName, StartTread i_start_thread ):
    name(i_QueueName),
    count(0),
    firstPtr(NULL),
@@ -51,7 +51,7 @@ AfQueue::AfQueue( const std::string &i_QueueName, bool i_start_thread ):
    }
 #endif
 
-   if( i_start_thread )
+   if( i_start_thread == e_start_thread )
    {
       /* Start the thread which waits for elements in the queue. */
       m_thread.Start( thread_entry_point, this );

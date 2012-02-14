@@ -34,11 +34,7 @@ QServer::QServer( QObject *parent):
       {
          port = serverPort();
          printf("QServer::QServer: Listening \"%s\" port %d ...\n", serverAddress().toString().toUtf8().data(), port);
-         if( false == af::Environment::setClientPort(port))
-         {
-            AFERROR("QServer::QServer: Can't init with invalid address.\n");
-            return;
-         }
+         af::Environment::setClientPort(port);
          break;
       }
       else

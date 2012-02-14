@@ -55,7 +55,7 @@ public:
     static inline bool GOD()   { return god_mode;    } ///< check user GOD   mode
 
     /// Set client port. Client can change its port.
-    static bool setClientPort( uint16_t port);
+    static void setClientPort( uint16_t port) { clientport = port;}
 
     /// Get versions:
     static inline int                 getVersionAfanasy() { return version_afanasy;  }
