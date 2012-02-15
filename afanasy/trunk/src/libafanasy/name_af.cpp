@@ -33,6 +33,20 @@ af::Farm* ferma = NULL;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+
+int LaunchProgramV(
+    FILE **o_in,
+    FILE **o_out,
+    FILE **o_err,
+    const char *i_program,
+    const char* i_args[]);
+
+void af::launchProgram( const std::string & commandline)
+{
+    const char * i_args[] = { "-c", commandline.c_str(), NULL};
+    LaunchProgramV( NULL, NULL, NULL, "/bin/bash", i_args);
+}
+
 void af::outError( const char * errMsg, const char * baseMsg)
 {
    if( baseMsg )

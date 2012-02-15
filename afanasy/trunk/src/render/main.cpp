@@ -1,16 +1,8 @@
-//#include <QtCore/QCoreApplication>
-
-//#include <Python.h>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/dlThread.h"
 #include "../libafanasy/host.h"
 #include "../libafanasy/render.h"
 
-//#include "../libafqt/name_afqt.h"
-//#include "../libafqt/qenvironment.h"
-
-//#include "qobject.h"
 #include "res.h"
 #include "renderhost.h"
 
@@ -62,7 +54,7 @@ int main(int argc, char *argv[])
 #endif
 
     // Initialize environment and try to append python path:
-    af::Environment ENV( af::Environment::AppendPythonPath, argc, argv);
+    af::Environment ENV( af::Environment::AppendPythonPath | af::Environment::SolveServerName, argc, argv);
     if( !ENV.isValid())
     {
         AFERROR("main: Environment initialization failed.\n");
@@ -123,19 +115,23 @@ int main(int argc, char *argv[])
     DlThread ServerAccept;
     ServerAccept.Start( &threadAcceptClient, NULL);
 
+    // Simple to give some time to start to listen to unused port
+    // It is needed, that we must send client port when register
+    usleep( 100);
+    // Nothing bad will happen if it did not start to listen after that time
+    // Only registration will happen on next render update cycle
+
     uint64_t cycle = 0;
     while( AFRunning)
     {
-        cycle++;
         msgCase( RenderHost::acceptTry());
-        RenderHost::update();
+
+        if( cycle % af::Environment::getRenderUpdateSec() == 0)
+            RenderHost::update();
+
+        cycle++;
         sleep(1);
     }
-//    QCoreApplication app( argc, argv);
-//    Object object( state, priority, command);
-//    RenderObject = &object;
-//    QObject::connect( &object, SIGNAL( exitApplication()), &app, SLOT( quit()));
-//    retval = app.exec();
 
     Py_Finalize();
 
@@ -154,9 +150,15 @@ void msgCase( af::Msg * msg)
 printf("msgCase: "); msg->stdOut();
 #endif
 
-    if( false == RenderHost::isConnected())
+    if( msg->wasSendFailed())
     {
-        RenderHost::connectionEstablished();
+        if( msg->getAddress().equal( af::Environment::getServerAddress()))
+        {
+            /// Message was failed to send to server
+            RenderHost::connectionLost();
+        }
+        delete msg;
+        return;
     }
 
     switch( msg->type())
@@ -174,8 +176,7 @@ printf("msgCase: "); msg->stdOut();
         // This is the situation when client was sucessfully registered
         else if((new_id > 0) && (RenderHost::getId() == 0))
         {
-            RenderHost::setId( new_id);
-            RenderHost::setUpdateMsgType( af::Msg::TRenderUpdate);
+            RenderHost::setRegistered( new_id);
         }
         // Server sends back zero id on any error
         // May be server was restarted and knows nothing about this render, so render must register first
@@ -186,13 +187,13 @@ printf("msgCase: "); msg->stdOut();
     case af::Msg::TVersionMismatch:
     case af::Msg::TClientExitRequest:
     {
+        printf("Render exit request recieved.\n");
         AFRunning = false;
         break;
     }
-        /*
     case af::Msg::TTask:
     {
-        runTask( msg);
+        RenderHost::runTask( msg);
         break;
     }
 //   case af::Msg::TRenderTaskStdOutRequest:
@@ -202,36 +203,37 @@ printf("msgCase: "); msg->stdOut();
     case af::Msg::TClientRestartRequest:
     {
         printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-        QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
+        af::launchProgram(af::Environment::getRenderExec());
         AFRunning = false;
         break;
     }
 //   case af::Msg::TClientStartRequest:
 //   {
 //      printf("Start client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
-//      QProcess::startDetached( afqt::stoq( af::Environment::getRenderExec()));
+//      af::launchProgram( af::Environment::getRenderExec());
 //      break;
 //   }
-   case af::Msg::TClientRebootRequest:
-   {
-      exitRender();
-      printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
-      QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdReboot()));
-      break;
-   }
-   case af::Msg::TClientShutdownRequest:
-   {
-      exitRender();
-      printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
-      QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdShutdown()));
-      break;
-   }
-   case af::Msg::TClientWOLSleepRequest:
-   {
-      printf("Sleep request, executing command:\n%s\n", af::Environment::getRenderCmdWolSleep().c_str());
-      QProcess::startDetached( afqt::stoq( af::Environment::getRenderCmdWolSleep()));
-      break;
-   }
+    case af::Msg::TClientRebootRequest:
+    {
+        AFRunning = false;
+        printf("Reboot request, executing command:\n%s\n", af::Environment::getRenderCmdReboot().c_str());
+        af::launchProgram( af::Environment::getRenderCmdReboot());
+        break;
+    }
+    case af::Msg::TClientShutdownRequest:
+    {
+        AFRunning = false;
+        printf("Shutdown request, executing command:\n%s\n", af::Environment::getRenderCmdShutdown().c_str());
+        af::launchProgram( af::Environment::getRenderCmdShutdown());
+        break;
+    }
+    case af::Msg::TClientWOLSleepRequest:
+    {
+        printf("Sleep request, executing command:\n%s\n", af::Environment::getRenderCmdWolSleep().c_str());
+        af::launchProgram( af::Environment::getRenderCmdWolSleep());
+        break;
+    }
+        /*
    case af::Msg::TRenderStopTask:
    {
       af::MCTaskPos taskpos( msg);

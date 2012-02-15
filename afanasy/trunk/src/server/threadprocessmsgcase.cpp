@@ -625,10 +625,14 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
       //    Retrieving output from render
       //
          msg_request_render = o_msg_response;
-         o_msg_response = new af::Msg();
-         if( af::msgRequest( msg_request_render, o_msg_response) == false )
+         msg_request_render->setReceiving();
+//         o_msg_response = new af::Msg();
+         bool ok;
+         o_msg_response = af::msgsend( msg_request_render, ok, af::VerboseOn);
+//         if( af::msgRequest( msg_request_render, o_msg_response) == false )
+         if( o_msg_response == NULL )
          {
-            delete o_msg_response;
+//            delete o_msg_response;
             o_msg_response = new af::Msg();
             o_msg_response->setString("Retrieving output from render failed. See server logs for details.");
          }

@@ -22,10 +22,9 @@ extern RenderHost * pRENDER;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int runningtasks):
-   ChildProcess( parent),
-   exec( taskExec),
-   service( *taskExec),
+TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
+   m_taskexec( i_taskExec),
+   service( *i_taskExec),
    parser( NULL),
    timer( this),
    update_status( af::TaskExec::UPPercent),
@@ -43,12 +42,12 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
 //
 // connect timer
    connect( &timer, SIGNAL( timeout() ), this, SLOT( sendTaskSate() ));
-   timer.setInterval( af::Environment::getRenderUpdateTaskPeriod() * 1000 * (runningtasks+1));
+   timer.setInterval( af::Environment::getRenderUpdateTaskPeriod() * 1000);
 
    QString command = afqt::stoq( service.getCommand());
    QString wdir    = afqt::stoq( service.getWDir());
 
-   parser = new ParserHost( exec->getParserType(), exec->getFramesNum());//, "AF_PROGRESS %d");
+   parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());//, "AF_PROGRESS %d");
 
    // Process task working directory:
    if( false == wdir.isEmpty())
@@ -74,7 +73,8 @@ TaskProcess::TaskProcess( QObject * parent, af::TaskExec * taskExec, int running
       }
    }
 
-   printf("\nStarting[%d]: ", runningtasks); exec->stdOut( false);
+   printf("\nStarting:\n ");
+   m_taskexec->stdOut( false);
    if( af::Environment::isVerboseMode()) printf("%s\n", command.toUtf8().data());
 
 #ifdef WINNT
@@ -99,7 +99,7 @@ TaskProcess::~TaskProcess()
    timer.stop();
    killProcess();
 
-   if( exec    != NULL  ) delete exec;
+   if( m_taskexec    != NULL  ) delete m_taskexec;
    if( parser  != NULL  ) delete parser;
 
    AFINFO("TaskProcess:~TaskProcess()")
@@ -108,7 +108,7 @@ TaskProcess::~TaskProcess()
 void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
 {
    if( update_status == 0 ) return;
-   printf("\nFinished: "); exec->stdOut( false);
+   printf("\nFinished: "); m_taskexec->stdOut( false);
 
    p_readyRead();
 
@@ -145,13 +145,13 @@ void TaskProcess::p_readyRead()
    if( output.size() == 0 ) return;
    parser->read( output);
 
-   if( exec->getListenAddressesNum())
+   if( m_taskexec->getListenAddressesNum())
    {
 #ifdef AFOUTPUT
 printf("Sending output to addresses:");
 #endif
-      af::MCTaskOutput mctaskoutput( pRENDER->getName(), exec->getJobId(), exec->getBlockNum(), exec->getTaskNum(), output.size(), output.data());
-      const std::list<af::Address> * addresses = exec->getListenAddresses();
+      af::MCTaskOutput mctaskoutput( pRENDER->getName(), m_taskexec->getJobId(), m_taskexec->getBlockNum(), m_taskexec->getTaskNum(), output.size(), output.data());
+      const std::list<af::Address> * addresses = m_taskexec->getListenAddresses();
       for( std::list<af::Address>::const_iterator it = addresses->begin(); it != addresses->end(); it++)
       {
 #ifdef AFOUTPUT
@@ -210,10 +210,10 @@ void TaskProcess::sendTaskSate()
    af::MCTaskUp taskup(
                      pRENDER->getId(),
 
-                     exec->getJobId(),
-                     exec->getBlockNum(),
-                     exec->getTaskNum(),
-                     exec->getNumber(),
+                     m_taskexec->getJobId(),
+                     m_taskexec->getBlockNum(),
+                     m_taskexec->getTaskNum(),
+                     m_taskexec->getNumber(),
 
                      update_status,
                      percent,

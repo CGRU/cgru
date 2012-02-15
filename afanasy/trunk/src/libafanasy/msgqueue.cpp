@@ -49,7 +49,10 @@ void ThreadCommon_dispatchMessages(void* arg)
   where thread can do some setup.
 */
 MsgQueue::MsgQueue( const std::string & QueueName, StartTread i_start_thread ):
-   AfQueue( QueueName, i_start_thread)
+    AfQueue( QueueName, i_start_thread),
+    m_returnQueue( NULL),
+    m_returnNotSended( false),
+    m_verbose( VerboseOn)
 {
 }
 
@@ -59,9 +62,50 @@ MsgQueue::~MsgQueue()
 
 void MsgQueue::processItem( AfQueueItem* item)
 {
-   Msg * msg = (Msg*)item;
+    Msg * msg = (Msg*)item;
 
-   af::msgsend( msg);
+    if( msg->addressIsEmpty() && ( msg->addressesCount() == 0 ))
+    {
+        AFERRAR("MsgQueue::processItem: '%s':\n   Message has no addresses to send to.", name.c_str());
+        delete msg;
+        return;
+    }
 
-   delete msg;
+    bool ok;
+    af::Msg * answer = af::msgsend( msg, ok, m_verbose);
+
+    if( answer != NULL )
+    {
+        // We got an answer:
+        if( m_returnQueue != NULL )
+        {
+            m_returnQueue->pushMsg( answer );
+        }
+        else
+        {
+            AFERRAR("MsgQueue::processItem: '%s':\n   Got an answer, but has no return queue set.", name.c_str())
+            printf("Reuest: ");
+            msg->stdOut();
+            printf("Answer: ");
+            answer->stdOut();
+            delete answer;
+        }
+    }
+
+    if(( false == ok) && m_returnNotSended )
+    {
+        if( m_returnQueue != NULL )
+        {
+            msg->setSendFailed();
+            m_returnQueue->pushMsg( msg );
+            return;
+        }
+        else
+        {
+            AFERRAR("MsgQueue::processItem: '%s':\n   Can't return message as no return queue set.", name.c_str())
+            msg->stdOut();
+        }
+    }
+
+    delete msg;
 }

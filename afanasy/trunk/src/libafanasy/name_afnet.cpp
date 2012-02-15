@@ -59,6 +59,110 @@ bool writedata( int fd, char* data, int len)
    return true;
 }
 
+af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
+                            bool & io_ok, af::VerboseMode i_verbose)
+{
+    io_ok = true;
+
+    if( i_address.isEmpty() )
+    {
+        AFERROR("af::msgsend: Address is empty.")
+        io_ok = false;
+        return NULL;
+    }
+
+    int socketfd;
+    struct sockaddr_storage client_addr;
+
+    if( false == i_address.setSocketAddress( &client_addr)) return false;
+
+    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
+    {
+        AFERRPE("af::msgsend: socket() call failed")
+        io_ok = false;
+        return NULL;
+    }
+
+    AFINFO("af::msgsend: tying to connect to client.")
+/*
+    // Use SIGALRM to unblock
+#ifndef WINNT
+    if( alarm(2) != 0 )
+        AFERROR("af::msgsend: alarm was already set.\n");
+#endif //WINNT
+*/
+    if( connect(socketfd, (struct sockaddr*)&client_addr, i_address.sizeofAddr()) != 0 )
+    {
+        if( i_verbose == af::VerboseOn )
+        {
+            AFERRPA("af::msgsend: connect failure for msgType '%s':\n%s: ",
+                af::Msg::TNAMES[i_msg->type()], i_address.generateInfoString().c_str())
+        }
+        close(socketfd);
+/*
+#ifndef WINNT
+        alarm(0);
+#endif //WINNT
+*/
+        io_ok = false;
+        return NULL;
+    }
+/*
+#ifndef WINNT
+    alarm(0);
+#endif //WINNT
+*/
+    //
+    // set socket maximum time to wait for an output operation to complete
+#ifndef WINNT
+    timeval so_sndtimeo;
+    so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
+    so_sndtimeo.tv_usec = 0;
+    if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
+    {
+        AFERRPE("af::msgsend: set socket SO_SNDTIMEO option failed")
+        i_address.stdOut(); printf("\n");
+    }
+    int nodelay = 1;
+    if( setsockopt( socketfd, IPPROTO_TCP, TCP_NODELAY, &nodelay, sizeof(nodelay)) != 0)
+    {
+       AFERRPE("af::msgsend: set socket TCP_NODELAY option failed");
+       i_address.stdOut(); printf("\n");
+    }
+#endif //WINNT
+    //
+    // send
+    if( false == af::msgwrite( socketfd, i_msg))
+    {
+        AFERRAR("af::msgsend: can't send message to client: %s",
+                i_address.generateInfoString().c_str())
+        close(socketfd);
+        io_ok = false;
+        return NULL;
+    }
+
+    if( false == i_msg->isReceiving())
+    {
+        close(socketfd);
+        return NULL;
+    }
+
+    //
+    // read answer
+    af::Msg * o_msg = new af::Msg();
+    if( false == af::msgread( socketfd, o_msg))
+    {
+       AFERROR("MsgAf::request: reading message failed.\n");
+       close( socketfd);
+       delete o_msg;
+       io_ok = false;
+       return NULL;
+    }
+
+    close(socketfd);
+    return o_msg;
+}
+
 void af::statwrite( af::Msg * msg)
 {
    mgstat.writeStat( msg);
@@ -153,7 +257,7 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
 
     return af::Address();
 }
-
+/*
 int af::connecttomaster( const std::string & i_name, int i_port, int i_type, VerboseMode i_verbose)
 {
    if( i_verbose == af::VerboseOn )
@@ -228,7 +332,7 @@ int af::connecttomaster( const std::string & i_name, int i_port, int i_type, Ver
 
    return socketfd;
 }
-
+*/
 bool af::msgread( int desc, af::Msg* msg)
 {
 AFINFO("com::msgread:\n");
@@ -273,29 +377,37 @@ AFINFO("com::msgread:\n");
    return true;
 }
 
-bool af::msgsend( int desc, const af::Msg *msg)
+bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 {
-    if( false == ::writedata( desc, msg->buffer(), msg->writeSize()))
+    if( false == ::writedata( i_desc, i_msg->buffer(), i_msg->writeSize()))
     {
         AFERROR("com::msgsend: Error writing message.\n");
         return false;
     }
 
-    mgstat.put( msg->type(),msg->writeSize());
+    mgstat.put( i_msg->type(), i_msg->writeSize());
 
     return true;
 }
 
-af::Msg * af::msgsend( const Msg * i_msg, bool * io_ok )
+af::Msg * af::msgsend( const Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 {
     if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
     {
         AFERROR("af::msgsend: Receiving message has several addresses.");
     }
 
+    if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
+    {
+        AFERROR("af::msgsend: Message has no addresses to send to.");
+        io_ok = false;
+        i_msg->stdOut();
+        return NULL;
+    }
+
     if( false == i_msg->addressIsEmpty())
     {
-        af::Msg * o_msg = af::msgsend( i_msg, i_msg->getAddress(), io_ok);
+        af::Msg * o_msg = ::msgsendtoaddress( i_msg, i_msg->getAddress(), io_ok, i_verbose);
         if( o_msg != NULL )
             return o_msg;
     }
@@ -309,96 +421,15 @@ af::Msg * af::msgsend( const Msg * i_msg, bool * io_ok )
     std::list<af::Address>::const_iterator it_end = addresses->end();
     while( it != it_end)
     {
-        af::msgsend( i_msg, *it, &ok);
-        if(( false == ok ) && ( io_ok != NULL ))
-            *io_ok = false;
+        ::msgsendtoaddress( i_msg, *it, ok, i_verbose);
+        if( false == ok )
+            io_ok = false;
         it++;
     }
 
     return NULL;
 }
-
-af::Msg * af::msgsend( const Msg * i_msg, const Address & i_address, bool * io_ok)
-{
-    if( io_ok != NULL )
-        *io_ok = true;
-
-    if( i_address.isEmpty() )
-    {
-        AFERROR("af::msgsend: Address is empty.")
-        if( io_ok != NULL )
-            *io_ok = false;
-        return NULL;
-    }
-
-    int socketfd;
-    struct sockaddr_storage client_addr;
-
-    if( false == i_address.setSocketAddress( &client_addr)) return false;
-
-    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
-    {
-        AFERRPE("af::msgsend: socket() call failed")
-        if( io_ok != NULL )
-            *io_ok = false;
-        return NULL;
-    }
-
-    AFINFO("af::msgsend: tying to connect to client.")
-
-    // Use SIGALRM to unblock
-#ifndef WINNT
-    if( alarm(2) != 0 )
-        AFERROR("af::msgsend: alarm was already set.\n");
-#endif //WINNT
-
-    if( connect(socketfd, (struct sockaddr*)&client_addr, i_address.sizeofAddr()) != 0 )
-    {
-        AFERRPA("af::msgsend: connect failure for msgType '%s': %s",
-            Msg::TNAMES[i_msg->type()], i_address.generateInfoString().c_str())
-        close(socketfd);
-#ifndef WINNT
-        alarm(0);
-#endif //WINNT
-        if( io_ok != NULL )
-            *io_ok = false;
-        return NULL;
-    }
-
-#ifndef WINNT
-    alarm(0);
-#endif //WINNT
-    //
-    // set socket maximum time to wait for an output operation to complete
-#ifndef WINNT
-    timeval so_sndtimeo;
-    so_sndtimeo.tv_sec = Environment::getServer_SO_SNDTIMEO_SEC();
-    so_sndtimeo.tv_usec = 0;
-    if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
-    {
-        AFERRPE("af::msgsend: set socket SO_SNDTIMEO option failed")
-        i_address.stdOut(); printf("\n");
-        close(socketfd);
-        if( io_ok != NULL )
-            *io_ok = false;
-        return NULL;
-    }
-#endif //WINNT
-    //
-    // send
-    if( false == msgsend( socketfd, i_msg))
-    {
-        AFERRAR("af::msgsend: can't send message to client: %s", i_address.generateInfoString().c_str())
-        close(socketfd);
-        if( io_ok != NULL )
-            *io_ok = false;
-        return NULL;
-    }
-
-    close(socketfd);
-    return NULL;
-}
-
+/*
 bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
 {
    if( i_request->addressIsEmpty() )
@@ -465,7 +496,8 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    close( socketfd);
    return true;
 }
-
+*/
+/*
 char * af::readdata( int fd, int & read_len)
 {
    int buffer_len = af::Msg::SizeBuffer;  // Beginning buffer length
@@ -503,3 +535,4 @@ char * af::readdata( int fd, int & read_len)
    AFINFA("af::readdata: returning %d bytes.\n", read_len)
    return buffer;
 }
+*/

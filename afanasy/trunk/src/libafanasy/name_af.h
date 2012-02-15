@@ -161,9 +161,11 @@ namespace af
 
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
+    void launchProgram( const std::string & commandline);
+
     /// Read data from file descriptor. Return a new allocated buffer pointer and a size passed through an argument.
     /** Return NULL pointer and negative size on error.**/
-    char * readdata( int fd, int & read_len);
+//    char * readdata( int fd, int & read_len);
 
     /// Calculate messages statistics and write it in buffer, return written size.
     void statwrite( af::Msg * msg = NULL );
@@ -176,26 +178,23 @@ namespace af
 
     /// Solve host address.
     const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
-
+/*
     /// Connect to Afanasy and return file discriptor. Return bad discriptor on error and prints an error in \c stderr.
     int connecttomaster( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
-
+*/
     /// Recieve message from given file discriptor \c desc to \c buffer
     /** Return true if success. This function will block process.**/
     bool msgread( int desc, af::Msg* msg);
 
-    /// Send a message to all its addresses
-    Msg * msgsend( const Msg * i_msg, bool * io_ok = NULL);
-
-    /// Send a message to specified address
-    Msg * msgsend( const Msg * i_msg, const Address & i_address, bool * io_ok = NULL);
-
     /// Send message \c msg to given file discriptor
     /** Return true if success.**/
-    bool msgsend( int desc, const af::Msg * msg);
+    bool msgwrite( int i_desc, const af::Msg * i_msg);
 
+    /// Send a message to all its addresses and receive an answer if needed
+    Msg * msgsend( const Msg * i_msg, bool & io_ok, VerboseMode i_verbose);
+/*
     /// Set message to it's address and wait for an \c answer, \c return true on success.
     bool msgRequest( const Msg * i_request, Msg * o_answer);
-
+*/
     bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
 }

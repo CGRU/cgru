@@ -141,7 +141,7 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    }
 
    // writing message back to client socket
-   if( false == af::msgsend( i_args->sd, i_msg))
+   if( false == af::msgwrite( i_args->sd, i_msg))
    {
       AFERROR("writeMessage: can't send message to client.")
       af::printAddress( &(i_args->ss));

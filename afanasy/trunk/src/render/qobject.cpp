@@ -66,7 +66,7 @@ Object::Object( uint32_t State, uint8_t Priority, const std::string & command):
    else
    {
       cmdMode = true;
-      tasks.append( new TaskProcess( this, new af::TaskExec( command), 0));
+      tasks.append( new TaskProcess( /*this,*/ new af::TaskExec( command)/*, 0*/));
    }
 
    connect( &timer, SIGNAL( timeout()), this, SLOT( refresh()));
@@ -103,7 +103,7 @@ void Object::connectionLost( af::Address * address)
    if( cmdMode ) return;
    if( connected == false ) return;
    connected = false;
-   render->setId( 0);
+//   render->setId( 0);
 
    for( int t = 0; t < tasks.size(); t++) tasks[t]->stop();
 
@@ -124,10 +124,10 @@ void Object::connectionLostOutput( af::Address * address)
    printf("Connection lost with listening address: "); address->stdOut(); printf("\n");
 
    int lasttasknum = -1;
-   for( int t = 0; t < tasks.size(); t++) if( ((tasks[t])->exec)->removeListenAddress( address)) lasttasknum = t;
+   for( int t = 0; t < tasks.size(); t++) if( ((tasks[t])->m_taskexec)->removeListenAddress( address)) lasttasknum = t;
    if( lasttasknum != -1)
    {
-      af::MCListenAddress mclass( af::MCListenAddress::FROMRENDER, address, tasks[lasttasknum]->exec->getJobId());
+      af::MCListenAddress mclass( af::MCListenAddress::FROMRENDER, address, tasks[lasttasknum]->m_taskexec->getJobId());
       qthreadClientSendOutput->send( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
    }
 
@@ -165,7 +165,7 @@ printf("Object::caseMessage: "); msg->stdOut();
       // This is the situation when client was sucessfully registered
       else if((id > 0) && (render->getId() == 0))
       {
-         render->setId( id);
+//         render->setId( id);
          setUpMsg( af::Msg::TRenderUpdate);
       }
       // Server sends back zero id on any error
@@ -249,17 +249,17 @@ printf("Object::caseMessage: "); msg->stdOut();
          {
             if( tasks[t]->is( mcaddr.getJobId(), mcaddr.getNumBlock(), mcaddr.getNumTask(), 0))
             {
-               if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
-               else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
+               if( mcaddr.toListen()) tasks[t]->m_taskexec->addListenAddress( mcaddr.getAddress());
+               else                   tasks[t]->m_taskexec->removeListenAddress( mcaddr.getAddress());
                mcaddr.stdOut();
             }
          }
          else
          {
-            if( tasks[t]->exec->getJobId() == mcaddr.getJobId())
+            if( tasks[t]->m_taskexec->getJobId() == mcaddr.getJobId())
             {
-               if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
-               else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
+               if( mcaddr.toListen()) tasks[t]->m_taskexec->addListenAddress( mcaddr.getAddress());
+               else                   tasks[t]->m_taskexec->removeListenAddress( mcaddr.getAddress());
                mcaddr.stdOut();
             }
          }
@@ -279,7 +279,7 @@ printf("Object::caseMessage: "); msg->stdOut();
 
 void Object::runTask( af::Msg *msg)
 {
-   tasks.append( new TaskProcess( this, new af::TaskExec( msg), tasks.size()));
+   tasks.append( new TaskProcess( /*this,*/ new af::TaskExec( msg)/*, tasks.size()*/));
 }
 
 void Object::setUpMsg( int type)

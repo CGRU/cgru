@@ -20,14 +20,17 @@ class TaskProcess : public ChildProcess
    Q_OBJECT
 
 public:
-   TaskProcess( QObject * parent, af::TaskExec * taskExec, int runningtasks);
+   TaskProcess( af::TaskExec * i_taskExec);
    ~TaskProcess();
 
-   inline bool is( int jobId, int blockNum, int taskNum, int Number) const
-      { return ((exec->getJobId() == jobId) && (exec->getBlockNum() == blockNum) && (exec->getTaskNum() == taskNum) && (exec->getNumber() == Number));}
+   inline bool is( int i_jobId, int i_blockNum, int i_taskNum, int i_Number) const
+      { return ((m_taskexec->getJobId() == i_jobId) &&
+                (m_taskexec->getBlockNum() == i_blockNum) &&
+                (m_taskexec->getTaskNum() == i_taskNum) &&
+                (m_taskexec->getNumber() == i_Number));}
 
-   inline bool is( const af::MCTaskPos & taskpos) const
-      { return is( taskpos.getJobId(), taskpos.getNumBlock(), taskpos.getNumTask(), taskpos.getNumber());}
+   inline bool is( const af::MCTaskPos & i_taskpos) const
+      { return is( i_taskpos.getJobId(), i_taskpos.getNumBlock(), i_taskpos.getNumTask(), i_taskpos.getNumber());}
 
    void getOutput( af::Msg & msg) const;
 
@@ -38,7 +41,7 @@ public:
    inline bool isZombie() const { return zombie;}
 
 public:
-   af::TaskExec * exec;
+   af::TaskExec * m_taskexec;
 
 private slots:
    void sendTaskSate();

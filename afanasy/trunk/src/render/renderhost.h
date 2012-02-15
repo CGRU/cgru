@@ -1,10 +1,9 @@
 #pragma once
 
 #include "../libafanasy/msgqueue.h"
-//#include "../libafanasy/name_af.h"
 #include "../libafanasy/render.h"
 
-//#include "../libafqt/name_afqt.h"
+#include "taskprocess.h"
 
 class Parser;
 class PyRes;
@@ -18,22 +17,25 @@ public:
     RenderHost();
     ~RenderHost();
 
-    inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue  ->pushMsg( i_msg);}
-    inline static void dispatchMessage( af::Msg * i_msg) { ms_msgDispatchQueue->pushMsg( i_msg);}
+    static void setAddressPort( uint16_t i_port) { ms_obj->address.setPort( i_port);}
+
+    inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
+    inline static void dispatchMessage( af::Msg * i_msg);
 
     inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
     inline static af::Msg * acceptTry()  { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_no_wait); }
 
     static bool isConnected() { return ms_connected;  }
-    static void connectionEstablished();
+    static void setRegistered( int i_id);
     static void connectionLost();
 
     inline static int  getId() { return ms_obj->af::Render::getId();}
-    inline static void setId( int new_id) { ms_obj->id = new_id;}
 
     static void setUpdateMsgType( int i_type);
 
     static void update();
+
+    static void runTask( af::Msg * i_msg);
 
 #ifdef WINNT
     void windowsMustDie() const;
@@ -45,8 +47,7 @@ private:
     std::vector<std::string> windowsmustdie;
 #endif
 
-    static std::vector<PyRes*> m_pyres;
-//   afqt::QMsg * upmsg;
+    static std::vector<PyRes*> ms_pyres;
 
     static af::MsgQueue * ms_msgAcceptQueue;
     static af::MsgQueue * ms_msgDispatchQueue;
@@ -54,4 +55,6 @@ private:
     static bool ms_connected;
 
     static int ms_updateMsgType;
+
+    static std::vector<TaskProcess*> ms_tasks;
 };

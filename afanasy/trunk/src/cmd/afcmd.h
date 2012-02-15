@@ -20,30 +20,22 @@ typedef std::list<Cmd*> CmdList;
 class AfCmd
 {
 public:
-   AfCmd();
-   ~AfCmd();
+    AfCmd();
+    ~AfCmd();
 
-   void addCmd( Cmd * cmd);
-   void RegisterCommands();
+    void addCmd( Cmd * cmd);
+    void RegisterCommands();
 
-   bool processCommand( int argc, char** argv, af::Msg &msg);  ///< Generate message parsing command line arguments. Return \c true on sucsess.
-   inline bool isRecieving() const { return recieving; }
+    bool processCommand( int argc, char** argv, af::Msg &msg);  ///< Generate message parsing command line arguments. Return \c true on sucsess.
+    inline bool isRecieving() const { return recieving; }
 
-   bool connect();      ///< Connect to Afanasy. Return true on success.
-   bool msgSend( af::Msg& msg);  ///< Send message to Afanasy.Return \c true on sucsess.
-
-   af::Msg * msgReceive();  ///< Recieve message from Afanasy.
-   bool msgReceive( af::Msg& msg);  ///< Recieve message from Afanasy. Return \c true on sucsess.
-   void msgOutput(  af::Msg& msg);  ///< Print message information in stdout.
-
-   void disconnect();   ///< Disconnect.
+    void msgOutput(  af::Msg& msg);  ///< Print message information in stdout.
 
 private:
 
-   int socketfd;                 ///< %Client socket descriptor.
-   bool recieving;
+    bool recieving;
 
-   CmdList commands;
-   Cmd * command;
+    CmdList commands;
+    Cmd * command;
 
 };

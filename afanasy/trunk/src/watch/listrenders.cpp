@@ -297,7 +297,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
          menu.addMenu( submenu);
       }
-
+/*
       {
          QMenu * submenu = new QMenu( "Restart", this);
 
@@ -308,7 +308,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
 
          menu.addMenu( submenu);
       }
-
+*/
       {
          QMenu * submenu = new QMenu( "Reboot", this);
 

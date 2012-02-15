@@ -80,6 +80,7 @@ void Msg::construct()
    mtype = Msg::TNULL;
    mint32 = 0;
    m_receive = false;
+   m_sendfailed = false;
 
    writing = false;
    msgwrittensize = 0;

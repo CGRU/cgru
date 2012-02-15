@@ -33,7 +33,8 @@ af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
 af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
 int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
 bool RenderHost::ms_connected = false;
-std::vector<PyRes*> RenderHost::m_pyres;
+std::vector<PyRes*> RenderHost::ms_pyres;
+std::vector<TaskProcess*> RenderHost::ms_tasks;
 
 RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
    Render( i_state, i_priority)
@@ -41,8 +42,14 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 //    Render = this;
     ms_obj = this;
 
+    // Set that we are not listening any port at creation
+    ms_obj->address.setPort( 0);
+
     ms_msgAcceptQueue   = new af::MsgQueue("Messages Accept Queue",   af::AfQueue::e_no_thread    );
     ms_msgDispatchQueue = new af::MsgQueue("Messages Dispatch Queue", af::AfQueue::e_start_thread );
+    ms_msgDispatchQueue->setReturnQueue( ms_msgAcceptQueue);
+    ms_msgDispatchQueue->returnNotSended();
+    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
 
     setOnline();
 
@@ -54,7 +61,7 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
     {
         if( (*it).empty() ) continue;
         printf("Adding custom resource meter '%s'\n", (*it).c_str());
-        m_pyres.push_back( new PyRes( *it, &hres));
+        ms_pyres.push_back( new PyRes( *it, &hres));
     }
 
 #ifdef WINNT
@@ -96,7 +103,7 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 #endif
 
     GetResources( host, hres, false);
-    for( int i = 0; i < m_pyres.size(); i++) m_pyres[i]->update();
+    for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
 
     stdOut();
     host.stdOut( true);
@@ -105,23 +112,38 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
 RenderHost::~RenderHost()
 {
-//    qthreadClientSend->send( new afqt::QMsg( af::Msg::TRenderDeregister, render->getId()));
-
     delete ms_msgAcceptQueue;
     delete ms_msgDispatchQueue;
 
-    for( int i = 0; i < m_pyres.size(); i++) if( m_pyres[i]) delete m_pyres[i];
+    for( int i = 0; i < ms_pyres.size(); i++) if( ms_pyres[i]) delete ms_pyres[i];
 //   if( upmsg != NULL ) delete upmsg;
 #ifdef WINNT
    windowsMustDie();
 #endif
+
+   af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
+   msg.setAddress( af::Environment::getServerAddress());
+   bool ok;
+   af::msgsend( & msg, ok, af::VerboseOn);
 }
 
-void RenderHost::connectionEstablished()
+void RenderHost::dispatchMessage( af::Msg * i_msg)
+{
+    if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
+    {
+        // Assuming that message should be send to server if no address specified.
+        i_msg->setAddress( af::Environment::getServerAddress());
+    }
+    ms_msgDispatchQueue->pushMsg( i_msg);
+}
+
+void RenderHost::setRegistered( int i_id)
 {
     ms_connected = true;
-
-    printf("Render connected.\n");
+    ms_obj->id = i_id;
+    ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
+    setUpdateMsgType( af::Msg::TRenderUpdate);
+    printf("Render registered.\n");
 }
 
 void RenderHost::connectionLost()
@@ -130,15 +152,17 @@ void RenderHost::connectionLost()
 
     ms_connected = false;
 
-    ms_obj->setId( 0);
+    ms_obj->id = 0;
 
     // Stop all tasks:
 //    for( int t = 0; t < tasks.size(); t++) tasks[t]->stop();
 
+    ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
+
     // Begin to try to register again:
     setUpdateMsgType( af::Msg::TRenderRegister);
 
-    printf("Object: connection lost, connecting...\n");
+    printf("Render connection lost, connecting...\n");
 }
 
 void RenderHost::setUpdateMsgType( int i_type)
@@ -148,29 +172,33 @@ void RenderHost::setUpdateMsgType( int i_type)
 
 void RenderHost::update()
 {
-printf("RenderHost::update():\n");
-    // Do this every update time, but not the first time, as at the begininng they are already updated
-//    if( upmsg != NULL )
+    // Do this every update time, but not the first time, as at the begininng resources are already updated
     static bool first_time = true;
 
     if( false == first_time )
     {
-//        delete upmsg;
         GetResources( ms_obj->host, ms_obj->hres, false);
-        for( int i = 0; i < m_pyres.size(); i++) m_pyres[i]->update();
+        for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
     }
     else
         first_time = false;
 
 //hres.stdOut();
-//   msg->resetWrittenSize();
-//   hres.readwrite( msg);
 
 #ifdef WINNT
     windowsMustDie();
 #endif
 
-    dispatchMessage( new af::Msg( ms_updateMsgType, ms_obj));//, true);
+    if( ms_obj->address.getPortHBO() == 0 )
+    {
+        // It seems that listening thread is not started to listen any port
+        return;
+        // Client was just started and we simple will wait
+    }
+
+    af::Msg * msg = new af::Msg( ms_updateMsgType, ms_obj);
+    msg->setReceiving();
+    dispatchMessage( msg);
 }
 
 #ifdef WINNT
@@ -189,3 +217,8 @@ void RenderHost::windowsMustDie() const
     }
 }
 #endif
+
+void RenderHost::runTask( af::Msg * i_msg)
+{
+    ms_tasks.push_back( new TaskProcess( new af::TaskExec( i_msg)));
+}

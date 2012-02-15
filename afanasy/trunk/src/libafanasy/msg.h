@@ -389,10 +389,16 @@ static const char * TNAMES[]; ///< Type names.
    inline const size_t addressesCount() const { return addresses.size();}
 
     /// Set to recieve an answer from the same socket after send
-    bool setReceiving( bool i_value = true ) { m_receive = i_value; }
+    void setReceiving( bool i_value = true ) { m_receive = i_value; }
 
     /// Set to recieve an answer from the same socket after send
     bool isReceiving() const { return m_receive; }
+
+    /// Set to recieve an answer from the same socket after send
+    void setSendFailed( bool i_value = true ) { m_sendfailed = i_value; }
+
+    /// Set to recieve an answer from the same socket after send
+    bool wasSendFailed() { return m_sendfailed; }
 
     /// Set message address
     inline void setAddress( const Address & i_address)
@@ -434,6 +440,7 @@ private:
     Address address;                ///< Address, where message came from or will be send.
     std::list<Address> addresses;   ///< Addresses to dispatch message to.
     bool m_receive;                 ///< Whether to recieve an answer on message request.
+    bool m_sendfailed;              ///< Message was failed to send.
 
 private:
 

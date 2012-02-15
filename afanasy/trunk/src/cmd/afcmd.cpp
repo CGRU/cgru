@@ -8,7 +8,6 @@
 #include "../include/macrooutput.h"
 
 AfCmd::AfCmd():
-   socketfd(-1),
    recieving( false),
    command( NULL)
 {
@@ -17,63 +16,12 @@ AfCmd::AfCmd():
 
 AfCmd::~AfCmd()
 {
-   for( CmdList::iterator it = commands.begin(); it != commands.end(); it++) delete (*it);
-   if( socketfd != -1 ) close( socketfd);
-}
-
-bool AfCmd::connect()
-{
-   socketfd = af::connecttomaster( ServerName, ServerPort, Protocol, Verbose ? af::VerboseOn : af::VerboseOff);
-   if( socketfd == -1)
-   {
-      printf("AfCmd::connect: can't connect to master.\n");
-      return false;
-   }
-   return true;
-}
-
-bool AfCmd::msgSend( af::Msg& msg)
-{
-   if( Verbose) { printf("AfCmd::msgSend: "); msg.stdOut();}
-   if( af::msgsend( socketfd, &msg)) return true;
-   printf("AfCmd::msgSend: can't send message to master.\n");
-   return false;
-}
-
-bool AfCmd::msgReceive( af::Msg& msg)
-{
-   if( false == af::msgread( socketfd, &msg))
-   {
-      printf("AfCmd::msgSend: reading ansswer failed.\n");
-      return false;
-   }
-   if( Verbose) { printf("AfCmd::msgRecv: "); msg.stdOut();}
-   return true;
-}
-
-af::Msg * AfCmd::msgReceive()
-{
-   int rawdata_len = 0;
-   char * rawdata = af::readdata( socketfd, rawdata_len);
-   if(( rawdata_len < 1 ) || ( rawdata == NULL ))
-   {
-      AFERRAR("AfCmd::msgReceive(): Receivind message failed (%d at %p)\n.", rawdata_len, rawdata);
-      return NULL;
-   }
-   af::Msg * answer = new af::Msg( rawdata, rawdata_len);
-   delete rawdata;
-   return answer;
-}
-
-void AfCmd::disconnect()
-{
-   close(socketfd);
-   socketfd = -1;
+    for( CmdList::iterator it = commands.begin(); it != commands.end(); it++) delete (*it);
 }
 
 void AfCmd::addCmd( Cmd * cmd)
 {
-   commands.push_back( cmd);
+    commands.push_back( cmd);
 }
 
 bool AfCmd::processCommand( int argc, char** argv, af::Msg &msg)

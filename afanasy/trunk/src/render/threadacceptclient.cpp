@@ -130,6 +130,7 @@ void threadAcceptClient( void * i_arg )
         if( value == 0 )
         {
             af::Environment::setClientPort( port);
+            RenderHost::setAddressPort( port);
             break;
         }
         if( errno == EADDRINUSE )
@@ -207,7 +208,7 @@ void threadAcceptClient( void * i_arg )
         af::Msg * msg_response = new af::Msg();
 
         // Write answer to socket
-        if( false == af::msgsend( sd, msg_response))
+        if( false == af::msgwrite( sd, msg_response))
         {
             AFERROR("writeMessage: can't send message to client.")
             af::printAddress( &(ss));
