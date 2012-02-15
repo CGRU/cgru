@@ -114,12 +114,15 @@ std::string Environment::afroot;
 std::string Environment::home;
 std::string Environment::home_afanasy;
 
+Address Environment::serveraddress;
+
 bool Environment::god_mode       = false;
 bool Environment::help_mode      = false;
 bool Environment::m_valid        = false;
 bool Environment::m_verbose_init = false;
 bool Environment::m_quiet_init   = false;
 bool Environment::m_verbose_mode = false;
+bool Environment::m_solveservername = false;
 bool Environment::visor_mode     = false;
 
 Passwd * Environment::passwd = NULL;
@@ -288,6 +291,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 {
     m_verbose_init = flags & Verbose;
     m_quiet_init = flags & Quiet;
+    m_solveservername = flags & SolveServerName;
     if( m_quiet_init ) m_verbose_init = false;
 //
 // Init command arguments:
@@ -569,14 +573,16 @@ bool Environment::init()
    renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
    userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
 
-   //
    //############ Server Accept IP Addresses Mask:
    if( false == Address::readIpMask( serveripmask, m_verbose_init))
    {
        return false;
    }
 
-   //
+    // Solve server name
+    if( m_solveservername )
+        serveraddress = af::solveNetName( servername, serverport, AF_UNSPEC, m_verbose_init ? VerboseOn : VerboseOff);
+
    //############ VISOR and GOD passwords:
    if( passwd != NULL) delete passwd;
    passwd = new Passwd( pswd_visor, pswd_god);

@@ -23,7 +23,7 @@ AfCmd::~AfCmd()
 
 bool AfCmd::connect()
 {
-   socketfd = af::connecttomaster( Verbose, Protocol, ServerName.c_str(), ServerPort);
+   socketfd = af::connecttomaster( ServerName, ServerPort, Protocol, Verbose ? af::VerboseOn : af::VerboseOff);
    if( socketfd == -1)
    {
       printf("AfCmd::connect: can't connect to master.\n");

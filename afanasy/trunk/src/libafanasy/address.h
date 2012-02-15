@@ -19,7 +19,7 @@ public:
    Address( const Address & other);                ///< Copy given address.
    Address( const Address * other);                ///< Copy given address.
    Address & operator=( const Address & other);    ///< Assignment operator
-   Address( const struct sockaddr_storage & ss);   ///< Set address from address storage structure.
+   Address( const struct sockaddr_storage * ss);   ///< Set address from address storage structure.
    Address( const std::string & str);              ///< Construct address parsing a string.
    Address( Msg * msg);                            ///< Construct address using raw data.
 
@@ -48,9 +48,8 @@ public:
 
    bool equal( const Address & other ) const;   ///< Compare address with other.
 
-//#ifndef WINNT
 /// Set sockaddr_in structure address.
-   bool setSocketAddress( struct sockaddr_storage & ss) const;
+   bool setSocketAddress( struct sockaddr_storage * ss) const;
 
 /// return the correct size of a 'sockaddr'. This size is needed by "connect" for example.
    inline size_t sizeofAddr( void ) const
@@ -60,7 +59,6 @@ public:
       /// Assume IPv4. if family is empty nothing works anyway.
       return sizeof(sockaddr_in);
    }
-//#endif
 
 /// Set new IP address.
    void setIP( const Address & other);

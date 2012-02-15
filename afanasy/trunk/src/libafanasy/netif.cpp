@@ -245,7 +245,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
             case AF_INET:
             case AF_INET6:
             {
-               addresses.push_back( Address(*ss));
+               addresses.push_back( Address( ss));
                break;
             }
          }

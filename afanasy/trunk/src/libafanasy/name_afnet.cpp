@@ -7,10 +7,7 @@
 #include <netinet/tcp.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
 #include <sys/types.h>
-#else
-#include <winsock2.h>
 #endif
 
 #include "address.h"
@@ -24,21 +21,29 @@
 
 af::MsgStat mgstat;
 
-void af::statwrite( af::Msg * msg)
+/// Read data from file descriptor. Return bytes than was written or -1 on any error and prints an error in \c stderr.
+int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 {
-   mgstat.writeStat( msg);
-}
-void af::statread( af::Msg * msg)
-{
-   mgstat.readStat( msg);
+    AFINFA("com::readdata:: trying to recieve %d bytes.\n", data_len);
+    int bytes = 0;
+    while( bytes < data_len )
+    {
+        int r = read( fd, data+bytes, buffer_maxlen-bytes);
+        if( r < 0)
+        {
+            AFERRPE("readdata: read");
+            return -1;
+        }
+        AFINFA("readdata: read %d bytes.\n", r);
+        if( r == 0) return 0;
+        bytes += r;
+    }
+
+    return bytes;
 }
 
-void af::statout( int columns, int sorting)
-{
-   mgstat.stdOut( columns, sorting);
-}
-
-bool af::writedata( int fd, char* data, int len)
+/// Write data to file descriptor. Return \c false on any arror and prints an error in \c stderr.
+bool writedata( int fd, char* data, int len)
 {
    int written_bytes = 0;
    while( written_bytes < len)
@@ -54,33 +59,107 @@ bool af::writedata( int fd, char* data, int len)
    return true;
 }
 
-int af::readdata( int fd, char* data, int data_len, int buffer_maxlen)
+void af::statwrite( af::Msg * msg)
 {
-   AFINFA("com::readdata:: trying to recieve %d bytes.\n", data_len);
-   int bytes = 0;
-   while( bytes < data_len )
-   {
-//      int r = read( fd, data+bytes, buffer_maxlen);
-      int r = read( fd, data+bytes, buffer_maxlen-bytes);
-      if( r < 0)
-      {
-         AFERRPE("com::readdata:: read");
-         return -1;
-      }
-      AFINFA("com::readdata:: read %d bytes.\n", r);
-      if( r == 0) return 0;
-      bytes += r;
-   }
-
-   return bytes;
+   mgstat.writeStat( msg);
+}
+void af::statread( af::Msg * msg)
+{
+   mgstat.readStat( msg);
 }
 
-int af::connecttomaster( bool verbose, int type, const char * servername, int serverport)
+void af::statout( int columns, int sorting)
 {
-   if( verbose )
+   mgstat.stdOut( columns, sorting);
+}
+
+const af::Address af::solveNetName( const std::string & i_name, int i_port, int i_type, VerboseMode i_verbose)
+{
+    if( i_verbose == af::VerboseOn )
+    {
+        printf("Solving '%s'", i_name.c_str());
+        switch( i_type)
+        {
+            case AF_UNSPEC: break;
+            case AF_INET:  printf(" and IPv4 forced"); break;
+            case AF_INET6: printf(" and IPv6 forced"); break;
+            default: printf(" (unknown protocol forced)");
+        }
+        printf("...\n");
+    }
+
+    struct addrinfo *res;
+    struct addrinfo hints;
+    bzero(&hints, sizeof(hints));
+    hints.ai_flags = AI_ADDRCONFIG;
+ //   hints.ai_family = AF_UNSPEC; // This is value is default
+    hints.ai_socktype = SOCK_STREAM;
+    char service_port[16];
+    sprintf( service_port, "%u", i_port);
+    int err = getaddrinfo( i_name.c_str(), service_port, &hints, &res);
+    if( err != 0 )
+    {
+        AFERRAR("com::connecttomaster:\n%s", gai_strerror(err))
+        return af::Address();
+    }
+
+    for( struct addrinfo *r = res; r != NULL; r = r->ai_next)
+    {
+        // Skip address if type is forced
+        if(( i_type != AF_UNSPEC ) && ( i_type != r->ai_family)) continue;
+
+        if( i_verbose == af::VerboseOn )
+        {
+            switch( r->ai_family)
+            {
+                case AF_INET:
+                {
+                    struct sockaddr_in * sa = (struct sockaddr_in*)(r->ai_addr);
+                    printf("IP = %s\n", inet_ntoa( sa->sin_addr));
+                    break;
+                }
+                case AF_INET6:
+                {
+                    static const int buffer_len = 256;
+                    char buffer[buffer_len];
+                    struct sockaddr_in6 * sa = (struct sockaddr_in6*)(r->ai_addr);
+                    const char * addr_str = inet_ntop( AF_INET6, &(sa->sin6_addr), buffer, buffer_len);
+                    printf("IPv6 = %s\n", addr_str);
+                    break;
+                }
+                default:
+                    printf("Unknown address family type = %d\n", r->ai_family);
+                    continue;
+            }
+        }
+
+        af::Address addr((struct sockaddr_storage*)(r->ai_addr));
+
+        if( i_verbose == af::VerboseOn )
+        {
+            printf("Address = ");
+            addr.stdOut();
+        }
+
+        // Free memory allocated for addresses:
+        freeaddrinfo( res);
+
+        return addr;
+
+    }
+
+    // Free memory allocated for addresses:
+    freeaddrinfo( res);
+
+    return af::Address();
+}
+
+int af::connecttomaster( const std::string & i_name, int i_port, int i_type, VerboseMode i_verbose)
+{
+   if( i_verbose == af::VerboseOn )
    {
-      printf("Solving '%s'", servername);
-      switch( type)
+      printf("Solving '%s'", i_name.c_str());
+      switch( i_type)
       {
          case AF_UNSPEC: break;
          case AF_INET:  printf(" and IPv4 forced"); break;
@@ -98,8 +177,8 @@ int af::connecttomaster( bool verbose, int type, const char * servername, int se
 //   hints.ai_family = AF_UNSPEC; // This is value is default
    hints.ai_socktype = SOCK_STREAM;
    char service_port[16];
-   sprintf( service_port, "%u", serverport);
-   int e = getaddrinfo( servername, service_port, &hints, &res);
+   sprintf( service_port, "%u", i_port);
+   int e = getaddrinfo( i_name.c_str(), service_port, &hints, &res);
    if( e != 0)
    {
       AFERRAR("com::connecttomaster:\n%s", gai_strerror(e));
@@ -107,7 +186,7 @@ int af::connecttomaster( bool verbose, int type, const char * servername, int se
    }
    for( struct addrinfo *r = res; r != NULL; r = r->ai_next)
    {
-      if( verbose)
+      if( i_verbose == af::VerboseOn )
       {
          switch( r->ai_family)
          {
@@ -132,7 +211,7 @@ int af::connecttomaster( bool verbose, int type, const char * servername, int se
          }
       }
       // Skip address if type is forced
-      if(( type != AF_UNSPEC ) && ( type != r->ai_family)) continue;
+      if(( i_type != AF_UNSPEC ) && ( i_type != r->ai_family)) continue;
 
       socketfd = socket( r->ai_family, r->ai_socktype, r->ai_protocol);
       if( socketfd != -1 && connect( socketfd, r->ai_addr, r->ai_addrlen) == 0)
@@ -150,44 +229,6 @@ int af::connecttomaster( bool verbose, int type, const char * servername, int se
    return socketfd;
 }
 
-char * af::readdata( int fd, int & read_len)
-{
-   int buffer_len = af::Msg::SizeBuffer;  // Beginning buffer length
-   char * buffer = new char[buffer_len];
-   read_len = 0;
-   for(;;)
-   {
-      int bytes = read( fd, buffer + read_len, buffer_len - read_len);
-      AFINFA("com::readdata: recieved %d bytes.\n", bytes)
-      if( bytes == 0 ) break;
-      if( bytes == -1 ) // Error receiving data
-      {
-         read_len = -1; delete buffer; buffer = NULL;
-         break;
-      }
-      read_len += bytes;
-      if( read_len >= af::Msg::SizeBufferLimit) // Too much data recieved
-      {
-         read_len = -1; delete buffer; buffer = NULL;
-         AFERRAR("Too big message received: len >= af::Msg::SizeBufferLimit : %d >= %d\n", read_len, af::Msg::SizeBufferLimit)
-         break;
-      }
-      if( read_len == buffer_len)  // Need to increase buffer size
-      {
-         AFINFO("com::readdata: allocating new buffer.\n")
-         char * old_buffer = buffer;
-         int old_buffer_len = buffer_len;
-         buffer_len = old_buffer_len << 1; // Increasing buffer twice
-         buffer = new char[buffer_len];
-         memcpy( buffer, old_buffer, read_len); // Copy recieved data into new buffer
-         delete old_buffer;
-      }
-      else break;
-   }
-   AFINFA("com::readdata: returning %d bytes.\n", read_len)
-   return buffer;
-}
-
 bool af::msgread( int desc, af::Msg* msg)
 {
 AFINFO("com::msgread:\n");
@@ -195,7 +236,7 @@ AFINFO("com::msgread:\n");
    char * buffer = msg->buffer();
 //
 // Read message header data
-   int bytes = readdata( desc, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer );
+   int bytes = ::readdata( desc, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer );
    if( bytes < af::Msg::SizeHeader)
    {
       AFERRAR("com::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).\n", bytes);
@@ -217,7 +258,7 @@ AFINFO("com::msgread:\n");
       int readlen = msgdatasize + af::Msg::SizeHeader - bytes;
       if( readlen > 0)
       {
-         bytes = af::readdata( desc, buffer+bytes, readlen, readlen);
+         bytes = ::readdata( desc, buffer+bytes, readlen, readlen);
          if( bytes < readlen)
          {
             AFERRAR("com::msgread: read message data: ( bytes < readlen : %d < %d)\n", bytes, readlen);
@@ -231,17 +272,131 @@ AFINFO("com::msgread:\n");
 
    return true;
 }
+
 bool af::msgsend( int desc, const af::Msg *msg)
 {
-   if( false == af::writedata( desc, msg->buffer(), msg->writeSize()))
-   {
-         AFERROR("com::msgsend: Error writing message.\n");
-         return false;
-   }
+    if( false == ::writedata( desc, msg->buffer(), msg->writeSize()))
+    {
+        AFERROR("com::msgsend: Error writing message.\n");
+        return false;
+    }
 
-   mgstat.put( msg->type(),msg->writeSize());
+    mgstat.put( msg->type(),msg->writeSize());
 
-   return true;
+    return true;
+}
+
+af::Msg * af::msgsend( const Msg * i_msg, bool * io_ok )
+{
+    if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
+    {
+        AFERROR("af::msgsend: Receiving message has several addresses.");
+    }
+
+    if( false == i_msg->addressIsEmpty())
+    {
+        af::Msg * o_msg = af::msgsend( i_msg, i_msg->getAddress(), io_ok);
+        if( o_msg != NULL )
+            return o_msg;
+    }
+
+    if( i_msg->addressesCount() < 1)
+        return NULL;
+
+    bool ok;
+    const std::list<af::Address> * addresses = i_msg->getAddresses();
+    std::list<af::Address>::const_iterator it = addresses->begin();
+    std::list<af::Address>::const_iterator it_end = addresses->end();
+    while( it != it_end)
+    {
+        af::msgsend( i_msg, *it, &ok);
+        if(( false == ok ) && ( io_ok != NULL ))
+            *io_ok = false;
+        it++;
+    }
+
+    return NULL;
+}
+
+af::Msg * af::msgsend( const Msg * i_msg, const Address & i_address, bool * io_ok)
+{
+    if( io_ok != NULL )
+        *io_ok = true;
+
+    if( i_address.isEmpty() )
+    {
+        AFERROR("af::msgsend: Address is empty.")
+        if( io_ok != NULL )
+            *io_ok = false;
+        return NULL;
+    }
+
+    int socketfd;
+    struct sockaddr_storage client_addr;
+
+    if( false == i_address.setSocketAddress( &client_addr)) return false;
+
+    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
+    {
+        AFERRPE("af::msgsend: socket() call failed")
+        if( io_ok != NULL )
+            *io_ok = false;
+        return NULL;
+    }
+
+    AFINFO("af::msgsend: tying to connect to client.")
+
+    // Use SIGALRM to unblock
+#ifndef WINNT
+    if( alarm(2) != 0 )
+        AFERROR("af::msgsend: alarm was already set.\n");
+#endif //WINNT
+
+    if( connect(socketfd, (struct sockaddr*)&client_addr, i_address.sizeofAddr()) != 0 )
+    {
+        AFERRPA("af::msgsend: connect failure for msgType '%s': %s",
+            Msg::TNAMES[i_msg->type()], i_address.generateInfoString().c_str())
+        close(socketfd);
+#ifndef WINNT
+        alarm(0);
+#endif //WINNT
+        if( io_ok != NULL )
+            *io_ok = false;
+        return NULL;
+    }
+
+#ifndef WINNT
+    alarm(0);
+#endif //WINNT
+    //
+    // set socket maximum time to wait for an output operation to complete
+#ifndef WINNT
+    timeval so_sndtimeo;
+    so_sndtimeo.tv_sec = Environment::getServer_SO_SNDTIMEO_SEC();
+    so_sndtimeo.tv_usec = 0;
+    if( setsockopt( socketfd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
+    {
+        AFERRPE("af::msgsend: set socket SO_SNDTIMEO option failed")
+        i_address.stdOut(); printf("\n");
+        close(socketfd);
+        if( io_ok != NULL )
+            *io_ok = false;
+        return NULL;
+    }
+#endif //WINNT
+    //
+    // send
+    if( false == msgsend( socketfd, i_msg))
+    {
+        AFERRAR("af::msgsend: can't send message to client: %s", i_address.generateInfoString().c_str())
+        close(socketfd);
+        if( io_ok != NULL )
+            *io_ok = false;
+        return NULL;
+    }
+
+    close(socketfd);
+    return NULL;
 }
 
 bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
@@ -255,7 +410,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    int socketfd;
    struct sockaddr_storage client_addr;
 
-   i_request->getAddress().setSocketAddress( client_addr);
+   i_request->getAddress().setSocketAddress( &client_addr);
    //
    // get socket descriptor
    if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, IPPROTO_TCP)) < 0 )
@@ -266,8 +421,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    }
    //
    // connect
-//   if ( connect( socketfd, (struct sockaddr*)&client_addr, sizeof(client_addr)) != 0 )
-   if ( connect( socketfd, (struct sockaddr*)&client_addr, i_request->getAddress().sizeofAddr()) != 0 )
+   if( connect( socketfd, (struct sockaddr*)&client_addr, i_request->getAddress().sizeofAddr()) != 0 )
    {
       AFERRPE("MsgAf::request: connect");
       i_request->getAddress().stdOut(); printf("\n");
@@ -292,7 +446,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
 #endif// WINNT
    //
    // send request
-   if( false == msgsend( socketfd, i_request))
+   if( false == af::msgsend( socketfd, i_request))
    {
       AFERROR("MsgAf::request: can't send message to client.\n");
       i_request->stdOut();
@@ -301,7 +455,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    }
    //
    // read answer
-   if( false == msgread( socketfd, o_answer))
+   if( false == af::msgread( socketfd, o_answer))
    {
       AFERROR("MsgAf::request: reading message failed.\n");
       close( socketfd);
@@ -310,4 +464,42 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
 
    close( socketfd);
    return true;
+}
+
+char * af::readdata( int fd, int & read_len)
+{
+   int buffer_len = af::Msg::SizeBuffer;  // Beginning buffer length
+   char * buffer = new char[buffer_len];
+   read_len = 0;
+   for(;;)
+   {
+      int bytes = read( fd, buffer + read_len, buffer_len - read_len);
+      AFINFA("af::readdata: recieved %d bytes.\n", bytes)
+      if( bytes == 0 ) break;
+      if( bytes == -1 ) // Error receiving data
+      {
+         read_len = -1; delete buffer; buffer = NULL;
+         break;
+      }
+      read_len += bytes;
+      if( read_len >= af::Msg::SizeBufferLimit) // Too much data recieved
+      {
+         read_len = -1; delete buffer; buffer = NULL;
+         AFERRAR("Too big message received: len >= af::Msg::SizeBufferLimit : %d >= %d\n", read_len, af::Msg::SizeBufferLimit)
+         break;
+      }
+      if( read_len == buffer_len)  // Need to increase buffer size
+      {
+         AFINFO("af::readdata: allocating new buffer.\n")
+         char * old_buffer = buffer;
+         int old_buffer_len = buffer_len;
+         buffer_len = old_buffer_len << 1; // Increasing buffer twice
+         buffer = new char[buffer_len];
+         memcpy( buffer, old_buffer, read_len); // Copy recieved data into new buffer
+         delete old_buffer;
+      }
+      else break;
+   }
+   AFINFA("af::readdata: returning %d bytes.\n", read_len)
+   return buffer;
 }

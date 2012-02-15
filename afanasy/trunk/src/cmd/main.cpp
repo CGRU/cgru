@@ -55,7 +55,7 @@ printf("Msg::SizeDataMax      = %d\n", Msg::SizeDataMax     );
    ServerName = af::Environment::getServerName();
    ServerPort = af::Environment::getServerPort();
 
-   if( af::init( af::InitFarm | (argc == 1 ? af::Verbose : af::NoFlags)) == false) return 1;
+   if( af::init( af::InitFarm | (argc == 1 ? af::InitVerbose : af::NoFlags)) == false) return 1;
    afsql::init();
 
 

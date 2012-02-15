@@ -27,7 +27,7 @@ public:
    Msg( int msgType, Af * afClass );
 
     /// Construct a message and set an address
-    Msg( const struct sockaddr_storage & ss);
+    Msg( const struct sockaddr_storage * ss);
 
     Msg( const char * rawData, int rawDataLen);
 
@@ -388,25 +388,35 @@ static const char * TNAMES[]; ///< Type names.
 
    inline const size_t addressesCount() const { return addresses.size();}
 
-/// Set message address to \c client .
-   inline void setAddress( const Client* client)
-      { address = client->getAddress();}
+    /// Set to recieve an answer from the same socket after send
+    bool setReceiving( bool i_value = true ) { m_receive = i_value; }
 
-/// Add dispatch address.
-   inline void addAddress( const Client* client)
-      { addresses.push_back( client->getAddress());}
+    /// Set to recieve an answer from the same socket after send
+    bool isReceiving() const { return m_receive; }
 
-/// Get address constant pointer.
-   inline const Address & getAddress() const { return address;}
+    /// Set message address
+    inline void setAddress( const Address & i_address)
+        { address = i_address;}
 
-/// Get addresses constant list pointer.
-   inline const std::list<Address> * getAddresses() const { return &addresses;}
+    /// Set message address to \c client
+    inline void setAddress( const Client* client)
+        { address = client->getAddress();}
+
+    /// Add dispatch address
+    inline void addAddress( const Client* client)
+        { addresses.push_back( client->getAddress());}
+
+    /// Get address constant pointer
+    inline const Address & getAddress() const { return address;}
+
+    /// Get addresses constant list pointer
+    inline const std::list<Address> * getAddresses() const { return &addresses;}
 
 private:
 
 // header:
    int32_t mversion;                ///< Afanasy network protocol version.
-//   int32_t msid;                    ///< Sender id.
+    //int32_t msid;                    ///< Sender id.
    int32_t mtype;                   ///< Message type.
    int32_t mint32;                  ///< Some 32-bit integer, data length for data messages.
 
@@ -414,13 +424,16 @@ private:
    char *mdata;                     ///< Data pointer.
    char *mbuffer;                   ///< Buffer pointer.
 
+// buffering parameters:
    bool writing;                    ///< Writing or reading data in message.
    int  mbuffer_size;               ///< Buffer size.
    int  mdata_maxsize;              ///< Data maximum size ( = buffer size - header size).
    int  msgwrittensize;             ///< Number of bytes already written in message buffer.
 
-   Address address;               ///< Address, where message came from or will be send.
-   std::list<Address> addresses;  ///< Addresses to dispatch message to.
+// communication parameters:
+    Address address;                ///< Address, where message came from or will be send.
+    std::list<Address> addresses;   ///< Addresses to dispatch message to.
+    bool m_receive;                 ///< Whether to recieve an answer on message request.
 
 private:
 

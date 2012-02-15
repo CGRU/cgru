@@ -55,14 +55,14 @@ void Address::copy( const Address & other)
    memcpy( &addr, &other.addr, ms_addrdatalength);
 }
 
-Address::Address( const struct sockaddr_storage & ss)
+Address::Address( const struct sockaddr_storage * ss)
 {
    memset( addr, 0, ms_addrdatalength);
-   switch( ss.ss_family)
+   switch( ss->ss_family)
    {
    case AF_INET:
    {
-      struct sockaddr_in * sa = (struct sockaddr_in*)(&ss);
+      struct sockaddr_in * sa = (struct sockaddr_in*)ss;
       family = IPv4;
       port = ntohs( sa->sin_port);
       memcpy( addr, &(sa->sin_addr), 4);
@@ -70,7 +70,7 @@ Address::Address( const struct sockaddr_storage & ss)
    }
    case AF_INET6:
    {
-      struct sockaddr_in6 * sa = (struct sockaddr_in6*)(&ss);
+      struct sockaddr_in6 * sa = (struct sockaddr_in6*)ss;
 
       // Check for mapped IPv4 address: 1-80 bits == 0, 81-96 bits == 1 and last 32 bits == IPv4
       family = IPv4;
@@ -96,7 +96,7 @@ Address::Address( const struct sockaddr_storage & ss)
       }
       else
       {
-         struct sockaddr_in * sa = (struct sockaddr_in*)(&ss);
+         struct sockaddr_in * sa = (struct sockaddr_in*)ss;
          port = ntohs( sa->sin_port);
          memcpy( addr, &(data[12]), 4);
       }
@@ -175,15 +175,14 @@ void Address::clear()
    memset( addr, 0, ms_addrdatalength);
 }
 
-#ifndef WINNT
-bool Address::setSocketAddress( struct sockaddr_storage & ss) const
+bool Address::setSocketAddress( struct sockaddr_storage * ss) const
 {
-   bzero( &ss, sizeof(sockaddr_storage));
+   bzero( ss, sizeof(sockaddr_storage));
    switch( family)
    {
       case IPv4:
       {
-         struct sockaddr_in * sa = (struct sockaddr_in*)(&ss);
+         struct sockaddr_in * sa = (struct sockaddr_in*)ss;
          sa->sin_family = AF_INET;
          sa->sin_port = htons( port);
          memcpy( &(sa->sin_addr), addr, 4);
@@ -191,7 +190,7 @@ bool Address::setSocketAddress( struct sockaddr_storage & ss) const
       }
       case IPv6:
       {
-         struct sockaddr_in6 * sa = (struct sockaddr_in6*)(&ss);
+         struct sockaddr_in6 * sa = (struct sockaddr_in6*)ss;
          sa->sin6_family = AF_INET6;
          sa->sin6_port = htons( port);
          memcpy( &(sa->sin6_addr), addr, 16);
@@ -206,7 +205,6 @@ bool Address::setSocketAddress( struct sockaddr_storage & ss) const
    }
    return true;
 }
-#endif
 
 void Address::setIP( const af::Address & other)
 {

@@ -47,7 +47,7 @@ bool af::init( uint32_t flags)
    if( flags & InitFarm)
    {
       AFINFO("af::init: trying to load farm\n");
-      if( loadFarm( flags & Verbose) == false)  return false;
+      if( loadFarm( flags & InitVerbose) == false)  return false;
    }
    return true;
 }

@@ -53,7 +53,7 @@ void processMessage( ThreadArgs * i_args)
     // Using a constructor that stores client address in message,
     // this client address will be used for a new client,
     // if it is a new client registration request.
-    af::Msg * msg_request = new af::Msg( i_args->ss);
+    af::Msg * msg_request = new af::Msg( &(i_args->ss));
 
     // Check message IP mask:
     if( false == msg_request->getAddress().matchIpMask())

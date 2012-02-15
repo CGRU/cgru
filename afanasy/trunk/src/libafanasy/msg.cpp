@@ -37,7 +37,7 @@ Msg::Msg( int msgType, Af * afClass )
    set( msgType, afClass);
 }
 
-Msg::Msg( const struct sockaddr_storage & ss):
+Msg::Msg( const struct sockaddr_storage * ss):
     address( ss)
 {
     construct();
@@ -79,6 +79,7 @@ void Msg::construct()
    mversion = Msg::Version;
    mtype = Msg::TNULL;
    mint32 = 0;
+   m_receive = false;
 
    writing = false;
    msgwrittensize = 0;

@@ -21,9 +21,6 @@ public:
 
 protected:
    void processItem( AfQueueItem* item);
-
-private:
-   void send( const Msg * msg, const Address & address) const;
 };
 
 } // namespace af

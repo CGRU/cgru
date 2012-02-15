@@ -24,7 +24,8 @@ public:
         Normal              = 0,
         Verbose             = 1,        ///< Output all information
         Quiet               = 1 << 1,   ///< Do not output even important information
-        AppendPythonPath    = 1 << 2
+        AppendPythonPath    = 1 << 2,   ///< Appent python sys.path with AFROOT/python
+        SolveServerName     = 1 << 3    ///< Solve server name
     };
 
     /// Return \c true if environment is valid.
@@ -73,6 +74,8 @@ public:
     static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
     static inline const std::string & getComputerName(){ return computername;  } ///< Get local computer name.
     static inline const std::string & getPlatform()    { return platform;      } ///< Get platform name.
+
+    static inline const Address & getServerAddress() { return serveraddress; }
 
     static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
@@ -169,6 +172,7 @@ private:
     static bool m_verbose_init;     ///< Verbose environment initialization
     static bool m_quiet_init;       ///< Quiet environment initialization
     static bool m_verbose_mode;     ///< Application verbose mode
+    static bool m_solveservername;  ///< Whether to solve server name
 
    static std::list<std::string> cmdarguments;
    static std::list<std::string> cmdarguments_usagearg;
@@ -194,7 +198,7 @@ private:
 
 /// Afanasy server name
    static std::string servername;
-
+    static Address serveraddress;
    static std::string serveripmask;
 
 /// User name
