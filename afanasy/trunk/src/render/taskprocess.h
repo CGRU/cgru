@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/dlThread.h"
 #include "../libafanasy/msgclasses/mctaskpos.h"
 #include "../libafanasy/name_af.h"
@@ -31,15 +33,13 @@ public:
 
     void refresh();
 
-//    void listen();
-
     inline bool isZombie() const { return m_zombie;}
 
 private:
     void sendTaskSate();
-    void killProcess();
-    void processFinished( int exitCode);
     void readProcess();
+    void processFinished( int exitCode);
+    void killProcess();
 
 private:
     af::TaskExec * m_taskexec;
@@ -49,13 +49,20 @@ private:
     time_t m_stop_time;
     bool m_zombie;
 
-//    DlThread * m_thread;
-
     pid_t m_pid;
+#ifdef WINNT
+    PROCESS_INFORMATION * process_info;
+    HANDLE hJob;
+ #endif
 
     FILE * m_io_output;
+    FILE * m_io_outerr;
     FILE * m_io_input;
 
-    static const int m_readbuffer_size = 1024;
+    // Read buffer:
+    static const int m_readbuffer_size = AFRENDER::TASK_READ_BUFFER_SIZE;
     char m_readbuffer[m_readbuffer_size];
+    // Will be set to FILEs:
+    char m_filebuffer_out[m_readbuffer_size];
+    char m_filebuffer_err[m_readbuffer_size];
 };

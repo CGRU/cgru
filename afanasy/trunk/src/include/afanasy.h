@@ -37,7 +37,7 @@ namespace AFADDR
 /// Users options:
 namespace AFUSER
 {
-   const int  MAXCOUNT         = 1000000;    ///< Maximum number or users.
+   const int  MAXCOUNT         = 100000;     ///< Maximum number or users.
    const char PSWD_VISOR[]     = "1832116180fdc61b64fd978401e462e9";  ///< Default Visor password.
    const char PSWD_GOD[]       = "73bcaaa458bff0d27989ed331b68b64d";  ///< Default GOD password.
    const int  ZOMBIETIME       = 2;          ///< Time to user to have no jobs and become a zombie.
@@ -71,29 +71,30 @@ namespace AFDATABASE
 /// Render options:
 namespace AFRENDER
 {
-   const int  TERMINATEWAITKILL   = 10;         ///< Seconds to wait task task finish after termination, then perform kill
-   const int  DEFAULTCAPACITY     = 1000;       ///< Default render capacity.
-   const int  DEFAULTMAXTASKS     = 2;          ///< Maximum tasks on can run on the same render the same time (default value).
-   const int  UPDATEPERIOD        = 5;          ///< Update status period ( seconds).
-   const int  UPDATETASKPERIOD    = 1;          ///< Update task state and percentage period ( seconds).
-   const int  ZOMBIETIME          = 60;         ///< Seconds to wait for update to Render is zombie.
-   const int  CONNECTRETRIES      = 3;          ///< Number of connect fails to turn to disconnected state.
-   const int  WAITFORCONNECTED    = 15000;      ///< Connect to server timeout milliseconds.
-   const int  WAITFORREADYREAD    = 15000;      ///< Wait for data from server timeout milliseconds.
-   const int  WAITFORBYTESWRITTEN = 15000;      ///< Wait writing to socket timeout milliseconds.
-   const int  MAXCOUNT            = 1000000;    ///< Maximum allowed online Renders.
-   const int  TASKPROCESSNICE     = 10;         ///< Child process nice.
-   const int  LOG_LINESMAX        = 100;        ///< Maximum number of lines in each Render log.
-   const int  LOGS_ROTATE         = 10;         ///< Number of logs to keep.
-   const char LOGS_DIRECTORY[]    = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
-   const char CMD_REBOOT[]        = "reboot";   ///< How to reboot a computer.
-   const char CMD_SHUTDOWN[]      = "shutdown"; ///< How to shutdown a computer.
-   const char CMD_WOLSLEEP[]      = "wolsleep"; ///< How to sleep computer.
-   const char CMD_WOLWAKE[]       = "wolwake";  ///< How to wake computer.
-   const char EXEC[]              = "afrender"; ///< How Render to execute another Render.
-   const char NETWORK_IF[]        = ".*";       ///< Network interface(s) pattern to measure traffic on.
-   const char HDDSPACE_PATH[]     = "/";        ///< Path to query total and free space.
-   const char IOSTAT_DEVICE[]     = "sda";      ///< Device to monitor IO.
+    const int  TERMINATEWAITKILL        = 10;         ///< Seconds to wait task task finish after termination, then perform kill
+    const int  DEFAULTCAPACITY          = 1000;       ///< Default render capacity.
+    const int  DEFAULTMAXTASKS          = 2;          ///< Maximum tasks on can run on the same render the same time (default value).
+    const int  UPDATEPERIOD             = 5;          ///< Update status period ( seconds).
+    const int  UPDATETASKPERIOD         = 1;          ///< Update task state and percentage period ( seconds).
+    const int  ZOMBIETIME               = 60;         ///< Seconds to wait for update to Render is zombie.
+    const int  CONNECTRETRIES           = 3;          ///< Number of connect fails to turn to disconnected state.
+    const int  WAITFORCONNECTED          = 15000;      ///< Connect to server timeout milliseconds.
+    const int  WAITFORREADYREAD         = 15000;      ///< Wait for data from server timeout milliseconds.
+    const int  WAITFORBYTESWRITTEN      = 15000;      ///< Wait writing to socket timeout milliseconds.
+    const int  MAXCOUNT                 = 100000;     ///< Maximum allowed online Renders.
+    const int  TASKPROCESSNICE          = 10;         ///< Child process nice.
+    const int  LOG_LINESMAX             = 100;        ///< Maximum number of lines in each Render log.
+    const int  LOGS_ROTATE              = 10;         ///< Number of logs to keep.
+    const char LOGS_DIRECTORY[]         = "renders";  ///< Renders logs store directory, relative to AFSERVER::TEMP_DIRECTORY
+    const char CMD_REBOOT[]             = "reboot";   ///< How to reboot a computer.
+    const char CMD_SHUTDOWN[]           = "shutdown"; ///< How to shutdown a computer.
+    const char CMD_WOLSLEEP[]           = "wolsleep"; ///< How to sleep computer.
+    const char CMD_WOLWAKE[]            = "wolwake";  ///< How to wake computer.
+    const char EXEC[]                   = "afrender"; ///< How Render to execute another Render.
+    const char NETWORK_IF[]             = ".*";       ///< Network interface(s) pattern to measure traffic on.
+    const char HDDSPACE_PATH[]          = "/";        ///< Path to query total and free space.
+    const char IOSTAT_DEVICE[]          = "sda";      ///< Device to monitor IO.
+    const int  TASK_READ_BUFFER_SIZE    = 1024*1024;  ///< Task process read buffer.
 }
 
 /// Watch options:
@@ -119,14 +120,14 @@ namespace AFTALK
    const int WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
    const int WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.
    const int WAITFORBYTESWRITTEN = 8000;     ///< Wait writing to socket timeout milliseconds.
-   const int MAXCOUNT            = 1000000;  ///< Maximum allowed online Talks.
+   const int MAXCOUNT            = 100000;   ///< Maximum allowed online Talks.
 }
 
 /// Monitor options:
 namespace AFMONITOR
 {
    const int UPDATEPERIOD        = 10;       ///< Update status period ( seconds).
-   const int MAXCOUNT            = 1000000;  ///< Maximum allowed online Monitors.
+   const int MAXCOUNT            = 100000;   ///< Maximum allowed online Monitors.
    const int CONNECTRETRIES      = 3;        ///< Number of connect fails to turn to disconnected state.
    const int WAITFORCONNECTED    = 8000;     ///< Connect to server timeout milliseconds.
    const int WAITFORREADYREAD    = 8000;     ///< Wait for data from server timeout milliseconds.

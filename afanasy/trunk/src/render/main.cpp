@@ -235,26 +235,19 @@ printf("msgCase: "); msg->stdOut();
         af::launchProgram( af::Environment::getRenderCmdWolSleep());
         break;
     }
-        /*
-   case af::Msg::TRenderStopTask:
-   {
-      af::MCTaskPos taskpos( msg);
-//printf("Msg::TRenderStopTask:\n"); taskpos.stdOut();
-      for( int t = 0; t < tasks.size(); t++) if( tasks[t]->is( taskpos)) tasks[t]->stop();
-   }
-   case af::Msg::TRenderCloseTask:
-   {
-      af::MCTaskPos taskpos( msg);
-//printf("Msg::TRenderCloseTask: [%d][%d][%d](%d)\n", taskpos.getJobId(), taskpos.getNumBlock(), taskpos.getNumTask(), taskpos.getNumber());
-      for( int t = 0; t < tasks.size(); t++)
-         if( tasks[t]->is( taskpos))
-         {
-            delete tasks[t];
-            tasks.removeAt( t);
-         }
-      break;
-   }
-   case af::Msg::TTaskListenOutput:
+    case af::Msg::TRenderStopTask:
+    {
+        af::MCTaskPos taskpos( msg);
+        RenderHost::stopTask( taskpos);
+        break;
+    }
+    case af::Msg::TRenderCloseTask:
+    {
+        af::MCTaskPos taskpos( msg);
+        RenderHost::closeTask( taskpos);
+        break;
+    }
+/*   case af::Msg::TTaskListenOutput:
    {
       af::MCListenAddress mcaddr( msg);
       for( int t = 0; t < tasks.size(); t++)
@@ -282,7 +275,7 @@ printf("msgCase: "); msg->stdOut();
    }
 */   default:
    {
-      AFERROR("Unknown message recieved.")
+      AFERROR("Unknown message recieved:")
       msg->stdOut();
       break;
    }

@@ -104,16 +104,17 @@ RenderHost::~RenderHost()
     delete ms_msgAcceptQueue;
     delete ms_msgDispatchQueue;
 
-    for( int i = 0; i < ms_pyres.size(); i++) if( ms_pyres[i]) delete ms_pyres[i];
-//   if( upmsg != NULL ) delete upmsg;
-#ifdef WINNT
-   windowsMustDie();
-#endif
+    for( int i = 0; i < ms_pyres.size(); i++)
+        if( ms_pyres[i])
+            delete ms_pyres[i];
 
-   af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
-   msg.setAddress( af::Environment::getServerAddress());
-   bool ok;
-   af::msgsend( & msg, ok, af::VerboseOn);
+//    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); it++)
+//        delete *it;
+
+    af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
+    msg.setAddress( af::Environment::getServerAddress());
+    bool ok;
+    af::msgsend( & msg, ok, af::VerboseOn);
 }
 
 void RenderHost::dispatchMessage( af::Msg * i_msg)
@@ -218,4 +219,33 @@ void RenderHost::windowsMustDie() const
 void RenderHost::runTask( af::Msg * i_msg)
 {
     ms_tasks.push_back( new TaskProcess( new af::TaskExec( i_msg)));
+}
+
+void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
+{
+    for( int t = 0; t < ms_tasks.size(); t++)
+    {
+        if( ms_tasks[t]->is( i_taskpos))
+        {
+            ms_tasks[t]->stop();
+            return;
+        }
+    }
+    AFERROR("RenderHost::stopTask: No such task:\n")
+    i_taskpos.stdOut();
+}
+
+void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
+{
+    for( int t = 0; t < ms_tasks.size(); t++)
+    {
+        if( ms_tasks[t]->is( i_taskpos))
+        {
+            delete ms_tasks[t];
+            ms_tasks.erase( ms_tasks.begin() + t);
+            return;
+        }
+    }
+    AFERROR("RenderHost::closeTask: No such task:\n")
+    i_taskpos.stdOut();
 }

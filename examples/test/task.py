@@ -77,8 +77,8 @@ while frame <= frame_end:
          print str(frame) + ': ' + str(p) + ': ' + str(v) + ': QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm'
 #         sys.stdout.flush()
          time.sleep(sleepsec)
-      time.sleep(sleepsec)
       sys.stdout.flush()
+      time.sleep(sleepsec)
    frame += frame_inc
 
 sys.stdout.flush()

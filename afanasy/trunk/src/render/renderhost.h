@@ -40,6 +40,10 @@ public:
 
     static void runTask( af::Msg * i_msg);
 
+    static void stopTask( const af::MCTaskPos & i_taskpos);
+
+    static void closeTask( const af::MCTaskPos & i_taskpos);
+
 #ifdef WINNT
     void windowsMustDie() const;
 #endif
