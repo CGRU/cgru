@@ -18,13 +18,17 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
-/*
-void thread_entry_point( void *i_parameter )
+
+extern void (*fp_setupChildProcess)( void);
+
+void setupChildProcess( void)
 {
-   TaskProcess * taskprocess = (TaskProcess *) i_parameter;
-   taskprocess->listen();
+//    printf("This is child process!\n");
+    if( setsid() == -1) AFERRPE("setsid")
+    int nicenew = nice( af::Environment::getRenderNice());
+    if( nicenew == -1) AFERRPE("nice")
 }
-*/
+
 // Taken from:
 // http://www.kegel.com/dkftpbench/nonblocking.html
 int setNonblocking(int fd)
@@ -84,11 +88,9 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     m_taskexec->stdOut( false);
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
-//    m_pid = af::launchProgram( command, wdir);
-//    m_pid = af::launchProgram( command, wdir, NULL, &stdout, &stderr);
-    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr);
+    fp_setupChildProcess = setupChildProcess;
 
-//    m_thread->Start( thread_entry_point, this);
+    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr);
 
     if( m_pid <= 0 )
     {
@@ -96,6 +98,14 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
         m_pid = 0;
         return;
     }
+
+#ifdef WINNT
+    process_info = pid();
+    SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
+    if( AssignProcessToJobObject( hJob, process_info->hProcess) == false)
+        AFERROR("AssignProcessToJobObject failed.\n");
+    ResumeThread( process_info->hThread); // | CREATE_SUSPENDED
+#endif
 
     setNonblocking( fileno( m_io_input));
     setNonblocking( fileno( m_io_output));
@@ -107,17 +117,49 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 
 TaskProcess::~TaskProcess()
 {
-   m_update_status = 0;
-   killProcess();
+    m_update_status = 0;
+    killProcess();
 
-   fclose( m_io_input);
-   fclose( m_io_output);
-   fclose( m_io_outerr);
+    fclose( m_io_input);
+    fclose( m_io_output);
+    fclose( m_io_outerr);
 
-   if( m_taskexec    != NULL  ) delete m_taskexec;
-   if( m_parser  != NULL  ) delete m_parser;
+    if( m_taskexec    != NULL  ) delete m_taskexec;
+    if( m_parser  != NULL  ) delete m_parser;
 
-   AFINFO("TaskProcess:~TaskProcess()")
+    AFINFO("TaskProcess:~TaskProcess()")
+}
+
+void TaskProcess::refresh()
+{
+    if( m_stop_time )
+    {
+        if( m_pid == 0 ) m_zombie = true;
+        else if( time( NULL) - m_stop_time > AFRENDER::TERMINATEWAITKILL ) killProcess();
+    }
+
+    if( m_pid == 0 )
+    {
+        return;
+    }
+
+    int status;
+    pid_t pid = waitpid( m_pid, &status, WNOHANG);
+
+    if( pid == 0 )
+    {
+        readProcess();
+    }
+    else if( pid == m_pid )
+    {
+        processFinished( status);
+    }
+    else if( pid == -1 )
+    {
+        AFERRPE("TaskProcess::refresh(): waitpid: ")
+    }
+
+    sendTaskSate();
 }
 
 void TaskProcess::readProcess()
@@ -225,42 +267,9 @@ void TaskProcess::sendTaskSate()
     af::Msg * msg = new af::Msg( type, &taskup);
     if( toRecieve) msg->setReceiving();
 
-    printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
+//    printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
 
     RenderHost::dispatchMessage( msg);
-}
-
-void TaskProcess::refresh()
-{
-    printf("TaskProcess::refresh():\n");
-
-    if( m_pid == 0 )
-    {
-        return;
-    }
-
-    int status;
-    pid_t pid = waitpid( m_pid, &status, WNOHANG);
-
-    if( pid == 0 )
-    {
-        readProcess();
-        sendTaskSate();
-    }
-    else if( pid == m_pid )
-    {
-        processFinished( status);
-    }
-    else if( pid == -1 )
-    {
-        AFERRPE("TaskProcess::refresh(): waitpid: ")
-    }
-
-    if( m_stop_time )
-    {
-        if( m_pid == 0 ) m_zombie = true;
-        else if( time( NULL) - m_stop_time > AFRENDER::TERMINATEWAITKILL ) killProcess();
-    }
 }
 
 void TaskProcess::processFinished( int exitCode)
@@ -295,13 +304,10 @@ void TaskProcess::processFinished( int exitCode)
             printf("Success: exitcode = %d.\n", exitCode);
         }
     }
-    sendTaskSate();
 }
 
-void TaskProcess::stop( bool noStatusUpdate)
+void TaskProcess::stop()
 {
-    if( noStatusUpdate ) m_update_status = 0;
-
     // Store the time when task was asked to be stopped (was asked first time)
     if( m_stop_time == 0 ) m_stop_time = time(NULL);
 
@@ -327,7 +333,7 @@ void TaskProcess::killProcess()
 #endif
 }
 
-void TaskProcess::getOutput( af::Msg & msg) const
+void TaskProcess::getOutput( af::Msg * o_msg) const
 {
     if( m_parser != NULL)
     {
@@ -335,15 +341,15 @@ void TaskProcess::getOutput( af::Msg & msg) const
         char *data = m_parser->getData( &size);
         if( size > 0)
         {
-            msg.setData( size, data);
+            o_msg->setData( size, data);
         }
         else
         {
-            msg.setString("Render: Silence...");
+            o_msg->setString("Render: Silence...");
         }
     }
     else
     {
-        msg.setString("Render: Parser is NULL.");
+        o_msg->setString("Render: Parser is NULL.");
     }
 }

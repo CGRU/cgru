@@ -201,23 +201,36 @@ void threadAcceptClient( void * i_arg )
             continue;
         }
 
-        RenderHost::acceptMessage( msg_request);
-        close(sd);
-        continue;
-
-        af::Msg * msg_response = new af::Msg();
-
-        // Write answer to socket
-        if( false == af::msgwrite( sd, msg_response))
+        switch( msg_request->type())
         {
-            AFERROR("writeMessage: can't send message to client.")
-            af::printAddress( &(ss));
-            msg_response->stdOut();
+        case af::Msg::TTaskOutputRequest:
+        {
+            af::MCTaskPos taskpos( msg_request);
+            af::Msg * msg_response = new af::Msg();
+
+            // Get task output immediately in this thread
+            RenderHost::lockMutex();
+            RenderHost::getTaskOutput( taskpos, msg_response);
+            RenderHost::unLockMutex();
+
+            // Write answer to the same socket
+            if( false == af::msgwrite( sd, msg_response))
+            {
+                AFERROR("writeMessage: can't send message to client.")
+                af::printAddress( &(ss));
+                msg_response->stdOut();
+            }
+            delete msg_response;
+            break;
+        }
+        default:
+            RenderHost::acceptMessage( msg_request);
+            close(sd);
+            continue;
         }
 
         close(sd);
         delete msg_request;
-        delete msg_response;
     }
 
     close( server_sd);

@@ -7,7 +7,7 @@
 #include "renderhost.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
@@ -124,12 +124,18 @@ int main(int argc, char *argv[])
     uint64_t cycle = 0;
     while( AFRunning)
     {
-        msgCase( RenderHost::acceptTry());
+        af::Msg * msg = RenderHost::acceptTry();
 
-        RenderHost::refresh();
+        RenderHost::lockMutex();
+
+        msgCase( msg);
+
+        RenderHost::refreshTasks();
 
         if( cycle % af::Environment::getRenderUpdateSec() == 0)
             RenderHost::update();
+
+        RenderHost::unLockMutex();
 
         cycle++;
         sleep(1);
@@ -152,12 +158,17 @@ void msgCase( af::Msg * msg)
 printf("msgCase: "); msg->stdOut();
 #endif
 
+    // Check not sended messages first, they were pushed back in accept quere:
     if( msg->wasSendFailed())
     {
         if( msg->getAddress().equal( af::Environment::getServerAddress()))
         {
-            /// Message was failed to send to server
+            // Message was failed to send to server
             RenderHost::connectionLost();
+        }
+        else if( msg->type() == af::Msg::TTaskOutput )
+        {
+            RenderHost::listenFailed( msg->getAddress());
         }
         delete msg;
         return;
@@ -168,7 +179,7 @@ printf("msgCase: "); msg->stdOut();
     case af::Msg::TRenderId:
     {
         int new_id = msg->int32();
-      // Server sends back -1 id if a render with the same hostname already exists:
+        // Server sends back -1 id if a render with the same hostname already exists:
         if( new_id == -1)
         {
             AFERRAR("Render with this hostname '%s' already registered.", af::Environment::getHostName().c_str())
@@ -198,10 +209,6 @@ printf("msgCase: "); msg->stdOut();
         RenderHost::runTask( msg);
         break;
     }
-//   case af::Msg::TRenderTaskStdOutRequest:
-//   {
-//      break;
-//   }
     case af::Msg::TClientRestartRequest:
     {
         printf("Restart client request, executing command:\n%s\n", af::Environment::getRenderExec().c_str());
@@ -247,39 +254,19 @@ printf("msgCase: "); msg->stdOut();
         RenderHost::closeTask( taskpos);
         break;
     }
-/*   case af::Msg::TTaskListenOutput:
-   {
-      af::MCListenAddress mcaddr( msg);
-      for( int t = 0; t < tasks.size(); t++)
-      {
-         if( mcaddr.justTask())
-         {
-            if( tasks[t]->is( mcaddr.getJobId(), mcaddr.getNumBlock(), mcaddr.getNumTask(), 0))
-            {
-               if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
-               else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
-               mcaddr.stdOut();
-            }
-         }
-         else
-         {
-            if( tasks[t]->exec->getJobId() == mcaddr.getJobId())
-            {
-               if( mcaddr.toListen()) tasks[t]->exec->addListenAddress( mcaddr.getAddress());
-               else                   tasks[t]->exec->removeListenAddress( mcaddr.getAddress());
-               mcaddr.stdOut();
-            }
-         }
-      }
-      break;
-   }
-*/   default:
-   {
-      AFERROR("Unknown message recieved:")
-      msg->stdOut();
-      break;
-   }
-   }
+    case af::Msg::TTaskListenOutput:
+    {
+        af::MCListenAddress mcaddr( msg);
+        RenderHost::listenTasks( mcaddr);
+        break;
+    }
+    default:
+    {
+        AFERROR("Unknown message recieved:")
+        msg->stdOut();
+        break;
+    }
+    }
 
-   delete msg;
+    delete msg;
 }

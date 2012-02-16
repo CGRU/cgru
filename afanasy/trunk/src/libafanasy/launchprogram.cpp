@@ -27,6 +27,8 @@
 #include <stdio.h>
 #include <unistd.h>
 
+void (*fp_setupChildProcess)( void) = NULL;
+
 /*
 int LaunchProgram(
 	FILE **o_in,
@@ -448,6 +450,9 @@ int LaunchProgramV(
 		{
 			close(i);
 		}
+
+                if( fp_setupChildProcess )
+                    fp_setupChildProcess();
 
 		err =
 			( (i_program[0] != '/') ?

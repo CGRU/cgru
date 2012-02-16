@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../libafanasy/dlMutex.h"
+#include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
 
@@ -7,8 +9,6 @@
 
 class Parser;
 class PyRes;
-
-//afqt::QMsg* update_handler_ptr( afqt::QMsg * msg);
 
 class RenderHost: public af::Render
 {
@@ -34,15 +34,24 @@ public:
 
     static void setUpdateMsgType( int i_type);
 
-    static void update();
+    static void refreshTasks();
 
-    static void refresh();
+    static void update();
 
     static void runTask( af::Msg * i_msg);
 
     static void stopTask( const af::MCTaskPos & i_taskpos);
 
     static void closeTask( const af::MCTaskPos & i_taskpos);
+
+    static void getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg);
+
+    static void listenTasks( const af::MCListenAddress & i_mcaddr);
+
+    static void listenFailed( const af::Address & i_addr);
+
+    inline static void   lockMutex() { m_mutex.Lock();  }
+    inline static void unLockMutex() { m_mutex.Unlock();}
 
 #ifdef WINNT
     void windowsMustDie() const;
@@ -64,4 +73,6 @@ private:
     static int ms_updateMsgType;
 
     static std::vector<TaskProcess*> ms_tasks;
+
+    static DlMutex m_mutex;
 };

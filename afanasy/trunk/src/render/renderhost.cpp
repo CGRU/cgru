@@ -1,5 +1,6 @@
 #include "renderhost.h"
 
+#include "../libafanasy/dlScopeLocker.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 
@@ -9,14 +10,7 @@
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
-/*
-RenderHost * Render;
 
-afqt::QMsg* update_handler_ptr( afqt::QMsg * msg)
-{
-   return Render->updateMsg( msg);
-}
-*/
 RenderHost * RenderHost::ms_obj = NULL;
 af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
 af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
@@ -24,6 +18,7 @@ int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
 bool RenderHost::ms_connected = false;
 std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
+DlMutex RenderHost::m_mutex;
 
 RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
    Render( i_state, i_priority)
@@ -145,7 +140,7 @@ void RenderHost::connectionLost()
     ms_obj->id = 0;
 
     // Stop all tasks:
-//    for( int t = 0; t < tasks.size(); t++) tasks[t]->stop();
+    for( int t = 0; t < ms_tasks.size(); t++) ms_tasks[t]->stop();
 
     ms_msgDispatchQueue->setVerboseMode( af::VerboseOff);
 
@@ -160,11 +155,24 @@ void RenderHost::setUpdateMsgType( int i_type)
     ms_updateMsgType = i_type;
 }
 
-void RenderHost::refresh()
+void RenderHost::refreshTasks()
 {
-    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); it++)
+    // Refresh tasks:
+    for( int t = 0; t < ms_tasks.size(); t++)
     {
-        (*it)->refresh();
+        ms_tasks[t]->refresh();
+    }
+
+    // Remove zombies:
+    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); )
+    {
+        if((*it)->isZombie())
+        {
+            delete *it;
+            it = ms_tasks.erase( it);
+        }
+        else
+            it++;
     }
 }
 
@@ -243,6 +251,56 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
         {
             delete ms_tasks[t];
             ms_tasks.erase( ms_tasks.begin() + t);
+            return;
+        }
+    }
+    AFERROR("RenderHost::closeTask: No such task:\n")
+    i_taskpos.stdOut();
+}
+
+void RenderHost::listenTasks( const af::MCListenAddress & i_mcaddr)
+{
+    for( int t = 0; t < ms_tasks.size(); t++)
+    {
+        if( i_mcaddr.justTask())
+        {
+            if( ms_tasks[t]->is( i_mcaddr.getJobId(), i_mcaddr.getNumBlock(), i_mcaddr.getNumTask(), 0))
+            {
+                if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
+                else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
+                i_mcaddr.stdOut();
+            }
+        }
+        else
+        {
+            if( ms_tasks[t]->is( i_mcaddr.getJobId()))
+            {
+                if( i_mcaddr.toListen()) ms_tasks[t]->addListenAddress(    i_mcaddr.getAddress());
+                else                     ms_tasks[t]->removeListenAddress( i_mcaddr.getAddress());
+                i_mcaddr.stdOut();
+            }
+        }
+    }
+}
+
+void RenderHost::listenFailed( const af::Address & i_addr)
+{
+    int lasttasknum = -1;
+    for( int t = 0; t < ms_tasks.size(); t++) if( (ms_tasks[t])->removeListenAddress( i_addr)) lasttasknum = t;
+    if( lasttasknum != -1)
+    {
+        af::MCListenAddress mclass( af::MCListenAddress::FROMRENDER, i_addr, ms_tasks[lasttasknum]->exec()->getJobId());
+        dispatchMessage( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
+    }
+}
+
+void RenderHost::getTaskOutput( const af::MCTaskPos & i_taskpos, af::Msg * o_msg)
+{
+    for( int t = 0; t < ms_tasks.size(); t++)
+    {
+        if( ms_tasks[t]->is( i_taskpos))
+        {
+            ms_tasks[t]->getOutput( o_msg);
             return;
         }
     }

@@ -18,6 +18,9 @@ public:
     TaskProcess( af::TaskExec * i_taskExec);
     ~TaskProcess();
 
+    inline bool is( int i_jobId) const
+        { return m_taskexec->getJobId() == i_jobId ;}
+
     inline bool is( int i_jobId, int i_blockNum, int i_taskNum, int i_Number) const
         { return ((m_taskexec->getJobId() == i_jobId) &&
                   (m_taskexec->getBlockNum() == i_blockNum) &&
@@ -27,13 +30,18 @@ public:
     inline bool is( const af::MCTaskPos & i_taskpos) const
         { return is( i_taskpos.getJobId(), i_taskpos.getNumBlock(), i_taskpos.getNumTask(), i_taskpos.getNumber());}
 
-    void getOutput( af::Msg & msg) const;
+    void getOutput( af::Msg * o_msg) const;
 
-    void stop( bool noStatusUpdate = false);
+    void stop();
 
     void refresh();
 
     inline bool isZombie() const { return m_zombie;}
+
+    inline bool    addListenAddress( const af::Address & i_addr) { return m_taskexec->addListenAddress(    i_addr);}
+    inline bool removeListenAddress( const af::Address & i_addr) { return m_taskexec->removeListenAddress( i_addr);}
+
+    const af::TaskExec * exec() { return m_taskexec;}
 
 private:
     void sendTaskSate();

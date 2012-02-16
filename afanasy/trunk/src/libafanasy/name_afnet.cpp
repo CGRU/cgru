@@ -390,7 +390,7 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
     return true;
 }
 
-af::Msg * af::msgsend( const Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
+af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 {
     if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
     {
@@ -423,7 +423,11 @@ af::Msg * af::msgsend( const Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
     {
         ::msgsendtoaddress( i_msg, *it, ok, i_verbose);
         if( false == ok )
+        {
             io_ok = false;
+            // Store an address that message was failed to send to
+            i_msg->setAddress( *it);
+        }
         it++;
     }
 

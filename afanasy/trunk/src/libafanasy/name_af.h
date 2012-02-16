@@ -192,7 +192,7 @@ namespace af
     bool msgwrite( int i_desc, const af::Msg * i_msg);
 
     /// Send a message to all its addresses and receive an answer if needed
-    Msg * msgsend( const Msg * i_msg, bool & io_ok, VerboseMode i_verbose);
+    Msg * msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose);
 /*
     /// Set message to it's address and wait for an \c answer, \c return true on success.
     bool msgRequest( const Msg * i_request, Msg * o_answer);
