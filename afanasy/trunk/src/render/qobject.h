@@ -1,5 +1,5 @@
 #pragma once
-
+/*
 #include "../libafanasy/name_af.h"
 
 #include "../libafqt/name_afqt.h"
@@ -8,7 +8,8 @@
 #include "../libafqt/qthreadclientup.h"
 
 #include "childprocess.h"
-
+*/
+#if 0
 class Parser;
 class RenderHost;
 class TaskProcess;
@@ -60,3 +61,4 @@ private:
    bool exiting;
    bool exitRequest;
 };
+#endif

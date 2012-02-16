@@ -17,10 +17,13 @@ public:
     RenderHost();
     ~RenderHost();
 
+    inline static int  getId() { return ms_obj->af::Render::getId();}
+    inline static const std::string & getName() { return ms_obj->af::Render::getName();}
+
     static void setAddressPort( uint16_t i_port) { ms_obj->address.setPort( i_port);}
 
     inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
-    inline static void dispatchMessage( af::Msg * i_msg);
+    static void dispatchMessage( af::Msg * i_msg);
 
     inline static af::Msg * acceptWait() { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_wait);    }
     inline static af::Msg * acceptTry()  { return ms_msgAcceptQueue->popMsg( af::AfQueue::e_no_wait); }
@@ -29,11 +32,11 @@ public:
     static void setRegistered( int i_id);
     static void connectionLost();
 
-    inline static int  getId() { return ms_obj->af::Render::getId();}
-
     static void setUpdateMsgType( int i_type);
 
     static void update();
+
+    static void refresh();
 
     static void runTask( af::Msg * i_msg);
 

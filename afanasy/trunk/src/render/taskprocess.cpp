@@ -1,6 +1,7 @@
 #include "taskprocess.h"
 
-#include <QtCore/QDir>
+#include <sys/types.h>
+#include <sys/wait.h>
 
 #include "../include/afanasy.h"
 
@@ -9,213 +10,201 @@
 #include "../libafanasy/msgclasses/mctaskoutput.h"
 #include "../libafanasy/msgclasses/mctaskup.h"
 
-#include "../libafqt/qmsg.h"
-#include "../libafqt/qthreadclientsend.h"
-
 #include "renderhost.h"
 #include "parserhost.h"
-
-extern afqt::QThreadClientSend * pCLIENT;
-extern RenderHost * pRENDER;
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
-
-TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
-   m_taskexec( i_taskExec),
-   service( *i_taskExec),
-   parser( NULL),
-   timer( this),
-   update_status( af::TaskExec::UPPercent),
-   stop_time( 0),
-   zombie( false)
+/*
+void thread_entry_point( void *i_parameter )
 {
-   setProcessChannelMode( QProcess::MergedChannels);
-//
-// connect process
-   connect( this, SIGNAL( finished( int , QProcess::ExitStatus ) ),
-            this, SLOT( p_finished( int , QProcess::ExitStatus ) ));
-   connect( this, SIGNAL( readyRead() ),
-            this, SLOT( p_readyRead() ));
+   TaskProcess * taskprocess = (TaskProcess *) i_parameter;
+   taskprocess->listen();
+}
+*/
+TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
+    m_taskexec( i_taskExec),
+    m_service( *i_taskExec),
+    m_parser( NULL),
+    m_update_status( af::TaskExec::UPPercent),
+    m_stop_time( 0),
+    m_zombie( false)
+{
+    std::string command = m_service.getCommand();
+    std::string wdir    = m_service.getWDir();
 
-//
-// connect timer
-   connect( &timer, SIGNAL( timeout() ), this, SLOT( sendTaskSate() ));
-   timer.setInterval( af::Environment::getRenderUpdateTaskPeriod() * 1000);
+    m_parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());//, "AF_PROGRESS %d");
 
-   QString command = afqt::stoq( service.getCommand());
-   QString wdir    = afqt::stoq( service.getWDir());
-
-   parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());//, "AF_PROGRESS %d");
-
-   // Process task working directory:
-   if( false == wdir.isEmpty())
-   {
+    // Process task working directory:
+    if( wdir.size())
+    {
 #ifdef WINNT
-      if( wdir.startsWith("/"))
-      {
-         AFERRAR("Working directory starts with '/':\n%s\nMay be it is not translated from UNIX?", wdir.toUtf8().data())
-      }
-      else if( wdir.startsWith("\\\\"))
-      {
-         AFERRAR("Working directory starts with '\\\\':\n%s\nUNC path can't be current. May be incorrect translation?", wdir.toUtf8().data())
-      }
-      else
+        if( wdir.find('/') == 0 )
+        {
+            AFERRAR("Working directory starts with '/':\n%s\nMay be it is not translated from UNIX?", wdir.c_str())
+            wdir.clear();
+        }
+        else if( wdir.find('\\') == 0)
+        {
+            AFERRAR("Working directory starts with '\\':\n%s\nUNC path can't be current. May be incorrect translation?", wdir.c_str())
+            wdir.clear();
+        }
+        else
 #endif
-      if( false == QDir( wdir).exists())
-      {
-         AFERRAR("Working directory does not exists:\n%s", wdir.toUtf8().data())
-      }
-      else
-      {
-         setWorkingDirectory( wdir);
-      }
-   }
+        if( false == af::pathIsFolder( wdir))
+        {
+            AFERRAR("Working directory does not exists:\n%s", wdir.c_str())
+            wdir.clear();
+        }
+    }
 
-   printf("\nStarting:\n ");
-   m_taskexec->stdOut( false);
-   if( af::Environment::isVerboseMode()) printf("%s\n", command.toUtf8().data());
+    printf("\nStarting:\n ");
+    m_taskexec->stdOut( false);
+    if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
-#ifdef WINNT
-//   args << "/c" << command;
-//   args << "/c" << command.replace("\"","\"\"\"");
-//   start( "cmd.exe", args, QIODevice::ReadWrite);
-   start( QString("cmd.exe /c %1").arg(command), QIODevice::ReadWrite);
-//   start( command, QIODevice::ReadWrite);
-   setupChildProcess();
-#else
-   QStringList args;
-   args << "-c" << command;
-   start( "/bin/bash", args, QIODevice::ReadWrite);
-#endif
+    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_output);
 
-   timer.start();
+//    m_thread->Start( thread_entry_point, this);
 }
 
 TaskProcess::~TaskProcess()
 {
-   update_status = 0;//af::TaskExec::UPRenderDeregister;
-   timer.stop();
+   m_update_status = 0;//af::TaskExec::UPRenderDeregister;
    killProcess();
 
    if( m_taskexec    != NULL  ) delete m_taskexec;
-   if( parser  != NULL  ) delete parser;
+   if( m_parser  != NULL  ) delete m_parser;
+
+//   m_thread->Join();
 
    AFINFO("TaskProcess:~TaskProcess()")
 }
 
-void TaskProcess::p_finished( int exitCode, QProcess::ExitStatus exitStatus)
+void TaskProcess::processFinished( int exitCode)
 {
-   if( update_status == 0 ) return;
-   printf("\nFinished: "); m_taskexec->stdOut( false);
+    m_pid = 0;
+    if( m_update_status == 0 ) return;
+    printf("\nFinished: "); m_taskexec->stdOut( false);
 
-   p_readyRead();
+    readProcess();
 
-   if(( exitStatus != QProcess::NormalExit ) || ( stop_time != 0 ))
+   if(/*( exitStatus != QProcess::NormalExit ) || */( m_stop_time != 0 ))
    {
       printf("Task terminated/killed.\n");
-      if( update_status != af::TaskExec::UPFinishedParserError )
-         update_status = af::TaskExec::UPFinishedCrash;
+      if( m_update_status != af::TaskExec::UPFinishedParserError )
+         m_update_status = af::TaskExec::UPFinishedCrash;
    }
    else
    {
       if( exitCode != 0)
       {
-         update_status = af::TaskExec::UPFinishedError;
+         m_update_status = af::TaskExec::UPFinishedError;
          printf("Error: exitcode = %d.\n", exitCode);
       }
-      else if( parser->isBadResult())
+      else if( m_parser->isBadResult())
       {
-         update_status = af::TaskExec::UPFinishedParserBadResult;
-         printf("Error: Bad result from parser (exitcode = %d).\n", exitCode);
+         m_update_status = af::TaskExec::UPFinishedParserBadResult;
+         printf("Error: Bad result from m_parser (exitcode = %d).\n", exitCode);
       }
       else
       {
-         update_status = af::TaskExec::UPFinishedSuccess;
+         m_update_status = af::TaskExec::UPFinishedSuccess;
          printf("Success: exitcode = %d.\n", exitCode);
       }
    }
    sendTaskSate();
 }
-
-void TaskProcess::p_readyRead()
+/*
+void TaskProcess::listen()
 {
-   std::string output = readAll().data();
+    printf("TaskProcess::listen()\n");
+    int readsize = fread( m_readbuffer, m_readbuffer_size, 1, m_io_output );
+    fwrite( m_readbuffer, readsize, 1, stderr);
+}
+*/
+void TaskProcess::readProcess()
+{
+//    return;
+
+    printf("TaskProcess::readProcess()\n");
+    printf("############################\n");
+    std::cout.flush();
+    int readsize = fread( m_readbuffer, 1, m_readbuffer_size, m_io_output );
+    fwrite( "What a fuck ???\n", 1, strlen( "What a fuck ???\n"), stdout);
+//    fwrite( m_readbuffer, 1, readsize, stdout);
+    std::cout.flush();
+    printf("\n############################\n");
+    std::cout.flush();
+
+    return;
+
+   std::string output;// = readAll().data();
    if( output.size() == 0 ) return;
-   parser->read( output);
+   m_parser->read( output);
 
    if( m_taskexec->getListenAddressesNum())
    {
 #ifdef AFOUTPUT
 printf("Sending output to addresses:");
 #endif
-      af::MCTaskOutput mctaskoutput( pRENDER->getName(), m_taskexec->getJobId(), m_taskexec->getBlockNum(), m_taskexec->getTaskNum(), output.size(), output.data());
-      const std::list<af::Address> * addresses = m_taskexec->getListenAddresses();
-      for( std::list<af::Address>::const_iterator it = addresses->begin(); it != addresses->end(); it++)
-      {
-#ifdef AFOUTPUT
-printf(" ");(*it).stdOut();
-#endif
-         if( pCLIENT) pCLIENT->send( new afqt::QMsg( af::Msg::TTaskOutput, &mctaskoutput, false, &(*it)));
-      }
-#ifdef AFOUTPUT
-printf("\n");
-#endif
+      af::MCTaskOutput mctaskoutput( RenderHost::getName(), m_taskexec->getJobId(), m_taskexec->getBlockNum(), m_taskexec->getTaskNum(), output.size(), output.data());
+      af::Msg * msg = new af::Msg( af::Msg::TTaskOutput, &mctaskoutput);
+      msg->setAddresses( *m_taskexec->getListenAddresses());
+      RenderHost::dispatchMessage( msg);
    }
 
-   if( parser->hasWarning() && (update_status != af::TaskExec::UPWarning) && (update_status != af::TaskExec::UPFinishedParserError))
+   if( m_parser->hasWarning() && (m_update_status != af::TaskExec::UPWarning) &&
+           (m_update_status != af::TaskExec::UPFinishedParserError))
    {
       printf("Warning: Parser notification.\n");
-      update_status = af::TaskExec::UPWarning;
+      m_update_status = af::TaskExec::UPWarning;
    }
-   if( parser->hasError() && ( stop_time == 0 ))
+   if( m_parser->hasError() && ( m_stop_time == 0 ))
    {
-      printf("Error: Bad result from parser. Stopping task.\n");
-      update_status = af::TaskExec::UPFinishedParserError;
+      printf("Error: Bad result from m_parser. Stopping task.\n");
+      m_update_status = af::TaskExec::UPFinishedParserError;
       stop();
    }
 }
 
 void TaskProcess::sendTaskSate()
 {
-   if( pCLIENT == NULL ) return;
-   if( update_status == 0 ) return;
+    if( m_update_status == 0 ) return;
 
-   int    type = af::Msg::TTaskUpdatePercent;
-   bool   toRecieve = false;
-   char * stdout_data = NULL;
-   int    stdout_size = 0;
+    int    type = af::Msg::TTaskUpdatePercent;
+    bool   toRecieve = false;
+    char * stdout_data = NULL;
+    int    stdout_size = 0;
 
-   if(( update_status != af::TaskExec::UPPercent ) &&
-      ( update_status != af::TaskExec::UPWarning ))
-   {
-      timer.setInterval( 10 * af::Environment::getRenderUpdateTaskPeriod() * 1000);
-      type = af::Msg::TTaskUpdateState;
-      toRecieve = true;
-      if( parser) stdout_data = parser->getData( &stdout_size);
-   }
+    if(( m_update_status != af::TaskExec::UPPercent ) &&
+        ( m_update_status != af::TaskExec::UPWarning ))
+    {
+        type = af::Msg::TTaskUpdateState;
+        toRecieve = true;
+        if( m_parser) stdout_data = m_parser->getData( &stdout_size);
+    }
 
-   int percent        = 0;
-   int frame          = 0;
-   int percentframe   = 0;
+    int percent        = 0;
+    int frame          = 0;
+    int percentframe   = 0;
 
-   if( parser)
-   {
-      percent        = parser->getPercent();
-      frame          = parser->getFrame();
-      percentframe   = parser->getPercentFrame();
-   }
+    if( m_parser)
+    {
+        percent        = m_parser->getPercent();
+        frame          = m_parser->getFrame();
+        percentframe   = m_parser->getPercentFrame();
+    }
 
-   af::MCTaskUp taskup(
-                     pRENDER->getId(),
+    af::MCTaskUp taskup(
+                     RenderHost::getId(),
 
                      m_taskexec->getJobId(),
                      m_taskexec->getBlockNum(),
                      m_taskexec->getTaskNum(),
                      m_taskexec->getNumber(),
 
-                     update_status,
+                     m_update_status,
                      percent,
                      frame,
                      percentframe,
@@ -224,47 +213,82 @@ void TaskProcess::sendTaskSate()
                      stdout_data
                   );
 
-   afqt::QMsg * msg = new afqt::QMsg( type, &taskup, toRecieve);
-   //printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
-   pCLIENT->send( msg);
-}
+    af::Msg * msg = new af::Msg( type, &taskup);
+    if( toRecieve) msg->setReceiving();
 
-void TaskProcess::stop( bool noStatusUpdate)
-{
-   if( noStatusUpdate ) update_status = 0;
+    printf("TaskProcess::sendTaskSate:\n");msg->stdOut();printf("\n");
 
-   // Store the time when task was asked to be stopped (was asked first time)
-   if( stop_time == 0 ) stop_time = time(NULL);
-
-   // Return if task is not running
-   if( pid() == 0 ) return;
-
-   // Trying to terminate() first, and only if no response after some time, then perform kill()
-   terminate();
+    RenderHost::dispatchMessage( msg);
 }
 
 void TaskProcess::refresh()
 {
-   if( stop_time )
-   {
-      if( pid() == 0 ) zombie = true;
-      else if( time( NULL) - stop_time > AFRENDER::TERMINATEWAITKILL ) killProcess();
-   }
+    printf("TaskProcess::refresh():\n");
+
+    if( m_pid == 0 )
+    {
+        return;
+    }
+
+    int status;
+    pid_t pid = waitpid( m_pid, &status, WNOHANG);
+
+    if( pid == 0 )
+    {
+        readProcess();
+        sendTaskSate();
+    }
+    else if( pid == m_pid )
+    {
+        processFinished( status);
+    }
+    else if( pid == -1 )
+    {
+        AFERRPE("TaskProcess::refresh(): waitpid: ")
+    }
+
+    if( m_stop_time )
+    {
+        if( m_pid == 0 ) m_zombie = true;
+        else if( time( NULL) - m_stop_time > AFRENDER::TERMINATEWAITKILL ) killProcess();
+    }
+}
+
+void TaskProcess::stop( bool noStatusUpdate)
+{
+   if( noStatusUpdate ) m_update_status = 0;
+
+   // Store the time when task was asked to be stopped (was asked first time)
+   if( m_stop_time == 0 ) m_stop_time = time(NULL);
+
+   // Return if task is not running
+   if( m_pid == 0 ) return;
+
+   // Trying to terminate() first, and only if no response after some time, then perform kill()
+#ifdef UNIX
+   killpg( getpgid( m_pid), SIGTERM);
+#else
+   CloseHandle( hJob );
+#endif
 }
 
 void TaskProcess::killProcess()
 {
-   if( pid() == 0 ) return;
-   printf("KILLING NOT TERMINATED TASK.\n");
-   kill();
+    if( m_pid == 0 ) return;
+    printf("KILLING NOT TERMINATED TASK.\n");
+#ifdef UNIX
+   killpg( getpgid( m_pid), SIGKILL);
+#else
+   CloseHandle( hJob );
+#endif
 }
 
 void TaskProcess::getOutput( af::Msg & msg) const
 {
-   if( parser != NULL)
+   if( m_parser != NULL)
    {
       int size;
-      char *data = parser->getData( &size);
+      char *data = m_parser->getData( &size);
       if( size > 0)
       {
          msg.setData( size, data);
@@ -286,6 +310,6 @@ fflush( stdout);
    }
    else
    {
-      msg.setString("Render: parser is NULL.");
+      msg.setString("Render: m_parser is NULL.");
    }
 }

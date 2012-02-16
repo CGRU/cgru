@@ -405,8 +405,12 @@ static const char * TNAMES[]; ///< Type names.
         { address = i_address;}
 
     /// Set message address to \c client
-    inline void setAddress( const Client* client)
-        { address = client->getAddress();}
+    inline void setAddress( const Client* i_client)
+        { address = i_client->getAddress();}
+
+    /// Set message address to \c client
+    inline void setAddresses( const std::list<Address> & i_addresses)
+        { addresses = i_addresses;}
 
     /// Add dispatch address
     inline void addAddress( const Client* client)

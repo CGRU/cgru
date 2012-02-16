@@ -1,21 +1,10 @@
 #include "renderhost.h"
 
-#include <QtNetwork/QTcpSocket>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "pyres.h"
 #include "res.h"
-
-#ifdef WINNT
-#include <QtCore/QDir>
-#include <QtCore/QFile>
-#include <QtCore/QString>
-#include <QtCore/QStringList>
-#endif
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -168,6 +157,14 @@ void RenderHost::connectionLost()
 void RenderHost::setUpdateMsgType( int i_type)
 {
     ms_updateMsgType = i_type;
+}
+
+void RenderHost::refresh()
+{
+    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); it++)
+    {
+        (*it)->refresh();
+    }
 }
 
 void RenderHost::update()

@@ -10,6 +10,15 @@
 #include <sys/mount.h>
 #include <sys/sysctl.h>
 
+/* All this IOKit stuff is for the disk drives statistics. */
+#include <CoreFoundation/CoreFoundation.h>
+#include <IOKit/IOKitLib.h>
+#include <IOKit/storage/IOBlockStorageDriver.h>
+#include <IOKit/storage/IOMedia.h>
+#include <IOKit/IOBSD.h>
+
+#include <algorithm>
+
 /* WARNING: from gataddrs man pages on Mac Os X
    If both <net/if.h> and <ifaddrs.h> are being included, <net/if.h> must be
    included before <ifaddrs.h>.
@@ -23,181 +32,229 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-host_cpu_load_info_data_t cpuload;
+host_cpu_load_info_data_t s_cpu_load_stats = {0};
 
-#define pagetok(size) ((size)<<pageshift)
-vm_statistics_data_t vm_stats;
-unsigned int maxmem;
-int pageshift  =  0;
-int pagesize   =  0;
-int swappgsin  = -1;
-int swappgsout = -1;
-
-struct res
+struct network_statistics_s
 {
-   int user;
-   int nice;
-   int system;
-   int idle;
-   int iowait;
-   int irq;
-   int softirq;
-}r0,r1;
+   uint64_t total_recv;
+   uint64_t total_send;
+} network_statistics = { 0, 0 };
 
-struct net
+/* most drives we will record */
+#define MAXDRIVES 16
+
+/* largest drive name we allow */
+#define MAXDRIVENAME 31
+
+static mach_port_t s_master_port;
+
+static unsigned s_init = 0;
+static unsigned s_num_drives = 0;
+static struct timeval s_cur_time, s_last_time;
+
+/* Statistics from one disk drive. */
+struct drivestats
 {
-   int recv;
-   int send;
-} network_statistics[2] = { {0,0}, {0,0} };
+   uint64_t read, write;
+   /* uint64_t total_time; */
+} s_disk_stats = {0};
 
-unsigned int memtotal, memfree, membuffers, memcached, swaptotal, swapfree;
+/* declarations, this is taken from iostat.h (DARWIN) . */
+static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write);
+static double compute_etime( struct timeval cur_time, struct timeval prev_time);
 
-int now = 0;
-
-void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
+void GetResources( af::Host & host, af::HostRes & hres, bool , bool verbose)
 {
+   /* Will be set to 1 after first run. */
+   static unsigned s_init = 0;
+
+   /* Some variables that we should get only once. NOTE: not sure this
+      really worth it. */
+   static uint64_t s_hz = 0;
+   static uint64_t s_physical_memory = 0;
+   static unsigned s_pagesize = 0;
+
+   /*
+      Start by getting the time interval since the last 'GetResources' call. 
+      if this is the first call, the time interval is computed since the 
+      last boot of this machine. This means the GetResources will return the
+      average stats since the boot of this machine when called for the first
+      time.
+   */
+
+   s_last_time = s_cur_time;
+   gettimeofday(&s_cur_time, NULL);
+   double etime = compute_etime(s_cur_time, s_last_time);
+
+   if( !s_init ) /* not thread safe but not really important. */
+   {
+      /*
+       * This is the first time we are called.
+       * Set the busy time to the system boot time, so the stats are
+       * calculated since system boot.
+       */
+      size_t sizeof_cur_time = sizeof(s_cur_time);
+      if (sysctlbyname("kern.boottime", &s_cur_time, &sizeof_cur_time, NULL, 0) == -1) 
+      {
+         perror( "sysctlbyname(\"kern.bootime\",...) failed: " );
+         return;
+      }
+
+      size_t size = sizeof(s_hz);
+      if( sysctlbyname("hw.cpufrequency", &s_hz, &size, NULL, 0) != 0)
+      {
+         perror( "sysctlbyname(\"hw.cpufrequency\",..) failed: " );
+         s_hz = 1000 << 20;
+      }
+
+      size = sizeof(s_physical_memory);
+      if( sysctlbyname("hw.memsize", &s_physical_memory, &size, NULL, 0) != 0 )
+      {
+         perror( "sysctlbyname(\"hw.memsize\",..) failed: " );
+      }
+      else
+      {
+         s_physical_memory /= (1024*1024);
+      }
+
+      s_pagesize = getpagesize();
+
+      s_init = 1;
+   }
+
    //
    // CPU info:
    //
-   if( getConstants)
-   {
-      // number of pocessors
-      host.cpu_num = sysconf(_SC_NPROCESSORS_ONLN);
 
-      // frequency of first pocessor
-      uint64_t hz;
-      size_t size = sizeof(hz);
-      if( sysctlbyname("hw.cpufrequency", &hz, &size, NULL, 0) == 0)
-         host.cpu_mhz = hz >> 20;
-      else 
-         perror( "sysctlbyname" ); 
-   }
+   /* This should be a constant obviously, unless you plan to remove a CPU
+      while rendering. :) */
+   static unsigned num_processors = sysconf(_SC_NPROCESSORS_ONLN);
+   host.cpu_num = num_processors;
+   host.cpu_mhz = s_hz >> 20;
+
    //
    // Memory & Swap total and usage:
    //
    {
-      if( getConstants )
-      {
-         size_t size = sizeof(maxmem);
-         sysctlbyname("hw.physmem", &maxmem, &size, NULL, 0);
-         pagesize = getpagesize();
+      vm_statistics_data_t vm_stats;
+      unsigned memtotal=0, memfree=0;
+      unsigned membuffers=0, memcached=0;
 
-         memtotal = maxmem >> 10;
-         printf("Memory Total = %u KBytes\n", memtotal);
-         printf("Memory Page Size = %u Bytes\n", pagesize);
+      memtotal = s_physical_memory;
+      unsigned count = HOST_VM_INFO_COUNT;
 
-         pageshift = 0;
-         while(( pagesize >>= 1) > 0) pageshift++;
-         pageshift -= 10;
-         printf("Memory Page Shift = %d\n", pageshift);
-      }
-      unsigned int count = HOST_VM_INFO_COUNT;
-      if( host_statistics( mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) == KERN_SUCCESS)
+      if( host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) == KERN_SUCCESS)
       {
-         memfree    = pagetok( vm_stats.free_count);
+         memfree = vm_stats.free_count;
          membuffers = 0;
-         memcached  = pagetok( vm_stats.inactive_count);
-         if( swappgsin < 0)
-         {
-            swapfree = 0;
-         }
-         else
-         {
-            int swapin  = pagetok( vm_stats.pageins  - swappgsin );
-            int swapout = pagetok( vm_stats.pageouts - swappgsout);
-            swapfree = (swapin + swapout);// >> 10;
-         }
-         swappgsin  = vm_stats.pageins;
-         swappgsout = vm_stats.pageouts;
+         memcached = vm_stats.inactive_count;
       }
       else
       {
-         AFERRPE("GetResources: host_satistics( HOST_VM_INFO) failure:");
+        perror("host_satistics(HOST_VM_INFO) failed");
       }
 
-      if( getConstants )
+      /* size of data in bytes. */
+      xsw_usage vmusage = {0};
+      size_t size = sizeof(vmusage);
+      if( sysctlbyname("vm.swapusage", &vmusage, &size, NULL, 0)!=0 )
       {
-         host.mem_mb  = memtotal >> 10;
-         host.swap_mb = 0;
+         perror( "unable to get swap usage by calling sysctlbyname(\"vm.swapusage\",...)" ); 
       }
-      hres.mem_free_mb    = ( memfree + memcached + membuffers ) >> 10;
-      hres.mem_cached_mb  = memcached  >> 10;
-      hres.mem_buffers_mb = membuffers >> 10;
-      hres.swap_used_mb   = swapfree / af::Environment::getRenderUpdateSec();
-   }//memory
+
+      /* A convertion factor to bring us to MBs */
+      host.mem_mb = s_physical_memory;
+      host.swap_mb = vmusage.xsu_total >> 20;
+      hres.mem_free_mb = (memfree * s_pagesize) >> 20;
+      hres.mem_cached_mb = (memcached  * s_pagesize) >> 20;
+      hres.mem_buffers_mb = (membuffers * s_pagesize) >> 20;
+      hres.swap_used_mb = vmusage.xsu_used  >> 20;
+   }
 
    //
    // CPU usage:
    //
    {
-      res * rl = &r0; res * rn = &r1;
-      if( now ) {     rl = &r1;       rn = &r0; }
-
       unsigned int count = HOST_CPU_LOAD_INFO_COUNT;
+      host_cpu_load_info_data_t current_cpu_load;
 
-      if( host_statistics( mach_host_self(), HOST_CPU_LOAD_INFO, (host_info_t)&cpuload, &count) == KERN_SUCCESS)
+      if( host_statistics(
+            mach_host_self(), HOST_CPU_LOAD_INFO,
+            (host_info_t)&current_cpu_load, &count) == KERN_SUCCESS)
       {
-         rn->user   = (unsigned long) (cpuload.cpu_ticks[CPU_STATE_USER]);
-         rn->nice   = (unsigned long) (cpuload.cpu_ticks[CPU_STATE_NICE]);
-         rn->system = (unsigned long) (cpuload.cpu_ticks[CPU_STATE_SYSTEM]);
-         rn->idle   = (unsigned long) (cpuload.cpu_ticks[CPU_STATE_IDLE]);
+         /* NOTE: we seem to have no 'iowait', "sofirq" and 'irq' on Mac Os X ? */
+         unsigned states[] = { CPU_STATE_USER, CPU_STATE_IDLE, CPU_STATE_SYSTEM,
+            CPU_STATE_NICE };
 
-         int user    = rl->user     - rn->user;
-         int nice    = rl->nice     - rn->nice;
-         int system  = rl->system   - rn->system;
-         int idle    = rl->idle     - rn->idle;
-         int iowait  = rl->iowait   - rn->iowait;
-         int irq     = rl->irq      - rn->irq;
-         int softirq = rl->softirq  - rn->softirq;
-         int total = user + nice + system + idle + iowait + irq + softirq;
-         if( total == 0 ) total = 1;
+         uint64_t intervals[ sizeof(states)/sizeof(states[0]) ];
+         uint64_t total = 0;
 
-         hres.cpu_user    = ( 100 * user    ) / total;
-         hres.cpu_nice    = ( 100 * nice    ) / total;
-         hres.cpu_system  = ( 100 * system  ) / total;
-         hres.cpu_idle    = ( 100 * idle    ) / total;
-         hres.cpu_iowait  = ( 100 * iowait  ) / total;
-         hres.cpu_irq     = ( 100 * irq     ) / total;
-         hres.cpu_softirq = ( 100 * softirq ) / total;
+         for( unsigned i=0; i<sizeof(states)/sizeof(states[0]); i++ )
+         {
+            unsigned s = states[i];
+            intervals[i] =
+               current_cpu_load.cpu_ticks[s] - s_cpu_load_stats.cpu_ticks[s];
+
+            total += intervals[i];
+
+            /* Update our counts for next iteration. */
+            s_cpu_load_stats.cpu_ticks[i] = current_cpu_load.cpu_ticks[i];
+         }
+
+         if( total == 0 )
+            total = 1;
+
+         hres.cpu_user    = ( 100 * intervals[0] ) / total;
+         hres.cpu_idle    = ( 100 * intervals[1] ) / total;
+         hres.cpu_system  = ( 100 * intervals[2] ) / total;
+         hres.cpu_nice    = ( 100 * intervals[3] ) / total;
+         hres.cpu_iowait  = 0;
+         hres.cpu_irq     = 0;
+         hres.cpu_softirq = 0;
       }
       else
       {
          AFERRPE("GetResources: host_satistics( HOST_CPU_LOAD_INFO) failure:");
       }
+
       // CPU Load Average:
       double loadavg[3] = { 0, 0, 0 };
       int nelem = getloadavg( loadavg, 3);
-      if( nelem < 2 ) loadavg[1] = loadavg[0];
-      if( nelem < 3 ) loadavg[2] = loadavg[1];
-      if( loadavg[0] > 25.0 ) loadavg[0] = 25.0;
-      if( loadavg[1] > 25.0 ) loadavg[1] = 25.0;
-      if( loadavg[2] > 25.0 ) loadavg[2] = 25.0;
-      hres.cpu_loadavg1 = 10.0 * loadavg[0];
-      hres.cpu_loadavg2 = 10.0 * loadavg[1];
-      hres.cpu_loadavg3 = 10.0 * loadavg[2];
-   }//cpu
+
+      /* FIXME: we need to put this in 0-255 range because we transmit these
+         values as 8 bit integers which is not really good. */
+      for( unsigned i=0; i<nelem; i++ )
+      {
+         double la = 10.0 * loadavg[0];
+
+         if( la > 255 )
+            la = 255;
+         else if( la < 0 )
+            la = 0;
+
+         hres.cpu_loadavg[i] = la;
+      }
+   }
 
    //
    // HDD space:
    //
    {
-      static char path[4096];
-      if( getConstants )
-      {
-         sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().c_str());
-         printf("HDD Space Path = '%s'\n", path);
-      }
+      static char path[MAXPATHLEN+1];
+      snprintf( path, MAXPATHLEN, "%s",
+         af::Environment::getRenderHDDSpacePath().c_str());
+
       struct statfs fsd;
-      if( statfs( path, &fsd) < 0)
+      if( statfs(path, &fsd) >= 0 )
       {
-         perror( "fs status:");
+         host.hdd_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
+         hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
       }
       else
       {
-         if( getConstants) host.hdd_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
-         hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
+         perror( "statfs() failed : ");
       }
-   }//hdd
+   }
 
    /*
       Network.
@@ -208,15 +265,10 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    hres.net_recv_kbsec = 0;
    hres.net_send_kbsec = 0;
 
+   struct ifaddrs *addr;
+   if( getifaddrs( &addr ) == 0 )
    {
-      net *nl = &network_statistics[now];
-      net *nn = &network_statistics[1-now];
-
-      struct ifaddrs *addr;
-      if( getifaddrs( &addr ) != 0 )
-         return;
-
-      unsigned net_recv = 0,  net_send = 0;
+      uint64_t net_recv = 0,  net_send = 0;
 
       for( struct ifaddrs *it = addr; it; it = it->ifa_next )
       {
@@ -236,24 +288,147 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          net_send += stats->ifi_obytes;
       }
 
-      nn->recv = net_recv;
-      nn->send = net_send;
-      net_recv = nn->recv - nl->recv;
-      net_send = nn->send - nl->send;
+      int64_t recv_interval = net_recv - network_statistics.total_recv;
+      int64_t send_interval = net_send - network_statistics.total_send;
 
-      if( net_recv >= 0 )
-      {
-         hres.net_recv_kbsec = net_recv / af::Environment::getRenderUpdateSec();
-         hres.net_recv_kbsec /= 1024;
-      }
+      network_statistics.total_recv = net_recv;
+      network_statistics.total_send = net_send;
 
-      if( net_send >= 0 )
-      {
-         hres.net_send_kbsec = net_send / af::Environment::getRenderUpdateSec();
-         hres.net_send_kbsec /= 1024;
-      }
+      hres.net_recv_kbsec = recv_interval / (etime*1024);
+      hres.net_send_kbsec = send_interval / (etime*1024);
 
-      now = 1 - now;
+      freeifaddrs( addr );
+   }
+
+   uint64_t read=0, write=0;
+   if( get_drive_stats(read, write) ) 
+   {
+      uint64_t read_interval = read - s_disk_stats.read;
+      uint64_t write_interval = write - s_disk_stats.write;
+
+      s_disk_stats.read = read;
+      s_disk_stats.write = write;
+
+      hres.hdd_rd_kbsec = read_interval / (etime*1024);
+      hres.hdd_wr_kbsec = write_interval / (etime*1024);
+   }
+   else
+   {
+      hres.hdd_rd_kbsec = hres.hdd_wr_kbsec = 0;
    }
 }
+
+static bool get_drive_stats( uint64_t &o_read, uint64_t &o_write)
+{
+	mach_port_t master_port;
+
+	/*  Get the I/O Kit communication handle.  */
+	IOMasterPort(bootstrap_port, &master_port);
+
+	/* Get an iterator for IOMedia objects.  */
+	CFMutableDictionaryRef match = IOServiceMatching("IOMedia");
+	CFDictionaryAddValue( match, CFSTR(kIOMediaWholeKey), kCFBooleanTrue );
+
+	io_iterator_t drivelist;
+	kern_return_t status =
+		IOServiceGetMatchingServices(master_port, match, &drivelist);
+
+	if (status != KERN_SUCCESS)
+		return false;
+
+	CFNumberRef number;
+	CFDictionaryRef properties;
+	CFDictionaryRef statistics;
+
+	uint64_t value;
+	uint64_t total_time = 0;
+
+	io_registry_entry_t drive, parent;
+
+	while( drive = IOIteratorNext(drivelist) )
+   {
+      /* get drive's parent */
+      kern_return_t status =
+         IORegistryEntryGetParentEntry(drive, kIOServicePlane, &parent);
+
+      /* We don't need this one anymore. */
+      IOObjectRelease( drive );
+
+      if( status != KERN_SUCCESS )
+         continue;
+
+      if( !IOObjectConformsTo(parent, "IOBlockStorageDriver") )
+      {
+         /* Not a block storage device, skip. NOTE: do we need to
+            go to "more parents" if this one is not a block device ?? */
+         IOObjectRelease( parent );
+         continue;
+      }
+
+      /* get drive properties */
+      status =
+         IORegistryEntryCreateCFProperties(
+               parent,
+               (CFMutableDictionaryRef *)&properties,
+               kCFAllocatorDefault,
+               kNilOptions);
+
+      /* We don't need this one anymore. */
+      IOObjectRelease( parent );
+
+      if( status != KERN_SUCCESS )
+      {
+         continue;
+      }
+
+      /* get statistics from properties */
+      statistics = (CFDictionaryRef)
+         CFDictionaryGetValue(
+               properties, CFSTR(kIOBlockStorageDriverStatisticsKey));
+
+      if( !statistics )
+      {
+         CFRelease(properties);
+         continue;
+      }
+
+      if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
+                  CFSTR(kIOBlockStorageDriverStatisticsBytesReadKey))))
+      {
+         CFNumberGetValue(number, kCFNumberSInt64Type, &value);
+         o_read += value;
+      }
+
+      if ((number = (CFNumberRef)CFDictionaryGetValue(statistics,
+                  CFSTR(kIOBlockStorageDriverStatisticsBytesWrittenKey))))
+      {
+         CFNumberGetValue(number, kCFNumberSInt64Type, &value);
+         o_write += value;
+      }
+   }
+
+   return true;
+}
+
+static double
+compute_etime(struct timeval cur_time, struct timeval prev_time)
+{
+	struct timeval busy_time;
+	uint64_t busy_usec;
+	long double etime;
+
+	timersub(&cur_time, &prev_time, &busy_time);
+
+	busy_usec = busy_time.tv_sec;  
+
+	busy_usec *= 1000000;          
+	busy_usec += busy_time.tv_usec;
+	etime = busy_usec;
+	etime /= 1000000;
+
+	return(etime);
+}
+
+
+
 #endif

@@ -90,9 +90,7 @@ public:
    HostRes();
    ~HostRes();
 
-   uint8_t cpu_loadavg1;
-   uint8_t cpu_loadavg2;
-   uint8_t cpu_loadavg3;
+   uint8_t cpu_loadavg[3];
 
    uint8_t cpu_user;
    uint8_t cpu_nice;

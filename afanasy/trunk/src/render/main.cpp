@@ -16,12 +16,12 @@ extern bool AFRunning;
 #include <signal.h>
 void sig_pipe(int signum)
 {
-    AFERROR("SIGPIPE:");
+    AFERROR("AFRender SIGPIPE");
 }
 void sig_int(int signum)
 {
     if( AFRunning )
-        fprintf( stderr,"\nInterrupt signal catched.\n");
+        fprintf( stderr,"\nAFRender: Interrupt signal catched.\n");
     AFRunning = false;
 }
 //#####################################################################################
@@ -125,6 +125,8 @@ int main(int argc, char *argv[])
     while( AFRunning)
     {
         msgCase( RenderHost::acceptTry());
+
+        RenderHost::refresh();
 
         if( cycle % af::Environment::getRenderUpdateSec() == 0)
             RenderHost::update();

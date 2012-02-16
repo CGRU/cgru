@@ -1,7 +1,5 @@
 #pragma once
 
-#include <QtCore/QString>
-
 #include "../include/afjob.h"
 #include "../include/aftypes.h"
 

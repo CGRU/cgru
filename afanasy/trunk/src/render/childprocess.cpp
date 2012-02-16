@@ -1,5 +1,5 @@
 #include "childprocess.h"
-
+#if 0
 #include "../libafanasy/environment.h"
 
 #define AFOUTPUT
@@ -70,3 +70,4 @@ void ChildProcess::kill()
 //   QProcess::kill();
 #endif
 }
+#endif

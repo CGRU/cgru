@@ -1,5 +1,5 @@
 #pragma once
-
+#if 0
 #include <QtCore/QProcess>
 
 #ifdef WINNT
@@ -28,3 +28,4 @@ private:
    HANDLE hJob;
 #endif
 };
+#endif

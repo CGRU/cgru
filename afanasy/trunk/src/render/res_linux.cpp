@@ -7,501 +7,560 @@
 #include <stdlib.h>
 #include <sys/param.h>
 #include <sys/statfs.h>
-#include <sys/statvfs.h>
-
-#include <QtCore/QRegExp>
-
+#include <sys/sysinfo.h>
+#include <net/if.h>
+#include <ifaddrs.h>
 #include "../libafanasy/environment.h"
 
-#include "../libafqt/name_afqt.h"
+/*
+	Various helper funcuntions.
+*/
+static float get_cpu_frequency();
+static void get_disk_stats();
+static long get_sector_size();
+static bool get_network_statistics(
+   uint64_t &o_rx_packets, uint64_t &o_tx_packet );
 
-#define AFOUTPUT
-#undef AFOUTPUT
-#include "../include/macrooutput.h"
+static double compute_etime(struct timeval cur_time, struct timeval prev_time);
 
-const char filename_cpu_info[]   = "/proc/cpuinfo";
-const char filename_cpu_stat[]   = "/proc/stat";
-const char filename_mem_info[]   = "/proc/meminfo";
-const char filename_disk_stat[]  = "/proc/diskstats";
-const char filename_net_stat[]   = "/proc/net/dev";
-
-const char CpuMHz[]     = "cpu MHz";
-const char MemTotal[]   = "MemTotal:";
-const char MemFree[]    = "MemFree:";
-const char Buffers[]    = "Buffers:";
-const char Cached[]     = "Cached:";
-const char SwapTotal[]  = "SwapTotal:";
-const char SwapFree[]   = "SwapFree:";
-const char ifBytes[]    = "bytes";
-
-const int fbuffer_size = 1 << 16;
-char fbuffer[ fbuffer_size];
-int  fdata_len;
-
-bool readFile( const char * filename)
+/*
+   Structures to track CPU, hard disk and network statistics from
+   call to call.
+*/
+struct CpuStats
 {
-   int fd = open( filename, O_RDONLY);
-   bool success = false;
-   fdata_len = 0;
-   if( fd < 0) perror( filename);
-   else
-   {
-      fdata_len = read( fd, fbuffer, fbuffer_size);
-      if( fdata_len <= 0) perror( filename);
-      else success = true;
-      close( fd);
-   }
-   return success;
-}
-bool readAttr( const char * name, const char * data, int &pos, int & value, bool verbose = false)
-{
-   if( pos >= fdata_len) return false;
-   int namelen = strlen(name);
-   while( pos < fdata_len)
-   {
-      bool founded = false;
-      if( strncmp( name, data+pos, namelen) == 0)
-      {
-         pos += namelen + 1;
-         while( data[pos] == ' ') pos++;
-         value = atoi( data+pos);
-         if( verbose) printf("%s %d\n", name, value);
-         founded = true;
-      }
-      while(( pos < fdata_len) && ( data[pos++] != '\n'));
-      if( founded ) return true;
-   }
-   return false;
-}
-/*int scan( int & value, const char * data, bool verbose = false)
-{
-   int pos = 0;
-   while( data[pos] != ' ') pos++;
-   while( data[pos] == ' ') pos++;
-   value = atoi( data + pos);
-   if( verbose) printf("value = %d\n", value);
-   return pos;
-}*/
-bool nextLine( int & pos)
-{
-   while( pos < fdata_len ) if( fbuffer[pos++] == '\n') return true;
-   return false;
-}
-bool onWord( char character)
-{
-   static const char separators[] = {' ','\n','|',':'};
-   static const int  separators_num = 4;
-   for( int s = 0; s < separators_num; s++) if( character == separators[s]) return false;
-   return true;
-}
-bool nextWord( int & pos)
-{
-   bool word = onWord( fbuffer[pos++]);
-   while( pos < fdata_len )
-   {
-      if( word ) word = onWord( fbuffer[pos]);
-      else if( onWord( fbuffer[pos])) return true;
-      pos ++;
-   }
-   return false;
-}
+   uint64_t user;
+   uint64_t nice;
+   uint64_t system;
+   uint64_t idle;
+   uint64_t iowait;
+   uint64_t irq;
+   uint64_t softirq;
+} sg_cpu = {0};
 
-struct res
+
+struct DiskStats
 {
-   unsigned long long user;
-   unsigned long long nice;
-   unsigned long long system;
-   unsigned long long idle;
-   unsigned long long iowait;
-   unsigned long long irq;
-   unsigned long long softirq;
-} r0, r1;
+   uint64_t rd_sectors;         // Sectors read
+   uint64_t wr_sectors;         // Sectors written
+} sg_diskstats = {0};
 
-struct io{
-   unsigned long long rd_ios;             // Read I/O operations
-   unsigned long long rd_merges;          // Reads merged
-   unsigned long long rd_sectors;         // Sectors read
-   unsigned long long rd_ticks;           // Time in queue + service for read
-   unsigned long long wr_ios;             // Write I/O operations
-   unsigned long long wr_merges;          // Writes merged
-   unsigned long long wr_sectors;         // Sectors written
-   unsigned long long wr_ticks;           // Time in queue + service for write
-   unsigned long long ticks;              // Time of requests in queue
-   unsigned long long aveq;               // Average queue length
-} io0, io1;
-
-struct net
+struct NetStats
 {
-   int recv;
-   int send;
-} n0, n1;
+   uint64_t rx, tx;
+} sg_netstats = {0};
 
-int now = 0;
+static struct timeval sg_current_time = {0}, sg_last_time = {0};
 
-int memtotal, memfree, membuffers, memcached, swaptotal, swapfree;
+/*
+   GetResources
 
+   Main entry point in this file. All other functions are utilities
+*/
 void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
 {
-   //
-   // CPU info:
-   //
-   if( getConstants)
+   static unsigned s_init = 0;
+
+   static long s_sector_size = 512;
+   static float s_cpu_frequency = 2000;
+
+   if( !s_init )
    {
-      // number of pocessors
-      host.cpu_num = sysconf(_SC_NPROCESSORS_ONLN);
-      // frequency of first pocessor
-      if( readFile( filename_cpu_info))
+      /* This is the first time we are called.
+         Set the busy time to the system boot time, so the stats are
+         calculated since system boot.  */
+      struct timeval current;
+      gettimeofday( &current, 0x0 );
+
+      struct sysinfo info;
+      sysinfo( &info );
+      sg_current_time.tv_sec = current.tv_sec - info.uptime;
+      sg_current_time.tv_usec = 0; 
+
+      s_cpu_frequency = get_cpu_frequency();
+#if 0
+      /* in man pages of iostat they seem to say that block size in 
+         in /proc/diskstats is always 512 on newer linux kernels so
+         it is unrelated with the block size returned by statfs,
+         go figure. (TODO: RECHECK). */
+      s_sector_size = get_sector_size();
+#endif
+
+      s_init = 1;
+   }
+
+   /* Compute time inerval since last run. */
+   sg_last_time = sg_current_time;
+   gettimeofday(&sg_current_time, NULL);
+
+   double etime = compute_etime(sg_current_time, sg_last_time );
+
+   static unsigned num_processors = sysconf(_SC_NPROCESSORS_ONLN);
+   host.cpu_num = num_processors;
+   host.cpu_mhz = int32_t( s_cpu_frequency );
+
+   /*
+      Memory: we rely on sysinfo here. Used to rely on /proc/meminfo
+      but that didn't work on at least my ubuntu system.
+   */
+   struct sysinfo si;
+
+   if( sysinfo(&si) >= 0 )
+   {
+      /* NOTE: should we account for si.mem_unit in here ? */
+      host.mem_mb = si.totalram >> 20;
+      hres.mem_free_mb  = si.freeram  >> 20;
+      host.swap_mb = si.totalswap >> 20;
+      hres.mem_buffers_mb = si.bufferram >> 20;
+      hres.swap_used_mb  = ( si.totalswap - si.freeswap ) >> 20;
+      hres.mem_cached_mb  = 0;
+   }
+   else
+   {
+      perror( "sysinfo() failed" );
+
+      host.mem_mb = hres.mem_free_mb  = host.swap_mb =
+         hres.mem_buffers_mb = hres.swap_used_mb  = 
+         hres.mem_cached_mb  = 0;
+   }
+
+   /*
+      CPU usage.
+
+      Only way is to read from /proc/stat. The first line, starting with
+      the "cpu" tag is the statistics for all the cpus. cat /proc/stat for
+      a quick peak.
+   */
+   FILE *cpufd = ::fopen( "/proc/stat", "r" );
+   if( cpufd )
+   {
+      char buffer[200];
+      buffer[sizeof(buffer)-1] = '\0';
+
+      while( fgets( buffer, sizeof(buffer)-1, cpufd) )
       {
-         int pos = 0;
-         int CpuMHz_len = strlen( CpuMHz);
-         while( pos < fdata_len)
+         if( strncmp(buffer, "cpu ", 4) != 0 )
+            continue;
+
+         static const char scan_fmt[] = "cpu %llu %llu %llu %llu %llu %llu %llu";
+
+         uint64_t user, nice, system, idle, iowait, irq, softirq;
+
+         int items = sscanf( buffer, scan_fmt,
+            &user, &nice, &system, &idle,
+            &iowait, &irq, &softirq);
+
+         if( items == 4 )
          {
-            if( strncmp( CpuMHz, fbuffer+pos, CpuMHz_len) == 0)
+            /* Seems possible on some systems. */
+            iowait = 0;
+            irq = 0;
+            softirq = 0;
+         }
+
+         uint64_t interval_user    = user     - sg_cpu.user;
+         uint64_t interval_nice    = nice     - sg_cpu.nice;
+         uint64_t interval_system  = system   - sg_cpu.system;
+         uint64_t interval_idle    = idle     - sg_cpu.idle;
+         uint64_t interval_iowait  = iowait   - sg_cpu.iowait;
+         uint64_t interval_irq     = irq      - sg_cpu.irq;
+         uint64_t interval_softirq = softirq  - sg_cpu.softirq;
+
+         uint64_t total = interval_user + interval_nice + interval_system  +
+            interval_idle + interval_iowait + interval_irq + interval_softirq;
+
+         if( total == 0)
+            total = 1;
+
+         hres.cpu_user    = ( interval_user    * 100 ) / total;
+         hres.cpu_nice    = ( interval_nice    * 100 ) / total;
+         hres.cpu_system  = ( interval_system  * 100 ) / total;
+         hres.cpu_idle    = ( interval_idle    * 100 ) / total;
+         hres.cpu_iowait  = ( interval_iowait  * 100 ) / total;
+         hres.cpu_irq     = ( interval_irq     * 100 ) / total;
+         hres.cpu_softirq = ( interval_softirq * 100 ) / total;
+
+         /* Upgrade totals for next iteration. */
+         sg_cpu.user = user;
+         sg_cpu.system = system;
+         sg_cpu.idle = idle;
+         sg_cpu.iowait = iowait;
+         sg_cpu.irq = irq;
+         sg_cpu.softirq = softirq;
+         sg_cpu.nice = nice;
+
+         break;
+      }
+
+      ::fclose( cpufd );
+   } 
+   else
+   {
+      perror( "unable to access /proc/stat so CPU statistics are unavailable" );
+   }
+
+   double loadavg[3] = { 0, 0, 0 };
+   int nelem = getloadavg( loadavg, 3);
+
+   /* FIXME: we need to put this in 0-255 range because we transmit these
+      values as 8 bit integers which is not really good. */
+   for( unsigned i=0; i<nelem; i++ )
+   {
+      loadavg[i] *= 10.0;
+      if( loadavg[i] > 255 ) loadavg[i] = 255;
+      if( loadavg[i] < 0 ) loadavg[i] = 0;
+
+      hres.cpu_loadavg[i] = uint8_t( loadavg[i] );
+   }
+
+   /*
+      get disk statistics.
+
+      TODO:
+      - Put this in a function.
+      - Get the good sector size.
+   */
+   {
+      static char path[MAXPATHLEN+1];
+      struct statfs fsd;
+      snprintf( path, MAXPATHLEN, "%s", af::Environment::getRenderHDDSpacePath().c_str());
+
+      if( statfs( path, &fsd) < 0)
+      {
+         perror( "statfs() failed");
+      }
+      else
+      {
+         host.hdd_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
+         hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
+      }
+
+      // io:
+      FILE *diskstats_fd = fopen( "/proc/diskstats", "r" ); 
+
+      hres.hdd_rd_kbsec = 0;
+      hres.hdd_wr_kbsec = 0;
+
+      if( diskstats_fd )
+      {
+         char buffer[200];
+         buffer[sizeof(buffer)-1] = '\0';
+
+         const char *disk_to_inspect = 
+            af::Environment::getRenderIOStatDevice().c_str();
+         bool all_disks = disk_to_inspect == 0x0 || strlen(disk_to_inspect)==0 ||
+            !strcmp(disk_to_inspect,"*");
+ 
+         uint64_t total_rd_sectors=0, total_wr_sectors=0, total_ticks=0;
+
+         while( fgets(buffer, sizeof(buffer)-1, diskstats_fd) )
+         {
+            char name[64];
+            int part_major, part_minor;
+
+            static const char scan_fmt[] = "%4d %4d %s %u %u %llu %u %u %u %llu %u %*u %u %u";
+
+            uint64_t rd_sectors, wr_sectors;
+            unsigned int rd_ios, rd_merges, rd_ticks;
+            unsigned int wr_ios, wr_merges, wr_ticks;
+            unsigned ticks, aveq;
+
+            int items = sscanf( buffer, scan_fmt,
+                  &part_major, &part_minor, name,
+                  &rd_ios, &rd_merges, &rd_sectors, &rd_ticks,
+                  &wr_ios, &wr_merges, &wr_sectors, &wr_ticks,
+                  &ticks, &aveq);
+
+            if( items != 13 )
+               continue;
+   
+            if( all_disks )
             {
-               pos += CpuMHz_len + 1;
-               while( fbuffer[pos] == ' ') pos++;
-               pos += 2;
-               host.cpu_mhz = atoi( fbuffer+pos);
+               /* For this to work correctly we have to ignore logical partitions
+                  and only account for the whole disk. The whole disk has a
+                  minor version of 0. */
+               if( part_minor != 0 )
+                  continue;
+            }
+            else if( strcmp(name, disk_to_inspect) != 0 )
+            {
+               continue;
+            }
+
+            total_rd_sectors += rd_sectors;
+            total_wr_sectors += wr_sectors;
+            total_ticks += ticks;
+
+            if( !all_disks )
+               break;
+         }
+
+         uint64_t interval_rd_sectors = total_rd_sectors - sg_diskstats.rd_sectors;
+         uint64_t interval_wr_sectors = total_wr_sectors - sg_diskstats.wr_sectors;
+
+         sg_diskstats.rd_sectors = total_rd_sectors;
+         sg_diskstats.wr_sectors = total_wr_sectors;
+
+         hres.hdd_rd_kbsec = int32_t(::ceil(interval_rd_sectors * s_sector_size / (1024*etime)));
+         hres.hdd_wr_kbsec = int32_t(::ceil(interval_wr_sectors * s_sector_size / (1024*etime)));
+
+         /* Could take this from elsewhere in this function but it it safer
+            to just re-do the addition in case we change code organisation. */
+
+         uint64_t cpu_ticks_total = sg_cpu.user + sg_cpu.system + sg_cpu.idle +
+            sg_cpu.iowait + sg_cpu.irq + sg_cpu.softirq;
+
+         uint64_t deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
+
+         if( deltams != 0 )
+         {
+            int busy = 100 * total_ticks / deltams;
+            if( busy > 100) busy = 100;
+            if( busy <   0) busy = 0;
+            hres.hdd_busy = busy;
+         }
+
+         if( !all_disks && feof(diskstats_fd) )
+         {
+            fprintf( stderr, "unable to find statistics about '%s' in '/proc/diskstats'.",
+               af::Environment::getRenderIOStatDevice().c_str() );
+         }
+
+         fclose(diskstats_fd);
+      }
+      else
+      {
+         perror( "can't open '/proc/diskstats' so no disk statistics will be shown" );
+      }
+   }
+
+   /*
+      Network.
+   */
+   uint64_t rx, tx;
+   if( get_network_statistics(rx, tx) )
+   {
+      uint64_t interval_rx = rx - sg_netstats.rx;
+      uint64_t interval_tx = tx - sg_netstats.tx;
+
+      sg_netstats.rx = rx;
+      sg_netstats.tx = tx;
+
+      hres.net_recv_kbsec = int(interval_rx / (1024*etime) );
+      hres.net_send_kbsec = int(interval_tx / (1024*etime) );
+   }
+
+	return;
+}
+
+/*
+   get_cpu_frequency
+
+   Gets CPU frequency information from /proc/cpuinfo. 
+*/
+static float get_cpu_frequency( )
+{
+   FILE *cpufd = ::fopen( "/proc/cpuinfo", "r" );
+
+   if( !cpufd )
+   {
+      perror( "unable to open '/proc/cpuinfo' so CPU freqyency is unavailable" );
+      return 2000.0f;
+   }
+
+   char buffer[200];
+   buffer[sizeof(buffer)-1] = '\0';
+
+   while( fgets(buffer, sizeof(buffer)-1, cpufd) )
+   {
+      if( strncmp(buffer, "cpu MHz", 7) != 0 )
+         continue;
+
+      float cpu_frequency;
+      int items = sscanf( buffer, "cpu MHz\t: %f\n", &cpu_frequency );
+
+      if( items == 1 )
+      {
+         fclose( cpufd );
+         return cpu_frequency;
+      }
+   }
+ 
+   fprintf( stderr, "couldn't find cpu frequency in '/proc/cpuinfo' file.\n" );
+
+   fclose( cpufd );
+
+   return 2000;
+}
+
+static double
+compute_etime(struct timeval cur_time, struct timeval prev_time)
+{
+	struct timeval busy_time;
+	u_int64_t busy_usec;
+	long double etime;
+
+	timersub(&cur_time, &prev_time, &busy_time);
+
+	busy_usec = busy_time.tv_sec;  
+	busy_usec *= 1000000;          
+	busy_usec += busy_time.tv_usec;
+	etime = busy_usec;
+	etime /= 1000000;
+
+	return(etime);
+}
+
+static long get_sector_size()
+{
+   struct statfs sfs;
+
+   /* FIXME: We assume that "/" is the correct path here but it could be
+      otherwise. Not sure how to link sda/hda to a path. */
+   if( statfs( "/",  &sfs ) == 0 )
+      return sfs.f_bsize;
+
+   perror( "unable to get disk's sector size" );
+
+   return 1024;
+}
+
+/*
+   get_network_statistics
+
+   Read the network statistics from /proc/net/dev
+
+   NOTES
+   - We are only interested in AF_LINK interfaces.
+*/
+static bool get_network_statistics(
+   uint64_t &o_rx_bytes, uint64_t &o_tx_bytes )
+{
+   const char *format_message_error = 
+      "can't understand /proc/net/dev format so network statistics are off.";
+
+   const char *file_name = "/proc/net/dev";
+
+   FILE *fd;
+   if( (fd = fopen(file_name, "r")) == 0x0 )
+   {
+      perror( "can't open /prov/net/dev for reading" );
+      return false;
+   }
+
+   const size_t buffer_size = 1024;
+   char buffer[buffer_size+1];
+   buffer[sizeof(buffer)-1] = '\0';
+
+   /* The first two lines are useless. */
+   if( !fgets(buffer, buffer_size, fd) ||
+       !fgets(buffer, buffer_size, fd) )
+   {
+      fprintf( stderr, format_message_error );
+      fclose( fd );
+      return false;
+   }
+
+   /* Make a basic check for the format. Both these words should be in
+      the file. */
+   if( strstr(buffer, "multicast") == 0x0 ||
+       strstr(buffer, "compressed") == 0x0 )
+   {
+      fprintf( stderr, format_message_error );
+      fclose( fd );
+      return false;
+   }
+
+   /*
+      Now, get all the network interfaces on this machine and their
+      associated flags.  This will allow us to skip some interfaces
+      that are present in /proc/net/dev but are not valid for our
+      purposes. For example, loop back and down interfaces are not
+      useful.
+   */
+   struct ifaddrs *addr;
+   if( getifaddrs( &addr ) == -1 )
+   {
+      perror( "unable to read network confiruation so network statistic are off" );
+      return false;
+   }
+
+   /* */
+   uint64_t rx_bytes=0, tx_bytes=0;
+
+   while( fgets(buffer, buffer_size, fd) )
+   {
+      /* Check if we have this interface in our ifaddrs and make sure
+         it is a valid interface. */
+      struct ifaddrs *it = addr;
+      for( ; it; it = it->ifa_next )
+      {
+         /* This should not happen but there are some pretty wild stuff
+            out there so better be careful. */
+         if( !it->ifa_name )
+            continue;
+
+         if( it->ifa_flags & IFF_LOOPBACK )
+            continue;
+
+         if( !(it->ifa_flags & IFF_UP) )
+            continue;
+
+         if( it->ifa_addr && it->ifa_addr->sa_family == AF_PACKET )
+         {
+            if( strstr(buffer, it->ifa_name) )
+            {
+               /* The interface listed in /proc/net/dev is also a valid
+                  AF_PACKET interface so we count it in. */
                break;
             }
-            while( fbuffer[pos] != '\n') pos++;
-            pos++;
          }
       }
-      else
+
+      if( !it )
       {
-         AFERRAR("Can't read \"%s\"", filename_cpu_info)
+         /* Can't find this interface or it is not a valid interface. */
+         continue; 
       }
-   }
 
-   //
-   // Memory & Swap total and usage:
-   //
-   if( readFile( filename_mem_info))
-   {
-      bool verbose = false;
-      int pos = 0;
-      if( getConstants ) readAttr( MemTotal,  fbuffer, pos, memtotal,  verbose);
-      readAttr( MemFree,   fbuffer, pos, memfree,    verbose);
-      readAttr( Buffers,   fbuffer, pos, membuffers, verbose);
-      readAttr( Cached,    fbuffer, pos, memcached,  verbose);
-      if( getConstants ) readAttr( SwapTotal, fbuffer, pos, swaptotal, verbose);
-      readAttr( SwapFree,  fbuffer, pos, swapfree,   verbose);
-      if( getConstants )
+      const int just_a_small_number = 8;
+      if( strlen(buffer) < just_a_small_number )
       {
-         host.mem_mb  =  memtotal >> 10;
-         host.swap_mb = swaptotal >> 10;
+         /* Just a quick check to make sure we are not reading any garbage
+            since we will be addressing a couple bytes at the beginning of
+            this string. */
+         continue;
       }
-      hres.mem_free_mb    = ( memfree + membuffers + memcached ) >> 10;
-      hres.mem_cached_mb  = memcached  >> 10;
-      hres.mem_buffers_mb = membuffers >> 10;
-      hres.swap_used_mb   = ( swaptotal - swapfree ) >> 10;
-   }
-   else
-   {
-      AFERRAR("Can't read \"%s\"", filename_mem_info)
-   }
-   //memory
+  
+      const char *delimiter = strchr(buffer, ':');
 
-   //
-   // CPU usage:
-   //
-   unsigned long long cpu_ticks_total = 0;
-   if( readFile( filename_cpu_stat))
-   {
-            res * rl = &r0; res * rn = &r1;
-      if( now ) { rl = &r1;       rn = &r0; }
-      bool verbose = false;
-      int pos = 0;
-      nextWord( pos);
-      static const char scan_fmt[] = "%llu %llu %llu %llu %llu %llu %llu";
-      sscanf( fbuffer + pos, scan_fmt,
-              &(rn->user),
-              &(rn->nice),
-              &(rn->system),
-              &(rn->idle),
-              &(rn->iowait),
-              &(rn->irq),
-              &(rn->softirq)
-         );
-      /*
-      pos += scan( rn->user,     fbuffer+pos, verbose);
-      pos += scan( rn->nice,     fbuffer+pos, verbose);
-      pos += scan( rn->system,   fbuffer+pos, verbose);
-      pos += scan( rn->idle,     fbuffer+pos, verbose);
-      pos += scan( rn->iowait,   fbuffer+pos, verbose);
-      pos += scan( rn->irq,      fbuffer+pos, verbose);
-      pos += scan( rn->softirq,  fbuffer+pos, verbose);
-*/
-      // Check for counters overflow:
-      if(( rn->user    >= rl->user   ) &&
-         ( rn->nice    >= rl->nice   ) &&
-         ( rn->system  >= rl->system ) &&
-         ( rn->idle    >= rl->idle   ) &&
-         ( rn->iowait  >= rl->iowait ) &&
-         ( rn->irq     >= rl->irq    ) &&
-         ( rn->softirq >= rl->softirq))
+      if( !delimiter )
+         continue;
+ 
+      uint64_t rx, tx;
+      int conv = sscanf(
+         delimiter + 1,
+         "%Lu %*Lu %*lu %*lu %*lu %*lu %*lu %*lu %Lu %*Lu %*lu %*lu %*lu %*lu %*lu %*lu",
+         &rx, &tx);
+
+      if( conv != 2 )
       {
-         unsigned long long user    = rn->user     - rl->user;
-         unsigned long long nice    = rn->nice     - rl->nice;
-         unsigned long long system  = rn->system   - rl->system;
-         unsigned long long idle    = rn->idle     - rl->idle;
-         unsigned long long iowait  = rn->iowait   - rl->iowait;
-         unsigned long long irq     = rn->irq      - rl->irq;
-         unsigned long long softirq = rn->softirq  - rl->softirq;
-         cpu_ticks_total = user + nice + system + idle + iowait + irq + softirq;
-#ifdef AFOUTPUT
-         printf("Total CPU user     = %llu\n", rn->user);
-         printf("Total CPU nice     = %llu\n", rn->nice);
-         printf("Total CPU system   = %llu\n", rn->system);
-         printf("Total CPU idle     = %llu\n", rn->idle);
-         printf("Total CPU iowait   = %llu\n", rn->iowait);
-         printf("Total CPU irq      = %llu\n", rn->irq);
-         printf("Total CPU softirq  = %llu\n", rn->softirq);
-         printf("Delta CPU user     = %llu\n", user);
-         printf("Delta CPU nice     = %llu\n", nice);
-         printf("Delta CPU system   = %llu\n", system);
-         printf("Delta CPU idle     = %llu\n", idle);
-         printf("Delta CPU iowait   = %llu\n", iowait);
-         printf("Delta CPU irq      = %llu\n", irq);
-         printf("Delta CPU softirq  = %llu\n", softirq);
-         printf("Delta CPU total    = %llu\n", cpu_ticks_total);
-#endif //AFOUTPUT
-         // Check for counters overflow:
-         if( cpu_ticks_total != 0)
-         {
-            hres.cpu_user    = ( user    * 100 ) / cpu_ticks_total;
-            hres.cpu_nice    = ( nice    * 100 ) / cpu_ticks_total;
-            hres.cpu_system  = ( system  * 100 ) / cpu_ticks_total;
-            hres.cpu_idle    = ( idle    * 100 ) / cpu_ticks_total;
-            hres.cpu_iowait  = ( iowait  * 100 ) / cpu_ticks_total;
-            hres.cpu_irq     = ( irq     * 100 ) / cpu_ticks_total;
-            hres.cpu_softirq = ( softirq * 100 ) / cpu_ticks_total;
-         }
+         /* Unknown format? */
+         continue;
       }
 
-      double loadavg[3] = { 0, 0, 0 };
-      int nelem = getloadavg( loadavg, 3);
-      if( nelem < 2 ) loadavg[1] = loadavg[0];
-      if( nelem < 3 ) loadavg[2] = loadavg[1];
-      if( loadavg[0] > 25.0 ) loadavg[0] = 25.0;
-      if( loadavg[1] > 25.0 ) loadavg[1] = 25.0;
-      if( loadavg[2] > 25.0 ) loadavg[2] = 25.0;
-      hres.cpu_loadavg1 = 10.0 * loadavg[0];
-      hres.cpu_loadavg2 = 10.0 * loadavg[1];
-      hres.cpu_loadavg3 = 10.0 * loadavg[2];
+      rx_bytes += rx;
+      tx_bytes += tx;
    }
-   else
-   {
-      AFERRAR("Can't read \"%s\"", filename_cpu_stat)
-   }//cpu
 
-   //
-   // HDD:
-   //
-   // space:
-   {
-   static char path[4096];
-   if( getConstants )
-   {
-      sprintf( path, "%s", af::Environment::getRenderHDDSpacePath().c_str());
-      printf("HDD Space Path = '%s'\n", path);
-   }
-   struct statfs fsd;
-   if( statfs( path, &fsd) < 0)
-   {
-      perror( "fs status:");
-   }
-   else
-   {
-      if( getConstants) host.hdd_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
-      hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
-   }
-   // io:
-   static char device[128];
-   if( getConstants )
-   {
-      sprintf( device, "%s", af::Environment::getRenderIOStatDevice().c_str());
-      printf("IO Stat Device = '%s'\n", device);
-   }
-   if( readFile( filename_disk_stat))
-   {
-             io * iol = &io0; io * ion = &io1;
-      if( now ) { iol = &io1;      ion = &io0; }
-      int pos = 0;
-      while( pos < fdata_len )
-      {
-         char name[64];
-         int part_major, part_minor;
+   o_rx_bytes = rx_bytes;
+   o_tx_bytes = tx_bytes;
 
-         static const char scan_fmt[] = "%4d %4d %s %u %u %llu %u %u %u %llu %u %*u %u %u";
+   /* This was allocated by getifaddrs() above. */
+   freeifaddrs( addr );
 
-         int items = sscanf( fbuffer + pos, scan_fmt,
-                   &part_major,
-                   &part_minor,
-                   name,
-                   &(ion->rd_ios),
-                   &(ion->rd_merges),
-                   &(ion->rd_sectors),
-                   &(ion->rd_ticks),
-                   &(ion->wr_ios),
-                   &(ion->wr_merges),
-                   &(ion->wr_sectors),
-                   &(ion->wr_ticks),
-                   &(ion->ticks),
-                   &(ion->aveq)
-            );
+   fclose( fd );
 
-         if( items != 13 ) continue;
-         if( strcmp( name, device) == 0 )
-         {
-#ifdef AFOUTPUT
-            printf("Total rd_sectors = %llu\n", ion->rd_sectors);
-            printf("Total wr_sectors = %llu\n", ion->wr_sectors);
-            printf("Total ticks      = %llu\n", ion->ticks);
-#endif //AFOUTPUT
-            // Check for counters overflow:
-            if(( ion->rd_sectors >= iol->rd_sectors) &&
-               ( ion->wr_sectors >= iol->wr_sectors) &&
-               ( ion->ticks      >= iol->ticks))
-            {
-               unsigned long long rd_sectors  = ion->rd_sectors  - iol->rd_sectors;
-               unsigned long long wr_sectors  = ion->wr_sectors  - iol->wr_sectors;
-               unsigned long long ticks       = ion->ticks       - iol->ticks;
-#ifdef AFOUTPUT
-               printf("Delta rd_sectors = %llu\n", rd_sectors);
-               printf("Delta wr_sectors = %llu\n", wr_sectors);
-               printf("Delta ticks      = %llu\n", ticks);
-#endif //AFOUTPUT
-               if( cpu_ticks_total != 0 )
-               {
-                  unsigned long long deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
-                  if( deltams != 0 )
-                  {
-                     int busy = 100 * ticks / deltams;
-                     if( busy > 100) busy = 100;
-                     if( busy <   0) busy = 0;
-                     hres.hdd_busy = busy;
-                  }
-               }
-
-   //            printf("\n%-6s: R %d MB/S   W %d MB/S   B %d%%\n", name, rd_sectors >> 11, wr_sectors >> 11, busy);
-
-               // Standart sector is 512 bytes
-   //TODO:  Get device sector size.
-               hres.hdd_rd_kbsec = ( rd_sectors / af::Environment::getRenderUpdateSec()) >> 1;
-               hres.hdd_wr_kbsec = ( wr_sectors / af::Environment::getRenderUpdateSec()) >> 1;
-            }
-
-            break;
-         }
-         else
-         {
-            while((fbuffer[pos++] != '\n') && (pos < fdata_len));
-         }
-      }
-   }
-   else
-   {
-      AFERRAR("Can't read \"%s\"", filename_disk_stat)
-   }
-   }//hdd
-
-   //
-   // Network:
-   //
-   {
-         net * nl = &n0; net * nn = &n1;
-   if( now ) { nl = &n1;       nn = &n0; }
-   bool verbose = false;
-   //verbose = true;
-   readFile( filename_net_stat);
-   static int b_recv = 0;
-   static int b_trans = 0;
-   static int ifBytes_len = strlen( ifBytes);
-   int net_recv_kb = 0; int net_send_kb = 0;
-   int pos = 0;
-   static QRegExp RenderNetworkIF;
-   if( getConstants)
-   {
-      RenderNetworkIF.setPattern( afqt::stoq( af::Environment::getRenderNetworkIF()));
-      if( RenderNetworkIF.isValid()) printf("Network traffic interface(s) pattern = '%s'\n", RenderNetworkIF.pattern().toUtf8().data());
-      else
-      {
-         AFERRAR("Render network interfaces mask is invalid:\n%s\n%s", RenderNetworkIF.pattern().toUtf8().data(), RenderNetworkIF.errorString().toUtf8().data())
-      }
-      printf("Network interfaces founded:\n");
-   }
-   while( pos < fdata_len )
-   {
-      if( !nextLine( pos)) break; // to rows titles
-      if( !nextWord( pos)) break; // to 1st row title
-      if( getConstants )
-      {
-         while( strncmp( ifBytes, fbuffer+pos, ifBytes_len) != 0)
-         {
-            b_recv ++;
-            if( !nextWord( pos)) break;
-         }
-         if( !nextWord( pos)) break; // to next word from bytes
-         b_trans = 1;
-         while( strncmp( ifBytes, fbuffer+pos, ifBytes_len) != 0)
-         {
-            b_trans ++;
-            if( !nextWord( pos)) break;
-         }
-         if( verbose) printf("Recieve pos: %d | Transmit pos: +%d\n", b_recv, b_trans);
-      }
-      if( !nextLine( pos)) break; // to first interface
-      while( pos < fdata_len)
-      {
-         while( fbuffer[++pos] == ' '); // skip spaces
-         if( verbose) printf("fbuffer[pos(5)]=\"%c\"\n", fbuffer[pos]);
-         // Getting interface name:
-         int separator_pos = 0; // search for interface name separator
-         while( fbuffer[pos + (separator_pos++)] != ':') if( separator_pos > 99) break; // stop if no searator founded (99 characters are more than enough)
-         QString ifname = QString::fromAscii( fbuffer + pos, separator_pos-1);
-         if( getConstants)
-         {
-            static int ifcount = 0;
-            if( RenderNetworkIF.isValid() && ( RenderNetworkIF.exactMatch( ifname)))
-               printf(" * ");
-            else
-               printf("   ");
-            printf("#%d = '%s'", ++ifcount, ifname.toUtf8().data());
-            printf("\n");
-         }
-         // Getting interface traffic:
-         if( RenderNetworkIF.isValid() && ( RenderNetworkIF.exactMatch( ifname))) // search for specified interfaces:
-         {
-            unsigned long long net_recv, net_send;
-            for( int w = 0; w < b_recv;  w++) if( !nextWord( pos)) break; // to bytes recieve
-            sscanf( fbuffer+pos, "%llu", &net_recv);
-            for( int w = 0; w < b_trans; w++) if( !nextWord( pos)) break; // to bytes transmit
-            sscanf( fbuffer+pos, "%llu", &net_send);
-            net_recv_kb += net_recv >> 10;
-            net_send_kb += net_send >> 10;
-            if( verbose )
-            {
-               printf("Recieved   bytes = %llu\n", net_recv);
-               printf("Transmited bytes = %llu\n", net_send);
-            }
-         }
-         if( !nextLine( pos)) break; // to next interface
-      }
-      break;
-   }
-   nn->recv = net_recv_kb;
-   nn->send = net_send_kb;
-   net_recv_kb = nn->recv - nl->recv;
-   net_send_kb = nn->send - nl->send;
-   if( verbose) printf("net_recv_kb=%d net_send_kb=%d\n", net_recv_kb, net_send_kb);
-   if( net_recv_kb >= 0 ) hres.net_recv_kbsec = net_recv_kb / af::Environment::getRenderUpdateSec();
-   if( net_send_kb >= 0 ) hres.net_send_kbsec = net_send_kb / af::Environment::getRenderUpdateSec();
-   }//network
-
-   now = 1 - now;
-
-//hres.stdOut(false);
+   return true;
 }
 #endif
