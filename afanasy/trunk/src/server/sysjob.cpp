@@ -115,7 +115,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
    {
       case af::TaskExec::UPWarning:                   message = "Warning";             break;
       case af::TaskExec::UPFailedToStart:             message = "Failed to start";     break;
-      case af::TaskExec::UPFinishedCrash:             message = "Finished crashed";    break;
+      case af::TaskExec::UPFinishedKilled:             message = "Finished crashed";    break;
       case af::TaskExec::UPFinishedParserError:       message = "Parser error";        break;
       case af::TaskExec::UPFinishedParserBadResult:   message = "Parser bad result";   break;
       case af::TaskExec::UPFinishedError:             message = "Finished error";      break;

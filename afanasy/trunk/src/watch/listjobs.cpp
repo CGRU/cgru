@@ -126,6 +126,11 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
    connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
    menu.addAction( action);
 
+   action = new QAction( "Restart Errors", this);
+   connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
+   if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
+   menu.addAction( action);
+
    if( af::Environment::VISOR() == false)
    {
       menu.addSeparator();
@@ -226,11 +231,6 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
    action = new QAction( "Pause", this);
    connect( action, SIGNAL( triggered() ), this, SLOT( actPause()   ));
    if( selectedItemsCount == 1) action->setEnabled( false == (jobitem->state & AFJOB::STATE_OFFLINE_MASK));
-   menu.addAction( action);
-
-   action = new QAction( "Restart Errors", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
-   if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
    menu.addAction( action);
 
    action = new QAction( "Stop", this);

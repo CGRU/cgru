@@ -112,7 +112,8 @@ void RenderHost::setListeningPort( uint16_t i_port)
 {
     ms_obj->address.setPort( i_port);
     m_listening = true;
-    printf("RenderHost::setListeningPort = %d\n", i_port);
+    if( af::Environment::isVerboseMode())
+        printf("RenderHost::setListeningPort = %d\n", i_port);
 }
 
 void RenderHost::dispatchMessage( af::Msg * i_msg)
@@ -245,7 +246,7 @@ void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
             return;
         }
     }
-    AFERROR("RenderHost::stopTask: No such task:\n")
+    AFERROR("RenderHost::stopTask: %d tasks, no such task:", ms_tasks.size())
     i_taskpos.stdOut();
 }
 
@@ -260,7 +261,7 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
             return;
         }
     }
-    AFERROR("RenderHost::closeTask: No such task:\n")
+    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", ms_tasks.size())
     i_taskpos.stdOut();
 }
 

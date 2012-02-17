@@ -107,7 +107,7 @@ public:
 
       UPFinishedSuccess,
       UPFinishedError,
-      UPFinishedCrash,
+      UPFinishedKilled,
       UPFinishedParserError,
       UPFinishedParserBadResult,
 

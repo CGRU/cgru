@@ -130,7 +130,7 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
       break;
    }
    case af::TaskExec::UPFailedToStart: if( message.size() == 0) message = "Failed to start.";
-   case af::TaskExec::UPFinishedCrash: if( message.size() == 0) message = "Finished crashed.";
+   case af::TaskExec::UPFinishedKilled: if( message.size() == 0) message = "Killed.";
    case af::TaskExec::UPFinishedParserError:
       if( message.size() == 0)
       {

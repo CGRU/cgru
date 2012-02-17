@@ -213,8 +213,8 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
       errorHost = true;
       break;
 
-   case af::TaskExec::UPFinishedCrash:
-      task->appendLog("Slave host service finished crashed.");
+   case af::TaskExec::UPFinishedKilled:
+      task->appendLog("Slave host service was killed.");
       releaseHost( renders, monitoring, &taskup );
       if( stopping == false) errorHost = true;
       break;

@@ -99,6 +99,8 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
         AFERROR("Failed to start a process")
         m_taskexec->stdOut( true);
         m_pid = 0;
+        m_update_status = af::TaskExec::UPFailedToStart;
+        sendTaskSate();
         return;
     }
 
@@ -146,6 +148,11 @@ void TaskProcess::refresh()
 
     if( m_pid == 0 )
     {
+        static int dead_cycle = 0;
+        dead_cycle ++;
+//        if(( dead_cycle % 10 ) == 0 )
+            sendTaskSate();
+        printf("Dead Cycle.\n");
         return;
     }
 
@@ -287,11 +294,11 @@ void TaskProcess::processFinished( int i_exitCode)
 
     readProcess();
 
-    if(/*( exitStatus != QProcess::NormalExit ) || */( m_stop_time != 0 ))
+    if(/*( exitStatus != QProcess::NormalExit ) || */( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
     {
-        printf("Task terminated/killed.\n");
+        printf("Task terminated/killed by signal %d.\n", WTERMSIG( i_exitCode));
         if( m_update_status != af::TaskExec::UPFinishedParserError )
-            m_update_status = af::TaskExec::UPFinishedCrash;
+            m_update_status = af::TaskExec::UPFinishedKilled;
     }
     else
     {
