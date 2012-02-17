@@ -61,8 +61,10 @@ int LaunchProgramV(
 	FILE **o_in,
 	FILE **o_out,
 	FILE **o_err,
-	const char *i_program,
-	const char* i_args[])
+        const char * i_program,
+        const char * i_args[],
+        const char * i_wdir = NULL,
+        int i_flags = 0)
 {
 	if (o_in)
 	{
@@ -453,6 +455,9 @@ int LaunchProgramV(
 
                 if( fp_setupChildProcess )
                     fp_setupChildProcess();
+                if( i_wdir )
+                    if( chdir( i_wdir) != 0 )
+                        perror("LaunchProgram: chdir(): ");
 
 		err =
 			( (i_program[0] != '/') ?

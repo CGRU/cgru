@@ -38,14 +38,19 @@ int LaunchProgramV(
     FILE **o_in,
     FILE **o_out,
     FILE **o_err,
-    const char *i_program,
-    const char* i_args[]);
+    const char * i_program,
+    const char * i_args[],
+    const char * wdir = NULL,
+    int i_flags = 0);
 
-int af::launchProgram( const std::string & commandline, const std::string & wdir,
-                       FILE ** o_in, FILE ** o_out, FILE ** o_err)
+int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir,
+                       FILE ** o_in, FILE ** o_out, FILE ** o_err, int i_flags)
 {
-    const char * i_args[] = { "-c", commandline.c_str(), NULL};
-    return LaunchProgramV( o_in, o_out, o_err, "/bin/bash", i_args);
+    const char * i_args[] = { "-c", i_commandline.c_str(), NULL};
+    const char * wdir = NULL;
+    if( i_wdir.size() > 0 )
+        wdir = i_wdir.c_str();
+    return LaunchProgramV( o_in, o_out, o_err, "/bin/bash", i_args, wdir, i_flags);
 }
 
 void af::outError( const char * errMsg, const char * baseMsg)

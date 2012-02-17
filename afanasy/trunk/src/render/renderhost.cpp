@@ -198,8 +198,9 @@ void RenderHost::update()
     if( ms_obj->address.getPortHBO() == 0 )
     {
         // It seems that listening thread is not started to listen any port
-        return;
+        AFERROR("Render is not listening any port.")
         // Client was just started and we simple will wait
+        return;
     }
 
     af::Msg * msg = new af::Msg( ms_updateMsgType, ms_obj);

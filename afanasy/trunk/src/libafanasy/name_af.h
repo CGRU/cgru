@@ -161,8 +161,9 @@ namespace af
 
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
-   int launchProgram( const std::string & commandline, const std::string & wdir = std::string(),
-                      FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);
+   int launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string(),
+                      FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL,
+                      int i_flags = 0);
 
     /// Read data from file descriptor. Return a new allocated buffer pointer and a size passed through an argument.
     /** Return NULL pointer and negative size on error.**/

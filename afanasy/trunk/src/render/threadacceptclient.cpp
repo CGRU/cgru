@@ -153,6 +153,8 @@ void threadAcceptClient( void * i_arg )
 
     printf( "Listening %d port...\n", af::Environment::getClientPort());
 
+    RenderHost::unLockMutex();
+
 //
 //############ accepting connections:
     while( AFRunning )
@@ -209,9 +211,9 @@ void threadAcceptClient( void * i_arg )
             af::Msg * msg_response = new af::Msg();
 
             // Get task output immediately in this thread
-            RenderHost::lockMutex();
+ //           RenderHost::lockMutex();
             RenderHost::getTaskOutput( taskpos, msg_response);
-            RenderHost::unLockMutex();
+//            RenderHost::unLockMutex();
 
             // Write answer to the same socket
             if( false == af::msgwrite( sd, msg_response))

@@ -84,13 +84,17 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
         }
     }
 
-    printf("\nStarting:\n ");
+    printf("\nStarting:\n");
     m_taskexec->stdOut( false);
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
     fp_setupChildProcess = setupChildProcess;
 
-    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr);
+    int flags = 0;
+#ifdef WINNT
+    flags = CREATE_SUSPENDED;
+#endif
+    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr, flags);
 
     if( m_pid <= 0 )
     {
@@ -100,19 +104,21 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     }
 
 #ifdef WINNT
-    process_info = pid();
+    process_info = m_pid;
     SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
     if( AssignProcessToJobObject( hJob, process_info->hProcess) == false)
-        AFERROR("AssignProcessToJobObject failed.\n");
-    ResumeThread( process_info->hThread); // | CREATE_SUSPENDED
+        AFERROR("AssignProcessToJobObject failed.\n")
+    ResumeThread( process_info->hThread);
 #endif
+
+    setbuf( m_io_output, m_filebuffer_out);
+    setbuf( m_io_outerr, m_filebuffer_err);
 
     setNonblocking( fileno( m_io_input));
     setNonblocking( fileno( m_io_output));
     setNonblocking( fileno( m_io_outerr));
 
-    setbuf( m_io_output, m_filebuffer_out);
-    setbuf( m_io_outerr, m_filebuffer_err);
+    printf("PID = %d\n", m_pid);
 }
 
 TaskProcess::~TaskProcess()
