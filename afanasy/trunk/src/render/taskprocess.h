@@ -46,7 +46,7 @@ public:
 private:
     void sendTaskSate();
     void readProcess();
-    void processFinished( int exitCode);
+    void processFinished( int i_exitCode);
     void killProcess();
 
 private:

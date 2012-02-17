@@ -1,5 +1,7 @@
 #include "pyclass.h"
 
+#include "environment.h"
+
 using namespace af;
 /*
 #if PY_MAJOR_VERSION < 3
@@ -64,7 +66,8 @@ bool PyClass::init( const std::string & dir, const std::string & name, PyObject 
    }
    if( initArgs) Py_DECREF( initArgs);
 
-   std::cout << "Module \"" << modulename << "\" imported." << std::endl;
+    if( af::Environment::isVerboseMode())
+        std::cout << "Module \"" << modulename << "\" imported." << std::endl;
 
    return true;
 }

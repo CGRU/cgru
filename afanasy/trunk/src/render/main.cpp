@@ -113,18 +113,18 @@ int main(int argc, char *argv[])
     RenderHost render( state, priority);
 
     DlThread ServerAccept;
-    RenderHost::lockMutex();
     ServerAccept.Start( &threadAcceptClient, NULL);
-
-    // Simple to give some time to start to listen to unused port
-    // It is needed, that we must send client port when register
-//    usleep( 100);
-    // Nothing bad will happen if it did not start to listen after that time
-    // Only registration will happen on next render update cycle
 
     uint64_t cycle = 0;
     while( AFRunning)
     {
+        if( false == RenderHost::isListening() )
+        {
+            // Wait accept thread to start to listen a port.
+            usleep( 100);
+            continue;
+        }
+
         af::Msg * msg = RenderHost::acceptTry();
 
         RenderHost::lockMutex();

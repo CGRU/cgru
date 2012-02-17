@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../libafanasy/dlMutex.h"
+#include "../libafanasy/dlRWLock.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgqueue.h"
 #include "../libafanasy/render.h"
@@ -20,7 +20,9 @@ public:
     inline static int  getId() { return ms_obj->af::Render::getId();}
     inline static const std::string & getName() { return ms_obj->af::Render::getName();}
 
-    static void setAddressPort( uint16_t i_port) { ms_obj->address.setPort( i_port);}
+    static void setListeningPort( uint16_t i_port);
+
+    inline static bool isListening() { return m_listening; }
 
     inline static void acceptMessage(   af::Msg * i_msg) { ms_msgAcceptQueue->pushMsg( i_msg);}
     static void dispatchMessage( af::Msg * i_msg);
@@ -50,8 +52,8 @@ public:
 
     static void listenFailed( const af::Address & i_addr);
 
-    inline static void   lockMutex() { m_mutex.Lock();  }
-    inline static void unLockMutex() { m_mutex.Unlock();}
+    inline static void   lockMutex() { ms_obj->m_mutex.WriteLock();  }
+    inline static void unLockMutex() { ms_obj->m_mutex.WriteUnlock();}
 
 #ifdef WINNT
     void windowsMustDie() const;
@@ -74,5 +76,7 @@ private:
 
     static std::vector<TaskProcess*> ms_tasks;
 
-    static DlMutex m_mutex;
+    static bool m_listening;
+
+    DlRWLock m_mutex;
 };

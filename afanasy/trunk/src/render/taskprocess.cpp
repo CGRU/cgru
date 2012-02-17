@@ -59,7 +59,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     std::string command = m_service.getCommand();
     std::string wdir    = m_service.getWDir();
 
-    m_parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());//, "AF_PROGRESS %d");
+    m_parser = new ParserHost( m_taskexec->getParserType(), m_taskexec->getFramesNum());
 
     // Process task working directory:
     if( wdir.size())
@@ -84,8 +84,6 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
         }
     }
 
-    printf("\nStarting:\n");
-    m_taskexec->stdOut( false);
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
     fp_setupChildProcess = setupChildProcess;
@@ -99,6 +97,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     if( m_pid <= 0 )
     {
         AFERROR("Failed to start a process")
+        m_taskexec->stdOut( true);
         m_pid = 0;
         return;
     }
@@ -118,7 +117,8 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     setNonblocking( fileno( m_io_output));
     setNonblocking( fileno( m_io_outerr));
 
-    printf("PID = %d\n", m_pid);
+    printf("Started PID=%d: ",m_pid);
+    m_taskexec->stdOut( af::Environment::isVerboseMode());
 }
 
 TaskProcess::~TaskProcess()
@@ -278,11 +278,12 @@ void TaskProcess::sendTaskSate()
     RenderHost::dispatchMessage( msg);
 }
 
-void TaskProcess::processFinished( int exitCode)
+void TaskProcess::processFinished( int i_exitCode)
 {
+    printf("Finished PID=%d: Exit Code=%d\n", m_pid, i_exitCode);
+
     m_pid = 0;
     if( m_update_status == 0 ) return;
-    printf("\nFinished: "); m_taskexec->stdOut( false);
 
     readProcess();
 
@@ -294,20 +295,18 @@ void TaskProcess::processFinished( int exitCode)
     }
     else
     {
-        if( exitCode != 0)
+        if( i_exitCode != 0)
         {
             m_update_status = af::TaskExec::UPFinishedError;
-            printf("Error: exitcode = %d.\n", exitCode);
         }
         else if( m_parser->isBadResult())
         {
             m_update_status = af::TaskExec::UPFinishedParserBadResult;
-            printf("Error: Bad result from m_parser (exitcode = %d).\n", exitCode);
+            AFINFO("Bad result from parser.")
         }
         else
         {
             m_update_status = af::TaskExec::UPFinishedSuccess;
-            printf("Success: exitcode = %d.\n", exitCode);
         }
     }
 }

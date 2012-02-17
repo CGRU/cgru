@@ -130,7 +130,7 @@ void threadAcceptClient( void * i_arg )
         if( value == 0 )
         {
             af::Environment::setClientPort( port);
-            RenderHost::setAddressPort( port);
+            RenderHost::setListeningPort( port);
             break;
         }
         if( errno == EADDRINUSE )
@@ -152,8 +152,6 @@ void threadAcceptClient( void * i_arg )
     }
 
     printf( "Listening %d port...\n", af::Environment::getClientPort());
-
-    RenderHost::unLockMutex();
 
 //
 //############ accepting connections:
@@ -179,7 +177,6 @@ void threadAcceptClient( void * i_arg )
                 AFERROR("The system limit on the total number of open files has been reached.")
                 break;
             case EINTR:
-                printf("Server was interrupted.\n");
                 AFRunning = false;
                 break;
             }
@@ -211,9 +208,9 @@ void threadAcceptClient( void * i_arg )
             af::Msg * msg_response = new af::Msg();
 
             // Get task output immediately in this thread
- //           RenderHost::lockMutex();
+            RenderHost::lockMutex();
             RenderHost::getTaskOutput( taskpos, msg_response);
-//            RenderHost::unLockMutex();
+            RenderHost::unLockMutex();
 
             // Write answer to the same socket
             if( false == af::msgwrite( sd, msg_response))

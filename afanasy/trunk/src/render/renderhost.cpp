@@ -18,16 +18,12 @@ int RenderHost::ms_updateMsgType = af::Msg::TRenderRegister;
 bool RenderHost::ms_connected = false;
 std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
-DlMutex RenderHost::m_mutex;
+bool RenderHost::m_listening = false;
 
 RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
    Render( i_state, i_priority)
 {
-//    Render = this;
     ms_obj = this;
-
-    // Set that we are not listening any port at creation
-    ms_obj->address.setPort( 0);
 
     ms_msgAcceptQueue   = new af::MsgQueue("Messages Accept Queue",   af::AfQueue::e_no_thread    );
     ms_msgDispatchQueue = new af::MsgQueue("Messages Dispatch Queue", af::AfQueue::e_start_thread );
@@ -110,6 +106,13 @@ RenderHost::~RenderHost()
     msg.setAddress( af::Environment::getServerAddress());
     bool ok;
     af::msgsend( & msg, ok, af::VerboseOn);
+}
+
+void RenderHost::setListeningPort( uint16_t i_port)
+{
+    ms_obj->address.setPort( i_port);
+    m_listening = true;
+    printf("RenderHost::setListeningPort = %d\n", i_port);
 }
 
 void RenderHost::dispatchMessage( af::Msg * i_msg)
@@ -195,11 +198,13 @@ void RenderHost::update()
     windowsMustDie();
 #endif
 
-    if( ms_obj->address.getPortHBO() == 0 )
+    if( false == isListening())
     {
-        // It seems that listening thread is not started to listen any port
-        AFERROR("Render is not listening any port.")
-        // Client was just started and we simple will wait
+        // Port can't be zero!
+        // It seems that listening thread is not started to listen any port.
+        AFERROR("RenderHost::update(): Render is not listening any port.")
+        // This error is not fatal.
+        // Client was just started and we simple will wait next update.
         return;
     }
 
