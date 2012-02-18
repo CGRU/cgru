@@ -246,7 +246,7 @@ void RenderHost::stopTask( const af::MCTaskPos & i_taskpos)
             return;
         }
     }
-    AFERROR("RenderHost::stopTask: %d tasks, no such task:", ms_tasks.size())
+    AFERRAR("RenderHost::stopTask: %d tasks, no such task:", int(ms_tasks.size()))
     i_taskpos.stdOut();
 }
 
@@ -261,7 +261,7 @@ void RenderHost::closeTask( const af::MCTaskPos & i_taskpos)
             return;
         }
     }
-    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", ms_tasks.size())
+    AFERRAR("RenderHost::closeTask: %d tasks, no such task:", int(ms_tasks.size()))
     i_taskpos.stdOut();
 }
 

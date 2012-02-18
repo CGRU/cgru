@@ -126,16 +126,20 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 TaskProcess::~TaskProcess()
 {
     m_update_status = 0;
+
     killProcess();
 
     fclose( m_io_input);
     fclose( m_io_output);
     fclose( m_io_outerr);
 
-    if( m_taskexec    != NULL  ) delete m_taskexec;
-    if( m_parser  != NULL  ) delete m_parser;
+#ifdef AFOUTPUT
+    printf(" ~ TaskProcess(): ");
+    m_taskexec->stdOut();
+#endif
 
-    AFINFO("TaskProcess:~TaskProcess()")
+    if( m_taskexec != NULL  ) delete m_taskexec;
+    if( m_parser   != NULL  ) delete m_parser;
 }
 
 void TaskProcess::refresh()
@@ -152,7 +156,7 @@ void TaskProcess::refresh()
         dead_cycle ++;
 //        if(( dead_cycle % 10 ) == 0 )
             sendTaskSate();
-        printf("Dead Cycle.\n");
+        printf("Dead Cycle:"); m_taskexec->stdOut();
         return;
     }
 
@@ -296,9 +300,9 @@ void TaskProcess::processFinished( int i_exitCode)
 
     if(/*( exitStatus != QProcess::NormalExit ) || */( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
     {
-        printf("Task terminated/killed by signal %d.\n", WTERMSIG( i_exitCode));
+        printf("Task terminated/killed by signal: '%s'.\n", strsignal( WTERMSIG( i_exitCode)));
         if( m_update_status != af::TaskExec::UPFinishedParserError )
-            m_update_status = af::TaskExec::UPFinishedKilled;
+            m_update_status  = af::TaskExec::UPFinishedKilled;
     }
     else
     {
