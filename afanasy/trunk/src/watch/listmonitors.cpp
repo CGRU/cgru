@@ -9,8 +9,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "itemmonitor.h"
 #include "ctrlsortfilter.h"
 #include "modelitems.h"
@@ -101,14 +99,14 @@ AFINFO("ListMonitors::caseMessage( Msg msg)\n");
       af::MCGeneral ids( msg);
 //printf("case af::Msg::TMonitorMonitorsAdd: "); ids.stdOut( true);
       deleteItems( ids);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TMonitorsListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TMonitorsListRequestIds, &ids, true));
       break;
    }
    case af::Msg::TMonitorMonitorsChanged:
    {
       af::MCGeneral ids( msg);
 //printf("case af::Msg::TMonitorMonitorsChanged: "); ids.stdOut( true);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TMonitorsListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TMonitorsListRequestIds, &ids, true));
       break;
    }
    default:

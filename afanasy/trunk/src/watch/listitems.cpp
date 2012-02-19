@@ -3,8 +3,6 @@
 #include <QtCore/QEvent>
 #include <QtGui/QBoxLayout>
 
-#include "../libafqt/qmsg.h"
-
 #include "item.h"
 #include "modelitems.h"
 #include "viewitems.h"
@@ -72,7 +70,7 @@ void ListItems::showEvent( QShowEvent * event)
 
 void ListItems::shownFunc()
 {
-   if( Watch::isConnected() && requestmsgtype ) Watch::sendMsg( new afqt::QMsg( requestmsgtype, 0, true));
+   if( Watch::isConnected() && requestmsgtype ) Watch::sendMsg( new af::Msg( requestmsgtype, 0, true));
 }
 
 void ListItems::hideEvent( QHideEvent * event)
@@ -188,7 +186,7 @@ void ListItems::action( af::MCGeneral& mcgeneral, int type)
    if( mcgeneral.getCount() == 0) return;
 //printf("ListNodes::action:\n"); mcgeneral.stdOut( true);
 
-   afqt::QMsg * msg = new afqt::QMsg( type, &mcgeneral);
+   af::Msg * msg = new af::Msg( type, &mcgeneral);
 
    Watch::sendMsg( msg);
 }

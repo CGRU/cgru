@@ -10,12 +10,10 @@ fi;
 # Process parameters:
 cleanup=0
 JobsPack=10
-Users=5
-PausePeriod=36
-PauseTime=12
-Deletion=12
-DeletionPausePeriod=9
-DeletionPauseTime=11
+Users=10
+PausePeriod=1
+PauseTime=10
+DeletionPeriod=1
 for arg in "$@"; do
     [ "$arg" == "--nocmdpost" ] && nocmdpost=1
     [ "$arg" == "-c" ] && cleanup=1
@@ -55,8 +53,7 @@ mkdir $tmpdir
 counter=0
 usr=$Users
 pp=$PausePeriod
-del=$Deletion
-del_period=$DeletionPausePeriod
+del=$DeletionPeriod
 while [ 1 ]; do
     for(( jp=0; jp<$JobsPack; jp++)); do
         output="Job = $counter, user = $usr, pause = $pp, deletion = $del, period = $del_period"
@@ -83,22 +80,20 @@ while [ 1 ]; do
         let counter=$counter+1
     done
     sleep 1
-    let del=$del-1
-    if [ $del == 0 ]; then
-        echo "Deleting Jobs."
-        $AF_ROOT/bin/afcmd jdel "emulate_job_.*"
-        del=$Deletion
-        let del_period=$del_period-1
-        if [ $del_period == 0 ]; then
-            echo "Deletion pause..."
-            sleep $DeletionPauseTime
-            del_period=$DeletionPausePeriod
-        fi
-    fi
     let pp=$pp-1
     if [ $pp == 0 ]; then
-        echo "Pause..."
         pp=$PausePeriod
-        sleep $PauseTime
+        let del=$del-1
+        if [ $del == 0 ]; then
+            echo "Deleting Jobs."
+            del=$DeletionPeriod
+            for(( dp=0; dp<$PauseTime; dp++)); do
+                $AF_ROOT/bin/afcmd jdel "emulate_job_.*"
+                sleep 1
+            done
+         else
+            echo "Pause..."
+            sleep $PauseTime
+        fi
     fi
 done

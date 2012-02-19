@@ -34,7 +34,7 @@ protected:
 private slots:
    void sendRegister();
    void caseMessage( af::Msg* msg);
-   void connectionLost( af::Address* address);
+   void connectionLost();
    void sendMessage();
    void activated();
    void hideRaiseDialog();

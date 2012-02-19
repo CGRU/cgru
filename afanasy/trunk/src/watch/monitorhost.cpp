@@ -2,8 +2,6 @@
 
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "watch.h"
 
 #define AFOUTPUT
@@ -56,7 +54,7 @@ printf("   %c [%s]\n", type==af::Msg::TMonitorSubscribe ? '+':'-', af::Msg::TNAM
          }
       }
    }
-   if( ids.getCount() && Watch::isConnected()) Watch::sendMsg( new afqt::QMsg( type, &ids));
+   if( ids.getCount() && Watch::isConnected()) Watch::sendMsg( new af::Msg( type, &ids));
 }
 
 void MonitorHost::connectionLost()
@@ -128,7 +126,7 @@ if( counts ) for( int j = 0; j < counts; j++, jIt++, cIt++)
 else printf("R: No ids.\n");
 }
 #endif
-   if( ids.getCount() && Watch::isConnected()) Watch::sendMsg( new afqt::QMsg( type, &ids));
+   if( ids.getCount() && Watch::isConnected()) Watch::sendMsg( new af::Msg( type, &ids));
 }
 
 void MonitorHost::setUid( int uid)
@@ -139,5 +137,5 @@ AFINFO("MonitorHost::setUid:");
    af::MCGeneral ids;
    ids.setId( Watch::getId());
    ids.addId( uid);
-   if( Watch::isConnected()) Watch::sendMsg( new afqt::QMsg( af::Msg::TMonitorUsersJobs, &ids));
+   if( Watch::isConnected()) Watch::sendMsg( new af::Msg( af::Msg::TMonitorUsersJobs, &ids));
 }

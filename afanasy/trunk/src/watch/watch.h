@@ -48,7 +48,7 @@ public:
    static void connectionLost();
    static void connectionEstablished();
 
-   static void sendMsg(  afqt::QMsg * msg);
+   static void sendMsg(  af::Msg * msg);
 
    static void addWindow(      Wnd      * wnd      );
    static void removeWindow(   Wnd      * wnd      );

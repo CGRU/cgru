@@ -1,5 +1,5 @@
 #include "qobject.h"
-/*
+#if 0
 #include <QtCore/QCoreApplication>
 
 #include "../libafanasy/environment.h"
@@ -21,8 +21,7 @@ RenderHost * pRENDER;
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
-*/
-#if 0
+
 Object * Object::OBJECT = NULL;
 
 bool recvMessage_handler( QTcpSocket *qsocket, af::Msg *msg) { return Object::OBJECT->requestAnswer( qsocket, msg);}

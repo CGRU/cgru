@@ -9,8 +9,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "itemuser.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
@@ -178,13 +176,13 @@ AFINFO("ListUsers::caseMessage( Msg msg)\n");
    {
       af::MCGeneral ids( msg);
       deleteItems( ids);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TUsersListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
       break;
    }
    case af::Msg::TMonitorUsersChanged:
    {
       af::MCGeneral ids( msg);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TUsersListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &ids, true));
       break;
    }
    default:
@@ -400,6 +398,6 @@ void ListUsers::actRequestLog()
    displayInfo( "User log request.");
    Item* item = getCurrentItem();
    if( item == NULL ) return;
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TUserLogRequestId, item->getId(), true);
+   af::Msg * msg = new af::Msg( af::Msg::TUserLogRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }

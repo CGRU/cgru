@@ -80,7 +80,7 @@ Watch::~Watch()
 
 void Watch::destroy() { d = NULL; m = NULL;}
 
-void Watch::sendMsg(        afqt::QMsg  * msg     ){if(d) d->sendMsg(        msg    );}
+void Watch::sendMsg(              af::Msg * msg   ){if(d) d->sendMsg(        msg    );}
 void Watch::displayInfo(    const QString &message){if(d){d->displayInfo(    message);if(d->isHidden())d->show();}}
 void Watch::displayWarning( const QString &message){if(d){d->displayWarning( message);if(d->isHidden())d->show();}}
 void Watch::displayError(   const QString &message){if(d){d->displayError(   message);if(d->isHidden())d->show();}}

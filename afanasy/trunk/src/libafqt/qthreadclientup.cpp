@@ -1,6 +1,7 @@
 #include "qthreadclientup.h"
 
 #include "../libafanasy/environment.h"
+#include "../libafanasy/msg.h"
 
 using namespace afqt;
 
@@ -39,7 +40,7 @@ void QThreadClientUp::setInterval( const int Seconds)
    if( ! blocking) timer.setInterval( Seconds * 1000 );
 }
 
-void QThreadClientUp::setUpMsg( QMsg * msg)
+void QThreadClientUp::setUpMsg( af::Msg * msg)
 {
    toQuit = false;
 
@@ -67,7 +68,7 @@ void QThreadClientUp::send()
       cond.wakeOne();
 }
 
-QMsg * afqt::QThreadClientUp::getMessage()
+af::Msg * afqt::QThreadClientUp::getMessage()
 {
    while( queue.getCount() > 1)
    {
@@ -85,7 +86,7 @@ AFINFO("QThreadClientUp::run()")
    if( blocking)
       while( ! toQuit )
       {
-         QMsg * message = getMessage();
+         af::Msg * message = getMessage();
 #ifdef AFOUTPUT
 printf("QThreadClientUp::run: (blocking) "); message->stdOut();
 #endif
@@ -103,7 +104,7 @@ printf("QThreadClientUp::run: (blocking) "); message->stdOut();
    else
       while( ! toQuit )
       {
-         QMsg * message = getMessage();
+         af::Msg * message = getMessage();
 #ifdef AFOUTPUT
 printf("QThreadClientUp::run: (non-blocking) "); message->stdOut();
 #endif

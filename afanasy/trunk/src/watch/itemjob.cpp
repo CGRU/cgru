@@ -7,7 +7,6 @@
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "../libafqt/qenvironment.h"
-#include "../libafqt/qmsg.h"
 
 #include "ctrlsortfilter.h"
 #include "watch.h"

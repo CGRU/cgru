@@ -9,6 +9,8 @@
 
 #include <string>
 
+namespace afqt { class QMsgQueue; }
+
 namespace af
 {
 void thread_entry_point( void *i_parameter );
@@ -20,6 +22,7 @@ public:
    AfQueueItem();
    virtual ~AfQueueItem();
    friend class AfQueue;
+   friend class afqt::QMsgQueue;
 private:
    mutable AfQueueItem * next_ptr;
 };

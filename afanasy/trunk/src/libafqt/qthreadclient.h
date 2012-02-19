@@ -2,8 +2,9 @@
 
 #include <QtCore/QThread>
 
+#include "../libafanasy/name_af.h"
+
 #include "name_afqt.h"
-#include "qmsg.h"
 #include "qmsgqueue.h"
 
 /// Class that can send messages in a different thread.
@@ -15,13 +16,13 @@ public:
    ~QThreadClient();      ///< Dectructor for safety thread exit.
 
 signals:
-   void newMsg( af::Msg *msg);                  ///< This signal will be emitted if server produced an answer.
-   void connectionLost( af::Address * address); ///< When can't connect to address.
+   void newMsg( af::Msg *msg);  ///< This signal will be emitted if server produced an answer.
+   void connectionLost();       ///< When can't connect to address.
 
 protected:
    afqt::QMsgQueue queue;
 
-   void sendMessage( QMsg * msg, QTcpSocket * socket); ///< Send message, stored in poiter.
+   void sendMessage( af::Msg * msg, QTcpSocket * socket); ///< Send message, stored in poiter.
    int numconnlost;   ///< Number of times to fail to connect to produce signal \c connectionLost.
    int connlostcount; ///< Current numder of fails to connect.
 };

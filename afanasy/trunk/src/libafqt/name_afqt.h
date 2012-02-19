@@ -18,7 +18,7 @@ namespace afqt
    const QHostAddress toQAddress( const af::Address & address);
 
 /// Connect to some adress.
-   bool connect( const af::Address * address, QTcpSocket * qSocket);
+   bool connect( const af::Address & address, QTcpSocket * qSocket);
 
 /// Sent message.
    bool sendMessage( QTcpSocket * qSocket, const af::Msg * msg);
@@ -34,7 +34,6 @@ namespace afqt
    class AttrColor;
    class AttrRect;
 
-   class QMsg;
    class QMsgQueue;
 
    class QThreadClient;

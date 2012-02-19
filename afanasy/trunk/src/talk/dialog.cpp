@@ -12,7 +12,6 @@
 #include "../libafanasy/msgclasses/mctalkdistmessage.h"
 
 #include "../libafqt/name_afqt.h"
-#include "../libafqt/qmsg.h"
 
 #include "talkhost.h"
 #include "textview.h"
@@ -55,7 +54,7 @@ Dialog::Dialog():
 
    connect( qServer,         SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*)));
    connect( qthreadClientUp, SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*)));
-   connect( qthreadClientUp, SIGNAL( connectionLost( af::Address*) ), this, SLOT( connectionLost( af::Address*)));
+   connect( qthreadClientUp, SIGNAL( connectionLost() ), this, SLOT( connectionLost()));
 
    connect( editor, SIGNAL( sendMessage()), this, SLOT( sendMessage()));
 
@@ -75,7 +74,7 @@ Dialog::Dialog():
 
 Dialog::~Dialog()
 {
-   qthreadClientSend->send( new afqt::QMsg( af::Msg::TTalkDeregister, talk->getId()));
+   qthreadClientSend->send( new af::Msg( af::Msg::TTalkDeregister, talk->getId()));
    if( talk != NULL) delete talk;
 }
 
@@ -96,7 +95,7 @@ void Dialog::hideRaiseDialog()
    }
 }
 
-void Dialog::connectionLost( af::Address* address)
+void Dialog::connectionLost()
 {
    if( connected == false ) return;
    connected = false;
@@ -108,9 +107,12 @@ void Dialog::connectionLost( af::Address* address)
    usersList->clear();
    setWindowTitle( afqt::stoq((std::string("Talk::") + username + "@" + hostname + ":(connecting...)")));
 }
-void Dialog::sendRegister(){ qthreadClientUp->setUpMsg( new afqt::QMsg( af::Msg::TTalkRegister, talk, true));}
+void Dialog::sendRegister()
+{
+    qthreadClientUp->setUpMsg( new af::Msg( af::Msg::TTalkRegister, talk, true));
+}
 
-void Dialog::caseMessage( af::Msg *msg)
+void Dialog::caseMessage( af::Msg * msg)
 {
 //AFINFO("void Dialog::caseMessage( Msg msg)\n");
    if( msg == NULL)
@@ -133,17 +135,16 @@ void Dialog::caseMessage( af::Msg *msg)
    {
       if( talk->getId())
       {
-         if( msg->int32() != talk->getId()) connectionLost( NULL);
+         if( msg->int32() != talk->getId()) connectionLost();
       }
       else
       {
          if( msg->int32())
          {
             talk->setId( msg->int32());
-            afqt::QMsg * msg = new afqt::QMsg( af::Msg::TTalkUpdateId, talk->getId(), true);
-            qthreadClientUp->setUpMsg( msg);
+            qthreadClientUp->setUpMsg( new af::Msg( af::Msg::TTalkUpdateId, talk->getId(), true));
          }
-         else connectionLost( NULL);
+         else connectionLost();
       }
       break;
    }
@@ -201,8 +202,7 @@ void Dialog::sendMessage()
    af::MCTalkdistmessage mcdmsg( username, text.toUtf8().data());
    for( int sel = 0; sel < count_sel; sel++) mcdmsg.addUser( qlist[sel]->text().toUtf8().data());
 
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TTalkDistributeData, &mcdmsg);
-   qthreadClientSend->send( msg);
+   qthreadClientSend->send( new af::Msg( af::Msg::TTalkDistributeData, &mcdmsg));
    editor->clear();
 }
 

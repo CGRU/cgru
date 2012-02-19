@@ -2,6 +2,7 @@
 #include "name_afqt.h"
 
 #include "../libafanasy/address.h"
+#include "../libafanasy/msg.h"
 
 using namespace afqt;
 
@@ -22,7 +23,7 @@ QThreadClient::~QThreadClient()
 AFINFO("QThreadClient::~QThreadClient()")
 }
 
-void QThreadClient::sendMessage( QMsg * msg, QTcpSocket * socket)
+void QThreadClient::sendMessage( af::Msg * msg, QTcpSocket * socket)
 {
    if( msg == NULL ) return;
 
@@ -31,7 +32,7 @@ printf("QThreadClient::sendMessage: "); msg->stdOut();
 #endif
 
    bool connected = false;
-   if( msg->getAddress() )
+   if( false == msg->addressIsEmpty() )
       connected = afqt::connect( msg->getAddress(), socket);
    else
       connected = afqt::connectAfanasy(   socket);
@@ -42,9 +43,9 @@ printf("QThreadClient::sendMessage: "); msg->stdOut();
       {
          if( afqt::sendMessage( socket, msg)) send = true;
       }
-      if( msg->getRecieving() && send)
+      if( msg->isReceiving() && send)
       {
-         af::Msg *answer = new af::Msg;
+         af::Msg * answer = new af::Msg;
          if( afqt::recvMessage( socket, answer))
          {
             emit newMsg( answer);
@@ -69,8 +70,7 @@ printf("QThreadClient::sendMessage: "); msg->stdOut();
       if( connlostcount == numconnlost )
       {
          AFERRAR("%s: Connection Lost!", objectName().toUtf8().data())
-         if( msg->getAddress() )  emit connectionLost( new af::Address( msg->getAddress()));
-         else                     emit connectionLost( NULL);
+         emit connectionLost();
       }
    }
 }

@@ -21,25 +21,25 @@ class Msg : public Af, public AfQueueItem
 {
 public:
 /// Default constructor.
-   Msg( int msgType = 0, int msgInt = 0);
+   Msg( int msgType = 0, int msgInt = 0, bool i_receiving = false);
 
 /// Constructor from \c Af class.
-   Msg( int msgType, Af * afClass );
+   Msg( int msgType, Af * afClass, bool i_receiving = false );
 
     /// Construct a message and set an address
     Msg( const struct sockaddr_storage * ss);
 
-    Msg( const char * rawData, int rawDataLen);
+    Msg( const char * rawData, int rawDataLen, bool i_receiving = false);
 
    ~Msg();///< Destructor.
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
 /// To set zero (\c Msg::TNone ) message to some non data message. Return \c true on success.
-   bool set( int msgType, int msgInt = 0);
+   bool set( int msgType, int msgInt = 0, bool i_receiving = false);
 
 /// Write \c Af class to message.
-   bool set( int msgType, Af * afClass );
+   bool set( int msgType, Af * afClass, bool i_receiving = false);
 
 /// To set zero (\c Msg::TNone ) message to data message. Return \c true on success.
    bool setData( int size, const char * msgData);

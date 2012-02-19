@@ -1,5 +1,6 @@
 #include "qthreadclientsend.h"
-#include "name_afqt.h"
+
+#include "../libafanasy/msg.h"
 
 using namespace afqt;
 
@@ -21,7 +22,7 @@ QThreadClientSend::~QThreadClientSend()
 AFINFO("QThreadClientSend::~QThreadClientSend()")
 }
 
-void QThreadClientSend::send( QMsg * msg)
+void QThreadClientSend::send( af::Msg * msg)
 {
 #ifdef AFOUTPUT
 printf("QThreadClientSend::send: "); msg->stdOut();
@@ -36,7 +37,7 @@ AFINFO("QThreadClientSend::run()")
 
    for(;;)
    {
-      QMsg *msg = queue.pop();
+      af::Msg * msg = queue.pop();
       if( msg != NULL)
       {
          sendMessage( msg, &socket);

@@ -13,7 +13,6 @@
 
 #include "../libafqt/name_afqt.h"
 #include "../libafqt/qenvironment.h"
-#include "../libafqt/qmsg.h"
 
 #include "buttonmonitor.h"
 #include "buttonout.h"
@@ -103,14 +102,14 @@ Dialog::Dialog():
    connect( &qServer,               SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
    connect( &qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
    connect( &qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
-   connect( &qThreadClientUpdate,   SIGNAL( connectionLost( af::Address*)), this, SLOT( connectionLost( af::Address*)));
-   connect( &qThreadSend,           SIGNAL( connectionLost( af::Address*)), this, SLOT( connectionLost( af::Address*)));
+   connect( &qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
+   connect( &qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
 
    setAutoFillBackground( true);
 
    monitor = new MonitorHost();
 
-   connectionLost( NULL);
+   connectionLost();
 
    connect( &repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
 
@@ -127,7 +126,7 @@ Dialog::~Dialog()
 {
    AFINFO("Dialog::~Dialog:")
    Watch::destroy();
-   qThreadSend.send( new afqt::QMsg( af::Msg::TMonitorDeregister, monitor->getId()));
+   qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, monitor->getId()));
    delete monitor;
 }
 
@@ -135,8 +134,8 @@ void Dialog::repaintStart( int mseconds) { repaintTimer.start( mseconds);       
 void Dialog::repaintFinish()             { repaintTimer.stop();                                       }
 void Dialog::repaintWatch()              { Watch::repaint(); if(listitems) listitems->repaintItems(); }
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
-void Dialog::sendRegister(){ qThreadClientUpdate.setUpMsg( new afqt::QMsg( af::Msg::TMonitorRegister, monitor, true));}
-void Dialog::sendMsg( afqt::QMsg * msg)
+void Dialog::sendRegister(){ qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, monitor, true));}
+void Dialog::sendMsg( af::Msg * msg)
 {
 #ifdef AFOUTPUT
 printf(" <<< Dialog::sendMsg: ");msg->stdOut();
@@ -190,7 +189,7 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
    menu.exec( event->globalPos());
 }
 
-void Dialog::connectionLost( af::Address* address)
+void Dialog::connectionLost()
 {
    if( monitorType == Watch::WJobs )
    {
@@ -224,7 +223,7 @@ void Dialog::connectionEstablished()
    displayInfo("Connection established.");
    connected = true;
    setDefaultWindowTitle();
-   qThreadSend.send( new afqt::QMsg( af::Msg::TUserIdRequest, &mcuserhost, true));
+   qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &mcuserhost, true));
 
    Watch::connectionEstablished();
 }
@@ -251,19 +250,19 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    {
       if( monitor->getId() != 0 )
       {
-         if( msg->int32() != monitor->getId()) connectionLost( NULL);
+         if( msg->int32() != monitor->getId()) connectionLost();
       }
       else
       {
          if( msg->int32() == 0)
          {
-            connectionLost( NULL);
+            connectionLost();
          }
          else
          {
             monitor->setId( msg->int32());
             connectionEstablished();
-            afqt::QMsg * msg = new afqt::QMsg( af::Msg::TMonitorUpdateId, monitor->getId(), true);
+            af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, monitor->getId(), true);
             qThreadClientUpdate.setUpMsg( msg);
          }
       }
@@ -355,7 +354,7 @@ bool Dialog::openMonitor( int type, bool open)
    {
       ButtonMonitor::unset();
       displayWarning("You are not registered ( and have no jobs).");
-      qThreadSend.send( new afqt::QMsg( af::Msg::TUserIdRequest, &mcuserhost, true));
+      qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &mcuserhost, true));
       return false;
    }
 

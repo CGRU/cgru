@@ -11,8 +11,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "itemjob.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
@@ -89,11 +87,11 @@ void ListJobs::shownFunc()
    if( Watch::isConnected() == false) return;
 
    if( af::Environment::VISOR())
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TJobsListRequest, 0, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequest, 0, true));
    else
    {
       if( Watch::getUid())
-         Watch::sendMsg( new afqt::QMsg( af::Msg::TJobsListRequestUserId, Watch::getUid(), true));
+         Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestUserId, Watch::getUid(), true));
       else
          if( parentWindow != (QWidget*)Watch::getDialog()) close();
    }
@@ -285,7 +283,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
    {
       if( updateItems( msg) && (af::Environment::VISOR() == false))
       {
-         Watch::sendMsg( new afqt::QMsg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+         Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
       }
       if( false == isSubscribed() )
       {
@@ -307,13 +305,13 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
    {
       af::MCGeneral ids( msg);
       deleteItems( ids);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TJobsListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
       break;
    }
    case af::Msg::TMonitorJobsChanged:
    {
       af::MCGeneral ids( msg);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TJobsListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
       break;
    }
    case af::Msg::TUserJobsOrder:
@@ -340,7 +338,7 @@ ItemNode* ListJobs::createNewItem( af::Node *node)
 void ListJobs::resetSorting()
 {
    if( af::Environment::VISOR() == false )
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
+      Watch::sendMsg( new af::Msg( af::Msg::TUserJobsOrderRequestId, Watch::getUid(), true));
 }
 
 void ListJobs::calcTotals()
@@ -492,7 +490,7 @@ void ListJobs::actRequestLog()
    displayInfo( "Job log request.");
    Item* item = getCurrentItem();
    if( item == NULL ) return;
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TJobLogRequestId, item->getId(), true);
+   af::Msg * msg = new af::Msg( af::Msg::TJobLogRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }
 
@@ -501,7 +499,7 @@ void ListJobs::actRequestErrorHostsList()
    displayInfo( "Job void hosts request.");
    Item* jobitem = getCurrentItem();
    if( jobitem == NULL ) return;
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TJobErrorHostsRequestId, jobitem->getId(), true);
+   af::Msg * msg = new af::Msg( af::Msg::TJobErrorHostsRequestId, jobitem->getId(), true);
    Watch::sendMsg( msg);
 }
 

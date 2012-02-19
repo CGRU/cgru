@@ -23,13 +23,13 @@ ListJobs::ListJobs( QWidget * parent):
    if( pMONITOR->isConnected())
    {
       eventIds.setId( pMONITOR->getId());
-      pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TMonitorSubscribe, &eventIds));
+      pMONITOR->sendMsg( new af::Msg( af::Msg::TMonitorSubscribe, &eventIds));
    }
 }
 
 ListJobs::~ListJobs()
 {
-//   pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TMonitorUnSubscribe, &eventIds));
+//   pMONITOR->sendMsg( new af::Msg( af::Msg::TMonitorUnSubscribe, &eventIds));
 }
 
 bool ListJobs::caseMessage( af::Msg* msg)
@@ -54,7 +54,7 @@ bool ListJobs::caseMessage( af::Msg* msg)
    case af::Msg::TMonitorJobsChanged:
    {
       af::MCGeneral list( msg);
-      pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TJobsListRequestIds, &list, true));
+      pMONITOR->sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &list, true));
       return true;
    }
    }
@@ -81,7 +81,7 @@ printf("ListJobs::usersSelectionChanged:");
 printf(" %d", (*ids)[i]);
    }
 printf("\n");
-   pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TJobsListRequestUsersIds, &userIds, true));
+   pMONITOR->sendMsg( new af::Msg( af::Msg::TJobsListRequestUsersIds, &userIds, true));
    userIds.setId( pMONITOR->getId());
-   pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TMonitorUsersJobs, &userIds));
+   pMONITOR->sendMsg( new af::Msg( af::Msg::TMonitorUsersJobs, &userIds));
 }

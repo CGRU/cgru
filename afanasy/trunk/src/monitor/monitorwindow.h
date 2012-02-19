@@ -24,7 +24,7 @@ public:
    inline bool isInitialized() const { return initialized; }
    inline bool isConnected()   const { return connected;   }
 
-   inline void sendMsg( afqt::QMsg * msg) { qthreadClientSend->send( msg); }
+   inline void sendMsg( af::Msg * msg) { qthreadClientSend->send( msg); }
    inline int  getId() const { return monitor->getId(); }
 
    inline int getUsersSelectionCount() const { return usersSelectionCount; }
@@ -47,7 +47,7 @@ protected:
 private slots:
    void sendRegister();
    void caseMessage( af::Msg* msg);
-   void connectionLost( af::Address* address);
+   void connectionLost();
 
    void usersSelectionChanged();
 

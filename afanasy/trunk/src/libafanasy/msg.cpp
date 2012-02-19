@@ -25,16 +25,16 @@ const int Msg::SizeDataMax       = Msg::SizeBufferLimit - Msg::SizeHeader;
 
 //
 //########################## Message constructors: (and destructor) ###########################
-Msg::Msg( int msgType, int msgInt)
+Msg::Msg( int msgType, int msgInt, bool i_receiving)
 {
    construct();
-   set( msgType, msgInt);
+   set( msgType, msgInt, i_receiving);
 }
 
-Msg::Msg( int msgType, Af * afClass )
+Msg::Msg( int msgType, Af * afClass, bool i_receiving )
 {
    construct();
-   set( msgType, afClass);
+   set( msgType, afClass, i_receiving);
 }
 
 Msg::Msg( const struct sockaddr_storage * ss):
@@ -44,11 +44,12 @@ Msg::Msg( const struct sockaddr_storage * ss):
     set( TNULL);
 }
 
-Msg::Msg( const char * rawData, int rawDataLen):
-   mbuffer( NULL),
-   // This message not for write any more data. All data will be written in this constuctor.
-   // We will only read node parameters to constuct af::Af based classes.
-   writing( false)
+Msg::Msg( const char * rawData, int rawDataLen, bool i_receiving):
+    m_receive( i_receiving),
+    mbuffer( NULL),
+    // This message not for write any more data. All data will be written in this constuctor.
+    // We will only read node parameters to constuct af::Af based classes.
+    writing( false)
 {
    if( rawDataLen < Msg::SizeHeader ) // Check minimum message size.
    {
@@ -152,18 +153,19 @@ bool Msg::checkZero( bool outerror )
    return true;
 }
 
-bool Msg::set( int msgType, int msgInt)
+bool Msg::set( int msgType, int msgInt, bool i_receiving)
 {
-   if( msgType >= Msg::TDATA)
-   {
-      AFERROR("Msg::set: Trying to set data message with no data.")
-      setInvalid();
-      return false;
-   }
-   mtype   = msgType;
-   mint32 = msgInt;
-   rw_header( true);
-   return true;
+    m_receive = i_receiving;
+    if( msgType >= Msg::TDATA)
+    {
+        AFERROR("Msg::set: Trying to set data message with no data.")
+        setInvalid();
+        return false;
+    }
+    mtype   = msgType;
+    mint32 = msgInt;
+    rw_header( true);
+    return true;
 }
 
 bool Msg::setData( int size, const char * msgData)
@@ -188,10 +190,11 @@ bool Msg::setData( int size, const char * msgData)
    return true;
 }
 
-bool Msg::set( int msgType, Af * afClass )
+bool Msg::set( int msgType, Af * afClass, bool i_receiving)
 {
    if(checkZero( true) == false ) return false;
 
+   m_receive = i_receiving;
    mtype = msgType;
    if( mtype < TDATA)
    {

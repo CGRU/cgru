@@ -12,7 +12,6 @@
 #include "../libafanasy/msgclasses/mctaskspos.h"
 
 #include "../libafqt/qenvironment.h"
-#include "../libafqt/qmsg.h"
 
 #include "actionid.h"
 #include "item.h"
@@ -541,7 +540,7 @@ af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, ListItems *
       {
          af::MCTasksPos taskspos( jobid, " (watch) ");
          if( taskspos.addBlock( id_block) == false) return NULL;
-         afqt::QMsg * msg = new afqt::QMsg( id_action, &taskspos);
+         af::Msg * msg = new af::Msg( id_action, &taskspos);
          Watch::sendMsg( msg);
          if( id_action== af::Msg::TTasksSkip) listitems->displayInfo( "Skip blocks.");
          else listitems->displayInfo( "Restart blocks.");

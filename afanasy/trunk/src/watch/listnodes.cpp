@@ -4,8 +4,6 @@
 #include <QtCore/QEvent>
 #include <QtCore/QTimer>
 
-#include "../libafqt/qmsg.h"
-
 #include "itemnode.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"

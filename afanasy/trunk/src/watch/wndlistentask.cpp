@@ -7,8 +7,6 @@
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskoutput.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "watch.h"
 
 #define AFOUTPUT
@@ -39,7 +37,7 @@ WndListenTask::WndListenTask( int JobId, int BlockNum, int TaskNum, const QStrin
    taskname += " %1:";
 
    af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK | af::MCListenAddress::TOLISTEN, Watch::getClientAddress(), jobid, block, task);
-   Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
+   Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
 }
 
 WndListenTask::~WndListenTask()
@@ -49,7 +47,7 @@ WndListenTask::~WndListenTask()
 void WndListenTask::closeEvent( QCloseEvent * event)
 {
    af::MCListenAddress mclass( af::MCListenAddress::JUSTTASK, Watch::getClientAddress(), jobid, block, task);
-   Watch::sendMsg( new afqt::QMsg( af::Msg::TTaskListenOutput, &mclass));
+   Watch::sendMsg( new af::Msg( af::Msg::TTaskListenOutput, &mclass));
    Wnd::closeEvent( event);
 }
 

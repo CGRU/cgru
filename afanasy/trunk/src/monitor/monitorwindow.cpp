@@ -6,7 +6,6 @@
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/name_afqt.h"
-#include "../libafqt/qmsg.h"
 
 #include "listjobs.h"
 #include "listusers.h"
@@ -66,8 +65,8 @@ MonitorWindow::MonitorWindow():
    connect( qServer,           SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*)));
    connect( qthreadClientUp,   SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*)));
    connect( qthreadClientSend, SIGNAL( newMsg( af::Msg*)), this, SLOT( caseMessage( af::Msg*)));
-   connect( qthreadClientUp,   SIGNAL( connectionLost( af::Address*) ), this, SLOT( connectionLost( af::Address*)));
-   connect( qthreadClientSend, SIGNAL( connectionLost( af::Address*) ), this, SLOT( connectionLost( af::Address*)));
+   connect( qthreadClientUp,   SIGNAL( connectionLost() ), this, SLOT( connectionLost()));
+   connect( qthreadClientSend, SIGNAL( connectionLost() ), this, SLOT( connectionLost()));
    monitor = new MonitorHost();
    initialized = true;
    monitor->stdOut();
@@ -81,18 +80,17 @@ MonitorWindow::~MonitorWindow()
 
 void MonitorWindow::closeEvent( QCloseEvent * event)
 {
-   qthreadClientSend->send( new afqt::QMsg( af::Msg::TMonitorDeregister, monitor->getId()));
+   qthreadClientSend->send( new af::Msg( af::Msg::TMonitorDeregister, monitor->getId()));
    connected = false;
 }
 
 void MonitorWindow::sendRegister()
 {
 //printf("MonitorWindow::sendRegister()\n");
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TMonitorRegister, monitor, true);
-   qthreadClientUp->setUpMsg( msg);
+   qthreadClientUp->setUpMsg( new af::Msg( af::Msg::TMonitorRegister, monitor, true));
 }
 
-void MonitorWindow::connectionLost( af::Address* address)
+void MonitorWindow::connectionLost()
 {
    if( connected == false ) return;
    connected = false;
@@ -136,19 +134,19 @@ void MonitorWindow::caseMessage( af::Msg *msg)
    {
       if( monitor->getId() != 0 )
       {
-         if( msg->int32() != monitor->getId()) connectionLost( NULL);
+         if( msg->int32() != monitor->getId()) connectionLost();
       }
       else
       {
          if( msg->int32() == 0)
          {
-            connectionLost( NULL);
+            connectionLost();
          }
          else
          {
             monitor->setId( msg->int32());
             connectionEstablished();
-            afqt::QMsg * msg = new afqt::QMsg( af::Msg::TMonitorUpdateId, monitor->getId(), true);
+            af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, monitor->getId(), true);
             qthreadClientUp->setUpMsg( msg);
          }
       }

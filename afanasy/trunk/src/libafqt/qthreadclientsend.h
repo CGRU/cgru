@@ -4,9 +4,9 @@
 #include <QtCore/QMutex>
 #include <QtCore/QWaitCondition>
 
+#include "../libafanasy/name_af.h"
 
 #include "name_afqt.h"
-#include "qmsg.h"
 #include "qthreadclient.h"
 
 /// Class that can send messages in a different thread.
@@ -22,7 +22,7 @@ public:
    ~QThreadClientSend();      ///< Dectructor for safety thread exit.
 
    virtual void run();        ///< QThread.run() method override.
-   void send( afqt::QMsg * msg);    ///< Send message function.
+   void send( af::Msg * msg);    ///< Send message function.
 
 protected:
 };

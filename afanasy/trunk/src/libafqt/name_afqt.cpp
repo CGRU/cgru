@@ -44,18 +44,18 @@ printf("afqt::connectAfanasy: %s : %d\n", afqt::QEnvironment::getAfServerQHostAd
    return true;
 }
 
-bool afqt::connect( const af::Address * address, QTcpSocket * qSocket)
+bool afqt::connect( const af::Address & address, QTcpSocket * qSocket)
 {
    if( qSocket->state() != QAbstractSocket::ConnectedState)
    {
 //      QHostAddress addr;
 //      address->setQAddress( addr);
 //      qSocket->connectToHost( addr, address->getPortHBO());
-      qSocket->connectToHost( afqt::toQAddress( address), address->getPortHBO());
+      qSocket->connectToHost( afqt::toQAddress( address), address.getPortHBO());
       if( qSocket->waitForConnected( WAITFORCONNECTED) == false)
       {
          AFERROR("afqt::connect: Can't connect to address:")
-         printf(" %s", address->generateInfoString().c_str());
+         printf(" %s", address.generateInfoString().c_str());
          printf(" Q = %s", afqt::toQAddress( address).toString().toUtf8().data());
          printf("\n");
          return false;

@@ -1,6 +1,6 @@
 #include "qmsgqueue.h"
 
-#include "qmsg.h"
+#include "../libafanasy/msg.h"
 
 using namespace afqt;
 
@@ -20,13 +20,13 @@ QMsgQueue::~QMsgQueue()
 AFINFO("QMsgQueue::~QMsgQueue():\n");
    while( firstPtr != NULL)
    {
-      QMsg* msg = firstPtr;
-      firstPtr = msg->next_ptr;
+      af::Msg * msg = firstPtr;
+      firstPtr = (af::Msg *)(msg->next_ptr);
       delete msg;
    }
 }
 
-bool QMsgQueue::push( QMsg* msg)
+bool QMsgQueue::push( af::Msg * msg)
 {
    if( msg == NULL)
    {
@@ -49,9 +49,9 @@ AFINFA("Msg* MsgQueue::push(): msg=%p, count=%d\n", msg, count);
    return true;
 }
 
-QMsg* QMsgQueue::pop( bool block)
+af::Msg * QMsgQueue::pop( bool block)
 {
-   QMsg* msg = NULL;
+   af::Msg * msg = NULL;
 
    bool semresult = true;
    if( block)        semaphore.acquire();
@@ -62,7 +62,7 @@ QMsg* QMsgQueue::pop( bool block)
    if((count > 0) && (firstPtr != NULL))
    {
       msg = firstPtr;
-      firstPtr = msg->next_ptr;
+      firstPtr = (af::Msg *)(msg->next_ptr);
       msg->next_ptr = NULL;
       count--;
    }

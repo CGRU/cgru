@@ -27,12 +27,12 @@ void ListNodes::connectionLost()
 
 void ListNodes::connectionEstablished()
 {
-   if( pMONITOR->isConnected() && type ) pMONITOR->sendMsg( new afqt::QMsg( type, 0, true));
+   if( pMONITOR->isConnected() && type ) pMONITOR->sendMsg( new af::Msg( type, 0, true));
 }
 
 void ListNodes::showEvent( QShowEvent * event)
 {
-   if( pMONITOR->isConnected() && type ) pMONITOR->sendMsg( new afqt::QMsg( type, 0, true));
+   if( pMONITOR->isConnected() && type ) pMONITOR->sendMsg( new af::Msg( type, 0, true));
 }
 
 void ListNodes::hideEvent( QHideEvent * event)
@@ -44,14 +44,14 @@ void ListNodes::subscribe()
 {
    if( subscribed) return;
    eventIds.setId( pMONITOR->getId());
-   pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TMonitorSubscribe, &eventIds));
+   pMONITOR->sendMsg( new af::Msg( af::Msg::TMonitorSubscribe, &eventIds));
    subscribed = true;
 }
 
 void ListNodes::unSubscribe()
 {
    eventIds.setId( pMONITOR->getId());
-   pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TMonitorUnsubscribe, &eventIds));
+   pMONITOR->sendMsg( new af::Msg( af::Msg::TMonitorUnsubscribe, &eventIds));
    subscribed = false;
 }
 

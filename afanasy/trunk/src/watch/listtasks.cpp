@@ -23,8 +23,6 @@
 #include "../libafanasy/msgclasses/mctaskspos.h"
 #include "../libafanasy/msgclasses/mctasksprogress.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "actionid.h"
 #include "dialog.h"
 #include "itemjobblock.h"
@@ -55,7 +53,7 @@ ListTasks::ListTasks( QWidget* parent, int JobId, const QString & JobName):
 
    view->setListItems( this);
 
-   Watch::sendMsg( new afqt::QMsg( af::Msg::TJobRequestId, jobid, true));
+   Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, jobid, true));
 
    parentWindow->setWindowTitle( jobname);
 }
@@ -287,7 +285,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
       if( constructed == false)
       {
          construct( job);
-         Watch::sendMsg( new afqt::QMsg( af::Msg::TJobProgressRequestId, jobid, true));
+         Watch::sendMsg( new af::Msg( af::Msg::TJobProgressRequestId, jobid, true));
          Watch::addJobId( jobid);
       }
       else
@@ -337,7 +335,7 @@ printf("ListTasks::caseMessage:\n"); msg->stdOut();
    {
       af::MCGeneral ids( msg);
       if( ids.hasId( jobid))
-         Watch::sendMsg( new afqt::QMsg( af::Msg::TJobRequestId, jobid, true));
+         Watch::sendMsg( new af::Msg( af::Msg::TJobRequestId, jobid, true));
       break;
    }
    case af::Msg::TBlocks:
@@ -540,7 +538,7 @@ void ListTasks::do_Skip_Restart( int type, int itemid)
 
    if( taskspos.getCount() < 1) return;
 
-   afqt::QMsg * msg = new afqt::QMsg( type, &taskspos);
+   af::Msg * msg = new af::Msg( type, &taskspos);
    switch ( type )
    {
       case af::Msg::TTasksSkip:
@@ -565,7 +563,7 @@ void ListTasks::do_Info_StdOut( int type, int number, Item * item)
    if( item->getId() != ItemJobTask::ItemId) return;
    ItemJobTask *itemTask = (ItemJobTask*)item;
    af::MCTaskPos mctaskpos( jobid, itemTask->getBlockNum(), itemTask->getTaskNum(), number);
-   afqt::QMsg * msg = new afqt::QMsg( type, &mctaskpos, true);
+   af::Msg * msg = new af::Msg( type, &mctaskpos, true);
    Watch::sendMsg( msg);
 }
 
@@ -703,7 +701,7 @@ void ListTasks::setBlockProperty( int type, af::MCGeneral & mcgeneral)
    }
    mcgeneral.addId( jobid);
    mcgeneral.setId( ((ItemJobBlock*)item)->getNumBlock());
-   afqt::QMsg * msg = new afqt::QMsg( type, &mcgeneral);
+   af::Msg * msg = new af::Msg( type, &mcgeneral);
    Watch::sendMsg( msg);
 }
 
@@ -766,7 +764,7 @@ void ListTasks::blockAction( int id_block, int id_action)
    if( mcgeneral != NULL )
    {
       mcgeneral->addId( jobid);
-      afqt::QMsg * msg = new afqt::QMsg( id_action, mcgeneral);
+      af::Msg * msg = new af::Msg( id_action, mcgeneral);
       Watch::sendMsg( msg);
       delete mcgeneral;
    }

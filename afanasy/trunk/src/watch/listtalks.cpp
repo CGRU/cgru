@@ -10,8 +10,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mctalkdistmessage.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "itemtalk.h"
 #include "ctrlsortfilter.h"
 #include "watch.h"
@@ -91,7 +89,7 @@ AFINFO("void ListTalks::caseMessage( Msg msg)\n");
    {
       af::MCGeneral ids( msg);
       deleteItems( ids);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TTalksListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TTalksListRequestIds, &ids, true));
       break;
    }
    default:
@@ -121,7 +119,7 @@ void ListTalks::actSendMessage()
 
    for( int i = 0; i < items.count(); i++) mcdmsg.addUser(((ItemTalk*)(items[i]))->getUserName().toUtf8().data());
 
-   Watch::sendMsg( new afqt::QMsg( af::Msg::TTalkDistributeData, &mcdmsg));
+   Watch::sendMsg( new af::Msg( af::Msg::TTalkDistributeData, &mcdmsg));
 }
 
 void ListTalks::actExit()

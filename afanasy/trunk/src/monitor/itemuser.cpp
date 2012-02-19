@@ -1,6 +1,6 @@
 #include "itemuser.h"
 
-#include "../libafqt/qmsg.h"
+#include "../libafqt/name_afqt.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT

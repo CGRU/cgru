@@ -42,7 +42,7 @@ public:
    void inline displayWarning( const QString &message) { infoline->displayWarning( message); }
    void inline displayError(   const QString &message) { infoline->displayError(   message); }
 
-   void sendMsg( afqt::QMsg * msg);
+   void sendMsg( af::Msg * msg);
 
    bool openMonitor( int type, bool open);
 
@@ -55,8 +55,8 @@ signals:
    void stop();
 
 private slots:
-   void newMessage( af::Msg *msg);
-   void connectionLost( af::Address* address);
+   void newMessage( af::Msg * msg);
+   void connectionLost();
    void repaintWatch();
 
    void actColors();

@@ -13,8 +13,6 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
 
-#include "../libafqt/qmsg.h"
-
 #include "actionid.h"
 #include "dialog.h"
 #include "itemrender.h"
@@ -129,7 +127,7 @@ void ListRenders::requestResources()
 
    if( ids.getCount())
    {
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TRendersUpdateRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TRendersUpdateRequestIds, &ids, true));
    }
 }
 
@@ -368,13 +366,13 @@ bool ListRenders::caseMessage( af::Msg * msg)
    {
       af::MCGeneral ids( msg);
       deleteItems( ids);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TRendersListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TRendersListRequestIds, &ids, true));
       break;
    }
    case af::Msg::TMonitorRendersChanged:
    {
       af::MCGeneral ids( msg);
-      Watch::sendMsg( new afqt::QMsg( af::Msg::TRendersListRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TRendersListRequestIds, &ids, true));
       break;
    }
    default:
@@ -519,7 +517,7 @@ void ListRenders::actRequestLog()
    Item* item = getCurrentItem();
    if( item == NULL ) return;
    displayInfo( "Render log request.");
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderLogRequestId, item->getId(), true);
+   af::Msg * msg = new af::Msg( af::Msg::TRenderLogRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }
 
@@ -528,7 +526,7 @@ void ListRenders::actRequestTasksLog()
    Item* item = getCurrentItem();
    if( item == NULL ) return;
    displayInfo( "Render tasks log request.");
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderTasksLogRequestId, item->getId(), true);
+   af::Msg * msg = new af::Msg( af::Msg::TRenderTasksLogRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }
 
@@ -537,7 +535,7 @@ void ListRenders::actRequestInfo()
    Item* item = getCurrentItem();
    if( item == NULL ) return;
    displayInfo( "Render info request.");
-   afqt::QMsg * msg = new afqt::QMsg( af::Msg::TRenderInfoRequestId, item->getId(), true);
+   af::Msg * msg = new af::Msg( af::Msg::TRenderInfoRequestId, item->getId(), true);
    Watch::sendMsg( msg);
 }
 

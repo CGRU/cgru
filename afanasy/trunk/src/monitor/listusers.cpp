@@ -45,7 +45,7 @@ bool ListUsers::caseMessage( af::Msg* msg)
    case af::Msg::TMonitorUsersChanged:
    {
       af::MCGeneral list( msg);
-      pMONITOR->sendMsg( new afqt::QMsg( af::Msg::TUsersListRequestIds, &list, true));
+      pMONITOR->sendMsg( new af::Msg( af::Msg::TUsersListRequestIds, &list, true));
       return true;
    }
    }
