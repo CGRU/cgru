@@ -298,27 +298,27 @@ void TaskProcess::processFinished( int i_exitCode)
 
     readProcess();
 
-    if(/*( exitStatus != QProcess::NormalExit ) || */( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
+    if( i_exitCode != 0)
     {
-        printf("Task terminated/killed by signal: '%s'.\n", strsignal( WTERMSIG( i_exitCode)));
-        if( m_update_status != af::TaskExec::UPFinishedParserError )
-            m_update_status  = af::TaskExec::UPFinishedKilled;
-    }
-    else
-    {
-        if( i_exitCode != 0)
+        if(( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
         {
-            m_update_status = af::TaskExec::UPFinishedError;
-        }
-        else if( m_parser->isBadResult())
-        {
-            m_update_status = af::TaskExec::UPFinishedParserBadResult;
-            AFINFO("Bad result from parser.")
+            printf("Task terminated/killed by signal: '%s'.\n", strsignal( WTERMSIG( i_exitCode)));
+            if( m_update_status != af::TaskExec::UPFinishedParserError )
+                m_update_status  = af::TaskExec::UPFinishedKilled;
         }
         else
         {
-            m_update_status = af::TaskExec::UPFinishedSuccess;
+            m_update_status = af::TaskExec::UPFinishedError;
         }
+    }
+    else if( m_parser->isBadResult())
+    {
+        m_update_status = af::TaskExec::UPFinishedParserBadResult;
+        AFINFO("Bad result from parser.")
+    }
+    else
+    {
+        m_update_status = af::TaskExec::UPFinishedSuccess;
     }
 }
 

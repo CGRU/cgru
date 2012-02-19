@@ -126,14 +126,14 @@ int main(int argc, char *argv[])
         }
 
         // Collect all available incomming messages:
-        std::list<af::Msg*> incomming_messages;
+        std::list<af::Msg*> in_msgs;
         while( af::Msg * msg = RenderHost::acceptTry() )
-            incomming_messages.push_back( msg);
+            in_msgs.push_back( msg);
 
         // Lock render:
         RenderHost::lockMutex();
         // React on all incoming messages:
-        for( std::list<af::Msg*>::iterator it = incomming_messages.begin(); it != incomming_messages.end(); it++)
+        for( std::list<af::Msg*>::iterator it = in_msgs.begin(); it != in_msgs.end(); it++)
             msgCase( *it);
         // Let tasks to do their work:
         RenderHost::refreshTasks();

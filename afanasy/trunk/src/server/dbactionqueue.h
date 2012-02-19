@@ -21,9 +21,6 @@ public:
    void delItem(    const afsql::DBItem * item);
    void updateItem( const afsql::DBItem * item, int attr = -1);
 
-/// Push queries to queue back.
-   inline bool pushQueries( Queries * queries) { if( m_working ) return push( queries); else return false;}
-
 protected:
 
    /// Called from run thead to process item just poped from queue

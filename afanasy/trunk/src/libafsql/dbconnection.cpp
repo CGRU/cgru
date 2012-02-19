@@ -16,11 +16,17 @@
 
 using namespace afsql;
 
+bool DBConnection::ms_enabled = true;
+
 DBConnection::DBConnection( const std::string & i_connection_name):
     m_name( i_connection_name),
+    m_conn( NULL),
     m_working( false),
     m_opened( false)
 {
+    if( false == ms_enabled )
+        return;
+
     m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
     if( PQstatus( m_conn) != CONNECTION_OK)
     {
@@ -80,6 +86,11 @@ bool DBConnection::DBOpen()
 
 void DBConnection::DBClose()
 {
+    if( m_working == false )
+    {
+        return;
+    }
+
     PQfinish( m_conn);
     m_conn = NULL;
 

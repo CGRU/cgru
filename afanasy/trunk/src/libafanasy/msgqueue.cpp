@@ -64,9 +64,16 @@ void MsgQueue::processItem( AfQueueItem* item)
 {
     Msg * msg = (Msg*)item;
 
+    if( msg == NULL )
+    {
+        AFERRAR("MsgQueue::processItem: '%s': NULL Meassage.\n", name.c_str())
+        return;
+    }
+
     if( msg->addressIsEmpty() && ( msg->addressesCount() == 0 ))
     {
         AFERRAR("MsgQueue::processItem: '%s':\n   Message has no addresses to send to.", name.c_str());
+        msg->stdOut();
         delete msg;
         return;
     }

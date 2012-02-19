@@ -31,6 +31,9 @@ public:
    bool dropTable( const std::string & i_tablename);
    bool dropAllTables();
 
+   inline static bool enabled() { return ms_enabled;  }
+   inline static void disable() { ms_enabled = false ;}
+
 private:
    std::string m_name;
    bool m_working;
@@ -39,4 +42,6 @@ private:
    DlMutex m_mutex;
 
    PGconn * m_conn;
+
+   static bool ms_enabled;
 };

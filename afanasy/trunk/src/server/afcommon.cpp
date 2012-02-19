@@ -28,8 +28,6 @@ LogQueue          * AFCommon::OutputLogQueue    = NULL;
 */
 AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 {
-   assert( core );
-
    MsgDispatchQueue = new af::MsgQueue(      "Sending Messages", af::AfQueue::e_start_thread);
    FileWriteQueue   = new FileQueue(         "Writing Files");
    CleanUpJobQueue  = new CleanUpQueue(      "Jobs Cleanup");
@@ -40,12 +38,12 @@ AFCommon::AFCommon( ThreadArgs * i_threadArgs)
 
 AFCommon::~AFCommon()
 {
-   delete FileWriteQueue;
-   delete MsgDispatchQueue;
-   delete CleanUpJobQueue;
-   delete OutputLogQueue;
-   delete DBUpTaskQueue;
-   delete DBUpdateQueue;
+    delete FileWriteQueue;
+    delete MsgDispatchQueue;
+    delete CleanUpJobQueue;
+    delete OutputLogQueue;
+    delete DBUpTaskQueue;
+    delete DBUpdateQueue;
 }
 
 /*

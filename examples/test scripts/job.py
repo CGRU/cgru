@@ -119,7 +119,11 @@ for b in range( numblocks):
       if int(fr[2]) < 0: negative_pertask = True
 
    if not options.stringtype and not negative_pertask:
-      block.setCommand('python task.py%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars(), False)
+      cmd = 'task.py'
+      cmd = os.path.join( os.getcwd(), cmd)
+      cmd = 'python "%s"' % cmd
+      cmd += '%(str_capacity)s%(str_hosts)s -s @#@ -e @#@ -i %(increment)d -t %(timesec)g -r %(randtime)g -v %(verbose)d @####@ @#####@ @#####@ @#####@' % vars()
+      block.setCommand( cmd, False)
       if options.frames != '':
          fr = frames[b].split('/')
          block.setNumeric( int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))

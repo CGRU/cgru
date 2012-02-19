@@ -4,6 +4,7 @@
 
 #include "../libafanasy/environment.h"
 
+#include "../libafsql/dbconnection.h"
 #include "../libafsql/dbjob.h"
 #include "../libafsql/dbrender.h"
 #include "../libafsql/dbuser.h"
@@ -18,9 +19,14 @@ extern bool AFRunning;
 #include "../include/macrooutput.h"
 
 DBActionQueue::DBActionQueue( const std::string & i_name, MonitorContainer * i_monitorcontainer):
-   af::AfQueue( i_name, af::AfQueue::e_start_thread),
-   m_monitors( i_monitorcontainer)
+    af::AfQueue( i_name, af::AfQueue::e_start_thread),
+    m_monitors( i_monitorcontainer),
+    m_working( false),
+    m_conn( NULL)
 {
+    if( false == afsql::DBConnection::enabled() )
+        return;
+
     m_conn = PQconnectdb( af::Environment::get_DB_ConnInfo().c_str());
     if( PQstatus( m_conn) != CONNECTION_OK)
     {
@@ -119,23 +125,29 @@ bool DBActionQueue::writeItem( af::AfQueueItem* item)
 
 void DBActionQueue::addItem( const afsql::DBItem * item)
 {
-   Queries * queries = new Queries();
-   item->dbInsert( queries);
-   push( queries);
+    if( false == m_working ) return;
+
+    Queries * queries = new Queries();
+    item->dbInsert( queries);
+    push( queries);
 }
 
 void DBActionQueue::updateItem( const afsql::DBItem * item, int attr)
 {
-   Queries * queries = new Queries();
-   item->dbUpdate( queries, attr);
-   push( queries);
+    if( false == m_working ) return;
+
+    Queries * queries = new Queries();
+    item->dbUpdate( queries, attr);
+    push( queries);
 }
 
 void DBActionQueue::delItem( const afsql::DBItem * item)
 {
-   Queries * queries = new Queries();
-   item->dbDelete( queries);
-   push( queries);
+    if( false == m_working ) return;
+
+    Queries * queries = new Queries();
+    item->dbDelete( queries);
+    push( queries);
 }
 
 void DBActionQueue::sendAlarm()

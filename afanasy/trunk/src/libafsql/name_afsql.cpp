@@ -24,7 +24,15 @@
 
 void afsql::init()
 {
-   DBAttr::init();
+    std::string nosql_flag("-nosql");
+    af::Environment::addUsage( nosql_flag, "Disable SQL database connection.");
+    if( af::Environment::hasArgument(nosql_flag))
+    {
+        afsql::DBConnection::disable();
+        printf("SQL database connection disabled.\n");
+    }
+
+    DBAttr::init();
 }
 
 bool afsql::execute( PGconn * i_conn, const std::list<std::string> * i_queries)

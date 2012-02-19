@@ -7,22 +7,22 @@
 namespace afsql
 {
 /// Init environment variables.
-   void init();
+    void init();
 
-   class DBAttr;
-   class DBAttrUInt8;
-   class DBAttrInt32;
-   class DBAttrUInt32;
-   class DBItem;
-   class DBJob;
-   class DBJobProgress;
-   class DBStatJob;
-   class DBBlockData;
-   class DBStatBlock;
-   class DBTaskProgress;
-   class DBTaskData;
-   class DBUser;
-   class DBRender;
+    class DBAttr;
+    class DBAttrUInt8;
+    class DBAttrInt32;
+    class DBAttrUInt32;
+    class DBItem;
+    class DBJob;
+    class DBJobProgress;
+    class DBStatJob;
+    class DBBlockData;
+    class DBStatBlock;
+    class DBTaskProgress;
+    class DBTaskData;
+    class DBUser;
+    class DBRender;
 
 
     bool connect( PGconn * i_conn);
