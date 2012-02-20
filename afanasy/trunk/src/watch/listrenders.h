@@ -75,6 +75,7 @@ private:
 private:
    void setService( bool enable);
    void calcTitle();
+   void setSpacing();
 
 private:
    static EDisplaySize ms_displaysize;

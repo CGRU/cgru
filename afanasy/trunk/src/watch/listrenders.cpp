@@ -83,6 +83,8 @@ Press RMB for Options.\
       connect( view->selectionModel(), SIGNAL( selectionChanged( const QItemSelection &, const QItemSelection &)),
                                  this,   SLOT( selectionChanged( const QItemSelection &, const QItemSelection &)));
 
+   setSpacing();
+
    QTimer * timer = new QTimer(this);
    timer->start( 1900 * af::Environment::getWatchRefreshInterval());
    connect( timer, SIGNAL( timeout()), this, SLOT( repaintItems()));
@@ -91,6 +93,21 @@ Press RMB for Options.\
 ListRenders::~ListRenders()
 {
 AFINFO("ListRenders::~ListRenders.")
+}
+
+void ListRenders::setSpacing()
+{
+    switch( ms_displaysize )
+    {
+    case  ListRenders::ESMallSize:
+        view->setSpacing( 1);
+        break;
+    case  ListRenders::ENormalSize:
+        view->setSpacing( 2);
+        break;
+    default:
+        view->setSpacing( 3);
+    }
 }
 
 void ListRenders::actChangeSize( int i_size)
@@ -102,6 +119,7 @@ void ListRenders::actChangeSize( int i_size)
 
     ms_displaysize = dsize;
 
+    setSpacing();
     itemsHeightCahnged();
     revertModel();
     repaintItems();

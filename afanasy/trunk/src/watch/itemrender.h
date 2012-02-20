@@ -41,6 +41,7 @@ protected:
 
 private:
    static const int HeightHost;
+   static const int HeightHostSmall;
    static const int HeightAnnotation;
    static const int HeightTask;
    static const int HeightOffline;
@@ -84,7 +85,7 @@ private:
    int capacity_used;
    QString capacity_usage;
 
-   QString  state;
+   QString  m_state;
    std::list<af::TaskExec*> tasks;
    std::list<const QPixmap*> tasksicons;
    long long taskstartfinishtime;
