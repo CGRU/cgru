@@ -5,11 +5,12 @@
 #include <QtGui/QMenu>
 #include <QtGui/QContextMenuEvent>
 
+#include "actionid.h"
 #include "listrenders.h"
 
-CtrlRenders::CtrlRenders( QWidget * parent, ListRenders * renderslist):
-   QLabel( "[O]", parent ),
-   list( renderslist)
+CtrlRenders::CtrlRenders( QWidget * i_parent, ListRenders * i_renderslist):
+   QLabel( "[O]", i_parent ),
+   m_list( i_renderslist)
 {
    setFixedHeight(16);
 }
@@ -20,23 +21,20 @@ CtrlRenders::~CtrlRenders()
 
 void CtrlRenders::contextMenuEvent(QContextMenuEvent *event)
 {
-   QMenu menu(this);
-   QAction *action;
+    QMenu menu(this);
+    ActionId * action_id;
 
-   action = new QAction( "Constants Height", this);
-   action->setCheckable( true);
-   action->setChecked( ListRenders::ConstHeight);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actExpandTasks() ));
-   menu.addAction( action);
+    action_id = new ActionId( int(ListRenders::EVariableSize), "Variable Size", this);
+    action_id->setCheckable( true);
+    action_id->setChecked( ListRenders::getDisplaySize() == ListRenders::EVariableSize);
+    connect( action_id, SIGNAL( triggeredId( int ) ), m_list, SLOT( actChangeSize( int) ));
+    menu.addAction( action_id);
 
-   menu.exec( event->globalPos());
-}
+    action_id = new ActionId( int(ListRenders::EBigSize), "Big Size", this);
+    action_id->setCheckable( true);
+    action_id->setChecked( ListRenders::getDisplaySize() == ListRenders::EBigSize);
+    connect( action_id, SIGNAL( triggeredId( int ) ), m_list, SLOT( actChangeSize( int) ));
+    menu.addAction( action_id);
 
-void CtrlRenders::actExpandTasks()
-{
-   ListRenders::ConstHeight = false == ListRenders::ConstHeight;
-
-   list->itemsHeightCahnged();
-   list->revertModel();
-   list->repaintItems();
+    menu.exec( event->globalPos());
 }

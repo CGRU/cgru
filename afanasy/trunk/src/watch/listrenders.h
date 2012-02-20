@@ -23,9 +23,18 @@ protected:
    void doubleClicked( Item * item);
 
 public:
-   static bool ConstHeight;
+    enum EDisplaySize
+    {
+        EVariableSize,
+        EBigSize,
+        ENormalSize,
+        ESMallSize
+    };
+    static EDisplaySize getDisplaySize() { return ms_displaysize; }
 
 private slots:
+
+   void actChangeSize( int i_size);
 
    void renderAdded( ItemNode * node, const QModelIndex & index);
    void selectionChanged ( const QItemSelection & selected, const QItemSelection & deselected );
@@ -68,6 +77,8 @@ private:
    void calcTitle();
 
 private:
+   static EDisplaySize ms_displaysize;
+
    static int     SortType;
    static bool    SortAscending;
    static QString FilterString;

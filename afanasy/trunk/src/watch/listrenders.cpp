@@ -26,7 +26,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-bool    ListRenders::ConstHeight    = false;
+ListRenders::EDisplaySize ListRenders::ms_displaysize = ListRenders::EVariableSize;
+
 int     ListRenders::SortType       = CtrlSortFilter::TPRIORITY;
 bool    ListRenders::SortAscending  = false;
 int     ListRenders::FilterType     = CtrlSortFilter::TNAME;
@@ -90,6 +91,20 @@ Press RMB for Options.\
 ListRenders::~ListRenders()
 {
 AFINFO("ListRenders::~ListRenders.")
+}
+
+void ListRenders::actChangeSize( int i_size)
+{
+    ListRenders::EDisplaySize dsize = (ListRenders::EDisplaySize)i_size;
+
+    if( dsize == ms_displaysize )
+        return;
+
+    ms_displaysize = dsize;
+
+    itemsHeightCahnged();
+    revertModel();
+    repaintItems();
 }
 
 void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)

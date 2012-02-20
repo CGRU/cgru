@@ -107,22 +107,23 @@ void ItemRender::deletePlots()
 
 bool ItemRender::calcHeight()
 {
-   plots_height = 0;
-   for( unsigned i = 0; i < plots.size(); i++) if( plots[i]->height+4 > plots_height ) plots_height = plots[i]->height+4;
-   plots_height += 2;
-   plots_height += HeightHost;
-   int old_height = height;
-   if( ListRenders::ConstHeight )
-   {
-      height = plots_height + HeightAnnotation;
-   }
-   else
-   {
-      if( online ) height = plots_height + HeightTask * int( tasks.size());
-      else height = HeightOffline;
-      if( false == annotation.isEmpty()) height += HeightAnnotation;
-   }
-   return old_height == height;
+    plots_height = 0;
+    for( unsigned i = 0; i < plots.size(); i++) if( plots[i]->height+4 > plots_height ) plots_height = plots[i]->height+4;
+    plots_height += 2;
+    plots_height += HeightHost;
+    int old_height = height;
+    switch( ListRenders::getDisplaySize() )
+    {
+    case  ListRenders::EBigSize:
+        height = plots_height + HeightAnnotation;
+        break;
+
+    default:
+        if( online ) height = plots_height + HeightTask * int( tasks.size());
+        else height = HeightOffline;
+        if( false == annotation.isEmpty()) height += HeightAnnotation;
+    }
+    return old_height == height;
 }
 
 void ItemRender::updateValues( af::Node *node, int type)
@@ -406,7 +407,9 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    painter->drawText( left_text_x,  y, left_text_w,  HeightHost+2, Qt::AlignBottom | Qt::AlignLeft,  capacity_usage);
    painter->drawText( right_text_x, y, right_text_w, HeightHost+2, Qt::AlignBottom | Qt::AlignRight, taskstartfinishtime_str);
 
-   if( ListRenders::ConstHeight )
+   switch( ListRenders::getDisplaySize() )
+   {
+   case  ListRenders::EBigSize:
    {
       QStringList tasks_users;
       QList<int> tasks_counts;
@@ -425,8 +428,10 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
       for( int i = 0; i < tasks_users.size(); i++) taskstr += QString(" %1:%2").arg( tasks_users[i]).arg( tasks_counts[i]);
       if( false == annotation.isEmpty()) taskstr = QString("%1 %2").arg( annotation, taskstr);
       painter->drawText( x+5, y, w-10, plots_height + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+
+      break;
    }
-   else
+   default:
    {
       std::list<af::TaskExec*>::const_iterator it = tasks.begin();
       std::list<const QPixmap*>::const_iterator ii = tasksicons.begin();
@@ -452,6 +457,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, pixmap );
       }
       painter->drawText( x+5, y, w-10, h-1, Qt::AlignBottom | Qt::AlignHCenter, annotation);
+   }
    }
 
    plotCpu.paint( painter, plot_x, plot_y, plot_w, plot_h);
