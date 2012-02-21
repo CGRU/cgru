@@ -111,9 +111,8 @@ int main(int argc, char *argv[])
     afsql::DBConnection afDB_JobRegister("AFDB_JobRegister");
 
     // containers initialization
-    JobContainer jobs;
+    JobContainer jobs( &afDB_JobRegister);
     if( false == jobs.isInitialized()) return 1;
-    JobContainer::setDataBase( &afDB_JobRegister);
     JobAf::setJobContainer( &jobs);
 
     UserContainer users;

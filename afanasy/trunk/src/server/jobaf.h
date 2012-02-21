@@ -80,22 +80,24 @@ public:
 
    virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
+   void setUser( UserAf * i_user);
+
 /// Initialize new job, came to Afanasy container.
-   bool initialize( UserAf * jobOwner);
+   bool initialize();
 
 /// Whether job is constructed successfully.
-   inline bool isConstructed() const { return constructed;}
+   inline bool isConstructed() const { return m_constructed;}
 
 /// Whether job is initialized successfully.
-   inline bool isInitialized() const { return initialized;}
+   inline bool isInitialized() const { return m_initialized;}
 
-   inline bool  fromDataBase() const { return fromdatabase;}          ///< Whether job was created from database.
+   inline bool  fromDataBase() const { return m_fromdatabase;}          ///< Whether job was created from database.
 
    int getUid() const;
 
    virtual int calcWeight()          const;  ///< Calculate and return memory size.
-   inline  int getLogsWeight()       const { return logsWeight;}        ///< Get job and all its tasks logs weight ( this value is stored after \c calcWeight method).
-   inline  int getBlackListsWeight() const { return blackListsWeight;}  ///< Get job and all its tasks black lists weight ( this value is stored after \c calcWeight method).
+   inline  int getLogsWeight()       const { return m_logsWeight;}        ///< Get job and all its tasks logs weight ( this value is stored after \c calcWeight method).
+   inline  int getBlackListsWeight() const { return m_blackListsWeight;}  ///< Get job and all its tasks black lists weight ( this value is stored after \c calcWeight method).
    inline  int getProgressWeight()   const { return progressWeight;}    ///< Get job tasks progress ( this value is stored after \c calcWeight method).
 
    bool checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str = NULL) const;
@@ -122,26 +124,26 @@ protected:
    void calcNeed();
 
 protected:
-   Block ** blocks;              ///< Blocks.
-   bool fromdatabase;            ///< Whether job constructed from database.
+   Block ** m_blocks;              ///< Blocks.
+   bool m_fromdatabase;            ///< Whether job constructed from database.
    std::list<std::string> loglist;           ///< Job log.
 
 private:
-   bool constructed;             ///< Whether the job was constructed successfully.
-   bool initialized;             ///< Whether the job was initialized successfully.
-   bool deletion;                ///< Whether the job is deleting.
+   bool m_constructed;             ///< Whether the job was constructed successfully.
+   bool m_initialized;             ///< Whether the job was initialized successfully.
+   bool m_deletion;                ///< Whether the job is deleting.
 
    std::list<RenderAf*> renders_ptrs;
    std::list<int> renders_counts;
 
    Listeners listeners;     ///> Addresses to send task output to.
 
-   UserAf * user;
+   UserAf * m_user;
 
 private:
    mutable int progressWeight;
-   mutable int logsWeight;
-   mutable int blackListsWeight;
+   mutable int m_logsWeight;
+   mutable int m_blackListsWeight;
 
 private:
    void initializeValues();

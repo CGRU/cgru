@@ -104,95 +104,101 @@ void ListJobs::connectionLost()
 
 void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 {
-   QMenu menu(this);
-   QMenu * submenu;
-   QAction *action;
+    QMenu menu(this);
+    QMenu * submenu;
+    QAction *action;
 
-   ItemJob* jobitem = (ItemJob*)getCurrentItem();
-   if( jobitem == NULL ) return;
-   int selectedItemsCount = getSelectedItemsCount();
+    ItemJob* jobitem = (ItemJob*)getCurrentItem();
+    if( jobitem == NULL ) return;
+    int selectedItemsCount = getSelectedItemsCount();
 
-   action = new QAction( "Show Log", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
-   menu.addAction( action);
+    action = new QAction( "Show Log", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestLog() ));
+    menu.addAction( action);
 
-   action = new QAction( "Show Error Hosts", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actRequestErrorHostsList() ));
-   menu.addAction( action);
+    action = new QAction( "Show Error Hosts", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actRequestErrorHostsList() ));
+    menu.addAction( action);
 
-   action = new QAction( "Reset Error Hosts", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
-   menu.addAction( action);
+    action = new QAction( "Reset Error Hosts", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actResetErrorHosts() ));
+    menu.addAction( action);
 
-   action = new QAction( "Restart Errors", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
-   if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
-   menu.addAction( action);
+    action = new QAction( "Restart Errors", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actRestartErrors() ));
+    if( selectedItemsCount == 1) action->setEnabled( jobitem->state & AFJOB::STATE_ERROR_MASK);
+    menu.addAction( action);
 
-   if( af::Environment::VISOR() == false)
-   {
-      menu.addSeparator();
-      action = new QAction( "Move Up", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actMoveUp() ));
-      menu.addAction( action);
-      action = new QAction( "Move Down", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actMoveDown() ));
-      menu.addAction( action);
-      action = new QAction( "Move Top", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actMoveTop() ));
-      menu.addAction( action);
-      action = new QAction( "Move Bottom", this);
-      connect( action, SIGNAL( triggered() ), this, SLOT( actMoveBottom() ));
-      menu.addAction( action);
-   }
-   menu.addSeparator();
+    menu.addSeparator();
+    if( af::Environment::VISOR() == false)
+    {
+        action = new QAction( "Move Up", this);
+        connect( action, SIGNAL( triggered() ), this, SLOT( actMoveUp() ));
+        menu.addAction( action);
+        action = new QAction( "Move Down", this);
+        connect( action, SIGNAL( triggered() ), this, SLOT( actMoveDown() ));
+        menu.addAction( action);
+        action = new QAction( "Move Top", this);
+        connect( action, SIGNAL( triggered() ), this, SLOT( actMoveTop() ));
+        menu.addAction( action);
+        action = new QAction( "Move Bottom", this);
+        connect( action, SIGNAL( triggered() ), this, SLOT( actMoveBottom() ));
+        menu.addAction( action);
+    }
+    else
+    {
+        action = new QAction("Change Owner", this);
+        connect( action, SIGNAL( triggered() ), this, SLOT( actSetUser() ));
+        menu.addAction( action);
+    }
+    menu.addSeparator();
 
-   action = new QAction( "Annotate", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
-   menu.addAction( action);
+    action = new QAction( "Annotate", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actAnnotate() ));
+    menu.addAction( action);
 
-   submenu = new QMenu( "Set Parameter", this);
+    submenu = new QMenu( "Set Parameter", this);
 
-   action = new QAction( "Max Running Tasks", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
-   submenu->addAction( action);
-   action = new QAction( "Max Run Tasks Per Host", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunTasksPerHost() ));
-   submenu->addAction( action);
-   action = new QAction( "Hosts Mask", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
-   submenu->addAction( action);
-   action = new QAction( "Hosts Exclude Mask", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
-   submenu->addAction( action);
-   action = new QAction( "Priority", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
-   submenu->addAction( action);
-   action = new QAction( "Depend Mask", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actDependMask() ));
-   submenu->addAction( action);
-   action = new QAction( "Global Depend Mask", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actDependMaskGlobal() ));
-   submenu->addAction( action);
-   action = new QAction( "Wait Time", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actWaitTime() ));
-   submenu->addAction( action);
-   action = new QAction( "OS Needed", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actNeedOS() ));
-   submenu->addAction( action);
-   action = new QAction( "Properties Needed", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actNeedProperties() ));
-   submenu->addAction( action);
-   action = new QAction( "Post Command", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
-   submenu->addAction( action);
-   action = new QAction( "Life Time", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
-   submenu->addAction( action);
+    action = new QAction( "Max Running Tasks", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
+    submenu->addAction( action);
+    action = new QAction( "Max Run Tasks Per Host", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunTasksPerHost() ));
+    submenu->addAction( action);
+    action = new QAction( "Hosts Mask", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMask() ));
+    submenu->addAction( action);
+    action = new QAction( "Hosts Exclude Mask", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actHostsMaskExclude() ));
+    submenu->addAction( action);
+    action = new QAction( "Priority", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actPriority() ));
+    submenu->addAction( action);
+    action = new QAction( "Depend Mask", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actDependMask() ));
+    submenu->addAction( action);
+    action = new QAction( "Global Depend Mask", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actDependMaskGlobal() ));
+    submenu->addAction( action);
+    action = new QAction( "Wait Time", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actWaitTime() ));
+    submenu->addAction( action);
+    action = new QAction( "OS Needed", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actNeedOS() ));
+    submenu->addAction( action);
+    action = new QAction( "Properties Needed", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actNeedProperties() ));
+    submenu->addAction( action);
+    action = new QAction( "Post Command", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actPostCommand() ));
+    submenu->addAction( action);
+    action = new QAction( "Life Time", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actLifeTime() ));
+    submenu->addAction( action);
 
-   menu.addMenu( submenu);
+    menu.addMenu( submenu);
 
-   menu.addSeparator();
+    menu.addSeparator();
 
    if( selectedItemsCount == 1)
    {
@@ -399,18 +405,31 @@ void ListJobs::calcTotals()
 
 void ListJobs::actAnnotate()
 {
-   ItemJob* item = (ItemJob*)getCurrentItem();
-   if( item == NULL ) return;
-   QString current = item->annotation;
+    ItemJob* item = (ItemJob*)getCurrentItem();
+    if( item == NULL ) return;
+    QString current = item->annotation;
 
-   bool ok;
-   QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
-   if( !ok) return;
+    bool ok;
+    QString text = QInputDialog::getText(this, "Annotate", "Enter Annotation", QLineEdit::Normal, current, &ok);
+    if( !ok) return;
 
-   af::MCGeneral mcgeneral( text.toUtf8().data());
-   action( mcgeneral, af::Msg::TJobAnnotate);
+    af::MCGeneral mcgeneral( text.toUtf8().data());
+    action( mcgeneral, af::Msg::TJobAnnotate);
 }
 
+void ListJobs::actSetUser()
+{
+    ItemJob* item = (ItemJob*)getCurrentItem();
+    if( item == NULL ) return;
+    QString current = item->username;
+
+    bool ok;
+    QString text = QInputDialog::getText(this, "Change Owner", "Enter New User Name", QLineEdit::Normal, current, &ok);
+    if( !ok) return;
+
+    af::MCGeneral mcgeneral( text.toUtf8().data());
+    action( mcgeneral, af::Msg::TJobSetUser);
+}
 
 void ListJobs::actMoveUp()
 {

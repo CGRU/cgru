@@ -51,7 +51,7 @@ public:
    inline void  setHostName( const std::string & str) { hostname = str;}
 
    inline int      getMaxRunningTasks()      const { return maxrunningtasks;     } ///< Get maximum hosts.
-   inline int      getNumJobs()              const { return numjobs;             } ///< Get jobs quantity.
+   inline int      getNumJobs()              const { return m_numjobs;             } ///< Get jobs quantity.
    inline int      getNumRunningJobs()       const { return numrunningjobs;      } ///< Get active jobs quantity.
    inline int      getRunningTasksNumber()   const { return runningtasksnumber;  } ///< Get number of hosts used by user jobs.
    inline uint32_t getTimeRegister()         const { return time_register;       } ///< Get register time.
@@ -100,7 +100,7 @@ protected:
 
    int32_t jobs_lifetime;        ///< User jobs default life time.
 
-   int32_t numjobs;              ///< User jobs quantity.
+   int32_t m_numjobs;              ///< User jobs quantity.
    int32_t numrunningjobs;       ///< User active jobs quantity.
    int32_t runningtasksnumber;   ///< User jobs hosts number.
 

@@ -690,6 +690,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
    case af::Msg::TBlockNeedProperties:
    case af::Msg::TTasksRestart:
    case af::Msg::TJobAnnotate:
+   case af::Msg::TJobSetUser:
    case af::Msg::TJobHostsMask:
    case af::Msg::TJobHostsMaskExclude:
    case af::Msg::TJobDependMask:

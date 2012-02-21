@@ -36,6 +36,7 @@ private slots:
    void actMoveBottom();
 
    void actAnnotate();
+   void actSetUser();
    void actPriority();
    void actHostsMask();
    void actHostsMaskExclude();

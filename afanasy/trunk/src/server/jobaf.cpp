@@ -20,6 +20,7 @@
 #include "sysjob.h"
 #include "task.h"
 #include "useraf.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -28,96 +29,107 @@
 JobContainer *JobAf::jobs  = NULL;
 
 JobAf::JobAf( af::Msg * msg):
-   afsql::DBJob(),
-   fromdatabase( false)
+    afsql::DBJob(),
+    m_fromdatabase( false)
 {
-   initializeValues();
-   read( msg);
-   progress = new afsql::DBJobProgress( this);
-   if( progress == NULL)
-   {
-      AFERROR("DBJob::DBJob: can't allocate memory for progresses.")
-      return;
-   }
-   construct();
+    initializeValues();
+    read( msg);
+    progress = new afsql::DBJobProgress( this);
+    if( progress == NULL)
+    {
+        AFERROR("DBJob::DBJob: can't allocate memory for progresses.")
+        return;
+    }
+    construct();
 }
 
 JobAf::JobAf( int Id):
-   afsql::DBJob( Id),
-   fromdatabase( true)
+    afsql::DBJob( Id),
+    m_fromdatabase( true)
 {
-   initializeValues();
+    initializeValues();
 }
 
 void JobAf::initializeValues()
 {
-   blocks            = NULL;
-   constructed       = false;
-   initialized       = false;
-   deletion          = false;
-   logsWeight        = 0;
-   blackListsWeight  = 0;
+    m_user             = NULL;
+    m_blocks           = NULL;
+    m_constructed      = false;
+    m_initialized      = false;
+    m_deletion         = false;
+    m_logsWeight       = 0;
+    m_blackListsWeight = 0;
 }
 
 bool JobAf::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
 //printf("JobAf::dbSelect:\n");
-   if( afsql::DBJob::dbSelect( i_conn) == false) return false;
-   return construct();
+    if( afsql::DBJob::dbSelect( i_conn) == false) return false;
+    return construct();
 }
 
 bool JobAf::construct()
 {
 AFINFA("JobAf::construct: \"%s\":", name.c_str())
-   if( constructed )
-   {
-      AFERROR("JobAf::construct: Already constructed.")
-      return true;
-   }
+    if( m_constructed )
+    {
+        AFERROR("JobAf::construct: Already constructed.")
+        return true;
+    }
 
-   if( blocksnum < 1 )
-   {
-      AFERRAR("JobAf::construct: invalid number of blocks = %d", blocksnum)
-      return false;
-   }
+    if( blocksnum < 1 )
+    {
+        AFERRAR("JobAf::construct: invalid number of blocks = %d", blocksnum)
+        return false;
+    }
 
-   blocks = new Block*[blocksnum];
-   if( blocks == NULL )
-   {
-      AFERROR("JobAf::construct: Can't allocate memory for blocks.")
-      return false;
-   }
-   for( int b = 0; b < blocksnum; b++) blocks[b] = NULL;
-   for( int b = 0; b < blocksnum; b++)
-   {
-      if( blocksdata[b]->isValid() == false) return false;
-      blocks[b] = newBlock(b);
-      if( blocks[b] == NULL )
-      {
-         AFERRAR("JobAf::construct: Can't create block %d of %d.", b, blocksnum)
-         return false;
-      }
-   }
+    m_blocks = new Block*[blocksnum];
+    if( m_blocks == NULL )
+    {
+        AFERROR("JobAf::construct: Can't allocate memory for blocks.")
+        return false;
+    }
+    for( int b = 0; b < blocksnum; b++) m_blocks[b] = NULL;
+    for( int b = 0; b < blocksnum; b++)
+    {
+        if( blocksdata[b]->isValid() == false) return false;
+        m_blocks[b] = newBlock(b);
+        if( m_blocks[b] == NULL )
+        {
+            AFERRAR("JobAf::construct: Can't create block %d of %d.", b, blocksnum)
+            return false;
+        }
+    }
 
-   constructed = true;
-   return true;
+    m_constructed = true;
+    return true;
 }
 
 JobAf::~JobAf()
 {
-   if( blocks )
-   {
-      for( int b = 0; b < blocksnum; b++) if( blocks[b]) delete blocks[b];
-      delete [] blocks;
-   }
+    if( m_blocks )
+    {
+        for( int b = 0; b < blocksnum; b++) if( m_blocks[b]) delete m_blocks[b];
+        delete [] m_blocks;
+    }
 }
 
 Block * JobAf::newBlock( int numBlock)
 {
-   return new Block( this, blocksdata[numBlock], progress, &loglist);
+    return new Block( this, blocksdata[numBlock], progress, &loglist);
 }
 
-bool JobAf::initialize( UserAf * jobOwner)
+void JobAf::setUser( UserAf * i_user)
+{
+    m_user = i_user;
+    for( int b = 0; b < blocksnum; b++)
+    {
+        m_blocks[b]->setUser( i_user);
+    }
+    username = i_user->getName();
+}
+
+bool JobAf::initialize()
 {
    if( isConstructed() == false)
    {
@@ -126,12 +138,10 @@ bool JobAf::initialize( UserAf * jobOwner)
    }
 
 //printf("JobAf::initialize: BEGIN\n");
-   user = jobOwner;
    progress->setJobId( id);
    for( int b = 0; b < blocksnum; b++)
    {
       blocksdata[b]->setJobId( id);
-      blocks[b]->setUser( jobOwner);
    }
 
 //
@@ -148,7 +158,7 @@ bool JobAf::initialize( UserAf * jobOwner)
 //
 // Executing pre commands ( if not from database )
 
-   if( fromdatabase == false )
+   if( m_fromdatabase == false )
    {
       if( false == cmd_pre.empty())
       {
@@ -195,21 +205,21 @@ bool JobAf::initialize( UserAf * jobOwner)
 
    refresh( time(NULL), NULL, NULL);
 
-   initialized = true;
+   m_initialized = true;
 
 //printf("JobAf::initialize: END\n");
    return true;
 }
 
-int JobAf::getUid() const { return user->getId(); }
+int JobAf::getUid() const { return m_user->getId(); }
 
 void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 {
-   if( deletion == false )
+   if( m_deletion == false )
    {
       state = AFJOB::STATE_OFFLINE_MASK;
       lock();
-      deletion = true;
+      m_deletion = true;
       if( getRunningTasksNumber() && (renders != NULL) && (monitoring != NULL))
       {
 //printf("JobAf::setZombie: runningtaskscounter = %d\n", runningtaskscounter);
@@ -251,28 +261,48 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
 //printf("JobAf::action: %s\n", af::Msg::TNAMES[type]);mcgeneral.stdOut();
-   uint32_t jobchanged = 0;
-   std::string userhost = mcgeneral.getUserName() + '@' + mcgeneral.getHostName();
-   switch( type)
-   {
-   case af::Msg::TJobAnnotate:
-   {
-      annotation = mcgeneral.getString();
-      appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
-      jobchanged = af::Msg::TMonitorJobsChanged;
-      AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
-      break;
-   }
-   case af::Msg::TJobHostsMask:
-   {
-      if( setHostsMask( mcgeneral.getString()))
-      {
-         appendLog( std::string("Hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
-         jobchanged = af::Msg::TMonitorJobsChanged;
-         AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
-      }
-      break;
-   }
+    uint32_t jobchanged = 0;
+    std::string userhost = mcgeneral.getUserName() + '@' + mcgeneral.getHostName();
+    switch( type)
+    {
+    case af::Msg::TJobAnnotate:
+    {
+        annotation = mcgeneral.getString();
+        appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
+        jobchanged = af::Msg::TMonitorJobsChanged;
+        AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
+        break;
+    }
+    case af::Msg::TJobSetUser:
+    {
+        UserAf * user = UserContainer::getUser( mcgeneral.getString());
+        if( user == NULL )
+            return true;
+
+        monitoring->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
+        monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), m_user->getId());
+
+        m_user->removeJob( this);
+        user->addJob( this);
+
+        monitoring->addEvent(    af::Msg::TMonitorUsersChanged, m_user->getId());
+        monitoring->addJobEvent( af::Msg::TMonitorJobsAdd, getId(), m_user->getId());
+
+        AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_username);
+
+        appendLog( std::string("Owner set to \"") + mcgeneral.getString() + "\" by " + userhost);
+        break;
+    }
+    case af::Msg::TJobHostsMask:
+    {
+        if( setHostsMask( mcgeneral.getString()))
+        {
+            appendLog( std::string("Hosts mask set to \"") + mcgeneral.getString() + "\" by " + userhost);
+            jobchanged = af::Msg::TMonitorJobsChanged;
+            AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_hostsmask);
+        }
+        break;
+    }
    case af::Msg::TJobHostsMaskExclude:
    {
       if( setHostsMaskExclude( mcgeneral.getString()))
@@ -341,7 +371,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       appendLog( std::string("Priority set to ") + af::itos( priority) + " by " + userhost);
       jobchanged = af::Msg::TMonitorJobsChanged;
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
-      if( monitoring ) monitoring->addUser( user);
+      if( monitoring ) monitoring->addUser( m_user);
       break;
    }
    case af::Msg::TJobNeedOS:
@@ -431,14 +461,14 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TJobDelete:
    {
       appendLog( "Deleted by " + userhost);
-      user->appendLog( std::string("Job \"") + name + "\" deleted by " + userhost);
+      m_user->appendLog( std::string("Job \"") + name + "\" deleted by " + userhost);
       setZombie( (RenderContainer*)pointer, monitoring);
       if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
       return true;
    }
    case af::Msg::TJobResetErrorHosts:
    {
-      for( int b = 0; b < blocksnum; b++) blocks[b]->action( mcgeneral, af::Msg::TBlockResetErrorHosts, NULL, monitoring);
+      for( int b = 0; b < blocksnum; b++) m_blocks[b]->action( mcgeneral, af::Msg::TBlockResetErrorHosts, NULL, monitoring);
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
    }
@@ -477,14 +507,14 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
       {
          for( int b = 0; b < blocksnum; b++)
          {
-            unsigned changes = blocks[b]->action( mcgeneral, type, NULL, monitoring);
+            unsigned changes = m_blocks[b]->action( mcgeneral, type, NULL, monitoring);
             if( jobchanged < changes ) jobchanged = changes;
          }
       }
       else
       {
          if( bnum >= blocksnum ) return false;
-         jobchanged = blocks[bnum]->action( mcgeneral, type, NULL, monitoring);
+         jobchanged = m_blocks[bnum]->action( mcgeneral, type, NULL, monitoring);
       }
       if( monitoring && jobchanged) monitoring->addJobEvent( jobchanged, getId(), getUid());
       return true;
@@ -536,7 +566,7 @@ void JobAf::checkDepends()
    // check local depends:
    if( hasDependMask())
    {
-      AfListIt jobsListIt( user->getJobsList());
+      AfListIt jobsListIt( m_user->getJobsList());
       for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       {
          if( job == this ) continue;
@@ -600,9 +630,9 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
     if( state & AFJOB::STATE_OFFLINE_MASK )
         return NULL;
 
-    if( blocks[block]->tasks[task]->m_solved )
+    if( m_blocks[block]->tasks[task]->m_solved )
         return NULL;
-    blocks[block]->tasks[task]->m_solved = true;
+    m_blocks[block]->tasks[task]->m_solved = true;
 
    //
    // Recursive dependence check, only if needed
@@ -634,9 +664,9 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    }
    if( false == ( progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
 
-   if( false == blocks[block]->canRun( render)) return NULL;
+   if( false == m_blocks[block]->canRun( render)) return NULL;
 
-   if( blocks[block]->tasks[task]->avoidHostsCheck( render->getName())) return NULL;
+   if( m_blocks[block]->tasks[task]->avoidHostsCheck( render->getName())) return NULL;
 
    //
    // Check block tasks dependence: Get tasks depend mask, if any exists:
@@ -656,7 +686,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
          if( b == block ) continue;
 
  //         if( blocksdata[block]->checkTasksDependMask( blocksdata[b]->getName()) == false ) continue;
-         if( blocks[block]->tasksDependsOn( b) == false )
+         if( m_blocks[block]->tasksDependsOn( b) == false )
              continue;
 
          long long firstdependframe, lastdependframe;
@@ -818,7 +848,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
         int numtasks = blocksdata[b]->getTasksNum();
         for( int t = 0; t < numtasks; t++)
         {
-            blocks[b]->tasks[t]->m_solved = false;
+            m_blocks[b]->tasks[t]->m_solved = false;
         }
     }
 
@@ -845,7 +875,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
          taskexec->setJobName( name);
          taskexec->setUserName( username);
          listeners.process( *taskexec);
-         blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
+         m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
          // If job was not started it became started
          if( time_started == 0 )
          {
@@ -864,8 +894,8 @@ void JobAf::updateTaskState( const af::MCTaskUp& taskup, RenderContainer * rende
 {
    if( false == checkBlockTaskNumbers( taskup.getNumBlock(), taskup.getNumTask(), "updateTaskState")) return;
    bool errorHost = false;
-   blocks[taskup.getNumBlock()]->tasks[taskup.getNumTask()]->updateState( taskup, renders, monitoring, errorHost);
-   if( errorHost) blocks[taskup.getNumBlock()]->errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
+   m_blocks[taskup.getNumBlock()]->tasks[taskup.getNumTask()]->updateState( taskup, renders, monitoring, errorHost);
+   if( errorHost) m_blocks[taskup.getNumBlock()]->errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
 }
 
 void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -873,11 +903,11 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
 //printf("JobAf::refresh: \"%s\"\n", getName().toUtf8().data());
    RenderContainer * renders = (RenderContainer*)pointer;
 
-   if( deletion )
+   if( m_deletion )
    {
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
       for( int b = 0; b < blocksnum; b++)
-         blocks[b]->refresh( currentTime, renders, monitoring);
+         m_blocks[b]->refresh( currentTime, renders, monitoring);
       if( getRunningTasksNumber() == 0 ) setZombie( NULL, monitoring);
 //printf("JobAf::refresh: deletion: runningtaskscounter = %d\n", runningtaskscounter);
    }
@@ -902,7 +932,7 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    //
    // Update blocks (blocks will uptate its tasks):
    for( int b = 0; b < blocksnum; b++)
-      if( blocks[b]->refresh( currentTime, renders, monitoring))
+      if( m_blocks[b]->refresh( currentTime, renders, monitoring))
          jobchanged = af::Msg::TMonitorJobsChanged;
 
    //
@@ -977,11 +1007,11 @@ void JobAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer
    if( id != AFJOB::SYSJOB_ID ) // skip system job
    {
       int result_lifetime = lifetime;
-      if( result_lifetime < 0 ) result_lifetime = user->getJobsLifeTime(); // get default value from user
+      if( result_lifetime < 0 ) result_lifetime = m_user->getJobsLifeTime(); // get default value from user
       if((result_lifetime > 0) && ((currentTime - time_creation) > result_lifetime))
       {
          appendLog( std::string("Life %1 finished.") + af::time2strHMS( result_lifetime, true));
-         user->appendLog( std::string("Job \"") + name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
+         m_user->appendLog( std::string("Job \"") + name + "\" life " + af::time2strHMS( result_lifetime, true) + " finished.");
          setZombie( renders, monitoring);
          jobchanged = af::Msg::TMonitorJobsDel, getId(), getUid();
       }
@@ -1058,8 +1088,8 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
 
       for( int t = start; t < end; t++)
       {
-         if( restart) blocks[b]->tasks[t]->restart( false, message, renders, monitoring);
-         else         blocks[b]->tasks[t]->skip( message, renders, monitoring);
+         if( restart) m_blocks[b]->tasks[t]->restart( false, message, renders, monitoring);
+         else         m_blocks[b]->tasks[t]->skip( message, renders, monitoring);
       }
    }
    AFCommon::QueueDBUpdateTask_end();
@@ -1072,7 +1102,7 @@ void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, Rend
    {
       int numtasks = blocksdata[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
-         blocks[b]->tasks[t]->restart( onlyRunning, message, renders, monitoring);
+         m_blocks[b]->tasks[t]->restart( onlyRunning, message, renders, monitoring);
    }
    AFCommon::QueueDBUpdateTask_end();
    refresh( time(NULL), renders, monitoring);
@@ -1084,7 +1114,7 @@ void JobAf::restartErrors( const std::string & message, RenderContainer * render
    {
       int numtasks = blocksdata[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
-         blocks[b]->tasks[t]->restartError( message, renders, monitoring);
+         m_blocks[b]->tasks[t]->restartError( message, renders, monitoring);
    }
 }
 
@@ -1097,20 +1127,20 @@ const std::list<std::string> & JobAf::getTaskLog( int block, int task)
 {
    static const std::list<std::string> emptylog;
    if( false == checkBlockTaskNumbers( block, task, "getTaskLog")) return emptylog;
-   return blocks[block]->tasks[task]->getLog();
+   return m_blocks[block]->tasks[task]->getLog();
 }
 
 af::TaskExec * JobAf::generateTask( int block, int task)
 {
    if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
-   return blocks[block]->data->genTask( task);
+   return m_blocks[block]->data->genTask( task);
 }
 
 const std::string JobAf::getErrorHostsListString() const
 {
    std::string str("Job \"");
    str += name + "\" error hosts:";
-   for( int block = 0; block < blocksnum; block++) blocks[block]->getErrorHostsListString( str);
+   for( int block = 0; block < blocksnum; block++) m_blocks[block]->getErrorHostsListString( str);
    return str;
 }
 
@@ -1120,7 +1150,7 @@ const std::string JobAf::getErrorHostsListString( int b, int t) const
    {
       return std::string("Invalid task[") + af::itos(b) + "][" + af::itos(t) + "].";
    }
-   std::string str = blocks[b]->tasks[t]->getErrorHostsListString();
+   std::string str = m_blocks[b]->tasks[t]->getErrorHostsListString();
    if( str.empty()) str = "The task has no error hosts.";
    return str;
 }
@@ -1150,7 +1180,7 @@ bool JobAf::getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::stri
       msg->setString("JobAf::getTaskStdOut: invalid job and task numbers");
       return false;
    }
-   return blocks[taskpos.getNumBlock()]->tasks[taskpos.getNumTask()]->getOutput( taskpos.getNumber(), msg, filename, renders);
+   return m_blocks[taskpos.getNumBlock()]->tasks[taskpos.getNumTask()]->getOutput( taskpos.getNumber(), msg, filename, renders);
 }
 
 void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
@@ -1161,13 +1191,13 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
    if( mclisten.justTask())
    {
       checkBlockTaskNumbers( mclisten.getNumBlock(), mclisten.getNumTask(), "listenOutput");
-      blocks[mclisten.getNumBlock()]->tasks[mclisten.getNumTask()]->listenOutput( mclisten, renders);
+      m_blocks[mclisten.getNumBlock()]->tasks[mclisten.getNumTask()]->listenOutput( mclisten, renders);
    }
    else
    {
       for( int b = 0; b < blocksnum; b++)
          for( int t = 0; t < blocksdata[b]->getTasksNum(); t++)
-            blocks[b]->tasks[t]->listenOutput( mclisten, renders);
+            m_blocks[b]->tasks[t]->listenOutput( mclisten, renders);
    }
 }
 
@@ -1188,21 +1218,21 @@ int JobAf::calcWeight() const
    if( progress != NULL) progressWeight = progress->calcWeight();
    weight += progressWeight;
 
-   logsWeight = 0;
+   m_logsWeight = 0;
    for( std::list<std::string>::const_iterator it = loglist.begin(); it != loglist.end(); it++)
-      logsWeight += af::weigh( *it);
+      m_logsWeight += af::weigh( *it);
 
    for( int b = 0; b < blocksnum; b++)
    {
-      weight += blocks[b]->calcWeight();
-      blackListsWeight += blocks[b]->blackListWeight();
-      logsWeight += blocks[b]->logsWeight();
+      weight += m_blocks[b]->calcWeight();
+      m_blackListsWeight += m_blocks[b]->blackListWeight();
+      m_logsWeight += m_blocks[b]->logsWeight();
    }
 
    weight += listeners.calcWeight();
 
-   weight += blackListsWeight;
-   weight += logsWeight;
+   weight += m_blackListsWeight;
+   weight += m_logsWeight;
 
 //printf("JobAf::calcWeight: %d bytes ( sizeof JobAf = %d)\n", weight, sizeof(JobAf));
    return weight;

@@ -676,7 +676,7 @@ const char * Msg::TNAMES[]=
 
    "TUserJobsSolveMethod",       ///< Set jobs solving mode.
    "TRenderEjectNotMyTasks",     ///< Stop mot my (based on username of message) tasks on Render,
-   "TRESERVED12",
+   "TJobSetUser",                ///< Change job owner.
    "TRESERVED13",
    "TRESERVED14",
    "TRESERVED15",

@@ -18,9 +18,12 @@
 
 using namespace af;
 
+UserContainer * UserContainer::ms_users = NULL;
+
 UserContainer::UserContainer():
    AfContainer( "Users", AFUSER::MAXCOUNT)
 {
+    ms_users = this;
 }
 
 UserContainer::~UserContainer()
@@ -59,6 +62,17 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
    m_userslist.add( user);
    AFCommon::QueueLog("User registered: " + user->generateInfoString( false));
    return user;
+}
+
+UserAf * UserContainer::getUser( const std::string & i_name )
+{
+    UserContainerIt usersIt( ms_users);
+    for(UserAf * user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
+    {
+        if( user->getName() == i_name )
+            return user;
+    }
+    return NULL;
 }
 
 void UserContainer::addUser( UserAf * user)

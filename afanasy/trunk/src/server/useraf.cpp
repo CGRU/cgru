@@ -32,7 +32,7 @@ UserAf::UserAf( int uid):
 
 void UserAf::construct()
 {
-   zombietime = 0;
+   m_zombietime = 0;
    time_online = time( NULL);
 }
 
@@ -160,22 +160,37 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    return true;
 }
 
-void UserAf::setZombie()
+void UserAf::setZombie( MonitorContainer * i_monitoring)
 {
-   AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
-   af::Node::setZombie();
-   appendLog( "Became a zombie.");
-   AFCommon::saveLog( log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());
+    AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
+    af:Node::setZombie();
+    if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, id);
+    appendLog( "Became a zombie.");
+    AFCommon::saveLog( m_log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());
 }
 
-int UserAf::addJob( JobAf *job)
+void UserAf::addJob( JobAf * i_job)
 {
-   appendLog( std::string("Adding a job: ") + job->getName());
-   zombietime = 0;
-   int userlistorder = m_jobslist.add( job );
-   numjobs++;
-   updateJobsOrder( job);
-   return userlistorder;
+    appendLog( std::string("Adding a job: ") + i_job->getName());
+
+    m_zombietime = 0;
+
+    m_jobslist.add( i_job );
+
+    m_numjobs++;
+
+    updateJobsOrder( i_job);
+
+    i_job->setUser( this);
+}
+
+void UserAf::removeJob( JobAf * i_job)
+{
+    appendLog( std::string("Removing a job: ") + i_job->getName());
+
+    m_jobslist.remove( i_job );
+
+    m_numjobs--;
 }
 
 void UserAf::updateJobsOrder( af::Job * newJob)
@@ -203,23 +218,22 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    int _numjobs = m_jobslist.getCount();
    if(( _numjobs == 0) && ( false == isPermanent()))
    {
-      if( zombietime )
+      if( m_zombietime )
       {
-         if( (currentTime-zombietime) > af::Environment::getUserZombieTime() )
+         if( (currentTime-m_zombietime) > af::Environment::getUserZombieTime() )
          {
             appendLog( std::string("ZOMBIETIME: " + af::itos( af::Environment::getUserZombieTime()) + " seconds with no job."));
-            setZombie();
-            if( monitoring ) monitoring->addEvent( af::Msg::TMonitorUsersDel, id);
+            setZombie( monitoring);
             return;
          }
       }
       else
       {
-         zombietime = currentTime;
+         m_zombietime = currentTime;
       }
       return;
    }
-   else zombietime = 0;
+   else m_zombietime = 0;
 
    int _numrunningjobs = 0;
    int _runningtasksnumber = 0;
@@ -236,12 +250,12 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    }
 
    if((( _numrunningjobs      != numrunningjobs       ) ||
-       ( _numjobs             != numjobs              ) ||
+       ( _numjobs             != m_numjobs              ) ||
        ( _runningtasksnumber  != runningtasksnumber   )) &&
          monitoring )
          monitoring->addEvent( af::Msg::TMonitorUsersChanged, id);
 
-   numjobs = _numjobs;
+   m_numjobs = _numjobs;
    numrunningjobs = _numrunningjobs;
    runningtasksnumber = _runningtasksnumber;
 
@@ -268,7 +282,7 @@ bool UserAf::canRun()
         return false;
     }
 
-    if( numjobs < 1 )
+    if( m_numjobs < 1 )
     {
         // Nothing to run
         return false;
@@ -361,8 +375,8 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
 
 void UserAf::appendLog( const std::string & message)
 {
-   log.push_back( af::time2str() + " : " + message);
-   while( log.size() > af::Environment::getUserLogLinesMax() ) log.pop_front();
+   m_log.push_back( af::time2str() + " : " + message);
+   while( m_log.size() > af::Environment::getUserLogLinesMax() ) m_log.pop_front();
 }
 
 void UserAf::generateJobsIds( af::MCGeneral & ids) const

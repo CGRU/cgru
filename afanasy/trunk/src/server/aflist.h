@@ -18,10 +18,7 @@ public:
 
    ~AfList();
 
-   int getCount()
-   {
-      return nodes_list.size();
-   }
+   inline int getCount() const { return nodes_list.size();}
 
    int add( af::Node *node);    ///< Add node to list.
 
@@ -46,7 +43,7 @@ public:
 //   void ReadLock( void ) { m_rw_lock.ReadLock(); }
 //   void ReadUnlock( void ) { m_rw_lock.ReadUnlock(); }
 
-protected:
+//protected:
    void remove( af::Node *node); ///< Remove node from list.
 
 private:

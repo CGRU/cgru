@@ -29,6 +29,11 @@ class CmdJobHostsMask: public Cmd { public:
    ~CmdJobHostsMask();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdJobsSetUser: public Cmd { public:
+   CmdJobsSetUser();
+   ~CmdJobsSetUser();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
 class CmdJobId: public Cmd { public:
    CmdJobId();
    ~CmdJobId();

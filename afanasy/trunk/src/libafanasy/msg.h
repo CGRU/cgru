@@ -337,7 +337,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 
 /**/TUserJobsSolveMethod/**/,       ///< Set jobs solving mode.
 /**/TRenderEjectNotMyTasks/**/,     ///< Stop mot my (based on username of message) tasks on Render,
-/**/TRESERVED12/**/,
+/**/TJobSetUser/**/,                ///< Change job owner.
 /**/TRESERVED13/**/,
 /**/TRESERVED14/**/,
 /**/TRESERVED15/**/,

@@ -442,7 +442,7 @@ SysJob::SysJob( int flags):
    progress = new afsql::DBJobProgress( this);
 
    construct();
-   fromdatabase = false;
+   m_fromdatabase = false;
 
    printf("System job constructed.\n");
 }
@@ -493,7 +493,7 @@ bool SysJob::solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("SysJob::solve:\n");
    for( int b = 0; b < blocksnum; b++ )
-      if(((SysBlock*)(blocks[b]))->isReady())
+      if(((SysBlock*)(m_blocks[b]))->isReady())
          return JobAf::solve( render, monitoring);
 
    return false;
@@ -510,7 +510,7 @@ void SysJob::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * ren
       return;
    }
 
-   ((SysBlock*)(blocks[taskup.getNumBlock()]))->updateTaskState( taskup, renders, monitoring);
+   ((SysBlock*)(m_blocks[taskup.getNumBlock()]))->updateTaskState( taskup, renders, monitoring);
 }
 
 void SysJob::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -578,7 +578,7 @@ void SysJob::restartTasks( const af::MCTasksPos &taskspos, RenderContainer * ren
          AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, blocksnum)
          continue;
       }
-      ((SysBlock*)(blocks[b]))->clearCommands();
+      ((SysBlock*)(m_blocks[b]))->clearCommands();
    }
    JobAf::restartTasks( taskspos, renders, monitoring);
 }

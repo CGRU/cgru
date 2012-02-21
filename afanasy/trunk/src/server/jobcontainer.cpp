@@ -18,11 +18,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-afsql::DBConnection * JobContainer::afDB = NULL;
+afsql::DBConnection * JobContainer::m_afDB = NULL;
 
-JobContainer::JobContainer():
-   AfContainer( "Jobs", AFJOB::MAXQUANTITY)
+JobContainer::JobContainer( afsql::DBConnection * i_afDB):
+    AfContainer( "Jobs", AFJOB::MAXQUANTITY)
 {
+    m_afDB = i_afDB;
 }
 
 JobContainer::~JobContainer()
@@ -32,27 +33,27 @@ AFINFO("JobContainer::~JobContainer:")
 
 void JobContainer::updateTaskState( af::MCTaskUp &taskup, RenderContainer * renders, MonitorContainer * monitoring)
 {
-   switch( taskup.getStatus())
-   {
-   case af::TaskExec::UPNULL:
-   case af::TaskExec::UPNoTaskRunning:
-   case af::TaskExec::UPNoJob:
-   case af::TaskExec::UPLAST:
-      AFERRAR("JobContainer::updateTaskState: Bad task update status (jobID=%d).\n", taskup.getNumJob());
-   return;
-   }
+    switch( taskup.getStatus())
+    {
+    case af::TaskExec::UPNULL:
+    case af::TaskExec::UPNoTaskRunning:
+    case af::TaskExec::UPNoJob:
+    case af::TaskExec::UPLAST:
+        AFERRAR("JobContainer::updateTaskState: Bad task update status (jobID=%d).\n", taskup.getNumJob());
+    return;
+    }
 
-   JobContainerIt jobsIt( this);
-   JobAf* job = jobsIt.getJob( taskup.getNumJob());
-   if( job != NULL )
-   {
-      job->updateTaskState( taskup, renders, monitoring);
-      return;
-   }
+    JobContainerIt jobsIt( this);
+    JobAf* job = jobsIt.getJob( taskup.getNumJob());
+    if( job != NULL )
+    {
+        job->updateTaskState( taskup, renders, monitoring);
+        return;
+    }
 
-// Job does not exist!
-   AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
-   if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
+    // Job does not exist!
+    AFERRAR("JobContainer::updateTaskState: Job with id=%d does not exists.", taskup.getNumJob())
+    if( taskup.getStatus() == af::TaskExec::UPPercent) RenderAf::closeLostTask( taskup);
 }
 
 int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContainer * monitoring)
@@ -78,7 +79,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
     }
 
     // Check database connection if it is working and if it is a new job:
-    if( afDB->isWorking() && ( job->fromDataBase() == false ))
+    if( m_afDB->isWorking() && ( job->fromDataBase() == false ))
     {
         afsql::DBConnection dbcheck("AFANASY_check");
         if( false == dbcheck.isWorking())
@@ -132,7 +133,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 
     // initialize job ( create tasks output folder, execute "pre"commands if any)
     AFINFO("JobContainer::job_register: initiaizing new job with user.")
-    if( job->initialize( user) == false)
+    if( job->initialize() == false)
     {
         AFERROR("JobContainer::job_register: Job initialization failed.")
 
@@ -158,19 +159,19 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
     if( job->fromDataBase() == false )
     {
         AFINFO("JobContainer::job_register: writing job to database.")
-        if( afDB == NULL )
+        if( m_afDB == NULL )
         {
             AFERROR("JobContainer::job_register: Afanasy database is not set.")
         }
         else
         {
-            if( afDB->DBOpen())
+            if( m_afDB->DBOpen())
             {
-                if( false == afDB->addJob( job))
+                if( false == m_afDB->addJob( job))
                 {
                     AFERRAR("Failed to add job to database: name = '%s', id = %d", job->getName().c_str(), job->getId())
                 }
-                afDB->DBClose();
+                m_afDB->DBClose();
             }
         }
     }

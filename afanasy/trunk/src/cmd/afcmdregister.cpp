@@ -86,6 +86,7 @@ void AfCmd::RegisterCommands()
     addCmd( new CmdJobPriority);
     addCmd( new CmdJobRunningTasksMaximum);
     addCmd( new CmdJobHostsMask);
+    addCmd( new CmdJobsSetUser);
     addCmd( new CmdJob);
 
     addCmd( new CmdTaskLog);

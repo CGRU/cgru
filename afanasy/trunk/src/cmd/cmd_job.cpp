@@ -108,8 +108,26 @@ bool CmdJobHostsMask::processArguments( int argc, char** argv, af::Msg &msg)
 {
    std::string name = argv[0];
    std::string mask = argv[1];
-//   if( af::RegExp::Validate( mask) == false ) return false;
+   if( af::RegExp::Validate( mask) == false ) return false;
    af::MCGeneral mcgeneral( name, mask);
+   msg.set( getMsgType(), &mcgeneral);
+   return true;
+}
+
+CmdJobsSetUser::CmdJobsSetUser()
+{
+   setCmd("juser");
+   setArgsCount(2);
+   setInfo("Change job owner.");
+   setHelp("juser [name] [user] Change job owner.");
+   setMsgType( af::Msg::TJobSetUser);
+}
+CmdJobsSetUser::~CmdJobsSetUser(){}
+bool CmdJobsSetUser::processArguments( int argc, char** argv, af::Msg &msg)
+{
+   std::string name = argv[0];
+   std::string user = argv[1];
+   af::MCGeneral mcgeneral( name, user);
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
