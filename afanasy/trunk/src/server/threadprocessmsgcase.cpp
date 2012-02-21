@@ -62,52 +62,52 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
       o_msg_response = new af::Msg( af::Msg::TConfirm, 1 - i_msg->int32());
       break;
    }
-   case af::Msg::TConfigLoad:
-   {
-      AfContainerLock tlock( i_args->talks,   AfContainerLock::WRITELOCK);
-      AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
-      AfContainerLock jlock( i_args->jobs,    AfContainerLock::WRITELOCK);
-      AfContainerLock ulock( i_args->users,   AfContainerLock::WRITELOCK);
-      std::string message;
-      if( af::Environment::reload())
-      {
+    case af::Msg::TConfigLoad:
+    {
+        AfContainerLock jlock( i_args->jobs,    AfContainerLock::WRITELOCK);
+        AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
+        AfContainerLock tlock( i_args->talks,   AfContainerLock::WRITELOCK);
+        AfContainerLock ulock( i_args->users,   AfContainerLock::WRITELOCK);
+        std::string message;
+        if( af::Environment::reload())
+        {
          message = "Reloaded successfully.";
-      }
-      else
-      {
+        }
+        else
+        {
          message = "Failed, see server logs fo details.";
-      }
-      o_msg_response = new af::Msg();
-      o_msg_response->setString( message);
-      break;
-   }
-   case af::Msg::TFarmLoad:
-   {
-      AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
-      AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+        }
+        o_msg_response = new af::Msg();
+        o_msg_response->setString( message);
+        break;
+    }
+    case af::Msg::TFarmLoad:
+    {
+        AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+        AfContainerLock rlock( i_args->renders,  AfContainerLock::WRITELOCK);
 
-      printf("\n   ========= RELOADING FARM =========\n\n");
-      std::string message;
-      if( af::loadFarm( true))
-      {
-         RenderContainerIt rendersIt( i_args->renders);
-         for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
-         {
-            render->getFarmHost();
-            i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
-         }
-         message = "Reloaded successfully.";
-         printf("\n   ========= FARM RELOADED SUCCESSFULLY =========\n\n");
-      }
-      else
-      {
-         message = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
-         printf("\n   ========= FARM RELOADING FAILED =========\n\n");
-      }
-      o_msg_response = new af::Msg();
-      o_msg_response->setString( message);
-      break;
-   }
+        printf("\n   ========= RELOADING FARM =========\n\n");
+        std::string message;
+        if( af::loadFarm( true))
+        {
+            RenderContainerIt rendersIt( i_args->renders);
+            for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+            {
+                render->getFarmHost();
+                i_args->monitors->addEvent( af::Msg::TMonitorRendersChanged, render->getId());
+            }
+            message = "Reloaded successfully.";
+            printf("\n   ========= FARM RELOADED SUCCESSFULLY =========\n\n");
+        }
+        else
+        {
+            message = "Failed, see server logs fo details. Check farm with \"afcmd fcheck\" at first.";
+            printf("\n   ========= FARM RELOADING FAILED =========\n\n");
+        }
+        o_msg_response = new af::Msg();
+        o_msg_response->setString( message);
+        break;
+    }
 
 // ---------------------------------- Monitor ---------------------------------//
    case af::Msg::TMonitorRegister:
@@ -150,16 +150,16 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
    }
 
 // ---------------------------------- Talk ---------------------------------//
-   case af::Msg::TTalkRegister:
-   {
-      AfContainerLock tlock( i_args->talks,    AfContainerLock::WRITELOCK);
-      AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
+    case af::Msg::TTalkRegister:
+    {
+        AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
+        AfContainerLock tlock( i_args->talks,    AfContainerLock::WRITELOCK);
 
-      TalkAf * newTalk = new TalkAf( i_msg);
-      newTalk->setAddressIP( i_msg->getAddress());
-      o_msg_response = i_args->talks->addTalk( newTalk, i_args->monitors);
-      break;
-   }
+        TalkAf * newTalk = new TalkAf( i_msg);
+        newTalk->setAddressIP( i_msg->getAddress());
+        o_msg_response = i_args->talks->addTalk( newTalk, i_args->monitors);
+        break;
+    }
    case af::Msg::TTalksListRequest:
    {
       AfContainerLock lock( i_args->talks, AfContainerLock::READLOCK);
@@ -198,17 +198,17 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
    }
 
 // ---------------------------------- Render -------------------------------//
-   case af::Msg::TRenderRegister:
-   {
+    case af::Msg::TRenderRegister:
+    {
 //printf("case af::Msg::TRenderRegister:\n");
-      AfContainerLock rLock( i_args->renders,  AfContainerLock::WRITELOCK);
-      AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+        AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+        AfContainerLock rLock( i_args->renders,  AfContainerLock::WRITELOCK);
 
-      RenderAf * newRender = new RenderAf( i_msg);
-      newRender->setAddressIP( i_msg->getAddress());
-      o_msg_response = i_args->renders->addRender( newRender, i_args->monitors);
-      break;
-   }
+        RenderAf * newRender = new RenderAf( i_msg);
+        newRender->setAddressIP( i_msg->getAddress());
+        o_msg_response = i_args->renders->addRender( newRender, i_args->monitors);
+        break;
+    }
    case af::Msg::TRenderUpdate:
    {
 //printf("case af::Msg::TRenderUpdate:\n");

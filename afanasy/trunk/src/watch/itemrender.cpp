@@ -579,6 +579,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
     if( busy)
     {
         int stars_offset_y = 13;
+        int stars_offset_x = 13;
         int star_size_one = 8;
         int star_size_txt = 11;
         int tasks_num_x = 25;
@@ -586,14 +587,16 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
         if( ListRenders::getDisplaySize() == ListRenders::ESMallSize)
         {
             stars_offset_y = 7;
+            stars_offset_x = 17;
             star_size_one = 6;
             star_size_txt = star_size_one;
+            tasks_num_x = 15;
             tasks_num_y = 16;
         }
 
         if( tasks.size() > 1 )
         {
-            drawStar( star_size_txt, x+13, y+stars_offset_y, painter);
+            drawStar( star_size_txt, x+stars_offset_x, y+stars_offset_y, painter);
             painter->setFont( afqt::QEnvironment::f_name);
             painter->setPen( afqt::QEnvironment::clr_textstars.c);
             painter->drawText( x, y, tasks_num_x, tasks_num_y, Qt::AlignHCenter | Qt::AlignVCenter,
@@ -601,7 +604,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
         }
         else
         {
-            drawStar( star_size_one, x+13, y+stars_offset_y, painter);
+            drawStar( star_size_one, x+stars_offset_x, y+stars_offset_y, painter);
         }
     }
 

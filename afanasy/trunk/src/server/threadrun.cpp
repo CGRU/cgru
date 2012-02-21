@@ -39,9 +39,9 @@ printf("...................................\n");
 AFINFO("ThreadRun::run: Locking containers...")
       AfContainerLock jLock( a->jobs,     AfContainerLock::WRITELOCK);
       AfContainerLock lLock( a->renders,  AfContainerLock::WRITELOCK);
-      AfContainerLock ulock( a->users,    AfContainerLock::WRITELOCK);
-      AfContainerLock tlock( a->talks,    AfContainerLock::WRITELOCK);
       AfContainerLock mlock( a->monitors, AfContainerLock::WRITELOCK);
+      AfContainerLock tlock( a->talks,    AfContainerLock::WRITELOCK);
+      AfContainerLock ulock( a->users,    AfContainerLock::WRITELOCK);
 
 //
 // Messages reaction:

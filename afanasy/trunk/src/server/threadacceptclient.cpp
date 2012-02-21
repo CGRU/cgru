@@ -129,17 +129,19 @@ void threadAcceptClient( void * i_arg )
       value = bind( server_sd, (struct sockaddr*)&server_sockaddr_in6, sizeof(server_sockaddr_in6));
    }
 
-   if( value != 0)
-   {
-      perror( "bind() error in ThreadServer_accept" );
-      return;
-   }
+    if( value != 0)
+    {
+        AFERRPE("bind() error in ThreadServer_accept");
+        AFRunning = false;
+        return;
+    }
 
-   if( listen( server_sd, 9) != 0)
-   {
-      perror( "listen() error in ThreadServer_accept" );
-      return;
-   }
+    if( listen( server_sd, 9) != 0)
+    {
+        AFERRPE("listen() error in ThreadServer_accept");
+        AFRunning = false;
+        return;
+    }
 
    printf( "Listening %d port...\n", af::Environment::getServerPort());
 
