@@ -58,13 +58,13 @@ public:
     inline static void unLockMutex() { ms_obj->m_mutex.Unlock();}
 
 #ifdef WINNT
-    void windowsMustDie() const;
+    static void windowsMustDie();
 #endif
 
 private:
     static RenderHost * ms_obj;
 #ifdef WINNT
-    std::vector<std::string> windowsmustdie;
+    static std::vector<std::string> windowsmustdie;
 #endif
 
     static std::vector<PyRes*> ms_pyres;

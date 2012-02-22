@@ -1,7 +1,7 @@
 #include "parserhost.h"
 
 #ifdef WINNT
-#define strcpy strcpy_s
+//#define strcpy strcpy_s
 #endif
 
 #define AFOUTPUT

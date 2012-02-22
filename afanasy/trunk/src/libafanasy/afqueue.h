@@ -3,7 +3,9 @@
 #include "dlMutex.h"
 #include "dlThread.h"
 
-#ifndef _WIN32
+#ifdef WINNT
+#include <windows.h>
+#else
 #include <semaphore.h>
 #endif
 
@@ -88,9 +90,11 @@ private:
       We need a pointer and a semaphore because MacOS X systems use pointers
       on sempahore openb but Linux doesn't (this simplifies code, see
       implementation). */
-#ifndef _WIN32
+#ifndef WINNT
    sem_t semcount;
    sem_t *semcount_ptr;
+#else
+   HANDLE semaphore;
 #endif
 
    int count;           ///< Number of items in queue.

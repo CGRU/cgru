@@ -92,7 +92,7 @@ void NetIF::readwrite( Msg * msg)
    rw_String(  name,    msg);
    rw_data(    (char*)macaddr, msg, MacAddrLen);
 
-   int8_t addrs = addresses.size();
+   int8_t addrs = int8_t(addresses.size());
    rw_int8_t( addrs, msg);
    for( int i = 0; i < addrs; i++)
       if( msg->isWriting()) addresses[i].write( msg);

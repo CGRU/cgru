@@ -32,7 +32,14 @@ AfQueue::AfQueue( const std::string &i_QueueName, StartTread i_start_thread ):
    lastPtr(NULL),
    m_thread_started(i_start_thread)
 {
-#ifdef MACOSX
+#ifdef WINNT
+	semaphore = CreateSemaphore( NULL, 1024, 1024, NULL);
+	if (semaphore == NULL) 
+    {
+		AFERROR("CreateSemaphore error in queue '%s'", i_QueueName.c_str());
+        return;
+    }
+#elif defined(MACOSX)
    /* We carate an exclusive semaphore and give read and write
       persmission to this owner. */
    semcount_ptr = sem_open( i_QueueName.c_str(), O_CREAT, 0600, 0);
@@ -42,7 +49,7 @@ AfQueue::AfQueue( const std::string &i_QueueName, StartTread i_start_thread ):
       perror( "sem_open() failing in AfQueue ctor" );
       return;
    }
-#elif defined(LINUX)
+#else
    semcount_ptr = &semcount;
    if( sem_init( semcount_ptr, 0, 0) != 0)
    {
@@ -71,8 +78,10 @@ AfQueue::~AfQueue()
       return;
    }
 
-#ifndef _WIN32
-   sem_post( semcount_ptr );
+#ifdef WINNT
+//   CloseHandle( semaphore);
+//#else
+   sem_post( semcount_ptr);
 #endif
 
    AFINFA("AfQueue::~AfQueue(): %s", name.c_str())
@@ -84,7 +93,11 @@ AfQueue::~AfQueue()
       delete item;
    }
 
+#ifdef WINNT
+   CloseHandle( semaphore);
+#else
    sem_close( semcount_ptr );
+#endif
 
    m_mutex.Unlock();
 

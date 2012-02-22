@@ -6,6 +6,8 @@
 
 #ifdef WINNT
 #include <winsock2.h>
+#define sprintf sprintf_s
+#define close _close
 #else
 #include <arpa/inet.h>
 #include <fcntl.h>
@@ -34,7 +36,7 @@ void threadAcceptClient( void * i_arg )
 
 // Check for available local network addresses
     struct addrinfo hints, *res;
-    bzero( &hints, sizeof(hints));
+    memset( &hints, 0, sizeof(hints));
     hints.ai_socktype = SOCK_STREAM;
     hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
     char port_str[16];
@@ -97,12 +99,12 @@ void threadAcceptClient( void * i_arg )
 //
 // initializing server socket address:
     struct sockaddr_in server_sockaddr_in4;
-    bzero( &server_sockaddr_in4, sizeof(server_sockaddr_in4));
+    memset( &server_sockaddr_in4, 0, sizeof(server_sockaddr_in4));
     server_sockaddr_in4.sin_addr.s_addr = INADDR_ANY;
     server_sockaddr_in4.sin_family = AF_INET;
 
     struct sockaddr_in6 server_sockaddr_in6;
-    bzero( &server_sockaddr_in6, sizeof(server_sockaddr_in6));
+    memset( &server_sockaddr_in6, 0, sizeof(server_sockaddr_in6));
     server_sockaddr_in6.sin6_family = AF_INET6;
 //   server_sockaddr_in6.sin6_addr = IN6ADDR_ANY_INIT; // This is default value, it is zeros
 
@@ -115,7 +117,12 @@ void threadAcceptClient( void * i_arg )
 //
 // set socket options for reuseing address immediatly after bind
     int value = 1;
-    if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) != 0)
+#ifdef WINNT
+#define TOCHAR (char *)
+#else
+#define TOCHAR
+#endif
+    if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, TOCHAR &value, sizeof(value)) != 0)
         AFERRPE("set socket SO_REUSEADDR option failed")
 
     int port = af::Environment::getClientPort();
@@ -189,7 +196,9 @@ void threadAcceptClient( void * i_arg )
             {
                 break;
             }
-            sleep( 1);
+
+            af::sleep_sec( 1);
+
             continue;
         }
 

@@ -2,12 +2,14 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/wait.h>
 
 #ifdef WINNT
 #include <windows.h>
+#include <Winsock2.h>
 #else
 #include <sys/ioctl.h>
+#include <sys/wait.h>
+extern void (*fp_setupChildProcess)( void);
 #endif
 
 #include "../include/afanasy.h"
@@ -24,8 +26,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-extern void (*fp_setupChildProcess)( void);
-
+#ifndef WINNT
 void setupChildProcess( void)
 {
 //    printf("This is child process!\n");
@@ -39,7 +40,6 @@ void setupChildProcess( void)
 int setNonblocking(int fd)
 {
     int flags;
-
     /* If they have O_NONBLOCK, use the Posix way to do it */
 #if defined(O_NONBLOCK)
     /* Fixme: O_NONBLOCK is defined but broken on SunOS 4.1.x and AIX 3.2.5. */
@@ -52,6 +52,7 @@ int setNonblocking(int fd)
     return ioctl(fd, FIOBIO, &flags);
 #endif
 }
+#endif
 
 TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     m_taskexec( i_taskExec),
@@ -91,12 +92,13 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
-    fp_setupChildProcess = setupChildProcess;
-
     int flags = 0;
 #ifdef WINNT
     flags = CREATE_SUSPENDED;
+#else
+    fp_setupChildProcess = setupChildProcess;
 #endif
+
     m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr, flags);
 
     if( m_pid <= 0 )
@@ -120,9 +122,11 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     setbuf( m_io_output, m_filebuffer_out);
     setbuf( m_io_outerr, m_filebuffer_err);
 
+#ifndef WINNT
     setNonblocking( fileno( m_io_input));
     setNonblocking( fileno( m_io_output));
     setNonblocking( fileno( m_io_outerr));
+#endif
 
     printf("Started PID=%d: ",m_pid);
     m_taskexec->stdOut( af::Environment::isVerboseMode());

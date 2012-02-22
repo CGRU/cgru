@@ -34,30 +34,53 @@ af::Farm* ferma = NULL;
 #include "../include/macrooutput.h"
 
 
+#ifdef WINNT
+bool LaunchProgramV(
+	PROCESS_INFORMATION * o_pinfo,
+	FILE **o_in,
+	FILE **o_out,
+	FILE **o_err,
+        const char * i_program,
+        const char * i_args[],
+        const char * i_wdir = NULL,
+        DWORD i_flags = 0);
+
+bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
+                       const std::string & i_commandline, const std::string & i_wdir,
+                       FILE ** o_in, FILE ** o_out, FILE ** o_err,
+					   DWORD i_flags)
+{
+    const char * wdir = NULL;
+    if( i_wdir.size() > 0 )
+        wdir = i_wdir.c_str();
+
+	const char shell[] = "cmd.exe";
+    const char * args[] = { "/c", i_commandline.c_str(), NULL};
+
+	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell, args, wdir, i_flags);
+}
+#else
 int LaunchProgramV(
     FILE **o_in,
     FILE **o_out,
     FILE **o_err,
     const char * i_program,
     const char * i_args[],
-    const char * wdir = NULL,
-    int i_flags = 0);
+    const char * wdir = NULL);
 
 int af::launchProgram( const std::string & i_commandline, const std::string & i_wdir,
-                       FILE ** o_in, FILE ** o_out, FILE ** o_err, int i_flags)
+                       FILE ** o_in, FILE ** o_out, FILE ** o_err)
 {
     const char * wdir = NULL;
     if( i_wdir.size() > 0 )
         wdir = i_wdir.c_str();
-#ifdef WINNT
-    const char shell[] = "cmd.exe";
-    const char * args[] = { "/c", i_commandline.c_str(), NULL};
-#else
-    const char shell[] = "/bin/bash";
+
+	const char shell[] = "/bin/bash";
     const char * args[] = { "-c", i_commandline.c_str(), NULL};
-#endif
-    return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_flags);
+
+	return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_flags);
 }
+#endif
 
 void af::outError( const char * errMsg, const char * baseMsg)
 {
@@ -124,6 +147,24 @@ bool af::loadFarm( const std::string & filename, bool verbose )
 void af::destroy()
 {
    if( ferma != NULL) delete ferma;
+}
+
+void af::sleep_sec(  int i_seconds )
+{
+#ifdef WINNT
+	Sleep( 1000 * i_seconds);
+#else
+	sleep( i_seconds);
+#endif
+}
+
+void af::sleep_msec( int i_mseconds)
+{
+#ifdef WINNT
+	Sleep(  i_mseconds);
+#else
+	usleep( 1000 * i_seconds);
+#endif
 }
 
 const std::string af::time2str( time_t time_sec, const char * time_format)
@@ -215,7 +256,7 @@ void af::printTime( time_t time_sec, const char * time_format)
 {
    std::cout << time2str( time_sec, time_format);
 }
-#ifndef WINNT
+
 void af::printAddress( struct sockaddr_storage * i_ss )
 {
    static const int buffer_len = 256;
@@ -250,7 +291,7 @@ void af::printAddress( struct sockaddr_storage * i_ss )
    }
    printf("\n");
 }
-#endif
+
 bool af::setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput)
 {
    std::string errString;

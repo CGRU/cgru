@@ -48,13 +48,13 @@ public:
    inline const std::string & getHostName() const { return hostname;}
    inline void  setHostName( const std::string & str) { hostname = str;}
 
-   inline int      getMaxRunningTasks()      const { return maxrunningtasks;     } ///< Get maximum hosts.
-   inline int      getNumJobs()              const { return m_numjobs;             } ///< Get jobs quantity.
-   inline int      getNumRunningJobs()       const { return numrunningjobs;      } ///< Get active jobs quantity.
-   inline int      getRunningTasksNumber()   const { return runningtasksnumber;  } ///< Get number of hosts used by user jobs.
-   inline uint32_t getTimeRegister()         const { return time_register;       } ///< Get register time.
-   inline uint32_t getTimeOnline()           const { return time_online;         } ///< Get online time.
-   inline int      getJobsLifeTime()         const { return jobs_lifetime;       } ///< Get jobs default life time.
+    inline int     getMaxRunningTasks()      const { return maxrunningtasks;     } ///< Get maximum hosts.
+    inline int     getNumJobs()              const { return m_numjobs;             } ///< Get jobs quantity.
+    inline int     getNumRunningJobs()       const { return numrunningjobs;      } ///< Get active jobs quantity.
+    inline int     getRunningTasksNumber()   const { return runningtasksnumber;  } ///< Get number of hosts used by user jobs.
+    inline int64_t getTimeRegister()         const { return time_register;       } ///< Get register time.
+    inline int64_t getTimeOnline()           const { return time_online;         } ///< Get online time.
+    inline int     getJobsLifeTime()         const { return jobs_lifetime;       } ///< Get jobs default life time.
 
    inline int getErrorsAvoidHost()      const { return errors_avoidhost;    }
    inline int getErrorsRetries()        const { return errors_retries;      }

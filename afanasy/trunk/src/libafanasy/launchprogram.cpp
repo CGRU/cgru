@@ -24,16 +24,14 @@
 	- Taken from TAARNACore.
 */
 
+#include <fcntl.h>
 #include <stdio.h>
 
 #ifdef WINNT
-
+#include <io.h>
 #include <windows.h>
-
 #else
-
 #include <unistd.h>
-
 #endif
 
 void (*fp_setupChildProcess)( void) = NULL;
@@ -66,14 +64,25 @@ int LaunchProgram(
 	return LaunchProgramV(o_in, o_out, o_err, i_program, Args);
 }
 */
-int LaunchProgramV(
+#ifdef _WIN32
+bool LaunchProgramV(
+	PROCESS_INFORMATION * o_pinfo,
 	FILE **o_in,
 	FILE **o_out,
 	FILE **o_err,
         const char * i_program,
         const char * i_args[],
         const char * i_wdir = NULL,
-        int i_flags = 0)
+        DWORD i_flags = 0)
+#else
+int LaunchProgramV(
+	FILE **o_in,
+	FILE **o_out,
+	FILE **o_err,
+        const char * i_program,
+        const char * i_args[],
+        const char * i_wdir = NULL)
+#endif
 {
 	if (o_in)
 	{
@@ -134,7 +143,7 @@ int LaunchProgramV(
 	if (o_in && !CreatePipe(&hStdinRead, &hStdinWrite, &saAttr, 0))
 	{
 		free( args );
-		return 0;
+		return false;
 	}
 
 	if (o_out && !CreatePipe(&hStdoutRead, &hStdoutWrite, &saAttr, 0))
@@ -146,7 +155,7 @@ int LaunchProgramV(
 		}
 
 		free( args );
-		return 0;
+		return false;
 	}
 
 	if (o_err && !CreatePipe(&hStderrRead, &hStderrWrite, &saAttr, 0))
@@ -164,7 +173,7 @@ int LaunchProgramV(
 		}
 
 		free( args );
-		return 0;
+		return false;
 	}
 
 	// Duplicate our ends of the pipes so they're not inheritable anymore
@@ -192,7 +201,7 @@ int LaunchProgramV(
 			}
 
 			free( args );
-			return 0;
+			return false;
 		}
 		
 		if (o_in)
@@ -218,7 +227,7 @@ int LaunchProgramV(
 			}
 
 			free( args );
-			return 0;
+			return false;
 		}
 	
 		if (o_out)	
@@ -243,7 +252,7 @@ int LaunchProgramV(
 
 			CloseHandle(hStderrWrite);
 			free( args );
-			return 0;
+			return false;
 		}
 		
 		if (o_err)
@@ -254,7 +263,6 @@ int LaunchProgramV(
 	// Create the process
 
 	STARTUPINFO startInfo;
-	PROCESS_INFORMATION procInfo;
 	
 	memset(&startInfo, 0, sizeof(STARTUPINFO));
 	startInfo.cb = sizeof(STARTUPINFO);
@@ -291,16 +299,17 @@ int LaunchProgramV(
 		invoking 3Delight tools which use this function.
 	*/
 	CONSOLE_SCREEN_BUFFER_INFO cinfos;
-	BOOL hasConsole = GetConsoleScreenBufferInfo(
-			GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos );
+	DWORD flags = i_flags;
+	if( false == GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos ))
+		flags = flags | CREATE_NO_WINDOW;
 
 	BOOL processCreated = CreateProcess(
 		0x0, argsAndProgram,
 		NULL, NULL,
 		o_in || o_out || o_err,
-		hasConsole ? 0 : CREATE_NO_WINDOW,
-		NULL, NULL,			// FIXME: should we specify a working directory?
-		&startInfo, &procInfo);
+		flags,
+		NULL, i_wdir,
+		&startInfo, o_pinfo);
 
 	free(argsAndProgram);
 
@@ -308,7 +317,7 @@ int LaunchProgramV(
 	{
 		// Close the thread handle (the process handle is kept)
 
-		CloseHandle(procInfo.hThread);
+		CloseHandle( o_pinfo->hThread);
 	}
 
 	free(args);
@@ -325,27 +334,27 @@ int LaunchProgramV(
 		CloseHandle(hStderrWrite);
 
 	if (!processCreated)
-		return 0;
+		return false;
 
 	if (o_in)
 	{
-		int fd = _open_osfhandle((dl_intptr)hStdinWrite, 0);
+		int fd = _open_osfhandle((intptr_t)hStdinWrite, 0);
 		*o_in = _fdopen(fd, "w");
 	}
 
 	if (o_out)
 	{
-		int fd = _open_osfhandle((dl_intptr)hStdoutRead, O_RDONLY);
+		int fd = _open_osfhandle((intptr_t)hStdoutRead, O_RDONLY);
 		*o_out = _fdopen(fd, "r");
 	}
 
 	if (o_err)
 	{
-		int fd = _open_osfhandle((dl_intptr)hStderrRead, O_RDONLY);
+		int fd = _open_osfhandle((intptr_t)hStderrRead, O_RDONLY);
 		*o_err = _fdopen(fd, "r");
 	}
 
-	return procInfo.dwProcessId;
+	return true;
 	
 #else
 	int pid, err;

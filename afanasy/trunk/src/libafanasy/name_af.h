@@ -99,7 +99,10 @@ namespace af
       Right
    };
 
-   void outError( const char * errMsg, const char * baseMsg = NULL);
+	void outError( const char * errMsg, const char * baseMsg = NULL);
+
+	void sleep_sec(  int i_seconds  );
+	void sleep_msec( int i_mseconds );
 
    const long long stoi( const std::string & str, bool * ok = NULL);
    const std::string itos( long long integer);
@@ -120,11 +123,11 @@ namespace af
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
    const std::string time2strHMS( int time32, bool clamp = false);
 
-   void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
-#ifndef WINNT
-   void printAddress( struct sockaddr_storage * i_ss );
-#endif
-   bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
+	void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
+
+	void printAddress( struct sockaddr_storage * i_ss );
+
+	bool setRegExp( RegExp & regexp, const std::string & str, const std::string & name, std::string * errOutput = NULL);
 
    void rw_int32 (  int32_t &integer, char * data, bool write);
    void rw_uint32( uint32_t &integer, char * data, bool write);
@@ -160,9 +163,15 @@ namespace af
 
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
+#ifdef WINNT
+   bool launchProgram( PROCESS_INFORMATION * o_pinfo,
+	                   const std::string & i_commandline, const std::string & i_wdir = std::string(),
+                       FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL,
+                       DWORD i_flags = 0);
+#else
    int launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string(),
-                      FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL,
-                      int i_flags = 0);
+                      FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);
+#endif
 
     /// Read data from file descriptor. Return a new allocated buffer pointer and a size passed through an argument.
     /** Return NULL pointer and negative size on error.**/

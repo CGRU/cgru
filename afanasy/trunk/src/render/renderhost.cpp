@@ -1,5 +1,9 @@
 #include "renderhost.h"
 
+#ifdef WINNT
+#include <fstream>
+#endif
+
 #include "../libafanasy/dlScopeLocker.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
@@ -45,42 +49,48 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
     }
 
 #ifdef WINNT
-    Sleep( 100);
     // Windows Must Die:
-    QStringList wmdfiles = QDir(af::Environment::getAfRoot().c_str()).entryList( QStringList("windowsmustdie*.txt"), QDir::Files, QDir::Name);
-    for( int i = 0; i < wmdfiles.size(); i++)
-    {
-        QString filename = QString("%1\\%2").arg( afqt::stoq( af::Environment::getAfRoot())).arg( wmdfiles[i]);
-        QFile file( filename);
-        if( file.open(QFile::ReadOnly))
-        {
-            char buf[4096];
-            int len = 0;
-            do
-            {
-                len = file.readLine( buf, sizeof( buf));
-                if( len > 0 )
-                {
-                    QString line = QString( buf).simplified();
-                    if( false == line.isEmpty())
-                        windowsmustdie.push_back( line);
-                }
-            }
-            while( len != -1);
-            file.close();
-        }
-        else printf("Unable to read '%s'.\n", filename.toUtf8().data());
-    }
+	HANDLE dir;
+	WIN32_FIND_DATA file_data;
+	if(( dir = FindFirstFile((af::Environment::getAfRoot() + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			std::string filename = af::Environment::getAfRoot() + '\\' + file_data.cFileName;
+			if( filename.find("windowsmustdie") != 0 )
+				continue;
+			if( false == af::pathFileExists( filename))
+				continue;
+			std::ifstream file( filename);
+			if( file.is_open())
+			{
+				while( file.good());
+				{
+					std::string line;
+					std::getline( file, line);
+					line = af::strStrip( line);
+					if( line.size() > 0 )
+						windowsmustdie.push_back( line);
+				}
+				file.close();
+			}
+			else printf("Unable to read '%s'.\n", filename.c_str());
+		} while( FindNextFile( dir, &file_data));
+		FindClose( dir);
+	}
+	else
+	{
+		AFERRAR("Can't open folder '%s'", af::Environment::getAfRoot().c_str())
+	}
     if( windowsmustdie.size())
     {
-//        windowsmustdie.removeDuplicates();
         printf("Windows Must Die:\n");
         for( int i = 0; i < windowsmustdie.size(); i++)
             printf("   %s\n", windowsmustdie[i].c_str());
     }
-#else
-    usleep( 100000);
 #endif
+
+	af::sleep_msec( 100);
 
     GetResources( host, hres, false);
     for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
@@ -215,13 +225,13 @@ void RenderHost::update()
 }
 
 #ifdef WINNT
-void RenderHost::windowsMustDie() const
+void RenderHost::windowsMustDie()
 {
 // Windows Must Die:
 //printf("RenderHost::windowsMustDie():\n");
     for( int i = 0; i < windowsmustdie.size(); i++)
     {
-        HWND WINAPI hw = FindWindow( NULL, TEXT( windowsmustdie[i].c_str());
+        HWND WINAPI hw = FindWindow( NULL, TEXT( windowsmustdie[i].c_str()));
         if( hw != NULL )
         {
             printf("Window must die founded:\n%s\n", windowsmustdie[i].c_str());

@@ -83,11 +83,7 @@ int main(int argc, char *argv[])
         af::Host host;
         af::HostRes hostres;
         GetResources( host, hostres, true, true);
-#ifdef WINNT
-        Sleep(100);
-#else
-        sleep(1);
-#endif
+        af::sleep_msec(100);
         GetResources( host, hostres, false, true);
         printf("\n");
         host.stdOut( true);
@@ -121,7 +117,7 @@ int main(int argc, char *argv[])
         if( false == RenderHost::isListening() )
         {
             // Wait accept thread to start to listen a port.
-            usleep( 100);
+            af::sleep_msec( 100);
             continue;
         }
 
@@ -145,7 +141,7 @@ int main(int argc, char *argv[])
             RenderHost::update();
 
         cycle++;
-        sleep(1);
+        af::sleep_sec(1);
     }
 
     Py_Finalize();
