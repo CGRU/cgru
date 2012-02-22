@@ -1,9 +1,5 @@
 #pragma once
 
-#include <stdlib.h>
-
-#include "../../include/aftypes.h"
-
 #include "msgclass.h"
 
 namespace af
