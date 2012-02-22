@@ -13,6 +13,7 @@
 
 #ifdef WINNT
 #define sprintf sprintf_s
+#define sscanf sscanf_s
 #endif
 
 #define AFOUTPUT
@@ -177,7 +178,7 @@ void Address::clear()
 
 bool Address::setSocketAddress( struct sockaddr_storage * ss) const
 {
-   bzero( ss, sizeof(sockaddr_storage));
+   memset( ss, 0, sizeof(sockaddr_storage));
    switch( family)
    {
       case IPv4:
@@ -336,7 +337,7 @@ bool Address::readIpMask( const std::string & i_serveripmask, bool i_verbose)
                     break;
                 }
                 bool ok;
-                unsigned byte = af::stoi( *bit, &ok);
+                unsigned byte = (unsigned)af::stoi( *bit, &ok);
                 if( false == ok )
                 {
                     AFERRAR("Invalid Server IP Mask: '%s': Invalid decimal number '%s'.", (*it).c_str(), (*bit).c_str());

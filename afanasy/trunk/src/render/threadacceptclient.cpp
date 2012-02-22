@@ -1,13 +1,18 @@
-#include <arpa/inet.h>
-#include <fcntl.h>
 #include <memory.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <time.h>
+
+#ifdef WINNT
+#include <winsock2.h>
+#else
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
+#include <sys/socket.h>
+#endif
 
 #include "../libafanasy/msg.h"
 #include "../libafanasy/environment.h"

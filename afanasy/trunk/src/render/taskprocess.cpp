@@ -1,9 +1,14 @@
 #include "taskprocess.h"
 
 #include <fcntl.h>
-#include <sys/ioctl.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+
+#ifdef WINNT
+#include <windows.h>
+#else
+#include <sys/ioctl.h>
+#endif
 
 #include "../include/afanasy.h"
 

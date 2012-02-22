@@ -7,6 +7,8 @@
 #pragma comment(lib, "IPHLPAPI.lib")
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+#define sprintf sprintf_s
+#define sscanf sscanf_s
 #endif //WINNT
 
 #ifdef LINUX
@@ -417,7 +419,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
          for( IP_ADAPTER_PREFIX * pPrefix = pCurrAddresses->FirstPrefix; pPrefix != NULL; pPrefix = pPrefix->Next)
          {
             if( false == skip_addresses )
-               addresses.push_back( Address(*((struct sockaddr_storage *)(pPrefix->Address.lpSockaddr))));
+               addresses.push_back( Address((struct sockaddr_storage *)(pPrefix->Address.lpSockaddr)));
 
             if( verbose )
             {

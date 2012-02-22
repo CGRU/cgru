@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <vector>
 
-#include "../../include/aftypes.h"
-
 #include "msgclassuserhost.h"
 
 namespace af

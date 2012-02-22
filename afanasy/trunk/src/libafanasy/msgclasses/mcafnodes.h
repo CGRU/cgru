@@ -2,8 +2,6 @@
 
 #include <vector>
 
-#include "../../include/aftypes.h"
-
 #include "../name_af.h"
 
 #include "msgclass.h"

@@ -10,7 +10,7 @@ The following makes PROTOTYPES default to 0 if it has not already been defined w
 /* POINTER defines a generic pointer type */
 typedef char *POINTER;
 
-#include "../../include/aftypes.h"
+#include <stdint.h>
 
 /* UINT2 defines a two byte word */
 typedef uint16_t UINT2;

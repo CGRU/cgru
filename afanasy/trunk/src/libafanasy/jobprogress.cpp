@@ -47,6 +47,8 @@ bool JobProgress::construct( Job * job)
          return false;
       }
    }
+
+   return true;
 }
 
 JobProgress::JobProgress( Msg * msg)

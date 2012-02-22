@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtGui/QWidget>
+#include <stdint.h>
 
-#include "../include/aftypes.h"
+#include <QtGui/QWidget>
 
 class OfflineScreen : public QWidget
 {

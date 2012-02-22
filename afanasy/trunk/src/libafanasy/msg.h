@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-#include "../include/aftypes.h"
-
 #include "afqueue.h"
 #include "client.h"
 

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../include/afjob.h"
-#include "../include/aftypes.h"
 
 #include "af.h"
 #include "addresseslist.h"

@@ -25,7 +25,16 @@
 */
 
 #include <stdio.h>
+
+#ifdef WINNT
+
+#include <windows.h>
+
+#else
+
 #include <unistd.h>
+
+#endif
 
 void (*fp_setupChildProcess)( void) = NULL;
 

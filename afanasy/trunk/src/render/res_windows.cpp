@@ -158,9 +158,9 @@ printf("\nGetResources:\n");
    if( loadavg[0] > 25.0 ) loadavg[0] = 25.0;
    if( loadavg[1] > 25.0 ) loadavg[1] = 25.0;
    if( loadavg[2] > 25.0 ) loadavg[2] = 25.0;
-   hres.cpu_loadavg1 = unsigned( 10.0 * loadavg[0]);
-   hres.cpu_loadavg2 = unsigned( 10.0 * loadavg[1]);
-   hres.cpu_loadavg3 = unsigned( 10.0 * loadavg[2]);
+   hres.cpu_loadavg[0] = unsigned( 10.0 * loadavg[0]);
+   hres.cpu_loadavg[1] = unsigned( 10.0 * loadavg[1]);
+   hres.cpu_loadavg[2] = unsigned( 10.0 * loadavg[2]);
    }//cpu
 
    //

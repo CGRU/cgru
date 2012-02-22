@@ -1,6 +1,5 @@
 #pragma once
 
-#include "../include/aftypes.h"
 #include "../include/afjob.h"
 
 #include "af.h"

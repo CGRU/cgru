@@ -3,8 +3,6 @@
 #include <list>
 #include <algorithm>
 
-#include "../include/aftypes.h"
-
 #include "af.h"
 
 class MCGeneral;

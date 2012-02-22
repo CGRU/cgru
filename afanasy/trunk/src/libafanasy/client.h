@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-#include "../include/aftypes.h"
-
 #include "address.h"
 #include "afnode.h"
 #include "netif.h"

@@ -4,6 +4,7 @@
 #include <iostream>
 #include <list>
 #include <memory.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sstream>
@@ -24,8 +25,6 @@
 #undef _POSIX_C_SOURCE
 #endif
 #include <Python.h>
-
-#include "../include/aftypes.h"
 
 struct sockaddr_storage;
 

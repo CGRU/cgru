@@ -1,5 +1,9 @@
 #include "parserhost.h"
 
+#ifdef WINNT
+#define strcpy strcpy_s
+#endif
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

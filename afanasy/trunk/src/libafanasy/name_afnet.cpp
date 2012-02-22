@@ -194,7 +194,7 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
 
     struct addrinfo *res;
     struct addrinfo hints;
-    bzero(&hints, sizeof(hints));
+    memset( &hints, 0, sizeof(hints));
     hints.ai_flags = AI_ADDRCONFIG;
  //   hints.ai_family = AF_UNSPEC; // This is value is default
     hints.ai_socktype = SOCK_STREAM;

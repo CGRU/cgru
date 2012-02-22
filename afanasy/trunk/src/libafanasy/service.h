@@ -1,7 +1,5 @@
 #pragma once
 
-#include "../include/aftypes.h"
-
 #include "name_af.h"
 #include "pyclass.h"
 #include "taskexec.h"

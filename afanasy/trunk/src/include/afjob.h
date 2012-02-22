@@ -1,6 +1,6 @@
 #pragma once
 
-#include "aftypes.h"
+#include <stdint.h>
 
 /// Job.
 namespace AFJOB

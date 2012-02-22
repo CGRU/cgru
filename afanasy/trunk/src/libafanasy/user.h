@@ -2,8 +2,6 @@
 
 #include <time.h>
 
-#include "../include/aftypes.h"
-
 #include "afnode.h"
 #include "name_af.h"
 #include "regexp.h"
