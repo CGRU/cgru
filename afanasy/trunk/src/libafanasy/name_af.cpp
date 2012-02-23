@@ -82,7 +82,7 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 	const char shell[] = "/bin/bash";
     const char * args[] = { "-c", i_commandline.c_str(), NULL};
 
-	return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir, i_flags);
+    return LaunchProgramV( o_in, o_out, o_err, shell, args, wdir);
 }
 #endif
 
@@ -167,7 +167,7 @@ void af::sleep_msec( int i_mseconds)
 #ifdef WINNT
 	Sleep(  i_mseconds);
 #else
-	usleep( 1000 * i_seconds);
+    usleep( 1000 * i_mseconds);
 #endif
 }
 

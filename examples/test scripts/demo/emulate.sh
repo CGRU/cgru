@@ -13,7 +13,7 @@ JobsPack=10
 Users=10
 PausePeriod=1
 PauseTime=10
-DeletionPeriod=1
+DeletionPeriod=5
 for arg in "$@"; do
     [ "$arg" == "--nocmdpost" ] && nocmdpost=1
     [ "$arg" == "-c" ] && cleanup=1

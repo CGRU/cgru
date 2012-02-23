@@ -63,9 +63,8 @@ public:
 
 private:
     static RenderHost * ms_obj;
-#ifdef WINNT
+
     static std::vector<std::string> windowsmustdie;
-#endif
 
     static std::vector<PyRes*> ms_pyres;
 

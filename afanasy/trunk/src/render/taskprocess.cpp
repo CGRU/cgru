@@ -181,7 +181,7 @@ void TaskProcess::refresh()
     else if ( result == WAIT_FAILED )
         pid = -1;
 #else
-    pid_t pid = waitpid( m_pid, &status, WNOHANG);
+    pid = waitpid( m_pid, &status, WNOHANG);
 #endif
 
     if( pid == 0 )
@@ -407,9 +407,9 @@ int TaskProcess::readPipe( FILE * i_file )
     {
         if( errno == EAGAIN )
         {
-            readsize = fread( m_readbuffer, 1, m_readbuffer_size, pFile );
+            readsize = fread( m_readbuffer, 1, m_readbuffer_size, i_file );
             if( readsize <= 0 )
-                continue;
+                return 0;
         }
         else
             return 0;

@@ -1,8 +1,9 @@
 #include "environment.h"
 
-#ifndef WINNT
-#include <pwd.h>
+#ifdef WINNT
 #include <windows.h>
+#else
+#include <pwd.h>
 #include <unistd.h>
 #endif
 
