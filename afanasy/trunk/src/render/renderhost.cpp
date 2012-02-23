@@ -57,15 +57,18 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 	{
 		do
 		{
-			std::string filename = af::Environment::getAfRoot() + '\\' + file_data.cFileName;
+			std::string filename( file_data.cFileName);
 			if( filename.find("windowsmustdie") != 0 )
 				continue;
+
+			filename = af::Environment::getAfRoot() + '\\' + filename;
 			if( false == af::pathFileExists( filename))
 				continue;
+
 			std::ifstream file( filename);
 			if( file.is_open())
 			{
-				while( file.good());
+				while( file.good())
 				{
 					std::string line;
 					std::getline( file, line);

@@ -120,6 +120,7 @@ void AfQueue::unlock()
 
 bool AfQueue::push( AfQueueItem* item, bool i_front )
 {
+
 	assert( item );
 
    item->next_ptr = NULL;
@@ -146,7 +147,6 @@ bool AfQueue::push( AfQueueItem* item, bool i_front )
       Now that we added a new element to this list, we can increase
       the semaphore count so that waiting processes can wake up.
    */
-
 #ifdef WINNT
     if( ReleaseSemaphore( semaphore, 1, NULL) == 0 )
         AFERRAR("AfQueue::push: ReleaseSemaphore() failed in '%s'", name.c_str())
@@ -167,7 +167,7 @@ AfQueueItem* AfQueue::pop( WaitMode i_mode )
 #ifdef WINNT
     if( WaitForSingleObject( semaphore, (i_mode==e_wait) ? INFINITE : 0 ) == WAIT_FAILED )
     {
-        AFERRAR("AfQueue::push: WaitForSingleObject() failed in '%s'", name.c_str())
+        AFERRAR("AfQueue::pop: WaitForSingleObject() failed in '%s'", name.c_str())
         return NULL;
     }
 #else

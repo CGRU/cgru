@@ -28,7 +28,11 @@ int readdata( int fd, char* data, int data_len, int buffer_maxlen)
     int bytes = 0;
     while( bytes < data_len )
     {
+#ifdef WINNT
+        int r = recv( fd, data+bytes, buffer_maxlen-bytes, 0);
+#else
         int r = read( fd, data+bytes, buffer_maxlen-bytes);
+#endif
         if( r < 0)
         {
             AFERRPE("readdata: read");
@@ -45,18 +49,22 @@ int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 /// Write data to file descriptor. Return \c false on any arror and prints an error in \c stderr.
 bool writedata( int fd, char* data, int len)
 {
-   int written_bytes = 0;
-   while( written_bytes < len)
-   {
-      int w = write( fd, data+written_bytes, len);
-      if( w < 0)
-      {
-         AFERRPE("com::writedata:");
-         return false;
-      }
-      written_bytes += w;
-   }
-   return true;
+    int written_bytes = 0;
+    while( written_bytes < len)
+    {
+#ifdef WINNT
+        int w = send( fd, data+written_bytes, len, 0);
+#else
+        int w = write( fd, data+written_bytes, len);
+#endif
+        if( w < 0)
+        {
+            AFERRPE("name_afnet.cpp writedata:");
+            return false;
+        }
+        written_bytes += w;
+    }
+    return true;
 }
 
 af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
@@ -74,7 +82,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
     int socketfd;
     struct sockaddr_storage client_addr;
 
-    if( false == i_address.setSocketAddress( &client_addr)) return false;
+    if( false == i_address.setSocketAddress( &client_addr)) return NULL;
 
     if(( socketfd = socket( client_addr.ss_family, SOCK_STREAM, 0)) < 0 )
     {
@@ -91,6 +99,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
         AFERROR("af::msgsend: alarm was already set.\n");
 #endif //WINNT
 */
+
     if( connect(socketfd, (struct sockaddr*)&client_addr, i_address.sizeofAddr()) != 0 )
     {
         if( i_verbose == af::VerboseOn )
@@ -98,7 +107,7 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
             AFERRPA("af::msgsend: connect failure for msgType '%s':\n%s: ",
                 af::Msg::TNAMES[i_msg->type()], i_address.generateInfoString().c_str())
         }
-        close(socketfd);
+        closesocket(socketfd);
 /*
 #ifndef WINNT
         alarm(0);
@@ -136,14 +145,14 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
     {
         AFERRAR("af::msgsend: can't send message to client: %s",
                 i_address.generateInfoString().c_str())
-        close(socketfd);
+        closesocket(socketfd);
         io_ok = false;
         return NULL;
     }
 
     if( false == i_msg->isReceiving())
     {
-        close(socketfd);
+        closesocket(socketfd);
         return NULL;
     }
 
@@ -153,13 +162,13 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
     if( false == af::msgread( socketfd, o_msg))
     {
        AFERROR("MsgAf::request: reading message failed.\n");
-       close( socketfd);
+       closesocket( socketfd);
        delete o_msg;
        io_ok = false;
        return NULL;
     }
 
-    close(socketfd);
+    closesocket(socketfd);
     return o_msg;
 }
 
@@ -322,7 +331,7 @@ int af::connecttomaster( const std::string & i_name, int i_port, int i_type, Ver
       break;
       if( socketfd != -1)
       {
-         close( socketfd);
+         closesocket( socketfd);
          socketfd = -1;
       }
    }
@@ -460,7 +469,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    {
       AFERRPE("MsgAf::request: connect");
       i_request->getAddress().stdOut(); printf("\n");
-      close(socketfd);
+      closesocket(socketfd);
       return false;
    }
    //
@@ -485,7 +494,7 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    {
       AFERROR("MsgAf::request: can't send message to client.\n");
       i_request->stdOut();
-      close( socketfd);
+      closesocket( socketfd);
       return false;
    }
    //
@@ -493,11 +502,11 @@ bool af::msgRequest( const af::Msg * i_request, af::Msg * o_answer)
    if( false == af::msgread( socketfd, o_answer))
    {
       AFERROR("MsgAf::request: reading message failed.\n");
-      close( socketfd);
+      closesocket( socketfd);
       return false;
    }
 
-   close( socketfd);
+   closesocket( socketfd);
    return true;
 }
 */
