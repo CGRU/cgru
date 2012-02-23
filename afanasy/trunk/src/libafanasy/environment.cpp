@@ -2,6 +2,7 @@
 
 #ifndef WINNT
 #include <pwd.h>
+#include <windows.h>
 #include <unistd.h>
 #endif
 
@@ -543,10 +544,17 @@ bool Environment::checkKey( const char key) { return passwd->checkKey( key, viso
 bool Environment::init()
 {
 //############ Local host name:
-#ifndef WINNT
-   computername = getenv("HOSTNAME");
+#ifdef WINNT
+    computername = getenv("COMPUTERNAME");
+
+    WSADATA wsaData;
+    WORD wVersionRequested = MAKEWORD(2, 2);
+    if ( WSAStartup( wVersionRequested, &wsaData) != 0) {
+        AFERROR("Environment::init(): WSAStartup failed.");
+        return false;
+    }
 #else
-   computername = getenv("COMPUTERNAME");
+   computername = getenv("HOSTNAME");
 #endif
    if( computername.empty())
    {

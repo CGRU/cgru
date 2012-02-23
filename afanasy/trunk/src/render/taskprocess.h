@@ -59,13 +59,18 @@ private:
 
     pid_t m_pid;
 #ifdef WINNT
-    PROCESS_INFORMATION * process_info;
+    PROCESS_INFORMATION m_pinfo;
     HANDLE hJob;
- #endif
-
+    HANDLE m_io_output;
+    HANDLE m_io_outerr;
+    HANDLE m_io_input;
+    int readPipe( HANDLE & i_handle );
+#else
     FILE * m_io_output;
     FILE * m_io_outerr;
     FILE * m_io_input;
+    int readPipe( FILE * i_file );
+#endif
 
     // Read buffer:
     static const int m_readbuffer_size = AFRENDER::TASK_READ_BUFFER_SIZE;

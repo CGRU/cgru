@@ -6,6 +6,7 @@
 #ifdef WINNT
 #include <windows.h>
 #include <Winsock2.h>
+#define fclose CloseHandle
 #else
 #include <sys/ioctl.h>
 #include <sys/wait.h>
@@ -27,6 +28,8 @@ extern void (*fp_setupChildProcess)( void);
 #include "../include/macrooutput.h"
 
 #ifndef WINNT
+// Setup task process for UNIX-like OSes:
+// This function is called by child process just after fork() and before exec()
 void setupChildProcess( void)
 {
 //    printf("This is child process!\n");
@@ -60,6 +63,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     m_parser( NULL),
     m_update_status( af::TaskExec::UPPercent),
     m_stop_time( 0),
+    m_pid(0),
     m_zombie( false)
 {
     std::string command = m_service.getCommand();
@@ -71,17 +75,11 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     if( wdir.size())
     {
 #ifdef WINNT
-        if( wdir.find('/') == 0 )
+        if( wdir.find("\\\\") == 0)
         {
-            AFERRAR("Working directory starts with '/':\n%s\nMay be it is not translated from UNIX?", wdir.c_str())
+            AFERRAR("Working directory starts with '\\':\n%s\nUNC path can't be current.", wdir.c_str())
             wdir.clear();
         }
-        else if( wdir.find('\\') == 0)
-        {
-            AFERRAR("Working directory starts with '\\':\n%s\nUNC path can't be current. May be incorrect translation?", wdir.c_str())
-            wdir.clear();
-        }
-        else
 #endif
         if( false == af::pathIsFolder( wdir))
         {
@@ -92,14 +90,15 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
-    int flags = 0;
 #ifdef WINNT
-    flags = CREATE_SUSPENDED;
+    if( af::launchProgram( &m_pinfo, command, wdir, &m_io_input, &m_io_output, &m_io_outerr,
+        CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+        m_pid = m_pinfo.dwProcessId;
 #else
+    // For UNIX we can ask child prcocess to call a function to setup after fork()
     fp_setupChildProcess = setupChildProcess;
+    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr);
 #endif
-
-    m_pid = af::launchProgram( command, wdir, &m_io_input, &m_io_output, &m_io_outerr, flags);
 
     if( m_pid <= 0 )
     {
@@ -111,18 +110,16 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
         return;
     }
 
+    // Perform some setup:
 #ifdef WINNT
-    process_info = m_pid;
-    SetPriorityClass( process_info->hProcess, BELOW_NORMAL_PRIORITY_CLASS);
-    if( AssignProcessToJobObject( hJob, process_info->hProcess) == false)
+    // Setup process for MS Windows OS:
+//    SetPriorityClass( m_pinfo.hProcess, BELOW_NORMAL_PRIORITY_CLASS);
+    if( AssignProcessToJobObject( hJob, m_pinfo.hProcess) == false)
         AFERROR("AssignProcessToJobObject failed.\n")
-    ResumeThread( process_info->hThread);
-#endif
-
+    ResumeThread( m_pinfo.hThread);
+#else
     setbuf( m_io_output, m_filebuffer_out);
     setbuf( m_io_outerr, m_filebuffer_err);
-
-#ifndef WINNT
     setNonblocking( fileno( m_io_input));
     setNonblocking( fileno( m_io_output));
     setNonblocking( fileno( m_io_outerr));
@@ -161,16 +158,31 @@ void TaskProcess::refresh()
 
     if( m_pid == 0 )
     {
+        // This class instance is not needed any more, but still exists due some error
         static int dead_cycle = 0;
         dead_cycle ++;
-//        if(( dead_cycle % 10 ) == 0 )
+        // Continue sending task state to server, may be some network connection error
+        if(( dead_cycle % 10 ) == 0 )
             sendTaskSate();
         printf("Dead Cycle:"); m_taskexec->stdOut();
         return;
     }
 
     int status;
+    pid_t pid = 0;
+#ifdef WINNT
+    DWORD result = WaitForSingleObject( m_pinfo.hProcess, 0);
+    if ( result == WAIT_OBJECT_0)
+    {
+        GetExitCodeProcess( m_pinfo.hProcess, &result);
+        status = result;
+        pid = m_pid;
+    }
+    else if ( result == WAIT_FAILED )
+        pid = -1;
+#else
     pid_t pid = waitpid( m_pid, &status, WNOHANG);
+#endif
 
     if( pid == 0 )
     {
@@ -192,32 +204,13 @@ void TaskProcess::readProcess()
 {
     std::string output;
 
-    for( int i = 0; i < 2; i++)
-    {
-        FILE * pFile = m_io_output;
-        if( i )
-            pFile = m_io_outerr;
+    int readsize = readPipe( m_io_output);
+    if( readsize > 0 )
+        output = std::string( m_readbuffer, readsize);
 
-        fflush( pFile);
-
-        if( feof( pFile))
-            continue;
-
-        int readsize = fread( m_readbuffer, 1, m_readbuffer_size, pFile );
-        if( readsize <= 0 )
-        {
-            if( errno == EAGAIN )
-            {
-                readsize = fread( m_readbuffer, 1, m_readbuffer_size, pFile );
-                if( readsize <= 0 )
-                    continue;
-            }
-            else
-                continue;
-        }
-
+    readsize = readPipe( m_io_outerr);
+    if( readsize > 0 )
         output += std::string( m_readbuffer, readsize);
-    }
 
     if( output.size() == 0 ) return;
 
@@ -309,15 +302,18 @@ void TaskProcess::processFinished( int i_exitCode)
 
     if( i_exitCode != 0)
     {
+        m_update_status = af::TaskExec::UPFinishedError;
+#ifdef WINNT
+        if( m_stop_time != 0 )
+        {
+            printf("Task terminated/killed\n");
+#else
         if(( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
         {
             printf("Task terminated/killed by signal: '%s'.\n", strsignal( WTERMSIG( i_exitCode)));
+#endif
             if( m_update_status != af::TaskExec::UPFinishedParserError )
                 m_update_status  = af::TaskExec::UPFinishedKilled;
-        }
-        else
-        {
-            m_update_status = af::TaskExec::UPFinishedError;
         }
     }
     else if( m_parser->isBadResult())
@@ -378,3 +374,46 @@ void TaskProcess::getOutput( af::Msg * o_msg) const
         o_msg->setString("Render: Parser is NULL.");
     }
 }
+
+#ifdef WINNT
+int TaskProcess::readPipe( HANDLE & i_handle )
+{
+    int readsize = 0;
+    OVERLAPPED overlap;
+    if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, NULL, &overlap))
+    {
+        AFERRAR("TaskProcess::readPipe: ReadFile() failure.")
+        return 0;
+    }
+
+    DWORD bytes;
+    if( false == GetOverlappedResult( i_handle, &overlap, &bytes, false))
+    {
+        AFERRAR("TaskProcess::readPipe: GetOverlappedResult() failure.")
+        return 0;
+    }
+    else
+        readsize = bytes;
+
+::write( 1, m_readbuffer, readsize);
+
+    return readsize;
+}
+#else
+int TaskProcess::readPipe( FILE * i_file )
+{
+    int readsize = fread( m_readbuffer, 1, m_readbuffer_size, i_file );
+    if( readsize <= 0 )
+    {
+        if( errno == EAGAIN )
+        {
+            readsize = fread( m_readbuffer, 1, m_readbuffer_size, pFile );
+            if( readsize <= 0 )
+                continue;
+        }
+        else
+            return 0;
+    }
+    return readsize;
+}
+#endif

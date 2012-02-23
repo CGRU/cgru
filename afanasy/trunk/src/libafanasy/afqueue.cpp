@@ -29,14 +29,14 @@ AfQueue::AfQueue( const std::string &i_QueueName, StartTread i_start_thread ):
    name(i_QueueName),
    count(0),
    firstPtr(NULL),
-   lastPtr(NULL),
-   m_thread_started(i_start_thread)
+   lastPtr(NULL)
 {
+    m_thread_started = ( i_start_thread == e_start_thread );
 #ifdef WINNT
-	semaphore = CreateSemaphore( NULL, 1024, 1024, NULL);
+	semaphore = CreateSemaphore( NULL, 0, 1024, NULL);
 	if (semaphore == NULL) 
     {
-		AFERROR("CreateSemaphore error in queue '%s'", i_QueueName.c_str());
+		AFERRPE("CreateSemaphore error in queue ctor");
         return;
     }
 #elif defined(MACOSX)
@@ -79,8 +79,8 @@ AfQueue::~AfQueue()
    }
 
 #ifdef WINNT
-//   CloseHandle( semaphore);
-//#else
+    ReleaseSemaphore( semaphore, 1, NULL);
+#else
    sem_post( semcount_ptr);
 #endif
 
@@ -147,11 +147,12 @@ bool AfQueue::push( AfQueueItem* item, bool i_front )
       the semaphore count so that waiting processes can wake up.
    */
 
-#ifndef _WIN32
-   if( sem_post(semcount_ptr) == -1 )
-   {
-      perror( "sem_post() failed in AfQueue::~AfQueue()" );
-   }
+#ifdef WINNT
+    if( ReleaseSemaphore( semaphore, 1, NULL) == 0 )
+        AFERRAR("AfQueue::push: ReleaseSemaphore() failed in '%s'", name.c_str())
+#else
+    if( sem_post(semcount_ptr) == -1 )
+        AFERRPE("AfQueue::push: sem_post() failed")
 #endif
 
    AFINFA("Msg* AfQueue::push: item=%p, count=%d", iteueuem, count);
@@ -163,7 +164,13 @@ AfQueueItem* AfQueue::pop( WaitMode i_mode )
 {
    AfQueueItem* item = NULL;
 
-#ifndef _WIN32
+#ifdef WINNT
+    if( WaitForSingleObject( semaphore, (i_mode==e_wait) ? INFINITE : 0 ) == WAIT_FAILED )
+    {
+        AFERRAR("AfQueue::push: WaitForSingleObject() failed in '%s'", name.c_str())
+        return NULL;
+    }
+#else
    int semresult = i_mode==e_wait ?
       sem_wait(semcount_ptr) : sem_trywait(semcount_ptr);
 
@@ -171,12 +178,12 @@ AfQueueItem* AfQueue::pop( WaitMode i_mode )
 	{
 		if( i_mode == e_wait )
 		{
-			perror( "sem_wait() failed in AfQueue::pop" );
+			AFERRPE("AfQueue::pop: sem_wait() failed");
 			return 0x0;
 		}
 		else if( errno != EAGAIN )
 		{
-			perror( "sem_trywait() failed in AfQueue::pop" );
+			AFERRPE("AfQueue::pop: sem_trywait() failed");
 			return 0x0;
 		}
 	}

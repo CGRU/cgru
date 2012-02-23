@@ -4,6 +4,7 @@
 #include "dlThread.h"
 
 #ifdef WINNT
+#include <winsock2.h>
 #include <windows.h>
 #else
 #include <semaphore.h>

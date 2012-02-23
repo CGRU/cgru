@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
     uint8_t priority = ENV.getPriority();
 
     RenderHost render( state, priority);
-
+return 0;
     DlThread ServerAccept;
     ServerAccept.Start( &threadAcceptClient, NULL);
 

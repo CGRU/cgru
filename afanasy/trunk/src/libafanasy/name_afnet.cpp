@@ -203,7 +203,7 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
     int err = getaddrinfo( i_name.c_str(), service_port, &hints, &res);
     if( err != 0 )
     {
-        AFERRAR("com::connecttomaster:\n%s", gai_strerror(err))
+        AFERRAR("af::solveNetName:\n%s", gai_strerror(err))
         return af::Address();
     }
 

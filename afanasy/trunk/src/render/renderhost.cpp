@@ -23,6 +23,7 @@ bool RenderHost::ms_connected = false;
 std::vector<PyRes*> RenderHost::ms_pyres;
 std::vector<TaskProcess*> RenderHost::ms_tasks;
 bool RenderHost::m_listening = false;
+std::vector<std::string> RenderHost::windowsmustdie;
 
 RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
    Render( i_state, i_priority)

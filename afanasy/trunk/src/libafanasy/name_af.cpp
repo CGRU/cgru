@@ -33,13 +33,12 @@ af::Farm* ferma = NULL;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-
 #ifdef WINNT
 bool LaunchProgramV(
 	PROCESS_INFORMATION * o_pinfo,
-	FILE **o_in,
-	FILE **o_out,
-	FILE **o_err,
+	HANDLE * o_in,
+	HANDLE * o_out,
+	HANDLE * o_err,
         const char * i_program,
         const char * i_args[],
         const char * i_wdir = NULL,
@@ -47,7 +46,7 @@ bool LaunchProgramV(
 
 bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
                        const std::string & i_commandline, const std::string & i_wdir,
-                       FILE ** o_in, FILE ** o_out, FILE ** o_err,
+                       HANDLE * o_in, HANDLE * o_out, HANDLE * o_err,
 					   DWORD i_flags)
 {
     const char * wdir = NULL;
@@ -58,6 +57,11 @@ bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
     const char * args[] = { "/c", i_commandline.c_str(), NULL};
 
 	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell, args, wdir, i_flags);
+}
+void af::launchProgram( const std::string & i_commandline, const std::string & i_wdir)
+{
+    PROCESS_INFORMATION pinfo;
+    af::launchProgram( &pinfo, i_commandline, i_wdir);
 }
 #else
 int LaunchProgramV(

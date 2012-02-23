@@ -164,13 +164,14 @@ namespace af
    char * fileRead( const std::string & filename, int & readsize, int maxfilesize = -1, std::string * errOutput = NULL);
 
 #ifdef WINNT
-   bool launchProgram( PROCESS_INFORMATION * o_pinfo,
-	                   const std::string & i_commandline, const std::string & i_wdir = std::string(),
-                       FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL,
-                       DWORD i_flags = 0);
+    void launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string());
+    bool launchProgram( PROCESS_INFORMATION * o_pinfo,
+	                    const std::string & i_commandline, const std::string & i_wdir = std::string(),
+                        HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
+                        DWORD i_flags = 0);
 #else
-   int launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string(),
-                      FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);
+    int launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string(),
+                       FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);
 #endif
 
     /// Read data from file descriptor. Return a new allocated buffer pointer and a size passed through an argument.
