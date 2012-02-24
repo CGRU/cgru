@@ -232,7 +232,7 @@ void RenderHost::update()
 void RenderHost::windowsMustDie()
 {
 // Windows Must Die:
-//printf("RenderHost::windowsMustDie():\n");
+    AFINFO("RenderHost::windowsMustDie():");
     for( int i = 0; i < windowsmustdie.size(); i++)
     {
         HWND WINAPI hw = FindWindow( NULL, TEXT( windowsmustdie[i].c_str()));

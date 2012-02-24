@@ -66,6 +66,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     m_pid(0),
     m_zombie( false)
 {
+//printf("TaskProcess::TaskProcess:\n");//return;
     std::string command = m_service.getCommand();
     std::string wdir    = m_service.getWDir();
 
@@ -91,7 +92,10 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
 #ifdef WINNT
-    if( af::launchProgram( &m_pinfo, command, wdir, &m_io_input, &m_io_output, &m_io_outerr,
+//    if( af::launchProgram( &m_pinfo, command, wdir, &m_io_input, &m_io_output, &m_io_outerr,
+//        CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+//        m_pid = m_pinfo.dwProcessId;
+    if( af::launchProgram( &m_pinfo, command, wdir, NULL, NULL, NULL,
         CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
         m_pid = m_pinfo.dwProcessId;
 #else
@@ -115,8 +119,9 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     // Setup process for MS Windows OS:
 //    SetPriorityClass( m_pinfo.hProcess, BELOW_NORMAL_PRIORITY_CLASS);
     if( AssignProcessToJobObject( hJob, m_pinfo.hProcess) == false)
-        AFERROR("AssignProcessToJobObject failed.\n")
-    ResumeThread( m_pinfo.hThread);
+        AFERRAR("TaskProcess: AssignProcessToJobObject failed with code = %d.", GetLastError())
+    if( ResumeThread( m_pinfo.hThread))
+        AFERRAR("TaskProcess: ResumeThread failed with code = %d.", GetLastError())
 #else
     setbuf( m_io_output, m_filebuffer_out);
     setbuf( m_io_outerr, m_filebuffer_err);
@@ -134,11 +139,11 @@ TaskProcess::~TaskProcess()
     m_update_status = 0;
 
     killProcess();
-
+/*
     fclose( m_io_input);
     fclose( m_io_output);
     fclose( m_io_outerr);
-
+*/
 #ifdef AFOUTPUT
     printf(" ~ TaskProcess(): ");
     m_taskexec->stdOut();
@@ -150,6 +155,7 @@ TaskProcess::~TaskProcess()
 
 void TaskProcess::refresh()
 {
+//printf("TaskProcess::refresh:\n");//return;
     if( m_stop_time )
     {
         if( m_pid == 0 ) m_zombie = true;
@@ -202,6 +208,7 @@ void TaskProcess::refresh()
 
 void TaskProcess::readProcess()
 {
+//printf("TaskProcess::readProcess:\n");//return;
     std::string output;
 
     int readsize = readPipe( m_io_output);
@@ -240,6 +247,7 @@ void TaskProcess::readProcess()
 
 void TaskProcess::sendTaskSate()
 {
+//printf("TaskProcess::sendTaskSate:\n");//return;
     if( m_update_status == 0 ) return;
 
     int    type = af::Msg::TTaskUpdatePercent;
@@ -293,6 +301,7 @@ void TaskProcess::sendTaskSate()
 
 void TaskProcess::processFinished( int i_exitCode)
 {
+//printf("TaskProcess::processFinished:\n");//return;
     printf("Finished PID=%d: Exit Code=%d\n", m_pid, i_exitCode);
 
     m_pid = 0;
@@ -378,6 +387,7 @@ void TaskProcess::getOutput( af::Msg * o_msg) const
 #ifdef WINNT
 int TaskProcess::readPipe( HANDLE & i_handle )
 {
+printf("TaskProcess::readPipe:\n");return 0;
     int readsize = 0;
     OVERLAPPED overlap;
     if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, NULL, &overlap))

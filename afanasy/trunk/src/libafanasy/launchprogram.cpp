@@ -137,9 +137,9 @@ bool LaunchProgramV(
 	HANDLE * phStderrRead  = &hStderrRead;
 	HANDLE * phStderrWrite = &hStderrWrite;
 
-    if( o_in  ) phStdinWrite = o_in;
-    if( o_out ) hStdoutRead  = o_out;
-    if( o_err ) hStderrRead  = o_err;
+    if( o_in  ) phStdinWrite  = o_in;
+    if( o_out ) phStdoutRead  = o_out;
+    if( o_err ) phStderrRead  = o_err;
 
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
@@ -309,6 +309,8 @@ bool LaunchProgramV(
 	if( false == GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos ))
 		flags = flags | CREATE_NO_WINDOW;
 
+printf("argsAndProgram:\n%s\n",argsAndProgram);
+
 	BOOL processCreated = CreateProcess(
 		0x0, argsAndProgram,
 		NULL, NULL,
@@ -318,14 +320,14 @@ bool LaunchProgramV(
 		&startInfo, o_pinfo);
 
 	free(argsAndProgram);
-
+/*
 	if (processCreated)
 	{
 		// Close the thread handle (the process handle is kept)
 
 		CloseHandle( o_pinfo->hThread);
 	}
-
+*/
 	free(args);
 	
 	// Close the unneeded pipe handles (they were inherited)

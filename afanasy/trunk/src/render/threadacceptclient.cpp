@@ -14,6 +14,7 @@
 #include <netdb.h>
 #include <netinet/in.h>
 #include <sys/socket.h>
+#define closesocket close
 #endif
 
 #include "../libafanasy/msg.h"
@@ -27,8 +28,6 @@
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;
-
-//void threadProcessMsg( void * i_args);
 
 void threadAcceptClient( void * i_arg )
 {
@@ -71,16 +70,20 @@ void threadAcceptClient( void * i_arg )
         }
     }
     freeaddrinfo( res);
-#ifdef MACOSX
-// FIXME: Current MAX OS can't listen IPv6?
+
+#if defined (WINNT)
+    printf("Disable listening IPv6 for MS Windows.\n");
+    protocol = AF_INET;
+#elif defined (MACOSX)
+    printf("Disable listening IPv6 for Mac OS X.\n");
     protocol = AF_INET;
 #endif
+
     if( af::Environment::hasArgument("-noIPv6"))
     {
         printf("IPv6 is disabled.\n");
         protocol = AF_INET;
     }
-
 
     switch(protocol)
     {
@@ -114,16 +117,15 @@ void threadAcceptClient( void * i_arg )
         AFERRPE("socket")
         return;
     }
-//
-// set socket options for reuseing address immediatly after bind
+
     int value = 1;
 #ifdef WINNT
 #define TOCHAR (char *)
 #else
 #define TOCHAR
-#endif
     if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, TOCHAR &value, sizeof(value)) != 0)
         AFERRPE("set socket SO_REUSEADDR option failed")
+#endif
 
     int port = af::Environment::getClientPort();
     int maxports = 0xffff-port;
@@ -145,12 +147,22 @@ void threadAcceptClient( void * i_arg )
             RenderHost::setListeningPort( port);
             break;
         }
+        #ifdef WINNT
+        if ( value == SOCKET_ERROR )
+            value = WSAGetLastError();
+        if(( value == WSAEACCES        ) ||
+           ( value == WSAEADDRINUSE    ) ||
+           ( value == WSAEADDRNOTAVAIL ) ||
+           ( value == WSAEINPROGRESS   ))
+        #else
         if( errno == EADDRINUSE )
+        #endif
         {
             port++;
             continue;
         }
 
+        AFERRAR("bind() = %d\n", value);
         AFERRPE("bind()");
         AFRunning = false;
         return;
@@ -158,7 +170,7 @@ void threadAcceptClient( void * i_arg )
 
     if( listen( server_sd, 9) != 0)
     {
-        perror("listen()" );
+        AFERRPE("listen()" );
         AFRunning = false;
         return;
     }
@@ -210,7 +222,7 @@ void threadAcceptClient( void * i_arg )
             AFERROR("threadAcceptClient: reading message failed.")
             af::printAddress( &(ss));
             delete msg_request;
-            close(sd);
+            closesocket(sd);
             continue;
         }
 
@@ -238,15 +250,15 @@ void threadAcceptClient( void * i_arg )
         }
         default:
             RenderHost::acceptMessage( msg_request);
-            close(sd);
+            closesocket(sd);
             continue;
         }
 
-        close(sd);
+        closesocket(sd);
         delete msg_request;
     }
 
-    close( server_sd);
+    closesocket( server_sd);
 
     AFINFO("threadAcceptClient: Finished.")
 }
