@@ -545,7 +545,8 @@ class Dialog( QtGui.QWidget):
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             value = str( int( self.fields[key].isChecked())) 
          elif isinstance( self.fields[key], QtGui.QComboBox):
-            value = str( self.fields[key].itemData( self.fields[key].currentIndex()).toString())
+            # value = str( self.fields[key].itemData( self.fields[key].currentIndex()).toString())
+            value = str( self.fields[key].itemData( self.fields[key].currentIndex()))
          line = key + '=' + value
          file.write( line + '\n')
       file.close()
