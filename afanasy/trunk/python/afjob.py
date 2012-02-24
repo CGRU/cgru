@@ -404,15 +404,30 @@ elif ext == 'ifd':
    if extrargs != '': cmd += ' ' + extrargs
    cmd += ' -V a -f "%s"' % scene
 
-# Maya:
-elif ext == 'mb':
-   scenetype = 'maya'
-#   cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
+# Maya (3Delight and Mental Ray):
+elif (ext == 'mb') or (ext == 'ma'):
+   if blocktype == 'maya_mental':
+      scenetype = 'maya_mental'
+   elif blocktype == 'maya_delight':
+      scenetype = 'maya_delight'
+   else:
+      blocktype = 'maya'
+      scenetype = 'maya'
+   # cmd = 'mayabatch' + cmdextension + ' -file "' + scene + '" -command "afanasyBatch(@#@,@#@,1,1);quit -f;"'
    if cmd is None: cmd = 'mayarender' + cmdextension
-   cmd += ' -s @#@ -e @#@ -b %d' % by
+   if scenetype == 'maya_mental': cmd += ' -r mr'
+   if scenetype == 'maya_delight': cmd += ' -r 3delight'
+   if scenetype != 'maya_delight': 
+      cmd += ' -s @#@ -e @#@ -b %d' % by
+   else:
+      cmd += ' -s @#@ -e @#@ -inc %d' % by
    if node != '': cmd += ' -cam "%s"' % node
-   if take != '': cmd += ' -rl "%s"' % take
-   if output != '':
+   if take != '': 
+      if scenetype == 'maya_delight':
+         cmd += ' -rp "%s"' % take
+      else:
+         cmd += ' -rl "%s"' % take
+   if (output != '') and (scenetype != 'maya_delight'):
       if os.path.isdir( output):
          cmd += ' -rd "%s"' % output
       else:

@@ -17,7 +17,7 @@ class parser:
       self.badresult = False
 
    def do( self, data):
-      print('Erorr: parser.do: Invalid call, this method must be implemented.')
+      print('Error: parser.do: Invalid call, this method must be implemented.')
 
    def parse( self, data):
       if not isinstance( data, str): data = str( data,'utf-8')

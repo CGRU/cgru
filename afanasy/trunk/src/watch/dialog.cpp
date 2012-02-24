@@ -278,7 +278,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
             ButtonMonitor::unset();
             closeList();
          }
-         displayWarning("You does not exist.");
+         displayWarning("You do not exist.");
       }
       else
       {

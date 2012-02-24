@@ -24,36 +24,175 @@ def getComboBoxString( comboBox):
    data = comboBox.itemData( comboBox.currentIndex())
    if data is None: return ''
    if isinstance( data, str): return data
-   return comboBox.itemData( comboBox.currentIndex()).toString()
+   return str( comboBox.itemData( comboBox.currentIndex()).toString())
+   # return comboBox.itemData( comboBox.currentIndex()).toString()
+
+def getComboBoxIndexFromData( comboBox, data):
+   dataDict = dict()
+   value = int()
+   for i in range(comboBox.count()):
+      dataDict[str(comboBox.itemData( i).toString())] = int( i)
+   if data in dataDict:
+      value = int(dataDict[str(data)])
+   if value is None: return 0
+   if isinstance( value, int): return value
+   return value
+
+def fileTypeList():
+   fileType_list = list()
+   # Syntax:
+   #    ( [ 'file_ext', 'file_ext' ], 'internal_name', 'UI Name' )
+   fileType_list.append( ( ['shk'], 'shake', 'Shake') )
+   fileType_list.append( ( ['blend'], 'blender', 'Blender') )
+   fileType_list.append( ( ['nk'], 'nuke', 'Nuke') )
+   fileType_list.append( ( ['hip'], 'houdini', 'Houdini') )
+   fileType_list.append( ( ['ifd'], 'mantra', 'Mantra') )
+   fileType_list.append( ( ['mb', 'ma'], 'maya', 'Maya') )
+   fileType_list.append( ( ['mb', 'ma'], 'maya_mental', 'Mental Ray') )
+   fileType_list.append( ( ['mb', 'ma'], 'maya_delight', '3Delight') )
+   fileType_list.append( ( ['scn'], 'xsi', 'Softimage') )
+   fileType_list.append( ( ['max'], 'max', '3dsmax') )
+   fileType_list.append( ( ['aep'], 'afterfx', 'After Effects') )
+   return fileType_list
+
+def fileType_internalNameToIndex(internalName):
+   index = int()
+   filetypes = fileTypeList()
+   for i in range(len(filetypes)):
+      filetype = filetypes[i]
+      filetypeName = filetype[1]
+      filetypeUIName = filetype[2]
+      if (filetypeName == internalName):
+          index = i
+   return index
+
+def fileType_internalNameToUIName(internalName):
+   uiName = str()
+   filetypes = fileTypeList()
+   for i in filetypes:
+      filetypeName = i[1]
+      filetypeUIName = i[2]
+      if (filetypeName == internalName):
+         uiName = filetypeUIName
+   return uiName
+
+def fileType_uiNameToInternalName(uiName):
+   internalName = str()
+   filetypes = fileTypeList()
+   for i in filetypes:
+      filetypeName = i[1]
+      filetypeUIName = i[2]
+      if (filetypeUIName == uiName):
+         internalName = filetypeName
+   return internalName
+
+def labelNodeNameDict():
+   labelNode_name = dict()
+   labelNode_name['default'] = 'Node/Camera:'
+   labelNode_name['houdini'] = 'ROP:'
+   labelNode_name['nuke'] = 'Write Node:'
+   labelNode_name['maya'] = 'Camera:'
+   labelNode_name['maya_delight'] = 'Camera:'
+   labelNode_name['maya_mental'] = 'Camera:'
+   labelNode_name['3dsmax'] = 'Camera:'
+   labelNode_name['afterfx'] = 'Composition:'
+   return labelNode_name
+
+def labelNodeTooltipsDict():
+   labelNode_tooltip = dict()
+   labelNode_tooltip['default'] = ('Houdini ROP\n'
+                                   'Nuke write node\n'
+                                   'Maya camera\n'
+                                   '3DSMAX camera\n'
+                                   'AfterFX composition')
+   labelNode_tooltip['houdini'] = 'Houdini ROP'
+   labelNode_tooltip['nuke'] = 'Nuke write node\nExample: \'Write1\''
+   labelNode_tooltip['maya'] = 'Maya camera\nExample: \'persp\''
+   labelNode_tooltip['maya_delight'] = 'Maya camera\nExample: \'persp\''
+   labelNode_tooltip['maya_mental'] = 'Maya camera\nExample: \'persp\''
+   labelNode_tooltip['3dsmax'] = '3DSMAX camera'
+   labelNode_tooltip['afterfx'] = 'AfterFX composition\nExample: \'Comp 1\''
+   return labelNode_tooltip
+
+def labelTakeNameDict():
+   labelTake_name = dict()
+   labelTake_name['default'] = 'Take/Layer/Pass/Batch:'
+   labelTake_name['houdini'] = 'Take:'
+   labelTake_name['xsi'] = 'Pass:'
+   labelTake_name['nuke'] = 'Not Used:'
+   labelTake_name['maya'] = 'Layer:'
+   labelTake_name['maya_delight'] = 'Render Pass:'
+   labelTake_name['maya_mental'] = 'Layer:'
+   labelTake_name['3dsmax'] = 'Batch:'
+   labelTake_name['afterfx'] = 'render settings template:'
+   return labelTake_name
+
+def labelTakeTooltipsDict():
+   labelTake_tooltip = dict()
+   labelTake_tooltip['default'] = ('Houdini take\n'
+                                   'SoftImage pass\n'
+                                   'Maya layer\n'
+                                   '3DFM render pass\n'
+                                   '3DSMAX batch\n'
+                                   'AfterFX render settings template')
+   labelTake_tooltip['houdini'] = 'Houdini take'
+   labelTake_tooltip['xsi'] = 'SoftImage pass'
+   labelTake_tooltip['nuke'] = '- Not used -'
+   labelTake_tooltip['maya'] = 'Maya render layer'
+   labelTake_tooltip['maya_delight'] = '3Delight for Maya Render Pass'
+   labelTake_tooltip['maya_mental'] = 'Maya render layer'
+   labelTake_tooltip['3dsmax'] = '3DSMAX batch'
+   labelTake_tooltip['afterfx'] = 'AfterFX render settings template\nExample: \'Best Settings\''
+   return labelTake_tooltip
 
 # Dialog class
 class Dialog( QtGui.QWidget):
    def __init__( self):
+
+      # Main Window
       QtGui.QWidget.__init__( self)
-      self.setWindowTitle('Afanasy Starter   CGRU ' + cgruconfig.VARS['CGRU_VERSION'])
-
-      self.constructed    = False
-      self.evaluated      = False
-      self.output         = ''
-
+      self.constructed = False
+      self.evaluated   = False
+      self.output      = ''
+      self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
       self.fields = dict()
-      
+      self.labels = dict()
+
+      # Get File Type dependant dicts
+      self.labelNode_name = labelNodeNameDict()
+      self.labelNode_tooltip = labelNodeTooltipsDict()
+      self.labelTake_name = labelTakeNameDict()
+      self.labelTake_tooltip = labelTakeTooltipsDict()
+
+      # Top level layouts:
       topLayout = QtGui.QVBoxLayout( self)
       tabwidget = QtGui.QTabWidget( self)
       topLayout.addWidget( tabwidget)
 
+      # General Tab:
       generalwidget = QtGui.QWidget( self)
       tabwidget.addTab( generalwidget,'Scene')
       generallayout = QtGui.QVBoxLayout( generalwidget)
 
+      # Job Tab:
       jobwidget = QtGui.QWidget( self)
       tabwidget.addTab( jobwidget,'Job')
       joblayout = QtGui.QVBoxLayout( jobwidget)
 
+      # Advanced Tab:
       auxwidget = QtGui.QWidget( self)
       tabwidget.addTab( auxwidget,'Advanced')
       advlayout = QtGui.QVBoxLayout( auxwidget)
 
+      # Service Type:
+      lFileType = QtGui.QHBoxLayout()
+      generallayout.addLayout( lFileType)
+      lFileType.addWidget( QtGui.QLabel('Override Service Type:', self))
+      self.fields['servicetype'] = QtGui.QComboBox( self)
+      lFileType.addWidget( self.fields['servicetype'] )
+      QtCore.QObject.connect( self.fields['servicetype'], 
+                              QtCore.SIGNAL('currentIndexChanged(int)'), 
+                              self.setFileType)
 
       # Scene:
       lScene = QtGui.QHBoxLayout()
@@ -122,25 +261,17 @@ class Dialog( QtGui.QWidget):
       # Node / Camera / Take:
       lNode = QtGui.QHBoxLayout()
       generallayout.addLayout( lNode)
-      labelNode = QtGui.QLabel('Node/Camera:')
-      lNode.addWidget( labelNode)
-      labelNode.setToolTip('\
-Houdini ROP\n\
-Nuke write node\n\
-Maya camera\n\
-3DSMAX camera\n\
-AfterFX composition')
+      self.labels['node'] = QtGui.QLabel(self.labelNode_name['default'])
+      lNode.addWidget( self.labels['node'] )
+      self.labels['node'].setToolTip(self.labelNode_tooltip['default'])
       self.fields['node'] = QtGui.QLineEdit( self)
       lNode.addWidget( self.fields['node'])
-      QtCore.QObject.connect( self.fields['node'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
-      labelTake = QtGui.QLabel('Take/Layer/Pass/Batch:')
-      lNode.addWidget( labelTake)
-      labelTake.setToolTip('\
-Houdini take\n\
-SoftImage pass\n\
-Maya layer\n\
-3DSMAX batch\n\
-AfterFX render settings template')
+      QtCore.QObject.connect( self.fields['node'], 
+                              QtCore.SIGNAL('textEdited(QString)'), 
+                              self.evaluate)
+      self.labels['take'] = QtGui.QLabel(self.labelTake_name['default'])
+      lNode.addWidget( self.labels['take'] )
+      self.labels['take'].setToolTip(self.labelTake_tooltip['default'])
       self.fields['take'] = QtGui.QLineEdit( self)
       lNode.addWidget( self.fields['take'])
       QtCore.QObject.connect( self.fields['take'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
@@ -148,35 +279,41 @@ AfterFX render settings template')
 
 
       # Advanced:
-      layout = QtGui.QHBoxLayout()
-      advlayout.addLayout( layout)
-      layout.addWidget( QtGui.QLabel('Operating System Type:'))
+      # OS Type:
+      osLayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( osLayout)
+      osLayout.addWidget( QtGui.QLabel('Operating System Type:'))
       self.fields['os'] = QtGui.QLineEdit( self)
-      layout.addWidget( self.fields['os'])
-      QtCore.QObject.connect( self.fields['os'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
+      osLayout.addWidget( self.fields['os'])
+      QtCore.QObject.connect( self.fields['os'], 
+                              QtCore.SIGNAL('textEdited(QString)'), 
+                              self.evaluate)
 
-      layout = QtGui.QHBoxLayout()
-      advlayout.addLayout( layout)
-      layout.addWidget( QtGui.QLabel('Tasks Command:'))
+      # Tasks Command:
+      exelayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( exelayout)
+      exelayout.addWidget( QtGui.QLabel('Tasks Command:'))
       self.fields['exec'] = QtGui.QLineEdit( self)
-      layout.addWidget( self.fields['exec'])
+      exelayout.addWidget( self.fields['exec'])
       QtCore.QObject.connect( self.fields['exec'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
       self.execBrowseButton = QtGui.QPushButton('Browse', self)
-      layout.addWidget( self.execBrowseButton)
+      exelayout.addWidget( self.execBrowseButton)
       QtCore.QObject.connect( self.execBrowseButton, QtCore.SIGNAL('pressed()'), self.browseExec)
 
-      layout = QtGui.QHBoxLayout()
-      advlayout.addLayout( layout)
-      layout.addWidget( QtGui.QLabel('Extra Arguments:'))
+      # Extra Arguments:
+      exarglayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( exarglayout)
+      exarglayout.addWidget( QtGui.QLabel('Extra Arguments:'))
       self.fields['extrargs'] = QtGui.QLineEdit( self)
-      layout.addWidget( self.fields['extrargs'])
+      exarglayout.addWidget( self.fields['extrargs'])
       QtCore.QObject.connect( self.fields['extrargs'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
-      layout = QtGui.QHBoxLayout()
-      advlayout.addLayout( layout)
-      layout.addWidget( QtGui.QLabel('Preview:'))
+      # Preview:
+      prvlayout = QtGui.QHBoxLayout()
+      advlayout.addLayout( prvlayout)
+      prvlayout.addWidget( QtGui.QLabel('Preview:'))
       self.fields['preview'] = QtGui.QLineEdit( self)
-      layout.addWidget( self.fields['preview'])
+      prvlayout.addWidget( self.fields['preview'])
       QtCore.QObject.connect( self.fields['preview'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
 
       # Job:
@@ -255,7 +392,6 @@ AfterFX render settings template')
       self.teCmd = QtGui.QTextEdit( self)
       topLayout.addWidget( self.teCmd)
 
-
       # Buttons:
       buttonsLayout = QtGui.QHBoxLayout()
       topLayout.addLayout( buttonsLayout)
@@ -282,12 +418,14 @@ AfterFX render settings template')
       self.refreshRecent()
 
       # Load last settings:
-      if not self.load( FileLast): self.evaluate()
+      if not self.load( FileLast): 
+         self.evaluate()
 
    def browseScene( self):
       scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['scenefile'].text()))
       if scene == '': return
       self.fields['scenefile'].setText( os.path.normpath( scene))
+      self.fileChange()
       self.evaluate()
 
    def browseOutImages( self):
@@ -308,6 +446,89 @@ AfterFX render settings template')
       self.fields['exec'].setText( os.path.normpath( path))
       self.evaluate()
 
+   def fileChange( self ):
+      scene_filepath = str()
+      try:
+         scene_filepath = self.fields['scenefile'].text()
+      except KeyError:
+         return False
+
+      if os.path.isfile(scene_filepath):
+         realValue = getComboBoxString( self.fields['servicetype'] )
+
+         enabledFileTypes = list()
+         theFileTypes = list()
+         theFileTypesData = list()
+
+         filetypes = fileTypeList()
+         for i in range(len(filetypes)):
+            filetype = filetypes[i]
+
+            if type(filetype) != type(str()):
+               fileExt_list = filetype[0]
+               filetypeName = filetype[1]
+
+               for j in fileExt_list:
+                  file_ext = '.' + j
+                  if str(scene_filepath).endswith(file_ext):
+                     enabledFileTypes.append(filetypeName)
+
+         theFileTypes.append( 'No Override' )
+         theFileTypesData.append( 'none' )
+         if len(enabledFileTypes) >= 1:
+            for enabledFileType in enabledFileTypes:
+               theFileTypes.append( fileType_internalNameToUIName(enabledFileType) )
+               theFileTypesData.append( enabledFileType )
+
+         self.fields['servicetype'].clear()
+         for i in range(len(theFileTypes)):
+            self.fields['servicetype'].addItem(theFileTypes[i], 
+                                    theFileTypesData[i])
+
+         theFileTypeData = ''
+         if (len(theFileTypesData) == 2) and \
+                not ((len(theFileTypesData) == 0) or \
+                    (len(theFileTypesData) == 1)):
+            theFileTypeData = theFileTypesData[1]
+         else:
+            theFileTypeData = realValue
+
+         # run file type dependant function
+         self.fileTypeDependantText( theFileTypeData )
+      else:
+         return False
+      return True
+
+   def setFileType( self ):
+      real_value = getComboBoxString( self.fields['servicetype'] )
+      self.fileTypeDependantText( real_value )
+      if self.evaluated:
+         self.evaluate()
+      return True
+
+   def fileTypeDependantText( self, theFileTypeData ):
+      labelKeyName = 'node'
+      try:
+         self.labels[labelKeyName].setText(self.labelNode_name[theFileTypeData])
+      except KeyError:
+         self.labels[labelKeyName].setText(self.labelNode_name['default'])
+      try:
+         self.labels[labelKeyName].setToolTip(self.labelNode_tooltip[theFileTypeData])
+      except KeyError:
+         self.labels[labelKeyName].setToolTip(self.labelNode_tooltip['default'])
+
+      labelKeyName = 'take'
+      try:
+         self.labels[labelKeyName].setText(self.labelTake_name[theFileTypeData])
+      except KeyError:
+         self.labels[labelKeyName].setText(self.labelTake_name['default'])
+      try:
+         self.labels[labelKeyName].setToolTip(self.labelTake_tooltip[theFileTypeData])
+      except KeyError:
+         self.labels[labelKeyName].setToolTip(self.labelTake_tooltip['default'])
+
+      return True
+
    def quitsave( self):
       self.save( FileLast)
       self.close()
@@ -322,7 +543,9 @@ AfterFX render settings template')
          elif isinstance( self.fields[key], QtGui.QSpinBox):
             value = str( self.fields[key].value())
          elif isinstance( self.fields[key], QtGui.QCheckBox):
-            value = str( int( self.fields[key].isChecked()))
+            value = str( int( self.fields[key].isChecked())) 
+         elif isinstance( self.fields[key], QtGui.QComboBox):
+            value = str( self.fields[key].itemData( self.fields[key].currentIndex()).toString())
          line = key + '=' + value
          file.write( line + '\n')
       file.close()
@@ -405,6 +628,12 @@ AfterFX render settings template')
             self.fields[key].setValue( int(value))
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             self.fields[key].setChecked( int(value))
+         elif isinstance( self.fields[key], QtGui.QComboBox):
+            index = int(getComboBoxIndexFromData( self.fields[key], str(value)))
+            self.fields[key].setCurrentIndex( index)
+         # make sure we only refresh when loading a new 'scenefile'.
+         if key == 'scenefile':
+            self.fileChange()
       self.constructed = True
       self.evaluate()
       return True
@@ -423,6 +652,7 @@ AfterFX render settings template')
       if not self.constructed: return
       self.evaluated = False
       self.bStart.setEnabled( False)
+      # self.fileChange()
 
       # Check parameters:
       # Frame range:
@@ -471,6 +701,9 @@ AfterFX render settings template')
          self.teCmd.setText('Job name is empty.')
          return
 
+      # Get File Type Override
+      servType = getComboBoxString( self.fields['servicetype'] )
+
       # Construct command:
       cmd = os.environ['AF_ROOT']
       cmd = os.path.join( cmd, 'python')
@@ -486,6 +719,7 @@ AfterFX render settings template')
       if not str( self.fields['outimages'].text()) == '': cmd += ' -output "%s"' % self.fields['outimages'].text()
       if not str( self.fields['preview'].text()) == '': cmd += ' -images "%s"' % self.fields['preview'].text()
       if not str( self.fields['extrargs'].text()) == '': cmd += ' -extrargs "%s"' % self.fields['extrargs'].text()
+      if servType != 'none': cmd += ' -type "%s"' % servType
       if str( self.fields['os'].text()) == '': cmd += ' -os any'
       else: cmd += ' -os "%s"' % self.fields['os'].text()
       cmd += ' -pwd "%s"' % self.fields['wdir'].text()
@@ -505,7 +739,6 @@ AfterFX render settings template')
       self.evaluated = True
       self.bStart.setEnabled( True)
       print('Evaluated')
-
 
    def start( self):
       self.evaluate()
