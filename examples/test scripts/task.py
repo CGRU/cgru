@@ -16,7 +16,7 @@ def interrupt( signum, frame):
 #signal.signal( signal.SIGINT,  interrupt)
 
 from time import strftime
-print 'Started at ' + strftime('%A %d %B %H:%M:%S')
+print('Started at ' + strftime('%A %d %B %H:%M:%S'))
 
 from optparse import OptionParser
 parser = OptionParser(usage='usage: %prog [options]', version='%prog 1.0')
@@ -39,29 +39,29 @@ filename    = options.filename
 verbose     = options.verbose
 cpunum      = options.cpunum
 
-print 'COMMAND:'
-print sys.argv
-print 'WORKING DIRECTORY:'
-print os.getcwd()
+print('COMMAND:')
+print(sys.argv)
+print('WORKING DIRECTORY:')
+print(os.getcwd())
 
 # Check frame range settings:
 if frame_end < frame_start:
-   print 'Error: frame_end(%d) < frame_start(%d)' % (frame_end, frame_start)
+   print('Error: frame_end(%d) < frame_start(%d)' % (frame_end, frame_start))
    frame_end = frame_start
-   print '[ PARSER WARNING ]'
+   print('[ PARSER WARNING ]')
 if frame_inc < 1:
-   print 'Error: frame_inc(%d) < 1' % frame_inc
+   print('Error: frame_inc(%d) < 1' % frame_inc)
    frame_inc = 1
-   print '[ PARSER WARNING ]'
+   print('[ PARSER WARNING ]')
 
 # Open some filename if specified:
 if( filename != ''):
-   print 'FILE:'
-   print filename
+   print('FILE:')
+   print( filename)
    f = open( filename)
    try:
       for line in f:
-         print line
+         print( line)
    finally:
       f.close()
 
@@ -69,12 +69,12 @@ sleepsec = (timesec + randtime*random.random()) / 100 / (verbose+1)
 
 frame = frame_start
 while frame <= frame_end:
-   print 'FRAME: ' + str(frame)
+   print( 'FRAME: ' + str(frame))
    time.sleep(sleepsec)
    for p in range(100):
-      print 'PROGRESS: ' + str(p+1)+'%'
+      print( 'PROGRESS: ' + str(p+1)+'%')
       for v in range( verbose):
-         print str(frame) + ': ' + str(p) + ': ' + str(v) + ': QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm'
+         print( str(frame) + ': ' + str(p) + ': ' + str(v) + ': QWERTYUIOPASDFGHJKLZXCVBNM1234567890qwertyuiopasdfghjklzxcvbnm')
 #         sys.stdout.flush()
          time.sleep(sleepsec)
       sys.stdout.flush()
@@ -82,4 +82,4 @@ while frame <= frame_end:
    frame += frame_inc
 
 sys.stdout.flush()
-print 'Finished at ' + strftime('%A %d %B %H:%M:%S')
+print( 'Finished at ' + strftime('%A %d %B %H:%M:%S'))

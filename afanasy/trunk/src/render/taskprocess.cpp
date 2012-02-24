@@ -66,7 +66,6 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     m_pid(0),
     m_zombie( false)
 {
-//printf("TaskProcess::TaskProcess:\n");//return;
     std::string command = m_service.getCommand();
     std::string wdir    = m_service.getWDir();
 
@@ -92,12 +91,13 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     if( af::Environment::isVerboseMode()) printf("%s\n", command.c_str());
 
 #ifdef WINNT
-//    if( af::launchProgram( &m_pinfo, command, wdir, &m_io_input, &m_io_output, &m_io_outerr,
-//        CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
-//        m_pid = m_pinfo.dwProcessId;
-    if( af::launchProgram( &m_pinfo, command, wdir, NULL, NULL, NULL,
+/*    if( af::launchProgram( &m_pinfo, command, wdir, 0, 0, 0,
         CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
         m_pid = m_pinfo.dwProcessId;
+*/    if( af::launchProgram( &m_pinfo, command, wdir, &m_io_input, &m_io_output, &m_io_outerr,
+        CREATE_SUSPENDED | BELOW_NORMAL_PRIORITY_CLASS))
+        m_pid = m_pinfo.dwProcessId;
+
 #else
     // For UNIX we can ask child prcocess to call a function to setup after fork()
     fp_setupChildProcess = setupChildProcess;
@@ -118,9 +118,14 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 #ifdef WINNT
     // Setup process for MS Windows OS:
 //    SetPriorityClass( m_pinfo.hProcess, BELOW_NORMAL_PRIORITY_CLASS);
+	hJob = CreateJobObject( NULL, NULL);
+	JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = { 0 };
+	jeli.BasicLimitInformation.LimitFlags = JOB_OBJECT_LIMIT_KILL_ON_JOB_CLOSE;
+	if( SetInformationJobObject( hJob, JobObjectExtendedLimitInformation, &jeli, sizeof( jeli ) ) == 0)
+		AFERROR("SetInformationJobObject failed.\n");
     if( AssignProcessToJobObject( hJob, m_pinfo.hProcess) == false)
         AFERRAR("TaskProcess: AssignProcessToJobObject failed with code = %d.", GetLastError())
-    if( ResumeThread( m_pinfo.hThread))
+    if( ResumeThread( m_pinfo.hThread) == -1)
         AFERRAR("TaskProcess: ResumeThread failed with code = %d.", GetLastError())
 #else
     setbuf( m_io_output, m_filebuffer_out);
@@ -139,11 +144,11 @@ TaskProcess::~TaskProcess()
     m_update_status = 0;
 
     killProcess();
-/*
+
     fclose( m_io_input);
     fclose( m_io_output);
     fclose( m_io_outerr);
-*/
+
 #ifdef AFOUTPUT
     printf(" ~ TaskProcess(): ");
     m_taskexec->stdOut();
@@ -155,7 +160,6 @@ TaskProcess::~TaskProcess()
 
 void TaskProcess::refresh()
 {
-//printf("TaskProcess::refresh:\n");//return;
     if( m_stop_time )
     {
         if( m_pid == 0 ) m_zombie = true;
@@ -208,7 +212,6 @@ void TaskProcess::refresh()
 
 void TaskProcess::readProcess()
 {
-//printf("TaskProcess::readProcess:\n");//return;
     std::string output;
 
     int readsize = readPipe( m_io_output);
@@ -247,7 +250,6 @@ void TaskProcess::readProcess()
 
 void TaskProcess::sendTaskSate()
 {
-//printf("TaskProcess::sendTaskSate:\n");//return;
     if( m_update_status == 0 ) return;
 
     int    type = af::Msg::TTaskUpdatePercent;
@@ -385,26 +387,34 @@ void TaskProcess::getOutput( af::Msg * o_msg) const
 }
 
 #ifdef WINNT
-int TaskProcess::readPipe( HANDLE & i_handle )
+int TaskProcess::readPipe( HANDLE i_handle )
 {
 printf("TaskProcess::readPipe:\n");return 0;
-    int readsize = 0;
+    DWORD readsize = 0;
+
+	if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, &readsize, NULL))
+    {
+        AFERRAR("TaskProcess::readPipe: ReadFile() failure with code = %d.", GetLastError())
+        return 0;
+    }
+
+/*
     OVERLAPPED overlap;
     if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, NULL, &overlap))
     {
-        AFERRAR("TaskProcess::readPipe: ReadFile() failure.")
+        AFERRAR("TaskProcess::readPipe: ReadFile() failure with code = %d.", GetLastError())
         return 0;
     }
 
     DWORD bytes;
     if( false == GetOverlappedResult( i_handle, &overlap, &bytes, false))
     {
-        AFERRAR("TaskProcess::readPipe: GetOverlappedResult() failure.")
+        AFERRAR("TaskProcess::readPipe: GetOverlappedResult() with code = %d.", GetLastError())
         return 0;
     }
     else
         readsize = bytes;
-
+*/
 ::write( 1, m_readbuffer, readsize);
 
     return readsize;

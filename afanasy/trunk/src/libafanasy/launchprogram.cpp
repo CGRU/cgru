@@ -76,12 +76,13 @@ bool LaunchProgramV(
 	HANDLE * o_in,
 	HANDLE * o_out,
 	HANDLE * o_err,
-    const char * i_program,
-    const char * i_args[],
+    const char * i_commandline,
+/*    const char * i_program,
+    const char * i_args[],*/
     const char * i_wdir = NULL,
     DWORD i_flags = 0)
 {
-/*	if (o_in)
+/**/	if (o_in)
 	{
 		*o_in = 0;
 	}
@@ -95,7 +96,8 @@ bool LaunchProgramV(
 	{
 		*o_err = 0;
 	}
-*/
+
+#if 0
 	char* args = (char*)malloc(1);
 	const char **currentArgs = i_args;
 
@@ -123,62 +125,51 @@ bool LaunchProgramV(
 
 		currentArgs++;
 	}
-
+#endif
 	// Create the pipes
 
-	HANDLE hStdinRead, hStdinWrite;
-	HANDLE hStdoutRead, hStdoutWrite;
-	HANDLE hStderrRead, hStderrWrite;
-
-	HANDLE * phStdinRead   = &hStdinRead;
-	HANDLE * phStdinWrite  = &hStdinWrite;
-	HANDLE * phStdoutRead  = &hStdoutRead;
-	HANDLE * phStdoutWrite = &hStdoutWrite;
-	HANDLE * phStderrRead  = &hStderrRead;
-	HANDLE * phStderrWrite = &hStderrWrite;
-
-    if( o_in  ) phStdinWrite  = o_in;
-    if( o_out ) phStdoutRead  = o_out;
-    if( o_err ) phStderrRead  = o_err;
+	HANDLE tmp_hStdinRead;
+	HANDLE tmp_hStdoutWrite;
+	HANDLE tmp_hStderrWrite;
 
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	saAttr.bInheritHandle = true;
 	saAttr.lpSecurityDescriptor = NULL;
 
-	if (o_in && !CreatePipe( phStdinRead, phStdinWrite, &saAttr, 0))
+	if (o_in && !CreatePipe( &tmp_hStdinRead, o_in, &saAttr, 0))
 	{
-		free( args );
+//		free( args );
 		return false;
 	}
 
-	if (o_out && !CreatePipe( phStdoutRead,  phStdoutWrite, &saAttr, 0))
+	if (o_out && !CreatePipe( o_out,  &tmp_hStdoutWrite, &saAttr, 0))
 	{
 		if (o_in)
 		{
-			CloseHandle( *phStdinRead);
-			CloseHandle( *phStdinWrite);
+			CloseHandle( tmp_hStdinRead);
+			CloseHandle( *o_in);
 		}
 
-		free( args );
+//		free( args );
 		return false;
 	}
 
-	if (o_err && !CreatePipe( phStderrRead,  phStderrWrite, &saAttr, 0))
+	if (o_err && !CreatePipe( o_err,  &tmp_hStderrWrite, &saAttr, 0))
 	{
 		if (o_in)
 		{
-			CloseHandle( *phStdinRead);
-			CloseHandle( *phStdinWrite);
+			CloseHandle( tmp_hStdinRead);
+			CloseHandle( *o_in);
 		}
 
 		if (o_out)
 		{
-			CloseHandle( *phStdoutRead);
-			CloseHandle( *phStdoutWrite);
+			CloseHandle( *o_out);
+			CloseHandle( tmp_hStdoutWrite);
 		}
 
-		free( args );
+//		free( args );
 		return false;
 	}
 
@@ -188,81 +179,81 @@ bool LaunchProgramV(
 		HANDLE hDupPipe;
 
 		if (o_in && !DuplicateHandle(
-			GetCurrentProcess(), *phStdinWrite,
+			GetCurrentProcess(), *o_in,
 			GetCurrentProcess(), &hDupPipe,
 			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
-			CloseHandle( *phStdinRead);
+			CloseHandle( tmp_hStdinRead);
 
 			if (o_out)
 			{
-				CloseHandle( *phStdoutRead);
-				CloseHandle( *phStdoutWrite);
+				CloseHandle( *o_out);
+				CloseHandle( tmp_hStdoutWrite);
 			}
 
 			if (o_err)
 			{
-				CloseHandle( *phStderrRead);
-				CloseHandle( *phStderrWrite);
+				CloseHandle( *o_err);
+				CloseHandle( tmp_hStderrWrite);
 			}
 
-			free( args );
+//			free( args );
 			return false;
 		}
 		
 		if (o_in)
-			*phStdinWrite = hDupPipe;
+			*o_in = hDupPipe;
 
 		if (o_out && !DuplicateHandle(
-			GetCurrentProcess(), *phStdoutRead,
+			GetCurrentProcess(), *o_out,
 			GetCurrentProcess(), &hDupPipe,
 			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
 			if (o_in)
 			{
-				CloseHandle( *phStdinRead);
-				CloseHandle( *phStdinWrite);
+				CloseHandle( tmp_hStdinRead);
+				CloseHandle( *o_in);
 			}
 
-			CloseHandle( *phStdoutWrite);
+			CloseHandle( tmp_hStdoutWrite);
 
 			if (o_err)
 			{
-				CloseHandle( *phStderrRead);
-				CloseHandle( *phStderrWrite);
+				CloseHandle( *o_err);
+				CloseHandle( tmp_hStderrWrite);
 			}
 
-			free( args );
+//			free( args );
 			return false;
 		}
 	
 		if (o_out)	
-			*phStdoutRead = hDupPipe;
+			*o_out = hDupPipe;
 
 		if (o_err && !DuplicateHandle(
-			GetCurrentProcess(), *phStderrRead,
+			GetCurrentProcess(), *o_err,
 			GetCurrentProcess(), &hDupPipe,
 			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
 			if (o_in)
 			{
-				CloseHandle( *phStdinRead);
-				CloseHandle( *phStdinWrite);
+				CloseHandle( tmp_hStdinRead);
+				CloseHandle( *o_in);
 			}
 
 			if (o_out)
 			{
-				CloseHandle( *phStdoutRead);
-				CloseHandle( *phStdoutWrite);
+				CloseHandle( *o_out);
+				CloseHandle( tmp_hStdoutWrite);
 			}
 
-			CloseHandle( *phStderrWrite);
-			free( args );
+			CloseHandle( tmp_hStderrWrite);
+//			free( args );
 			return false;
 		}
 		
 		if (o_err)
-			*phStderrRead = hDupPipe;
+			*o_err = hDupPipe;
 			
 	}
 	
@@ -275,28 +266,33 @@ bool LaunchProgramV(
 	startInfo.dwFlags = STARTF_USESTDHANDLES;
 
 	if (o_in)
-		startInfo.hStdInput = *phStdinRead;		// pipe
+		startInfo.hStdInput = *o_in;		// pipe
 	else
 		startInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
 	if (o_out)
-		startInfo.hStdOutput = *phStdoutWrite;	// pipe
+		startInfo.hStdOutput = *o_out;	// pipe
 	else
 		startInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	if (o_err)
-		startInfo.hStdError = *phStderrWrite;	   // pipe
+		startInfo.hStdError = *o_err;	   // pipe
 	else
 		startInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 
-	char *argsAndProgram;
-	size_t bufSize;
+//	char *argsAndProgram;
+//	size_t bufSize;
 
-	bufSize = strlen(i_program) + strlen(args) + 5;
+//	bufSize = strlen(i_program) + strlen(args) + 5;
 
-	argsAndProgram = (char *)malloc(bufSize);
+//	argsAndProgram = (char *)malloc(bufSize);
 
-	sprintf(argsAndProgram, "\"%s\" %s", i_program, args);
+//	sprintf(argsAndProgram, "\"%s\" %s", i_program, args);
+
+	size_t bufSize = strlen(i_commandline) + 1;
+	char * argsAndProgram = (char *)malloc( bufSize);
+	strncpy( argsAndProgram, i_commandline, bufSize-1);
+	argsAndProgram[bufSize-1] = '\0';
 
 	/*
 		Check if we have a console by calling GetConsoleScreenBufferInfo().
@@ -308,8 +304,6 @@ bool LaunchProgramV(
 	DWORD flags = i_flags;
 	if( false == GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos ))
 		flags = flags | CREATE_NO_WINDOW;
-
-printf("argsAndProgram:\n%s\n",argsAndProgram);
 
 	BOOL processCreated = CreateProcess(
 		0x0, argsAndProgram,
@@ -328,40 +322,40 @@ printf("argsAndProgram:\n%s\n",argsAndProgram);
 		CloseHandle( o_pinfo->hThread);
 	}
 */
-	free(args);
+//	free(args);
 	
 	// Close the unneeded pipe handles (they were inherited)
 
 	if (o_in)
-		CloseHandle( *phStdinRead);
+		CloseHandle( tmp_hStdinRead);
 
 	if (o_out)
-		CloseHandle( *phStdoutWrite);
+		CloseHandle( tmp_hStdoutWrite);
 
 	if (o_err)
-		CloseHandle( *phStderrWrite);
+		CloseHandle( tmp_hStderrWrite);
 
 	if (!processCreated)
 		return false;
-/*
+///*
 	if (o_in)
 	{
-		int fd = _open_osfhandle((intptr_t)hStdinWrite, 0);
-		*o_in = _fdopen(fd, "w");
+		int fd = _open_osfhandle((intptr_t)(*o_in), 0);
+		/*o_in = */_fdopen(fd, "w");
 	}
 
 	if (o_out)
 	{
-		int fd = _open_osfhandle((intptr_t)hStdoutRead, O_RDONLY);
-		*o_out = _fdopen(fd, "r");
+		int fd = _open_osfhandle((intptr_t)(*o_out), O_RDONLY);
+		/*o_out = */_fdopen(fd, "r");
 	}
 
 	if (o_err)
 	{
-		int fd = _open_osfhandle((intptr_t)hStderrRead, O_RDONLY);
-		*o_err = _fdopen(fd, "r");
+		int fd = _open_osfhandle((intptr_t)(*o_err), O_RDONLY);
+		/*o_err = */_fdopen(fd, "r");
 	}
-*/
+//*/
 	return true;
 }
 

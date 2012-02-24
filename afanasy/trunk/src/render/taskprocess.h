@@ -64,7 +64,7 @@ private:
     HANDLE m_io_output;
     HANDLE m_io_outerr;
     HANDLE m_io_input;
-    int readPipe( HANDLE & i_handle );
+    int readPipe( HANDLE i_handle );
 #else
     FILE * m_io_output;
     FILE * m_io_outerr;
