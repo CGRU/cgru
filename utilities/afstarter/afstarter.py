@@ -31,7 +31,8 @@ def getComboBoxIndexFromData( comboBox, data):
    dataDict = dict()
    value = int()
    for i in range(comboBox.count()):
-      dataDict[str(comboBox.itemData( i).toString())] = int( i)
+      #dataDict[str(comboBox.itemData( i).toString())] = int( i)
+      dataDict[comboBox.itemData( i)] = int( i)
    if data in dataDict:
       value = int(dataDict[str(data)])
    if value is None: return 0
