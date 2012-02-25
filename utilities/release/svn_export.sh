@@ -11,15 +11,16 @@ packsrev=`python ./getrevision.py ..`
 popd > /dev/null
 
 # Exporting current subversion:
-cgruSVN=cgru_svn${packsrev}
+cgruREV=cgru_rev${packsrev}
 tmpdir=tmp
 [ -d $tmpdir ] || mkdir -pv $tmpdir
-cgruSVN_dir=$tmpdir/$cgruSVN
-[ -d $cgruSVN_dir ] && rm -rf $cgruSVN_dir
+cgruREV_dir=$tmpdir/$cgruREV
+[ -d $cgruREV_dir ] && rm -rf $cgruREV_dir
 echo "Exporting CGRU revision $packsrev"
-svn export $cgruRoot $cgruSVN_dir
+svn export $cgruRoot $cgruREV_dir
+echo ${packsrev} > $cgruREV_dir/revision.txt
 cd $tmpdir
-acrhivename=$curdir/$cgruSVN.7z
+acrhivename=$curdir/$cgruREV.7z
 [ -f $acrhivename ] && rm -fv $acrhivename
 echo "Compressing $acrhivename"
-7za a -r -y -t7z $acrhivename $cgruSVN > /dev/null || echo "Failed!"
+7za a -r -y -t7z $acrhivename $cgruREV > /dev/null || echo "Failed!"

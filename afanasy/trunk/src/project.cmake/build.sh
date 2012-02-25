@@ -32,6 +32,8 @@ case ${DISTRIBUTIVE} in
     CentOS)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         ;;
+    MacOSX)
+        ;;
     *)
         echo "Warning: Untested system: '${DISTRIBUTIVE}'"
         ;;
