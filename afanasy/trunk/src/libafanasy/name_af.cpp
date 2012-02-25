@@ -40,8 +40,6 @@ bool LaunchProgramV(
 	HANDLE * o_out,
 	HANDLE * o_err,
 	const char * i_commanline,
-//    const char * i_program,
-//    const char * i_args[],
     const char * i_wdir = NULL,
     DWORD i_flags = 0);
 
@@ -56,8 +54,6 @@ bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
 
 	std::string shell_commandline("cmd.exe /c ");
 	shell_commandline += i_commandline;
-//	const char shell[] = "cmd.exe";
-//    const char * args[] = { "/c", i_commandline.c_str(), NULL};
 
 	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_flags);
 }

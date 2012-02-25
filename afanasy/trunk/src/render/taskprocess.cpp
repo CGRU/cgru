@@ -389,17 +389,18 @@ void TaskProcess::getOutput( af::Msg * o_msg) const
 #ifdef WINNT
 int TaskProcess::readPipe( HANDLE i_handle )
 {
-printf("TaskProcess::readPipe:\n");return 0;
+printf("TaskProcess::readPipe:\n");//return 0;
     DWORD readsize = 0;
-
+/*
 	if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, &readsize, NULL))
     {
         AFERRAR("TaskProcess::readPipe: ReadFile() failure with code = %d.", GetLastError())
         return 0;
     }
+*/
 
-/*
     OVERLAPPED overlap;
+    ZeroMemory( &overlap, 0, sizeof(overlap));
     if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, NULL, &overlap))
     {
         AFERRAR("TaskProcess::readPipe: ReadFile() failure with code = %d.", GetLastError())
@@ -414,7 +415,7 @@ printf("TaskProcess::readPipe:\n");return 0;
     }
     else
         readsize = bytes;
-*/
+//*/
 ::write( 1, m_readbuffer, readsize);
 
     return readsize;

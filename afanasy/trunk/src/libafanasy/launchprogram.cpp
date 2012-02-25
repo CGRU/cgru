@@ -42,34 +42,6 @@
 void (*fp_setupChildProcess)( void) = NULL;
 #endif
 
-/*
-int LaunchProgram(
-	FILE **o_in,
-	FILE **o_out,
-	FILE **o_err,
-	const char *i_program,
-	...)
-{
-	char *currentArg;
-	const char* Args[32];
-	const char** pArgs = Args;
- 
-	va_list  plist;
-	va_start(plist, i_program);
-
-	while ((currentArg = va_arg(plist, char *)))
-	{
-		*pArgs = currentArg;
-		pArgs++;
-	}
-
-	*pArgs = 0;
-
-	va_end(plist);
-
-	return LaunchProgramV(o_in, o_out, o_err, i_program, Args);
-}
-*/
 #ifdef _WIN32
 bool LaunchProgramV(
 	PROCESS_INFORMATION * o_pinfo,
@@ -77,26 +49,9 @@ bool LaunchProgramV(
 	HANDLE * o_out,
 	HANDLE * o_err,
     const char * i_commandline,
-/*    const char * i_program,
-    const char * i_args[],*/
     const char * i_wdir = NULL,
     DWORD i_flags = 0)
 {
-/**/	if (o_in)
-	{
-		*o_in = 0;
-	}
-
-	if (o_out)
-	{
-		*o_out = 0;
-	}
-
-	if (o_err)
-	{
-		*o_err = 0;
-	}
-
 #if 0
 	char* args = (char*)malloc(1);
 	const char **currentArgs = i_args;
@@ -128,48 +83,45 @@ bool LaunchProgramV(
 #endif
 	// Create the pipes
 
-	HANDLE tmp_hStdinRead;
-	HANDLE tmp_hStdoutWrite;
-	HANDLE tmp_hStderrWrite;
+	HANDLE hStdinRead;
+	HANDLE hStdoutWrite;
+	HANDLE hStderrWrite;
 
 	SECURITY_ATTRIBUTES saAttr;
 	saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
 	saAttr.bInheritHandle = true;
 	saAttr.lpSecurityDescriptor = NULL;
 
-	if (o_in && !CreatePipe( &tmp_hStdinRead, o_in, &saAttr, 0))
+	if (o_in && !CreatePipe( &hStdinRead, o_in, &saAttr, 0))
 	{
-//		free( args );
 		return false;
 	}
 
-	if (o_out && !CreatePipe( o_out,  &tmp_hStdoutWrite, &saAttr, 0))
+	if (o_out && !CreatePipe( o_out,  &hStdoutWrite, &saAttr, 0))
 	{
 		if (o_in)
 		{
-			CloseHandle( tmp_hStdinRead);
+			CloseHandle( hStdinRead);
 			CloseHandle( *o_in);
 		}
 
-//		free( args );
 		return false;
 	}
 
-	if (o_err && !CreatePipe( o_err,  &tmp_hStderrWrite, &saAttr, 0))
+	if (o_err && !CreatePipe( o_err,  &hStderrWrite, &saAttr, 0))
 	{
 		if (o_in)
 		{
-			CloseHandle( tmp_hStdinRead);
+			CloseHandle( hStdinRead);
 			CloseHandle( *o_in);
 		}
 
 		if (o_out)
 		{
 			CloseHandle( *o_out);
-			CloseHandle( tmp_hStdoutWrite);
+			CloseHandle( hStdoutWrite);
 		}
 
-//		free( args );
 		return false;
 	}
 
@@ -183,21 +135,20 @@ bool LaunchProgramV(
 			GetCurrentProcess(), &hDupPipe,
 			0, false, DUPLICATE_CLOSE_SOURCE | DUPLICATE_SAME_ACCESS))
 		{
-			CloseHandle( tmp_hStdinRead);
+			CloseHandle( hStdinRead);
 
 			if (o_out)
 			{
 				CloseHandle( *o_out);
-				CloseHandle( tmp_hStdoutWrite);
+				CloseHandle( hStdoutWrite);
 			}
 
 			if (o_err)
 			{
 				CloseHandle( *o_err);
-				CloseHandle( tmp_hStderrWrite);
+				CloseHandle( hStderrWrite);
 			}
 
-//			free( args );
 			return false;
 		}
 		
@@ -211,19 +162,18 @@ bool LaunchProgramV(
 		{
 			if (o_in)
 			{
-				CloseHandle( tmp_hStdinRead);
+				CloseHandle( hStdinRead);
 				CloseHandle( *o_in);
 			}
 
-			CloseHandle( tmp_hStdoutWrite);
+			CloseHandle( hStdoutWrite);
 
 			if (o_err)
 			{
 				CloseHandle( *o_err);
-				CloseHandle( tmp_hStderrWrite);
+				CloseHandle( hStderrWrite);
 			}
 
-//			free( args );
 			return false;
 		}
 	
@@ -237,18 +187,18 @@ bool LaunchProgramV(
 		{
 			if (o_in)
 			{
-				CloseHandle( tmp_hStdinRead);
+				CloseHandle( hStdinRead);
 				CloseHandle( *o_in);
 			}
 
 			if (o_out)
 			{
 				CloseHandle( *o_out);
-				CloseHandle( tmp_hStdoutWrite);
+				CloseHandle( hStdoutWrite);
 			}
 
-			CloseHandle( tmp_hStderrWrite);
-//			free( args );
+			CloseHandle( hStderrWrite);
+
 			return false;
 		}
 		
@@ -264,30 +214,28 @@ bool LaunchProgramV(
 	memset(&startInfo, 0, sizeof(STARTUPINFO));
 	startInfo.cb = sizeof(STARTUPINFO);
 	startInfo.dwFlags = STARTF_USESTDHANDLES;
-
+/*
+    if ( ! SetHandleInformation( *o_in, HANDLE_FLAG_INHERIT, 0) )
+        printf("SetHandleInformation error = %d", GetLastError()); 
+    if ( ! SetHandleInformation( *o_out, HANDLE_FLAG_INHERIT, 0) )
+        printf("SetHandleInformation error = %d", GetLastError()); 
+    if ( ! SetHandleInformation( *o_err, HANDLE_FLAG_INHERIT, 0) )
+        printf("SetHandleInformation error = %d", GetLastError()); 
+*/
 	if (o_in)
-		startInfo.hStdInput = *o_in;		// pipe
+		startInfo.hStdInput = hStdinRead;		// pipe
 	else
 		startInfo.hStdInput = GetStdHandle(STD_INPUT_HANDLE);
 
 	if (o_out)
-		startInfo.hStdOutput = *o_out;	// pipe
+		startInfo.hStdOutput = hStdoutWrite;	// pipe
 	else
 		startInfo.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
 
 	if (o_err)
-		startInfo.hStdError = *o_err;	   // pipe
+		startInfo.hStdError = hStderrWrite;	   // pipe
 	else
 		startInfo.hStdError = GetStdHandle(STD_ERROR_HANDLE);
-
-//	char *argsAndProgram;
-//	size_t bufSize;
-
-//	bufSize = strlen(i_program) + strlen(args) + 5;
-
-//	argsAndProgram = (char *)malloc(bufSize);
-
-//	sprintf(argsAndProgram, "\"%s\" %s", i_program, args);
 
 	size_t bufSize = strlen(i_commandline) + 1;
 	char * argsAndProgram = (char *)malloc( bufSize);
@@ -314,48 +262,21 @@ bool LaunchProgramV(
 		&startInfo, o_pinfo);
 
 	free(argsAndProgram);
-/*
-	if (processCreated)
-	{
-		// Close the thread handle (the process handle is kept)
 
-		CloseHandle( o_pinfo->hThread);
-	}
-*/
-//	free(args);
-	
 	// Close the unneeded pipe handles (they were inherited)
 
 	if (o_in)
-		CloseHandle( tmp_hStdinRead);
+		CloseHandle( hStdinRead);
 
 	if (o_out)
-		CloseHandle( tmp_hStdoutWrite);
+		CloseHandle( hStdoutWrite);
 
 	if (o_err)
-		CloseHandle( tmp_hStderrWrite);
+		CloseHandle( hStderrWrite);
 
 	if (!processCreated)
 		return false;
-///*
-	if (o_in)
-	{
-		int fd = _open_osfhandle((intptr_t)(*o_in), 0);
-		/*o_in = */_fdopen(fd, "w");
-	}
 
-	if (o_out)
-	{
-		int fd = _open_osfhandle((intptr_t)(*o_out), O_RDONLY);
-		/*o_out = */_fdopen(fd, "r");
-	}
-
-	if (o_err)
-	{
-		int fd = _open_osfhandle((intptr_t)(*o_err), O_RDONLY);
-		/*o_err = */_fdopen(fd, "r");
-	}
-//*/
 	return true;
 }
 
