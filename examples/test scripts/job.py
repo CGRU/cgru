@@ -165,6 +165,8 @@ if options.pause:
 if options.output:
    job.output( 1)
 
+job.setNeedOS('')
+
 exit_status = 0
 if options.sendjob:
    for x in range(xcopy):
