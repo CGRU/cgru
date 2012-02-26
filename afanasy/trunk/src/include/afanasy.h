@@ -51,7 +51,7 @@ namespace AFSERVER
 	const int  SO_RCVTIMEO_SEC   = 2;  ///< Receive timeout seconds.
 	const int  SO_SNDTIMEO_SEC   = 2;  ///< Send timeout seconds.
 #ifdef WINNT
-	const char TEMP_DIRECTORY[]  = "afanasy"; ///< Server store logs, tasks output.
+	const char TEMP_DIRECTORY[]  = "\\afanasy"; ///< Server store logs, tasks output.
 #else
 	const char TEMP_DIRECTORY[]  = "/var/tmp/afanasy"; ///< Server store logs, tasks output.
 #endif
