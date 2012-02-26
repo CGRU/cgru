@@ -1,5 +1,7 @@
 #include "jobaf.h"
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/addresseslist.h"
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
@@ -148,7 +150,7 @@ bool JobAf::initialize()
 // Create tasks output directory ( if needed )
    tasksoutputdir = name;
    af::pathFilterFileName( tasksoutputdir);
-   tasksoutputdir = af::Environment::getTasksStdOutDir() + '/' + tasksoutputdir;
+   tasksoutputdir = af::Environment::getTasksStdOutDir() + AFGENERAL::PATH_SEPARATOR + tasksoutputdir;
    if( af::pathMakeDir( tasksoutputdir) == false)
    {
       appendLog( std::string("Unable to create tasks output directory:\n") + tasksoutputdir);

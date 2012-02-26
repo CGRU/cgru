@@ -1,11 +1,11 @@
 #pragma once
 
-#ifndef WINNT
-#include <regex.h>
-#else
-// Provide empty not used values:
+#ifdef WINNT
+#include <regex>
 static const int REG_EXTENDED = 0;
-static const int REG_ICASE = 0;
+static const int REG_ICASE = 1;
+#else
+#include <regex.h>
 #endif
 
 #include "name_af.h"
@@ -44,14 +44,17 @@ public:
 
 private:
 
-   int cflags;
-   bool exclude;
-   bool contain;
-   std::string pattern;
-#ifndef WINNT
-   regex_t regexp;
+    int cflags;
+    bool exclude;
+    bool contain;
+    std::string pattern;
+
+#ifdef WINNT
+    std::tr1::regex regexp;
+#else
+    regex_t regexp;
 #endif
 
-   static const int compile_flags;
+    static const int compile_flags;
 };
 }

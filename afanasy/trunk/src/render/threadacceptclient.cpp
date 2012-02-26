@@ -7,7 +7,6 @@
 #ifdef WINNT
 #include <winsock2.h>
 #define sprintf sprintf_s
-#define close _close
 #else
 #include <arpa/inet.h>
 #include <fcntl.h>

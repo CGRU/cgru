@@ -35,11 +35,12 @@ void CleanUpData::doCleanUp()
 #ifdef WINNT
 	HANDLE dir;
 	WIN32_FIND_DATA file_data;
-	if(( dir = FindFirstFile( tasksoutdir.c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	if(( dir = FindFirstFile((tasksoutdir + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
 	{
 		do
 		{
 			std::string filename( file_data.cFileName);
+
 			if( filename.find(".") == 0 )
 				continue;
 
