@@ -56,7 +56,7 @@ pp=$PausePeriod
 del=$DeletionPeriod
 while [ 1 ]; do
     for(( jp=0; jp<$JobsPack; jp++)); do
-        output="Job = $counter, user = $usr, pause = $pp, deletion = $del, period = $del_period"
+        output="Job = $counter, user = $usr, pause = $pp, deletion = $del"
         echo $output
         jobname="emulate_job_$counter"
         username="user_$usr"
