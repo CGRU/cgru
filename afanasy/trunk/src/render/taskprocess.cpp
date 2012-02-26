@@ -389,34 +389,26 @@ void TaskProcess::getOutput( af::Msg * o_msg) const
 #ifdef WINNT
 int TaskProcess::readPipe( HANDLE i_handle )
 {
-printf("TaskProcess::readPipe:\n");//return 0;
+    // Get how much data is available:
+    DWORD bytesAvail;
+    if ( false == PeekNamedPipe( i_handle, NULL, 0, NULL, &bytesAvail, NULL))
+    {
+        DWORD lastError = GetLastError();
+        if( lastError != ERROR_BROKEN_PIPE )
+            AFERRAR("TaskProcess::readPipe: PeekNamedPipe() failure with code = %d.", GetLastError())
+        return 0;
+    }
+
+    if ( bytesAvail <= 0 )
+        return 0;
+
+    // Read data:
     DWORD readsize = 0;
-/*
-	if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, &readsize, NULL))
+	if( false == ReadFile( i_handle, m_readbuffer, bytesAvail, &readsize, NULL))
     {
         AFERRAR("TaskProcess::readPipe: ReadFile() failure with code = %d.", GetLastError())
         return 0;
     }
-*/
-
-    OVERLAPPED overlap;
-    ZeroMemory( &overlap, 0, sizeof(overlap));
-    if( false == ReadFile( i_handle, m_readbuffer, m_readbuffer_size, NULL, &overlap))
-    {
-        AFERRAR("TaskProcess::readPipe: ReadFile() failure with code = %d.", GetLastError())
-        return 0;
-    }
-
-    DWORD bytes;
-    if( false == GetOverlappedResult( i_handle, &overlap, &bytes, false))
-    {
-        AFERRAR("TaskProcess::readPipe: GetOverlappedResult() with code = %d.", GetLastError())
-        return 0;
-    }
-    else
-        readsize = bytes;
-//*/
-::write( 1, m_readbuffer, readsize);
 
     return readsize;
 }
