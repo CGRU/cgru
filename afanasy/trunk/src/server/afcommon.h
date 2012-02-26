@@ -11,7 +11,7 @@
 #include "cleanupqueue.h"
 #include "logqueue.h"
 
-class ThreadArgs;
+struct ThreadArgs;
 
 /*
    From what I understand this is just a holder for global

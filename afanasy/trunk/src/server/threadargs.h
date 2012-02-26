@@ -1,6 +1,10 @@
 #pragma once
 
+#ifdef WINNT
+#include <winsock2.h>
+#else
 #include <sys/socket.h>
+#endif
 
 #include "../libafanasy/name_af.h"
 

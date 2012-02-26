@@ -578,9 +578,9 @@ bool Environment::init()
    std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
    PRINT("Local computer name = '%s'\n", computername.c_str());
 
-   tasksstdoutdir = tempdirectory + '/' +    AFJOB::TASKS_OUTPUTDIR;
-   renderslogsdir = tempdirectory + '/' + AFRENDER::LOGS_DIRECTORY;
-   userslogsdir   = tempdirectory + '/' +   AFUSER::LOGS_DIRECTORY;
+   tasksstdoutdir = tempdirectory + AFGENERAL::PATH_SEPARATOR +    AFJOB::TASKS_OUTPUTDIR;
+   renderslogsdir = tempdirectory + AFGENERAL::PATH_SEPARATOR + AFRENDER::LOGS_DIRECTORY;
+   userslogsdir   = tempdirectory + AFGENERAL::PATH_SEPARATOR +   AFUSER::LOGS_DIRECTORY;
 
    //############ Server Accept IP Addresses Mask:
    if( false == Address::readIpMask( serveripmask, m_verbose_init))

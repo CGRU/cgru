@@ -6,7 +6,6 @@ qtsrc=qt-everywhere-opensource-src-$ver
 qtsrc=qt-everywhere-opensource-src-$ver
 
 for arg in $*; do
-   [ "$arg" == "--nosql" ] && nosql=1
    [ "$arg" == "-h" ] && help=1
 done
 
@@ -18,7 +17,6 @@ if [ ! -d $qtsrc ]; then
 fi
 
 flags="-prefix $qtdir -v -opensource -release -static -silent"
-[ -z "$nosql" ] && flags="$flags -qt-sql-psql"
 flags="$flags -nomake examples -nomake demos -nomake designer"
 flags="$flags -no-qt3support -no-xmlpatterns -no-multimedia -no-audio-backend -no-phonon -no-webkit -no-javascript-jit -no-script -no-scripttools -no-declarative -no-gif -no-openssl"
 

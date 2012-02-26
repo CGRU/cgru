@@ -140,6 +140,6 @@ AFINFO("ThreadRun::run: deleting zombies:")
 // Sleeping
 //
 AFINFO("ThreadRun::run: sleeping...")
-   sleep( 1);
+   af::sleep_sec( 1);
 }
 }

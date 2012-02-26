@@ -88,7 +88,7 @@ void DBActionQueue::processItem( af::AfQueueItem* item)
                 m_conn = NULL;
             }
             sendAlarm();
-            sleep( AFDATABASE::RECONNECTAFTER);
+            af::sleep_sec( AFDATABASE::RECONNECTAFTER);
         }
     }
 

@@ -42,6 +42,7 @@ public:
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 
+#ifndef WINNT
 class CmdFork : public Cmd
 {
 public:
@@ -49,3 +50,4 @@ public:
    ~CmdFork();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+#endif

@@ -1,13 +1,17 @@
-#include <arpa/inet.h>
-#include <fcntl.h>
 #include <memory.h>
-#include <netdb.h>
-#include <netinet/in.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+
+#ifdef WINNT
+#else
+#include <arpa/inet.h>
+#include <fcntl.h>
+#include <netdb.h>
+#include <netinet/in.h>
 #include <sys/socket.h>
 #include <sys/types.h>
-#include <time.h>
+#endif
 
 #include "../libafanasy/environment.h"
 #include "../libafanasy/dlThread.h"
@@ -29,7 +33,7 @@ void threadAcceptClient( void * i_arg )
 
 // Check for available local network addresses
    struct addrinfo hints, *res;
-   bzero( &hints, sizeof(hints));
+   memset( &hints, 0, sizeof(hints));
    hints.ai_socktype = SOCK_STREAM;
    hints.ai_flags = AI_PASSIVE | AI_ADDRCONFIG;
    char port[16];
@@ -64,9 +68,13 @@ void threadAcceptClient( void * i_arg )
       }
    }
    freeaddrinfo( res);
-#ifdef MACOSX
-// FIXME: Current MAX OS can't listen IPv6?
-   protocol = AF_INET;
+
+#if defined (WINNT)
+    printf("Disable listening IPv6 for MS Windows.\n");
+    protocol = AF_INET;
+#elif defined (MACOSX)
+    printf("Disable listening IPv6 for Mac OS X.\n");
+    protocol = AF_INET;
 #endif
     if( af::Environment::hasArgument("-noIPv6"))
     {
@@ -92,13 +100,13 @@ void threadAcceptClient( void * i_arg )
 //
 // initializing server socket address:
    struct sockaddr_in server_sockaddr_in4;
-   bzero( &server_sockaddr_in4, sizeof(server_sockaddr_in4));
+   memset( &server_sockaddr_in4, 0, sizeof(server_sockaddr_in4));
    server_sockaddr_in4.sin_port = htons( af::Environment::getServerPort());
    server_sockaddr_in4.sin_addr.s_addr = INADDR_ANY;
    server_sockaddr_in4.sin_family = AF_INET;
 
    struct sockaddr_in6 server_sockaddr_in6;
-   bzero( &server_sockaddr_in6, sizeof(server_sockaddr_in6));
+   memset( &server_sockaddr_in6, 0, sizeof(server_sockaddr_in6));
    server_sockaddr_in6.sin6_port = htons( af::Environment::getServerPort());
    server_sockaddr_in6.sin6_family = AF_INET6;
 //   server_sockaddr_in6.sin6_addr = IN6ADDR_ANY_INIT; // This is default value, it is zeros
@@ -111,8 +119,13 @@ void threadAcceptClient( void * i_arg )
    }
 //
 // set socket options for reuseing address immediatly after bind
+    #ifdef WINNT
+    #define TOCHAR (char *)
+    #else
+    #define TOCHAR
+    #endif
    int value = 1;
-   if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, &value, sizeof(value)) != 0)
+   if( setsockopt( server_sd, SOL_SOCKET, SO_REUSEADDR, TOCHAR(&value), sizeof(value)) != 0)
       AFERRPE("set socket SO_REUSEADDR option failed")
 
    value = -1;
@@ -185,7 +198,7 @@ void threadAcceptClient( void * i_arg )
             delete threadArgs;
             break;
          }
-         sleep( error_wait);
+         af::sleep_sec( error_wait);
          if( error_wait < error_wait_max) error_wait = error_wait << 1;
          continue;
       }

@@ -76,6 +76,7 @@ bool CmdServerPort::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
+#ifndef WINNT
 CmdFork::CmdFork()
 {
    setCmd("fork");
@@ -90,3 +91,4 @@ bool CmdFork::processArguments( int argc, char** argv, af::Msg &msg)
    for( int i = 0; i < count; i++) fork();
    return true;
 }
+#endif

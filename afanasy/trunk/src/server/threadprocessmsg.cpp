@@ -1,10 +1,16 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+#ifdef WINNT
+#include <winsock2.h>
+#else
 #include <arpa/inet.h>
 #include <netdb.h>
 #include <netinet/in.h>
-#include <stdio.h>
-#include <stdlib.h>
 #include <sys/socket.h>
 #include <sys/types.h>
+#define closesocket close
+#endif
 
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
@@ -42,7 +48,7 @@ void threadProcessMsg( void * i_args)
    // arguments are deleted in any way.
    processMessage( threadArgs);
 
-   close(threadArgs->sd);
+   closesocket(threadArgs->sd);
 
    delete threadArgs;
 }
@@ -106,7 +112,13 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
    so_rcvtimeo.tv_sec = af::Environment::getServer_SO_RCVTIMEO_SEC();
    so_rcvtimeo.tv_usec = 0;
 
-   if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, &so_rcvtimeo, sizeof(so_rcvtimeo)) != 0)
+    #ifdef WINNT
+    #define TOCHAR (char *)
+    #else
+    #define TOCHAR
+    #endif
+
+   if( setsockopt( i_args->sd, SOL_SOCKET, SO_RCVTIMEO, TOCHAR(&so_rcvtimeo), sizeof(so_rcvtimeo)) != 0)
    {
       AFERRPE("readMessage: setsockopt failed.");
       af::printAddress( &(i_args->ss));
@@ -132,7 +144,14 @@ void writeMessage( ThreadArgs * i_args, af::Msg * i_msg)
    timeval so_sndtimeo;
    so_sndtimeo.tv_sec = af::Environment::getServer_SO_SNDTIMEO_SEC();
    so_sndtimeo.tv_usec = 0;
-   if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, &so_sndtimeo, sizeof(so_sndtimeo)) != 0)
+
+    #ifdef WINNT
+    #define TOCHAR (char *)
+    #else
+    #define TOCHAR
+    #endif
+
+   if( setsockopt( i_args->sd, SOL_SOCKET, SO_SNDTIMEO, TOCHAR(&so_sndtimeo), sizeof(so_sndtimeo)) != 0)
    {
       AFERRPE("writeMessage: set socket SO_SNDTIMEO option failed")
       af::printAddress( &(i_args->ss));

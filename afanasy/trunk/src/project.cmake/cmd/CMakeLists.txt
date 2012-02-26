@@ -15,4 +15,8 @@ if( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
    set_target_properties(afcmd PROPERTIES LINK_FLAGS $ENV{AF_ADD_LFLAGS})
 endif( NOT $ENV{AF_ADD_LFLAGS} STREQUAL "" )
 
+if(WIN32)
+   target_link_libraries(afcmd Ws2_32.lib Iphlpapi.lib)
+endif(WIN32)
+
 target_link_libraries(afcmd afapi afsql)

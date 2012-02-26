@@ -1,11 +1,16 @@
 #include "afcommon.h"
 
 #include <fcntl.h>
+#ifdef WINNT
+#include <io.h>
+//#define open _open
+#else
 #include <sys/errno.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/unistd.h>
 #include <sys/wait.h>
+#endif
 
 #include "../libafanasy/environment.h"
 

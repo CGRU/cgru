@@ -37,11 +37,11 @@ void sig_int(int signum)
 }
 void sig_alrm(int signum)
 {
-   printf("ALARM: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)DlThread::Self());
+   printf("ALARM: Thread ID = %lu.\n", (long unsigned)DlThread::Self());
 }
 void sig_pipe(int signum)
 {
-   printf("PIPE ERROR: PID = %u, Thread ID = %lu.\n", (unsigned)getpid(), (long unsigned)DlThread::Self());
+   printf("PIPE ERROR: Thread ID = %lu.\n", (long unsigned)DlThread::Self());
 }
 
 //######################################## main #########################################

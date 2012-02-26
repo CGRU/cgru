@@ -6,11 +6,9 @@ if exist override.cmd call override.cmd
 
 call %VSINSTALLDIR%\VC\vcvarsall.bat %VCVARS%
 
-python patch-qprocess_win.cpp.py %qt%
-
 cd %qt%
 
-configure.exe -platform win32-msvc2010 -release -opensource -static -no-scripttools -no-multimedia -no-script -no-webkit -nomake examples -nomake demos -no-sql-sqlite -no-gif
+configure.exe -platform win32-msvc2010 -release -opensource -static -no-scripttools -no-multimedia -no-script -no-webkit -nomake examples -nomake demos -no-gif
 nmake
 
 pause

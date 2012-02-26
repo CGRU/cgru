@@ -19,7 +19,10 @@ So each path (project, asset) can have individual software setup.
    <maxrunningtasks>-1</maxrunningtasks>
 
 <!-- Client & Server -->
-   <servername>localhost</servername>
+   <servername>127.0.0.1</servername>
+<!-- Put server name or IP address in this var
+    <servername>localhost</servername>
+-->
     <!-- Acceptable ip addresses masks, space separated.
     Mask should have at least one '.' for IPv4 or one ':' for IPv6. -->
     <serveripmask>*.* 127.0.0.1 192.168.* *:* 0:0:0:0:0:0:0:1 FC00:* FD00:*</serveripmask>
@@ -27,8 +30,10 @@ So each path (project, asset) can have individual software setup.
    <clientport>51001</clientport>
    <srv_so_rcvtimeo_sec>2</srv_so_rcvtimeo_sec>
    <srv_so_sndtimeo_sec>2</srv_so_sndtimeo_sec>
+<!-- 
    <tempdirectory>/var/tmp/afanasy</tempdirectory>
-
+ -->
+ 
 <!-- Job -->
    <task_default_capacity>1000</task_default_capacity>
    <task_update_timeout>300</task_update_timeout>

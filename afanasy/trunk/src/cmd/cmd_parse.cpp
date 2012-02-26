@@ -31,7 +31,7 @@ bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
    }
 
    int maxsize = 1 << 20;
-   char buffer[maxsize];
+   char * buffer = new char(maxsize);
    for(;;)
    {
       int size = read( 0, buffer, maxsize);
@@ -61,5 +61,6 @@ bool CmdParse::processArguments( int argc, char** argv, af::Msg &msg)
          printf("\n");
       }
    }
-   return true;
+    delete buffer;
+    return true;
 }

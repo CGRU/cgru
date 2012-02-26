@@ -55,7 +55,7 @@ bool CmdFarmCheck::processArguments( int argc, char** argv, af::Msg &msg)
       check( hostname);
    }
    if( argc ) return true;
-   int maxsize = 1 << 10;
+   static const int maxsize = 1 << 10;
    char buffer[maxsize];
    for(;;)
    {
