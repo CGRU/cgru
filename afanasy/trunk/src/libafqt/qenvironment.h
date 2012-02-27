@@ -36,6 +36,10 @@ public:
 
    static Attr theme;
 
+   static Attr soundJobAdded;
+   static Attr soundJobDone;
+   static Attr soundJobError;
+
    static AttrNumber savePrefsOnExit;
    static AttrNumber saveWndRectsOnExit;
    static AttrNumber saveGUIOnExit;

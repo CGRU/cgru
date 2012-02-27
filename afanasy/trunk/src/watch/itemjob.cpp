@@ -19,8 +19,9 @@ const int ItemJob::Height = 30;
 const int ItemJob::HeightAnnotation = 12;
 
 ItemJob::ItemJob( af::Job *job):
-   ItemNode( (af::Node*)job),
-   blocksnum(  job->getBlocksNum())
+    ItemNode( (af::Node*)job),
+    blocksnum(  job->getBlocksNum()),
+    state(0)
 {
    if( blocksnum == 0)
    {
@@ -55,6 +56,20 @@ void ItemJob::updateValues( af::Node *node, int type)
       AFERROR("ItemJob::updateValues: Blocks number mismatch, deleting invalid item.")
       resetId();
       return;
+   }
+
+   // This is not item creation:
+   if( state != 0 )
+   {
+       // Just done:
+       if( false == ( state & AFJOB::STATE_DONE_MASK ))
+            if( job->getState() & AFJOB::STATE_DONE_MASK )
+                Watch::someJobDone();
+
+       // Just got an error:
+       if( false == ( state & AFJOB::STATE_ERROR_MASK ))
+            if( job->getState() & AFJOB::STATE_ERROR_MASK )
+                Watch::someJobError();
    }
 
    annotation           = afqt::stoq( job->getAnnontation().c_str());

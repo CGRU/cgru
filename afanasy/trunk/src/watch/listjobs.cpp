@@ -312,6 +312,7 @@ printf("ListJobs::caseMessage:\n"); msg->stdOut();
       af::MCGeneral ids( msg);
       deleteItems( ids);
       Watch::sendMsg( new af::Msg( af::Msg::TJobsListRequestIds, &ids, true));
+      Watch::someJobAdded();
       break;
    }
    case af::Msg::TMonitorJobsChanged:

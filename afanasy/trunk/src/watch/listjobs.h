@@ -5,8 +5,6 @@
 
 #include "listnodes.h"
 
-//class ItemJobBrief;
-
 class ListJobs : public ListNodes
 {
    Q_OBJECT

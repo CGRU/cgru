@@ -83,6 +83,10 @@ public:
    static void addJobId( int jId );
    static void delJobId( int jId );
 
+    static void someJobAdded();
+    static void someJobDone();
+    static void someJobError();
+
    static WndList* opened[WLAST];
 
    static void raiseWindow( QWidget * wnd, const QString * name = NULL);

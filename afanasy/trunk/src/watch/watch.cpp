@@ -4,6 +4,7 @@
 #include <QtCore/QProcess>
 #include <QtGui/QApplication>
 #include <QtGui/QPixmap>
+#include <QtGui/QSound>
 
 #include "../include/afanasy.h"
 
@@ -275,4 +276,25 @@ void Watch::startProcess( const QString & cmd, const QString & wdir)
       }
    }
    QProcess::startDetached( shell, args);
+}
+
+void Watch::someJobAdded()
+{
+    displayInfo("Job added.");
+    if( false == afqt::QEnvironment::soundJobAdded.str.isEmpty())
+        QSound::play( afqt::QEnvironment::soundJobAdded.str );
+}
+
+void Watch::someJobDone()
+{
+    displayInfo("Job Done.");
+    if( false == afqt::QEnvironment::soundJobDone.str.isEmpty())
+        QSound::play( afqt::QEnvironment::soundJobDone.str );
+}
+
+void Watch::someJobError()
+{
+    displayWarning("Job Error.");
+    if( false == afqt::QEnvironment::soundJobError.str.isEmpty())
+        QSound::play( afqt::QEnvironment::soundJobError.str );
 }

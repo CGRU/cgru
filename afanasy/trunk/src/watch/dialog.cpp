@@ -29,6 +29,7 @@
 #include "watch.h"
 #include "wnd.h"
 #include "wndcustomizegui.h"
+#include "wndcustomizesounds.h"
 #include "wndtext.h"
 #include "wndlist.h"
 
@@ -164,6 +165,10 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
 
     action = new QAction( "Customize GUI...", this);
     connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
+    menu.addAction( action);
+
+    action = new QAction( "Sound Events...", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actSounds() ));
     menu.addAction( action);
 
     menu.addSeparator();
@@ -487,8 +492,14 @@ void Dialog::keyPressEvent( QKeyEvent * event)
 
 void Dialog::actColors()
 {
-   new WndCustomizeGUI();
-   Watch::displayInfo("Opening 'GUI' Window");
+    new WndCustomizeGUI();
+    Watch::displayInfo("Opening 'GUI' Window");
+}
+
+void Dialog::actSounds()
+{
+    new WndCustomizeSounds();
+    Watch::displayInfo("Opening 'Sounds' Window");
 }
 
 void Dialog::actSavePreferencesOnExit()   { afqt::QEnvironment::savePrefsOnExit.n    = 1 - afqt::QEnvironment::savePrefsOnExit.n;     }

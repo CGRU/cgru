@@ -55,17 +55,18 @@ signals:
    void stop();
 
 private slots:
-   void newMessage( af::Msg * msg);
-   void connectionLost();
-   void repaintWatch();
+    void newMessage( af::Msg * msg);
+    void connectionLost();
+    void repaintWatch();
 
-   void actColors();
-   void actSavePreferencesOnExit();
-   void actSaveGUIOnExit();
-   void actSaveWndRectsOnExit();
-   void actSavePreferences();
-   void actShowOfflineNoise();
-   void actGuiTheme( QString theme);
+    void actColors();
+    void actSounds();
+    void actSavePreferencesOnExit();
+    void actSaveGUIOnExit();
+    void actSaveWndRectsOnExit();
+    void actSavePreferences();
+    void actShowOfflineNoise();
+    void actGuiTheme( QString theme);
 
 public:
    void keyPressEvent(    QKeyEvent         * event);

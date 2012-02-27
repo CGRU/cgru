@@ -4,8 +4,6 @@
 
 #include "wnd.h"
 
-class ColorWidget;
-
 class WndCustomizeGUI : public Wnd
 {
 Q_OBJECT

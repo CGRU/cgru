@@ -18,18 +18,22 @@
 
 using namespace afqt;
 
-Attr       QEnvironment::theme(               "theme",                "Theme",                   AFGUI::THEME                  );
+Attr       QEnvironment::theme(              "theme",                "Theme",                   AFGUI::THEME                   );
 
-AttrNumber QEnvironment::savePrefsOnExit(     "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT        );
-AttrNumber QEnvironment::saveWndRectsOnExit(  "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS           );
-AttrNumber QEnvironment::saveGUIOnExit(       "saveguionexit",        "Save Gui Settings",       AFGUI::SAVEGUI                );
-AttrNumber QEnvironment::showOfflineNoise(    "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE       );
+Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Sound Job Added",         ""                             );
+Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Sound Job Done",          ""                             );
+Attr       QEnvironment::soundJobError(      "sound_job_error",      "Sound Job Error",         ""                             );
 
-Attr       QEnvironment::font_family(         "font_family",          "Font Family",             AFGUI::FONT_FAMILY            );
-AttrNumber QEnvironment::font_sizename(       "font_sizename",        "Size Name",               AFGUI::FONT_SIZENAME          );
-AttrNumber QEnvironment::font_sizeinfo(       "font_sizeinfo",        "Size Info",               AFGUI::FONT_SIZEINFO          );
-AttrNumber QEnvironment::font_sizemin(        "font_sizemin",         "Size Minimum",            AFGUI::FONT_SIZEMIN           );
-AttrNumber QEnvironment::font_sizeplotter(    "font_sizeplotter",     "Size Plotter",            AFGUI::FONT_SIZEPLOTTER       );
+AttrNumber QEnvironment::savePrefsOnExit(    "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT         );
+AttrNumber QEnvironment::saveWndRectsOnExit( "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS            );
+AttrNumber QEnvironment::saveGUIOnExit(      "saveguionexit",        "Save Gui Settings",       AFGUI::SAVEGUI                 );
+AttrNumber QEnvironment::showOfflineNoise(   "showofflinenoise",     "Show Offline Noise",      AFGUI::SHOWOFFLINENOISE        );
+
+Attr       QEnvironment::font_family(        "font_family",          "Font Family",             AFGUI::FONT_FAMILY             );
+AttrNumber QEnvironment::font_sizename(      "font_sizename",        "Size Name",               AFGUI::FONT_SIZENAME           );
+AttrNumber QEnvironment::font_sizeinfo(      "font_sizeinfo",        "Size Info",               AFGUI::FONT_SIZEINFO           );
+AttrNumber QEnvironment::font_sizemin(       "font_sizemin",         "Size Minimum",            AFGUI::FONT_SIZEMIN            );
+AttrNumber QEnvironment::font_sizeplotter(   "font_sizeplotter",     "Size Plotter",            AFGUI::FONT_SIZEPLOTTER        );
 
 AttrColor QEnvironment::clr_Window(          "clr_Window",           "Window",                  AFGUI::CLR_WINDOW              );
 AttrColor QEnvironment::clr_WindowText(      "clr_WindowText",       "Window Text",             AFGUI::CLR_WINDOWTEXT          );
@@ -107,6 +111,10 @@ QEnvironment::QEnvironment( const QString & i_name)
    ms_attrs_prefs.append( &saveWndRectsOnExit);
    ms_attrs_prefs.append( &saveGUIOnExit     );
    ms_attrs_prefs.append( &showOfflineNoise  );
+
+   ms_attrs_prefs.append( &soundJobAdded       );
+   ms_attrs_prefs.append( &soundJobDone        );
+   ms_attrs_prefs.append( &soundJobError       );
 
    ms_attrs_gui.append( &font_family         );
    ms_attrs_gui.append( &font_sizename       );
