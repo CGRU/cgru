@@ -440,7 +440,8 @@ elif (ext == 'mb') or (ext == 'ma'):
          cmd += ' -of "%s"' % os.path.basename( of)
       images = output
    cmd += ' -proj "%s"' % pwd
-   cmd += ' "-mr:art"'
+   if scenetype == 'maya_mental':
+      cmd += ' "-mr:art"'
    if extrargs != '': cmd += ' ' + extrargs
    cmd += ' "%s"' % scene
 
