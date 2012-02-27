@@ -20,9 +20,9 @@ using namespace afqt;
 
 Attr       QEnvironment::theme(              "theme",                "Theme",                   AFGUI::THEME                   );
 
-Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Sound Job Added",         ""                             );
-Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Sound Job Done",          ""                             );
-Attr       QEnvironment::soundJobError(      "sound_job_error",      "Sound Job Error",         ""                             );
+Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Job Added",               ""                             );
+Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Job Done",                ""                             );
+Attr       QEnvironment::soundJobError(      "sound_job_error",      "Job Error",               ""                             );
 
 AttrNumber QEnvironment::savePrefsOnExit(    "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT         );
 AttrNumber QEnvironment::saveWndRectsOnExit( "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS            );
