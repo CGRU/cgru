@@ -50,7 +50,8 @@ void ButtonMonitor::createImage()
 {
    // Calculate button images filename:
    static const QString img_extension = ".png";
-   QString img_filename = afqt::stoq( af::Environment::getAfRoot()) + "/icons/watch/buttons/";
+   QString img_filename = afqt::stoq( af::Environment::getAfRoot())
+           + "/icons/watch/" + afqt::QEnvironment::theme.str + "/buttons/";
    switch( type)
    {
       case Watch::WJobs:
@@ -263,8 +264,8 @@ void ButtonMonitor::paintEvent( QPaintEvent * event )
    else
    {
       QString text = Watch::BtnName[type];
-      if( pressed ) text = QString("*%1*").arg(text);
-      if( type == CurrentType) text = QString("[%1]").arg(text);
+      if( pressed ) text = QString("[%1]").arg(text);
+      else if( type == CurrentType) text = QString("[*%1*]").arg(text);
       else if( hovered ) text = QString("=%1=").arg(text);
       painter.drawText( 0, 0, width-1, height-1, Qt::AlignHCenter | Qt::AlignVCenter, text);
       painter.drawRect( 0, 0, width-1, height-1);

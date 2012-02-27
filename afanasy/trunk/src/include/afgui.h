@@ -2,12 +2,14 @@
 
 namespace AFGUI
 {
-   const int SAVEPREFSONEXIT = 1;
-   const int SAVEWNDRECTS = 1;
-   const int SAVEGUI = 0;
-   const int SHOWOFFLINENOISE = 1;
+    const char THEME[] = "Civil";
 
-   const char FONT_FAMILY[] = "SansSerif";
+    const int SAVEPREFSONEXIT = 1;
+    const int SAVEWNDRECTS = 1;
+    const int SAVEGUI = 0;
+    const int SHOWOFFLINENOISE = 1;
+
+    const char FONT_FAMILY[] = "SansSerif";
 
 #ifdef MACOSX
 

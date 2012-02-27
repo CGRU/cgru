@@ -16,23 +16,25 @@ class QDomElement;
 class afqt::QEnvironment
 {
 public:
-   QEnvironment( const QString & Name = QString());
+   QEnvironment( const QString & i_name);
    ~QEnvironment();
 
-   static inline bool isValid() { return valid;}
+   static inline bool isValid() { return ms_valid;}
 
    static void initFonts();
 
    static void setPalette( QPalette & palette);
 
-   static const QString getFileName() { return QString::fromUtf8( filename.c_str()); }
+   static const QString & getFileName() { return ms_filename; }
 
    static bool save();
    static void saveWndRects( QByteArray & data);
    static void saveGUI( QByteArray & data);
 
-   static bool getRect( const QString & name, QRect & rect);
-   static void setRect( const QString & name, const QRect & rect);
+   static bool getRect( const QString & i_name, QRect & rect);
+   static void setRect( const QString & i_name, const QRect & rect);
+
+   static Attr theme;
 
    static AttrNumber savePrefsOnExit;
    static AttrNumber saveWndRectsOnExit;
@@ -97,29 +99,37 @@ public:
    static QFont f_plotter;
    static QFont f_min;
 
-   const QString & getServerName()  const { return servername; }
-   const QString & getUserName()    const { return username;   }
-   const QString & getHostName()    const { return hostname;   }
+    inline static const QString & getServerName() { return ms_servername; }
+    inline static const QString & getUserName()   { return ms_username;   }
+    inline static const QString & getHostName()   { return ms_hostname;   }
 
-/// Get Afanasy server QHostAddress.
-   static inline const QHostAddress & getAfServerQHostAddress()  { return qafserveraddress;}
+    /// Get Afanasy server QHostAddress.
+    inline static const QHostAddress & getAfServerQHostAddress()  { return ms_qafserveraddress;}
+
+    static const QStringList getThemes();
+
+    static bool loadTheme( const QString & i_theme);
+
+    static bool loadAttrs( const QString & i_filename );
 
 private:
    static void solveServerAddress();
 
-   static bool openXMLDomDocument(  QDomDocument & doc, const std::string & filename);
+   static bool openXMLDomDocument(  QDomDocument & doc, const QString & i_filename);
 
 private:
-   static bool valid;
-   static QString name;
+    static bool ms_valid;
+    static QString ms_appname;
 
-   static QHostAddress qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
-   static QString servername;
-   static QString username;
-   static QString hostname;
+    static QString ms_themes_folder;
 
-   static std::string filename;
-   static QList<Attr*> attrs_prefs;
-   static QList<AttrRect*> attrs_wndrects;
-   static QList<Attr*> attrs_gui;
+    static QHostAddress ms_qafserveraddress;    ///< QHostAddress class. Point to Afanasy server address.
+    static QString ms_servername;
+    static QString ms_username;
+    static QString ms_hostname;
+
+    static QString ms_filename;
+    static QList<Attr*> ms_attrs_prefs;
+    static QList<AttrRect*> ms_attrs_wndrects;
+    static QList<Attr*> ms_attrs_gui;
 };

@@ -1,6 +1,7 @@
 #include "qenvironment.h"
 
 #include <QtCore/QFile>
+#include <QtCore/QDir>
 #include <QtNetwork/QHostInfo>
 #include <QtXml/QDomDocument>
 
@@ -16,6 +17,8 @@
 #include "../include/macrooutput.h"
 
 using namespace afqt;
+
+Attr       QEnvironment::theme(               "theme",                "Theme",                   AFGUI::THEME                  );
 
 AttrNumber QEnvironment::savePrefsOnExit(     "saveprefsonexit",      "Save On Exit",            AFGUI::SAVEPREFSONEXIT        );
 AttrNumber QEnvironment::saveWndRectsOnExit(  "savewndrectonexit",    "Save Windows Geometry",   AFGUI::SAVEWNDRECTS           );
@@ -76,122 +79,127 @@ QColor QEnvironment::qclr_black(   0,   0,   0);
 QColor QEnvironment::qclr_white( 255, 255, 255);
 
 
-std::string QEnvironment::filename = "";
+QString QEnvironment::ms_filename;
+QString QEnvironment::ms_themes_folder;
 
 QFont QEnvironment::f_name;
 QFont QEnvironment::f_info;
 QFont QEnvironment::f_plotter;
 QFont QEnvironment::f_min;
-QList<Attr*>     QEnvironment::attrs_prefs;
-QList<AttrRect*> QEnvironment::attrs_wndrects;
-QList<Attr*>     QEnvironment::attrs_gui;
+QList<Attr*>     QEnvironment::ms_attrs_prefs;
+QList<AttrRect*> QEnvironment::ms_attrs_wndrects;
+QList<Attr*>     QEnvironment::ms_attrs_gui;
 
-bool QEnvironment::valid = false;
+bool QEnvironment::ms_valid = false;
 
-QHostAddress QEnvironment::qafserveraddress;
-QString QEnvironment::name;
-QString QEnvironment::servername;
-QString QEnvironment::username;
-QString QEnvironment::hostname;
+QHostAddress QEnvironment::ms_qafserveraddress;
+QString QEnvironment::ms_appname;
+QString QEnvironment::ms_servername;
+QString QEnvironment::ms_username;
+QString QEnvironment::ms_hostname;
 
-QEnvironment::QEnvironment( const QString & Name)
+QEnvironment::QEnvironment( const QString & i_name)
 {
-   name = Name;
+   ms_appname = i_name;
 
-   attrs_prefs.append( &savePrefsOnExit   );
-   attrs_prefs.append( &saveWndRectsOnExit);
-   attrs_prefs.append( &saveGUIOnExit     );
-   attrs_prefs.append( &showOfflineNoise  );
+   ms_attrs_prefs.append( &theme             );
+   ms_attrs_prefs.append( &savePrefsOnExit   );
+   ms_attrs_prefs.append( &saveWndRectsOnExit);
+   ms_attrs_prefs.append( &saveGUIOnExit     );
+   ms_attrs_prefs.append( &showOfflineNoise  );
 
-   attrs_gui.append( &font_family         );
-   attrs_gui.append( &font_sizename       );
-   attrs_gui.append( &font_sizeinfo       );
-   attrs_gui.append( &font_sizemin        );
-   attrs_gui.append( &font_sizeplotter    );
+   ms_attrs_gui.append( &font_family         );
+   ms_attrs_gui.append( &font_sizename       );
+   ms_attrs_gui.append( &font_sizeinfo       );
+   ms_attrs_gui.append( &font_sizemin        );
+   ms_attrs_gui.append( &font_sizeplotter    );
 
-   attrs_gui.append( &clr_Window          );
-   attrs_gui.append( &clr_WindowText      );
-   attrs_gui.append( &clr_Base            );
+   ms_attrs_gui.append( &clr_Window          );
+   ms_attrs_gui.append( &clr_WindowText      );
+   ms_attrs_gui.append( &clr_Base            );
 //   attrs_gui.append( &clr_AlternateBase   );
-   attrs_gui.append( &clr_Text            );
-   attrs_gui.append( &clr_Button          );
+   ms_attrs_gui.append( &clr_Text            );
+   ms_attrs_gui.append( &clr_Button          );
 
-   attrs_gui.append( &clr_Light           );
-   attrs_gui.append( &clr_Midlight        );
-   attrs_gui.append( &clr_Mid             );
-   attrs_gui.append( &clr_Dark            );
-   attrs_gui.append( &clr_Shadow          );
+   ms_attrs_gui.append( &clr_Light           );
+   ms_attrs_gui.append( &clr_Midlight        );
+   ms_attrs_gui.append( &clr_Mid             );
+   ms_attrs_gui.append( &clr_Dark            );
+   ms_attrs_gui.append( &clr_Shadow          );
 
-   attrs_gui.append( &clr_Highlight       );
-   attrs_gui.append( &clr_HighlightedText );
-   attrs_gui.append( &clr_Link            );
-   attrs_gui.append( &clr_LinkVisited     );
+   ms_attrs_gui.append( &clr_Highlight       );
+   ms_attrs_gui.append( &clr_HighlightedText );
+   ms_attrs_gui.append( &clr_Link            );
+   ms_attrs_gui.append( &clr_LinkVisited     );
 
-   attrs_gui.append( &clr_item            );
-   attrs_gui.append( &clr_selected        );
-   attrs_gui.append( &clr_itemjob         );
-   attrs_gui.append( &clr_itemjoboff      );
-   attrs_gui.append( &clr_itemjobwtime    );
-   attrs_gui.append( &clr_itemjobwdep     );
-   attrs_gui.append( &clr_itemjobdone     );
-   attrs_gui.append( &clr_itemjoberror    );
-   attrs_gui.append( &clr_itemrender      );
-   attrs_gui.append( &clr_itemrenderoff   );
-   attrs_gui.append( &clr_itemrenderbusy  );
-   attrs_gui.append( &clr_itemrendernimby );
-   attrs_gui.append( &clr_itemrenderpltclr);
-   attrs_gui.append( &clr_running         );
-   attrs_gui.append( &clr_done            );
-   attrs_gui.append( &clr_error           );
-   attrs_gui.append( &clr_star            );
-   attrs_gui.append( &clr_outline         );
-   attrs_gui.append( &clr_starline        );
+   ms_attrs_gui.append( &clr_item            );
+   ms_attrs_gui.append( &clr_selected        );
+   ms_attrs_gui.append( &clr_itemjob         );
+   ms_attrs_gui.append( &clr_itemjoboff      );
+   ms_attrs_gui.append( &clr_itemjobwtime    );
+   ms_attrs_gui.append( &clr_itemjobwdep     );
+   ms_attrs_gui.append( &clr_itemjobdone     );
+   ms_attrs_gui.append( &clr_itemjoberror    );
+   ms_attrs_gui.append( &clr_itemrender      );
+   ms_attrs_gui.append( &clr_itemrenderoff   );
+   ms_attrs_gui.append( &clr_itemrenderbusy  );
+   ms_attrs_gui.append( &clr_itemrendernimby );
+   ms_attrs_gui.append( &clr_itemrenderpltclr);
+   ms_attrs_gui.append( &clr_running         );
+   ms_attrs_gui.append( &clr_done            );
+   ms_attrs_gui.append( &clr_error           );
+   ms_attrs_gui.append( &clr_star            );
+   ms_attrs_gui.append( &clr_outline         );
+   ms_attrs_gui.append( &clr_starline        );
 
-   attrs_gui.append( &clr_textbright      );
-   attrs_gui.append( &clr_textmuted       );
-   attrs_gui.append( &clr_textdone        );
-   attrs_gui.append( &clr_textstars       );
+   ms_attrs_gui.append( &clr_textbright      );
+   ms_attrs_gui.append( &clr_textmuted       );
+   ms_attrs_gui.append( &clr_textdone        );
+   ms_attrs_gui.append( &clr_textstars       );
 
-   if( false == name.isEmpty())
-   {
-      QDomDocument doc( name);
-      filename = af::Environment::getHomeAfanasy() + AFGENERAL::PATH_SEPARATOR + name.toUtf8().data() + ".xml";
-      if( openXMLDomDocument( doc, filename))
-      {
-         for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->read( doc);
-         for( int i = 0; i < attrs_gui.size(); i++) attrs_gui[i]->read( doc);
-      }
+    ms_filename = stoq( af::Environment::getHomeAfanasy())
+           + AFGENERAL::PATH_SEPARATOR + ms_appname.toUtf8().data() + ".xml";
+    ms_themes_folder = stoq( af::Environment::getAfRoot().c_str())
+           + AFGENERAL::PATH_SEPARATOR + "icons" + AFGENERAL::PATH_SEPARATOR + "watch";
 
-      QDomNodeList wndRectNodes = doc.elementsByTagName( AttrRect::WndTagName);
-      for( int i = 0; i < wndRectNodes.size(); i++)
-      {
-         AttrRect * attrrect = AttrRect::readNode( wndRectNodes.at(i));
-         if( attrrect == NULL) continue;
-         attrs_wndrects.append( attrrect);
-      }
-   }
+    ms_servername  = QString::fromUtf8( af::Environment::getServerName().c_str());
+    ms_username    = QString::fromUtf8( af::Environment::getUserName().c_str());
+    ms_hostname    = QString::fromUtf8( af::Environment::getHostName().c_str());
 
-   servername  = QString::fromUtf8( af::Environment::getServerName().c_str());
-   username    = QString::fromUtf8( af::Environment::getUserName().c_str());
-   hostname    = QString::fromUtf8( af::Environment::getHostName().c_str());
+    ms_valid = true;
 
-   valid = true;
+    loadAttrs( ms_filename);
+    loadTheme( theme.str);
+    loadAttrs( ms_filename);
 
-   initFonts();
-   solveServerAddress();
+    QDomDocument doc( ms_appname);
+    if( openXMLDomDocument( doc, ms_filename))
+    {
+        QDomNodeList wndRectNodes = doc.elementsByTagName( AttrRect::WndTagName);
+        for( int i = 0; i < wndRectNodes.size(); i++)
+        {
+            AttrRect * attrrect = AttrRect::readNode( wndRectNodes.at(i));
+            if( attrrect == NULL) continue;
+            ms_attrs_wndrects.append( attrrect);
+        }
+    }
 
-   printf("Qt version = \"%s\"\n", qVersion());
+    initFonts();
+
+    solveServerAddress();
+
+    printf("Qt version = \"%s\"\n", qVersion());
 }
 
-bool QEnvironment::openXMLDomDocument( QDomDocument & doc, const std::string & filename)
+bool QEnvironment::openXMLDomDocument( QDomDocument & o_doc, const QString & i_filename)
 {
-   QFile file( filename.c_str());
+   QFile file( i_filename);
    if( file.open(QIODevice::ReadOnly) == false) return false;
 
    QString errorMsg; int errorLine = 0; int errorColumn = 0;
-   if( doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
+   if( o_doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
    {
-      AFERRAR("Parse error '%s' [Line %d - Col %d]:", filename.c_str(), errorLine, errorColumn)
+      AFERRAR("Parse error '%s' [Line %d - Col %d]:", i_filename.toUtf8().data(), errorLine, errorColumn)
       printf("%s\n", errorMsg.toUtf8().data());
       file.close();
       return false;
@@ -219,7 +227,7 @@ void QEnvironment::initFonts()
 QEnvironment::~QEnvironment()
 {
    if( savePrefsOnExit.n != 0) save();
-   for( int i = 0; i < attrs_wndrects.size(); i++) delete attrs_wndrects[i];
+   for( int i = 0; i < ms_attrs_wndrects.size(); i++) delete ms_attrs_wndrects[i];
 }
 
 void QEnvironment::setPalette( QPalette & palette)
@@ -248,22 +256,20 @@ void QEnvironment::setPalette( QPalette & palette)
 
 bool QEnvironment::save()
 {
-   if( filename.empty() ) return true;
-
    QByteArray data;
 
-   data.append(QByteArray("<!-- Created by ") + name.toUtf8() + " -->\n");
+   data.append(QByteArray("<!-- Created by ") + ms_appname.toUtf8() + " -->\n");
    data.append("<watch>\n");
-   for( int i = 0; i < attrs_prefs.size(); i++) attrs_prefs[i]->write( data);
+   for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->write( data);
    if( saveGUIOnExit.n != 0) saveGUI( data);
    if( saveWndRectsOnExit.n != 0) saveWndRects( data);
 
    data.append("</watch>\n");
 
-   QFile file( afqt::stoq( filename));
+   QFile file( ms_filename);
    if( file.open( QIODevice::WriteOnly) == false)
    {
-      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'", filename.c_str())
+      AFERRAR("afqt::QEnvironment::save: Can't write to '%s'", ms_filename.toUtf8().data())
       return false;
    }
    file.write( data);
@@ -274,36 +280,36 @@ bool QEnvironment::save()
 
 void QEnvironment::saveGUI( QByteArray & data)
 {
-   for( int i = 0; i < attrs_gui.size(); i++) attrs_gui[i]->write( data);
+   for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->write( data);
 }
 
 void QEnvironment::saveWndRects( QByteArray & data)
 {
-   for( int i = 0; i < attrs_wndrects.size(); i++) attrs_wndrects[i]->write( data);
+   for( int i = 0; i < ms_attrs_wndrects.size(); i++) ms_attrs_wndrects[i]->write( data);
 }
 
-bool QEnvironment::getRect( const QString & name, QRect & rect)
+bool QEnvironment::getRect( const QString & i_name, QRect & rect)
 {
-   for( int i = 0; i < attrs_wndrects.size(); i++)
+   for( int i = 0; i < ms_attrs_wndrects.size(); i++)
    {
-      if( attrs_wndrects[i]->getName() == name)
+      if( ms_attrs_wndrects[i]->getName() == i_name)
       {
-         rect = attrs_wndrects[i]->r;
+         rect = ms_attrs_wndrects[i]->r;
          return true;
       }
    }
-   AttrRect * attrrect = new AttrRect( name, rect);
-   attrs_wndrects.append( attrrect);
+   AttrRect * attrrect = new AttrRect( i_name, rect);
+   ms_attrs_wndrects.append( attrrect);
    return false;
 }
 
-void QEnvironment::setRect( const QString & name, const QRect & rect)
+void QEnvironment::setRect( const QString & i_name, const QRect & rect)
 {
-   for( int i = 0; i < attrs_wndrects.size(); i++)
+   for( int i = 0; i < ms_attrs_wndrects.size(); i++)
    {
-      if( attrs_wndrects[i]->getName() == name)
+      if( ms_attrs_wndrects[i]->getName() == i_name)
       {
-         attrs_wndrects[i]->r = rect;
+         ms_attrs_wndrects[i]->r = rect;
          return;
       }
    }
@@ -317,17 +323,17 @@ void QEnvironment::solveServerAddress()
    if( af::netIsIpAddr( af::Environment::getServerName()))
    {
       printf("Server address IP direct literals specified.\n");
-      adresses << QHostAddress ( servername);
+      adresses << QHostAddress ( ms_servername);
    }
    else
    {
       printf("Looking up server name \"%s\"...\n", af::Environment::getServerName().c_str());
-      QHostInfo qhostinfo = QHostInfo::fromName( servername);
+      QHostInfo qhostinfo = QHostInfo::fromName( ms_servername);
       adresses = qhostinfo.addresses();
       if( adresses.size() < 1 )
       {
          AFERRAR("Can't solve server name.", serveraddrnum_arg.c_str())
-         valid = false;
+         ms_valid = false;
          return;
       }
    }
@@ -356,7 +362,7 @@ void QEnvironment::solveServerAddress()
       else
       {
          AFERRAR("No argument provided to: '%s'", serveraddrnum_arg.c_str())
-         valid = false;
+         ms_valid = false;
       }
    }
 
@@ -367,6 +373,53 @@ void QEnvironment::solveServerAddress()
          printf( "Using the first, or provide argument: %s number\n", serveraddrnum_arg.c_str());
    }
 
-   qafserveraddress = QHostAddress( adresses[serveraddrnum]);
-   printf( "Server address = '%s:%u'\n", qafserveraddress.toString().toUtf8().data(), af::Environment::getServerPort());
+   ms_qafserveraddress = QHostAddress( adresses[serveraddrnum]);
+   printf( "Server address = '%s:%u'\n", ms_qafserveraddress.toString().toUtf8().data(), af::Environment::getServerPort());
+}
+
+const QStringList QEnvironment::getThemes()
+{
+    QStringList list;
+
+    QDir qdir( ms_themes_folder);
+    if( false == qdir.exists())
+        return list;
+
+    QStringList entryList = qdir.entryList( QDir::AllDirs, QDir::Name);
+    for( int i = 0; i < entryList.size(); i++)
+        if( entryList[i][0] != '.' )
+            list.append( entryList[i]);
+
+    return list;
+}
+
+bool QEnvironment::loadTheme( const QString & i_theme)
+{
+    QString filename = ms_themes_folder + AFGENERAL::PATH_SEPARATOR + i_theme + AFGENERAL::PATH_SEPARATOR + "watch.xml";
+    if( loadAttrs( filename))
+    {
+        theme.str = i_theme;
+        return true;
+    }
+    AFERRAR("QEnvironment::loadTheme: Failed to load theme '%s' from:\n%s",
+            i_theme.toUtf8().data(), filename.toUtf8().data())
+    return false;
+}
+
+bool QEnvironment::loadAttrs( const QString & i_filename )
+{
+    QDomDocument doc( ms_appname);
+    if( openXMLDomDocument( doc, i_filename))
+    {
+        for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->read( doc);
+        for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->read( doc);
+    }
+    else
+    {
+        return false;
+    }
+
+    initFonts();
+
+    return true;
 }

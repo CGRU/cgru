@@ -14,6 +14,7 @@
 #include "../libafqt/name_afqt.h"
 #include "../libafqt/qenvironment.h"
 
+#include "actionid.h"
 #include "buttonmonitor.h"
 #include "buttonout.h"
 #include "labelversion.h"
@@ -145,16 +146,29 @@ printf(" <<< Dialog::sendMsg: ");msg->stdOut();
 
 void Dialog::contextMenuEvent(QContextMenuEvent *event)
 {
-   QMenu menu(this);
-   QAction *action;
+    QMenu menu(this);
+    QAction *action;
+    QMenu * submenu;
 
-   action = new QAction( "Customize GUI...", this);
-   connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
-   menu.addAction( action);
+    submenu = new QMenu( "Choose Theme", this);
+    QStringList themes = afqt::QEnvironment::getThemes();
+    for( int i = 0; i < themes.size(); i++)
+    {
+        ActionString * action_str = new ActionString( themes[i], themes[i], this);
+        action_str->setCheckable( true);
+        action_str->setChecked( afqt::QEnvironment::theme.str == themes[i]);
+        connect( action_str, SIGNAL( triggeredString(QString)), this, SLOT( actGuiTheme(QString)));
+        submenu->addAction( action_str);
+    }
+    menu.addMenu( submenu);
 
-   menu.addSeparator();
+    action = new QAction( "Customize GUI...", this);
+    connect( action, SIGNAL( triggered() ), this, SLOT( actColors() ));
+    menu.addAction( action);
 
-   QMenu * submenu = new QMenu( "Preferences", this);
+    menu.addSeparator();
+
+    submenu = new QMenu( "Preferences", this);
 
    action = new QAction( "Save Prefs on Exit", this);
    action->setCheckable( true);
@@ -488,4 +502,16 @@ void Dialog::actSavePreferences()
       Watch::displayInfo(QString("Saved '%1'").arg( afqt::QEnvironment::getFileName()));
    else
       Watch::displayError(QString("Failed to save to'%1'").arg( afqt::QEnvironment::getFileName()));
+}
+
+void Dialog::actGuiTheme( QString theme)
+{
+    if( afqt::QEnvironment::loadTheme( theme))
+    {
+        ButtonMonitor::refreshImages();
+        repaintWatch();
+        Watch::displayInfo(QString("Theme '%1' loaded").arg( theme));
+    }
+    else
+        Watch::displayError(QString("Failed to load '%1' theme").arg( theme));
 }

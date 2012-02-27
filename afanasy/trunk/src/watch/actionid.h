@@ -20,7 +20,6 @@ private:
    int id;
 };
 
-
 class ActionIdId : public QAction
 {
 
@@ -38,4 +37,22 @@ private slots:
 private:
    int id_1;
    int id_2;
+};
+
+class ActionString : public QAction
+{
+
+Q_OBJECT
+
+public:
+   ActionString( const QString & i_string, const QString & i_text, QObject * i_parent );
+
+signals:
+   void triggeredString( QString );
+
+private slots:
+   void triggeredString_Slot();
+
+private:
+   QString m_string;
 };

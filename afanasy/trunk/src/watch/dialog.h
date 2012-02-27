@@ -65,6 +65,7 @@ private slots:
    void actSaveWndRectsOnExit();
    void actSavePreferences();
    void actShowOfflineNoise();
+   void actGuiTheme( QString theme);
 
 public:
    void keyPressEvent(    QKeyEvent         * event);
