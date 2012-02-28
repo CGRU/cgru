@@ -86,9 +86,9 @@ else
 
     if( false == m_back_pixmap.isNull() )
     {
-        m_back_angle = int( 20.0f * random() / RAND_MAX );
-        m_back_offset_x = int( 20.0f * random() / RAND_MAX );
-        m_back_offset_y = int( 20.0f * random() / RAND_MAX );
+        m_back_angle = int( 20.0f * rand() / RAND_MAX );
+        m_back_offset_x = int( 20.0f * rand() / RAND_MAX );
+        m_back_offset_y = int( 20.0f * rand() / RAND_MAX );
         m_back_pixmap = m_back_pixmap.transformed(
             QTransform().rotate( m_back_angle ), Qt::SmoothTransformation);
     }
