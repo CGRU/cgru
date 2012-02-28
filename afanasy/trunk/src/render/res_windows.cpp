@@ -1,6 +1,7 @@
 #ifdef WINNT
 #include "res.h"
 
+//#include <Windows.h>
 #include <Winbase.h>
 #include <Iphlpapi.h>
 
@@ -12,6 +13,16 @@
 
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
+/*
+void WINAPI GetSystemTimeAsFileTime(
+  __out  LPFILETIME lpSystemTimeAsFileTime
+);
+typedef struct _FILETIME {
+  DWORD dwLowDateTime;
+  DWORD dwHighDateTime;
+} FILETIME, *PFILETIME;
+*/
+FILETIME fltime = { 0, 0 };
 
 struct cpu
 {
@@ -44,6 +55,7 @@ int now = 0;
 
 void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
 {
+::GetSystemTimeAsFileTime( &fltime);
 #ifdef AFOUTPUT
 printf("\nGetResources:\n");
 #endif //AFOUTPUT
