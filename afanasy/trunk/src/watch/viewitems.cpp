@@ -2,6 +2,11 @@
 
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
+#include <QtGui/QPainter>
+
+#include "../libafanasy/environment.h"
+
+#include "../libafqt/qenvironment.h"
 
 #include "item.h"
 #include "watch.h"
@@ -33,48 +38,115 @@ void ItemDelegate::emitSizeHintChanged( const QModelIndex &index)
 }
 
 ViewItems::ViewItems( QWidget * parent):
-   QListView( parent),
-   listitems( NULL)
+    QListView( parent),
+    listitems( NULL)
 {
-   setSpacing( 3);
-   setUniformItemSizes( false);
+    setSpacing( 3);
+    setUniformItemSizes( false);
 
-#if QT_VERSION >= 0x040300
-   setSelectionRectVisible( true);
+    #if QT_VERSION >= 0x040300
+    setSelectionRectVisible( true);
+    #endif
+    setSelectionMode( QAbstractItemView::ExtendedSelection);
+
+    viewport()->setBackgroundRole( QPalette::Mid);
+    viewport()->setAutoFillBackground( true);
+
+    loadImage();
+
+    itemDelegate = new ItemDelegate;
+    setItemDelegate( itemDelegate);
+}
+
+void ViewItems::loadImage()
+{
+#if QT_VERSION >= 0x040704
+if( afqt::QEnvironment::back_image.str.isEmpty())
+{
+    if( false == m_back_pixmap.isNull() )
+    {
+        m_back_pixmap = QPixmap();
+        printf("Clearing PIXMAP\n");
+    }
+}
+else
+{
+    m_back_pixmap.load( afqt::QEnvironment::back_image.str);
+
+    if( m_back_pixmap.isNull() )
+        m_back_pixmap.load( afqt::stoq(af::Environment::getAfRoot())
+                            + "/icons/watch/"
+                            + afqt::QEnvironment::theme.str + "/"
+                            + afqt::QEnvironment::back_image.str);
+
+    if( false == m_back_pixmap.isNull() )
+    {
+        m_back_pixmap = m_back_pixmap.transformed(
+            QTransform().rotate( 20.0f * random() / RAND_MAX ), Qt::SmoothTransformation);
+        m_back_offset_x = 20.0f * random() / RAND_MAX;
+        m_back_offset_y = 20.0f * random() / RAND_MAX;
+    }
+}
 #endif
-   setSelectionMode( QAbstractItemView::ExtendedSelection);
-
-   viewport()->setBackgroundRole( QPalette::Mid);
-   viewport()->setAutoFillBackground( true);
-
-   itemDelegate = new ItemDelegate;
-   setItemDelegate( itemDelegate);
 }
 
 ViewItems::~ViewItems()
 {
-   if( itemDelegate ) delete itemDelegate;
+    if( itemDelegate ) delete itemDelegate;
 }
 
 void ViewItems::emitSizeHintChanged( const QModelIndex &index)
 {
-   itemDelegate->emitSizeHintChanged( index);
+    itemDelegate->emitSizeHintChanged( index);
 }
 
 void ViewItems::keyPressEvent( QKeyEvent * event)
 {
-   if(( selectionMode() != QAbstractItemView::NoSelection ) && ( event->key() == Qt::Key_Escape )) clearSelection();
-   QListView::keyPressEvent( event);
+    if(( selectionMode() != QAbstractItemView::NoSelection ) && ( event->key() == Qt::Key_Escape )) clearSelection();
+    QListView::keyPressEvent( event);
 
 #if QT_VERSION >= 0x040600
-   Watch::keyPressEvent( event);
+    Watch::keyPressEvent( event);
 #endif
 }
 
 void ViewItems::mousePressEvent( QMouseEvent * event)
 {
-   if( listitems)
-      if( listitems->mousePressed( event))
-         return;
-   QListView::mousePressEvent( event);
+    if( listitems)
+        if( listitems->mousePressed( event))
+            return;
+    QListView::mousePressEvent( event);
 }
+
+void ViewItems::repaintViewport()
+{
+    loadImage();
+    viewport()->repaint();
+}
+
+#if QT_VERSION >= 0x040704
+void ViewItems::paintEvent( QPaintEvent * event )
+{
+//    printf("ViewItems::paintEvent:\n");
+    if( m_back_pixmap.isNull() )
+    {
+        QListView::paintEvent( event );
+        return;
+    }
+
+    QPainter p( viewport());
+
+    QRect r = viewport()->rect();
+    int x = r.width();
+    int y = r.height();
+    int w = m_back_pixmap.width();
+    int h = m_back_pixmap.height();
+
+    x -= w + m_back_offset_x;
+    y -= h + m_back_offset_y;
+
+    p.drawPixmap( x, y, w, h, m_back_pixmap);
+
+    QListView::paintEvent( event );
+}
+#endif

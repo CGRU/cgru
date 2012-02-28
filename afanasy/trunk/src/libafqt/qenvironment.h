@@ -36,6 +36,8 @@ public:
 
    static Attr theme;
 
+   static Attr back_image;
+
    static Attr soundJobAdded;
    static Attr soundJobDone;
    static Attr soundJobError;

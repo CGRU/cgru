@@ -113,9 +113,9 @@ void ListItems::connectionLost()
 void ListItems::connectionEstablished() { if( isVisible()) shownFunc(); }
 void ListItems::deleteAllItems() { model->deleteAllItems();}
 void ListItems::doubleClicked( Item * item) {}
-void ListItems::repaintItems() { view->viewport()->repaint();}
 void ListItems::revertModel()  { model->revert();}
 void ListItems::itemsHeightCahnged() { model->itemsHeightCahnged();}
+void ListItems::repaintItems() { view->repaintViewport();}
 
 void ListItems::deleteItems( af::MCGeneral & ids)
 {

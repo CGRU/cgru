@@ -9,6 +9,7 @@
 #include "../libafqt/qenvironment.h"
 
 #include "colorwidget.h"
+#include "filewidget.h"
 #include "fontwidget.h"
 #include "numberwidget.h"
 #include "watch.h"
@@ -25,7 +26,8 @@ WndCustomizeGUI::WndCustomizeGUI():
    QLabel * label;
    ColorWidget * cw;
    NumberWidget * nw;
-   FontWidget * fw;
+   FontWidget * ftw;
+   FileWidget * flw;
 
    hlayout = new QHBoxLayout( this);
 //   hlayout->setContentsMargins( 1, 1, 1, 1);
@@ -37,6 +39,8 @@ WndCustomizeGUI::WndCustomizeGUI():
 #endif
    vlayout->setSpacing( 2);
    hlayout->addLayout( vlayout);
+
+   flw = new FileWidget( this, &afqt::QEnvironment::back_image            ); vlayout->addWidget( flw);
 
    label = new QLabel("QT standart GUI pallete:", this);
    label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
@@ -89,7 +93,7 @@ WndCustomizeGUI::WndCustomizeGUI():
    label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
    vlayout->addWidget( label);
 
-   fw = new FontWidget( this, &afqt::QEnvironment::font_family); vlayout->addWidget( fw);
+   ftw = new FontWidget( this, &afqt::QEnvironment::font_family); vlayout->addWidget( ftw);
 
    nw = new NumberWidget( this, &afqt::QEnvironment::font_sizename   ); vlayout->addWidget( nw);
    nw = new NumberWidget( this, &afqt::QEnvironment::font_sizeinfo   ); vlayout->addWidget( nw);

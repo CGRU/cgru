@@ -20,6 +20,8 @@ using namespace afqt;
 
 Attr       QEnvironment::theme(              "theme",                "Theme",                   AFGUI::THEME                   );
 
+Attr       QEnvironment::back_image(         "back_image",           "Background Image",        ""                             );
+
 Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Job Added",               ""                             );
 Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Job Done",                ""                             );
 Attr       QEnvironment::soundJobError(      "sound_job_error",      "Job Error",               ""                             );
@@ -104,66 +106,68 @@ QString QEnvironment::ms_hostname;
 
 QEnvironment::QEnvironment( const QString & i_name)
 {
-   ms_appname = i_name;
+    ms_appname = i_name;
 
-   ms_attrs_prefs.append( &theme             );
-   ms_attrs_prefs.append( &savePrefsOnExit   );
-   ms_attrs_prefs.append( &saveWndRectsOnExit);
-   ms_attrs_prefs.append( &saveGUIOnExit     );
-   ms_attrs_prefs.append( &showOfflineNoise  );
+    ms_attrs_prefs.append( &theme             );
+    ms_attrs_prefs.append( &savePrefsOnExit   );
+    ms_attrs_prefs.append( &saveWndRectsOnExit);
+    ms_attrs_prefs.append( &saveGUIOnExit     );
+    ms_attrs_prefs.append( &showOfflineNoise  );
 
-   ms_attrs_prefs.append( &soundJobAdded       );
-   ms_attrs_prefs.append( &soundJobDone        );
-   ms_attrs_prefs.append( &soundJobError       );
+    ms_attrs_prefs.append( &soundJobAdded     );
+    ms_attrs_prefs.append( &soundJobDone      );
+    ms_attrs_prefs.append( &soundJobError     );
 
-   ms_attrs_gui.append( &font_family         );
-   ms_attrs_gui.append( &font_sizename       );
-   ms_attrs_gui.append( &font_sizeinfo       );
-   ms_attrs_gui.append( &font_sizemin        );
-   ms_attrs_gui.append( &font_sizeplotter    );
+    ms_attrs_gui.append( &back_image          );
 
-   ms_attrs_gui.append( &clr_Window          );
-   ms_attrs_gui.append( &clr_WindowText      );
-   ms_attrs_gui.append( &clr_Base            );
-//   attrs_gui.append( &clr_AlternateBase   );
-   ms_attrs_gui.append( &clr_Text            );
-   ms_attrs_gui.append( &clr_Button          );
+    ms_attrs_gui.append( &font_family         );
+    ms_attrs_gui.append( &font_sizename       );
+    ms_attrs_gui.append( &font_sizeinfo       );
+    ms_attrs_gui.append( &font_sizemin        );
+    ms_attrs_gui.append( &font_sizeplotter    );
 
-   ms_attrs_gui.append( &clr_Light           );
-   ms_attrs_gui.append( &clr_Midlight        );
-   ms_attrs_gui.append( &clr_Mid             );
-   ms_attrs_gui.append( &clr_Dark            );
-   ms_attrs_gui.append( &clr_Shadow          );
+    ms_attrs_gui.append( &clr_Window          );
+    ms_attrs_gui.append( &clr_WindowText      );
+    ms_attrs_gui.append( &clr_Base            );
+    //attrs_gui.append( &clr_AlternateBase   );
+    ms_attrs_gui.append( &clr_Text            );
+    ms_attrs_gui.append( &clr_Button          );
 
-   ms_attrs_gui.append( &clr_Highlight       );
-   ms_attrs_gui.append( &clr_HighlightedText );
-   ms_attrs_gui.append( &clr_Link            );
-   ms_attrs_gui.append( &clr_LinkVisited     );
+    ms_attrs_gui.append( &clr_Light           );
+    ms_attrs_gui.append( &clr_Midlight        );
+    ms_attrs_gui.append( &clr_Mid             );
+    ms_attrs_gui.append( &clr_Dark            );
+    ms_attrs_gui.append( &clr_Shadow          );
 
-   ms_attrs_gui.append( &clr_item            );
-   ms_attrs_gui.append( &clr_selected        );
-   ms_attrs_gui.append( &clr_itemjob         );
-   ms_attrs_gui.append( &clr_itemjoboff      );
-   ms_attrs_gui.append( &clr_itemjobwtime    );
-   ms_attrs_gui.append( &clr_itemjobwdep     );
-   ms_attrs_gui.append( &clr_itemjobdone     );
-   ms_attrs_gui.append( &clr_itemjoberror    );
-   ms_attrs_gui.append( &clr_itemrender      );
-   ms_attrs_gui.append( &clr_itemrenderoff   );
-   ms_attrs_gui.append( &clr_itemrenderbusy  );
-   ms_attrs_gui.append( &clr_itemrendernimby );
-   ms_attrs_gui.append( &clr_itemrenderpltclr);
-   ms_attrs_gui.append( &clr_running         );
-   ms_attrs_gui.append( &clr_done            );
-   ms_attrs_gui.append( &clr_error           );
-   ms_attrs_gui.append( &clr_star            );
-   ms_attrs_gui.append( &clr_outline         );
-   ms_attrs_gui.append( &clr_starline        );
+    ms_attrs_gui.append( &clr_Highlight       );
+    ms_attrs_gui.append( &clr_HighlightedText );
+    ms_attrs_gui.append( &clr_Link            );
+    ms_attrs_gui.append( &clr_LinkVisited     );
 
-   ms_attrs_gui.append( &clr_textbright      );
-   ms_attrs_gui.append( &clr_textmuted       );
-   ms_attrs_gui.append( &clr_textdone        );
-   ms_attrs_gui.append( &clr_textstars       );
+    ms_attrs_gui.append( &clr_item            );
+    ms_attrs_gui.append( &clr_selected        );
+    ms_attrs_gui.append( &clr_itemjob         );
+    ms_attrs_gui.append( &clr_itemjoboff      );
+    ms_attrs_gui.append( &clr_itemjobwtime    );
+    ms_attrs_gui.append( &clr_itemjobwdep     );
+    ms_attrs_gui.append( &clr_itemjobdone     );
+    ms_attrs_gui.append( &clr_itemjoberror    );
+    ms_attrs_gui.append( &clr_itemrender      );
+    ms_attrs_gui.append( &clr_itemrenderoff   );
+    ms_attrs_gui.append( &clr_itemrenderbusy  );
+    ms_attrs_gui.append( &clr_itemrendernimby );
+    ms_attrs_gui.append( &clr_itemrenderpltclr);
+    ms_attrs_gui.append( &clr_running         );
+    ms_attrs_gui.append( &clr_done            );
+    ms_attrs_gui.append( &clr_error           );
+    ms_attrs_gui.append( &clr_star            );
+    ms_attrs_gui.append( &clr_outline         );
+    ms_attrs_gui.append( &clr_starline        );
+
+    ms_attrs_gui.append( &clr_textbright      );
+    ms_attrs_gui.append( &clr_textmuted       );
+    ms_attrs_gui.append( &clr_textdone        );
+    ms_attrs_gui.append( &clr_textstars       );
 
     ms_filename = stoq( af::Environment::getHomeAfanasy())
            + AFGENERAL::PATH_SEPARATOR + ms_appname.toUtf8().data() + ".xml";
