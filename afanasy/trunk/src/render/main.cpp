@@ -82,9 +82,9 @@ int main(int argc, char *argv[])
     {
         af::Host host;
         af::HostRes hostres;
-        GetResources( host, hostres, true, true);
+        GetResources( host, hostres, true);
         af::sleep_msec(100);
-        GetResources( host, hostres, false, true);
+        GetResources( host, hostres, true);
         printf("\n");
         host.stdOut( true);
         hostres.stdOut( true);

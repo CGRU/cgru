@@ -39,7 +39,7 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
     setOnline();
 
     host.os = af::Environment::getPlatform();
-    GetResources( host, hres, true);
+    GetResources( host, hres);
 
     std::list<std::string> resclasses = af::strSplit( af::Environment::getRenderResClasses(), ";");
     for( std::list<std::string>::const_iterator it = resclasses.begin(); it != resclasses.end(); it++)
@@ -96,7 +96,7 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
 	af::sleep_msec( 100);
 
-    GetResources( host, hres, false);
+    GetResources( host, hres);
     for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
 
     stdOut();
@@ -201,7 +201,7 @@ void RenderHost::update()
 
     if( false == first_time )
     {
-        GetResources( ms_obj->host, ms_obj->hres, false);
+        GetResources( ms_obj->host, ms_obj->hres);
         for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
     }
     else

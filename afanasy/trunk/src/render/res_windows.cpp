@@ -42,15 +42,18 @@ struct io
 
 int now = 0;
 
-void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
+void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
 {
 #ifdef AFOUTPUT
 printf("\nGetResources:\n");
 #endif //AFOUTPUT
+    /* Will be set to 1 after first run. */
+    static unsigned s_init = 0;
+
    //
    // CPU info:
    //
-   if( getConstants)
+   if( !s_init)
    {
       // number of pocessors
       SYSTEM_INFO sysinfo;
@@ -84,6 +87,8 @@ printf("\nGetResources:\n");
          AFERRAR("%s", Buffer);
          host.cpu_mhz = 1000;
       }
+
+      s_init = 1;
    }
 
    //

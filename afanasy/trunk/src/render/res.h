@@ -2,4 +2,4 @@
 
 #include "../libafanasy/host.h"
 
-void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose = false);
+void GetResources( af::Host & host, af::HostRes & hres, bool verbose = false);

@@ -43,6 +43,7 @@ struct DiskStats
 {
    uint64_t rd_sectors;         // Sectors read
    uint64_t wr_sectors;         // Sectors written
+   uint64_t ticks;              // CPU ticks spended in IO waiting - needed for "busy" calculation
 } sg_diskstats = {0};
 
 struct NetStats
@@ -57,7 +58,7 @@ static struct timeval sg_current_time = {0}, sg_last_time = {0};
 
    Main entry point in this file. All other functions are utilities
 */
-void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool verbose)
+void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
 {
    static unsigned s_init = 0;
 
@@ -327,9 +328,11 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 
          uint64_t interval_rd_sectors = total_rd_sectors - sg_diskstats.rd_sectors;
          uint64_t interval_wr_sectors = total_wr_sectors - sg_diskstats.wr_sectors;
+         uint64_t interval_ticks      = total_ticks      - sg_diskstats.ticks;
 
          sg_diskstats.rd_sectors = total_rd_sectors;
          sg_diskstats.wr_sectors = total_wr_sectors;
+         sg_diskstats.ticks      = total_ticks;
 
          hres.hdd_rd_kbsec = int32_t(::ceil(interval_rd_sectors * s_sector_size / (1024*etime)));
          hres.hdd_wr_kbsec = int32_t(::ceil(interval_wr_sectors * s_sector_size / (1024*etime)));
@@ -341,7 +344,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
 
          if( milliseconds_delta != 0 )
          {
-            int busy = 100 * total_ticks / milliseconds_delta;
+            int busy = 100 * interval_ticks / milliseconds_delta;
             if( busy > 100) busy = 100;
             if( busy <   0) busy = 0;
             hres.hdd_busy = busy;
