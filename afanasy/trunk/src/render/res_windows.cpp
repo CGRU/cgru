@@ -87,8 +87,6 @@ printf("\nGetResources:\n");
          AFERRAR("%s", Buffer);
          host.cpu_mhz = 1000;
       }
-
-      s_init = 1;
    }
 
    //
@@ -98,7 +96,7 @@ printf("\nGetResources:\n");
    MEMORYSTATUSEX statex;
    statex.dwLength = sizeof( statex);
    GlobalMemoryStatusEx( &statex);
-   if( getConstants )
+   if( !s_init )
    {
       host.mem_mb  = int( statex.ullTotalPhys     >> 20 );
       host.swap_mb = int( statex.ullTotalPageFile >> 20 );
@@ -173,7 +171,7 @@ printf("\nGetResources:\n");
    //
    {// space:
    static char * directory = NULL;
-   if( getConstants && (af::Environment::getRenderHDDSpacePath() != "/"))
+   if((!s_init) && (af::Environment::getRenderHDDSpacePath() != "/"))
    {
       static char path[4096];
       sprintf_s( path, "%s", af::Environment::getRenderHDDSpacePath().c_str());
@@ -183,7 +181,7 @@ printf("\nGetResources:\n");
    ULARGE_INTEGER totalNumberOfBytes, totalNumberOfFreeBytes;
    if( GetDiskFreeSpaceEx( directory, NULL, &totalNumberOfBytes, &totalNumberOfFreeBytes))
    {
-      if( getConstants) host.hdd_gb = int( totalNumberOfBytes.QuadPart >> 30 );
+      host.hdd_gb = int( totalNumberOfBytes.QuadPart >> 30 );
       hres.hdd_free_gb  = int( totalNumberOfFreeBytes.QuadPart >> 30 );
    }
    else
@@ -224,7 +222,7 @@ printf("\nGetResources:\n");
                 io * io_last = &io0; io * io_now = &io1;
          if( now ) { io_last = &io1;      io_now = &io0; }
 
-         if( getConstants && verbose )
+         if((!s_init) && verbose )
          {
             printf("Storage Manager Name = ");
             for ( int j = 0; j < 8; j++) printf("%c", dp.StorageManagerName[j]);
@@ -339,7 +337,7 @@ printf("\nGetResources:\n");
          }
          if( calculated ) continue;
          iftypes.push_back( row->dwType);
-         if( getConstants && verbose)
+         if((!s_init) && verbose)
          {
             printf("IF#%2d InterfaceName:\t %ws\n", row->dwType, row->wszName);
             printf("IF#%2d Description:\t ", row->dwType);
@@ -359,6 +357,8 @@ printf("\nGetResources:\n");
    }//network
 
    now = 1 - now;
+
+	s_init = 1;
 
 //hres.stdOut(false);
 }
