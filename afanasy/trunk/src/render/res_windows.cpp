@@ -1,7 +1,6 @@
 #ifdef WINNT
 #include "res.h"
 
-//#include <Windows.h>
 #include <Winbase.h>
 #include <Iphlpapi.h>
 
@@ -13,16 +12,6 @@
 
 #define MALLOC(x) HeapAlloc(GetProcessHeap(), 0, (x))
 #define FREE(x) HeapFree(GetProcessHeap(), 0, (x))
-/*
-void WINAPI GetSystemTimeAsFileTime(
-  __out  LPFILETIME lpSystemTimeAsFileTime
-);
-typedef struct _FILETIME {
-  DWORD dwLowDateTime;
-  DWORD dwHighDateTime;
-} FILETIME, *PFILETIME;
-*/
-FILETIME fltime = { 0, 0 };
 
 struct cpu
 {
@@ -53,12 +42,35 @@ struct io
 
 int now = 0;
 
+/*
+void WINAPI GetSystemTimeAsFileTime(
+  __out  LPFILETIME lpSystemTimeAsFileTime
+);
+typedef struct _FILETIME {
+  DWORD dwLowDateTime;
+  DWORD dwHighDateTime;
+} FILETIME, *PFILETIME;
+*/
+ULONGLONG g_time_prev = 0;
+
 void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
 {
-::GetSystemTimeAsFileTime( &fltime);
 #ifdef AFOUTPUT
 printf("\nGetResources:\n");
 #endif //AFOUTPUT
+
+    // Time interval between calls calculation:
+    FILETIME ftime_now;
+    GetSystemTimeAsFileTime( &ftime_now);
+    ULARGE_INTEGER time_now;
+    time_now.HighPart = ftime_now.dwHighDateTime;
+    time_now.LowPart  = ftime_now.dwLowDateTime;
+    ULONGLONG time_delta = time_now.QuadPart - g_time_prev;
+    if( time_delta == 0 )
+        time_delta = 1;
+    double time_interval_sec = double( time_delta ) / 10000000.0;
+    g_time_prev = time_now.QuadPart;
+
     /* Will be set to 1 after first run. */
     static unsigned s_init = 0;
 
@@ -265,8 +277,8 @@ printf("\nGetResources:\n");
             printf("Delta BytesRead    = %llu\n", BytesRead);
             printf("Delta BytesWritten = %llu\n", BytesWritten);
 #endif //AFOUTPUT
-            hres.hdd_rd_kbsec = int(( BytesRead    >> 10) / af::Environment::getRenderUpdateSec());
-            hres.hdd_wr_kbsec = int(( BytesWritten >> 10) / af::Environment::getRenderUpdateSec());
+            hres.hdd_rd_kbsec = int( double( BytesRead   ) / 1024.0 / time_interval_sec);
+            hres.hdd_wr_kbsec = int( double( BytesWritten) / 1024.0 / time_interval_sec);
          }
 
          // Check for time counters overflow:
@@ -362,8 +374,8 @@ printf("\nGetResources:\n");
       }
       int recv = net_now->recv - net_last->recv;
       int send = net_now->send - net_last->send;
-      if( recv >= 0 ) hres.net_recv_kbsec = recv / af::Environment::getRenderUpdateSec();
-      if( send >= 0 ) hres.net_send_kbsec = send / af::Environment::getRenderUpdateSec();
+      if( recv >= 0 ) hres.net_recv_kbsec = double(recv) / time_interval_sec;
+      if( send >= 0 ) hres.net_send_kbsec = double(send) / time_interval_sec;
    }
    if( ifTable) FREE( ifTable);
    }//network

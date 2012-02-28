@@ -84,7 +84,7 @@ int main(int argc, char *argv[])
         af::HostRes hostres;
         GetResources( host, hostres, true);
         af::sleep_msec(100);
-        GetResources( host, hostres, true);
+        GetResources( host, hostres);
         printf("\n");
         host.stdOut( true);
         hostres.stdOut( true);
