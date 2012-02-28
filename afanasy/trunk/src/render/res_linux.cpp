@@ -99,31 +99,60 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
    host.cpu_num = num_processors;
    host.cpu_mhz = int32_t( s_cpu_frequency );
 
-   /*
-      Memory: we rely on sysinfo here. Used to rely on /proc/meminfo
-      but that didn't work on at least my ubuntu system.
-   */
-   struct sysinfo si;
+    /*
+        Memory: we rely on sysinfo here. Used to rely on /proc/meminfo
+        but that didn't work on at least my ubuntu system.
 
-   if( sysinfo(&si) >= 0 )
-   {
-      /* NOTE: should we account for si.mem_unit in here ? */
-      host.mem_mb = si.totalram >> 20;
-      hres.mem_free_mb  = si.freeram  >> 20;
-      host.swap_mb = si.totalswap >> 20;
-      hres.mem_buffers_mb = si.bufferram >> 20;
-      hres.swap_used_mb  = ( si.totalswap - si.freeswap ) >> 20;
-      hres.mem_cached_mb  = 0;
-   }
-   else
-   {
-      perror( "sysinfo() failed" );
-
-      host.mem_mb = hres.mem_free_mb  = host.swap_mb =
-         hres.mem_buffers_mb = hres.swap_used_mb  = 
-         hres.mem_cached_mb  = 0;
-   }
-
+        But! sysinfo does not have cached memory information.
+         - So we switched back to /proc/meminfo - Timur
+    */
+#if 1
+    FILE * memfd = ::fopen( "/proc/meminfo", "r" );
+    if( memfd )
+    {
+        char buffer[200];
+        buffer[sizeof(buffer)-1] = '\0';
+        unsigned long long llu;
+        char records[6][12] = {"MemTotal:","MemFree:","Buffers:","Cached:","SwapTotal:","SwapFree:"};
+        int32_t * pointers[6] = {&host.mem_mb, &hres.mem_free_mb, &hres.mem_buffers_mb, &hres.mem_cached_mb, &host.swap_mb, &hres.swap_used_mb};
+        int i = 0;
+        while( fgets( buffer, sizeof(buffer)-1, memfd) )
+        {
+            int record_len = strlen(records[i]);
+            if( strncmp( buffer, records[i], record_len) != 0 ) continue;
+            static const char scan_fmt[] = "%llu";
+            if( sscanf( buffer + record_len, scan_fmt, &llu) == 1 )
+                *(pointers[i]) = llu >> 10;
+            //printf("records[%d][%d] = '%s' %d\n", i, record_len, records[i], *(pointers[i]));
+            if( ++i == 6 ) break;
+        }
+        ::fclose( memfd );
+        hres.mem_free_mb = hres.mem_free_mb + hres.mem_buffers_mb + hres.mem_cached_mb;
+        hres.swap_used_mb = host.swap_mb - hres.swap_used_mb;
+    }
+    else
+    {
+        perror( "unable to access /proc/meminfo so memory usage is unavailable" );
+#else
+    struct sysinfo si;
+    if( sysinfo(&si) >= 0 )
+    {
+        /* NOTE: should we account for si.mem_unit in here ? */
+        host.mem_mb = si.totalram >> 20;
+        hres.mem_free_mb = (si.freeram + si.bufferram) >> 20;
+        host.swap_mb = si.totalswap >> 20;
+        hres.mem_buffers_mb = si.bufferram >> 20;
+        hres.swap_used_mb  = ( si.totalswap - si.freeswap ) >> 20;
+        hres.mem_cached_mb  = 0;
+    }
+    else
+    {
+        perror( "sysinfo() failed" );
+#endif
+        host.mem_mb = 1;
+        host.swap_mb = 1;
+        hres.mem_free_mb = hres.mem_buffers_mb = hres.swap_used_mb = hres.mem_cached_mb  = 0;
+    }
    /*
       CPU usage.
 
@@ -131,6 +160,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
       the "cpu" tag is the statistics for all the cpus. cat /proc/stat for
       a quick peak.
    */
+    uint64_t cpu_ticks_total = 1; // We need to store it to calculate "hdd busy" parameter;
    FILE *cpufd = ::fopen( "/proc/stat", "r" );
    if( cpufd )
    {
@@ -166,19 +196,19 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          uint64_t interval_irq     = irq      - sg_cpu.irq;
          uint64_t interval_softirq = softirq  - sg_cpu.softirq;
 
-         uint64_t total = interval_user + interval_nice + interval_system  +
+         cpu_ticks_total = interval_user + interval_nice + interval_system  +
             interval_idle + interval_iowait + interval_irq + interval_softirq;
 
-         if( total == 0)
-            total = 1;
+         if( cpu_ticks_total == 0)
+            cpu_ticks_total = 1;
 
-         hres.cpu_user    = ( interval_user    * 100 ) / total;
-         hres.cpu_nice    = ( interval_nice    * 100 ) / total;
-         hres.cpu_system  = ( interval_system  * 100 ) / total;
-         hres.cpu_idle    = ( interval_idle    * 100 ) / total;
-         hres.cpu_iowait  = ( interval_iowait  * 100 ) / total;
-         hres.cpu_irq     = ( interval_irq     * 100 ) / total;
-         hres.cpu_softirq = ( interval_softirq * 100 ) / total;
+         hres.cpu_user    = ( interval_user    * 100 ) / cpu_ticks_total;
+         hres.cpu_nice    = ( interval_nice    * 100 ) / cpu_ticks_total;
+         hres.cpu_system  = ( interval_system  * 100 ) / cpu_ticks_total;
+         hres.cpu_idle    = ( interval_idle    * 100 ) / cpu_ticks_total;
+         hres.cpu_iowait  = ( interval_iowait  * 100 ) / cpu_ticks_total;
+         hres.cpu_irq     = ( interval_irq     * 100 ) / cpu_ticks_total;
+         hres.cpu_softirq = ( interval_softirq * 100 ) / cpu_ticks_total;
 
          /* Upgrade totals for next iteration. */
          sg_cpu.user = user;
@@ -307,14 +337,11 @@ void GetResources( af::Host & host, af::HostRes & hres, bool getConstants, bool 
          /* Could take this from elsewhere in this function but it it safer
             to just re-do the addition in case we change code organisation. */
 
-         uint64_t cpu_ticks_total = sg_cpu.user + sg_cpu.system + sg_cpu.idle +
-            sg_cpu.iowait + sg_cpu.irq + sg_cpu.softirq;
+         uint64_t milliseconds_delta = cpu_ticks_total * 1000 / host.cpu_num / HZ;
 
-         uint64_t deltams = cpu_ticks_total * 1000 / host.cpu_num / HZ;
-
-         if( deltams != 0 )
+         if( milliseconds_delta != 0 )
          {
-            int busy = 100 * total_ticks / deltams;
+            int busy = 100 * total_ticks / milliseconds_delta;
             if( busy > 100) busy = 100;
             if( busy <   0) busy = 0;
             hres.hdd_busy = busy;
