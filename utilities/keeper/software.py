@@ -5,7 +5,7 @@ import cgruutils
 
 from PyQt4 import QtCore, QtGui
 
-Names = ['Blender','Houdini','Maya','Nuke']
+Names = ['Blender','Houdini','Maya','Nuke', 'NukeX']
 if sys.platform.find('win') == 0:
    Names.extend(['3DSMax','Softimage','AfterFX'])
 if sys.platform.find('darwin') == 0:
@@ -23,6 +23,7 @@ def startC4D():       startDetached('c4d')
 def startHoudini():   startDetached('houdini')
 def startMaya():      startDetached('maya')
 def startNuke():      startDetached('nuke')
+def startNukeX():     startDetached('nuke --nukex')
 def start3DSMax():    startDetached('3dsmax')
 def startSoftimage(): startDetached('xsi')
 def startAfterFX():   startDetached('afterfx')
@@ -49,6 +50,7 @@ def exampleC4D():       exampleSoftware('c4d','start_c4d')
 def exampleHoudini():   exampleSoftware('houdini','start_houdini')
 def exampleMaya():      exampleSoftware('maya','start_maya')
 def exampleNuke():      exampleSoftware('nuke','start_nuke')
+def exampleNukeX():     exampleNuke()
 def example3DSMax():    exampleSoftware('3D Studio Max','start_3dsmax')
 def exampleSoftimage(): exampleSoftware('softimage','start_softimage')
 def exampleAfterFX():   exampleSoftware('After FX','start_afterfx')
@@ -99,6 +101,7 @@ def locateC4D():        locateSoftware('C4D')
 def locateHoudini():    locateSoftware('Houdini')
 def locateMaya():       locateSoftware('Maya')
 def locateNuke():       locateSoftware('Nuke')
+def locateNukeX():      locateSoftware('NukeX')
 def locate3DSMax():     locateSoftware('3DSMax')
 def locateSoftimage():  locateSoftware('Softimage')
 def locateAfterFX():    locateSoftware('AfterFX')
