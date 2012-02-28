@@ -2,6 +2,10 @@
 
 #include <QtGui/QListView>
 
+#if QT_VERSION >= 0x040602
+#define DRAWBACK 1
+#endif
+
 class ListItems;
 
 class ItemDelegate : public QAbstractItemDelegate
@@ -34,7 +38,7 @@ public:
 protected:
     void keyPressEvent( QKeyEvent * event);
     void mousePressEvent( QMouseEvent * event);
-    #if QT_VERSION >= 0x040704
+    #ifdef DRAWBACK
     void paintEvent ( QPaintEvent * event );
     #endif
 
@@ -48,6 +52,8 @@ private:
    ListItems * listitems;
 
    QPixmap m_back_pixmap;
+   QString m_back_filename;
+   int m_back_angle;
    int m_back_offset_x;
    int m_back_offset_y;
 };

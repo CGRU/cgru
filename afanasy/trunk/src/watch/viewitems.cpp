@@ -12,6 +12,10 @@
 #include "watch.h"
 #include "listitems.h"
 
+#define AFOUTPUT
+#undef AFOUTPUT
+#include "../include/macrooutput.h"
+
 ItemDelegate::ItemDelegate( QWidget *parent):
    QAbstractItemDelegate( parent)
 {
@@ -60,31 +64,33 @@ ViewItems::ViewItems( QWidget * parent):
 
 void ViewItems::loadImage()
 {
-#if QT_VERSION >= 0x040704
-if( afqt::QEnvironment::back_image.str.isEmpty())
+#ifdef DRAWBACK
+AFINFA("ViewItems::loadImage: '%s'", afqt::QEnvironment::back_image.str.toUtf8().data());
+if( afqt::QEnvironment::back_image.str.isEmpty() && ( false == m_back_filename.isEmpty()))
 {
-    if( false == m_back_pixmap.isNull() )
-    {
-        m_back_pixmap = QPixmap();
-        printf("Clearing PIXMAP\n");
-    }
+    m_back_filename.clear();
+    m_back_pixmap = QPixmap();
 }
 else
 {
-    m_back_pixmap.load( afqt::QEnvironment::back_image.str);
+    m_back_filename = afqt::QEnvironment::back_image.str;
+    m_back_pixmap.load( m_back_filename);
 
     if( m_back_pixmap.isNull() )
+    {
         m_back_pixmap.load( afqt::stoq(af::Environment::getAfRoot())
                             + "/icons/watch/"
                             + afqt::QEnvironment::theme.str + "/"
-                            + afqt::QEnvironment::back_image.str);
+                            + m_back_filename);
+    }
 
     if( false == m_back_pixmap.isNull() )
     {
+        m_back_angle = int( 20.0f * random() / RAND_MAX );
+        m_back_offset_x = int( 20.0f * random() / RAND_MAX );
+        m_back_offset_y = int( 20.0f * random() / RAND_MAX );
         m_back_pixmap = m_back_pixmap.transformed(
-            QTransform().rotate( 20.0f * random() / RAND_MAX ), Qt::SmoothTransformation);
-        m_back_offset_x = 20.0f * random() / RAND_MAX;
-        m_back_offset_y = 20.0f * random() / RAND_MAX;
+            QTransform().rotate( m_back_angle ), Qt::SmoothTransformation);
     }
 }
 #endif
@@ -120,14 +126,16 @@ void ViewItems::mousePressEvent( QMouseEvent * event)
 
 void ViewItems::repaintViewport()
 {
-    loadImage();
     viewport()->repaint();
 }
 
-#if QT_VERSION >= 0x040704
+#ifdef DRAWBACK
 void ViewItems::paintEvent( QPaintEvent * event )
 {
-//    printf("ViewItems::paintEvent:\n");
+    AFINFO("ViewItems::paintEvent:");
+    if( m_back_filename != afqt::QEnvironment::back_image.str )
+        loadImage();
+
     if( m_back_pixmap.isNull() )
     {
         QListView::paintEvent( event );

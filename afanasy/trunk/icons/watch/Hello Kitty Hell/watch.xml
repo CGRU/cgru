@@ -1,7 +1,7 @@
 <!-- Afanasy Watch "Hello Kitty" Theme -->
 <watch>
    <theme               >Hello Kitty</theme>
-   <back_image          >hello_kitty.png</back_image>
+   <back_image          >hello_kitty_hell.png</back_image>
    <font_family         >SansSerif</font_family>
    <font_sizename       >10</font_sizename>
    <font_sizeinfo       >8</font_sizeinfo>
