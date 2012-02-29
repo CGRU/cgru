@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: all
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), afanasy-render (= @VERSION@), @DEPENDS_CGRU@
+Depends: cgru-common (= @VERSION@), afanasy-common (= @VERSION@), afanasy-render (= @VERSION@), @DEPENDS_CGRU_COMMA@
 Suggests: mencoder
 Section: graphics
 Priority: extra

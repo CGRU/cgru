@@ -12,8 +12,8 @@ packages_afrender="cgru-common afanasy-common afanasy-render"
 packages_afserver="cgru-common afanasy-common afanasy-server"
 packages_uninstall="cgru afanasy-render afanasy-server afanasy-common cgru-common"
 
-[ -z "${PACKAGE_MANAGER}" ] && source ./distribution.sh
-[ -z "${PACKAGE_MANAGER}" ] && exit 1
+[ -z "${PACKAGE_FORMAT}" ] && source ../distribution.sh
+[ -z "${PACKAGE_FORMAT}" ] && exit 1
 
 if [ -z "${output}" ]; then
    echo "Error: Output folder not specified."
@@ -31,46 +31,55 @@ cp -f "${template}" "${output}/${install_afserver}"
 cp -f "${template}" "${output}/${install_afrender}"
 cp -f "${template}" "${output}/${uninstall}"
 
-if [ -z "$PACKAGE_MANAGER" ]; then
-   echo "Package manager is not set (PACKAGE_MANAGER variable is empty)."
+if [ -z "$PACKAGE_FORMAT" ]; then
+   echo "Package manager is not set (PACKAGE_FORMAT variable is empty)."
    exit 1
-elif [ "$PACKAGE_MANAGER" == "DPKG" ]; then
+elif [ "$PACKAGE_FORMAT" == "DPKG" ]; then
    extension=".deb"
    install_cmd="dpkg --install"
    uninstall_cmd="dpkg --remove"
-elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
+elif [ "$PACKAGE_FORMAT" == "RPM" ]; then
    extension=".rpm"
    install_cmd="rpm --install"
    uninstall_cmd="rpm --erase --nodeps"
 else
-   echo "Unknown package manager = '$PACKAGE_MANAGER'"
+   echo "Unknown package manager = '$PACKAGE_FORMAT'"
    exit 1
 fi
 
 curdir=$PWD
 cd "${output}"
 
-function writeCommands(){
-   for package in $*; do
-      package_file=`bash -c "ls ${package}*${extension}"`
-      for package_file in $package_file; do break; done
-      if [ -z "${package_file}" ]; then
-         echo "Error: Package '${package}' does not exists."
-         exit 1
-      fi
-      echo "echo Installing ${package_file}" >> $afile
-      echo "${install_cmd} ${package_file}" >> $afile
-   done
+function writeInstallDepends(){
+    echo "echo Installing packages dependences:" >> $afile
+    echo "${PACKAGE_MANAGER} install ${DEPENDS_AFANASY} ${DEPENDS_CGRU}" >> $afile
+    echo  "" >> $afile
+}
+
+function writeInstallPackages(){
+    for package in $*; do
+        package_file=`bash -c "ls ${package}*${extension}"`
+        for package_file in $package_file; do break; done
+        if [ -z "${package_file}" ]; then
+            echo "Error: Package '${package}' does not exists."
+            exit 1
+        fi
+        echo "echo Installing ${package_file}" >> $afile
+        echo "${install_cmd} ${package_file}" >> $afile
+    done
 }
 
 afile=${install_cgru}
-writeCommands ${packages_cgru}
+writeInstallDepends
+writeInstallPackages ${packages_cgru}
 
 afile=${install_afrender}
-writeCommands ${packages_afrender}
+writeInstallDepends
+writeInstallPackages ${packages_afrender}
 
 afile=${install_afserver}
-writeCommands ${packages_afserver}
+writeInstallDepends
+writeInstallPackages ${packages_afserver}
 
 for package in ${packages_uninstall}; do
    echo "${uninstall_cmd} ${package}" >> "${uninstall}"

@@ -3,7 +3,7 @@ Version: @VERSION@
 Architecture: @ARCHITECTURE@
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: cgru-common (= @VERSION@), @DEPENDS_AFANASY@
+Depends: cgru-common (= @VERSION@), @DEPENDS_AFANASY_COMMA@
 Section: graphics
 Priority: extra
 Homepage: http://sourceforge.net/projects/cgru/

@@ -9,7 +9,7 @@ Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
 
-Requires:      cgru-common = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@, @DEPENDS_CGRU@
+Requires:      cgru-common = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@, @DEPENDS_CGRU_COMMA@
 AutoReqProv:   no
 
 %description

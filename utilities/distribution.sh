@@ -48,13 +48,15 @@ function debianArch(){
    else
       export ARCHITECTURE="i386"
    fi
-   export PACKAGE_MANAGER="DPKG"
+   export PACKAGE_FORMAT="DPKG"
+   export PACKAGE_MANAGER="apt-get"
 }
 
 # Common for RedHat distributives:
 function redhatArch(){
    export VERSION_NAME="${DISTRIBUTIVE}-${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
-   export PACKAGE_MANAGER="RPM"
+   export PACKAGE_FORMAT="RPM"
+   export PACKAGE_MANAGER="yum"
    export RELEASE_NUMBER="0"
 }
 
@@ -70,9 +72,14 @@ case ${DISTRIBUTIVE} in
       debianArch
       export VERSION_NAME="ubuntu${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
       ;;
+   openSUSE)
+      redhatArch
+      export PACKAGE_MANAGER="zypper"
+      ;;
    Simply)
       export DISTRIBUTIVE="AltLinux"
       redhatArch
+      export PACKAGE_MANAGER="apt-get"
       export VERSION_NAME="alt${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
       ;;
    *)
@@ -81,4 +88,3 @@ case ${DISTRIBUTIVE} in
 esac
 
 echo "${DISTRIBUTIVE} ${DISTRIBUTIVE_VERSION} ${ARCHITECTURE}"
-[ -z "${PACKAGE_MANAGER}" ] || echo "Package manager = '${PACKAGE_MANAGER}'"

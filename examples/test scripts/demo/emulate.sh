@@ -62,17 +62,22 @@ while [ 1 ]; do
         username="user_$usr"
         tmpfile=$tmpdir/$jobname
 
-        if [ $jp == 0 ]; then
-            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 > /dev/null
-            if [ $? != 0 ]; then
-                echo "Error creation new job, exiting."
-                exit 1
-            fi
-        elif [ -z "$nocmdpost" ]; then
+#        if [ $jp == 0 ]; then
+#            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 > /dev/null
+#            if [ $? != 0 ]; then
+#                echo "Error creation new job, exiting."
+#                exit 1
+#            fi
+        if [ -z "$nocmdpost" ]; then
             echo $output > $tmpfile
-            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 --cmdpost "rm $tmpfile" > /dev/null &
+            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 --cmdpost "rm $tmpfile" > /dev/null
         else
-            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 > /dev/null &
+            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 > /dev/null
+        fi
+
+        if [ $? != 0 ]; then
+            echo "Error creating a job, exiting."
+            exit 1
         fi
 
         let usr=$usr-1

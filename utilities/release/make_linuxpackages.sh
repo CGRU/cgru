@@ -83,17 +83,18 @@ echo "Exporting '$cgruRoot' to '$cgruExp'..."
 # Creating Packages:
 installdir="/opt/cgru"
 
-if [ -z "$PACKAGE_MANAGER" ]; then
-   echo "Package manager is not set (PACKAGE_MANAGER variable is empty)."
+if [ -z "$PACKAGE_FORMAT" ]; then
+   echo "Packages format is not set (PACKAGE_FORMAT variable is empty)."
    exit 1
-elif [ "$PACKAGE_MANAGER" == "DPKG" ]; then
+elif [ "$PACKAGE_FORMAT" == "DPKG" ]; then
    echo "Creating DEBIAN packages..."
-elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
+elif [ "$PACKAGE_FORMAT" == "RPM" ]; then
    echo "Creating RPM packages..."
 else
-   echo "Unknown package manager = '$PACKAGE_MANAGER'"
+   echo "Unknown packages format = '$PACKAGE_FORMAT'"
    exit 1
 fi
+echo "Packages format = '${PACKAGE_FORMAT}'"
 
 # packages output directoty:
 packages_output_dir="output"
@@ -128,14 +129,14 @@ for packages_dir in $packages_dirs; do
       [ -z $size ] || export SIZE=$size
 
       # perform package manager specific operations:
-      if [ "$PACKAGE_MANAGER" == "DPKG" ]; then
+      if [ "$PACKAGE_FORMAT" == "DPKG" ]; then
          # copy DEBIAN folder:
          rcopy "${packages_dir}/${package}/DEBIAN" "${tmpdir}/${package}"
          # replace variables:
          ./replacevars.sh ${packages_dir}/${package}/DEBIAN/control ${tmpdir}/${package}/DEBIAN/control
          # build package:
          dpkg-deb -b "${tmpdir}/${package}" "${packages_output_dir}/${package}.${VERSION_NUMBER}_${VERSION_NAME}.deb"
-      elif [ "$PACKAGE_MANAGER" == "RPM" ]; then
+      elif [ "$PACKAGE_FORMAT" == "RPM" ]; then
          # copy RPM folder:
          rcopy "${packages_dir}/${package}/RPM" "${tmpdir}/${package}"
          # replace variables:

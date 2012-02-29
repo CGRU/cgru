@@ -7,7 +7,7 @@ echo "Depends for $DISTRIBUTIVE:"
 # Case distribution:
 case ${DISTRIBUTIVE} in
    Debian | Ubuntu )
-      export DEPENDS_AFANASY="libqt4-core, libqt4-gui, libqt4-network, libqt4-xml, libpq5"
+      export DEPENDS_AFANASY="libqt4-core libqt4-gui libqt4-network libqt4-xml libpq5"
       export DEPENDS_CGRU="python-qt4"
       ;;
    Fedora )
@@ -24,5 +24,15 @@ case ${DISTRIBUTIVE} in
       ;;
 esac
 
-[ -z "$DEPENDS_AFANASY" ] || echo "DEPENDS_AFANASY = '$DEPENDS_AFANASY'"
-[ -z "$DEPENDS_CGRU"    ] || echo "DEPENDS_CGRU = '$DEPENDS_CGRU'"
+for dep in $DEPENDS_AFANASY; do
+    [ -z "$DEPENDS_AFANASY_COMMA" ] || DEPENDS_AFANASY_COMMA="${DEPENDS_AFANASY_COMMA}, "
+    export DEPENDS_AFANASY_COMMA="${DEPENDS_AFANASY_COMMA}${dep}"
+done
+
+for dep in $DEPENDS_CGRU; do
+    [ -z "$DEPENDS_CGRU_COMMA" ] || DEPENDS_CGRU_COMMA="${DEPENDS_CGRU_COMMA}, "
+    export DEPENDS_CGRU_COMMA="${DEPENDS_CGRU_COMMA}${dep}"
+done
+
+[ -z "$DEPENDS_AFANASY" ] || echo "DEPENDS_AFANASY = '$DEPENDS_AFANASY_COMMA'"
+[ -z "$DEPENDS_CGRU"    ] || echo "DEPENDS_CGRU    = '$DEPENDS_CGRU_COMMA'"
