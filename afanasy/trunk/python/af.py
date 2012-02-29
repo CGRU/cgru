@@ -164,7 +164,7 @@ class Job(pyaf.Job):
          return False
       self.fillBlocks()
       if self.construct() == False: return False
-      return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)[0]
+      return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), False, verbose)[0]
 
    def pause(      self): self.offline()
    def setPaused(  self): self.offline()
@@ -187,7 +187,7 @@ class Cmd( pyaf.Cmd):
       if self.getDataLen() < 1:
          print('ERROR: Request message is not set.')
          return False
-      output = afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), verbose)
+      output = afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), True, verbose)
       if output[0] == True:
          self.requestOutput = output[1]
          return True

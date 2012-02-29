@@ -5,7 +5,7 @@ import os
 import socket
 import sys
 
-def sendServer( data, datalen, host, port, verbose = False):
+def sendServer( data, datalen, host, port, receive = True, verbose = False):
    s = None
    err_msg = ''
    for res in socket.getaddrinfo( host, port, socket.AF_UNSPEC, socket.SOCK_STREAM):
@@ -36,6 +36,10 @@ def sendServer( data, datalen, host, port, verbose = False):
 
    if verbose: print('afnetwork.sendServer: send %d bytes' % datalen)
    s.sendall( data)
+   
+   if not receive:
+      return True, None
+   
    data = b''
    while True:
       buffer = s.recv(4096)
