@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pyqt="PyQt-x11-gpl-4.9"
+pyqt="PyQt-x11-gpl-4.9.1"
 sip="$PWD/sip"
 export PYTHONPATH="$sip"
 pybin="$PWD/3.2.2/bin"
@@ -57,7 +57,7 @@ fi
 
 cd $pyqt
 
-flags="$flags -e QtCore -e QtGui -e QtNetwork -e QtSvg"
+flags="$flags -e QtCore -e QtGui"
 
 $python configure.py $flags
 make
