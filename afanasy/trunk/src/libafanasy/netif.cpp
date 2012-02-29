@@ -316,7 +316,7 @@ void NetIF::getNetIFs( std::vector<NetIF*> & netIFs, bool verbose)
          else if(( ifaddrs_ptr->ifa_addr->sa_family == AF_INET ) || ( ifaddrs_ptr->ifa_addr->sa_family == AF_INET6 ))
          {
             struct sockaddr_storage * ss = ( struct sockaddr_storage *)(ifaddrs_ptr->ifa_addr);
-            Address addr(*ss);
+            Address addr( ss);
             std::map< std::string, std::vector<Address> >::iterator it = addresses_map.find( adapter_name);
             if( it != addresses_map.end())
                (*it).second.push_back( addr);
