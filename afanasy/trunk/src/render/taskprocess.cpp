@@ -8,6 +8,7 @@
 #include <Winsock2.h>
 #define fclose CloseHandle
 #else
+#include <signal.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
 extern void (*fp_setupChildProcess)( void);

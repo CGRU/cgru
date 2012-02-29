@@ -6,12 +6,12 @@ TEMPLATE = app
 CONFIG += release
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
+QMAKE_CXXFLAGS += -I/usr/include
 
 DIR = ../../cmd
 LIBS += -lpq
 LIBS += -L../libafapi -lafapi
 LIBS += -L../libafsql -lafsql
-LIBS += -L../libafnetwork -lafnetwork
 LIBS += -L../libafanasy -lafanasy
 LIBS += $$(AF_PYTHON_LIB)
 

@@ -4,6 +4,7 @@ TEMPLATE = lib
 CONFIG = staticlib
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
+QMAKE_CXXFLAGS += -I/usr/include
 
 DIR = ../../libafsql
 
