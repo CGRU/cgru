@@ -3,14 +3,14 @@ DESTDIR = ../../../bin
 
 TEMPLATE = app
 
-CONFIG += qt release
-QT += xml network
+CONFIG += thread release
 
 QMAKE_CXXFLAGS += $$(AF_PYTHON_INC)
 
 DIR = ../../render
-LIBS += -L../libafqt -lafqt
 LIBS += -L../libafanasy -lafanasy
+LIBS += -framework CoreFoundation
+LIBS += -framework IOKit
 LIBS += $$(AF_PYTHON_LIB)
 
 SOURCES += $$system(ls $$DIR/*.cpp)
