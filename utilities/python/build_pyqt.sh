@@ -57,7 +57,7 @@ fi
 
 cd $pyqt
 
-flags="$flags -e QtCore -e QtGui"
+flags="$flags -e QtCore -e QtGui -e QtNetwork"
 
 $python configure.py $flags
 make
