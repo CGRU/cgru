@@ -106,7 +106,7 @@ int main(int argc, char *argv[])
     }
     uint8_t priority = ENV.getPriority();
 
-    RenderHost render( state, priority);
+    RenderHost * render = new RenderHost( state, priority);
 
     DlThread ServerAccept;
     ServerAccept.Start( &threadAcceptClient, NULL);
@@ -141,8 +141,12 @@ int main(int argc, char *argv[])
             RenderHost::update();
 
         cycle++;
-        af::sleep_sec(1);
+
+        if( AFRunning )
+            af::sleep_sec(1);
     }
+
+    delete render;
 
     Py_Finalize();
 
@@ -153,6 +157,9 @@ int main(int argc, char *argv[])
 
 void msgCase( af::Msg * msg)
 {
+    if( false == AFRunning )
+        return;
+
     if( msg == NULL)
     {
         return;

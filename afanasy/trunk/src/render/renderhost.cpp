@@ -15,6 +15,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+extern bool AFRunning;
+
 RenderHost * RenderHost::ms_obj = NULL;
 af::MsgQueue * RenderHost::ms_msgAcceptQueue = NULL;
 af::MsgQueue * RenderHost::ms_msgDispatchQueue = NULL;
@@ -106,20 +108,31 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
 RenderHost::~RenderHost()
 {
-    delete ms_msgAcceptQueue;
-    delete ms_msgDispatchQueue;
-
+    // Delete custom python resources:
     for( int i = 0; i < ms_pyres.size(); i++)
         if( ms_pyres[i])
             delete ms_pyres[i];
 
-//    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); it++)
-//        delete *it;
+    // Send deregister message if connected:
+    if( ms_connected )
+    {
+        af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
+        msg.setAddress( af::Environment::getServerAddress());
+        bool ok;
+        af::msgsend( & msg, ok, af::VerboseOn);
+        ms_connected = false;
+    }
 
-    af::Msg msg( af::Msg::TRenderDeregister, ms_obj->getId());
-    msg.setAddress( af::Environment::getServerAddress());
-    bool ok;
-    af::msgsend( & msg, ok, af::VerboseOn);
+    // Delete all tasks:
+    for( std::vector<TaskProcess*>::iterator it = ms_tasks.begin(); it != ms_tasks.end(); )
+    {
+        delete *it;
+        it = ms_tasks.erase( it);
+    }
+
+    // Delete queues:
+    delete ms_msgAcceptQueue;
+    delete ms_msgDispatchQueue;
 }
 
 void RenderHost::setListeningPort( uint16_t i_port)
@@ -132,6 +145,8 @@ void RenderHost::setListeningPort( uint16_t i_port)
 
 void RenderHost::dispatchMessage( af::Msg * i_msg)
 {
+    if( false == AFRunning ) return;
+
     if( i_msg->addressIsEmpty() && ( i_msg->addressesCount() == 0 ))
     {
         // Assuming that message should be send to server if no address specified.
@@ -175,6 +190,9 @@ void RenderHost::setUpdateMsgType( int i_type)
 
 void RenderHost::refreshTasks()
 {
+    if( false == AFRunning )
+        return;
+
     // Refresh tasks:
     for( int t = 0; t < ms_tasks.size(); t++)
     {
@@ -196,6 +214,9 @@ void RenderHost::refreshTasks()
 
 void RenderHost::update()
 {
+    if( false == AFRunning )
+        return;
+
     // Do this every update time, but not the first time, as at the begininng resources are already updated
     static bool first_time = true;
 
