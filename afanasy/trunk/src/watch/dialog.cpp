@@ -4,6 +4,7 @@
 #include <QtGui/QBoxLayout>
 #include <QtGui/QContextMenuEvent>
 #include <QtGui/QMenu>
+#include <QtGui/QPainter>
 #include <QtGui/QScrollArea>
 
 #include "../include/afanasy.h"
@@ -133,7 +134,7 @@ Dialog::~Dialog()
 }
 
 void Dialog::repaintStart( int mseconds) { repaintTimer.start( mseconds);                             }
-void Dialog::repaintFinish()             { repaintTimer.stop();                                       }
+void Dialog::repaintFinish()             { repaintTimer.stop(); ButtonMonitor::refreshImages();       }
 void Dialog::repaintWatch()              { Watch::repaint(); if(listitems) listitems->repaintItems(); }
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
 void Dialog::sendRegister(){ qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, monitor, true));}
@@ -525,4 +526,17 @@ void Dialog::actGuiTheme( QString theme)
     }
     else
         Watch::displayError(QString("Failed to load '%1' theme").arg( theme));
+}
+
+void Dialog::paintEvent( QPaintEvent * event )
+{
+    return;
+printf("Dialog::paintEvent:\n");
+    QPainter p( this);
+
+    QRect r = rect();
+
+    p.drawPixmap(0,0, QPixmap("/cgru/doc/images/cgru.png"));
+
+//    QWidget::paintEvent( event );
 }

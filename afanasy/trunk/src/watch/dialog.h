@@ -73,6 +73,7 @@ public:
 protected:
    void contextMenuEvent( QContextMenuEvent * event);
    void closeEvent(       QCloseEvent       * event);
+   void paintEvent ( QPaintEvent * event );
 
 private:
    bool connected;

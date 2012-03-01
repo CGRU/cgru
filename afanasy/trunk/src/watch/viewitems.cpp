@@ -65,15 +65,15 @@ ViewItems::ViewItems( QWidget * parent):
 void ViewItems::loadImage()
 {
 #ifdef DRAWBACK
-AFINFA("ViewItems::loadImage: '%s'", afqt::QEnvironment::back_image.str.toUtf8().data());
-if( afqt::QEnvironment::back_image.str.isEmpty() && ( false == m_back_filename.isEmpty()))
+AFINFA("ViewItems::loadImage: '%s'", afqt::QEnvironment::image_back.str.toUtf8().data());
+if( afqt::QEnvironment::image_back.str.isEmpty() && ( false == m_back_filename.isEmpty()))
 {
     m_back_filename.clear();
     m_back_pixmap = QPixmap();
 }
 else
 {
-    m_back_filename = afqt::QEnvironment::back_image.str;
+    m_back_filename = afqt::QEnvironment::image_back.str;
     m_back_pixmap.load( m_back_filename);
 
     if( m_back_pixmap.isNull() )
@@ -133,7 +133,7 @@ void ViewItems::repaintViewport()
 void ViewItems::paintEvent( QPaintEvent * event )
 {
     AFINFO("ViewItems::paintEvent:");
-    if( m_back_filename != afqt::QEnvironment::back_image.str )
+    if( m_back_filename != afqt::QEnvironment::image_back.str )
         loadImage();
 
     if( m_back_pixmap.isNull() )

@@ -20,7 +20,15 @@ using namespace afqt;
 
 Attr       QEnvironment::theme(              "theme",                "Theme",                   AFGUI::THEME                   );
 
-Attr       QEnvironment::back_image(         "back_image",           "Background Image",        ""                             );
+Attr       QEnvironment::image_back(            "image_back",            "Items Background",        ""                         );
+Attr       QEnvironment::image_border_topleft(  "image_border_topleft",  "Border Top Left",         ""                         );
+Attr       QEnvironment::image_border_topright( "image_border_topright", "Border Top Right",        ""                         );
+Attr       QEnvironment::image_border_botleft(  "image_border_botleft",  "Border Bottom Left",      ""                         );
+Attr       QEnvironment::image_border_botright( "image_border_botright", "Border Bottom Right",     ""                         );
+Attr       QEnvironment::image_snap_leftoff(    "image_snap_leftoff",    "Snap Left Off",           ""                         );
+Attr       QEnvironment::image_snap_lefton(     "image_snap_lefton",     "Snap Left On",            ""                         );
+Attr       QEnvironment::image_snap_rightoff(   "image_snap_rightoff",   "Snap Right Off",          ""                         );
+Attr       QEnvironment::image_snap_righton(    "image_snap_righton",    "Snap Right On",           ""                         );
 
 Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Job Added",               ""                             );
 Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Job Done",                ""                             );
@@ -118,7 +126,15 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_prefs.append( &soundJobDone      );
     ms_attrs_prefs.append( &soundJobError     );
 
-    ms_attrs_gui.append( &back_image          );
+    ms_attrs_gui.append( &image_back          );
+    ms_attrs_gui.append( &image_border_topleft);
+    ms_attrs_gui.append( &image_border_topright);
+    ms_attrs_gui.append( &image_border_botleft);
+    ms_attrs_gui.append( &image_border_botright);
+    ms_attrs_gui.append( &image_snap_leftoff);
+    ms_attrs_gui.append( &image_snap_lefton);
+    ms_attrs_gui.append( &image_snap_rightoff);
+    ms_attrs_gui.append( &image_snap_righton);
 
     ms_attrs_gui.append( &font_family         );
     ms_attrs_gui.append( &font_sizename       );

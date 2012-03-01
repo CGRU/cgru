@@ -1,7 +1,7 @@
 <!-- Afanasy Watch "Military" Theme -->
 <watch>
    <theme               >Military</theme>
-   <back_image          >afanasy.png</back_image>
+   <image_back          >afanasy.png</image_back>
    <font_family         >SansSerif</font_family>
    <font_sizename       >10</font_sizename>
    <font_sizeinfo       >8</font_sizeinfo>

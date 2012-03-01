@@ -5,12 +5,12 @@
 class Wnd : public QWidget
 {
 public:
-   Wnd( const QString & Name);
-   ~Wnd();
+    Wnd( const QString & Name);
+    ~Wnd();
 
 protected:
-   virtual void closeEvent( QCloseEvent * event);
+    virtual void closeEvent( QCloseEvent * event);
 
 private:
-   QString name;
+    QString name;
 };

@@ -92,12 +92,12 @@ bool LaunchProgramV(
 	saAttr.bInheritHandle = true;
 	saAttr.lpSecurityDescriptor = NULL;
 
-	if (o_in && !CreatePipe( &hStdinRead, o_in, &saAttr, 0))
+    if (o_in && !CreatePipe( &hStdinRead, o_in, &saAttr, 1024))
 	{
 		return false;
 	}
 
-	if (o_out && !CreatePipe( o_out,  &hStdoutWrite, &saAttr, 0))
+    if (o_out && !CreatePipe( o_out,  &hStdoutWrite, &saAttr, 1024*1024))
 	{
 		if (o_in)
 		{
@@ -108,7 +108,7 @@ bool LaunchProgramV(
 		return false;
 	}
 
-	if (o_err && !CreatePipe( o_err,  &hStderrWrite, &saAttr, 0))
+    if (o_err && !CreatePipe( o_err,  &hStderrWrite, &saAttr, 1024*1024))
 	{
 		if (o_in)
 		{
