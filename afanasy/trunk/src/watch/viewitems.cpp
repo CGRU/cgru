@@ -3,6 +3,7 @@
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPainter>
+#include <QtGui/QScrollBar>
 
 #include "../libafanasy/environment.h"
 
@@ -74,14 +75,14 @@ if( afqt::QEnvironment::image_back.str.isEmpty() && ( false == m_back_filename.i
 else
 {
     m_back_filename = afqt::QEnvironment::image_back.str;
-    m_back_pixmap.load( m_back_filename);
 
-    if( m_back_pixmap.isNull() )
+    if( false == m_back_pixmap.load( m_back_filename) )
     {
-        m_back_pixmap.load( afqt::stoq(af::Environment::getAfRoot())
+        if( false == m_back_pixmap.load( afqt::stoq(af::Environment::getAfRoot())
                             + "/icons/watch/"
                             + afqt::QEnvironment::theme.str + "/"
-                            + m_back_filename);
+                            + m_back_filename))
+            m_back_pixmap = QPixmap();
     }
 
     if( false == m_back_pixmap.isNull() )
@@ -136,7 +137,8 @@ void ViewItems::paintEvent( QPaintEvent * event )
     if( m_back_filename != afqt::QEnvironment::image_back.str )
         loadImage();
 
-    if( m_back_pixmap.isNull() )
+    if( m_back_pixmap.isNull() ||
+        verticalScrollBar()->isVisible())
     {
         QListView::paintEvent( event );
         return;
