@@ -32,6 +32,11 @@ WndCustomizeGUI::WndCustomizeGUI():
     colorsWidget->setBackgroundRole( QPalette::Mid);
     colorsWidget->setAutoFillBackground( true);
 
+    QWidget * starsWidget = new QWidget( this);
+    tabWidet->addTab( starsWidget, "Stars Shape");
+    starsWidget->setBackgroundRole( QPalette::Mid);
+    starsWidget->setAutoFillBackground( true);
+
     QWidget * fontsWidget = new QWidget( this);
     tabWidet->addTab( fontsWidget, "Fonts");
     fontsWidget->setBackgroundRole( QPalette::Mid);
@@ -136,6 +141,14 @@ WndCustomizeGUI::WndCustomizeGUI():
     cw = new ColorWidget( this, &afqt::QEnvironment::clr_textmuted         ); vlayout->addWidget( cw);
     cw = new ColorWidget( this, &afqt::QEnvironment::clr_textdone          ); vlayout->addWidget( cw);
     cw = new ColorWidget( this, &afqt::QEnvironment::clr_textstars         ); vlayout->addWidget( cw);
+
+
+    // Stars:
+    vlayout = new QVBoxLayout( starsWidget);
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::star_numpoints ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::star_radiusin  ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::star_radiusout ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::star_rotate    ));
 
 
     // Images:

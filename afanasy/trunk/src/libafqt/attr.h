@@ -11,26 +11,26 @@ class QDomElement;
 class afqt::Attr
 {
 public:
-   Attr( const QString & Name, const QString & Label, const QString & initString);
-   virtual ~Attr();
+    Attr( const QString & Name, const QString & Label, const QString & initString);
+    virtual ~Attr();
 
-   virtual bool readData();
-   virtual void writeData();
+    virtual bool readData();
+    virtual void writeData();
 
-   virtual bool read( const QDomDocument & doc);
-   virtual void write( QByteArray & data);
+    virtual bool read( const QDomDocument & doc);
+    virtual void write( QByteArray & data);
 
-   const QString & getName()  const { return name; }
-   const QString & getLabel() const { return label;}
+    const QString & getName()  const { return name; }
+    const QString & getLabel() const { return label;}
 
 public:
-   QString str;
+    QString str;
 
 protected:
-   static bool getXMLAttribute(  QDomElement & element, const QString & name, int & value);
-   static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
+    static bool getXMLAttribute(  QDomElement & element, const QString & name, int & value);
+    static bool getXMLElement( const QDomDocument & doc, const QString & name, QString & text );
 
 private:
-   QString name;
-   QString label;
+    QString name;
+    QString label;
 };

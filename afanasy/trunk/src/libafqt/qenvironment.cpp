@@ -18,17 +18,22 @@
 
 using namespace afqt;
 
-Attr       QEnvironment::theme(              "theme",                "Theme",                   AFGUI::THEME                   );
+Attr       QEnvironment::theme("theme", "Theme", AFGUI::THEME );
 
-Attr       QEnvironment::image_back(            "image_back",            "Items Background",        ""                         );
-Attr       QEnvironment::image_border_topleft(  "image_border_topleft",  "Border Top Left",         ""                         );
-Attr       QEnvironment::image_border_topright( "image_border_topright", "Border Top Right",        ""                         );
-Attr       QEnvironment::image_border_botleft(  "image_border_botleft",  "Border Bottom Left",      ""                         );
-Attr       QEnvironment::image_border_botright( "image_border_botright", "Border Bottom Right",     ""                         );
-Attr       QEnvironment::image_snap_leftoff(    "image_snap_leftoff",    "Snap Left Off",           ""                         );
-Attr       QEnvironment::image_snap_lefton(     "image_snap_lefton",     "Snap Left On",            ""                         );
-Attr       QEnvironment::image_snap_rightoff(   "image_snap_rightoff",   "Snap Right Off",          ""                         );
-Attr       QEnvironment::image_snap_righton(    "image_snap_righton",    "Snap Right On",           ""                         );
+Attr       QEnvironment::image_back(            "image_back",            "Items Background",        "");
+Attr       QEnvironment::image_border_topleft(  "image_border_topleft",  "Border Top Left",         "");
+Attr       QEnvironment::image_border_topright( "image_border_topright", "Border Top Right",        "");
+Attr       QEnvironment::image_border_botleft(  "image_border_botleft",  "Border Bottom Left",      "");
+Attr       QEnvironment::image_border_botright( "image_border_botright", "Border Bottom Right",     "");
+Attr       QEnvironment::image_snap_leftoff(    "image_snap_leftoff",    "Snap Left Off",           "");
+Attr       QEnvironment::image_snap_lefton(     "image_snap_lefton",     "Snap Left On",            "");
+Attr       QEnvironment::image_snap_rightoff(   "image_snap_rightoff",   "Snap Right Off",          "");
+Attr       QEnvironment::image_snap_righton(    "image_snap_righton",    "Snap Right On",           "");
+
+AttrNumber QEnvironment::star_numpoints( "star_numpoints", "Edges Number", AFGUI::STAR_NUMPOINTS );
+AttrNumber QEnvironment::star_radiusout( "star_radiusout", "Outer Radius", AFGUI::STAR_RADIUSOUT );
+AttrNumber QEnvironment::star_radiusin(  "star_radiusin",  "Inner Radius", AFGUI::STAR_RADIUSIN  );
+AttrNumber QEnvironment::star_rotate(    "star_rotate",    "Rotate Angle", AFGUI::STAR_ROTATE    );
 
 Attr       QEnvironment::soundJobAdded(      "sound_job_added",      "Job Added",               ""                             );
 Attr       QEnvironment::soundJobDone(       "sound_job_done",       "Job Done",                ""                             );
@@ -135,6 +140,11 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &image_snap_lefton);
     ms_attrs_gui.append( &image_snap_rightoff);
     ms_attrs_gui.append( &image_snap_righton);
+
+    ms_attrs_gui.append( &star_numpoints );
+    ms_attrs_gui.append( &star_radiusout );
+    ms_attrs_gui.append( &star_radiusin  );
+    ms_attrs_gui.append( &star_rotate    );
 
     ms_attrs_gui.append( &font_family         );
     ms_attrs_gui.append( &font_sizename       );

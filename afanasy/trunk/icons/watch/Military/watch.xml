@@ -1,16 +1,26 @@
 <!-- Afanasy Watch "Military" Theme -->
 <watch>
+
     <theme               >Military</theme>
+
     <image_back          >afanasy.png</image_back>
+
     <image_border_topleft>border_topleft.png</image_border_topleft>
     <image_border_topright>border_topright</image_border_topright>
     <image_border_botleft>border_botleft.png</image_border_botleft>
     <image_border_botright>border_botright.png</image_border_botright>
+
+    <star_numpoints>5</star_numpoints>
+    <star_radiusout>100</star_radiusout>
+    <star_radiusin>40</star_radiusin>
+    <star_rotate>0</star_rotate>
+
     <font_family         >SansSerif</font_family>
     <font_sizename       >10</font_sizename>
     <font_sizeinfo       >8</font_sizeinfo>
     <font_sizemin        >5</font_sizemin>
     <font_sizeplotter    >7</font_sizeplotter>
+
     <clr_Window          >5F7844</clr_Window>
     <clr_WindowText      >320000</clr_WindowText>
     <clr_Base            >AAE682</clr_Base>
@@ -48,4 +58,5 @@
     <clr_textmuted       >465A32</clr_textmuted>
     <clr_textdone        >F0C83C</clr_textdone>
     <clr_textstars       >14320A</clr_textstars>
+
 </watch>

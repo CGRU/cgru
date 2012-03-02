@@ -46,6 +46,11 @@ public:
     static Attr image_snap_rightoff;
     static Attr image_snap_righton;
 
+    static AttrNumber star_numpoints;
+    static AttrNumber star_radiusout;
+    static AttrNumber star_radiusin;
+    static AttrNumber star_rotate;
+
     static Attr soundJobAdded;
     static Attr soundJobDone;
     static Attr soundJobError;
