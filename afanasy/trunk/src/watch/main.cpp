@@ -1,17 +1,12 @@
 #include <QtGui/QApplication>
 #include <QtGui/QIcon>
 
-//#include <Python.h>
-
-#define _USE_MATH_DEFINES
-#include <math.h>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "dialog.h"
-#include "item.h"
+
 #include "watch.h"
 
 #define AFOUTPUT
@@ -71,27 +66,6 @@ int main(int argc, char *argv[])
 
    QApplication app(argc, argv);
    app.setWindowIcon( QIcon( afqt::stoq( ENV.getCGRULocation()) + "/icons/afwatch.png"));
-   QPalette palette = app.palette();
-   QENV.setPalette( palette);
-   app.setPalette( palette);
-
-   //
-   // calculate star points:
-   {
-      float r = .4f;
-      float angle   = float( 90.0/180*M_PI);
-      float angle_d = float( 36.0f/180*M_PI);
-      for( int i = 0; i < 10; i++)
-      {
-         Item::star_pointsInit[i].setX( cosf( angle));
-         Item::star_pointsInit[i].setY(-sinf( angle));
-         i++;
-         angle += angle_d;
-         Item::star_pointsInit[i].setX( cosf( angle)*r);
-         Item::star_pointsInit[i].setY(-sinf( angle)*r);
-         angle += angle_d;
-      }
-   }
 
    Dialog dialog;
    if( !dialog.isInitialized())

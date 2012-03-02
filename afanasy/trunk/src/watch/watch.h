@@ -100,6 +100,8 @@ public:
     inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return services_icons_large.value( service_name, NULL);}
     inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return services_icons_small.value( service_name, NULL);}
 
+    void static refreshGui();
+
     void static loadImage( QPixmap & o_pixmap, const QString & i_filename);
 
 private:

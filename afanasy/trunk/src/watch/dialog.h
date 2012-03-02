@@ -51,6 +51,8 @@ public:
     void repaintStart( int mseconds = 1000);
     void repaintFinish();
 
+    void reloadImages();
+
     void keyPressEvent(    QKeyEvent         * event);
 
 signals:
@@ -80,7 +82,6 @@ private:
     void closeList();
     void connectionEstablished();
     void setDefaultWindowTitle();
-    void reloadImages();
 
 private:
     bool initialized;
@@ -113,8 +114,8 @@ private:
 
     af::MsgClassUserHost mcuserhost;
 
-    QPixmap img_topleft;
-    QPixmap img_topright;
-    QPixmap img_botleft;
-    QPixmap img_botright;
+    QPixmap m_img_topleft;
+    QPixmap m_img_topright;
+    QPixmap m_img_botleft;
+    QPixmap m_img_botright;
 };

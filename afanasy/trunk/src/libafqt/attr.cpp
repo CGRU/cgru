@@ -28,6 +28,7 @@ void Attr::writeData()  {}
 bool Attr::read( const QDomDocument & doc)
 {
    if( getXMLElement( doc, name, str) == false) return false;
+   str = str.trimmed();
    return readData();
 }
 

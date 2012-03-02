@@ -5,44 +5,44 @@
 
 class LabelVersion : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   LabelVersion ( QWidget *parent);
-   ~LabelVersion ();
+    LabelVersion ( QWidget *parent);
+    ~LabelVersion ();
 
-   void showMessage( const std::string & str);
+    void showMessage( const std::string & str);
 
-   static int getStringStatus( const std::string & str);
+    static int getStringStatus( const std::string & str);
 
-   enum Status {
-      SS_None = 0,
-      SS_Info,
-      SS_Alarm,
-      SS_Last
-   };
+    enum Status {
+        SS_None = 0,
+        SS_Info,
+        SS_Alarm,
+        SS_Last
+    };
 
 protected:
-   void paintEvent( QPaintEvent * event);
-   void mousePressEvent( QMouseEvent * event);
-   void mouseDoubleClickEvent( QMouseEvent * event );
+    void paintEvent( QPaintEvent * event);
+    void mousePressEvent( QMouseEvent * event);
+    void mouseDoubleClickEvent( QMouseEvent * event );
 
 private slots:
-   void refreshMessage();
+    void refreshMessage();
 
 private:
-   void resetMessage();
+    void resetMessage();
 
 private:
-   QFont font;
-   QString label;
-   QString tooltip;
-   QString message;
-   //   QPixmap logo;
+    QFont font;
+    QString label;
+    QString tooltip;
+    QString message;
+    //   QPixmap logo;
 
-   QTimer timer;
+    QTimer timer;
 
-   int status;
+    int status;
 
-   int phase;
+    int phase;
 };

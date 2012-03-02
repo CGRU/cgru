@@ -49,7 +49,6 @@ FileWidget::~FileWidget()
 
 void FileWidget::browse()
 {
-//    QString afile = QFileDialog::getOpenFileName( this, "Choose Sound File", "", "Sounds [*.wav] (*.wav)");
     QString afile = QFileDialog::getOpenFileName( this,
                                                   QString("Browse %1 File").arg( m_attr->getLabel()),
                                                   "", m_filesmask);
@@ -59,9 +58,11 @@ void FileWidget::browse()
 
     m_lineedit->setText( afile);
     m_attr->str = m_lineedit->text();
+    Watch::refreshGui();
 }
 
 void FileWidget::editingFinished()
 {
     m_attr->str = m_lineedit->text();
+    Watch::refreshGui();
 }

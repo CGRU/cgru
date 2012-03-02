@@ -100,15 +100,11 @@ Dialog::Dialog():
     hlayout_b->addWidget( btnMonitor[Watch::WUsers   ]);
     hlayout_b->addStretch();
 
-    setFocusPolicy(Qt::StrongFocus);
-
     connect( &qServer,               SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
     connect( &qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
     connect( &qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
-
-    setAutoFillBackground( true);
 
     monitor = new MonitorHost();
 
@@ -116,11 +112,16 @@ Dialog::Dialog():
 
     connect( &repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
 
+    setFocusPolicy(Qt::StrongFocus);
+    setAutoFillBackground( true);
+    QRect rect;
+    if( afqt::QEnvironment::getRect( "Main", rect)) setGeometry( rect);
+
     displayInfo("Ready.");
     initialized = true;
 
-    QRect rect;
-    if( afqt::QEnvironment::getRect( "Main", rect)) setGeometry( rect);
+    reloadImages();
+    Watch::refreshGui();
 }
 
 void Dialog::closeEvent( QCloseEvent * event) { afqt::QEnvironment::setRect( "Main", geometry());}
@@ -133,8 +134,8 @@ Dialog::~Dialog()
     delete monitor;
 }
 
-void Dialog::repaintStart( int mseconds) { repaintTimer.start( mseconds);                             }
-void Dialog::repaintFinish()             { repaintTimer.stop(); ButtonMonitor::refreshImages();       }
+void Dialog::repaintStart( int mseconds) { repaintTimer.start( mseconds);}
+void Dialog::repaintFinish()             { repaintTimer.stop();}
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
 void Dialog::sendRegister(){ qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, monitor, true));}
 void Dialog::sendMsg( af::Msg * msg)
@@ -519,8 +520,8 @@ void Dialog::actGuiTheme( QString theme)
 {
     if( afqt::QEnvironment::loadTheme( theme))
     {
-        ButtonMonitor::refreshImages();
-        repaintWatch();
+        Watch::refreshGui();
+        //repaintWatch();
         Watch::displayInfo(QString("Theme '%1' loaded").arg( theme));
     }
     else
@@ -529,10 +530,10 @@ void Dialog::actGuiTheme( QString theme)
 
 void Dialog::reloadImages()
 {
-    Watch::loadImage( img_topleft,  afqt::QEnvironment::image_border_topleft.str  );
-    Watch::loadImage( img_topright, afqt::QEnvironment::image_border_topright.str );
-    Watch::loadImage( img_botleft,  afqt::QEnvironment::image_border_botleft.str  );
-    Watch::loadImage( img_botright, afqt::QEnvironment::image_border_botright.str );
+    Watch::loadImage( m_img_topleft,  afqt::QEnvironment::image_border_topleft.str  );
+    Watch::loadImage( m_img_topright, afqt::QEnvironment::image_border_topright.str );
+    Watch::loadImage( m_img_botleft,  afqt::QEnvironment::image_border_botleft.str  );
+    Watch::loadImage( m_img_botright, afqt::QEnvironment::image_border_botright.str );
 }
 
 void Dialog::paintEvent( QPaintEvent * event )
@@ -543,25 +544,22 @@ void Dialog::paintEvent( QPaintEvent * event )
 
     QRect r = rect();
 
-    if( false == img_topleft.isNull())
-        p.drawPixmap( 0, 0, img_topleft);
+    if( false == m_img_topleft.isNull())
+        p.drawPixmap( 0, 0, m_img_topleft);
 
-    if( false == img_topright.isNull())
-        p.drawPixmap( r.width() - img_topright.width(), 0, img_topright);
+    if( false == m_img_topright.isNull())
+        p.drawPixmap( r.width() - m_img_topright.width(), 0, m_img_topright);
 
-    if( false == img_botleft.isNull())
-        p.drawPixmap( 0, r.height() - img_botleft.height(), img_botleft);
+    if( false == m_img_botleft.isNull())
+        p.drawPixmap( 0, r.height() - m_img_botleft.height(), m_img_botleft);
 
-    if( false == img_botright.isNull())
-        p.drawPixmap( r.width() - img_topright.width(), r.height() - img_botright.height(), img_botright);
+    if( false == m_img_botright.isNull())
+        p.drawPixmap( r.width() - m_img_botright.width(), r.height() - m_img_botright.height(), m_img_botright);
 //    QWidget::paintEvent( event );
 }
 
 void Dialog::repaintWatch()
 {
-    reloadImages();
-    repaint();
     if ( listitems ) listitems->repaintItems();
-
     Watch::repaint();
 }

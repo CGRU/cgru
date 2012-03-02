@@ -6,6 +6,9 @@
 #include <QtGui/QPixmap>
 #include <QtGui/QSound>
 
+//#define _USE_MATH_DEFINES
+//#include <math.h>
+
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -15,6 +18,7 @@
 #include "blockinfo.h"
 #include "buttonmonitor.h"
 #include "dialog.h"
+#include "item.h"
 #include "monitorhost.h"
 #include "listtasks.h"
 #include "reciever.h"
@@ -87,8 +91,6 @@ void Watch::displayWarning( const QString &message){if(d){d->displayWarning( mes
 void Watch::displayError(   const QString &message){if(d){d->displayError(   message);if(d->isHidden())d->show();}}
 void Watch::setWindowTitle( const QString & title ){if(d){d->setWindowTitle( title  );if(d->isHidden())d->show();}}
 void Watch::keyPressEvent( QKeyEvent * event) { if(d) d->keyPressEvent( event);}
-void Watch::repaintStart()  { if(d) d->repaintStart(100); }
-void Watch::repaintFinish() { if(d) d->repaintFinish();   }
 
 bool Watch::isInitialized() { if(d) return d->isInitialized(); else return false;  }
 bool Watch::isConnected()   { if(d) return d->isConnected();   else return false;  }
@@ -234,19 +236,6 @@ AFINFO("Watch::raiseWindow: trying to raise a window.")
 AFINFA("Watch::raiseWindow: \"%s\" window raised.", name->toUtf8().data())
 }
 
-void Watch::repaint()
-{
-//printf("Watch::repaint: start\n");
-   QPalette palette = app->palette();
-   afqt::QEnvironment::setPalette( palette);
-   afqt::QEnvironment::initFonts();
-   app->setPalette( palette);
-
-   for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
-   for( QLinkedList<Wnd*>::iterator wIt = windows.begin(); wIt != windows.end(); wIt++) (*wIt)->update();
-//printf("Watch::repaint: finish\n");
-}
-
 void Watch::startProcess( const QString & cmd, const QString & wdir)
 {
    printf("Starting '%s'", cmd.toUtf8().data());
@@ -299,6 +288,36 @@ void Watch::someJobError()
         QSound::play( afqt::QEnvironment::soundJobError.str );
 }
 
+void Watch::repaintStart()  { if( d) d->repaintStart(100); }
+void Watch::repaintFinish() { if( d) d->repaintFinish(); refreshGui(); }
+
+void Watch::refreshGui()
+{
+    // Calculate star points:
+    {
+       float r = .4f;
+       float angle   = float( 90.0/180*M_PI);
+       float angle_d = float( 36.0f/180*M_PI);
+       for( int i = 0; i < 10; i++)
+       {
+          Item::star_pointsInit[i].setX( cosf( angle));
+          Item::star_pointsInit[i].setY(-sinf( angle));
+          i++;
+          angle += angle_d;
+          Item::star_pointsInit[i].setX( cosf( angle)*r);
+          Item::star_pointsInit[i].setY(-sinf( angle)*r);
+          angle += angle_d;
+       }
+    }
+
+    // Refresh Images:
+    ButtonMonitor::refreshImages();
+    if( d) d->reloadImages();
+
+    // Repaint:
+    repaint();
+}
+
 void Watch::loadImage( QPixmap & o_pixmap, const QString & i_filename)
 {
     // Set Pixmap to empty if needed:
@@ -329,4 +348,18 @@ void Watch::loadImage( QPixmap & o_pixmap, const QString & i_filename)
             }
         }
     }
+}
+
+void Watch::repaint()
+{
+//printf("Watch::repaint: start\n");
+    QPalette palette = app->palette();
+    afqt::QEnvironment::setPalette( palette);
+    afqt::QEnvironment::initFonts();
+    app->setPalette( palette);
+
+    if( d) d->repaint();
+    for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
+    for( QLinkedList<Wnd*>::iterator wIt = windows.begin(); wIt != windows.end(); wIt++) (*wIt)->update();
+//printf("Watch::repaint: finish\n");
 }
