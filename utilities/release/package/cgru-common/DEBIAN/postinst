@@ -1,7 +1,0 @@
-#!/bin/bash
-
-echo "CGRU-common post install:"
-
-find /opt/cgru -type d -exec chmod a+rwx {} \;
-
-exit 0

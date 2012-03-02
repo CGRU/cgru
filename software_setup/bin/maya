@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source $CGRU_LOCATION/software_setup/setup_maya.sh
-
-"$APP_EXE" "$@"

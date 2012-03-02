@@ -1,5 +1,0 @@
-#!/bin/bash
-
-source $CGRU_LOCATION/software_setup/setup_blender.sh
-
-$APP_EXE "$@"

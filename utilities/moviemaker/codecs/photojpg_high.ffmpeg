@@ -1,2 +1,0 @@
-PhotoJPG (high)
-ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec mjpeg -qmin 1 -qmax 3 "@OUTPUT@.@CONTAINER@"

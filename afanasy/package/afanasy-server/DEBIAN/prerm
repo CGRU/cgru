@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "Afanasy server PRE REMOVE:"
-
-/etc/init.d/afserver stop || true
-
-/opt/cgru/afanasy/init/initlinks.sh u rm afserver || true
-
-exit 0

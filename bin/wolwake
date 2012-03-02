@@ -1,3 +1,0 @@
-#!/bin/bash
-
-python $CGRU_LOCATION/utilities/wolwake.py "$@"
