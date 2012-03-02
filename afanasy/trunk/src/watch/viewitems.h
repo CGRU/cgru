@@ -11,29 +11,29 @@ class ListItems;
 class ItemDelegate : public QAbstractItemDelegate
 {
 public:
-   ItemDelegate( QWidget *parent = 0);
+    ItemDelegate( QWidget *parent = 0);
 
-   void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    void paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-   QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
+    QSize sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const;
 
-   void emitSizeHintChanged( const QModelIndex &index);
+    void emitSizeHintChanged( const QModelIndex &index);
 };
 
 class ViewItems: public QListView
 {
 public:
-   ViewItems( QWidget * parent);
-   virtual ~ViewItems();
+    ViewItems( QWidget * parent);
+    virtual ~ViewItems();
 
-   void emitSizeHintChanged( const QModelIndex &index);
+    void emitSizeHintChanged( const QModelIndex &index);
 
-   inline void updateGeometries() { QListView::updateGeometries();}
+    inline void updateGeometries() { QListView::updateGeometries();}
 
-//   inline void set_mousePressEvent_handler( bool (*handler)( QMouseEvent  *)) { mousePressEvent_handler = handler;}
-   inline void setListItems( ListItems * ptr) { listitems = ptr;}
+    //   inline void set_mousePressEvent_handler( bool (*handler)( QMouseEvent  *)) { mousePressEvent_handler = handler;}
+    inline void setListItems( ListItems * ptr) { listitems = ptr;}
 
-   void repaintViewport();
+    void repaintViewport();
 
 protected:
     void keyPressEvent( QKeyEvent * event);
@@ -47,13 +47,13 @@ private:
 
 private:
 //   bool (*mousePressEvent_handler)( QMouseEvent * );
-   ItemDelegate * itemDelegate;
+    ItemDelegate * itemDelegate;
 
-   ListItems * listitems;
+    ListItems * listitems;
 
-   QPixmap m_back_pixmap;
-   QString m_back_filename;
-   int m_back_angle;
-   int m_back_offset_x;
-   int m_back_offset_y;
+    QPixmap m_back_pixmap;
+    QString m_back_filename;
+    int m_back_angle;
+    int m_back_offset_x;
+    int m_back_offset_y;
 };

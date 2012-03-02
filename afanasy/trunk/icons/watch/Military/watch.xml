@@ -2,6 +2,10 @@
 <watch>
    <theme               >Military</theme>
    <image_back          >afanasy.png</image_back>
+   <image_border_topleft></image_border_topleft>
+   <image_border_topright></image_border_topright>
+   <image_border_botleft></image_border_botleft>
+   <image_border_botright></image_border_botright>
    <font_family         >SansSerif</font_family>
    <font_sizename       >10</font_sizename>
    <font_sizeinfo       >8</font_sizeinfo>

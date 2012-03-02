@@ -10,9 +10,11 @@
 
 #include "watch.h"
 
-FileWidget::FileWidget( QWidget * parent, afqt::Attr * attrString):
-    QWidget( parent),
-    attr( attrString)
+FileWidget::FileWidget( QWidget * i_parent, afqt::Attr * i_attr,
+                        const QString & i_filesmask):
+    QWidget( i_parent),
+    m_attr( i_attr),
+    m_filesmask( i_filesmask)
 {
     QHBoxLayout * layout = new QHBoxLayout(this);
 #if QT_VERSION >= 0x040300
@@ -22,17 +24,17 @@ FileWidget::FileWidget( QWidget * parent, afqt::Attr * attrString):
     QSizePolicy policy;
     policy.setHorizontalPolicy( QSizePolicy::Minimum);
 
-    QLabel * label = new QLabel( attr->getLabel(), this);
+    QLabel * label = new QLabel( m_attr->getLabel(), this);
     policy.setHorizontalPolicy( QSizePolicy::Maximum);
     label->setSizePolicy( policy);
     layout->addWidget( label);
 
-    lineedit = new QLineEdit( this);
+    m_lineedit = new QLineEdit( this);
     policy.setHorizontalPolicy( QSizePolicy::Minimum);
-    lineedit->setSizePolicy( policy);
-    lineedit->setText( attr->str);
-    connect( lineedit, SIGNAL( editingFinished()), this, SLOT( editingFinished()));
-    layout->addWidget( lineedit);
+    m_lineedit->setSizePolicy( policy);
+    m_lineedit->setText( m_attr->str);
+    connect( m_lineedit, SIGNAL( editingFinished()), this, SLOT( editingFinished()));
+    layout->addWidget( m_lineedit);
 
     QPushButton * button = new QPushButton( "Browse", this);
     connect( button, SIGNAL( pressed()), this, SLOT( browse()));
@@ -47,16 +49,19 @@ FileWidget::~FileWidget()
 
 void FileWidget::browse()
 {
-    QString afile = QFileDialog::getOpenFileName( this, "Choose Sound File", "", "Sounds [*.wav] (*.wav)");
+//    QString afile = QFileDialog::getOpenFileName( this, "Choose Sound File", "", "Sounds [*.wav] (*.wav)");
+    QString afile = QFileDialog::getOpenFileName( this,
+                                                  QString("Browse %1 File").arg( m_attr->getLabel()),
+                                                  "", m_filesmask);
 
     if( afile.isEmpty())
         return;
 
-    lineedit->setText( afile);
-    attr->str = lineedit->text();
+    m_lineedit->setText( afile);
+    m_attr->str = m_lineedit->text();
 }
 
 void FileWidget::editingFinished()
 {
-    attr->str = lineedit->text();
+    m_attr->str = m_lineedit->text();
 }

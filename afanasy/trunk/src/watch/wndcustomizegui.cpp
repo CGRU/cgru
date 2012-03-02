@@ -140,17 +140,20 @@ WndCustomizeGUI::WndCustomizeGUI():
 
     // Images:
     vlayout = new QVBoxLayout( imagesWidget);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_back ); vlayout->addWidget( flw);
 
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_topleft  ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_topright ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_botleft  ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_botright ); vlayout->addWidget( flw);
+    QString filesmask("PNG Images [*.png] (*.png)");
 
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_leftoff  ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_lefton   ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_rightoff ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_righton  ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_back, filesmask); vlayout->addWidget( flw);
+
+    flw = new FileWidget( this, &afqt::QEnvironment::image_border_topleft , filesmask ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_border_topright, filesmask ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_border_botleft , filesmask ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_border_botright, filesmask ); vlayout->addWidget( flw);
+
+    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_leftoff , filesmask ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_lefton  , filesmask ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_rightoff, filesmask ); vlayout->addWidget( flw);
+    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_righton , filesmask ); vlayout->addWidget( flw);
 
 
     // Fonts:

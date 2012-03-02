@@ -241,7 +241,7 @@ void Watch::repaint()
    afqt::QEnvironment::setPalette( palette);
    afqt::QEnvironment::initFonts();
    app->setPalette( palette);
-   if( d) d->repaint();
+
    for( int i = 0; i < WLAST; i++) if( opened[i]) opened[i]->repaintItems();
    for( QLinkedList<Wnd*>::iterator wIt = windows.begin(); wIt != windows.end(); wIt++) (*wIt)->update();
 //printf("Watch::repaint: finish\n");
@@ -297,4 +297,36 @@ void Watch::someJobError()
     displayWarning("Job Error.");
     if( false == afqt::QEnvironment::soundJobError.str.isEmpty())
         QSound::play( afqt::QEnvironment::soundJobError.str );
+}
+
+void Watch::loadImage( QPixmap & o_pixmap, const QString & i_filename)
+{
+    // Set Pixmap to empty if needed:
+    if( i_filename.isEmpty())
+    {
+        if( false == o_pixmap.isNull())
+        {
+            o_pixmap = QPixmap();
+        }
+    }
+    else
+    {
+        // Try to load a file:
+        if( false == o_pixmap.load( i_filename) )
+        {
+            // Try to load a file in current theme folder:
+            if( false == o_pixmap.load( afqt::stoq(af::Environment::getAfRoot())
+                                + "/icons/watch/"
+                                + afqt::QEnvironment::theme.str + "/"
+                                + i_filename))
+            {
+                // Load fails:
+                if( false == o_pixmap.isNull())
+                {
+                    // Set Pixmap to empty if it was not
+                    o_pixmap = QPixmap();
+                }
+            }
+        }
+    }
 }

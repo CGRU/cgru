@@ -27,32 +27,34 @@ class QScrollArea;
 
 class Dialog : public QWidget
 {
-   Q_OBJECT
+    Q_OBJECT
 
 public:
-   Dialog();
-   ~Dialog();
+    Dialog();
+    ~Dialog();
 
-   inline bool isInitialized() const { return initialized; }
-   inline bool isConnected()   const { return connected;   }
+    inline bool isInitialized() const { return initialized; }
+    inline bool isConnected()   const { return connected;   }
 
-   inline int getUid() const { return uid;}
+    inline int getUid() const { return uid;}
 
-   void inline displayInfo(    const QString &message) { infoline->displayInfo(    message); }
-   void inline displayWarning( const QString &message) { infoline->displayWarning( message); }
-   void inline displayError(   const QString &message) { infoline->displayError(   message); }
+    void inline displayInfo(    const QString &message) { infoline->displayInfo(    message); }
+    void inline displayWarning( const QString &message) { infoline->displayWarning( message); }
+    void inline displayError(   const QString &message) { infoline->displayError(   message); }
 
-   void sendMsg( af::Msg * msg);
+    void sendMsg( af::Msg * msg);
 
-   bool openMonitor( int type, bool open);
+    bool openMonitor( int type, bool open);
 
-   inline MonitorHost * getMonitor() { return monitor;}
+    inline MonitorHost * getMonitor() { return monitor;}
 
-   void repaintStart( int mseconds = 1000);
-   void repaintFinish();
+    void repaintStart( int mseconds = 1000);
+    void repaintFinish();
+
+    void keyPressEvent(    QKeyEvent         * event);
 
 signals:
-   void stop();
+    void stop();
 
 private slots:
     void newMessage( af::Msg * msg);
@@ -68,48 +70,51 @@ private slots:
     void actShowOfflineNoise();
     void actGuiTheme( QString theme);
 
-public:
-   void keyPressEvent(    QKeyEvent         * event);
 protected:
-   void contextMenuEvent( QContextMenuEvent * event);
-   void closeEvent(       QCloseEvent       * event);
-   void paintEvent ( QPaintEvent * event );
+    void contextMenuEvent( QContextMenuEvent * event);
+    void closeEvent(       QCloseEvent       * event);
+    void paintEvent ( QPaintEvent * event );
 
 private:
-   bool connected;
-   int uid;
-   MonitorHost * monitor;
-
-   int monitorType;
-
-   afqt::QThreadClientUp   qThreadClientUpdate;
-   afqt::QThreadClientSend qThreadSend;
-   afqt::QServer           qServer;
-
-   ListItems * listitems;
-   OfflineScreen * offlinescreen;
-   InfoLine * infoline;
-   LabelVersion * labelversion;
-
-   QHBoxLayout *hlayout_a;
-   QVBoxLayout *vlayout_a;
-   QHBoxLayout *hlayout_b;
-   QVBoxLayout *vlayout_b;
-
-   QTimer repaintTimer;
-
-   ButtonMonitor *btnMonitor[Watch::WLAST];
-
-   ButtonOut *btn_outlft;
-   ButtonOut *btn_outrht;
-
-   af::MsgClassUserHost mcuserhost;
-
-   bool initialized;
+    void sendRegister();
+    void closeList();
+    void connectionEstablished();
+    void setDefaultWindowTitle();
+    void reloadImages();
 
 private:
-   void sendRegister();
-   void closeList();
-   void connectionEstablished();
-   void setDefaultWindowTitle();
+    bool initialized;
+    bool connected;
+    int uid;
+    MonitorHost * monitor;
+
+    int monitorType;
+
+    afqt::QThreadClientUp   qThreadClientUpdate;
+    afqt::QThreadClientSend qThreadSend;
+    afqt::QServer           qServer;
+
+    ListItems * listitems;
+    OfflineScreen * offlinescreen;
+    InfoLine * infoline;
+    LabelVersion * labelversion;
+
+    QHBoxLayout *hlayout_a;
+    QVBoxLayout *vlayout_a;
+    QHBoxLayout *hlayout_b;
+    QVBoxLayout *vlayout_b;
+
+    QTimer repaintTimer;
+
+    ButtonMonitor *btnMonitor[Watch::WLAST];
+
+    ButtonOut *btn_outlft;
+    ButtonOut *btn_outrht;
+
+    af::MsgClassUserHost mcuserhost;
+
+    QPixmap img_topleft;
+    QPixmap img_topright;
+    QPixmap img_botleft;
+    QPixmap img_botright;
 };

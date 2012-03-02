@@ -18,28 +18,28 @@
 #include "../include/macrooutput.h"
 
 ItemDelegate::ItemDelegate( QWidget *parent):
-   QAbstractItemDelegate( parent)
+    QAbstractItemDelegate( parent)
 {
 }
 
 void ItemDelegate::paint( QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-   if( qVariantCanConvert<Item*>(index.data()))
-      qVariantValue<Item*>( index.data())->paint( painter, option);
+    if( qVariantCanConvert<Item*>(index.data()))
+        qVariantValue<Item*>( index.data())->paint( painter, option);
 }
 
 QSize ItemDelegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-   if( qVariantCanConvert<Item*>(index.data()))
-      return qVariantValue<Item*>(index.data())->sizeHint( option);
-   return QSize();
+    if( qVariantCanConvert<Item*>(index.data()))
+        return qVariantValue<Item*>(index.data())->sizeHint( option);
+    return QSize();
 }
 
 void ItemDelegate::emitSizeHintChanged( const QModelIndex &index)
 {
-#if QT_VERSION >= 0x040400
-   emit sizeHintChanged( index);
-#endif
+    #if QT_VERSION >= 0x040400
+    emit sizeHintChanged( index);
+    #endif
 }
 
 ViewItems::ViewItems( QWidget * parent):
@@ -122,6 +122,7 @@ void ViewItems::mousePressEvent( QMouseEvent * event)
     if( listitems)
         if( listitems->mousePressed( event))
             return;
+
     QListView::mousePressEvent( event);
 }
 

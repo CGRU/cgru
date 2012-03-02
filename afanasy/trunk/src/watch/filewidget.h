@@ -10,14 +10,17 @@ class FileWidget : public QWidget
 {
 Q_OBJECT
 public:
-   FileWidget( QWidget * parent, afqt::Attr * attrString);
-   ~FileWidget();
+    FileWidget( QWidget * i_parent, afqt::Attr * i_attr,
+                const QString & i_filesmask = QString(""));
+    ~FileWidget();
 
 private slots:
-   void editingFinished();
-   void browse();
+    void editingFinished();
+    void browse();
 
 private:
-   afqt::Attr * attr;
-   QLineEdit * lineedit;
+    afqt::Attr * m_attr;
+    QLineEdit * m_lineedit;
+
+    QString m_filesmask;
 };

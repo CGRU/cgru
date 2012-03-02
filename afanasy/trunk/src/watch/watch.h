@@ -20,12 +20,12 @@ class WndList;
 class Watch
 {
 public:
-   Watch( Dialog * pDialog, QApplication * pApplication);
-   ~Watch();
+    Watch( Dialog * pDialog, QApplication * pApplication);
+    ~Watch();
 
-   static void destroy();
+    static void destroy();
 
-   enum MonType{
+    enum MonType{
                WNONE,
 
                WJobs,
@@ -37,84 +37,86 @@ public:
                WLAST
             };
 
-   static const QString BtnName[WLAST];
-   static const QString WndName[WLAST];
+    static const QString BtnName[WLAST];
+    static const QString WndName[WLAST];
 
-   static bool isInitialized();
-   static bool isConnected();
-   static int  getUid();
-   static int  getId();
+    static bool isInitialized();
+    static bool isConnected();
+    static int  getUid();
+    static int  getId();
 
-   static void connectionLost();
-   static void connectionEstablished();
+    static void connectionLost();
+    static void connectionEstablished();
 
-   static void sendMsg(  af::Msg * msg);
+    static void sendMsg(  af::Msg * msg);
 
-   static void addWindow(      Wnd      * wnd      );
-   static void removeWindow(   Wnd      * wnd      );
-   static void addReciever(    Reciever * reciever );
-   static void removeReciever( Reciever * reciever );
+    static void addWindow(      Wnd      * wnd      );
+    static void removeWindow(   Wnd      * wnd      );
+    static void addReciever(    Reciever * reciever );
+    static void removeReciever( Reciever * reciever );
 
-   static void caseMessage( af::Msg * msg);
+    static void caseMessage( af::Msg * msg);
 
-   static void setWindowTitle( const QString & title);
+    static void setWindowTitle( const QString & title);
 
-   static void displayInfo(    const QString &message);
-   static void displayWarning( const QString &message);
-   static void displayError(   const QString &message);
+    static void displayInfo(    const QString &message);
+    static void displayWarning( const QString &message);
+    static void displayError(   const QString &message);
 
-   static bool openMonitor( int type, bool open);
+    static bool openMonitor( int type, bool open);
 
-   static void listenJob(  int id, const QString & name);
-   inline static void listenJob_rem(  int id) { listenjobids.removeAll(id);}
-   static void watchJodTasksWindowAdd( int id, const QString & name);
-   static void watchJodTasksWindowRem( int id);
-   static void listenTask( int jobid, int block, int task, const QString & name);
+    static void listenJob(  int id, const QString & name);
+    inline static void listenJob_rem(  int id) { listenjobids.removeAll(id);}
+    static void watchJodTasksWindowAdd( int id, const QString & name);
+    static void watchJodTasksWindowRem( int id);
+    static void listenTask( int jobid, int block, int task, const QString & name);
 
-   inline static Dialog * getDialog()  { return d;}
-   static const af::Address & getClientAddress();
-   static void keyPressEvent( QKeyEvent * event);
+    inline static Dialog * getDialog()  { return d;}
+    static const af::Address & getClientAddress();
+    static void keyPressEvent( QKeyEvent * event);
 
-   static void   subscribe( const QList<int> & events);
-   static void unsubscribe( const QList<int> & events);
+    static void   subscribe( const QList<int> & events);
+    static void unsubscribe( const QList<int> & events);
 
-   static void setUid(   int uid );
+    static void setUid(   int uid );
 
-   static void addJobId( int jId );
-   static void delJobId( int jId );
+    static void addJobId( int jId );
+    static void delJobId( int jId );
 
     static void someJobAdded();
     static void someJobDone();
     static void someJobError();
 
-   static WndList* opened[WLAST];
+    static WndList* opened[WLAST];
 
-   static void raiseWindow( QWidget * wnd, const QString * name = NULL);
+    static void raiseWindow( QWidget * wnd, const QString * name = NULL);
 
-   static void repaint();
-   static void repaintStart();
-   static void repaintFinish();
+    static void repaint();
+    static void repaintStart();
+    static void repaintFinish();
 
-   static void startProcess( const QString & cmd, const QString & wdir = QString());
+    static void startProcess( const QString & cmd, const QString & wdir = QString());
 
-   inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return services_icons_large.value( service_name, NULL);}
-   inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return services_icons_small.value( service_name, NULL);}
+    inline static const QPixmap * getServiceIconLarge( const QString & service_name) { return services_icons_large.value( service_name, NULL);}
+    inline static const QPixmap * getServiceIconSmall( const QString & service_name) { return services_icons_small.value( service_name, NULL);}
+
+    void static loadImage( QPixmap & o_pixmap, const QString & i_filename);
 
 private:
-   static MonitorHost * m;
-   static Dialog * d;
-   static QApplication * app;
+    static MonitorHost * m;
+    static Dialog * d;
+    static QApplication * app;
 
-   static QLinkedList<Wnd*> windows;
-   static QLinkedList<Reciever*> recievers;
+    static QLinkedList<Wnd*> windows;
+    static QLinkedList<Reciever*> recievers;
 
-   static QStringList previewcmds;
-   static QStringList rendercmds;
+    static QStringList previewcmds;
+    static QStringList rendercmds;
 
-   static QLinkedList<int> listenjobids;
-   static QLinkedList<int> watchtasksjobids;
-   static QLinkedList<QWidget*> watchtaskswindows;
+    static QLinkedList<int> listenjobids;
+    static QLinkedList<int> watchtasksjobids;
+    static QLinkedList<QWidget*> watchtaskswindows;
 
-   static QMap<QString, QPixmap *> services_icons_large;
-   static QMap<QString, QPixmap *> services_icons_small;
+    static QMap<QString, QPixmap *> services_icons_large;
+    static QMap<QString, QPixmap *> services_icons_small;
 };
