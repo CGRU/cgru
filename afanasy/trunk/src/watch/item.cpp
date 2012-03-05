@@ -4,6 +4,9 @@
 #include <QtGui/QPainter>
 #include <QtCore/QTimer>
 
+#define _USE_MATH_DEFINES	 
+#include <math.h>
+
 #include "../include/afjob.h"
 
 #include "../libafqt/qenvironment.h"
