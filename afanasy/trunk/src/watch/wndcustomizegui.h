@@ -8,9 +8,9 @@ class WndCustomizeGUI : public Wnd
 {
 Q_OBJECT
 public:
-   WndCustomizeGUI();
-   ~WndCustomizeGUI();
+    WndCustomizeGUI();
+    ~WndCustomizeGUI();
 
 private slots:
-   void save();
+    void save();
 };

@@ -38,79 +38,86 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+int Dialog::ms_size_border_top   = 40;
+int Dialog::ms_size_border_bot   = 25;
+int Dialog::ms_size_border_left  = 65;
+int Dialog::ms_size_border_right = 75;
+
 Dialog::Dialog():
-    connected(false),
-    uid(0),
-    monitorType( Watch::WNONE),
-    qThreadClientUpdate( this, false, af::Environment::getMonitorUpdatePeriod(), af::Environment::getMonitorConnectRetries()),
-    qThreadSend( this, af::Environment::getMonitorConnectRetries()),
-    qServer( this),
-    listitems( NULL),
-    offlinescreen( NULL),
-    repaintTimer( this),
-    initialized( false)
+    m_connected(false),
+    m_uid(0),
+    m_monitorType( Watch::WNONE),
+    m_qThreadClientUpdate( this, false, af::Environment::getMonitorUpdatePeriod(), af::Environment::getMonitorConnectRetries()),
+    m_qThreadSend( this, af::Environment::getMonitorConnectRetries()),
+    m_qServer( this),
+    m_listitems( NULL),
+    m_offlinescreen( NULL),
+    m_repaintTimer( this),
+    m_initialized( false)
 {
-    if( qServer.isInitialized() == false )
+    if( m_qServer.isInitialized() == false )
     {
         AFERROR("Dialog::Dialog: Server initialization failed.")
         return;
     }
 
-    for( int b = 0; b < Watch::WLAST; b++) btnMonitor[b] = NULL;
+    for( int b = 0; b < Watch::WLAST; b++) m_btnMonitor[b] = NULL;
 
-    hlayout_a = new QHBoxLayout( this);
-    vlayout_a = new QVBoxLayout();
-    hlayout_b = new QHBoxLayout();
-    vlayout_b = new QVBoxLayout();
+    m_hlayout_a = new QHBoxLayout( this);
+    m_vlayout_a = new QVBoxLayout();
+    m_hlayout_b = new QHBoxLayout();
+    m_vlayout_b = new QVBoxLayout();
 
-    hlayout_a->setMargin ( 1);
-    vlayout_a->setMargin ( 1);
-    hlayout_b->setMargin ( 1);
-    vlayout_b->setMargin ( 1);
-    hlayout_a->setSpacing( 1);
-    vlayout_a->setSpacing( 1);
-    hlayout_b->setSpacing( 1);
-    vlayout_b->setSpacing( 1);
+    m_hlayout_a->setMargin ( 0);
+    m_vlayout_a->setMargin ( 0);
+    m_hlayout_b->setMargin ( 0);
+    m_vlayout_b->setMargin ( 0);
+    m_hlayout_a->setSpacing( 0);
+    m_vlayout_a->setSpacing( 0);
+    m_hlayout_b->setSpacing( 0);
+    m_vlayout_b->setSpacing( 0);
 
-    btn_outlft = new ButtonOut( ButtonOut::Left,  this);
-    btn_outrht = new ButtonOut( ButtonOut::Right, this);
+    m_btn_out_left = new ButtonOut( ButtonOut::Left,  this);
+    m_btn_out_right = new ButtonOut( ButtonOut::Right, this);
 
-    hlayout_a->addWidget( btn_outlft);
-    hlayout_a->addLayout( vlayout_a);
-    hlayout_a->addWidget( btn_outrht);
-    vlayout_a->addLayout( hlayout_b);
-    vlayout_a->addLayout( vlayout_b);
+    m_hlayout_a->addWidget( m_btn_out_left);
+    m_hlayout_a->addLayout( m_vlayout_a);
+    m_hlayout_a->addWidget( m_btn_out_right);
+    m_vlayout_a->addLayout( m_hlayout_b);
+    m_vlayout_a->addLayout( m_vlayout_b);
 
-    hlayout_a->setAlignment( btn_outlft, Qt::AlignVCenter);
-    hlayout_a->setAlignment( btn_outrht, Qt::AlignVCenter);
+    m_hlayout_a->setAlignment( m_btn_out_left, Qt::AlignVCenter);
+    m_hlayout_a->setAlignment( m_btn_out_right, Qt::AlignVCenter);
 
-    infoline = new InfoLine( this);
-    infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
-    vlayout_b->addWidget( infoline);
+    m_infoline = new InfoLine( this);
+    m_infoline->setMaximumHeight( ButtonMonitor::ButtonsHeight);
+    m_vlayout_b->addWidget( m_infoline);
 
-    labelversion = new LabelVersion(this);
-    vlayout_b->addWidget( labelversion);
+    m_labelversion = new LabelVersion(this);
+    m_vlayout_b->addWidget( m_labelversion);
 
-    hlayout_b->addStretch();
-    btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
-    hlayout_b->addWidget( btnMonitor[Watch::WJobs    ]);
-    btnMonitor[Watch::WRenders] = new ButtonMonitor( Watch::WRenders, this);
-    hlayout_b->addWidget( btnMonitor[Watch::WRenders ]);
-    btnMonitor[Watch::WUsers]   = new ButtonMonitor( Watch::WUsers,   this);
-    hlayout_b->addWidget( btnMonitor[Watch::WUsers   ]);
-    hlayout_b->addStretch();
+    m_topleft  = new QWidget( this);
+    m_topright = new QWidget( this);
+    m_hlayout_b->addWidget( m_topleft);
+    m_btnMonitor[Watch::WJobs]    = new ButtonMonitor( Watch::WJobs,    this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WJobs    ]);
+    m_btnMonitor[Watch::WRenders] = new ButtonMonitor( Watch::WRenders, this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WRenders ]);
+    m_btnMonitor[Watch::WUsers]   = new ButtonMonitor( Watch::WUsers,   this);
+    m_hlayout_b->addWidget( m_btnMonitor[Watch::WUsers   ]);
+    m_hlayout_b->addWidget( m_topright);
 
-    connect( &qServer,               SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
-    connect( &qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
-    connect( &qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
-    connect( &qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
-    connect( &qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
+    connect( &m_qServer,               SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
+    connect( &m_qThreadSend,           SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
+    connect( &m_qThreadClientUpdate,   SIGNAL( newMsg( af::Msg*)), this, SLOT( newMessage( af::Msg*)));
+    connect( &m_qThreadClientUpdate,   SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
+    connect( &m_qThreadSend,           SIGNAL( connectionLost()),  this, SLOT( connectionLost()));
 
-    monitor = new MonitorHost();
+    m_monitor = new MonitorHost();
 
     connectionLost();
 
-    connect( &repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
+    connect( &m_repaintTimer, SIGNAL( timeout()), this, SLOT( repaintWatch()));
 
     setFocusPolicy(Qt::StrongFocus);
     setAutoFillBackground( true);
@@ -118,7 +125,7 @@ Dialog::Dialog():
     if( afqt::QEnvironment::getRect( "Main", rect)) setGeometry( rect);
 
     displayInfo("Ready.");
-    initialized = true;
+    m_initialized = true;
 
     reloadImages();
     Watch::refreshGui();
@@ -130,20 +137,20 @@ Dialog::~Dialog()
 {
     AFINFO("Dialog::~Dialog:")
     Watch::destroy();
-    qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, monitor->getId()));
-    delete monitor;
+    m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, m_monitor->getId()));
+    delete m_monitor;
 }
 
-void Dialog::repaintStart( int mseconds) { repaintTimer.start( mseconds);}
-void Dialog::repaintFinish()             { repaintTimer.stop();}
+void Dialog::repaintStart( int mseconds) { m_repaintTimer.start( mseconds);}
+void Dialog::repaintFinish()             { m_repaintTimer.stop();}
 void Dialog::setDefaultWindowTitle() { setWindowTitle( QString("Watch - ") + afqt::stoq( af::Environment::getUserName()) + "@" + afqt::stoq( af::Environment::getServerName()) );}
-void Dialog::sendRegister(){ qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, monitor, true));}
+void Dialog::sendRegister(){ m_qThreadClientUpdate.setUpMsg( new af::Msg( af::Msg::TMonitorRegister, m_monitor, true));}
 void Dialog::sendMsg( af::Msg * msg)
 {
 #ifdef AFOUTPUT
 printf(" <<< Dialog::sendMsg: ");msg->stdOut();
 #endif
-    qThreadSend.send( msg);
+    m_qThreadSend.send( msg);
 }
 
 void Dialog::contextMenuEvent(QContextMenuEvent *event)
@@ -211,21 +218,21 @@ void Dialog::contextMenuEvent(QContextMenuEvent *event)
 
 void Dialog::connectionLost()
 {
-    if( monitorType == Watch::WJobs )
+    if( m_monitorType == Watch::WJobs )
     {
         if( afqt::QEnvironment::showOfflineNoise.n)
         {
-            offlinescreen =  new OfflineScreen( listitems);
-            vlayout_b->insertWidget( 0, offlinescreen);
+            m_offlinescreen =  new OfflineScreen( m_listitems);
+            m_vlayout_b->insertWidget( 0, m_offlinescreen);
         }
         closeList();
         ButtonMonitor::unset();
     }
 
     displayError("Connection lost.");
-    connected = false;
-    uid = 0;
-    monitor->setId( 0);
+    m_connected = false;
+    m_uid = 0;
+    m_monitor->setId( 0);
     setWindowTitle( "Watch - " + afqt::stoq( af::Environment::getUserName()) + " (connecting...)");
 
     sendRegister();
@@ -235,15 +242,15 @@ void Dialog::connectionLost()
 
 void Dialog::connectionEstablished()
 {
-    if( offlinescreen )
+    if( m_offlinescreen )
     {
-        delete offlinescreen;
-        offlinescreen = NULL;
+        delete m_offlinescreen;
+        m_offlinescreen = NULL;
     }
     displayInfo("Connection established.");
-    connected = true;
+    m_connected = true;
     setDefaultWindowTitle();
-    qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &mcuserhost, true));
+    m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
 
     Watch::connectionEstablished();
 }
@@ -268,9 +275,9 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
    }
    case af::Msg::TMonitorId:
    {
-      if( monitor->getId() != 0 )
+      if( m_monitor->getId() != 0 )
       {
-         if( msg->int32() != monitor->getId()) connectionLost();
+         if( msg->int32() != m_monitor->getId()) connectionLost();
       }
       else
       {
@@ -280,20 +287,20 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
          }
          else
          {
-            monitor->setId( msg->int32());
+            m_monitor->setId( msg->int32());
             connectionEstablished();
-            af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, monitor->getId(), true);
-            qThreadClientUpdate.setUpMsg( msg);
+            af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, m_monitor->getId(), true);
+            m_qThreadClientUpdate.setUpMsg( msg);
          }
       }
       break;
    }
    case af::Msg::TUserId:
    {
-      uid = msg->int32();
-      if( uid == 0 )
+      m_uid = msg->int32();
+      if( m_uid == 0 )
       {
-         if( monitorType == Watch::WJobs )
+         if( m_monitorType == Watch::WJobs )
          {
             ButtonMonitor::unset();
             closeList();
@@ -303,7 +310,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
       else
       {
          displayInfo("You have registered.");
-         if( monitorType == Watch::WNONE )
+         if( m_monitorType == Watch::WNONE )
          {
             ButtonMonitor::pushButton( Watch::WJobs);
          }
@@ -330,7 +337,7 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
       std::string str;
       msg->getString( str);
       if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
-         labelversion->showMessage( str);
+         m_labelversion->showMessage( str);
       else
          new WndText( "Message", msg);
       break;
@@ -354,9 +361,9 @@ printf(" >>> Dialog::newMessage: ");msg->stdOut();
 
 void Dialog::closeList()
 {
-    if( listitems != NULL) listitems->close();
-    listitems = NULL;
-    monitorType = Watch::WNONE;
+    if( m_listitems != NULL) m_listitems->close();
+    m_listitems = NULL;
+    m_monitorType = Watch::WNONE;
 }
 
 bool Dialog::openMonitor( int type, bool open)
@@ -369,12 +376,12 @@ bool Dialog::openMonitor( int type, bool open)
       return false;
    }
 
-   if( !connected ) return false;
-   if(( type == Watch::WJobs) && ( uid == 0 ) && ( af::Environment::VISOR() == false ))
+   if( !m_connected ) return false;
+   if(( type == Watch::WJobs) && ( m_uid == 0 ) && ( af::Environment::VISOR() == false ))
    {
       ButtonMonitor::unset();
       displayWarning("You are not registered ( and have no jobs).");
-      qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &mcuserhost, true));
+      m_qThreadSend.send( new af::Msg( af::Msg::TUserIdRequest, &m_mcuserhost, true));
       return false;
    }
 
@@ -425,7 +432,7 @@ bool Dialog::openMonitor( int type, bool open)
    }
    default:
       AFERRAR("Dialog::changeMonitor: unknown type = %d", type)
-      if( false == open ) monitorType = Watch::WNONE;
+      if( false == open ) m_monitorType = Watch::WNONE;
       return false;
    }
 
@@ -435,9 +442,9 @@ bool Dialog::openMonitor( int type, bool open)
    }
    else
    {
-      listitems = newlist;
-      vlayout_b->insertWidget( 0, newlist);
-      monitorType = type;
+      m_listitems = newlist;
+      m_vlayout_b->insertWidget( 0, newlist);
+      m_monitorType = type;
    }
 
    return true;
@@ -452,11 +459,11 @@ void Dialog::keyPressEvent( QKeyEvent * event)
    {
       if( af::Environment::GOD())
       {
-         btnMonitor[Watch::WTalks] = new ButtonMonitor( Watch::WTalks, this);
-         hlayout_b->addWidget( btnMonitor[Watch::WTalks]);
+         m_btnMonitor[Watch::WTalks] = new ButtonMonitor( Watch::WTalks, this);
+         m_hlayout_b->addWidget( m_btnMonitor[Watch::WTalks]);
 
-         btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
-         hlayout_b->addWidget( btnMonitor[Watch::WMonitors]);
+         m_btnMonitor[Watch::WMonitors] = new ButtonMonitor( Watch::WMonitors, this);
+         m_hlayout_b->addWidget( m_btnMonitor[Watch::WMonitors]);
 
          setBackgroundRole( QPalette::LinkVisited );
          displayWarning("GOD MODE");
@@ -468,21 +475,21 @@ void Dialog::keyPressEvent( QKeyEvent * event)
       }
       else
       {
-         if( btnMonitor[Watch::WTalks])
+         if( m_btnMonitor[Watch::WTalks])
          {
-            delete btnMonitor[Watch::WTalks];
-            btnMonitor[Watch::WTalks] = NULL;
+            delete m_btnMonitor[Watch::WTalks];
+            m_btnMonitor[Watch::WTalks] = NULL;
          }
-         if( btnMonitor[Watch::WMonitors])
+         if( m_btnMonitor[Watch::WMonitors])
          {
-            delete btnMonitor[Watch::WMonitors];
-            btnMonitor[Watch::WMonitors] = NULL;
+            delete m_btnMonitor[Watch::WMonitors];
+            m_btnMonitor[Watch::WMonitors] = NULL;
          }
 
          setBackgroundRole( QPalette::NoRole );
          displayWarning("SUPER USER MODE OFF");
       }
-      int opened_type = monitorType ;
+      int opened_type = m_monitorType ;
       closeList();
 //      ButtonMonitor::unset();
       ButtonMonitor::refreshImages();
@@ -530,10 +537,31 @@ void Dialog::actGuiTheme( QString theme)
 
 void Dialog::reloadImages()
 {
+    Watch::loadImage( m_img_top,      afqt::QEnvironment::image_border_top.str      );
     Watch::loadImage( m_img_topleft,  afqt::QEnvironment::image_border_topleft.str  );
     Watch::loadImage( m_img_topright, afqt::QEnvironment::image_border_topright.str );
+    Watch::loadImage( m_img_bot,      afqt::QEnvironment::image_border_bot.str      );
     Watch::loadImage( m_img_botleft,  afqt::QEnvironment::image_border_botleft.str  );
     Watch::loadImage( m_img_botright, afqt::QEnvironment::image_border_botright.str );
+
+    if( m_img_top.isNull() )
+    {
+        m_topleft->setFixedHeight( ms_size_border_top);
+        m_topright->setFixedHeight( ms_size_border_top);
+    }
+    else
+    {
+        m_topleft->setFixedHeight( m_img_top.height());
+        m_topright->setFixedHeight( m_img_top.height());
+    }
+
+    if( m_img_bot.isNull())
+        m_labelversion->setFixedHeight( ms_size_border_bot);
+    else
+        m_labelversion->setFixedHeight( m_img_bot.height());
+
+    m_btn_out_left->reloadImages();
+    m_btn_out_right->reloadImages();
 }
 
 void Dialog::paintEvent( QPaintEvent * event )
@@ -544,22 +572,29 @@ void Dialog::paintEvent( QPaintEvent * event )
 
     QRect r = rect();
 
+    if( false == m_img_top.isNull())
+        p.drawPixmap( r.width()/2 - m_img_top.width()/2, 0, m_img_top);
+
     if( false == m_img_topleft.isNull())
         p.drawPixmap( 0, 0, m_img_topleft);
 
     if( false == m_img_topright.isNull())
         p.drawPixmap( r.width() - m_img_topright.width(), 0, m_img_topright);
 
+    if( false == m_img_bot.isNull())
+        p.drawPixmap( r.width()/2 - m_img_bot.width()/2, r.height() - m_img_bot.height(), m_img_bot);
+
     if( false == m_img_botleft.isNull())
         p.drawPixmap( 0, r.height() - m_img_botleft.height(), m_img_botleft);
 
     if( false == m_img_botright.isNull())
         p.drawPixmap( r.width() - m_img_botright.width(), r.height() - m_img_botright.height(), m_img_botright);
-//    QWidget::paintEvent( event );
+
+    //QWidget::paintEvent( event );
 }
 
 void Dialog::repaintWatch()
 {
-    if ( listitems ) listitems->repaintItems();
+    if ( m_listitems ) m_listitems->repaintItems();
     Watch::repaint();
 }

@@ -5,29 +5,34 @@
 class ButtonOut : public QWidget
 {
 public:
-    ButtonOut( const int button_position, QWidget *parent);
+    ButtonOut( const int i_button_position, QWidget * i_parent);
     ~ButtonOut();
 
     enum{ Center, Left, Right, LAST};
 
-    inline static const int getType() { return CurrentType; }
+    inline static const int getType() { return ms_CurrentType; }
 
     void setSelected();
     void setUnSelected();
 
-    static const int width;
-    static const int height;
+    void reloadImages();
 
 protected:
-    virtual void mousePressEvent( QMouseEvent * event );
-    virtual void paintEvent( QPaintEvent * event);
+    virtual void mousePressEvent( QMouseEvent * i_event );
+    virtual void paintEvent( QPaintEvent * i_event);
 
 private:
-    bool selected;
-    int type;
+    bool m_selected;
+    int  m_type;
+
+    QPixmap m_img_off;
+    QPixmap m_img_on;
 
 private:
-    static ButtonOut * buttons[LAST];
-    static ButtonOut * Current;
-    static int CurrentType;
+    static const int ms_width;
+    static const int ms_height;
+
+    static ButtonOut * ms_Buttons[LAST];
+    static ButtonOut * ms_Current;
+    static int ms_CurrentType;
 };

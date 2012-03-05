@@ -33,20 +33,20 @@ public:
     Dialog();
     ~Dialog();
 
-    inline bool isInitialized() const { return initialized; }
-    inline bool isConnected()   const { return connected;   }
+    inline bool isInitialized() const { return m_initialized; }
+    inline bool isConnected()   const { return m_connected;   }
 
-    inline int getUid() const { return uid;}
+    inline int getUid() const { return m_uid;}
 
-    void inline displayInfo(    const QString &message) { infoline->displayInfo(    message); }
-    void inline displayWarning( const QString &message) { infoline->displayWarning( message); }
-    void inline displayError(   const QString &message) { infoline->displayError(   message); }
+    void inline displayInfo(    const QString &message) { m_infoline->displayInfo(    message); }
+    void inline displayWarning( const QString &message) { m_infoline->displayWarning( message); }
+    void inline displayError(   const QString &message) { m_infoline->displayError(   message); }
 
     void sendMsg( af::Msg * msg);
 
     bool openMonitor( int type, bool open);
 
-    inline MonitorHost * getMonitor() { return monitor;}
+    inline MonitorHost * getMonitor() { return m_monitor;}
 
     void repaintStart( int mseconds = 1000);
     void repaintFinish();
@@ -84,38 +84,48 @@ private:
     void setDefaultWindowTitle();
 
 private:
-    bool initialized;
-    bool connected;
-    int uid;
-    MonitorHost * monitor;
+    bool m_initialized;
+    bool m_connected;
+    int  m_uid;
+    MonitorHost * m_monitor;
 
-    int monitorType;
+    int m_monitorType;
 
-    afqt::QThreadClientUp   qThreadClientUpdate;
-    afqt::QThreadClientSend qThreadSend;
-    afqt::QServer           qServer;
+    afqt::QThreadClientUp   m_qThreadClientUpdate;
+    afqt::QThreadClientSend m_qThreadSend;
+    afqt::QServer           m_qServer;
 
-    ListItems * listitems;
-    OfflineScreen * offlinescreen;
-    InfoLine * infoline;
-    LabelVersion * labelversion;
+    ListItems * m_listitems;
+    OfflineScreen * m_offlinescreen;
+    InfoLine * m_infoline;
+    LabelVersion * m_labelversion;
 
-    QHBoxLayout *hlayout_a;
-    QVBoxLayout *vlayout_a;
-    QHBoxLayout *hlayout_b;
-    QVBoxLayout *vlayout_b;
+    QHBoxLayout * m_hlayout_a;
+    QVBoxLayout * m_vlayout_a;
+    QHBoxLayout * m_hlayout_b;
+    QVBoxLayout * m_vlayout_b;
 
-    QTimer repaintTimer;
+    QTimer m_repaintTimer;
 
-    ButtonMonitor *btnMonitor[Watch::WLAST];
+    ButtonMonitor * m_btnMonitor[Watch::WLAST];
 
-    ButtonOut *btn_outlft;
-    ButtonOut *btn_outrht;
+    ButtonOut * m_btn_out_left;
+    ButtonOut * m_btn_out_right;
 
-    af::MsgClassUserHost mcuserhost;
+    af::MsgClassUserHost m_mcuserhost;
 
+    QPixmap m_img_top;
     QPixmap m_img_topleft;
     QPixmap m_img_topright;
+    QPixmap m_img_bot;
     QPixmap m_img_botleft;
     QPixmap m_img_botright;
+
+    QWidget * m_topleft;
+    QWidget * m_topright;
+
+    static int ms_size_border_top;
+    static int ms_size_border_bot;
+    static int ms_size_border_left;
+    static int ms_size_border_right;
 };

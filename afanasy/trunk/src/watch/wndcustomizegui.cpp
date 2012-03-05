@@ -68,34 +68,34 @@ WndCustomizeGUI::WndCustomizeGUI():
     label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
     vlayout->addWidget( label);
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Window            ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_WindowText        ); vlayout->addWidget( cw);
-    //   cw = new ColorWidget( this, &afqt::QEnvironment::clr_AlternateBase     ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Base              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Text              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Button            ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Window          ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_WindowText      ));
+    //vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_AlternateBase ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Base            ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Text            ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Button          ));
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Light             ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Midlight          ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Mid               ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Dark              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Shadow            ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Light           ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Midlight        ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Mid             ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Dark            ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Shadow          ));
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Highlight         ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_HighlightedText   ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Highlight       ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_HighlightedText ));
 
     label = new QLabel("Watch specific colors:", this);
     label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
     vlayout->addWidget( label);
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_item              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_selected          ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_running           ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_done              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_error             ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_outline           ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_star              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_starline          ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_item     ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_selected ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_running  ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_done     ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_error    ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_outline  ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_star     ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_starline ));
 
     vlayout = new QVBoxLayout();
     #if QT_VERSION >= 0x040300
@@ -109,38 +109,38 @@ WndCustomizeGUI::WndCustomizeGUI():
     label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
     vlayout->addWidget( label);
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_Link              ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_LinkVisited       ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_Link        ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_LinkVisited ));
 
     label = new QLabel("Job Item Colors:", this);
     label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
     vlayout->addWidget( label);
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemjoberror  ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemjoboff    ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwtime  ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwdep   ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemjobdone   ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemjob       ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoberror  ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjoboff    ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwtime  ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobwdep   ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjobdone   ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemjob       ));
 
     label = new QLabel("Render Item Colors:", this);
     label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
     vlayout->addWidget( label);
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrender       ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderoff    ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderbusy   ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrendernimby  ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpltclr ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrender       ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderoff    ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderbusy   ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrendernimby  ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_itemrenderpltclr ));
 
     label = new QLabel("Watch Nodes Font Colors:", this);
     label->setAlignment( Qt::AlignHCenter | Qt::AlignVCenter);
     vlayout->addWidget( label);
 
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_textbright        ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_textmuted         ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_textdone          ); vlayout->addWidget( cw);
-    cw = new ColorWidget( this, &afqt::QEnvironment::clr_textstars         ); vlayout->addWidget( cw);
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_textbright ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_textmuted  ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_textdone   ));
+    vlayout->addWidget( new ColorWidget( this, &afqt::QEnvironment::clr_textstars  ));
 
 
     // Stars:
@@ -156,26 +156,28 @@ WndCustomizeGUI::WndCustomizeGUI():
 
     QString filesmask("PNG Images [*.png] (*.png)");
 
-    flw = new FileWidget( this, &afqt::QEnvironment::image_back, filesmask); vlayout->addWidget( flw);
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_back, filesmask));
 
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_topleft , filesmask ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_topright, filesmask ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_botleft , filesmask ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_border_botright, filesmask ); vlayout->addWidget( flw);
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_border_top,      filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_border_topleft , filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_border_topright, filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_border_bot,      filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_border_botleft , filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_border_botright, filesmask ));
 
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_leftoff , filesmask ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_lefton  , filesmask ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_rightoff, filesmask ); vlayout->addWidget( flw);
-    flw = new FileWidget( this, &afqt::QEnvironment::image_snap_righton , filesmask ); vlayout->addWidget( flw);
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_snap_leftoff , filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_snap_lefton  , filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_snap_rightoff, filesmask ));
+    vlayout->addWidget( new FileWidget( this, &afqt::QEnvironment::image_snap_righton , filesmask ));
 
 
     // Fonts:
     vlayout = new QVBoxLayout( fontsWidget);
-    ftw = new FontWidget(   this, &afqt::QEnvironment::font_family     ); vlayout->addWidget( ftw);
-    nw  = new NumberWidget( this, &afqt::QEnvironment::font_sizename   ); vlayout->addWidget( nw );
-    nw  = new NumberWidget( this, &afqt::QEnvironment::font_sizeinfo   ); vlayout->addWidget( nw );
-    nw  = new NumberWidget( this, &afqt::QEnvironment::font_sizemin    ); vlayout->addWidget( nw );
-    nw  = new NumberWidget( this, &afqt::QEnvironment::font_sizeplotter); vlayout->addWidget( nw );
+    vlayout->addWidget( new FontWidget(   this, &afqt::QEnvironment::font_family     ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::font_sizename   ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::font_sizeinfo   ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::font_sizemin    ));
+    vlayout->addWidget( new NumberWidget( this, &afqt::QEnvironment::font_sizeplotter));
 
 
     QPushButton * button = new QPushButton("Save GUI Preferences", this);

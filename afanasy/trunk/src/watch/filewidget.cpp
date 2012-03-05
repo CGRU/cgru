@@ -51,7 +51,7 @@ void FileWidget::browse()
 {
     QString afile = QFileDialog::getOpenFileName( this,
                                                   QString("Browse %1 File").arg( m_attr->getLabel()),
-                                                  "", m_filesmask);
+                                                  m_lineedit->text(), m_filesmask);
 
     if( afile.isEmpty())
         return;

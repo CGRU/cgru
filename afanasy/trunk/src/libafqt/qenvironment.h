@@ -37,8 +37,10 @@ public:
     static Attr theme;
 
     static Attr image_back;
+    static Attr image_border_top;
     static Attr image_border_topleft;
     static Attr image_border_topright;
+    static Attr image_border_bot;
     static Attr image_border_botleft;
     static Attr image_border_botright;
     static Attr image_snap_leftoff;

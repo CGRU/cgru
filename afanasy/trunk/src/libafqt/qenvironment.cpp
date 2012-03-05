@@ -21,8 +21,10 @@ using namespace afqt;
 Attr       QEnvironment::theme("theme", "Theme", AFGUI::THEME );
 
 Attr       QEnvironment::image_back(            "image_back",            "Items Background",        "");
+Attr       QEnvironment::image_border_top(      "image_border_top",      "Border Top",              "");
 Attr       QEnvironment::image_border_topleft(  "image_border_topleft",  "Border Top Left",         "");
 Attr       QEnvironment::image_border_topright( "image_border_topright", "Border Top Right",        "");
+Attr       QEnvironment::image_border_bot(      "image_border_bot",      "Border Bottom",           "");
 Attr       QEnvironment::image_border_botleft(  "image_border_botleft",  "Border Bottom Left",      "");
 Attr       QEnvironment::image_border_botright( "image_border_botright", "Border Bottom Right",     "");
 Attr       QEnvironment::image_snap_leftoff(    "image_snap_leftoff",    "Snap Left Off",           "");
@@ -121,25 +123,27 @@ QEnvironment::QEnvironment( const QString & i_name)
 {
     ms_appname = i_name;
 
-    ms_attrs_prefs.append( &theme             );
-    ms_attrs_prefs.append( &savePrefsOnExit   );
-    ms_attrs_prefs.append( &saveWndRectsOnExit);
-    ms_attrs_prefs.append( &saveGUIOnExit     );
-    ms_attrs_prefs.append( &showOfflineNoise  );
+    ms_attrs_prefs.append( &theme              );
+    ms_attrs_prefs.append( &savePrefsOnExit    );
+    ms_attrs_prefs.append( &saveWndRectsOnExit );
+    ms_attrs_prefs.append( &saveGUIOnExit      );
+    ms_attrs_prefs.append( &showOfflineNoise   );
 
     ms_attrs_prefs.append( &soundJobAdded     );
     ms_attrs_prefs.append( &soundJobDone      );
     ms_attrs_prefs.append( &soundJobError     );
 
-    ms_attrs_gui.append( &image_back          );
-    ms_attrs_gui.append( &image_border_topleft);
-    ms_attrs_gui.append( &image_border_topright);
-    ms_attrs_gui.append( &image_border_botleft);
-    ms_attrs_gui.append( &image_border_botright);
-    ms_attrs_gui.append( &image_snap_leftoff);
-    ms_attrs_gui.append( &image_snap_lefton);
-    ms_attrs_gui.append( &image_snap_rightoff);
-    ms_attrs_gui.append( &image_snap_righton);
+    ms_attrs_gui.append( &image_back            );
+    ms_attrs_gui.append( &image_border_top      );
+    ms_attrs_gui.append( &image_border_topleft  );
+    ms_attrs_gui.append( &image_border_topright );
+    ms_attrs_gui.append( &image_border_bot      );
+    ms_attrs_gui.append( &image_border_botleft  );
+    ms_attrs_gui.append( &image_border_botright );
+    ms_attrs_gui.append( &image_snap_leftoff    );
+    ms_attrs_gui.append( &image_snap_lefton     );
+    ms_attrs_gui.append( &image_snap_rightoff   );
+    ms_attrs_gui.append( &image_snap_righton    );
 
     ms_attrs_gui.append( &star_numpoints );
     ms_attrs_gui.append( &star_radiusout );
