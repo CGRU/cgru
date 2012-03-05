@@ -19,7 +19,7 @@ using namespace af;
 const int32_t Msg::Version = AFVERSION;
 const int32_t Msg::Magick  = 1;
 
-// Version + Type + Integer + SID + Magick = 20 bytes.
+// Version + Magick + SID + Type + Integer = 20 bytes.
 const int Msg::SizeHeader        = 4 + 4 + 4 + 4 + 4;
 
 const int Msg::SizeBuffer        = 1 << 14;                 ///< Message reading buffer size = 16 Kilo bytes.
@@ -301,9 +301,9 @@ void Msg::rw_header( bool write )
     int offset = 0;
     rw_int32( m_version, m_buffer+offset, write); offset+=int32_size;
     rw_int32( m_magick,  m_buffer+offset, write); offset+=int32_size;
+    rw_int32( m_sid,     m_buffer+offset, write); offset+=int32_size;
     rw_int32( m_type,    m_buffer+offset, write); offset+=int32_size;
     rw_int32( m_int32,   m_buffer+offset, write); offset+=int32_size;
-    rw_int32( m_sid,     m_buffer+offset, write); offset+=int32_size;
     #ifdef AFOUTPUT
     printf("Msg::readwrite: at %p: ", mbuffer); stdOut();
     #endif

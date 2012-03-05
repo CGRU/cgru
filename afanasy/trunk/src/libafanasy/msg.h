@@ -430,9 +430,9 @@ private:
 
 // header:
     int32_t m_version;   ///< Afanasy network protocol version.
+    int32_t m_magick;    ///< Magick number.
     int32_t m_sid;       ///< Sender id.
     int32_t m_type;      ///< Message type.
-    int32_t m_magick;    ///< Magick number.
     int32_t m_int32;     ///< Some 32-bit integer, data length for data messages.
 
 // data poiters:
