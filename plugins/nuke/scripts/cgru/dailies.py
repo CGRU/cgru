@@ -306,10 +306,10 @@ def dailiesGenCmd( node):
    if fstart !=  -1: cmd += ' --fs %d' % fstart
    if fend   !=  -1: cmd += ' --fe %d' % fend
    if fffirst      : cmd += ' --fff'
-   if not encodeonly: #OHadd
-	   cmd += ' -r "%s"' % format #OHadd
-	   cmd += ' -t "%s"' % template #OHadd
-	   cmd += ' -s "%s"' % slate	#OHadd
+   if not encodeonly:
+	   cmd += ' -r "%s"' % format
+	   if template is not None and template != '': cmd += ' -t "%s"'  % template
+	   if slate    is not None and slate    != '': cmd += ' -s "%s"'  % slate
 	   if company  is not None and company  != '': cmd += ' --company "%s"'  % company
 	   if project  is not None and project  != '': cmd += ' --project "%s"'  % project
 	   if shot     is not None and shot     != '': cmd += ' --shot "%s"'     % shot

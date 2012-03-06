@@ -289,7 +289,7 @@ def reformatAnnotate( infile, outfile):
    # Set quality if specified:
    if Options.quality != '': cmd += ' -quality ' + Options.quality
    # Set/Reset common properties:
-   cmd += ' -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1'
+   cmd += ' -strip -density 72x72 -units PixelsPerInch -sampling-factor 1x1 -alpha Off'
    # Set output file name and launch:
    cmd += ' "%s"' % outfile
    if Verbose: print( cmd + '\n')
