@@ -125,7 +125,9 @@ void MonitorWindow::caseMessage( af::Msg *msg)
 #endif
    switch( msg->type())
    {
+   case af::Msg::TClientExitRequest:
    case af::Msg::TVersionMismatch:
+   case af::Msg::TMagicMismatch:
    {
       emit stop();
       break;

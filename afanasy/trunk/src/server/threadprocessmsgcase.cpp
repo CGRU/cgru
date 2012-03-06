@@ -68,14 +68,17 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
         AfContainerLock rlock( i_args->renders, AfContainerLock::WRITELOCK);
         AfContainerLock tlock( i_args->talks,   AfContainerLock::WRITELOCK);
         AfContainerLock ulock( i_args->users,   AfContainerLock::WRITELOCK);
+        printf("\n   ========= RELOADING CONFIG =========\n\n");
         std::string message;
         if( af::Environment::reload())
         {
-         message = "Reloaded successfully.";
+            message = "Reloaded successfully.";
+            printf("\n   ========= CONFIG RELOADED SUCCESSFULLY =========\n\n");
         }
         else
         {
-         message = "Failed, see server logs fo details.";
+            message = "Failed, see server logs fo details.";
+            printf("\n   ========= CONFIG RELOADING FAILED =========\n\n");
         }
         o_msg_response = new af::Msg();
         o_msg_response->setString( message);
@@ -655,143 +658,147 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
       af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
       o_msg_response = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
    }
-   // Cases for run cycle thread:
-   case af::Msg::TTaskUpdatePercent:
-   case af::Msg::TTaskListenOutput:
-   case af::Msg::TTasksSkip:
-   case af::Msg::TBlockErrorsAvoidHost:
-   case af::Msg::TBlockErrorRetries:
-   case af::Msg::TBlockErrorsSameHost:
-   case af::Msg::TBlockErrorsForgiveTime:
-   case af::Msg::TBlockTasksMaxRunTime:
-   case af::Msg::TBlockResetErrorHosts:
-   case af::Msg::TBlockDependMask:
-   case af::Msg::TBlockTasksDependMask:
-   case af::Msg::TBlockHostsMask:
-   case af::Msg::TBlockHostsMaskExclude:
-   case af::Msg::TBlockMaxRunningTasks:
-   case af::Msg::TBlockMaxRunTasksPerHost:
-   case af::Msg::TBlockCommand:
-   case af::Msg::TBlockWorkingDir:
-   case af::Msg::TBlockFiles:
-   case af::Msg::TBlockCmdPost:
-   case af::Msg::TBlockService:
-   case af::Msg::TBlockParser:
-   case af::Msg::TBlockCapacity:
-   case af::Msg::TBlockCapacityCoeffMin:
-   case af::Msg::TBlockCapacityCoeffMax:
-   case af::Msg::TBlockMultiHostMin:
-   case af::Msg::TBlockMultiHostMax:
-   case af::Msg::TBlockMultiHostWaitMax:
-   case af::Msg::TBlockMultiHostWaitSrv:
-   case af::Msg::TBlockNeedMemory:
-   case af::Msg::TBlockNeedPower:
-   case af::Msg::TBlockNeedHDD:
-   case af::Msg::TBlockNeedProperties:
-   case af::Msg::TTasksRestart:
-   case af::Msg::TJobAnnotate:
-   case af::Msg::TJobSetUser:
-   case af::Msg::TJobHostsMask:
-   case af::Msg::TJobHostsMaskExclude:
-   case af::Msg::TJobDependMask:
-   case af::Msg::TJobDependMaskGlobal:
-   case af::Msg::TJobMaxRunningTasks:
-   case af::Msg::TJobMaxRunTasksPerHost:
-   case af::Msg::TJobWaitTime:
-   case af::Msg::TJobLifeTime:
-   case af::Msg::TJobPriority:
-   case af::Msg::TJobNeedOS:
-   case af::Msg::TJobNeedProperties:
-   case af::Msg::TJobCmdPost:
-   case af::Msg::TJobStart:
-   case af::Msg::TJobStop:
-   case af::Msg::TJobRestart:
-   case af::Msg::TJobRestartErrors:
-   case af::Msg::TJobResetErrorHosts:
-   case af::Msg::TJobPause:
-   case af::Msg::TJobRestartPause:
-   case af::Msg::TJobDelete:
-   case af::Msg::TRenderAnnotate:
-   case af::Msg::TRenderSetPriority:
-   case af::Msg::TRenderSetCapacity:
-   case af::Msg::TRenderSetMaxTasks:
-   case af::Msg::TRenderSetService:
-   case af::Msg::TRenderRestoreDefaults:
-   case af::Msg::TRenderSetNIMBY:
-   case af::Msg::TRenderSetNimby:
-   case af::Msg::TRenderSetUser:
-   case af::Msg::TRenderSetFree:
-   case af::Msg::TRenderEjectTasks:
-   case af::Msg::TRenderEjectNotMyTasks:
-   case af::Msg::TRenderDelete:
-   case af::Msg::TRenderRestart:
-   case af::Msg::TRenderReboot:
-   case af::Msg::TRenderShutdown:
-   case af::Msg::TRenderDeregister:
-   case af::Msg::TRenderExit:
-   case af::Msg::TRenderWOLSleep:
-   case af::Msg::TRenderWOLWake:
-   case af::Msg::TUserAnnotate:
-   case af::Msg::TUserAdd:
-   case af::Msg::TUserDel:
-   case af::Msg::TUserHostsMask:
-   case af::Msg::TUserHostsMaskExclude:
-   case af::Msg::TUserMaxRunningTasks:
-   case af::Msg::TUserPriority:
-   case af::Msg::TUserJobsLifeTime:
-   case af::Msg::TUserJobsSolveMethod:
-   case af::Msg::TUserErrorsAvoidHost:
-   case af::Msg::TUserErrorRetries:
-   case af::Msg::TUserErrorsTaskSameHost:
-   case af::Msg::TUserErrorsForgiveTime:
-   case af::Msg::TUserMoveJobsUp:
-   case af::Msg::TUserMoveJobsDown:
-   case af::Msg::TUserMoveJobsTop:
-   case af::Msg::TUserMoveJobsBottom:
-   case af::Msg::TTalkDeregister:
-   case af::Msg::TMonitorSubscribe:
-   case af::Msg::TMonitorUnsubscribe:
-   case af::Msg::TMonitorDeregister:
-   case af::Msg::TMonitorUsersJobs:
-   case af::Msg::TMonitorJobsIdsAdd:
-   case af::Msg::TMonitorJobsIdsSet:
-   case af::Msg::TMonitorJobsIdsDel:
-   case af::Msg::TMonitorMessage:
-   case af::Msg::TMonitorExit:
-   case af::Msg::TTalkExit:
-   {
-//printf("ThreadReadMsg::msgCase: pushing message to run thread:\n"); i_msg->stdOut();
-      // Push message for run cycle thread.
-      i_args->msgQueue->pushMsg( i_msg);
-      // Need to return here to not to delete input message (i_msg) later.
-      return o_msg_response;
-      //  ( o_msg_response is NULL in all cases except Msg::TTaskUpdateState,
-      //    in that case render should recieve an answer to close task
-      //    and finish sending any updates for the task )
-   }
-// -------------------------------------------------------------------------//
+    // Cases for run cycle thread:
+    case af::Msg::TTaskUpdatePercent:
+    case af::Msg::TTaskListenOutput:
+    case af::Msg::TTasksSkip:
+    case af::Msg::TBlockErrorsAvoidHost:
+    case af::Msg::TBlockErrorRetries:
+    case af::Msg::TBlockErrorsSameHost:
+    case af::Msg::TBlockErrorsForgiveTime:
+    case af::Msg::TBlockTasksMaxRunTime:
+    case af::Msg::TBlockResetErrorHosts:
+    case af::Msg::TBlockDependMask:
+    case af::Msg::TBlockTasksDependMask:
+    case af::Msg::TBlockHostsMask:
+    case af::Msg::TBlockHostsMaskExclude:
+    case af::Msg::TBlockMaxRunningTasks:
+    case af::Msg::TBlockMaxRunTasksPerHost:
+    case af::Msg::TBlockCommand:
+    case af::Msg::TBlockWorkingDir:
+    case af::Msg::TBlockFiles:
+    case af::Msg::TBlockCmdPost:
+    case af::Msg::TBlockService:
+    case af::Msg::TBlockParser:
+    case af::Msg::TBlockCapacity:
+    case af::Msg::TBlockCapacityCoeffMin:
+    case af::Msg::TBlockCapacityCoeffMax:
+    case af::Msg::TBlockMultiHostMin:
+    case af::Msg::TBlockMultiHostMax:
+    case af::Msg::TBlockMultiHostWaitMax:
+    case af::Msg::TBlockMultiHostWaitSrv:
+    case af::Msg::TBlockNeedMemory:
+    case af::Msg::TBlockNeedPower:
+    case af::Msg::TBlockNeedHDD:
+    case af::Msg::TBlockNeedProperties:
+    case af::Msg::TTasksRestart:
+    case af::Msg::TJobAnnotate:
+    case af::Msg::TJobSetUser:
+    case af::Msg::TJobHostsMask:
+    case af::Msg::TJobHostsMaskExclude:
+    case af::Msg::TJobDependMask:
+    case af::Msg::TJobDependMaskGlobal:
+    case af::Msg::TJobMaxRunningTasks:
+    case af::Msg::TJobMaxRunTasksPerHost:
+    case af::Msg::TJobWaitTime:
+    case af::Msg::TJobLifeTime:
+    case af::Msg::TJobPriority:
+    case af::Msg::TJobNeedOS:
+    case af::Msg::TJobNeedProperties:
+    case af::Msg::TJobCmdPost:
+    case af::Msg::TJobStart:
+    case af::Msg::TJobStop:
+    case af::Msg::TJobRestart:
+    case af::Msg::TJobRestartErrors:
+    case af::Msg::TJobResetErrorHosts:
+    case af::Msg::TJobPause:
+    case af::Msg::TJobRestartPause:
+    case af::Msg::TJobDelete:
+    case af::Msg::TRenderAnnotate:
+    case af::Msg::TRenderSetPriority:
+    case af::Msg::TRenderSetCapacity:
+    case af::Msg::TRenderSetMaxTasks:
+    case af::Msg::TRenderSetService:
+    case af::Msg::TRenderRestoreDefaults:
+    case af::Msg::TRenderSetNIMBY:
+    case af::Msg::TRenderSetNimby:
+    case af::Msg::TRenderSetUser:
+    case af::Msg::TRenderSetFree:
+    case af::Msg::TRenderEjectTasks:
+    case af::Msg::TRenderEjectNotMyTasks:
+    case af::Msg::TRenderDelete:
+    case af::Msg::TRenderRestart:
+    case af::Msg::TRenderReboot:
+    case af::Msg::TRenderShutdown:
+    case af::Msg::TRenderDeregister:
+    case af::Msg::TRenderExit:
+    case af::Msg::TRenderWOLSleep:
+    case af::Msg::TRenderWOLWake:
+    case af::Msg::TUserAnnotate:
+    case af::Msg::TUserAdd:
+    case af::Msg::TUserDel:
+    case af::Msg::TUserHostsMask:
+    case af::Msg::TUserHostsMaskExclude:
+    case af::Msg::TUserMaxRunningTasks:
+    case af::Msg::TUserPriority:
+    case af::Msg::TUserJobsLifeTime:
+    case af::Msg::TUserJobsSolveMethod:
+    case af::Msg::TUserErrorsAvoidHost:
+    case af::Msg::TUserErrorRetries:
+    case af::Msg::TUserErrorsTaskSameHost:
+    case af::Msg::TUserErrorsForgiveTime:
+    case af::Msg::TUserMoveJobsUp:
+    case af::Msg::TUserMoveJobsDown:
+    case af::Msg::TUserMoveJobsTop:
+    case af::Msg::TUserMoveJobsBottom:
+    case af::Msg::TTalkDeregister:
+    case af::Msg::TMonitorSubscribe:
+    case af::Msg::TMonitorUnsubscribe:
+    case af::Msg::TMonitorDeregister:
+    case af::Msg::TMonitorUsersJobs:
+    case af::Msg::TMonitorJobsIdsAdd:
+    case af::Msg::TMonitorJobsIdsSet:
+    case af::Msg::TMonitorJobsIdsDel:
+    case af::Msg::TMonitorMessage:
+    case af::Msg::TMonitorExit:
+    case af::Msg::TTalkExit:
+    {
+        // Push message for run cycle thread.
+        i_args->msgQueue->pushMsg( i_msg);
+        // Need to return here to not to delete input message (i_msg) later.
+        return o_msg_response;
+        //  ( o_msg_response is NULL in all cases except Msg::TTaskUpdateState,
+        //    in that case render should recieve an answer to close task
+        //    and finish sending any updates for the task )
+    }
+    // -------------------------------------------------------------------------//
    case af::Msg::TVersionMismatch:
    {
-      AFCommon::QueueLogError( i_msg->generateInfoString( false));
-      o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
-      break;
+       AFCommon::QueueLogError( i_msg->generateInfoString( false));
+       o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
+       break;
    }
-   case af::Msg::TInvalid:
+   case af::Msg::TMagicMismatch:
    {
-      AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->generateInfoString( false));
-      break;
+       AFCommon::QueueLogError( i_msg->generateInfoString( false));
+       o_msg_response = new af::Msg( af::Msg::TMagicMismatch, 1);
+       break;
    }
-   default:
-   {
-      AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->generateInfoString( false));
-      break;
-   }
-   }
-//if(i_msg->type()==Msg::TJobRegister)printf("Msg::TJobRegister:returning.\n");
+    case af::Msg::TInvalid:
+    {
+        AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->generateInfoString( false));
+        break;
+    }
+    default:
+    {
+        AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->generateInfoString( false));
+        break;
+    }
+    }
 
-   // Deleting input message as it not needed any more.
-   delete i_msg;
+    // Deleting input message as it not needed any more.
+    delete i_msg;
 
-   // Returning an answer
-   return o_msg_response;
+    // Returning an answer
+    return o_msg_response;
 }

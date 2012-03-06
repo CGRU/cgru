@@ -40,7 +40,6 @@ public:
       { cmdarguments_usagearg.push_back( arg); cmdarguments_usagehelp.push_back( help);}
 
     static bool reload();
-    static bool load( const std::string & filename, bool initialize, bool Verbose);
 
     static void setVerboseInit( bool value = true) { m_verbose_init = value;}
     static bool getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name );
@@ -180,6 +179,7 @@ private:
    static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
    static void printUsage(); ///< Output command usage
    static void load();
+   static bool load( const std::string & filename, bool Verbose);
    static void getVars( const rapidxml::xml_node<> * pnode);
    static bool init();
 

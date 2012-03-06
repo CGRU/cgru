@@ -12,6 +12,8 @@
 
 #include "passwd/passwd.h"
 
+#include "msg.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -144,93 +146,95 @@ std::string Environment::version_date;
 
 void Environment::getVars( const rapidxml::xml_node<> * pnode)
 {
-   getVar( pnode, filenamesizemax,                   "filenamesizemax"                   );
-   getVar( pnode, timeformat,                        "timeformat"                        );
-   getVar( pnode, priority,                          "priority"                          );
-   getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
+    getVar( pnode, af::Msg::Magic,                    "magic_number"                      );
 
-   getVar( pnode, servername,                        "servername"                        );
-   getVar( pnode, serveripmask,                      "serveripmask"                      );
-   getVar( pnode, serverport,                        "serverport"                        );
-   getVar( pnode, clientport,                        "clientport"                        );
+    getVar( pnode, filenamesizemax,                   "filenamesizemax"                   );
+    getVar( pnode, timeformat,                        "timeformat"                        );
+    getVar( pnode, priority,                          "priority"                          );
+    getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
 
-   getVar( pnode, user_logs_rotate,                  "user_logs_rotate"                  );
-   getVar( pnode, render_logs_rotate,                "render_logs_rotate"                );
+    getVar( pnode, servername,                        "servername"                        );
+    getVar( pnode, serveripmask,                      "serveripmask"                      );
+    getVar( pnode, serverport,                        "serverport"                        );
+    getVar( pnode, clientport,                        "clientport"                        );
 
-   getVar( pnode, tempdirectory,                     "tempdirectory"                     );
+    getVar( pnode, user_logs_rotate,                  "user_logs_rotate"                  );
+    getVar( pnode, render_logs_rotate,                "render_logs_rotate"                );
 
-   getVar( pnode, db_conninfo,                       "db_conninfo"                       );
-   getVar( pnode, db_stringquotes,                   "db_stringquotes"                   );
-   getVar( pnode, db_stringnamelen,                  "db_stringnamelen"                  );
-   getVar( pnode, db_stringexprlen,                  "db_stringexprlen"                  );
+    getVar( pnode, tempdirectory,                     "tempdirectory"                     );
 
-   getVar( pnode, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
-   getVar( pnode, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
+    getVar( pnode, db_conninfo,                       "db_conninfo"                       );
+    getVar( pnode, db_stringquotes,                   "db_stringquotes"                   );
+    getVar( pnode, db_stringnamelen,                  "db_stringnamelen"                  );
+    getVar( pnode, db_stringexprlen,                  "db_stringexprlen"                  );
 
-   getVar( pnode, task_default_capacity,             "task_default_capacity"             );
-   getVar( pnode, task_update_timeout,               "task_update_timeout"               );
-   getVar( pnode, task_log_linesmax,                 "task_log_linesmax"                 );
-   getVar( pnode, job_log_linesmax,                  "job_log_linesmax"                  );
+    getVar( pnode, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
+    getVar( pnode, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
 
-   getVar( pnode, render_default_capacity,           "render_default_capacity"           );
-   getVar( pnode, render_default_maxtasks,           "render_default_maxtasks"           );
-   getVar( pnode, render_exec,                       "render_exec"                       );
-   getVar( pnode, render_cmd_reboot,                 "render_cmd_reboot"                 );
-   getVar( pnode, render_cmd_shutdown,               "render_cmd_shutdown"               );
-   getVar( pnode, render_cmd_wolsleep,               "render_cmd_wolsleep"               );
-   getVar( pnode, render_cmd_wolwake,                "render_cmd_wolwake"                );
-   getVar( pnode, render_hddspace_path,              "render_hddspace_path"              );
-   getVar( pnode, render_networkif,                  "render_networkif"                  );
-   getVar( pnode, render_iostat_device,              "render_iostat_device"              );
-   getVar( pnode, render_resclasses,                 "render_resclasses"                 );
-   getVar( pnode, render_nice,                       "render_nice"                       );
-   getVar( pnode, render_update_sec,                 "render_update_sec"                 );
-   getVar( pnode, render_updatetaskperiod,           "render_updatetaskperiod"           );
-   getVar( pnode, render_zombietime,                 "render_zombietime"                 );
-   getVar( pnode, render_connectretries,             "render_connectretries"             );
-   getVar( pnode, render_waitforconnected,           "render_waitforconnected"           );
-   getVar( pnode, render_waitforreadyread,           "render_waitforreadyread"           );
-   getVar( pnode, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
-   getVar( pnode, render_log_linesmax,               "render_log_linesmax"               );
+    getVar( pnode, task_default_capacity,             "task_default_capacity"             );
+    getVar( pnode, task_update_timeout,               "task_update_timeout"               );
+    getVar( pnode, task_log_linesmax,                 "task_log_linesmax"                 );
+    getVar( pnode, job_log_linesmax,                  "job_log_linesmax"                  );
 
-   getVar( pnode, previewcmds,                       "previewcmds"                       );
-   getVar( pnode, rendercmds,                        "rendercmds"                        );
-   getVar( pnode, rendercmds_admin,                  "rendercmds_admin"                  );
-   getVar( pnode, watch_refreshinterval,             "watch_refreshinterval"             );
-   getVar( pnode, watch_connectretries,              "watch_connectretries"              );
-   getVar( pnode, watch_waitforconnected,            "watch_waitforconnected"            );
-   getVar( pnode, watch_waitforreadyread,            "watch_waitforreadyread"            );
-   getVar( pnode, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
+    getVar( pnode, render_default_capacity,           "render_default_capacity"           );
+    getVar( pnode, render_default_maxtasks,           "render_default_maxtasks"           );
+    getVar( pnode, render_exec,                       "render_exec"                       );
+    getVar( pnode, render_cmd_reboot,                 "render_cmd_reboot"                 );
+    getVar( pnode, render_cmd_shutdown,               "render_cmd_shutdown"               );
+    getVar( pnode, render_cmd_wolsleep,               "render_cmd_wolsleep"               );
+    getVar( pnode, render_cmd_wolwake,                "render_cmd_wolwake"                );
+    getVar( pnode, render_hddspace_path,              "render_hddspace_path"              );
+    getVar( pnode, render_networkif,                  "render_networkif"                  );
+    getVar( pnode, render_iostat_device,              "render_iostat_device"              );
+    getVar( pnode, render_resclasses,                 "render_resclasses"                 );
+    getVar( pnode, render_nice,                       "render_nice"                       );
+    getVar( pnode, render_update_sec,                 "render_update_sec"                 );
+    getVar( pnode, render_updatetaskperiod,           "render_updatetaskperiod"           );
+    getVar( pnode, render_zombietime,                 "render_zombietime"                 );
+    getVar( pnode, render_connectretries,             "render_connectretries"             );
+    getVar( pnode, render_waitforconnected,           "render_waitforconnected"           );
+    getVar( pnode, render_waitforreadyread,           "render_waitforreadyread"           );
+    getVar( pnode, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
+    getVar( pnode, render_log_linesmax,               "render_log_linesmax"               );
 
-   getVar( pnode, pswd_visor,                        "pswd_visor"                        );
-   getVar( pnode, pswd_god,                          "pswd_god"                          );
+    getVar( pnode, previewcmds,                       "previewcmds"                       );
+    getVar( pnode, rendercmds,                        "rendercmds"                        );
+    getVar( pnode, rendercmds_admin,                  "rendercmds_admin"                  );
+    getVar( pnode, watch_refreshinterval,             "watch_refreshinterval"             );
+    getVar( pnode, watch_connectretries,              "watch_connectretries"              );
+    getVar( pnode, watch_waitforconnected,            "watch_waitforconnected"            );
+    getVar( pnode, watch_waitforreadyread,            "watch_waitforreadyread"            );
+    getVar( pnode, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
 
-   getVar( pnode, errors_forgivetime,                "errors_forgivetime"                );
-   getVar( pnode, errors_avoid_host,                 "errors_avoid_host"                 );
-   getVar( pnode, task_error_retries,                "task_error_retries"                );
-   getVar( pnode, task_errors_same_host,             "task_errors_same_host"             );
+    getVar( pnode, pswd_visor,                        "pswd_visor"                        );
+    getVar( pnode, pswd_god,                          "pswd_god"                          );
 
-   getVar( pnode, sysjob_tasklife,                   "sysjob_tasklife"                   );
-   getVar( pnode, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
-   getVar( pnode, sysjob_postcmd_service,            "sysjob_postcmd_service"            );
-   getVar( pnode, sysjob_wol_service,                "sysjob_wol_service"                );
+    getVar( pnode, errors_forgivetime,                "errors_forgivetime"                );
+    getVar( pnode, errors_avoid_host,                 "errors_avoid_host"                 );
+    getVar( pnode, task_error_retries,                "task_error_retries"                );
+    getVar( pnode, task_errors_same_host,             "task_errors_same_host"             );
 
-   getVar( pnode, user_zombietime,                   "user_zombietime"                   );
-   getVar( pnode, user_log_linesmax,                 "user_log_linesmax"                 );
+    getVar( pnode, sysjob_tasklife,                   "sysjob_tasklife"                   );
+    getVar( pnode, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
+    getVar( pnode, sysjob_postcmd_service,            "sysjob_postcmd_service"            );
+    getVar( pnode, sysjob_wol_service,                "sysjob_wol_service"                );
 
-   getVar( pnode, talk_updateperiod,                 "talk_updateperiod"                 );
-   getVar( pnode, talk_zombietime,                   "talk_zombietime"                   );
-   getVar( pnode, talk_connectretries,               "talk_connectretries"               );
-   getVar( pnode, talk_waitforconnected,             "talk_waitforconnected"             );
-   getVar( pnode, talk_waitforreadyread,             "talk_waitforreadyread"             );
-   getVar( pnode, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
+    getVar( pnode, user_zombietime,                   "user_zombietime"                   );
+    getVar( pnode, user_log_linesmax,                 "user_log_linesmax"                 );
 
-   getVar( pnode, monitor_updateperiod,              "monitor_updateperiod"              );
-   getVar( pnode, monitor_zombietime,                "monitor_zombietime"                );
-   getVar( pnode, monitor_connectretries,            "monitor_connectretries"            );
-   getVar( pnode, monitor_waitforconnected,          "monitor_waitforconnected"          );
-   getVar( pnode, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
-   getVar( pnode, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
+    getVar( pnode, talk_updateperiod,                 "talk_updateperiod"                 );
+    getVar( pnode, talk_zombietime,                   "talk_zombietime"                   );
+    getVar( pnode, talk_connectretries,               "talk_connectretries"               );
+    getVar( pnode, talk_waitforconnected,             "talk_waitforconnected"             );
+    getVar( pnode, talk_waitforreadyread,             "talk_waitforreadyread"             );
+    getVar( pnode, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
+
+    getVar( pnode, monitor_updateperiod,              "monitor_updateperiod"              );
+    getVar( pnode, monitor_zombietime,                "monitor_zombietime"                );
+    getVar( pnode, monitor_connectretries,            "monitor_connectretries"            );
+    getVar( pnode, monitor_waitforconnected,          "monitor_waitforconnected"          );
+    getVar( pnode, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
+    getVar( pnode, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
 }
 
 bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name)
@@ -469,19 +473,19 @@ void Environment::load()
 {
    std::string filename;
    filename = ( afroot + "/config_default.xml");
-   load( filename, false, m_verbose_init);
+   load( filename, m_verbose_init);
    filename = ( afroot + "/config.xml");
-   load( filename, false, m_verbose_init);
+   load( filename, m_verbose_init);
    filename = ( home_afanasy + "/config.xml");
-   load( filename, false, m_verbose_init);
+   load( filename, m_verbose_init);
    bool _verbose_init = m_verbose_init;
    m_verbose_init = false;
    filename = ( afroot + "/config_shadow.xml");
-   load( filename, false, m_verbose_init);
+   load( filename, m_verbose_init);
    m_verbose_init=_verbose_init;
 }
 
-bool Environment::load( const std::string & filename, bool initialize, bool Verbose)
+bool Environment::load( const std::string & filename, bool Verbose)
 {
    bool retval = false;
    m_verbose_init = Verbose;
@@ -523,8 +527,7 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
          else
          {
             getVars( root_node);
-            if( initialize ) retval = init();
-            else retval = true;
+            retval = true;
          }
       }
       delete [] buffer;
@@ -534,10 +537,10 @@ bool Environment::load( const std::string & filename, bool initialize, bool Verb
 
 bool Environment::reload()
 {
-   m_verbose_init = true;
-   load();
-   m_valid = init();
-   return m_valid;
+    m_verbose_init = true;
+    load();
+    m_valid = init();
+    return m_valid;
 }
 
 bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
@@ -595,6 +598,9 @@ bool Environment::init()
    //############ VISOR and GOD passwords:
    if( passwd != NULL) delete passwd;
    passwd = new Passwd( pswd_visor, pswd_god);
+
+//   //############ Message Magic Number:
+//   af::Msg
 
    return true;
 }

@@ -6,21 +6,6 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-CmdConfig::CmdConfig()
-{
-   setCmd("config");
-   setInfo("Print config from file.");
-   setArgsCount(1);
-   setHelp("config [filename] Print config loaded from specified file name.");
-}
-CmdConfig::~CmdConfig(){}
-bool CmdConfig::processArguments( int argc, char** argv, af::Msg &msg)
-{
-   std::string filename( argv[0]);
-   af::Environment::load( filename, true, af::Environment::Verbose);
-   return true;
-}
-
 CmdConfigLoad::CmdConfigLoad()
 {
    setCmd("cload");

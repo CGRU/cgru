@@ -257,106 +257,97 @@ void Dialog::connectionEstablished()
 
 void Dialog::newMessage( af::Msg *msg)
 {
-   if( msg == NULL)
-   {
-      AFERROR("Dialog::caseMessage: msg == NULL")
-      return;
-   }
-#ifdef AFOUTPUT
-printf(" >>> Dialog::newMessage: ");msg->stdOut();
-#endif
-   switch( msg->type())
-   {
-   case af::Msg::TClientExitRequest:
-   case af::Msg::TVersionMismatch:
-   {
-      emit stop();
-      break;
-   }
-   case af::Msg::TMonitorId:
-   {
-      if( m_monitor->getId() != 0 )
-      {
-         if( msg->int32() != m_monitor->getId()) connectionLost();
-      }
-      else
-      {
-         if( msg->int32() == 0)
-         {
-            connectionLost();
-         }
-         else
-         {
-            m_monitor->setId( msg->int32());
-            connectionEstablished();
-            af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, m_monitor->getId(), true);
-            m_qThreadClientUpdate.setUpMsg( msg);
-         }
-      }
-      break;
-   }
-   case af::Msg::TUserId:
-   {
-      m_uid = msg->int32();
-      if( m_uid == 0 )
-      {
-         if( m_monitorType == Watch::WJobs )
-         {
-            ButtonMonitor::unset();
-            closeList();
-         }
-         displayWarning("You do not exist.");
-      }
-      else
-      {
-         displayInfo("You have registered.");
-         if( m_monitorType == Watch::WNONE )
-         {
-            ButtonMonitor::pushButton( Watch::WJobs);
-         }
-      }
-      break;
-   }
-   case af::Msg::TDATA:
-   {
-      new WndText( "Data", msg);
-      break;
-   }
-   case af::Msg::TStringList:
-   {
-      new WndText( "List", msg);
-      break;
-   }
-   case af::Msg::TTask:
-   {
-      new WndText( "Task", msg);
-      break;
-   }
-   case af::Msg::TString:
-   {
-      std::string str;
-      msg->getString( str);
-      if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
-         m_labelversion->showMessage( str);
-      else
-         new WndText( "Message", msg);
-      break;
-   }
-/*
-   case af::Msg::TString:
-   {
-      std::string str;
-      msg->getString( str);
-      displayInfo( afqt::stoq( str));
-      break;
-   }
-*/
-   default:
-      Watch::caseMessage( msg);
-   }
-   AFINFO("Dialog::newMessage: Reaction finished deleting message.")
-   delete msg;
-   AFINFO("Dialog::newMessage: Message successfully deleted.")
+    if( msg == NULL)
+    {
+        AFERROR("Dialog::caseMessage: msg == NULL")
+        return;
+    }
+    #ifdef AFOUTPUT
+    printf(" >>> Dialog::newMessage: ");msg->stdOut();
+    #endif
+    switch( msg->type())
+    {
+    case af::Msg::TClientExitRequest:
+    case af::Msg::TVersionMismatch:
+    case af::Msg::TMagicMismatch:
+    {
+        emit stop();
+        break;
+    }
+    case af::Msg::TMonitorId:
+    {
+        if( m_monitor->getId() != 0 )
+        {
+            if( msg->int32() != m_monitor->getId()) connectionLost();
+        }
+        else
+        {
+            if( msg->int32() == 0)
+            {
+                connectionLost();
+            }
+            else
+            {
+                m_monitor->setId( msg->int32());
+                connectionEstablished();
+                af::Msg * msg = new af::Msg( af::Msg::TMonitorUpdateId, m_monitor->getId(), true);
+                m_qThreadClientUpdate.setUpMsg( msg);
+            }
+        }
+        break;
+    }
+    case af::Msg::TUserId:
+    {
+        m_uid = msg->int32();
+        if( m_uid == 0 )
+        {
+            if( m_monitorType == Watch::WJobs )
+            {
+                ButtonMonitor::unset();
+                closeList();
+            }
+            displayWarning("You do not exist.");
+        }
+        else
+        {
+            displayInfo("You have registered.");
+            if( m_monitorType == Watch::WNONE )
+            {
+                ButtonMonitor::pushButton( Watch::WJobs);
+            }
+        }
+        break;
+    }
+    case af::Msg::TDATA:
+    {
+        new WndText( "Data", msg);
+        break;
+    }
+    case af::Msg::TStringList:
+    {
+        new WndText( "List", msg);
+        break;
+    }
+    case af::Msg::TTask:
+    {
+        new WndText( "Task", msg);
+        break;
+    }
+    case af::Msg::TString:
+    {
+        std::string str = msg->getString();
+        if( LabelVersion::getStringStatus( str) != LabelVersion::SS_None )
+            m_labelversion->showMessage( str);
+        else
+            new WndText( "Message", msg);
+        break;
+    }
+    default:
+        Watch::caseMessage( msg);
+    }
+    AFINFO("Dialog::newMessage: Reaction finished deleting message.")
+    delete msg;
+    AFINFO("Dialog::newMessage: Message successfully deleted.")
 }
 
 void Dialog::closeList()
