@@ -5,8 +5,10 @@
 
     <image_back          ></image_back>
 
+    <image_border_top      ></image_border_top>
     <image_border_topleft  ></image_border_topleft>
     <image_border_topright ></image_border_topright>
+    <image_border_bot      ></image_border_bot>
     <image_border_botleft  ></image_border_botleft>
     <image_border_botright ></image_border_botright>
 

@@ -5,6 +5,7 @@
 
     <image_back          >hello_kitty.png</image_back>
 
+    <image_border_top      ></image_border_top>
     <image_border_topleft  >border_top_left.png</image_border_topleft>
     <image_border_topright >border_top_right</image_border_topright>
     <image_border_bot      >border_bot.png</image_border_bot>

@@ -5,8 +5,10 @@
 
     <image_back          >afanasy.png</image_back>
 
+    <image_border_top      ></image_border_top>
     <image_border_topleft  >border_topleft.png</image_border_topleft>
     <image_border_topright >border_topright</image_border_topright>
+    <image_border_bot      ></image_border_bot>
     <image_border_botleft  >border_botleft.png</image_border_botleft>
     <image_border_botright >border_botright.png</image_border_botright>
 
