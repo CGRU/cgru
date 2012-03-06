@@ -129,8 +129,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    /* This should be a constant obviously, unless you plan to remove a CPU
       while rendering. :) */
    static unsigned num_processors = sysconf(_SC_NPROCESSORS_ONLN);
-   host.cpu_num = num_processors;
-   host.cpu_mhz = s_hz >> 20;
+   hres.cpu_num = num_processors;
+   hres.cpu_mhz = s_hz >> 20;
 
    //
    // Memory & Swap total and usage:
@@ -163,8 +163,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       }
 
       /* A convertion factor to bring us to MBs */
-      host.mem_mb = s_physical_memory;
-      host.swap_mb = vmusage.xsu_total >> 20;
+      hres.mem_total_mb = s_physical_memory;
+      hres.swap_total_mb = vmusage.xsu_total >> 20;
       hres.mem_free_mb = (memfree * s_pagesize) >> 20;
       hres.mem_cached_mb = (memcached  * s_pagesize) >> 20;
       hres.mem_buffers_mb = (membuffers * s_pagesize) >> 20;
@@ -247,7 +247,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       struct statfs fsd;
       if( statfs(path, &fsd) >= 0 )
       {
-         host.hdd_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
+         hres.hdd_total_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
          hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
       }
       else

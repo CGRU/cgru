@@ -136,11 +136,13 @@ int Render::calcWeight() const
    for( std::list<TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++) weight += (*it)->calcWeight();
    return weight;
 }
-
+#if 0
 const std::string Render::getResourcesString() const
 {
-   std::ostringstream stream;
-   stream << "Resources:";
+    std::ostringstream stream;
+
+    hres.generateInfoStream( stream, true);
+/*   stream << "Resources:";
    stream << "\n   CPU usage: "
          << unsigned( hres.cpu_idle    ) << "% idle, "
          << unsigned( hres.cpu_user    ) << "% user, "
@@ -157,10 +159,10 @@ const std::string Render::getResourcesString() const
    stream << "\n   Swap: used " << hres.swap_used_mb << " Mb of total " << host.swap_mb << " Mb";
    stream << "\n   Network: recieving " << hres.net_recv_kbsec << " Kb/sec, sending " << hres.net_send_kbsec << " Kb/sec";
    stream << "\n   HDD: free " << hres.hdd_free_gb << " Gb of total " << host.hdd_gb << " Gb";
-
-   return stream.str();
+*/
+    return stream.str();
 }
-
+#endif
 void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)

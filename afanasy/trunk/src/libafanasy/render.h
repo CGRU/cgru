@@ -77,7 +77,7 @@ public:
    inline const std::list<TaskExec*> & getTasks() { return tasks;}
    inline int getTasksNumber() const { return int(tasks.size());}
 
-   const std::string getResourcesString() const;
+//   const std::string getResourcesString() const;
 
    inline const std::string & getAnnontation() const { return annotation;}
 

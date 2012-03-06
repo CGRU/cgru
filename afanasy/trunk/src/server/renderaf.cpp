@@ -70,7 +70,8 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
 
    if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
 
-   appendLog( getResourcesString());
+//   appendLog( getResourcesString());
+   appendLog( hres.generateInfoString());
 
    if( toZombie )
    {

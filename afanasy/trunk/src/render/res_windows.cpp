@@ -82,7 +82,7 @@ printf("\nGetResources:\n");
       // number of pocessors
       SYSTEM_INFO sysinfo;
       GetSystemInfo( &sysinfo);
-      host.cpu_num = sysinfo.dwNumberOfProcessors;
+      hres.cpu_num = sysinfo.dwNumberOfProcessors;
 
       // frequency of first pocessor
       HKEY hKey;
@@ -97,7 +97,7 @@ printf("\nGetResources:\n");
       if( lError == ERROR_SUCCESS)
       {
          RegQueryValueEx( hKey, "~MHz", NULL, NULL, (LPBYTE) &dwMHz, &BufSize);
-         host.cpu_mhz = dwMHz;
+         hres.cpu_mhz = dwMHz;
       }
       else
       {
@@ -109,7 +109,7 @@ printf("\nGetResources:\n");
                          _MAX_PATH,
                          0);
          AFERRAR("%s", Buffer);
-         host.cpu_mhz = 1000;
+         hres.cpu_mhz = 1000;
       }
    }
 
@@ -122,8 +122,8 @@ printf("\nGetResources:\n");
    GlobalMemoryStatusEx( &statex);
    if( !s_init )
    {
-      host.mem_mb  = int( statex.ullTotalPhys     >> 20 );
-      host.swap_mb = int( statex.ullTotalPageFile >> 20 );
+      hres.mem_total_mb  = int( statex.ullTotalPhys     >> 20 );
+      hres.swap_total_mb = int( statex.ullTotalPageFile >> 20 );
    }
    hres.mem_free_mb    = int( statex.ullAvailPhys >> 20 );
    hres.mem_cached_mb  = 0;
@@ -205,12 +205,12 @@ printf("\nGetResources:\n");
    ULARGE_INTEGER totalNumberOfBytes, totalNumberOfFreeBytes;
    if( GetDiskFreeSpaceEx( directory, NULL, &totalNumberOfBytes, &totalNumberOfFreeBytes))
    {
-      host.hdd_gb = int( totalNumberOfBytes.QuadPart >> 30 );
+      hres.hdd_total_gb = int( totalNumberOfBytes.QuadPart >> 30 );
       hres.hdd_free_gb  = int( totalNumberOfFreeBytes.QuadPart >> 30 );
    }
    else
    {
-      host.hdd_gb = 0;
+      hres.hdd_total_gb = 0;
       hres.hdd_free_gb  = 0;
    }
    }

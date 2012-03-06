@@ -97,8 +97,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
    double etime = compute_etime(sg_current_time, sg_last_time );
 
    static unsigned num_processors = sysconf(_SC_NPROCESSORS_ONLN);
-   host.cpu_num = num_processors;
-   host.cpu_mhz = int32_t( s_cpu_frequency );
+   hres.cpu_num = num_processors;
+   hres.cpu_mhz = int32_t( s_cpu_frequency );
 
     /*
         Memory: we rely on sysinfo here. Used to rely on /proc/meminfo
@@ -115,7 +115,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
         buffer[sizeof(buffer)-1] = '\0';
         unsigned long long llu;
         char records[6][12] = {"MemTotal:","MemFree:","Buffers:","Cached:","SwapTotal:","SwapFree:"};
-        int32_t * pointers[6] = {&host.mem_mb, &hres.mem_free_mb, &hres.mem_buffers_mb, &hres.mem_cached_mb, &host.swap_mb, &hres.swap_used_mb};
+        int32_t * pointers[6] = {&hres.mem_total_mb, &hres.mem_free_mb, &hres.mem_buffers_mb, &hres.mem_cached_mb, &hres.swap_total_mb, &hres.swap_used_mb};
         int i = 0;
         while( fgets( buffer, sizeof(buffer)-1, memfd) )
         {
@@ -129,7 +129,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
         }
         ::fclose( memfd );
         hres.mem_free_mb = hres.mem_free_mb + hres.mem_buffers_mb + hres.mem_cached_mb;
-        hres.swap_used_mb = host.swap_mb - hres.swap_used_mb;
+        hres.swap_used_mb = hres.swap_total_mb - hres.swap_used_mb;
     }
     else
     {
@@ -139,9 +139,9 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
     if( sysinfo(&si) >= 0 )
     {
         /* NOTE: should we account for si.mem_unit in here ? */
-        host.mem_mb = si.totalram >> 20;
+        hres.mem_mb = si.totalram >> 20;
         hres.mem_free_mb = (si.freeram + si.bufferram) >> 20;
-        host.swap_mb = si.totalswap >> 20;
+        hres.swap_mb = si.totalswap >> 20;
         hres.mem_buffers_mb = si.bufferram >> 20;
         hres.swap_used_mb  = ( si.totalswap - si.freeswap ) >> 20;
         hres.mem_cached_mb  = 0;
@@ -150,8 +150,8 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
     {
         perror( "sysinfo() failed" );
 #endif
-        host.mem_mb = 1;
-        host.swap_mb = 1;
+        hres.mem_total_mb = 1;
+        hres.swap_total_mb = 1;
         hres.mem_free_mb = hres.mem_buffers_mb = hres.swap_used_mb = hres.mem_cached_mb  = 0;
     }
    /*
@@ -262,7 +262,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
       }
       else
       {
-         host.hdd_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
+         hres.hdd_total_gb = ((fsd.f_blocks >> 10) * fsd.f_bsize) >> 20;
          hres.hdd_free_gb  = ((fsd.f_bfree  >> 10) * fsd.f_bsize) >> 20;
       }
 
@@ -340,7 +340,7 @@ void GetResources( af::Host & host, af::HostRes & hres, bool verbose)
          /* Could take this from elsewhere in this function but it it safer
             to just re-do the addition in case we change code organisation. */
 
-         uint64_t milliseconds_delta = cpu_ticks_total * 1000 / host.cpu_num / HZ;
+         uint64_t milliseconds_delta = cpu_ticks_total * 1000 / hres.cpu_num / HZ;
 
          if( milliseconds_delta != 0 )
          {

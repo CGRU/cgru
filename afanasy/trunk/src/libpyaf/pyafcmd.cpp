@@ -177,7 +177,7 @@ PyObject * PyAf_Cmd_renderlistdecode( PyAf_Cmd_Object * self, PyObject * args)
       PyDict_SetItemString( pydict, "time_registered", PyLong_FromLong( render->getTimeRegister()));
       PyDict_SetItemString( pydict, "time_taskstartfinish", PyLong_FromLong( render->getTasksStartFinishTime()));
       PyDict_SetItemString( pydict, "info", PyBytes_FromString( render->generateInfoString( true).c_str()));
-      PyDict_SetItemString( pydict, "resources", PyBytes_FromString( render->getHostRes().generateInfoString( &render->getHost(), true).c_str()));
+      PyDict_SetItemString( pydict, "resources", PyBytes_FromString( render->getHostRes().generateInfoString( true).c_str()));
       PyObject * pylist_tasks = PyList_New(0);
       std::list<af::TaskExec*> tasks;
       for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)

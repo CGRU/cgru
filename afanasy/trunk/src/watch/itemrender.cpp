@@ -168,21 +168,22 @@ void ItemRender::updateValues( af::Node *node, int type)
       {
          becameOnline = true;
          update_counter = 0;
-//         hostAttrs = name;
 
          host = render->getHost();
-         plotMem.setScale( host.mem_mb);
-         plotMem.setHotMin(( 90*host.mem_mb)/100);
-         plotMem.setHotMax((100*host.mem_mb)/100);
-         plotHDD.setScale( host.hdd_gb);
-         plotHDD.setHotMin(( 95*host.hdd_gb)/100);
-         plotHDD.setHotMax((100*host.hdd_gb)/100);
-         plotSwp.setScale( host.swap_mb);
-         if( host.swap_mb )
+         hres.copy( render->getHostRes());
+
+         plotMem.setScale( hres.mem_total_mb);
+         plotMem.setHotMin(( 90*hres.mem_total_mb)/100);
+         plotMem.setHotMax((100*hres.mem_total_mb)/100);
+         plotHDD.setScale( hres.hdd_total_gb);
+         plotHDD.setHotMin(( 95*hres.hdd_total_gb)/100);
+         plotHDD.setHotMax((100*hres.hdd_total_gb)/100);
+         plotSwp.setScale( hres.swap_total_mb);
+         if( hres.swap_total_mb )
          {
             plotSwp.setLabel("S");
-            plotSwp.setHotMin(( 10*host.swap_mb)/100);
-            plotSwp.setHotMax((100*host.swap_mb)/100);
+            plotSwp.setHotMin(( 10*hres.swap_total_mb)/100);
+            plotSwp.setHotMax((100*hres.swap_total_mb)/100);
          }
          else
          {
@@ -261,11 +262,11 @@ void ItemRender::updateValues( af::Node *node, int type)
 
       hres.copy( render->getHostRes());
 
-      tooltip_resources = hres.generateInfoString( &host, true);
+      tooltip_resources = hres.generateInfoString( true);
 
       int cpubusy = hres.cpu_user + hres.cpu_nice + hres.cpu_system + hres.cpu_iowait + hres.cpu_irq + hres.cpu_softirq;
-      int mem_used = host.mem_mb - hres.mem_free_mb;
-      int hdd_used = host.hdd_gb - hres.hdd_free_gb;
+      int mem_used = hres.mem_total_mb - hres.mem_free_mb;
+      int hdd_used = hres.hdd_total_gb - hres.hdd_free_gb;
 
       plotCpu.addValue( 0, hres.cpu_system + hres.cpu_iowait + hres.cpu_irq + hres.cpu_softirq);
       plotCpu.addValue( 1, hres.cpu_user + hres.cpu_nice);
