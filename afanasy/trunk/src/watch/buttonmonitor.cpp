@@ -42,7 +42,7 @@ ButtonMonitor::ButtonMonitor( int wType, QWidget *parent):
    createImage();
 
    QString tooltip = QString("Show %1 list.").arg(Watch::WndName[wType]);
-   if( wType != Watch::WJobs ) tooltip += "\nUse RMP to open new window.";
+   if( wType != Watch::WJobs ) tooltip += "\nUse RMB to open new window.";
    setToolTip(tooltip);
 }
 
