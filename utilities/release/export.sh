@@ -1,7 +1,6 @@
 #!/bin/bash
 
 dest=$1
-afanasy=trunk
 
 if [ -z "$dest" ]; then
    echo "Specify destination."
@@ -50,16 +49,16 @@ rcopy software_setup $dest
 rcopy start $dest
 rcopy examples $dest
 
-copy afanasy/$afanasy $dest/afanasy
-rcopy afanasy/$afanasy/bin $dest/afanasy
-rcopy afanasy/$afanasy/lib $dest/afanasy
-[ -d afanasy/$afanasy/bin_pyaf ] && rcopy afanasy/$afanasy/bin_pyaf $dest/afanasy
-rcopy afanasy/$afanasy/doc $dest/afanasy
-rcopy afanasy/$afanasy/icons $dest/afanasy
-rcopy afanasy/$afanasy/init $dest/afanasy
-rcopy afanasy/$afanasy/plugins $dest/afanasy
-rcopy afanasy/$afanasy/python $dest/afanasy
-rcopy afanasy/$afanasy/webvisor $dest/afanasy
+copy afanasy $dest/afanasy
+rcopy afanasy/bin $dest/afanasy
+rcopy afanasy/lib $dest/afanasy
+[ -d afanasy/bin_pyaf ] && rcopy afanasy/bin_pyaf $dest/afanasy
+rcopy afanasy/doc $dest/afanasy
+rcopy afanasy/icons $dest/afanasy
+rcopy afanasy/init $dest/afanasy
+rcopy afanasy/plugins $dest/afanasy
+rcopy afanasy/python $dest/afanasy
+rcopy afanasy/webvisor $dest/afanasy
 
 copy utilities $dest/utilities
 rcopy utilities/doc $dest/utilities

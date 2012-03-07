@@ -20,7 +20,7 @@ echo "Exporting CGRU revision $packsrev"
 svn export $cgruRoot $cgruREV_dir
 echo ${packsrev} > $cgruREV_dir/revision.txt
 cd $tmpdir
-acrhivename=$curdir/$cgruREV.7z
+acrhivename=$curdir/cgru.$packsver.7z
 [ -f $acrhivename ] && rm -fv $acrhivename
 echo "Compressing $acrhivename"
 7za a -r -y -t7z $acrhivename $cgruREV > /dev/null || echo "Failed!"

@@ -22,7 +22,7 @@ Mxx_ru::Cpp::lib_target{
 
    case toolset.tag( "target_os" )
       when "unix"
-
+         define "UNIX"
          case ENV['UNIXTYPE']
             when "MACOSX"
                define "MACOSX"

@@ -13,7 +13,6 @@ cgru=$PWD
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
-cgru=`dirname $cgru`
 
 # Setup Version:
 pushd .. > /dev/null
@@ -30,4 +29,9 @@ export AF_PYTHON_MODULE_EXTRA_LIBS=
 
 [ -f override.sh ] && source override.sh
 
-exec ruby afanasy.mxw.rb $*
+ruby afanasy.mxw.rb $*
+
+libdir="../../lib"
+[ -d $libdir ] || mkdir -pv $libdir
+binpyaf="../../bin/pyaf.so"
+[ -f $binpyaf ] && mv -fv $binpyaf $libdir/pyaf.so

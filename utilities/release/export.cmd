@@ -28,13 +28,13 @@ xcopy doc %dest%\doc\ /y
 xcopy doc\icons %dest%\doc\icons\ /ys
 xcopy doc\images %dest%\doc\images\ /ys
 
-xcopy afanasy\%afanasy% %dest%\afanasy\ /y
-xcopy afanasy\%afanasy%\bin %dest%\afanasy\bin\ /y
-xcopy afanasy\%afanasy%\bin_pyaf %dest%\afanasy\bin_pyaf\ /ys
-xcopy afanasy\%afanasy%\icons %dest%\afanasy\icons\ /ys
-xcopy afanasy\%afanasy%\plugins %dest%\afanasy\plugins\ /ys
-xcopy afanasy\%afanasy%\python %dest%\afanasy\python\ /ys
-xcopy afanasy\%afanasy%\doc %dest%\afanasy\doc\ /ys
+xcopy afanasy %dest%\afanasy\ /y
+xcopy afanasy\bin %dest%\afanasy\bin\ /y
+xcopy afanasy\bin_pyaf %dest%\afanasy\bin_pyaf\ /ys
+xcopy afanasy\icons %dest%\afanasy\icons\ /ys
+xcopy afanasy\plugins %dest%\afanasy\plugins\ /ys
+xcopy afanasy\python %dest%\afanasy\python\ /ys
+xcopy afanasy\doc %dest%\afanasy\doc\ /ys
 
 xcopy utilities\ %dest%\utilities\ /y
 xcopy utilities\doc %dest%\utilities\doc\ /ys

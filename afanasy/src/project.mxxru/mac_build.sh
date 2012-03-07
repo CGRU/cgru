@@ -3,7 +3,7 @@
 export UNIXTYPE="MACOSX"
 export MXX_RU_CPP_TOOLSET=gcc_darwin
 
-pushd ../../../.. >> /dev/null
+pushd ../../.. >> /dev/null
 cgru=$PWD
 popd >> /dev/null
 

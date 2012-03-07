@@ -2,7 +2,7 @@
 
 pushd .. > /dev/null
 folder=$PWD
-cd ../../../utilities
+cd ../../utilities
 source ./getrevision.sh $folder
 [ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh > /dev/null
 popd > /dev/null

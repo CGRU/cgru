@@ -5,7 +5,6 @@ cgru=$PWD
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
-cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 cgru_qt=$cgru_utils/qt/4.8.0
 [ -d $cgru_qt ] || cgru_qt=$cgru_utils/qt/4.8.1

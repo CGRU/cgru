@@ -30,20 +30,20 @@ puts "OS="+toolset.tag("target_os")
 
    # Projects (no support libs are needed here, they will be taken from dependencies)
 
-   case toolset.tag( "target_os" )
-      when "unix"
-         case ENV['UNIXTYPE']
-            when "MACOSX"
-               puts "Trying to build on MAC..."
-#               puts "QTDIR="+ENV['QTDIR']
-#               raise "QTDIR environment variable is not defined." if ENV['QTDIR'] == nil
-         end
-         required_prj "server.mxx.rb"
-         required_prj "cmd.mxx.rb"
-   end
-   required_prj "talk.mxx.rb"
-   required_prj "render.mxx.rb"
-   required_prj "watch.mxx.rb"
-   required_prj "monitor.mxx.rb"
-   required_prj "libpyaf.mxx.rb"
+    case toolset.tag( "target_os" )
+        when "unix"
+            case ENV['UNIXTYPE']
+                when "MACOSX"
+                    puts "Trying to build on MAC..."
+#                   puts "QTDIR="+ENV['QTDIR']
+#                   raise "QTDIR environment variable is not defined." if ENV['QTDIR'] == nil
+            end
+    end
+    required_prj "server.mxx.rb"
+    required_prj "cmd.mxx.rb"
+    required_prj "talk.mxx.rb"
+    required_prj "render.mxx.rb"
+    required_prj "watch.mxx.rb"
+    required_prj "monitor.mxx.rb"
+    required_prj "libpyaf.mxx.rb"
 }

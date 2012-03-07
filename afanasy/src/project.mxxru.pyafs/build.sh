@@ -13,7 +13,6 @@ cgru=$PWD
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
-cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 pythondir=$cgru_utils/python
 

@@ -1,11 +1,9 @@
 #!/bin/bash
 
 for arg in "$@"; do
-   if [ $arg == "--skipcheck" ]; then
-      check="--exitsuccess"
-   else
-      afanasy="$arg"
-   fi
+    if [ $arg == "--skipcheck" ]; then
+        check="--exitsuccess"
+    fi
 done
 
 # Location:
@@ -14,11 +12,9 @@ cgruRoot="../.."
 function rcopy(){ rsync -rL --exclude '.svn' --exclude '__pycache__' --exclude '*.pyc' $1 $2; }
 
 # Version and revision:
-packsver=`cat $cgruRoot/version.txt`
+export VERSION_NUMBER=`cat $cgruRoot/version.txt`
 pushd $cgruRoot/utilities > /dev/null
-packsrev=`python ./getrevision.py ..`
 popd > /dev/null
-echo "CGRU $packsver rev$packsrev"
 
 # Disrtibutive variables:
 source ../distribution.sh
@@ -26,36 +22,12 @@ source ../distribution.sh
 # Disrtibutive depend packages variables:
 source ./depends.sh
 
-# Function to print usage and exit:
-function usage(){
-   if [ -n "$ErrorMessage" ]; then
-      echo "ERROR: $ErrorMessage"
-   fi
-   echo "Usage:"
-   echo "   `basename $0` afanasy_branch=\"${afanasy}\" [version_number=\"${packsver}\"]"
-   echo "Example:"
-   echo "   `basename $0` ${afanasy} ${packsver}"
-   exit
-}
-
-# Afanasy location:
-[ -z "$afanasy" ] && afanasy="trunk"
-afanasy="afanasy/$afanasy"
-if [ ! -d $cgruRoot/$afanasy ]; then
-   ErrorMessage="Afanasy directory '$cgruRoot/$afanasy' does not exists."
-   usage
-fi
-
 # Check:
-./check.sh $check "$afanasy"
+./check.sh $check
 if [ "$?" != "0" ]; then
    echo "Some required binaries not founded. Use \"--skipcheck\" argument to skip it."
    exit 1
 fi
-
-# Packages version number:
-[ ! -z "$2" ] && packsver=$2
-export VERSION_NUMBER=$packsver
 
 # Temporary directory
 tmpdir="tmp"
@@ -67,7 +39,7 @@ mkdir -p $tmpdir
 chmod a+rwx $tmpdir
 
 # Processing icons:
-./process_icons.sh $afanasy
+./process_icons.sh
 
 # Exporting CGRU:
 cgruExp="cgru_export"
@@ -77,7 +49,7 @@ if [ -d $cgruExp ]; then
    rm -rf $cgruExp
 fi
 echo "Exporting '$cgruRoot' to '$cgruExp'..."
-./export.sh $cgruExp $afanasy
+./export.sh $cgruExp
 
 #
 # Creating Packages:
@@ -103,7 +75,7 @@ mkdir $packages_output_dir
 chmod a+rwx $packages_output_dir
 
 # Walk in every package folder:
-packages_dirs="$cgruRoot/$afanasy/package $cgruRoot/utilities/release/package"
+packages_dirs="$cgruRoot/afanasy/package $cgruRoot/utilities/release/package"
 for packages_dir in $packages_dirs; do
    packages=`ls "${packages_dir}"`
    for package in $packages; do
@@ -160,7 +132,7 @@ done
 ./install_create.sh "${packages_output_dir}"
 
 # Create archive:
-archive_name="cgru.${packsver}.${VERSION_NAME}.tar.gz"
+archive_name="cgru.${VERSION_NUMBER}.${VERSION_NAME}.tar.gz"
 curdir=$PWD
 cd "${packages_output_dir}"
 tar -cvzf "${archive_name}" *

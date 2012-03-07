@@ -2,37 +2,29 @@
 
 Mxx_ru::Cpp::exe_target {
 
-   target "afrender"
+    target "afrender"
 
-   required_prj "libafqt.mxx.rb"
+    required_prj "libafqt.mxx.rb"
 
-   qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )
-   qt.use_modules QT_GUI, QT_CORE, QT_NETWORK, QT_XML
+    case toolset.tag("target_os")
+        when "unix"
+            define "UNIX"
 
-   qt.moc_result_subdir = "../project.mxxru/tmp/render/moc/"
-   qt.hpp_ext = ".h"
-   qt.h2moc "../render/childprocess.h"
-   qt.h2moc "../render/qobject.h"
-   qt.h2moc "../render/taskprocess.h"
+            case ENV['UNIXTYPE']
+                when "MACOSX"
+                    define "MACOSX"
+                    linker_option "-prebind"
+                else
+                    define "LINUX"
+            end
 
-   case toolset.tag("target_os")
-      when "unix"
+        when "mswin"
+            define "WINNT"
+            lib "Advapi32"
+            lib "User32"
+        else
+            raise "#{toolset.tag('target_os')} platform is not supported."
+    end
 
-         case ENV['UNIXTYPE']
-            when "MACOSX"
-               define "MACOSX"
-               linker_option "-prebind"
-            else
-               define "LINUX"
-         end
-
-      when "mswin"
-         define "WINNT"
-         lib "Advapi32"
-         lib "User32"
-      else
-         raise "#{toolset.tag('target_os')} platform is not supported."
-   end
-
-   cpp_sources Dir.glob('../render/*.cpp')
+    cpp_sources Dir.glob('../render/*.cpp')
 }
