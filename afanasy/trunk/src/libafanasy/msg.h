@@ -78,6 +78,7 @@ public:
 
 /**/TConfigLoad/**/,                ///< Reload config file
 /**/TFarmLoad/**/,                  ///< Reload farm file
+/**/TMagicNumber/**/,               ///< Set new Magic Number
 
 
 /**/TClientExitRequest/**/,         ///< Request to client to exit,

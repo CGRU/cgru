@@ -26,42 +26,69 @@
 
 af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
-//i_msg->stdOut();
-   af::Msg * o_msg_response = NULL;
+    //i_msg->stdOut();
+    af::Msg * o_msg_response = NULL;
 
-   switch( i_msg->type())
-   {
-   case af::Msg::TNULL:
-   case af::Msg::TDATA:
-   case af::Msg::TTESTDATA:
-   case af::Msg::TStringList:
-   {
-      i_msg->stdOutData();
-      break;
-   }
-   case af::Msg::TString:
-   {
-      std::string str = i_msg->getString();
-      if( str.empty()) break;
+    switch( i_msg->type())
+    {
+    case af::Msg::TVersionMismatch:
+    {
+        AFCommon::QueueLogError( i_msg->generateInfoString( false));
+        o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
+        break;
+    }
+    case af::Msg::TMagicMismatch:
+    {
+        AFCommon::QueueLogError( i_msg->generateInfoString( false));
+        o_msg_response = new af::Msg( af::Msg::TMagicMismatch, 1);
+        break;
+    }
+    case af::Msg::TMagicNumber:
+    {
+        std::string msg = "Magick Number " + af::itos( af::Msg::Magic)
+                + " changed to " + af::itos( i_msg->int32());
+        AFCommon::QueueLog( msg);
+        o_msg_response = new af::Msg();
+        o_msg_response->setString( msg);
+        af::Msg::Magic = i_msg->int32();
+        break;
+    }
+    case af::Msg::TInvalid:
+    {
+        AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->generateInfoString( false));
+        break;
+    }
+    case af::Msg::TNULL:
+    case af::Msg::TDATA:
+    case af::Msg::TTESTDATA:
+    case af::Msg::TStringList:
+    {
+        i_msg->stdOutData();
+        break;
+    }
+    case af::Msg::TString:
+    {
+        std::string str = i_msg->getString();
+        if( str.empty()) break;
 
-      AFCommon::QueueLog( str);
-      AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
-      i_args->monitors->sendMessage( str);
-      break;
-   }
-   case af::Msg::TStatRequest:
-   {
-      o_msg_response = new af::Msg;
-      af::statwrite( o_msg_response);
-      break;
-   }
-   case af::Msg::TConfirm:
-   {
-      printf("Thread process message: Msg::TConfirm: %d\n", i_msg->int32());
-      i_args->msgQueue->pushMsg( new af::Msg( af::Msg::TConfirm, 1));
-      o_msg_response = new af::Msg( af::Msg::TConfirm, 1 - i_msg->int32());
-      break;
-   }
+        AFCommon::QueueLog( str);
+        AfContainerLock mLock( i_args->monitors, AfContainerLock::WRITELOCK);
+        i_args->monitors->sendMessage( str);
+        break;
+    }
+    case af::Msg::TStatRequest:
+    {
+        o_msg_response = new af::Msg;
+        af::statwrite( o_msg_response);
+        break;
+    }
+    case af::Msg::TConfirm:
+    {
+        printf("Thread process message: Msg::TConfirm: %d\n", i_msg->int32());
+        i_args->msgQueue->pushMsg( new af::Msg( af::Msg::TConfirm, 1));
+        o_msg_response = new af::Msg( af::Msg::TConfirm, 1 - i_msg->int32());
+        break;
+    }
     case af::Msg::TConfigLoad:
     {
         AfContainerLock jlock( i_args->jobs,    AfContainerLock::WRITELOCK);
@@ -772,23 +799,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
         //    and finish sending any updates for the task )
     }
     // -------------------------------------------------------------------------//
-   case af::Msg::TVersionMismatch:
-   {
-       AFCommon::QueueLogError( i_msg->generateInfoString( false));
-       o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
-       break;
-   }
-   case af::Msg::TMagicMismatch:
-   {
-       AFCommon::QueueLogError( i_msg->generateInfoString( false));
-       o_msg_response = new af::Msg( af::Msg::TMagicMismatch, 1);
-       break;
-   }
-    case af::Msg::TInvalid:
-    {
-        AFCommon::QueueLogError( std::string("Invalid message recieved: ") + i_msg->generateInfoString( false));
-        break;
-    }
     default:
     {
         AFCommon::QueueLogError( std::string("Unknown message recieved: ") + i_msg->generateInfoString( false));

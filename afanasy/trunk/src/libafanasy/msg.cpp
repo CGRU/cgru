@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "../include/afanasy.h"
 #include "../include/afversion.h"
 
 #include "msgclasses/mctest.h"
@@ -17,7 +18,7 @@
 using namespace af;
 
 const int Msg::Version = AFVERSION;
-int Msg::Magic = 1;
+int Msg::Magic = AFGENERAL::MAGIC_NUMBER;
 
 // Version + Magic + SID + Type + Integer = 20 bytes.
 const int Msg::SizeHeader        = 4 + 4 + 4 + 4 + 4;
@@ -357,7 +358,7 @@ bool Msg::checkValidness()
     }
     else if( m_type == af::Msg::TMagicMismatch )
     {
-        m_magic = 0;
+        m_magic = AFGENERAL::MAGIC_NUMBER_BAD;
     }
 
     return true;
@@ -427,11 +428,12 @@ const char * Msg::TNAMES[]=
 
     "TConfirm",                   ///< Simple answer with no data to confirm something.
 
-    /// Request messages, sizes, quantities statistics. Can be requested displayed by anatoly.
+    /// Request messages, sizes, quantities statistics.
     "TStatRequest",
 
     "TConfigLoad",                ///< Reload config file
     "TFarmLoad",                  ///< Reload farm file
+    "TMagicNumber",               ///< Set new Magic Number
 
 
     "TClientExitRequest",         ///< Request to client to exit,
