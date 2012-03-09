@@ -1,9 +1,0 @@
-#!/bin/bash
-
-echo "Afanasy render PRE REMOVE:"
-
-/etc/init.d/afrender stop || true
-
-/opt/cgru/afanasy/init/initlinks.sh u rm afrender || true
-
-exit 0
