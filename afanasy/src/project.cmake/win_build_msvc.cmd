@@ -1,7 +1,7 @@
 rem @echo off
 set CMAKE_GENERATOR=Visual Studio 10 Win64
 
-pushd ..\..\..\..
+pushd ..\..\..
 call setup.cmd
 popd
 
