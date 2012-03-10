@@ -52,6 +52,8 @@ int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTE
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
 int     Environment::render_log_linesmax =             AFRENDER::LOG_LINESMAX;
+std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
+ 
 std::string Environment::render_exec =                 AFRENDER::EXEC;
 std::string Environment::render_cmd_reboot =           AFRENDER::CMD_REBOOT;
 std::string Environment::render_cmd_shutdown =         AFRENDER::CMD_SHUTDOWN;
@@ -176,6 +178,7 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
     getVar( pnode, task_log_linesmax,                 "task_log_linesmax"                 );
     getVar( pnode, job_log_linesmax,                  "job_log_linesmax"                  );
 
+    getVar( pnode, cmd_shell,                         "cmd_shell"                         );
     getVar( pnode, render_default_capacity,           "render_default_capacity"           );
     getVar( pnode, render_default_maxtasks,           "render_default_maxtasks"           );
     getVar( pnode, render_exec,                       "render_exec"                       );

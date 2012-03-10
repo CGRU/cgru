@@ -72,6 +72,12 @@ namespace AFDATABASE
 /// Render options:
 namespace AFRENDER
 {
+/// Shell to run a command:
+#ifdef WINNT
+	const char CMD_SHELL[]              = "cmd.exe /c";
+#else
+	const char CMD_SHELL[]              = "/bin/bash -c";
+#endif
     const int  TERMINATEWAITKILL        = 10;         ///< Seconds to wait task task finish after termination, then perform kill
     const int  DEFAULTCAPACITY          = 1000;       ///< Default render capacity.
     const int  DEFAULTMAXTASKS          = 2;          ///< Maximum tasks on can run on the same render the same time (default value).

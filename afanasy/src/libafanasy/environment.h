@@ -128,6 +128,8 @@ public:
 
     static inline int getRenderDefaultCapacity()       { return render_default_capacity;     }
     static inline int getRenderDefaultMaxTasks()       { return render_default_maxtasks;     }
+    static inline std::string & getCmdShell()          { return cmd_shell;}
+ 
     static inline int getRenderNice()                  { return render_nice;                 } ///< Get Render task process nice factor.
     static inline int getRenderUpdateSec()             { return render_update_sec;           } ///< Get Render update interval ( in seconds ).
     static inline int getRenderUpdateTaskPeriod()      { return render_updatetaskperiod;     }
@@ -251,6 +253,7 @@ private:
    static int render_waitforbyteswritten;
    static int render_log_linesmax;
    static std::string render_exec;       ///< How Render can execute anther Render.
+   static std::string cmd_shell;
    static std::string render_cmd_reboot;
    static std::string render_cmd_shutdown;
    static std::string render_cmd_wolsleep;
