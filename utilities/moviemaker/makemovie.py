@@ -278,6 +278,8 @@ def getImages( inpattern):
       print( inputdir)
       print('Expression:')
       print( expr.pattern)
+      if Options.framestart != -1 or Options.frameend != -1:
+         print('Frame Range: %d - %d' % (Options.framestart, Options.frameend))
       sys.exit(1)
    allFiles.sort()
    if Verbose: print('Files fonded: %d' % len(allFiles))

@@ -108,7 +108,7 @@ AudioCodecNames  = [   'MP3 (Mpeg-1 Layer 3)', 'AAC (Advanced Audio Codec)',    
 AudioCodecValues = [             'libmp3lame',                    'libfaac',  'libvorbis',                             'flac']
 
 # Process Containers:
-Containers = ['mov','avi','mp4','m4v']
+Containers = ['mov','avi','mp4','m4v','mxf']
 if not str(Options.container) in Containers: Containers.append( str(Options.container))
 
 # Process Cacher:
@@ -151,7 +151,7 @@ if not Options.format in FormatValues:
    FormatNames.append( Options.format)
 
 # Process temporary images format:
-TmpImgFormats = ['tga','jpg']
+TmpImgFormats = ['tga','jpg','dpx','png']
 if Options.tmpformat not in TmpImgFormats: TmpImgFormats.append( Options.tmpformat)
 
 # Process templates:
