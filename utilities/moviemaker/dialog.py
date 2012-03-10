@@ -151,7 +151,7 @@ if not Options.format in FormatValues:
    FormatNames.append( Options.format)
 
 # Process temporary images format:
-TmpImgFormats = ['tga','jpg','dpx','png']
+TmpImgFormats = ['tga','jpg','dpx','png','tif']
 if Options.tmpformat not in TmpImgFormats: TmpImgFormats.append( Options.tmpformat)
 
 # Process templates:
