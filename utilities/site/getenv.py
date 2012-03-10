@@ -19,7 +19,6 @@ REMOTE_BEGIN         = getenv_errorexit('REMOTE_BEGIN')
 REMOTE_END           = getenv_errorexit('REMOTE_END')
 
 SRCDIR               = getenv_errorexit('SRCDIR')
-AFANASY              = getenv_errorexit('AFANASY')
 TMPDIR               = getenv_errorexit('TMPDIR')
 CGRUEXPORT           = getenv_errorexit('CGRUEXPORT')
 WWWROOT              = getenv_errorexit('WWWROOT')

@@ -16,18 +16,7 @@ def walk( remote):
 
    dircount = 0
 
-   afanasy_branches_path = os.path.join( getenv.SRCDIR, 'afanasy')
-
    for dirpath, dirnames, filenames in os.walk( getenv.SRCDIR, True, None, False):
-
-      # Check afanasy branch if not remote:
-      if not remote:
-         if dirpath.find( afanasy_branches_path) == 0:
-            folder = dirpath[len(afanasy_branches_path):]
-            if len(folder) < 1: continue
-            while folder[0] == '/' and len(folder): folder = folder[1:]
-            while folder != os.path.dirname( folder) and len(os.path.dirname( folder)): folder = os.path.dirname( folder)
-            if folder.find( getenv.AFANASY) == -1: continue
 
       # Check exclude strings:
       exclude_directoty = False
