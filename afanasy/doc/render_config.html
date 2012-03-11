@@ -46,6 +46,13 @@
 
 <ul>
 <li><p>
+<a name="cmd_shell"><code>cmd_shell</code></a> not defined by default.<br/>
+Shell command used to launch any other command. It is important that it will be used by render to launch task process.
+If not defined build-in values are used:<br/>
+<i>UNIX</i>: "/bin/bash -c"<br/>
+<i>MS Windows</i>: "cmd.exe /c"<br/>
+</p></li>
+<li><p>
 <code>render_default_capacity</code> = 1000<br/>
 Default render capacity value, if not set in farm config.
 </p></li>
