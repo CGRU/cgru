@@ -1,0 +1,172 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../../../doc/styles.css" rel="stylesheet" type="text/css" />
+<title>XSI Afanasy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="CGRU: CG Tools, CG Rules, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://www.linkedin.com/groups/CGRU-AFANASY-4263049"><img src="../../../../doc/images/linkedin.png" border="0" alt="LinkedIn" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h2 align="center">Afanasy in Softimage</h2>
+<hr />
+
+<h3>Afanasy Window</h3>
+
+<table width="99%">
+<tr align="center">
+<td width="50%">
+   <b>Render - > Submit to Afanasy</b>
+   <p>General Submission Parameters:<br/>
+   <img src="images/afwindow_submission.png" alt="afwindow_submission.png" /></p>
+</td>
+<td width="50%">
+   <b>Jobs Example:</b>
+   <img src="images/afwatch_jobs.png" alt="afwatch_jobs.png" /></p>
+</td>
+</tr>
+</table>
+
+<ul>
+<li><b>Job Name</b> - Job name. Scene name by default. And pass name if render several passes at once.
+</li>
+<li><b>Pass</b> - Pass(es) to render. You can choose to render current, all or selected pass(es).
+</li>
+<li><b>Take Frame Range From Pass</b> - Render pass with its own frame range, if it is set.
+</li>
+<li><b>Force Pass Frame Range</b> - Render specified below frame range in any case.
+</li>
+<li><b>Start Frame</b> - First frame to render.
+</li>
+<li><b>End Frame</b> - Last frame to render.
+</li>
+<li><b>By Frame</b> - Frames increment.
+</li>
+<li><b>Frames Per Task</b> - Number of frames to render by one task.
+</li>
+<li><b>Simulate</b> - Force not to simulate by setting Play Control to Frame Range.
+</li>
+<li><b>Start Job Paused</b> - Send job in <i>Off-line</i> state.
+</li>
+</ul>
+
+<p align="center">Job Scheduling Parameters:<br/>
+<img src="images/afwindow_scheduling.png" alt="afwindow_scheduling.png" /></p>
+<ul>
+<li><b>Priority</b> - Job <a href="../../../doc/job.html#Priority">Priority</a> parameter, '-1' - use default priority.
+</li>
+<li><b>Capacity</b> - Job tasks <a href="../../../doc/job_block.html#Capacity">Capacity</a>, '-1' - use default capacity.
+</li>
+<li><b>Max Hosts</b> - <a href="../../../doc/job.html#MaxHosts">Maximum Hosts</a> the job can run on, '-1' - means no limit.
+</li>
+<li><b>Task Max Run Time</b> - <a href="../../../doc/job_block.html#TasksMaxRunTime">Maximum Time</a>, '0' - means no limit.
+</li>
+<li><b>Hosts Mask</b> - <a href="../../../doc/job.html#HostsMask">Hostname Mask</a> pattern, job can run on.
+</li>
+<li><b>Exclude Hosts Mask</b> - <a href="../../../doc/job.html#HostsMaskExclude">Hostname Mask Exclude</a> pattern, job can not run on.
+</li>
+<li><b>Depend Mask</b> - Job names <a href="../../../doc/job.html#DependMask">Depend Mask</a> pattern, to wait other jobs to finish.
+</li>
+<li><b>Global Depend Mask</b> - Job names <a href="../../../doc/job.html#DependMaskGlobal">Depend Mask Global</a> pattern, to wait other jobs from any user to finish.
+</li>
+</ul>
+
+<h3>VariRender</h3>
+<p>
+VariRender can help you to automatically increment some value and to render scene with different parameters at once.
+For example particles with different seed, to increase their quantity by compositing.
+</p>
+<p align="center">VariRender Parameters:<br/>
+<img src="images/afwindow_varirender.png" alt="afwindow_varirender.png" /></p>
+<ul>
+<li><b>Enable VariRender</b> - Turn it on or off.
+</li>
+<li><b>Attribute</b> - Attribute name to variate. Change some object parameter and look script editor, or command line for name.
+</li>
+<li><b>Start Value</b> - First value to start from.
+</li>
+<li><b>Step</b> - Value increment.
+</li>
+<li><b>Count</b> - Quantity of value increments.
+</li>
+</ul>
+
+<p>
+<b>Afanasy Job</b>
+</p>
+<p>
+This is a job from CGRU examples. Rendering two passes with VariRender.
+</p>
+<p style="text-align:center">
+<img src="images/afwatch_varirender.png" alt="afwatch_varirender.png" /></p>
+<p>
+For each pass it generates a job. For each parameter value it generates a block of tasks.
+</p>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net/projects/cgru/"><img src="../../../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://libregraphicsworld.org/tag/cgru"><img src="../../../../doc/images/lgw.png" border="0" alt="Libre Graphics World" /></a>
+</td>
+</tr>
+</table>
+</body>
+</html>

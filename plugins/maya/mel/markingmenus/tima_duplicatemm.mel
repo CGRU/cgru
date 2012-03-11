@@ -1,0 +1,28 @@
+//
+//	tima_duplicatemm.mel
+//
+//###################################################################################################################
+
+global proc tima_DuplicateMMP_globalProc()
+{
+	if (`popupMenu -exists tempMM`) { deleteUI tempMM; }
+	popupMenu -button 1 -ctl false -alt true -allowOptionBoxes true -parent viewPanes -mm 1 tempMM;
+		menuItem -rp "N" -l "Copy" -ecr 1 -c "duplicate -renameChildren;";
+//		menuItem -rp "NE" -l "Copy" -ecr 1 -c "duplicate -renameChildren;";
+		menuItem -rp "E" -l "Copy Graph" -ecr 1 -c "duplicate -renameChildren -upstreamNodes;";
+//		menuItem -rp "SE" -l "merge vertices" -ecr 0 -c "";
+		menuItem -rp "S" -l "Instance" -ecr 1 -c "instance;";
+//		menuItem -rp "SW" -l "extrude face" -ecr 0 -c "";
+		menuItem -rp "W" -l "Copy Connect" -ecr 1 -c "duplicate -renameChildren -inputConnections;";
+//		menuItem -rp "NW" -l "cut faces tool" -ecr 0 -c "";
+
+		menuItem -l "Duplicate Option Box" -ecr 0 -c "DuplicateOptions;";
+//		menuItem -divider 1;
+//		menuItem -l "menuItem1" -ecr 0 -c "";
+	setParent -m ..;
+}
+
+global proc tima_DuplicateMMR_globalProc()
+{
+	if( `popupMenu -exists tempMM` ) deleteUI tempMM;
+}

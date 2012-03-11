@@ -1,0 +1,2 @@
+XVID (low)
+mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.@CONTAINER@" -ovc xvid -xvidencopts bitrate=4000

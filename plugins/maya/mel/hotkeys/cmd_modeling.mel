@@ -1,0 +1,46 @@
+
+if(`runTimeCommand -q -exists PoltToolsMMpress_rtc`) runTimeCommand -e -delete PoltToolsMMpress_rtc;
+runTimeCommand
+	-annotation "PoltToolsMMpress"
+	-category "_CGRU_mod_"
+	-command ("timaPolyToolsMMP")
+	PoltToolsMMpress_rtc;
+nameCommand
+	-annotation "PoltToolsMMpress_rtcNameCommand"
+	-command ("PoltToolsMMpress_rtc")
+	PoltToolsMMpress_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists PoltToolsMMrelease_rtc`) runTimeCommand -e -delete PoltToolsMMrelease_rtc;
+runTimeCommand
+	-annotation "PoltToolsMMrelease"
+	-category "_CGRU_mod_"
+	-command ("timaPolyToolsMMR")
+	PoltToolsMMrelease_rtc;
+nameCommand
+	-annotation "PoltToolsMMrelease_rtcNameCommand"
+	-command ("PoltToolsMMrelease_rtc")
+	PoltToolsMMrelease_rtcNameCommand;
+
+if(`runTimeCommand -q -exists PolySelectShell_rtc`) runTimeCommand -e -delete PolySelectShell_rtc;
+runTimeCommand
+	-annotation "PolySelectShell_rtc"
+	-category "_CGRU_mod_"
+	-command ("polySelectBorderShell 0")
+	PolySelectShell_rtc;
+nameCommand
+	-annotation "PolySelectShell_rtcNameCommand"
+	-command ("PolySelectShell_rtc")
+	PolySelectShell_rtcNameCommand;
+
+if(`runTimeCommand -q -exists PolyMergeUV_rtc`) runTimeCommand -e -delete PolyMergeUV_rtc;
+runTimeCommand
+	-annotation "PolySelectShell_rtc"
+	-category "_CGRU_mod_"
+	-command ("polyPerformAction \"polyMergeUV\" v 0")
+	PolyMergeUV_rtc;
+nameCommand
+	-annotation "PolyMergeUV_rtcNameCommand"
+	-command ("PolyMergeUV_rtc")
+	PolyMergeUV_rtcNameCommand;
+

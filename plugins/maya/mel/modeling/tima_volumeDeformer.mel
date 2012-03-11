@@ -1,0 +1,83 @@
+{
+
+   // Get selection to construct new nodes names prefix
+   //
+   string $sel[] = `ls -sl`;
+   string $prefix = $sel[0] + "_vd";
+
+   // Create deformer
+   //
+   string $deformer[] = `deformer -type tm_volumeDeformer -name $prefix`;
+
+   // Create polycube and connect mesh and bounding box attributes
+   //
+   string $cube = `createNode polyCube`;
+   string $cubeShape = `createNode mesh -name ( $prefix + "MeshShape")`;
+   connectAttr ( $cube + ".output") ($cubeShape + ".inMesh");
+   string $cubeTransform[] = `listRelatives -p $cubeShape`;
+   $cubeTransform[0] = `rename $cubeTransform[0] ( $prefix + "Mesh")`;
+   polySoftEdge -angle 180 $cubeShape;
+   connectAttr ( $cubeShape + ".worldMesh") ( $deformer[0] + ".polymesh");
+   connectAttr ( $cubeTransform[0] + ".boundingBoxMinX") ( $deformer[0] + ".bboxXmin");
+   connectAttr ( $cubeTransform[0] + ".boundingBoxMaxX") ( $deformer[0] + ".bboxXmax");
+   connectAttr ( $cubeTransform[0] + ".boundingBoxMinY") ( $deformer[0] + ".bboxYmin");
+   connectAttr ( $cubeTransform[0] + ".boundingBoxMaxY") ( $deformer[0] + ".bboxYmax");
+   connectAttr ( $cubeTransform[0] + ".boundingBoxMinZ") ( $deformer[0] + ".bboxZmin");
+   connectAttr ( $cubeTransform[0] + ".boundingBoxMaxZ") ( $deformer[0] + ".bboxZmax");
+   setAttr -lock true ($cubeTransform[0] + ".rx");
+   setAttr -lock true ($cubeTransform[0] + ".ry");
+   setAttr -lock true ($cubeTransform[0] + ".rz");
+   setAttr -lock true ($cubeTransform[0] + ".sx");
+   setAttr -lock true ($cubeTransform[0] + ".sy");
+   setAttr -lock true ($cubeTransform[0] + ".sz");
+   setAttr ( $cubeShape + ".overrideEnabled") 1;
+   setAttr ( $cubeShape + ".overrideColor") 15;
+   delete -ch $cubeShape;
+
+   // Pivot locator
+   //
+   string $pivotLocatorShape = `createNode locator -name ( $prefix + "Pivot_locatorShape")`;
+   string $pivotLocator[] = `listRelatives -p $pivotLocatorShape`;
+   $pivotLocator[0] = `rename $pivotLocator[0] ( $prefix + "Pivot_locator")`;
+   connectAttr ( $pivotLocator[0] + ".tx") ( $deformer[0] + ".px");
+   connectAttr ( $pivotLocator[0] + ".ty") ( $deformer[0] + ".py");
+   connectAttr ( $pivotLocator[0] + ".tz") ( $deformer[0] + ".pz");
+   setAttr -lock true ($pivotLocator[0] + ".rx");
+   setAttr -lock true ($pivotLocator[0] + ".ry");
+   setAttr -lock true ($pivotLocator[0] + ".rz");
+   setAttr -lock true ($pivotLocator[0] + ".sx");
+   setAttr -lock true ($pivotLocator[0] + ".sy");
+   setAttr -lock true ($pivotLocator[0] + ".sz");
+   setAttr -lock true ($pivotLocatorShape + ".localScaleX") 0.1;
+   setAttr -lock true ($pivotLocatorShape + ".localScaleY") 0.1;
+   setAttr -lock true ($pivotLocatorShape + ".localScaleZ") 0.1;
+   setAttr ( $pivotLocatorShape + ".overrideEnabled") 1;
+   setAttr ( $pivotLocatorShape + ".overrideColor") 4;
+   parent $pivotLocator[0] $cubeTransform[0];
+
+   // Transform locator
+   //
+   string $transformLocatorShape = `createNode locator -name ( $prefix + "Transform_locatorShape")`;
+   string $transformLocator[] = `listRelatives -p $transformLocatorShape`;
+   $transformLocator[0] = `rename $transformLocator[0] ( $prefix + "Transform_locator")`;
+   connectAttr ( $transformLocator[0] + ".tx") ( $deformer[0] + ".tx");
+   connectAttr ( $transformLocator[0] + ".ty") ( $deformer[0] + ".ty");
+   connectAttr ( $transformLocator[0] + ".tz") ( $deformer[0] + ".tz");
+   connectAttr ( $transformLocator[0] + ".rx") ( $deformer[0] + ".rx");
+   connectAttr ( $transformLocator[0] + ".ry") ( $deformer[0] + ".ry");
+   connectAttr ( $transformLocator[0] + ".rz") ( $deformer[0] + ".rz");
+   connectAttr ( $transformLocator[0] + ".sx") ( $deformer[0] + ".sx");
+   connectAttr ( $transformLocator[0] + ".sy") ( $deformer[0] + ".sy");
+   connectAttr ( $transformLocator[0] + ".sz") ( $deformer[0] + ".sz");
+   setAttr ( $transformLocatorShape + ".overrideEnabled") 1;
+   setAttr ( $transformLocatorShape + ".overrideColor") 23;
+   parent $transformLocator[0] $pivotLocator[0];
+
+   // Set multiply attribute to set deformer in working state
+   //
+   setAttr ( $deformer[0] + ".multiplier") 1;
+
+   // Select objects
+   //
+   select $deformer[0] $transformLocator[0];
+}

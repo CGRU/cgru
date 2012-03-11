@@ -1,0 +1,110 @@
+global proc timaPolygon_selectLR_globalProc( int $command, int $mode, float $angle)
+{
+	string $hlArray[] = `ls -hl`;
+	if(`size($hlArray)` == 0)
+	{
+		cgruWarning("Nothing hilited. Hilite mesh and select an edge (edges).");
+		return;
+	}
+	if(!`objectType -isType mesh $hlArray[0]`)
+		$hlArray = `listRelatives -s $hlArray[0]`;
+/**/	if(!`objectType -isType mesh $hlArray[0]`)
+	{
+		cgruWarning("No mesh hilited.");
+		return;
+	}
+/**/	string $selArray[] = `ls -sl -fl`;
+	if(`size($selArray)` == 0)
+	{
+		cgruWarning("No components selected. Select an edge (edges).");
+		return;
+	}
+	int $ec[] = `polyEvaluate -edgeComponent`;
+	if($ec[0] < 1)
+	{
+		cgruWarning("No edge selected.");
+		return;
+	}
+	int $result[];
+	int $counter = 0;;
+	string $curSel;
+	for( $curSel in $selArray)
+	{
+//print($curSel + "\n");
+		if(`gmatch $curSel "*.e*"` == 0) continue;
+//print($curSel + "\n");
+		$curSel = `substitute ".*e" $curSel ""`;
+		int $sel_a = `match "[0-9]+" $curSel`;
+		int $compArray[];
+		string $cmd = "tm_polygon -s";
+		switch ( $command)
+		{
+		case 1:
+			$cmd += "l ";
+			break;
+		case 2:
+			$cmd += "r ";
+			break;
+		default:
+			cgruError("///###*** BAD COMMAND");
+			return;
+		}
+		$cmd += (" " + $hlArray[0] + " " + $sel_a + " " + $mode + " " + $angle + " 10000;");
+		$compArray = `eval($cmd)`;
+		int $count = `size($compArray)`;
+		int $i;
+		for( $i = 0; $i < $count; $i++)
+			$result[$counter++] = $compArray[$i];
+	}
+//print($compArray);
+	select -cl;
+	int $comp;
+	for( $comp in $result)
+	{
+		string $cmd = "select -add " + $hlArray[0] + ".e[" + $comp + "];";
+		eval ($cmd);
+	}
+}
+
+global proc timaPolygon_selectFP_globalProc()
+{
+	string $hlArray[] = `ls -hl`;
+	if(`size($hlArray)` == 0)
+	{
+		cgruWarning("Nothing hilited. Hilite mesh and select two vertices.");
+		return;
+	}
+	if(!`objectType -isType mesh $hlArray[0]`)
+		$hlArray = `listRelatives -s $hlArray[0]`;
+/**/	if(!`objectType -isType mesh $hlArray[0]`)
+	{
+		cgruWarning("No mesh hilited.");
+		return;
+	}
+/**/	string $selArray[] = `ls -sl -fl`;
+	if(`size($selArray)` == 0)
+	{
+		cgruWarning("No components selected. Select two vertices.");
+		return;
+	}
+	int $ec[] = `polyEvaluate -vertexComponent`;
+	if($ec[0] != 2)
+	{
+		cgruWarning("Wrong number of vertices selected. Select two vertices.");
+		return;
+	}
+	$selArray[0] = `substitute ".*vtx" $selArray[0] ""`;
+	int $vtx_a = `match "[0-9]+" $selArray[0]`;
+	$selArray[1] = `substitute ".*vtx" $selArray[1] ""`;
+	int $vtx_b = `match "[0-9]+" $selArray[1]`;
+	string $cmd = "tm_polygon -fp " + $hlArray[0] + " " + $vtx_a + " " + $vtx_b + " 1.0;";
+	int $edgesArray[] = `eval( $cmd)`;
+//print($edgesArray);
+	select -cl;
+	int $edge;
+	for( $edge in $edgesArray)
+	{
+		string $cmd = "select -add " + $hlArray[0] + ".e[" + $edge + "];";
+		eval ($cmd);
+	}
+}

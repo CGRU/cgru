@@ -1,0 +1,150 @@
+
+float  rand_common_A( int x)			 
+{
+    x = (x<<13) ^ x;
+    return ((float)( 1.0 - ((x * (x * x * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0));    
+}
+
+float rand_common_A2D( int x, int y)
+{
+    int n = x + y * 57;
+    n = (n<<13) ^ n;
+    return ((float)( 1.0 - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0));    
+}
+
+float rand_common_A4D( int x, int y, int z, int t)
+{
+    int n = x + y*11 + z*31 + t*57;
+    n = (n<<13) ^ n;
+    return ((float)( 1.0 - ( (n * (n * n * 15731 + 789221) + 1376312589) & 0x7fffffff) / 1073741824.0));    
+}
+
+float Linear_Interpolate( float a, float b, float x)
+{
+	return  a*(1-x) + b*x;
+}
+/*
+float Cosine_Interpolate( float a, float b, float x)
+{
+	float f = (1 - cosf( x * 3.1415927)) * 0.5;
+	return  a*(1 - f) + b*f;
+}
+*/
+float Cubic_Interpolate( float v0, float v1, float v2, float v3, float x)
+{
+	float P = (v3 - v2) - (v0 - v1);
+	float Q = (v0 - v1) - P;
+	float R = v2 - v0;
+	float S = v1;
+	return (P * x*x*x + Q * x*x + R*x + S);
+}
+
+#define randNG rand_common_A
+
+float SmoothNoise_1D( int x)
+{
+    return (randNG(x)/2  +  randNG(x-1)/4  +  randNG(x+1)/4);
+}
+
+float SmoothNoise_2D ( int x, int y)
+{
+	#define randNG rand_common_A2D
+	float corners = ( randNG(x-1, y-1)+ randNG(x+1, y-1) + randNG(x-1, y+1) + randNG(x+1, y+1) ) / 16;
+	float sides   = ( randNG(x-1, y)  + randNG(x+1, y)  + randNG(x, y-1)  + randNG(x, y+1) ) /  8;
+	float center  =  randNG(x, y) / 4;
+	return (corners + sides + center);
+}
+
+float SmoothNoise_4D ( int x, int y, int z, int t)
+{
+	#define randNG rand_common_A4D
+	float center     =  randNG(x, y, z, t);
+	float corners1D  = 0;
+			corners1D += randNG(x-1,y  ,z  ,t  );
+			corners1D += randNG(x+1,y  ,z  ,t  );
+			corners1D += randNG(x , y-1,z  ,t  );
+			corners1D += randNG(x , y+1,z  ,t  );
+			corners1D += randNG(x , y  ,z-1,t  );
+			corners1D += randNG(x , y  ,z+1,t  );
+			corners1D += randNG(x , y  ,z  ,t+1);
+			corners1D += randNG(x , y  ,z  ,t+1);
+	float corners2D  = 0;
+			corners2D += randNG(x-1,y-1,z  ,t  );
+			corners2D += randNG(x+1,y-1,z  ,t  );
+			corners2D += randNG(x-1,y+1,z  ,t  );
+			corners2D += randNG(x+1,y+1,z  ,t  );
+			corners2D += randNG(x  ,y-1,z-1,t  );
+			corners2D += randNG(x  ,y+1,z-1,t  );
+			corners2D += randNG(x  ,y-1,z+1,t  );
+			corners2D += randNG(x  ,y+1,z+1,t  );
+			corners2D += randNG(x  ,y  ,z-1,t-1);
+			corners2D += randNG(x  ,y  ,z+1,t-1);
+			corners2D += randNG(x  ,y  ,z-1,t+1);
+			corners2D += randNG(x  ,y  ,z+1,t+1);
+	return (center /4 + corners1D / 8 + corners2D /16 );
+}
+
+float InterpolatedNoise_4D(float x, float y, float z, float t)
+{
+      int int_X    = int(x);
+      float fractional_X = x - int_X;
+      int int_Y    = int(y);
+      float fractional_Y = y - int_Y;
+      int int_Z    = int(z);
+      float fractional_Z = z - int_Z;
+      int int_T    = int(t);
+      float fractional_T = t - int_T;
+
+      float v01 = SmoothNoise_4D(int_X  , int_Y  , int_Z  , int_T  );
+      float v02 = SmoothNoise_4D(int_X+1, int_Y  , int_Z  , int_T  );
+      float v03 = SmoothNoise_4D(int_X  , int_Y+1, int_Z  , int_T  );
+      float v04 = SmoothNoise_4D(int_X+1, int_Y+1, int_Z  , int_T  );
+      float v05 = SmoothNoise_4D(int_X  , int_Y  , int_Z+1, int_T  );
+      float v06 = SmoothNoise_4D(int_X+1, int_Y  , int_Z+1, int_T  );
+      float v07 = SmoothNoise_4D(int_X  , int_Y+1, int_Z+1, int_T  );
+      float v08 = SmoothNoise_4D(int_X+1, int_Y+1, int_Z+1, int_T  );
+      float v09 = SmoothNoise_4D(int_X  , int_Y  , int_Z  , int_T+1);
+      float v10 = SmoothNoise_4D(int_X+1, int_Y  , int_Z  , int_T+1);
+      float v11 = SmoothNoise_4D(int_X  , int_Y+1, int_Z  , int_T+1);
+      float v12 = SmoothNoise_4D(int_X+1, int_Y+1, int_Z  , int_T+1);
+      float v13 = SmoothNoise_4D(int_X  , int_Y  , int_Z+1, int_T+1);
+      float v14 = SmoothNoise_4D(int_X+1, int_Y  , int_Z+1, int_T+1);
+      float v15 = SmoothNoise_4D(int_X  , int_Y+1, int_Z+1, int_T+1);
+      float v16 = SmoothNoise_4D(int_X+1, int_Y+1, int_Z+1, int_T+1);
+
+      float i01 = Linear_Interpolate(v01, v02, fractional_X);
+      float i02 = Linear_Interpolate(v03, v04, fractional_X);
+      float i03 = Linear_Interpolate(v05, v06, fractional_X);
+      float i04 = Linear_Interpolate(v07, v08, fractional_X);
+      float i05 = Linear_Interpolate(v09, v10, fractional_X);
+      float i06 = Linear_Interpolate(v11, v12, fractional_X);
+      float i07 = Linear_Interpolate(v13, v14, fractional_X);
+      float i08 = Linear_Interpolate(v15, v16, fractional_X);
+
+      float i11 = Linear_Interpolate(i01, i02, fractional_Y);
+      float i12 = Linear_Interpolate(i03, i04, fractional_Y);
+      float i13 = Linear_Interpolate(i05, i06, fractional_Y);
+      float i14 = Linear_Interpolate(i07, i08, fractional_Y);
+
+      float i21 = Linear_Interpolate(i11, i12, fractional_Z);
+      float i22 = Linear_Interpolate(i13, i14, fractional_Z);
+
+	  return Linear_Interpolate(i21, i22, fractional_T);
+}
+
+float PerlinNoise_4D(float x, float y, float z, float t, int Octaves, float parameter)
+{
+	float total = 0;
+	float ampltude = 1;
+	float frequency = 1;
+	for( int i = 0; i < Octaves; i++)
+	{
+		for( int p = 0; p < i; p++)
+		{
+	        frequency *= 2;
+			ampltude *= parameter;
+		}
+		total = total + InterpolatedNoise_4D(x * frequency, y * frequency, z * frequency, t * frequency);
+	}
+	return total;
+}

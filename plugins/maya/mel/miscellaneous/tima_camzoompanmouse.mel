@@ -1,0 +1,87 @@
+global proc timaCZPM_ContextPress_globalProc(string $cameraShape)
+{
+	string $modifier   = `draggerContext -query -modifier timaCZPM_Context`;
+	if($modifier == "ctrl")
+	{
+		string $tempArray[] = timaGetCurrentCamera_globalProc();
+		string $currentCamera = $tempArray[0];
+		string $currentCameraShape = $tempArray[1];
+cgruInfo("CurrentCamera = " + $currentCamera);
+cgruInfo("CurrentCameraShape = " + $currentCameraShape);
+		$cameraShape = $currentCameraShape;
+		draggerContext -edit -pressCommand (" undoInfo -swf 0; timaCZPM_ContextPress_globalProc(\"" + $cameraShape + "\"); undoInfo -swf 1;") timaCZPM_Context;
+	}
+	if($modifier == "shift")
+	{
+		setAttr ($cameraShape + ".overscan") 1;
+		setAttr ($cameraShape + ".horizontalFilmOffset") 0;
+		setAttr ($cameraShape + ".verticalFilmOffset") 0;
+cgruInfo("RESET " + $cameraShape);
+	}
+	float $io = `getAttr ($cameraShape + ".overscan")`;
+	float $ih = `getAttr ($cameraShape + ".horizontalFilmOffset")`;
+	float $iv = `getAttr ($cameraShape + ".verticalFilmOffset")`;
+	draggerContext -edit -dragCommand (" undoInfo -swf 0; timaCZPM_ContextDrag_globalProc(\"" + $cameraShape + "\", " + $io + "," + $ih + "," + $iv + "); undoInfo -swf 1;") timaCZPM_Context;
+}
+global proc timaCZPM_ContextDrag_globalProc(string $cameraShape, float $io, float $ih, float $iv)
+{
+	float  $pressPosition[] = `draggerContext -query -anchorPoint timaCZPM_Context`;
+	float  $dragPosition[] = `draggerContext -query -dragPoint timaCZPM_Context`;
+	int    $button     = `draggerContext -query -button timaCZPM_Context`;
+	string $modifier   = `draggerContext -query -modifier timaCZPM_Context`;
+//print("\n***\n");
+//print ("Press : " + $pressPosition[0] + " " + $pressPosition[1] + " " + $pressPosition[2] + ";   currentCameraShape = " + $cameraShape + "\n");
+//print ("Drag: " + $dragPosition[0] + " " + $dragPosition[1] + " " + $dragPosition[2] + "  Button is " + $button + "  Modifier is " + $modifier + "\n");
+	if($modifier == "shift")
+	{
+		setAttr ($cameraShape + ".overscan") 1;
+		setAttr ($cameraShape + ".horizontalFilmOffset") 0;
+		setAttr ($cameraShape + ".verticalFilmOffset") 0;
+		return;
+	}
+	if($button == 1)
+	{
+		float $overscan = `getAttr ($cameraShape + ".overscan")`;
+		float $new_overscan = $io * `exp (1 * (($pressPosition[0] - $dragPosition[0]) * 0.003))`;
+		if($new_overscan < 0.01) $new_overscan = 0.01;
+		setAttr ($cameraShape + ".overscan") $new_overscan;
+//print("old overscan = " + $overscan + "; new overscan = " + $new_overscan + "\n");
+		refresh -currentView;
+		return;
+	}
+	if($button == 2)
+	{
+		float $overscan = `getAttr ($cameraShape + ".overscan")`;
+		float $horizontalFilmOffset = `getAttr ($cameraShape + ".horizontalFilmOffset")`;
+		float $verticalFilmOffset = `getAttr ($cameraShape + ".verticalFilmOffset")`;
+		float $new_horizontalFilmOffset = $ih + (($pressPosition[0] - $dragPosition[0]) * 0.0009 * $overscan);
+		float $new_verticalFilmOffset = $iv + (($pressPosition[1] - $dragPosition[1]) * 0.0009 * $overscan);
+		setAttr ($cameraShape + ".horizontalFilmOffset") $new_horizontalFilmOffset;
+		setAttr ($cameraShape + ".verticalFilmOffset") $new_verticalFilmOffset;
+//print("overscan = " + $overscan + "\n");
+//print("old horizontalFilmOffset = " + $horizontalFilmOffset + "; new horizontalFilmOffset = " + $new_horizontalFilmOffset + "\n");
+//print("old verticalFilmOffset = " + $verticalFilmOffset + "; new verticalFilmOffset = " + $new_verticalFilmOffset + "\n");
+		refresh -currentView;
+		return;
+	}
+}
+//#############################################################################################################33
+{
+	string $tempArray[] = timaGetCurrentCamera_globalProc();
+	string $currentCamera = $tempArray[0];
+	string $currentCameraShape = $tempArray[1];
+	if(`draggerContext -q -exists timaCZPM_Context` == 0)
+	{
+		draggerContext
+			-pressCommand	(" undoInfo -swf 0; timaCZPM_ContextPress_globalProc(\"" + $currentCameraShape + "\"); undoInfo -swf 1;")
+			-dragCommand	(" undoInfo -swf 0; timaCZPM_ContextDrag_globalProc(\"" + $currentCameraShape + "\", 1, 0, 0); undoInfo -swf 1;")
+			-space		"screen"
+			-cursor		"fly"
+			timaCZPM_Context;
+//print("///###   draggerContext ceated\n");
+	}
+	draggerContext -edit -cursor "fly" timaCZPM_Context;
+	draggerContext -edit -pressCommand (" undoInfo -swf 0; timaCZPM_ContextPress_globalProc(\"" + $currentCameraShape + "\"); undoInfo -swf 1;") timaCZPM_Context;
+	draggerContext -edit -dragCommand (" undoInfo -swf 0; timaCZPM_ContextDrag_globalProc(\"" + $currentCameraShape + "\", 1, 0, 0); undoInfo -swf 1;") timaCZPM_Context;
+	setToolTo timaCZPM_Context;
+}

@@ -1,0 +1,133 @@
+//
+//    afanasy.mel
+//
+//print("starting afanasy\n");
+//#################################################################
+
+//
+// create variables to store settings
+//
+if(`optionVar -exists "cgru_afanasy__start_frame_ov"`   == false ) optionVar -iv "cgru_afanasy__start_frame_ov"   1;
+if(`optionVar -exists "cgru_afanasy__end_frame_ov"`     == false ) optionVar -iv "cgru_afanasy__end_frame_ov"     2;
+if(`optionVar -exists "cgru_afanasy__frames_render_ov"` == false ) optionVar -iv "cgru_afanasy__frames_render_ov" 1;
+if(`optionVar -exists "cgru_afanasy__by_frame_ov"`      == false ) optionVar -iv "cgru_afanasy__by_frame_ov"      1;
+
+global proc afanasy_launch()
+{
+   if(`window -exists cgru_afanasy_wnd` == false) return;
+
+   //
+   // get window fields
+   //
+   int $start_frame     = `intField -q -v cgru_afanasy__start_frame`;
+   int $end_frame       = `intField -q -v cgru_afanasy__end_frame`;
+   int $frames_render   = `intField -q -v cgru_afanasy__frames_render`;
+   int $by_frame        = `intField -q -v cgru_afanasy__by_frame`;
+   int $pause          = `checkBox -q -v cgru_afanasy__paused`;
+
+   // check values
+   if( $start_frame > $end_frame) $end_frame = $start_frame;
+   if( $frames_render < 1) $frames_render = 1;
+   if( $by_frame < 1) $by_frame = 1;
+
+   // store fields values
+   optionVar -iv "cgru_afanasy__start_frame_ov"   $start_frame;
+   optionVar -iv "cgru_afanasy__end_frame_ov"     $end_frame;
+   optionVar -iv "cgru_afanasy__frames_render_ov" $frames_render;
+   optionVar -iv "cgru_afanasy__by_frame_ov"      $by_frame;
+
+   //
+   // get pathes
+   //
+   string $scene = `file -q -sceneName`;
+   python( "import time" );
+   string $datetime = `python( "time.strftime('%y%m%d-%H%M%S-') + str(time.time()-int(time.time()))[2:5]")`;
+   string $file  = $scene + "." + $datetime + ".mb";
+
+   string $project = `workspace -q -rootDirectory`;
+   string $outdir  = `workspace -fre "images"`;
+
+   string $jobame = `substitute ".*/" $scene ""`;
+
+int $DEBUG = false;
+
+//DEBUG: uncomment next line
+//$DEBUG = true;
+
+if( $DEBUG)
+{
+   print($start_frame + "s " + $end_frame + "e " + $frames_render + "r ");// + $by_frame + "b\n");
+   print("scene   = " + $scene   + "\n");
+   print("file    = " + $file    + "\n");
+   print("jobame  = " + $jobame  + "\n");
+   print("project = " + $project + "\n");
+   print("outdir  = " + $outdir  + "\n");
+}
+//
+   //
+   // close window if needed
+   //
+   if(`checkBox -q -v cgru_afanasy__close`) deleteUI cgru_afanasy_wnd;
+
+   string $cmd = "\"" + $file + "\"";
+   $cmd += " "         + $start_frame;
+   $cmd += " "         + $end_frame;
+   $cmd += " -by "     + $by_frame;
+   $cmd += " -fpr "    + $frames_render;
+   $cmd += " -name \"" + $jobame + "\"";
+   $cmd += " -pwd \""  + $project + "\"";
+   $cmd += " -output \"" + $outdir + "\"";
+   $cmd += " -deletescene";
+   if( $pause) $cmd += " -pause";
+
+   if(`about -windows`)
+      $cmd = "python \"" + `getenv AF_ROOT` + "/python/afjob.py\" " + $cmd;
+   else
+      $cmd = `getenv AF_ROOT` + "/python/afjob.sh " + $cmd +  " &";
+
+   //
+   // if debug mode print command and return
+   //
+//   if( $DEBUG)
+   print( $cmd + "\n");
+
+   //
+   // save a file and start the command
+   //
+   file -rename $file;
+   file -force -save;
+   file -rename $scene;
+   system($cmd);
+}
+//
+//#################################################################
+//
+//    GUI:
+global proc afanasy()
+{
+   if(`window -exists cgru_afanasy_wnd`) deleteUI cgru_afanasy_wnd;
+   window -t "Afanasy" cgru_afanasy_wnd;
+   columnLayout -adj true;
+      int $labelsWidth = 90;
+      rowLayout -nc 2 -adj 2 -cw2 $labelsWidth 50;
+         text -l "   Start Frame";
+         intField -v `optionVar -q "cgru_afanasy__start_frame_ov"`   cgru_afanasy__start_frame;
+         setParent ..;
+      rowLayout -nc 2 -adj 2 -cw2 $labelsWidth 50;
+         text -l "   End Frame";
+         intField -v `optionVar -q "cgru_afanasy__end_frame_ov"`     cgru_afanasy__end_frame;
+         setParent ..;
+      rowLayout -nc 2 -adj 2 -cw2 $labelsWidth 50;
+         text -l "   F P R";
+         intField -v `optionVar -q "cgru_afanasy__frames_render_ov"` cgru_afanasy__frames_render;
+         setParent ..;
+      rowLayout -nc 2 -adj 2 -cw2 $labelsWidth 50;
+         text -l "   By Frame";
+         intField -v `optionVar -q "cgru_afanasy__by_frame_ov"`      cgru_afanasy__by_frame;
+         setParent ..;
+      checkBox -l " Start Paused " -v 0 cgru_afanasy__paused;
+      button -l "   LAUNCH   " -c "afanasy_launch()";
+      checkBox -l " Close After " -v 1 cgru_afanasy__close;
+
+   showWindow cgru_afanasy_wnd;
+}

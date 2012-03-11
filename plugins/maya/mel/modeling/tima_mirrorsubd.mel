@@ -1,0 +1,103 @@
+global proc tima_mirrorsubd( int $mirror, int $mirrorUV, int $subdivide)
+{
+//
+// duplicate meshes, connect outMesh->inMesh, mirror, subdivide
+//
+//################################################################################################
+
+string $selection[] = `ls -sl -l`;
+if(`size($selection)` == 0 ) return;
+string $suffix = "_ms";
+string $meshes[] = `ls -sl -l -dag -noIntermediate -type "mesh"`;
+string $groupName = `substitute ".*|" $selection[0] ""` + $suffix;
+string $group = `createNode "transform" -name $groupName`;
+
+if( $mirror)
+{
+   addAttr -ln "mergeVtxThreshold" -at double  -min 0.0001 -max 1.0 -dv 0.01  $group;
+   setAttr -e -channelBox true ($group+".mergeVtxThreshold");
+   if( $mirrorUV == false)
+   {
+      addAttr -ln "mirrorDirection" -at "enum" -en "+X:-X:+Y:-Y:+Z:-Z" $group;
+      setAttr ($group+".mirrorDirection") 1;
+      setAttr -e -channelBox true ($group+".mirrorDirection");
+   }
+}
+if( $mirrorUV)
+{
+   addAttr -ln "mergeUVsThreshold" -at double  -min 0.0001 -max 1.0 -dv 0.001 $group;
+   setAttr -e -channelBox true ($group+".mergeUVsThreshold");
+}
+if( $subdivide)
+{
+   addAttr -ln "smoothDepth" -at long -min 0 -max 4 -dv 1 $group;
+   setAttr -e -channelBox true ($group+".smoothDepth");
+}
+
+string $mesh;
+for( $mesh in $meshes)
+{
+   string $meshName = `substitute ".*|" $mesh ""`;
+   string $newmesh_transform[] = `duplicate -name ( $meshName + $suffix) $mesh`;
+   string $newmesh[] = `listRelatives -s $newmesh_transform[0]`;
+
+   tm_polygon -removeTweaks $newmesh[0];
+
+   parent $newmesh_transform[0] $group;
+
+   connectAttr ($mesh + ".outMesh") ($newmesh[0] + ".inMesh");
+
+   if( $mirror)
+   {
+      if     ( getAttr ($newmesh_transform[0]+".tx") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".ty") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".tz") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".rx") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".ry") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".rz") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".sx") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".sy") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+      else if( getAttr ($newmesh_transform[0]+".sz") != 0) makeIdentity -apply true -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+
+      makeIdentity -apply 0 -t 1 -r 1 -s 1 -n 0 $newmesh_transform[0];
+
+      if( $mirrorUV)
+      {
+         string $dupTransform[] = `duplicate $newmesh[0]`;
+         string $dupShape[] = `listRelatives -s $dupTransform[0]`;
+         string $meshSource[] = `listConnections -plugs 1 -s 1 -d 0 ($newmesh[0] + ".inMesh")`;
+         string $transformUV = `createNode tm_transformUV`;
+         connectAttr $meshSource[0]              ($transformUV + ".inMesh");
+         connectAttr ($transformUV + ".outMesh") ($dupShape[0] + ".inMesh");
+
+         setAttr ($dupTransform[0]+".sx") -1;
+         makeIdentity -apply 1 -t 1 -r 1 -s 1 -n 0 $dupTransform[0];
+         polyNormal -normalMode 0 -ch 1 $dupTransform[0];
+         $newmesh_transform = `polyUnite -ch 1 -name $newmesh[0] $newmesh[0] $dupTransform[0]`;
+         $newmesh = `listRelatives -s $newmesh_transform[0]`;
+         parent $newmesh_transform[0] $group;
+
+         string $mergeVertex[] = `polyMergeVertex $newmesh[0]`;
+         connectAttr ( $group + ".mergeVtxThreshold" ) ( $mergeVertex[0] + ".distance" );
+         string $mergeUV[] = `polyMergeUV $newmesh[0]`;
+         connectAttr ( $group + ".mergeUVsThreshold" ) ( $mergeUV[0] + ".distance" );
+      }
+      else
+      {
+         string $polyMirror[] = `polyMirrorFace -ws 1 -direction 1 -pivot 0 0 0 -ch 1 $newmesh`;
+         setAttr ($polyMirror[0]+".mergeMode") 1;
+         connectAttr ( $group + ".mirrorDirection" ) ( $polyMirror[0] + ".direction"      );
+         connectAttr ( $group + ".mergeVtxThreshold"  ) ( $polyMirror[0] + ".mergeThreshold" );
+      }
+   }
+   if( $subdivide)
+   {
+      string $polySmoothFace[] = `polySmooth -keepBorder 0 -keepHardEdge 0 -keepSelectionBorder 0 $newmesh[0]`;
+      setAttr ( $polySmoothFace[0] + ".smoothUVs") true;
+      connectAttr ( $group + ".smoothDepth") ( $polySmoothFace[0] + ".divisions");
+   }
+}
+
+select $group;
+//################################################################################################
+}

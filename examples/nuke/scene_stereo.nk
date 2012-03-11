@@ -1,0 +1,314 @@
+#! /usr/local/Nuke6.1v1/Nuke6.1 -nx
+version 6.1 v1
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="25" w="1366" h="718" screen="0">
+        <splitter orientation="1">
+            <split size="858"></split>
+            <splitter orientation="1">
+                <split size="40"></split>
+                <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                    <page id="Toolbar.1"></page>
+                </dock>
+                <split size="814"></split>
+                <splitter orientation="2">
+                    <split size="381"></split>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"></page>
+                        <page id="Script Editor.2"></page>
+                    </dock>
+                    <split size="277"></split>
+                    <dock id="" activePageId="DAG.1">
+                        <page id="DAG.1"></page>
+                        <page id="Curve Editor.1"></page>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="496"></split>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"></page>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /cg/tools/cgru/examples/nuke/scene_stereo.nk
+ last_frame 11
+ lock_range true
+ fps 25
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy_format "720 576 0 0 720 576 1.09 PAL"
+ proxySetting always
+ views "left #ff0000
+right #00ff00"
+}
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos 104
+ ypos -383
+}
+Transform {
+ translate {{100*noise(2.34+.05*frame) i} {100*noise(3.45+.05*frame) i}}
+ rotate {{180*noise(4.56+.05*frame) i}}
+ scale {{.4+.2*noise(0.12+.05*frame) i} {.4+.2*noise(1.23+.05*frame) i}}
+ center {320 240}
+ motionblur 1
+ name Transform1
+ xpos 223
+ ypos -360
+}
+Transform {
+ translate {(default {0 0} right {100 0})}
+ center {360 288}
+ name Transform8
+ xpos 223
+ ypos -332
+}
+set N2c5e510 [stack 0]
+Write {
+ channels rgba
+ file render/key_%v.%04d.exr
+ proxy render/key_proxy_%v.%04d.exr
+ file_type exr
+ name key
+ xpos 333
+ ypos -339
+}
+Constant {
+ inputs 0
+ channels rgb
+ color {0.0443748 0.0548952 0.205 0.35}
+ name Constant1
+ xpos 3
+ ypos -335
+}
+Ramp {
+ opacity {{.6+.4*noise(3.1+.4*frame)}}
+ p0 {480 -95}
+ p1 {230 625}
+ color {1 0.829351 0.381265 1}
+ name Ramp1
+ xpos 3
+ ypos -259
+}
+set N2c777e0 [stack 0]
+Write {
+ file render/back_%v.%04d.exr
+ proxy render/back_proxy_%v.%04d.exr
+ file_type exr
+ name back
+ xpos 113
+ ypos -266
+}
+afanasy {
+ inputs 2
+ name afanasy1
+ label raw
+ xpos 399
+ ypos -266
+ jobname raw
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ independent true
+}
+Read {
+ inputs 0
+ file render/key_%v.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/key_proxy_%v.%04d.exr
+ last 9999
+ version 11
+ name Read3
+ xpos 223
+ ypos -165
+}
+push $N2c5e510
+Switch {
+ inputs 2
+ which 1
+ name Switch2
+ xpos 223
+ ypos -193
+}
+Read {
+ inputs 0
+ file render/back_%v.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/back_proxy_%v.%04d.exr
+ last 9999
+ version 9
+ name Read2
+ xpos 3
+ ypos -166
+}
+push $N2c777e0
+Switch {
+ inputs 2
+ which 1
+ name Switch1
+ xpos 3
+ ypos -194
+}
+Merge2 {
+ inputs 2
+ name Merge1
+ xpos 113
+ ypos -194
+}
+Crop {
+ box {0 0 720 576}
+ crop false
+ name Crop1
+ xpos 113
+ ypos -58
+}
+set N2dd1020 [stack 0]
+Write {
+ file render/final_%v.%04d.exr
+ proxy render/final_proxy_%v.%04d.exr
+ file_type exr
+ name final
+ xpos 223
+ ypos -65
+}
+Read {
+ inputs 0
+ file render/final_%v.%04d.exr
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy render/final_proxy_%v.%04d.exr
+ last 9999
+ version 2
+ name Read1
+ xpos 3
+ ypos -32
+}
+push $N2dd1020
+Switch {
+ inputs 2
+ which 1
+ name Switch3
+ xpos 113
+ ypos -2
+}
+Write {
+ file render/preview_%v.%04d.jpg
+ proxy render/preview_proxy_%v.%04d.jpg
+ file_type jpeg
+ _jpeg_quality 0.95
+ checkHashOnRead false
+ name preview
+ xpos 113
+ ypos 46
+}
+afanasy {
+ inputs 3
+ name afanasy2
+ label comp
+ xpos 399
+ ypos 46
+ jobname comp
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+ fullrange true
+}
+Read {
+ inputs 0
+ file render/preview_%v.%04d.jpg
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy render/final_proxy.%04d.exr
+ last 11
+ version 2
+ name Read_stereo
+ xpos -23
+ ypos 95
+}
+cgru_dailies {
+ name dailies
+ xpos 113
+ ypos 125
+ format 720x576
+ fps 24
+ codec /cg/tools/cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg
+ company ""
+ project Nuke
+ shot scene
+ version 1
+ artist Afanasy
+ activity comp
+ comments "cgru afanasy nuke example"
+ movfolder /cg/tools/cgru/examples/nuke
+ movrule (s)_(v)_(d)
+ movname scene_v001_110125
+ viewsnames "right left"
+ knob_1 ""
+ template /cg/tools/cgru/utilities/moviemaker/templates/dailies
+ slate /cg/tools/cgru/utilities/moviemaker/templates/dailies_slate
+ draw169 25
+ draw235 25
+ line169 200,200,200
+ line235 200,200,200
+ logopath /cg/tools/cgru/utilities/moviemaker/logos/logo.png
+ logosize 20
+}
+set N2f1b270 [stack 0]
+afanasy {
+ name afanasy3
+ label dailies
+ xpos 289
+ ypos 118
+ jobname dailies
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask scene.nk.*
+ dependmaskglbl ""
+ addnodes ""
+}
+afanasy {
+ inputs 2
+ name afanasy
+ label all
+ xpos 399
+ ypos 118
+ jobname all
+ knob ""
+ knob_1 ""
+ hostsmask ""
+ hostsmaskexcl ""
+ dependmask ""
+ dependmaskglbl ""
+ addnodes ""
+}
+Read {
+ inputs 0
+ file render/preview_l.%04d.jpg
+ format "720 576 0 0 720 576 1.09 PAL"
+ proxy render/final_proxy.%04d.exr
+ last 11
+ version 2
+ name Read_left
+ xpos 113
+ ypos 187
+}
+push $N2f1b270
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 252
+ ypos 216
+}

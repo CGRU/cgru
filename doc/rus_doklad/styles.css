@@ -1,0 +1,26 @@
+body {
+   font-size: 17px;
+   text-align: justify;
+}
+h1 {
+   font-family: Verdana;
+   font-weight: bold;
+}
+code {
+   color: Navy;
+   font-weight: bold;
+}
+kbd {
+   color: Purple;
+   font-weight: bold;
+}
+pre {
+   color: #000000;
+}
+a:hover {
+   color: #500000;
+}
+a:active {
+   color: #D00000;
+}
+

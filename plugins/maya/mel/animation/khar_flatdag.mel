@@ -1,0 +1,616 @@
+//************************************ 
+// tkFlatDag
+//------------------------------------
+// Mel script for flatten DAG
+//------------------------------------
+// ver 1.2 23.06.04
+//------------------------------------
+// Worked under Maya 3.x -4.x (NT, Irix, Lunix)
+//------------------------------------
+// Author:
+// Kharitonov Konstantin
+// khar_khar@mail.ru
+//************************************
+{
+if(`window -exists khar_flatdag_window`) deleteUI khar_flatdag_window;
+window -wh 100 100 -rtf 1 -t "Flatten DAG" khar_flatdag_window;
+  	columnLayout -rs 2 -adjustableColumn true main;
+		frameLayout -mh 5 -mw 5 -label "Extra Parameters" -labelAlign "center" -borderStyle "etchedOut" ;
+			columnLayout -rs 2 -adjustableColumn true;
+				int $cw1 = 100; $cw2 = 50;
+				checkBoxGrp  -numberOfCheckBoxes 1
+					-cw2 $cw1 $cw2
+					-label "Input Connections" 
+					-ann "Duplicate w/ Input Connection"
+					-cal 1 "left" khar_flatdag_incon_checkBoxGrp;
+				checkBoxGrp  -numberOfCheckBoxes 1
+					-cw2 $cw1 $cw2
+					-label "Up Stream Graph" 
+					-ann "Duplicate w/ Up Stream Graph"
+					-cal 1 "left" khar_flatdag_upstream_intFieldGrp;
+		/*		checkBoxGrp  -numberOfCheckBoxes 1
+					-cw2 $cw1 $cw2
+					-ann "Use Current frame instead flater animation sequnce"
+					-label "Use Current Frame" 
+					-cal 1 "left" khar_flatdag_current_intFieldGrp;
+		*/		floatFieldGrp
+					-cw2 $cw1 $cw2
+					-pre 4
+					-cal 1 "left" 
+					-ann "Translate multiplier of all duplicated nodes"
+					-label "Mult Translate"
+					-v1 1 khar_flatdag_multtra_intFieldGrp;   	
+		/* 		checkBoxGrp  -numberOfCheckBoxes 1
+					-cw2 $cw1 $cw2
+					-ann "Hide obj for fast redraw"
+					-label "Redraw" 
+					-cal 1 "left" khar_flatdag_redraw_intFieldGrp;
+		*///		setParent ..;
+		//	setParent ..;	  	  	
+		//	frameLayout -mh 5  -mw 5 -label "Curve Simplify" -labelAlign "center" -borderStyle "etchedOut" ;
+		//		columnLayout -rs 2 -adjustableColumn true;
+				checkBoxGrp  -numberOfCheckBoxes 1
+						-cw2 $cw1 $cw2
+						-label "Simplify Curve"
+						-ann "Use Curve Simplify"
+						-cal 1 "left"
+						-on1 "floatFieldGrp -e -en true khar_flatdag_tol_intFieldGrp;"
+						-of1 "floatFieldGrp -e -en false khar_flatdag_tol_intFieldGrp;"
+					khar_flatdag_simp_intFieldGrp;
+				 floatFieldGrp
+						-cw2 $cw1 $cw2
+						-cal 1 "left"
+						-pre 4
+						-ann "Time Tolerance for Curve Simplify"
+						-label "Simplify tolerance"
+						-en false
+						-v1 1
+					khar_flatdag_tol_intFieldGrp;
+			setParent ..;
+		setParent ..;	  	  	
+		intFieldGrp -label "Start frame" 
+				-cw2 $cw1 $cw2
+				-v1 `playbackOptions -q -min`
+			khar_flatdag_frameBegin_intFieldGrp;
+		intFieldGrp -label "End frame"
+				-cw2 $cw1 $cw2
+				-v1 `playbackOptions -q -max`
+			khar_flatdag_frameEnd_intFieldGrp;
+		floatFieldGrp
+			-cw2 $cw1 $cw2
+			-pre 4
+			-label "Step:"
+			-v1 1 khar_flatdag_step_intFieldGrp;
+		rowLayout -nc 2	-cw2 $cw1 $cw2;
+			button -w ($cw1-2) -l "Flatten Out" -ann "Flat DAG for selected object" -c "khar_flatdag_globalProc()";
+			button -w ($cw2+2) -l "Help" -ann "Starts HTML page." -bgc .9 .9 .6
+				-c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/animation_/khar_flatdag.html\")`;";
+	showWindow khar_flatdag_window;
+}
+//#################################################################################################
+global proc khar_flatdag_globalProc()
+{
+//"flatSel*string^selection*optionMenuGrp*Use Selection",
+//	string $type = `optionMenuGrp -q -v flatSel`;
+	float $start = `intFieldGrp -q -v1 khar_flatdag_frameBegin_intFieldGrp`;
+	float $end = `intFieldGrp -q -v1 khar_flatdag_frameEnd_intFieldGrp`;
+	float $step = `floatFieldGrp -q -v1 khar_flatdag_step_intFieldGrp`;
+	int $simp = `checkBoxGrp -q -v1 khar_flatdag_simp_intFieldGrp`;
+	float $tol = `floatFieldGrp -q -v1 khar_flatdag_tol_intFieldGrp`;
+	float $MultTra = `floatFieldGrp -q -v1 khar_flatdag_multtra_intFieldGrp`;
+	int $ic = `checkBoxGrp -q -v1 khar_flatdag_incon_checkBoxGrp`;
+	int $up = `checkBoxGrp -q -v1 khar_flatdag_upstream_intFieldGrp`;
+//	int $flatCur = `checkBoxGrp -q -v1 khar_flatdag_current_intFieldGrp`;
+//	int $redraw = `checkBoxGrp -q -v1 khar_flatdag_redraw_intFieldGrp`;
+
+//	int $useNoReDraw = 1- $redraw ;
+//	string $selw[] = `ls -ni -sl -dag -tr -s`;
+	//work selection get shapes 
+	string $selShapes[] = `ls -ni -sl -dag -s`;
+	//save selection
+	string $selection[] = `ls -sl`;
+	string $shape;
+	string $tranforms[];
+	string $tranformsDub[];
+	string $tranform;
+	int $z=0;
+	string $tmpStrArray[];
+
+	// get transforms
+	for ($shape in $selShapes) {
+		$tmpStrArray = `listRelatives -p $shape`;
+		$tranforms[$z] = $tmpStrArray[0];
+		$z++;
+	}
+	
+	if (!`size($tranforms)`) {
+		warning ("tkFlatDag: Select Some thing for produce flatten") ;
+		return;
+	}
+	
+	if ( !($start <= $end) ) {
+		warning "tkFlatDag:FrameStart must be less FrameEnd.";
+	}
+	
+	//save global seting fro tangens 
+	string $in[] = `keyTangent -q -g -inTangentType`;
+	string $out[] = `keyTangent -q -g -outTangentType`;
+	
+	//set tang. to linear 
+	keyTangent -g -inTangentType "linear";
+	keyTangent -g -outTangentType "linear";	
+	
+	
+	includeEffectsGlobals();
+		
+	string $node = createDecomposeMatrixNode();
+	
+	// del dublicate 
+	
+	$tranforms = stringArrayRemoveDuplicates($tranforms);
+	
+	string $stemp[];
+	string $stemp2[];
+	//dublicate
+	
+	string $parent = `group -n "group" -empty`;
+	
+	$z=0;
+	
+	
+	string $names[]= {"translateX","translateY","translateZ","rotateX","rotateY","rotateZ","scaleX","scaleY","scaleZ","shearXY","shearXZ","shearYZ","rotateAxisX","rotateAxisY","rotateAxisZ"};
+	
+	float $lockState[];
+	
+	string $name;
+	
+	int $nam =0;
+	
+	int $rigidBodyOn[];
+	
+	
+	for ($tranform in $tranforms) {
+		
+		$nam = 0;
+		//lock state clear and save
+		for ($name in $names) {
+			if (`getAttr -l ($tranform+ "."+ $name)`) {
+				setAttr -l 0 ($tranform+ "." + $name);
+				$lockState[$nam] = 1;
+			} else {
+				$lockState[$nam] = 0;
+			}
+			$nam++;
+		}			
+		
+		//save 
+		
+		$ro = `getAttr ($tranform+".rotateOrder")`;
+		
+		$rpx = `getAttr ($tranform+".rotatePivotX")`;
+		$rpy = `getAttr($tranform+".rotatePivotY") `;
+		$rpz = `getAttr ($tranform+".rotatePivotZ")`;
+		
+		$spx = `getAttr ($tranform+".scalePivotX") `;
+		$spy = `getAttr ($tranform+".scalePivotY") `;
+		$spz = `getAttr ($tranform+".scalePivotZ") `;	
+		
+		
+		$rax = `getAttr ($tranform+".rotateAxisX") `;
+		$ray = `getAttr ($tranform+".rotateAxisY") `;
+		$raz = `getAttr ($tranform+".rotateAxisZ") `;
+		
+		// neded !!!!!!!!!!!!!!!!
+		setAttr ($tranform+".rotateOrder") 0;
+		
+		xform -rp 0 0 0 $tranform;
+		xform -ra 0 0 0 $tranform;
+		xform -sp 0 0 0 $tranform;
+		
+		if ($ic){
+			$stemp = `duplicate -rr -ic -rc $tranform`; 
+		} else {
+			if ($up){
+				$stemp = `duplicate -rr -un -rc $tranform`; 
+			} else {
+				$stemp = `duplicate -rr -rc $tranform`; 
+			}		
+		
+		}
+		
+		// neded !!!!!!!!!!!!!!!!
+		setAttr ($tranform+".rotateOrder") $ro;
+		
+		xform -rp $rpx $rpy $rpz $tranform;
+		xform -ra $rax $ray $raz $tranform;
+		xform -sp $spx $spy $spz $tranform;
+	
+	////////////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////// by [nevermind] ////////////////////////////////////////
+	////////////////////////////////////////////////////////////////////////////////////////////
+		string $list[] = `listConnections -sh on -t rigidBody $stemp[0]`;
+		if (`objExists $list[0]`) {
+			delete $list[0];
+			$rigidBodyOn[$z] = 1; 
+		}
+	////////////////////////////////////////////////////////////////////////////////////////////
+
+		$stemp2 = `parent $stemp[0] $parent`;
+		$tranformsDub[$z] = $stemp2[0];
+				
+		//clear keys + lock state - set on oryginal
+		$nam = 0;
+		
+		
+			
+		
+		//print ("dub: " +$tranformsDub[]+"\n");
+		
+		for ($name in $names) {
+			
+			if ($ic) {
+				khar_flatdag_deleteConnection_globalProc($tranformsDub[$z]+"."+$name);
+			}
+			
+//			if (!$flatCur) {
+				cutKey -cl -time ($start+":"+$end) -attribute $name $tranformsDub[$z];
+//			}
+			
+			if ($lockState[$nam] == 1){
+				setAttr -l 1 ($tranform+ "." + $name);
+			}	
+			$nam++;
+		}
+		
+
+		
+		$z++;
+	}
+	
+/*	if ($flatCur) {
+		$start = `currentTime -q`;
+		$start = $end;
+			
+	}*/
+	
+		
+	float $frame = $start;
+	
+	float $bigArrayLast[];
+	
+	float $bigArrayCur[];
+	
+	
+	int $array;
+	
+	float $tr[];
+	
+	float $save = `currentTime -q `;
+	
+	global string $gMainProgressBar; 
+	
+	if ($end != $start) {
+	
+		progressBar -edit
+			-beginProgress
+			-isInterruptable true
+			-status "Flatern DAG ..."
+			-maxValue ($end - $start)
+			$gMainProgressBar;
+	}
+	
+	int $breakBox = 0;
+	
+	float $tr[];
+	
+	// on all panels 
+//	if ($useNoReDraw) 
+//		tkNoReDraw(1);
+	
+	while ($frame <= $end) {
+		
+//		if (!$flatCur) {
+			currentTime -e $frame;		
+			
+			//pa re get 
+	//		tkNoReDraw(2);
+//		}
+		
+		$array = 0;
+		$z = 0;
+		
+		for ($tranform in $tranforms) {
+			
+			if ((`progressBar -query -isCancelled $gMainProgressBar`) || ($breakBox))  {
+				$breakBox = 1;
+				break;
+			}	
+
+
+			//connect node 
+			connectAttr -f ($tranform+".worldMatrix") ($node+".inputMatrix");
+			
+			/*
+			if ($rigidBodyOn[$z] == 1) {
+				$tr = `xform -q -m $tranform`;
+				xform -m $tr[0] $tr[1] $tr[2] $tr[3] $tr[4] $tr[5] $tr[6] $tr[7] $tr[8] $tr[9] $tr[10] $tr[11] $tr[12] $tr[13] $tr[14] $tr[15] ($tranformsDub[$z]);			
+			}
+			*/
+			
+			// get translate
+			
+			//$translate[0] = ;
+			//$translate[1] = `getAttr ($node+".outputTranslateY")`;
+			//$translate[2] = `getAttr ($node+".outputTranslateZ")`;
+			
+			// set translate
+			//xform -ws -t $translate $tranformsDub[$z];
+			
+			
+			
+			//setKeyframe -attribute "translateX" -t ($frame) -v (`getAttr ($node+".outputTranslateX")`) $tranformsDub[$z];
+			//setKeyframe -attribute "translateY" -t ($frame) -v (`getAttr ($node+".outputTranslateY")`) $tranformsDub[$z];
+			//setKeyframe -attribute "translateZ" -t ($frame) -v (`getAttr ($node+".outputTranslateZ")`) $tranformsDub[$z];
+			
+			//fist frame 
+			
+			//if ($rigidBodyOn[$z] == 1) {
+				
+			//	setKeyframe -attribute "translateX" $tranformsDub[$z];
+			///	setKeyframe -attribute "translateY" $tranformsDub[$z];
+			//	setKeyframe -attribute "translateZ" $tranformsDub[$z];
+				
+			//	setKeyframe -attribute "rotateX" $tranformsDub[$z];
+			//	setKeyframe -attribute "rotateY" $tranformsDub[$z];
+			//	setKeyframe -attribute "rotateZ" $tranformsDub[$z];
+			
+			//} else {
+			
+				if ($frame == $start) {
+
+					$bigArrayLast[$array + 0]  = $MultTra *`getAttr ($node+".outputTranslateX")`;
+					$bigArrayLast[$array + 1]  = $MultTra *`getAttr ($node+".outputTranslateY")`;
+					$bigArrayLast[$array + 2]  = $MultTra *`getAttr ($node+".outputTranslateZ")`;
+
+					$bigArrayLast[$array + 3]  = `getAttr ($node+".outputRotateX")`;
+					$bigArrayLast[$array + 4]  = `getAttr ($node+".outputRotateY")`;
+					$bigArrayLast[$array + 5]  = `getAttr ($node+".outputRotateZ")`;
+
+					$bigArrayLast[$array + 6]  = `getAttr ($node+".outputScaleX")`;
+					$bigArrayLast[$array + 7]  = `getAttr ($node+".outputScaleY")`;
+					$bigArrayLast[$array + 8]  = `getAttr ($node+".outputScaleZ")`;				
+
+					$bigArrayLast[$array + 9]  = `getAttr ($node+".outputShearX")`;
+					$bigArrayLast[$array + 10] = `getAttr ($node+".outputShearY")`;
+					$bigArrayLast[$array + 11] = `getAttr ($node+".outputShearZ")`;
+
+					//init position
+
+					//xform -ws -t	$bigArrayLast[$array + 0] $bigArrayLast[$array + 1] 	$bigArrayLast[$array + 2] 	($tranformsDub[$z]);
+
+					//xform -ws -ro	$bigArrayLast[$array + 3] $bigArrayLast[$array + 4] 	$bigArrayLast[$array + 5] 	($tranformsDub[$z]); 
+
+					//xform -ws -s	$bigArrayLast[$array + 6] $bigArrayLast[$array + 7] 	$bigArrayLast[$array + 8] 	($tranformsDub[$z]);
+
+					//xform -ws -sh	$bigArrayLast[$array + 9] $bigArrayLast[$array + 10] 	$bigArrayLast[$array + 11] 	($tranformsDub[$z]);
+
+				} else {
+
+					$bigArrayCur[$array + 0]  = $MultTra *`getAttr ($node+".outputTranslateX")`;
+					$bigArrayCur[$array + 1]  = $MultTra *`getAttr ($node+".outputTranslateY")`;
+					$bigArrayCur[$array + 2]  = $MultTra *`getAttr ($node+".outputTranslateZ")`;
+
+					$bigArrayCur[$array + 3]  = `getAttr ($node+".outputRotateX")`;
+					$bigArrayCur[$array + 4]  = `getAttr ($node+".outputRotateY")`;
+					$bigArrayCur[$array + 5]  = `getAttr ($node+".outputRotateZ")`;
+
+					$bigArrayCur[$array + 6]  = `getAttr ($node+".outputScaleX")`;
+					$bigArrayCur[$array + 7]  = `getAttr ($node+".outputScaleY")`;
+					$bigArrayCur[$array + 8]  = `getAttr ($node+".outputScaleZ")`;				
+
+					$bigArrayCur[$array + 9]  = `getAttr ($node+".outputShearX")`;
+					$bigArrayCur[$array + 10] = `getAttr ($node+".outputShearY")`;
+					$bigArrayCur[$array + 11] = `getAttr ($node+".outputShearZ")`;				
+					
+					if ($bigArrayCur[$array + 0] != $bigArrayLast[$array + 0]) {
+						setKeyframe -attribute "translateX" -t ($frame - $step) -v ($bigArrayLast[$array + 0]) $tranformsDub[$z];
+						setKeyframe -attribute "translateX" -t ($frame) -v ($bigArrayCur[$array + 0]) $tranformsDub[$z];
+					}
+
+					if ($bigArrayCur[$array + 1] != $bigArrayLast[$array + 1]) {
+						setKeyframe -attribute "translateY" -t ($frame - $step) -v ($bigArrayLast[$array + 1]) $tranformsDub[$z];
+						setKeyframe -attribute "translateY" -t ($frame) -v ($bigArrayCur[$array + 1]) $tranformsDub[$z];
+					}				
+
+					if ($bigArrayCur[$array + 2] != $bigArrayLast[$array + 2]) {
+						setKeyframe -attribute "translateZ" -t ($frame - $step) -v ($bigArrayLast[$array + 2]) $tranformsDub[$z];
+						setKeyframe -attribute "translateZ" -t ($frame) -v ($bigArrayCur[$array + 2]) $tranformsDub[$z];
+					}				
+
+					
+
+					if ($bigArrayCur[$array + 3] != $bigArrayLast[$array + 3]) {
+						setKeyframe -attribute "rotateX" -t ($frame - $step) -v ($bigArrayLast[$array + 3]) $tranformsDub[$z];
+					  setKeyframe -attribute "rotateX" -t ($frame) -v ($bigArrayCur[$array + 3]) $tranformsDub[$z];
+					}
+
+					if ($bigArrayCur[$array + 4] != $bigArrayLast[$array + 4]) {
+						setKeyframe -attribute "rotateY" -t ($frame - $step) -v ($bigArrayLast[$array + 4]) $tranformsDub[$z];
+						setKeyframe -attribute "rotateY" -t ($frame) -v ($bigArrayCur[$array + 4]) $tranformsDub[$z];
+					}				
+
+					if ($bigArrayCur[$array + 5] != $bigArrayLast[$array + 5]) {
+						setKeyframe -attribute "rotateZ" -t ($frame - $step) -v ($bigArrayLast[$array + 5]) $tranformsDub[$z];
+						setKeyframe -attribute "rotateZ" -t ($frame) -v ($bigArrayCur[$array + 5]) $tranformsDub[$z];
+					}					
+
+					
+
+					if ($bigArrayCur[$array + 6] != $bigArrayLast[$array + 6]) {
+						setKeyframe -attribute "scaleX" -t ($frame - $step) -v ($bigArrayLast[$array + 6]) $tranformsDub[$z];
+						setKeyframe -attribute "scaleX" -t ($frame) -v ($bigArrayCur[$array + 6]) $tranformsDub[$z];
+					}
+
+					if ($bigArrayCur[$array + 7] != $bigArrayLast[$array + 7]) {
+						setKeyframe -attribute "scaleY" -t ($frame - $step) -v ($bigArrayLast[$array + 7]) $tranformsDub[$z];
+						setKeyframe -attribute "scaleY" -t ($frame) -v ($bigArrayCur[$array + 7]) $tranformsDub[$z];
+					}				
+
+					if ($bigArrayCur[$array + 8] != $bigArrayLast[$array + 8]) {
+						setKeyframe -attribute "scaleZ" -t ($frame - $step) -v ($bigArrayLast[$array + 8]) $tranformsDub[$z];
+						setKeyframe -attribute "scaleZ" -t ($frame) -v ($bigArrayCur[$array + 8]) $tranformsDub[$z];
+					}	
+
+					
+
+					if ($bigArrayCur[$array + 9] != $bigArrayLast[$array + 9]) {
+						setKeyframe -attribute "shearXY" -t ($frame - $step) -v ($bigArrayLast[$array + 9]) $tranformsDub[$z];
+						setKeyframe -attribute "shearXY" -t ($frame) -v ($bigArrayCur[$array + 9]) $tranformsDub[$z];
+					}
+
+					if ($bigArrayCur[$array + 10] != $bigArrayLast[$array + 10]) {
+						setKeyframe -attribute "shearXZ" -t ($frame - $step) -v ($bigArrayLast[$array + 10]) $tranformsDub[$z];
+						setKeyframe -attribute "shearXZ" -t ($frame) -v ($bigArrayCur[$array + 10]) $tranformsDub[$z];
+					}				
+
+					if ($bigArrayCur[$array + 11] != $bigArrayLast[$array + 11]) {
+						setKeyframe -attribute "shearYZ" -t ($frame - $step) -v ($bigArrayLast[$array + 11]) $tranformsDub[$z];
+						setKeyframe -attribute "shearYZ" -t ($frame) -v ($bigArrayCur[$array + 11]) $tranformsDub[$z];
+					}			
+				//}
+			
+			}
+			
+			disconnectAttr ($tranform+".worldMatrix") ($node+".inputMatrix");
+			
+			$z++;
+			
+			$array += 12;
+		}
+		
+		if ($frame != $start) {
+			$bigArrayLast = $bigArrayCur;
+		}
+		
+		// Update progress bar
+		
+		progressBar -edit -step 1 $gMainProgressBar;
+		
+		// Break if esc 
+		
+		if ((`progressBar -query -isCancelled $gMainProgressBar`) || ($breakBox))  {
+			$breakBox = 1;
+			break;
+		}	
+		
+		$frame += $step;
+	}
+	
+	// on all panels 
+//	if ($useNoReDraw) 
+//		tkNoReDraw(0);
+	
+	
+	for ($tranform in $tranformsDub) {
+
+		
+		//print ("tr:" + $tranform+"\n");
+		
+		
+		setAttr -k 1 ($tranform + ".translateX");
+		setAttr -k 1 ($tranform + ".translateY");
+		setAttr -k 1 ($tranform + ".translateZ");
+
+		setAttr -k 1 ($tranform + ".rotateX");
+		setAttr -k 1 ($tranform + ".rotateY");
+		setAttr -k 1 ($tranform + ".rotateZ");
+		
+		setAttr -k 1 ($tranform + ".scaleX");
+		setAttr -k 1 ($tranform + ".scaleY");
+		setAttr -k 1 ($tranform + ".scaleZ");
+		
+		setAttr -k 1 ($tranform + ".shearXY");
+		setAttr -k 1 ($tranform + ".shearXZ");
+		setAttr -k 1 ($tranform + ".shearYZ");
+
+		delete -staticChannels -unitlessAnimationCurves 1 -hierarchy none -controlPoints 0 -shape 1 $tranform;
+
+		setAttr -k 0 ($tranform + ".shearXY");
+		setAttr -k 0 ($tranform + ".shearXZ");
+		setAttr -k 0 ($tranform + ".shearYZ");
+		
+		if ($simp)  {
+
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".translateX");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".translateY");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".translateZ");
+
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".rotateX");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".rotateY");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".rotateZ");			
+
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".scaleX");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".scaleY");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".scaleZ");			
+
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".shearXY");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".shearXZ");
+			filterCurve -f simplify -timeTolerance $tol ($tranform + ".shearYZ");	
+		}
+	}
+		
+	
+	if ($breakBox) {
+		warning ("tkFlatDag: Breaked by user in frame " + $frame+" " );
+	}
+	
+	progressBar -edit -endProgress $gMainProgressBar;
+	
+	//to the saved 
+	
+	keyTangent -g -inTangentType $in[0] ;
+	keyTangent -g -outTangentType $out[0] ;
+	
+	currentTime -e $save;
+	
+	//delete node !!
+	delete $node;
+	
+	// save selection
+	select -ne -r $selection; 
+
+}
+
+
+global proc khar_flatdag_deleteConnection_globalProc( string $destName )
+//
+// If the specified name is the destination of a connection,
+// then delete that connection.
+//
+{
+	if ( `connectionInfo -isDestination $destName` ){
+		string $destination = `connectionInfo -getExactDestination $destName`;
+
+		// When deleting a src connection from a character, you must remove
+		// the item from the character set or the character will no longer
+		// work consistently: bug 127212
+		//
+		string $srcConn[] = `listConnections -s 1 -d 0 -type character $destination`;
+		if (size($srcConn)) {
+			string $warnMsg = ("Removed \'"+$destination+"\' from character \'"+$srcConn[0]+"\'.");
+			warning($warnMsg);
+			character -e -rm $srcConn[0] $destination;
+		}
+		
+		// delete -icn doesn't work if destination attr is readOnly 
+		// so use disconnectAttr in this case
+		//
+		string $sArr[1] = `ls -ro $destination`;
+		if (size($sArr)) {
+			string $src = `connectionInfo -sourceFromDestination $destination`;
+			disconnectAttr $src $destination;
+		} else {
+			delete -icn $destination;
+		}
+	}
+}

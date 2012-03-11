@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Afanasy render POST INSTALL"
+
+id render || useradd render -m
+
+/opt/cgru/afanasy/init/initlinks.sh u add afrender || true
+
+/etc/init.d/afrender start || true
+
+exit 0

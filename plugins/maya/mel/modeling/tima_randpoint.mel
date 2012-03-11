@@ -1,0 +1,40 @@
+global proc timaRandPointWnd_randB_globalProc()
+{
+	if (!`window -exists timaRandPointWnd`) return;
+	string $cmd = "tm_randPoint -amp ";
+	float $amp = `floatField -q -v timaRandPointWnd_amplitudeFF`;
+	$cmd += $amp;
+	$cmd += " -ax ";
+	float $amp_x = `floatField -q -v timaRandPointWnd_ampxFF`;
+	$cmd += $amp_x;
+	$cmd += " -ay ";
+	float $amp_y = `floatField -q -v timaRandPointWnd_ampyFF`;
+	$cmd += $amp_y;
+	$cmd += " -az ";
+	float $amp_z = `floatField -q -v timaRandPointWnd_ampzFF`;
+	$cmd += $amp_z;
+	eval $cmd;
+}
+
+{
+	if (`window -exists timaRandPointWnd`) deleteUI timaRandPointWnd;
+	window -t "Rand Ponint" timaRandPointWnd;
+		columnLayout;
+			rowLayout -nc 2 -cw2 73 73;
+				text -l "Amplutude:";
+				floatField -v 1.0 timaRandPointWnd_amplitudeFF;
+			setParent ..;
+			rowLayout -nc 3 -cw3 48 48 48;
+				text -l "amp x:";
+				text -l "amp y:";
+				text -l "amp z:";
+			setParent ..;
+			rowLayout -nc 3 -cw3 48 48 48;
+				floatField -v 1.0 -w 45 timaRandPointWnd_ampxFF;
+				floatField -v 1.0 -w 45 timaRandPointWnd_ampyFF;
+				floatField -v 1.0 -w 45 timaRandPointWnd_ampzFF;
+			setParent ..;
+			button -l "Randomize" -w 142 -h 16 -c timaRandPointWnd_randB_globalProc;
+			button -l "undo (z)" -w 142 -h 16 -c "undo";
+	showWindow timaRandPointWnd;
+}

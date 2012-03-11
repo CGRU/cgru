@@ -1,0 +1,58 @@
+global proc int AEtm_makeHgeo_BrowseCasheDir(string $path, string $fileType)
+{
+   $path = match( ".*\\.", $path );
+   int $len = `size( $path)`-1;
+   $path = `substring $path 1 $len`;
+   string $path = match( ".*\\.", $path );
+   $len = `size( $path)`-1;
+   $path = `substring $path 1 $len`;
+   textFieldButtonGrp -e -tx $path AEtm_makeHgeo_file_textFieldButtonGrp;
+   return 1;
+}
+
+global proc AEtm_makeHgeo_fileNameReplace( string $fileName )
+{
+   textFieldButtonGrp -e -cc ("setAttr -type \"string\" " + $fileName + " `textFieldButtonGrp -q -tx AEtm_makeHgeo_file_textFieldButtonGrp`;") AEtm_makeHgeo_file_textFieldButtonGrp;
+   textFieldButtonGrp -e -bc ("fileBrowser(\"AEtm_makeHgeo_BrowseCasheDir\",\"Select\",\"geo\",0); setAttr -type \"string\" " + $fileName + " `textFieldButtonGrp -q -tx AEtm_makeHgeo_file_textFieldButtonGrp`;") AEtm_makeHgeo_file_textFieldButtonGrp;
+   textFieldButtonGrp -e -tx `getAttr $fileName` AEtm_makeHgeo_file_textFieldButtonGrp; 
+}
+
+global proc AEtm_makeHgeo_fileNameNew( string $fileName )
+{
+      textFieldButtonGrp
+      -l "File Name"
+      -cal 1 "center"
+      -ann "File for Cashing"
+      -bl "Browse.."
+      -cw3 70 250 65
+   AEtm_makeHgeo_file_textFieldButtonGrp;
+
+   AEtm_makeHgeo_fileNameReplace( $fileName );
+}
+
+global proc AEtm_makeHgeoTemplate( string $nodeName )
+{
+// AEswatchDisplay $nodeName;
+   editorTemplate -beginScrollLayout;
+
+      editorTemplate -beginLayout "Main Attributes" -collapse 0;
+         editorTemplate -beginNoOptimize;
+         editorTemplate -label "Frame" -addControl "frame";
+         editorTemplate -label "Padding" -addControl "padding";
+         editorTemplate -label "Reconstruct" -addControl "reconstruct";
+         editorTemplate -label "Cache Frames" -addControl "cacheFrames";
+         editorTemplate -callCustom "AEtm_makeHgeo_fileNameNew" "AEtm_makeHgeo_fileNameReplace" "fileName";
+      editorTemplate -endLayout;
+
+      editorTemplate -suppress "fileName";
+      editorTemplate -suppress "frame";
+      editorTemplate -suppress "filename";
+      editorTemplate -suppress "padding";
+      editorTemplate -suppress "reconstruct";
+      editorTemplate -suppress "cacheFrames";
+
+      AEdependNodeTemplate $nodeName;
+      editorTemplate -addExtraControls;
+
+   editorTemplate -endScrollLayout;
+}

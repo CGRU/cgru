@@ -1,0 +1,51 @@
+/*
+cgruSourceFile("cgruplugins.mel");
+*/
+//###########################################################################################
+
+if(`getenv MAYA_CGRU_PLUG_INS_AUTOLOAD` != "")
+if(int(`getenv MAYA_CGRU_PLUG_INS_AUTOLOAD`))
+{
+cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD = 1");
+string $version = `getenv MAYA_VERSION`;
+string $cgruPluginsPath = `getenv "MAYA_CGRU_LOCATION"` + "/mll/" + $version + `getenv MAYA_ARCH` + "/";
+cgruInfo("cgruPluginsPath = " + $cgruPluginsPath);
+
+int $supportedOs = 0;
+string $mask;
+if(`about -windows`)
+{
+   $mask = "*.mll";
+   cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD: OS=windows, mask=" + $mask + ", version = " + $version);
+   $supportedOs = 1;
+}
+else if(`about -linux`)
+{
+   $mask = "*.so";
+   cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD: OS=linux, mask=" + $mask + ", version = " + $version);
+   $supportedOs = 1;
+}
+else if(`about -mac`)
+{
+   $mask = "*.bundle";
+   cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD: OS=mac, mask=" + $mask + ", version = " + $version);
+   $supportedOs = 1;
+}
+if($supportedOs)
+{
+   string $cgruPlugins[] = `getFileList -fld $cgruPluginsPath -fs $mask`;
+   string $plugin;
+   for( $plugin in $cgruPlugins)
+   {
+      cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD: Loading " + $plugin + " plugin.");
+      if(catch(`loadPlugin $plugin`))
+         cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD: Can't load.");
+      else
+         cgruInfo("MAYA_CGRU_PLUG_INS_AUTOLOAD: Loaded.");
+   }
+}
+else
+{
+   cgruInfo("No plug-ins for this OS !");
+}
+}

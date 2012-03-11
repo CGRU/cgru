@@ -1,0 +1,118 @@
+/*
+cgruSourceFile("_autosource/tima_extendshelf.mel");
+*/
+
+global proc timaEditShelf_remaneShelf_globalProc( string $shelfName)
+{
+   string $newLabel;
+   string $result = `promptDialog
+         -title "Rename Shelf"
+         -message "enter new name:"
+         -button "ok" -button "cancel"
+         -defaultButton "ok" -cancelButton "cancel"
+         -dismissString "cancel"`;
+   if ($result == "ok")
+      $newLabel = `promptDialog -query -text`;
+   else return;
+   shelfTabLayout -e -tl $shelfName $newLabel ShelfLayout;
+   renameUI $shelfName $newLabel;
+}
+
+global proc timaEditShelf_editLable_globalProc( string $itemName)
+{
+   if(`window -exists timaEditShelf_EditLabelWnd`) deleteUI timaEditShelf_EditLabelWnd;
+   window -title "Shelf Lable Edit" timaEditShelf_EditLabelWnd;
+   columnLayout -adj 1;
+      rowLayout -nc 2 -adj 2 -cw1 50;
+         text -l " icon text";
+         string $valStr = `shelfButton -q -imageOverlayLabel $itemName`;
+         string $ctrl = `textField -w 100 -tx $valStr`;
+         string $ccmd = "shelfButton -e -imageOverlayLabel \`textField -q -tx " + $ctrl + "\` " + $itemName;
+         textField -e -cc $ccmd $ctrl;
+         setParent..;
+      text -l "  label :";
+      string $valStr = `shelfButton -q -l $itemName`;
+      string $ctrl = `textField -w 150 -tx $valStr`;
+      string $ccmd = "shelfButton -e -l \`textField -q -tx " + $ctrl + "\` " + $itemName;
+      textField -e -cc $ccmd $ctrl;
+      text -l "  annotation :";
+      string $valStr = `shelfButton -q -ann $itemName`;
+      string $ctrl = `textField -w 150 -tx $valStr`;
+      string $ccmd = "shelfButton -e -ann \`textField -q -tx " + $ctrl + "\` " + $itemName;
+      textField -e -cc $ccmd $ctrl;
+   showWindow timaEditShelf_EditLabelWnd;
+}
+
+global proc timaEditShelf_editCmd_globalProc( string $itemName)
+{
+   string $itemCmd = `shelfButton -q -c $itemName`;
+   if(`window -exists timaEditShelf_EditCmdWnd`) deleteUI timaEditShelf_EditCmdWnd;
+   window -title "Shelf Command Edit" timaEditShelf_EditCmdWnd;
+   string $wndFrame = `formLayout -nd 10`;
+      string $ctrl = `scrollField -tx $itemCmd -wordWrap 0 timaEditShelf_textScrollField`;
+      string $buttonsRow = `rowLayout -nc 2 -cw2 50 100`;
+         string $bapp = `button -h 18 -l " apply "`;
+         string $baac = `button -h 18 -l " apply and close "`;
+   showWindow timaEditShelf_EditCmdWnd;
+   formLayout -e
+
+      -attachForm $ctrl "top"    0
+         -attachForm $ctrl "left"   0
+         -attachForm $ctrl "bottom" 20
+         -attachForm $ctrl "right"  0
+
+      -attachControl $buttonsRow     "top"    1 $ctrl
+         -attachForm $buttonsRow     "left"   0
+         -attachForm $buttonsRow     "bottom" 0
+         -attachForm $buttonsRow     "right"  0
+
+   $wndFrame;
+   button -e
+      -c ("shelfButton -e -c \`scrollField -q -tx " + $ctrl + "\` " + $itemName)
+      $bapp;
+   button -e
+      -c ("shelfButton -e -c \`scrollField -q -tx " + $ctrl + "\` " + $itemName + "; deleteUI timaEditShelf_EditCmdWnd")
+      $baac;
+}
+
+global proc timaEditShelf_tabDDC_globalProc()
+{
+   string $shelfLabel = `shelfTabLayout -q -st ShelfLayout`;
+   int $sti = `shelfTabLayout -q -sti ShelfLayout`;
+   string $shelfNamesArray[] = `shelfTabLayout -q -ca ShelfLayout`;
+   string $curShelf = $shelfNamesArray[$sti - 1];
+   timaEditShelf_extendShelf_globalProc( $curShelf);
+   cgruInfo($shelfLabel + " & items -extended.");
+}
+
+global proc timaEditShelf_extendShelf_globalProc( string $shelf)
+{
+      string $itemsArray[] = `shelfLayout -q -ca $shelf`;
+      string $curItem;
+      for ( $curItem in $itemsArray)
+      {
+         string $menus[] = `shelfButton -q -popupMenuArray $curItem`;
+         string $menu;
+         for( $menu in $menus)
+            deleteUI $menu;
+        popupMenu -b 3 -p $curItem cgru_shelf_buttonmenu_popupMenu;
+            menuItem -l "edit label"
+               -c ("timaEditShelf_editLable_globalProc(\"" + $curItem + "\")");
+            menuItem -l "rename shelf"
+               -c ("timaEditShelf_remaneShelf_globalProc(\"" + $shelf + "\")");
+            menuItem -l "edit command"
+               -c ("timaEditShelf_editCmd_globalProc(\"" + $curItem + "\")");
+            menuItem -l "delete item"
+               -c ("deleteUI " + $curItem);
+      }
+}
+
+{
+   string $shelfNamesArray[] = `shelfTabLayout -q -ca ShelfLayout`;
+   string $curShelf;
+   for ( $curShelf in $shelfNamesArray)
+      timaEditShelf_extendShelf_globalProc( $curShelf);
+   cgruInfo("Shelf extension enabled.");
+}
+//########################################################################################
+shelfTabLayout -e -dcc "timaEditShelf_tabDDC_globalProc()" ShelfLayout;

@@ -1,0 +1,653 @@
+// Copyright (C) 1997-2011 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+global proc channelBoxCommand( string $operation )
+//
+{
+	switch( $operation ) {
+		case "-key":
+			channelBox -e -exe "setKeyframe \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-keyall":
+			channelBox -e -exe "setKeyframe \"#P.#A\";" false mainChannelBox;
+			break;
+		case "-breakdown":
+			channelBox -e -exe "setKeyframe -breakdown true \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-breakdownall":
+			channelBox -e -exe "setKeyframe -breakdown true \"#P.#A\";" false mainChannelBox;
+			break;
+		case "-mute":
+			channelBox -e -exe "mute \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-muteall":
+			channelBox -e -exe "mute \"#P.#A\";" false mainChannelBox;
+			break;
+		case "-unmute":
+			channelBox -e -exe "mute -disable -force \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-unmuteall":
+			channelBox -e -exe "mute -disable -force \"#P.#A\";" false mainChannelBox;
+			break;
+		case "-lock":
+			channelBox -e -exe "setAttr -lock true \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-unlock":
+			channelBox -e -exe "CBunlockAttr \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-unkeyable":
+			channelBox -e -exe "setAttr -keyable false -channelBox false \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-unkeyableDisplayed":
+			channelBox -e -exe "setAttr -keyable false -channelBox true \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-keyable":
+			channelBox -e -exe "setAttr -keyable true \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-addToLayers":
+			global string $gSelectedAnimLayers[];
+			string $attrs[] = `selectedChannelBoxPlugs`;
+			modifyPlugsInLayers($attrs, $gSelectedAnimLayers, true);
+			break;
+		case "-removeFromLayers":
+			global string $gSelectedAnimLayers[];
+			string $attrs[] = `selectedChannelBoxPlugs`;
+			modifyPlugsInLayers($attrs, $gSelectedAnimLayers, false);
+			break;
+		case "-lockUnkeyable":
+			channelBox -e -exe "setAttr -lock true -keyable false -channelBox false \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-expression":
+			{
+				string $objList[] = `channelBox -q -mainObjectList mainChannelBox`;
+				string $attrList[] = `channelBox -q -selectedMainAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					expressionEditor "EE" $objList[0] $attrList[0];
+
+				} else {
+					$objList = `channelBox -q -shapeObjectList mainChannelBox`;
+					$attrList = `channelBox -q -selectedShapeAttributes mainChannelBox`;
+
+					if ( size($objList) > 0 && size($attrList) > 0 ){
+						expressionEditor "EE" $objList[0] $attrList[0];
+
+					} else {
+						$objList = `channelBox -q -historyObjectList mainChannelBox`;
+						$attrList = `channelBox -q -selectedHistoryAttributes mainChannelBox`;
+
+						if ( size($objList) > 0 && size($attrList) > 0 ){
+							expressionEditor "EE" $objList[0] $attrList[0];
+							
+						} else {
+						    $objList = `channelBox -q -outputObjectList mainChannelBox`;
+						    $attrList = `channelBox -q -selectedOutputAttributes mainChannelBox`;
+
+						    if ( size($objList) > 0 && size($attrList) > 0 ){
+							    expressionEditor "EE" $objList[0] $attrList[0];
+						    }
+						}		
+					}
+				}
+			}
+			break;
+		case "-driven":
+			{
+				string $objList[] = `channelBox -q -mainObjectList mainChannelBox`;
+				string $attrList[] = `channelBox -q -selectedMainAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					setDrivenKeyWindow "" $attrList;
+
+				} else {
+					$objList = `channelBox -q -shapeObjectList mainChannelBox`;
+					$attrList = `channelBox -q -selectedShapeAttributes mainChannelBox`;
+
+					if ( size($objList) > 0 && size($attrList) > 0 ){
+						setDrivenKeyWindow $objList[0] $attrList;
+
+					} else {
+						$objList = `channelBox -q -historyObjectList mainChannelBox`;
+						$attrList = `channelBox -q -selectedHistoryAttributes mainChannelBox`;
+
+						if ( size($objList) > 0 && size($attrList) > 0 ){
+							setDrivenKeyWindow $objList[0] $attrList;
+						} else {
+							$objList = `channelBox -q -outputObjectList mainChannelBox`;
+							$attrList = `channelBox -q -selectedOutputAttributes mainChannelBox`;
+
+							if ( size($objList) > 0 && size($attrList) > 0 ){
+								setDrivenKeyWindow $objList[0] $attrList;
+							}
+						}
+					}
+				}
+			}
+			break;
+		case "-animCurve":
+			channelBox -e -exe "CBanimCurve \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-cut":
+			{
+				string $objList[] = `channelBox -q -mainObjectList mainChannelBox`;
+				string $attrList[] = `channelBox -q -selectedMainAttributes mainChannelBox`;
+
+				string $cmd = "";
+				int $okay = 0;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -shapeObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedShapeAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -historyObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedHistoryAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -outputObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedOutputAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				if ( $okay == 1 ){
+					evalEcho( $cmd );
+				}
+			}
+			break;
+		case "-copy":
+			{
+				string $objList[] = `channelBox -q -mainObjectList mainChannelBox`;
+				string $attrList[] = `channelBox -q -selectedMainAttributes mainChannelBox`;
+
+				string $cmd = "";
+				int $okay = 0;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "copyKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -shapeObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedShapeAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "copyKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -historyObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedHistoryAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "copyKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -outputObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedOutputAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "copyKey -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				if ( $okay == 1 ){
+					evalEcho( $cmd );
+				}
+			}
+			break;
+		case "-paste":
+			{
+				string $objList[] = `channelBox -q -mainObjectList mainChannelBox`;
+				string $attrList[] = `channelBox -q -selectedMainAttributes mainChannelBox`;
+
+				string $cmd = "";
+				int $okay = false;
+				float $currentTime = `currentTime -query`;
+				string $pasteKey = ("pasteKey -connect true -time " + $currentTime);
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + $pasteKey;
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = true;
+				}
+
+				$objList = `channelBox -q -shapeObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedShapeAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + $pasteKey;
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = true;
+				}
+
+				$objList = `channelBox -q -historyObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedHistoryAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + $pasteKey;
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = true;
+				}
+
+				$objList = `channelBox -q -outputObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedOutputAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + $pasteKey;
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = true;
+				}
+
+				if ( $okay ){
+					evalEcho( $cmd );
+				}
+			}
+			break;
+		case "-delete":
+			{
+				string $objList[] = `channelBox -q -mainObjectList mainChannelBox`;
+				string $attrList[] = `channelBox -q -selectedMainAttributes mainChannelBox`;
+
+				string $cmd = "";
+				int $okay = 0;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -cl -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -shapeObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedShapeAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -cl -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -historyObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedHistoryAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -cl -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				$objList = `channelBox -q -outputObjectList mainChannelBox`;
+				$attrList = `channelBox -q -selectedOutputAttributes mainChannelBox`;
+
+				if ( size($objList) > 0 && size($attrList) > 0 ){
+					$cmd = $cmd + "cutKey -cl -t \":\" -f \":\"";
+					for( $channel in $attrList )
+						$cmd = $cmd + " -at \"" + $channel+"\"";
+					for ( $object in $objList )
+						$cmd = $cmd + " " + $object;
+					$cmd = $cmd + ";\n";
+					$okay = 1;
+				}
+
+				if ( $okay == 1 ){
+					evalEcho( $cmd );
+				}
+			}
+			break;
+		case "-freezeTranslate":
+			makeIdentity -apply true -t 1 -r 0 -s 0 -n 0;
+			break;
+		case "-freezeRotate":
+			makeIdentity -apply true -t 0 -r 1 -s 0 -n 0;
+			break;
+		case "-freezeScale":
+			makeIdentity -apply true -t 0 -r 0 -s 1 -n 0;
+			break;
+		case "-freezeAll":
+			makeIdentity -apply true -t 1 -r 1 -s 1 -n 0;
+			break;
+		case "-selectNode":
+			select -r `channelBox -q -hol mainChannelBox` `channelBox -q -ool mainChannelBox`;
+			break;
+		case "-deleteNode":
+			delete `channelBox -q -hol mainChannelBox` `channelBox -q -ool mainChannelBox`;
+			break;
+		case "-attributeEditor":
+			select -add `channelBox -q -hol mainChannelBox` `channelBox -q -ool mainChannelBox`;
+			openAEWindow;
+			break;
+		case "-publishToContainer":
+			python "import maya.app.general.publishAttrToContainer";
+			python "maya.app.general.publishAttrToContainer.publishAttrToContainer()";
+			break;
+		case "-unpublishFromContainer":
+			python "import maya.app.general.publishAttrToContainer";
+			python "maya.app.general.publishAttrToContainer.unpublishAttrFromContainer()";
+			break;
+		case "-deleteAttributes":
+			channelBox -e -exe "catch (`deleteAttr -attribute \"#A\" \"#P\"`);" true mainChannelBox;
+			break;
+		case "-precision":
+			{
+				int $oldPrecision = `optionVar -query channelsPrecision`;
+				int $newPrecision = precisionPrompt ("", $oldPrecision, 15);
+				if ($newPrecision > 0) {
+					
+					// Change the width of the fields depending on the
+					// precision.
+					//
+					int $oldWidth = `channelBox -q -fieldWidth mainChannelBox`;
+					int $newWidth;
+					if ($newPrecision <= 3) {
+						$newWidth = 65;
+					} else if ($newPrecision <= 6) {
+						$newWidth = 95;
+					} else if ($newPrecision <= 9) {
+						$newWidth = 115;
+					} else if ($newPrecision <= 12) {
+						$newWidth = 130;
+					} else {
+						$newWidth = 155;						
+					}
+					channelBox -e -pre $newPrecision 
+						-fieldWidth $newWidth 
+						mainChannelBox;
+					optionVar -iv channelsPrecision $newPrecision;
+					optionVar -iv channelsFieldWidth $newWidth;
+				}
+			}
+			break;
+		case "-break":
+			channelBox -e -exe "CBdeleteConnection \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-selectConnection":
+			channelBox -e -exe "CBselectConnection \"#P.#A\";" true mainChannelBox;
+			break;
+		case "-reset":
+			global int $gChannelsWidth;
+			optionVar -iv channelsLongName 1;   // 1=nice
+			optionVar -iv channelsPrecision 3;
+			optionVar -iv channelsFieldWidth 65;
+			$gChannelsWidth = 230;
+			channelBox -e -ln true -nn true
+				-precision 3 -fieldWidth 65 mainChannelBox;
+			setChannelsWidth ($gChannelsWidth);
+			checkSpeedButton "medium" true;
+			channelBox -e -hyperbolic false mainChannelBox;
+			channelBox -e -showNamespace true mainChannelBox;
+			channelBox -e -useManips "standard" mainChannelBox;
+			initChannelBoxButtons;
+			break;
+
+//BEGIN CGRU #################################################################################################
+
+      case "-gamma22":
+         {
+            string $plugs[] = selectedChannelBoxPlugs();
+            string $plug;
+            for( $plug in $plugs)
+            {
+               float $value = `getAttr $plug`;
+               $value = `pow $value 2.2`;
+               setAttr $plug $value;
+            }
+         }
+         break;
+
+      case "-gamma45":
+         {
+            string $plugs[] = selectedChannelBoxPlugs();
+            string $plug;
+            for( $plug in $plugs)
+            {
+               float $value = `getAttr $plug`;
+               $value = `pow $value .4545454545454545`;
+               setAttr $plug $value;
+            }
+         }
+         break;
+
+      case "-addcharacter":
+         channelBox -e -exe "doEditCharacterArgList 0 \{ \"1\" \}\;" true mainChannelBox;
+         break;
+
+      case "-removecharacter":
+
+         channelBox -e -exe "doEditCharacterArgList 0 \{ \"0\" \}\;" true mainChannelBox;
+         break;
+
+      case "-aliasAttributes":
+
+                          string $text;
+                          string $result = `promptDialog
+                           -title "Alias Attribute"
+                         -message "Enter Alias:"
+                         -button "OK" -button "Cancel"
+                         -defaultButton "OK" -cancelButton "Cancel"
+                         -dismissString "Cancel"`;
+
+                        if ($result == "OK") {
+                         $text = `promptDialog -q`;
+                        }
+         channelBox -e -exe ("aliasAttr " + $text + "  \"#P.#A\";") true mainChannelBox;
+         break;
+
+      case "-select":
+         {
+            string $shapes[] = `channelBox -q -shapeObjectList mainChannelBox`;
+            string $input[] = `channelBox -q -historyObjectList mainChannelBox`;
+            string $output[] = `channelBox -q -outputObjectList mainChannelBox`;
+            if(`size($input)` > 0) select $input;
+            else if(`size($output)` > 0) select $output;
+            else if(`size($shapes)` > 0) select $shapes;
+         }
+         break;
+
+//END CGRU #################################################################################################
+	}
+}
+
+global proc modifyPlugsInLayers(string $plugs[], string $layers[], int $operation)
+{
+	if(size($layers) < 1)
+	{
+		string $errMsg =  (uiRes("m_channelBoxCommand.kAnimLayerChannelBoxNoLayerSelected"));
+		error($errMsg);
+		return;
+	}
+	if(size($plugs) < 1) 
+	{
+		string $errMsg =  (uiRes("m_channelBoxCommand.kAnimLayerChannelBoxNoAttrsToAdd"));
+		error($errMsg);
+		return;
+	}
+	
+	for($layer in $layers)
+	{
+		if(`objectType $layer` != "animLayer")
+			continue;
+		
+		for($plug in $plugs) {
+			if($operation)
+				evalEcho( "animLayer -edit -attribute "+$plug +" "+$layer );
+			else
+				evalEcho( "animLayer -edit -removeAttribute "+$plug +" "+$layer );
+		}
+	}
+}
+
+global proc CBunlockAttr( string $plugName )
+//
+// If this plug or any of its ancestors is locked,
+// unlock it.
+//
+{
+	string $lockedPlug = `connectionInfo -gla $plugName`;
+	if ( $lockedPlug != "" ){
+		setAttr -lock false $lockedPlug;
+	}
+}
+
+
+global proc CBdeleteConnection( string $destName )
+//
+// If the specified name is the destination of a connection,
+// then delete that connection.
+//
+{
+	if ( `connectionInfo -isDestination $destName` ){
+		string $destination = `connectionInfo -getExactDestination $destName`;
+
+		// When deleting a src connection from a character, you must remove
+		// the item from the character set or the character will no longer
+		// work consistently: bug 127212
+		//
+		string $srcConn[] = `listConnections -s 1 -d 0 -type character $destination`;
+		if (size($srcConn)) {
+			string $warnMsg = (uiRes("m_channelBoxCommand.kRemovedWarn"));
+			string $warnDisplay = `format -s $destination -s $srcConn[0] $warnMsg`;
+			warning($warnDisplay);
+			character -e -rm $srcConn[0] $destination;
+		}
+		
+		// delete -icn doesn't work if destination attr is readOnly 
+		// so use disconnectAttr in this case
+		//
+		string $sArr[1] = `ls -ro $destination`;
+		if (size($sArr)) {
+			string $src = `connectionInfo -sourceFromDestination $destination`;
+			disconnectAttr $src $destination;
+		} else {
+			delete -icn $destination;
+		}
+	}
+}
+
+global proc CBselectConnection( string $destName )
+//
+// If the specified name is the destination of a connection,
+// then select that connection.
+//
+{
+	if ( `connectionInfo -isDestination $destName` ){
+		string $destination = `connectionInfo -getExactDestination $destName`;
+		string $input[] = `listConnections $destination`;
+		select -replace $input[0];
+	}
+}
+
+global proc CBanimCurve( string $destName )
+//
+// If the specified name is the destination of a connection,
+// and an animCurve then select it and open the graph editor
+//
+{
+	string $inputs[] = `listConnections -destination 0 -type animCurve $destName`;
+	if (size($inputs) > 0) {
+		select -replace $inputs[0];
+		GraphEditor;
+	} else {
+		GraphEditor;
+	}
+}

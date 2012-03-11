@@ -1,0 +1,114 @@
+global proc timaPolySplit_loopSplit_globalProc( int $mode, float $angle)
+{
+	string $selArray[] = `ls -sl`;
+	if(`size($selArray)` == 0)
+	{
+		cgruWarning("nothing selected !");
+		return;
+	}
+	string $hlArray[] = `ls -hl`;
+	$selArray[0] = `substitute ".*e" $selArray[0] ""`;
+	int $sel_a = `match "[0-9]+" $selArray[0]`;
+	if(`objectType -isType mesh $hlArray[0]` == 0) $hlArray = `listRelatives -s $hlArray[0]`;
+	int $compArray[];
+	string $cmd = "tm_polygon -sr " + $hlArray[0] + " " + $sel_a + " " + $mode + " " + $angle + " 10000;";
+	$compArray = `eval($cmd)`;
+	int $edgesCount = `size($compArray)`;
+	{
+		string $strA[] = `polyInfo -edgeToFace ($hlArray[0] + ".e[" + $compArray[0] + "]")`;
+		$strA[0] = `substitute ".*:" $strA[0] ""`;
+		$strA[0] = `strip $strA[0]`;
+		tokenize $strA[0] " " $strA;
+//print($strA);
+		if(`size($strA)` > 1)
+		{
+			string $strB[] = `polyInfo -edgeToFace ($hlArray[0] + ".e[" + $compArray[$edgesCount-1] + "]")`;
+			$strB[0] = `substitute ".*:" $strB[0] ""`;
+			$strB[0] = `strip $strB[0]`;
+			tokenize $strB[0] " " $strB;
+//print($strB);
+			if(`size($strB)` > 1)
+			{
+				if($strA[0] == $strB[0]) $compArray[$edgesCount] = $compArray[0];
+				else if($strA[0] == $strB[1]) $compArray[$edgesCount] = $compArray[0];
+				else if($strA[1] == $strB[0]) $compArray[$edgesCount] = $compArray[0];
+				else if($strA[1] == $strB[1]) $compArray[$edgesCount] = $compArray[0];
+			}
+		}
+	}
+	$cmd = "tm_polyModPrep " + $hlArray[0] + ";";
+	eval( $cmd);
+	timaPolySplit_doSplit_globalProc( $hlArray[0], $compArray);
+//print($compArray);
+//	select -cl;
+	hilite $hlArray[0];
+	cgruInfo($edgesCount  + " edges splited.");
+}
+//#####################################################################################################
+global proc timaPolySplit_selSplit_globalProc()
+{
+	string $selArray[] = `ls -sl`;
+	if(`size($selArray)` == 0)
+	{
+		cgruWarning("nothing selected !");
+		return;
+	}
+	string $hlArray[] = `ls -hl`;
+	if(`objectType -isType mesh $hlArray[0]` == 0) $hlArray = `listRelatives -s $hlArray[0]`;
+	string $cmd = "tm_polygon -etr";
+	int $compArray[] = `eval($cmd)`;
+	int $edgesCount = `size($compArray)`;
+	{
+		string $strA[] = `polyInfo -edgeToFace ($hlArray[0] + ".e[" + $compArray[0] + "]")`;
+		$strA[0] = `substitute ".*:" $strA[0] ""`;
+		$strA[0] = `strip $strA[0]`;
+		tokenize $strA[0] " " $strA;
+//print($strA);
+		if(`size($strA)` > 1)
+		{
+			string $strB[] = `polyInfo -edgeToFace ($hlArray[0] + ".e[" + $compArray[$edgesCount-1] + "]")`;
+			$strB[0] = `substitute ".*:" $strB[0] ""`;
+			$strB[0] = `strip $strB[0]`;
+			tokenize $strB[0] " " $strB;
+//print($strB);
+			if(`size($strB)` > 1)
+			{
+				if($strA[0] == $strB[0]) $compArray[$edgesCount] = $compArray[0];
+				else if($strA[0] == $strB[1]) $compArray[$edgesCount] = $compArray[0];
+				else if($strA[1] == $strB[0]) $compArray[$edgesCount] = $compArray[0];
+				else if($strA[1] == $strB[1]) $compArray[$edgesCount] = $compArray[0];
+			}
+		}
+	}
+	$cmd = "tm_polyModPrep " + $hlArray[0] + ";";
+	eval( $cmd);
+	timaPolySplit_doSplit_globalProc( $hlArray[0], $compArray);
+//print($compArray);
+//	select -cl;
+	hilite $hlArray[0];
+	cgruInfo($edgesCount  + " edges splited.\n");
+}
+//#####################################################################################################
+global proc timaPolySplit_doSplit_globalProc( string $mesh, int $edgesArray[])
+{
+	int $numEdges = `size($edgesArray)`;
+	string $splitNode = `createNode tm_polySplit`;
+	string $cmd = "setAttr " + $splitNode + ".inputEdges -type componentList " + $numEdges;
+	int $i;
+	for( $i = 0; $i < $numEdges; $i++) $cmd += " e[" + $edgesArray[$i] + "]";
+	eval($cmd);
+	if(`connectionInfo -isDestination ($mesh + ".inMesh")`)
+	{
+		string $source = `connectionInfo -sourceFromDestination ($mesh + ".inMesh")`;
+		connectAttr -f $source ($splitNode + ".inMesh");
+	}
+	else
+	{
+		connectAttr -f ($mesh + ".outMesh") ($splitNode + ".inMesh");
+		disconnectAttr ($mesh + ".outMesh") ($splitNode + ".inMesh");
+		eval("tm_polygon -abs " + $mesh + " 1;");
+	}
+	eval($cmd);
+	connectAttr -f ($splitNode + ".outMesh") ($mesh + ".inMesh");
+}
+//#####################################################################################################

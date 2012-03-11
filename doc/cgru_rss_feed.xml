@@ -1,0 +1,99 @@
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+   <title>CGRU - AFANASY</title>
+   <link>http://cgru.sourceforge.net/</link>
+   <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
+   <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
+   <language>en-us</language>
+   <pubDate>Sat, 11 Feb 2011 00:00:00 GMT</pubDate>
+   <lastBuildDate>Sat, 11 Feb 2011 00:00:00 GMT</lastBuildDate>
+   <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
+   <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.5.5 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release155</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release155</guid>
+      <description>
+         Server has customizable acceptable IP addresses mask.
+         Movie Maker custom container and ability to save settings.
+         User can set jobs solving to parallel.
+         Only PostgreSQL database is supported as native library is used instead of QtSql.
+      </description>
+      <pubDate>Sat, 11 Feb 2011 00:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.5.4 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release154</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release154</guid>
+      <description>
+         AltLinux RPM packages.
+         Blender Cycles render engine support.
+         Nimby schedule and Afanasy Starter improvements.
+         MSVC 10 and Qt 4.8.0.
+         Some important bugs fixed.
+      </description>
+      <pubDate>Thu, 22 Dec 2011 12:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.5.3 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release153</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release153</guid>
+      <description>
+         Some important bugs fixed.
+      </description>
+      <pubDate>Mon, 5 Dec 2011 12:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.5.2 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release152</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release152</guid>
+      <description>
+         Movie Maker can explode movie to sequence and add sound from a file with audio.
+         Keeper displays local Afanasy render client status in a system tray icon.
+         Some important bugs fixed.
+      </description>
+      <pubDate>Fri, 2 Dec 2011 12:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.5.1 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release151</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release151</guid>
+      <description>
+         Keeper - a system tray application with menu,
+            designed launch CGRU and AFANASY tools,
+            setup and start other software applications to run with CGRU configured.
+         Standalone dialog to submit jobs.
+         Abobe After Effects support.
+      </description>
+      <pubDate>Mon, 14 Nov 2011 12:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.5.0 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release150</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release150</guid>
+      <description>Sub-task dependences to start render during simulation. Houdini submission major improvements. Technical changes.</description>
+      <pubDate>Mon, 29 Aug 2011 12:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.4.5 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release145</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release145</guid>
+      <description>MAX, Maya, XSI 2012. Blender 2.5. Python 3. Render client bug fix.</description>
+      <pubDate>Thu, 26 May 2011 10:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.4.4 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release144</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release144</guid>
+      <description>New features. Bug fixes.</description>
+      <pubDate>Sat, 7 May 2011 00:00:00 GMT</pubDate>
+   </item>
+   <item>
+      <title>CGRU Version 1.4.3 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release143</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release143</guid>
+      <description>Server memory leak fixed.</description>
+      <pubDate>Mon, 11 Apr 2011 00:00:00 GMT</pubDate>
+   </item>
+</channel>
+</rss>

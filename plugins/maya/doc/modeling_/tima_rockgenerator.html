@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../_system/styles.css" rel="stylesheet" type="text/css">
+<title>Rock Generator</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="CGRU: CG Tools, CG Rules, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://www.linkedin.com/groups/CGRU-AFANASY-4263049"><img src="../../../../doc/images/linkedin.png" border="0" alt="LinkedIn" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+<div class="commonText">
+<p><strong>Rocks Generator:</strong>
+</p>
+<table width="811" border="0">
+  <tr>
+    <td width="391" height="1176"><img src="tima_rockgenerator.png" width="380" height="1174"></td>
+    <td width="410" align="left" valign="top"><p>&nbsp;</p>
+    <p>Generator for tree types of rocks with detail level: <br>
+      <strong>Poly cylinder based:</strong><br>
+      parameters for standart polyCube cration<br>
+      <em>partial offset, rotate scale</em> - cylinder camber<br>
+      <strong></strong> (levels = 2):</p>
+    <p><img src="tima_rockgenerator1.png" width="327" height="295"></p>
+    <p><strong>Poly cube based:</strong><br>
+      parameters for standart polyCube cration.<br>
+      (levels = 2):</p>
+    <p><img src="tima_rockgenerator2.png" width="376" height="115"></p>    
+    <p><strong>GeoShpere based</strong>: <br>
+      <em>radius</em> - geoshpere radius<br>
+      <em>type</em> - 1-tera, 2-octa, 3-icosa<br>
+      <em>base frequency</em>  - geoshpere frequency<br>
+      (levels = 2):</p>
+    <p><img src="tima_rockgenerator3.png" width="374" height="95"></p>
+    <p><strong>Deformation:<br>
+      </strong><em>levels</em> - detalization parameter<br>
+        <em>soft edge</em> - angle to make edges smooth.<br>
+      Its beter to test other papameters by yourself to get to know their meaning.</p>
+    <p>Rocks inherit UVs from base primitives and can transform them randomly.</p>    <p>You can point maya meterial  or slim appearance, which new rocks will have.</p>
+    <p>Generator can save parameters to file, located in &quot;%MAYA_APP_DIR%/rockgenerator/presetName.rg&quot;. A menu &quot;base params -&gt; load -&gt; ...&quot; scans all &quot;*.rg&quot; files in this directory and create menuitems with their names to load them.<br>
+      And also it has presets for base params: &quot;cylinders&quot;, &quot;spheres&quot; and &quot;boxes&quot; (&quot;base params -&gt; presets -&gt; ...&quot;).</p>
+    </td>
+  </tr>
+</table>
+<p>This script needs &quot;tima##.mll&quot; to be loaded.</p>
+<p align = "right">
+<a href="../index.html" target="_top" class="smallComments">jump to CGRU documentation</a>
+</p>
+</div>
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net/projects/cgru/"><img src="../../../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://libregraphicsworld.org/tag/cgru"><img src="../../../../doc/images/lgw.png" border="0" alt="Libre Graphics World" /></a>
+</td>
+</tr>
+</table>
+</body>
+</html>

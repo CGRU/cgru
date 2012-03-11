@@ -1,0 +1,490 @@
+
+global int $tima_AutoSaveEnabled;
+global int $tima_AutoSaveTime;
+global int $tima_AutoSaveSelectionsEnable;
+global int $tima_AutoSaveSelectionsCount;
+global int $tima_AutoSaveSelections;
+global int $tima_AutoSaveCD;
+global float $tima_LastAutoSaveTime;
+global int $tima_AutoSaveAddRecent;
+global int $tima_AutoSaveAnotherDir;
+global string $tima_AutoSaveDirectory;
+global int $tima_AutoSaveInt;
+global int $tima_AutoSaveIntima_ax;
+global int $tima_AutoSavePadding;
+
+global int $tima_AutoSaveHisEnabled;
+global string $tima_AutoSaveHisDirectory;
+global int $tima_AutoSaveHisTimes;
+global int $tima_AutoSaveHisCount;
+
+//global proc string tima_AutoSave_getDefaultAutoSaveDir()
+
+global proc tima_AutoSave_initDefautlPaths(int $makeDirs)
+{
+	global string $tima_AutoSaveDirectory;
+	global string $tima_AutoSaveHisDirectory;
+
+	string $tmpStr = `about -os`;
+	if(`gmatch $tmpStr "l*"`)
+		$tima_AutoSaveDirectory = "/tmp/autosavedir";
+	else
+		$tima_AutoSaveDirectory = "c:/temp/autosavedir";
+	$tima_AutoSaveHisDirectory = $tima_AutoSaveDirectory + "/backup";
+	if($makeDirs)
+	{
+		sysFile -makeDir $tima_AutoSaveHisDirectory;
+		sysFile -makeDir $tima_AutoSaveDirectory;
+	}
+}
+
+global proc int tima_killScriptJob_globalProc( string $stringInJob, int $toKill, int $printJobs)
+{
+	string $listAllJobs[] = `scriptJob -lj`;
+	int $retCount = 0;
+	string $curJob;
+	for( $curJob in $listAllJobs)
+		if (`gmatch $curJob ("*" + $stringInJob + "*")`)
+		{
+			if( $toKill) scriptJob -kill (int(`match "[0-9]+" $curJob`));
+			$retCount++;
+			if($printJobs) print ("\n # "+ $retCount + " - " + $curJob);
+		}
+	return $retCount;
+}
+
+global proc tima_LoadAutoSaveManagerSettings_globalProc()
+{
+	global int $tima_AutoSaveEnabled;
+	global int $tima_AutoSaveTime;
+global int $tima_AutoSaveSelectionsEnable;
+global int $tima_AutoSaveSelectionsCount;
+	global int $tima_AutoSaveCD;
+	global int $tima_AutoSaveAddRecent;
+	global int $tima_AutoSaveAnotherDir;
+	global string $tima_AutoSaveDirectory;
+	global int $tima_AutoSaveIntMax;
+	global int $tima_AutoSavePadding;
+
+	global int $tima_AutoSaveHisEnabled;
+	global string $tima_AutoSaveHisDirectory;
+	global int $tima_AutoSaveHisTimes;
+
+//BEGIN default settings
+	$tima_AutoSaveEnabled = 0;
+	$tima_AutoSaveTime = 300;
+	$tima_AutoSaveSelectionsEnable = 0;
+	$tima_AutoSaveSelectionsCount = 100;
+	$tima_AutoSaveCD = 1;
+	$tima_AutoSaveAddRecent = 0;
+	$tima_AutoSaveAnotherDir = 1;
+	$tima_AutoSaveIntMax = 10;
+	$tima_AutoSavePadding = 4;
+
+	$tima_AutoSaveHisEnabled = 0;
+	$tima_AutoSaveHisTimes = 10;
+//END default settings
+	tima_AutoSave_initDefautlPaths(0);
+
+	string $iniFileName = ((`getenv "MAYA_APP_DIR"`) + "/autosave.ini");
+	if(`fopen $iniFileName "r"` == 0)
+	{	
+		tima_AutoSave_initDefautlPaths(1);
+		tima_SaveAutoSaveManagerSettings_globalProc;
+		cgruWarning("Autosave runs for the first time ! ( default directry - " + $tima_AutoSaveDirectory + " )");
+		return;
+	}
+	int $fileId = `fopen $iniFileName "r"`;
+	string $fileLine = `fgetline $fileId`;
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveEnabled = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveTime = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveSelectionsEnable = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveSelectionsCount = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveCD = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveAddRecent = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveAnotherDir = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+	{
+		$tima_AutoSaveDirectory = (`match "<.*>" $fileLine`);
+		int $tmp = `size($tima_AutoSaveDirectory)` - 1;
+		$tima_AutoSaveDirectory = `substring $tima_AutoSaveDirectory 2 $tmp`;
+	}
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveIntMax = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSavePadding = int(`match "[0-9]+" $fileLine`);
+//##
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveHisEnabled = int(`match "[0-9]+" $fileLine`);
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+	{
+		$tima_AutoSaveHisDirectory = (`match "<.*>" $fileLine`);
+		int $tmp = `size($tima_AutoSaveHisDirectory)` - 1;
+		$tima_AutoSaveHisDirectory = `substring $tima_AutoSaveHisDirectory 2 $tmp`;
+	}
+	$fileLine = `fgetline $fileId`;
+	if (`size($fileLine)`)
+		$tima_AutoSaveHisTimes = int(`match "[0-9]+" $fileLine`);
+//##
+	fclose $fileId;
+}
+
+global proc tima_SaveAutoSaveManagerSettings_globalProc()
+{
+	global int $tima_AutoSaveEnabled;
+	global int $tima_AutoSaveTime;
+global int $tima_AutoSaveSelectionsEnable;
+global int $tima_AutoSaveSelectionsCount;
+	global int $tima_AutoSaveCD;
+	global int $tima_AutoSaveAddRecent;
+	global int $tima_AutoSaveAnotherDir;
+	global string $tima_AutoSaveDirectory;
+	global int $tima_AutoSaveIntMax;
+	global int $tima_AutoSavePadding;
+
+	global int $tima_AutoSaveHisEnabled;
+	global string $tima_AutoSaveHisDirectory;
+	global int $tima_AutoSaveHisTimes;
+
+	string $iniFileName = ((`getenv "MAYA_APP_DIR"`) + "/autosave.ini");
+	int $fileId = `fopen $iniFileName "w"`;
+
+	fprint $fileId ("Autosave Manager Settings:\r\n");
+	fprint $fileId ("autosaveEnabled = " + string($tima_AutoSaveEnabled) + "\r\n");
+	fprint $fileId ("autosaveTime = " + string($tima_AutoSaveTime) + "\r\n");
+	fprint $fileId ("autoSaveSelectionsEnable = " + string($tima_AutoSaveSelectionsEnable) + "\r\n");
+	fprint $fileId ("sutoSaveSelectionsCount = " + string($tima_AutoSaveSelectionsCount) + "\r\n");
+	fprint $fileId ("autosaveShowConfirmDialog = " + string($tima_AutoSaveCD) + "\r\n");
+	fprint $fileId ("autosaveAddRecent = " + string($tima_AutoSaveAddRecent) + "\r\n");
+	fprint $fileId ("autosaveAnotherDir = " + string($tima_AutoSaveAnotherDir) + "\r\n");
+	fprint $fileId ("autosaveDirectory = <" + $tima_AutoSaveDirectory + ">\r\n");
+	fprint $fileId ("autosaveIntMax = " + string($tima_AutoSaveIntMax) + "\r\n");
+	fprint $fileId ("autosavePadding = " + string($tima_AutoSavePadding) + "\r\n");
+
+	fprint $fileId ("autosaveHistoryEnabled = " + string($tima_AutoSaveHisEnabled) + "\r\n");
+	fprint $fileId ("autosaveDirectoryHisDirectory = <" + $tima_AutoSaveHisDirectory + ">\r\n");
+	fprint $fileId ("autosaveHistoryTimes = " + string($tima_AutoSaveHisTimes) + "\r\n");
+
+	fclose $fileId;
+}
+
+global proc tima_ShowAutoSaveManagerWnd_globalProc()
+{
+	global int $tima_AutoSaveEnabled;
+	global int $tima_AutoSaveTime;
+global int $tima_AutoSaveSelectionsEnable;
+global int $tima_AutoSaveSelectionsCount;
+	global int $tima_AutoSaveCD;
+	global int $tima_AutoSaveAddRecent;
+	global int $tima_AutoSaveAnotherDir;
+	global string $tima_AutoSaveDirectory;
+	global int $tima_AutoSaveIntMax;
+	global int $tima_AutoSavePadding;
+
+	global int $tima_AutoSaveHisEnabled;
+	global string $tima_AutoSaveHisDirectory;
+	global int $tima_AutoSaveHisTimes;
+
+	if(`window -ex tima_AutoSaveManagerWnd`) deleteUI tima_AutoSaveManagerWnd;
+	window -widthHeight 150 170 -title "Autosave Manager"-iconName "autosaveMgr"
+				-rtf 1 -mnb 0 -mxb 0
+			tima_AutoSaveManagerWnd;
+		columnLayout -adj 1;
+			rowLayout -nc 2 -cw2 120 32 -adj 1;
+				checkBox -label " Enable autosave " -align "left" -v $tima_AutoSaveEnabled
+					-onc "$tima_AutoSaveEnabled = 1; tima_SaveAutoSaveManagerSettings_globalProc; scriptJob -event SelectionChanged \"tima_AutoSaveJob_globalProc\""
+					-ofc "$tima_AutoSaveEnabled = 0; tima_SaveAutoSaveManagerSettings_globalProc; tima_killScriptJob_globalProc(\"tima_AutoSaveJob_globalProc\", 1, 0); $lastAutosaveTime = `timerX`";
+				button -l "help" -bgc 0.9 0.9 0.7
+					-c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/miscellaneous_/tima_autosavemgr.html\")`;";
+				setParent..;
+			rowLayout -nc 3 -columnWidth3 100 35 40 -adj 2;
+				text -l " Autosave time ";
+				intField -w 30 -minValue 1 -v ($tima_AutoSaveTime/60)
+						-cc "$tima_AutoSaveTime = (`intField -q -v autosaveTimeFF`) * 60; tima_SaveAutoSaveManagerSettings_globalProc; $lastAutosaveTime = `timerX`"
+						-en (1 - $tima_AutoSaveSelectionsEnable)
+					autosaveTimeFF;
+				text -l " min ";
+				setParent ..;
+			rowLayout -nc 3 -cw3 25 75 30-adj 3;
+				checkBox -l "" -v $tima_AutoSaveSelectionsEnable
+						-onc "intField -e -en 0 autosaveTimeFF; $tima_AutoSaveSelectionsEnable = 1; tima_SaveAutoSaveManagerSettings_globalProc; intField -e -en 1 tima_autosave_selections_intField;"
+						-ofc "intField -e -en 1 autosaveTimeFF; $tima_AutoSaveSelectionsEnable = 0; tima_SaveAutoSaveManagerSettings_globalProc; intField -e -en 0 tima_autosave_selections_intField;"
+					tima_autosave_selections_checkBox;
+				text -l " Selections ";
+				intField -en $tima_AutoSaveSelectionsEnable
+						-v $tima_AutoSaveSelectionsCount
+						-cc "$tima_AutoSaveSelectionsCount = `intField -q -v tima_autosave_selections_intField`; tima_SaveAutoSaveManagerSettings_globalProc;"
+					tima_autosave_selections_intField;
+				setParent ..;
+			separator -width 150;
+			checkBox -label " Show confirm dialog " -align "left" -v $tima_AutoSaveCD
+					-onc "$tima_AutoSaveCD = 1; tima_SaveAutoSaveManagerSettings_globalProc;"
+					-ofc "$tima_AutoSaveCD = 0; tima_SaveAutoSaveManagerSettings_globalProc;";
+			checkBox -label " Add to recent files list " -align "left" -v $tima_AutoSaveAddRecent
+					-onc "$tima_AutoSaveAddRecent = 1; tima_SaveAutoSaveManagerSettings_globalProc;"
+					-ofc "$tima_AutoSaveAddRecent = 0; tima_SaveAutoSaveManagerSettings_globalProc;";
+			rowLayout -nc 2 -columnWidth2 100 50 -adj 2;
+				text -l " files maximum ";
+				intField -w 50 -minValue 2 -v $tima_AutoSaveIntMax
+						-cc (" $tima_AutoSaveIntMax = `intField -q -v tima_AutoSaveWnd_IntMax`; tima_SaveAutoSaveManagerSettings_globalProc;")
+					tima_AutoSaveWnd_IntMax;
+				setParent ..;
+			rowLayout -nc 2 -columnWidth2 100 50 -adj 2;
+				text -l " name padding ";
+				intField -w 50 -minValue 1 -v $tima_AutoSavePadding
+						-cc (" $tima_AutoSavePadding = `intField -q -v tima_AutoSaveWnd_IntPad`; tima_SaveAutoSaveManagerSettings_globalProc;")
+					tima_AutoSaveWnd_IntPad;
+				setParent ..;
+			separator -width 150;
+			checkBox -label " Save in another directory " -align "left" -v $tima_AutoSaveAnotherDir
+					-onc "$tima_AutoSaveAnotherDir = 1; tima_SaveAutoSaveManagerSettings_globalProc; textField -e -ed 1 tima_AutoSaveDirTextField; button -e -en 1 autosaveDirBrowseButton;"
+					-ofc "$tima_AutoSaveAnotherDir = 0; tima_SaveAutoSaveManagerSettings_globalProc; textField -e -ed 0 tima_AutoSaveDirTextField; button -e -en 0 autosaveDirBrowseButton;";
+			textField -w 150 -ed $tima_AutoSaveAnotherDir -tx $tima_AutoSaveDirectory
+					-cc "tima_AutoSaveTextFieldCmd_globalProc(\"tima_AutoSaveDirTextField\", 0);"
+				tima_AutoSaveDirTextField;
+			button -w 150 -en $tima_AutoSaveAnotherDir -l " browse " -c "tima_AutoSaveBrowse_globalProc(0)" autosaveDirBrowseButton;
+			separator -width 150;
+			frameLayout -l "history backup" -bs "etchedOut";
+				columnLayout -adj 1;
+					checkBox -label "enable backup" -align "left" -v $tima_AutoSaveHisEnabled
+							-onc "$tima_AutoSaveHisEnabled = 1; tima_SaveAutoSaveManagerSettings_globalProc;"
+							-ofc "$tima_AutoSaveHisEnabled = 0; tima_SaveAutoSaveManagerSettings_globalProc;"
+						tima_AutoSaveWnd_enHisCB;
+					rowLayout -nc 3 -columnWidth3 100 25 40 -adj 2;
+						text -l " backup every ";
+						intField -w 23 -minValue 1 -v $tima_AutoSaveHisTimes
+								-cc "$tima_AutoSaveHisTimes = (`intField -q -v tima_AutoSaveHisTimesIntField`); tima_SaveAutoSaveManagerSettings_globalProc;"
+							tima_AutoSaveHisTimesIntField;
+						text -l " saves ";
+					setParent ..;
+					textField -w 145 -tx $tima_AutoSaveHisDirectory
+							-cc "tima_AutoSaveTextFieldCmd_globalProc(\"tima_AutoSaveHisDirTextField\", 1);"
+						tima_AutoSaveHisDirTextField;
+					button -w 145 -l " browse " -c "tima_AutoSaveBrowse_globalProc(1)" tima_AutoSaveHisDirBrowseButton;
+	showWindow tima_AutoSaveManagerWnd;
+}
+
+global proc tima_AutoSaveTextFieldCmd_globalProc(string $field, int $history)
+{
+	global string $tima_AutoSaveDirectory;
+	global string $tima_AutoSaveHisDirectory;
+
+	string $typedDir = `textField -q -tx $field`;
+	if(`filetest -d $typedDir` == 0)
+	{
+		if( `confirmDialog	-message "create it ?" -title "Directory does not exists !" -button "Yes" -button "No"
+					-defaultButton "Yes" -cancelButton "No" -dismissString "No"` == "No")
+		{
+			textField -e -tx $tima_AutoSaveDirectory tima_AutoSaveDirTextField;
+			return;
+		}
+		else
+		{
+			if(`sysFile -makeDir $typedDir` == 0)
+			{
+				textField -e -tx $tima_AutoSaveDirectory tima_AutoSaveDirTextField;
+				error("\n !!! can not create this directory :( ");
+				return;
+			}
+		}
+	}
+	if($history) $tima_AutoSaveHisDirectory = $typedDir;
+	else  $tima_AutoSaveDirectory = $typedDir;
+	tima_SaveAutoSaveManagerSettings_globalProc;
+}
+
+global proc tima_AutoSaveBrowse_globalProc(int $history)
+{
+	fileBrowserDialog -m 4 -fc ("tima_AutoSaveBrowserCommand_globalProc(" + $history + ")") -ft "directory" -an "choose" -om "Import";
+}
+
+global proc tima_AutoSaveBrowserCommand_globalProc(int $history, string $filename, string $fileType)
+{
+	global string $tima_AutoSaveDirectory;
+	global string $tima_AutoSaveHisDirectory;
+
+	if($history)
+	{
+		$tima_AutoSaveHisDirectory = $filename;
+		textField -e -tx $tima_AutoSaveHisDirectory tima_AutoSaveHisDirTextField;
+	}
+	else
+	{
+		$tima_AutoSaveDirectory = $filename;
+		textField -e -tx $tima_AutoSaveDirectory tima_AutoSaveDirTextField;
+	}
+	tima_SaveAutoSaveManagerSettings_globalProc;
+}
+
+global proc tima_PerformAutoSave_globalProc()
+{
+	global int $tima_AutoSaveAddRecent;
+	global int $tima_AutoSaveAnotherDir;
+	global string $tima_AutoSaveDirectory;
+	global int $tima_AutoSaveInt;
+	global int $tima_AutoSaveIntMax;
+	global int $tima_AutoSavePadding;
+
+	global int $tima_AutoSaveHisEnabled;
+	global string $tima_AutoSaveHisDirectory;
+	global int $tima_AutoSaveHisTimes;
+	global int $tima_AutoSaveHisCount;
+
+int $printLog = 0;
+	string $oldFileDir = `file -q -sn`;
+if ($printLog) cgruInfo("$oldFileDir = " + $oldFileDir);
+	if( $oldFileDir == "")
+		$oldFileDir = $tima_AutoSaveDirectory + "/noname.mb";
+	string $oldFileName = `substitute ".*/" $oldFileDir ""`;
+if ($printLog) cgruInfo("$oldFileName = " + $oldFileName);
+	string $fileDir;
+	if( $tima_AutoSaveAnotherDir)
+	{
+		if(`filetest -d $tima_AutoSaveDirectory` == 0)
+		{
+			tima_AutoSave_initDefautlPaths(1);
+			cgruWarning("Autosave directory does not exists! ( moving to default - " + $tima_AutoSaveDirectory + " )");
+		}
+		$fileDir = ($tima_AutoSaveDirectory + "/");
+	}
+	else $fileDir = `match ".*/" $oldFileDir`;
+if ($printLog) cgruInfo("$fileDir = " + $fileDir);
+	string $nameBody = (`match ".*\\." $oldFileName` + "@");
+	string $fileExt = `substitute ".*\\." $oldFileName ""`;
+if ($printLog) cgruInfo("$nameBody = " + $nameBody);
+	string $nameInt = string($tima_AutoSaveInt);
+	while( `size($nameInt)` < $tima_AutoSavePadding)
+		$nameInt = "0" + $nameInt;
+	
+	$tima_AutoSaveHisCount++;
+	if( $tima_AutoSaveHisEnabled && ($tima_AutoSaveHisCount >= $tima_AutoSaveHisTimes))
+	{
+		string $date;
+		string $time;
+		int $l;
+
+      if(`about -windows`)
+      {
+          $date = `system("date /t")`;
+          $date += "_" + `system("time /t")`;
+          string $clean_date;
+          while( $clean_date != $date )
+          {
+              $clean_date = $date;
+              $date = `substitute "\n" $date ""`;
+              $date = `substitute "\r" $date ""`;
+              $date = `substitute " " $date "_"`;
+              $date = `substitute "/" $date "_"`;
+              $date = `substitute ":" $date "_"`;
+              $date = `substitute "\\\\" $date "_"`;
+          }
+      }
+		else
+		{
+         $date = `system("date +%y_%m_%d__%H_%M_%S")`;
+		}
+		if(`filetest -d $tima_AutoSaveHisDirectory` == 0)
+		{
+			tima_AutoSave_initDefautlPaths(1);
+			cgruWarning(" !!! autosave history directory does not exists! ( moving to default - " + $tima_AutoSaveHisDirectory + " )");
+		}
+		else $fileDir = ($tima_AutoSaveHisDirectory + "/");
+
+		$nameBody = ($tima_AutoSaveHisDirectory + "/" + $nameBody + $date + "." + $fileExt);
+		$tima_AutoSaveHisCount = 0;
+	}
+	else
+	{
+		$nameBody = ($fileDir + $nameBody + $nameInt + "." + $fileExt);
+		$tima_AutoSaveInt++;
+	}
+
+	global string $gCurrentSacredTool;
+	string $userTool = $gCurrentSacredTool;
+	string $userSelection[] = `ls -sl`;
+	string $userHilition[] = `ls -hl`;
+
+if ($printLog) cgruInfo("$nameBody (rename) = " + $nameBody);
+	file -rn $nameBody;
+	string $fileType = "";
+	if($fileExt == "ma")
+		$fileType = "mayaAscii";
+	else		//mb
+		$fileType = "mayaBinary";		
+	file -f -s -type $fileType;
+	if( $tima_AutoSaveAddRecent) addRecentFile($nameBody, $fileType);
+	file -rn $oldFileDir;
+	if($tima_AutoSaveInt == $tima_AutoSaveIntMax) $tima_AutoSaveInt = 0;
+
+	setToolTo $userTool;
+	hilite $userHilition;
+	select $userSelection;
+	cgruInfo("Autosave result - " + $nameBody);
+}
+
+global proc tima_AutoSaveJob_globalProc()
+{
+	global int $tima_AutoSaveEnabled;
+	if( $tima_AutoSaveEnabled == 0) return;
+	global int $tima_AutoSaveSelectionsEnable;
+	if($tima_AutoSaveSelectionsEnable)
+	{
+		global int $tima_AutoSaveSelectionsCount;
+		global int $tima_AutoSaveSelections;
+		$tima_AutoSaveSelections ++;
+		if ( $tima_AutoSaveSelections < $tima_AutoSaveSelectionsCount ) return;
+		$tima_AutoSaveSelections = 0;
+	}
+	else
+	{
+		global float $lastAutosaveTime;
+		global int $tima_AutoSaveTime;
+		if ((`timerX` - $lastAutosaveTime) < $tima_AutoSaveTime) return;
+		$lastAutosaveTime = `timerX`;
+	}
+	global int $tima_AutoSaveCD;
+	if( $tima_AutoSaveCD)
+		if( `confirmDialog -message "Confirm autosave ?" -title "Autosave Time !" -button "Yes" -button "No" -defaultButton "No" -cancelButton "No" -dismissString "No"` == "No") return;
+	tima_PerformAutoSave_globalProc();
+}
+/*
+global proc tima_AutoSaveResetInt()
+{
+	global int $tima_AutoSaveInt;
+	$tima_AutoSaveInt = 0;
+}
+*/
+//_________________________ autosave manager initial commands : ____________________________________________________________
+
+tima_LoadAutoSaveManagerSettings_globalProc;
+$tima_AutoSaveInt = 0;
+if($tima_AutoSaveEnabled)
+{
+	$lastAutosaveTime = `timerX`;
+	$tima_AutoSaveSelections = 0;
+	$tima_AutoSaveHisCount = 0;
+	tima_killScriptJob_globalProc("tima_AutoSaveJob_globalProc", 1, 0);
+	scriptJob -event SelectionChanged "tima_AutoSaveJob_globalProc";
+//	tima_killScriptJob_globalProc("tima_AutoSaveResetInt", 1, 0);
+//	scriptJob -event NewSceneOpened "tima_AutoSaveResetInt";
+//	scriptJob -event SceneOpened "tima_AutoSaveResetInt";
+}

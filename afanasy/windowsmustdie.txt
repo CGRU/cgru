@@ -1,0 +1,5 @@
+Microsoft Visual C++ Runtime Library
+Visual Studio Just-In-Time Debugger
+mantra.exe
+mantra.exe - Application Error
+3ds Max application

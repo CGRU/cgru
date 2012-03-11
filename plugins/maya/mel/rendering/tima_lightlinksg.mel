@@ -1,0 +1,33 @@
+global proc tima_lightlinksg_globalProc( int $make)
+{
+	string $selShapesArray[] = `ls -sl -l -dag -type "mesh" -type "nurbsSurface" -type "subdiv"`;
+	if(!`size($selShapesArray)`) cgruError("tima light link : No shape selected.");
+//cgruInfo("Selected ShapesArray:");
+//print($selShapesArray);
+	string $selLightsArray[] = `ls -sl -lights -dag`;
+	if(!`size($selLightsArray)`) cgruError("tima light link : No lights selected.");
+//cgruInfo("Selected LightsArray:");
+//print($selLightsArray);
+	string $selShadingEnginesArrray[];
+	string $shape;
+	string $tmpStrArray[];
+	for( $shape in $selShapesArray)
+	{
+		$tmpStrArray = `listConnections -s 0 -d 1 -et 1 -t "shadingEngine" $shape`;
+		appendStringArray($selShadingEnginesArrray, $tmpStrArray, `size($tmpStrArray)`);
+	}
+	$selShadingEnginesArrray = stringArrayRemoveDuplicates ($selShadingEnginesArrray);
+	if(!`size($selShadingEnginesArrray)`) cgruError("tima light link : No shading groups found.");
+//cgruInfo("Selected Shading Engines:");
+//print($selShadingEnginesArrray);
+	string $cmd, $shadingEngine, $light;
+	if( $make)
+		$cmd = "lightlink -make ";
+	else
+		$cmd = "lightlink -break ";
+	for( $shadingEngine in $selShadingEnginesArrray)
+		$cmd += " -o " + $shadingEngine;
+	for( $light in $selLightsArray)
+		$cmd += " -l " + $light;
+	evalEcho($cmd + ";");
+}

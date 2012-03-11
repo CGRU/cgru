@@ -1,0 +1,649 @@
+// Copyright (C) 1997-2010 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+//
+//
+// Creation Date:  20 Aug 1996
+//
+//
+//  Procedure Name:
+//		OutlinerEdMenu
+//
+//  Description:
+//		Creates a popup menu for the outliner, that
+//		allows for control of outliner display
+//
+//  Input Arguments:
+//      Parent outliner.
+//
+//  Return Value:
+//      None.
+//
+
+//
+//  Procedure Name:
+//      setOutlinerLongName
+//
+//  Description:
+//		Sets the Outliner long/short name flag
+//
+//  Input Arguments:
+//      state - 0 = short, 1 = nice, 2 = long
+//
+//  Return Value:
+//      None.
+//
+global proc setOutlinerLongName (int $state, string $outlineEd)
+{
+	//	Query the current "name" state of the outliner.
+	//
+	int $longNames = `outlinerEditor -query -longNames $outlineEd`;
+	int $niceNames = `outlinerEditor -query -niceNames $outlineEd`;
+
+	//	Check for a change.
+	//
+	if ($niceNames && $state == 1) return;
+	if (!$niceNames && $longNames && $state == 2) return;
+	if (!$niceNames && !$longNames && $state == 0) return;
+
+	if( $state == 2 ) {
+		outlinerEditor -e -ln true -nn false $outlineEd;
+	} else if( $state == 1 ) {
+		outlinerEditor -e -ln true -nn true $outlineEd;
+	} else {
+		outlinerEditor -e -ln false -nn false $outlineEd;
+	}
+}
+
+global proc OutlinerEdMenuCommand (string $outlineEd)
+{
+	//
+	// This is the post command for the Outliner Editor popup menu
+	
+	setParent -m ($outlineEd+"Popup");
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showDagOnly $outlineEd`
+		dagItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showShapes $outlineEd`
+		shapeItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showAttributes $outlineEd`
+		attributeItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showSetMembers $outlineEd`
+		setMembersItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showConnected $outlineEd`
+		connectedItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showNamespace $outlineEd`
+		showNamespaceItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showMuteInfo $outlineEd`
+		showMuteItem;
+    menuItem -edit
+		-checkBox `outlinerEditor -query -organizeByLayer $outlineEd`
+		organizeLayerItem;		
+    menuItem -edit
+		-checkBox `outlinerEditor -query -autoExpandLayers $outlineEd`
+		autoExpandLayersItem;				
+
+	int $outlinerLongName = 1;
+	if (!`outlinerEditor -query -niceNames $outlineEd`) {
+		$outlinerLongName = (`outlinerEditor -query -longNames $outlineEd` ? 2 : 0);
+	}
+		menuItem -edit
+			-radioButton ( 1 == $outlinerLongName )
+			niceNameItem;
+		menuItem -edit
+			-radioButton ( 2 == $outlinerLongName )
+			longNameItem;
+		menuItem -edit
+			-radioButton ( 0 == $outlinerLongName )
+			shortNameItem;
+
+	string $sortOrder = `outlinerEditor -query -sortOrder $outlineEd`;
+		menuItem -edit
+			-radioButton ($sortOrder == "none")
+			noneSortOrderItem;
+		menuItem -edit
+			-radioButton ($sortOrder == "dagName")
+			dagNameSortOrderItem;
+
+	string $attrAlphaOrder = `outlinerEditor -query -attrAlphaOrder $outlineEd`;
+		menuItem -edit
+			-radioButton ($attrAlphaOrder == "default")
+			defaultAttrAlphaSortOrderItem;
+		menuItem -edit
+			-radioButton ($attrAlphaOrder == "ascend")
+			ascendAttrAlphaSortOrderItem;
+		menuItem -edit
+			-radioButton ($attrAlphaOrder == "descend")
+			descendAttrAlphaSortOrderItem;
+}
+
+global proc buildContainerMenu(string $parentMenu)
+{
+	setParent -menu $parentMenu;
+	menu -edit -deleteAllItems $parentMenu;
+
+	string $selObj;
+	string $containers[] = `ls -sl -containers`;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kSelectAssetContents"))
+		-annotation (getRunTimeCommandAnnotation("SelectContainerContents"))
+		-enable (size($containers) > 0)
+		-command SelectContainerContents
+		selectContainerContentsItem;
+
+	if (size($containers) == 0) {
+		string $sel[] = `ls -sl`;
+		string $ownerContainer = `container -q -findContainer $sel`;
+		if (size($ownerContainer) > 0) {
+			$containers[0] = $ownerContainer;
+		}
+		$selObj = $sel[0];
+	}
+	
+	for ($container in $containers) {
+		// user-defined menu
+		//
+		string $menuProc = `getAttr ($container+".rmbCommand")`;
+		if (size($menuProc) > 0)
+		{
+			if (`exists $menuProc`)
+			{
+				string $menuItems[] = `eval $menuProc`;
+				int $mm;
+				int $menuCount = size($menuItems);
+				if ($menuCount % 2 != 0)
+				{
+					// the user provided an invalid # of items, skip
+					// the last
+					//
+					$menuCount--;
+				}
+				if ($menuCount > 0) {
+					menuItem -divider true;
+					string $menuObj = (size($selObj) > 0) ? $selObj : $container;
+					for ($mm = 0; $mm < $menuCount; $mm+=2)
+					{
+						menuItem -label $menuItems[$mm] -c ($menuItems[$mm+1]+" "+$menuObj);
+					}
+				}
+			}
+			else {
+				string $warnStr = (uiRes("m_OutlinerEdMenu.kSkippedRmb"));
+				warning(`format -s $menuProc $warnStr`);
+			}
+		}
+	}
+}
+
+global proc unloadRefFromOutlinerPrompt(string $msg)
+{
+    // Get the dialog's formLayout.
+    //
+    string $form = `setParent -q`;
+
+    // layoutDialog's are not resizable, so hard code a size here,
+    // to make sure all UI elements are visible.
+    //
+    formLayout -e -width 450 $form;
+			
+	string $t = `text -l $msg`;
+	string $t2 = `text -l (uiRes("m_OutlinerEdMenu.kContinue"))`;
+
+	string $unloadText = (uiRes("m_OutlinerEdMenu.kOptionUnload"));
+	string $cancelText = (uiRes("m_OutlinerEdMenu.kOptionCancel"));
+	string $b1 = `button -l $cancelText
+		-c ("layoutDialog -dismiss \""+$cancelText+"\"")`;	
+	string $b2 = `button -l $unloadText
+		-c ("layoutDialog -dismiss \""+$unloadText+"\"")`;
+
+    string $cb1 = `checkBox -label (uiRes("m_OutlinerEdMenu.kDoNotShowDialogMsg"))`;
+	
+	checkBox -e -onCommand "optionVar -iv outlinerEdSuppressRefDialog 1"
+		-offCommand "optionVar -iv outlinerEdSuppressRefDialog 0"
+		$cb1;
+
+    int $spacer = 5;
+    int $top = 15;
+    int $edge = 5;
+
+    formLayout -edit
+        -attachForm            $t   "top"    $top
+        -attachForm            $t   "left"   $edge
+        -attachNone            $t   "bottom"
+        -attachForm            $t   "right"  $edge
+
+        -attachControl         $t2   "top"    $spacer $t
+        -attachForm            $t2   "left"   $edge
+        -attachNone            $t2   "bottom"
+        -attachForm            $t2   "right"  $edge
+
+        -attachControl         $b1  "top"    $spacer $t2
+        -attachForm            $b1  "left"   $edge
+        -attachNone            $b1  "bottom"
+        -attachPosition        $b1  "right"  $spacer 48
+
+        -attachControl         $b2  "top"    $spacer $t2
+        -attachPosition        $b2  "left"   $spacer 48
+        -attachNone            $b2  "bottom"
+        -attachForm            $b2  "right"  $edge
+
+        -attachControl         $cb1 "top"    $spacer $b1
+        -attachForm            $cb1 "left"   $edge
+        -attachForm            $cb1 "bottom" $spacer
+        -attachNone            $cb1 "right"
+    $form;
+}
+
+global proc loadUnloadRefFileCB(int $load, string $selObj, string $file)
+{
+	// Unless the selected object is a container & the file contents are
+	// only what is in the container, issue a warning indicating the whole
+	// file will be removed, not just the single container
+	//
+	if (!`optionVar -exists outlinerEdSuppressRefDialog`) {
+		optionVar -intValue outlinerEdSuppressRefDialog 0;
+	}
+
+	// Determine whether to show a dialog asking if they really want to 
+    // unload everything the file, not just what is selected. Show it unless:
+	//  * we are loading, not unloading
+	//  * optionVar has been set to suppress it
+	//  * the selected object is not referenced ... that means it's the
+	//    groupnode above a reference so the entire contents will be
+	//    under it
+	//
+	if (0 == $load) {
+		int $suppressDialog = (`optionVar -q outlinerEdSuppressRefDialog` ||
+							   ! `referenceQuery -isNodeReferenced $selObj`);
+		
+		if (0 == $suppressDialog &&
+			(`container -q -isContainer $selObj`)) {
+			// We'll also suppress the dialog if the selected object is a
+			// container & the file contents are only what is in the container
+			//
+			string $contents[] = `container -q -nodeList $selObj`;
+			string $fileContents[] = `referenceQuery -nodes $file`;
+			$suppressDialog = (size($fileContents) == (size($contents) + 1));
+		}
+		
+		string $result = (uiRes("m_OutlinerEdMenu.kOptionUnload"));
+		if (0 == $suppressDialog) {
+			string $fname = basename($file,"");		
+			string $message = (uiRes("m_OutlinerEdMenu.kAllFileUnloadMsg"));
+			string $msg = `format -s $fname -s $selObj $message`;
+			$result = `layoutDialog -title (uiRes("m_OutlinerEdMenu.kUnloadReference"))
+				-ui ("unloadRefFromOutlinerPrompt \""+$msg+"\"")`;
+		}
+		
+		if ($result == (uiRes("m_OutlinerEdMenu.kOptionUnload"))) {
+			string $cmd = ("file -unloadReference -f \""+$file+"\"; ");
+			if (! `referenceQuery -isNodeReferenced $selObj`) {
+				$cmd += ("select -r "+"\""+$selObj+"\";");
+			}
+			evalEcho $cmd;
+		}
+	} else {
+		string $cmd = ("file -loadReference -f \""+$file+"\"; ");
+		$cmd += ("select -r "+"\""+$selObj+"\";");
+		evalEcho $cmd;
+	}
+}
+
+global proc buildReferenceMenu(string $parentMenu)
+{
+	setParent -menu $parentMenu;
+	menu -edit -deleteAllItems $parentMenu;
+
+	string $sel[] = `ls -sl`;
+
+	// determine if selection is referenced or is a group node for a reference
+	//
+	int $postedMenu = 0;
+	if (size($sel) > 0) {
+		string $selContainer[] = `ls -sl -containers`;
+		string $selObj = (size($selContainer) > 0) ? $selContainer[0] : $sel[0];
+		string $relatedRefNode;
+		
+		string $file;
+		int $isLoaded;
+		if (`referenceQuery -isNodeReferenced $selObj`) {
+			$file = `referenceQuery -filename $selObj`;
+			$isLoaded = 1;
+		} else {
+			string $refNode[] = `listConnections -s 1 -d 0 -type reference ($selObj+".ihi")`;
+			if (size($refNode) > 0) {
+				$file = `referenceQuery -filename $refNode[0]`;
+				$isLoaded = `referenceQuery -isLoaded $refNode[0]`;
+				$relatedRefNode = $refNode[0];
+			}
+		}
+
+		if (size($file) > 0) {
+			string $fname = basename($file,"");
+			int $load = ($isLoaded == 0);
+			string $menuString = ($load) ?
+				(uiRes("m_OutlinerEdMenu.kLoadFile")) :
+				(uiRes("m_OutlinerEdMenu.kUnloadFile"));
+			string $menuMsg = `format -s $fname $menuString`;
+			menuItem -label $menuMsg -c ("loadUnloadRefFileCB "+$load+" \""+$selObj+"\" \""+$file+"\"");
+			$postedMenu = 1;
+
+			if ($isLoaded) {
+				string $refNode = `referenceQuery -referenceNode $file`;
+				string $liveEdits[] = `referenceQuery -liveEdits -editStrings -orn $refNode`;
+				menuItem -label (uiRes("m_OutlinerEdMenu.kExportRefEdits"))
+					-enable (size($liveEdits) > 0)
+					-annotation (uiRes("m_OutlinerEdMenu.kExportRefEditsAnnot"))
+					-command ("ExportEditsFromRefEd");
+				if (size($liveEdits) > 0) {
+					menuItem -optionBox true 
+						-annotation (uiRes("m_OutlinerEdMenu.kExportRefEditsOptionsAnnot"))
+						-command ("ExportEditsFromRefEdOptions");
+				}
+			}
+
+			string $reffedObj = (size($relatedRefNode) > 0) ? $relatedRefNode :
+				$selObj;
+			string $childRefs[] = `referenceQuery -child -referenceNode $reffedObj`;
+			int $firstChildItem = 1;
+			for ($childRef in $childRefs) {
+				$loaded = `referenceQuery -isLoaded $childRef`;
+				if (! $loaded) {
+					if ($firstChildItem) {
+						menuItem -divider true;
+						$firstChildItem = 0;
+					}
+					
+					string $menuString = (uiRes("m_OutlinerEdMenu.kLoadChildFile"));
+					$file = `referenceQuery -filename $childRef`;
+					$fname = basename($file,"");
+					string $menuMsg = `format -s $fname $menuString`;
+					menuItem -label $menuMsg -c ("loadUnloadRefFileCB 1 \""+$selObj+"\" \""+$file+"\"");
+				}
+			}
+		}
+	}
+
+	if (! $postedMenu) {
+		menuItem -label (uiRes("m_OutlinerEdMenu.kNoRef")) -enable false;
+	}
+}
+
+
+
+// Expose the popup menu name so it can be customized
+global string $gOutlinerPopupMenu;
+
+global proc OutlinerEdMenu (string $outlineEd)
+{
+	global string $gOutlinerPopupMenu;
+
+	// These are visible to clients, do not change their names
+	string $menuName = $outlineEd + "Popup";
+	$gOutlinerPopupMenu = $menuName;
+
+	popupMenu
+		-ctrlModifier false
+		-button 3
+		-postMenuCommand ("OutlinerEdMenuCommand " + $outlineEd)
+		-parent $outlineEd $menuName;
+
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowDAGObjectsOnly")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -showDagOnly #1 " + $outlineEd)
+		dagItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowShapes")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showShapes #1 " + $outlineEd)
+		shapeItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowAttributes")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showAttributes #1 " + $outlineEd)
+		attributeItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowSetMembers")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showSetMembers #1 " + $outlineEd)
+		setMembersItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowConnected")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showConnected #1 " + $outlineEd)
+		connectedItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowNamespaces")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -showNamespace #1 " + $outlineEd)
+		showNamespaceItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowMuteInformation")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -showMuteInfo #1 " + $outlineEd)
+		showMuteItem;
+    menuItem -label (uiRes("m_OutlinerEdMenu.kOrganizeByLayer")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -organizeByLayer #1 " + $outlineEd)
+		organizeLayerItem;		
+    menuItem -label (uiRes("m_OutlinerEdMenu.kAutoExpandLayers")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -autoExpandLayers #1 " + $outlineEd)
+		autoExpandLayersItem;				
+	menuItem -divider true;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kRevealSelected"))  
+		-command ("outlinerEditor -edit -showSelected  1 " + $outlineEd)
+		showSelectedItem;
+
+	int $outlinerLongName = 1;
+	if (!`outlinerEditor -query -niceNames $outlineEd`) {
+		$outlinerLongName = (`outlinerEditor -query -longNames $outlineEd` ? 2 : 0);
+	}
+	menuItem -label (uiRes("m_OutlinerEdMenu.kChannelNames")) -subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kNice"))
+			-radioButton ( 1 == $outlinerLongName )
+			-command ("setOutlinerLongName 1 " + $outlineEd)
+			niceNameItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kLong"))
+			-radioButton ( 2 == $outlinerLongName )
+			-command ("setOutlinerLongName 2 " + $outlineEd)
+			longNameItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kShort"))
+			-radioButton ( 0 == $outlinerLongName )
+			-command ("setOutlinerLongName 0 " + $outlineEd)
+			shortNameItem;
+		setParent -m ..;
+
+	string $sortOrder = `outlinerEditor -query -sortOrder $outlineEd`;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kSortOrder"))-subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kSceneHierarchy"))
+			-radioButton ($sortOrder == "none")
+			-command ("outlinerEditor -edit -sortOrder none " + $outlineEd)
+			noneSortOrderItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAlphabeticalWithinType"))
+			-radioButton ($sortOrder == "dagName")
+			-command ("outlinerEditor -edit -sortOrder dagName " + $outlineEd)
+			dagNameSortOrderItem;
+		setParent -m ..;
+
+	menuItem -divider true;
+
+	string $attrAlphaOrder = `outlinerEditor -query -attrAlphaOrder $outlineEd`;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphaOrder"))-subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphaDefault"))
+			-radioButton ($attrAlphaOrder == "default")
+			-command ("outlinerEditor -edit -attrAlphaOrder \"default\" " + $outlineEd)
+			defaultAttrAlphaSortOrderItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphabeticalAscend"))
+			-radioButton ($attrAlphaOrder == "ascend")
+			-command ("outlinerEditor -edit -attrAlphaOrder ascend " + $outlineEd)
+			ascendAttrAlphaSortOrderItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphabeticalDescend"))
+			-radioButton ($attrAlphaOrder == "descend")
+			-command ("outlinerEditor -edit -attrAlphaOrder descend " + $outlineEd)
+			descendAttrAlphaSortOrderItem;
+		setParent -m ..;
+
+	menuItem -divider true;
+	string $referenceMenu = `menuItem -label (uiRes("m_OutlinerEdMenu.kReference")) -aob true -subMenu true`;
+	menuItem -edit -postMenuCommand ("buildReferenceMenu "+$referenceMenu) $referenceMenu;
+	setParent -m ..;
+	string $containerMenu = `menuItem -label (uiRes("m_OutlinerEdMenu.kAsset")) -subMenu true`;
+	menuItem -edit -postMenuCommand ("buildContainerMenu "+$containerMenu) $containerMenu;
+	setParent -m ..;
+	menuItem -divider true;
+	
+	menuItem -label (uiRes("m_OutlinerEdMenu.kSelectSetMembers"))
+		-command ("selectAllSetMembers " + $outlineEd)
+		selectAllSetMembersItem;
+
+    menuItem -divider true;
+    string $animLayerFilterOptions = `outlinerEditor -query -animLayerFilterOptions $outlineEd`;    
+    int $showAnimLayerWeight = `outlinerEditor -query -showAnimLayerWeight $outlineEd`;    
+	menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterOptions"))-subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterFromLayerEditor"))
+			-radioButton ($animLayerFilterOptions == "animLayerEditor")
+			-command ("outlinerEditor -edit -animLayerFilterOptions \"animLayerEditor\" " + $outlineEd)
+			animLayerFilterAnimLayerEditorItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterAllAffecting"))
+			-radioButton ($animLayerFilterOptions == "allAffecting")
+			-command ("outlinerEditor -edit -animLayerFilterOptions allAffecting " + $outlineEd)
+			animLayerFilterAllAffectingItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterActive"))
+			-radioButton ($animLayerFilterOptions == "active")
+			-command ("outlinerEditor -edit -animLayerFilterOptions active " + $outlineEd)
+			animLayerFilterAllActiveItem;
+        menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterSelected"))
+			-radioButton ($animLayerFilterOptions == "selected")
+			-command ("outlinerEditor -edit -animLayerFilterOptions selected " + $outlineEd)
+			animLayerFilterSelectedItem;								
+        
+        menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterActiveAndSelected"))
+			-radioButton ($animLayerFilterOptions == "activeAndSelected")
+			-command ("outlinerEditor -edit -animLayerFilterOptions activeAndSelected " + $outlineEd)
+			animLayerFilterActiveAndSelectedItem;											
+		
+		menuItem -divider true;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kShowAnimLayerWeight")) 
+		    -checkBox ($showAnimLayerWeight == 1)
+		    -command ("outlinerEditor -edit -showAnimLayerWeight #1 " + $outlineEd)
+		    showAnimLayerWeightItem;		
+		
+		setParent -m ..;
+		
+	menuItem -divider true;
+//BEGIN CGRU ########################################################################################################
+   menuItem -divider true;
+   menuItem -l "set active characters" -c ("{string $s[]=`ls -sl -type \"character\"`;setCurrentCharacters($s);}");
+   menuItem -divider true;
+   menuItem -l "add selection to set" -c ("tima_OutlinerEdMenu_ASTS_globalProc " + $outlineEd);
+   menuItem -l "remove selecton from set" -c ("tima_OutlinerEdMenu_RSFS_globalProc " + $outlineEd);
+   menuItem -divider true;
+//END CGRU ########################################################################################################
+
+	//
+        //  Invoke any user supplied code. This callback is published and
+        //  needs to remain consistent in future versions of Maya.
+        //
+        if (exists ("outlinerEdMenuUserCallback") )
+        {
+                // Use catchQuiet in case no callback is supplied, we don't want that to
+                // show an error
+                catchQuiet( eval("source \"outlinerEdMenuUserCallback\"") );
+
+        }
+}
+//BEGIN CGRU ########################################################################################################
+global proc tima_OutlinerEdMenu_ASTS_globalProc(string $outliner)
+{
+   string $outlinerSelection = `outlinerEditor -query -selectionConnection $outliner`;
+   string $selectedObjects[] = `ls -sl`;
+   int $selSize = `size($selectedObjects)` -1;
+   string $set = $selectedObjects[$selSize];
+   if(`nodeType $selectedObjects[$selSize]` != "objectSet")
+   {
+      warning(" ### select set at last to add objects to !!!");
+      return;
+   }
+   int $i;
+   for( $i = 0; $i < $selSize; $i++)
+      sets -add $set $selectedObjects[$i];
+}
+global proc tima_OutlinerEdMenu_RSFS_globalProc(string $outliner)
+{
+   string $outlinerSelection = `outlinerEditor -query -selectionConnection $outliner`;
+   string $selectedObjects[] = `ls -sl`;
+   int $selSize = `size($selectedObjects)` -1;
+   string $set = $selectedObjects[$selSize];
+   if(`nodeType $selectedObjects[$selSize]` != "objectSet")
+   {
+      warning(" ### select set at last to add objects to !!!");
+      return;
+   }
+   int $i;
+   for( $i = 0; $i < $selSize; $i++)
+      sets -rm $set $selectedObjects[$i];
+}
+//END CGRU ########################################################################################################
+
+global proc selectAllSetMembers (string $outliner)
+//
+//  Procedure Name:
+//      selectAllSetMembers
+//
+//  Description:
+//      For each set that is selected (gray) in the given Outliner editor,
+//	the members of that set are added to the selection list.
+//	The sets themselves are not added to the selection list, and will
+//	be deselected.
+//
+//  Input Arguments:
+//      The Outliner to get the list of selected sets from.
+//
+//  Return Value:
+//      None.
+//
+
+
+{
+	//  Get the selection connection that the given Outliner is using,
+	//  and get a list of all it's members.
+	//
+	string $outlinerSelection = `outlinerEditor -query -selectionConnection $outliner`;
+	string $selectedObjects[] = `selectionConnection -query -object $outlinerSelection`;
+
+	string $currentObject;
+
+	for($currentObject in $selectedObjects) { 
+
+		//  If the selected object is a set (a node of type objectSet),
+		//  then make sure it is deselected and then select its contents instead.
+		//
+		if(`nodeType $currentObject` == "objectSet" || `nodeType -api $currentObject` == "kPluginObjectSet") {
+			select -noExpand -deselect $currentObject;
+			select -add $currentObject;
+		}
+	}
+}
+

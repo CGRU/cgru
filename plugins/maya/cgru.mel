@@ -1,0 +1,69 @@
+/***************************************************************************
+*    Copyright (C) 2009 by Timur Hairulin                                  *
+*                                                                          *
+*    This program is free software; you can redistribute it and/or modify  *
+*    it under the terms of the GNU Library General Public License as       *
+*    published by the Free Software Foundation; either version 2 of the    *
+*    License, or (at your option) any later version.                       *
+*                                                                          *
+*    This program is distributed in the hope that it will be useful,       *
+*    but WITHOUT ANY WARRANTY; without even the implied warranty of        *
+*    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the         *
+*    GNU General Public License for more details.                          *
+*                                                                          *
+*    You should have received a copy of the GNU Library General Public     *
+*    License along with this program; if not, write to the                 *
+*    Free Software Foundation, Inc.,                                       *
+*    59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.             *
+***************************************************************************/
+
+print("\n// ***** cgru initialization begin\n");
+//############################################ setting up locations: ######################################
+global string $cgruDir;                $cgruDir = `getenv MAYA_CGRU_LOCATION`;
+global string $cgruDir_MEL;            $cgruDir_MEL = $cgruDir + "/mel";
+global string $cgruDir_DOC;            $cgruDir_DOC  = $cgruDir + "/doc";
+{string $tmpStr = `about -os`;         if(`gmatch $tmpStr "l*"`)$cgruDir_DOC = "file://" + $cgruDir_DOC;}
+//############################################ initializing output: #####################################
+global proc cgruInfo(string $str)      { print(      "// Info: cgru: " + $str + "\n");}
+global proc cgruWarning(string $str)   { warning( "cgru: " + $str);}
+global proc cgruError(string $str)     { error(      "cgru: " + $str);}
+//############################################ initializing sourcing methods: #######################################
+global proc cgruSourceFile( string $file)
+{
+global string $cgruDir_MEL;
+   string $cmd = ("source \"" + $cgruDir_MEL + "/" + $file + "\"");
+   cgruInfo("Sourcing local \"" + $cgruDir_MEL + "/" + $file + "\"");
+   catch(`eval $cmd`);
+}
+global proc cgruSourceDir( string $dir, int $global)
+{
+global string $cgruDir_MEL;
+   string $folder = $dir + "/";
+   if(!$global) $folder = $cgruDir_MEL + "/" + $folder;
+   string $scriptsFilesArray[] = `getFileList -folder $folder -filespec "*.mel"`;
+   cgruInfo("Sourcing directory \"" + $folder + "\"");
+   string $file;
+   for( $file in $scriptsFilesArray)
+   {
+      string $cmd = ("source \"" + $folder + $file + "\"");
+      cgruInfo(" - Sourcing \"" + $folder + $file + "\"");
+      catch(`eval $cmd`);
+   }
+}
+global proc cgruSourceFile_global( string $file)
+{string $cmd = ("source \"" + $file + "\""); cgruInfo("Sourcing absolute \"" + $file + "\""); catch(`eval $cmd`);}
+//########################################## sourcing scripts: ###############################
+{
+cgruSourceFile("cgruplugins.mel");               // load plugins stored cgru/mll folder
+cgruSourceDir("_autosource", 0);                 // startup scripts sourcing
+cgruSourceDir("hotkeys", 0);                     // init hotkeys commands
+cgruSourceDir("markingmenus", 0);                // init marking menus global procedures
+cgruSourceFile("cgrumenu.mel");                  // create [__CGRU__] menu in main maya window menu bar
+cgruSourceFile("cgruquicklaunch.mel");           // build "quick launch" icons in maya status bar
+
+if(!(`getenv MAYA_CGRU_AUTOLOAD` == ""))         // Optional auto source some external scripts:
+cgruSourceDir(`getenv MAYA_CGRU_AUTOLOAD`, 1);   // cgruSourceDir( string $folder, int $global):
+                                                 // $global = 1 when sourcing external files (which are not in cgru subfolders).
+}
+//#########################################################################################################
+print("// ***** cgru initialization end.\n");

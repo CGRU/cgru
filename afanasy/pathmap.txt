@@ -1,0 +1,15 @@
+# This is an example paths map file
+
+# This is a comment
+
+# At first Afanasy searches pathsmap files at home in "~./afanasy/pathmap*", so every user can customize paths.
+# Then in a current directory ".", and every client can have some paths map.
+# And at last in Afanasy root directory "AF_ROOT", which can be the same (network) for everyone during job submission.
+
+#     Client:                 Server:
+
+#\\server\projects\          /cg/projects/
+
+# You can use only "\" slashes for windows, even if some application on windows use "/" slashes.
+# Afanasy tries both slashes when searchs a path to replace.
+# But will replace with specified slashes, if unix slashes not forced (for Nuke, for example).

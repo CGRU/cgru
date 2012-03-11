@@ -1,0 +1,182 @@
+global proc string[] timaGetCurrentCamera_globalProc()
+{
+	string $currentCamera;
+	string $currentCameraShape;
+	string $currentPanel = `getPanel -wf`;
+	string $tmpString;
+	string $tempArray[];
+	if(`modelPanel -ex $currentPanel`)
+		$tmpString = `modelPanel -q -cam $currentPanel`;
+	else
+	{
+		cgruWarning("Invalid panel - " + $currentPanel);
+		clear $tempArray;
+		return $tempArray;
+	}
+	if(`gmatch $tmpString "*|*"`)
+	{
+		cgruWarning("More then one node in scene has name \"" + $tmpString + "\"! Check camera and it`s transform names.");
+	}
+	string $camera_nodeType = `nodeType $tmpString`;
+	if(`gmatch $camera_nodeType "camera"`)
+	{
+		$currentCameraShape  = $tmpString;
+		$tempArray = `listRelatives -f -p $currentCameraShape`;
+		$currentCamera = $tempArray[0];
+	}
+	else
+	{
+		$currentCamera = $tmpString;
+		$tempArray = `listRelatives -f -s $currentCamera`;
+		$currentCameraShape = $tempArray[0];
+	}
+	$camera_nodeType = `nodeType $currentCameraShape`;
+	string $transform_nodeType = `nodeType $currentCamera`;
+	if((`gmatch $camera_nodeType "camera"` == 0) || (`gmatch $transform_nodeType "transform"` == 0))
+	{
+		cgruWarning ("Cannot find camera in " + $currentPanel);
+		clear $tempArray;
+		return $tempArray;
+	}
+	clear $tempArray;
+	$tempArray[0] = $currentCamera;
+	$tempArray[1] = $currentCameraShape;
+	return $tempArray;
+}
+
+global proc timaLockCam_globalProc()
+{
+	string $camera;
+	{
+		string $panelName = `getPanel -wf`;
+		if(`gmatch $panelName "modelPanel*"`)
+			$camera = `modelPanel -q -cam $panelName`;
+	}
+	if( $camera == "")
+	{
+		cgruWarning("can`t find camera");
+		return;
+	}
+	int $state = 1;
+	if(`getAttr -l ($camera + ".tx")`) $state = 0;
+	setAttr -l $state ($camera + ".tx");
+	setAttr -l $state ($camera + ".ty");
+	setAttr -l $state ($camera + ".tz");
+	setAttr -l $state ($camera + ".rx");
+	setAttr -l $state ($camera + ".ry");
+	setAttr -l $state ($camera + ".rz");
+	if($state)
+		cgruInfo("Camera - " + $camera + " - locked");
+	else
+		cgruInfo("Camera - " + $camera + " - unlocked");
+}
+
+global proc timaCamerasMMP()
+{
+	string $tempArray[] = timaGetCurrentCamera_globalProc();
+	string $currentCamera = $tempArray[0];
+	string $currentCameraShape = $tempArray[1];
+	if (`popupMenu -exists tempMM`) { deleteUI tempMM; }
+	popupMenu -button 1 -ctl false -alt true -allowOptionBoxes true -parent viewPanes -mm 1 tempMM;
+		int $lock = `getAttr -l ($currentCamera + ".tx")`;
+		if($lock)
+			menuItem -rp "N" -l ("unlock " + $currentCamera) -ecr 0 -c "timaLockCam_globalProc()";
+		else
+			menuItem -rp "N" -l ("lock " + $currentCamera) -ecr 0 -c "timaLockCam_globalProc()";
+		
+		menuItem -rp "NE" -l ("select " + $currentCamera) -ecr 0 -c ("select -r " + $currentCamera);
+		
+		menuItem -rp "E" -l "Film Fit" -ecr 0 -sm 1;
+			radioMenuItemCollection;
+			int $filmFit = `getAttr ($currentCamera + ".filmFit")`;
+
+			if($filmFit == 0) menuItem -l "currnet - Fill" -ecr 0 -radioButton 1 -en 0;
+			else menuItem -l "Fill" -ecr 0 -radioButton 0 -c ("setAttr " + $currentCameraShape + ".filmFit" + " 0");
+
+			if($filmFit == 1) menuItem -l "currnet - Horizontal" -ecr 0 -radioButton 1 -en 0;
+			else menuItem -l "Horizontal" -ecr 0 -radioButton 0 -c ("setAttr " + $currentCameraShape + ".filmFit" + " 1");
+
+			if($filmFit == 2) menuItem -l "currnet - Vertical" -ecr 0 -radioButton 1 -en 0;
+			else menuItem -l "Vertical" -ecr 0 -radioButton 0 -c ("setAttr " + $currentCameraShape + ".filmFit" + " 2");
+
+			if($filmFit == 3) menuItem -l "currnet - Overscan" -ecr 0 -radioButton 1 -en 0;
+			else menuItem -l "Overscan" -ecr 0 -radioButton 0 -c ("setAttr " + $currentCameraShape + ".filmFit" + " 3");
+			
+			menuItem -divider 1;
+
+			menuItem -l ("current Overcsan is " + `getAttr ($currentCamera + ".overscan")`) -en 0;
+			menuItem -l "set Overcsan to 1.0" -ecr 0 -c ("setAttr " + $currentCameraShape + ".overscan" + " 1.0");
+			menuItem -l "set Overcsan to 1.2" -ecr 0 -c ("setAttr " + $currentCameraShape + ".overscan" + " 1.2");
+			menuItem -l "set Overcsan to 1.4" -ecr 0 -c ("setAttr " + $currentCameraShape + ".overscan" + " 1.4");
+			menuItem -l "set Overcsan to 2.0" -ecr 0 -c ("setAttr " + $currentCameraShape + ".overscan" + " 2.0");
+
+		setParent -m ..;
+		
+		menuItem -rp "SE" -l "Camera Tools" -ecr 0 -sm 1;
+			menuItem -l "Camera Zoom&Pan" -ecr 0 -c "cgruSourceFile(\"miscellaneous/tima_camzoompanmouse.mel\");";
+			menuItem -l "Zoom Tool" -ecr 0 -c "ZoomTool";
+			menuItem -l "Roll Tool" -ecr 0
+				-c "setToolTo `rollCtx -alternateContext 0 -toolName \"Roll Tool\" -rollScale 1`";
+			menuItem -l "Azimuth Elevation Tool" -ecr 0
+				-c "setToolTo `orbitCtx -alternateContext 0 -toolName \"Azimuth Elevation Tool\" -orbitScale 1 -localOrbit 1`";
+			menuItem -l "Yaw-Pitch Tool" -ecr 0
+				-c "setToolTo `orbitCtx -alternateContext 0 -toolName \"Yaw-Pitch Tool\" -orbitScale 1 -localOrbit 0`";
+		setParent -m ..;
+		
+		menuItem -rp "S" -l ($currentCamera + " attributes") -ecr 0 -c ("showEditor " + $currentCamera);
+		
+		menuItem -rp "SW" -l "_presets.." -sm 1;
+			menuItem -l "far1000000_near1" -ecr 0 -c ("setAttr " + $currentCameraShape + ".nearClipPlane 1; setAttr " + $currentCameraShape + ".farClipPlane 1000000;");
+			menuItem -l "far1000000_near1_f100" -ecr 0 -c ("setAttr " + $currentCameraShape + ".nearClipPlane 1; setAttr " + $currentCameraShape + ".farClipPlane 1000000; setAttr " + $currentCameraShape + ".focalLength 100;");
+			menuItem -l "1.417_.854_1.66" -ecr 0 -c ("setAttr " + $currentCameraShape + ".hfa 1.417; setAttr " + $currentCameraShape + ".vfa .854;");
+		setParent -m ..;
+		
+		menuItem -rp "W" -l "display options" -ecr 0 -sm 1;
+			int $state;
+
+			$state = `getAttr ($currentCameraShape + ".displayFilmGate")`;
+			if($state)	menuItem -l "hide FilmGate" -c ("setAttr " + $currentCameraShape + ".displayFilmGate" + " 0");
+			else		menuItem -l "show FilmGate" -c ("setAttr " + $currentCameraShape + ".displayFilmGate" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".displayResolution")`;
+			if($state)	menuItem -l "hide Resolution" -c ("setAttr " + $currentCameraShape + ".displayResolution" + " 0");
+			else		menuItem -l "show Resolution" -c ("setAttr " + $currentCameraShape + ".displayResolution" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".displayFieldChart")`;
+			if($state)	menuItem -l "hide FieldChart" -c ("setAttr " + $currentCameraShape + ".displayFieldChart" + " 0");
+			else		menuItem -l "show FieldChart" -c ("setAttr " + $currentCameraShape + ".displayFieldChart" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".displaySafeAction")`;
+			if($state)	menuItem -l "hide SafeAction" -c ("setAttr " + $currentCameraShape + ".displaySafeAction" + " 0");
+			else		menuItem -l "show SafeAction" -c ("setAttr " + $currentCameraShape + ".displaySafeAction" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".displaySafeTitle")`;
+			if($state)	menuItem -l "hide SafeTitle" -c ("setAttr " + $currentCameraShape + ".displaySafeTitle" + " 0");
+			else		menuItem -l "show SafeTitle" -c ("setAttr " + $currentCameraShape + ".displaySafeTitle" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".displayFilmPivot")`;
+			if($state)	menuItem -l "hide FilmPivot" -c ("setAttr " + $currentCameraShape + ".displayFilmPivot" + " 0");
+			else		menuItem -l "show FilmPivot" -c ("setAttr " + $currentCameraShape + ".displayFilmPivot" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".displayFilmOrigin")`;
+			if($state)	menuItem -l "hide FilmOrigin" -c ("setAttr " + $currentCameraShape + ".displayFilmOrigin" + " 0");
+			else		menuItem -l "show FilmOrigin" -c ("setAttr " + $currentCameraShape + ".displayFilmOrigin" + " 1");
+
+			$state = `getAttr ($currentCameraShape + ".journalCommand")`;
+			if($state)	menuItem -l "hide journalCommand" -c ("setAttr " + $currentCameraShape + ".journalCommand" + " 0");
+			else		menuItem -l "show journalCommand" -c ("setAttr " + $currentCameraShape + ".journalCommand" + " 1");
+
+		setParent -m ..;
+		
+		menuItem -rp "NW" -l "key transform" -ecr 0 -c (" setKeyframe " + $currentCamera + ".ry; setKeyframe " + $currentCamera + ".rx; setKeyframe " + $currentCamera + ".rz; setKeyframe " + $currentCamera + ".tx; setKeyframe " + $currentCamera + ".ty; setKeyframe " + $currentCamera + ".tz; ");
+		string $camerasArray[] = `ls -cameras`;
+		string $camera;
+		for($camera in $camerasArray)
+			menuItem -l `substitute "Shape" $camera ""` -ecr false -c ("{string $panelName = `getPanel -wf`;if(`gmatch $panelName \"modelPanel*\"`) modelPanel -e -cam " + $camera + " $panelName;}");
+	setParent -m ..;
+}
+
+global proc timaCamerasMMR()
+{
+	if( `popupMenu -exists tempMM` ) deleteUI tempMM;
+}

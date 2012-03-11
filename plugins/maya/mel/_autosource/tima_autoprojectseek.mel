@@ -1,0 +1,64 @@
+//
+//		tima_AutoProjectSeek.mel
+//
+//#########################################################################
+
+if(`optionVar -exists "tima_AutoProjectSeek_Enable"` == 0) optionVar -iv "tima_AutoProjectSeek_Enable" 1;
+
+global proc tima_AutoProjectSeek_checkBox_Command()
+{
+	if (`optionVar -q "tima_AutoProjectSeek_Enable"`)
+	{
+		optionVar -iv "tima_AutoProjectSeek_Enable" 0;
+		cgruInfo("AutoProjectSeek disabled");
+	}
+	else
+	{
+		optionVar -iv "tima_AutoProjectSeek_Enable" 1;
+		cgruInfo("AutoProjectSeek enabled");
+	}
+}
+
+global proc tima_AutoProjectSeek_Proc(string $saveChangeAction)
+{
+	if(`optionVar -q "tima_AutoProjectSeek_Enable"` == 0) return;
+
+	string $fullPath;
+	if(`gmatch $saveChangeAction "*mayaAscii*"`)
+		$fullPath = `substitute "\.ma\";.*" $saveChangeAction ""`;
+	if(`gmatch $saveChangeAction "*mayaBinary*"`)
+		$fullPath = `substitute "\.mb\";.*" $saveChangeAction ""`;
+	$fullPath = `substitute ".*\"" $fullPath ""`;
+
+	
+	string $fullFileName = $fullPath;
+//print("\n $fullFileName = " + $fullFileName);
+	while(1)
+	{
+		if(`gmatch $fullPath "*/*"` == 0)
+		{
+			cgruWarning("No worksapce found !");
+			return;
+		}
+		string $oldPath = $fullPath;
+		$fullPath = `match ".*/" $fullPath`;
+//print("\n $fullPath = " + $fullPath);
+		if(`gmatch $oldPath $fullPath`)
+		{
+			cgruWarning("No worksapce found !");
+			return;
+		}
+		int $i = `size $fullPath` - 1;
+		$fullPath = `substring $fullPath 1 $i`;
+		if(`filetest -r ($fullPath + "/workspace.mel")`)
+		{
+			workspace -o $fullPath;
+			cgruInfo("New workspace found - " + $fullPath);
+			break;
+		}
+	}
+}
+//	print("\n************************\n");
+
+if(`optionVar -q "tima_AutoProjectSeek_Enable"`)
+		cgruInfo("AutoProjectSeek enabled.");

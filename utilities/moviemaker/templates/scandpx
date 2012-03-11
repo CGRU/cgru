@@ -1,0 +1,19 @@
+-weight bold
+-stroke black -strokewidth 3
+-fill white -pointsize 15 -gravity northwest -annotate +10+10 "%%[dpx:television.time.code]"
+#-fill white -pointsize 15 -gravity northwest -annotate +10+30 "%%[dpx:file.filename]"
+-fill white -pointsize 15 -gravity northwest -annotate +10+30 "%(FILEIN)s"
+-fill white -pointsize 15 -gravity northwest -annotate +10+50 "%%[dpx:file.timestamp]"
+-fill white -pointsize 15 -gravity northeast -annotate +10+10 "%%[dpx:file.project]"
+-fill white -pointsize 15 -gravity northeast -annotate +10+30 "%(DATETIME)s"
+-fill white -pointsize 15 -gravity southwest -annotate +10+10 "%(MOVIENAME)s"
+-fill white -pointsize 15 -gravity southeast -annotate +10+10 "%%[dpx:orientation.device] %%[dpx:film.type] %%[dpx:film.prefix] %%[dpx:film.count] %%[dpx:film.offset]"
+-stroke none
+-fill white -pointsize 15 -gravity northwest -annotate +10+10 "%%[dpx:television.time.code]"
+#-fill white -pointsize 15 -gravity northwest -annotate +10+30 "%%[dpx:file.filename]"
+-fill white -pointsize 15 -gravity northwest -annotate +10+30 "%(FILEIN)s"
+-fill white -pointsize 15 -gravity northwest -annotate +10+50 "%%[dpx:file.timestamp]"
+-fill white -pointsize 15 -gravity northeast -annotate +10+10 "%%[dpx:file.project]"
+-fill white -pointsize 15 -gravity northeast -annotate +10+30 "%(DATETIME)s"
+-fill white -pointsize 15 -gravity southwest -annotate +10+10 "%(MOVIENAME)s"
+-fill white -pointsize 15 -gravity southeast -annotate +10+10 "%%[dpx:orientation.device] %%[dpx:film.type] %%[dpx:film.prefix] %%[dpx:film.count] %%[dpx:film.offset]"

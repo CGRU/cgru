@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "Afanasy common pre remove, exiting Afanasy applications:"
+
+# Quit applications:
+for p in afcmd afwatch aftalk afmonitor; do pkill $p || true; done
+
+exit 0

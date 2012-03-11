@@ -1,0 +1,22 @@
+
+print("\n");
+cgruInfo("   ****** Remove Mtor Subdiv Attributes.mel  ******");
+{
+	string $selArray[] = `ls -sl -l -dag -ni -type "mesh"`;
+	string $mesh;
+	for ($mesh in $selArray)
+	{
+		print("shape - " + $mesh);
+		if (`attributeExists mtorSubdiv $mesh`)
+			eval ("deleteAttr -at mtorSubdiv " + $mesh);
+		if (`attributeExists mtorSubdivExtrap $mesh`)
+			eval ("deleteAttr -at mtorSubdivExtrap " + $mesh);
+		if (`attributeExists mtorSubdivInterp $mesh`)
+			eval ("deleteAttr -at mtorSubdivInterp " + $mesh);
+		if (`attributeExists mtorSubdivIgnoreEdges $mesh`)
+			eval ("deleteAttr -at mtorSubdivIgnoreEdges " + $mesh);
+		print(" - mtor subdiv attributes successfully removed\n");
+	}
+}
+print("\n");
+cgruInfo("Remove Mtor Subdiv Attributes executed - see script editor for details");

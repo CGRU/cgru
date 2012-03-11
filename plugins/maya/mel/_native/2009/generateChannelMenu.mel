@@ -1,0 +1,196 @@
+// Copyright (C) 1997-2006 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+global proc enableDisableChannelMenu( string $parent )
+//
+// Enables or disables menu items in the channelBox
+// menus, based on whether channels are selected or
+// not.
+{
+	int $channelsSelected = `selectedChannels`;
+
+	menuItem -e -enable $channelsSelected ( $parent + "|keyItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|breakdownItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|muteItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|unmuteItem" );		
+	menuItem -e -enable $channelsSelected ( $parent + "|copyItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|cutItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|pasteItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|deleteItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|duplicateAttrValueItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|lockItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|unlockItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|unkeyableItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|lockUnkeyableItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|unkeyableDisplayedItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|keyableItem" );
+
+	menuItem -e -enable $channelsSelected ( $parent + "|breakItem" );
+	menuItem -e -enable $channelsSelected ( $parent + "|selectConnectionItem" );	
+
+}
+
+global proc generateChannelMenu( string $parent, int $popupMenu )
+//
+// Generates the menu on both the menubar and on
+// the RMB, when the user asks for either of these.
+//
+{
+	setParent -m $parent;
+
+	if( 0 != `menu -q -ni $parent` ) {
+		//
+		// The menu already exists - just set the
+		// enable/disable state for
+		// each of the menuItems that operation on
+		// selected channels.
+		//
+		enableDisableChannelMenu $parent;
+
+	} else {
+		//
+		// The menu doesn't exist yet - build it
+		//
+		if( $popupMenu ) {
+			//
+			//	A popup menu is being generated - attach
+			//	a label to the top of the popup
+			//
+			menuItem -label (uiRes("m_generateChannelMenu.kChannels"));
+			menuItem -d true;
+			menuItem -d true;
+		}
+		menuItem -label (uiRes("m_generateChannelMenu.kKeySelected")) -c "channelBoxCommand -key" keyItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kKeyAll")) -c "channelBoxCommand -keyall" keyAllItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kBreakDownSelected")) -c "channelBoxCommand -breakdown" breakdownItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kBreakDownAll")) -c "channelBoxCommand -breakdownall" breakdownAllItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kMuteSelected")) -c "channelBoxCommand -mute" muteItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kMuteAll")) -c "channelBoxCommand -muteall" muteAllItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kUnmuteSelected")) -c "channelBoxCommand -unmute" unmuteItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kUnmuteAll")) -c "channelBoxCommand -unmuteall" unmuteAllItem;
+
+		menuItem -divider true;
+
+		menuItem -label (uiRes("m_generateChannelMenu.kCutSelected")) -c "channelBoxCommand -cut" cutItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kCopySelected")) -c "channelBoxCommand -copy" copyItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kPasteSelected")) -c "channelBoxCommand -paste" pasteItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kDeleteSelected")) -c "channelBoxCommand -delete" deleteItem;
+
+		menuItem -d true;
+		
+		menuItem -label (uiRes("m_generateChannelMenu.kDuplicateValues")) -c "copyAttrValues" duplicateAttrValueItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kFreeze")) -subMenu true;
+			menuItem -label (uiRes("m_generateChannelMenu.kTranslate")) -c "channelBoxCommand -freezeTranslate" freezeTranslateItem;
+			menuItem -label (uiRes("m_generateChannelMenu.kRotate")) -c "channelBoxCommand -freezeRotate" freezeRotateItem;
+			menuItem -label (uiRes("m_generateChannelMenu.kScale")) -c "channelBoxCommand -freezeScale" freezeScaleItem;
+			menuItem -label (uiRes("m_generateChannelMenu.kAll")) -c "channelBoxCommand -freezeAll" freezeAllItem;
+		setParent -m ..;
+		
+		menuItem -d true;
+
+		menuItem -label (uiRes("m_generateChannelMenu.kBreakConnections")) -c "channelBoxCommand -break" breakItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kSelectConnection")) -c "channelBoxCommand -selectConnection" selectConnectionItem;
+
+		menuItem -d true;
+
+
+//BEGIN CGRU #################################################################################################
+      menuItem -d 1;
+      menuItem -l "Select" -c "channelBoxCommand -select";
+      menuItem -divider true; 
+      menuItem -l "Randomize..." -c "cgruSourceFile(\"miscellaneous/tima_randchannels.mel\");";
+      menuItem -divider true; 
+      menuItem -l "gamma_2.2" -c "channelBoxCommand -gamma22" gammaItem22;
+      menuItem -l "gamma_0.4545" -c "channelBoxCommand -gamma45" gammaItem45;
+      menuItem -divider 1; 
+      menuItem -l "Add to the character.." -c "channelBoxCommand -addcharacter" addCharItem;
+      menuItem -l "Remove from the character.." -c "channelBoxCommand -removecharacter" rmCharItem;
+      menuItem -divider 1; 
+      menuItem -label "Alias Attribute" -command "channelBoxCommand -aliasAttributes" aliasAttrItem;
+      menuItem -d 1;
+      menuItem -d 1;
+//END CGRU #################################################################################################
+
+
+
+		menuItem -label (uiRes("m_generateChannelMenu.kLockSelected")) -c "channelBoxCommand -lock" lockItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kUnlockSelected")) -c "channelBoxCommand -unlock" unlockItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kHideSelected")) -c "channelBoxCommand -unkeyable" unkeyableItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kLockHideSelected")) -c "channelBoxCommand -lockUnkeyable" lockUnkeyableItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kMakeSelectedNonkeyable")) -c "channelBoxCommand -unkeyableDisplayed" unkeyableDisplayedItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kMakeSelectedKeyable")) -c "channelBoxCommand -keyable" keyableItem;		
+		
+		menuItem -d true;
+		
+		menuItem -label (uiRes("m_generateChannelMenu.kAddToSelectedLayers")) -c "channelBoxCommand -addToLayers" addToLayersItem;
+		menuItem -label (uiRes("m_generateChannelMenu.kRemoveFromSelectedLayers")) -c "channelBoxCommand -removeFromLayers" removeFromLayersItem;
+		
+		enableDisableChannelMenu $parent;
+	}
+}
+
+global proc buildChannelBoxOptionMenu( string $parent ) {
+//
+//	Builds the menu containing the options for various
+//	settings in the channel box.
+//
+	
+	setParent -m $parent;
+	menu -e -dai $parent;
+
+    radioMenuItemCollection;
+    menuItem -label (uiRes("m_generateChannelMenu.kSlow")) 
+		-radioButton (0.1 == `channelBox -q -speed mainChannelBox`)
+		-c "channelBoxSettings slow #1";
+	menuItem -label (uiRes("m_generateChannelMenu.kMedium")) 
+		-radioButton (1.0 == `channelBox -q -speed mainChannelBox`)
+		-c "channelBoxSettings medium #1";
+	menuItem -label (uiRes("m_generateChannelMenu.kFast")) 
+		-radioButton (10.0 == `channelBox -q -speed mainChannelBox`)
+		-c "channelBoxSettings fast #1";
+	menuItem -d true;
+	menuItem -label (uiRes("m_generateChannelMenu.kHyperbolic")) 
+		-checkBox `channelBox -q -hyperbolic mainChannelBox`
+		-c "channelBoxSettings hyperbolic #1";
+	menuItem -d true;
+	menuItem -label (uiRes("m_generateChannelMenu.kShowNamespace")) 
+		-checkBox `channelBox -q -showNamespace mainChannelBox`
+		-c "channelBoxSettings showNamespace #1";
+	menuItem -d true;
+
+	radioMenuItemCollection;
+	menuItem -label (uiRes("m_generateChannelMenu.kNoManips")) 
+		-radioButton ("none" == `channelBox -q -useManips mainChannelBox` )
+		-c "channelBoxSettings useManips 0";
+	menuItem -label (uiRes("m_generateChannelMenu.kInvisibleManips")) 
+		-radioButton ("invisible" == `channelBox -q -useManips mainChannelBox` )
+		-c "channelBoxSettings useManips 1";
+	menuItem -label (uiRes("m_generateChannelMenu.kStandardManips")) 
+		-radioButton ("standard" == `channelBox -q -useManips mainChannelBox` )
+		-c "channelBoxSettings useManips 2";
+	menuItem -d true;
+
+	menuItem -label (uiRes("m_generateChannelMenu.kChangePrecision"))
+		-command "channelBoxCommand -precision";
+
+	menuItem -label (uiRes("m_generateChannelMenu.kResetDefault")) 
+		-command "channelBoxCommand -reset";
+}

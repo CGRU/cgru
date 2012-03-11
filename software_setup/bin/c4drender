@@ -1,0 +1,5 @@
+#!/bin/bash
+
+source $CGRU_LOCATION/software_setup/setup_c4d.sh
+
+$CGRU_PYTHONEXE $C4D_RENDER_SCRIPT "$@"
