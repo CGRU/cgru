@@ -1,0 +1,13 @@
+//
+// Synopsis:
+//
+// menuItem -l "label" -ecr [boolean (enable command repeat)] -ann "annotation" -c "command"
+//
+
+   menuItem -l "AdvPlayblast..." -ecr 0 -c "cgruSourceFile(\"animation/tima_advplayblast.mel\");" -ann "Maya playblast with lots of HUD display settings.";
+   menuItem -l "AdvFrameCtrls..." -ecr 0 -c "cgruSourceFile(\"animation/tima_advframectrl.mel\");" -ann "to see subframe motion";
+   menuItem -l "Flatten DAG..." -ecr 0 -c "cgruSourceFile(\"animation/khar_flatdag.mel\");" -ann "Bake under parent.";
+   menuItem -divider true;
+   menuItem -l "HExport Transform (Camera)..." -ecr 0 -c "cgruSourceFile(\"animation/tima_hexportcam.mel\")" -ann "Export camera ( or transform only) to Houdini hscript file.";
+   menuItem -l "Houdini \"geo\" Reader" -ecr 0 -c "{string $r=`createNode tm_makeHgeo`;string $m=`createNode mesh`;connectAttr($r+\".outMesh\") ($m+\".inMesh\");}" -ann "Houdini \"*.$F4.geo\" sequence reader.";
+   menuItem -l "Export  \"obj\" Sequence..." -ecr 0 -c "cgruSourceFile(\"animation/zl_exportOBJ.mel\");zl_exportObjWin();" -ann "Write \"*.$F4.obj\" sequence.";

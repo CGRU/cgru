@@ -1,0 +1,80 @@
+
+if(`runTimeCommand -q -exists SelectNone_rtc`) runTimeCommand -e -delete SelectNone_rtc;
+runTimeCommand
+	-annotation "select none"
+	-category "_CGRU_misc_"
+	-command ("select -cl;")
+	SelectNone_rtc;
+nameCommand
+	-annotation "SelectNone_rtcNameCommand"
+	-command ("SelectNone_rtc")
+	SelectNone_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists HideSelectedObjects_rtc`) runTimeCommand -e -delete HideSelectedObjects_rtc;
+runTimeCommand
+	-annotation "Hide Selection: Hide the selected object(s)"
+	-category "_CGRU_misc_"
+	-command ("hideKeepSelection `ls -sl`;")
+	HideSelectedObjects_rtc;
+nameCommand
+	-annotation "HideSelectedObjects_rtcNameCommand"
+	-command ("HideSelectedObjects_rtc")
+	HideSelectedObjects_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists ShowSelectedObjects_rtc`) runTimeCommand -e -delete ShowSelectedObjects_rtc;
+runTimeCommand
+	-annotation "Show Selection: Show all selected objects"
+	-category "_CGRU_misc_"
+	-command ("showHidden -a;")
+	ShowSelectedObjects_rtc;
+nameCommand
+	-annotation "ShowSelectedObjects_rtcNameCommand"
+	-command ("ShowSelectedObjects_rtc")
+	ShowSelectedObjects_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists TemplateObject_rtc`) runTimeCommand -e -delete TemplateObject_rtc;
+runTimeCommand
+	-annotation "Template: Make objects templated"
+	-category "_CGRU_misc_"
+	-command ("toggle -state on -template;")
+	TemplateObject_rtc;
+nameCommand
+	-annotation "TemplateObject_rtcNameCommand"
+	-command ("TemplateObject_rtc")
+	TemplateObject_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists UntemplateObject_rtc`) runTimeCommand -e -delete UntemplateObject_rtc;
+runTimeCommand
+	-annotation "Untemplate: Make objects untemplated"
+	-category "_CGRU_misc_"
+	-command ("toggle -state off -template;")
+	UntemplateObject_rtc;
+nameCommand
+	-annotation "UntemplateObject_rtcNameCommand"
+	-command ("UntemplateObject_rtc")
+	UntemplateObject_rtcNameCommand;
+
+if(`runTimeCommand -q -exists DuplicateMMpress_rtc`) runTimeCommand -e -delete DuplicateMMpress_rtc;
+runTimeCommand
+	-annotation "DuplicateMMpress"
+	-category "_CGRU_misc_"
+	-command ("tima_DuplicateMMP_globalProc")
+	DuplicateMMpress_rtc;
+nameCommand
+	-annotation "DuplicateMMpress_rtcNameCommand"
+	-command ("DuplicateMMpress_rtc")
+	DuplicateMMpress_rtcNameCommand;
+if(`runTimeCommand -q -exists DuplicateMMrelease_rtc`) runTimeCommand -e -delete DuplicateMMrelease_rtc;
+runTimeCommand
+	-annotation "DuplicateMMrelease"
+	-category "_CGRU_misc_"
+	-command ("tima_DuplicateMMR_globalProc")
+	DuplicateMMrelease_rtc;
+nameCommand
+	-annotation "DuplicateMMrelease_rtcNameCommand"
+	-command ("DuplicateMMrelease_rtc")
+	DuplicateMMrelease_rtcNameCommand;

@@ -1,0 +1,59 @@
+
+if(`runTimeCommand -q -exists IsolateSelect_rtc`) runTimeCommand -e -delete IsolateSelect_rtc;
+runTimeCommand
+	-annotation "view isolate selected"
+	-category "_CGRU_camv_"
+	-command ("{string $panel = `getPanel -wf`;if(`gmatch $panel \"modelPanel*\"`){if(`isolateSelect -q -state $panel`) isolateSelect -state 0 $panel; else	{isolateSelect -state 1 $panel;	isolateSelect -addSelected $panel;}}}")
+	IsolateSelect_rtc;
+nameCommand
+	-annotation "IsolateSelect_rtcNameCommand"
+	-command ("IsolateSelect_rtc")
+	IsolateSelect_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists CamerasMMpress_rtc`) runTimeCommand -e -delete CamerasMMpress_rtc;
+runTimeCommand
+	-annotation "CamerasMMpressress"
+	-category "_CGRU_camv_"
+	-command ("timaCamerasMMP")
+	CamerasMMpress_rtc;
+nameCommand
+	-annotation "CamerasMMpress_rtcNameCommand"
+	-command ("CamerasMMpress_rtc")
+	CamerasMMpress_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists CamerasMMrelease_rtc`) runTimeCommand -e -delete CamerasMMrelease_rtc;
+runTimeCommand
+	-annotation "CamerasMMrelease"
+	-category "_CGRU_camv_"
+	-command ("timaCamerasMMR")
+	CamerasMMrelease_rtc;
+nameCommand
+	-annotation "CamerasMMrelease_rtcNameCommand"
+	-command ("CamerasMMrelease_rtc")
+	CamerasMMrelease_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists DisplayShadedTexturedAllLighted_rtc`) runTimeCommand -e -delete DisplayShadedTexturedAllLighted_rtc;
+runTimeCommand
+	-annotation "display shooth shaded, textured, using all lighs"
+	-category "_CGRU_camv_"
+	-command ("{string $currentPanel = `getPanel -withFocus`;string $panelType = `getPanel -to $currentPanel`;if ($panelType ==  \"modelPanel\"){modelEditor -edit -da \"smoothShaded\" -displayTextures on	-dl \"all\" $currentPanel;}else if (`isTrue \"MayaCreatorExists\"` && `scriptedPanel -ex $currentPanel` && `scriptedPanel -q -type $currentPanel` == \"dynPaintScriptedPanelType\") {dynPaintEditor -e -dtx 1 -dsa \"smoothShaded\" -dsl \"default\" $gDynPaintEditorName;}}")
+	DisplayShadedTexturedAllLighted_rtc;
+nameCommand
+	-annotation "DisplayShadedTexturedAllLighted_rtcNameCommand"
+	-command ("DisplayShadedTexturedAllLighted_rtc")
+	DisplayShadedTexturedAllLighted_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists DisplayShadedTexturedNoLighted_rtc`) runTimeCommand -e -delete DisplayShadedTexturedNoLighted_rtc;
+runTimeCommand
+	-annotation "display shooth shaded, textured, using no lighs"
+	-category "_CGRU_camv_"
+	-command ("{string $currentPanel = `getPanel -withFocus`;string $panelType = `getPanel -to $currentPanel`;if ($panelType ==  \"modelPanel\"){modelEditor -edit -da \"smoothShaded\" -displayTextures on	-dl \"none\" $currentPanel;}else if (`isTrue \"MayaCreatorExists\"` && `scriptedPanel -ex $currentPanel` && `scriptedPanel -q -type $currentPanel` == \"dynPaintScriptedPanelType\") {dynPaintEditor -e -dtx 1 -dsa \"smoothShaded\" -dsl \"default\" $gDynPaintEditorName;}}")
+	DisplayShadedTexturedNoLighted_rtc;
+nameCommand
+	-annotation "DisplayShadedTexturedNoLighted_rtcNameCommand"
+	-command ("DisplayShadedTexturedNoLighted_rtc")
+	DisplayShadedTexturedNoLighted_rtcNameCommand;

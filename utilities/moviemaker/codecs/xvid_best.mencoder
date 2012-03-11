@@ -1,0 +1,2 @@
+XVID (best)
+mencoder mf://@INPUT@ -mf fps=@FPS@ -o "@OUTPUT@.@CONTAINER@" -ovc xvid -xvidencopts fixed_quant=1

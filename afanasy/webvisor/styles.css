@@ -1,0 +1,59 @@
+body {
+   background-color: #DFEDA2;
+   background-image:url('images/back.jpg');
+   color: #002000;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-size: 14px;
+   text-align: justify;
+}
+a:link {
+   color: #000060;
+}
+a:visited {
+   color: #000060;
+}
+a:hover {
+   color: #500000;
+}
+a:active {
+   color: #D00000;
+}
+
+.state_empty
+{
+}
+
+.state_error
+{
+ background-color: #FF7777;
+}
+
+.state_waitdep
+{
+ background-color: #BBAABB;
+}
+
+.state_waittime
+{
+ background-color: #AAAAFF;
+}
+
+.state_running
+{
+ background-color: #A5FF7F;
+}
+
+.state_done
+{
+ background-color: #779966;
+}
+
+.state_offline
+{
+ background-color: #808080;
+}
+
+.state_nimby
+{
+ background-color: #A0A0D0;
+}

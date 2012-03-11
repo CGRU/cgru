@@ -1,0 +1,1035 @@
+//
+//		tima_advplayblast.mel
+//
+//print("\n                                advanced playblast                                       \n");
+//#####################################################################################################
+
+global float $tima_AdvPlayblast_userBgc[];
+global string $tima_AdvPlayblast_ActivePanel;
+global string $tima_AdvPlayblast_ActiveCamera;
+global float $tima_AdvPlayblast_ActiveCamOverscan;
+global int $tima_AdvPlayblast_ShowObjTypes[];
+global int $tima_AdvPlayblast_HUDvisibilities[7];
+
+$tima_AdvPlayblast_userBgc = `displayRGBColor -q "background"`;
+
+if(`optionVar -exists "tima_AdvPlayblast_pbBgcR"` == 0) optionVar -fv "tima_AdvPlayblast_pbBgcR" $tima_AdvPlayblast_userBgc[0];
+if(`optionVar -exists "tima_AdvPlayblast_pbBgcG"` == 0) optionVar -fv "tima_AdvPlayblast_pbBgcG" $tima_AdvPlayblast_userBgc[1];
+if(`optionVar -exists "tima_AdvPlayblast_pbBgcB"` == 0) optionVar -fv "tima_AdvPlayblast_pbBgcB" $tima_AdvPlayblast_userBgc[2];
+
+if(`optionVar -exists "tima_AdvPlayblast_HUD_hide"` == 0) optionVar -iv "tima_AdvPlayblast_HUD_hide" 1;
+
+if(`optionVar -exists "tima_AdvPlayblast_PrNCBv"` == 0) optionVar -iv "tima_AdvPlayblast_PrNCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_ShtCBv"` == 0) optionVar -iv "tima_AdvPlayblast_ShtCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_CamCBv"` == 0) optionVar -iv "tima_AdvPlayblast_CamCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_CFVCBv"` == 0) optionVar -iv "tima_AdvPlayblast_CFVCBv" 0;
+if(`optionVar -exists "tima_AdvPlayblast_CFLCBv"` == 0) optionVar -iv "tima_AdvPlayblast_CFLCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_CFMCBv"` == 0) optionVar -iv "tima_AdvPlayblast_CFMCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_CRSCBv"` == 0) optionVar -iv "tima_AdvPlayblast_CRSCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_RNGCBv"` == 0) optionVar -iv "tima_AdvPlayblast_RNGCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_FPSCBv"` == 0) optionVar -iv "tima_AdvPlayblast_FPSCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_ScnCBv"` == 0) optionVar -iv "tima_AdvPlayblast_ScnCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_DATCBv"` == 0) optionVar -iv "tima_AdvPlayblast_DATCBv" 1;
+if(`optionVar -exists "tima_AdvPlayblast_UsrCBv"` == 0) optionVar -iv "tima_AdvPlayblast_UsrCBv" 1;
+
+if(`optionVar -exists "tima_AdvPlayblast_showCurrentFrame"` == 0) optionVar -iv "tima_AdvPlayblast_showCurrentFrame" 1;
+
+if(`optionVar -exists "tima_AdvPlayblast_hideObjectTypes"` == 0) optionVar -iva "tima_AdvPlayblast_hideObjectTypes" 1;
+
+if(`optionVar -exists "tima_AdvPlayblast_hideFieldNames"` == 0) optionVar -iv "tima_AdvPlayblast_hideFieldNames" 0;
+if(`optionVar -exists "tima_AdvPlayblast_compactDisplay"` == 0) optionVar -iv "tima_AdvPlayblast_compactDisplay" 0;
+
+if(`optionVar -exists "tima_AdvPlayblast_resetOverscan"` == 0) optionVar -iv "tima_AdvPlayblast_resetOverscan" 0;
+//#############################################		show current frame
+global proc tima_AdvPlayblast_showCurrentFrame_refresh()
+{
+	if(`window -exists tima_AdvPlayblastWnd` == 0) return;
+	headsUpDisplay -rp 6 0;
+	headsUpDisplay	-section          6
+			-block            0
+			-allowOverlap     1
+			-blockSize        "small"
+			-label            "frame:"
+			-labelFontSize    "small"
+			-event            timeChanged
+			-command          "currentTime -q"
+		tima_AdvPlayblast_HUDf;
+}
+global proc tima_AdvPlayblast_showCurrentFrame_create_expression()
+{
+	string $tima_AdvPlayblast_expressions[] = `ls -type expression "tima_AdvPlayblast_showCurrentFrame_refresh_expression*"`;
+	if(`size $tima_AdvPlayblast_expressions` != 0) return;
+
+	string $selArray[] = `ls -sl`;
+	string $hilArray[] = `ls -hl`;
+
+	createNode expression -name "tima_AdvPlayblast_showCurrentFrame_refresh_expression";
+	expression -e -s "tima_AdvPlayblast_showCurrentFrame_refresh"  -o "" -ae 1 -uc all  tima_AdvPlayblast_showCurrentFrame_refresh_expression;
+
+	select -ne $selArray;
+	hilite $hilArray;
+}
+global proc tima_AdvPlayblast_showCurrentFrame_delete_expression()
+{
+	string $tima_AdvPlayblast_expressions[] = `ls -type expression "tima_AdvPlayblast_showCurrentFrame_refresh_expression*"`;
+	if(`size $tima_AdvPlayblast_expressions` != 0) delete $tima_AdvPlayblast_expressions;
+}
+global proc tima_AdvPlayblast_showCurrentFrame()
+{
+	if(`checkBox -q -v tima_AdvPlayblast_showCurrentFrameCB`)
+	{
+		tima_AdvPlayblast_showCurrentFrame_create_expression();
+		tima_AdvPlayblast_showCurrentFrame_refresh();
+		optionVar -iv "tima_AdvPlayblast_showCurrentFrame" 1;
+	}
+	else
+	{
+		headsUpDisplay -rp 6 0;
+		tima_AdvPlayblast_showCurrentFrame_delete_expression();
+		optionVar -iv "tima_AdvPlayblast_showCurrentFrame" 0;
+	}
+}
+//#############################################
+global proc tima_AdvPlayblast_hideHUDs()
+{
+	global int $tima_AdvPlayblast_HUDvisibilities[7];
+
+	$tima_AdvPlayblast_HUDvisibilities[0] = `optionVar -q "polyCountVisibility"`;
+	$tima_AdvPlayblast_HUDvisibilities[1] = `optionVar -q "objectDetailsVisibility"`;
+	$tima_AdvPlayblast_HUDvisibilities[2] = `optionVar -q "viewAxisVisibility"`;
+	$tima_AdvPlayblast_HUDvisibilities[3] = `optionVar -q "cameraNamesVisibility"`;
+	$tima_AdvPlayblast_HUDvisibilities[4] = `optionVar -q "animationDetailsVisibility"`;
+	$tima_AdvPlayblast_HUDvisibilities[5] = `optionVar -q "frameRateVisibility"`;
+	$tima_AdvPlayblast_HUDvisibilities[6] = `toggleAxis -q -o`;
+	$tima_AdvPlayblast_HUDvisibilities[7] = `optionVar -q "subdDetailsVisibility"`;
+
+	if($tima_AdvPlayblast_HUDvisibilities[0]) setPolyCountVisibility(0);
+	if($tima_AdvPlayblast_HUDvisibilities[1]) ToggleObjectDetails();
+	if($tima_AdvPlayblast_HUDvisibilities[2]) ToggleViewAxis;
+	if($tima_AdvPlayblast_HUDvisibilities[3]) ToggleCameraNames;
+	if($tima_AdvPlayblast_HUDvisibilities[4]) ToggleAnimationDetails;
+	if($tima_AdvPlayblast_HUDvisibilities[5]) ToggleFrameRate;
+	if($tima_AdvPlayblast_HUDvisibilities[6]) ToggleOriginAxis;
+	if($tima_AdvPlayblast_HUDvisibilities[7]) ToggleSubdDetails;
+}
+
+global proc tima_AdvPlayblast_showHUDs()
+{
+	global int $tima_AdvPlayblast_HUDvisibilities[7];
+
+	if($tima_AdvPlayblast_HUDvisibilities[0]) setPolyCountVisibility(1);
+	if($tima_AdvPlayblast_HUDvisibilities[1]) ToggleObjectDetails();
+	if($tima_AdvPlayblast_HUDvisibilities[2]) ToggleViewAxis;
+	if($tima_AdvPlayblast_HUDvisibilities[3]) ToggleCameraNames;
+	if($tima_AdvPlayblast_HUDvisibilities[4]) ToggleAnimationDetails;
+	if($tima_AdvPlayblast_HUDvisibilities[5]) ToggleFrameRate;
+	if($tima_AdvPlayblast_HUDvisibilities[6]) ToggleOriginAxis;
+	if($tima_AdvPlayblast_HUDvisibilities[7]) ToggleSubdDetails;
+}
+
+global proc tima_AdvPlayblastShowText()
+{
+	if(`window -exists tima_AdvPlayblastWnd` == 0) return;
+	int $hideFN = `menuItem -q -checkBox tima_AdvPlayblast_hideFieldNamesCB`;
+	int $compDis = `menuItem -q -checkBox tima_AdvPlayblast_compactDisplayCB`;
+	optionVar -iv "tima_AdvPlayblast_hideFieldNames" $hideFN;
+	optionVar -iv "tima_AdvPlayblast_compactDisplay" $compDis;
+
+	string $topString;
+	string $botString;
+
+	if(`checkBox -q -v tima_AdvPlayblast_PrNCB`)
+	{
+		if($hideFN) $topString = $topString + " ";
+		else $topString = $topString + " PRJ: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_PrjTF`;
+		optionVar -iv "tima_AdvPlayblast_PrNCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_PrNCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_ShtCB`)
+	{
+		if($hideFN) $topString = $topString + " ";
+		else $topString = $topString + " SHOT: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_ShtTF`;
+		optionVar -iv "tima_AdvPlayblast_ShtCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_ShtCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_CamCB`)
+	{
+		if($hideFN) $topString = $topString + " ";
+		else $topString = $topString + " CAM: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_CamTF`;
+		optionVar -iv "tima_AdvPlayblast_CamCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_CamCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_CFVCB`)
+	{
+		$topString = $topString + " FOV: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_CFVTF`;
+		optionVar -iv "tima_AdvPlayblast_CFVCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_CFVCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_CFLCB`)
+	{
+		$topString = $topString + " FL: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_CFLTF`;
+		optionVar -iv "tima_AdvPlayblast_CFLCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_CFLCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_CFMCB`)
+	{
+		$topString = $topString + " Film: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_CFMTF`;
+		optionVar -iv "tima_AdvPlayblast_CFMCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_CFMCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_CRSCB`)
+	{
+		$topString = $topString + " Res: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_CRSTF`;
+		optionVar -iv "tima_AdvPlayblast_CRSCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_CRSCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_RNGCB`)
+	{
+		$topString = $topString + " Range: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_RNGTF`;
+		optionVar -iv "tima_AdvPlayblast_RNGCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_RNGCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_FPSCB`)
+	{
+		$topString = $topString + " FPS: ";
+		$topString = $topString + `textField -q -tx tima_AdvPlayblast_FPSTF`;
+		optionVar -iv "tima_AdvPlayblast_FPSCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_FPSCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_ScnCB`)
+	{
+		if($hideFN) $botString = $botString + " ";
+		else $botString = $botString + " SCENE: ";
+		$botString = $botString + `textField -q -tx tima_AdvPlayblast_ScnTF`;
+		optionVar -iv "tima_AdvPlayblast_ScnCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_ScnCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_DATCB`)
+	{
+		if($hideFN) $botString = $botString + " ";
+		else $botString = $botString + " Date: ";
+		$botString = $botString + `textField -q -tx tima_AdvPlayblast_DATTF`;
+		optionVar -iv "tima_AdvPlayblast_DATCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_DATCBv" 0;
+
+	if(`checkBox -q -v tima_AdvPlayblast_UsrCB`)
+	{
+		if($hideFN) $botString = $botString + " ";
+		else $botString = $botString + " User: ";
+		$botString = $botString + `textField -q -tx tima_AdvPlayblast_UsrTF`;
+		optionVar -iv "tima_AdvPlayblast_UsrCBv" 1;
+	}
+	else optionVar -iv "tima_AdvPlayblast_UsrCBv" 0;
+
+	headsUpDisplay -rp 2 0;
+	headsUpDisplay -rp 8 0;
+
+	if($compDis)
+	{
+		$topString = $topString + $botString;
+		headsUpDisplay	-section          2
+				-block            0
+				-allowOverlap     1
+				-blockSize        "small"
+				-label            $topString
+				-labelFontSize    "small"
+			tima_AdvPlayblast_HUD0;
+	}
+	else
+	{
+		headsUpDisplay	-section          2
+				-block            0
+				-allowOverlap     1
+				-blockSize        "small"
+				-label            $topString
+				-labelFontSize    "small"
+			tima_AdvPlayblast_HUDt;
+		headsUpDisplay	-section          8
+				-block            0
+				-allowOverlap     1
+				-blockSize        "small"
+				-label            $botString
+				-labelFontSize    "small"
+			tima_AdvPlayblast_HUDb;
+	}
+}
+
+global proc tima_AdvPlayblastShowWnd()
+{
+	global string $tima_AdvPlayblast_ActivePanel;
+	global string $tima_AdvPlayblast_ActiveCamera;
+
+	$tima_AdvPlayblast_ActivePanel = `getPanel -wf`;
+	string $str = `objectTypeUI $tima_AdvPlayblast_ActivePanel`;
+	if (`gmatch $str "*model*"`)
+	{
+		print("\n");
+		print("///### AdvPlayblast: Active Panel = " + $tima_AdvPlayblast_ActivePanel + "\n");
+		print("///### AdvPlayblast: Active Camera = " + $tima_AdvPlayblast_ActiveCamera + "\n");
+	}
+	else
+	{
+		warning("///### AdvPlayblast: No Active Panel Found !");
+		return;
+	}
+	if(`window -exists tima_AdvPlayblastWnd`) return;
+	window -title "Advanced Playblast" tima_AdvPlayblastWnd;
+	columnLayout -adj 1;
+	int $cw1 = 40;
+	int $cw2 = 165;
+	int $cw3 = 150;
+	int $cw4 = 35;
+	int $cw5 = 100;
+
+	separator -style "in";
+	rowLayout -nc 4 -cw4 150 150 150 150;
+
+	// Heads Up Display 
+	//
+		checkBox -l "     Hide Heads Up Display "
+			-v `optionVar -q "tima_AdvPlayblast_HUD_hide"`
+			-onc "tima_AdvPlayblast_hideHUDs(); optionVar -iv \"tima_AdvPlayblast_HUD_hide\" 1;"
+			-ofc "tima_AdvPlayblast_showHUDs(); optionVar -iv \"tima_AdvPlayblast_HUD_hide\" 0;"
+			tima_AdvPlayblast_HUDCB;
+
+	// Object Types Display
+	//
+		text -l " Hide Object Types -> ";
+			string $hideObjectTypes_types[] = {
+					"nurbsCurves",
+					"nurbsSurfaces",
+					"polymeshes",
+					"subdivSurfaces",
+					"planes",
+					"lights",
+					"cameras",
+					"controlVertices",
+					"grid",
+					"hulls",
+					"joints",
+					"ikHandles",
+					"deformers",
+					"dynamics",
+					"fluids",
+					"locators",
+					"dimensions",
+					"handles",
+					"pivots",
+					"textures",
+					"strokes" };
+			int $i;
+			int $hideObjectTypes[] = `optionVar -q "tima_AdvPlayblast_hideObjectTypes"`;
+			int $l = `size($hideObjectTypes_types)`;
+			if(`size($hideObjectTypes)` != $l)
+			{
+				clear $hideObjectTypes;
+				optionVar -clearArray "tima_AdvPlayblast_hideObjectTypes";
+				for( $i = 0; $i < $l; $i++)
+				{
+					optionVar -iva "tima_AdvPlayblast_hideObjectTypes" 0;
+					$hideObjectTypes[$i] = 0;
+				}
+			}
+			popupMenu -button 1 tima_AdvPlayblast_hideObjectTypes_popupMenu;
+			menuItem -l " show all " -c "tima_AdvPlayblast_hideObjectTypes_proc(0)";
+			menuItem -l " hide all " -c "tima_AdvPlayblast_hideObjectTypes_proc(1)";
+			menuItem -divider 1;
+			for( $i = 0; $i < $l; $i++)
+			{
+				menuItem -l $hideObjectTypes_types[$i] -checkBox $hideObjectTypes[$i]
+							-c "tima_AdvPlayblast_hideObjectTypes_proc(2)";
+			}
+
+	// Text Display Options
+	//
+		text -l " Text Display Options -> ";
+			popupMenu -button 1;
+				menuItem -l "hide field names" -checkBox `optionVar -q "tima_AdvPlayblast_hideFieldNames"`
+					-c "tima_AdvPlayblastShowText()" tima_AdvPlayblast_hideFieldNamesCB;
+				menuItem -l "compact display" -checkBox `optionVar -q "tima_AdvPlayblast_compactDisplay"`
+					-c "tima_AdvPlayblastShowText()" tima_AdvPlayblast_compactDisplayCB;
+	// Camera Options
+	//
+		text -l " Camera Options -> ";
+			popupMenu -button 1;
+				menuItem -l "Reset Overscan" -checkBox `optionVar -q "tima_AdvPlayblast_resetOverscan"`
+					-c "tima_AdvPlayblastCamProc(1)" tima_AdvPlayblast_resetOverscanCB;
+	setParent ..;
+	separator -style "in";
+	float $pbBgcR = `optionVar -q "tima_AdvPlayblast_pbBgcR"`;
+	float $pbBgcG = `optionVar -q "tima_AdvPlayblast_pbBgcG"`;
+	float $pbBgcB = `optionVar -q "tima_AdvPlayblast_pbBgcB"`;
+	columnLayout -adj 1;
+		rowLayout -nc 4 -cw4 ($cw2+$cw3) $cw4 $cw5 30 -adj 1;
+			frameLayout -lv 0;
+				colorSliderGrp -label " Background color " -rgb $pbBgcR $pbBgcG $pbBgcB -cw 1 100 -adj 3 -cc "tima_AdvPlayblast_BgCcc()" tima_AdvPlayblast_BgCSG;
+			setParent.. ;
+			text -l "";
+			checkBox -l "frame number" -v `optionVar -q "tima_AdvPlayblast_showCurrentFrame"` -cc "tima_AdvPlayblast_showCurrentFrame()" tima_AdvPlayblast_showCurrentFrameCB;
+			button -l "help" -bgc .9 .9 .6
+				-c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/animation_/tima_advplayblast.html\")`;";
+		setParent.. ;
+	setParent.. ;
+	
+	separator -style "in";
+
+	// Title
+	//
+	rowLayout -nc 5 -cw5 $cw1 $cw2 $cw3 $cw4 $cw5 -adj 5;
+		text -l "show";
+		text -l "Field Name    " -fn "boldLabelFont";
+		text -l "auto  " -fn "boldLabelFont";
+		text -l " more";
+		text -l "      custom   " -fn "boldLabelFont";
+	setParent ..;
+
+	// Project Name
+	//
+	string $projectName = `workspace -q -o`;
+	$projectName = `substitute ".*/" $projectName ""`;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Project - " -v `optionVar -q "tima_AdvPlayblast_PrNCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_PrNCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $projectName;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $projectName -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_PrjTF;
+	setParent ..;
+
+	// Shot Name
+	//
+	string $shotName = `file -q -sceneName`;
+	$shotName = `match ".*/" $shotName`;
+	int $l = `size($shotName)`;
+	if( $l > 1) $shotName = `substring $shotName 1 ($l - 1)`;
+	$shotName = `substitute ".*/" $shotName ""`;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Shot - " -v `optionVar -q "tima_AdvPlayblast_ShtCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_ShtCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $shotName;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $shotName -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_ShtTF;
+	setParent ..;
+
+	// Camera Name
+	//
+	string $allCameras[] = `ls -cameras`;
+	$str = `modelPanel -q -cam $tima_AdvPlayblast_ActivePanel`;
+	$cameraName = `substitute "Shape" $str ""`;
+	$tima_AdvPlayblast_ActiveCamera = $cameraName;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Camera Name - " -v `optionVar -q "tima_AdvPlayblast_CamCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CamCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $cameraName;
+		text -l " -><- ";
+			popupMenu -button 1 tima_AdvPlayblast_CamListPPM;
+			for( $str in $allCameras)
+			{
+				$str = `substitute "Shape" $str ""`;
+				menuItem -l $str -c ("textField -e -tx " + $str + " tima_AdvPlayblast_CamTF; tmGPSwitchCam(\"" + $str + "\"); $tima_AdvPlayblast_ActiveCamera = \"" + $str + "\";");
+			}
+		textField -ed 1 -w 150 -tx $cameraName -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CamTF;
+	setParent ..;
+
+	// Camera Field Of View
+	//
+	float $cameraFV = 54.43;
+	if (`objExists $cameraName`)
+		$cameraFV = `getAttr ($cameraName + ".focalLength")`;
+		$cameraFV = 100 - $cameraFV;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Camera field of view -  " -v `optionVar -q "tima_AdvPlayblast_CFVCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CFVCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $cameraFV;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $cameraFV -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CFVTF;
+	setParent ..;
+
+	// Camera Focal Length
+	//
+	float $cameraFL = 35.0;
+	if (`objExists $cameraName`)
+		$cameraFL = `getAttr ($cameraName + ".focalLength")`;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Camera focal length -  " -v `optionVar -q "tima_AdvPlayblast_CFLCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CFLCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $cameraFL;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $cameraFL -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CFLTF;
+	setParent ..;
+
+	// Film
+	//
+	string $film = "768 576";
+	if (`objExists $cameraName`)
+	{
+		$film = `getAttr ($cameraName + ".horizontalFilmAperture")` + "*";
+		$film = $film + `getAttr ($cameraName + ".verticalFilmAperture")`;
+	}
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Film gate -  " -v `optionVar -q "tima_AdvPlayblast_CFMCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CFMCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $film;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $film -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CFMTF;
+	setParent ..;
+
+	// Resolution
+	//
+	string $resolution = (`optionVar -query playblastWidth` + " " + `optionVar -query playblastHeight`);
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Resolution -  " -v `optionVar -q "tima_AdvPlayblast_CRSCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_CRSCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $resolution;
+		text -l " -><- " tima_AdvPlayblast_CRSTx;
+			popupMenu -button 1 tima_AdvPlayblast_CRSPPM;
+		textField -ed 1 -w 150 -tx $resolution -cc "tima_AdvPlayblastShowText(); tima_AdvPlayblast_CRS_appendList(1);" tima_AdvPlayblast_CRSTF;
+	setParent ..;
+
+	// Range
+	//
+	string $range;
+	float $pbStart = `optionVar -q playblastStartTime`;
+	float $pbEnd = `optionVar -q playblastEndTime`;
+	if(`radioButtonGrp -ex useStartEnd` && `floatFieldGrp -q -en startTime`)
+	{
+		float $rangeArray[];
+		$rangeArray = `floatFieldGrp -q -v startTime`;
+		$pbStart = $rangeArray[0];
+		$rangeArray = `floatFieldGrp -q -v endTime`;
+		$pbEnd = $rangeArray[0];
+	}
+	else
+	{
+		global string $gPlayBackSlider;
+		float $rangeSlider[];
+		$rangeSlider[0] = `playbackOptions -q -min`;
+		$rangeSlider[1] = `playbackOptions -q -max`;
+		if(`timeControl -q -rangeVisible $gPlayBackSlider`)
+		{
+			$rangeSlider = `timeControl -q -rangeArray $gPlayBackSlider`;
+			$rangeSlider[1] = $rangeSlider[1] - 1.0;		//  - 1.0 from AW example, see "doPlayblastArgList.mel"
+		}
+		$pbStart = $rangeSlider[0];
+		$pbEnd = $rangeSlider[1];
+	}
+	string $range = ($pbStart + "-" + $pbEnd);
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Range -  " -v `optionVar -q "tima_AdvPlayblast_RNGCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_RNGCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $range;
+		text -l " -><- " tima_AdvPlayblast_RNGTx;
+			popupMenu -button 1 tima_AdvPlayblast_RNGPPM;
+		textField -ed 1 -w 150 -tx $range -cc "tima_AdvPlayblastShowText(); tima_AdvPlayblast_RNG_appendList(1);" tima_AdvPlayblast_RNGTF;
+	setParent ..;
+
+	// FPS
+	//
+	float $fps; 
+	string $timeUnit = `currentUnit -q -time`; 
+	if( $timeUnit == "game" ) 
+		$fps = 15; 
+	else if( $timeUnit == "film" ) 
+		$fps = 24; 
+	else if( $timeUnit == "pal" ) 
+		$fps = 25; 
+	else if( $timeUnit == "ntsc" ) 
+		$fps = 30; 
+	else if( $timeUnit == "show" ) 
+		$fps = 48; 
+	else if( $timeUnit == "palf" ) 
+		$fps = 50; 
+	else if( $timeUnit == "ntscf" ) 
+		$fps = 60; 
+	else 
+		$fps = 24; 
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "FPS -  " -v `optionVar -q "tima_AdvPlayblast_FPSCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_FPSCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $fps;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $fps -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_FPSTF;
+	setParent ..;
+
+	// Scene Name
+	//
+	string $sceneName = `file -q -sceneName`;
+	$sceneName = `substitute (".*" + $projectName) $sceneName ""`;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Scene - " -v `optionVar -q "tima_AdvPlayblast_ScnCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_ScnCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $sceneName;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $sceneName -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_ScnTF;
+	setParent ..;
+
+	// Date
+	//
+	string $date = "date";
+   if(`about -linux`)
+   {
+      $date = `system("date +%d.%m.%y_%H:%M")`;
+      int $l = `size($date)` - 1;
+      $date = `substring $date 1 $l`;
+   }
+   if(`about -windows`)
+   {
+      $date = `system("date /T")`;
+      $l = `size($date)`;
+      $date = `substring $date 1 ($l - 3)`;
+      $date = $date +  " - " + `system("time /T")`;
+      $l = `size($date)`;
+      $date = `substring $date 1 ($l - 2)`;
+   }
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "Date - " -v `optionVar -q "tima_AdvPlayblast_DATCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_DATCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $date;
+		text -l " ----- ";
+		textField -ed 1 -w 50 -tx $date -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_DATTF;
+	setParent ..;
+
+	// User
+	//
+	string $user = "user";
+   if(`about -windows`) $user = `getenv USERNAME`;
+   if(`about -linux`) $user = `getenv USER`;
+	rowLayout -nc 4 -cw4 $cw2 ($cw3 + $cw1) $cw4 $cw5 -adj 4;
+		checkBox -l "User Name - " -v `optionVar -q "tima_AdvPlayblast_UsrCBv"` -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_UsrCB;
+		textField -ed 0 -w ($cw3 + $cw1) -tx $user;
+		text -l " ----- ";
+		textField -ed 1 -w 150 -tx $user -cc "tima_AdvPlayblastShowText()" tima_AdvPlayblast_UsrTF;
+	setParent ..;
+	separator -style "in";
+
+//###
+	// Output format
+	//
+	rowLayout -nc 2 -cw2 270 70 -adj 2;
+	if(`about -linux`) {
+		radioButtonGrp -l "Viewer" 
+			-nrb 2
+			-cw3 70 100 100
+			-label1 "xanim "
+			-en1 false
+			-label2 "fcheck"
+			-select 2
+			tima_AdvPlayblast_formatRBG;
+	}else if(`about -mac`) {
+		radioButtonGrp -l "Viewer" 
+			-nrb 2
+			-cw3 70 100 100
+			-label1 "QuickTime "
+			-label2 "fcheck"
+			-select 2
+			tima_AdvPlayblast_formatRBG;
+	}else{
+		radioButtonGrp -l "Viewer" 
+			-nrb 2
+			-cw3 70 100 100
+			-label1 "Movieplayer "
+			-label2 "fcheck"
+			-select 1
+			tima_AdvPlayblast_formatRBG;
+	}
+	if( `optionVar -query playblastOutputFormat` == "iff") {
+		radioButtonGrp -edit -select 2 tima_AdvPlayblast_formatRBG;
+	} else {
+		radioButtonGrp -edit -select 1 tima_AdvPlayblast_formatRBG;
+	}
+
+	// Compression
+	//
+	if (`about -windows`) {
+			button -l "Compression..." -enable true -c "playblast -options" compression;
+	}else if (`about -linux`) {
+		optionMenuGrp -l "Compression" -enable true compression;
+			setParent -m ..;
+	}else if(`about -irix`) {
+		optionMenuGrp -l "Compression" -enable true compression;
+			menuItem -l "MVC1";
+			menuItem -l "MVC2";
+			menuItem -l "JPEG";
+			menuItem -l "RLE";
+			menuItem -l "None";
+			setParent -m ..;
+	}else if (`about -mac`) {
+			button -l "Compression..." -enable true -c "playblast -options" compression;
+	}else{
+		optionMenuGrp -l "Compression" -enable true compression;
+			setParent -m ..;
+	}
+	setParent ..;
+
+	// Filename
+	//
+	rowLayout -nc 3 -cw3 240 30 70 -adj 1;
+	if(`about -linux`)
+		textFieldGrp -l "File name" -cw2 70 100 -adj 2 -enable true
+				-tx `optionVar -query playblastFile`
+				-cc "tima_AdvPlayblast_FBr_appendList(1)"
+			tima_AdvPlayblast_FBrTF;
+	else
+		textFieldGrp -l "Movie file" -cw2 70 100 -adj 2 -enable true
+				-tx `optionVar -query playblastFile`
+				-cc "tima_AdvPlayblast_FBr_appendList(1)"
+			tima_AdvPlayblast_FBrTF;
+		text -l " -><- " tima_AdvPlayblast_FBrTx;
+			popupMenu -button 1 tima_AdvPlayblast_FBrPPM;
+		button -l " browse... " -w 69 -enable true -c "tima_AdvPlayblast_FileBrowser()" tima_AdvPlayblast_browser;
+	setParent ..;
+
+//###
+
+	separator -style "in";
+	rowLayout -nc 2 -cw2 70 320 -adj 1;
+
+	//	do playplast
+	//
+	button -l " do playblast with settings from this window " -c "tima_AdvPlayblastDoPlayblast()";
+
+	//Close & Delete Nodes
+	//
+	button -l " close + delete viewport information + restore background color" -bgc 0.9 0.7 0.6 -w 319 -c "tima_AdvPlayblastCloseWnd()";
+
+	setParent ..;
+	separator -style "in";
+
+	showWindow tima_AdvPlayblastWnd;
+	tima_AdvPlayblast_RNG_appendList(0);
+	tima_AdvPlayblast_CRS_appendList(0);
+	tima_AdvPlayblast_FBr_appendList(0);
+	
+	if(`checkBox -q -v tima_AdvPlayblast_HUDCB`) tima_AdvPlayblast_hideHUDs();
+
+	tima_AdvPlayblastShowText();
+	tima_AdvPlayblast_BgCcc();
+	tima_AdvPlayblast_hideObjectTypes_proc(4);
+	tima_AdvPlayblast_hideObjectTypes_proc(2);
+	tima_AdvPlayblastCamProc(0);
+	tima_AdvPlayblastCamProc(4);
+	tima_AdvPlayblast_showCurrentFrame();
+}
+
+global proc tima_AdvPlayblast_BgCcc()
+{
+	float $color[] = `colorSliderGrp -q -rgb tima_AdvPlayblast_BgCSG`;
+	displayRGBColor "background" $color[0] $color[1//   fileBrowserDialog -mode 2 -fc "tima_AdvPlayblast_FileBrowser_command" -an "use";
+] $color[2];
+	optionVar -fv "tima_AdvPlayblast_pbBgcR" $color[0];
+	optionVar -fv "tima_AdvPlayblast_pbBgcG" $color[1];
+	optionVar -fv "tima_AdvPlayblast_pbBgcB" $color[2];
+}
+
+global proc tima_AdvPlayblastDoPlayblast()
+{
+
+	string $str;
+
+	// get output format
+	//
+	int $selected = `radioButtonGrp -query -select tima_AdvPlayblast_formatRBG`;
+	if( $selected == 2 )
+	{
+		$str = "iff";
+	} else {
+		if(`about -mac`){
+			$str = "qt";
+		}else{
+			$str = "sgi";
+		}
+	}
+	optionVar -stringValue playblastOutputFormat $str;
+
+	// get compression
+	//
+	string $compression;
+	if(`about -irix`) {
+		$selected = `optionMenuGrp -query -select compression`;
+
+		if( $selected == 1 ) {
+			$compression = "mvc1";
+		} else if( $selected == 2 ) {
+			$compression = "mvc2";
+		} else if( $selected == 3 ) {
+			$compression = "jpeg";
+		} else if( $selected == 4 ) {
+			$compression = "rle";
+		} else {
+			$compression = "none";
+		}
+	} else {
+		$compression = "none";
+	}
+	optionVar -stringValue playblastCompression $compression;
+
+	// filename
+	// 
+	string $filename = `textFieldGrp -q -fileName tima_AdvPlayblast_FBrTF`;
+	optionVar -stringValue playblastFile $filename;
+
+	//	get width&height
+	//
+	$str = `textField -q -tx tima_AdvPlayblast_CRSTF`;
+	int $displayWidth = `match "^[0-9]+" $str`;
+	int $displayHeight = `match "[0-9]+$" $str`;
+	optionVar -intValue playblastWidth $displayWidth;
+	optionVar -intValue playblastHeight $displayHeight;
+
+	//	get start&end Time
+	//
+	$str = `textField -q -tx tima_AdvPlayblast_RNGTF`;
+	int $startTime = `match "^[0-9]+" $str`;
+	int $endTime = `match "[0-9]+$" $str`;
+	optionVar -floatValue playblastStartTime $startTime;
+	optionVar -floatValue playblastEndTime $endTime;
+
+	string $cmd = "doPlayblastArgList 3 { " +
+//		"\"" + `optionVar -query playblastSaveToFile` + " \"" +
+		"\"" + "1" + " \"" +
+		",\"" + `optionVar -query playblastFile` + "\"" +
+//		",\"" + `optionVar -query playblastViewerOn` + "\"" +
+		",\"" + "1" + "\"" +
+		",\"" + `optionVar -query playblastOutputFormat` + "\"" +
+//		",\"" + `optionVar -query playblastShowOrnaments` + "\"" +
+		",\"" + "1" + "\"" +
+//		",\"" + `optionVar -query playblastScale` + "\"" +
+		",\"" + "1" + "\"" +
+		",\"" + `optionVar -query playblastCompression` + "\"" +
+//		",\"" + `optionVar -query playblastDisplaySizeSource` + "\"" +
+		",\"" + "3" + "\"" +
+		",\"" + `optionVar -query playblastWidth` + "\"" +
+		",\"" + `optionVar -query playblastHeight` + "\"" +
+//		",\"" + `optionVar -query playblastUseStartEnd` + "\"" +
+		",\"" + "1" + "\"" +
+		",\"" + `optionVar -query playblastStartTime` + "\"" +
+		",\"" + `optionVar -query playblastEndTime` + "\"" +
+		",\"" + `optionVar -query playblastClearCache` + "\"" +
+		"};";
+
+	print("\n");
+	print($cmd);
+	print("\n");
+	eval($cmd);
+}
+//####################################################################################
+
+global proc tima_AdvPlayblast_RNG_appendList( int $append)
+{
+	$append = 1;	// <- !!!!!!!!!!
+	string $range = `textField -q -tx tima_AdvPlayblast_RNGTF`;
+	if( `optionVar -ex tima_AdvPlayblast_RNGlist` == 0) optionVar -sva tima_AdvPlayblast_RNGlist $range;
+	string $rangesArrayA[] = `optionVar -q tima_AdvPlayblast_RNGlist`;
+	int $i;
+	int $l = `size($rangesArrayA)`;
+	if ($append)
+	{
+		for ( $i = 0; $i < $l; $i++)
+			if (`gmatch $rangesArrayA[$i] $range`) optionVar -removeFromArray tima_AdvPlayblast_RNGlist $i;
+		optionVar -stringValueAppend tima_AdvPlayblast_RNGlist $range;
+	}
+	$rangesArrayA = `optionVar -q tima_AdvPlayblast_RNGlist`;
+	$l = `size($rangesArrayA)`;
+	if( $l > 10) optionVar -removeFromArray tima_AdvPlayblast_RNGlist 0;
+	deleteUI -m tima_AdvPlayblast_RNGPPM;
+	popupMenu -button 1 -p tima_AdvPlayblast_RNGTx tima_AdvPlayblast_RNGPPM;
+	for( $i = $l ; $i > 0; $i = $i - 1)
+		menuItem -l $rangesArrayA[$i - 1] -p tima_AdvPlayblast_RNGPPM -c ("textField -e -tx \"" + ($rangesArrayA[$i - 1]) + "\" tima_AdvPlayblast_RNGTF; tima_AdvPlayblast_RNG_appendList(1); tima_AdvPlayblastShowText");
+	if($l == 0)
+	{
+		menuItem -l $range -p tima_AdvPlayblast_RNGPPM -c ("textField -e -tx \"" + $range + "\" tima_AdvPlayblast_RNGTF; tima_AdvPlayblast_RNG_appendList(1); tima_AdvPlayblastShowText");
+		optionVar -sva tima_AdvPlayblast_RNGlist $range;
+	}
+}
+//####################################################################################
+
+global proc tima_AdvPlayblast_CRS_appendList( int $append)
+{
+	string $resolution = `textField -q -tx tima_AdvPlayblast_CRSTF`;
+	if( `optionVar -ex tima_AdvPlayblast_CRSlist` == 0) optionVar -sva tima_AdvPlayblast_CRSlist $resolution;
+	string $resolutionsArrayA[] = `optionVar -q tima_AdvPlayblast_CRSlist`;
+	int $i;
+	int $l = `size($resolutionsArrayA)`;
+	if(($resolutionsArrayA[$l - 1] != "") && ($append == 0))
+		textField -e -tx $resolutionsArrayA[$l - 1] tima_AdvPlayblast_CRSTF;
+	if ($append)
+	{
+		for ( $i = 0; $i < $l; $i++)
+			if (`gmatch $resolutionsArrayA[$i] $resolution`) optionVar -removeFromArray tima_AdvPlayblast_CRSlist $i;
+		optionVar -stringValueAppend tima_AdvPlayblast_CRSlist $resolution;
+	}
+	$resolutionsArrayA = `optionVar -q tima_AdvPlayblast_CRSlist`;
+	$l = `size($resolutionsArrayA)`;
+	if( $l > 10) optionVar -removeFromArray tima_AdvPlayblast_CRSlist 0;
+	deleteUI -m tima_AdvPlayblast_CRSPPM;
+	popupMenu -button 1 -p tima_AdvPlayblast_CRSTx tima_AdvPlayblast_CRSPPM;
+	for( $i = $l ; $i > 0; $i = $i - 1)
+		menuItem -l $resolutionsArrayA[$i - 1] -p tima_AdvPlayblast_CRSPPM -c ("textField -e -tx \"" + ($resolutionsArrayA[$i - 1]) + "\" tima_AdvPlayblast_CRSTF; tima_AdvPlayblast_CRS_appendList(1); tima_AdvPlayblastShowText");
+	if($l == 0)
+	{
+		menuItem -l $resolution -p tima_AdvPlayblast_CRSPPM -c ("textField -e -tx \"" + $resolution + "\" tima_AdvPlayblast_CRSTF; tima_AdvPlayblast_CRS_appendList(1); tima_AdvPlayblastShowText");
+		optionVar -sva tima_AdvPlayblast_CRSlist $resolution;
+	}
+}
+//####################################################################################
+
+global proc tima_AdvPlayblast_FBr_appendList( int $append)
+{
+	string $pbFile = `textFieldGrp -q -tx tima_AdvPlayblast_FBrTF`;
+	if( `optionVar -ex tima_AdvPlayblast_FBrlist` == 0) optionVar -sva tima_AdvPlayblast_FBrlist $pbFile;
+	string $pbFilesArrayA[] = `optionVar -q tima_AdvPlayblast_FBrlist`;
+	int $l = `size($pbFilesArrayA)`;
+	int $i;
+	if(($pbFilesArrayA[$l - 1] != "") && ($append == 0))
+		textFieldGrp -e -tx $pbFilesArrayA[$l - 1] tima_AdvPlayblast_FBrTF;
+	if ($append)
+	{
+		for ( $i = 0; $i < $l; $i++)
+			if (`gmatch $pbFilesArrayA[$i] $pbFile`) optionVar -removeFromArray tima_AdvPlayblast_FBrlist $i;
+		optionVar -stringValueAppend tima_AdvPlayblast_FBrlist $pbFile;
+	}
+	$pbFilesArrayA = `optionVar -q tima_AdvPlayblast_FBrlist`;
+	$l = `size($pbFilesArrayA)`;
+	if( $l > 10) optionVar -removeFromArray tima_AdvPlayblast_FBrlist 0;
+	deleteUI -m tima_AdvPlayblast_FBrPPM;
+	popupMenu -button 1 -p tima_AdvPlayblast_FBrTx tima_AdvPlayblast_FBrPPM;
+	for( $i = $l ; $i > 0; $i = $i - 1)
+		menuItem -l $pbFilesArrayA[$i - 1] -p tima_AdvPlayblast_FBrPPM -c ("textFieldGrp -e -tx \"" + ($pbFilesArrayA[$i - 1]) + "\" tima_AdvPlayblast_FBrTF; tima_AdvPlayblast_FBr_appendList(1); tima_AdvPlayblastShowText");
+	if($l == 0)
+	{
+		menuItem -l $pbFile -p tima_AdvPlayblast_FBrPPM -c ("textFieldGrp -e -tx \"" + $pbFile + "\" tima_AdvPlayblast_FBrTF; tima_AdvPlayblast_FBr_appendList(1); tima_AdvPlayblastShowText");
+		optionVar -sva tima_AdvPlayblast_FBrlist $pbFile;
+	}
+}
+
+//#####################################################################
+global proc tima_AdvPlayblast_hideObjectTypes_proc(int $mode)
+{
+	global string $tima_AdvPlayblast_ActivePanel;
+	global int $tima_AdvPlayblast_ShowObjTypes[];
+	string $childs[] = `popupMenu -q -itemArray tima_AdvPlayblast_hideObjectTypes_popupMenu`;
+	string $types[];
+	int $hide[];
+	int $l = (`size($childs)` - 3);
+	for( $i = 0; $i < $l; $i++)
+	{
+		$types[$i] = `menuItem -q -l $childs[$i + 3]`;
+//		print("\n " + $childs[$i] + " - " + $types[$i] + " - " + `menuItem -q -checkBox $childs[$i + 3]`);
+	}
+	int $i;
+	switch ($mode)
+	{
+		case 0:
+			optionVar -clearArray "tima_AdvPlayblast_hideObjectTypes";
+			for( $i = 0; $i < $l; $i++)
+			{
+				$hide[$i] = 0;
+				menuItem -e -checkBox 0 $childs[$i + 3];
+				optionVar -iva "tima_AdvPlayblast_hideObjectTypes" 0;
+			}
+			break;
+		case 1:
+			optionVar -clearArray "tima_AdvPlayblast_hideObjectTypes";
+			for( $i = 0; $i < $l; $i++)
+			{
+				$hide[$i] = 1;
+				menuItem -e -checkBox 1 $childs[$i + 3];
+				optionVar -iva "tima_AdvPlayblast_hideObjectTypes" 1;
+			}
+			break;
+		case 2:
+			optionVar -clearArray "tima_AdvPlayblast_hideObjectTypes";
+			for( $i = 0; $i < $l; $i++)
+			{
+				int $val = `menuItem -q -checkBox $childs[$i + 3]`;
+				$hide[$i] = $val;
+				optionVar -iva "tima_AdvPlayblast_hideObjectTypes" $val;
+			}
+			break;
+		case 3:
+			for( $i = 0; $i < $l; $i++)
+				$hide[$i] = 1 - $tima_AdvPlayblast_ShowObjTypes[$i];
+			break;
+	}
+	if($mode == 4)
+	{
+		clear $tima_AdvPlayblast_ShowObjTypes;
+		for( $i = 0; $i < $l; $i++)
+			$tima_AdvPlayblast_ShowObjTypes[$i] = `eval("modelEditor -q -" + $types[$i] + " " + $tima_AdvPlayblast_ActivePanel + ";")`;
+		return;
+	}
+	for( $i = 0; $i < $l; $i++)
+		eval("modelEditor -e -" + $types[$i] + " " + (1 - $hide[$i]) + " " + $tima_AdvPlayblast_ActivePanel + ";");
+}
+
+//#####################################################################
+global proc tima_AdvPlayblast_FileBrowser()
+{
+//   fileBrowserDialog -mode 2 -fc "tima_AdvPlayblast_FileBrowser_command" -an "use";
+   fileBrowser("tima_AdvPlayblast_FileBrowser_command","Accept","",1);
+}
+
+global proc tima_AdvPlayblast_FileBrowser_command( string $filename, string $fileType )
+{
+	textFieldGrp -e -tx $filename tima_AdvPlayblast_FBrTF;
+	tima_AdvPlayblast_FBr_appendList(1);
+}
+//#####################################################################
+global proc tima_AdvPlayblastCamProc(int $mode)
+{
+	global string $tima_AdvPlayblast_ActiveCamera;
+	global float $tima_AdvPlayblast_ActiveCamOverscan;
+//print("\n ActiveCamera = " + $tima_AdvPlayblast_ActiveCamera + "\n");
+	string $tmp[] = `listRelatives -s $tima_AdvPlayblast_ActiveCamera`;
+	string $camShape = $tmp[0];
+
+	if($mode == 0)
+	{
+		$tima_AdvPlayblast_ActiveCamOverscan = `getAttr ($camShape + ".overscan")`;
+		return;
+	}
+	if($mode == 2)
+	{
+		setAttr ($camShape + ".overscan") $tima_AdvPlayblast_ActiveCamOverscan;
+		return;
+	}
+	int $resetOverscan = (1 - `optionVar -q "tima_AdvPlayblast_resetOverscan"`);
+	if($mode == 1) optionVar -iv "tima_AdvPlayblast_resetOverscan" $resetOverscan;
+	if($mode == 4) $resetOverscan = 1 - $resetOverscan;
+	if($resetOverscan) setAttr ($camShape + ".overscan") 1.0;
+	else setAttr ($camShape + ".overscan") $tima_AdvPlayblast_ActiveCamOverscan;
+}
+//#####################################################################
+
+global proc tima_AdvPlayblastCloseWnd()
+{
+	global float $tima_AdvPlayblast_userBgc[];
+	displayRGBColor "background" $tima_AdvPlayblast_userBgc[0] $tima_AdvPlayblast_userBgc[1] $tima_AdvPlayblast_userBgc[2];
+
+	tima_AdvPlayblast_hideObjectTypes_proc(3);
+	tima_AdvPlayblastCamProc(2);
+
+	headsUpDisplay -rp 2 0;
+	headsUpDisplay -rp 8 0;
+	headsUpDisplay -rp 6 0;
+	tima_AdvPlayblast_showCurrentFrame_delete_expression();
+
+	if(`window -exists tima_AdvPlayblastWnd`)
+	{
+		if(`checkBox -q -v tima_AdvPlayblast_HUDCB`)
+		{
+			tima_AdvPlayblast_showHUDs;
+		}
+		deleteUI tima_AdvPlayblastWnd;
+	}
+}
+//#####################################################################
+
+tima_AdvPlayblastShowWnd();

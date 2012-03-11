@@ -1,0 +1,13 @@
+#!/bin/bash
+
+echo "CGRU-common PRE REMOVE:"
+
+/opt/cgru/utilities/keeper/cmdkeeper.sh quit
+if [ -d /opt/cgru ]; then
+   find /opt/cgru -type f -name *.pyc -exec rm -vf {} \;
+   find /opt/cgru -type d -name __pycache__ -exec rm -rvf {} \;
+fi
+
+/opt/cgru/examples/clear.sh
+
+exit 0

@@ -1,0 +1,120 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="../icon.png" type="image/png" />
+<title>Asset</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="CGRU: CG Tools, CG Rules, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://www.linkedin.com/groups/CGRU-AFANASY-4263049"><img src="../../doc/images/linkedin.png" border="0" alt="LinkedIn" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h1 align="center">Asset - новое слово.</h1>
+<hr />
+
+<table width="1000" height="400" bgcolor="#FFFFFF" align="center">
+<tr><td align="center"><a href="images/asset_humour.jpg"><img src="images/asset.jpg" align="middle" alt="asset"/></a>
+</td></tr></table>
+
+<p>
+Все уже слышали это слово? Думаю что к "нам" притащил его в первую очередь Houdini. Теперь уже и в Maya они. Наверное в будущем мы его будем слышать гораздо чаще. Но это совсем не обязательно 3d понятие, и asset вообще может не иметь отношения к компьютерной графике. Если вы из конструктора соберёте машинку, её тоже можно назвать ассетом. CG персонаж - хороший пример ассета.
+</p>
+<p>
+У ассета есть входы - его интерфейс и выходы. Если ассет "хороший" - то что внутри вас не волнует, если вы только не собрались менять его содержимое. Подаёте что-то на вход, получаете результат, а внутри чёрный ящик. Вы можете перенести его куда угодно, он будет всегда работать. Всё что ему нужно должно находиться в нём самом или подаваться на вход.
+</p>
+<p>
+Проект или какую-то его часть тоже можно назвать ассетом. Maya Project - неплохой тому пример. Он предлагает хранить всё в одной папке. Заметьте, там не только модели, текстуры и прочие материалы но ещё и скрипты. Это важный момент. Если вы пользуетесь какими-то инструментами, то они тоже должны быть в проекте. Такой проект вы можете перенести куда угодно и он будет работать. И не надо будет объяснять что для работы нужны такие-то инструменты и лежат они должны там-то и там-то.
+</p>
+<p>
+Но скрипты относящиеся к проекту - это небольшие инструменты, и скорее всего они только для этого проекта и нужны. А как быть с софтом и прочими более универсальными инструментами, нужными на всех проектах. Не держать же версию Maya, Houdini, Nuke в проекте. А хорошо бы иметь проект со всему нужными софтами, да ещё и в настроенном состоянии. Мы постоянно переходим на более новые версии, старые инструменты устаревают. И через год вы откроете старую сцену (а может и не старую, проект может длиться и дольше) а там уже ничего не работает. Не хватает каких-то скриптов, новые плагины работают немного не так, а старые уже не совместимы. Наверняка ещё многие сталкивались с тем, что вы на новом проекте хотите перейти на новую версию Maya, Houdini или Nuke. А другие ваши товарищи говорят, что ещё долго будут сдавать старый проект, во всю его на считают на ферме, не надо на рендера ставить новый Nuke или RenderMan, сцена может как-нибудь по-другому отрендериться, не до нового Nuke им сейчас. А это не редкость, что в новом софте старую сцену надо немного поправить. Знакомая ситуация?
+</p>
+<p>
+А у многих на десктопе ярлычки и от 4 и 5 Nuke, от 2008, 2009 и 2010 Maya, от 9, 9.5 и 10 Houdini? Можно же на одном компьютере держать разные версии одной программы. А что если такие ярлычки для разных версий держать в самих проектах? И всё, этот проект ещё на 4-ом Nuke, а более новый уже на 5-ом. И ни каких конфликтов. Осталось только рендерам на ферме объяснить какой ярлычок запустить. А для этого просто пользуемся рабочим каталогом. Т.е. тоже просим рендер не просто запустить Nuke, а зайти в нужную папку и там запустить Nuke.
+</p>
+<p>
+Рабочий каталог - Working Directory - папка в которой находится процесс. В любой OS у любой запущенной программы (процесса (в общем случае у программы может быть не один процесс)) есть такое понятие, и по-молчанию рабочий каталог - это папка откуда запустили приложение. Любой путь может быть относительным. Тогда приложение будет искать файл относительно своего рабочего каталога. Процесс может изменить свой рабочий каталог. Но нам сейчас это не нужно.
+</p>
+<p>
+Часто вы брали откуда-нибудь "чужие" сцены? Из другой конторы, или модели с текстурами из интернета? Скорее всего, сразу они не работали. А ваша программа писала сообщения, что не может открыть файл "\\server\projects\island\textures\train\roof.tif" или "Z:\Textures\train\roof.tif". Но ни диска Z ни компьютера server у вас нету. Такое также может случиться и с вашими сценами после переименования компьютеров, перемещения проекта, восстановления старого проекта и т.п.
+</p>
+<p>
+Так не проще сделать подпроект train в котором будет папка textures. А программы запускать из этой самой папки train. Заодно и правильная версия софта запустится. В сцене с поездом все пути к текстурам будут начинаться просто с textures, например "textures/roof.tif". Тогда где бы этот поезд не оказался он всегда будет работать. Может он вам же в будущем ещё пригодится в других проектах. Вот это и будет "настоящий" asset поезда.
+</p>
+<p>
+В Афанасии у задач указывается рабочий каталог. А по-умолчанию он берёт текущий во время создания задачи (в конструкторе job-ы). Примеры у CGRU также основаны на asset-ах - запуск софта из определённого места, использование относительных путей.
+</p>
+
+<p>
+</p>
+
+<table width="1000" height="400" bgcolor="#FFFFFF" align="center">
+<tr><td align="center"><img src="images/toilet.jpg" align="middle" alt="toilet"/>
+</td></tr></table>
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net/projects/cgru/"><img src="../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://libregraphicsworld.org/tag/cgru"><img src="../../doc/images/lgw.png" border="0" alt="Libre Graphics World" /></a>
+</td>
+</tr>
+</table>
+</body>
+</html>

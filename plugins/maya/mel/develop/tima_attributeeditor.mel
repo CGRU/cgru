@@ -1,0 +1,115 @@
+global proc tima_AttrEdit_attrCC_globalProc(string $ctrlName, string $objName, string $attrName, string $attrType, int $mutliAttr)
+{
+	string $cmd = "setAttr " + $objName + "." + $attrName + " ";
+	if($mutliAttr) $cmd += "-type \"" + $attrType + "\" ";
+	$cmd += `textField -q -tx $ctrlName` + ";";
+	catch(`evalEcho($cmd)`);
+}
+{
+string $sel[] = `ls -sl`;
+if (`size($sel)` == 0) error " nothing selected :( ";
+string $cur = $sel[0];
+string $objInfoWndName = ("tima_AttrEdit_" + $cur + "_window");
+if (`window -exists $objInfoWndName`) deleteUI $objInfoWndName;
+window -t ("List attributes : " + $cur) $objInfoWndName;
+string $scroll = `scrollLayout`;
+string $newLine = `columnLayout -adj 1`;
+string $lAttr[] = `listAttr $cur`;
+string $cAttr;
+rowLayout -nc 4 -cw4 80 180 80 110;
+	text -l "   Node name: ";
+	textField -ed 0 -w 175 -tx $cur;
+	text -l "   Node type: ";
+	textField -ed 0 -w 110 -tx (`nodeType $cur`);
+setParent $newLine;
+text - l ("___attributes list: _________(childs count)______________(numbre of attributes = " + `size($lAttr)` + ")___");
+int $cw1 = 250;
+int $cw2 = 32;
+int $cw3 = 110;
+int $cw4 = 250;
+int $cwd = 3;
+rowLayout -nc 4 -cw4 $cw1 $cw2 $cw3 $cw4;
+	textField -ed 0 -w ($cw1 - $cwd) -tx " [______NAME______] ";
+	textField -ed 0 -w ($cw2 - $cwd) -tx "[CC]";
+	textField -ed 0 -w ($cw3 - $cwd) -tx " [____TYPE____] ";
+	textField -ed 0 -w ($cw4 - $cwd) -tx " [_____VALUE_____] ";
+int $NUM_ATTR_LIMIT = 999;
+int $ATTR_COUNTER = 0;
+for ($cAttr in $lAttr)
+{
+if($ATTR_COUNTER > $NUM_ATTR_LIMIT) break;
+$ATTR_COUNTER ++;
+	setParent $newLine;
+	int $aCC;
+	string $aType, $aVal;//, $aCC;
+	int $hasVal = false;
+	int $hasChilds = false;
+	int $editAble = false;
+	int $mutliAttr = false;
+//print("\n" + $cAttr);
+//type:
+	if (`attributeQuery -node $cur -exists $cAttr` == 0) $aType = "( can't query )";
+	else
+	{
+		if(catchQuiet(`getAttr -type -silent ($cur + "." + $cAttr)`)) $aType = "( can't get )";
+		else
+		{
+//print("   ***   ");
+			$aType = `getAttr -type -silent ($cur + "." + $cAttr)`;
+			if(`size($aType)` == 0) $aType = "( empty type )";
+			else
+			{
+				$hasChilds = true;
+				$hasVal = true;
+			}
+		}
+	}
+//print("-" + $aType);
+//childs:
+	$aCC = 0;
+	if($hasChilds)
+	{
+		string $childsList[] = `attributeQuery -n $cur -lc $cAttr`;
+		$aCC = `size($childsList)`;
+//		if( $aCC > 0) $hasVal = false;
+	}
+//print("-" + $aCC);
+//value:
+	$aVal = "";
+	if($hasVal)
+	{
+		if( $aType == "TdataCompound") $aVal = "Compound with mixed types.";
+      else if( $aType == "message") $aVal = "Message.";
+		else if(( $aType == "matrix") || (`gmatch $aType "*[0-9]"`))
+		{
+			$ma = `getAttr -sl ($cur + "." + $cAttr)`;
+			for($cv in $ma) $aVal += ($cv + " ");
+			$editAble = true;
+			$mutliAttr = true;
+		}
+		else if(`attributeQuery -n $cur -m $cAttr`) $aVal = "Multi-Attribute.";
+		else if( catch($aVal = `getAttr -sl ($cur + "." + $cAttr)`))
+			$aVal += ("Can`t get value.");
+		else $editAble = true;
+//print("-" + $aVal);
+	}
+//output:
+	rowLayout -nc 4 -cw4 $cw1 $cw2 $cw3 $cw4;
+		textField -ed 0 -w ($cw1 - $cwd) -tx $cAttr;
+		intField -ed 0 -w ($cw2 - $cwd) -v $aCC;
+		textField -ed 0 -w ($cw3 - $cwd) -tx $aType;
+		string $attrFieldCtrl, $attrCCstring;
+		if($hasVal)
+			$attrFieldCtrl = `textField -ed $editAble -w ($cw4 - $cwd) -tx $aVal`;
+		if($editAble)
+		{
+			$attrCCstring  = ("tima_AttrEdit_attrCC_globalProc(\""	+ $attrFieldCtrl + "\",\""
+									+ $cur + "\",\""
+									+ $cAttr + "\",\""
+									+ $aType + "\",\""
+									+ $mutliAttr + "\")");
+			textField -e -cc $attrCCstring $attrFieldCtrl;
+		}
+}
+showWindow $objInfoWndName;
+}

@@ -1,0 +1,883 @@
+cgruSourceFile("modeling/tima_makegeoshphere.mel");
+
+global proc tima_RockGenerator_editUV_globalProc( string $rockShape, float $kU, float $kV)
+{
+	float $scaleUMin = `floatField -q -v tima_RockGen_scaleUMin_floatField`;
+	float $scaleUMax = `floatField -q -v tima_RockGen_scaleUMax_floatField`;
+	float $scaleVMin = `floatField -q -v tima_RockGen_scaleVMin_floatField`;
+	float $scaleVMax = `floatField -q -v tima_RockGen_scaleVMax_floatField`;
+	float $offsetUMin = `floatField -q -v tima_RockGen_offsetUMin_floatField`;
+	float $offsetUMax = `floatField -q -v tima_RockGen_offsetUMax_floatField`;
+	float $offsetVMin = `floatField -q -v tima_RockGen_offsetVMin_floatField`;
+	float $offsetVMax = `floatField -q -v tima_RockGen_offsetVMax_floatField`;
+
+	int $uvCount[] = `polyEvaluate -uv $rockShape`;
+
+	float $scaleU = rand( $scaleUMin, $scaleUMax);
+	float $scaleV = rand( $scaleVMin, $scaleVMax);
+	polyEditUV -su ($scaleU*$kU) -sv ($scaleV*$kV) ($rockShape + ".map[0:" + ($uvCount[0]-1) + "]");
+
+	float $offsetU = rand( $offsetUMin, $offsetUMax);
+	float $offsetV = rand( $offsetVMin, $offsetVMax);
+	polyEditUV -r 1 -u $offsetU -v $offsetV ($rockShape + ".map[0:" + ($uvCount[0]-1) + "]");
+}
+//#################################################################################################################
+global proc tima_RockGenerator_deform_globalProc( string $rockShape)
+{
+	int $noiseLevels = `intField -q -v tima_RockGen_nLevels_intField`;
+	float $softEdgeMin = `floatField -q -v tima_RockGen_softEdgeMin_floatField`;
+	float $softEdgeMax = `floatField -q -v tima_RockGen_softEdgeMax_floatField`;
+	float $softEdge = rand( $softEdgeMin, $softEdgeMax);
+	if($noiseLevels != 0)
+	{
+		float $noiseAmpMin = `floatField -q -v tima_RockGen_nAmpMin_floatField`;
+		float $noiseAmpMax = `floatField -q -v tima_RockGen_nAmpMax_floatField`;
+		float $noiseFadeMin = `floatField -q -v tima_RockGen_nFadeMin_floatField`;
+		float $noiseFadeMax = `floatField -q -v tima_RockGen_nFadeMax_floatField`;
+		float $noiseStSmoothMin = `floatField -q -v tima_RockGen_nStSmoothMin_floatField`;
+		float $noiseStSmoothMax = `floatField -q -v tima_RockGen_nStSmoothMax_floatField`;
+		float $noiseStSmooth = rand( $noiseStSmoothMin, $noiseStSmoothMax);
+		float $noiseLaSmoothMin = `floatField -q -v tima_RockGen_nLaSmoothMin_floatField`;
+		float $noiseLaSmoothMax = `floatField -q -v tima_RockGen_nLaSmoothMax_floatField`;
+		float $noiseLaSmooth = rand( $noiseLaSmoothMin, $noiseLaSmoothMax);
+		float $noiseSmDelta;
+		if($noiseLevels != 1)
+			$noiseSmDelta = ($noiseLaSmooth - $noiseStSmooth) / ($noiseLevels - 1);
+		else
+			$noiseSmDelta = $noiseLaSmooth - $noiseStSmooth;
+		float $continuty = $noiseStSmooth;
+		for( $level = 0; $level < $noiseLevels; $level++)
+		{
+			polySmooth -mth 0 -dv 1 -c $continuty -kb 0 -ksb 0 -khe 0 -kt 0 -kmb 0 -suv 0 -sl 1 -dpe 1 -ps 0.1 -ro 1 -ch 0 $rockShape;
+			float $rndAmp = rand($noiseAmpMin, $noiseAmpMax);
+			float $noiseFade = rand($noiseFadeMin, $noiseFadeMax);
+			$rndAmp = $rndAmp / (1 + $level * $noiseFade);
+			tm_randPoint -amp $rndAmp -obj $rockShape;
+			$continuty += $noiseSmDelta;
+		}
+	}
+	polySoftEdge -a $softEdge -ch 0 $rockShape;
+}
+//#################################################################################################################
+global proc tima_RockGenerator__globalProc()
+{
+	if (!`window -exists tima_RockGenerator_window`) return;
+	int $startIndex = 0;
+	{
+		string $sceneRocks[] = `ls -type "transform" "*GenRock*"`;
+		string $name;
+		for( $name in $sceneRocks)
+		{
+			int $number = `match "[0-9]+" $name`;
+			if( $number > $startIndex) $startIndex = $number;
+		}
+		$startIndex++;
+	}
+	int $offsetX = 0;
+
+	int $rocksQuantity = `intField -q -v tima_RockGen_rockQuantity_intField`;
+
+	float $globalScaleMin = `floatField -q -v tima_RockGen_globalScaleMin_floatField`;
+	float $globalScaleMax = `floatField -q -v tima_RockGen_globalScaleMax_floatField`;
+	float $scaleXMin = `floatField -q -v tima_RockGen_scaleXMin_floatField`;
+	float $scaleXMax = `floatField -q -v tima_RockGen_scaleXMax_floatField`;
+	float $scaleYMin = `floatField -q -v tima_RockGen_scaleYMin_floatField`;
+	float $scaleYMax = `floatField -q -v tima_RockGen_scaleYMax_floatField`;
+	float $scaleZMin = `floatField -q -v tima_RockGen_scaleZMin_floatField`;
+	float $scaleZMax = `floatField -q -v tima_RockGen_scaleZMax_floatField`;
+
+	string $shadingGroup = `textField -q -ann tima_RockGen_ammTF`;
+
+	float $noiseAmpMin = `floatField -q -v tima_RockGen_baseNoiseMin_floatField`;
+	float $noiseAmpMax = `floatField -q -v tima_RockGen_baseNoiseMax_floatField`;
+
+	int $rockNumber = 0;
+	string $rocksTransforms[];
+	if(`checkBox -q -v tima_RockGen_pcUse_checkBox`)//##########################################################   pCylinder based Rocks
+	{
+		float $pcRadiusMin = `floatField -q -v tima_RockGen_pcRadiusMin_floatField`;
+		float $pcRadiusMax = `floatField -q -v tima_RockGen_pcRadiusMax_floatField`;
+		float $pcHeightMin = `floatField -q -v tima_RockGen_pcHeightMin_floatField`;
+		float $pcHeightMax = `floatField -q -v tima_RockGen_pcHeightMax_floatField`;
+		int $pcAxisDivMin = `intField -q -v tima_RockGen_pcAxisDivMin_intField`;
+		int $pcAxisDivMax = `intField -q -v tima_RockGen_pcAxisDivMax_intField` + 1;
+		int $pcHeightDivMin = `intField -q -v tima_RockGen_pcHeightDivMin_intField`;
+		int $pcHeightDivMax = `intField -q -v tima_RockGen_pcHeightDivMax_intField` + 1;
+		float $pcSharpCapsMin = `floatField -q -v tima_RockGen_pcSharpCapsMin_floatField`;
+		float $pcSharpCapsMax = `floatField -q -v tima_RockGen_pcSharpCapsMax_floatField`;
+		float $pcPartOffsetMin = `floatField -q -v tima_RockGen_pcPartOffsetMin_floatField`;
+		float $pcPartOffsetMax = `floatField -q -v tima_RockGen_pcPartOffsetMax_floatField`;
+		float $pcPartRotateMin = `floatField -q -v tima_RockGen_pcPartRotateMin_floatField`;
+		float $pcPartRotateMax = `floatField -q -v tima_RockGen_pcPartRotateMax_floatField`;
+		float $pcPartScaleMin = `floatField -q -v tima_RockGen_pcPartScaleMin_floatField`;
+		float $pcPartScaleMax = `floatField -q -v tima_RockGen_pcPartScaleMax_floatField`;
+		for( $pcNumber = 0; $pcNumber < $rocksQuantity; $pcNumber++)
+		{
+			float $scale = rand($globalScaleMin, $globalScaleMax);
+			float $scaleX = rand($scaleXMin, $scaleXMax);
+			float $scaleY = rand($scaleYMin, $scaleYMax);
+			float $scaleZ = rand($scaleZMin, $scaleZMax);
+			float $pcRadius = rand($pcRadiusMin, $pcRadiusMax);
+			float $pcHeight = rand($pcHeightMin, $pcHeightMax);
+			float $pcSharpCapsT = rand($pcSharpCapsMin, $pcSharpCapsMax);
+			float $pcSharpCapsB = rand($pcSharpCapsMin, $pcSharpCapsMax);
+			int $pcAxisDiv = rand($pcAxisDivMin, $pcAxisDivMax);
+			int $pcHeightDiv = rand($pcHeightDivMin, $pcHeightDivMax);
+			float $pcPartOffset = rand($pcPartOffsetMin, $pcPartOffsetMax);
+			float $pcPartRotate = rand($pcPartRotateMin, $pcPartRotateMax);
+			float $pcPartScale = rand($pcPartScaleMin, $pcPartScaleMax);
+			string $makePolyCylResArray[];
+			$makePolyCylResArray = `polyCylinder -r $pcRadius -h $pcHeight -sx $pcAxisDiv -sy $pcHeightDiv -sz 0 -ax 0 1 0 -tx 2 -ch 0 -n ("pcGenRock" + $startIndex)`;
+			string $pcTransformName = $makePolyCylResArray[0];
+			$makePolyCylResArray = `listRelatives -s -f $makePolyCylResArray`;
+			string $rockShape = $makePolyCylResArray[0];
+			if(`checkBox -q -v tima_RockGen_editUVs_checkBox`)
+				tima_RockGenerator_editUV_globalProc( $rockShape, (($scaleX+$scaleZ)*$pcRadius*0.166), ($scaleY*$pcHeight*0.1));
+			float $rndAmp = rand($noiseAmpMin, $noiseAmpMax);
+			tm_randPoint -amp $rndAmp -obj $rockShape;
+			int $vtxIndex;
+			{
+				$vtxIndex = rand( 0, $pcAxisDiv);
+				move -r -os
+					0 (-$pcHeight * $pcSharpCapsB) 0
+					($rockShape + ".vtx[" + $vtxIndex + "]");
+				$vtxIndex = rand( $pcAxisDiv * $pcHeightDiv, $pcAxisDiv * $pcHeightDiv + $pcAxisDiv);
+				move -r -os
+					0 ($pcHeight * $pcSharpCapsT) 0
+					($rockShape + ".vtx[" + $vtxIndex + "]");
+			}
+			{
+				$vtxIndex = rand(($pcAxisDiv + ($pcHeightDiv - 1)), ($pcAxisDiv * $pcHeightDiv - ($pcHeightDiv - 1)));
+				move -r (rand($pcPartOffsetMin, $pcPartOffsetMax)) (rand($pcPartOffsetMin, $pcPartOffsetMax)) (rand($pcPartOffsetMin, $pcPartOffsetMax))
+					($rockShape + ".vtx[0:" + $vtxIndex + "]");
+			}
+			{
+				$vtxIndex = rand(($pcAxisDiv + ($pcHeightDiv - 1)), ($pcAxisDiv * $pcHeightDiv - ($pcHeightDiv - 1)));
+				rotate -r -eu -p
+					(rand( -$pcRadius*0.2, $pcRadius*0.2)) (rand( -$pcHeight*0.1, $pcHeight*0.1)) (rand( -$pcRadius*0.2, $pcRadius*0.2))
+					(rand($pcPartRotateMin, $pcPartRotateMax) * 0.04) (rand($pcPartRotateMin, $pcPartRotateMax)) (rand($pcPartRotateMin, $pcPartRotateMax) * 0.04)
+					($rockShape + ".vtx[0:" + $vtxIndex + "]");
+			}
+			{
+				$vtxIndex = rand(($pcAxisDiv + ($pcHeightDiv - 1)), ($pcAxisDiv * $pcHeightDiv - ($pcHeightDiv - 1)));
+				scale -r -p
+					(rand( -$pcRadius*0.2, $pcRadius*0.2)) (rand( -$pcHeight*0.1, $pcHeight*0.1)) (rand( -$pcRadius*0.2, $pcRadius*0.2))
+					(rand($pcPartScaleMin, $pcPartScaleMax)) (rand($pcPartScaleMin, $pcPartScaleMax)) (rand($pcPartScaleMin, $pcPartScaleMax))
+					($rockShape + ".vtx[0:" + $vtxIndex + "]");
+			}
+			int $level;
+			tima_RockGenerator_deform_globalProc( $rockShape);
+			setAttr ($pcTransformName + ".ry") (rand(360));
+			setAttr ($pcTransformName + ".sx") ($scale * $scaleX);
+			setAttr ($pcTransformName + ".sy") ($scale * $scaleY);
+			setAttr ($pcTransformName + ".sz") ($scale * $scaleZ);
+			if(`checkBox -q -v tima_RockGen_doOffset_checkBox`)
+			{
+				move -a -ws $offsetX 0 0 $pcTransformName;
+				$offsetX += ($pcRadiusMax*2.5*$globalScaleMax* $scaleXMax);
+			}
+			if(`checkBox -q -v tima_RockGen_amm_checkBox`)
+				sets -e -forceElement $shadingGroup $rockShape;
+			$rocksTransforms[$rockNumber] = $pcTransformName;
+			$startIndex++;
+			$rockNumber++;
+		}
+	}
+	if(`checkBox -q -v tima_RockGen_pbUse_checkBox`)//##########################################################   polyCube based Rocks
+	{
+		float $pbWidthMin = `floatField -q -v tima_RockGen_pbWidthMin_floatField`;
+		float $pbWidthMax = `floatField -q -v tima_RockGen_pbWidthMax_floatField`;
+		float $pbHeightMin = `floatField -q -v tima_RockGen_pbHeightMin_floatField`;
+		float $pbHeightMax = `floatField -q -v tima_RockGen_pbHeightMax_floatField`;
+		float $pbDepthMin = `floatField -q -v tima_RockGen_pbDepthMin_floatField`;
+		float $pbDepthMax = `floatField -q -v tima_RockGen_pbDepthMax_floatField`;
+		int $pbDivWidthMin = `intField -q -v tima_RockGen_pbDivWidthMin_intField`;
+		int $pbDivWidthMax = `intField -q -v tima_RockGen_pbDivWidthMin_intField` + 1;
+		int $pbDivHeightMin = `intField -q -v tima_RockGen_pbDivHeightMin_intField`;
+		int $pbDivHeightMax = `intField -q -v tima_RockGen_pbDivHeightMin_intField` + 1;
+		int $pbDivDepthMin = `intField -q -v tima_RockGen_pbDivDepthMin_intField`;
+		int $pbDivDepthMax = `intField -q -v tima_RockGen_pbDivDepthMin_intField` + 1;
+		for( $pbNumber = 0; $pbNumber < $rocksQuantity; $pbNumber ++)
+		{
+			float $scale = rand($globalScaleMin, $globalScaleMax);
+			float $scaleX = rand($scaleXMin, $scaleXMax);
+			float $scaleY = rand($scaleYMin, $scaleYMax);
+			float $scaleZ = rand($scaleZMin, $scaleZMax);
+			float $pbWidth = rand($pbWidthMin, $pbWidthMax);
+			float $pbHeight = rand($pbHeightMin, $pbHeightMax);
+			float $pbDepth = rand($pbDepthMin, $pbDepthMax);
+			int $pbDivWidth = rand($pbDivWidthMin, $pbDivWidthMax);
+			int $pbDivHeight = rand($pbDivHeightMin, $pbDivHeightMax);
+			int $pbDivDepth = rand($pbDivDepthMin, $pbDivDepthMax);
+
+			string $makePolyCubeResArray[] = `polyCube -w $pbWidth -h $pbHeight -d $pbDepth -sx $pbDivWidth -sy $pbDivHeight -sz $pbDivDepth -ax 0 1 0 -tx 1 -ch 0`;
+			string $pbTransformName = $makePolyCubeResArray[0];
+			$makePolyCubeResArray = `listRelatives -s $makePolyCubeResArray[0]`;
+			string $pbShapeName = $makePolyCubeResArray[0];
+			float $rndAmp = rand($noiseAmpMin, $noiseAmpMax);
+			tm_randPoint -amp $rndAmp -obj $pbShapeName;
+			if(`checkBox -q -v tima_RockGen_editUVs_checkBox`)
+				tima_RockGenerator_editUV_globalProc( $pbShapeName, (($scaleX+$scaleZ)*($pbWidth + $pbDepth)*0.2), ($scaleY*$pbHeight*0.1));
+			tima_RockGenerator_deform_globalProc( $pbShapeName);
+			setAttr ($pbTransformName + ".sx") ($scale * $scaleX);
+			setAttr ($pbTransformName + ".sy") ($scale * $scaleY);
+			setAttr ($pbTransformName + ".sz") ($scale * $scaleZ);
+			if(`checkBox -q -v tima_RockGen_doOffset_checkBox`)
+			{
+				move -a -ws $offsetX 0 0 $pbTransformName;
+				$offsetX += ($pbWidth*$globalScaleMax* $scaleXMax);
+			}
+			if(`checkBox -q -v tima_RockGen_amm_checkBox`)
+				sets -e -forceElement $shadingGroup $pbShapeName;
+			$rocksTransforms[$rockNumber] = $pbTransformName;
+			$rockNumber++;
+			$startIndex++;
+		}
+	}
+	if(`checkBox -q -v tima_RockGen_gsUse_checkBox`)//##########################################################   geoShere based Rocks
+	{
+		float $gsRadiusMin = `floatField -q -v tima_RockGen_gsRadiusMin_floatField`;
+		float $gsRadiusMax = `floatField -q -v tima_RockGen_gsRadiusMax_floatField`;
+		int $gsFreqMin = `intField -q -v tima_RockGen_gsFreqMin_intField`;
+		int $gsFreqMax= `intField -q -v tima_RockGen_gsFreqMax_intField` + 1;
+		int $gsTypeMin = `intField -q -v tima_RockGen_gsTypeMin_intField`;
+		int $gsTypeMax= `intField -q -v tima_RockGen_gsTypeMax_intField` + 1;
+		for( $geoNumber = 0; $geoNumber < $rocksQuantity; $geoNumber ++)
+		{
+			float $scale = rand($globalScaleMin, $globalScaleMax);
+			float $scaleX = rand($scaleXMin, $scaleXMax);
+			float $scaleY = rand($scaleYMin, $scaleYMax);
+			float $scaleZ = rand($scaleZMin, $scaleZMax);
+			float $gsRadius = rand($gsRadiusMin, $gsRadiusMax);
+			int $gsFreq = rand($gsFreqMin, $gsFreqMax);
+			int $gsType = rand($gsTypeMin, $gsTypeMax);
+			string $makeGeoSphereResArray[] = timaMakeGeoSphere_globalProc( $gsType, $gsFreq, $gsRadius);
+			string $geoTransformName = `rename -is $makeGeoSphereResArray[0] ("gsGenRock" + $startIndex)`;
+			string $geoShapeName = `rename $makeGeoSphereResArray[2] ($geoTransformName + "Shape")`;
+			delete -ch $geoShapeName;
+			float $rndAmp = rand($noiseAmpMin, $noiseAmpMax);
+			tm_randPoint -amp $rndAmp -obj $geoShapeName;
+			polyAutoProjection -ibd 1 -cm 0 -l 2 -sc 1 -o 1 -p 4 -ps 0.1 -ch 0 $geoShapeName;
+			if(`checkBox -q -v tima_RockGen_editUVs_checkBox`)
+				tima_RockGenerator_editUV_globalProc( $geoShapeName, (($scaleX+$scaleZ)*$gsRadius*0.5), ($scaleY*$gsRadius*0.3));
+			tima_RockGenerator_deform_globalProc( $geoShapeName);
+			setAttr ($geoTransformName + ".rx") (rand(360));
+			setAttr ($geoTransformName + ".ry") (rand(360));
+			setAttr ($geoTransformName + ".rz") (rand(360));
+			setAttr ($geoTransformName + ".sx") ($scale * $scaleX);
+			setAttr ($geoTransformName + ".sy") ($scale * $scaleY);
+			setAttr ($geoTransformName + ".sz") ($scale * $scaleZ);
+			if(`checkBox -q -v tima_RockGen_doOffset_checkBox`)
+			{
+				move -a -ws $offsetX 0 0 $geoTransformName;
+				$offsetX += ($gsRadiusMax*2*$globalScaleMax* $scaleXMax);
+			}
+			if(`checkBox -q -v tima_RockGen_amm_checkBox`)
+				sets -e -forceElement $shadingGroup $geoShapeName;
+			$rocksTransforms[$rockNumber] = $geoTransformName;
+			$rockNumber++;
+			$startIndex++;
+		}
+	}
+	if($rockNumber == 0)
+	{
+		warning ("///###***   rockNumbe == 0 !!! Check \"use\" and \"quantity\" fields.");
+		return;
+	}
+	string $parentName;
+	if(`checkBox -q -v tima_RockGen_group_checkBox`)
+	{
+		$parentName = `createNode transform -n "rocks_grp#"`;
+		parent $rocksTransforms $parentName;
+		if(`checkBox -q -v tima_RockGen_parent_checkBox` && (`textField -q -ann tima_RockGen_parentTF` != "NULL"))
+		{
+			parent $parentName (`textField -q -ann tima_RockGen_parentTF`);
+		}
+		select -r $parentName;
+	}
+	else
+	{
+		if(`checkBox -q -v tima_RockGen_parent_checkBox` && (`textField -q -ann tima_RockGen_parentTF` != "NULL"))
+		{
+			parent $rocksTransforms (`textField -q -ann tima_RockGen_parentTF`);
+			select -r $rocksTransforms;
+		}
+		select -r $rocksTransforms;
+	}
+	if(`checkBox -q -v tima_RockGen_asa_checkBox` && (`textField -q -ann tima_RockGen_asaTF` != "NULL"))
+		mtor control attach surface `textField -q -ann tima_RockGen_asaTF`;
+}
+//#################################################################################################################
+global proc tima_RockGen_ammGetBT_globalProc()
+{
+	string $selArray[] = `ls -sl -l`;
+	if(!`size($selArray)`) return;
+	if($selArray[0] == "lambert1")
+	{
+		textField -e -tx "lambert1" -ann "initialShadingGroup" tima_RockGen_ammTF;
+		return;
+	}
+	string $selType = `nodeType $selArray[0]`;
+	switch ($selType)
+	{
+		case "transform":
+			$selArray = `listRelatives -f -s $selArray[0]`;
+			if(!`size($selArray)`) return;
+			$selType = `nodeType $selArray[0]`;
+			if($selType != "mesh") return;
+		case "mesh":
+			string $SG[] = `listConnections -s 0 -d 1 ($selArray[0] + ".instObjGroups")`;
+			string $mm[] = `listConnections -s 1 -d 0 ($SG[0] + ".surfaceShader")`;
+			textField -e -tx $mm[0] -ann $SG[0] tima_RockGen_ammTF;
+			break;
+		case "shadingEngine":
+			string $mm[] = `listConnections -s 1 -d 0 ($selArray[0] + ".surfaceShader")`;
+			textField -e -tx $mm[0] -ann $selArray[0] tima_RockGen_ammTF;
+			break;
+		default:
+			string $classification[] = `getClassification $selType`;
+			if($classification[0] != "shader/surface") break;
+			string $SG[] = `listConnections -s 0 -d 1 ($selArray[0] + ".outColor")`;
+			textField -e -tx $selArray[0] -ann $SG[0] tima_RockGen_ammTF;
+			break;
+	}
+}
+global proc tima_RockGen_asaGetBT_globalProc()
+{
+	string $selArray[] = `ls -sl -l`;
+	if(`size($selArray)`)
+	{
+		string $keys[] = `mtor palette showpicked`;
+		if(!`size($keys)`) return;
+		string $func = `slimcmd slim GetAppearances -id $keys[0]`;
+		string $label = `slimcmd $func GetLabel`;
+		textField -e -tx $label -ann $keys[0] tima_RockGen_asaTF;
+	}
+	else
+	{
+		string $pickedFunctions = `slimcmd slim GetAppearances -selected 1`;
+		string $buffer[];
+		int $numTokens = `tokenize $pickedFunctions " " $buffer`;
+		if($numTokens) $pickedFunctions = $buffer[0];
+		if($pickedFunctions == "")
+		{
+			textField -e -tx "NULL" -ann "NULL" tima_RockGen_asaTF;
+			return;
+		}
+		string $key = `slimcmd $pickedFunctions GetID`;
+		string $label = `slimcmd $pickedFunctions GetLabel`;
+		textField -e -tx $label -ann $key tima_RockGen_asaTF;
+	}
+}
+//#################################################################################################################
+global proc tima_RockGenerator_save_globalProc()
+{
+	string $allControls[] = `lsUI -ctl`;
+	string $conrol;
+	string $MAYA_APP_DIR = `getenv "MAYA_APP_DIR"`;
+	string $dirFileList[] = `getFileList -folder ($MAYA_APP_DIR + "/")`;
+	if(!stringArrayCount( "rockgenerator", $dirFileList)) sysFile -makeDir ($MAYA_APP_DIR + "/rockgenerator");
+	string $fileName;
+ 	string $result = `promptDialog 
+ 		-title "save paramerets"
+ 		-message "enter file name:"
+ 		-button "ok" -button "cancel"
+ 		-defaultButton "ok" -cancelButton "cancel"
+ 		-dismissString "cancel"`;
+ 	if ($result == "ok") $fileName = `promptDialog -query -text`;
+	else return;
+	string $saveFileName = ($MAYA_APP_DIR + "/rockgenerator/" + $fileName + ".rg");
+	string $saveLine;
+	int $fileId = `fopen $saveFileName "w"`;
+	for( $control in $allControls)
+	{
+		if(!`gmatch $control "tima_RockGen_*"`) continue;
+		string $ctrlType = `objectTypeUI $control`;
+		$saveLine = "";
+		if($ctrlType == "floatField")
+			$saveLine += ("floatField -e -v " + `floatField -q -v $control`);
+		else if($ctrlType == "intField")
+			$saveLine += ("intField -e -v " + `intField -q -v $control`);
+		else if($ctrlType == "checkBox")
+			$saveLine += ("checkBox -e -v " + `checkBox -q -v $control`);
+		else if($ctrlType == "field")
+			$saveLine += ("textField -e -tx \"" + `textField -q -tx $control` + "\" -ann \"" + `textField -q -ann $control` + "\"");
+		else continue;
+		$saveLine += (" " + $control + ";\r\n");
+		fprint $fileId $saveLine;
+
+	}
+	string $allFrames[] = `lsUI -cl`;
+	string $frame;
+	for( $frame in $allFrames)
+	{
+		if(!`gmatch $frame "tima_RockGen_*_frameLayout"`) continue;
+		$saveLine = "";
+		$saveLine += ("frameLayout -e -cl " + `frameLayout -q -cl $frame`);
+		$saveLine += (" " + $frame + ";\r\n");
+		fprint $fileId $saveLine;
+	}
+	$saveLine = "window -e -wh ";
+	$saveLine += `window -q -w tima_RockGenerator_window` + " ";
+	$saveLine += `window -q -h tima_RockGenerator_window` + " ";
+	$saveLine += "tima_RockGenerator_window;\r\n";
+	fprint $fileId $saveLine;
+	fclose $fileId;
+}
+global proc tima_RockGenerator_makeLoadList_globalProc()
+{
+	popupMenu -e -deleteAllItems tima_RockGenerator_saveLoadPpM;
+	string $MAYA_APP_DIR = `getenv "MAYA_APP_DIR"`;
+	string $dirFileList[] = `getFileList -folder ($MAYA_APP_DIR + "/")`;
+	if(!stringArrayCount( "rockgenerator", $dirFileList))
+	{
+		sysFile -makeDir ($MAYA_APP_DIR + "/rockgenerator");
+		return;
+	}
+	$dirFileList = `getFileList -folder ($MAYA_APP_DIR + "/rockgenerator/") -filespec "*.rg"`;
+	if(!`size($dirFileList)`) return;
+	string $file;
+	for($file in $dirFileList)
+	{
+		string $label = `substitute ".rg" $file ""`;
+		string $cmd = ("source \"" + $MAYA_APP_DIR + "/rockgenerator/" + $file + "\";");
+		menuItem -l $label -c $cmd -p tima_RockGenerator_saveLoadPpM;
+	}
+}
+//#################################################################################################################
+global proc tima_RockGen_selParerntBT_globalProc()
+{
+	string $selArray[] = `ls -sl -l`;
+	if(`size($selArray)` == 0) return;
+	if(`objectType -isType "transform" $selArray[0]` == 0) return;
+	string $name = `substitute ".*|" $selArray[0] ""`;
+	textField -e -tx $name -ann $selArray[0] tima_RockGen_parentTF;
+}
+//#################################################################################################################
+proc tima_RockGenerator_show_window_proc()
+{
+	if (`window -exists tima_RockGenerator_window`) deleteUI tima_RockGenerator_window;
+	int $cw1 = 100;
+	int $cw2 = 50;
+	int $cw3 = $cw2;
+	window -t "Rock Generator" tima_RockGenerator_window;
+ 		string $form = `formLayout -numberOfDivisions 100`;
+			string $paramsControl = `rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3`;
+				text -l "base params " -ann "click to manage presets";
+					popupMenu -button 1;
+						menuItem -l "save" -c "tima_RockGenerator_save_globalProc()";
+						menuItem -divider true;
+						menuItem -l "load ->" -sm 1 -postMenuCommand "tima_RockGenerator_makeLoadList_globalProc()" tima_RockGenerator_saveLoadPpM;
+						setParent -m ..;
+						menuItem -divider true;
+						menuItem -l "presets ->" -sm 1;
+							menuItem -l "cylinders" -c "tima_RockGenerator_loadPreset(\"cylinders\")";
+							menuItem -l "spheres" -c "tima_RockGenerator_loadPreset(\"spheres\")";
+							menuItem -l "boxes" -c "tima_RockGenerator_loadPreset(\"boxes\")";
+						setParent -m ..;
+						menuItem -divider true;
+						string $MAYA_APP_DIR = `getenv "MAYA_APP_DIR"`;
+						string $path = $MAYA_APP_DIR + "/rockgenerator";
+						string $path = toNativePath( $path );
+						string $path = `encodeString $path`;
+						string $cmd = "system (\"explorer " + $path + "\");";
+						menuItem -l "open folder" -c $cmd;
+				text -l "   min";
+				text -l "   max";
+			setParent..;
+			string $scroll = `scrollLayout -cr 1 -mcw 150`;
+				columnLayout -adj 1;
+					rowLayout -nc 2 -cw2 $cw1 $cw2;
+						text -l "quantity";
+						intField -v 5 -w ($cw2-5) tima_RockGen_rockQuantity_intField;
+					setParent..;
+					separator;
+					frameLayout -l "Object transform scale" -cll 1 tima_RockGen_ots_frameLayout;
+						columnLayout -adj 1;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "global scale";
+								floatField -v 0.9 -w ($cw2-5) -pre 1 tima_RockGen_globalScaleMin_floatField;
+								floatField -v 1.1 -w ($cw2-5) -pre 1 tima_RockGen_globalScaleMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "scale X";
+								floatField -v 0.9 -w ($cw2-5) -pre 1 tima_RockGen_scaleXMin_floatField;
+								floatField -v 1.1 -w ($cw2-5) -pre 1 tima_RockGen_scaleXMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "scale Y";
+								floatField -v 0.9 -w ($cw2-5) -pre 1 tima_RockGen_scaleYMin_floatField;
+								floatField -v 1.1 -w ($cw2-5) -pre 1 tima_RockGen_scaleYMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "scale Z";
+								floatField -v 0.9 -w ($cw2-5) -pre 1 tima_RockGen_scaleZMin_floatField;
+								floatField -v 1.1 -w ($cw2-5) -pre 1 tima_RockGen_scaleZMax_floatField;
+							setParent..;
+						setParent..;
+					setParent..;
+					separator;
+					frameLayout -l "UV coords edit" -cll 1 tima_RockGen_uvce_frameLayout;
+						columnLayout -adj 1;
+							checkBox -l "edit UVs" -v 1 tima_RockGen_editUVs_checkBox;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "scale U";
+								floatField -v 0.5 -w ($cw2-5) -pre 1 tima_RockGen_scaleUMin_floatField;
+								floatField -v 0.6 -w ($cw2-5) -pre 1 tima_RockGen_scaleUMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "scale V";
+								floatField -v 0.5 -w ($cw2-5) -pre 1 tima_RockGen_scaleVMin_floatField;
+								floatField -v 0.6 -w ($cw2-5) -pre 1 tima_RockGen_scaleVMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "offset U";
+								floatField -v 0 -w ($cw2-5) -pre 1 tima_RockGen_offsetUMin_floatField;
+								floatField -v 1 -w ($cw2-5) -pre 1 tima_RockGen_offsetUMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "offset V";
+								floatField -v 0 -w ($cw2-5) -pre 1 tima_RockGen_offsetVMin_floatField;
+								floatField -v 1 -w ($cw2-5) -pre 1 tima_RockGen_offsetVMax_floatField;
+							setParent..;
+						setParent..;
+					setParent..;
+					separator;
+					frameLayout -l "Materials" -cll 1 tima_RockGen_mat_frameLayout;
+						columnLayout -adj 1;
+							checkBox -l "assign maya material" -v 1 tima_RockGen_amm_checkBox;
+							rowLayout -nc 2 -cw2 ($cw1 + $cw2) $cw3 -adj 1;
+								textField -tx "lambert1" -ed 0 -w ($cw1 + $cw2 -3) -ann "initialShadingGroup" tima_RockGen_ammTF;
+								button -l " Get " -c "tima_RockGen_ammGetBT_globalProc()";
+							setParent..;
+							checkBox -l "assign slim appearance" -v 1 tima_RockGen_asa_checkBox;
+							rowLayout -nc 2 -cw2 ($cw1 + $cw2) $cw3 -adj 1;
+								textField -tx "NULL" -ed 0 -w ($cw1 + $cw2 -3) -ann "NULL" tima_RockGen_asaTF;
+								button -l " Get " -c "tima_RockGen_asaGetBT_globalProc()";
+							setParent..;
+						setParent..;
+					setParent..;
+					separator;
+					frameLayout -l "polyCylinder based" -cll 1 tima_RockGen_pcb_frameLayout;
+						columnLayout -adj 1;
+							checkBox -l "use" -v 1 tima_RockGen_pcUse_checkBox;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "radius";
+								floatField -v 0.8 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pcRadiusMin_floatField;
+								floatField -v 1.2 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pcRadiusMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "height";
+								floatField -v 8 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pcHeightMin_floatField;
+								floatField -v 10 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pcHeightMax_floatField;
+							setParent..;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "axis divisions";
+								intField -v 3 -w ($cw2-5) -min 3 tima_RockGen_pcAxisDivMin_intField;
+								intField -v 4 -w ($cw2-5) -min 3 tima_RockGen_pcAxisDivMax_intField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "height divisions";
+								intField -v 3 -w ($cw2-5) -min 1 tima_RockGen_pcHeightDivMin_intField;
+								intField -v 4 -w ($cw2-5) -min 1 tima_RockGen_pcHeightDivMax_intField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "sharp caps";
+								floatField -v 0.1 -w ($cw2-5) -pre 1 tima_RockGen_pcSharpCapsMin_floatField;
+								floatField -v 0.2 -w ($cw2-5) -pre 1 tima_RockGen_pcSharpCapsMax_floatField;
+							setParent..;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "partial offset";
+								floatField -v 0.0 -w ($cw2-5) -pre 1 tima_RockGen_pcPartOffsetMin_floatField;
+								floatField -v 0.2 -w ($cw2-5) -pre 1 tima_RockGen_pcPartOffsetMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "partial rotate";
+								floatField -v -90 -w ($cw2-5) -pre 1 tima_RockGen_pcPartRotateMin_floatField;
+								floatField -v 90  -w ($cw2-5) -pre 1 tima_RockGen_pcPartRotateMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "partial scale";
+								floatField -v 1.0 -w ($cw2-5) -pre 1 tima_RockGen_pcPartScaleMin_floatField;
+								floatField -v 1.2 -w ($cw2-5) -pre 1 tima_RockGen_pcPartScaleMax_floatField;
+							setParent..;
+						setParent..;
+					setParent..;
+					separator;
+					frameLayout -l "polyCube based" -cll 1 tima_RockGen_pbb_frameLayout;
+						columnLayout -adj 1;
+							checkBox -l "use" -v 1 tima_RockGen_pbUse_checkBox;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "width";
+								floatField -v 2.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pbWidthMin_floatField;
+								floatField -v 2.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pbWidthMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "height";
+								floatField -v 1.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pbHeightMin_floatField;
+								floatField -v 1.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pbHeightMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "depth";
+								floatField -v 1.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pbDepthMin_floatField;
+								floatField -v 1.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_pbDepthMax_floatField;
+							setParent..;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "divisions width";
+								intField -v 2 -w ($cw2-5) -min 0 tima_RockGen_pbDivWidthMin_intField;
+								intField -v 4 -w ($cw2-5) -min 0 tima_RockGen_pbDivWidthMax_intField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "divisions height";
+								intField -v 2 -w ($cw2-5) -min 0 tima_RockGen_pbDivHeightMin_intField;
+								intField -v 3 -w ($cw2-5) -min 0 tima_RockGen_pbDivHeightMax_intField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "divisions depth";
+								intField -v 2 -w ($cw2-5) -min 0 tima_RockGen_pbDivDepthMin_intField;
+								intField -v 3 -w ($cw2-5) -min 0 tima_RockGen_pbDivDepthMax_intField;
+							setParent..;
+						setParent..;
+					setParent..;
+					separator;
+					frameLayout -l "geoSphere based" -cll 1 tima_RockGen_geob_frameLayout;
+						columnLayout -adj 1;
+							checkBox -l "use" -v 1 tima_RockGen_gsUse_checkBox;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "radius";
+								floatField -v 0.8 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_gsRadiusMin_floatField;
+								floatField -v 1.2 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_gsRadiusMax_floatField;
+							setParent..;
+							separator;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "type";
+								intField -v 2 -w ($cw2-5) -min 1 -max 3 -step 1 tima_RockGen_gsTypeMin_intField;
+								intField -v 3 -w ($cw2-5) -min 1 -max 3 -step 1 tima_RockGen_gsTypeMax_intField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "base frequency";
+								intField -v 1 -w ($cw2-5) -min 0 -max 5 -step 1 tima_RockGen_gsFreqMin_intField;
+								intField -v 1 -w ($cw2-5) -min 0 -max 5 -step 1 tima_RockGen_gsFreqMax_intField;
+							setParent..;
+						setParent..;
+					setParent..;
+					separator;
+					frameLayout -l "Deformation" -cll 1 tima_RockGen_def_frameLayout;
+						columnLayout -adj 1;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "base noise";
+								floatField -v 0.3 -w ($cw2-5) -min 0 -pre 2 tima_RockGen_baseNoiseMin_floatField;
+								floatField -v 0.5 -w ($cw2-5) -min 0 -pre 2 tima_RockGen_baseNoiseMax_floatField;
+							setParent..;
+							separator;
+							rowLayout -nc 2 -cw2 $cw1 $cw2 -adj 1;
+								text -l "levels";
+								intField -v 2 -w ($cw2-5) -min 0 tima_RockGen_nLevels_intField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "start smoothness";
+								floatField -v 0.5 -w ($cw2-5) -min 0 -max 1 -pre 2 tima_RockGen_nStSmoothMin_floatField;
+								floatField -v 0.6 -w ($cw2-5) -min 0 -max 1 -pre 2 tima_RockGen_nStSmoothMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "last smoothness";
+								floatField -v 0.8 -w ($cw2-5) -min 0 -max 1 -pre 2 tima_RockGen_nLaSmoothMin_floatField;
+								floatField -v 0.9 -w ($cw2-5) -min 0 -max 1 -pre 2 tima_RockGen_nLaSmoothMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "noise amp";
+								floatField -v 0.3 -w ($cw2-5) -min 0 -pre 2 tima_RockGen_nAmpMin_floatField;
+								floatField -v 0.5 -w ($cw2-5) -min 0 -pre 2 tima_RockGen_nAmpMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "noise amp fade";
+								floatField -v 1.5 -w ($cw2-5) -min 0 -pre 2 tima_RockGen_nFadeMin_floatField;
+								floatField -v 2.9 -w ($cw2-5) -min 0 -pre 2 tima_RockGen_nFadeMax_floatField;
+							setParent..;
+							rowLayout -nc 3 -cw3 $cw1 $cw2 $cw3 -adj 1;
+								text -l "softEdge";
+								floatField -v 15.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_softEdgeMin_floatField;
+								floatField -v 20.0 -w ($cw2-5) -min 0 -pre 1 tima_RockGen_softEdgeMax_floatField;
+							setParent..;
+						setParent..;
+					setParent..;
+				setParent..;
+			setParent..;
+			string $generateUI = `columnLayout -adj 1`;
+				separator;
+				rowLayout -nc 2 -cw2 ($cw1+5) ($cw2+$cw3+5) -adj 1;
+					checkBox -l "group rocks" -w $cw1 -v 1 tima_RockGen_group_checkBox;
+					checkBox -l "parent result" -w ($cw2+$cw3) -v 1 tima_RockGen_parent_checkBox;
+				setParent..;
+				rowLayout -nc 2 -cw2 ($cw1+$cw2) $cw3 -adj 1;
+					textField -w ($cw1+$cw2-5) -tx "NULL" -ann "NULL" -ed 0 tima_RockGen_parentTF;
+					button -w ($cw3-5) -l " Sel " -c "tima_RockGen_selParerntBT_globalProc()";
+				setParent..;
+				separator;
+				rowLayout -nc 2 -cw2 $cw1 ($cw2 + $cw3) -adj 1;
+					button -l " GENERATE " -c "tima_RockGenerator__globalProc()";
+					checkBox -l "offset rocks" -v 1 tima_RockGen_doOffset_checkBox;
+				setParent..;
+				separator;
+			setParent..;
+		setParent..;
+		formLayout -edit
+			-attachForm		$paramsControl	"top"    0
+			-attachForm		$paramsControl	"left"   0
+			-attachForm		$paramsControl	"right"  0
+			-attachOppositeForm	$paramsControl	"bottom" -15
+
+			-attachForm		$scroll		"top"    20
+			-attachForm		$scroll		"left"   0
+			-attachForm		$scroll		"right"  0
+			-attachForm		$scroll		"bottom" 70
+
+			-attachOppositeForm	$generateUI	"top"	 -65
+			-attachForm		$generateUI	"left"   0
+			-attachForm		$generateUI	"right"  0
+			-attachForm		$generateUI	"bottom" 0
+		$form;
+	showWindow tima_RockGenerator_window;
+}
+
+tima_RockGenerator_show_window_proc();
+
+global proc tima_RockGenerator_loadPreset(string $preset)
+{
+	switch ($preset)
+	{
+		case "cylinders":
+checkBox -e -v 1 tima_RockGen_pcUse_checkBox;
+checkBox -e -v 0 tima_RockGen_gsUse_checkBox;
+checkBox -e -v 0 tima_RockGen_pbUse_checkBox;
+floatField -e -v 0.7 tima_RockGen_baseNoiseMax_floatField;
+floatField -e -v 0.5 tima_RockGen_baseNoiseMin_floatField;
+floatField -e -v 1 tima_RockGen_globalScaleMax_floatField;
+floatField -e -v 1 tima_RockGen_globalScaleMin_floatField;
+floatField -e -v 0.5 tima_RockGen_nAmpMax_floatField;
+floatField -e -v 0.4 tima_RockGen_nAmpMin_floatField;
+floatField -e -v 1.2 tima_RockGen_nFadeMax_floatField;
+floatField -e -v 1.1 tima_RockGen_nFadeMin_floatField;
+floatField -e -v 0.9 tima_RockGen_nLaSmoothMax_floatField;
+floatField -e -v 0.8 tima_RockGen_nLaSmoothMin_floatField;
+intField -e -v 2 tima_RockGen_nLevels_intField;
+floatField -e -v 0.3 tima_RockGen_nStSmoothMax_floatField;
+floatField -e -v 0.2 tima_RockGen_nStSmoothMin_floatField;
+intField -e -v 4 tima_RockGen_pcAxisDivMax_intField;
+intField -e -v 3 tima_RockGen_pcAxisDivMin_intField;
+intField -e -v 4 tima_RockGen_pcHeightDivMax_intField;
+intField -e -v 3 tima_RockGen_pcHeightDivMin_intField;
+floatField -e -v 10 tima_RockGen_pcHeightMax_floatField;
+floatField -e -v 8 tima_RockGen_pcHeightMin_floatField;
+floatField -e -v 0.2 tima_RockGen_pcPartOffsetMax_floatField;
+floatField -e -v 0 tima_RockGen_pcPartOffsetMin_floatField;
+floatField -e -v 90 tima_RockGen_pcPartRotateMax_floatField;
+floatField -e -v -90 tima_RockGen_pcPartRotateMin_floatField;
+floatField -e -v 1.5 tima_RockGen_pcPartScaleMax_floatField;
+floatField -e -v 1.1 tima_RockGen_pcPartScaleMin_floatField;
+floatField -e -v 1.2 tima_RockGen_pcRadiusMax_floatField;
+floatField -e -v 0.8 tima_RockGen_pcRadiusMin_floatField;
+floatField -e -v 0.2 tima_RockGen_pcSharpCapsMax_floatField;
+floatField -e -v 0.1 tima_RockGen_pcSharpCapsMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleXMax_floatField;
+floatField -e -v 0.9 tima_RockGen_scaleXMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleYMax_floatField;
+floatField -e -v 0.9 tima_RockGen_scaleYMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleZMax_floatField;
+floatField -e -v 0.9 tima_RockGen_scaleZMin_floatField;
+floatField -e -v 22 tima_RockGen_softEdgeMax_floatField;
+floatField -e -v 18 tima_RockGen_softEdgeMin_floatField;
+frameLayout -e -cl 0 tima_RockGen_def_frameLayout;
+frameLayout -e -cl 1 tima_RockGen_geob_frameLayout;
+frameLayout -e -cl 0 tima_RockGen_ots_frameLayout;
+frameLayout -e -cl 1 tima_RockGen_pbb_frameLayout;
+frameLayout -e -cl 0 tima_RockGen_pcb_frameLayout;
+		break;
+		case "spheres":
+checkBox -e -v 0 tima_RockGen_pcUse_checkBox;
+checkBox -e -v 1 tima_RockGen_gsUse_checkBox;
+checkBox -e -v 0 tima_RockGen_pbUse_checkBox;
+floatField -e -v 0.7 tima_RockGen_baseNoiseMax_floatField;
+floatField -e -v 0.5 tima_RockGen_baseNoiseMin_floatField;
+floatField -e -v 1 tima_RockGen_globalScaleMax_floatField;
+floatField -e -v 1 tima_RockGen_globalScaleMin_floatField;
+intField -e -v 1 tima_RockGen_gsFreqMax_intField;
+intField -e -v 1 tima_RockGen_gsFreqMin_intField;
+floatField -e -v 1.2 tima_RockGen_gsRadiusMax_floatField;
+floatField -e -v 0.8 tima_RockGen_gsRadiusMin_floatField;
+intField -e -v 3 tima_RockGen_gsTypeMax_intField;
+intField -e -v 1 tima_RockGen_gsTypeMin_intField;
+floatField -e -v 0.4 tima_RockGen_nAmpMax_floatField;
+floatField -e -v 0.3 tima_RockGen_nAmpMin_floatField;
+floatField -e -v 2.2 tima_RockGen_nFadeMax_floatField;
+floatField -e -v 2.1 tima_RockGen_nFadeMin_floatField;
+floatField -e -v 0.9 tima_RockGen_nLaSmoothMax_floatField;
+floatField -e -v 0.8 tima_RockGen_nLaSmoothMin_floatField;
+intField -e -v 2 tima_RockGen_nLevels_intField;
+floatField -e -v 0.6 tima_RockGen_nStSmoothMax_floatField;
+floatField -e -v 0.3 tima_RockGen_nStSmoothMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleXMax_floatField;
+floatField -e -v 0.9 tima_RockGen_scaleXMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleYMax_floatField;
+floatField -e -v 0.9 tima_RockGen_scaleYMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleZMax_floatField;
+floatField -e -v 0.9 tima_RockGen_scaleZMin_floatField;
+floatField -e -v 22 tima_RockGen_softEdgeMax_floatField;
+floatField -e -v 18 tima_RockGen_softEdgeMin_floatField;
+frameLayout -e -cl 0 tima_RockGen_def_frameLayout;
+frameLayout -e -cl 0 tima_RockGen_geob_frameLayout;
+frameLayout -e -cl 0 tima_RockGen_ots_frameLayout;
+frameLayout -e -cl 1 tima_RockGen_pbb_frameLayout;
+frameLayout -e -cl 1 tima_RockGen_pcb_frameLayout;
+		break;
+		case "boxes":
+checkBox -e -v 0 tima_RockGen_pcUse_checkBox;
+checkBox -e -v 0 tima_RockGen_gsUse_checkBox;
+checkBox -e -v 1 tima_RockGen_pbUse_checkBox;
+floatField -e -v 0.03 tima_RockGen_baseNoiseMax_floatField;
+floatField -e -v 0.02 tima_RockGen_baseNoiseMin_floatField;
+floatField -e -v 1 tima_RockGen_globalScaleMax_floatField;
+floatField -e -v 1 tima_RockGen_globalScaleMin_floatField;
+floatField -e -v 0.04 tima_RockGen_nAmpMax_floatField;
+floatField -e -v 0.03 tima_RockGen_nAmpMin_floatField;
+floatField -e -v 0.5 tima_RockGen_nFadeMax_floatField;
+floatField -e -v 0.5 tima_RockGen_nFadeMin_floatField;
+floatField -e -v 0.3 tima_RockGen_nLaSmoothMax_floatField;
+floatField -e -v 0.3 tima_RockGen_nLaSmoothMin_floatField;
+intField -e -v 2 tima_RockGen_nLevels_intField;
+floatField -e -v 0 tima_RockGen_nStSmoothMax_floatField;
+floatField -e -v 0 tima_RockGen_nStSmoothMin_floatField;
+floatField -e -v 1 tima_RockGen_pbDepthMax_floatField;
+floatField -e -v 1 tima_RockGen_pbDepthMin_floatField;
+intField -e -v 2 tima_RockGen_pbDivDepthMax_intField;
+intField -e -v 3 tima_RockGen_pbDivDepthMin_intField;
+intField -e -v 2 tima_RockGen_pbDivHeightMax_intField;
+intField -e -v 3 tima_RockGen_pbDivHeightMin_intField;
+intField -e -v 2 tima_RockGen_pbDivWidthMax_intField;
+intField -e -v 4 tima_RockGen_pbDivWidthMin_intField;
+floatField -e -v 1 tima_RockGen_pbHeightMax_floatField;
+floatField -e -v 1 tima_RockGen_pbHeightMin_floatField;
+floatField -e -v 2 tima_RockGen_pbWidthMax_floatField;
+floatField -e -v 2 tima_RockGen_pbWidthMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleXMax_floatField;
+floatField -e -v 0.95 tima_RockGen_scaleXMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleYMax_floatField;
+floatField -e -v 0.95 tima_RockGen_scaleYMin_floatField;
+floatField -e -v 1 tima_RockGen_scaleZMax_floatField;
+floatField -e -v 0.95 tima_RockGen_scaleZMin_floatField;
+floatField -e -v 10 tima_RockGen_softEdgeMax_floatField;
+floatField -e -v 10 tima_RockGen_softEdgeMin_floatField;
+frameLayout -e -cl 0 tima_RockGen_def_frameLayout;
+frameLayout -e -cl 1 tima_RockGen_geob_frameLayout;
+frameLayout -e -cl 0 tima_RockGen_ots_frameLayout;
+frameLayout -e -cl 0 tima_RockGen_pbb_frameLayout;
+frameLayout -e -cl 1 tima_RockGen_pcb_frameLayout;
+		break;
+	}
+}

@@ -1,0 +1,109 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../_system/styles.css" rel="stylesheet" type="text/css">
+<title>autosaving</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="CGRU: CG Tools, CG Rules, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://www.linkedin.com/groups/CGRU-AFANASY-4263049"><img src="../../../../doc/images/linkedin.png" border="0" alt="LinkedIn" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+<div class="commonText">
+<p><strong>Autosave manager.</strong></p>
+<p>Autosave manager window configures the automatic saving of your scene:</p>
+<table width="800" border="0">
+  <tr>
+    <td width="162" height="321"><img src="tima_autosavemgr.png" width="160" height="343"></td>
+    <td width="628" valign="top"><p class="smallComments">&nbsp;</p>
+      <p class="smallComments"><strong>Enable autosave</strong> - turns it on or off.<br>
+      <strong>help</strong> - open this HTML page. <br>
+      <strong>Autosave every &quot;#n&quot; nimutes</strong> - sets the autosave time.<br>
+      <strong>Selections</strong> - set autosave to count selection mode.<br>
+      <strong>Show confirm dialog</strong> - raises a dialog when the time is about to save, so you will be able to choose whether to save or not.<br>
+      <strong>Add to recent files list</strong> - adds an autosave name to maya &quot; File -&gt; Recent Files&quot; menu.<br>
+      <strong>Files maximum</strong> - sets the cycle quantity of autosave files.<br>
+      <strong>Name padding</strong> - sets the quantity digits in the number or the filename.<br>
+      <strong>Save in another directory</strong> - sets the directory to place autosave files. If this flag is off autosave manager will place files in the directory you work in.<br>
+      <strong>browse</strong> - browse path to the autosave directory.</p>
+      <p class="smallComments">        <em>history backup section:<br>
+      </em><strong>enable backup</strong> - turns backup on or off.<br>
+      <strong>backup every &quot;#n&quot; saves</strong> - set the frequency of backup.<br>
+      <strong>backup directory</strong> - set the directory to place backup files.<br>
+      <strong>browse</strong> - to browse path to the backup directory.</p>
+    </td>
+  </tr>
+</table>
+<p>By default the autosave is off. You can use autosave to save you scene periodically. Choose the frequency of autosaving by setting up the autosave time. Maya will save your scene every &quot;n&quot; minutes with the adjusted name. Or you can use autosave in &quot;<strong>Selection</strong>&quot; mode. In this mode it counts every maya selection changes.</p>
+<p>It adds special autosave symbol - &quot;@&quot; and a save number with the specified padding. For example - &quot;test.@0006.mb&quot;. And prints full autosaved path - &quot;autosave result - c:/temp/autoSaveDir/temp.@0006.mb&quot;. When save number is equal to &quot;files maximum&quot; manager sets it to zero. So autosave is a cycle procedure, whith overwrites old autosave files. </p>
+<p>Every time user changes selection manager  compares the time of last autosave and the current time. So if you do not doing anything (if you went away, for example) manager will not work! It is very useful, because if you was away for a long time manager will not overwrite you last saves with the same scene.</p>
+<p>History Backup - spacially designed for backup you saves history. Unlike autosave it never overwrite files. Backup adds to autosave name current date and time and stores it in a specific backup directory. So there is no way for name coincidence. It is the reason for the permanent enlarging of backup directory. You should clean it up periodically ( about every several mounths or once a year at least). The advantage of using history backup is that you can always do the steps back to the history crearing you masterpieces.</p>
+<p align = "right">
+<a href="../index.html" target="_top" class="smallComments">jump to CGRU documentation</a>
+</p>
+</div>
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net/projects/cgru/"><img src="../../../../doc/images/sourceforgeproject.png" border="0" alt="SourceForge.net Project" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top"><img src="../../../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://libregraphicsworld.org/tag/cgru"><img src="../../../../doc/images/lgw.png" border="0" alt="Libre Graphics World" /></a>
+</td>
+</tr>
+</table>
+</body>
+</html>

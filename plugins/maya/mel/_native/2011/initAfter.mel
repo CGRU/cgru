@@ -1,0 +1,439 @@
+// Copyright (C) 1997-2010 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+//
+//
+//  Creation Date:  May 7 1997
+//
+//  Description:
+//      This script is called after file open/new on startup to make
+//		sure that the UI construction went okay, and if not to clean up.
+//  
+{
+	global string $gMainPane;
+
+	if (`paneLayout -ex $gMainPane`) {
+		//
+		//  Make sure that the main pane was finally managed.
+		//
+		paneLayout -e -manage true $gMainPane;
+
+	}
+
+	// set the name of the proc to call when you need to exit from
+	// the current tool
+	//
+	contextInfo -esc "escapeCurrentTool";
+
+	//	Initialize the pre-defined Heads-Up Displays
+	//
+	source initHUDScripts.mel;
+
+	//Object Details
+	
+	headsUpDisplay -s 4
+			   -b 0
+			   -vis (`optionVar -q objectDetailsVisibility`)
+			   -label  (uiRes("m_initAfter.kHUDTitleBackfaces"))
+			   -lw 135
+			   -dw 75
+			   -c "objectDetailsBackfaces()"
+			   -ev "SelectionChanged"
+			   -nc "attributeChange"
+			   HUDObjDetBackfaces;
+
+	headsUpDisplay -s 4
+			   -b 1
+			   -vis (`optionVar -q objectDetailsVisibility`)
+			   -label  (uiRes("m_initAfter.kHUDTitleSmoothness"))
+			   -lw 135
+			   -dw 75
+			   -c "objectDetailsSmoothness()"
+			   -ev "SelectionChanged"
+			   -nc "attributeChange"
+			   HUDObjDetSmoothness;
+
+	headsUpDisplay -s 4
+			   -b 2
+			   -vis (`optionVar -q objectDetailsVisibility`)
+			   -label (uiRes("m_initAfter.kHUDTitleInstance"))
+			   -lw 135
+			   -dw 75
+			   -c "objectDetailsInstance()"
+			   -ev "SelectionChanged"
+			   -nc "instanceChange"
+			   HUDObjDetInstance;
+
+	headsUpDisplay -s 4
+			   -b 3
+			   -vis (`optionVar -q objectDetailsVisibility`)
+			   -label (uiRes("m_initAfter.kHUDTitleDisplayLayer"))
+			   -lw 135
+			   -dw 75
+			   -c "objectDetailsDisplayLayer()"
+			   -ev "SelectionChanged"
+			   -nc "connectionChange"
+			   HUDObjDetDispLayer;
+
+	headsUpDisplay -s 4
+			   -b 4
+			   -vis (`optionVar -q objectDetailsVisibility`)
+			   -label (uiRes("m_initAfter.kHUDTitleDistanceFromCamera"))
+			   -lw 135
+			   -dw 75
+			   -pre "distanceFromCamera"
+			   HUDObjDetDistFromCam;
+
+	headsUpDisplay -s 4
+				-b 5
+				-vis (`optionVar -q objectDetailsVisibility`)
+				-label (uiRes("m_initAfter.kHUDTitleSelectedObjects")) 
+				-lw 135
+				-dw 75
+				-c "objectDetailsNumberOfSelectedObjects()"
+				-ev "SelectionChanged"
+				HUDObjDetNumSelObjs;
+
+	//Poly Count
+
+	headsUpDisplay -s 0
+			   -b 0
+			   -vis (`optionVar -q polyCountVisibility`)
+			   -label (uiRes("m_initAfter.kHUDTitleVerts")) 
+			   -lw 50
+			   -dw 65
+			   -da "right"
+			   -pre "polyVerts"
+			   HUDPolyCountVerts;
+
+	headsUpDisplay -s 0
+			   -b 1
+			   -vis (`optionVar -q polyCountVisibility`)
+			    -label (uiRes("m_initAfter.kHUDTitleEdges")) 
+			   -lw 50
+			   -dw 65
+			   -da "right"
+			   -pre "polyEdges"
+			   HUDPolyCountEdges;
+
+	headsUpDisplay -s 0
+			   -b 2
+			   -vis (`optionVar -q polyCountVisibility`)
+			  -label (uiRes("m_initAfter.kHUDTitleFaces")) 
+			   -lw 50
+			   -dw 65
+			   -da "right"
+			   -pre "polyFaces"
+			   HUDPolyCountFaces;
+
+	headsUpDisplay -s 0
+			   -b 3
+			   -vis (`optionVar -q polyCountVisibility`)
+			    -label (uiRes("m_initAfter.kHUDTitleTris")) 
+			   -lw 50
+			   -dw 65
+			   -da "right"
+			   -pre "polyTriangles"
+			   HUDPolyCountTriangles;
+
+	headsUpDisplay -s 0
+			   -b 4
+			   -vis (`optionVar -q polyCountVisibility`)
+			    -label (uiRes("m_initAfter.kHUDTitleUVs"))
+			   -lw 50
+			   -dw 65
+			   -da "right"
+			   -pre "polyUVs"
+			   HUDPolyCountUVs;
+
+	// Subd details
+	headsUpDisplay -s 0
+			   -b 5
+			   -vis (`optionVar -q subdDetailsVisibility`)
+			   -label (uiRes("m_initAfter.kHUDTitleSubdivCurrentLevel")) 
+			   -lw 135
+			   -dw 30
+				-c "subdDetailsCurrentLevel()"
+			   -ev "SelectionChanged"
+			   -nc "attributeChange"
+			   HUDSubdLevel;
+
+	headsUpDisplay -s 0
+			   -b 6
+			   -vis (`optionVar -q subdDetailsVisibility`)
+			   -label (uiRes("m_initAfter.kHUDTitleSubdivMode"))
+			   -lw 135
+			   -dw 30
+				-c "subdDetailsCurrentMode()"
+			   -ev "SelectionChanged"
+			   HUDSubdMode;
+
+	//Camera Names
+	headsUpDisplay -s 7
+			   -b 0
+			   -vis (`optionVar -q cameraNamesVisibility`)
+			   -ao true
+			   -ba center
+			   -pre "cameraNames"
+			   HUDCameraNames;
+
+	// This HUD is used to display the string.
+	// Its visibility is toggled in toggleHWRendererModelPanel()
+	// and the setCameraNamesVisibility().
+	headsUpDisplay -s 2
+		   -b 1
+		   -vis (`optionVar -q cameraNamesVisibility`)
+		   -ba center		   
+		   -label (uiRes("m_initAfter.kHUDTitleCameraName")) 
+		   -pre "renderQuality"
+		   HUDHQCameraNames;
+	
+	string $titleIKBlend = (uiRes("m_initAfter.kHUDTitleIKBlend")) ;
+	string $titleCurrentCharacter = (uiRes("m_initAfter.kHUDTitleCurrentCharacter")) ;
+	string $titlePlaybackSpeed =  (uiRes("m_initAfter.kHUDTitlePlaybackSpeed")) ;
+	string $titleFbikKeyingMode = (uiRes("m_initAfter.kHUDFbikKeyingMode")) ;
+	string $titleFbikKeyType = (uiRes("m_initAfter.kHUDFbikKeyType")) ;	
+	string $titleCurrentFrame = (uiRes("m_initAfter.kHUDCurrentFrameLabel"));
+	string $titleSceneTimecode = (uiRes("m_initAfter.kHUDSceneTimecodeLabel"));
+
+	int $section = 9;
+	int $lblWidth = 115;
+
+	if(`about -ev`) 
+	{
+		$section = 3;
+		$lblWidth = 135;
+	}
+
+	//Frame Rate
+
+	headsUpDisplay -s $section
+		   -b 0
+		   -vis (`optionVar -q frameRateVisibility`)
+		   -ba right
+		   -dfs large
+		   -da right
+		   -dp 1
+		   -pre "frameRate"
+		   HUDFrameRate;
+
+	// Current Frame
+	headsUpDisplay 
+			-section			$section
+			-block				1
+			-blockSize			"small"
+			-label				$titleCurrentFrame
+			-labelWidth			$lblWidth
+			-dataWidth			75
+			-labelFontSize		"small"
+			-dataFontSize		"small"
+			-allowOverlap		true
+			-blockAlignment		"center"
+			-preset				"currentFrame"
+			-vis (`optionVar -q currentFrameVisibility`)
+		HUDCurrentFrame;
+
+	// Animation Stuff
+
+	headsUpDisplay -s $section
+		   -b 2
+		  -label $titleIKBlend
+		   -dp 1
+		   -dfs "small"
+		   -lw $lblWidth
+		   -dw 75
+		   -c "animationDetailsIKFK()"
+		   -ev "SelectionChanged"
+		   -nc "attributeChange"
+		   HUDIKSolverState;
+
+	headsUpDisplay -s $section
+		   -b 3
+		   -label $titleCurrentCharacter
+		   -dp 1
+		   -dfs "small"
+		   -lw $lblWidth
+		   -dw 75
+		   -c "animationDetailsCurrentCharacter()"
+		   -ev "NewSceneOpened"
+		   HUDCurrentCharacter;
+
+	headsUpDisplay -s $section
+		   -b 4
+		   -label $titlePlaybackSpeed
+		   -dp 1
+		   -dfs "small"
+		   -lw $lblWidth
+		   -dw 75
+		   -c "animationDetailsPlaybackSpeed()"
+		   -ev "timeUnitChanged"
+		   HUDPlaybackSpeed;
+		   
+    headsUpDisplay -s $section
+		   -b 5
+		   -label $titleFbikKeyingMode
+		   -dp 1
+		   -dfs "small"
+		   -lw $lblWidth
+		   -dw 75
+		   -c "fbikDetailsKeyingMode()"
+		   -ev "SelectionChanged"
+		   HUDFbikKeyingMode;
+		   
+    headsUpDisplay -s $section
+		   -b 6
+		   -label $titleFbikKeyType
+		   -dp 1
+		   -dfs "small"
+		   -lw $lblWidth
+		   -dw 75
+		   -c "fbikDetailsKeyType()"
+		   -ev "SelectionChanged"
+		   HUDFbikKeyType;
+
+
+	headsUpDisplay -section $section
+			   -block 7
+			   -vis (`optionVar -q selectDetailsVisibility`)
+			   -lw $lblWidth
+			   -preset "softSelect"
+			   HUDSoftSelectState;
+
+	headsUpDisplay -section $section
+			   -block 8
+			   -vis (`optionVar -q selectDetailsVisibility`)
+			   -preset "reflection"
+			   -lw $lblWidth
+			   HUDReflectionState;
+
+	string $titleCurrentContainer = (uiRes("m_initAfter.kHUDCurrentContainerLabel"));
+	// Current container
+	headsUpDisplay 
+			-section			$section
+			-block				9
+			-blockSize			"small"
+			-label				$titleCurrentContainer
+			-labelWidth			$lblWidth
+//			-dataWidth			75
+			-labelFontSize		"small"
+			-dataFontSize		"small"
+//			-blockAlignment		"center"
+		    -command			"getCurrentContainer"
+			-event				"currentContainerChange"
+			-vis (`optionVar -q currentContainerVisibility`)
+		HUDCurrentContainer;
+
+	// None of the above animation HUDs had their visibility
+	// set according to the option var.  Do that now...
+	//
+	setAnimationDetailsVisibility(`optionVar -q animationDetailsVisibility`);
+	setFbikDetailsVisibility(`optionVar -q fbikDetailsVisibility`);
+
+	headsUpDisplay -section $section
+			   -block 10
+			   -vis (`optionVar -q focalLengthVisibility`)
+			   -preset "focalLength"
+			   -lw $lblWidth
+			   HUDFocalLength;
+
+	// Scene Timecode
+	headsUpDisplay 
+			-section			$section
+			-block				11
+			-blockSize			"small"
+			-label				$titleSceneTimecode
+			-labelWidth			$lblWidth
+			-dataWidth			75
+			-labelFontSize		"small"
+			-dataFontSize		"small"
+			-allowOverlap		true
+			-blockAlignment		"center"
+			-preset				"sceneTimecode"
+			-vis (`optionVar -q sceneTimecodeVisibility`)
+		HUDSceneTimecode;
+
+	//View Axis
+
+	headsUpDisplay -s 5
+			   -b 0
+			   -vis (`optionVar -q viewAxisVisibility`)
+			   -pre "viewAxis"
+			   HUDViewAxis;
+
+    // Check which renderer is the preferred renderer.
+    //
+    evalDeferred -lowestPriority "setupRendererSceneOpenedCallback";
+	
+	// Set up default decimal places for universal manipulator
+	linearPrecision 3;
+	
+	// Setup default filter for "Echo All" mode of script editor
+	commandEcho -filter {"setLastFocusedCommand", "buildScriptEditor", "handleScriptEditorAction", "verifyCommandPopupMenus"};
+
+	source fileDialogFilterTypes;
+}
+
+// Define the callback that is needed for the file command to
+// turn off anything 'dangerous' on file i/o
+//
+global proc fileCmdCallback () {
+
+	// Go to a safe tool. 
+	// Force the safe tool to be the select tool.
+	//
+	global string $gCurrentSacredTool;
+	global string $gSelect;
+	global string $gPreFileCmdCallbackTool;
+	$gCurrentSacredTool = $gSelect;
+	$gPreFileCmdCallbackTool = `currentCtx`;
+	escapeCurrentTool;
+		
+	// Make sure that playback is off
+	//
+	global int $gPreFileCmdCallbackPlayState;
+	if (`exists play`) {
+		$gPreFileCmdCallbackPlayState = `play -query -state`;
+		if ( $gPreFileCmdCallbackPlayState ) {
+			play -state off;
+		}
+	}
+}
+
+// Puts back what fileCmdCallback changes
+//
+global proc fileCmdRestoreCallback () {
+	global string $gPreFileCmdCallbackTool;
+	global int $gPreFileCmdCallbackPlayState;
+	if ( size($gPreFileCmdCallbackTool) )
+	{
+		setToolTo $gPreFileCmdCallbackTool;
+	}
+	if ( `exists play` && $gPreFileCmdCallbackPlayState )
+	{
+		play -state $gPreFileCmdCallbackPlayState;
+	}
+}
+
+// Assign the callback to the file command
+file -c "fileCmdCallback" "fileCmdRestoreCallback";
+
+//CGRU launch:
+{string $cmd = ("source \"" + `getenv MAYA_CGRU_LOCATION` + "/cgru.mel\"");catch(`eval $cmd`);}

@@ -1,0 +1,26 @@
+#!/bin/sh
+. /etc/rc.common
+ 
+# The start subroutine
+StartService() {
+    # Insert your start command below.  For example:
+mount -t nfs Node7:/cg /cg
+    # End example.
+}
+ 
+# The stop subroutine
+StopService() {
+    # Insert your stop command(s) below.  For example:
+umount /cg
+    # End example.
+}
+ 
+# The restart subroutine
+RestartService() {
+    # Insert your start command below.  For example:
+umount /cg
+mount -t nfs Node7:/cg /cg
+    # End example.
+}
+ 
+RunService "$1"

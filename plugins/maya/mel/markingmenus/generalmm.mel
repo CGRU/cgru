@@ -1,0 +1,44 @@
+//
+//	GeneralMM.mel
+//
+//###################################################################################################################
+
+global proc cgruGeneralMMP()
+{
+
+global string $cgruDir_MEL;
+string $cgruMenusLocation = `getenv MAYA_CGRU_MENUS_LOCATION`;
+if($cgruMenusLocation == "") $cgruMenusLocation = $cgruDir_MEL;
+
+	if (`popupMenu -exists tempMM`) { deleteUI tempMM; }
+	popupMenu -button 1 -ctl true -alt true -allowOptionBoxes true -parent viewPanes -mm 1 tempMM;
+		menuItem -rp "N" -l "Modeling" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_modeling.mel");
+			setParent -m ..;
+		menuItem -rp "NE" -l "Animation" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_animation.mel");
+			setParent -m ..;
+		menuItem -rp "E" -l "Rendering" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_rendering.mel");
+			setParent -m ..;
+		menuItem -rp "SE" -l "Miscellaneous" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_miscellaneous.mel");
+			setParent -m ..;
+		menuItem -rp "S" -l "Develop" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_develop.mel");
+			setParent -m ..;
+		menuItem -rp "SW" -l "Interface" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_interface.mel");
+			setParent -m ..;
+		menuItem -rp "W"  -l "Reload" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_reload.mel");
+			setParent -m ..;
+		menuItem -rp "NW"  -l "Documentation" -allowOptionBoxes true -subMenu 1;
+			cgruSourceFile_global( $cgruMenusLocation + "/menuitems_documentation.mel");
+			setParent -m ..;
+}
+
+global proc cgruGeneralMMR()
+{
+	if( `popupMenu -exists tempMM` ) deleteUI tempMM;
+}

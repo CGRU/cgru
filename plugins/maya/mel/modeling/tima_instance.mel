@@ -1,0 +1,21 @@
+{
+	string $selArray[] = `ls -sl -l`;
+	int $size = `size($selArray)`;
+	if($size < 2) cgruError("Select two objects at least!");
+	string $copyAttrs[] = { "tx", "ty", "tz", "rx", "ry", "rz", "sx", "sy", "sz",
+				"shearXY", "shearXZ", "shearYZ",
+				"rotatePivotX", "rotatePivotY", "rotatePivotZ",
+				"rotatePivotTranslateX", "rotatePivotTranslateY", "rotatePivotTranslateZ",
+				"scalePivotX", "scalePivotY", "scalePivotZ",
+				"scalePivotTranslateX", "scalePivotTranslateY", "scalePivotTranslateZ",
+				"rotateAxisX", "rotateAxisY", "rotateAxisZ"};
+	string $newName, $attr;
+	int $i;
+	for( $i = 1; $i < $size; $i++)
+	{
+		string  $newName[] = `instance $selArray[0]`;
+		for( $attr in $copyAttrs)
+			setAttr ($newName[0] + "." + $attr) `getAttr ($selArray[$i] + "." + $attr)`;
+		delete $selArray[$i];
+	}
+}

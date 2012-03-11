@@ -1,0 +1,2 @@
+H.264 Low
+ffmpeg -y -pix_fmt rgb24 -r @FPS@ -i "@INPUT@" -vcodec libx264 -fpre "@CODECS@/h264_common.ffpreset" -crf 25 "@OUTPUT@.@CONTAINER@"

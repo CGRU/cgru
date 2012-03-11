@@ -1,0 +1,83 @@
+#! /usr/local/Nuke6.2v1/Nuke6.2 -nx
+version 6.2 v1
+define_window_layout_xml {<?xml version="1.0" encoding="UTF-8"?>
+<layout version="1.0">
+    <window x="0" y="24" w="1366" h="720" screen="0">
+        <splitter orientation="1">
+            <split size="862"></split>
+            <splitter orientation="1">
+                <split size="40"></split>
+                <dock id="" hideTitles="1" activePageId="Toolbar.1">
+                    <page id="Toolbar.1"></page>
+                </dock>
+                <split size="818"></split>
+                <splitter orientation="2">
+                    <split size="329"></split>
+                    <dock id="" activePageId="Viewer.1">
+                        <page id="Viewer.1"></page>
+                    </dock>
+                    <split size="329"></split>
+                    <dock id="" activePageId="DAG.1">
+                        <page id="DAG.1"></page>
+                        <page id="Curve Editor.1"></page>
+                        <page id="DopeSheet.1"></page>
+                    </dock>
+                </splitter>
+            </splitter>
+            <split size="498"></split>
+            <dock id="" activePageId="Properties.1">
+                <page id="Properties.1"></page>
+            </dock>
+        </splitter>
+    </window>
+</layout>
+}
+Root {
+ inputs 0
+ name /cgru/plugins/nuke/encode.nk
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ proxy_type scale
+ proxy_format "1024 778 0 0 1024 778 1 1K_Super_35(full-ap)"
+}
+Read {
+ inputs 0
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ origset true
+ colorspace Cineon
+ name Read2
+ xpos 57
+ ypos -142
+}
+Read {
+ inputs 0
+ format "2048 1556 0 0 2048 1556 1 2K_Super_35(full-ap)"
+ origset true
+ name Read1
+ xpos -71
+ ypos -140
+}
+Switch {
+ inputs 2
+ which {{frame!=Read1.first i}}
+ name Switch1
+ xpos -6
+ ypos -31
+}
+Write {
+ file file.mov
+ file_type ffmpeg
+ format "MOV format (mov)"
+ Advanced 1
+ codec "Sorenson Vector Quantizer 1"
+ checkHashOnRead false
+ name Write1
+ xpos -6
+ ypos 17
+}
+Viewer {
+ frame 1
+ input_process false
+ name Viewer1
+ xpos 126
+ ypos 24
+}

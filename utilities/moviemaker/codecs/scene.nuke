@@ -1,0 +1,2 @@
+Nuke Scene
+cd $CGRU_LOCATION; cd examples; cd nuke; ./nuke -ti $CGRU_LOCATION/plugins/nuke/encode.py -x $CGRU_LOCATION/plugins/nuke/encode.nk -f @FPS@ -r "Read1,Read2" -X "Write1" "@INPUT@" "@OUTPUT@.@CONTAINER@"

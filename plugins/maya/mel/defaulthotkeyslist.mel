@@ -1,0 +1,59 @@
+
+// Modeling :
+hotkey -keyShortcut "p" -alt -name ("PoltToolsMMpress_rtcNameCommand");
+hotkey -keyShortcut "p" -alt -releaseName ("PoltToolsMMrelease_rtcNameCommand");
+hotkey -keyShortcut "S" -name ("PolySelectShell_rtcNameCommand");
+hotkey -keyShortcut "S" -ctl -name ("PolyMergeUV_rtcNameCommand");
+
+// Animation :
+hotkey -keyShortcut "k" -alt -name ("SubFramePrev_rtcNameCommand");
+hotkey -keyShortcut "l" -alt -name ("SubFrameNext_rtcNameCommand");
+hotkey -keyShortcut "a" -alt -name ("AnimToolsMMpress_rtcNameCommand");
+hotkey -keyShortcut "a" -alt -releaseName ("AnimToolsMMrelease_rtcNameCommand");
+
+// Rendering :
+//hotkey -keyShortcut "a" -alt -name ("ShowHideRMappCtrlWnd_rtcNameCommand");
+
+// Miscellaneous :
+hotkey -keyShortcut "d" -name ("SelectNone_rtcNameCommand");
+hotkey -keyShortcut "h" -ctl -name ("HideSelectedObjects_rtcNameCommand");
+hotkey -keyShortcut "H" -name ("ShowSelectedObjects_rtcNameCommand");
+hotkey -keyShortcut "t" -ctl -name ("TemplateObject_rtcNameCommand");
+hotkey -keyShortcut "T" -name ("UntemplateObject_rtcNameCommand");
+hotkey -keyShortcut "d" -alt -name ("DuplicateMMpress_rtcNameCommand");
+hotkey -keyShortcut "d" -alt -releaseName ("DuplicateMMrelease_rtcNameCommand");
+
+// Interface & Windows :
+hotkey -keyShortcut "o" -alt -name ("ShowHideOutliner_rtcNameCommand");
+hotkey -keyShortcut "h" -alt -name ("ShowHideHyperGraph_rtcNameCommand");
+hotkey -keyShortcut "S" -alt -ctl -name ("ShowHideHyperShade_rtcNameCommand");
+hotkey -keyShortcut "g" -alt -name ("ShowHideGraphEditor_rtcNameCommand");
+hotkey -keyShortcut "t" -alt -name ("ShowHideToolProperties_rtcNameCommand");
+hotkey -keyShortcut "u" -alt -name ("ShowHideTextureEditor_rtcNameCommand");
+hotkey -keyShortcut "n" -alt -name ("MinimizeAllWindows_rtcNameCommand");
+hotkey -keyShortcut "m" -alt -name ("MaximizeAllWindows_rtcNameCommand");
+hotkey -keyShortcut " " -alt -ctl -name ("GeneralMMpress_rtcNameCommand");
+hotkey -keyShortcut " " -alt -ctl -releaseName ("GeneralMMrelease_rtcNameCommand");
+
+// Cameras & Views & Panels :
+hotkey -keyShortcut "i" -alt -name ("IsolateSelect_rtcNameCommand");
+hotkey -keyShortcut "c" -alt -name ("CamerasMMpress_rtcNameCommand");
+hotkey -keyShortcut "c" -alt -releaseName ("CamerasMMrelease_rtcNameCommand");
+hotkey -keyShortcut "8" -name ("DisplayShadedTexturedAllLighted_rtcNameCommand");
+hotkey -keyShortcut "9" -name ("DisplayShadedTexturedNoLighted_rtcNameCommand");
+
+
+//
+// Tetris :
+
+hotkey -keyShortcut "}" -ctl -name ("TetrisRight_rtcNameCommand");
+hotkey -keyShortcut "}" -ctl -releaseName ("TetrisRelease_rtcNameCommand");
+
+hotkey -keyShortcut "{" -ctl -name ("TetrisLeft_rtcNameCommand");
+hotkey -keyShortcut "{" -ctl -releaseName ("TetrisRelease_rtcNameCommand");
+
+hotkey -keyShortcut "P" -ctl -name ("TetrisRotate_rtcNameCommand");
+hotkey -keyShortcut "P" -ctl -releaseName ("TetrisRelease_rtcNameCommand");
+
+hotkey -keyShortcut "O" -ctl -name ("TetrisDown_rtcNameCommand");
+hotkey -keyShortcut "O" -ctl -releaseName ("TetrisRelease_rtcNameCommand");

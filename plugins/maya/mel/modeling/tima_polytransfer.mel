@@ -1,0 +1,43 @@
+global proc tima_PolyTransferDo()
+{
+	string $selArray[] = `ls -sl`;
+	int $size = `size($selArray)`;
+	if($size < 2)
+	{
+		cgruWarning("Select minimum two objects (or more).");
+		return;
+	}
+	string $object;
+	int $i = 0;
+	for( $i = 1; $i < $size; $i++)
+		polyTransfer	-ao $selArray[0]
+				-v `checkBox -q -v tima_PolyTransferWnd_vertexCB`
+				-vc `checkBox -q -v tima_PolyTransferWnd_colorsCB`
+				-uv `checkBox -q -v tima_PolyTransferWnd_UVsetsCB`
+				-ch `checkBox -q -v tima_PolyTransferWnd_chCB`
+			$selArray[$i];
+cgruInfo(" " + ($size - 1) + " objects transfered");
+}
+//####################################################################################################################
+{
+	if(`window -exists tima_PolyTransferWnd`) deleteUI tima_PolyTransferWnd;
+	window -t " MultiTransfer " tima_PolyTransferWnd;
+	columnLayout -adj 1;
+		text -l "Select object to transfer from first.";
+		separator;
+		int $width = 60;
+		rowLayout -nc 3 -cw3 $width $width $width;
+			checkBox -l "Vertex" -v 0 tima_PolyTransferWnd_vertexCB;
+			checkBox -l "Colors" -v 0 tima_PolyTransferWnd_colorsCB;
+			checkBox -l "UVsets" -v 1 tima_PolyTransferWnd_UVsetsCB;
+			setParent ..;
+		separator;
+		checkBox -l "construction history" -v 1 tima_PolyTransferWnd_chCB;
+		separator;
+		$width = 90;
+		int $height = 18;
+		rowLayout -nc 2 -cw2 $width $width;
+			button -l " Apply " -h $height -w ($width - 2) -c "tima_PolyTransferDo()";
+			button -l " Apply + Close " -h $height -w ($width - 2) -c "tima_PolyTransferDo(); deleteUI tima_PolyTransferWnd";
+	showWindow tima_PolyTransferWnd;
+}

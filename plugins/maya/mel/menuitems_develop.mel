@@ -1,0 +1,20 @@
+//
+// Synopsis:
+//
+// menuItem -l "label" -c "command" -ann "annotation"
+//
+
+   menuItem -l "Attributes List..." -ecr 0 -c "cgruSourceFile(\"develop/tima_attributeeditor.mel\");" -ann "Creates a list of all attributes.";
+   menuItem -l "ScriptJob Manager..." -ecr 0 -c "cgruSourceFile(\"develop/tima_scriptjobmgr.mel\");" -ann "Creates a list of scriptJobs, can kill some.";
+   menuItem -divider true;
+   menuItem -l "Remove lightLinkers" -ecr 0 -ann "Remove all lightLinker nodes from scene."
+      -c "{string $str[] = `ls -type \"lightLinker\"`; string $node; for( $node in $str){string $cmd; $cmd = \"tm_killNode \" + $node + \";\";catch(`evalEcho $cmd`);}}";
+   menuItem -divider true;
+{
+   string $sep = ":";
+   if(`about -windows`) $sep = ";";
+   menuItem -l "Get MAYA_SCRIPT_PATH"  -ecr 0 -c ("{string $buffer[]; string $getEnv=`getenv \"MAYA_SCRIPT_PATH\"`;  int $countEnv=`tokenize $getEnv \""+$sep+"\" $buffer`; cgruInfo(\"MAYA_SCRIPT_PATH = \");  int $i; for ( $i=0; $i<$countEnv; $i++) print(\" # \" + ($i +1) + \" - \" + $buffer[$i] + \"\\n\");}") -ann "Prints MAYA_SCRIPT_PATH environment variable in a row.";
+   menuItem -l "Get MAYA_PLUG_IN_PATH" -ecr 0 -c ("{string $buffer[]; string $getEnv=`getenv \"MAYA_PLUG_IN_PATH\"`; int $countEnv=`tokenize $getEnv \""+$sep+"\" $buffer`; cgruInfo(\"MAYA_PLUG_IN_PATH = \"); int $i; for ( $i=0; $i<$countEnv; $i++) print(\" # \" + ($i +1) + \" - \" + $buffer[$i] + \"\\n\");}") -ann "Prints MAYA_PLUG_IN_PATH environment variable in a row.";
+   menuItem -l "Get MAYA_MODULE_PATH"  -ecr 0 -c ("{string $buffer[]; string $getEnv=`getenv \"MAYA_MODULE_PATH\"`;  int $countEnv=`tokenize $getEnv \""+$sep+"\" $buffer`; cgruInfo(\"MAYA_MODULE_PATH = \");  int $i; for ( $i=0; $i<$countEnv; $i++) print(\" # \" + ($i +1) + \" - \" + $buffer[$i] + \"\\n\");}") -ann "Prints MAYA_MODULE_PATH environment variable in a row.";
+   menuItem -l "Get XBMLANGPATH"       -ecr 0 -c ("{string $buffer[]; string $getEnv=`getenv \"XBMLANGPATH\"`;       int $countEnv=`tokenize $getEnv \""+$sep+"\" $buffer`; cgruInfo(\"XBMLANGPATH = \");       int $i; for ( $i=0; $i<$countEnv; $i++) print(\" # \" + ($i +1) + \" - \" + $buffer[$i] + \"\\n\");}") -ann "Prints XBMLANGPATH environment variable in a row.";
+}

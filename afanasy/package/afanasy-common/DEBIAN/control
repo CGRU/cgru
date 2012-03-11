@@ -1,0 +1,11 @@
+Package: afanasy-common
+Version: @VERSION@
+Architecture: @ARCHITECTURE@
+Maintainer: Timur Hairulin <timurhai@gmail.com>
+Installed-Size: @SIZE@
+Depends: cgru-common (= @VERSION@), @DEPENDS_AFANASY_COMMA@
+Section: graphics
+Priority: extra
+Homepage: http://sourceforge.net/projects/cgru/
+Description: Afanasy binary files
+ Afanasy binary files.

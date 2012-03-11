@@ -1,0 +1,42 @@
+{
+	if(`window -exists timaAdvFrameCtrlWnd`) deleteUI timaAdvFrameCtrlWnd;
+	window -title "AdvFrameCtrl" timaAdvFrameCtrlWnd;
+	string $mainForm = `formLayout -numberOfDivisions 100`;
+		floatField -v 0.1 -precision 3 
+				-cc "$timaSubFrameStep = `floatField -q -v timaAdvFrameCtrls_FF`;"
+			timaAdvFrameCtrls_FF;
+		string $prevSFB = `button -l "|<" -ann ("ctrl + \"[\"") -c "undoInfo -swf 0; currentTime (`currentTime -q` - $timaSubFrameStep); undoInfo -swf 1;"`;
+		string $snapFB = `button -l "snap" -c "undoInfo -swf 0;	float $curTime = `currentTime -q`; float $floorTime = `floor $curTime`;	if( ($curTime - $floorTime) < 0.5 ) currentTime ($floorTime); else currentTime ($floorTime + 1); undoInfo -swf 1;"`;
+		string $nextSFB = `button -l ">|" -ann ("ctrl + \"]\"") -c "undoInfo -swf 0; currentTime (`currentTime -q` + $timaSubFrameStep); undoInfo -swf 1;"`;
+
+	formLayout -edit
+			-attachNone			$snapFB		"top"		
+			-attachPosition		$snapFB		"left"		1 0
+			-attachNone			$snapFB		"bottom"	
+			-attachPosition		$snapFB		"right"		1 30
+
+			-attachNone			$prevSFB	"top"		
+			-attachPosition		$prevSFB	"left"		1 30
+			-attachNone			$prevSFB	"bottom"	
+			-attachPosition		$prevSFB	"right"		1 50
+
+			-attachNone			$nextSFB	"top"		
+			-attachPosition		$nextSFB	"left"		1 50
+			-attachNone			$nextSFB	"bottom"	
+			-attachPosition		$nextSFB	"right"		1 70
+
+			-attachNone			timaAdvFrameCtrls_FF	"top"		
+			-attachPosition		timaAdvFrameCtrls_FF	"left"		1 70
+			-attachNone			timaAdvFrameCtrls_FF	"bottom"	
+			-attachPosition		timaAdvFrameCtrls_FF	"right"		1 100
+	$mainForm;
+
+	popupMenu -button 3 -p timaAdvFrameCtrls_FF;
+		menuItem -l "0.5   f " -c "floatField -e -v 0.5 timaAdvFrameCtrls_FF; $timaSubFrameStep = 0.5;";
+		menuItem -l "0.2   f " -c "floatField -e -v 0.2 timaAdvFrameCtrls_FF; $timaSubFrameStep = 0.2;";
+		menuItem -l "0.1   f " -c "floatField -e -v 0.1 timaAdvFrameCtrls_FF; $timaSubFrameStep = 0.1;";
+		menuItem -l "0.02  f " -c "floatField -e -v 0.02 timaAdvFrameCtrls_FF; $timaSubFrameStep = 0.02;";
+		menuItem -l "0.004 f " -c "floatField -e -v 0.004 timaAdvFrameCtrls_FF; $timaSubFrameStep = 0.004;";
+
+	showWindow timaAdvFrameCtrlWnd;
+}

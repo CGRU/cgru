@@ -1,0 +1,56 @@
+//
+//	Synopsis:
+//
+//	menuItem -l "label" -ann "annotation" -c "command"
+//
+
+   menuItem -l "Unfreeze Translation..."  -c "cgruSourceFile(\"modeling/tima_unfreezetranslation.mel\");" -ann "Unfreeze Translation";
+   menuItem -l "Make Instance"            -c "cgruSourceFile(\"modeling/tima_instance.mel\");" -ann "select transforms to make shapes instance";
+   menuItem -l "MultiTransfer..."         -c "cgruSourceFile(\"modeling/tima_polytransfer.mel\");" -ann "Poly transfer to multiply objects.";
+
+   menuItem -l "Mirror&Subdivision" -sm 1;
+      menuItem -l "Mirror"              -ecr 1 -c "cgruSourceFile(\"modeling/tima_mirrorsubd.mel\");tima_mirrorsubd( 1,0,0);" -ann "Create mirror group.";
+      menuItem -l "Mirror Subdivide"    -ecr 1 -c "cgruSourceFile(\"modeling/tima_mirrorsubd.mel\");tima_mirrorsubd( 1,0,1);" -ann "Create mirror group and subdivide.";
+      menuItem -l "Mirror+UV"           -ecr 1 -c "cgruSourceFile(\"modeling/tima_mirrorsubd.mel\");tima_mirrorsubd( 1,1,0);" -ann "Create mirror group.";
+      menuItem -l "Mirror+UV Subdivide" -ecr 1 -c "cgruSourceFile(\"modeling/tima_mirrorsubd.mel\");tima_mirrorsubd( 1,1,1);" -ann "Create mirror group and subdivide.";
+      menuItem -l "Subdivide"           -ecr 1 -c "cgruSourceFile(\"modeling/tima_mirrorsubd.mel\");tima_mirrorsubd( 0,0,1);" -ann "Create subdivide group.";
+      menuItem -l "Connect shapes only" -ecr 1 -c "cgruSourceFile(\"modeling/tima_mirrorsubd.mel\");tima_mirrorsubd( 0,0,0);" -ann "Create a group connected shapes.";
+      setParent -m ..;
+
+   menuItem -divider 1;
+
+   menuItem -l "Select loop edges"     -ecr 1   -c "tm_polySelect -l 3 45;";
+   menuItem -l "Select ring edges"     -ecr 1   -c "tm_polySelect -r 3 45;";
+   menuItem -l "Loop split"            -ecr 1   -c "tm_polySplitLoopSel;" -ann "Edges loop split. Select an edge to start.";
+   menuItem -l "Split selected"        -ecr 1   -c "tm_polySplit -s;" -ann "Split selected edges.";
+   menuItem -l "Slot edges"            -ecr 1   -c "polyMapCut;tm_polySlot;" -ann "Slot selected split. Select an continuous edges to make a hole.";
+   menuItem -l "Loop&Ring&Split" -sm 1;
+      menuItem -l "Sel. Loop Edges (topology)" -ecr 1 -c "tm_polySelect -l 1 45;"
+            -ann "Select loop edges based on topology only";
+      menuItem -l "Sel. Loop Edges (angle)" -ecr 1 -c "tm_polySelect -l 2 45;"
+            -ann "Select loop edges based on minimum angle only";
+      menuItem -l "Sel. Loop Edges (top&angle)" -ecr 1 -c "tm_polySelect -l 3 45;"
+            -ann "Select loop edges based topology and angle";
+      menuItem -l "Sel. Ring Edges (topology)" -ecr 1 -c "tm_polySelect -r 1 45;"
+            -ann "Select ring edges based on topology only";
+      menuItem -l "Sel. Ring Edges (angle)" -ecr 1 -c "tm_polySelect -r 2 45;"
+            -ann "Select ring edges based on minimum angle only";
+      menuItem -l "Sel. Ring Edges (top&angle)" -ecr 1 -c "tm_polySelect -r 3 45;"
+            -ann "Select ring edges based topology and angle";
+      menuItem -divider 1;
+      menuItem -l "Loop split (topology)" -ecr 1	-c "tm_polySplitLoopSel 1 45;"
+            -ann "Edges loop split based on topology method.";
+      menuItem -l "Loop split (angle)" -ecr 1	-c "tm_polySplitLoopSel 2 45;"
+            -ann "Edges loop split based on  minimum angle method.";
+      menuItem -l "Loop split (top&angle)" -ecr 1	-c "tm_polySplitLoopSel 3 45;"
+            -ann "Edges loop split based on topology and angle method.";
+      setParent -m ..;
+   menuItem -l "Find path edges"	-ecr 1	-c "cgruSourceFile(\"modeling/tima_polytools.mel\");timaPolygon_selectFP_globalProc();" -ann "Select two mesh vertices to find path edges";
+   menuItem -divider 1;
+   menuItem -l "Randomize Points..."  -ecr 1   -c "cgruSourceFile(\"modeling/tima_randpoint.mel\");"      -ann "Translates poly vertices randomly";
+   menuItem -l "Volume Deformer"      -ecr 1   -c "cgruSourceFile(\"modeling/tima_volumeDeformer.mel\");" -ann "Apply volume deformer";
+   menuItem -l "Randomize Deformer"   -ecr 1   -c "deformer -type tm_randDef"     -ann "Select objects to apply random deformer";
+   menuItem -l "Perlin Noise"         -ecr 1   -c "deformer -type tm_noisePerlin" -ann "Select objects to apply Perlin Noise deformer";
+   menuItem -divider 1;
+   menuItem -l "GeoSphere"            -ecr 1   -c "cgruSourceFile(\"modeling/tima_makegeoshphere.mel\");timaMakeGeoSphere_globalProc( 0, 0, 1);" -ann "Create GeoSphere.";
+   menuItem -l "Rocks Generator..."   -ecr 0   -c "cgruSourceFile(\"modeling/tima_rockgenerator.mel\");" -ann "Generates Rocks.";

@@ -1,0 +1,155 @@
+//
+//
+//
+//#############################################################################################
+//
+global proc float tima_hexportcam_m2h_lenght( float $l, float $a, float $f)
+{
+   float $xm = $l * cosd($a);
+   float $ym = $l * sind($a);
+   float $xh = $xm / $f;
+   float $yh = $ym;
+   return sqrt( $xh*$xh + $yh*$yh);
+}
+//
+global proc tima_hexportcam_outKeys( string $mobject, string $mcam, string $hobject, string $filename)
+{
+   string $timeunit = `currentUnit -q -t`;
+   float $fps = 25;
+   if( $timeunit == "ntsc") $fps = 30;
+   else if( $timeunit == "film") $fps = 24;
+
+   string $attributesM[] = {"tx","ty","tz","rx","ry","rz","focalLength"};
+   string $attributesH[] = {"tx","ty","tz","rx","ry","rz","focal"};
+   int $transformAttributesNumber = 5;
+
+   int $fileId=`fopen $filename "w"`;
+
+   fprint $fileId "chblockbegin\n";
+
+   int $a = 0;
+   string $attrM;
+   for( $attrM in $attributesM)
+   {
+      string $attrH = $attributesH[$a];
+      string $object = $mobject;
+      if( $a > $transformAttributesNumber)
+      {
+         if( $mcam != "") $object = $mcam;
+         else break;
+      }
+      $a++;
+
+      int $keyframeCount  = `keyframe   -q -keyframeCount  ( $mobject+"." + $attrM)`;
+      if( $keyframeCount < 1 ) continue;
+      float $frames[]     = `keyframe   -q -timeChange     ( $mobject+"." + $attrM)`;
+      float $values[]     = `keyframe   -q -valueChange    ( $mobject+"." + $attrM)`;
+      float $inWeight[]   = `keyTangent -q -inWeight       ( $mobject+"." + $attrM)`;
+      float $inAngle[]    = `keyTangent -q -inAngle        ( $mobject+"." + $attrM)`;
+      float $outWeight[]  = `keyTangent -q -outWeight      ( $mobject+"." + $attrM)`;
+      float $outAngle[]   = `keyTangent -q -outAngle       ( $mobject+"." + $attrM)`;
+      fprint $fileId ("chadd -f " + $frames[0] + " " + $frames[$keyframeCount-1] + " " + $hobject + " " + $attrH + "\n");
+      int $k;
+      for( $k = 0; $k < $keyframeCount; $k++)
+      {
+         float $xm = $outWeight[$k] * cosd($outAngle[$k]);
+         float $ym = $outWeight[$k] * sind($outAngle[$k]);
+         float $xh = $xm / $fps;
+         float $yh = $ym;
+         $inWeight[$k] =  tima_hexportcam_m2h_lenght(  $inWeight[$k],  $inAngle[$k], $fps);
+         $outWeight[$k] = tima_hexportcam_m2h_lenght( $outWeight[$k], $outAngle[$k], $fps);
+         $inAngle[$k]   =  $fps *`tand($inAngle[$k])`;
+         $outAngle[$k]  =  $fps *`tand($outAngle[$k])`;
+         string $cmd = "chkey";
+         $cmd += (" -f " + $frames[$k]   );
+         $cmd += (" -v " + $values[$k]   );
+         $cmd += (" -m " + $inAngle[$k]  );
+         $cmd += (" -a " + $inWeight[$k] );
+         $cmd += (" -V " + $values[$k]   );
+         $cmd += (" -M " + $outAngle[$k] );
+         $cmd += (" -A " + $outWeight[$k]);
+         $cmd += (" -T vmVM -F 'bezier()' ");
+         $cmd += ($hobject + "/" + $attrH + "\n");
+         fprint $fileId $cmd;
+      }
+   }
+
+   fprint $fileId "chblockend\n";
+
+   fclose $fileId;
+}
+//###########################################################################################################
+//
+global proc tima_hexportcam_Write()
+{
+   string $mobject = `textField -q -tx tima_hexportcam_mobject_textField`;
+   keyTangent -edit -weightedTangents true $mobject;
+   string $mcam = `textField -q -tx tima_hexportcam_mcam_textField`;
+   string $hobject = `textField -q -tx tima_hexportcam_hobject_textField`;
+   string $filename = `textField -q -tx tima_hexportcam_filename_textField`;
+   tima_hexportcam_outKeys( $mobject, $mcam, $hobject, $filename);
+}
+global proc tima_hexportcam_SetFile( string $fileName, string $fileType)
+{
+   textField -e -tx $fileName tima_hexportcam_filename_textField;
+}
+//###########################################################################################################
+//
+proc hexportcam( string $hobject, string $filename)
+{
+if(`window -exists tima_hexportcam_Wnd`) deleteUI tima_hexportcam_Wnd;
+
+string $sel[] = `ls -sl`;
+if(`size($sel)` < 1)
+{
+   error("Nothing selected. Select an object.");
+   return;
+}
+string $mobject = "";
+string $mcam = "";
+
+if(`nodeType $sel[0]` == "transform")
+{
+   $mobject = $sel[0];
+   string $shapes[] = `listRelatives -c -s $sel[0]`;
+   if(`size $shapes` > 0)
+      if(`nodeType $shapes[0]` == "camera")
+         $mcam = $shapes[0];
+}
+else if( `nodeType $sel[0]` == "camera")
+{
+   $mcam = $sel[0];
+   string $parents[] = `listRelatives -p $sel[0]`;
+   if(`nodeType $parents[0]` == "transform")
+      $mobject = $parents[0];
+}
+if( $mobject == "")
+{
+   error("Select transform or camera shape.");
+   return;
+}
+
+if( $hobject == "") $hobject = "/obj/" + $mobject;
+if( $filename == "") $filename = `file -q -expandName` + "." + $mobject + ".cmd";
+
+window -t " hexportcam " tima_hexportcam_Wnd;
+columnLayout -adj 1;
+   rowLayout -nc 2 -cw2 80 60 -adj 2;
+      text -l " Transform = ";
+      textField -enable false -text $mobject tima_hexportcam_mobject_textField;
+      setParent ..;
+   rowLayout -nc 2 -cw2 80 60 -adj 2;
+      text -l " Camera = ";
+      textField -enable false -text $mcam tima_hexportcam_mcam_textField;
+      setParent ..;
+   separator;
+   text -l ("Houdni operator = ");
+   textField -text $hobject tima_hexportcam_hobject_textField;
+   text -l ("File for output  = ");
+   textField -text $filename tima_hexportcam_filename_textField;
+   button -l " Browse " -c "fileBrowser(\"tima_hexportcam_SetFile\", \"Set file to write\", \"\", 1)";
+   button -l " Write HScript " -c tima_hexportcam_Write;
+showWindow tima_hexportcam_Wnd;
+}
+
+hexportcam( "", "");

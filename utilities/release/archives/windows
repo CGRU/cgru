@@ -1,0 +1,10 @@
+#!/bin/bash
+
+# Make release with binaries for Windows64
+
+dest=$1
+[ -d "$dest" ] || exit 1
+
+echo "Clearing bash scripts '$dest'"
+find "${dest}" -type f -name *.sh -exec rm -vf {} \;
+exit 0

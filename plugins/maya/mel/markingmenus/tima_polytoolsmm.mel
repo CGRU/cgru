@@ -1,0 +1,73 @@
+//
+//	PolyToolsMM.mel
+//
+//###################################################################################################################
+
+global proc timaPolyToolsMMP()
+{
+if (`popupMenu -exists tempMM`) { deleteUI tempMM; }
+popupMenu -button 1 -ctl false -alt true -allowOptionBoxes true -parent viewPanes -mm 1 tempMM;
+	menuItem -rp "N" -l "SplitPpolygon Tool" -ecr 1 -c "SplitPolygonTool";
+	menuItem -rp "NE" -l "Soften Edges" -ecr 1 -c "{string $selArray[] = `ls -sl`;polyPerformAction \"polySoftEdge -a 180\" e 0;select -r $selArray;}";
+	menuItem -rp "E" -l "Harden Edges" -ecr 1 -c "{string $selArray[] = `ls -sl`;polyPerformAction \"polySoftEdge -a 0\" e 0;select -r $selArray;}";
+	menuItem -rp "SE" -l "Merge Vertices" -ecr 1 -c "polyPerformAction \"polyMergeVertex -d 1000\" v 0";
+	menuItem -rp "S" -l "- DELETE HISTORY -" -ecr 1 -c "DeleteHistory;";
+	menuItem -rp "SW" -l "Extrude Face" -ecr 1 -c "ExtrudeFace";
+	menuItem -rp "W" -l "Delete Edge" -ecr 1 -c "polyDelEdge -cv true -ch 1;";
+	menuItem -rp "NW" -l "Cut Faces Tool" -ecr 1 -c "CutPolygon";
+
+	menuItem -l "select loop edges" -ecr 1 -c "tm_polySelect -l 3 45;";
+	menuItem -l "select ring edges" -ecr 1 -c "tm_polySelect -r 3 45;";
+	menuItem -l "move..." -sm 1;
+		menuItem -l "move -x 0" -ecr 1 -c "move -x 0;";
+		menuItem -l "move -y 0" -ecr 1 -c "move -y 0;";
+		menuItem -l "move -z 0" -ecr 1 -c "move -z 0;";
+	setParent -m ..;
+	menuItem -l "Split Edge Ring Tool" -ecr 1 -c "SplitEdgeRingTool;";
+	menuItem -l "Reverse Normals" -ecr 1 -c "ReversePolygonNormals";
+	menuItem -l "Convert Selection to..." -sm 1  -allowOptionBoxes true;
+		menuItem -l "Edge Loop" -ecr 1 -c "SelectEdgeLoop;";
+		menuItem -l "Edge Ring" -ecr 1 -c "SelectEdgeRing;";
+		menuItem -l "Boundary" -ecr 1 -c "polySelectConstraint -pp 3;";
+		menuItem -l "Face Path" -ecr 1 -c "SelectFacePath;";
+		menuItem -l "Contiguous Edges" -ecr 1 -c "SelectContiguousEdges;";
+		menuItem -optionBox true -ecr 0 -c "SelectContiguousEdgesOptions;";
+		menuItem -l "Contained Faces" -ecr 1 -c "ConvertSelectionToContainedFaces;";
+		menuItem -l "Contained Edges" -ecr 1 -c "ConvertSelectionToContainedEdges;";
+		menuItem -divider 1;
+		menuItem -l "Selection Constraints..." -ecr 1 -c ";";
+	setParent -m ..;
+	menuItem -l "loop split" -ecr 1	-c "tm_polySplitLoopSel;" -ann "Edges loop split. Select an edge to start.";
+	menuItem -l "split selected" -ecr 1 -c "tm_polySplit -s;" -ann "Split selected edges.";
+	menuItem -l "slot edges" -ecr 1	-c "polyMapCut;tm_polySlot;" -ann "Slot selected split. Select an continuous edges to make a hole.";
+	menuItem -divider 1;
+	menuItem -l "loop&ring&split..." -sm 1;
+		menuItem -l "sel.Loop Edges (topology)" -ecr 1 -c "tm_polySelect -l 1 45;"
+			-ann "Select loop edges based on topology only";
+		menuItem -l "sel.Loop Edges (angle)" -ecr 1 -c "tm_polySelect -l 2 45;"
+			-ann "Select loop edges based on minimum angle only";
+		menuItem -l "sel.Loop Edges (top&angle)" -ecr 1 -c "tm_polySelect -l 3 45;"
+			-ann "Select loop edges based topology and angle";
+		menuItem -l "sel.Ring Edges (topology)" -ecr 1 -c "tm_polySelect -r 1 45;"
+			-ann "Select ring edges based on topology only";
+		menuItem -l "sel.Ring Edges (angle)" -ecr 1 -c "tm_polySelect -r 2 45;"
+			-ann "Select ring edges based on minimum angle only";
+		menuItem -l "sel.Ring Edges (top&angle)" -ecr 1 -c "tm_polySelect -r 3 45;"
+			-ann "Select ring edges based topology and angle";
+		menuItem -divider 1;
+		menuItem -l "loop split (topology)" -ecr 1	-c "tm_polySplitLoopSel 1 45;"
+			-ann "Edges loop split based on topology method.";
+		menuItem -l "loop split (angle)" -ecr 1	-c "tm_polySplitLoopSel 2 45;"
+			-ann "Edges loop split based on  minimum angle method.";
+		menuItem -l "loop split (top&angle)" -ecr 1	-c "tm_polySplitLoopSel 3 45;"
+			-ann "Edges loop split based on topology and angle method.";
+	setParent -m ..;
+	menuItem -divider 1;
+	menuItem -l "Polygons Display..." -ecr 0 -c "CustomPolygonDisplayOptions;";
+setParent -m ..;
+}
+
+global proc timaPolyToolsMMR()
+{
+	if( `popupMenu -exists tempMM` ) deleteUI tempMM;
+}

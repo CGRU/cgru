@@ -1,0 +1,96 @@
+//source "X:/timeshift/common/3d/lib/mel/zl_exportOBJ.mel";
+//zl_exportObjWin;
+
+global proc zl_exportObjWin()
+{
+if (!`optionVar -exists "zl_exportObjPath"`) {
+	zl_exportObjSetVar("./3d/geo/","meshes",1,250,1);
+
+}
+string $path = `optionVar -q "zl_exportObjPath"`;
+string $name = `optionVar -q "zl_exportObjName"`;
+int $start = `optionVar -q "zl_exportObjStart"`;
+int $end = `optionVar -q "zl_exportObjEnd"`;
+int $step = `optionVar -q "zl_exportObjStep"`;
+
+
+global string $zl_exportObjPathField;
+global string $zl_exportObjNameField;
+global string $zl_exportObjStartField;
+global string $zl_exportObjEndField;
+global string $zl_exportObjStepField;
+global string $zl_exportObjWindowRef;
+$zl_exportObjWindowRef = `window -sizeable off -title "Export OBJs"`;
+        columnLayout -adjustableColumn true;
+		rowLayout -numberOfColumns 3 -columnAttach 1 "right" 0 -columnWidth 1 50 -columnWidth 2 350;
+			text -label "Path";
+			string $zl_exportObjPathField = `textField -editable false -text $path -w 350  `;
+			button -label  "Browse" -c "fileBrowser(\"zl_exportObjSetFolder $zl_exportObjPathField \",\"Set Folder\",\"\",4)";
+			setParent ..;
+		rowLayout -numberOfColumns 3 -columnAttach 1 "right" 0 -columnWidth 1 50 -columnWidth 2 350;
+			text -label "Name";
+			string $zl_exportObjNameField = `textField -text $name -w 350`;
+			text -label ".$F4.obj";
+			setParent ..;
+		rowLayout -numberOfColumns 6 -columnAttach 1 "right" 0 -columnWidth 1 50 -columnAttach 3 "right" 0 -columnWidth 3 50 -columnAttach 5 "right" 0 -columnWidth 5 50;
+			text -label "Start";
+			string $zl_exportObjStartField = `intField -value $start`;
+			text -label "End";
+			string $zl_exportObjEndField = `intField -value $end`;
+			text -label "Step";
+			string $zl_exportObjStepField = `intField -value $step`;
+			setParent ..;
+		rowLayout -numberOfColumns 1 -columnAttach 1 "both" 100 -columnWidth 1 400;
+			button -c "zl_exportObjStart $zl_exportObjPathField $zl_exportObjNameField  $zl_exportObjStartField $zl_exportObjEndField $zl_exportObjStepField $zl_exportObjWindowRef" -l "OK" -align "center";
+
+showWindow $zl_exportObjWindowRef;
+window -e -h 130 -w 460 $zl_exportObjWindowRef;
+
+}
+global proc zl_exportObjSetVar(string $path, string $name, int $start, int $end, int $step)
+{
+optionVar -sv "zl_exportObjPath" $path -sv "zl_exportObjName" $name -iv "zl_exportObjStart" $start -iv "zl_exportObjEnd" $end -iv "zl_exportObjStep" $step;
+}
+global proc zl_exportObjSetFolder(string $pathField, string $folderName, string $fileType)
+{
+    global string $gDefaultFileBrowserDir;
+	if (endString($folderName,1)!="/") $folderName+="/";
+	textField -e -text $folderName $pathField;
+	chdir $folderName;
+    $gDefaultFileBrowserDir=$folderName;
+
+}
+global proc zl_exportObjStart(string $pathField, string $nameField, string $startField, string $endField, string $stepField, string $winRef)
+{
+	string $path = `textField -q -text $pathField`;
+	string $name = `textField -q -text $nameField`;
+	int    $start = `intField -q -value $startField`;
+	int    $end   = `intField -q -value $endField`;
+	int    $step   = `intField -q -value $stepField`;
+
+	zl_exportObjSetVar($path, $name, $start, $end, $step);
+
+
+	print ("\nFiles: "+$path+$name+".$F4.obj\n");
+	print ("Start: "+$start+"\tEnd: "+$end+"\tStep: "+$step+"\n");
+	deleteUI $winRef;
+	zl_exportObj($path,$name, $start, $end, $step);
+}
+global proc zl_exportObj(string $directory,string $filename, int $start, int $end, int $step)
+{
+	if (chdir($directory)==-1){
+		error("Directory "+$directory+" is not exists");
+	};
+	int $i=0;
+	for ($i=$start; $i<=$end; $i+=$step ) {
+		currentTime $i;
+		int $j;
+		int $count = 0;
+		string $pad = "";
+		while (pow(10,$count)<=$i) $count++;
+        if ($i==0) $count=1;
+		for($j=0;$j<(4-$count);$j++) $pad+="0";
+		print("file -op \"groups=1;ptgroups=0;smoothing=0;normals=0;materials=0;\" -f -typ \"OBJexport\" -pr -es \""+$directory+$filename+"."+$pad+""+$i+".obj\"\n");
+		file -op "groups=1;ptgroups=0;smoothing=0;normals=0;materials=0;" -f -typ "OBJexport" -pr -es ($directory+$filename+"."+$pad+$i+".obj");
+	}
+}

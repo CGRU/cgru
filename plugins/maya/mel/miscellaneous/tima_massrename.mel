@@ -1,0 +1,457 @@
+{
+if (`window -exists tima_massRename_window`){deleteUI tima_massRename_window;}
+window -widthHeight 251 232 -t "Mass Rename" -rtf 1 -mnb 1 -mxb 0 tima_massRename_window;
+tabLayout -innerMarginWidth 3 -innerMarginHeight 3 tima_massRename_tabs;
+frameLayout -l "" -bv 1 -bs "etchedIn" tima_massRename_frameA;
+	columnLayout;
+		rowLayout -nc 2
+				-columnWidth 1 90
+				-columnWidth 2 100;
+			text -l " New Names";
+			textField -w 130 tima_massRename_newNameRS_textField;
+		setParent -u;
+		rowLayout -nc 2
+				-columnWidth 1 90
+				-columnWidth 2 100;
+			text -l " First Index";
+			intField -w 130 tima_massRename_firstIndexRS_intField;
+		setParent -u;
+		rowLayout -nc 2
+				-columnWidth 1 90
+				-columnWidth 2 100;
+			text -l " Padding";
+			intField -w 130 tima_massRename_numPaddingRS_intField;
+		setParent -u;
+		rowLayout -nc 2
+				-columnWidth 1 90
+				-columnWidth 2 100;
+			button -w 90 -l "Select Hierarchy" -c "SelectHierarchy; tima_massRename_printSelection_globalProc(1)";
+			button -w 135 -l "Select Hierarchy By Type" -c "tima_massRename_selectHierarchyOfTheSameType_globalProc(1)";
+		setParent -u;
+		button -w 225 -l "Rename" -c "tima_massRename_renSel_globalProc()";
+		frameLayout -l "   Selection Information" -bv 1 -bs "in" -cll 1 -cl 1 -ec "tima_massRename_printSelection_globalProc(1)";
+			columnLayout tima_massRename_selInfoParent_columnLayout;
+				button -l "        Refresh Selection Info         " -c "tima_massRename_printSelection_globalProc(1)";
+			setParent -u;
+		setParent -u;
+	setParent -u;
+setParent -u;
+frameLayout -l "" -bv 1 -bs "etchedIn" tima_massRename_frameB;
+	columnLayout;
+		columnLayout;
+			rowLayout -nc 3
+					-columnWidth 1 90
+					-columnWidth 2 50
+					-columnWidth 3 100;
+				text -l " New Prefix Name";
+				textField -w 45 tima_massRename_newPrefixNamePH_textField;
+				button -w 85 -l "Add Prefix" -c "tima_massRename_addPrefHi_globalProc()";
+			setParent -u;
+			rowLayout -nc 3
+					-columnWidth 1 90
+					-columnWidth 2 50
+					-columnWidth 3 100;
+				text -l " Old Prefix Lenth";
+				intField -w 45 tima_massRename_oldPrefixLengthPH_intField;
+				button -w 85 -l "Remove Prefix" -c "tima_massRename_remPrefHi_globalProc()";
+			setParent -u;
+			rowLayout -nc 3
+					-columnWidth 1 90
+					-columnWidth 2 50
+					-columnWidth 3 100;
+				text -l " Old Prefix Name";
+				textField -w 45 tima_massRename_oldPrefixNamePH_textField;
+				button -w 85 -l "Remove Prefix" -c "tima_massRename_remPrefHi2_globalProc()";
+			setParent -u;
+			rowLayout -nc 2
+					-columnWidth 1 170
+					-columnWidth 2 30;
+				text -l "   Operate only with the same type";
+				checkBox - l "" -v 1 PreSmartCheckCtrl;
+			setParent -u;
+		setParent -u;
+		frameLayout -l "   Hierarchy Information" -bv 1 -bs "in" -cll 1 -cl 1 -ec "tima_massRename_printSelectionHierarchy_globalProc()";
+			columnLayout tima_massRename_printSelHiParent_columnLayout;
+				button -l "        Refresh Children List         " -c "tima_massRename_printSelectionHierarchy_globalProc()";
+			setParent -u;
+		setParent -u;
+	setParent -u;
+setParent -u;
+frameLayout -l "" -bv 1 -bs "etchedIn" tima_massRename_frameC;
+	columnLayout;
+		columnLayout;
+			rowLayout -nc 3
+					-columnWidth 1 90
+					-columnWidth 2 50
+					-columnWidth 3 100;
+				text -l " New Prefix Name";
+				textField -w 45 tima_massRename_newPrefixNamePS_textField;
+				button -w 85 -l "Add Prefix" -c "tima_massRename_addPrefSel_globalProc()";
+			setParent -u;
+			rowLayout -nc 3
+					-columnWidth 1 90
+					-columnWidth 2 50
+					-columnWidth 3 100;
+				text -l " Old Prefix Lenth";
+				intField -w 45 tima_massRename_oldPrefixLengthPS_intField;
+				button -w 85 -l "Remove Prefix" -c "tima_massRename_remPrefSel_globalProc()";
+			setParent -u;
+			rowLayout -nc 3
+					-columnWidth 1 90
+					-columnWidth 2 50
+					-columnWidth 3 100;
+				text -l " Old Prefix Name";
+				textField -w 45 tima_massRename_oldPrefixNamePS_textField;
+				button -w 85 -l "Remove Prefix" -c "tima_massRename_remPrefSel2_globalProc()";
+			setParent -u;
+		setParent -u;
+		separator -style "none";
+		button -w 225 -h 18 -l "Select Hierarchy By Type" -c "tima_massRename_selectHierarchyOfTheSameType_globalProc(2)";
+		separator -style "none";
+		frameLayout -l "   Selection Information" -bv 1 -bs "in" -cll 1 -cl 1 -ec "tima_massRename_printSelection_globalProc(2)";
+			columnLayout tima_massRename_selInfoParent2_columnLayout;
+				button -l "      Refresh Selection Info       " -c "tima_massRename_printSelection_globalProc(2)";
+			setParent -u;
+		setParent -u;
+	setParent -u;
+setParent -u;
+tabLayout -edit
+ 		-tabLabel tima_massRename_frameA "Rename"
+		-tabLabel tima_massRename_frameB "Prefix Hierarchy "
+		-tabLabel tima_massRename_frameC "Prefix Selection"
+ 		tima_massRename_tabs;
+showWindow tima_massRename_window;
+}
+//	_______________________________________________________________Aux Procedures_________________________________________________________
+global proc string tima_massRename_getShortNameFromFullPath_globalProc (string $fullPath)
+{
+	string $buffer[];
+	string $outText;
+	int $numTokens = `tokenize $fullPath "|" $buffer`;
+	$outText = $buffer[$numTokens - 1];
+	return $outText;
+}
+
+global proc string[] tima_massRename_getCorrectChilds_globalProc(string $parentNode)
+{
+	string $chArray[];
+	if ($parentNode == 0) return $chArray;
+	$chArray = `listRelatives -ad -f $parentNode`;
+	if (`size($chArray)` == 0) return $chArray;
+	if (`checkBox -q -v PreSmartCheckCtrl`)
+	{
+		string $parentType = `nodeType($parentNode)`;
+		if ($parentType == "transform")
+		{
+			string $parentShape[] = `listRelatives -f -s $parentNode`;
+			if (`size($parentShape)` != 0)
+			{
+				$parentShapeType = `nodeType($parentShape[0])`;
+				string $currentChild;
+				int $i = 0;
+				string $newArray[];
+				for ( $currentChild in $chArray)
+				{
+					string $currentType = `nodeType($currentChild)`;
+					if ($currentType == $parentType)
+					{
+						string $chidShape[] = `listRelatives -f -s $currentChild`;
+						string $childShapeType = `nodeType($chidShape[0])`;
+						if ( $childShapeType == $parentShapeType)
+						{
+							$newArray[$i] = $currentChild;
+							$i++;
+						}
+					}
+				}
+				return $newArray;
+			}
+			else $chArray = `listRelatives -ad -f -type $parentType $parentNode`;
+		}
+		else $chArray = `listRelatives -ad -f -type $parentType $parentNode`;
+		
+	}
+	return $chArray;
+}
+
+//	________________________________________________________________Buttons Procedures____________________________________________________
+global proc tima_massRename_selectHierarchyOfTheSameType_globalProc(int $wndTab)
+{
+	string $selArray[] = `ls -sl -l`;
+	string $currentParent;
+	string $commandLine = "select -add ";
+	for ($currentParent in $selArray)
+	{
+		string $chArray[] = `tima_massRename_getCorrectChilds_globalProc($currentParent)`;
+		string $cur;
+		for ( $cur in $chArray)
+		{
+			$commandLine += ($cur + " ");
+		}
+	}
+	eval $commandLine;
+	tima_massRename_printSelection_globalProc($wndTab);
+}
+
+global proc tima_massRename_printSelection_globalProc(int $wndTab)
+{
+	switch ($wndTab)
+	{
+		case 1:
+			setParent tima_massRename_selInfoParent_columnLayout;
+		break;
+		case 2:
+			setParent tima_massRename_selInfoParent2_columnLayout;
+		break;
+	}
+	if (`columnLayout -ex tima_massRename_printSel_columnLayout`) deleteUI tima_massRename_printSel_columnLayout;
+	columnLayout tima_massRename_printSel_columnLayout;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		text -l "nothing selected :(";
+		return;
+	}
+	text -l "    selection array:   " -fn boldLabelFont;
+	string $cur;
+	int $i = 0;
+	scrollLayout -w 220 -h 500;
+	rowColumnLayout -nc 1 -cw 1 500;
+	for ( $cur in $selArray)
+	{
+		$i++;
+		$cur = `tima_massRename_getShortNameFromFullPath_globalProc($cur)`;
+		string $outText = ("#" + $i + " -   " + $cur);
+		text -l ($outText);
+	}
+}
+
+global proc tima_massRename_renSel_globalProc()
+{
+	string $newNames = `textField -q -tx tima_massRename_newNameRS_textField`;
+	if ($newNames == "") return;
+	int $firstIndex = `intField -q -v tima_massRename_firstIndexRS_intField`;
+	int $numPadding = `intField -q -v tima_massRename_numPaddingRS_intField`;
+	string $selArray[] = `ls -sl`;
+	int $arraySize = `size($selArray)`;
+	if ($arraySize == 0)
+	{
+	tima_massRename_printSelection_globalProc(1);
+		return;
+	}
+	for ( $counter = 0; $counter < $arraySize; $counter++)
+	{
+		string $indexString = $counter + $firstIndex;
+		if (size($indexString) < ($numPadding + 1))
+		{
+			int $zeros = $numPadding - (`size($indexString)`); 
+			for ( $z = 0; $z < $zeros; $z++) $indexString = ("0" + $indexString);
+		}
+		string $newName = ($newNames + $indexString);
+		if((`objExists($selArray[$counter])`) == 0) $selArray = `ls -sl`;
+		rename ($selArray[$counter]) ($newName);
+	}
+	tima_massRename_printSelection_globalProc(1);
+}
+
+global proc tima_massRename_printSelectionHierarchy_globalProc()
+{
+	setParent tima_massRename_printSelHiParent_columnLayout;
+	if (`columnLayout -ex tima_massRename_printSelHi_columnLayout`) deleteUI tima_massRename_printSelHi_columnLayout;
+	columnLayout tima_massRename_printSelHi_columnLayout;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		text -l "nothing selected :(";
+		return;
+	}
+	scrollLayout -w 220 -h 500;
+	rowColumnLayout -nc 1 -cw 1 500;
+	string $currentParent;
+	for ($currentParent in $selArray)
+	{
+		string $chArray[] = `tima_massRename_getCorrectChilds_globalProc($currentParent)`;
+		if (size($chArray) == 0)
+		{
+			text -l ("   " + `tima_massRename_getShortNameFromFullPath_globalProc($currentParent)` + "has no children :(   ") -fn boldLabelFont;;
+			continue;
+		}
+		string $cur;
+		text -l ("   " + `tima_massRename_getShortNameFromFullPath_globalProc($currentParent)` + " childs:   ") -fn boldLabelFont;
+		for ( $cur in $chArray)
+		{
+			string $outText = `tima_massRename_getShortNameFromFullPath_globalProc($cur)`;
+			text -l ($outText);
+		}
+	}
+}
+
+global proc tima_massRename_addPrefHi_globalProc()
+{
+	string $inText1 = `textField -q -tx tima_massRename_newPrefixNamePH_textField`;
+	if ($inText1 == "") return;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		tima_massRename_printSelectionHierarchy_globalProc();
+		return;
+	}
+	string $cur;
+	for ( $cur in $selArray)
+	{
+		string $pathsArray[] = `tima_massRename_getCorrectChilds_globalProc($cur)`;
+		if (size($pathsArray) == 0)
+		{
+			tima_massRename_printSelectionHierarchy_globalProc();
+			return;
+		}
+		int $size = `size($pathsArray)`;
+		for ( $i = 0; $i < $size; $i++)
+		{
+			string $newName = ($inText1 + `tima_massRename_getShortNameFromFullPath_globalProc($pathsArray[$i])`);
+			rename ($pathsArray[$i]) ($newName);
+		}
+		string $newName = ($inText1 + `tima_massRename_getShortNameFromFullPath_globalProc($cur)`);
+		rename ($cur) ($newName);
+	}
+	tima_massRename_printSelectionHierarchy_globalProc();
+}
+
+global proc tima_massRename_remPrefHi_globalProc()
+{
+	int $number1 = `intField -q -v tima_massRename_oldPrefixLengthPH_intField`;
+	if ($number1 == 0) return;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		tima_massRename_printSelectionHierarchy_globalProc();
+		return;
+	}
+	string $cur;
+	for ( $cur in $selArray)
+	{
+		string $pathsArray[] = `tima_massRename_getCorrectChilds_globalProc($cur)`;
+		if (size($pathsArray) == 0)
+		{
+			tima_massRename_printSelectionHierarchy_globalProc();
+			return;
+		}
+		int $size = `size($pathsArray)`;
+		for ( $i = 0; $i < $size; $i++)
+		{
+			string $oldName = `tima_massRename_getShortNameFromFullPath_globalProc($pathsArray[$i])`;
+			int $lastSymbolIndex = `size($oldName)`;
+			string $newName = `substring $oldName ($number1 + 1) $lastSymbolIndex`;
+			rename ($pathsArray[$i]) ($newName);
+		}
+		string $oldName = `tima_massRename_getShortNameFromFullPath_globalProc($cur)`;
+		int $lastSymbolIndex = `size($oldName)`;
+		string $newName = `substring $oldName ($number1 + 1) $lastSymbolIndex`;
+		rename ($cur) ($newName);
+	}
+	tima_massRename_printSelectionHierarchy_globalProc();
+}
+
+global proc tima_massRename_remPrefHi2_globalProc()
+{
+	string $inText1 = `textField -q -tx tima_massRename_oldPrefixNamePH_textField`;
+	if ($inText1 == "") return;
+	int $prefixSize = `size($inText1)`;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		tima_massRename_printSelectionHierarchy_globalProc();
+		return;
+	}
+	string $cur;
+	for ($cur in $selArray)
+	{
+		string $pathsArray[] = `tima_massRename_getCorrectChilds_globalProc($cur)`;
+		if (size($pathsArray) == 0)
+		{
+			tima_massRename_printSelectionHierarchy_globalProc();
+			return;
+		}
+		int $size = `size($pathsArray)`;
+		for ( $i = 0; $i < $size; $i++)
+		{
+			string $oldName = `tima_massRename_getShortNameFromFullPath_globalProc($pathsArray[$i])`;
+			int $lastSymbolIndex = `size($oldName)`;
+			string $oldPrefix = `substring $oldName 1 $prefixSize`;
+			if ($oldPrefix != $inText1) continue;
+			string $newName = `substring $oldName ($prefixSize + 1) $lastSymbolIndex`;
+			rename ($pathsArray[$i]) ($newName);
+		}
+		string $oldName = `tima_massRename_getShortNameFromFullPath_globalProc($cur)`;
+		int $lastSymbolIndex = `size($oldName)`;
+		string $oldPrefix = `substring $oldName 1 $prefixSize`;
+		if ($oldPrefix != $inText1) continue;
+		string $newName = `substring $oldName ($prefixSize + 1) $lastSymbolIndex`;
+		rename ($cur) ($newName);
+	}
+	tima_massRename_printSelectionHierarchy_globalProc();
+}
+
+global proc tima_massRename_addPrefSel_globalProc()
+{
+	string $inText1 = `textField -q -tx tima_massRename_newPrefixNamePS_textField`;
+	if ($inText1 == "") return;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		tima_massRename_printSelection_globalProc(2);
+		return;
+	}
+	string $cur;
+	for ( $cur in $selArray)
+	{
+		string $newName = ($inText1 + `tima_massRename_getShortNameFromFullPath_globalProc($cur)`);
+		rename ($cur) ($newName);
+	}
+	tima_massRename_printSelection_globalProc(2);
+}
+
+global proc tima_massRename_remPrefSel_globalProc()
+{
+	int $number1 = `intField -q -v tima_massRename_oldPrefixLengthPS_intField`;
+	if ($number1 == 0) return;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		tima_massRename_printSelection_globalProc(2);
+		return;
+	}
+	string $cur;
+	for ( $cur in $selArray)
+	{
+		string $oldName = `tima_massRename_getShortNameFromFullPath_globalProc($cur)`;
+		int $lastSymbolIndex = `size($oldName)`;
+		string $newName = `substring $oldName ($number1 + 1) $lastSymbolIndex`;
+		rename ($cur) ($newName);
+	}
+	tima_massRename_printSelection_globalProc(2);
+}
+
+global proc tima_massRename_remPrefSel2_globalProc()
+{
+	string $inText1 = `textField -q -tx tima_massRename_oldPrefixNamePS_textField`;
+	if ($inText1 == "") return;
+	int $prefixSize = `size($inText1)`;
+	string $selArray[] = `ls -sl -l`;
+	if (size($selArray) == 0)
+	{
+		tima_massRename_printSelection_globalProc(2);
+		return;
+	}
+	string $cur;
+	for ($cur in $selArray)
+	{
+		string $oldName = `tima_massRename_getShortNameFromFullPath_globalProc($cur)`;
+		int $lastSymbolIndex = `size($oldName)`;
+		string $oldPrefix = `substring $oldName 1 $prefixSize`;
+		if ($oldPrefix != $inText1) continue;
+		string $newName = `substring $oldName ($prefixSize + 1) $lastSymbolIndex`;
+		rename ($cur) ($newName);
+	}
+	tima_massRename_printSelection_globalProc(2);
+}
