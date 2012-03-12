@@ -1,0 +1,32 @@
+Layout
+
+afanasy
+	Render farm manager.
+
+bin
+	General binaries.
+
+doc
+	HTML documentation.
+
+examples
+	Example scenes and scripts, testing scripts.
+
+icons
+	Icons
+
+lib
+	General library. Common scripts may used anywhere is the project.
+
+plugins
+	Plug-ins for different software.
+
+software_setup
+	Different software setups scripts to work with CGRU.
+
+start
+	CGRU applications launch scripts.
+
+utilities
+	Various utilities. Folder for anything else.
+
