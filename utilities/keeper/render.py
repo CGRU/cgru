@@ -22,9 +22,11 @@ def showInfo( tray = None):
    for rinfo in renders:
       if isstring:
          msg += rinfo['info']
+         msg += '\n'
          msg += rinfo['resources']
       else:
          msg += str(rinfo['info'], 'utf-8')
+         msg += '\n'
          msg += str(rinfo['resources'], 'utf-8')
    if isstring: msg = QtCore.QString.fromUtf8( msg)
    WndInfo.setPlainText( msg)

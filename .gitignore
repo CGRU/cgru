@@ -12,6 +12,9 @@ override.cmd
 tmp*
 temp*
 
+# VIM swp files
+*.swp
+
 # Archives
 *.tar
 *.gz
