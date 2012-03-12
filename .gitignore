@@ -1,0 +1,19 @@
+# Override scripts
+override.sh
+override.cmd
+
+# Subversion
+.svn
+
+# Python
+*.pyc
+
+# Temporary folders
+tmp*
+temp*
+
+# Archives
+*.tar
+*.gz
+*.bz2
+
