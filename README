@@ -16,7 +16,7 @@ icons
 	Icons
 
 lib
-	General library. Common scripts may used anywhere is the project.
+	General library. Common scripts may used anywhere in the project.
 
 plugins
 	Plug-ins for different software.
