@@ -22,7 +22,7 @@ plugins
 	Plug-ins for different software.
 
 software_setup
-	Different software setups scripts to work with CGRU.
+	Different software setup scripts to work with CGRU.
 
 start
 	CGRU applications launch scripts.
