@@ -1,0 +1,9 @@
+# Cmake generated files
+
+CMakeFiles
+*.cmake
+CMakeCache.txt
+Makefile
+
+# Qt moc files folders
+*/__/
