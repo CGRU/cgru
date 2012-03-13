@@ -1,0 +1,40 @@
+#pragma once
+
+#include <QtGui/QListWidget>
+
+#include <msg.h>
+#include <afnode.h>
+#include <msgclasses/mcgeneral.h>
+#include <msgclasses/mcafnodes.h>
+
+#include "itemnode.h"
+
+class ListNodes : public QListWidget
+{
+public:
+   ListNodes( int listType, QWidget * parent);
+   virtual ~ListNodes();
+
+   virtual bool caseMessage( af::Msg *msg) = 0;
+
+   virtual ItemNode * createNode( af::Node * node) = 0;
+
+   virtual void connectionLost();
+   virtual void connectionEstablished();
+
+protected:
+   int type;
+   af::MCGeneral eventIds;
+   bool subscribed;
+
+protected:
+
+   virtual void showEvent( QShowEvent * event);
+   virtual void hideEvent( QHideEvent * event);
+
+   virtual void subscribe();
+   virtual void unSubscribe();
+
+   void setList( af::MCAfNodes & nodes );
+   void deleteNodes( af::MCGeneral & list );
+};

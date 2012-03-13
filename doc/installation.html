@@ -1,0 +1,116 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+<title>CGRU Installation</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">CGRU Installation</h2>
+<hr />
+
+<h3>Get CGRU</h3>
+<p>
+Download a latest release and unpack.
+</p>
+<p>
+You can use SVN to check out latest version:
+</p>
+<p>
+<code>
+$ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
+</code>
+</p>
+<p>
+And build it yourself.
+</p>
+<h4>Debian Packages.</h4>
+<p>
+Debian and Ubuntu users (and may be other Debian-like distributives) can use <kbd>.deb</kbd> packages.<br/>
+See this <a href="install_debian.html">Debian installation</a> page.
+</p>
+<h3>Setup Afanasy Environment</h3>
+<p>
+You need to go in CGRU Afanasy folder and source a script:
+</p>
+<code>
+$ cd afanasy<br/>
+$ source setup.sh<br/>
+</code>
+<p>
+You can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
+<code>
+pwd=$PWD; cd .../cgru/afanasy; source setup.sh; cd $pwd<br/>
+</code>
+And shell will automatically source it at every launch.
+</p>
+<p>
+After this setup, Afanasy commands will appear in $PATH and $PYTHONPATH will be appended with Python modules location. So you can launch Afanasy commands and import Python module.
+</p>
+<p>
+<b>MS Windows:</b>
+ <kbd>cmd</kbd> scripts are also provided (its do the same).
+</p>
+
+<h3>Run CGRU</h3>
+<p>
+Afanasy examples are located in <kbd>cgru/afanasy/examples</kbd> directory.<br/>
+General tools for specific soft are located in <kbd>cgru/plugins/[software_name]</kbd> folder.<br/>
+Afanasy Tools for specific soft are located in <kbd>cgru/afanasy/plugins/[software_name]</kbd> folder.<br/>
+Examples has software launching scripts to make them to run with Afanasy setup.<br/>
+Documentation for specific soft in located in <kbd>cgru/plugins/[software_name]/doc</kbd> folder.<br/>
+Run examples by executing script from it example directory.<br/>
+For example to launch Houdini example:<br/>
+<code>
+ $ cd .../cgru/afanasy/examples/houdini<br/>
+ $ ./houdini
+</code>
+</p>
+<p>
+<b>MS Windows:</b>
+You can double click application launch script in <kbd>cgru\bin</kbd> directory, or create link to it.<br/>
+To launch example run its script. Example for NUKE: <kbd>cgru\afanasy\examples\nuke\nuke.cmd</kbd>
+</p>
+<h3>CG - Rules</h3>
+<p>
+Do not forget to read <a href="cgrules.html">CG Rules</a> to find out what's going on.
+</p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,435 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><font color="#DD0000">★</font><i><a href="../../index.html" target="_top">CGRU</a></i><font color="#DD0000">★</font></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#507020" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Afanasy</h2>
+<hr />
+
+<h3>General Configuration:</h3>
+<p>
+Afanasy configuration stored in XML files. It reads them on launch.
+</p><p>
+Default configuration:<br/>
+<kbd>cgru/afanasy/config_default.xml</kbd><br/>
+Configuration overrides:<br/>
+<kbd>cgru/afanasy/config.xml</kbd><br/>
+Per user turning:<br/>
+<kbd>~/.afanasy/config.xml</kbd><br/>
+Last values, which overrides even users values and which initialization will not be echoed by <code>afcmd</code> (for passwords):<br/>
+<kbd>cgru/afanasy/config_shadow.xml</kbd><br/>
+It reads them in specified sequence, each time overriding previous variables value.<br/>
+</p>
+<p>
+You can copy <kbd>cgru/afanasy/config_default.xml</kbd> file in <kbd>cgru/afanasy/config.xml</kbd> and remove elements which default values you want to keep. You need at least to override <code>servername</code> (if you want other computers to find it). Override <code>cmdprefix</code> to empty value to use default software (or you own project setup). Generate keys using <code>afcmd passwd</code> command for your own passwords and put them into <kbd>cgru/afanasy/config_shadow.xml</kbd>.
+</p>
+
+<h3><a name="Configuration"/>Configuration Elements:</h3>
+
+<h4><a name="ConfGeneral"/>General:</h4>
+<ul>
+<li><p>
+<code>timeformat</code> = ddd dMMM hh:mm.ss<br/>
+Time format for afanasy logs. See <a href="http://doc.trolltech.com/qdatetime.html#toString">QDateTime::toString</a> for time format documentation.
+</p></li>
+<li><p>
+<code>filenamesizemax</code> = 250<br/>
+Afanasy generates some file names automatically, to store task output for example. If filename length for some reasons will be grater this value, it will be truncated to maximum.<br>
+( tasks outputs storing filename generating policy prevents same filenames, truncating will never produce the same file name )
+</p></li>
+<li><p>
+<code>cmdprefix</code> = ""<br/>
+Tasks commands prefix. Set it to './' to launch 'myrender' not from path but from current task directory where 'myrender' can be reconfigured individually for the asset.
+</p></li>
+<li><p>
+<code>path_client</code> = c:/cg/tools;c:/projects<br/>
+<code>path_server</code> = /cg/tools;/cg/projects<br/>
+Remap path from client to server. Path list separated with ';'. Linux server has another path than MS Windows workstations. May be your Linux server has another path than even Linux workstations.
+</p></li>
+<li><p>
+<code>priority</code> = 99<br/>
+Default priority for users and jobs. User with no administrative rights can't set priority greater than this value.
+</p></li>
+<li><p>
+<code>maxhosts</code> = -1<br/>
+Default maximum hosts number for users and jobs. Value '-1' means no hosts number limit.
+</p></li>
+<li><p>
+<code>hostsmask</code> = ""<br/>
+Default hosts mask number for users and jobs. Empty means that users and jobs can run on any host. Afanasy uses <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).
+</p></li>
+</ul>
+
+<h4><a name="ConfClientServer"/>Client &amp; Server:</h4>
+<ul>
+<li><p>
+<code>servername</code> = localhost<br/>
+Command for render to execute another render or to restart.
+</p></li>
+<li><p>
+<code>serverport</code> = 51000<br/>
+Port to listen to server.
+</p></li>
+<li><p>
+<code>clientport</code> = 51001<br/>
+First port to listen to clients. Next client launched on the host will listen the next port.
+</p></li>
+<li><p>
+<code>srv_so_rcvtimeo_sec</code> = 2<br/>
+Set socket maximum time to wait for an input operation to complete (see <i>man setsockopt</i>).
+</p></li>
+<li><p>
+<code>srv_so_sndtimeo_sec</code> = 2<br/>
+Set socket maximum time to wait for an output operation to complete (see <i>man setsockopt</i>).
+</p></li>
+<li><p>
+<code>tempdirectory</code> = /var/tmp/afanasy/<br/>
+Directory for sever to store logs and tasks outputs.
+</p></li>
+</ul>
+
+<h4><a name="ConfJob"/>Job:</h4>
+<ul>
+<li><p>
+<code>task_default_capacity</code> = 1000<br/>
+Default tasks capacity value, if not set manually on job creation or running job GUI.
+</p></li>
+<li><p>
+<code>task_update_timeout</code> = 300 (seconds)<br/>
+If task status or percentage has not been updated for this period it's considered as an error.
+</p></li>
+<li><p>
+<code>job_logs_rotate</code> = 10<br/>
+Server store logs of a jobs with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
+</p></li>
+</ul>
+
+<h4><a name="ConfRender"/>Render:</h4>
+<ul>
+<li><p>
+<code>render_default_capacity</code> = 1000<br/>
+Default render capacity value, if not set in farm config.
+</p></li>
+<li><p>
+<code>render_default_maxtasks</code> = 5<br/>
+Maximum allowed simultaneously running tasks on render, if not set in farm config.
+</p></li>
+<li><p>
+<code>render_exec</code> = afrender<br/>
+Command for render to execute another render or to restart.
+</p></li>
+<li><p>
+<code>render_nice</code> = 10<br/>
+Renice task command process on render.
+</p></li>
+<li><p>
+<code>render_update_sec</code> = 5 (seconds)<br/>
+Render resources update interval.
+</p></li>
+<li><p>
+<code>render_updatetaskperiod</code> = 1 (seconds)<br/>
+Period to render to update task state or percentage (even if there is no parser).
+</p></li>
+<li><p>
+<code>render_zombietime</code> = 60 (seconds)<br/>
+Time to server to delete render if there is no update (resources usage) for this period.
+</p></li>
+<li><p>
+<code>render_connectretries</code> = 3<br/>
+Connection fails times to consider to render that there is no connection to server.
+</p></li>
+<li><p>
+<code>render_waitforconnected</code> = 15000 (milliseconds)<br/>
+Time to wait for connection establishing to consider that connection is available.
+</p></li>
+<li><p>
+<code>render_waitforreadyread</code> = 15000 (milliseconds)<br/>
+Time to wait for incoming data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>render_waitforbyteswritten</code> = 15000 (milliseconds)<br/>
+Time to wait for writing data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>render_logs_linesmax</code> = 100<br/>
+Server truncates log above this limit.
+</p></li>
+<li><p>
+<code>render_logs_rotate</code> = 10<br/>
+Server store logs of renders with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
+</p></li>
+</ul>
+
+
+<h4><a name="ConfUser"/>User:</h4>
+<ul>
+<li><p>
+<code>errors_avoid_host</code> = 3<br/>
+<a href="user.html#ErrorsAvoidHost">Errors Avoid Host</a> parameter for new user.
+</p></li>
+<li><p>
+<code>task_error_retries</code> = 3<br/>
+<a href="user.html#ErrorRetries">Error Retries</a> parameter for new user.
+</p></li>
+<li><p>
+<code>task_error_same_host</code> = 3<br/>
+<a href="user.html#ErrorsTaskSameHost">Errors Task Same Host</a> parameter for new user.
+</p></li>
+<li><p>
+<code>user_zombietime</code> = 2 (seconds)<br/>
+Time to temporary (not registered) user to have no jobs and to be deleted from server.
+</p></li>
+<li><p>
+<code>user_logs_linesmax</code> = 100<br/>
+Server truncates log above this limit.
+</p></li>
+<li><p>
+<code>user_logs_rotate</code> = 10<br/>
+Server store logs of users with the same name by renaming old. It adds a number to the end of old file name (logs rotating).
+</p></li>
+</ul>
+
+<h4><a name="ConfWatch"/>Watch:</h4>
+<ul>
+<li><p>
+<code>pswd_visor</code> = 1832116180fdc61b64fd978401e462e9<br/>
+Visor rights password. You can use <kbd>afcmd passwd [string]</kbd> to get password digits key.
+</p></li>
+<li><p>
+<code>pswd_visor</code> = 73bcaaa458bff0d27989ed331b68b64d<br/>
+GOD rights password.<br/>
+(This default values are very common passwords which exists in any MD5 database)<br/>
+Password length must be <b>five characters</b>.
+</p></li>
+<li><p>
+<code>previewcmds</code> = kuickshow;djv_view<br/>
+Programs to view frames. 'kuickshow' - is a common and very light KDE viewer which supports various formats. 'djv_view' - good sequence (and movies) viewer.
+</p></li>
+<li><p>
+<code>watch_font_family</code> = SansSerif<br/>
+GUI font.
+</p></li>
+<li><p>
+<code>watch_font_sizename</code> = 8<br/>
+Font size for nodes names and important information.
+</p></li>
+<li><p>
+<code>watch_font_sizeinfo</code> = 7<br/>
+Font size for nodes common information.
+</p></li>
+<li><p>
+<code>watch_font_sizemin</code> = 5<br/>
+Smallest font for nodes state.
+</p></li>
+<li><p>
+<code>watch_connectretries</code> = 3<br/>
+Connection fails times to consider to Watch that there is no connection to server.
+</p></li>
+<li><p>
+<code>watch_waitforconnected</code> = 8000 (milliseconds)<br/>
+Time to wait for connection establishing to consider that connection is available.
+</p></li>
+<li><p>
+<code>watch_waitforreadyread</code> = 8000 (milliseconds)<br/>
+Time to wait for incoming data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>watch_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
+Time to wait for writing data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>watch_refreshinterval</code> = 5 (seconds)<br/>
+Force update some widgets painting, even if there is no information change ( they can display a timer, for example).
+</p></li>
+</ul>
+
+<h4><a name="ConfMonitor"/>Monitor:</h4>
+<ul>
+<li><p>
+(this is Watch parameter too)<br/>
+<code>monitor_updateperiod</code> = 10 (seconds)<br/>
+Period to send dummy message to server to keep alive.
+</p></li>
+<li><p>
+(this is Watch parameter too)<br/>
+<code>monitor_zombietime</code> = 40 (seconds)<br/>
+Time to server to delete monitor if there is no update (even no dummy message) for this period.
+</p></li>
+<li><p>
+(this is Watch parameter too)<br/>
+<code>monitor_connectretries</code> = 3<br/>
+Connection fails times to consider to Monitor that there is no connection to server.
+</p></li>
+<li><p>
+(this is Watch parameter too)<br/>
+<code>monitor_waitforconnected</code> = 8000 (milliseconds)<br/>
+Time to wait for connection establishing to consider that connection is available.
+</p></li>
+<li><p>
+(this is Watch parameter too)<br/>
+<code>monitor_waitforreadyread</code> = 8000 (milliseconds)<br/>
+Time to wait for incoming data to consider that connection is not lost.
+</p></li>
+<li><p>
+(this is Watch parameter too)<br/>
+<code>monitor_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
+Time to wait for writing data to consider that connection is not lost.
+</p></li>
+</ul>
+
+<h4><a name="ConfTalk"/>Talk:</h4>
+<ul>
+<li><p>
+<code>talk_updateperiod</code> = 5 (seconds)<br/>
+Period to send dummy message to server to keep alive.
+</p></li>
+<li><p>
+<code>talk_zombietime</code> = 18 (seconds)<br/>
+Time to server to delete monitor if there is no update (even no dummy message) for this period.
+</p></li>
+<li><p>
+<code>talk_connectretries</code> = 3<br/>
+Connection fails times to consider to Talk that there is no connection to server.
+</p></li>
+<li><p>
+<code>talk_waitforconnected</code> = 8000 (milliseconds)<br/>
+Time to wait for connection establishing to consider that connection is available.
+</p></li>
+<li><p>
+<code>talk_waitforreadyread</code> = 8000 (milliseconds)<br/>
+Time to wait for incoming data to consider that connection is not lost.
+</p></li>
+<li><p>
+<code>talk_waitforbyteswritten</code> = 8000 (milliseconds)<br/>
+Time to wait for writing data to consider that connection is not lost.
+</p></li>
+</ul>
+
+<h4><a name="ConfDatabase"/>Database:</h4>
+Try to keep this default values.
+<ul>
+<li><p>
+<code>db_type</code> = QPSQL<br/>
+Database type. You can query available database drivers by <kbd>afcmd db_drivers</kbd> command.
+</p></li>
+<li><p>
+<code>db_hostname</code> = localhost<br/>
+Host to connect to database.
+</p></li>
+<li><p>
+<code>db_databasename</code> = afanasy<br/>
+Database name.
+</p></li>
+<li><p>
+<code>db_username</code> = afadmin<br/>
+Database user name.
+</p></li>
+<li><p>
+<code>db_password</code> = AfPassword<br/>
+Database password.
+</p></li>
+<li><p>
+<code>db_stringquotes</code> = $$<br/>
+String quotes in statements. With default quotes ( " or ' ) you can't operate strings which contains such characters. Check whether your database supports it.
+</p></li>
+<li><p>
+<code>db_stringnamelen</code> = 512<br/>
+Names length limit. It is a name of job, block, task, user, host e.t.c.
+</p></li>
+<li><p>
+<code>db_stringexprlen</code> = 4096<br/>
+Expressions length limit. It is an expression of hosts mask, depend mask and command, working directory.
+</p></li>
+</ul>
+You can check database connection by <kbd>afcmd db_check</kbd> command.
+
+<h3><a name="Farm"/>Farm Setup:</h3>
+<p>
+After general configuration, afanasy try to load <kbd>cgru/afanasy/farm.xml</kbd> to setup a farm. If this file does not exists it load <kbd>cgru/afanasy/farm_default.xml</kbd> which setup default farm and provided as an example to copy and modify to describe your hosts.
+</p>
+<ul>
+<li><p>
+<code>pattern</code> name="<i>pattern name</i>"<br/>
+</p></li>
+<li><p>
+<code>mask</code><br/>
+Hosts which names matches this mask will take this pattern settings.
+</p></li>
+<li><p>
+<code>description</code><br/>
+Does not mean anything for sever, job or render host, only for humans.
+</p></li>
+<li><p>
+<code>os</code><br/>
+Operating system name. Can be matched by jobs.
+</p></li>
+<li><p>
+<code>capacity</code><br/>
+Running Tasks maximum capacity value.
+</p></li>
+<li><p>
+<code>maxtasks</code><br/>
+Maximum number of simultaneously running tasks.
+</p></li>
+<li><p>
+<code>power</code><br/>
+Some number which minimum can be needed by jobs.
+</p></li>
+<li><p>
+<code>properties</code><br/>
+Some string which matching can be needed by jobs.
+</p></li>
+<li><p>
+<code>service</code> name="<i>type</i>" count="<i>limit number</i>"<br/>
+List of names and counts of available services.
+</p></li>
+</ul>
+Host will take parameters from last matched pattern. So first pattern mask in default farm is ".*" - means that host with any name will take some default settings.
+
+<h3>Main server launching command:</h3>
+<p><code>$ afserver</code></p>
+<p>Server can re-read configuration files "on-the-fly", without restart or even stop jobs solving and running tasks. Use <kbd>afcmd cload</kbd> command to ask server to reload configuration and <kbd>afcmd fload</kbd> to reload farm setup. But sever will not change listen port or database connection setup without restart. Client can't reload configuration "on-the-fly", it needs restart to reconfigure.
+</p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#507020" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><font color="#DD0000">★</font><i><a href="../../index.html" target="_top">CGRU</a></i><font color="#DD0000">★</font></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

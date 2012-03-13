@@ -1,0 +1,11 @@
+//
+//	Synopsis:
+//
+//	menuItem -l "label" -ann "annotation" -c "command"
+//
+
+	menuItem -l "INTERFACE:" -enable off;
+	menuItem -divider true;
+	menuItem -l "Cannels|Layers Window..." -ecr 0 -c "cgruSourceFile(\"interface/tima_channelslayerswindow.mel\");" -ann "Show channel box and layer editor in separate window.";
+	menuItem -l "Cannels Window..." -ecr 0 -c "cgruSourceFile(\"interface/tima_channelswindow.mel\");" -ann "Show channel box and layer editor in separate window.";
+	menuItem -l "Layers Window..." -ecr 0 -c "cgruSourceFile(\"interface/tima_layerswindow.mel\");" -ann "Show channel box and layer editor in separate window.";

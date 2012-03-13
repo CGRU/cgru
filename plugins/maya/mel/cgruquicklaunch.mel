@@ -1,0 +1,134 @@
+if(`optionVar -exists "cgru_quicklaunch_expand_optionVar_iv"` == 0) optionVar -iv "cgru_quicklaunch_expand_optionVar_iv" 0;
+
+proc cgru_initform_globalProc( string $parent, string $name,
+         string $longName, string $shortName,
+         int $top, int $left, int $right, int $bottom,
+	 int $height,
+         float $r, float $g, float $b)
+{
+   string $name = "cgru_form_" + $name;
+   setParent $parent;
+   if (`frameLayout -ex $name`) deleteUI $name;
+   frameLayout -lv 0 -borderStyle "etchedOut" $name;
+      text -l $shortName -height $height -ann $longName -bgc $r $g $b ($name + "_text");
+   formLayout -edit
+      -attachForm          $name    top      $top
+//      -attachNone          $name    top
+      -attachForm          $name    left     $left
+      -attachForm          $name    bottom   $bottom
+//      -attachNone          $name    bottom
+      -attachOppositeForm  $name    right    $right
+   $parent;
+}
+proc cgru_initbutton_globalProc( string $parent, string $name,
+         string $cmd, string $longName, string $shortName,
+         int $top, int $left, int $right, int $bottom,
+	 int $height,
+         float $r, float $g, float $b)
+{
+   string $name = "cgru_btn_" + $name;
+   setParent $parent;
+   if (`frameLayout -ex $name`) deleteUI $name;
+   frameLayout -labelVisible 0 -borderStyle "etchedOut" $name;
+      button -l $shortName -height $height -ann $longName -bgc $r $g $b -c $cmd ($name + "_text");
+   formLayout -edit
+//      -attachForm          $name    top      $top	
+      -attachNone          $name    top
+      -attachForm          $name    left     $left
+//      -attachForm          $name    bottom   $bottom
+      -attachNone          $name    bottom
+      -attachOppositeForm  $name    right    $right
+   $parent;
+}
+//#######################################################################################################
+global proc cgru_expand_globalProc()
+{
+   optionVar -iv "cgru_quicklaunch_expand_optionVar_iv" (1 - (`optionVar -q cgru_quicklaunch_expand_optionVar_iv`));
+   cgru_buildforms_globalProc();
+}
+//#######################################################################################################
+
+global proc cgru_buildforms_globalProc()
+{
+global string $cgruDir_MEL;
+string $cgruMenusLocation = `getenv MAYA_CGRU_MENUS_LOCATION`;
+if($cgruMenusLocation == "") $cgruMenusLocation = $cgruDir_MEL;
+
+   int $frames_width = 255;
+   int $right = 2;
+   int $width = 35;
+   int $step = 2;
+   int $top = 4;
+   int $bottom = 2;
+   int $height = 15;
+   int $exp_btn_t = 0;
+   int $exp_btn_b = 0;
+   int $exp_btn_w = 18;
+   int $exp_btn_h = 24;
+
+   global string $gStatusLine;
+
+   string $parent = "CGRU_QUIKLAUNCH_FORMS";
+   if (`formLayout -ex $parent`) deleteUI $parent;
+   formLayout -p $gStatusLine  $parent;// -backgroundColor .9 .1 .1 $parent;
+   formLayout -edit
+      -attachNone          $parent    top
+//      -attachForm          $parent    top      5
+      -attachOppositeForm  $parent    left     (-$frames_width)
+      -attachNone          $parent    bottom
+//      -attachForm          $parent    bottom    5
+      -attachForm          $parent    right    10
+   $gStatusLine;
+   if(`optionVar -q cgru_quicklaunch_expand_optionVar_iv`)
+   {
+      cgru_initbutton_globalProc( $parent, "expand", "cgru_expand_globalProc()", "Collapse forms", ">", $exp_btn_b, $right, (-($right + $exp_btn_w)), $exp_btn_b, $exp_btn_h, 0.70, 0.70,  0.70);
+
+      $right = $right + $exp_btn_w + $step;
+      cgru_initform_globalProc( $parent, "mod", "Modeling", " mod", $top, $right, -($right + $width), $bottom, $height, 0.78, 0.85,  0.90);
+      popupMenu -button 1 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_modeling.mel");
+
+      $right = $right + $width + $step;
+      cgru_initform_globalProc( $parent, "anim", "Animation", "anim", $top, $right, -($right + $width), $bottom, $height, 0.70, 0.90,  0.70);
+      popupMenu -button 1 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_animation.mel");
+
+      $right = $right + $width + $step;
+      cgru_initform_globalProc( $parent, "rend", "Rendering", "rend", $top, $right, -($right + $width), $bottom, $height, 0.90, 0.90,  0.70);
+      popupMenu -button 1 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_rendering.mel");
+
+      $right = $right + $width + $step;
+      cgru_initform_globalProc( $parent, "misc", "Miscellaneous", "misc", $top, $right, -($right + $width), $bottom, $height, 0.80, 0.80,  0.80);
+      popupMenu -button 1 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_miscellaneous.mel");
+
+      $right = $right + $width + $step;
+      cgru_initform_globalProc( $parent, "dev", "Develop", " dev", $top, $right, -($right + $width), $bottom, $height, 0.90, 0.70,  0.60);
+      popupMenu -button 1 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_develop.mel");
+
+      $right = $right + $width + $step;
+      cgru_initform_globalProc( $parent, "ui", "LMB-Interface | MMB-Reload | RMB-Documentation", "  UI", $top, $right, -($right + $width), $bottom, $height, 0.90, 0.90,  0.90);
+      popupMenu -button 1 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_interface.mel");
+      popupMenu -button 2 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_reload.mel");
+      popupMenu -button 3 -allowOptionBoxes 1;
+      cgruSourceFile_global( $cgruMenusLocation + "/menuitems_documentation.mel");
+
+   }
+   else
+   {
+      if (`frameLayout -ex cgru_btn_expand`) deleteUI cgru_btn_expand;
+      if (`frameLayout -ex cgru_form_mod`) deleteUI cgru_form_mod;
+      if (`frameLayout -ex cgru_form_anim`) deleteUI cgru_form_anim;
+      if (`frameLayout -ex cgru_form_rend`) deleteUI cgru_form_rend;
+      if (`frameLayout -ex cgru_form_misc`) deleteUI cgru_form_misc;
+      if (`frameLayout -ex cgru_form_dev`) deleteUI cgru_form_dev;
+      if (`frameLayout -ex cgru_form_ui`) deleteUI cgru_form_ui;
+      cgru_initbutton_globalProc( $parent, "expand", "cgru_expand_globalProc()", "Expand forms", "<", $exp_btn_b, ($frames_width - 2*$exp_btn_w), (-$frames_width+$exp_btn_w), $exp_btn_b, $exp_btn_h, 0.70, 0.70,  0.70);
+   }
+}
+cgru_buildforms_globalProc();
+//#######################################################################################################

@@ -1,0 +1,17 @@
+//
+// Synopsis:
+//
+// menuItem -l "label" -ann "annotation" -c "command"
+//
+
+   if(`getenv AF_ROOT`!="")
+   {
+      menuItem -l "Afanasy..." -ecr 0 -c "afanasy" -ann "Afanasy render manager window.";
+      menuItem -divider true;
+   }
+
+   menuItem -l "Rendering Flags..." -ecr 0 -c "cgruSourceFile(\"rendering/tima_renderingflags.mel\");" -ann "Changes rendering flags on hierarchy";
+   menuItem -l "Lights Manager..." -ecr 0 -c "cgruSourceFile(\"rendering/tima_lightsmanager.mel\");" -ann "Massive attribute editing of selected lighs.";
+   menuItem -divider true;
+   menuItem  -l "Make light links to SG" -ann "Make links between selected objects shading groups and selected ligths." -c "cgruSourceFile(\"rendering/tima_lightlinksg.mel\");tima_lightlinksg_globalProc(1);";
+   menuItem  -l "Break light links to SG" -ann "Break links between selected objects shading groups and selected ligths." -c "cgruSourceFile(\"rendering/tima_lightlinksg.mel\");tima_lightlinksg_globalProc(0);";

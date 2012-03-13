@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Python Block Class</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Block Object</h2>
+<hr />
+
+<h3>Block constructor</h3>
+<ul>
+<li>block = af.<b>Block(</b><i>blockname, blocktype</i><b>)</b>
+<p>
+Construct a new block and return it.
+</p></li>
+</ul>
+
+<h3>Block variables</h3>
+<ul>
+<li>block.<b>tasks</b> = [ ]
+<p>
+Tasks list. Not used in numeric block.<br/>
+</p></li>
+</ul>
+
+<h3>Block functions</h3>
+<ul>
+
+<li>block.<b>setCapacity(</b><i>number</i><b>)</b>
+<p>
+Set block <a href="job_block.html#Capacity">Capacity</a> value.
+</p></li>
+
+<li>block.<b>setCommandView(</b><i>image file name</i><b>)</b>
+<p>
+Set block <a href="job_block.html#CommandView">View Command</a> argument.
+</p></li>
+
+<li>block.<b>setCommand(</b><i>command</i><b>)</b>
+<p>
+Set block <a href="job_block.html#Command">Command</a>.
+</p></li>
+
+<li>block.<b>setCmdPost(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#CmdPost">Post command</a>.
+</p></li>
+
+<li>block.<b>setCmdPre(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#CmdPre">Pre command</a>.
+</p></li>
+
+<li>block.<b>setHostsMask(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#HostsMask">Hosts Mask</a>.
+</p></li>
+
+<li>block.<b>setHostsMaskExclude(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#HostsMaskExclude">Exclude Hosts Mask</a>.
+</p></li>
+
+<li>block.<b>setDependMask(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#DependMask">Depend Mask</a>.
+</p></li>
+
+<li>block.<b>setMaxHosts(</b><i>number</i><b>)</b>
+<p>
+Set block <a href="job_block.html#MaxHosts">Maximum Hosts</a> number.
+</p></li>
+
+<li>block.<b>setMultiHost(</b><i>int min, int max, int waitmax, bool sameHostMaster, const char * service, int waitsrv</i><b>)</b>
+<p>
+Set block tasks to be able to run on several hosts and set <a href="job_block.html#MultiHost">Multi Hosts Tasks</a> parameters.
+</p></li>
+
+<li>block.<b>setNeedHDD(</b><i>gigabytes</i><b>)</b>
+<p>
+Set block <a href="job_block.html#NeedHDD">Disk Space Needed</a> in gigabytes.
+</p></li>
+
+<li>block.<b>setNeedMemory(</b><i>megabytes</i><b>)</b>
+<p>
+Set block <a href="job_block.html#NeedMemory">Memory Needed</a> in megabytes.
+</p></li>
+
+<li>block.<b>setNeedPower(</b><i>power</i><b>)</b>
+<p>
+Set block <a href="job_block.html#NeedPower">Needed Host Power</a> mask.
+</p></li>
+
+<li>block.<b>setNeedProperties(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#NeedProperties">Needed Host Properties</a> mask.
+</p></li>
+
+<li>block.<b>setNumeric(</b><i>start, end, [perHost=1]</i><b>)</b>
+<p>
+Set block to numeric <a href="job_block.html#Numeric">Numeric</a> type.
+</p></li>
+
+<li>block.<b>setParserType(</b><i>type</i><b>)</b>
+<p>
+Set block tasks<a href="job_block.html#ParserType">Parser Type</a> name.
+</p></li>
+
+<li>block.<b>setTasksDependMask(</b><i>mask</i><b>)</b>
+<p>
+Set block <a href="job_block.html#TasksDependMask">Tasks Depend Mask</a>.
+</p></li>
+
+<li>block.<b>setTasksMaxRunTime(</b><i>seconds</i><b>)</b>
+<p>
+Set block <a href="job_block.html#TasksMaxRunTime">Tasks Maximum Running Time</a> limit (in seconds).
+</p></li>
+
+<li>block.<b>setTasksName(</b><i>name</i><b>)</b>
+<p>
+Set block <a href="job_block.html#TasksName">Tasks Name</a>.
+</p></li>
+
+<li>block.<b>setVariableCapacity(</b><i>min, max</i><b>)</b>
+<p>
+Set block capacity to variable, through <a href="job_block.html#Capacity">Capacity Coefficients</a> - maximum and minimun values.
+</p></li>
+
+<li>block.<b>setWorkingDirectory(</b><i>directory</i><b>)</b>
+<p>
+Set block tasks <a href="job_block.html#WorkingDirectory">Working Directory</a>.
+</p></li>
+
+</ul>
+
+<h3>Depricated Block functions</h3>
+<ul>
+
+<li>block.<b>addTask(</b><i>taskname</i><b>)</b>
+<p>
+Add a new task to block and return it.<br/>
+Use <kbd>block.tasks</kbd> list instead (append it for example).
+</p></li>
+
+</ul>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

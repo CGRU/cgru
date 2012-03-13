@@ -1,0 +1,504 @@
+proc tima_SetsEditor_showWindow_proc()
+{
+	if (`window -exists tima_SetsEditor_window`) deleteUI tima_SetsEditor_window;
+	window -widthHeight 290 607 -t "Sets Editor" tima_SetsEditor_window;
+	formLayout -numberOfDivisions 100 tima_SetsEditor_formLayout;
+		frameLayout -l " Main Operations : " -bv 1 -bs "etchedIn" tima_SetsEditor_mainCommands_frameLayout;
+		setParent tima_SetsEditor_formLayout;
+		frameLayout -l "Sets List Manager" tima_SetsEditor_setsListManager_frameLayout;
+		setParent tima_SetsEditor_formLayout;
+		frameLayout -l "Set A" -dropCallback tima_setADropCallBack_globalProc tima_SetsEditor_setA_frameLayout;
+		setParent tima_SetsEditor_formLayout;
+		frameLayout -l "Sets B" tima_SetsEditor_setB_frameLayout;
+		setParent tima_SetsEditor_formLayout;
+		frameLayout -l " Place Result In : " -bv 1 -bs "etchedIn" tima_SetsEditor_placeResultIn_frameLayout;
+		setParent tima_SetsEditor_formLayout;
+		frameLayout -l " aux operations : " -bv 1 -bs "etchedIn" tima_SetsEditor_auxOperatoins_frameLayout;
+		setParent tima_SetsEditor_formLayout;
+		frameLayout -l "     message box : " -bv 1 -bs "etchedIn" tima_SetsEditor_messageBox_frameLayout;
+	formLayout -edit
+		-attachForm			tima_SetsEditor_setsListManager_frameLayout	"top"		160
+		-attachForm			tima_SetsEditor_setsListManager_frameLayout	"left"		2
+		-attachForm			tima_SetsEditor_setsListManager_frameLayout	"bottom"	2
+		-attachPosition		tima_SetsEditor_setsListManager_frameLayout	"right"		1 50
+
+		-attachForm			tima_SetsEditor_setB_frameLayout			"top"		220
+		-attachPosition		tima_SetsEditor_setB_frameLayout			"left"		1 50
+		-attachForm			tima_SetsEditor_setB_frameLayout			"bottom"	2
+		-attachForm			tima_SetsEditor_setB_frameLayout			"right"		2
+
+		-attachForm			tima_SetsEditor_setA_frameLayout			"top"		160
+		-attachPosition		tima_SetsEditor_setA_frameLayout			"left"		0 50
+		-attachOppositeForm	tima_SetsEditor_setA_frameLayout			"bottom"	-218
+		-attachForm			tima_SetsEditor_setA_frameLayout			"right"		2
+
+		-attachForm			tima_SetsEditor_mainCommands_frameLayout		"top"		2
+		-attachForm			tima_SetsEditor_mainCommands_frameLayout		"left"		2
+		-attachOppositeForm	tima_SetsEditor_mainCommands_frameLayout		"bottom"	-124
+		-attachForm			tima_SetsEditor_mainCommands_frameLayout		"right"		120
+
+		-attachForm			tima_SetsEditor_placeResultIn_frameLayout	"top"		2
+		-attachOppositeForm	tima_SetsEditor_placeResultIn_frameLayout	"left"		-118
+		-attachOppositeForm	tima_SetsEditor_placeResultIn_frameLayout	"bottom"	-74
+		-attachForm			tima_SetsEditor_placeResultIn_frameLayout	"right"		2
+
+		-attachForm			tima_SetsEditor_auxOperatoins_frameLayout	"top"		75
+		-attachOppositeForm	tima_SetsEditor_auxOperatoins_frameLayout	"left"		-118
+		-attachOppositeForm	tima_SetsEditor_auxOperatoins_frameLayout	"bottom"	-158
+		-attachForm			tima_SetsEditor_auxOperatoins_frameLayout	"right"		2
+
+		-attachForm			tima_SetsEditor_messageBox_frameLayout		"top"		125
+		-attachForm			tima_SetsEditor_messageBox_frameLayout		"left"		2
+		-attachOppositeForm	tima_SetsEditor_messageBox_frameLayout		"bottom"	-158
+		-attachForm			tima_SetsEditor_messageBox_frameLayout		"right"		120
+
+	tima_SetsEditor_formLayout;
+	setParent tima_SetsEditor_mainCommands_frameLayout;
+		columnLayout -adjustableColumn true;
+	    		separator -height 3 -style "none";
+			button -l "  A + B  " -c "tima_mainSEOperation_renameSet_globalProc(1)";
+	    		separator -height 3 -style "none";
+			button -l "  A - B  " -c "tima_mainSEOperation_renameSet_globalProc(2)";
+	    		separator -height 3 -style "none";
+			button -l "  A and all B  " -c "tima_mainSEOperation_renameSet_globalProc(3)";
+	    		separator -height 3 -style "none";
+			button -l "  A and any B  " -c "tima_mainSEOperation_renameSet_globalProc(4)";
+	setParent tima_SetsEditor_placeResultIn_frameLayout;
+		columnLayout -adjustableColumn false;
+	    		separator -height 5 -style "none";
+			radioCollection placeResultRC;
+			radioButton -label " new set           "   -align "right";
+			radioButton -label " set A               " -align "right";
+			radioButton -label " selection         "  -align "right" -sl;
+	
+	setParent tima_SetsEditor_setsListManager_frameLayout;
+		formLayout -numberOfDivisions 10 tima_SetsEditor_setsListManagerForm;
+			rowLayout -nc 2 -cw 1 35 -cw 2 100 tima_SetsEditor_setsListManagerButtons_rowLayout;
+				button -h 15 -l "clear" -c "textScrollList -edit -removeAll \"tima_SetsEditor_SEsetM_textScrollList\"";
+				button -h 15 -l "add from selection" -c "tima_SetsEditor_Add_globalProc(\"tima_SetsEditor_SEsetM_textScrollList\")";
+			setParent -u;
+			paneLayout tima_SetsEditor_SEsetMColumnScroll_paneLayout;
+				textScrollList	-allowMultiSelection true
+						-dragCallback textDragCallbackProc
+						-dropCallback tima_setDropCallBack_globalProc
+						-doubleClickCommand tima_dcListMCmd_globalProc
+						-deleteKeyCommand "tima_deleteListCmd_globalProc(\"tima_SetsEditor_SEsetM_textScrollList\")"
+					tima_SetsEditor_SEsetM_textScrollList;
+					popupMenu -button 3;
+						menuItem -l "rename set" -c "tima_SetsEditor_renameSet_globalProc()";
+		formLayout -edit
+			-attachForm	tima_SetsEditor_setsListManagerButtons_rowLayout	"top"		2
+			-attachForm	tima_SetsEditor_setsListManagerButtons_rowLayout	"left"		2
+			-attachNone	tima_SetsEditor_setsListManagerButtons_rowLayout	"bottom"
+			-attachForm	tima_SetsEditor_setsListManagerButtons_rowLayout	"right"		2
+
+			-attachForm	tima_SetsEditor_SEsetMColumnScroll_paneLayout		"top"		20
+			-attachForm	tima_SetsEditor_SEsetMColumnScroll_paneLayout		"left"		2
+			-attachForm	tima_SetsEditor_SEsetMColumnScroll_paneLayout		"bottom"	2
+			-attachForm	tima_SetsEditor_SEsetMColumnScroll_paneLayout		"right"		2
+		tima_SetsEditor_setsListManagerForm;
+	setParent tima_SetsEditor_setA_frameLayout;
+	columnLayout -adjustableColumn true;
+		checkBox -label " use selection " -align "center" -onCommand "checkBox -e -v 0 useSelectionAsB" useSelectionAsA;
+		paneLayout -h 15;
+			textScrollList	-allowMultiSelection true
+					-dragCallback textDragCallbackProc
+					-doubleClickCommand tima_dcListACmd_globalProc
+					-deleteKeyCommand "tima_deleteListCmd_globalProc(\"tima_SetsEditor_SEsetA_textScrollList\")"
+				tima_SetsEditor_SEsetA_textScrollList;
+	setParent tima_SetsEditor_setB_frameLayout;
+		formLayout -numberOfDivisions 10 tima_SetsEditor_setsBForm;
+			columnLayout -adjustableColumn true tima_SetsEditor_setsBButtonsRow_columnLayout;
+				checkBox -label " use selection " -align "center" -onCommand "checkBox -e -v 0 useSelectionAsA" useSelectionAsB;
+				rowLayout -nc 2 -cw 1 35 -cw 2 100;
+					button -h 15 -l "clear" -c "textScrollList -edit -removeAll \"tima_SetsEditor_SEsetB_textScrollList\"";
+					button -h 15 -l "add from selection" -c "tima_SetsEditor_Add_globalProc(\"tima_SetsEditor_SEsetB_textScrollList\")";
+			setParent tima_SetsEditor_setsBForm;
+			paneLayout tima_SetsEditor_setsBItemsScroll_paneLayout;
+				textScrollList	-allowMultiSelection true
+						-dragCallback textDragCallbackProc
+						-dropCallback tima_setDropCallBack_globalProc
+						-doubleClickCommand tima_dcListBCmd_globalProc
+						-deleteKeyCommand "tima_deleteListCmd_globalProc(\"tima_SetsEditor_SEsetB_textScrollList\")"
+					tima_SetsEditor_SEsetB_textScrollList;
+		formLayout -edit
+			-attachForm	tima_SetsEditor_setsBButtonsRow_columnLayout	"top"		2
+			-attachForm	tima_SetsEditor_setsBButtonsRow_columnLayout	"left"		2
+			-attachNone	tima_SetsEditor_setsBButtonsRow_columnLayout	"bottom"
+			-attachForm	tima_SetsEditor_setsBButtonsRow_columnLayout	"right"		2
+
+			-attachForm	tima_SetsEditor_setsBItemsScroll_paneLayout	"top"		35
+			-attachForm	tima_SetsEditor_setsBItemsScroll_paneLayout	"left"		2
+			-attachForm	tima_SetsEditor_setsBItemsScroll_paneLayout	"bottom"	2
+			-attachForm	tima_SetsEditor_setsBItemsScroll_paneLayout	"right"		2
+		tima_SetsEditor_setsBForm;
+	setParent tima_SetsEditor_auxOperatoins_frameLayout;
+		formLayout -numberOfDivisions 10 tima_SetsEditor_auxOperations_formLayout;
+			button -l "sel set" -c "tima_auxSEOperation_renameSet_globalProc(1)" tima_SetsEditor_auxSelSet_button;
+			button -l "sel mem" -c "tima_auxSEOperation_renameSet_globalProc(2)" tima_SetsEditor_auxSelMem_button;
+			button -l "add sel" -c "tima_auxSEOperation_renameSet_globalProc(3)" tima_SetsEditor_auxSetAdd_button;
+			button -l "rem sel" -c "tima_auxSEOperation_renameSet_globalProc(4)" tima_SetsEditor_auxSetRem_button;
+			button -l "help" -bgc .9 .9 .6
+					-c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/miscellaneous/tima_setseditor.html\")`;"
+						tima_SetsEditor_help_button;
+		formLayout -edit
+			-attachForm		tima_SetsEditor_auxSelSet_button	"top"		3
+			-attachForm		tima_SetsEditor_auxSelSet_button	"left"		3
+			-attachPosition	tima_SetsEditor_auxSelSet_button	"bottom"	1 4
+			-attachPosition	tima_SetsEditor_auxSelSet_button	"right"		1 5
+
+			-attachForm		tima_SetsEditor_auxSelMem_button	"top"		3
+			-attachPosition	tima_SetsEditor_auxSelMem_button	"left"		1 5
+			-attachPosition	tima_SetsEditor_auxSelMem_button	"bottom"	1 4
+			-attachForm		tima_SetsEditor_auxSelMem_button	"right"		3
+
+			-attachPosition	tima_SetsEditor_auxSetAdd_button	"top"		1 4
+			-attachForm		tima_SetsEditor_auxSetAdd_button	"left"		3
+			-attachPosition	tima_SetsEditor_auxSetAdd_button	"bottom"	1 8
+			-attachPosition	tima_SetsEditor_auxSetAdd_button	"right"		1 5
+
+			-attachPosition	tima_SetsEditor_auxSetRem_button	"top"		1 4
+			-attachPosition	tima_SetsEditor_auxSetRem_button	"left"		1 5
+			-attachPosition	tima_SetsEditor_auxSetRem_button	"bottom"	1 8
+			-attachForm		tima_SetsEditor_auxSetRem_button	"right"		3
+
+			-attachPosition	tima_SetsEditor_help_button		"top"		0 8
+			-attachForm		tima_SetsEditor_help_button		"left"		15
+			-attachForm		tima_SetsEditor_help_button		"bottom"	0
+			-attachForm		tima_SetsEditor_help_button		"right"		15	
+		tima_SetsEditor_auxOperations_formLayout;
+	showWindow tima_SetsEditor_window;
+}
+//_____________________________________________________________  buttons procedures  ___________________________________________________
+global proc tima_SetsEditor_Add_globalProc(string $listParent)
+{
+	string $selArray[] = `ls -sl -l`;
+	if(`size $selArray` == 0) $selArray = `ls -hl -l`;
+	if(`size $selArray` == 0)
+	{
+		tima_sentTextToMsgBox_globalProc("nothing selected");
+		return;
+	}
+	string $setsArray[];
+	string $cur;
+	for( $cur in $selArray)
+	{
+		string $curChildsArray[] = `listRelatives -ad -f $cur`;
+		$curChildsArray[`size $curChildsArray`] = $cur;
+		string $curChild;
+		for( $curChild in $curChildsArray)
+		{
+			string $curChildType = `nodeType $curChild`;
+			if(	($curChildType == "nurbsSurface")	||
+				($curChildType == "mesh"	)	||
+				($curChildType == "nurbsCurve"	)	||
+				($curChildType == "lattice"	)	||
+				($curChildType == "subdiv"	)	)
+			{
+				string $connectedSets[] = `listConnections -type objectSet $curChild`;
+				$setsArray = stringArrayCatenate($setsArray, $connectedSets);
+			}
+			if(	($curChildType == "lattice"		)	||
+				($curChildType == "clusterHandle"	)	||
+				(`gmatch $curChildType "deform*"`	)	)
+			{
+				string $connectedNodes[] = `listConnections -s 0 -d 1 $curChild`;
+				string $curNode;
+				for ( $curNode in $connectedNodes)
+				{
+					string $curNodeType = `nodeType $curNode`;
+					if(	($curNodeType == "ffd")		||
+						($curNodeType == "cluster")	||
+						(`gmatch $curChildType "deform*"`))
+					{
+						string $connectedSets[] = `listConnections -s 0 -d 1 -type objectSet $curNode`;
+						$setsArray = stringArrayCatenate($setsArray, $connectedSets);
+					}
+				}
+			}
+			if ($curChildType == "objectSet")
+			{
+				string $tmp[];
+				$tmp[0] = $curChild;
+				$setsArray = stringArrayCatenate($setsArray, $tmp);
+			}
+		}
+	}
+	string $addArray[];
+	int $i = 0;
+	for( $cur in $setsArray)
+	{
+		if(`gmatch $cur "*SG"`) continue;
+		if(`gmatch $cur "*tweak*"`) continue;
+		if(`gmatch $cur "*ShadingGroup*"`) continue;
+		$addArray[$i] = $cur;
+		$i++;
+	}
+	tima_addLists_globalProc( $addArray, $listParent);
+}
+//####################################################################################################
+global proc tima_SetsEditor_renameSet_globalProc()
+{
+	string $selectedSetName[] = `textScrollList -q -selectItem tima_SetsEditor_SEsetM_textScrollList`;
+	int $selectedSetIndex[] = `textScrollList -q -selectIndexedItem tima_SetsEditor_SEsetM_textScrollList`;
+	string $oldSetName = $selectedSetName[0];
+	int $setIndex = $selectedSetIndex[0];
+	string $newSetName;
+	string $result = `promptDialog
+			-title ("Rename " + $oldSetName + " Set")
+			-message "enter new name:"
+			-text $oldSetName
+			-button "ok" -button "cancel"
+			-defaultButton "ok" -cancelButton "cancel"
+			-dismissString "cancel"`;
+	if ($result == "ok")
+		$newSetName = `promptDialog -query -text`;
+	else return;
+	$newSetName = `rename $oldSetName $newSetName`;
+	textScrollList -e -removeIndexedItem $setIndex tima_SetsEditor_SEsetM_textScrollList;
+	textScrollList -e -appendPosition $setIndex $newSetName tima_SetsEditor_SEsetM_textScrollList;
+	textScrollList -e -selectIndexedItem $setIndex tima_SetsEditor_SEsetM_textScrollList;
+}
+//####################################################################################################
+global proc tima_mainSEOperation_renameSet_globalProc(int $operation)
+{
+	string $tempSet;
+	string $setNameA;
+	if (`checkBox -q -v useSelectionAsA`)
+	{
+		string $sel[] = `ls -sl`;
+		if (`size($sel)` == 0)
+		{
+			tima_sentTextToMsgBox_globalProc("nothing as set A selected :(");
+			return;
+		}
+		$tempSet = `sets -n tempSet`;
+		$setNameA = $tempSet;
+	}
+	else
+	{
+		string $controlsArrayA[] = `textScrollList -q -allItems tima_SetsEditor_SEsetA_textScrollList`;
+		if(`size($controlsArrayA)` == 0)
+		{
+			tima_sentTextToMsgBox_globalProc("no set A selected :(");
+			if (`objExists $tempSet`) delete $tempSet;
+			return;
+		}
+		$setNameA = $controlsArrayA[0];
+	}
+	string $namesArrayB[];
+	string $namesStringB = " ";
+	string $cur;
+	if (`checkBox -q -v useSelectionAsB`)
+	{
+		string $sel[] = `ls -sl`;
+		if (`size($sel)` == 0)
+		{
+			tima_sentTextToMsgBox_globalProc("nothing as set B selected :(");
+			if (`objExists $tempSet`) delete $tempSet;
+			return;
+		}
+		$tempSet = `sets -n tempSet`;
+		$namesStringB = ($namesStringB + $tempSet);
+		$namesArrayB[0] = $tempSet;
+	}
+	else
+	{
+		$namesArrayB = `textScrollList -q -allItems tima_SetsEditor_SEsetB_textScrollList`;
+		if(`size($namesArrayB)` == 0)
+		{
+			tima_sentTextToMsgBox_globalProc("no set B selected :(");
+			if (`objExists $tempSet`) delete $tempSet;
+			return;
+		}
+		for( $cur in $namesArrayB)
+		{
+			$namesStringB = ($namesStringB + " " + $cur);
+		}
+	}
+	string $outText = "";
+	string $newItemsNames[];
+	switch ($operation)
+	{
+		case 1:
+			$newItemsNames = eval("sets -union " + $setNameA + $namesStringB);
+			$outText = ("A + B ");
+		break;
+		case 2:
+			$newItemsNames = eval("sets -subtract " + $setNameA + $namesStringB);
+			$outText = ("A - B ");
+		break;
+		case 3:
+			$newItemsNames = eval("sets -intersection " + $setNameA + $namesStringB);
+			$outText = ("A and all B ");
+		break;
+		case 4:
+			for( $cur in $namesArrayB)
+			{
+				string $intersection[] = eval("sets -intersection " + $setNameA + " " + $cur);
+				$newItemsNames = stringArrayCatenate($newItemsNames, $intersection);
+			}
+			$newItemsNames = stringArrayRemoveDuplicates($newItemsNames);
+			$outText = ("A and any B ");
+		break;
+	}
+	if (`objExists $tempSet`) delete $tempSet;
+	if(`size($newItemsNames)` == 0)
+	{
+		tima_sentTextToMsgBox_globalProc("the result is empty :(");
+		return;
+	}
+	string $rcChilds[] = `radioCollection -q -collectionItemArray placeResultRC`;
+	if (`radioButton -q -sl $rcChilds[0]`)
+	{
+		string $resultSetName = `sets -n newSet $newItemsNames`;
+		$outText = ($resultSetName + " = " + $outText);
+	}
+	if (`radioButton -q -sl $rcChilds[1]`)
+	{
+		if( `objExists $setNameA` == 0) createNode objectSet -n $setNameA;
+		sets -clear $setNameA;
+		sets -addElement $setNameA $newItemsNames;
+		$outText = ("set A = " + $outText);
+	}
+	if (`radioButton -q -sl $rcChilds[2]`)
+	{
+		select -r $newItemsNames;
+		$outText = ("selection = " + $outText);
+	}
+	tima_sentTextToMsgBox_globalProc($outText);
+}
+global proc tima_auxSEOperation_renameSet_globalProc(int $operation)
+{
+	string $selectionArray[];
+	string $selectedItems[] = `textScrollList -q -selectItem tima_SetsEditor_SEsetA_textScrollList`;
+	$selectionArray = stringArrayCatenate($selectionArray,$selectedItems);
+	$selectedItems = `textScrollList -q -selectItem tima_SetsEditor_SEsetB_textScrollList`;
+	$selectionArray = stringArrayCatenate($selectionArray,$selectedItems);
+	$selectedItems = `textScrollList -q -selectItem tima_SetsEditor_SEsetM_textScrollList`;
+	$selectionArray = stringArrayCatenate($selectionArray,$selectedItems);
+	if( `size($selectionArray)` == 0)
+	{
+		tima_sentTextToMsgBox_globalProc("nothing selected :(");
+		return;
+	}
+	$selectionArray = stringArrayRemoveDuplicates($selectionArray);
+	string $cur;
+	switch ($operation)
+	{
+		case 1:
+			select -cl;
+			for( $cur in $selectionArray)
+				select -add -ne $cur;
+			tima_sentTextToMsgBox_globalProc(" sets nodes selected  :)");
+		break;
+		case 2:
+			select -cl;
+			for( $cur in $selectionArray)
+				select -add $cur;
+			tima_sentTextToMsgBox_globalProc(" sets members selected  :)");
+		break;
+		case 3:
+			string $sel[] = `ls -sl`;
+			if( `size($sel)` == 0)
+			{
+				tima_sentTextToMsgBox_globalProc("nothing selected :(");
+				return;
+			}
+			for( $cur in $selectionArray)
+				sets -addElement $cur $sel;
+			tima_sentTextToMsgBox_globalProc(" members added to sets  :)");
+		break;
+		case 4:
+			string $sel[] = `ls -sl`;
+			if( `size($sel)` == 0)
+			{
+				tima_sentTextToMsgBox_globalProc("nothing selected :(");
+				return;
+			}
+			for( $cur in $selectionArray)
+				sets -remove $cur $sel;
+			tima_sentTextToMsgBox_globalProc(" members removed from sets  :)");
+		break;
+	}
+}
+//_________________________________________________________  drug&drop procedures  _________________________________________
+global proc tima_setADropCallBack_globalProc(string $dragControl, string $dropControl, string $msgs[], int $x, int $y, int $type)
+{
+	if (`gmatch $dragControl "*tima_SetsEditor_SEsetA_textScrollList*"`) return;
+	string $droppedItems[] = `textScrollList -q -selectItem $dragControl`;
+	$droppedItems = stringArrayCatenate($droppedItems, $msgs);
+	int $lastDroppedItemNumber = (`size($droppedItems)` - 1);
+	if($lastDroppedItemNumber < 0) return;
+	string $oldItems[] = `textScrollList -q -allItems tima_SetsEditor_SEsetA_textScrollList`;
+	if((`size($oldItems)`) > 0) textScrollList -edit -removeAll tima_SetsEditor_SEsetA_textScrollList;
+	textScrollList -edit -append $droppedItems[$lastDroppedItemNumber] tima_SetsEditor_SEsetA_textScrollList;
+	string $listBItems[] = `textScrollList -q -allItems tima_SetsEditor_SEsetB_textScrollList`;
+	if((`size($listBItems)`) == 0) return;
+	if(stringArrayCount( $droppedItems[$lastDroppedItemNumber], $listBItems) > 0)
+					textScrollList -edit -removeItem $droppedItems[$lastDroppedItemNumber] tima_SetsEditor_SEsetB_textScrollList;
+} 
+global proc tima_setDropCallBack_globalProc(string $dragControl, string $dropControl, string $msgs[], int $x, int $y, int $type)
+{
+	if( $dragControl == $dropControl) return;
+	string $droppedItems[] = `textScrollList -q -selectItem $dragControl`;
+	$droppedItems = stringArrayCatenate($droppedItems, $msgs);
+	if((`size($droppedItems)`) == 0) return;
+	tima_addLists_globalProc( $droppedItems, $dropControl);
+}
+global proc string[] textDragCallbackProc(string $dragControl, int $x, int $y, int $mods)
+{
+	int $clickedItemId = int($y / 13);
+	string $listItems[] = `textScrollList -q -allItems $dragControl`;
+	string $retItem[];
+	$retItem[0] = $listItems[$clickedItemId];
+	return $retItem;
+}
+//_____________________________________________________________  keyboard&mouse reactions _____________________________________________
+global proc tima_deleteListCmd_globalProc(string $parentList)
+{
+	string $selectedItems[] = `textScrollList -q -selectItem $parentList`;
+	if(`size($selectedItems)` == 0) return;
+	string $cur;
+	for( $cur in $selectedItems)
+		textScrollList -edit -removeItem $cur $parentList;
+}
+global proc tima_dcListBCmd_globalProc()
+{
+	string $selectedItems[] = `textScrollList -q -selectItem tima_SetsEditor_SEsetB_textScrollList`;
+	string $oldItems[] = `textScrollList -q -allItems tima_SetsEditor_SEsetA_textScrollList`;
+	if((`size($oldItems)`) > 0) textScrollList -edit -removeAll tima_SetsEditor_SEsetA_textScrollList;
+	textScrollList -edit -append $selectedItems[0] tima_SetsEditor_SEsetA_textScrollList;
+	textScrollList -edit -removeItem $selectedItems[0] tima_SetsEditor_SEsetB_textScrollList;
+}
+global proc tima_dcListACmd_globalProc()
+{
+	string $selectedItems[] = `textScrollList -q -selectItem tima_SetsEditor_SEsetA_textScrollList`;
+	select -r -ne $selectedItems[0];
+	tima_sentTextToMsgBox_globalProc($selectedItems[0] + " selected");
+}
+global proc tima_dcListMCmd_globalProc()
+{
+	string $selectedItems[] = `textScrollList -q -selectItem tima_SetsEditor_SEsetM_textScrollList`;
+	select -r $selectedItems[0];
+	tima_sentTextToMsgBox_globalProc($selectedItems[0] + " members selected");
+}
+//_____________________________________________________________  aux procedures  ______________________________________________________
+global proc tima_addLists_globalProc(string $inputArray[], string $listName)
+{
+	$inputArray = stringArrayRemoveDuplicates($inputArray);
+	string $oldNamesArray[] = `textScrollList -q -allItems $listName`;
+	$inputArray = stringArrayRemove($oldNamesArray, $inputArray);
+	for ($cur in $inputArray)
+		{
+			textScrollList -edit -append $cur $listName;
+		}
+}
+global proc tima_sentTextToMsgBox_globalProc(string $msg)
+{
+	string $oldMsg[] = `frameLayout -q -childArray tima_SetsEditor_messageBox_frameLayout`;
+	if (`size($oldMsg)` > 0) deleteUI $oldMsg[0];
+	text -p tima_SetsEditor_messageBox_frameLayout -l $msg -fn "smallObliqueLabelFont";
+}
+//##################################################################################################################################
+tima_SetsEditor_showWindow_proc();

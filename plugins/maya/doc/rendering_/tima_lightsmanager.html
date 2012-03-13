@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../_system/styles.css" rel="stylesheet" type="text/css">
+<title>Lights Manager</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+<div class="commonText">
+<p><strong>Lights Manager:</strong></p>
+<p>&#1044;&#1083;&#1103; &#1091;&#1089;&#1090;&#1072;&#1085;&#1086;&#1074;&#1082;&#1080; &#1072;&#1090;&#1088;&#1080;&#1073;&#1091;&#1090;&#1086;&#1074; &#1089;&#1088;&#1072;&#1079;&#1091; &#1085;&#1072; &#1084;&#1085;&#1086;&#1075;&#1080;&#1093; &#1080;&#1089;&#1090;&#1086;&#1095;&#1085;&#1080;&#1082;&#1072;&#1093; &#1089;&#1074;&#1077;&#1090;&#1072;. &#1054;&#1087;&#1077;&#1088;&#1080;&#1088;&#1091;&#1077;&#1090; &#1089;&#1086; &#1074;&#1089;&#1077;&#1084;&#1080; &#1074;&#1099;&#1076;&#1077;&#1083;&#1077;&#1085;&#1099;&#1084;&#1080; &#1080;&#1089;&#1090;&#1086;&#1095;&#1085;&#1080;&#1082;&#1072;&#1084;&#1080; &#1089;&#1074;&#1077;&#1090;&#1072; &#1089; &#1091;&#1095;&#1077;&#1090;&#1086;&#1084; &#1080;&#1077;&#1088;&#1072;&#1088;&#1093;&#1080;. &#1054;&#1082;&#1085;&#1086; &#1087;&#1086;&#1082;&#1072;&#1079;&#1099;&#1074;&#1072;&#1077;&#1090; &#1080;&#1085;&#1092;&#1086;&#1088;&#1084;&#1072;&#1094;&#1080;&#1102; &#1086; &#1087;&#1077;&#1088;&#1074;&#1086;&#1084; &#1087;&#1086;&#1087;&#1072;&#1074;&#1096;&#1080;&#1084;&#1089;&#1103; &#1077;&#1084;&#1091; &#1080;&#1089;&#1090;&#1086;&#1095;&#1085;&#1080;&#1082;&#1077; &#1089;&#1074;&#1077;&#1090;&#1072; &#1080;&#1079; &#1074;&#1099;&#1076;&#1077;&#1083;&#1077;&#1085;&#1085;&#1099;&#1093;.</p>
+<table width="800" height="87" border="0">
+  <tr>
+    <td width="218"><img src="tima_lightsmanager.png" width="208" height="382"></td>
+    <td width="572" valign="top">
+      <p class="smallComments">&nbsp;</p>
+      <p class="smallComments">&quot;<strong>set</strong>&quot; - set attribute fo current lights.<br>
+&quot;<strong>Light</strong>&quot; - light color.<br>
+&quot;<strong>Shad</strong>&quot; - shadow color.</p>
+      <p class="smallComments"><em>mental ray</em>:<br>
+        &quot;<strong>Clear map name;</strong>&quot - set smapFilename attribute to &quot;&quot;.<br>
+        &quot;<strong>Set shape name - </strong>&quot; set shadow file name to the name of each lightShape name.<br>
+        &quot;<strong>skip empty maps</strong>&quot; - skip light if it smapFilename == &quot;&quot;.<br>
+        &quot;<strong>prefix string A:</strong>&quot; - set smapFilename = stringA + smapFilename.<br>
+      &quot;<strong>suffix string A:</strong>&quot; - set smapFilename = smapFilename + stringA.<br>
+      &quot;<strong>A:</strong>&quot;
+- stringA input field.<br> 
+&quot;<strong>replace string A with string B</strong>:&quot; - search stringA in smapFilename and replace it with stringB.<br>
+&quot;<strong>B:</strong>&quot; - stringB input field.<br>
+&quot;<strong>refresh</strong>&quot; - refresh window information.<br>
+&quot;<strong>print in script editor</strong>&quot; - output setAttr commands in Script Editor.<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>
+<br>        
+Output field displays status.<br>
+<br>
+&quot;<strong>help</strong>&quot; button opens this HTML page.    </p>    </td>
+  </tr>
+</table>
+<p>&nbsp;</p>
+<p align = "right">
+<a href="../index.html" target="_top" class="smallComments">jump to CGRU documentation</a>
+</p>
+</div>
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

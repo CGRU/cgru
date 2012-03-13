@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "CGRU common PRE REMOVE:"
+
+pydir="/opt/cgru/lib/python"
+if [ -d "${pydir}" ]; then
+   rm -rf "${pydir}"
+fi
+
+exit 0

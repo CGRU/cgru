@@ -1,0 +1,11 @@
+#!/bin/bash
+
+echo "Afanasy server POST INSTALL"
+
+id renderer || useradd renderer
+
+/opt/cgru/afanasy/init/initlinks.sh afserver || true
+
+/etc/init.d/afserver start || true
+
+exit 0

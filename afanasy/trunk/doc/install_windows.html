@@ -1,0 +1,89 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy MS Windows</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Afanasy MS Windows Client</h2>
+<hr />
+
+<p>
+<i>
+Afanasy Windows version is 'alpha'. It appears only because Afanasy client applications are written on Qt, which is cross-platform (and build uses CMake, which is cross-platform too). There is no Afanasy developers using this platform (yet). So nobody testing it and fixing bugs. 
+</i>
+</p>
+<p>
+There is no server for windows. Afanasy server uses some Linux common tools, for example Apache, SQL (Postgre), PHP. There is no reason to translate sources or launch with emulators current Linux version. Any (even very small) company can have at least one Linux server for various purposes (forum, web, ftp, mail, file server, router). You can use it for Afanasy too.
+</p>
+<p>
+Latest release contains windows client applications: render, watch, talk and python module to send jobs. They built against a version of server which sources are in the same release.
+</p>
+<p>
+You can build the latest version yourself using <kbd>MSVC</kbd> or <kbd>MinGW</kbd>. Dowload and install <kbd>Qt</kbd>. Use <kbd>SVN (Subversion)</kbd> to get code and <kbd>CMake</kbd> to build make files.
+</p>
+
+<ol>
+<li><h4>Get CGRU</h4>
+   Download latest release and unpack<br/>
+   Better to do it once on server and share tools directory, so same directory will be on client<br/>
+</li>
+
+<li><h4>Install <kbd>python2.5</kbd></h4>
+Nuke, Houdini, Maya use Python 2.5 version.
+</li>
+
+<li><h4>Launch</h4>
+Afanasy applications launch scripts are located in <kbd>cgru/bin</kbd> directory.<br/>
+<kbd>afrender.cmd</kbd> - render slave client.<br/>
+<kbd>afwatch.cmd</kbd> - GUI.<br/>
+<kbd>aftalk.cmd</kbd> - chat client.<br/>
+</li>
+
+<li><h4>Web Server</h4>
+   <p>If it installed on afanasy server, it available at</p>
+   <p><kbd>http://[afanasy server computer name]</kbd></p>
+   <p>Or ask your admin configured it.</p>
+</li>
+</ol>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

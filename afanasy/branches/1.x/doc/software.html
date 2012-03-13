@@ -1,0 +1,112 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Software Integration</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Afanasy Software Integration</h2>
+<hr />
+<p>
+If you are able to create and run python script, you can use afanasy to distribute any soft (command lines).
+</p>
+<p>
+Some soft (Houdini, Nuke, Maya, Blender) has an embedded python. So you can create a job directly from it.
+It is very comfortable to get render scene information and to send it to afanasy within the same script.
+</p>
+<p>
+If you software does not have python, you can generate a job from command line arguments.
+Afanasy has a simple utility <a href="python_afjob.html"><b>afjob</b></a> for it.
+Or you can generate a concrete python script for your scene and run it.
+</p>
+<p>
+Full integration with soft consumes:<br/>
+</p>
+<ul>
+<li><a href="services.html">Service</a> description script</li>
+<li><a href="parsers.html">Parser</a> script to get running task progress</li>
+<li>Some GUI to launch a job (it can be integrated in application node network, like Houdini ROP or Nuke Write node)</li>
+</ul>
+<p>
+CGRU software scripts are located in:<br/>
+<kbd>cgru/afanasy/plugins/[software name]</kbd>
+</p>
+<p>
+Some examples of software integration with afanasy are located in:<br/>
+<kbd>cgru/afanasy/examples</kbd>
+</p>
+
+<h3>Required Packages:</h3>
+<p>
+<kbd>python2.5</kbd>
+</p>
+
+<h3>Required Environment:</h3>
+<p>
+To setup environment you can go in CGRU folder and source a script:<br/>
+<code>
+$ cd .../cgru<br/>
+$ source setup.sh<br/>
+</code>
+</p>
+<p>
+For example you can put next line at the end of your <kbd>~/.bashrc</kbd> file:<br/>
+<code>
+#pwd=$PWD; cd .../cgru; source startup.sh; cd $pwd
+</code>
+<br/>
+End your shell will automatically setup on every launch.
+</p>
+<p>
+CGRU examples already have a commands which setup environment and then run application.<br/>
+Example for NUKE:<br/>
+<code>
+$ cd .../cgru/examples/nuke<br/>
+$ ./nuke<br/>
+</code></p>
+
+<p>
+MS Windows <kbd>cmd</kbd> scripts are also provided (its do the same).<br/>
+You can just double-click 'nuke.cmd' example to launch it (it will start in current explorer directory).
+</p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,40 @@
+{
+string $cgruMenuName = `getenv MAYA_CGRU_MENUS_NAME`;
+if($cgruMenuName == "") $cgruMenuName = "[___CGRU___]";
+
+global string $cgruDir_MEL;
+string $cgruMenusLocation = `getenv MAYA_CGRU_MENUS_LOCATION`;
+if($cgruMenusLocation == "") $cgruMenusLocation = $cgruDir_MEL;
+
+if(stringArrayCount("cgru_menu", `window -q -menuArray MayaWindow`)) deleteUI cgru_menu;
+menu -l $cgruMenuName -aob 1 -to 1 -p MayaWindow cgru_menu;
+menuItem -sm 1 -to 1 -l "Modeling" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_modeling.mel");
+setParent -m ..;
+menuItem -sm 1 -to 1 -l "Animation" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_animation.mel");
+setParent -m ..;
+menuItem -sm 1 -to 1 -l "Rendering" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_rendering.mel");
+setParent -m ..;
+//menuItem -sm 1 -to 1 -l "Dynamics" -aob 1;
+//	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_dynamics.mel");
+setParent -m ..;
+menuItem -sm 1 -to 1 -l "Miscellaneous" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_miscellaneous.mel");
+setParent -m ..;
+menuItem -sm 1 -to 1 -l "Develop" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_develop.mel");
+setParent -m ..;
+menuItem -sm 1 -to 1 -l "Interface" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_interface.mel");
+setParent -m ..;
+menuItem -divider 1;
+menuItem -sm 1 -l "Reload" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_reload.mel");
+setParent -m ..;
+menuItem -divider 1;
+menuItem -sm 1 -l "Documentation" -aob 1;
+	cgruSourceFile_global( $cgruMenusLocation + "/menuitems_documentation.mel");
+setParent -m ..;
+}

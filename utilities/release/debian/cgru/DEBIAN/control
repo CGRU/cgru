@@ -1,0 +1,14 @@
+Package: cgru
+Version: @VERSION@
+Architecture: all
+Maintainer: Timur Hairulin <timurhai@gmail.com>
+Installed-Size: @SIZE@
+Depends: ffmpeg, python-qt4, mencoder, cgru-common (= @VERSION@), afanasy-doc (= @VERSION@), afanasy-gui (= @VERSION@), afanasy-render (= @VERSION@), afanasy-plugins (= @VERSION@), afanasy-examples (= @VERSION@)
+Suggests: apache2, php5, php5-gd, php5-pgsql
+Section: graphics
+Priority: extra
+Homepage: http://sourceforge.net/projects/cgru/
+Description: CG Tools Pack, Afanasy Render Manager
+ Dummy package to install all CGRU featues for workstation.
+ Include Afanasy GUI and render.
+ Initialize Afanasy render startup daemon.

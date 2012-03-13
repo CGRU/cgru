@@ -1,0 +1,20 @@
+global proc string[] timaMakeGeoSphere_globalProc( int $type, int $frequency, float $radius)
+{
+	string $result[];
+	string $makeGeoSphereNodeName = `createNode tm_makeGeoSphere -n "makeGeoSphere"`;	
+	string $transName = `createNode transform -n "geoSphere"`;
+	string $meshName  = `createNode -parent $transName -n "geoSphereShape" mesh`;
+	connectAttr (($makeGeoSphereNodeName + ".outMesh" ), ( $meshName + ".inMesh" ) );
+	sets -addElement initialShadingGroup $meshName;
+	select -r $transName;
+	if(($type>0)&&($type<4)&&($frequency>0)&&($frequency<7))
+	{
+		setAttr ($makeGeoSphereNodeName + ".primitive") $type;
+		setAttr ($makeGeoSphereNodeName + ".frequency") $frequency;
+		setAttr ($makeGeoSphereNodeName + ".radius") $radius;
+	}
+	$result[0] = $transName;
+	$result[1] = $makeGeoSphereNodeName;
+	$result[2] = $meshName;
+	return $result;
+}

@@ -1,0 +1,28 @@
+#!/bin/sh
+. /etc/rc.common
+ 
+# The start subroutine
+StartService() {
+    # Insert your start command below.  For example:
+#source /cg/tools/cgru/startup.sh
+/cg/tools/cgru/afanasy/scripts/afrender start
+    # End example.
+}
+ 
+# The stop subroutine
+StopService() {
+    # Insert your stop command(s) below.  For example:
+/cg/tools/cgru/afanasy/scripts/afrender stop
+    # End example.
+}
+ 
+# The restart subroutine
+RestartService() {
+    # Insert your start command below.  For example:
+/cg/tools/cgru/afanasy/scripts/afrender stop
+sleep 1
+/cg/tools/cgru/afanasy/scripts/afrender start
+    # End example.
+}
+ 
+RunService "$1"

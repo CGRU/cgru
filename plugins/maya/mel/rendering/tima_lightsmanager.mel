@@ -1,0 +1,296 @@
+//#############################################################################################
+//#############################################################################################
+global proc string[] tima_lightsmanager_getLights_plobalProc()
+{
+	return `ls -sl -dag -type "light"`;
+}
+//#############################################################################################
+global proc tima_lightsmanager_refresh_plobalProc()
+{
+	string $lights[] = tima_lightsmanager_getLights_plobalProc();
+	if(!(`size($lights)`))
+	{
+		text -e -l "No lights found." tima_lightsmanager_status_text;
+		textField -e -tx "" tima_lightsmanager_map_textField;
+		return;
+	}
+	string $map = `getAttr ($lights[0] + ".smapFilename")`;
+	textField -e -tx $map tima_lightsmanager_map_textField;
+
+	float $color[] = `getAttr ($lights[0] + ".color")`;
+	colorSliderGrp -e -rgb $color[0] $color[1] $color[2] tima_lightsmanager_color_colorSliderGrp;
+	$color = `getAttr ($lights[0] + ".shadowColor")`;
+	colorSliderGrp -e -rgb $color[0] $color[1] $color[2] tima_lightsmanager_shadowColor_colorSliderGrp;
+	floatField -e -v `getAttr ($lights[0] + ".intensity")` tima_lightsmanager_intensity_floatField;
+
+//	setParent -m tima_lightsmanager_operate_optionMenu; 
+//	-itemListShort
+
+	text -e -l " ok " tima_lightsmanager_status_text;
+}
+//#############################################################################################
+global proc tima_lightsmanager_setDecayRate_plobalProc()
+{
+	string $lights[] = tima_lightsmanager_getLights_plobalProc();
+	if(!(`size($lights)`))
+	{
+		text -e -l "No lights found." tima_lightsmanager_status_text;
+		textField -e -tx "" tima_lightsmanager_map_textField;
+		return;
+	}
+	string $decayType = `optionMenu -q -v tima_lightsmanager_decayRate_optionMenu`;
+	int $print = `checkBox -q -v tima_lightsmanager_print_checkBox`;
+	string $light, $cmd;
+	for( $light in $lights)
+	{
+		$cmd = "setAttr \"" + $light + ".decayRate\" ";
+		if($decayType == "No Decay") $cmd += "0;";
+		else if($decayType == "Linear") $cmd += "1;";
+		else if($decayType == "Quadratic") $cmd += "2;";
+		else if($decayType == "Cubic") $cmd += "3;";
+		if($print)
+			evalEcho( $cmd);
+		else
+			eval( $cmd);
+	}
+	text -e -l " ok " tima_lightsmanager_status_text;
+}
+//#############################################################################################
+global proc tima_lightsmanager_defLightSet_plobalProc( int $add)
+{
+	string $lights[] = tima_lightsmanager_getLights_plobalProc();
+	if(!(`size($lights)`))
+	{
+		text -e -l "No lights found." tima_lightsmanager_status_text;
+		textField -e -tx "" tima_lightsmanager_map_textField;
+		return;
+	}
+	int $print = `checkBox -q -v tima_lightsmanager_print_checkBox`;
+	string $light, $cmd, $parents[];
+	for( $light in $lights)
+	{
+		$parents = `listRelatives -p $light`;
+		if($add)
+			$cmd = "sets -add defaultLightSet " + $parents[0] + ";";
+		else 
+			$cmd = "sets -remove defaultLightSet " + $parents[0] + ";";
+		if($print)
+			evalEcho( $cmd);
+		else
+			eval( $cmd);
+	}
+	text -e -l " ok " tima_lightsmanager_status_text;
+}
+//#############################################################################################
+global proc tima_lightsmanager_editMap_plobalProc( int $mode)
+{
+	string $lights[] = tima_lightsmanager_getLights_plobalProc();
+	if(!(`size($lights)`))
+	{
+		text -e -l "No lights found." tima_lightsmanager_status_text;
+		textField -e -tx "" tima_lightsmanager_map_textField;
+		return;
+	}
+	string $stringA = `textField -q -tx tima_lightsmanager_stringA_textField`;
+	string $stringB = `textField -q -tx tima_lightsmanager_stringB_textField`;
+	int $skipEmptyMap = `checkBox -q -v tima_lightsmanager_skipEmptyMap_checkBox`;
+	int $print = `checkBox -q -v tima_lightsmanager_print_checkBox`;
+	string $light, $map, $tmp, $cmd;
+	for( $light in $lights)
+	{
+		$tmp = `getAttr ($light + ".smapFilename")`;
+		if($skipEmptyMap && ($tmp=="")) continue;
+		$map = $tmp;
+		switch ($mode)
+		{
+		case 0: // prefix
+			$map = $stringA + $map;
+			break;
+		case 1: // suffix
+			$map = $map + $stringA;
+			break;
+		case 2: // replace
+			$map = `substitute $stringA $map $stringB`;
+			break;
+		case 3: // clear
+			$map = "";
+			break;
+		case 4: // set shape name
+			$map = $light;
+			break;
+		}
+		$cmd = "setAttr -type \"string\" \"" + $light + ".smapFilename\" \"" + $map + "\";";
+		if($print)
+			evalEcho( $cmd);
+		else
+			eval( $cmd);
+	}
+	textField -e -tx $map tima_lightsmanager_map_textField;
+	text -e -l " ok " tima_lightsmanager_status_text;
+}
+//#############################################################################################
+global proc tima_lightsmanager_setColor_plobalProc()
+{
+	string $lights[] = tima_lightsmanager_getLights_plobalProc();
+	if(!(`size($lights)`))
+	{
+		text -e -l "No lights found." tima_lightsmanager_status_text;
+		textField -e -tx "" tima_lightsmanager_map_textField;
+		return;
+	}
+	float $color[] = `colorSliderGrp -q -rgb tima_lightsmanager_color_colorSliderGrp`;
+	float $intensity = `floatField -q -v tima_lightsmanager_intensity_floatField`;
+	float $shadowColor[] = `colorSliderGrp -q -rgb tima_lightsmanager_shadowColor_colorSliderGrp`;
+	int $print = `checkBox -q -v tima_lightsmanager_print_checkBox`;
+	string $light, $cmd;
+	for( $light in $lights)
+	{
+		$cmd = "setAttr \"" + $light + ".color\" -type double3 " + $color[0] + " " + $color[1] + " " + $color[2] + ";\n";
+		$cmd += "setAttr \"" + $light + ".intensity\" " + $intensity + ";\n";
+		$cmd += "setAttr \"" + $light + ".shadowColor\" -type double3 " + $shadowColor[0] + " " + $shadowColor[1] + " " + $shadowColor[2] + ";\n";
+		if($print)
+			evalEcho( $cmd);
+		else
+			eval( $cmd);
+	}
+	text -e -l " ok " tima_lightsmanager_status_text;
+}
+//#############################################################################################
+global proc tima_lightsmanager_agjustfloatslider_globalProc()
+{
+	float $value = `floatField -q -v tima_lightsmanager_intensity_floatField`;
+	if( $value < 0)
+	{
+		floatSlider -e -min ($value*2) tima_lightsmanager_intensity_floatSlider;
+		floatSlider -e -max 0 tima_lightsmanager_intensity_floatSlider;
+	}
+	else
+	{
+		floatSlider -e -min 0 tima_lightsmanager_intensity_floatSlider;
+		floatSlider -e -max ($value*2) tima_lightsmanager_intensity_floatSlider;
+	}
+	floatSlider -e -v $value tima_lightsmanager_intensity_floatSlider;
+}
+//#############################################################################################
+//#############################################################################################
+{
+	if(`window -exists tima_lightsmanager_window`) deleteUI tima_lightsmanager_window;
+	int $window_w = 200;
+	int $window_h = 500;
+	int $cw1 = 60;
+	int $cw2 = 50;
+   int $cw3 = 35;
+	window -t "Lights Manager" tima_lightsmanager_window;
+	columnLayout -adj 1;
+//		optionMenu -label "Operate with:" tima_lightsmanager_operate_optionMenu;
+		frameLayout -l "base paremeters" -la "center" -bs "etchedIn";
+			columnLayout -adj 1;
+            rowLayout -nc 2 -cw 2 $cw3 -adj 1;
+					columnLayout -adj 1;
+                  colorSliderGrp -l "Light" -cw3 $cw1 $cw2 50 -adj 3
+							-ann "lights color"
+							tima_lightsmanager_color_colorSliderGrp;
+                  rowLayout -nc 3 -cw 1 $cw1 -cw 2 $cw2 -adj 3;
+							text -l "intensity";
+                     floatField -v 0 -w $cw2 -precision 3
+								-ann "lights intensity"
+								-cc "tima_lightsmanager_agjustfloatslider_globalProc()"
+								tima_lightsmanager_intensity_floatField;
+							floatSlider -v 0
+								-min 0 -max 2
+								-ann "lights intensity"
+								-cc "floatField -e -v `floatSlider -q -v tima_lightsmanager_intensity_floatSlider` tima_lightsmanager_intensity_floatField"
+								tima_lightsmanager_intensity_floatSlider;
+							setParent ..;
+                  colorSliderGrp -l "Shadow" -cw 1 $cw1 -cw 2 $cw2 -adj 3
+							-ann "shadows color"
+							tima_lightsmanager_shadowColor_colorSliderGrp;
+						setParent ..;
+					columnLayout -adj 1;
+						button -l "set" -w 30 -h 60
+							-c "tima_lightsmanager_setColor_plobalProc();";
+						setParent ..;
+					setParent ..;
+				separator;
+            rowLayout -nc 2 -cw 2 $cw3 -adj 1;
+					optionMenu -label "Decay Rate" tima_lightsmanager_decayRate_optionMenu;
+						menuItem -label "No Decay";
+						menuItem -label "Linear";
+						menuItem -label "Quadratic";
+						menuItem -label "Cubic";
+					button -l "set"	-c "tima_lightsmanager_setDecayRate_plobalProc();";
+					setParent ..;
+				separator;
+				text "Illuminates by Default:";
+				rowLayout -nc 2 -adj 1;
+					button -l " enable "
+						-ann "Include lights in defaultLightSet"
+						-c "tima_lightsmanager_defLightSet_plobalProc(1);";
+					button -l " disable "
+						-ann "Exclude lights fron defaultLightSet"
+						-c "tima_lightsmanager_defLightSet_plobalProc(0);";
+					setParent ..;
+				setParent ..;
+			setParent ..;
+		frameLayout -l "mental ray" -la "center" -bs "etchedIn";
+			columnLayout -adj 1;
+				text -l "Shadow Map File Name"  -w ($window_w - 4);
+				textField -ed 0 -tx " wait... "
+					-ann "one of the selected lights map"
+					tima_lightsmanager_map_textField;
+            rowLayout -nc 2 -adj 1;
+               button -l "set shape name" -align  "center"
+                  -ann "smapFilename = stringB + smapFilename"
+                  -c "tima_lightsmanager_editMap_plobalProc(4);";
+               button -l "clear map name" -align  "center"
+						-ann "smapFilename = stringA + smapFilename"
+						-c "tima_lightsmanager_editMap_plobalProc(3);";
+					setParent ..;
+				checkBox -l "skip empty maps" -align "left" -v 0
+					-ann "skip light if smapFilename is not specified"
+					tima_lightsmanager_skipEmptyMap_checkBox;
+            rowLayout -nc 2 -adj 1;
+               button -l " prefix string A: " -align  "center"
+						-ann "smapFilename = stringA + smapFilename"
+						-c "tima_lightsmanager_editMap_plobalProc(0);";
+               button -l " suff str A: " -align  "center"
+						-ann "smapFilename = stringB + smapFilename"
+						-c "tima_lightsmanager_editMap_plobalProc(1);";
+					setParent ..;
+            rowLayout -nc 2 -adj 2 -cw 1 20 -columnAlign2 "left" "left";
+					text -l "A:";
+					textField -ann "enter string A" tima_lightsmanager_stringA_textField;
+					setParent ..;
+				button -l "replace string A with string B:"
+					-ann "search string A and replace with string B"
+					-c "tima_lightsmanager_editMap_plobalProc(2);";
+            rowLayout -nc 2 -adj 2 -cw 1 20;
+					text -l "B:";
+					textField -ann "enter string B" tima_lightsmanager_stringB_textField;
+					setParent ..;
+				setParent ..;
+			setParent ..;
+/*		frameLayout -l "maya" -la "center" -bs "etchedIn";
+			columnLayout;
+				text " ( not finished ) ";
+				setParent ..;
+			setParent ..;
+		setParent ..;*/
+	rowLayout -nc 2 -adj 1;
+		text -l "ok " -al "left" -ann "status" tima_lightsmanager_status_text;
+		button -l " refresh "
+			-ann "refresh window information"
+			-c "tima_lightsmanager_refresh_plobalProc();";
+		setParent ..;
+	separator;
+	rowLayout -nc 2 -adj 1;
+		checkBox -l "echo commands" -v 0
+			-ann "output attributes changing in script editor"
+			tima_lightsmanager_print_checkBox;
+		button -l " help " -bgc .9 .9 .6
+			-c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/rendering_/tima_lightsmanager.html\")`;";
+		setParent ..;
+	showWindow tima_lightsmanager_window;
+	tima_lightsmanager_refresh_plobalProc();
+}
+//#############################################################################################

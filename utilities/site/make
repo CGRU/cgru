@@ -1,0 +1,38 @@
+#!/bin/bash
+
+export DIRS_EXLUDE_FINDSUB="tmp;svn;doxygen;webvisor;trunk;branches;tags;icons/icons"
+export DIRS_INLUDE_FILEEXT=".html;.php;.css;.js;.jpg;.gif;.png"
+
+export HEADER_MARKER="<!--HEADER-->"
+export FOOTER_MARKER="<!--FOOTER-->"
+export LOCAL_BEGIN="<!--LOCAL_BEGIN-->"
+export LOCAL_END="<!--LOCAL_END-->"
+export REMOTE_BEGIN="<!--REMOTE_BEGIN"
+export REMOTE_END="REMOTE_END-->"
+
+export SRCDIR="../.."
+export AFANASY="trunk"
+export TMPDIR="temp"
+export CGRUEXPORT="${TMPDIR}/cgru"
+export WWWROOT="${TMPDIR}/wwwroot"
+
+if [ "$1" == "-r" ]; then
+   if [ -d "$TMPDIR" ]; then
+      echo "Removing old temporary directory..."
+      rm -rf "$TMPDIR"
+   fi
+   mkdir -p "$TMPDIR"
+   echo "Exporting CGRU for remote site..."
+   svn export $SRCDIR $CGRUEXPORT
+   cp -rp "${CGRUEXPORT}/afanasy/${AFANASY}/"* "${CGRUEXPORT}/afanasy"
+   rm -rf "${CGRUEXPORT}/afanasy/trunk"
+   rm -rf "${CGRUEXPORT}/afanasy/branches"
+   rm -rf "${CGRUEXPORT}/afanasy/tags"
+   export SRCDIR="${CGRUEXPORT}"
+else
+   echo "Making site."
+   echo "Type '$0 -r' to make remote site version."
+   export DIRS_EXLUDE_FINDSUB="${DIRS_EXLUDE_FINDSUB};temp"
+fi
+
+python makesite.py $*

@@ -1,0 +1,9 @@
+//
+//	Synopsis:
+//
+//	menuItem -l "label" -ecr 0 -ann "annotation" -c "command"
+//
+
+	menuItem -l "DOCUMENTATION:" -enable off;
+	menuItem -divider true;
+	menuItem -l "CGRU Docs local..." -c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/index.html\")`;";

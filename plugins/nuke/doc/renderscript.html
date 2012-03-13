@@ -1,0 +1,108 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../../doc/styles.css" rel="stylesheet" type="text/css">
+<link rel="shortcut icon" href="../icon.png" type="image/png" />
+<title>CGRU Nuke Render Script</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+
+<h2 align="center">Nuke CGRU Render Script.</h2>
+<hr />
+
+<p>
+In command line Nuke can execute a python script in your scene. Script, scene, nuke and script options can be passed in command line arguments. So you can render scenes through a script.
+</p>
+<p>
+This script will open a scene, render specified node in temporary folder, copy (with overwrite) images in destination folder, delete temporary folder. This can save your network traffic a bit. As normally nuke open an empty temporary file and often write there some portions of an image. This script copy an entire image only once, on successful render.
+</p>
+
+<h4>Command:</h4>
+<p>
+<kbd>cgru/plugins/nuke/render.py</kbd><br/>
+</p>
+
+<h4>Arguments:</h4>
+<p>
+Arguments are like in Nuke:
+</p>
+<p>
+'-x', '--xscene' - Path to scene to execute<br/>
+'-X', '--xnode' - The name of node to execute<br/>
+'-F', '--frange', - Frame range to render (Nuke syntax: 'A-BxC' every C'th frame from A to last one less or equal to B)<br/>
+</p>
+
+<h4>Usage:</h4>
+<p>
+As arguments are like in Nuke, you can simple insert in your render command a string, to use script render:<br/>
+<kbd> -t render_script.py</kbd>
+</p>
+<p>
+Common Nuke render command:<br/>
+<code>
+nuke -i -X Write1 -F1-10x1 -x scene.nk
+</code>
+</p>
+<p>
+Modified Nuke render command, to use a render script:<br/>
+<code>
+nuke -i <u><i>-t render_script.py</i></u> -X Write1 -F1-10x1 -x scene.nk
+</code>
+</p>
+
+<p>
+In afanasy examples, Nuke render launch command is customized in bash script, which launches Nuke:
+</p>
+<pre>
+
+   # Nuke render launcher:
+   export NUKE_AF_RENDER="nuke -i -m %(threads)s"
+   if [ ! -z "${CGRU_LOCATION}" ]; then
+      export NUKE_AF_RENDER="${NUKE_AF_RENDER} -t ${CGRU_LOCATION}/plugins/nuke/render.py"
+   fi
+
+</pre>
+<p>
+* string '<i>%(threads)s</i>' will be replaced to a number later, in other python scripts.
+<p>
+
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

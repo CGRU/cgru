@@ -1,0 +1,11 @@
+{
+  Description     = "CG";
+  Provides        = ("CG");
+  Uses            = ("Network");
+  OrderPreference = "Late";
+  Messages =
+  {
+    start = "Starting CG Utilities";
+    stop  = "Stopping CG Utilities";
+  };
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="../icon.png" type="image/png" />
+<title>Afanasy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Афанасий.</h2>
+<hr />
+
+<table width="1000" height="800" bgcolor="#FFFFFF" align="center"><tr>
+<td align="center"><a href="images/zaafanasy_rodina.jpg"><img src="images/zaafanasy_dobrovol.jpg" align="middle" alt="zaafanasy_dobrovol"/></a></td>
+</tr></table>
+
+<p>
+Мне показалось, что уже пора нам иметь свой диспетчер. Ну сколько можно мучить старый Alfred? Каждая фирма тратит кучу времени на одно и тоже. Приходит в фирму подкованный человек ТД, ставит Alfred, затачивает его подо всё что нужно. Если сложить всё то время, которое тратится на обслуживание Alfred-а в наших конторах, плюс немного других диспетчеров, то у нас уже давно был бы диспетчер по круче Alfred-а.
+</p>
+<p>
+Вот я и решил заниматься не Alfred-ом а Афанасием - бесплатной и свободной версией универсального диспетчера. В чём-то он уже его лучше, а в чем-то ещё отстаёт, но я над этим работаю. Я занимаюсь в основном ядром диспетчера - его сервером. Было бы хорошо если бы вы помогли мне его пообвешиваить всевозможными улилитами для инеграции с разным софтом. Вы же это делаете для Alfred-a и возможно других диспетчеров. А у Афанасия есть плюс - он бесплатный и с открытым исходным кодом. Но это не трбевание за его использование. Любой может его скачать с публичного сайта SourceForge и пользоваться, ничего для него не делая. Более того вы даже так, ничего не совершенствуя, простым использованием, будете приносить пользу программе, выявляя ошибки и привлекая разработчиков. А вот разработчиков я заинтересовать хочу.
+</p>
+<p>
+Есть не мало задач, которые точно с лёгкостью можно разделить между разными людьми, которые могут находиться и в разных конторах. И которые не требуют полного знания всего и вся.
+</p>
+
+<ol>
+   <li>
+      <b>Client</b> - поддержка под Linux, Mac OS X, MS Windows и любую другию OS, если кому надо.
+   </li>
+   <li>
+      <b>GUI</b> - графический интерфейс для пользователей, несколько типов независимых интерфейсов.
+   </li>
+   <li>
+      <b>Job Submission Scripts</b> - прикручивать к новым софтам, поддерживать и усовершенствовать уже написанные.
+   </li>
+   <li>
+      <b>Python Scripts</b> - совершенствовать API, делать новые парсеры задач, усовершенсвовать существующие.
+   </li>
+   <li>
+      <b>Инсталлятор</b> - скрипты для автоматизации установки.
+   </li>
+   <li>
+      <b>Документация</b> - всегда надо, всегда не хватает.
+   </li>
+   <li>
+      <b>WEB интерфейс</b> - наблюдение за текущими задачами и просмотр данных о старых - вывод статистики.
+   </li>
+   <li>
+      <b>CLI</b> - интерфейс из командной строки для администраторов и разработчиков (консольное приложение).
+   </li>
+</ol>
+
+<p>
+Главное что это всё надо сделать один раз. И не придётся потом прикручивать Alfred в каждой конторе, так как определённая текучесть кадров наблюдается и среди "подкованных" людей.
+</p>
+<p>
+0. <b>Сервер</b> - ядро Афанасия.<br/>
+Для диспетчера одного разработчика ядра, я думаю хватит, хотя 2е головы лучше, а можно и больше, но тут надо его полностью изучить и плотно со мной сотрудничать.
+</p>
+
+<table width="1000" height="800" bgcolor="#FFFFFF" align="center"><tr>
+<td align="center"><a href="images/zaafanasy_notalfred.jpg"><img src="images/zaafanasy_help.jpg" align="middle" alt="zaafanasy_help"/></a></td>
+</tr></table>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,47 @@
+
+global float $timaSubFrameStep; $timaSubFrameStep = 0.2;
+if(`runTimeCommand -q -exists SubFramePrev_rtc`) runTimeCommand -e -delete SubFramePrev_rtc;
+runTimeCommand
+	-annotation "SubFramePrev_Ann"
+	-category "_CGRU_anim_"
+	-command ("undoInfo -swf 0; currentTime (`currentTime -q` - $timaSubFrameStep); undoInfo -swf 1;")
+	SubFramePrev_rtc;
+nameCommand
+	-annotation "SubFramePrev_rtcNameCommand"
+	-command ("SubFramePrev_rtc")
+	SubFramePrev_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists SubFrameNext_rtc`) runTimeCommand -e -delete SubFrameNext_rtc;
+runTimeCommand
+	-annotation "SubFrameNext_Ann"
+	-category "_CGRU_anim_"
+	-command ("undoInfo -swf 0; currentTime (`currentTime -q` + $timaSubFrameStep); undoInfo -swf 1;")
+	SubFrameNext_rtc;
+nameCommand
+	-annotation "SubFrameNext_rtcNameCommand"
+	-command ("SubFrameNext_rtc")
+	SubFrameNext_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists AnimToolsMMpress_rtc`) runTimeCommand -e -delete AnimToolsMMpress_rtc;
+runTimeCommand
+	-annotation "AnimToolsMMpress"
+	-category "_CGRU_anim_"
+	-command ("tima_AnimToolsMMP_globalProc")
+	AnimToolsMMpress_rtc;
+nameCommand
+	-annotation "AnimToolsMMpress_rtcNameCommand"
+	-command ("AnimToolsMMpress_rtc")
+	AnimToolsMMpress_rtcNameCommand;
+if(`runTimeCommand -q -exists AnimToolsMMrelease_rtc`) runTimeCommand -e -delete AnimToolsMMrelease_rtc;
+runTimeCommand
+	-annotation "AnimToolsMMrelease"
+	-category "_CGRU_anim_"
+	-command ("tima_AnimToolsMMR_globalProc")
+	AnimToolsMMrelease_rtc;
+nameCommand
+	-annotation "AnimToolsMMrelease_rtcNameCommand"
+	-command ("AnimToolsMMrelease_rtc")
+	AnimToolsMMrelease_rtcNameCommand;
+

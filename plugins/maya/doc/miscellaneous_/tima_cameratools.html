@@ -1,0 +1,68 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../_system/styles.css" rel="stylesheet" type="text/css">
+<title>camera tools</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+<div class="commonText">
+<p><strong>Camera Tools.</strong></p>
+<p> <strong>Camera Zoom&amp;Pan:</strong><br>
+  You can zoom and pan view without modifying camera transform ! Very useful, when you want to enlarge part of the view with imagePlane or do not want to modify camera animation. <br>
+  It is a scripted tool witch reacts on:<br>
+<strong>LMB drag</strong> - non-perspective zooming (change camera overscan).<br>
+<strong>MMB drag</strong> - pan camera without changing translations (offset camera film).<br>
+<strong>Shift + LMB</strong> - reset zoom (set overscan to 1.0).<br>
+<strong>Ctrl + LMB</strong> click on some viewport - retune tool to other view and other camera.</p>
+<p>  Cameras marking menu allows fast camera attributes editing for the active viewport. And contains a list of all scene cameras for fast changing.<br>
+  You can find it in &quot;_CGRU_camv_&quot; hotkey category in maya Hotkeys Editor window. Default hotkey is &quot;Ctrl + c&quot;;</p>
+<p><img src="tima_cameratools.png" width="800" height="277"></p>
+<p>persp - is the active viewport camera in this example.<br>
+  &quot;<strong>lock camName</strong>&quot; - lock translate and rotate camera transform attributes.<br>
+  &quot;<strong>select camName</strong>&quot; - select the current camera.<br>
+  &quot;<strong>camName attributes</strong>&quot; - open an attribute editor for this camera.<br>
+  &quot;<strong>key transform</strong>&quot; - set keys on translate and rotate attributes of camera transform.<br>
+&quot;<strong>Film Fit -&gt;</strong>&quot;, &quot;<strong>display options -&gt;</strong>&quot;and &quot;<strong>_presets.. -&gt;</strong>&quot; menuitems for rapid editing listed attributes.<br>
+&quot;<strong>Zoom Too</strong>l&quot;, &quot;<strong>Roll Tool</strong>&quot;, &quot;<strong>Azimuth Elevation Tool</strong>&quot; and &quot;<strong>Yaw-Pitch Tool</strong>&quot; are the standart camera tools.</p>
+<p align = "right">
+<a href="../index.html" target="_top" class="smallComments">jump to CGRU documentation</a>
+</p>
+</div>
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,24 @@
+//
+// Synopsis:
+//
+// menuItem -l "label" -ann "annotation" -c "command"
+//
+
+   menuItem -l "Autosave Manager..." -ecr 0 -c "tima_ShowAutoSaveManagerWnd_globalProc();" -ann "Config auto save.";
+   menuItem -divider true;
+   menuItem -l "Auto Project Seek" -enableCommandRepeat 0 -checkBox `optionVar -q "tima_AutoProjectSeek_Enable"` -c "tima_AutoProjectSeek_checkBox_Command()";
+   menuItem -divider true;
+   menuItem -l "Camera Zoom&Pan" -ecr 1 -c "cgruSourceFile(\"miscellaneous/tima_camzoompanmouse.mel\");" -ann "Rapid editing rendering flags on the selected hierarchy.";
+   menuItem -l "Mass Rename..." -ecr 0 -c "cgruSourceFile(\"miscellaneous/tima_massrename.mel\");" -ann "Multiply objects rename.";
+   menuItem -l "Sets Editor..." -ecr 0 -c "cgruSourceFile(\"miscellaneous/tima_setseditor.mel\");" -ann "Boolean operations with sets window.";
+   menuItem -l "Rivet (Button)" -ecr 0 -i "bazh_rivet_icon.xpm" -c "cgruSourceFile(\"miscellaneous/bazh_rivet.mel\");" -ann "Constrains locator to polygon or NURBS surface.";
+   menuItem -l "Reparent" -ecr 1 -c "tm_reparent" -ann "Reparent ANY DAG node to ANY other DAG parent. Usefull to reparent shapes.";
+   menuItem -divider true;
+   menuItem -l "Kill Node(s)" -ecr 1 -c "{string $sel[]=`ls -sl -l`;string $node;for($node in $sel) tm_killNode $node;}" -ann "Kill selected node(s).";
+   menuItem -divider true;
+   menuItem -l "Output Window" -sm 1;
+      menuItem -l "MS Windows Only !" -enable false;
+      menuItem -divider true;
+      menuItem -l "Clear" -ecr 0 -c "tm_clearOutput -clear";
+      menuItem -l "Close" -ecr 0 -c "tm_clearOutput -close";
+   setParent -m ..;

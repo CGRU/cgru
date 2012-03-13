@@ -1,0 +1,117 @@
+
+if(`runTimeCommand -q -exists ShowHideOutliner_rtc`) runTimeCommand -e -delete ShowHideOutliner_rtc;
+runTimeCommand
+	-annotation "show/hide Outliner window"
+	-category "_CGRU_uiw_"
+	-command ("if (`window -ex outlinerPanel1Window`) deleteUI outlinerPanel1Window; else OutlinerWindow;")
+	ShowHideOutliner_rtc;
+nameCommand
+	-annotation "ShowHideOutliner_rtcNameCommand"
+	-command ("ShowHideOutliner_rtc")
+	ShowHideOutliner_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists ShowHideHyperGraph_rtc`) runTimeCommand -e -delete ShowHideHyperGraph_rtc;
+runTimeCommand
+	-annotation "show/hide HyperGraph window"
+	-category "_CGRU_uiw_"
+	-command ("if (`window -ex hyperGraphPanel1Window`) deleteUI hyperGraphPanel1Window; else HypergraphWindow;")
+	ShowHideHyperGraph_rtc;
+nameCommand
+	-annotation "ShowHideHyperGraph_rtcNameCommand"
+	-command ("ShowHideHyperGraph_rtc")
+	ShowHideHyperGraph_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists ShowHideHyperShade_rtc`) runTimeCommand -e -delete ShowHideHyperShade_rtc;
+runTimeCommand
+	-annotation "show/hide HyperShade window"
+	-category "_CGRU_uiw_"
+	-command ("if (`window -ex hyperShadePanel1Window`) deleteUI hyperShadePanel1Window; else HypershadeWindow;")
+	ShowHideHyperShade_rtc;
+nameCommand
+	-annotation "ShowHideHyperShade_rtcNameCommand"
+	-command ("ShowHideHyperShade_rtc")
+	ShowHideHyperShade_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists ShowHideGraphEditor_rtc`) runTimeCommand -e -delete ShowHideGraphEditor_rtc;
+runTimeCommand
+	-annotation "show/hide GraphEditor window"
+	-category "_CGRU_uiw_"
+	-command ("if (`window -ex graphEditor1Window`) deleteUI graphEditor1Window; else GraphEditor;")
+	ShowHideGraphEditor_rtc;
+nameCommand
+	-annotation "ShowHideGraphEditor_rtcNameCommand"
+	-command ("ShowHideGraphEditor_rtc")
+	ShowHideGraphEditor_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists ShowHideToolProperties_rtc`) runTimeCommand -e -delete ShowHideToolProperties_rtc;
+runTimeCommand
+	-annotation "show/hide ToolProperties window"
+	-category "_CGRU_uiw_"
+	-command ("if(`window -exists toolProperties`) deleteUI toolProperties; else toolPropertyWindow;")
+	ShowHideToolProperties_rtc;
+nameCommand
+	-annotation "ShowHideToolProperties_rtcNameCommand"
+	-command ("ShowHideToolProperties_rtc")
+	ShowHideToolProperties_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists ShowHideTextureEditor_rtc`) runTimeCommand -e -delete ShowHideTextureEditor_rtc;
+runTimeCommand
+	-annotation "show/hide UV Texture Editor window"
+	-category "_CGRU_uiw_"
+	-command ("if (`window -ex polyTexturePlacementPanel1Window`) deleteUI polyTexturePlacementPanel1Window; else TextureViewWindow;")
+	ShowHideTextureEditor_rtc;
+nameCommand
+	-annotation "ShowHideTextureEditor_rtcNameCommand"
+	-command ("ShowHideTextureEditor_rtc")
+	ShowHideTextureEditor_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists MinimizeAllWindows_rtc`) runTimeCommand -e -delete MinimizeAllWindows_rtc;
+runTimeCommand
+	-annotation "minimize all windows"
+	-category "_CGRU_uiw_"
+	-command ("{string $wndArray[] = `lsUI -wnd`; string $wnd; for($wnd in $wndArray) {if($wnd == \"MayaWindow\") continue;	window -e -i 1 $wnd;}}")
+	MinimizeAllWindows_rtc;
+nameCommand
+	-annotation "MinimizeAllWindows_rtcNameCommand"
+	-command ("MinimizeAllWindows_rtc")
+	MinimizeAllWindows_rtcNameCommand;
+
+
+if(`runTimeCommand -q -exists MaximizeAllWindows_rtc`) runTimeCommand -e -delete MaximizeAllWindows_rtc;
+runTimeCommand
+	-annotation "maximize all windows"
+	-category "_CGRU_uiw_"
+	-command ("{string $wndArray[] = `lsUI -wnd`; string $wnd; for($wnd in $wndArray) {if($wnd == \"MayaWindow\") continue;	window -e -i 0 $wnd;}}")
+	MaximizeAllWindows_rtc;
+nameCommand
+	-annotation "MaximizeAllWindows_rtcNameCommand"
+	-command ("MaximizeAllWindows_rtc")
+	MaximizeAllWindows_rtcNameCommand;
+
+if(`runTimeCommand -q -exists GeneralMMpress_rtc`) runTimeCommand -e -delete GeneralMMpress_rtc;
+runTimeCommand
+	-annotation "GeneralMMpress"
+	-category "_CGRU_uiw_"
+	-command ("cgruGeneralMMP")
+	GeneralMMpress_rtc;
+nameCommand
+	-annotation "GeneralMMpress_rtcNameCommand"
+	-command ("GeneralMMpress_rtc")
+	GeneralMMpress_rtcNameCommand;
+
+if(`runTimeCommand -q -exists GeneralMMrelease_rtc`) runTimeCommand -e -delete GeneralMMrelease_rtc;
+runTimeCommand
+	-annotation "GeneralMMrelease"
+	-category "_CGRU_uiw_"
+	-command ("cgruGeneralMMR")
+	GeneralMMrelease_rtc;
+nameCommand
+	-annotation "GeneralMMrelease_rtcNameCommand"
+	-command ("GeneralMMrelease_rtc")
+	GeneralMMrelease_rtcNameCommand;

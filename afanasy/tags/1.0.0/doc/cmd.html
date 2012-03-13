@@ -1,0 +1,114 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Cmd</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><font color="#DD0000">★</font><i><a href="../../index.html" target="_top">CGRU</a></i><font color="#DD0000">★</font></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#507020" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Command line interface to Afanasy server and database</h2>
+<hr />
+
+<p><code>$ afcmd</code></p>
+Manipulate server parameters and database, query various information. Modify jobs, users, renders.
+<p>
+<kbd>afcmd [command]</kbd> execute a command.<br />
+</p>
+<p>
+<kbd>afcmd</kbd> command without any arguments to see output of afanasy environment initialization.<br />
+</p>
+<p>
+<kbd>afcmd h</kbd> display help - list all commands.<br />
+</p>
+<p>
+<kbd>afcmd h [command]</kbd> display help for specified command.<br />
+</p>
+<p>
+<kbd>afcmd v [other arguments]</kbd> put program in verbose mode.<br />
+In this mode program outputs in|out messages size.<br />
+</p>
+
+<h3>Some useful commands:</h3>
+
+<h4>Database:</h4>
+<p>
+<code>$ afcmd db_drivers</code><br/>
+List available database drivers.
+</p>
+<p>
+<code>$ afcmd db_check</code><br/>
+Check database connection.
+</p>
+<p>
+<code>$ afcmd db_resetall</code><br/>
+Drop tables in Afanasy database if any, and create new. This command must be executed at least before frist Afanasy start to create needed tables.
+</p>
+<p>
+<code>$ afcmd db_jobsclean</code><br/>
+Delete invalid jobs from database. This can happen on some Afanasy bug (which I will fix :) ) or on some connection bug (this never happened yet, but it is possible). Invalid job in this case is a job with not all required data in other tables (blocks, tasks ..)
+</p>
+
+<h4>Server:</h4>
+<p>
+<code>$ afcmd cload</code><br/>
+Ask Afanasy server to reread config files. It can be reconfigured without restart.
+</p>
+<p>
+<code>$ afcmd fload</code><br/>
+Ask Afanasy server to reread farm configuration. It can be reconfigured without restart.
+</p>
+<p>
+<code>$ afcmd stat</code><br/>
+Output traffic statistics.
+</p>
+
+<h4>General:</h4>
+<p>
+<code>$ afcmd num</code><br/>
+Test how Afanasy will fill numeric command with numbers (first and last frame).
+</p>
+<p>
+<code>$ afcmd parse</code><br/>
+Parse input with specified python class. For example you can check parser work:<br/>
+<kbd>mantra -V a -f render/scene.0001.ifd | afcmd parse <i>my_custom_parser_class_name</i></kbd>
+</p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#507020" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><font color="#DD0000">★</font><i><a href="../../index.html" target="_top">CGRU</a></i><font color="#DD0000">★</font></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

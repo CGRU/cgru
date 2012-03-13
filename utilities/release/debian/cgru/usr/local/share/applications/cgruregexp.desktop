@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=RegExp
+Comment=Regular expressions checker
+Exec=/opt/cgru/utilities/regexp/bin/regexp
+Icon=cgruregexp
+Terminal=false
+Type=Application
+Categories=X-CGRU

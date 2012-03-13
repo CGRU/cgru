@@ -1,0 +1,36 @@
+body {
+   background-color: #CFDDA2;
+   color: #002000;
+   font-family: Verdana, Arial, Helvetica, sans-serif;
+   font-size: 14px;
+   text-align: justify;
+}
+h1 {
+   font-family: Verdana;
+   font-weight: bold;
+}
+code {
+   color: Navy;
+   font-weight: bold;
+}
+kbd {
+   color: Purple;
+   font-weight: bold;
+}
+pre {
+   background-color: #001000;
+   color: #70FF40;
+   font-weight: bold;
+}
+a:link {
+   color: #000060;
+}
+a:visited {
+   color: #000060;
+}
+a:hover {
+   color: #500000;
+}
+a:active {
+   color: #D00000;
+}

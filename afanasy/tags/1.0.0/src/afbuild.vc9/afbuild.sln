@@ -1,0 +1,95 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afanasy", "..\libafanasy\libafanasy.vcproj", "{9CE3155C-FDC1-33B1-9A91-38457C2264BF}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afqt", "..\libafqt\libafqt.vcproj", "{FC621C32-B08E-3B57-BC26-F5A1B6393F68}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afapi", "..\libafapi\libafapi.vcproj", "{F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF} = {9CE3155C-FDC1-33B1-9A91-38457C2264BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afmonitor", "..\monitor\afmonitor.vcproj", "{C269E61C-396A-3262-AF73-D0B9DEF3C2F7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68} = {FC621C32-B08E-3B57-BC26-F5A1B6393F68}
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF} = {9CE3155C-FDC1-33B1-9A91-38457C2264BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "pyaf", "..\libpyaf\libpyaf.vcproj", "{75EDAF35-D2EE-3248-888E-222C721F7B19}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289} = {F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289}
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68} = {FC621C32-B08E-3B57-BC26-F5A1B6393F68}
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF} = {9CE3155C-FDC1-33B1-9A91-38457C2264BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afrender", "..\render\afrender.vcproj", "{28172FB8-8B67-3D01-B0FF-79A3E921B543}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68} = {FC621C32-B08E-3B57-BC26-F5A1B6393F68}
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF} = {9CE3155C-FDC1-33B1-9A91-38457C2264BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "aftalk", "..\talk\aftalk.vcproj", "{EA87E88F-AAF2-31BB-B321-C7DAA3FA06CE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68} = {FC621C32-B08E-3B57-BC26-F5A1B6393F68}
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF} = {9CE3155C-FDC1-33B1-9A91-38457C2264BF}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "afwatch", "..\watch\afwatch.vcproj", "{DCF68D46-9648-3BE9-9A12-D59FABFA6788}"
+	ProjectSection(ProjectDependencies) = postProject
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68} = {FC621C32-B08E-3B57-BC26-F5A1B6393F68}
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF} = {9CE3155C-FDC1-33B1-9A91-38457C2264BF}
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Includes", "Includes", "{20EDB737-EFCC-4B2F-949E-E1CF0AC85ABD}"
+	ProjectSection(SolutionItems) = preProject
+		..\include\afanasy.h = ..\include\afanasy.h
+		..\include\afgui.h = ..\include\afgui.h
+		..\include\afjob.h = ..\include\afjob.h
+		..\include\aftypes.h = ..\include\aftypes.h
+		..\include\afversion.h = ..\include\afversion.h
+		..\include\macrooutput.h = ..\include\macrooutput.h
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF}.Debug|x64.ActiveCfg = Debug|x64
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF}.Debug|x64.Build.0 = Debug|x64
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF}.Release|x64.ActiveCfg = Release|x64
+		{9CE3155C-FDC1-33B1-9A91-38457C2264BF}.Release|x64.Build.0 = Release|x64
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68}.Debug|x64.ActiveCfg = Debug|x64
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68}.Debug|x64.Build.0 = Debug|x64
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68}.Release|x64.ActiveCfg = Release|x64
+		{FC621C32-B08E-3B57-BC26-F5A1B6393F68}.Release|x64.Build.0 = Release|x64
+		{F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289}.Debug|x64.ActiveCfg = Debug|x64
+		{F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289}.Debug|x64.Build.0 = Debug|x64
+		{F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289}.Release|x64.ActiveCfg = Release|x64
+		{F5C00D2A-A27A-3AFD-B1D8-8B7DEAB30289}.Release|x64.Build.0 = Release|x64
+		{C269E61C-396A-3262-AF73-D0B9DEF3C2F7}.Debug|x64.ActiveCfg = Debug|x64
+		{C269E61C-396A-3262-AF73-D0B9DEF3C2F7}.Debug|x64.Build.0 = Debug|x64
+		{C269E61C-396A-3262-AF73-D0B9DEF3C2F7}.Release|x64.ActiveCfg = Release|x64
+		{C269E61C-396A-3262-AF73-D0B9DEF3C2F7}.Release|x64.Build.0 = Release|x64
+		{75EDAF35-D2EE-3248-888E-222C721F7B19}.Debug|x64.ActiveCfg = Debug|x64
+		{75EDAF35-D2EE-3248-888E-222C721F7B19}.Debug|x64.Build.0 = Debug|x64
+		{75EDAF35-D2EE-3248-888E-222C721F7B19}.Release|x64.ActiveCfg = Release|x64
+		{75EDAF35-D2EE-3248-888E-222C721F7B19}.Release|x64.Build.0 = Release|x64
+		{28172FB8-8B67-3D01-B0FF-79A3E921B543}.Debug|x64.ActiveCfg = Debug|x64
+		{28172FB8-8B67-3D01-B0FF-79A3E921B543}.Debug|x64.Build.0 = Debug|x64
+		{28172FB8-8B67-3D01-B0FF-79A3E921B543}.Release|x64.ActiveCfg = Release|x64
+		{28172FB8-8B67-3D01-B0FF-79A3E921B543}.Release|x64.Build.0 = Release|x64
+		{EA87E88F-AAF2-31BB-B321-C7DAA3FA06CE}.Debug|x64.ActiveCfg = Debug|x64
+		{EA87E88F-AAF2-31BB-B321-C7DAA3FA06CE}.Debug|x64.Build.0 = Debug|x64
+		{EA87E88F-AAF2-31BB-B321-C7DAA3FA06CE}.Release|x64.ActiveCfg = Release|x64
+		{EA87E88F-AAF2-31BB-B321-C7DAA3FA06CE}.Release|x64.Build.0 = Release|x64
+		{DCF68D46-9648-3BE9-9A12-D59FABFA6788}.Debug|x64.ActiveCfg = Debug|x64
+		{DCF68D46-9648-3BE9-9A12-D59FABFA6788}.Debug|x64.Build.0 = Debug|x64
+		{DCF68D46-9648-3BE9-9A12-D59FABFA6788}.Release|x64.ActiveCfg = Release|x64
+		{DCF68D46-9648-3BE9-9A12-D59FABFA6788}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

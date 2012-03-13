@@ -1,0 +1,699 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="stylestable.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="../icon.png" type="image/png" />
+<title>Render Farm Managers Comparison</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Сравнение Менеджеров Рендер Фермы.</h2>
+<hr />
+
+<p>
+<b><i>Price</i>:</b><br/>
+Цена на 2009.06.15. Уточняйте текущие цены по ссылкам.<br/>
+Зачастую цена зависит от размера вашей фермы - количества компьютеров в ней, а точнее от количества клиентов, которые могут подключиться к серверу (или репозиторию в случае с DeadLine). Большой плюс, я считаю, когда менеджер можно попробовать бесплатно с несколькими клиентами, так вы получите полное впечатление перед покупкой (ну или раздумаете покупать).<br/>
+</p>
+<p>
+<b><i>Engine</i>:</b><br/>
+"Движок" или кто генерит команды.<br/>
+<b>typed</b> - Командные строки генерит сам менеджер, в зависимости от типа задачи (Maya, Nuke, Houdini, RenderMan, e.t.c), начального и конечного кадров, а также всевозможных параметров типа разрешения, камеры и прочих справедливых для данного типа  (рабочей программы). Обычно это наиболее "готовое" решение. Вы сразу же можете делать всё, что может данный менеджер. Но зато его наиболее сложно приспосабливать под уникальные для фирмы (проекта) задачи. И вообще не факт что под вашу задачу его вообще можно приспособить. Подходит больше для мелких фирм без администратора, технического директора, разработчиков, и делающих более "однообразную" работу используя для этого известные готовые решения и распространённые программы.<br/>
+<b>cmd+numbers</b> - Командные строки для разных кадров генерятся из одной путём подставления в неё начального и конечного кадра.  Это очень "дешевый" способ, просто администрировать/программировать, мало трафика и вообще мало данных на задачу. Но не понятно как посчитать задачу если она разбивается не на кадры (к примеру тени). Обычно процесс запускается просто с переменными окружения (environment variables) указывающими на начальный и конечный кадры, а вы должны сделать такую команду которая бы из как-то использовала. Но есть и другие решения.<br/>
+<b>cmd array</b> - Каждая подзадача имеет свою командную строку. Наиболее "гибкое" решение. Вы можете делать всё что хотите.<br/>
+</p>
+<p>
+<b><i>Other tools</i>:</b><br/>
+Всевозможные инструменты, не имеющие прямого отношения к управлению фермой. Они не обязательно должны поставляться вместе с менеджеров и уж тем более быть зашитыми в его движок. Их можно сделать самим и прикрутить к вашему менеджеру, более того так даже лучше, так вы будете их контролировать. Но для маленькой конторы без админов наличие таких утилит может помочь, если они справятся с вашими задачами.<br/>
+<b>UP</b> - Утилита как-то автоматизирующая апдейт всех клиентов на ферме. Если в фирме есть админ, то он и так всё апдейтит как ему это удобно. Может имеет смысл если его нет.<br/>
+<b>NM</b> - Автоматический "маппинг" не существующего сетевого диска в MS Windows. Лучше пользоваться не сетевыми дисками а UNC путями. В документациях к диспетчерам, поддерживающих такую возможность так и написано.<br/>
+<b>IS</b> - Image splitting (slicing) or "Tile Render" - разбиение картинки на части и одновременный их рендер на разных компьютерах. Но не факт что такой диспетчер справится с нужным вам форматом и вообще умеет это для нужной вам программы. Обычно это громкие слова в "Features" и подробное описание условий как, где и для чего это всё же работает. Лучше делать это самим и полностью контролировать этот процесс.<br/>
+<b>IC</b> - Image Checking - возможность проверить картинку на "битость" (обычно это минимальный размер файла). Вот это может быть полезно для особых случаев, но обычно если процесс завершился без ошибки то и результатом всё хорошо. А если у вас особые случаи, то лучше и делать всё самим.<br/>
+<b>RC</b> - Resources Copy - Копирование локальных ресурсов на файловый сервер. Администраторы и ТД должны заботиться о месте хранения и копировании ресурсов, а не пользователи. Где не так там бардак и сеть вечно тормозит.<br/>
+<b>LR</b> - Local Render - рендерит картинку локально, а затем копирует её на место в общее сетевой ресурс. Экономия сетевого трафика, так как лучше один раз переписать весь файл, чем постоянно по чуть-чуть дописывать во время просчёта.<br/>
+<b>PM</b> - Power Management - Сервер может выключать рендера когда они какое-то время стоят без дела, а потом опять включить. Экономьте электричество :)<br/>
+</p>
+<p>
+Помните, <i>Alfred</i>, который вообще без "утилит", наиболее распространён в крупных конторах как у "нас" так и у "них". Не важно что уже умеет делать диспетчер, важно чтобы его можно было научить чему угодно. Как конструктор.
+</p>
+<p>
+<b><i>OS</i>:</b><br/>
+Под какую операционную систему существует программа или её часть - сервер, интерфейс, клиент.<br/>
+</p>
+<p>
+<b><i>Main Server</i>:</b><br/>
+Наличия главного сервера у диспетчера. Как это не странно может показаться подкованному человеку, но у некоторых диспетчеров его нет. Это может привести к неудобству его администрирования. Например невозможно на время кому-то что-то запретить или управлять чужой задачей.<br/>
+</p>
+<p>
+<b><i>Job Submission</i>:</b><br/>
+Способ постановки задачи. Хорошо если есть способ без каких-либо графических приложений (диалогов GUI) для интеграции в вашу рабочую программу. Консольная (командная) утилита - самый простой способ. Скрипт наиболее гибкий способ. Но кто будет писать его руками? Он всё равно будет генериться какой-либо утилитой. Python интегрирован во многие популярные CG программы, такие как Houdini, Maya, Nuke. Очень удобно общаться и со сценой и с диспетчером внутри одного скрипта.<br/>
+<b>GUI</b> - Диалог, в отдельном приложении или вызывается из монитора менеджера.<br/>
+<b>cmd</b> - консольное приложение, которое может сгенерить задачу из командной строки и послать на её сервер.<br/>
+Интеграция с вашей рабочей программой может оказаться очень полезной. Вы можете перенести идеологию вашей программы и интегрировать диспетчер в сцену. Например в Nuke и Houdini должна быть именно нода, посылающая задачу, а не какое-нибудь окошко диалог, которое рушит их принципы. А это на эту ноду тогда уже можно с чем-то конектить, писать экспрешены.
+</p>
+<p>
+<b><i>Store</i>:</b><br/>
+Способ долговременного хранения данных. Если его вообще нет и данные хранятся только в памяти сервера, то в случае его перезапуска они будут утеряны. Самый стандартный способ хранения вообще каких-либо данных - база данных SQL. В этом случае, ознакомившись со схемой их хранения, вы сами можете их читать и обрабатывать как угодно. Писать для этого собственные утилиты, не зависящие от разработчиков сервера, от его протоколов.<br/>
+</p>
+<p>
+<b><i>Host Resources</i>:</b><br/>
+Тип ресурсов присылаемых рендером. Обычно есть загруженность процессора(ов) и памяти. Хорошо если приходит информация о SWAP, так как его использование может сильно замедлить процесс. Полезно иметь детальную информацию о использовании CPU, считает ли он вашу сцену или выполняет какие-то системные операции, а может просто ожидает ввода-вывода. Информация о сетевом трафике может помочь понять проблемы со скоростью сети.<br/>
+</p>
+<p>
+<b><i>Job Dep</i>:</b><br/>
+Зависимости между задачами. Одна или несколько задач могут ждать выполнения другой зависимой (других зависимых). Очень полезно, поставили считаться 3d, затем зависимый "композ" (и идёте спокойно домой).<br/>
+<b>f</b> - Задача может зависеть от другой "покадрово". Т.е. посчитался 5ый кадр одной задачи, может считаться 5ый кадр другой. Частичное решение зависимости между кадрами для диспетчера не поддерживающего зависимости между подзадачами. Но в общем случае у вас может не совпасть, например, 5ый кадр 3d и 5ый кадр композитинга (мало ли какой offset или retime вы там сделали или много ещё чего).<br/>
+</p>
+<p>
+<b><i>Task Dep</i>:</b><br/>
+Возможность поставить зависимости между подзадачами. Например считаем для кадра сначала 2е тени, а затем сам кадр или, для композитинга, сначала задник, потом кей, потом финальные dpx-ы (и жпеги для превью).<br/>
+</p>
+<p>
+<b><i>Several Clients Same Host</i>:</b><br/>
+Возможность запустить несколько клиентских программ на одном компьютере. Это самый простой способ заставить клиента считать одновременно еще какие-нибудь задачи, но эта функция менее нужна в случае если клиент поддерживает <i>Multi Task Host</i>. Другой клиент может быть совсем по-другому сконфигурирован и использоваться для специальных задач. Может пригодится для "дебага" или просто для тестов чего-то нового.<br/>
+</p>
+<p>
+<b><i>Multi Task Host</i>:</b><br/>
+Один клиент может запускать несколько задач одновременно. Очень полезно для ферм с разными по мощности компьютерам и разными по сложности задачами, особенно когда и то и другое одновременно (что отнюдь не редко). Более сильная машина может одновременно считать большее количество разных подзадач. И большее количество лёгких подзадач могут одновременно считаться на одном компьютере. Более сбалансированное использование фермы, так как меньше "простоя" - это когда клиент считает что-то лёгкое, что почти не отнимает ресурсов, но для диспетчера он "занят" и больше ему ничего не предлагается делать (так как обычно у таких диспетчеров клиент либо "занят" либо "свободен" и отсутствует понятие "насколько он занят").<br/>
+</p>
+<p>
+<b><i>Var CPU</i>:</b><br/>
+Нередко бывает, что в командной строке приложению можно указать сколько процессоров использовать. Диспетчеру поддерживаемому такую возможность можно описать такие правила для каждого типа сервисов (приложений). Тогда он сам может менять "вес" подзадачи для того чтобы лучше заполнить свободное место считающего компьютера. Это имеет смысл только если диспетчер поддерживает предыдущий пункт (Multi Task Host).<br/>
+</p>
+<p>
+<b><i>Multi Host Task</i>:</b><br/>
+Некоторые приложения могут запускаться на нескольких компьютерах одновременно, так сказать поддерживают возможность "распараллеливаться" сами. Тогда чтобы диспетчер их окончательно :) "допараллелил", он тоже должен уметь выделить одной подзадаче сразу несколько клиентов. Из известных мне программ это поддерживают: "RenderMan NET Render", "Mantra Multi Host Render", "Houdini 10 Fluids".<br/>
+</p>
+<p>
+<b><i>Task Output Parsing</i>:</b><br/>
+Способ парсинга stdout&amp;stderr подзадачи в основном для выдачи прогресса. Лучший способ это инстанисирование питоновского класса, который вы сами сделали. Питон это язык программирования, а значит гибкость. Класс это не только функции но и данные, а значит вы можете хранить в нём что-то полезное. У классов есть наследование - вы можете написать основные базовые парсеры, а потом наследовать от них более сложные.<br/>
+</p>
+
+<a name="table"/>
+<hr />
+<h2 align="center">Render Farm Managers Comparison.</h2>
+
+<table class="managers">
+
+<tr align="center">
+   <th><pre> Name </pre></th>
+   <th><pre>      Price      </pre><small>(2009.06.15)</small></th>
+   <th><pre>Annual<br/>Support<br/>and Upgrade</pre></th>
+   <th><pre>Engine</pre></th>
+   <th><pre>Other<br/>Tools</pre></th>
+   <th><pre>      OS      </pre></th>
+   <th>Main<br/>Server</th>
+   <th><pre>Job<br/>Submission</pre></th>
+   <th><pre>Storage</pre></th>
+   <th><pre> Host Resources </pre></th>
+   <th><font size="-1">Job<br/>Dep</font></th>
+   <th><font size="-1">Task<br/>Dep</font></th>
+   <th><font size="-2">Several<br/>Clients<br/>Same<br/>Host</font></th>
+   <th><font size="-1">Multi<br/>Task<br/>Host</font></th>
+   <th><font size="-1">Var<br/>CPU</font></th>
+   <th><font size="-1">Multi<br/>Host<br/>Task</font></th>
+   <th>Task<br/>Output<br/>Parsing</th>
+   <th align="left">
+      <pre>  Comment                                                                               </pre>
+      <small>&nbsp;&nbsp;( +/-: "good" or "not good" information )</small>
+   </th>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.lightstorm3d.com/download/html_en/frameBooster.htm" target="_blank">FrameBooster</a></td>
+   <td><b><i>Free</i></b></td>
+   <td>-</td>
+   <td>1 type: Maya</td>
+   <td>-</td>
+   <td>Win</td>
+   <td>-</td>
+   <td>Maya MEL GUI</td>
+   <td>shared folder</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">- Last release 2002 for Maya 4.0 NT</td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.brucerayne.com/renderfarm.html" target="_blank">RenderFarm Commander</a></td>
+   <td>Free &lt;= 2<br/>$45 &lt;= 8 clients<br/>$95 > 8 clients</td>
+   <td>-</td>
+   <td>1 type: LightWave</td>
+   <td>IS IC</td>
+   <td>Mac</td>
+   <td>+</td>
+   <td>GUI</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      - Poor site documentation.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.farmerjoe.info/?p=1/" target="_blank">Farmerjoe</a></td>
+   <td><b><i>Free</i></b></td>
+   <td>-</td>
+   <td>1 type: Blender</td>
+   <td>-</td>
+   <td>Win, Mac, Lin</td>
+   <td>+</td>
+   <td>Blender GUI</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      <br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://loki-render.berlios.de/" target="_blank">Loki Render</a></td>
+   <td><b><i>Free</i></b></td>
+   <td>-</td>
+   <td>1 type: Blender</td>
+   <td>-</td>
+   <td>Win, Mac, Lin</td>
+   <td>+</td>
+   <td>Blender GUI</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left"></td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.schmitzware.org/Framesets/indexFrameset.html" target="_blank">Spider</a></td>
+   <td>Free &lt;= 3<br/>$29 per Monitor</td>
+   <td>-</td>
+   <td>2 types: Maya, MR<br/>+ API</td>
+   <td>-</td>
+   <td>Manager - Mac<br/>Client - Mac, Lin</td>
+   <td>-</td>
+   <td>GUI</td>
+   <td>?</td>
+   <td>CPU (per CPU percentage) MEM SWAP</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>Python class</td>
+   <td align="left">- Last release 2005 (Maya 6.0)</td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.drqueue.org/" target="_blank">DrQueue</a></td>
+   <td><b><i>Free</i></b></td>
+   <td>100€-250€<br/>per month!<br/>+10% per node</td>
+   <td>1 job = 1 cmd+numbers</td>
+   <td>-</td>
+   <td>Lin, Mac, Irix, FreeBSD, Win</td>
+   <td>+</td>
+   <td>Python API<br/>cmd</td>
+   <td>-</td>
+   <td>-</td>
+   <td>+</td>
+   <td>-</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      - Jobs limit.<br/>
+      - Very old architecture.<br/>
+      - 2 years no changes in source code (2004 - ver 0.63, 2006-2009 - ver 0.64).<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.render-server.de/cms/" target="_blank">Royal Render</a></td>
+   <td>245€; - 4 clients<br/>1750€; - 40 clients</td>
+   <td>-<br/>up14,8€-23,7€</td>
+   <td>12 types<br/>cmd+numbers</td>
+   <td>UP IC IS RC PM</td>
+   <td>Server - Win<br/>Client - Win,Lin</td>
+   <td>+</td>
+   <td>Plugin cmd XML<br/><font size="-2">Scene Parser ?</font></td>
+   <td>?</td>
+   <td>CPU MEM</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      Advanced Server +500&#8364;<br/>
+      - Poor site documentation.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.squidnetsoftware.com/" target="_blank">SquidNet</a></td>
+   <td>Free &lt;= 2<br/>$20 per node<br/>+ $80 once</td>
+   <td>-</td>
+   <td>12 types<br/>cmd+numbers</td>
+   <td>UP</td>
+   <td>Win, Lin</td>
+   <td>+</td>
+   <td>GUI</td>
+   <td>disk</td>
+   <td>CPU MEM</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>+</td>
+   <td align="left"></td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.axceleon.com/render.html" target="_blank">EnFuzion</a><br/>(Axceleon)</td>
+   <td>$? (commercial)</td>
+   <td>-</td>
+   <td>19 types</td>
+   <td>-</td>
+   <td>Win, Lin, Mac, AIX, IRIX, Solaris</td>
+   <td>+</td>
+   <td>?</td>
+   <td>?</td>
+   <td>?</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      - Very poor site documentation, no even prices.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.liquiddreamsolutions.com/web5/index.php" target="_blank">ButterflyNetRender</a><br/>(Liquid Dream Solutions)</td>
+   <td>$125 per node<br/>+ $125 server<br/>+ product packs*</td>
+   <td>-<br/>$upgrade</td>
+   <td>12 types<br/>cmd+numbers</td>
+   <td>IS IC PM</td>
+   <td>Win, Lin</td>
+   <td>+</td>
+   <td>GUI</td>
+   <td>?</td>
+   <td>CPU MEM</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      * Various product packs for small companies includes 5-15 clients and server with various limitations.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.uberware.net/smedge/" target="_blank">Smedge</a></td>
+   <td>$85 - $65<br/>per client</td>
+   <td>-</td>
+   <td>25 types<br/>cmd+numbers</td>
+   <td>IC IS NM</td>
+   <td>Win, Mac, Lin</td>
+   <td>+</td>
+   <td>GUI</td>
+   <td>?</td>
+   <td>-</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>+</td>
+   <td align="left">$85(1-15), $75(16 - 50), $85(50+)</td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://seriss.com" target="_blank">Rush</a></td>
+   <td>$160 - $190<br/>per client</td>
+   <td>-</td>
+   <td>16 types<br/>cmd+numbers</td>
+   <td>IS NM</td>
+   <td>Win, Mac, Lin</td>
+   <td>+</td>
+   <td>GUI<br/>cmd</td>
+   <td>?</td>
+   <td>CPU (user + system per CPU) MEM SWAP</td>
+   <td>+<br/>f</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">$190(1-100),$180(101-200),$170(201-500),$160(501+)<br/>2004-ver102.41 - 2009-ver102.42a10</td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.vvertex.com" target="_blank">Muster</a></td>
+   <td>$85 per client<br/>unlimited $2499</td>
+   <td>-<br/>up$55($1499unl)</td>
+   <td>11 types<br/>cmd+numbers</td>
+   <td>IS IC NM</td>
+   <td>Lin, Mac, Win</td>
+   <td>+</td>
+   <td>GUI</td>
+   <td>SQL<br/>(SQLite MySQL)</td>
+   <td>CPU MEM SWAP</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      $55 upgrade, $1499 unlimited upgrade.<br/>
+      - Poor site documentation.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.pipelinefx.com/products/overview.php" target="_blank">Qube</a><br/>(PipelineFX)</td>
+   <td>$300 worker<br/>$600 supervisor<br/>Demo</td>
+   <td>sup worker $60<br/>sup server $120</td>
+   <td>26 types<br/>cmd+numbers</td>
+   <td>NM</td>
+   <td>Win, Mac, Lin</td>
+   <td>+</td>
+   <td>GUI<br/>cmd</td>
+   <td>SQL<br/>(MySQL)</td>
+   <td>CPU (used,total number) MEM SWAP</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">annual support: $300 supervisor $150 worker</td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.renderpal.com" target="_blank">RenderPal</a></td>
+   <td>Free &lt;= 3<br/>40€-45€ per client<br/>unlimited 1699€</td>
+   <td>-</td>
+   <td>26 types<br/>cmd+numbers</td>
+   <td>UP IS IC PM</td>
+   <td>Server,GUI - Win<br/>Client - Win,Mac,Lin</td>
+   <td>+</td>
+   <td>GUI</td>
+   <td>SQL<br/>(SQLite)</td>
+   <td>CPU MEM ping</td>
+   <td>+</td>
+   <td>-</td>
+   <td>+<br/>&#8364;</td>
+   <td>+ *</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">* <i>Multi Task Host</i> - only configures how many tasks of each type can be exected.</td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.franticfilms.com/software/support/deadline" target="_blank">Deadline</a><br/>(Frantic Films)</td>
+   <td>Free &lt;= 2<br/>$110 - $140<br/>per client</td>
+   <td>sup+up=<br/>$27.5-$35<br/>per node</td>
+   <td>37 types +SDK<br/>cmd+numbers</td>
+   <td>UP RC LR IS IC PM</td>
+   <td>Win, Mac, Lin</td>
+   <td>- *</td>
+   <td>GUI cmd<br/>Python API<br/>+SDK</td>
+   <td>shared folder<br/>(samba)</td>
+   <td>CPU MEM HDD</td>
+   <td>+<br/>f</td>
+   <td>-</td>
+   <td>-</td>
+   <td>- **</td>
+   <td>+</td>
+   <td>-</td>
+   <td><font size="-2">Regular Expression</font><br/>+SDK</td>
+   <td align="left">
+      + Total service limit to count network licensing of working program.<br/>
+      $140(&lt;25),$130(&lt;50),$120(&lt;100),$110(&lt;150),support+upgrade($27.5-$35)<br/>
+      * But main storage (repository) administration is "OK".<br/>
+      ** <i>Multi Task Host</i> - only configures how many tasks of each type can be exected.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="https://renderman.pixar.com/products/tools/alfred.html" target="_blank">Alfred</a><br/>(Pixar)</td>
+   <td>$350 per node<br/>+$1000 once</td>
+   <td>sup$200 per licence<br/>up$350+$1000</td>
+   <td>cmd array<br/>1 submit: RAT</td>
+   <td>-</td>
+   <td>Lin, Win, Mac</td>
+   <td>-</td>
+   <td>Script</td>
+   <td>local files<br/><font size="-2"><pre>SQL statistics*</pre></font></td>
+   <td>CPU (loadavg) MEM HDD</td>
+   <td>-</td>
+   <td>+</td>
+   <td>+ **</td>
+   <td>-</td>
+   <td>-</td>
+   <td>+</td>
+   <td>Build-in</td>
+   <td align="left">
+      * Only to store some statistics, not to store all server state.<br/>
+      ** Not client programs, their configuration.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left">Afanasy<br/>(<a href="http://cgru.sourceforge.net/" target="_blank">SourceForge</a>)<br/>(<a href="../../index.html" target="_blank">local doc</a>)</td>
+   <td><b><i>Free</i></b></td>
+   <td>-</td>
+   <td>cmd array<br/>cmd+numbers array*<br/>(QT+sprintf)<br/>4 submits</td>
+   <td>-</td>
+   <td>Server - Lin,Mac<br/>Client,GUI - Lin,Mac, Win(-alpha)</td>
+   <td>+</td>
+   <td>Python API<br/>cmd (python)</td>
+   <td>SQL<br/>(Postgre**)</td>
+   <td>CPU (user, nice, system, I/O wait, loadavg) MEM SWAP HDD NET</td>
+   <td>+</td>
+   <td>+</td>
+   <td>+</td>
+   <td>+</td>
+   <td>+</td>
+   <td>+</td>
+   <td>Python class</td>
+   <td align="left">
+      - Windows client program version is "alpha".<br/>
+      * <i>cmd+numbers array</i> - may be several patterns to fill with numbers to generate commands.<br/>
+      ** QSL database type may be reconfigured, you can use any driver that supported by Qt (MySQL, SQLite).<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://www.cinesoft.ru" target="_blank">DUMA</a><br/>(СineSoft)</td>
+   <td>$250 - $300<br/>per node</td>
+   <td>sup+up=<br/>$50 - $60<br/>per license</td>
+   <td>cmd array<br/>cmd+numbers<br/>(TCL)<br/>8 submits</td>
+   <td>IC(perl)</td>
+   <td>Win, Mac, Lin</td>
+   <td>+</td>
+   <td>Script<br/>(Alfred)</td>
+   <td>disk<br/><font size="-2"><pre>SQL statistics*</pre></font></td>
+   <td>CPU MEM HDD</td>
+   <td>+</td>
+   <td>+</td>
+   <td>+<br/>$</td>
+   <td>+</td>
+   <td>+</td>
+   <td>+</td>
+   <td><font size="-2">Regular Expression (TCL)**</font></td>
+   <td align="left">
+      Ask СineSoft for detailed prices.<br/>
+      * Only to store some statistics, not to store all server state.<br/>
+      ** + Output highlighting by QT Regular Expression.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <td align="left"><a href="http://gridengine.sunsource.net/" target="_blank">SGE</a><br/>(Sun Grid Engine)</td>
+   <td><b><i>Free</i></b></td>
+   <td>-</td>
+   <td>cmd</td>
+   <td>-</td>
+   <td>Lin, Mac, Solaris, AIX, HP-UX<br/>Win - host only</td>
+   <td>+<br/>+Shd*</td>
+   <td>cmd<br/>GUI</td>
+   <td>disk<br/><font size="-2"><pre>(+SQL**)</pre></font></td>
+   <td>CPU (loadavg + %) MEM(+Virtual) SWAP</td>
+   <td>+</td>
+   <td>+</td>
+   <td>-</td>
+   <td>+</td>
+   <td>-</td>
+   <td>-</td>
+   <td>-</td>
+   <td align="left">
+      - Not designed for CG.<br/>
+      * Shadow master hosts can detect a failure of the master daemon and take over its role as master host.<br/>
+      ** Not for internal usage. SQL database duplication only for users custom queries.<br/>
+   </td>
+</tr>
+<tr align="center">
+   <th><pre> Name </pre></th>
+   <th><pre>      Price      </pre><small>(2009.06.15)</small></th>
+   <th><pre>Annual<br/>Support<br/>and Upgrade</pre></th>
+   <th><pre>Engine</pre></th>
+   <th><pre>Other<br/>Tools</pre></th>
+   <th><pre>      OS      </pre></th>
+   <th>Main<br/>Server</th>
+   <th><pre>Job<br/>Submission</pre></th>
+   <th><pre>Storage</pre></th>
+   <th><pre> Host Resources </pre></th>
+   <th><font size="-1">Job<br/>Dep</font></th>
+   <th><font size="-1">Task<br/>Dep</font></th>
+   <th><font size="-2">Several<br/>Clients<br/>Same<br/>Host</font></th>
+   <th><font size="-1">Multi<br/>Task<br/>Host</font></th>
+   <th><font size="-1">Var<br/>CPU</font></th>
+   <th><font size="-1">Multi<br/>Host<br/>Task</font></th>
+   <th>Task<br/>Output<br/>Parsing</th>
+   <th align="left">
+      <pre>  Comment                                                                               </pre>
+      <small>&nbsp;&nbsp;( +/-: "good" or "not good" information )</small>
+   </th>
+</tr>
+</table>
+
+<hr />
+
+<p>
+<b><i>Price</i>:</b><br/>
+Product price at 2009.06.15. See links for current prices.<br/>
+Often depends on quantity of render nodes in your farm - how much clients can be connected to server. Its better when application can be launched and checked with one or several clients for free.<br/>
+</p>
+<p>
+<b><i>Engine</i>:</b><br/>
+<b>typed</b> - Command lines are generated by manager itself, depending on job type (Maya, Nuke, Houdini, RenderMan, e.t.c) and job settings like first and last frame, resolution, camera e.t.c. Most "ready" way<br/>
+<b>cmd+numbers</b> - Command lines are generated by filling some pattern with numbers (frames). Most "cheap" way. Usually client run a process with environment variables pointing on first and last frame to render, and your command may use them. (But how to split, for example, shadows ?).<br/>
+<b>cmd array</b> - Each job task has a command line. Most "customizable" way. You can do anything you want (you can do <b>IS, IC, LR</b> (see below) by writing you own "smart" commands and utilities).<br/>
+</p>
+<p>
+<b><i>Other tools</i>:</b><br/>
+Various tools, not directly related to tasks distribution. Better to do all this things yourself (admins, TDs can automate it) for full control, not by manager additional utilities or even engine. But it can be useful for small companies without TD.<br/>
+<b>UP</b> - Manager application update utilities (admins can do it in their favorite way).<br/>
+<b>NM</b> - Network drive mapping for MS Windows (better to use UNC paths).<br/>
+<b>IS</b> - Image splitting (slicing) or "Tile Render" (may be your application or image format are not supported).<br/>
+<b>IC</b> - Image checking. Often it is an ability to check existence and minimum size of specified files.<br/>
+<b>RC</b> - Copy scene local resources (wow :) TDs must care about resources location and movement, not users).<br/>
+<b>LR</b> - Local Render - render images locally and copy to final network location them after render complete. Can save network traffic (better to copy image once, not writing small portions during calculation).<br/>
+<b>PM</b> - Power Management - Server can shutdown clients if they are not busy for some time. May save electricity.<br/>
+Remember, <i>Alfred</i> with no tools, more popular in big and famous companies. No matter what manager can already do. Matter to be flexible to be able to learn to do anything, like a constructor. 
+</p>
+<p>
+<b><i>OS</i>:</b><br/>
+Operating system requirements.<br/>
+</p>
+<p>
+<b><i>Main Server</i>:</b><br/>
+Whether an application has a main server. Often its more comfortable to manage all users and all their jobs through server administration.<br/>
+</p>
+<p>
+<b><i>Job Submission</i>:</b><br/>
+The way to submit a job. Better to have some methods without any GUI to integrate in your working program in best way. Command line utility is the simplest way. Script is most flexible way, but will your write it yourself? You'll generate it in your application script. Python integrated in most popular CG programs, such as Houdini, Maya, Nuke. It is very comfortable to communicate and scene and manager within the same script.<br/>
+<b>GUI</b> - some special dialog to fill with values to submit a job.<br/>
+<b>cmd</b> - program which can submit a job parsing arguments.<br/>
+Integration with your working program can help you to integrate manager in your scene. For example in Nuke and Houdini there must be a node to generate and send jobs, not a dialog. This node you can connect with others, write expressions on its parameters.
+</p>
+<p>
+<b><i>Store</i>:</b><br/>
+The way manager stores jobs and may be other settings. No store means jobs loss on server restart. SQL is a standard way to store data, you can connect database your own way and make any unique queries you want (for example write Python or PHP scripts for you own utilities).<br/>
+</p>
+<p>
+<b><i>Host Resources</i>:</b><br/>
+What kind of resources render nodes send to server. CPU, memory and disk usage are usually present. Its good to know about SWAP usage as it can slow down process. Detailed CPU usage can be also very useful, whether it renders a task or perform some system operations or wait some IO devices. Network traffic can help you to find out network speed problems.<br/>
+</p>
+<p>
+<b><i>Job Dep</i>:</b><br/>
+Job dependence. Job can wait other job(s) to be done to run. Very useful, as result of one jobs can be sources for others.<br/>
+<b>f</b> - Whole job can be frame depending or not. If job is frame depending each its frame waits other job same frame. May be useful for managers without tasks dependence.<br/>
+</p>
+<p>
+<b><i>Task Dep</i>:</b><br/>
+Tasks dependence. Some job tasks can wait other job task(s) to be done to run. For example all frames can be started after some simulation and each frame can be stared after 2 its shadows.<br/>
+</p>
+<p>
+<b><i>Several Clients Same Host</i>:</b><br/>
+An ability to launch more than one clients on the same host. It is the simplest way to make host to render more tasks at the same time. Also another client may have its own configuration, for special purposes. Useful for comfortable debug, or simple check something new.<br/>
+</p>
+<p>
+<b><i>Multi Task Host</i>:</b><br/>
+One client can run several tasks at the same time. Useful for farm with hosts and tasks with different "power". More powerful machine can run more tasks. More lite tasks can be executed on the same machine. More balanced farm resources usage. No time wasting (time wasting may happen when client run some lite task which take no resources, but can't do to something else simultaneity, as server interpret it as "busy" or "free" only, server does not understand how much client busy).<br/>
+</p>
+<p>
+<b><i>Var CPU</i>:</b><br/>
+Software usually support specifying the number of CPUs in command line. Manager can learn rules for every application to vary tasks "power". This can help to fit render resources with tasks better. But only if manager supports previous ability (Multi Task Host).<br/>
+</p>
+<p>
+<b><i>Multi Host Task</i>:</b><br/>
+Some render applications supports running one frame on several hosts: "RenderMan NET Render", "Mantra multi host render", "Houdini 10 simulations".<br/>
+</p>
+<p>
+<b><i>Task Output Parsing</i>:</b><br/>
+The way manager parses task output (stdout&amp;stderr). The best way is a Python class. Python is programming language - it is flexibility. Class is not only method, you can store some useful data. Class inheritance - you can write come base basic classes and inherit them for more complex parsers.<br/>
+</p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

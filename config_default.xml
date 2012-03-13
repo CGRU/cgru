@@ -1,0 +1,11 @@
+<!-- Copy this file into 'config.xml' and setup you own -->
+<cgru>
+
+<!-- Documentation host
+If not set, local file will be opened, which can be not installed or old.
+-->
+<!--
+   <docshost>localhost</docshost>
+-->
+
+</cgru>

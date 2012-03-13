@@ -1,0 +1,121 @@
+// Copyright (C) 2000-2001 Michael Bazhutkin - Copyright (C) 2000 studio Klassika
+// www.geocites.com/bazhutkin
+// bazhutkin@mail.ru
+//
+//  Rivet (button) 1.0
+//  Script File
+//  MODIFY THIS AT YOUR OWN RISK
+//
+//  Creation Date:  April 13, 2001
+//
+//
+//  Description:
+//	Use "Rivet" to constrain locator to polygon or NURBS surfaces
+//	Select two edges on polygon object
+//	or select one point on NURBS surface and call rivet
+//	Parent your rivets and buttons to this locator
+
+global proc string bazh_rivet_globalProc( )
+{
+
+string $nameObject;
+string $namePOSI;
+
+string $parts[];
+string $list[] = `filterExpand -sm 32`;
+int $size = size($list);
+if ($size > 0)
+{
+	if ($size != 2)
+	{	cgruError("No two edges selected");
+		return "";
+	}
+
+	tokenize($list[0],".",$parts);
+	$nameObject = $parts[0];
+	tokenize($list[0],"[]",$parts);
+	float $e1 = $parts[1];
+	tokenize($list[1],"[]",$parts);
+	float $e2 = $parts[1];
+
+	string $nameCFME1 = `createNode curveFromMeshEdge -n "rivetCurveFromMeshEdge1"`;
+		setAttr ".ihi" 1;
+		setAttr ".ei[0]"  $e1;
+	string $nameCFME2 = `createNode curveFromMeshEdge -n "rivetCurveFromMeshEdge2"`;
+		setAttr ".ihi" 1;
+		setAttr ".ei[0]"  $e2;
+	string $nameLoft = `createNode loft -n "rivetLoft1"`;
+		setAttr -s 2 ".ic";
+		setAttr ".u" yes;
+		setAttr ".rsn" yes;
+
+	$namePOSI = `createNode pointOnSurfaceInfo -n "rivetPointOnSurfaceInfo1"`;
+		setAttr ".turnOnPercentage" 1;
+		setAttr ".parameterU" 0.5;
+		setAttr ".parameterV" 0.5;
+
+	connectAttr -f ($nameLoft + ".os") ($namePOSI + ".is");
+	connectAttr ($nameCFME1 + ".oc") ($nameLoft + ".ic[0]");
+	connectAttr ($nameCFME2 + ".oc") ($nameLoft + ".ic[1]");
+	connectAttr ($nameObject + ".w") ($nameCFME1 + ".im");
+	connectAttr ($nameObject + ".w") ($nameCFME2 + ".im");
+}
+else
+{	$list = `filterExpand -sm 41`;
+	$size = size($list);
+
+	if ($size > 0)
+	{
+		if ($size != 1)
+		{	cgruError("No one point selected");
+			return "";
+		}
+		tokenize($list[0],".",$parts);
+		$nameObject = $parts[0];
+		tokenize($list[0],"[]",$parts);
+		float $u = $parts[1];
+		float $v = $parts[2];
+		$namePOSI = `createNode pointOnSurfaceInfo -n "rivetPointOnSurfaceInfo1"`;
+				setAttr ".turnOnPercentage" 0;
+				setAttr ".parameterU" $u;
+				setAttr ".parameterV" $v;
+		connectAttr -f ($nameObject + ".ws") ($namePOSI + ".is");
+	}
+	else
+	{	
+		cgruError("No edges or point selected");
+		return "";
+	}
+}
+
+string $nameLocator = `createNode transform -n "rivet1"`;
+createNode locator -n ($nameLocator + "Shape") -p $nameLocator;
+
+string $nameAC = `createNode aimConstraint -p $nameLocator -n ($nameLocator + "_rivetAimConstraint1")`;
+	setAttr ".tg[0].tw" 1;
+	setAttr ".a" -type "double3" 0 1 0;
+	setAttr ".u" -type "double3" 0 0 1;
+	setAttr -k off ".v";
+	setAttr -k off ".tx";
+	setAttr -k off ".ty";
+	setAttr -k off ".tz";
+	setAttr -k off ".rx";
+	setAttr -k off ".ry";
+	setAttr -k off ".rz";
+	setAttr -k off ".sx";
+	setAttr -k off ".sy";
+	setAttr -k off ".sz";
+
+connectAttr ($namePOSI + ".position") ($nameLocator + ".translate");
+connectAttr ($namePOSI + ".n") ($nameAC + ".tg[0].tt");
+connectAttr ($namePOSI + ".tv") ($nameAC + ".wu");
+connectAttr ($nameAC + ".crx") ($nameLocator + ".rx");
+connectAttr ($nameAC + ".cry") ($nameLocator + ".ry");
+connectAttr ($nameAC + ".crz") ($nameLocator + ".rz");
+
+select -r $nameLocator;
+return ($nameLocator);
+
+}
+
+bazh_rivet_globalProc;

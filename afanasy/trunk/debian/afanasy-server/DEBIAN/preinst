@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Afanasy server PRE INSTALL"
+
+if [ -e /etc/init.d/afserver ]; then
+   echo "Trying to stop previously installed service..."
+   /etc/init.d/afserver stop || true
+fi
+
+exit 0

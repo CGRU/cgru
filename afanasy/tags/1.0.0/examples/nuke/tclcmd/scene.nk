@@ -1,0 +1,65 @@
+#! /cg/soft/Nuke4.7v2/Nuke4.7 -nx
+version 4.7200
+define_window_layout -1 {  {4 0 0.00234375 0 0.680469 0.714667 0 1 {-320 -325 1 0.28271 0}}  {2 0 0.64375 0 1 1 0 1 {0}} }
+restore_window_layout_from_script -1
+Root {
+ inputs 0
+ name /cg/tools/cgru/examples/nuke/tclcmd/scene.nk
+ frame 3
+ format "640 480 0 0 640 480 1 PC_Video"
+ proxy_format "640 480 0 0 640 480 1 PC_Video"
+ lookup {lookup {to_sRGB(x) C 0 255}}
+}
+ColorBars {
+ inputs 0
+ name ColorBars1
+ xpos 79
+ ypos -195
+}
+Transform {
+ translate {{250*noise(1.23+.03*frame)} {250*noise(2.34+.02*frame)}}
+ rotate {{360*noise(3.45+.01*frame)}}
+ scale {{.5+.3*noise(4.56+.01*frame)}}
+ center {320 240}
+ name Transform1
+ xpos 79
+ ypos -121
+}
+Write {
+ file render/img.%04d.jpg
+ file_type jpeg
+ _jpeg_quality 0.95
+ name Write1
+ xpos 79
+ ypos -45
+}
+afanasy {
+ inputs 1
+ name afanasy
+ xpos 189
+ ypos -45
+ tab1 1
+ jname ""
+ use_time_range_button ""
+ first 1
+ last 10
+ fpr 1
+ render_button ""
+ tab2 1
+ pause false
+ pri -1
+ hmax -1
+ hmask ""
+ hmaske ""
+ dmask ""
+ dmaskg ""
+ capacity -1
+ capmin -1
+ capmax -1
+}
+Viewer {
+ roi {-0.5 -0.3 0.5 0.3}
+ name Viewer1
+ xpos -42
+ ypos 34
+}

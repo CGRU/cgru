@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Afanasy render PRE INSTALL"
+
+if [ -e /etc/init.d/afrender ]; then
+   echo "Trying to stop previously installed service..."
+   /etc/init.d/afrender stop || true
+fi
+
+exit 0

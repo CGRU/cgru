@@ -1,0 +1,246 @@
+global int $timaRenderingFlags_rAttrsNumber = 15;	// number of attrinures
+global string $timaRenderingFlags_rAttrsNames[];
+clear $timaRenderingFlags_rAttrsNames;
+global string $timaRenderingFlags_rAttrsFullNames[];
+clear $timaRenderingFlags_rAttrsFullNames;
+$timaRenderingFlags_rAttrsNames =
+{
+	"castsShadows",			// 1
+	"receiveShadows",		// 2
+	"motionBlur",			// 3
+	"primaryVisibility",		// 4
+	"smoothShading",		// 5
+	"visibleInReflections",		// 6
+	"visibleInRefractions",		// 7
+	"doubleSided",			// 8
+	"opposite",			// 9
+	"miTransparencyCast",		// 10
+	"miTransparencyReceive",	// 11
+	"miReflectionReceive",		// 12
+	"miRefractionReceive",		// 13
+	"miFinalGatherCast",		// 14
+	"miFinalGatherReceive"		// 15
+};
+$timaRenderingFlags_rAttrsFullNames =
+{
+	"Casts Shadows",		// 1
+	"Reciave Shadows",		// 2
+	"Motion Blur",			// 3
+	"Primary Visibility",		// 4
+	"Smooth Shading",		// 5
+	"Visible In Reflections",	// 6
+	"Visible In Refractions",	// 7
+	"Double Sided",			// 8
+	"Opposite",			// 9
+	"Visible In Transparency",	// 10
+	"Transmit In Transparency",	// 11
+	"Trace Reflection",		// 12
+	"Transmit Refraction",		// 13
+	"Final Gather Cast",		// 14
+	"Final Gather Receive"		// 15
+};
+//####################################################################################
+global proc timaRenderingFlags_Refresh_globalProc( int $mode)
+{
+global string $timaRenderingFlags_rAttrsNames[];
+global int $timaRenderingFlags_rAttrsNumber;
+
+	float $cRon = 0.9;	float $cRsm = 0.7;	float $cRof = 0.6;
+	float $cGon = 0.9;	float $cGsm = 0.7;	float $cGof = 0.6;
+	float $cBon = 0.4;	float $cBsm = 0.5;	float $cBof = 0.6;
+
+	text -e -bgc $cRon $cGon $cBon timaRenderingFlags_allON_TX;
+	text -e -bgc $cRsm $cGsm $cBsm timaRenderingFlags_sONsOFF_TX;
+	text -e -bgc $cRof $cGof $cBof timaRenderingFlags_allOFF_TX;
+	if($mode == -1) return;
+	text -e -l "scanning" timaRenderingFlags_status_TX;
+/*
+ -bgc $cRon $cGon $cBon
+ -bgc $cRsm $cGsm $cBsm
+   -bgc $cRof $cGof $cBof             ("timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_CB");
+
+*/
+	string $selArray[] = `ls -sl -dag -et mesh -et nurbsSurface -et subdiv`;
+	if(`size $selArray` == 0)
+	{
+		text -e -l "no shapes selected" timaRenderingFlags_status_TX;
+		return;
+	}
+	int $attrIndex;
+	for( $attrIndex = 0; $attrIndex < $timaRenderingFlags_rAttrsNumber; $attrIndex++)
+		$rAttrsFlags[$attrIndex] = -1;
+	string $shape;
+	int $count = 0;
+	int $digits = 0;
+	for( $shape in $selArray)
+	{
+		for( $attrIndex = 0;  $attrIndex < $timaRenderingFlags_rAttrsNumber;  $attrIndex++)
+		{
+			if(`getAttr ($shape + "." + $timaRenderingFlags_rAttrsNames[$attrIndex])`)
+			{
+				if($rAttrsFlags[$attrIndex] == -1) $rAttrsFlags[$attrIndex] = 1;
+				else if ($rAttrsFlags[$attrIndex] == 0) $rAttrsFlags[$attrIndex] = 2;
+			}
+			else
+			{
+				if($rAttrsFlags[$attrIndex] == -1) $rAttrsFlags[$attrIndex] = 0;
+				else if ($rAttrsFlags[$attrIndex] == 1) $rAttrsFlags[$attrIndex] = 2;
+			}
+		}
+		$count++;
+		int $cur = $count/1000;
+		if($cur > $digits)
+		{
+			$digits = $cur;
+			string $outText = "scanning";
+			int $i;
+			for( $i = 0; $i < $digits; $i++)
+				$outText += ".";
+			text -e -l $outText timaRenderingFlags_status_TX;
+		}
+	}
+   for( $attrIndex = 0;  $attrIndex < $timaRenderingFlags_rAttrsNumber;  $attrIndex++)
+   {
+      string $cmd_CB = "checkBox -e  -enable 1 -bgc ";
+      string $cmd_TX = "text -e -bgc ";
+      switch ($rAttrsFlags[$attrIndex])
+      {
+      case 0:
+         $cmd_CB = $cmd_CB + $cRof + " " + $cGof + " " + $cBof + " -v 0 ";
+         $cmd_TX = $cmd_TX + $cRof + " " + $cGof + " " + $cBof + " -l \"OFF\" ";
+         break;
+      case 1:
+         $cmd_CB = $cmd_CB + $cRon + " " + $cGon + " " + $cBon + " -v 1 ";
+         $cmd_TX = $cmd_TX + $cRon + " " + $cGon + " " + $cBon + " -l \"ON\" ";
+         break;
+      case 2:
+         $cmd_CB = $cmd_CB + $cRsm + " " + $cGsm + " " + $cBsm + " -v 1 ";
+         $cmd_TX = $cmd_TX + $cRsm + " " + $cGsm + " " + $cBsm + " -l \"OFF|ON\" ";
+         break;
+      }
+      $cmd_CB = $cmd_CB + "timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_CB;";
+      $cmd_TX = $cmd_TX + "timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_TX;";
+      eval($cmd_CB);
+      eval($cmd_TX);
+   }
+   int $h = `window -q -h timaRenderingFlags_Wnd`;
+   window -e -h ($h+1) timaRenderingFlags_Wnd;
+   window -e -h $h timaRenderingFlags_Wnd;
+   text -e -l "refreshed" timaRenderingFlags_status_TX;
+}
+//#####################################################################################
+global proc timaRenderingFlags_set_globalProc( int $attrIndex)
+{
+global string $timaRenderingFlags_rAttrsNames[];
+global int $timaRenderingFlags_rAttrsNumber;
+
+	text -e -l "setting" timaRenderingFlags_status_TX;
+	int $rAttrsFlags[];
+	string $selArray[] = `ls -sl -dag -et mesh -et nurbsSurface -et subdiv`;
+	if(`size $selArray` == 0)
+	{
+		text -e -l "no shapes selected" timaRenderingFlags_status_TX;
+		return;
+	}
+	if ($attrIndex == -1)
+	{
+		for( $attrIndex = 0;  $attrIndex < $timaRenderingFlags_rAttrsNumber;  $attrIndex++)
+			$rAttrsFlags[$attrIndex] = `eval("checkBox -q -v " + "timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_CB;")`;
+		string $shape;
+		int $count = 0;
+		int $digits = 0;
+		for( $shape in $selArray)
+		{
+			int $attrIndex;
+			for( $attrIndex = 0;  $attrIndex < $timaRenderingFlags_rAttrsNumber;  $attrIndex++)
+				setAttr ($shape + "." + $timaRenderingFlags_rAttrsNames[$attrIndex]) $rAttrsFlags[$attrIndex];
+			$count++;
+			int $cur = $count/1000;
+			if($cur > $digits)
+			{
+				$digits = $cur;
+				string $outText = "setting";
+				int $i;
+				for( $i = 0; $i < $digits; $i++)
+					$outText += ".";
+				text -e -l $outText timaRenderingFlags_status_TX;
+			}
+		}
+		text -e -l "set all" timaRenderingFlags_status_TX;
+	}
+	else
+	{
+		$flag = `eval("checkBox -q -v " + "timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_CB;")`;
+		int $count = 0;
+		int $digits = 0;
+		for( $shape in $selArray)
+		{
+			setAttr ($shape + "." + $timaRenderingFlags_rAttrsNames[$attrIndex]) $flag;
+			$count++;
+			int $cur = $count/1000;
+			if($cur > $digits)
+			{
+				$digits = $cur;
+				string $outText = "setting";
+				int $i;
+				for( $i = 0; $i < $digits; $i++)
+					$outText += ".";
+				text -e -l $outText timaRenderingFlags_status_TX;
+			}
+		}
+		text -e -l ($timaRenderingFlags_rAttrsNames[$attrIndex] + " " + $flag) timaRenderingFlags_status_TX;
+	}
+}
+//############################################################################################################
+{
+	if(`window -exists timaRenderingFlags_Wnd`) deleteUI timaRenderingFlags_Wnd;
+   int $cw1 = 170;
+   int $cw2 = 35;
+   int $cw3 = 60;
+   window -t "Rendering Flags" timaRenderingFlags_Wnd;
+	columnLayout -adj 1;
+      rowLayout -nc 3 -ad3 1 -cw3 $cw1 $cw2 $cw3;
+         text -l " all ON " -align "right" -font "fixedWidthFont" timaRenderingFlags_allON_TX;
+         text -l " --- " -font "fixedWidthFont" timaRenderingFlags_allON_TXD;
+         text -l "\"ON\"" -font "fixedWidthFont" timaRenderingFlags_allON_TXT;
+         setParent ..;
+      rowLayout -nc 3 -adj 1 -cw3 $cw1 $cw2 $cw3;
+         text -l " some ON some OFF " -align "right" -font "fixedWidthFont" timaRenderingFlags_sONsOFF_TX;
+         text -l " --- " -font "fixedWidthFont" timaRenderingFlags_sONsOFF_TXD;
+         text -l "\"ON|OFF\"" -font "fixedWidthFont" timaRenderingFlags_sONsOFF_TXT;
+         setParent ..;
+      rowLayout -nc 3 -adj 1 -cw3 $cw1 $cw2 $cw3;
+         text -l " all OFF " -align "right" -font "fixedWidthFont" timaRenderingFlags_allOFF_TX;
+         text -l " --- " -font "fixedWidthFont" timaRenderingFlags_allOFF_TXD;
+         text -l "\"OFF\"" -font "fixedWidthFont" timaRenderingFlags_allOFF_TXT;
+         setParent ..;
+      separator;
+      string $buton_set_name = "Set";
+      int $attrIndex;
+      for( $attrIndex = 0; $attrIndex < $timaRenderingFlags_rAttrsNumber; $attrIndex++)
+      {
+			if($attrIndex == 10) text -l " --- mental ray --- ";
+         rowLayout -nc 3 -adj 1 -cw3 $cw1 $cw2 $cw3;
+				checkBox -align left
+					-l $timaRenderingFlags_rAttrsFullNames[$attrIndex]
+					-ann $timaRenderingFlags_rAttrsNames[$attrIndex]
+					("timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_CB");
+				button -l $buton_set_name
+					-c ("timaRenderingFlags_set_globalProc(" + $attrIndex + ");");
+            text -l " ... "
+               ("timaRenderingFlags_" + $timaRenderingFlags_rAttrsNames[$attrIndex] + "_TX");
+			setParent ..;
+		}
+      rowLayout -nc 2 -adj 1 -cw2 $cw1 ($cw2 + $cw3);
+			button -l "refresh" -c "timaRenderingFlags_Refresh_globalProc(0);";
+			button -l "Set All" -c "timaRenderingFlags_set_globalProc(-1);";
+		setParent ..;
+		separator;
+      rowLayout -nc 2 -adj 1 -cw2 $cw1 ($cw2+$cw3);
+			text -l "ok" -align "left" timaRenderingFlags_status_TX;
+			button -l " help " -bgc .9 .9 .6
+				-c "showHelp -absolute `toNativePath( $cgruDir_DOC + \"/rendering_/tima_renderingflags.html\")`;";
+		setParent ..;
+	showWindow timaRenderingFlags_Wnd;
+	timaRenderingFlags_Refresh_globalProc(-1);
+}

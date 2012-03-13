@@ -1,0 +1,18 @@
+global proc afanasyBatch(
+        float $start,
+        float $end,
+        float $by,
+        int $isInteractiveBatch        // interactive batch or command line rendering
+/*        string $sceneName,                      // the original scene name before export
+        string $layer,                          // render specific layer
+        string $renderer,                       // use specific renderer is not empty string.
+        string $option                          // optional arg to the render command*/
+)
+{
+    string $RG[] = `ls -type "renderGlobals"`;
+    setAttr ($RG[0] +".startFrame") $start;
+    setAttr ($RG[0] +".endFrame") $end;
+    setAttr ($RG[0] +".byFrameStep") $by;
+//    mayaBatchRenderProcedure($isInteractiveBatch,$sceneName,$layer,$renderer,$option);
+    mayaBatchRenderProcedure("","","","","");
+}

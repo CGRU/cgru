@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "CGRU common POST INSTALL"
+
+pydir="/opt/cgru/lib/python"
+if [ -d "${pydir}" ]; then
+   chmod a+rwx "${pydir}"
+fi
+
+exit 0

@@ -1,0 +1,115 @@
+<!-- Copy this file into "farm.xml" and describe you own -->
+<farm>
+   <pattern name="Some Host">
+      <mask>.*</mask>
+      <description>Unrecognized machine</description>
+      <capacity>1100</capacity>
+      <maxtasks>2</maxtasks>
+      <power>1000</power>
+      <service name="generic" />
+      <service name="nuke" />
+      <service name="hbatch" />
+      <service name="prman" />
+      <service name="mantra" />
+      <service name="hbatch_prman" />
+      <service name="hbatch_mantra" />
+      <service name="maya" />
+      <service name="blender" />
+      <service name="blender_internal" />
+      <service name="blender_yafray" />
+      <service name="yafray" />
+      <os>linux mac windows</os>
+<!--
+This is commented text.
+-->
+   </pattern>
+   <pattern name="Render Host">
+      <mask>r.*</mask>
+      <description>Some render machine</description>
+      <os>linux</os>
+      <capacity>1100</capacity>
+      <maxtasks>2</maxtasks>
+      <power>1000</power>
+      <service name="generic" />
+      <service name="nuke" count="2"/>
+      <service name="prman" count="2" />
+      <service name="mantra" />
+      <service name="hbatch" />
+      <service name="hbatch_mantra" />
+   </pattern>
+   <pattern name="Renders #1">
+      <mask>r0.*</mask>
+      <description>First 2CPU renders</description>
+      <os>linux</os>
+      <maxtasks>20</maxtasks>
+      <capacity>1100</capacity>
+      <power>2000</power>
+      <properties>intel</properties>
+      <service name="generic" />
+      <service name="nuke" count="2"/>
+      <service name="prman" count="2" />
+      <service name="prman" />
+      <service name="mantra" />
+      <service name="hbatch" />
+      <service name="hbatch_mantra" />
+   </pattern>
+   <pattern name="Renders #2">
+      <mask>r1.*</mask>
+      <description>Second 4CPU renders</description>
+      <os>linux</os>
+      <maxtasks>40</maxtasks>
+      <capacity>4400</capacity>
+      <power>4000</power>
+      <properties>intel nvidiagpu</properties>
+      <service name="generic" />
+      <service name="nuke" />
+      <service name="prman" count="2" />
+      <service name="mantra" />
+      <service name="hbatch" />
+      <service name="hbatch_mantra" />
+   </pattern>
+   <pattern name="Renders #3">
+      <mask>r2.*</mask>
+      <description>Third 8CPU renders</description>
+      <os>linux</os>
+      <maxtasks>80</maxtasks>
+      <capacity>8800</capacity>
+      <power>8000</power>
+      <properties>intel nvidiagpu</properties>
+      <service name="generic" />
+      <service name="nuke" />
+      <service name="prman" count="2" />
+      <service name="mantra" />
+      <service name="hbatch" />
+      <service name="hbatch_mantra" />
+   </pattern>
+   <pattern name="WndStation">
+      <mask>w.*</mask>
+      <description>Windows workstation</description>
+      <os>windows</os>
+      <maxtasks>1</maxtasks>
+      <capacity>1000</capacity>
+      <power>1000</power>
+      <service name="generic"/>
+   </pattern>
+   <pattern name="LinStation">
+      <mask>l.*</mask>
+      <description>Linux workstation</description>
+      <os>linux</os>
+      <maxtasks>1</maxtasks>
+      <capacity>1000</capacity>
+      <power>1000</power>
+      <service name="generic" />
+      <service name="nuke" />
+      <service name="prman" />
+      <service name="mantra" />
+      <service name="hbatch" />
+      <service name="hbatch_mantra" />
+      <service name="hbatch_prman" />
+      <service name="maya" />
+      <service name="blender" />
+      <service name="blender_internal" />
+      <service name="blender_yafray" />
+      <service name="yafray" />
+   </pattern>
+</farm>

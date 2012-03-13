@@ -1,0 +1,70 @@
+
+global proc tima_ScriptJobMgr_Refresh_globalProc()
+{
+	string $scriptJob_lj_array[] = `scriptJob -lj`;
+	string $curJob;
+	string $listJobs[];
+	int $numJobs[];
+	int $count = 0;
+	for ($curJob in $scriptJob_lj_array)
+	{
+		if((`gmatch $curJob "*-*"` == 0) && (`checkBox -q -v tima_ScriptJobMgrWnd_checkBox`)) continue;
+		string $tmpStr = `match "[0-9]+:" $curJob`;
+		int $tmpInt = `size($tmpStr)` - 1;
+		$tmpStr = `substring $tmpStr 1 $tmpInt`;
+		$numJobs[$count] = int($tmpStr);
+		$tmpStr = `substitute "[0-9]+:" $curJob ""`;
+		$listJobs[$count] = $tmpStr;
+		$count++;
+	}
+	deleteUI tima_ScriptJobMgrWnd_columnLayout;
+	setParent tima_ScriptJobMgrWnd_frameLayout;
+	columnLayout -adj 1 tima_ScriptJobMgrWnd_columnLayout;
+	$count = 0;
+	for ($curJob in $listJobs)
+	{
+		separator;
+		rowLayout -nc 2 -adj 2 -cw 1 60 -bgc 0.7 0.7 0.7;
+			button -bgc 0.9 0.7 0.6 -l ("kill " + $numJobs[$count]) -c ("tima_ScriptJobMgr_Kill_globalProc(" + $numJobs[$count] + ")");
+			text -l ($curJob) -bgc 0.95 0.95 0.95;
+			setParent..;
+		$count++;
+	}
+}
+
+global proc tima_ScriptJobMgr_Kill_globalProc(int $jobId)
+{
+	scriptJob -kill $jobId -force;
+	tima_ScriptJobMgr_Refresh_globalProc();
+}
+proc tima_ScriptJobMgr_globalProc()
+{
+	if(`window -exists tima_ScriptJobMgrWnd`) deleteUI tima_ScriptJobMgrWnd;
+	window -title "tima_  Script Job Manager" tima_ScriptJobMgrWnd;
+	formLayout -numberOfDivisions 10 tima_ScriptJobMgrWnd_formLayout;
+		rowLayout -nc 3 -cw3 50 250 150 tima_ScriptJobMgrWnd_rowLayout;
+			button -h 18 -l "refresh" -c "tima_ScriptJobMgr_Refresh_globalProc()";
+			text -h 18 - l " click \"kill #\" button to force kill scriptJob ";
+			checkBox -l " hide empty id " -v 1 tima_ScriptJobMgrWnd_checkBox;
+			setParent..;
+		scrollLayout tima_ScriptJobMgrWnd_scrollLayout;
+			frameLayout -l "current script jobs :" -borderStyle "in" tima_ScriptJobMgrWnd_frameLayout;
+				columnLayout tima_ScriptJobMgrWnd_columnLayout;
+	formLayout -e
+
+		-attachForm		tima_ScriptJobMgrWnd_rowLayout     "top"    0
+	    	-attachForm		tima_ScriptJobMgrWnd_rowLayout     "left"   0
+	    	-attachOppositeForm	tima_ScriptJobMgrWnd_rowLayout     "bottom" -19
+	    	-attachForm		tima_ScriptJobMgrWnd_rowLayout	"right"  0
+
+		-attachForm		tima_ScriptJobMgrWnd_scrollLayout     "top"    20
+	    	-attachForm		tima_ScriptJobMgrWnd_scrollLayout     "left"   0
+	    	-attachForm		tima_ScriptJobMgrWnd_scrollLayout     "bottom" 0
+	    	-attachForm		tima_ScriptJobMgrWnd_scrollLayout     "right"  0
+
+		tima_ScriptJobMgrWnd_formLayout;
+	showWindow tima_ScriptJobMgrWnd;
+	tima_ScriptJobMgr_Refresh_globalProc();
+}
+
+tima_ScriptJobMgr_globalProc();

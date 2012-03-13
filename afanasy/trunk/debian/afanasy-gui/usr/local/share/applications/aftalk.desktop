@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=Talk
+Comment=Chat Afanasy Client
+Exec=/opt/cgru/afanasy/bin/aftalk
+Icon=aftalk
+Terminal=false
+Type=Application
+Categories=X-CGRU

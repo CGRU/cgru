@@ -1,0 +1,78 @@
+Gizmo {
+   tile_color 0x6e9048ff
+   note_font_color 0x200ff
+
+   addUserKnob { 20 ""        l General        }
+   addUserKnob {  1 jobname   l "Job Name"     }
+   addUserKnob { 26 "" l "" }
+   addUserKnob { 32 "" "Use time range" T {
+                  knob [node this].framefirst [knob root.first_frame]
+                  knob [node this].framelast  [knob root.last_frame ]
+      }
+   }
+   addUserKnob {  3 framefirst      l "First Frame"      }
+   addUserKnob {  3 framelast       l "Last Frame"       }
+   addUserKnob {  3 framespertask   l "Frames Per Task"  }
+   addUserKnob { 26 "" l ""}
+   addUserKnob { 22 knob_1 l RENDER T "afanasy.render( nuke.toNode(\"this\"))"}
+   addUserKnob {  6 startpaused     l "Start Paused"     }
+
+   addUserKnob { 20 "" Parameters }
+   addUserKnob {  3 maxhosts        l "Maximum Hosts"          }
+   addUserKnob {  3 priority        l "Priority"               }
+   addUserKnob {  1 hostsmask       l "Hosts Mask"             }
+   addUserKnob {  1 hostsmaskexcl   l "Exclude Hosts Mask"     }
+   addUserKnob {  1 dependmask      l "Depend Mask"            }
+   addUserKnob {  1 dependmaskglbl  l "Global Depend Mask"     }
+   addUserKnob {  3 capacity        l "Capacity"               }
+   addUserKnob {  3 capacitymin     l "Minimum Capacity Coeff" }
+   addUserKnob {  3 capacitymax     l "Maximum Capacity Coeff" }
+
+   addUserKnob { 20 "" MultiWrite }
+   addUserKnob {  1 addnodes    l "Add Nodes"    }
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 independent l "Connected nodes are independent" }
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 reversedeps l "Reverse dependences on connected nodes" }
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 fullrange   l "Down stream will wait for whole frame range rendered" }
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 forceframes l "Force upstream frame settings" }
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 singlejob   l "Construct single job from all connected nodes" }
+
+   name afanasy
+
+   jobname          ""
+   framefirst      1
+   framelast      11
+   framespertask   1
+   startpaused     0
+
+   maxhosts       -1
+   priority       -1
+   capacity       -1
+   capacitymin    -1
+   capacitymax    -1
+   hostsmask      ""
+   hostsmaskexcl  ""
+   dependmask     ""
+   dependmaskglbl ""
+
+   addnodes       ""
+   independent    0
+   reversedeps    1
+   fullrange      0
+   forceframes    0
+   singlejob      1
+
+   help "- Please, Afanasy, help me to render."
+}
+
+for { set i 0 } { $i < 100 } { incr i } {
+   Input { }
+}
+
+Output { name Output1 }
+
+end_group

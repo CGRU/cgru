@@ -1,0 +1,132 @@
+global proc tima_randchannels_globalProc( int $operation)
+{
+	string $objects[] = selectedChannelBoxObjects();
+	if(!`size($objects)`)
+	{
+		cgruWarning("No attributes selected in the channel box.");
+		return;
+	}
+	string $attributes[] = selectedChannelBoxAttributes();
+	if(!`size($attributes)`)
+	{
+		cgruWarning("No attributes selected in the channel box.");
+		return;
+	}
+	float $base = `floatField -q -v tima_randchannels_base_floatField`;
+	float $min = `floatField -q -v tima_randchannels_min_floatField`;
+	float $max = `floatField -q -v tima_randchannels_max_floatField`;
+	int $same = `checkBox -q -v tima_randchannels_same_checkBox`;
+	int $sphrand = `checkBox -q -v tima_randchannels_sphrand_checkBox`;
+	string $object, $attribute, $plug, $cmd;
+	float $old_val, $new_val, $rnd;
+	vector $vec;
+	float $r_x, $r_y, $r_z, $len, $n_x, $n_y, $n_z;
+	int $counter = 0;
+	for($object in $objects)
+	{
+		if($same)
+			$rnd = $base + rand( $min, $max);
+		if($sphrand)
+		{
+			do
+			{
+				$vec = sphrand( 1);
+				$len = sqrt(($vec.x)*($vec.x) + ($vec.y)*($vec.y) + ($vec.z)*($vec.z));
+			} while ($len == 0);
+			$n_x = ($vec.x) / $len;
+			$n_y = ($vec.y) / $len;
+			$n_z = ($vec.z) / $len;
+			$len = $min + ($max-$min)*$len;
+			$r_x = $base + ($n_x)*$len;
+			$r_y = $base + ($n_y)*$len;
+			$r_z = $base + ($n_z)*$len;
+		}
+		for($attribute in $attributes)
+		{
+			$plug = $object + "." + $attribute;
+			if((!$same) && (!$sphrand))
+				$rnd = $base + rand( $min, $max);
+			if($sphrand)
+			{
+				if(($counter % 3) == 0) $rnd = $r_x;
+				if(($counter % 3) == 1) $rnd = $r_y;
+				if(($counter % 3) == 2) $rnd = $r_z;
+				$counter++;
+			}
+			$old_val = 0.0;
+			$cmd = "getAttr " + $plug;
+			if(!catch(`eval $cmd`))
+				$old_val = `eval $cmd`;
+			switch( $operation)
+			{
+				case 0:
+					$new_val = $rnd;
+					break;
+				case 1:
+					$new_val = $old_val + $rnd;
+					break;
+				case 2:
+					$new_val = $old_val - $rnd;
+					break;
+				case 3:
+					$new_val = $old_val * $rnd;
+					break;
+				case 4:
+					if($rnd != 0.0)
+						$new_val = $old_val / $rnd;
+					else
+					{
+						$new_val = $old_val;
+						cgruWarning("Divizion by zero in plug " + $plug + ". Old value restored.");
+					}
+					break;
+			}
+			$cmd = "setAttr " + $plug + " " + $new_val;
+			catch(`eval $cmd`);
+		}
+	}
+}
+
+{
+	if(`window -exists tima_randchannels_window`) deleteUI tima_randchannels_window;
+	int $ww = 128;
+	int $wh = 40;
+	window -t "Randomize Values" -toolbox 1 -mnb 0 -mxb 0 -rtf 1 -sizeable off -wh $ww $wh tima_randchannels_window;
+	columnLayout;
+		int $cw = $ww/3;
+		int $fw = $cw - 2;
+		int $fh = 20;
+		rowLayout -nc 3 -cw3 $cw $cw $cw;
+			text -l " base" -w $fw -h $fh -ann "random = base + rand( min, max)";
+			text -l "      min" -w $fw -h $fh -ann "random = base + rand( min, max)";
+			floatField -v -1.0 -pre 2 -w $fw -h $fh -ann "random = base + rand( min, max)" tima_randchannels_min_floatField;
+		setParent..;
+		rowLayout -nc 3 -cw3 $cw $cw $cw;
+			floatField -v 0.0 -pre 2 -w $fw -h $fh -ann "random = base + rand( min, max)" tima_randchannels_base_floatField;
+			text -l "      max" -w $fw -h $fh -ann "random = base + rand( min, max)";
+			floatField -v 1.0 -pre 2 -w $fw -h $fh -ann "random = base + rand( min, max)" tima_randchannels_max_floatField;
+		setParent..;
+		$cw = $ww/5;
+		rowLayout -nc 5 -cw5 $cw $cw $cw $cw $cw;
+		int $bw = $cw - 2;
+		int $bh = 16;
+			button -l " = " -w $bw -h $bh -c "tima_randchannels_globalProc(0);"
+				-ann "New value = base + rand( min, max)"
+				tima_randchannels_equal_button;
+			button -l " + " -w $bw -h $bh -c "tima_randchannels_globalProc(1);"
+				-ann "New value = Old value + (base + rand( min, max))"
+				tima_randchannels_plus_button;
+			button -l " - " -w $bw -h $bh -c "tima_randchannels_globalProc(2);"
+				-ann "New value = Old value - (base + rand( min, max))"
+				tima_randchannels_minus_button;
+			button -l " * " -w $bw -h $bh -c "tima_randchannels_globalProc(3);"
+				-ann "New value = Old value * (base + rand( min, max))"
+				tima_randchannels_mult_button;
+			button -l " / " -w $bw -h $bh -c "tima_randchannels_globalProc(4);"
+				-ann "New value = Old value / (base + rand( min, max))"
+				tima_randchannels_div_button;
+		setParent..;
+		checkBox -l "the same per object" tima_randchannels_same_checkBox;
+		checkBox -l "sphrand first 3 attrs" tima_randchannels_sphrand_checkBox;
+	showWindow tima_randchannels_window;
+}

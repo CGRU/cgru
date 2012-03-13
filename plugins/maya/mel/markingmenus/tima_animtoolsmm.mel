@@ -1,0 +1,28 @@
+//
+//	AnimToolsMM.mel
+//
+//###################################################################################################################
+
+global proc tima_AnimToolsMMP_globalProc()
+{
+	if (`popupMenu -exists tempMM`) { deleteUI tempMM; }
+	popupMenu -button 1 -ctl false -alt true -allowOptionBoxes true -parent viewPanes -mm 1 tempMM;
+		menuItem -rp "N" -l "inout_spline" -ecr 0 -c "keyTangent -global -itt spline; keyTangent -global -ott spline;";
+//		menuItem -rp "NE" -l "soften edges" -ecr 0 -c "";
+		menuItem -rp "E" -l "inout_linear" -ecr 0 -c "keyTangent -global -itt linear; keyTangent -global -ott linear;";
+//		menuItem -rp "SE" -l "merge vertices" -ecr 0 -c "";
+		menuItem -rp "S" -l "inout_clamped" -ecr 0 -c "keyTangent -global -itt clamped; keyTangent -global -ott clamped;";
+//		menuItem -rp "SW" -l "extrude face" -ecr 0 -c "";
+		menuItem -rp "W" -l "inout_flat" -ecr 0 -c "keyTangent -global -itt flat; keyTangent -global -ott flat;";
+//		menuItem -rp "NW" -l "cut faces tool" -ecr 0 -c "";
+
+		menuItem -l "out_step" -ecr 0 -c "keyTangent -global -itt step; keyTangent -global -ott step;";
+//		menuItem -divider 1;
+//		menuItem -l "menuItem1" -ecr 0 -c "";
+	setParent -m ..;
+}
+
+global proc tima_AnimToolsMMR_globalProc()
+{
+	if( `popupMenu -exists tempMM` ) deleteUI tempMM;
+}

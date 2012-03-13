@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Afanasy common POST INSTALL"
+
+if [ -d /opt/cgru/afanasy/python ]; then
+   find /opt/cgru/afanasy/python -type d -exec chmod a+rwx {} \;
+fi
+
+exit 0

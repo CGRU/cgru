@@ -1,0 +1,27 @@
+#include "infoline.h"
+
+InfoLine::InfoLine( QWidget *parent):
+   QLineEdit( parent)
+{
+   setMaximumHeight( 20);
+   setReadOnly( true);
+}
+
+InfoLine::~InfoLine()
+{
+}
+
+void InfoLine::displayInfo( const QString &message)
+{
+   setText( message);
+}
+
+void InfoLine::displayWarning( const QString &message)
+{
+   setText( "WARNING: " + message);
+}
+
+void InfoLine::displayError( const QString &message)
+{
+   setText( "ERROR: " + message);
+}

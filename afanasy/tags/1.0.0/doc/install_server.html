@@ -1,0 +1,142 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Build Afanasy</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><font color="#DD0000">★</font><i><a href="../../index.html" target="_top">CGRU</a></i><font color="#DD0000">★</font></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#507020" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+<h2 align="center">Prepare Afanasy Server</h2>
+<hr />
+<ol>
+<li><h4>You need UNIX</h4>
+   Any Linux or Mac or other UNIX (any <a href="http://en.wikipedia.org/wiki/POSIX">POSIX</a>, so may be MS Windows with emulators, if you are brave).<br/>
+</li>
+<li><h4>Required packages:</h4>
+   <kbd>
+   g++<br/>
+   subversion cmake<br/>
+   libqt4-core libqt4-dev libqt4-gui libqt4-sql libqt4-sql-psql<br/>
+   python python-dev<br/>
+   </kbd>
+</li>
+<li><h4>Download</h4>
+   <code>
+   $ su<br/>
+   # mkdir /cg<br/>
+   # chown a+w /cg<br/>
+   # exit<br/>
+   $ cd /cg<br/>
+   $ mkdir tools<br/>
+   $ cd tools<br/>
+   $ svn co https://cgru.svn.sourceforge.net/svnroot/cgru cgru<br/>
+   </code>
+</li>
+<li><h4>Build a project</h4>
+   <code>
+   $ cd cgru/src/afanasy<br/>
+   $ ./build.sh<br/>
+   </code>
+</li>
+<li><h4>Postgre SQL</h4>
+<p>Database server needed to store jobs state. Afanasy reads information from database on start. You can use Afanasy without any database, but server will start with no data.
+</p><p>
+You can install database using package manager, and its the best way. But if Qt and PostgreSQL versions are incompatible in your distributive, you can download and install some previous version of PostgreSQL.</p>
+<h5>Database Setup</h5>
+<ul>
+   <li>
+      Edit Postgre SQL client authentication configuration file<br/>
+      <kbd>/usr/local/pgsql/data/pg_hba.conf</kbd><br/>
+      Add this line<br/>
+      <kbd>local afanasy afadmin password</kbd><br/>
+      Read comments in this file to know what does it mean.
+   </li>
+   <li>
+      Restart database<br/>
+   </li>
+   <li>
+      Create afanasy database and user<br/>
+      <code>
+      # su - postgres<br/>
+      $ createdb afanasy<br/>
+      $ psql afanasy<br/>
+      CREATE USER afadmin PASSWORD 'AfPassword';<br/>
+      </code>
+   </li>
+</ul>
+<h5>Create Tables</h5>
+<ul>
+   <li>
+      Go into CGRU commands directory:<br />
+      <code>$ cd cgru/bin</code><br />
+   </li>
+   <li>
+      Get a list of available QT database drivers:<br />
+      <code>$ ./afcmd db_drivers</code><br />
+      QPSQL must be preset in list, or check QT installation.<br />
+   </li>
+   <li>
+      Check database connection:<br />
+      <code>$ ./afcmd db_check</code><br />
+      Program will output error or print "Database connection is working" if everything is ok.<br />
+   </li>
+   <li>
+      Create required tables:<br />
+      <code>$ ./afcmd db_resetall</code><br />
+      This command also delete old tables if they exists.<br />
+   </li>
+</ul>
+<p>
+<h5>Example script for automatic setup:</h5>
+There is an example script to install PostgreSQL using <kbd>apt-get</kbd> and configure it for Afanasy. It works on <kbd>Ubuntu</kbd>, <kbd>Debian</kbd> and other debian-like distributives.<br/>
+Launch under <kbd>root</kbd>:<br/>
+<code>
+# cd afanasy/examples/scripts<br/>
+# ./setup_pgsql.sh<br/>
+</code>
+</p>
+</li>
+<li><h4>Web Server</h4>
+   <p>If you want to watch afanasy database state through web install packages:</p>
+   <p><kbd>apache2 libapache2-mod-php5 php5 php5-pgsql php5-gd</kbd></p>
+   <p>Site root directory will be available in afanasy/php directory</p>
+</li>
+</ol>
+<!--FOOTER-->
+<br/>
+<table bgcolor="#507020" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><font color="#DD0000">★</font><i><a href="../../index.html" target="_top">CGRU</a></i><font color="#DD0000">★</font></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

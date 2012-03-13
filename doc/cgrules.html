@@ -1,0 +1,82 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="styles.css" rel="stylesheet" type="text/css" />
+<title>CGRUles</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">CGRUles</h2>
+<hr />
+
+Most important CG Rule is turning around the way to launch software.
+<ul>
+   <li><h3>Each project (asset) has it's own software setup.</h3></li>
+   <li><h3>Use working directories and relative paths.</h3></li>
+   <li><h3>Such commands like <kbd>houdini mantra nuke prman</kbd> in $PATH which you can run anywhere can became a head ache.</h3></li>
+</ul>
+
+<p>
+The simplest way to store software setup in projects is to keep launching scripts in its assets (subprojects) root. To launch Nuke with setup for special asset user must run Nuke in asset root directory. For example:<br/>
+<code>
+ $ cd /cg/projects/[project name]/[asset name]<br/>
+ $ ./nuke<br/>
+</code>
+Where <kbd>./nuke</kbd> is a script which points to special Nuke version and its scripts and plug-ins.
+</p>
+
+<h4>Advantages:</h4>
+<ul>
+<li>
+Different projects and even subprojects (assets) can use different software versions at the same time (with different scripts, compiled plug-ins etc).
+</li>
+<li>
+You can render from assets with different software versions on the same farm machines simultaneously. Different versions can be executed even on the same machine at the same time (if you want several CPUs machines to run several tasks at once).
+</li>
+<li>
+Project setup is stored with project. You can restore old project and the way it launches software will be restored too.
+</li>
+</ul>
+
+<p>
+If you launch software in asset directory you can use relative paths. So you can relocate asset with no need to fix paths to it's sources. It's very useful if you work with another company or in different places, and to exchange scenes (assets). For example you can do some work at home, bring scene in office, and all paths to textures, 3d models will be correct.
+</p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

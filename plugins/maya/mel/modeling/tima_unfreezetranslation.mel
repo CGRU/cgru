@@ -1,0 +1,258 @@
+global proc timaUnFreezeTranslationDo_globalProc()
+{
+	string $selArray[] = `ls -sl`;
+	if(`size($selArray)` == 0)
+	{
+		print("\n");
+		warning(" ### nothing selected !!!\n");
+		return;
+	}
+	int $xAxis, $yAxis, $zAxis;
+
+	if(`radioCollection -q -select timaUnfrTrans_XARC` == "timaUnfrTrans_XAPB") $xAxis = 1;
+	if(`radioCollection -q -select timaUnfrTrans_XARC` == "timaUnfrTrans_XAMB") $xAxis = 2;
+	if(`radioCollection -q -select timaUnfrTrans_XARC` == "timaUnfrTrans_XADB") $xAxis = 3;
+	if(`radioCollection -q -select timaUnfrTrans_XARC` == "timaUnfrTrans_XAXB") $xAxis = 4;
+
+	if(`radioCollection -q -select timaUnfrTrans_YARC` == "timaUnfrTrans_YAPB") $yAxis = 1;
+	if(`radioCollection -q -select timaUnfrTrans_YARC` == "timaUnfrTrans_YAMB") $yAxis = 2;
+	if(`radioCollection -q -select timaUnfrTrans_YARC` == "timaUnfrTrans_YADB") $yAxis = 3;
+	if(`radioCollection -q -select timaUnfrTrans_YARC` == "timaUnfrTrans_YAXB") $yAxis = 4;
+
+	if(`radioCollection -q -select timaUnfrTrans_ZARC` == "timaUnfrTrans_ZAPB") $zAxis = 1;
+	if(`radioCollection -q -select timaUnfrTrans_ZARC` == "timaUnfrTrans_ZAMB") $zAxis = 2;
+	if(`radioCollection -q -select timaUnfrTrans_ZARC` == "timaUnfrTrans_ZADB") $zAxis = 3;
+	if(`radioCollection -q -select timaUnfrTrans_ZARC` == "timaUnfrTrans_ZAXB") $zAxis = 4;
+
+	string $tansform;
+	for( $tansform in $selArray)
+	{
+		float $tx, $ty, $tz;
+		if($xAxis == 1)
+			$tx = `getAttr ($tansform + ".rotatePivotX")`;
+		if($xAxis == 2)
+			$tx = `getAttr ($tansform + ".boundingBoxMinX")`;
+		if($xAxis == 3)
+			$tx = `getAttr ($tansform + ".boundingBoxCenterX")`;
+		if($xAxis == 4)
+			$tx = `getAttr ($tansform + ".boundingBoxMaxX")`;
+
+		if($yAxis == 1)
+			$ty = `getAttr ($tansform + ".rotatePivotY")`;
+		if($yAxis == 2)
+			$ty = `getAttr ($tansform + ".boundingBoxMinY")`;
+		if($yAxis == 3)
+			$ty = `getAttr ($tansform + ".boundingBoxCenterY")`;
+		if($yAxis == 4)
+			$ty = `getAttr ($tansform + ".boundingBoxMaxY")`;
+
+		if($zAxis == 1)
+			$tz = `getAttr ($tansform + ".rotatePivotZ")`;
+		if($zAxis == 2)
+			$tz = `getAttr ($tansform + ".boundingBoxMinZ")`;
+		if($zAxis == 3)
+			$tz = `getAttr ($tansform + ".boundingBoxCenterZ")`;
+		if($zAxis == 4)
+			$tz = `getAttr ($tansform + ".boundingBoxMaxZ")`;
+
+		move -r (-$tx) (-$ty) (-$tz) $tansform;
+		makeIdentity -apply true -t 1 $tansform;
+		move -r $tx $ty $tz $tansform;
+//print("\n $tx = " + $tx);
+//print("\n $ty = " + $ty);
+//print("\n $tz = " + $tz);
+	}
+}
+//####################################################################################
+
+global proc timaUnFreezeTranslationDo_globalProc2()
+{
+	string $selArray[] = `ls -sl`;
+	if(`size($selArray)` == 0)
+	{
+		print("\n");
+		warning(" ### nothing selected !!!\n");
+		return;
+	}
+	int $xAxis, $yAxis, $zAxis;
+
+	if(`radioCollection -q -select timaUnfrTrans_XMRC` == "timaUnfrTrans_XMMB") $xAxis = 2;
+	if(`radioCollection -q -select timaUnfrTrans_XMRC` == "timaUnfrTrans_XMDB") $xAxis = 3;
+	if(`radioCollection -q -select timaUnfrTrans_XMRC` == "timaUnfrTrans_XMXB") $xAxis = 4;
+
+	if(`radioCollection -q -select timaUnfrTrans_YMRC` == "timaUnfrTrans_YMMB") $yAxis = 2;
+	if(`radioCollection -q -select timaUnfrTrans_YMRC` == "timaUnfrTrans_YMDB") $yAxis = 3;
+	if(`radioCollection -q -select timaUnfrTrans_YMRC` == "timaUnfrTrans_YMXB") $yAxis = 4;
+
+	if(`radioCollection -q -select timaUnfrTrans_ZMRC` == "timaUnfrTrans_ZMMB") $zAxis = 2;
+	if(`radioCollection -q -select timaUnfrTrans_ZMRC` == "timaUnfrTrans_ZMDB") $zAxis = 3;
+	if(`radioCollection -q -select timaUnfrTrans_ZMRC` == "timaUnfrTrans_ZMXB") $zAxis = 4;
+
+	string $tansform;
+	for( $tansform in $selArray)
+	{
+		float $tx, $ty, $tz;
+		if($xAxis == 1)
+			$tx = `getAttr ($tansform + ".rotatePivotX")`;
+		if($xAxis == 2)
+			$tx = `getAttr ($tansform + ".boundingBoxMinX")`;
+		if($xAxis == 3)
+			$tx = `getAttr ($tansform + ".boundingBoxCenterX")`;
+		if($xAxis == 4)
+			$tx = `getAttr ($tansform + ".boundingBoxMaxX")`;
+
+		if($yAxis == 1)
+			$ty = `getAttr ($tansform + ".rotatePivotY")`;
+		if($yAxis == 2)
+			$ty = `getAttr ($tansform + ".boundingBoxMinY")`;
+		if($yAxis == 3)
+			$ty = `getAttr ($tansform + ".boundingBoxCenterY")`;
+		if($yAxis == 4)
+			$ty = `getAttr ($tansform + ".boundingBoxMaxY")`;
+
+		if($zAxis == 1)
+			$tz = `getAttr ($tansform + ".rotatePivotZ")`;
+		if($zAxis == 2)
+			$tz = `getAttr ($tansform + ".boundingBoxMinZ")`;
+		if($zAxis == 3)
+			$tz = `getAttr ($tansform + ".boundingBoxCenterZ")`;
+		if($zAxis == 4)
+			$tz = `getAttr ($tansform + ".boundingBoxMaxZ")`;
+
+		float $xf[] = `xform -q -ws -t $tansform`;
+		$tx = $tx + $xf[0] - `getAttr ($tansform + ".tx")`;
+		$ty = $ty + $xf[1] - `getAttr ($tansform + ".ty")`;
+		$tz = $tz + $xf[2] - `getAttr ($tansform + ".tz")`;
+		move -a $tx $ty $tz ($tansform + ".scalePivot") ($tansform + ".rotatePivot");
+//print("\n $tx = " + $tx);
+//print("\n $ty = " + $ty);
+//print("\n $tz = " + $tz);
+	}
+}
+//####################################################################################
+global proc timaUnFreezeTranslationDo_globalProc3()
+{
+	string $selArray[] = `ls -sl`;
+	if( `pluginInfo -query -loaded decomposeMatrix` == 0 )
+	{
+		if( catch(`loadPlugin -quiet "decomposeMatrix"`) )
+		{
+			warning(" ### Can't load plugin node decomposeMatrix !!!");
+			return;
+		}
+	}
+	string $node = `createNode decomposeMatrix`;
+	string $transform;
+	for( $transform in $selArray)
+	{
+		connectAttr -f ($transform + ".worldMatrix") ($node + ".inputMatrix");
+		float $rx = `getAttr ($node + ".outputRotateX")`;
+		float $ry = `getAttr ($node + ".outputRotateY")`;
+		float $rz = `getAttr ($node + ".outputRotateZ")`;
+print("\n $rx = " + $rx);
+print("\n $ry = " + $ry);
+print("\n $rz = " + $rz);
+//		makeIdentity -apply true -t 0 -r 1 -s 0 $transform;
+//		setAttr ($transform + ".rx") 0;
+//		setAttr ($transform + ".ry") 0;
+//		setAttr ($transform + ".rz") 0;
+		rotate -r -ws (-$rx) (-$ry) (-$rz) $transform;
+//		rotate -r -ws $rx $ry $rz $transform;
+//		rotate -r -ws $rx $ry $rz $transform;
+		disconnectAttr ($transform + ".worldMatrix") ($node + ".inputMatrix");
+	}
+	delete $node;
+	select -r $selArray;
+}
+
+{
+	if(`window -exists timaUnFreezeTranslationWnd`) deleteUI -wnd timaUnFreezeTranslationWnd;
+	window -title "Unfreeze Translation" timaUnFreezeTranslationWnd;
+	columnLayout -adj 1;
+		rowLayout -nc 3 -cw3 70 70 70;
+			frameLayout -l "X axis :";
+				columnLayout -adj 1;
+					radioCollection timaUnfrTrans_XARC;
+					radioButton -l "Pivot" timaUnfrTrans_XAPB;
+					radioButton -l "BBMin" timaUnfrTrans_XAMB;
+					radioButton -l "BBMid" timaUnfrTrans_XADB;
+					radioButton -l "BBMax" timaUnfrTrans_XAXB;
+					radioCollection -e -sl timaUnfrTrans_XAPB timaUnfrTrans_XARC;
+				setParent..;
+			setParent..;
+			frameLayout -l "Y axis :";
+				columnLayout -adj 1;
+					radioCollection timaUnfrTrans_YARC;
+					radioButton -l "Pivot" timaUnfrTrans_YAPB;
+					radioButton -l "BBMin" timaUnfrTrans_YAMB;
+					radioButton -l "BBMid" timaUnfrTrans_YADB;
+					radioButton -l "BBMax" timaUnfrTrans_YAXB;
+					radioCollection -e -sl timaUnfrTrans_YAPB timaUnfrTrans_YARC;
+				setParent..;
+			setParent..;
+			frameLayout -l "Z axis :";
+				columnLayout -adj 1;
+					radioCollection timaUnfrTrans_ZARC;
+					radioButton -l "Pivot" timaUnfrTrans_ZAPB;
+					radioButton -l "BBMin" timaUnfrTrans_ZAMB;
+					radioButton -l "BBMid" timaUnfrTrans_ZADB;
+					radioButton -l "BBMax" timaUnfrTrans_ZAXB;
+					radioCollection -e -sl timaUnfrTrans_ZAPB timaUnfrTrans_ZARC;
+				setParent..;
+			setParent..;
+		setParent..;
+		rowLayout -nc 2 -cw2 160 50;
+			button -l "unfreeze" -w 148 -c "timaUnFreezeTranslationDo_globalProc()";
+			button -l "help" -w 30 -h 18 -bgc 0.9 0.9 0.7
+				-c "showHelp -absolute `toNativePath(  $cgruDir_DOC + \"/modeling_/tima_unfreeze_trans.html\")`;";
+		setParent..;
+		separator;
+		text -l "and move pivot to ->";
+		rowLayout -nc 3 -cw3 70 70 70;
+			frameLayout -l "X axis :";
+				columnLayout -adj 1;
+					radioCollection timaUnfrTrans_XMRC;
+					radioButton -l "BBMin" timaUnfrTrans_XMMB;
+					radioButton -l "BBMid" timaUnfrTrans_XMDB;
+					radioButton -l "BBMax" timaUnfrTrans_XMXB;
+					radioCollection -e -sl timaUnfrTrans_XMDB timaUnfrTrans_XMRC;
+				setParent..;
+			setParent..;
+			frameLayout -l "Y axis :";
+				columnLayout -adj 1;
+					radioCollection timaUnfrTrans_YMRC;
+					radioButton -l "BBMin" timaUnfrTrans_YMMB;
+					radioButton -l "BBMid" timaUnfrTrans_YMDB;
+					radioButton -l "BBMax" timaUnfrTrans_YMXB;
+					radioCollection -e -sl timaUnfrTrans_YMDB timaUnfrTrans_YMRC;
+				setParent..;
+			setParent..;
+			frameLayout -l "Z axis :";
+				columnLayout -adj 1;
+					radioCollection timaUnfrTrans_ZMRC;
+					radioButton -l "BBMin" timaUnfrTrans_ZMMB;
+					radioButton -l "BBMid" timaUnfrTrans_ZMDB;
+					radioButton -l "BBMax" timaUnfrTrans_ZMXB;
+					radioCollection -e -sl timaUnfrTrans_ZMDB timaUnfrTrans_ZMRC;
+				setParent..;
+			setParent..;
+		setParent..;
+		button -l " translate " -c "timaUnFreezeTranslationDo_globalProc2()";
+		separator;
+		frameLayout -lv 0;
+			columnLayout -adj 1;
+				rowLayout -nc 2 -cw2 100 102;
+					text -l " --- FREEZE : ---      " -fn "boldLabelFont";
+					button -h 15 -w 102 -l "     all " -c "makeIdentity -apply true -t 1 -r 1 -s 1;";
+				setParent..;
+				rowLayout -nc 3 -cw3 70 70 70;
+					button -h 17 -w 62 -l " translation " -c "makeIdentity -apply true -t 1 -r 0 -s 0;";
+					button -h 17 -w 62 -l " rotation " -c "makeIdentity -apply true -t 0 -r 1 -s 0;";
+					button -h 17 -w 62 -l " scale " -c "makeIdentity -apply true -t 0 -r 0 -s 1;";
+				setParent..;
+				separator;
+				button -l " Freeze rotation to world " -en 0 -c "timaUnFreezeTranslationDo_globalProc3()";
+			setParent..;
+		setParent..;
+	showWindow timaUnFreezeTranslationWnd;
+}

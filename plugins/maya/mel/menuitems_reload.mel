@@ -1,0 +1,20 @@
+//
+//	Synopsis:
+//
+//	menuItem -l "label" -ann "annotation" -c "command"
+//
+
+	menuItem -l "RELOAD:" -enable off;
+	menuItem -divider true;
+	menuItem -l "This menu" -c "cgruSourceFile(\"cgrumenu.mel\");";
+	menuItem -l "Marking menus" -c "cgruSourceDir(\"markingmenus\", 0);";
+	menuItem -l "Auto source" -c "cgruSourceDir(\"_autosource\", 0);";
+	menuItem -l "Hotkey commands" -c "cgruSourceDir(\"hotkeys\", 0);";
+	menuItem -divider 1;
+	menuItem -l "Override scripts" -c "cgruSourceDir(\"override\", 0);";
+	menuItem -divider 1;
+	menuItem -l "Default hotkeys" -c "cgruSourceFile(\"defaulthotkeyslist.mel\");";
+	menuItem -divider 1;
+	menuItem -l "Rehash Scripts" -c "rehash;";
+	menuItem -divider 1;
+	menuItem -l "Reinit CGRU" -c "{string $cmd = (\"source \\\"\" + $cgruDir + \"/cgru.mel\\\"\");catch(`eval $cmd`);}";

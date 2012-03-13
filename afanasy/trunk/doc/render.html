@@ -1,0 +1,122 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy Render</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="author" content="Timur Hairulin" />
+<meta name="description" content="CGRU: Tools for Houdini, Nuke, Maya, Afanasy - free open source render farm manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, prman, Afanasy, animation, rendering, render, farm, manager, free, open source" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<a href="http://cgtalk.ru"><img src="../../doc/images/cgtalkru.png" width="88" height="31" border="0" alt="CGTALK.RU Logo" /></a>
+</td>
+</tr>
+</table>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<!--HEADER-->
+
+<h2 align="center">Afanasy Render Host</h2>
+<hr />
+
+<p><code>$ afrender</code></p>
+<p>Afanasy server ask Render, running on remote host to run tasks.</p>
+
+<h3><a href="afanasy.html#ConfRender">Render Configuration</a></h3>
+
+<h3>Render Attributes:</h3>
+<ul>
+<li><a name="Name"/><b>Name</b> - Each render has an unique name. If new render comes to server with the name which already exists, server change it's name by adding a number. Users and jobs hosts masks (huntgroup) are based on render names and <a href="http://doc.trolltech.com/qregexp.html#details">QT Regular Expressions</a> (they are Perl-like).
+<br/><br/></li>
+<li><a name="Address"/><b>Address</b> - IP address and port that render listen.
+<br/><br/></li>
+<li><a name="TimeLaunch"/><b>Launch Time</b> - Time the application was launched.</li>
+<li><a name="TimeRegister"/><b>Registration Time</b> - Time the render was registered on server.</li>
+<li><a name="TimeUpdate"/><b>Last Update Time</b> - Last time the render has update its resources usage.
+<br/><br/></li>
+<li><a name="Tasks"/><b>Tasks</b> - Running tasks number and some its attributes (user, job, etc.).</li>
+<li><a name="CapacityUsed"/><b>Capacity Used</b> - Capacity used by running tasks.</li>
+</ul>
+
+<h3>Render Editable Parameters:</h3>
+<ul>
+<li><a name="UserName"/><b>Render User</b> - Who launched a render. Can be changed only by administrators. Note that process do not change uid. This value for afanasy only.</li>
+<li><a name="Priority"/><b>Priority</b> - Render with greater priority get task first.</li>
+<li><a name="State"/><b>Render State:</b>
+   <ul>
+   <li><b><i> Free  </i></b> - Render is not captured by anybody.</li>
+   <li><b><i> nimby </i></b> - Render is taken by his user. Only render user can render on it.</li>
+   <li><b><i> NIMBY </i></b> - Render is taken by his user and he don't want to render on it.</li>
+   </ul>
+</li>
+</ul>
+
+<h3>Render Host Attributes:</h3>
+<ul>
+<li><a name="Capacity"/><b>Capacity</b> - Total capacity value (each running task takes some capacity).</li>
+<li><a name="MaxTasks"/><b>Max Tasks</b> - Maximum number of tasks can be running the same time.</li>
+<li><a name="CpuNum"/><b>Number of CPUs</b> - Processors number.</li>
+<li><a name="MHz"/><b>CPUs MHz</b> - Fist Processor frequency.</li>
+<li><a name="MemoryMb"/><b>Memory Megabytes</b> - Total memory in megabytes.</li>
+<li><a name="SwapMb"/><b>Swap Megabytes</b> - Total swap space in megabytes.</li>
+<li><a name="HddGb"/><b>HDD Gigabytes</b> - Total disk space in gigabytes.
+<br/><br/></li>
+<li><a name="OS"/><b>OS</b> - OS name described in farm setup.</li>
+<li><a name="Power"/><b>Power</b> - Custom number described in farm setup.</li>
+<li><a name="Properties"/><b>Properties</b> - Custom string described in farm setup.
+<br/><br/></li>
+<li><a name="ServicesNames"/><b>Services Names</b> - List of type names of available services.</li>
+</ul>
+
+<h3>Render Host Resources Usage:</h3>
+<ul>
+<li><a name="CpuLoadavg"/><b>CPU Loadavg[3]</b> - Load average.</li>
+<li><a name="CpuUser"/><b>CPU User</b> - User usage percentage.</li>
+<li><a name="CpuNice"/><b>CPU Nice</b> - User 'nice' usage percentage (low priority processes).</li>
+<li><a name="CpuSystem"/><b>CPU System</b> - System usage percentage.</li>
+<li><a name="CpuIdle"/><b>CPU Idle</b> - Idle percentage (CPU free).</li>
+<li><a name="CpuIOWait"/><b>CPU IO Wait</b> - Waiting for I/O complete percentage.</li>
+<li><a name="CpuIRQ"/><b>CPU IRQ</b> - Interrupts servicing percentage.</li>
+<li><a name="CpuIRQ"/><b>CPU Soft-IRQ</b> - Soft interrupts servicing percentage.
+<br/><br/></li>
+<li><a name="MemoryFreeMb"/><b>Memory Free Mb</b> - Free memory in megabytes.</li>
+<li><a name="MemoryCachedMb"/><b>Memory Cached Mb</b> - Cached memory in megabytes.</li>
+<li><a name="MemoryCachedMb"/><b>Memory Buffers Mb</b> - Buffered memory in megabytes.</li>
+<li><a name="SwapUsedMb"/><b>Swap Used Mb</b> - Used swap in megabytes.</li>
+<li><a name="HDDFreeGb"/><b>HDD Free Gb</b> - Available free disk space in gigabytes (in root - '/').</li>
+<li><a name="NetRecvKbSec"/><b>Net Received Kb/Sec</b> - Network receiving usage in kilobytes per second.</li>
+<li><a name="NetSendKbSec"/><b>Net Send Kb/Sec</b> - Network sending usage in kilobytes per second.</li>
+</ul>
+
+<p>To register a render already in [nimby|NIMBY] state use command:</p>
+<p><code>$ afrender [nimby|NIMBY]</code></p>
+
+<!--FOOTER-->
+<br/>
+<table bgcolor="#506030" width="99%"><tr><td><p></p></td></tr></table>
+<br/>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<small><i><a href="http://sourceforge.net/projects/cgru/">SourceForge.net Project</a></i></small>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top">CGRU</a></p>
+</td>
+<td width="33%">
+<small><i><a href="http://www.cgtalk.ru/forum/forumdisplay.php?f=168">Раздел на форуме CGTALK.RU</a></i></small>
+</td>
+</tr>
+</table>
+</body>
+</html>

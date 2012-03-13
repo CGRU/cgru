@@ -1,0 +1,32 @@
+#!/bin/bash
+
+egExpr="
+(\.pyc$\
+|/bin$\
+|/tmp$\
+|/temp$\
+|/override\
+|/icons/icons$\
+|/farm.xml$\
+|/Makefile$\
+|/moc_.*cpp$\
+|/cmake_install.cmake$\
+|/CMakeFiles$\
+|/CMakeCache.txt$\
+|/__$\
+|config.xml$\
+|afanasy/webvisor$\
+|afanasy/plugins$\
+|afanasy/doc$\
+|afanasy/icons$\
+|plugins/maya/mll\
+|utilities/fbx2clip/fbxsdk$\
+|utilities/release/debpackages$"
+
+for str in $*; do
+   egExpr="${egExpr}|${str}"
+done
+
+egExpr="${egExpr})"
+
+svn st | egrep -v $egExpr

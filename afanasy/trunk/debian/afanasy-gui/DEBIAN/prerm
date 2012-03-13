@@ -1,0 +1,9 @@
+#!/bin/bash
+
+echo "Afanasy GUI PRE REMOVE:"
+
+procs="afwatch aftalk afmonitor"
+
+for p in $procs; do pkill $p || true; done
+
+exit 0

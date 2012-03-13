@@ -1,0 +1,11 @@
+{
+  Description     = "afanasy";
+  Provides        = ("afanasy");
+  Requires        = ("postgresql-8.3");
+  OrderPreference = "Late";
+  Messages =
+  {
+    start = "Starting Afanasy Server";
+    stop  = "Stopping Afanasy Server";
+  };
+}

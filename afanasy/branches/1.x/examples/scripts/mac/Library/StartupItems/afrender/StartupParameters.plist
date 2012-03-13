@@ -1,0 +1,12 @@
+{
+  Description     = "afrender";
+  Provides        = ("afrender");
+  Requires        = ("CG");
+  Uses            = ("Network");
+  OrderPreference = "Late";
+  Messages =
+  {
+    start = "Starting Afanasy Render Node";
+    stop  = "Stopping Afanasy Render Node";
+  };
+}

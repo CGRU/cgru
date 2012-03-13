@@ -1,0 +1,11 @@
+Package: afanasy-doc
+Version: @VERSION@
+Architecture: all
+Maintainer: Timur Hairulin <timurhai@gmail.com>
+Installed-Size: @SIZE@
+Depends: cgru-common (= @VERSION@)
+Section: graphics
+Priority: extra
+Homepage: http://sourceforge.net/projects/cgru/
+Description: Afanasy Documentation
+ Afanasy local HTML documentation.
