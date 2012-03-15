@@ -159,7 +159,7 @@ for i in range( argsl):
    if arg == '-exec':
       i += 1
       if i == argsl: break
-      cmd = '"%s"' % argsv[i]
+      cmd = '%s' % argsv[i]
       continue
 
    if arg == '-file':
@@ -420,7 +420,7 @@ elif (ext == 'mb') or (ext == 'ma'):
    if scenetype != 'maya_delight': 
       cmd += ' -s @#@ -e @#@ -b %d' % by
    else:
-      cmd += ' -s @#@ -e @#@ -inc %d' % by
+      cmd += ' -an 1 -s @#@ -e @#@ -inc %d' % by
    if node != '': cmd += ' -cam "%s"' % node
    if take != '': 
       if scenetype == 'maya_delight':
