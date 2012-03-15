@@ -211,9 +211,15 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << name << "@" << username << "[" << id << "]";
-      stream << " (" << version << " r" << revision << ") ";
-      address.generateInfoStream( stream ,full);
+		if( isOnline())  stream << " ON  ";
+		if( isOffline()) stream << " off ";
+		stream << name << "@" << username << "[" << id << "]";
+		stream << " (v'" << version << "' r" << revision << ")";
+		if( isBusy())  stream << " B";
+		if( isNimby()) stream << " (n)";
+		if( isNIMBY()) stream << " (N)";
+		stream << " ";
+        address.generateInfoStream( stream ,full);
 //      stream << " - " << calcWeight() << " bytes.";
    }
 }

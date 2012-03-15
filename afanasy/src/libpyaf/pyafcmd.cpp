@@ -150,50 +150,57 @@ PyObject * PyAf_Cmd_renderlistget( PyAf_Cmd_Object * self, PyObject * args)
 }
 PyObject * PyAf_Cmd_renderlistdecode( PyAf_Cmd_Object * self, PyObject * args)
 {
-   Py_ssize_t length;
-   char * buffer = PyAf::GetData( length, args, "PyAf_Cmd_renderlistdecode");
-   af::Msg * message = new af::Msg( buffer, length);
-   af::MCAfNodes mcNodes( message);
-   delete message;
+	PyObject * pylist = PyList_New(0);
 
-   PyObject * pylist = PyList_New(0);
-   for( unsigned i = 0 ; i < mcNodes.getCount(); i++)
-   {
-      af::Render * render = (af::Render*)(mcNodes.getNode(i));
-      PyObject * pydict = PyDict_New();
-      PyDict_SetItemString( pydict, "id", PyLong_FromLong( render->getId()));
-      PyDict_SetItemString( pydict, "name", PyBytes_FromString( render->getName().c_str()));
-      PyDict_SetItemString( pydict, "username", PyBytes_FromString( render->getUserName().c_str()));
-      PyDict_SetItemString( pydict, "revision", PyLong_FromLong( render->getRevision()));
-      PyDict_SetItemString( pydict, "version", PyBytes_FromString( render->getVersion().c_str()));
-      PyDict_SetItemString( pydict, "annotation", PyBytes_FromString( render->getAnnontation().c_str()));
-      PyDict_SetItemString( pydict, "online", PyBool_FromLong( render->isOnline()));
-      PyDict_SetItemString( pydict, "busy", PyBool_FromLong( render->isBusy()));
-      PyDict_SetItemString( pydict, "free", PyBool_FromLong( render->isFree()));
-      PyDict_SetItemString( pydict, "nimby", PyBool_FromLong( render->isNimby()));
-      PyDict_SetItemString( pydict, "NIMBY", PyBool_FromLong( render->isNIMBY()));
-      PyDict_SetItemString( pydict, "address", PyBytes_FromString( render->getAddress().generateInfoString().c_str()));
-      PyDict_SetItemString( pydict, "time_launched", PyLong_FromLong( render->getTimeLaunch()));
-      PyDict_SetItemString( pydict, "time_registered", PyLong_FromLong( render->getTimeRegister()));
-      PyDict_SetItemString( pydict, "time_taskstartfinish", PyLong_FromLong( render->getTasksStartFinishTime()));
-      PyDict_SetItemString( pydict, "info", PyBytes_FromString( render->generateInfoString( true).c_str()));
-      PyDict_SetItemString( pydict, "resources", PyBytes_FromString( render->getHostRes().generateInfoString( true).c_str()));
-      PyObject * pylist_tasks = PyList_New(0);
-      std::list<af::TaskExec*> tasks;
-      for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
-      {
-         PyObject * taskInfo = PyDict_New();
-         PyDict_SetItemString( taskInfo, "name", PyBytes_FromString((*it)->getName().c_str()));
-         PyDict_SetItemString( taskInfo, "service", PyBytes_FromString((*it)->getServiceType().c_str()));
-         PyDict_SetItemString( taskInfo, "name_user", PyBytes_FromString((*it)->getUserName().c_str()));
-         PyDict_SetItemString( taskInfo, "name_job", PyBytes_FromString((*it)->getJobName().c_str()));
-         PyDict_SetItemString( taskInfo, "name_block", PyBytes_FromString((*it)->getBlockName().c_str()));
-         PyList_Append( pylist_tasks, taskInfo);
-      }
-      PyDict_SetItemString( pydict, "tasks", pylist_tasks);
-      PyList_Append( pylist, pydict);
-   }
-   return pylist;
+	Py_ssize_t length;
+	char * buffer = PyAf::GetData( length, args, "PyAf_Cmd_renderlistdecode");
+	af::Msg * message = new af::Msg( buffer, length);
+	if( message->type() != af::Msg::TRendersList )
+	{
+		AFERROR("PyAf_Cmd_renderlistdecode: Message type is not af::Msg::TRenderList");
+		return pylist;
+		delete message;
+	}
+	af::MCAfNodes mcNodes( message);
+	delete message;
+
+	for( unsigned i = 0 ; i < mcNodes.getCount(); i++)
+	{
+		af::Render * render = (af::Render*)(mcNodes.getNode(i));
+		PyObject * pydict = PyDict_New();
+		PyDict_SetItemString( pydict, "id", PyLong_FromLong( render->getId()));
+		PyDict_SetItemString( pydict, "name", PyBytes_FromString( render->getName().c_str()));
+		PyDict_SetItemString( pydict, "username", PyBytes_FromString( render->getUserName().c_str()));
+		PyDict_SetItemString( pydict, "revision", PyLong_FromLong( render->getRevision()));
+		PyDict_SetItemString( pydict, "version", PyBytes_FromString( render->getVersion().c_str()));
+		PyDict_SetItemString( pydict, "annotation", PyBytes_FromString( render->getAnnontation().c_str()));
+		PyDict_SetItemString( pydict, "online", PyBool_FromLong( render->isOnline()));
+		PyDict_SetItemString( pydict, "busy", PyBool_FromLong( render->isBusy()));
+		PyDict_SetItemString( pydict, "free", PyBool_FromLong( render->isFree()));
+		PyDict_SetItemString( pydict, "nimby", PyBool_FromLong( render->isNimby()));
+		PyDict_SetItemString( pydict, "NIMBY", PyBool_FromLong( render->isNIMBY()));
+		PyDict_SetItemString( pydict, "address", PyBytes_FromString( render->getAddress().generateInfoString().c_str()));
+		PyDict_SetItemString( pydict, "time_launched", PyLong_FromLong( render->getTimeLaunch()));
+		PyDict_SetItemString( pydict, "time_registered", PyLong_FromLong( render->getTimeRegister()));
+		PyDict_SetItemString( pydict, "time_taskstartfinish", PyLong_FromLong( render->getTasksStartFinishTime()));
+		PyDict_SetItemString( pydict, "info", PyBytes_FromString( render->generateInfoString( true).c_str()));
+		PyDict_SetItemString( pydict, "resources", PyBytes_FromString( render->getHostRes().generateInfoString( true).c_str()));
+		PyObject * pylist_tasks = PyList_New(0);
+		std::list<af::TaskExec*> tasks;
+		for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
+		{
+			PyObject * taskInfo = PyDict_New();
+			PyDict_SetItemString( taskInfo, "name", PyBytes_FromString((*it)->getName().c_str()));
+			PyDict_SetItemString( taskInfo, "service", PyBytes_FromString((*it)->getServiceType().c_str()));
+			PyDict_SetItemString( taskInfo, "name_user", PyBytes_FromString((*it)->getUserName().c_str()));
+			PyDict_SetItemString( taskInfo, "name_job", PyBytes_FromString((*it)->getJobName().c_str()));
+			PyDict_SetItemString( taskInfo, "name_block", PyBytes_FromString((*it)->getBlockName().c_str()));
+			PyList_Append( pylist_tasks, taskInfo);
+		}
+		PyDict_SetItemString( pydict, "tasks", pylist_tasks);
+		PyList_Append( pylist, pydict);
+	}
+	return pylist;
 }
 
 PyObject * PyAf_Cmd_rendersetnimby( PyAf_Cmd_Object * self, PyObject * args)
