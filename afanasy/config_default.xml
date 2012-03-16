@@ -26,6 +26,8 @@ So each path (project, asset) can have individual software setup.
     <!-- Acceptable ip addresses masks, space separated.
     Mask should have at least one '.' for IPv4 or one ':' for IPv6. -->
     <serveripmask>*.* 127.0.0.1 192.168.* *:* 0:0:0:0:0:0:0:1 FC00:* FD00:*</serveripmask>
+	<!-- Magic number, default value is '1', value '0' is reserved and means magic number mismatch. -->
+	<magic_number>1</magick_number>
    <serverport>51000</serverport>
    <clientport>51001</clientport>
    <srv_so_rcvtimeo_sec>2</srv_so_rcvtimeo_sec>

@@ -351,7 +351,7 @@ bool Msg::checkValidness()
     }
     if( m_magic != Msg::Magic )
     {
-        AFERRAR("Msg::checkValidness: Magic number mismatch: Recieved(%d) != Library(%d)", m_magic, Msg::Magic)
+        AFERRAR("Msg::checkValidness: Magic number mismatch: Recieved(%d) != Local(%d)", m_magic, Msg::Magic)
         m_type = Msg::TMagicMismatch;
         m_int32 = 0;
         return true;

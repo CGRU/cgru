@@ -110,6 +110,15 @@ Mask should have at least one '.' for IPv4 or one ':' for IPv6.
 There are some useful examples in the default value.
 </p></li>
 <li><p>
+	<a name="magic_number"><code>magic_number</code></a> = 1<br/>
+	Magic number.
+	Server will not react on message with another magic number.
+	If client receives a message with invalid magic number it will exit.
+	You can use it to filter clients and any connections.
+	For example, on some internal tools changes, you can ensure that all clients are updated.
+	Value '0' is reserved and means magic number mismatch.
+</p></li>
+<li><p>
 <code>serverport</code> = 51000<br/>
 Port to listen to server.
 </p></li>
