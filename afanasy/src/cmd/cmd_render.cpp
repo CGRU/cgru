@@ -250,3 +250,41 @@ bool CmdRenderWOLWake::processArguments( int argc, char** argv, af::Msg &msg)
    msg.set( getMsgType(), &mcgeneral);
    return true;
 }
+
+CmdRenderServiceOn::CmdRenderServiceOn()
+{
+	setCmd("rsrvon");
+	setInfo("Enable disabled render service.");
+	setHelp("rsrvon [name|mask] [service] Enable disabled render service.");
+	setArgsCount(2);
+	setMsgType( af::Msg::TRenderSetService);
+}
+CmdRenderServiceOn::~CmdRenderServiceOn(){}
+bool CmdRenderServiceOn::processArguments( int argc, char** argv, af::Msg &msg)
+{
+	std::string mask = argv[0];
+	if( af::RegExp::Validate( mask) == false ) return false;
+	af::MCGeneral mcgeneral( mask, 1);
+	mcgeneral.setString( argv[1]);
+	msg.set( getMsgType(), &mcgeneral);
+	return true;
+}
+
+CmdRenderServiceOff::CmdRenderServiceOff()
+{
+	setCmd("rsrvoff");
+	setInfo("Disable render service.");
+	setHelp("rsrvoff [name|mask] [service] Disable render service.");
+	setArgsCount(2);
+	setMsgType( af::Msg::TRenderSetService);
+}
+CmdRenderServiceOff::~CmdRenderServiceOff(){}
+bool CmdRenderServiceOff::processArguments( int argc, char** argv, af::Msg &msg)
+{
+	std::string mask = argv[0];
+	if( af::RegExp::Validate( mask) == false ) return false;
+	af::MCGeneral mcgeneral( mask, 0);
+	mcgeneral.setString( argv[1]);
+	msg.set( getMsgType(), &mcgeneral);
+	return true;
+}

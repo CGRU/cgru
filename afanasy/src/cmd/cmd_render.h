@@ -69,3 +69,13 @@ class CmdRenderWOLWake : public Cmd { public:
    ~CmdRenderWOLWake ();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
+class CmdRenderServiceOn : public Cmd { public:
+   CmdRenderServiceOn ();
+   ~CmdRenderServiceOn ();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
+class CmdRenderServiceOff : public Cmd { public:
+   CmdRenderServiceOff ();
+   ~CmdRenderServiceOff ();
+   bool processArguments( int argc, char** argv, af::Msg &msg);
+};
