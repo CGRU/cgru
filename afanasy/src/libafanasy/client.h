@@ -26,7 +26,6 @@ public:
    inline long long getTimeLaunch()         const { return time_launch;   }  ///< Get client launch time.
    inline long long getTimeRegister()       const { return time_register; }  ///< Get client register time.
    inline long long getTimeUpdate()         const { return time_update;   }  ///< Get client last update time.
-   inline int       getRevision()           const { return revision;      }  ///< Get client revison.
    inline const std::string & getVersion()  const { return version;       }  ///< Get client version.
    inline const std::string & getUserName() const { return username;      }  ///< Get client user name.
 
@@ -53,7 +52,6 @@ protected:
    int64_t     time_launch;   ///< Client launch time.
    int64_t     time_register; ///< Client registration on server time.
    int64_t     time_update;   ///< Client last update time.
-   int32_t     revision;      ///< Client build revision.
    std::string version;       ///< Client version.
    std::string username;      ///< Client user name.
    Address     address;       ///< Client computer address.

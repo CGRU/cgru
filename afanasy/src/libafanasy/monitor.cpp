@@ -52,7 +52,6 @@ void Monitor::readwrite( Msg * msg)
    rw_int64_t( time_activity, msg);
    rw_String ( name,          msg);
    rw_String ( username,      msg);
-   rw_int32_t( revision,      msg);
    rw_String ( version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
@@ -83,7 +82,6 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
    {
       stream << "Monitor name = \"" << name << "\" (id=" << getId() << ")";
       stream << "\n Version: " << version;
-      stream << "\n Build Revision: " << revision;
       stream << "\n Launch Time: " + af::time2str( time_launch);
       stream << "\n Register Time: " + af::time2str( time_register);
       stream << "\n Time Activity: " + af::time2str( time_activity);
@@ -107,7 +105,7 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
    else
    {
       stream << name << "[" << id << "]";
-      stream << " (" << version << " r" << revision << ") ";
+      stream << " v'" << version << "' ";
       address.generateInfoStream( stream, full);
    }
 }

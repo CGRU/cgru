@@ -171,7 +171,6 @@ PyObject * PyAf_Cmd_renderlistdecode( PyAf_Cmd_Object * self, PyObject * args)
 		PyDict_SetItemString( pydict, "id", PyLong_FromLong( render->getId()));
 		PyDict_SetItemString( pydict, "name", PyBytes_FromString( render->getName().c_str()));
 		PyDict_SetItemString( pydict, "username", PyBytes_FromString( render->getUserName().c_str()));
-		PyDict_SetItemString( pydict, "revision", PyLong_FromLong( render->getRevision()));
 		PyDict_SetItemString( pydict, "version", PyBytes_FromString( render->getVersion().c_str()));
 		PyDict_SetItemString( pydict, "annotation", PyBytes_FromString( render->getAnnontation().c_str()));
 		PyDict_SetItemString( pydict, "online", PyBool_FromLong( render->isOnline()));

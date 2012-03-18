@@ -119,14 +119,12 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
    address.copy( render->getAddress());
    grabNetIFs( render->netIFs);
    time_launch = render->time_launch;
-   revision = render->revision;
    version = render->version;
    taskstartfinishtime = 0;
    getFarmHost( &render->host);
    setOnline();
    update( render);
-   std::string str = "Online (r";
-   str += af::itos(revision) + " v" + version + ").";
+   std::string str = "Online v'" + version + "'.";
    appendLog( str);
    if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
    AFCommon::QueueDBUpdateItem( this);

@@ -56,7 +56,7 @@ public:
     static void setClientPort( uint16_t port) { clientport = port;}
 
     /// Get versions:
-    static inline int                 getVersionAfanasy() { return version_afanasy;  }
+    static inline const std::string & getVersionRevision(){ return version_revision; }
     static inline const std::string & getVersionCGRU()    { return version_cgru;     }
     static inline const std::string & getVersionPython()  { return version_python;   }
     static inline const std::string & getVersionGCC()     { return version_gcc;      }
@@ -190,7 +190,7 @@ private:
    static std::string home;            ///< User home directory.
    static std::string home_afanasy;    ///< Afanasy home settings.
 
-   static int version_afanasy;         ///< Afanasy build sources version, will be compiled in binaries
+   static std::string version_revision;///< Sources version, will be compiled in binaries
    static std::string version_cgru;    ///< CGRU version, will be get from environment on applications startup
    static std::string version_python;  ///< Compiled Python version
    static std::string version_gcc;     ///< GCC version

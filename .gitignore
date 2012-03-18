@@ -2,6 +2,10 @@
 override.sh
 override.cmd
 
+# Compiled objects
+*.o
+*.a
+
 # Subversion
 .svn
 
