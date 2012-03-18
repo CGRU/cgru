@@ -1,9 +1,10 @@
 #!/bin/bash
 
 pushd .. > /dev/null
-folder=$PWD
-cd ../../utilities
-source ./getrevision.sh $folder
+cgru=$PWD
+cd ../..
+cd utilities
+source ./getrevision.sh $cgru
 [ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh > /dev/null
 popd > /dev/null
 

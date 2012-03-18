@@ -32,7 +32,6 @@ void Talk::readwrite( Msg * msg)
    rw_int64_t( time_register, msg);
    rw_String ( name,          msg);
    rw_String ( username,      msg);
-   rw_int32_t( revision,      msg);
    rw_String ( version,       msg);
    address.readwrite( msg);
 }
@@ -45,13 +44,12 @@ void Talk::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Launched At: " << af::time2str( time_launch);
       stream << "\n Registered At: " << af::time2str( time_register);
       stream << "\n Version: " << version;
-      stream << "\n Build Revision: " << revision;
       stream << "\n Last Update At: " << af::time2str( time_update);
    }
    else
    {
       stream << name << "[" << id << "]";
-      stream << " (" << version << " r" << revision << ") ";
+      stream << " v'" << version << "' ";
       address.generateInfoStream( stream, full);
    }
 }

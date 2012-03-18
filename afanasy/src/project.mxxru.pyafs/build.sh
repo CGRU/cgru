@@ -18,9 +18,8 @@ pythondir=$cgru_utils/python
 
 # Setup Version:
 pushd .. > /dev/null
-folder=$PWD
 cd $cgru/utilities
-source ./getrevision.sh $folder
+source ./getrevision.sh $cgru
 popd > /dev/null
 
 export AF_LFLAGS="-lrt -lz"

@@ -76,7 +76,6 @@ void Render::readwrite( Msg * msg)
 
    case Msg::TRenderRegister:
 
-      rw_int32_t ( revision,              msg);
       rw_String  ( version,               msg);
       rw_String  ( name,                  msg);
       rw_String  ( username,              msg);
@@ -168,7 +167,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    if( full)
    {
       stream << "Render " << name << "@" << username << " (id=" << id << "):";
-      stream << "\n Version = \"" << version << "\" Build Revision = " << revision;
+      stream << "\n Version = \"" << version;
 
       if( isDirty()) stream << "\nDirty! Capacity|Max Tasks changed, or service(s) disabled.";
 
@@ -214,7 +213,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isOnline())  stream << " ON  ";
 		if( isOffline()) stream << " off ";
 		stream << name << "@" << username << "[" << id << "]";
-		stream << " (v'" << version << "' r" << revision << ")";
+		stream << " v'" << version << "'";
 		if( isBusy())  stream << " B";
 		if( isNimby()) stream << " (n)";
 		if( isNIMBY()) stream << " (N)";

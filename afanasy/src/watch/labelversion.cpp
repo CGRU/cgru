@@ -20,11 +20,11 @@ LabelVersion::LabelVersion( QWidget *parent):
 
     label = QString("CGRU VERSION %1").arg(af::Environment::getVersionCGRU().c_str());
     tooltip = QString("Build at %1"
-                     "\nAfanasy sources revision: %2"
+                     "\nRevision: %2"
                      "\nPython version: %3"
                      "\nQt version: %4")
          .arg( af::Environment::getVersionDate().c_str())
-         .arg( af::Environment::getVersionAfanasy())
+         .arg( af::Environment::getVersionRevision().c_str())
          .arg( af::Environment::getVersionPython().c_str())
          .arg( qVersion());
     if( false == af::Environment::getVersionGCC().empty())

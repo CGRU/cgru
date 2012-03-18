@@ -140,7 +140,7 @@ std::list<std::string> Environment::previewcmds;
 std::list<std::string> Environment::rendercmds;
 std::list<std::string> Environment::rendercmds_admin;
 
-int         Environment::version_afanasy = 0;
+std::string Environment::version_revision;
 std::string Environment::version_cgru;
 std::string Environment::version_python;
 std::string Environment::version_gcc;
@@ -442,11 +442,13 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
    version_cgru = getenv("CGRU_VERSION");
    QUIET("CGRU version = \"%s\"\n", version_cgru.c_str());
 
-   // Build Revision:
-//#ifdef CGRU_REVISION
-   version_afanasy = CGRU_REVISION;
-//#endif
-   QUIET("Afanasy build revision = \"%d\"\n", version_afanasy);
+	// Build Revision:
+	#ifdef CGRU_REVISION
+	#define STRINGIFY(x) #x
+	#define EXPAND(x) STRINGIFY(x)
+	version_revision = EXPAND(CGRU_REVISION);
+	#endif
+	QUIET("Afanasy build revision = \"%s\"\n", version_revision.c_str());
 
    // Python:
    version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);

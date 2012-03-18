@@ -57,7 +57,6 @@ private:
    af::Host    host;
    af::HostRes hres;
 
-   int revision;
    QString  version;
    QString  username;
    QString  tasksusers; ///< For sorting and filtering only

@@ -9,6 +9,29 @@ if os.path.isfile( revfile):
         f.close()
         sys.exit(0)
 
+
+
+# Get Git SHA:
+cmd = "git log --pretty=format:'%H' -n 1"
+if len(sys.argv) > 1: cmd += ' "%s"' % sys.argv[1]
+proc = subprocess.Popen( cmd, shell=True, bufsize=100000, stdout=subprocess.PIPE)
+gitsha = proc.stdout.read()
+proc.wait()
+if proc.returncode == 0:
+	print( gitsha)
+	sys.exit(0)
+
+#Get git logs count:
+#cmd = "git log --pretty=format:''"
+#if len(sys.argv) > 1: cmd += ' "%s"' % sys.argv[1]
+#output = str( subprocess.Popen( cmd, shell=True, bufsize=100000, stdout=subprocess.PIPE).stdout.read())
+#count = output.count('\n')
+#if count > 2:
+#	print( count)
+#	sys.exit(0)
+
+
+
 # Get SVN revision:
 cmd = 'svn info'
 if len(sys.argv) > 1: cmd += ' "%s"' % sys.argv[1]
