@@ -63,4 +63,5 @@ For /F "Tokens=*" %%I in ('type version.txt') Do Set CGRU_VERSION=%%I
 cd utilities
 call getrevision.cmd ..
 echo CGRU_REVISION %CGRU_REVISION%
-echo %CGRU_VERSION% rev%CGRU_REVISION% > %dest%\version.txt
+rem echo %CGRU_VERSION% rev%CGRU_REVISION% > %dest%\version.txt
+echo %CGRU_REVISION% > %dest%\revision.txt

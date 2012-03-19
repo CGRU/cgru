@@ -1,13 +1,15 @@
 #!/bin/bash
 
-# Location:
-cgruRoot="../.."
+# Locations:
 curdir=$PWD
+pushd "../.." > /dev/null
+cgruRoot=$PWD
+popd > /dev/null
 
 # Version and revision:
 packsver=`cat $cgruRoot/version.txt`
 pushd $cgruRoot/utilities > /dev/null
-packsrev=`python ./getrevision.py ..`
+packsrev=`python ./getrevision.py $cgruRoot`
 popd > /dev/null
 
 # Exporting current subversion:

@@ -15,6 +15,8 @@ exclude="$exclude --exclude 'config.xml'"
 exclude="$exclude --exclude 'pathmap_*.cmd'"
 exclude="$exclude --exclude 'override.sh'"
 exclude="$exclude --exclude '.svn'"
+exclude="$exclude --exclude '.git'"
+exclude="$exclude --exclude '.gitignore'"
 exclude="$exclude --exclude '*.cmd'"
 exclude="$exclude --exclude '*.pyc'"
 exclude="$exclude --exclude '__pycache__'"
@@ -38,6 +40,7 @@ popd > /dev/null
 
 cd ../..
 examples/clear.sh
+cgru=$PWD
 
 copy . $dest
 
@@ -90,5 +93,7 @@ rcopy plugins/maya/mel $dest/plugins/maya
 
 CGRU_VERSION=`cat version.txt`
 cd utilities
-source ./getrevision.sh ..
-echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
+source ./getrevision.sh $cgru
+#echo "${CGRU_VERSION} rev${CGRU_REVISION}" > $dest/version.txt
+echo "${CGRU_REVISION}" > $dest/revision.txt
+
