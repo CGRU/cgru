@@ -3,6 +3,9 @@ override.sh
 override.cmd
 
 # Compiled objects
+*.exe
+*.dll
+*.so
 *.o
 *.a
 
@@ -12,12 +15,12 @@ override.cmd
 # Python
 *.pyc
 
-# Temporary folders
+# Temporary files and folders
 tmp*
 temp*
-
-# VIM swp files
 *.swp
+*.suo
+*.sdf
 
 # Archives
 *.tar

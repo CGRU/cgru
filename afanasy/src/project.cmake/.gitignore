@@ -7,3 +7,12 @@ Makefile
 
 # Qt moc files folders
 */__/
+
+# MS Visual Studio:
+*.user
+*.filters
+*.vcxproj
+*.dir
+*.sln
+Debug
+Release

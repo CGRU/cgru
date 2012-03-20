@@ -312,7 +312,7 @@ void TaskProcess::processFinished( int i_exitCode)
 
     readProcess();
 
-    if( i_exitCode != 0)
+    if(( i_exitCode != 0 ) || ( m_stop_time != 0 ))
     {
         m_update_status = af::TaskExec::UPFinishedError;
 #ifdef WINNT
