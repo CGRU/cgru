@@ -12,12 +12,14 @@ if os.path.isfile( revfile):
 
 
 # Get Git SHA:
-cmd = "git log --pretty=format:'%H' -n 1"
+cmd = "git log --pretty=format:%H -n 1"
 if len(sys.argv) > 1: cmd += ' "%s"' % sys.argv[1]
 proc = subprocess.Popen( cmd, shell=True, bufsize=100000, stdout=subprocess.PIPE)
 gitsha = proc.stdout.read()
 proc.wait()
 if proc.returncode == 0:
+	if not isinstance( gitsha, str):
+		gitsha = str( gitsha, 'utf-8')
 	print( gitsha)
 	sys.exit(0)
 
