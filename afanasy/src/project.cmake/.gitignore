@@ -14,5 +14,6 @@ Makefile
 *.vcxproj
 *.dir
 *.sln
+*.opensdf
 Debug
 Release
