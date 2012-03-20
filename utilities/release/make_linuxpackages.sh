@@ -113,6 +113,9 @@ for packages_dir in $packages_dirs; do
          rcopy "${packages_dir}/${package}/RPM" "${tmpdir}/${package}"
          # replace variables:
          ./replacevars.sh  "${packages_dir}/${package}/RPM/SPECS/${package}.spec" "${tmpdir}/${package}/RPM/SPECS/${package}.spec"
+         # create required folders:
+         mkdir -v "${tmpdir}/${package}/RPM/BUILD"
+         mkdir -v "${tmpdir}/${package}/RPM/RPMS"
          # launch rpm build script:
          curdir=$PWD
          cd ${tmpdir}/${package}

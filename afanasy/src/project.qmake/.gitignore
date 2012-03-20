@@ -1,3 +1,4 @@
 # Generated make files:
 Makefile
-
+moc_*
+libpyaf.so.*
