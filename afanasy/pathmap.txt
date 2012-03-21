@@ -8,7 +8,7 @@
 
 #     Client:                 Server:
 
-#\\server\projects\          /cg/projects/
+#\\server\projects\          /mnt/prj/
 
 # You can use only "\" slashes for windows, even if some application on windows use "/" slashes.
 # Afanasy tries both slashes when searchs a path to replace.
