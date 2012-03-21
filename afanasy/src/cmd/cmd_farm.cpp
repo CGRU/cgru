@@ -85,7 +85,7 @@ bool CmdFarmCheck::check( const std::string & hostname)
    }
    else
    {
-      std::cout << "Does not exists in farm !" << std::endl;
+      std::cout << "Does not exist in farm !" << std::endl;
       return false;
    }
 }
