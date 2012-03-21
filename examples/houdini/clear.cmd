@@ -4,5 +4,4 @@ For /F "Tokens=*" %%I in ('dir /b "scene.hip*"') Do if not "%%I" == "scene.hip" 
 
 if exist "*.mov" del /f /q "*.mov"
 
-cd render
-del /f /q *
+if exist render rd /s /q render

@@ -4,5 +4,4 @@ For /F "Tokens=*" %%I in ('dir /b "AE Project.aep*"') Do if not "%%I" == "AE Pro
 
 if exist "AE Project.aep Logs" rd /s /q "AE Project.aep Logs"
 
-cd render
-del /f /q *
+if exist render rd /s /q render

@@ -7,4 +7,4 @@ for scene in `ls scene.blend*`; do
    rm -fv $scene
 done
 rm -fv untitled.blend*
-rm -fv render/*
+[ -d render ] && rm -rfv render

@@ -9,5 +9,6 @@ for scene in $scenes; do
       rm -fv $tmpscene
    done
 done
-rm -fv render/*
+
 rm -fv *.mov
+[ -d render ] && rm -rfv render

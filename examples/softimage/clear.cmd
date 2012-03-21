@@ -11,6 +11,4 @@ cd system
 For /F "Tokens=*" %%I in ('dir /b /ad') Do if not "%%I" == ".svn" rd /s /q "%%I"
 cd ..
 
-cd Render_Pictures
-del /f /q *
-For /F "Tokens=*" %%I in ('dir /b /ad') Do if not "%%I" == ".svn" rd /s /q "%%I"
+if exist Render_Pictures rd /s /q Render_Pictures
