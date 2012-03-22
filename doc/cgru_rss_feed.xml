@@ -5,10 +5,23 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Sat, 11 Feb 2011 00:00:00 GMT</pubDate>
-   <lastBuildDate>Sat, 11 Feb 2011 00:00:00 GMT</lastBuildDate>
+   <pubDate>Thu, 22 Mar 2011 00:00:00 GMT</pubDate>
+   <lastBuildDate>Thu, 22 Mar 2011 00:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.6.0 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release160</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release160</guid>
+      <description>
+         Afanasy server is available for MS Windows platform.
+         AfWatch GUI styles and various customizations. Default look is civil (not military).
+         Administrator can change job owner.
+         No Qt library in Afanasy render client. So Qt is used for GUI only now.
+         GitHub CGRU project started.
+      </description>
+      <pubDate>Thu, 22 Mar 2011 00:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.5.5 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release155</link>
