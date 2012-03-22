@@ -17,11 +17,12 @@ for archive in `ls`; do
       ./export.sh "archives/${archive_dir}"
       popd > /dev/null
    fi
-   for version in `cat "${archive_dir}/version.txt"`; do break; done
+   for version in `cat -v "${archive_dir}/version.txt" | sed -e "s/\^M//g"`; do break; done
    echo "Creating CGRU archive for '${archive}': '${archive_dir}'-'${version}'"
 
    # Cleanup archive folders:
    echo "Clearing '${archive}':"
+   find "${archive_dir}" -type d -name .git -exec rm -rvf {} \;
    find "${archive_dir}" -type d -name .svn -exec rm -rvf {} \;
    find "${archive_dir}" -type f -name *.pyc -exec rm -vf {} \;
    find "${archive_dir}" -type d -name __pycache__ -exec rm -rvf {} \;
