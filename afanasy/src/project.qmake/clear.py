@@ -4,7 +4,7 @@ import os
 import shutil
 import sys
 
-store = ['.svn','build.sh','override.sh','clear.py','project.pro','win_build_mingw.cmd','win_build_msvc.cmd']
+store = ['.svn','.gitignore','build.sh','override.sh','clear.py','project.pro','win_build_mingw.cmd','win_build_msvc.cmd']
 projects = ['libafanasy','libafapi','libafqt','libafsql','libpyaf','cmd','server','render','talk','watch','monitor']
 
 folders = []
