@@ -52,26 +52,47 @@
 
 <h2>License:</h2>
 <p>
-CGRU has LGPL license.
+CGRU is licensed under the <a href="http://www.gnu.org/licenses/lgpl.html">GNU Lesser General Public License (LGPL)</a> license.
+</p>
+
+<p>
+But there are some tools included in CGRU, and some of them have another license:
 </p>
 
 <ul>
-<li>
-	Python
-</li>
-<li>
-	Qt
-</li>
-<li>
-	PyQt
-</li>
-<li>
-	ImageMagick
-</li>
-<li>
-	FFMpeg
-</li>
+	<li>
+		<a href="http://www.imagemagick.org/script/license.php">ImageMagick</a> (no limitations).
+	</li>
+	<li>
+		<a href="http://ffmpeg.org/legal.html">FFMpeg</a> - LGPL.
+	</li>
+	<li>
+		<a href="http://www.postgresql.org/about/licence/">PostgreSQL</a>
+		- a liberal Open Source license, similar to the BSD or MIT licenses.
+	</li>
+	<li>
+		<a href="http://www.riverbankcomputing.co.uk/software/pyqt/license">PyQt</a> - GPL or Commercial.
+	</li>
+	<li>
+		<a href="http://docs.python.org/license.html">Python</a> (no limitations).
+	</li>
+	<li>
+		<a href="http://qt.nokia.com/products/licensing/">Qt</a> - LGPL.
+	</li>
 </ul>
+
+<p>
+	If you are going to modify its code in commercial purposes (without sharing),
+	and licenses are very important, i think that the bottle neck is PyQt.
+	But it is not the project "engine".
+	It is used for auxiliary utilities, and for GUI only.
+</p>
+<p>
+	<a href="http://www.pyside.org/">PySide</a> project has active development,
+	and it seems that soon it will preset in any Linux distribution as a standard package.
+	And it has <a href="http://www.pyside.org/about/">LGPL license</a> - it is its purpose.
+	Later we can switch from PyQt to PySide.
+</p>
 
 <!--FOOTER-->
 </td></tr></table>
