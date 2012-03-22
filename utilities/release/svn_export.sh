@@ -7,22 +7,26 @@ cgruRoot=$PWD
 popd > /dev/null
 
 # Version and revision:
-packsver=`cat $cgruRoot/version.txt`
+version=`cat $cgruRoot/version.txt`
 pushd $cgruRoot/utilities > /dev/null
-packsrev=`python ./getrevision.py $cgruRoot`
+revision=`python ./getrevision.py $cgruRoot`
 popd > /dev/null
 
-# Exporting current subversion:
-cgruREV=cgru_rev${packsrev}
+# Prepare folders:
+snapshot=cgru_snapshot.$version
 tmpdir=tmp
 [ -d $tmpdir ] || mkdir -pv $tmpdir
-cgruREV_dir=$tmpdir/$cgruREV
-[ -d $cgruREV_dir ] && rm -rf $cgruREV_dir
-echo "Exporting CGRU revision $packsrev"
-svn export $cgruRoot $cgruREV_dir
-echo ${packsrev} > $cgruREV_dir/revision.txt
+snapshot_dir=$tmpdir/$snapshot
+[ -d $snapshot_dir ] && rm -rf $snapshot_dir
+
+# Exporting current subversion:
+echo "Exporting CGRU revision $revision"
+svn export $cgruRoot $snapshot_dir
+echo ${revision} > $snapshot_dir/revision.txt
+
+# Make an archive:
 cd $tmpdir
-acrhivename=$curdir/cgru.$packsver.7z
+acrhivename=$curdir/$snapshot.7z
 [ -f $acrhivename ] && rm -fv $acrhivename
 echo "Compressing $acrhivename"
-7za a -r -y -t7z $acrhivename $cgruREV > /dev/null || echo "Failed!"
+7za a -r -y -t7z $acrhivename $snapshot > /dev/null || echo "Failed!"
