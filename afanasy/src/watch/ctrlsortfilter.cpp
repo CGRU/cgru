@@ -36,24 +36,24 @@ const char * CtrlSortFilter::TNAMES[] = {
 };
 
 const char * CtrlSortFilter::TNAMES_SHORT[] = {
-"NONE",
-"PRY",
-"CAP",
-"NAME",
-"USER",
-"TUSR",
-"HOST",
-"JOBS",
-"RUN",
-"TCRT",
-"TLCH",
-"TSTR",
-"TRGS",
-"TACT",
-"TFNS",
-"TRUN",
-"VER",
-"ADDR",
+"none",
+"Priority",
+"Capacity",
+"Name",
+"User",
+"TaskUser",
+"Host",
+"Jobs",
+"Tasks",
+"Created",
+"Launched",
+"Started",
+"Registered",
+"Activity",
+"Finished",
+"Running",
+"Version",
+"Address",
 "[LAST]"
 };
 
@@ -236,14 +236,29 @@ void CtrlSortFilter::actFilter( const QString & str)
 
 void CtrlSortFilter::selLabel()
 {
-   label->setText(
-      QString("s:%1-%2 f:%3-%4%5")
-         .arg( TNAMES_SHORT[*sorttype])
-         .arg( (*sortascending) ? "a" : "d")
-         .arg( TNAMES_SHORT[*filtertype])
-         .arg( (*filterinclude) ? "i" : "e")
-         .arg( (*filtermatch) ? "m" : "c")
-      );
+	QString text;
+	text += "Sort: ";
+	text += TNAMES_SHORT[*sorttype];
+	if( *sorttype != TNONE )
+	{
+		if( *sortascending ) text += "^";
+	}
+
+	text += "   ";
+
+	text += "Filter: ";
+	if( *filtertype != TNONE )
+	{
+		if( *filtermatch ) text += "$";
+	}
+	text += TNAMES_SHORT[*filtertype];
+	if( *filtertype != TNONE )
+	{
+		if( *filtermatch ) text += "$";
+		if( false == *filterinclude) text += "!";
+	}
+
+	label->setText( text);
 
    if((*filtertype == TNONE) || filter->isEmpty())
       setBackgroundRole( QPalette::Window);//NoRole );

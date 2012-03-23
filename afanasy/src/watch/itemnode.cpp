@@ -41,10 +41,8 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
    if( false == sort_str.isEmpty() )
    {
       if( other.sort_str.isEmpty())
-      {
-         AFERROR("ItemNode::compare: other.sort_str is empty.")
          return false;
-      }
+
       switch( operation)
       {
          case GREATER:        return ((sort_str) == (other.sort_str)) ? name > other.name : ((sort_str) >  (other.sort_str));
@@ -77,18 +75,17 @@ bool ItemNode::compare( const ItemNode & other, int operation) const
          }
       }
    }
-   AFERROR("ItemNode::compare: Values comparison error.")
+
    return false;
 }
 
 bool ItemNode::filter( const QRegExp & regexp, const bool & filtermatch)
 {
-   if( filter_str.isEmpty())
-   {
-      AFERROR("ItemNode::filter: Filter string is empty.")
-      return false;
-   }
-   if( filtermatch )
-      return regexp.exactMatch( filter_str);
-   return filter_str.contains( regexp);
+	if( filter_str.isEmpty())
+		return false;
+
+	if( filtermatch )
+		return regexp.exactMatch( filter_str);
+
+	return filter_str.contains( regexp);
 }
