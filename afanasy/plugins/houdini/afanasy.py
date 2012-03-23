@@ -187,6 +187,10 @@ class BlockParameters:
    def genJob( self, blockparams):
       if VERBOSE: print 'Generating job on "%s"' % self.job_name
 
+      if len( blockparams) < 1:
+         print('Can`t generate job without any blocks on "%s"' % self.afnode.name())
+         return
+
       # Calculate temporary hip name:
       ftime = time.time()
       tmphip = hou.hipFile.name() + '_' + afcommon.filterFileName(self.job_name) + time.strftime('.%m%d-%H%M%S-') + str(ftime - int(ftime))[2:5] + ".hip"
@@ -387,14 +391,16 @@ def getJobParameters( afnode, subblock = False, frame_range = None, prefix = '')
 
       prevparams = newparams
 
-   # Last parameter needed to generate job.
+   # Last parameter needed to generate a job.
    if not subblock: params.append( BlockParameters( afnode, None, False, '', frame_range, True))
    
    return params
 
 def render( afnode):
-   if VERBOSE: print '\nRendering "%s":' % afnode.path()
-   params = getJobParameters( afnode)
-   if params is not None:
-      params[-1].genJob( params[:-1])
-      for parm in params: parm.doPost()
+	if VERBOSE: print '\nRendering "%s":' % afnode.path()
+	params = getJobParameters( afnode)
+	if params is not None and len(params) > 1:
+		params[-1].genJob( params[:-1])
+		for parm in params: parm.doPost()
+	else:
+		hou.ui.displayMessage('No tasks founded for\n%s\nIs it conncetted to some valid ROP node?' % afnode.path())
