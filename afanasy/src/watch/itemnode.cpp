@@ -16,7 +16,7 @@ ItemNode::ItemNode( af::Node *node):
    Item( afqt::stoq( node->getName()), node->getId()),
    height( Height),
    sort_int( 0),
-	m_hidden( false)
+	m_flagshidden( 0)
 {
    locked = node->isLocked();
 }
@@ -89,4 +89,14 @@ bool ItemNode::filter( const QRegExp & regexp, const bool & filtermatch)
 		return regexp.exactMatch( filter_str);
 
 	return filter_str.contains( regexp);
+}
+
+bool ItemNode::getHidden( int32_t i_flags) const
+{
+	bool result = m_flagshidden & i_flags;
+
+	if( i_flags & ListNodes::e_HideInvert)
+		result = !result;
+
+	return result;
 }

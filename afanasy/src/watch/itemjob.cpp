@@ -72,7 +72,11 @@ void ItemJob::updateValues( af::Node *node, int type)
                 Watch::someJobError();
    }
 
-	setHidden( job->isHidden());
+	setHidden(  job->isHidden()  );
+	setOffline( job->isOffline() );
+	setDone(    job->isDone()    );
+	setError(   job->isError()   );
+
    annotation           = afqt::stoq( job->getAnnontation().c_str());
    priority             = job->getPriority();
    username             = afqt::stoq( job->getUserName().c_str());

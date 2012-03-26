@@ -1,6 +1,7 @@
 #pragma once
 
 #include "item.h"
+#include "listnodes.h"
 
 #include "../libafanasy/afnode.h"
 
@@ -49,8 +50,16 @@ public:
    inline const long long & getSortInt() const { return sort_int; }
    inline const QString   & getSortStr() const { return sort_str; }
 
-	inline bool isHidden() const { return m_hidden;}
-	inline void setHidden( bool i_value) { m_hidden = i_value;}
+	inline void setHidden(  bool i_value)
+		{ if( i_value ) m_flagshidden |= ListNodes::e_HideHidden;  else m_flagshidden &= ~ListNodes::e_HideHidden;  }
+	inline void setDone(    bool i_value)
+		{ if( i_value ) m_flagshidden |= ListNodes::e_HideDone;    else m_flagshidden &= ~ListNodes::e_HideDone;    }
+	inline void setOffline( bool i_value)
+		{ if( i_value ) m_flagshidden |= ListNodes::e_HideOffline; else m_flagshidden &= ~ListNodes::e_HideOffline; }
+	inline void setError(   bool i_value)
+		{ if( i_value ) m_flagshidden |= ListNodes::e_HideError;   else m_flagshidden &= ~ListNodes::e_HideError;   }
+
+	bool getHidden( int32_t i_flags) const;
 
 protected:
    int height;
@@ -61,5 +70,5 @@ protected:
    QString  filter_str;   ///< For filtering by some string
 
 private:
-	bool m_hidden;
+	int32_t m_flagshidden;
 };

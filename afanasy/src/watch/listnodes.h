@@ -22,15 +22,18 @@ public:
    ListNodes( QWidget* parent, int RequestMsgType = 0);
    virtual ~ListNodes();
 
-	inline bool isShowingHidden() const { return m_showingHidden; }
-
 	enum e_HideShow {
-		e_HShowHidden,
-		e_HShowHiddenOnly
+		e_HideInvert     = 1<<0,
+		e_HideHidden     = 1<<2,
+		e_HideDone       = 1<<3,
+		e_HideOffline    = 1<<4,
+		e_HideError      = 1<<5
 	};
 
+	int32_t getFlagsHideShow() const { return ms_flagsHideShow; }
+
 public slots:
-	void actShowHidden( int i_type);
+	void actHideShow( int i_type);
 
 protected:
 
@@ -42,8 +45,6 @@ protected:
 
    CtrlSortFilter * ctrl;
    void initSortFilterCtrl();
-
-	bool m_showingHidden;
 
    bool sorting;
    bool sortascending;
@@ -67,6 +68,10 @@ private slots:
 private:
    void filter( ItemNode * item, int row);
 	void processHidden();
+	void processHidden( ItemNode * i_item, int i_row);
+
+private:
+	static uint32_t ms_flagsHideShow;
 
    QRegExp filter_exp;
    QString filter_str;

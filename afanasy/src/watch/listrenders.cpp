@@ -263,6 +263,13 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    {
       menu.addSeparator();
 
+		action = new QAction( "Set Hidden", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+		menu.addAction( action);
+		action = new QAction( "Unset Hidden", this);
+		connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+		menu.addAction( action);
+
       {
          QMenu * submenu = new QMenu( "Exit", this);
 
@@ -543,6 +550,22 @@ void ListRenders::actWOLWake()
 {
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TRenderWOLWake);
+}
+
+void ListRenders::actSetHidden()
+{
+	af::MCGeneral mcgeneral;
+	mcgeneral.setNumber(1);
+	action( mcgeneral, af::Msg::TRenderHideShow);
+	displayInfo("Hide render.");
+}
+
+void ListRenders::actUnsetHidden()
+{
+	af::MCGeneral mcgeneral;
+	mcgeneral.setNumber(0);
+	action( mcgeneral, af::Msg::TRenderHideShow);
+	displayInfo("Unhide render.");
 }
 
 void ListRenders::actRequestLog()

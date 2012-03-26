@@ -14,10 +14,11 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+uint32_t ListNodes::ms_flagsHideShow = e_HideHidden;
+
 ListNodes::ListNodes( QWidget* parent, int RequestMsgType):
    ListItems( parent, RequestMsgType),
    ctrl( NULL),
-	m_showingHidden( false),
    sorting( false),
    sortascending( false),
    filtering( false),
@@ -121,6 +122,9 @@ bool ListNodes::updateItems( af::Msg * msg)
             // filter node
             if( filtering ) filter( itemnode, i);
 
+				// process show/hide
+				processHidden( itemnode, i);
+
             // store last and first changed row
             if( firstChangedRow == -1 ) firstChangedRow = i;
             if(  lastChangedRow  <  i )  lastChangedRow = i;
@@ -187,7 +191,7 @@ bool ListNodes::updateItems( af::Msg * msg)
          filter( new_item, row);
       }
 
-		processHidden();
+		processHidden( new_item, row);
 
       if( newitemscreated == false ) newitemscreated = true;
 
@@ -208,6 +212,8 @@ void ListNodes::sort()
    QList<Item*> selectedItems( getSelectedItems());
    ((ModelNodes*)model)->sortnodes( sortascending);
    setSelectedItems( selectedItems);
+
+	if( filtering ) filter();
 }
 
 bool ListNodes::setFilter( const QString & str)
@@ -297,16 +303,21 @@ void ListNodes::filterSettingsChanged()
    if( filtering) filter();
 }
 
-void ListNodes::actShowHidden( int i_type )
+void ListNodes::actHideShow( int i_type )
 {
-	m_showingHidden = ( false == m_showingHidden );
+	ms_flagsHideShow ^= i_type;
 	processHidden();
 }
 
 void ListNodes::processHidden()
 {
 	for( int i = 0; i < model->count(); i++)
-		view->setRowHidden( i, m_showingHidden ? false : ((ItemNode*)(model->item(i)))->isHidden());
+		processHidden( (ItemNode*)(model->item(i)), i);
+}
+
+void ListNodes::processHidden( ItemNode * i_node, int i_row)
+{
+	view->setRowHidden( i_row, i_node->getHidden( ms_flagsHideShow));
 }
 
 void ListNodes::sortMatch( const std::vector<int32_t> * list)

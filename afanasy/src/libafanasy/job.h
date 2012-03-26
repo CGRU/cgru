@@ -46,10 +46,12 @@ public:
    inline const std::string & getDescription()  const { return description; }
    inline const std::string & getAnnontation()  const { return annotation;  }
 
-   inline bool isStarted() const {return time_started != 0 ; }                ///< Whether job is started.
-   inline bool isReady()   const {return state & AFJOB::STATE_READY_MASK;   }///< Whether job is ready.
-   inline bool isRunning() const {return state & AFJOB::STATE_RUNNING_MASK; }///< Whether job is running.
-   inline bool isDone()    const {return state & AFJOB::STATE_DONE_MASK;    }///< Whether job is done.
+	inline bool isStarted() const {return time_started != 0 ; }                ///< Whether a job is started.
+	inline bool isReady()   const {return state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
+	inline bool isRunning() const {return state & AFJOB::STATE_RUNNING_MASK; } ///< Whether a job is running.
+	inline bool isDone()    const {return state & AFJOB::STATE_DONE_MASK;    } ///< Whether a job is done.
+	inline bool isOffline() const {return state & AFJOB::STATE_OFFLINE_MASK; } ///< Whether a ojb is offline (paused).
+	inline bool isError()   const {return state & AFJOB::STATE_ERROR_MASK;   } ///< Whether a ojb has error(s).
 
    inline bool setHostsMask(         const std::string & str, std::string * errOutput = NULL)
       { return setRegExp( hostsmask, str, "job hosts mask", errOutput);}

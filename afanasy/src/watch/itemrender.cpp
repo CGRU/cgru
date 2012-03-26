@@ -147,6 +147,9 @@ void ItemRender::updateValues( af::Node *node, int type)
    case 0: // The item was just created
    case af::Msg::TRendersList:
    {
+		setHidden(  render->isHidden()  );
+		setOffline( render->isOffline() );
+
       version            = afqt::stoq( render->getVersion());
       username           = afqt::stoq( render->getUserName());
       annotation         = afqt::stoq( render->getAnnontation());
