@@ -60,6 +60,7 @@ private:
    QString  version;
    QString  username;
    QString  tasksusers; ///< For sorting and filtering only
+	QString tasks_users_counts; ///< One string collection of all tasks users and counts
    QString  annotation;
    int priority;
    int capacity;

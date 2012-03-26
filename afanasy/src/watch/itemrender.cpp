@@ -212,11 +212,33 @@ void ItemRender::updateValues( af::Node *node, int type)
       else creationTime = "\nNot registered.";
 
       busy = render->isBusy();
-      deleteTasks();
       taskstartfinishtime = render->getTasksStartFinishTime();
-      tasks = render->getTasks();
-      for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
-         tasksicons.push_back( Watch::getServiceIconSmall( QString::fromUtf8( (*it)->getServiceType().c_str())));
+
+		// Get tasks inforamtion:
+		deleteTasks();
+   		tasksusers.clear();
+		tasks_users_counts.clear();
+		tasks = render->getTasks();
+		QStringList tasks_users;
+		QList<int> tasks_counts;
+		for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
+		{
+			tasksicons.push_back( Watch::getServiceIconSmall( QString::fromUtf8( (*it)->getServiceType().c_str())));
+			QString tusr = QString::fromUtf8( (*it)->getUserName().c_str());
+			int pos = tasks_users.indexOf( tusr);
+			if( pos != -1) tasks_counts[pos]++;
+			else
+			{
+				tasks_users << tusr;
+				tasks_counts << 1;
+			}
+		}
+		for( int i = 0; i < tasks_users.size(); i++)
+		{
+			if( false == tasksusers.isEmpty()) tasksusers.append(' ');
+			tasksusers.append( tasks_users[i]);
+			tasks_users_counts += QString(" %1:%2").arg( tasks_users[i]).arg( tasks_counts[i]);
+		}
 
       dirty = render->isDirty();
 
@@ -339,17 +361,6 @@ void ItemRender::updateValues( af::Node *node, int type)
 
    calcHeight();
 
-   tasksusers.clear();
-   for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
-   {
-      QString tusr = QString::fromUtf8( (*it)->getUserName().c_str());
-      if( false == tasksusers.contains( tusr))
-      {
-         if( false == tasksusers.isEmpty()) tasksusers.append(' ');
-         tasksusers.append( tusr);
-      }
-   }
-
    if( wolWaking ) offlineState = "Waking Up";
    else if( wolSleeping || wolFalling) offlineState = "Sleeping";
    else offlineState = "Offline";
@@ -414,11 +425,13 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
     }
 
     QString ann_state = m_state;
-    // Join annotation with state on small displays:
+    // Join annotation+state+tasks on small displays:
     if(  ListRenders::getDisplaySize() == ListRenders::ESMallSize )
     {
-        if(  false == annotation.isEmpty() && (ListRenders::getDisplaySize() == ListRenders::ESMallSize ))
-        ann_state = annotation + ' ' + ann_state;
+		if( false == annotation.isEmpty())
+			ann_state = annotation + ' ' + ann_state;
+		if( false == tasks_users_counts.isEmpty())
+			ann_state = ann_state + ' ' + tasks_users_counts;
     }
     else
     {
@@ -477,20 +490,20 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
     }
 
     // Print Bottom|Right
-    // busy/free time for big displays or annotation for normal
+    // busy/free time for big displays or annotation+users for normal
     switch( ListRenders::getDisplaySize() )
     {
     case  ListRenders::ESMallSize:
         break;
     case  ListRenders::ENormalSize:
-        if( annotation.isEmpty())
+        if( annotation.isEmpty() && tasks_users_counts.isEmpty())
             break;
-        painter->setPen(   afqt::QEnvironment::qclr_black );
-        painter->setFont(  afqt::QEnvironment::f_info);
-        painter->drawText( right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight, annotation);
+        painter->drawText( right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
+			annotation + ' ' + tasks_users_counts);
         break;
     default:
-        painter->drawText( right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight, taskstartfinishtime_str);
+        painter->drawText( right_text_x, y, right_text_w, base_height+2, Qt::AlignBottom | Qt::AlignRight,
+			taskstartfinishtime_str);
     }
 
    // Print information under plotters:
@@ -501,22 +514,7 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
        break;
    case  ListRenders::EBigSize:
    {
-      QStringList tasks_users;
-      QList<int> tasks_counts;
-      for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
-      {
-         QString tusr = QString::fromUtf8( (*it)->getUserName().c_str());
-         int pos = tasks_users.indexOf( tusr);
-         if( pos != -1) tasks_counts[pos]++;
-         else
-         {
-            tasks_users << tusr;
-            tasks_counts << 1;
-         }
-      }
-      QString taskstr;
-      for( int i = 0; i < tasks_users.size(); i++) taskstr += QString(" %1:%2").arg( tasks_users[i]).arg( tasks_counts[i]);
-      painter->drawText( x+5, y, w-10, plots_height + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, taskstr);
+      painter->drawText( x+5, y, w-10, plots_height + HeightAnnotation, Qt::AlignBottom | Qt::AlignLeft, tasks_users_counts);
 
       if( false == annotation.isEmpty())
       {
