@@ -8,12 +8,12 @@
 namespace af
 {
 ///   Message - Afanasy communication unit.
-/**   Any type of client ( Talk, Render), Anatoly and Afanasy communicate throug messages.
+/**   Any type of client ( aftalk, afrender), afcmd and afserver communicate through messages.
 ***   Message can have some data or not, determined on its type.
 ***   Messages with type greater than or equal to \c Msg::TDATA must have some data to be valid.
 ***   They must have non zero data pointer and data length greater than zero.
 ***   Messages with type less than \c Msg::TDATA must not have any data to be valid.
-***   They must have NULL data poiner.
+***   They must have NULL data pointer.
 **/
 class Msg : public Af, public AfQueueItem
 {
@@ -358,6 +358,8 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
     inline char* data()  const { return m_data;  }///< Get data pointer.
     inline int   int32() const { return m_int32; }///< Get 32-bit integer, data lenght for data messages.
     inline int   sid()   const { return m_sid;   }///< Get sender id.
+
+	inline void setSid( uint32_t i_sid) { m_sid = i_sid; rw_header( true);}
 
     inline char* buffer() const { return m_buffer;}///< Get buffer pointer.
 

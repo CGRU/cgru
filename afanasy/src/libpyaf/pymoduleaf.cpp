@@ -89,9 +89,11 @@ PyMODINIT_FUNC PyInit_pyaf(void)
 
 
 //############ Version: ########################
-#ifdef CGRU_REVISION
-   PySys_WriteStdout("Revision = #CGRU_REVISION\n");
-#endif
+	#ifdef CGRU_REVISION
+	#define STRINGIFY(x) #x
+	#define EXPAND(x) STRINGIFY(x)
+	PySys_WriteStdout("Afanasy build revision = \"%s\"\n", EXPAND(CGRU_REVISION));
+	#endif
    PySys_WriteStdout("Python version = \"%d.%d.%d\"\n", PY_MAJOR_VERSION, PY_MINOR_VERSION, PY_MICRO_VERSION);
 //###################################################
 

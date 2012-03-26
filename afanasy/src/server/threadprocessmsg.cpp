@@ -93,6 +93,8 @@ printf("Request: ");msg_request->stdOut();
       return;
    }
 
+	msg_response->setSid( msg_request->sid());
+
 #ifdef AFOUTPUT
 printf("Response: ");msg_response->stdOut();
 #endif

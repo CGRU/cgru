@@ -447,8 +447,8 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	#define STRINGIFY(x) #x
 	#define EXPAND(x) STRINGIFY(x)
 	version_revision = EXPAND(CGRU_REVISION);
-	#endif
 	QUIET("Afanasy build revision = \"%s\"\n", version_revision.c_str());
+	#endif
 
    // Python:
    version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);
