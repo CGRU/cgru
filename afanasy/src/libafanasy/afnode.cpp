@@ -18,6 +18,9 @@ Node::Node():
    /// Containers does not use zero id, just created node has no container.
    id( 0),
 
+	state(0),
+	flags(0),
+
    priority( 0),
 
    /// Just created node (need was not calculated) has no need.
@@ -26,7 +29,6 @@ Node::Node():
    m_solve_cycle(0),
 
    locked( false),
-   zombie( false),
    prev_ptr( NULL),
    next_ptr( NULL)
 {

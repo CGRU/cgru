@@ -702,8 +702,8 @@ const char * Msg::TNAMES[]=
     "TRESERVED15",
     "TRESERVED16",
     "TRESERVED17",
-    "TRESERVED18",
-    "TRESERVED19",
+	"TRenderHideShow",			///< Hide or show renders.
+	"TJobHideShow",				///< Hide or show jobs.
 
     "TLAST"                       ///< The last type number.
 };

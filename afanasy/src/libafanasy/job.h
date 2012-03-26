@@ -25,7 +25,7 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline unsigned getFlags() const { return flags;}
+//   inline unsigned getFlags() const { return flags;}
    inline unsigned getState() const { return state;}
 
    inline int getBlocksNum()           const { return blocksnum;           }
@@ -99,11 +99,7 @@ protected:
    BlockData  ** blocksdata;    ///< Blocks pointer.
    int32_t blocksnum;   ///< Number of blocks in job.
 
-   uint32_t flags;      ///< Job flags.
-
    int32_t userlistorder;   ///< Job order in user jobs list.
-
-   uint32_t state;      ///< Job state.
 
    std::string description; ///< Job description for statistics purposes only.
    std::string annotation;

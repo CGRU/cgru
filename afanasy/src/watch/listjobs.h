@@ -47,6 +47,8 @@ private slots:
    void actNeedProperties();
    void actPostCommand();
    void actLifeTime();
+	void actSetHidden();
+	void actUnsetHidden();
 
    void blockAction( int id_block, int id_action);
 

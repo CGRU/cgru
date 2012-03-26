@@ -8,6 +8,7 @@ set(moc_hdr
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/actionid.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/buttonmonitor.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/colorwidget.h"
+ "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrljobs.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlrenders.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/ctrlsortfilter.h"
  "${CMAKE_CURRENT_SOURCE_DIR}/../../watch/dialog.h"

@@ -104,7 +104,7 @@ int AfContainer::add( af::Node *node)
          af::Node * another = first_ptr;
          while( another != NULL)
          {
-            if((!another->zombie) && (another->name == node->name))
+            if((!another->isZombie()) && (another->name == node->name))
             {
                node->name = origname + '-' + af::itos( number++);
                unique = false;
@@ -171,7 +171,7 @@ void AfContainer::refresh( AfContainer * pointer, MonitorContainer * monitoring)
    time_t currnetTime = time( NULL);
    for( af::Node * node = first_ptr; node != NULL; node = node->next_ptr)
    {
-      if( node->zombie ) continue;
+      if( node->isZombie() ) continue;
       node->refresh( currnetTime, pointer, monitoring);
    }
 }
@@ -181,7 +181,7 @@ af::Msg* AfContainer::generateList( int type)
    af::MCAfNodes mcNodes;
    for( af::Node * node = first_ptr; node != NULL; node = node->next_ptr)
    {
-      if( node->zombie ) continue;
+      if( node->isZombie() ) continue;
       mcNodes.addNode( node);
    }
    return new af::Msg( type, &mcNodes);
@@ -202,7 +202,7 @@ af::Msg* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
       }
       af::Node * node = nodesTable[ pos];
       if( node == NULL   ) continue;
-      if( node -> zombie ) continue;
+      if( node->isZombie()) continue;
       mcNodes.addNode( node);
    }
    if(( getcount == 0) && (false == mcgeneral.getName().empty()))
@@ -220,7 +220,7 @@ af::Msg* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
          for( af::Node *node = first_ptr; node != NULL; node = node->next_ptr )
          {
             if( node == NULL   ) continue;
-            if( node -> zombie ) continue;
+            if( node->isZombie()) continue;
             if( rx.match( node->name))
             {
                mcNodes.addNode( node);
@@ -267,7 +267,7 @@ void AfContainer::freeZombies()
    last_ptr = NULL;
    while( node != NULL)
    {
-      if((node->zombie) && node->unLocked())
+      if((node->isZombie()) && node->unLocked())
       {
          af::Node* z_node = node;
          node = z_node->next_ptr;

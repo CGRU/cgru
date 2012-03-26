@@ -29,6 +29,7 @@ void DBRender::addDBAttributes()
    dbAddAttr( new DBAttrInt32 (  DBAttr::_id,                &id                 ));
 
    dbAddAttr( new DBAttrUInt32(  DBAttr::_state,             &state              ));
+   dbAddAttr( new DBAttrUInt32(  DBAttr::_flags,             &flags              ));
    dbAddAttr( new DBAttrUInt8 (  DBAttr::_priority,          &priority           ));
    dbAddAttr( new DBAttrString(  DBAttr::_username,          &username           ));
    dbAddAttr( new DBAttrInt32 (  DBAttr::_capacity,          &capacity           ));

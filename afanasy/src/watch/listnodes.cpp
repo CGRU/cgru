@@ -17,6 +17,7 @@
 ListNodes::ListNodes( QWidget* parent, int RequestMsgType):
    ListItems( parent, RequestMsgType),
    ctrl( NULL),
+	m_showingHidden( false),
    sorting( false),
    sortascending( false),
    filtering( false),
@@ -186,6 +187,8 @@ bool ListNodes::updateItems( af::Msg * msg)
          filter( new_item, row);
       }
 
+		processHidden();
+
       if( newitemscreated == false ) newitemscreated = true;
 
 AFINFA( "adding item \"%s\", id=%d\n", new_item->getName().toUtf8().data(), new_item->getId());
@@ -273,7 +276,9 @@ void ListNodes::filterChanged()
 
 void ListNodes::filterTypeChanged()
 {
-   for( int i = 0; i < model->count(); i++) ((ItemNode*)(model->item(i)))->setFilterType( ctrl->getFilterType());
+	for( int i = 0; i < model->count(); i++)
+		((ItemNode*)(model->item(i)))->setFilterType( ctrl->getFilterType());
+
    if((ctrl->getFilterType() == CtrlSortFilter::TNONE) || (ctrl->getFilterType() >= CtrlSortFilter::TLAST))
    {
       filtering = false;
@@ -290,6 +295,18 @@ void ListNodes::filterSettingsChanged()
    filterinclude = ctrl->isFilterInclude();
    filtermatch   = ctrl->isFilterMatch();
    if( filtering) filter();
+}
+
+void ListNodes::actShowHidden( int i_type )
+{
+	m_showingHidden = ( false == m_showingHidden );
+	processHidden();
+}
+
+void ListNodes::processHidden()
+{
+	for( int i = 0; i < model->count(); i++)
+		view->setRowHidden( i, m_showingHidden ? false : ((ItemNode*)(model->item(i)))->isHidden());
 }
 
 void ListNodes::sortMatch( const std::vector<int32_t> * list)

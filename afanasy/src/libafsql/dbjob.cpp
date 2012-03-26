@@ -27,6 +27,7 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrInt32(  DBAttr::_id,                 &id                  ));
 
    dbAddAttr( new DBAttrUInt32( DBAttr::_state,              &state               ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,              &flags               ));
    dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,           &priority            ));
    dbAddAttr( new DBAttrInt64 ( DBAttr::_time_started,       &time_started        ));
    dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,          &time_done           ));
@@ -44,7 +45,6 @@ void DBJob::addDBAttributes()
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_os,            &need_os             ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,    &need_properties     ));
    dbAddAttr( new DBAttrString( DBAttr::_description,        &description         ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,              &flags               ));
 
    dbAddAttr( new DBAttrString( DBAttr::_name,               &name                ));
    dbAddAttr( new DBAttrString( DBAttr::_hostname,           &hostname            ));

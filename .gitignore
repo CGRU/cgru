@@ -18,6 +18,7 @@ override.cmd
 # Temporary files and folders
 tmp*
 temp*
+*.swo
 *.swp
 *.suo
 *.sdf

@@ -13,8 +13,6 @@ using namespace af;
 #include "../include/macrooutput.h"
 
 Job::Job( int Id):
-   flags( 0),
-   state( 0),
    blocksnum( 0),
    maxrunningtasks(  -1 ),
    maxruntasksperhost(  -1 ),
@@ -164,6 +162,7 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << username;
    if( hostname.size()) stream << "@" << hostname;
    stream << "[" << userlistorder << "]";
+	if( isHidden()) stream << " (hidden)";
 
    if( blocksnum == 0)
    {
@@ -225,27 +224,4 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
          stream << std::endl << std::endl;
          blocksdata[b]->generateInfoStream( stream, false);
       }
-   /*
-
-   if( blocksdata != NULL)
-   {
-      if( isStarted())
-         for( int b = 0; b < blocksnum; b++)
-         {
-            stream << std::endl;
-            stream << "block[" << b << "]: ";
-            stream << blocksdata[b]->getTasksNum() <<  " tasks: ";
-            stream << blocksdata[b]->getRunningTasksNumber() <<  " run, ";
-            stream << blocksdata[b]->getRunningTasksNumber() <<  " done, ";
-            stream << blocksdata[b]->getProgressTasksError() <<  " error\n";
-            blocksdata[b]->generateProgressStream( stream);
-         }
-
-      for( int b = 0; b < blocksnum; b++)
-      {
-         stream << std::endl;
-         blocksdata[b]->generateInfoStream( stream, false);
-      }
-   }
-*/
 }

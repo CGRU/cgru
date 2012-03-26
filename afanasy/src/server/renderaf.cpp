@@ -230,6 +230,18 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
       break;
    }
+	case af::Msg::TRenderHideShow:
+	{
+		if( isHidden() == mcgeneral.getNumber())
+			return true;
+		setHidden( mcgeneral.getNumber());
+		if( isHidden())
+			appendLog("Set hidden by " + userhost);
+		else
+			appendLog("Unset hidden by " + userhost);
+		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_flags);
+		break;
+	}
    case af::Msg::TRenderSetCapacity:
    {
       appendLog( std::string("Capacity set to ") + af::itos( mcgeneral.getNumber()) + " by " + userhost);

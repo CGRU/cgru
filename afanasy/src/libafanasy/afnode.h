@@ -48,14 +48,23 @@ public:
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
+	enum Flags
+	{
+		FZombie = 1<<0,
+		FHidden = 1<<1
+	};
+
+	inline bool isZombie() const { return (flags & FZombie ); } ///< Whether a node is zombie.
+	inline bool isHidden() const { return (flags & FHidden ); } ///< Whether a node is hidden.
+
    inline void lock()     const { locked =  true; }
    inline void unLock()   const { locked = false; }
    inline bool isLocked() const { return  locked; }
    inline bool unLocked() const { return !locked; }
 
-   inline bool isZombie() const { return zombie;}  ///< Whether job node is zombie.
+	virtual void setZombie() { flags = flags | FZombie; } ///< Request to kill a node.
 
-   virtual void setZombie() { zombie = true; } ///< Request to kill a node.
+	inline void setHidden( bool i_hide = true) { if( i_hide ) flags = flags | FHidden; else flags = flags & (~FHidden); }
 
    // Just interesting - good to show server load
    static unsigned long long getSolvesCount() { return sm_solve_cycle; }
@@ -112,6 +121,9 @@ protected:
 
    mutable bool locked;    ///< Lock state.
 
+	uint32_t state;   ///< State.
+	uint32_t flags;   ///< Flags.
+
 private:
 /// Try to solve a node
     bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
@@ -119,7 +131,7 @@ private:
 private:
 
 /// When node is ready to be deleted from container its becames a zombie and wait for a deletion by special thread.
-   bool zombie;
+//   bool zombie;
 
 /// Will be incremented on each solve on any node
 /** 2^64 / ( seconds_in_year * million_solves_persecond ) ~ 600 thousands of years to work with no overflow

@@ -24,13 +24,13 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline bool isOnline()  const { return (state & SOnline ); }///< Whether Render is online.
-   inline bool isBusy()    const { return (state & SBusy   ); }///< Whether Render is busy.
-   inline bool isNIMBY()   const { return (state & SNIMBY  ); }///< Whether Render is NIMBY.
-   inline bool isNimby()   const { return (state & Snimby  ); }///< Whether Render is nimby.
-   inline bool isFree()    const { return (((~state) & SNIMBY) && ((~state) & Snimby));}///< Whether Render is free.
-   inline bool isOffline() const { return !(state & SOnline );}///< Whether Render is offline.
-   inline bool isDirty()   const { return !(state & SDirty);}  ///< Whether Render is dirty.
+	inline bool isOnline()  const { return (state & SOnline ); }///< Whether Render is online.
+	inline bool isBusy()    const { return (state & SBusy   ); }///< Whether Render is busy.
+	inline bool isNIMBY()   const { return (state & SNIMBY  ); }///< Whether Render is NIMBY.
+	inline bool isNimby()   const { return (state & Snimby  ); }///< Whether Render is nimby.
+	inline bool isFree()    const { return (((~state) & SNIMBY) && ((~state) & Snimby));}///< Whether Render is free.
+	inline bool isOffline() const { return !(state & SOnline );}///< Whether Render is offline.
+	inline bool isDirty()   const { return !(state & SDirty);}  ///< Whether Render is dirty.
 
    inline bool isWOLFalling()   const { return state & SWOLFalling;  }
    inline bool isWOLSleeping()  const { return state & SWOLSleeping; }
@@ -83,17 +83,17 @@ public:
 
 public:
 
-   enum State
-   {
-      SOnline = 1<<0,
-      Snimby  = 1<<1,
-      SNIMBY  = 1<<2,
-      SBusy   = 1<<3,
-      SDirty  = 1<<4,
-      SWOLFalling = 1<<5,
-      SWOLSleeping = 1<<6,
-      SWOLWaking = 1<<7
-   };
+	enum State
+	{
+		SOnline      = 1<<0,
+		Snimby       = 1<<1,
+		SNIMBY       = 1<<2,
+		SBusy        = 1<<3,
+		SDirty       = 1<<4,
+		SWOLFalling  = 1<<5,
+		SWOLSleeping = 1<<6,
+		SWOLWaking   = 1<<7
+	};
 
 protected:
    inline void setBusy(  bool Busy ) { if(Busy ) state = state | SBusy;  else state = state & (~SBusy );}
@@ -101,9 +101,6 @@ protected:
    void checkDirty();
 
 protected:
-
-   uint32_t state;   ///< State.
-   uint32_t flags;   ///< Flags.
 
    int32_t capacity;
    int32_t capacity_used;

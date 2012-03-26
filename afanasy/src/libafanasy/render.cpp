@@ -12,9 +12,9 @@
 using namespace af;
 
 Render::Render( uint32_t State, uint8_t Priority):
-   Client( Client::GetEnvironment, 0),
-   state( State)
+   Client( Client::GetEnvironment, 0)
 {
+	state = State;
    construct();
    priority = Priority;
 }
@@ -135,33 +135,7 @@ int Render::calcWeight() const
    for( std::list<TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++) weight += (*it)->calcWeight();
    return weight;
 }
-#if 0
-const std::string Render::getResourcesString() const
-{
-    std::ostringstream stream;
 
-    hres.generateInfoStream( stream, true);
-/*   stream << "Resources:";
-   stream << "\n   CPU usage: "
-         << unsigned( hres.cpu_idle    ) << "% idle, "
-         << unsigned( hres.cpu_user    ) << "% user, "
-         << unsigned( hres.cpu_nice    ) << "% user nice, "
-         << unsigned( hres.cpu_system  ) << "% system, "
-         << unsigned( hres.cpu_iowait  ) << "% i/o, "
-         << unsigned( hres.cpu_irq     ) << "% irq, "
-         << unsigned( hres.cpu_softirq ) << "% soft irq";
-   stream << "\n   Memory:"
-         << " free " << hres.mem_free_mb << " Mb of total " << host.mem_mb << " Mb"
-         << ": unused " << hres.mem_free_mb << " Mb"
-         << ", cached " << hres.mem_cached_mb << " Mb"
-         << ", buffers " << hres.mem_buffers_mb << " Mb";
-   stream << "\n   Swap: used " << hres.swap_used_mb << " Mb of total " << host.swap_mb << " Mb";
-   stream << "\n   Network: recieving " << hres.net_recv_kbsec << " Kb/sec, sending " << hres.net_send_kbsec << " Kb/sec";
-   stream << "\n   HDD: free " << hres.hdd_free_gb << " Gb of total " << host.hdd_gb << " Gb";
-*/
-    return stream.str();
-}
-#endif
 void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
@@ -174,16 +148,16 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << std::endl;
       address.generateInfoStream( stream ,full);
 
-      stream << "\n Status:";
-      if( isOnline()) stream << " Online";
-      if( isOffline()) stream << " Offline";
-//      if( isFree()) stream << " Free";
-      if( isBusy()) stream << " Busy";
-      if( isNimby()) stream << " (nimby)";
-      if( isNIMBY()) stream << " (NIMBY)";
-      if( isWOLFalling()) stream << " WOL-Falling";
-      if( isWOLSleeping()) stream << " WOL-Sleeping";
-      if( isWOLWaking()) stream << " WOL-Waking";
+		stream << "\n Status:";
+		if( isOnline()) stream << " Online";
+		if( isOffline()) stream << " Offline";
+		if( isHidden()) stream << " Hidden";
+		if( isBusy()) stream << " Busy";
+		if( isNimby()) stream << " (nimby)";
+		if( isNIMBY()) stream << " (NIMBY)";
+		if( isWOLFalling()) stream << " WOL-Falling";
+		if( isWOLSleeping()) stream << " WOL-Sleeping";
+		if( isWOLWaking()) stream << " WOL-Waking";
 
       stream << "\n Priority = " << int(priority);
       stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";

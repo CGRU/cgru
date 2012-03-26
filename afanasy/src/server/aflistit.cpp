@@ -28,7 +28,7 @@ void AfListIt::next()
 //printf("AfListIt::next: it == it_end\n");
       return;
    }
-   while( (*m_it)->zombie )
+   while( (*m_it)->isZombie())
    {
       if( ++m_it == m_it_end )
       {
@@ -47,7 +47,7 @@ void AfListIt::reset()
    {
        return;
    }
-   while( (*m_it)->zombie )
+   while( (*m_it)->isZombie())
    {
        if( ++m_it == m_it_end )
        {

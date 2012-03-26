@@ -22,6 +22,16 @@ public:
    ListNodes( QWidget* parent, int RequestMsgType = 0);
    virtual ~ListNodes();
 
+	inline bool isShowingHidden() const { return m_showingHidden; }
+
+	enum e_HideShow {
+		e_HShowHidden,
+		e_HShowHiddenOnly
+	};
+
+public slots:
+	void actShowHidden( int i_type);
+
 protected:
 
    virtual bool init( bool createModelView = true);
@@ -32,6 +42,8 @@ protected:
 
    CtrlSortFilter * ctrl;
    void initSortFilterCtrl();
+
+	bool m_showingHidden;
 
    bool sorting;
    bool sortascending;
@@ -54,6 +66,7 @@ private slots:
 
 private:
    void filter( ItemNode * item, int row);
+	void processHidden();
 
    QRegExp filter_exp;
    QString filter_str;

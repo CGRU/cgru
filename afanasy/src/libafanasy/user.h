@@ -75,9 +75,6 @@ public:
    inline const std::string & getAnnontation() const { return annotation;}
 
 protected:
-   uint32_t state;             ///< State.
-   uint32_t flags;             ///< Flags.
-
    std::string annotation;
    std::string customdata;
 

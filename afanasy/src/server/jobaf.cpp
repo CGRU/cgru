@@ -305,6 +305,19 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
         }
         break;
     }
+	case af::Msg::TJobHideShow:
+	{
+		if( isHidden() == mcgeneral.getNumber())
+			return true;
+		setHidden( mcgeneral.getNumber());
+		if( isHidden())
+			appendLog("Set hidden by " + userhost);
+		else
+			appendLog("Unset hidden by " + userhost);
+		jobchanged = af::Msg::TMonitorJobsChanged;
+		AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_flags);
+		break;
+	}
    case af::Msg::TJobHostsMaskExclude:
    {
       if( setHostsMaskExclude( mcgeneral.getString()))

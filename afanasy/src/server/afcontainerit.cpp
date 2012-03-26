@@ -56,7 +56,7 @@ void AfContainerIt::reset()
    if( node == NULL) return;
    if( byPassZombies )
    {
-      while( node->zombie)
+      while( node->isZombie())
       {
          node = node->next_ptr;
          if( node == NULL) return;
@@ -71,7 +71,7 @@ void AfContainerIt::next()
    if( node == NULL) return;
    if( byPassZombies )
    {
-      while( node->zombie )
+      while( node->isZombie())
       {
          node = node->next_ptr;
          if( node == NULL) return;
@@ -99,7 +99,7 @@ af::Node* AfContainerIt::get( int id)
       AFCommon::QueueLogError("AfContainerIt::get(): node == NULL : id = " + af::itos(id));
       return NULL;
    }
-   if( node->zombie)
+   if( node->isZombie())
    {
       AFCommon::QueueLogError("AfContainerIt::get(): node is zombie ( id = %d ) \n" + af::itos(id));
       return NULL;

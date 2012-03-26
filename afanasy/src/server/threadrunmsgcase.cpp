@@ -82,6 +82,7 @@ switch ( i_msg->type())
     case af::Msg::TRenderExit:
     case af::Msg::TRenderWOLSleep:
     case af::Msg::TRenderWOLWake:
+	case af::Msg::TRenderHideShow:
     {
         af::MCGeneral mcgeneral( i_msg);
         i_args->renders->action( mcgeneral, i_msg->type(), i_args->jobs, i_args->monitors);
@@ -154,6 +155,7 @@ switch ( i_msg->type())
     case af::Msg::TJobNeedOS:
     case af::Msg::TJobNeedProperties:
     case af::Msg::TJobCmdPost:
+	case af::Msg::TJobHideShow:
     case af::Msg::TBlockErrorsAvoidHost:
     case af::Msg::TBlockErrorRetries:
     case af::Msg::TBlockErrorsSameHost:

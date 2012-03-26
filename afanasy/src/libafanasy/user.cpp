@@ -42,8 +42,6 @@ User::User( Msg * msg)
 
 void User::construct()
 {
-   flags = 0;
-   state = 0;
    m_numjobs = 0;
    numrunningjobs = 0;
    need = 0.0f;

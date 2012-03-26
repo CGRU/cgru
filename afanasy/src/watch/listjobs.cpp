@@ -12,6 +12,7 @@
 #include "../libafanasy/address.h"
 
 #include "itemjob.h"
+#include "ctrljobs.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
 #include "viewitems.h"
@@ -72,6 +73,13 @@ ListJobs::ListJobs( QWidget* parent):
    }
 
    initSortFilterCtrl();
+
+	CtrlJobs * control = new CtrlJobs( ctrl, this);
+	control->setToolTip("\
+Sort & Filter Jobs.\n\
+Press RMB for Options.\
+");
+	ctrl->getLayout()->addWidget( control);
 
    init();
 
@@ -159,6 +167,12 @@ void ListJobs::contextMenuEvent( QContextMenuEvent *event)
 
     submenu = new QMenu( "Set Parameter", this);
 
+	action = new QAction( "Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actSetHidden() ));
+	submenu->addAction( action);
+	action = new QAction( "Not Hidden", this);
+	connect( action, SIGNAL( triggered() ), this, SLOT( actUnsetHidden() ));
+	submenu->addAction( action);
     action = new QAction( "Max Running Tasks", this);
     connect( action, SIGNAL( triggered() ), this, SLOT( actMaxRunningTasks() ));
     submenu->addAction( action);
@@ -503,6 +517,22 @@ void ListJobs::actDelete()
    af::MCGeneral mcgeneral;
    action( mcgeneral, af::Msg::TJobDelete);
    displayInfo( "Delete job.");
+}
+
+void ListJobs::actSetHidden()
+{
+	af::MCGeneral mcgeneral;
+	mcgeneral.setNumber(1);
+	action( mcgeneral, af::Msg::TJobHideShow);
+	displayInfo( "Hide job.");
+}
+
+void ListJobs::actUnsetHidden()
+{
+	af::MCGeneral mcgeneral;
+	mcgeneral.setNumber(0);
+	action( mcgeneral, af::Msg::TJobHideShow);
+	displayInfo( "Unhide job.");
 }
 
 void ListJobs::actRequestLog()

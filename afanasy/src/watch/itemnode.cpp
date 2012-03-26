@@ -15,7 +15,8 @@
 ItemNode::ItemNode( af::Node *node):
    Item( afqt::stoq( node->getName()), node->getId()),
    height( Height),
-   sort_int( 0)
+   sort_int( 0),
+	m_hidden( false)
 {
    locked = node->isLocked();
 }

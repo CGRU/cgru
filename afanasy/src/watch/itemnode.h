@@ -49,6 +49,9 @@ public:
    inline const long long & getSortInt() const { return sort_int; }
    inline const QString   & getSortStr() const { return sort_str; }
 
+	inline bool isHidden() const { return m_hidden;}
+	inline void setHidden( bool i_value) { m_hidden = i_value;}
+
 protected:
    int height;
    QString tooltip;
@@ -56,4 +59,7 @@ protected:
    long long sort_int;    ///< For sorting by some number
    QString  sort_str;     ///< For sorting by some string
    QString  filter_str;   ///< For filtering by some string
+
+private:
+	bool m_hidden;
 };
