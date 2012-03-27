@@ -28,12 +28,38 @@ bool CmdNumeric::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
+CmdNumericDiv::CmdNumericDiv()
+{
+	setCmd("numdiv");
+	setArgsCount(1);
+	setInfo("Divide sequence of a numeric tasks.");
+	setHelp("numdiv [quantity] Divide sequence of a numeric tasks.");
+}
+
+CmdNumericDiv::~CmdNumericDiv(){}
+
+bool CmdNumericDiv::processArguments( int argc, char** argv, af::Msg &msg)
+{
+	int quantity = atoi(argv[0]);
+	if( quantity < 1 )
+	{
+		AFERROR("Quantity should be a number grater that zero")
+		return false;
+	}
+
+	for( int i = 0; i < quantity; i++)
+		std::cout << " " << af::genDivNumber( i, quantity);
+
+	std::cout << std::endl;
+	return true;
+}
+
 CmdNumericCmd::CmdNumericCmd()
 {
    setCmd("numcmd");
    setArgsCount(5);
-   setInfo("Test numeric command fill with numbers.");
-   setHelp("numcmds [command] [start] [end] [pertask] [increment(by)] Check numeric commad.");
+   setInfo("Generate numeric commands.");
+   setHelp("numcmd [command] [start] [end] [pertask] [increment(by)] Generate numeric commads.");
 }
 
 CmdNumericCmd::~CmdNumericCmd(){}

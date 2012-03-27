@@ -368,6 +368,43 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
    }
 }
 
+int af::genDivNumber( int i_index, int i_quantity)
+{
+	if( i_index < 0 )
+	{
+		AFERRAR("af::genDivNumber: index < 0 (%d < 0)", i_index)
+		return 0;
+	}
+
+	if( i_index == 0 )
+		return 0;
+
+	if( i_index == 1 )
+		return i_quantity-1;
+
+	if( i_index >= i_quantity )
+	{
+		AFERRAR("af::genDivNumber: index >= quantity (%d >= %d)", i_index, i_quantity)
+		return i_quantity-1;
+	}
+
+	int index = i_quantity >> 1;
+	int power = 2;
+//	int division = i;
+
+	for( int i = 3; i <= i_index; i++)
+	{
+		power >>= 1;
+
+		if( i < power )
+			index -= index >> 1;
+		else
+			index += index >> 1;
+	}
+
+	return index;
+}
+
 const std::string af::fillNumbers( const std::string & pattern, long long start, long long end)
 {
    std::string str;
