@@ -1,6 +1,7 @@
 #pragma once
 
 #include "../libafanasy/name_af.h"
+#include "../libafanasy/blockdata.h"
 #include "../libafanasy/taskprogress.h"
 
 #include "item.h"
@@ -12,6 +13,8 @@ public:
    ~ItemJobTask();
 
    void upProgress( const af::TaskProgress & tp);
+
+	inline bool isBlockNumeric() const { return block->isNumeric();}
 
    inline int getBlockNum() const { return blocknum; }
    inline int getTaskNum()  const { return tasknum;  }

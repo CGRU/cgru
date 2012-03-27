@@ -104,6 +104,8 @@ public:
 
     void static loadImage( QPixmap & o_pixmap, const QString & i_filename);
 
+	void static browseImages( const QString & i_image, const QString & i_wdir);
+
 private:
     static MonitorHost * m;
     static Dialog * d;

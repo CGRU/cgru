@@ -3,9 +3,6 @@
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 
-#include "../libafanasy/blockdata.h"
-//#include "../libafanasy/jobprogress.h"
-
 #include "../libafqt/qenvironment.h"
 
 #include "itemjobblock.h"

@@ -215,30 +215,33 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
                connect( action, SIGNAL( triggered() ), this, SLOT( actBrowseFolder() ));
                menu.addAction( action);
 
-               QMenu * submenu_cmd = new QMenu( "Preview", this);
-               int p = 0;
-               for( std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
-               {
-                  if( files.size() > 1)
-                  {
-                     QMenu * submenu_img = new QMenu( QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
-                     for( int i = 0; i < files.size(); i++)
-                     {
-                        QString imgname = files[i].right(99);
-                        ActionIdId * actionid = new ActionIdId( p, i, imgname, this);
-                        connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-                        submenu_img->addAction( actionid);
-                     }
-                     submenu_cmd->addMenu( submenu_img);
-                  }
-                  else
-                  {
-                     ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
-                     connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
-                     submenu_cmd->addAction( actionid);
-                  }
-               }
-               menu.addMenu( submenu_cmd);
+				if( ((ItemJobTask*)(item))->isBlockNumeric() )
+				{
+					QMenu * submenu_cmd = new QMenu( "Preview", this);
+					int p = 0;
+					for( std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
+					{
+						if( files.size() > 1)
+						{
+							QMenu * submenu_img = new QMenu( QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
+							for( int i = 0; i < files.size(); i++)
+							{
+								QString imgname = files[i].right(99);
+								ActionIdId * actionid = new ActionIdId( p, i, imgname, this);
+								connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+								submenu_img->addAction( actionid);
+							}
+							submenu_cmd->addMenu( submenu_img);
+						}
+						else
+						{
+							ActionIdId * actionid = new ActionIdId( p, 0, QString("%1").arg( QString::fromUtf8((*it).c_str())), this);
+							connect( actionid, SIGNAL( triggeredId(int,int) ), this, SLOT( actTaskPreview(int,int) ));
+							submenu_cmd->addAction( actionid);
+						}
+					}
+					menu.addMenu( submenu_cmd);
+				}
             }
          }
 
@@ -654,35 +657,7 @@ void ListTasks::actBrowseFolder()
         return;
     }
 
-    if( image.isEmpty())
-        return;
-
-    QString folder = image.left( image.lastIndexOf('/'));
-    folder = folder.left( image.lastIndexOf('\\'));
-    if( folder == image )
-        folder = wdir;
-
-    QDir dir( wdir);
-    if( dir.exists())
-        dir.cd( folder);
-    else
-        dir.setPath( folder);
-
-    if( false == dir.exists())
-    {
-        Watch::displayError( QString("Folder '%1' does not exist.").arg( dir.path()));
-        return;
-    }
-
-#ifdef WINNT
-    Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
-    QStringList args;
-    args << "/c" << "start" << "Open Images Folder" << dir.path();
-    QProcess::startDetached( "cmd.exe", args);
-#else
-    QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
-    Watch::startProcess( cmd + " \"" + folder + "\"", wdir);
-#endif
+	Watch::browseImages( image, wdir);
 }
 
 void ListTasks::setBlockProperty( int type, af::MCGeneral & mcgeneral)

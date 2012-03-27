@@ -105,9 +105,9 @@ On MS Windows it should be something like:
 <!-- Commands argument = "@ARG@"
      To clear a list specify an empty element text.
 -->
-   <previewcmds>nuke -v @ARG@</previewcmds>
-   <previewcmds>imf_disp @ARG@</previewcmds>
-   <previewcmds>mplay @ARG@</previewcmds>
+   <previewcmds>nuke -v "@ARG@"</previewcmds>
+   <previewcmds>imf_disp "@ARG@"</previewcmds>
+   <previewcmds>mplay "@ARG@"</previewcmds>
 <!-- Example for MS Windows:
      <rendercmds></rendercmds>
      <rendercmds>vncviewer @ARG@</rendercmds>

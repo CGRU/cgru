@@ -336,6 +336,39 @@ void Watch::loadImage( QPixmap & o_pixmap, const QString & i_filename)
     }
 }
 
+void Watch::browseImages( const QString & i_image, const QString & i_wdir)
+{
+    if( i_image.isEmpty())
+        return;
+
+    QString folder = i_image.left( i_image.lastIndexOf('/'));
+    folder = folder.left( i_image.lastIndexOf('\\'));
+    if( folder == i_image )
+        folder = i_wdir;
+
+    QDir dir( i_wdir);
+    if( dir.exists())
+        dir.cd( folder);
+    else
+        dir.setPath( folder);
+
+    if( false == dir.exists())
+    {
+        Watch::displayError( QString("Folder '%1' does not exist.").arg( dir.path()));
+        return;
+    }
+
+#ifdef WINNT
+    Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
+    QStringList args;
+    args << "/c" << "start" << "Open Images Folder" << dir.path();
+    QProcess::startDetached( "cmd.exe", args);
+#else
+    QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
+    Watch::startProcess( cmd + " \"" + folder + "\"", i_wdir);
+#endif
+}
+
 void Watch::repaint()
 {
 //printf("Watch::repaint: start\n");

@@ -183,7 +183,7 @@ class BlockParameters:
                   nuke.message('Error:\n%s\nInvalid files pattern.\nView "%s".' % ( self.writename, view))
                   self.valid = False
                   return
-               self.imgfile += part1 + '#'*padding + part2
+               self.imgfile += part1 + '@' + '#'*padding + '@' + part2
 
          # Check images folders:
          for imgfile in self.imgfile.split(';'):
