@@ -4,8 +4,6 @@
 #include <QtGui/QTextEdit>
 
 #include "../libafanasy/msg.h"
-#include "../libafanasy/service.h"
-#include "../libafanasy/taskexec.h"
 
 #include "../libafqt/name_afqt.h"
 
@@ -54,74 +52,15 @@ WndText::WndText( const QString & Name, af::Msg * msg):
                qTextEdit->append( afqt::stoq(*it));
             break;
          }
-         case af::Msg::TTask:
-         {
-            showTask( msg);
-            break;
-         }
          default:
-            AFERROR("WndText::WndText: Invalid message:\n");
-            msg->stdOut();
+            insertText("WndText::WndText: Invalid message:\n");
+            insertText( afqt::stoq( msg->generateInfoString()));
       }
    }
 }
 
 WndText::~WndText()
 {
-}
-
-void WndText::showTask( af::Msg * msg)
-{
-   af::TaskExec taskexec( msg);
-   af::Service service( taskexec);
-   QString wdir      = afqt::stoq( service.getWDir());
-   QString command   = afqt::stoq( service.getCommand());
-   QString files     = afqt::stoq( service.getFiles());
-
-   QTextCharFormat fParameter;
-   QTextCharFormat fInfo;
-   fParameter.setFontWeight(QFont::Bold);
-   fInfo.setFontItalic(true);
-
-   QTextCursor c( qTextEdit->textCursor());
-
-   c.insertText( afqt::stoq( taskexec.getName()), fParameter);
-   c.insertText( "\n");
-   c.insertText( afqt::stoq( taskexec.getServiceType()), fParameter);
-   c.insertText( "[", fInfo);
-   c.insertText( afqt::stoq( taskexec.getParserType()), fParameter);
-   c.insertText( "]:", fInfo);
-   c.insertText( QString::number( taskexec.getCapacity()), fParameter);
-   c.insertText( " frames(", fInfo);
-   c.insertText( QString::number( taskexec.getFrameStart()), fParameter);
-   c.insertText( ",", fInfo);
-   c.insertText( QString::number( taskexec.getFrameFinish()), fParameter);
-   c.insertText( ",", fInfo);
-   c.insertText( QString::number( taskexec.getFramesNum()), fParameter);
-   c.insertText( "):", fInfo);
-   c.insertText( "\n");
-   c.insertText( "Command:", fInfo);
-   c.insertText( "\n");
-   c.insertText( command, fParameter);
-   c.insertText( "\n");
-   c.insertText( "Working Directory:", fInfo);
-   c.insertText( "\n");
-   c.insertText( wdir, fParameter);
-   if( files.isEmpty() == false)
-   {
-      c.insertText( "\n");
-      c.insertText( "Files:", fInfo);
-      c.insertText( "\n");
-      c.insertText( files.replace(";","\n"), fParameter);
-   }
-   if( taskexec.hasFileSizeCheck())
-   {
-      c.insertText( "\n");
-      c.insertText( "File Size Check: ", fInfo);
-      c.insertText( QString::number( taskexec.getFileSizeMin()), fParameter);
-      c.insertText( " - ", fInfo);
-      c.insertText( QString::number( taskexec.getFileSizeMax()), fParameter);
-   }
 }
 
 void WndText::insertText( const QString text)

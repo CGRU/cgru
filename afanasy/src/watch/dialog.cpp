@@ -31,6 +31,7 @@
 #include "wnd.h"
 #include "wndcustomizegui.h"
 #include "wndcustomizesounds.h"
+#include "wndtask.h"
 #include "wndtext.h"
 #include "wndlist.h"
 
@@ -330,7 +331,7 @@ void Dialog::newMessage( af::Msg *msg)
     }
     case af::Msg::TTask:
     {
-        new WndText( "Task", msg);
+        new WndTask( "Task", msg);
         break;
     }
     case af::Msg::TString:

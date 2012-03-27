@@ -18,7 +18,4 @@ public:
 protected:
    QVBoxLayout * layout;
    QTextEdit * qTextEdit;
-
-private:
-   void showTask( af::Msg * msg);
 };
