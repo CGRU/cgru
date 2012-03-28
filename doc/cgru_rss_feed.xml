@@ -5,10 +5,21 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Thu, 22 Mar 2011 00:00:00 GMT</pubDate>
-   <lastBuildDate>Thu, 22 Mar 2011 00:00:00 GMT</lastBuildDate>
+   <pubDate>Wed, 28 Mar 2011 00:00:00 GMT</pubDate>
+   <lastBuildDate>Wed, 28 Mar 2011 00:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.6.1 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release161</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release161</guid>
+      <description>
+         Tasks can be solved in a not-sequential manner. For example 1-10: 0 9 5 2 7 1 3 6 8 4.
+         You can hide jobs or renders in AfWatch by some parameter.
+         AfWatch can preview tasks of a not-numeric blocks (This bug is a main reason of this release).
+      </description>
+      <pubDate>Wed, 28 Mar 2011 00:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.6.0 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release160</link>
