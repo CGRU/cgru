@@ -117,7 +117,7 @@ namespace af
    const std::string strReplace( const std::string & str, char before, char after);
    const std::list<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
 
-	int genDivNumber( int i_index, int i_quantity);
+	int getReadyTaskNumber( int i_quantity, TaskProgress * i_tp);
    const std::string fillNumbers( const std::string & pattern, long long start, long long end);
    const std::string replaceArgs( const std::string & pattern, const std::string & arg);
 

@@ -2,6 +2,7 @@
 
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/taskexec.h"
+#include "../libafanasy/taskprogress.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -28,29 +29,41 @@ bool CmdNumeric::processArguments( int argc, char** argv, af::Msg &msg)
    return true;
 }
 
-CmdNumericDiv::CmdNumericDiv()
+CmdNumericGen::CmdNumericGen()
 {
-	setCmd("numdiv");
+	setCmd("numgen");
 	setArgsCount(1);
-	setInfo("Divide sequence of a numeric tasks.");
-	setHelp("numdiv [quantity] Divide sequence of a numeric tasks.");
+	setInfo("Generate tasks numbers sequence.");
+	setHelp("numgen [quantity] Generate tasks numbers sequence.");
 }
 
-CmdNumericDiv::~CmdNumericDiv(){}
+CmdNumericGen::~CmdNumericGen(){}
 
-bool CmdNumericDiv::processArguments( int argc, char** argv, af::Msg &msg)
+bool CmdNumericGen::processArguments( int argc, char** argv, af::Msg &msg)
 {
 	int quantity = atoi(argv[0]);
 	if( quantity < 1 )
 	{
-		AFERROR("Quantity should be a number grater that zero")
+		AFERROR("Quantity should be a number greater that zero.")
 		return false;
 	}
 
+	af::TaskProgress * tp = new af::TaskProgress[quantity];
 	for( int i = 0; i < quantity; i++)
-		std::cout << " " << af::genDivNumber( i, quantity);
+		tp[i].state = AFJOB::STATE_READY_MASK;
 
+	int counter = 0;
+	int task;
+	while(( task = af::getReadyTaskNumber( quantity, tp)) != -1)
+	{
+		std::cout << " " << task;
+		tp[task].state = 0;
+		if( counter++ > 100) break;
+	}
 	std::cout << std::endl;
+
+	delete [] tp;
+
 	return true;
 }
 

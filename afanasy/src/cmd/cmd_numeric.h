@@ -10,11 +10,11 @@ public:
 	bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 
-class CmdNumericDiv : public Cmd
+class CmdNumericGen : public Cmd
 {
 public:
-	CmdNumericDiv();
-	~CmdNumericDiv();
+	CmdNumericGen();
+	~CmdNumericGen();
 	bool processArguments( int argc, char** argv, af::Msg &msg);
 };
 
