@@ -880,14 +880,19 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 		if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 
 		int numtasks = blocksdata[b]->getTasksNum();
-		int t = 0;
-		while( t < numtasks )
+		int t = -1;
+		for(;;)
 		{
 			if( blocksdata[b]->isSequential())
 			{
+				t++;
+				if( t >= numtasks )
+				{
+					break;
+				}
+
 				if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK ))
 				{
-					t++;
 					continue;
 				}
 			}
