@@ -376,6 +376,9 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 	{
 		if( false == (flags & af::BlockData::FNonSequential))
 		{
+			if( i_tp[task]->isSolved()) continue;
+			i_tp[task]->setSolved();
+
 			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
 				return task;
 			else
@@ -402,6 +405,9 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 
 			if( index >= i_quantity )
 				index = i_quantity - 1;
+
+			if( i_tp[index]->isSolved()) continue;
+			i_tp[index]->setSolved();
 
 			if( i_tp[index]->state & AFJOB::STATE_READY_MASK )
 				return index;

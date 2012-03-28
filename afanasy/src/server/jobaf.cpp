@@ -864,7 +864,14 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
         int numtasks = blocksdata[b]->getTasksNum();
         for( int t = 0; t < numtasks; t++)
         {
-            m_blocks[b]->tasks[t]->m_solved = false;
+			// Needed for recursion function, to not to try to solve the same task again
+			m_blocks[b]->tasks[t]->m_solved = false;
+
+			if( blocksdata[b]->isNonSequential())
+			{
+				// Needed to store tasks that was tried
+				progress->tp[b][t]->setNotSolved();
+			}
         }
     }
 
@@ -873,40 +880,50 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 		if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 
 		int numtasks = blocksdata[b]->getTasksNum();
-		//for( int t = 0; t < numtasks; t++)
-		int t;
-		for( int startTask = 0; startTask < numtasks; startTask++)
+		int t = 0;
+		while( t < numtasks )
 		{
-			while(( t = af::getReadyTaskNumber( numtasks, progress->tp[b], blocksdata[b]->getFlags(), startTask)) != -1)
+			if( blocksdata[b]->isSequential())
 			{
-				//static int cycle = 0;printf("cycle = %d\n", cycle++);
-				//if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK )) continue;
-				std::list<int> blocksIds;
-				af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
-				// Job may became paused, if recursion during task generation detected:
-				if( state & AFJOB::STATE_OFFLINE_MASK )
+				if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK ))
 				{
-					if( taskexec ) delete taskexec;
-					return false;
+					t++;
+					continue;
 				}
-				// No task was generated:
-				if( taskexec == NULL ) continue;
-
-				// Job successfully solved (produced a task)
-				taskexec->setJobName( name);
-				taskexec->setUserName( username);
-				listeners.process( *taskexec);
-				m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
-				// If job was not started it became started
-				if( time_started == 0 )
-				{
-					time_started = time(NULL);
-					appendLog("Started.");
-					AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_started);
-				}
-	
-				return true;
 			}
+			else
+			{
+				t = af::getReadyTaskNumber( numtasks, progress->tp[b], blocksdata[b]->getFlags());
+				if( t == -1 )
+					break;
+			}
+
+			//static int cycle = 0;printf("cycle = %d\n", cycle++);
+			std::list<int> blocksIds;
+			af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
+			// Job may became paused, if recursion during task generation detected:
+			if( state & AFJOB::STATE_OFFLINE_MASK )
+			{
+				if( taskexec ) delete taskexec;
+				return false;
+			}
+			// No task was generated:
+			if( taskexec == NULL ) continue;
+
+			// Job successfully solved (produced a task)
+			taskexec->setJobName( name);
+			taskexec->setUserName( username);
+			listeners.process( *taskexec);
+			m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
+			// If job was not started it became started
+			if( time_started == 0 )
+			{
+				time_started = time(NULL);
+				appendLog("Started.");
+				AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_started);
+			}
+
+			return true;
 		}
 	}
 	return false;

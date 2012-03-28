@@ -62,13 +62,10 @@ bool CmdNumericGen::processArguments( int argc, char** argv, af::Msg &msg)
 		tp[i]->state = AFJOB::STATE_READY_MASK;
 	}
 
-	int counter = 0;
 	int task;
 	while(( task = af::getReadyTaskNumber( quantity, tp, af::BlockData::FNonSequential, start_from)) != -1)
 	{
 		std::cout << " " << task;
-		tp[task]->state = 0;
-		if( counter++ > 100) break;
 	}
 	std::cout << std::endl;
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../include/afjob.h"
+
 #include "name_af.h"
 #include "msg.h"
 
@@ -25,6 +27,11 @@ public:
    int32_t  errors_count;  ///< Number of times task finished with errors .
    int64_t  time_start;    ///< start time.
    int64_t  time_done;     ///< Task finish time ( or last update time if still running ).
+
+	inline void setSolved() { state |= AFJOB::STATE_SOLVED_MASK; }
+	inline void setNotSolved() { state &= (~AFJOB::STATE_SOLVED_MASK); }
+	inline bool isSolved() const { return state & AFJOB::STATE_SOLVED_MASK; }
+	inline bool isNotSolved() const { return false == (state & AFJOB::STATE_SOLVED_MASK); }
 
    std::string hostname;           ///< Host, last event occurs where.
 

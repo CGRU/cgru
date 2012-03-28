@@ -70,6 +70,8 @@ namespace AFJOB
    const   char   STATE_PARSERBADRESULT_NAME[]     = "ParserBadResult";
    const   char   STATE_PARSERBADRESULT_NAME_S[]   = "PBR";
 
+   const uint32_t STATE_SOLVED_MASK       = 1<<13;
+
    const int  SYSJOB_ID                   = 1;  // System job ID
    const char SYSJOB_NAME[]               = "afanasy";
    const char SYSJOB_USERNAME[]           = "afadmin";
