@@ -50,7 +50,7 @@ private slots:
 	void actSetHidden();
 	void actUnsetHidden();
 
-   void blockAction( int id_block, int id_action);
+   void blockAction( int id_block, int id_action, int i_number);
 
    void actStart();
    void actStop();

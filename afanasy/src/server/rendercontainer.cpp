@@ -51,7 +51,7 @@ af::Msg * RenderContainer::addRender( RenderAf *newRender, MonitorContainer * mo
             else if( render->online( newRender, monitoring))
             {
                int id = render->getId();
-               AFCommon::QueueLog("Render online: " + render->generateInfoString( false));
+               AFCommon::QueueLog("Render: " + render->generateInfoString( false));
                delete newRender;
                // Return new render ID to render to tell that it was successfully registered:
                return new af::Msg( af::Msg::TRenderId, id);

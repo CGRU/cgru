@@ -43,6 +43,7 @@ parser.add_option(      '--parser',       dest='parser',       type='string', de
 parser.add_option('-v', '--verbose',      dest='verbose',      type='int',    default=0,  help='tasks verbose level')
 parser.add_option('-x', '--xcopy',        dest='xcopy',        type='int',    default=1,  help='number of copies to send')
 parser.add_option(      '--sub',          dest='subdep',       action='store_true', default=False, help='sub task dependence')
+parser.add_option(      '--nonseq',       dest='nonseq',       action='store_true', default=False, help='task non-sequential running')
 parser.add_option('-s', '--stringtype',   dest='stringtype',   action='store_true', default=False, help='generate not numeric blocks')
 parser.add_option('-o', '--output',       dest='output',       action='store_true', default=False, help='output job information')
 parser.add_option(      '--pause',        dest='pause',        action='store_true', default=False, help='start job paused')
@@ -98,6 +99,8 @@ for b in range( numblocks):
    if options.maxtime: block.setTasksMaxRunTime( options.maxtime)
 
    if options.capacity != 0 : block.setCapacity( options.capacity)
+
+   if options.nonseq: block.setNonSequential()
 
    str_capacity = ''
    if options.capmin != -1 or options.capmax != -1:

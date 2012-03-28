@@ -243,6 +243,12 @@ PyObject * PyAf_Block_setNeedProperties( PyAf_Block_Object *self, PyObject *arg)
    Py_RETURN_FALSE;
 }
 
+PyObject * PyAf_Block_setNonSequential( PyAf_Block_Object *self)
+{
+   self->block->setNonSequential( true);
+   Py_RETURN_NONE;
+}
+
 PyObject * PyAf_Block_setNumeric( PyAf_Block_Object *self, PyObject *args)
 {
    long long start, end, perHost, incement;

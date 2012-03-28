@@ -185,6 +185,7 @@ switch ( i_msg->type())
     case af::Msg::TBlockNeedPower:
     case af::Msg::TBlockNeedHDD:
     case af::Msg::TBlockNeedProperties:
+    case af::Msg::TBlockNonSequential:
     {
         af::MCGeneral mcgeneral( i_msg);
         i_args->jobs->action( mcgeneral, i_msg->type(), i_args->renders, i_args->monitors);

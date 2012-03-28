@@ -29,13 +29,14 @@ public:
 
    inline uint32_t getFlags() const { return flags;}
 
-   enum Flags{
-      FNumeric          = 1 << 0,
-      FVarCapacity      = 1 << 1,
-      FMultiHost        = 1 << 2,
-      FSameHostMaster   = 1 << 3,
-      FDependSubTask    = 1 << 4
-   };
+	enum Flags{
+		FNumeric          = 1 << 0,
+		FVarCapacity      = 1 << 1,
+		FMultiHost        = 1 << 2,
+		FSameHostMaster   = 1 << 3,
+		FDependSubTask    = 1 << 4,
+		FNonSequential    = 1 << 5
+	};
 
    bool isValid() const;
    inline  void setJobId( int value) { jobid = value;}   ///< Set id of block job.
@@ -68,6 +69,10 @@ public:
    inline bool isDependSubTask() const { return flags & FDependSubTask;} ///< Other block can depend this block sub task
 
    inline void setDependSubTask( bool value = true) { if(value) flags |= FDependSubTask; else flags &= (~FDependSubTask);}
+
+	inline bool isSequential()    const { return false == (flags & FNonSequential);}
+	inline bool isNonSequential() const { return flags & FNonSequential; }
+	inline void setNonSequential( bool i_value ) { if(i_value) flags |= FNonSequential; else flags &= (~FNonSequential);}
 
    inline void setParserCoeff( int value ) { parsercoeff = value; }
 

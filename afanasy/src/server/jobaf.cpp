@@ -516,6 +516,7 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    case af::Msg::TBlockMultiHostMax:
    case af::Msg::TBlockMultiHostWaitMax:
    case af::Msg::TBlockMultiHostWaitSrv:
+   case af::Msg::TBlockNonSequential:
    {
       int bnum = mcgeneral.getId();
       if( bnum == -1)
@@ -867,42 +868,48 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
         }
     }
 
-   for( int b = 0; b < blocksnum; b++)
-   {
-      if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
+	for( int b = 0; b < blocksnum; b++)
+	{
+		if( false == ( blocksdata[b]->getState() & AFJOB::STATE_READY_MASK )) continue;
 
-      int numtasks = blocksdata[b]->getTasksNum();
-      for( int t = 0; t < numtasks; t++)
-      {
-         if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK )) continue;
-         std::list<int> blocksIds;
-         af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
-         // Job may became paused, if recursion during task generation detected:
-         if( state & AFJOB::STATE_OFFLINE_MASK )
-         {
-            if( taskexec ) delete taskexec;
-            return false;
-         }
-         // No task was generated:
-         if( taskexec == NULL ) continue;
+		int numtasks = blocksdata[b]->getTasksNum();
+		//for( int t = 0; t < numtasks; t++)
+		int t;
+		for( int startTask = 0; startTask < numtasks; startTask++)
+		{
+			while(( t = af::getReadyTaskNumber( numtasks, progress->tp[b], blocksdata[b]->getFlags(), startTask)) != -1)
+			{
+				//static int cycle = 0;printf("cycle = %d\n", cycle++);
+				//if( false == ( progress->tp[b][t]->state & AFJOB::STATE_READY_MASK )) continue;
+				std::list<int> blocksIds;
+				af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
+				// Job may became paused, if recursion during task generation detected:
+				if( state & AFJOB::STATE_OFFLINE_MASK )
+				{
+					if( taskexec ) delete taskexec;
+					return false;
+				}
+				// No task was generated:
+				if( taskexec == NULL ) continue;
 
-         // Job successfully solved (produced a task)
-         taskexec->setJobName( name);
-         taskexec->setUserName( username);
-         listeners.process( *taskexec);
-         m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
-         // If job was not started it became started
-         if( time_started == 0 )
-         {
-            time_started = time(NULL);
-            appendLog("Started.");
-            AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_started);
-         }
-
-         return true;
-      }
-   }
-   return false;
+				// Job successfully solved (produced a task)
+				taskexec->setJobName( name);
+				taskexec->setUserName( username);
+				listeners.process( *taskexec);
+				m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
+				// If job was not started it became started
+				if( time_started == 0 )
+				{
+					time_started = time(NULL);
+					appendLog("Started.");
+					AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_time_started);
+				}
+	
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 void JobAf::updateTaskState( const af::MCTaskUp& taskup, RenderContainer * renders, MonitorContainer * monitoring)

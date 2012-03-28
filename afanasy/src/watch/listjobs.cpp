@@ -801,11 +801,11 @@ void ListJobs::actListenJob()
 }
 
 
-void ListJobs::blockAction( int id_block, int id_action)
+void ListJobs::blockAction( int id_block, int id_action, int i_number)
 {
    ItemJob* jobitem = (ItemJob*)getCurrentItem();
    if( jobitem == NULL ) return;
-   af::MCGeneral * mcgeneral = jobitem->blockAction( id_block, id_action, this);
+   af::MCGeneral * mcgeneral = jobitem->blockAction( id_block, id_action, i_number, this);
    if( mcgeneral != NULL)
    {
       action( *mcgeneral, id_action);

@@ -613,6 +613,17 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
       AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_multihost_waitsrv);
       break;
    }
+	case af::Msg::TBlockNonSequential:
+	{
+		data->setNonSequential( mcgeneral.getNumber());
+		appendJobLog( std::string("Tasks solving set to ") +
+			(mcgeneral.getNumber() ? "non-sequential" : "sequential")
+			+ " by " + userhost);
+		if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
+		jobchanged = af::Msg::TMonitorJobsChanged;
+		AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)data, afsql::DBAttr::_flags);
+		break;
+	}
    default:
    {
       AFERRAR("Block::action: Invalid type = \"%s\"", af::Msg::TNAMES[type])

@@ -34,7 +34,7 @@ CmdNumericGen::CmdNumericGen()
 	setCmd("numgen");
 	setArgsCount(1);
 	setInfo("Generate tasks numbers sequence.");
-	setHelp("numgen [quantity] Generate tasks numbers sequence.");
+	setHelp("numgen [quantity] [start from] Generate tasks numbers sequence.");
 }
 
 CmdNumericGen::~CmdNumericGen(){}
@@ -47,21 +47,33 @@ bool CmdNumericGen::processArguments( int argc, char** argv, af::Msg &msg)
 		AFERROR("Quantity should be a number greater that zero.")
 		return false;
 	}
+	int start_from = 0;
+	if( argc > 1 )
+	{
+		start_from = atoi(argv[1]);	
+	}
 
-	af::TaskProgress * tp = new af::TaskProgress[quantity];
+	printf("Tasks quantity = %d, starting from %d:\n", quantity, start_from);
+
+	af::TaskProgress ** tp = new af::TaskProgress * [quantity];
 	for( int i = 0; i < quantity; i++)
-		tp[i].state = AFJOB::STATE_READY_MASK;
+	{
+		tp[i] = new af::TaskProgress;
+		tp[i]->state = AFJOB::STATE_READY_MASK;
+	}
 
 	int counter = 0;
 	int task;
-	while(( task = af::getReadyTaskNumber( quantity, tp)) != -1)
+	while(( task = af::getReadyTaskNumber( quantity, tp, af::BlockData::FNonSequential, start_from)) != -1)
 	{
 		std::cout << " " << task;
-		tp[task].state = 0;
+		tp[task]->state = 0;
 		if( counter++ > 100) break;
 	}
 	std::cout << std::endl;
 
+	for( int i = 0; i < quantity; i++)
+		delete tp[i];
 	delete [] tp;
 
 	return true;

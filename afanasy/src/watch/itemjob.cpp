@@ -305,12 +305,12 @@ void ItemJob::generateMenu( int id_block, QMenu * menu, QWidget * qwidget)
    blockinfo[ id_block >= 0 ? id_block : 0].generateMenu( id_block, menu, qwidget);
 }
 
-af::MCGeneral * ItemJob::blockAction( int id_block, int id_action, ListItems * listitems) const
+af::MCGeneral * ItemJob::blockAction( int id_block, int id_action, int i_number, ListItems * listitems) const
 {
    if((id_block >= 0) && (id_block >= blocksnum))
    {
       AFERRAR("ListJobs::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return NULL;
    }
-   return blockinfo[ id_block >= 0 ? id_block : 0].blockAction( id_block, id_action, listitems);
+   return blockinfo[ id_block >= 0 ? id_block : 0].blockAction( id_block, id_action, i_number, listitems);
 }

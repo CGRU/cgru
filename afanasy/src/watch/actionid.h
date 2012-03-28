@@ -8,16 +8,16 @@ class ActionId : public QAction
 Q_OBJECT
 
 public:
-   ActionId( int ID, const QString & text, QObject * parent );
+	ActionId( int i_id, const QString & text, QObject * parent );
 
 signals:
-   void triggeredId( int);
+	void triggeredId( int);
 
 private slots:
-   void triggeredId_Slot();
+	void triggeredId_Slot();
 
 private:
-   int id;
+	int m_id;
 };
 
 class ActionIdId : public QAction
@@ -26,17 +26,37 @@ class ActionIdId : public QAction
 Q_OBJECT
 
 public:
-   ActionIdId ( int ID_1, int ID_2, const QString & text, QObject * parent );
+	ActionIdId ( int i_id_1, int i_id_2, const QString & text, QObject * parent );
 
 signals:
-   void triggeredId( int, int);
+	void triggeredId( int, int);
 
 private slots:
-   void triggeredId_Slot();
+	void triggeredId_Slot();
 
 private:
-   int id_1;
-   int id_2;
+	int m_id_1;
+	int m_id_2;
+};
+
+class ActionIdIdId : public QAction
+{
+
+Q_OBJECT
+
+public:
+	ActionIdIdId ( int i_id_1, int i_id_2, int i_id_3, const QString & text, QObject * parent );
+
+signals:
+	void triggeredId( int, int, int);
+
+private slots:
+	void triggeredId_Slot();
+
+private:
+	int m_id_1;
+	int m_id_2;
+	int m_id_3;
 };
 
 class ActionString : public QAction
@@ -45,14 +65,14 @@ class ActionString : public QAction
 Q_OBJECT
 
 public:
-   ActionString( const QString & i_string, const QString & i_text, QObject * i_parent );
+	ActionString( const QString & i_string, const QString & i_text, QObject * i_parent );
 
 signals:
-   void triggeredString( QString );
+	void triggeredString( QString );
 
 private slots:
-   void triggeredString_Slot();
+	void triggeredString_Slot();
 
 private:
-   QString m_string;
+	QString m_string;
 };

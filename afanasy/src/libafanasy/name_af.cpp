@@ -23,6 +23,7 @@
 #include <unistd.h>
 #endif
 
+#include "blockdata.h"
 #include "environment.h"
 #include "farm.h"
 #include "regexp.h"
@@ -369,26 +370,18 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
    }
 }
 
-int af::getReadyTaskNumber( int i_quantity, af::TaskProgress * i_tp)
+int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
 {
-	for( int task = 0; task < i_quantity; task++)
+	for( int task = i_startFrom; task < i_quantity; task++)
 	{
-/*		if( task == 0 )
+		if( false == (flags & af::BlockData::FNonSequential))
 		{
-			if(i_tp[0].state & AFJOB::STATE_READY_MASK)
-				return 0;
+			if( i_tp[task]->state & AFJOB::STATE_READY_MASK )
+				return task;
 			else
 				continue;
 		}
 
-		if( task == 1 )
-		{
-			if(i_tp[i_quantity-1].state & AFJOB::STATE_READY_MASK)
-				return i_quantity-1;
-			else
-				continue;
-		}
-*/
 		int64_t powered = 1;
 		while( powered < task )
 			powered <<= 1;
@@ -401,7 +394,7 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress * i_tp)
 		}
 
 		//printf(" task=%d, powered=%lld\n", task, powered);
-		for( int64_t i = 0; i <= powered; i++)
+		for( int64_t i = i_startFrom; i <= powered; i++)
 		{
 			int index = i;
 			if( false == nodivision_needed )
@@ -410,7 +403,7 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress * i_tp)
 			if( index >= i_quantity )
 				index = i_quantity - 1;
 
-			if( i_tp[index].state & AFJOB::STATE_READY_MASK )
+			if( i_tp[index]->state & AFJOB::STATE_READY_MASK )
 				return index;
 		}
 	}

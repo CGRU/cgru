@@ -718,6 +718,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
     case af::Msg::TBlockNeedPower:
     case af::Msg::TBlockNeedHDD:
     case af::Msg::TBlockNeedProperties:
+    case af::Msg::TBlockNonSequential:
     case af::Msg::TTasksRestart:
     case af::Msg::TJobAnnotate:
     case af::Msg::TJobSetUser:

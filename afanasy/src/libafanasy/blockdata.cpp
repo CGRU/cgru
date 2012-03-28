@@ -696,6 +696,7 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
       }
 
       if( isDependSubTask() ) stream << "\n   Sub Task Dependence.";
+      if( isNonSequential() ) stream << "\n   Non-sequential tasks solving.";
 
       if( full || ( maxrunningtasks != -1 )) stream << "\n Max Running Tasks = " << maxrunningtasks;
       if( full && ( maxrunningtasks == -1 )) stream << " (no limit)";

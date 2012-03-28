@@ -728,14 +728,14 @@ void ListTasks::actTaskListen()
       jobname + '(' + itemTask->getName() + ')');
 }
 
-void ListTasks::blockAction( int id_block, int id_action)
+void ListTasks::blockAction( int id_block, int id_action, int i_number)
 {
    if( id_block >= blocksnum)
    {
       AFERRAR("ListTasks::blockAction: id_block >= blocksnum (%d>=%d)", id_block, blocksnum)
       return;
    }
-   af::MCGeneral * mcgeneral = wblocks[id_block]->blockAction( id_block, id_action, this);
+   af::MCGeneral * mcgeneral = wblocks[id_block]->blockAction( id_block, id_action, i_number, this);
    if( mcgeneral != NULL )
    {
       mcgeneral->addId( jobid);

@@ -38,6 +38,7 @@ PyObject * PyAf_Block_setNeedHDD(            PyAf_Block_Object *self, PyObject *
 PyObject * PyAf_Block_setNeedMemory(         PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedPower(          PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setNeedProperties(     PyAf_Block_Object *self, PyObject *arg);
+PyObject * PyAf_Block_setNonSequential(      PyAf_Block_Object *self);
 PyObject * PyAf_Block_setNumeric(            PyAf_Block_Object *self, PyObject *args);
 PyObject * PyAf_Block_setParser(             PyAf_Block_Object *self, PyObject *arg);
 PyObject * PyAf_Block_setParserCoeff(        PyAf_Block_Object *self, PyObject *arg);
@@ -78,6 +79,7 @@ static PyMethodDef PyAf_Block_methods[] = {
    {"setNeedMemory",          (PyCFunction) PyAf_Block_setNeedMemory,         METH_O,        "Set memory needed."},
    {"setNeedPower",           (PyCFunction) PyAf_Block_setNeedPower,          METH_O,        "Set power needed."},
    {"setNeedProperties",      (PyCFunction) PyAf_Block_setNeedProperties,     METH_O,        "Set needed properties."},
+   {"setNonSequential",       (PyCFunction) PyAf_Block_setNonSequential,      METH_NOARGS,   "Set non-seqential tasks running."},
    {"setNumeric",             (PyCFunction) PyAf_Block_setNumeric,            METH_VARARGS,  "Set block type to numeric."},
    {"setParser",              (PyCFunction) PyAf_Block_setParser,             METH_O,        "Set tasks parser type."},
    {"setParserCoeff",         (PyCFunction) PyAf_Block_setParserCoeff,        METH_O,        "Set tasks parser coefficient."},

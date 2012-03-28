@@ -71,6 +71,7 @@ bool BlockInfo::update( const af::BlockData* block, int type)
       multihost            = block->isMultiHost();
       varcapacity          = block->canVarCapacity();
       numeric              = block->isNumeric();
+		nonsequential      = block->isNonSequential();
 
       frame_first          = block->getFrameFirst();
       frame_last           = block->getFrameLast();
@@ -214,6 +215,9 @@ void BlockInfo::refresh()
    {
       tasksinfo += QString("/%1").arg( -frame_pertask);
    }
+
+	if( nonsequential )
+		tasksinfo += "*";
 
    str_compact = QString("%1: ").arg( tasksinfo);
    if( tasksdone) str_compact += QString("%1: ").arg( str_runtime);
@@ -388,14 +392,14 @@ void BlockInfo::drawProgress(
 
 void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu)
 {
-   ActionIdId *action;
+   ActionIdIdId *action;
 
    // There is no need to reset error hosts for all job blocks here.
    // Job item has a special menuitem for it.
    if( id_block != -1 )
    {
-      action = new ActionIdId( id_block, af::Msg::TBlockResetErrorHosts, "Reset Error Hosts", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockResetErrorHosts, 0, "Reset Error Hosts", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
       menu->addSeparator();
@@ -405,12 +409,12 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
    if( id_block != -1 )
    {
 
-      action = new ActionIdId( id_block, af::Msg::TTasksSkip, "Skip Block", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TTasksSkip, 0, "Skip Block", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
-      action = new ActionIdId( id_block, af::Msg::TTasksRestart, "Restart Block", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TTasksRestart, 0, "Restart Block", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
       menu->addSeparator();
@@ -419,66 +423,76 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
    if( submenu != NULL )
        menu = submenu;
 
-   action = new ActionIdId( id_block, af::Msg::TBlockErrorsAvoidHost, "Set Errors Avoid Host", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockNonSequential, 1, "Set Non-Sequential", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockErrorsSameHost, "Set Task Errors Same Host", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
-
-   action = new ActionIdId( id_block, af::Msg::TBlockErrorRetries, "Set Task Error Retries", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
-
-   action = new ActionIdId( id_block, af::Msg::TBlockTasksMaxRunTime, "Set Tasks MaxRunTime", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
-
-   action = new ActionIdId( id_block, af::Msg::TBlockErrorsForgiveTime, "Set Errors Forgive time", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockNonSequential, 0, "Unset Non-Sequential", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
    menu->addSeparator();
 
-   action = new ActionIdId( id_block, af::Msg::TBlockDependMask, "Set Depend Mask", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockErrorsAvoidHost, 0, "Set Errors Avoid Host", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockTasksDependMask, "Set Tasks Depend Mask", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockErrorsSameHost, 0, "Set Task Errors Same Host", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockHostsMask, "Set Hosts Mask", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockErrorRetries, 0, "Set Task Error Retries", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockHostsMaskExclude, "Set Exclude Hosts Mask", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockTasksMaxRunTime, 0, "Set Tasks MaxRunTime", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockMaxRunningTasks, "Set Max Running Tasks", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
-   menu->addAction( action);
-
-   action = new ActionIdId( id_block, af::Msg::TBlockMaxRunTasksPerHost, "Set Max Tasks Per Host", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockErrorsForgiveTime, 0, "Set Errors Forgive time", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
    menu->addSeparator();
 
-   action = new ActionIdId( id_block, af::Msg::TBlockCapacity, "Set Capacity", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockDependMask, 0, "Set Depend Mask", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdIdId( id_block, af::Msg::TBlockTasksDependMask, 0, "Set Tasks Depend Mask", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdIdId( id_block, af::Msg::TBlockHostsMask, 0, "Set Hosts Mask", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdIdId( id_block, af::Msg::TBlockHostsMaskExclude, 0, "Set Exclude Hosts Mask", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdIdId( id_block, af::Msg::TBlockMaxRunningTasks, 0, "Set Max Running Tasks", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
+   menu->addAction( action);
+
+   action = new ActionIdIdId( id_block, af::Msg::TBlockMaxRunTasksPerHost, 0, "Set Max Tasks Per Host", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
+   menu->addAction( action);
+
+   menu->addSeparator();
+
+   action = new ActionIdIdId( id_block, af::Msg::TBlockCapacity, 0, "Set Capacity", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
    if( varcapacity)
    {
-      action = new ActionIdId( id_block, af::Msg::TBlockCapacityCoeffMin, "Set Capacity Min Coeff", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockCapacityCoeffMin, 0, "Set Capacity Min Coeff", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
-      action = new ActionIdId( id_block, af::Msg::TBlockCapacityCoeffMax, "Set Capacity Max Coeff", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockCapacityCoeffMax, 0, "Set Capacity Max Coeff", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
    }
 
@@ -486,43 +500,43 @@ void BlockInfo::generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMe
 
    if( multihost)
    {
-      action = new ActionIdId( id_block, af::Msg::TBlockMultiHostMin, "Set Hosts Minimum", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockMultiHostMin, 0, "Set Hosts Minimum", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
-      action = new ActionIdId( id_block, af::Msg::TBlockMultiHostMax, "Set Hosts Maximum", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockMultiHostMax, 0, "Set Hosts Maximum", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
-      action = new ActionIdId( id_block, af::Msg::TBlockMultiHostWaitMax, "Set Maximum Hosts Wait Time", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockMultiHostWaitMax, 0, "Set Maximum Hosts Wait Time", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
-      action = new ActionIdId( id_block, af::Msg::TBlockMultiHostWaitSrv, "Set Service Wait Time", qwidget);
-      QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+      action = new ActionIdIdId( id_block, af::Msg::TBlockMultiHostWaitSrv, 0, "Set Service Wait Time", qwidget);
+      QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
       menu->addAction( action);
 
       menu->addSeparator();
    }
 
-   action = new ActionIdId( id_block, af::Msg::TBlockNeedMemory, "Set Needed Memory", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockNeedMemory, 0, "Set Needed Memory", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockNeedHDD, "Set Needed HDD", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockNeedHDD, 0, "Set Needed HDD", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockNeedPower, "Set Needed Power", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockNeedPower, 0, "Set Needed Power", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 
-   action = new ActionIdId( id_block, af::Msg::TBlockNeedProperties, "Set Needed Properties", qwidget);
-   QObject::connect( action, SIGNAL( triggeredId( int, int) ), qwidget, SLOT( blockAction( int, int) ));
+   action = new ActionIdIdId( id_block, af::Msg::TBlockNeedProperties, 0, "Set Needed Properties", qwidget);
+   QObject::connect( action, SIGNAL( triggeredId( int, int, int) ), qwidget, SLOT( blockAction( int, int, int) ));
    menu->addAction( action);
 }
 
-af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, ListItems * listitems) const
+af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, int i_number, ListItems * listitems) const
 {
 //printf("BlockInfo::blockAction: jobid=%d blocknum=%d id_block=%d id_action=%d\n", jobid, blocknum, id_block, id_action);
 
@@ -546,6 +560,10 @@ af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, ListItems *
          else listitems->displayInfo( "Restart blocks.");
          return NULL;
       }
+
+		case af::Msg::TBlockNonSequential:
+			set_number = i_number;
+		break;
 
       case af::Msg::TBlockErrorRetries:
          if( id_block == blocknum ) cur_number = errors_retries;

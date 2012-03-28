@@ -52,7 +52,7 @@ public:
    inline void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL)
         { info.generateMenu( id_block, menu, qwidget, submenu);}
 
-   inline af::MCGeneral * blockAction( int id_block, int id_action, ListItems * listitems) const { return info.blockAction( id_block, id_action, listitems);}
+   inline af::MCGeneral * blockAction( int id_block, int id_action, int i_number, ListItems * listitems) const { return info.blockAction( id_block, id_action, i_number, listitems);}
 
    bool mousePressed( const QPoint & pos,const QRect & rect);
 

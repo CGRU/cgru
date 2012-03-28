@@ -345,7 +345,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRESERVED14/**/,
 /**/TRESERVED15/**/,
 /**/TRESERVED16/**/,
-/**/TRESERVED17/**/,
+/**/TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
 /**/TRenderHideShow/**/,			///< Hide or show renders.
 /**/TJobHideShow/**/,				///< Hide or show jobs.
 

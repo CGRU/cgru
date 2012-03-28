@@ -701,9 +701,9 @@ const char * Msg::TNAMES[]=
     "TRESERVED14",
     "TRESERVED15",
     "TRESERVED16",
-    "TRESERVED17",
-	"TRenderHideShow",			///< Hide or show renders.
-	"TJobHideShow",				///< Hide or show jobs.
+	"TBlockNonSequential",        ///< Set block task solving to non-sequential.
+	"TRenderHideShow",            ///< Hide or show renders.
+	"TJobHideShow",               ///< Hide or show jobs.
 
     "TLAST"                       ///< The last type number.
 };

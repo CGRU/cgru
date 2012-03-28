@@ -44,7 +44,7 @@ public:
 
    void generateMenu( int id_block, QMenu * menu, QWidget * qwidget, QMenu * submenu = NULL);
 
-   af::MCGeneral * blockAction( int id_block, int id_action, ListItems * listitems) const;
+   af::MCGeneral * blockAction( int id_block, int id_action, int i_number, ListItems * listitems) const;
 
 private:
    uint32_t state;
@@ -68,6 +68,7 @@ private:
    long long taskssumruntime;
 
    bool numeric;              ///< Whether the block is numeric.
+	bool nonsequential;
    bool varcapacity;
    bool multihost;
    bool multihost_samemaster;
