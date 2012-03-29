@@ -5,8 +5,8 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Wed, 28 Mar 2011 00:00:00 GMT</pubDate>
-   <lastBuildDate>Wed, 28 Mar 2011 00:00:00 GMT</lastBuildDate>
+   <pubDate>Thu, 29 Mar 2012 00:00:00 GMT</pubDate>
+   <lastBuildDate>Thu, 29 Mar 2012 00:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
    <item>
@@ -18,7 +18,7 @@
          You can hide jobs or renders in AfWatch by some parameter.
          AfWatch can preview tasks of a not-numeric blocks (This bug is a main reason of this release).
       </description>
-      <pubDate>Wed, 28 Mar 2011 00:00:00 GMT</pubDate>
+      <pubDate>Thu, 29 Mar 2012 00:00:00 GMT</pubDate>
    </item>
    <item>
       <title>CGRU Version 1.6.0 Released.</title>
