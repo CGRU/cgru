@@ -130,8 +130,8 @@ bool readMessage( ThreadArgs * i_args, af::Msg * io_msg)
    // Reading message from client socket.
    if( false == af::msgread( i_args->sd, io_msg))
    {
-      AFERROR("readMessage: Reading message failed.")
-      af::printAddress( &(i_args->ss));
+      //AFERROR("readMessage: Reading message failed.")
+      //af::printAddress( &(i_args->ss));
       return false;
    }
 

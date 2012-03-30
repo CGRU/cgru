@@ -27,6 +27,7 @@ extern bool AFRunning;
 
 // Thread functions:
 void threadAcceptClient( void * i_arg );
+void threadAcceptClientHttp( void * i_arg );
 void threadRunCycle( void * i_args);
 
 //####################### signal handlers ####################################
@@ -256,6 +257,9 @@ int main(int argc, char *argv[])
     */
     DlThread ServerAccept;
     ServerAccept.Start( &threadAcceptClient, &threadArgs);
+
+    DlThread ServerAcceptHttp;
+    ServerAcceptHttp.Start( &threadAcceptClientHttp, &threadArgs);
 
     // Run cycle thread.
     // All 'brains' are there.

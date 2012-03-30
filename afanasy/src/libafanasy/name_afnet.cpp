@@ -48,7 +48,7 @@ int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 }
 
 /// Write data to file descriptor. Return \c false on any arror and prints an error in \c stderr.
-bool writedata( int fd, char* data, int len)
+bool writedata( int fd, const char * data, int len)
 {
     int written_bytes = 0;
     while( written_bytes < len)
@@ -66,6 +66,53 @@ bool writedata( int fd, char* data, int len)
         written_bytes += w;
     }
     return true;
+}
+
+
+bool processHTTP( char * i_buffer, int i_bytes, int i_desc)
+{
+	if( strncmp( i_buffer, "POST", 4) == 0 )
+	{
+writedata( 1, i_buffer, i_bytes);
+writedata( 1, "\n@\n", 3);
+		int offset = 4;
+		while( offset + af::Msg::SizeHeader < i_bytes )
+		{
+			if(( int(i_buffer[offset]) == af::Msg::Version ) && ( int(i_buffer[offset+4]) == af::Msg::Magic))
+			{
+				memcpy( i_buffer, i_buffer+offset, i_bytes-offset);
+writedata( 1, i_buffer, i_bytes-offset);
+writedata( 1, "\n@\n", 3);
+				return false;
+			}
+			offset++;
+		}
+		return false;
+	}
+
+	if( strncmp( i_buffer, "GET", 3) != 0 )
+	{
+		return false;
+	}
+
+writedata( 1, i_buffer, i_bytes);
+
+	int datalen;
+	std::string datafile = af::Environment::getAfRoot() + "/" + "browser.html";
+	char * data = af::fileRead( datafile, datalen);
+	if( data == NULL )
+	{
+		static const char httpError[] = "AFERROR";
+		writedata( i_desc, httpError, strlen(httpError));
+	}
+	else
+	{
+		static const char httpHeader[] = "HTTP/1.0 200 OK\r\n\r\n";
+		writedata( i_desc, httpHeader, strlen(httpHeader));
+		writedata( i_desc, data, datalen);
+	}
+
+	return true;
 }
 
 af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
@@ -351,6 +398,10 @@ AFINFO("com::msgread:\n");
 //
 // Read message header data
    int bytes = ::readdata( desc, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer );
+
+	if( processHTTP( buffer, bytes, desc))
+		return false;
+
    if( bytes < af::Msg::SizeHeader)
    {
       AFERRAR("com::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).\n", bytes);

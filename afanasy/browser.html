@@ -1,0 +1,40 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+<html>
+<head>
+<title>AFANASY</title>
+<!--
+<script type="text/javascript" src="browser.js"></script>
+-->
+<script type="text/javascript" >
+function init()
+{
+	document.getElementById("id").innerHTML="insert";
+
+	var myArray = new ArrayBuffer(512);
+	var arrayView = new Int32Array(myArray);
+	for ( var i = 0; i < arrayView.length; i++ )
+	{ 
+		arrayView[i] = 49;
+	}
+	arrayView[0] = 44;
+	arrayView[1] = 1;
+	arrayView[2] = 0;
+	arrayView[3] = 0;
+	arrayView[4] = 0;
+	var xhr = new XMLHttpRequest; 
+	xhr.open("POST", "/", false);  
+	xhr.send(myArray);
+
+	document.getElementById("test").innerHTML="insert";
+};
+</script>
+</head>
+<body onload="init()">
+
+WOW ! It works!
+
+<p id="id"></p>
+<p id="test"></p>
+
+</body>
+</html>
