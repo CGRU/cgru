@@ -23,7 +23,7 @@ def dailiesEvaluate( node):
       node.knob('fps').setValue( fps)
 
    # Codec Preset:
-   codec = node.knob('codec').value()
+   codec = node.knob('codec').getEvaluatedValue()
    if codec == None or codec == '' or not os.path.isfile( codec):
       codec = os.getenv('CGRU_DAILIES_CODEC', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/codecs/photojpg_best.ffmpeg')
       codec = codec.replace('\\','/')
@@ -44,13 +44,13 @@ def dailiesEvaluate( node):
       lgfgrav = os.getenv('CGRU_DAILIES_LGFGRAV', 'North')
       node.knob('lgfgrav').setValue( lgfgrav)
    # Logo slate file:
-   lgspath = node.knob('lgspath').value()
+   lgspath = node.knob('lgspath').getEvaluatedValue()
    if lgspath != None and lgspath != '' and not os.path.isfile( lgspath):
       lgspath = os.getenv('CGRU_DAILIES_LGSPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
       lgspath = lgspath.replace('\\','/')
       node.knob('lgspath').setValue( lgspath)
    # Logo frame file:
-   lgfpath = node.knob('lgfpath').value()
+   lgfpath = node.knob('lgfpath').getEvaluatedValue()
    if lgfpath != None and lgfpath != '' and not os.path.isfile( lgfpath):
       lgfpath = os.getenv('CGRU_DAILIES_LGFPATH', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/logos/logo.png')
       lgfpath = lgfpath.replace('\\','/')
@@ -58,14 +58,14 @@ def dailiesEvaluate( node):
 
    if newNode:
       # Template:
-      template = node.knob('template').value()
+      template = node.knob('template').getEvaluatedValue()
       if template == None or template == '' or not os.path.isfile( template):
          template = os.getenv('CGRU_DAILIES_TEMPLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_withlogo')
          template = template.replace('\\','/')
          node.knob('template').setValue( template)
 
       # Slate:
-      slate = node.knob('slate').value()
+      slate = node.knob('slate').getEvaluatedValue()
       if slate == None or slate == '' or not os.path.isfile( slate):
          slate = os.getenv('CGRU_DAILIES_SLATE', os.environ['CGRU_LOCATION'] + '/utilities/moviemaker/templates/dailies_slate')
          slate = slate.replace('\\','/')
@@ -115,7 +115,7 @@ def dailiesEvaluate( node):
       node.knob('artist').setValue( os.getenv('USER', os.getenv('USERNAME','')))
 
    # Dailies Folder:
-   movfolder = node.knob('movfolder').value()
+   movfolder = node.knob('movfolder').getEvaluatedValue()
    if movfolder is None or movfolder == '' or not os.path.isdir( movfolder):
       inputnode = None
       for i in range( node.inputs()):
@@ -240,7 +240,7 @@ def dailiesGenCmd( node):
       return
 
    # Get Movie Folder:
-   movfolder = node.knob('movfolder').value()
+   movfolder = node.knob('movfolder').getEvaluatedValue()
    if movfolder is None or movfolder == '':
       nuke.message('Error:\n%s\nMovie folder is not set.' % node.name())
       return
@@ -249,8 +249,8 @@ def dailiesGenCmd( node):
    format   = node.knob('format'  ).value()
    fps      = node.knob('fps'     ).value()
    codec    = node.knob('codec'   ).value()
-   template = node.knob('template').value()
-   slate    = node.knob('slate'   ).value()
+   template = node.knob('template').getEvaluatedValue()
+   slate    = node.knob('slate'   ).getEvaluatedValue()
    company  = node.knob('company' ).value()
    project  = node.knob('project' ).value()
    shot     = node.knob('shot'    ).value()
@@ -264,8 +264,8 @@ def dailiesGenCmd( node):
    draw235  = node.knob('draw235' ).value()
    line169  = node.knob('line169' ).value()
    line235  = node.knob('line235' ).value()
-   lgspath  = node.knob('lgspath' ).value()
-   lgfpath  = node.knob('lgfpath' ).value()
+   lgspath  = node.knob('lgspath' ).getEvaluatedValue()
+   lgfpath  = node.knob('lgfpath' ).getEvaluatedValue()
    lgsgrav  = node.knob('lgsgrav' ).value()
    lgfgrav  = node.knob('lgfgrav' ).value()
    lgssize  = int(node.knob('lgssize').value())
