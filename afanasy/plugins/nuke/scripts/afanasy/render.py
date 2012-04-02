@@ -60,7 +60,7 @@ def getInputNodes( afnode, parent):
       inputnodes.append( node)
 
    if afnode != None:
-      LastAfNode = afnode 
+      LastAfNode = afnode
       addnodes = afnode.knob('addnodes').value()
       if addnodes != None and addnodes != '':
          if VERBOSE == 2: print 'Adding nodes "%s" to "%s"' % ( addnodes, afnode.name())
@@ -338,7 +338,7 @@ def getBlocksParameters( afnode, subblock, prefix, fparams):
                   mask = newparams[0].prefix + '.*'
                else:
                   mask = newparams[0].name
-               for ppar in prevparams: 
+               for ppar in prevparams:
                   if newparams[0].fullrangedepend:
                      ppar.addDependMask( mask)
                   else:
@@ -598,7 +598,7 @@ def renderNodes( nodes, fparams, storeframes):
       nuke.message('No jobs generated.')
       return
 
-   
+
    afpathmap = __import__('afpathmap', globals(), locals(), [])
    pm = afpathmap.PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
 
@@ -608,7 +608,7 @@ def renderNodes( nodes, fparams, storeframes):
       if pm.initialized:
          pm_scenename = scenename + '.pm'
          nuke.scriptSave( pm_scenename)
-         pm.toServerFile( pm_scenename, scenename, SearchStrings = ['file ','font '], Verbose = False)
+         pm.toServerFile( pm_scenename, scenename, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
          os.remove( pm_scenename)
       else:
          nuke.scriptSave( scenename)
