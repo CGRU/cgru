@@ -12,19 +12,11 @@ using namespace af;
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Job::Job( int Id):
-   blocksnum( 0),
-   maxrunningtasks(  -1 ),
-   maxruntasksperhost(  -1 ),
-   time_creation( time( NULL)),
-   time_wait( 0),
-   time_started( 0),
-   time_done( 0),
-   userlistorder( -1),
-   lifetime( -1)
+Job::Job( int Id)
 {
-   initDefaultValues();
-   id = Id;
+	initDefaultValues();
+	id = Id;
+	time_creation = time(NULL);
 }
 
 Job::Job( Msg * msg)
@@ -33,24 +25,53 @@ Job::Job( Msg * msg)
    read( msg);
 }
 
+Job::Job( JSON & i_value)
+{
+	initDefaultValues();
+	time_creation = time(NULL);
+	json_read( i_value);
+}
+
+void Job::json_read( JSON & i_object)
+{
+	if( false == i_object.IsObject())
+	{
+		AFERROR("Job::Job: Not a JSON object.")
+		return;
+	}
+
+	jr_string("name",        name,        i_object);
+	jr_string("username",    username,    i_object);
+	jr_string("hostname",    hostname,    i_object);
+	jr_string("annotation",  annotation,  i_object);
+	jr_string("description", description, i_object);
+	jr_string("cmd_pre",     cmd_pre,     i_object);
+	jr_string("cmd_post",    cmd_post,    i_object);
+	jr_regexp("hostsmask",   hostsmask,   i_object);
+}
+
 void Job::initDefaultValues()
 {
-   blocksdata = NULL;
+	id = 0;
+	blocksnum = 0;
+	maxrunningtasks = -1;
+	maxruntasksperhost = -1;
+	time_wait = 0;
+	time_started = 0;
+	time_done = 0;
+	userlistorder = -1;
+	lifetime = -1;
+	blocksdata = NULL;
 
-   hostsmask.setCaseInsensitive();
-
-   hostsmask_exclude.setCaseInsensitive();
-   hostsmask_exclude.setExclude();
-
-   dependmask.setCaseSensitive();
-
-   dependmask_global.setCaseSensitive();
-
-   need_os.setCaseInsensitive();
-   need_os.setContain();
-
-   need_properties.setCaseSensitive();
-   need_os.setContain();
+	hostsmask.setCaseInsensitive();
+	hostsmask_exclude.setCaseInsensitive();
+	hostsmask_exclude.setExclude();
+	dependmask.setCaseSensitive();
+	dependmask_global.setCaseSensitive();
+	need_os.setCaseInsensitive();
+	need_os.setContain();
+	need_properties.setCaseSensitive();
+	need_os.setContain();
 }
 
 Job::~Job()
@@ -164,32 +185,34 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    stream << "[" << userlistorder << "]";
 	if( isHidden()) stream << " (hidden)";
 
-   if( blocksnum == 0)
-   {
-      stream << "\n\t ERROR: HAS NO BLOCKS !";
-      return;
-   }
-   if( blocksdata == NULL)
-   {
-      stream << "\n\t ERROR: HAS NULL BLOCKS DATA !";
-      return;
-   }
-   if( blocksdata != NULL)
-   {
-      for( int b = 0; b < blocksnum; b++)
-      {
-         if( blocksdata[b] != NULL) continue;
-         stream << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
-         return;
-      }
-   }
+	bool display_blocks = true;
+	if( blocksnum == 0)
+	{
+		stream << "\n\t ERROR: HAS NO BLOCKS !";
+		display_blocks = false;
+	}
+	else if( blocksdata == NULL)
+	{
+		stream << "\n\t ERROR: HAS NULL BLOCKS DATA !";
+		display_blocks = false;
+	}
+	else if( blocksdata != NULL)
+	{
+		for( int b = 0; b < blocksnum; b++)
+		{
+			if( blocksdata[b] != NULL) continue;
+			stream << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
+			display_blocks = false;
+		}
+	}
 
-   if( full == false )
+   if((full == false) && display_blocks)
    {
       stream << " - " << calcWeight() << " bytes.";
       return;
    }
 
+   if( annotation.size()) stream << "\n    " << annotation;
    if( description.size()) stream << "\n    " << description;
 
    stream << "\n Time created  = " << af::time2str( time_creation);
@@ -217,6 +240,9 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    if( need_properties.notEmpty()) stream << "\n Needed properties: \"" << need_properties.getPattern() << "\"";
    if( cmd_pre.size()) stream << "\n Pre command:\n" << cmd_pre;
    if( cmd_post.size()) stream << "\n Post command:\n" << cmd_post;
+
+	if( false == display_blocks )
+		return;
 
    if(( blocksnum <=3 ) && ( blocksdata != NULL ))
       for( int b = 0; b < blocksnum; b++)

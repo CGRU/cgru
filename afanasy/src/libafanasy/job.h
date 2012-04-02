@@ -13,15 +13,18 @@ namespace af
 class Job : public Node
 {
 public:
-   Job( int Id);
+	Job( int Id);
 
 /// Construct data from message buffer, corresponding to message type.
 /** Used when user create a new job and send it to Afanasy.
 /// And when user watching job progress ( for example from Watch).
 **/
-   Job( Msg * msg);
+	Job( Msg * msg);
 
-   virtual ~Job();
+/// Construct data from JSON:
+	Job( JSON & i_value);
+
+	virtual ~Job();
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
@@ -151,8 +154,13 @@ protected:
 
 private:
    void initDefaultValues();
+
    void readwrite( Msg * msg); ///< Read or write data in buffer.
    void rw_blocks( Msg * msg); ///< Read or write blocks.
+
+	void json_read( JSON & i_object);
+	void json_write( std::ostringstream & stream);
+
    virtual BlockData * newBlockData( Msg * msg);
 };
 }

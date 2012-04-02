@@ -7,7 +7,11 @@
 #include <winsock2.h>
 #endif
 
+#include "rapidjson/document.h"
+
 #include "name_af.h"
+
+typedef rapidjson::Value JSON;
 
 namespace af
 {
@@ -54,5 +58,9 @@ protected:
    static void rw_Int32_Vect(  std::vector <  int32_t > &vect, Msg * msg);
    static void rw_UInt32_List( std::list   < uint32_t > &list, Msg * msg);
    static void rw_UInt32_Vect( std::vector < uint32_t > &vect, Msg * msg);
+
+
+	static void jr_string( const char * i_name, std::string & o_attr, JSON & i_object);
+	static void jr_regexp( const char * i_name, RegExp & o_attr, JSON & i_object);
 };
 }

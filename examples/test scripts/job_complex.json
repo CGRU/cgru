@@ -1,0 +1,22 @@
+{
+	"job":
+	{
+		"name":"job name",
+		"username":"jimmy",
+		"annotation":"json test",
+		"description":"for tests only",
+		"hostsmask":"renderhost.*",
+		"blocks":[
+		{
+			"name":"block A",
+			"tasksName":"frame @####@",
+			"tasksCommand":"render @####@"
+		},
+		{
+			"name":"block B",
+			"tasksName":"frame @####@",
+			"tasksCommand":"render @####@"
+		}
+		]
+	}
+}

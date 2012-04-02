@@ -30,6 +30,8 @@
 #include "cmd_job.h"
 #include "cmd_task.h"
 
+#include "cmd_json.h"
+
 void AfCmd::RegisterCommands()
 {
     addCmd( new CmdVerbose);
@@ -128,4 +130,6 @@ void AfCmd::RegisterCommands()
     addCmd( new CmdFarmCheck);
 
     addCmd( new CmdStatistics);
+
+    addCmd( new CmdJSON);
 }

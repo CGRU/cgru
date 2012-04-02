@@ -148,6 +148,7 @@ void threadAcceptPort( void * i_arg, int i_port, bool i_exitOnFail)
 
 	if( value != 0)
 	{
+		AFERRAR("Port %d:", i_port)
 		AFERRPE("bind()")
 		if( i_exitOnFail ) AFRunning = false;
 		return;

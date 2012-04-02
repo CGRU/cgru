@@ -73,21 +73,30 @@ bool processHTTP( char * i_buffer, int i_bytes, int i_desc)
 {
 	if( strncmp( i_buffer, "POST", 4) == 0 )
 	{
-writedata( 1, i_buffer, i_bytes);
+writedata( 1, i_buffer, 50);
 writedata( 1, "\n@\n", 3);
 		int offset = 4;
 		while( offset + af::Msg::SizeHeader < i_bytes )
 		{
-			if(( int(i_buffer[offset]) == af::Msg::Version ) && ( int(i_buffer[offset+4]) == af::Msg::Magic))
+			int version, magic;
+			af::rw_int32( version, i_buffer + offset, false);
+			af::rw_int32( magic  , i_buffer + offset+4, false);
+			//if(( int(i_buffer[offset]) == af::Msg::Version ) && ( int(i_buffer[offset+4]) == af::Msg::Magic))
+			if(( version == af::Msg::Version ) && ( magic == af::Msg::Magic))
 			{
 				memcpy( i_buffer, i_buffer+offset, i_bytes-offset);
-writedata( 1, i_buffer, i_bytes-offset);
-writedata( 1, "\n@\n", 3);
-				return false;
+for( int i = 0; i < 5; i++)
+{
+	int i32;
+	af::rw_int32( i32, i_buffer + i*4, false);
+	printf( " %d", i32);
+}
+printf("\n");
+				return true;
 			}
 			offset++;
 		}
-		return false;
+		return true;
 	}
 
 	if( strncmp( i_buffer, "GET", 3) != 0 )
@@ -97,9 +106,25 @@ writedata( 1, "\n@\n", 3);
 
 writedata( 1, i_buffer, i_bytes);
 
+	int get_start = 4;
+	int get_finish = get_start; 
+	char * data = NULL;
 	int datalen;
-	std::string datafile = af::Environment::getAfRoot() + "/" + "browser.html";
-	char * data = af::fileRead( datafile, datalen);
+	std::string datafile;
+	while( i_buffer[++get_finish] != ' ');
+	if( get_finish - get_start > 1 )
+	{
+		datafile = std::string( i_buffer + get_start, get_finish - get_start);
+printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
+		datafile = af::Environment::getAfRoot() + datafile;
+		data = af::fileRead( datafile, datalen);
+	}
+
+	if( data == NULL )
+	{
+		datafile = af::Environment::getAfRoot() + "/" + "browser.html";
+		data = af::fileRead( datafile, datalen);
+	}
 	if( data == NULL )
 	{
 		static const char httpError[] = "AFERROR";

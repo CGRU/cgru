@@ -437,3 +437,17 @@ void Af::rw_UInt32_Vect( std::vector<uint32_t> &vect, Msg * msg)
       }
    }
 }
+
+void Af::jr_string( const char * i_name, std::string & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsString()) o_attr = (char*)value.GetString();
+}
+
+void Af::jr_regexp( const char * i_name, RegExp & o_attr, JSON & i_object)
+{
+	std::string pattern;
+	jr_string( i_name, pattern, i_object);
+	o_attr.setPattern( pattern);
+}
+

@@ -258,8 +258,8 @@ int main(int argc, char *argv[])
     DlThread ServerAccept;
     ServerAccept.Start( &threadAcceptClient, &threadArgs);
 
-    DlThread ServerAcceptHttp;
-    ServerAcceptHttp.Start( &threadAcceptClientHttp, &threadArgs);
+    //DlThread ServerAcceptHttp;
+    //ServerAcceptHttp.Start( &threadAcceptClientHttp, &threadArgs);
 
     // Run cycle thread.
     // All 'brains' are there.
