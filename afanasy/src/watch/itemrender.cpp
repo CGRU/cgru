@@ -528,17 +528,9 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
    default:
    {
       std::list<af::TaskExec*>::const_iterator it = tasks.begin();
-      std::list<const QPixmap*>::const_iterator ii = tasksicons.begin();
-      for( int numtask = 1; it != tasks.end(); it++, ii++, numtask++)
+      std::list<const QPixmap*>::const_iterator icons_it = tasksicons.begin();
+      for( int numtask = 1; it != tasks.end(); it++, icons_it++, numtask++)
       {
-         const QPixmap *pixmap_ptr = *ii;
-         if( !pixmap_ptr )
-         {
-            continue;
-         }
-
-         const QPixmap &pixmap = *pixmap_ptr;
-
          QString taskstr = QString("%1").arg((*it)->getCapacity());
          if((*it)->getCapCoeff()) taskstr += QString("x%1").arg((*it)->getCapCoeff());
          taskstr += QString(": %1[%2][%3]").arg( QString::fromUtf8((*it)->getJobName().c_str())).arg(QString::fromUtf8((*it)->getBlockName().c_str())).arg(QString::fromUtf8((*it)->getName().c_str()));
@@ -548,7 +540,12 @@ void ItemRender::paint( QPainter *painter, const QStyleOptionViewItem &option) c
          painter->drawText( x, y, w-5, plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignRight,
             QString("%1 - %2").arg(QString::fromUtf8((*it)->getUserName().c_str())).arg( af::time2strHMS( time(NULL) - (*it)->getTimeStart()).c_str()), &rect_usertime);
          painter->drawText( x+18, y, w-30-rect_usertime.width(), plots_height + HeightTask * numtask - 2, Qt::AlignBottom | Qt::AlignLeft, taskstr);
-         painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, pixmap );
+
+         // Draw an icon only if pointer is not NULL:
+         if( *icons_it )
+         {
+         	painter->drawPixmap( x+5, y + plots_height + HeightTask * numtask - 15, *(*icons_it) );
+         }
       }
       painter->setPen(   afqt::QEnvironment::qclr_black );
       painter->setFont(  afqt::QEnvironment::f_info);
