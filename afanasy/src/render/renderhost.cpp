@@ -40,15 +40,15 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
     setOnline();
 
-    host.os = af::Environment::getPlatform();
-    GetResources( host, hres);
+    m_host.os = af::Environment::getPlatform();
+    GetResources( m_host, m_hres);
 
     std::list<std::string> resclasses = af::strSplit( af::Environment::getRenderResClasses(), ";");
     for( std::list<std::string>::const_iterator it = resclasses.begin(); it != resclasses.end(); it++)
     {
         if( (*it).empty() ) continue;
         printf("Adding custom resource meter '%s'\n", (*it).c_str());
-        ms_pyres.push_back( new PyRes( *it, &hres));
+        ms_pyres.push_back( new PyRes( *it, &m_hres));
     }
 
 #ifdef WINNT
@@ -98,12 +98,12 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
 	af::sleep_msec( 100);
 
-    GetResources( host, hres);
+    GetResources( m_host, m_hres);
     for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
 
     stdOut();
-    host.stdOut( true);
-    hres.stdOut( true);
+    m_host.stdOut( true);
+    m_hres.stdOut( true);
 }
 
 RenderHost::~RenderHost()
@@ -137,7 +137,7 @@ RenderHost::~RenderHost()
 
 void RenderHost::setListeningPort( uint16_t i_port)
 {
-    ms_obj->address.setPort( i_port);
+    ms_obj->m_address.setPort( i_port);
     m_listening = true;
     if( af::Environment::isVerboseMode())
         printf("RenderHost::setListeningPort = %d\n", i_port);
@@ -158,7 +158,7 @@ void RenderHost::dispatchMessage( af::Msg * i_msg)
 void RenderHost::setRegistered( int i_id)
 {
     ms_connected = true;
-    ms_obj->id = i_id;
+    ms_obj->m_id = i_id;
     ms_msgDispatchQueue->setVerboseMode( af::VerboseOn);
     setUpdateMsgType( af::Msg::TRenderUpdate);
     printf("Render registered.\n");
@@ -170,7 +170,7 @@ void RenderHost::connectionLost()
 
     ms_connected = false;
 
-    ms_obj->id = 0;
+    ms_obj->m_id = 0;
 
     // Stop all tasks:
     for( int t = 0; t < ms_tasks.size(); t++) ms_tasks[t]->stop();
@@ -222,7 +222,7 @@ void RenderHost::update()
 
     if( false == first_time )
     {
-        GetResources( ms_obj->host, ms_obj->hres);
+        GetResources( ms_obj->m_host, ms_obj->m_hres);
         for( int i = 0; i < ms_pyres.size(); i++) ms_pyres[i]->update();
     }
     else

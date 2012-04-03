@@ -451,3 +451,39 @@ void Af::jr_regexp( const char * i_name, RegExp & o_attr, JSON & i_object)
 	o_attr.setPattern( pattern);
 }
 
+void Af::jr_bool  ( const char * i_name, bool        & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsBool()) o_attr = value.GetBool();
+}
+
+void Af::jr_int8  ( const char * i_name, int8_t      & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt()) o_attr = value.GetInt();
+}
+
+void Af::jr_uint8 ( const char * i_name, uint8_t     & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsUint()) o_attr = value.GetUint();
+}
+
+void Af::jr_int32 ( const char * i_name, int32_t     & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt()) o_attr = value.GetInt();
+}
+
+void Af::jr_uint32( const char * i_name, uint32_t    & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsUint()) o_attr = value.GetUint();
+}
+
+void Af::jr_int64( const char * i_name, int64_t    & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt64()) o_attr = value.GetInt64();
+}
+

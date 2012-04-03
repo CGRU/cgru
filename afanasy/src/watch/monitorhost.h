@@ -11,7 +11,7 @@ public:
    MonitorHost();
    ~MonitorHost();
 
-   inline void setId( int new_id) { id = new_id;}
+   inline void setId( int new_id) { m_id = new_id;}
 
    inline void   subscribe( const QList<int> & eIds ) { setEvents( af::Msg::TMonitorSubscribe,   eIds);}
    inline void unsubscribe( const QList<int> & eIds ) { setEvents( af::Msg::TMonitorUnsubscribe, eIds);}
@@ -31,5 +31,5 @@ private:
 
 private:
    void setEvents( int type, const QList<int> & eIds);
-   void setJobId(  int type, int id);
+   void setJobId(  int type, int m_id);
 };

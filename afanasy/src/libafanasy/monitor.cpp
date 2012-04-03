@@ -17,7 +17,7 @@ Monitor::Monitor():
    Client( Client::GetEnvironment, 0)
 {
    construct();
-   name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + address.generatePortString().c_str();
+   m_name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + m_address.generatePortString().c_str();
 }
 
 Monitor::Monitor( Msg * msg):
@@ -46,20 +46,20 @@ Monitor::~Monitor()
 
 void Monitor::readwrite( Msg * msg)
 {
-   rw_int32_t( id,            msg);
-   rw_int64_t( time_launch,   msg);
-   rw_int64_t( time_register, msg);
+   rw_int32_t( m_id,            msg);
+   rw_int64_t( m_time_launch,   msg);
+   rw_int64_t( m_time_register, msg);
    rw_int64_t( time_activity, msg);
-   rw_String ( name,          msg);
-   rw_String ( username,      msg);
-   rw_String ( version,       msg);
+   rw_String ( m_name,          msg);
+   rw_String ( m_user_name,      msg);
+   rw_String ( m_version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
 
    rw_Int32_List( jobsUsersIds, msg);
    rw_Int32_List( jobsIds,      msg);
 
-   address.readwrite( msg);
+   m_address.readwrite( msg);
 }
 
 bool Monitor::hasEvent( int type) const
@@ -80,10 +80,10 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full )
    {
-      stream << "Monitor name = \"" << name << "\" (id=" << getId() << ")";
-      stream << "\n Version: " << version;
-      stream << "\n Launch Time: " + af::time2str( time_launch);
-      stream << "\n Register Time: " + af::time2str( time_register);
+      stream << "Monitor name = \"" << m_name << "\" (id=" << getId() << ")";
+      stream << "\n Version: " << m_version;
+      stream << "\n Launch Time: " + af::time2str( m_time_launch);
+      stream << "\n Register Time: " + af::time2str( m_time_register);
       stream << "\n Time Activity: " + af::time2str( time_activity);
 
       stream << "\n UIds[" << jobsUsersIds.size() << "]:";
@@ -104,8 +104,8 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
    }
    else
    {
-      stream << name << "[" << id << "]";
-      stream << " v'" << version << "' ";
-      address.generateInfoStream( stream, full);
+      stream << m_name << "[" << m_id << "]";
+      stream << " v'" << m_version << "' ";
+      m_address.generateInfoStream( stream, full);
    }
 }

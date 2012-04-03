@@ -14,7 +14,6 @@
 CmdJSON::CmdJSON()
 {
    setCmd("json");
-   setArgsCount(1);
    setInfo("JSON file.");
    setHelp("json [file] JSON file.");
 }
@@ -55,67 +54,85 @@ void outJSON( rapidjson::Value & i_value, int i_depth = 0)
 
 bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 {
-	std::string filename( argv[argc-1]);
+	char * data = NULL;
 
-	if( false == af::pathFileExists( filename))
+	if( argc > 0 )
 	{
-		AFERRAR("File not fouded:\n%s", filename.c_str())
-		return false;
+		std::string filename( argv[argc-1]);
+
+		if( false == af::pathFileExists( filename))
+		{
+			AFERRAR("File not fouded:\n%s", filename.c_str())
+			return false;
+		}
+
+		if( Verbose )
+			printf("Trying to open:\n%s", filename.c_str());
+
+		int datalen;
+		data = af::fileRead( filename, datalen);
+
+		if( data == NULL )
+		{
+			AFERRAR("Unable to load file:\n%s", filename.c_str())
+			return true;
+		}
 	}
-
-	if( Verbose )
-		printf("Trying to open:\n%s", filename.c_str());
-
-	int datalen;
-	char * data = af::fileRead( filename, datalen);
-
-	if( data == NULL )
+	else
 	{
-		AFERRAR("Unable to load file:\n%s", filename.c_str())
-		return true;
+		int datalen = 1 << 20;
+		data = new char[ datalen];
+		int readed = 0;
+		for(;;)
+		{
+			int bytes = read( 0, data + readed, datalen-readed-2);
+			if( bytes <= 0)
+				break;
+			readed += bytes;
+		}
+		data[readed] = '\0';
 	}
 
 	rapidjson::Document document;
 	if (document.ParseInsitu<0>(data).HasParseError())
 	{
-		AFERRAR("Parsing file failed:\n%s", filename.c_str())
-		AFERRAR("At character %d:", int( document.GetErrorOffset()))
+		AFERRAR("Parsing failed at character %d:", int( document.GetErrorOffset()))
 		AFERRAR("%s", document.GetParseError())
 		return true;
 	}
 
 	if( document.IsObject())
 	{
-		outJSON( document);
-		printf("\n");
+		if( Verbose )
+		{
+			outJSON( document);
+			printf("\n");
+		}
 	}
 	else
 	{
-		AFERRAR("Can't find root object in file:\n%s", filename.c_str())
+		AFERROR("Can't find root object.")
 		return true;
 	}
 	
+	printf("{\n");
+
 	if( document.HasMember("job"))
 	{
 		af::Job job( document["job"]);
-		job.stdOut( true);
+		if( Verbose )
+		{
+			job.stdOut( true);
+			printf("\n");
+		}
+		std::ostringstream stream;
+		job.json_write( stream);
+		printf("%s\n", stream.str().c_str());
 	}
 
-	delete data;
+	printf("}\n");
 
-	/*
-	rapidjson::FileStream s(stdout);
-	rapidjson::PrettyWriter<rapidjson::FileStream> writer(s);		// Can also use Writer for condensed formatting
-
-	writer.StartObject();
-	writer.String("married");
-	writer.Bool(0);
-	writer.EndObject();
-	
-	printf("\n");
-
-	if( document["job"].HasMember("name")) printf(" document.HasMember(job)\n");
-	*/
+	delete [] data;
 
 	return true;
 }

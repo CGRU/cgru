@@ -5,5 +5,5 @@
 class TalkHost: public af::Talk
 {
 public:
-   inline void setId( int new_id) { id = new_id;}
+   inline void setId( int new_id) { m_id = new_id;}
 };

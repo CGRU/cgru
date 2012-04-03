@@ -29,7 +29,7 @@ RenderAf::RenderAf( af::Msg * msg):
 RenderAf::RenderAf( int Id):
    DBRender( Id)
 {
-   AFINFA("RenderAf::RenderAf(%d)", id);
+   AFINFA("RenderAf::RenderAf(%d)", m_id);
    init();
 }
 
@@ -38,8 +38,8 @@ void RenderAf::init()
    hostname = "no farm host";
    hostdescription = "";
    servicesnum = 0;
-   if( host.capacity == 0 ) host.capacity = af::Environment::getRenderDefaultCapacity();
-   if( host.maxtasks == 0 ) host.maxtasks = af::Environment::getRenderDefaultMaxTasks();
+   if( m_host.capacity == 0 ) m_host.capacity = af::Environment::getRenderDefaultCapacity();
+   if( m_host.maxtasks == 0 ) m_host.maxtasks = af::Environment::getRenderDefaultMaxTasks();
    setBusy( false);
 }
 
@@ -51,8 +51,8 @@ void RenderAf::setRegisterTime()
 {
    af::Client::setRegisterTime();
 
-   taskstartfinishtime = 0;
-   wol_operation_time = 0;
+   m_task_start_finish_time = 0;
+   m_wol_operation_time = 0;
 
    if( isOnline()) appendLog("Registered online.");
    else appendLog("Registered offline.");
@@ -71,22 +71,22 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
    if( jobs && updateTaskState) ejectTasks( jobs, monitoring, updateTaskState);
 
 //   appendLog( getResourcesString());
-   appendLog( hres.generateInfoString());
+   appendLog( m_hres.generateInfoString());
 
    if( toZombie )
    {
       AFCommon::QueueLog("Render Deleting: " + generateInfoString( false));
       appendLog("Waiting for deletion.");
       setZombie();
-      AFCommon::saveLog( loglist, af::Environment::getRendersLogsDir(), name, af::Environment::getRenderLogsRotate());
-      if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, id);
+      AFCommon::saveLog( loglist, af::Environment::getRendersLogsDir(), m_name, af::Environment::getRenderLogsRotate());
+      if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, m_id);
    }
    else
    {
       AFCommon::QueueLog("Render Offline: " + generateInfoString( false));
       appendLog("Offline.");
-      time_launch = 0;
-      if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+      m_time_launch = 0;
+      if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    }
 }
@@ -100,7 +100,7 @@ bool RenderAf::update( const af::Render * render)
       return false;
    }
 
-   hres.copy( render->getHostRes());
+   m_hres.copy( render->getHostRes());
 
    updateTime();
    return true;
@@ -116,17 +116,17 @@ bool RenderAf::online( RenderAf * render, MonitorContainer * monitoring)
    setBusy( false);
    setWOLSleeping( false);
    setWOLWaking( false);
-   address.copy( render->getAddress());
-   grabNetIFs( render->netIFs);
-   time_launch = render->time_launch;
-   version = render->version;
-   taskstartfinishtime = 0;
-   getFarmHost( &render->host);
+   m_address.copy( render->getAddress());
+   grabNetIFs( render->m_netIFs);
+   m_time_launch = render->m_time_launch;
+   m_version = render->m_version;
+   m_task_start_finish_time = 0;
+   getFarmHost( &render->m_host);
    setOnline();
    update( render);
-   std::string str = "Online v'" + version + "'.";
+   std::string str = "Online v'" + m_version + "'.";
    appendLog( str);
-   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
    AFCommon::QueueDBUpdateItem( this);
    return true;
 }
@@ -157,7 +157,7 @@ void RenderAf::setTask( af::TaskExec *taskexec, MonitorContainer * monitoring, b
 
    addTask( taskexec);
    addService( taskexec->getServiceType());
-   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
    if( start)
    {
@@ -183,7 +183,7 @@ void RenderAf::startTask( af::TaskExec *taskexec)
       AFERROR("RenderAf::startTask: Render is offline.")
       return;
    }
-   for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
+   for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
    {
       if( taskexec != *it) continue;
 
@@ -219,7 +219,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderAnnotate:
    {
       appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
-      annotation = mcgeneral.getString();
+      m_annotation = mcgeneral.getString();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
    }
@@ -267,9 +267,9 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderRestoreDefaults:
    {
       appendLog( std::string("Default farm host settings restored by ") + userhost);
-      maxtasks = -1;
-      capacity = -1;
-      services_disabled.clear();
+      m_max_tasks = -1;
+      m_capacity = -1;
+      m_services_disabled.clear();
       disableServices();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_capacity);
@@ -300,7 +300,7 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
    case af::Msg::TRenderSetUser:
    {
       appendLog( std::string("User set to \"") + mcgeneral.getString() + "\" by " + userhost);
-      username = mcgeneral.getString();
+      m_user_name = mcgeneral.getString();
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_username);
       break;
    }
@@ -378,18 +378,18 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       return false;
    }
    }
-   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
    return true;
 }
 
 void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, uint32_t upstatus, const std::string * i_keeptasks_username )
 {
-   if( tasks.size() < 1) return;
+   if( m_tasks.size() < 1) return;
    std::list<int>id_jobs;
    std::list<int>id_blocks;
    std::list<int>id_tasks;
    std::list<int>numbers;
-   for( std::list<af::TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++)
+   for( std::list<af::TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
    {
        // Skip if username to keep tasks provided:
        if( i_keeptasks_username != NULL )
@@ -412,7 +412,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
       JobAf* job = jobsIt.getJob( *jIt);
       if( job != NULL )
       {
-         af::MCTaskUp taskup( id, *jIt, *bIt, *tIt, *nIt, upstatus);
+         af::MCTaskUp taskup( m_id, *jIt, *bIt, *tIt, *nIt, upstatus);
          job->updateTaskState( taskup, renders, monitoring);
       }
    }
@@ -451,16 +451,16 @@ void RenderAf::wolSleep( MonitorContainer * monitoring)
       appendLog("Can't perform Wake-On-Line operations. Render is busy.");
       return;
    }
-   if( netIFs.size() < 1)
+   if( m_netIFs.size() < 1)
    {
       appendLog("Can't perform Wake-On-Line operations. No network interfaces information.");
       return;
    }
 
    setWOLFalling( true);
-   wol_operation_time = time( NULL);
+   m_wol_operation_time = time( NULL);
    AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
-   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
    af::Msg* msg = new af::Msg( af::Msg::TClientWOLSleepRequest);
    msg->setAddress( this);
@@ -481,21 +481,21 @@ void RenderAf::wolWake(  MonitorContainer * monitoring)
       return;
    }
 
-   if( netIFs.size() < 1)
+   if( m_netIFs.size() < 1)
    {
       appendLog("Can't perform Wake-On-Line operations. No network interfaces information.");
       return;
    }
 
    setWOLWaking( true);
-   wol_operation_time = time( NULL);
+   m_wol_operation_time = time( NULL);
    AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
-   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 
    std::string cmd = af::Environment::getRenderCmdWolWake();
-   for( int i = 0; i < netIFs.size(); i++) cmd += " " + netIFs[i]->getMACAddrString( false);
+   for( int i = 0; i < m_netIFs.size(); i++) cmd += " " + m_netIFs[i]->getMACAddrString( false);
 
-   SysJob::AddWOLCommand( cmd, "", name, name);
+   SysJob::AddWOLCommand( cmd, "", m_name, m_name);
 }
 
 void RenderAf::stopTask( int jobid, int blocknum, int tasknum, int number)
@@ -523,7 +523,7 @@ void RenderAf::taskFinished( const af::TaskExec * taskexec, MonitorContainer * m
       str += taskexec->generateInfoString( false);
       appendTasksLog( str);
    }
-   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, id);
+   if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 }
 
 void RenderAf::addTask( af::TaskExec * taskexec)
@@ -532,15 +532,15 @@ void RenderAf::addTask( af::TaskExec * taskexec)
    if( false == isBusy())
    {
       setBusy( true);
-      taskstartfinishtime = time( NULL);
+      m_task_start_finish_time = time( NULL);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    }
-   tasks.push_back( taskexec);
+   m_tasks.push_back( taskexec);
 
-   capacity_used += taskexec->getCapResult();
+   m_capacity_used += taskexec->getCapResult();
 
-   if( capacity_used > getCapacity() )
-      AFERRAR("RenderAf::addTask(): capacity_used > host.capacity (%d>%d)", capacity_used, host.capacity)
+   if( m_capacity_used > getCapacity() )
+      AFERRAR("RenderAf::addTask(): capacity_used > host.capacity (%d>%d)", m_capacity_used, m_host.capacity)
 }
 
 void RenderAf::removeTask( const af::TaskExec * taskexec)
@@ -548,21 +548,21 @@ void RenderAf::removeTask( const af::TaskExec * taskexec)
    // Do not set free status here, even if this task was last.
    // May it will take another task in this run cycle
 
-   for( std::list<af::TaskExec*>::iterator it = tasks.begin(); it != tasks.end(); it++)
+   for( std::list<af::TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
    {
       if( *it == taskexec)
       {
-         it = tasks.erase( it);
+         it = m_tasks.erase( it);
          continue;
       }
    }
 
-   if( capacity_used < taskexec->getCapResult())
+   if( m_capacity_used < taskexec->getCapResult())
    {
-      AFERRAR("RenderAf::removeTask(): capacity_used < taskdata->getCapResult() (%d<%d)", capacity_used, taskexec->getCapResult())
-      capacity_used = 0;
+      AFERRAR("RenderAf::removeTask(): capacity_used < taskdata->getCapResult() (%d<%d)", m_capacity_used, taskexec->getCapResult())
+      m_capacity_used = 0;
    }
-   else capacity_used -= taskexec->getCapResult();
+   else m_capacity_used -= taskexec->getCapResult();
 }
 
 void RenderAf::refresh( time_t currentTime,  AfContainer * pointer, MonitorContainer * monitoring)
@@ -588,10 +588,10 @@ void RenderAf::notSolved()
    // If render was busy but has no tasks after solve it is not busy now
    // Needed not to reset busy render status if it run one task after other
 
-   if( isBusy() && ( tasks.size() == 0))
+   if( isBusy() && ( m_tasks.size() == 0))
    {
       setBusy( false);
-      taskstartfinishtime = time( NULL);
+      m_task_start_finish_time = time( NULL);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_state);
    }
 }
@@ -623,20 +623,20 @@ bool RenderAf::getFarmHost( af::Host * newHost)
    for( int i = 0; i < servicesnum; i++)
    {
       servicescounts_old.push_back( servicescounts[i]);
-      servicesnames_old.push_back( host.getServiceName(i));
+      servicesnames_old.push_back( m_host.getServiceName(i));
    }
    int servicesnum_old = servicesnum;
 
    // Clear services and services usage:
-   host.clearServices();
+   m_host.clearServices();
    servicescounts.clear();
    servicesnum = 0;
 
    // When render becames online it refresh hardware information:
-   if( newHost ) host.copy( *newHost);
+   if( newHost ) m_host.copy( *newHost);
 
    // Get farm services setttings:
-   if( af::farm()->getHost( name, host, hostname, hostdescription ) == false)
+   if( af::farm()->getHost( m_name, m_host, hostname, hostdescription ) == false)
    {
       hostname = "no farm host";
       hostdescription = "";
@@ -646,14 +646,14 @@ bool RenderAf::getFarmHost( af::Host * newHost)
    // Check dirty - check if capacity was overriden and now is equal to the new value
    checkDirty();
 
-   servicesnum = host.getServicesNum();
+   servicesnum = m_host.getServicesNum();
    servicescounts.resize( servicesnum, 0);
 
    std::list<std::string>::const_iterator osnIt = servicesnames_old.begin();
    std::list<int>::const_iterator oscIt = servicescounts_old.begin();
    for( int o = 0; o < servicesnum_old; o++, osnIt++, oscIt++)
       for( int i = 0; i < servicesnum; i++)
-         if( *osnIt == host.getServiceName(i))
+         if( *osnIt == m_host.getServiceName(i))
             servicescounts[i] = *oscIt;
 
    disableServices();
@@ -665,12 +665,12 @@ void RenderAf::disableServices()
 {
    disabledservices.clear();
    disabledservices.resize( servicesnum, 0);
-   if( false == services_disabled.empty())
+   if( false == m_services_disabled.empty())
    {
-      std::list<std::string> dissrvlist = af::strSplit( services_disabled, ";");
+      std::list<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
       for( std::list<std::string>::const_iterator it = dissrvlist.begin(); it != dissrvlist.end(); it++)
          for( int i = 0; i < servicesnum; i++)
-            if( *it == host.getServiceName(i))
+            if( *it == m_host.getServiceName(i))
                disabledservices[i] = 1;
    }
    checkDirty();
@@ -678,12 +678,12 @@ void RenderAf::disableServices()
 
 void RenderAf::setService( const std::string & srvname, bool enable)
 {
-   std::list<std::string> dissrvlist = af::strSplit( services_disabled, ";");
+   std::list<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
    if( enable) dissrvlist.remove( srvname);
    else dissrvlist.push_back( srvname);
 
-   if( dissrvlist.size()) services_disabled = af::strJoin( dissrvlist, ";");
-   else services_disabled.clear();
+   if( dissrvlist.size()) m_services_disabled = af::strJoin( dissrvlist, ";");
+   else m_services_disabled.clear();
 
    disableServices();
 }
@@ -696,19 +696,19 @@ const std::string RenderAf::getServicesString() const
    for( int i = 0; i < servicesnum; i++)
    {
       str += "\n   ";
-      str += host.getServiceName(i);
+      str += m_host.getServiceName(i);
       if( disabledservices[i] ) str += " (DISABLED)";
-      if(( servicescounts[i] > 0) || ( host.getServiceCount(i) > 0))
+      if(( servicescounts[i] > 0) || ( m_host.getServiceCount(i) > 0))
       {
          str += ": ";
          if( servicescounts[i] > 0) str += af::itos( servicescounts[i]);
-         if( host.getServiceCount(i) > 0) str += " / max=" + af::itos( host.getServiceCount(i));
+         if( m_host.getServiceCount(i) > 0) str += " / max=" + af::itos( m_host.getServiceCount(i));
       }
    }
-   if( false == services_disabled.empty())
+   if( false == m_services_disabled.empty())
    {
       str += "\nDisabled services:\n   ";
-      str += services_disabled;
+      str += m_services_disabled;
    }
 
    return str;
@@ -716,16 +716,16 @@ const std::string RenderAf::getServicesString() const
 
 bool RenderAf::canRunService( const std::string & type) const
 {
-   if( false == af::farm()->serviceLimitCheck( type, name)) return false;
+   if( false == af::farm()->serviceLimitCheck( type, m_name)) return false;
 
    for( int i = 0; i < servicesnum; i++)
    {
-      if( host.getServiceName(i) == type)
+      if( m_host.getServiceName(i) == type)
       {
          if( disabledservices[i]) return false;
-         if( host.getServiceCount(i) > 0)
+         if( m_host.getServiceCount(i) > 0)
          {
-            return servicescounts[i] < host.getServiceCount(i);
+            return servicescounts[i] < m_host.getServiceCount(i);
          }
          return true;
       }
@@ -735,16 +735,16 @@ bool RenderAf::canRunService( const std::string & type) const
 
 void RenderAf::addService( const std::string & type)
 {
-   af::farm()->serviceLimitAdd( type, name);
+   af::farm()->serviceLimitAdd( type, m_name);
 
    for( int i = 0; i < servicesnum; i++)
    {
-      if( host.getServiceName(i) == type)
+      if( m_host.getServiceName(i) == type)
       {
          servicescounts[i]++;
-         if((host.getServiceCount(i) > 0 ) && (servicescounts[i] > host.getServiceCount(i)))
+         if((m_host.getServiceCount(i) > 0 ) && (servicescounts[i] > m_host.getServiceCount(i)))
             AFERRAR("RenderAf::addService: servicescounts > host.getServiceCount for '%s' (%d>=%d)",
-                    type.c_str(), servicescounts[i], host.getServiceCount(i))
+                    type.c_str(), servicescounts[i], m_host.getServiceCount(i))
          return;
       }
    }
@@ -752,11 +752,11 @@ void RenderAf::addService( const std::string & type)
 
 void RenderAf::remService( const std::string & type)
 {
-   af::farm()->serviceLimitRelease( type, name);
+   af::farm()->serviceLimitRelease( type, m_name);
 
    for( int i = 0; i < servicesnum; i++)
    {
-      if( host.getServiceName(i) == type)
+      if( m_host.getServiceName(i) == type)
       {
          if( servicescounts[i] < 1)
          {

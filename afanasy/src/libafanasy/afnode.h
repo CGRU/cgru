@@ -23,12 +23,12 @@ public:
    virtual ~Node();
 
 /// Nodes comparison by priority ( wich is private property).
-   inline bool operator <  ( const af::Node &other) const { return priority <  other.priority;}
-   inline bool operator <= ( const af::Node &other) const { return priority <= other.priority;}
-   inline bool operator >  ( const af::Node &other) const { return priority >  other.priority;}
-   inline bool operator >= ( const af::Node &other) const { return priority >= other.priority;}
-   inline bool operator == ( const af::Node &other) const { return priority == other.priority;}
-   inline bool operator != ( const af::Node &other) const { return priority != other.priority;}
+   inline bool operator <  ( const af::Node &other) const { return m_priority <  other.m_priority;}
+   inline bool operator <= ( const af::Node &other) const { return m_priority <= other.m_priority;}
+   inline bool operator >  ( const af::Node &other) const { return m_priority >  other.m_priority;}
+   inline bool operator >= ( const af::Node &other) const { return m_priority >= other.m_priority;}
+   inline bool operator == ( const af::Node &other) const { return m_priority == other.m_priority;}
+   inline bool operator != ( const af::Node &other) const { return m_priority != other.m_priority;}
 
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -36,10 +36,10 @@ public:
 /// Refresh node information
    virtual void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 
-   inline int getId()       const { return id;      } ///< Get Node id.
-   inline int getPriority() const { return priority;} ///< Get Node priority.
-   inline void  getName( std::string & str) const { str =  name;    } ///< Get Node name.
-   inline const std::string & getName()     const { return name;    } ///< Get Node name.
+   inline int getId()       const { return m_id;      } ///< Get Node id.
+   inline int getPriority() const { return m_priority;} ///< Get Node priority.
+   inline void  getName( std::string & str) const { str =  m_name;    } ///< Get Node name.
+   inline const std::string & getName()     const { return m_name;    } ///< Get Node name.
 
    friend class ::AfContainer;
    friend class ::AfContainerIt;
@@ -54,17 +54,17 @@ public:
 		FHidden = 1<<1
 	};
 
-	inline bool isZombie() const { return (flags & FZombie ); } ///< Whether a node is zombie.
-	inline bool isHidden() const { return (flags & FHidden ); } ///< Whether a node is hidden.
+    inline bool isZombie() const { return (m_flags & FZombie ); } ///< Whether a node is zombie.
+    inline bool isHidden() const { return (m_flags & FHidden ); } ///< Whether a node is hidden.
 
-   inline void lock()     const { locked =  true; }
-   inline void unLock()   const { locked = false; }
-   inline bool isLocked() const { return  locked; }
-   inline bool unLocked() const { return !locked; }
+   inline void lock()     const { m_locked =  true; }
+   inline void unLock()   const { m_locked = false; }
+   inline bool isLocked() const { return  m_locked; }
+   inline bool unLocked() const { return !m_locked; }
 
-	virtual void setZombie() { flags = flags | FZombie; } ///< Request to kill a node.
+    virtual void setZombie() { m_flags = m_flags | FZombie; } ///< Request to kill a node.
 
-	inline void setHidden( bool i_hide = true) { if( i_hide ) flags = flags | FHidden; else flags = flags & (~FHidden); }
+    inline void setHidden( bool i_hide = true) { if( i_hide ) m_flags = m_flags | FHidden; else m_flags = m_flags & (~FHidden); }
 
    // Just interesting - good to show server load
    static unsigned long long getSolvesCount() { return sm_solve_cycle; }
@@ -105,24 +105,27 @@ protected:
 
     virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
 
+	void json_read( JSON & i_object);
+	void json_write( std::ostringstream & stream);
+
 protected:
 
 /// Node id, unique for nodes of the same type. It is a position in container where node is stoted.
-   int32_t id;
+   int32_t m_id;
 
 /// Node priority. When new node added to container or a priority changed, container sort nodes by priority.
-   uint8_t priority;
+   uint8_t m_priority;
 
 /// Node name. Name is unique for nodes stored in container.
 /** When new node added and a node with the same name is already exists in container,
 *** container change node name by adding a number.
 **/
-   std::string name;
+   std::string m_name;
 
-   mutable bool locked;    ///< Lock state.
+   mutable bool m_locked;    ///< Lock state.
 
-	uint32_t state;   ///< State.
-	uint32_t flags;   ///< Flags.
+    uint32_t m_state;   ///< State.
+    uint32_t m_flags;   ///< Flags.
 
 private:
 /// Try to solve a node
@@ -148,12 +151,12 @@ private:
     unsigned long long m_solve_cycle;
 
 /// Previous node pointer. Previous container node has a greater or equal priority.
-   Node * prev_ptr;
+   Node * m_prev_ptr;
 
 /// Next node pointer. Next container node has a less or equal priority.
-   Node * next_ptr;
+   Node * m_next_ptr;
 
 /// List of lists which have this node ( for a exapmle: each user has some jobs).
-   std::list<AfList*> lists;
+   std::list<AfList*> m_lists;
 };
 }

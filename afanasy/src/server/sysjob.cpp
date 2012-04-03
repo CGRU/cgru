@@ -429,15 +429,15 @@ SysJob::SysJob( int flags):
 
    if( flags != New ) return;
 
-   name              = AFJOB::SYSJOB_NAME;
-   username          = AFJOB::SYSJOB_USERNAME;
-   priority          = AFGENERAL::DEFAULT_PRIORITY;
-   maxrunningtasks   = AFGENERAL::MAXRUNNINGTASKS;
+   m_name              = AFJOB::SYSJOB_NAME;
+   m_user_name          = AFJOB::SYSJOB_USERNAME;
+   m_priority          = AFGENERAL::DEFAULT_PRIORITY;
+   m_max_running_tasks   = AFGENERAL::MAXRUNNINGTASKS;
 
-   blocksnum = BlockLastIndex;
-   blocksdata = new af::BlockData*[blocksnum];
-   blocksdata[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, id);
-   blocksdata[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     id);
+   m_blocksnum = BlockLastIndex;
+   m_blocksdata = new af::BlockData*[m_blocksnum];
+   m_blocksdata[BlockPostCmdIndex] = new SysBlockData_CmdPost( BlockPostCmdIndex, m_id);
+   m_blocksdata[BlockWOLIndex    ] = new SysBlockData_WOL(     BlockWOLIndex,     m_id);
 
    progress = new afsql::DBJobProgress( this);
 
@@ -467,12 +467,12 @@ Block * SysJob::newBlock( int numBlock)
    {
    case BlockPostCmdIndex:
    {
-      block_cmdpost = new SysBlock_CmdPost( this, blocksdata[numBlock], progress, &loglist);
+      block_cmdpost = new SysBlock_CmdPost( this, m_blocksdata[numBlock], progress, &loglist);
       return block_cmdpost;
    }
    case BlockWOLIndex:
    {
-      block_wol = new SysBlock_WOL( this, blocksdata[numBlock], progress, &loglist);
+      block_wol = new SysBlock_WOL( this, m_blocksdata[numBlock], progress, &loglist);
       return block_wol;
    }
    default:
@@ -492,7 +492,7 @@ void SysJob::AddWOLCommand(  const std::string & Command, const std::string & Wo
 bool SysJob::solve( RenderAf *render, MonitorContainer * monitoring)
 {
 //printf("SysJob::solve:\n");
-   for( int b = 0; b < blocksnum; b++ )
+   for( int b = 0; b < m_blocksnum; b++ )
       if(((SysBlock*)(m_blocks[b]))->isReady())
          return JobAf::solve( render, monitoring);
 
@@ -573,9 +573,9 @@ void SysJob::restartTasks( const af::MCTasksPos &taskspos, RenderContainer * ren
    for( int p = 0; p < taskspos.getCount(); p++)
    {
       int b = taskspos.getNumBlock(p);
-      if( b >= blocksnum)
+      if( b >= m_blocksnum)
       {
-         AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, blocksnum)
+         AFERRAR("SysJob::skipTasks: b >= blocksnum ( %d >= %d )", b, m_blocksnum)
          continue;
       }
       ((SysBlock*)(m_blocks[b]))->clearCommands();
@@ -601,7 +601,7 @@ void SysJob::appendJobLog( const std::string & message)
 
 bool SysJob::isValid() const
 {
-   if( blocksnum != BlockLastIndex ) return false;
+   if( m_blocksnum != BlockLastIndex ) return false;
    return true;
 }
 

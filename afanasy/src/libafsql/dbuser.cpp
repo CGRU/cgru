@@ -28,25 +28,25 @@ DBUser::DBUser( int uid):
 
 void DBUser::addDBAttributes()
 {
-   dbAddAttr( new DBAttrInt32(  DBAttr::_id,                   &id                  ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_id,                   &m_id                  ));
 
-   dbAddAttr( new DBAttrUInt32( DBAttr::_state,                &state               ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &flags               ));
-   dbAddAttr( new DBAttrString( DBAttr::_hostname,             &hostname            ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,      &maxrunningtasks     ));
-   dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,             &priority            ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask           ));
-   dbAddAttr( new DBAttrUInt8 ( DBAttr::_errors_retries,       &errors_retries      ));
-   dbAddAttr( new DBAttrUInt8 ( DBAttr::_errors_avoidhost,     &errors_avoidhost    ));
-   dbAddAttr( new DBAttrUInt8 ( DBAttr::_errors_tasksamehost,  &errors_tasksamehost ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_errors_forgivetime,   &errors_forgivetime  ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_lifetime,             &jobs_lifetime       ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude   ));
-   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_register,        &time_register       ));
-   dbAddAttr( new DBAttrString( DBAttr::_annotation,           &annotation          ));
-   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &customdata          ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_state,                &m_state               ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &m_flags               ));
+   dbAddAttr( new DBAttrString( DBAttr::_hostname,             &m_host_name            ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,      &m_max_running_tasks     ));
+   dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,             &m_priority            ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &m_hosts_mask           ));
+   dbAddAttr( new DBAttrUInt8 ( DBAttr::_errors_retries,       &m_errors_retries      ));
+   dbAddAttr( new DBAttrUInt8 ( DBAttr::_errors_avoidhost,     &m_errors_avoid_host    ));
+   dbAddAttr( new DBAttrUInt8 ( DBAttr::_errors_tasksamehost,  &m_errors_task_same_host ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_errors_forgivetime,   &m_errors_forgive_time  ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_lifetime,             &m_jobs_life_time       ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &m_hosts_mask_exclude   ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_register,        &m_time_register       ));
+   dbAddAttr( new DBAttrString( DBAttr::_annotation,           &m_annotation          ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &m_customdata          ));
 
-   dbAddAttr( new DBAttrString( DBAttr::_name,                 &name                ));
+   dbAddAttr( new DBAttrString( DBAttr::_name,                 &m_name                ));
 
 // Unused by server, but used in vebvisor:
    password = "";

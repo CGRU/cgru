@@ -58,7 +58,7 @@ void AfContainerIt::reset()
    {
       while( node->isZombie())
       {
-         node = node->next_ptr;
+         node = node->m_next_ptr;
          if( node == NULL) return;
       }
    }
@@ -67,13 +67,13 @@ void AfContainerIt::reset()
 void AfContainerIt::next()
 {
    if( node == NULL) return;
-   node = node->next_ptr;
+   node = node->m_next_ptr;
    if( node == NULL) return;
    if( byPassZombies )
    {
       while( node->isZombie())
       {
-         node = node->next_ptr;
+         node = node->m_next_ptr;
          if( node == NULL) return;
       }
    }

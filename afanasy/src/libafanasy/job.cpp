@@ -15,20 +15,20 @@ using namespace af;
 Job::Job( int Id)
 {
 	initDefaultValues();
-	id = Id;
-	time_creation = time(NULL);
+	m_id = Id;
+	m_time_creation = time(NULL);
 }
 
 Job::Job( Msg * msg)
 {
-   initDefaultValues();
-   read( msg);
+	initDefaultValues();
+	read( msg);
 }
 
 Job::Job( JSON & i_value)
 {
 	initDefaultValues();
-	time_creation = time(NULL);
+	m_time_creation = time(NULL);
 	json_read( i_value);
 }
 
@@ -40,109 +40,160 @@ void Job::json_read( JSON & i_object)
 		return;
 	}
 
-	jr_string("name",        name,        i_object);
-	jr_string("username",    username,    i_object);
-	jr_string("hostname",    hostname,    i_object);
-	jr_string("annotation",  annotation,  i_object);
-	jr_string("description", description, i_object);
-	jr_string("cmd_pre",     cmd_pre,     i_object);
-	jr_string("cmd_post",    cmd_post,    i_object);
-	jr_regexp("hostsmask",   hostsmask,   i_object);
+	Node::json_read( i_object);
+
+	jr_string("user_name",     m_user_name,     i_object);
+	jr_string("host_name",     m_host_name,     i_object);
+	jr_string("annotation",    m_annotation,    i_object);
+	jr_string("description",   m_description,   i_object);
+	jr_uint32("flags",         m_flags,         i_object);
+	jr_uint32("state",         m_state,         i_object);
+	jr_int32 ("user_list_order",            m_user_list_order,            i_object);
+	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
+	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
+	jr_string("cmd_pre",  m_cmd_pre,  i_object);
+	jr_string("cmd_post", m_cmd_post, i_object);
+
+	jr_int64 ("time_creation",      m_time_creation,       i_object);
+	jr_int64 ("time_wait",          m_time_wait,           i_object);
+	jr_int64 ("time_started",       m_time_started,        i_object);
+	jr_int64 ("time_done",          m_time_done,           i_object);
+	jr_int32 ("time_life",          m_time_life,           i_object);
+
+	jr_regexp("hosts_mask",         m_hosts_mask,          i_object);
+	jr_regexp("hosts_mask_exclude", m_hosts_mask_exclude,  i_object);
+	jr_regexp("depend_mask",        m_depend_mask,         i_object);
+	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object);
+	jr_regexp("need_os",            m_need_os,             i_object);
+	jr_regexp("need_properties",    m_need_properties,     i_object);
+}
+
+void Job::json_write( std::ostringstream & stream)
+{
+	stream << "\"job\"";
+	stream << ":{";
+	Node::json_write( stream);
+
+	stream << "\"user_name\":\"" << m_user_name << "\",";
+	stream << "\"host_name\":\"" << m_host_name << "\",";
+
+	stream << "\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\",";
+	stream << "\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\",";
+	stream << "\"annotation\":\""   << af::strEscape( m_annotation  ) << "\",";
+	stream << "\"description\":\""  << af::strEscape( m_description ) << "\",";
+
+	stream << "\"flags\":"                      << m_flags                      << ",";
+	stream << "\"state\":"                      << m_state                      << ",";
+	stream << "\"user_list_order\":"            << m_user_list_order            << ",";
+	stream << "\"max_running_tasks\":"          << m_max_running_tasks          << ",";
+	stream << "\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host << ",";
+	stream << "\"time_creation\":"              << m_time_creation              << ",";
+	stream << "\"time_wait\":"                  << m_time_wait                  << ",";
+	stream << "\"time_started\":"               << m_time_started               << ",";
+	stream << "\"time_done\":"                  << m_time_done                  << ",";
+	stream << "\"time_life\":"                  << m_time_life                  << ",";
+
+	stream << "\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\",";
+	stream << "\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\",";
+	stream << "\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\",";
+	stream << "\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\",";
+	stream << "\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\",";
+	stream << "\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
+
+	stream << "}";
 }
 
 void Job::initDefaultValues()
 {
-	id = 0;
-	blocksnum = 0;
-	maxrunningtasks = -1;
-	maxruntasksperhost = -1;
-	time_wait = 0;
-	time_started = 0;
-	time_done = 0;
-	userlistorder = -1;
-	lifetime = -1;
-	blocksdata = NULL;
+	m_id = 0;
+	m_blocksnum = 0;
+	m_max_running_tasks = -1;
+	m_max_running_tasks_per_host = -1;
+	m_time_wait = 0;
+	m_time_started = 0;
+	m_time_done = 0;
+	m_user_list_order = -1;
+	m_time_life = -1;
+	m_blocksdata = NULL;
 
-	hostsmask.setCaseInsensitive();
-	hostsmask_exclude.setCaseInsensitive();
-	hostsmask_exclude.setExclude();
-	dependmask.setCaseSensitive();
-	dependmask_global.setCaseSensitive();
-	need_os.setCaseInsensitive();
-	need_os.setContain();
-	need_properties.setCaseSensitive();
-	need_os.setContain();
+	m_hosts_mask.setCaseInsensitive();
+	m_hosts_mask_exclude.setCaseInsensitive();
+	m_hosts_mask_exclude.setExclude();
+	m_depend_mask.setCaseSensitive();
+	m_depend_mask_global.setCaseSensitive();
+	m_need_os.setCaseInsensitive();
+	m_need_os.setContain();
+	m_need_properties.setCaseSensitive();
+	m_need_os.setContain();
 }
 
 Job::~Job()
 {
-   if( blocksdata != NULL)
+   if( m_blocksdata != NULL)
    {
-      for( int b = 0; b < blocksnum; b++)
-         if( blocksdata[b] != NULL) delete blocksdata[b];
-      delete [] blocksdata;
+	  for( int b = 0; b < m_blocksnum; b++)
+		 if( m_blocksdata[b] != NULL) delete m_blocksdata[b];
+	  delete [] m_blocksdata;
    }
 }
 
 void Job::readwrite( Msg * msg)
 {
-//printf("Job::readwrite: BEGIN\n");
-   Node::readwrite( msg);
+	Node::readwrite( msg);
 
-   rw_String  ( username,           msg);
-   rw_String  ( hostname,           msg);
-   rw_int32_t ( blocksnum,          msg);
-   rw_uint32_t( flags,              msg);
-   rw_uint32_t( state,              msg);
-   rw_int32_t ( maxrunningtasks,    msg);
-   rw_int32_t ( maxruntasksperhost, msg);
-   rw_String  ( cmd_pre,            msg);
-   rw_String  ( cmd_post,           msg);
+	rw_String  ( m_user_name,           msg);
+	rw_String  ( m_host_name,           msg);
+	rw_int32_t ( m_blocksnum,          msg);
+	rw_uint32_t( m_flags,              msg);
+	rw_uint32_t( m_state,              msg);
+	rw_int32_t ( m_max_running_tasks,    msg);
+	rw_int32_t ( m_max_running_tasks_per_host, msg);
+	rw_String  ( m_cmd_pre,            msg);
+	rw_String  ( m_cmd_post,           msg);
 
-   rw_int32_t ( userlistorder,      msg);
-   rw_int64_t ( time_creation,      msg);
-   rw_int64_t ( time_wait,          msg);
-   rw_int64_t ( time_started,       msg);
-   rw_int64_t ( time_done,          msg);
-   rw_int32_t ( lifetime,           msg);
+	rw_int32_t ( m_user_list_order,      msg);
+	rw_int64_t ( m_time_creation,      msg);
+	rw_int64_t ( m_time_wait,          msg);
+	rw_int64_t ( m_time_started,       msg);
+	rw_int64_t ( m_time_done,          msg);
+	rw_int32_t ( m_time_life,           msg);
 
-   rw_String  ( description,        msg);
-   rw_String  ( annotation,         msg);
+	rw_String  ( m_description,        msg);
+	rw_String  ( m_annotation,         msg);
 
-   rw_RegExp  ( hostsmask,          msg);
-   rw_RegExp  ( hostsmask_exclude,  msg);
-   rw_RegExp  ( dependmask,         msg);
-   rw_RegExp  ( dependmask_global,  msg);
-   rw_RegExp  ( need_os,            msg);
-   rw_RegExp  ( need_properties,    msg);
+	rw_RegExp  ( m_hosts_mask,          msg);
+	rw_RegExp  ( m_hosts_mask_exclude,  msg);
+	rw_RegExp  ( m_depend_mask,         msg);
+	rw_RegExp  ( m_depend_mask_global,  msg);
+	rw_RegExp  ( m_need_os,            msg);
+	rw_RegExp  ( m_need_properties,    msg);
 
-   rw_blocks(  msg);
-//printf("Job::readwrite: END\n");
+	rw_blocks(  msg);
 }
 
 void Job::rw_blocks( Msg * msg)
 {
-   if( blocksnum < 1)
+   if( m_blocksnum < 1)
    {
-      AFERRAR("Job::rw_blocks: invalid blocks number = %d", blocksnum)
+	  AFERRAR("Job::rw_blocks: invalid blocks number = %d", m_blocksnum)
       return;
    }
 
    if( msg->isWriting() )
    {
-      for( int b = 0; b < blocksnum; b++)
+	  for( int b = 0; b < m_blocksnum; b++)
       {
-         blocksdata[b]->write( msg);
+		 m_blocksdata[b]->write( msg);
       }
    }
    else
    {
-      blocksdata = new BlockData*[blocksnum];
-      for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
-      for( int b = 0; b < blocksnum; b++)
+	  m_blocksdata = new BlockData*[m_blocksnum];
+	  for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
+	  for( int b = 0; b < m_blocksnum; b++)
       {
-         blocksdata[b] = newBlockData( msg);
-         if( blocksdata[b] == NULL)
+		 m_blocksdata[b] = newBlockData( msg);
+		 if( m_blocksdata[b] == NULL)
          {
             AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
             return;
@@ -159,48 +210,48 @@ BlockData * Job::newBlockData( Msg * msg)
 
 int Job::calcWeight() const
 {
-   int weight = Node::calcWeight();
-   weight += sizeof(Job) - sizeof( Node);
-   for( int b = 0; b < blocksnum; b++) weight += blocksdata[b]->calcWeight();
-   weight += weigh( description);
-   weight += weigh( username);
-   weight += weigh( hostname);
-   weight += hostsmask.weigh();
-   weight += hostsmask_exclude.weigh();
-   weight += dependmask.weigh();
-   weight += dependmask_global.weigh();
-   weight += need_os.weigh();
-   weight += need_properties.weigh();
-   return weight;
+	int weight = Node::calcWeight();
+	weight += sizeof(Job) - sizeof( Node);
+	for( int b = 0; b < m_blocksnum; b++) weight += m_blocksdata[b]->calcWeight();
+	weight += weigh( m_description);
+	weight += weigh( m_user_name);
+	weight += weigh( m_host_name);
+	weight += m_hosts_mask.weigh();
+	weight += m_hosts_mask_exclude.weigh();
+	weight += m_depend_mask.weigh();
+	weight += m_depend_mask_global.weigh();
+	weight += m_need_os.weigh();
+	weight += m_need_properties.weigh();
+	return weight;
 }
 
 void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full ) stream << "Job name = ";
 
-   stream << "\"" << name << "\"";
-   stream << "[" << id << "]: ";
-   stream << username;
-   if( hostname.size()) stream << "@" << hostname;
-   stream << "[" << userlistorder << "]";
+   stream << "\"" << m_name << "\"";
+   stream << "[" << m_id << "]: ";
+   stream << m_user_name;
+   if( m_host_name.size()) stream << "@" << m_host_name;
+   stream << "[" << m_user_list_order << "]";
 	if( isHidden()) stream << " (hidden)";
 
 	bool display_blocks = true;
-	if( blocksnum == 0)
+	if( m_blocksnum == 0)
 	{
 		stream << "\n\t ERROR: HAS NO BLOCKS !";
 		display_blocks = false;
 	}
-	else if( blocksdata == NULL)
+	else if( m_blocksdata == NULL)
 	{
 		stream << "\n\t ERROR: HAS NULL BLOCKS DATA !";
 		display_blocks = false;
 	}
-	else if( blocksdata != NULL)
+	else if( m_blocksdata != NULL)
 	{
-		for( int b = 0; b < blocksnum; b++)
+		for( int b = 0; b < m_blocksnum; b++)
 		{
-			if( blocksdata[b] != NULL) continue;
+			if( m_blocksdata[b] != NULL) continue;
 			stream << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
 			display_blocks = false;
 		}
@@ -212,42 +263,42 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
       return;
    }
 
-   if( annotation.size()) stream << "\n    " << annotation;
-   if( description.size()) stream << "\n    " << description;
+   if( m_annotation.size()) stream << "\n    " << m_annotation;
+   if( m_description.size()) stream << "\n    " << m_description;
 
-   stream << "\n Time created  = " << af::time2str( time_creation);
+   stream << "\n Time created  = " << af::time2str( m_time_creation);
 
    if( isStarted())
-      stream << "\n Time started  = " << af::time2str( time_started);
+	  stream << "\n Time started  = " << af::time2str( m_time_started);
    if( isDone())
-      stream << "\n Time finished = " << af::time2str( time_done);
+	  stream << "\n Time finished = " << af::time2str( m_time_done);
 
-   if( lifetime > 0 ) stream << "\n Life Time " << lifetime << " seconds";
+   if( m_time_life > 0 ) stream << "\n Life Time " << m_time_life << " seconds";
 
-   if( hostname.size()) stream << "\n Creation host = \"" << hostname << "\"";
-   stream << "\n Priority = " << int(priority);
-   stream << "\n Maximum running tasks = " << maxrunningtasks;
-   if( maxrunningtasks == -1 ) stream << " (no limit)";
-   stream << "\n Maximum running tasks per host = " << maxruntasksperhost;
-   if( maxruntasksperhost == -1 ) stream << " (no limit)";
-   stream << "\n Hosts mask: \"" << hostsmask.getPattern() << "\"";
-   if( hostsmask.empty()) stream << " (any host)";
-   if( hostsmask_exclude.notEmpty()) stream << "\n Exclude hosts mask: \"" << hostsmask_exclude.getPattern() << "\"";
-   if( dependmask.notEmpty()) stream << "\n Depend mask = \"" << dependmask.getPattern() << "\"";
-   if( dependmask_global.notEmpty()) stream << "\n Global depend mask = \"" << dependmask_global.getPattern() << "\"";
-   if( time_wait ) stream << "\n Wait time = " << af::time2str( time_wait);
-   if( need_os.notEmpty()) stream << "\n Needed OS: \"" << need_os.getPattern() << "\"";
-   if( need_properties.notEmpty()) stream << "\n Needed properties: \"" << need_properties.getPattern() << "\"";
-   if( cmd_pre.size()) stream << "\n Pre command:\n" << cmd_pre;
-   if( cmd_post.size()) stream << "\n Post command:\n" << cmd_post;
+   if( m_host_name.size()) stream << "\n Creation host = \"" << m_host_name << "\"";
+   stream << "\n Priority = " << int(m_priority);
+   stream << "\n Maximum running tasks = " << m_max_running_tasks;
+   if( m_max_running_tasks == -1 ) stream << " (no limit)";
+   stream << "\n Maximum running tasks per host = " << m_max_running_tasks_per_host;
+   if( m_max_running_tasks_per_host == -1 ) stream << " (no limit)";
+   stream << "\n Hosts mask: \"" << m_hosts_mask.getPattern() << "\"";
+   if( m_hosts_mask.empty()) stream << " (any host)";
+   if( m_hosts_mask_exclude.notEmpty()) stream << "\n Exclude hosts mask: \"" << m_hosts_mask_exclude.getPattern() << "\"";
+   if( m_depend_mask.notEmpty()) stream << "\n Depend mask = \"" << m_depend_mask.getPattern() << "\"";
+   if( m_depend_mask_global.notEmpty()) stream << "\n Global depend mask = \"" << m_depend_mask_global.getPattern() << "\"";
+   if( m_time_wait ) stream << "\n Wait time = " << af::time2str( m_time_wait);
+   if( m_need_os.notEmpty()) stream << "\n Needed OS: \"" << m_need_os.getPattern() << "\"";
+   if( m_need_properties.notEmpty()) stream << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
+   if( m_cmd_pre.size()) stream << "\n Pre command:\n" << m_cmd_pre;
+   if( m_cmd_post.size()) stream << "\n Post command:\n" << m_cmd_post;
 
 	if( false == display_blocks )
 		return;
 
-   if(( blocksnum <=3 ) && ( blocksdata != NULL ))
-      for( int b = 0; b < blocksnum; b++)
+   if(( m_blocksnum <=3 ) && ( m_blocksdata != NULL ))
+	  for( int b = 0; b < m_blocksnum; b++)
       {
          stream << std::endl << std::endl;
-         blocksdata[b]->generateInfoStream( stream, false);
+		 m_blocksdata[b]->generateInfoStream( stream, false);
       }
 }

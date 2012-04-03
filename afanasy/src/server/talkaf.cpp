@@ -40,7 +40,7 @@ void TalkAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
 //printf("TalkAf::refresh: \"%s\"\n", getName().toUtf8().data());
    if( getTimeUpdate() < (currentTime - af::Environment::getTalkZombieTime()))
    {
-      if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksDel, id);
+      if( monitoring) monitoring->addEvent( af::Msg::TMonitorTalksDel, m_id);
       setZombie();
    }
 }

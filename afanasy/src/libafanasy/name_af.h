@@ -115,6 +115,7 @@ namespace af
    const std::string strJoin( const std::list<std::string> & strlist, const std::string & separator = " ");
    const std::string strJoin( const std::vector<std::string> & strvect, const std::string & separator = " ");
    const std::string strReplace( const std::string & str, char before, char after);
+	const std::string strEscape( const std::string & i_str);
    const std::list<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
 
 	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags, int i_startFrom = 0);

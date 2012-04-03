@@ -23,7 +23,7 @@ void MonitorAf::refresh( time_t currentTime, AfContainer * pointer, MonitorConta
 {
    if( getTimeUpdate() < (currentTime - af::Environment::getMonitorZombieTime()))
    {
-      if( monitoring) monitoring->addEvent( af::Msg::TMonitorMonitorsDel, id);
+      if( monitoring) monitoring->addEvent( af::Msg::TMonitorMonitorsDel, m_id);
       setZombie();
    }
 }

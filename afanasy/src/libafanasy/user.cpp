@@ -14,44 +14,44 @@
 using namespace af;
 
 User::User( const std::string & username, const std::string & host):
-   hostname( host),
-   maxrunningtasks(  af::Environment::getMaxRunningTasksNumber() ),
-   errors_retries(    af::Environment::getTaskErrorRetries() ),
-   errors_avoidhost( af::Environment::getErrorsAvoidHost()  ),
-   errors_tasksamehost( af::Environment::getTaskErrorsSameHost() ),
-   errors_forgivetime( af::Environment::getErrorsForgiveTime()),
-   jobs_lifetime( 0),
-   time_register( 0)
+	m_host_name( host),
+	m_max_running_tasks(  af::Environment::getMaxRunningTasksNumber() ),
+	m_errors_retries(    af::Environment::getTaskErrorRetries() ),
+	m_errors_avoid_host( af::Environment::getErrorsAvoidHost()  ),
+	m_errors_task_same_host( af::Environment::getTaskErrorsSameHost() ),
+	m_errors_forgive_time( af::Environment::getErrorsForgiveTime()),
+	m_jobs_life_time( 0),
+	m_time_register( 0)
 {
-   name = username;
-   priority = af::Environment::getPriority();
+	m_name = username;
+	m_priority = af::Environment::getPriority();
 
-   construct();
+	construct();
 }
 
 User::User( int uid)
 {
-   id = uid;
-   construct();
+	m_id = uid;
+	construct();
 }
 
 User::User( Msg * msg)
 {
-   read( msg);
+	read( msg);
 }
 
 void User::construct()
 {
-   m_numjobs = 0;
-   numrunningjobs = 0;
-   need = 0.0f;
-   runningtasksnumber = 0;
-   time_online = 0;
+	m_jobs_num = 0;
+	m_running_jobs_num = 0;
+	need = 0.0f;
+	m_running_tasks_num = 0;
+	m_time_online = 0;
 
-   hostsmask.setCaseInsensitive();
+	m_hosts_mask.setCaseInsensitive();
 
-   hostsmask_exclude.setCaseInsensitive();
-   hostsmask_exclude.setExclude();
+	m_hosts_mask_exclude.setCaseInsensitive();
+	m_hosts_mask_exclude.setExclude();
 }
 
 User::~User()
@@ -61,38 +61,38 @@ AFINFO("User::~User:")
 
 void User::readwrite( Msg * msg)
 {
-    Node::readwrite( msg);
+	Node::readwrite( msg);
 
-    rw_uint32_t( state,                 msg);
-    rw_uint32_t( flags,                 msg);
-    rw_int64_t ( time_register,         msg);
-    rw_String  ( hostname,              msg);
-    rw_int32_t ( maxrunningtasks,       msg);
-    rw_uint8_t ( errors_retries,        msg);
-    rw_uint8_t ( errors_avoidhost,      msg);
-    rw_uint8_t ( errors_tasksamehost,   msg);
-    rw_int32_t ( errors_forgivetime,    msg);
-    rw_int64_t ( time_online,           msg);
-    rw_int32_t ( jobs_lifetime,         msg);
-    rw_int32_t ( m_numjobs,             msg);
-    rw_int32_t ( numrunningjobs,        msg);
-    rw_int32_t ( runningtasksnumber,    msg);
-    rw_float   ( need,                  msg);
-    rw_RegExp  ( hostsmask,             msg);
-    rw_RegExp  ( hostsmask_exclude,     msg);
-    rw_String  ( annotation,            msg);
-    rw_String  ( customdata,            msg);
+	rw_uint32_t( m_state,                 msg);
+	rw_uint32_t( m_flags,                 msg);
+	rw_int64_t ( m_time_register,         msg);
+	rw_String  ( m_host_name,             msg);
+	rw_int32_t ( m_max_running_tasks,     msg);
+	rw_uint8_t ( m_errors_retries,        msg);
+	rw_uint8_t ( m_errors_avoid_host,     msg);
+	rw_uint8_t ( m_errors_task_same_host, msg);
+	rw_int32_t ( m_errors_forgive_time,   msg);
+	rw_int64_t ( m_time_online,           msg);
+	rw_int32_t ( m_jobs_life_time,        msg);
+	rw_int32_t ( m_jobs_num,              msg);
+	rw_int32_t ( m_running_jobs_num,      msg);
+	rw_int32_t ( m_running_tasks_num,     msg);
+	rw_float   ( need,                    msg);
+	rw_RegExp  ( m_hosts_mask,            msg);
+	rw_RegExp  ( m_hosts_mask_exclude,    msg);
+	rw_String  ( m_annotation,            msg);
+	rw_String  ( m_customdata,            msg);
 }
 
 void User::setPermanent( bool value)
 {
    if( value )
    {
-      state = state | Permanent;
-      time_register = time( NULL);
+      m_state = m_state | Permanent;
+      m_time_register = time( NULL);
    }
    else
-      state = state & (~Permanent);
+      m_state = m_state & (~Permanent);
 }
 
 void User::setJobsSolveMethod( int i_method )
@@ -100,23 +100,23 @@ void User::setJobsSolveMethod( int i_method )
     switch( i_method)
     {
     case af::Node::SolveByOrder:
-        state = state & (~SolveJobsParrallel);
+        m_state = m_state & (~SolveJobsParrallel);
         break;
     case af::Node::SolveByPriority:
-        state = state | SolveJobsParrallel;
+        m_state = m_state | SolveJobsParrallel;
         break;
     }
 }
 
 int User::calcWeight() const
 {
-   int weight = Node::calcWeight();
-   weight += sizeof(User) - sizeof( Node);
-   weight += weigh(hostname);
-   weight += hostsmask.weigh();
-   weight += hostsmask_exclude.weigh();
-   weight += weigh(annotation);
-   return weight;
+	int weight = Node::calcWeight();
+	weight += sizeof(User) - sizeof( Node);
+	weight += weigh(m_host_name);
+	weight += m_hosts_mask.weigh();
+	weight += m_hosts_mask_exclude.weigh();
+	weight += weigh(m_annotation);
+	return weight;
 }
 
 const std::string User::generateErrorsSolvingString() const
@@ -128,55 +128,55 @@ const std::string User::generateErrorsSolvingString() const
 
 void User::generateErrorsSolvingStream( std::ostringstream & stream) const
 {
-   stream << "E-" << int(errors_avoidhost) << "j|"
-         << int(errors_tasksamehost) << "t|"
-         << int(errors_retries) << "r";
-   if( errors_forgivetime > 0 ) stream << " F" << af::time2strHMS( errors_forgivetime, true);
+   stream << "E-" << int(m_errors_avoid_host) << "j|"
+         << int(m_errors_task_same_host) << "t|"
+         << int(m_errors_retries) << "r";
+   if( m_errors_forgive_time > 0 ) stream << " F" << af::time2strHMS( m_errors_forgive_time, true);
 }
 
 void User::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "User name = \"" << name << "\" (id=" << id << "):";
-      stream << "\n Priority = " << int(priority);
+      stream << "User name = \"" << m_name << "\" (id=" << m_id << "):";
+      stream << "\n Priority = " << int(m_priority);
       stream << "\n    Each point gives 10% bonus";
-      stream << "\n Jobs = " << m_numjobs << " / active jobs = " << numrunningjobs;
-      if( jobs_lifetime > 0 ) stream << "\n Jobs life time = " << af::time2strHMS( jobs_lifetime, true);
-      stream << "\n Maximum Running Tasks = " << maxrunningtasks;
-      if( maxrunningtasks < 1 ) stream << " (no limit)";
-      stream << "\n Running Tasks Number = " << runningtasksnumber;
-      if( hasHostsMask())        stream << "\n Hosts Mask = \"" << hostsmask.getPattern() << "\"";
-      if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << hostsmask_exclude.getPattern() << "\"";
+      stream << "\n Jobs = " << m_jobs_num << " / active jobs = " << m_running_jobs_num;
+      if( m_jobs_life_time > 0 ) stream << "\n Jobs life time = " << af::time2strHMS( m_jobs_life_time, true);
+      stream << "\n Maximum Running Tasks = " << m_max_running_tasks;
+      if( m_max_running_tasks < 1 ) stream << " (no limit)";
+      stream << "\n Running Tasks Number = " << m_running_tasks_num;
+      if( hasHostsMask())        stream << "\n Hosts Mask = \"" << m_hosts_mask.getPattern() << "\"";
+      if( hasHostsMaskExclude()) stream << "\n Exclude Hosts Mask = \"" << m_hosts_mask_exclude.getPattern() << "\"";
 
       stream << "\n Errors Solving: ";
       generateErrorsSolvingStream( stream);
-      stream << "\n    Errors To Avoid Host = " << int(errors_avoidhost);
-      stream << "\n    Maximum Errors Same Task = " << int(errors_tasksamehost);
-      stream << "\n    Task Errors To Retry = " << int(errors_retries);
-      stream << "\n    Errors Forgive Time = " << af::time2strHMS( errors_forgivetime, true);
-      if( errors_forgivetime == 0 ) stream << " (infinite, no forgiving)";
+      stream << "\n    Errors To Avoid Host = " << int(m_errors_avoid_host);
+      stream << "\n    Maximum Errors Same Task = " << int(m_errors_task_same_host);
+      stream << "\n    Task Errors To Retry = " << int(m_errors_retries);
+      stream << "\n    Errors Forgive Time = " << af::time2strHMS( m_errors_forgive_time, true);
+      if( m_errors_forgive_time == 0 ) stream << " (infinite, no forgiving)";
 
-      if( hostname.size() != 0) stream << "\n Last host = \"" << hostname << "\"";
+      if( m_host_name.size() != 0) stream << "\n Last host = \"" << m_host_name << "\"";
       if( isPermanent())
       {
          stream << "\n User is permanent (stored in database)";
-         stream << "\n Registration time = " << time2str( time_register);
+         stream << "\n Registration time = " << time2str( m_time_register);
       }
       else stream << "\n (user is temporal)";
-      stream << "\n Online time = " << time2str( time_online);
-      if( annotation.size()) stream << "\n" << annotation;
-      if( customdata.size()) stream << "\nCustom Data:\n" << customdata;
+      stream << "\n Online time = " << time2str( m_time_online);
+      if( m_annotation.size()) stream << "\n" << m_annotation;
+      if( m_customdata.size()) stream << "\nCustom Data:\n" << m_customdata;
       //stream << "\n Memory = " << calcWeight() << " bytes.";
    }
    else
    {
-      stream << "#" << id << ":" << int(priority)
-            << " " << name
-            << " j" << m_numjobs << "/" << numrunningjobs
-            << " r" << runningtasksnumber << "/" << maxrunningtasks
-            << " " << time2str( time_online)
-            << " " <<  hostname
+      stream << "#" << m_id << ":" << int(m_priority)
+            << " " << m_name
+            << " j" << m_jobs_num << "/" << m_running_jobs_num
+            << " r" << m_running_tasks_num << "/" << m_max_running_tasks
+            << " " << time2str( m_time_online)
+            << " " <<  m_host_name
             << " " << (isPermanent() == 1 ? "P" : "T")
             << " - " << calcWeight() << " bytes.";
    }

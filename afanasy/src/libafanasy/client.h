@@ -14,7 +14,7 @@ class Client : public Node
 public:
 
 /// Construct client, getting values from environment.
-   Client( int flags, int Id);
+   Client( int m_flags, int Id);
 
    enum Flags{
       DoNotGetAnyValues    = 0,
@@ -23,40 +23,40 @@ public:
 
    virtual ~Client();
 
-   inline long long getTimeLaunch()         const { return time_launch;   }  ///< Get client launch time.
-   inline long long getTimeRegister()       const { return time_register; }  ///< Get client register time.
-   inline long long getTimeUpdate()         const { return time_update;   }  ///< Get client last update time.
-   inline const std::string & getVersion()  const { return version;       }  ///< Get client version.
-   inline const std::string & getUserName() const { return username;      }  ///< Get client user name.
+	inline long long getTimeLaunch()         const { return m_time_launch;   }  ///< Get client launch time.
+	inline long long getTimeRegister()       const { return m_time_register; }  ///< Get client register time.
+	inline long long getTimeUpdate()         const { return m_time_update;   }  ///< Get client last update time.
+	inline const std::string & getVersion()  const { return m_version;       }  ///< Get client version.
+	inline const std::string & getUserName() const { return m_user_name;      }  ///< Get client user name.
 
-   inline const Address & getAddress() const { return address;} ///< Get client address.
+   inline const Address & getAddress() const { return m_address;} ///< Get client address.
    inline bool addrEqual( const Client * other ) const          ///< Compare address with other.
-               { return address.equal(other->address);}
+			   { return m_address.equal(other->m_address);}
 
-   inline void setAddressIP( const Address & other) { address.setIP( other);}
+   inline void setAddressIP( const Address & other) { m_address.setIP( other);}
 
 /// Set registration time ( and update time).
    virtual void setRegisterTime();
 
    inline virtual bool isOnline() const { return true; }///< Whether the client is online.
 
-   inline void updateTime() {  time_update   = time( NULL );} ///< Update client last update time.
+   inline void updateTime() {  m_time_update   = time( NULL );} ///< Update client last update time.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
 protected:
-   void clearNetIFs();
-   void grabNetIFs( std::vector<NetIF*> & otherNetIFs);
+	void clearNetIFs();
+	void grabNetIFs( std::vector<NetIF*> & otherNetIFs);
 
 protected:
-   int64_t     time_launch;   ///< Client launch time.
-   int64_t     time_register; ///< Client registration on server time.
-   int64_t     time_update;   ///< Client last update time.
-   std::string version;       ///< Client version.
-   std::string username;      ///< Client user name.
-   Address     address;       ///< Client computer address.
+	int64_t     m_time_launch;   ///< Client launch time.
+	int64_t     m_time_register; ///< Client registration on server time.
+	int64_t     m_time_update;   ///< Client last update time.
+	std::string m_version;       ///< Client version.
+	std::string m_user_name;     ///< Client user name.
+	Address     m_address;       ///< Client computer address.
 
-   std::vector<NetIF*> netIFs;
+	std::vector<NetIF*> m_netIFs;
 
 private:
 };

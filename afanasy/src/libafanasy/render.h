@@ -24,62 +24,62 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-	inline bool isOnline()  const { return (state & SOnline ); }///< Whether Render is online.
-	inline bool isBusy()    const { return (state & SBusy   ); }///< Whether Render is busy.
-	inline bool isNIMBY()   const { return (state & SNIMBY  ); }///< Whether Render is NIMBY.
-	inline bool isNimby()   const { return (state & Snimby  ); }///< Whether Render is nimby.
-	inline bool isFree()    const { return (((~state) & SNIMBY) && ((~state) & Snimby));}///< Whether Render is free.
-	inline bool isOffline() const { return !(state & SOnline );}///< Whether Render is offline.
-	inline bool isDirty()   const { return !(state & SDirty);}  ///< Whether Render is dirty.
+	inline bool isOnline()  const { return (m_state & SOnline ); }///< Whether Render is online.
+	inline bool isBusy()    const { return (m_state & SBusy   ); }///< Whether Render is busy.
+	inline bool isNIMBY()   const { return (m_state & SNIMBY  ); }///< Whether Render is NIMBY.
+	inline bool isNimby()   const { return (m_state & Snimby  ); }///< Whether Render is nimby.
+	inline bool isFree()    const { return (((~m_state) & SNIMBY) && ((~m_state) & Snimby));}///< Whether Render is free.
+	inline bool isOffline() const { return !(m_state & SOnline );}///< Whether Render is offline.
+	inline bool isDirty()   const { return !(m_state & SDirty);}  ///< Whether Render is dirty.
 
-   inline bool isWOLFalling()   const { return state & SWOLFalling;  }
-   inline bool isWOLSleeping()  const { return state & SWOLSleeping; }
-   inline bool isWOLWaking()    const { return state & SWOLWaking;   }
-   inline long long getWOLTime()const { return wol_operation_time;   }
-   inline void setWOLFalling(   bool value) { if( value ) state = state | SWOLFalling;  else state = state & (~SWOLFalling); }
-   inline void setWOLSleeping(  bool value) { if( value ) state = state | SWOLSleeping; else state = state & (~SWOLSleeping);}
-   inline void setWOLWaking(    bool value) { if( value ) state = state | SWOLWaking;   else state = state & (~SWOLWaking);  }
+	inline bool isWOLFalling()   const { return m_state & SWOLFalling;  }
+	inline bool isWOLSleeping()  const { return m_state & SWOLSleeping; }
+	inline bool isWOLWaking()    const { return m_state & SWOLWaking;   }
+	inline long long getWOLTime()const { return m_wol_operation_time;   }
+	inline void setWOLFalling(   bool value) { if( value ) m_state = m_state | SWOLFalling;  else m_state = m_state & (~SWOLFalling); }
+	inline void setWOLSleeping(  bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
+	inline void setWOLWaking(    bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
 
-   inline int getMaxTasks()     const { return (maxtasks == -1 ? host.maxtasks : maxtasks);}
-   inline int getCapacity()     const { return (capacity == -1 ? host.capacity : capacity);}
-   inline int getCapacityUsed() const { return capacity_used;}
-   inline int getCapacityFree() const { return (capacity == -1 ? host.capacity : capacity) - capacity_used;}
-   inline bool hasCapacity( int value) const { return capacity_used + value <= (capacity == -1 ? host.capacity : capacity );}
+	inline int getMaxTasks()     const { return (m_max_tasks == -1 ? m_host.maxtasks : m_max_tasks);}
+	inline int getCapacity()     const { return (m_capacity == -1 ? m_host.capacity : m_capacity);}
+	inline int getCapacityUsed() const { return m_capacity_used;}
+	inline int getCapacityFree() const { return (m_capacity == -1 ? m_host.capacity : m_capacity) - m_capacity_used;}
+	inline bool hasCapacity( int value) const { return m_capacity_used + value <= (m_capacity == -1 ? m_host.capacity : m_capacity );}
 
 /// Whether Render is ready to render tasks.
    inline bool isReady() const { return (
-            ( state & SOnline ) &&
-            ( false == ( state & SNIMBY )) &&
-            ( priority > 0 ) &&
-            ( capacity_used < getCapacity() ) &&
-            ( (int)tasks.size() < getMaxTasks() ) &&
+			( m_state & SOnline ) &&
+			( false == ( m_state & SNIMBY )) &&
+			( m_priority > 0 ) &&
+			( m_capacity_used < getCapacity() ) &&
+			( (int)m_tasks.size() < getMaxTasks() ) &&
             ( false == isWOLFalling())
          );}
 
-   inline const Host    & getHost()    const { return host;}
-   inline const HostRes & getHostRes() const { return hres;}
+   inline const Host    & getHost()    const { return m_host;}
+   inline const HostRes & getHostRes() const { return m_hres;}
 
-   inline void setFree()   { state = state & (~Snimby); state = state & (~SNIMBY);}///< Set free (unset nimby and NIMBY).
-   inline void setNIMBY()  { state = state |   SNIMBY;  state = state & (~Snimby);}///< Set NIMBY.
-   inline void setNimby()  { state = state |   Snimby;  state = state & (~SNIMBY);}///< Set nimby.
+   inline void setFree()   { m_state = m_state & (~Snimby); m_state = m_state & (~SNIMBY);}///< Set free (unset nimby and NIMBY).
+   inline void setNIMBY()  { m_state = m_state |   SNIMBY;  m_state = m_state & (~Snimby);}///< Set NIMBY.
+   inline void setNimby()  { m_state = m_state |   Snimby;  m_state = m_state & (~SNIMBY);}///< Set nimby.
 
-   inline void setOnline()  { state = state |   SOnline ; wol_operation_time = time(NULL);}
-   inline void setOffline() { state = state & (~SOnline); wol_operation_time = time(NULL);}
+   inline void setOnline()  { m_state = m_state |   SOnline ; m_wol_operation_time = time(NULL);}
+   inline void setOffline() { m_state = m_state & (~SOnline); m_wol_operation_time = time(NULL);}
 
-   inline void setPriority( int value) { priority = value; }///< Set priority.
+   inline void setPriority( int value) { m_priority = value; }///< Set priority.
 
-   void setCapacity( int value) { capacity = value; checkDirty();}
-   void setMaxTasks( int value) { maxtasks = value; checkDirty();}
+   void setCapacity( int value) { m_capacity = value; checkDirty();}
+   void setMaxTasks( int value) { m_max_tasks = value; checkDirty();}
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
-   inline long long getTasksStartFinishTime() const { return taskstartfinishtime; }///< Get tasks start or finish time.
-   inline const std::list<TaskExec*> & getTasks() { return tasks;}
-   inline int getTasksNumber() const { return int(tasks.size());}
+   inline long long getTasksStartFinishTime() const { return m_task_start_finish_time; }///< Get tasks start or finish time.
+   inline const std::list<TaskExec*> & getTasks() { return m_tasks;}
+   inline int getTasksNumber() const { return int(m_tasks.size());}
 
 //   const std::string getResourcesString() const;
 
-   inline const std::string & getAnnontation() const { return annotation;}
+   inline const std::string & getAnnontation() const { return m_annotation;}
 
 public:
 
@@ -96,28 +96,28 @@ public:
 	};
 
 protected:
-   inline void setBusy(  bool Busy ) { if(Busy ) state = state | SBusy;  else state = state & (~SBusy );}
+   inline void setBusy(  bool Busy ) { if(Busy ) m_state = m_state | SBusy;  else m_state = m_state & (~SBusy );}
    void restoreDefaults();       ///< Restore host capacity and reset disabled services.
    void checkDirty();
 
 protected:
 
-   int32_t capacity;
-   int32_t capacity_used;
-   int32_t maxtasks;
+	int32_t m_capacity;
+	int32_t m_capacity_used;
+	int32_t m_max_tasks;
 
-   std::string services_disabled;
-   std::string customdata;
-   std::string annotation;
+	std::string m_services_disabled;
+	std::string m_custom_data;
+	std::string m_annotation;
 
-   Host     host;
-   HostRes  hres;
+	Host     m_host;
+	HostRes  m_hres;
 
-   std::list<TaskExec*> tasks;
+	std::list<TaskExec*> m_tasks;
 
-   int64_t taskstartfinishtime; ///< Task start or finish time.
+	int64_t m_task_start_finish_time; ///< Task start or finish time.
 
-   int64_t wol_operation_time;   ///< Last WOL operation time (to sleep or to wake).
+	int64_t m_wol_operation_time;   ///< Last WOL operation time (to sleep or to wake).
 
 private:
    void construct();

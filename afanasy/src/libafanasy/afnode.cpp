@@ -15,34 +15,34 @@ using namespace af;
 unsigned long long af::Node::sm_solve_cycle = 1;
 
 Node::Node():
-   /// Containers does not use zero id, just created node has no container.
-   id( 0),
+    /// Containers does not use zero id, just created node has no container.
+    m_id( 0),
 
-	state(0),
-	flags(0),
+    m_state(0),
+    m_flags(0),
 
-   priority( 0),
+    m_priority( 0),
 
-   /// Just created node (need was not calculated) has no need.
-   m_solve_need(0.0),
-   /// 0 means that it was not solved at all
-   m_solve_cycle(0),
+    /// Just created node (need was not calculated) has no need.
+    m_solve_need(0.0),
+    /// 0 means that it was not solved at all
+    m_solve_cycle(0),
 
-   locked( false),
-   prev_ptr( NULL),
-   next_ptr( NULL)
+    m_locked( false),
+    m_prev_ptr( NULL),
+    m_next_ptr( NULL)
 {
 }
 
 bool Node::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d", name.c_str(), id)
+   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d", m_name.c_str(), m_id)
    return false;
 }
 
 void Node::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d", name.c_str(), id)
+   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d", m_name.c_str(), m_id)
    return;
 }
 
@@ -53,39 +53,55 @@ AFINFO("Node::~Node():")
 
 void Node::readwrite( Msg * msg)
 {
-   rw_int32_t( id,        msg);
-   rw_uint8_t( priority,  msg);
-   rw_bool   ( locked,    msg);
-   rw_String(  name,      msg);
+	rw_int32_t( m_id,        msg);
+	rw_uint8_t( m_priority,  msg);
+	rw_bool   ( m_locked,    msg);
+	rw_String(  m_name,      msg);
+}
+
+void Node::json_read( JSON & i_object)
+{
+	jr_string("name",        m_name,        i_object);
+	jr_int32 ("id",          m_id,          i_object);
+	jr_uint8 ("priority",    m_priority,    i_object);
+	jr_bool  ("locked",      m_locked,      i_object);
+}
+
+void Node::json_write( std::ostringstream & stream)
+{
+	stream << "\"name\":\""   << af::strEscape(m_name)         << "\",";
+	stream << "\"id\":"       << m_id                          << ",";
+	stream << "\"priority\":" << int(m_priority)               << ",";
+	stream << "\"locked\":"   << (m_locked ? "true" : "false") << ",";
 }
 
 int Node::calcWeight() const
 {
    int weight = sizeof( Node);
-   weight += af::weigh( name);
-   for( unsigned l = 0; l < lists.size(); l++) weight += sizeof(void*);
+   weight += af::weigh( m_name);
+   for( unsigned l = 0; l < m_lists.size(); l++) weight += sizeof(void*);
    return weight;
 }
 
 /// Main solving functions should be implemented in child classes (if solving needed):
 bool Node::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-    AFERRAR("af::Node::solve(): Did not implemented on '%s'.", name.c_str())
+    AFERRAR("af::Node::solve(): Did not implemented on '%s'.", m_name.c_str())
     return false;
 }
 void Node::calcNeed()
 {
-    AFERRAR("af::Node::calcNeed(): Did not implememted on '%s'.\n", name.c_str())
+    AFERRAR("af::Node::calcNeed(): Did not implememted on '%s'.\n", m_name.c_str())
     calcNeedResouces(-1);
 }
 bool Node::canRun()
 {
-    AFERRAR("af::Node::canRun(): Did not implememted on '%s'.\n", name.c_str())
+    AFERRAR("af::Node::canRun(): Did not implememted on '%s'.\n", m_name.c_str())
     return false;
 }
 bool Node::canRunOn( RenderAf * i_render)
 {
-    AFERRAR("af::Node::canRunOn(): Did not implememted on '%s'.\n", name.c_str())
+    AFERRAR("af::Node::canRunOn(): Did not implememted on '%s'.\n", m_name.c_str())
     return false;
 }
 
@@ -151,7 +167,7 @@ void Node::calcNeedResouces( int i_resourcesquantity)
 
     // Main solving function:
     // ( each priority point gives 10% more resources )
-    m_solve_need = pow( 1.1, priority) / (i_resourcesquantity + 1.0);
+    m_solve_need = pow( 1.1, m_priority) / (i_resourcesquantity + 1.0);
 }
 
 // Functor for sorting algorithm

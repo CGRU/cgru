@@ -745,6 +745,29 @@ const std::string af::strReplace( const std::string & str, char before, char aft
    return replaced;
 }
 
+const std::string af::strEscape( const std::string & i_str)
+{
+	std::string str;
+	if( i_str.size() == 0)
+		return str;
+
+	char esc[] = "\\\"\n\r\t";
+	int esc_len = 5;
+	for( std::string::const_iterator it = i_str.begin(); it != i_str.end(); it++)
+	{
+		for( int i = 0; i < esc_len; i++)
+		{
+			if( *it == esc[i])
+			{
+				str += '\\';
+				break;
+			}
+		}
+		str += *it;
+	}
+	return str;
+}
+
 const std::list<std::string> af::strSplit( const std::string & str, const std::string & separators)
 {
    std::list<std::string> strlist;

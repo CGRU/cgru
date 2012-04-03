@@ -22,7 +22,7 @@ public:
 
    bool hasJobEvent( int type, int uid) const;
 
-   bool hasJobId( int id) const;
+   bool hasJobId( int m_id) const;
 
 private:
    void setEvents( const af::MCGeneral & ids, bool value);

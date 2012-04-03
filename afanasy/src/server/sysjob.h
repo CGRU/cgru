@@ -107,7 +107,7 @@ public:
    };
 
 public:
-   SysJob( int flags);
+   SysJob( int m_flags);
    virtual ~SysJob();
 
    bool isValid() const;

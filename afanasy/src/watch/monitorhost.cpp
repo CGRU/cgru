@@ -10,7 +10,7 @@
 
 MonitorHost::MonitorHost()
 {
-   id = 0;
+   m_id = 0;
    events_counts = new int[EventsCount];
    for( int e = 0; e < EventsCount; e++) events_counts[e] = 0;
 }

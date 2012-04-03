@@ -98,7 +98,7 @@ void ItemJob::updateValues( af::Node *node, int type)
    cmd_post             = afqt::stoq( job->getCmdPost());
    description          = afqt::stoq( job->getDescription());
    num_runningtasks     = job->getRunningTasksNumber();
-   lifetime             = job->getLifeTime();
+   lifetime             = job->getTimeLife();
 
    compact_display   = true;
    for( int b = 0; b < blocksnum; b++)

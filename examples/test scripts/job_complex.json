@@ -1,21 +1,31 @@
 {
 	"job":
 	{
-		"name":"job name",
-		"username":"jimmy",
-		"annotation":"json test",
-		"description":"for tests only",
-		"hostsmask":"renderhost.*",
+		"name"                       : "job name",
+		"user_name"                  : "jimmy",
+		"annotation"                 : "json test",
+		"priority"                   : 50,
+		"max_running_tasks"          : 20,
+		"max_running_tasks_per_host" : 3,
+		"time_creation"              : 12345678901,
+		"time_wait"                  : 12345688901,
+		"description"                : "\\for\\ \"tests\" 'only'",
+		"hosts_mask"                 : "renderhost.*",
+		"hosts_mask_exclude"         : "badhost.*",
+		"depend_mask"                : "my3djob.*",
+		"depend_mask_global"         : "his3djob.*",
+		"need_os"                    : "linux",
+		"need_properties"            : "cuda",
 		"blocks":[
 		{
-			"name":"block A",
-			"tasksName":"frame @####@",
-			"tasksCommand":"render @####@"
+			"name":         "block A",
+			"tasksName":    "frame @####@",
+			"tasksCommand": "render @####@"
 		},
 		{
-			"name":"block B",
-			"tasksName":"frame @####@",
-			"tasksCommand":"render @####@"
+			"name":         "block B",
+			"tasksName":    "frame @####@",
+			"tasksCommand": "render @####@"
 		}
 		]
 	}

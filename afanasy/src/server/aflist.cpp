@@ -20,7 +20,7 @@ AfList::~AfList()
    std::list<af::Node*>::iterator end_it = nodes_list.end();
 
    while( it != end_it)
-      (*it++)->lists.remove( this);
+	  (*it++)->m_lists.remove( this);
 }
 
 int AfList::add( af::Node *node)
@@ -62,7 +62,7 @@ int AfList::add( af::Node *node)
          nodes_list.push_back( node);
 
       index++;
-      node->lists.push_back( this);
+      node->m_lists.push_back( this);
    }
 
 //   m_rw_lock.WriteUnlock();
@@ -74,7 +74,7 @@ void AfList::remove( af::Node *node)
 //   m_rw_lock.WriteLock();
 
    nodes_list.remove(node);
-   node->lists.remove(this);
+   node->m_lists.remove(this);
 
 //   m_rw_lock.WriteUnlock();
 }

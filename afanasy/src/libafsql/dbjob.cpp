@@ -24,34 +24,34 @@ DBJob::DBJob( int Id):
 
 void DBJob::addDBAttributes()
 {
-   dbAddAttr( new DBAttrInt32(  DBAttr::_id,                 &id                  ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_id,                 &m_id                  ));
 
-   dbAddAttr( new DBAttrUInt32( DBAttr::_state,              &state               ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,              &flags               ));
-   dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,           &priority            ));
-   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_started,       &time_started        ));
-   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,          &time_done           ));
-   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_wait,          &time_wait           ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,    &maxrunningtasks     ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxruntasksperhost, &maxruntasksperhost  ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_userlistorder,      &userlistorder       ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,          &hostsmask           ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,  &hostsmask_exclude   ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,         &dependmask          ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask_global,  &dependmask_global   ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_lifetime,           &lifetime            ));
-   dbAddAttr( new DBAttrString( DBAttr::_annotation,         &annotation          ));
-   dbAddAttr( new DBAttrString( DBAttr::_cmd_post,           &cmd_post            ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_need_os,            &need_os             ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,    &need_properties     ));
-   dbAddAttr( new DBAttrString( DBAttr::_description,        &description         ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_state,              &m_state               ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,              &m_flags               ));
+   dbAddAttr( new DBAttrUInt8 ( DBAttr::_priority,           &m_priority            ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_started,       &m_time_started        ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_done,          &m_time_done           ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_wait,          &m_time_wait           ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxrunningtasks,    &m_max_running_tasks     ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_maxruntasksperhost, &m_max_running_tasks_per_host  ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_userlistorder,      &m_user_list_order       ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,          &m_hosts_mask           ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,  &m_hosts_mask_exclude   ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,         &m_depend_mask          ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask_global,  &m_depend_mask_global   ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_lifetime,           &m_time_life            ));
+   dbAddAttr( new DBAttrString( DBAttr::_annotation,         &m_annotation          ));
+   dbAddAttr( new DBAttrString( DBAttr::_cmd_post,           &m_cmd_post            ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_need_os,            &m_need_os             ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,    &m_need_properties     ));
+   dbAddAttr( new DBAttrString( DBAttr::_description,        &m_description         ));
 
-   dbAddAttr( new DBAttrString( DBAttr::_name,               &name                ));
-   dbAddAttr( new DBAttrString( DBAttr::_hostname,           &hostname            ));
-   dbAddAttr( new DBAttrString( DBAttr::_username,           &username            ));
-   dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &blocksnum           ));
-   dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,            &cmd_pre             ));
-   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_creation,      &time_creation       ));
+   dbAddAttr( new DBAttrString( DBAttr::_name,               &m_name                ));
+   dbAddAttr( new DBAttrString( DBAttr::_hostname,           &m_host_name            ));
+   dbAddAttr( new DBAttrString( DBAttr::_username,           &m_user_name            ));
+   dbAddAttr( new DBAttrInt32 ( DBAttr::_blocksnum,          &m_blocksnum           ));
+   dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,            &m_cmd_pre             ));
+   dbAddAttr( new DBAttrInt64 ( DBAttr::_time_creation,      &m_time_creation       ));
 }
 
 DBJob::~DBJob()
@@ -72,7 +72,7 @@ const std::string DBJob::dbGetIDsCmd()
 
 bool DBJob::dbAdd( PGconn * i_conn) const
 {
-    AFINFA("DBJob::dbAdd: name = '%s', id = %d", name.c_str(), id);
+    AFINFA("DBJob::dbAdd: name = '%s', id = %d", m_name.c_str(), m_id);
 
     std::list<std::string> queries;
     dbInsert( &queries);
@@ -84,9 +84,9 @@ bool DBJob::dbAdd( PGconn * i_conn) const
 
     bool o_result = true;
 
-    for( int b = 0; b < blocksnum; b++)
+    for( int b = 0; b < m_blocksnum; b++)
     {
-        if( false == ((DBBlockData*)(blocksdata[b]))->dbAdd( i_conn))
+        if( false == ((DBBlockData*)(m_blocksdata[b]))->dbAdd( i_conn))
         {
             o_result = false;
             break;
@@ -110,25 +110,25 @@ bool DBJob::dbAdd( PGconn * i_conn) const
 
 bool DBJob::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
-    AFINFA("DBJob::dbSelect: id = %d", id);
+    AFINFA("DBJob::dbSelect: id = %d", m_id);
 
    if( DBItem::dbSelect( i_conn) == false) return false;
-   if( blocksnum == 0)
+   if( m_blocksnum == 0)
    {
       AFERROR("DBJob::dbSelect: blocksnum == 0")
       return false;
    }
-   blocksdata = new af::BlockData*[blocksnum];
-   for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
-   for( int b = 0; b < blocksnum; b++)
+   m_blocksdata = new af::BlockData*[m_blocksnum];
+   for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
+   for( int b = 0; b < m_blocksnum; b++)
    {
-      DBBlockData * dbBlock = new DBBlockData( b, id);
+      DBBlockData * dbBlock = new DBBlockData( b, m_id);
       if( dbBlock->dbSelect( i_conn) == false)
       {
          delete dbBlock;
          return false;
       }
-      blocksdata[b] = dbBlock;
+      m_blocksdata[b] = dbBlock;
    }
    progress = new DBJobProgress( this);
    if( progress == NULL)
@@ -144,7 +144,7 @@ bool DBJob::dbSelect( PGconn * i_conn, const std::string * i_where)
 void DBJob::dbDelete( std::list<std::string> * queries) const
 {
    DBItem::dbDelete( queries);
-   if( id != AFJOB::SYSJOB_ID) // Do not add system job to statistics
+   if( m_id != AFJOB::SYSJOB_ID) // Do not add system job to statistics
       statistics.addJob( this, queries);
 }
 

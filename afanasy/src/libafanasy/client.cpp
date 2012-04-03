@@ -12,11 +12,11 @@
 using namespace af;
 
 Client::Client( int flags, int Id):
-   time_launch( 0),
-   time_register( 0),
-   time_update( 0)
+	m_time_launch( 0),
+	m_time_register( 0),
+	m_time_update( 0)
 {
-   id = Id;
+   m_id = Id;
    if( flags & GetEnvironment )
    {
       bool verbose = false;
@@ -26,20 +26,20 @@ Client::Client( int flags, int Id):
 #ifdef MACOSX
 //      verbose = true;
 #endif //MACOSX
-      af::NetIF::getNetIFs( netIFs, verbose);
+	  af::NetIF::getNetIFs( m_netIFs, verbose);
 
       std::cout << "Network Interfaces:" << std::endl;
-      for( int i = 0; i < netIFs.size(); i++)
+	  for( int i = 0; i < m_netIFs.size(); i++)
       {
          std::cout << "   ";
-         netIFs[i]->stdOut(true);
+		 m_netIFs[i]->stdOut(true);
       }
 
-      address.setPort( af::Environment::getClientPort());
-      time_launch = time(NULL);
-      username = af::Environment::getUserName();
-      name = af::Environment::getHostName();
-      version = af::Environment::getVersionCGRU();
+	  m_address.setPort( af::Environment::getClientPort());
+	  m_time_launch = time(NULL);
+	  m_user_name = af::Environment::getUserName();
+	  m_name = af::Environment::getHostName();
+	  m_version = af::Environment::getVersionCGRU();
    }
 }
 
@@ -50,8 +50,8 @@ Client::~Client()
 
 void Client::clearNetIFs()
 {
-   for( int i = 0; i < netIFs.size(); i++) if( netIFs[i]) delete netIFs[i];
-   netIFs.clear();
+   for( int i = 0; i < m_netIFs.size(); i++) if( m_netIFs[i]) delete m_netIFs[i];
+   m_netIFs.clear();
 }
 
 void Client::grabNetIFs( std::vector<NetIF*> & otherNetIFs)
@@ -59,15 +59,15 @@ void Client::grabNetIFs( std::vector<NetIF*> & otherNetIFs)
    clearNetIFs();
    for( int i = 0; i < otherNetIFs.size(); i++)
    {
-      netIFs.push_back( otherNetIFs[i]);
+	  m_netIFs.push_back( otherNetIFs[i]);
       otherNetIFs[i] = NULL;
    }
 }
 
 void Client::setRegisterTime()
 {
-   time_register = time( NULL);
-   time_update = time_register;
+   m_time_register = time( NULL);
+   m_time_update = m_time_register;
 }
 
 int Client::calcWeight() const
@@ -75,10 +75,10 @@ int Client::calcWeight() const
    int weight = Node::calcWeight();
 //printf("Client::calcWeight: Node::calcWeight: %d bytes\n", weight);
    weight += sizeof(Client) - sizeof( Node);
-   weight += weigh( username);
-   weight += weigh( version );
-   weight += address.calcWeight();
-   for( int i = 0; i < netIFs.size(); i++) weight += netIFs[i]->calcWeight();
+   weight += weigh( m_user_name);
+   weight += weigh( m_version );
+   weight += m_address.calcWeight();
+   for( int i = 0; i < m_netIFs.size(); i++) weight += m_netIFs[i]->calcWeight();
 //printf("Client::calcWeight: %d bytes ( sizeof Client = %d)\n", weight, sizeof( Client));
    return weight;
 }

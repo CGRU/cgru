@@ -33,7 +33,7 @@ UserAf::UserAf( int uid):
 void UserAf::construct()
 {
    m_zombietime = 0;
-   time_online = time( NULL);
+   m_time_online = time( NULL);
 }
 
 UserAf::~UserAf()
@@ -47,7 +47,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    {
    case af::Msg::TUserAnnotate:
    {
-      annotation = mcgeneral.getString();
+      m_annotation = mcgeneral.getString();
       appendLog( std::string("Annotation set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_annotation);
       break;
@@ -72,50 +72,50 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
    }
    case af::Msg::TUserMaxRunningTasks:
    {
-      maxrunningtasks = mcgeneral.getNumber();
-      appendLog( std::string("Max running tasks set to ") + af::itos( maxrunningtasks) + " by " + userhost);
+      m_max_running_tasks = mcgeneral.getNumber();
+      appendLog( std::string("Max running tasks set to ") + af::itos( m_max_running_tasks) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_maxrunningtasks);
       break;
    }
    case af::Msg::TUserPriority:
    {
-      priority = mcgeneral.getNumber();
-      appendLog( std::string("Priority set to ") + af::itos( priority) + " by " + userhost);
+      m_priority = mcgeneral.getNumber();
+      appendLog( std::string("Priority set to ") + af::itos( m_priority) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_priority);
       break;
    }
    case af::Msg::TUserErrorsAvoidHost:
    {
-      errors_avoidhost = mcgeneral.getNumber();
-      appendLog( std::string("Errors to avoid host set to ") + af::itos( errors_avoidhost) + " by " + userhost);
+      m_errors_avoid_host = mcgeneral.getNumber();
+      appendLog( std::string("Errors to avoid host set to ") + af::itos( m_errors_avoid_host) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_avoidhost);
       break;
    }
    case af::Msg::TUserErrorRetries:
    {
-      errors_retries = mcgeneral.getNumber();
-      appendLog( std::string("Errors retries set to ") + af::itos( errors_retries) + " by " + userhost);
+      m_errors_retries = mcgeneral.getNumber();
+      appendLog( std::string("Errors retries set to ") + af::itos( m_errors_retries) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_retries);
       break;
    }
    case af::Msg::TUserErrorsTaskSameHost:
    {
-      errors_tasksamehost = mcgeneral.getNumber();
-      appendLog( std::string("Errors for task on the same host set to ") + af::itos( errors_tasksamehost) + " by " + userhost);
+      m_errors_task_same_host = mcgeneral.getNumber();
+      appendLog( std::string("Errors for task on the same host set to ") + af::itos( m_errors_task_same_host) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_tasksamehost);
       break;
    }
    case af::Msg::TUserErrorsForgiveTime:
    {
-      errors_forgivetime = mcgeneral.getNumber();
-      appendLog( std::string("Errors forgive time set to ") + af::itos( errors_forgivetime) + " by " + userhost);
+      m_errors_forgive_time = mcgeneral.getNumber();
+      appendLog( std::string("Errors forgive time set to ") + af::itos( m_errors_forgive_time) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_errors_forgivetime);
       break;
    }
    case af::Msg::TUserJobsLifeTime:
    {
-      jobs_lifetime = mcgeneral.getNumber();
-      appendLog( std::string("Jobs life time set to ") + af::time2strHMS( jobs_lifetime, true) + " by " + userhost);
+      m_jobs_life_time = mcgeneral.getNumber();
+      appendLog( std::string("Jobs life time set to ") + af::time2strHMS( m_jobs_life_time, true) + " by " + userhost);
       if( isPermanent()) AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_lifetime);
       break;
    }
@@ -156,7 +156,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
       return false;
    }
    }
-   monitoring->addEvent( af::Msg::TMonitorUsersChanged, id);
+   monitoring->addEvent( af::Msg::TMonitorUsersChanged, m_id);
    return true;
 }
 
@@ -164,9 +164,9 @@ void UserAf::setZombie( MonitorContainer * i_monitoring)
 {
     AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
     af:Node::setZombie();
-    if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, id);
+    if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
     appendLog( "Became a zombie.");
-    AFCommon::saveLog( m_log, af::Environment::getUsersLogsDir(), name, af::Environment::getUserLogsRotate());
+    AFCommon::saveLog( m_log, af::Environment::getUsersLogsDir(), m_name, af::Environment::getUserLogsRotate());
 }
 
 void UserAf::addJob( JobAf * i_job)
@@ -177,7 +177,7 @@ void UserAf::addJob( JobAf * i_job)
 
     m_jobslist.add( i_job );
 
-    m_numjobs++;
+    m_jobs_num++;
 
     updateJobsOrder( i_job);
 
@@ -190,7 +190,7 @@ void UserAf::removeJob( JobAf * i_job)
 
     m_jobslist.remove( i_job );
 
-    m_numjobs--;
+    m_jobs_num--;
 }
 
 void UserAf::updateJobsOrder( af::Job * newJob)
@@ -249,15 +249,15 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
       }
    }
 
-   if((( _numrunningjobs      != numrunningjobs       ) ||
-       ( _numjobs             != m_numjobs              ) ||
-       ( _runningtasksnumber  != runningtasksnumber   )) &&
+   if((( _numrunningjobs      != m_running_jobs_num       ) ||
+       ( _numjobs             != m_jobs_num              ) ||
+       ( _runningtasksnumber  != m_running_tasks_num   )) &&
          monitoring )
-         monitoring->addEvent( af::Msg::TMonitorUsersChanged, id);
+         monitoring->addEvent( af::Msg::TMonitorUsersChanged, m_id);
 
-   m_numjobs = _numjobs;
-   numrunningjobs = _numrunningjobs;
-   runningtasksnumber = _runningtasksnumber;
+   m_jobs_num = _numjobs;
+   m_running_jobs_num = _numrunningjobs;
+   m_running_tasks_num = _runningtasksnumber;
 
    // Update solving parameters:
    calcNeed();
@@ -266,7 +266,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
 void UserAf::calcNeed()
 {
     // Need calculation based on running tasks number
-    calcNeedResouces( runningtasksnumber);
+    calcNeedResouces( m_running_tasks_num);
 }
 
 bool UserAf::canRun()
@@ -276,20 +276,20 @@ bool UserAf::canRun()
         return false;
     }*/
 
-    if( priority == 0)
+    if( m_priority == 0)
     {
         // Zero priority - turns user jobs solving off
         return false;
     }
 
-    if( m_numjobs < 1 )
+    if( m_jobs_num < 1 )
     {
         // Nothing to run
         return false;
     }
 
     // Check maximum running tasks:
-    if(( maxrunningtasks >= 0 ) && ( runningtasksnumber >= maxrunningtasks ))
+    if(( m_max_running_tasks >= 0 ) && ( m_running_tasks_num >= m_max_running_tasks ))
     {
         return false;
     }
@@ -307,7 +307,7 @@ bool UserAf::canRunOn( RenderAf * i_render)
     }
 
 // Check nimby:
-   if( i_render->isNimby() && (name != i_render->getUserName())) return false;
+   if( i_render->isNimby() && (m_name != i_render->getUserName())) return false;
 
 // check hosts mask:
    if( false == checkHostsMask( i_render->getName())) return false;
@@ -330,7 +330,7 @@ bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
     if( m_jobslist.solve( solve_method, i_render, i_monitoring))
     {
         // Increase running tasks counter
-        runningtasksnumber++;
+        m_running_tasks_num++;
 
         // Return true - that node was solved
         return true;
@@ -382,7 +382,7 @@ void UserAf::appendLog( const std::string & message)
 void UserAf::generateJobsIds( af::MCGeneral & ids) const
 {
    if( ids.getCount()) ids.clearIds();
-   ids.setId( id);
+   ids.setId( m_id);
    m_jobslist.generateIds( ids);
 }
 

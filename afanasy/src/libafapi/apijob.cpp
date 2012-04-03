@@ -16,7 +16,7 @@ Job::Job( bool DeleteBlocksWithJob):
    message( NULL),
    deleteBlocksWithJob( DeleteBlocksWithJob)
 {
-   name = AFJOB::DEFAULT_NAME;
+   m_name = AFJOB::DEFAULT_NAME;
 }
 Job::~Job()
 {
@@ -24,20 +24,20 @@ Job::~Job()
 
    // Deleting blocks some times not needed, for example Python deletes all objects itself
    if( false == deleteBlocksWithJob)
-      for( int b = 0; b < blocksnum; b++) blocksdata[b] = NULL;
+      for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
 }
 
-void Job::setUserName(     const std::string & str )  { username     = str;   }
-void Job::setHostName(     const std::string & str )  { hostname     = str;   }
-void Job::setName(         const std::string & str )  { name         = str;   }
-void Job::setCmdPre(       const std::string & str )  { cmd_pre      = str;   }
-void Job::setCmdPost(      const std::string & str )  { cmd_post     = str;   }
-void Job::setDescription(  const std::string & str )  { description  = str;   }
-void Job::setMaxRunningTasks(       int value      )  { maxrunningtasks    = value; }
-void Job::setMaxRunTasksPerHost(    int value      )  { maxruntasksperhost = value; }
-void Job::setPriority(              int value      )  { priority           = value; }
-void Job::setWaitTime(        long long value      )  { time_wait          = value; }
-void Job::offline()                                   { state              = state | AFJOB::STATE_OFFLINE_MASK;   }
+void Job::setUserName(     const std::string & str )  { m_user_name     = str;   }
+void Job::setHostName(     const std::string & str )  { m_host_name     = str;   }
+void Job::setName(         const std::string & str )  { m_name         = str;   }
+void Job::setCmdPre(       const std::string & str )  { m_cmd_pre      = str;   }
+void Job::setCmdPost(      const std::string & str )  { m_cmd_post     = str;   }
+void Job::setDescription(  const std::string & str )  { m_description  = str;   }
+void Job::setMaxRunningTasks(       int value      )  { m_max_running_tasks    = value; }
+void Job::setMaxRunTasksPerHost(    int value      )  { m_max_running_tasks_per_host = value; }
+void Job::setPriority(              int value      )  { m_priority           = value; }
+void Job::setWaitTime(        long long value      )  { m_time_wait          = value; }
+void Job::offline()                                   { m_state              = m_state | AFJOB::STATE_OFFLINE_MASK;   }
 
 int  Job::getDataLen() { if( message) return message->writeSize(); else return -1;}
 void Job::clearBlocksList() { blocks.clear();}
@@ -117,28 +117,28 @@ char * Job::getData()
 
 void Job::deleteBlocksDataPointers()
 {
-   if( blocksdata == NULL ) return;
-   delete [] blocksdata;
-   blocksdata = NULL;
-   blocksnum = 0;
+   if( m_blocksdata == NULL ) return;
+   delete [] m_blocksdata;
+   m_blocksdata = NULL;
+   m_blocksnum = 0;
 }
 
 void Job::fillBlocksDataPointersFromList()
 {
    deleteBlocksDataPointers();
-   blocksnum = int( blocks.size());
-   if( blocksnum == 0)
+   m_blocksnum = int( blocks.size());
+   if( m_blocksnum == 0)
    {
       AFERROR("Job::fillBlocksDataPointersFromList: Job has no blocks.")
       return;
    }
-   blocksdata = new af::BlockData*[blocksnum];
+   m_blocksdata = new af::BlockData*[m_blocksnum];
    std::list<Block*>::iterator it = blocks.begin();
-   for( int b = 0; b < blocksnum; b++, it++)
+   for( int b = 0; b < m_blocksnum; b++, it++)
    {
       (*it)->setBlockNumber( b);
       (*it)->fillTasksArrayFromList();
-      blocksdata[b] = *it;
+      m_blocksdata[b] = *it;
    }
 }
 
@@ -153,7 +153,7 @@ bool Job::construct()
       return false;
    }
    fillBlocksDataPointersFromList();
-   for( int b = 0; b < blocksnum; b++) if( blocksdata[b]->isValid() == false) return false;
+   for( int b = 0; b < m_blocksnum; b++) if( m_blocksdata[b]->isValid() == false) return false;
 
    message = new af::Msg( af::Msg::TJobRegister, this);
    if( message == NULL)

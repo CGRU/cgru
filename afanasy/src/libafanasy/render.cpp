@@ -14,15 +14,15 @@ using namespace af;
 Render::Render( uint32_t State, uint8_t Priority):
    Client( Client::GetEnvironment, 0)
 {
-	state = State;
-   construct();
-   priority = Priority;
+	m_state = State;
+	construct();
+	m_priority = Priority;
 }
 
 Render::Render( int Id):
    Client( Client::DoNotGetAnyValues, Id)
 {
-   construct();
+	construct();
 }
 
 Render::Render( Msg * msg):
@@ -34,10 +34,10 @@ Render::Render( Msg * msg):
 
 void Render::construct()
 {
-   maxtasks = -1;
-   capacity = -1;
-   capacity_used = 0;
-   wol_operation_time = 0;
+	m_max_tasks = -1;
+	m_capacity = -1;
+	m_capacity_used = 0;
+	m_wol_operation_time = 0;
 }
 
 Render::~Render()
@@ -50,46 +50,46 @@ void Render::readwrite( Msg * msg)
    {
    case Msg::TRendersList:
 
-      rw_bool   ( locked,              msg);
-      rw_int64_t( taskstartfinishtime, msg);
-      rw_int32_t( maxtasks,            msg);
-      rw_int32_t( capacity,            msg);
-      rw_int32_t( capacity_used,       msg);
-      rw_int64_t( time_update,         msg);
-      rw_int64_t( time_register,       msg);
-      rw_int64_t( wol_operation_time,  msg);
-      rw_String ( annotation,          msg);
+	  rw_bool   ( m_locked,                 msg);
+	  rw_int64_t( m_task_start_finish_time, msg);
+	  rw_int32_t( m_max_tasks,              msg);
+	  rw_int32_t( m_capacity,               msg);
+	  rw_int32_t( m_capacity_used,          msg);
+	  rw_int64_t( m_time_update,            msg);
+	  rw_int64_t( m_time_register,          msg);
+	  rw_int64_t( m_wol_operation_time,     msg);
+	  rw_String ( m_annotation,             msg);
 
       if( msg->isWriting())
       {
-         uint32_t taskscount = uint32_t(tasks.size());
+		 uint32_t taskscount = uint32_t(m_tasks.size());
          rw_uint32_t( taskscount, msg);
-         std::list<TaskExec*>::iterator it = tasks.begin();
+		 std::list<TaskExec*>::iterator it = m_tasks.begin();
          for( unsigned t = 0; t < taskscount; t++) (*(it++))->write( msg);
       }
       else
       {
          uint32_t taskscount;
          rw_uint32_t( taskscount, msg);
-         for( unsigned t = 0; t < taskscount; t++) tasks.push_back( new TaskExec( msg));
+		 for( unsigned t = 0; t < taskscount; t++) m_tasks.push_back( new TaskExec( msg));
       }
 
    case Msg::TRenderRegister:
 
-      rw_String  ( version,               msg);
-      rw_String  ( name,                  msg);
-      rw_String  ( username,              msg);
-      rw_uint32_t( state,                 msg);
-      rw_uint32_t( flags,                 msg);
-      rw_uint8_t ( priority,              msg);
-      rw_int64_t ( time_launch,           msg);
-      host.readwrite( msg);
-      address.readwrite( msg);
+	  rw_String  ( m_version,      msg);
+	  rw_String  ( m_name,         msg);
+	  rw_String  ( m_user_name,    msg);
+	  rw_uint32_t( m_state,        msg);
+	  rw_uint32_t( m_flags,        msg);
+	  rw_uint8_t ( m_priority,     msg);
+	  rw_int64_t ( m_time_launch,  msg);
+	  m_host.readwrite( msg);
+	  m_address.readwrite( msg);
 
    case Msg::TRenderUpdate:
    case Msg::TRendersListUpdates:
 
-      hres.readwrite( msg);
+	  m_hres.readwrite( msg);
 
       break;
    default:
@@ -97,42 +97,42 @@ void Render::readwrite( Msg * msg)
    }
 
    // Always send ID
-   rw_int32_t( id, msg);
+   rw_int32_t( m_id, msg);
 
    // Send network interfaces information only when register
    if( msg->type() == Msg::TRenderRegister)
    {
-      int8_t netIfs_size = netIFs.size();
+	  int8_t netIfs_size = m_netIFs.size();
       rw_int8_t( netIfs_size, msg);
       for( int i = 0; i < netIfs_size; i++)
-         if( msg->isWriting()) netIFs[i]->write( msg);
-         else netIFs.push_back( new NetIF( msg));
+		 if( msg->isWriting()) m_netIFs[i]->write( msg);
+		 else m_netIFs.push_back( new NetIF( msg));
    }
 }
 
 void Render::checkDirty()
 {
-   if( capacity == host.capacity ) capacity = -1;
-   if( maxtasks == host.maxtasks ) maxtasks = -1;
-   if(( capacity == -1 ) && ( maxtasks == -1 ) && ( services_disabled.empty() ))
-      state = state | SDirty;
+   if( m_capacity == m_host.capacity ) m_capacity = -1;
+   if( m_max_tasks == m_host.maxtasks ) m_max_tasks = -1;
+   if(( m_capacity == -1 ) && ( m_max_tasks == -1 ) && ( m_services_disabled.empty() ))
+	  m_state = m_state | SDirty;
    else
-      state = state & (~SDirty);
+	  m_state = m_state & (~SDirty);
 }
 
 void Render::restoreDefaults()
 {
-   capacity = -1;//host.capacity;
-   maxtasks = -1;//host.maxtasks;
-   services_disabled.clear();
-   state = state & (~SDirty);
+   m_capacity = -1;//host.capacity;
+   m_max_tasks = -1;//host.maxtasks;
+   m_services_disabled.clear();
+   m_state = m_state & (~SDirty);
 }
 
 int Render::calcWeight() const
 {
    int weight = Client::calcWeight();
    weight += sizeof(Render) - sizeof( Client);
-   for( std::list<TaskExec*>::const_iterator it = tasks.begin(); it != tasks.end(); it++) weight += (*it)->calcWeight();
+   for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++) weight += (*it)->calcWeight();
    return weight;
 }
 
@@ -140,13 +140,13 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    if( full)
    {
-      stream << "Render " << name << "@" << username << " (id=" << id << "):";
-      stream << "\n Version = \"" << version;
+	  stream << "Render " << m_name << "@" << m_user_name << " (id=" << m_id << "):";
+	  stream << "\n Version = \"" << m_version;
 
       if( isDirty()) stream << "\nDirty! Capacity|Max Tasks changed, or service(s) disabled.";
 
       stream << std::endl;
-      address.generateInfoStream( stream ,full);
+	  m_address.generateInfoStream( stream ,full);
 
 		stream << "\n Status:";
 		if( isOnline()) stream << " Online";
@@ -159,24 +159,24 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 		if( isWOLSleeping()) stream << " WOL-Sleeping";
 		if( isWOLWaking()) stream << " WOL-Waking";
 
-      stream << "\n Priority = " << int(priority);
+	  stream << "\n Priority = " << int(m_priority);
       stream << "\n Capacity = " << getCapacityFree() << " of " << getCapacity() << " ( " << getCapacityUsed() << " used )";
       stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
-      if( wol_operation_time ) stream << "\n WOL operation time = " << time2str( wol_operation_time);
-      if( time_launch   ) stream << "\n Launched at: " << time2str( time_launch   );
-      if( time_register ) stream << "\n Registered at: " << time2str( time_register );
+	  if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
+	  if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
+	  if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
 
       stream << std::endl;
-      host.generateInfoStream( stream, full);
+	  m_host.generateInfoStream( stream, full);
 
-      if( netIFs.size())
+	  if( m_netIFs.size())
       {
          stream << "\nNetwork Interfaces:";
-         for( int i = 0; i < netIFs.size(); i++)
+		 for( int i = 0; i < m_netIFs.size(); i++)
          {
             stream << "\n   ";
-            netIFs[i]->generateInfoStream( stream, true);
+			m_netIFs[i]->generateInfoStream( stream, true);
          }
       }
 
@@ -186,13 +186,13 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    {
 		if( isOnline())  stream << " ON  ";
 		if( isOffline()) stream << " off ";
-		stream << name << "@" << username << "[" << id << "]";
-		stream << " v'" << version << "'";
+		stream << m_name << "@" << m_user_name << "[" << m_id << "]";
+		stream << " v'" << m_version << "'";
 		if( isBusy())  stream << " B";
 		if( isNimby()) stream << " (n)";
 		if( isNIMBY()) stream << " (N)";
 		stream << " ";
-        address.generateInfoStream( stream ,full);
+		m_address.generateInfoStream( stream ,full);
 //      stream << " - " << calcWeight() << " bytes.";
    }
 }
