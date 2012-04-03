@@ -42,7 +42,12 @@ envhip = envhip.replace('\\','/')
 os.environ['HIP'] = envhip
 hou.allowEnvironmentToOverwriteVariable('HIP', True)
 hou.hscript('set HIP=' + envhip)
-hou.hipFile.load( hip, True)
+# Note that we ignore all load warnings.
+try:
+   hou.hipFile.load(hip)
+except hou.LoadWarning:
+   pass
+#hou.hipFile.load( hip, True)
 hou.hscript('set HIP=' + envhip)
 print 'HIP set to "%s"' % envhip
 
