@@ -469,6 +469,18 @@ void Af::jr_uint8 ( const char * i_name, uint8_t     & o_attr, JSON & i_object)
 	if( value.IsUint()) o_attr = value.GetUint();
 }
 
+void Af::jr_int16 ( const char * i_name, int16_t     & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt()) o_attr = value.GetInt();
+}
+
+void Af::jr_uint16( const char * i_name, uint16_t    & o_attr, JSON & i_object)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsUint()) o_attr = value.GetUint();
+}
+
 void Af::jr_int32 ( const char * i_name, int32_t     & o_attr, JSON & i_object)
 {
 	JSON & value = i_object[i_name];

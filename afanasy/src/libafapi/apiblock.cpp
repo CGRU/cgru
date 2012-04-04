@@ -13,16 +13,16 @@ Block::Block( bool DeleteTasksWithBlock):
       deleteTasksWithBlock( DeleteTasksWithBlock)
 {
 AFINFA("API: Block constuctor called.")
-   name     = AFJOB::BLOCK_DEFAULT_NAME;
-   service  = AFJOB::BLOCK_DEFAULT_SERVICE;
-   parser   = AFJOB::BLOCK_DEFAULT_PARSER;
+   m_name     = AFJOB::BLOCK_DEFAULT_NAME;
+   m_service  = AFJOB::BLOCK_DEFAULT_SERVICE;
+   m_parser   = AFJOB::BLOCK_DEFAULT_PARSER;
 }
 
 Block::~Block()
 {
-AFINFA("API: Block['%s'] destructor called.", name.c_str())
+AFINFA("API: Block['%s'] destructor called.", m_name.c_str())
 // Do not delete tasks with block. They must be deleted manually. Python will delete them.
-   if(( false == deleteTasksWithBlock) && tasksdata ) for( int b = 0; b < tasksnum; b++) tasksdata[b] = NULL;
+   if(( false == deleteTasksWithBlock) && m_tasks_data ) for( int b = 0; b < m_tasks_num; b++) m_tasks_data[b] = NULL;
 }
 
 void Block::stdOut( bool full) const
@@ -35,9 +35,9 @@ void Block::setVariableCapacity( int min, int max)
 {
    if( min < 0 ) min = 0;
    if( max < 0 ) max = 0;
-   flags = flags | FVarCapacity;
-   capcoeff_min = min;
-   capcoeff_max = max;
+   m_flags = m_flags | FVarCapacity;
+   m_capacity_coeff_min = min;
+   m_capacity_coeff_max = max;
 }
 
 void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const std::string & service, int waitsrv)
@@ -63,20 +63,20 @@ void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, co
       sameHostMaster = false;
    }
 
-   flags = flags | FMultiHost;
-   if( sameHostMaster) flags = flags | FSameHostMaster;
-   multihost_min  = min;
-   multihost_max  = max;
-   multihost_waitmax = waitmax;
-   multihost_waitsrv = waitsrv;
-   if( false == service.empty()) multihost_service = service;
+   m_flags = m_flags | FMultiHost;
+   if( sameHostMaster) m_flags = m_flags | FSameHostMaster;
+   m_multihost_min  = min;
+   m_multihost_max  = max;
+   m_multihost_waitmax = waitmax;
+   m_multihost_waitsrv = waitsrv;
+   if( false == service.empty()) m_multihost_service = service;
 }
 
 void Block::clearTasksList()
 {
    if( isNumeric()) return;
    tasks.clear();
-   tasksnum = 0;
+   m_tasks_num = 0;
 }
 
 bool Block::appendTask( Task * task)
@@ -117,8 +117,8 @@ bool Block::appendTask( Task * task)
    task->setName( newName);
 
    tasks.push_back( task);
-   tasksnum++;
-   frame_last = tasksnum;
+   m_tasks_num++;
+   m_frame_last = m_tasks_num;
    return true;
 }
 
@@ -136,13 +136,13 @@ void Block::fillTasksArrayFromList()
 {
    if( isNumeric()) return;
 
-   if( tasksdata )
+   if( m_tasks_data )
    {
       AFINFO("API: Block::readwrite: Deleting old tasks data array.")
-      delete [] tasksdata;
+      delete [] m_tasks_data;
    }
    AFINFO("API: Block::readwrite: Creating tasks data array.")
-   tasksdata = new af::TaskData*[tasksnum];
+   m_tasks_data = new af::TaskData*[m_tasks_num];
    std::list<Task*>::iterator it = tasks.begin();
-   for( int t = 0; t < tasksnum; t++, it++) tasksdata[t] = *it;
+   for( int t = 0; t < m_tasks_num; t++, it++) m_tasks_data[t] = *it;
 }

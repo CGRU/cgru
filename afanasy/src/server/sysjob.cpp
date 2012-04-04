@@ -615,16 +615,16 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
 //   initDefaults();
 AFINFA("DBBlockData::DBBlockData: JobId=%d, BlockNum=%d", JobId, blocknum)
 
-   capacity = af::Environment::getTaskDefaultCapacity();
+   m_capacity = af::Environment::getTaskDefaultCapacity();
 
-   name = "system_commands";
+   m_name = "system_commands";
 
-   tasksnum = 1;
+   m_tasks_num = 1;
 
-   tasksdata = new af::TaskData*[tasksnum];
-   for( int t = 0; t < tasksnum; t++)
+   m_tasks_data = new af::TaskData*[m_tasks_num];
+   for( int t = 0; t < m_tasks_num; t++)
    {
-      tasksdata[t] = new SysTaskData;
+      m_tasks_data[t] = new SysTaskData;
    }
 }
 

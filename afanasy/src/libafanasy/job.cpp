@@ -17,7 +17,8 @@ Job::Job( int Id)
 	initDefaultValues();
 	m_id = Id;
 	m_time_creation = time(NULL);
-}
+	m_valid = true;
+};
 
 Job::Job( Msg * msg)
 {
@@ -25,15 +26,11 @@ Job::Job( Msg * msg)
 	read( msg);
 }
 
-Job::Job( JSON & i_value)
+Job::Job( JSON & i_object)
 {
 	initDefaultValues();
 	m_time_creation = time(NULL);
-	json_read( i_value);
-}
 
-void Job::json_read( JSON & i_object)
-{
 	if( false == i_object.IsObject())
 	{
 		AFERROR("Job::Job: Not a JSON object.")
@@ -66,6 +63,34 @@ void Job::json_read( JSON & i_object)
 	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object);
 	jr_regexp("need_os",            m_need_os,             i_object);
 	jr_regexp("need_properties",    m_need_properties,     i_object);
+
+	JSON & blocks = i_object["blocks"];
+	if( false == blocks.IsArray())
+	{
+		AFERROR("Job::Job: Can't find blocks array.");
+		return;
+	}
+
+	m_blocksnum = blocks.Size();
+	if( m_blocksnum < 1 )
+	{
+		AFERROR("Job::Job: Blocks array has zero size.");
+		return;
+	}
+
+	m_blocksdata = new BlockData*[m_blocksnum];
+	for( int b = 0; b < m_blocksnum; b++) m_blocksdata[b] = NULL;
+	for( int b = 0; b < m_blocksnum; b++)
+	{
+		m_blocksdata[b] = newBlockData( blocks[b], b);
+		if( m_blocksdata[b] == NULL)
+		{
+			AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
+			return;
+		}
+	}
+
+	m_valid = true;
 }
 
 void Job::json_write( std::ostringstream & stream)
@@ -105,6 +130,7 @@ void Job::json_write( std::ostringstream & stream)
 
 void Job::initDefaultValues()
 {
+	m_valid = false; 
 	m_id = 0;
 	m_blocksnum = 0;
 	m_max_running_tasks = -1;
@@ -200,12 +226,18 @@ void Job::rw_blocks( Msg * msg)
          }
       }
    }
+
+	m_valid = true;
 }
 
 BlockData * Job::newBlockData( Msg * msg)
 {
-//printf("Job::createBlock:\n");
    return new BlockData( msg);
+}
+
+BlockData * Job::newBlockData( JSON & i_object, int i_num)
+{
+   return new BlockData( i_object, i_num);
 }
 
 int Job::calcWeight() const
@@ -225,7 +257,28 @@ int Job::calcWeight() const
 	return weight;
 }
 
-void Job::generateInfoStream( std::ostringstream & stream, bool full) const
+void Job::stdOutJobBlocksTasks() const
+{
+	std::ostringstream stream;
+	generateInfoStreamJob( stream, true);
+	stream << std::endl;
+	generateInfoStreamBlocks( stream, true);
+	std::cout << stream.str() << std::endl;
+}
+
+void Job::generateInfoStreamBlocks( std::ostringstream & stream, bool full) const
+{
+	if( m_blocksdata == NULL )
+		return;
+
+	for( int b = 0; b < m_blocksnum; b++)
+	{
+		stream << std::endl << std::endl;
+		m_blocksdata[b]->generateInfoStream( stream, full);
+	}
+}
+
+void Job::generateInfoStreamJob(    std::ostringstream & stream, bool full) const
 {
    if( full ) stream << "Job name = ";
 
@@ -291,14 +344,20 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
    if( m_need_properties.notEmpty()) stream << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
    if( m_cmd_pre.size()) stream << "\n Pre command:\n" << m_cmd_pre;
    if( m_cmd_post.size()) stream << "\n Post command:\n" << m_cmd_post;
+}
+ 
+void Job::generateInfoStream( std::ostringstream & stream, bool full) const
+{
+	generateInfoStreamJob( stream, full);
 
-	if( false == display_blocks )
-		return;
+	if( full == false ) return;
 
-   if(( m_blocksnum <=3 ) && ( m_blocksdata != NULL ))
-	  for( int b = 0; b < m_blocksnum; b++)
-      {
-         stream << std::endl << std::endl;
-		 m_blocksdata[b]->generateInfoStream( stream, false);
-      }
+	if(( m_blocksnum <=3 ) && ( m_blocksdata != NULL ))
+	{
+		for( int b = 0; b < m_blocksnum; b++)
+		{
+			stream << std::endl << std::endl;
+			m_blocksdata[b]->generateInfoStream( stream, false);
+		}
+	}
 }

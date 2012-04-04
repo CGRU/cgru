@@ -23,7 +23,7 @@ DBBlockData::DBBlockData( af::Msg * msg):
 DBBlockData::DBBlockData( int BlockNum, int JobId):
    af::BlockData( BlockNum, JobId)
 {
-AFINFA("DBBlockData::DBBlockData(): JobId=%d, BlockNum=%d", jobid, blocknum)
+AFINFA("DBBlockData::DBBlockData(): JobId=%d, BlockNum=%d", m_job_id, m_block_num)
    addDBAttributes();
 }
 
@@ -35,54 +35,54 @@ DBBlockData::DBBlockData():
 
 void DBBlockData::addDBAttributes()
 {
-   dbAddAttr( new DBAttrInt32Const(          DBAttr::_id_job, &jobid                  ));
+   dbAddAttr( new DBAttrInt32Const(          DBAttr::_id_job, &m_job_id                  ));
 
-   dbAddAttr( new DBAttrInt32(  DBAttr::_id_block,             &blocknum               ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_id_block,             &m_block_num               ));
 
-   dbAddAttr( new DBAttrString( DBAttr::_command,              &command                ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_tasksmaxruntime,      &tasksmaxruntime        ));
-   dbAddAttr( new DBAttrInt8(   DBAttr::_errors_retries,       &errors_retries         ));
-   dbAddAttr( new DBAttrInt8(   DBAttr::_errors_avoidhost,     &errors_avoidhost       ));
-   dbAddAttr( new DBAttrInt8(   DBAttr::_errors_tasksamehost,  &errors_tasksamehost    ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_errors_forgivetime,   &errors_forgivetime     ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_capacity,             &capacity               ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_min,         &capcoeff_min           ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_max,         &capcoeff_max           ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_maxrunningtasks,      &maxrunningtasks        ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_maxruntasksperhost,   &maxruntasksperhost     ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,           &dependmask             ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_tasksdependmask,      &tasksdependmask        ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &hostsmask              ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &hostsmask_exclude      ));
-   dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_min,         &filesize_min           ));
-   dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_max,         &filesize_max           ));
-   dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_min,        &multihost_min          ));
-   dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_max,        &multihost_max          ));
-   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitmax,    &multihost_waitmax      ));
-   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitsrv,    &multihost_waitsrv      ));
-   dbAddAttr( new DBAttrString( DBAttr::_wdir,                 &wdir                   ));
-   dbAddAttr( new DBAttrString( DBAttr::_files,                &files                  ));
-   dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,      &need_properties        ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_need_memory,          &need_memory            ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_need_hdd,             &need_hdd               ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_need_power,           &need_power             ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_parsercoeff,          &parsercoeff            ));
-   dbAddAttr( new DBAttrString( DBAttr::_service,              &service                ));
-   dbAddAttr( new DBAttrString( DBAttr::_parser,               &parser                 ));
-   dbAddAttr( new DBAttrString( DBAttr::_cmd_post,             &cmd_post               ));
-   dbAddAttr( new DBAttrString( DBAttr::_environment,          &environment            ));
-   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &customdata             ));
+   dbAddAttr( new DBAttrString( DBAttr::_command,              &m_command                ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_tasksmaxruntime,      &m_tasks_max_run_time        ));
+   dbAddAttr( new DBAttrInt8(   DBAttr::_errors_retries,       &m_errors_retries         ));
+   dbAddAttr( new DBAttrInt8(   DBAttr::_errors_avoidhost,     &m_errors_avoid_host       ));
+   dbAddAttr( new DBAttrInt8(   DBAttr::_errors_tasksamehost,  &m_errors_task_same_host    ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_errors_forgivetime,   &m_errors_forgive_time     ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_capacity,             &m_capacity               ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_min,         &m_capacity_coeff_min           ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_capcoeff_max,         &m_capacity_coeff_max           ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_maxrunningtasks,      &m_max_running_tasks        ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_maxruntasksperhost,   &m_max_running_tasks_per_host     ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_dependmask,           &m_depend_mask             ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_tasksdependmask,      &m_tasks_depend_mask        ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask,            &m_hosts_mask              ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &m_hosts_mask_exclude      ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_min,         &m_file_size_min           ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_max,         &m_file_size_max           ));
+   dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_min,        &m_multihost_min          ));
+   dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_max,        &m_multihost_max          ));
+   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitmax,    &m_multihost_waitmax      ));
+   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitsrv,    &m_multihost_waitsrv      ));
+   dbAddAttr( new DBAttrString( DBAttr::_wdir,                 &m_wdir                   ));
+   dbAddAttr( new DBAttrString( DBAttr::_files,                &m_files                  ));
+   dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,      &m_need_properties        ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_need_memory,          &m_need_memory            ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_need_hdd,             &m_need_hdd               ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_need_power,           &m_need_power             ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_parsercoeff,          &m_parser_coeff            ));
+   dbAddAttr( new DBAttrString( DBAttr::_service,              &m_service                ));
+   dbAddAttr( new DBAttrString( DBAttr::_parser,               &m_parser                 ));
+   dbAddAttr( new DBAttrString( DBAttr::_cmd_post,             &m_cmd_post               ));
+   dbAddAttr( new DBAttrString( DBAttr::_environment,          &m_environment            ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &m_custom_data             ));
 
-   dbAddAttr( new DBAttrString( DBAttr::_name,                 &name                   ));
-   dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,              &cmd_pre                ));
-   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &flags                  ));
-   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_pertask,        &frame_pertask          ));
-   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_first,          &frame_first            ));
-   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_last,           &frame_last             ));
-   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_inc,            &frame_inc              ));
-   dbAddAttr( new DBAttrString( DBAttr::_multihost_service,    &multihost_service      ));
-   dbAddAttr( new DBAttrString( DBAttr::_tasksname,            &tasksname              ));
-   dbAddAttr( new DBAttrInt32(  DBAttr::_tasksnum,             &tasksnum               ));
+   dbAddAttr( new DBAttrString( DBAttr::_name,                 &m_name                   ));
+   dbAddAttr( new DBAttrString( DBAttr::_cmd_pre,              &m_cmd_pre                ));
+   dbAddAttr( new DBAttrUInt32( DBAttr::_flags,                &m_flags                  ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_pertask,        &m_frames_per_task          ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_first,          &m_frame_first            ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_last,           &m_frame_last             ));
+   dbAddAttr( new DBAttrInt64(  DBAttr::_frame_inc,            &m_frames_inc              ));
+   dbAddAttr( new DBAttrString( DBAttr::_multihost_service,    &m_multihost_service      ));
+   dbAddAttr( new DBAttrString( DBAttr::_tasksname,            &m_tasks_name              ));
+   dbAddAttr( new DBAttrInt32(  DBAttr::_tasksnum,             &m_tasks_num               ));
 }
 
 DBBlockData::~DBBlockData()
@@ -97,7 +97,7 @@ af::TaskData * DBBlockData::createTask( af::Msg * msg)
 
 bool DBBlockData::dbAdd( PGconn * i_conn) const
 {
-AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", blocknum, tasksnum)
+AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", m_block_num, m_tasks_num)
    std::list<std::string> queries;
    dbInsert( &queries);
 
@@ -113,9 +113,9 @@ AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", blocknum, tasksnum)
    }
 
    DBTaskData::dbPrepareInsert( i_conn);
-   for( int t = 0; t < tasksnum; t++)
+   for( int t = 0; t < m_tasks_num; t++)
    {
-      if( false == ((DBTaskData*)(tasksdata[t]))->dbPrepareInsertExec( jobid, blocknum, t, i_conn))
+      if( false == ((DBTaskData*)(m_tasks_data[t]))->dbPrepareInsertExec( m_job_id, m_block_num, t, i_conn))
       {
           AFERROR("Failed to add task data to database.\n")
           return false;
@@ -128,20 +128,20 @@ AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", blocknum, tasksnum)
 bool DBBlockData::dbSelect( PGconn * i_conn, const std::string * i_where)
 {
    if( DBItem::dbSelect( i_conn) == false) return false;
-   if( isNumeric() || (tasksnum == 0)) return true;
+   if( isNumeric() || (m_tasks_num == 0)) return true;
 
-   tasksdata = new af::TaskData*[tasksnum];
-   for( int t = 0; t < tasksnum; t++) tasksdata[t] = NULL;
-   for( int t = 0; t < tasksnum; t++)
+   m_tasks_data = new af::TaskData*[m_tasks_num];
+   for( int t = 0; t < m_tasks_num; t++) m_tasks_data[t] = NULL;
+   for( int t = 0; t < m_tasks_num; t++)
    {
       DBTaskData * dbtaskdata = new DBTaskData;
-      std::string where = DBTaskData::dbWhereSelect( jobid, blocknum, t);
+      std::string where = DBTaskData::dbWhereSelect( m_job_id, m_block_num, t);
       if( dbtaskdata->dbSelect( i_conn, &where) == false)
       {
          delete dbtaskdata;
          return false;
       }
-      tasksdata[t] = dbtaskdata;
+      m_tasks_data[t] = dbtaskdata;
    }
 
    return true;

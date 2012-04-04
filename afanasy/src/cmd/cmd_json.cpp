@@ -122,7 +122,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		af::Job job( document["job"]);
 		if( Verbose )
 		{
-			job.stdOut( true);
+			job.stdOutJobBlocksTasks();
 			printf("\n");
 		}
 		std::ostringstream stream;

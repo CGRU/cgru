@@ -18,14 +18,30 @@
 		"need_properties"            : "cuda",
 		"blocks":[
 		{
-			"name":         "block A",
-			"tasksName":    "frame @####@",
-			"tasksCommand": "render @####@"
+			"name"                   : "Nuke",
+			"tasks_name"             : "frames @#@-@#@",
+			"service"                : "nuke",
+			"parser"                 : "nuke",
+			"capacity"               : 2222,
+			"frame_first"            : 1,
+			"frame_last"             : 100,
+			"frames_per_task"        : 10,
+			"frames_inc"             : 2,
+			"errors_retries"         : 9,
+			"errors_avoid_host"      : 4,
+			"errors_task_same_host"  : 3,
+			"errors_forgive_time"    : 3600,
+			"command"                : "nuke -F@#@,@#@ -x scene.nk -X Write1",
+			"files"                  : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
 		},
 		{
-			"name":         "block B",
-			"tasksName":    "frame @####@",
-			"tasksCommand": "render @####@"
+			"name"                   : "Generic",
+			"tasks_name"             : "generate @#@",
+			"service"                : "generic",
+			"parser"                 : "generic",
+			"capacity"               : 1111,
+			"command"                : "generate @#@",
+			"files"                  : "afile @#@.jpg"
 		}
 		]
 	}

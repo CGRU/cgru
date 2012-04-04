@@ -26,10 +26,10 @@ public:
    void setVariableCapacity( int min, int max);
 
 /// Set block tasks to multihost
-   void setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const std::string & service, int waitsrv);
+   void setMultiHost( int min, int max, int waitmax, bool sameHostMaster, const std::string & m_service, int waitsrv);
 
 public:
-   inline void setBlockNumber( int value) { blocknum = value;}
+   inline void setBlockNumber( int value) { m_block_num = value;}
    virtual int calcWeight() const; ///< Calculate and return memory size.
    void fillTasksArrayFromList();
 

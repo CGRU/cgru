@@ -22,9 +22,12 @@ public:
 	Job( Msg * msg);
 
 	/// Construct data from JSON:
-	Job( JSON & i_value);
+	Job( JSON & i_object);
 
 	virtual ~Job();
+
+	inline bool isValid()   const { return          m_valid; }
+	inline bool isInvalid() const { return false == m_valid; }
 
 	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
@@ -102,6 +105,8 @@ public:
 
 	void json_write( std::ostringstream & stream);
 
+	void stdOutJobBlocksTasks() const;
+
 protected:
 	BlockData  ** m_blocksdata;    ///< Blocks pointer.
 	int32_t m_blocksnum;   ///< Number of blocks in job.
@@ -160,8 +165,13 @@ private:
 	void readwrite( Msg * msg); ///< Read or write data in buffer.
 	void rw_blocks( Msg * msg); ///< Read or write blocks.
 
-	void json_read( JSON & i_object);
-
 	virtual BlockData * newBlockData( Msg * msg);
+	virtual BlockData * newBlockData( JSON & i_object, int i_num);
+
+	void generateInfoStreamJob(    std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void generateInfoStreamBlocks( std::ostringstream & stream, bool full = false) const;
+
+private:
+	bool m_valid;
 };
 }

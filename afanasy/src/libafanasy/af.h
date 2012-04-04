@@ -65,6 +65,8 @@ protected:
 	static void jr_bool  ( const char * i_name, bool        & o_attr, JSON & i_object);
 	static void jr_int8  ( const char * i_name, int8_t      & o_attr, JSON & i_object);
 	static void jr_uint8 ( const char * i_name, uint8_t     & o_attr, JSON & i_object);
+	static void jr_int16 ( const char * i_name, int16_t     & o_attr, JSON & i_object);
+	static void jr_uint16( const char * i_name, uint16_t    & o_attr, JSON & i_object);
 	static void jr_int32 ( const char * i_name, int32_t     & o_attr, JSON & i_object);
 	static void jr_uint32( const char * i_name, uint32_t    & o_attr, JSON & i_object);
 	static void jr_int64 ( const char * i_name, int64_t     & o_attr, JSON & i_object);
