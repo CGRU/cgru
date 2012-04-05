@@ -101,6 +101,7 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	initDefaults();
 	construct();
 
+	m_block_num = i_num;
 //	switch( msg->type())
 //	{
 //	case Msg::TJob:
@@ -108,6 +109,44 @@ BlockData::BlockData( JSON & i_object, int i_num)
 //	case Msg::TBlocks:
 //		rw_uint32_t( m_flags,                 msg);
 //		if( isNotNumeric()) rw_tasks(         msg);
+	JSON & tasks = i_object["tasks"];
+	if( tasks.IsArray())
+	{
+		m_tasks_num = tasks.Size();
+		if( m_tasks_num < 1 )
+		{
+			AFERROR("BlockData::BlockData: Zero size tasks array.")
+			return;
+		}
+		for( int t = 0; t < m_tasks_num; t++)
+		{
+			m_tasks_data = new TaskData*[m_tasks_num];
+			for( int b = 0; b < m_tasks_num; b++)
+			{
+				m_tasks_data[b] = createTask( tasks[t]);
+				if( m_tasks_data[b] == NULL)
+				{
+					AFERROR("BlockData::BlockData: Can not allocate memory for new task.")
+					return;
+				}
+			}
+		}
+	}
+
+	int64_t frame_first     = 0;
+	int64_t frame_last      = 0;
+	int64_t frames_per_task = 1;
+	int64_t frames_inc      = 1;
+
+	int32_t capacity_coeff_min = -1;
+	int32_t capacity_coeff_max = -1;
+
+	int8_t   multihost_min        = -1;
+	int8_t   multihost_max        = -1;
+	uint16_t multihost_waitsrv    = 0;
+	uint16_t multihost_waitmax    = 0;
+	bool     multihost_samemaster = false;
+	std::string multihost_service;
 
 //	case Msg::TBlocksProperties:
 	//jr_int32 ("parser_coeff",          m_parser_coeff,          i_object);
@@ -119,23 +158,26 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	jr_string("files",                 m_files,                 i_object);
 	jr_string("cmd_pre",               m_cmd_pre,               i_object);
 	jr_string("cmd_post",              m_cmd_post,              i_object);
-	jr_string("multihost_service",     m_multihost_service,     i_object);
+	jr_string("multihost_service",     multihost_service,       i_object);
 	//jr_string("custom_data",           m_custom_data,           i_object);
 
 //	case Msg::TJobsList:
-	jr_uint32("flags",                 m_flags,                 i_object);
-	jr_int64 ("frame_first",           m_frame_first,           i_object);
-	jr_int64 ("frame_last",            m_frame_last,            i_object);
-	jr_int64 ("frames_per_task",       m_frames_per_task,       i_object);
-	jr_int64 ("frames_inc",            m_frames_inc,            i_object);
+	//jr_uint32("flags",                 m_flags,                 i_object);
+
+	jr_int64 ("frame_first",           frame_first,             i_object);
+	jr_int64 ("frame_last",            frame_last,              i_object);
+	jr_int64 ("frames_per_task",       frames_per_task,         i_object);
+	jr_int64 ("frames_inc",            frames_inc,              i_object);
+	jr_int32 ("capacity_coeff_min",    capacity_coeff_min,      i_object);
+	jr_int32 ("capacity_coeff_max",    capacity_coeff_max,      i_object);
+	jr_int8  ("multihost_min",         multihost_min,           i_object);
+	jr_int8  ("multihost_max",         multihost_max,           i_object);
+	jr_uint16("multihost_waitsrv",     multihost_waitsrv,       i_object);
+	jr_uint16("multihost_waitmax",     multihost_waitmax,       i_object);
+	jr_bool  ("multihost_samemaster",  multihost_samemaster,    i_object);
 	//jr_int64 ("file_size_min",         m_file_size_min,         i_object);
 	//jr_int64 ("file_size_max",         m_file_size_max,         i_object);
-	jr_int32 ("capacity_coeff_min",    m_capacity_coeff_min,    i_object);
-	jr_int32 ("capacity_coeff_max",    m_capacity_coeff_max,    i_object);
-	jr_uint8 ("multihost_min",         m_multihost_min,         i_object);
-	jr_uint8 ("multihost_max",         m_multihost_max,         i_object);
-	jr_uint16("multihost_waitsrv",     m_multihost_waitsrv,     i_object);
-	jr_uint16("multihost_waitmax",     m_multihost_waitmax,     i_object);
+
 	jr_int32 ("capacity",              m_capacity,              i_object);
 	jr_int32 ("max_running_tasks",     m_max_running_tasks,     i_object);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
@@ -149,7 +191,7 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	jr_regexp("need_properties",       m_need_properties,       i_object);
 	jr_string("name",                  m_name,                  i_object);
 	jr_string("service",               m_service,               i_object);
-	jr_int32 ("tasks_num",             m_tasks_num,             i_object);
+	//jr_int32 ("tasks_num",             m_tasks_num,             i_object);
 	jr_int8  ("errors_retries",        m_errors_retries,        i_object);
 	jr_int8  ("errors_avoid_host",     m_errors_avoid_host,     i_object);
 	jr_int8  ("errors_task_same_host", m_errors_task_same_host, i_object);
@@ -179,6 +221,39 @@ BlockData::BlockData( JSON & i_object, int i_num)
 //	default:
 //		AFERRAR("BlockData::readwrite: invalid type = %s.", Msg::TNAMES[msg->type()])
 //	}
+
+	if( m_tasks_data == NULL )
+		setNumeric( frame_first, frame_last, frames_per_task, frames_inc);
+
+	if(( capacity_coeff_min != -1 ) || ( capacity_coeff_max != -1 ))
+		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
+
+	if(( multihost_min != -1 ) || ( multihost_max != -1 ))
+		setMultiHost( multihost_min, multihost_max, multihost_waitmax,
+				multihost_samemaster, multihost_service, multihost_waitsrv);
+}
+
+void BlockData::jsonWrite( std::ostringstream & stream, int type)
+{
+	stream << "{";
+
+	stream << "\"name\":\"" << m_name << "\"";
+
+	if( m_tasks_data == NULL )
+	{
+		stream << "}";
+		return;
+	}
+
+	stream << ",\"tasks\":[";
+	for( int t = 0; t < m_tasks_num; t++ )
+	{
+		if( t != 0 )
+			stream << ',';
+		m_tasks_data[t]->jsonWrite( stream);
+	}
+
+	stream << "]}";
 }
 
 bool BlockData::isValid() const
@@ -337,9 +412,13 @@ void BlockData::rw_tasks( Msg * msg)
    }
 }
 
+TaskData * BlockData::createTask( JSON & i_object)
+{
+   return new TaskData( i_object);
+}
+
 TaskData * BlockData::createTask( Msg * msg)
 {
-//printf("BlockData::createTask:\n");
    return new TaskData( msg);
 }
 
@@ -352,6 +431,48 @@ bool BlockData::setCapacity( int value)
    }
    AFERRAR("BlockData::setCapacity: invalid capacity = %d", value)
    return false;
+}
+
+void BlockData::setVariableCapacity( int i_capacity_coeff_min, int i_capacity_coeff_max)
+{
+	if( i_capacity_coeff_min < 0 ) i_capacity_coeff_min = 0;
+	if( i_capacity_coeff_max < 0 ) i_capacity_coeff_max = 0;
+	m_flags = m_flags | FVarCapacity;
+	m_capacity_coeff_min = i_capacity_coeff_min;
+	m_capacity_coeff_max = i_capacity_coeff_max;
+}
+
+void BlockData::setMultiHost( int i_min, int i_max, int i_waitmax,
+		bool i_sameHostMaster, const std::string & i_service, int i_waitsrv)
+{
+   if( i_min < 1)
+   {
+      AFERROR("BlockData::setMultiHost: Minimum must be greater then zero.")
+      return;
+   }
+   if( i_max < i_min)
+   {
+      AFERROR("BlockData::setMultiHost: Maximum must be greater or equal then minimum.")
+      return;
+   }
+   if(( i_min > AFJOB::TASK_MULTIHOSTMAXHOSTS) || ( i_max > AFJOB::TASK_MULTIHOSTMAXHOSTS))
+   {
+      AFERRAR("BlockData::setMultiHost: Maximum hosts number is limited to %d.", AFJOB::TASK_MULTIHOSTMAXHOSTS)
+      return;
+   }
+   if( i_sameHostMaster && ( false == i_service.empty() ))
+   {
+      AFERROR("BlockData::setMultiHost: Block can't have multihost service if master and slave can be the same host.")
+      i_sameHostMaster = false;
+   }
+
+   m_flags = m_flags | FMultiHost;
+   if( i_sameHostMaster) m_flags = m_flags | FSameHostMaster;
+   m_multihost_min  = i_min;
+   m_multihost_max  = i_max;
+   m_multihost_waitmax = i_waitmax;
+   m_multihost_waitsrv = i_waitsrv;
+   if( false == i_service.empty()) m_multihost_service = i_service;
 }
 
 bool BlockData::setCapacityCoeffMin( int value)
@@ -762,8 +883,6 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
       if( false == m_cmd_pre.empty()) stream << "\n Pre Command:\n" << m_cmd_pre;
       if( false == m_cmd_post.empty()) stream << "\n Post Command:\n" << m_cmd_post;
 
-      if( false == m_multihost_service.empty()) stream << "\n MultiHost Service = " << m_multihost_service;
-
       if( false == m_custom_data.empty()) stream << "\n Custom Data:\n" << m_custom_data;
 
 //      break;
@@ -776,9 +895,10 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 
       if( isMultiHost() )
       {
-         stream << "\n MultiHost: x" << m_multihost_min << " -x" << m_multihost_max;
-         stream << "\n    Wait service start = " << m_multihost_waitsrv;
-         stream << "\n    Wait service start maximum = " << m_multihost_waitmax;
+         stream << "\n MultiHost '" << m_multihost_service << "': x" << int(m_multihost_min) << " -x" << int(m_multihost_max);
+         if( canMasterRunOnSlaveHost()) stream << "\n    Master can run on the same slave host.";
+         stream << "\n    Wait service wait = " << m_multihost_waitsrv;
+         stream << "\n    Wait maximum wait = " << m_multihost_waitmax;
       }
 
       if( isDependSubTask() ) stream << "\n   Sub Task Dependence.";
@@ -786,6 +906,9 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
 
 	  if( full || ( m_max_running_tasks != -1 )) stream << "\n Max Running Tasks = " << m_max_running_tasks;
 	  if( full && ( m_max_running_tasks == -1 )) stream << " (no limit)";
+	  if( full || ( m_max_running_tasks_per_host != -1 ))
+			stream << "\n Max Running Tasks Per Host = " << m_max_running_tasks_per_host;
+	  if( full && ( m_max_running_tasks_per_host == -1 )) stream << " (no limit)";
 
       if( m_need_memory > 0           ) stream << "\n Needed Memory = "   << m_need_memory;
       if( m_need_power  > 0           ) stream << "\n Need Power = "      << m_need_power;
@@ -800,9 +923,10 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
       if( full ) stream << "\n Service = " << m_service;
       if( full ) stream << "\n Tasks Number = " << m_tasks_num;
 
-      if( full ) stream << "\nErrors solving:";
 	  if( full || ( m_max_running_tasks     != -1 )) stream << "\n Maximum running tasks = " << m_max_running_tasks;
 	  if( full && ( m_max_running_tasks     == -1 )) stream << " (no limit)";
+
+      if( full ) stream << "\nErrors solving:";
       if( full || ( m_errors_avoid_host    != -1 )) stream << "\n Errors for block avoid host = " << int(m_errors_avoid_host);
       if( full && ( m_errors_avoid_host    == -1 )) stream << " (user settings used)";
       if( full || ( m_errors_task_same_host != -1 )) stream << "\n Errors for task avoid host = " << int( m_errors_task_same_host);
@@ -834,6 +958,18 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
       stream << "Can not generate type info for type = " << Msg::TNAMES[type];
       break;
    }
+}
+
+void BlockData::generateInfoStreamTasks( std::ostringstream & stream, bool full) const
+{
+	if( m_tasks_num < 1 ) return;
+	if( m_tasks_data == NULL ) return;
+	for( int t = 0; t < m_tasks_num; t++ )
+	{
+		if( t > 0 )
+			stream << std::endl;
+		m_tasks_data[t]->generateInfoStream( stream, full);
+	}
 }
 
 void BlockData::generateInfoStream( std::ostringstream & stream, bool full) const

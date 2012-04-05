@@ -3,6 +3,7 @@
 #include "../include/afjob.h"
 
 #include "af.h"
+#include "msg.h"
 #include "name_af.h"
 #include "regexp.h"
 #include "taskexec.h"
@@ -45,9 +46,10 @@ public:
    inline  void setJobId( int value) { m_job_id = value;}   ///< Set id of block job.
    inline  int  getJobId() const { return m_job_id;}        ///< Get id of block job.
 
-   virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
-   void generateInfoStreamTyped( std::ostringstream & stream, int type, bool full = false) const;
-   const std::string generateInfoStringTyped( int type, bool full = false) const;
+	virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
+	virtual void generateInfoStreamTasks( std::ostringstream & stream, bool full = false) const;
+	void generateInfoStreamTyped( std::ostringstream & stream, int type, bool full = false) const;
+	const std::string generateInfoStringTyped( int type, bool full = false) const;
 
    virtual int  calcWeight() const;                      ///< Calculate and return memory size.
 
@@ -246,6 +248,8 @@ public:
    inline void setProgressAvoidHostsNum( int value ) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);
 
+	void jsonWrite( std::ostringstream & stream, int type = Msg::TBlocks);
+
 /// Generate progress bits info string.
    void generateProgressStream( std::ostringstream & stream) const;
    const std::string generateProgressString() const;
@@ -335,8 +339,12 @@ private:
    void construct();
 
    virtual TaskData * createTask( Msg * msg);
+   virtual TaskData * createTask( JSON & i_object);
    void rw_tasks( Msg * msg); ///< Read & write tasks data.
 
+	void setVariableCapacity( int i_capacity_coeff_min, int i_capacity_coeff_max);
+	void setMultiHost( int i_min, int i_max, int i_waitmax,
+			bool i_sameHostMaster, const std::string & i_service, int i_waitsrv);
 
 // Functions to update tasks progress and progeress bar:
 // (for information purpoces only, no meaning for server)

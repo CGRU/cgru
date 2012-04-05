@@ -38,11 +38,11 @@ DBTaskData::DBTaskData( af::Msg * msg)
 
 void DBTaskData::addDBAttributes()
 {
-   dbAddAttr( new DBAttrString( DBAttr::_name,        &name       ));
-   dbAddAttr( new DBAttrString( DBAttr::_command,     &command    ));
-   dbAddAttr( new DBAttrString( DBAttr::_files,       &files      ));
-   dbAddAttr( new DBAttrString( DBAttr::_dependmask,  &dependmask ));
-   dbAddAttr( new DBAttrString( DBAttr::_customdata,  &customdata ));
+   dbAddAttr( new DBAttrString( DBAttr::_name,        &m_name       ));
+   dbAddAttr( new DBAttrString( DBAttr::_command,     &m_command    ));
+   dbAddAttr( new DBAttrString( DBAttr::_files,       &m_files      ));
+   dbAddAttr( new DBAttrString( DBAttr::_dependmask,  &m_depend_mask ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,  &m_custom_data ));
 }
 
 DBTaskData::~DBTaskData()
@@ -82,11 +82,11 @@ bool DBTaskData::dbPrepareInsertExec( int id_job, int id_block, int id_task, PGc
     data_pointers[0] = id_job_str.c_str();
     data_pointers[1] = id_block_str.c_str();
     data_pointers[2] = id_task_str.c_str();
-    data_pointers[3] = name.c_str();
-    data_pointers[4] = command.c_str();
-    data_pointers[5] = files.c_str();
-    data_pointers[6] = dependmask.c_str();
-    data_pointers[7] = customdata.c_str();
+    data_pointers[3] = m_name.c_str();
+    data_pointers[4] = m_command.c_str();
+    data_pointers[5] = m_files.c_str();
+    data_pointers[6] = m_depend_mask.c_str();
+    data_pointers[7] = m_custom_data.c_str();
 
     PGresult * res = PQexecPrepared( i_conn, ms_db_prepare_name,
                                      8, data_pointers,
@@ -109,6 +109,6 @@ void DBTaskData::readwrite( af::Msg * msg)
    {
       static bool name_only = true;
       rw_bool(    name_only,    msg);
-      rw_String(  name,         msg);
+      rw_String(  m_name,         msg);
    }
 }

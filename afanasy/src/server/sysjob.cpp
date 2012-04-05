@@ -639,7 +639,7 @@ SysBlockData::~SysBlockData()
 SysTaskData::SysTaskData():
    afsql::DBTaskData()
 {
-   name = "Dummy task. See all tasks logs here.";
+   m_name = "Dummy task. See all tasks logs here.";
 }
 
 SysTaskData::~SysTaskData()

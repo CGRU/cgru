@@ -37,7 +37,7 @@ Job::Job( JSON & i_object)
 		return;
 	}
 
-	Node::json_read( i_object);
+	Node::jsonRead( i_object);
 
 	jr_string("user_name",     m_user_name,     i_object);
 	jr_string("host_name",     m_host_name,     i_object);
@@ -88,44 +88,77 @@ Job::Job( JSON & i_object)
 			AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
 			return;
 		}
+		if( false == m_blocksdata[b]->isValid())
+		{
+			return;
+		}
 	}
 
 	m_valid = true;
 }
 
-void Job::json_write( std::ostringstream & stream)
+void Job::jsonWrite( std::ostringstream & stream, int type)
 {
 	stream << "\"job\"";
 	stream << ":{";
-	Node::json_write( stream);
+	Node::jsonWrite( stream);
 
 	stream << "\"user_name\":\"" << m_user_name << "\",";
 	stream << "\"host_name\":\"" << m_host_name << "\",";
 
-	stream << "\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\",";
-	stream << "\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\",";
-	stream << "\"annotation\":\""   << af::strEscape( m_annotation  ) << "\",";
-	stream << "\"description\":\""  << af::strEscape( m_description ) << "\",";
+	if( m_cmd_pre.size())
+		stream << "\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\",";
+	if( m_cmd_post.size())
+		stream << "\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\",";
+	if( m_annotation.size())
+		stream << "\"annotation\":\""   << af::strEscape( m_annotation  ) << "\",";
+	if( m_description.size())
+		stream << "\"description\":\""  << af::strEscape( m_description ) << "\",";
 
 	stream << "\"flags\":"                      << m_flags                      << ",";
 	stream << "\"state\":"                      << m_state                      << ",";
 	stream << "\"user_list_order\":"            << m_user_list_order            << ",";
-	stream << "\"max_running_tasks\":"          << m_max_running_tasks          << ",";
-	stream << "\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host << ",";
 	stream << "\"time_creation\":"              << m_time_creation              << ",";
-	stream << "\"time_wait\":"                  << m_time_wait                  << ",";
-	stream << "\"time_started\":"               << m_time_started               << ",";
-	stream << "\"time_done\":"                  << m_time_done                  << ",";
-	stream << "\"time_life\":"                  << m_time_life                  << ",";
+	if( m_max_running_tasks != -1 )
+		stream << "\"max_running_tasks\":"          << m_max_running_tasks          << ",";
+	if( m_max_running_tasks_per_host != -1 )
+		stream << "\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host << ",";
+	if( m_time_wait != 0 )
+		stream << "\"time_wait\":"                  << m_time_wait                  << ",";
+	if( m_time_started != 0 )
+		stream << "\"time_started\":"               << m_time_started               << ",";
+	if( m_time_done != 0 )
+		stream << "\"time_done\":"                  << m_time_done                  << ",";
+	if( m_time_life != -1 )
+		stream << "\"time_life\":"                  << m_time_life                  << ",";
 
-	stream << "\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\",";
-	stream << "\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\",";
-	stream << "\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\",";
-	stream << "\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\",";
-	stream << "\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\",";
-	stream << "\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
+	if( hasHostsMask())
+		stream << "\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\",";
+	if( hasHostsMaskExclude())
+		stream << "\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\",";
+	if( hasDependMask())
+		stream << "\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\",";
+	if( hasDependMaskGlobal())
+		stream << "\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\",";
+	if( hasNeedOS())
+		stream << "\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\",";
+	if( hasNeedProperties())
+		stream << "\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
 
-	stream << "}";
+	if( m_blocksdata == NULL )
+	{
+		stream << "}";
+		return;
+	}	
+
+	stream << ",\"blocks\":[";
+	for( int b = 0; b < m_blocksnum; b++ )
+	{
+		if( b != 0 )
+			stream << ',';
+		m_blocksdata[b]->jsonWrite( stream, type);
+	}
+	stream << "]}";
 }
 
 void Job::initDefaultValues()
@@ -275,6 +308,10 @@ void Job::generateInfoStreamBlocks( std::ostringstream & stream, bool full) cons
 	{
 		stream << std::endl << std::endl;
 		m_blocksdata[b]->generateInfoStream( stream, full);
+		stream << std::endl << std::endl;
+		m_blocksdata[b]->generateInfoStreamTasks( stream, full);
+		stream << std::endl << std::endl;
+		m_blocksdata[b]->generateProgressStream( stream);
 	}
 }
 

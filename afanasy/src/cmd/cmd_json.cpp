@@ -126,7 +126,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 			printf("\n");
 		}
 		std::ostringstream stream;
-		job.json_write( stream);
+		job.jsonWrite( stream);
 		printf("%s\n", stream.str().c_str());
 	}
 

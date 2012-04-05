@@ -59,7 +59,7 @@ void Node::readwrite( Msg * msg)
 	rw_String(  m_name,      msg);
 }
 
-void Node::json_read( JSON & i_object)
+void Node::jsonRead( JSON & i_object)
 {
 	jr_string("name",        m_name,        i_object);
 	jr_int32 ("id",          m_id,          i_object);
@@ -67,7 +67,7 @@ void Node::json_read( JSON & i_object)
 	jr_bool  ("locked",      m_locked,      i_object);
 }
 
-void Node::json_write( std::ostringstream & stream)
+void Node::jsonWrite( std::ostringstream & stream)
 {
 	stream << "\"name\":\""   << af::strEscape(m_name)         << "\",";
 	stream << "\"id\":"       << m_id                          << ",";

@@ -5,6 +5,7 @@
 
 #include "afnode.h"
 #include "blockdata.h"
+#include "msg.h"
 #include "regexp.h"
 
 namespace af
@@ -103,7 +104,7 @@ public:
 
 	virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
-	void json_write( std::ostringstream & stream);
+	void jsonWrite( std::ostringstream & stream, int type = Msg::TJob);
 
 	void stdOutJobBlocksTasks() const;
 

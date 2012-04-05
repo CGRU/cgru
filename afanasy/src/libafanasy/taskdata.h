@@ -8,40 +8,45 @@ class TaskData : public Af
 {
 public:
 
-   TaskData();
+	TaskData();
 
-   TaskData( Msg * msg);
+	TaskData( Msg * msg);
 
-   virtual ~TaskData();
+	/// Construct data from JSON:
+	TaskData( JSON & i_value);
 
-   int calcWeight() const;                         ///< Calculate and return memory size.
-   void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	virtual ~TaskData();
 
-   inline const std::string & getName()        const { return name;       }
-   inline const std::string & getCommand()     const { return command;    }
-   inline const std::string & getFiles()       const { return files;      }
-   inline const std::string & getDependMask()  const { return dependmask; }
-   inline const std::string & getCustomData()  const { return customdata; }
+	int calcWeight() const;                         ///< Calculate and return memory size.
+	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
-   inline void setFiles(      const std::string & str) { files      = str;  }
-   inline void setDependMask( const std::string & str) { dependmask = str;  }
-   inline void setCustomData( const std::string & str) { customdata = str;  }
+	inline const std::string & getName()        const { return m_name;        }
+	inline const std::string & getCommand()     const { return m_command;     }
+	inline const std::string & getFiles()       const { return m_files;       }
+	inline const std::string & getDependMask()  const { return m_depend_mask; }
+	inline const std::string & getCustomData()  const { return m_custom_data; }
 
-   inline bool hasFiles()        const { return      files.empty() == false;}  ///< Whether files are set.
-   inline bool hasDependMask()   const { return dependmask.empty() == false;}  ///< Whether depend mask is set.
-   inline bool hasCustomData()   const { return customdata.empty() == false;}  ///< Whether files are set.
+	inline void setFiles(      const std::string & str) { m_files       = str;  }
+	inline void setDependMask( const std::string & str) { m_depend_mask = str;  }
+	inline void setCustomData( const std::string & str) { m_custom_data = str;  }
 
-   bool checkDependMask( const std::string & str);
+	inline bool hasFiles()        const { return       m_files.empty() == false;}  ///< Whether files are set.
+	inline bool hasDependMask()   const { return m_depend_mask.empty() == false;}  ///< Whether depend mask is set.
+	inline bool hasCustomData()   const { return m_custom_data.empty() == false;}  ///< Whether files are set.
 
-protected:
-   std::string name;        ///< Task name.
-   std::string command;     ///< Command.
-   std::string files;       ///< Files.
-   std::string dependmask;  ///< Dependences.
-   std::string customdata;  ///< Some custom data.
+	bool checkDependMask( const std::string & str);
+
+	void jsonWrite( std::ostringstream & stream);
 
 protected:
-/// Read or write task data.
-   virtual void readwrite( Msg * msg);
+	std::string m_name;        ///< Task name.
+	std::string m_command;     ///< Command.
+	std::string m_files;       ///< Files.
+	std::string m_depend_mask;  ///< Dependences.
+	std::string m_custom_data;  ///< Some custom data.
+
+protected:
+	/// Read or write task data.
+	virtual void readwrite( Msg * msg);
 };
 }
