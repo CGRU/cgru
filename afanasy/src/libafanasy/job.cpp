@@ -103,47 +103,47 @@ void Job::jsonWrite( std::ostringstream & stream, int type)
 	stream << ":{";
 	Node::jsonWrite( stream);
 
-	stream << "\"user_name\":\"" << m_user_name << "\",";
-	stream << "\"host_name\":\"" << m_host_name << "\",";
+	stream << ",\"user_name\":\"" << m_user_name << "\"";
+	stream << ",\"host_name\":\"" << m_host_name << "\"";
 
 	if( m_cmd_pre.size())
-		stream << "\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\",";
+		stream << ",\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\"";
 	if( m_cmd_post.size())
-		stream << "\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\",";
+		stream << ",\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\"";
 	if( m_annotation.size())
-		stream << "\"annotation\":\""   << af::strEscape( m_annotation  ) << "\",";
+		stream << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
 	if( m_description.size())
-		stream << "\"description\":\""  << af::strEscape( m_description ) << "\",";
+		stream << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 
-	stream << "\"flags\":"                      << m_flags                      << ",";
-	stream << "\"state\":"                      << m_state                      << ",";
-	stream << "\"user_list_order\":"            << m_user_list_order            << ",";
-	stream << "\"time_creation\":"              << m_time_creation              << ",";
+	stream << ",\"flags\":"                      << m_flags;
+	stream << ",\"state\":"                      << m_state;
+	stream << ",\"user_list_order\":"            << m_user_list_order;
+	stream << ",\"time_creation\":"              << m_time_creation;
 	if( m_max_running_tasks != -1 )
-		stream << "\"max_running_tasks\":"          << m_max_running_tasks          << ",";
+		stream << ",\"max_running_tasks\":"          << m_max_running_tasks;
 	if( m_max_running_tasks_per_host != -1 )
-		stream << "\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host << ",";
+		stream << ",\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
 	if( m_time_wait != 0 )
-		stream << "\"time_wait\":"                  << m_time_wait                  << ",";
+		stream << ",\"time_wait\":"                  << m_time_wait;
 	if( m_time_started != 0 )
-		stream << "\"time_started\":"               << m_time_started               << ",";
+		stream << ",\"time_started\":"               << m_time_started;
 	if( m_time_done != 0 )
-		stream << "\"time_done\":"                  << m_time_done                  << ",";
+		stream << ",\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
-		stream << "\"time_life\":"                  << m_time_life                  << ",";
+		stream << ",\"time_life\":"                  << m_time_life;
 
 	if( hasHostsMask())
-		stream << "\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\",";
+		stream << ",\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
 	if( hasHostsMaskExclude())
-		stream << "\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\",";
+		stream << ",\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 	if( hasDependMask())
-		stream << "\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\",";
+		stream << ",\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
 	if( hasDependMaskGlobal())
-		stream << "\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\",";
+		stream << ",\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\"";
 	if( hasNeedOS())
-		stream << "\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\",";
+		stream << ",\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
 	if( hasNeedProperties())
-		stream << "\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
+		stream << ",\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
 
 	if( m_blocksdata == NULL )
 	{

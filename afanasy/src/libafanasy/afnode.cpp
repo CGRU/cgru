@@ -69,10 +69,10 @@ void Node::jsonRead( JSON & i_object)
 
 void Node::jsonWrite( std::ostringstream & stream)
 {
-	stream << "\"name\":\""   << af::strEscape(m_name)         << "\",";
-	stream << "\"id\":"       << m_id                          << ",";
-	stream << "\"priority\":" << int(m_priority)               << ",";
-	stream << "\"locked\":"   << (m_locked ? "true" : "false") << ",";
+	stream << "\"name\":\""    << af::strEscape(m_name) << "\"";
+	stream << ",\"id\":"       << m_id;
+	stream << ",\"priority\":" << int(m_priority);
+	stream << ",\"locked\":"   << (m_locked ? "true" : "false");
 }
 
 int Node::calcWeight() const

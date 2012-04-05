@@ -33,10 +33,10 @@ TaskData::TaskData( JSON & i_value)
 
 void TaskData::jsonWrite( std::ostringstream & stream)
 {
-	stream << "{\"name\":\""      <<                m_name      << "\",";
-	stream << "\"command\":\""   << af::strEscape( m_command ) << "\",";
+	stream << "{\"name\":\""      <<                m_name      << "\"";
+	stream << ",\"command\":\""   << af::strEscape( m_command ) << "\"";
 	if( m_files.size())
-		stream << "\"files\":\"" << af::strEscape( m_files   ) << "\"}";
+		stream << ",\"files\":\"" << af::strEscape( m_files   ) << "\"}";
 }
 
 void TaskData::readwrite( Msg * msg)
