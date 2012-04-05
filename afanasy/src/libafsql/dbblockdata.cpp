@@ -58,8 +58,8 @@ void DBBlockData::addDBAttributes()
    dbAddAttr( new DBAttrInt64(  DBAttr::_filesize_max,         &m_file_size_max           ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_min,        &m_multihost_min          ));
    dbAddAttr( new DBAttrUInt8(  DBAttr::_multihost_max,        &m_multihost_max          ));
-   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitmax,    &m_multihost_waitmax      ));
-   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitsrv,    &m_multihost_waitsrv      ));
+   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitmax,    &m_multihost_max_wait      ));
+   dbAddAttr( new DBAttrUInt16( DBAttr::_multihost_waitsrv,    &m_multihost_service_wait      ));
    dbAddAttr( new DBAttrString( DBAttr::_wdir,                 &m_wdir                   ));
    dbAddAttr( new DBAttrString( DBAttr::_files,                &m_files                  ));
    dbAddAttr( new DBAttrRegExp( DBAttr::_need_properties,      &m_need_properties        ));

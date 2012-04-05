@@ -37,7 +37,7 @@ public:
 		FNumeric          = 1 << 0,
 		FVarCapacity      = 1 << 1,
 		FMultiHost        = 1 << 2,
-		FSameHostMaster   = 1 << 3,
+        FMasterOnSlave    = 1 << 3,
 		FDependSubTask    = 1 << 4,
 		FNonSequential    = 1 << 5
 	};
@@ -70,7 +70,7 @@ public:
    inline bool isNotNumeric() const { return false == (m_flags & FNumeric);} ///< Whether the block is not numeric.
    inline bool canVarCapacity() const { return m_flags & FVarCapacity;} ///< Whether the block can variate tasks capacity.
    inline bool isMultiHost() const { return m_flags & FMultiHost;} ///< Whether the one block task can run on several hosts.
-   inline bool canMasterRunOnSlaveHost() const { return m_flags & FSameHostMaster;} ///< Can multihost task run master host on slave machines.
+   inline bool canMasterRunOnSlaveHost() const { return m_flags & FMasterOnSlave;} ///< Can multihost task run master host on slave machines.
    inline bool isDependSubTask() const { return m_flags & FDependSubTask;} ///< Other block can depend this block sub task
 
    inline void setDependSubTask( bool value = true) { if(value) m_flags |= FDependSubTask; else m_flags &= (~FDependSubTask);}
@@ -114,8 +114,8 @@ public:
 
    bool setMultiHostMin( int value);
    bool setMultiHostMax( int value);
-   inline void setMultiHostWaitSrv( int value) { m_multihost_waitsrv = value;}
-   inline void setMultiHostWaitMax( int value) { m_multihost_waitmax = value;}
+   inline void setMultiHostWaitSrv( int value) { m_multihost_service_wait = value;}
+   inline void setMultiHostWaitMax( int value) { m_multihost_max_wait = value;}
 
 /// Set block depend mask.
    bool setDependMask(        const std::string & str, std::string * errOutput = NULL)
@@ -211,8 +211,8 @@ public:
    inline int getCapCoeffMax()       const { return m_capacity_coeff_max;     }
    inline int getMultiHostMin()      const { return m_multihost_min;    }
    inline int getMultiHostMax()      const { return m_multihost_max;    }
-   inline int getMultiHostWaitSrv()  const { return m_multihost_waitsrv;}
-   inline int getMultiHostWaitMax()  const { return m_multihost_waitmax;}
+   inline int getMultiHostWaitSrv()  const { return m_multihost_service_wait;}
+   inline int getMultiHostWaitMax()  const { return m_multihost_max_wait;}
    inline int getCapMinResult()      const
 	  { return ( canVarCapacity() && ( m_capacity_coeff_min > 0)) ? m_capacity * m_capacity_coeff_min : m_capacity;}
 
@@ -316,15 +316,17 @@ protected:
 	/// Time from last error to remove host from error list
 	int32_t m_errors_forgive_time;
 
-	int64_t  m_file_size_min;
-	int64_t  m_file_size_max;
-	int32_t  m_capacity_coeff_min;
-	int32_t  m_capacity_coeff_max;
-	uint8_t  m_multihost_min;
-	uint8_t  m_multihost_max;
-	uint16_t m_multihost_waitmax;
-	uint16_t m_multihost_waitsrv;
+    int64_t m_file_size_min;
+    int64_t m_file_size_max;
+
+    int32_t m_capacity_coeff_min;
+    int32_t m_capacity_coeff_max;
+
+    uint8_t     m_multihost_min;
+    uint8_t     m_multihost_max;
+    uint16_t    m_multihost_max_wait;
 	std::string m_multihost_service;
+    uint16_t    m_multihost_service_wait;
 
 	RegExp m_depend_mask;
 	RegExp m_tasks_depend_mask;

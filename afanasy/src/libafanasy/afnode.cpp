@@ -21,7 +21,7 @@ Node::Node():
     m_state(0),
     m_flags(0),
 
-    m_priority( 0),
+    m_priority( 99),
 
     /// Just created node (need was not calculated) has no need.
     m_solve_need(0.0),
@@ -63,8 +63,12 @@ void Node::jsonRead( JSON & i_object)
 {
 	jr_string("name",        m_name,        i_object);
 	jr_int32 ("id",          m_id,          i_object);
-	jr_uint8 ("priority",    m_priority,    i_object);
 	jr_bool  ("locked",      m_locked,      i_object);
+
+	int32_t priority = -1;
+	jr_int32 ("priority",    priority,      i_object);
+	if( priority > 255 ) m_priority = 255;
+	else if( priority != -1 ) m_priority = priority;
 }
 
 void Node::jsonWrite( std::ostringstream & stream)
@@ -72,7 +76,8 @@ void Node::jsonWrite( std::ostringstream & stream)
 	stream << "\"name\":\""    << af::strEscape(m_name) << "\"";
 	stream << ",\"id\":"       << m_id;
 	stream << ",\"priority\":" << int(m_priority);
-	stream << ",\"locked\":"   << (m_locked ? "true" : "false");
+	if( m_locked )
+		stream << ",\"locked\":true";
 }
 
 int Node::calcWeight() const

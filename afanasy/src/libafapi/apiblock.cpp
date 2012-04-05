@@ -64,11 +64,11 @@ void Block::setMultiHost( int min, int max, int waitmax, bool sameHostMaster, co
    }
 
    m_flags = m_flags | FMultiHost;
-   if( sameHostMaster) m_flags = m_flags | FSameHostMaster;
+   if( sameHostMaster) m_flags = m_flags | FMasterOnSlave;
    m_multihost_min  = min;
    m_multihost_max  = max;
-   m_multihost_waitmax = waitmax;
-   m_multihost_waitsrv = waitsrv;
+   m_multihost_max_wait = waitmax;
+   m_multihost_service_wait = waitsrv;
    if( false == service.empty()) m_multihost_service = service;
 }
 
