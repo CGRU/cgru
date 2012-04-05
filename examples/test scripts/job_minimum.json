@@ -15,7 +15,7 @@
 			"frames_per_task"            : 10,
 			"frames_inc"                 : 2,
 			"command"                    : "nuke -F@#@,@#@ -x scene.nk -X Write1",
-			"wdir"                       : "/home/jimmy/work",
+			"working_directory"          : "/home/jimmy/work",
 			"files"                      : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
 		}
 		]

@@ -31,7 +31,8 @@ void BlockData::initDefaults()
    p_tasksdone = 0;
    p_taskserror = 0;
    p_taskssumruntime = 0;
-   m_state = AFJOB::STATE_READY_MASK;
+	m_job_id = 0;
+   m_state = 0;//AFJOB::STATE_READY_MASK;
    m_flags = 0;
    m_frame_first = 0;
    m_frame_last = 0;
@@ -141,19 +142,22 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	int32_t capacity_coeff_min = -1;
 	int32_t capacity_coeff_max = -1;
 
-    int8_t      multihost_min             = -1;
-    int8_t      multihost_max             = -1;
-    uint16_t    multihost_max_wait        = 0;
-    std::string multihost_service;
-    uint16_t    multihost_service_wait    = 0;
-    bool        multihost_master_on_slave = false;
+	int8_t      multihost_min             = -1;
+	int8_t      multihost_max             = -1;
+	uint16_t    multihost_max_wait        = 0;
+	std::string multihost_service;
+	uint16_t    multihost_service_wait    = 0;
+	bool        multihost_master_on_slave = false;
+
+	bool depend_sub_task = false;
+	bool non_sequential  = false;
 
 //	case Msg::TBlocksProperties:
-	//jr_int32 ("parser_coeff",          m_parser_coeff,          i_object);
+	//jr_int32 ("parser_coeff",        m_parser_coeff,          i_object);
 	jr_string("tasks_name",            m_tasks_name,            i_object);
 	jr_string("parser",                m_parser,                i_object);
-	jr_string("wdir",                  m_wdir,                  i_object);
-	//jr_string("environment",           m_environment,           i_object);
+	jr_string("working_directory",     m_working_directory,     i_object);
+	//jr_string("environment",         m_environment,           i_object);
 	jr_string("command",               m_command,               i_object);
 	jr_string("files",                 m_files,                 i_object);
 	jr_string("cmd_pre",               m_cmd_pre,               i_object);
@@ -164,22 +168,24 @@ BlockData::BlockData( JSON & i_object, int i_num)
 //	case Msg::TJobsList:
 	//jr_uint32("flags",                 m_flags,                 i_object);
 
-    jr_int64 ("frame_first",     frame_first,     i_object);
-    jr_int64 ("frame_last",      frame_last,      i_object);
-    jr_int64 ("frames_per_task", frames_per_task, i_object);
-    jr_int64 ("frames_inc",      frames_inc,      i_object);
-    jr_int32 ("capacity_coeff_min", capacity_coeff_min, i_object);
-    jr_int32 ("capacity_coeff_max", capacity_coeff_max, i_object);
-    jr_int8  ("multihost_min",             multihost_min,             i_object);
-    jr_int8  ("multihost_max",             multihost_max,             i_object);
-    jr_uint16("multihost_max_wait",        multihost_max_wait,        i_object);
-    jr_uint16("multihost_service_wait",    multihost_service_wait,    i_object);
-    jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
-	//jr_int64 ("file_size_min",         m_file_size_min,         i_object);
-	//jr_int64 ("file_size_max",         m_file_size_max,         i_object);
+	jr_int64 ("frame_first",     frame_first,     i_object);
+	jr_int64 ("frame_last",      frame_last,      i_object);
+	jr_int64 ("frames_per_task", frames_per_task, i_object);
+	jr_int64 ("frames_inc",      frames_inc,      i_object);
+	jr_int32 ("capacity_coeff_min", capacity_coeff_min, i_object);
+	jr_int32 ("capacity_coeff_max", capacity_coeff_max, i_object);
+	jr_int8  ("multihost_min",             multihost_min,             i_object);
+	jr_int8  ("multihost_max",             multihost_max,             i_object);
+	jr_uint16("multihost_max_wait",        multihost_max_wait,        i_object);
+	jr_uint16("multihost_service_wait",    multihost_service_wait,    i_object);
+	jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
+	//jr_int64 ("file_size_min", m_file_size_min, i_object);
+	//jr_int64 ("file_size_max", m_file_size_max, i_object);
+	jr_bool  ("depend_sub_task", depend_sub_task, i_object);
+	jr_bool  ("non_sequential",  non_sequential,  i_object);
 
 	jr_int32 ("capacity",              m_capacity,              i_object);
-    jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
+	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
 	jr_int32 ("need_memory",           m_need_memory,           i_object);
 	jr_int32 ("need_power",            m_need_power,            i_object);
@@ -197,25 +203,25 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	jr_int8  ("errors_task_same_host", m_errors_task_same_host, i_object);
 	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object);
 	jr_uint32("tasks_max_run_time",    m_tasks_max_run_time,    i_object);
-
+/*
 //	case Msg::TBlocksProgress:
 
-    jr_uint32("state",                 m_state,                 i_object);
-    jr_int32 ("job_id",                m_job_id,                i_object);
-    jr_int32 ("block_num",             m_block_num,             i_object);
+	jr_uint32("state",                 m_state,                 i_object);
+	jr_int32 ("job_id",                m_job_id,                i_object);
+	jr_int32 ("block_num",             m_block_num,             i_object);
 	jr_int32 ("running_tasks_counter", m_running_tasks_counter, i_object);
 
-    jr_uint8 ("p_percentage",      p_percentage,      i_object);
-    jr_int32 ("p_errorhostsnum",   p_errorhostsnum,   i_object);
-    jr_int32 ("p_avoidhostsnum",   p_avoidhostsnum,   i_object);
-    jr_int32 ("p_tasksready",      p_tasksready,      i_object);
-    jr_int32 ("p_tasksdone",       p_tasksdone,       i_object);
-    jr_int32 ("p_taskserror",      p_taskserror,      i_object);
-    jr_int64 ("p_taskssumruntime", p_taskssumruntime, i_object);
+	jr_uint8 ("p_percentage",      p_percentage,      i_object);
+	jr_int32 ("p_errorhostsnum",   p_errorhostsnum,   i_object);
+	jr_int32 ("p_avoidhostsnum",   p_avoidhostsnum,   i_object);
+	jr_int32 ("p_tasksready",      p_tasksready,      i_object);
+	jr_int32 ("p_tasksdone",       p_tasksdone,       i_object);
+	jr_int32 ("p_taskserror",      p_taskserror,      i_object);
+	jr_int64 ("p_taskssumruntime", p_taskssumruntime, i_object);
 
-//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
-//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
-
+	//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
+	//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
+*/
 //	break;
 
 //	default:
@@ -229,113 +235,160 @@ BlockData::BlockData( JSON & i_object, int i_num)
 		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
 
 	if(( multihost_min != -1 ) || ( multihost_max != -1 ))
-        setMultiHost( multihost_min, multihost_max, multihost_max_wait,
-                multihost_master_on_slave, multihost_service, multihost_service_wait);
+		setMultiHost( multihost_min, multihost_max, multihost_max_wait,
+				multihost_master_on_slave, multihost_service, multihost_service_wait);
+
+	if( depend_sub_task )
+		setDependSubTask( true );
+
+	if( non_sequential )
+		setNonSequential( true );
 }
 
 void BlockData::jsonWrite( std::ostringstream & stream, int type)
 {
 	stream << "{";
 
-	stream << "\"name\":\"" << m_name << "\"";
-
 	switch( type)
 	{
 	case Msg::TJob:
 	case Msg::TJobRegister:
 	case Msg::TBlocks:
+
 		//rw_uint32_t( m_flags,                 msg);
 		//if( isNotNumeric()) rw_tasks(         msg);
+		if( isNotNumeric() && ( m_tasks_data != NULL ))
+		{
+			stream << "\"tasks\":[";
+			for( int t = 0; t < m_tasks_num; t++ )
+			{
+				if( t != 0 )
+					stream << ',';
+				m_tasks_data[t]->jsonWrite( stream);
+			}
+			stream << "],";
+		}
 
 	case Msg::TBlocksProperties:
-	//jr_int32 ("parser_coeff",          m_parser_coeff,          i_object);
-		stream << ",\"tasks_name\":\""     << m_tasks_name              << "\"";
-		stream << ",\"command\":\""        << af::strEscape( m_command) << "\"";
-		stream << ",\"wdir\":\""           << af::strEscape( m_wdir   ) << "\"";
-/*	jr_string("parser",                m_parser,                i_object);
-	//jr_string("environment",           m_environment,           i_object);
-	jr_string("files",                 m_files,                 i_object);
-	jr_string("cmd_pre",               m_cmd_pre,               i_object);
-	jr_string("cmd_post",              m_cmd_post,              i_object);
-	jr_string("multihost_service",     multihost_service,       i_object);
-	//jr_string("custom_data",           m_custom_data,           i_object);
+		stream << "\"tasks_name\":\"" << m_tasks_name             << "\"";
+		stream << ",\"command\":\""   << af::strEscape(m_command) << "\"";
+		if( m_parser.size())
+			stream << ",\"parser\":\"" << m_parser << "\"";
+		if( m_working_directory.size())
+			stream << ",\"working_directory\":\"" << af::strEscape(m_working_directory ) << "\"";
+		if( m_files.size())
+			stream << ",\"files\":\""             << af::strEscape( m_files )    << "\"";
+		if( m_cmd_pre.size())
+			stream << ",\"cmd_pre\":\""           << af::strEscape( m_cmd_pre )  << "\"";
+		if( m_cmd_post.size())
+			stream << ",\"cmd_post\":\""          << af::strEscape( m_cmd_post ) << "\"";
+		if( m_multihost_service.size())
+			stream << ",\"multihost_service\":\"" << m_multihost_service         << "\"";
+		//stream << ",\"environment\":\""         << m_environment               << "\"";
+		//stream << ",\"parser_coeff\":\:"        << m_parser_coeff              << "\"";
+		//stream << ",\"custom_data\":\""         << m_custom_data               << "\"";
+		stream << ',';
 
-//	case Msg::TJobsList:
-	//jr_uint32("flags",                 m_flags,                 i_object);
+	case Msg::TJobsList:
 
-    jr_int64 ("frame_first",     frame_first,     i_object);
-    jr_int64 ("frame_last",      frame_last,      i_object);
-    jr_int64 ("frames_per_task", frames_per_task, i_object);
-    jr_int64 ("frames_inc",      frames_inc,      i_object);
-    jr_int32 ("capacity_coeff_min", capacity_coeff_min, i_object);
-    jr_int32 ("capacity_coeff_max", capacity_coeff_max, i_object);
-    jr_int8  ("multihost_min",             multihost_min,             i_object);
-    jr_int8  ("multihost_max",             multihost_max,             i_object);
-    jr_uint16("multihost_max_wait",        multihost_max_wait,        i_object);
-    jr_uint16("multihost_service_wait",    multihost_service_wait,    i_object);
-    jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
-	//jr_int64 ("file_size_min",         m_file_size_min,         i_object);
-	//jr_int64 ("file_size_max",         m_file_size_max,         i_object);
+		//stream << ",\"flags",                << m_flags;
 
-	jr_int32 ("capacity",              m_capacity,              i_object);
-    jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
-	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
-	jr_int32 ("need_memory",           m_need_memory,           i_object);
-	jr_int32 ("need_power",            m_need_power,            i_object);
-	jr_int32 ("need_hdd",              m_need_hdd,              i_object);
-	jr_regexp("depend_mask",           m_depend_mask,           i_object);
-	jr_regexp("tasks_depend_mask",     m_tasks_depend_mask,     i_object);
-	jr_regexp("hosts_mask",            m_hosts_mask,            i_object);
-	jr_regexp("hosts_mask_exclude",    m_hosts_mask_exclude,    i_object);
-	jr_regexp("need_properties",       m_need_properties,       i_object);
-	jr_string("name",                  m_name,                  i_object);
-	jr_string("service",               m_service,               i_object);
-	//jr_int32 ("tasks_num",             m_tasks_num,             i_object);
-	jr_int8  ("errors_retries",        m_errors_retries,        i_object);
-	jr_int8  ("errors_avoid_host",     m_errors_avoid_host,     i_object);
-	jr_int8  ("errors_task_same_host", m_errors_task_same_host, i_object);
-	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object);
-	jr_uint32("tasks_max_run_time",    m_tasks_max_run_time,    i_object);
+		stream << "\"frame_first\":"      << m_frame_first;
+		stream << ",\"frame_last\":"      << m_frame_last;
+		stream << ",\"frames_per_task\":" << m_frames_per_task;
+		stream << ",\"frames_inc\":"      << m_frames_inc;
+		if( isDependSubTask())
+			stream << ",\"depend_sub_task\":true";
+		if( isNonSequential())
+			stream << ",\"non_sequential\":true";
+		if( canVarCapacity())
+		{
+			stream << ",\"capacity_coeff_min\":" << m_capacity_coeff_min;
+			stream << ",\"capacity_coeff_max\":" << m_capacity_coeff_max;
+		}
+		if( isMultiHost())
+		{
+			stream << ",\"multihost_min\":"          << int(m_multihost_min);
+			stream << ",\"multihost_max\":"          << int(m_multihost_max);
+			stream << ",\"multihost_max_wait\":"     << int(m_multihost_max_wait);
+			stream << ",\"multihost_service_wait\":" << int(m_multihost_service_wait);
+			if( canMasterRunOnSlaveHost())
+				stream << ",\"multihost_master_on_slave\":true";
+		}
+		//stream << ",\"file_size_min\":"         << m_file_size_min;
+		//stream << ",\"file_size_max\":"         << m_file_size_max;
+		stream << ",\"capacity\":"              << m_capacity;
+		if( m_max_running_tasks != -1 )
+			stream << ",\"max_running_tasks\":"          << m_max_running_tasks;
+		if( m_max_running_tasks_per_host != -1 )
+			stream << ",\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
+		if( m_need_memory > 0 )
+			stream << ",\"need_memory\":"           << m_need_memory;
+		if( m_need_power > 0 )
+			stream << ",\"need_power\":"            << m_need_power;
+		if( m_need_hdd > 0 )
+			stream << ",\"need_hdd\":"              << m_need_hdd;
+		//stream << ",\"tasks_num\":"             << m_tasks_num;
+		if( m_errors_retries != -1 )
+			stream << ",\"errors_retries\":"        << int(m_errors_retries);
+		if( m_errors_avoid_host != -1 )
+			stream << ",\"errors_avoid_host\":"     << int(m_errors_avoid_host);
+		if( m_errors_task_same_host != -1 )
+			stream << ",\"errors_task_same_host\":" << int(m_errors_task_same_host);
+		if( m_errors_forgive_time != -1 )
+			stream << ",\"errors_forgive_time\":"   << int(m_errors_forgive_time);
+		if( m_tasks_max_run_time > 0 )
+			stream << ",\"tasks_max_run_time\":"    << int(m_tasks_max_run_time);
 
-//	case Msg::TBlocksProgress:
+		stream << ",\"name\":\""               << m_name << "\"";
+		stream << ",\"service\":\""            << m_service << "\"";
+		if( hasDependMask())
+			stream << ",\"depend_mask\":\""        << m_depend_mask.getPattern() << "\"";
+		if( hasTasksDependMask())
+			stream << ",\"tasks_depend_mask\":\""  << m_tasks_depend_mask.getPattern() << "\"";
+		if( hasHostsMask())
+			stream << ",\"hosts_mask\":\""         << m_hosts_mask.getPattern() << "\"";
+		if( hasHostsMaskExclude())
+			stream << ",\"hosts_mask_exclude\":\"" << m_hosts_mask_exclude.getPattern() << "\"";
+		if( hasNeedProperties())
+			stream << ",\"need_properties\":\""    << m_need_properties.getPattern() << "\"";
+		stream << ',';
 
-    jr_uint32("state",                 m_state,                 i_object);
-    jr_int32 ("job_id",                m_job_id,                i_object);
-    jr_int32 ("block_num",             m_block_num,             i_object);
-	jr_int32 ("running_tasks_counter", m_running_tasks_counter, i_object);
+	case Msg::TBlocksProgress:
 
-    jr_uint8 ("p_percentage",      p_percentage,      i_object);
-    jr_int32 ("p_errorhostsnum",   p_errorhostsnum,   i_object);
-    jr_int32 ("p_avoidhostsnum",   p_avoidhostsnum,   i_object);
-    jr_int32 ("p_tasksready",      p_tasksready,      i_object);
-    jr_int32 ("p_tasksdone",       p_tasksdone,       i_object);
-    jr_int32 ("p_taskserror",      p_taskserror,      i_object);
-    jr_int64 ("p_taskssumruntime", p_taskssumruntime, i_object);
+		stream << "\"block_num\":"  << m_block_num;
+		if( m_state != 0 )
+			stream << "\",state\":"   << m_state;
+		if( m_job_id != 0 )
+			stream << ",\"job_id\":" << m_job_id;
+		if( m_running_tasks_counter > 0 )
+			stream << ",\"running_tasks_counter\":" << m_running_tasks_counter;
 
-//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
-//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
-*/
+		if( p_percentage > 0 )
+			stream << ",\"p_percentage\":"      << int(p_percentage);
+		if( p_errorhostsnum > 0 )
+			stream << ",\"p_errorhostsnum\":"   << p_errorhostsnum;
+		if( p_avoidhostsnum > 0 )
+			stream << ",\"p_avoidhostsnum\":"   << p_avoidhostsnum;
+		if( p_tasksready > 0 )
+			stream << ",\"p_tasksready\":"      << p_tasksready;
+		if( p_tasksdone > 0 )
+			stream << ",\"p_tasksdone\":"       << p_tasksdone;
+		if( p_taskserror > 0 )
+			stream << ",\"p_taskserror\":"      << p_taskserror;
+		if( p_taskssumruntime > 0 )
+			stream << ",\"p_taskssumruntime\":" << p_taskssumruntime;
+
+		//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
+		//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
+
 	break;
 
 	default:
 		AFERRAR("BlockData::readwrite: invalid type = %s.", Msg::TNAMES[type])
 	}
 
-	if( m_tasks_data == NULL )
-	{
-		stream << "}";
-		return;
-	}
-
-	stream << ",\"tasks\":[";
-	for( int t = 0; t < m_tasks_num; t++ )
-	{
-		if( t != 0 )
-			stream << ',';
-		m_tasks_data[t]->jsonWrite( stream);
-	}
-
-	stream << "]}";
+	stream << "}";
 }
 
 bool BlockData::isValid() const
@@ -384,71 +437,71 @@ void BlockData::readwrite( Msg * msg)
 	case Msg::TJobRegister:
 	case Msg::TBlocks:
 		rw_uint32_t( m_flags,                 msg);
-		if( isNotNumeric()) rw_tasks(       msg);
+		if( isNotNumeric()) rw_tasks(         msg);
 
 	case Msg::TBlocksProperties:
-		rw_int32_t ( m_parser_coeff,           msg);
-		rw_String  ( m_tasks_name,             msg);
+		rw_int32_t ( m_parser_coeff,          msg);
+		rw_String  ( m_tasks_name,            msg);
 		rw_String  ( m_parser,                msg);
-		rw_String  ( m_wdir,                  msg);
+		rw_String  ( m_working_directory,     msg);
 		rw_String  ( m_environment,           msg);
 		rw_String  ( m_command,               msg);
 		rw_String  ( m_files,                 msg);
 		rw_String  ( m_cmd_pre,               msg);
 		rw_String  ( m_cmd_post,              msg);
 		rw_String  ( m_multihost_service,     msg);
-		rw_String  ( m_custom_data,            msg);
+		rw_String  ( m_custom_data,           msg);
 
 	case Msg::TJobsList:
 		rw_uint32_t( m_flags,                 msg);
 		rw_int64_t ( m_frame_first,           msg);
 		rw_int64_t ( m_frame_last,            msg);
-		rw_int64_t ( m_frames_per_task,         msg);
-		rw_int64_t ( m_frames_inc,             msg);
-		rw_int64_t ( m_file_size_min,          msg);
-		rw_int64_t ( m_file_size_max,          msg);
-		rw_int32_t ( m_capacity_coeff_min,          msg);
-		rw_int32_t ( m_capacity_coeff_max,          msg);
+		rw_int64_t ( m_frames_per_task,       msg);
+		rw_int64_t ( m_frames_inc,            msg);
+		rw_int64_t ( m_file_size_min,         msg);
+		rw_int64_t ( m_file_size_max,         msg);
+		rw_int32_t ( m_capacity_coeff_min,    msg);
+		rw_int32_t ( m_capacity_coeff_max,    msg);
 		rw_uint8_t ( m_multihost_min,         msg);
 		rw_uint8_t ( m_multihost_max,         msg);
-        rw_uint16_t( m_multihost_service_wait,     msg);
-        rw_uint16_t( m_multihost_max_wait,     msg);
+		rw_uint16_t( m_multihost_service_wait,msg);
+		rw_uint16_t( m_multihost_max_wait,    msg);
 		rw_int32_t ( m_capacity,              msg);
-		rw_int32_t ( m_max_running_tasks,       msg);
+		rw_int32_t ( m_max_running_tasks,     msg);
 		rw_int32_t ( m_max_running_tasks_per_host,    msg);
 		rw_int32_t ( m_need_memory,           msg);
 		rw_int32_t ( m_need_power,            msg);
 		rw_int32_t ( m_need_hdd,              msg);
-		rw_RegExp  ( m_depend_mask,            msg);
-		rw_RegExp  ( m_tasks_depend_mask,       msg);
-		rw_RegExp  ( m_hosts_mask,             msg);
-		rw_RegExp  ( m_hosts_mask_exclude,     msg);
+		rw_RegExp  ( m_depend_mask,           msg);
+		rw_RegExp  ( m_tasks_depend_mask,     msg);
+		rw_RegExp  ( m_hosts_mask,            msg);
+		rw_RegExp  ( m_hosts_mask_exclude,    msg);
 		rw_RegExp  ( m_need_properties,       msg);
 		rw_String  ( m_name,                  msg);
 		rw_String  ( m_service,               msg);
-		rw_int32_t ( m_tasks_num,              msg);
+		rw_int32_t ( m_tasks_num,             msg);
 		rw_int8_t  ( m_errors_retries,        msg);
-		rw_int8_t  ( m_errors_avoid_host,      msg);
-		rw_int8_t  ( m_errors_task_same_host,   msg);
-		rw_int32_t ( m_errors_forgive_time,    msg);
-		rw_uint32_t( m_tasks_max_run_time,       msg);
+		rw_int8_t  ( m_errors_avoid_host,     msg);
+		rw_int8_t  ( m_errors_task_same_host, msg);
+		rw_int32_t ( m_errors_forgive_time,   msg);
+		rw_uint32_t( m_tasks_max_run_time,    msg);
 
 	case Msg::TBlocksProgress:
 
-		rw_int32_t ( m_running_tasks_counter,  msg);
-		rw_data(   (char*)p_bar_done,       msg, AFJOB::PROGRESS_BYTES);
-		rw_data(   (char*)p_bar_running,    msg, AFJOB::PROGRESS_BYTES);
-		rw_uint8_t ( p_percentage,          msg);
-		rw_int32_t ( p_errorhostsnum,       msg);
-		rw_int32_t ( p_avoidhostsnum,       msg);
-		rw_int32_t ( p_tasksready,          msg);
-		rw_int32_t ( p_tasksdone,           msg);
-		rw_int32_t ( p_taskserror,          msg);
-		rw_int64_t ( p_taskssumruntime,     msg);
+		rw_int32_t ( m_running_tasks_counter, msg);
+		rw_data(   (char*)p_bar_done,         msg, AFJOB::PROGRESS_BYTES);
+		rw_data(   (char*)p_bar_running,      msg, AFJOB::PROGRESS_BYTES);
+		rw_uint8_t ( p_percentage,            msg);
+		rw_int32_t ( p_errorhostsnum,         msg);
+		rw_int32_t ( p_avoidhostsnum,         msg);
+		rw_int32_t ( p_tasksready,            msg);
+		rw_int32_t ( p_tasksdone,             msg);
+		rw_int32_t ( p_taskserror,            msg);
+		rw_int64_t ( p_taskssumruntime,       msg);
 
 		rw_uint32_t( m_state,                 msg);
-		rw_int32_t ( m_job_id,                 msg);
-		rw_int32_t ( m_block_num,              msg);
+		rw_int32_t ( m_job_id,                msg);
+		rw_int32_t ( m_block_num,             msg);
 
 	break;
 
@@ -836,7 +889,7 @@ TaskExec * BlockData::genTask( int num) const
 			end,
 			frames_num,
 
-			m_wdir,
+			m_working_directory,
 			m_environment,
 
 			m_job_id,
@@ -910,7 +963,7 @@ int BlockData::calcWeight() const
 	weight += m_hosts_mask.weigh();
 	weight += m_hosts_mask_exclude.weigh();
 	weight += weigh(m_name);
-	weight += weigh(m_wdir);
+	weight += weigh(m_working_directory);
 	weight += weigh(m_environment);
 	weight += weigh(m_command);
 	weight += weigh(m_files);
@@ -954,7 +1007,7 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & stream, int type, 
       if( full || ( ! m_parser.empty())) stream << "\n Parser = " << m_parser;
       if( full && (   m_parser.empty())) stream << " is empty (no parser)";
 
-      if( false == m_wdir.empty()) stream << "\n Working Directory:\n" << m_wdir;
+	  if( false == m_working_directory.empty()) stream << "\n Working Directory:\n" << m_working_directory;
 
       if( false == m_command.empty()) stream << "\n Command:\n" << m_command;
 
@@ -1059,33 +1112,6 @@ void BlockData::generateInfoStream( std::ostringstream & stream, bool full) cons
    stream << "Block[" << m_name << "] " << m_service << "[" << m_capacity << "] " << m_tasks_num << " tasks";
    generateInfoStreamTyped( stream, Msg::TBlocksProgress,   full);
    generateInfoStreamTyped( stream, Msg::TBlocksProperties, full);
-//   if( full ) generateInfoStreamTyped( stream, Msg::TBlocks, full);
-/*
-   if( full )
-   {
-      if( isNumeric())
-      {
-         stream << "\n numeric: start = " << frame_first
-               << ", end = " << frame_last
-               << ", perTask = " << frame_pertask
-               << ", increment = " << frame_inc << ".";
-      }
-      else if( tasksdata != NULL )
-      {
-         for( int t = 0; t < tasksnum; t++)
-         {
-            stream << std::endl;
-            stream << "#" << t << ":";
-            TaskExec * task = genTask(t);
-            stream << " [" << task->getName() << "] ";
-            stream << "'" << task->getCommand() << "'";
-            if( task->hasFiles()) stream << " (" << task->getFiles() << ")";
-            delete task;
-         }
-      }
-      stream << " memory: " << calcWeight() << " bytes.";
-   }
-*/
 }
 
 

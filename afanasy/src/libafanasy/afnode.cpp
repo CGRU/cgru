@@ -61,12 +61,12 @@ void Node::readwrite( Msg * msg)
 
 void Node::jsonRead( JSON & i_object)
 {
-	jr_string("name",        m_name,        i_object);
-	jr_int32 ("id",          m_id,          i_object);
-	jr_bool  ("locked",      m_locked,      i_object);
+	jr_string("name",   m_name,   i_object);
+	jr_int32 ("id",     m_id,     i_object);
+	jr_bool  ("locked", m_locked, i_object);
 
 	int32_t priority = -1;
-	jr_int32 ("priority",    priority,      i_object);
+	jr_int32 ("priority", priority, i_object);
 	if( priority > 255 ) m_priority = 255;
 	else if( priority != -1 ) m_priority = priority;
 }
@@ -74,7 +74,8 @@ void Node::jsonRead( JSON & i_object)
 void Node::jsonWrite( std::ostringstream & stream)
 {
 	stream << "\"name\":\""    << af::strEscape(m_name) << "\"";
-	stream << ",\"id\":"       << m_id;
+	if( m_id > 0 )
+		stream << ",\"id\":"   << m_id;
 	stream << ",\"priority\":" << int(m_priority);
 	if( m_locked )
 		stream << ",\"locked\":true";

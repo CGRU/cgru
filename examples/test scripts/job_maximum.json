@@ -30,6 +30,7 @@
 			"frame_last"                 : 100,
 			"frames_per_task"            : 10,
 			"frames_inc"                 : 2,
+			"non_sequential"             : true,
 			"errors_retries"             : 9,
 			"errors_avoid_host"          : 4,
 			"errors_task_same_host"      : 3,
@@ -40,7 +41,7 @@
 			"hosts_mask_exclude"         : "badhost_b.*",
 			"need_properties"            : "nvidia",
 			"command"                    : "nuke -F@#@,@#@ -x scene.nk -X Write1",
-			"wdir"                       : "/home/jimmy/work",
+			"working_directory"          : "/home/jimmy/work",
 			"files"                      : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
 		},
 		{
@@ -49,6 +50,7 @@
 			"service"                    : "generic",
 			"parser"                     : "generic",
 			"capacity"                   : 1100,
+			"depend_sub_task"            : true,
 			"max_running_tasks"          : 20,
 			"max_running_tasks_per_host" : 3,
 			"multihost_min"              : 3,
@@ -58,7 +60,7 @@
 			"multihost_service_wait"     : 3,
 			"multihost_master_on_slave"  : false,
 			"command"                    : "generate @#@",
-			"wdir"                       : "/home/jimmy/work",
+			"working_directory"          : "/home/jimmy/work",
 			"files"                      : "folder/@#@.jpg",
 			"tasks":[
 			{

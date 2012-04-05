@@ -43,9 +43,9 @@ Job::Job( JSON & i_object)
 	jr_string("host_name",     m_host_name,     i_object);
 	jr_string("annotation",    m_annotation,    i_object);
 	jr_string("description",   m_description,   i_object);
-	jr_uint32("flags",         m_flags,         i_object);
-	jr_uint32("state",         m_state,         i_object);
-	jr_int32 ("user_list_order",            m_user_list_order,            i_object);
+	//jr_uint32("flags",       m_flags,         i_object);
+	//jr_uint32("state",       m_state,         i_object);
+	//jr_int32 ("user_list_order",          m_user_list_order,            i_object);
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
 	jr_string("cmd_pre",  m_cmd_pre,  i_object);
@@ -115,10 +115,13 @@ void Job::jsonWrite( std::ostringstream & stream, int type)
 	if( m_description.size())
 		stream << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 
-	stream << ",\"flags\":"                      << m_flags;
-	stream << ",\"state\":"                      << m_state;
-	stream << ",\"user_list_order\":"            << m_user_list_order;
-	stream << ",\"time_creation\":"              << m_time_creation;
+	if( m_flags != 0 )
+		stream << ",\"flags\":"                      << m_flags;
+	if( m_state != 0 )
+		stream << ",\"state\":"                      << m_state;
+	if( m_user_list_order != -1 )
+		stream << ",\"user_list_order\":"            << m_user_list_order;
+	stream << ",\"time_creation\":"                  << m_time_creation;
 	if( m_max_running_tasks != -1 )
 		stream << ",\"max_running_tasks\":"          << m_max_running_tasks;
 	if( m_max_running_tasks_per_host != -1 )

@@ -89,7 +89,7 @@ public:
 /// Set block tasks parser type.
    inline void setParser(           const std::string & str    ) { m_parser           = str;   }
 /// Set block tasks working directory.
-   inline void setWDir(             const std::string & str    ) { m_wdir             = str;   }
+   inline void setWDir(             const std::string & str    ) { m_working_directory             = str;   }
 /// Set block tasks extra environment.
    inline void setEnv(              const std::string & str    ) { m_environment      = str;   }
 /// Set block tasks command.
@@ -137,7 +137,7 @@ public:
    inline void setNeedPower(  int power  ) { m_need_power  = power; }
    inline void setNeedHDD(    int hdd    ) { m_need_hdd    = hdd;   }
 
-   inline void setWorkingDirectory( const std::string & str) {  m_wdir        = str;   }
+   inline void setWorkingDirectory( const std::string & str) {  m_working_directory        = str;   }
    inline void setEnvironment(      const std::string & str) {  m_environment = str;   }
    inline void setCustomData( const std::string & str) {  m_custom_data  = str;  }
    inline void setFileSizeCheck( long long min, long long max) { m_file_size_min = min; m_file_size_max = max; }
@@ -156,7 +156,7 @@ public:
    void setFramesPerTask( long long perTask); ///< For sting tasks and per tasr dependency solve
 
    inline const std::string & getName()         const { return m_name;                }  ///< Get name.
-   inline const std::string & getWDir()         const { return m_wdir;                }  ///< Get working directory.
+   inline const std::string & getWDir()         const { return m_working_directory;                }  ///< Get working directory.
    inline const std::string & getCmd()          const { return m_command;             }  ///< Get command.
    inline bool                hasTasksName()    const { return m_tasks_name.size();    }  ///< Whether block has tasks name.
    inline const std::string & getTasksName()    const { return m_tasks_name;           }  ///< Get tasks name.
@@ -295,7 +295,7 @@ protected:
 	std::string m_parser;      ///< Tasks parser type.
 	int32_t m_parser_coeff; ///< Parser koefficient.
 
-	std::string m_wdir;        ///< Block tasks working directory.
+	std::string m_working_directory;        ///< Block tasks working directory.
 	std::string m_environment; ///< Block tasks extra environment.
 
 	std::string m_cmd_pre;   ///< Pre command.
