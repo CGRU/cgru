@@ -27,6 +27,9 @@ public:
 /// Construct job from message data with provided message type.
    JobAf( af::Msg * msg);
 
+/// Construct job from JSON.
+	JobAf(  JSON & i_object);
+
 /// Construct empty Job for database.
    JobAf( int Id);
 

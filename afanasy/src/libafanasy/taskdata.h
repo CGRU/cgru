@@ -18,7 +18,7 @@ public:
 	virtual ~TaskData();
 
 	int calcWeight() const;                         ///< Calculate and return memory size.
-	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+    void generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
 	inline const std::string & getName()        const { return m_name;        }
 	inline const std::string & getCommand()     const { return m_command;     }
@@ -36,7 +36,7 @@ public:
 
 	bool checkDependMask( const std::string & str);
 
-	void jsonWrite( std::ostringstream & stream);
+    void jsonWrite( std::ostringstream & o_str);
 
 protected:
 	std::string m_name;        ///< Task name.

@@ -37,12 +37,13 @@ JobAf::JobAf( af::Msg * msg):
     initializeValues();
     read( msg);
     progress = new afsql::DBJobProgress( this);
-    if( progress == NULL)
-    {
-        AFERROR("DBJob::DBJob: can't allocate memory for progresses.")
-        return;
-    }
     construct();
+}
+
+JobAf::JobAf( JSON & i_object):
+	m_fromdatabase( false)
+{
+	initializeValues();
 }
 
 JobAf::JobAf( int Id):
@@ -73,6 +74,10 @@ bool JobAf::dbSelect( PGconn * i_conn, const std::string * i_where)
 bool JobAf::construct()
 {
 AFINFA("JobAf::construct: \"%s\":", m_name.c_str())
+
+	if( false == isValid())
+		return false;
+
     if( m_constructed )
     {
         AFERROR("JobAf::construct: Already constructed.")

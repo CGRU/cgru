@@ -31,12 +31,12 @@ TaskData::TaskData( JSON & i_value)
 	//jr_string("custom_data", m_custom_data, i_value);
 }
 
-void TaskData::jsonWrite( std::ostringstream & stream)
+void TaskData::jsonWrite( std::ostringstream & o_str)
 {
-	stream << "{\"name\":\""      <<                m_name      << "\"";
-	stream << ",\"command\":\""   << af::strEscape( m_command ) << "\"";
+    o_str << "{\"name\":\""      <<                m_name      << "\"";
+    o_str << ",\"command\":\""   << af::strEscape( m_command ) << "\"";
 	if( m_files.size())
-		stream << ",\"files\":\"" << af::strEscape( m_files   ) << "\"}";
+        o_str << ",\"files\":\"" << af::strEscape( m_files   ) << "\"}";
 }
 
 void TaskData::readwrite( Msg * msg)
@@ -65,24 +65,24 @@ int TaskData::calcWeight() const
    return weight;
 }
 
-void TaskData::generateInfoStream( std::ostringstream & stream, bool full) const
+void TaskData::generateInfoStream( std::ostringstream & o_str, bool full) const
 {
    if( full)
    {
-      stream << "    Task '" << m_name << "':";
-      stream << "\n        Command = '" << m_command << "'";
-      stream << "\n        Files = '%s'" << m_files << "'";
-	  if( m_depend_mask.size()) stream << "\n        Dependences = '" << m_depend_mask << "'";
-	  if( m_custom_data.size()) stream << "\n        Custom Data = '" << m_custom_data << "'";
-      //stream << "Memory: " << calcWeight() << " bytes\n";
+      o_str << "    Task '" << m_name << "':";
+      o_str << "\n        Command = '" << m_command << "'";
+      o_str << "\n        Files = '%s'" << m_files << "'";
+      if( m_depend_mask.size()) o_str << "\n        Dependences = '" << m_depend_mask << "'";
+      if( m_custom_data.size()) o_str << "\n        Custom Data = '" << m_custom_data << "'";
+      //o_str << "Memory: " << calcWeight() << " bytes\n";
    }
    else
    {
-      stream << "N'" << m_name << "' C'" << m_command << "'";
-      if( m_files.size()     ) stream << " F'" << m_files << "'";
-	  if( m_depend_mask.size()) stream << " D'" << m_depend_mask << "'";
-	  if( m_custom_data.size()) stream << " cd'" << m_custom_data << "'";
-      stream << " " << calcWeight() << " bytes";
-      stream << std::endl;
+      o_str << "N'" << m_name << "' C'" << m_command << "'";
+      if( m_files.size()     ) o_str << " F'" << m_files << "'";
+      if( m_depend_mask.size()) o_str << " D'" << m_depend_mask << "'";
+      if( m_custom_data.size()) o_str << " cd'" << m_custom_data << "'";
+      o_str << " " << calcWeight() << " bytes";
+      o_str << std::endl;
    }
 }

@@ -30,7 +30,7 @@ public:
 	inline bool isValid()   const { return          m_valid; }
 	inline bool isInvalid() const { return false == m_valid; }
 
-	void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+    void generateInfoStream( std::ostringstream & o_str, bool full = false) const; /// Generate information.
 
 	//inline unsigned getFlags() const { return flags;}
 	inline unsigned getState() const { return m_state;}
@@ -104,7 +104,7 @@ public:
 
 	virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
-	void jsonWrite( std::ostringstream & stream, int type = Msg::TJob);
+    void jsonWrite( std::ostringstream & o_str, int type = Msg::TJob);
 
 	void stdOutJobBlocksTasks() const;
 
@@ -169,8 +169,8 @@ private:
 	virtual BlockData * newBlockData( Msg * msg);
 	virtual BlockData * newBlockData( JSON & i_object, int i_num);
 
-	void generateInfoStreamJob(    std::ostringstream & stream, bool full = false) const; /// Generate information.
-	void generateInfoStreamBlocks( std::ostringstream & stream, bool full = false) const;
+    void generateInfoStreamJob(    std::ostringstream & o_str, bool full = false) const; /// Generate information.
+    void generateInfoStreamBlocks( std::ostringstream & o_str, bool full = false) const;
 
 private:
 	bool m_valid;

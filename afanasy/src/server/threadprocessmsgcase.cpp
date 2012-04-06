@@ -24,6 +24,8 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg);
+
 af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
     //i_msg->stdOut();
@@ -62,9 +64,13 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
     case af::Msg::TDATA:
     case af::Msg::TTESTDATA:
     case af::Msg::TStringList:
+	{
+		i_msg->stdOutData();
+		break;
+	}
 	case af::Msg::TJSON:
     {
-        i_msg->stdOutData();
+		o_msg_response = threadProcessJSON( i_args, i_msg);
         break;
     }
     case af::Msg::TString:

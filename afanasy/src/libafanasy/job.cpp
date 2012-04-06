@@ -18,7 +18,7 @@ Job::Job( int Id)
 	m_id = Id;
 	m_time_creation = time(NULL);
 	m_valid = true;
-};
+}
 
 Job::Job( Msg * msg)
 {
@@ -97,71 +97,71 @@ Job::Job( JSON & i_object)
 	m_valid = true;
 }
 
-void Job::jsonWrite( std::ostringstream & stream, int type)
+void Job::jsonWrite( std::ostringstream & o_str, int type)
 {
-	stream << "\"job\"";
-	stream << ":{";
-	Node::jsonWrite( stream);
+	o_str << "\"job\"";
+	o_str << ":{";
+	Node::jsonWrite( o_str);
 
-	stream << ",\"user_name\":\"" << m_user_name << "\"";
-	stream << ",\"host_name\":\"" << m_host_name << "\"";
+	o_str << ",\"user_name\":\"" << m_user_name << "\"";
+	o_str << ",\"host_name\":\"" << m_host_name << "\"";
 
 	if( m_cmd_pre.size())
-		stream << ",\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\"";
+		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\"";
 	if( m_cmd_post.size())
-		stream << ",\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\"";
+		o_str << ",\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\"";
 	if( m_annotation.size())
-		stream << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
+		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
 	if( m_description.size())
-		stream << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
+		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 
 	if( m_flags != 0 )
-		stream << ",\"flags\":"                      << m_flags;
+		o_str << ",\"flags\":"                      << m_flags;
 	if( m_state != 0 )
-		stream << ",\"state\":"                      << m_state;
+		o_str << ",\"state\":"                      << m_state;
 	if( m_user_list_order != -1 )
-		stream << ",\"user_list_order\":"            << m_user_list_order;
-	stream << ",\"time_creation\":"                  << m_time_creation;
+		o_str << ",\"user_list_order\":"            << m_user_list_order;
+	o_str << ",\"time_creation\":"                  << m_time_creation;
 	if( m_max_running_tasks != -1 )
-		stream << ",\"max_running_tasks\":"          << m_max_running_tasks;
+		o_str << ",\"max_running_tasks\":"          << m_max_running_tasks;
 	if( m_max_running_tasks_per_host != -1 )
-		stream << ",\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
+		o_str << ",\"max_running_tasks_per_host\":" << m_max_running_tasks_per_host;
 	if( m_time_wait != 0 )
-		stream << ",\"time_wait\":"                  << m_time_wait;
+		o_str << ",\"time_wait\":"                  << m_time_wait;
 	if( m_time_started != 0 )
-		stream << ",\"time_started\":"               << m_time_started;
+		o_str << ",\"time_started\":"               << m_time_started;
 	if( m_time_done != 0 )
-		stream << ",\"time_done\":"                  << m_time_done;
+		o_str << ",\"time_done\":"                  << m_time_done;
 	if( m_time_life != -1 )
-		stream << ",\"time_life\":"                  << m_time_life;
+		o_str << ",\"time_life\":"                  << m_time_life;
 
 	if( hasHostsMask())
-		stream << ",\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
+		o_str << ",\"hosts_mask\":\""         << af::strEscape( m_hosts_mask.getPattern()         ) << "\"";
 	if( hasHostsMaskExclude())
-		stream << ",\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
+		o_str << ",\"hosts_mask_exclude\":\"" << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
 	if( hasDependMask())
-		stream << ",\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
+		o_str << ",\"depend_mask\":\""        << af::strEscape( m_depend_mask.getPattern()        ) << "\"";
 	if( hasDependMaskGlobal())
-		stream << ",\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\"";
+		o_str << ",\"depend_mask_global\":\"" << af::strEscape( m_depend_mask_global.getPattern() ) << "\"";
 	if( hasNeedOS())
-		stream << ",\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
+		o_str << ",\"need_os\":\""            << af::strEscape( m_need_os.getPattern()            ) << "\"";
 	if( hasNeedProperties())
-		stream << ",\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
+		o_str << ",\"need_properties\":\""    << af::strEscape( m_need_properties.getPattern()    ) << "\"";
 
 	if( m_blocksdata == NULL )
 	{
-		stream << "}";
+		o_str << "}";
 		return;
 	}	
 
-	stream << ",\"blocks\":[";
+	o_str << ",\"blocks\":[";
 	for( int b = 0; b < m_blocksnum; b++ )
 	{
 		if( b != 0 )
-			stream << ',';
-		m_blocksdata[b]->jsonWrite( stream, type);
+			o_str << ',';
+		m_blocksdata[b]->jsonWrite( o_str, type);
 	}
-	stream << "]}";
+	o_str << "]}";
 }
 
 void Job::initDefaultValues()
@@ -295,49 +295,49 @@ int Job::calcWeight() const
 
 void Job::stdOutJobBlocksTasks() const
 {
-	std::ostringstream stream;
-	generateInfoStreamJob( stream, true);
-	stream << std::endl;
-	generateInfoStreamBlocks( stream, true);
-	std::cout << stream.str() << std::endl;
+	std::ostringstream o_str;
+	generateInfoStreamJob( o_str, true);
+	o_str << std::endl;
+	generateInfoStreamBlocks( o_str, true);
+	std::cout << o_str.str() << std::endl;
 }
 
-void Job::generateInfoStreamBlocks( std::ostringstream & stream, bool full) const
+void Job::generateInfoStreamBlocks( std::ostringstream & o_str, bool full) const
 {
 	if( m_blocksdata == NULL )
 		return;
 
 	for( int b = 0; b < m_blocksnum; b++)
 	{
-		stream << std::endl << std::endl;
-		m_blocksdata[b]->generateInfoStream( stream, full);
-		stream << std::endl << std::endl;
-		m_blocksdata[b]->generateInfoStreamTasks( stream, full);
-		stream << std::endl << std::endl;
-		m_blocksdata[b]->generateProgressStream( stream);
+		o_str << std::endl << std::endl;
+		m_blocksdata[b]->generateInfoStream( o_str, full);
+		o_str << std::endl << std::endl;
+		m_blocksdata[b]->generateInfoStreamTasks( o_str, full);
+		o_str << std::endl << std::endl;
+		m_blocksdata[b]->generateProgressStream( o_str);
 	}
 }
 
-void Job::generateInfoStreamJob(    std::ostringstream & stream, bool full) const
+void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
 {
-   if( full ) stream << "Job name = ";
+   if( full ) o_str << "Job name = ";
 
-   stream << "\"" << m_name << "\"";
-   stream << "[" << m_id << "]: ";
-   stream << m_user_name;
-   if( m_host_name.size()) stream << "@" << m_host_name;
-   stream << "[" << m_user_list_order << "]";
-	if( isHidden()) stream << " (hidden)";
+   o_str << "\"" << m_name << "\"";
+   o_str << "[" << m_id << "]: ";
+   o_str << m_user_name;
+   if( m_host_name.size()) o_str << "@" << m_host_name;
+   o_str << "[" << m_user_list_order << "]";
+	if( isHidden()) o_str << " (hidden)";
 
 	bool display_blocks = true;
 	if( m_blocksnum == 0)
 	{
-		stream << "\n\t ERROR: HAS NO BLOCKS !";
+		o_str << "\n\t ERROR: HAS NO BLOCKS !";
 		display_blocks = false;
 	}
 	else if( m_blocksdata == NULL)
 	{
-		stream << "\n\t ERROR: HAS NULL BLOCKS DATA !";
+		o_str << "\n\t ERROR: HAS NULL BLOCKS DATA !";
 		display_blocks = false;
 	}
 	else if( m_blocksdata != NULL)
@@ -345,50 +345,50 @@ void Job::generateInfoStreamJob(    std::ostringstream & stream, bool full) cons
 		for( int b = 0; b < m_blocksnum; b++)
 		{
 			if( m_blocksdata[b] != NULL) continue;
-			stream << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
+			o_str << "\n\t ERROR: BLOCK[" << b << "] HAS NULL DATA !";
 			display_blocks = false;
 		}
 	}
 
    if((full == false) && display_blocks)
    {
-      stream << " - " << calcWeight() << " bytes.";
+	  o_str << " - " << calcWeight() << " bytes.";
       return;
    }
 
-   if( m_annotation.size()) stream << "\n    " << m_annotation;
-   if( m_description.size()) stream << "\n    " << m_description;
+   if( m_annotation.size()) o_str << "\n    " << m_annotation;
+   if( m_description.size()) o_str << "\n    " << m_description;
 
-   stream << "\n Time created  = " << af::time2str( m_time_creation);
+   o_str << "\n Time created  = " << af::time2str( m_time_creation);
 
    if( isStarted())
-	  stream << "\n Time started  = " << af::time2str( m_time_started);
+	  o_str << "\n Time started  = " << af::time2str( m_time_started);
    if( isDone())
-	  stream << "\n Time finished = " << af::time2str( m_time_done);
+	  o_str << "\n Time finished = " << af::time2str( m_time_done);
 
-   if( m_time_life > 0 ) stream << "\n Life Time " << m_time_life << " seconds";
+   if( m_time_life > 0 ) o_str << "\n Life Time " << m_time_life << " seconds";
 
-   if( m_host_name.size()) stream << "\n Creation host = \"" << m_host_name << "\"";
-   stream << "\n Priority = " << int(m_priority);
-   stream << "\n Maximum running tasks = " << m_max_running_tasks;
-   if( m_max_running_tasks == -1 ) stream << " (no limit)";
-   stream << "\n Maximum running tasks per host = " << m_max_running_tasks_per_host;
-   if( m_max_running_tasks_per_host == -1 ) stream << " (no limit)";
-   stream << "\n Hosts mask: \"" << m_hosts_mask.getPattern() << "\"";
-   if( m_hosts_mask.empty()) stream << " (any host)";
-   if( m_hosts_mask_exclude.notEmpty()) stream << "\n Exclude hosts mask: \"" << m_hosts_mask_exclude.getPattern() << "\"";
-   if( m_depend_mask.notEmpty()) stream << "\n Depend mask = \"" << m_depend_mask.getPattern() << "\"";
-   if( m_depend_mask_global.notEmpty()) stream << "\n Global depend mask = \"" << m_depend_mask_global.getPattern() << "\"";
-   if( m_time_wait ) stream << "\n Wait time = " << af::time2str( m_time_wait);
-   if( m_need_os.notEmpty()) stream << "\n Needed OS: \"" << m_need_os.getPattern() << "\"";
-   if( m_need_properties.notEmpty()) stream << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
-   if( m_cmd_pre.size()) stream << "\n Pre command:\n" << m_cmd_pre;
-   if( m_cmd_post.size()) stream << "\n Post command:\n" << m_cmd_post;
+   if( m_host_name.size()) o_str << "\n Creation host = \"" << m_host_name << "\"";
+   o_str << "\n Priority = " << int(m_priority);
+   o_str << "\n Maximum running tasks = " << m_max_running_tasks;
+   if( m_max_running_tasks == -1 ) o_str << " (no limit)";
+   o_str << "\n Maximum running tasks per host = " << m_max_running_tasks_per_host;
+   if( m_max_running_tasks_per_host == -1 ) o_str << " (no limit)";
+   o_str << "\n Hosts mask: \"" << m_hosts_mask.getPattern() << "\"";
+   if( m_hosts_mask.empty()) o_str << " (any host)";
+   if( m_hosts_mask_exclude.notEmpty()) o_str << "\n Exclude hosts mask: \"" << m_hosts_mask_exclude.getPattern() << "\"";
+   if( m_depend_mask.notEmpty()) o_str << "\n Depend mask = \"" << m_depend_mask.getPattern() << "\"";
+   if( m_depend_mask_global.notEmpty()) o_str << "\n Global depend mask = \"" << m_depend_mask_global.getPattern() << "\"";
+   if( m_time_wait ) o_str << "\n Wait time = " << af::time2str( m_time_wait);
+   if( m_need_os.notEmpty()) o_str << "\n Needed OS: \"" << m_need_os.getPattern() << "\"";
+   if( m_need_properties.notEmpty()) o_str << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
+   if( m_cmd_pre.size()) o_str << "\n Pre command:\n" << m_cmd_pre;
+   if( m_cmd_post.size()) o_str << "\n Post command:\n" << m_cmd_post;
 }
  
-void Job::generateInfoStream( std::ostringstream & stream, bool full) const
+void Job::generateInfoStream( std::ostringstream & o_str, bool full) const
 {
-	generateInfoStreamJob( stream, full);
+	generateInfoStreamJob( o_str, full);
 
 	if( full == false ) return;
 
@@ -396,8 +396,8 @@ void Job::generateInfoStream( std::ostringstream & stream, bool full) const
 	{
 		for( int b = 0; b < m_blocksnum; b++)
 		{
-			stream << std::endl << std::endl;
-			m_blocksdata[b]->generateInfoStream( stream, false);
+			o_str << std::endl << std::endl;
+			m_blocksdata[b]->generateInfoStream( o_str, false);
 		}
 	}
 }

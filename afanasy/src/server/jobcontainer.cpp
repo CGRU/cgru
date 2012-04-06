@@ -66,16 +66,25 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
         return 0;
     }
 
-    if( job->isConstructed() == false )
-    {
-        AFERROR("JobContainer::job_register: Job is not constructed.")
-        return 0;
-    }
+	if( job->isValid() == false )
+	{
+		AFERROR("JobContainer::job_register: Job is invalid.")
+		delete job;
+		return 0;
+	}
 
-    if( users == NULL )
+	if( job->isConstructed() == false )
+	{
+		AFERROR("JobContainer::job_register: Job is not constructed.")
+		delete job;
+		return 0;
+	}
+
+	if( users == NULL )
     {
         AFERROR("JobContainer::job_register: Users container is not set.")
-        return 0;
+		delete job;
+		return 0;
     }
 
     // Check database connection if it is working and if it is a new job:

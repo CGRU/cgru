@@ -46,9 +46,9 @@ public:
    inline  void setJobId( int value) { m_job_id = value;}   ///< Set id of block job.
    inline  int  getJobId() const { return m_job_id;}        ///< Get id of block job.
 
-	virtual void generateInfoStream( std::ostringstream & stream, bool full = false) const;
-	virtual void generateInfoStreamTasks( std::ostringstream & stream, bool full = false) const;
-	void generateInfoStreamTyped( std::ostringstream & stream, int type, bool full = false) const;
+    virtual void generateInfoStream( std::ostringstream & o_str, bool full = false) const;
+    virtual void generateInfoStreamTasks( std::ostringstream & o_str, bool full = false) const;
+    void generateInfoStreamTyped( std::ostringstream & o_str, int type, bool full = false) const;
 	const std::string generateInfoStringTyped( int type, bool full = false) const;
 
    virtual int  calcWeight() const;                      ///< Calculate and return memory size.
@@ -248,10 +248,10 @@ public:
    inline void setProgressAvoidHostsNum( int value ) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);
 
-	void jsonWrite( std::ostringstream & stream, int type = Msg::TBlocks);
+    void jsonWrite( std::ostringstream & o_str, int i_type = Msg::TBlocks);
 
 /// Generate progress bits info string.
-   void generateProgressStream( std::ostringstream & stream) const;
+   void generateProgressStream( std::ostringstream & o_str) const;
    const std::string generateProgressString() const;
    void stdOutProgress() const;
 
