@@ -13,9 +13,10 @@
 
 CmdJSON::CmdJSON()
 {
-   setCmd("json");
-   setInfo("JSON file.");
-   setHelp("json [file] JSON file.");
+	setCmd("json");
+	setInfo("JSON file or stdin.");
+	setHelp("json [send] [file] JSON file, send or not.");
+	setMsgType( af::Msg::TJSON);
 }
 
 CmdJSON::~CmdJSON(){}
@@ -55,6 +56,13 @@ void outJSON( rapidjson::Value & i_value, int i_depth = 0)
 bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 {
 	char * data = NULL;
+	bool send = false;
+
+	if( argc > 1 )
+	{
+		if( strcmp( argv[0], "send") == 0 )
+			send = true;
+	}
 
 	if( argc > 0 )
 	{
@@ -115,7 +123,10 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		return true;
 	}
 	
-	printf("{\n");
+	std::ostringstream stream;
+	stream << "{\n";
+
+	bool valid = false;
 
 	if( document.HasMember("job"))
 	{
@@ -125,14 +136,21 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 			job.stdOutJobBlocksTasks();
 			printf("\n");
 		}
-		std::ostringstream stream;
+		if( valid )
+			stream << ",\n";
 		job.jsonWrite( stream);
-		printf("%s\n", stream.str().c_str());
+		if( job.isValid())
+			valid = true;
 	}
 
-	printf("}\n");
+	stream << "}";
 
 	delete [] data;
+
+	printf("%s\n", stream.str().c_str());
+
+	if( send && valid )
+		msg.setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
 
 	return true;
 }

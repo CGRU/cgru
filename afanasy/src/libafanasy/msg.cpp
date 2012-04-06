@@ -175,24 +175,24 @@ bool Msg::set( int msgType, int msgInt, bool i_receiving)
     return true;
 }
 
-bool Msg::setData( int size, const char * msgData)
+bool Msg::setData( int i_size, const char * i_msgData, int i_type)
 {
    if(checkZero( true) == false ) return false;
 
-   m_type = Msg::TDATA;
+   m_type = i_type;
 
-   if(( size    <= 0                ) ||
-      ( size    >  Msg::SizeDataMax ) ||
-      ( msgData == NULL             ) )
+   if(( i_size    <= 0                ) ||
+      ( i_size    >  Msg::SizeDataMax ) ||
+      ( i_msgData == NULL             ) )
    {
       AFERROR("Msg::setData(): invalid arguments.")
       setInvalid();
       return false;
    }
    m_writing = true;
-   w_data( msgData, this, size);
+   w_data( i_msgData, this, i_size);
 
-   m_int32 = size;
+   m_int32 = i_size;
    rw_header( true);
    return true;
 }
@@ -385,6 +385,7 @@ void Msg::stdOutData( bool withHeader)
    switch( m_type)
    {
    case Msg::TDATA:
+   case Msg::TJSON:
    {
       if( m_data[0] != '/') printf( "%s\n", m_data);
       break;
@@ -700,7 +701,7 @@ const char * Msg::TNAMES[]=
     "TRESERVED13",
     "TRESERVED14",
     "TRESERVED15",
-    "TRESERVED16",
+	"TJSON",                      ///< JSON
 	"TBlockNonSequential",        ///< Set block task solving to non-sequential.
 	"TRenderHideShow",            ///< Hide or show renders.
 	"TJobHideShow",               ///< Hide or show jobs.

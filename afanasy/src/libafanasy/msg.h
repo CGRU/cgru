@@ -40,7 +40,7 @@ public:
     bool set( int msgType, Af * afClass, bool i_receiving = false);
 
     /// To set zero (\c Msg::TNone ) message to data message. Return \c true on success.
-    bool setData( int size, const char * msgData);
+    bool setData( int i_size, const char * i_msgData, int i_type = TDATA);
 
     /// To set zero (\c Msg::TNone ) message to QString message. Return \c true on success.
     bool setString( const std::string & qstring);
@@ -344,7 +344,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRESERVED13/**/,
 /**/TRESERVED14/**/,
 /**/TRESERVED15/**/,
-/**/TRESERVED16/**/,
+/**/TJSON/**/,                      ///< JSON
 /**/TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
 /**/TRenderHideShow/**/,			///< Hide or show renders.
 /**/TJobHideShow/**/,				///< Hide or show jobs.
