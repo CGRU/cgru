@@ -1,0 +1,9 @@
+{
+	"get":
+	{
+		"type" : "jobs",
+		"mask" : "afanasy|_empty_.*",
+		"ids"  : [1,2],
+		"uids" : [1,2]
+	}
+}

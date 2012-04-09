@@ -19,6 +19,7 @@ DBJob::DBJob( int Id):
    af::Job( Id),
    progress( NULL)
 {
+AFINFA("DBJob::DBJob: id=%d", Id)
    addDBAttributes();
 }
 
@@ -56,18 +57,23 @@ void DBJob::addDBAttributes()
 
 DBJob::~DBJob()
 {
-   if( progress != NULL ) delete progress;
+	if( progress != NULL ) delete progress;
 }
 
 af::BlockData * DBJob::newBlockData( af::Msg * msg)
 {
 //printf("DBJob::createBlock:\n");
-   return new DBBlockData( msg);
+	return new DBBlockData( msg);
+}
+
+af::BlockData * DBJob::newBlockData( JSON & i_object, int i_num)
+{
+	return new DBBlockData( i_object, i_num);
 }
 
 const std::string DBJob::dbGetIDsCmd()
 {
-   return std::string("SELECT id FROM ") + TableName + " ORDER BY userlistorder";
+	return std::string("SELECT id FROM ") + TableName + " ORDER BY userlistorder";
 }
 
 bool DBJob::dbAdd( PGconn * i_conn) const

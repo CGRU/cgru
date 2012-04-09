@@ -26,7 +26,7 @@ public:
    inline bool solve( af::Node::SolvingMethod i_method, RenderAf * i_render, MonitorContainer * i_monitoring)
                 { return af::Node::solveList( nodes_list, i_method, i_render, i_monitoring);}
 
-   void moveNodes( const std::vector<int32_t> * list, int type);
+   void moveNodes( const std::vector<int32_t> & i_list, int i_type);
 
    enum MoveType{
       MoveUp,

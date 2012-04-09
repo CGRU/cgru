@@ -30,6 +30,11 @@ Job::Job( JSON & i_object)
 {
 	initDefaultValues();
 	m_time_creation = time(NULL);
+	jsonRead( i_object);
+}
+
+void Job::jsonRead( JSON & i_object)
+{
 
 	if( false == i_object.IsObject())
 	{
@@ -101,7 +106,7 @@ void Job::jsonWrite( std::ostringstream & o_str, int type)
 {
 	o_str << "\"job\"";
 	o_str << ":{";
-	Node::jsonWrite( o_str);
+	Node::jsonWrite( o_str, type);
 
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\"host_name\":\"" << m_host_name << "\"";

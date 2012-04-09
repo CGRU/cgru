@@ -17,6 +17,7 @@ CmdJSON::CmdJSON()
 	setInfo("JSON file or stdin.");
 	setHelp("json [send] [file] JSON file, send or not.");
 	setMsgType( af::Msg::TJSON);
+	setRecieving();
 }
 
 CmdJSON::~CmdJSON(){}
@@ -57,6 +58,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 {
 	char * data = NULL;
 	bool send = false;
+	int datalen;
 
 	if( argc > 1 )
 	{
@@ -77,7 +79,6 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		if( Verbose )
 			printf("Trying to open:\n%s", filename.c_str());
 
-		int datalen;
 		data = af::fileRead( filename, datalen);
 
 		if( data == NULL )
@@ -88,7 +89,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 	}
 	else
 	{
-		int datalen = 1 << 20;
+		datalen = 1 << 20;
 		data = new char[ datalen];
 		int readed = 0;
 		for(;;)
@@ -98,8 +99,12 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 				break;
 			readed += bytes;
 		}
-		data[readed] = '\0';
+		datalen = readed;
+		data[datalen] = '\0';
 	}
+
+	char * data_copy = new char[datalen];
+	memcpy( data_copy, data, datalen);
 
 	rapidjson::Document document;
 	if (document.ParseInsitu<0>(data).HasParseError())
@@ -126,7 +131,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 	std::ostringstream stream;
 	stream << "{\n";
 
-	bool valid = false;
+	bool send_stream = false;
 
 	if( document.HasMember("job"))
 	{
@@ -136,21 +141,35 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 			job.stdOutJobBlocksTasks();
 			printf("\n");
 		}
-		if( valid )
+		if( send_stream )
 			stream << ",\n";
-		job.jsonWrite( stream);
+		job.jsonWrite( stream, af::Msg::TJob);
 		if( job.isValid())
-			valid = true;
+		{
+			send_stream = true;
+			setRecieving( false);
+		}
+		else
+		{
+			send_stream = false;
+		}
 	}
 
 	stream << "}";
 
+	if( send_stream )
+		printf("%s\n", stream.str().c_str());
+
+	if( send )
+	{
+		if( send_stream )
+			msg.setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
+		else
+			msg.setData( datalen, data_copy, af::Msg::TJSON);
+	}
+
 	delete [] data;
-
-	printf("%s\n", stream.str().c_str());
-
-	if( send && valid )
-		msg.setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
+	delete [] data_copy;
 
 	return true;
 }

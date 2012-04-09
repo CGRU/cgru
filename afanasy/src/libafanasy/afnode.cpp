@@ -71,7 +71,7 @@ void Node::jsonRead( JSON & i_object)
 	else if( priority != -1 ) m_priority = priority;
 }
 
-void Node::jsonWrite( std::ostringstream & o_str)
+void Node::jsonWrite( std::ostringstream & o_str, int type)
 {
     o_str << "\"name\":\""    << af::strEscape(m_name) << "\"";
 	if( m_id > 0 )

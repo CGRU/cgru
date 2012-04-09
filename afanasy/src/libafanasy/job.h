@@ -104,7 +104,8 @@ public:
 
 	virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
-    void jsonWrite( std::ostringstream & o_str, int type = Msg::TJob);
+	void jsonRead( JSON & i_object);
+    void jsonWrite( std::ostringstream & o_str, int type);
 
 	void stdOutJobBlocksTasks() const;
 

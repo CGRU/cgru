@@ -88,6 +88,7 @@ void AfCmd::msgOutput( af::Msg &msg)
       switch( msg.type())
       {
          case af::Msg::TDATA:
+         case af::Msg::TJSON:
          case af::Msg::TString:
          case af::Msg::TStringList:
             msg.stdOutData( false);

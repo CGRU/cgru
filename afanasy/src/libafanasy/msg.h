@@ -354,10 +354,11 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 
     static const char * TNAMES[]; ///< Type names.
 
-    inline int   type()  const { return m_type;  }///< Get message type.
-    inline char* data()  const { return m_data;  }///< Get data pointer.
-    inline int   int32() const { return m_int32; }///< Get 32-bit integer, data lenght for data messages.
-    inline int   sid()   const { return m_sid;   }///< Get sender id.
+    inline int   type()    const { return m_type;  }///< Get message type.
+    inline char* data()    const { return m_data;  }///< Get data pointer.
+    inline int   dataLen() const { return m_int32; }///< Get data length.
+    inline int   int32()   const { return m_int32; }///< Get 32-bit integer, data lenght for data messages.
+    inline int   sid()     const { return m_sid;   }///< Get sender id.
 
 	inline void setSid( uint32_t i_sid) { m_sid = i_sid; rw_header( true);}
 

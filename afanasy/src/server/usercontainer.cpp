@@ -162,20 +162,44 @@ af::Msg* UserContainer::generateJobsList( int id)
    return new af::Msg( af::Msg::TJobsList, &mcjobs);
 }
 
-af::Msg* UserContainer::generateJobsList( const af::MCGeneral & ids)
+af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids, bool json)
 {
-   UserContainerIt usersIt( this);
-   MCAfNodes mcjobs;
+	UserContainerIt usersIt( this);
+	MCAfNodes mcjobs;
+	std::ostringstream str;
+	bool has_jobs = false;
 
-   int count = ids.getCount();
-   for( int i = 0; i < count; i++)
-   {
-      UserAf* user = usersIt.getUser( ids.getId(i));
-      if( user == NULL) continue;
-      user->jobsinfo( mcjobs);
-   }
+	if( json )
+	{
+		str << "{\n";
+	}
 
-   return new af::Msg( af::Msg::TJobsList, &mcjobs);
+	for( int i = 0; i < ids.size(); i++)
+	{
+		UserAf* user = usersIt.getUser( ids[i]);
+		if( user == NULL) continue;
+		if( json )
+		{
+			if(( i != 0 ) && ( has_jobs ))
+				str << ",\n";
+			has_jobs = user->getJobs( str);
+		}
+		else
+			user->jobsinfo( mcjobs);
+	}
+
+	af::Msg * msg = new af::Msg();
+
+	if( json )
+	{
+		str << "\n}";
+		std::string string = str.str();
+		msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
+	}
+	else
+		msg->set( af::Msg::TJobsList, &mcjobs);
+
+	return msg;
 }
 
 //############################################################################

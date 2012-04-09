@@ -36,6 +36,8 @@ public:
     bool solve( RenderAf * i_render, MonitorContainer * i_monitoring); ///< Generate task for \c render host, return \c true if task generated.
 
     void jobsinfo( af::MCAfNodes &mcjobs); ///< Generate all uses jobs information.
+    
+	bool getJobs( std::ostringstream & o_str);
 
     void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);///< Refresh user attributes corresponding on jobs information.
 

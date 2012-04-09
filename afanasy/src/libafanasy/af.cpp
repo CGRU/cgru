@@ -499,3 +499,13 @@ void Af::jr_int64( const char * i_name, int64_t    & o_attr, JSON & i_object)
 	if( value.IsInt64()) o_attr = value.GetInt64();
 }
 
+void Af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, JSON & i_object)
+{
+	JSON & array = i_object[i_name];
+	if( false == array.IsArray())
+		return;
+
+	for( int i = 0; i < array.Size(); i++)
+		if( array[i].IsInt())
+			o_attr.push_back( array[i].GetInt());
+}

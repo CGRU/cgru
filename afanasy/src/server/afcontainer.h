@@ -19,11 +19,23 @@ public:
 
    inline bool isInitialized() {  return initialized;}///< Whether container was successfully initialized.
 
-/// Generate MCAfNodes message with all stored Nodes.
-   af::Msg* generateList( int type);
+	/// Generate nodes message matching provided ids or mask:
+	af::Msg * generateList( int i_type, const std::vector<int32_t> & i_ids, const std::string & i_mask, bool i_json);
 
-/// Generate MCAfNodes message with Nodes with provided ids.
-   af::Msg* generateList( int type, const af::MCGeneral & mcgeneral);
+	/// Generate MCAfNodes message with Nodes with provided ids or mask:
+	af::Msg * generateList( int i_type, const af::MCGeneral & i_mcgeneral);
+
+	/// Generate all nodes:
+	af::Msg * generateList( int i_type);
+
+	/// Generate all nodes:
+	void generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, bool i_json);
+
+	/// Generate nodes matching ids:
+	void generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::vector<int32_t> & ids, bool json);
+
+	/// Generate nodes matching mask:
+	void generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::string & i_mask, bool i_json);
 
    bool setZombie( int id);
 

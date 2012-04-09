@@ -320,9 +320,9 @@ void ListNodes::processHidden( ItemNode * i_node, int i_row)
 	view->setRowHidden( i_row, i_node->getHidden( ms_flagsHideShow));
 }
 
-void ListNodes::sortMatch( const std::vector<int32_t> * list)
+void ListNodes::sortMatch( const std::vector<int32_t> & i_list)
 {
    QList<Item*> selectedItems( getSelectedItems());
-   ((ModelNodes*)model)->sortMatch( list);
+   ((ModelNodes*)model)->sortMatch( i_list);
    setSelectedItems( selectedItems);
 }

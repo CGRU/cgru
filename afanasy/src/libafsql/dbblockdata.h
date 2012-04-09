@@ -11,6 +11,7 @@ class DBBlockData: public DBItem, public af::BlockData
 public:
    DBBlockData();
    DBBlockData( af::Msg * msg);
+   DBBlockData( JSON & i_object, int i_num);
    DBBlockData( int BlockNum, int JobId);
    virtual ~DBBlockData();
 

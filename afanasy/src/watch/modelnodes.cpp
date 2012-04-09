@@ -160,11 +160,11 @@ void ModelNodes::sortnodes( bool ascending)
    delete [] array;
 }
 
-void ModelNodes::sortMatch( const std::vector<int32_t> * list)
+void ModelNodes::sortMatch( const std::vector<int32_t> & i_list)
 {
    int numitems = items.size();
    if( numitems < 2 ) return;
-   int listlen = int( list->size());
+   int listlen = int( i_list.size());
    if( listlen < 2 ) return;
 
    Item ** array = new Item*[numitems];
@@ -178,7 +178,7 @@ void ModelNodes::sortMatch( const std::vector<int32_t> * list)
       for( int i = 0; i < numitems; i++)
       {
          if( array[i] == NULL ) continue;
-         if( array[i]->getId() == (*list)[l])
+         if( array[i]->getId() == i_list[l])
          {
             items[j] = array[i];
             array[i] = NULL;

@@ -41,9 +41,13 @@ JobAf::JobAf( af::Msg * msg):
 }
 
 JobAf::JobAf( JSON & i_object):
+    afsql::DBJob(),
 	m_fromdatabase( false)
 {
 	initializeValues();
+    jsonRead( i_object);
+    progress = new afsql::DBJobProgress( this);
+    construct();
 }
 
 JobAf::JobAf( int Id):

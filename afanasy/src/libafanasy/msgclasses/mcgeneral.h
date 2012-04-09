@@ -38,7 +38,7 @@ public:
 
    inline int getNumber() const { return number; }
 
-   inline const std::vector<int32_t> * getList() const { return &list; }
+   inline const std::vector<int32_t> & getList() const { return list; }
 
    inline void clearIds() { list.clear(); }
 

@@ -176,62 +176,136 @@ void AfContainer::refresh( AfContainer * pointer, MonitorContainer * monitoring)
    }
 }
 
-af::Msg* AfContainer::generateList( int type)
+af::Msg * AfContainer::generateList( int i_type, const std::vector<int32_t> & i_ids, const std::string & i_mask, bool i_json)
 {
-   af::MCAfNodes mcNodes;
-   for( af::Node * node = first_ptr; node != NULL; node = node->m_next_ptr)
-   {
-      if( node->isZombie() ) continue;
-      mcNodes.addNode( node);
-   }
-   return new af::Msg( type, &mcNodes);
+	af::MCAfNodes mcnodes;
+	std::ostringstream str;
+	bool added = false;
+
+	if( i_json )
+		str << "{\n";
+
+	if( i_ids.size())
+		generateList( i_type, mcnodes, str, i_ids, i_json);
+	else if( i_mask.size())
+		generateList( i_type, mcnodes, str, i_mask, i_json);
+	else
+		generateList( i_type, i_json);
+
+	af::Msg * msg = new af::Msg();
+
+	if( i_json )
+	{
+		str << "\n}";
+		std::string s = str.str();
+		msg->setData( s.size(), s.c_str(), af::Msg::TJSON);
+	}
+	else
+		msg->set( i_type, &mcnodes);
+
+	return msg;
 }
 
-af::Msg* AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
+void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, bool i_json)
 {
-   af::MCAfNodes mcNodes;
-   int getcount = mcgeneral.getCount();
+	bool added = false;
 
-   for( int i = 0; i < getcount; i++)
-   {
-      int pos = mcgeneral.getId(i);
-      if( pos >= size)
-      {
-         AFCommon::QueueLogError("AfContainer::generateList: position >= size");
-         continue;
-      }
-      af::Node * node = nodesTable[ pos];
-      if( node == NULL   ) continue;
-      if( node->isZombie()) continue;
-      mcNodes.addNode( node);
-   }
-   if(( getcount == 0) && (false == mcgeneral.getName().empty()))
-   {
-      std::string errMsg;
-      af::RegExp rx;
-      rx.setPattern( mcgeneral.getName(), &errMsg);
-      if( rx.empty())
-      {
-         AFCommon::QueueLogError( std::string("AfContainer::generateList: ") + errMsg);
-      }
-      else
-      {
-         bool namefounded = false;
-         for( af::Node *node = first_ptr; node != NULL; node = node->m_next_ptr )
-         {
-            if( node == NULL   ) continue;
-            if( node->isZombie()) continue;
-            if( rx.match( node->m_name))
-            {
-               mcNodes.addNode( node);
-               if( false == namefounded) namefounded = true;
-            }
-         }
-         if( namefounded == false )
-            AFCommon::QueueLog(std::string("AfContainer::generateList: No node matches \"") + mcgeneral.getName() + ("\" founded."));
-      }
-   }
-   return new af::Msg( type, &mcNodes);
+	for( af::Node * node = first_ptr; node != NULL; node = node->m_next_ptr)
+	{
+		if( node->isZombie() ) continue;
+
+		if( added && i_json )
+			o_str << ",\n";
+
+		if( i_json )
+			node->jsonWrite( o_str, i_type);
+		else
+			o_mcnodes.addNode( node);
+
+		added = true;
+	}
+}
+
+void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::vector<int32_t> & i_ids, bool i_json)
+{
+	bool added = false;
+
+	for( int i = 0; i < i_ids.size(); i++)
+	{
+		if( i_ids[i] >= size)
+		{
+			AFCommon::QueueLogError("AfContainer::generateList: position >= size");
+			continue;
+		}
+		af::Node * node = nodesTable[ i_ids[i]];
+		if( node == NULL   )
+			continue;
+		if( node->isZombie())
+			continue;
+
+		if( added && i_json )
+			o_str << ",\n";
+
+		if( i_json )
+			node->jsonWrite( o_str, i_type);
+		else
+			o_mcnodes.addNode( node);
+
+		added = true;
+	}
+}
+
+void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::string & i_mask, bool i_json)
+{
+	if( false == i_mask.size()) return;
+
+	bool added = false;
+
+	std::string errMsg;
+	af::RegExp rx;
+	rx.setPattern( i_mask, &errMsg);
+	if( rx.empty())
+	{
+		AFCommon::QueueLogError( std::string("AfContainer::generateList: ") + errMsg);
+	}
+	else
+	{
+		bool namefounded = false;
+		for( af::Node *node = first_ptr; node != NULL; node = node->m_next_ptr )
+		{
+			if( node == NULL   ) continue;
+			if( node->isZombie()) continue;
+			if( rx.match( node->m_name))
+			{
+				if( added && i_json )
+					o_str << ",\n";
+
+				if( i_json )
+					node->jsonWrite( o_str, i_type);
+				else
+					o_mcnodes.addNode( node);
+
+				added = true;
+
+				if( false == namefounded)
+					namefounded = true;
+			}
+		}
+		if( namefounded == false )
+		AFCommon::QueueLog(std::string("AfContainer::generateList: No node matches \"") + i_mask + ("\" founded."));
+	}
+}
+
+af::Msg * AfContainer::generateList( int type, const af::MCGeneral & mcgeneral)
+{
+	return generateList( type, mcgeneral.getList(), mcgeneral.getName(), false);
+}
+
+af::Msg * AfContainer::generateList( int i_type)
+{
+	std::vector<int32_t> ids;
+	std::string mask;
+	return generateList( i_type, ids, mask, false);
 }
 
 bool AfContainer::setZombie( int id)

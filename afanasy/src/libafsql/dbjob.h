@@ -34,6 +34,7 @@ protected:
 private:
    void addDBAttributes();
    virtual af::BlockData * newBlockData( af::Msg * msg);
+   virtual af::BlockData * newBlockData( JSON & i_object, int i_num);
 
 private:
    static const std::string TableName;

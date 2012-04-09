@@ -16,8 +16,17 @@ const int         DBBlockData::KeysNum = 2;
 DBBlockData::DBBlockData( af::Msg * msg):
    af::BlockData( 0, 0)
 {
+AFINFO("DBBlockData::DBBlockData():")
    addDBAttributes();
    read( msg);
+}
+
+DBBlockData::DBBlockData( JSON & i_object, int i_num):
+   af::BlockData( i_num, 0)
+{
+AFINFA("DBBlockData::DBBlockData(): BlockNum=%d", i_num)
+   addDBAttributes();
+   jsonRead( i_object);
 }
 
 DBBlockData::DBBlockData( int BlockNum, int JobId):
@@ -97,7 +106,7 @@ af::TaskData * DBBlockData::createTask( af::Msg * msg)
 
 bool DBBlockData::dbAdd( PGconn * i_conn) const
 {
-AFINFA("DBBlockData::dbAdd: blocknum = %d, tasksnum = %d", m_block_num, m_tasks_num)
+AFINFA("DBBlockData::dbAdd: %s[%d,%d] %d tasks %s", m_name.c_str(), m_job_id, m_block_num, m_tasks_num, isNumeric() ? "NUMERIC":"NOT_NUMERIC")
    std::list<std::string> queries;
    dbInsert( &queries);
 

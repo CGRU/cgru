@@ -14,7 +14,7 @@ public:
    Cmd();
    virtual ~Cmd();
 
-   inline void setRecieving() { recieving = true; }
+	inline void setRecieving( bool i_value = true) { recieving = i_value; }
    inline void setCmd(   const std::string & str) { cmd    = str;   }
    inline void setInfo(  const std::string & str) { info   = str;   }
    inline void setHelp(  const std::string & str) { help   = str;   }

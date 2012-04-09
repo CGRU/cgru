@@ -1,3 +1,4 @@
+
 #include "blockdata.h"
 
 #include <memory.h>
@@ -14,9 +15,7 @@
 
 using namespace af;
 
-BlockData::BlockData():
-   m_job_id( 0),
-   m_block_num(0)
+BlockData::BlockData()
 {
    initDefaults();
    construct();
@@ -24,43 +23,45 @@ BlockData::BlockData():
 
 void BlockData::initDefaults()
 {
-   p_percentage = 0;
-   p_errorhostsnum = 0;
-   p_avoidhostsnum = 0;
-   p_tasksready = 0;
-   p_tasksdone = 0;
-   p_taskserror = 0;
-   p_taskssumruntime = 0;
 	m_job_id = 0;
-   m_state = 0;//AFJOB::STATE_READY_MASK;
-   m_flags = 0;
-   m_frame_first = 0;
-   m_frame_last = 0;
-   m_frames_per_task = 1;
-   m_frames_inc = 1;
-   m_max_running_tasks = -1;
-   m_max_running_tasks_per_host = -1;
-   m_tasks_max_run_time = 0;
-   m_capacity = AFJOB::TASK_DEFAULT_CAPACITY;
-   m_need_memory = 0;
-   m_need_power = 0;
-   m_need_hdd = 0;
-   m_errors_retries = -1;
-   m_errors_avoid_host = -1;
-   m_errors_task_same_host = -1;
-   m_errors_forgive_time = -1;
-   m_file_size_min = -1;
-   m_file_size_max = -1;
-   m_capacity_coeff_min = 0;
-   m_capacity_coeff_max = 0;
-   m_multihost_min = 0;
-   m_multihost_max = 0;
-   m_multihost_max_wait = 0;
-   m_multihost_service_wait = 0;
-   m_parser_coeff = 1;
+	m_block_num = 0;
+	m_state = 0;//AFJOB::STATE_READY_MASK;
+	m_flags = 0;
+	m_frame_first = 0;
+	m_frame_last = 0;
+	m_frames_per_task = 1;
+	m_frames_inc = 1;
+	m_max_running_tasks = -1;
+	m_max_running_tasks_per_host = -1;
+	m_tasks_max_run_time = 0;
+	m_capacity = AFJOB::TASK_DEFAULT_CAPACITY;
+	m_need_memory = 0;
+	m_need_power = 0;
+	m_need_hdd = 0;
+	m_errors_retries = -1;
+	m_errors_avoid_host = -1;
+	m_errors_task_same_host = -1;
+	m_errors_forgive_time = -1;
+	m_file_size_min = -1;
+	m_file_size_max = -1;
+	m_capacity_coeff_min = 0;
+	m_capacity_coeff_max = 0;
+	m_multihost_min = 0;
+	m_multihost_max = 0;
+	m_multihost_max_wait = 0;
+	m_multihost_service_wait = 0;
+	m_parser_coeff = 1;
 
-   memset( p_bar_running, 0, AFJOB::PROGRESS_BYTES);
-   memset( p_bar_done,    0, AFJOB::PROGRESS_BYTES);
+	p_percentage = 0;
+	p_errorhostsnum = 0;
+	p_avoidhostsnum = 0;
+	p_tasksready = 0;
+	p_tasksdone = 0;
+	p_taskserror = 0;
+	p_taskssumruntime = 0;
+
+	memset( p_bar_running, 0, AFJOB::PROGRESS_BYTES);
+	memset( p_bar_done,    0, AFJOB::PROGRESS_BYTES);
 }
 
 BlockData::BlockData( Msg * msg)
@@ -69,13 +70,13 @@ BlockData::BlockData( Msg * msg)
    read( msg);
 }
 
-BlockData::BlockData( int BlockNum, int JobId):
-   m_job_id( JobId),
-   m_block_num( BlockNum)
+BlockData::BlockData( int BlockNum, int JobId)
 {
 AFINFA("BlockData::BlockData(): JobId=%d, BlockNum=%d", m_job_id, m_block_num)
-   initDefaults();
-   construct();
+	initDefaults();
+	m_job_id = JobId;
+	m_block_num = BlockNum;
+	construct();
 }
 
 void BlockData::construct()
@@ -103,6 +104,12 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	construct();
 
 	m_block_num = i_num;
+
+	jsonRead( i_object);
+}
+
+void BlockData::jsonRead( JSON & i_object)
+{
 //	switch( msg->type())
 //	{
 //	case Msg::TJob:

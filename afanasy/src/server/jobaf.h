@@ -28,7 +28,7 @@ public:
    JobAf( af::Msg * msg);
 
 /// Construct job from JSON.
-	JobAf(  JSON & i_object);
+	JobAf( JSON & i_object);
 
 /// Construct empty Job for database.
    JobAf( int Id);

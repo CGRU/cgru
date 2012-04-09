@@ -22,7 +22,7 @@ public:
 
    void sortnodes( bool ascending = true);
 
-   void sortMatch( const std::vector<int32_t> * list);
+   void sortMatch( const std::vector<int32_t> & i_list);
 
 signals:
    void nodeAdded( ItemNode * node, const QModelIndex & index);

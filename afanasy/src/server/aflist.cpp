@@ -116,7 +116,7 @@ int AfList::sortPriority( af::Node * node)
    return index;
 }
 
-void AfList::moveNodes( const std::vector<int32_t> * list, int type)
+void AfList::moveNodes( const std::vector<int32_t> & i_list, int i_type)
 {
 #ifdef AFOUTPUT
 printf("AfList::moveNodes:\n");
@@ -124,17 +124,17 @@ printf("AfList::moveNodes:\n");
 //
 //    ensure in proper type
 //
-   switch ( type)
+   switch ( i_type)
    {
       case MoveUp: case MoveDown: case MoveTop: case MoveBottom: break;
       default:
-         AFERRAR("AfList::moveNodes: Invalid type = %d\n", type);
+         AFERRAR("AfList::moveNodes: Invalid type = %d\n", i_type);
          return;
    }
 //
 //    return if no nodes ids to move
 //
-   if( list->size() == 0)
+   if( i_list.size() == 0)
    {
       AFERROR("AfList::moveNodes: Move nodes ids list is empty.\n");
       return;
@@ -150,9 +150,9 @@ printf("AfList::moveNodes:\n");
    std::list<af::Node*>::iterator it = it_begin;
    while( it != it_end)
    {
-      for( unsigned n = 0; n < list->size(); n++)
+      for( unsigned n = 0; n < i_list.size(); n++)
       {
-         if( (*it)->getId() == (*list)[n] )
+         if( (*it)->getId() == i_list[n] )
          {
 #ifdef AFOUTPUT
 printf("Founded a node \"%s\"-%d\n", (*it)->getName().toUtf8().data(), (*it)->getId());
@@ -178,13 +178,13 @@ printf("Founded a node \"%s\"-%d\n", (*it)->getName().toUtf8().data(), (*it)->ge
    std::list<af::Node*>::iterator it_move_begin = move_list.begin();
    std::list<af::Node*>::iterator it_move_end   = move_list.end();
    std::list<af::Node*>::iterator it_move;
-   if((type == MoveDown) || (type == MoveTop)) it_move = it_move_end;
+   if(( i_type == MoveDown) || ( i_type == MoveTop)) it_move = it_move_end;
    else it_move = it_move_begin;
 
    for(;;)
    {
       af::Node * node;
-      if((type == MoveDown) || (type == MoveTop))
+      if(( i_type == MoveDown) || ( i_type == MoveTop))
       {
          if( it_move == it_move_begin ) break;
          it_move--;
@@ -211,7 +211,7 @@ printf("Processing node \"%s\"-%d\n", node->getName().toUtf8().data(), node->get
          continue;
       }
 
-      switch ( type)
+      switch ( i_type)
       {
          case MoveUp:
          {

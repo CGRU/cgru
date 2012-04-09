@@ -41,10 +41,10 @@ void DBItem::dbInsert( std::list<std::string> * queries) const
    std::string str = std::string("INSERT INTO ") + dbGetTableName() + " (";
    for( int i = 0; i < dbAttributes.size(); i++)
    {
-      if( i != 0 ) str += ",\n";
+      if( i != 0 ) str += ",";
       str += dbAttributes[i]->getName();
    }
-   str += "\n) VALUES (";
+   str += ") VALUES (";
    for( int i = 0; i < dbAttributes.size(); i++)
    {
       if( i != 0 ) str += ",";

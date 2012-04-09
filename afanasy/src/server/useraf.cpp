@@ -201,6 +201,22 @@ void UserAf::updateJobsOrder( af::Job * newJob)
       ((JobAf*)(job))->setUserListOrder( userlistorder++, job != newJob);
 }
 
+bool UserAf::getJobs( std::ostringstream & o_str)
+{
+	AfListIt jobsListIt( &m_jobslist);
+	bool first = true;
+	bool has_jobs = false;
+	for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+	{
+		if( false == first )
+			o_str << ",\n";
+		first = false;
+		((af::Job*)(job))->jsonWrite( o_str, af::Msg::TJobsList);
+		has_jobs = true;
+	}
+	return has_jobs;
+}
+
 void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 {
    AfListIt jobsListIt( &m_jobslist);

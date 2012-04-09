@@ -30,7 +30,7 @@ public:
     af::Msg* generateJobsList( int id);
 
     /// Generate MCJobs message for users with provided ids.
-    af::Msg* generateJobsList( const af::MCGeneral & ids);
+    af::Msg* generateJobsList( const std::vector<int32_t> & ids, bool json = false);
 
     /// Generate task for \c render , return \c true on success.
     bool solve( RenderAf *render, MonitorContainer * monitoring);
