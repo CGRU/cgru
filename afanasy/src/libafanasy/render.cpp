@@ -99,6 +99,12 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << ',';
 	m_host.jsonWrite( o_str);
 
+	if( isOnline())
+	{
+		o_str << ',';
+		m_hres.jsonWrite( o_str);
+	}
+
 	o_str << "}";
 }
 

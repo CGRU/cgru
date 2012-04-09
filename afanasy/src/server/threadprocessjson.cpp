@@ -22,6 +22,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		error += ":\n";
 		error += document.GetParseError();
 		AFCommon::QueueLogError( error);
+		delete i_msg;
 		delete [] data;
 		return NULL;
 	}
@@ -30,10 +31,11 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		std::string error = "JSON: Can't find root object.";
 		AFCommon::QueueLogError( error);
+		delete i_msg;
 		delete [] data;
 		return NULL;
 	}
-	
+
     af::Msg * o_msg_response = NULL;
 
 	if( document.HasMember("job"))
@@ -84,7 +86,15 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		}
 	}
 
+	if( document.HasMember("action"))
+	{
+		i_args->msgQueue->pushMsg( i_msg);
+		delete [] data;
+		return NULL;
+	}
+
 	delete [] data;
+	delete i_msg;
 
 	return o_msg_response;
 }

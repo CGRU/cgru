@@ -1,0 +1,14 @@
+{
+	"action":
+	{
+		"user_name" : "jimmy",
+		"host_name" : "pc01",
+		"mask"      : "_empty_.*",
+		"ids"       : [2,3],
+		"type"      : "set",
+		"jobs"      :
+		{
+			"capacity" : 10
+		}
+	}
+}

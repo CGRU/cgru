@@ -26,6 +26,7 @@ void outJSON( rapidjson::Value & i_value, int i_depth = 0)
 {
 	if( i_value.IsObject())
 	{
+		printf("{");
 		rapidjson::Value::MemberIterator it = i_value.MemberBegin();
 		while( it != i_value.MemberEnd())
 		{
@@ -36,10 +37,19 @@ void outJSON( rapidjson::Value & i_value, int i_depth = 0)
 			outJSON( it->value, i_depth+1);
 			it++;
 		}
+		printf("}");
 	}
 	else if( i_value.IsArray())
+	{
+		printf("[");
 		for( int i = 0; i < i_value.Size(); i++)
+		{
+			if( i != 0 )
+				printf(",");
 			outJSON( i_value[i], i_depth);
+		}
+		printf("]");
+	}
 	else if( i_value.IsString())
 		printf("'%s'", (char *) i_value.GetString());
 	else if( i_value.IsNumber())
