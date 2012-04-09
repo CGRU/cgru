@@ -158,6 +158,29 @@ Address::Address( Msg * msg)
    read( msg);
 }
 
+void Address::jsonWrite( std::ostringstream & o_str)
+{
+	o_str << "\"address\":{\"family\":";
+	switch( family)
+	{
+		case IPv4:
+		{
+			o_str << "4";
+			break;
+		}
+		case IPv6:
+		{
+			o_str << "6";
+			break;
+		}
+		default:
+			o_str << "0";
+	}
+	o_str << ",\"ip\":\"";
+	generateIPStream( o_str, false);
+	o_str << "\",\"port\":" << int( port) << "}";
+}
+
 void Address::readwrite( Msg * msg)
 {
    rw_int8_t(   family, msg);

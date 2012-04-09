@@ -22,33 +22,35 @@ public:
     void generateServicesStream( std::ostringstream & stream) const; /// Generate services information.
     void printServices() const;
 
-    inline int getServicesNum()        const { return servicesnum;       }
-    inline int getServiceCount( int n) const { return servicescounts[n]; }
+	inline int getServicesNum()        const { return m_services_num;       }
+	inline int getServiceCount( int n) const { return m_services_counts[n]; }
 
     /// TODO: check number and size
-    inline const std::string & getServiceName( int n) const { return servicesnames[n];}
+	inline const std::string & getServiceName( int n) const { return m_services_names[n];}
 
-    int32_t capacity;
-    int32_t maxtasks;
-    int32_t power;
+	int32_t m_capacity;
+	int32_t m_max_tasks;
+	int32_t m_power;
 
-    std::string os;
-    std::string properties;
-    std::string resources;
-    std::string data;
+	std::string m_os;
+	std::string m_properties;
+	std::string m_resources;
+	std::string m_data;
 
-    int32_t wol_idlesleep_time;
+	int32_t m_wol_idlesleep_time;
 
     void readwrite( Msg * msg); ///< Read or write Host in message.
 
+	void jsonWrite( std::ostringstream & o_str);
+
 private:
-    std::vector<std::string> servicesnames;
-    std::vector<int32_t> servicescounts;
+	std::vector<std::string> m_services_names;
+	std::vector<int32_t> m_services_counts;
 
     void mergeParameters( const Host & other);
 
 private:
-    int32_t servicesnum;
+	int32_t m_services_num;
 };
 
 class HostResMeter : public Af
@@ -120,6 +122,8 @@ public:
     void generateInfoStream( std::ostringstream & stream, bool full = false) const;
 
     void copy( const HostRes & other);
+
+	void jsonWrite( std::ostringstream & o_str);
 
     void readwrite( Msg * msg); ///< Read or write Host Resources in message.
 

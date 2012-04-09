@@ -44,6 +44,64 @@ Render::~Render()
 {
 }
 
+
+void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
+{
+	o_str << "\"render\":{";
+
+	Client::v_jsonWrite( o_str, i_type);
+
+	o_str << ",\"capacity_used\":" << m_capacity_used;
+	o_str << ",\"task_start_finish_time\":" << m_task_start_finish_time;
+	if( m_capacity  > 0 )
+		o_str << ",\"capacity\":" << m_capacity;
+	if( m_max_tasks  > 0 )
+		o_str << ",\"max_tasks\":" << m_max_tasks;
+	if( m_wol_operation_time > 0 )
+		o_str << ",\"wol_operation_time\":" << m_wol_operation_time;
+
+	if( m_annotation.size())
+		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
+
+	if( isNimby())
+		o_str << ",\"nimby\":true";
+	if( isNIMBY())
+		o_str << ",\"NIMBY\":true";
+	if( isOffline())
+		o_str << ",\"offline\":true";
+	if( isBusy())
+		o_str << ",\"busy\":true";
+	if( isDirty())
+		o_str << ",\"dirty\":true";
+	if( isWOLFalling())
+		o_str << ",\"wol_falling\":true";
+	if( isWOLSleeping())
+		o_str << ",\"wol_sleeping\":true";
+	if( isWOLWaking())
+		o_str << ",\"wol_waking\":true";
+
+	if( m_tasks.size())
+	{
+		o_str << ",\"tasks\":[";
+		bool first = true;
+		for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+		{
+			if( false == first )
+				o_str << ',';
+			else
+				first = false;
+
+			(*it)->jsonWrite( o_str, i_type);
+		}
+		o_str << "]";
+	}
+
+	o_str << ',';
+	m_host.jsonWrite( o_str);
+
+	o_str << "}";
+}
+
 void Render::readwrite( Msg * msg)
 {
    switch( msg->type())
@@ -112,8 +170,8 @@ void Render::readwrite( Msg * msg)
 
 void Render::checkDirty()
 {
-   if( m_capacity == m_host.capacity ) m_capacity = -1;
-   if( m_max_tasks == m_host.maxtasks ) m_max_tasks = -1;
+   if( m_capacity == m_host.m_capacity ) m_capacity = -1;
+   if( m_max_tasks == m_host.m_max_tasks ) m_max_tasks = -1;
    if(( m_capacity == -1 ) && ( m_max_tasks == -1 ) && ( m_services_disabled.empty() ))
 	  m_state = m_state | SDirty;
    else

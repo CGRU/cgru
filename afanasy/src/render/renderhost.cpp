@@ -40,7 +40,7 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
 
     setOnline();
 
-    m_host.os = af::Environment::getPlatform();
+    m_host.m_os = af::Environment::getPlatform();
     GetResources( m_host, m_hres);
 
     std::list<std::string> resclasses = af::strSplit( af::Environment::getRenderResClasses(), ";");

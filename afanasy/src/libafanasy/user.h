@@ -66,11 +66,13 @@ public:
 	inline bool  isPermanent() const      { return m_state & Permanent; } ///< Wheter the user is permanent.
 	void setPermanent( bool value);
 
-	inline bool solveJobsParrallel() const { return m_state & SolveJobsParrallel; }
+	inline bool solveJobsParallel() const { return m_state & SolveJobsParallel; }
 
 	void setJobsSolveMethod( int i_method );
 
 	virtual int calcWeight() const; ///< Calculate and return memory size.
+
+	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
 
 	inline const std::string & getAnnontation() const { return m_annotation;}
 
@@ -105,8 +107,8 @@ protected:
 private:
    enum State
    {
-      Permanent            = 1,
-      SolveJobsParrallel   = 2
+	  Permanent         = 1,
+	  SolveJobsParallel = 2
    };
 
 private:
@@ -114,6 +116,6 @@ private:
    void readwrite( Msg * msg);   ///< Read or write user in buffer.
 
 // DEPRECATED:
-   float need;                   ///< User need for hosts.
+   float DEPRECATED;                   ///< User need for hosts.
 };
 }

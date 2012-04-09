@@ -48,6 +48,25 @@ Client::~Client()
    clearNetIFs();
 }
 
+void Client::v_jsonWrite( std::ostringstream & o_str, int type)
+{
+	Node::v_jsonWrite( o_str, type);
+
+	o_str << ",\"user_name\":\"" << m_user_name << "\"";
+	o_str << ",\"time_register\":" << m_time_register;
+	o_str << ",\"time_launch\":" << m_time_launch;
+	o_str << ",\"time_update\":" << m_time_update;
+
+	if( false == m_address.isEmpty())
+	{
+		o_str << ',';
+		m_address.jsonWrite( o_str);
+	}
+
+	if( m_version.size())
+		o_str << ",\"version\":\"" << m_version << "\"";
+}
+
 void Client::clearNetIFs()
 {
    for( int i = 0; i < m_netIFs.size(); i++) if( m_netIFs[i]) delete m_netIFs[i];

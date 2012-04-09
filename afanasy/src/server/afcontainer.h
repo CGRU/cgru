@@ -29,13 +29,13 @@ public:
 	af::Msg * generateList( int i_type);
 
 	/// Generate all nodes:
-	void generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, bool i_json);
+	void generateListAll( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, bool i_json);
 
 	/// Generate nodes matching ids:
-	void generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::vector<int32_t> & ids, bool json);
+	void generateListIDs( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::vector<int32_t> & ids, bool json);
 
 	/// Generate nodes matching mask:
-	void generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::string & i_mask, bool i_json);
+	void generateListMask( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::string & i_mask, bool i_json);
 
    bool setZombie( int id);
 

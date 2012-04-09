@@ -44,7 +44,7 @@ void User::construct()
 {
 	m_jobs_num = 0;
 	m_running_jobs_num = 0;
-	need = 0.0f;
+	DEPRECATED = 0.0f;
 	m_running_tasks_num = 0;
 	m_time_online = 0;
 
@@ -57,6 +57,49 @@ void User::construct()
 User::~User()
 {
 AFINFO("User::~User:")
+}
+
+void User::v_jsonWrite( std::ostringstream & o_str, int i_type)
+{
+	o_str << "\"user\"";
+	o_str << ":{";
+
+	Node::v_jsonWrite( o_str, i_type);
+
+	o_str << ",\"time_register\":" << m_time_register;
+	o_str << ",\"time_online\":" << m_time_online;
+	o_str << ",\"errors_retries\":" << int(m_errors_retries);
+	o_str << ",\"errors_avoid_host\":" << int(m_errors_avoid_host);
+	o_str << ",\"errors_task_same_host\":" << int(m_errors_task_same_host);
+	o_str << ",\"errors_forgive_time\":" << m_errors_forgive_time;
+
+	if( isPermanent() )
+		o_str << ",\"permanent\":true";
+	if( solveJobsParallel() )
+		o_str << ",\"solve_parallel\":true";
+
+	if( m_max_running_tasks != -1 )
+		o_str << ",\"max_running_tasks\":" << m_max_running_tasks;
+	if( m_jobs_life_time > 0 )
+		o_str << ",\"max_jobs_life_time\":" << m_jobs_life_time;
+
+	if( m_host_name.size())
+		o_str << ",\"host_name\":\"" << m_host_name << "\"";
+	if( m_annotation.size())
+		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
+	if( hasHostsMask())
+		o_str << ",\"hosts_mask\":\""  << af::strEscape( m_hosts_mask.getPattern() ) << "\"";
+	if( hasHostsMaskExclude())
+		o_str << ",\"hosts_mask_exclude\":\""  << af::strEscape( m_hosts_mask_exclude.getPattern() ) << "\"";
+
+	if( m_jobs_num > 0 )
+		o_str << ",\"jobs_num\":" << m_jobs_num;
+	if( m_running_jobs_num > 0 )
+		o_str << ",\"running_jobs_num\":" << m_running_jobs_num;
+	if( m_running_tasks_num > 0 )
+		o_str << ",\"running_tasks_num\":" << m_running_tasks_num;
+
+	o_str << "}";
 }
 
 void User::readwrite( Msg * msg)
@@ -77,7 +120,7 @@ void User::readwrite( Msg * msg)
 	rw_int32_t ( m_jobs_num,              msg);
 	rw_int32_t ( m_running_jobs_num,      msg);
 	rw_int32_t ( m_running_tasks_num,     msg);
-	rw_float   ( need,                    msg);
+	rw_float   ( DEPRECATED,              msg);
 	rw_RegExp  ( m_hosts_mask,            msg);
 	rw_RegExp  ( m_hosts_mask_exclude,    msg);
 	rw_String  ( m_annotation,            msg);
@@ -100,10 +143,10 @@ void User::setJobsSolveMethod( int i_method )
     switch( i_method)
     {
     case af::Node::SolveByOrder:
-        m_state = m_state & (~SolveJobsParrallel);
+		m_state = m_state & (~SolveJobsParallel);
         break;
     case af::Node::SolveByPriority:
-        m_state = m_state | SolveJobsParrallel;
+		m_state = m_state | SolveJobsParallel;
         break;
     }
 }

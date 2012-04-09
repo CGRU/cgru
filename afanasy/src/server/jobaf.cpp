@@ -852,13 +852,13 @@ bool JobAf::canRunOn( RenderAf * i_render)
     }
 
     // check needed os:
-    if( false == checkNeedOS( i_render->getHost().os))
+    if( false == checkNeedOS( i_render->getHost().m_os))
     {
         return false;
     }
 
     // check needed properties:
-    if( false == checkNeedProperties( i_render->getHost().properties))
+    if( false == checkNeedProperties( i_render->getHost().m_properties))
     {
         return false;
     }

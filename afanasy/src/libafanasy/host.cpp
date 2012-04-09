@@ -9,13 +9,13 @@
 using namespace af;
 
 Host::Host():
-    capacity( 0),
-    maxtasks( 0),
-    power(0),
-    os(""),
-    properties(""),
-    servicesnum(0),
-    wol_idlesleep_time(0)
+	m_capacity( 0),
+	m_max_tasks( 0),
+	m_power(0),
+	m_os(""),
+	m_properties(""),
+	m_services_num(0),
+	m_wol_idlesleep_time(0)
 {
 }
 
@@ -26,27 +26,27 @@ void Host::setService( const std::string & name, int count)
 //printf("Host::setService: '%s':%d\n", name.c_str(), count);
    int index = 0;
    bool exists = false;
-   for( std::vector<std::string>::const_iterator it = servicesnames.begin(); it != servicesnames.end(); it++, index++)
+   for( std::vector<std::string>::const_iterator it = m_services_names.begin(); it != m_services_names.end(); it++, index++)
       if( *it == name )
       {
          exists = true;
          break;
       }
    if( exists)
-      servicescounts[index] = count;
+	  m_services_counts[index] = count;
    else
    {
-      servicesnames.push_back(name);
-      servicescounts.push_back( count);
-      servicesnum++;
+	  m_services_names.push_back(name);
+	  m_services_counts.push_back( count);
+	  m_services_num++;
    }
 }
 
 void Host::clearServices()
 {
-    servicesnames.clear();
-    servicescounts.clear();
-    servicesnum = 0;
+	m_services_names.clear();
+	m_services_counts.clear();
+	m_services_num = 0;
 }
 
 void Host::copy( const Host & other)
@@ -58,21 +58,21 @@ void Host::copy( const Host & other)
 void Host::merge( const Host & other)
 {
     mergeParameters( other);
-    for( int i = 0; i < other.servicesnum; i++)
-        setService( other.servicesnames[i], other.servicescounts[i]);
+	for( int i = 0; i < other.m_services_num; i++)
+		setService( other.m_services_names[i], other.m_services_counts[i]);
 }
 
 void Host::remServices( const std::list<std::string> & remNames)
 {
    for( std::list<std::string>::const_iterator remIt = remNames.begin(); remIt != remNames.end(); remIt++)
    {
-      std::vector<std::string>::iterator srvIt = servicesnames.begin();
-      while( srvIt != servicesnames.end())
+	  std::vector<std::string>::iterator srvIt = m_services_names.begin();
+	  while( srvIt != m_services_names.end())
       {
          if( *srvIt == *remIt)
          {
-            srvIt = servicesnames.erase( srvIt);
-            servicesnum--;
+			srvIt = m_services_names.erase( srvIt);
+			m_services_num--;
          }
          else srvIt++;
       }
@@ -81,27 +81,47 @@ void Host::remServices( const std::list<std::string> & remNames)
 
 void Host::mergeParameters( const Host & other)
 {
-    if( other.maxtasks      ) maxtasks = other.maxtasks;
-    if( other.capacity      ) capacity = other.capacity;
-    if( other.power         ) power    = other.power;
+	if( other.m_max_tasks      ) m_max_tasks = other.m_max_tasks;
+	if( other.m_capacity      ) m_capacity = other.m_capacity;
+	if( other.m_power         ) m_power    = other.m_power;
 
-    if( other.os.size()        ) os           = other.os;
-    if( other.properties.size()) properties   = other.properties;
-    if( other.resources.size() ) resources    = other.resources;
-    if( other.data.size()      ) data         = other.data;
+	if( other.m_os.size()        ) m_os           = other.m_os;
+	if( other.m_properties.size()) m_properties   = other.m_properties;
+	if( other.m_resources.size() ) m_resources    = other.m_resources;
+	if( other.m_data.size()      ) m_data         = other.m_data;
 
-    if( other.wol_idlesleep_time ) wol_idlesleep_time = other.wol_idlesleep_time;
+	if( other.m_wol_idlesleep_time ) m_wol_idlesleep_time = other.m_wol_idlesleep_time;
+}
+
+void Host::jsonWrite( std::ostringstream & o_str)
+{
+	o_str << "\"host\":{";
+
+	o_str << "\"capacity\":"  << m_capacity;
+	o_str << ",\"max_tasks\":" << m_max_tasks;
+	o_str << ",\"power\":"     << m_power;
+
+	if( m_os.size())
+		o_str << ",\"os\":\"" << m_os << "\"";
+	if( m_properties.size())
+		o_str << ",\"properties\":\"" << m_properties << "\"";
+/*	if( m_resources.size())
+		o_str << ",\"resources\":\"" << m_resources << "\"";
+	if( m_data.size())
+		o_str << ",\"data\":\"" << m_data << "\"";
+*/
+	o_str << "}";
 }
 
 void Host::readwrite( Msg * msg)
 {
-    rw_int32_t( maxtasks,     msg);
-    rw_int32_t( capacity,     msg);
-    rw_int32_t( power,        msg);
-    rw_String ( os,           msg);
-    rw_String ( properties,   msg);
-    rw_String ( resources,    msg);
-    rw_String ( data,         msg);
+	rw_int32_t( m_max_tasks,     msg);
+	rw_int32_t( m_capacity,     msg);
+	rw_int32_t( m_power,        msg);
+	rw_String ( m_os,           msg);
+	rw_String ( m_properties,   msg);
+	rw_String ( m_resources,    msg);
+	rw_String ( m_data,         msg);
 }
 
 void Host::generateInfoStream( std::ostringstream & stream, bool full) const
@@ -110,32 +130,32 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
 
    if(full)
    {
-      if( false == os.empty()) stream << "\n   OS=\"" << os << "\"";
+	  if( false == m_os.empty()) stream << "\n   OS=\"" << m_os << "\"";
 
       stream << std::endl;
-      stream << "   Capacity = " << capacity << ", Max Tasks = " << maxtasks << ", Power = " << power;
+	  stream << "   Capacity = " << m_capacity << ", Max Tasks = " << m_max_tasks << ", Power = " << m_power;
 
-      if( wol_idlesleep_time )
-         stream << "\n   WOL Sleep Idle Time = " << time2strHMS( wol_idlesleep_time, true );
+	  if( m_wol_idlesleep_time )
+		 stream << "\n   WOL Sleep Idle Time = " << time2strHMS( m_wol_idlesleep_time, true );
 
    }
    else
    {
-      if( false == os.empty()) stream << "OS=\"" << os << "\"";
-      stream << " CAP" << capacity;
-      stream << " MAX=" << maxtasks;
-      stream << " P" << power;
-      stream << " WOL" << time2str( wol_idlesleep_time );
+	  if( false == m_os.empty()) stream << "OS=\"" << m_os << "\"";
+	  stream << " CAP" << m_capacity;
+	  stream << " MAX=" << m_max_tasks;
+	  stream << " P" << m_power;
+	  stream << " WOL" << time2str( m_wol_idlesleep_time );
    }
 }
 
 void Host::generateServicesStream( std::ostringstream & stream) const
 {
-    for( int i = 0; i < servicesnum; i++)
+	for( int i = 0; i < m_services_num; i++)
     {
         if( i ) stream << std::endl;
-        stream << "Service: \"" << servicesnames[i] << "\"";
-        if( servicescounts[i]) stream << " - " << servicescounts[i];
+		stream << "Service: \"" << m_services_names[i] << "\"";
+		if( m_services_counts[i]) stream << " - " << m_services_counts[i];
     }
 }
 
@@ -265,6 +285,15 @@ void HostRes::copy( const HostRes & other)
 
     for( unsigned i = 0; i < custom.size(); i++)
         *(custom[i]) = *(other.custom[i]);
+}
+
+void HostRes::jsonWrite( std::ostringstream & o_str)
+{
+	o_str << "\"host_resources\":{";
+
+	o_str << "\"cpu_num\":" << cpu_num;
+
+	o_str << "}";
 }
 
 void HostRes::readwrite( Msg * msg)

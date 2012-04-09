@@ -180,17 +180,16 @@ af::Msg * AfContainer::generateList( int i_type, const std::vector<int32_t> & i_
 {
 	af::MCAfNodes mcnodes;
 	std::ostringstream str;
-	bool added = false;
 
 	if( i_json )
 		str << "{\n";
 
 	if( i_ids.size())
-		generateList( i_type, mcnodes, str, i_ids, i_json);
+		generateListIDs( i_type, mcnodes, str, i_ids, i_json);
 	else if( i_mask.size())
-		generateList( i_type, mcnodes, str, i_mask, i_json);
+		generateListMask( i_type, mcnodes, str, i_mask, i_json);
 	else
-		generateList( i_type, i_json);
+		generateListAll( i_type, mcnodes, str, i_json);
 
 	af::Msg * msg = new af::Msg();
 
@@ -198,7 +197,7 @@ af::Msg * AfContainer::generateList( int i_type, const std::vector<int32_t> & i_
 	{
 		str << "\n}";
 		std::string s = str.str();
-		msg->setData( s.size(), s.c_str(), af::Msg::TJSON);
+		msg->setData( s.size()+1, s.c_str(), af::Msg::TJSON);
 	}
 	else
 		msg->set( i_type, &mcnodes);
@@ -206,7 +205,7 @@ af::Msg * AfContainer::generateList( int i_type, const std::vector<int32_t> & i_
 	return msg;
 }
 
-void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, bool i_json)
+void AfContainer::generateListAll( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, bool i_json)
 {
 	bool added = false;
 
@@ -218,7 +217,7 @@ void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostr
 			o_str << ",\n";
 
 		if( i_json )
-			node->jsonWrite( o_str, i_type);
+			node->v_jsonWrite( o_str, i_type);
 		else
 			o_mcnodes.addNode( node);
 
@@ -226,7 +225,7 @@ void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostr
 	}
 }
 
-void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::vector<int32_t> & i_ids, bool i_json)
+void AfContainer::generateListIDs( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::vector<int32_t> & i_ids, bool i_json)
 {
 	bool added = false;
 
@@ -247,7 +246,7 @@ void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostr
 			o_str << ",\n";
 
 		if( i_json )
-			node->jsonWrite( o_str, i_type);
+			node->v_jsonWrite( o_str, i_type);
 		else
 			o_mcnodes.addNode( node);
 
@@ -255,7 +254,7 @@ void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostr
 	}
 }
 
-void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::string & i_mask, bool i_json)
+void AfContainer::generateListMask( int i_type, af::MCAfNodes & o_mcnodes, std::ostringstream & o_str, const std::string & i_mask, bool i_json)
 {
 	if( false == i_mask.size()) return;
 
@@ -281,7 +280,7 @@ void AfContainer::generateList( int i_type, af::MCAfNodes & o_mcnodes, std::ostr
 					o_str << ",\n";
 
 				if( i_json )
-					node->jsonWrite( o_str, i_type);
+					node->v_jsonWrite( o_str, i_type);
 				else
 					o_mcnodes.addNode( node);
 

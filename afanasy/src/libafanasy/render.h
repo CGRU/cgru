@@ -40,11 +40,11 @@ public:
 	inline void setWOLSleeping(  bool value) { if( value ) m_state = m_state | SWOLSleeping; else m_state = m_state & (~SWOLSleeping);}
 	inline void setWOLWaking(    bool value) { if( value ) m_state = m_state | SWOLWaking;   else m_state = m_state & (~SWOLWaking);  }
 
-	inline int getMaxTasks()     const { return (m_max_tasks == -1 ? m_host.maxtasks : m_max_tasks);}
-	inline int getCapacity()     const { return (m_capacity == -1 ? m_host.capacity : m_capacity);}
+	inline int getMaxTasks()     const { return (m_max_tasks == -1 ? m_host.m_max_tasks : m_max_tasks);}
+	inline int getCapacity()     const { return (m_capacity == -1 ? m_host.m_capacity : m_capacity);}
 	inline int getCapacityUsed() const { return m_capacity_used;}
-	inline int getCapacityFree() const { return (m_capacity == -1 ? m_host.capacity : m_capacity) - m_capacity_used;}
-	inline bool hasCapacity( int value) const { return m_capacity_used + value <= (m_capacity == -1 ? m_host.capacity : m_capacity );}
+	inline int getCapacityFree() const { return (m_capacity == -1 ? m_host.m_capacity : m_capacity) - m_capacity_used;}
+	inline bool hasCapacity( int value) const { return m_capacity_used + value <= (m_capacity == -1 ? m_host.m_capacity : m_capacity );}
 
 /// Whether Render is ready to render tasks.
    inline bool isReady() const { return (
@@ -80,6 +80,8 @@ public:
 //   const std::string getResourcesString() const;
 
    inline const std::string & getAnnontation() const { return m_annotation;}
+
+   virtual void v_jsonWrite( std::ostringstream & o_str, int type);
 
 public:
 

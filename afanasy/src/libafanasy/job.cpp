@@ -102,11 +102,11 @@ void Job::jsonRead( JSON & i_object)
 	m_valid = true;
 }
 
-void Job::jsonWrite( std::ostringstream & o_str, int type)
+void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 {
 	o_str << "\"job\"";
 	o_str << ":{";
-	Node::jsonWrite( o_str, type);
+	Node::v_jsonWrite( o_str, i_type);
 
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\"host_name\":\"" << m_host_name << "\"";
@@ -164,7 +164,7 @@ void Job::jsonWrite( std::ostringstream & o_str, int type)
 	{
 		if( b != 0 )
 			o_str << ',';
-		m_blocksdata[b]->jsonWrite( o_str, type);
+		m_blocksdata[b]->jsonWrite( o_str, i_type);
 	}
 	o_str << "]}";
 }

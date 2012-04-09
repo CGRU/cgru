@@ -187,14 +187,14 @@ bool Block::canRun( RenderAf * render)
    // Check needed hdd:
    if( data->getNeedHDD()    > render->getHostRes().hdd_free_gb ) return false;
    // Check needed power:
-   if( data->getNeedPower()  > render->getHost().power       ) return false;
+   if( data->getNeedPower()  > render->getHost().m_power       ) return false;
 
    // check hosts mask:
    if( false == data->checkHostsMask( render->getName())) return false;
    // check exclude hosts mask:
    if( false == data->checkHostsMaskExclude( render->getName())) return false;
    // Check needed properties:
-   if( false == data->checkNeedProperties( render->getHost().properties)) return false;
+   if( false == data->checkNeedProperties( render->getHost().m_properties)) return false;
 
    return true;
 }

@@ -71,14 +71,16 @@ void Node::jsonRead( JSON & i_object)
 	else if( priority != -1 ) m_priority = priority;
 }
 
-void Node::jsonWrite( std::ostringstream & o_str, int type)
+void Node::v_jsonWrite( std::ostringstream & o_str, int i_type)
 {
     o_str << "\"name\":\""    << af::strEscape(m_name) << "\"";
 	if( m_id > 0 )
         o_str << ",\"id\":"   << m_id;
     o_str << ",\"priority\":" << int(m_priority);
 	if( m_locked )
-        o_str << ",\"locked\":true";
+		o_str << ",\"locked\":true";
+	if( isHidden())
+		o_str << ",\"hidden\":true";
 }
 
 int Node::calcWeight() const

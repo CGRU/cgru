@@ -38,8 +38,8 @@ void RenderAf::init()
    hostname = "no farm host";
    hostdescription = "";
    servicesnum = 0;
-   if( m_host.capacity == 0 ) m_host.capacity = af::Environment::getRenderDefaultCapacity();
-   if( m_host.maxtasks == 0 ) m_host.maxtasks = af::Environment::getRenderDefaultMaxTasks();
+   if( m_host.m_capacity == 0 ) m_host.m_capacity = af::Environment::getRenderDefaultCapacity();
+   if( m_host.m_max_tasks == 0 ) m_host.m_max_tasks = af::Environment::getRenderDefaultMaxTasks();
    setBusy( false);
 }
 
@@ -540,7 +540,7 @@ void RenderAf::addTask( af::TaskExec * taskexec)
    m_capacity_used += taskexec->getCapResult();
 
    if( m_capacity_used > getCapacity() )
-      AFERRAR("RenderAf::addTask(): capacity_used > host.capacity (%d>%d)", m_capacity_used, m_host.capacity)
+      AFERRAR("RenderAf::addTask(): capacity_used > host.capacity (%d>%d)", m_capacity_used, m_host.m_capacity)
 }
 
 void RenderAf::removeTask( const af::TaskExec * taskexec)

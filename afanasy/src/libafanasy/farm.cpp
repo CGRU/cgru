@@ -257,10 +257,10 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
 
                if     ( cnode_name == XMLNAME_MASK          ) mask            = cnode_value;
                else if( cnode_name == XMLNAME_DESCRIPTION   ) description     = cnode_value;
-               else if( cnode_name == XMLNAME_OS            ) host.os         = cnode_value;
-               else if( cnode_name == XMLNAME_PROPERTIES    ) host.properties = cnode_value;
-               else if( cnode_name == XMLNAME_RESOURCES     ) host.resources  = cnode_value;
-               else if( cnode_name == XMLNAME_DATA          ) host.data       = cnode_value;
+               else if( cnode_name == XMLNAME_OS            ) host.m_os         = cnode_value;
+               else if( cnode_name == XMLNAME_PROPERTIES    ) host.m_properties = cnode_value;
+               else if( cnode_name == XMLNAME_RESOURCES     ) host.m_resources  = cnode_value;
+               else if( cnode_name == XMLNAME_DATA          ) host.m_data       = cnode_value;
                else if( cnode_name == XMLNAME_CAPACITY      )
                {
                   if( false == numberOk )
@@ -268,7 +268,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                      AFERRAR("Invalid machine capacity \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
                      return false;
                   }
-                  host.capacity = number;
+                  host.m_capacity = number;
                }
                else if( cnode_name == XMLNAME_MAXTASKS)
                {
@@ -277,7 +277,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                      AFERRAR("Invalid machine maxtasks \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
                      return false;
                   }
-                  host.maxtasks = number;
+                  host.m_max_tasks = number;
                }
                else if( cnode_name == XMLNAME_POWER)
                {
@@ -286,7 +286,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                      AFERRAR("Invalid machine power \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
                      return false;
                   }
-                  host.power = number;
+                  host.m_power = number;
                }
                else if( cnode_name == XMLNAME_WOLIDLESLEEPTIME)
                {
@@ -295,7 +295,7 @@ bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
                      AFERRAR("Invalid machine WOL idle sleep time \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
                      return false;
                   }
-                  host.wol_idlesleep_time = number;
+                  host.m_wol_idlesleep_time = number;
                }
             }
          }

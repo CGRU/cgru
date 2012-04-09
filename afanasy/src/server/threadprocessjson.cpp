@@ -1,5 +1,6 @@
 #include "afcommon.h"
 #include "jobcontainer.h"
+#include "rendercontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -70,6 +71,16 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 				o_msg_response = i_args->jobs->generateList( af::Msg::TJobsList, ids, mask, true);
 			}
+		}
+		else if( type == "users")
+		{
+			AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
+			o_msg_response = i_args->users->generateList( af::Msg::TUsersList, ids, mask, true);
+		}
+		else if( type == "renders")
+		{
+			AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
+			o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, ids, mask, true);
 		}
 	}
 

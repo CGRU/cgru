@@ -67,7 +67,7 @@ void ItemUser::updateValues( af::Node *node, int type)
 
    strRightTop = hostname;
 
-    if( user->solveJobsParrallel())
+    if( user->solveJobsParallel())
     {
         strRightBottom = "Par";
     }

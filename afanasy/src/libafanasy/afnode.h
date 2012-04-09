@@ -106,7 +106,7 @@ protected:
     virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
 
 	void jsonRead( JSON & i_object);
-    virtual void jsonWrite( std::ostringstream & o_str, int type);
+	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
 
 protected:
 

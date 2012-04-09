@@ -143,7 +143,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		}
 		if( send_stream )
 			stream << ",\n";
-		job.jsonWrite( stream, af::Msg::TJob);
+		job.v_jsonWrite( stream, af::Msg::TJob);
 		if( job.isValid())
 		{
 			send_stream = true;

@@ -81,6 +81,8 @@ public:
 
    static const int ms_addrdatalength = 16;
 
+   void jsonWrite( std::ostringstream & o_str);
+
 private:
 
    static std::list<AddressMask> ms_addr_masks;

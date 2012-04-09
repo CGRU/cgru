@@ -211,7 +211,7 @@ bool UserAf::getJobs( std::ostringstream & o_str)
 		if( false == first )
 			o_str << ",\n";
 		first = false;
-		((af::Job*)(job))->jsonWrite( o_str, af::Msg::TJobsList);
+		((af::Job*)(job))->v_jsonWrite( o_str, af::Msg::TJobsList);
 		has_jobs = true;
 	}
 	return has_jobs;
@@ -338,7 +338,7 @@ bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
     af::Node::SolvingMethod solve_method = af::Node::SolveByOrder;
 
-    if( solveJobsParrallel())
+    if( solveJobsParallel())
     {
         solve_method = af::Node::SolveByPriority;
     }

@@ -44,6 +44,8 @@ public:
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
+   virtual void v_jsonWrite( std::ostringstream & o_str, int type);
+
 protected:
 	void clearNetIFs();
 	void grabNetIFs( std::vector<NetIF*> & otherNetIFs);
