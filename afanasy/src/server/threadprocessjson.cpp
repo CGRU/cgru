@@ -34,18 +34,18 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	if( getObj.IsObject())
 	{
 		std::string type;
-		af::Af::jr_string("type", type, getObj);
+		af::jr_string("type", type, getObj);
 
 		std::vector<int32_t> ids;
-		af::Af::jr_int32vec("ids", ids, getObj);
+		af::jr_int32vec("ids", ids, getObj);
 
 		std::string mask;
-		af::Af::jr_string("mask", mask, getObj);
+		af::jr_string("mask", mask, getObj);
 
 		if( type == "jobs" )
 		{
 			std::vector<int32_t> uids;
-			af::Af::jr_int32vec("uids", uids, getObj);
+			af::jr_int32vec("uids", uids, getObj);
 			if( uids.size())
 			{
 				AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);

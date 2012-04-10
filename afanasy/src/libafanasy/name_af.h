@@ -27,6 +27,7 @@
 #include <Python.h>
 
 #include "rapidjson/document.h"
+typedef rapidjson::Value JSON;
 
 struct sockaddr_storage;
 
@@ -213,5 +214,17 @@ namespace af
 */
     bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
 
+
 	char * jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::string * o_err = NULL);
+	void jr_string( const char * i_name, std::string & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_regexp( const char * i_name, RegExp      & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_bool  ( const char * i_name, bool        & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_int8  ( const char * i_name, int8_t      & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_uint8 ( const char * i_name, uint8_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_int16 ( const char * i_name, int16_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_uint16( const char * i_name, uint16_t    & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_int32 ( const char * i_name, int32_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_uint32( const char * i_name, uint32_t    & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_int64 ( const char * i_name, int64_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, JSON & i_object, std::string * o_str = NULL);
 }

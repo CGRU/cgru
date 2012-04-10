@@ -19,13 +19,20 @@ void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		return;
 	}
 
-	JSON & jaction = document["action"];
-	if( false == jaction.IsObject())
+	JSON & action = document["action"];
+	if( false == action.IsObject())
 	{
 		AFCommon::QueueLogError("JSON action is not an object.");
 		delete [] data;
 		return;
 	}
+
+	if( action.HasMember("jobs"))
+		i_args->jobs->action( action, i_args->renders, i_args->monitors);
+	else if( action.HasMember("renders"))
+		i_args->renders->action( action, i_args->jobs, i_args->monitors);
+	else if( action.HasMember("users"))
+		i_args->users->action( action, NULL, i_args->monitors);
 
 	delete [] data;
 }

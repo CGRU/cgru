@@ -371,6 +371,52 @@ void AfContainer::freeZombies()
    }
 }
 
+void AfContainer::action( JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+	std::vector<int32_t> ids;
+	af::jr_int32vec("ids", ids, i_action);
+	if( ids.size())
+	{
+		for( int i = 0; i < ids.size(); i++)
+		{
+			if( ids[i] >= size)
+			{
+				AFERRAR("AfContainer::action: position >= size (%d>=%d)", ids[i], size)
+				continue;
+			}
+			af::Node *node = nodesTable[ids[i]];
+			if( node == NULL ) continue;
+			//action( node, mcgeneral, type, pointer, monitoring);
+		}
+		return;
+	}
+
+	std::string mask;
+	af::jr_string("mask", mask, i_action);
+	if( mask.size())
+	{
+		std::string errMsg;
+		af::RegExp rx;
+		rx.setPattern( mask, &errMsg);
+		if( rx.empty())
+		{
+			AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + mask + ("\" is invalid: ") + errMsg);
+			return;
+		}
+		bool namefounded = false;
+		for( af::Node *node = first_ptr; node != NULL; node = node->m_next_ptr )
+		{
+			if( rx.match( node->m_name))
+			{
+				//action( node, mcgeneral, type, pointer, monitoring);
+				if( false == namefounded) namefounded = true;
+			}
+		}
+		if( false == namefounded )
+			AFCommon::QueueLog( name + ": No node matches \"" + mask + "\" founded.");
+	}
+}
+
 void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
    bool namefounded = false;

@@ -1,6 +1,7 @@
 #include "name_af.h"
 
 #include "msg.h"
+#include "regexp.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -37,4 +38,76 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 		AFERRAR("%s", err.c_str())
 
 	return data;
+}
+
+void af::jr_string( const char * i_name, std::string & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsString()) o_attr = (char*)value.GetString();
+}
+
+void af::jr_regexp( const char * i_name, RegExp & o_attr, JSON & i_object, std::string * o_str)
+{
+	std::string pattern;
+	jr_string( i_name, pattern, i_object);
+	o_attr.setPattern( pattern);
+}
+
+void af::jr_bool  ( const char * i_name, bool        & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsBool()) o_attr = value.GetBool();
+}
+
+void af::jr_int8  ( const char * i_name, int8_t      & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt()) o_attr = value.GetInt();
+}
+
+void af::jr_uint8 ( const char * i_name, uint8_t     & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsUint()) o_attr = value.GetUint();
+}
+
+void af::jr_int16 ( const char * i_name, int16_t     & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt()) o_attr = value.GetInt();
+}
+
+void af::jr_uint16( const char * i_name, uint16_t    & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsUint()) o_attr = value.GetUint();
+}
+
+void af::jr_int32 ( const char * i_name, int32_t     & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt()) o_attr = value.GetInt();
+}
+
+void af::jr_uint32( const char * i_name, uint32_t    & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsUint()) o_attr = value.GetUint();
+}
+
+void af::jr_int64( const char * i_name, int64_t    & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & value = i_object[i_name];
+	if( value.IsInt64()) o_attr = value.GetInt64();
+}
+
+void af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, JSON & i_object, std::string * o_str)
+{
+	JSON & array = i_object[i_name];
+	if( false == array.IsArray())
+		return;
+
+	for( int i = 0; i < array.Size(); i++)
+		if( array[i].IsInt())
+			o_attr.push_back( array[i].GetInt());
 }
