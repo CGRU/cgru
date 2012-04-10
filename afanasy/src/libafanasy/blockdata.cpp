@@ -365,7 +365,7 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 
         o_str << "\"block_num\":"  << m_block_num;
 		if( m_state != 0 )
-            o_str << "\",state\":"   << m_state;
+            o_str << ",\"state\":"   << m_state;
 		if( m_job_id != 0 )
             o_str << ",\"job_id\":" << m_job_id;
 		if( m_running_tasks_counter > 0 )

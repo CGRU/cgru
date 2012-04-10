@@ -10,29 +10,13 @@
 
 af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 {
-	int datalen = i_msg->dataLen();
-	char * data = new char[datalen+1];
-	memcpy( data, i_msg->data(), datalen);
-	data[datalen] = '\0';
-
 	rapidjson::Document document;
-	if (document.ParseInsitu<0>(data).HasParseError())
+	std::string error;
+	char * data = af::jsonParseMsg( document, i_msg, &error);
+	if( data == NULL )
 	{
-		std::string error = "JSON: Parsing failed at character " + af::itos( int( document.GetErrorOffset()));
-		error += ":\n";
-		error += document.GetParseError();
 		AFCommon::QueueLogError( error);
 		delete i_msg;
-		delete [] data;
-		return NULL;
-	}
-
-	if( false == document.IsObject())
-	{
-		std::string error = "JSON: Can't find root object.";
-		AFCommon::QueueLogError( error);
-		delete i_msg;
-		delete [] data;
 		return NULL;
 	}
 

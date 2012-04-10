@@ -26,6 +26,8 @@
 #endif
 #include <Python.h>
 
+#include "rapidjson/document.h"
+
 struct sockaddr_storage;
 
 namespace af
@@ -210,4 +212,6 @@ namespace af
     bool msgRequest( const Msg * i_request, Msg * o_answer);
 */
     bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
+
+	char * jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::string * o_err = NULL);
 }

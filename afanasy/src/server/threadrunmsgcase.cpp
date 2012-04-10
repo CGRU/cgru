@@ -20,10 +20,17 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg);
+
 void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
 switch ( i_msg->type())
 {
+	case af::Msg::TJSON:
+	{
+		threadRunJSON( i_args, i_msg);
+		break;
+	}
     case af::Msg::TTalkExit:
     {
         af::MCGeneral mcgeneral( i_msg);
