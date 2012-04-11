@@ -28,7 +28,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-JobContainer *JobAf::jobs  = NULL;
+JobContainer *JobAf::ms_jobs  = NULL;
 
 JobAf::JobAf( af::Msg * msg):
     afsql::DBJob(),
@@ -267,6 +267,52 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    if( monitoring ) monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
    AFCommon::QueueLog("Deleting a job: " + generateInfoString());
    unLock();
+}
+
+void JobAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+	const JSON & operaion = i_action["operation"];
+	if( operaion.IsString())
+	{
+		std::string opname = operaion.GetString();
+		if( opname == "delete")
+		{
+			appendLog("Deleted by " + i_author);
+			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_author);
+			setZombie( (RenderContainer*)i_container, i_monitoring);
+			if( i_monitoring ) i_monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
+			return;
+		}
+		else if( opname == "stop")
+		{
+		   restartAllTasks( true, "Job stopped by " + i_author, (RenderContainer*)i_container, i_monitoring);
+		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
+		}
+		else
+		{
+			appendLog("Unknown operation \"" + opname + "\" by " + i_author);
+			return;
+		}
+		appendLog("Operation \"" + opname + "\" by " + i_author);
+	}
+
+	const JSON & params = i_action["params"];
+	if( params.IsObject())
+		jsonRead( params, &io_changes);
+
+	if( io_changes.size() )
+	{
+		AFCommon::QueueDBUpdateItem( this);
+		if( i_monitoring )
+			i_monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+	}
+}
+
+void JobAf::v_priorityChanged( MonitorContainer * i_monitoring)
+{
+	if( i_monitoring ) i_monitoring->addUser( m_user);
+	ms_jobs->sortPriority( this);
 }
 
 bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
@@ -574,7 +620,7 @@ void JobAf::checkDepends()
    // check global depends:
    if( hasDependMaskGlobal())
    {
-      JobContainerIt jobsIt( jobs);
+	  JobContainerIt jobsIt( ms_jobs);
       for( Job *job = jobsIt.job(); job != NULL; jobsIt.next(), job = jobsIt.job())
       {
          if( job == this ) continue;

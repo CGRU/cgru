@@ -13,7 +13,7 @@ public:
 	TaskData( Msg * msg);
 
 	/// Construct data from JSON:
-	TaskData( JSON & i_value);
+	TaskData( const JSON & i_value);
 
 	virtual ~TaskData();
 

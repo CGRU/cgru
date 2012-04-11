@@ -75,27 +75,47 @@ void Node::action( const JSON & i_action, AfContainer * i_container, MonitorCont
 	if( host_name.empty()) return;
 
 	std::string author = user_name + '@' + host_name;
+	std::string changes;
 
-	v_action( i_action, type, author, i_container, i_monitoring);
-//printf("%s by %s\n", type.c_str(), author.c_str());
+	const JSON & params = i_action["params"];
+	if( params.IsObject())
+		jsonRead( params, &changes, i_monitoring);
+
+	v_action( i_action, type, author, changes, i_container, i_monitoring);
+
+	if( changes.size())
+	{
+		if( changes[0] == '\n' )
+			changes[0] = ' ';
+		changes += std::string(" by ") + author;
+		appendLog( changes);
+	}
 }
 
 void Node::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-					   AfContainer * i_container, MonitorContainer * i_monitoring)
+					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
-
 }
 
-void Node::jsonRead( JSON & i_object)
+void Node::v_priorityChanged( MonitorContainer * i_monitoring ){}
+
+void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorContainer * i_monitoring)
 {
+	int32_t priority = -1;
+	jr_int32 ("priority", priority, i_object, io_changes);
+	if( priority > 255 ) m_priority = 255;
+	else if( priority != -1 ) m_priority = priority;
+
+	if( io_changes )
+	{
+		if( priority != -1 )
+			v_priorityChanged( i_monitoring);
+		return;
+	}
+
 	jr_string("name",   m_name,   i_object);
 	jr_int32 ("id",     m_id,     i_object);
 	jr_bool  ("locked", m_locked, i_object);
-
-	int32_t priority = -1;
-	jr_int32 ("priority", priority, i_object);
-	if( priority > 255 ) m_priority = 255;
-	else if( priority != -1 ) m_priority = priority;
 }
 
 void Node::v_jsonWrite( std::ostringstream & o_str, int i_type)

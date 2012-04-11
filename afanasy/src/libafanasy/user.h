@@ -74,6 +74,8 @@ public:
 
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
 
+	void jsonRead( const JSON & i_object, std::string * io_changes);
+
 	inline const std::string & getAnnontation() const { return m_annotation;}
 
 protected:

@@ -18,7 +18,7 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-RenderContainer * RenderAf::renders = NULL;
+RenderContainer * RenderAf::ms_renders = NULL;
 
 RenderAf::RenderAf( af::Msg * msg):
    DBRender( msg)
@@ -200,6 +200,43 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 
    AFERROR("RenderAf::startTask: No such task.")
    taskexec->stdOut( false);
+}
+
+void RenderAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_renders->sortPriority( this);}
+
+void RenderAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+	JobContainer * jobs = (JobContainer*)i_container;
+
+	const JSON & operaion = i_action["operation"];
+	if( operaion.IsString())
+	{
+		std::string opname = operaion.GetString();
+		if(( opname == "exit") && isOnline())
+		{
+			appendLog( std::string("Exit by ") + i_author);
+			exitClient( af::Msg::TClientExitRequest, jobs, i_monitoring);
+			return;
+		}
+		else
+		{
+			appendLog("Unknown operation \"" + opname + "\" by " + i_author);
+			return;
+		}
+		appendLog("Operation \"" + opname + "\" by " + i_author);
+	}
+
+	const JSON & params = i_action["params"];
+	if( params.IsObject())
+		jsonRead( params, &io_changes);
+
+	if( io_changes.size() )
+	{
+		AFCommon::QueueDBUpdateItem( this);
+		if( i_monitoring )
+			i_monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+	}
 }
 
 bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
@@ -413,7 +450,7 @@ void RenderAf::ejectTasks( JobContainer * jobs, MonitorContainer * monitoring, u
       if( job != NULL )
       {
          af::MCTaskUp taskup( m_id, *jIt, *bIt, *tIt, *nIt, upstatus);
-         job->updateTaskState( taskup, renders, monitoring);
+         job->updateTaskState( taskup, ms_renders, monitoring);
       }
    }
 }
@@ -765,7 +802,7 @@ void RenderAf::remService( const std::string & type)
 
 void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
 {
-   RenderContainerIt rIt( renders);
+   RenderContainerIt rIt( ms_renders);
    RenderAf * render = rIt.getRender( taskup.getClientId());
    if( render == NULL)
    {

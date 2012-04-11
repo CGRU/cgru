@@ -34,7 +34,7 @@ public:
 	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
 
 	virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-						   AfContainer * i_container, MonitorContainer * i_monitoring);
+						   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring);
 
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -115,7 +115,7 @@ protected:
 
     virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message
 
-	void jsonRead( JSON & i_object);
+	void jsonRead( const JSON & i_object, std::string * io_changes = NULL, MonitorContainer * i_monitoring = NULL);
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
 
 protected:
@@ -140,6 +140,8 @@ protected:
 private:
 /// Try to solve a node
     bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
+
+	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
 

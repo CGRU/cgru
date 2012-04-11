@@ -78,6 +78,9 @@ public:
 /// Set some attributes.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
+   virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+						  std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring);
+
    virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 
    void setUser( UserAf * i_user);
@@ -110,7 +113,7 @@ public:
 
 public:
    /// Set Jobs Container.
-   inline static void setJobContainer( JobContainer *Jobs){ jobs = Jobs;}
+   inline static void setJobContainer( JobContainer *Jobs){ ms_jobs = Jobs;}
 
 protected:
    /// Allocate JobInfo, tasksLog.
@@ -144,6 +147,8 @@ private:
 private:
    void initializeValues();
 
+	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
+
 /// Skip or restart some tasks.
    void tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, RenderContainer * renders, MonitorContainer * monitoring);
 
@@ -160,5 +165,5 @@ private:
    af::TaskExec *genTask( RenderAf *render, int block, int task, std::list<int> * blocksIds, MonitorContainer * monitoring);
 
 private:
-   static JobContainer *jobs;          ///< Jobs container pointer.
+   static JobContainer * ms_jobs;          ///< Jobs container pointer.
 };

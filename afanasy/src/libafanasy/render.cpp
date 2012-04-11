@@ -108,6 +108,18 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << "}";
 }
 
+void Render::jsonRead( const JSON &i_object, std::string * io_changes)
+{
+	if( false == i_object.IsObject())
+	{
+		AFERROR("Render::jsonRead: Not a JSON object.")
+		return;
+	}
+
+	jr_string("annotation",    m_annotation,    i_object, io_changes);
+	jr_string("user_name",     m_user_name,     i_object);
+}
+
 void Render::readwrite( Msg * msg)
 {
    switch( msg->type())

@@ -62,6 +62,9 @@ public:
 /// Set some Render attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
+   virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+						  std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring);
+
    inline const std::list<std::string> & getTasksLog() { return tasksloglist; }  ///< Get tasks log list.
    const std::string getServicesString() const;                      ///< Get services information.
 
@@ -75,8 +78,8 @@ public:
    void notSolved();
 
 public:
-   /// Set jobs container.
-   inline static void setRenderContainer( RenderContainer *Rendercontainer){ renders = Rendercontainer;}
+   /// Set container.
+   inline static void setRenderContainer( RenderContainer *Rendercontainer){ ms_renders = Rendercontainer;}
 
    /// Stop task on render if it is not running (for server)
    static void closeLostTask( const af::MCTaskUp &taskup);
@@ -117,6 +120,8 @@ private:
 
    void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
+   virtual void v_priorityChanged( MonitorContainer * i_monitoring);
+
 private:
-   static RenderContainer * renders;
+   static RenderContainer * ms_renders;
 };

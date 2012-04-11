@@ -98,7 +98,7 @@ void BlockData::construct()
 }
 
 /// Construct data from JSON:
-BlockData::BlockData( JSON & i_object, int i_num)
+BlockData::BlockData( const JSON & i_object, int i_num)
 {
 	initDefaults();
 	construct();
@@ -108,7 +108,7 @@ BlockData::BlockData( JSON & i_object, int i_num)
 	jsonRead( i_object);
 }
 
-void BlockData::jsonRead( JSON & i_object)
+void BlockData::jsonRead( const JSON & i_object)
 {
 //	switch( msg->type())
 //	{
@@ -117,7 +117,7 @@ void BlockData::jsonRead( JSON & i_object)
 //	case Msg::TBlocks:
 //		rw_uint32_t( m_flags,                 msg);
 //		if( isNotNumeric()) rw_tasks(         msg);
-	JSON & tasks = i_object["tasks"];
+	const JSON & tasks = i_object["tasks"];
 	if( tasks.IsArray())
 	{
 		m_tasks_num = tasks.Size();
@@ -554,7 +554,7 @@ void BlockData::rw_tasks( Msg * msg)
    }
 }
 
-TaskData * BlockData::createTask( JSON & i_object)
+TaskData * BlockData::createTask( const JSON & i_object)
 {
    return new TaskData( i_object);
 }

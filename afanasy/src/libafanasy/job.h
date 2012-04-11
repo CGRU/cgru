@@ -104,7 +104,7 @@ public:
 
 	virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
-	void jsonRead( JSON & i_object);
+	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
 	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
 
 	void stdOutJobBlocksTasks() const;
@@ -168,7 +168,7 @@ private:
 	void rw_blocks( Msg * msg); ///< Read or write blocks.
 
 	virtual BlockData * newBlockData( Msg * msg);
-	virtual BlockData * newBlockData( JSON & i_object, int i_num);
+	virtual BlockData * newBlockData( const JSON & i_object, int i_num);
 
     void generateInfoStreamJob(    std::ostringstream & o_str, bool full = false) const; /// Generate information.
     void generateInfoStreamBlocks( std::ostringstream & o_str, bool full = false) const;

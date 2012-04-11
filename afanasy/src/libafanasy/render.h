@@ -83,6 +83,8 @@ public:
 
    virtual void v_jsonWrite( std::ostringstream & o_str, int type);
 
+   void jsonRead( const JSON & i_object, std::string * io_changes);
+
 public:
 
 	enum State

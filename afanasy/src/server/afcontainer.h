@@ -64,6 +64,9 @@ public:
 
    inline int getCount() const { return count; }
 
+	/// Sort nodes list according to priority, called when priority attribute of any node changes.
+	void sortPriority( af::Node * node);
+
 protected:
    int add( af::Node *node);   ///< Add node to container.
 
@@ -82,7 +85,4 @@ private:
 private:
 /// Set some node attribute that came from message class.
    void action( af::Node * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
-
-/// Sort nodes list according to priority, called when priority attribute of any node changes.
-   void sortPriority( af::Node * node);
 };

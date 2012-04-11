@@ -22,7 +22,7 @@ TaskData::~TaskData()
 //printf("TaskData::~TaskData:\n");
 }
 
-TaskData::TaskData( JSON & i_value)
+TaskData::TaskData( const JSON & i_value)
 {
 	jr_string("name",        m_name,        i_value);
 	jr_string("command",     m_command,     i_value);

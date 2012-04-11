@@ -102,6 +102,17 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << "}";
 }
 
+void User::jsonRead( const JSON &i_object, std::string * io_changes)
+{
+	if( false == i_object.IsObject())
+	{
+		AFERROR("User::jsonRead: Not a JSON object.")
+		return;
+	}
+
+	jr_string("annotation",    m_annotation,    i_object, io_changes);
+}
+
 void User::readwrite( Msg * msg)
 {
 	Node::readwrite( msg);

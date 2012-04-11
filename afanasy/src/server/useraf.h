@@ -9,6 +9,7 @@
 
 class JobAf;
 class RenderAf;
+class UserContainer;
 
 /// Server side of Afanasy user.
 class UserAf : public afsql::DBUser
@@ -44,6 +45,9 @@ public:
     ///< Set some user attribute.
     bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
+	virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+						   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring);
+
     void moveJobs( const af::MCGeneral & mcgeneral, int type);
 
     virtual int calcWeight() const; ///< Calculate and return memory size.
@@ -52,6 +56,9 @@ public:
 
     void generateJobsIds( af::MCGeneral & ids) const;
 
+	/// Set container.
+	inline static void setUserContainer( UserContainer * i_users ) { ms_users = i_users;}
+
 protected:
     void calcNeed();
 
@@ -59,9 +66,13 @@ private:
     void construct();
     void updateJobsOrder( af::Job * newJob = NULL);
     void setZombie( MonitorContainer * i_monitoring);    ///< Set user to zombie.
+	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
     uint32_t m_zombietime; ///< User zombie time - time to have no jobs before deletion.
 
     AfList m_jobslist; ///< Jobs list.
+
+private:
+   static UserContainer * ms_users;
 };

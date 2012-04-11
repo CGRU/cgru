@@ -24,7 +24,7 @@ public:
    BlockData( Msg * msg);
 
 /// Construct data from JSON:
-	BlockData( JSON & i_value, int i_num);
+	BlockData( const JSON & i_value, int i_num);
 
 /// Empty constructor for database.
    BlockData( int BlockNum, int JobId);
@@ -248,7 +248,7 @@ public:
    inline void setProgressAvoidHostsNum( int value ) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);
 
-    void jsonRead(  JSON & i_objectstd);
+	void jsonRead( const JSON & i_objectstd);
     void jsonWrite( std::ostringstream & o_str, int i_type = Msg::TBlocks);
 
 /// Generate progress bits info string.
@@ -342,7 +342,7 @@ private:
    void construct();
 
    virtual TaskData * createTask( Msg * msg);
-   virtual TaskData * createTask( JSON & i_object);
+   virtual TaskData * createTask( const JSON & i_object);
    void rw_tasks( Msg * msg); ///< Read & write tasks data.
 
 	void setVariableCapacity( int i_capacity_coeff_min, int i_capacity_coeff_max);

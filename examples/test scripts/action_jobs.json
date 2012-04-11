@@ -5,10 +5,12 @@
 		"host_name" : "pc01",
 		"mask"      : "_empty_.*",
 		"ids"       : [2,3],
-		"type"      : "set",
-		"jobs"      :
+		"type"      : "jobs",
+		"operation" : "stop",
+		"params"    :
 		{
-			"capacity" : 10
+			"priority"   : 75,
+			"annotation" : "json json json"
 		}
 	}
 }

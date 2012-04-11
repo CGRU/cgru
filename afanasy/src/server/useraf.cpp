@@ -11,10 +11,13 @@
 #include "jobaf.h"
 #include "renderaf.h"
 #include "monitorcontainer.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
+
+UserContainer * UserAf::ms_users = NULL;
 
 UserAf::UserAf( const std::string & username, const std::string & host):
    afsql::DBUser( username, host)
@@ -38,6 +41,23 @@ void UserAf::construct()
 
 UserAf::~UserAf()
 {
+}
+
+void UserAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_users->sortPriority( this);}
+
+void UserAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+	const JSON & params = i_action["params"];
+	if( params.IsObject())
+		jsonRead( params, &io_changes);
+
+	if( io_changes.size() )
+	{
+		AFCommon::QueueDBUpdateItem( this);
+		if( i_monitoring )
+			i_monitoring->addEvent( af::Msg::TMonitorUsersChanged, m_id);
+	}
 }
 
 bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)

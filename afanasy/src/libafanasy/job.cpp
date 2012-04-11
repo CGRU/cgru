@@ -33,43 +33,47 @@ Job::Job( JSON & i_object)
 	jsonRead( i_object);
 }
 
-void Job::jsonRead( JSON & i_object)
+void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 {
-
 	if( false == i_object.IsObject())
 	{
-		AFERROR("Job::Job: Not a JSON object.")
+		AFERROR("Job::jsonRead: Not a JSON object.")
 		return;
 	}
+
+	jr_string("annotation",    m_annotation,    i_object, io_changes);
+	jr_string("description",   m_description,   i_object, io_changes);
+	jr_string("cmd_pre",       m_cmd_pre,       i_object, io_changes);
+	jr_string("cmd_post",      m_cmd_post,      i_object, io_changes);
+
+	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
+	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
+	jr_int32 ("time_life",          m_time_life,           i_object, io_changes);
+	jr_int64 ("time_wait",          m_time_wait,           i_object, io_changes);
+
+	jr_regexp("hosts_mask",         m_hosts_mask,          i_object, io_changes);
+	jr_regexp("hosts_mask_exclude", m_hosts_mask_exclude,  i_object, io_changes);
+	jr_regexp("depend_mask",        m_depend_mask,         i_object, io_changes);
+	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object, io_changes);
+	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
+	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
+
+	if( io_changes )
+		return;
 
 	Node::jsonRead( i_object);
 
 	jr_string("user_name",     m_user_name,     i_object);
 	jr_string("host_name",     m_host_name,     i_object);
-	jr_string("annotation",    m_annotation,    i_object);
-	jr_string("description",   m_description,   i_object);
 	//jr_uint32("flags",       m_flags,         i_object);
 	//jr_uint32("state",       m_state,         i_object);
 	//jr_int32 ("user_list_order",          m_user_list_order,            i_object);
-	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
-	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
-	jr_string("cmd_pre",  m_cmd_pre,  i_object);
-	jr_string("cmd_post", m_cmd_post, i_object);
 
 	jr_int64 ("time_creation",      m_time_creation,       i_object);
-	jr_int64 ("time_wait",          m_time_wait,           i_object);
-	jr_int64 ("time_started",       m_time_started,        i_object);
-	jr_int64 ("time_done",          m_time_done,           i_object);
-	jr_int32 ("time_life",          m_time_life,           i_object);
+	//jr_int64 ("time_started",       m_time_started,        i_object);
+	//jr_int64 ("time_done",          m_time_done,           i_object);
 
-	jr_regexp("hosts_mask",         m_hosts_mask,          i_object);
-	jr_regexp("hosts_mask_exclude", m_hosts_mask_exclude,  i_object);
-	jr_regexp("depend_mask",        m_depend_mask,         i_object);
-	jr_regexp("depend_mask_global", m_depend_mask_global,  i_object);
-	jr_regexp("need_os",            m_need_os,             i_object);
-	jr_regexp("need_properties",    m_need_properties,     i_object);
-
-	JSON & blocks = i_object["blocks"];
+	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
 	{
 		AFERROR("Job::Job: Can't find blocks array.");
@@ -276,7 +280,7 @@ BlockData * Job::newBlockData( Msg * msg)
    return new BlockData( msg);
 }
 
-BlockData * Job::newBlockData( JSON & i_object, int i_num)
+BlockData * Job::newBlockData( const JSON & i_object, int i_num)
 {
    return new BlockData( i_object, i_num);
 }

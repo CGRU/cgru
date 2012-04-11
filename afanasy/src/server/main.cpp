@@ -114,14 +114,15 @@ int main(int argc, char *argv[])
     // containers initialization
     JobContainer jobs( &afDB_JobRegister);
     if( false == jobs.isInitialized()) return 1;
-    JobAf::setJobContainer( &jobs);
+	JobAf::setJobContainer( &jobs);
 
     UserContainer users;
     if( false == users.isInitialized()) return 1;
+	UserAf::setUserContainer( &users);
 
     RenderContainer renders;
     if( false == renders.isInitialized()) return 1;
-    RenderAf::setRenderContainer( &renders);
+	RenderAf::setRenderContainer( &renders);
 
     TalkContainer talks;
     if( false == talks.isInitialized()) return 1;
