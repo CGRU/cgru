@@ -7,7 +7,11 @@
 http://www.cplusplus.com/reference/clibrary/ctime/strftime
 -->
    <filenamesizemax>250</filenamesizemax>
-   <cmdprefix></cmdprefix>
+
+<!-- Changes log for any afnode (job, render, user) -->
+	<afnode_log_lines_max>100</afnode_log_lines_max>
+	<afnode_logs_rotate>10</afnode_logs_rotate>
+
 <!--
 If 'AF_CMD_PREFIX' environment variable exists, it will be used.
 With such prefix commands are launched from current directory.
@@ -15,6 +19,8 @@ Prefix './' used in examples and set through environment.
    <cmdprefix>./</cmdprefix>
 So each path (project, asset) can have individual software setup.
 -->
+	<cmdprefix></cmdprefix>
+
    <priority>99</priority>
    <maxrunningtasks>-1</maxrunningtasks>
 
@@ -40,7 +46,6 @@ So each path (project, asset) can have individual software setup.
    <task_default_capacity>1000</task_default_capacity>
    <task_update_timeout>300</task_update_timeout>
    <task_log_linesmax>100</task_log_linesmax>
-   <job_log_linesmax>100</job_log_linesmax>
 
 <!-- Render -->
 <!--
@@ -71,8 +76,6 @@ iostat - parce output of linux 'iostat' command, specify device in "render_custo
    <render_waitforconnected>15000</render_waitforconnected>
    <render_waitforreadyread>15000</render_waitforreadyread>
    <render_waitforbyteswritten>15000</render_waitforbyteswritten>
-   <render_log_linesmax>100</render_log_linesmax>
-   <render_logs_rotate>10</render_logs_rotate>
    <render_exec>afrender</render_exec>
    <render_cmd_reboot>reboot</render_cmd_reboot>
    <render_cmd_shutdown>shutdown -P 1 afrequest</render_cmd_shutdown>
@@ -96,8 +99,6 @@ On MS Windows it should be something like:
    <task_errors_same_host>3</task_errors_same_host>
    <errors_forgivetime>18000</errors_forgivetime>
    <user_zombietime>2</user_zombietime>
-   <user_log_linesmax>100</user_log_linesmax>
-   <user_logs_rotate>10</user_logs_rotate>
 
 <!-- Watch -->
    <pswd_visor>1832116180fdc61b64fd978401e462e9</pswd_visor>

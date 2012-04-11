@@ -371,7 +371,7 @@ void AfContainer::freeZombies()
    }
 }
 
-void AfContainer::action( JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
+void AfContainer::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	std::vector<int32_t> ids;
 	af::jr_int32vec("ids", ids, i_action);
@@ -386,7 +386,7 @@ void AfContainer::action( JSON & i_action, AfContainer * i_container, MonitorCon
 			}
 			af::Node *node = nodesTable[ids[i]];
 			if( node == NULL ) continue;
-			//action( node, mcgeneral, type, pointer, monitoring);
+			node->action( i_action, i_container, i_monitoring);
 		}
 		return;
 	}
@@ -408,7 +408,7 @@ void AfContainer::action( JSON & i_action, AfContainer * i_container, MonitorCon
 		{
 			if( rx.match( node->m_name))
 			{
-				//action( node, mcgeneral, type, pointer, monitoring);
+				node->action( i_action, i_container, i_monitoring);
 				if( false == namefounded) namefounded = true;
 			}
 		}

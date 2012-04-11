@@ -3,6 +3,7 @@
 #include <stdio.h>
 
 #include "msgclasses/mcgeneral.h"
+#include "environment.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -59,6 +60,32 @@ void Node::readwrite( Msg * msg)
 	rw_String(  m_name,      msg);
 }
 
+void Node::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+	if( isLocked())
+		return;
+
+	std::string type, user_name, host_name;
+	jr_string("type", type, i_action);
+	jr_string("user_name", user_name, i_action);
+	jr_string("host_name", host_name, i_action);
+
+	if( type.empty()) return;
+	if( user_name.empty()) return;
+	if( host_name.empty()) return;
+
+	std::string author = user_name + '@' + host_name;
+
+	v_action( i_action, type, author, i_container, i_monitoring);
+//printf("%s by %s\n", type.c_str(), author.c_str());
+}
+
+void Node::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+					   AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+
+}
+
 void Node::jsonRead( JSON & i_object)
 {
 	jr_string("name",   m_name,   i_object);
@@ -88,8 +115,17 @@ int Node::calcWeight() const
    int weight = sizeof( Node);
    weight += af::weigh( m_name);
    for( unsigned l = 0; l < m_lists.size(); l++) weight += sizeof(void*);
+
    return weight;
 }
+
+int Node::calcLogWeight() const
+{
+	int weight = 0;
+	for( std::list<std::string>::const_iterator it = m_log.begin(); it != m_log.end(); it++)
+	   weight += af::weigh( *it);
+}
+
 
 /// Main solving functions should be implemented in child classes (if solving needed):
 bool Node::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
@@ -231,4 +267,10 @@ bool Node::solveList( std::list<af::Node*> & i_list, SolvingMethod i_method,
 
     // Return false - that no nodes was not solved
     return false;
+}
+
+void Node::appendLog( const std::string & message)
+{
+   m_log.push_back( af::time2str() + " : " + message);
+   while( m_log.size() > af::Environment::getAfNodeLogLinesMax() ) m_log.pop_front();
 }

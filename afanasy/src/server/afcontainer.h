@@ -49,7 +49,7 @@ public:
    void action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 	/// Perform an aciton described by JSON object:
-	void action( JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
+	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
 
    /* */
    void ReadLock( void ) { m_rw_lock.ReadLock(); }

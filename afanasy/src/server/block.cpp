@@ -16,13 +16,12 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
-Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
+Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
    job( blockJob),
    data( blockData),
    tasks( NULL),
    user( NULL),
    jobprogress( progress),
-   joblog( log),
    initialized( false)
 {
    tasks = new Task*[ data->getTasksNum()];
@@ -56,7 +55,7 @@ Block::~Block()
 
 void Block::appendJobLog( const std::string & message)
 {
-   joblog->push_back( af::time2str() + " : B[" + data->getName() + "]: " + message);
+   job->appendLog("B[" + data->getName() + "]: " + message);
 }
 
 void Block::errorHostsAppend( int task, int hostId, RenderContainer * renders)

@@ -39,9 +39,6 @@ public:
 
    void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
-/// Get job log.
-   inline const std::list<std::string> & getLog() { return loglist;}
-
    const std::string getErrorHostsListString() const; /// Get avoid hosts list.
    virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
@@ -119,9 +116,6 @@ protected:
    /// Allocate JobInfo, tasksLog.
    bool construct();
 
-   /// Append task log with a \c message .
-   void appendLog( const std::string & message);
-
    virtual Block * newBlock( int numBlock); ///< Virtual function to create another blocks in child classes
 
    void calcNeed();
@@ -129,7 +123,6 @@ protected:
 protected:
    Block ** m_blocks;              ///< Blocks.
    bool m_fromdatabase;            ///< Whether job constructed from database.
-   std::list<std::string> loglist;           ///< Job log.
 
 private:
    bool m_constructed;             ///< Whether the job was constructed successfully.

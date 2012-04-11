@@ -166,7 +166,7 @@ void UserAf::setZombie( MonitorContainer * i_monitoring)
     af:Node::setZombie();
     if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
     appendLog( "Became a zombie.");
-    AFCommon::saveLog( m_log, af::Environment::getUsersLogsDir(), m_name, af::Environment::getUserLogsRotate());
+	AFCommon::saveLog( getLog(), af::Environment::getUsersLogsDir(), m_name, af::Environment::getAfNodeLogsRotate());
 }
 
 void UserAf::addJob( JobAf * i_job)
@@ -387,12 +387,6 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
       }
    }
    updateJobsOrder();
-}
-
-void UserAf::appendLog( const std::string & message)
-{
-   m_log.push_back( af::time2str() + " : " + message);
-   while( m_log.size() > af::Environment::getUserLogLinesMax() ) m_log.pop_front();
 }
 
 void UserAf::generateJobsIds( af::MCGeneral & ids) const

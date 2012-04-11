@@ -78,7 +78,7 @@ void RenderAf::offline( JobContainer * jobs, uint32_t updateTaskState, MonitorCo
       AFCommon::QueueLog("Render Deleting: " + generateInfoString( false));
       appendLog("Waiting for deletion.");
       setZombie();
-      AFCommon::saveLog( loglist, af::Environment::getRendersLogsDir(), m_name, af::Environment::getRenderLogsRotate());
+	  AFCommon::saveLog( getLog(), af::Environment::getRendersLogsDir(), m_name, af::Environment::getAfNodeLogsRotate());
       if( monitoring ) monitoring->addEvent( af::Msg::TMonitorRendersDel, m_id);
    }
    else
@@ -603,15 +603,9 @@ void RenderAf::sendOutput( af::MCListenAddress & mclisten, int JobId, int Block,
    AFCommon::QueueMsgDispatch( msg);
 }
 
-void RenderAf::appendLog( const std::string & message)
-{
-   while( loglist.size() > af::Environment::getRenderLogLinesMax() ) loglist.pop_front();
-   loglist.push_back( af::time2str() + " : " + message);
-}
-
 void RenderAf::appendTasksLog( const std::string & message)
 {
-   while( tasksloglist.size() > af::Environment::getRenderLogLinesMax() ) tasksloglist.pop_front();
+   while( tasksloglist.size() > af::Environment::getAfNodeLogLinesMax() ) tasksloglist.pop_front();
    tasksloglist.push_back( af::time2str() + " : " + message);
 }
 

@@ -46,15 +46,11 @@ public:
 
     void moveJobs( const af::MCGeneral & mcgeneral, int type);
 
-    inline const std::list<std::string> & getLog() { return m_log; }    ///< Get log.
-
     virtual int calcWeight() const; ///< Calculate and return memory size.
 
     inline AfList * getJobsList() { return &m_jobslist; }
 
     void generateJobsIds( af::MCGeneral & ids) const;
-
-    void appendLog( const std::string & message);  ///< Append task log with a \c message .
 
 protected:
     void calcNeed();
@@ -68,6 +64,4 @@ private:
     uint32_t m_zombietime; ///< User zombie time - time to have no jobs before deletion.
 
     AfList m_jobslist; ///< Jobs list.
-
-    std::list<std::string> m_log;                          ///< Log.
 };

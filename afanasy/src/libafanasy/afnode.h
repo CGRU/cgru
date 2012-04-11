@@ -30,6 +30,12 @@ public:
    inline bool operator == ( const af::Node &other) const { return m_priority == other.m_priority;}
    inline bool operator != ( const af::Node &other) const { return m_priority != other.m_priority;}
 
+	/// Set some node attribute by incoming message.
+	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
+
+	virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
+						   AfContainer * i_container, MonitorContainer * i_monitoring);
+
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
@@ -47,6 +53,7 @@ public:
    friend class ::AfListIt;
 
    virtual int calcWeight() const;                   ///< Calculate and return memory size.
+   int calcLogWeight() const;
 
 	enum Flags
 	{
@@ -93,6 +100,9 @@ public:
 
    /// Compare nodes solving need:
    bool greaterNeed( const af::Node * i_other) const;
+
+   void appendLog( const std::string & message);  ///< Append task log with a \c message .
+   inline const std::list<std::string> & getLog() { return m_log; }    ///< Get log.
 
 protected:
 /// General need calculation function,
@@ -158,5 +168,7 @@ private:
 
 /// List of lists which have this node ( for a exapmle: each user has some jobs).
    std::list<AfList*> m_lists;
+
+   std::list<std::string> m_log;                          ///< Log.
 };
 }

@@ -10,8 +10,8 @@
 //////////////////////////////////////////   BLOCK    /////////////////////////////////////////////////////////
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-SysBlock_WOL::SysBlock_WOL( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
-   SysBlock( blockJob, blockData, progress, log)
+SysBlock_WOL::SysBlock_WOL( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
+   SysBlock( blockJob, blockData, progress)
 {
 AFINFO("SysBlock_WOL::SysBlock_WOL:")
 }

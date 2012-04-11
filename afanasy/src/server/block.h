@@ -13,7 +13,7 @@ class Task;
 class Block
 {
 public:
-   Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
+   Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress);
    virtual ~Block();
 
    inline bool isInitialized() const { return initialized;}
@@ -63,7 +63,6 @@ protected:
 
 private:
    af::JobProgress * jobprogress;
-   std::list<std::string> * joblog;
 
    std::list<std::string>  errorHosts;       ///< Avoid error hosts list.
    std::list<int>          errorHostsCounts; ///< Number of errors on error host.

@@ -50,7 +50,7 @@ private:
 class SysBlock : public Block
 {
 public:
-   SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log);
+   SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress);
    virtual ~SysBlock();
 
    void updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring);

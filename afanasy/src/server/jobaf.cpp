@@ -127,7 +127,7 @@ JobAf::~JobAf()
 
 Block * JobAf::newBlock( int numBlock)
 {
-    return new Block( this, m_blocksdata[numBlock], progress, &loglist);
+	return new Block( this, m_blocksdata[numBlock], progress);
 }
 
 void JobAf::setUser( UserAf * i_user)
@@ -1254,12 +1254,6 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
    }
 }
 
-void JobAf::appendLog( const std::string & message)
-{
-   loglist.push_back( af::time2str() + " : " + message);
-   while( loglist.size() > af::Environment::getJobLogLinesMax() ) loglist.pop_front();
-}
-
 int JobAf::calcWeight() const
 {
 //printf("JobAf::calcWeight: '%s' runningtaskscounter=%d\n", name.toUtf8().data(), runningtaskscounter);
@@ -1271,9 +1265,7 @@ int JobAf::calcWeight() const
    if( progress != NULL) progressWeight = progress->calcWeight();
    weight += progressWeight;
 
-   m_logsWeight = 0;
-   for( std::list<std::string>::const_iterator it = loglist.begin(); it != loglist.end(); it++)
-      m_logsWeight += af::weigh( *it);
+   m_logsWeight = calcLogWeight();
 
    for( int b = 0; b < m_blocksnum; b++)
    {

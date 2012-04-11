@@ -157,8 +157,8 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 
 //Task * SysBlock::task = NULL;
 
-SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress, std::list<std::string> * log):
-   Block( blockJob, blockData, progress, log)
+SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
+   Block( blockJob, blockData, progress)
 {
 //printf("SysBlock::SysBlock:\n");
    taskprogress = progress->tp[ data->getBlockNum()][0];
@@ -467,12 +467,12 @@ Block * SysJob::newBlock( int numBlock)
    {
    case BlockPostCmdIndex:
    {
-      block_cmdpost = new SysBlock_CmdPost( this, m_blocksdata[numBlock], progress, &loglist);
+	  block_cmdpost = new SysBlock_CmdPost( this, m_blocksdata[numBlock], progress);
       return block_cmdpost;
    }
    case BlockWOLIndex:
    {
-      block_wol = new SysBlock_WOL( this, m_blocksdata[numBlock], progress, &loglist);
+	  block_wol = new SysBlock_WOL( this, m_blocksdata[numBlock], progress);
       return block_wol;
    }
    default:

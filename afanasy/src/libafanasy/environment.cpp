@@ -30,7 +30,6 @@ int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMA
 int     Environment::task_default_capacity =           AFJOB::TASK_DEFAULT_CAPACITY;
 int     Environment::task_update_timeout =             AFJOB::TASK_UPDATE_TIMEOUT;
 int     Environment::task_log_linesmax =               AFJOB::TASK_LOG_LINESMAX;
-int     Environment::job_log_linesmax =                AFJOB::JOB_LOG_LINESMAX;
 
 int     Environment::serverport =                      AFADDR::SERVER_PORT;
 int     Environment::clientport =                      AFADDR::CLIENT_PORT;
@@ -51,7 +50,6 @@ int     Environment::render_connectretries =           AFRENDER::CONNECTRETRIES;
 int     Environment::render_waitforconnected =         AFRENDER::WAITFORCONNECTED;
 int     Environment::render_waitforreadyread =         AFRENDER::WAITFORREADYREAD;
 int     Environment::render_waitforbyteswritten =      AFRENDER::WAITFORBYTESWRITTEN;
-int     Environment::render_log_linesmax =             AFRENDER::LOG_LINESMAX;
 std::string Environment::cmd_shell =                   AFRENDER::CMD_SHELL;
  
 std::string Environment::render_exec =                 AFRENDER::EXEC;
@@ -76,7 +74,6 @@ std::string Environment::sysjob_wol_service =         AFJOB::SYSJOB_BLOCKSERVICE
 std::string Environment::sysjob_postcmd_service =     AFJOB::SYSJOB_BLOCKSERVICE;
 
 int     Environment::user_zombietime =                 AFUSER::ZOMBIETIME;
-int     Environment::user_log_linesmax =               AFUSER::LOG_LINESMAX;
 
 int     Environment::monitor_updateperiod =            AFMONITOR::UPDATEPERIOD;
 int     Environment::monitor_connectretries =          AFMONITOR::CONNECTRETRIES;
@@ -92,10 +89,11 @@ int     Environment::talk_waitforreadyread =           AFTALK::WAITFORREADYREAD;
 int     Environment::talk_waitforbyteswritten =        AFTALK::WAITFORBYTESWRITTEN;
 int     Environment::talk_zombietime =                 AFTALK::ZOMBIETIME;
 
-int Environment::render_logs_rotate =              AFRENDER::LOGS_ROTATE;
+int Environment::afnode_logs_rotate   =              AFGENERAL::LOGS_ROTATE;
+int Environment::afnode_log_lines_max =              AFGENERAL::LOG_LINES_MAX;
+
 int Environment::server_so_rcvtimeo_sec =          AFSERVER::SO_RCVTIMEO_SEC;
 int Environment::server_so_sndtimeo_sec =          AFSERVER::SO_SNDTIMEO_SEC;
-int Environment::user_logs_rotate =                AFUSER::LOGS_ROTATE;
 
 std::string Environment::db_conninfo =                     AFDATABASE::CONNINFO;
 std::string Environment::db_stringquotes =                 AFDATABASE::STRINGQUOTES;
@@ -151,7 +149,9 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
     getVar( pnode, af::Msg::Magic,                    "magic_number"                      );
 
     getVar( pnode, filenamesizemax,                   "filenamesizemax"                   );
-    getVar( pnode, timeformat,                        "timeformat"                        );
+	getVar( pnode, afnode_log_lines_max,              "afnode_log_lines_max"              );
+	getVar( pnode, afnode_logs_rotate,                "afnode_logs_rotate"                );
+	getVar( pnode, timeformat,                        "timeformat"                        );
     getVar( pnode, priority,                          "priority"                          );
     getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
 
@@ -159,9 +159,6 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
     getVar( pnode, serveripmask,                      "serveripmask"                      );
     getVar( pnode, serverport,                        "serverport"                        );
     getVar( pnode, clientport,                        "clientport"                        );
-
-    getVar( pnode, user_logs_rotate,                  "user_logs_rotate"                  );
-    getVar( pnode, render_logs_rotate,                "render_logs_rotate"                );
 
     getVar( pnode, tempdirectory,                     "tempdirectory"                     );
 
@@ -176,7 +173,6 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
     getVar( pnode, task_default_capacity,             "task_default_capacity"             );
     getVar( pnode, task_update_timeout,               "task_update_timeout"               );
     getVar( pnode, task_log_linesmax,                 "task_log_linesmax"                 );
-    getVar( pnode, job_log_linesmax,                  "job_log_linesmax"                  );
 
     getVar( pnode, cmd_shell,                         "cmd_shell"                         );
     getVar( pnode, render_default_capacity,           "render_default_capacity"           );
@@ -198,7 +194,6 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
     getVar( pnode, render_waitforconnected,           "render_waitforconnected"           );
     getVar( pnode, render_waitforreadyread,           "render_waitforreadyread"           );
     getVar( pnode, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
-    getVar( pnode, render_log_linesmax,               "render_log_linesmax"               );
 
     getVar( pnode, previewcmds,                       "previewcmds"                       );
     getVar( pnode, rendercmds,                        "rendercmds"                        );
@@ -223,7 +218,6 @@ void Environment::getVars( const rapidxml::xml_node<> * pnode)
     getVar( pnode, sysjob_wol_service,                "sysjob_wol_service"                );
 
     getVar( pnode, user_zombietime,                   "user_zombietime"                   );
-    getVar( pnode, user_log_linesmax,                 "user_log_linesmax"                 );
 
     getVar( pnode, talk_updateperiod,                 "talk_updateperiod"                 );
     getVar( pnode, talk_zombietime,                   "talk_zombietime"                   );

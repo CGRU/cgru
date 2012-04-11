@@ -97,7 +97,6 @@ public:
     static inline int getTaskDefaultCapacity()           { return task_default_capacity;        }
     static inline int getTaskUpdateTimeout()             { return task_update_timeout;          }
     static inline int getTaskLogLinesMax()               { return task_log_linesmax;            }
-    static inline int getJobLogLinesMax()                { return job_log_linesmax;             }
 
     static inline int getErrorsForgiveTime()             { return errors_forgivetime;           }
     static inline int getErrorsAvoidHost()               { return errors_avoid_host;            }
@@ -110,7 +109,6 @@ public:
     static inline const std::string & getSysPostCmdService() { return sysjob_postcmd_service;    }
 
     static inline int getUserZombieTime()                { return user_zombietime;              }
-    static inline int getUserLogLinesMax()               { return user_log_linesmax;            }
 
     static inline int getMonitorUpdatePeriod()           { return monitor_updateperiod;         }
     static inline int getMonitorConnectRetries()         { return monitor_connectretries;       }
@@ -138,7 +136,7 @@ public:
     static inline int getRenderWaitForConnected()      { return render_waitforconnected;     }
     static inline int getRenderWaitForReadyRead()      { return render_waitforreadyread;     }
     static inline int getRenderWaitForBytesWritten()   { return render_waitforbyteswritten;  }
-    static inline int getRenderLogLinesMax()           { return render_log_linesmax;         }
+
     static inline const std::string & getRenderExec()          { return render_exec;            } ///< Get Render execution commannd.
     static inline const std::string & getRenderCmdReboot()     { return render_cmd_reboot;      }
     static inline const std::string & getRenderCmdShutdown()   { return render_cmd_shutdown;    }
@@ -149,8 +147,8 @@ public:
     static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
     static inline const std::string & getRenderResClasses()    { return render_resclasses;      }
 
-    static inline int getUserLogsRotate()    { return   user_logs_rotate; }
-    static inline int getRenderLogsRotate()  { return render_logs_rotate; }
+	static inline int getAfNodeLogsRotate()  { return afnode_logs_rotate;   }
+	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
     static inline const std::string & getTempDirectory()       { return tempdirectory;  } ///< Get temp directory.
     static inline const std::string & getTasksStdOutDir()      { return tasksstdoutdir; } ///< Get tasks standart output directory.
@@ -214,6 +212,8 @@ private:
    static std::string platform;
 
    static int filenamesizemax;
+   static int afnode_logs_rotate;
+   static int afnode_log_lines_max;
 
    static int priority;          ///< Default priority
    static int maxrunningtasks;   ///< Default maximum running tasks number
@@ -239,7 +239,6 @@ private:
    static int task_update_timeout;
    static int task_default_capacity;
    static int task_log_linesmax;
-   static int job_log_linesmax;
 
    static int render_default_capacity;
    static int render_default_maxtasks;
@@ -251,7 +250,7 @@ private:
    static int render_waitforconnected;
    static int render_waitforreadyread;
    static int render_waitforbyteswritten;
-   static int render_log_linesmax;
+
    static std::string render_exec;       ///< How Render can execute anther Render.
    static std::string cmd_shell;
    static std::string render_cmd_reboot;
@@ -274,7 +273,6 @@ private:
    static std::string sysjob_postcmd_service;
 
    static int user_zombietime;
-   static int user_log_linesmax;
 
    static int monitor_updateperiod;
    static int monitor_connectretries;
@@ -291,9 +289,6 @@ private:
    static int talk_waitforbyteswritten;
 
    /// Temp directory
-   static int   user_logs_rotate;
-   static int render_logs_rotate;
-
    static std::string tempdirectory;
    static std::string tasksstdoutdir;
    static std::string renderslogsdir;

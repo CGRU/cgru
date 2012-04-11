@@ -21,7 +21,6 @@ namespace AFJOB
    const int TASK_UPDATE_TIMEOUT   = 300;  ///< Seconds for task to have no update to produce error.
    const int TASK_STOP_TIMEOUT     = 5;    ///< Time after running task was asked to stop, it become not running itself.
    const int TASK_LOG_LINESMAX     = 100;  ///< Maximum number of lines in task log.
-   const int JOB_LOG_LINESMAX      = 100;  ///< Maximum number of lines in job log.
 
    const int TASK_MULTIHOSTMAXHOSTS = 100;
 

@@ -62,7 +62,6 @@ public:
 /// Set some Render attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   inline const std::list<std::string> & getLog()      { return loglist; }       ///< Get log list.
    inline const std::list<std::string> & getTasksLog() { return tasksloglist; }  ///< Get tasks log list.
    const std::string getServicesString() const;                      ///< Get services information.
 
@@ -91,7 +90,6 @@ private:
 
    std::vector<int> disabledservices;
 
-   std::list<std::string> loglist;                          ///< Log.
    std::list<std::string> tasksloglist;                     ///< Tasks Log.
 
 private:
@@ -117,7 +115,6 @@ private:
    void wolSleep( MonitorContainer * monitoring);
    void wolWake(  MonitorContainer * monitoring);
 
-   void appendLog(      const std::string & message);  ///< Append log list with a \c message .
    void appendTasksLog( const std::string & message);  ///< Append tasks log with a \c message .
 
 private:

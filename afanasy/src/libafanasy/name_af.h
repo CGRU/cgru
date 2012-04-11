@@ -179,10 +179,6 @@ namespace af
                        FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);
 #endif
 
-    /// Read data from file descriptor. Return a new allocated buffer pointer and a size passed through an argument.
-    /** Return NULL pointer and negative size on error.**/
-//    char * readdata( int fd, int & read_len);
-
     /// Calculate messages statistics and write it in buffer, return written size.
     void statwrite( af::Msg * msg = NULL );
 
@@ -194,10 +190,7 @@ namespace af
 
     /// Solve host address.
     const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
-/*
-    /// Connect to Afanasy and return file discriptor. Return bad discriptor on error and prints an error in \c stderr.
-    int connecttomaster( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
-*/
+
     /// Recieve message from given file discriptor \c desc to \c buffer
     /** Return true if success. This function will block process.**/
     bool msgread( int desc, af::Msg* msg);
@@ -208,23 +201,20 @@ namespace af
 
     /// Send a message to all its addresses and receive an answer if needed
     Msg * msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose);
-/*
-    /// Set message to it's address and wait for an \c answer, \c return true on success.
-    bool msgRequest( const Msg * i_request, Msg * o_answer);
-*/
+
     bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
 
 
 	char * jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::string * o_err = NULL);
-	void jr_string( const char * i_name, std::string & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_regexp( const char * i_name, RegExp      & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_bool  ( const char * i_name, bool        & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_int8  ( const char * i_name, int8_t      & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_uint8 ( const char * i_name, uint8_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_int16 ( const char * i_name, int16_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_uint16( const char * i_name, uint16_t    & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_int32 ( const char * i_name, int32_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_uint32( const char * i_name, uint32_t    & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_int64 ( const char * i_name, int64_t     & o_attr, JSON & i_object, std::string * o_str = NULL);
-	void jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, JSON & i_object, std::string * o_str = NULL);
+	void jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_regexp( const char * i_name, RegExp      & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_bool  ( const char * i_name, bool        & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_int8  ( const char * i_name, int8_t      & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_uint8 ( const char * i_name, uint8_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_int16 ( const char * i_name, int16_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_uint16( const char * i_name, uint16_t    & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_int32 ( const char * i_name, int32_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_uint32( const char * i_name, uint32_t    & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_int64 ( const char * i_name, int64_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	void jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const JSON & i_object, std::string * o_str = NULL);
 }
