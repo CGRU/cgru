@@ -209,11 +209,12 @@ void RenderAf::v_action( const JSON & i_action, const std::string & i_type, cons
 {
 	JobContainer * jobs = (JobContainer*)i_container;
 
-	const JSON & operaion = i_action["operation"];
-	if( operaion.IsString())
+	const JSON & operation = i_action["operation"];
+	if( operation.IsObject())
 	{
-		std::string opname = operaion.GetString();
-		if(( opname == "exit") && isOnline())
+		std::string type;
+		af::jr_string("type", type, operation);
+		if(( type == "exit") && isOnline())
 		{
 			appendLog( std::string("Exit by ") + i_author);
 			exitClient( af::Msg::TClientExitRequest, jobs, i_monitoring);
@@ -221,10 +222,10 @@ void RenderAf::v_action( const JSON & i_action, const std::string & i_type, cons
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + opname + "\" by " + i_author);
+			appendLog("Unknown operation \"" + type + "\" by " + i_author);
 			return;
 		}
-		appendLog("Operation \"" + opname + "\" by " + i_author);
+		appendLog("Operation \"" + type + "\" by " + i_author);
 	}
 
 	const JSON & params = i_action["params"];

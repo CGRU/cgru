@@ -41,6 +41,28 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
+	if( io_changes && m_blocksnum && m_blocksdata )
+	{
+		std::vector<int32_t> block_ids;
+		jr_int32vec("block_ids", block_ids, i_object);
+		if( block_ids.size())
+		{
+			for( std::vector<int32_t>::const_iterator it = block_ids.begin(); it != block_ids.end(); it++)
+			{
+				if( *it >= m_blocksnum )
+				{
+					appendLog("Invalid block number = " + itos(*it));
+					break;
+				}
+				std::string changes;
+				m_blocksdata[*it]->jsonRead( i_object, &changes);
+				if( changes.size())
+					*io_changes = "\nBlock['" + m_blocksdata[*it]->getName() + "']:" + changes;
+			}
+			return;
+		}
+	}
+
 	jr_string("annotation",    m_annotation,    i_object, io_changes);
 	jr_string("description",   m_description,   i_object, io_changes);
 	jr_string("cmd_pre",       m_cmd_pre,       i_object, io_changes);

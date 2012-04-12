@@ -248,7 +248,7 @@ public:
    inline void setProgressAvoidHostsNum( int value ) { p_avoidhostsnum = value; }
    void setStateDependent( bool depend);
 
-	void jsonRead( const JSON & i_objectstd);
+	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
     void jsonWrite( std::ostringstream & o_str, int i_type = Msg::TBlocks);
 
 /// Generate progress bits info string.

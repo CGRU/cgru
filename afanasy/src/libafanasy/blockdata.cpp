@@ -108,15 +108,45 @@ BlockData::BlockData( const JSON & i_object, int i_num)
 	jsonRead( i_object);
 }
 
-void BlockData::jsonRead( const JSON & i_object)
+void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 {
-//	switch( msg->type())
-//	{
-//	case Msg::TJob:
-//	case Msg::TJobRegister:
-//	case Msg::TBlocks:
-//		rw_uint32_t( m_flags,                 msg);
-//		if( isNotNumeric()) rw_tasks(         msg);
+	//jr_uint32("flags",               m_flags,                 i_object);
+
+	jr_int32 ("capacity",              m_capacity,              i_object, io_changes);
+	jr_int32 ("need_memory",           m_need_memory,           i_object, io_changes);
+	jr_int32 ("need_power",            m_need_power,            i_object, io_changes);
+	jr_int32 ("need_hdd",              m_need_hdd,              i_object, io_changes);
+	jr_regexp("depend_mask",           m_depend_mask,           i_object, io_changes);
+	jr_regexp("tasks_depend_mask",     m_tasks_depend_mask,     i_object, io_changes);
+	jr_regexp("hosts_mask",            m_hosts_mask,            i_object, io_changes);
+	jr_regexp("hosts_mask_exclude",    m_hosts_mask_exclude,    i_object, io_changes);
+	jr_regexp("need_properties",       m_need_properties,       i_object, io_changes);
+	jr_string("name",                  m_name,                  i_object, io_changes);
+	jr_string("service",               m_service,               i_object, io_changes);
+	jr_int8  ("errors_retries",        m_errors_retries,        i_object, io_changes);
+	jr_int8  ("errors_avoid_host",     m_errors_avoid_host,     i_object, io_changes);
+	jr_int8  ("errors_task_same_host", m_errors_task_same_host, i_object, io_changes);
+	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object, io_changes);
+	jr_uint32("tasks_max_run_time",    m_tasks_max_run_time,    i_object, io_changes);
+	jr_string("tasks_name",            m_tasks_name,            i_object, io_changes);
+	jr_string("parser",                m_parser,                i_object, io_changes);
+	jr_string("working_directory",     m_working_directory,     i_object, io_changes);
+	jr_string("command",               m_command,               i_object, io_changes);
+	jr_string("files",                 m_files,                 i_object, io_changes);
+	jr_string("cmd_pre",               m_cmd_pre,               i_object, io_changes);
+	jr_string("cmd_post",              m_cmd_post,              i_object, io_changes);
+	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
+	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
+	//jr_string("custom_data",         m_custom_data,           i_object, io_changes);
+	//jr_string("environment",         m_environment,           i_object, io_changes);
+	//jr_int32 ("parser_coeff",        m_parser_coeff,          i_object, io_changes);
+
+	if( m_capacity < 1 )
+		m_capacity = 1;
+
+	if( io_changes )
+		return;
+
 	const JSON & tasks = i_object["tasks"];
 	if( tasks.IsArray())
 	{
@@ -159,21 +189,7 @@ void BlockData::jsonRead( const JSON & i_object)
 	bool depend_sub_task = false;
 	bool non_sequential  = false;
 
-//	case Msg::TBlocksProperties:
-	//jr_int32 ("parser_coeff",        m_parser_coeff,          i_object);
-	jr_string("tasks_name",            m_tasks_name,            i_object);
-	jr_string("parser",                m_parser,                i_object);
-	jr_string("working_directory",     m_working_directory,     i_object);
-	//jr_string("environment",         m_environment,           i_object);
-	jr_string("command",               m_command,               i_object);
-	jr_string("files",                 m_files,                 i_object);
-	jr_string("cmd_pre",               m_cmd_pre,               i_object);
-	jr_string("cmd_post",              m_cmd_post,              i_object);
 	jr_string("multihost_service",     multihost_service,       i_object);
-	//jr_string("custom_data",           m_custom_data,           i_object);
-
-//	case Msg::TJobsList:
-	//jr_uint32("flags",                 m_flags,                 i_object);
 
 	jr_int64 ("frame_first",     frame_first,     i_object);
 	jr_int64 ("frame_last",      frame_last,      i_object);
@@ -191,25 +207,6 @@ void BlockData::jsonRead( const JSON & i_object)
 	jr_bool  ("depend_sub_task", depend_sub_task, i_object);
 	jr_bool  ("non_sequential",  non_sequential,  i_object);
 
-	jr_int32 ("capacity",              m_capacity,              i_object);
-	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
-	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
-	jr_int32 ("need_memory",           m_need_memory,           i_object);
-	jr_int32 ("need_power",            m_need_power,            i_object);
-	jr_int32 ("need_hdd",              m_need_hdd,              i_object);
-	jr_regexp("depend_mask",           m_depend_mask,           i_object);
-	jr_regexp("tasks_depend_mask",     m_tasks_depend_mask,     i_object);
-	jr_regexp("hosts_mask",            m_hosts_mask,            i_object);
-	jr_regexp("hosts_mask_exclude",    m_hosts_mask_exclude,    i_object);
-	jr_regexp("need_properties",       m_need_properties,       i_object);
-	jr_string("name",                  m_name,                  i_object);
-	jr_string("service",               m_service,               i_object);
-	//jr_int32 ("tasks_num",             m_tasks_num,             i_object);
-	jr_int8  ("errors_retries",        m_errors_retries,        i_object);
-	jr_int8  ("errors_avoid_host",     m_errors_avoid_host,     i_object);
-	jr_int8  ("errors_task_same_host", m_errors_task_same_host, i_object);
-	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object);
-	jr_uint32("tasks_max_run_time",    m_tasks_max_run_time,    i_object);
 /*
 //	case Msg::TBlocksProgress:
 

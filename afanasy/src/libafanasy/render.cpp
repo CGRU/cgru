@@ -118,6 +118,13 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 
 	jr_string("annotation",    m_annotation,    i_object, io_changes);
 	jr_string("user_name",     m_user_name,     i_object);
+
+	bool nimby;
+	if( jr_bool("nimby", nimby, i_object, io_changes))
+	{
+		if( nimby ) setNimby();
+		else setFree();
+	}
 }
 
 void Render::readwrite( Msg * msg)

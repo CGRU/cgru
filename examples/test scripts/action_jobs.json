@@ -6,11 +6,19 @@
 		"mask"      : "_empty_.*",
 		"ids"       : [2,3],
 		"type"      : "jobs",
-		"operation" : "stop",
-		"params"    :
+		"-operation" :
 		{
+			"type"   : "stop",
+			"name"   : "nuke",
+			"enable" : true
+		},
+		"params"     :
+		{
+			"block_ids"  : [0,2],
+			"hidden"     : true,
 			"priority"   : 75,
-			"annotation" : "json json json"
+			"annotation" : "json action",
+			"hosts_mask" : "bhm.*"
 		}
 	}
 }

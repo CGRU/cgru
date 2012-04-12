@@ -71,15 +71,63 @@ void Node::action( const JSON & i_action, AfContainer * i_container, MonitorCont
 	jr_string("host_name", host_name, i_action);
 
 	if( type.empty()) return;
-	if( user_name.empty()) return;
-	if( host_name.empty()) return;
+	if( user_name.empty())
+	{
+		appendLog("Action should have a not empty \"user_name\" string.");
+		return;
+	}
+	if( host_name.empty())
+	{
+		appendLog("Action should have a not empty \"host_name\" string.");
+		return;
+	}
 
 	std::string author = user_name + '@' + host_name;
 	std::string changes;
 
-	const JSON & params = i_action["params"];
-	if( params.IsObject())
-		jsonRead( params, &changes, i_monitoring);
+	bool valid = false;
+	if( i_action.HasMember("operation"))
+	{
+		const JSON & operation = i_action["operation"];
+		if( false == operation.IsObject())
+		{
+			appendLog("Action \"operation\" should be an object " + author);
+			return;
+		}
+		const JSON & type = operation["type"];
+		if( false == type.IsString())
+		{
+			appendLog("Action \"operation\" \"type\" should be a string " + author);
+			return;
+		}
+		if( strlen( type.GetString()) == 0)
+		{
+			appendLog("Action \"operation\" \"type\" string is empty " + author);
+			return;
+		}
+		valid = true;
+	}
+
+	if( i_action.HasMember("params"))
+	{
+		const JSON & params = i_action["params"];
+		if( params.IsObject())
+		{
+			jsonRead( params, &changes, i_monitoring);
+			valid = true;
+		}
+		else
+		{
+			appendLog("Action \"params\" should be an object " + author);
+			return;
+		}
+	}
+
+	if( valid == false )
+	{
+		appendLog("Action should have an \"operation\" or(and) \"params\" object.");
+		return;
+	}
 
 	v_action( i_action, type, author, changes, i_container, i_monitoring);
 

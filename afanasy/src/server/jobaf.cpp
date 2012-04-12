@@ -272,11 +272,12 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
 void JobAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
 					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
-	const JSON & operaion = i_action["operation"];
-	if( operaion.IsString())
+	const JSON & operation = i_action["operation"];
+	if( operation.IsObject())
 	{
-		std::string opname = operaion.GetString();
-		if( opname == "delete")
+		std::string type;
+		af::jr_string("type", type, operation);
+		if( type == "delete")
 		{
 			appendLog("Deleted by " + i_author);
 			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_author);
@@ -284,17 +285,17 @@ void JobAf::v_action( const JSON & i_action, const std::string & i_type, const s
 			if( i_monitoring ) i_monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
 			return;
 		}
-		else if( opname == "stop")
+		else if( type == "stop")
 		{
 		   restartAllTasks( true, "Job stopped by " + i_author, (RenderContainer*)i_container, i_monitoring);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + opname + "\" by " + i_author);
+			appendLog("Unknown operation \"" + type + "\" by " + i_author);
 			return;
 		}
-		appendLog("Operation \"" + opname + "\" by " + i_author);
+		appendLog("Operation \"" + type + "\" by " + i_author);
 	}
 
 	const JSON & params = i_action["params"];
