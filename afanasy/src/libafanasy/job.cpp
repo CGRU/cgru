@@ -41,32 +41,10 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
-	if( io_changes && m_blocksnum && m_blocksdata )
-	{
-		std::vector<int32_t> block_ids;
-		jr_int32vec("block_ids", block_ids, i_object);
-		if( block_ids.size())
-		{
-			for( std::vector<int32_t>::const_iterator it = block_ids.begin(); it != block_ids.end(); it++)
-			{
-				if( *it >= m_blocksnum )
-				{
-					appendLog("Invalid block number = " + itos(*it));
-					break;
-				}
-				std::string changes;
-				m_blocksdata[*it]->jsonRead( i_object, &changes);
-				if( changes.size())
-					*io_changes = "\nBlock['" + m_blocksdata[*it]->getName() + "']:" + changes;
-			}
-			return;
-		}
-	}
-
-	jr_string("annotation",    m_annotation,    i_object, io_changes);
-	jr_string("description",   m_description,   i_object, io_changes);
-	jr_string("cmd_pre",       m_cmd_pre,       i_object, io_changes);
-	jr_string("cmd_post",      m_cmd_post,      i_object, io_changes);
+	jr_string("annotation",     m_annotation,    i_object, io_changes);
+	jr_string("description",    m_description,   i_object, io_changes);
+	jr_string("m_command_pre",  m_command_pre,   i_object, io_changes);
+	jr_string("m_command_post", m_command_post,  i_object, io_changes);
 
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
@@ -137,10 +115,10 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\"host_name\":\"" << m_host_name << "\"";
 
-	if( m_cmd_pre.size())
-		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_cmd_pre     ) << "\"";
-	if( m_cmd_post.size())
-		o_str << ",\"cmd_post\":\""     << af::strEscape( m_cmd_post    ) << "\"";
+	if( m_command_pre.size())
+		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
+	if( m_command_post.size())
+		o_str << ",\"cmd_post\":\""     << af::strEscape( m_command_post    ) << "\"";
 	if( m_annotation.size())
 		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
 	if( m_description.size())
@@ -241,8 +219,8 @@ void Job::readwrite( Msg * msg)
 	rw_uint32_t( m_state,              msg);
 	rw_int32_t ( m_max_running_tasks,    msg);
 	rw_int32_t ( m_max_running_tasks_per_host, msg);
-	rw_String  ( m_cmd_pre,            msg);
-	rw_String  ( m_cmd_post,           msg);
+	rw_String  ( m_command_pre,            msg);
+	rw_String  ( m_command_post,           msg);
 
 	rw_int32_t ( m_user_list_order,      msg);
 	rw_int64_t ( m_time_creation,      msg);
@@ -413,8 +391,8 @@ void Job::generateInfoStreamJob(    std::ostringstream & o_str, bool full) const
    if( m_time_wait ) o_str << "\n Wait time = " << af::time2str( m_time_wait);
    if( m_need_os.notEmpty()) o_str << "\n Needed OS: \"" << m_need_os.getPattern() << "\"";
    if( m_need_properties.notEmpty()) o_str << "\n Needed properties: \"" << m_need_properties.getPattern() << "\"";
-   if( m_cmd_pre.size()) o_str << "\n Pre command:\n" << m_cmd_pre;
-   if( m_cmd_post.size()) o_str << "\n Post command:\n" << m_cmd_post;
+   if( m_command_pre.size()) o_str << "\n Pre command:\n" << m_command_pre;
+   if( m_command_post.size()) o_str << "\n Post command:\n" << m_command_post;
 }
  
 void Job::generateInfoStream( std::ostringstream & o_str, bool full) const

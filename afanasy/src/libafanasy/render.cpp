@@ -119,10 +119,15 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_string("annotation",    m_annotation,    i_object, io_changes);
 	jr_string("user_name",     m_user_name,     i_object);
 
-	bool nimby;
+	bool nimby, NIMBY;
 	if( jr_bool("nimby", nimby, i_object, io_changes))
 	{
 		if( nimby ) setNimby();
+		else setFree();
+	}
+	if( jr_bool("NIMBY", NIMBY, i_object, io_changes))
+	{
+		if( NIMBY ) setNIMBY();
 		else setFree();
 	}
 }

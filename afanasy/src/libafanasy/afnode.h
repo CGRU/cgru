@@ -33,8 +33,8 @@ public:
 	/// Set some node attribute by incoming message.
 	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
 
-	virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-						   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring);
+	virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+							AfContainer * i_container, MonitorContainer * i_monitoring);
 
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);

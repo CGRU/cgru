@@ -34,7 +34,7 @@ Task::~Task()
 
 void Task::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderAf * render, MonitorContainer * monitoring)
 {
-   if( block->data->isMultiHost())
+   if( block->m_data->isMultiHost())
    {
       if( run )
          ((TaskRunMulti*)(run))->addHost( taskexec, render, monitoring);
@@ -56,7 +56,7 @@ void Task::updateState( const af::MCTaskUp & taskup, RenderContainer * renders, 
    if( run == NULL)
    {
       std::ostringstream stream;
-      stream << "Task::updatestate: Task is not running: " << block->job->getName();
+      stream << "Task::updatestate: Task is not running: " << block->m_job->getName();
       stream << "[" << taskup.getNumBlock() << "][" << taskup.getNumTask() << "]";
       AFCommon::QueueLogError( stream.str());
       if(( taskup.getStatus() == af::TaskExec::UPPercent  ) ||
@@ -150,7 +150,7 @@ void Task::restartError( const std::string & message, RenderContainer * renders,
    if( false == ( progress->state & AFJOB::STATE_ERROR_MASK )) return;
    if( run )
    {
-      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]", block->job->getName().c_str(), block->data->getBlockNum(), number)
+      AFERRAR("Task::restartError: task is runnning: %s[%d][%d]", block->m_job->getName().c_str(), block->m_data->getBlockNum(), number)
       return;
    }
    progress->state = AFJOB::STATE_READY_MASK;
@@ -242,12 +242,12 @@ const std::string Task::getErrorHostsListString() const
 
 void Task::monitor( MonitorContainer * monitoring) const
 {
-   if( monitoring ) monitoring->addTask( block->job->getId(), block->data->getBlockNum(), number, progress);
+   if( monitoring ) monitoring->addTask( block->m_job->getId(), block->m_data->getBlockNum(), number, progress);
 }
 
 void Task::updateDatabase() const
 {
-   AFCommon::QueueDBUpdateTask( block->job->getId(), block->data->getBlockNum(), number, progress);
+   AFCommon::QueueDBUpdateTask( block->m_job->getId(), block->m_data->getBlockNum(), number, progress);
 }
 
 void Task::appendLog( const std::string & message)
@@ -269,14 +269,14 @@ void Task::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rende
 const std::string Task::getOutputFileName( int startcount) const
 {
    std::ostringstream stream;
-   stream << "b"  << block->data->getBlockNum();
+   stream << "b"  << block->m_data->getBlockNum();
    stream << ".t" << number;
    stream << ".s" << startcount;
-   stream << "-" << block->data->getName();
-   stream << "." << block->data->genTaskName( number);
+   stream << "-" << block->m_data->getName();
+   stream << "." << block->m_data->genTaskName( number);
    std::string filename = stream.str();
    af::pathFilterFileName( filename);
-   filename = block->job->getTasksOutputDir() + "/" + filename;
+   filename = block->m_job->getTasksOutputDir() + "/" + filename;
    return filename;
 }
 

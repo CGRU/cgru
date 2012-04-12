@@ -36,7 +36,7 @@ TaskRun::TaskRun( Task * runningTask,
    stopTime( 0),
    zombie( false)
 {
-AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum)
+AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().toUtf8().data(), block->m_data->getBlockNum(), tasknum)
    (*counter)++;
 
    progress->percent = -1;
@@ -62,7 +62,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->job->getName().toUtf8().data(), b
 
 TaskRun::~TaskRun()
 {
-AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum)
+AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", block->m_job->getName().toUtf8().data(), block->m_data->getBlockNum(), tasknum)
    if   ( *counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *counter)
    else ( *counter )--;
    if( exec) delete exec;
@@ -88,12 +88,12 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    }
    if((progress->state & AFJOB::STATE_RUNNING_MASK) == false)
    {
-      AFERRAR("TaskRun::update: %s[%d][%d] task is not running.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::update: %s[%d][%d] task is not running.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return;
    }
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::update: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::update: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return;
    }
 
@@ -195,7 +195,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
 {
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::refresh: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::refresh: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return false;
    }
 //printf("TaskRun::refresh: %s[%d][%d]\n", block->job->getName().toUtf8().data(), block->data->getBlockNum(), tasknum);
@@ -203,7 +203,7 @@ bool TaskRun::refresh( time_t currentTime, RenderContainer * renders, MonitorCon
    bool changed = false;
 
    // Tasks with running time > maximum set to errors: // If it TasksMaxRunTime > 0 ( 0 is "infinite" )
-   if((block->data->getTasksMaxRunTime() != 0) && (currentTime - progress->time_start > block->data->getTasksMaxRunTime()))
+   if((block->m_data->getTasksMaxRunTime() != 0) && (currentTime - progress->time_start > block->m_data->getTasksMaxRunTime()))
    {
       stop("Task maximum run time reached.", renders, monitoring);
       errorHostId = hostId;
@@ -234,7 +234,7 @@ void TaskRun::stop( const std::string & message, RenderContainer * renders, Moni
    if( stopTime ) return;
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::stop: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return;
    }
    stopTime = time( NULL);
@@ -295,13 +295,13 @@ void TaskRun::listen( af::MCListenAddress & mclisten, RenderContainer * renders)
    if( hostId == 0 ) return;
    if( exec == NULL)
    {
-      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRun::listen: %s[%d][%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return;
    }
 printf("Listening running task:"); mclisten.stdOut();
    RenderContainerIt rendersIt( renders);
    RenderAf * render = rendersIt.getRender( hostId);
-   if( render != NULL) render->sendOutput( mclisten, block->job->getId(), block->data->getBlockNum(), tasknum);
+   if( render != NULL) render->sendOutput( mclisten, block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
 }
 
 bool TaskRun::getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const
@@ -317,7 +317,7 @@ bool TaskRun::getOutput( int startcount, af::Msg *msg, RenderContainer * renders
       RenderAf * render = rendersIt.getRender( hostId);
       if( render != NULL )
       {
-         af::MCTaskPos taskpos( block->job->getId(), block->data->getBlockNum(), tasknum);
+         af::MCTaskPos taskpos( block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
          msg->set( af::Msg::TTaskOutputRequest, &taskpos);
          msg->setAddress( render);
          return true;

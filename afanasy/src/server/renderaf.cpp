@@ -204,8 +204,8 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 
 void RenderAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_renders->sortPriority( this);}
 
-void RenderAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+void RenderAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+						AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	JobContainer * jobs = (JobContainer*)i_container;
 
@@ -214,10 +214,25 @@ void RenderAf::v_action( const JSON & i_action, const std::string & i_type, cons
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
-		if(( type == "exit") && isOnline())
+		if( type == "exit")
 		{
-			appendLog( std::string("Exit by ") + i_author);
+			if( false == isOnline()) return;
+			appendLog("Exit by " + i_author);
 			exitClient( af::Msg::TClientExitRequest, jobs, i_monitoring);
+			return;
+		}
+		if( type == "eject_tasks")
+		{
+			if( false == isBusy()) return;
+			appendLog("Task(s) ejected by " + i_author);
+			ejectTasks( jobs, i_monitoring, af::TaskExec::UPEject);
+			return;
+		}
+		if( type == "eject_tasks_keep_my")
+		{
+			if( false == isBusy()) return;
+			appendLog("Task(s) ejected keeping own by " + i_author);
+			ejectTasks( jobs, i_monitoring, af::TaskExec::UPEject, &(af::strSplit(i_author,"@").front()));
 			return;
 		}
 		else

@@ -70,7 +70,7 @@ public:
    inline int getNumSysTasks() const { return systasks.size();}
    SysTask * getReadySysTask() const;
 
-   inline void appendTaskLog( const std::string & message) const { tasks[0]->appendLog( message);}
+   inline void appendTaskLog( const std::string & message) const { m_tasks[0]->appendLog( message);}
 
 private:
    SysTask * addTask( af::TaskExec * taskexec);

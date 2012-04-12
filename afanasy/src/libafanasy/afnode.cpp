@@ -65,12 +65,10 @@ void Node::action( const JSON & i_action, AfContainer * i_container, MonitorCont
 	if( isLocked())
 		return;
 
-	std::string type, user_name, host_name;
-	jr_string("type", type, i_action);
+	std::string user_name, host_name;
 	jr_string("user_name", user_name, i_action);
 	jr_string("host_name", host_name, i_action);
 
-	if( type.empty()) return;
 	if( user_name.empty())
 	{
 		appendLog("Action should have a not empty \"user_name\" string.");
@@ -129,7 +127,7 @@ void Node::action( const JSON & i_action, AfContainer * i_container, MonitorCont
 		return;
 	}
 
-	v_action( i_action, type, author, changes, i_container, i_monitoring);
+	v_action( i_action, author, changes, i_container, i_monitoring);
 
 	if( changes.size())
 	{
@@ -140,8 +138,8 @@ void Node::action( const JSON & i_action, AfContainer * i_container, MonitorCont
 	}
 }
 
-void Node::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+void Node::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+					AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 }
 

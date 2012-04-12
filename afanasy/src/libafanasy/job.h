@@ -48,8 +48,8 @@ public:
 
 	inline const std::string & getUserName()     const { return m_user_name;   }
 	inline const std::string & getHostName()     const { return m_host_name;   }
-	inline const std::string & getCmdPre()       const { return m_cmd_pre;     }
-	inline const std::string & getCmdPost()      const { return m_cmd_post;    }
+	inline const std::string & getCmdPre()       const { return m_command_pre;     }
+	inline const std::string & getCmdPost()      const { return m_command_post;    }
 	inline const std::string & getDescription()  const { return m_description; }
 	inline const std::string & getAnnontation()  const { return m_annotation;  }
 
@@ -122,10 +122,10 @@ protected:
 	std::string m_host_name;    ///< Computer name, where job was created.
 
 	/// Job pre command (executed by server on job registration)
-	std::string m_cmd_pre;
+	std::string m_command_pre;
 
 	/// Job post command (executed by server on job deletion)
-	std::string m_cmd_post;
+	std::string m_command_post;
 
 	/// Maximum number of running tasks
 	int32_t m_max_running_tasks;

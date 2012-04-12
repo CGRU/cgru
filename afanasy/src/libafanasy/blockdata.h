@@ -97,9 +97,9 @@ public:
 /// Set block tasks veiw result command.
    inline void setFiles(            const std::string & str    ) { m_files            = str;   }
 /// Set block pre commnand.
-   inline void setCmdPre(           const std::string & str    ) { m_cmd_pre          = str;   }
+   inline void setCmdPre(           const std::string & str    ) { m_command_pre          = str;   }
 /// Set block post commnand.
-   inline void setCmdPost(          const std::string & str    ) { m_cmd_post         = str;   }
+   inline void setCmdPost(          const std::string & str    ) { m_command_post         = str;   }
 /// Set tasks maximum run time, after this time task will be restart as error task
    inline void setTasksMaxRunTime(     const int secs   ) { m_tasks_max_run_time      = secs;  }
 /// Set maximum running tasks
@@ -216,10 +216,10 @@ public:
    inline int getCapMinResult()      const
 	  { return ( canVarCapacity() && ( m_capacity_coeff_min > 0)) ? m_capacity * m_capacity_coeff_min : m_capacity;}
 
-   inline bool                hasCmdPre()  const { return m_cmd_pre.size();  }///< Whether pre command is set.
-   inline const std::string & getCmdPre()  const { return m_cmd_pre;         }///< Get pre command.
-   inline bool                hasCmdPost() const { return m_cmd_post.size(); }///< Whether post command is set.
-   inline const std::string & getCmdPost() const { return m_cmd_post;        }///< Get post command.
+   inline bool                hasCmdPre()  const { return m_command_pre.size();  }///< Whether pre command is set.
+   inline const std::string & getCmdPre()  const { return m_command_pre;         }///< Get pre command.
+   inline bool                hasCmdPost() const { return m_command_post.size(); }///< Whether post command is set.
+   inline const std::string & getCmdPost() const { return m_command_post;        }///< Get post command.
 
    inline int getErrorsAvoidHost()      const { return m_errors_avoid_host;    }
    inline int getErrorsRetries()        const { return m_errors_retries;      }
@@ -299,8 +299,8 @@ protected:
 	std::string m_working_directory;        ///< Block tasks working directory.
 	std::string m_environment; ///< Block tasks extra environment.
 
-	std::string m_cmd_pre;   ///< Pre command.
-	std::string m_cmd_post;  ///< Post command.
+	std::string m_command_pre;   ///< Pre command.
+	std::string m_command_post;  ///< Post command.
 
 	std::string m_command;               ///< Command.
 	std::string m_files;          ///< Command to view tasks result.

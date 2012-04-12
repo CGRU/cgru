@@ -42,10 +42,10 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
 {
    if( taskExec == NULL)
    {
-      AFERRAR("TaskRunMulti::TaskRunMulti: %s[%d] Task executable is NULL.", block->job->getName().c_str(), block->data->getBlockNum())
+      AFERRAR("TaskRunMulti::TaskRunMulti: %s[%d] Task executable is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum())
       return;
    }
-   hasservice = ( block->data->getMultiHostService().empty() == false);
+   hasservice = ( block->m_data->getMultiHostService().empty() == false);
    tasknum = taskExec->getTaskNum();
    task->appendLog("Starting to capture hosts:");
    progress->state = AFJOB::STATE_RUNNING_MASK | AFJOB::STATE_READY_MASK;
@@ -54,10 +54,10 @@ TaskRunMulti::TaskRunMulti( Task * runningTask,
 
 TaskRunMulti::~TaskRunMulti()
 {
-AFINFA("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+AFINFA("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
    if( execs.size() != 0)
    {
-      AFERRAR("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRunMulti:: ~ TaskRunMulti: %s[%d][%d]:", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
    }
    for( std::list<af::TaskExec*>::iterator it = execs.begin(); it != execs.end(); it++) delete *it;
    progress->hostname = hostnamemaster;
@@ -109,7 +109,7 @@ void TaskRunMulti::addHost( af::TaskExec * taskexec, RenderAf * render, MonitorC
    time_lasthostadded = time( NULL);
 
    // Setting task not be ready to take any hosts if their quantity is enough
-   if( (int)execs.size() >= block->data->getMultiHostMax()) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
+   if( (int)execs.size() >= block->m_data->getMultiHostMax()) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
 }
 
 void TaskRunMulti::setMasterTask()
@@ -136,7 +136,7 @@ void TaskRunMulti::startServices( RenderContainer * renders)
       RenderAf * render = rendersIt.getRender( *hIt);
       if( render == NULL) continue;
 
-      (*tIt)->setCommand( block->data->getMultiHostService());
+      (*tIt)->setCommand( block->m_data->getMultiHostService());
       render->startTask(*tIt);
    }
 }
@@ -147,12 +147,12 @@ void TaskRunMulti::startMaster( RenderContainer * renders, MonitorContainer * mo
    RenderAf * render = rendersIt.getRender( hostId);
    if( render == NULL)
    {
-      AFERRAR("TaskRunMulti::startMaster: %s[%d][%d] Render id=%d is NULL.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum, hostId)
+      AFERRAR("TaskRunMulti::startMaster: %s[%d][%d] Render id=%d is NULL.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum, hostId)
       return;
    }
 
    // Add a master to slaves list if needed
-   if( block->data->canMasterRunOnSlaveHost()) hostnames.push_back( render->getName());
+   if( block->m_data->canMasterRunOnSlaveHost()) hostnames.push_back( render->getName());
 
    exec->setHostNames( hostnames);
 
@@ -182,12 +182,12 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
 
    if( isZombie() )
    {
-      AFERRAR("TaskRunMulti::update: ZOMBIE %s[%d][%d]", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRunMulti::update: ZOMBIE %s[%d][%d]", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return;
    }
    if((progress->state & AFJOB::STATE_RUNNING_MASK) == false)
    {
-      AFERRAR("TaskRunMulti::update: NOT RUNNING %s[%d][%d] task is not running.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+      AFERRAR("TaskRunMulti::update: NOT RUNNING %s[%d][%d] task is not running.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
       return;
    }
 
@@ -248,7 +248,7 @@ void TaskRunMulti::update( const af::MCTaskUp& taskup, RenderContainer * renders
       break;
 
    default:
-      AFERRAR("TaskRun::updateState: %s[%d][%d]: Unknown task update status = %d", block->job->getName().c_str(), block->data->getBlockNum(), tasknum, taskup.getStatus())
+      AFERRAR("TaskRun::updateState: %s[%d][%d]: Unknown task update status = %d", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum, taskup.getStatus())
       return;
    }
 
@@ -275,8 +275,8 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
    if((masterrunning == false) && (stopping == false))
    {
       if( time_servicestarted == false)
-         if(( (int)execs.size() >= block->data->getMultiHostMax()) ||
-           (( (int)execs.size() >= block->data->getMultiHostMin()) && (currentTime-time_lasthostadded >= block->data->getMultiHostWaitMax())))
+         if(( (int)execs.size() >= block->m_data->getMultiHostMax()) ||
+           (( (int)execs.size() >= block->m_data->getMultiHostMin()) && (currentTime-time_lasthostadded >= block->m_data->getMultiHostWaitMax())))
          {
             if( progress->state & AFJOB::STATE_READY_MASK) progress->state = progress->state & (~AFJOB::STATE_READY_MASK);
             setMasterTask();
@@ -285,8 +285,8 @@ bool TaskRunMulti::refresh( time_t currentTime, RenderContainer * renders, Monit
          }
 
       if( time_servicestarted )
-         if((block->data->getMultiHostWaitSrv() == 0) ||
-            (currentTime - time_servicestarted > block->data->getMultiHostWaitSrv()))
+         if((block->m_data->getMultiHostWaitSrv() == 0) ||
+            (currentTime - time_servicestarted > block->m_data->getMultiHostWaitSrv()))
          {
             startMaster( renders, monitoring);
          }
@@ -322,7 +322,7 @@ void TaskRunMulti::stop( const std::string & message, RenderContainer * renders,
       {
          if( time_servicestopped )
          {
-            AFERRAR("TaskRunMulti::stop: %s[%d][%d] Services already asked to be stopped.", block->job->getName().c_str(), block->data->getBlockNum(), tasknum)
+            AFERRAR("TaskRunMulti::stop: %s[%d][%d] Services already asked to be stopped.", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
             return;
          }
          // Stopping service on slaves (if it was not asked to be stopped before)

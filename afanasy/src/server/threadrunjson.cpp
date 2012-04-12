@@ -1,6 +1,8 @@
 #include "afcommon.h"
 #include "jobcontainer.h"
+#include "monitorcontainer.h"
 #include "rendercontainer.h"
+#include "talkcontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
 
@@ -42,6 +44,10 @@ void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		i_args->renders->action( action, i_args->jobs, i_args->monitors);
 	else if( type == "users")
 		i_args->users->action( action, NULL, i_args->monitors);
+	else if( type == "talks")
+		i_args->talks->action( action, NULL, i_args->monitors);
+	else if( type == "monitors")
+		i_args->monitors->action( action, NULL, NULL);
 	else
 		AFCommon::QueueLogError(std::string("JSON action has unknown type - \"") + type + "\"");
 

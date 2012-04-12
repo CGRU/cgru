@@ -133,8 +133,8 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_string("working_directory",     m_working_directory,     i_object, io_changes);
 	jr_string("command",               m_command,               i_object, io_changes);
 	jr_string("files",                 m_files,                 i_object, io_changes);
-	jr_string("cmd_pre",               m_cmd_pre,               i_object, io_changes);
-	jr_string("cmd_post",              m_cmd_post,              i_object, io_changes);
+	jr_string("command_pre",           m_command_pre,           i_object, io_changes);
+	jr_string("command_post",          m_command_post,          i_object, io_changes);
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
 	//jr_string("custom_data",         m_custom_data,           i_object, io_changes);
@@ -282,10 +282,10 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
             o_str << ",\"working_directory\":\"" << af::strEscape(m_working_directory ) << "\"";
 		if( m_files.size())
             o_str << ",\"files\":\""             << af::strEscape( m_files )    << "\"";
-		if( m_cmd_pre.size())
-            o_str << ",\"cmd_pre\":\""           << af::strEscape( m_cmd_pre )  << "\"";
-		if( m_cmd_post.size())
-            o_str << ",\"cmd_post\":\""          << af::strEscape( m_cmd_post ) << "\"";
+		if( m_command_pre.size())
+            o_str << ",\"cmd_pre\":\""           << af::strEscape( m_command_pre )  << "\"";
+		if( m_command_post.size())
+            o_str << ",\"cmd_post\":\""          << af::strEscape( m_command_post ) << "\"";
 		if( m_multihost_service.size())
             o_str << ",\"multihost_service\":\"" << m_multihost_service         << "\"";
         //o_str << ",\"environment\":\""         << m_environment               << "\"";
@@ -451,8 +451,8 @@ void BlockData::readwrite( Msg * msg)
 		rw_String  ( m_environment,           msg);
 		rw_String  ( m_command,               msg);
 		rw_String  ( m_files,                 msg);
-		rw_String  ( m_cmd_pre,               msg);
-		rw_String  ( m_cmd_post,              msg);
+		rw_String  ( m_command_pre,               msg);
+		rw_String  ( m_command_post,              msg);
 		rw_String  ( m_multihost_service,     msg);
 		rw_String  ( m_custom_data,           msg);
 
@@ -971,8 +971,8 @@ int BlockData::calcWeight() const
 	weight += weigh(m_environment);
 	weight += weigh(m_command);
 	weight += weigh(m_files);
-	weight += weigh(m_cmd_pre);
-	weight += weigh(m_cmd_post);
+	weight += weigh(m_command_pre);
+	weight += weigh(m_command_post);
 	weight += weigh(m_custom_data);
 
 	return weight;
@@ -1019,8 +1019,8 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
 
       if( false == m_files.empty()) o_str << "\n Files:\n" << af::strReplace( m_files, ';', '\n');
 
-      if( false == m_cmd_pre.empty()) o_str << "\n Pre Command:\n" << m_cmd_pre;
-      if( false == m_cmd_post.empty()) o_str << "\n Post Command:\n" << m_cmd_post;
+      if( false == m_command_pre.empty()) o_str << "\n Pre Command:\n" << m_command_pre;
+      if( false == m_command_post.empty()) o_str << "\n Post Command:\n" << m_command_post;
 
       if( false == m_custom_data.empty()) o_str << "\n Custom Data:\n" << m_custom_data;
 

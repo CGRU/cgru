@@ -30,8 +30,8 @@ Job::~Job()
 void Job::setUserName(     const std::string & str )  { m_user_name     = str;   }
 void Job::setHostName(     const std::string & str )  { m_host_name     = str;   }
 void Job::setName(         const std::string & str )  { m_name         = str;   }
-void Job::setCmdPre(       const std::string & str )  { m_cmd_pre      = str;   }
-void Job::setCmdPost(      const std::string & str )  { m_cmd_post     = str;   }
+void Job::setCmdPre(       const std::string & str )  { m_command_pre      = str;   }
+void Job::setCmdPost(      const std::string & str )  { m_command_post     = str;   }
 void Job::setDescription(  const std::string & str )  { m_description  = str;   }
 void Job::setMaxRunningTasks(       int value      )  { m_max_running_tasks    = value; }
 void Job::setMaxRunTasksPerHost(    int value      )  { m_max_running_tasks_per_host = value; }

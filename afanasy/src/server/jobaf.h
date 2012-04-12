@@ -78,8 +78,8 @@ public:
 /// Set some attributes.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   virtual void v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-						  std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring);
+   virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+						   AfContainer * i_container, MonitorContainer * i_monitoring);
 
    virtual bool dbSelect( PGconn * i_conn, const std::string * i_where = NULL);
 

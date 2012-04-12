@@ -171,10 +171,10 @@ bool JobAf::initialize()
 
    if( m_fromdatabase == false )
    {
-      if( false == m_cmd_pre.empty())
+      if( false == m_command_pre.empty())
       {
-         AFCommon::executeCmd( m_cmd_pre);
-         appendLog( std::string("Job pre command executed:\n") + m_cmd_pre);
+         AFCommon::executeCmd( m_command_pre);
+         appendLog( std::string("Job pre command executed:\n") + m_command_pre);
       }
       for( int b = 0; b < m_blocksnum; b++)
       {
@@ -245,10 +245,10 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
       return;
    }
 
-   if( false == m_cmd_post.empty())
+   if( false == m_command_post.empty())
    {
-      SysJob::AddPostCommand( m_cmd_post, m_blocksnum > 0 ? m_blocksdata[0]->getWDir(): "", m_user_name, m_name);
-      appendLog( std::string("Executing job post command:\n") + m_cmd_post);
+      SysJob::AddPostCommand( m_command_post, m_blocksnum > 0 ? m_blocksdata[0]->getWDir(): "", m_user_name, m_name);
+      appendLog( std::string("Executing job post command:\n") + m_command_post);
    }
    for( int b = 0; b < m_blocksnum; b++)
    {
@@ -269,9 +269,62 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    unLock();
 }
 
-void JobAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+void JobAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+						AfContainer * i_container, MonitorContainer * i_monitoring)
 {
+	// If action has blocks ids array - action to for blocks
+	if( i_action.HasMember("block_ids"))
+	{
+		const JSON & blocks = i_action["block_ids"];
+		if( blocks.IsArray())
+		{
+			std::vector<int32_t> block_ids;
+			af::jr_int32vec("block_ids", block_ids, i_action);
+			if( block_ids.size())
+			{
+				bool job_progress_changed = false;
+				// If blocks ids array has only one "-1" value - action to for all blocks
+				if(( block_ids.size() == 1 ) && ( block_ids[0] == -1 ))
+				{
+					for( int b = 0; b < m_blocksnum; b++)
+						if( m_blocks[b]->action(
+								i_action, i_author, io_changes, i_container, i_monitoring))
+							job_progress_changed = true;
+				}
+				else
+				{
+					for( int b = 0; b < block_ids.size(); b++)
+					{
+						if(( block_ids[b] >= getBlocksNum()) || ( block_ids[b] < 0 ))
+						{
+							appendLog("Invalid block number = " + af::itos(block_ids[b]) + " " + i_author);
+							continue;
+						}
+						if( m_blocks[block_ids[b]]->action(
+								i_action, i_author, io_changes, i_container, i_monitoring))
+							job_progress_changed = true;
+					}
+				}
+
+				if( i_monitoring && job_progress_changed )
+					i_monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+
+				return;
+			}
+			else
+			{
+				appendLog("\"block_ids\" array does not contain any integers " + i_author);
+				return;
+			}
+		}
+		else
+		{
+			appendLog("\"block_ids\" should be an array of integers " + i_author);
+			return;
+		}
+		return;
+	}
+
 	const JSON & operation = i_action["operation"];
 	if( operation.IsObject())
 	{
@@ -296,6 +349,8 @@ void JobAf::v_action( const JSON & i_action, const std::string & i_type, const s
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_author);
+		AFCommon::QueueDBUpdateItem( this);
+		return;
 	}
 
 	const JSON & params = i_action["params"];
@@ -467,8 +522,8 @@ bool JobAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * poi
    }
    case af::Msg::TJobCmdPost:
    {
-      m_cmd_post = mcgeneral.getString();
-      appendLog( std::string("Post command set to \"") + m_cmd_post + "\" by " + userhost);
+      m_command_post = mcgeneral.getString();
+      appendLog( std::string("Post command set to \"") + m_command_post + "\" by " + userhost);
       AFCommon::QueueDBUpdateItem( this, afsql::DBAttr::_cmd_post);
       jobchanged = af::Msg::TMonitorJobsChanged;
       break;
@@ -702,9 +757,9 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
     if( m_state & AFJOB::STATE_OFFLINE_MASK )
         return NULL;
 
-    if( m_blocks[block]->tasks[task]->m_solved )
+	if( m_blocks[block]->m_tasks[task]->m_solved )
         return NULL;
-    m_blocks[block]->tasks[task]->m_solved = true;
+	m_blocks[block]->m_tasks[task]->m_solved = true;
 
    //
    // Recursive dependence check, only if needed
@@ -738,7 +793,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
 
    if( false == m_blocks[block]->canRun( render)) return NULL;
 
-   if( m_blocks[block]->tasks[task]->avoidHostsCheck( render->getName())) return NULL;
+   if( m_blocks[block]->m_tasks[task]->avoidHostsCheck( render->getName())) return NULL;
 
    //
    // Check block tasks dependence: Get tasks depend mask, if any exists:
@@ -921,7 +976,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
         for( int t = 0; t < numtasks; t++)
         {
 			// Needed for recursion function, to not to try to solve the same task again
-			m_blocks[b]->tasks[t]->m_solved = false;
+			m_blocks[b]->m_tasks[t]->m_solved = false;
 
 			if( m_blocksdata[b]->isNonSequential())
 			{
@@ -994,7 +1049,7 @@ void JobAf::updateTaskState( const af::MCTaskUp& taskup, RenderContainer * rende
 {
    if( false == checkBlockTaskNumbers( taskup.getNumBlock(), taskup.getNumTask(), "updateTaskState")) return;
    bool errorHost = false;
-   m_blocks[taskup.getNumBlock()]->tasks[taskup.getNumTask()]->updateState( taskup, renders, monitoring, errorHost);
+   m_blocks[taskup.getNumBlock()]->m_tasks[taskup.getNumTask()]->updateState( taskup, renders, monitoring, errorHost);
    if( errorHost) m_blocks[taskup.getNumBlock()]->errorHostsAppend( taskup.getNumTask(), taskup.getClientId(), renders);
 }
 
@@ -1188,8 +1243,8 @@ void JobAf::tasks_Skip_Restart( const af::MCTasksPos &taskspos, bool restart, Re
 
       for( int t = start; t < end; t++)
       {
-         if( restart) m_blocks[b]->tasks[t]->restart( false, message, renders, monitoring);
-         else         m_blocks[b]->tasks[t]->skip( message, renders, monitoring);
+		 if( restart) m_blocks[b]->m_tasks[t]->restart( false, message, renders, monitoring);
+		 else         m_blocks[b]->m_tasks[t]->skip( message, renders, monitoring);
       }
    }
    AFCommon::QueueDBUpdateTask_end();
@@ -1202,7 +1257,7 @@ void JobAf::restartAllTasks( bool onlyRunning, const std::string & message, Rend
    {
       int numtasks = m_blocksdata[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
-         m_blocks[b]->tasks[t]->restart( onlyRunning, message, renders, monitoring);
+		 m_blocks[b]->m_tasks[t]->restart( onlyRunning, message, renders, monitoring);
    }
    AFCommon::QueueDBUpdateTask_end();
    refresh( time(NULL), renders, monitoring);
@@ -1214,7 +1269,7 @@ void JobAf::restartErrors( const std::string & message, RenderContainer * render
    {
       int numtasks = m_blocksdata[b]->getTasksNum();
       for( int t = 0; t < numtasks; t++)
-         m_blocks[b]->tasks[t]->restartError( message, renders, monitoring);
+		 m_blocks[b]->m_tasks[t]->restartError( message, renders, monitoring);
    }
 }
 
@@ -1227,13 +1282,13 @@ const std::list<std::string> & JobAf::getTaskLog( int block, int task)
 {
    static const std::list<std::string> emptylog;
    if( false == checkBlockTaskNumbers( block, task, "getTaskLog")) return emptylog;
-   return m_blocks[block]->tasks[task]->getLog();
+   return m_blocks[block]->m_tasks[task]->getLog();
 }
 
 af::TaskExec * JobAf::generateTask( int block, int task)
 {
    if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
-   return m_blocks[block]->data->genTask( task);
+   return m_blocks[block]->m_data->genTask( task);
 }
 
 const std::string JobAf::getErrorHostsListString() const
@@ -1250,7 +1305,7 @@ const std::string JobAf::getErrorHostsListString( int b, int t) const
    {
       return std::string("Invalid task[") + af::itos(b) + "][" + af::itos(t) + "].";
    }
-   std::string str = m_blocks[b]->tasks[t]->getErrorHostsListString();
+   std::string str = m_blocks[b]->m_tasks[t]->getErrorHostsListString();
    if( str.empty()) str = "The task has no error hosts.";
    return str;
 }
@@ -1280,7 +1335,7 @@ bool JobAf::getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::stri
       msg->setString("JobAf::getTaskStdOut: invalid job and task numbers");
       return false;
    }
-   return m_blocks[taskpos.getNumBlock()]->tasks[taskpos.getNumTask()]->getOutput( taskpos.getNumber(), msg, filename, renders);
+   return m_blocks[taskpos.getNumBlock()]->m_tasks[taskpos.getNumTask()]->getOutput( taskpos.getNumber(), msg, filename, renders);
 }
 
 void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)
@@ -1291,13 +1346,13 @@ void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * rend
    if( mclisten.justTask())
    {
       checkBlockTaskNumbers( mclisten.getNumBlock(), mclisten.getNumTask(), "listenOutput");
-      m_blocks[mclisten.getNumBlock()]->tasks[mclisten.getNumTask()]->listenOutput( mclisten, renders);
+	  m_blocks[mclisten.getNumBlock()]->m_tasks[mclisten.getNumTask()]->listenOutput( mclisten, renders);
    }
    else
    {
       for( int b = 0; b < m_blocksnum; b++)
          for( int t = 0; t < m_blocksdata[b]->getTasksNum(); t++)
-            m_blocks[b]->tasks[t]->listenOutput( mclisten, renders);
+			m_blocks[b]->m_tasks[t]->listenOutput( mclisten, renders);
    }
 }
 

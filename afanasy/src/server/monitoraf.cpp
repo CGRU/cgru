@@ -35,6 +35,30 @@ void MonitorAf::setZombie()
    Node::setZombie();
 }
 
+void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+						AfContainer * i_container, MonitorContainer * i_monitoring)
+{
+	const JSON & operation = i_action["operation"];
+	if( operation.IsObject())
+	{
+		std::string type;
+		af::jr_string("type", type, operation);
+		if( type == "exit")
+		{
+			af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
+			msg->setAddress( this);
+			AFCommon::QueueMsgDispatch( msg);
+			return;
+		}
+		else
+		{
+			appendLog("Unknown operation \"" + type + "\" by " + i_author);
+			return;
+		}
+		appendLog("Operation \"" + type + "\" by " + i_author);
+	}
+}
+
 bool MonitorAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
    switch( type)

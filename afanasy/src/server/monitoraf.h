@@ -18,6 +18,9 @@ public:
 
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
+   virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+						   AfContainer * i_container, MonitorContainer * i_monitoring);
+
    bool hasJobUid( int uid) const;
 
    bool hasJobEvent( int type, int uid) const;

@@ -45,8 +45,8 @@ UserAf::~UserAf()
 
 void UserAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_users->sortPriority( this);}
 
-void UserAf::v_action( const JSON & i_action, const std::string & i_type, const std::string & i_author,
-					   std::string & io_changes, AfContainer * i_container, MonitorContainer * i_monitoring)
+void UserAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
+						AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	const JSON & params = i_action["params"];
 	if( params.IsObject())

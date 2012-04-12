@@ -161,7 +161,7 @@ SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress
    Block( blockJob, blockData, progress)
 {
 //printf("SysBlock::SysBlock:\n");
-   taskprogress = progress->tp[ data->getBlockNum()][0];
+   taskprogress = progress->tp[ m_data->getBlockNum()][0];
    taskprogress->state &= ~AFJOB::STATE_READY_MASK;
    taskprogress->starts_count = 0;
    taskprogress->errors_count = 0;
@@ -199,7 +199,7 @@ bool SysBlock::isReady() const
 void SysBlock::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
 //printf("SysBlock::startTask:\n");
-   taskexec->setBlockName( data->getName());
+   taskexec->setBlockName( m_data->getName());
    SysTask * systask = getReadySysTask();
 
    // Add new ready task:
@@ -207,12 +207,12 @@ void SysBlock::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorCon
 
    if( systask == NULL ) return;
 
-   systask->start( taskexec, data->getRunningTasksCounter(), render, monitoring);
+   systask->start( taskexec, m_data->getRunningTasksCounter(), render, monitoring);
 
    taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
    taskprogress->starts_count++;
 
-   if( monitoring ) tasks[0]->monitor( monitoring);
+   if( monitoring ) m_tasks[0]->monitor( monitoring);
 }
 
 SysTask * SysBlock::getReadySysTask() const
@@ -311,12 +311,12 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    bool blockProgress_changed = false;
    bool taskchanged = false;
 
-   uint32_t blockstate_new = data->getState();
+   uint32_t blockstate_new = m_data->getState();
    uint32_t blockstate_old = blockstate_new;
    uint32_t taskstate_old = taskprogress->state;
-   int tasksready_old = data->getProgressTasksReady();
-   int tasksdone_old  = data->getProgressTasksDone();
-   int taskserror_old = data->getProgressTasksError();
+   int tasksready_old = m_data->getProgressTasksReady();
+   int tasksdone_old  = m_data->getProgressTasksDone();
+   int taskserror_old = m_data->getProgressTasksError();
    int tasksready_new = 0;
    int tasksdone_new  = tasksdone_old;
    int taskserror_new = 0;
@@ -325,8 +325,8 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    taskprogress->state &= ~AFJOB::STATE_RUNNING_MASK;
    taskprogress->state &= ~AFJOB::STATE_READY_MASK;
 
-   if( data->getRunningTasksNumber() > 0 ) blockstate_new |= AFJOB::STATE_RUNNING_MASK;
-   data->setState( blockstate_new);
+   if( m_data->getRunningTasksNumber() > 0 ) blockstate_new |= AFJOB::STATE_RUNNING_MASK;
+   m_data->setState( blockstate_new);
 
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
    {
@@ -355,7 +355,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       ( tasksdone_old  != tasksdone_new  ) ||
       ( taskserror_old != taskserror_new )  ) blockProgress_changed = true;
 
-   if( taskchanged && monitoring) tasks[0]->monitor( monitoring);
+   if( taskchanged && monitoring) m_tasks[0]->monitor( monitoring);
 
    // For block in jobs list monitoring
    if( Block::refresh( currentTime, renders, monitoring))
@@ -366,12 +366,12 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    else
    {
       // Add block to monitoring if it was not, but has changes
-      if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, data);
+      if( monitoring ) monitoring->addBlock( af::Msg::TBlocksProgress, m_data);
    }
 
-   data->setProgressTasksReady( tasksready_new  );
-   data->setProgressTasksDone(  tasksdone_new   );
-   data->setProgressTasksError( taskserror_new  );
+   m_data->setProgressTasksReady( tasksready_new  );
+   m_data->setProgressTasksDone(  tasksdone_new   );
+   m_data->setProgressTasksError( taskserror_new  );
 
    return blockProgress_changed;
 }

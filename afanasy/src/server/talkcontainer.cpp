@@ -37,9 +37,9 @@ af::Msg * TalkContainer::addTalk( TalkAf *newTalk, MonitorContainer * monitoring
    return new af::Msg( af::Msg::TTalkId, id);
 }
 
-void TalkContainer::distributeData( af::Msg *msg)
+void TalkContainer::distributeData( af::Msg * i_msg)
 {
-   af::MCTalkdistmessage msgdist( msg);
+   af::MCTalkdistmessage msgdist( i_msg);
    const std::list<std::string> * list = msgdist.getList();
 
    std::string user, text;
@@ -72,7 +72,7 @@ else printf("\n");
 #endif
       }
    }
-   AFCommon::QueueMsgDispatch( msg);
+   AFCommon::QueueMsgDispatch( message);
 }
 
 //##############################################################################
