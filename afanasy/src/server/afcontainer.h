@@ -20,7 +20,7 @@ public:
    inline bool isInitialized() {  return initialized;}///< Whether container was successfully initialized.
 
 	/// Generate nodes message matching provided ids or mask:
-	af::Msg * generateList( int i_type, const std::vector<int32_t> & i_ids, const std::string & i_mask, bool i_json);
+	af::Msg * generateList( int i_type, const std::string & i_type_name, const std::vector<int32_t> & i_ids, const std::string & i_mask, bool i_json);
 
 	/// Generate MCAfNodes message with Nodes with provided ids or mask:
 	af::Msg * generateList( int i_type, const af::MCGeneral & i_mcgeneral);

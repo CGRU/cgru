@@ -21,7 +21,7 @@ AFINFO("DBBlockData::DBBlockData():")
    read( msg);
 }
 
-DBBlockData::DBBlockData( JSON & i_object, int i_num):
+DBBlockData::DBBlockData( const JSON & i_object, int i_num):
    af::BlockData( i_num, 0)
 {
 AFINFA("DBBlockData::DBBlockData(): BlockNum=%d", i_num)
@@ -102,6 +102,11 @@ af::TaskData * DBBlockData::createTask( af::Msg * msg)
 {
 //printf("DBBlockData::createTask:\n");
    return new DBTaskData( msg);
+}
+
+af::TaskData * DBBlockData::createTask( const JSON & i_object)
+{
+	return new DBTaskData( i_object);
 }
 
 bool DBBlockData::dbAdd( PGconn * i_conn) const

@@ -108,8 +108,8 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 
 void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 {
-	o_str << "\"job\"";
-	o_str << ":{";
+	o_str << "{";
+
 	Node::v_jsonWrite( o_str, i_type);
 
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";

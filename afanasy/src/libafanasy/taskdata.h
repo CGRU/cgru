@@ -13,7 +13,7 @@ public:
 	TaskData( Msg * msg);
 
 	/// Construct data from JSON:
-	TaskData( const JSON & i_value);
+	TaskData( const JSON & i_object);
 
 	virtual ~TaskData();
 
@@ -36,7 +36,8 @@ public:
 
 	bool checkDependMask( const std::string & str);
 
-    void jsonWrite( std::ostringstream & o_str);
+	void jsonRead( const JSON & i_object);
+	void jsonWrite( std::ostringstream & o_str);
 
 protected:
 	std::string m_name;        ///< Task name.

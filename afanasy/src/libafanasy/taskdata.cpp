@@ -22,13 +22,18 @@ TaskData::~TaskData()
 //printf("TaskData::~TaskData:\n");
 }
 
-TaskData::TaskData( const JSON & i_value)
+TaskData::TaskData( const JSON & i_object)
 {
-	jr_string("name",        m_name,        i_value);
-	jr_string("command",     m_command,     i_value);
-	jr_string("files",       m_files,       i_value);
-	//jr_string("depend_mask", m_depend_mask, i_value);
-	//jr_string("custom_data", m_custom_data, i_value);
+	jsonRead( i_object);
+}
+
+void TaskData::jsonRead( const JSON & i_object)
+{
+	jr_string("name",        m_name,        i_object);
+	jr_string("command",     m_command,     i_object);
+	jr_string("files",       m_files,       i_object);
+	//jr_string("depend_mask", m_depend_mask, i_object);
+	//jr_string("custom_data", m_custom_data, i_object);
 }
 
 void TaskData::jsonWrite( std::ostringstream & o_str)

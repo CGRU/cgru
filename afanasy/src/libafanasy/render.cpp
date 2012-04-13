@@ -47,7 +47,7 @@ Render::~Render()
 
 void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 {
-	o_str << "\"render\":{";
+	o_str << "{";
 
 	Client::v_jsonWrite( o_str, i_type);
 

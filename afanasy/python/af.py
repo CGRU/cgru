@@ -1,56 +1,45 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import sys
-
-import json
-
 import time
-
-import pyaf
-print('Python module = "%s"' % pyaf.__file__)
 
 import afenv
 import afnetwork
 import services
 
 from afpathmap import PathMap
+pathmap = PathMap()
 
-def CheckClass( afroot, name, folder):
+def CheckClass( name, folder):
 	filename = name + '.py'
-	path = os.path.join( afroot, 'python')
+	path = os.path.join( afenv.VARS['AF_ROOT'], 'python')
 	path = os.path.join( path, folder)
 	if filename in os.listdir( path): return True
 	return False
 
-class Task(pyaf.Task):
+class Task:
 	def __init__( self, taskname = ''):
-		self.env = afenv.Env()
-		if self.env.valid == False: print('ERROR: Invalid environment, may be some problems.')
-		self.pm = PathMap( self.env.Vars['afroot'])
 		self.data = dict()
+		self.setName( taskname)
 
-		pyaf.Task.__init__( self)
-		if taskname != '': self.setName( taskname)
+	def setName( self, name):
+		if name != '': self.data["name"] = name
 
 	def setCommand( self, command, TransferToServer = True):
-		if TransferToServer: command = self.pm.toServer( command)
-
-		pyaf.Task.setCommand( self, command)
+		if TransferToServer: command = pathmap.toServer( command)
+		self.data["command"] = command
 
 	def setFiles( self, files, TransferToServer = True):
-		if TransferToServer: files = self.pm.toServer( files)
+		if TransferToServer: files = pathmap.toServer( files)
+		self.data["files"] = files
 
-		pyaf.Task.setFiles( self, files)
-
-class Block(pyaf.Block):
+class Block:
 	def __init__( self, blockname = 'block', service = 'generic'):
-		self.env = afenv.Env()
-		if self.env.valid == False: print('ERROR: Invalid environment, may be some problems.')
-		self.pm = PathMap( self.env.Vars['afroot'])
 		parser = ''
-		if not CheckClass( self.env.Vars['afroot'], service, 'services'):
+		if not CheckClass( service, 'services'):
 			print('Error: Unknown service "%s", setting to "generic"' % service)
 			service = 'generic'
 		else:
@@ -61,36 +50,32 @@ class Block(pyaf.Block):
 		self.data["name"] = blockname
 		self.data["service"] = service
 		self.data["parser"] = parser
-		self.data["capacity"] = int( self.env.Vars['task_default_capacity'])
+		self.data["capacity"] = int( afenv.VARS['task_default_capacity'])
 		self.data["working_directory"] = os.getenv('PWD', os.getcwd())
-
-		pyaf.Block.__init__( self)
-
-		self.setName( blockname)
-		self.setService( service)
-		self.setParser( parser)
-		self.setWorkingDirectory( os.getenv('PWD', os.getcwd()) )
-		self.setCapacity( int( self.env.Vars['task_default_capacity'] ) )
-		self.tasks = []
 
 	def setParser( self, parser, nocheck = False):
 		if parser != '':
 			if not nocheck:
-				if not CheckClass( self.env.Vars['afroot'], parser, 'parsers'):
+				if not CheckClass( parser, 'parsers'):
 					if parser != 'none':
 						print('Error: Unknown parser "%s", setting to "none"' % parser)
 						parser = 'none'
-		pyaf.Block.setParser( self, parser)
+		self.data["parser"] = parser
 
 	def setNumeric( self, start = 1, end = 10, pertask = 1, increment = 1):
+		if len( self.tasks):
+			print('Error: Block.setNumeric: Block already has tasks.')
+			return
 		if end < start:
 			print('Error: Block.setNumeric: end < start (%d < %d)' % (end,start))
 			end = start
 		if pertask < 1:
 			print('Error: Block.setNumeric: pertask < 1 (%d < 1)' % pertask)
 			pertask = 1
-
-		pyaf.Block.setNumeric( self, start, end, pertask, increment)
+		self.data["frame_first"] = start
+		self.data["frame_last"] = end
+		self.data["frames_per_task"] = pertask
+		self.data["frames_inc"] = increment
 
 	def setCapacity( self, capacity):
 		if capacity < 0:
@@ -98,91 +83,58 @@ class Block(pyaf.Block):
 			return
 		self.data["capacity"] = capacity
 
-		pyaf.Block.setCapacity( self, capacity)
-
 	def setVariableCapacity( self, capacity_coeff_min, capacity_coeff_max):
 		if capacity_coeff_min >= 0 or capacity_coeff_max >= 0:
 			self.data["capacity_coeff_min"] = capacity_coeff_min
 			self.data["capacity_coeff_max"] = capacity_coeff_max
 
-			pyaf.Block.setVariableCapacity( self, capacity_coeff_min, capacity_coeff_max)
-
 	def setWorkingDirectory( self, working_directory, TransferToServer = True):
-		if TransferToServer: working_directory = self.pm.toServer( working_directory)
+		if TransferToServer: working_directory = pathmap.toServer( working_directory)
 		self.data["working_directory"] = working_directory
 
-		pyaf.Block.setWorkingDirectory( self, working_directory)
-
 	def setCommand( self, command, prefix = True, TransferToServer = True):
-		if prefix: command = os.getenv('AF_CMD_PREFIX', self.env.Vars['cmdprefix']) + command
-		if TransferToServer: command = self.pm.toServer( command)
+		if prefix: command = os.getenv('AF_CMD_PREFIX', afenv.VARS['cmdprefix']) + command
+		if TransferToServer: command = pathmap.toServer( command)
 		self.data["command"] = command
 
-		pyaf.Block.setCommand( self, command)
-
 	def setCmdPre(  self, command_pre, TransferToServer = True):
-		if TransferToServer: command_pre = self.pm.toServer( command_pre)
+		if TransferToServer: command_pre = pathmap.toServer( command_pre)
 		self.data["command_pre"] = command_pre
 
-		pyaf.Block.setCmdPre(  self, command_pre)
-
 	def setCmdPost( self, command_post, TransferToServer = True):
-		if TransferToServer: command_post = self.pm.toServer( command_post)
+		if TransferToServer: command_post = pathmap.toServer( command_post)
 		self.data["command_post"] = command_post
 
-		pyaf.Block.setCmdPost( self, command_post)
-
 	def setFiles(  self, files, TransferToServer = True):
-		if TransferToServer: files = self.pm.toServer( files)
+		if TransferToServer: files = pathmap.toServer( files)
 		self.data["files"] = files
 
-		pyaf.Block.setFiles(  self, files)
-
 	def fillTasks( self):
-		self.clearTasksList()
-		t = 0
-		for task in self.tasks:
-			if isinstance( task, Task):
-				self.appendTask( task)
-			else:
-				print('Warning: Skipping element[%d] of list "tasks" which is not an instance of "Task") class:' % t)
-				print(repr(task))
-			t += 1
+		if len( self.tasks):
+			self.data["tasks"] = []
+			for task in self.tasks:
+				self.data["tasks"].append( task.data)
 
-class Job(pyaf.Job):
+class Job:
 	def __init__( self, jobname = None, verbose = False):
-		self.env = afenv.Env( verbose)
-		if self.env.valid == False: print('ERROR: Invalid environment, may be some problems.')
-		self.pm = PathMap( self.env.Vars['afroot'], False, verbose)
-
 		self.data = dict()
-		self.data["name"] = "noname"
-		self.data["user_name"] = self.env.Vars['username']
-		self.data["host_name"] = self.env.Vars['hostname']
-		self.data["priority"]  = self.env.Vars['priority']
-		self.data["time_creation"] = int(time.time())
 		self.data["blocks"] = []
+		self.data["name"] = "noname"
+		self.data["user_name"] = afenv.VARS['USERNAME']
+		self.data["host_name"] = afenv.VARS['HOSTNAME']
+		self.data["priority"]  = afenv.VARS['priority']
+		self.data["time_creation"] = int(time.time())
+		if jobname is not None: self.setName( jobname)
 
-		pyaf.Job.__init__( self)
-		self.setPriority(        int( self.env.Vars['priority']       ))
-		self.setUserName(             self.env.Vars['username']        )
-		self.setHostName(             self.env.Vars['hostname']        )
-		if jobname != None: self.setName( jobname)
-		platform = sys.platform
-		# looking at 'darwin' at first as its name contains 'win' sting too
-		if platform.find('darwin') > -1: self.setNeedOS( 'mac')
-		elif platform.find('win') > -1: self.setNeedOS( 'win')
-		else: self.setNeedOS( 'linux')
-		self.blocks = []
+	def setName( self, name):
+		if len(name):
+			self.data["name"] = name
 
 	def setUserName( self, username):
 		if username == None or username == '':
 			username = 'none'
 			print('Error: Username is empty.')
 		self.data["user_name"] = username.lower()
-
-		username = username.lower()
-		pyaf.Job.setUserName( self, username)
 
 	def setPriority( self, priority):
 		if priority < 0: return
@@ -191,21 +143,17 @@ class Job(pyaf.Job):
 			print('Warning: priority clamped to maximum = %d' % priority)
 		self.data["priority"] = priority
 
-		pyaf.Job.setPriority( self, priority)
-
 	def setCmdPre(  self, command, TransferToServer = True):
-		if TransferToServer: command = self.pm.toServer( command)
+		if TransferToServer: command = pathmap.toServer( command)
 		self.data["command_pre"] = command
 
-		pyaf.Job.setCmdPre(  self, command)
-
 	def setCmdPost( self, command, TransferToServer = True):
-		if TransferToServer: command = self.pm.toServer( command)
+		if TransferToServer: command = pathmap.toServer( command)
 		self.data["command_post"] = command
 
-		pyaf.Job.setCmdPost( self, command)
-
 	def fillBlocks( self):
+		for block in self.blocks:
+			self.data["blocks"].append( block.data)
 		self.clearBlocksList()
 		b = 0
 		for block in self.blocks:
@@ -227,103 +175,121 @@ class Job(pyaf.Job):
 		if len( self.blocks) == 0:
 			print('Error: Job has no blocks')
 			return False
-
-		for block in self.blocks:
-			self.data["blocks"].append( block.data)
-		obj = {"job": self.data }
-		print(json.dumps( obj))
-
 		self.fillBlocks()
-		if self.construct() == False: return False
-		return afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), False, verbose)[0]
 
-	def pause(      self): self.offline()
-	def setPaused(  self): self.offline()
-	def setOffline( self): self.offline()
+		obj = {"job": self.data }
+		#print(json.dumps( obj))
+
+		if self.construct() == False: return False
+		return afnetwork.sendServer( json.dumps( obj), False, verbose)[0]
+
 	def pause(      self): self.data["pause"] = true
 	def setPaused(  self): self.data["pause"] = true
 	def setOffline( self): self.data["pause"] = true
 	def offline(    self): self.data["pause"] = true
 
 
-class Cmd( pyaf.Cmd):
-   def __init__( self ):
-      self.env = afenv.Env()
-      if self.env.valid == False:
-         print('ERROR: Invalid environment, may be some problems.')
-      self.pm = PathMap( self.env.Vars['afroot'])
-      pyaf.Cmd.__init__( self, self.env.Vars['servername'], self.env.Vars['serverport'])
-      pyaf.Cmd.setUserName( self, self.env.Vars['username'])
-      pyaf.Cmd.setHostName( self, self.env.Vars['hostname'])
-      self.requestOutput = None
+class Cmd:
+	def __init__( self ):
+		self.data = dict()
+		self.data['user_name'] = afenv.VARS['USERNAME']
+		self.data['host_name'] = afenv.VARS['HOSTNAME']
+		self.action = None
    
-   def _sendRequest(self, verbose = False):
-      if self.getDataLen() < 1:
-         print('ERROR: Request message is not set.')
-         return False
-      output = afnetwork.sendServer( self.getData(), self.getDataLen(), self.env.Vars['servername'], int(self.env.Vars['serverport']), True, verbose)
-      if output[0] == True:
-         self.requestOutput = output[1]
-         return True
-      else:
-         self.requestOutput = None
-         return False
+	def _sendRequest(self, verbose = False):
+		if self.action is None:
+			print('ERROR: Action is not set.')
+			return None
 
-   def getJobList( self, verbose = False):
-      self.getjoblist(0)
-      if self._sendRequest(verbose):
-         return self.decodejoblist(self.requestOutput)
-      else:
-         return False
+		obj = { self.action: self.data }
+		#print(json.dumps( obj))
 
-   def deleteJob(self, jobName, verbose = False):
-      self.deletejob(jobName)
-      if self._sendRequest(verbose):
-         return True
-      else:
-         return False
+		output = afnetwork.sendServer( json.dumps( obj), True, verbose)
 
-   def getJobInfo(self, jobId, verbose = False):
-      self.getjobinfo(jobId)
-      if self._sendRequest(verbose):
-         return self.decodejobinfo(self.requestOutput)
-      else:
-         return False
+		if output[0] == True:
+			return output[1]
+		else:
+			return None
 
-   def renderSetNimby( self, text):
-      self.rendersetnimby( self.env.Vars['hostname'], text)
-      self._sendRequest()
+	def getJobList( self, verbose = False):
+		self.action = 'get'
+		self.data['type'] = 'jobs'
+		return self._sendRequest(verbose)
 
-   def renderSetNIMBY( self, text):
-      self.rendersetNIMBY( self.env.Vars['hostname'], text)
-      self._sendRequest()
+	def deleteJob(self, jobName, verbose = False):
+		self.action = 'action'
+		self.data['type'] = 'jobs'
+		self.data['mask'] = jobName
+		self.data['operation'] = {'type':'delete'}
+		return self._sendRequest(verbose)
 
-   def renderSetFree( self, text):
-      self.rendersetfree( self.env.Vars['hostname'], text)
-      self._sendRequest()
+	def getJobInfo(self, jobId, verbose = False):
+		#self.getjobinfo(jobId)
+		return self._sendRequest(verbose)
 
-   def renderEjectTasks( self, text):
-      self.renderejecttasks( self.env.Vars['hostname'], text)
-      self._sendRequest()
+	def renderSetNimby( self, text):
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['params'] = {'nimby':True}
+		self._sendRequest()
 
-   def renderEjectNotMyTasks( self, text):
-      self.renderejectnotmytasks( self.env.Vars['hostname'], text)
-      self._sendRequest()
+	def renderSetNIMBY( self, text):
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['params'] = {'NIMBY':True}
+		self._sendRequest()
 
-   def renderExit( self, text):
-      self.renderexit( self.env.Vars['hostname'], text)
-      self._sendRequest()
+	def renderSetFree( self, text):
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['params'] = {'nimby':False}
+		self._sendRequest()
 
-   def talkExit( self, text):
-      self.talkexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + ':.*', text)
-      self._sendRequest()
+	def renderEjectTasks( self, text):
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['operation'] = {'type':'eject_tasks'}
+		self._sendRequest()
 
-   def monitorExit( self, text):
-      self.monitorexit( self.env.Vars['username'] + '@' + self.env.Vars['hostname'] + ':.*', text)
-      self._sendRequest()
+	def renderEjectNotMyTasks( self, text):
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['operation'] = {'type':'eject_tasks_keep_my'}
+		self._sendRequest()
 
-   def renderGetLocal( self): return self.renderGetList( self.env.Vars['hostname'])
-   def renderGetList( self, mask = '.*'):
-      if not self.renderlistget( mask): return
-      if self._sendRequest():
-         return self.renderlistdecode( self.requestOutput)
+	def renderExit( self, text):
+		self.action = 'action'
+		self.data['type'] = 'renders'
+		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['operation'] = {'type':'exit'}
+		self._sendRequest()
+
+	def talkExit( self, text):
+		self.action = 'action'
+		self.data['type'] = 'talks'
+		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME']
+		self.data['operation'] = {'type':'exit'}
+		#self.talkexit( afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*', text)
+		self._sendRequest()
+
+	def monitorExit( self, text):
+		self.action = 'action'
+		self.data['type'] = 'monitors'
+		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME']
+		self.data['operation'] = {'type':'exit'}
+		#self.monitorexit( afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*', text)
+		self._sendRequest()
+
+	def renderGetList( self, mask = None):
+		self.action = 'get'
+		self.data['type'] = 'renders'
+		if mask is not None:
+			self.data['mask'] = mask
+		return self._sendRequest()
+
+	def renderGetLocal( self): return self.renderGetList( afenv.VARS['HOSTNAME'])

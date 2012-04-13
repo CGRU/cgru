@@ -1,11 +1,24 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+import json
 import os
 import socket
 import sys
 
-def sendServer( data, datalen, host, port, receive = True, verbose = False):
+import afenv
+
+def sendServer( data, receive = True, verbose = False):
+
+	size = len(data)
+	header = bytearray((0,0,0,44, 0,0,0,1, 0,0,0,0, 0,0,0,219, 0,0,int(size/256),size-256*int(size/256)))
+	data = header + bytearray( data, 'utf-8')
+	datalen = len(data)
+	#return True, None
+
+	host = afenv.VARS['servername']
+	port = int(afenv.VARS['serverport'])
+
 	s = None
 	err_msg = ''
 	reslist = []
@@ -53,5 +66,8 @@ def sendServer( data, datalen, host, port, receive = True, verbose = False):
 			break
 		data += buffer
 	s.close()
+
+	#print(data[20:-1])
+	data = json.loads(data[20:-1])
 
 	return True, data

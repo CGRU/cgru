@@ -151,18 +151,13 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if( tasks.IsArray())
 	{
 		m_tasks_num = tasks.Size();
-		if( m_tasks_num < 1 )
-		{
-			AFERROR("BlockData::BlockData: Zero size tasks array.")
-			return;
-		}
-		for( int t = 0; t < m_tasks_num; t++)
+		if( m_tasks_num > 1 )
 		{
 			m_tasks_data = new TaskData*[m_tasks_num];
-			for( int b = 0; b < m_tasks_num; b++)
+			for( int t = 0; t < m_tasks_num; t++)
 			{
-				m_tasks_data[b] = createTask( tasks[t]);
-				if( m_tasks_data[b] == NULL)
+				m_tasks_data[t] = createTask( tasks[t]);
+				if( m_tasks_data[t] == NULL)
 				{
 					AFERROR("BlockData::BlockData: Can not allocate memory for new task.")
 					return;

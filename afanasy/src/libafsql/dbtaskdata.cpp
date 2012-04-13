@@ -36,6 +36,12 @@ DBTaskData::DBTaskData( af::Msg * msg)
    read( msg);
 }
 
+DBTaskData::DBTaskData( const JSON & i_object)
+{
+	addDBAttributes();
+	jsonRead( i_object);
+}
+
 void DBTaskData::addDBAttributes()
 {
    dbAddAttr( new DBAttrString( DBAttr::_name,        &m_name       ));

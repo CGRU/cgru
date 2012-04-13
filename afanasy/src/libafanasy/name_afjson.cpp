@@ -13,9 +13,9 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 	char * data = new char[datalen+1];
 	memcpy( data, i_msg->data(), datalen);
 	data[datalen] = '\0';
+//printf("%s\n", data);
 
 	std::string err;
-
 	if( o_doc.ParseInsitu<0>(data).HasParseError())
 	{
 		err = "JSON: Parsing failed at character " + af::itos( int( o_doc.GetErrorOffset()));

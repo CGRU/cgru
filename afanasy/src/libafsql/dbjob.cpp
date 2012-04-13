@@ -66,7 +66,7 @@ af::BlockData * DBJob::newBlockData( af::Msg * msg)
 	return new DBBlockData( msg);
 }
 
-af::BlockData * DBJob::newBlockData( JSON & i_object, int i_num)
+af::BlockData * DBJob::newBlockData( const JSON & i_object, int i_num)
 {
 	return new DBBlockData( i_object, i_num);
 }

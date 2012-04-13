@@ -162,7 +162,7 @@ af::Msg* UserContainer::generateJobsList( int id)
    return new af::Msg( af::Msg::TJobsList, &mcjobs);
 }
 
-af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids, bool json)
+af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids, const std::string & i_type_name, bool json)
 {
 	UserContainerIt usersIt( this);
 	MCAfNodes mcjobs;
@@ -171,7 +171,7 @@ af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids, bool
 
 	if( json )
 	{
-		str << "{\n";
+		str << "{\"" << i_type_name << "\":[\n";
 	}
 
 	for( int i = 0; i < ids.size(); i++)
@@ -192,9 +192,9 @@ af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids, bool
 
 	if( json )
 	{
-		str << "\n}";
+		str << "\n]}";
 		std::string string = str.str();
-		msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
+		msg->setData( string.size()+1, string.c_str(), af::Msg::TJSON);
 	}
 	else
 		msg->set( af::Msg::TJobsList, &mcjobs);

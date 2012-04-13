@@ -11,7 +11,7 @@ class DBBlockData: public DBItem, public af::BlockData
 public:
    DBBlockData();
    DBBlockData( af::Msg * msg);
-   DBBlockData( JSON & i_object, int i_num);
+   DBBlockData( const JSON & i_object, int i_num);
    DBBlockData( int BlockNum, int JobId);
    virtual ~DBBlockData();
 
@@ -26,6 +26,7 @@ protected:
 private:
    void addDBAttributes();
    virtual af::TaskData * createTask( af::Msg * msg);
+   virtual af::TaskData * createTask( const JSON & i_object);
 
 private:
    static const std::string TableName;
