@@ -3,6 +3,7 @@
 
 import json
 import os
+import re
 import sys
 import time
 
@@ -13,7 +14,17 @@ import services
 from afpathmap import PathMap
 pathmap = PathMap()
 
-def CheckClass( name, folder):
+def checkRegExp( pattern):
+	result = True
+	try:
+		re.compile(pattern)
+	except:
+		print('Error: Invalid regular expression pattern "%s"' % pattern)
+		print( str(sys.exc_info()[1]))
+		result = False
+	return result
+
+def checkClass( name, folder):
 	filename = name + '.py'
 	path = os.path.join( afenv.VARS['AF_ROOT'], 'python')
 	path = os.path.join( path, folder)
@@ -38,25 +49,32 @@ class Task:
 
 class Block:
 	def __init__( self, blockname = 'block', service = 'generic'):
-		parser = ''
-		if not CheckClass( service, 'services'):
-			print('Error: Unknown service "%s", setting to "generic"' % service)
-			service = 'generic'
-		else:
-			__import__("services", globals(), locals(), [service])
-			parser = eval(('services.%s.parser') % service)
-
 		self.data = dict()
 		self.data["name"] = blockname
-		self.data["service"] = service
-		self.data["parser"] = parser
 		self.data["capacity"] = int( afenv.VARS['task_default_capacity'])
 		self.data["working_directory"] = os.getenv('PWD', os.getcwd())
+		self.tasks = []
+		if self.setService( service):
+			__import__("services", globals(), locals(), [self.data["service"]])
+			parser = eval(('services.%s.parser') % self.data["service"])
+			self.setParser( parser)
+
+	def setService( self, service, nocheck = False):
+		if service != '':
+			result = True
+			if not nocheck:
+				if not checkClass( service, 'services'):
+					print('Error: Unknown service "%s", setting to "generic"' % service)
+					service = 'generic'
+					result = False
+			self.data["service"] = service
+			return result
+		return False
 
 	def setParser( self, parser, nocheck = False):
 		if parser != '':
 			if not nocheck:
-				if not CheckClass( parser, 'parsers'):
+				if not checkClass( parser, 'parsers'):
 					if parser != 'none':
 						print('Error: Unknown parser "%s", setting to "none"' % parser)
 						parser = 'none'
@@ -109,6 +127,29 @@ class Block:
 		if TransferToServer: files = pathmap.toServer( files)
 		self.data["files"] = files
 
+	def setName(               self, value): self.data["name"] = value
+	def setTasksName(          self, value): self.data["tasks_name"] = value
+	def setFramesPerTask(      self, value): self.data["frames_per_task"] = value
+	def setParserCoeff(        self, value): self.data["parser_coeff"] = value
+	def setNonSequential(      self, value): self.data["non_sequential"] = value
+	def setDependSubTask(      self, value): self.data["depend_sub_task"] = value
+	def setMaxRunningTasks(    self, value): self.data["max_running_tasks"] = value
+	def setMaxRunTasksPerHost( self, value): self.data["max_running_tasks_per_host"] = value
+	def setErrorsAvoidHost(    self, value): self.data["errors_avoid_host"] = value
+	def setErrorsForgiveTime(  self, value): self.data["errors_forgive_time"] = value
+	def setErrorsRetries(      self, value): self.data["errors_retries"] = value
+	def setErrorsTaskSameHost( self, value): self.data["errors_task_same_host"] = value
+	def setNeedHDD(            self, value): self.data["need_hdd"] = value
+	def setNeedMemory(         self, value): self.data["need_memory"] = value
+	def setNeedPower(          self, value): self.data["need_power"] = value
+
+	def setDependMask(       self, value):
+		if checkRegExp(value): self.data["depend_mask"] = value
+	def setTasksDependMask( self, value):
+		if checkRegExp(value): self.data["tasks_depend_mask"] = value
+	def setNeedProperties(   self, value):
+		if checkRegExp(value): self.data["need_properties"] = value
+
 	def fillTasks( self):
 		if len( self.tasks):
 			self.data["tasks"] = []
@@ -118,23 +159,21 @@ class Block:
 class Job:
 	def __init__( self, jobname = None, verbose = False):
 		self.data = dict()
-		self.data["blocks"] = []
 		self.data["name"] = "noname"
 		self.data["user_name"] = afenv.VARS['USERNAME']
 		self.data["host_name"] = afenv.VARS['HOSTNAME']
 		self.data["priority"]  = afenv.VARS['priority']
 		self.data["time_creation"] = int(time.time())
-		if jobname is not None: self.setName( jobname)
+		self.setName( jobname)
+		self.blocks = []
 
 	def setName( self, name):
-		if len(name):
+		if name is not None and len(name):
 			self.data["name"] = name
 
 	def setUserName( self, username):
-		if username == None or username == '':
-			username = 'none'
-			print('Error: Username is empty.')
-		self.data["user_name"] = username.lower()
+		if username is not None and len(username):
+			self.data["user_name"] = username.lower()
 
 	def setPriority( self, priority):
 		if priority < 0: return
@@ -152,18 +191,10 @@ class Job:
 		self.data["command_post"] = command
 
 	def fillBlocks( self):
+		self.data["blocks"] = []
 		for block in self.blocks:
+			block.fillTasks()
 			self.data["blocks"].append( block.data)
-		self.clearBlocksList()
-		b = 0
-		for block in self.blocks:
-			if isinstance( block, Block):
-				block.fillTasks()
-				self.appendBlock( block)
-			else:
-				print('Warning: Skipping element[%d] of list "blocks" which is not an instance of "Block" class:' % b)
-				print(repr(block))
-			b += 1
 
 	def output( self, full = False):
 		self.fillBlocks()
@@ -180,14 +211,31 @@ class Job:
 		obj = {"job": self.data }
 		#print(json.dumps( obj))
 
-		if self.construct() == False: return False
 		return afnetwork.sendServer( json.dumps( obj), False, verbose)[0]
 
-	def pause(      self): self.data["pause"] = true
-	def setPaused(  self): self.data["pause"] = true
-	def setOffline( self): self.data["pause"] = true
-	def offline(    self): self.data["pause"] = true
+	def setAnnotation(         self, value): self.data["annotation"] = value
+	def setDescription(        self, value): self.data["description"] = value
+	def setWaitTime(           self, value): self.data["time_wait"] = value
+	def setMaxRunningTasks(    self, value): self.data["max_running_tasks"] = value
+	def setMaxRunTasksPerHost( self, value): self.data["max_running_tasks_per_host"] = value
 
+	def setHostsMask(        self, value):
+		if checkRegExp(value): self.data["hosts_mask"] = value
+	def setHostsMaskExclude( self, value):
+		if checkRegExp(value): self.data["hosts_mask_exclude"] = value
+	def setDependMask(       self, value):
+		if checkRegExp(value): self.data["depend_mask"] = value
+	def setDependMaskGlobal( self, value):
+		if checkRegExp(value): self.data["depend_mask_global"] = value
+	def setNeedOS(           self, value):
+		if checkRegExp(value): self.data["need_os"] = value
+	def setNeedProperties(   self, value):
+		if checkRegExp(value): self.data["need_properties"] = value
+
+	def pause(      self): self.data["offline"] = true
+	def setPaused(  self): self.data["offline"] = true
+	def setOffline( self): self.data["offline"] = true
+	def offline(    self): self.data["offline"] = true
 
 class Cmd:
 	def __init__( self ):
@@ -201,10 +249,10 @@ class Cmd:
 			print('ERROR: Action is not set.')
 			return None
 
+		receive = ( self.action == 'get')
 		obj = { self.action: self.data }
 		#print(json.dumps( obj))
-
-		output = afnetwork.sendServer( json.dumps( obj), True, verbose)
+		output = afnetwork.sendServer( json.dumps( obj), receive, verbose)
 
 		if output[0] == True:
 			return output[1]
@@ -214,7 +262,10 @@ class Cmd:
 	def getJobList( self, verbose = False):
 		self.action = 'get'
 		self.data['type'] = 'jobs'
-		return self._sendRequest(verbose)
+		data = self._sendRequest()
+		if 'jobs' in data:
+			return data['jobs']
+		return None
 
 	def deleteJob(self, jobName, verbose = False):
 		self.action = 'action'
@@ -290,6 +341,9 @@ class Cmd:
 		self.data['type'] = 'renders'
 		if mask is not None:
 			self.data['mask'] = mask
-		return self._sendRequest()
+		data = self._sendRequest()
+		if 'renders' in data:
+			return data['renders']
+		return None
 
 	def renderGetLocal( self): return self.renderGetList( afenv.VARS['HOSTNAME'])

@@ -1,3 +1,5 @@
+import json
+
 import af
 
 import cmd
@@ -7,38 +9,34 @@ WndInfo = None
 from PyQt4 import QtCore, QtGui
 
 def showInfo( tray = None):
-   renders = af.Cmd().renderGetLocal()
+	renders = af.Cmd().renderGetLocal()
 
-   if len( renders) == 0:
-      if tray is not None: tray.showMessage('Render information:', 'No local render client founded.')
-      return
+	if renders is None or len( renders) == 0:
+		if tray is not None: tray.showMessage('Render information:', 'No local render client founded.')
+		return
 
-   global WndInfo
+	global WndInfo
 
-   WndInfo = QtGui.QTextEdit()
-   msg = ''
-   isstring = False
-   if isinstance( renders[0]['info'], str): isstring = True
-   for rinfo in renders:
-      if isstring:
-         msg += rinfo['info']
-         msg += '\n'
-         msg += rinfo['resources']
-      else:
-         msg += str(rinfo['info'], 'utf-8')
-         msg += '\n'
-         msg += str(rinfo['resources'], 'utf-8')
-   if isstring: msg = QtCore.QString.fromUtf8( msg)
-   WndInfo.setPlainText( msg)
-   WndInfo.setReadOnly( True)
-   WndInfo.resize( WndInfo.viewport().size())
-   WndInfo.setWindowTitle('AFANASY Render Information:')
-   WndInfo.show()
-   
+	WndInfo = QtGui.QTextEdit()
+	WndInfo.setPlainText( json.dumps( renders[0], sort_keys=True, indent=4))
+	WndInfo.setReadOnly( True)
+	WndInfo.resize( WndInfo.viewport().size())
+	WndInfo.setWindowTitle('AFANASY Render Information:')
+	WndInfo.show()
+
+def getParameter( data, parm, default):
+	if parm in data:
+		return data[parm]
+	return default
+
 def refresh():
-   renders = af.Cmd().renderGetLocal()
-   if renders is not None and len( renders):
-      render = renders[0]
-      #print( render)
-      cmd.Tray.showRenderIcon( render['online'], render['nimby'] or render['NIMBY'], render['busy'])
-   else: cmd.Tray.showIcon()
+	renders = af.Cmd().renderGetLocal()
+	if renders is not None and len( renders):
+		render = renders[0]
+		#print( render)
+		online = not getParameter( render, 'offline', False)
+		nimby = getParameter( render, 'nimby', False)
+		NIMBY = getParameter( render, 'NIMBY', False)
+		busy = getParameter( render, 'busy', False)
+		cmd.Tray.showRenderIcon( online, nimby or NIMBY, busy)
+	else: cmd.Tray.showIcon()

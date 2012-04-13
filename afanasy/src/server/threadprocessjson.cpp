@@ -33,8 +33,12 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	JSON & getObj = document["get"];
 	if( getObj.IsObject())
 	{
-		std::string type;
+		std::string type, mode;
 		af::jr_string("type", type, getObj);
+		af::jr_string("mode", mode, getObj);
+		bool full = false;
+		if( mode == "full")
+			full = true;
 
 		std::vector<int32_t> ids;
 		af::jr_int32vec("ids", ids, getObj);
@@ -55,7 +59,8 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			else
 			{
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
-				o_msg_response = i_args->jobs->generateList( af::Msg::TJobsList, type, ids, mask, true);
+				o_msg_response = i_args->jobs->generateList(
+					full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, true);
 			}
 		}
 		else if( type == "users")

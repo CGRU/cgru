@@ -67,7 +67,14 @@ def sendServer( data, receive = True, verbose = False):
 		data += buffer
 	s.close()
 
+	if len(data) < 22:
+		return True, None
 	#print(data[20:-1])
-	data = json.loads(data[20:-1])
+
+	try:
+		data = json.loads(data[20:-1])
+	except:
+		print( str(sys.exc_info()[1]))
+		data = None
 
 	return True, data
