@@ -868,43 +868,42 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
 
 bool JobAf::canRun()
 {
-    if( isLocked() )
+	if( isLocked() )
     {
         return false;
     }
 
-//printf("JobAf::solve( RenderAf *render): %s - %s\n", name.toUtf8().data(), render->getName().toUtf8().data());
-
-    // Check some validness:
+	// Check some validness:
     if( m_blocksnum < 1)
     {
         AFERROR("JobAf::solve: job has no blocks.")
         return false;
     }
 
-    // check job state:
+	// check job state:
     if( m_state & AFJOB::STATE_OFFLINE_MASK )
     {
         return false;
     }
-    if( false == ( m_state & AFJOB::STATE_READY_MASK  ))
+
+	if( false == ( m_state & AFJOB::STATE_READY_MASK  ))
     {
-        return false;
+		return false;
     }
 
-    // Zero priority turns job off:
+	// Zero priority turns job off:
     if( m_priority == 0 )
     {
         return false;
     }
 
-    // check maximum running tasks:
+	// check maximum running tasks:
     if(( m_max_running_tasks >= 0 ) && ( getRunningTasksNumber() >= m_max_running_tasks ))
     {
         return false;
     }
 
-    // check maximum running tasks per host:
+	// check maximum running tasks per host:
     if(  m_max_running_tasks_per_host == 0 )
     {
         return false;
@@ -937,29 +936,28 @@ bool JobAf::canRunOn( RenderAf * i_render)
             break;
         }
     }
-    if( false == enoughCapacity) return false;
+	if( false == enoughCapacity)
+		return false;
 
-
-
-    // check hosts mask:
+	// check hosts mask:
     if( false == checkHostsMask( i_render->getName()))
     {
         return false;
     }
 
-    // check exclude hosts mask:
+	// check exclude hosts mask:
     if( false == checkHostsMaskExclude( i_render->getName()))
     {
         return false;
     }
 
-    // check needed os:
+	// check needed os:
     if( false == checkNeedOS( i_render->getHost().m_os))
     {
         return false;
     }
 
-    // check needed properties:
+	// check needed properties:
     if( false == checkNeedProperties( i_render->getHost().m_properties))
     {
         return false;
@@ -970,7 +968,8 @@ bool JobAf::canRunOn( RenderAf * i_render)
 
 bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 {
-    for( int b = 0; b < m_blocksnum; b++)
+//printf("Job::solve:\n");
+	for( int b = 0; b < m_blocksnum; b++)
     {
         int numtasks = m_blocksdata[b]->getTasksNum();
         for( int t = 0; t < numtasks; t++)

@@ -71,7 +71,7 @@ bool DBTaskData::dbPrepareInsert( PGconn * i_conn)
     bool o_result = true;
     if( PQresultStatus(res) != PGRES_COMMAND_OK)
     {
-        AFERRAR("SQL Preparing tasks data insertion failed: %s", PQerrorMessage( i_conn));
+        AFERRAR("SQL: Preparing tasks data insertion failed: %s", PQerrorMessage( i_conn));
         o_result = false;
     }
     PQclear( res);

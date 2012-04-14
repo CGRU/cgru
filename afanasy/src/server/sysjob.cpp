@@ -33,6 +33,7 @@ SysTask::SysTask( af::TaskExec * taskexec, SysCmd * SystemCommand, Block * block
    syscmd( SystemCommand),
    birthtime(0)
 {
+AFINFO("SysTask::SysTask:");
    progress = &taskProgress;
 }
 
@@ -88,7 +89,7 @@ void SysTask::start( af::TaskExec * taskexec, int * runningtaskscounter, RenderA
 
 void SysTask::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId)
 {
-//printf("SysTask::refresh:\n");
+AFINFO("SysTask::refresh:");
    Task::refresh( currentTime, renders, monitoring, errorHostId);
    if( birthtime == 0 ) birthtime = currentTime;
    if((currentTime - birthtime > af::Environment::getSysJobTaskLife() ) && (isReady()))
@@ -160,7 +161,7 @@ void SysTask::updateState( const af::MCTaskUp & taskup, RenderContainer * render
 SysBlock::SysBlock( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):
    Block( blockJob, blockData, progress)
 {
-//printf("SysBlock::SysBlock:\n");
+AFINFO("SysBlock::SysBlock:");
    taskprogress = progress->tp[ m_data->getBlockNum()][0];
    taskprogress->state &= ~AFJOB::STATE_READY_MASK;
    taskprogress->starts_count = 0;
@@ -198,7 +199,7 @@ bool SysBlock::isReady() const
 
 void SysBlock::startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring)
 {
-//printf("SysBlock::startTask:\n");
+AFINFO("SysBlock::startTask:");
    taskexec->setBlockName( m_data->getName());
    SysTask * systask = getReadySysTask();
 
@@ -224,7 +225,7 @@ SysTask * SysBlock::getReadySysTask() const
 
 SysTask * SysBlock::addTask( af::TaskExec * taskexec)
 {
-//printf("SysBlock::addTask:\n");
+AFINFO("SysBlock::addTask:");
    if( commands.size() == 0)
    {
       AFCommon::QueueLogError("SysBlock::addTask: commands.size() == 0");
@@ -307,7 +308,7 @@ void SysBlock::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * r
 
 bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring)
 {
-//printf("SysBlock::refresh:\n");
+AFINFO("SysBlock::refresh:");
    bool blockProgress_changed = false;
    bool taskchanged = false;
 
@@ -321,12 +322,8 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
    int tasksdone_new  = tasksdone_old;
    int taskserror_new = 0;
 
-   blockstate_new &= ~AFJOB::STATE_RUNNING_MASK;
    taskprogress->state &= ~AFJOB::STATE_RUNNING_MASK;
    taskprogress->state &= ~AFJOB::STATE_READY_MASK;
-
-   if( m_data->getRunningTasksNumber() > 0 ) blockstate_new |= AFJOB::STATE_RUNNING_MASK;
-   m_data->setState( blockstate_new);
 
    for( std::list<SysTask*>::iterator it = systasks.begin(); it != systasks.end(); it++)
    {
@@ -334,7 +331,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       (*it)->refresh( currentTime, renders, monitoring, errorHostId);
       if( errorHostId != -1 ) errorHostsAppend( 0, errorHostId, renders);
       if((*it)->isRunning()) taskprogress->state |= AFJOB::STATE_RUNNING_MASK;
-      if((*it)->isReady()  )
+	  if((*it)->isReady()  )
       {
          taskprogress->state |= AFJOB::STATE_READY_MASK;
          taskserror_new ++;
@@ -349,6 +346,21 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       tasksready_new = commands.size();
    }
 
+
+	// Set block state accoring to task state
+   if( taskprogress->state & AFJOB::STATE_READY_MASK )
+	   blockstate_new |= AFJOB::STATE_READY_MASK;
+   else
+	   blockstate_new &= ~AFJOB::STATE_READY_MASK;
+
+   if( taskprogress->state & AFJOB::STATE_RUNNING_MASK )
+	   blockstate_new |= AFJOB::STATE_RUNNING_MASK;
+   else
+	   blockstate_new &= ~AFJOB::STATE_RUNNING_MASK;
+
+   m_data->setState( blockstate_new);
+
+	// Check changes:
    if(  taskstate_old  != taskprogress->state ) taskchanged = true;
    if(( blockstate_old != blockstate_new ) ||
       ( tasksready_old != tasksready_new ) ||
@@ -356,6 +368,7 @@ bool SysBlock::refresh( time_t currentTime, RenderContainer * renders, MonitorCo
       ( taskserror_old != taskserror_new )  ) blockProgress_changed = true;
 
    if( taskchanged && monitoring) m_tasks[0]->monitor( monitoring);
+
 
    // For block in jobs list monitoring
    if( Block::refresh( currentTime, renders, monitoring))
@@ -515,7 +528,7 @@ void SysJob::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * ren
 
 void SysJob::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-//printf("SysJob::refresh:\n");
+AFINFO("SysJob::refresh:");
    JobAf::refresh( currentTime, pointer, monitoring);
 }
 
@@ -613,7 +626,7 @@ SysBlockData::SysBlockData( int BlockNum, int JobId):
    afsql::DBBlockData( BlockNum, JobId)
 {
 //   initDefaults();
-AFINFA("DBBlockData::DBBlockData: JobId=%d, BlockNum=%d", JobId, blocknum)
+AFINFA("DBBlockData::DBBlockData: JobId=%d, BlockNum=%d", m_job_id, m_block_num)
 
    m_capacity = af::Environment::getTaskDefaultCapacity();
 

@@ -45,5 +45,4 @@ puts "OS="+toolset.tag("target_os")
     required_prj "render.mxx.rb"
     required_prj "watch.mxx.rb"
     required_prj "monitor.mxx.rb"
-    required_prj "libpyaf.mxx.rb"
 }

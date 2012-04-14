@@ -69,12 +69,15 @@ def sendServer( data, receive = True, verbose = False):
 
 	if len(data) < 22:
 		return True, None
-	#print(data[20:-1])
+
+	data = data[20:-1]
+	struct = None
 
 	try:
-		data = json.loads(data[20:-1])
+		struct = json.loads(data)
 	except:
+		print( data)
 		print( str(sys.exc_info()[1]))
-		data = None
+		struct = None
 
-	return True, data
+	return True, struct

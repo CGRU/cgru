@@ -1,11 +1,9 @@
 TEMPLATE = subdirs
-unix:SUBDIRS = libafanasy libafsql server libafapi cmd libafqt render talk watch monitor libpyaf
-win32:SUBDIRS = libafanasy libafapi libafqt render talk watch monitor libpyaf
+SUBDIRS = libafanasy libafsql server cmd libafqt render talk watch monitor
 
 libafsql.depends = libafanasy
 server.depends = libafanasy libafsql
-libafapi.depends = libafanasy
-cmd.depends = libafanasy libafsql libafapi
+cmd.depends = libafanasy libafsql
 libafqt.depends = libafanasy
 render.depends = libafqt
 talk.depends = libafqt

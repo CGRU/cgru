@@ -34,8 +34,14 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	if( getObj.IsObject())
 	{
 		std::string type, mode;
+		bool binary = false;
 		af::jr_string("type", type, getObj);
 		af::jr_string("mode", mode, getObj);
+		af::jr_bool("binary", binary, getObj);
+
+		bool json = true;
+		if( binary )
+			json = false;
 		bool full = false;
 		if( mode == "full")
 			full = true;
@@ -54,24 +60,24 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			{
 				AfContainerLock jLock( i_args->jobs,  AfContainerLock::READLOCK);
 				AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
-				o_msg_response = i_args->users->generateJobsList( uids, type, true);
+				o_msg_response = i_args->users->generateJobsList( uids, type, json);
 			}
 			else
 			{
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 				o_msg_response = i_args->jobs->generateList(
-					full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, true);
+					full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
 			}
 		}
 		else if( type == "users")
 		{
 			AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
-			o_msg_response = i_args->users->generateList( af::Msg::TUsersList, type, ids, mask, true);
+			o_msg_response = i_args->users->generateList( af::Msg::TUsersList, type, ids, mask, json);
 		}
 		else if( type == "renders")
 		{
 			AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
-			o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, true);
+			o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
 		}
 	}
 

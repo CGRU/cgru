@@ -13,10 +13,9 @@ pushd $cgru > /dev/null
 cgru=$PWD
 popd > /dev/null
 
-dirs_nonempty="afanasy/bin_pyaf plugins/maya/mll"
+dirs_nonempty="plugins/maya/mll"
 cgru_bins="exrjoin"
 afanasy_bins="afserver afcmd afrender aftalk afwatch"
-afanasy_libs="pyaf.so"
 [ -z "$DISTRIBUTIVE" ] && source "$cgru/utilities/distribution.sh"
 if [ ! -z "$DISTRIBUTIVE" ]; then
     case ${DISTRIBUTIVE} in
@@ -49,7 +48,6 @@ done
 bins=""
 for bin in $cgru_bins; do bins="$cgru/bin/$bin $bins"; done
 for bin in $afanasy_bins; do bins="$cgru/afanasy/bin/$bin $bins"; done
-for lib in $afanasy_libs; do bins="$cgru/afanasy/lib/$lib $bins"; done
 for bin in $bins; do
    if [ ! -x "$bin" ]; then
       echo "No binary '$bin'."

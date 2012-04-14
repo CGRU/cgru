@@ -126,7 +126,10 @@ AFINFA("DBBlockData::dbAdd: %s[%d,%d] %d tasks %s", m_name.c_str(), m_job_id, m_
        return true;
    }
 
-   DBTaskData::dbPrepareInsert( i_conn);
+	// Prepare query, but only for the first block (to do it at one per connection)
+	if( m_block_num == 0 )
+		DBTaskData::dbPrepareInsert( i_conn);
+
    for( int t = 0; t < m_tasks_num; t++)
    {
       if( false == ((DBTaskData*)(m_tasks_data[t]))->dbPrepareInsertExec( m_job_id, m_block_num, t, i_conn))

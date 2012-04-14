@@ -76,8 +76,3 @@ class CmdJobsRestart: public Cmd { public:
    ~CmdJobsRestart();
    bool processArguments( int argc, char** argv, af::Msg &msg);
 };
-class CmdJob: public Cmd { public:
-   CmdJob();
-   ~CmdJob();
-   bool processArguments( int argc, char** argv, af::Msg &msg);
-};

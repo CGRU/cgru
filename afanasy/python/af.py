@@ -131,7 +131,7 @@ class Block:
 	def setTasksName(          self, value): self.data["tasks_name"] = value
 	def setFramesPerTask(      self, value): self.data["frames_per_task"] = value
 	def setParserCoeff(        self, value): self.data["parser_coeff"] = value
-	def setNonSequential(      self, value): self.data["non_sequential"] = value
+	def setNonSequential( self, value = True ): self.data["non_sequential"] = value
 	def setDependSubTask(      self, value): self.data["depend_sub_task"] = value
 	def setMaxRunningTasks(    self, value): self.data["max_running_tasks"] = value
 	def setMaxRunTasksPerHost( self, value): self.data["max_running_tasks_per_host"] = value
@@ -198,9 +198,7 @@ class Job:
 
 	def output( self, full = False):
 		self.fillBlocks()
-		if full: print('Job information:')
-		else:    print('Job: ',)
-		pyaf.Job.output( self, full)
+		print( json.dumps( self.data, sort_keys=True, indent=4))
 
 	def send( self, verbose = False):
 		if len( self.blocks) == 0:
@@ -263,8 +261,9 @@ class Cmd:
 		self.action = 'get'
 		self.data['type'] = 'jobs'
 		data = self._sendRequest()
-		if 'jobs' in data:
-			return data['jobs']
+		if data is not None:
+			if 'jobs' in data:
+				return data['jobs']
 		return None
 
 	def deleteJob(self, jobName, verbose = False):
@@ -275,8 +274,9 @@ class Cmd:
 		return self._sendRequest(verbose)
 
 	def getJobInfo(self, jobId, verbose = False):
-		#self.getjobinfo(jobId)
-		return self._sendRequest(verbose)
+		self.data['ids'] = [ jobId ]
+		self.data['mode'] = 'full'
+		return self.getJobList(verbose)
 
 	def renderSetNimby( self, text):
 		self.action = 'action'
@@ -342,8 +342,9 @@ class Cmd:
 		if mask is not None:
 			self.data['mask'] = mask
 		data = self._sendRequest()
-		if 'renders' in data:
-			return data['renders']
+		if data is not None:
+			if 'renders' in data:
+				return data['renders']
 		return None
 
 	def renderGetLocal( self): return self.renderGetList( afenv.VARS['HOSTNAME'])

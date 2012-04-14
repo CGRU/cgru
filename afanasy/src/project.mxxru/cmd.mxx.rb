@@ -4,7 +4,6 @@ Mxx_ru::Cpp::exe_target{
 
     target "afcmd"
 
-    required_prj "libafapi.mxx.rb"
     required_prj "libafsql.mxx.rb"
 
     qt = generator( Mxx_ru::Cpp::Qt4.new( self ) )

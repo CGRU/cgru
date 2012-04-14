@@ -41,10 +41,10 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
-	jr_string("annotation",     m_annotation,    i_object, io_changes);
-	jr_string("description",    m_description,   i_object, io_changes);
-	jr_string("m_command_pre",  m_command_pre,   i_object, io_changes);
-	jr_string("m_command_post", m_command_post,  i_object, io_changes);
+	jr_string("annotation",   m_annotation,   i_object, io_changes);
+	jr_string("description",  m_description,  i_object, io_changes);
+	jr_string("command_pre",  m_command_pre,  i_object, io_changes);
+	jr_string("command_post", m_command_post, i_object, io_changes);
 
 	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
 	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);

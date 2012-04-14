@@ -19,4 +19,4 @@ if(WIN32)
    target_link_libraries(afcmd Ws2_32.lib Iphlpapi.lib)
 endif(WIN32)
 
-target_link_libraries(afcmd afapi afsql)
+target_link_libraries(afcmd afsql)

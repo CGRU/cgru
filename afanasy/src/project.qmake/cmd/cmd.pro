@@ -11,7 +11,6 @@ QMAKE_CXXFLAGS += -I/usr/include/postgresql
 
 DIR = ../../cmd
 LIBS += -lpq
-LIBS += -L../libafapi -lafapi
 LIBS += -L../libafsql -lafsql
 LIBS += -L../libafanasy -lafanasy
 LIBS += $$(AF_PYTHON_LIB)

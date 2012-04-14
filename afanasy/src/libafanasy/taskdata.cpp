@@ -38,10 +38,11 @@ void TaskData::jsonRead( const JSON & i_object)
 
 void TaskData::jsonWrite( std::ostringstream & o_str)
 {
-    o_str << "{\"name\":\""      <<                m_name      << "\"";
-    o_str << ",\"command\":\""   << af::strEscape( m_command ) << "\"";
+	o_str << "{\"name\":\""      <<                m_name      << "\"";
+	o_str << ",\"command\":\""   << af::strEscape( m_command ) << "\"";
 	if( m_files.size())
-        o_str << ",\"files\":\"" << af::strEscape( m_files   ) << "\"}";
+		o_str << ",\"files\":\"" << af::strEscape( m_files   ) << "\"";
+	o_str << '}';
 }
 
 void TaskData::readwrite( Msg * msg)

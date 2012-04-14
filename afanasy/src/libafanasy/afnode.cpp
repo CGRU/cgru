@@ -293,7 +293,7 @@ struct GreaterNeed : public std::binary_function<af::Node*,af::Node*,bool>
 bool Node::solveList( std::list<af::Node*> & i_list, SolvingMethod i_method,
                       RenderAf * i_render, MonitorContainer * i_monitoring)
 {
-    if( i_list.size() == 0 )
+	if( i_list.size() == 0 )
     {
         // No nodes - no solve needed
         return false;
@@ -301,12 +301,12 @@ bool Node::solveList( std::list<af::Node*> & i_list, SolvingMethod i_method,
 
     std::list<af::Node*> solvelist;
     for( std::list<af::Node*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
-    {
+	{
         if((*it)->canRunOn( i_render))
        {
-           solvelist.push_back(*it);
+		   solvelist.push_back(*it);
        }
-    }
+	}
 
     if( solvelist.size() == 0 )
     {

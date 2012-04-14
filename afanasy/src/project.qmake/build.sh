@@ -6,8 +6,8 @@ cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
-cgru_qt=$cgru_utils/qt/4.8.0
-[ -d $cgru_qt ] || cgru_qt=$cgru_utils/qt/4.8.1
+cgru_qt=$cgru_utils/qt/4.8.1
+[ -d $cgru_qt ] || cgru_qt=$cgru_utils/qt/4.8.0
 cgru_python=$cgru_utils/python/3.2.2
 
 # Setup Version:
@@ -44,8 +44,6 @@ if [ `uname` == "Darwin" ]; then
    export AF_PYTHON_MODULE_EXTRA_LIBS=""
    export QMAKESPEC="macx-g++"
    export AF_PYTHON_LIB="-L/Library/Frameworks/Python.framework/Versions/3.2/lib/python3.2/config-3.2m -lpython3.2"
-else
-   export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz"
 fi
 # export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz -lgthread -lglib"
 # export AF_PYTHON_MODULE_EXTRA_LIBS="-lrt -lz -lgthread-2.0 -lglib-2.0"
@@ -58,7 +56,6 @@ export AF_PYTHON_LIB="-rdynamic ${AF_PYTHON_LIB}"
 
 echo "AF_PYTHON_INC=$AF_PYTHON_INC"
 echo "AF_PYTHON_LIB=$AF_PYTHON_LIB"
-echo "AF_PYTHON_MODULE_EXTRA_LIBS=$AF_PYTHON_MODULE_EXTRA_LIBS"
 
 # Setup Qt if qmake not specified (try qt4 first):
 if [ -z "$QMAKE" ]; then
@@ -83,13 +80,6 @@ $QMAKE
 
 # Make files
 make
-
-# Copy python library:
-[ -d ../../lib ] || mkdir -pv ../../lib
-pyaf="libpyaf/libpyaf.so"
-[ -f $pyaf ] && cp -fv $pyaf ../../lib/pyaf.so
-pyaf="libpyaf/libpyaf.dylib.1.0.0"
-[ -f $pyaf ] && cp -fv $pyaf ../../lib/pyaf.so
 
 # Copy binaries from apps on mac:
 if [ `uname` == "Darwin" ]; then
