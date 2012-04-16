@@ -197,7 +197,7 @@ af::Msg * AfContainer::generateList( int i_type, const std::string & i_type_name
 	{
 		str << "\n]}";
 		std::string s = str.str();
-		msg->setData( s.size()+1, s.c_str(), af::Msg::TJSON);
+		msg->setData( s.size(), s.c_str(), af::Msg::TJSON);
 	}
 	else
 		msg->set( i_type, &mcnodes);

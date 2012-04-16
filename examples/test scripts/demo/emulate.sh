@@ -1,11 +1,13 @@
 #!/bin/bash
 
-if [ "$1" == "-h" ]; then
+function usageExit(){
     echo "Usage:"
-    echo "-c                Cleanup mode."
-    echo "--nocmdpost       Skip post command."
+    echo "jobs + number    Number of jobs in each pack."
+    echo "tasks + number   Number of tasks in each job."
+    echo "nopost           Skip post command."
+    echo "cleanup          Cleanup mode."
     exit 0
-fi;
+}
 
 # Process parameters:
 cleanup=0
@@ -14,12 +16,36 @@ Users=10
 PausePeriod=1
 PauseTime=10
 DeletionPeriod=5
-for arg in "$@"; do
-    [ "$arg" == "--nocmdpost" ] && nocmdpost=1
-    [ "$arg" == "-c" ] && cleanup=1
-    JobsPack="$arg"
+numtasks=10
+while [ ! -z "$1" ]; do
+	case "$1" in
+	"jobs" )
+		JobsPack=$2
+		shift
+		;;
+	"tasks" )
+		numtasks=$2
+		shift
+		;;
+	"nopost" )
+		nocmdpost=1
+		;;
+	"cleanup" )
+		cleanup=1
+		;;
+	"h" )
+		usageExit
+		;;
+	*)
+		echo "Unrecognized option $1"
+		usageExit
+		;;
+	esac
+	shift
 done
-echo "JobsPack = $JobsPack"
+
+echo "Jobs Pack    = $JobsPack"
+echo "Tasks Number = $numtasks"
 
 # Temporary folder:
 tmpdir=/tmp/afanasy_emulate
@@ -62,17 +88,11 @@ while [ 1 ]; do
         username="user_$usr"
         tmpfile=$tmpdir/$jobname
 
-#        if [ $jp == 0 ]; then
-#            python ./job.py --name $jobname --user $username -b 2 -n 10 -t 1 > /dev/null
-#            if [ $? != 0 ]; then
-#                echo "Error creation new job, exiting."
-#                exit 1
-#            fi
         if [ -z "$nocmdpost" ]; then
             echo $output > $tmpfile
-            python ./job.py -s --name $jobname --user $username -b 2 -n 10 -t 1 --nonseq --cmdpost "rm $tmpfile" > /dev/null
+            python ./job.py -s --name $jobname --user $username -b 2 -n $numtasks -t 1 --nonseq --cmdpost "rm $tmpfile" > /dev/null
         else
-            python ./job.py -s --name $jobname --user $username -b 2 -n 10 -t 1 --nonseq > /dev/null
+            python ./job.py -s --name $jobname --user $username -b 2 -n $numtasks -t 1 --nonseq > /dev/null
         fi
 
         if [ $? != 0 ]; then

@@ -25,7 +25,7 @@ af::MsgStat mgstat;
 /// Read data from file descriptor. Return bytes than was written or -1 on any error and prints an error in \c stderr.
 int readdata( int fd, char* data, int data_len, int buffer_maxlen)
 {
-    AFINFA("com::readdata:: trying to recieve %d bytes.\n", data_len);
+    AFINFA("readdata: trying to recieve %d bytes.\n", data_len);
     int bytes = 0;
     while( bytes < data_len )
     {
@@ -40,7 +40,7 @@ int readdata( int fd, char* data, int data_len, int buffer_maxlen)
             return -1;
         }
         AFINFA("readdata: read %d bytes.\n", r);
-        if( r == 0) return 0;
+        if( r == 0) return bytes;
         bytes += r;
     }
 
@@ -68,76 +68,106 @@ bool writedata( int fd, const char * data, int len)
     return true;
 }
 
-
-bool processHTTP( char * i_buffer, int i_bytes, int i_desc)
+// Return header offset
+int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 {
-	if( strncmp( i_buffer, "POST", 4) == 0 )
+//printf("\nReceived %d bytes:\n", i_bytes);
+	char * buffer = io_msg->buffer();
+	int offset = 0;
+	bool founded = false;
+	int min_after = 13;
+
+	if( strncmp( buffer, "POST", 4) == 0 )
 	{
-writedata( 1, i_buffer, 50);
-writedata( 1, "\n@\n", 3);
-		int offset = 4;
-		while( offset + af::Msg::SizeHeader < i_bytes )
+		offset = 4;
+		while( offset+min_after < i_bytes )
 		{
-			int version, magic;
-			af::rw_int32( version, i_buffer + offset, false);
-			af::rw_int32( magic  , i_buffer + offset+4, false);
-			//if(( int(i_buffer[offset]) == af::Msg::Version ) && ( int(i_buffer[offset+4]) == af::Msg::Magic))
-			if(( version == af::Msg::Version ) && ( magic == af::Msg::Magic))
+			if( strncmp("[ * AFANASY * ]", buffer+offset, 15) == 0)
 			{
-				memcpy( i_buffer, i_buffer+offset, i_bytes-offset);
-for( int i = 0; i < 5; i++)
-{
-	int i32;
-	af::rw_int32( i32, i_buffer + i*4, false);
-	printf( " %d", i32);
-}
-printf("\n");
-				return true;
+				founded = true;
+				break;
 			}
-			offset++;
+			else
+				while( offset+min_after < i_bytes )
+					if( buffer[offset++] == '\n')
+						break;
 		}
-		return true;
 	}
 
-	if( strncmp( i_buffer, "GET", 3) != 0 )
+	if( founded || ( strncmp("[ * AFANASY * ]", buffer, 15) == 0 ))
 	{
-		return false;
+		offset += 15;
+//writedata( 1, buffer+offset, i_bytes);
+		int magic, sid, size;
+		int num = sscanf( buffer + offset, "%d %d %d", &magic, &sid, &size);
+//printf("\n sscanf=%d\n",num);
+		if( num == 3 )
+		{
+			while( ++offset < i_bytes )
+			{
+				if( strncmp( buffer+offset, "JSON", 4) == 0)
+				{
+					offset += 3;
+					while( ++offset < i_bytes )
+					{
+						if( buffer[offset] == '{' )
+						{
+							//printf("FOUNDED: %d %d %d Offset=%d:\n", magic, sid, size, offset);
+							//write(1, buffer, offset);
+							//write(1, buffer+offset, i_bytes - offset);
+							//write(1,"\n",1);
+							io_msg->setHeader( magic, sid, af::Msg::TJSON, size, offset, i_bytes);
+							//return false;
+							//io_msg->stdOutData();
+							return offset;
+						}
+					}
+				}
+			}
+			return -1;
+		}
 	}
 
-writedata( 1, i_buffer, i_bytes);
+	if( strncmp( buffer, "GET", 3) == 0 )
+	{
+		//writedata( 1, buffer, io_bytes);
+		int get_start = 4;
+		int get_finish = get_start; 
+		char * data = NULL;
+		int datalen;
+		std::string datafile;
+		while( buffer[++get_finish] != ' ');
+		if( get_finish - get_start > 1 )
+		{
+			datafile = std::string( buffer + get_start, get_finish - get_start);
+//printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
+			datafile = af::Environment::getAfRoot() + datafile;
+			std::string error;
+			data = af::fileRead( datafile, datalen, -1, &error);
+		}
+		else
+		{
+			datafile = af::Environment::getAfRoot() + "/" + "browser.html";
+			data = af::fileRead( datafile, datalen);
+		}
 
-	int get_start = 4;
-	int get_finish = get_start; 
-	char * data = NULL;
-	int datalen;
-	std::string datafile;
-	while( i_buffer[++get_finish] != ' ');
-	if( get_finish - get_start > 1 )
-	{
-		datafile = std::string( i_buffer + get_start, get_finish - get_start);
-printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
-		datafile = af::Environment::getAfRoot() + datafile;
-		data = af::fileRead( datafile, datalen);
+		if( data == NULL )
+		{
+			static const char httpError[] = "HTTP/1.0 404 Not Found\r\n\r\n";
+			writedata( i_desc, httpError, strlen(httpError));
+		}
+		else
+		{
+			static const char httpHeader[] = "HTTP/1.0 200 OK\r\n\r\n";
+			writedata( i_desc, httpHeader, strlen(httpHeader));
+			writedata( i_desc, data, datalen);
+		}
+		return -1;
 	}
 
-	if( data == NULL )
-	{
-		datafile = af::Environment::getAfRoot() + "/" + "browser.html";
-		data = af::fileRead( datafile, datalen);
-	}
-	if( data == NULL )
-	{
-		static const char httpError[] = "AFERROR";
-		writedata( i_desc, httpError, strlen(httpError));
-	}
-	else
-	{
-		static const char httpHeader[] = "HTTP/1.0 200 OK\r\n\r\n";
-		writedata( i_desc, httpHeader, strlen(httpHeader));
-		writedata( i_desc, data, datalen);
-	}
+	io_msg->readHeader( i_bytes);
 
-	return true;
+	return af::Msg::SizeHeader;
 }
 
 af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address,
@@ -349,48 +379,50 @@ AFINFO("com::msgread:\n");
 // Read message header data
    int bytes = ::readdata( desc, buffer, af::Msg::SizeHeader, af::Msg::SizeBuffer );
 
-	if( processHTTP( buffer, bytes, desc))
-		return false;
-
    if( bytes < af::Msg::SizeHeader)
    {
       AFERRAR("com::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).\n", bytes);
       msg->setInvalid();
       return false;
    }
-   if( msg->readHeader( bytes) == false)
-   {
-      AFERROR("com::msgread: constructing message header failed.\n");
-      msg->setInvalid();
-      return false;
-   }
-//
-// Read message data if any
-   if( msg->type() >= af::Msg::TDATA)
-   {
-      buffer = msg->buffer(); // buffer may be changed to fit new size
-      int msgdatasize = msg->int32();
-      int readlen = msgdatasize + af::Msg::SizeHeader - bytes;
-      if( readlen > 0)
-      {
-         bytes = ::readdata( desc, buffer+bytes, readlen, readlen);
-         if( bytes < readlen)
-         {
-            AFERRAR("com::msgread: read message data: ( bytes < readlen : %d < %d)\n", bytes, readlen);
-            msg->setInvalid();
-            return false;
-         }
-      }
-   }
 
-   mgstat.put( msg->type(), msg->writeSize());
+	// Header offset is variable on not binary header (http)
+	int header_offset = processHeader( msg, bytes, desc);
+	if( header_offset < 1)
+		return false;
 
-   return true;
+	//
+	// Read message data if any
+	if( msg->type() >= af::Msg::TDATA)
+	{
+		buffer = msg->buffer(); // buffer may be changed to fit new size
+		bytes -= header_offset;
+		int readlen = msg->dataLen() - bytes;
+		if( readlen > 0)
+		{
+//printf("Need to read more %d bytes of data:\n", readlen);
+			bytes = ::readdata( desc, buffer + af::Msg::SizeHeader + bytes, readlen, readlen);
+			if( bytes < readlen)
+			{
+				AFERRAR("af::msgread: read message data: ( bytes < readlen : %d < %d)", bytes, readlen)
+				msg->setInvalid();
+				return false;
+			}
+		}
+	}
+//msg->stdOutData();
+	mgstat.put( msg->type(), msg->writeSize());
+
+	return true;
 }
 
 bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 {
-    if( false == ::writedata( i_desc, i_msg->buffer(), i_msg->writeSize()))
+	int offset = 0;
+	if( i_msg->type() == af::Msg::TJSON )
+		offset = af::Msg::SizeHeader;
+
+    if( false == ::writedata( i_desc, i_msg->buffer() + offset, i_msg->writeSize() - offset ))
     {
         AFERROR("com::msgsend: Error writing message.\n");
         return false;

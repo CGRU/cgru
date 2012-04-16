@@ -373,7 +373,11 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
     inline bool isReading() const { return !m_writing; } ///< Writing or reading data in message.
 
     void setInvalid();             ///< Set message invalidness.
-    bool readHeader( int bytes);   ///< Read header from message buffer, \c bytes - number of already written bytes in it's buffer.
+    void readHeader( int bytes);   ///< Read header from message buffer, \c bytes - number of already written bytes in it's buffer.
+
+	// Set header to specified values, that are get from text data
+	// i_offset and i_bytes to shift message data, to remove HTTP header for example
+	void setHeader( int i_magic, int i_sid, int i_type, int i_size, int i_offset = 0, int i_bytes = 0);
 
     inline bool      isNull() const { return m_type == TNULL;    }///< Whether message is null.
     inline bool   isInvalid() const { return m_type == TInvalid; }///< Whether message is invalid.
@@ -463,8 +467,8 @@ private:
     bool checkZero( bool outerror ); ///< Check Zero type, data length and pointer.
     bool checkValidness();           ///< Check message header validness;
 
-    /// Allocate memory for buffer, copy \c to_copy_len bytes in new buffer if any
-    bool allocateBuffer( int size, int to_copy_len = 0);
+	/// Allocate memory for buffer, copy \c to_copy_len bytes in new buffer if any
+	bool allocateBuffer( int i_size, int i_copy_len = 0, int i_copy_offset = Msg::SizeHeader);
 
     void rw_header( bool write ); ///< Read or write message header.
     void readwrite( Msg * msg);

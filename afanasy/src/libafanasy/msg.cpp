@@ -97,18 +97,18 @@ void Msg::construct()
     allocateBuffer( Msg::SizeBuffer);
 }
 
-bool Msg::allocateBuffer( int size, int to_copy_len)
+bool Msg::allocateBuffer( int i_size, int i_copy_len, int i_copy_offset)
 {
    if( m_type == Msg::TInvalid) return false;
-   if( size > Msg::SizeBufferLimit)
+   if( i_size > Msg::SizeBufferLimit)
    {
-      AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)", size, Msg::SizeBufferLimit)
+      AFERRAR("Msg::allocateBuffer: size > Msg::SizeBufferLimit ( %d > %d)", i_size, Msg::SizeBufferLimit)
       setInvalid();
       return false;
    }
    char * old_buffer = m_buffer;
-   m_buffer_size = size;
-AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", size, written, old_buffer)
+   m_buffer_size = i_size;
+AFINFA("Msg::allocateBuffer: trying %d bytes ( %d written at %p)", i_size, written, old_buffer)
    m_buffer = new char[m_buffer_size];
    if( m_buffer == NULL )
    {
@@ -122,7 +122,8 @@ AFINFA("Msg::allocateBuffer: new buffer at %p", m_buffer)
 
    if( old_buffer != NULL )
    {
-      if( to_copy_len > 0) memcpy( m_data, old_buffer + Msg::SizeHeader, to_copy_len);
+//printf("Copying old buffer: offset=%d size=%d\n", i_copy_offset, i_copy_len);
+      if( i_copy_len > 0) memcpy( m_data, old_buffer + i_copy_offset, i_copy_len);
       delete [] old_buffer;
    }
 
@@ -280,7 +281,35 @@ bool Msg::getStringList( std::list<std::string> & stringlist)
    return true;
 }
 
-bool Msg::readHeader( int bytes)
+void Msg::setHeader( int i_magic, int i_sid, int i_type, int i_size, int i_offset, int i_bytes)
+{
+//printf("Msg::setHeader:\n");
+	m_version = af::Msg::Version;
+	m_magic   = i_magic;
+	m_sid     = i_sid;
+	m_type    = i_type;
+	m_int32   = i_size;
+	
+	checkValidness();
+
+	if( m_type >= Msg::TDATA)
+	{
+		if( m_data_maxsize < m_int32)
+		{
+			allocateBuffer( m_int32+Msg::SizeHeader, i_bytes - i_offset, i_offset);
+			rw_header( true );
+		}
+		else
+		{
+			if(( i_offset > 0 ) && ( i_bytes > 0 ))
+				memcpy( m_buffer + af::Msg::SizeHeader, m_buffer + i_offset, i_bytes - i_offset); 
+		}
+	}
+
+	return;
+}
+
+void Msg::readHeader( int bytes)
 {
    rw_header( false );
    if(( m_type >= Msg::TDATA) && ( m_data_maxsize < m_int32))
@@ -288,7 +317,6 @@ bool Msg::readHeader( int bytes)
       allocateBuffer( m_int32+Msg::SizeHeader, bytes-Msg::SizeHeader);
       rw_header( true );
    }
-   return true;
 }
 
 void Msg::readwrite( Msg * msg)

@@ -18,16 +18,22 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 	std::string err;
 	if( o_doc.ParseInsitu<0>(data).HasParseError())
 	{
-		err = "JSON: Parsing failed at character " + af::itos( int( o_doc.GetErrorOffset()));
+		err = "JSON frist 100 characters:\n";
+		err += std::string( data, datalen < 100 ? datalen : 100);
+		err += ":\n";
+		err += "JSON: Parsing failed at character " + af::itos( int( o_doc.GetErrorOffset()));
 		err += ":\n";
 		err += o_doc.GetParseError();
 		delete [] data;
 		data = NULL;
 	}
 
-	if( false == o_doc.IsObject())
+	if( data && ( false == o_doc.IsObject()))
 	{
-		err = "JSON: Can't find root object.";
+		err = "JSON frist 100 characters:\n";
+		err += std::string( data, datalen < 100 ? datalen : 100);
+		err += ":\n";
+		err += "JSON: Can't find root object.";
 		delete [] data;
 		data = NULL;
 	}

@@ -8,10 +8,20 @@ import sys
 
 import afenv
 
+AF_SENDERID=0
+
+def genHeader( data_size):
+	data = b'[ * AFANASY * ]'
+	data += ' ' + str(int(afenv.VARS["magic_number"]))
+	data += ' ' + str(AF_SENDERID)
+	data += ' ' + str(data_size)
+	data += ' JSON'
+	return data
+
 def sendServer( data, receive = True, verbose = False):
 
 	size = len(data)
-	header = bytearray((0,0,0,44, 0,0,0,1, 0,0,0,0, 0,0,0,219, 0,0,int(size/256),size-256*int(size/256)))
+	header = genHeader(size)
 	data = header + bytearray( data, 'utf-8')
 	datalen = len(data)
 	#return True, None
@@ -67,10 +77,6 @@ def sendServer( data, receive = True, verbose = False):
 		data += buffer
 	s.close()
 
-	if len(data) < 22:
-		return True, None
-
-	data = data[20:-1]
 	struct = None
 
 	try:

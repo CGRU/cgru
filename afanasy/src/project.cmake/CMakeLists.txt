@@ -33,7 +33,6 @@ endif(WIN32)
 include_directories(${PYTHON_INCLUDE_PATH})
 
 set( CMAKE_RUNTIME_OUTPUT_DIRECTORY "../../../$ENV{AF_OSTYPE}/bin")
-set( CMAKE_LIBRARY_OUTPUT_DIRECTORY "../../../$ENV{AF_OSTYPE}/lib")
 set( CMAKE_ARCHIVE_OUTPUT_DIRECTORY "../../../$ENV{AF_OSTYPE}/archives")
 
 add_subdirectory(libafanasy)

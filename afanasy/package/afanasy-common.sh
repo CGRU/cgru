@@ -8,8 +8,5 @@ installdir=$3
 
 # Copying files:
 mkdir -p $pack/$installdir/afanasy
-files="\
-afanasy/bin \
-afanasy/lib \
-"
+files="afanasy/bin"
 for f in $files; do cp -r $src/$f $pack/$installdir/$f; done

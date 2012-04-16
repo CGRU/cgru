@@ -116,11 +116,7 @@ bool afqt::recvMessage( QTcpSocket * qSocket, af::Msg * msg)
       return false;
    }
 
-   if( msg->readHeader( bytes) == false )
-   {
-      AFERROR("afqt::recvMessage: constructing message header failed.\n");
-      return false;
-   }
+   msg->readHeader( bytes);
 
    int msgtype = msg->type();
    int datalen = msg->int32();
