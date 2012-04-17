@@ -11,12 +11,12 @@ import afenv
 AF_SENDERID=0
 
 def genHeader( data_size):
-	data = b'[ * AFANASY * ]'
+	data = '[ * AFANASY * ]'
 	data += ' ' + str(int(afenv.VARS["magic_number"]))
 	data += ' ' + str(AF_SENDERID)
 	data += ' ' + str(data_size)
 	data += ' JSON'
-	return data
+	return bytearray( data, 'utf-8')
 
 def sendServer( data, receive = True, verbose = False):
 
