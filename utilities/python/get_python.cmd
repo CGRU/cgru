@@ -1,6 +1,6 @@
 set ver=%1
 set arch=%2
-if "%ver%"=="" set ver=2.7.1
+if "%ver%"=="" set ver=3.2.3
 if "%arch%"=="" set arch=amd64
 
 set location=http://www.python.org/ftp/python

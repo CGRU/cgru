@@ -3,7 +3,7 @@
 pyqt="PyQt-x11-gpl-4.9.1"
 sip="$PWD/sip"
 export PYTHONPATH="$sip"
-pybin="$PWD/3.2.2/bin"
+pybin="$PWD/3.2.3/bin"
 export PATH="$sip:$PATH"
 [ -d $pybin ] && export PATH="$pybin:$PATH"
 
@@ -18,7 +18,7 @@ flags="-g --confirm-license --no-sip-files"
 # Qt:
 qtver=$1
 if [ -z "$qtver" ]; then
-   qtver="4.7.4"
+   qtver="4.8.1"
 fi
 qt=`dirname $PWD`/qt/$qtver
 if [ ! -d "$qt" ]; then

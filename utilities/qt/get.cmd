@@ -1,4 +1,4 @@
-set ver=4.8.0
+set ver=4.8.1
 
 set location=http://get.qt.nokia.com/qt/source
 set foldername=qt-everywhere-opensource-src-%ver%
