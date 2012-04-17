@@ -96,10 +96,8 @@ class Block:
 		self.data["frames_inc"] = increment
 
 	def setCapacity( self, capacity):
-		if capacity < 0:
-			print('Error: Block.setCapacity: capacity < 0 (%d < 0)' % capacity)
-			return
-		self.data["capacity"] = capacity
+		if capacity > 0:
+			self.data["capacity"] = capacity
 
 	def setVariableCapacity( self, capacity_coeff_min, capacity_coeff_max):
 		if capacity_coeff_min >= 0 or capacity_coeff_max >= 0:
@@ -131,8 +129,6 @@ class Block:
 	def setTasksName(          self, value): self.data["tasks_name"] = value
 	def setFramesPerTask(      self, value): self.data["frames_per_task"] = value
 	def setParserCoeff(        self, value): self.data["parser_coeff"] = value
-	def setNonSequential( self, value = True ): self.data["non_sequential"] = value
-	def setDependSubTask(      self, value): self.data["depend_sub_task"] = value
 	def setMaxRunningTasks(    self, value): self.data["max_running_tasks"] = value
 	def setMaxRunTasksPerHost( self, value): self.data["max_running_tasks_per_host"] = value
 	def setTasksMaxRunTime(    self, value): self.data["tasks_max_run_time"] = value
@@ -143,6 +139,8 @@ class Block:
 	def setNeedHDD(            self, value): self.data["need_hdd"] = value
 	def setNeedMemory(         self, value): self.data["need_memory"] = value
 	def setNeedPower(          self, value): self.data["need_power"] = value
+	def setNonSequential( self, value = True ): self.data["non_sequential"] = value
+	def setDependSubTask( self, value = True ): self.data["depend_sub_task"] = value
 
 	def setDependMask(       self, value):
 		if checkRegExp(value): self.data["depend_mask"] = value

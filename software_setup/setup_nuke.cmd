@@ -19,9 +19,6 @@ if defined NUKE_PATH (
    set NUKE_PATH=%NUKE_AF_PATH%
 )
 
-rem Add Afanasy Python module:
-set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
-
 rem Default number of threads for rendering:
 SET NUKE_AF_RENDERTHREADS=2
 

@@ -9,14 +9,14 @@ str_hostseparator = ','
 
 class service:
    "This is base service class."
-   def __init__( self, afroot, wdir, command, capacity, hosts, files = ''):
+   def __init__( self, wdir, command, capacity, hosts, files = ''):
       self.wdir = wdir
       self.command = command
       self.capacity = capacity
       self.hosts = hosts
       self.files = files
 
-      self.pm = afpathmap.PathMap( afroot)
+      self.pm = afpathmap.PathMap()
 
       self.str_capacity = str_capacity
       self.str_hosts = str_hosts

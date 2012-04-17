@@ -79,17 +79,13 @@ if fby < 1: errorExit('By frame (%(fby)d) must be grater or equal 1' % vars(), F
 # Check scene file for existence:
 if not os.path.isfile( xscene): errorExit('File "%s" not founded.' % xscene, False)
 
-# Get Afanasy root directory:
-afroot = os.getenv('AF_ROOT')
-if afroot is None: errorExit('AF_ROOT is not defined.', True)
-
 # Create and check temp directory:
 tmpdir = tempfile.mkdtemp('.afrender.nuke')
 if os.path.exists( tmpdir): print('Temp directory = "%s"' % tmpdir)
 else: errorExit('Error creating temp directory.', False)
 
 # Transfer scene paths
-pm = PathMap( afroot, UnixSeparators = True, Verbose = True)
+pm = PathMap( UnixSeparators = True, Verbose = True)
 if pm.initialized:
    pmscene = os.path.basename(xscene)
    pmscene = os.path.join( tmpdir, pmscene)

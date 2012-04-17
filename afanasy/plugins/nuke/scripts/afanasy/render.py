@@ -600,7 +600,7 @@ def renderNodes( nodes, fparams, storeframes):
 
 
    afpathmap = __import__('afpathmap', globals(), locals(), [])
-   pm = afpathmap.PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
+   pm = afpathmap.PathMap( UnixSeparators = True, Verbose = True)
 
    changed = nuke.modified()
    for i in range(len(jobs)):

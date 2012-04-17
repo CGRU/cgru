@@ -3,9 +3,6 @@
 # Source general for all soft directives:
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
-# Setup special Python module:
-export PYTHONPATH="$AF_ROOT/bin_pyaf/3.2.2:$PYTHONPATH"
-
 # Setup default Blender location:
 export BLENDER_LOCATION="/usr/bin"
 

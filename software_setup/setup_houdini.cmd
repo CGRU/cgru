@@ -1,8 +1,6 @@
 rem Source general for all soft directives:
 call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
-set PYTHONPATH=%AF_ROOT%\bin_pyaf\2.6.6;%PYTHONPATH%
-
 set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 11.1.67
 
 set APP_DIR=%HOUDINI_LOCATION%

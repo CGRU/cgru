@@ -3,10 +3,6 @@
 # Source general for all soft directives:
 source "$CGRU_LOCATION/software_setup/setup__all.sh"
 
-
-# Setup special Python module:
-export PYTHONPATH="$AF_ROOT/bin_pyaf/2.6.7:$PYTHONPATH"
-
 # Setup CGRU common scripts if location provided
 if [ ! -z "${CGRU_LOCATION}" ]; then
    export NUKE_CGRU_PATH="${CGRU_LOCATION}/plugins/nuke"

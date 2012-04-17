@@ -229,6 +229,8 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 
 	if( m_tasks_data == NULL )
 		setNumeric( frame_first, frame_last, frames_per_task, frames_inc);
+	else if( frames_per_task != 0 )
+		m_frames_per_task = frames_per_task;
 
 	if(( capacity_coeff_min != -1 ) || ( capacity_coeff_max != -1 ))
 		setVariableCapacity( capacity_coeff_min, capacity_coeff_max);
