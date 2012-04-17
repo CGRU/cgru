@@ -30,7 +30,6 @@ xcopy doc\images %dest%\doc\images\ /ys
 
 xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
-xcopy afanasy\bin_pyaf %dest%\afanasy\bin_pyaf\ /ys
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\plugins %dest%\afanasy\plugins\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys

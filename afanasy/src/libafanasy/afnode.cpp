@@ -190,6 +190,7 @@ int Node::calcLogWeight() const
 	int weight = 0;
 	for( std::list<std::string>::const_iterator it = m_log.begin(); it != m_log.end(); it++)
 	   weight += af::weigh( *it);
+    return weight;
 }
 
 
