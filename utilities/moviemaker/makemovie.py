@@ -554,7 +554,7 @@ if Options.afanasy:
          bp.tasks.append( t)
          t.setCommand( cmd)
          n += 1
-      bp.setCapacity( Options.afconvcap)
+      if Options.afconvcap > 0: bp.setCapacity( Options.afconvcap)
 
    if need_convert:
       bc=af.Block( 'convert', 'movgen')
@@ -565,7 +565,7 @@ if Options.afanasy:
          bc.tasks.append( t)
          t.setCommand( cmd)
          n += 1
-      bc.setCapacity( Options.afconvcap)
+      if Options.afconvcap > 0: bc.setCapacity( Options.afconvcap)
       if len(cmd_precomp): bc.setDependMask('precomp')
       bc.setTasksMaxRunTime(11)
 
@@ -574,7 +574,7 @@ if Options.afanasy:
    t = af.Task( Output)
    be.tasks.append( t)
    t.setCommand( cmd_encode)
-   be.setCapacity( Options.afenccap)
+   if Options.afenccap > 0: be.setCapacity( Options.afenccap)
    if need_convert:
       be.setDependMask('convert')
       os.makedirs( TmpDir)

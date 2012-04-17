@@ -153,6 +153,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		}
 		if( send_stream )
 			stream << ",\n";
+		stream << "\"job\":";
 		job.v_jsonWrite( stream, af::Msg::TJob);
 		if( job.isValid())
 		{
@@ -172,10 +173,27 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 
 	if( send )
 	{
+		std::string header = "[ * AFANASY * ] 1 0 ";
+		header += af::itos( stream.str().size());
+		header += " JSON";
+		char * send_data = NULL;
+		int send_data_len = 0;
+
 		if( send_stream )
-			msg.setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
+		{
+			send_data_len = header.size() + stream.str().size();
+			send_data = new char[send_data_len];
+			memcpy( send_data, header.c_str(), header.size());
+			memcpy( send_data + header.size(), stream.str().c_str(), stream.str().size());
+		}
 		else
+		{
 			msg.setData( datalen, data_copy, af::Msg::TJSON);
+		}
+
+		msg.setData( send_data_len, send_data, af::Msg::TJSON);
+
+		delete [] send_data;
 	}
 
 	delete [] data;

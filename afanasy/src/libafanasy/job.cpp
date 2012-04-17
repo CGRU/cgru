@@ -58,6 +58,11 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	jr_regexp("need_os",            m_need_os,             i_object, io_changes);
 	jr_regexp("need_properties",    m_need_properties,     i_object, io_changes);
 
+	bool offline = false;
+	jr_bool("offline",  offline, i_object, io_changes);
+	if( offline )
+		m_state |= AFJOB::STATE_OFFLINE_MASK;
+
 	if( io_changes )
 		return;
 
@@ -115,6 +120,9 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\"host_name\":\"" << m_host_name << "\"";
 
+	if( isOffline())
+		o_str << ",\"offline\":true";
+
 	if( m_command_pre.size())
 		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
 	if( m_command_post.size())
@@ -124,10 +132,11 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	if( m_description.size())
 		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 
-	if( m_flags != 0 )
+/*	if( m_flags != 0 )
 		o_str << ",\"flags\":"                      << m_flags;
 	if( m_state != 0 )
 		o_str << ",\"state\":"                      << m_state;
+		*/
 	if( m_user_list_order != -1 )
 		o_str << ",\"user_list_order\":"            << m_user_list_order;
 	o_str << ",\"time_creation\":"                  << m_time_creation;

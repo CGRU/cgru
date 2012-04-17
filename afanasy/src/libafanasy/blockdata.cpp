@@ -151,7 +151,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if( tasks.IsArray())
 	{
 		m_tasks_num = tasks.Size();
-		if( m_tasks_num > 1 )
+		if( m_tasks_num > 0 )
 		{
 			m_tasks_data = new TaskData*[m_tasks_num];
 			for( int t = 0; t < m_tasks_num; t++)
