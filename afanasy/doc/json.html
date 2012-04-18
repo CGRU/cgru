@@ -1,0 +1,347 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<link href="../../doc/styles.css" rel="stylesheet" type="text/css" />
+<link rel="shortcut icon" href="images/icon.png" type="image/png">
+<title>Afanasy JSON</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="description" content="CGRU: CG Tools, CG Rules, Afanasy - Free Open Source Render Farm Manager" />
+<meta name="keywords" content="Houdini, Maya, Nuke, RenderMan, Mantra, Mentalray, Max, XSI, SoftImage, prman, Afanasy, animation, rendering, render, farm, manager, free, open source, 3D, 2D" />
+</head>
+<body>
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="http://sourceforge.net/projects/cgru"><img src="../../doc/images/sflogo.png" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://www.linkedin.com/groups/CGRU-AFANASY-4263049"><img src="../../doc/images/linkedin.png" border="0" alt="LinkedIn" /></a>
+</td>
+</tr>
+</table>
+
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_left.png')" />
+</td>
+<td>
+<div style="width:100%;height:40px;background:url('../../doc/images/header.png') repeat-x" />
+</td>
+<td width="200px">
+<div style="width:100%;height:40px;background:url('../../doc/images/header_right.png')" />
+</td>
+</tr>
+</table>
+<table width="90%" border="0" align="center" cellpadding="0" cellspacing="0"><tr><td>
+<!--HEADER-->
+
+<h2 align="center">Afanasy JSON</h2>
+<hr />
+<p>
+You can communicate with Afanasy server by JSON.
+</p>
+<ul>
+	<li>
+		<code>afcmd json [file|pipe]</code> - Test json syntax, output an error and position.
+	</li>
+	<li>
+		<code>afcmd v json [file|pipe]</code> - Same as previous and output parsed json document structure.
+	</li>
+	<li>
+		<code>afcmd json send [file]</code> - Send json data after successfully parsed.
+	</li>
+</ul>
+
+<p>
+Use Afanasy Python module to construct and send valid structures.
+</p>
+
+<h3>Job Mininum:</h3>
+<pre/>
+
+{
+	"job":
+	{
+		"name"                  : "job name",
+		"user_name"             : "jimmy",
+		"host_name"             : "host",
+		"blocks":[
+		{
+			"name"              : "Nuke",
+			"tasks_name"        : "frames @#@-@#@",
+			"service"           : "nuke",
+			"parser"            : "nuke",
+			"frame_first"       : 1,
+			"frame_last"        : 100,
+			"frames_per_task"   : 10,
+			"frames_inc"        : 2,
+			"command"           : "nuke -F@#@,@#@ -x scene.nk -X Write1",
+			"working_directory" : "/home/jimmy/work",
+			"files"             : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
+		}
+		]
+	}
+}
+
+</pre>
+
+<h3>Get Examples:</h3>
+<table border="1">
+<tr>
+	<th size="25%">Get all jobs list</th>
+	<th size="25%">Get jobs list from users ids with</th>
+	<th size="25%">Get renders list which hostnames match pattern</th>
+	<th size="25%">Get users list with special ids</th>
+</tr>
+<tr>
+<td><pre>
+{
+ "get":
+ {
+  "type" : "jobs"
+ }
+}
+
+</pre></td>
+<td><pre>
+{
+ "get":
+ {
+  "type" : "jobs",
+  "uids" : [1,2]
+ }
+}
+</pre></td>
+<td><pre>
+{
+ "get":
+ {
+  "type" : "renders",
+  "mask" : "farmhost.*"
+ }
+}
+</pre></td>
+<td><pre>
+{
+ "get":
+ {
+  "type" : "users",
+  "ids"  : [1,2]
+ }
+}
+</pre></td>
+</tr>
+</table>
+
+<h3>Action Examples:</h3>
+<table border="1">
+<tr>
+	<th colspan="2">Edit parameters</th>
+	<th colspan="2">Perform operations</th>
+</tr>
+<tr>
+	<td size="25%">Set render nimby</td>
+	<td size="25%">Set user priority</td>
+	<td size="25%">Exit render</td>
+	<td size="25%">Delete job</td>
+</tr>
+<tr>
+<td><pre>
+{
+ "action":
+ {
+  "user_name"  : "jimmy",
+  "host_name"  : "pc01",
+  "mask"       : "pc02",
+  "type"       : "renders",
+  "params"     :
+  {
+   "nimby"     : true
+  }
+ }
+}
+</pre></td>
+<td><pre>
+{
+ "action":
+ {
+  "user_name"  : "jimmy",
+  "host_name"  : "pc01",
+  "mask"       : "bob",
+  "type"       : "users",
+  "params"     :
+  {
+   "priority"  : "50"
+  }
+ }
+}
+</pre></td>
+<td><pre>
+{
+ "action":
+ {
+  "user_name"  : "jimmy",
+  "host_name"  : "pc01",
+  "mask"       : "pc02",
+  "type"       : "renders",
+  "operation"  :
+  {
+   "type"      : "exit"
+  }
+ }
+}
+</pre></td>
+<td><pre>
+{
+ "action":
+ {
+  "user_name"  : "jimmy",
+  "host_name"  : "pc01",
+  "mask"       : "my3drender",
+  "type"       : "jobs",
+  "operation"  :
+  {
+   "type"      : "delete"
+  }
+ }
+}
+</pre></td>
+</tr>
+</table>
+
+<h3>Job Maximum:</h3>
+<pre/>
+
+{
+	"job":
+	{
+		"name"                           : "job name",
+		"user_name"                      : "jimmy",
+		"annotation"                     : "json test",
+		"priority"                       : 50,
+		"max_running_tasks"              : 20,
+		"max_running_tasks_per_host"     : 3,
+		"time_creation"                  : 12345678901,
+		"time_wait"                      : 12345688901,
+		"time_life"                      : 360000,
+		"description"                    : "\\for\\ \"tests\" 'only'",
+		"hosts_mask"                     : "renderhost.*",
+		"hosts_mask_exclude"             : "badhost.*",
+		"depend_mask"                    : "my3djob.*",
+		"depend_mask_global"             : "his3djob.*",
+		"need_os"                        : "linux",
+		"need_properties"                : "cuda",
+		"command_post"                   : "deletefiles path/to/some.scene",
+		"blocks":[
+		{
+			"name"                       : "Nuke",
+			"tasks_name"                 : "frames @#@-@#@",
+			"service"                    : "nuke",
+			"parser"                     : "nuke",
+			"capacity"                   : 500,
+			"capacity_coeff_min"         : 2,
+			"capacity_coeff_max"         : 4,
+			"frame_first"                : 1,
+			"frame_last"                 : 100,
+			"frames_per_task"            : 10,
+			"frames_inc"                 : 2,
+			"non_sequential"             : true,
+			"errors_retries"             : 9,
+			"errors_avoid_host"          : 4,
+			"errors_task_same_host"      : 3,
+			"errors_forgive_time"        : 3600,
+			"depend_mask"                : "someBlock",
+			"tasks_depend_mask"          : "someBlockTasks",
+			"hosts_mask"                 : "renderhost_b.*",
+			"hosts_mask_exclude"         : "badhost_b.*",
+			"need_properties"            : "nvidia",
+			"command"                    : "nuke -F@#@,@#@ -x scene.nk -X Write1",
+			"working_directory"          : "/home/jimmy/work",
+			"files"                      : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg",
+			"command_post"               : "deletefiles scene.nk"
+		},
+		{
+			"name"                       : "Generic",
+			"tasks_name"                 : "generate @#@",
+			"service"                    : "generic",
+			"parser"                     : "generic",
+			"capacity"                   : 1100,
+			"depend_sub_task"            : true,
+			"max_running_tasks"          : 20,
+			"max_running_tasks_per_host" : 3,
+			"tasks_max_run_time"         : 600,
+			"multihost_min"              : 3,
+			"multihost_max"              : 5,
+			"multihost_max_wait"         : 10,
+			"multihost_service"          : "generic_server",
+			"multihost_service_wait"     : 3,
+			"multihost_master_on_slave"  : false,
+			"command"                    : "generate @#@",
+			"working_directory"          : "/home/jimmy/work",
+			"files"                      : "folder/@#@.jpg",
+			"tasks":[
+			{
+				"name"                   : "Process A",
+				"command"                : "-a file_a",
+				"files"                  : "file_a"
+			},
+			{
+				"name"                   : "Process B",
+				"command"                : "-b file_b",
+				"files"                  : "file_b"
+			},
+			{
+				"name"                   : "Process C",
+				"command"                : "-c file_c",
+				"files"                  : "file_c"
+			}
+			]
+		}
+		]
+	}
+}
+
+</pre>
+
+
+<!--FOOTER-->
+</td></tr></table>
+<table width="100%" align="center" cellpadding="0" cellspacing="0">
+<tr>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+</td>
+<td>
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+</td>
+<td width="200px">
+   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+</td>
+</tr>
+</table>
+
+<table width="99%" align="center">
+<tr align="center">
+<td width="33%">
+<a href="https://github.com/CGRU/cgru"><img src="../../doc/images/github.png" border="0" alt="SourceForge.net Project" /></a>
+</td>
+<td width="33%">
+<p><a href="../../index.html" target="_top"><img src="../../doc/images/cgru16.png" border="0" alt="CGRU" /></a></p>
+</td>
+<td width="33%">
+<a href="http://libregraphicsworld.org/tag/cgru"><img src="../../doc/images/lgw.png" border="0" alt="Libre Graphics World" /></a>
+</td>
+</tr>
+</table>
+</body>
+</html>
