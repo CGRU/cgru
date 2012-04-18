@@ -80,9 +80,13 @@ def sendServer( data, receive = True, verbose = False):
 	struct = None
 
 	try:
-		struct = json.loads(data)
+		if not isinstance( data, str):
+			data = str( data, 'utf-8')
+		struct = json.loads( data)
 	except:
+		print('afnetwork.py: Received data:')
 		print( data)
+		print('JSON loads error:')
 		print( str(sys.exc_info()[1]))
 		struct = None
 

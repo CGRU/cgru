@@ -229,10 +229,10 @@ class Job:
 	def setNeedProperties(   self, value):
 		if checkRegExp(value): self.data["need_properties"] = value
 
-	def pause(      self): self.data["offline"] = true
-	def setPaused(  self): self.data["offline"] = true
-	def setOffline( self): self.data["offline"] = true
-	def offline(    self): self.data["offline"] = true
+	def pause(      self): self.data["offline"] = True
+	def setPaused(  self): self.data["offline"] = True
+	def setOffline( self): self.data["offline"] = True
+	def offline(    self): self.data["offline"] = True
 
 class Cmd:
 	def __init__( self ):

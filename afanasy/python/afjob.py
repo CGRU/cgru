@@ -561,7 +561,7 @@ if hostsexcl      != '': job.setHostsMaskExclude( hostsexcl)
 if dependmask     != '': job.setDependMask( dependmask)
 if dependglobal   != '': job.setDependMaskGlobal( dependglobal)
 if deletescene         : job.setCmdPost('deletefiles "%s"' % os.path.abspath(scene))
-if startpaused         : job.offLine()
+if startpaused         : job.offline()
 if platform != '':
    if platform == 'any': job.setNeedOS('')
    else: job.setNeedOS( platform)
