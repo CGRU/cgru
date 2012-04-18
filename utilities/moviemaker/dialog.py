@@ -1542,7 +1542,7 @@ Add this options to temporary image saving.')
 
       cmd = 'makemovie.py'
       cmd = os.path.join( os.path.dirname( os.path.abspath( sys.argv[0])), cmd)
-      cmd = '"%s" "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
+      cmd = '%s "%s"' % ( os.getenv('CGRU_PYTHONEXE','python'), cmd)
       cmd += ' -c "%s"' % getComboBoxString( self.fields['codec'])
       cmd += ' -f %s' % self.fields['fps'].currentText()
       cmd += ' -n %s' % self.fields['container'].currentText()
