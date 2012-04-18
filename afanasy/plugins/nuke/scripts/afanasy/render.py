@@ -462,7 +462,7 @@ class JobParameters:
       if self.dependmaskglobal != None:
          self.dependmaskglobal = str( self.dependmaskglobal)
          if self.dependmaskglobal != '': job.setDependMaskGlobal( self.dependmaskglobal)
-      if self.startpaused: job.offLine()
+      if self.startpaused: job.offline()
       if self.platform is None or self.platform == 'Any': job.setNeedOS('')
       job.setCmdPost('deletefiles "%s"' % self.scenename)
       job.blocks = blocks
