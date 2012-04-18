@@ -491,6 +491,7 @@ Block * SysJob::newBlock( int numBlock)
    default:
       AFERRAR("SysJob::createBlock: Invalid block number = %d", numBlock)
    }
+	return NULL;
 }
 
 void SysJob::AddPostCommand( const std::string & Command, const std::string & WorkingDirectory, const std::string & UserName, const std::string & JobName)
