@@ -1,22 +1,22 @@
 {
 	"job":
 	{
-		"name"                           : "job name",
-		"user_name"                      : "jimmy",
-		"host_name"                      : "host",
+		"name"                  : "job name",
+		"user_name"             : "jimmy",
+		"host_name"             : "host",
 		"blocks":[
 		{
-			"name"                       : "Nuke",
-			"tasks_name"                 : "frames @#@-@#@",
-			"service"                    : "nuke",
-			"parser"                     : "nuke",
-			"frame_first"                : 1,
-			"frame_last"                 : 100,
-			"frames_per_task"            : 10,
-			"frames_inc"                 : 2,
-			"command"                    : "nuke -F@#@,@#@ -x scene.nk -X Write1",
-			"working_directory"          : "/home/jimmy/work",
-			"files"                      : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
+			"name"              : "Nuke",
+			"tasks_name"        : "frames @#@-@#@",
+			"service"           : "nuke",
+			"parser"            : "nuke",
+			"frame_first"       : 1,
+			"frame_last"        : 100,
+			"frames_per_task"   : 10,
+			"frames_inc"        : 2,
+			"command"           : "nuke -F@#@,@#@ -x scene.nk -X Write1",
+			"working_directory" : "/home/jimmy/work",
+			"files"             : "folder/img_L.@####@.jpg;folder/img_R.@####@.jpg"
 		}
 		]
 	}
