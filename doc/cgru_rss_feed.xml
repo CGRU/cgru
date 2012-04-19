@@ -5,10 +5,21 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Thu, 29 Mar 2012 00:00:00 GMT</pubDate>
-   <lastBuildDate>Thu, 29 Mar 2012 00:00:00 GMT</lastBuildDate>
+   <pubDate>Thu, 19 Apr 2012 00:00:00 GMT</pubDate>
+   <lastBuildDate>Thu, 19 Apr 2012 00:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.6.2 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release162</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release162</guid>
+      <description>
+         JSON age started.
+         No binary python module needed.
+         Bug fixes.
+      </description>
+      <pubDate>Thu, 19 Apr 2012 00:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.6.1 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release161</link>

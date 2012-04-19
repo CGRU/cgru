@@ -46,18 +46,22 @@ You can communicate with Afanasy server by JSON.
 </p>
 <ul>
 	<li>
-		<code>afcmd json [file|pipe]</code> - Test json syntax, output an error and position.
+		<code>afcmd json [file|pipe]</code> - Test JSON syntax, output an error and position.
 	</li>
 	<li>
-		<code>afcmd v json [file|pipe]</code> - Same as previous and output parsed json document structure.
+		<code>afcmd v json [file|pipe]</code> - Same as previous and output parsed JSON document structure.
 	</li>
 	<li>
-		<code>afcmd json send [file]</code> - Send json data after successfully parsed.
+		<code>afcmd json send [file]</code> - Send JSON data after successfully parsed.
 	</li>
 </ul>
 
 <p>
-Use Afanasy Python module to construct and send valid structures.
+You can use Afanasy Python module to construct and send valid structures.
+</p>
+
+<p>
+JSON protocol is not finished. Only job structure is final - to remove python binary module dependence to send a job.
 </p>
 
 <h3>Job Mininum:</h3>

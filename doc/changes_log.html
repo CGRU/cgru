@@ -85,13 +85,17 @@ You can upgrade only one client to check changes, the is no need to update all c
 <br/>
 
 
-<p><a id="release162"><b>1.6.2</b></a> 2012.04.18 </p>
+<p><a id="release162"><b>1.6.2</b></a> 2012.04.19 </p>
 
 <p>
 API is based on <a href="../afanasy/doc/json">JSON</a> now.
-Python API is the same but no binary module exists.
+Python API is the same but no binary module needed, it communicates with server itself by json build-in module.
+(All Python API is written on Python language, not on Python C API.)
 You can communicate with Afanasy server within any language/script that can create JSON structures.
-(No libafanasy needed to send and get data.)
+(No libafanasy needed to send and get data, all possible linking problems are in the past.)
+</p>
+<p>
+<i>JSON protocol is not finished. Finished only job structure - to remove python binary module dependence to send a job.</i>
 </p>
 
 <p>
