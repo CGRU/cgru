@@ -239,17 +239,15 @@ class BlockParameters:
          block.setFiles( self.imgfile)
          if self.capacity != -1: block.setCapacity( self.capacity)
 
-         threads = os.getenv('NUKE_AF_RENDERTHREADS', '2')
-         cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i -m %(threads)s')
+         threads = os.getenv('NUKE_AF_RENDERTHREADS')
+         cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i')
          cmdargs = ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
          if self.capacitymin != -1 or self.capacitymax != -1:
-
-
-
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             services = __import__('services.service', globals(), locals(), [])
             threads = services.service.str_capacity
-         cmd = cmd.replace('AF_THREADS', threads)
+         if threads is not None:
+         	cmd = cmd.replace('AF_THREADS', threads)
          block.setCommand( cmd + cmdargs)
       elif self.wnode.Class() == DailiesNodeClassName:
          cgru = __import__('cgru', globals(), locals(), [])

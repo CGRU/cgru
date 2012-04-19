@@ -26,7 +26,8 @@ fi
 export NUKE_AF_RENDERTHREADS=2
 
 # Nuke render launcher:
-export NUKE_AF_RENDER="nuke -i -m AF_THREADS"
+export NUKE_AF_RENDER="nuke -i"
+# export NUKE_AF_RENDER="nuke -i -m AF_THREADS"
 if [ ! -z "${CGRU_LOCATION}" ]; then
    export NUKE_AF_RENDER="${NUKE_AF_RENDER} -t ${CGRU_LOCATION}/plugins/nuke/render.py"
 fi
