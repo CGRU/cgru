@@ -130,7 +130,7 @@ void ListRenders::renderAdded( ItemNode * node, const QModelIndex & index)
    ItemRender * render = (ItemRender*)node;
    if( af::Environment::VISOR() == false)
    {
-      if( render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str())) || render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str()))
+	   if(( render->getName() == QString::fromUtf8( af::Environment::getComputerName().c_str())) || (render->getUserName() == QString::fromUtf8( af::Environment::getUserName().c_str())))
          view->selectionModel()->select( index, QItemSelectionModel::Select);
    }
 }
@@ -142,7 +142,7 @@ void ListRenders::selectionChanged( const QItemSelection & selected, const QItem
       if( qVariantCanConvert<Item*>( indexes[i].data()))
       {
          ItemRender * render = (ItemRender*)qVariantValue<Item*>( indexes[i].data());
-         if((false == render->getName().contains( QString::fromUtf8( af::Environment::getComputerName().c_str()))) && ( render->getUserName() != QString::fromUtf8( af::Environment::getUserName().c_str())))
+		 if(( render->getName() != QString::fromUtf8( af::Environment::getComputerName().c_str())) && ( render->getUserName() != QString::fromUtf8( af::Environment::getUserName().c_str())))
             view->selectionModel()->select( indexes[i], QItemSelectionModel::Deselect);
       }
 }
