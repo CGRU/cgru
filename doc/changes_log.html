@@ -85,10 +85,10 @@ You can upgrade only one client to check changes, the is no need to update all c
 <br/>
 
 
-<p><a id="release162"><b>1.6.2</b></a> 2012.04.19 </p>
+<p><a id="release162"><b>1.6.2</b></a> 2012.04.23 </p>
 
 <p>
-API is based on <a href="../afanasy/doc/json">JSON</a> now.
+API is based on <a href="../afanasy/doc/json.html">JSON</a> now.
 Python API is the same but no binary module needed, it communicates with server itself by json build-in module.
 (All Python API is written on Python language, not on Python C API.)
 You can communicate with Afanasy server within any language/script that can create JSON structures.
@@ -105,7 +105,8 @@ You can communicate with Afanasy server within any language/script that can crea
 	Bugs Fixed:
 </p>
 <p>
-	AfWatch shows task with no service icon.<br/>
+	AfWatch shows tasks with no service icon.<br/>
+	AfWatch filtering and sorting nodes when new nodes created and old changed fixed.<br/>
 	Houdini render script loads scene within try-catch to pass warning exception.<br/>
 	Nuke dailies node can handle tcl expressions, it uses <i>getEvaluatedValue()</i> instead of <i>value()</i>.<br/>
 	Nuke render script changes "root.project_directory" according to OS paths map (for mixed OS-es farm rendering).<br/>

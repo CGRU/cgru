@@ -233,6 +233,7 @@ class Job:
 	def setPaused(  self): self.data["offline"] = True
 	def setOffline( self): self.data["offline"] = True
 	def offline(    self): self.data["offline"] = True
+	def offLine(    self): self.data["offline"] = True
 
 class Cmd:
 	def __init__( self ):
@@ -322,17 +323,15 @@ class Cmd:
 	def talkExit( self, text):
 		self.action = 'action'
 		self.data['type'] = 'talks'
-		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME']
+		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*'
 		self.data['operation'] = {'type':'exit'}
-		#self.talkexit( afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*', text)
 		self._sendRequest()
 
 	def monitorExit( self, text):
 		self.action = 'action'
 		self.data['type'] = 'monitors'
-		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME']
+		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*'
 		self.data['operation'] = {'type':'exit'}
-		#self.monitorexit( afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*', text)
 		self._sendRequest()
 
 	def renderGetList( self, mask = None):

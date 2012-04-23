@@ -119,11 +119,9 @@ bool ListNodes::updateItems( af::Msg * msg)
             // check for item new geometry height
             if( oldheight != itemnode->getHeight()) view->emitSizeHintChanged( model->index(i));
 
-            // filter node
-            if( filtering ) filter( itemnode, i);
-
-				// process show/hide
-				processHidden( itemnode, i);
+				// process show/hide node if we are not going to sort all of them
+				if( itemsToSort.size() == 0 )
+					processHidden( itemnode, i);
 
             // store last and first changed row
             if( firstChangedRow == -1 ) firstChangedRow = i;
@@ -184,19 +182,21 @@ bool ListNodes::updateItems( af::Msg * msg)
       }
       else row = ((ModelNodes*)model)->addNode( new_item);
 
+		if( filtering )
+			new_item->setFilterType( ctrl->getFilterType() );
 
-      if( filtering )
-      {
-         new_item->setFilterType( ctrl->getFilterType() );
-         filter( new_item, row);
-      }
-
-		processHidden( new_item, row);
+		if( itemsToSort.size() == 0 )
+			processHidden( new_item, row);
 
       if( newitemscreated == false ) newitemscreated = true;
 
 AFINFA( "adding item \"%s\", id=%d\n", new_item->getName().toUtf8().data(), new_item->getId());
    }
+
+	if( itemsToSort.size() )
+	{
+		filter();
+	}
 
 //   model->revert();
 //   model->reset();
@@ -232,20 +232,35 @@ bool ListNodes::setFilter( const QString & str)
 
 void ListNodes::filter()
 {
-   for( int i = 0; i < model->count(); i++) filter((ItemNode*)(model->item(i)), i);
+   for( int i = 0; i < model->count(); i++) processHidden((ItemNode*)(model->item(i)), i);
 }
 
-void ListNodes::filter( ItemNode * item, int row)
+void ListNodes::processHidden( ItemNode * i_item, int i_row)
 {
-   if( item == NULL)
-   {
-      AFERROR("ListNodes::filter: Item pointer is NULL.\n");
-      return;
-   }
-   if((filtering == false) || (filter_str.isEmpty()))
-      view->setRowHidden( row , false);
-   else
-      view->setRowHidden( row , item->filter( filter_exp, filtermatch) != filterinclude);
+	if( i_item == NULL)
+	{
+		AFERROR("ListNodes::filter: Item pointer is NULL.\n");
+		return;
+	}
+
+	bool hidden;
+
+	if(( filtering == false ) || ( filter_str.isEmpty() ))
+	{
+		hidden = false;
+	}
+	else
+	{
+		hidden = i_item->filter( filter_exp, filtermatch) != filterinclude;
+	}
+
+	if( hidden == false )
+		hidden = i_item->getHidden( ms_flagsHideShow);
+
+	if( hidden != view->isRowHidden( i_row))
+		view->setRowHidden( i_row , hidden);
+
+//if(hidden)printf("Hidding node '%s'\n", i_item->getName().toUtf8().data()); else printf("Showing node '%s'\n", i_item->getName().toUtf8().data());
 }
 
 void ListNodes::sortTypeChanged()
@@ -276,7 +291,7 @@ void ListNodes::filterChanged()
 {
    if( setFilter( ctrl->getFilter()))
    {
-      if( filtering) filter();
+	  if( filtering) filter();
    }
 }
 
@@ -306,18 +321,7 @@ void ListNodes::filterSettingsChanged()
 void ListNodes::actHideShow( int i_type )
 {
 	ms_flagsHideShow ^= i_type;
-	processHidden();
-}
-
-void ListNodes::processHidden()
-{
-	for( int i = 0; i < model->count(); i++)
-		processHidden( (ItemNode*)(model->item(i)), i);
-}
-
-void ListNodes::processHidden( ItemNode * i_node, int i_row)
-{
-	view->setRowHidden( i_row, i_node->getHidden( ms_flagsHideShow));
+	filter();
 }
 
 void ListNodes::sortMatch( const std::vector<int32_t> & i_list)

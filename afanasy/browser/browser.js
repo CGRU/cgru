@@ -7,7 +7,7 @@ function info( msg)
 
 function init()
 {
-	document.getElementById('id').innerHTML='launching...';
+//	document.getElementById('id').innerHTML='launching...';
 
-	renders = new Renders();
+	renders = new RendersList();
 }

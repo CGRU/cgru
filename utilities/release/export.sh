@@ -54,6 +54,7 @@ rcopy examples $dest
 
 copy afanasy $dest/afanasy
 rcopy afanasy/bin $dest/afanasy
+rcopy afanasy/browser $dest/afanasy
 rcopy afanasy/doc $dest/afanasy
 rcopy afanasy/icons $dest/afanasy
 rcopy afanasy/init $dest/afanasy

@@ -13,7 +13,7 @@ revision=`python ./getrevision.py $cgruRoot`
 popd > /dev/null
 
 # Prepare folders:
-snapshot=cgru_snapshot.$version
+snapshot=cgru.$version
 tmpdir=tmp
 [ -d $tmpdir ] || mkdir -pv $tmpdir
 snapshot_dir=$tmpdir/$snapshot

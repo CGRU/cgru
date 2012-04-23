@@ -66,8 +66,6 @@ private slots:
    void filterSettingsChanged();
 
 private:
-   void filter( ItemNode * item, int row);
-	void processHidden();
 	void processHidden( ItemNode * i_item, int i_row);
 
 private:
