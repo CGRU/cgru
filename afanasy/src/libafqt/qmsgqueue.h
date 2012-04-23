@@ -2,10 +2,10 @@
 
 #include "../libafanasy/name_af.h"
 
+#include "name_afqt.h"
+
 #include <QtCore/QSemaphore>
 #include <QtCore/QMutex>
-
-#include "name_afqt.h"
 
 /// Simple FIFO message queue, with pthread mutex and semaphore counter for \c push() and \c pop() operations.
 class afqt::QMsgQueue
