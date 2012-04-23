@@ -57,10 +57,6 @@ function RenderNode( obj)
 //	this.row1 = document.createElement('tr');
 //	this.table.appendChild( this.row1);
 
-	var name = obj.name;
-	if( obj.version != null )
-		name += ' ' + obj.version;
-
 	var user = obj.user_name;
 
 	if( obj.offline === true )
@@ -86,13 +82,29 @@ function RenderNode( obj)
 
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);
-	this.name.innerHTML = name;
+	this.name.innerHTML = obj.name;
+	this.name.title = 'Client host name';
 //	this.name.style.backgroundColor = '#EEEE99';
+
+	if( obj.version != null )
+	{
+		this.version = document.createElement('span');
+		this.element.appendChild( this.version);
+		this.version.innerHTML = ' ' + obj.version;
+		this.version.title = 'Client version';
+	}
+
+	this.priority = document.createElement('span');
+	this.element.appendChild( this.priority);
+	this.priority.style.cssFloat = 'right';
+	this.priority.innerHTML = '-' + obj.priority;
+	this.priority.title = 'Priority';
 
 	this.user_name = document.createElement('span');
 	this.element.appendChild( this.user_name);
 	this.user_name.style.cssFloat = 'right';
 	this.user_name.innerHTML = user;
+	this.user_name.title = 'User name and "Nimby" status'
 //	this.user_name.style.backgroundColor = '#EEEEBB';
 
 	this.center = document.createElement('span');
@@ -118,6 +130,11 @@ function RenderNode( obj)
 	if( capacity == null )
 		capacity = obj.host.capacity;
 	capacity = obj.capacity_used + '/' + capacity;
+	this.capacity = document.createElement('span');
+	this.element.appendChild( this.capacity);
+	this.capacity.innerHTML = capacity;
+	this.capacity.title = 'Capacity used / total'
+
 	var max_tasks = obj.max_tasks;
 	if( max_tasks == null )
 		max_tasks = obj.host.max_tasks;
@@ -125,11 +142,11 @@ function RenderNode( obj)
 		max_tasks = '(' + obj.tasks.length + '/' + max_tasks + ')';
 	else
 		max_tasks = '(0/' + max_tasks + ')';
-	capacity += ' ' + max_tasks;
-	this.capacity = document.createElement('span');
-	this.element.appendChild( this.capacity);
-	this.capacity.innerHTML = capacity;
-	this.capacity.style.textAlign = 'center';
+	max_tasks = ' ' + max_tasks;
+	this.max_tasks = document.createElement('span');
+	this.element.appendChild( this.max_tasks);
+	this.max_tasks.innerHTML = max_tasks;
+	this.max_tasks.title = 'Running tasks / maximum'
 
 	var state = 'NEW';
 	if(( obj.task_start_finish_time != null ) && ( obj.task_start_finish_time > 0 ))
