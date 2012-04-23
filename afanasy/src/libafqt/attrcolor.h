@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtGui/QColor>
-
 #include "attr.h"
+
+#include <QtGui/QColor>
 
 class QByteArray;
 class QDomDocument;

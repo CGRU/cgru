@@ -1,14 +1,14 @@
 #include "itemuser.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QPainter>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"
 #include "watch.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

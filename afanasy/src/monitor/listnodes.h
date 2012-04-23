@@ -1,13 +1,13 @@
 #pragma once
 
-#include <QtGui/QListWidget>
-
 #include "../libafanasy/afnode.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 #include "../libafanasy/msgclasses/mcafnodes.h"
 
 #include "itemnode.h"
+
+#include <QtGui/QListWidget>
 
 class ListNodes : public QListWidget
 {

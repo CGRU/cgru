@@ -1,10 +1,5 @@
 #include "wndcustomizegui.h"
 
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QPushButton>
-#include <QtGui/QTabWidget>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
@@ -14,6 +9,11 @@
 #include "fontwidget.h"
 #include "numberwidget.h"
 #include "watch.h"
+
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QPushButton>
+#include <QtGui/QTabWidget>
 
 #define AFOUTPUT
 #undef AFOUTPUT

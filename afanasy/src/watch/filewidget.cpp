@@ -1,14 +1,14 @@
 #include "filewidget.h"
 
+#include "../libafqt/attr.h"
+
+#include "watch.h"
+
 #include <QtGui/QFileDialog>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QLineEdit>
 #include <QtGui/QPushButton>
-
-#include "../libafqt/attr.h"
-
-#include "watch.h"
 
 FileWidget::FileWidget( QWidget * i_parent, afqt::Attr * i_attr,
                         const QString & i_filesmask):

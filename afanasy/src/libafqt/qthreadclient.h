@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QtCore/QThread>
-
 #include "../libafanasy/name_af.h"
 
 #include "name_afqt.h"
 #include "qmsgqueue.h"
+
+#include <QtCore/QThread>
 
 /// Class that can send messages in a different thread.
 class afqt::QThreadClient : public QThread

@@ -1,13 +1,13 @@
 #pragma once
 
-#include <QtCore/QMutex>
-#include <QtGui/QWidget>
-
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
 #include "infoline.h"
 #include "reciever.h"
+
+#include <QtCore/QMutex>
+#include <QtGui/QWidget>
 
 class QVBoxLayout;
 class QMouseEvent;

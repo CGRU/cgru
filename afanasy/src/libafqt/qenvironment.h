@@ -1,14 +1,14 @@
 #pragma once
 
-#include <QtGui/QColor>
-#include <QtGui/QFont>
-#include <QtGui/QPalette>
-#include <QtNetwork/QHostAddress>
-
 #include "name_afqt.h"
 #include "attr.h"
 #include "attrnumber.h"
 #include "attrcolor.h"
+
+#include <QtGui/QColor>
+#include <QtGui/QFont>
+#include <QtGui/QPalette>
+#include <QtNetwork/QHostAddress>
 
 class QByteArray;
 class QDomElement;

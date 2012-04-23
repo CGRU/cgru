@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../libafqt/qenvironment.h"
+
 #include <QtGui/QLineEdit>
 
 class InfoLine : public QLineEdit

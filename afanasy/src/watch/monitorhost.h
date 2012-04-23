@@ -1,9 +1,9 @@
 #pragma once
 
-#include <QtCore/QList>
-
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/msg.h"
+
+#include <QtCore/QList>
 
 class MonitorHost: public af::Monitor
 {

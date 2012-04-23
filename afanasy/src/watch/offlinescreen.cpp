@@ -1,15 +1,13 @@
 #include "offlinescreen.h"
 
+#include "watch.h"
+
 #include <QtCore/QTimer>
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
 
-#include "../libafanasy/environment.h"
-
-#include "watch.h"
-
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 typedef union _rgba

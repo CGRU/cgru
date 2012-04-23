@@ -1,5 +1,7 @@
 #pragma once
 
+#include "../libafqt/qenvironment.h"
+
 #include <QtGui/QColor>
 #include <QtGui/QPainter>
 

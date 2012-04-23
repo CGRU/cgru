@@ -1,15 +1,5 @@
 #include "listtasks.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QEvent>
-#include <QtCore/QProcess>
-#include <QtCore/QTimer>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QListWidget>
-#include <QtGui/QMenu>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/address.h"
@@ -30,6 +20,16 @@
 #include "modelitems.h"
 #include "viewitems.h"
 #include "watch.h"
+
+#include <QtCore/QDir>
+#include <QtCore/QEvent>
+#include <QtCore/QProcess>
+#include <QtCore/QTimer>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QListWidget>
+#include <QtGui/QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT

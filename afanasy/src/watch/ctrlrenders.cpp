@@ -1,12 +1,12 @@
 #include "ctrlrenders.h"
 
+#include "actionid.h"
+#include "listrenders.h"
+
 #include <QtCore/QEvent>
 #include <QtGui/QLabel>
 #include <QtGui/QMenu>
 #include <QtGui/QContextMenuEvent>
-
-#include "actionid.h"
-#include "listrenders.h"
 
 CtrlRenders::CtrlRenders( QWidget * i_parent, ListRenders * i_renderslist):
    QLabel( "[O]", i_parent ),

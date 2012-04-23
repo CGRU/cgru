@@ -1,5 +1,7 @@
 #pragma once
 
+#include "item.h"
+
 #include <QtCore/QAbstractItemModel>
 
 class Item;

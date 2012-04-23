@@ -1,11 +1,11 @@
 #include "wndtext.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QTextEdit>
-
 #include "../libafanasy/msg.h"
 
 #include "../libafqt/name_afqt.h"
+
+#include <QtGui/QLayout>
+#include <QtGui/QTextEdit>
 
 #define AFOUTPUT
 #undef AFOUTPUT

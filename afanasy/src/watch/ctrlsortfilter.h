@@ -1,5 +1,8 @@
 #pragma once
 
+#include "actionid.h"
+#include "listitems.h"
+
 #include <QtGui/QAction>
 #include <QtGui/QWidget>
 

@@ -1,12 +1,12 @@
 #include "itemtalk.h"
 
-#include <QtCore/QEvent>
-#include <QtNetwork/QHostAddress>
-#include <QtGui/QPainter>
-
 #include "../libafqt/qenvironment.h"
 
 #include "ctrlsortfilter.h"
+
+#include <QtCore/QEvent>
+#include <QtNetwork/QHostAddress>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

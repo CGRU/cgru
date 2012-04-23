@@ -8,11 +8,6 @@
 #include <QtGui/QPainter>
 #include <QtGui/QContextMenuEvent>
 
-#include "../libafqt/qenvironment.h"
-
-#include "actionid.h"
-#include "listitems.h"
-
 const char * CtrlSortFilter::TNAMES[] = {
 "Disabled",
 "Priority",

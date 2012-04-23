@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../libafanasy/environment.h"
+
+#include "../libafqt/name_afqt.h"
+
 #include <QtGui/QSystemTrayIcon>
 
 class QTimer;

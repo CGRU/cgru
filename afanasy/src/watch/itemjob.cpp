@@ -1,8 +1,5 @@
 #include "itemjob.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QPainter>
-
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
@@ -10,6 +7,9 @@
 
 #include "ctrlsortfilter.h"
 #include "watch.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

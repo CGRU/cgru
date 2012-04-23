@@ -1,10 +1,10 @@
-#include <QtGui/QApplication>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "monitorwindow.h"
+
+#include <QtGui/QApplication>
 
 #define AFOUTPUT
 #undef AFOUTPUT

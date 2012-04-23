@@ -1,13 +1,13 @@
 #include "wndlistenjob.h"
 
-#include <QtGui/QLayout>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mclistenaddress.h"
 #include "../libafanasy/msgclasses/mctaskoutput.h"
 
 #include "watch.h"
+
+#include <QtGui/QLayout>
 
 #define AFOUTPUT
 #undef AFOUTPUT

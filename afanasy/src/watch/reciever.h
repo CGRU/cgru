@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtGui/QTextEdit>
-
 #include "../libafanasy/name_af.h"
+
+#include <QtGui/QTextEdit>
 
 class Reciever
 {

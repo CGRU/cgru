@@ -1,11 +1,11 @@
 #include "wndlist.h"
 
-#include <QtGui/QLayout>
-
 #include "../libafanasy/msg.h"
 
 #include "watch.h"
 #include "listitems.h"
+
+#include <QtGui/QLayout>
 
 #define AFOUTPUT
 #undef AFOUTPUT

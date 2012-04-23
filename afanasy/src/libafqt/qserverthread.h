@@ -1,11 +1,11 @@
 #pragma once
 
-#include <QtNetwork/QTcpSocket>
-#include <QtCore/QThread>
-
 #include "../libafanasy/msg.h"
 
 #include "name_afqt.h"
+
+#include <QtNetwork/QTcpSocket>
+#include <QtCore/QThread>
 
 class afqt::QServerThread : public QThread
 {

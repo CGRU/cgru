@@ -1,13 +1,5 @@
 #include "wndtask.h"
 
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QLineEdit>
-#include <QtGui/QMenu>
-#include <QtGui/QPushButton>
-#include <QtGui/QTextEdit>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -19,6 +11,14 @@
 
 #include "actionid.h"
 #include "watch.h"
+
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QLineEdit>
+#include <QtGui/QMenu>
+#include <QtGui/QPushButton>
+#include <QtGui/QTextEdit>
 
 #define AFOUTPUT
 #undef AFOUTPUT

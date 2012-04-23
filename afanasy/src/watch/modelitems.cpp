@@ -1,7 +1,5 @@
 #include "modelitems.h"
 
-#include "item.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

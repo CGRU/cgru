@@ -1,14 +1,14 @@
 #include "listnodes.h"
 
-#include <QtGui/QBoxLayout>
-#include <QtCore/QEvent>
-#include <QtCore/QTimer>
-
 #include "itemnode.h"
 #include "ctrlsortfilter.h"
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
+
+#include <QtGui/QBoxLayout>
+#include <QtCore/QEvent>
+#include <QtCore/QTimer>
 
 #define AFOUTPUT
 #undef AFOUTPUT

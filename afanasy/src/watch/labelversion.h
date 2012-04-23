@@ -1,5 +1,8 @@
 #pragma once
 
+#include "../libafanasy/environment.h"
+#include "../libafqt/qenvironment.h"
+
 #include <QtCore/QTimer>
 #include <QtGui/QWidget>
 

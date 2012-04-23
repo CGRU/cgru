@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QtGui/QMainWindow>
-
 #include "../libafqt/qserver.h"
 #include "../libafqt/qthreadclientsend.h"
 #include "../libafqt/qthreadclientup.h"
 
 #include "monitorhost.h"
+
+#include <QtGui/QMainWindow>
 
 class ListNodes;
 class ListUsers;

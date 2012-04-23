@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QtGui/QWidget>
-
 #include "../libafqt/qserver.h"
 #include "../libafqt/qthreadclientsend.h"
 #include "../libafqt/qthreadclientup.h"
+
+#include <QtGui/QWidget>
 
 class TalkHost;
 class UsersList;

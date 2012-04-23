@@ -1,12 +1,12 @@
 #include "numberwidget.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QSpinBox>
-
 #include "../libafqt/attrnumber.h"
 
 #include "watch.h"
+
+#include <QtGui/QLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QSpinBox>
 
 NumberWidget::NumberWidget( QWidget * parent, afqt::AttrNumber * attrNumber):
     QWidget( parent),

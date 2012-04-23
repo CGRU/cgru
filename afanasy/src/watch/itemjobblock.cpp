@@ -1,8 +1,5 @@
 #include "itemjobblock.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QPainter>
-
 #include "itemjobtask.h"
 #include "listtasks.h"
 
@@ -10,6 +7,9 @@
 #include "../libafanasy/jobprogress.h"
 
 #include "../libafqt/qenvironment.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT
