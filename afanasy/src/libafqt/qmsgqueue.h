@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../libafanasy/name_af.h"
+
 #include <QtCore/QSemaphore>
 #include <QtCore/QMutex>
-
-#include "../libafanasy/name_af.h"
 
 #include "name_afqt.h"
 
