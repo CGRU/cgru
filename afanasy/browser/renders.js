@@ -14,10 +14,18 @@ function RendersList()
 
 	this.items = [];
 
+	refresh();
+}
+
+//RendersList.prototype.refresh = function()
+refresh = function()
+{
 	var obj = {};
 	obj.get = {};
 	obj.get.type = 'renders';
 	send(obj);
+
+//	this.timer = setTimeout("refresh()", 1000);
 }
 
 RendersList.prototype.processMsg = function( obj)
@@ -150,10 +158,139 @@ function RenderNode( obj)
 
 	var state = 'NEW';
 	if(( obj.task_start_finish_time != null ) && ( obj.task_start_finish_time > 0 ))
+	{
 		state = obj.task_start_finish_time;
+//		state = new Date( state * 1000);
+//		state = .001*((new Date()).UTC()) + '-' +  state;
+		state = new Date() - new Date( state * 1000);
+		var seconds = (state / 1000);
+		var minutes = seconds / 60;
+		var hours = minutes / 60;
+		var days = hours / 24;
+		seconds = seconds - minutes*60;
+		minutes = minutes - hours*60;
+		hours = hours - days*24;
+		state = hours + ':' + minutes + '.' + seconds;
+		if( days > 1 )
+			state = days + 'd ' + state;
+	}
 	this.state = document.createElement('span');
 	this.element.appendChild( this.state);
 	this.state.style.cssFloat = 'right';
 	this.state.innerHTML = state;
 }
 
+RenderNode.prototype.update = function( obj)
+{
+	this.params = obj
+
+	var user = obj.user_name;
+
+	if( obj.offline === true )
+		this.element.style.backgroundColor = '#999999';
+	if( obj.busy === true )
+		this.element.style.backgroundColor = '#99EE77';
+
+	if( obj.NIMBY === true )
+	{
+		if( obj.offline !== true) this.element.style.backgroundColor = '#8888DD';
+		user = '(' + user + ')N';
+	}
+	else if( obj.nimby === true )
+	{
+		if( obj.offline !== true) this.element.style.backgroundColor = '#9999DD';
+		user = '(' + user + ')n';
+	}
+
+	this.name.innerHTML = obj.name;
+	this.name.title = 'Client host name';
+
+	if( obj.version != null )
+	{
+		this.version = document.createElement('span');
+		this.element.appendChild( this.version);
+		this.version.innerHTML = ' ' + obj.version;
+		this.version.title = 'Client version';
+	}
+	else
+	{
+		this.version.innerHTML = ' ';
+	}
+
+	this.priority = document.createElement('span');
+	this.element.appendChild( this.priority);
+	this.priority.style.cssFloat = 'right';
+	this.priority.innerHTML = '-' + obj.priority;
+	this.priority.title = 'Priority';
+
+	this.user_name = document.createElement('span');
+	this.element.appendChild( this.user_name);
+	this.user_name.style.cssFloat = 'right';
+	this.user_name.innerHTML = user;
+	this.user_name.title = 'User name and "Nimby" status'
+//	this.user_name.style.backgroundColor = '#EEEEBB';
+
+	this.center = document.createElement('span');
+	this.element.appendChild( this.center);
+	this.center.style.backgroundColor = '#EEEE99';
+	this.center.style.textAlign = 'center';
+	this.center.style.position = 'absolute';
+	this.center.style.left = '40%';
+	this.center.style.width = '20%';
+
+	if( obj.offline === true )
+	{
+		this.center.innerHTML = 'offline';
+		return;
+	}
+
+	this.center.style.height = '2.4em';
+	this.center.innerHTML = '.';
+
+	this.element.appendChild( document.createElement('br'));
+
+	var capacity = obj.capacity;
+	if( capacity == null )
+		capacity = obj.host.capacity;
+	capacity = obj.capacity_used + '/' + capacity;
+	this.capacity = document.createElement('span');
+	this.element.appendChild( this.capacity);
+	this.capacity.innerHTML = capacity;
+	this.capacity.title = 'Capacity used / total'
+
+	var max_tasks = obj.max_tasks;
+	if( max_tasks == null )
+		max_tasks = obj.host.max_tasks;
+	if( obj.busy === true )
+		max_tasks = '(' + obj.tasks.length + '/' + max_tasks + ')';
+	else
+		max_tasks = '(0/' + max_tasks + ')';
+	max_tasks = ' ' + max_tasks;
+	this.max_tasks = document.createElement('span');
+	this.element.appendChild( this.max_tasks);
+	this.max_tasks.innerHTML = max_tasks;
+	this.max_tasks.title = 'Running tasks / maximum'
+
+	var state = 'NEW';
+	if(( obj.task_start_finish_time != null ) && ( obj.task_start_finish_time > 0 ))
+	{
+		state = obj.task_start_finish_time;
+//		state = new Date( state * 1000);
+//		state = .001*((new Date()).UTC()) + '-' +  state;
+		state = new Date() - new Date( state * 1000);
+		var seconds = (state / 1000);
+		var minutes = seconds / 60;
+		var hours = minutes / 60;
+		var days = hours / 24;
+		seconds = seconds - minutes*60;
+		minutes = minutes - hours*60;
+		hours = hours - days*24;
+		state = hours + ':' + minutes + '.' + seconds;
+		if( days > 1 )
+			state = days + 'd ' + state;
+	}
+	this.state = document.createElement('span');
+	this.element.appendChild( this.state);
+	this.state.style.cssFloat = 'right';
+	this.state.innerHTML = state;
+}
