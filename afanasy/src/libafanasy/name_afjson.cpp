@@ -7,6 +7,16 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+const std::string af::jsonMakeHeader( int size)
+{
+	std::string header = "[ * AFANASY * ] ";
+	header += af::itos( af::Msg::Magic);
+	header += " 0 ";
+	header += af::itos( size);
+	header += " JSON";
+	return header;
+}
+
 char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::string * o_err)
 {
 	int datalen = i_msg->dataLen();
