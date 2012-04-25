@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#include "../libafanasy/environment.h"
+
 #include <QtGui/QWidget>
 
 class OfflineScreen : public QWidget

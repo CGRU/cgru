@@ -1,14 +1,11 @@
 #include "labelversion.h"
 
+#include "watch.h"
+#include "wndtext.h"
+
 #include <QtCore/QFile>
 #include <QtGui/QPainter>
 #include <QtGui/QTextEdit>
-
-#include "../libafanasy/environment.h"
-#include "../libafqt/qenvironment.h"
-
-#include "watch.h"
-#include "wndtext.h"
 
 LabelVersion::LabelVersion( QWidget *parent):
     QWidget( parent),

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtGui/QListWidget>
-
 #include "../libafanasy/afnode.h"
+
+#include <QtGui/QListWidget>
 
 class ItemNode : public QListWidgetItem
 {

@@ -1,11 +1,11 @@
 #include "itemjobtask.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QPainter>
-
 #include "../libafqt/qenvironment.h"
 
 #include "itemjobblock.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

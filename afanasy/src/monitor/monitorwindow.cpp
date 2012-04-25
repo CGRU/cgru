@@ -1,8 +1,5 @@
 #include "monitorwindow.h"
 
-#include <QtGui/QDockWidget>
-#include <QtGui/QMenuBar>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/name_afqt.h"
@@ -10,6 +7,9 @@
 #include "listjobs.h"
 #include "listusers.h"
 #include "listrenders.h"
+
+#include <QtGui/QDockWidget>
+#include <QtGui/QMenuBar>
 
 #define AFOUTPUT
 #undef AFOUTPUT

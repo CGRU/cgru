@@ -8,7 +8,7 @@ cgru=`dirname $cgru`
 cgru_utils=$cgru/utilities
 cgru_qt=$cgru_utils/qt/4.8.1
 [ -d $cgru_qt ] || cgru_qt=$cgru_utils/qt/4.8.0
-cgru_python=$cgru_utils/python/3.2.2
+cgru_python=$cgru_utils/python/3.2.3
 
 # Setup Version:
 pushd .. > /dev/null

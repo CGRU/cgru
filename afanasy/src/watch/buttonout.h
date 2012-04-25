@@ -1,5 +1,9 @@
 #pragma once
 
+#include "watch.h"
+
+#include "../libafqt/qenvironment.h"
+
 #include <QtGui/QWidget>
 
 class ButtonOut : public QWidget

@@ -1,12 +1,12 @@
 #include "fontwidget.h"
 
-#include <QtGui/QLayout>
-#include <QtGui/QLabel>
-#include <QtGui/QLineEdit>
-
 #include "../libafqt/attr.h"
 
 #include "watch.h"
+
+#include <QtGui/QLayout>
+#include <QtGui/QLabel>
+#include <QtGui/QLineEdit>
 
 FontWidget::FontWidget( QWidget * parent, afqt::Attr * attrString):
       QWidget( parent),

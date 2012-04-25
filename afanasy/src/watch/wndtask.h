@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QtGui/QPushButton>
-
 #include "../libafanasy/name_af.h"
 
 #include "wnd.h"
+
+#include <QtGui/QPushButton>
 
 class QContextMenuEvent;
 

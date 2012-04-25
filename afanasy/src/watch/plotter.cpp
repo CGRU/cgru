@@ -1,7 +1,5 @@
 #include "plotter.h"
 
-#include "../libafqt/qenvironment.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

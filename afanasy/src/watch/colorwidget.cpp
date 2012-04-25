@@ -1,15 +1,15 @@
 #include "colorwidget.h"
 
+#include "../libafqt/qenvironment.h"
+#include "../libafqt/attrcolor.h"
+
+#include "watch.h"
+
 #include <QtGui/QColor>
 #include <QtGui/QColorDialog>
 #include <QtGui/QLayout>
 #include <QtGui/QLabel>
 #include <QtGui/QPainter>
-
-#include "../libafqt/qenvironment.h"
-#include "../libafqt/attrcolor.h"
-
-#include "watch.h"
 
 ColorWidget::ColorWidget( QWidget * parent, afqt::AttrColor * color):
       QWidget( parent),

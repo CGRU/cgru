@@ -1,12 +1,8 @@
 #include "buttonout.h"
 
-#include "watch.h"
-
 #include <QtCore/QEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QMouseEvent>
-
-#include "../libafqt/qenvironment.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT

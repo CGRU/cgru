@@ -1,11 +1,5 @@
 #include "listmonitors.h"
 
-#include <QtGui/QMenu>
-#include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QContextMenuEvent>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
 
@@ -13,6 +7,12 @@
 #include "ctrlsortfilter.h"
 #include "modelitems.h"
 #include "watch.h"
+
+#include <QtGui/QMenu>
+#include <QtCore/QEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QLayout>
+#include <QtGui/QContextMenuEvent>
 
 #define AFOUTPUT
 #undef AFOUTPUT

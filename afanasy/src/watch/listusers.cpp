@@ -1,11 +1,5 @@
 #include "listusers.h"
 
-#include <QtGui/QMenu>
-#include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QContextMenuEvent>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
@@ -14,6 +8,12 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
+
+#include <QtGui/QMenu>
+#include <QtCore/QEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QLayout>
+#include <QtGui/QContextMenuEvent>
 
 #define AFOUTPUT
 #undef AFOUTPUT

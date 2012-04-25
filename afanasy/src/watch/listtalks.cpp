@@ -1,11 +1,5 @@
 #include "listtalks.h"
 
-#include <QtGui/QMenu>
-#include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLayout>
-#include <QtGui/QContextMenuEvent>
-
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mctalkdistmessage.h"
@@ -13,6 +7,12 @@
 #include "itemtalk.h"
 #include "ctrlsortfilter.h"
 #include "watch.h"
+
+#include <QtGui/QMenu>
+#include <QtCore/QEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QLayout>
+#include <QtGui/QContextMenuEvent>
 
 #define AFOUTPUT
 #undef AFOUTPUT

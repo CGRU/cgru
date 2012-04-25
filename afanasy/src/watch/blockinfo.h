@@ -1,10 +1,10 @@
 #pragma once
 
-#include <QtGui/QPainter>
-
 #include "../include/afjob.h"
 
 #include "../libafanasy/name_af.h"
+
+#include <QtGui/QPainter>
 
 class QStyleOptionViewItem;
 class QMenu;

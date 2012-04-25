@@ -1,15 +1,15 @@
 #include "buttonmonitor.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QMenu>
-#include <QtGui/QPainter>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "wndlist.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QMenu>
+#include <QtGui/QPainter>
 
 #define AFOUTPUT
 #undef AFOUTPUT

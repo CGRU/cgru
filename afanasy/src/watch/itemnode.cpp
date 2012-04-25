@@ -1,12 +1,12 @@
 #include "itemnode.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QPainter>
-#include <QtCore/QTimer>
-
 #include "../include/afjob.h"
 
 #include "../libafqt/name_afqt.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QPainter>
+#include <QtCore/QTimer>
 
 #define AFOUTPUT
 #undef AFOUTPUT

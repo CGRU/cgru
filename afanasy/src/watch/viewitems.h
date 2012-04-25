@@ -1,5 +1,9 @@
 #pragma once
 
+#include "../libafanasy/environment.h"
+
+#include "../libafqt/qenvironment.h"
+
 #include <QtGui/QListView>
 
 #if QT_VERSION >= 0x040602

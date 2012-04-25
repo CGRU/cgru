@@ -2,10 +2,6 @@
 
 #include <limits.h>
 
-#include <QtCore/QEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMenu>
-
 #include "../libafanasy/msg.h"
 #include "../libafanasy/blockdata.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
@@ -17,6 +13,10 @@
 #include "item.h"
 #include "listitems.h"
 #include "watch.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT

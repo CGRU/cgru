@@ -6,10 +6,6 @@
 #include <QtCore/QTimer>
 #include <QtGui/QWidget>
 
-#include "../libafanasy/environment.h"
-
-#include "../libafqt/name_afqt.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

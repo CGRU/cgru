@@ -1,13 +1,5 @@
 #include "listrenders.h"
 
-#include <QtCore/QEvent>
-#include <QtCore/QTimer>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QLabel>
-#include <QtGui/QLayout>
-#include <QtGui/QMenu>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -21,6 +13,14 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
+
+#include <QtCore/QEvent>
+#include <QtCore/QTimer>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QLabel>
+#include <QtGui/QLayout>
+#include <QtGui/QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT

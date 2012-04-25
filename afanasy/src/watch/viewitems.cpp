@@ -1,17 +1,13 @@
 #include "viewitems.h"
 
+#include "item.h"
+#include "watch.h"
+#include "listitems.h"
+
 #include <QtCore/QEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QPainter>
 #include <QtGui/QScrollBar>
-
-#include "../libafanasy/environment.h"
-
-#include "../libafqt/qenvironment.h"
-
-#include "item.h"
-#include "watch.h"
-#include "listitems.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT

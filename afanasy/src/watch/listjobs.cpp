@@ -1,13 +1,5 @@
 #include "listjobs.h"
 
-#include <QtCore/QDateTime>
-#include <QtCore/QEvent>
-#include <QtCore/QTimer>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QInputDialog>
-#include <QtGui/QMenu>
-
 #include "../libafanasy/environment.h"
 #include "../libafanasy/address.h"
 
@@ -17,6 +9,14 @@
 #include "modelnodes.h"
 #include "viewitems.h"
 #include "watch.h"
+
+#include <QtCore/QDateTime>
+#include <QtCore/QEvent>
+#include <QtCore/QTimer>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QInputDialog>
+#include <QtGui/QMenu>
 
 #define AFOUTPUT
 #undef AFOUTPUT

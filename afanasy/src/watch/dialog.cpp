@@ -1,12 +1,5 @@
 #include "dialog.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QBoxLayout>
-#include <QtGui/QContextMenuEvent>
-#include <QtGui/QMenu>
-#include <QtGui/QPainter>
-#include <QtGui/QScrollArea>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -34,6 +27,13 @@
 #include "wndtask.h"
 #include "wndtext.h"
 #include "wndlist.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QBoxLayout>
+#include <QtGui/QContextMenuEvent>
+#include <QtGui/QMenu>
+#include <QtGui/QPainter>
+#include <QtGui/QScrollArea>
 
 #define AFOUTPUT
 #undef AFOUTPUT

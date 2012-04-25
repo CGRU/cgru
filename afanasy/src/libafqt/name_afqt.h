@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtNetwork/QTcpSocket>
-
 #include "../libafanasy/name_af.h"
+
+#include <QtNetwork/QTcpSocket>
 
 namespace afqt
 {

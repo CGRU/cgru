@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtGui/QWidget>
-
 #include "../libafqt/name_afqt.h"
+
+#include <QtGui/QWidget>
 
 class NumberWidget : public QWidget
 {

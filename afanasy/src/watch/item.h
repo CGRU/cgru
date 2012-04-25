@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../libafanasy/afnode.h"
+
 #include <QtGui/QItemDelegate>
 #include <QtGui/QStyleOption>
-
-#include "../libafanasy/afnode.h"
 
 class MainWidget;
 

@@ -4,8 +4,6 @@
 #include "dialog.h"
 #include "watch.h"
 
-#include "../libafqt/qenvironment.h"
-
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"

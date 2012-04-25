@@ -1,9 +1,9 @@
 #pragma once
 
+#include "../libafqt/name_afqt.h"
+
 #include <QtCore/QLinkedList>
 #include <QtCore/QStringList>
-
-#include "../libafqt/name_afqt.h"
 
 class QApplication;
 class QKeyEvent;

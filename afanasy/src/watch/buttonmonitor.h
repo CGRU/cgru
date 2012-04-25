@@ -1,9 +1,9 @@
 #pragma once
 
+#include "watch.h"
+
 #include <QtGui/QImage>
 #include <QtGui/QWidget>
-
-#include "watch.h"
 
 class ButtonMonitor : public QWidget
 {

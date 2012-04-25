@@ -1,12 +1,12 @@
 #pragma once
 
-#include <QtNetwork/QTcpServer>
-#include <QtNetwork/QTcpSocket>
-#include <QtCore/QThread>
-
 #include "../libafanasy/msg.h"
 
 #include "name_afqt.h"
+
+#include <QtNetwork/QTcpServer>
+#include <QtNetwork/QTcpSocket>
+#include <QtCore/QThread>
 
 /// Qt Server thread class.
 /** This class initialize QServer in a different thread.

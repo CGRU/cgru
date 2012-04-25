@@ -1,11 +1,5 @@
 #pragma once
 
-#include <QtGui/QBoxLayout>
-#include <QtCore/QLinkedList>
-#include <QtGui/QListWidget>
-#include <QtCore/QTimer>
-#include <QtGui/QWidget>
-
 #include "../libafanasy/msgclasses/msgclassuserhost.h"
 
 #include "../libafqt/qserver.h"
@@ -14,6 +8,12 @@
 
 #include "infoline.h"
 #include "watch.h"
+
+#include <QtGui/QBoxLayout>
+#include <QtCore/QLinkedList>
+#include <QtGui/QListWidget>
+#include <QtCore/QTimer>
+#include <QtGui/QWidget>
 
 class ButtonOut;
 class ButtonMonitor;

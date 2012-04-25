@@ -1,8 +1,8 @@
 #pragma once
 
-#include <QtCore/QString>
-
 #include "name_afqt.h"
+
+#include <QtCore/QString>
 
 class QByteArray;
 class QDomDocument;

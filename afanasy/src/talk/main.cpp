@@ -1,11 +1,11 @@
-#include <QtGui/QApplication>
-#include <QtGui/QIcon>
-
 #include "../libafanasy/environment.h"
 
 #include "../libafqt/qenvironment.h"
 
 #include "dialog.h"
+
+#include <QtGui/QApplication>
+#include <QtGui/QIcon>
 
 #define AFOUTPUT
 #undef AFOUTPUT

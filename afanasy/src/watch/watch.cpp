@@ -1,14 +1,5 @@
 #include "watch.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QProcess>
-#include <QtGui/QApplication>
-#include <QtGui/QPixmap>
-#include <QtGui/QSound>
-
-//#define _USE_MATH_DEFINES
-//#include <math.h>
-
 #include "../include/afanasy.h"
 
 #include "../libafanasy/environment.h"
@@ -25,6 +16,12 @@
 #include "wndlist.h"
 #include "wndlistenjob.h"
 #include "wndlistentask.h"
+
+#include <QtCore/QDir>
+#include <QtCore/QProcess>
+#include <QtGui/QApplication>
+#include <QtGui/QPixmap>
+#include <QtGui/QSound>
 
 #define AFOUTPUT
 #undef AFOUTPUT

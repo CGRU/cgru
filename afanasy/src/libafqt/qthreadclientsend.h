@@ -1,13 +1,13 @@
 #pragma once
 
-#include <QtCore/QThread>
-#include <QtCore/QMutex>
-#include <QtCore/QWaitCondition>
-
 #include "../libafanasy/name_af.h"
 
 #include "name_afqt.h"
 #include "qthreadclient.h"
+
+#include <QtCore/QThread>
+#include <QtCore/QMutex>
+#include <QtCore/QWaitCondition>
 
 /// Class that can send messages in a different thread.
 /** send( Msg *msg) function will write message into a buffer and execute a thread to send it,

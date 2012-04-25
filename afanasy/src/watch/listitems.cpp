@@ -1,12 +1,12 @@
 #include "listitems.h"
 
-#include <QtCore/QEvent>
-#include <QtGui/QBoxLayout>
-
 #include "item.h"
 #include "modelitems.h"
 #include "viewitems.h"
 #include "watch.h"
+
+#include <QtCore/QEvent>
+#include <QtGui/QBoxLayout>
 
 #define AFOUTPUT
 #undef AFOUTPUT
