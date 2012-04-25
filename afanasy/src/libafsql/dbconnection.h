@@ -1,11 +1,10 @@
 #pragma once
 
-#include <libpq-fe.h>
+#include "name_afsql.h"
 
 #include "../libafanasy/dlMutex.h"
 #include "../libafanasy/name_af.h"
 
-#include "name_afsql.h"
 
 class afsql::DBConnection
 {
