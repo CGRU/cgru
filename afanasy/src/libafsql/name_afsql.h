@@ -1,6 +1,10 @@
 #pragma once
 
-#include <libpq-fe.h>
+#ifdef NO_POSTGRESQL
+#	include "../libafsql/libpq-fe-empty.h"
+#else
+#	include <libpq-fe.h>
+#endif
 
 #include "../libafanasy/name_af.h"
 

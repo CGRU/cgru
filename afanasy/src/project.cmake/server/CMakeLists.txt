@@ -1,9 +1,13 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../server/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../server/*.h")
 
-find_package( PostgreSQL REQUIRED)
+find_package( PostgreSQL )
 
-include_directories( ${PostgreSQL_INCLUDE_DIRS})
+if( PostgreSQL_FOUND )
+	include_directories( ${PostgreSQL_INCLUDE_DIRS})
+else( PostgreSQL_FOUND )
+	add_definitions( -DNO_POSTGRESQL )
+endif( PostgreSQL_FOUND )
 
 add_executable(afserver ${src} ${inc})
 
