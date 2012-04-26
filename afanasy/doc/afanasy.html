@@ -163,6 +163,12 @@ Users and Jobs can have a limit for maximum running tasks number - no new tasks 
 You can limit job (and block) to start tasks on the same host.
 </p>
 
+<h4>JSON Protocol</h4>
+<p>
+Any information can be send ti and retrieved from server via JSON.
+You can send jobs and write custom GUI.
+</p>
+
 <h4>Python API</h4>
 <p>
 You can create and send job using python.
@@ -244,7 +250,43 @@ You can set some server parameter "on-the-fly".
 Change some user, job and host attributes.
 Query users, jobs, hosts attributes and traffic statistics.
 </p>
-<h4>Job Example</h4>
+
+<h4>JSON Job Example</h4>
+<pre>
+
+  {
+    "job":
+    {
+      "name"                : "job name",
+      "user_name"           : "jimmy",
+      "host_name"           : "host",
+      "blocks":[
+      {
+        "name"              : "Nuke",
+        "tasks_name"        : "frames @#@-@#@",
+        "service"           : "nuke",
+        "parser"            : "nuke",
+        "frame_first"       : 1,
+        "frame_last"        : 100,
+        "frames_per_task"   : 10,
+        "frames_inc"        : 2,
+        "command"           : "nuke -F@#@,@#@ -x scene.nk -X Write1",
+        "working_directory" : "/home/jimmy/work",
+        "files"             : "img_L.@####@.jpg;img_R.@####@.jpg"
+      }
+      ],
+      "command_post"        : "deletefiles path/to/some.scene",
+    }
+  }
+
+</pre>
+<p>
+ * This is an example of a job with a "numeric" block.
+Tasks will be created automatically on demand, and on server and on GUI side.
+By such "on-the-fly" tasks creation way Afanasy can handle jobs with a huge tasks number.
+</p>
+
+<h4>Python Job Example</h4>
 <pre>
 
    #!/usr/bin/env python

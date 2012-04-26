@@ -18,9 +18,9 @@ function debianArch(){
    packages="$packages python-qt4"
    packages="$packages p7zip-full"
    packages="$packages git-core"
-   packages="$packages libzip1 libzip-dev"
+   packages="$packages libzip2 libzip-dev"
    # ImageMagick:
-   packages="$packages libjpeg62 libjpeg62-dev"
+   #packages="$packages libjpeg62 libjpeg62-dev"
    packages="$packages libtiff4 libtiff4-dev"
    packages="$packages libpng12-0 libpng12-dev"
    packages="$packages libfreetype6 libfreetype6-dev"

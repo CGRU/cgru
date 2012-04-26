@@ -259,12 +259,48 @@ af::Msg * msgsendtoaddress( const af::Msg * i_msg, const af::Address & i_address
         return NULL;
     }
 
+
+	// Read JSON answer:
+	if( i_msg->type() == af::Msg::TJSON )
+	{
+		static const int read_buf_len = 4096;
+		char read_buf[read_buf_len];
+		std::string buffer;
+		while( buffer.size() <= af::Msg::SizeDataMax )
+		{
+			#ifdef WINNT
+			int r = recv( socketfd, read_buf, read_buf_len, 0);
+			#else
+			int r = read( socketfd, read_buf, read_buf_len);
+			#endif
+			if( r <= 0 )
+				break;
+			buffer += std::string( read_buf, r);
+		}
+
+		af::Msg * o_msg = NULL;
+		if( buffer.size())
+		{
+			o_msg = new af::Msg();
+			o_msg->setData( buffer.size(), buffer.c_str(), af::Msg::TJSON);
+			io_ok = true;
+		}
+		else
+		{
+			AFERROR("af::msgsendtoaddress: Reading JSON answer failed.");
+			io_ok = false;
+		}
+
+    	closesocket(socketfd);
+		return o_msg;
+	}
+
     //
-    // read answer
+    // Read binary answer:
     af::Msg * o_msg = new af::Msg();
     if( false == af::msgread( socketfd, o_msg))
     {
-       AFERROR("MsgAf::request: reading message failed.\n");
+       AFERROR("af::msgsendtoaddress: Reading answer message failed.");
        closesocket( socketfd);
        delete o_msg;
        io_ok = false;
