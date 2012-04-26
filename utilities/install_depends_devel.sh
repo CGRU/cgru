@@ -6,7 +6,7 @@ source ./distribution.sh
 
 # List packages:
 
-packages="yasm p7zip ruby wget inkscape cmake"
+packages="yasm p7zip ruby wget inkscape cmake subversion"
 packages_noarch="rubygems"
 
 # Packages for Debian distributives:
@@ -18,7 +18,7 @@ function debianArch(){
    packages="$packages python-qt4"
    packages="$packages p7zip-full"
    packages="$packages git-core"
-   packages="$packages libzip2 libzip-dev"
+   packages="$packages libzip1 libzip-dev"
    # ImageMagick:
    #packages="$packages libjpeg62 libjpeg62-dev"
    packages="$packages libtiff4 libtiff4-dev"
@@ -97,10 +97,7 @@ case ${DISTRIBUTIVE} in
    AltLinux)
       altArch
       ;;
-   Debian)
-      debianArch
-      ;;
-   Ubuntu)
+   Debian|Ubuntu|Mint)
       debianArch
       ;;
    openSUSE)

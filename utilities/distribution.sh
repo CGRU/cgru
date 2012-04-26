@@ -2,8 +2,8 @@
 
 echo "Detecting UNIX distribution..."
 
-distskeys="Debian Ubuntu CentOS Fedora openSUSE Simply Gentoo"
-knowndists="Debian Ubuntu CentOS Fedora openSUSE AltLinux MacOSX Gentoo"
+distskeys="Debian Ubuntu CentOS Fedora openSUSE Simply Gentoo Mint"
+knowndists="Debian Ubuntu CentOS Fedora openSUSE AltLinux MacOSX Gentoo Mint"
 
 if [ `uname` == "Darwin" ]; then
    export DISTRIBUTIVE="MacOSX"
@@ -71,6 +71,10 @@ case ${DISTRIBUTIVE} in
    Ubuntu)
       debianArch
       export VERSION_NAME="ubuntu${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
+      ;;
+   Mint)
+      debianArch
+      export VERSION_NAME="mint${DISTRIBUTIVE_VERSION}_${ARCHITECTURE}"
       ;;
    openSUSE)
       redhatArch
