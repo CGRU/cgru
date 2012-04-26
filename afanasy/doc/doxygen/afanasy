@@ -584,7 +584,6 @@ WARN_LOGFILE           =
 INPUT                  = ../../src/libafanasy \
                          ../../src/libafanasy/msgclasses \
                          ../../src/libafsql \
-                         ../../src/libafnetwork \
                          ../../src/server \
                          ../../src/cmd \
                          ../../src/include

@@ -583,7 +583,6 @@ WARN_LOGFILE           =
 
 INPUT                  = ../../src/libafanasy \
                          ../../src/libafanasy/msgclasses \
-                         ../../src/libafqt \
                          ../../src/render
 
 # This tag can be used to specify the character encoding of the source files
