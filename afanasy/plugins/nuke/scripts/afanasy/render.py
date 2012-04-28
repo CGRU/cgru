@@ -163,7 +163,8 @@ class BlockParameters:
             octx.setView( 1 + nuke.views().index(view))
             # If frame first and frame last are equal no sequence needed
             if self.framefirst == self.framelast:
-               images += fileknob.getEvaluatedValue( octx)
+               octx.setFrame( self.framefirst)
+               self.imgfile += fileknob.getEvaluatedValue( octx)
             else:
                # Get files from first and last frames to calculate frames pattern:
                octx.setFrame( self.framefirst)
