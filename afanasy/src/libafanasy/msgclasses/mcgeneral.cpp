@@ -79,6 +79,17 @@ bool MCGeneral::hasId( int value)
    return false;
 }
 
+void MCGeneral::setList( const std::list<int32_t> & i_list)
+{
+	list.clear();
+	std::list<int32_t>::const_iterator it = i_list.begin();
+	while( it != i_list.end())
+	{
+		list.push_back(*it);
+		it++;
+	}
+}
+
 void MCGeneral::generateInfoStream( std::ostringstream & stream, bool full) const
 {
    MsgClassUserHost::generateInfoStream( stream, false);

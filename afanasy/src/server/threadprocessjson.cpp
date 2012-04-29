@@ -1,5 +1,7 @@
 #include "afcommon.h"
 #include "jobcontainer.h"
+#include "monitoraf.h"
+#include "monitorcontainer.h"
 #include "rendercontainer.h"
 #include "threadargs.h"
 #include "usercontainer.h"
@@ -21,14 +23,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 
     af::Msg * o_msg_response = NULL;
-
-	if( document.HasMember("job"))
-	{
-		// No containers locks needed here.
-		// Job registration is a complex procedure.
-		// It locks and unlocks needed containers itself.
-		i_args->jobs->job_register( new JobAf( document["job"]), i_args->users, i_args->monitors);
-	}
 
 	JSON & getObj = document["get"];
 	if( getObj.IsObject())
@@ -80,16 +74,30 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
 		}
 	}
-
-	if( document.HasMember("action"))
+	else if( document.HasMember("action"))
 	{
 		i_args->msgQueue->pushMsg( i_msg);
-		delete [] data;
-		return NULL;
+		// To not to detele it, set to NULL, as it pushed to another queue
+		i_msg = NULL; //< To not to detele it, as it pushed to another queue
+	}
+	else if( document.HasMember("job"))
+	{
+		// No containers locks needed here.
+		// Job registration is a complex procedure.
+		// It locks and unlocks needed containers itself.
+		i_args->jobs->job_register( new JobAf( document["job"]), i_args->users, i_args->monitors);
+	}
+	else if( document.HasMember("monitor"))
+	{
+		AfContainerLock lock( i_args->monitors, AfContainerLock::WRITELOCK);
+		MonitorAf * newMonitor = new MonitorAf( document["monitor"]);
+		newMonitor->setAddressIP( i_msg->getAddress());
+		o_msg_response = i_args->monitors->addMonitor( newMonitor);
 	}
 
+
 	delete [] data;
-	delete i_msg;
+	if( i_msg ) delete i_msg;
 
 	return o_msg_response;
 }

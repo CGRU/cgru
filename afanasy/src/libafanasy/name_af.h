@@ -128,6 +128,8 @@ namespace af
    const std::string time2str( time_t time_sec = time( NULL), const char * time_format = NULL);
    const std::string time2strHMS( int time32, bool clamp = false);
 
+	bool addUniqueToList( std::list<int32_t> & o_list, int i_value);
+
 	void printTime( time_t time_sec = time( NULL), const char * time_format = NULL);
 
 	void printAddress( struct sockaddr_storage * i_ss );

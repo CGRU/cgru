@@ -129,6 +129,7 @@ int main(int argc, char *argv[])
 
     MonitorContainer monitors;
     if( false == monitors.isInitialized()) return 1;
+	MonitorAf::setMonitorContainer( &monitors);
 
     // Message Queue initialization, but without thread start.
     // Run cycle queue will read this messages itself.

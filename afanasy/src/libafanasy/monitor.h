@@ -15,11 +15,16 @@ public:
 /// Construct Monitor from buffer.
    Monitor( Msg * msg);
 
+	/// Construct Monitor from JSON:
+	Monitor( const JSON & obj);
+
    virtual ~Monitor();
+
+	inline bool isListeningPort() const { return m_listening_port; }
 
    bool hasEvent( int type) const;
 
-   inline long long getTimeActivity()      const { return time_activity;       }
+   inline long long getTimeActivity()      const { return m_time_activity;     }
    inline size_t    getJobsUsersIdsCount() const { return jobsUsersIds.size(); }
    inline size_t    getJobsIdsCount()      const { return jobsIds.size();      }
 
@@ -35,10 +40,12 @@ protected:
    bool  *  events;
    std::list<int32_t> jobsUsersIds;
    std::list<int32_t> jobsIds;
-   int64_t time_activity;     ///< Last activity
+   int64_t m_time_activity;     ///< Last activity
 
 private:
    bool construct();
    void readwrite( Msg * msg); ///< Read or write Monitor in buffer.
+
+	bool m_listening_port;
 };
 }

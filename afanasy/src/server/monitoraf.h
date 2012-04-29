@@ -8,6 +8,8 @@ public:
 
    MonitorAf( af::Msg * msg);
 
+	MonitorAf( const JSON & obj);
+
    ~MonitorAf();
 
    void setZombie();
@@ -27,10 +29,14 @@ public:
 
    bool hasJobId( int m_id) const;
 
+	static void setMonitorContainer( MonitorContainer * i_monitors) { m_monitors = i_monitors;}
+
 private:
-   void setEvents( const af::MCGeneral & ids, bool value);
-   void setJobsUsersIds( const af::MCGeneral & ids);
-   void addJobIds( const af::MCGeneral & ids);
-   void setJobIds( const af::MCGeneral & ids);
-   void delJobIds( const af::MCGeneral & ids);
+   void setEvents( const std::vector<int32_t> & i_ids, bool value);
+   void setJobsUsersIds( const std::vector<int32_t> & i_ids);
+   void addJobIds( const std::vector<int32_t> & i_ids);
+   void setJobIds( const std::vector<int32_t> & i_ids);
+   void delJobIds( const std::vector<int32_t> & i_ids);
+
+	static MonitorContainer * m_monitors;
 };

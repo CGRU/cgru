@@ -14,7 +14,7 @@ class Client : public Node
 public:
 
 /// Construct client, getting values from environment.
-   Client( int m_flags, int Id);
+   Client( int i_flags, int Id);
 
    enum Flags{
       DoNotGetAnyValues    = 0,

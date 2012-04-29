@@ -4,6 +4,8 @@
 
 #include "../libafanasy/taskprogress.h"
 
+#include "monitoraf.h"
+
 class MonitorAf;
 class UserAf;
 
@@ -37,8 +39,6 @@ public:
 
 private:
 
-   static bool addUniqueToList( std::list<int32_t> & list, int value);
-
    std::list<int32_t> * events;
    int eventsCount;
 
@@ -54,8 +54,6 @@ private:
    std::list<UserAf*> users;
 
    void clearEvents();
-
-   static bool collectIds( const std::list<int32_t> & list, af::MCGeneral & ids);
 };
 
 /// Monitors interator.

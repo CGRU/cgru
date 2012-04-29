@@ -523,7 +523,7 @@ const char * Msg::TNAMES[]=
     "TRESERVED05",
     "TRESERVED06",
     "TRESERVED07",
-    "TRESERVED08",
+	"TMonitorLogRequestId",       ///< Request a log of a Monitor with given id.
     "TRESERVED09",
 
     /*---------------------------------------------------------------------------------------------------------*/

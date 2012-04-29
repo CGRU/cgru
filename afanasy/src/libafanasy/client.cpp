@@ -11,13 +11,13 @@
 
 using namespace af;
 
-Client::Client( int flags, int Id):
+Client::Client( int i_flags, int Id):
 	m_time_launch( 0),
 	m_time_register( 0),
 	m_time_update( 0)
 {
    m_id = Id;
-   if( flags & GetEnvironment )
+   if( i_flags & GetEnvironment )
    {
       bool verbose = false;
 #ifdef WINNT

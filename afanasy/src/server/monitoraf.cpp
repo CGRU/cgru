@@ -10,8 +10,15 @@
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
 
+MonitorContainer * MonitorAf::m_monitors = NULL;
+
 MonitorAf::MonitorAf( af::Msg * msg):
    af::Monitor( msg)
+{
+}
+
+MonitorAf::MonitorAf( const JSON & obj):
+	af::Monitor( obj)
 {
 }
 
@@ -41,21 +48,49 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 	const JSON & operation = i_action["operation"];
 	if( operation.IsObject())
 	{
-		std::string type;
-		af::jr_string("type", type, operation);
-		if( type == "exit")
+		std::string optype;
+		af::jr_string("type", optype, operation);
+		if( optype == "exit")
 		{
 			af::Msg* msg = new af::Msg( af::Msg::TClientExitRequest);
 			msg->setAddress( this);
 			AFCommon::QueueMsgDispatch( msg);
 			return;
 		}
-		else
+		if( optype == "watch")
 		{
-			appendLog("Unknown operation \"" + type + "\" by " + i_author);
+			std::string opclass, opstatus;
+			af::jr_string("class", opclass, operation);
+			af::jr_string("status", opstatus, operation);
+			bool subscribe = false;
+			std::vector<int32_t> ids;
+			if( opstatus == "subscribe")
+				subscribe = true;
+			if( opclass == "renders")
+			{
+				ids.push_back( af::Msg::TMonitorRendersAdd);
+				ids.push_back( af::Msg::TMonitorRendersChanged);
+				ids.push_back( af::Msg::TMonitorRendersDel);
+			}
+			else
+			{
+				appendLog("Unknown operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
+				return;
+			}
+			if( ids.size())
+			{
+				setEvents( ids, subscribe);
+				m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
+				appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
+			}
 			return;
 		}
-		appendLog("Operation \"" + type + "\" by " + i_author);
+		else
+		{
+			appendLog("Unknown operation \"" + optype + "\" by " + i_author);
+			return;
+		}
+		appendLog("Operation \"" + optype + "\" by " + i_author);
 	}
 }
 
@@ -80,38 +115,38 @@ bool MonitorAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
 
 bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
 {
-   time_activity = time( NULL);
+   m_time_activity = time( NULL);
 //printf("MonitorAf::setInterest: [%s]:\n", af::Msg::TNAMES[type]);
    switch(type)
    {
       case af::Msg::TMonitorSubscribe:
       {
-         setEvents( ids, true);
+         setEvents( ids.getList(), true);
          break;
       }
       case af::Msg::TMonitorUnsubscribe:
       {
-         setEvents( ids, false);
+         setEvents( ids.getList(), false);
          break;
       }
       case af::Msg::TMonitorUsersJobs:
       {
-         setJobsUsersIds( ids);
+         setJobsUsersIds( ids.getList());
          break;
       }
       case af::Msg::TMonitorJobsIdsAdd:
       {
-         addJobIds( ids);
+         addJobIds( ids.getList());
          break;
       }
       case af::Msg::TMonitorJobsIdsSet:
       {
-         setJobIds( ids);
+         setJobIds( ids.getList());
          break;
       }
       case af::Msg::TMonitorJobsIdsDel:
       {
-         delJobIds( ids);
+         delJobIds( ids.getList());
          break;
       }
       default:
@@ -123,29 +158,28 @@ bool MonitorAf::setInterest( int type, const af::MCGeneral & ids)
    return true;
 }
 
-void MonitorAf::setJobsUsersIds( const af::MCGeneral & ids)
+void MonitorAf::setJobsUsersIds( const std::vector<int32_t> & i_ids)
 {
-   int count = ids.getCount();
-   jobsUsersIds.clear();
-   for( int i = 0; i < count; i++) jobsUsersIds.push_back( ids.getId( i));
+	jobsUsersIds.clear();
+	for( int i = 0; i < i_ids.size(); i++)
+		jobsUsersIds.push_back( i_ids[i]);
 }
 
-void MonitorAf::setEvents( const af::MCGeneral & ids, bool value)
+void MonitorAf::setEvents( const std::vector<int32_t> & i_ids, bool value)
 {
-   int count = ids.getCount();
-   for( int i = 0; i < count; i++)
-   {
-      int eventNum = ids.getId(i) - EventsShift;
-//printf("MonitorAf::setEvents: [%s] - %s\n", af::Msg::TNAMES[ids.getId(i)], value ? "ADD" : "DEL");
-      if((eventNum >= 0) && (eventNum < EventsCount))
-      {
-         events[eventNum] = value;
-      }
-      else
-      {
-         AFERRAR("MonitorAf::addEvent: Invalid event: [%s]\n", af::Msg::TNAMES[ids.getId(i)]);
-      }
-   }
+	for( int i = 0; i < i_ids.size(); i++)
+	{
+		int eventNum = i_ids[i] - EventsShift;
+		//printf("MonitorAf::setEvents: [%s] - %s\n", af::Msg::TNAMES[ids.getId(i)], value ? "ADD" : "DEL");
+		if((eventNum >= 0) && (eventNum < EventsCount))
+		{
+			events[eventNum] = value;
+		}
+		else
+		{
+			AFERRAR("MonitorAf::addEvent: Invalid event: %d\n", i_ids[i]);
+		}
+	}
 }
 
 bool MonitorAf::hasJobUid( int uid) const
@@ -169,35 +203,31 @@ bool MonitorAf::hasJobEvent( int type, int uid) const
 
 bool MonitorAf::hasJobId( int id) const
 {
-   for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
-   {
-      if( *it == id) return true;
-   }
-   return false;
+	for( std::list<int32_t>::const_iterator it = jobsIds.begin(); it != jobsIds.end(); it++)
+	{
+		if( *it == id) return true;
+	}
+	return false;
 }
 
-void MonitorAf::addJobIds( const af::MCGeneral & ids)
+void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 {
-   int count = ids.getCount();
-   for( int i = 0; i < count; i++)
-   {
-      int id = ids.getId(i);
-      if( hasJobId( id) == false)
-      {
-         jobsIds.push_back( id);
-      }
-   }
+	for( int i = 0; i < i_ids[i]; i++)
+	{
+		if( hasJobId( i_ids[i]) == false)
+		{
+			jobsIds.push_back( i_ids[i]);
+		}
+	}
 }
 
-void MonitorAf::setJobIds( const af::MCGeneral & ids)
+void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
 {
-   int count = ids.getCount();
-   jobsIds.clear();
-   for( int i = 0; i < count; i++) jobsIds.push_back( ids.getId(i));
+	jobsIds.clear();
+	for( int i = 0; i < i_ids.size(); i++) jobsIds.push_back( i_ids[i]);
 }
 
-void MonitorAf::delJobIds( const af::MCGeneral & ids)
+void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
-   int count = ids.getCount();
-   for( int i = 0; i < count; i++) jobsIds.remove( ids.getId(i));
+	for( int i = 0; i < i_ids.size(); i++) jobsIds.remove( i_ids[i]);
 }

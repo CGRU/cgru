@@ -40,6 +40,9 @@ public:
 
    inline const std::vector<int32_t> & getList() const { return list; }
 
+	void setList( const std::list<int32_t> & i_list);
+	inline void setList( const std::vector<int32_t> & i_list) { list = i_list;}
+
    inline void clearIds() { list.clear(); }
 
 private:

@@ -14,17 +14,31 @@ const int Monitor::EventsShift = af::Msg::TMonitorEvents_BEGIN + 1;
 const int Monitor::EventsCount = af::Msg::TMonitorEvents_END - Monitor::EventsShift;
 
 Monitor::Monitor():
-   Client( Client::GetEnvironment, 0)
+   Client( Client::GetEnvironment, 0),
+	m_listening_port(true)
 {
    construct();
    m_name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + m_address.generatePortString().c_str();
 }
 
 Monitor::Monitor( Msg * msg):
-   Client( Client::DoNotGetAnyValues, 0)
+   Client( Client::DoNotGetAnyValues, 0),
+	m_listening_port(true)
 {
    if( construct() == false) return;
    read( msg);
+}
+
+Monitor::Monitor( const JSON & obj):
+   Client( Client::DoNotGetAnyValues, 0),
+	m_listening_port(false)
+{
+	m_time_launch = time(NULL);
+	m_time_activity = 0;
+	construct();
+	jr_string("name",      m_name,      obj);
+	jr_string("user_name", m_user_name, obj);
+	jr_string("version",   m_version,   obj);
 }
 
 bool Monitor::construct()
@@ -49,9 +63,9 @@ void Monitor::readwrite( Msg * msg)
    rw_int32_t( m_id,            msg);
    rw_int64_t( m_time_launch,   msg);
    rw_int64_t( m_time_register, msg);
-   rw_int64_t( time_activity, msg);
+   rw_int64_t( m_time_activity, msg);
    rw_String ( m_name,          msg);
-   rw_String ( m_user_name,      msg);
+   rw_String ( m_user_name,     msg);
    rw_String ( m_version,       msg);
 
    for( int e = 0; e < EventsCount; e++) rw_bool( events[e], msg);
@@ -84,7 +98,8 @@ void Monitor::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Version: " << m_version;
       stream << "\n Launch Time: " + af::time2str( m_time_launch);
       stream << "\n Register Time: " + af::time2str( m_time_register);
-      stream << "\n Time Activity: " + af::time2str( time_activity);
+		if( m_time_activity )
+			stream << "\n Time Activity: " + af::time2str( m_time_activity);
 
       stream << "\n UIds[" << jobsUsersIds.size() << "]:";
       for( std::list<int32_t>::const_iterator it = jobsUsersIds.begin(); it != jobsUsersIds.end(); it++)

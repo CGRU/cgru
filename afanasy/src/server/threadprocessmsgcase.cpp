@@ -184,6 +184,20 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
       o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList, ids);
       break;
    }
+	case af::Msg::TMonitorLogRequestId:
+	{
+		AfContainerLock lock( i_args->monitors,  AfContainerLock::READLOCK);
+
+		MonitorContainerIt it( i_args->monitors);
+		MonitorAf* node = it.getMonitor( i_msg->int32());
+		if( node == NULL )
+		{ // FIXME: Better to return some message in any case.
+			break;
+		}
+		o_msg_response = new af::Msg();
+		o_msg_response->setStringList( node->getLog());
+		break;
+	}
 
 // ---------------------------------- Talk ---------------------------------//
     case af::Msg::TTalkRegister:

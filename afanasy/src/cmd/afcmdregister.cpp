@@ -54,6 +54,7 @@ void AfCmd::RegisterCommands()
     addCmd( new CmdTalkList);
 
     addCmd( new CmdMonitorList);
+    addCmd( new CmdMonitorLog);
 
     addCmd( new CmdRenderList);
     addCmd( new CmdRenderPriority);

@@ -370,6 +370,17 @@ void af::rw_uint32( uint32_t& integer, char * data, bool write)
    }
 }
 
+bool af::addUniqueToList( std::list<int32_t> & o_list, int i_value)
+{
+	std::list<int32_t>::iterator it = o_list.begin();
+	std::list<int32_t>::iterator end_it = o_list.end();
+	while( it != end_it)
+		if( (*it++) == i_value)
+			return false;
+	o_list.push_back( i_value);
+	return true;
+}
+
 int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
 {
 	for( int task = i_startFrom; task < i_quantity; task++)

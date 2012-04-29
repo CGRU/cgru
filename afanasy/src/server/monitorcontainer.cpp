@@ -9,7 +9,6 @@
 #include "../libafanasy/msg.h"
 
 #include "afcommon.h"
-#include "monitoraf.h"
 #include "useraf.h"
 
 #define AFOUTPUT
@@ -82,7 +81,7 @@ void MonitorContainer::addEvent( int type, int id)
    }
 //printf("MonitorContainer::addEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
    int typeNum = type - af::Msg::TMonitorCommonEvents_BEGIN -1;
-   addUniqueToList( events[typeNum], id);
+   af::addUniqueToList( events[typeNum], id);
 }
 
 void MonitorContainer::addJobEvent( int type, int id, int uid)
@@ -94,16 +93,7 @@ void MonitorContainer::addJobEvent( int type, int id, int uid)
    }
 //printf("MonitorContainer::addJobEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
    int typeNum = type - af::Msg::TMonitorJobEvents_BEGIN -1;
-   if( addUniqueToList( jobEvents[typeNum], id)) jobEventsUids[typeNum].push_back( uid);
-}
-
-bool MonitorContainer::addUniqueToList( std::list<int32_t> & list, int value)
-{
-   std::list<int32_t>::iterator it = list.begin();
-   std::list<int32_t>::iterator end_it = list.end();
-   while( it != end_it) if( (*it++) == value) return false;
-   list.push_back( value);
-   return true;
+   if( af::addUniqueToList( jobEvents[typeNum], id)) jobEventsUids[typeNum].push_back( uid);
 }
 
 void MonitorContainer::dispatch()
@@ -118,8 +108,6 @@ void MonitorContainer::dispatch()
       int eventType = af::Msg::TMonitorCommonEvents_BEGIN+1 + e;
 //printf("MonitorContainer::dispatch: [%s]\n", af::Msg::TNAMES[eventType]);
       af::Msg * msg = NULL;
-//      af::Msg * msg = new af::Msg( eventType, &mcIds );
-//      bool founded = false;
       MonitorContainerIt monitorsIt( this);
       for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
       {
@@ -128,7 +116,8 @@ void MonitorContainer::dispatch()
             if( msg == NULL )
             {
                af::MCGeneral mcIds;
-               collectIds( events[e], mcIds );
+//               collectIds( events[e], mcIds );
+				mcIds.setList( events[e]);
                msg = new af::Msg( eventType, &mcIds );
             }
             msg->addAddress( monitor);
@@ -137,7 +126,6 @@ void MonitorContainer::dispatch()
       if( msg )
       {
           AFCommon::QueueMsgDispatch( msg);
-//printf("MonitorContainer::dispatch: ");msg->stdOut();
       }
    }
 
@@ -265,7 +253,7 @@ void MonitorContainer::dispatch()
    //
    clearEvents();
 }
-
+/*
 bool MonitorContainer::collectIds( const std::list<int32_t> & list, af::MCGeneral & ids)
 {
    std::list<int32_t>::const_iterator it = list.begin();
@@ -274,7 +262,7 @@ bool MonitorContainer::collectIds( const std::list<int32_t> & list, af::MCGenera
    if( ids.getCount()) return true;
    else return false;
 }
-
+*/
 void MonitorContainer::clearEvents()
 {
    for( int e = 0; e < eventsCount; e++) events[e].clear();

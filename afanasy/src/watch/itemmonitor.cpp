@@ -46,7 +46,10 @@ void ItemMonitor::updateValues( af::Node *node, int type)
    af::Monitor *monitor = (af::Monitor*)node;
 
    time_activity = monitor->getTimeActivity();
-   time_activity_str = TimeActivity.arg( afqt::time2Qstr( time_activity ));
+	if( time_activity )
+		time_activity_str = TimeActivity.arg( afqt::time2Qstr( time_activity ));
+	else
+		time_activity_str = TimeActivity.arg( "no activity");
 
    events.clear();
    eventscount = 0;
