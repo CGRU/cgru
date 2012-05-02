@@ -20,7 +20,7 @@ public:
 
    virtual ~Monitor();
 
-	inline bool isListeningPort() const { return m_listening_port; }
+//	inline bool isListeningPort() const { return m_listening_port; }
 
    bool hasEvent( int type) const;
 
@@ -35,6 +35,8 @@ public:
 
    static const int EventsCount;
    static const int EventsShift;
+	static const char EventsNames[18][32];
+//	static const char EventsClasses[18][32];
 
 protected:
    bool  *  events;
@@ -45,7 +47,6 @@ protected:
 private:
    bool construct();
    void readwrite( Msg * msg); ///< Read or write Monitor in buffer.
-
-	bool m_listening_port;
+	//bool m_listening_port;
 };
 }

@@ -1,0 +1,15 @@
+{
+	"action":
+	{
+		"user_name"  : "jimmy",
+		"host_name"  : "pc01",
+		"ids"        : [2],
+		"type"       : "monitors",
+		"operation"  :
+		{
+			"type"   : "watch",
+			"class"  : "renders",
+			"status" : "subscribe"
+		}
+	}
+}

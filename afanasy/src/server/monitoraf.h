@@ -31,12 +31,20 @@ public:
 
 	static void setMonitorContainer( MonitorContainer * i_monitors) { m_monitors = i_monitors;}
 
+	inline bool collectingEvents() { return m_events_ids != NULL;}
+
+	void addEvents( int i_type, const std::list<int32_t> i_ids);
+
+	af::Msg * getEvents();
+
 private:
    void setEvents( const std::vector<int32_t> & i_ids, bool value);
    void setJobsUsersIds( const std::vector<int32_t> & i_ids);
    void addJobIds( const std::vector<int32_t> & i_ids);
    void setJobIds( const std::vector<int32_t> & i_ids);
    void delJobIds( const std::vector<int32_t> & i_ids);
+
+	std::list<int32_t> * m_events_ids;
 
 	static MonitorContainer * m_monitors;
 };

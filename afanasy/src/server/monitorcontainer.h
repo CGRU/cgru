@@ -16,8 +16,8 @@ public:
    MonitorContainer();
    ~MonitorContainer();
 
-/// Add new Monitor to container.
-   af::Msg* addMonitor( MonitorAf *newMonitor);
+	/// Add new Monitor to container.
+	af::Msg * addMonitor( MonitorAf * i_monitor, bool i_json = false);
 
    void sendMessage( const af::MCGeneral & mcgeneral);
 
@@ -40,7 +40,6 @@ public:
 private:
 
    std::list<int32_t> * events;
-   int eventsCount;
 
    std::list<int32_t> * jobEvents;
    std::list<int32_t> * jobEventsUids;

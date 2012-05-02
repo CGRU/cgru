@@ -415,8 +415,11 @@ void Msg::stdOutData( bool withHeader)
    case Msg::TDATA:
    case Msg::TJSON:
    {
-      if( m_data[0] != '/') printf( "%s\n", m_data);
-      break;
+		if( m_data[0] == '/')
+			break;
+		::write( 1, m_data, m_int32);
+		::write( 1, "\n", 1);
+		break;
    }
    case Msg::TTESTDATA:
    {

@@ -1,14 +1,8 @@
-function msgReceived( obj)
-{
-	for( i = 0; i < recievers.length; i++)
-	{
-		recievers[i].processMsg( obj);
-	}
-}
-
 function send( obj)
 {
-	obj_str = JSON.stringify(obj);
+	var obj_str = JSON.stringify(obj);
+
+document.getElementById('send').innerHTML='c' + g_cycle + ' send: ' + obj_str;
 
 	//document.getElementById("test").innerHTML='' + obj_str.length + ':' + obj_str;
 	var xhr = new XMLHttpRequest;
@@ -28,7 +22,7 @@ function send( obj)
 		{
 			if( xhr.status == 200 )
 			{
-				msgReceived( eval('('+xhr.responseText+')'));
+				processMsg( eval('('+xhr.responseText+')'));
 			}
 		}
 	};
@@ -40,4 +34,46 @@ function send( obj)
 	}
 	document.getElementById("finish").innerHTML="It works!";
 */
+}
+
+function subscribe( i_class)
+{
+	if( g_id == 0 ) return;
+
+	var obj = {};
+	obj.action = {};
+	obj.action.user_name = g_user_name;
+	obj.action.host_name = g_host_name;
+	obj.action.type = "monitors";
+	obj.action.ids = [g_id];
+	obj.action.operation = {};
+	obj.action.operation.type = "watch";
+	obj.action.operation.class = i_class;
+	obj.action.operation.status = "subscribe";
+
+	send(obj);
+}
+
+function getEvents()
+{
+	if( g_id == 0 ) return;
+//info('c' + g_cycle + ' getting events...');
+	var obj = {};
+	obj.get = {};
+	obj.get.type = 'monitors';
+	obj.get.ids = [g_id];
+	obj.get.mode = 'events';
+
+	send(obj);
+}
+
+function getNodes( i_type, i_ids)
+{
+	var obj = {};
+	obj.get = {};
+	obj.get.type = i_type;
+	if(( i_ids != null ) && ( i_ids.length > 0 ))
+		obj.get.ids = i_ids
+
+	send(obj);
 }

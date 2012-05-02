@@ -1,0 +1,8 @@
+{
+	"get":
+	{
+		"type" : "monitors",
+		"ids"  : [2],
+		"mode" : "events"
+	}
+}

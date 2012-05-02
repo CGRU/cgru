@@ -56,6 +56,16 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 	return data;
 }
 
+af::Msg * af::jsonMsg( const char * i_str)
+{
+	int len = strlen( i_str);
+	if( len > 10000 )
+		return NULL;
+	af::Msg * o_msg = new af::Msg();
+	o_msg->setData( len, i_str, af::Msg::TJSON);
+	return o_msg;
+}
+
 bool af::jr_regexp( const char * i_name, RegExp & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & value = i_object[i_name];

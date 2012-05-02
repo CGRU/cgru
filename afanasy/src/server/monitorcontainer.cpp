@@ -18,13 +18,11 @@
 MonitorContainer::MonitorContainer():
    ClientContainer( "Monitors", AFTALK::MAXCOUNT),
    events( NULL),
-   eventsCount( 0),
    jobEvents( NULL),
    jobEventsUids( NULL),
    jobEventsCount( 0)
 {
-   eventsCount = af::Msg::TMonitorCommonEvents_END - af::Msg::TMonitorCommonEvents_BEGIN - 1;
-   events = new std::list<int32_t>[ eventsCount];
+   events = new std::list<int32_t>[ af::Monitor::EventsCount];
    jobEventsCount = af::Msg::TMonitorJobEvents_END - af::Msg::TMonitorJobEvents_BEGIN - 1;
    jobEvents     = new std::list<int32_t>[ jobEventsCount];
    jobEventsUids = new std::list<int32_t>[ jobEventsCount];
@@ -39,15 +37,46 @@ AFINFO("MonitorContainer::~MonitorContainer:\n");
    if( jobEventsUids != NULL ) delete [] jobEventsUids;
 }
 
-af::Msg * MonitorContainer::addMonitor( MonitorAf *newMonitor)
+af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
 {
-   int id = addClient( newMonitor, true, this, af::Msg::TMonitorMonitorsDel);
-   if( id != 0 )
-   {
-      AFCommon::QueueLog("Monitor registered: " + newMonitor->generateInfoString( false));
-      addEvent( af::Msg::TMonitorMonitorsAdd, id);
-   }
-   return new af::Msg( af::Msg::TMonitorId, id);
+	int id = 0;
+	if( i_json )
+	{
+		// Considering that JSON monitors does not listening any port.
+		// So we do not need check whether another client with the same address exists.
+		id = add( i_monitor);
+		if( id == 0 )
+		{
+			delete i_monitor;
+		}
+		else
+		{
+			i_monitor->setRegisterTime();
+		}
+	}
+	else
+	{
+		// If client is listening a port, it has an address.
+		// We should delete older client with the same address,
+		// that is why monitor container pointer and event type is needed.
+		id = addClient( i_monitor, true, this, af::Msg::TMonitorMonitorsDel);
+	}
+
+	if( id != 0 )
+	{
+		AFCommon::QueueLog("Monitor registered: " + i_monitor->generateInfoString( false));
+		addEvent( af::Msg::TMonitorMonitorsAdd, id);
+	}
+
+	if( i_json == false )
+		return new af::Msg( af::Msg::TMonitorId, id);
+
+	std::string data = "{\"id\":";
+	data += af::itos(id);
+	data += "}";
+	af::Msg * msg = new af::Msg();
+	msg->setData( data.size(), data.c_str(), af::Msg::TJSON);
+	return msg;
 }
 
 bool MonitorContainer::setInterest( int type, af::MCGeneral & ids)
@@ -80,7 +109,7 @@ void MonitorContainer::addEvent( int type, int id)
       return;
    }
 //printf("MonitorContainer::addEvent: [%s] (%d<%d<%d)\n", af::Msg::TNAMES[type], af::Msg::TMonitorCommonEvents_BEGIN, type, af::Msg::TMonitorCommonEvents_END);
-   int typeNum = type - af::Msg::TMonitorCommonEvents_BEGIN -1;
+   int typeNum = type - af::Monitor::EventsShift;
    af::addUniqueToList( events[typeNum], id);
 }
 
@@ -101,27 +130,34 @@ void MonitorContainer::dispatch()
    //
    // Common Events:
    //
-   for( int e = 0; e < eventsCount; e++)
+   for( int e = 0; e < af::Monitor::EventsCount; e++)
    {
       if( events[e].size() < 1) continue;
 
-      int eventType = af::Msg::TMonitorCommonEvents_BEGIN+1 + e;
+//      int eventType = af::Msg::TMonitorCommonEvents_BEGIN+1 + e;
+      int eventType = e + af::Monitor::EventsShift;
 //printf("MonitorContainer::dispatch: [%s]\n", af::Msg::TNAMES[eventType]);
       af::Msg * msg = NULL;
       MonitorContainerIt monitorsIt( this);
       for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
       {
-         if( monitor->hasEvent( eventType))
-         {
-            if( msg == NULL )
-            {
-               af::MCGeneral mcIds;
-//               collectIds( events[e], mcIds );
-				mcIds.setList( events[e]);
-               msg = new af::Msg( eventType, &mcIds );
-            }
-            msg->addAddress( monitor);
-         }
+			if( monitor->hasEvent( eventType))
+			{
+				if( monitor->collectingEvents())
+				{
+					monitor->addEvents( e, events[e]);
+				}
+				else
+				{
+					if( msg == NULL )
+					{
+						af::MCGeneral mcIds;
+						mcIds.setList( events[e]);
+						msg = new af::Msg( eventType, &mcIds );
+					}
+					msg->addAddress( monitor);
+				}
+			}
       }
       if( msg )
       {
@@ -265,7 +301,7 @@ bool MonitorContainer::collectIds( const std::list<int32_t> & list, af::MCGenera
 */
 void MonitorContainer::clearEvents()
 {
-   for( int e = 0; e < eventsCount; e++) events[e].clear();
+   for( int e = 0; e < af::Monitor::EventsCount; e++) events[e].clear();
 
    for( int e = 0; e < jobEventsCount; e++)
    {

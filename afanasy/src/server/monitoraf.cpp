@@ -13,17 +13,20 @@
 MonitorContainer * MonitorAf::m_monitors = NULL;
 
 MonitorAf::MonitorAf( af::Msg * msg):
-   af::Monitor( msg)
+   af::Monitor( msg),
+	m_events_ids( NULL)
 {
 }
 
 MonitorAf::MonitorAf( const JSON & obj):
 	af::Monitor( obj)
 {
+	m_events_ids = new std::list<int32_t>[af::Monitor::EventsCount];
 }
 
 MonitorAf::~MonitorAf()
 {
+   if( m_events_ids != NULL ) delete [] m_events_ids;
 }
 
 void MonitorAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -83,6 +86,7 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 				m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
 				appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
 			}
+			m_time_activity = time( NULL);
 			return;
 		}
 		else
@@ -231,3 +235,78 @@ void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
 	for( int i = 0; i < i_ids.size(); i++) jobsIds.remove( i_ids[i]);
 }
+
+void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
+{
+	if( m_events_ids == NULL)
+	{
+		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
+		return;
+	}
+
+	if(( i_type >= af::Monitor::EventsCount ) || ( i_type < 0 ))
+	{
+		AFERRAR("MonitorAf::addEvents: Event %d is invalid.", i_type)
+		return;
+	}
+
+	std::list<int32_t>::const_iterator it = i_ids.begin();
+	while( it != i_ids.end())
+	{
+		af::addUniqueToList( m_events_ids[i_type], *it);
+		it++;
+	}
+}
+
+af::Msg * MonitorAf::getEvents()
+{
+	updateTime();
+
+	af::Msg * msg = new af::Msg();
+	if( m_events_ids == NULL)
+	{
+		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
+		return msg;
+	}
+
+	std::ostringstream stream;
+	stream << "{\"events\":";
+	bool hasevents = false;
+
+	for( int e = 0; e < af::Monitor::EventsCount; e++)
+	{
+		if( m_events_ids[e].size() == 0 )
+			continue;
+
+		if( hasevents )
+			stream << ",";
+		else
+			stream << "{";
+		stream << "\n\"" << af::Monitor::EventsNames[e] << "\":";
+		stream << "[";
+
+		std::list<int32_t>::const_iterator it = m_events_ids[e].begin();
+		while( it != m_events_ids[e].end())
+		{
+			if( it != m_events_ids[e].begin())
+				stream << ",";
+			stream << *it;
+			it++;
+		}
+
+		stream << "]";
+		hasevents = true;
+		m_events_ids[e].clear();
+	}
+
+	if( false == hasevents )
+		stream << "\nnull";
+	else
+		stream << "\n}";
+	stream << "\n}";
+
+	msg->setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
+
+	return msg;
+}
+

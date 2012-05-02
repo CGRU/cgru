@@ -219,4 +219,6 @@ namespace af
 	bool jr_uint32( const char * i_name, uint32_t    & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int64 ( const char * i_name, int64_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const JSON & i_object);
+
+	af::Msg * jsonMsg( const char * i_str);
 }

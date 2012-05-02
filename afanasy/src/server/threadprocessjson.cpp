@@ -73,6 +73,32 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 			o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
 		}
+		else if( type == "monitors")
+		{
+			AfContainerLock lock( i_args->monitors, AfContainerLock::READLOCK);
+			if( mode == "events")
+			{
+				MonitorContainerIt it( i_args->monitors);
+				if( ids.size() )
+				{
+					MonitorAf* node = it.getMonitor( ids[0]);
+					if( node != NULL )
+					{
+						o_msg_response = node->getEvents();
+					}
+					else
+					{
+						o_msg_response = af::jsonMsg("{\"id\":0}");
+					}
+				}
+				else
+				{
+					o_msg_response = af::jsonMsg("{\"error\":\"id not specified\"}");
+				}
+			}
+			else
+				o_msg_response = i_args->monitors->generateList( af::Msg::TMonitorsList, type, ids, mask, json);
+		}
 	}
 	else if( document.HasMember("action"))
 	{
@@ -92,7 +118,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		AfContainerLock lock( i_args->monitors, AfContainerLock::WRITELOCK);
 		MonitorAf * newMonitor = new MonitorAf( document["monitor"]);
 		newMonitor->setAddressIP( i_msg->getAddress());
-		o_msg_response = i_args->monitors->addMonitor( newMonitor);
+		o_msg_response = i_args->monitors->addMonitor( newMonitor, true);
 	}
 
 

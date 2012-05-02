@@ -2,19 +2,22 @@ function RendersList()
 {
 	this.valid = false;
 	this.name = 'renders';
-	for( i = 0; i < recievers.lenght; i++)
+	for( i = 0; i < g_recievers.lenght; i++)
 	{
-		if( recievers.name == this.name )
+		if( g_recievers[i].name == this.name )
 		{
 			info('ERROR: Renders list already exists.');
 			return;
 		}
 	}
-	recievers.push( this);
+	g_recievers.push( this);
+	g_updaters.push( this);
 
 	this.items = [];
 
-	getRenders();
+	subscribe('renders');
+
+	getNodes('renders');
 }
 
 //RendersList.prototype.refresh = function()
@@ -28,9 +31,22 @@ getRenders = function()
 	this.timer = setTimeout("getRenders()", 1000);
 }
 
+RendersList.prototype.update = function()
+{
+}
+
 RendersList.prototype.processMsg = function( obj)
 {
 //	document.getElementById('data').innerHTML=obj.renders;
+
+	if( obj.events != null )
+	{
+		this.delNodes( obj.events.renders_del);
+		ids = mergeIds( obj.events.renders_change, obj.events.renders_add);
+		if( ids.length > 0 )
+			getNodes('renders', ids);
+		return;
+	}
 
 	if( obj.renders == null )
 		return;
@@ -60,7 +76,26 @@ RendersList.prototype.processMsg = function( obj)
 		this.items.push( new RenderNode(obj.renders[new_ids[i]]));
 	}
 
-	info('renders processed ' + obj.renders.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
+info('c' + g_cycle + ' renders processed ' + obj.renders.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
+}
+
+RendersList.prototype.delNodes = function( i_ids)
+{
+	if( i_ids == null ) return;
+	if( i_ids.length == null ) return;
+	if( i_ids.length == 0 ) return;
+	if( this.items.length == 0 ) return;
+
+	for( d = 0; d < i_ids.length; d++ )
+		for( i = 0; i < this.items.length; i++)
+			if( this.items[i].params.id == i_ids[d] )
+			{
+				document.getElementById('data').removeChild(this.items[i].element);
+				this.items.splice(i,1);
+				break;
+			}
+
+info('c' + g_cycle + ' renders size after deletion = ' + this.items.length);
 }
 
 function RenderNode( obj)

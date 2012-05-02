@@ -13,25 +13,67 @@ using namespace af;
 const int Monitor::EventsShift = af::Msg::TMonitorEvents_BEGIN + 1;
 const int Monitor::EventsCount = af::Msg::TMonitorEvents_END - Monitor::EventsShift;
 
+const char Monitor::EventsNames[Monitor::EventsCount][32] = {
+	"JOB_BEGIN",
+	"jobs_add",
+	"jobs_change",
+	"jobs_del",
+	"JOB_END",
+	"COMMON_BEGIN",
+	"users_add",
+	"users_change",
+	"users_del",
+	"renders_add",
+	"renders_change",
+	"renders_del",
+	"monitors_add",
+	"monitors_change",
+	"monitors_del",
+	"talks_add",
+	"talks_del",
+	"COMMON_END"
+};
+/*
+const char Monitor::EventsClasses[Monitor::EventsCount][32] = {
+	"jobs",
+	"jobs",
+	"jobs",
+	"jobs",
+	"jobs",
+	"common",
+	"users",
+	"users",
+	"users",
+	"renders",
+	"renders",
+	"renders",
+	"monitors",
+	"monitors",
+	"monitors",
+	"talks",
+	"talks",
+	"common"
+};
+*/
 Monitor::Monitor():
-   Client( Client::GetEnvironment, 0),
-	m_listening_port(true)
+   Client( Client::GetEnvironment, 0)
+//	m_listening_port(true)
 {
    construct();
    m_name = af::Environment::getUserName() + "@" + af::Environment::getHostName() + ":" + m_address.generatePortString().c_str();
 }
 
 Monitor::Monitor( Msg * msg):
-   Client( Client::DoNotGetAnyValues, 0),
-	m_listening_port(true)
+   Client( Client::DoNotGetAnyValues, 0)
+//	m_listening_port(true)
 {
    if( construct() == false) return;
    read( msg);
 }
 
 Monitor::Monitor( const JSON & obj):
-   Client( Client::DoNotGetAnyValues, 0),
-	m_listening_port(false)
+   Client( Client::DoNotGetAnyValues, 0)
+//	m_listening_port(false)
 {
 	m_time_launch = time(NULL);
 	m_time_activity = 0;
@@ -85,7 +127,7 @@ bool Monitor::hasEvent( int type) const
    }
    else
    {
-      AFERRAR("MonitorAf::hasEvent: Invalid event: [%s]", af::Msg::TNAMES[type])
+      AFERRAR("Monitor::hasEvent: Invalid event: [%s]", af::Msg::TNAMES[type])
       return false;
    }
 }
