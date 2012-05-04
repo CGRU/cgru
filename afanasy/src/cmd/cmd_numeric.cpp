@@ -135,11 +135,11 @@ bool CmdNumericCalcTask::processArguments( int argc, char** argv, af::Msg &msg)
 
    af::BlockData block;
    block.setNumeric( start, end, fpt, inc);
-   int tasknum;
-   bool in_range = block.calcTaskNumber( frame, tasknum);
+   bool inValidRange;
+   int tasknum = block.calcTaskNumber( frame, inValidRange);
 
    std::cout << "Tasks Number = " << tasknum;
-   if( false == in_range ) std::cout << " (out of range)";
+   if( false == inValidRange ) std::cout << " (out of range)";
    std::cout << std::endl;
 
    return true;

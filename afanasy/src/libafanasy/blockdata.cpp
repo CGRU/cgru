@@ -760,28 +760,30 @@ bool BlockData::genNumbers( long long & start, long long & end, int num, long lo
    return true;
 }
 
-bool BlockData::calcTaskNumber( long long frame, int & tasknum) const
+int BlockData::calcTaskNumber( long long i_frame, bool & o_inValidRange) const
 {
-   tasknum = frame - m_frame_first;
+   int o_tasknum = i_frame - m_frame_first;
 
-   if( m_frames_per_task > 0 ) tasknum = tasknum / m_frames_per_task;
-   else tasknum = tasknum * (-m_frames_per_task);
+   if( m_frames_per_task > 0 ) o_tasknum = o_tasknum / m_frames_per_task;
+   else o_tasknum = o_tasknum * (-m_frames_per_task);
 
-   if( m_frames_inc > 1 ) tasknum = tasknum / m_frames_inc;
+   if( m_frames_inc > 1 ) o_tasknum = o_tasknum / m_frames_inc;
 
-   bool retval = true;
-   if( tasknum < 0 )
+   o_inValidRange = true;
+   if( o_tasknum < 0 )
    { 
-      tasknum = 0;
-      retval = false;
+      o_tasknum = 0;
+      o_inValidRange = false;
    }
-   if( tasknum >= m_tasks_num )
+   if( o_tasknum >= m_tasks_num )
    {
-      tasknum = m_tasks_num - 1;
-      retval = false;
+      o_tasknum = m_tasks_num - 1;
+      o_inValidRange = false;
    }
-   if(( frame < m_frame_first ) || ( frame > m_frame_last )) retval = false;
-   return retval;
+   if(( i_frame < m_frame_first ) || ( i_frame > m_frame_last ))
+		o_inValidRange = false;
+
+   return o_tasknum;
 }
 
 void BlockData::setFramesPerTask( long long perTask)

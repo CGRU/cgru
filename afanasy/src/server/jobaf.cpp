@@ -830,25 +830,37 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
             lastdependframe  += m_blocksdata[b]->getFrameFirst();
          }
          if( m_blocksdata[b]->getFramePerTask() < 0 ) lastdependframe++; // For several frames in task
-         m_blocksdata[b]->calcTaskNumber( firstdependframe, firstdependtask);
-         if( m_blocksdata[b]->calcTaskNumber(  lastdependframe,  lastdependtask))
-            if( m_blocksdata[b]->getFramePerTask() < 0 ) lastdependtask--;
+
+			bool inValidRange;
+			firstdependtask = m_blocksdata[b]->calcTaskNumber( firstdependframe, inValidRange);
+			lastdependtask  = m_blocksdata[b]->calcTaskNumber(  lastdependframe, inValidRange);
+			if( inValidRange )
+				if( m_blocksdata[b]->getFramePerTask() < 0 )
+					lastdependtask--;
 
 //printf("Dep['%s'[%d]/(%lld) <- '%s'/(%lld)]: DepFrames = %lld - %lld: DepTasks = %d - %d\n", blocksdata[block]->getName().c_str(), task, blocksdata[block]->getFramePerTask(), blocksdata[b]->getName().c_str(), blocksdata[b]->getFramePerTask(), firstdependframe, lastdependframe, firstdependtask, lastdependtask);
 
          for( int t = firstdependtask; t <= lastdependtask; t++)
          {
 //printf("Dep['%s':%d-'%s']: checking '%s':%d - %s\n", blocksdata[block]->getName().toUtf8().data(), task, blocksdata[b]->getName().toUtf8().data(), blocksdata[b]->getName().toUtf8().data(), t, (progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK) ? "DONE" : "NOT Done");
-            if( progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK ) continue;
+            // Task is done, so depend is satisfied:
+            if( progress->tp[b][t]->state & AFJOB::STATE_DONE_MASK )
+					continue;
+
+            // Check subframe depend, is depend task is running:
             if( m_blocksdata[b]->isDependSubTask() && ( progress->tp[b][t]->state & AFJOB::STATE_RUNNING_MASK ))
             {
-               long long f_start, f_end, f_start_dep, f_end_dep;
-               m_blocksdata[block]->genNumbers( f_start, f_end, task);
+//               long long f_start, f_end, f_start_dep, f_end_dep;
+//               m_blocksdata[block]->genNumbers( f_start, f_end, task);
+               long long f_start_dep, f_end_dep;
                m_blocksdata[b]->genNumbers( f_start_dep, f_end_dep, t);
                long long frame_run = f_start_dep + progress->tp[b][t]->frame;
-//printf("Dep['%s': #%d '%s']: f_s=%lld f_d=%lld\n", blocksdata[block]->getName().c_str(), task, blocksdata[b]->getName().c_str(), f_start, frame_run);
-               if( frame_run > f_start ) continue;
+//printf("Dep['%s': #%d '%s']: f_s=%lld f_d=%lld\n", m_blocksdata[block]->getName().c_str(), task, m_blocksdata[b]->getName().c_str(), firstdependframe, frame_run);
+               if( frame_run > lastdependframe )
+					continue;
             }
+
+            // Run recurtsion:
             af::TaskExec * task_ptr = genTask( render, b, t, (t == firstdependtask ? blocksIds : NULL), monitoring);
             if( m_state & AFJOB::STATE_OFFLINE_MASK )
             {
