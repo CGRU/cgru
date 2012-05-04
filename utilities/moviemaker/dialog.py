@@ -1693,8 +1693,10 @@ Add this options to temporary image saving.')
       self.btnStop.setEnabled( False)
       self.btnRefresh.setEnabled( True)
       self.running = False
-      if exitCode != 0: return
-      self.saveRecent()
+      if exitCode != 0:
+         return
+      if not self.decode:
+         self.saveRecent()
       self.cmdField.setText('Finished.')
       if self.decode and self.decodeEncode.isChecked():
          self.decodeEnable.setChecked( False)
