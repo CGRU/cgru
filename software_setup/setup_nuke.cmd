@@ -24,10 +24,6 @@ SET NUKE_AF_RENDERTHREADS=2
 
 rem Nuke render launcher:
 SET NUKE_AF_RENDER=nuke -i
-rem SET NUKE_AF_RENDER=nuke -i -m AF_THREADS
-if defined CGRU_LOCATION (
-   SET NUKE_AF_RENDER=%NUKE_AF_RENDER% -t %CGRU_LOCATION%\plugins\nuke\render.py
-)
 
 SET NUKE_DIR=C:\Program Files\Nuke6.3v3
 SET NUKE_EXEC=%NUKE_DIR%\Nuke6.3.exe
