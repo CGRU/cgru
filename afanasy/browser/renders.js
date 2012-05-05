@@ -109,7 +109,7 @@ function RenderNode( obj)
 	this.element.style.margin = '5px';
 	this.element.style.padding = '3px';
 
-	this.params = obj
+//	this.params = obj
 
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);

@@ -9,7 +9,6 @@ import re
 import nuke
 
 from parsers import parser
-from afpathmap import PathMap
 
 tmpdir = None
 
@@ -41,6 +40,8 @@ ArgsParser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --h
 ArgsParser.add_option('-x', '--xscene', dest='xscene', type='string', default='', help='Path to scene to execute')
 ArgsParser.add_option('-X', '--xnode',  dest='xnode',  type='string', default='', help='The name of node to execute')
 ArgsParser.add_option('-F', '--frange', dest='frange', type='string', default='', help='Frame range to render (Nuke syntax)')
+ArgsParser.add_option(      '--notmpimage', dest='notmpimage', action='store_true', default=False, help='Do not use temporary image.')
+ArgsParser.add_option(      '--nopathmap',  dest='nopathmap',  action='store_true', default=False, help='Do not use paths map.')
 (options, args) = ArgsParser.parse_args()
 xscene = options.xscene
 xnode  = options.xnode
@@ -84,16 +85,19 @@ tmpdir = tempfile.mkdtemp('.afrender.nuke')
 if os.path.exists( tmpdir): print('Temp directory = "%s"' % tmpdir)
 else: errorExit('Error creating temp directory.', False)
 
-# Transfer scene paths
-pm = PathMap( UnixSeparators = True, Verbose = True)
-if pm.initialized:
-   pmscene = os.path.basename(xscene)
-   pmscene = os.path.join( tmpdir, pmscene)
-   pm.toClientFile( xscene, pmscene, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
-   xscene = pmscene
-   print('Scene pathes mapped: "%s"' % xscene)
+# Transfer scene paths:
+if not options.nopathmap:
+	afpathmap = __import__('afpathmap', globals(), locals(), [])
+	pm = afpathmap.PathMap( UnixSeparators = True, Verbose = True)
+	if pm.initialized:
+		pmscene = os.path.basename(xscene)
+		pmscene = os.path.join( tmpdir, pmscene)
+		pm.toClientFile( xscene, pmscene, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
+		xscene = pmscene
+		print('Scene pathes mapped: "%s"' % xscene)
 
 # Try to open scene:
+print('Opening ' + xscene)
 try: nuke.scriptOpen( xscene)
 except: errorExit('Scene open error:\n' + str(sys.exc_info()[1]), True)
 
@@ -129,21 +133,22 @@ except:
 if views_num < 1:
     errorExit('Can`t find valid views on "%s" write node.' % xnode, True)
 
-# Change render forder to temporary:
-try:
-   filepath   = fileknob.value()
-   # Nuke paths has only unix slashes, even on MS Windows platform
-   if sys.platform.find('win') == 0:
-      filepath = filepath.replace('/','\\')
-   imagesdir  = os.path.dirname(  filepath)
-   imagesname = os.path.basename( filepath)
-   tmppath    = os.path.join( tmpdir, imagesname)
-   # Nuke paths has only unix slashes, even on MS Windows platform
-   if sys.platform.find('win') == 0:
-      tmppath = tmppath.replace('\\','/')
-   fileknob.setValue( tmppath)
-except:
-   errorExit('File operations error on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
+# Change render images folder to temporary:
+if not options.notmpimage:
+	try:
+		filepath   = fileknob.value()
+		# Nuke paths has only UNIX slashes, even on MS Windows platform
+		if sys.platform.find('win') == 0:
+			filepath = filepath.replace('/','\\')
+		imagesdir  = os.path.dirname(  filepath)
+		imagesname = os.path.basename( filepath)
+		tmppath    = os.path.join( tmpdir, imagesname)
+		# Nuke paths has only UNIX slashes, even on MS Windows platform
+		if sys.platform.find('win') == 0:
+			tmppath = tmppath.replace('\\','/')
+		fileknob.setValue( tmppath)
+	except:
+		errorExit('File operations error on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
 
 print('Number of views = %d' % views_num)
 
@@ -169,6 +174,8 @@ while frame <= flast:
          print('Node execution error:')
          print(str(sys.exc_info()[1]))
          exitcode = 1
+
+      if options.notmpimage: continue
 
       # Copy image files from temp directory:
       allitems = os.listdir( tmpdir)
