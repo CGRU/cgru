@@ -41,7 +41,7 @@ ArgsParser.add_option('-x', '--xscene', dest='xscene', type='string', default=''
 ArgsParser.add_option('-X', '--xnode',  dest='xnode',  type='string', default='', help='The name of node to execute')
 ArgsParser.add_option('-F', '--frange', dest='frange', type='string', default='', help='Frame range to render (Nuke syntax)')
 ArgsParser.add_option(      '--notmpimage', dest='notmpimage', action='store_true', default=False, help='Do not use temporary image.')
-ArgsParser.add_option(      '--nopathmap',  dest='nopathmap',  action='store_true', default=False, help='Do not use paths map.')
+ArgsParser.add_option(      '--nopathsmap', dest='nopathsmap', action='store_true', default=False, help='Do not use paths map.')
 (options, args) = ArgsParser.parse_args()
 xscene = options.xscene
 xnode  = options.xnode
@@ -86,7 +86,7 @@ if os.path.exists( tmpdir): print('Temp directory = "%s"' % tmpdir)
 else: errorExit('Error creating temp directory.', False)
 
 # Transfer scene paths:
-if not options.nopathmap:
+if not options.nopathsmap:
 	afpathmap = __import__('afpathmap', globals(), locals(), [])
 	pm = afpathmap.PathMap( UnixSeparators = True, Verbose = True)
 	if pm.initialized:

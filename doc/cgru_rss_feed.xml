@@ -5,10 +5,20 @@
    <atom:link href="http://cgru.sourceforge.net/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
    <description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
    <language>en-us</language>
-   <pubDate>Mon, 23 Apr 2012 00:00:00 GMT</pubDate>
-   <lastBuildDate>Mon, 23 Apr 2012 00:00:00 GMT</lastBuildDate>
+   <pubDate>Sat, 5 May 2012 00:00:00 GMT</pubDate>
+   <lastBuildDate>Sat, 5 May 2012 00:00:00 GMT</lastBuildDate>
    <managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
    <webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+   <item>
+      <title>CGRU Version 1.6.3 Released.</title>
+      <link>http://cgru.sourceforge.net/doc/changes_log.html#release163</link>
+      <guid>http://cgru.sourceforge.net/doc/changes_log.html#release163</guid>
+      <description>
+         Nuke render and submission scripts options added to skip paths map and render to temporary image stages.
+         Bug fixes.
+      </description>
+      <pubDate>Sat, 5 May 2012 00:00:00 GMT</pubDate>
+   </item>
    <item>
       <title>CGRU Version 1.6.2 Released.</title>
       <link>http://cgru.sourceforge.net/doc/changes_log.html#release162</link>

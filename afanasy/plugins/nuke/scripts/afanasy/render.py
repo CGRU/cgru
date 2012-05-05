@@ -119,6 +119,8 @@ class BlockParameters:
       self.hostsmask         = None
       self.hostsmaskexclude  = None
       self.fullrangedepend   = 0
+      self.tmpimage          = 1
+      self.pathsmap          = 1
       if afnode is not None:
          self.framefirst        = int( afnode.knob('framefirst').value())
          self.framelast         = int( afnode.knob('framelast').value())
@@ -128,6 +130,8 @@ class BlockParameters:
          self.capacity          = int( afnode.knob('capacity').value())
          self.capacitymin       = int( afnode.knob('capacitymin').value())
          self.capacitymax       = int( afnode.knob('capacitymax').value())
+         self.tmpimage          = int( afnode.knob('tmpimage').value())
+         self.pathsmap          = int( afnode.knob('pathsmap').value())
          self.hostsmask         = afnode.knob('hostsmask').value()
          self.hostsmaskexclude  = afnode.knob('hostsmaskexcl').value()
 
@@ -240,16 +244,31 @@ class BlockParameters:
          block.setFiles( self.imgfile)
          if self.capacity != -1: block.setCapacity( self.capacity)
 
-         threads = os.getenv('NUKE_AF_RENDERTHREADS')
          cmd = os.getenv('NUKE_AF_RENDER', 'nuke -i')
-         cmdargs = ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
+         if self.tmpimage or self.pathsmap:
+            cgru_location = os.getenv('CGRU_LOCATION')
+            if cgru_location is None:
+               print('CGRU_LOCATION is not set, can`t enable tmpimage and pathsmap')
+            else:
+               # That the Nuke-Render-Script need to
+			   # rewrite the Script and replace file to render in temporary image file
+               nukerenderscript = os.environ['CGRU_LOCATION']
+               nukerenderscript = os.path.join( nukerenderscript, 'plugins')
+               nukerenderscript = os.path.join( nukerenderscript, 'nuke')
+               nukerenderscript = os.path.join( nukerenderscript, 'render.py')
+               cmd += ' -t %s' % nukerenderscript
+               if not self.tmpimage: cmd += ' --notmpimage'
+               if not self.pathsmap: cmd += ' --nopathsmap'
+
          if self.capacitymin != -1 or self.capacitymax != -1:
             block.setVariableCapacity( self.capacitymin, self.capacitymax)
             services = __import__('services.service', globals(), locals(), [])
-            threads = services.service.str_capacity
-         if threads is not None:
-         	cmd = cmd.replace('AF_THREADS', threads)
-         block.setCommand( cmd + cmdargs)
+            cmd += ' -m ' + services.service.str_capacity
+
+         cmd += ' -X %s -F@#@-@#@x%d -x \"%s\"' % ( self.writename, self.frameinc, scenename)
+
+         block.setCommand( cmd)
+
       elif self.wnode.Class() == DailiesNodeClassName:
          cgru = __import__('cgru', globals(), locals(), [])
          cgru.dailiesEvaluate( self.wnode)

@@ -44,32 +44,40 @@ Gizmo {
    addUserKnob { 26 "" l "" }
    addUserKnob {  6 singlejob   l "Construct single job" }
 
+   addUserKnob { 20 "" Advanced }
+   addUserKnob {  6 tmpimage l "Render to temporary image" }
+   addUserKnob { 26 "" l "" }
+   addUserKnob {  6 pathsmap l "Apply paths map to scene" }
+
    name afanasy
 
-   jobname          ""
-   framefirst      1
-   framelast      11
-   frameinc        1
-   framespertask   1
-   framespertask   1
-   startpaused     0
+	jobname          ""
+	framefirst      1
+	framelast      11
+	frameinc        1
+	framespertask   1
+	framespertask   1
+	startpaused     0
 
-   maxhosts       -1
-   priority       -1
-   capacity       -1
-   capacitymin    -1
-   capacitymax    -1
-   hostsmask      ""
-   hostsmaskexcl  ""
-   dependmask     ""
-   dependmaskglbl ""
+	maxhosts       -1
+	priority       -1
+	capacity       -1
+	capacitymin    -1
+	capacitymax    -1
+	hostsmask      ""
+	hostsmaskexcl  ""
+	dependmask     ""
+	dependmaskglbl ""
 
-   addnodes       ""
-   independent    0
-   reversedeps    1
-   fullrange      0
-   forceframes    0
-   singlejob      1
+	addnodes       ""
+	independent     0
+	reversedeps     1
+	fullrange       0
+	forceframes     0
+	singlejob       1
+
+	tmpimage        1
+	pathsmap        1
 
    help "- Please, Afanasy, help me to render."
 }
