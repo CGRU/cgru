@@ -19,7 +19,7 @@ afanasy_bins="afserver afcmd afrender aftalk afwatch"
 [ -z "$DISTRIBUTIVE" ] && source "$cgru/utilities/distribution.sh"
 if [ ! -z "$DISTRIBUTIVE" ]; then
     case ${DISTRIBUTIVE} in
-        Fedora | openSUSE )
+        Fedora | openSUSE | Ubuntu | Debian )
             cgru_bins="$cgru_bins ffmpeg"
             ;;
         *)
