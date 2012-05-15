@@ -441,7 +441,7 @@ elif (ext == 'mb') or (ext == 'ma'):
       images = output
    cmd += ' -proj "%s"' % pwd
    if scenetype == 'maya_mental':
-      cmd += ' -art'
+      cmd += ' -art -v 5'
    if extrargs != '': cmd += ' ' + extrargs
    cmd += ' "%s"' % scene
 
