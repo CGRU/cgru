@@ -1,0 +1,12 @@
+body {
+font: 1.1em Arial;
+}
+
+#view {
+border: 1px solid #666;
+background: #CCCCCC;
+}
+
+div.item {
+border: 1px solid #666;
+}

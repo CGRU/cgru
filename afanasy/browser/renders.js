@@ -1,5 +1,6 @@
-function RendersList()
+function RendersList( parentElement)
 {
+	this.parentElement = parentElement;
 	this.valid = false;
 	this.name = 'renders';
 	for( i = 0; i < g_recievers.lenght; i++)
@@ -12,6 +13,7 @@ function RendersList()
 	}
 	g_recievers.push( this);
 	g_updaters.push( this);
+	g_monitors.push( this);
 
 	this.items = [];
 
@@ -20,15 +22,14 @@ function RendersList()
 	getNodes('renders');
 }
 
-//RendersList.prototype.refresh = function()
-getRenders = function()
+RendersList.prototype.destroy = function()
 {
-	var obj = {};
-	obj.get = {};
-	obj.get.type = 'renders';
-	send(obj);
-
-	this.timer = setTimeout("getRenders()", 1000);
+	for( i = 0; i < this.items.length; i++)
+		this.parentElement.removeChild(this.items[i].element);
+	this.items = [];
+	g_recievers = [];
+	g_updaters = [];
+	g_monitors = [];
 }
 
 RendersList.prototype.update = function()
@@ -37,8 +38,6 @@ RendersList.prototype.update = function()
 
 RendersList.prototype.processMsg = function( obj)
 {
-//	document.getElementById('data').innerHTML=obj.renders;
-
 	if( obj.events != null )
 	{
 		this.delNodes( obj.events.renders_del);
@@ -73,7 +72,7 @@ RendersList.prototype.processMsg = function( obj)
 
 	for( i = 0; i < new_ids.length; i++)
 	{
-		this.items.push( new RenderNode(obj.renders[new_ids[i]]));
+		this.items.push( new RenderNode(obj.renders[new_ids[i]], this.parentElement));
 	}
 
 info('c' + g_cycle + ' renders processed ' + obj.renders.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
@@ -90,7 +89,7 @@ RendersList.prototype.delNodes = function( i_ids)
 		for( i = 0; i < this.items.length; i++)
 			if( this.items[i].params.id == i_ids[d] )
 			{
-				document.getElementById('data').removeChild(this.items[i].element);
+				this.parentElement.removeChild(this.items[i].element);
 				this.items.splice(i,1);
 				break;
 			}
@@ -98,14 +97,15 @@ RendersList.prototype.delNodes = function( i_ids)
 info('c' + g_cycle + ' renders size after deletion = ' + this.items.length);
 }
 
-function RenderNode( obj)
+function RenderNode( obj, parentElement)
 {
-	this.element = document.createElement('p');
-	document.getElementById('data').appendChild(this.element);
-//	this.element.style.width = '50%';
-	this.element.style.outlineStyle = 'solid';
-	this.element.style.outlineWidth = '1px';
-	this.element.style.outlineColor = '#777777';
+	this.parentElement = parentElement;
+	this.element = document.createElement('div');
+	this.element.className = 'item';
+	this.element.onmousedown=cm_ItemMouseDown;
+	this.element.onmouseover=cm_ItemMouseOver;
+//	this.element.node = this;
+	this.parentElement.appendChild(this.element);
 	this.element.style.margin = '5px';
 	this.element.style.padding = '3px';
 
