@@ -64,13 +64,16 @@ function cm_ItemSetSelected( el, on)
 	{
 		if( el.selected ) return;
 		el.selected = true;
-		el.className = 'selected';
+		if( false == el.classList.contains('selected'))
+			el.classList.add('selected');
+//		el.innerHTML='selected';
 	}
 	else
 	{
 		if( false == el.selected ) return;
 		el.selected = false;
-		el.className = '';
+		el.classList.remove('selected');
+//		el.innerHTML='';
 	}
 }
 

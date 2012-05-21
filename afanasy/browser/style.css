@@ -1,12 +1,51 @@
 body {
-font: 1.1em Arial;
+font: 16px Arial;
 }
 
-#view {
-border: 1px solid #666;
+div.view {
+border: 2px solid #676767;
 background: #CCCCCC;
+font-size: 12px;
+font-weight: bold;
+color: #000000;
 }
 
-div.item {
-border: 1px solid #666;
+div.view div {
+background: #AAAAAA;
+border: 1px solid #676767;
+margin: 4px;
+padding: 1px 7px;
+border-radius: 4px;
 }
+
+div.view div.nimby {
+background: #8888FF;
+}
+
+div.view div.offline {
+background: #555555;
+}
+
+div.view div.running {
+/*background: #88FF88;*/
+color: #DDFFDD;
+}
+
+div.view div.selected {
+background: #DDFFDD;
+color: #000000;
+}
+
+div.view div > .resources {
+background: #EEEE99;
+text-align: center;
+position: absolute;
+left: 40%;
+width: 20%;
+height: 2.4em;
+}
+
+div.view div.offline > .resources {
+height: 1.2em;
+}
+

@@ -101,20 +101,15 @@ function RenderNode( obj, parentElement)
 {
 	this.parentElement = parentElement;
 	this.element = document.createElement('div');
-	this.element.className = 'item';
+//	this.element.className = 'item';
 	this.element.onmousedown=cm_ItemMouseDown;
 	this.element.onmouseover=cm_ItemMouseOver;
 //	this.element.node = this;
 	this.parentElement.appendChild(this.element);
-	this.element.style.margin = '5px';
-	this.element.style.padding = '3px';
-
-//	this.params = obj
 
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);
 	this.name.title = 'Client host name';
-//	this.name.style.backgroundColor = '#EEEE99';
 
 	this.version = document.createElement('span');
 	this.element.appendChild( this.version);
@@ -129,15 +124,10 @@ function RenderNode( obj, parentElement)
 	this.element.appendChild( this.user_name);
 	this.user_name.style.cssFloat = 'right';
 	this.user_name.title = 'User name and "Nimby" status'
-//	this.user_name.style.backgroundColor = '#EEEEBB';
 
 	this.center = document.createElement('span');
 	this.element.appendChild( this.center);
-	this.center.style.backgroundColor = '#EEEE99';
-	this.center.style.textAlign = 'center';
-	this.center.style.position = 'absolute';
-	this.center.style.left = '40%';
-	this.center.style.width = '20%';
+	this.center.className = 'resources';
 
 	this.element.appendChild( document.createElement('br'));
 
@@ -163,22 +153,36 @@ RenderNode.prototype.update = function( obj)
 
 	var user = obj.user_name;
 
-	this.element.style.backgroundColor = '#EEEEEE';
-
 	if( obj.offline === true )
-		this.element.style.backgroundColor = '#999999';
+	{
+		if( false == this.element.classList.contains('offline'))
+		this.element.classList.add('offline');
+	}
+	else
+		this.element.classList.remove('offline');
+
 	if( obj.busy === true )
-		this.element.style.backgroundColor = '#99EE77';
+	{
+		if( false == this.element.classList.contains('running'))
+		this.element.classList.add('running');
+	}
+	else
+		this.element.classList.remove('running');
+
 	if( obj.NIMBY === true )
 	{
-		if( obj.offline !== true) this.element.style.backgroundColor = '#8888DD';
+		if( false == this.element.classList.contains('nimby'))
+			this.element.classList.add('nimby');
 		user = '(' + user + ')N';
 	}
 	else if( obj.nimby === true )
 	{
-		if( obj.offline !== true) this.element.style.backgroundColor = '#9999DD';
+		if( false == this.element.classList.contains('nimby'))
+			this.element.classList.add('nimby');
 		user = '(' + user + ')n';
 	}
+	else
+		this.element.classList.remove('nimby');
 
 	this.name.innerHTML = obj.name;
 	if( obj.version != null )
@@ -192,14 +196,12 @@ RenderNode.prototype.update = function( obj)
 
 	if( obj.offline === true )
 	{
-		this.center.style.height = '1.2em';
 		this.center.innerHTML = 'offline';
 		this.capacity.innerHTML = '';
 		this.max_tasks.innerHTML = '';
 		this.state.innerHTML = '';
 		return;
 	}
-	this.center.style.height = '2.4em';
 	this.center.innerHTML = '.';
 
 	var capacity = obj.capacity;
