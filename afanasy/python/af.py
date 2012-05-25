@@ -142,6 +142,10 @@ class Block:
 	def setNonSequential( self, value = True ): self.data["non_sequential"] = value
 	def setDependSubTask( self, value = True ): self.data["depend_sub_task"] = value
 
+	def setHostsMask(        self, value):
+		if checkRegExp(value): self.data["hosts_mask"] = value
+	def setHostsMaskExclude( self, value):
+		if checkRegExp(value): self.data["hosts_mask_exclude"] = value
 	def setDependMask(       self, value):
 		if checkRegExp(value): self.data["depend_mask"] = value
 	def setTasksDependMask( self, value):
