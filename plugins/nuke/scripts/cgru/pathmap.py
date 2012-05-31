@@ -8,10 +8,11 @@ import nuke
 
 SERVER_PATHS_SUFFIX = 'SERVERPATHS'
 CLIENT_PATHS_SUFFIX = 'CLIENTPATHS'
+SearchStrings = ['file ','font ', 'project_directory ']
 
 def pmSaveToServer():
    print 'Saving scene to server paths...'
-   pm = PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
+   pm = PathMap( UnixSeparators = True, Verbose = True)
    nuke.scriptSave()
 
    # Get server scene name:
@@ -21,7 +22,7 @@ def pmSaveToServer():
    # Map paths from client to server:
    error_msg = ''
    if pm.initialized:
-      pm.toServerFile( scenename, scenename_server, SearchStrings = ['file '], Verbose = True)
+      pm.toServerFile( scenename, scenename_server, SearchStrings, Verbose = True)
    else:
       print 'No paths map preset. Just copying scene to:'
       print scenename_server
@@ -36,7 +37,7 @@ def pmSaveToServer():
 
 def pmOpenFromServer():
    print 'Opening scene with server paths...'
-   pm = PathMap( os.environ['AF_ROOT'], UnixSeparators = True, Verbose = True)
+   pm = PathMap( UnixSeparators = True, Verbose = True)
 
    # Get server scene name:
    scenename_server = nuke.getFilename('Select a scene with server paths','*.nk')
@@ -54,7 +55,7 @@ def pmOpenFromServer():
    # Map paths from server to client:
    error_msg = ''
    if pm.initialized:
-      pm.toClientFile( scenename_server, scenename_client, SearchStrings = ['file '], Verbose = True)
+      pm.toClientFile( scenename_server, scenename_client, SearchStrings, Verbose = True)
    else:
       print 'No paths map preset. Just copying scene to:'
       print scenename_client
