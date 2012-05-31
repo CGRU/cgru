@@ -1,5 +1,6 @@
 g_cycle = 0;
 g_id = 0;
+g_uids = [0];
 g_name = 'web';
 g_version = 'browser';
 g_user_name = "jimmy";
@@ -12,8 +13,9 @@ g_key_shift = false;
 g_recievers = [];
 g_updaters = [];
 g_monitors = [];
+g_cur_monitor = null;
 
-function register()
+function g_Register()
 {
 	if( g_id != 0)
 		return;
@@ -22,29 +24,25 @@ function register()
 	obj.monitor = {};
 	obj.monitor.name = g_name;
 	obj.monitor.version = g_version;
-	send(obj);
+	nw_Send(obj);
 
-	setTimeout("register()", 5000);
+	setTimeout("g_Register()", 5000);
 }
 
-function processMsg( obj)
+function g_ProcessMsg( obj)
 {
-document.getElementById('recv').innerHTML='c' + g_cycle + ' recv: ' + JSON.stringify(obj);
-
 	if( obj.id != null )
 	{
 		if(( g_id == 0 ) && ( obj.id > 0 ))
 		{
 			// Monitor is not registered and recieved an ID:
 			g_id = obj.id;
-			registered();
+			g_Registered();
 		}
 		else if( obj.id != g_id )
 		{
 			// Recieved ID does not match:
-			g_id = 0;
-			deregistered();
-			register();
+			g_Deregistered();
 		}
 	}
 
@@ -57,17 +55,17 @@ document.getElementById('recv').innerHTML='c' + g_cycle + ' recv: ' + JSON.strin
 	}
 }
 
-function update()
+function g_Update()
 {
 	g_cycle++;
-	setTimeout("update()", 1000);
+	setTimeout("g_Update()", 1000);
 
 	document.getElementById('id').innerHTML = 'ID = ' + g_id + ' c' + g_cycle;
 
 	if( g_id == 0 )
 		return;
 
-	getEvents('monitors','events');
+	nw_GetEvents('monitors','events');
 
 	for( i = 0; i < g_updaters.length; i++)
 	{
@@ -75,22 +73,38 @@ function update()
 	}
 }
 
-function init()
+function g_Init()
 {
 //	document.getElementById('id').innerHTML='launching...';
 
-	register();
-	update();
+	g_Register();
+	g_Update();
 	cm_Init();
 }
 
-function registered()
+function g_Registered()
 {
-	renders = new RendersList(document.getElementById('view'));
+	new Monitor( document.getElementById('view'), 'renders');
+//	new Monitor( document.getElementById('view'), 'jobs');
 }
 
-function deregistered()
+function g_Deregistered()
+{
+	g_id = 0;
+	g_CloseAllMonitors();
+	g_Register();
+}
+
+function g_CloseAllMonitors()
 {
 	for( var i = 0; i < g_monitors.length; i++)
 		g_monitors[i].destroy();
+}
+
+function g_OpenTasks( jobId)
+{
+	g_CloseAllMonitors();
+	new Monitor( document.getElementById('view'), 'tasks', jobId);
+//	new Monitor( document.getElementById('view'), 'renders');
+document.getElementById('test').innerHTML = jobId;
 }

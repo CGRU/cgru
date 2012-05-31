@@ -183,7 +183,7 @@ void MonitorContainer::dispatch()
       MonitorContainerIt monitorsIt( this);
       for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
       {
-         af::MCGeneral mcIds;
+			std::list<int32_t> ids;
          bool founded = false;
 
          std::list<int32_t>::const_iterator jIt = jobEvents[e].begin();
@@ -195,16 +195,25 @@ void MonitorContainer::dispatch()
             if( monitor->hasJobEvent( eventType, *uIt))
             {
                if( !founded) founded = true;
-               mcIds.addId( *jIt);
+						ids.push_back( *jIt);
             }
             jIt++;
             uIt++;
          }
          if( ! founded ) continue;
 
-         af::Msg * msg = new af::Msg( eventType, &mcIds );
-         msg->setAddress( monitor);
-         AFCommon::QueueMsgDispatch( msg);
+			if( monitor->collectingEvents())
+			{
+				monitor->addEvents( eventType - af::Monitor::EventsShift, ids);
+			}
+			else
+			{
+				af::MCGeneral mcIds;
+				mcIds.setList( ids);
+				af::Msg * msg = new af::Msg( eventType, &mcIds );
+				msg->addAddress( monitor);
+				AFCommon::QueueMsgDispatch( msg);
+			}
       }
    }
 

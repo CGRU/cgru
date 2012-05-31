@@ -1,8 +1,11 @@
-function send( obj)
+nw_send_count = 0;
+nw_recv_count = 0;
+
+function nw_Send( obj)
 {
 	var obj_str = JSON.stringify(obj);
 
-document.getElementById('send').innerHTML='c' + g_cycle + ' send: ' + obj_str;
+document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
 
 	//document.getElementById("test").innerHTML='' + obj_str.length + ':' + obj_str;
 	var xhr = new XMLHttpRequest;
@@ -22,7 +25,8 @@ document.getElementById('send').innerHTML='c' + g_cycle + ' send: ' + obj_str;
 		{
 			if( xhr.status == 200 )
 			{
-				processMsg( eval('('+xhr.responseText+')'));
+				g_ProcessMsg( eval('('+xhr.responseText+')'));
+document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
 			}
 		}
 	};
@@ -36,9 +40,10 @@ document.getElementById('send').innerHTML='c' + g_cycle + ' send: ' + obj_str;
 */
 }
 
-function subscribe( i_class)
+function nw_Subscribe( i_class, i_subscribe)
 {
 	if( g_id == 0 ) return;
+	if( i_subscribe == null ) i_subscribe = true;
 
 	var obj = {};
 	obj.action = {};
@@ -49,12 +54,16 @@ function subscribe( i_class)
 	obj.action.operation = {};
 	obj.action.operation.type = "watch";
 	obj.action.operation.class = i_class;
-	obj.action.operation.status = "subscribe";
+	if( i_subscribe )
+		obj.action.operation.status = "subscribe";
+	else
+		obj.action.operation.status = "unsubscribe";
+	obj.action.operation.uids = g_uids;
 
-	send(obj);
+	nw_Send(obj);
 }
 
-function getEvents()
+function nw_GetEvents()
 {
 	if( g_id == 0 ) return;
 //info('c' + g_cycle + ' getting events...');
@@ -64,16 +73,18 @@ function getEvents()
 	obj.get.ids = [g_id];
 	obj.get.mode = 'events';
 
-	send(obj);
+	nw_Send(obj);
 }
 
-function getNodes( i_type, i_ids)
+function nw_GetNodes( i_type, i_ids, i_mode)
 {
 	var obj = {};
 	obj.get = {};
 	obj.get.type = i_type;
 	if(( i_ids != null ) && ( i_ids.length > 0 ))
 		obj.get.ids = i_ids
+	if( i_mode )
+		obj.get.mode = i_mode;
 
-	send(obj);
+	nw_Send(obj);
 }

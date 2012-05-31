@@ -67,9 +67,18 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 			af::jr_string("status", opstatus, operation);
 			bool subscribe = false;
 			std::vector<int32_t> ids;
+			std::vector<int32_t> uids;
+			af::jr_int32vec("uids", uids, operation);
 			if( opstatus == "subscribe")
 				subscribe = true;
-			if( opclass == "renders")
+
+			if( opclass == "jobs")
+			{
+				ids.push_back( af::Msg::TMonitorJobsAdd);
+				ids.push_back( af::Msg::TMonitorJobsChanged);
+				ids.push_back( af::Msg::TMonitorJobsDel);
+			}
+			else if( opclass == "renders")
 			{
 				ids.push_back( af::Msg::TMonitorRendersAdd);
 				ids.push_back( af::Msg::TMonitorRendersChanged);
@@ -85,6 +94,10 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 				setEvents( ids, subscribe);
 				m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
 				appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
+			}
+			if( uids.size())
+			{
+				setJobsUsersIds( uids);
 			}
 			m_time_activity = time( NULL);
 			return;
@@ -256,6 +269,8 @@ void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 		af::addUniqueToList( m_events_ids[i_type], *it);
 		it++;
 	}
+
+printf("MonitorAf::addEvents: i_ids.size()=%lu\n", i_ids.size());
 }
 
 af::Msg * MonitorAf::getEvents()
@@ -304,6 +319,8 @@ af::Msg * MonitorAf::getEvents()
 	else
 		stream << "\n}";
 	stream << "\n}";
+
+if( hasevents ) printf("MonitorAf::getEvents():\n%s\n", stream.str().c_str());
 
 	msg->setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
 

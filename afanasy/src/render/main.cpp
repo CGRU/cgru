@@ -202,9 +202,17 @@ printf("msgCase: "); msg->stdOut();
             RenderHost::setRegistered( new_id);
         }
         // Server sends back zero id on any error
-        // May be server was restarted and knows nothing about this render, so render must register first
-        else if ( RenderHost::getId() != new_id )
+        else if ( new_id == 0 )
+		{
+			printf("Zero ID recieved, no such online render, re-connecting...\n");
             RenderHost::connectionLost();
+		}
+		// Bad case, should not ever happen, try to re-register.
+        else if ( RenderHost::getId() != new_id )
+		{
+			AFERRAR("IDs mistatch: this %d != %d new, re-connecting...", RenderHost::getId(), new_id);
+            RenderHost::connectionLost();
+		}
         break;
     }
     case af::Msg::TVersionMismatch:

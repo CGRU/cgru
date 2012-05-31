@@ -23,7 +23,7 @@ background: #8888FF;
 }
 
 div.view div.offline {
-background: #555555;
+background: #656565;
 }
 
 div.view div.running {
@@ -47,5 +47,6 @@ height: 2.4em;
 
 div.view div.offline > .resources {
 height: 1.2em;
+background: #888888;
 }
 
