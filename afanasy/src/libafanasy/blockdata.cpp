@@ -292,9 +292,9 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 
 	case Msg::TJobsList:
 
-        //o_str << ",\"flags",                << m_flags;
-
-        o_str << "\"frame_first\":"      << m_frame_first;
+	//	o_str << ",\"flags",             << m_flags;
+		o_str << "\"tasks_num\":"        << m_tasks_num;
+		o_str << ",\"frame_first\":"     << m_frame_first;
         o_str << ",\"frame_last\":"      << m_frame_last;
         o_str << ",\"frames_per_task\":" << m_frames_per_task;
         o_str << ",\"frames_inc\":"      << m_frames_inc;
@@ -329,7 +329,6 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
             o_str << ",\"need_power\":"            << m_need_power;
 		if( m_need_hdd > 0 )
             o_str << ",\"need_hdd\":"              << m_need_hdd;
-        //o_str << ",\"tasks_num\":"             << m_tasks_num;
 		if( m_errors_retries != -1 )
             o_str << ",\"errors_retries\":"        << int(m_errors_retries);
 		if( m_errors_avoid_host != -1 )

@@ -62,6 +62,9 @@ Monitor.prototype.processMsg = function( obj)
 
 	if( this.type == 'tasks' )
 	{
+		jobs = obj.jobs;
+		if( jobs.length == 1 )
+			this.constructJob( jobs[0]);
 		return;
 	}
 
@@ -92,7 +95,7 @@ Monitor.prototype.processMsg = function( obj)
 
 	for( i = 0; i < new_ids.length; i++)
 	{
-		var node = this.createNode( nodes[new_ids[i]]);
+		var node = this.newNode( nodes[new_ids[i]]);
 		if( node != null )
 			this.items.push( node);
 	}
@@ -117,34 +120,56 @@ Monitor.prototype.delNodes = function( i_ids)
 			}
 }
 
-Monitor.prototype.createNode = function( i_obj)
+Monitor.prototype.newNode = function( i_obj)
 {
 	var node = null
-	if     ( this.type == 'jobs'   ) node = new    JobNode( i_obj);
-	else if( this.type == 'renders') node = new RenderNode( i_obj);
+	if     ( this.type == 'jobs'   ) node = new    JobNode();
+	else if( this.type == 'renders') node = new RenderNode();
 	else return null;
 
-	node.element = document.createElement('div');
-//	node.element.className = 'item';
-	this.element.appendChild( node.element);
-
-	node.init();
-	node.params = i_obj;
-	node.update();
-	node.parentElement = this.element;
-	node.element.node = node;
-	node.element.onmousedown = cm_ItemMouseDown;
-	node.element.onmouseover = cm_ItemMouseOver;
-	node.element.ondblclick = this.onDoubleClick;
+	this.createItem( node, i_obj);
 
 	return node;
+}
+
+Monitor.prototype.createItem = function( i_item, i_obj)
+{
+	i_item.element = document.createElement('div');
+//	i_item.element.className = 'item';
+	this.element.appendChild( i_item.element);
+
+	i_item.init();
+	i_item.params = i_obj;
+	i_item.update();
+	i_item.parentElement = this.element;
+	i_item.element.item = i_item;
+	i_item.element.onmousedown = cm_ItemMouseDown;
+	i_item.element.onmouseover = cm_ItemMouseOver;
+	i_item.element.ondblclick = this.onDoubleClick;
 }
 
 Monitor.prototype.onDoubleClick = function(e)
 {
 	if( e == null ) return;
-	var node = e.currentTarget.node;
-	if( node == null ) return;
-document.getElementById('test').innerHTML = node.params.name;
-	node.onDoubleClick();
+	var item = e.currentTarget.item;
+	if( item == null ) return;
+//document.getElementById('test').innerHTML = item.params.name;
+	item.onDoubleClick();
+}
+
+Monitor.prototype.constructJob = function( job)
+{
+	this.job = job;
+	for( var b = 0; b < this.job.blocks.length; b++)
+	{
+		var block = new BlockItem();
+		this.createItem( block, this.job.blocks[b]);
+		this.items.push( block);
+		for( var t = 0; t < this.job.blocks[b].tasks_num; t++)
+		{
+//			var task = new TaskItem( this.job.blocks[b], t);
+//			this.createItem( block, this.job.blocks[b]);
+//			this.items.push( block);
+		}
+	}
 }

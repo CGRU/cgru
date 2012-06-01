@@ -25,8 +25,8 @@ document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_
 		{
 			if( xhr.status == 200 )
 			{
-				g_ProcessMsg( eval('('+xhr.responseText+')'));
 document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
+				g_ProcessMsg( eval('('+xhr.responseText+')'));
 			}
 		}
 	};

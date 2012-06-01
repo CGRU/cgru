@@ -136,7 +136,7 @@ function cm_ItemSelectNext( previous )
 function cm_ArrayRemove( io_arr, i_value)
 {
 	var index = io_arr.indexOf( i_value);
-	if( index > 0 )
+	if( index >= 0 )
 		io_arr.splice( index, 1);
 }
 

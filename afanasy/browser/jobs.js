@@ -4,7 +4,7 @@ JobNode.prototype.init = function()
 {
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);
-	this.name.title = 'Client host name';
+	this.name.title = 'Job name';
 
 	this.priority = document.createElement('span');
 	this.element.appendChild( this.priority);

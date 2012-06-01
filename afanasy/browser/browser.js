@@ -84,8 +84,8 @@ function g_Init()
 
 function g_Registered()
 {
-	new Monitor( document.getElementById('view'), 'renders');
-//	new Monitor( document.getElementById('view'), 'jobs');
+//	new Monitor( document.getElementById('view'), 'renders');
+	new Monitor( document.getElementById('view'), 'jobs');
 }
 
 function g_Deregistered()
@@ -97,8 +97,8 @@ function g_Deregistered()
 
 function g_CloseAllMonitors()
 {
-	for( var i = 0; i < g_monitors.length; i++)
-		g_monitors[i].destroy();
+	while( g_monitors.length > 0 )
+		g_monitors[0].destroy();
 }
 
 function g_OpenTasks( jobId)
@@ -106,5 +106,5 @@ function g_OpenTasks( jobId)
 	g_CloseAllMonitors();
 	new Monitor( document.getElementById('view'), 'tasks', jobId);
 //	new Monitor( document.getElementById('view'), 'renders');
-document.getElementById('test').innerHTML = jobId;
+//document.getElementById('test').innerHTML = jobId;
 }
