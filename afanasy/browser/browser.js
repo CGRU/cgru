@@ -78,7 +78,7 @@ function g_Init()
 //	document.getElementById('id').innerHTML='launching...';
 
 	g_Register();
-	g_Update();
+//	g_Update();
 	cm_Init();
 }
 

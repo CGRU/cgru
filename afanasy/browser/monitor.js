@@ -60,11 +60,11 @@ Monitor.prototype.processMsg = function( obj)
 		return;
 	}
 
-	if( this.type == 'tasks' )
+	if(( this.type == 'tasks') && ( this.job == null ))
 	{
-		jobs = obj.jobs;
-		if( jobs.length == 1 )
-			this.constructJob( jobs[0]);
+		if( obj.jobs != null )
+			if( obj.jobs.length == 1 )
+				this.constructJob( obj.jobs[0]);
 		return;
 	}
 
@@ -167,9 +167,9 @@ Monitor.prototype.constructJob = function( job)
 		this.items.push( block);
 		for( var t = 0; t < this.job.blocks[b].tasks_num; t++)
 		{
-//			var task = new TaskItem( this.job.blocks[b], t);
-//			this.createItem( block, this.job.blocks[b]);
-//			this.items.push( block);
+			var task = new TaskItem( t);
+			this.createItem( task, this.job.blocks[b]);
+			this.items.push( task);
 		}
 	}
 }
