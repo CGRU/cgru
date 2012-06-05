@@ -1289,6 +1289,24 @@ void JobAf::writeProgress( af::Msg &msg)
    msg.set( af::Msg::TJobProgress, progress);
 }
 
+af::Msg * JobAf::writeProgress( bool json)
+{
+	af::Msg * msg = new af::Msg(); 
+	if( json )
+	{
+		std::ostringstream stream;
+		progress->jsonWrite( stream);
+		std::string string = stream.str();
+		msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
+	}
+	else
+	{
+		msg->set( af::Msg::TJobProgress, progress);
+	}
+
+	return msg;
+}
+
 const std::list<std::string> & JobAf::getTaskLog( int block, int task)
 {
    static const std::list<std::string> emptylog;

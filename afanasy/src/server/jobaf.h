@@ -39,6 +39,8 @@ public:
 
    void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
+   af::Msg * writeProgress( bool json);   ///< Write job progress in message.
+
    const std::string getErrorHostsListString() const; /// Get avoid hosts list.
    virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 

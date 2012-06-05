@@ -19,8 +19,8 @@ function Monitor( i_element, i_type, i_id)
 
 	if( this.type == 'tasks')
 	{
-		this.jobid = i_id;
-		nw_GetNodes( 'jobs', [this.jobid], 'full');
+		this.job_id = i_id;
+		nw_GetNodes( 'jobs', [this.job_id], 'full');
 	}
 	else
 	{
@@ -60,11 +60,22 @@ Monitor.prototype.processMsg = function( obj)
 		return;
 	}
 
-	if(( this.type == 'tasks') && ( this.job == null ))
+	if( this.type == 'tasks')
 	{
-		if( obj.jobs != null )
-			if( obj.jobs.length == 1 )
-				this.constructJob( obj.jobs[0]);
+		if( this.job == null )
+		{
+			if( obj.jobs != null )
+				if( obj.jobs.length == 1 )
+					this.jobConstruct( obj.jobs[0]);
+		}
+		else
+		{
+			if( obj.job_progress != null )
+			{
+				if( obj.job_progress.id == this.job_id )
+					this.jobProgress( obj.job_progress.progress);
+			}
+		}
 		return;
 	}
 
@@ -157,19 +168,51 @@ Monitor.prototype.onDoubleClick = function(e)
 	item.onDoubleClick();
 }
 
-Monitor.prototype.constructJob = function( job)
+Monitor.prototype.jobConstruct = function( job)
 {
 	this.job = job;
+	this.blocks = [];
 	for( var b = 0; b < this.job.blocks.length; b++)
 	{
-		var block = new BlockItem();
+		var block = new BlockItem(b);
 		this.createItem( block, this.job.blocks[b]);
 		this.items.push( block);
+		this.blocks.push( block);
+		block.tasks = [];
 		for( var t = 0; t < this.job.blocks[b].tasks_num; t++)
 		{
 			var task = new TaskItem( t);
 			this.createItem( task, this.job.blocks[b]);
 			this.items.push( task);
+			block.tasks.push( task);
+		}
+	}
+
+	nw_GetNodes( 'jobs', [this.job_id], 'progress');
+//Watch::addJobId( job_id);
+}
+
+Monitor.prototype.jobProgress = function( progress)
+{
+	if( this.blocks.length != progress.length )
+	{
+		cm_Error('Job progress bocks length mismatch: job_id='
+			+ this.job_id + ' ' + this.blocks.length + '!=' + progress.length);
+		return;
+	}
+
+	for( var b = 0; b < this.blocks.length; b++)
+	{
+		if( this.blocks[b].tasks.length != progress[b].length )
+		{
+			cm_Error('Job progress tasks length mismatch: job_id='
+				+ this.job_id + ' block=' + b + ' ' + this.blocks[b].tasks.length + '!=' + progress[b].length);
+			return;
+		}
+
+		for( var t = 0; t < this.blocks[b].tasks.length; t++)
+		{
+			this.blocks[b].tasks[t].updateProgress( progress[b][t]);
 		}
 	}
 }

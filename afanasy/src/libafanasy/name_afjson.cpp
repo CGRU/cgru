@@ -1,5 +1,7 @@
 #include "name_af.h"
 
+#include "../include/afjob.h"
+
 #include "msg.h"
 #include "regexp.h"
 
@@ -60,9 +62,22 @@ af::Msg * af::jsonMsg( const char * i_str)
 {
 	int len = strlen( i_str);
 	if( len > 10000 )
+	{
+		AFERRAR("Too long json simple message = %d", len)
 		return NULL;
+	}
 	af::Msg * o_msg = new af::Msg();
 	o_msg->setData( len, i_str, af::Msg::TJSON);
+	return o_msg;
+}
+
+af::Msg * af::jsonMsgError( const char * i_str)
+{
+	std::string str = "{\"error\":\"";
+	str += i_str;
+	str += "\"}";
+	af::Msg * o_msg = new af::Msg();
+	o_msg->setData( str.size(), str.c_str(), af::Msg::TJSON);
 	return o_msg;
 }
 
@@ -174,3 +189,20 @@ bool af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const 
 
 	return true;
 }
+
+void af::jw_state( uint32_t i_state, std::ostringstream & o_str)
+{
+	if( i_state & AFJOB::STATE_READY_MASK           ) o_str << ",\"rdy\":1";
+	if( i_state & AFJOB::STATE_RUNNING_MASK         ) o_str << ",\"run\":1";
+	if( i_state & AFJOB::STATE_DONE_MASK            ) o_str << ",\"don\":1";
+	if( i_state & AFJOB::STATE_ERROR_MASK           ) o_str << ",\"err\":1";
+	if( i_state & AFJOB::STATE_SKIPPED_MASK         ) o_str << ",\"skp\":1";
+	if( i_state & AFJOB::STATE_OFFLINE_MASK         ) o_str << ",\"off\":1";
+	if( i_state & AFJOB::STATE_WARNING_MASK         ) o_str << ",\"wrn\":1";
+	if( i_state & AFJOB::STATE_PARSERERROR_MASK     ) o_str << ",\"per\":1";
+	if( i_state & AFJOB::STATE_PARSERBADRESULT_MASK ) o_str << ",\"pbr\":1";
+	if( i_state & AFJOB::STATE_WAITDEP_MASK         ) o_str << ",\"wdp\":1";
+	if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << ",\"wtm\":1";
+	if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << ",\"sto\":1";
+	if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << ",\"ste\":1";
+} 

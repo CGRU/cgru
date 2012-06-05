@@ -59,8 +59,27 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			else
 			{
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
-				o_msg_response = i_args->jobs->generateList(
-					full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
+				JobAf * job = NULL;
+				bool was_error = false;
+				if( ids.size() == 1 )
+				{
+					JobContainerIt jobsIt( i_args->jobs);
+					job = jobsIt.getJob( ids[0]);
+					if( job == NULL )
+					{
+						o_msg_response = af::jsonMsgError( "Invalid ID");
+						was_error = true;
+					}
+				}
+
+				if( was_error == false )
+				{
+					if(( mode == "progress" ) && ( job != NULL ))
+						o_msg_response = job->writeProgress( json);
+					else
+						o_msg_response = i_args->jobs->generateList(
+							full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
+				}
 			}
 		}
 		else if( type == "users")

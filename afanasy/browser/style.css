@@ -50,3 +50,23 @@ height: 1.2em;
 background: #888888;
 }
 
+.task
+{
+position: relative;
+margin: 0px;
+padding: 0px;
+height: 12px;
+}
+
+.progress
+{
+/*z-index: 0;*/
+background: #88D888;
+margin: 0px;
+padding: 0px;
+position: absolute;
+float: left;
+left: 0%;
+width: 50%;
+height: 80%;
+}

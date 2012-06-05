@@ -11,17 +11,17 @@
 using namespace af;
 
 JobProgress::JobProgress( Job * job, bool doConstruct):
-   jobid( job->getId())
+   m_job_id( job->getId())
 {
    if( doConstruct ) construct( job);
 }
 
 bool JobProgress::construct( Job * job)
 {
-   blocksnum = job->getBlocksNum();
-   if( blocksnum < 1)
+   m_blocks_num = job->getBlocksNum();
+   if( m_blocks_num < 1)
    {
-      AFERRAR("JobProgress::JobProgress: invalid number if blocks = %d (jobid=%d)", blocksnum, job->getId())
+      AFERRAR("JobProgress::JobProgress: invalid number if blocks = %d (m_job_id=%d)", m_blocks_num, job->getId())
       return false;
    }
 
@@ -31,13 +31,13 @@ bool JobProgress::construct( Job * job)
       return false;
    }
 
-   for( int b = 0; b < blocksnum; b++)
+   for( int b = 0; b < m_blocks_num; b++)
    {
       const af::BlockData * block = job->getBlock( b);
       tasksnum[b] = block->getTasksNum();
       if( tasksnum[b] < 1)
       {
-         AFERRAR("JobProgress::JobProgress: invalud number of tasks = %d (jobid=%d,block=%d)", tasksnum[b], job->getId(), b)
+         AFERRAR("JobProgress::JobProgress: invalud number of tasks = %d (m_job_id=%d,block=%d)", tasksnum[b], job->getId(), b)
          return false;
       }
 
@@ -61,14 +61,14 @@ bool JobProgress::initBlocks()
    tasksnum    = NULL;
    tp          = NULL;
 
-   if( blocksnum == 0)
+   if( m_blocks_num == 0)
    {
-      AFERROR("JobProgress::initialize: blocksnum == 0\n");
+      AFERROR("JobProgress::initialize: m_blocks_num == 0\n");
       return false;
    }
 
-   tasksnum = new int32_t        [ blocksnum];
-   tp       = new TaskProgress **[ blocksnum];
+   tasksnum = new int32_t        [ m_blocks_num];
+   tp       = new TaskProgress **[ m_blocks_num];
 
    return true;
 }
@@ -94,11 +94,11 @@ TaskProgress * JobProgress::newTaskProgress() const
 
 JobProgress::~JobProgress()
 {
-AFINFA("JobProgress::~JobProgress: Job Id = %d", jobid)
+AFINFA("JobProgress::~JobProgress: Job Id = %d", m_job_id)
    if( tp != NULL )
    {
       AFINFO("JobProgress::~JobProgress: Deleting tasks running information.")
-      for( int b = 0; b < blocksnum; b++)
+      for( int b = 0; b < m_blocks_num; b++)
       {
          if( tp[b] != NULL )
          {
@@ -116,8 +116,8 @@ AFINFA("JobProgress::~JobProgress: Job Id = %d", jobid)
 
 void JobProgress::readwrite( Msg * msg)
 {
-   rw_int32_t( jobid,     msg);
-   rw_int32_t( blocksnum, msg);
+   rw_int32_t( m_job_id,     msg);
+   rw_int32_t( m_blocks_num, msg);
 
    if( msg->isReading() )
    {
@@ -128,7 +128,7 @@ void JobProgress::readwrite( Msg * msg)
       }
    }
 
-   for( int b = 0; b < blocksnum; b++)
+   for( int b = 0; b < m_blocks_num; b++)
    {
       rw_int32_t( tasksnum[b],        msg);
       if( tasksnum[b] == 0 ) continue;
@@ -147,10 +147,33 @@ void JobProgress::readwrite( Msg * msg)
    }
 }
 
+
+void JobProgress::jsonWrite( std::ostringstream & o_str) const
+{
+//	o_str << "void JobProgress::jsonWrite( std::ostringstream & o_str) const";
+	o_str << "{\"job_progress\":{";
+	o_str << "\"id\":" << m_job_id << ",\n";
+	o_str << "\"progress\":[\n";
+	for( int b = 0; b < m_blocks_num; b++)
+	{
+		if( b > 0 )
+			o_str << ",\n";
+		o_str << "[";
+		for( int t = 0; t < tasksnum[b]; t++)
+		{
+			if( t > 0 )
+				o_str << ",\n";
+			tp[b][t]->jsonWrite( o_str);
+		}
+		o_str << "]";
+	}
+	o_str << "\n]}}";
+}
+
 int JobProgress::calcWeight() const
 {
    int weight  = sizeof(JobProgress);
-   for( int b = 0; b < blocksnum; b++)
+   for( int b = 0; b < m_blocks_num; b++)
    {
       weight += sizeof(*tasksnum);
       weight += tasksnum[b] * sizeof(**tp);
@@ -162,7 +185,7 @@ int JobProgress::calcWeight() const
 
 void JobProgress::generateInfoStream( std::ostringstream & stream, bool full ) const
 {
-    for( int b = 0; b < blocksnum; b++)
+    for( int b = 0; b < m_blocks_num; b++)
     {
         if( b > 0 ) stream << std::endl;
         stream << "Block #"<< b;

@@ -47,6 +47,11 @@ function info( i_msg, i_elem)
 	document.getElementById(i_elem).innerHTML=i_msg;
 }
 
+function cm_Error( i_msg)
+{
+	document.getElementById('error').innerHTML='Error:' + i_msg;
+}
+
 function cm_ItemMouseDown(e)
 {
 	if( e.button != 0 ) return;

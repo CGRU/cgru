@@ -29,7 +29,7 @@ document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.
 				g_ProcessMsg( eval('('+xhr.responseText+')'));
 			}
 		}
-	};
+	}
 /*
 	if(xhr.status == 200)
 	{

@@ -35,7 +35,7 @@ bool DBJobProgress::dbAdd( PGconn * i_conn) const
     DBTaskProgress::dbPrepareInsert( i_conn);
 
     int id_job = getJobId();
-    for( int b = 0; b < blocksnum; b++)
+    for( int b = 0; b < m_blocks_num; b++)
     {
         int id_block(b);
         for( int t = 0; t < tasksnum[b]; t++)
@@ -53,7 +53,7 @@ bool DBJobProgress::dbAdd( PGconn * i_conn) const
 
 bool DBJobProgress::dbSelect( PGconn * i_conn)
 {
-   for( int b = 0; b < blocksnum; b++)
+   for( int b = 0; b < m_blocks_num; b++)
    {
       for( int t = 0; t < tasksnum[b]; t++)
       {

@@ -35,7 +35,8 @@ public:
 
    std::string hostname;           ///< Host, last event occurs where.
 
-//private:
    void readwrite( Msg * msg); ///< Read or write progress in buffer.
+
+	void jsonWrite( std::ostringstream & o_str) const;
 };
 }
