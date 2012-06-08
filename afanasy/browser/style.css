@@ -8,14 +8,17 @@ background: #CCCCCC;
 font-size: 12px;
 font-weight: bold;
 color: #000000;
+overflow: auto;
+height: 500px;
 }
 
 div.view div {
 background: #AAAAAA;
 border: 1px solid #676767;
-margin: 4px;
-padding: 1px 7px;
-border-radius: 4px;
+position: relative;
+/*margin: 4px;*/
+/*padding: 1px 7px;*/
+/*border-radius: 4px;*/
 }
 
 div.view div.nimby {
@@ -50,23 +53,38 @@ height: 1.2em;
 background: #888888;
 }
 
-.task
+.job
 {
-position: relative;
-margin: 0px;
-padding: 0px;
-height: 12px;
+margin: 3px;
+padding: 4px 7px;
+height: 24px;
+border-radius: 6px;
 }
 
-.progress
+.block
 {
-/*z-index: 0;*/
-background: #88D888;
+margin: 4px 4px 0px 4px;
+padding: 4px 7px;
+height: 24px;
+border-radius: 4px;
+}
+
+.task
+{
+margin: 1px 10px 0px 10px;
+padding: 0px 4px;
+height: 12px;
+border-radius: 0px;
+}
+
+.task_progress
+{
+background: #0A0;
 margin: 0px;
 padding: 0px;
 position: absolute;
-float: left;
 left: 0%;
-width: 50%;
-height: 80%;
+width: 0%;
+height: 100%;
+opacity: 0.3;
 }

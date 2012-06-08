@@ -15,19 +15,19 @@ function cm_OnKeyDown(e)
 		g_key_shift=false;
 		g_key_ctrl=false;
 		g_mouse_down=false;
-		cm_ItemSelectAll( null, false);
+		if( g_cur_monitor) g_cur_monitor.selectAll( false);
 	}
 	else if(e.keyCode==16) g_key_shift=true; // SHIFT
 	else if(e.keyCode==17) g_key_ctrl=true; // CTRL
 	else if(e.keyCode==65 && g_key_ctrl) // CTRL+A
 	{
-		cm_ItemSelectAll( null, true);
+		if( g_cur_monitor) g_cur_monitor.selectAll( true);
 		return false;
 	}
-	else if(e.keyCode==38) cm_ItemSelectNext( true); // DOWN
-	else if(e.keyCode==40) cm_ItemSelectNext( false); // UP
+	else if((e.keyCode==38) && g_cur_monitor) g_cur_monitor.selectNext( true); // DOWN
+	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( false); // UP
 //	else if(evt.keyCode==116) return false; // F5
-document.getElementById('test').innerHTML='key down: ' + e.keyCode;
+//document.getElementById('test').innerHTML='key down: ' + e.keyCode;
 //	return false; 
 }
 
@@ -36,7 +36,7 @@ function cm_OnKeyUp(e)
 	if(!e) return;
 	if(e.keyCode==16) g_key_shift=false; // SHIFT
 	if(e.keyCode==17) g_key_ctrl=false; // CTRL
-document.getElementById('test').innerHTML='key up: ' + e.keyCode;
+//document.getElementById('test').innerHTML='key up: ' + e.keyCode;
 //	return false; 
 }
 
@@ -50,92 +50,6 @@ function info( i_msg, i_elem)
 function cm_Error( i_msg)
 {
 	document.getElementById('error').innerHTML='Error:' + i_msg;
-}
-
-function cm_ItemMouseDown(e)
-{
-	if( e.button != 0 ) return;
-	if( false == g_key_ctrl )
-		cm_ItemSelectAll( e.currentTarget, false);
-	cm_ItemToggleSelection(e.currentTarget);
-}
-
-function cm_ItemMouseOver(e)
-{
-	if( e.button != 0 ) return;
-	if( false == g_mouse_down ) return;
-	cm_ItemToggleSelection(e.currentTarget)
-}
-
-function cm_ItemToggleSelection( el)
-{
-	if (!el) return;
-	if (el.selected )
-		cm_ItemSetSelected( el, false)
-	else
-		cm_ItemSetSelected( el, true)
-}
-
-function cm_ItemSetSelected( el, on)
-{
-	g_cur_monitor = el.parentElement.monitor;
-	if( on )
-	{
-		if( el.selected ) return;
-		el.selected = true;
-		if( false == el.classList.contains('selected'))
-			el.classList.add('selected');
-//		el.innerHTML='selected';
-	}
-	else
-	{
-		if( false == el.selected ) return;
-		el.selected = false;
-		el.classList.remove('selected');
-//		el.innerHTML='';
-	}
-}
-
-function cm_ItemSelectAll( el, on)
-{
-	if( el )
-		g_cur_monitor = el.parentElement.monitor;
-	if( g_cur_monitor == null ) return;
-	for( var i = 0; i < g_cur_monitor.items.length; i++)
-		cm_ItemSetSelected( g_cur_monitor.items[i].element, on);
-}
-
-function cm_ItemSelectNext( previous )
-{
-	if( g_cur_monitor == null ) return;
-	if( g_cur_monitor.items.length == 0 ) return;
-	if( g_cur_monitor.cur_item == null )
-		g_cur_monitor.cur_item = g_cur_monitor.items[0];
-
-//get index of current element
-	cur_index = 0;
-	for( var i = 0; i < g_cur_monitor.items.length; i++)
-		if( g_cur_monitor.cur_item == g_cur_monitor.items[i])
-		{
-			cur_index = i;
-			break;
-		}
-
-	if( previous )
-		next_index = cur_index-1;
-	else
-		next_index = cur_index+1;
-
-	if( next_index < 0 ) return;
-	if( next_index >= g_cur_monitor.items.length ) return;
-	if( cur_index == next_index ) return;
-
-	g_cur_monitor.cur_item = g_cur_monitor.items[next_index]; 
-	element = g_cur_monitor.cur_item.element;
-	if( false == g_key_shift )
-		cm_ItemSelectAll( element, false);
-	cm_ItemSetSelected( element, true);
-//	cm_ItemToggleSelection( element);
 }
 
 function cm_ArrayRemove( io_arr, i_value)
@@ -196,3 +110,15 @@ function cm_TimeStringFromNow( time)
 		time = days + 'd ' + time;
 	return time;
 }
+
+function cm_GetState( i_state)
+{
+	var state = {};
+	state.string = i_state;
+	if( i_state.indexOf('RDY') != -1 ) state.rdy = true;
+	if( i_state.indexOf('RUN') != -1 ) state.run = true;
+	if( i_state.indexOf('DON') != -1 ) state.don = true;
+	if( i_state.indexOf('ERR') != -1 ) state.err = true;
+	return state;
+}
+

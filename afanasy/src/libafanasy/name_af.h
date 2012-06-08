@@ -120,6 +120,7 @@ namespace af
    const std::string strReplace( const std::string & str, char before, char after);
 	const std::string strEscape( const std::string & i_str);
    const std::list<std::string> strSplit( const std::string & str, const std::string & separators = "|;,: ");
+	const std::string vectToStr( const std::vector<int32_t> & i_vec);
 
 	int getReadyTaskNumber( int i_quantity, TaskProgress ** i_tp, int32_t flags, int i_startFrom = 0);
    const std::string fillNumbers( const std::string & pattern, long long start, long long end);

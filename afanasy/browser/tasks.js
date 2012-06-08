@@ -5,6 +5,8 @@ function BlockItem( i_block_num)
 
 BlockItem.prototype.init = function() 
 {
+	this.element.classList.add('block');
+
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);
 	this.name.title = 'Block name';
@@ -44,40 +46,29 @@ TaskItem.prototype.init = function()
 
 	this.progress = document.createElement('span');
 	this.element.appendChild( this.progress);
-	this.progress.classList.add('progress');
-	this.progress.style.zIndex = 1;
-/*		this.progress_done = document.createElement('span');
-		this.progress.appendChild( this.progress_done);
-		this.progress_done.classList.add('progress_done');
-*/
+	this.progress.classList.add('task_progress');
+//	this.progress.style.zIndex = 1;
+
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);
 	this.name.title = 'Task name';
-	this.name.style.zIndex = 100;
-	this.name.style.left = '1%';
-	this.name.style.cssFloat = 'left';
+//	this.name.style.position = 'relative';
+//	this.name.style.zIndex = 2;
 
 	this.percent = document.createElement('span');
 	this.element.appendChild( this.percent);
+//	this.percent.style.position = 'relative';
+//	this.percent.style.zIndex = 2;
 
-	this.props = document.createElement('span');
-	this.element.appendChild( this.props);
-	this.props.style.cssFloat = 'right';
-	this.props.title = 'Task properties';
+	this.state = document.createElement('span');
+	this.element.appendChild( this.state);
+	this.state.style.cssFloat = 'right';
+	this.state.title = 'Task state';
 }
 
 TaskItem.prototype.update = function()
 {
 	this.name.innerHTML = this.genName();
-
-	if( this.params.tasks )
-	{
-		this.props.innerHTML = 'array';
-	}
-	else
-	{
-		this.props.innerHTML = 'numeric';
-	}
 
 	if( this.params.running === true )
 	{
@@ -88,11 +79,30 @@ TaskItem.prototype.update = function()
 		this.element.classList.remove('running');
 }
 
-TaskItem.prototype.updateProgress = function( progress)
+TaskItem.prototype.updateProgress = function( i_progress)
 {
 //	this.progress = progress;
-	percent = progress.per;
-	this.percent.innerHTML = ' ' + percent + '%';
+
+	var state = cm_GetState( i_progress.state);
+	this.state.innerHTML = state.string;
+
+	var percent = -1;
+//	percent = 50;
+	if( state.run ) percent = i_progress.per;
+	if( state.don ) percent = 100;
+	if( state.skp ) percent = 100;
+	if( percent < 0 ) percent = 0;
+	if( percent > 100 ) percent = 100;
+	if( percent != -1 )
+	{
+		if( state.run)
+			this.percent.innerHTML = ' ' + percent + '%';
+		this.progress.style.width = '' + percent + '%'
+	}
+	else
+	{
+		this.percent.innerHTML = '';
+	}
 }
 
 TaskItem.prototype.genName = function()

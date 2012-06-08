@@ -66,39 +66,52 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 			af::jr_string("class", opclass, operation);
 			af::jr_string("status", opstatus, operation);
 			bool subscribe = false;
-			std::vector<int32_t> ids;
+			std::vector<int32_t> eids;
 			std::vector<int32_t> uids;
-			af::jr_int32vec("uids", uids, operation);
 			if( opstatus == "subscribe")
 				subscribe = true;
 
 			if( opclass == "jobs")
 			{
-				ids.push_back( af::Msg::TMonitorJobsAdd);
-				ids.push_back( af::Msg::TMonitorJobsChanged);
-				ids.push_back( af::Msg::TMonitorJobsDel);
+				eids.push_back( af::Msg::TMonitorJobsAdd);
+				eids.push_back( af::Msg::TMonitorJobsChanged);
+				eids.push_back( af::Msg::TMonitorJobsDel);
+				af::jr_int32vec("uids", uids, operation);
+				if( uids.size())
+				{
+					// Set ids of user(s) whos jobs we are interested in
+					// Zero id means super user - interested in all jobs
+					setJobsUsersIds( uids);
+					appendLog("User ids set to: '" + af::vectToStr( uids) + "'");
+				}
+			}
+			else if( opclass == "tasks")
+			{
+				std::vector<int32_t> jids;
+				af::jr_int32vec("ids", jids, operation);
+				if( subscribe )
+					setJobIds( jids);
+				else
+					delJobIds( jids);
 			}
 			else if( opclass == "renders")
 			{
-				ids.push_back( af::Msg::TMonitorRendersAdd);
-				ids.push_back( af::Msg::TMonitorRendersChanged);
-				ids.push_back( af::Msg::TMonitorRendersDel);
+				eids.push_back( af::Msg::TMonitorRendersAdd);
+				eids.push_back( af::Msg::TMonitorRendersChanged);
+				eids.push_back( af::Msg::TMonitorRendersDel);
 			}
 			else
 			{
 				appendLog("Unknown operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
 				return;
 			}
-			if( ids.size())
+			if( eids.size())
 			{
-				setEvents( ids, subscribe);
-				m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
-				appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
+				// Subscribe or unsubscibe common events:
+				setEvents( eids, subscribe);
 			}
-			if( uids.size())
-			{
-				setJobsUsersIds( uids);
-			}
+			m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
+			appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
 			m_time_activity = time( NULL);
 			return;
 		}

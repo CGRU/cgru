@@ -192,17 +192,19 @@ bool af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const 
 
 void af::jw_state( uint32_t i_state, std::ostringstream & o_str)
 {
-	if( i_state & AFJOB::STATE_READY_MASK           ) o_str << ",\"rdy\":1";
-	if( i_state & AFJOB::STATE_RUNNING_MASK         ) o_str << ",\"run\":1";
-	if( i_state & AFJOB::STATE_DONE_MASK            ) o_str << ",\"don\":1";
-	if( i_state & AFJOB::STATE_ERROR_MASK           ) o_str << ",\"err\":1";
-	if( i_state & AFJOB::STATE_SKIPPED_MASK         ) o_str << ",\"skp\":1";
-	if( i_state & AFJOB::STATE_OFFLINE_MASK         ) o_str << ",\"off\":1";
-	if( i_state & AFJOB::STATE_WARNING_MASK         ) o_str << ",\"wrn\":1";
-	if( i_state & AFJOB::STATE_PARSERERROR_MASK     ) o_str << ",\"per\":1";
-	if( i_state & AFJOB::STATE_PARSERBADRESULT_MASK ) o_str << ",\"pbr\":1";
-	if( i_state & AFJOB::STATE_WAITDEP_MASK         ) o_str << ",\"wdp\":1";
-	if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << ",\"wtm\":1";
-	if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << ",\"sto\":1";
-	if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << ",\"ste\":1";
+	o_str << "\"state\":\"";
+	if( i_state & AFJOB::STATE_READY_MASK           ) o_str << " RDY";
+	if( i_state & AFJOB::STATE_RUNNING_MASK         ) o_str << " RUN";
+	if( i_state & AFJOB::STATE_DONE_MASK            ) o_str << " DON";
+	if( i_state & AFJOB::STATE_ERROR_MASK           ) o_str << " ERR";
+	if( i_state & AFJOB::STATE_SKIPPED_MASK         ) o_str << " SKP";
+	if( i_state & AFJOB::STATE_OFFLINE_MASK         ) o_str << " OFF";
+	if( i_state & AFJOB::STATE_WARNING_MASK         ) o_str << " WRN";
+	if( i_state & AFJOB::STATE_PARSERERROR_MASK     ) o_str << " PER";
+	if( i_state & AFJOB::STATE_PARSERBADRESULT_MASK ) o_str << " PBR";
+	if( i_state & AFJOB::STATE_WAITDEP_MASK         ) o_str << " WDP";
+	if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << " WTM";
+	if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";
+	if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
+	o_str << "\"";
 } 

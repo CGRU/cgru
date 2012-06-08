@@ -108,3 +108,15 @@ function g_OpenTasks( jobId)
 //	new Monitor( document.getElementById('view'), 'renders');
 //document.getElementById('test').innerHTML = jobId;
 }
+
+function g_Info( i_msg, i_elem)
+{
+	if( i_elem == null )
+		i_elem = 'info';
+	document.getElementById(i_elem).innerHTML=i_msg;
+}
+
+function g_Error( i_err)
+{
+	g_Info('Error: ' + i_err);
+}

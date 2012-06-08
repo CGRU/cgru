@@ -9,10 +9,7 @@ document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_
 
 	//document.getElementById("test").innerHTML='' + obj_str.length + ':' + obj_str;
 	var xhr = new XMLHttpRequest;
-/*	xhr.onerror = function()
-	{
-		document.getElementById("error").innerHTML='Error: ' + xhr.statusText();
-	}*/
+	xhr.onerror = function() { g_Error(xhr.statusText()); }
 	xhr.open("POST", "/", true); 
 	xhr.send('[ * AFANASY * ] 1 0 '+obj_str.length+' JSON'+obj_str);
 
@@ -40,10 +37,9 @@ document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.
 */
 }
 
-function nw_Subscribe( i_class, i_subscribe)
+function nw_Subscribe( i_class, i_subscribe, i_ids)
 {
 	if( g_id == 0 ) return;
-	if( i_subscribe == null ) i_subscribe = true;
 
 	var obj = {};
 	obj.action = {};
@@ -58,6 +54,8 @@ function nw_Subscribe( i_class, i_subscribe)
 		obj.action.operation.status = "subscribe";
 	else
 		obj.action.operation.status = "unsubscribe";
+	if( i_ids != null )
+		obj.action.operation.ids = i_ids;
 	obj.action.operation.uids = g_uids;
 
 	nw_Send(obj);

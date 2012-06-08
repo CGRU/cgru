@@ -298,16 +298,7 @@ void MonitorContainer::dispatch()
    //
    clearEvents();
 }
-/*
-bool MonitorContainer::collectIds( const std::list<int32_t> & list, af::MCGeneral & ids)
-{
-   std::list<int32_t>::const_iterator it = list.begin();
-   std::list<int32_t>::const_iterator end_it = list.end();
-   while( it != end_it) ids.addId( *(it++));
-   if( ids.getCount()) return true;
-   else return false;
-}
-*/
+
 void MonitorContainer::clearEvents()
 {
    for( int e = 0; e < af::Monitor::EventsCount; e++) events[e].clear();

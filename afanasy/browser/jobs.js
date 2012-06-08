@@ -2,6 +2,8 @@ function JobNode() {}
 
 JobNode.prototype.init = function() 
 {
+	this.element.classList.add('job');
+
 	this.name = document.createElement('span');
 	this.element.appendChild( this.name);
 	this.name.title = 'Job name';

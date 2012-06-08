@@ -381,6 +381,18 @@ bool af::addUniqueToList( std::list<int32_t> & o_list, int i_value)
 	return true;
 }
 
+const std::string af::vectToStr( const std::vector<int32_t> & i_vec)
+{
+	std::string o_str;
+	for( int i = 0; i < i_vec.size(); i++)
+	{
+		if( i > 0 )
+			o_str += ", ";
+		o_str += af::itos( i_vec[i]);
+	}
+	return o_str;
+}
+
 int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
 {
 	for( int task = i_startFrom; task < i_quantity; task++)
