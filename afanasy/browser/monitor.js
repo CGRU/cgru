@@ -56,6 +56,14 @@ Monitor.prototype.processMsg = function( obj)
 {
 	if( obj.events != null )
 	{
+		if( this.type == 'tasks')
+		{
+			if( obj.events.tasks_progress != null )
+			{
+				this.tasksProgress( obj.events.tasks_progress );
+			}
+			return;
+		}
 		this.delNodes( eval('obj.events.'+this.type+'_del'));
 		ids = cm_IdsMerge( eval('obj.events.'+this.type+'_change'), eval('obj.events.'+this.type+'_add'));
 		if( ids.length > 0 )
@@ -319,3 +327,31 @@ Monitor.prototype.jobProgress = function( progress)
 		}
 	}
 }
+
+Monitor.prototype.tasksProgress = function( tasks_progress)
+{
+g_Info('Monitor.prototype.tasksProgress = function( tasks_progress)');
+	var j = -1;
+	
+	for( var i = 0; i < tasks_progress.length; i++)
+	{
+g_Info(' jid='+tasks_progress[i].job_id+' this='+this.job_id);
+		if( tasks_progress[i].job_id == this.job_id)
+		{
+			j = i;
+			break;
+		}
+	}
+
+	if( j == -1 ) return;
+
+	for( var i = 0; i < tasks_progress[j].progress.length; i++)
+	{
+		var b = tasks_progress[j].blocks[i];
+		var t = tasks_progress[j].tasks[i];
+		var p = tasks_progress[j].progress[i];
+g_Info(' b'+b+' t'+t+ ' ' + p);
+		this.blocks[b].tasks[t].updateProgress( p);
+	}
+}
+

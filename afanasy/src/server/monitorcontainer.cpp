@@ -218,7 +218,7 @@ void MonitorContainer::dispatch()
    }
 
    //
-   // Tasks events:
+   // Tasks progress events:
    //
    std::list<af::MCTasksProgress*>::const_iterator tIt = tasks.begin();
    while( tIt != tasks.end())
@@ -229,11 +229,26 @@ void MonitorContainer::dispatch()
       {
          if( monitor->hasJobId( (*tIt)->getJobId()))
          {
-            if( msg == NULL)
-            {
-               msg = new af::Msg( af::Msg::TTasksRun, *tIt);
-            }
-            msg->addAddress( monitor);
+			if( monitor->collectingEvents())
+			{
+				const std::list<af::TaskProgress*> * progresses  = (*tIt)->getTasksRun();
+				std::list<int32_t>::const_iterator blocksIt = (*tIt)->getBlocks()->begin();
+				std::list<int32_t>::const_iterator tasksIt = (*tIt)->getTasks()->begin();
+				std::list<af::TaskProgress*>::const_iterator progressIt = progresses->begin();
+				while( progressIt != progresses->end())
+				{
+					monitor->addTaskProgress( (*tIt)->getJobId(), *blocksIt, *tasksIt, *progressIt);
+					blocksIt++; tasksIt++; progressIt++;
+				}
+			}
+			else
+			{
+	            if( msg == NULL)
+    	        {
+        	       msg = new af::Msg( af::Msg::TTasksRun, *tIt);
+            	}
+	            msg->addAddress( monitor);
+			}
          }
       }
       if( msg )

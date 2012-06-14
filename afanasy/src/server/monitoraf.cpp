@@ -14,19 +14,19 @@ MonitorContainer * MonitorAf::m_monitors = NULL;
 
 MonitorAf::MonitorAf( af::Msg * msg):
    af::Monitor( msg),
-	m_events_ids( NULL)
+	m_event_nodeids( NULL)
 {
 }
 
 MonitorAf::MonitorAf( const JSON & obj):
 	af::Monitor( obj)
 {
-	m_events_ids = new std::list<int32_t>[af::Monitor::EventsCount];
+	m_event_nodeids = new std::list<int32_t>[af::Monitor::EventsCount];
 }
 
 MonitorAf::~MonitorAf()
 {
-   if( m_events_ids != NULL ) delete [] m_events_ids;
+   if( m_event_nodeids != NULL ) delete [] m_event_nodeids;
 }
 
 void MonitorAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -264,7 +264,7 @@ void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 
 void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 {
-	if( m_events_ids == NULL)
+	if( m_event_nodeids == NULL)
 	{
 		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
 		return;
@@ -279,11 +279,48 @@ void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 	std::list<int32_t>::const_iterator it = i_ids.begin();
 	while( it != i_ids.end())
 	{
-		af::addUniqueToList( m_events_ids[i_type], *it);
+		af::addUniqueToList( m_event_nodeids[i_type], *it);
 		it++;
 	}
 
 printf("MonitorAf::addEvents: i_ids.size()=%lu\n", i_ids.size());
+}
+
+void MonitorAf::addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgress * i_tp)
+{
+std::ostringstream str;
+af::jw_state( i_tp->state, str);
+printf("MonitorAf::addTaskProgress():j=%d b=%d t=%d s='%s'\n", i_j, i_b, i_t, str.str().c_str());
+
+	for( int j = 0; j < m_tp.size(); j++)
+	{
+		if( m_tp[j].job_id != i_j ) continue;
+
+		for( int t = 0; t < m_tp[j].tp.size(); t++)
+		{
+			if(( m_tp[j].blocks[t] == i_t ) && ( m_tp[j].tasks[t] == i_b ))
+			{
+				m_tp[j].tp[t] = *i_tp;
+printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
+				return;
+			}
+		}
+
+		m_tp[j].blocks.push_back( i_b);
+		m_tp[j].tasks.push_back(  i_t);
+		m_tp[j].tp.push_back( *i_tp);
+
+printf("MonitorAf::addTaskProgress(): Task progress of the same job pushed.\n");
+		return;
+	}
+
+	const int last = m_tp.size();
+	m_tp.push_back( MTP());
+	m_tp[last].job_id = i_j;
+	m_tp[last].blocks.push_back( i_b);
+	m_tp[last].tasks.push_back( i_t);
+	m_tp[last].tp.push_back( *i_tp);
+printf("MonitorAf::addTaskProgress(): New job task progress pushed.\n");
 }
 
 af::Msg * MonitorAf::getEvents()
@@ -291,7 +328,7 @@ af::Msg * MonitorAf::getEvents()
 	updateTime();
 
 	af::Msg * msg = new af::Msg();
-	if( m_events_ids == NULL)
+	if( m_event_nodeids == NULL)
 	{
 		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
 		return msg;
@@ -303,7 +340,7 @@ af::Msg * MonitorAf::getEvents()
 
 	for( int e = 0; e < af::Monitor::EventsCount; e++)
 	{
-		if( m_events_ids[e].size() == 0 )
+		if( m_event_nodeids[e].size() == 0 )
 			continue;
 
 		if( hasevents )
@@ -313,10 +350,10 @@ af::Msg * MonitorAf::getEvents()
 		stream << "\n\"" << af::Monitor::EventsNames[e] << "\":";
 		stream << "[";
 
-		std::list<int32_t>::const_iterator it = m_events_ids[e].begin();
-		while( it != m_events_ids[e].end())
+		std::list<int32_t>::const_iterator it = m_event_nodeids[e].begin();
+		while( it != m_event_nodeids[e].end())
 		{
-			if( it != m_events_ids[e].begin())
+			if( it != m_event_nodeids[e].begin())
 				stream << ",";
 			stream << *it;
 			it++;
@@ -324,7 +361,40 @@ af::Msg * MonitorAf::getEvents()
 
 		stream << "]";
 		hasevents = true;
-		m_events_ids[e].clear();
+		m_event_nodeids[e].clear();
+	}
+
+	if( m_tp.size())
+	{
+		if( hasevents ) stream << ",";
+		stream << "\n{\"tasks_progress\":[";
+		for( int j = 0; j < m_tp.size(); j++)
+		{
+			if( j > 0 ) stream << ",";
+			stream << "{\"job_id\":" << m_tp[j].job_id;
+			stream << ",\"blocks\":[";
+			for( int t = 0; t < m_tp[j].blocks.size(); t++)
+			{
+				if( t > 0 ) stream << ",";
+				stream << m_tp[j].blocks[t];
+			}
+			stream << "],\"tasks\":[";
+			for( int t = 0; t < m_tp[j].tasks.size(); t++)
+			{
+				if( t > 0 ) stream << ",";
+				stream << m_tp[j].tasks[t];
+			}
+			stream << "],\"progress\":[";
+			for( int t = 0; t < m_tp[j].tp.size(); t++)
+			{
+				if( t > 0 ) stream << ",";
+				m_tp[j].tp[j].jsonWrite( stream);
+			}	
+			stream << "]}";
+		}
+		stream << "]";
+		hasevents = true;
+		m_tp.clear();
 	}
 
 	if( false == hasevents )

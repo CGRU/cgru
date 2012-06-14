@@ -119,6 +119,7 @@ function cm_GetState( i_state)
 	if( i_state.indexOf('RUN') != -1 ) state.run = true;
 	if( i_state.indexOf('DON') != -1 ) state.don = true;
 	if( i_state.indexOf('ERR') != -1 ) state.err = true;
+	if( i_state.indexOf('SKP') != -1 ) state.skp = true;
 	return state;
 }
 

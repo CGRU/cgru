@@ -86,23 +86,18 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	var state = cm_GetState( i_progress.state);
 	this.state.innerHTML = state.string;
 
-	var percent = -1;
-//	percent = 50;
-	if( state.run ) percent = i_progress.per;
+	var percent = 0;
+	if( state.run && i_progress.per ) percent = i_progress.per;
 	if( state.don ) percent = 100;
 	if( state.skp ) percent = 100;
 	if( percent < 0 ) percent = 0;
 	if( percent > 100 ) percent = 100;
-	if( percent != -1 )
-	{
-		if( state.run)
-			this.percent.innerHTML = ' ' + percent + '%';
-		this.progress.style.width = '' + percent + '%'
-	}
+
+	if( state.run)
+		this.percent.innerHTML = ' ' + percent + '%';
 	else
-	{
 		this.percent.innerHTML = '';
-	}
+	this.progress.style.width = ( percent + '%');
 }
 
 TaskItem.prototype.genName = function()

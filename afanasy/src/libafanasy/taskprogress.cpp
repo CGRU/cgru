@@ -44,14 +44,14 @@ void TaskProgress::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "{";
 	jw_state( state, o_str);
-	if( percent >= 0 ) o_str << ",\"per\":" << int(percent);
-	if( frame        ) o_str << ",\"frm\":" << frame;
-	if( percentframe ) o_str << ",\"pfr\":" << int(percentframe);
-	if( starts_count ) o_str << ",\"str\":" << starts_count;
-	if( errors_count ) o_str << ",\"err\":" << errors_count;
-	if( time_start   ) o_str << ",\"tst\":" << time_start;
-	if( time_done    ) o_str << ",\"tdn\":" << time_done;
-	if( hostname.size()) o_str << ",\"hst\":\"" << hostname << "\"";
+	if( percent      > 0 ) o_str << ",\"per\":" << int(percent);
+	if( frame        > 0 ) o_str << ",\"frm\":" << frame;
+	if( percentframe > 0 ) o_str << ",\"pfr\":" << int(percentframe);
+	if( starts_count > 0 ) o_str << ",\"str\":" << starts_count;
+	if( errors_count > 0 ) o_str << ",\"err\":" << errors_count;
+	if( time_start   > 0 ) o_str << ",\"tst\":" << time_start;
+	if( time_done    > 0 ) o_str << ",\"tdn\":" << time_done;
+	if( hostname.size()  ) o_str << ",\"hst\":\"" << hostname << "\"";
 	o_str << "}";
 }
 
