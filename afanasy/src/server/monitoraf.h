@@ -2,22 +2,7 @@
 
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/taskprogress.h"
-/*
-struct MTP_Tasks {
-	int task_num;
-	af::TaskProgress progress;
-};
 
-struct MTP_Blocks {
-	int block_num;
-	std::vector<MTP_Tasks> tasks;
-};
-
-struct MTP_Jobs {
-	int job_id;
-	std::vector<MTP_Blocks> blocks;
-};
-*/
 class MonitorAf: public af::Monitor
 {
 public:
@@ -55,6 +40,8 @@ public:
 
 	void addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgress * i_tp);
 
+	void addBlock( int i_j, int i_b, int i_mode);
+
 private:
    void setEvents( const std::vector<int32_t> & i_ids, bool value);
    void setJobsUsersIds( const std::vector<int32_t> & i_ids);
@@ -65,22 +52,20 @@ private:
 private:
 	std::list<int32_t> * m_event_nodeids;
 
-//	typedef std::vector<int> VI;
-//	typedef std::vector<VI> VVI;
-	struct MTP {
+	struct MTaskProgresses {
 		int job_id;
 		std::vector<int> blocks;
 		std::vector<int> tasks;
 		std::vector<af::TaskProgress> tp;
 	};
-	std::vector<MTP> m_tp;
-///*
-//	std::vector<int32_t> m_job_ids;
-//	std::vector<int32_t> m_block_nums;
-//	std::vector<int32_t> m_task_nums;
-//*/
-//	std::vector<VVI> m_jbt;
-//	std::vector<af::TaskProgress> m_task_progresses;
+	std::vector<MTaskProgresses> m_tp;
+
+	struct MBlocksIds {
+		int job_id;
+		int block_num;
+		int mode;
+	};
+	std::vector<MBlocksIds> m_bids;
 
 private:
 	static MonitorContainer * m_monitors;

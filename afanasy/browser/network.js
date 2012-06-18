@@ -74,15 +74,23 @@ function nw_GetEvents()
 	nw_Send(obj);
 }
 
-function nw_GetNodes( i_type, i_ids, i_mode)
+function nw_GetNodes( i_type, i_ids, i_mode, i_blocks)
 {
 	var obj = {};
 	obj.get = {};
 	obj.get.type = i_type;
 	if(( i_ids != null ) && ( i_ids.length > 0 ))
-		obj.get.ids = i_ids
+		obj.get.ids = i_ids;
 	if( i_mode )
 		obj.get.mode = i_mode;
+	if( i_blocks )
+		obj.get.block_ids = i_blocks;
 
 	nw_Send(obj);
 }
+
+function nw_GetBlocks( i_job_id, i_blocks, i_modes)
+{
+	nw_GetNodes( "jobs", [i_job_id], i_modes, i_blocks);
+}
+

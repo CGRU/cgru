@@ -25,7 +25,7 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 	char * data = new char[datalen+1];
 	memcpy( data, i_msg->data(), datalen);
 	data[datalen] = '\0';
-//printf("%s\n", data);
+//printf("af::jsonParseMsg:\n");printf("%s\n", data);
 
 	std::string err;
 	if( o_doc.ParseInsitu<0>(data).HasParseError())
@@ -186,6 +186,19 @@ bool af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const 
 	for( int i = 0; i < array.Size(); i++)
 		if( array[i].IsInt())
 			o_attr.push_back( array[i].GetInt());
+
+	return true;
+}
+
+bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, const JSON & i_object)
+{
+	const JSON & array = i_object[i_name];
+	if( false == array.IsArray())
+		return false;
+
+	for( int i = 0; i < array.Size(); i++)
+		if( array[i].IsString())
+			o_attr.push_back( array[i].GetString());
 
 	return true;
 }

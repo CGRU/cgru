@@ -41,6 +41,8 @@ public:
 
    af::Msg * writeProgress( bool json);   ///< Write job progress in message.
 
+	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes);
+
    const std::string getErrorHostsListString() const; /// Get avoid hosts list.
    virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 

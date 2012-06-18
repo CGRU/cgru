@@ -273,8 +273,15 @@ void MonitorContainer::dispatch()
       {
          if( monitor->hasJobId( (*bIt)->getJobId()))
          {
-            mcblocks.addNode( (*bIt));
-            if( type < *tIt) type = *tIt;
+			if( monitor->collectingEvents())
+			{
+				monitor->addBlock( (*bIt)->getJobId(), (*bIt)->getBlockNum(), *tIt);
+			}
+			else
+			{
+    	        mcblocks.addNode( (*bIt));
+	            if( type < *tIt) type = *tIt;
+			}
          }
       }
       if( mcblocks.getCount() < 1) continue;

@@ -61,6 +61,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 				JobAf * job = NULL;
 				bool was_error = false;
+				std::vector<int32_t> block_ids;
 				if( ids.size() == 1 )
 				{
 					JobContainerIt jobsIt( i_args->jobs);
@@ -70,11 +71,19 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						o_msg_response = af::jsonMsgError( "Invalid ID");
 						was_error = true;
 					}
+					af::jr_int32vec("block_ids", block_ids, getObj);
 				}
 
 				if( was_error == false )
 				{
-					if(( mode == "progress" ) && ( job != NULL ))
+					if( block_ids.size() && ( job != NULL ))
+					{
+						std::vector<std::string> modes;
+						af::jr_int32vec("block_ids", block_ids, getObj);
+						af::jr_stringvec("mode", modes, getObj);
+						o_msg_response = job->writeBlocks( block_ids, modes);
+					}
+					else if(( mode == "progress" ) && ( job != NULL ))
 						o_msg_response = job->writeProgress( json);
 					else
 						o_msg_response = i_args->jobs->generateList(

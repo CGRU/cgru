@@ -301,7 +301,7 @@ printf("MonitorAf::addTaskProgress():j=%d b=%d t=%d s='%s'\n", i_j, i_b, i_t, st
 			if(( m_tp[j].blocks[t] == i_t ) && ( m_tp[j].tasks[t] == i_b ))
 			{
 				m_tp[j].tp[t] = *i_tp;
-printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
+//printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
 				return;
 			}
 		}
@@ -310,17 +310,36 @@ printf("MonitorAf::addTaskProgress(): Task progress updated.\n");
 		m_tp[j].tasks.push_back(  i_t);
 		m_tp[j].tp.push_back( *i_tp);
 
-printf("MonitorAf::addTaskProgress(): Task progress of the same job pushed.\n");
+//printf("MonitorAf::addTaskProgress(): Task progress of the same job pushed.\n");
 		return;
 	}
 
 	const int last = m_tp.size();
-	m_tp.push_back( MTP());
+	m_tp.push_back( MTaskProgresses());
 	m_tp[last].job_id = i_j;
 	m_tp[last].blocks.push_back( i_b);
 	m_tp[last].tasks.push_back( i_t);
 	m_tp[last].tp.push_back( *i_tp);
-printf("MonitorAf::addTaskProgress(): New job task progress pushed.\n");
+//printf("MonitorAf::addTaskProgress(): New job task progress pushed.\n");
+}
+
+void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
+{
+	for( int i = 0; i < m_bids.size(); i++)
+	{
+		if(( m_bids[i].job_id == i_j ) && ( m_bids[i].block_num == i_b ))
+		{
+			if( m_bids[i].mode < i_mode )
+				m_bids[i].mode = i_mode;
+			return;
+		}
+	}
+
+	int i = m_bids.size();
+	m_bids.push_back( MBlocksIds());
+	m_bids[i].job_id = i_j;
+	m_bids[i].block_num = i_b;
+	m_bids[i].mode = i_mode;
 }
 
 af::Msg * MonitorAf::getEvents()
@@ -388,13 +407,55 @@ af::Msg * MonitorAf::getEvents()
 			for( int t = 0; t < m_tp[j].tp.size(); t++)
 			{
 				if( t > 0 ) stream << ",";
-				m_tp[j].tp[j].jsonWrite( stream);
+				m_tp[j].tp[t].jsonWrite( stream);
 			}	
 			stream << "]}";
 		}
 		stream << "]";
 		hasevents = true;
 		m_tp.clear();
+	}
+
+	if( m_bids.size())
+	{
+		if( hasevents ) stream << ",";
+		stream << "\n\"block_ids\":{";
+
+		stream << "\"job_id\":[";
+		for( int i = 0; i < m_bids.size(); i++)
+		{
+			if( i > 0 ) stream << ",";
+			stream << m_bids[i].job_id;
+		}
+		stream << "],";
+
+		stream << "\"block_num\":[";
+		for( int i = 0; i < m_bids.size(); i++)
+		{
+			if( i > 0 ) stream << ",";
+			stream << m_bids[i].block_num;
+		}
+		stream << "],";
+
+		stream << "\"mode\":[";
+		for( int i = 0; i < m_bids.size(); i++)
+		{
+			if( i > 0 ) stream << ",";
+std::string mode;
+switch( m_bids[i].mode )
+{
+case /**/af::Msg::TBlocksProgress/**/:   mode = "progress";   break;
+case /**/af::Msg::TBlocksProperties/**/: mode = "properties"; break;
+case /**/af::Msg::TBlocks/**/:           mode = "full";       break;
+default:
+	AFERRAR("MonitorAf::addBlock: Invalid block write mode: %d", m_bids[i].mode);
+}
+			stream << '"' << mode << '"';
+		}
+		stream << "]}";
+
+		hasevents = true;
+		m_bids.clear();
 	}
 
 	if( false == hasevents )

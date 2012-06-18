@@ -62,6 +62,10 @@ Monitor.prototype.processMsg = function( obj)
 			{
 				this.tasksProgress( obj.events.tasks_progress );
 			}
+			if( obj.events.block_ids != null )
+			{
+				this.getBlocks( obj.events.block_ids );
+			}
 			return;
 		}
 		this.delNodes( eval('obj.events.'+this.type+'_del'));
@@ -350,8 +354,31 @@ g_Info(' jid='+tasks_progress[i].job_id+' this='+this.job_id);
 		var b = tasks_progress[j].blocks[i];
 		var t = tasks_progress[j].tasks[i];
 		var p = tasks_progress[j].progress[i];
-g_Info(' b'+b+' t'+t+ ' ' + p);
 		this.blocks[b].tasks[t].updateProgress( p);
 	}
+}
+
+Monitor.prototype.getBlocks = function( i_block_ids)
+{
+	blocks = [];
+	modes = [];
+
+var test = 'block ids:'
+document.getElementById('test').innerHTML = test;
+
+	for( var i = 0; i < i_block_ids.job_id.length; i++)
+	{
+		if( this.job_id != i_block_ids.job_id[i]) continue;
+test += ' n' + i_block_ids.block_num[i];
+test += ' m' + i_block_ids.mode[i];
+		blocks.push( i_block_ids.block_num[i]);
+		modes.push( i_block_ids.mode[i]);
+	}
+
+document.getElementById('test').innerHTML = test;
+
+	if( blocks.length == 0 ) return;
+
+	nw_GetBlocks( this.job_id, blocks, modes);
 }
 
