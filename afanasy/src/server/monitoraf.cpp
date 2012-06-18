@@ -1,5 +1,6 @@
 #include "monitoraf.h"
 
+#include "../libafanasy/blockdata.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
@@ -283,14 +284,12 @@ void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 		it++;
 	}
 
-printf("MonitorAf::addEvents: i_ids.size()=%lu\n", i_ids.size());
+//printf("MonitorAf::addEvents: i_ids.size()=%lu\n", i_ids.size());
 }
 
 void MonitorAf::addTaskProgress( int i_j, int i_b, int i_t, const af::TaskProgress * i_tp)
 {
-std::ostringstream str;
-af::jw_state( i_tp->state, str);
-printf("MonitorAf::addTaskProgress():j=%d b=%d t=%d s='%s'\n", i_j, i_b, i_t, str.str().c_str());
+//std::ostringstream str;af::jw_state( i_tp->state, str);printf("MonitorAf::addTaskProgress():j=%d b=%d t=%d s='%s'\n", i_j, i_b, i_t, str.str().c_str());
 
 	for( int j = 0; j < m_tp.size(); j++)
 	{
@@ -357,6 +356,7 @@ af::Msg * MonitorAf::getEvents()
 	stream << "{\"events\":";
 	bool hasevents = false;
 
+	// Nodes events:
 	for( int e = 0; e < af::Monitor::EventsCount; e++)
 	{
 		if( m_event_nodeids[e].size() == 0 )
@@ -383,6 +383,7 @@ af::Msg * MonitorAf::getEvents()
 		m_event_nodeids[e].clear();
 	}
 
+	// Tasks progress:
 	if( m_tp.size())
 	{
 		if( hasevents ) stream << ",";
@@ -416,6 +417,7 @@ af::Msg * MonitorAf::getEvents()
 		m_tp.clear();
 	}
 
+	// Blocks ids:
 	if( m_bids.size())
 	{
 		if( hasevents ) stream << ",";
@@ -441,16 +443,7 @@ af::Msg * MonitorAf::getEvents()
 		for( int i = 0; i < m_bids.size(); i++)
 		{
 			if( i > 0 ) stream << ",";
-std::string mode;
-switch( m_bids[i].mode )
-{
-case /**/af::Msg::TBlocksProgress/**/:   mode = "progress";   break;
-case /**/af::Msg::TBlocksProperties/**/: mode = "properties"; break;
-case /**/af::Msg::TBlocks/**/:           mode = "full";       break;
-default:
-	AFERRAR("MonitorAf::addBlock: Invalid block write mode: %d", m_bids[i].mode);
-}
-			stream << '"' << mode << '"';
+			stream << '"' << af::BlockData::DataModeFromMsgType( m_bids[i].mode) << '"';
 		}
 		stream << "]}";
 

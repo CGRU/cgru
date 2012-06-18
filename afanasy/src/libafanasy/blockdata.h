@@ -31,8 +31,6 @@ public:
 
    virtual ~BlockData();
 
-   inline uint32_t getFlags() const { return m_flags;}
-
 	enum Flags{
 		FNumeric          = 1 << 0,
 		FVarCapacity      = 1 << 1,
@@ -41,6 +39,13 @@ public:
 		FDependSubTask    = 1 << 4,
 		FNonSequential    = 1 << 5
 	};
+
+	static const char DataMode_Progress[];
+	static const char DataMode_Properties[];
+	static const char DataMode_Full[];
+	static const char * DataModeFromMsgType( int i_type);
+
+	inline uint32_t getFlags() const { return m_flags;}
 
    bool isValid() const;
    inline  void setJobId( int value) { m_job_id = value;}   ///< Set id of block job.

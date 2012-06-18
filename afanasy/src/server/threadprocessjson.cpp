@@ -79,7 +79,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 					if( block_ids.size() && ( job != NULL ))
 					{
 						std::vector<std::string> modes;
-						af::jr_int32vec("block_ids", block_ids, getObj);
 						af::jr_stringvec("mode", modes, getObj);
 						o_msg_response = job->writeBlocks( block_ids, modes);
 					}

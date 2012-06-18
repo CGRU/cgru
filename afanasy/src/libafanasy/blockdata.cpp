@@ -15,6 +15,21 @@
 
 using namespace af;
 
+const char   BlockData::DataMode_Progress[] = "progress";
+const char   BlockData::DataMode_Properties[] = "properties";
+const char   BlockData::DataMode_Full[] = "full";
+const char * BlockData::DataModeFromMsgType( int i_type)
+{
+	switch( i_type)
+	{
+		case af::Msg::TBlocksProgress:   return DataMode_Progress;
+		case af::Msg::TBlocksProperties: return DataMode_Properties;
+		case af::Msg::TBlocks:           return DataMode_Full;
+	} 
+	AFERRAR("BlockData::DataModeFromMsgTyp: Invalid block write mode: %d", i_type);
+	return "invalid";
+}
+
 BlockData::BlockData()
 {
    initDefaults();
@@ -135,11 +150,11 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_string("files",                 m_files,                 i_object, io_changes);
 	jr_string("command_pre",           m_command_pre,           i_object, io_changes);
 	jr_string("command_post",          m_command_post,          i_object, io_changes);
-	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object);
-	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object);
+	jr_int32 ("max_running_tasks",          m_max_running_tasks,          i_object, io_changes);
+	jr_int32 ("max_running_tasks_per_host", m_max_running_tasks_per_host, i_object, io_changes);
 	//jr_string("custom_data",         m_custom_data,           i_object, io_changes);
 	//jr_string("environment",         m_environment,           i_object, io_changes);
-	//jr_int32 ("parser_coeff",        m_parser_coeff,          i_object, io_changes);
+	jr_int32 ("parser_coeff",          m_parser_coeff,          i_object, io_changes);
 
 	if( m_capacity < 1 )
 		m_capacity = 1;
