@@ -101,6 +101,12 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 				eids.push_back( af::Msg::TMonitorRendersChanged);
 				eids.push_back( af::Msg::TMonitorRendersDel);
 			}
+			else if( opclass == "users")
+			{
+				eids.push_back( af::Msg::TMonitorUsersAdd);
+				eids.push_back( af::Msg::TMonitorUsersChanged);
+				eids.push_back( af::Msg::TMonitorUsersDel);
+			}
 			else
 			{
 				appendLog("Unknown operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);

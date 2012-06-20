@@ -81,6 +81,14 @@ af::Msg * af::jsonMsgError( const char * i_str)
 	return o_msg;
 }
 
+af::Msg * af::jsonMsg( const std::ostringstream & i_stream)
+{
+	af::Msg * o_msg = new af::Msg();
+	std::string string = i_stream.str();
+	o_msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
+	return o_msg;
+}
+
 bool af::jr_regexp( const char * i_name, RegExp & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & value = i_object[i_name];

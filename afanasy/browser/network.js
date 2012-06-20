@@ -1,5 +1,9 @@
+nw_connected = false;
 nw_send_count = 0;
 nw_recv_count = 0;
+nw_error_count = 0;
+nw_error_count_max = 5;
+nw_error_total = 0;
 
 function nw_Send( obj)
 {
@@ -7,14 +11,10 @@ function nw_Send( obj)
 
 document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
 
-	//document.getElementById("test").innerHTML='' + obj_str.length + ':' + obj_str;
 	var xhr = new XMLHttpRequest;
-	xhr.onerror = function() { g_Error(xhr.statusText()); }
+	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 	xhr.open("POST", "/", true); 
 	xhr.send('[ * AFANASY * ] 1 0 '+obj_str.length+' JSON'+obj_str);
-
-	//document.getElementById("status").innerHTML='Status number = ' + xhr.status;
-	//document.getElementById("statustext").innerHTML='Status text: ' + xhr.statusText;
 
 	xhr.onreadystatechange = function()
 	{
@@ -23,18 +23,23 @@ document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_
 			if( xhr.status == 200 )
 			{
 document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
+				nw_error_count = 0;
+				nw_connected = true;
 				g_ProcessMsg( eval('('+xhr.responseText+')'));
+				return;
+			}
+			nw_error_count++;
+			nw_error_total++;
+//document.getElementById("status").innerHTML=nw_error_count+': Status number = ' + xhr.status;
+//document.getElementById("statustext").innerHTML='Status text: ' + xhr.statusText;
+			if(( nw_error_count > nw_error_count_max ) && nw_connected )
+			{
+				nw_connected = false;
+				g_Error('Connection lost.');
+				g_ConnectionLost();
 			}
 		}
 	}
-/*
-	if(xhr.status == 200)
-	{
-		document.getElementById("type").innerHTML='Type = ' + xhr.responseType;
-		document.getElementById("data").innerHTML=xhr.responseText;
-	}
-	document.getElementById("finish").innerHTML="It works!";
-*/
 }
 
 function nw_Subscribe( i_class, i_subscribe, i_ids)

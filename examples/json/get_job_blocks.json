@@ -1,0 +1,11 @@
+{
+	"get":
+	{
+		"type" : "jobs",
+		"block_ids" : [0],
+		"mode" : ["progress"],
+		"-mode" : ["properties"],
+		"-mode" : ["full"],
+		"ids"  : [2]
+	}
+}

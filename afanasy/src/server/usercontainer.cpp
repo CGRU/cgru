@@ -189,17 +189,14 @@ af::Msg* UserContainer::generateJobsList( const std::vector<int32_t> & ids,
 			user->jobsinfo( mcjobs);
 	}
 
-	af::Msg * msg = new af::Msg();
-
 	if( json )
 	{
 		stream << "\n]}";
-		std::string string = stream.str();
-		msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
+		return af::jsonMsg( stream);
 	}
-	else
-		msg->set( af::Msg::TJobsList, &mcjobs);
 
+	af::Msg * msg = new af::Msg();
+	msg->set( af::Msg::TJobsList, &mcjobs);
 	return msg;
 }
 

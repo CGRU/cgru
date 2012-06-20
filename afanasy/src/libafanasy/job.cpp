@@ -133,10 +133,12 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 
 /*	if( m_flags != 0 )
-		o_str << ",\"flags\":"                      << m_flags;
+		o_str << ",\"flags\":"                      << m_flags;*/
 	if( m_state != 0 )
-		o_str << ",\"state\":"                      << m_state;
-		*/
+	{
+		o_str << ",";
+		jw_state( m_state, o_str);
+	}
 	if( m_user_list_order != -1 )
 		o_str << ",\"user_list_order\":"            << m_user_list_order;
 	o_str << ",\"time_creation\":"                  << m_time_creation;

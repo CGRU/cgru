@@ -456,7 +456,14 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 {
 	int offset = 0;
 	if( i_msg->type() == af::Msg::TJSON )
+	{
 		offset = af::Msg::SizeHeader;
+//		::writedata( i_desc, "HTTP/1.1 200 OK", 16);
+//		::writedata( i_desc, "Content-Type: application/json", 32);
+//                            1234567890123456789012345678901234567890
+//                            0         1         2         3
+//		::writedata( i_desc, "\r\n\r\n", 4);
+	}
 
     if( false == ::writedata( i_desc, i_msg->buffer() + offset, i_msg->writeSize() - offset ))
     {

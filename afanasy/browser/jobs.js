@@ -17,11 +17,21 @@ JobNode.prototype.init = function()
 	this.element.appendChild( this.user_name);
 	this.user_name.style.cssFloat = 'right';
 	this.user_name.title = 'User name'
+
+	this.state = document.createElement('span');
+	this.element.appendChild( this.state);
+//	this.state.style.cssFloat = 'right';
+	this.state.style.position = 'absolute';
+	this.state.style.left = '40%';
+	this.state.title = 'Job state';
 }
 
 JobNode.prototype.update = function()
 {
-	if( this.params.offline === true )
+	var state = cm_GetState( this.params.state);
+	this.state.innerHTML = state.string + '-';
+
+	if( state.off )
 	{
 		if( false == this.element.classList.contains('offline'))
 		this.element.classList.add('offline');
@@ -29,7 +39,7 @@ JobNode.prototype.update = function()
 	else
 		this.element.classList.remove('offline');
 
-	if( this.params.running === true )
+	if( state.run )
 	{
 		if( false == this.element.classList.contains('running'))
 		this.element.classList.add('running');
@@ -42,12 +52,6 @@ JobNode.prototype.update = function()
 	this.priority.innerHTML = '-' + this.params.priority;
 
 	this.user_name.innerHTML = this.params.user_name;
-
-	if( this.params.offline === true )
-	{
-		this.center.innerHTML = 'offline';
-		return;
-	}
 }
 
 JobNode.prototype.onDoubleClick = function()

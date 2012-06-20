@@ -261,6 +261,18 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 		setNonSequential( true );
 }
 
+void BlockData::jsonWrite( std::ostringstream & o_str, const std::string & i_datamode)
+{
+	int type = 0;
+	if     ( i_datamode == DataMode_Progress   ) type = af::Msg::TBlocksProgress;
+	else if( i_datamode == DataMode_Properties ) type = af::Msg::TBlocksProperties;
+	else if( i_datamode == DataMode_Full       ) type = af::Msg::TBlocks;	
+	else
+		AFERRAR("BlockData::jsonWrite: Unknown data mode '%s'", i_datamode.c_str())
+
+	jsonWrite( o_str, type);
+}
+
 void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 {
     o_str << "{";
@@ -373,7 +385,10 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 
         o_str << "\"block_num\":"  << m_block_num;
 		if( m_state != 0 )
-            o_str << ",\"state\":"   << m_state;
+		{
+			o_str << ",";
+			jw_state( m_state, o_str);
+		}
 		if( m_job_id != 0 )
             o_str << ",\"job_id\":" << m_job_id;
 		if( m_running_tasks_counter > 0 )

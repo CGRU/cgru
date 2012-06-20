@@ -226,4 +226,5 @@ namespace af
 
 	af::Msg * jsonMsg( const char * i_str);
 	af::Msg * jsonMsgError( const char * i_str);
+	af::Msg * jsonMsg( const std::ostringstream & i_stream);
 }

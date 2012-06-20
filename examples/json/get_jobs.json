@@ -2,11 +2,9 @@
 	"get":
 	{
 		"type" : "jobs",
-		"-mask" : "afanasy|_empty_.*",
-		"ids"  : [2],
-		"-block_ids" : [0],
+		"-ids"  : [1],
 		"-uids" : [1,2],
 		"-mode" : "full",
-		"mode" : "progress"
+		"mask" : "afanasy|_empty_.*"
 	}
 }

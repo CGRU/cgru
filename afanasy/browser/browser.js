@@ -14,6 +14,7 @@ g_recievers = [];
 g_updaters = [];
 g_monitors = [];
 g_cur_monitor = null;
+g_monitor_buttons = [];
 
 function g_Register()
 {
@@ -75,7 +76,10 @@ function g_Update()
 
 function g_Init()
 {
-//	document.getElementById('id').innerHTML='launching...';
+	var header = document.getElementById('header');
+	g_monitor_buttons = header.getElementsByClassName('mbutton');
+	for( var i = 0; i < g_monitor_buttons.length; i++)
+		g_monitor_buttons[i].onclick = g_MButtonClick;
 
 	g_Register();
 	g_Update();
@@ -95,8 +99,16 @@ function g_Deregistered()
 	g_Register();
 }
 
+function g_ConnectionLost()
+{
+	g_Deregistered();
+}
+
 function g_CloseAllMonitors()
 {
+	for( var i = 0; i < g_monitor_buttons.length; i++)
+		g_monitor_buttons[i].classList.remove('pushed');
+
 	while( g_monitors.length > 0 )
 		g_monitors[0].destroy();
 }
@@ -107,6 +119,18 @@ function g_OpenTasks( jobId)
 	new Monitor( document.getElementById('view'), 'tasks', jobId);
 //	new Monitor( document.getElementById('view'), 'renders');
 //document.getElementById('test').innerHTML = jobId;
+}
+
+function g_MButtonClick( evt)
+{
+	if( evt == null ) return;
+	var el = evt.currentTarget;
+	if( el == null ) return;
+
+	g_CloseAllMonitors();
+	el.classList.add('pushed');
+
+	new Monitor( document.getElementById('view'), el.innerHTML);
 }
 
 function g_Info( i_msg, i_elem)

@@ -1309,9 +1309,9 @@ af::Msg * JobAf::writeProgress( bool json)
 
 af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes)
 {
-printf("JobAf::writeBlocks: bs=%d, ms=%d\n", i_block_ids.size(), i_modes.size());
-printf("bids:");for(int i=0;i<i_block_ids.size();i++)printf(" %d",i_block_ids[i])    ;printf("\n");
-printf("mods:");for(int i=0;i<i_modes.size()    ;i++)printf(" %s",i_modes[i].c_str());printf("\n");
+//printf("JobAf::writeBlocks: bs=%d, ms=%d\n", i_block_ids.size(), i_modes.size());
+//printf("bids:");for(int i=0;i<i_block_ids.size();i++)printf(" %d",i_block_ids[i])    ;printf("\n");
+//printf("mods:");for(int i=0;i<i_modes.size()    ;i++)printf(" %s",i_modes[i].c_str());printf("\n");
 	if( i_block_ids.size() != i_modes.size())
 	{
 		AFERRAR("JobAf::writeBlocks: i_block_ids.size() != i_modes.size(): %d != %d",
@@ -1319,7 +1319,22 @@ printf("mods:");for(int i=0;i<i_modes.size()    ;i++)printf(" %s",i_modes[i].c_s
 		return NULL;
 	}
 
-	return NULL;
+	std::ostringstream str;
+	str << "{\"blocks\":[\n";
+	for( int b = 0; b < i_block_ids.size(); b++)
+	{
+		if( b > 0 ) str << ",";
+		if( i_block_ids[b] >= m_blocksnum )
+		{
+			AFERRAR("JobAf::writeBlocks: i_block_ids[b] >= m_blocksnum: %d >= %d",
+				i_block_ids[b], m_blocksnum);
+			return NULL;
+		}
+		m_blocksdata[i_block_ids[b]]->jsonWrite( str, i_modes[b]);
+	}
+	str << "\n]}";
+
+	return af::jsonMsg( str);
 }
 
 const std::list<std::string> & JobAf::getTaskLog( int block, int task)

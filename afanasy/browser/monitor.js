@@ -83,13 +83,14 @@ Monitor.prototype.processMsg = function( obj)
 				if( obj.jobs.length == 1 )
 					this.jobConstruct( obj.jobs[0]);
 		}
-		else
+		else if( obj.job_progress != null )
 		{
-			if( obj.job_progress != null )
-			{
 				if( obj.job_progress.id == this.job_id )
 					this.jobProgress( obj.job_progress.progress);
-			}
+		}
+		else if( obj.blocks != null )
+		{
+			this.updateBlocks( obj.blocks);
 		}
 		return;
 	}
@@ -151,6 +152,7 @@ Monitor.prototype.newNode = function( i_obj)
 	var node = null
 	if     ( this.type == 'jobs'   ) node = new    JobNode();
 	else if( this.type == 'renders') node = new RenderNode();
+	else if( this.type == 'users'  ) node = new   UserNode();
 	else return null;
 
 	this.createItem( node, i_obj);
@@ -161,7 +163,7 @@ Monitor.prototype.newNode = function( i_obj)
 Monitor.prototype.createItem = function( i_item, i_obj)
 {
 	i_item.element = document.createElement('div');
-//	i_item.element.className = 'item';
+	i_item.element.className = 'item';
 	this.element.appendChild( i_item.element);
 
 	i_item.init();
@@ -382,3 +384,20 @@ document.getElementById('test').innerHTML = test;
 	nw_GetBlocks( this.job_id, blocks, modes);
 }
 
+Monitor.prototype.updateBlocks = function( i_blocks)
+{
+	for( var i = 0; i < i_blocks.length; i++)
+	{
+		if( i_blocks[i].job_id != this.job_id ) continue;
+
+		for( var b = 0; b < this.blocks.length; b++)
+		{
+			if( i_blocks[i].block_num != b ) continue;
+
+//			this.blocks[b].getData( i_blocks[i]);
+			this.blocks[b].params = i_blocks[i];
+			this.blocks[b].update();
+			break;
+		}
+	}
+}

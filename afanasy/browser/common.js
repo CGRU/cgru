@@ -114,12 +114,19 @@ function cm_TimeStringFromNow( time)
 function cm_GetState( i_state)
 {
 	var state = {};
+	if( i_state == null )
+	{
+		state.string = '';
+		return state;
+	}
+
 	state.string = i_state;
 	if( i_state.indexOf('RDY') != -1 ) state.rdy = true;
 	if( i_state.indexOf('RUN') != -1 ) state.run = true;
 	if( i_state.indexOf('DON') != -1 ) state.don = true;
 	if( i_state.indexOf('ERR') != -1 ) state.err = true;
 	if( i_state.indexOf('SKP') != -1 ) state.skp = true;
+	if( i_state.indexOf('OFF') != -1 ) state.off = true;
 	return state;
 }
 

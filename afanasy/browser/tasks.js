@@ -15,17 +15,25 @@ BlockItem.prototype.init = function()
 	this.element.appendChild( this.props);
 	this.props.style.cssFloat = 'right';
 	this.props.title = 'Block properties';
+
+	this.state = document.createElement('span');
+	this.element.appendChild( this.state);
+	this.state.style.cssFloat = 'right';
+	this.state.title = 'Block state';
 }
 
 BlockItem.prototype.update = function()
 {
-	if( this.params.running === true )
+	var state = cm_GetState( this.params.state);
+	this.state.innerHTML = state.string + '-';
+
+	if( state.off )
 	{
-		if( false == this.element.classList.contains('running'))
-		this.element.classList.add('running');
+		if( false == this.element.classList.contains('offline'))
+		this.element.classList.add('offline');
 	}
 	else
-		this.element.classList.remove('running');
+		this.element.classList.remove('offline');
 
 	if( this.params.tasks )
 		this.props.innerHTML = 'array';
@@ -46,7 +54,7 @@ TaskItem.prototype.init = function()
 
 	this.progress = document.createElement('span');
 	this.element.appendChild( this.progress);
-	this.progress.classList.add('task_progress');
+	this.progress.classList.add('progress');
 //	this.progress.style.zIndex = 1;
 
 	this.name = document.createElement('span');

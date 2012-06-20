@@ -255,6 +255,7 @@ public:
 
 	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
     void jsonWrite( std::ostringstream & o_str, int i_type = Msg::TBlocks);
+	void jsonWrite( std::ostringstream & o_str, const std::string & i_datamode);
 
 /// Generate progress bits info string.
    void generateProgressStream( std::ostringstream & o_str) const;
