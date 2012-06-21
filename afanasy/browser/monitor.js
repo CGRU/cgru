@@ -1,7 +1,26 @@
 function Monitor( i_element, i_type, i_id)
 {
-	this.element = i_element;
-	this.element.monitor = this;
+	this.elParent = i_element;
+
+	this.elMonitor = document.createElement('div');
+	this.elParent.appendChild( this.elMonitor);
+	this.elMonitor.classList.add('monitor');
+	this.elMonitor.monitor = this;
+
+	this.elCtrl = document.createElement('div');
+	this.elList = document.createElement('div');
+	this.elInfo = document.createElement('div');
+	this.elMonitor.appendChild( this.elCtrl);
+	this.elMonitor.appendChild( this.elList);
+	this.elMonitor.appendChild( this.elInfo);
+	this.elCtrl.classList.add('ctrl');
+	this.elList.classList.add('list');
+	this.elInfo.classList.add('info');
+///*
+this.elCtrl.innerHTML='ctrl';
+this.elList.innerHTML='list';
+this.elInfo.innerHTML='info';
+//*/
 //	this.valid = false;
 	this.type = i_type;
 	for( i = 0; i < g_recievers.lenght; i++)
@@ -34,9 +53,6 @@ function Monitor( i_element, i_type, i_id)
 
 Monitor.prototype.destroy = function()
 {
-	for( i = 0; i < this.items.length; i++)
-		this.element.removeChild(this.items[i].element);
-	this.items = [];
 	if( g_cur_monitor == this )
 		g_cur_monitor = null;
 	cm_ArrayRemove(	g_recievers, this);
@@ -46,6 +62,13 @@ Monitor.prototype.destroy = function()
 		nw_Subscribe( this.type, false, [this.job_id]);
 	else
 		nw_Subscribe( this.type, false);
+
+//	for( i = 0; i < this.items.length; i++)
+//		this.element.removeChild(this.items[i].element);
+
+	this.items = [];
+
+	this.elParent.removeChild( this.elMonitor);
 }
 
 Monitor.prototype.update = function()
@@ -127,7 +150,7 @@ Monitor.prototype.processMsg = function( obj)
 			this.items.push( node);
 	}
 
-g_Info(this.type + ':' + g_cycle + ' nodes processed ' + nodes.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
+//g_Info(this.type + ':' + g_cycle + ' nodes processed ' + nodes.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
 }
 
 Monitor.prototype.delNodes = function( i_ids)
@@ -141,7 +164,7 @@ Monitor.prototype.delNodes = function( i_ids)
 		for( i = 0; i < this.items.length; i++)
 			if( this.items[i].params.id == i_ids[d] )
 			{
-				this.element.removeChild(this.items[i].element);
+				this.elList.removeChild( this.items[i].element);
 				this.items.splice(i,1);
 				break;
 			}
@@ -164,12 +187,13 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 {
 	i_item.element = document.createElement('div');
 	i_item.element.className = 'item';
-	this.element.appendChild( i_item.element);
+	this.elList.appendChild( i_item.element);
 
 	i_item.init();
 	i_item.params = i_obj;
 	i_item.update();
-	i_item.parentElement = this.element;
+	i_item.monitor = this;
+	i_item.element.monitor = this;
 	i_item.element.item = i_item;
 	i_item.element.onmousedown = this.onMouseDown;
 	i_item.element.onmouseover = this.onMouseOver;
@@ -189,7 +213,7 @@ Monitor.prototype.onMouseDown = function(evt)
 	if( evt.button != 0 ) return;
 	var el = evt.currentTarget;
 	if( el == null ) return;
-	g_cur_monitor = el.parentElement.monitor;
+	g_cur_monitor = el.monitor;
 	if( false == g_key_ctrl )
 		g_cur_monitor.selectAll( false);
 	if( g_key_shift && g_cur_monitor.cur_item )
@@ -218,7 +242,7 @@ Monitor.prototype.onMouseOver = function(evt)
 {
 	if( evt.button != 0 ) return;
 	if( false == g_mouse_down ) return;
-	g_cur_monitor = evt.currentTarget.parentElement.monitor;
+	g_cur_monitor = evt.currentTarget.monitor;
 	g_cur_monitor.elSetSelected( evt.currentTarget, g_key_ctrl == false);
 }
 

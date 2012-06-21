@@ -2,41 +2,97 @@ body {
 font: 16px Arial;
 }
 
+* {
+margin: 0;
+padding: 0;
+overflow: hidden;
+}
+
 #header {
+position: absolute;
+width: 100%;
+height: 50px;
 background: #AAA;
-border: 2px solid #676767;
-margin: 8px 16px;
-padding: 10px;
+/*border: 2px solid #676767;*/
+/*box-shadow: 0px 0px 20px #000;*/
+}
+
+#content {
+position: absolute;
+width: 100%;
+top: 50px;
+bottom: 50px;
+/*overflow: auto;*/
+}
+
+#footer {
+position: absolute;
+width: 100%;
+bottom: 0;
+height: 50px;
+background: #AAA;
 }
 
 .mbutton {
 background: #DDD;
-border: 1px outset #676767;
+border: 1px solid #676767;
 border-radius: 6px;
+position: relative;
+top: 10px;
 margin: 10px;
 padding: 5px;
 cursor: pointer;
 text-transform: uppercase;
 font-weight: bold;
 color: #222;
-box-shadow: 0px 0px 5px #000;
+box-shadow: 0px 0px 2px #000;
 }
 
 .mbutton.pushed {
 background: #EFD;
 border: 1px inset #555;
-color: #333;
-box-shadow: 0px 0px -5px #000;
+color: #353;
+box-shadow: 0px 0px 5px #000 inset;
 }
 
-.view {
-border: 2px solid #676767;
-background: #CCCCCC;
+.monitor {
+position: absolute;
+/*position: relative;*/
+top: 10px;
+bottom: 10px;
+width: 100%;
+/*border: 2px solid #676767;*/
+/*background: #CCCCCC;*/
 font-size: 12px;
 font-weight: bold;
 color: #000000;
+/*overflow: auto;*/
+}
+
+.monitor .ctrl {
+width: 100%;
+position: absolute;
+top: 0;
+height: 50px;
+background: #FCC;
+}
+
+.monitor .list {
+background: #CCD;
+position: absolute;
 overflow: auto;
-height: 300px;
+width: 100%;
+top: 50px;
+bottom: 50px;
+/*height: 50px;*/
+}
+
+.monitor .info {
+width: 100%;
+position: absolute;
+bottom: 0;
+background: #AAF;
+height: 50px;
 }
 
 .item {

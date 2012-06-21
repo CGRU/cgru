@@ -61,7 +61,7 @@ function g_Update()
 	g_cycle++;
 	setTimeout("g_Update()", 1000);
 
-	document.getElementById('id').innerHTML = 'ID = ' + g_id + ' c' + g_cycle;
+//	document.getElementById('id').innerHTML = 'ID = ' + g_id + ' c' + g_cycle;
 
 	if( g_id == 0 )
 		return;
@@ -88,8 +88,8 @@ function g_Init()
 
 function g_Registered()
 {
-//	new Monitor( document.getElementById('view'), 'renders');
-	new Monitor( document.getElementById('view'), 'jobs');
+	g_Info('Registed: ID = ' + g_id);
+	g_OpenMonitor('jobs');
 }
 
 function g_Deregistered()
@@ -113,14 +113,6 @@ function g_CloseAllMonitors()
 		g_monitors[0].destroy();
 }
 
-function g_OpenTasks( jobId)
-{
-	g_CloseAllMonitors();
-	new Monitor( document.getElementById('view'), 'tasks', jobId);
-//	new Monitor( document.getElementById('view'), 'renders');
-//document.getElementById('test').innerHTML = jobId;
-}
-
 function g_MButtonClick( evt)
 {
 	if( evt == null ) return;
@@ -128,9 +120,23 @@ function g_MButtonClick( evt)
 	if( el == null ) return;
 
 	g_CloseAllMonitors();
-	el.classList.add('pushed');
 
-	new Monitor( document.getElementById('view'), el.innerHTML);
+	g_OpenMonitor( el.innerHTML);
+}
+
+function g_OpenMonitor( i_type, i_id)
+{
+	for( var i = 0; i < g_monitor_buttons.length; i++)
+		if( g_monitor_buttons[i].innerHTML == i_type )
+			g_monitor_buttons[i].classList.add('pushed');
+
+	new Monitor( document.getElementById('content'), i_type, i_id);
+}
+
+function g_OpenTasks( i_job_id)
+{
+	g_CloseAllMonitors();
+	g_OpenMonitor('tasks', i_job_id);
 }
 
 function g_Info( i_msg, i_elem)
