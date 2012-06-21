@@ -463,7 +463,7 @@ af::Msg * MonitorAf::getEvents()
 		stream << "\n}";
 	stream << "\n}";
 
-if( hasevents ) printf("MonitorAf::getEvents():\n%s\n", stream.str().c_str());
+//if( hasevents ) printf("MonitorAf::getEvents():\n%s\n", stream.str().c_str());
 
 	msg->setData( stream.str().size(), stream.str().c_str(), af::Msg::TJSON);
 
