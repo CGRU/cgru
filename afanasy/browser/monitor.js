@@ -1,5 +1,6 @@
 function Monitor( i_element, i_type, i_id)
 {
+	this.type = i_type;
 	this.elParent = i_element;
 
 	this.elMonitor = document.createElement('div');
@@ -7,22 +8,37 @@ function Monitor( i_element, i_type, i_id)
 	this.elMonitor.classList.add('monitor');
 	this.elMonitor.monitor = this;
 
-	this.elCtrl = document.createElement('div');
 	this.elList = document.createElement('div');
+	this.elCtrl = document.createElement('div');
 	this.elInfo = document.createElement('div');
-	this.elMonitor.appendChild( this.elCtrl);
 	this.elMonitor.appendChild( this.elList);
+	this.elMonitor.appendChild( this.elCtrl);
 	this.elMonitor.appendChild( this.elInfo);
-	this.elCtrl.classList.add('ctrl');
 	this.elList.classList.add('list');
+	this.elCtrl.classList.add('ctrl');
 	this.elInfo.classList.add('info');
+
+	this.elCtrlSort = document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlSort);
+	this.elCtrlSort.classList.add('sort');
+	this.elCtrlSort.innerHTML = 'Sort:';
+
+	this.elCtrlFilter = document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlFilter);
+	this.elCtrlFilter.classList.add('sort');
+	this.elCtrlFilter.classList.add('filter');
+	this.elCtrlFilter.innerHTML = 'Filter:';
+
+	this.elInfoText = document.createElement('div');
+	this.elInfoText.classList.add('text');	
+	this.elInfoText.innerHTML = this.type;
+	this.elInfo.appendChild( this.elInfoText);
 ///*
-this.elCtrl.innerHTML='ctrl';
-this.elList.innerHTML='list';
-this.elInfo.innerHTML='info';
+//this.elCtrl.innerHTML='ctrl';
+//this.elList.innerHTML='list';
+//this.elInfo.innerHTML='info';
 //*/
 //	this.valid = false;
-	this.type = i_type;
 	for( i = 0; i < g_recievers.lenght; i++)
 	{
 		if( g_recievers[i].type == this.type )
@@ -200,6 +216,11 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 	i_item.element.ondblclick = this.onDoubleClick;
 }
 
+Monitor.prototype.info = function( i_str)
+{
+	this.elInfoText.innerHTML = i_str;
+}
+
 Monitor.prototype.onDoubleClick = function(evt)
 {
 	if( evt == null ) return;
@@ -251,6 +272,7 @@ Monitor.prototype.elSetSelected = function( el, on)
 	if( on )
 	{
 		this.cur_item = el.item;
+		this.info( this.cur_item.params.name);
 		if( el.selected ) return;
 		el.selected = true;
 		if( false == el.classList.contains('selected'))

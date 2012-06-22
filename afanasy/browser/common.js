@@ -1,6 +1,6 @@
 function cm_Init()
 {
-	document.body.style.MozUserSelect='none';
+//	document.body.style.MozUserSelect='none';
 	document.body.onkeydown = cm_OnKeyDown;
 	document.body.onkeyup = cm_OnKeyUp;
 	document.body.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
