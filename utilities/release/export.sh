@@ -12,6 +12,7 @@ function createDir(){
 }
 
 exclude="$exclude --exclude 'config.xml'"
+exclude="$exclude --exclude 'farm.xml'"
 exclude="$exclude --exclude 'pathmap_*.cmd'"
 exclude="$exclude --exclude 'override.sh'"
 exclude="$exclude --exclude '.svn'"
