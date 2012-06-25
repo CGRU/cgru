@@ -4,6 +4,7 @@
 
 #include "msg.h"
 #include "regexp.h"
+#include "render.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -211,21 +212,38 @@ bool af::jr_stringvec( const char * i_name, std::vector<std::string> & o_attr, c
 	return true;
 }
 
-void af::jw_state( uint32_t i_state, std::ostringstream & o_str)
+void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 {
 	o_str << "\"state\":\"";
-	if( i_state & AFJOB::STATE_READY_MASK           ) o_str << " RDY";
-	if( i_state & AFJOB::STATE_RUNNING_MASK         ) o_str << " RUN";
-	if( i_state & AFJOB::STATE_DONE_MASK            ) o_str << " DON";
-	if( i_state & AFJOB::STATE_ERROR_MASK           ) o_str << " ERR";
-	if( i_state & AFJOB::STATE_SKIPPED_MASK         ) o_str << " SKP";
-	if( i_state & AFJOB::STATE_OFFLINE_MASK         ) o_str << " OFF";
-	if( i_state & AFJOB::STATE_WARNING_MASK         ) o_str << " WRN";
-	if( i_state & AFJOB::STATE_PARSERERROR_MASK     ) o_str << " PER";
-	if( i_state & AFJOB::STATE_PARSERBADRESULT_MASK ) o_str << " PBR";
-	if( i_state & AFJOB::STATE_WAITDEP_MASK         ) o_str << " WDP";
-	if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << " WTM";
-	if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";
-	if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
+
+	if( i_render )
+	{
+		if( i_state & Render::SOnline      ) o_str << " ONL";
+		else                                 o_str << " OFF";
+		if( i_state & Render::Snimby       ) o_str << " NbY";
+		if( i_state & Render::SNIMBY       ) o_str << " NBY";
+		if( i_state & Render::SBusy        ) o_str << " RUN";
+		if( i_state & Render::SDirty       ) o_str << " DRT";
+		if( i_state & Render::SWOLFalling  ) o_str << " WFL";
+		if( i_state & Render::SWOLSleeping ) o_str << " WSL";
+		if( i_state & Render::SWOLWaking   ) o_str << " WWK";
+	}
+	else
+	{
+		if( i_state & AFJOB::STATE_READY_MASK           ) o_str << " RDY";
+		if( i_state & AFJOB::STATE_RUNNING_MASK         ) o_str << " RUN";
+		if( i_state & AFJOB::STATE_DONE_MASK            ) o_str << " DON";
+		if( i_state & AFJOB::STATE_ERROR_MASK           ) o_str << " ERR";
+		if( i_state & AFJOB::STATE_SKIPPED_MASK         ) o_str << " SKP";
+		if( i_state & AFJOB::STATE_OFFLINE_MASK         ) o_str << " OFF";
+		if( i_state & AFJOB::STATE_WARNING_MASK         ) o_str << " WRN";
+		if( i_state & AFJOB::STATE_PARSERERROR_MASK     ) o_str << " PER";
+		if( i_state & AFJOB::STATE_PARSERBADRESULT_MASK ) o_str << " PBR";
+		if( i_state & AFJOB::STATE_WAITDEP_MASK         ) o_str << " WDP";
+		if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << " WTM";
+		if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";
+		if( i_state & AFJOB::STATE_STDERR_MASK          ) o_str << " STE";
+	}
+
 	o_str << "\"";
 } 

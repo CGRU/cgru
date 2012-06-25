@@ -18,6 +18,10 @@ function Monitor( i_element, i_type, i_id)
 	this.elCtrl.classList.add('ctrl');
 	this.elInfo.classList.add('info');
 
+//	this.elList.onmousedown = function(e) { return false;}
+//	this.elList.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
+//	this.elList.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
+
 	this.elCtrlSort = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('sort');
@@ -25,7 +29,7 @@ function Monitor( i_element, i_type, i_id)
 
 	this.elCtrlFilter = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlFilter);
-	this.elCtrlFilter.classList.add('sort');
+//	this.elCtrlFilter.classList.add('sort');
 	this.elCtrlFilter.classList.add('filter');
 	this.elCtrlFilter.innerHTML = 'Filter:';
 
@@ -39,7 +43,7 @@ function Monitor( i_element, i_type, i_id)
 //this.elInfo.innerHTML='info';
 //*/
 //	this.valid = false;
-	for( i = 0; i < g_recievers.lenght; i++)
+	for( i = 0; i < g_recievers.length; i++)
 	{
 		if( g_recievers[i].type == this.type )
 		{

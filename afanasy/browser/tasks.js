@@ -27,14 +27,6 @@ BlockItem.prototype.update = function()
 	var state = cm_GetState( this.params.state);
 	this.state.innerHTML = state.string + '-';
 
-	if( state.off )
-	{
-		if( false == this.element.classList.contains('offline'))
-		this.element.classList.add('offline');
-	}
-	else
-		this.element.classList.remove('offline');
-
 	if( this.params.tasks )
 		this.props.innerHTML = 'array';
 	else

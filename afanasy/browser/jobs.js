@@ -28,29 +28,10 @@ JobNode.prototype.init = function()
 
 JobNode.prototype.update = function()
 {
-	var state = cm_GetState( this.params.state);
-	this.state.innerHTML = state.string + '-';
-
-	if( state.off )
-	{
-		if( false == this.element.classList.contains('offline'))
-		this.element.classList.add('offline');
-	}
-	else
-		this.element.classList.remove('offline');
-
-	if( state.run )
-	{
-		if( false == this.element.classList.contains('running'))
-		this.element.classList.add('running');
-	}
-	else
-		this.element.classList.remove('running');
-
+	var state = cm_GetState( this.params.state, this.element);
+	this.state.innerHTML = state.string;
 	this.name.innerHTML = this.params.name;
-
 	this.priority.innerHTML = '-' + this.params.priority;
-
 	this.user_name.innerHTML = this.params.user_name;
 }
 

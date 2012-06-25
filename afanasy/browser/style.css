@@ -2,7 +2,7 @@ body {
 font: 16px Arial;
 background: #ab8;
 /*user-select: none;
-moz-user-select: none;*/
+-moz-user-select: none;*/
 }
 
 * {
@@ -11,34 +11,23 @@ padding: 0;
 overflow: hidden;
 }
 
-#header {
+#header,#footer {
 position: absolute;
-top: 0;
-left: 0;
-right: 0;
+left: 0; right: 0;
 height: 46px;
 border: 2px solid #555;
 box-shadow: 0px 0px 10px #000;
 /*background: #AAA;*/
 }
+#header { top: 0; }
+#footer { bottom: 0; }
 
 #content {
 position: absolute;
-width: 100%;
+left: 0; right: 0;
 top: 50px;
 bottom: 50px;
 /*overflow: auto;*/
-}
-
-#footer {
-position: absolute;
-bottom: 0;
-left: 0;
-right: 0;
-height: 46px;
-border: 2px solid #555;
-box-shadow: 0px 0px 10px #000;
-/*background: #AAA;*/
 }
 
 .mbutton {
@@ -55,7 +44,6 @@ font-weight: bold;
 color: #222;
 box-shadow: 0px 0px 2px #000;
 }
-
 .mbutton.pushed {
 background: #EFD;
 border: 1px inset #555;
@@ -65,64 +53,43 @@ box-shadow: 0px 0px 5px #000 inset;
 
 .monitor {
 position: absolute;
-/*position: relative;*/
-top: 0;
-bottom: 0;
-width: 100%;
-/*border: 2px solid #676767;*/
-/*background: #CCCCCC;*/
+top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
 font-weight: bold;
-color: #000000;
-/*overflow: auto;*/
 }
 
-.monitor .ctrl {
-/*width: 100%;*/
+.monitor .ctrl,.info {
 position: absolute;
-top: 0;
-left: 0;
-right: 0;
-height: 36px;
-border: 2px solid #555;
+left: 0; right: 0;
+height: 40px;
+/*border: 2px solid #555;*/
 box-shadow: 0px 0px 10px #000;
 /*background: #DDC;*/
 }
+.monitor .ctrl { top: 0; }
+.monitor .info { bottom: 0;}
 
-.monitor .ctrl .sort {
+.monitor .list {
+position: absolute;
+left: 0; right: 0;
+overflow: auto;
+top: 40px;
+bottom: 40px;
+/*background: #CCD;*/
+-moz-user-select: none;
+}
+
+.monitor .ctrl .sort,.filter {
 position: absolute;
 top: 5px;
-left: 5px;
-right: 70%;
 bottom: 5px;
 box-shadow: 0px 0px 5px #000 inset;
 background: #789;
 padding: 5px;
 border-radius: 4px;
 }
-
-.monitor .ctrl .sort.filter {
-left: 31%;
-right: 5px;
-}
-
-.monitor .list {
-position: absolute;
-overflow: auto;
-width: 100%;
-top: 40px;
-bottom: 40px;
-/*background: #CCD;*/
-}
-
-.monitor .info {
-width: 100%;
-position: absolute;
-bottom: 0;
-height: 40px;
-box-shadow: 0px 0px 10px #000;
-/*background: #AAF;*/
-}
+.monitor .ctrl .sort { left: 5px; right: 70%; }
+.monitor .ctrl .filter { left: 31%; right: 5px; }
 
 .monitor .info .text {
 position: absolute;
@@ -137,7 +104,7 @@ border-radius: 4px;
 /*margin: 5px;*/
 padding: 5px;
 user-select: text;
-moz-user-select: text;
+-moz-user-select: text;
 }
 
 .item {
@@ -148,19 +115,14 @@ margin: 3px;
 padding: 1px 7px;
 border-radius: 4px;
 }
-
-.item.nimby {
-background: #8888FF;
-}
-
-.item.offline {
-background: #656565;
-}
-
-.item.running {
-color: #DDFFDD;
-}
-
+.item.NbY { background: #88F;}
+.item.NBY { background: #77F;}
+.item.DON { background: #685;}
+.item.WDP { background: #969;}
+.item.WTM { background: #86C;}
+.item.RUN { background: #8A7;}
+.item.ERR { background: #A65;}
+.item.OFF { background: #777;}
 .item.selected {
 background: #DDFFDD;
 color: #000000;
@@ -175,32 +137,28 @@ width: 20%;
 height: 2.4em;
 }
 
-.item.offline .resources {
+.item.OFF .resources {
 height: 1.2em;
 background: #888888;
 }
 
-.item.job
-{
+.item.job {
 height: 24px;
 }
 
-.item.block
-{
+.item.block {
 margin: 4px 4px 0px 4px;
 height: 24px;
 }
 
-.item.task
-{
+.item.task {
 margin: 1px 10px 0px 10px;
 padding: 0px 4px;
 height: 12px;
 border-radius: 0px;
 }
 
-.item.task .progress
-{
+.item.task .progress {
 background: #0A0;
 margin: 0px;
 padding: 0px;

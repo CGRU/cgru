@@ -51,6 +51,9 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 
 	Client::v_jsonWrite( o_str, i_type);
 
+	o_str << ",";
+	jw_state( m_state, o_str, true /*it is render node state type*/);
+
 	o_str << ",\"capacity_used\":" << m_capacity_used;
 	o_str << ",\"task_start_finish_time\":" << m_task_start_finish_time;
 	if( m_capacity  > 0 )
@@ -62,7 +65,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 
 	if( m_annotation.size())
 		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
-
+/*
 	if( isNimby())
 		o_str << ",\"nimby\":true";
 	if( isNIMBY())
@@ -79,7 +82,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 		o_str << ",\"wol_sleeping\":true";
 	if( isWOLWaking())
 		o_str << ",\"wol_waking\":true";
-
+*/
 	if( m_tasks.size())
 	{
 		o_str << ",\"tasks\":[";

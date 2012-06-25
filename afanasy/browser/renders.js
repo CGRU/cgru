@@ -43,7 +43,8 @@ RenderNode.prototype.init = function()
 RenderNode.prototype.update = function()
 {
 	var user = this.params.user_name;
-
+	var state = cm_GetState( this.params.state, this.element);
+/*
 	if( this.params.offline === true )
 	{
 		if( false == this.element.classList.contains('offline'))
@@ -74,7 +75,7 @@ RenderNode.prototype.update = function()
 	}
 	else
 		this.element.classList.remove('nimby');
-
+*/
 	this.name.innerHTML = this.params.name;
 	if( this.params.version != null )
 		this.version.innerHTML = ' ' + this.params.version;
@@ -85,7 +86,7 @@ RenderNode.prototype.update = function()
 
 	this.user_name.innerHTML = user;
 
-	if( this.params.offline === true )
+	if( state.OFF )
 	{
 		this.center.innerHTML = 'offline';
 		this.capacity.innerHTML = '';

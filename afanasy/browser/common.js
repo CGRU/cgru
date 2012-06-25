@@ -3,8 +3,10 @@ function cm_Init()
 //	document.body.style.MozUserSelect='none';
 	document.body.onkeydown = cm_OnKeyDown;
 	document.body.onkeyup = cm_OnKeyUp;
-	document.body.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
-	document.body.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
+//	document.body.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
+//	document.body.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
+	document.body.onmousedown = function(e) { if(e.button==0){g_mouse_down=true; }}
+	document.body.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false;}}
 }
 
 function cm_OnKeyDown(e)
@@ -15,7 +17,10 @@ function cm_OnKeyDown(e)
 		g_key_shift=false;
 		g_key_ctrl=false;
 		g_mouse_down=false;
-		if( g_cur_monitor) g_cur_monitor.selectAll( false);
+		for( var i = 0; i < g_monitors.length; i++)
+		{
+			g_monitors[i].selectAll( false);
+		}
 	}
 	else if(e.keyCode==16) g_key_shift=true; // SHIFT
 	else if(e.keyCode==17) g_key_ctrl=true; // CTRL
@@ -111,7 +116,8 @@ function cm_TimeStringFromNow( time)
 	return time;
 }
 
-function cm_GetState( i_state)
+cm_States = ['RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY'];
+function cm_GetState( i_state, i_el)
 {
 	var state = {};
 	if( i_state == null )
@@ -121,12 +127,16 @@ function cm_GetState( i_state)
 	}
 
 	state.string = i_state;
-	if( i_state.indexOf('RDY') != -1 ) state.rdy = true;
-	if( i_state.indexOf('RUN') != -1 ) state.run = true;
-	if( i_state.indexOf('DON') != -1 ) state.don = true;
-	if( i_state.indexOf('ERR') != -1 ) state.err = true;
-	if( i_state.indexOf('SKP') != -1 ) state.skp = true;
-	if( i_state.indexOf('OFF') != -1 ) state.off = true;
+	for( var i = 0; i < cm_States.length; i++)
+	{
+		if( i_el ) i_el.classList.remove( cm_States[i]);
+		if( i_state.indexOf( cm_States[i]) != -1 )
+		{
+			eval('state.' + cm_States[i] + ' = true;');
+			if( i_el ) i_el.classList.add( cm_States[i]);
+		}
+	}
+
 	return state;
 }
 

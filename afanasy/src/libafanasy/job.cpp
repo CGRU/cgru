@@ -120,8 +120,13 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\"host_name\":\"" << m_host_name << "\"";
 
-	if( isOffline())
-		o_str << ",\"offline\":true";
+/*	if( m_flags != 0 )
+		o_str << ",\"flags\":"                      << m_flags;*/
+	if( m_state != 0 )
+	{
+		o_str << ",";
+		jw_state( m_state, o_str);
+	}
 
 	if( m_command_pre.size())
 		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
@@ -132,13 +137,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	if( m_description.size())
 		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 
-/*	if( m_flags != 0 )
-		o_str << ",\"flags\":"                      << m_flags;*/
-	if( m_state != 0 )
-	{
-		o_str << ",";
-		jw_state( m_state, o_str);
-	}
 	if( m_user_list_order != -1 )
 		o_str << ",\"user_list_order\":"            << m_user_list_order;
 	o_str << ",\"time_creation\":"                  << m_time_creation;
