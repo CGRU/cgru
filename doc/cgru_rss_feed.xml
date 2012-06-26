@@ -5,8 +5,8 @@
 	<atom:link href="http://cgru.info/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
 	<description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
 	<language>en-us</language>
-	<pubDate>Thu, 21 Jun 2012 00:00:00 GMT</pubDate>
-	<lastBuildDate>Thu, 21 Jun 2012 00:00:00 GMT</lastBuildDate>
+	<pubDate>Tue, 26 Jun 2012 00:00:00 GMT</pubDate>
+	<lastBuildDate>Tue, 26 Jun 2012 00:00:00 GMT</lastBuildDate>
 	<managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
 	<webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
 	<item>
@@ -17,7 +17,7 @@
 			New domain cgru.info started.
 			Bug fixes.
 		</description>
-		<pubDate>Thu, 21 Jun 2012 00:00:00 GMT</pubDate>
+		<pubDate>Tue, 26 Jun 2012 00:00:00 GMT</pubDate>
 	</item>
 	<item>
 		<title>CGRU Version 1.6.3 Released.</title>
