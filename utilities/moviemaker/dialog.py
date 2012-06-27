@@ -1512,7 +1512,7 @@ Add this options to temporary image saving.')
 
       localtime = time.localtime()
       if self.cbFakeTime.isChecked():
-		localtime = time.localtime( 1.0 * self.fakeTime.dateTime().toTime_t())
+         localtime = time.localtime( 1.0 * self.fakeTime.dateTime().toTime_t())
 
       company  = '%s' % self.fields['company'].text()
       artist   = '%s' % self.fields['artist'].text()
