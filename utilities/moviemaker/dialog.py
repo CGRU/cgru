@@ -1641,7 +1641,7 @@ Add this options to temporary image saving.')
 
    def execute( self):
       if not self.evaluated: return
-      command = "%s" % self.cmdField.toPlainText()
+      command = '%s' % self.cmdField.toPlainText()
       if len(command) == 0: return
 
       afanasy = False
