@@ -1705,9 +1705,7 @@ Add this options to temporary image saving.')
          if sys.version_info[0] < 3:
             print( command)
          else:
-            print( command)
-            command = cgruutils.toStr( command)
-            #print( bytearray(command,'utf-8'))
+            print( bytearray(command,'utf-8'))
          self.process.start( command)
 
    def processerror( self, error):
