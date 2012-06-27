@@ -1702,8 +1702,12 @@ Add this options to temporary image saving.')
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('readyRead()'), self.processoutput)
          print('\n################################################\n')		 
-         command = cgruutils.toStr( command)
-         print( bytearray(command,'utf-8'))
+         if sys.version_info[0] < 3:
+            print( command)
+         else:
+            print( command)
+            command = cgruutils.toStr( command)
+            #print( bytearray(command,'utf-8'))
          self.process.start( command)
 
    def processerror( self, error):
