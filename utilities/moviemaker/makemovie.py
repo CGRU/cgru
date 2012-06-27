@@ -46,6 +46,7 @@ Parser.add_option('--thumbnail',        dest='thumbnail',   action='store_true',
 Parser.add_option('--addtime',          dest='addtime',     action='store_true', default=False,       help='Draw time with date')
 Parser.add_option('--datesuffix',       dest='datesuffix',  action='store_true', default=False,       help='Add date suffix to output file name')
 Parser.add_option('--timesuffix',       dest='timesuffix',  action='store_true', default=False,       help='Add time suffix to output file name')
+Parser.add_option('--faketime',         dest='faketime',    type  ='int',        default=0,           help='Use fake time')
 Parser.add_option('-V', '--verbose',    dest='verbose',     action='store_true', default=False,       help='Verbose mode')
 Parser.add_option('-D', '--debug',      dest='debug',       action='store_true', default=False,       help='Debug mode (verbose mode, no commands execution)')
 Parser.add_option('-A', '--afanasy',    dest='afanasy',     action='store_true', default=False,       help='Send to Afanasy')
@@ -175,16 +176,17 @@ if len(cmd_encode) < 2:
 if Verbose: print('Encode command = "%s"' % cmd_encode)
 
 # Date and time:
-#datetimestring = '`date +%y-%m-%d_%H-%M`'
-datetimestring = time.strftime('%y-%m-%d')
+localtime = time.localtime()
+if Options.faketime : localtime = time.localtime( 1.0 * Options.faketime)
+datetimestring = time.strftime('%y-%m-%d', localtime)
 datetimesuffix = ''
-if Datesuffix: datetimesuffix += time.strftime('%y%m%d')
+if Datesuffix: datetimesuffix += time.strftime('%y%m%d', localtime)
 if Options.addtime:
    if datetimestring != '': datetimestring += ' '
-   datetimestring += time.strftime('%H:%M')
+   datetimestring += time.strftime('%H:%M', localtime)
 if Timesuffix:
    if datetimesuffix != '': datetimesuffix += '_'
-   datetimesuffix += time.strftime('%H%M')
+   datetimesuffix += time.strftime('%H%M', localtime)
 
 # Output file:
 Output = Output.strip('" ')

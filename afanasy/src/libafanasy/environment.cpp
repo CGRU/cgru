@@ -23,6 +23,9 @@
 
 using namespace af;
 
+int Environment::magic_mode_index = MMM_Reject;
+std::string Environment::magic_mode;
+
 int     Environment::priority =                        AFGENERAL::DEFAULT_PRIORITY;
 int     Environment::maxrunningtasks =                 AFGENERAL::MAXRUNNINGTASKS;
 int     Environment::filenamesizemax =                 AFGENERAL::FILENAMESIZEMAX;
@@ -147,6 +150,7 @@ std::string Environment::version_date;
 void Environment::getVars( const rapidxml::xml_node<> * pnode)
 {
     getVar( pnode, af::Msg::Magic,                    "magic_number"                      );
+    getVar( pnode, magic_mode,                        "magic_mode"                        );
 
     getVar( pnode, filenamesizemax,                   "filenamesizemax"                   );
 	getVar( pnode, afnode_log_lines_max,              "afnode_log_lines_max"              );
@@ -598,8 +602,9 @@ bool Environment::init()
    if( passwd != NULL) delete passwd;
    passwd = new Passwd( pswd_visor, pswd_god);
 
-//   //############ Message Magic Number:
-//   af::Msg
+//   //############ Message Magic Number Mismatch Mode:
+	if      ( magic_mode == "getonly" ) magic_mode_index = MMM_GetOnly;
+	else if ( magic_mode == "notasks" ) magic_mode_index = MMM_NoTasks;
 
    return true;
 }

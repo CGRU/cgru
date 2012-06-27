@@ -26,6 +26,13 @@ public:
         SolveServerName     = 1 << 3    ///< Solve server name
     };
 
+	enum MagickMismatchMode
+	{
+		MMM_Reject  = 0, ///< Messages with invalid macgick number will be rejected.
+		MMM_GetOnly = 1, ///< You can get information only, no change allowed.
+		MMM_NoTasks = 2, ///< You can't add jobs and change existing tasks commands.
+	};
+
     /// Return \c true if environment is valid.
     static inline bool isValid() { return m_valid; }
 
@@ -182,6 +189,9 @@ private:
    static bool load( const std::string & filename, bool Verbose);
    static void getVars( const rapidxml::xml_node<> * pnode);
    static bool init();
+
+	static int magic_mode_index;
+	static std::string magic_mode;
 
    static std::string cgrulocation;    ///< CGRU root directory.
    static std::string afroot;          ///< Afanasy root directory.

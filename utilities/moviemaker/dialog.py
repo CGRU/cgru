@@ -86,6 +86,7 @@ LogosPath = os.path.join( DialogPath, 'logos')
 CodecsPath = os.path.join( DialogPath, 'codecs')
 FormatsPath = os.path.join( DialogPath, 'formats')
 FPS = ['23.976','24','25','30','48','50']
+TimeFormat = 'd MMM yyyy, h:mm'
 
 Activities = ['comp','render','anim','dyn','sim','stereo','cloth','part','skin','setup','clnup','mtpnt','rnd','test']
 FontsList = ['','Arial','Courier-New','Impact','Tahoma','Times-New-Roman','Verdana']
@@ -672,6 +673,19 @@ Example "255,255,0" - yellow.')
 
       # Parameters
 
+      # Fake time:
+      layout = QtGui.QHBoxLayout()
+      parameterslayout.addLayout( layout)
+      self.cbFakeTime = QtGui.QCheckBox('Fake Time:', self)
+      self.cbFakeTime.setChecked( False);
+      QtCore.QObject.connect( self.cbFakeTime, QtCore.SIGNAL('stateChanged(int)'), self.evaluate)
+      layout.addWidget( self.cbFakeTime)
+      self.fakeTime = QtGui.QDateTimeEdit( QtCore.QDateTime.currentDateTime(), self)
+      self.fakeTime.setDisplayFormat( TimeFormat)
+      self.fakeTime.setCalendarPopup( True)
+      layout.addWidget( self.fakeTime)
+      QtCore.QObject.connect( self.fakeTime, QtCore.SIGNAL('dateTimeChanged()'), self.evaluate)
+
       # Image Aspect:
       group = QtGui.QGroupBox('Aspect')
       parameterslayout.addWidget( group)
@@ -1043,7 +1057,8 @@ Add this options to temporary image saving.')
 
       layout.addWidget( QtGui.QLabel('Start At Time:', self))
       self.editAfTime = QtGui.QDateTimeEdit( QtCore.QDateTime.currentDateTime(), self)
-      self.editAfTime.setDisplayFormat('dddd d MMMM yyyy, h:mm')
+      self.editAfTime.setDisplayFormat( TimeFormat)
+      self.editAfTime.setCalendarPopup( True)
       QtCore.QObject.connect( self.editAfTime, QtCore.SIGNAL('dateTimeChanged()'), self.evaluate)
       layout.addWidget( self.editAfTime)
 
@@ -1495,12 +1510,16 @@ Add this options to temporary image saving.')
          version = os.path.basename( os.path.dirname(self.inputPattern))
          self.fields['version'].setText( version)
 
+      localtime = time.localtime()
+      if self.cbFakeTime.isChecked():
+		localtime = time.localtime( 1.0 * self.fakeTime.dateTime().toTime_t())
+
       company  = '%s' % self.fields['company'].text()
       artist   = '%s' % self.fields['artist'].text()
       activity = '%s' % self.fields['activity'].text()
       comments = '%s' % self.fields['comments'].text()
       font     = '%s' % self.fields['font'].text()
-      date     = time.strftime('%y%m%d')
+      date     = time.strftime('%y%m%d', localtime)
 
       outdir = '%s' % self.fields['outputfolder'].text()
       if outdir == '':
@@ -1596,6 +1615,8 @@ Add this options to temporary image saving.')
             cmd += ' --lgfgrav %s' % self.fields['lgfgrav'].currentText()
       if self.fields['datesuffix'].isChecked(): cmd += ' --datesuffix'
       if self.fields['timesuffix'].isChecked(): cmd += ' --timesuffix'
+      if self.cbFakeTime.isChecked() : cmd += ' --faketime %d' % self.fakeTime.dateTime().toTime_t()
+
       if self.StereoDuplicate and self.inputPattern2 is None:
          cmd += ' --stereodub'
       if audiofile != '':

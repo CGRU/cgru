@@ -34,6 +34,12 @@ So each path (project, asset) can have individual software setup.
     <serveripmask>*.* 127.0.0.1 192.168.* *:* 0:0:0:0:0:0:0:1 FC00:* FD00:*</serveripmask>
 	<!-- Magic number, default value is '1', value '0' is reserved and means magic number mismatch. -->
 	<magic_number>1</magic_number>
+	<!-- Magic number mismath mode: -->
+	<magic_mode>reject</magic_mode> <!-- All messages with invalid magick number will be rejected. -->
+	<!-- Invalid magic number mode:
+	<magic_mode>getonly</magic_mode> You can get information only. No changes allowed.
+	<magic_mode>notasks</magic_mode> You can't add jobs and change existing tasks commands.
+	-->
    <serverport>51000</serverport>
    <clientport>51001</clientport>
    <srv_so_rcvtimeo_sec>2</srv_so_rcvtimeo_sec>
