@@ -4,6 +4,9 @@ import os, sys, time
 
 import afcommon
 
+TimeFromat = '%y-%m-%d %H:%M'
+DateFormat = '%y%m%d'
+
 def dailiesEvaluate( node):
 
    newNode = False
@@ -137,6 +140,17 @@ def dailiesEvaluate( node):
       movrule = os.getenv('CGRU_DAILIES_NAMING', '(s)_(v)_(d)')
       node.knob('movrule').setValue( movrule)
 
+   # Date:
+   localtime = time.localtime()
+   faketime_str = node.knob('faketime_str').value()
+   faketime_on  = int(node.knob('faketime_on').value())
+   if not faketime_on or faketime_str is None or faketime_str == '':
+      faketime_str = time.strftime( TimeFromat, localtime)
+      node.knob('faketime_str').setValue( faketime_str)
+   if faketime_on:
+      localtime = time.strptime( faketime_str, TimeFromat)
+   date = time.strftime( DateFormat, localtime)
+
    # Movie Name:
    if node.knob('movauto').value() or node.knob('movname').value is None or node.knob('movname').value == '':
 
@@ -145,8 +159,6 @@ def dailiesEvaluate( node):
       # Project:
       project = node.knob('project').value()
       if project is None: project = ''
-      # Date:
-      date = time.strftime('%y%m%d')
       # Version:
       version = node.knob('version').value()
       if version is None: version = ''
@@ -273,7 +285,8 @@ def dailiesGenCmd( node):
    fstart   = int(node.knob('fstart').value())
    fend     = int(node.knob('fend').value())
    fffirst  = int(node.knob('fffirst').value())
-
+   faketime_on    = int(node.knob('faketime_on').value())
+   faketime_str   = node.knob('faketime_str').value()
    encodeonly     = node.knob('encodeonly').value()
    tmpformat      = node.knob('tmpformat').value()
    tmpquality     = node.knob('tmpquality').value()
@@ -291,12 +304,11 @@ def dailiesGenCmd( node):
    cmd = os.path.join( cmd, 'makemovie.py')
    cmd = 'python ' + cmd
 
-   # cmd += ' -r "%s"' % format #OHadd
    cmd += ' -f "%s"' % fps
    cmd += ' -c "%s"' % codec
-   # cmd += ' -t "%s"' % template #OHadd
-   # cmd += ' -s "%s"' % slate	#OHadd
 
+   if faketime_on and faketime_str is not None and faketime_str != '':
+      cmd += ' --faketime %d' % int(time.mktime( time.strptime( faketime_str, TimeFromat)))
    if tmpformat  is not None and tmpformat  != '': cmd += ' --tmpformat "%s"'   % tmpformat
    if tmpquality is not None and tmpquality != '': cmd += ' --tmpquality "%s"'  % tmpquality
    if not autocolorspace: cmd += ' --noautocorr'

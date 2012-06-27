@@ -38,6 +38,8 @@ Gizmo {
 
    addUserKnob { 20 "" Parameters }
 
+   addUserKnob {  6 faketime_on  l "Enable Fake Time" +STARTLINE }
+   addUserKnob {  1 faketime_str l "[YY-MM-DD HH:MM]" -STARTLINE }
    addUserKnob {  7 asp_in   l "Input Aspect" R -1.0 9.0 +STARTLINE }
    addUserKnob {  3 fstart   l "Frame Range"     +STARTLINE }
    addUserKnob {  3 fend     l " -  "            -STARTLINE }
@@ -75,6 +77,7 @@ Gizmo {
    forceviews  0
    viewsnames  "left right"
 
+   faketime_on 0
    asp_in      -1
    fstart      -1
    fend        -1
