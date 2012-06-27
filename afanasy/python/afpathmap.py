@@ -5,6 +5,8 @@ import sys
 
 import afenv
 
+import cgruutils
+
 #PathSeparators = ' ";=,\''
 PathSeparators = ' ";=,\':'
 #if sys.platform.find('win') != 0: PathSeparators += ':'
@@ -61,11 +63,11 @@ def findPathMapFiles( folder):
 	PathMapFile = 'pathmap'
 	pathmap_files = []
 	if folder is not None:
-		if not isinstance( folder, str): folder = str( folder,'utf-8')
+		folder = cgruutils.toStr( folder)
 		if os.path.isdir( folder):
 			files = os.listdir( folder)
 			for afile in files:
-				if not isinstance( afile, str): folder = str( afile,'utf-8')
+				afile = cgruutils.toStr( afile)
 				if afile.find( PathMapFile) != 0: continue
 				filename = os.path.join( folder, afile)
 				if not os.path.isfile( filename): continue
@@ -91,7 +93,7 @@ class PathMap:
 
 			file = open( filename, 'r')
 			for line in file:
-				if not isinstance( line, str): line = str( line,'utf-8')
+				if not isinstance( line, str): line = cgruutils.toStr( line)
 				line = line.strip()
 				linelen = len(line)
 				if linelen <= 3: continue
@@ -124,8 +126,7 @@ class PathMap:
 
 
 	def translatePath( self, path, toserver, Verbose):
-		newpath = path
-		if not isinstance( newpath, str): newpath = str( newpath,'utf-8')
+		newpath = cgruutils.toStr( path)
 		if len(newpath) < 1: return newpath
 		if not self.initialized: return newpath
 		position = 0
@@ -196,7 +197,7 @@ class PathMap:
 		filein.close()
 		outdata = ''
 		for line in inlines:
-			if not isinstance( line, str): line = str( line,'utf-8')
+			if not isinstance( line, str): line = cgruutils.toStr( line)
 			toskip = False
 			if len( SearchStrings): toskip = True
 			for searchstr in SearchStrings:

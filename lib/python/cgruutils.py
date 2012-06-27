@@ -165,3 +165,11 @@ def copyJobFile( fileName, jobName = '', fileExtension = ''):
          copyFile = ''
    return copyFile
 
+def toStr( data):
+	if isinstance( data, str):
+		return data
+
+	if sys.version_info[0] < 3:
+		return str( data)
+
+	return str( data, 'utf-8')
