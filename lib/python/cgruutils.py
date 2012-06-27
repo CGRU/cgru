@@ -170,6 +170,8 @@ def toStr( data):
 		return data
 
 	if sys.version_info[0] < 3:
+		if isinstance( data, unicode):
+			return data.encode('utf-8')
 		return str( data)
 
 	return str( data, 'utf-8')

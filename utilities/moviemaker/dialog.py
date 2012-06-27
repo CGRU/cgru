@@ -1748,13 +1748,13 @@ Add this options to temporary image saving.')
       for key in self.fields:
          value = ''
          if isinstance( self.fields[key], QtGui.QLineEdit):
-            value = str( self.fields[key].text())
+            value = cgruutils.toStr( '%s' % self.fields[key].text())
          elif isinstance( self.fields[key], QtGui.QSpinBox):
             value = str( self.fields[key].value())
          elif isinstance( self.fields[key], QtGui.QCheckBox):
             value = str( int( self.fields[key].isChecked()))
          elif isinstance( self.fields[key], QtGui.QComboBox):
-            value = str( self.fields[key].currentText())
+            value = cgruutils.toStr( '%s' % self.fields[key].currentText())
          line = key + '=' + value
          file.write( line + '\n')
       file.close()
@@ -1769,12 +1769,14 @@ Add this options to temporary image saving.')
       file.close()
       self.constructed = False
       for line in lines:
+         line = cgruutils.toStr( line)
          pos = line.find('=')
          if pos < 1: continue
          key = line[:pos]
          if key not in self.fields: continue
-         value = line[pos+1:].strip()         
+         value = line[pos+1:].strip()
          if isinstance( self.fields[key], QtGui.QLineEdit):
+            if sys.version_info[0] < 3: value = value.decode('utf-8')
             self.fields[key].setText( value)
          elif isinstance( self.fields[key], QtGui.QSpinBox):
             self.fields[key].setValue( int(value))
