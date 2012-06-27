@@ -1701,8 +1701,9 @@ Add this options to temporary image saving.')
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('error( int)'), self.processerror)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('finished( int)'), self.processfinished)
          QtCore.QObject.connect( self.process, QtCore.SIGNAL('readyRead()'), self.processoutput)
-         print('\n################################################\n')
-         print(command)
+         print('\n################################################\n')		 
+         command = cgruutils.toStr( command)
+         print( bytearray(command,'utf-8'))
          self.process.start( command)
 
    def processerror( self, error):
@@ -1744,7 +1745,10 @@ Add this options to temporary image saving.')
 
    def save( self, filename, fullPath = False):
       if not fullPath: filename = os.path.join( cgruconfig.VARS['HOME_CGRU'], FilePrefix) + filename + FileSuffix
-      file = open( filename,'w')
+      if sys.version_info[0] < 3:	  
+         file = open( filename,'w')
+      else:
+         file = open( filename,'w', buffering=-1, encoding='utf-8')
       for key in self.fields:
          value = ''
          if isinstance( self.fields[key], QtGui.QLineEdit):
@@ -1764,7 +1768,10 @@ Add this options to temporary image saving.')
       if not os.path.isfile( filename): return False
       print('Loading "%s"' % filename)
 
-      file = open( filename,'r')
+      if sys.version_info[0] < 3:	  
+         file = open( filename,'r')
+      else:
+         file = open( filename,'r', buffering=-1, encoding='utf-8')
       lines = file.readlines()
       file.close()
       self.constructed = False
