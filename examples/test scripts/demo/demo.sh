@@ -1,12 +1,10 @@
 #!/bin/bash
 
 if [ -z $CGRU_LOCATION ]; then
-   pushd ../.. >> /dev/null
+   pushd ../../.. >> /dev/null
    source setup.sh
    popd >> /dev/null
 fi
-
-source $CGRU_LOCATION/utilities/python/setup.sh
 
 cd ..
 
@@ -31,8 +29,8 @@ afcmd ruser wl03 alex
 afcmd ruser wl04 peter
 sleep 1
 
-afcmd rnimby wl0.
-afcmd rNIMBY wl0[0\|2]
+afcmd rnimby "wl0."
+afcmd rNIMBY "wl0[0\|2]"
 
 export AF_USERNAME=tima
 export AF_HOSTNAME=wl00
