@@ -14,12 +14,14 @@
 MonitorContainer * MonitorAf::m_monitors = NULL;
 
 MonitorAf::MonitorAf( af::Msg * msg):
-   af::Monitor( msg),
+	af::Monitor( msg),
+	AfNodeSrv( this),
 	m_event_nodeids( NULL)
 {
 }
 
 MonitorAf::MonitorAf( const JSON & obj):
+	AfNodeSrv( this),
 	af::Monitor( obj)
 {
 	m_event_nodeids = new std::list<int32_t>[af::Monitor::EventsCount];
@@ -43,7 +45,7 @@ void MonitorAf::setZombie()
 {
    AFCommon::QueueLog("Deleting monitor: " + generateInfoString( false));
 
-   Node::setZombie();
+	AfNodeSrv::setZombie();
 }
 
 void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,

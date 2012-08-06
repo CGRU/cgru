@@ -1,12 +1,13 @@
 #pragma once
 
-#include "../libafanasy/afnode.h"
+//#include "../libafanasy/afnode.h"
 
+#include "afnodesrv.h"
 #include "afcontainer.h"
 
 /// Afanasy nodes container locker.
+/* Node is a base class of user, render and job */
 
-/* FIXME: yes, but what is a node?? */
 class AfContainerLock
 {
 public:
@@ -29,25 +30,20 @@ class AfContainerIt
 {
 public:
 
-/// Create an iterator for the container.
-   AfContainerIt( AfContainer* afContainer, bool skipZombies);
+	/// Create an iterator for the container.
+	AfContainerIt( AfContainer* afContainer, bool skipZombies = true);
    ~AfContainerIt();
 
    void next();   ///< Set iterator position on next node.
    void reset();  ///< Set iterator position on the first node.
 
-   friend class AfContainer;
+	inline AfNodeSrv * getNode() { return node; }
 
-protected:
-/// Get current node pointer. \c NULL returned if interator at end.
-   inline const af::Node* object() const { return node; }
-
-/// Get node with specitied id. \c NULL returned if there is no node with such id.
-   af::Node* get( int id);
-
-   af::Node* node; ///< Current node pointer.
+	/// Get node with specitied id. \c NULL returned if there is no node with such id.
+	AfNodeSrv* get( int id);
 
 private:
-   AfContainer* container; ///< Container pointer.
-   bool byPassZombies;     ///< Whether iterator will bypass zobmies in \c next() function.
+	AfNodeSrv * node; ///< Current node pointer.
+	AfContainer * container; ///< Container pointer.
+	bool byPassZombies;     ///< Whether iterator will bypass zobmies in \c next() function.
 };

@@ -21,14 +21,19 @@
 RenderContainer * RenderAf::ms_renders = NULL;
 
 RenderAf::RenderAf( af::Msg * msg):
-   DBRender( msg)
+	DBRender( msg),
+	AfNodeSrv( this)
 {
    init();
 }
 
 RenderAf::RenderAf( int Id):
-   DBRender( Id)
+	DBRender( Id),
+	AfNodeSrv( this)
 {
+//printf("RenderAf::RenderAf:\n");
+//printf("this = %p\n", this);
+//	setNode( this);
    AFINFA("RenderAf::RenderAf(%d)", m_id);
    init();
 }

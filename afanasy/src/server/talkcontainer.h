@@ -28,8 +28,8 @@ public:
    TalkContainerIt( TalkContainer* container, bool skipZombies = true);
    ~TalkContainerIt();
 
-   inline TalkAf* Talk() { return (TalkAf*)node; }
-   inline TalkAf* getTalk( int id) { return (TalkAf*)(get( id)); }
+	inline TalkAf * Talk() { return (TalkAf*)(getNode()); }
+	inline TalkAf * getTalk( int id) { return (TalkAf*)(get( id)); }
 
 private:
 };

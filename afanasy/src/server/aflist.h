@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../libafanasy/afnode.h"
-//#include "../libafanasy/dlRWLock.h"
+//#include "../libafanasy/afnode.h"
+#include "afnodesrv.h"
 
 class AfListIt;
 class AfContainer;
@@ -20,11 +20,11 @@ public:
 
    inline int getCount() const { return nodes_list.size();}
 
-   int add( af::Node *node);    ///< Add node to list.
+	int add( AfNodeSrv * i_node);    ///< Add node to list.
 
    /// Solve nodes list:
    inline bool solve( af::Node::SolvingMethod i_method, RenderAf * i_render, MonitorContainer * i_monitoring)
-                { return af::Node::solveList( nodes_list, i_method, i_render, i_monitoring);}
+                { return AfNodeSrv::solveList( nodes_list, i_method, i_render, i_monitoring);}
 
    void moveNodes( const std::vector<int32_t> & i_list, int i_type);
 
@@ -40,17 +40,12 @@ public:
    friend class AfContainer;
    friend class AfListIt;
 
-//   void ReadLock( void ) { m_rw_lock.ReadLock(); }
-//   void ReadUnlock( void ) { m_rw_lock.ReadUnlock(); }
-
 //protected:
-   void remove( af::Node *node); ///< Remove node from list.
+	void remove( AfNodeSrv *node); ///< Remove node from list.
 
 private:
-   int sortPriority( af::Node * node);   ///< Sort nodes by priority.
+	int sortPriority( AfNodeSrv * i_node);   ///< Sort nodes by priority.
 
 private:
-//   DlRWLock m_rw_lock;
-
-   std::list<af::Node*> nodes_list;      ///< Nodes list.
+	std::list<AfNodeSrv*> nodes_list;      ///< Nodes list.
 };

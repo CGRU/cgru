@@ -21,14 +21,15 @@ AfContainer::AfContainer(  std::string ContainerName, int MaximumSize):
    last_ptr( NULL),
    initialized( false)
 {
-   nodesTable = new af::Node*[size];
+   nodesTable = new AfNodeSrv*[size];
    if( nodesTable == NULL)
    {
       AFERRAR("AfContainer::AfContainer: cant't allocate memory for %d nodes.\n", size);
       return;
    }
-   AFINFA("AfContainer::AfContainer: %d bytes allocated for table at %p\n", size*sizeof(af::Node*), nodesTable);
-   for( int i = 0; i < size; i++ ) nodesTable[i] = NULL;
+   AFINFA("AfContainer::AfContainer: %d bytes allocated for table at %p\n", size*sizeof(AfNodeSrv*), nodesTable);
+	for( int i = 0; i < size; i++ )
+		nodesTable[i] = NULL;
 
    initialized = true;
 }
@@ -46,21 +47,24 @@ AFINFO("AfContainer::~AfContainer:")
    if( nodesTable != NULL) delete [] nodesTable;
 }
 
-int AfContainer::add( af::Node *node)
+int AfContainer::add( AfNodeSrv * i_node)
 {
-   if( node == NULL )
-   {
-      AFERROR("AfContainer::add: node == NULL.")
-      return 0;
-   }
-   if( count >= size-1)
-   {
-      AFERRAR("AfContainer::add: maximum number of nodes = %d reached.", count)
-      return 0;
-   }
+	if( i_node == NULL )
+	{
+		AFERROR("AfContainer::add: node == NULL.")
+		return 0;
+	}
+	if( count >= size-1)
+	{
+		AFERRAR("AfContainer::add: maximum number of nodes = %d reached.", count)
+		return 0;
+		}
 
-   int newId = node->m_id;
-   bool founded = false;
+//printf("AfContainer::add: node = %p, node->m_node = %p\n", (void*)(i_node), (void*)(i_node->m_node));
+//printf("AfContainer::add: name = %s\n", i_node->m_node->m_name.c_str());
+
+	int newId = i_node->m_node->m_id;
+	bool founded = false;
 
    if( newId != 0)
    {
@@ -91,22 +95,22 @@ int AfContainer::add( af::Node *node)
    }
    else
    {
-      node->m_id = newId;
+      i_node->m_node->m_id = newId;
 
 //
 // get an unique name
-      {
-      std::string origname = node->m_name;
+	{
+      std::string origname = i_node->m_node->m_name;
       int number = 1;
       for(;;)
       {
          bool unique = true;
-         af::Node * another = first_ptr;
+         AfNodeSrv * another = first_ptr;
          while( another != NULL)
          {
-            if((!another->isZombie()) && (another->m_name == node->m_name))
+            if((!another->m_node->isZombie()) && (another->m_node->m_name == i_node->m_node->m_name))
             {
-               node->m_name = origname + '-' + af::itos( number++);
+               i_node->m_node->m_name = origname + '-' + af::itos( number++);
                unique = false;
                break;
             }
@@ -114,15 +118,16 @@ int AfContainer::add( af::Node *node)
          }
          if( unique ) break;
       }
-      }
+	}
 
+//printf("############\n");
 //
 // find a *before node with greater or equal priority and a node *after it
-      af::Node *before = first_ptr;
-      af::Node *after  = NULL;
+      AfNodeSrv *before = first_ptr;
+      AfNodeSrv *after  = NULL;
       while( before != NULL )
       {
-         if( *before < *node )
+         if( *before < *i_node )
          {
             after = before;
             before = before->m_prev_ptr;
@@ -135,43 +140,43 @@ int AfContainer::add( af::Node *node)
 
       if( before == NULL)
       {
-         first_ptr = node;
+         first_ptr = i_node;
 //         printf("before == NULL\n");
       }
       else
       {
 //         printf("before:"); before->stdOut();
-         before->m_next_ptr = node;
-         node->m_prev_ptr = before;
+         before->m_next_ptr = i_node;
+         i_node->m_prev_ptr = before;
       }
       if( after  == NULL)
       {
-         last_ptr = node;
+         last_ptr = i_node;
 //         printf("after == NULL\n");
       }
       else
       {
 //         printf("after:"); after->stdOut();
-         after->m_prev_ptr = node;
-         node->m_next_ptr = after;
+         after->m_prev_ptr = i_node;
+         i_node->m_next_ptr = after;
       }
 
-      nodesTable[node->m_id] = node;
+      nodesTable[i_node->m_node->m_id] = i_node;
       count++;
    }
 
    if( !founded )
       AFERROR("AfContainer::add: nodes table full.")
-   AFINFA("AfContainer::add: new id = %u, count = %u", node->m_id, count)
+   AFINFA("AfContainer::add: new id = %u, count = %u", i_node->m_id, count)
    return newId;
 }
 
 void AfContainer::refresh( AfContainer * pointer, MonitorContainer * monitoring)
 {
    time_t currnetTime = time( NULL);
-   for( af::Node * node = first_ptr; node != NULL; node = node->m_next_ptr)
+   for( AfNodeSrv * node = first_ptr; node != NULL; node = node->m_next_ptr)
    {
-      if( node->isZombie() ) continue;
+      if( node->m_node->isZombie() ) continue;
       node->refresh( currnetTime, pointer, monitoring);
    }
 }
@@ -209,17 +214,17 @@ void AfContainer::generateListAll( int i_type, af::MCAfNodes & o_mcnodes, std::o
 {
 	bool added = false;
 
-	for( af::Node * node = first_ptr; node != NULL; node = node->m_next_ptr)
+	for( AfNodeSrv * node = first_ptr; node != NULL; node = node->m_next_ptr)
 	{
-		if( node->isZombie() ) continue;
+		if( node->m_node->isZombie() ) continue;
 
 		if( added && i_json )
 			o_str << ",\n";
 
 		if( i_json )
-			node->v_jsonWrite( o_str, i_type);
+			node->m_node->v_jsonWrite( o_str, i_type);
 		else
-			o_mcnodes.addNode( node);
+			o_mcnodes.addNode( node->m_node);
 
 		added = true;
 	}
@@ -236,19 +241,19 @@ void AfContainer::generateListIDs( int i_type, af::MCAfNodes & o_mcnodes, std::o
 			AFCommon::QueueLogError("AfContainer::generateList: position >= size");
 			continue;
 		}
-		af::Node * node = nodesTable[ i_ids[i]];
+		AfNodeSrv * node = nodesTable[ i_ids[i]];
 		if( node == NULL   )
 			continue;
-		if( node->isZombie())
+		if( node->m_node->isZombie())
 			continue;
 
 		if( added && i_json )
 			o_str << ",\n";
 
 		if( i_json )
-			node->v_jsonWrite( o_str, i_type);
+			node->m_node->v_jsonWrite( o_str, i_type);
 		else
-			o_mcnodes.addNode( node);
+			o_mcnodes.addNode( node->m_node);
 
 		added = true;
 	}
@@ -270,19 +275,19 @@ void AfContainer::generateListMask( int i_type, af::MCAfNodes & o_mcnodes, std::
 	else
 	{
 		bool namefounded = false;
-		for( af::Node *node = first_ptr; node != NULL; node = node->m_next_ptr )
+		for( AfNodeSrv *node = first_ptr; node != NULL; node = node->m_next_ptr )
 		{
 			if( node == NULL   ) continue;
-			if( node->isZombie()) continue;
-			if( rx.match( node->m_name))
+			if( node->m_node->isZombie()) continue;
+			if( rx.match( node->m_node->m_name))
 			{
 				if( added && i_json )
 					o_str << ",\n";
 
 				if( i_json )
-					node->v_jsonWrite( o_str, i_type);
+					node->m_node->v_jsonWrite( o_str, i_type);
 				else
-					o_mcnodes.addNode( node);
+					o_mcnodes.addNode( node->m_node);
 
 				added = true;
 
@@ -321,13 +326,13 @@ bool AfContainer::setZombie( int id)
       AFERRAR("AfContainer::setZombie: Too big id = %d < %d = maximum.", id, size)
       return false;
    }
-   af::Node * node = nodesTable[ id];
+   AfNodeSrv * node = nodesTable[ id];
    if( node == NULL )
    {
       AFERRAR("AfContainer::setZombie: No node with id=%d.", id)
       return false;
    }
-   if( node->isZombie())
+   if( node->m_node->isZombie())
    {
       AFERRAR("AfContainer::setZombie: Node with id=%d already a zombie.", id)
       return false;
@@ -338,13 +343,13 @@ bool AfContainer::setZombie( int id)
 
 void AfContainer::freeZombies()
 {
-   af::Node *node = first_ptr;
+   AfNodeSrv *node = first_ptr;
    last_ptr = NULL;
    while( node != NULL)
    {
-      if((node->isZombie()) && node->unLocked())
+      if((node->m_node->isZombie()) && node->m_node->unLocked())
       {
-         af::Node* z_node = node;
+         AfNodeSrv* z_node = node;
          node = z_node->m_next_ptr;
          if( last_ptr != NULL)
          {
@@ -356,7 +361,7 @@ void AfContainer::freeZombies()
             first_ptr = node;
             if( node != NULL ) first_ptr->m_prev_ptr = NULL;
          }
-         nodesTable[ z_node->m_id] = NULL;
+         nodesTable[ z_node->m_node->m_id] = NULL;
 
          std::list<AfList*>::iterator it = z_node->m_lists.begin();
          std::list<AfList*>::iterator end_it = z_node->m_lists.end();
@@ -386,7 +391,7 @@ void AfContainer::action( const JSON & i_action, AfContainer * i_container, Moni
 				AFERRAR("AfContainer::action: position >= size (%d>=%d)", ids[i], size)
 				continue;
 			}
-			af::Node *node = nodesTable[ids[i]];
+			AfNodeSrv *node = nodesTable[ids[i]];
 			if( node == NULL ) continue;
 			node->action( i_action, i_container, i_monitoring);
 		}
@@ -406,9 +411,9 @@ void AfContainer::action( const JSON & i_action, AfContainer * i_container, Moni
 			return;
 		}
 		bool namefounded = false;
-		for( af::Node *node = first_ptr; node != NULL; node = node->m_next_ptr )
+		for( AfNodeSrv *node = first_ptr; node != NULL; node = node->m_next_ptr )
 		{
-			if( rx.match( node->m_name))
+			if( rx.match( node->m_node->m_name))
 			{
 				node->action( i_action, i_container, i_monitoring);
 				if( false == namefounded) namefounded = true;
@@ -435,9 +440,9 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
          AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + pattern + ("\" is invalid: ") + errMsg);
          return;
       }
-      for( af::Node *node = first_ptr; node != NULL; node = node->m_next_ptr )
+      for( AfNodeSrv *node = first_ptr; node != NULL; node = node->m_next_ptr )
       {
-         if( rx.match( node->m_name))
+         if( rx.match( node->m_node->m_name))
          {
             action( node, mcgeneral, type, pointer, monitoring);
             if( false == namefounded) namefounded = true;
@@ -454,7 +459,7 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
             AFERRAR("AfContainer::action: position >= size (%d>=%d)", pos, size)
             continue;
          }
-         af::Node *node = nodesTable[ pos];
+         AfNodeSrv *node = nodesTable[ pos];
          if( node == NULL ) continue;
          action( node, mcgeneral, type, pointer, monitoring);
       }
@@ -464,9 +469,9 @@ void AfContainer::action( const af::MCGeneral & mcgeneral, int type, AfContainer
       AFCommon::QueueLog( name + ": " + af::Msg::TNAMES[type] + ": No node matches \"" + pattern + "\" founded.");
 }
 
-void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
+void AfContainer::action( AfNodeSrv * node, const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   if( node->isLocked()) return;
+   if( node->m_node->isLocked()) return;
    if( node->action( mcgeneral, type, pointer, monitoring) == false )
    {
       AFCommon::QueueLogError( std::string("Unknown  action: ") + af::Msg::TNAMES[type]);
@@ -481,31 +486,31 @@ void AfContainer::action( af::Node * node, const af::MCGeneral & mcgeneral, int 
    }
 }
 
-void AfContainer::sortPriority( af::Node * node)
+void AfContainer::sortPriority( AfNodeSrv * i_node)
 {
    if( count < 2 ) return;
 
 // extract node from list by connecting pointer of previous and next nodes
-   af::Node * before  = node->m_prev_ptr;
-   af::Node * after   = node->m_next_ptr;
-   if(    before != NULL ) before->m_next_ptr = node->m_next_ptr;
-   else first_ptr = node->m_next_ptr;
-   if(    after  != NULL )  after->m_prev_ptr = node->m_prev_ptr;
-   else last_ptr  = node->m_prev_ptr;
+   AfNodeSrv * before  = i_node->m_prev_ptr;
+   AfNodeSrv * after   = i_node->m_next_ptr;
+   if(    before != NULL ) before->m_next_ptr = i_node->m_next_ptr;
+   else first_ptr = i_node->m_next_ptr;
+   if(    after  != NULL )  after->m_prev_ptr = i_node->m_prev_ptr;
+   else last_ptr  = i_node->m_prev_ptr;
 
    bool lessPriorityFounded = false;
 // insetring node after last node with a greater or same priority
    for( before = first_ptr; before != NULL; before = before->m_next_ptr )
    {
-      if( *before >= *node ) continue;
+      if( *before >= *i_node ) continue;
 
       after  = before;
       before = before->m_prev_ptr;
-      node->m_prev_ptr = before;
-      node->m_next_ptr = after;
-      after->m_prev_ptr = node;
-      if( before != NULL ) before->m_next_ptr = node;
-      else first_ptr = node;
+      i_node->m_prev_ptr = before;
+      i_node->m_next_ptr = after;
+      after->m_prev_ptr = i_node;
+      if( before != NULL ) before->m_next_ptr = i_node;
+      else first_ptr = i_node;
 
       lessPriorityFounded = true;
       break;
@@ -514,13 +519,13 @@ void AfContainer::sortPriority( af::Node * node)
    if( lessPriorityFounded == false )
    {
    // push node into the end of list
-      last_ptr->m_next_ptr = node;
-      node->m_prev_ptr = last_ptr;
-      node->m_next_ptr = NULL;
-      last_ptr = node;
+      last_ptr->m_next_ptr = i_node;
+      i_node->m_prev_ptr = last_ptr;
+      i_node->m_next_ptr = NULL;
+      last_ptr = i_node;
    }
 
-   std::list<AfList*>::iterator it = node->m_lists.begin();
-   std::list<AfList*>::iterator end_it = node->m_lists.end();
-   while( it != end_it) (*it++)->sortPriority( node);
+   std::list<AfList*>::iterator it = i_node->m_lists.begin();
+   std::list<AfList*>::iterator end_it = i_node->m_lists.end();
+   while( it != end_it) (*it++)->sortPriority( i_node);
 }

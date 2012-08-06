@@ -23,41 +23,52 @@ ClientContainer::~ClientContainer()
 AFINFO("ClientContainer::~ClientContainer:\n");
 }
 
-int ClientContainer::addClient( af::Client *newClient, bool deleteSameAddress, MonitorContainer * monitoring, int msgEventType)
+int ClientContainer::addClient( AfNodeSrv * i_nodesrv, bool deleteSameAddress, MonitorContainer * monitoring, int msgEventType)
 {
    int id = 0;
 
-   if( newClient == NULL )
+	if( i_nodesrv == NULL )
    {
       AFERROR("ClientContainer::addClient: Client is NULL (was not allocated).\n ");
       return 0;
    }
 
-   if( newClient->isOnline())
-   {
-      ClientContainerIt clientsIt( this);
-      for( af::Client *client = clientsIt.Client(); client != NULL; clientsIt.next(), client = clientsIt.Client())
-      {
-         if( newClient->addrEqual( client))
-         {
-            if( deleteSameAddress)
-            {
-               client->setZombie();
-               if( monitoring ) monitoring->addEvent( msgEventType, client->getId());
-            }
-            else
-            {
-               AFCommon::QueueLogError( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
-               AFINFO( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
-               delete newClient;
-               AFINFO("ClientContainer::addClient: Client deleted. Returning zero...");
-               return 0;
-            }
-         }
-      }
-   }
+//printf("ClientContainer::addClient: newCLient = %p, newClient->m_node = %p\n", i_nodesrv, i_nodesrv->m_node);
+	af::Client * newClient = (af::Client*)(i_nodesrv->m_node);
 
-   id = add( newClient);
+	if( newClient->isOnline())
+	{
+//      ClientContainerIt clientsIt( this);
+		AfContainerIt nodesIt( this);
+//af::Client *client = clientsIt.Client();
+//client != NULL;
+//clientsIt.next();
+//client = clientsIt.Client();
+//printf("###############\n");
+//      for( af::Client *client = clientsIt.Client(); client != NULL; clientsIt.next(), client = clientsIt.Client())
+		for( AfNodeSrv * node = nodesIt.getNode(); node != NULL; nodesIt.next(), node = nodesIt.getNode())
+		{
+			af::Client * client = (af::Client*)(node->m_node);
+			if( newClient->addrEqual( client))
+			{
+				if( deleteSameAddress)
+				{
+					node->setZombie();
+					if( monitoring ) monitoring->addEvent( msgEventType, client->getId());
+				}
+				else
+				{
+					AFCommon::QueueLogError( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
+					AFINFO( std::string("Client with this address already exists: ") + newClient->getAddress().generateInfoString());
+					delete newClient;
+					AFINFO("ClientContainer::addClient: Client deleted. Returning zero...");
+					return 0;
+				}
+			}
+		}
+	}
+
+   id = add( i_nodesrv);
    AFINFA("ClientContainer::addClient: id = %d.", id);
    if( id == 0)
    {
@@ -73,14 +84,17 @@ int ClientContainer::addClient( af::Client *newClient, bool deleteSameAddress, M
 
 bool ClientContainer::updateId( int id)
 {
-   ClientContainerIt clientsIt( this);
-   af::Client* client = clientsIt.getClient( id);
+//   ClientContainerIt clientsIt( this);
+//   af::Client* client = clientsIt.getClient( id);
+	AfContainerIt nodesIt( this);
+	AfNodeSrv * node = nodesIt.get( id);
+	af::Client * client = (af::Client*)(node->m_node);
    if( client == NULL ) return false;
 
    client->updateTime();
    return true;
 }
-
+/*
 //##############################################################################
 ClientContainerIt::ClientContainerIt( ClientContainer* container, bool skipZombies):
    AfContainerIt( (AfContainer*)container, skipZombies)
@@ -89,4 +103,4 @@ ClientContainerIt::ClientContainerIt( ClientContainer* container, bool skipZombi
 
 ClientContainerIt::~ClientContainerIt()
 {
-}
+}*/

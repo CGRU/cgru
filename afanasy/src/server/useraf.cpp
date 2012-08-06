@@ -20,14 +20,16 @@
 UserContainer * UserAf::ms_users = NULL;
 
 UserAf::UserAf( const std::string & username, const std::string & host):
-   afsql::DBUser( username, host)
+	afsql::DBUser( username, host),
+	AfNodeSrv( this)
 {
    construct();
    appendLog("Registered.");
 }
 
 UserAf::UserAf( int uid):
-   afsql::DBUser( uid)
+	afsql::DBUser( uid),
+	AfNodeSrv( this)
 {
    construct();
    appendLog("Registered from database.");
@@ -183,7 +185,7 @@ bool UserAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * po
 void UserAf::setZombie( MonitorContainer * i_monitoring)
 {
     AFCommon::QueueLog("Deleting user: " + generateInfoString( false));
-    af:Node::setZombie();
+    AfNodeSrv::setZombie();
     if( i_monitoring ) i_monitoring->addEvent( af::Msg::TMonitorUsersDel, m_id);
     appendLog( "Became a zombie.");
 	AFCommon::saveLog( getLog(), af::Environment::getUsersLogsDir(), m_name, af::Environment::getAfNodeLogsRotate());
@@ -217,8 +219,8 @@ void UserAf::updateJobsOrder( af::Job * newJob)
 {
    AfListIt jobsListIt( &m_jobslist);
    int userlistorder = 0;
-   for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-      ((JobAf*)(job))->setUserListOrder( userlistorder++, job != newJob);
+   for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+      ((JobAf*)(job))->setUserListOrder( userlistorder++, ((void*)(job)) != ((void*)(newJob)));
 }
 
 bool UserAf::getJobs( std::ostringstream & o_str)
@@ -226,7 +228,7 @@ bool UserAf::getJobs( std::ostringstream & o_str)
 	AfListIt jobsListIt( &m_jobslist);
 	bool first = true;
 	bool has_jobs = false;
-	for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+	for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
 	{
 		if( false == first )
 			o_str << ",\n";
@@ -240,8 +242,8 @@ bool UserAf::getJobs( std::ostringstream & o_str)
 void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 {
    AfListIt jobsListIt( &m_jobslist);
-   for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-      mcjobs.addNode( job);
+   for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+      mcjobs.addNode( job->m_node);
 }
 
 void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -275,7 +277,7 @@ void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContaine
    int _runningtasksnumber = 0;
    {
       AfListIt jobsListIt( &m_jobslist);
-      for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+      for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       {
          if( ((JobAf*)job)->isRunning())
          {

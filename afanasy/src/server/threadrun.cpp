@@ -98,8 +98,16 @@ AFINFO("ThreadRun::run: Refreshing data:")
       }
 
       // cycle on renders, which produced a task
-      while( rIds.size())
-      {
+		static const int renders_cycle_limit = 100000;
+		int renders_cycle = 0;
+		while( rIds.size())
+		{
+			renders_cycle++;
+			if( renders_cycle > renders_cycle_limit )
+			{
+				AFERROR("Renders solve cycles limit reached.");
+				break;
+			}
          AFINFA("ThreadRun::run: Renders on cycle: %d", int(rIds.size()))
          std::list<int>::iterator rIt = rIds.begin();
          while( rIt != rIds.end())

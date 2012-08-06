@@ -157,7 +157,8 @@ int main(int argc, char *argv[])
         for( std::list<int>::const_iterator it = rids.begin(); it != rids.end(); it++)
         {
             RenderAf * render = new RenderAf( *it);
-            if( afDB_JobRegister.getItem( render)) renders.addRender( render);
+            if( afDB_JobRegister.getItem( render))
+				renders.addRender( render);
             else delete render;
         }
         printf("%d renders registered.\n", renders.getCount());

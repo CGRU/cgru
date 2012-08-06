@@ -8,7 +8,8 @@
 #include "monitorcontainer.h"
 
 TalkAf::TalkAf( af::Msg * msg):
-   af::Talk( msg)
+	af::Talk( msg),
+	AfNodeSrv( this)
 {
 }
 
@@ -73,5 +74,5 @@ void TalkAf::setZombie()
 {
    AFCommon::QueueLog("Deleting talk: " + generateInfoString( false));
 
-   Node::setZombie();
+	AfNodeSrv::setZombie();
 }

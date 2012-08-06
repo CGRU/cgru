@@ -62,8 +62,8 @@ public:
    MonitorContainerIt( MonitorContainer* container, bool skipZombies = true);
    ~MonitorContainerIt();
 
-   inline MonitorAf* monitor() { return (MonitorAf*)node; }
-   inline MonitorAf* getMonitor( int id) { return (MonitorAf*)(get( id)); }
+	inline MonitorAf * monitor() { return (MonitorAf*)(getNode()); }
+	inline MonitorAf * getMonitor( int id) { return (MonitorAf*)(get( id)); }
 
 private:
 };

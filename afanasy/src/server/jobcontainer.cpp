@@ -120,7 +120,7 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
         }
 
         // Add job node to container.
-        if( add((af::Node*)job) == false )
+        if( add( job) == false )
         {
             delete job;
             AFERROR("JobContainer::job_register: Can't add job to container.")

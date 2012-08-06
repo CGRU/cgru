@@ -6,13 +6,14 @@
 #include "../libafsql/dbuser.h"
 
 #include "aflist.h"
+#include "afnodesrv.h"
 
 class JobAf;
 class RenderAf;
 class UserContainer;
 
 /// Server side of Afanasy user.
-class UserAf : public afsql::DBUser
+class UserAf : public afsql::DBUser, public AfNodeSrv
 {
 public:
     /// Create a new user.

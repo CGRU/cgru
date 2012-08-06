@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 
+#include "../include/afanasy.h"
 #include "msgclasses/mcgeneral.h"
 #include "environment.h"
 
@@ -13,7 +14,7 @@ using namespace af;
 
 // Zero solve cycle variable in nodes is initial,
 // it means that node was not solved at all.
-unsigned long long af::Node::sm_solve_cycle = 1;
+//unsigned long long af::Node::sm_solve_cycle = 1;
 
 Node::Node():
     /// Containers does not use zero id, just created node has no container.
@@ -22,19 +23,19 @@ Node::Node():
     m_state(0),
     m_flags(0),
 
-    m_priority( 99),
+    m_priority( AFGENERAL::DEFAULT_PRIORITY),
 
     /// Just created node (need was not calculated) has no need.
-    m_solve_need(0.0),
+//    m_solve_need(0.0),
     /// 0 means that it was not solved at all
-    m_solve_cycle(0),
+//    m_solve_cycle(0),
 
-    m_locked( false),
+    m_locked( false)/*,
     m_prev_ptr( NULL),
-    m_next_ptr( NULL)
+    m_next_ptr( NULL)*/
 {
 }
-
+/*
 bool Node::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
    AFERRAR("Node::action: invalid call: name=\"%s\", id=%d", m_name.c_str(), m_id)
@@ -46,7 +47,7 @@ void Node::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer 
    AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d", m_name.c_str(), m_id)
    return;
 }
-
+*/
 Node::~Node()
 {
 AFINFO("Node::~Node():")
@@ -59,7 +60,7 @@ void Node::readwrite( Msg * msg)
 	rw_bool   ( m_locked,    msg);
 	rw_String(  m_name,      msg);
 }
-
+/*
 void Node::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 	if( isLocked())
@@ -142,7 +143,7 @@ void Node::v_action( const JSON & i_action, const std::string & i_author, std::s
 					AfContainer * i_container, MonitorContainer * i_monitoring)
 {
 }
-
+*/
 void Node::v_priorityChanged( MonitorContainer * i_monitoring ){}
 
 void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorContainer * i_monitoring)
@@ -180,7 +181,7 @@ int Node::calcWeight() const
 {
    int weight = sizeof( Node);
    weight += af::weigh( m_name);
-   for( unsigned l = 0; l < m_lists.size(); l++) weight += sizeof(void*);
+//   for( unsigned l = 0; l < m_lists.size(); l++) weight += sizeof(void*);
 
    return weight;
 }
@@ -193,7 +194,7 @@ int Node::calcLogWeight() const
     return weight;
 }
 
-
+/*
 /// Main solving functions should be implemented in child classes (if solving needed):
 bool Node::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 {
@@ -335,7 +336,7 @@ bool Node::solveList( std::list<af::Node*> & i_list, SolvingMethod i_method,
     // Return false - that no nodes was not solved
     return false;
 }
-
+*/
 void Node::appendLog( const std::string & message)
 {
    m_log.push_back( af::time2str() + " : " + message);

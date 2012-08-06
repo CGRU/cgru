@@ -8,6 +8,7 @@
 
 #include "../libafsql/dbjob.h"
 
+#include "afnodesrv.h"
 #include "listeners.h"
 
 class Block;
@@ -20,7 +21,7 @@ class Task;
 class UserAf;
 
 /// Server side of Afanasy job.
-class JobAf : public afsql::DBJob
+class JobAf : public afsql::DBJob , public AfNodeSrv
 {
 public:
 

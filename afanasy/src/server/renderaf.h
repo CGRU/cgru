@@ -7,12 +7,14 @@
 
 #include "../libafsql/dbrender.h"
 
+#include "afnodesrv.h"
+
 class MsgQueue;
 class JobContainer;
 class RenderContainer;
 
 /// Afanasy server side of Render host.
-class RenderAf: public afsql::DBRender
+class RenderAf: public afsql::DBRender, public AfNodeSrv
 {
 public:
 /// Construct Render from message and provided address.

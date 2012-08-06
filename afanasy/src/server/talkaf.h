@@ -2,9 +2,11 @@
 
 #include "../libafanasy/talk.h"
 
+#include "afnodesrv.h"
+
 class MonitorContainer;
 
-class TalkAf: public af::Talk
+class TalkAf: public af::Talk, public AfNodeSrv
 {
 public:
 

@@ -47,8 +47,8 @@ public:
     JobContainerIt( JobContainer* jobContainer, bool skipZombies = true);
     ~JobContainerIt();
 
-    inline JobAf* job() { return (JobAf*)node; }
-    inline JobAf* getJob( int id) { return (JobAf*)(get( id)); }
+	inline JobAf * job() { return (JobAf*)(getNode()); }
+	inline JobAf * getJob( int id) { return (JobAf*)(get( id)); }
 
 private:
 };

@@ -32,6 +32,7 @@ JobContainer *JobAf::ms_jobs  = NULL;
 
 JobAf::JobAf( af::Msg * msg):
     afsql::DBJob(),
+	AfNodeSrv( this),
     m_fromdatabase( false)
 {
     initializeValues();
@@ -42,6 +43,7 @@ JobAf::JobAf( af::Msg * msg):
 
 JobAf::JobAf( JSON & i_object):
     afsql::DBJob(),
+	AfNodeSrv( this),
 	m_fromdatabase( false)
 {
 	initializeValues();
@@ -52,6 +54,7 @@ JobAf::JobAf( JSON & i_object):
 
 JobAf::JobAf( int Id):
     afsql::DBJob( Id),
+	AfNodeSrv( this),
     m_fromdatabase( true)
 {
     initializeValues();
@@ -258,7 +261,7 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
          appendLog( std::string("Executing block[") + m_blocksdata[b]->getName() + "] post command:\n" + m_blocksdata[b]->getCmdPost());
       }
    }
-   Node::setZombie();
+   AfNodeSrv::setZombie();
 
    // Queue job cleanup:
    AFCommon::QueueJobCleanUp( this);
@@ -694,11 +697,11 @@ void JobAf::checkDepends()
    if( hasDependMask())
    {
       AfListIt jobsListIt( m_user->getJobsList());
-      for( af::Node *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+      for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
       {
          if( job == this ) continue;
 //printf("JobAf::checkDepends: name2=%s\n", job->getName().toUtf8().data());
-         if(( ((JobAf*)job)->isDone() == false ) && ( checkDependMask( job->getName()) ))
+         if(( ((JobAf*)job)->isDone() == false ) && ( checkDependMask( ((JobAf*)job)->getName()) ))
          {
             depend_local = true;
 //printf("Set.\n");

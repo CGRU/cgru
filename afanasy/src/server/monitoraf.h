@@ -3,7 +3,9 @@
 #include "../libafanasy/monitor.h"
 #include "../libafanasy/taskprogress.h"
 
-class MonitorAf: public af::Monitor
+#include "afnodesrv.h"
+
+class MonitorAf: public af::Monitor, public AfNodeSrv
 {
 public:
 

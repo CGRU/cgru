@@ -28,8 +28,8 @@ public:
    RenderContainerIt( RenderContainer* container, bool skipZombies = true);
    ~RenderContainerIt();
 
-   inline RenderAf* render() { return (RenderAf*)node; }
-   inline RenderAf* getRender( int id) { return (RenderAf*)(get( id)); }
+	inline RenderAf * render() { return (RenderAf*)(getNode()); }
+	inline RenderAf * getRender( int id) { return (RenderAf*)(get( id)); }
 
 private:
 };

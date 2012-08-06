@@ -53,8 +53,8 @@ public:
     UserContainerIt( UserContainer* userslist, bool skipZombies = true);
     ~UserContainerIt();
 
-    inline UserAf * user() { return (UserAf*)node; }
-    inline UserAf * getUser( int id) { return (UserAf*)(get( id)); }
+	inline UserAf * user() { return (UserAf*)(getNode()); }
+	inline UserAf * getUser( int id) { return (UserAf*)(get( id)); }
 
 private:
 };

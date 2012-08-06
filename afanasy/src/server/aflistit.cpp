@@ -10,13 +10,11 @@ AfListIt::AfListIt( AfList* i_aflist):
    m_node( NULL),
    m_list( i_aflist)
 {
-//	aflist->ReadLock();
    reset();
 }
 
 AfListIt::~AfListIt()
 {
-//	list->ReadUnlock();
 }
 
 void AfListIt::next()
@@ -28,7 +26,8 @@ void AfListIt::next()
 //printf("AfListIt::next: it == it_end\n");
       return;
    }
-   while( (*m_it)->isZombie())
+//   while( (*m_it)->isZombie())
+   while( (*m_it)->m_node->isZombie())
    {
       if( ++m_it == m_it_end )
       {
@@ -47,7 +46,8 @@ void AfListIt::reset()
    {
        return;
    }
-   while( (*m_it)->isZombie())
+//   while( (*m_it)->isZombie())
+   while( (*m_it)->m_node->isZombie())
    {
        if( ++m_it == m_it_end )
        {
