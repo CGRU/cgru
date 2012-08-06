@@ -88,8 +88,13 @@ bool ClientContainer::updateId( int id)
 //   af::Client* client = clientsIt.getClient( id);
 	AfContainerIt nodesIt( this);
 	AfNodeSrv * node = nodesIt.get( id);
+	if( node == NULL ) return false;
 	af::Client * client = (af::Client*)(node->m_node);
-   if( client == NULL ) return false;
+	if( client == NULL )
+	{
+		AFERROR("ClientContainer::updateId: node is NULL")
+		return false;
+	}
 
    client->updateTime();
    return true;

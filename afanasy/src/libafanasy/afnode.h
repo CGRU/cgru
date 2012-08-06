@@ -143,7 +143,7 @@ protected:
 
 private:
 /// Try to solve a node
-    bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
+//    bool trySolve( RenderAf * i_render, MonitorContainer * i_monitoring);
 
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
