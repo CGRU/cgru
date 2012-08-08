@@ -6,6 +6,7 @@
 #include "../libafanasy/msg.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
+class Action;
 class AfContainer;
 class AfContainerIt;
 
@@ -49,7 +50,8 @@ public:
    void action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 	/// Perform an aciton described by JSON object:
-	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
+//	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
+	void action( Action & i_action);
 
    /* */
    void ReadLock( void ) { m_rw_lock.ReadLock(); }

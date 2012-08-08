@@ -2,6 +2,8 @@
 
 #include "../libafanasy/afnode.h"
 
+class Action;
+
 class AfNodeSrv
 {
 public:
@@ -18,6 +20,8 @@ printf("this = %p\n", this);
 printf("m_node = %p\n", m_node);
 }
 */
+	inline af::Node * node() { return m_node; }
+
 	/// Nodes comparison by priority ( wich is private property).
 	inline bool operator <  ( const AfNodeSrv & other) const { return m_node->m_priority <  other.m_node->m_priority;}
 	inline bool operator <= ( const AfNodeSrv & other) const { return m_node->m_priority <= other.m_node->m_priority;}
@@ -27,10 +31,10 @@ printf("m_node = %p\n", m_node);
 	inline bool operator != ( const AfNodeSrv & other) const { return m_node->m_priority != other.m_node->m_priority;}
 
 	/// Set some node attribute by incoming message.
-	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
+//	void action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring);
+	void action( Action & i_action);
 
-	virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-							AfContainer * i_container, MonitorContainer * i_monitoring);
+	virtual void v_action( Action & i_action);
 
 /// Set some node attribute by incoming message.
    virtual bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
@@ -98,7 +102,7 @@ private:
 	virtual void v_priorityChanged( MonitorContainer * i_monitoring);
 
 private:
-public:
+//public:
 
 	af::Node * m_node;
 

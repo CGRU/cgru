@@ -8,6 +8,7 @@
 #include "aflist.h"
 #include "afnodesrv.h"
 
+class Action;
 class JobAf;
 class RenderAf;
 class UserContainer;
@@ -46,8 +47,7 @@ public:
     ///< Set some user attribute.
     bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-	virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-							AfContainer * i_container, MonitorContainer * i_monitoring);
+	virtual void v_action( Action & i_action);
 
     void moveJobs( const af::MCGeneral & mcgeneral, int type);
 

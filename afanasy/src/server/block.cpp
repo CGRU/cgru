@@ -5,6 +5,7 @@
 #include "../libafsql/dbattr.h"
 #include "../libafsql/dbblockdata.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "jobaf.h"
 #include "monitorcontainer.h"
@@ -337,13 +338,12 @@ bool Block::refresh( time_t currentTime, RenderContainer * renders, MonitorConta
    return blockProgress_changed;
 }
 
-bool Block::action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-					AfContainer * i_container, MonitorContainer * i_monitoring)
+bool Block::action( Action & i_action)
 {
 	uint32_t blockchanged_type = 0;
 	bool job_progress_changed = false;
 
-	const JSON & operation = i_action["operation"];
+	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
 		std::string type;
@@ -356,15 +356,15 @@ bool Block::action( const JSON & i_action, const std::string & i_author, std::st
 		}
 		else
 		{
-			appendJobLog("Unknown operation \"" + type + "\" by " + i_author);
+			appendJobLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			return false;
 		}
 
-		appendJobLog("Operation \"" + type + "\" by " + i_author);
+		appendJobLog("Operation \"" + type + "\" by " + i_action.author);
 	}
 	else
 	{
-		const JSON & params = i_action["params"];
+		const JSON & params = (*i_action.data)["params"];
 		if( params.IsObject())
 		{
 			std::string changes;
@@ -373,7 +373,7 @@ bool Block::action( const JSON & i_action, const std::string & i_author, std::st
 			if( changes.empty())
 				return false;
 
-			io_changes = "\nBlock['" + m_data->getName() + "']:" + changes;
+			i_action.log = "\nBlock['" + m_data->getName() + "']:" + changes;
 
 			blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;
@@ -383,8 +383,7 @@ bool Block::action( const JSON & i_action, const std::string & i_author, std::st
 	if( blockchanged_type )
 	{
 		AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)m_data);
-		if( i_monitoring )
-			i_monitoring->addBlock( af::Msg::TBlocksProperties, m_data);
+		i_action.monitors->addBlock( af::Msg::TBlocksProperties, m_data);
 	}
 
 	return job_progress_changed;

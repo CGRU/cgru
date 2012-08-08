@@ -4,6 +4,7 @@
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msgclasses/mcgeneral.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "monitorcontainer.h"
 
@@ -48,10 +49,9 @@ void MonitorAf::setZombie()
 	AfNodeSrv::setZombie();
 }
 
-void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						AfContainer * i_container, MonitorContainer * i_monitoring)
+void MonitorAf::v_action( Action & i_action)
 {
-	const JSON & operation = i_action["operation"];
+	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
 		std::string optype;
@@ -111,7 +111,7 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 			}
 			else
 			{
-				appendLog("Unknown operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
+				appendLog("Unknown operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_action.author);
 				return;
 			}
 			if( eids.size())
@@ -120,16 +120,16 @@ void MonitorAf::v_action( const JSON & i_action, const std::string & i_author, s
 				setEvents( eids, subscribe);
 			}
 			m_monitors->addEvent( af::Msg::TMonitorMonitorsChanged, getId());
-			appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_author);
+			appendLog("Operation \"" + optype + "\" class \"" + opclass + "\" status \"" + opstatus + "\" by " + i_action.author);
 			m_time_activity = time( NULL);
 			return;
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + optype + "\" by " + i_author);
+			appendLog("Unknown operation \"" + optype + "\" by " + i_action.author);
 			return;
 		}
-		appendLog("Operation \"" + optype + "\" by " + i_author);
+		appendLog("Operation \"" + optype + "\" by " + i_action.author);
 	}
 }
 

@@ -6,6 +6,7 @@
 
 #include "../libafsql/dbattr.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "aflistit.h"
 #include "jobaf.h"
@@ -47,18 +48,16 @@ UserAf::~UserAf()
 
 void UserAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_users->sortPriority( this);}
 
-void UserAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						AfContainer * i_container, MonitorContainer * i_monitoring)
+void UserAf::v_action( Action & i_action)
 {
-	const JSON & params = i_action["params"];
+	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
-		jsonRead( params, &io_changes);
+		jsonRead( params, &i_action.log);
 
-	if( io_changes.size() )
+	if( i_action.log.size() )
 	{
 		AFCommon::QueueDBUpdateItem( this);
-		if( i_monitoring )
-			i_monitoring->addEvent( af::Msg::TMonitorUsersChanged, m_id);
+		i_action.monitors->addEvent( af::Msg::TMonitorUsersChanged, m_id);
 	}
 }
 
@@ -241,9 +240,9 @@ bool UserAf::getJobs( std::ostringstream & o_str)
 
 void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 {
-   AfListIt jobsListIt( &m_jobslist);
-   for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
-      mcjobs.addNode( job->m_node);
+	AfListIt jobsListIt( &m_jobslist);
+	for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
+		mcjobs.addNode( job->node());
 }
 
 void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)

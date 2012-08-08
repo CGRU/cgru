@@ -12,6 +12,7 @@
 #include "../libafsql/dbconnection.h"
 #include "../libafsql/dbjobprogress.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "aflistit.h"
 #include "block.h"
@@ -272,17 +273,16 @@ void JobAf::setZombie( RenderContainer * renders, MonitorContainer * monitoring)
    unLock();
 }
 
-void JobAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						AfContainer * i_container, MonitorContainer * i_monitoring)
+void JobAf::v_action( Action & i_action)
 {
 	// If action has blocks ids array - action to for blocks
-	if( i_action.HasMember("block_ids"))
+	if( i_action.data->HasMember("block_ids"))
 	{
-		const JSON & blocks = i_action["block_ids"];
+		const JSON & blocks = (*i_action.data)["block_ids"];
 		if( blocks.IsArray())
 		{
 			std::vector<int32_t> block_ids;
-			af::jr_int32vec("block_ids", block_ids, i_action);
+			af::jr_int32vec("block_ids", block_ids, *i_action.data);
 			if( block_ids.size())
 			{
 				bool job_progress_changed = false;
@@ -290,8 +290,7 @@ void JobAf::v_action( const JSON & i_action, const std::string & i_author, std::
 				if(( block_ids.size() == 1 ) && ( block_ids[0] == -1 ))
 				{
 					for( int b = 0; b < m_blocksnum; b++)
-						if( m_blocks[b]->action(
-								i_action, i_author, io_changes, i_container, i_monitoring))
+						if( m_blocks[b]->action( i_action))
 							job_progress_changed = true;
 				}
 				else
@@ -300,71 +299,70 @@ void JobAf::v_action( const JSON & i_action, const std::string & i_author, std::
 					{
 						if(( block_ids[b] >= getBlocksNum()) || ( block_ids[b] < 0 ))
 						{
-							appendLog("Invalid block number = " + af::itos(block_ids[b]) + " " + i_author);
+							appendLog("Invalid block number = " + af::itos(block_ids[b]) + " " + i_action.author);
 							continue;
 						}
-						if( m_blocks[block_ids[b]]->action(
-								i_action, i_author, io_changes, i_container, i_monitoring))
+						if( m_blocks[block_ids[b]]->action( i_action))
 							job_progress_changed = true;
 					}
 				}
 
-				if( i_monitoring && job_progress_changed )
-					i_monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+				if( job_progress_changed )
+					i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
 
 				return;
 			}
 			else
 			{
-				appendLog("\"block_ids\" array does not contain any integers " + i_author);
+				appendLog("\"block_ids\" array does not contain any integers " + i_action.author);
 				return;
 			}
 		}
 		else
 		{
-			appendLog("\"block_ids\" should be an array of integers " + i_author);
+			appendLog("\"block_ids\" should be an array of integers " + i_action.author);
 			return;
 		}
 		return;
 	}
 
-	const JSON & operation = i_action["operation"];
+	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
 		std::string type;
 		af::jr_string("type", type, operation);
 		if( type == "delete")
 		{
-			appendLog("Deleted by " + i_author);
-			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_author);
-			setZombie( (RenderContainer*)i_container, i_monitoring);
-			if( i_monitoring ) i_monitoring->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
+			appendLog("Deleted by " + i_action.author);
+			m_user->appendLog( "Job \"" + m_name + "\" deleted by " + i_action.author);
+			setZombie( i_action.renders, i_action.monitors);
+			i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
 			return;
 		}
 		else if( type == "stop")
 		{
-		   restartAllTasks( true, "Job stopped by " + i_author, (RenderContainer*)i_container, i_monitoring);
+		   restartAllTasks( true, "Job stopped by " + i_action.author, i_action.renders, i_action.monitors);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + type + "\" by " + i_author);
+			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			return;
 		}
-		appendLog("Operation \"" + type + "\" by " + i_author);
+		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
 		AFCommon::QueueDBUpdateItem( this);
 		return;
 	}
 
-	const JSON & params = i_action["params"];
+	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
-		jsonRead( params, &io_changes);
+		jsonRead( params, &i_action.log);
 
-	if( io_changes.size() )
+	if( i_action.log.size() )
 	{
 		AFCommon::QueueDBUpdateItem( this);
-		if( i_monitoring )
-			i_monitoring->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
+		i_action.monitors->addJobEvent( af::Msg::TMonitorJobsChanged, getId(), getUid());
 	}
 }
 

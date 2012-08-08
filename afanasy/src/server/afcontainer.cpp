@@ -5,6 +5,7 @@
 #include "../libafanasy/msgclasses/mcafnodes.h"
 #include "../libafanasy/regexp.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "aflist.h"
 #include "afcontainerit.h"
@@ -378,49 +379,48 @@ void AfContainer::freeZombies()
    }
 }
 
-void AfContainer::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
+//void AfContainer::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
+void AfContainer::action( Action & i_action)
 {
-	std::vector<int32_t> ids;
-	af::jr_int32vec("ids", ids, i_action);
-	if( ids.size())
+	if( i_action.ids.size())
 	{
-		for( int i = 0; i < ids.size(); i++)
+		for( int i = 0; i < i_action.ids.size(); i++)
 		{
-			if( ids[i] >= size)
+			if( i_action.ids[i] >= size)
 			{
-				AFERRAR("AfContainer::action: position >= size (%d>=%d)", ids[i], size)
+				AFERRAR("AfContainer::action: position >= size (%d>=%d)", i_action.ids[i], size)
 				continue;
 			}
-			AfNodeSrv *node = nodesTable[ids[i]];
+			AfNodeSrv * node = nodesTable[i_action.ids[i]];
 			if( node == NULL ) continue;
-			node->action( i_action, i_container, i_monitoring);
+//			node->action( i_action, i_container, i_monitoring);
+			node->action( i_action);
 		}
 		return;
 	}
 
-	std::string mask;
-	af::jr_string("mask", mask, i_action);
-	if( mask.size())
+	if( i_action.mask.size())
 	{
 		std::string errMsg;
 		af::RegExp rx;
-		rx.setPattern( mask, &errMsg);
+		rx.setPattern( i_action.mask, &errMsg);
 		if( rx.empty())
 		{
-			AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + mask + ("\" is invalid: ") + errMsg);
+			AFCommon::QueueLogError( std::string("AfContainer::action: Name pattern \"") + i_action.mask + ("\" is invalid: ") + errMsg);
 			return;
 		}
 		bool namefounded = false;
-		for( AfNodeSrv *node = first_ptr; node != NULL; node = node->m_next_ptr )
+		for( AfNodeSrv * node = first_ptr; node != NULL; node = node->m_next_ptr )
 		{
 			if( rx.match( node->m_node->m_name))
 			{
-				node->action( i_action, i_container, i_monitoring);
+//				node->action( i_action, i_container, i_monitoring);
+				node->action( i_action);
 				if( false == namefounded) namefounded = true;
 			}
 		}
 		if( false == namefounded )
-			AFCommon::QueueLog( name + ": No node matches \"" + mask + "\" founded.");
+			AFCommon::QueueLog( name + ": No node matches \"" + i_action.mask + "\" founded.");
 	}
 }
 

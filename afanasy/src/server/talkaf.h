@@ -4,6 +4,7 @@
 
 #include "afnodesrv.h"
 
+class Action;
 class MonitorContainer;
 
 class TalkAf: public af::Talk, public AfNodeSrv
@@ -18,8 +19,7 @@ public:
 
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						   AfContainer * i_container, MonitorContainer * i_monitoring);
+	virtual void v_action( Action & i_action);
 
    void refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring);
 

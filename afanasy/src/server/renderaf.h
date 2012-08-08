@@ -9,6 +9,7 @@
 
 #include "afnodesrv.h"
 
+class Action;
 class MsgQueue;
 class JobContainer;
 class RenderContainer;
@@ -64,8 +65,7 @@ public:
 /// Set some Render attribute.
    bool action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
-   virtual void v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						   AfContainer * i_container, MonitorContainer * i_monitoring);
+	virtual void v_action( Action & i_action);
 
    inline const std::list<std::string> & getTasksLog() { return tasksloglist; }  ///< Get tasks log list.
    const std::string getServicesString() const;                      ///< Get services information.

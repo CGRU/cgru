@@ -5,6 +5,7 @@
 
 #include "useraf.h"
 
+class Action;
 class MonitorContainer;
 class RenderAf;
 class RenderContainer;
@@ -50,8 +51,7 @@ public:
    uint32_t action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring);
 
 	/// Return \c true if some job block progess parameter needs to updated for monitoring
-	bool action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-					AfContainer * i_container, MonitorContainer * i_monitoring);
+	bool action( Action & i_action);
 
    bool tasksDependsOn( int block);
 

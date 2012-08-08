@@ -34,7 +34,7 @@ int ClientContainer::addClient( AfNodeSrv * i_nodesrv, bool deleteSameAddress, M
    }
 
 //printf("ClientContainer::addClient: newCLient = %p, newClient->m_node = %p\n", i_nodesrv, i_nodesrv->m_node);
-	af::Client * newClient = (af::Client*)(i_nodesrv->m_node);
+	af::Client * newClient = (af::Client*)(i_nodesrv->node());
 
 	if( newClient->isOnline())
 	{
@@ -48,7 +48,7 @@ int ClientContainer::addClient( AfNodeSrv * i_nodesrv, bool deleteSameAddress, M
 //      for( af::Client *client = clientsIt.Client(); client != NULL; clientsIt.next(), client = clientsIt.Client())
 		for( AfNodeSrv * node = nodesIt.getNode(); node != NULL; nodesIt.next(), node = nodesIt.getNode())
 		{
-			af::Client * client = (af::Client*)(node->m_node);
+			af::Client * client = (af::Client*)(node->node());
 			if( newClient->addrEqual( client))
 			{
 				if( deleteSameAddress)
@@ -89,7 +89,7 @@ bool ClientContainer::updateId( int id)
 	AfContainerIt nodesIt( this);
 	AfNodeSrv * node = nodesIt.get( id);
 	if( node == NULL ) return false;
-	af::Client * client = (af::Client*)(node->m_node);
+	af::Client * client = (af::Client*)(node->node());
 	if( client == NULL )
 	{
 		AFERROR("ClientContainer::updateId: node is NULL")

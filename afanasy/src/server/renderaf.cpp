@@ -8,6 +8,7 @@
 
 #include "../libafsql/dbattr.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -209,12 +210,9 @@ void RenderAf::startTask( af::TaskExec *taskexec)
 
 void RenderAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_renders->sortPriority( this);}
 
-void RenderAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						AfContainer * i_container, MonitorContainer * i_monitoring)
+void RenderAf::v_action( Action & i_action)
 {
-	JobContainer * jobs = (JobContainer*)i_container;
-
-	const JSON & operation = i_action["operation"];
+	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
 		std::string type;
@@ -222,41 +220,41 @@ void RenderAf::v_action( const JSON & i_action, const std::string & i_author, st
 		if( type == "exit")
 		{
 			if( false == isOnline()) return;
-			appendLog("Exit by " + i_author);
-			exitClient( af::Msg::TClientExitRequest, jobs, i_monitoring);
+			appendLog("Exit by " + i_action.author);
+			exitClient( af::Msg::TClientExitRequest, i_action.jobs, i_action.monitors);
 			return;
 		}
 		if( type == "eject_tasks")
 		{
 			if( false == isBusy()) return;
-			appendLog("Task(s) ejected by " + i_author);
-			ejectTasks( jobs, i_monitoring, af::TaskExec::UPEject);
+			appendLog("Task(s) ejected by " + i_action.author);
+			ejectTasks( i_action.jobs, i_action.monitors, af::TaskExec::UPEject);
 			return;
 		}
 		if( type == "eject_tasks_keep_my")
 		{
 			if( false == isBusy()) return;
-			appendLog("Task(s) ejected keeping own by " + i_author);
-			ejectTasks( jobs, i_monitoring, af::TaskExec::UPEject, &(af::strSplit(i_author,"@").front()));
+			appendLog("Task(s) ejected keeping own by " + i_action.author);
+			//ejectTasks( jobs, i_monitoring, af::TaskExec::UPEject, &(af::strSplit(i_author,"@").front()));
+			ejectTasks( i_action.jobs, i_action.monitors, af::TaskExec::UPEject, &i_action.user_name);
 			return;
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + type + "\" by " + i_author);
+			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			return;
 		}
-		appendLog("Operation \"" + type + "\" by " + i_author);
+		appendLog("Operation \"" + type + "\" by " + i_action.author);
 	}
 
-	const JSON & params = i_action["params"];
+	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
-		jsonRead( params, &io_changes);
+		jsonRead( params, &i_action.log);
 
-	if( io_changes.size() )
+	if( i_action.log.size() )
 	{
 		AFCommon::QueueDBUpdateItem( this);
-		if( i_monitoring )
-			i_monitoring->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+		i_action.monitors->addEvent( af::Msg::TMonitorRendersChanged, m_id);
 	}
 }
 

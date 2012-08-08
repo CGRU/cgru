@@ -1,5 +1,8 @@
 #include "afnodesrv.h"
 
+#include "action.h"
+#include "afcommon.h"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -23,101 +26,82 @@ AfNodeSrv::AfNodeSrv( af::Node * i_node):
 
 bool AfNodeSrv::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::action: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
+   AFERRAR("AfNodeSrv::action: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
    return false;
 }
 
 void AfNodeSrv::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
 {
-   AFERRAR("Node::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
+   AFERRAR("AfNodeSrv::refresh: invalid call: name=\"%s\", id=%d", m_node->m_name.c_str(), m_node->m_id)
    return;
 }
 
 AfNodeSrv::~AfNodeSrv()
 {
-AFINFO("Node::~Node():")
+AFINFO("AfNodeSrv::~Node():")
 }
 
-void AfNodeSrv::action( const JSON & i_action, AfContainer * i_container, MonitorContainer * i_monitoring)
+void AfNodeSrv::action( Action & i_action)
 {
 	if( m_node->isLocked())
 		return;
 
-	std::string user_name, host_name;
-	af::jr_string("user_name", user_name, i_action);
-	af::jr_string("host_name", host_name, i_action);
-
-	if( user_name.empty())
-	{
-		m_node->appendLog("Action should have a not empty \"user_name\" string.");
-		return;
-	}
-	if( host_name.empty())
-	{
-		m_node->appendLog("Action should have a not empty \"host_name\" string.");
-		return;
-	}
-
-	std::string author = user_name + '@' + host_name;
-	std::string changes;
-
 	bool valid = false;
-	if( i_action.HasMember("operation"))
+	if( i_action.data->HasMember("operation"))
 	{
-		const JSON & operation = i_action["operation"];
+		const JSON & operation = (*i_action.data)["operation"];
 		if( false == operation.IsObject())
 		{
-			m_node->appendLog("Action \"operation\" should be an object " + author);
+			AFCommon::QueueLogError("Action \"operation\" should be an object, " + i_action.author);
 			return;
 		}
 		const JSON & type = operation["type"];
 		if( false == type.IsString())
 		{
-			m_node->appendLog("Action \"operation\" \"type\" should be a string " + author);
+			AFCommon::QueueLogError("Action \"operation\" \"type\" should be a string, " + i_action.author);
 			return;
 		}
 		if( strlen( type.GetString()) == 0)
 		{
-			m_node->appendLog("Action \"operation\" \"type\" string is empty " + author);
+			AFCommon::QueueLogError("Action \"operation\" \"type\" string is empty, " + i_action.author);
 			return;
 		}
 		valid = true;
 	}
 
-	if( i_action.HasMember("params"))
+	if( i_action.data->HasMember("params"))
 	{
-		const JSON & params = i_action["params"];
+		const JSON & params = (*i_action.data)["params"];
 		if( params.IsObject())
 		{
-			m_node->jsonRead( params, &changes, i_monitoring);
+			m_node->jsonRead( params, &i_action.log, i_action.monitors);
 			valid = true;
 		}
 		else
 		{
-			m_node->appendLog("Action \"params\" should be an object " + author);
+			AFCommon::QueueLogError("Action \"params\" should be an object, " + i_action.author);
 			return;
 		}
 	}
 
 	if( valid == false )
 	{
-		m_node->appendLog("Action should have an \"operation\" or(and) \"params\" object.");
+		AFCommon::QueueLogError("Action should have an \"operation\" or(and) \"params\" object, " + i_action.author);
 		return;
 	}
 
-	v_action( i_action, author, changes, i_container, i_monitoring);
+	v_action( i_action);
 
-	if( changes.size())
+	if( i_action.log.size())
 	{
-		if( changes[0] == '\n' )
-			changes[0] = ' ';
-		changes += std::string(" by ") + author;
-		m_node->appendLog( changes);
+		if( i_action.log[0] == '\n' )
+			i_action.log[0] = ' ';
+		i_action.log += std::string(" by ") + i_action.author;
+		m_node->appendLog( i_action.log);
 	}
 }
 
-void AfNodeSrv::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-					AfContainer * i_container, MonitorContainer * i_monitoring)
+void AfNodeSrv::v_action( Action & i_action)
 {
 }
 
@@ -185,12 +169,12 @@ bool AfNodeSrv::trySolve( RenderAf * i_render, MonitorContainer * i_monitoring)
 
     // Returning that node was solved
     return true;
-//printf("Node::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
+//printf("AfNodeSrv::setSolved: '%s': cycle = %d, need = %g\n", name.c_str(), m_solve_cycle, m_solve_need);
 }
 
 void AfNodeSrv::calcNeedResouces( int i_resourcesquantity)
 {
-//printf("Node::calcNeedResouces: '%s': resourcesquantity = %d\n", name.c_str(), i_resourcesquantity);
+//printf("AfNodeSrv::calcNeedResouces: '%s': resourcesquantity = %d\n", name.c_str(), i_resourcesquantity);
 	m_solve_need = 0.0;
 
 // Need calculation no need as there is no need at all for some reason.

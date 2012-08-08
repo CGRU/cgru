@@ -1,3 +1,4 @@
+#include "action.h"
 #include "afcommon.h"
 #include "jobcontainer.h"
 #include "monitorcontainer.h"
@@ -12,7 +13,7 @@
 
 void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 {
-	rapidjson::Document document;
+/*	rapidjson::Document document;
 	std::string error;
 	char * data = af::jsonParseMsg( document, i_msg, &error);
 	if( data == NULL )
@@ -37,19 +38,24 @@ void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		delete [] data;
 		return;
 	}
+*/
 
-	if( type == "jobs")
-		i_args->jobs->action( action, i_args->renders, i_args->monitors);
-	else if( type == "renders")
-		i_args->renders->action( action, i_args->jobs, i_args->monitors);
-	else if( type == "users")
-		i_args->users->action( action, NULL, i_args->monitors);
-	else if( type == "talks")
-		i_args->talks->action( action, NULL, i_args->monitors);
-	else if( type == "monitors")
-		i_args->monitors->action( action, NULL, NULL);
+	Action action( i_msg, i_args);
+	if( action.isInvalid())
+		return;
+
+	if( action.type == "jobs")
+		i_args->jobs->action( action);
+	else if( action.type == "renders")
+		i_args->renders->action( action);
+	else if( action.type == "users")
+		i_args->users->action( action);
+	else if( action.type == "talks")
+		i_args->talks->action( action);
+	else if( action.type == "monitors")
+		i_args->monitors->action( action);
 	else
-		AFCommon::QueueLogError(std::string("JSON action has unknown type - \"") + type + "\"");
+		AFCommon::QueueLogError(std::string("JSON action has unknown type - \"") + action.type + "\"");
 
-	delete [] data;
+//	delete [] data;
 }

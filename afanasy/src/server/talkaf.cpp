@@ -4,6 +4,7 @@
 
 #include "../libafanasy/environment.h"
 
+#include "action.h"
 #include "afcommon.h"
 #include "monitorcontainer.h"
 
@@ -17,10 +18,9 @@ TalkAf::~TalkAf()
 {
 }
 
-void TalkAf::v_action( const JSON & i_action, const std::string & i_author, std::string & io_changes,
-						AfContainer * i_container, MonitorContainer * i_monitoring)
+void TalkAf::v_action( Action & i_action)
 {
-	const JSON & operation = i_action["operation"];
+	const JSON & operation = (*i_action.data)["operation"];
 	if( operation.IsObject())
 	{
 		std::string type;
@@ -34,10 +34,10 @@ void TalkAf::v_action( const JSON & i_action, const std::string & i_author, std:
 		}
 		else
 		{
-			appendLog("Unknown operation \"" + type + "\" by " + i_author);
+			appendLog("Unknown operation \"" + type + "\" by " + i_action.author);
 			return;
 		}
-		appendLog("Operation \"" + type + "\" by " + i_author);
+		appendLog("Operation \"" + type + "\" by " + i_action.author);
 	}
 }
 
