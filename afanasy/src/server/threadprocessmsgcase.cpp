@@ -2,6 +2,8 @@
 #include <fcntl.h>
 #include <sys/stat.h>
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/environment.h"
 #include "../libafanasy/farm.h"
 #include "../libafanasy/msg.h"
@@ -29,20 +31,22 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg);
 af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
     //i_msg->stdOut();
+	//printf("IM=%d LM=%d MM=%d\n", i_msg->getMagicNumber(), af::Msg::Magic, af::Environment::getMagicMode());
     af::Msg * o_msg_response = NULL;
 
     switch( i_msg->type())
     {
     case af::Msg::TVersionMismatch:
     {
-        AFCommon::QueueLogError( i_msg->generateInfoString( false));
+//        AFCommon::QueueLogError( i_msg->generateInfoString( false));
         o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
         break;
     }
     case af::Msg::TMagicMismatch:
     {
-        AFCommon::QueueLogError( i_msg->generateInfoString( false));
+//        AFCommon::QueueLogError( i_msg->generateInfoString( false));
         o_msg_response = new af::Msg( af::Msg::TMagicMismatch, 1);
+		o_msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_BAD);
         break;
     }
     case af::Msg::TMagicNumber:
@@ -700,13 +704,13 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
       o_msg_response = new af::Msg( af::Msg::TJobsWeight, &jobsWeight);
       break;
    }
+    // Cases for run cycle thread:
    case af::Msg::TTaskUpdateState:
    {
       af::MCTaskUp taskup( i_msg);
       af::MCTaskPos taskpos( taskup.getNumJob(), taskup.getNumBlock(), taskup.getNumTask(), taskup.getNumber());
       o_msg_response = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
    }
-    // Cases for run cycle thread:
     case af::Msg::TTaskUpdatePercent:
     case af::Msg::TTaskListenOutput:
     case af::Msg::TTasksSkip:
@@ -802,7 +806,23 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
     case af::Msg::TUserMoveJobsDown:
     case af::Msg::TUserMoveJobsTop:
     case af::Msg::TUserMoveJobsBottom:
+    case af::Msg::TTalkExit:
     case af::Msg::TTalkDeregister:
+	{
+		// Check magic number mismatch mode:
+		if( i_msg->isMagicInvalid() && ( af::Environment::getMagicMode() <= af::MMM_GetOnly ))
+		{
+			std::string err = "Magic Mismatch Mode: \"";
+			err += af::Environment::getMagicModeName();
+			err += "\"";
+			err += "\nMessage type not allowed: \"";
+			err += af::Msg::TNAMES[i_msg->type()];
+			err += "\"";
+			AFCommon::QueueLogError( err);
+			delete i_msg;
+			return o_msg_response;
+		}
+	}
     case af::Msg::TMonitorSubscribe:
     case af::Msg::TMonitorUnsubscribe:
     case af::Msg::TMonitorDeregister:
@@ -812,7 +832,6 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
     case af::Msg::TMonitorJobsIdsDel:
     case af::Msg::TMonitorMessage:
     case af::Msg::TMonitorExit:
-    case af::Msg::TTalkExit:
     {
         // Push message for run cycle thread.
         i_args->msgQueue->pushMsg( i_msg);

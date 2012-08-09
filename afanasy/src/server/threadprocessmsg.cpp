@@ -83,6 +83,32 @@ void processMessage( ThreadArgs * i_args)
 printf("Request: ");msg_request->stdOut();
 #endif
 
+	// Filter reactions on magic number mismatch:
+	if( msg_request->isMagicInvalid())
+	{
+	   	switch( msg_request->type())
+		{
+		case af::Msg::TConfigLoad:
+		case af::Msg::TFarmLoad:
+		case af::Msg::TJobRegister:
+	    case af::Msg::TBlockCommand:
+	    case af::Msg::TBlockWorkingDir:
+	    case af::Msg::TBlockFiles:
+	    case af::Msg::TBlockCmdPost:
+		{
+			std::string err = "Magic Mismatch Mode: \"";
+			err += af::Environment::getMagicModeName();
+			err += "\"";
+			err += "\nMessage type not allowed: \"";
+			err += af::Msg::TNAMES[msg_request->type()];
+			err += "\"";
+			AFCommon::QueueLogError( err);
+			delete msg_request;
+			return;
+		}
+		}
+	}
+
    // React on message, may be with response to the same opened socket.
    af::Msg * msg_response = threadProcessMsgCase( i_args, msg_request);
    // If request not needed any more it will be deleted there.

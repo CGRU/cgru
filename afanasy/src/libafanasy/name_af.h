@@ -96,11 +96,25 @@ namespace af
       VerboseOn
    };
 
+	enum InitFlags
+	{
+		NoFlags      = 0,
+		InitVerbose  = 1,
+		InitFarm     = 1 << 1,
+	};
+
    enum Direction
    {
       Left,
       Right
    };
+
+	enum MagickMismatchMode
+	{
+		MMM_Reject  = 0, ///< Messages with invalid macgick number will be rejected.
+		MMM_GetOnly = 1, ///< You can get information only, no change allowed.
+		MMM_NoTasks = 2, ///< You can't add jobs and change existing tasks commands.
+	};
 
 	void outError( const char * errMsg, const char * baseMsg = NULL);
 
@@ -145,12 +159,6 @@ namespace af
 
 
    bool  init( uint32_t flags );
-   enum InitFlags
-   {
-      NoFlags      = 0,
-      InitVerbose  = 1,
-      InitFarm     = 1 << 1,
-   };
    void  destroy();
 
    bool  loadFarm( bool verbose = false);

@@ -26,13 +26,6 @@ public:
         SolveServerName     = 1 << 3    ///< Solve server name
     };
 
-	enum MagickMismatchMode
-	{
-		MMM_Reject  = 0, ///< Messages with invalid macgick number will be rejected.
-		MMM_GetOnly = 1, ///< You can get information only, no change allowed.
-		MMM_NoTasks = 2, ///< You can't add jobs and change existing tasks commands.
-	};
-
     /// Return \c true if environment is valid.
     static inline bool isValid() { return m_valid; }
 
@@ -61,6 +54,9 @@ public:
 
     /// Set client port. Client can change its port.
     static void setClientPort( uint16_t port) { clientport = port;}
+
+	static inline const int           getMagicMode()     { return magic_mode_index; }
+	static inline const std::string & getMagicModeName() { return magic_mode;       }
 
     /// Get versions:
     static inline const std::string & getVersionRevision(){ return version_revision; }

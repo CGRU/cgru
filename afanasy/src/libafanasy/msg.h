@@ -434,7 +434,10 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
     /// Get addresses constant list pointer
     inline const std::list<Address> * getAddresses() const { return &m_addresses;}
 
-    inline void setMagicNumber( int i_number) { m_magic = i_number;}
+	inline int  getMagicNumber() const { return m_magic;               }
+	inline bool isMagicValid()   const { return m_magic == Msg::Magic; }
+	inline bool isMagicInvalid() const { return m_magic != Msg::Magic; }
+	inline void setMagicNumber( int i_number) { m_magic =  i_number;   }
 
 private:
 
@@ -446,8 +449,8 @@ private:
     int32_t m_int32;     ///< Some 32-bit integer, data length for data messages.
 
 // data poiters:
-    char * m_data;       ///< Data pointer.
-    char * m_buffer;     ///< Buffer pointer.
+	char * m_buffer;     ///< Internal buffer pointer, for header and data
+	char * m_data;       ///< Message data pointer = buffer + header_size.
 
 // buffering parameters:
     bool m_writing;                  ///< Writing or reading data in message.

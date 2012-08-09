@@ -377,7 +377,7 @@ bool Msg::checkValidness()
         m_int32 = 0;
         return true;
     }
-    if( m_magic != Msg::Magic )
+    if(( m_magic != Msg::Magic ) && ( Environment::getMagicMode() == af::MMM_Reject ))
     {
         AFERRAR("Msg::checkValidness: Magic number mismatch: Recieved(%d) != Local(%d)", m_magic, Msg::Magic)
         m_type = Msg::TMagicMismatch;
@@ -417,8 +417,9 @@ void Msg::stdOutData( bool withHeader)
    {
 		if( m_data[0] == '/')
 			break;
-		::write( 1, m_data, m_int32);
-		::write( 1, "\n", 1);
+		static int unused;
+		unused = ::write( 1, m_data, m_int32);
+		unused = ::write( 1, "\n", 1);
 		break;
    }
    case Msg::TTESTDATA:
