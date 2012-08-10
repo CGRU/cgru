@@ -1,5 +1,7 @@
 #include "action.h"
 
+#include "../libafanasy/environment.h"
+
 #include "afcommon.h"
 
 Action::Action( af::Msg * i_msg, ThreadArgs * i_args):
@@ -8,6 +10,7 @@ Action::Action( af::Msg * i_msg, ThreadArgs * i_args):
 	renders( i_args->renders),
 	talks( i_args->talks),
 	users( i_args->users),
+	permissions( 0),
 	m_buffer( NULL),
 	m_valid( false)
 {
@@ -57,6 +60,17 @@ Action::Action( af::Msg * i_msg, ThreadArgs * i_args):
 		return;
 	}
 	author = user_name + '@' + host_name;
+
+	if( i_msg->isMagicInvalid())
+	{
+		switch( af::Environment::getMagicMode())
+		{
+		case af::MMM_GetOnly:
+			permissions |= PReadOnly;
+		case af::MMM_NoTasks:
+			permissions |= PNoTasks;
+		}
+	}
 
 	m_valid = true;
 }

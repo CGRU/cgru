@@ -135,10 +135,17 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	else if( document.HasMember("job"))
 	{
-		// No containers locks needed here.
-		// Job registration is a complex procedure.
-		// It locks and unlocks needed containers itself.
-		i_args->jobs->job_register( new JobAf( document["job"]), i_args->users, i_args->monitors);
+		if( i_msg->isMagicInvalid() )
+		{
+			AFCommon::QueueLogError("Job registration is not allowed: Magic number mismatch.");
+		}
+		else
+		{
+			// No containers locks needed here.
+			// Job registration is a complex procedure.
+			// It locks and unlocks needed containers itself.
+			i_args->jobs->job_register( new JobAf( document["job"]), i_args->users, i_args->monitors);
+		}
 	}
 	else if( document.HasMember("monitor"))
 	{

@@ -24,6 +24,10 @@ JobNode.prototype.init = function()
 	this.state.style.position = 'absolute';
 	this.state.style.left = '40%';
 	this.state.title = 'Job state';
+
+	this.blocks = [];
+	for( var b = 0; b < this.params.blocks.length; b++)
+		this.blocks.push( new JobBlock( this.element, this.params.blocks[b]));
 }
 
 JobNode.prototype.update = function()
@@ -40,3 +44,11 @@ JobNode.prototype.onDoubleClick = function()
 	g_OpenTasks( this.params.id );
 }
 
+function JobBlock( i_elParent, i_block)
+{
+	i_elParent.appendChild( document.createElement('br'));
+	this.params = i_block;	
+	this.element = document.createElement('span');	
+	i_elParent.appendChild( this.element);
+	this.element.innerHTML = this.params.name;
+}

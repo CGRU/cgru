@@ -44,7 +44,15 @@ void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	if( action.isInvalid())
 		return;
 
-	if( action.type == "jobs")
+	if(( action.permissions & Action::PReadOnly ) && ( action.type != "monitors"))
+	{
+		AFCommon::QueueLogError( std::string("Action has \"readonly\" permissions only. Type = \"" + action.type + "\""));
+		return;
+	}
+
+	if( action.type == "monitors")
+		i_args->monitors->action( action);
+	else if( action.type == "jobs")
 		i_args->jobs->action( action);
 	else if( action.type == "renders")
 		i_args->renders->action( action);
@@ -52,8 +60,6 @@ void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		i_args->users->action( action);
 	else if( action.type == "talks")
 		i_args->talks->action( action);
-	else if( action.type == "monitors")
-		i_args->monitors->action( action);
 	else
 		AFCommon::QueueLogError(std::string("JSON action has unknown type - \"") + action.type + "\"");
 

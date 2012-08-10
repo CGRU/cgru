@@ -209,8 +209,8 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 	i_item.element.className = 'item';
 	this.elList.appendChild( i_item.element);
 
-	i_item.init();
 	i_item.params = i_obj;
+	i_item.init();
 	i_item.update();
 	i_item.monitor = this;
 	i_item.element.monitor = this;
