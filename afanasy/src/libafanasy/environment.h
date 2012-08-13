@@ -23,11 +23,15 @@ public:
         Verbose             = 1,        ///< Output all information
         Quiet               = 1 << 1,   ///< Do not output even important information
         AppendPythonPath    = 1 << 2,   ///< Appent python sys.path with AFROOT/python
-        SolveServerName     = 1 << 3    ///< Solve server name
+        SolveServerName     = 1 << 3,   ///< Solve server name
+		Server              = 1 << 4    ///< Whether it is a server
     };
 
     /// Return \c true if environment is valid.
     static inline bool isValid() { return m_valid; }
+
+	static inline bool isServer() { return m_server;          }
+	static inline bool isClient() { return m_server == false; }
 
     /// Return \c true if argument exists
     static bool hasArgument( const std::string & argument);
@@ -173,6 +177,7 @@ private:
     static bool m_quiet_init;       ///< Quiet environment initialization
     static bool m_verbose_mode;     ///< Application verbose mode
     static bool m_solveservername;  ///< Whether to solve server name
+    static bool m_server;           ///< Whether the it is a server
 
    static std::list<std::string> cmdarguments;
    static std::list<std::string> cmdarguments_usagearg;

@@ -130,6 +130,7 @@ bool Environment::m_verbose_init = false;
 bool Environment::m_quiet_init   = false;
 bool Environment::m_verbose_mode = false;
 bool Environment::m_solveservername = false;
+bool Environment::m_server          = false;
 bool Environment::visor_mode     = false;
 
 Passwd * Environment::passwd = NULL;
@@ -299,6 +300,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
     m_verbose_init = flags & Verbose;
     m_quiet_init = flags & Quiet;
     m_solveservername = flags & SolveServerName;
+	m_server = flags & Server;
     if( m_quiet_init ) m_verbose_init = false;
 //
 // Init command arguments:

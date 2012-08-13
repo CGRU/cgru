@@ -12,6 +12,8 @@
 #define closesocket close
 #endif
 
+#include "../include/afanasy.h"
+
 #include "../libafanasy/address.h"
 #include "../libafanasy/environment.h"
 #include "../libafanasy/msg.h"
@@ -80,7 +82,7 @@ void processMessage( ThreadArgs * i_args)
     }
 
 #ifdef AFOUTPUT
-printf("Request: ");msg_request->stdOut();
+printf("Request:  "); msg_request->stdOut();
 #endif
 
 	// Filter reactions on magic number mismatch:
@@ -119,10 +121,15 @@ printf("Request: ");msg_request->stdOut();
       return;
    }
 
+	// Set response message sender id and magick number as in request:
 	msg_response->setSid( msg_request->sid());
+	if( msg_response->type() == af::Msg::TMagicMismatch )
+		msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_BAD);
+	else
+		msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
 
 #ifdef AFOUTPUT
-printf("Response: ");msg_response->stdOut();
+printf("Response: "); msg_response->stdOut();
 #endif
 
    // Write response message back to client socket

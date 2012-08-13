@@ -11,6 +11,8 @@
 #define closesocket close
 #endif
 
+#include "../include/afanasy.h"
+
 #include "address.h"
 #include "environment.h"
 #include "msg.h"
@@ -478,6 +480,9 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 
 af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 {
+	if( af::Environment::isServer())
+		i_msg->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
+
     if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
     {
         AFERROR("af::msgsend: Receiving message has several addresses.");

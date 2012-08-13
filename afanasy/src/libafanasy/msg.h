@@ -437,7 +437,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 	inline int  getMagicNumber() const { return m_magic;               }
 	inline bool isMagicValid()   const { return m_magic == Msg::Magic; }
 	inline bool isMagicInvalid() const { return m_magic != Msg::Magic; }
-	inline void setMagicNumber( int i_number) { m_magic =  i_number;   }
+	inline void setMagicNumber( int i_number) { m_magic =  i_number; rw_header(true); }
 
 private:
 

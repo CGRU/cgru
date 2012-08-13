@@ -38,15 +38,16 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
     {
     case af::Msg::TVersionMismatch:
     {
-//        AFCommon::QueueLogError( i_msg->generateInfoString( false));
+        AFCommon::QueueLogError( i_msg->generateInfoString( false));
         o_msg_response = new af::Msg( af::Msg::TVersionMismatch, 1);
         break;
     }
     case af::Msg::TMagicMismatch:
     {
-//        AFCommon::QueueLogError( i_msg->generateInfoString( false));
+		std::string err = "Magick number mismatch: recieved ";
+		err += af::itos( i_msg->getMagicNumber()) + " != " + af::itos( af::Msg::Magic) += " local.";
+		AFCommon::QueueLogError( err);
         o_msg_response = new af::Msg( af::Msg::TMagicMismatch, 1);
-		o_msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_BAD);
         break;
     }
     case af::Msg::TMagicNumber:

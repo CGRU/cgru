@@ -49,7 +49,7 @@ void sig_pipe(int signum)
 int main(int argc, char *argv[])
 {
     // Initialize environment:
-    af::Environment ENV( af::Environment::Normal, argc, argv);
+    af::Environment ENV( af::Environment::Server, argc, argv);
     ENV.addUsage("-noIPv6", "Disable IPv6.");
 
     // Initialize general library:

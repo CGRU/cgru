@@ -138,7 +138,8 @@ Dialog::~Dialog()
 {
     AFINFO("Dialog::~Dialog:")
     Watch::destroy();
-    m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, m_monitor->getId()));
+	if( m_connected )
+		m_qThreadSend.send( new af::Msg( af::Msg::TMonitorDeregister, m_monitor->getId()));
     delete m_monitor;
 }
 

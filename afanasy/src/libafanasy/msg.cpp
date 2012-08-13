@@ -372,22 +372,31 @@ bool Msg::checkValidness()
     }
     if( m_version != Msg::Version)
     {
-        AFERRAR("Msg::checkValidness: Version mismatch: Recieved(%d) != Library(%d)", m_version, Msg::Version)
+		if( af::Environment::isClient())
+			AFERRAR("Msg::checkValidness: Version mismatch: Recieved(%d) != Library(%d)", m_version, Msg::Version)
         m_type = Msg::TVersionMismatch;
         m_int32 = 0;
         return true;
     }
-    if(( m_magic != Msg::Magic ) && ( Environment::getMagicMode() == af::MMM_Reject ))
-    {
-        AFERRAR("Msg::checkValidness: Magic number mismatch: Recieved(%d) != Local(%d)", m_magic, Msg::Magic)
-        m_type = Msg::TMagicMismatch;
-        m_int32 = 0;
-        return true;
-    }
-    else if( m_type == af::Msg::TMagicMismatch )
-    {
-        m_magic = AFGENERAL::MAGIC_NUMBER_BAD;
-    }
+	if( af::Environment::isServer() )
+	{
+	    if(( m_magic != Msg::Magic ) && ( Environment::getMagicMode() == af::MMM_Reject ))
+	    {
+	        m_type = Msg::TMagicMismatch;
+	        m_int32 = 0;
+	        return true;
+	    }
+	}
+	else
+	{
+	    if(( m_magic != Msg::Magic ) && ( m_magic != AFGENERAL::MAGIC_NUMBER_ANY ))
+	    {
+	        AFERRAR("Msg::checkValidness: Magic number mismatch: Recieved(%d) != Local(%d)", m_magic, Msg::Magic)
+	        m_type = Msg::TMagicMismatch;
+	        m_int32 = 0;
+	        return true;
+	    }
+	}
 
     return true;
 }
@@ -403,7 +412,7 @@ void Msg::generateInfoStream( std::ostringstream & stream, bool full) const
 {
     if( m_type <= Msg::TLAST) stream << Msg::TNAMES[m_type];
     else stream << "!UNKNOWN!";
-    stream << ": Length=" << writeSize() << ", type=" << m_type;
+    stream << ": Length=" << writeSize() << ", type=" << m_type << ", magic=" << m_magic;
 }
 
 void Msg::stdOutData( bool withHeader)

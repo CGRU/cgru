@@ -7,7 +7,8 @@
 namespace AFGENERAL
 {
     const int  MAGIC_NUMBER       = 1;
-    const int  MAGIC_NUMBER_BAD   = 0;
+	const int  MAGIC_NUMBER_BAD   = 0;	/// Server sends it back to client with some invalid magic number
+	const int  MAGIC_NUMBER_ANY   = 2;  /// Server sends it client, it never shows its real magick number
     const char TIME_FORMAT[]      = "%a %d %b %H:%M.%S";  ///< Default time output format.
     const int  DEFAULT_PRIORITY   = 99;                   ///< Default priority for user, jobs and hosts.
     const int  MAXRUNNINGTASKS    = -1;                   ///< Default maximum running tasks number.
