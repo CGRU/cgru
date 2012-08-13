@@ -50,5 +50,25 @@ function JobBlock( i_elParent, i_block)
 	this.params = i_block;	
 	this.element = document.createElement('span');	
 	i_elParent.appendChild( this.element);
-	this.element.innerHTML = this.params.name;
+
+	this.tasks = document.createElement('span');
+	this.element.appendChild( this.tasks);
+	var tasks = 't' + this.params.tasks_num;
+	if( this.params.numeric )
+	{
+		tasks += '(' + this.params.frame_first + '-' + this.params.frame_last;
+		if( this.params.frames_per_task > 1 )
+			tasks += ':' + this.params.frames_per_task;
+		if( this.params.frames_inc > 1 )
+			tasks += '/' + this.params.frames_inc;
+		tasks += ')';
+	}
+	tasks += ': ';
+	this.tasks.innerHTML = tasks;
+	this.tasks.title = 'Block tasks'
+
+	this.name = document.createElement('span');
+	this.element.appendChild( this.name);
+	this.name.innerHTML = this.params.name;
+	this.name.title = 'Block name';
 }

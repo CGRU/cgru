@@ -324,9 +324,9 @@ void Msg::readwrite( Msg * msg)
 AFERROR("Msg::readwrite( Msg * msg): - Invalid call, use Msg::readwrite( bool write )")
 }
 
-void Msg::rw_header( bool write )
+void Msg::rw_header( bool write)
 {
-    if( write && ( false == checkValidness() ))
+    if( write && ( false == checkValidness( false) ))
     {
         AFERROR("Msg::rw_header: Message is invalid.")
     }
@@ -340,14 +340,14 @@ void Msg::rw_header( bool write )
     #ifdef AFOUTPUT
     printf("Msg::readwrite: at %p: ", mbuffer); stdOut();
     #endif
-    if(( false == write ) && ( false == checkValidness() ))
+    if(( false == write ) && ( false == checkValidness( true) ))
     {
         AFERROR("Msg::rw_header: Message is invalid.")
     }
     m_writtensize = 0;
 }
 
-bool Msg::checkValidness()
+bool Msg::checkValidness( bool checkMagic)
 {
     if( m_type >= Msg::TLAST)
     {
@@ -378,6 +378,8 @@ bool Msg::checkValidness()
         m_int32 = 0;
         return true;
     }
+	if( checkMagic )
+	{
 	if( af::Environment::isServer() )
 	{
 	    if(( m_magic != Msg::Magic ) && ( Environment::getMagicMode() == af::MMM_Reject ))
@@ -396,6 +398,7 @@ bool Msg::checkValidness()
 	        m_int32 = 0;
 	        return true;
 	    }
+	}
 	}
 
     return true;

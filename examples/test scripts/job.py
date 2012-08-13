@@ -22,7 +22,7 @@ parser.add_option('-b', '--numblocks',    dest='numblocks',    type='int',    de
 parser.add_option('-n', '--numtasks',     dest='numtasks',     type='int',    default=10, help='number of tasks')
 parser.add_option('-f', '--frames',       dest='frames',       type='string', default='', help='frames "1/20/2/3,1/20/2/3"')
 parser.add_option('-i', '--increment',    dest='increment',    type='int',    default=1,  help='tasks "frame increment" parameter')
-parser.add_option('-p', '--perhost',      dest='perhost',      type='int',    default=1,  help='number of tasks per host')
+parser.add_option('-p', '--pertask',      dest='pertask',      type='int',    default=1,  help='number of tasks per task')
 parser.add_option('-m', '--maxtime',      dest='maxtime',      type='int',    default=0,  help='tasks maximum run time in seconds')
 parser.add_option(      '--send',         dest='sendjob',      type='int',    default=1,  help='send job')
 parser.add_option('-w', '--waittime',     dest='waittime',     type='int',    default=0,  help='set job to wait to start time')
@@ -131,8 +131,8 @@ for b in range( numblocks):
          fr = frames[b].split('/')
          block.setNumeric( int(fr[0]), int(fr[1]), int(fr[2]), int(fr[3]))
       else:
-         block.setNumeric( 1, numtasks, options.perhost, increment)
-      if options.perhost > 1:
+         block.setNumeric( 1, numtasks, options.pertask, increment)
+      if options.pertask > 1:
          block.setFiles('file_a.@#@.@###@-file_a.@#@.@###@;file_b.@#@.@###@-file_b.@#@.@###@')
       else:
          block.setFiles('file_a.@#@.@####@;file_b.@#@.@####@')

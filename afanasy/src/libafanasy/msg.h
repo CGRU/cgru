@@ -437,7 +437,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 	inline int  getMagicNumber() const { return m_magic;               }
 	inline bool isMagicValid()   const { return m_magic == Msg::Magic; }
 	inline bool isMagicInvalid() const { return m_magic != Msg::Magic; }
-	inline void setMagicNumber( int i_number) { m_magic =  i_number; rw_header(true); }
+	inline void setMagicNumber( int i_number) { m_magic =  i_number; rw_header( true); }
 
 private:
 
@@ -468,12 +468,12 @@ private:
 
     void construct();                ///< Called from constuctors.
     bool checkZero( bool outerror ); ///< Check Zero type, data length and pointer.
-    bool checkValidness();           ///< Check message header validness;
+    bool checkValidness( bool checkMagic = true); ///< Check message header validness and magic number;
 
 	/// Allocate memory for buffer, copy \c to_copy_len bytes in new buffer if any
 	bool allocateBuffer( int i_size, int i_copy_len = 0, int i_copy_offset = Msg::SizeHeader);
 
-    void rw_header( bool write ); ///< Read or write message header.
+    void rw_header( bool write); ///< Read or write message header.
     void readwrite( Msg * msg);
 };
 }

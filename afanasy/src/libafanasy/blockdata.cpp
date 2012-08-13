@@ -320,7 +320,8 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 	case Msg::TJobsList:
 
 	//	o_str << ",\"flags",             << m_flags;
-		o_str << "\"tasks_num\":"        << m_tasks_num;
+		o_str << "\"numeric\":"          << isNumeric() ? "true":"false";
+		o_str << ",\"tasks_num\":"       << m_tasks_num;
 		o_str << ",\"frame_first\":"     << m_frame_first;
         o_str << ",\"frame_last\":"      << m_frame_last;
         o_str << ",\"frames_per_task\":" << m_frames_per_task;
