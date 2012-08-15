@@ -410,7 +410,7 @@ const af::Address af::solveNetName( const std::string & i_name, int i_port, int 
 
 bool af::msgread( int desc, af::Msg* msg)
 {
-AFINFO("com::msgread:\n");
+AFINFO("af::msgread:\n");
 
    char * buffer = msg->buffer();
 //
@@ -419,7 +419,7 @@ AFINFO("com::msgread:\n");
 
    if( bytes < af::Msg::SizeHeader)
    {
-      AFERRAR("com::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).\n", bytes);
+      AFERRAR("af::msgread: can't read message header, bytes = %d (< Msg::SizeHeader).", bytes);
       msg->setInvalid();
       return false;
    }

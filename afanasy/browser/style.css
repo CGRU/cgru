@@ -146,6 +146,13 @@ background: #888888;
 /*height: 24px;*/
 }
 
+.item .jobblock {
+border: 1px solid #666;
+margin: 2px;
+padding: 2px;
+/*box-shadow: 0px 0px 5px #222 inset;*/
+}
+
 .item.block {
 margin: 4px 4px 0px 4px;
 height: 24px;

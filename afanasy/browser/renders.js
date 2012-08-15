@@ -38,44 +38,18 @@ RenderNode.prototype.init = function()
 	this.element.appendChild( this.state);
 	this.state.style.cssFloat = 'right';
 	this.state.title = 'Busy / free status and time';
+
+	this.annotation = document.createElement('div');
+	this.element.appendChild( this.annotation);
+	this.annotation.title = 'Annotation';
+	this.annotation.style.textAlign = 'center';
 }
 
 RenderNode.prototype.update = function()
 {
 	var user = this.params.user_name;
 	var state = cm_GetState( this.params.state, this.element);
-/*
-	if( this.params.offline === true )
-	{
-		if( false == this.element.classList.contains('offline'))
-		this.element.classList.add('offline');
-	}
-	else
-		this.element.classList.remove('offline');
 
-	if( this.params.busy === true )
-	{
-		if( false == this.element.classList.contains('running'))
-		this.element.classList.add('running');
-	}
-	else
-		this.element.classList.remove('running');
-
-	if( this.params.NIMBY === true )
-	{
-		if( false == this.element.classList.contains('nimby'))
-			this.element.classList.add('nimby');
-		user = '(' + user + ')N';
-	}
-	else if( this.params.nimby === true )
-	{
-		if( false == this.element.classList.contains('nimby'))
-			this.element.classList.add('nimby');
-		user = '(' + user + ')n';
-	}
-	else
-		this.element.classList.remove('nimby');
-*/
 	this.name.innerHTML = this.params.name;
 	if( this.params.version != null )
 		this.version.innerHTML = ' ' + this.params.version;
@@ -85,6 +59,11 @@ RenderNode.prototype.update = function()
 	this.priority.innerHTML = '-' + this.params.priority;
 
 	this.user_name.innerHTML = user;
+
+	if( this.params.annotation )
+		this.annotation.innerHTML = this.params.annotation;
+	else
+		this.annotation.innerHTML = '';
 
 	if( state.OFF )
 	{

@@ -122,7 +122,7 @@ function cm_GetState( i_state, i_el)
 	var state = {};
 	if( i_state == null )
 	{
-		state.string = '';
+		state.string = '-';
 		return state;
 	}
 
