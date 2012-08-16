@@ -11,7 +11,7 @@ g_key_ctrl = false;
 g_key_shift = false;
 
 g_recievers = [];
-g_updaters = [];
+g_refreshers = [];
 g_monitors = [];
 g_cur_monitor = null;
 g_monitor_buttons = [];
@@ -56,10 +56,10 @@ function g_ProcessMsg( obj)
 	}
 }
 
-function g_Update()
+function g_Refresh()
 {
 	g_cycle++;
-	setTimeout("g_Update()", 1000);
+	setTimeout("g_Refresh()", 1000);
 
 //	document.getElementById('id').innerHTML = 'ID = ' + g_id + ' c' + g_cycle;
 
@@ -68,9 +68,9 @@ function g_Update()
 
 	nw_GetEvents('monitors','events');
 
-	for( i = 0; i < g_updaters.length; i++)
+	for( i = 0; i < g_refreshers.length; i++)
 	{
-		g_updaters[i].update();
+		g_refreshers[i].refresh();
 	}
 }
 
@@ -82,7 +82,7 @@ function g_Init()
 		g_monitor_buttons[i].onclick = g_MButtonClick;
 
 	g_Register();
-	g_Update();
+	g_Refresh();
 	cm_Init();
 }
 

@@ -3,6 +3,7 @@ function RenderNode() {}
 RenderNode.prototype.init = function()
 {
 	this.name = document.createElement('span');
+	this.name.classList.add('name');
 	this.element.appendChild( this.name);
 	this.name.title = 'Client host name';
 
@@ -34,21 +35,23 @@ RenderNode.prototype.init = function()
 	this.element.appendChild( this.max_tasks);
 	this.max_tasks.title = 'Running tasks / maximum'
 
-	this.state = document.createElement('span');
-	this.element.appendChild( this.state);
-	this.state.style.cssFloat = 'right';
-	this.state.title = 'Busy / free status and time';
+	this.stateTime = document.createElement('span');
+	this.element.appendChild( this.stateTime);
+	this.stateTime.style.cssFloat = 'right';
+	this.stateTime.title = 'Busy / free status and time';
 
 	this.annotation = document.createElement('div');
 	this.element.appendChild( this.annotation);
 	this.annotation.title = 'Annotation';
 	this.annotation.style.textAlign = 'center';
+
+	this.state = {};
 }
 
 RenderNode.prototype.update = function()
 {
 	var user = this.params.user_name;
-	var state = cm_GetState( this.params.state, this.element);
+	cm_GetState( this.params.state, this.element, this.state);
 
 	this.name.innerHTML = this.params.name;
 	if( this.params.version != null )
@@ -65,12 +68,13 @@ RenderNode.prototype.update = function()
 	else
 		this.annotation.innerHTML = '';
 
-	if( state.OFF )
+	if( this.state.OFF == true )
 	{
 		this.center.innerHTML = 'offline';
 		this.capacity.innerHTML = '';
 		this.max_tasks.innerHTML = '';
 		this.state.innerHTML = '';
+		this.refresh();
 		return;
 	}
 	this.center.innerHTML = '.';
@@ -91,14 +95,23 @@ RenderNode.prototype.update = function()
 	max_tasks = ' ' + max_tasks;
 	this.max_tasks.innerHTML = max_tasks;
 
-	var state = 'NEW';
+	this.refresh();
+}
+
+RenderNode.prototype.refresh = function()
+{
+	var stateTime = 'NEW';
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{
-		state = cm_TimeStringFromNow( this.params.task_start_finish_time);
-		if( this.params.busy === true )
-			state += ' busy';
+		stateTime = cm_TimeStringInterval( this.params.task_start_finish_time);
+		if( this.state.RUN == true )
+			stateTime += ' busy';
 		else
-			state += ' free';
+			stateTime += ' free';
 	}
-	this.state.innerHTML = state;
+	this.stateTime.innerHTML = stateTime;
+}
+
+RenderNode.prototype.onDoubleClick = function()
+{
 }

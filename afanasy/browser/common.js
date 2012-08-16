@@ -94,9 +94,14 @@ function cm_IdsMerge( i_ids1, i_ids2)
 	return o_ids;
 }
 
-function cm_TimeStringFromNow( time)
+function cm_TimeStringInterval( time1, time2)
 {
-	time = new Date() - new Date( time * 1000);
+	if( time2 == null )
+		time2 = new Date();
+	else
+		time2 = new Date( time2 * 1000);
+
+	time = time2 - new Date( time1 * 1000);
 	var seconds = Math.floor(time / 1000);
 	var minutes = Math.floor(seconds / 60);
 	var hours = Math.floor(minutes / 60);
@@ -117,26 +122,26 @@ function cm_TimeStringFromNow( time)
 }
 
 cm_States = ['RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY'];
-function cm_GetState( i_state, i_el)
+function cm_GetState( i_state, i_elParent, i_elChild)
 {
-	var state = {};
 	if( i_state == null )
-	{
-		state.string = '-';
-		return state;
-	}
+		i_elChild.innerHTML = '-';
+	else
+		i_elChild.innerHTML = i_state;
 
-	state.string = i_state;
 	for( var i = 0; i < cm_States.length; i++)
 	{
-		if( i_el ) i_el.classList.remove( cm_States[i]);
-		if( i_state.indexOf( cm_States[i]) != -1 )
+		i_elParent.classList.remove( cm_States[i]);
+		if( i_state )
 		{
-			eval('state.' + cm_States[i] + ' = true;');
-			if( i_el ) i_el.classList.add( cm_States[i]);
+			if( i_state.indexOf( cm_States[i]) != -1 )
+			{
+				eval('i_elChild.' + cm_States[i] + ' = true;');
+				i_elParent.classList.add( cm_States[i]);
+			}
+			else
+				eval('i_elChild.' + cm_States[i] + ' = false;');
 		}
 	}
-
-	return state;
 }
 

@@ -63,7 +63,7 @@ function Monitor( i_element, i_type, i_id)
 	}
 	else
 	{
-		g_updaters.push( this);
+		g_refreshers.push( this);
 		nw_Subscribe( this.type, true);
 		nw_GetNodes( this.type);
 	}
@@ -76,7 +76,7 @@ Monitor.prototype.destroy = function()
 	if( g_cur_monitor == this )
 		g_cur_monitor = null;
 	cm_ArrayRemove(	g_recievers, this);
-	cm_ArrayRemove(	g_updaters, this);
+	cm_ArrayRemove(	g_refreshers, this);
 	cm_ArrayRemove(	g_monitors, this);
 	if( this.type == 'tasks')
 		nw_Subscribe( this.type, false, [this.job_id]);
@@ -91,8 +91,10 @@ Monitor.prototype.destroy = function()
 	this.elParent.removeChild( this.elMonitor);
 }
 
-Monitor.prototype.update = function()
+Monitor.prototype.refresh = function()
 {
+	for( i = 0; i < this.items.length; i++)
+		this.items[i].refresh();
 }
 
 Monitor.prototype.processMsg = function( obj)
@@ -415,19 +417,19 @@ Monitor.prototype.getBlocks = function( i_block_ids)
 	blocks = [];
 	modes = [];
 
-var test = 'block ids:'
-document.getElementById('test').innerHTML = test;
+//var test = 'block ids:'
+//document.getElementById('test').innerHTML = test;
 
 	for( var i = 0; i < i_block_ids.job_id.length; i++)
 	{
 		if( this.job_id != i_block_ids.job_id[i]) continue;
-test += ' n' + i_block_ids.block_num[i];
-test += ' m' + i_block_ids.mode[i];
+//test += ' n' + i_block_ids.block_num[i];
+//test += ' m' + i_block_ids.mode[i];
 		blocks.push( i_block_ids.block_num[i]);
 		modes.push( i_block_ids.mode[i]);
 	}
 
-document.getElementById('test').innerHTML = test;
+//document.getElementById('test').innerHTML = test;
 
 	if( blocks.length == 0 ) return;
 

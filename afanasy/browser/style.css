@@ -1,8 +1,9 @@
 body {
 font: 16px Arial;
+font-weight: bold;
 background: #ab8;
-/*user-select: none;
--moz-user-select: none;*/
+user-select: none;
+-moz-user-select: none;
 }
 
 * {
@@ -40,7 +41,6 @@ margin: 10px;
 padding: 5px;
 cursor: pointer;
 text-transform: uppercase;
-font-weight: bold;
 color: #222;
 box-shadow: 0px 0px 2px #000;
 }
@@ -55,7 +55,6 @@ box-shadow: 0px 0px 5px #000 inset;
 position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
-font-weight: bold;
 }
 
 .monitor .ctrl,.info {
@@ -76,7 +75,7 @@ overflow: auto;
 top: 40px;
 bottom: 40px;
 /*background: #CCD;*/
--moz-user-select: none;
+/*-moz-user-select: none;*/
 }
 
 .monitor .ctrl .sort,.filter {
@@ -175,3 +174,9 @@ width: 0%;
 height: 100%;
 opacity: 0.3;
 }
+
+.name {
+font-size: 14px;
+/*font-weight: bold;*/
+}
+

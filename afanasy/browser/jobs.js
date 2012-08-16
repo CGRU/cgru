@@ -5,6 +5,7 @@ JobNode.prototype.init = function()
 	this.element.classList.add('job');
 
 	this.name = document.createElement('span');
+	this.name.classList.add('name');
 	this.element.appendChild( this.name);
 	this.name.title = 'Job name';
 
@@ -67,17 +68,11 @@ JobNode.prototype.init = function()
 
 JobNode.prototype.update = function()
 {
-	var state = cm_GetState( this.params.state, this.element);
-	this.state.innerHTML = state.string;
+	cm_GetState( this.params.state, this.element, this.state);
+//	this.state.innerHTML = state.string;
 	this.name.innerHTML = this.params.name;
 	this.priority.innerHTML = ' p' + this.params.priority;
 	this.user_name.innerHTML = this.params.user_name;
-
-	var time = this.params.time_started;
-	if( time )
-		this.time.innerHTML = time;
-	else
-		this.time.innerHTML = '';
 
 	if( this.params.depend_mask )
 		this.depend_mask.innerHTML = ' d(' + this.params.depend_mask + ') ';
@@ -109,6 +104,23 @@ JobNode.prototype.update = function()
 		this.blocks[b].params = this.params.blocks[b];
 		this.blocks[b].update();
 	}
+
+	this.refresh();
+}
+
+JobNode.prototype.refresh = function()
+{
+	var time = this.params.time_started;
+	if( time )
+	{
+		if( this.state.DON == true )
+			time = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
+		else
+			time = cm_TimeStringInterval( time);
+		this.time.innerHTML = time;
+	}
+	else
+		this.time.innerHTML = '';
 }
 
 JobNode.prototype.onDoubleClick = function()

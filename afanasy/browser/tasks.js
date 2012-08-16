@@ -24,8 +24,7 @@ BlockItem.prototype.init = function()
 
 BlockItem.prototype.update = function()
 {
-	var state = cm_GetState( this.params.state);
-	this.state.innerHTML = state.string + '-';
+	cm_GetState( this.params.state, this.element, this.state);
 
 	if( this.params.tasks )
 		this.props.innerHTML = 'array';
@@ -83,17 +82,17 @@ TaskItem.prototype.updateProgress = function( i_progress)
 {
 //	this.progress = progress;
 
-	var state = cm_GetState( i_progress.state);
-	this.state.innerHTML = state.string;
+	cm_GetState( i_progress.state, this.element, this.state);
+//	this.state.innerHTML = state.string;
 
 	var percent = 0;
-	if( state.run && i_progress.per ) percent = i_progress.per;
-	if( state.don ) percent = 100;
-	if( state.skp ) percent = 100;
+	if( this.state.RUN && i_progress.per ) percent = i_progress.per;
+	if( this.state.DON ) percent = 100;
+	if( this.state.SKP ) percent = 100;
 	if( percent < 0 ) percent = 0;
 	if( percent > 100 ) percent = 100;
 
-	if( state.run)
+	if( this.state.RUN )
 		this.percent.innerHTML = ' ' + percent + '%';
 	else
 		this.percent.innerHTML = '';
