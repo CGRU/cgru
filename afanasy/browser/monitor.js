@@ -93,6 +93,15 @@ Monitor.prototype.destroy = function()
 
 Monitor.prototype.refresh = function()
 {
+	if( this.type == 'users' )
+	{
+		this.max_tasks = 0;
+		for( i = 0; i < this.items.length; i++)
+			if( this.items[i].params.running_tasks_num )
+				if( this.items[i].params.running_tasks_num > this.max_tasks )
+					this.max_tasks = this.items[i].params.running_tasks_num;
+	}
+
 	for( i = 0; i < this.items.length; i++)
 		this.items[i].refresh();
 }

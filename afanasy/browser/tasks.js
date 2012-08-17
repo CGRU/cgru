@@ -8,6 +8,7 @@ BlockItem.prototype.init = function()
 	this.element.classList.add('block');
 
 	this.name = document.createElement('span');
+	this.name.classList.add('name');
 	this.element.appendChild( this.name);
 	this.name.title = 'Block name';
 
@@ -45,7 +46,7 @@ TaskItem.prototype.init = function()
 
 	this.progress = document.createElement('span');
 	this.element.appendChild( this.progress);
-	this.progress.classList.add('progress');
+	this.progress.classList.add('bar');
 //	this.progress.style.zIndex = 1;
 
 	this.name = document.createElement('span');

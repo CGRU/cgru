@@ -29,16 +29,24 @@ UserNode.prototype.init = function()
 
 	this.jobs = document.createElement('span');
 	this.element.appendChild( this.jobs);
+	this.jobs.style.cssFloat = 'left';
 	this.jobs.title = 'Jobs, all/running';
 
 	this.solving = document.createElement('span');
 	this.element.appendChild( this.solving);
 	this.solving.style.cssFloat = 'right';
 
+	this.element.appendChild( document.createElement('br'));
+
 	this.annotation = document.createElement('div');
 	this.element.appendChild( this.annotation);
 	this.annotation.title = 'Annotation';
 	this.annotation.style.textAlign = 'center';
+
+	this.bar = document.createElement('div');
+	this.element.appendChild( this.bar);
+	this.bar.classList.add('bar');
+	this.bar.style.textAlign = 'center';
 }
 
 UserNode.prototype.update = function()
@@ -73,6 +81,8 @@ UserNode.prototype.update = function()
 		jobs += this.params.running_jobs_num;
 	else
 		jobs += '0';
+	if( this.params.running_tasks_num )
+		jobs += '-' + this.params.running_tasks_num;
 	this.jobs.innerHTML = jobs;
 
 	var solving = 'User jobs solving method:';
@@ -92,10 +102,18 @@ UserNode.prototype.update = function()
 		this.annotation.innerHTML = this.params.annotation;
 	else
 		this.annotation.innerHTML = '';
+
+	this.refresh();
 }
 
 UserNode.prototype.refresh = function()
 {
+	var percent = '';
+	if( this.params.running_tasks_num && ( this.monitor.max_tasks > 0 ))
+		percent = 100 * this.params.running_tasks_num/this.monitor.max_tasks;
+	else
+		percent = '0';
+	this.bar.style.width = percent + '%';
 }
 
 UserNode.prototype.onDoubleClick = function()

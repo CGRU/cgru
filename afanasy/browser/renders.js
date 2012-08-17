@@ -74,7 +74,7 @@ RenderNode.prototype.update = function()
 		this.capacity.innerHTML = '';
 		this.max_tasks.innerHTML = '';
 		this.state.innerHTML = '';
-		this.refresh();
+		this.stateTime.innerHTML = '';
 		return;
 	}
 	this.center.innerHTML = '.';
@@ -100,6 +100,11 @@ RenderNode.prototype.update = function()
 
 RenderNode.prototype.refresh = function()
 {
+	if( this.state.OFF == true )
+	{
+		return;
+	}
+
 	var stateTime = 'NEW';
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{

@@ -90,6 +90,7 @@ function g_Registered()
 {
 	g_Info('Registed: ID = ' + g_id);
 	g_OpenMonitor('jobs');
+//	g_OpenMonitor('users');
 }
 
 function g_Deregistered()

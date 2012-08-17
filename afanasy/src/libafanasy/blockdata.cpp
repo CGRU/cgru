@@ -1039,20 +1039,15 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
 
       if( full || ( ! m_parser.empty())) o_str << "\n Parser = " << m_parser;
       if( full && (   m_parser.empty())) o_str << " is empty (no parser)";
-
+/*
       if( false == m_working_directory.empty()) o_str << "\n Working Directory:\n" << m_working_directory;
-
       if( false == m_command.empty()) o_str << "\n Command:\n" << m_command;
-
       if( false == m_environment.empty()) o_str << "\n Environment = " << m_environment;
-
       if( false == m_files.empty()) o_str << "\n Files:\n" << af::strReplace( m_files, ';', '\n');
-
       if( false == m_command_pre.empty()) o_str << "\n Pre Command:\n" << m_command_pre;
       if( false == m_command_post.empty()) o_str << "\n Post Command:\n" << m_command_post;
-
       if( false == m_custom_data.empty()) o_str << "\n Custom Data:\n" << m_custom_data;
-
+*/
 //      break;
 //   case Msg::TJobsList:
 

@@ -75,7 +75,7 @@ overflow: auto;
 top: 40px;
 bottom: 40px;
 /*background: #CCD;*/
-/*-moz-user-select: none;*/
+-moz-user-select: none;
 }
 
 .monitor .ctrl .sort,.filter {
@@ -131,13 +131,14 @@ color: #000000;
 background: #EEEE99;
 text-align: center;
 position: absolute;
+top: 0;
+height: 2.5em;
 left: 40%;
-width: 20%;
-height: 2.4em;
+right: 40%;
 }
 
 .item.OFF .resources {
-height: 1.2em;
+height: 1.3em;
 background: #888888;
 }
 
@@ -164,18 +165,16 @@ height: 12px;
 border-radius: 0px;
 }
 
-.item.task .progress {
+.item .bar {
 background: #0A0;
-margin: 0px;
-padding: 0px;
+/*margin: 0px; padding: 0px;*/
 position: absolute;
-left: 0%;
-width: 0%;
-height: 100%;
+top: 0px; bottom: 0px;
+left: 0%; width: 0%;
 opacity: 0.3;
 }
 
-.name {
+.item .name {
 font-size: 14px;
 /*font-weight: bold;*/
 }
