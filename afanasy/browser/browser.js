@@ -89,7 +89,8 @@ function g_Init()
 function g_Registered()
 {
 	g_Info('Registed: ID = ' + g_id);
-	g_OpenMonitor('jobs');
+//	g_OpenMonitor('jobs');
+	g_OpenMonitor('renders');
 //	g_OpenMonitor('users');
 }
 

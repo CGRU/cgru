@@ -442,49 +442,113 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 	return -1;
 }
 
-const std::string af::fillNumbers( const std::string & pattern, long long start, long long end)
+const std::string af::fillNumbers( const std::string & i_pattern, long long i_start, long long i_end)
 {
-   std::string str;
-   int pos = 0;
-   int nstart = -1;
-   int part = 0;
-   long long number = start;
+	std::string str;
+	int pos = 0;
+	int nstart = -1;
+	int part = 0;
+	long long number = i_start;
 
-   while( pos < pattern.size())
-   {
-      if( pattern[pos] == '@')
-      {
-         if(( nstart != -1) && (( pos - nstart ) > 1))
-         {
-            str += std::string( pattern.data()+part, nstart-part);
-            std::string number_str = af::itos( number);
-            if( number_str.size() < ( pos - nstart - 1))
-               number_str = std::string( pos - nstart - 1 - number_str.size(), '0') + number_str;
-            str += number_str;
-            if( number == start ) number = end;
-            else number = start;
-            part = pos + 1;
-            nstart = -1;
-         }
-         else
-            nstart = pos;
-      }
-      else if( nstart != -1)
-      {
-         if( pattern[pos] != '#')
-         {
-            nstart = -1;
-         }
-      }
-      pos++;
-   }
+	while( pos < i_pattern.size())
+	{
+		if( i_pattern[pos] == '@')
+		{
+			if(( nstart != -1) && (( pos - nstart ) > 1))
+			{
+				// we founded the second "@" character in some pattern pair
+				// store input string from the last pattern
+				str += std::string( i_pattern.data()+part, nstart-part);
 
-   if( str.empty() ) return pattern;
+				// check for a negative number value
+				bool negative;
+				if( number < 0 )
+				{
+					number = -number;
+					negative = true;
+				}
+				else
+				{
+					negative = false;
+				}
 
-   if(( part > 0 ) && ( part < pattern.size()))
-      str += std::string( pattern.data()+part, pattern.size()-part);
+				// convert integer to string
+				std::string number_str = af::itos( number);
+				int number_str_size = number_str.size();
+				if( negative )
+				{
+					// increase size for padding zeors by 1 for "-" character
+					// as it will be added after
+					number_str_size ++;
+				}
+				if( number_str_size < ( pos - nstart - 1))
+				{
+					number_str = std::string( pos - nstart - 1 - number_str_size, '0') + number_str;
+				}
+				if( negative )
+				{
+					number_str = '-' + number_str;
+				}
+				str += number_str;
 
-   return str;
+				// Change numbder from start to end and back (cycle)
+				if( negative )
+				{
+					// return negative if was so
+					number = -number;
+				}
+				if( number == i_start )
+				{
+					// if last replacement was start, next "should" be "end"
+					number = i_end;
+				}
+				else
+				{
+					// if last replacement was "end", next should be "start"
+					number = i_start;
+				}
+
+				// remember where we finished to replace last pattern
+				part = pos + 1;
+
+				// reset start position to search new pattern
+				nstart = -1;
+			}
+			else
+			{
+				// start reading "@#*@" pattern
+				// remember first "@" position
+				nstart = pos;
+			}
+		}
+		else if( nstart != -1) // "@" was started
+		{
+			if( i_pattern[pos] != '#') // but character is not "#"
+			{
+				// reset start position, considering that it is not a pattern
+				nstart = -1;
+			}
+		}
+
+		// go the next character
+		pos++;
+	}
+
+	if( str.empty() )
+	{
+		// no patterns were founded
+		// returning and input string unchanged
+		return i_pattern;
+	}
+
+	if(( part > 0 ) && ( part < i_pattern.size()))
+	{
+		// there were some pattern replacements
+		// add unchanged string tail (all data from the last replacement)
+		str += std::string( i_pattern.data()+part, i_pattern.size()-part);
+	}
+
+	return str;
 }
 
 const std::string af::replaceArgs( const std::string & pattern, const std::string & arg)

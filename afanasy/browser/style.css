@@ -129,19 +129,43 @@ color: #000000;
 
 .item .resources {
 background: #EEEE99;
-text-align: center;
 position: absolute;
 top: 0;
+left: 50%;
+width: 0;
+overflow: visible;
+/*
+text-align: center;
 height: 2.5em;
-left: 40%;
-right: 40%;
+right: 30%;
+*/
 }
 
+.item .plotter {
+background: #000;
+border: 2px inset #888;
+position: absolute;
+/*
+width: 50px;
+position: relative;
+width: 10%;
+*/
+}
+
+.item .plotter .label {
+color: #FF3;
+font-size: 10px;
+font-weight: normal;
+position: absolute;
+top: 2px; left: 2px;
+}
+
+/*
 .item.OFF .resources {
 height: 1.3em;
 background: #888888;
 }
-
+*/
 .item.job {
 /*height: 24px;*/
 }

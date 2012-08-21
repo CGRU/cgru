@@ -21,9 +21,9 @@ RenderNode.prototype.init = function()
 	this.user_name.style.cssFloat = 'right';
 	this.user_name.title = 'User name and "Nimby" status'
 
-	this.center = document.createElement('span');
-	this.element.appendChild( this.center);
-	this.center.className = 'resources';
+	this.resources = document.createElement('div');
+	this.element.appendChild( this.resources);
+	this.resources.className = 'resources';
 
 	this.element.appendChild( document.createElement('br'));
 
@@ -44,6 +44,14 @@ RenderNode.prototype.init = function()
 	this.element.appendChild( this.annotation);
 	this.annotation.title = 'Annotation';
 	this.annotation.style.textAlign = 'center';
+
+	this.plotters = [];
+	new Plotter( this.plotters, this.resources, 'C');
+	new Plotter( this.plotters, this.resources, 'M');
+	new Plotter( this.plotters, this.resources, 'S');
+	new Plotter( this.plotters, this.resources, 'H');
+	new Plotter( this.plotters, this.resources, 'N');
+	new Plotter( this.plotters, this.resources, 'D');
 
 	this.state = {};
 }
@@ -68,16 +76,19 @@ RenderNode.prototype.update = function()
 	else
 		this.annotation.innerHTML = '';
 
+	for( var i = 0; i < this.plotters.length; i++)
+		this.plotters[i].setHidden( this.state.OFF)
+
 	if( this.state.OFF == true )
 	{
-		this.center.innerHTML = 'offline';
+//		this.resources.innerHTML = 'offline';
 		this.capacity.innerHTML = '';
 		this.max_tasks.innerHTML = '';
 		this.state.innerHTML = '';
 		this.stateTime.innerHTML = '';
 		return;
 	}
-	this.center.innerHTML = '.';
+//	this.resources.innerHTML = '.';
 
 	var capacity = this.params.capacity;
 	if( capacity == null )

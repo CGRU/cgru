@@ -123,11 +123,7 @@ blocknames = []
 
 #
 # checking some critical argumens values
-
-if s < 0:
-   error_exit( 'invalid start frame')
-if e < 0:
-   error_exit( 'invalid end frame')
+if e < s: error_exit('End frame sould be less or equal to start frame.')
 
 #
 # getting arguments
