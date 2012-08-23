@@ -9,44 +9,46 @@ class ParserHost
 
 public:
 
-   ParserHost( const std::string & task_type, int num_frames);
-   ~ParserHost();
+	ParserHost( const std::string & task_type, int num_frames);
+	~ParserHost();
 
-   void read( std::string & output);
+	void read( std::string & output);
 
-   inline int getPercent()      const { return percent      ;}
-   inline int getFrame()        const { return frame        ;}
-   inline int getPercentFrame() const { return percentframe ;}
-   inline int hasWarning()      const { return warning      ;}
-   inline int hasError()        const { return error        ;}
-   inline int isBadResult()     const { return badresult    ;}
+	inline int getPercent()        const { return percent;         }
+	inline int getFrame()          const { return frame;           }
+	inline int getPercentFrame()   const { return percentframe;    }
+	inline int hasWarning()        const { return warning;         }
+	inline int hasError()          const { return error;           }
+	inline int isBadResult()       const { return badresult;       }
+	inline int isFinishedSuccess() const { return finishedsuccess; }
 
-   inline char* getData( int *size ) const { *size = datasize; return data;}
-
-private:
-   af::Parser * parser;
-
-   std::string type;
-   int numframes;
-
-   int  percent;
-   int  frame;
-   int  percentframe;
-   bool error;
-   bool warning;
-   bool badresult;
-
-   char*              data;
-   int                datasize;
-   static const int   DataSizeMax;
-   static const int   DataSizeHalf;
-   static const int   DataSizeShift;
-   bool               overload;
-   static const char* overload_string;
-   int                overload_string_length;
+	inline char* getData( int *size ) const { *size = datasize; return data;}
 
 private:
-   void setOverload();
-   bool shiftData( int offset);
-   void parse( std::string & output);
+	af::Parser * parser;
+
+	std::string type;
+	int numframes;
+
+	int  percent;
+	int  frame;
+	int  percentframe;
+	bool error;
+	bool warning;
+	bool badresult;
+	bool finishedsuccess;
+
+	char*              data;
+	int                datasize;
+	static const int   DataSizeMax;
+	static const int   DataSizeHalf;
+	static const int   DataSizeShift;
+	bool               overload;
+	static const char* overload_string;
+	int                overload_string_length;
+
+private:
+	void setOverload();
+	bool shiftData( int offset);
+	void parse( std::string & output);
 };

@@ -63,13 +63,16 @@ namespace AFJOB
    const   char   STATE_WARNING_NAME[]             = "Warning";
    const   char   STATE_WARNING_NAME_S[]           = "WRN";
    const uint32_t STATE_PARSERERROR_MASK           = 1<<11;
-   const   char   STATE_PARSERERROR_NAME[]         = "ParserError";
+   const   char   STATE_PARSERERROR_NAME[]         = "Parser Error";
    const   char   STATE_PARSERERROR_NAME_S[]       = "PER";
    const uint32_t STATE_PARSERBADRESULT_MASK       = 1<<12;
-   const   char   STATE_PARSERBADRESULT_NAME[]     = "ParserBadResult";
+   const   char   STATE_PARSERBADRESULT_NAME[]     = "Parser Bad Result";
    const   char   STATE_PARSERBADRESULT_NAME_S[]   = "PBR";
+   const uint32_t STATE_PARSERSUCCESS_MASK         = 1<<13;
+   const   char   STATE_PARSERSUCCESS_NAME[]       = "Parser Finished Success";
+   const   char   STATE_PARSERSUCCESS_NAME_S[]     = "PBR";
 
-   const uint32_t STATE_SOLVED_MASK       = 1<<13;
+   const uint32_t STATE_SOLVED_MASK       = 1<<14;
 
    const int  SYSJOB_ID                   = 1;  // System job ID
    const char SYSJOB_NAME[]               = "afanasy";

@@ -109,6 +109,7 @@ public:
       UPFinishedKilled,
       UPFinishedParserError,
       UPFinishedParserBadResult,
+      UPFinishedParserSuccess,
 
       UPRenderDeregister,
       UPRenderExit,

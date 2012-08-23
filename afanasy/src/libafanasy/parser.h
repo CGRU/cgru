@@ -8,20 +8,20 @@ namespace af
 class Parser: public PyClass
 {
 public:
-   Parser( const std::string & type, int frames = 1);
-   ~Parser();
+	Parser( const std::string & type, int frames = 1);
+	~Parser();
 
-   inline bool isInitialized() const { return initialized;}
+	inline bool isInitialized() const { return initialized;}
 
-   bool parse( std::string & data,
-               int & percent, int & frame, int & percentframe,
-               bool & warning, bool & error, bool & badresult) const;
+	bool parse( std::string & data,
+				int & percent, int & frame, int & percentframe,
+				bool & warning, bool & error, bool & badresult, bool & finishedsuccess) const;
 
 private:
-   bool initialized;
-   int  numframes;
-   std::string name;
+	bool initialized;
+	int  numframes;
+	std::string name;
 
-   PyObject* PyObj_FuncParse;
+	PyObject* PyObj_FuncParse;
 };
 }

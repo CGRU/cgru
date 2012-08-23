@@ -1,5 +1,7 @@
 Plotter_W = 50;
 Plotter_H = 25;
+Plotter_MW = 8;
+Plotter_MH = 2;
 
 function Plotter( i_plottersArray, i_pElement, i_label)
 {
@@ -8,11 +10,27 @@ function Plotter( i_plottersArray, i_pElement, i_label)
 	this.element = document.createElement('div');
 	this.elParent.appendChild( this.element);
 	this.element.classList.add('plotter');
-	this.element.style.top = '2px';
+	this.element.style.top = Plotter_MH + 'px';
 	this.element.style.width = Plotter_W + 'px';
 	this.element.style.height = Plotter_H + 'px';
 
-	this.element.style.left = (-3*Plotter_W + i_plottersArray.length * Plotter_W) + 'px';
+	var dx = Plotter_W + Plotter_MW;
+	this.element.style.left = (-3*dx + i_plottersArray.length * dx) + 'px';
+
+    this.canvas = document.createElement('canvas');
+	this.canvas.width = Plotter_W;
+	this.canvas.height = Plotter_H;
+	this.element.appendChild( this.canvas);
+
+	if( this.canvas.getContext)
+	{
+		var ctx = this.canvas.getContext('2d');
+		ctx.fillStyle = 'rgb(200,80,0)';
+		ctx.fillRect( 0, 0, Plotter_W/2, Plotter_H/2);
+		ctx.fillStyle = 'rgb(0,0,200)';
+		ctx.fillRect( Plotter_W/2, Plotter_H/2, Plotter_W, Plotter_H);
+	}
+
 
 	this.elLabel = document.createElement('div');
 	this.element.appendChild( this.elLabel);

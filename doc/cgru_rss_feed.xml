@@ -5,10 +5,20 @@
 	<atom:link href="http://cgru.info/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
 	<description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
 	<language>en-us</language>
-	<pubDate>Tue, 26 Jun 2012 00:00:00 GMT</pubDate>
-	<lastBuildDate>Tue, 26 Jun 2012 00:00:00 GMT</lastBuildDate>
+	<pubDate>Thu, 23 Aug 2012 00:00:00 GMT</pubDate>
+	<lastBuildDate>Thu, 23 Aug 2012 00:00:00 GMT</lastBuildDate>
 	<managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
 	<webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
+	<item>
+		<title>CGRU Version 1.6.5 Released.</title>
+		<link>http://cgru.info/doc/changes_log.html#release165</link>
+		<guid>http://cgru.info/doc/changes_log.html#release165</guid>
+		<description>
+			Afanasy python parser can consider that task is already done and finish(stop) it with a success.
+			Bug fixes.
+		</description>
+		<pubDate>Thu, 23 Aug 2012 00:00:00 GMT</pubDate>
+	</item>
 	<item>
 		<title>CGRU Version 1.6.4 Released.</title>
 		<link>http://cgru.info/doc/changes_log.html#release164</link>
