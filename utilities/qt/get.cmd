@@ -1,6 +1,6 @@
-set ver=4.8.1
+set ver=4.8.2
 
-set location=http://get.qt.nokia.com/qt/source
+set location=http://releases.qt-project.org/qt4/source
 set foldername=qt-everywhere-opensource-src-%ver%
 set archive_ext=zip
 set archive=%foldername%.%archive_ext%

@@ -38,9 +38,10 @@ def refresh():
 #		nimby = getParameter( render, 'nimby', False)
 #		NIMBY = getParameter( render, 'NIMBY', False)
 #		busy = getParameter( render, 'busy', False)
-		online = render["state"].find('OFF') == -1
-		nimby  = render["state"].find('NbY') != -1
-		NIMBY  = render["state"].find('NBY') != -1
-		busy   = render["state"].find('RUN') != -1
-		cmd.Tray.showRenderIcon( online, nimby or NIMBY, busy)
+		if "state" in render:
+			online = render["state"].find('OFF') == -1
+			nimby  = render["state"].find('NbY') != -1
+			NIMBY  = render["state"].find('NBY') != -1
+			busy   = render["state"].find('RUN') != -1
+			cmd.Tray.showRenderIcon( online, nimby or NIMBY, busy)
 	else: cmd.Tray.showIcon()
