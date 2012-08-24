@@ -65,7 +65,8 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
     m_update_status( af::TaskExec::UPPercent),
     m_stop_time( 0),
     m_pid(0),
-    m_zombie( false)
+    m_zombie( false),
+    m_dead_cycle(0)
 {
     std::string command = m_service.getCommand();
     std::string wdir    = m_service.getWDir();
@@ -142,6 +143,7 @@ TaskProcess::TaskProcess( af::TaskExec * i_taskExec):
 
 TaskProcess::~TaskProcess()
 {
+//printf(" ~ TaskProcess(): m_pid = %d, Z = %s, m_stop_time = %llu\n", m_pid, m_zombie ? "TRUE":"FALSE", m_stop_time);
     m_update_status = 0;
 
     killProcess();
@@ -161,21 +163,43 @@ TaskProcess::~TaskProcess()
 
 void TaskProcess::refresh()
 {
+	// If task was asked to stop
     if( m_stop_time )
     {
-        if( m_pid == 0 ) m_zombie = true;
-        else if( time( NULL) - m_stop_time > AFRENDER::TERMINATEWAITKILL ) killProcess();
+		// If it is not running any more
+        if( m_pid == 0 )
+		{
+			// Set zombie to let render to delete this class instance
+			m_zombie = true;
+		}
+        else if( time( NULL) - m_stop_time > AFRENDER::TERMINATEWAITKILL )
+		{
+			// Task was asket to stop but did not stopped for more than AFRENDER::TERMINATEWAITKILL seconds
+			printf("Warining: Task stopping time > %d seconds.\n", AFRENDER::TERMINATEWAITKILL);
+			// Kill process in this case
+			killProcess();
+		}
     }
 
+	// Task is finished
     if( m_pid == 0 )
     {
-        // This class instance is not needed any more, but still exists due some error
-        static int dead_cycle = 0;
-        dead_cycle ++;
-        // Continue sending task state to server, may be some network connection error
-        if(( dead_cycle % 10 ) == 0 )
+		if( m_dead_cycle > 0 )
+		{
+	        // This class instance is not needed any more, but still exists due some error
+    	    printf("Dead Cycle #%d: ", m_dead_cycle); m_taskexec->stdOut();
+		}
+
+		// This is a first dead cycle.
+        m_dead_cycle ++;
+		// And in normal case it should be the last one.
+
+        // Continue sending task state to server, may be some network connection error.
+        if(( m_dead_cycle % 10 ) == 0 )
+		{
+			// But only every 10 cycles, as network may be very busy (almost down in this case).
             sendTaskSate();
-        printf("Dead Cycle:"); m_taskexec->stdOut();
+		}
         return;
     }
 
@@ -190,17 +214,22 @@ void TaskProcess::refresh()
         pid = m_pid;
     }
     else if ( result == WAIT_FAILED )
+	{
         pid = -1;
+	}
 #else
     pid = waitpid( m_pid, &status, WNOHANG);
 #endif
+//printf("TaskProcess::refresh(): pid=%d, m_pid=%d\n", pid, m_pid);
 
     if( pid == 0 )
     {
+		// Task is not finished
         readProcess();
     }
     else if( pid == m_pid )
     {
+		// Task is finished
         processFinished( status);
     }
     else if( pid == -1 )
@@ -209,6 +238,28 @@ void TaskProcess::refresh()
     }
 
     sendTaskSate();
+}
+
+void TaskProcess::close()
+{
+// Server asked render to close a task
+// So it is not needed for server any more
+//printf("TaskProcess::close(): m_pid = %d, Z = %s, m_stop_time = %llu\n", m_pid, m_zombie ? "TRUE":"FALSE", m_stop_time);
+
+	// Zero value means that message for server is not needed
+   	m_update_status = 0;
+
+	// If task was asked to stop
+	if( m_stop_time )
+	{
+		// It can be parser case, error or success, no matter here
+		// Task should be set to zombie only after its process finish
+
+		return;
+	}
+
+	// Set zombie to let render to delete this class instance
+	m_zombie = true;
 }
 
 void TaskProcess::readProcess()
@@ -235,23 +286,40 @@ void TaskProcess::readProcess()
         RenderHost::dispatchMessage( msg);
     }
 
-    if( m_parser->hasWarning() && (m_update_status != af::TaskExec::UPWarning) &&
-           (m_update_status != af::TaskExec::UPFinishedParserError))
+	if( m_parser->hasWarning() && ( m_update_status != af::TaskExec::UPWarning               ) &&
+	                              ( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
+	                              ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
     {
         printf("Warning: Parser notification.\n");
         m_update_status = af::TaskExec::UPWarning;
     }
-    if( m_parser->hasError() && ( m_stop_time == 0 ))
-    {
-        printf("Error: Bad result from m_parser. Stopping task.\n");
-        m_update_status = af::TaskExec::UPFinishedParserError;
-        stop();
-    }
+
+	// if task is not in "stopping" state
+    if( m_stop_time == 0 )
+	{
+		// ckeck parser reasouns to force to stop a task
+	    if( m_parser->hasError())
+	    {
+	        printf("Error: Parser bad result. Stopping task.\n");
+	        m_update_status = af::TaskExec::UPFinishedParserError;
+	        stop();
+	    }
+	    if( m_parser->isFinishedSuccess())
+	    {
+	        printf("Warning: Parser finished success. Stopping task.\n");
+	        m_update_status = af::TaskExec::UPFinishedParserSuccess;
+	        stop();
+	    }
+	}
 }
 
 void TaskProcess::sendTaskSate()
 {
-    if( m_update_status == 0 ) return;
+    if( m_update_status == 0 )
+	{
+		// Zero value means that message for server is not needed
+		return;
+	}
 
     int    type = af::Msg::TTaskUpdatePercent;
     bool   toRecieve = false;
@@ -304,12 +372,27 @@ void TaskProcess::sendTaskSate()
 
 void TaskProcess::processFinished( int i_exitCode)
 {
-//printf("TaskProcess::processFinished:\n");//return;
-    printf("Finished PID=%d: Exit Code=%d\n", m_pid, i_exitCode);
+printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(stopped)":"");
 
+	// Zero m_pid means that task is not running any more
     m_pid = 0;
-    if( m_update_status == 0 ) return;
 
+#ifdef WINNT
+	if( m_stop_time != 0 )
+		printf("Task terminated/killed\n");
+#else
+	if(( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
+		printf("Task terminated/killed by signal: '%s'.\n", strsignal( WTERMSIG( i_exitCode)));
+#endif
+
+	// If server update not needed
+    if( m_update_status == 0 )
+	{
+		// We do not need to read process output
+		return;
+	}
+
+	// Read process last output
     readProcess();
 
     if(( i_exitCode != 0 ) || ( m_stop_time != 0 ))
@@ -318,14 +401,13 @@ void TaskProcess::processFinished( int i_exitCode)
 #ifdef WINNT
         if( m_stop_time != 0 )
         {
-            printf("Task terminated/killed\n");
 #else
         if(( m_stop_time != 0 ) || WIFSIGNALED( i_exitCode))
         {
-            printf("Task terminated/killed by signal: '%s'.\n", strsignal( WTERMSIG( i_exitCode)));
 #endif
-            if( m_update_status != af::TaskExec::UPFinishedParserError )
-                m_update_status  = af::TaskExec::UPFinishedKilled;
+			if(( m_update_status != af::TaskExec::UPFinishedParserError   ) &&
+			   ( m_update_status != af::TaskExec::UPFinishedParserSuccess ))
+			     m_update_status  = af::TaskExec::UPFinishedKilled;
         }
     }
     else if( m_parser->isBadResult())
@@ -341,11 +423,18 @@ void TaskProcess::processFinished( int i_exitCode)
 
 void TaskProcess::stop()
 {
-    // Store the time when task was asked to be stopped (was asked first time)
-    if( m_stop_time == 0 ) m_stop_time = time(NULL);
+	// If time was not asked to stop before
+	if( m_stop_time == 0 )
+	{
+		// Store the time when task was asked to be stopped (was asked first time)
+		m_stop_time = time(NULL);
+	}
 
-    // Return if task is not running
-    if( m_pid == 0 ) return;
+	// Return if task is not running
+	if( m_pid == 0 )
+	{
+		return;
+	}
 
     // Trying to terminate() first, and only if no response after some time, then perform kill()
 #ifdef UNIX

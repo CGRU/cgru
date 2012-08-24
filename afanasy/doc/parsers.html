@@ -55,12 +55,12 @@ and based from <br/>
 
 <p>It describes a parser:</p>
 <ul>
-   <li>
-      Parser with this name exists.
-   </li>
-   <li>
-      Parsing function by overriding <code>parser.do(self, data)</code> method.
-   </li>
+	<li>
+		Parser with this name exists.
+	</li>
+	<li>
+		Parsing function by overriding <code>parser.do(self, data)</code> method.
+	</li>
 </ul>
 
 <h3>Parser method:</h3>
@@ -81,6 +81,10 @@ It has data on input to parse. During parsing it can set some properties:
  - Error. Task will finish with an error.
 In this case render will not try to kill it, sometimes you don`t need this.
 You can use at the end of task execution, at final result check.
+<li><b>self.finishedsuccess</b> (<kbd>False</kbd>/<kbd>True</kbd>)
+ - Success. Task will finish with a success.
+Parser can consider that task is aready done and should not to continue.
+Render will terminate(kill) task process and send "done" status to server (not an "error").
 </li>
 </ul>
 This method can return a string result.
@@ -94,19 +98,19 @@ Or you can cut some useless information.
 <table width="100%" align="center" cellpadding="0" cellspacing="0">
 <tr>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
+	<div style="width:100%;height:40px;background:url('../../doc/images/footer_left.png')" />
 </td>
 <td>
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+	<div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
 </td>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
+	<div style="width:100%;height:40px;background:url('../../doc/images/footer_center.png')" />
 </td>
 <td>
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
+	<div style="width:100%;height:40px;background:url('../../doc/images/footer.png') repeat-x" />
 </td>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
+	<div style="width:100%;height:40px;background:url('../../doc/images/footer_right.png')" />
 </td>
 </tr>
 </table>

@@ -123,12 +123,22 @@ void TaskRun::update( const af::MCTaskUp& taskup, RenderContainer * renders, Mon
    {
       return;
    }
-   case af::TaskExec::UPFinishedSuccess:
-   {
-      progress->state = progress->state | AFJOB::STATE_DONE_MASK;
-      finish( "Finished success.", renders, monitoring);
-      break;
-   }
+	case af::TaskExec::UPFinishedParserSuccess:
+		if( message.size() == 0)
+		{
+			message = "Parser finished success.";
+			progress->state = progress->state | AFJOB::STATE_PARSERSUCCESS_MASK;
+		}
+	case af::TaskExec::UPFinishedSuccess:
+	{
+		if( message.size() == 0)
+		{
+			message = "Finished success.";
+		}
+		progress->state = progress->state | AFJOB::STATE_DONE_MASK;
+		finish( message, renders, monitoring);
+		break;
+	}
    case af::TaskExec::UPFailedToStart: if( message.size() == 0) message = "Failed to start.";
    case af::TaskExec::UPFinishedKilled: if( message.size() == 0) message = "Killed.";
    case af::TaskExec::UPFinishedParserError:
