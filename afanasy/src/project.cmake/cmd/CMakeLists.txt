@@ -5,6 +5,7 @@ find_package( PostgreSQL )
 
 if( PostgreSQL_FOUND )
 	include_directories( ${PostgreSQL_INCLUDE_DIRS})
+	link_directories( ${PostgreSQL_LIBRARY_DIRS})
 else( PostgreSQL_FOUND )
 	add_definitions( -DNO_POSTGRESQL )
 endif( PostgreSQL_FOUND )
