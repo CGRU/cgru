@@ -42,6 +42,10 @@ function Plotter( i_plottersArray, i_pElement, i_label)
 //	this.element.style.left = '50px';
 
 	i_plottersArray.push( this);
+
+	this.values = [];
+	this.colors = [];
+	this.colorsHot = [];
 }
 
 Plotter.prototype.setHidden = function( i_hide)
@@ -51,3 +55,21 @@ Plotter.prototype.setHidden = function( i_hide)
 	else
 		this.element.style.display = 'block';
 }
+
+Plotter.prototype.addGraph = function( i_r, i_g, i_b, i_rHot, i_gHot, i_bHot)
+{
+	this.values.push([]);
+	this.colors.push([ i_r, i_g, i_b]);
+	if( i_rHot && i_gHot && i_bHot )
+		this.colorsHot.push( i_rHot, i_gHot, i_bHot);
+	else
+		this.colorsHot.push( null);
+}
+
+Plotter.prototype.addValues = function( i_vals, i_store)
+{
+	if( i_vals.length != this.values.length )
+	{
+	}
+}
+

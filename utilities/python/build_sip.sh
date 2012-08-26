@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sip="sip-4.13.2"
+sip="sip*"
 
 if [ "$1" == "-h" ]; then
    cd $sip
@@ -8,7 +8,7 @@ if [ "$1" == "-h" ]; then
    exit 0
 fi
 
-pypath="$PWD/3.2.3/bin"
+pypath="$PWD/3.*/bin"
 [ -d $pypath ] && export PATH="$pypath:$PATH"
 
 python="python"
