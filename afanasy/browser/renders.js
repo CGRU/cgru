@@ -58,22 +58,26 @@ RenderNode.prototype.init = function()
 	this.elAnnotation.style.textAlign = 'center';
 
 	this.plotters = [];
-	new Plotter( this.plotters, this.elResources, 'C');
-	new Plotter( this.plotters, this.elResources, 'M');
-	new Plotter( this.plotters, this.elResources, 'S');
-	new Plotter( this.plotters, this.elResources, 'H');
-	new Plotter( this.plotters, this.elResources, 'N');
-	new Plotter( this.plotters, this.elResources, 'D');
+	this.plotterC = new Plotter( this.plotters, this.elResources, 'C');
+	this.plotterM = new Plotter( this.plotters, this.elResources, 'M');
+	this.plotterS = new Plotter( this.plotters, this.elResources, 'S');
+	this.plotterH = new Plotter( this.plotters, this.elResources, 'H');
+	this.plotterN = new Plotter( this.plotters, this.elResources, 'N');
+	this.plotterD = new Plotter( this.plotters, this.elResources, 'D');
+
+	this.plotterC.addGraph( 200,   0,  0);
+	this.plotterC.addGraph(  50, 200, 20);
 
 	this.state = {};
 }
 
 RenderNode.prototype.update = function()
 {
-	var user = this.params.user_name;
 	cm_GetState( this.params.state, this.element, this.state);
 
 	this.elName.innerHTML = this.params.name;
+	this.elName.title = this.params.host.os;
+
 	if( this.params.version != null )
 		this.elVersion.innerHTML = ' ' + this.params.version;
 	else
@@ -81,6 +85,9 @@ RenderNode.prototype.update = function()
 
 	this.elPriority.innerHTML = '-' + this.params.priority;
 
+	var user = this.params.user_name;
+	if( this.state.NBY )
+		user = 'NIMBY(' + user + ')N';
 	this.elUserName.innerHTML = user;
 
 	if( this.params.annotation )
@@ -122,6 +129,8 @@ RenderNode.prototype.update = function()
 		max_tasks = '(0/' + max_tasks + ')';
 	max_tasks = ' ' + max_tasks;
 	this.elMaxTasks.innerHTML = max_tasks;
+	
+//	this.plotterC.update( this.params.host_resources);
 
 	this.refresh();
 }
