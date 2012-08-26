@@ -40,6 +40,9 @@ case ${DISTRIBUTIVE} in
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
         ;;
+    Mint)
+        export ADD_CMAKE_MODULE_PATH="$PWD"
+        ;;
     Fedora)
         export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
         ;;
