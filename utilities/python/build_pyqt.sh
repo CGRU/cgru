@@ -1,6 +1,6 @@
 #!/bin/bash
 
-pyqt="PyQt-x11-gpl-4.9.1"
+pyqt="PyQt*"
 sip="$PWD/sip"
 export PYTHONPATH="$sip"
 pybin="$PWD/3.2.3/bin"
@@ -18,11 +18,11 @@ flags="-g --confirm-license --no-sip-files"
 # Qt:
 qtver=$1
 if [ -z "$qtver" ]; then
-   qtver="4.8.1"
+   qtver="4.8.2"
 fi
 qt=`dirname $PWD`/qt/$qtver
 if [ ! -d "$qt" ]; then
-   qtver="4.8.0"
+   qtver="4.8.3"
    qt=`dirname $PWD`/qt/$qtver
 fi
 if [ ! -d "$qt" ]; then

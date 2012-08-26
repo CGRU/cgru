@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=4.9.1
+ver=4.9.4
 location="http://www.riverbankcomputing.co.uk/static/Downloads/PyQt4"
 foldername="PyQt-x11-gpl-$ver"
 archive_ext="tar.gz"

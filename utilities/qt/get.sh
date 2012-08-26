@@ -1,8 +1,8 @@
 #!/bin/bash
 
-ver=4.8.1
+ver=4.8.2
 [ -z "$1" ] || ver=$1
-lcation="http://get.qt.nokia.com/qt/source"
+lcation="http://releases.qt-project.org/qt4/source"
 foldername="qt-everywhere-opensource-src-$ver"
 archive_ext="tar.gz"
 archive="$foldername.$archive_ext"
