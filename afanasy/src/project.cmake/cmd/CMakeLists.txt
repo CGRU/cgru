@@ -1,15 +1,12 @@
 file(GLOB_RECURSE src RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../cmd/*.cpp")
 file(GLOB_RECURSE inc RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}/../../cmd/*.h")
 
-find_package( PostgreSQL )
-
 if( PostgreSQL_FOUND )
 	include_directories( ${PostgreSQL_INCLUDE_DIRS})
 	link_directories( ${PostgreSQL_LIBRARY_DIRS})
 else( PostgreSQL_FOUND )
 	add_definitions( -DNO_POSTGRESQL )
 endif( PostgreSQL_FOUND )
-
 
 add_executable(afcmd ${src} ${inc})
 

@@ -1,13 +1,29 @@
 #!/bin/bash
 
+# Get sources folder:
 pushd .. > /dev/null
-cgru=$PWD
+src=$PWD
+
+# Get distribution variables:
 cd ../..
 cd utilities
-source ./getrevision.sh $cgru
+source ./getrevision.sh $src
 [ -z "${DISTRIBUTIVE}" ] && source ./distribution.sh > /dev/null
+
+# Go to initial folder:
 popd > /dev/null
 
+# Process options:
+options=""
+sql="REQUIRED"
+for arg in "$@"; do
+	[ $arg == "--nosql" ] && sql="NO"
+done
+
+# Configure SQL:
+export AF_POSTGRESQL=$sql
+
+# Configure build flags:
 export AF_ADD_CFLAGS=""
 export AF_ADD_LFLAGS="-lutil"
 
@@ -40,9 +56,5 @@ case ${DISTRIBUTIVE} in
         ;;
 esac
 
-# export AF_PYTHON_INCLUDE_PATH=C:\Python31\include
-# export AF_PYTHON_LIBRARIES=C:\Python31\libs\libpython31.a
-
-[ -f override.sh ] && source override.sh
-
+# Build:
 cmake . && make
