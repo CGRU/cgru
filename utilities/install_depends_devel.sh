@@ -11,6 +11,7 @@ packages_noarch="rubygems"
 
 # Packages for Debian distributives:
 function debianArch(){
+   packages="$packages vim"
    packages="$packages g++"
    packages="$packages python-dev"
    packages="$packages libpq-dev"
@@ -32,6 +33,7 @@ function debianArch(){
 
 # Packages for RedHat distributives:
 function redhatArch(){
+   packages="$packages vim"
    packages="$packages gcc-c++"
    packages="$packages python-devel"
    packages="$packages postgresql-devel"
@@ -54,6 +56,7 @@ function redhatArch(){
 
 # Packages for SUSE distributives:
 function suseArch(){
+   packages="$packages vim"
    packages="$packages gcc-c++"
    packages="$packages python-devel"
    packages="$packages postgresql-devel"
@@ -73,6 +76,7 @@ function suseArch(){
 
 # Packages for AltLinux distributives:
 function altArch(){
+   packages="$packages vim-console"
    packages="$packages gcc4.5-c++"
    packages="$packages python-dev"
    packages="$packages postgresql-devel"
