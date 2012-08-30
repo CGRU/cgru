@@ -4,7 +4,7 @@
 export MAYA_CGRU_LOCATION=$PWD
 
 # Set Maya version, to get it default location and setup CGRU scripts path
-export MAYA_VERSION=2012
+export MAYA_VERSION=2013
 # Set Maya architecture, to get it default location and setup CGRU plugins path
 export MAYA_ARCH=-x64
 # For 32bit Maya uncomment next line

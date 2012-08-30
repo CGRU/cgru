@@ -1,0 +1,1253 @@
+// Copyright (C) 1997-2011 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+//
+//
+// Creation Date:  20 Aug 1996
+//
+//
+//  Procedure Name:
+//		OutlinerEdMenu
+//
+//  Description:
+//		Creates a popup menu for the outliner, that
+//		allows for control of outliner display
+//
+//  Input Arguments:
+//      Parent outliner.
+//
+//  Return Value:
+//      None.
+//
+
+//
+//  Procedure Name:
+//      setOutlinerLongName
+//
+//  Description:
+//		Sets the Outliner long/short name flag
+//
+//  Input Arguments:
+//      state - 0 = short, 1 = nice, 2 = long
+//
+//  Return Value:
+//      None.
+//
+global proc setOutlinerLongName (int $state, string $outlineEd)
+{
+	//	Query the current "name" state of the outliner.
+	//
+	int $longNames = `outlinerEditor -query -longNames $outlineEd`;
+	int $niceNames = `outlinerEditor -query -niceNames $outlineEd`;
+
+	//	Check for a change.
+	//
+	if ($niceNames && $state == 1) return;
+	if (!$niceNames && $longNames && $state == 2) return;
+	if (!$niceNames && !$longNames && $state == 0) return;
+
+	if( $state == 2 ) {
+		outlinerEditor -e -ln true -nn false $outlineEd;
+	} else if( $state == 1 ) {
+		outlinerEditor -e -ln true -nn true $outlineEd;
+	} else {
+		outlinerEditor -e -ln false -nn false $outlineEd;
+	}
+}
+
+global proc OutlinerEdMenuCommand (string $outlineEd)
+{
+	//
+	// This is the post command for the Outliner Editor popup menu
+	
+	setParent -m ($outlineEd+"Popup");
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showDagOnly $outlineEd`
+		dagItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showShapes $outlineEd`
+		shapeItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showReferenceNodes $outlineEd`
+		referenceNodeItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showReferenceMembers $outlineEd`
+		referenceMemberItem;		
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showAttributes $outlineEd`
+		attributeItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showSetMembers $outlineEd`
+		setMembersItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showConnected $outlineEd`
+		connectedItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showNamespace $outlineEd`
+		showNamespaceItem;
+	menuItem -edit
+		-checkBox `outlinerEditor -query -showMuteInfo $outlineEd`
+		showMuteItem;
+    menuItem -edit
+		-checkBox `outlinerEditor -query -organizeByLayer $outlineEd`
+		organizeLayerItem;		
+    menuItem -edit
+		-checkBox `outlinerEditor -query -autoExpandLayers $outlineEd`
+		autoExpandLayersItem;				
+
+	int $outlinerLongName = 1;
+	if (!`outlinerEditor -query -niceNames $outlineEd`) {
+		$outlinerLongName = (`outlinerEditor -query -longNames $outlineEd` ? 2 : 0);
+	}
+		menuItem -edit
+			-radioButton ( 1 == $outlinerLongName )
+			niceNameItem;
+		menuItem -edit
+			-radioButton ( 2 == $outlinerLongName )
+			longNameItem;
+		menuItem -edit
+			-radioButton ( 0 == $outlinerLongName )
+			shortNameItem;
+
+	string $sortOrder = `outlinerEditor -query -sortOrder $outlineEd`;
+		menuItem -edit
+			-radioButton ($sortOrder == "none")
+			noneSortOrderItem;
+		menuItem -edit
+			-radioButton ($sortOrder == "dagName")
+			dagNameSortOrderItem;
+
+	string $attrAlphaOrder = `outlinerEditor -query -attrAlphaOrder $outlineEd`;
+		menuItem -edit
+			-radioButton ($attrAlphaOrder == "default")
+			defaultAttrAlphaSortOrderItem;
+		menuItem -edit
+			-radioButton ($attrAlphaOrder == "ascend")
+			ascendAttrAlphaSortOrderItem;
+		menuItem -edit
+			-radioButton ($attrAlphaOrder == "descend")
+			descendAttrAlphaSortOrderItem;
+}
+
+global proc buildContainerMenu(string $parentMenu)
+{
+	setParent -menu $parentMenu;
+	menu -edit -deleteAllItems $parentMenu;
+
+	string $selObj;
+	string $containers[] = `ls -sl -containers`;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kSelectAssetContents"))
+		-annotation (getRunTimeCommandAnnotation("SelectContainerContents"))
+		-enable (size($containers) > 0)
+		-command SelectContainerContents
+		selectContainerContentsItem;
+
+	if (size($containers) == 0) {
+		string $sel[] = `ls -sl`;
+		string $ownerContainer = `container -q -findContainer $sel`;
+		if (size($ownerContainer) > 0) {
+			$containers[0] = $ownerContainer;
+		}
+		$selObj = $sel[0];
+	}
+	
+	for ($container in $containers) {
+		// user-defined menu
+		//
+		string $menuProc = `getAttr ($container+".rmbCommand")`;
+		if (size($menuProc) > 0)
+		{
+			if (`exists $menuProc`)
+			{
+				string $menuItems[] = `eval $menuProc`;
+				int $mm;
+				int $menuCount = size($menuItems);
+				if ($menuCount % 2 != 0)
+				{
+					// the user provided an invalid # of items, skip
+					// the last
+					//
+					$menuCount--;
+				}
+				if ($menuCount > 0) {
+					menuItem -divider true;
+					string $menuObj = (size($selObj) > 0) ? $selObj : $container;
+					for ($mm = 0; $mm < $menuCount; $mm+=2)
+					{
+						menuItem -label $menuItems[$mm] -c ($menuItems[$mm+1]+" "+$menuObj);
+					}
+				}
+			}
+			else {
+				string $warnStr = (uiRes("m_OutlinerEdMenu.kSkippedRmb"));
+				warning(`format -s $menuProc $warnStr`);
+			}
+		}
+	}
+}
+
+global string $gLstRefNode[]; // Also used in performFileAction.mel
+global string $gLstRefFile[];
+
+global proc buildReferenceMenu(string $parentMenu)
+{	
+	setParent -menu $parentMenu;
+	menu -edit -deleteAllItems $parentMenu;
+		
+	string $selections[] = `ls -sl`;
+
+	if(size($selections) == 0)
+	{
+		menuItem 
+			-label (uiRes("m_OutlinerEdMenu.kItemCreateReference"))
+			-annotation (uiRes("m_OutlinerEdMenu.kCreateRefToFile"))
+			-command ("CreateReference");	
+		menuItem 
+			-optionBox true
+			-annotation (uiRes("m_OutlinerEdMenu.kCreateRefOptions"))
+			-command ("CreateReferenceOptions");
+		return;
+	}
+
+	global string $gLstRefNode[];
+	global string $gLstRefFile[];
+	clear($gLstRefNode);
+	clear($gLstRefFile);
+	int $lstIndex = 0;
+	string $selObj, $file, $fname, $resolvedPath;
+	int $isLoaded = 1;	
+	
+	// Generate the reference node list with the selected object and remove duplicate references.
+	//
+	for ($selObj in $selections)
+	{		
+		if (`referenceQuery -isNodeReferenced $selObj`) 
+		{		
+			string $refNode = "";
+			if (!catchQuiet(`referenceQuery -referenceNode $selObj`)) {
+				$refNode = `referenceQuery -referenceNode $selObj`;
+			}
+			else
+			{
+				continue;
+			} 
+
+			{
+				$selObj = $refNode;
+				$file = `referenceQuery -filename $selObj`;	
+			}				
+		} 
+		else 
+		{		
+			// Validate if the selection is a reference node	
+			if (!catchQuiet(`referenceQuery -filename $selObj`)) {
+				$file = `referenceQuery -filename $selObj`;							
+			}
+			else 
+			{	// Validate if it's a Group and/or Locator associated with the reference node
+				string $refNode[] = `listConnections -s 0 -d 1 -type reference ($selObj+".message")`;
+				if (size($refNode) > 0) {		
+					$selObj = $refNode[0];				
+					$file = `referenceQuery -filename $selObj`;																		
+				}
+				else
+				{					
+					$selObj = "";
+				}			
+			}			
+		}	
+	
+		if($selObj != "")
+		{
+			if (stringArrayContains($selObj,$gLstRefNode)!= 1)
+			{
+				stringArrayInsertAtIndex($lstIndex,$gLstRefNode,$selObj);
+				stringArrayInsertAtIndex($lstIndex,$gLstRefFile,$file);						
+				$lstIndex++;					
+			}			
+		}
+	}
+
+	
+	if (size($gLstRefNode) > 0) 
+	{		
+		int $isMultiSelection = 1;
+		if (size($gLstRefNode) == 1) {
+			$isMultiSelection = 0;
+			$isLoaded = `referenceQuery -isLoaded $gLstRefNode[0]`;
+			$resolvedPath = `referenceQuery -filename $gLstRefNode[0]`;
+			$fname = basename($gLstRefFile[0],"");
+		}
+			
+		if($isMultiSelection)
+		{
+			menuItem 
+				-label (uiRes("m_OutlinerEdMenu.kMultiItemLoad"))
+				-command ("loadUnloadReference(1, 0)");
+				
+			menuItem 
+				-label (uiRes("m_OutlinerEdMenu.kMultiItemUnload"))
+				-command ("loadUnloadReference(0, 0)");
+		}else{			 
+			int $load = ($isLoaded == 0);
+			string $menuString = ($load) ?
+				(uiRes("m_OutlinerEdMenu.kLoadFile")) :
+				(uiRes("m_OutlinerEdMenu.kUnloadFile"));
+			string $menuMsg = `format -s $fname $menuString`;
+			menuItem 
+				-label $menuMsg 
+				-command ("loadUnloadReference(" + $load + ", 0)");				
+		}
+		
+			
+		menuItem -divider true;
+						
+		menuItem 
+			-label (uiRes("m_OutlinerEdMenu.kItemReloadRef"))
+			-annotation (uiRes("m_OutlinerEdMenu.kReloadSelected"))
+			-command ("loadUnloadReference(1,1)");
+			
+
+		if(!$isMultiSelection)
+		{
+			if(!$isLoaded)
+			{ 
+				menuItem -divider true;
+
+				string $child[] = `referenceQuery -child -rfn $gLstRefNode[0]`;
+				if (size($child) > 0)
+				{
+					menuItem 
+						-label (uiRes("m_OutlinerEdMenu.kItemHideUnloadedContent"))				
+						-annotation (uiRes("m_OutlinerEdMenu.kHideUnloadedContent"))				        
+						-command ( "file -unloadReference " + $gLstRefNode[0] );
+
+					menuItem 
+						-label (uiRes("m_OutlinerEdMenu.kItemShowPreviewContentsRef"))				
+						-annotation (uiRes("m_OutlinerEdMenu.kShowPreviewContentsRef"))				        
+						-command ( "file -loadReferencePreview " + $gLstRefNode[0] );				        
+				}
+				else
+				{
+					menuItem 
+						-label (uiRes("m_OutlinerEdMenu.kItemPreviewContent"))				
+						-annotation (uiRes("m_OutlinerEdMenu.kPreviewContent"))
+						-command ( "file -loadReferencePreview " + $gLstRefNode[0] );
+				}
+			}			
+						
+			string $proxyManager[] = `listConnections -type "proxyManager" $gLstRefNode[0]`;
+			if (`size $proxyManager` != 0)
+			{
+				menuItem -subMenu true
+					-label (uiRes("m_OutlinerEdMenu.kItemReloadProxy"))
+					-annotation (uiRes("m_OutlinerEdMenu.kReloadSpecifiedProxy"));
+					
+				string $proxyNodes[] = `getRelatedProxies $gLstRefNode[0]`;				
+				if( !`exists isActiveProxy` ){
+					source "proxyUtils.mel";
+				}
+				
+				string $proxyLabel;
+				string $proxyTag;
+				string $proxyFile;
+				for( $i=0; $i<size($proxyNodes); $i+=1) {
+					$proxyFile = `reference -rfn $proxyNodes[$i] -q -f -sn`;
+					$proxyTag = `getAttr ($proxyNodes[$i] + ".proxyTag")`;
+					$proxyLabel = ($proxyTag + " (" + $proxyFile + ")");
+					if( isActiveProxy( $proxyNodes[$i] ) ){
+						menuItem -label $proxyLabel -enable false -command ("proxySwitch " + $proxyNodes[$i]);
+					} else {
+						menuItem -label $proxyLabel -enable true -command ("proxySwitch " + $proxyNodes[$i]);
+					}
+				}								
+				setParent -menu ..;						
+			}
+		}
+		
+		menuItem -divider true;
+								
+		menuItem 
+			-enable $isLoaded
+			-label (uiRes("m_OutlinerEdMenu.kItemSelectFile"))
+			-annotation (uiRes("m_OutlinerEdMenu.kSelectAllNodes"))
+			-command ("selectReferencesContents()");
+										
+		menuItem -divider true;
+		
+		menuItem 
+			-label (uiRes("m_OutlinerEdMenu.kItemDuplicate"))				
+			-annotation (uiRes("m_OutlinerEdMenu.kDuplicateFile"))
+			-command ("duplicateReferences()");
+			   
+		menuItem 
+			-label (uiRes("m_OutlinerEdMenu.kItemImportObjects"))
+			-annotation (uiRes("m_OutlinerEdMenu.kImportAllNodes"))
+			-command ("importReferences()");
+			
+		menuItem 
+			-label (uiRes("m_OutlinerEdMenu.kItemRemove"))
+			-annotation (uiRes("m_OutlinerEdMenu.kRemoveSelected"))
+			-command ("removeRefFile()");
+		
+		if(!$isMultiSelection)
+		{			
+			menuItem
+				-label (uiRes("m_OutlinerEdMenu.kItemReplaceRef"))							
+				-annotation (uiRes("m_OutlinerEdMenu.kReplaceFile"))
+				-command ("replaceReference \"" + $gLstRefFile[0] + "\" \""+$gLstRefNode[0]+"\"" );
+			
+			menuItem 
+				-subMenu true
+				-label (uiRes("m_OutlinerEdMenu.kItemRecent"))
+				-annotation (uiRes("m_OutlinerEdMenu.kShowRefFiles"))
+				-postMenuCommand ("buildMenuReferenceReplaced " + $parentMenu +"\"" + $gLstRefNode[0] + "\" \""+ $gLstRefFile[0] +"\"")
+				referenceRecentFilesReplacedItem;	
+			
+			setParent -menu ..;	
+		
+			menuItem -divider true;	
+			
+			menuItem 
+				-enable $isLoaded
+				-label (uiRes("m_OutlinerEdMenu.kItemSaveReference"))
+				-annotation (uiRes("m_OutlinerEdMenu.kBakeOutmodifications"))
+				-command ("saveRefEdits \"" + $resolvedPath +"\"");
+
+			menuItem 
+				-enable $isLoaded
+				-label (uiRes("m_OutlinerEdMenu.kExportRefEdits"))				
+				-annotation (getRunTimeCommandAnnotation("ExportOfflineFile"))
+				-command ("ExportOfflineFileFromRefEd");				
+
+			menuItem 
+				-optionBox true 
+				-annotation (getRunTimeCommandAnnotation("ExportOfflineFileOptions"))
+				-command ("ExportOfflineFileFromRefEdOptions");			
+				
+			menuItem				
+				-label (uiRes("m_OutlinerEdMenu.kAssignOfflineFile"))
+				-annotation (getRunTimeCommandAnnotation("ApplyOfflineFileFromRefEd"))
+				-command ("AssignOfflineFileFromRefEd");
+
+			menuItem 
+				-optionBox true 
+				-annotation (getRunTimeCommandAnnotation("AssignOfflineFileOptions"))
+				-command ("AssignOfflineFileFromRefEdOptions"); 
+				
+			menuItem 
+				-label (uiRes("m_OutlinerEdMenu.kItemListReference"))
+				-annotation (uiRes("m_OutlinerEdMenu.kListModifications"))
+				-command ("referenceEditsWindow \""+$resolvedPath+"\" false");	
+		}
+		
+		menuItem -divider true;	
+		
+		if(!$isMultiSelection)
+		{
+		
+			int $unlockAllowed = 1;			
+			int $isLocked = `getAttr ($gLstRefNode[0] + ".locked")`;
+
+			// If this file is locked, or its parent.			
+			int $isFileLocked = `file -q -lockFile $fname` ||
+								`getAttr -lock ($gLstRefNode[0] + ".locked")`;
+			if( $isLocked == 1 ) {
+				$unlockAllowed = ($isFileLocked == 0);			
+			}			
+						
+			string $labelLockUnlock = ($isLocked) ?	
+				(uiRes("m_OutlinerEdMenu.kUnlockRef")): 
+				(uiRes("m_OutlinerEdMenu.kLockRef"));
+			string $annLockUnlock = ($isLocked) ?
+				(uiRes("m_OutlinerEdMenu.kUnlockRefAnnot")):
+				(uiRes("m_OutlinerEdMenu.kLockRefAnnot"));
+			
+			string $cmd = "setAttr (\""+ $gLstRefNode[0] + ".locked\") " + !$isLocked + "; select -cl;";
+			
+									
+			if($isLoaded){
+				$cmd = "file -unloadReference " + $gLstRefNode[0] + "; " + $cmd + " file -loadReference " + $gLstRefNode[0] + ";";	
+			}
+				
+			menuItem
+				-enable $unlockAllowed
+				-label $labelLockUnlock
+				-annotation $annLockUnlock
+				-command ($cmd);
+		} else {
+			menuItem				
+				-label (uiRes("m_OutlinerEdMenu.kMultiLockRef"))
+				-annotation (uiRes("m_OutlinerEdMenu.kMultiLockRefAnnot"))
+				-command ("lockUnlockReferences " + 1 );
+			menuItem				
+				-label (uiRes("m_OutlinerEdMenu.kMultiUnlockRef"))
+				-annotation (uiRes("m_OutlinerEdMenu.kMultiUnlockRefAnnot"))
+				-command ("lockUnlockReferences " + 0 );
+		}							
+	}
+	else
+	{	
+		{
+			menuItem 			
+				-label (uiRes("m_OutlinerEdMenu.kExportAsReference"))
+			    -annotation (uiRes("m_OutlinerEdMenu.kExportAsReferenceAnn"))
+			    -command ("projectViewer ExportSelectionAsReference");
+			menuItem 
+			    -optionBox true
+			    -annotation (uiRes("m_OutlinerEdMenu.kExportAsReferenceOpttions"))
+			    -command ("fileOptions \"ExportSelectionAsReference\" \"projectViewer ExportSelectionAsReference\"");
+		}		
+	}		
+}
+
+global proc loadUnloadReference(int $load, int $force)
+{
+//
+//	Description:
+//		A callback to load/unload one or multiple references.
+//
+	global string $gLstRefNode[];	
+	int $numRefNodes = size($gLstRefNode);
+
+	int $i = 0;
+	for ( $i = 0; $i < $numRefNodes; $i++ ) 
+	{
+		if (!$load) {	
+			// "catch quiet" in case we unload a parent before his child.
+			catchQuiet(`file -unloadReference $gLstRefNode[$i]`);		
+		} else {
+			if(!`referenceQuery -isLoaded $gLstRefNode[$i]` || $force)
+			{			
+				file -loadReference $gLstRefNode[$i];
+			}			
+		}
+	}
+}
+
+global proc selectReferencesContents()
+//
+//	Description:
+//		A callback to select contents of one or multiple references.
+//
+{	
+	global string $gLstRefNode[];
+	int $numRefNodes = size($gLstRefNode);
+
+	int $i = 0;
+	for ( $i = 0; $i < $numRefNodes; $i++ ) 
+	{
+		if(`referenceQuery -isLoaded $gLstRefNode[$i]`)
+		{
+			if($i == 0)
+			{
+				file -selectAll -referenceNode $gLstRefNode[$i];
+			}
+			else
+			{
+				file -selectAll -add -referenceNode $gLstRefNode[$i];
+			}			
+		}
+	}
+}
+
+global proc duplicateReferences()
+//
+//	Description:
+//		A callback to duplicate one or multiple references.
+//
+{	
+	global string $gLstRefNode[];
+	int $numRefNodes = size($gLstRefNode);
+
+	int $i = 0;
+	for ( $i = 0; $i < $numRefNodes; $i++ ) 
+	{		
+		select -r $gLstRefNode[$i];
+		duplicateReference 0 " ";		
+	}
+}
+
+global proc importReferences()
+//
+//	Description:
+//		A callback to import object from one or multiple top references.
+//
+{	
+	global string $gLstRefNode[];
+	int $numRefNodes = size($gLstRefNode);
+
+	int $i = 0;
+	for ( $i = 0; $i < $numRefNodes; $i++ ) 
+	{		
+		if(`referenceQuery -isLoaded $gLstRefNode[$i]`)
+		{
+			file -importReference -referenceNode $gLstRefNode[$i];
+		}				
+	}
+}
+
+global proc lockUnlockReferences(int $lock)
+//
+//	Description:
+//		A callback to lock or unlock one or multiple references.
+//
+{	
+	global string $gLstRefNode[];
+	global string $gLstRefFile[];
+	int $numRefNodes = size($gLstRefNode);
+
+	int $i = 0;
+	for ( $i = 0; $i < $numRefNodes; $i++ ) 
+	{				
+		string $fname = basename($gLstRefFile[$i],"");
+		// If this file is locked, or its parent.			
+		int $isFileLocked = `file -q -lockFile $fname` ||
+							`getAttr -lock ($gLstRefNode[$i] + ".locked")`;							
+			
+		// Do not lock if it's already locked.
+		// Do not lock a child ref node already locked when his parent is locked.
+		// Do not unlock a child if his parent is locked.	
+		if(!$isFileLocked)
+		{					
+			if(`referenceQuery -isLoaded $gLstRefNode[$i]`)
+			{
+				file -unloadReference $gLstRefNode[$i];
+				setAttr($gLstRefNode[$i] + ".locked", $lock);
+				file -loadReference $gLstRefNode[$i];
+			}
+			else
+			{				
+				setAttr($gLstRefNode[$i] + ".locked", $lock);				
+			}
+		}
+		else
+		{
+			if(!$lock)
+			{	
+				string $warnStr = (uiRes("m_OutlinerEdMenu.kParentLocked"));
+				warning(`format -s $gLstRefNode[$i]  $warnStr`);
+			}
+		}			
+	}	
+	// if we unlock, clear the selection to refresh since we only do a setAttr
+	select -cl;
+}
+
+proc string buildRemoveReferenceMessage( string $refNode, string $namespace)
+//
+// Description:
+//		Helper proc for building the message that warn the user that
+//		removing a reference is not undoable.
+//
+{		
+	//*** REFACTORING REQUIRED with referenceEdRemoveCB ****
+
+	string $remRefMsg = (uiRes("m_OutlinerEdMenu.kRemoveRef"));			
+	
+	int $nbns = size($namespace);
+	if ($nbns > 0)
+	{
+		// Warn about non-empty namespace	
+		$remRefMsg += (uiRes("m_OutlinerEdMenu.kWarningRemoveRefNsNotEmpty"));
+	}
+		
+	string $message = `format -s $refNode $remRefMsg`;
+	return $message;
+}
+
+global proc removeRefFile()
+//
+//	Description:
+//		Removed the reference file selected in the outliner.
+//
+{	
+	//*** REFACTORING REQUIRED with referenceEdRemoveCB ****
+	
+	string $remReference		= (uiRes("m_OutlinerEdMenu.kRemoveReference"));
+	string $remove				= (uiRes("m_OutlinerEdMenu.kRefRemoveOption"));
+	string $removeAnnot			= (uiRes("m_OutlinerEdMenu.kRefRemoveAnnot"));
+	string $mergeWithRoot		= (uiRes("m_OutlinerEdMenu.kRefMergeWithRootOption"));
+	string $mergeWithRootAnnot	= (uiRes("m_OutlinerEdMenu.kRefMergeWithRootAnnot"));
+	string $mergeWithParent		= (uiRes("m_OutlinerEdMenu.kRefMergeWithParentOption"));
+	string $mergeWithParentAnnot = (uiRes("m_OutlinerEdMenu.kRefMergeWithParentAnnot"));
+	string $deleteContent		= (uiRes("m_OutlinerEdMenu.kRefDeleteContentOption"));
+	string $deleteContentAnnot	= (uiRes("m_OutlinerEdMenu.kRefDeleteContentAnnot"));
+	string $keepNamespace		= (uiRes("m_OutlinerEdMenu.kRefKeepNamespaceOption"));
+	string $keepNamespaceAnnot	= (uiRes("m_OutlinerEdMenu.kRefKeepNamespaceAnnot"));
+	string $cancel				= (uiRes("m_OutlinerEdMenu.kRefCancelOption"));	
+	string $cancelAnnot			= (uiRes("m_OutlinerEdMenu.kRefCancelAnnot"));
+	
+		
+	
+	string $message;	
+	
+	global string $gLstRefNode[];
+	global string $gLstRefFile[];
+	int $numRefNodes = size($gLstRefNode);
+
+	int $i = 0;
+	for ( $i = 0; $i < $numRefNodes; $i++ ) 
+	{				
+		string $fname = basename($gLstRefFile[$i],"");
+		string $namespace = "";			
+		
+		// validation in case a parent has been deleted and we try
+        // to remove a child that doesn't exists anymore.
+		if (catchQuiet(`referenceQuery -filename $fname`)) {
+			break;						
+		}
+		
+		int $isUsingNamespaces = `file -query -usingNamespaces $fname`;
+		if ($isUsingNamespaces)
+		{
+			if (!catchQuiet(`referenceQuery -namespace $fname`)) {
+				$namespace = `referenceQuery -namespace $fname`;
+			}					
+		}
+		
+
+		// Loop through namespace contents to see if some namespaces are non-empty (apart from the
+		// reference), i.e. one element gives 0 for referenceQuery -isNodeReferenced.	
+		
+		int $nsIsEmpty = true;	
+		if($namespace != "")
+		{
+			
+			int $isRefNsRoot = `namespace -query -isRootNamespace $namespace`;
+			if(!$isRefNsRoot)
+			{
+				string $nsContent[] = `namespaceInfo -dagPath -listOnlyDependencyNodes $namespace`;
+					
+				for ($ii = 0; $ii < size($nsContent); $ii++)
+				{
+					int $isNodeReferenced = `referenceQuery -isNodeReferenced $nsContent[$ii]`;
+					if (!$isNodeReferenced)
+					{
+						$nsIsEmpty = false;
+						break;
+					}		
+				}
+			}
+			
+		    if ($nsIsEmpty)
+		    {
+			    $namespace = "";
+		    }	
+		}
+
+		$message = buildRemoveReferenceMessage($gLstRefNode[$i], $namespace);
+								 
+		// Ideally we'd like to use the reference node form of the command as
+		// all reference nodes are unique but referenced files may not be.
+		// However if there are more files returned than nodes, then we must
+		// resort to the file form of the command.
+		//
+
+		string $result;
+		if ($nsIsEmpty)
+		{
+			$result = `confirmDialog -t $remReference
+								-m $message
+								-button $remove
+								-annotation $removeAnnot
+								-button $cancel
+								-annotation $cancelAnnot
+								-defaultButton $cancel`;
+		}
+		else
+		{
+			$result = `confirmDialog -t $remReference
+								-m $message
+								-button $mergeWithRoot
+								-annotation $mergeWithRootAnnot
+								-button $mergeWithParent
+								-annotation $mergeWithParentAnnot
+								-button $deleteContent
+								-annotation $deleteContentAnnot
+								-button $keepNamespace
+								-annotation $keepNamespaceAnnot
+								-button $cancel
+								-annotation $cancelAnnot
+								-defaultButton $cancel`;
+		}
+	
+		if ($result == $mergeWithRoot)
+		{		
+			file -removeReference -mergeNamespaceWithRoot -referenceNode $gLstRefNode[$i];		
+		}
+		if ($result == $mergeWithParent)
+		{		
+			file -removeReference -mergeNamespaceWithParent -referenceNode $gLstRefNode[$i];		
+		}
+		else if ($result == $deleteContent)
+		{		
+			file -removeReference -force -referenceNode $gLstRefNode[$i];		
+		}
+		else if (($result == $keepNamespace) || ($result == $remove))
+		{		
+			file -removeReference -referenceNode $gLstRefNode[$i];		
+		}
+	}
+
+	if (`window -exists namespaceEditor`)
+	{		
+		updateNamespaceEditor();		
+	}
+}
+
+global proc saveRefEdits(string $refFile)
+//
+//	Description:
+//		All internal edits and connections are moved from 
+//		main scene's reference node to reference file.
+//
+{
+	//*** REFACTORING REQUIRED with referenceEdSaveReference****
+
+	string $message		   = (uiRes("m_OutlinerEdMenu.kSavingReference"));	
+	string $msg			   = `format -s $refFile $message`;	
+	string $save 		   = (uiRes("m_OutlinerEdMenu.kRefSaveEdits")) ;
+	string $cancel		   = (uiRes("m_OutlinerEdMenu.kRefCancelSaveEdits"));
+	string $result = `confirmDialog -t (uiRes("m_OutlinerEdMenu.kSaveRefEdits"))
+				-message $msg
+				-button $save -button $cancel -defaultButton $cancel`;
+				
+	if ($result == $save) {
+		file -f -saveReference $refFile;
+	}
+}
+
+global proc referenceReplacedList(string $fileToReplace, string $refNode)
+//
+//	Description:
+//		Adds the file to replace in the replaced file list.
+//
+{		
+	//*** REFACTORING REQUIRED with referenceEdUpdateList ****
+
+	
+	//	Set the length of the list to 5.
+	//
+	int $MAX_SIZE = 5;
+	int $nFn = `getAttr -size ($refNode + ".fileNames")`;
+	int $nItems = ($nFn >= $MAX_SIZE) ? $MAX_SIZE : $nFn;
+
+	//	Two cases:
+	//    1: The file was never used before, then pop this
+	//      to the top of the list and shove everything 
+	//       else down.
+	//    2: The file was used before, then put the file at the
+	//       top and push everything down to the file's old
+	//       level.
+	//
+	int $usedBefore = false;
+	int $usedItem = 0;
+	for ($i = 0; $i < $nItems; $i++) {
+		string $fileName = `getAttr ($refNode+".fileNames["+$i+"]")`;		
+		if ($fileName == $fileToReplace) {
+			print $usedBefore;
+			$usedBefore = true;
+			$usedItem = $i;
+			break;
+		}
+	}
+
+	if (!$usedBefore) {
+		if ($nItems < $MAX_SIZE) {
+			$nItems++;
+		}
+	}
+
+	string $newStr = $fileToReplace;
+	string $swap;
+	for ($i = 0; $i < $nItems; $i++) {
+		$swap = `getAttr ($refNode + ".fileNames["+$i+"]")`;
+		setAttr -type "string" ($refNode+".fileNames["+$i+"]") $newStr;		
+		$newStr = $swap;
+
+		if ($usedBefore && $usedItem == $i) {
+			break;
+		}
+	}
+}
+
+global proc buildMenuReferenceReplaced(string $parentMenu, string $refNode, string $selectedFile)
+//
+//	Description:
+//		Builds the recently replaced files list for a specific reference. If one
+//		of the items is selected, the reference is replaced with that file.
+//	 	The new file should move to the head of the list.
+{
+	
+	//*** REFACTORING REQUIRED with buildReferenceEdRecentMenu ****
+
+	string $menu = ($parentMenu + "|referenceRecentFilesReplacedItem");	
+	//	Get the number of files previously used.
+	//
+	int $nListFiles = `getAttr -size ($refNode+".fileNames")`;
+	
+	//	Get the list of files.
+	//
+	int $i, $j;
+	string $fileList[];
+	for ($i = 0, $j = 0; $i < $nListFiles; $i++) {
+		string $nextFile = `getAttr ($refNode+".fileNames["+$i+"]")`;
+		if (size($nextFile) == 0) {
+			continue;
+		}
+		$fileList[$j++] = $nextFile;
+	}
+
+	//	Pack the list, if necessary.
+	//
+	int $nFiles = `size($fileList)`;
+	if ($i != $j) {
+		for ($i = 0; $i < $nListFiles; $i++) {
+			string $fileName;
+			if ($i < $nFiles) {
+				$fileName = $fileList[$i];
+			}
+			setAttr -type "string" ($refNode+".fileNames["+$i+"]") $fileName;
+		}
+	} 
+
+	string $oldParent = `setParent -q -menu`;	
+	setParent -menu $parentMenu;
+	
+	//	Check and see if the current menu contains the same names as
+	//	the list in the reference node.
+	//
+	string $localList[] = `menu -q -itemArray $menu`;
+	int $nLocalItems = `size($localList)`;
+	if ($nFiles == $nLocalItems) {
+		int $i;
+		for ($i = 0; $i < $nLocalItems; $i++) {
+			if ($localList[$i] != $fileList[$i]) {
+				break;
+			}
+		}
+		if ($i == $nLocalItems) {
+			return;
+		}
+	}
+
+	menu -e -deleteAllItems $menu;
+	setParent -menu $menu;
+
+	for ($i = 0; $i < $nFiles; $i++) { 
+		string $cmd = ("referenceReplacedList \"" + $selectedFile + "\" \""+$refNode+"\";" +
+						"file -lr \"" + $refNode + 
+					   "\" \"" + $fileList[$i] + "\";");
+		menuItem -label $fileList[$i] -c $cmd;
+	}
+
+	setParent -menu $oldParent;
+}
+
+global proc replaceReference(string $file, string $refNode)
+//
+//	Description:
+//		A callback to replace the currently loaded reference file with 
+//		a new reference file, while still keeping the same reference node.
+//
+{	
+
+	//*** REFACTORING REQUIRED with referenceEdReplaceCB ****
+	
+	// global variable used in performFileAction.mel 
+	global string $gReplaceReferenceNode;	
+	$gReplaceReferenceNode = $refNode;
+	
+	// Add the replaced file in a list for the option "Recently Replaced Files" 
+	referenceReplacedList($file, $refNode);
+	
+	if ( size($gReplaceReferenceNode) > 0 ) 
+	{
+		projectViewer ReplaceReference;
+	}		
+}
+
+
+// Expose the popup menu name so it can be customized
+global string $gOutlinerPopupMenu;
+
+global proc OutlinerEdMenu (string $outlineEd)
+{
+	global string $gOutlinerPopupMenu;
+
+	// These are visible to clients, do not change their names
+	string $menuName = $outlineEd + "Popup";
+	$gOutlinerPopupMenu = $menuName;
+
+	popupMenu
+		-ctrlModifier false
+		-button 3
+		-postMenuCommand ("OutlinerEdMenuCommand " + $outlineEd)
+		-parent $outlineEd $menuName;
+
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowDAGObjectsOnly")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -showDagOnly #1 " + $outlineEd)
+		dagItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowShapes")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showShapes #1 " + $outlineEd)
+		shapeItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowReferenceNodes")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showReferenceNodes #1 " + $outlineEd)
+		referenceNodeItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowReferenceMembers")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showReferenceMembers #1 " + $outlineEd)
+		referenceMemberItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowAttributes")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showAttributes #1 " + $outlineEd)
+		attributeItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowSetMembers")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showSetMembers #1 " + $outlineEd)
+		setMembersItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowConnected")) 
+		-checkBox false
+		-command ("outlinerEditor -edit -showConnected #1 " + $outlineEd)
+		connectedItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowNamespaces")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -showNamespace #1 " + $outlineEd)
+		showNamespaceItem;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kShowMuteInformation")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -showMuteInfo #1 " + $outlineEd)
+		showMuteItem;
+    menuItem -label (uiRes("m_OutlinerEdMenu.kOrganizeByLayer")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -organizeByLayer #1 " + $outlineEd)
+		organizeLayerItem;		
+    menuItem -label (uiRes("m_OutlinerEdMenu.kAutoExpandLayers")) 
+		-checkBox true
+		-command ("outlinerEditor -edit -autoExpandLayers #1 " + $outlineEd)
+		autoExpandLayersItem;				
+	menuItem -divider true;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kRevealSelected"))  
+		-command ("outlinerEditor -edit -showSelected  1 " + $outlineEd)
+		showSelectedItem;
+
+	int $outlinerLongName = 1;
+	if (!`outlinerEditor -query -niceNames $outlineEd`) {
+		$outlinerLongName = (`outlinerEditor -query -longNames $outlineEd` ? 2 : 0);
+	}
+	menuItem -label (uiRes("m_OutlinerEdMenu.kChannelNames")) -subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kNice"))
+			-radioButton ( 1 == $outlinerLongName )
+			-command ("setOutlinerLongName 1 " + $outlineEd)
+			niceNameItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kLong"))
+			-radioButton ( 2 == $outlinerLongName )
+			-command ("setOutlinerLongName 2 " + $outlineEd)
+			longNameItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kShort"))
+			-radioButton ( 0 == $outlinerLongName )
+			-command ("setOutlinerLongName 0 " + $outlineEd)
+			shortNameItem;
+		setParent -m ..;
+
+	string $sortOrder = `outlinerEditor -query -sortOrder $outlineEd`;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kSortOrder"))-subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kSceneHierarchy"))
+			-radioButton ($sortOrder == "none")
+			-command ("outlinerEditor -edit -sortOrder none " + $outlineEd)
+			noneSortOrderItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAlphabeticalWithinType"))
+			-radioButton ($sortOrder == "dagName")
+			-command ("outlinerEditor -edit -sortOrder dagName " + $outlineEd)
+			dagNameSortOrderItem;
+		setParent -m ..;
+
+	menuItem -divider true;
+
+	string $attrAlphaOrder = `outlinerEditor -query -attrAlphaOrder $outlineEd`;
+	menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphaOrder"))-subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphaDefault"))
+			-radioButton ($attrAlphaOrder == "default")
+			-command ("outlinerEditor -edit -attrAlphaOrder \"default\" " + $outlineEd)
+			defaultAttrAlphaSortOrderItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphabeticalAscend"))
+			-radioButton ($attrAlphaOrder == "ascend")
+			-command ("outlinerEditor -edit -attrAlphaOrder ascend " + $outlineEd)
+			ascendAttrAlphaSortOrderItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAttrAlphabeticalDescend"))
+			-radioButton ($attrAlphaOrder == "descend")
+			-command ("outlinerEditor -edit -attrAlphaOrder descend " + $outlineEd)
+			descendAttrAlphaSortOrderItem;
+		setParent -m ..;
+
+	menuItem -divider true;
+	string $referenceMenu = `menuItem -label (uiRes("m_OutlinerEdMenu.kReference")) -aob true -subMenu true`;
+	menuItem -edit -postMenuCommand ("buildReferenceMenu "+$referenceMenu) $referenceMenu;
+	setParent -m ..;
+	
+	
+	string $containerMenu = `menuItem -label (uiRes("m_OutlinerEdMenu.kAsset")) -subMenu true`;
+	menuItem -edit -postMenuCommand ("buildContainerMenu "+$containerMenu) $containerMenu;
+	setParent -m ..;
+	menuItem -divider true;
+	
+	menuItem -label (uiRes("m_OutlinerEdMenu.kSelectSetMembers"))
+		-command ("selectAllSetMembers " + $outlineEd)
+		selectAllSetMembersItem;
+
+    menuItem -divider true;
+    string $animLayerFilterOptions = `outlinerEditor -query -animLayerFilterOptions $outlineEd`;    
+    int $showAnimLayerWeight = `outlinerEditor -query -showAnimLayerWeight $outlineEd`;    
+	menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterOptions"))-subMenu true;
+		radioMenuItemCollection;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterFromLayerEditor"))
+			-radioButton ($animLayerFilterOptions == "animLayerEditor")
+			-command ("outlinerEditor -edit -animLayerFilterOptions \"animLayerEditor\" " + $outlineEd)
+			animLayerFilterAnimLayerEditorItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterAllAffecting"))
+			-radioButton ($animLayerFilterOptions == "allAffecting")
+			-command ("outlinerEditor -edit -animLayerFilterOptions allAffecting " + $outlineEd)
+			animLayerFilterAllAffectingItem;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterActive"))
+			-radioButton ($animLayerFilterOptions == "active")
+			-command ("outlinerEditor -edit -animLayerFilterOptions active " + $outlineEd)
+			animLayerFilterAllActiveItem;
+        menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterSelected"))
+			-radioButton ($animLayerFilterOptions == "selected")
+			-command ("outlinerEditor -edit -animLayerFilterOptions selected " + $outlineEd)
+			animLayerFilterSelectedItem;								
+        
+        menuItem -label (uiRes("m_OutlinerEdMenu.kAnimLayerFilterActiveAndSelected"))
+			-radioButton ($animLayerFilterOptions == "activeAndSelected")
+			-command ("outlinerEditor -edit -animLayerFilterOptions activeAndSelected " + $outlineEd)
+			animLayerFilterActiveAndSelectedItem;											
+		
+		menuItem -divider true;
+		menuItem -label (uiRes("m_OutlinerEdMenu.kShowAnimLayerWeight")) 
+		    -checkBox ($showAnimLayerWeight == 1)
+		    -command ("outlinerEditor -edit -showAnimLayerWeight #1 " + $outlineEd)
+		    showAnimLayerWeightItem;		
+		
+		setParent -m ..;
+		
+	menuItem -divider true;
+
+//BEGIN CGRU ########################################################################################################
+   menuItem -divider true;
+   menuItem -l "set active characters" -c ("{string $s[]=`ls -sl -type \"character\"`;setCurrentCharacters($s);}");
+   menuItem -divider true;
+   menuItem -l "add selection to set" -c ("tima_OutlinerEdMenu_ASTS_globalProc " + $outlineEd);
+   menuItem -l "remove selecton from set" -c ("tima_OutlinerEdMenu_RSFS_globalProc " + $outlineEd);
+   menuItem -divider true;
+//END CGRU ########################################################################################################
+
+	//
+        //  Invoke any user supplied code. This callback is published and
+        //  needs to remain consistent in future versions of Maya.
+        //
+        if (exists ("outlinerEdMenuUserCallback") )
+        {
+                // Use catchQuiet in case no callback is supplied, we don't want that to
+                // show an error
+                catchQuiet( eval("source \"outlinerEdMenuUserCallback\"") );
+
+        }
+}
+//BEGIN CGRU ########################################################################################################
+global proc tima_OutlinerEdMenu_ASTS_globalProc(string $outliner)
+{
+   string $outlinerSelection = `outlinerEditor -query -selectionConnection $outliner`;
+   string $selectedObjects[] = `ls -sl`;
+   int $selSize = `size($selectedObjects)` -1;
+   string $set = $selectedObjects[$selSize];
+   if(`nodeType $selectedObjects[$selSize]` != "objectSet")
+   {
+      warning(" ### select set at last to add objects to !!!");
+      return;
+   }
+   int $i;
+   for( $i = 0; $i < $selSize; $i++)
+      sets -add $set $selectedObjects[$i];
+}
+global proc tima_OutlinerEdMenu_RSFS_globalProc(string $outliner)
+{
+   string $outlinerSelection = `outlinerEditor -query -selectionConnection $outliner`;
+   string $selectedObjects[] = `ls -sl`;
+   int $selSize = `size($selectedObjects)` -1;
+   string $set = $selectedObjects[$selSize];
+   if(`nodeType $selectedObjects[$selSize]` != "objectSet")
+   {
+      warning(" ### select set at last to add objects to !!!");
+      return;
+   }
+   int $i;
+   for( $i = 0; $i < $selSize; $i++)
+      sets -rm $set $selectedObjects[$i];
+}
+//END CGRU ########################################################################################################
+
+global proc selectAllSetMembers (string $outliner)
+//
+//  Procedure Name:
+//      selectAllSetMembers
+//
+//  Description:
+//      For each set that is selected (gray) in the given Outliner editor,
+//	the members of that set are added to the selection list.
+//	The sets themselves are not added to the selection list, and will
+//	be deselected.
+//
+//  Input Arguments:
+//      The Outliner to get the list of selected sets from.
+//
+//  Return Value:
+//      None.
+//
+
+
+{
+	//  Get the selection connection that the given Outliner is using,
+	//  and get a list of all it's members.
+	//
+	string $outlinerSelection = `outlinerEditor -query -selectionConnection $outliner`;
+	string $selectedObjects[] = `selectionConnection -query -object $outlinerSelection`;
+
+	string $currentObject;
+
+	for($currentObject in $selectedObjects) { 
+
+		//  If the selected object is a set (a node of type objectSet),
+		//  then make sure it is deselected and then select its contents instead.
+		//
+		if(`nodeType $currentObject` == "objectSet" || `nodeType -api $currentObject` == "kPluginObjectSet") {
+			select -noExpand -deselect $currentObject;
+			select -add $currentObject;
+		}
+	}
+}
+

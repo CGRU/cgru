@@ -1,0 +1,156 @@
+// Copyright (C) 1997-2011 Autodesk, Inc., and/or its licensors.
+// All rights reserved.
+//
+// The coded instructions, statements, computer programs, and/or related
+// material (collectively the "Data") in these files contain unpublished
+// information proprietary to Autodesk, Inc. ("Autodesk") and/or its licensors,
+// which is protected by U.S. and Canadian federal copyright law and by
+// international treaties.
+//
+// The Data is provided for use exclusively by You. You have the right to use,
+// modify, and incorporate this Data into other products for purposes authorized 
+// by the Autodesk software license agreement, without fee.
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND. AUTODESK
+// DOES NOT MAKE AND HEREBY DISCLAIMS ANY EXPRESS OR IMPLIED WARRANTIES
+// INCLUDING, BUT NOT LIMITED TO, THE WARRANTIES OF NON-INFRINGEMENT,
+// MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE, OR ARISING FROM A COURSE 
+// OF DEALING, USAGE, OR TRADE PRACTICE. IN NO EVENT WILL AUTODESK AND/OR ITS
+// LICENSORS BE LIABLE FOR ANY LOST REVENUES, DATA, OR PROFITS, OR SPECIAL,
+// DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES, EVEN IF AUTODESK AND/OR ITS
+// LICENSORS HAS BEEN ADVISED OF THE POSSIBILITY OR PROBABILITY OF SUCH DAMAGES.
+
+//
+//
+// Creation Date:  Nov 17 1996
+//
+//  Procedure Name:
+//      saveChanges
+//
+//  Description:
+//		Prompt the user to save changes before performing the requested
+//		action.
+//
+//  Input Arguments:
+//      ??
+//
+//  Return Value:
+//      1 = everything's groovy
+//		0 = user selected cancel from dialog
+//
+
+global proc int saveChanges ( string $saveChangeAction )
+//
+//	Description:
+//		
+//
+{
+	string $fileName;
+	string $result;
+	int $returnValue = 1;
+	
+	if (`file -q -amf`) {
+		$fileName = `file -q -sceneName`;
+
+		// These are not tagged and come from
+		// TdialogStrings, since Tdialog has special string
+		// processing to add (windows only!) hotkey-mnemonic
+		// shortcuts to a small but very specific list of
+		// strings.
+		//
+        string $save = `uiRes "s_TdialogStrings.rSave"`;
+        string $dontSave = `uiRes "s_TdialogStrings.rDontSave"`;
+        string $cancel = `uiRes "s_TdialogStrings.rCancel"`;
+
+		if ($fileName != "") {
+			string $saveMsg = (uiRes("m_saveChanges.kSaveFileMsg"));
+			string $confirmMessage = (`format -s $fileName $saveMsg`);
+
+			if (`about -evalVersion`) {
+				//
+				//	Determine the file extension.
+				//
+				string $extension = `match "\\..*$" $fileName`;
+				$extension = `tolower $extension`;
+				if ($extension == ".ma" || $extension == ".mb") {
+
+					//	Save the filename.
+					//
+					string $oldFilename = $fileName;
+
+					//	Strip off the "ma" or "mb" file extension, ie. the
+					//	last two characters, leaving the ".".
+					//	
+					$fileName = `substring $fileName 1 (size($fileName) - 2)`;
+					//
+					//	Append on "mp", the file extension for
+					//	Maya PLE files.
+					//
+					$fileName += "mp";
+
+					//	Construct a helpful message informing the user
+					//	we will not write out an ascii or binary file.
+					//	Instead, we will write out a Maya PLE file.
+					//
+					$saveMessage = (uiRes("m_saveChanges.kMayaPersonalLearning"));
+					$baseName = basename($oldFilename, "");
+					$confirmMessage = (`format -s $baseName -s $fileName $saveMessage`);
+				}
+			}
+
+			$result = `confirmDialog -title (uiRes("m_saveChanges.kSaveChanges"))
+				-message $confirmMessage
+				-button $save 
+				-button $dontSave 
+				-button $cancel
+				-defaultButton $save
+				-cancelButton $cancel`;
+
+			if ($result == $save) {
+				if (`about -evalVersion`) {
+					if (catch(`file -save -type "mayaPLE"`)) {
+						// There is already plenty of prompts when this happens.
+						$returnValue = 0;
+					}
+
+				} else {
+					if (catch(`file -save`)) {
+					// There is already plenty of prompts when this happens.
+					$returnValue = 0;
+				        }
+				}
+
+			} else if ($result == $cancel) {
+				$returnValue = 0;
+			}
+
+		} else {
+			$result = `confirmDialog -title (uiRes("m_saveChanges.kWarningSceneNotSaved"))
+				-message ( (uiRes("m_saveChanges.kSaveChangesToUntitled")) )
+				-button $save 
+				-button $dontSave
+				-button $cancel
+				-defaultButton $save
+				-cancelButton $cancel`;
+			if ( $result == $save  ) {
+			    projectViewer "SaveAs";
+				$returnValue = 1;
+			} else if ( $result == $dontSave ) {
+			    $returnValue = 1;
+			} else if ( $result == $cancel ) {
+			    $returnValue = 0;
+			}
+		}
+	}
+
+	if ($returnValue == 1) {
+		if (`pluginInfo -q -loaded "mayalive"`) {
+			if (`exists mlResetAllDeletable`)
+				mlResetAllDeletable;
+		}
+//BEGIN CGRU ####################################################################################################
+      tima_AutoProjectSeek_Proc($saveChangeAction);
+//END CGRU ####################################################################################################
+		evalEcho($saveChangeAction);
+	}
+	return $returnValue;
+}
