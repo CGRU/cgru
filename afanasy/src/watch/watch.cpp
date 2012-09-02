@@ -233,6 +233,22 @@ AFINFO("Watch::raiseWindow: trying to raise a window.")
 AFINFA("Watch::raiseWindow: \"%s\" window raised.", name->toUtf8().data())
 }
 
+#ifdef WINNT
+void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
+{
+	printf("Starting '%s'", i_cmd.toUtf8().data());
+	if( false == i_wdir.isEmpty()) printf(" in '%s'", i_wdir.toUtf8().data());
+	printf("\n");
+
+	PROCESS_INFORMATION pinfo;
+
+	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL, 0);
+
+	CloseHandle( pinfo.hThread);
+	CloseHandle( pinfo.hProcess);
+}
+#endif
+/*
 void Watch::startProcess( const QString & cmd, const QString & wdir)
 {
    printf("Starting '%s'", cmd.toUtf8().data());
@@ -263,7 +279,7 @@ void Watch::startProcess( const QString & cmd, const QString & wdir)
    }
    QProcess::startDetached( shell, args);
 }
-
+*/
 void Watch::someJobAdded()
 {
     displayInfo("Job added.");
@@ -355,15 +371,14 @@ void Watch::browseImages( const QString & i_image, const QString & i_wdir)
         return;
     }
 
+	Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
 #ifdef WINNT
-    Watch::displayInfo( QString("Opening '%1'").arg( dir.path().toUtf8().data()));
-    QStringList args;
-    args << "/c" << "start" << "Open Images Folder" << dir.path();
-    QProcess::startDetached( "cmd.exe", args);
+	QString cmd = "explorer";
 #else
-    QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
-    Watch::startProcess( cmd + " \"" + folder + "\"", i_wdir);
+	QString cmd = afqt::stoq( af::Environment::getCGRULocation()) + "/utilities/browse.sh";
 #endif
+	cmd += " \"" + folder + "\"";
+	Watch::startProcess( cmd, i_wdir);
 }
 
 void Watch::repaint()
