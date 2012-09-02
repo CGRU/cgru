@@ -69,6 +69,8 @@ function Monitor( i_element, i_type, i_id)
 	}
 
 	g_cur_monitor = this;
+
+	setTimeout("nw_ReqestRendersResources()", 4900);
 }
 
 Monitor.prototype.destroy = function()
