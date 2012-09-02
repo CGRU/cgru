@@ -15,10 +15,10 @@ else( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_L
 	find_package(PythonLibs REQUIRED)
 endif( ( NOT $ENV{AF_PYTHON_INCLUDE_PATH} STREQUAL "") AND ( NOT $ENV{AF_PYTHON_LIBRARIES} STREQUAL "" ) )
 
-if( $ENV{AF_POSTGRESQL} STREQUAL "NO" )
+if( "$ENV{AF_POSTGRESQL}" STREQUAL "NO" )
 	message("\nWARNING! Building without SQL.\n")
 else()
-	if( $ENV{AF_POSTGRESQL} STREQUAL "REQUIRED" )
+	if( "$ENV{AF_POSTGRESQL}" STREQUAL "REQUIRED" )
 		find_package(PostgreSQL REQUIRED)
 	else()
 		find_package(PostgreSQL)
