@@ -233,53 +233,24 @@ AFINFO("Watch::raiseWindow: trying to raise a window.")
 AFINFA("Watch::raiseWindow: \"%s\" window raised.", name->toUtf8().data())
 }
 
-#ifdef WINNT
 void Watch::startProcess( const QString & i_cmd, const QString & i_wdir)
 {
 	printf("Starting '%s'", i_cmd.toUtf8().data());
 	if( false == i_wdir.isEmpty()) printf(" in '%s'", i_wdir.toUtf8().data());
 	printf("\n");
 
+#ifdef WINNT
 	PROCESS_INFORMATION pinfo;
 
 	af::launchProgram( &pinfo, i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL, 0);
 
 	CloseHandle( pinfo.hThread);
 	CloseHandle( pinfo.hProcess);
-}
-#endif
-/*
-void Watch::startProcess( const QString & cmd, const QString & wdir)
-{
-   printf("Starting '%s'", cmd.toUtf8().data());
-   if( false == wdir.isEmpty()) printf(" in '%s'", wdir.toUtf8().data());
-   printf("\n");
-
-   QStringList args;
-   QString shell;
-#ifdef WINNT
-   shell = "cmd.exe";
-   args << "/c" << cmd;
 #else
-   shell = "/bin/bash";
-   args << "-c" << cmd;
+	af::launchProgram( i_cmd.toStdString(), i_wdir.toStdString(), NULL, NULL, NULL);
 #endif
-
-   if( false == wdir.isEmpty())
-   {
-      if( false == QDir( wdir).exists())
-      {
-         AFERROR("Working directory does not exists.")
-      }
-      else
-      {
-         QProcess::startDetached( shell, args, wdir);
-         return;
-      }
-   }
-   QProcess::startDetached( shell, args);
 }
-*/
+
 void Watch::someJobAdded()
 {
     displayInfo("Job added.");
