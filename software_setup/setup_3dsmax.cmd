@@ -1,7 +1,7 @@
 rem Source general for all soft directives:
 call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
-set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2012
+set MAX_LOCATION=C:\Program Files\Autodesk\3ds Max 2013
 
 set "PATH=%CGRU_LOCATION%\plugins\max;%PATH%"
 

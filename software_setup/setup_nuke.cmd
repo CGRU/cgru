@@ -25,7 +25,7 @@ SET NUKE_AF_RENDERTHREADS=2
 rem Nuke render launcher:
 SET NUKE_AF_RENDER=nuke -i
 
-SET NUKE_DIR=C:\Program Files\Nuke6.3v3
+SET NUKE_DIR=C:\Program Files\Nuke6.3v4
 SET NUKE_EXEC=%NUKE_DIR%\Nuke6.3.exe
 
 SET APP_DIR=%NUKE_DIR%

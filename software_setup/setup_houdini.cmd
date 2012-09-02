@@ -1,7 +1,7 @@
 rem Source general for all soft directives:
 call %CGRU_LOCATION%\software_setup\setup__all.cmd
 
-set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 11.1.67
+set HOUDINI_LOCATION=C:\Program Files\Side Effects Software\Houdini 12.1.33
 
 set APP_DIR=%HOUDINI_LOCATION%
 set APP_EXE=%HOUDINI_LOCATION%\bin\houdini.exe
