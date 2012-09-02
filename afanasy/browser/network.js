@@ -96,6 +96,12 @@ function nw_GetNodes( i_type, i_ids, i_mode, i_blocks)
 
 function nw_GetBlocks( i_job_id, i_blocks, i_modes)
 {
-	nw_GetNodes( "jobs", [i_job_id], i_modes, i_blocks);
+	nw_GetNodes( 'jobs', [i_job_id], i_modes, i_blocks);
+}
+
+function nw_ReqestRendersResources()
+{
+	setTimeout("nw_ReqestRendersResources()", 4900);
+	nw_GetNodes( 'renders');
 }
 

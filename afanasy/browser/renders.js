@@ -65,15 +65,26 @@ RenderNode.prototype.init = function()
 	this.plotterN = new Plotter( this.plotters, this.elResources, 'N');
 	this.plotterD = new Plotter( this.plotters, this.elResources, 'D');
 
-	this.plotterC.addGraph( 200,   0,  0);
-	this.plotterC.addGraph(  50, 200, 20);
+	this.plotterC.addGraph();
+	this.plotterC.setColor([200,   0,  0]);
+	this.plotterC.addGraph();
+	this.plotterC.setColor([ 50, 200, 20]);
+
+	this.plotterM.addGraph();
+	this.plotterM.setColor([50, 200, 20], [255, 0, 0]);
+	this.plotterM.addGraph();
+	this.plotterM.setColor([ 0,  50,  0]);
 
 	this.state = {};
 }
 
 RenderNode.prototype.update = function()
 {
+	var was_online = ( this.state.ONL == true )
 	cm_GetState( this.params.state, this.element, this.state);
+	var became_online = false;
+	if( this.state.ONL && ( was_online == false ))
+		became_online = true;
 
 	this.elName.innerHTML = this.params.name;
 	this.elName.title = this.params.host.os;
@@ -130,7 +141,15 @@ RenderNode.prototype.update = function()
 	max_tasks = ' ' + max_tasks;
 	this.elMaxTasks.innerHTML = max_tasks;
 	
-//	this.plotterC.update( this.params.host_resources);
+	var r = this.params.host_resources;
+
+	if( became_online )
+	{
+		this.plotterM.setScale( r.mem_total_mb, 9 * r.mem_total_mb / 10);
+	}
+
+	this.plotterC.addValues([ r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq, r.cpu_user + r.cpu_nice]);
+	this.plotterM.addValues([ r.mem_total_mb - r.mem_free_mb, r.mem_cached_mb + r.mem_buffers_mb]);
 
 	this.refresh();
 }

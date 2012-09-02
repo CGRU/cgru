@@ -121,7 +121,7 @@ function cm_TimeStringInterval( time1, time2)
 	return time;
 }
 
-cm_States = ['RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY'];
+cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY'];
 function cm_GetState( i_state, i_elParent, i_elChild)
 {
 	if( i_state == null )
