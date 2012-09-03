@@ -11,7 +11,7 @@ case ${DISTRIBUTIVE} in
       export DEPENDS_CGRU="python-qt4 imagemagick"
       ;;
    Fedora )
-      export DEPENDS_CGRU="PyQt4 ImageMagick"
+      export DEPENDS_CGRU="PyQt4 ImageMagick libpqxx"
       ;;
    openSUSE )
       export DEPENDS_CGRU="python-qt4 ImageMagick libpq5"
