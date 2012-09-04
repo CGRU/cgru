@@ -1,6 +1,6 @@
 import os, sys, time
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 import cgruconfig
 import cgruutils

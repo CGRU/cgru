@@ -7,7 +7,7 @@ if len( sys.argv) <= 1:
    print('Error: No command specified.')
    sys.exit(1)
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 class Dialog( QtGui.QWidget):
    def __init__( self):

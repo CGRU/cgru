@@ -8,7 +8,7 @@ import af
 Application = None
 Tray = None
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 def getVar( var, title = 'Set Variable', label = 'Enter new value:'):
    oldvalue = ''

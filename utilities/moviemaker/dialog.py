@@ -10,7 +10,7 @@ import time
 import cgruconfig
 import cgruutils
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 # Save files settings:
 FilePrefix = 'moviemaker.'

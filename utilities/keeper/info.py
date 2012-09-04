@@ -3,11 +3,13 @@ import cgruutils
 
 import os, sys
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
+
+import cgrupyqt
 
 class Window( QtGui.QTextEdit ):
    def __init__( self, parent = None):
-      QtGui.QWidget.__init__( self, parent)
+      QtGui.QTextEdit.__init__( self, parent)
 
       self.setWindowTitle('Configuration: %s version %s' % (cgruconfig.VARS['company'], cgruconfig.VARS['CGRU_VERSION']))
 
@@ -21,6 +23,7 @@ class Window( QtGui.QTextEdit ):
       self.fundefined.setFontItalic( True)
 
       self.textCursor().insertText('Python:\n', self.ftitle)
+      self.appendVar( cgrupyqt.PythonQtType, str(cgrupyqt.PythonQt))
       self.appendVar('sys.prefix', sys.prefix)
       self.appendVar('Executable', os.getenv('CGRU_PYTHONEXE'))
       self.appendVar('Version', sys.version)

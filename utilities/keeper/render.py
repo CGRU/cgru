@@ -6,7 +6,7 @@ import cmd
 
 WndInfo = None
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 def showInfo( tray = None):
 	renders = af.Cmd().renderGetLocal()

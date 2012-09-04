@@ -4,7 +4,7 @@ import nimby
 import render
 import tray
 
-from PyQt4 import QtCore, QtNetwork
+from cgrupyqt import QtCore, QtNetwork
 
 class Server( QtNetwork.QTcpServer):
    def __init__( self, application):

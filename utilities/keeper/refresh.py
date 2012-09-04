@@ -2,7 +2,7 @@ import cgruconfig
 import nimby
 import render
 
-from PyQt4 import QtCore
+from cgrupyqt import QtCore
 
 # Set a default refresh interval in seconds:
 if 'keeper_refresh' not in cgruconfig.VARS: cgruconfig.VARS['keeper_refresh'] = '36'

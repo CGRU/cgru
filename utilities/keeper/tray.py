@@ -14,7 +14,7 @@ import software
 
 from nimby_dialog import NimbyDialog
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 class ActionCommand( QtGui.QAction):
    def __init__( self, parent, name, command, iconpath = None):

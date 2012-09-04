@@ -11,7 +11,7 @@ if sys.platform.find('win') == 0:
    qtconf_file.write('Binaries = ' + pyqt4dir + '\n')
    qtconf_file.close()
 
-from PyQt4 import QtGui
+from cgrupyqt import QtGui
 
 import cgruconfig
 import cmd

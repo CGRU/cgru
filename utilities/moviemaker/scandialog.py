@@ -5,7 +5,7 @@ import os, sys
 import cgruconfig
 import cgruutils
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 # Command arguments:
 

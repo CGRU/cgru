@@ -3,7 +3,7 @@ import os, sys, time
 import cgruconfig
 import cgruutils
 
-from PyQt4 import QtCore, QtGui
+from cgrupyqt import QtCore, QtGui
 
 Names = ['Blender','Houdini','Maya','Nuke', 'NukeX']
 if sys.platform.find('win') == 0:
