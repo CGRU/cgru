@@ -24,6 +24,7 @@ def getComboBoxString( comboBox):
    data = comboBox.itemData( comboBox.currentIndex())
    if data is None: return ''
    if isinstance( data, str): return data
+   if isinstance( data, unicode): return data
    return str( comboBox.itemData( comboBox.currentIndex()).toString())
    # return comboBox.itemData( comboBox.currentIndex()).toString()
 
