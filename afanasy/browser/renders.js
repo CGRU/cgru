@@ -145,7 +145,7 @@ RenderNode.prototype.update = function()
 
 	if( became_online )
 	{
-		this.plotterM.setScale( r.mem_total_mb, 9 * r.mem_total_mb / 10);
+		this.plotterM.setScale( r.mem_total_mb, 85 * r.mem_total_mb / 100, r.mem_total_mb);
 	}
 
 	this.plotterC.addValues([ r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq, r.cpu_user + r.cpu_nice]);

@@ -6,6 +6,7 @@ Plotter_MH = 2;
 Plotter_Lines = 100;
 Plotter_MainW = 10;
 Plotter_TailClrFade = 1;//.9;
+Plotter_TailLineWidth = .8;
 
 function Plotter( i_plottersArray, i_pElement, i_label)
 {
@@ -51,7 +52,8 @@ function Plotter( i_plottersArray, i_pElement, i_label)
 	this.pos = -1;
 	this.values = [];
 	this.colors = [];
-	this.colorsHot = [];
+	this.clrNrm = [];
+	this.clrHot = [];
 	this.scale = 100;
 }
 
@@ -66,14 +68,15 @@ Plotter.prototype.setHidden = function( i_hide)
 Plotter.prototype.addGraph = function()
 {
 	this.values.push([]);
-	this.colors.push([0,250,0]);
-	this.colorsHot.push( null);
+	this.colors.push([]);
+	this.clrNrm.push([0,250,0]);
+	this.clrHot.push( null);
 }
 
 Plotter.prototype.setColor = function( i_clr, i_clrHot)
 {
-	this.colors[this.values.length-1] = i_clr;
-	this.colorsHot[this.values.length-1] = i_clrHot;
+	this.clrNrm[this.values.length-1] = i_clr;
+	this.clrHot[this.values.length-1] = i_clrHot;
 }
 
 Plotter.prototype.setScale = function( i_scale, i_hot_min, i_hot_max)
@@ -96,8 +99,36 @@ Plotter.prototype.addValues = function( i_vals, i_store)
 	if( this.pos == Plotter_Lines )
 		this.pos = 0;
 
+	var clrs = [];
 	for( var v = 0; v < i_vals.length; v++)
+	{
 		this.values[v][this.pos] = i_vals[v];
+
+		clrs.push( [this.clrNrm[v][0], this.clrNrm[v][1], this.clrNrm[v][2]] );
+		if( this.clrHot[v] && this.hot_min && this.hot_max )
+		{
+			if( i_vals[v] > this.hot_min )
+			{
+				for( var c = 0; c < 3; c++)
+				{
+					if( i_vals[v] >= this.hot_max )
+					{
+						clrs[v][c] = this.clrHot[v][c];
+					}
+					else
+					{
+						var val = ( i_vals[v] - this.hot_min ) / ( this.hot_max - this.hot_min );
+//g_Info( val + ' c'+(cycle++));
+						clrs[v][c] = Math.round( this.clrNrm[v][c] + val * ( this.clrHot[v][c] - this.clrNrm[v][c] ));
+					}
+				}
+			}
+		}
+
+		this.colors[v][this.pos] = clrs[v];
+		for( var c = 0; c < 3; c++)
+			this.colors[v][this.pos][c] *= Plotter_TailClrFade;
+	}
 
 	if( false == this.canvas.getContext )
 		return;
@@ -112,7 +143,7 @@ Plotter.prototype.addValues = function( i_vals, i_store)
 	var h0 = Plotter_H;
 	for( var v = 0; v < this.values.length; v++)
 	{
-		ctx.fillStyle = 'rgb('+this.colors[v][0]+','+this.colors[v][1]+','+this.colors[v][2]+')';
+		ctx.fillStyle = 'rgb('+clrs[v][0]+','+clrs[v][1]+','+clrs[v][2]+')';
 		var h = Plotter_H * this.values[v][this.pos] / this.scale;
 		h0 -= h;
 		ctx.fillRect( x, h0, Plotter_W, h);
@@ -121,7 +152,7 @@ Plotter.prototype.addValues = function( i_vals, i_store)
 	if( this.values[0].length == 1 )
 		return;
 
-	ctx.lineWidth = .8;
+	ctx.lineWidth = Plotter_TailLineWidth;
 	x -= 1;
 	var p = this.pos-1;
 	for( var i = 0; i < this.values[0].length-1; i++)
@@ -132,7 +163,7 @@ Plotter.prototype.addValues = function( i_vals, i_store)
 		for( var v = 0; v < this.values.length; v++)
 		{
 
-			ctx.strokeStyle = 'rgb('+(this.colors[v][0]*Plotter_TailClrFade)+','+(this.colors[v][1]*Plotter_TailClrFade)+','+(this.colors[v][2]*Plotter_TailClrFade)+')';
+			ctx.strokeStyle = 'rgb('+this.colors[v][p][0]+','+this.colors[v][p][1]+','+this.colors[v][p][2]+')';
 			var h = h0 - (Plotter_H * this.values[v][p] / this.scale);
 			ctx.beginPath();
 			ctx.moveTo( x, h0);
