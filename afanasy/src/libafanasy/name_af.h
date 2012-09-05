@@ -184,7 +184,7 @@ namespace af
     bool launchProgram( PROCESS_INFORMATION * o_pinfo,
 	                    const std::string & i_commandline, const std::string & i_wdir = std::string(),
                         HANDLE * o_in = NULL, HANDLE * o_out = NULL, HANDLE * o_err = NULL,
-                        DWORD i_flags = 0);
+                        DWORD i_flags = 0, bool alwaysCreateWindow = false);
 #else
     int launchProgram( const std::string & i_commandline, const std::string & i_wdir = std::string(),
                        FILE ** o_in = NULL, FILE ** o_out = NULL, FILE ** o_err = NULL);

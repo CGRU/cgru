@@ -42,13 +42,14 @@ bool LaunchProgramV(
 	HANDLE * o_out,
 	HANDLE * o_err,
 	const char * i_commanline,
-    const char * i_wdir = NULL,
-    DWORD i_flags = 0);
+    const char * i_wdir,
+    DWORD i_flags,
+	bool alwaysCreateWindow);
 
 bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
                        const std::string & i_commandline, const std::string & i_wdir,
                        HANDLE * o_in, HANDLE * o_out, HANDLE * o_err,
-					   DWORD i_flags)
+					   DWORD i_flags, bool alwaysCreateWindow)
 {
     const char * wdir = NULL;
     if( i_wdir.size() > 0 )
@@ -57,7 +58,7 @@ bool af::launchProgram( PROCESS_INFORMATION * o_pinfo,
 	std::string shell_commandline = af::Environment::getCmdShell() + " ";
 	shell_commandline += i_commandline;
 
-	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_flags);
+	return LaunchProgramV( o_pinfo, o_in, o_out, o_err, shell_commandline.c_str(), wdir, i_flags, alwaysCreateWindow);
 }
 void af::launchProgram( const std::string & i_commandline, const std::string & i_wdir)
 {

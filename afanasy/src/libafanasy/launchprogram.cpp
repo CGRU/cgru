@@ -49,8 +49,9 @@ bool LaunchProgramV(
 	HANDLE * o_out,
 	HANDLE * o_err,
     const char * i_commandline,
-    const char * i_wdir = NULL,
-    DWORD i_flags = 0)
+    const char * i_wdir,
+    DWORD i_flags,
+	bool alwaysCreateWindow)
 {
 #if 0
 	char* args = (char*)malloc(1);
@@ -213,7 +214,8 @@ bool LaunchProgramV(
 	
 	memset(&startInfo, 0, sizeof(STARTUPINFO));
 	startInfo.cb = sizeof(STARTUPINFO);
-	startInfo.dwFlags = STARTF_USESTDHANDLES;
+	if( o_in || o_out || o_err )
+		startInfo.dwFlags = STARTF_USESTDHANDLES;
 /*
     if ( ! SetHandleInformation( *o_in, HANDLE_FLAG_INHERIT, 0) )
         printf("SetHandleInformation error = %d", GetLastError()); 
@@ -250,7 +252,8 @@ bool LaunchProgramV(
 	*/
 	CONSOLE_SCREEN_BUFFER_INFO cinfos;
 	DWORD flags = i_flags;
-	if( false == GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos ))
+	if(( false == alwaysCreateWindow ) &&
+	   ( false == GetConsoleScreenBufferInfo( GetStdHandle( STD_OUTPUT_HANDLE ), &cinfos )))
 		flags = flags | CREATE_NO_WINDOW;
 
 	BOOL processCreated = CreateProcess(
