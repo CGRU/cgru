@@ -12,7 +12,7 @@ function nw_Send( obj)
 document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
 
 	var xhr = new XMLHttpRequest;
-	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
+//	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 	xhr.open("POST", "/", true); 
 	xhr.send('[ * AFANASY * ] 1 0 '+obj_str.length+' JSON'+obj_str);
 

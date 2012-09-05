@@ -58,12 +58,12 @@ RenderNode.prototype.init = function()
 	this.elAnnotation.style.textAlign = 'center';
 
 	this.plotters = [];
-	this.plotterC = new Plotter( this.plotters, this.elResources, 'C');
-	this.plotterM = new Plotter( this.plotters, this.elResources, 'M');
-	this.plotterS = new Plotter( this.plotters, this.elResources, 'S');
-	this.plotterH = new Plotter( this.plotters, this.elResources, 'H');
-	this.plotterN = new Plotter( this.plotters, this.elResources, 'N');
-	this.plotterD = new Plotter( this.plotters, this.elResources, 'D');
+	this.plotterC = new Plotter( this.plotters, this.elResources, 'C', 'CPU');
+	this.plotterM = new Plotter( this.plotters, this.elResources, 'M', 'Memory');
+	this.plotterS = new Plotter( this.plotters, this.elResources, 'S', 'Swap');
+	this.plotterH = new Plotter( this.plotters, this.elResources, 'H', 'HDD Space');
+	this.plotterN = new Plotter( this.plotters, this.elResources, 'N', 'Network I/O');
+	this.plotterD = new Plotter( this.plotters, this.elResources, 'D', 'Disk I/O');
 
 	this.plotterC.addGraph();
 	this.plotterC.setColor([200,   0,  0]);
@@ -74,6 +74,23 @@ RenderNode.prototype.init = function()
 	this.plotterM.setColor([50, 200, 20], [255, 0, 0]);
 	this.plotterM.addGraph();
 	this.plotterM.setColor([ 0,  50,  0]);
+
+	this.plotterH.addGraph( 10);
+	this.plotterH.setColor([50, 200, 20], [ 255, 0, 0]);
+
+	this.plotterN.addGraph();
+	this.plotterN.setColor([90, 200, 20], [ 255, 0, 10]);
+	this.plotterN.addGraph();
+	this.plotterN.setColor([20, 200, 90], [ 255, 0, 90]);
+	this.plotterN.setScale(-1, 10000, 100000);
+	this.plotterN.setAutoScale( 1000, 100000);
+
+	this.plotterD.addGraph();
+	this.plotterD.setColor([90, 200, 20], [ 250, 50, 20]);
+	this.plotterD.addGraph();
+	this.plotterD.setColor([20, 200, 90], [ 250, 50, 90]);
+	this.plotterD.setScale(-1, 10000, 100000);
+	this.plotterD.setAutoScale( 1000, 100000);
 
 	this.state = {};
 }
@@ -146,10 +163,14 @@ RenderNode.prototype.update = function()
 	if( became_online )
 	{
 		this.plotterM.setScale( r.mem_total_mb, 85 * r.mem_total_mb / 100, r.mem_total_mb);
+		this.plotterH.setScale( r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
 	}
 
 	this.plotterC.addValues([ r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq, r.cpu_user + r.cpu_nice]);
 	this.plotterM.addValues([ r.mem_total_mb - r.mem_free_mb, r.mem_cached_mb + r.mem_buffers_mb]);
+	this.plotterH.addValues([ r.hdd_total_gb - r.hdd_free_gb]);
+	this.plotterN.addValues([ r.net_recv_kbsec, r.net_send_kbsec]);
+	this.plotterD.addValues([ r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
 
 	this.refresh();
 }
