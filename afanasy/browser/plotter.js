@@ -66,6 +66,17 @@ function Plotter( i_plottersArray, i_pElement, i_label, i_title)
 	this.clrBG = [0,0,0];
 }
 
+Plotter.prototype.setTitle = function( i_title)
+{
+	this.title = i_title;
+	this.element.title = this.title;
+}
+
+Plotter.prototype.appendTitle = function( i_append)
+{
+	this.element.title = this.title + i_append;
+}
+
 Plotter.prototype.setHidden = function( i_hide)
 {
 	if( i_hide )

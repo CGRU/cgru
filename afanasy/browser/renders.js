@@ -75,6 +75,9 @@ RenderNode.prototype.init = function()
 	this.plotterM.addGraph();
 	this.plotterM.setColor([ 0,  50,  0]);
 
+	this.plotterS.addGraph();
+	this.plotterS.setColor([100, 200, 30], [255, 0, 0]);
+
 	this.plotterH.addGraph( 10);
 	this.plotterH.setColor([50, 200, 20], [ 255, 0, 0]);
 
@@ -162,15 +165,57 @@ RenderNode.prototype.update = function()
 
 	if( became_online )
 	{
-		this.plotterM.setScale( r.mem_total_mb, 85 * r.mem_total_mb / 100, r.mem_total_mb);
-		this.plotterH.setScale( r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
+		if( r != null )
+		{
+			this.plotterC.setTitle('CPU: '+r.cpu_mhz+' MHz x'+r.cpu_num);
+
+			this.plotterM.setTitle('Memory: '+r.mem_total_mb+' Mb');
+			this.plotterM.setScale( r.mem_total_mb, 85 * r.mem_total_mb / 100, r.mem_total_mb);
+
+			if( r.swap_total_mb > 0 )
+			{
+				this.plotterS.setTitle('Swap: '+r.swap_total_mb+' Mb');
+				this.plotterS.setScale( r.swap_total_mb, r.swap_total_mb / 10, r.swap_total_mb);
+			}
+			else
+			{
+				this.plotterS.setTitle('Swap I/O');
+				this.plotterS.setScale( -1, 100, 10000);
+				this.plotterS.setAutoScale( 1000, 100000);
+			}
+
+			this.plotterH.setTitle('HDD Space: '+r.hdd_total_gb+' Gb');
+			this.plotterH.setScale( r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
+		}
 	}
 
-	this.plotterC.addValues([ r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq, r.cpu_user + r.cpu_nice]);
-	this.plotterM.addValues([ r.mem_total_mb - r.mem_free_mb, r.mem_cached_mb + r.mem_buffers_mb]);
-	this.plotterH.addValues([ r.hdd_total_gb - r.hdd_free_gb]);
-	this.plotterN.addValues([ r.net_recv_kbsec, r.net_send_kbsec]);
-	this.plotterD.addValues([ r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
+	if( r != null )
+	{
+		var usr = r.cpu_user + r.cpu_nice;
+		var sys = r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq;
+		this.plotterC.appendTitle('\nUsage: '+usr+'%\nSystem: '+sys+'%');
+		this.plotterC.addValues([ sys, usr]);
+
+		var mem = r.mem_total_mb - r.mem_free_mb;
+		var buf = r.mem_cached_mb + r.mem_buffers_mb;
+		this.plotterM.appendTitle('\n-buffered: '+buf+'\nUsed: '+mem+' Mb');
+		this.plotterM.addValues([ mem, buf]);
+
+		this.plotterS.addValues([ r.swap_used_mb]);
+		if( r.swap_total_mb > 0 )
+			this.plotterS.appendTitle('\nUsed: '+r.swap_used_mb+' Mb');
+		else
+			this.plotterS.appendTitle('\nUsage: '+r.swap_used_mb+' MBytes/s');
+
+		this.plotterH.appendTitle('\nFree: '+r.hdd_free_gb+' Gb');
+		this.plotterH.addValues([ r.hdd_total_gb - r.hdd_free_gb]);
+
+		this.plotterN.appendTitle('\nReceive: '+Math.round(r.net_recv_kbsec/1024)+' MBytes/s\nSend: '+Math.round(r.net_send_kbsec/1024)+' MBytes/s')
+		this.plotterN.addValues([ r.net_recv_kbsec, r.net_send_kbsec]);
+
+		this.plotterD.appendTitle('\nRead: '+Math.round(r.hdd_rd_kbsec/1024)+ 'MBytes/s\nWrite: '+Math.round(r.hdd_wr_kbsec/1024)+' MBytes/s\nBusy: '+r.hdd_busy+'%');
+		this.plotterD.addValues([ r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
+	}
 
 	this.refresh();
 }
