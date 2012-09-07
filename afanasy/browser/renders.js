@@ -96,6 +96,7 @@ RenderNode.prototype.init = function()
 	this.plotterD.setAutoScale( 1000, 100000);
 
 	this.state = {};
+	this.tasks = [];
 }
 
 RenderNode.prototype.update = function()
@@ -217,6 +218,13 @@ RenderNode.prototype.update = function()
 		this.plotterD.addValues([ r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
 	}
 
+	for( var t = 0; t < this.tasks.length; t++)
+		this.tasks[t].destroy();
+	this.tasks = [];
+	if( this.params.tasks != null )
+	for( var t = 0; t < this.params.tasks.length; t++)
+		this.tasks.push( new RenderTask( this.params.tasks[t], this.element));
+
 	this.refresh();
 }
 
@@ -241,8 +249,67 @@ RenderNode.prototype.refresh = function()
 			stateTime += ' free';
 	}
 	this.elStateTime.innerHTML = stateTime;
+
+	for( var t = 0; t < this.tasks.length; t++)
+		this.tasks[t].refresh();
 }
 
 RenderNode.prototype.onDoubleClick = function()
 {
+}
+
+function RenderTask( i_task, i_element)
+{
+	this.elParent = i_element;
+	this.element = document.createElement('div');
+	this.elParent.appendChild( this.element);
+	this.element.classList.add('rendertask');
+
+	this.elCapacity = document.createElement('span');
+	this.element.appendChild( this.elCapacity);
+	this.elCapacity.style.marginLeft = '4px';
+	this.elCapacity.innerHTML = i_task.capacity;
+	this.elCapacity.title = 'Capacity';
+
+	this.elJob = document.createElement('span');
+	this.element.appendChild( this.elJob)
+	this.elJob.style.marginLeft = '8px';
+	this.elJob.innerHTML = i_task.job_name;
+	this.elJob.title = 'Job Name';
+
+	this.elBlock = document.createElement('span');
+	this.element.appendChild( this.elBlock)
+	this.elBlock.innerHTML = '['+i_task.block_name+']';
+	this.elBlock.title = 'Block Name';
+
+	this.elName = document.createElement('span');
+	this.element.appendChild( this.elName)
+	this.elName.innerHTML = '['+i_task.name+']';
+	this.elName.title = 'Task Name';
+
+	this.elTime = document.createElement('span');
+	this.element.appendChild( this.elTime)
+	this.elTime.style.cssFloat = 'right';
+	this.elTime.style.marginRight = '4px';
+	this.elTime.title = 'Running Time';
+	this.time = i_task.time_start;
+
+	this.elUser = document.createElement('span');
+	this.element.appendChild( this.elUser)
+	this.elUser.style.cssFloat = 'right';
+	this.elUser.style.marginRight = '4px';
+	this.elUser.innerHTML = i_task.user_name;
+	this.elUser.title = 'User Name';
+
+	this.refresh();
+}
+
+RenderTask.prototype.refresh = function()
+{
+	this.elTime.innerHTML = cm_TimeStringInterval( this.time);
+}
+
+RenderTask.prototype.destroy = function()
+{
+	this.elParent.removeChild( this.element);
 }

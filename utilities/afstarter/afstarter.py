@@ -1,5 +1,6 @@
 import os, sys, time
 
+import cgrupyqt
 from cgrupyqt import QtCore, QtGui
 
 import cgruconfig
@@ -424,26 +425,26 @@ class Dialog( QtGui.QWidget):
          self.evaluate()
 
    def browseScene( self):
-      scene = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['scenefile'].text()))
+      scene = cgrupyqt.GetOpenFileName( self,'Choose a file', self.fields['scenefile'].text())
       if scene == '': return
       self.fields['scenefile'].setText( os.path.normpath( scene))
       self.fileChange()
       self.evaluate()
 
    def browseOutImages( self):
-      path = str( QtGui.QFileDialog.getSaveFileName( self,'Choose a file', self.fields['outimages'].text()))
+      path = cgrupyqt.GetSaveFileName( self,'Choose a file', self.fields['outimages'].text())
       if path == '': return
       self.fields['outimages'].setText( os.path.normpath( path))
       self.evaluate()
 
    def browseOutFolder( self):
-      path = str( QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', self.fields['outimages'].text()))
+      path = cgrupyqt.GetExistingDirectory( self,'Choose a directory', self.fields['outimages'].text())
       if path == '': return
       self.fields['outimages'].setText( os.path.normpath( path))
       self.evaluate()
 
    def browseExec( self):
-      path = str( QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['exec'].text()))
+      path = cgrupyqt.GetOpenFileName( self,'Choose a file', self.fields['exec'].text()
       if path == '': return
       self.fields['exec'].setText( os.path.normpath( path))
       self.evaluate()
@@ -642,12 +643,12 @@ class Dialog( QtGui.QWidget):
       return True
 
    def browseLoad( self):
-      filename = str( QtGui.QFileDialog.getOpenFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU']))
+      filename = cgrupyqt.GetOpenFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU'])
       if filename == '': return
       self.load( filename, True)
 
    def browseSave( self):
-      filename = str( QtGui.QFileDialog.getSaveFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU']))
+      filename = cgrupyqt.GetSaveFileName( self,'Choose afstarter file', cgruconfig.VARS['HOME_CGRU'])
       if filename == '': return
       self.save( filename, True)
 

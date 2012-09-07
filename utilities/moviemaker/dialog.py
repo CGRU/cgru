@@ -10,6 +10,7 @@ import time
 import cgruconfig
 import cgruutils
 
+import cgrupyqt
 from cgrupyqt import QtCore, QtGui
 
 # Save files settings:
@@ -1120,12 +1121,12 @@ Add this options to temporary image saving.')
 # Decode:
 
    def decodeBrowseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a movie file', self.decodeInputFileName.text())
+      afile = cgrupyqt.GetOpenFileName( self,'Choose a movie file', self.decodeInputFileName.text())
       if len( afile):
          self.decodeInputFileName.setText( afile)
          self.decodeInputChanged()
    def decodeBrowseOutput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a sequence', self.decodeOutputSequence.text())
+      afile = cgrupyqt.GetOpenFileName( self,'Choose a sequence', self.decodeOutputSequence.text())
       if len( afile):
          self.decodeOutputSequence.setText( afile)
          self.decodeOutputChanged()
@@ -1177,7 +1178,7 @@ Add this options to temporary image saving.')
 # Encode:
 
    def audioBrowseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose an audio or movie file with sound', self.fields['audiofile'].text())
+      afile = cgrupyqt.GetOpenFileName( self,'Choose an audio or movie file with sound', self.fields['audiofile'].text())
       if len( afile):
          self.fields['audiofile'].setText( afile)
          self.audioInputChanged()
@@ -1257,7 +1258,7 @@ Add this options to temporary image saving.')
       if oldlogo != '':
          dirname = os.path.dirname( oldlogo)
          if dirname != '': lgspath = dirname
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgspath)
+      afile = cgrupyqt.GetOpenFileName( self,'Choose a file', lgspath)
       if len( afile):
          self.fields['lgspath'].setText( '%s' % afile)
          self.evaluate()
@@ -1268,23 +1269,23 @@ Add this options to temporary image saving.')
       if oldlogo != '':
          dirname = os.path.dirname( oldlogo)
          if dirname != '': lgfpath = dirname
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', lgfpath)
+      afile = cgrupyqt.GetOpenFileName( self,'Choose a file', lgfpath)
       if len( afile):
          self.fields['lgfpath'].setText( '%s' % afile)
          self.evaluate()
 
    def browseOutputFolder( self):
-      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.fields['outputfolder'].text()))
+      folder = cgrupyqt.GetExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.fields['outputfolder'].text()))
       if len( folder): self.fields['outputfolder'].setText( folder)
 
    def browseInput( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['input0'].text())
+      afile = cgrupyqt.GetOpenFileName( self,'Choose a file', self.fields['input0'].text())
       if len( afile):
          self.fields['input0'].setText( afile)
          self.inputFileChanged()
 
    def browseInput2( self):
-      afile = QtGui.QFileDialog.getOpenFileName( self,'Choose a file', self.fields['input1'].text())
+      afile = cgrupyqt.GetOpenFileName( self,'Choose a file', self.fields['input1'].text())
       if len( afile):
          self.fields['input1'].setText( afile)
          self.inputFileChanged2()
@@ -1804,7 +1805,7 @@ Add this options to temporary image saving.')
       return True
 
    def browseSave( self):
-      filename = str( QtGui.QFileDialog.getSaveFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU']))
+      filename = cgrupyqt.GetSaveFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU'])
       if filename == '': return
       filendir = os.path.dirname( filename)
       filename = os.path.basename( filename)
@@ -1813,7 +1814,7 @@ Add this options to temporary image saving.')
       self.save( filename, True)
 
    def browseLoad( self):
-      filename = str( QtGui.QFileDialog.getOpenFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU']))
+      filename = cgrupyqt.GetOpenFileName( self,'Choose MovieMaker file', cgruconfig.VARS['HOME_CGRU'])
       if filename == '': return
       self.load( filename, True)
 

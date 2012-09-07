@@ -3,6 +3,7 @@ import os, sys, time
 import cgruconfig
 import cgruutils
 
+import cgrupyqt
 from cgrupyqt import QtCore, QtGui
 
 Names = ['Blender','Houdini','Maya','Nuke', 'NukeX']
@@ -68,7 +69,7 @@ def browse():
       startDetached( cmd)
 
 def locateSoftware( soft):
-   filename = QtGui.QFileDialog.getOpenFileName( None, 'Select %s executabe:' % soft)
+   filename = cgrupyqt.GetOpenFileName( None, 'Select %s executabe:' % soft)
    if filename is None: return
    filename = str( filename)
    if filename == '': return
