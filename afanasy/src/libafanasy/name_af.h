@@ -174,6 +174,7 @@ namespace af
    const std::string pathUp( const std::string & path);
    const std::string pathHome();
    bool pathMakeDir( const std::string & i_path, VerboseMode i_verbose = VerboseOff);
+	const std::vector<std::string> getFilesList( const std::string & i_path);
 
    bool netIsIpAddr( const std::string & addr, bool verbose = false);
 

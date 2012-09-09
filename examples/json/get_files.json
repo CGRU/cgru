@@ -1,0 +1,7 @@
+{
+	"get":
+	{
+		"type" : "files",
+		"path" : "icons/software"
+	}
+}
