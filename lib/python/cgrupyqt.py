@@ -32,9 +32,3 @@ def GetSaveFileName( i_qwdget, i_title, i_path):
 		afile, filter = QtGui.QFileDialog.getSaveFileName( i_qwdget, i_title, i_path)
 		return afile
 	return str( QtGui.QFileDialog.getSaveFileName( i_qwdget, i_title, i_path))
-
-def GetExistingDirectory( i_qwidget, i_title, i_path):
-	if PySide:
-		folder, filter = QtGui.QFileDialog.getExistingDirectory( i_qwidget, i_title, i_path)
-		return folder
-	return str( QtGui.QFileDialog.getExistingDirectory( i_qwidget, i_title, i_path))

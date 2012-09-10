@@ -438,7 +438,7 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def browseOutFolder( self):
-      path = cgrupyqt.GetExistingDirectory( self,'Choose a directory', self.fields['outimages'].text())
+      path = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', self.fields['outimages'].text())
       if path == '': return
       self.fields['outimages'].setText( os.path.normpath( path))
       self.evaluate()

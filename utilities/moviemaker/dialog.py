@@ -1275,7 +1275,7 @@ Add this options to temporary image saving.')
          self.evaluate()
 
    def browseOutputFolder( self):
-      folder = cgrupyqt.GetExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.fields['outputfolder'].text()))
+      folder = QtGui.QFileDialog.getExistingDirectory( self,'Choose a directory', os.path.dirname('%s' % self.fields['outputfolder'].text()))
       if len( folder): self.fields['outputfolder'].setText( folder)
 
    def browseInput( self):
