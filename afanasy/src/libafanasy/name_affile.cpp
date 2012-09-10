@@ -229,6 +229,27 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path)
 		return list;
 
 	std::string path = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + i_path;
+
+#ifdef WINNT
+	HANDLE dir;
+	WIN32_FIND_DATA file_data;
+	if(( dir = FindFirstFile((path + "\\*").c_str(), &file_data)) != INVALID_HANDLE_VALUE)
+	{
+		do
+		{
+			std::string filename( file_data.cFileName);
+
+			if( filename.find(".") == 0 )
+				continue;
+
+			list.push_back( filename);
+
+		} while ( FindNextFile( dir, &file_data));
+		FindClose( dir);
+	}
+
+#else
+
 	struct dirent *de = NULL;
 	DIR * dir = opendir( path.c_str());
 	if( dir == NULL)
@@ -244,6 +265,7 @@ const std::vector<std::string> af::getFilesList( const std::string & i_path)
 
 	closedir(dir);
 
+#endif
+
 	return list;
 }
-
