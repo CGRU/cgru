@@ -16,6 +16,8 @@ g_monitors = [];
 g_cur_monitor = null;
 g_monitor_buttons = [];
 
+g_Images = [];
+
 function g_Register()
 {
 	if( g_id != 0)
@@ -32,6 +34,16 @@ function g_Register()
 
 function g_ProcessMsg( obj)
 {
+	if(( obj.files != null ) && ( obj.path != null ))
+	{
+		for( var i = 0; i < obj.files.length; i++)
+		{
+			var img = new Image();
+			img.src = obj.path + "/" + obj.files[i];
+			g_Images.push( img);
+		}
+	}
+
 	if( obj.id != null )
 	{
 		if(( g_id == 0 ) && ( obj.id > 0 ))
@@ -81,6 +93,7 @@ function g_Init()
 	for( var i = 0; i < g_monitor_buttons.length; i++)
 		g_monitor_buttons[i].onclick = g_MButtonClick;
 
+	nw_GetSoftwareIcons();
 	g_Register();
 	g_Refresh();
 	cm_Init();

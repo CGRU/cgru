@@ -99,6 +99,16 @@ function nw_GetBlocks( i_job_id, i_blocks, i_modes)
 	nw_GetNodes( 'jobs', [i_job_id], i_modes, i_blocks);
 }
 
+function nw_GetSoftwareIcons()
+{
+	var obj = {};
+	obj.get = {};
+	obj.get.type = 'files';
+	obj.get.path = 'icons/software';
+
+	nw_Send(obj);
+}
+
 function nw_ReqestRendersResources()
 {
 	setTimeout("nw_ReqestRendersResources()", 4900);

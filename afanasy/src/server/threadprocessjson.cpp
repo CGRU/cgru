@@ -132,7 +132,8 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			std::ostringstream files;
 			af::jr_string("path", path, getObj);
 			std::vector<std::string> list = af::getFilesList( path);
-			files << "{\"files\":[";
+			files << "{\"path\":\"" << path << "\",\n";
+			files << "\"files\":[";
 			for( int i = 0; i < list.size(); i++)
 			{
 				if( i )

@@ -265,6 +265,14 @@ function RenderTask( i_task, i_element)
 	this.elParent.appendChild( this.element);
 	this.element.classList.add('rendertask');
 
+	this.elIcon = document.createElement('img');
+	this.element.appendChild( this.elIcon);
+	this.elIcon.src = 'icons/software/nuke.png';
+//	this.elIcon.width = '32px';
+//	this.elIcon.height = '32px';
+	this.elIcon.style.width = '16px';
+	this.elIcon.style.height = '16px';
+
 	this.elCapacity = document.createElement('span');
 	this.element.appendChild( this.elCapacity);
 	this.elCapacity.style.marginLeft = '4px';

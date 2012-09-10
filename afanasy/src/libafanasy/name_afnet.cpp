@@ -139,11 +139,13 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 		int datalen;
 		std::string datafile;
 		while( buffer[++get_finish] != ' ');
+		while( buffer[get_start] == '/' ) get_start++;
+		while( buffer[get_start] == '\\') get_start++;
 		if( get_finish - get_start > 1 )
 		{
 			datafile = std::string( buffer + get_start, get_finish - get_start);
-//printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
-			if(( datafile.find("..") == -1 ) && ( datafile.find(':') == -1 ) && ( datafile[0] != '/') && ( datafile[0] != '\\'))
+printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
+			if(( datafile.find("..") == -1 ) && ( datafile.find(':') == -1 ))
 			{
 				datafile = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + datafile;
 				std::string error;
