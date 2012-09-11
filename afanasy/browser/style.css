@@ -116,10 +116,10 @@ border-radius: 4px;
 }
 .item.NbY { background: #88F;}
 .item.NBY { background: #77F;}
-.item.DON { background: #685;}
+.item.DON { background: #486;}
 .item.WDP { background: #969;}
 .item.WTM { background: #86C;}
-.item.RUN { background: #8A7;}
+.item.RUN { background: #DD6;}
 .item.ERR { background: #A65;}
 .item.OFF { background: #777;}
 .item.selected {
@@ -160,10 +160,11 @@ top: 2px; left: 2px;
 }
 
 .item .jobblock {
-border: 1px solid #666;
+/*border: 1px solid #666;*/
 margin: 2px;
-padding: 2px;
-/*box-shadow: 0px 0px 5px #222 inset;*/
+padding: 2px 5px;
+border-radius: 4px;
+box-shadow: 0px 0px 5px #000 inset;
 }
 
 .item.block {
@@ -187,9 +188,12 @@ opacity: 0.3;
 }
 
 .user .bar {
-background: #FF0;
-opacity: 0.7;
+background: #FF4;
+opacity: 1;
 border-radius: 3px;
+text-align: center;
+/*margin: 0px 5px;*/
+/*padding: 0px 5px;*/
 /*border: 1px solid #444;*/
 box-shadow: 0px 0px 8px #000 inset;
 }
@@ -201,12 +205,20 @@ font-size: 14px;
 
 /*.item.render .task {*/
 .rendertask {
-background: #7D4;
+/*background: #DD3;*/
 margin: 1px;
 padding: 1px 5px;
 /*height: 24px;*/
 /*border: 1px solid #666;*/
 border-radius: 4px;
-box-shadow: 0px 0px 2px #222 inset;
+box-shadow: 0px 0px 5px #000 inset;
 /*opacity: 0.9;*/
 }
+
+.rendertask .icon {
+position: absolute;
+width: 16px; height: 16px;
+/*border: 1px solid #666;*/
+/*box-shadow: 0px 0px 5px #000 inset;*/
+}
+

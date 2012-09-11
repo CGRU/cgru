@@ -85,6 +85,7 @@ UserNode.prototype.init = function()
 	this.elBar = document.createElement('div');
 	this.elBarParent.appendChild( this.elBar);
 	this.elBar.classList.add('bar');
+//	this.elBar.style.textAlign = 'right';
 }
 
 UserNode.prototype.update = function()
@@ -160,11 +161,16 @@ UserNode.prototype.update = function()
 UserNode.prototype.refresh = function()
 {
 	var percent = '';
+	var label = '';
 	if( this.params.running_tasks_num && ( this.monitor.max_tasks > 0 ))
+	{
 		percent = 100 * this.params.running_tasks_num/this.monitor.max_tasks;
+		label = this.params.running_tasks_num;
+	}
 	else
 		percent = '0';
 	this.elBar.style.width = percent + '%';
+	this.elBar.innerHTML = label;
 }
 
 UserNode.prototype.onDoubleClick = function()

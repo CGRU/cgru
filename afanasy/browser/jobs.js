@@ -4,100 +4,100 @@ JobNode.prototype.init = function()
 {
 	this.element.classList.add('job');
 
-	this.name = document.createElement('span');
-	this.name.classList.add('name');
-	this.element.appendChild( this.name);
-	this.name.title = 'Job name';
+	this.elName = document.createElement('span');
+	this.elName.classList.add('name');
+	this.element.appendChild( this.elName);
+	this.elName.title = 'Job name';
 
-	this.user_name = document.createElement('span');
-	this.element.appendChild( this.user_name);
-	this.user_name.style.cssFloat = 'right';
-	this.user_name.title = 'User name'
+	this.elUserName = document.createElement('span');
+	this.element.appendChild( this.elUserName);
+	this.elUserName.style.cssFloat = 'right';
+	this.elUserName.title = 'User name'
 
 	this.element.appendChild( document.createElement('br'));
 
-	this.state = document.createElement('span');
-	this.element.appendChild( this.state);
-	this.state.title = 'Job state';
+	this.elState = document.createElement('span');
+	this.element.appendChild( this.elState);
+	this.elState.title = 'Job state';
 
-	this.time = document.createElement('span');
-	this.element.appendChild( this.time);
-	this.time.style.cssFloat = 'right';
-	this.time.style.marginLeft = '4px';
-	this.time.title = 'Running time';
+	this.elTime = document.createElement('span');
+	this.element.appendChild( this.elTime);
+	this.elTime.style.cssFloat = 'right';
+	this.elTime.style.marginLeft = '4px';
+	this.elTime.title = 'Running time';
 
-	this.priority = document.createElement('span');
-	this.element.appendChild( this.priority);
-	this.priority.style.cssFloat = 'right';
-	this.priority.style.marginLeft = '4px';
-	this.priority.title = 'Priority';
+	this.elPriority = document.createElement('span');
+	this.element.appendChild( this.elPriority);
+	this.elPriority.style.cssFloat = 'right';
+	this.elPriority.style.marginLeft = '4px';
+	this.elPriority.title = 'Priority';
 
-	this.depend_mask = document.createElement('span');
-	this.element.appendChild( this.depend_mask);
-	this.depend_mask.style.cssFloat = 'right';
-	this.depend_mask.style.marginLeft = '4px';
-	this.depend_mask.title = 'Depend mask';
+	this.elDependMask = document.createElement('span');
+	this.element.appendChild( this.elDependMask);
+	this.elDependMask.style.cssFloat = 'right';
+	this.elDependMask.style.marginLeft = '4px';
+	this.elDependMask.title = 'Depend mask';
 
-	this.depend_mask_global = document.createElement('span');
-	this.element.appendChild( this.depend_mask_global);
-	this.depend_mask_global.style.cssFloat = 'right';
-	this.depend_mask_global.style.marginLeft = '4px';
-	this.depend_mask_global.title = 'Global depend mask';
+	this.elDependMaskGlobal = document.createElement('span');
+	this.element.appendChild( this.elDependMaskGlobal);
+	this.elDependMaskGlobal.style.cssFloat = 'right';
+	this.elDependMaskGlobal.style.marginLeft = '4px';
+	this.elDependMaskGlobal.title = 'Global depend mask';
 
-	this.hosts_mask = document.createElement('span');
-	this.element.appendChild( this.hosts_mask);
-	this.hosts_mask.style.cssFloat = 'right';
-	this.hosts_mask.style.marginLeft = '4px';
-	this.hosts_mask.title = 'Hosts mask';
+	this.elHostsMask = document.createElement('span');
+	this.element.appendChild( this.elHostsMask);
+	this.elHostsMask.style.cssFloat = 'right';
+	this.elHostsMask.style.marginLeft = '4px';
+	this.elHostsMask.title = 'Hosts mask';
 
-	this.hosts_mask_exclude = document.createElement('span');
-	this.element.appendChild( this.hosts_mask_exclude);
-	this.hosts_mask_exclude.style.cssFloat = 'right';
-	this.hosts_mask_exclude.style.marginLeft = '4px';
-	this.hosts_mask_exclude.title = 'Hosts mask exclude';
+	this.elHostsMaskExclude = document.createElement('span');
+	this.element.appendChild( this.elHostsMaskExclude);
+	this.elHostsMaskExclude.style.cssFloat = 'right';
+	this.elHostsMaskExclude.style.marginLeft = '4px';
+	this.elHostsMaskExclude.title = 'Hosts mask exclude';
 
 	this.blocks = [];
 	for( var b = 0; b < this.params.blocks.length; b++)
 		this.blocks.push( new JobBlock( this.element, this.params.blocks[b]));
 
-	this.annotation = document.createElement('div');
-	this.element.appendChild( this.annotation);
-	this.annotation.title = 'Annotation';
-	this.annotation.style.textAlign = 'center';
+	this.elAnnotation = document.createElement('div');
+	this.element.appendChild( this.elAnnotation);
+	this.elAnnotation.title = 'Annotation';
+	this.elAnnotation.style.textAlign = 'center';
 }
 
 JobNode.prototype.update = function()
 {
-	cm_GetState( this.params.state, this.element, this.state);
-//	this.state.innerHTML = state.string;
-	this.name.innerHTML = this.params.name;
-	this.priority.innerHTML = ' p' + this.params.priority;
-	this.user_name.innerHTML = this.params.user_name;
+	cm_GetState( this.params.state, this.element, this.elState);
+//	this.elState.innerHTML = state.string;
+	this.elName.innerHTML = this.params.name;
+	this.elPriority.innerHTML = 'P' + this.params.priority;
+	this.elUserName.innerHTML = this.params.user_name;
 
 	if( this.params.depend_mask )
-		this.depend_mask.innerHTML = ' d(' + this.params.depend_mask + ') ';
+		this.elDependMask.innerHTML = 'D(' + this.params.depend_mask + ') ';
 	else
-		this.depend_mask.innerHTML = '';
+		this.elDependMask.innerHTML = '';
 
 	if( this.params.depend_mask_global )
-		this.depend_mask_global.innerHTML = ' g(' + this.params.depend_mask_global + ') ';
+		this.elDependMaskGlobal.innerHTML = 'G(' + this.params.depend_mask_global + ') ';
 	else
-		this.depend_mask_global.innerHTML = '';
+		this.elDependMaskGlobal.innerHTML = '';
 
 	if( this.params.hosts_mask )
-		this.hosts_mask.innerHTML = ' h(' + this.params.hosts_mask + ') ';
+		this.elHostsMask.innerHTML = 'H(' + this.params.hosts_mask + ') ';
 	else
-		this.hosts_mask.innerHTML = '';
+		this.elHostsMask.innerHTML = '';
 
 	if( this.params.hosts_mask_exclude )
-		this.hosts_mask_exclude.innerHTML = ' e(' + this.params.hosts_mask_exclude + ') ';
+		this.elHostsMaskExclude.innerHTML = 'E(' + this.params.hosts_mask_exclude + ') ';
 	else
-		this.hosts_mask_exclude.innerHTML = '';
+		this.elHostsMaskExclude.innerHTML = '';
 
 	if( this.params.annotation )
-		this.annotation.innerHTML = this.params.annotation;
+		this.elAnnotation.innerHTML = this.params.annotation;
 	else
-		this.annotation.innerHTML = '';
+		this.elAnnotation.innerHTML = '';
 
 	for( var b = 0; b < this.params.blocks.length; b++)
 	{
@@ -113,14 +113,14 @@ JobNode.prototype.refresh = function()
 	var time = this.params.time_started;
 	if( time )
 	{
-		if( this.state.DON == true )
+		if( this.elState.DON == true )
 			time = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
 		else
 			time = cm_TimeStringInterval( time);
-		this.time.innerHTML = time;
+		this.elTime.innerHTML = time;
 	}
 	else
-		this.time.innerHTML = '';
+		this.elTime.innerHTML = '';
 }
 
 JobNode.prototype.onDoubleClick = function()
@@ -130,13 +130,14 @@ JobNode.prototype.onDoubleClick = function()
 
 function JobBlock( i_elParent, i_block)
 {
-	this.params = i_block;	
-	this.element = document.createElement('div');	
+	this.params = i_block;
+
+	this.element = document.createElement('div');
 	i_elParent.appendChild( this.element);
 	this.element.classList.add('jobblock');
 
-	this.tasks = document.createElement('span');
-	this.element.appendChild( this.tasks);
+	this.elTasks = document.createElement('span');
+	this.element.appendChild( this.elTasks);
 	var tasks = 't' + this.params.tasks_num;
 	var tasks_title = 'Block tasks:'
 	if( this.params.numeric )
@@ -167,20 +168,20 @@ function JobBlock( i_elParent, i_block)
 		tasks_title += '\nNon-sequential solving.';
 	}
 	tasks += ': ';
-	this.tasks.innerHTML = tasks;
-	this.tasks.title = tasks_title;
+	this.elTasks.innerHTML = tasks;
+	this.elTasks.title = tasks_title;
 
-	this.name = document.createElement('span');
-	this.element.appendChild( this.name);
-	this.name.innerHTML = this.params.name;
-	this.name.title = 'Block name';
+	this.elName = document.createElement('span');
+	this.element.appendChild( this.elName);
+	this.elName.innerHTML = this.params.name;
+	this.elName.title = 'Block name';
 
-	this.depends = document.createElement('span');
-	this.element.appendChild( this.depends);
+	this.elDepends = document.createElement('span');
+	this.element.appendChild( this.elDepends);
 
-	this.properties = document.createElement('span');
-	this.element.appendChild( this.properties);
-	this.properties.style.cssFloat = 'right';
+	this.elProperties = document.createElement('span');
+	this.element.appendChild( this.elProperties);
+	this.elProperties.style.cssFloat = 'right';
 }
 
 JobBlock.prototype.update = function()
@@ -205,11 +206,11 @@ JobBlock.prototype.update = function()
 		if( deps_title.length ) deps_title += '\n';
 		deps_title += 'Subtasks depend.'
 	}
-	this.depends.innerHTML = deps;
-	this.depends.title = deps_title;
+	this.elDepends.innerHTML = deps;
+	this.elDepends.title = deps_title;
 
 	var props = '';
 	props += '[' + this.params.capacity + ']';
-	this.properties.innerHTML = props;
+	this.elProperties.innerHTML = props;
 }
 

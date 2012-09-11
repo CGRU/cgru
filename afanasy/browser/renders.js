@@ -270,11 +270,7 @@ function RenderTask( i_task, i_element)
 	this.elIcon = document.createElement('img');
 	this.element.appendChild( this.elIcon);
 	this.elIcon.src = 'icons/software/'+i_task.service+'.png';
-//	this.elIcon.width = '32px';
-//	this.elIcon.height = '32px';
-	this.elIcon.style.width = '16px';
-	this.elIcon.style.height = '16px';
-	this.elIcon.style.position = 'absolute';
+	this.elIcon.classList.add('icon');
 
 	this.elCapacity = document.createElement('span');
 	this.element.appendChild( this.elCapacity);
