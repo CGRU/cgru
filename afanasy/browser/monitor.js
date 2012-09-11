@@ -223,14 +223,14 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 	this.elList.appendChild( i_item.element);
 
 	i_item.params = i_obj;
-	i_item.init();
-	i_item.update();
 	i_item.monitor = this;
 	i_item.element.monitor = this;
 	i_item.element.item = i_item;
 	i_item.element.onmousedown = this.onMouseDown;
 	i_item.element.onmouseover = this.onMouseOver;
 	i_item.element.ondblclick = this.onDoubleClick;
+	i_item.init();
+	i_item.update();
 }
 
 Monitor.prototype.info = function( i_str)

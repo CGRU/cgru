@@ -80,7 +80,7 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	if( m_max_running_tasks != -1 )
 		o_str << ",\"max_running_tasks\":" << m_max_running_tasks;
 	if( m_jobs_life_time > 0 )
-		o_str << ",\"max_jobs_life_time\":" << m_jobs_life_time;
+		o_str << ",\"jobs_life_time\":" << m_jobs_life_time;
 
 	if( m_host_name.size())
 		o_str << ",\"host_name\":\"" << m_host_name << "\"";

@@ -121,6 +121,52 @@ function cm_TimeStringInterval( time1, time2)
 	return time;
 }
 
+function cm_TimeStringFromSeconds( i_seconds)
+{
+	var str = '';
+	var seconds = i_seconds;
+	var days = 0; var hours = 0;
+	var minutes = Math.floor( seconds / 60 );
+	if( minutes > 0 )
+	{
+		seconds -= minutes * 60;
+		hours = Math.floor( minutes / 60 );
+		if( hours > 0 )
+		{
+			minutes -= hours * 60;
+			days = Math.floor( hours / 24 );
+			if( days > 0 )
+				hours -= days * 24;
+		}
+	}
+
+	if( days )
+		str += days + 'd ';
+
+	if( hours )
+	{
+		str += hours;
+		if( minutes || seconds )
+		{
+			str += ':'; if( minutes < 10 ) str += '0'; str += minutes;
+			if( seconds ) { str += '.'; if( seconds < 10 ) str += '0'; str += seconds;}
+		}
+		else str += 'h';
+	}
+	else if( minutes )
+	{
+		str += minutes;
+		if( seconds ) { str += '.'; if( seconds < 10 ) str += '0'; str += seconds;}
+		str += 'm';
+	}
+	else if( seconds )
+	{
+		str += seconds + 's ';
+	}
+
+	return str;
+}
+
 cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY'];
 function cm_GetState( i_state, i_elParent, i_elChild)
 {

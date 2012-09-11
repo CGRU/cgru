@@ -2,6 +2,8 @@ function RenderNode() {}
 
 RenderNode.prototype.init = function()
 {
+	this.element.classList.add('render');
+
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
@@ -267,15 +269,16 @@ function RenderTask( i_task, i_element)
 
 	this.elIcon = document.createElement('img');
 	this.element.appendChild( this.elIcon);
-	this.elIcon.src = 'icons/software/nuke.png';
+	this.elIcon.src = 'icons/software/'+i_task.service+'.png';
 //	this.elIcon.width = '32px';
 //	this.elIcon.height = '32px';
 	this.elIcon.style.width = '16px';
 	this.elIcon.style.height = '16px';
+	this.elIcon.style.position = 'absolute';
 
 	this.elCapacity = document.createElement('span');
 	this.element.appendChild( this.elCapacity);
-	this.elCapacity.style.marginLeft = '4px';
+	this.elCapacity.style.marginLeft = '20px';
 	this.elCapacity.innerHTML = i_task.capacity;
 	this.elCapacity.title = 'Capacity';
 

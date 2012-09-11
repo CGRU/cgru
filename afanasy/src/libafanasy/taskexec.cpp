@@ -106,11 +106,12 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type)
 		o_str << "\"task_exec\":";
 
 	o_str << "{\"name\":\""       << m_name       << "\"";
+	o_str << ",\"service\":\""    << m_service    << "\"";
 	o_str << ",\"user_name\":\""  << m_user_name  << "\"";
 	o_str << ",\"block_name\":\"" << m_block_name << "\"";
 	o_str << ",\"job_name\":\""   << m_job_name   << "\"";
-	o_str << ",\"time_start\":" << m_time_start;
-	o_str << ",\"capacity\":"   << m_capacity;
+	o_str << ",\"time_start\":"   << m_time_start;
+	o_str << ",\"capacity\":"     << m_capacity;
 
 	if( m_capacity_coeff > 0 )
 		o_str << ",\"capacity_coeff\":\"" << m_capacity_coeff;
