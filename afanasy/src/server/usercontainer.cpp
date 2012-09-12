@@ -50,7 +50,7 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
    }
 
    UserAf *user = new UserAf( username, hostname);
-   if( add(user) == 0)
+   if( addUser(user) == 0)
    {
       AFERROR("UserContainer::addUser: Can't add user to container.\n");
       delete user;
@@ -59,7 +59,6 @@ UserAf* UserContainer::addUser( const std::string & username, const std::string 
 
    if( monitoring) monitoring->addEvent( af::Msg::TMonitorUsersAdd, user->getId());
 
-   m_userslist.add( user);
    AFCommon::QueueLog("User registered: " + user->generateInfoString( false));
    return user;
 }
@@ -75,10 +74,16 @@ UserAf * UserContainer::getUser( const std::string & i_name )
     return NULL;
 }
 
-void UserContainer::addUser( UserAf * user)
+int UserContainer::addUser( UserAf * user)
 {
-   add(user);
-   m_userslist.add( user);
+	// Add node to container:
+	int newId = add(user);
+
+	// On success add user to solving list:
+	if( newId > 0 )
+		m_userslist.add( user);
+
+	return newId;
 }
 
 void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, MonitorContainer * monitoring)
@@ -132,7 +137,7 @@ void UserContainer::setPermanent( const af::MCGeneral & usr, bool permanent, Mon
    //    Create a new permanent user and put him to database
    //
    UserAf *user = new UserAf( username, hostname);
-   if( add(user) == 0)
+   if( addUser( user) == 0)
    {
       delete user;
       AFERRAR("UserContainer::setPermanent: Can't add user \"%s\" node to container.", username.c_str());

@@ -20,8 +20,8 @@ public:
     /// Add user, called when job registering, if user with this name exists it's hostname set to \c hostname only.
     UserAf* addUser( const std::string & username, const std::string & hostname, MonitorContainer * monitoring);
 
-    /// Add user, called on start with user created from batadase.
-    void    addUser( UserAf * user);
+    /// Add user, called on start with user created from batadase, or on "afcmd uadd".
+    int    addUser( UserAf * user);
 
     /// Set user permanent, such users do not deleted when have no jobs, they stored in database.
     void setPermanent( const af::MCGeneral & usr, bool permanent, MonitorContainer * monitoring);

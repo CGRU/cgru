@@ -216,6 +216,7 @@ bool AfNodeSrv::solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMeth
     std::list<AfNodeSrv*> solvelist;
     for( std::list<AfNodeSrv*>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
 	{
+//printf("AfNodeSrv::solvelist: name = %s\n", (*it)->m_node->m_name.c_str());
         if((*it)->canRunOn( i_render))
        {
 		   solvelist.push_back(*it);
