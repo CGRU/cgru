@@ -69,7 +69,12 @@ JobNode.prototype.init = function()
 JobNode.prototype.update = function()
 {
 	cm_GetState( this.params.state, this.element, this.elState);
-//	this.elState.innerHTML = state.string;
+
+	var displayFull = false;
+	if( this.elState.ERR || this.elState.RUN || this.elState.SKP ||
+	  ((this.elState.DON == false) && (this.params.time_started > 0 )))
+		displayFull = true;
+
 	this.elName.innerHTML = this.params.name;
 	this.elPriority.innerHTML = 'P' + this.params.priority;
 	this.elUserName.innerHTML = this.params.user_name;
@@ -102,7 +107,7 @@ JobNode.prototype.update = function()
 	for( var b = 0; b < this.params.blocks.length; b++)
 	{
 		this.blocks[b].params = this.params.blocks[b];
-		this.blocks[b].update();
+		this.blocks[b].update( displayFull);
 	}
 
 	this.refresh();
@@ -132,8 +137,17 @@ function JobBlock( i_elParent, i_block)
 {
 	this.params = i_block;
 
+	this.elRoot = document.createElement('div');
+	i_elParent.appendChild( this.elRoot);
+
+	this.elIcon = document.createElement('img');
+	this.elRoot.appendChild( this.elIcon);
+	this.elIcon.src = 'icons/software/'+this.params.service+'.png';
+	this.elIcon.style.position = 'absolute';
+//	this.elIcon.classList.add('icon');
+
 	this.element = document.createElement('div');
-	i_elParent.appendChild( this.element);
+	this.elRoot.appendChild( this.element);
 	this.element.classList.add('jobblock');
 
 	this.elTasks = document.createElement('span');
@@ -182,10 +196,50 @@ function JobBlock( i_elParent, i_block)
 	this.elProperties = document.createElement('span');
 	this.element.appendChild( this.elProperties);
 	this.elProperties.style.cssFloat = 'right';
+
+//	this.element.appendChild( document.createElement('br'));
+//	this.displayFull = false;
 }
 
-JobBlock.prototype.update = function()
+
+JobBlock.prototype.constructFull = function()
 {
+	this.elIcon.style.width = '48px';
+	this.elIcon.style.height = '48px';
+	this.element.style.marginLeft = '54px';
+
+	this.elFull = document.createElement('div');
+	this.element.appendChild( this.elFull);
+
+	this.elFull.appendChild( document.createElement('br'));
+
+	this.elPercent = document.createElement('span');
+	this.elFull.appendChild( this.elPercent);
+	this.elPercent.innerHTML = '%';
+}
+
+JobBlock.prototype.constructBrief = function()
+{
+	this.elIcon.style.width = '20px';
+	this.elIcon.style.height = '20px';
+	this.element.style.marginLeft = '24px';
+
+	if( this.elFull)
+		this.element.removeChild( this.elFull);
+	this.elFull = null;
+}
+
+JobBlock.prototype.update = function( i_displayFull)
+{
+	if( this.displayFull != i_displayFull )
+	{
+		if( i_displayFull )
+			this.constructFull();
+		else
+			this.constructBrief();
+	}
+	this.displayFull = i_displayFull;
+
 	var deps = '';
 	var deps_title = ''
 	if( this.params.depend_mask )

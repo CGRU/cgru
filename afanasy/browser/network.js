@@ -111,7 +111,6 @@ function nw_GetSoftwareIcons()
 
 function nw_ReqestRendersResources()
 {
-	setTimeout("nw_ReqestRendersResources()", 4900);
-	nw_GetNodes( 'renders');
+	nw_GetNodes('renders');
 }
 

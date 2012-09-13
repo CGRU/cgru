@@ -70,7 +70,7 @@ function Monitor( i_element, i_type, i_id)
 
 	g_cur_monitor = this;
 
-	setTimeout("nw_ReqestRendersResources()", 4900);
+	this.cycle = 0;
 }
 
 Monitor.prototype.destroy = function()
@@ -103,9 +103,15 @@ Monitor.prototype.refresh = function()
 				if( this.items[i].params.running_tasks_num > this.max_tasks )
 					this.max_tasks = this.items[i].params.running_tasks_num;
 	}
+	else if(( this.type == 'renders') && ( this.cycle % 5 == 0 ))
+	{
+		nw_ReqestRendersResources();
+	}
 
 	for( i = 0; i < this.items.length; i++)
 		this.items[i].refresh();
+
+	this.cycle++;
 }
 
 Monitor.prototype.processMsg = function( obj)
