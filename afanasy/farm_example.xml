@@ -30,21 +30,25 @@ Mask ".*" will match any render name. So here defined some default settings for 
       <service name="wakeonlan" />
       <service name="postcmd" />
 -->
-      <service name="generic" />
-      <service name="movgen" />
-      <service name="shake" />
-      <service name="nuke" />
+      <service name="afterfx" />
+      <service name="blender" />
+      <service name="blender" />
+      <service name="c4d" />
       <service name="hbatch" />
-      <service name="prman"/>
-      <service name="mantra" />
       <service name="hbatch_prman" />
       <service name="hbatch_mantra" />
-      <service name="maya" />
-      <service name="blender" />
-      <service name="yafray" />
-      <service name="xsi" />
+      <service name="mantra" />
       <service name="max" />
-      <service name="afterfx" />
+      <service name="maya" />
+      <service name="maya_delight" />
+      <service name="maya_mental" />
+      <service name="mentalray" />
+      <service name="movgen" />
+      <service name="nuke" />
+      <service name="prman"/>
+      <service name="shake" />
+      <service name="xsi" />
+      <service name="yafray" />
 <!--
 Comment it if you agree with build in os detection (names)
       <os>linux mac windows</os>
