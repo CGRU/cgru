@@ -137,12 +137,15 @@ function JobBlock( i_elParent, i_block)
 {
 	this.params = i_block;
 
+	this.tasks_num = this.params.tasks_num;
+
 	this.elRoot = document.createElement('div');
 	i_elParent.appendChild( this.elRoot);
 
+	this.service = this.params.service;
 	this.elIcon = document.createElement('img');
 	this.elRoot.appendChild( this.elIcon);
-	this.elIcon.src = 'icons/software/'+this.params.service+'.png';
+	this.elIcon.src = 'icons/software/'+this.service+'.png';
 	this.elIcon.style.position = 'absolute';
 //	this.elIcon.classList.add('icon');
 
@@ -152,7 +155,7 @@ function JobBlock( i_elParent, i_block)
 
 	this.elTasks = document.createElement('span');
 	this.element.appendChild( this.elTasks);
-	var tasks = 't' + this.params.tasks_num;
+	var tasks = 't' + this.tasks_num;
 	var tasks_title = 'Block tasks:'
 	if( this.params.numeric )
 	{
@@ -187,7 +190,6 @@ function JobBlock( i_elParent, i_block)
 
 	this.elName = document.createElement('span');
 	this.element.appendChild( this.elName);
-	this.elName.innerHTML = this.params.name;
 	this.elName.title = 'Block name';
 
 	this.elDepends = document.createElement('span');
@@ -213,9 +215,11 @@ JobBlock.prototype.constructFull = function()
 
 	this.elFull.appendChild( document.createElement('br'));
 
-	this.elPercent = document.createElement('span');
-	this.elFull.appendChild( this.elPercent);
-	this.elPercent.innerHTML = '%';
+	this.elPercentage = document.createElement('span');
+	this.elFull.appendChild( this.elPercentage);
+
+	this.elRunTime = document.createElement('span');
+	this.elFull.appendChild( this.elRunTime);
 }
 
 JobBlock.prototype.constructBrief = function()
@@ -240,31 +244,68 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 	this.displayFull = i_displayFull;
 
-	var deps = '';
-	var deps_title = ''
-	if( this.params.depend_mask )
+	if( this.params.name )
 	{
-		deps += ' [' + this.params.depend_mask + ']';
-		if( deps_title.length ) deps_title += '\n';
-		deps_title += 'Depend mask = \"' + this.params.depend_mask + '\".'
-	}
-	if( this.params.tasks_depend_mask )
-	{
-		deps += ' T[' + this.params.tasks_depend_mask + ']';
-		if( deps_title.length ) deps_title += '\n';
-		deps_title += 'Tasks depend mask = \"' + this.params.tasks_depend_mask + '\".'
-	}
-	if( this.params.depend_sub_task )
-	{
-		deps += ' [SUB]';
-		if( deps_title.length ) deps_title += '\n';
-		deps_title += 'Subtasks depend.'
-	}
-	this.elDepends.innerHTML = deps;
-	this.elDepends.title = deps_title;
+		this.elName.innerHTML = this.params.name;
 
-	var props = '';
-	props += '[' + this.params.capacity + ']';
-	this.elProperties.innerHTML = props;
+		if( this.service != this.params.service )
+		{
+			this.service = this.params.service;
+			this.elIcon.src = 'icons/software/'+this.service+'.png';
+		}
+		this.elIcon.title = this.service;
+//info(this.service);
+
+		var deps = '';
+		var deps_title = ''
+		if( this.params.depend_mask )
+		{
+			deps += ' [' + this.params.depend_mask + ']';
+			if( deps_title.length ) deps_title += '\n';
+			deps_title += 'Depend mask = \"' + this.params.depend_mask + '\".'
+		}
+		if( this.params.tasks_depend_mask )
+		{
+			deps += ' T[' + this.params.tasks_depend_mask + ']';
+			if( deps_title.length ) deps_title += '\n';
+			deps_title += 'Tasks depend mask = \"' + this.params.tasks_depend_mask + '\".'
+		}
+		if( this.params.depend_sub_task )
+		{
+			deps += ' [SUB]';
+			if( deps_title.length ) deps_title += '\n';
+			deps_title += 'Subtasks depend.'
+		}
+		this.elDepends.innerHTML = deps;
+		this.elDepends.title = deps_title;
+
+		var props = '';
+		props += '[' + this.params.capacity + ']';
+		this.elProperties.innerHTML = props;
+	}
+
+	if( this.displayFull )
+	{
+		var percentage = 0;
+		if( this.params.p_percentage ) percentage = this.params.p_percentage;
+		this.elPercentage.innerHTML = percentage + '%';
+
+		var tasks_done = 0;
+		if( this.params.p_tasksdone ) tasks_done = this.params.p_tasksdone;
+
+		if( this.params.p_taskssumruntime && tasks_done )
+		{
+			var rt = 'RT: S' + cm_TimeStringFromSeconds( this.params.p_taskssumruntime);
+			var done
+			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_taskssumruntime / tasks_done));
+			rt += '/A' + avg;
+			this.elRunTime.innerHTML = rt;
+		}
+		else
+		{
+			this.elRunTime.innerHTML = '';
+			this.elRunTime.title = '';
+		}
+	}
 }
 

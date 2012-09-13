@@ -552,6 +552,7 @@ uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer *
 	  m_data->setService( mcgeneral.getString());
       appendJobLog( std::string("Service set to \"") + mcgeneral.getString() + "\" by " + userhost);
       if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
+      jobchanged = af::Msg::TMonitorJobsChanged;
 	  AFCommon::QueueDBUpdateItem( (afsql::DBBlockData*)m_data, afsql::DBAttr::_service);
       break;
    }

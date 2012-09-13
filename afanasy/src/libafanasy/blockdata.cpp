@@ -298,8 +298,8 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 		}
 
 	case Msg::TBlocksProperties:
-        o_str << "\"tasks_name\":\"" << m_tasks_name             << "\"";
-        o_str << ",\"command\":\""   << af::strEscape(m_command) << "\"";
+        o_str << "\"command\":\""     << af::strEscape(m_command) << "\"";
+        o_str << ",\"tasks_name\":\"" << m_tasks_name             << "\"";
 		if( m_parser.size())
             o_str << ",\"parser\":\"" << m_parser << "\"";
 		if( m_working_directory.size())
@@ -319,8 +319,11 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 
 	case Msg::TJobsList:
 
+        o_str << "\"name\":\""           << m_name << "\"";
+        o_str << ",\"service\":\""       << m_service << "\"";
+        o_str << ",\"capacity\":"        << m_capacity;
 	//	o_str << ",\"flags",             << m_flags;
-		o_str << "\"numeric\":"          << isNumeric() ? "true":"false";
+		o_str << ",\"numeric\":"         << isNumeric() ? "true":"false";
 		o_str << ",\"tasks_num\":"       << m_tasks_num;
 		o_str << ",\"frame_first\":"     << m_frame_first;
         o_str << ",\"frame_last\":"      << m_frame_last;
@@ -346,7 +349,6 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 		}
         //o_str << ",\"file_size_min\":"         << m_file_size_min;
         //o_str << ",\"file_size_max\":"         << m_file_size_max;
-        o_str << ",\"capacity\":"              << m_capacity;
 		if( m_max_running_tasks != -1 )
             o_str << ",\"max_running_tasks\":"          << m_max_running_tasks;
 		if( m_max_running_tasks_per_host != -1 )
@@ -368,8 +370,6 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 		if( m_tasks_max_run_time > 0 )
             o_str << ",\"tasks_max_run_time\":"    << int(m_tasks_max_run_time);
 
-        o_str << ",\"name\":\""               << m_name << "\"";
-        o_str << ",\"service\":\""            << m_service << "\"";
 		if( hasDependMask())
             o_str << ",\"depend_mask\":\""        << m_depend_mask.getPattern() << "\"";
 		if( hasTasksDependMask())
