@@ -217,9 +217,32 @@ JobBlock.prototype.constructFull = function()
 
 	this.elPercentage = document.createElement('span');
 	this.elFull.appendChild( this.elPercentage);
+	this.elPercentage.title = 'Block Done Percentage';
+	this.elPercentage.style.marginLeft = '4px';
+
+	this.elTasksDon = document.createElement('span');
+	this.elFull.appendChild( this.elTasksDon);
+	this.elTasksDon.title = 'Done Tasks Counter';
+	this.elTasksDon.style.marginLeft = '4px';
+
+	this.elTasksRdy = document.createElement('span');
+	this.elFull.appendChild( this.elTasksRdy);
+	this.elTasksRdy.title = 'Ready Tasks Counter';
+	this.elTasksRdy.style.marginLeft = '4px';
+
+	this.elTasksRun = document.createElement('span');
+	this.elFull.appendChild( this.elTasksRun);
+	this.elTasksRun.title = 'Running Tasks Counter';
+	this.elTasksRun.style.marginLeft = '4px';
+
+	this.elTasksErr = document.createElement('span');
+	this.elFull.appendChild( this.elTasksErr);
+	this.elTasksErr.title = 'Error Tasks Counter';
+	this.elTasksErr.style.marginLeft = '4px';
 
 	this.elRunTime = document.createElement('span');
 	this.elFull.appendChild( this.elRunTime);
+	this.elRunTime.style.cssFloat = 'right';
 }
 
 JobBlock.prototype.constructBrief = function()
@@ -292,14 +315,26 @@ JobBlock.prototype.update = function( i_displayFull)
 
 		var tasks_done = 0;
 		if( this.params.p_tasksdone ) tasks_done = this.params.p_tasksdone;
+		this.elTasksDon.innerHTML = 'don:'+tasks_done;
+
+		var tasks_rdy = 0;
+		if( this.params.p_tasksready ) tasks_rdy = this.params.p_tasksready;
+		this.elTasksRdy.innerHTML = 'rdy:'+tasks_rdy;
+
+		var tasks_run = 0;
+		if( this.params.running_tasks_counter ) tasks_run = this.params.running_tasks_counter;
+		this.elTasksRun.innerHTML = 'run:'+tasks_run;
+
+		var tasks_err = 0;
+		if( this.params.p_taskserror ) tasks_err = this.params.p_taskserror;
+		this.elTasksErr.innerHTML = 'err:'+tasks_err;
 
 		if( this.params.p_taskssumruntime && tasks_done )
 		{
-			var rt = 'RT: S' + cm_TimeStringFromSeconds( this.params.p_taskssumruntime);
-			var done
+			var sum = cm_TimeStringFromSeconds( this.params.p_taskssumruntime);
 			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_taskssumruntime / tasks_done));
-			rt += '/A' + avg;
-			this.elRunTime.innerHTML = rt;
+			this.elRunTime.innerHTML = sum +'/'+avg;
+			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
 		}
 		else
 		{
