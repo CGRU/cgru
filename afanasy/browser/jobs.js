@@ -10,54 +10,28 @@ JobNode.prototype.init = function()
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
-	this.elName.title = 'Job name';
+	this.elName.title = 'Job Name';
 
-	this.elUserName = document.createElement('span');
-	this.element.appendChild( this.elUserName);
-	this.elUserName.style.cssFloat = 'right';
-	this.elUserName.title = 'User name'
+	this.elUserName = cm_ElCreateFloatText( this.element,	'right', 'User Name');
 
 	this.element.appendChild( document.createElement('br'));
 
 	this.elState = document.createElement('span');
 	this.element.appendChild( this.elState);
-	this.elState.title = 'Job state';
+	this.elState.title = 'Job State';
 
-	this.elTime = document.createElement('span');
-	this.element.appendChild( this.elTime);
-	this.elTime.style.cssFloat = 'right';
-	this.elTime.style.marginLeft = '4px';
-	this.elTime.title = 'Running time';
-
-	this.elPriority = document.createElement('span');
-	this.element.appendChild( this.elPriority);
-	this.elPriority.style.cssFloat = 'right';
-	this.elPriority.style.marginLeft = '4px';
-	this.elPriority.title = 'Priority';
-
-	this.elDependMask = document.createElement('span');
-	this.element.appendChild( this.elDependMask);
-	this.elDependMask.style.cssFloat = 'right';
-	this.elDependMask.style.marginLeft = '4px';
-	this.elDependMask.title = 'Depend mask';
-
-	this.elDependMaskGlobal = document.createElement('span');
-	this.element.appendChild( this.elDependMaskGlobal);
-	this.elDependMaskGlobal.style.cssFloat = 'right';
-	this.elDependMaskGlobal.style.marginLeft = '4px';
-	this.elDependMaskGlobal.title = 'Global depend mask';
-
-	this.elHostsMask = document.createElement('span');
-	this.element.appendChild( this.elHostsMask);
-	this.elHostsMask.style.cssFloat = 'right';
-	this.elHostsMask.style.marginLeft = '4px';
-	this.elHostsMask.title = 'Hosts mask';
-
-	this.elHostsMaskExclude = document.createElement('span');
-	this.element.appendChild( this.elHostsMaskExclude);
-	this.elHostsMaskExclude.style.cssFloat = 'right';
-	this.elHostsMaskExclude.style.marginLeft = '4px';
-	this.elHostsMaskExclude.title = 'Hosts mask exclude';
+	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
+	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
+	this.elPriority = cm_ElCreateFloatText( this.element, 'right', 'Priority');
+	this.elDependMask = cm_ElCreateFloatText( this.element, 'right', 'Depend Mask');
+	this.elDependMaskGlobal = cm_ElCreateFloatText( this.element, 'right', 'Global Depend Mask');
+	this.elHostsMask = cm_ElCreateFloatText( this.element, 'right', 'Hosts Mask');
+	this.elHostsMaskExclude = cm_ElCreateFloatText( this.element, 'right', 'Exclude Hosts Mask');
+	this.elMaxRunTasks = cm_ElCreateFloatText( this.element, 'right', 'Maximum Running Tasks');
+	this.elMaxRunTasksPH = cm_ElCreateFloatText( this.element, 'right', 'Maximum Running Tasks Per Host');
+	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Properties');
+	this.elNeedOS = cm_ElCreateFloatText( this.element, 'right', 'OS Needed');
+	
 
 	this.blocks = [];
 	for( var b = 0; b < this.params.blocks.length; b++)
@@ -82,30 +56,45 @@ JobNode.prototype.update = function()
 	this.elPriority.innerHTML = 'P' + this.params.priority;
 	this.elUserName.innerHTML = this.params.user_name;
 
+	if( this.params.time_life )
+		this.elLifeTime.innerHTML = 'L' + cm_TimeStringFromSeconds( this.params.time_life);
+	else this.elLifeTime.innerHTML = '';
+
 	if( this.params.depend_mask )
-		this.elDependMask.innerHTML = 'D(' + this.params.depend_mask + ') ';
-	else
-		this.elDependMask.innerHTML = '';
+		this.elDependMask.innerHTML = 'D(' + this.params.depend_mask + ')';
+	else this.elDependMask.innerHTML = '';
 
 	if( this.params.depend_mask_global )
-		this.elDependMaskGlobal.innerHTML = 'G(' + this.params.depend_mask_global + ') ';
-	else
-		this.elDependMaskGlobal.innerHTML = '';
+		this.elDependMaskGlobal.innerHTML = 'G(' + this.params.depend_mask_global + ')';
+	else this.elDependMaskGlobal.innerHTML = '';
 
 	if( this.params.hosts_mask )
-		this.elHostsMask.innerHTML = 'H(' + this.params.hosts_mask + ') ';
-	else
-		this.elHostsMask.innerHTML = '';
+		this.elHostsMask.innerHTML = 'H(' + this.params.hosts_mask + ')';
+	else this.elHostsMask.innerHTML = '';
 
 	if( this.params.hosts_mask_exclude )
-		this.elHostsMaskExclude.innerHTML = 'E(' + this.params.hosts_mask_exclude + ') ';
-	else
-		this.elHostsMaskExclude.innerHTML = '';
+		this.elHostsMaskExclude.innerHTML = 'E(' + this.params.hosts_mask_exclude + ')';
+	else this.elHostsMaskExclude.innerHTML = '';
+
+	if( this.params.max_running_tasks )
+		this.elMaxRunTasks.innerHTML = 'Max' + this.params.max_running_tasks;
+	else this.elMaxRunTasks.innerHTML = '';
+
+	if( this.params.max_running_tasks_per_host )
+		this.elMaxRunTasksPH.innerHTML = 'MPH' + this.params.max_running_tasks_per_host;
+	else this.elMaxRunTasksPH.innerHTML = '';
+
+	if( this.params.need_properties )
+		this.elNeedProperties.innerHTML = this.params.need_properties;
+	else this.elNeedProperties.innerHTML = '';
+
+	if( this.params.need_os)
+		this.elNeedOS.innerHTML = this.params.need_os;
+	else this.elNeedOS.innerHTML = '';
 
 	if( this.params.annotation )
 		this.elAnnotation.innerHTML = this.params.annotation;
-	else
-		this.elAnnotation.innerHTML = '';
+	else this.elAnnotation.innerHTML = '';
 
 	for( var b = 0; b < this.params.blocks.length; b++)
 	{
@@ -118,7 +107,15 @@ JobNode.prototype.update = function()
 
 JobNode.prototype.refresh = function()
 {
-	var time = this.params.time_started;
+	var time = this.params.time_wait;
+	if( time && this.elState.WTM )
+	{
+		time = cm_TimeStringInterval( new Date().getTime()/1000, time);
+		this.elTime.innerHTML = time;
+		return;
+	}
+
+	time = this.params.time_started;
 	if( time )
 	{
 		if( this.elState.DON == true )
@@ -126,9 +123,10 @@ JobNode.prototype.refresh = function()
 		else
 			time = cm_TimeStringInterval( time);
 		this.elTime.innerHTML = time;
+		return;
 	}
-	else
-		this.elTime.innerHTML = '';
+
+	this.elTime.innerHTML = '';
 }
 
 JobNode.prototype.onDoubleClick = function()
@@ -198,18 +196,18 @@ function JobBlock( i_elParent, i_block)
 	this.elDepends = document.createElement('span');
 	this.element.appendChild( this.elDepends);
 
-	this.elCapacity = cm_CreateFloatText( this.element, 'right', 'Tasks Capacity');
-	this.elErrSolving = cm_CreateFloatText( this.element, 'right');
-	this.elForgiveTime = cm_CreateFloatText( this.element, 'right', 'Errors Forgive Time');
-	this.elMaxRunTime = cm_CreateFloatText( this.element, 'right', 'Task Maximum Run Time');
-	this.elMaxRunTasks = cm_CreateFloatText( this.element, 'right', 'Maximum Running Tasks');
-	this.elMaxRunTasksPH = cm_CreateFloatText( this.element, 'right', 'Maximum Running Tasks Per Host');
-	this.elHostsMask = cm_CreateFloatText( this.element, 'right', 'Hosts Mask');
-	this.elHostsMaskExclude = cm_CreateFloatText( this.element, 'right', 'Exclude Hosts Mask');
-	this.elNeedMem = cm_CreateFloatText( this.element, 'right', 'Required Memory');
-	this.elNeedHDD = cm_CreateFloatText( this.element, 'right', 'Required HDD Space');
-	this.elNeedPower = cm_CreateFloatText( this.element, 'right', 'Needed Power');
-	this.elNeedProperties = cm_CreateFloatText( this.element, 'right', 'Needed Properties');
+	this.elCapacity = cm_ElCreateFloatText( this.element, 'right', 'Tasks Capacity');
+	this.elErrSolving = cm_ElCreateFloatText( this.element, 'right');
+	this.elForgiveTime = cm_ElCreateFloatText( this.element, 'right', 'Errors Forgive Time');
+	this.elMaxRunTime = cm_ElCreateFloatText( this.element, 'right', 'Task Maximum Run Time');
+	this.elMaxRunTasks = cm_ElCreateFloatText( this.element, 'right', 'Maximum Running Tasks');
+	this.elMaxRunTasksPH = cm_ElCreateFloatText( this.element, 'right', 'Maximum Running Tasks Per Host');
+	this.elHostsMask = cm_ElCreateFloatText( this.element, 'right', 'Hosts Mask');
+	this.elHostsMaskExclude = cm_ElCreateFloatText( this.element, 'right', 'Exclude Hosts Mask');
+	this.elNeedMem = cm_ElCreateFloatText( this.element, 'right', 'Required Memory');
+	this.elNeedHDD = cm_ElCreateFloatText( this.element, 'right', 'Required HDD Space');
+	this.elNeedPower = cm_ElCreateFloatText( this.element, 'right', 'Needed Power');
+	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Needed Properties');
 }
 
 

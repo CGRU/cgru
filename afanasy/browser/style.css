@@ -122,7 +122,7 @@ border-radius: 4px;
 .item.NBY { background: #77F;}
 .item.DON { background: #486;}
 .item.WDP { background: #969;}
-.item.WTM { background: #86C;}
+.item.WTM { background: #599;}
 .item.RUN { background: #BB6;}
 .item.ERR { background: #A65;}
 .item.OFF { background: #777;}
@@ -223,7 +223,7 @@ font-size: 14px;
 
 /*.item.render .task {*/
 .rendertask {
-/*background: #DD3;*/
+background: #DD3;
 margin: 1px;
 padding: 1px 5px;
 /*height: 24px;*/
@@ -232,11 +232,9 @@ border-radius: 4px;
 box-shadow: 0px 0px 5px #000 inset;
 /*opacity: 0.9;*/
 }
-
+/*
 .rendertask .icon {
 position: absolute;
 width: 16px; height: 16px;
-/*border: 1px solid #666;*/
-/*box-shadow: 0px 0px 5px #000 inset;*/
 }
-
+*/

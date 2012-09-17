@@ -4,26 +4,17 @@ RenderNode.prototype.init = function()
 {
 	this.element.classList.add('render');
 
-	this.elName = document.createElement('span');
+	this.elName = cm_ElCreateText( this.element, 'Client Host Name');
 	this.elName.classList.add('name');
-	this.element.appendChild( this.elName);
-//	this.elName.style.cssFloat = 'left';
-	this.elName.title = 'Client host name';
 
-	this.elVersion = document.createElement('span');
-	this.element.appendChild( this.elVersion);
-//	this.elVersion.style.cssFloat = 'left';
-	this.elVersion.title = 'Client version';
+	this.elVersion = cm_ElCreateText( this.element, 'Client Version');
 
 	this.elPriority = document.createElement('span');
 	this.element.appendChild( this.elPriority);
 	this.elPriority.style.cssFloat = 'right';
 	this.elPriority.title = 'Priority';
 
-	this.elUserName = document.createElement('span');
-	this.element.appendChild( this.elUserName);
-	this.elUserName.style.cssFloat = 'right';
-	this.elUserName.title = 'User name and "Nimby" status'
+	this.elUserName = cm_ElCreateFloatText( this.element, 'right', 'User Name and "Nimby" Status');
 
 	this.elResources = document.createElement('div');
 	this.element.appendChild( this.elResources);
@@ -41,18 +32,9 @@ RenderNode.prototype.init = function()
 
 	this.element.appendChild( document.createElement('br'));
 
-	this.elCapacity = document.createElement('span');
-	this.element.appendChild( this.elCapacity);
-	this.elCapacity.title = 'Capacity used / total'
-
-	this.elMaxTasks = document.createElement('span');
-	this.element.appendChild( this.elMaxTasks);
-	this.elMaxTasks.title = 'Running tasks / maximum'
-
-	this.elStateTime = document.createElement('span');
-	this.element.appendChild( this.elStateTime);
-	this.elStateTime.style.cssFloat = 'right';
-	this.elStateTime.title = 'Busy / free status and time';
+	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used/Total');
+	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running/Maximum');
+	this.elStateTime = cm_ElCreateFloatText( this.element, 'right', 'Busy/Free Status and Time');
 
 	this.elAnnotation = document.createElement('div');
 	this.element.appendChild( this.elAnnotation);
@@ -113,15 +95,15 @@ RenderNode.prototype.update = function()
 	this.elName.title = this.params.host.os;
 
 	if( this.params.version != null )
-		this.elVersion.innerHTML = ' ' + this.params.version;
+		this.elVersion.innerHTML = 'v' + this.params.version;
 	else
 		this.elVersion.innerHTML = '';
 
 	this.elPriority.innerHTML = '-' + this.params.priority;
 
 	var user = this.params.user_name;
-	if( this.state.NBY )
-		user = 'NIMBY(' + user + ')N';
+	if( this.state.NbY ) user = 'nimby(' + user + ')n';
+	else if( this.state.NBY ) user = 'NIMBY(' + user + ')N';
 	this.elUserName.innerHTML = user;
 
 	if( this.params.annotation )
@@ -139,6 +121,7 @@ RenderNode.prototype.update = function()
 
 	if( this.state.OFF == true )
 	{
+		this.clearTasks();
 		this.elPower.innerHTML = 'Offline';
 		this.elCapacity.innerHTML = '';
 		this.elMaxTasks.innerHTML = '';
@@ -152,7 +135,7 @@ RenderNode.prototype.update = function()
 	if( capacity == null )
 		capacity = this.params.host.capacity;
 	capacity = this.params.capacity_used + '/' + capacity;
-	this.elCapacity.innerHTML = capacity;
+	this.elCapacity.innerHTML = '['+capacity+']';
 
 	var max_tasks = this.params.max_tasks;
 	if( max_tasks == null )
@@ -161,7 +144,6 @@ RenderNode.prototype.update = function()
 		max_tasks = '(' + this.params.tasks.length + '/' + max_tasks + ')';
 	else
 		max_tasks = '(0/' + max_tasks + ')';
-	max_tasks = ' ' + max_tasks;
 	this.elMaxTasks.innerHTML = max_tasks;
 	
 	var r = this.params.host_resources;
@@ -220,14 +202,19 @@ RenderNode.prototype.update = function()
 		this.plotterD.addValues([ r.hdd_rd_kbsec, r.hdd_wr_kbsec], r.hdd_busy / 100);
 	}
 
-	for( var t = 0; t < this.tasks.length; t++)
-		this.tasks[t].destroy();
-	this.tasks = [];
+	this.clearTasks();
 	if( this.params.tasks != null )
 	for( var t = 0; t < this.params.tasks.length; t++)
 		this.tasks.push( new RenderTask( this.params.tasks[t], this.element));
 
 	this.refresh();
+}
+
+RenderNode.prototype.clearTasks = function()
+{
+	for( var t = 0; t < this.tasks.length; t++)
+		this.tasks[t].destroy();
+	this.tasks = [];
 }
 
 RenderNode.prototype.refresh = function()
@@ -260,53 +247,44 @@ RenderNode.prototype.onDoubleClick = function()
 {
 }
 
-function RenderTask( i_task, i_element)
+function RenderTask( i_task, i_elParent)
 {
-	this.elParent = i_element;
-	this.element = document.createElement('div');
-	this.elParent.appendChild( this.element);
-	this.element.classList.add('rendertask');
+	this.elParent = i_elParent;
+
+	this.elRoot = document.createElement('div');
+	i_elParent.appendChild( this.elRoot);
 
 	this.elIcon = document.createElement('img');
-	this.element.appendChild( this.elIcon);
+	this.elRoot.appendChild( this.elIcon);
 	this.elIcon.src = 'icons/software/'+i_task.service+'.png';
-	this.elIcon.classList.add('icon');
+	this.elIcon.style.position = 'absolute';
+	this.elIcon.style.width = '18px';
+	this.elIcon.style.height = '18px';
+	this.elIcon.title = i_task.service;
+//	this.elIcon.classList.add('icon');
 
-	this.elCapacity = document.createElement('span');
-	this.element.appendChild( this.elCapacity);
-	this.elCapacity.style.marginLeft = '20px';
-	this.elCapacity.innerHTML = i_task.capacity;
-	this.elCapacity.title = 'Capacity';
+	this.element = document.createElement('div');
+	this.elRoot.appendChild( this.element);
+	this.element.style.marginLeft = '20px';
+	this.element.classList.add('rendertask');
 
-	this.elJob = document.createElement('span');
-	this.element.appendChild( this.elJob)
-	this.elJob.style.marginLeft = '8px';
+	this.elCapacity = cm_ElCreateText( this.element, 'Task Capacity');
+	this.elCapacity.innerHTML = '['+i_task.capacity+']';
+
+	this.elJob = cm_ElCreateText( this.element, 'Job Name');
 	this.elJob.innerHTML = i_task.job_name;
-	this.elJob.title = 'Job Name';
 
-	this.elBlock = document.createElement('span');
-	this.element.appendChild( this.elBlock)
+	this.elBlock = cm_ElCreateText( this.element, 'Block Name');
 	this.elBlock.innerHTML = '['+i_task.block_name+']';
-	this.elBlock.title = 'Block Name';
 
-	this.elName = document.createElement('span');
-	this.element.appendChild( this.elName)
+	this.elName = cm_ElCreateText( this.element, 'Task Name');
 	this.elName.innerHTML = '['+i_task.name+']';
-	this.elName.title = 'Task Name';
 
-	this.elTime = document.createElement('span');
-	this.element.appendChild( this.elTime)
-	this.elTime.style.cssFloat = 'right';
-	this.elTime.style.marginRight = '4px';
-	this.elTime.title = 'Running Time';
+	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.time = i_task.time_start;
 
-	this.elUser = document.createElement('span');
-	this.element.appendChild( this.elUser)
-	this.elUser.style.cssFloat = 'right';
-	this.elUser.style.marginRight = '4px';
+	this.elUser = cm_ElCreateFloatText( this.element, 'right', 'User Name');
 	this.elUser.innerHTML = i_task.user_name;
-	this.elUser.title = 'User Name';
 
 	this.refresh();
 }

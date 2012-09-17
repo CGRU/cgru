@@ -191,7 +191,7 @@ function cm_GetState( i_state, i_elParent, i_elChild)
 	}
 }
 
-function cm_CreateFloatText( i_elParent, i_side, i_title)
+function cm_ElCreateFloatText( i_elParent, i_side, i_title)
 {
 	var element = document.createElement('span');
 	i_elParent.appendChild( element);
@@ -202,5 +202,15 @@ function cm_CreateFloatText( i_elParent, i_side, i_title)
 		element.style.marginLeft = '4px';
 	else
 		element.style.marginRight = '4px';
+	return element;
+}
+
+function cm_ElCreateText( i_elParent, i_title)
+{
+	var element = document.createElement('span');
+	i_elParent.appendChild( element);
+	if( i_title )
+		element.title = i_title;
+	element.style.marginLeft = '4px';
 	return element;
 }

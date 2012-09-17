@@ -13,11 +13,8 @@ UserNode.prototype.init = function()
 	this.element.appendChild( this.elPriority);
 	this.elPriority.title = 'Priority';
 
-	this.elHostName = document.createElement('span');
+	this.elHostName = cm_ElCreateFloatText( this.element, 'right', 'Host Name');
 	this.elHostName.classList.add('name');
-	this.element.appendChild( this.elHostName);
-	this.elHostName.style.cssFloat = 'right';
-	this.elHostName.title = 'User host'
 
 	this.elCenter = document.createElement('div');
 	this.element.appendChild( this.elCenter);
@@ -27,45 +24,18 @@ UserNode.prototype.init = function()
 	this.elCenter.style.top = '1px';
 	this.elCenter.style.textAlign = 'center';
 
-	this.elMaxRunningTasks = document.createElement('span');
-	this.elCenter.appendChild( this.elMaxRunningTasks);
-	this.elMaxRunningTasks.title = 'Maximum Running Tasks';
-	this.elMaxRunningTasks.style.marginLeft = '4px';
-
-	this.elHostsMask = document.createElement('span');
-	this.elCenter.appendChild( this.elHostsMask);
-	this.elHostsMask.title = 'Hosts Mask';
-	this.elHostsMask.style.marginLeft = '4px';
-
-	this.elHostsMaskExclude = document.createElement('span');
-	this.elCenter.appendChild( this.elHostsMaskExclude);
-	this.elHostsMaskExclude.title = 'Exclude Hosts Mask';
-	this.elHostsMaskExclude.style.marginLeft = '4px';
-
-	this.elErrors = document.createElement('span');
-	this.elCenter.appendChild( this.elErrors);
-	this.elErrors.style.marginLeft = '4px';
-
-	this.elForgive = document.createElement('span');
-	this.elCenter.appendChild( this.elForgive);
-	this.elForgive.style.marginLeft = '4px';
-	this.elForgive.title = 'Errors Forgive Time';
-
-	this.elJobsLifeTime = document.createElement('span');
-	this.elCenter.appendChild( this.elJobsLifeTime);
-	this.elJobsLifeTime.style.marginLeft = '4px';
-	this.elJobsLifeTime.title = 'Jobs Life Time';
+	this.elMaxRunningTasks = cm_ElCreateText( this.elCenter, 'Maximum Running Tasks');
+	this.elHostsMask = cm_ElCreateText( this.elCenter, 'Hosts Mask');
+	this.elHostsMaskExclude = cm_ElCreateText( this.elCenter, 'Exclude Hosts Mask');
+	this.elErrors = cm_ElCreateText( this.elCenter);
+	this.elForgive = cm_ElCreateText( this.elCenter, 'Errors Forgive Time');
+	this.elJobsLifeTime = cm_ElCreateText( this.elCenter, 'Jobs Life Time');
 
 	this.element.appendChild( document.createElement('br'));
 
-	this.elJobs = document.createElement('span');
-	this.element.appendChild( this.elJobs);
-	this.elJobs.style.cssFloat = 'left';
-	this.elJobs.title = 'Jobs, all/running';
+	this.elJobs = cm_ElCreateFloatText( this.element, 'left', 'Jobs: All/Running');
 
-	this.elSolving = document.createElement('span');
-	this.element.appendChild( this.elSolving);
-	this.elSolving.style.cssFloat = 'right';
+	this.elSolving = cm_ElCreateFloatText( this.element, 'right');
 
 	this.element.appendChild( document.createElement('br'));
 
