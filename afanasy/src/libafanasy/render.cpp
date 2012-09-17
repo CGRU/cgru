@@ -65,24 +65,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 
 	if( m_annotation.size())
 		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
-/*
-	if( isNimby())
-		o_str << ",\"nimby\":true";
-	if( isNIMBY())
-		o_str << ",\"NIMBY\":true";
-	if( isOffline())
-		o_str << ",\"offline\":true";
-	if( isBusy())
-		o_str << ",\"busy\":true";
-	if( isDirty())
-		o_str << ",\"dirty\":true";
-	if( isWOLFalling())
-		o_str << ",\"wol_falling\":true";
-	if( isWOLSleeping())
-		o_str << ",\"wol_sleeping\":true";
-	if( isWOLWaking())
-		o_str << ",\"wol_waking\":true";
-*/
+
 	if( m_tasks.size())
 	{
 		o_str << ",\"tasks\":[";

@@ -296,5 +296,5 @@ RenderTask.prototype.refresh = function()
 
 RenderTask.prototype.destroy = function()
 {
-	this.elParent.removeChild( this.element);
+	this.elParent.removeChild( this.elRoot);
 }
