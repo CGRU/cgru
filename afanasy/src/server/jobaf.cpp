@@ -792,7 +792,7 @@ af::TaskExec * JobAf::genTask( RenderAf *render, int block, int task, std::list<
    }
    if( false == ( progress->tp[block][task]->state & AFJOB::STATE_READY_MASK) ) return NULL;
 
-   if( false == m_blocks[block]->canRun( render)) return NULL;
+   if( false == m_blocks[block]->canRunOn( render)) return NULL;
 
    if( m_blocks[block]->m_tasks[task]->avoidHostsCheck( render->getName())) return NULL;
 
@@ -939,17 +939,18 @@ bool JobAf::canRunOn( RenderAf * i_render)
         return false;
     }
 
-    // check blocks with enough capacity
-    bool enoughCapacity = false;
-    for( int b = 0; b < m_blocksnum; b++)
-    {
-        if( i_render->hasCapacity( m_blocksdata[b]->getCapMinResult()))
-        {
-            enoughCapacity = true;
-            break;
-        }
-    }
-	if( false == enoughCapacity)
+	// check at least one block can run on render
+	bool blockCanRunOn = false;
+	for( int b = 0; b < m_blocksnum; b++)
+	{
+//		if( i_render->hasCapacity( m_blocksdata[b]->getCapMinResult()))
+		if( m_blocks[b]->canRunOn( i_render))
+		{
+			blockCanRunOn = true;
+			break;
+		}
+	}
+	if( false == blockCanRunOn )
 		return false;
 
 	// check hosts mask:
@@ -981,7 +982,7 @@ bool JobAf::canRunOn( RenderAf * i_render)
 
 bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 {
-//printf("Job::solve:\n");
+//printf("Job::solve: %s:\n", m_name.c_str());
 	for( int b = 0; b < m_blocksnum; b++)
     {
         int numtasks = m_blocksdata[b]->getTasksNum();
@@ -1029,12 +1030,14 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 			//static int cycle = 0;printf("cycle = %d\n", cycle++);
 			std::list<int> blocksIds;
 			af::TaskExec *taskexec = genTask( render, b, t, &blocksIds, monitoring);
+
 			// Job may became paused, if recursion during task generation detected:
 			if( m_state & AFJOB::STATE_OFFLINE_MASK )
 			{
 				if( taskexec ) delete taskexec;
 				return false;
 			}
+
 			// No task was generated:
 			if( taskexec == NULL ) continue;
 
@@ -1043,6 +1046,7 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 			taskexec->setUserName( m_user_name);
 			listeners.process( *taskexec);
 			m_blocks[taskexec->getBlockNum()]->startTask( taskexec, render, monitoring);
+
 			// If job was not started it became started
 			if( m_time_started == 0 )
 			{

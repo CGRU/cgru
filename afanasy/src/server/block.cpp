@@ -169,7 +169,7 @@ void Block::taskFinished( af::TaskExec * taskexec, RenderAf * render, MonitorCon
    remRenderCounts( render);
 }
 
-bool Block::canRun( RenderAf * render)
+bool Block::canRunOn( RenderAf * render)
 {
    // check max running tasks on the same host:
    if(  m_data->getMaxRunTasksPerHost() == 0 ) return false;

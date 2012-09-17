@@ -39,7 +39,7 @@ public:
    virtual void getErrorHostsListString( std::string & str) const;
    virtual void errorHostsReset();
 
-   bool canRun( RenderAf * render);
+   bool canRunOn( RenderAf * render);
 
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
 

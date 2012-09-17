@@ -299,6 +299,7 @@ bool af::addUniqueToList( std::list<int32_t> & o_list, int i_value)
 
 int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
 {
+//printf("af::getReadyTaskNumber:\n");
 	for( int task = i_startFrom; task < i_quantity; task++)
 	{
 		if( false == (flags & af::BlockData::FNonSequential))
@@ -323,7 +324,7 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 			powered = i_quantity;
 		}
 
-		//printf(" task=%d, powered=%lld\n", task, powered);
+//printf(" task=%d, powered=%lld\n", task, powered);
 		for( int64_t i = i_startFrom; i <= powered; i++)
 		{
 			int index = i;
@@ -342,7 +343,7 @@ int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t fl
 	}
 
 	// No ready tasks founded:
-	//printf("No ready tasks founded.\n");
+//printf("No ready tasks founded.\n");
 	return -1;
 }
 

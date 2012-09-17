@@ -36,6 +36,9 @@ const std::string af::time2str( time_t time_sec, const char * time_format)
 
 const std::string af::time2strHMS( int time32, bool clamp)
 {
+	if( time32 == 0 )
+		return "0";
+
 	static const int timeStrLenMax = 64;
 	char buffer[timeStrLenMax];
 

@@ -76,11 +76,11 @@ JobNode.prototype.update = function()
 		this.elHostsMaskExclude.innerHTML = 'E(' + this.params.hosts_mask_exclude + ')';
 	else this.elHostsMaskExclude.innerHTML = '';
 
-	if( this.params.max_running_tasks )
+	if( this.params.max_running_tasks != null )
 		this.elMaxRunTasks.innerHTML = 'Max' + this.params.max_running_tasks;
 	else this.elMaxRunTasks.innerHTML = '';
 
-	if( this.params.max_running_tasks_per_host )
+	if( this.params.max_running_tasks_per_host != null )
 		this.elMaxRunTasksPH.innerHTML = 'MPH' + this.params.max_running_tasks_per_host;
 	else this.elMaxRunTasksPH.innerHTML = '';
 
@@ -380,19 +380,19 @@ JobBlock.prototype.update = function( i_displayFull)
 		this.elErrSolving.innerHTML = errTxt;
 		this.elErrSolving.title = errTit;
 
-		if( this.params.errors_forgive_time )
+		if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
 			this.elForgiveTime.innerHTML = 'F'+cm_TimeStringFromSeconds( this.params.errors_forgive_time);
 		else this.elForgiveTime.innerHTML = '';
 
-		if( this.params.tasks_max_run_time)
+		if( this.params.tasks_max_run_time != null )
 			this.elMaxRunTime.innerHTML = 'MRT'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time);
 		else this.elMaxRunTime.innerHTML = '';
 
-		if( this.params.max_running_tasks)
+		if( this.params.max_running_tasks != null )
 			this.elMaxRunTasks.innerHTML = 'Max'+this.params.max_running_tasks;
 		else this.elMaxRunTasks.innerHTML = '';
 
-		if( this.params.max_running_tasks_per_host)
+		if( this.params.max_running_tasks_per_host != null )
 			this.elMaxRunTasksPH.innerHTML = 'MPH'+this.params.max_running_tasks_per_host;
 		else this.elMaxRunTasksPH.innerHTML = '';
 

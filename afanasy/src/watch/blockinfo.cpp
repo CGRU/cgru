@@ -68,7 +68,6 @@ bool BlockInfo::update( const af::BlockData* block, int type)
    case af::Msg::TBlocksProperties:
       multihost            = block->isMultiHost();
       multihost_samemaster = block->canMasterRunOnSlaveHost();
-      multihost            = block->isMultiHost();
       varcapacity          = block->canVarCapacity();
       numeric              = block->isNumeric();
 		nonsequential      = block->isNonSequential();
@@ -164,9 +163,9 @@ void BlockInfo::refresh()
 
    str_properties.clear();
 
-   if(( errors_avoidhost != -1) || ( errors_tasksamehost != -1) || ( errors_retries != -1))
+   if(( errors_avoidhost >= 0 ) || ( errors_tasksamehost >= 0 ) || ( errors_retries >= 0 ))
       str_properties += QString("E:%1b|%2t|%3r").arg( errors_avoidhost).arg( errors_tasksamehost).arg( errors_retries);
-   if( errors_forgivetime != -1 ) str_properties += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
+   if( errors_forgivetime >= 0 ) str_properties += QString(" F%1").arg( af::time2strHMS( errors_forgivetime, true).c_str());
 
    if( tasksmaxruntime) str_properties += QString(" Max%1").arg( af::time2strHMS( tasksmaxruntime, true).c_str());
 
@@ -175,10 +174,10 @@ void BlockInfo::refresh()
    if( false == hostsmask.isEmpty()          ) str_properties += QString(" H(%1)").arg( hostsmask         );
    if( false == hostsmask_exclude.isEmpty()  ) str_properties += QString(" E(%1)").arg( hostsmask_exclude );
    if( false == need_properties.isEmpty()    ) str_properties += QString(" P(%1)").arg( need_properties   );
-   if( need_memory   ) str_properties += QString(" M>%1").arg( need_memory);
-   if( need_hdd      ) str_properties += QString(" H>%1").arg( need_hdd);
-   if( need_power    ) str_properties += QString(" P>%1").arg( need_power);
-   if( multihost     )
+   if( need_memory > 0 ) str_properties += QString(" M>%1").arg( need_memory);
+   if( need_hdd    > 0 ) str_properties += QString(" H>%1").arg( need_hdd);
+   if( need_power  > 0 ) str_properties += QString(" P>%1").arg( need_power);
+   if( multihost )
    {
       str_properties += QString(" MH(%1,%2)").arg( multihost_min).arg( multihost_max);
       if( multihost_samemaster) str_properties += 'S';
@@ -583,7 +582,7 @@ af::MCGeneral * BlockInfo::blockAction( int id_block, int id_action, int i_numbe
       {
          double cur = 0;
          if( id_block == blocknum ) cur = double(errors_forgivetime) / (60*60);
-         double hours = QInputDialog::getDouble( listitems, "Set Errors forgive time", "Enter number of hours (0=infinite)", cur, 0, 365*24, 3, &ok);
+         double hours = QInputDialog::getDouble( listitems, "Set Errors forgive time", "Enter number of hours (0=infinite)", cur, -1, 365*24, 3, &ok);
          set_number = int( hours * 60*60 );
          break;
       }

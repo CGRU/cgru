@@ -124,6 +124,10 @@ function cm_TimeStringInterval( time1, time2)
 function cm_TimeStringFromSeconds( i_seconds)
 {
 	var str = '';
+
+	if( i_seconds == 0 )
+		return '0';
+
 	var seconds = i_seconds;
 	var days = 0; var hours = 0;
 	var minutes = Math.floor( seconds / 60 );
