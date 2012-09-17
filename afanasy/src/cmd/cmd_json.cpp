@@ -117,10 +117,42 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 	memcpy( data_copy, data, datalen);
 
 	rapidjson::Document document;
-	if (document.ParseInsitu<0>(data).HasParseError())
+	if (document.ParseInsitu<0>(data_copy).HasParseError())
 	{
-		AFERRAR("Parsing failed at character %d:", int( document.GetErrorOffset()))
-		AFERRAR("%s", document.GetParseError())
+		int pos = document.GetErrorOffset();
+		AFERRAR("Parsing failed at character %d:", pos)
+		AFERRAR("%s:", document.GetParseError())
+		int len = 60;
+		int pos_a = pos;
+		while( --pos_a > 0 )
+		{
+			if( data[pos_a] == '\n' )
+			{
+				pos_a++;
+				break;
+			}
+			if( pos-pos_a >= len/2 )
+				break;
+		}
+		int pos_b = pos;
+		while( ++pos_b < datalen-1 )
+		{
+			if( data[pos_b] == '\n' )
+			{
+				pos_b--;
+				break;
+			}
+			if( pos_b-pos >= len/2 )
+				break;
+		}
+		len = pos_b - pos_a + 1;
+		int unused;
+		unused = write( 1, data + pos_a, len);
+		unused = write( 1, "\n", 1);
+		for( int i = 0; i < pos - pos_a; i++)
+			unused = write( 1, " ", 1);
+		unused = write( 1, "^", 1);
+		unused = write( 1, "\n", 1);
 		return true;
 	}
 
@@ -190,7 +222,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 			send_data_len = header.size() + datalen;
 			send_data = new char[send_data_len];
 			memcpy( send_data, header.c_str(), header.size());
-			memcpy( send_data + header.size(), data_copy, datalen);
+			memcpy( send_data + header.size(), data, datalen);
 		}
 
 		msg.setData( send_data_len, send_data, af::Msg::TJSON);

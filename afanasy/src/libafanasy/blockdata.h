@@ -366,6 +366,7 @@ private:
 private:
    uint8_t  p_bar_done[AFJOB::PROGRESS_BYTES];          ///< Done tasks progress for each block.
    uint8_t  p_bar_running[AFJOB::PROGRESS_BYTES];       ///< Running task progress for each block.
+	char    p_progressbar[AFJOB::ASCII_PROGRESS_LENGTH];
    uint8_t  p_percentage;        ///< Tasks average percentage.
    int32_t  p_errorhostsnum;     ///< Number of error host of the block.
    int32_t  p_avoidhostsnum;     ///< Number of error host block avoiding.

@@ -28,7 +28,7 @@ function Plotter( i_plottersArray, i_pElement, i_label, i_title)
 	var dx = Plotter_W + Plotter_MW;
 	this.element.style.left = (-3*dx + i_plottersArray.length * dx) + 'px';
 
-    this.canvas = document.createElement('canvas');
+	this.canvas = document.createElement('canvas');
 	this.canvas.width = Plotter_W;
 	this.canvas.height = Plotter_H;
 	this.canvas.style.width = Plotter_W + 'px';

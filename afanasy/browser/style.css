@@ -21,7 +21,11 @@ box-shadow: 0px 0px 10px #000;
 /*background: #AAA;*/
 }
 #header { top: 0; }
-#footer { bottom: 0; }
+#footer {
+bottom: 0;
+font: 12px Arial;
+font-weight: normal;
+}
 
 #content {
 position: absolute;
@@ -119,7 +123,7 @@ border-radius: 4px;
 .item.DON { background: #486;}
 .item.WDP { background: #969;}
 .item.WTM { background: #86C;}
-.item.RUN { background: #DD6;}
+.item.RUN { background: #BB6;}
 .item.ERR { background: #A65;}
 .item.OFF { background: #777;}
 .item.selected {
@@ -179,7 +183,11 @@ height: 12px;
 border-radius: 0px;
 }
 
-.item .bar {
+.bar.DON { background: #363;}
+.bar.RUN { background: #FF0;}
+.bar.ERR { background: #F00;}
+
+.task .bar {
 background: #0A0;
 /*margin: 0px; padding: 0px;*/
 position: absolute;
@@ -188,14 +196,24 @@ opacity: 0.3;
 }
 
 .user .bar {
+position: absolute;
+top: 0; bottom: 0; left: 0; width: 0;
 background: #FF4;
-opacity: 1;
 border-radius: 3px;
 text-align: center;
 /*margin: 0px 5px;*/
 /*padding: 0px 5px;*/
 /*border: 1px solid #444;*/
 box-shadow: 0px 0px 8px #000 inset;
+}
+
+.job .bar {
+}
+
+.job .progress {
+border: 1px solid #444;
+margin: 2px;
+border-radius: 3px;
 }
 
 .item .name {

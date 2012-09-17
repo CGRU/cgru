@@ -77,6 +77,7 @@ void BlockData::initDefaults()
 
 	memset( p_bar_running, 0, AFJOB::PROGRESS_BYTES);
 	memset( p_bar_done,    0, AFJOB::PROGRESS_BYTES);
+	memset( p_progressbar,     AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
 }
 
 BlockData::BlockData( Msg * msg)
@@ -410,8 +411,16 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
 		if( p_taskssumruntime > 0 )
             o_str << ",\"p_taskssumruntime\":" << p_taskssumruntime;
 
-		//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
-		//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
+//		if(( p_tasksdone < m_tasks_num ) ||
+//		     p_taskserror || m_running_tasks_counter )
+		{
+			o_str << ",\"p_progressbar\":\"";
+			for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
+			{
+				o_str << char(AFJOB::ASCII_PROGRESS_STATES[p_progressbar[i]*2]);
+			}
+			o_str << "\"";
+		}
 
 	break;
 
@@ -1255,6 +1264,8 @@ bool BlockData::updateBars( JobProgress * progress)
 {
    bool changed = false;
 
+
+	// Binary bits for afwatch:
    for( int pb = 0; pb < AFJOB::PROGRESS_BYTES; pb++)
    {
       p_bar_done[pb]    = 0;
@@ -1294,6 +1305,33 @@ bool BlockData::updateBars( JobProgress * progress)
       }
    }
    //stdOutFlags();
+
+
+	// ASCII:
+	for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
+		p_progressbar[i] = 0;
+
+	for( int t = 0; t < m_tasks_num; t++)
+	{
+		int value = 0;
+		for( int i = 0; i < AFJOB::ASCII_PROGRESS_COUNT; i++)
+			if(( progress->tp[m_block_num][t]->state & AFJOB::ASCII_PROGRESS_MASK ) == AFJOB::ASCII_PROGRESS_STATES[i*2+1] )
+				if( value < i)
+					value = i;
+
+		int pos_a = AFJOB::ASCII_PROGRESS_LENGTH * ( t   ) / m_tasks_num;
+		int pos_b = AFJOB::ASCII_PROGRESS_LENGTH * ( t+1 ) / m_tasks_num;
+		if( pos_b > pos_a )
+			pos_b--;
+		if( pos_b > AFJOB::ASCII_PROGRESS_LENGTH )
+			pos_b = AFJOB::ASCII_PROGRESS_LENGTH - 1;
+
+		for( int p = pos_a; p <= pos_b; p++)
+		{
+			if( value > p_progressbar[p] )
+				p_progressbar[p] = value;
+		}
+	}
 
    return changed;
 }

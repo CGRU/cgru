@@ -191,3 +191,16 @@ function cm_GetState( i_state, i_elParent, i_elChild)
 	}
 }
 
+function cm_CreateFloatText( i_elParent, i_side, i_title)
+{
+	var element = document.createElement('span');
+	i_elParent.appendChild( element);
+	element.style.cssFloat = i_side;
+	if( i_title )
+		element.title = i_title;
+	if( i_side == 'right')
+		element.style.marginLeft = '4px';
+	else
+		element.style.marginRight = '4px';
+	return element;
+}

@@ -86,4 +86,21 @@ namespace AFJOB
    const int  SYSJOB_ERRORS_TASKSAMEHOST  = 1;
    const int  SYSJOB_ERRORS_RETRIES       = 9;
    const int  SYSJOB_ERRORS_FORGIVETIME   = 3600;  // System job error hosts forgive time ( default = 1 hour )
+
+	// Tasks progess some states for GUI in ASCII
+	// Order is priority, as only one, most important state displayed in a job block progress bar
+	const int ASCII_PROGRESS_COUNT = 9;
+	const int ASCII_PROGRESS_STATES[ASCII_PROGRESS_COUNT*2] = {
+		' ', 0,
+		'D', STATE_DONE_MASK,
+		'S', STATE_SKIPPED_MASK | STATE_DONE_MASK,
+		'G', STATE_DONE_MASK | STATE_WARNING_MASK,
+		'r', STATE_READY_MASK,
+		'W', STATE_WAITDEP_MASK,
+		'R', STATE_RUNNING_MASK,
+		'N', STATE_RUNNING_MASK | STATE_WARNING_MASK,
+		'E', STATE_ERROR_MASK};
+	const uint32_t ASCII_PROGRESS_MASK = STATE_READY_MASK | STATE_DONE_MASK | STATE_SKIPPED_MASK |
+		STATE_DONE_MASK | STATE_WARNING_MASK | STATE_RUNNING_MASK | STATE_ERROR_MASK;
+	const int ASCII_PROGRESS_LENGTH = 128;
 }
