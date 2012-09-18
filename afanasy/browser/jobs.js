@@ -3,6 +3,14 @@ function JobNode() {}
 Block_ProgressBarLength = 128;
 Block_ProgressBarHeight =  10;
 
+BarDONrgb = '#363';
+BarSKPrgb = '#266';
+BarDWRrgb = '#141';
+BarWDPrgb = '#A2A';
+BarRUNrgb = '#FF0';
+BarRWRrgb = '#FA0';
+BarERRrgb = '#F00';
+
 JobNode.prototype.init = function() 
 {
 	this.element.classList.add('job');
@@ -215,6 +223,7 @@ JobBlock.prototype.constructFull = function()
 {
 	this.elIcon.style.width = '48px';
 	this.elIcon.style.height = '48px';
+	this.elIcon.style.marginTop = '4px';
 	this.element.style.marginLeft = '54px';
 
 	this.elFull = document.createElement('div');
@@ -263,34 +272,21 @@ JobBlock.prototype.constructFull = function()
 	this.canvas.style.height = Block_ProgressBarHeight + 'px';
 	this.canvas.style.width = '100%';
 
-	this.elPercentage = document.createElement('span');
-	this.elFull.appendChild( this.elPercentage);
-	this.elPercentage.title = 'Block Done Percentage';
-	this.elPercentage.style.marginLeft = '4px';
+	this.elPercentage = cm_ElCreateText( this.elFull, 'Block Done Percentage');
+	this.elTasksDon = cm_ElCreateText( this.elFull, 'Done Tasks Counter');
+	this.elTasksRdy = cm_ElCreateText( this.elFull, 'Ready Tasks Counter');
+	this.elTasksRun = cm_ElCreateText( this.elFull, 'Running Tasks Counter');
+	this.elTasksErr = cm_ElCreateText( this.elFull, 'Error Tasks Counter');
 
-	this.elTasksDon = document.createElement('span');
-	this.elFull.appendChild( this.elTasksDon);
-	this.elTasksDon.title = 'Done Tasks Counter';
-	this.elTasksDon.style.marginLeft = '4px';
+//	this.elTasksDon.classList.add('font-done');
+//	this.elTasksRdy.classList.add('font-ready');
+//	this.elTasksRun.classList.add('font-run');
+//	this.elTasksErr.classList.add('font-error');
+	this.elTasksErr.classList.add('ERR');
 
-	this.elTasksRdy = document.createElement('span');
-	this.elFull.appendChild( this.elTasksRdy);
-	this.elTasksRdy.title = 'Ready Tasks Counter';
-	this.elTasksRdy.style.marginLeft = '4px';
+	this.elRunTime = cm_ElCreateFloatText( this.elFull, 'right');
 
-	this.elTasksRun = document.createElement('span');
-	this.elFull.appendChild( this.elTasksRun);
-	this.elTasksRun.title = 'Running Tasks Counter';
-	this.elTasksRun.style.marginLeft = '4px';
-
-	this.elTasksErr = document.createElement('span');
-	this.elFull.appendChild( this.elTasksErr);
-	this.elTasksErr.title = 'Error Tasks Counter';
-	this.elTasksErr.style.marginLeft = '4px';
-
-	this.elRunTime = document.createElement('span');
-	this.elFull.appendChild( this.elRunTime);
-	this.elRunTime.style.cssFloat = 'right';
+	this.elErrHosts = cm_ElCreateFloatText( this.elFull, 'right');
 }
 
 JobBlock.prototype.constructBrief = function()
@@ -436,12 +432,20 @@ JobBlock.prototype.update = function( i_displayFull)
 		this.elTasksRdy.innerHTML = 'rdy:'+tasks_rdy;
 
 		var tasks_run = 0;
-		if( this.params.running_tasks_counter ) tasks_run = this.params.running_tasks_counter;
-		this.elTasksRun.innerHTML = 'run:'+tasks_run;
+		if( this.params.running_tasks_counter )
+		{
+			tasks_run = this.params.running_tasks_counter;
+			this.elTasksRun.innerHTML = 'run:'+tasks_run;
+		}
+		else this.elTasksRun.innerHTML = '';
 
 		var tasks_err = 0;
-		if( this.params.p_taskserror ) tasks_err = this.params.p_taskserror;
-		this.elTasksErr.innerHTML = 'err:'+tasks_err;
+		if( this.params.p_taskserror )
+		{
+			tasks_err = this.params.p_taskserror;
+			this.elTasksErr.innerHTML = 'err:'+tasks_err;
+		}
+		else this.elTasksErr.innerHTML = '';
 
 		if( this.params.p_taskssumruntime && tasks_done )
 		{
@@ -456,6 +460,22 @@ JobBlock.prototype.update = function( i_displayFull)
 			this.elRunTime.title = '';
 		}
 
+		var he_txt = '', he_tit = '';
+		this.elErrHosts.classList.remove('ERR');
+		if( this.params.p_errorhostsnum )
+		{
+			he_txt = 'Eh' + this.params.p_errorhostsnum;
+			he_tit = 'Error Hosts: ' + this.params.p_errorhostsnum;
+			if( this.params.p_avoidhostsnum )
+			{
+				he_txt += ': ' + this.params.p_avoidhostsnum + ' Avoid';
+				he_tit += '\nAvoiding Hosts: ' + this.params.p_avoidhostsnum;
+				this.elErrHosts.classList.add('ERR');
+			}
+		}
+		this.elErrHosts.innerHTML = he_txt;
+		this.elErrHosts.title = he_tit;
+
 		this.elBarPercentage.style.width = percentage + '%';
 		this.elBarDone.style.width = Math.floor( 100 * tasks_done / this.tasks_num ) + '%';
 		this.elBarErr.style.width = Math.ceil( 100 * tasks_err / this.tasks_num ) + '%';
@@ -464,8 +484,6 @@ JobBlock.prototype.update = function( i_displayFull)
 		if( this.params.p_progressbar )
 		{
 			var ctx = this.canvas.getContext('2d');
-//			ctx.fillStyle = 'rgba(0,0,0,0)';
-//			ctx.fillRect( 0, 0, Block_ProgressBarLength, Block_ProgressBarHeight);
 			ctx.clearRect( 0, 0, Block_ProgressBarLength, Block_ProgressBarHeight);
 			ctx.lineWidth = 1;
 			ctx.lineCap = 'square';
@@ -474,14 +492,14 @@ JobBlock.prototype.update = function( i_displayFull)
 				var rgb = '#000';
 				switch( this.params.p_progressbar.charAt(i) )
 				{
-					case 'r': continue;          // RDY
-					case 'D': rgb = '#363';break;// DON
-					case 'S': rgb = '#266';break;// SKP
-					case 'G': rgb = '#141';break;// DON | WRN
-					case 'W': rgb = '#A2A';break;// WDP
-					case 'R': rgb = '#FF0';break;// RUN
-					case 'N': rgb = '#7F0';break;// RUN | WRN
-					case 'E': rgb = '#F00';break;// ERR
+					case 'r': continue; // RDY
+					case 'D': rgb = BarDONrgb; break;
+					case 'S': rgb = BarSKPrgb; break;// SKP
+					case 'G': rgb = BarDWRrgb; break;// DON | WRN
+					case 'W': rgb = BarWDPrgb; break;// WDP
+					case 'R': rgb = BarRUNrgb; break;// RUN
+					case 'N': rgb = BarRWRrgb; break;// RUN | WRN
+					case 'E': rgb = BarERRrgb; break;// ERR
 				}
 				ctx.strokeStyle = rgb;
 				ctx.beginPath();

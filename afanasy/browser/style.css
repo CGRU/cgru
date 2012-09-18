@@ -123,8 +123,8 @@ border-radius: 4px;
 .item.DON { background: #486;}
 .item.WDP { background: #969;}
 .item.WTM { background: #599;}
-.item.RUN { background: #BB6;}
-.item.ERR { background: #A65;}
+.item.RUN { background: #7A4;}
+.item.ERR { background: #965;}
 .item.OFF { background: #777;}
 .item.selected {
 background: #DDFFDD;
@@ -183,9 +183,9 @@ height: 12px;
 border-radius: 0px;
 }
 
-.bar.DON { background: #363;}
-.bar.RUN { background: #FF0;}
-.bar.ERR { background: #F00;}
+.DON { background: #363;}
+.RUN { background: #FF0;}
+.ERR { background: #F00;}
 
 .task .bar {
 background: #0A0;
@@ -238,3 +238,10 @@ position: absolute;
 width: 16px; height: 16px;
 }
 */
+/*
+.font-ready { opacity: .7;}
+.font-run   { color: #FF0;}
+.font-done  { color: #130;}
+.font-error { color: #F00;}
+*/
+
