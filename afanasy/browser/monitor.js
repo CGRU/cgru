@@ -21,6 +21,7 @@ function Monitor( i_element, i_type, i_id)
 //	this.elList.onmousedown = function(e) { return false;}
 //	this.elList.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
 //	this.elList.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
+	this.elList.oncontextmenu = function(e) { return false;}
 
 	this.elCtrlSort = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
