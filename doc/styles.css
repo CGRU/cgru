@@ -1,37 +1,52 @@
 body {
-   background-color: #CFDDA2;
-   background-image:url('images/back.jpg');
-   color: #002000;
-   font-family: Verdana, Arial, Helvetica, sans-serif;
-   font-size: 16px;
-   text-align: justify;
+background-color: #CFDDA2;
+background-image:url('images/back.jpg');
+color: #002000;
+font-family: Verdana, Arial, Helvetica, sans-serif;
+font-size: 16px;
+text-align: justify;
 }
 h1 {
-   font-family: Verdana;
-   font-weight: bold;
+font-family: Verdana;
+font-weight: bold;
 }
 code {
-   color: Navy;
-   font-weight: bold;
+color: Navy;
+font-weight: bold;
 }
 kbd {
-   color: Purple;
-   font-weight: bold;
+color: Purple;
+font-weight: bold;
 }
 pre {
-   background-color: #001000;
-   color: #70FF40;
-   font-weight: bold;
+background-color: #001000;
+color: #70FF40;
+font-weight: bold;
 }
 a:link {
-   color: #000060;
+color: #000060;
 }
 a:visited {
-   color: #000060;
+color: #000060;
 }
 a:hover {
-   color: #500000;
+color: #500000;
 }
 a:active {
-   color: #D00000;
+color: #D00000;
 }
+.biglink {
+display: block;
+text-align: center;
+margin: 5px;
+padding: 10px;
+overflow: hidden;
+border-radius: 5px;
+-moz-transition: all 1s ease-in-out;
+}
+.biglink:hover {
+background: rgba(255,255,100,.1);
+box-shadow: 0px 0px 5px #FFA inset;
+-moz-transition: all .3s ease-in-out;
+}
+
