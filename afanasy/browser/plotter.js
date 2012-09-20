@@ -1,4 +1,4 @@
-Plotter_W = 50;
+Plotter_W = 54;
 Plotter_H = 25;
 Plotter_MW = 8;
 Plotter_MH = 2;

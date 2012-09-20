@@ -30,7 +30,8 @@ RenderNode.prototype.init = function()
 	this.elPower.style.left = '0';
 	this.elPower.style.right = '0';
 
-	this.element.appendChild( document.createElement('br'));
+	this.elNewLine = document.createElement('br');
+	this.element.appendChild( this.elNewLine);
 
 	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used/Total');
 	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running/Maximum');
@@ -127,9 +128,11 @@ RenderNode.prototype.update = function()
 		this.elMaxTasks.innerHTML = '';
 		this.state.innerHTML = '';
 		this.elStateTime.innerHTML = '';
+		this.elNewLine.style.display = 'none';
 		return;
 	}
 	this.elPower.innerHTML = '';
+	this.elNewLine.style.display = 'block';
 
 	var capacity = this.params.capacity;
 	if( capacity == null )

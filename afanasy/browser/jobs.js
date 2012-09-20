@@ -511,3 +511,16 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 }
 
+JobNode.prototype.onContexMenu = function( i_evt)
+{
+	var menu = new ContextMenu( document.body, i_evt, this, 'jobitem_context');
+	menu.addItem('Start', 'start');
+	menu.addItem('Pause', 'pause');
+	menu.show();
+}
+
+JobNode.prototype.action = function( i_name)
+{
+	this.monitor.info( this.params.name + ': ' + i_name);
+}
+

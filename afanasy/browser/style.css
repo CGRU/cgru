@@ -1,6 +1,5 @@
 body {
 font: 16px Arial;
-font-weight: bold;
 background: #ab8;
 }
 
@@ -23,8 +22,7 @@ box-shadow: 0px 0px 10px #000;
 #header { top: 0; }
 #footer {
 bottom: 0;
-font: 12px Arial;
-font-weight: normal;
+font-size: 12px;
 }
 
 #content {
@@ -36,6 +34,7 @@ bottom: 50px;
 }
 
 .mbutton {
+font-weight: bold;
 position: relative;
 background: #DDD;
 border: 1px solid #676767;
@@ -56,6 +55,7 @@ box-shadow: 0px 0px 5px #000 inset;
 }
 
 .monitor {
+font-weight: bold;
 position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
@@ -96,10 +96,7 @@ border-radius: 4px;
 
 .monitor .info .text {
 position: absolute;
-top: 5px;
-left: 8px;
-right: 8px;
-bottom: 8px;
+top: 5px; left: 8px; right: 8px; bottom: 8px;
 background: #CCC;
 border: 1px solid #444;
 box-shadow: 0px 0px 5px #222 inset;
@@ -245,3 +242,17 @@ width: 16px; height: 16px;
 .font-error { color: #F00;}
 */
 
+.contextmenu {
+font-size: 12px;
+display: none;
+cursor: pointer;
+background: #AAA;
+position: absolute;
+border-radius: 4px;
+box-shadow: 0px 0px 5px #000;
+padding: 4px 10px;
+top: 0; left: 0;
+}
+.contextmenu > * { padding: 2px; border-top: 1px solid #999;}
+.contextmenu > *:first-child { border-style: none;}
+.contextmenu > *:hover { background: #DFF;}

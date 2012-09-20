@@ -21,7 +21,9 @@ function Monitor( i_element, i_type, i_id)
 //	this.elList.onmousedown = function(e) { return false;}
 //	this.elList.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
 //	this.elList.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
-	this.elList.oncontextmenu = function(e) { return false;}
+/*	this.elList.oncontextmenu = this.onContextMenu;
+	this.elList.monitor = this;
+	this.elList.EType = 'list';*/
 
 	this.elCtrlSort = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
@@ -236,6 +238,8 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 	i_item.element.onmousedown = this.onMouseDown;
 	i_item.element.onmouseover = this.onMouseOver;
 	i_item.element.ondblclick = this.onDoubleClick;
+	i_item.element.oncontextmenu = this.onContextMenu;
+
 	i_item.init();
 	i_item.update();
 }
@@ -258,6 +262,8 @@ Monitor.prototype.onMouseDown = function(evt)
 	if( evt.button != 0 ) return;
 	var el = evt.currentTarget;
 	if( el == null ) return;
+	if( el.monitor == null ) return
+
 	g_cur_monitor = el.monitor;
 	if( false == g_key_ctrl )
 		g_cur_monitor.selectAll( false);
@@ -330,29 +336,45 @@ Monitor.prototype.selectAll = function( on)
 Monitor.prototype.selectNext = function( previous)
 {
 	if( this.items.length == 0 ) return;
-	if( this.cur_item == null )
-		this.cur_item = this.items[0];
 
-	var cur_index = 0;
-	for( var i = 0; i < this.items.length; i++)
-		if( this.cur_item == this.items[i])
-		{
-			cur_index = i;
-			break;
-		}
-
-	var next_index = cur_index+1;
-	if( previous )
-		next_index = cur_index-1;
+	var next_index = 0;
+	if( this.cur_item )
+	{
+		var cur_index = 0;
+		for( var i = 0; i < this.items.length; i++)
+			if( this.cur_item == this.items[i])
+			{
+				cur_index = i;
+				break;
+			}
+		var next_index = cur_index+1;
+		if( previous )
+			next_index = cur_index-1;
+	}
 
 	if( next_index < 0 ) return;
 	if( next_index >= this.items.length ) return;
-	if( cur_index == next_index ) return;
+	if( next_index == cur_index ) return;
 
 	this.cur_item = this.items[next_index]; 
 	if( false == g_key_shift )
 		this.selectAll( false);
 	this.elSetSelected( this.cur_item.element, true);
+}
+
+Monitor.prototype.onContextMenu = function( evt)
+{
+	var el = evt.currentTarget;
+	if( el == null ) return;
+	if( el.monitor == null ) return
+
+	g_cur_monitor = el.monitor;
+	if( el.selected != true )
+		g_cur_monitor.selectAll( false);
+	g_cur_monitor.elSetSelected( el, true);
+	el.item.onContexMenu( evt);
+
+	return false;
 }
 
 Monitor.prototype.jobConstruct = function( job)
