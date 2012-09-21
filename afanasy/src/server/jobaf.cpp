@@ -339,10 +339,37 @@ void JobAf::v_action( Action & i_action)
 			i_action.monitors->addJobEvent( af::Msg::TMonitorJobsDel, getId(), getUid());
 			return;
 		}
+		else if( type == "start")
+		{
+			m_state = m_state & (~AFJOB::STATE_OFFLINE_MASK);
+		}
+		else if( type == "pause")
+		{
+			m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
+		}
 		else if( type == "stop")
 		{
 		   restartAllTasks( true, "Job stopped by " + i_action.author, i_action.renders, i_action.monitors);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
+		}
+		else if( type == "restart")
+		{
+			//printf("Msg::TJobRestart:\n");
+			restartAllTasks( false, "Job restarted by " + i_action.author,  i_action.renders, i_action.monitors);
+			//printf("Msg::TJobRestart: tasks restarted.\n");
+			checkDepends();
+			m_time_started = 0;
+		}
+		else if( type == "restart_errors")
+		{
+			restartErrors( "Job errors restarted by " + i_action.author,  i_action.renders, i_action.monitors);
+		}
+		else if( type == "restart_pause")
+		{
+			restartAllTasks( false, "Job restarted ( and paused ) by " + i_action.author,  i_action.renders, i_action.monitors);
+			checkDepends();
+			m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
+			m_time_started = 0;
 		}
 		else
 		{

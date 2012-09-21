@@ -54,6 +54,16 @@ color: #353;
 box-shadow: 0px 0px 5px #000 inset;
 }
 
+.menubutton {
+background: #AAA;
+box-shadow: 0px 0px 5px #000 inset;
+border-radius: 4px;
+cursor: pointer;
+margin: 4px;
+padding: 4px;
+position: relative;
+}
+
 .monitor {
 font-weight: bold;
 position: absolute;
@@ -91,8 +101,8 @@ background: #789;
 padding: 5px;
 border-radius: 4px;
 }
-.monitor .ctrl .sort { left: 5px; right: 70%; }
-.monitor .ctrl .filter { left: 31%; right: 5px; }
+.monitor .ctrl .sort { left: 50px; right: 60%; }
+.monitor .ctrl .filter { left: 41%; right: 5px; }
 
 .monitor .info .text {
 position: absolute;
@@ -120,7 +130,7 @@ border-radius: 4px;
 .item.DON { background: #486;}
 .item.WDP { background: #969;}
 .item.WTM { background: #599;}
-.item.RUN { background: #7A4;}
+.item.RUN { background: #8A6;}
 .item.ERR { background: #965;}
 .item.OFF { background: #777;}
 .item.selected {
@@ -253,6 +263,8 @@ box-shadow: 0px 0px 5px #000;
 padding: 4px 10px;
 top: 0; left: 0;
 }
-.contextmenu > * { padding: 2px; border-top: 1px solid #999;}
-.contextmenu > *:first-child { border-style: none;}
-.contextmenu > *:hover { background: #DFF;}
+.contextmenuitem { padding: 2px; border-top: 1px solid #999;}
+.contextmenuitem:first-child { border-style: none;}
+.contextmenuitem:hover { background: #DFF;}
+.contextmenuitem.disabled { color: #555;}
+.contextmenuitem.disabled:hover { background: #AAA;}

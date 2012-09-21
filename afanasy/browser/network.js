@@ -46,19 +46,14 @@ function nw_Subscribe( i_class, i_subscribe, i_ids)
 {
 	if( g_id == 0 ) return;
 
-	var obj = {};
-	obj.action = {};
-	obj.action.user_name = g_user_name;
-	obj.action.host_name = g_host_name;
-	obj.action.type = "monitors";
-	obj.action.ids = [g_id];
+	var obj = nw_ConstructActionObject('monitors', [g_id]);
 	obj.action.operation = {};
-	obj.action.operation.type = "watch";
+	obj.action.operation.type = 'watch';
 	obj.action.operation.class = i_class;
 	if( i_subscribe )
-		obj.action.operation.status = "subscribe";
+		obj.action.operation.status = 'subscribe';
 	else
-		obj.action.operation.status = "unsubscribe";
+		obj.action.operation.status = 'unsubscribe';
 	if( i_ids != null )
 		obj.action.operation.ids = i_ids;
 	obj.action.operation.uids = g_uids;
@@ -112,5 +107,33 @@ function nw_GetSoftwareIcons()
 function nw_ReqestRendersResources()
 {
 	nw_GetNodes('renders');
+}
+
+function nw_ConstructActionObject( i_type, i_ids)
+{
+	var obj = {};
+	obj.action = {};
+	obj.action.user_name = g_user_name;
+	obj.action.host_name = g_host_name;
+	obj.action.type = i_type;
+	obj.action.ids = i_ids;
+
+	return obj;
+}
+
+function nw_Action( i_type, i_name, i_ids)
+{
+	if( i_ids.length == 0 )
+	{
+		g_Error( i_type + ' action ' + i_name + ' IDs are empty.');
+		return;
+	}
+
+	var obj = nw_ConstructActionObject( i_type, i_ids);
+
+	obj.action.operation = {};
+	obj.action.operation.type = i_name;
+
+	nw_Send( obj);
 }
 

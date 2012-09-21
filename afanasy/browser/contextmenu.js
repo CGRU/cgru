@@ -38,15 +38,29 @@ ContextMenu.prototype.show = function()
 	this.element.style.top  = this.posY + 'px';
 }
 
-ContextMenu.prototype.addItem = function( i_name, i_actionName)
+ContextMenu.prototype.addItem = function( i_name, i_actionName, i_enabled)
 {
+	if( i_enabled == null )	i_enabled = true;
+
 	var el = document.createElement('div');
 	this.element.appendChild( el);
+	el.classList.add('contextmenuitem');
 	el.innerHTML = i_name;
 	el.parentmenu = this;
 	el.actionName = i_actionName;
-	el.onmousedown = this.onMouseUpDown;
-	el.onmouseup   = this.onMouseUpDown;
+
+	if( i_enabled )
+	{
+		el.onmousedown = this.onMouseUpDown;
+		el.onmouseup   = this.onMouseUpDown;
+	}
+	else
+		el.classList.add('disabled');
+}
+
+ContextMenu.prototype.addSeparator = function( evt)
+{
+	this.element.lastChild.style.borderBottom = '3px solid #888';
 }
 
 ContextMenu.prototype.onMouseUpDown = function( evt)

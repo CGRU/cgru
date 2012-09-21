@@ -25,6 +25,13 @@ function Monitor( i_element, i_type, i_id)
 	this.elList.monitor = this;
 	this.elList.EType = 'list';*/
 
+	this.elCtrlSet = document.createElement('span');
+	this.elCtrl.appendChild( this.elCtrlSet);
+	this.elCtrlSet.classList.add('menubutton');
+	this.elCtrlSet.innerHTML = 'SET';
+	this.elCtrlSet.style.top = '7px';
+	this.elCtrlSet.onmouseover = this.onMouseOverSet;
+
 	this.elCtrlSort = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('sort');
@@ -375,6 +382,29 @@ Monitor.prototype.onContextMenu = function( evt)
 	el.item.onContexMenu( evt);
 
 	return false;
+}
+
+
+Monitor.prototype.onMouseOverSet = function( evt)
+{
+	if( g_cur_monitor == null ) return;
+g_cur_monitor.info('onMouseOverSet');
+	if( g_cur_monitor.cur_item == null ) return;
+//	g_cur_monitor.cur_item.
+}
+
+Monitor.prototype.action = function( i_name)
+{
+	nw_Action( this.type, i_name, this.getSelectedIds());
+}
+
+Monitor.prototype.getSelectedIds = function()
+{
+	var ids = [];
+	for( var i = 0; i < this.items.length; i++)
+		if( this.items[i].element.selected == true )
+			ids.push( this.items[i].params.id);
+	return ids;
 }
 
 Monitor.prototype.jobConstruct = function( job)

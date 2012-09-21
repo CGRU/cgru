@@ -514,13 +514,19 @@ JobBlock.prototype.update = function( i_displayFull)
 JobNode.prototype.onContexMenu = function( i_evt)
 {
 	var menu = new ContextMenu( document.body, i_evt, this, 'jobitem_context');
+	menu.addItem('Restart Errors', 'restart_errors', this.elState.ERR);
+	menu.addSeparator();
 	menu.addItem('Start', 'start');
 	menu.addItem('Pause', 'pause');
+	menu.addItem('Stop', 'stop');
+	menu.addItem('Restart', 'restart');
+	menu.addItem('Restart&Pause', 'restart_pause');
+	menu.addItem('Delete', 'delete');
 	menu.show();
 }
 
 JobNode.prototype.action = function( i_name)
 {
-	this.monitor.info( this.params.name + ': ' + i_name);
+	this.monitor.action( i_name);
 }
 
