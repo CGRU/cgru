@@ -15,7 +15,6 @@ g_refreshers = [];
 g_monitors = [];
 g_cur_monitor = null;
 g_monitor_buttons = [];
-g_contextmenus = [];
 
 g_Images = [];
 
@@ -122,19 +121,13 @@ function g_ConnectionLost()
 
 function g_CloseAllMonitors()
 {
-	g_CloseAllContextMenus();
+	cgru_ClosePopus();
 
 	for( var i = 0; i < g_monitor_buttons.length; i++)
 		g_monitor_buttons[i].classList.remove('pushed');
 
 	while( g_monitors.length > 0 )
 		g_monitors[0].destroy();
-}
-
-function g_CloseAllContextMenus()
-{
-	while( g_contextmenus.length > 0 )
-		g_contextmenus[0].destroy();
 }
 
 function g_MButtonClick( evt)

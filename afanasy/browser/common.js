@@ -21,7 +21,7 @@ function cm_OnKeyDown(e)
 		{
 			g_monitors[i].selectAll( false);
 		}
-		g_CloseAllContextMenus();
+		cgru_ClosePopus();
 	}
 	else if(e.keyCode==16) g_key_shift=true; // SHIFT
 	else if(e.keyCode==17) g_key_ctrl=true; // CTRL

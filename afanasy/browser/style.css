@@ -252,19 +252,3 @@ width: 16px; height: 16px;
 .font-error { color: #F00;}
 */
 
-.contextmenu {
-font-size: 12px;
-display: none;
-cursor: pointer;
-background: #AAA;
-position: absolute;
-border-radius: 4px;
-box-shadow: 0px 0px 5px #000;
-padding: 4px 10px;
-top: 0; left: 0;
-}
-.contextmenuitem { padding: 2px; border-top: 1px solid #999;}
-.contextmenuitem:first-child { border-style: none;}
-.contextmenuitem:hover { background: #DFF;}
-.contextmenuitem.disabled { color: #555;}
-.contextmenuitem.disabled:hover { background: #AAA;}

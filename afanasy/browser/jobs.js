@@ -513,7 +513,7 @@ JobBlock.prototype.update = function( i_displayFull)
 
 JobNode.prototype.onContexMenu = function( i_evt)
 {
-	var menu = new ContextMenu( document.body, i_evt, this, 'jobitem_context');
+	var menu = new cgru_Menu( document.body, i_evt, this, 'jobitem_context');
 	menu.addItem('Restart Errors', 'restart_errors', this.elState.ERR);
 	menu.addSeparator();
 	menu.addItem('Start', 'start');
@@ -523,6 +523,11 @@ JobNode.prototype.onContexMenu = function( i_evt)
 	menu.addItem('Restart&Pause', 'restart_pause');
 	menu.addItem('Delete', 'delete');
 	menu.show();
+}
+
+JobNode.prototype.openDialogSet = function()
+{
+	var dialog = new cgru_Dialog( document, document.body, this, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
 }
 
 JobNode.prototype.action = function( i_name)
