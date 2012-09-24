@@ -391,7 +391,7 @@ Monitor.prototype.onMouseOverSet = function( evt)
 g_cur_monitor.info('onMouseOverSet');
 	if( g_cur_monitor.cur_item == null ) return;
 
-	g_cur_monitor.cur_item.openDialogSet();
+	g_cur_monitor.cur_item.openMenuSet( evt);
 }
 
 Monitor.prototype.action = function( i_name)

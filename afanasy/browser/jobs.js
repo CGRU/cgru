@@ -276,6 +276,8 @@ JobBlock.prototype.constructFull = function()
 	this.elTasksDon = cm_ElCreateText( this.elFull, 'Done Tasks Counter');
 	this.elTasksRdy = cm_ElCreateText( this.elFull, 'Ready Tasks Counter');
 	this.elTasksRun = cm_ElCreateText( this.elFull, 'Running Tasks Counter');
+	this.elTasksSkp = cm_ElCreateText( this.elFull, 'Skipped Tasks Counter');
+	this.elTasksWrn = cm_ElCreateText( this.elFull, 'Warning Tasks Counter');
 	this.elTasksErr = cm_ElCreateText( this.elFull, 'Error Tasks Counter');
 
 //	this.elTasksDon.classList.add('font-done');
@@ -424,11 +426,11 @@ JobBlock.prototype.update = function( i_displayFull)
 		this.elPercentage.innerHTML = percentage + '%';
 
 		var tasks_done = 0;
-		if( this.params.p_tasksdone ) tasks_done = this.params.p_tasksdone;
+		if( this.params.p_tasks_done ) tasks_done = this.params.p_tasks_done;
 		this.elTasksDon.innerHTML = 'don:'+tasks_done;
 
 		var tasks_rdy = 0;
-		if( this.params.p_tasksready ) tasks_rdy = this.params.p_tasksready;
+		if( this.params.p_tasks_ready ) tasks_rdy = this.params.p_tasks_ready;
 		this.elTasksRdy.innerHTML = 'rdy:'+tasks_rdy;
 
 		var tasks_run = 0;
@@ -440,17 +442,33 @@ JobBlock.prototype.update = function( i_displayFull)
 		else this.elTasksRun.innerHTML = '';
 
 		var tasks_err = 0;
-		if( this.params.p_taskserror )
+		if( this.params.p_tasks_error )
 		{
-			tasks_err = this.params.p_taskserror;
+			tasks_err = this.params.p_tasks_error;
 			this.elTasksErr.innerHTML = 'err:'+tasks_err;
 		}
 		else this.elTasksErr.innerHTML = '';
 
-		if( this.params.p_taskssumruntime && tasks_done )
+		var tasks_skp = 0;
+		if( this.params.p_tasks_skipped )
 		{
-			var sum = cm_TimeStringFromSeconds( this.params.p_taskssumruntime);
-			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_taskssumruntime / tasks_done));
+			tasks_skp = this.params.p_tasks_skipped;
+			this.elTasksSkp.innerHTML = 'skp:'+tasks_skp;
+		}
+		else this.elTasksSkp.innerHTML = '';
+
+		var tasks_wrn = 0;
+		if( this.params.p_tasks_warning )
+		{
+			tasks_wrn = this.params.p_tasks_warning;
+			this.elTasksWrn.innerHTML = 'wrn:'+tasks_wrn;
+		}
+		else this.elTasksWrn.innerHTML = '';
+
+		if( this.params.p_tasks_run_time && tasks_done )
+		{
+			var sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
+			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / tasks_done));
 			this.elRunTime.innerHTML = sum +'/'+avg;
 			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
 		}
@@ -462,14 +480,14 @@ JobBlock.prototype.update = function( i_displayFull)
 
 		var he_txt = '', he_tit = '';
 		this.elErrHosts.classList.remove('ERR');
-		if( this.params.p_errorhostsnum )
+		if( this.params.p_error_hosts )
 		{
-			he_txt = 'Eh' + this.params.p_errorhostsnum;
-			he_tit = 'Error Hosts: ' + this.params.p_errorhostsnum;
-			if( this.params.p_avoidhostsnum )
+			he_txt = 'Eh' + this.params.p_error_hosts;
+			he_tit = 'Error Hosts: ' + this.params.p_error_hosts;
+			if( this.params.p_avoid_hosts )
 			{
-				he_txt += ': ' + this.params.p_avoidhostsnum + ' Avoid';
-				he_tit += '\nAvoiding Hosts: ' + this.params.p_avoidhostsnum;
+				he_txt += ': ' + this.params.p_avoid_hosts + ' Avoid';
+				he_tit += '\nAvoiding Hosts: ' + this.params.p_avoid_hosts;
 				this.elErrHosts.classList.add('ERR');
 			}
 		}
@@ -525,13 +543,20 @@ JobNode.prototype.onContexMenu = function( i_evt)
 	menu.show();
 }
 
-JobNode.prototype.openDialogSet = function()
+JobNode.prototype.openMenuSet = function( i_evt)
 {
-	var dialog = new cgru_Dialog( document, document.body, this, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
+	var menu = new cgru_Menu( document.body, i_evt, this, 'jobs_menuset');
+	menu.addItem('Annotation','annotation');
+	menu.show();
 }
 
 JobNode.prototype.action = function( i_name)
 {
+	if( i_name == 'annotation')
+	{
+		var dialog = new cgru_Dialog( document, document.body, this, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
+		return;
+	}
 	this.monitor.action( i_name);
 }
 

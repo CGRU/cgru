@@ -34,7 +34,7 @@ function cm_OnKeyDown(e)
 	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( false); // UP
 //	else if(evt.keyCode==116) return false; // F5
 //document.getElementById('test').innerHTML='key down: ' + e.keyCode;
-//	return false; 
+//	return true; 
 }
 
 function cm_OnKeyUp(e)

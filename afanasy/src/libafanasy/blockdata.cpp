@@ -67,17 +67,19 @@ void BlockData::initDefaults()
 	m_multihost_service_wait = 0;
 	m_parser_coeff = 1;
 
-	p_percentage = 0;
-	p_errorhostsnum = 0;
-	p_avoidhostsnum = 0;
-	p_tasksready = 0;
-	p_tasksdone = 0;
-	p_taskserror = 0;
-	p_taskssumruntime = 0;
+	p_percentage     = 0;
+	p_error_hosts    = 0;
+	p_avoid_hosts    = 0;
+	p_tasks_ready    = 0;
+	p_tasks_done     = 0;
+	p_tasks_error    = 0;
+	p_tasks_skipped  = 0;
+	p_tasks_warning  = 0;
+	p_tasks_run_time = 0;
 
 	memset( p_bar_running, 0, AFJOB::PROGRESS_BYTES);
 	memset( p_bar_done,    0, AFJOB::PROGRESS_BYTES);
-	memset( p_progressbar,     AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
+	memset( p_progressbar, AFJOB::ASCII_PROGRESS_STATES[0], AFJOB::ASCII_PROGRESS_LENGTH);
 }
 
 BlockData::BlockData( Msg * msg)
@@ -227,12 +229,12 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_int32 ("running_tasks_counter", m_running_tasks_counter, i_object);
 
 	jr_uint8 ("p_percentage",      p_percentage,      i_object);
-	jr_int32 ("p_errorhostsnum",   p_errorhostsnum,   i_object);
-	jr_int32 ("p_avoidhostsnum",   p_avoidhostsnum,   i_object);
-	jr_int32 ("p_tasksready",      p_tasksready,      i_object);
-	jr_int32 ("p_tasksdone",       p_tasksdone,       i_object);
-	jr_int32 ("p_taskserror",      p_taskserror,      i_object);
-	jr_int64 ("p_taskssumruntime", p_taskssumruntime, i_object);
+	jr_int32 ("p_error_hosts",   p_error_hosts,   i_object);
+	jr_int32 ("p_avoid_hosts",   p_avoid_hosts,   i_object);
+	jr_int32 ("p_tasks_ready",      p_tasks_ready,      i_object);
+	jr_int32 ("p_tasks_done",       p_tasks_done,       i_object);
+	jr_int32 ("p_tasks_error",      p_tasks_error,      i_object);
+	jr_int64 ("p_tasks_run_time", p_tasks_run_time, i_object);
 
 	//rw_data(   (char*)p_bar_done,       i_object, AFJOB::PROGRESS_BYTES);
 	//rw_data(   (char*)p_bar_running,    i_object, AFJOB::PROGRESS_BYTES);
@@ -397,22 +399,26 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
             o_str << ",\"running_tasks_counter\":" << m_running_tasks_counter;
 
 		if( p_percentage > 0 )
-            o_str << ",\"p_percentage\":"      << int(p_percentage);
-		if( p_errorhostsnum > 0 )
-            o_str << ",\"p_errorhostsnum\":"   << p_errorhostsnum;
-		if( p_avoidhostsnum > 0 )
-            o_str << ",\"p_avoidhostsnum\":"   << p_avoidhostsnum;
-		if( p_tasksready > 0 )
-            o_str << ",\"p_tasksready\":"      << p_tasksready;
-		if( p_tasksdone > 0 )
-            o_str << ",\"p_tasksdone\":"       << p_tasksdone;
-		if( p_taskserror > 0 )
-            o_str << ",\"p_taskserror\":"      << p_taskserror;
-		if( p_taskssumruntime > 0 )
-            o_str << ",\"p_taskssumruntime\":" << p_taskssumruntime;
+            o_str << ",\"p_percentage\":"     << int(p_percentage);
+		if( p_error_hosts > 0 )
+            o_str << ",\"p_error_hosts\":"    << p_error_hosts;
+		if( p_avoid_hosts > 0 )
+            o_str << ",\"p_avoid_hosts\":"    << p_avoid_hosts;
+		if( p_tasks_ready > 0 )
+            o_str << ",\"p_tasks_ready\":"    << p_tasks_ready;
+		if( p_tasks_done > 0 )
+            o_str << ",\"p_tasks_done\":"     << p_tasks_done;
+		if( p_tasks_error > 0 )
+            o_str << ",\"p_tasks_error\":"    << p_tasks_error;
+		if( p_tasks_skipped > 0 )
+            o_str << ",\"p_tasks_skipped\":"  << p_tasks_skipped;
+		if( p_tasks_warning > 0 )
+            o_str << ",\"p_tasks_warning\":"  << p_tasks_warning;
+		if( p_tasks_run_time > 0 )
+            o_str << ",\"p_tasks_run_time\":" << p_tasks_run_time;
 
-//		if(( p_tasksdone < m_tasks_num ) ||
-//		     p_taskserror || m_running_tasks_counter )
+//		if(( p_tasks_done < m_tasks_num ) ||
+//		     p_tasks_error || m_running_tasks_counter )
 		{
 			o_str << ",\"p_progressbar\":\"";
 			for( int i = 0; i < AFJOB::ASCII_PROGRESS_LENGTH; i++)
@@ -532,12 +538,12 @@ void BlockData::readwrite( Msg * msg)
 		rw_data(   (char*)p_bar_done,         msg, AFJOB::PROGRESS_BYTES);
 		rw_data(   (char*)p_bar_running,      msg, AFJOB::PROGRESS_BYTES);
 		rw_uint8_t ( p_percentage,            msg);
-		rw_int32_t ( p_errorhostsnum,         msg);
-		rw_int32_t ( p_avoidhostsnum,         msg);
-		rw_int32_t ( p_tasksready,            msg);
-		rw_int32_t ( p_tasksdone,             msg);
-		rw_int32_t ( p_taskserror,            msg);
-		rw_int64_t ( p_taskssumruntime,       msg);
+		rw_int32_t ( p_error_hosts,         msg);
+		rw_int32_t ( p_avoid_hosts,         msg);
+		rw_int32_t ( p_tasks_ready,            msg);
+		rw_int32_t ( p_tasks_done,             msg);
+		rw_int32_t ( p_tasks_error,            msg);
+		rw_int64_t ( p_tasks_run_time,       msg);
 
 		rw_uint32_t( m_state,                 msg);
 		rw_int32_t ( m_job_id,                msg);
@@ -1114,15 +1120,15 @@ void BlockData::generateInfoStreamTyped( std::ostringstream & o_str, int type, b
 
       if( full ) o_str << "\nRunning Progress:";
 
-      if( p_tasksdone ) o_str << "\n Run Time: Sum = " << af::time2strHMS( p_taskssumruntime, true)
-            << " / Average = " << af::time2strHMS( p_taskssumruntime/p_tasksdone, true);
+      if( p_tasks_done ) o_str << "\n Run Time: Sum = " << af::time2strHMS( p_tasks_run_time, true)
+            << " / Average = " << af::time2strHMS( p_tasks_run_time/p_tasks_done, true);
 
-      if( full ) o_str << "\n Tasks Ready = " << p_tasksready;
-      if( full ) o_str << "\n Tasks Done = " << p_tasksdone;
-      if( full ) o_str << "\n Tasks Error = " << p_taskserror;
+      if( full ) o_str << "\n Tasks Ready = " << p_tasks_ready;
+      if( full ) o_str << "\n Tasks Done = " << p_tasks_done;
+      if( full ) o_str << "\n Tasks Error = " << p_tasks_error;
 
-      if( p_errorhostsnum ) o_str << "\n Error hosts count = " << p_errorhostsnum;
-      if( p_avoidhostsnum ) o_str << "\n Avoid hosts count = " << p_avoidhostsnum;
+      if( p_error_hosts ) o_str << "\n Error hosts count = " << p_error_hosts;
+      if( p_avoid_hosts ) o_str << "\n Avoid hosts count = " << p_avoid_hosts;
 
       break;
 
@@ -1162,13 +1168,15 @@ bool BlockData::updateProgress( JobProgress * progress)
    if( updateBars( progress))
       changed = true;
 
-   uint32_t  new_state                  = 0;
-   int32_t   new_tasksready             = 0;
-   int32_t   new_tasksdone              = 0;
-   int32_t   new_taskserror             = 0;
-   int32_t   new_percentage             = 0;
-   bool      new_tasksskipped           = false;
-   long long new_taskssumruntime        = 0;
+	uint32_t  new_state          = 0;
+	int32_t   new_percentage     = 0;
+	int32_t   new_tasks_ready    = 0;
+	int32_t   new_tasks_done     = 0;
+	int32_t   new_tasks_error    = 0;
+	int       new_tasks_skipped  = 0;
+	int       new_tasks_warning  = 0;
+	long long new_tasks_run_time = 0;
+
 
    for( int t = 0; t < m_tasks_num; t++)
    {
@@ -1177,13 +1185,13 @@ bool BlockData::updateProgress( JobProgress * progress)
 
       if( task_state & AFJOB::STATE_READY_MASK   )
       {
-         new_tasksready++;
+         new_tasks_ready++;
       }
       if( task_state & AFJOB::STATE_DONE_MASK    )
       {
-         new_tasksdone++;
+         new_tasks_done++;
          task_percent = 100;
-         new_taskssumruntime += progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
+         new_tasks_run_time += progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
       }
       if( task_state & AFJOB::STATE_RUNNING_MASK )
       {
@@ -1194,34 +1202,42 @@ bool BlockData::updateProgress( JobProgress * progress)
       }
       if( task_state & AFJOB::STATE_ERROR_MASK   )
       {
-         new_taskserror++;
+         new_tasks_error++;
          task_percent = 0;
-         new_taskssumruntime += progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
+         new_tasks_run_time += progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
       }
-      if( task_state & AFJOB::STATE_SKIPPED_MASK   )
-      {
-         new_tasksskipped = true;
-         new_taskssumruntime += progress->tp[m_block_num][t]->time_done - progress->tp[m_block_num][t]->time_start;
-      }
+		if( task_state & AFJOB::STATE_SKIPPED_MASK )
+		{
+			new_tasks_skipped++;
+			task_percent = 100;
+		}
+		if( task_state & AFJOB::STATE_WARNING_MASK )
+		{
+			new_tasks_warning++;
+		}
 
       new_percentage += task_percent;
    }
    new_percentage = new_percentage / m_tasks_num;
 
-   if(( p_tasksready          != new_tasksready             )||
-      ( p_tasksdone           != new_tasksdone              )||
-      ( p_taskserror          != new_taskserror             )||
-      ( p_percentage          != new_percentage             )||
-      ( p_taskssumruntime     != new_taskssumruntime        ))
-      changed = true;
+	if(( p_tasks_ready    != new_tasks_ready    )||
+	   ( p_tasks_done     != new_tasks_done     )||
+	   ( p_tasks_error    != new_tasks_error    )||
+	   ( p_tasks_skipped  != new_tasks_skipped  )||
+	   ( p_tasks_warning  != new_tasks_warning  )||
+	   ( p_percentage     != new_percentage     )||
+	   ( p_tasks_run_time != new_tasks_run_time ))
+		changed = true;
 
-   p_tasksready         = new_tasksready;
-   p_tasksdone          = new_tasksdone;
-   p_taskserror         = new_taskserror;
-   p_percentage         = new_percentage;
-   p_taskssumruntime    = new_taskssumruntime;
+	p_tasks_ready    = new_tasks_ready;
+	p_tasks_done     = new_tasks_done;
+	p_tasks_error    = new_tasks_error;
+	p_tasks_skipped  = new_tasks_skipped;
+	p_tasks_warning  = new_tasks_warning;
+	p_percentage     = new_percentage;
+	p_tasks_run_time = new_tasks_run_time;
 
-   if( new_tasksready)
+   if( new_tasks_ready)
    {
       new_state = new_state | AFJOB::STATE_READY_MASK;
       new_state = new_state & (~AFJOB::STATE_DONE_MASK);
@@ -1241,17 +1257,17 @@ bool BlockData::updateProgress( JobProgress * progress)
       new_state = new_state & (~AFJOB::STATE_RUNNING_MASK);
    }
 
-   if( new_tasksdone == m_tasks_num ) new_state = new_state |   AFJOB::STATE_DONE_MASK;
-   else                            new_state = new_state & (~AFJOB::STATE_DONE_MASK);
+	if( new_tasks_done == m_tasks_num ) new_state = new_state |   AFJOB::STATE_DONE_MASK;
+	else                                new_state = new_state & (~AFJOB::STATE_DONE_MASK);
 
-   if( new_taskserror) new_state = new_state |   AFJOB::STATE_ERROR_MASK;
-   else                new_state = new_state & (~AFJOB::STATE_ERROR_MASK);
+	if( new_tasks_error) new_state = new_state |   AFJOB::STATE_ERROR_MASK;
+	else                 new_state = new_state & (~AFJOB::STATE_ERROR_MASK);
 
-   if( new_tasksskipped) new_state = new_state |   AFJOB::STATE_SKIPPED_MASK;
-   else                  new_state = new_state & (~AFJOB::STATE_SKIPPED_MASK);
+	if( new_tasks_skipped) new_state = new_state |   AFJOB::STATE_SKIPPED_MASK;
+	else                   new_state = new_state & (~AFJOB::STATE_SKIPPED_MASK);
 
-   if( m_state & AFJOB::STATE_WAITDEP_MASK)
-      new_state = new_state & (~AFJOB::STATE_READY_MASK);
+	if( m_state & AFJOB::STATE_WAITDEP_MASK)
+	new_state = new_state & (~AFJOB::STATE_READY_MASK);
 
    bool depend = m_state & AFJOB::STATE_WAITDEP_MASK;
    m_state = new_state;
