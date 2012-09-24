@@ -4,7 +4,7 @@
 
 Summary:       Afanasy Qt GUI files
 License:       LGPL
-Name:          afanasy-common
+Name:          afanasy-qtgui
 Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
