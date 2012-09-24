@@ -3,11 +3,12 @@
 %define _topdir %(echo $PWD)/RPM
 
 Summary:       Afanasy render client
-License:       GPL
+License:       LGPL
 Name:          afanasy-render
 Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
+URL:           http://cgru.info/
 
 Requires:      afanasy-common = @VERSION@
 

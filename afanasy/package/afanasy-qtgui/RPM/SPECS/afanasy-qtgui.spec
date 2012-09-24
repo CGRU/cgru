@@ -2,7 +2,7 @@
 
 %define _topdir %(echo $PWD)/RPM
 
-Summary:       Afanasy binary files
+Summary:       Afanasy Qt GUI files
 License:       LGPL
 Name:          afanasy-common
 Version:       @VERSION@
@@ -13,7 +13,7 @@ URL:           http://cgru.info/
 Requires:      cgru-common = @VERSION@
 
 %description
-Afanasy binary files.
+Afanasy Qt GUI files.
 
 %prep
 

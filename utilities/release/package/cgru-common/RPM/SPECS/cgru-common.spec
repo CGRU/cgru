@@ -3,11 +3,12 @@
 %define _topdir %(echo $PWD)/RPM
 
 Summary:       CGRU Common
-License:       GPL
+License:       LGPL
 Name:          cgru-common
 Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
+URL:           http://cgru.info/
 
 AutoReqProv:   no
 

@@ -1,11 +1,11 @@
-Package: afanasy-common
+Package: afanasy-qtgui
 Version: @VERSION@
 Architecture: @ARCHITECTURE@
 Maintainer: Timur Hairulin <timurhai@gmail.com>
 Installed-Size: @SIZE@
-Depends: cgru-common (= @VERSION@), @DEPENDS_AFANASY_COMMA@
+Depends: cgru-common (= @VERSION@), @DEPENDS_QTGUI_COMMA@
 Section: graphics
 Priority: extra
 Homepage: http://cgru.info/
-Description: Afanasy binary files
- Afanasy binary files.
+Description: Afanasy Qt GUI files
+ Afanasy Qt GUI files.

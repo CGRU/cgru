@@ -7,10 +7,10 @@ install_afrender="install_afrender.sh"
 uninstall="uninstall.sh"
 template="install_template"
 
-packages_cgru="cgru-common afanasy-common afanasy-render cgru"
+packages_cgru="cgru-common afanasy-common afanasy-render afanasy-qtgui cgru"
 packages_afrender="cgru-common afanasy-common afanasy-render"
 packages_afserver="cgru-common afanasy-common afanasy-server"
-packages_uninstall="cgru afanasy-render afanasy-server afanasy-common cgru-common"
+packages_uninstall="cgru afanasy-qtgui afanasy-render afanasy-server afanasy-common cgru-common"
 
 [ -z "${PACKAGE_FORMAT}" ] && source ../distribution.sh
 [ -z "${PACKAGE_FORMAT}" ] && exit 1

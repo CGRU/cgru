@@ -3,11 +3,12 @@
 %define _topdir %(echo $PWD)/RPM
 
 Summary:       Afanasy server
-License:       GPL
+License:       LGPL
 Name:          afanasy-server
 Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
+URL:           http://cgru.info/
 
 Requires:      afanasy-common = @VERSION@
 

@@ -85,13 +85,17 @@ You can upgrade only one client to check changes, the is no need to update all c
 <br/>
 
 
-<p><a id="release166"><b>1.6.6</b></a> 2012.09.12</p>
+<p><a id="release166"><b>1.6.6</b></a> 2012.09.24</p>
 <p>
 	All Python applications with GUI in CGRU can use and PySide and PyQt.
 	At first PySide will be tried to import and than PyQt.
 	It means that if you have PySide instaled it will be used.
 	PySide has LGPL license, PyQt - only GPL.
-	So now all CGRU components has LGPL or similar license.
+	So now all components in <b>CGRU has LGPL license</b> or similar.
+</p>
+<p>
+	New Linux package <b><i>afanasy-qtgui</i></b> appeared.
+	Needed only to remove <i>libqt</i> dependence from <i>afanasy-render</i> and <i>afansy-server</i> packages (not to install huge Qt on render nodes).
 </p>
 <p>
 	Bugs Fixed:

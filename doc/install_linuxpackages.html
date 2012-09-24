@@ -47,130 +47,146 @@ Linux packages will be installed in <kbd>/opt/cgru</kbd> folder.
 
 <table border="1" width="100%">
 <tr aligh="center">
-   <td style="padding:6px">
-      <h3>Dependence<br/>Structure:</h3>
-   </td>
-   <td style="padding:6px">
-      <h3>Description:</h3>
-   </td>
-   <td style="padding:6px">
-      <h3>Depends:</h3>
-   </td>
-   <td style="padding:6px">
-      <h3>Suggests:</h3>
-   </td>
+	<td style="padding:6px">
+		<h3>Dependence<br/>Structure:</h3>
+	</td>
+	<td style="padding:6px">
+		<h3>Description:</h3>
+	</td>
+	<td style="padding:6px">
+		<h3>Depends:</h3>
+	</td>
+	<td style="padding:6px">
+		<h3>Suggests:</h3>
+	</td>
 </tr>
 <tr aligh="center">
-   <td rowspan="5" style="padding:6px">
-      <ul>
-      <li>
-         cgru
-         <ul>
-         <li>
-            afanasy-render
-            <ul>
-            <li>
-               afanasy-common
-               <ul>
-               <li>
-                  cgru-common
-               </li>
-               </ul>
-            </li>
-            </ul>
-         </li>
-         </ul>
-      </li>
-      <li>
-         afanasy-server
-         <ul>
-         <li>
-            afanasy-common
-            <ul>
-            <li>
-               cgru-common
-            </li>
-            </ul>
-         </li>
-         </ul>
-      </li>
-      </ul>
-   </td>
-   <td style="padding:6px">
-      <p><b>cgru</b>: Start menu item.</p>
-   </td>
-   <td align="center" style="padding:6px">
-      PyQt
-   </td>
-   <td align="center" style="padding:6px">
-   </td>
+	<td rowspan="6" style="padding:6px">
+		<ul>
+		<li>
+			cgru
+			<ul>
+			<li>
+				afanasy-render
+				<ul>
+				<li>
+					afanasy-common
+					<ul>
+					<li>
+						cgru-common
+					</li>
+					</ul>
+				</li>
+				</ul>
+			</li>
+			<li>
+				afanasy-qtgui
+				<ul>
+				<li>
+					cgru-common
+				</li>
+				</ul>
+			</li>
+			</ul>
+		</li>
+		<li>
+			afanasy-server
+			<ul>
+			<li>
+				afanasy-common
+				<ul>
+				<li>
+					cgru-common
+				</li>
+				</ul>
+			</li>
+			</ul>
+		</li>
+		</ul>
+	</td>
+	<td style="padding:6px">
+		<p><b>cgru</b>: Start menu item.</p>
+	</td>
+	<td align="center" style="padding:6px">
+		PyQt
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
 </tr>
 <tr>
-   <td style="padding:6px">
-      <p><b>cgru-common</b>: All files, except Afanasy binaries.<br/></p>
-   </td>
-   <td align="center" style="padding:6px">
-   </td>
-   <td align="center" style="padding:6px">
-      mencoder
-   </td>
+	<td style="padding:6px">
+		<p><b>cgru-common</b>: All files, except Afanasy binaries.<br/></p>
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
 </tr>
 <tr>
-   <td style="padding:6px">
-      <p><b>afanasy-common</b>: Afanasy binary files.</p>
-   </td>
-   <td align="center" style="padding:6px">
-      Qt (libqt)<br/>
-      PostgreSQL (libpq)<br/>
-   </td>
-   <td align="center" style="padding:6px">
-   </td>
+	<td style="padding:6px">
+		<p><b>afanasy-common</b>: Afanasy binary files.</p>
+	</td>
+	<td align="center" style="padding:6px">
+		PostgreSQL (libpq)<br/>
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
 </tr>
 <tr>
-   <td style="padding:6px">
-      <p><b>afanasy-render</b>: Afanasy render startup script. Creates '<i>render</i>' user if does not exists.</p>
-   </td>
-   <td align="center" style="padding:6px">
-   </td>
-   <td align="center" style="padding:6px">
-   </td>
+	<td style="padding:6px">
+		<p><b>afanasy-render</b>: Afanasy render startup script. Creates '<i>render</i>' user if does not exists.</p>
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
 </tr>
 <tr>
-   <td style="padding:6px">
-      <p><b>afanasy-server</b>: Afanasy server startup script. Creates '<i>render</i>' user if does not exists.</p>
-   </td>
-   <td align="center" style="padding:6px">
-   </td>
-   <td align="center" style="padding:6px">
-      postgresql-server apache php php-gd php-pgsql
-   </td>
+	<td style="padding:6px">
+		<p><b>afanasy-server</b>: Afanasy server startup script. Creates '<i>render</i>' user if does not exists.</p>
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
+	<td align="center" style="padding:6px">
+		postgresql-server apache php php-gd php-pgsql
+	</td>
 </tr>
 <tr>
-   <td style="padding:6px" colspan="2">
-   </td>
-   <td style="padding:6px" colspan="2">
-      * <i>Packages names are vary in each Linux distribution.</i>
-   </td>
+	<td style="padding:6px">
+		<p><b>afanasy-qtgui</b>: Afanasy Qt GUI files.</p>
+	</td>
+	<td align="center" style="padding:6px">
+		Qt (libqt)<br/>
+	</td>
+	<td align="center" style="padding:6px">
+	</td>
+</tr>
+<tr>
+	<td style="padding:6px" colspan="2">
+	</td>
+	<td style="padding:6px" colspan="2">
+		* <i>Packages names are vary in each Linux distribution.</i>
+	</td>
 </tr>
 </table>
 
 <h3>Setup Files:</h3>
 <ul>
 <li>
-   <b>opt/cgru/config.xml</b> - global CGRU configuration (documentation server, default = localhost).
+	<b>opt/cgru/config.xml</b> - global CGRU configuration (documentation server, default = localhost).
 </li>
 <li>
-   <b>opt/cgru/afanasy/config.xml</b> - Afanasy configuration (afanasy server, default = localhost).
+	<b>opt/cgru/afanasy/config.xml</b> - Afanasy configuration (afanasy server, default = localhost).
 </li>
 <li>
-   <b>opt/cgru/afanasy/farm.xml</b> - Farm hosts configuration.
+	<b>opt/cgru/afanasy/farm.xml</b> - Farm hosts configuration.
 </li>
 <li>
-   <b>opt/cgru/afanasy/nonrootuser</b> - Afanasy server and render user name (default = render).
+	<b>opt/cgru/afanasy/nonrootuser</b> - Afanasy server and render user name (default = render).
 </li>
 <li>
-   <b>opt/cgru/afanasy/init/depends_afserver_*</b> - Afanasy server depends.<br/>
-   <b>opt/cgru/afanasy/init/depends_afrender_*</b> - Afanasy render depends.
+	<b>opt/cgru/afanasy/init/depends_afserver_*</b> - Afanasy server depends.<br/>
+	<b>opt/cgru/afanasy/init/depends_afrender_*</b> - Afanasy render depends.
 </li>
 </ul>
 
@@ -219,19 +235,19 @@ See commands in uninstall script from any version and use them to remove old 'ha
 <table width="100%" align="center" cellpadding="0" cellspacing="0">
 <tr>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../doc/images/footer_left.png')" />
+	<div style="width:100%;height:40px;background:url('../doc/images/footer_left.png')" />
 </td>
 <td>
-   <div style="width:100%;height:40px;background:url('../doc/images/footer.png') repeat-x" />
+	<div style="width:100%;height:40px;background:url('../doc/images/footer.png') repeat-x" />
 </td>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../doc/images/footer_center.png')" />
+	<div style="width:100%;height:40px;background:url('../doc/images/footer_center.png')" />
 </td>
 <td>
-   <div style="width:100%;height:40px;background:url('../doc/images/footer.png') repeat-x" />
+	<div style="width:100%;height:40px;background:url('../doc/images/footer.png') repeat-x" />
 </td>
 <td width="200px">
-   <div style="width:100%;height:40px;background:url('../doc/images/footer_right.png')" />
+	<div style="width:100%;height:40px;background:url('../doc/images/footer_right.png')" />
 </td>
 </tr>
 </table>

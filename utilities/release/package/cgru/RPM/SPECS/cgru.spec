@@ -3,13 +3,14 @@
 %define _topdir %(echo $PWD)/RPM
 
 Summary:       CGRU
-License:       GPL
+License:       LGPL
 Name:          cgru
 Version:       @VERSION@
 Release:       @RELEASE@
 Group:         Applications/Graphics
+URL:           http://cgru.info/
 
-Requires:      cgru-common = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@, @DEPENDS_CGRU_COMMA@
+Requires:      cgru-common = @VERSION@, afanasy-qtgui = @VERSION@, afanasy-render = @VERSION@, afanasy-common = @VERSION@, @DEPENDS_CGRU_COMMA@
 AutoReqProv:   no
 
 %description

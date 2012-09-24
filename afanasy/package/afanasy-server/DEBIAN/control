@@ -6,7 +6,7 @@ Installed-Size: @SIZE@
 Depends: afanasy-common (= @VERSION@)
 Section: graphics
 Priority: extra
-Homepage: http://sourceforge.net/projects/cgru/
+Homepage: http://cgru.info/
 Description: Afanasy Server
  Create user "render" if does not exists.
  Setup server daemon startup.
