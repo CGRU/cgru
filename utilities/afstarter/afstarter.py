@@ -444,7 +444,7 @@ class Dialog( QtGui.QWidget):
       self.evaluate()
 
    def browseExec( self):
-      path = cgrupyqt.GetOpenFileName( self,'Choose a file', self.fields['exec'].text()
+      path = cgrupyqt.GetOpenFileName( self,'Choose a file', self.fields['exec'].text())
       if path == '': return
       self.fields['exec'].setText( os.path.normpath( path))
       self.evaluate()
