@@ -532,6 +532,8 @@ JobBlock.prototype.update = function( i_displayFull)
 JobNode.prototype.onContexMenu = function( i_evt)
 {
 	var menu = new cgru_Menu( document.body, i_evt, this, 'jobitem_context');
+	menu.addItem('Show Log...', 'log');
+	menu.addItem('Reset Error Hosts', 'reset_error_hosts');
 	menu.addItem('Restart Errors', 'restart_errors', this.elState.ERR);
 	menu.addSeparator();
 	menu.addItem('Start', 'start');
@@ -552,11 +554,16 @@ JobNode.prototype.openMenuSet = function( i_evt)
 
 JobNode.prototype.action = function( i_name)
 {
+	g_Info('action = ' + i_name);	
 	if( i_name == 'annotation')
 	{
 		var dialog = new cgru_Dialog( document, document.body, this, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
-		return;
 	}
-	this.monitor.action( i_name);
+	else if( i_name == 'log')
+	{
+		nw_GetNodes('jobs', [this.monitor.cur_item.params.id], i_name);
+	}
+	else
+		this.monitor.action( i_name);
 }
 

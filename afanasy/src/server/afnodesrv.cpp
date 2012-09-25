@@ -1,5 +1,7 @@
 #include "afnodesrv.h"
 
+#include "../libafanasy/environment.h"
+
 #include "action.h"
 #include "afcommon.h"
 
@@ -97,7 +99,7 @@ void AfNodeSrv::action( Action & i_action)
 		if( i_action.log[0] == '\n' )
 			i_action.log[0] = ' ';
 		i_action.log += std::string(" by ") + i_action.author;
-		m_node->appendLog( i_action.log);
+		appendLog( i_action.log);
 	}
 }
 
@@ -248,5 +250,41 @@ bool AfNodeSrv::solveList( std::list<AfNodeSrv*> & i_list, af::Node::SolvingMeth
 
     // Return false - that no nodes was not solved
     return false;
+}
+
+void AfNodeSrv::appendLog( const std::string & message)
+{
+	m_log.push_back( af::time2str() + " : " + message);
+	while( m_log.size() > af::Environment::getAfNodeLogLinesMax() ) m_log.pop_front();
+}
+
+int AfNodeSrv::calcLogWeight() const
+{
+	int weight = 0;
+	for( std::list<std::string>::const_iterator it = m_log.begin(); it != m_log.end(); it++)
+		weight += af::weigh( *it);
+    return weight;
+}
+
+af::Msg * AfNodeSrv::writeLog() const
+{
+	af::Msg * msg = new af::Msg();
+	std::ostringstream stream;
+
+	stream << "{\"log\":{\"id\":" << m_node->m_id;
+	stream << ",\"name\":\"" << m_node->m_name << "\"";
+	stream << ",\"list\":[";
+	for( std::list<std::string>::const_iterator it = m_log.begin(); it != m_log.end(); it++)
+	{
+		if( it != m_log.begin())
+			stream << ",";
+		stream << "\"" << af::strEscape(*it) << "\"";
+	}
+	stream << "]}}";
+
+	std::string string = stream.str();
+	msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
+
+	return msg;
 }
 

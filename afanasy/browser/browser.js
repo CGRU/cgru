@@ -34,7 +34,7 @@ function g_Register()
 
 function g_ProcessMsg( obj)
 {
-	if(( obj.files != null ) && ( obj.path != null ))
+	if( obj.files && obj.path )
 	{
 		for( var i = 0; i < obj.files.length; i++)
 		{
@@ -42,9 +42,10 @@ function g_ProcessMsg( obj)
 			img.src = obj.path + "/" + obj.files[i];
 			g_Images.push( img);
 		}
+		return;
 	}
 
-	if( obj.id != null )
+	if( obj.id )
 	{
 		if(( g_id == 0 ) && ( obj.id > 0 ))
 		{
@@ -57,6 +58,13 @@ function g_ProcessMsg( obj)
 			// Recieved ID does not match:
 			g_Deregistered();
 		}
+		return;
+	}
+
+	if( obj.log )
+	{
+		g_ShowLog( obj.log);
+		return;
 	}
 
 	if( g_id == 0 )
@@ -154,6 +162,17 @@ function g_OpenTasks( i_job_id)
 {
 	g_CloseAllMonitors();
 	g_OpenMonitor('tasks', i_job_id);
+}
+
+function g_ShowLog( log)
+{
+	if( log.list == null ) return;
+	var logWnd = window.open( null, 'Log', 'location=no');
+	cgru_LoadCSS(window.location+'afanasy/browser/style.css', logWnd.document);
+//	logWnd.document.write('<div>'+window.location+'</div>');
+	for( i = 0; i < log.list.length; i++)
+		logWnd.document.write('<div>'+log.list[i]+'</div>');
+	logWnd.focus();
 }
 
 function g_Info( i_msg, i_elem)

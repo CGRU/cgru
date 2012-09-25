@@ -1,0 +1,8 @@
+{
+	"get":
+	{
+		"type" : "jobs",
+		"mode" : "log",
+		"ids"  : [2]
+	}
+}

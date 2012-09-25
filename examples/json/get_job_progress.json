@@ -1,0 +1,8 @@
+{
+	"get":
+	{
+		"type" : "jobs",
+		"mode" : "progress",
+		"ids"  : [2]
+	}
+}

@@ -352,6 +352,11 @@ void JobAf::v_action( Action & i_action)
 		   restartAllTasks( true, "Job stopped by " + i_action.author, i_action.renders, i_action.monitors);
 		   m_state = m_state | AFJOB::STATE_OFFLINE_MASK;
 		}
+		else if( type == "reset_error_hosts")
+		{
+			for( int b = 0; b < m_blocksnum; b++)
+				m_blocks[b]->action( i_action);
+		}
 		else if( type == "restart")
 		{
 			//printf("Msg::TJobRestart:\n");

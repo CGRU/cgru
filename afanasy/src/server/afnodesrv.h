@@ -57,6 +57,11 @@ printf("m_node = %p\n", m_node);
 
 	virtual void setZombie() { m_node->m_flags = m_node->m_flags | af::Node::FZombie; } ///< Request to kill a node.
 
+	void appendLog( const std::string & message);  ///< Append task log with a \c message .
+	inline const std::list<std::string> & getLog() { return m_log; }    ///< Get log.
+	af::Msg * writeLog() const;
+	int calcLogWeight() const;
+
 //    inline void setHidden( bool i_hide = true) { if( i_hide ) m_flags = m_flags | FHidden; else m_flags = m_flags & (~FHidden); }
 
 	// Just interesting - good to show server load
@@ -132,4 +137,6 @@ private:
 
 /// List of lists which have this node ( for a exapmle: each user has some jobs).
 	std::list<AfList*> m_lists;
+
+	std::list<std::string> m_log;                          ///< Log.
 };
