@@ -12,15 +12,19 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_CGRU="python-qt4 imagemagick"
 		;;
 	Fedora )
-		export DEPENDS_CGRU="PyQt4 ImageMagick libpqxx"
+		export DEPENDS_AFANASY="libpqxx"
+		export DEPENDS_CGRU="PyQt4 ImageMagick"
 		;;
 	openSUSE )
-		export DEPENDS_CGRU="python-qt4 ImageMagick libpq5"
+		export DEPENDS_AFANASY="libpq5"
+		export DEPENDS_CGRU="python-qt4 ImageMagick"
 		;;
 	AltLinux )
-		export DEPENDS_CGRU="python-module-PyQt4 libpq5.4 ImageMagick"
+		export DEPENDS_AFANASY="libpq5.4"
+		export DEPENDS_CGRU="python-module-PyQt4 ImageMagick"
 		;;
 	*)
+		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_CGRU="PyQt4"
 		;;
 esac

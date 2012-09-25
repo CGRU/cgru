@@ -167,12 +167,15 @@ function g_OpenTasks( i_job_id)
 function g_ShowLog( log)
 {
 	if( log.list == null ) return;
-	var logWnd = window.open( null, 'Log', 'location=no');
-	cgru_LoadCSS(window.location+'afanasy/browser/style.css', logWnd.document);
-//	logWnd.document.write('<div>'+window.location+'</div>');
+	var wnd = window.open( null, 'Log', 'location=no');
+	cgru_LoadCSS(window.location+'afanasy/browser/style.css', wnd.document);
+	wnd.document.write('<div style="font: 12px Arial; background: #CCC; position:absolute;top:0;bottom:0;left:0;right:0;">');
+//	wnd.document.body.style.background = '#AAA';
+	wnd.document.write('<div>');
 	for( i = 0; i < log.list.length; i++)
-		logWnd.document.write('<div>'+log.list[i]+'</div>');
-	logWnd.focus();
+		wnd.document.write('<div>'+log.list[i]+'</div>');
+	wnd.document.write('</div>');
+	wnd.focus();
 }
 
 function g_Info( i_msg, i_elem)
