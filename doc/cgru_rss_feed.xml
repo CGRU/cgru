@@ -5,8 +5,8 @@
 	<atom:link href="http://cgru.info/doc/cgru_rss_feed.xml" rel="self" type="application/rss+xml" />
 	<description>CGRU: CG Tools&amp;Rules. Afanasy Free Open Source Render Farm Manager.</description>
 	<language>en-us</language>
-	<pubDate>Mon, 24 Sep 2012 00:00:00 GMT</pubDate>
-	<lastBuildDate>Mon, 24 Sep 2012 00:00:00 GMT</lastBuildDate>
+	<pubDate>Wed, 26 Sep 2012 00:00:00 GMT</pubDate>
+	<lastBuildDate>Wed, 26 Sep 2012 00:00:00 GMT</lastBuildDate>
 	<managingEditor>timurhai@gmail.com (Timur Hairulin)</managingEditor>
 	<webMaster>timurhai@gmail.com (Timur Hairulin)</webMaster>
 	<item>
@@ -15,9 +15,10 @@
 		<guid>http://cgru.info/doc/changes_log.html#release166</guid>
 		<description>
 			PySide and license.
+			New linux package 'afanasy-qtgui' to remove Qt dependence from 'afanasy-server' and 'afanasy-render' packages.
 			Bug fixes.
 		</description>
-		<pubDate>Mon, 24 Sep 2012 00:00:00 GMT</pubDate>
+		<pubDate>Wed, 26 Sep 2012 00:00:00 GMT</pubDate>
 	</item>
 	<item>
 		<title>CGRU Version 1.6.5 Released.</title>
