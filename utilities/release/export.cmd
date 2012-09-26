@@ -25,6 +25,7 @@ xcopy software_setup %dest%\software_setup\ /ys
 xcopy start %dest%\start\ /ys
 
 xcopy doc %dest%\doc\ /y
+xcopy doc\fun %dest%\doc\fun\ /ys
 xcopy doc\icons %dest%\doc\icons\ /ys
 xcopy doc\images %dest%\doc\images\ /ys
 
