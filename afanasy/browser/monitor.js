@@ -394,9 +394,9 @@ g_cur_monitor.info('onMouseOverSet');
 	g_cur_monitor.cur_item.openMenuSet( evt);
 }
 
-Monitor.prototype.action = function( i_name)
+Monitor.prototype.action = function( i_operation, i_params)
 {
-	nw_Action( this.type, i_name, this.getSelectedIds());
+	nw_Action( this.type, this.getSelectedIds(), i_operation, i_params);
 }
 
 Monitor.prototype.getSelectedIds = function()

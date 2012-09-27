@@ -1,4 +1,4 @@
-.cgrudialog {
+.cgru_dialog {
 position: absolute;
 background: #AAA;
 border-radius: 4px;
@@ -7,32 +7,41 @@ top: 30%;
 left: 10%;
 right: 10%;
 }
-.cgrudialogback {
+.cgru_dialog_back {
 position: absolute;
 background: rgba(0,0,0,0.5);
 top: 0; bottom: 0; left: 0; right: 0;
 }
-.cgrudialogtitle {
+.cgru_dialog * {
+margin: 10px;
+background: #CCC;
+padding: 6px;
+border-radius: 8px;
+}
+.cgru_dialog_title {
 margin: 0;
 background: #CCC;
 padding: 4px;
+border-radius: 0px;
+box-shadow: 0px 0px 5px #000;
 }
-.cgrudialoginfo {
-margin: 10px;
-background: #CCC;
-padding: 8px;
-border-radius: 8px;
+.cgru_dialog_info {
+box-shadow: 0px 0px 5px #000 inset;
 }
-.cgrudialoginput {
-margin: 10px;
+.cgru_dialog_input {
 background: #EEE;
-padding: 8px;
-border-radius: 8px;
-
+box-shadow: 0px 0px 5px #000 inset;
+}
+.cgru_dialog_button {
+/*margin: 0;*/
+box-shadow: 0px 0px 5px #000;
+text-align: center;
+width: 40%;
+float: left;
 }
 
 
-.cgrumenu {
+.cgru_menu {
 font-size: 12px;
 display: none;
 cursor: pointer;
@@ -43,8 +52,8 @@ box-shadow: 0px 0px 5px #000;
 padding: 4px 10px;
 top: 0; left: 0;
 }
-.cgrumenuitem { box-shadow: 0px 0px 10px #AAA inset; border-radius: 4px; padding: 2px; border-top: 1px solid #999;}
-.cgrumenuitem:first-child { border-style: none;}
-.cgrumenuitem:hover { background: #DFF;}
-.cgrumenuitem.disabled { color: #555;}
-.cgrumenuitem.disabled:hover { background: #AAA;}
+.cgru_menu_item { box-shadow: 0px 0px 10px #AAA inset; border-radius: 4px; padding: 2px; border-top: 1px solid #999;}
+.cgru_menu_item:first-child { border-style: none;}
+.cgru_menu_item:hover { background: #DFF;}
+.cgru_menu_item.disabled { color: #555;}
+.cgru_menu_item.disabled:hover { background: #AAA;}

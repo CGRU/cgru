@@ -47,11 +47,15 @@ copy . $dest
 
 rcopy bin $dest
 rcopy lib $dest
-rcopy doc $dest
 rcopy icons $dest
 rcopy software_setup $dest
 rcopy start $dest
 rcopy examples $dest
+
+copy doc $dest/doc
+rcopy doc/fun $dest/doc
+rcopy doc/icons $dest/doc
+rcopy doc/images $dest/doc
 
 copy afanasy $dest/afanasy
 rcopy afanasy/bin $dest/afanasy

@@ -121,18 +121,21 @@ function nw_ConstructActionObject( i_type, i_ids)
 	return obj;
 }
 
-function nw_Action( i_type, i_name, i_ids)
+function nw_Action( i_type, i_ids, i_operation, i_params)
 {
 	if( i_ids.length == 0 )
 	{
-		g_Error( i_type + ' action ' + i_name + ' IDs are empty.');
+		g_Error( i_type + ' Action: IDs are empty.');
 		return;
 	}
 
 	var obj = nw_ConstructActionObject( i_type, i_ids);
 
-	obj.action.operation = {};
-	obj.action.operation.type = i_name;
+	if( i_operation )
+		obj.action.operation = i_operation;
+	
+	if( i_params )
+		obj.action.params = i_params;
 
 	nw_Send( obj);
 }

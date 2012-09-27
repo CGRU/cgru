@@ -557,13 +557,25 @@ JobNode.prototype.action = function( i_name)
 	g_Info('action = ' + i_name);	
 	if( i_name == 'annotation')
 	{
-		var dialog = new cgru_Dialog( document, document.body, this, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
+		var dialog = new cgru_Dialog( document, document.body, this, i_name, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
 	}
 	else if( i_name == 'log')
 	{
 		nw_GetNodes('jobs', [this.monitor.cur_item.params.id], i_name);
 	}
 	else
-		this.monitor.action( i_name);
+	{
+		var operation = {};
+		operation.type = i_name;
+		this.monitor.action( operation, null);
+	}
+}
+
+JobNode.prototype.actionParameter = function( i_name, i_value)
+{
+	var params = {};
+	eval('params.'+i_name+'="'+i_value+'";');
+	g_Info('params.'+i_name+'="'+i_value+'";');
+	this.monitor.action( null, params);
 }
 
