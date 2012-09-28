@@ -531,7 +531,7 @@ JobBlock.prototype.update = function( i_displayFull)
 
 JobNode.prototype.onContexMenu = function( i_evt)
 {
-	var menu = new cgru_Menu( document.body, i_evt, this, 'jobitem_context');
+	var menu = new cgru_Menu( document.body, i_evt, this, 'contextMenuHandle', 'jobitem_context');
 	menu.addItem('Show Log...', 'log');
 	menu.addItem('Reset Error Hosts', 'reset_error_hosts');
 	menu.addItem('Restart Errors', 'restart_errors', this.elState.ERR);
@@ -547,19 +547,35 @@ JobNode.prototype.onContexMenu = function( i_evt)
 
 JobNode.prototype.openMenuSet = function( i_evt)
 {
-	var menu = new cgru_Menu( document.body, i_evt, this, 'jobs_menuset');
-	menu.addItem('Annotation','annotation');
+	var menu = new cgru_Menu( document.body, i_evt, this, 'setMenuHandle', 'jobs_menuset');
+	actions = JobNode.actions;
+	for( var i = 0; i < actions.length; i++)
+		menu.addItem( actions[i].name, actions[i].parm);
 	menu.show();
 }
 
-JobNode.prototype.action = function( i_name)
+//JobNode.parameters = ['annotation','priority'];
+//JobNode.actionsJSON = '{"actions":[{"name":"priority"  ,"title":"Priority"},{"name":"annotation","title":"Annotation"}]}';
+//JobNode.actions = eval('('+JobNode.parameters+')');
+JobNode.actions = [];
+JobNode.actions[0] = {};
+JobNode.actions[0].name = 'Priority';
+JobNode.actions[0].parm = 'priority';
+JobNode.actions[1] = {};
+JobNode.actions[1].name = 'Annotation';
+JobNode.actions[1].parm = 'annotation';
+
+
+JobNode.prototype.setMenuHandle = function( i_name)
 {
-	g_Info('action = ' + i_name);	
-	if( i_name == 'annotation')
-	{
-		var dialog = new cgru_Dialog( document, document.body, this, i_name, 'jobs_parameter', 'Set Parameter', 'Enter New Value');
-	}
-	else if( i_name == 'log')
+	new cgru_Dialog( document, document.body, this, i_name, this.params[i_name], 'jobs_parameter', 'Set Parameter', 'Enter "'+i_name+'"');
+}
+
+JobNode.prototype.contextMenuHandle = function( i_name)
+{
+	g_Info('action = ' + i_name);
+
+	if( i_name == 'log')
 	{
 		nw_GetNodes('jobs', [this.monitor.cur_item.params.id], i_name);
 	}
@@ -571,11 +587,13 @@ JobNode.prototype.action = function( i_name)
 	}
 }
 
-JobNode.prototype.actionParameter = function( i_name, i_value)
+JobNode.prototype.cgru_Dialog = function( i_name, i_value)
 {
 	var params = {};
-	eval('params.'+i_name+'="'+i_value+'";');
-	g_Info('params.'+i_name+'="'+i_value+'";');
+	if( typeof(this.params[i_name]) == 'number')
+		i_value = parseInt( i_value);
+	params[i_name] = i_value;
+g_Info('params.'+i_name+'="'+i_value+'";');
 	this.monitor.action( null, params);
 }
 
