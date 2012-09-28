@@ -92,25 +92,25 @@ RenderNode.prototype.update = function()
 	if( this.state.ONL && ( was_online == false ))
 		became_online = true;
 
-	this.elName.innerHTML = this.params.name;
+	this.elName.textContent = this.params.name;
 	this.elName.title = this.params.host.os;
 
 	if( this.params.version != null )
-		this.elVersion.innerHTML = 'v' + this.params.version;
+		this.elVersion.textContent = 'v' + this.params.version;
 	else
-		this.elVersion.innerHTML = '';
+		this.elVersion.textContent = '';
 
-	this.elPriority.innerHTML = '-' + this.params.priority;
+	this.elPriority.textContent = '-' + this.params.priority;
 
 	var user = this.params.user_name;
 	if( this.state.NbY ) user = 'nimby(' + user + ')n';
 	else if( this.state.NBY ) user = 'NIMBY(' + user + ')N';
-	this.elUserName.innerHTML = user;
+	this.elUserName.textContent = user;
 
 	if( this.params.annotation )
-		this.elAnnotation.innerHTML = this.params.annotation;
+		this.elAnnotation.textContent = this.params.annotation;
 	else
-		this.elAnnotation.innerHTML = '';
+		this.elAnnotation.textContent = '';
 
 	for( var i = 0; i < this.plotters.length; i++)
 		this.plotters[i].setHidden( this.state.OFF)
@@ -123,22 +123,22 @@ RenderNode.prototype.update = function()
 	if( this.state.OFF == true )
 	{
 		this.clearTasks();
-		this.elPower.innerHTML = 'Offline';
-		this.elCapacity.innerHTML = '';
-		this.elMaxTasks.innerHTML = '';
-		this.state.innerHTML = '';
-		this.elStateTime.innerHTML = '';
+		this.elPower.textContent = 'Offline';
+		this.elCapacity.textContent = '';
+		this.elMaxTasks.textContent = '';
+		this.state.textContent = '';
+		this.elStateTime.textContent = '';
 		this.elNewLine.style.display = 'none';
 		return;
 	}
-	this.elPower.innerHTML = '';
+	this.elPower.textContent = '';
 	this.elNewLine.style.display = 'block';
 
 	var capacity = this.params.capacity;
 	if( capacity == null )
 		capacity = this.params.host.capacity;
 	capacity = this.params.capacity_used + '/' + capacity;
-	this.elCapacity.innerHTML = '['+capacity+']';
+	this.elCapacity.textContent = '['+capacity+']';
 
 	var max_tasks = this.params.max_tasks;
 	if( max_tasks == null )
@@ -147,7 +147,7 @@ RenderNode.prototype.update = function()
 		max_tasks = '(' + this.params.tasks.length + '/' + max_tasks + ')';
 	else
 		max_tasks = '(0/' + max_tasks + ')';
-	this.elMaxTasks.innerHTML = max_tasks;
+	this.elMaxTasks.textContent = max_tasks;
 	
 	var r = this.params.host_resources;
 
@@ -227,7 +227,7 @@ RenderNode.prototype.refresh = function()
 		var power = this.offlineState;
 		if( this.params.wol_operation_time )
 			power += ' ' + cm_TimeStringInterval( this.params.wol_operation_time);
-		this.elPower.innerHTML = power;
+		this.elPower.textContent = power;
 		return;
 	}
 
@@ -240,7 +240,7 @@ RenderNode.prototype.refresh = function()
 		else
 			stateTime += ' free';
 	}
-	this.elStateTime.innerHTML = stateTime;
+	this.elStateTime.textContent = stateTime;
 
 	for( var t = 0; t < this.tasks.length; t++)
 		this.tasks[t].refresh();
@@ -272,32 +272,40 @@ function RenderTask( i_task, i_elParent)
 	this.element.classList.add('rendertask');
 
 	this.elCapacity = cm_ElCreateText( this.element, 'Task Capacity');
-	this.elCapacity.innerHTML = '['+i_task.capacity+']';
+	this.elCapacity.textContent = '['+i_task.capacity+']';
 
 	this.elJob = cm_ElCreateText( this.element, 'Job Name');
-	this.elJob.innerHTML = i_task.job_name;
+	this.elJob.textContent = i_task.job_name;
 
 	this.elBlock = cm_ElCreateText( this.element, 'Block Name');
-	this.elBlock.innerHTML = '['+i_task.block_name+']';
+	this.elBlock.textContent = '['+i_task.block_name+']';
 
 	this.elName = cm_ElCreateText( this.element, 'Task Name');
-	this.elName.innerHTML = '['+i_task.name+']';
+	this.elName.textContent = '['+i_task.name+']';
 
 	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.time = i_task.time_start;
 
 	this.elUser = cm_ElCreateFloatText( this.element, 'right', 'User Name');
-	this.elUser.innerHTML = i_task.user_name;
+	this.elUser.textContent = i_task.user_name;
 
 	this.refresh();
 }
 
 RenderTask.prototype.refresh = function()
 {
-	this.elTime.innerHTML = cm_TimeStringInterval( this.time);
+	this.elTime.textContent = cm_TimeStringInterval( this.time);
 }
 
 RenderTask.prototype.destroy = function()
 {
 	this.elParent.removeChild( this.elRoot);
 }
+
+
+RenderNode.actions = [];
+
+RenderNode.actions.push(['context', 'log',               'menuHandleGet',       'Show Log']);
+
+RenderNode.actions.push(['set', 'annotation', 'menuHandleSet', 'Annotation']);
+

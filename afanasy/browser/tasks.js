@@ -28,11 +28,11 @@ BlockItem.prototype.update = function()
 	cm_GetState( this.params.state, this.element, this.state);
 
 	if( this.params.tasks )
-		this.props.innerHTML = 'array';
+		this.props.textContent = 'array';
 	else
-		this.props.innerHTML = 'numeric';
+		this.props.textContent = 'numeric';
 
-	this.name.innerHTML = this.params.name;
+	this.name.textContent = this.params.name;
 }
 
 function TaskItem( i_task_num )
@@ -68,7 +68,7 @@ TaskItem.prototype.init = function()
 
 TaskItem.prototype.update = function()
 {
-	this.name.innerHTML = this.genName();
+	this.name.textContent = this.genName();
 
 	if( this.params.running === true )
 	{
@@ -84,7 +84,7 @@ TaskItem.prototype.updateProgress = function( i_progress)
 //	this.progress = progress;
 
 	cm_GetState( i_progress.state, this.element, this.state);
-//	this.state.innerHTML = state.string;
+//	this.state.textContent = state.string;
 
 	var percent = 0;
 	if( this.state.RUN && i_progress.per ) percent = i_progress.per;
@@ -94,9 +94,9 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	if( percent > 100 ) percent = 100;
 
 	if( this.state.RUN )
-		this.percent.innerHTML = ' ' + percent + '%';
+		this.percent.textContent = ' ' + percent + '%';
 	else
-		this.percent.innerHTML = '';
+		this.percent.textContent = '';
 	this.progress.style.width = ( percent + '%');
 }
 

@@ -33,7 +33,7 @@ function cm_OnKeyDown(e)
 	else if((e.keyCode==38) && g_cur_monitor) g_cur_monitor.selectNext( true); // DOWN
 	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( false); // UP
 //	else if(evt.keyCode==116) return false; // F5
-//document.getElementById('test').innerHTML='key down: ' + e.keyCode;
+//document.getElementById('test').textContent='key down: ' + e.keyCode;
 //	return true; 
 }
 
@@ -42,7 +42,7 @@ function cm_OnKeyUp(e)
 	if(!e) return;
 	if(e.keyCode==16) g_key_shift=false; // SHIFT
 	if(e.keyCode==17) g_key_ctrl=false; // CTRL
-//document.getElementById('test').innerHTML='key up: ' + e.keyCode;
+//document.getElementById('test').textContent='key up: ' + e.keyCode;
 //	return false; 
 }
 
@@ -50,12 +50,12 @@ function info( i_msg, i_elem)
 {
 	if( i_elem == null )
 		i_elem = 'info';
-	document.getElementById(i_elem).innerHTML=i_msg;
+	document.getElementById(i_elem).textContent=i_msg;
 }
 
 function cm_Error( i_msg)
 {
-	document.getElementById('error').innerHTML='Error:' + i_msg;
+	document.getElementById('error').textContent='Error:' + i_msg;
 }
 
 function cm_ArrayRemove( io_arr, i_value)
@@ -176,9 +176,9 @@ cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','
 function cm_GetState( i_state, i_elParent, i_elChild)
 {
 	if( i_state == null )
-		i_elChild.innerHTML = '-';
+		i_elChild.textContent = '-';
 	else
-		i_elChild.innerHTML = i_state;
+		i_elChild.textContent = i_state;
 
 	for( var i = 0; i < cm_States.length; i++)
 	{

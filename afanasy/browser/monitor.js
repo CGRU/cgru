@@ -28,29 +28,29 @@ function Monitor( i_element, i_type, i_id)
 	this.elCtrlSet = document.createElement('span');
 	this.elCtrl.appendChild( this.elCtrlSet);
 	this.elCtrlSet.classList.add('menubutton');
-	this.elCtrlSet.innerHTML = 'SET';
+	this.elCtrlSet.textContent = 'SET';
 	this.elCtrlSet.style.top = '7px';
 	this.elCtrlSet.onmouseover = this.onMouseOverSet;
 
 	this.elCtrlSort = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('sort');
-	this.elCtrlSort.innerHTML = 'Sort:';
+	this.elCtrlSort.textContent = 'Sort:';
 
 	this.elCtrlFilter = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlFilter);
 //	this.elCtrlFilter.classList.add('sort');
 	this.elCtrlFilter.classList.add('filter');
-	this.elCtrlFilter.innerHTML = 'Filter:';
+	this.elCtrlFilter.textContent = 'Filter:';
 
 	this.elInfoText = document.createElement('div');
 	this.elInfoText.classList.add('text');	
-	this.elInfoText.innerHTML = this.type;
+	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
 ///*
-//this.elCtrl.innerHTML='ctrl';
-//this.elList.innerHTML='list';
-//this.elInfo.innerHTML='info';
+//this.elCtrl.textContent='ctrl';
+//this.elList.textContent='list';
+//this.elInfo.textContent='info';
 //*/
 //	this.valid = false;
 	for( i = 0; i < g_recievers.length; i++)
@@ -253,7 +253,7 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 
 Monitor.prototype.info = function( i_str)
 {
-	this.elInfoText.innerHTML = i_str;
+	this.elInfoText.textContent = i_str;
 }
 
 Monitor.prototype.onDoubleClick = function(evt)
@@ -314,14 +314,14 @@ Monitor.prototype.elSetSelected = function( el, on)
 		el.selected = true;
 		if( false == el.classList.contains('selected'))
 			el.classList.add('selected');
-//		el.innerHTML='selected';
+//		el.textContent='selected';
 	}
 	else
 	{
 		if( false == el.selected ) return;
 		el.selected = false;
 		el.classList.remove('selected');
-//		el.innerHTML='';
+//		el.textContent='';
 	}
 }
 
@@ -379,20 +379,56 @@ Monitor.prototype.onContextMenu = function( evt)
 	if( el.selected != true )
 		g_cur_monitor.selectAll( false);
 	g_cur_monitor.elSetSelected( el, true);
-	el.item.onContexMenu( evt);
+
+	var menu = new cgru_Menu( document.body, evt, g_cur_monitor, this.type+'_context');
+	var actions = g_cur_monitor.cur_item.constructor.actions;
+	for( var i = 0; i < actions.length; i++)
+		if( actions[i][0] == 'context' )
+			menu.addItem( actions[i][1], actions[i][2], actions[i][3]);
+	menu.show();
 
 	return false;
 }
-
+Monitor.prototype.menuHandleOperation = function( i_name)
+{
+g_Info('Operation = ' + i_name);
+	var operation = {};
+	operation.type = i_name;
+	this.action( operation, null);
+}
+Monitor.prototype.menuHandleGet = function( i_name)
+{
+g_Info('Get = ' + i_name);
+	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
+}
 
 Monitor.prototype.onMouseOverSet = function( evt)
 {
 	if( g_cur_monitor == null ) return;
-g_cur_monitor.info('onMouseOverSet');
 	if( g_cur_monitor.cur_item == null ) return;
+	if( g_cur_monitor.hasSelection() == false ) return;
 
-	g_cur_monitor.cur_item.openMenuSet( evt);
+	var menu = new cgru_Menu( document.body, evt, g_cur_monitor, this.type+'_set');
+	var actions = g_cur_monitor.cur_item.constructor.actions;
+	for( var i = 0; i < actions.length; i++)
+		if( actions[i][0] == 'set' )
+			menu.addItem( actions[i][1], actions[i][2], actions[i][3]);
+	menu.show();
 }
+Monitor.prototype.menuHandleSet = function( i_parameter)
+{
+	new cgru_Dialog( document, document.body, this, 'setParameter', i_parameter, this.cur_item.params[i_parameter], this.type+'_parameter');
+}
+Monitor.prototype.setParameter = function( i_parameter, i_value)
+{
+	var params = {};
+	if( typeof(this.cur_item.params[i_parameter]) == 'number')
+		i_value = parseInt( i_value);
+	params[i_parameter] = i_value;
+g_Info('params.'+i_parameter+'="'+i_value+'";');
+	this.action( null, params);
+}
+
 
 Monitor.prototype.action = function( i_operation, i_params)
 {
@@ -406,6 +442,14 @@ Monitor.prototype.getSelectedIds = function()
 		if( this.items[i].element.selected == true )
 			ids.push( this.items[i].params.id);
 	return ids;
+}
+
+Monitor.prototype.hasSelection = function()
+{
+	for( var i = 0; i < this.items.length; i++)
+		if( this.items[i].element.selected == true )
+			return true;
+	return false;
 }
 
 Monitor.prototype.jobConstruct = function( job)
@@ -489,7 +533,7 @@ Monitor.prototype.getBlocks = function( i_block_ids)
 	modes = [];
 
 //var test = 'block ids:'
-//document.getElementById('test').innerHTML = test;
+//document.getElementById('test').textContent = test;
 
 	for( var i = 0; i < i_block_ids.job_id.length; i++)
 	{
@@ -500,7 +544,7 @@ Monitor.prototype.getBlocks = function( i_block_ids)
 		modes.push( i_block_ids.mode[i]);
 	}
 
-//document.getElementById('test').innerHTML = test;
+//document.getElementById('test').textContent = test;
 
 	if( blocks.length == 0 ) return;
 

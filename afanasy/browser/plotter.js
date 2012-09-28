@@ -47,7 +47,7 @@ function Plotter( i_plottersArray, i_pElement, i_label, i_title)
 	this.elLabel = document.createElement('div');
 	this.element.appendChild( this.elLabel);
 	this.elLabel.classList.add('label');
-	this.elLabel.innerHTML = this.label;
+	this.elLabel.textContent = this.label;
 
 //	this.element.style.width = '50px';
 //	this.element.style.height = '50px';
@@ -221,7 +221,7 @@ Plotter.prototype.addValues = function( i_vals, i_hot)
 		if( blue > 255 ) blue = 255;
 		this.clrBG[2] = blue;
 
-		this.elLabel.innerHTML = this.label + ' ' + (scale/this.label_value);
+		this.elLabel.textContent = this.label + ' ' + (scale/this.label_value);
 	}
 
 	var ctx = this.canvas.getContext('2d');

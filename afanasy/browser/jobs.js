@@ -60,49 +60,49 @@ JobNode.prototype.update = function()
 	  ((this.elState.DON == false) && (this.params.time_started > 0 )))
 		displayFull = true;
 
-	this.elName.innerHTML = this.params.name;
-	this.elPriority.innerHTML = 'P' + this.params.priority;
-	this.elUserName.innerHTML = this.params.user_name;
+	this.elName.textContent = this.params.name;
+	this.elPriority.textContent = 'P' + this.params.priority;
+	this.elUserName.textContent = this.params.user_name;
 
 	if( this.params.time_life )
-		this.elLifeTime.innerHTML = 'L' + cm_TimeStringFromSeconds( this.params.time_life);
-	else this.elLifeTime.innerHTML = '';
+		this.elLifeTime.textContent = 'L' + cm_TimeStringFromSeconds( this.params.time_life);
+	else this.elLifeTime.textContent = '';
 
 	if( this.params.depend_mask )
-		this.elDependMask.innerHTML = 'D(' + this.params.depend_mask + ')';
-	else this.elDependMask.innerHTML = '';
+		this.elDependMask.textContent = 'D(' + this.params.depend_mask + ')';
+	else this.elDependMask.textContent = '';
 
 	if( this.params.depend_mask_global )
-		this.elDependMaskGlobal.innerHTML = 'G(' + this.params.depend_mask_global + ')';
-	else this.elDependMaskGlobal.innerHTML = '';
+		this.elDependMaskGlobal.textContent = 'G(' + this.params.depend_mask_global + ')';
+	else this.elDependMaskGlobal.textContent = '';
 
 	if( this.params.hosts_mask )
-		this.elHostsMask.innerHTML = 'H(' + this.params.hosts_mask + ')';
-	else this.elHostsMask.innerHTML = '';
+		this.elHostsMask.textContent = 'H(' + this.params.hosts_mask + ')';
+	else this.elHostsMask.textContent = '';
 
 	if( this.params.hosts_mask_exclude )
-		this.elHostsMaskExclude.innerHTML = 'E(' + this.params.hosts_mask_exclude + ')';
-	else this.elHostsMaskExclude.innerHTML = '';
+		this.elHostsMaskExclude.textContent = 'E(' + this.params.hosts_mask_exclude + ')';
+	else this.elHostsMaskExclude.textContent = '';
 
 	if( this.params.max_running_tasks != null )
-		this.elMaxRunTasks.innerHTML = 'Max' + this.params.max_running_tasks;
-	else this.elMaxRunTasks.innerHTML = '';
+		this.elMaxRunTasks.textContent = 'Max' + this.params.max_running_tasks;
+	else this.elMaxRunTasks.textContent = '';
 
 	if( this.params.max_running_tasks_per_host != null )
-		this.elMaxRunTasksPH.innerHTML = 'MPH' + this.params.max_running_tasks_per_host;
-	else this.elMaxRunTasksPH.innerHTML = '';
+		this.elMaxRunTasksPH.textContent = 'MPH' + this.params.max_running_tasks_per_host;
+	else this.elMaxRunTasksPH.textContent = '';
 
 	if( this.params.need_properties )
-		this.elNeedProperties.innerHTML = this.params.need_properties;
-	else this.elNeedProperties.innerHTML = '';
+		this.elNeedProperties.textContent = this.params.need_properties;
+	else this.elNeedProperties.textContent = '';
 
 	if( this.params.need_os)
-		this.elNeedOS.innerHTML = this.params.need_os;
-	else this.elNeedOS.innerHTML = '';
+		this.elNeedOS.textContent = this.params.need_os;
+	else this.elNeedOS.textContent = '';
 
 	if( this.params.annotation )
-		this.elAnnotation.innerHTML = this.params.annotation;
-	else this.elAnnotation.innerHTML = '';
+		this.elAnnotation.textContent = this.params.annotation;
+	else this.elAnnotation.textContent = '';
 
 	for( var b = 0; b < this.params.blocks.length; b++)
 	{
@@ -119,7 +119,7 @@ JobNode.prototype.refresh = function()
 	if( time && this.elState.WTM )
 	{
 		time = cm_TimeStringInterval( new Date().getTime()/1000, time);
-		this.elTime.innerHTML = time;
+		this.elTime.textContent = time;
 		return;
 	}
 
@@ -130,11 +130,11 @@ JobNode.prototype.refresh = function()
 			time = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
 		else
 			time = cm_TimeStringInterval( time);
-		this.elTime.innerHTML = time;
+		this.elTime.textContent = time;
 		return;
 	}
 
-	this.elTime.innerHTML = '';
+	this.elTime.textContent = '';
 }
 
 JobNode.prototype.onDoubleClick = function()
@@ -194,7 +194,7 @@ function JobBlock( i_elParent, i_block)
 		tasks_title += '\nNon-sequential solving.';
 	}
 	tasks += ': ';
-	this.elTasks.innerHTML = tasks;
+	this.elTasks.textContent = tasks;
 	this.elTasks.title = tasks_title;
 
 	this.elName = document.createElement('span');
@@ -315,7 +315,7 @@ JobBlock.prototype.update = function( i_displayFull)
 
 	if( this.params.name )
 	{
-		this.elName.innerHTML = this.params.name;
+		this.elName.textContent = this.params.name;
 
 		if( this.service != this.params.service )
 		{
@@ -344,10 +344,10 @@ JobBlock.prototype.update = function( i_displayFull)
 			if( deps_title.length ) deps_title += '\n';
 			deps_title += 'Subtasks depend.'
 		}
-		this.elDepends.innerHTML = deps;
+		this.elDepends.textContent = deps;
 		this.elDepends.title = deps_title;
 
-		this.elCapacity.innerHTML = '[' + this.params.capacity + ']';
+		this.elCapacity.textContent = '[' + this.params.capacity + ']';
 
 		var errTxt = '';
 		var errTit = '';
@@ -375,106 +375,106 @@ JobBlock.prototype.update = function( i_displayFull)
 			if( ert == 0 ) errTit = ' (unlimited)';
 			else if( ert == -1 ) errTit = ' (user settings used)';
 		}
-		this.elErrSolving.innerHTML = errTxt;
+		this.elErrSolving.textContent = errTxt;
 		this.elErrSolving.title = errTit;
 
 		if(( this.params.errors_forgive_time != null ) && ( this.params.errors_forgive_time >= 0 ))
-			this.elForgiveTime.innerHTML = 'F'+cm_TimeStringFromSeconds( this.params.errors_forgive_time);
-		else this.elForgiveTime.innerHTML = '';
+			this.elForgiveTime.textContent = 'F'+cm_TimeStringFromSeconds( this.params.errors_forgive_time);
+		else this.elForgiveTime.textContent = '';
 
 		if( this.params.tasks_max_run_time != null )
-			this.elMaxRunTime.innerHTML = 'MRT'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time);
-		else this.elMaxRunTime.innerHTML = '';
+			this.elMaxRunTime.textContent = 'MRT'+cm_TimeStringFromSeconds( this.params.tasks_max_run_time);
+		else this.elMaxRunTime.textContent = '';
 
 		if( this.params.max_running_tasks != null )
-			this.elMaxRunTasks.innerHTML = 'Max'+this.params.max_running_tasks;
-		else this.elMaxRunTasks.innerHTML = '';
+			this.elMaxRunTasks.textContent = 'Max'+this.params.max_running_tasks;
+		else this.elMaxRunTasks.textContent = '';
 
 		if( this.params.max_running_tasks_per_host != null )
-			this.elMaxRunTasksPH.innerHTML = 'MPH'+this.params.max_running_tasks_per_host;
-		else this.elMaxRunTasksPH.innerHTML = '';
+			this.elMaxRunTasksPH.textContent = 'MPH'+this.params.max_running_tasks_per_host;
+		else this.elMaxRunTasksPH.textContent = '';
 
 		if( this.params.hosts_mask)
-			this.elHostsMask.innerHTML = 'H('+this.params.hosts_mask+')';
-		else this.elHostsMask.innerHTML = '';
+			this.elHostsMask.textContent = 'H('+this.params.hosts_mask+')';
+		else this.elHostsMask.textContent = '';
 
 		if( this.params.hosts_mask_exclude)
-			this.elHostsMaskExclude.innerHTML = 'E('+this.params.hosts_mask_exclude+')';
-		else this.elHostsMaskExclude.innerHTML = '';
+			this.elHostsMaskExclude.textContent = 'E('+this.params.hosts_mask_exclude+')';
+		else this.elHostsMaskExclude.textContent = '';
 
 		if( this.params.need_memory)
-			this.elNeedMem.innerHTML = 'RAM'+this.params.need_memory;
-		else this.elNeedMem.innerHTML = '';
+			this.elNeedMem.textContent = 'RAM'+this.params.need_memory;
+		else this.elNeedMem.textContent = '';
 
 		if( this.params.need_hdd)
-			this.elNeedHDD.innerHTML = 'HDD'+this.params.need_hdd;
-		else this.elNeedHDD.innerHTML = '';
+			this.elNeedHDD.textContent = 'HDD'+this.params.need_hdd;
+		else this.elNeedHDD.textContent = '';
 
 		if( this.params.need_power)
-			this.elNeedPower.innerHTML = 'Pow'+this.params.need_power;
-		else this.elNeedPower.innerHTML = '';
+			this.elNeedPower.textContent = 'Pow'+this.params.need_power;
+		else this.elNeedPower.textContent = '';
 
 		if( this.params.need_properties)
-			this.elNeedProperties.innerHTML = this.params.need_properties;
-		else this.elNeedProperties.innerHTML = '';
+			this.elNeedProperties.textContent = this.params.need_properties;
+		else this.elNeedProperties.textContent = '';
 	}
 
 	if( this.displayFull )
 	{
 		var percentage = 0;
 		if( this.params.p_percentage ) percentage = this.params.p_percentage;
-		this.elPercentage.innerHTML = percentage + '%';
+		this.elPercentage.textContent = percentage + '%';
 
 		var tasks_done = 0;
 		if( this.params.p_tasks_done ) tasks_done = this.params.p_tasks_done;
-		this.elTasksDon.innerHTML = 'don:'+tasks_done;
+		this.elTasksDon.textContent = 'don:'+tasks_done;
 
 		var tasks_rdy = 0;
 		if( this.params.p_tasks_ready ) tasks_rdy = this.params.p_tasks_ready;
-		this.elTasksRdy.innerHTML = 'rdy:'+tasks_rdy;
+		this.elTasksRdy.textContent = 'rdy:'+tasks_rdy;
 
 		var tasks_run = 0;
 		if( this.params.running_tasks_counter )
 		{
 			tasks_run = this.params.running_tasks_counter;
-			this.elTasksRun.innerHTML = 'run:'+tasks_run;
+			this.elTasksRun.textContent = 'run:'+tasks_run;
 		}
-		else this.elTasksRun.innerHTML = '';
+		else this.elTasksRun.textContent = '';
 
 		var tasks_err = 0;
 		if( this.params.p_tasks_error )
 		{
 			tasks_err = this.params.p_tasks_error;
-			this.elTasksErr.innerHTML = 'err:'+tasks_err;
+			this.elTasksErr.textContent = 'err:'+tasks_err;
 		}
-		else this.elTasksErr.innerHTML = '';
+		else this.elTasksErr.textContent = '';
 
 		var tasks_skp = 0;
 		if( this.params.p_tasks_skipped )
 		{
 			tasks_skp = this.params.p_tasks_skipped;
-			this.elTasksSkp.innerHTML = 'skp:'+tasks_skp;
+			this.elTasksSkp.textContent = 'skp:'+tasks_skp;
 		}
-		else this.elTasksSkp.innerHTML = '';
+		else this.elTasksSkp.textContent = '';
 
 		var tasks_wrn = 0;
 		if( this.params.p_tasks_warning )
 		{
 			tasks_wrn = this.params.p_tasks_warning;
-			this.elTasksWrn.innerHTML = 'wrn:'+tasks_wrn;
+			this.elTasksWrn.textContent = 'wrn:'+tasks_wrn;
 		}
-		else this.elTasksWrn.innerHTML = '';
+		else this.elTasksWrn.textContent = '';
 
 		if( this.params.p_tasks_run_time && tasks_done )
 		{
 			var sum = cm_TimeStringFromSeconds( this.params.p_tasks_run_time);
 			var avg = cm_TimeStringFromSeconds( Math.round( this.params.p_tasks_run_time / tasks_done));
-			this.elRunTime.innerHTML = sum +'/'+avg;
+			this.elRunTime.textContent = sum +'/'+avg;
 			this.elRunTime.title = 'Running Time:\nTotal: '+sum+'\nAverage per task: '+avg;
 		}
 		else
 		{
-			this.elRunTime.innerHTML = '';
+			this.elRunTime.textContent = '';
 			this.elRunTime.title = '';
 		}
 
@@ -491,7 +491,7 @@ JobBlock.prototype.update = function( i_displayFull)
 				this.elErrHosts.classList.add('ERR');
 			}
 		}
-		this.elErrHosts.innerHTML = he_txt;
+		this.elErrHosts.textContent = he_txt;
 		this.elErrHosts.title = he_tit;
 
 		this.elBarPercentage.style.width = percentage + '%';
@@ -529,71 +529,19 @@ JobBlock.prototype.update = function( i_displayFull)
 	}
 }
 
-JobNode.prototype.onContexMenu = function( i_evt)
-{
-	var menu = new cgru_Menu( document.body, i_evt, this, 'contextMenuHandle', 'jobitem_context');
-	menu.addItem('Show Log...', 'log');
-	menu.addItem('Reset Error Hosts', 'reset_error_hosts');
-	menu.addItem('Restart Errors', 'restart_errors', this.elState.ERR);
-	menu.addSeparator();
-	menu.addItem('Start', 'start');
-	menu.addItem('Pause', 'pause');
-	menu.addItem('Stop', 'stop');
-	menu.addItem('Restart', 'restart');
-	menu.addItem('Restart&Pause', 'restart_pause');
-	menu.addItem('Delete', 'delete');
-	menu.show();
-}
-
-JobNode.prototype.openMenuSet = function( i_evt)
-{
-	var menu = new cgru_Menu( document.body, i_evt, this, 'setMenuHandle', 'jobs_menuset');
-	actions = JobNode.actions;
-	for( var i = 0; i < actions.length; i++)
-		menu.addItem( actions[i].name, actions[i].parm);
-	menu.show();
-}
-
-//JobNode.parameters = ['annotation','priority'];
-//JobNode.actionsJSON = '{"actions":[{"name":"priority"  ,"title":"Priority"},{"name":"annotation","title":"Annotation"}]}';
-//JobNode.actions = eval('('+JobNode.parameters+')');
 JobNode.actions = [];
-JobNode.actions[0] = {};
-JobNode.actions[0].name = 'Priority';
-JobNode.actions[0].parm = 'priority';
-JobNode.actions[1] = {};
-JobNode.actions[1].name = 'Annotation';
-JobNode.actions[1].parm = 'annotation';
 
+JobNode.actions.push(['context', 'log',               'menuHandleGet',       'Show Log']);
+JobNode.actions.push(['context', 'reset_error_hosts', 'menuHandleOperation', 'Reset Error Hosts']);
+JobNode.actions.push(['context', 'restart_errors',    'menuHandleOperation', 'Restart Errors']);
+JobNode.actions.push(['context',  null,                null,                  null]);
+JobNode.actions.push(['context', 'start',             'menuHandleOperation', 'Start']);
+JobNode.actions.push(['context', 'pause',             'menuHandleOperation', 'Pause']);
+JobNode.actions.push(['context', 'stop',              'menuHandleOperation', 'Stop']);
+JobNode.actions.push(['context', 'restart',           'menuHandleOperation', 'Restart']);
+JobNode.actions.push(['context', 'restart_pause',     'menuHandleOperation', 'Restart&Pause']);
+JobNode.actions.push(['context', 'delete',            'menuHandleOperation', 'Delete']);
 
-JobNode.prototype.setMenuHandle = function( i_name)
-{
-	new cgru_Dialog( document, document.body, this, i_name, this.params[i_name], 'jobs_parameter', 'Set Parameter', 'Enter "'+i_name+'"');
-}
-
-JobNode.prototype.contextMenuHandle = function( i_name)
-{
-	g_Info('action = ' + i_name);
-
-	if( i_name == 'log')
-	{
-		nw_GetNodes('jobs', [this.monitor.cur_item.params.id], i_name);
-	}
-	else
-	{
-		var operation = {};
-		operation.type = i_name;
-		this.monitor.action( operation, null);
-	}
-}
-
-JobNode.prototype.cgru_Dialog = function( i_name, i_value)
-{
-	var params = {};
-	if( typeof(this.params[i_name]) == 'number')
-		i_value = parseInt( i_value);
-	params[i_name] = i_value;
-g_Info('params.'+i_name+'="'+i_value+'";');
-	this.monitor.action( null, params);
-}
+JobNode.actions.push(['set', 'priority',   'menuHandleSet', 'Priority']);
+JobNode.actions.push(['set', 'annotation', 'menuHandleSet', 'Annotation']);
 

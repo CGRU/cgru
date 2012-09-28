@@ -60,27 +60,27 @@ UserNode.prototype.init = function()
 
 UserNode.prototype.update = function()
 {
-	this.elName.innerHTML = this.params.name;
+	this.elName.textContent = this.params.name;
 
-	this.elPriority.innerHTML = '-' + this.params.priority;
+	this.elPriority.textContent = '-' + this.params.priority;
 
-	if( this.params.host_name ) this.elHostName.innerHTML = this.params.host_name;
-	else this.elHostName.innerHTML = '';
+	if( this.params.host_name ) this.elHostName.textContent = this.params.host_name;
+	else this.elHostName.textContent = '';
 
-	if( this.params.max_running_tasks ) this.elMaxRunningTasks.innerHTML = 'Max('+this.params.max_running_tasks+')';
-	else this.elMaxRunningTasks.innerHTML = '';
+	if( this.params.max_running_tasks ) this.elMaxRunningTasks.textContent = 'Max('+this.params.max_running_tasks+')';
+	else this.elMaxRunningTasks.textContent = '';
 
-	if( this.params.hosts_mask ) this.elHostsMask.innerHTML = 'H('+this.params.hosts_mask+')';
-	else this.elHostsMask.innerHTML = '';
+	if( this.params.hosts_mask ) this.elHostsMask.textContent = 'H('+this.params.hosts_mask+')';
+	else this.elHostsMask.textContent = '';
 
-	if( this.params.hosts_mask_exclude ) this.elHostsMaskExclude.innerHTML = 'E('+this.params.hosts_mask+')';
-	else this.elHostsMaskExclude.innerHTML = '';
+	if( this.params.hosts_mask_exclude ) this.elHostsMaskExclude.textContent = 'E('+this.params.hosts_mask+')';
+	else this.elHostsMaskExclude.textContent = '';
 
-	if( this.params.errors_forgive_time ) this.elForgive.innerHTML = 'F'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time);
-	else this.elForgive.innerHTML = '';
+	if( this.params.errors_forgive_time ) this.elForgive.textContent = 'F'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time);
+	else this.elForgive.textContent = '';
 
-	if( this.params.jobs_life_time ) this.elJobsLifeTime.innerHTML = 'L'+ cm_TimeStringFromSeconds( this.params.jobs_life_time);
-	else this.elJobsLifeTime.innerHTML = '';
+	if( this.params.jobs_life_time ) this.elJobsLifeTime.textContent = 'L'+ cm_TimeStringFromSeconds( this.params.jobs_life_time);
+	else this.elJobsLifeTime.textContent = '';
 
 	var errstr = 'Err:';
 	var errtit = 'Errors solving:';
@@ -90,7 +90,7 @@ UserNode.prototype.update = function()
 	errtit += '\nJob tasks to avoid host: ' + this.params.errors_task_same_host;
 	errstr += this.params.errors_retries + 'R';
 	errtit += '\nError task retries: ' + this.params.errors_retries;
-	this.elErrors.innerHTML = errstr;
+	this.elErrors.textContent = errstr;
 	this.elErrors.title = errtit;
 
 	var jobs = 'j';
@@ -105,25 +105,25 @@ UserNode.prototype.update = function()
 		jobs += '0';
 	if( this.params.running_tasks_num )
 		jobs += '-' + this.params.running_tasks_num;
-	this.elJobs.innerHTML = jobs;
+	this.elJobs.textContent = jobs;
 
 	var solving = 'User jobs solving method:';
 	if( this.params.solve_parallel )
 	{
-		this.elSolving.innerHTML = 'Par';
+		this.elSolving.textContent = 'Par';
 		solving += '\nParallel: All together accoring to jobs priority.\n';
 	}
 	else
 	{
-		this.elSolving.innerHTML = 'Ord';
+		this.elSolving.textContent = 'Ord';
 		solving += '\nOrdered: One by one accoring to jobs priority and order.\n';
 	}
 	this.elSolving.title = solving;
 
 	if( this.params.annotation )
-		this.elAnnotation.innerHTML = this.params.annotation;
+		this.elAnnotation.textContent = this.params.annotation;
 	else
-		this.elAnnotation.innerHTML = '';
+		this.elAnnotation.textContent = '';
 
 	this.refresh();
 }
@@ -140,7 +140,7 @@ UserNode.prototype.refresh = function()
 	else
 		percent = '0';
 	this.elBar.style.width = percent + '%';
-	this.elBar.innerHTML = label;
+	this.elBar.textContent = label;
 }
 
 UserNode.prototype.onDoubleClick = function()
