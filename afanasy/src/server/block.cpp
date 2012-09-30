@@ -115,19 +115,21 @@ bool Block::avoidHostsCheck( const std::string & hostname) const
    return false;
 }
 
-void Block::getErrorHostsListString( std::string & str) const
+void Block::getErrorHostsList( std::list<std::string> & o_list) const
 {
-   str += std::string("\nBlock['") + m_data->getName() + "'] error hosts:";
+	o_list.push_back( std::string("Block['") + m_data->getName() + "'] error hosts:");
    std::list<std::string>::const_iterator hIt = m_errorHosts.begin();
    std::list<int>::const_iterator cIt = m_errorHostsCounts.begin();
    std::list<time_t>::const_iterator tIt = m_errorHostsTime.begin();
    for( ; hIt != m_errorHosts.end(); hIt++, tIt++, cIt++ )
    {
-      str += "\n";
-      str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
+		std::string str = *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
       if(( getErrorsAvoidHost() > 0 ) && ( *cIt >= getErrorsAvoidHost())) str += " - ! AVOIDING !";
+		o_list.push_back( str);
    }
-   for( int t = 0; t < m_data->getTasksNum(); t++) m_tasks[t]->getErrorHostsListString( str);
+
+	for( int t = 0; t < m_data->getTasksNum(); t++)
+		m_tasks[t]->getErrorHostsList( o_list);
 }
 
 void Block::errorHostsReset()

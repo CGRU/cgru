@@ -216,28 +216,28 @@ bool Task::avoidHostsCheck( const std::string & hostname) const
    return false;
 }
 
-void Task::getErrorHostsListString( std::string & str) const
+void Task::getErrorHostsList( std::list<std::string> & o_list) const
 {
    if( errorHosts.size())
    {
-      str += "\nTask[" + af::itos(number) + "] error hosts: ";
+		o_list.push_back( std::string("Task[") + af::itos(number) + "] error hosts: ");
       std::list<std::string>::const_iterator hIt = errorHosts.begin();
       std::list<int>::const_iterator cIt = errorHostsCounts.begin();
       std::list<time_t>::const_iterator tIt = errorHostsTime.begin();
       for( ; hIt != errorHosts.end(); hIt++, tIt++, cIt++ )
       {
-         str += "\n";
-         str += *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
-         if((block->getErrorsTaskSameHost() > 0) && ( *cIt >= block->getErrorsTaskSameHost())) str += " - ! AVOIDING !";
+			std::string str = *hIt + ": " + af::itos( *cIt) + " at " + af::time2str( *tIt);
+			if((block->getErrorsTaskSameHost() > 0) && ( *cIt >= block->getErrorsTaskSameHost())) str += " - ! AVOIDING !";
+			o_list.push_back( str);
       }
    }
 }
 
 const std::string Task::getErrorHostsListString() const
 {
-   std::string str;
-   getErrorHostsListString( str);
-   return str;
+	std::list<std::string> list;
+	getErrorHostsList( list);
+	return af::strJoin( list, "\n");
 }
 
 void Task::monitor( MonitorContainer * monitoring) const

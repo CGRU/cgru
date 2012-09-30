@@ -289,11 +289,11 @@ void SysBlock::errorHostsAppend( int task, int hostId, RenderContainer * renders
    if( systask) systask->errorHostsAppend( render->getName());
 }
 
-void SysBlock::getErrorHostsListString( std::string & str) const
+void SysBlock::getErrorHostsList( std::list<std::string> & o_list) const
 {
-   Block::getErrorHostsListString( str);
+	Block::getErrorHostsList( o_list);
    for( std::list<SysTask*>::const_iterator it = systasks.begin(); it != systasks.end(); it++)
-      (*it)->getErrorHostsListString( str);
+		(*it)->getErrorHostsList( o_list);
 }
 
 void SysBlock::updateTaskState( const af::MCTaskUp & taskup, RenderContainer * renders, MonitorContainer * monitoring)

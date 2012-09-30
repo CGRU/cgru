@@ -59,20 +59,14 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 	return data;
 }
 
-af::Msg * af::jsonMsg( const char * i_str)
+af::Msg * af::jsonMsg( const std::string & i_str)
 {
-	int len = strlen( i_str);
-	if( len > 10000 )
-	{
-		AFERRAR("Too long json simple message = %d", len)
-		return NULL;
-	}
 	af::Msg * o_msg = new af::Msg();
-	o_msg->setData( len, i_str, af::Msg::TJSON);
+	o_msg->setData( i_str.size(), i_str.c_str(), af::Msg::TJSON);
 	return o_msg;
 }
 
-af::Msg * af::jsonMsgError( const char * i_str)
+af::Msg * af::jsonMsgError( const std::string & i_str)
 {
 	std::string str = "{\"error\":\"";
 	str += i_str;
@@ -88,6 +82,25 @@ af::Msg * af::jsonMsg( const std::ostringstream & i_stream)
 	std::string string = i_stream.str();
 	o_msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
 	return o_msg;
+}
+
+af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, const std::list<std::string> & i_list)
+{
+	std::ostringstream stream;
+
+	stream << "{\"message\":{";
+	stream << "\"name\":\"" << i_name << "\"";
+	stream << ",\"type\":\"" << i_type << "\"";
+	stream << ",\"list\":[";
+	for( std::list<std::string>::const_iterator it = i_list.begin(); it != i_list.end(); it++)
+	{
+		if( it != i_list.begin())
+			stream << ",";
+		stream << "\"" << af::strEscape(*it) << "\"";
+	}
+	stream << "]}}";
+
+	return af::jsonMsg( stream);
 }
 
 bool af::jr_regexp( const char * i_name, RegExp & o_attr, const JSON & i_object, std::string * o_str)

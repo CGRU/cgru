@@ -384,7 +384,7 @@ Monitor.prototype.onContextMenu = function( evt)
 	var actions = g_cur_monitor.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == 'context' )
-			menu.addItem( actions[i][1], actions[i][2], actions[i][3]);
+			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
 	menu.show();
 
 	return false;
@@ -412,18 +412,23 @@ Monitor.prototype.onMouseOverSet = function( evt)
 	var actions = g_cur_monitor.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == 'set' )
-			menu.addItem( actions[i][1], actions[i][2], actions[i][3]);
+			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
 	menu.show();
 }
 Monitor.prototype.menuHandleSet = function( i_parameter)
 {
-	new cgru_Dialog( document, document.body, this, 'setParameter', i_parameter, this.cur_item.params[i_parameter], this.type+'_parameter');
+	var ptype = null;
+	var actions = g_cur_monitor.cur_item.constructor.actions;
+	for( var i = 0; i < actions.length; i++)
+		if( i_parameter == actions[i][1])
+			ptype = actions[i][2];
+	new cgru_Dialog( document, document.body, this, 'setParameter', i_parameter, ptype, this.cur_item.params[i_parameter], this.type+'_parameter');
 }
 Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
 	var params = {};
-	if( typeof(this.cur_item.params[i_parameter]) == 'number')
-		i_value = parseInt( i_value);
+//	if( typeof(this.cur_item.params[i_parameter]) == 'number')
+//		i_value = parseInt( i_value);
 	params[i_parameter] = i_value;
 g_Info('params.'+i_parameter+'="'+i_value+'";');
 	this.action( null, params);

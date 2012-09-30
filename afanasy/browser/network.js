@@ -9,7 +9,7 @@ function nw_Send( obj)
 {
 	var obj_str = JSON.stringify(obj);
 
-document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
+document.getElementById('send').textContent='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
 
 	var xhr = new XMLHttpRequest;
 	xhr.overrideMimeType('application/json');
@@ -23,7 +23,7 @@ document.getElementById('send').innerHTML='c' + nw_send_count + ' send: ' + obj_
 		{
 			if( xhr.status == 200 )
 			{
-document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
+document.getElementById('recv').textContent='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
 				nw_error_count = 0;
 				nw_connected = true;
 				g_ProcessMsg( eval('('+xhr.responseText+')'));
@@ -31,8 +31,8 @@ document.getElementById('recv').innerHTML='c' + nw_recv_count + ' recv: ' + xhr.
 			}
 			nw_error_count++;
 			nw_error_total++;
-//document.getElementById("status").innerHTML=nw_error_count+': Status number = ' + xhr.status;
-//document.getElementById("statustext").innerHTML='Status text: ' + xhr.statusText;
+//document.getElementById("status").textContent=nw_error_count+': Status number = ' + xhr.status;
+//document.getElementById("statustext").textContent='Status text: ' + xhr.statusText;
 			if(( nw_error_count > nw_error_count_max ) && nw_connected )
 			{
 				nw_connected = false;

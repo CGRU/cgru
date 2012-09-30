@@ -233,7 +233,8 @@ namespace af
 
 	void jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render = false);
 
-	af::Msg * jsonMsg( const char * i_str);
-	af::Msg * jsonMsgError( const char * i_str);
+	af::Msg * jsonMsg( const std::string & i_str);
+	af::Msg * jsonMsgError( const std::string & i_str);
 	af::Msg * jsonMsg( const std::ostringstream & i_stream);
+	af::Msg * jsonMsg( const std::string & i_type, const std::string & i_name, const std::list<std::string> & i_list);
 }

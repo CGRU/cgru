@@ -39,14 +39,18 @@ public:
 
    virtual void setZombie( RenderContainer * renders, MonitorContainer * monitoring);        ///< Set job node to zombie.
 
-   void writeProgress( af::Msg &msg);   ///< Write job progress in message.
+	void writeProgress( af::Msg &msg);   ///< Write job progress in message.
 
-   af::Msg * writeProgress( bool json);   ///< Write job progress in message.
+	af::Msg * writeProgress( bool json);   ///< Write job progress in message.
 
-	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes);
+	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const;
 
-   const std::string getErrorHostsListString() const; /// Get avoid hosts list.
-   virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
+	af::Msg * writeErrorHosts() const;
+	af::Msg * writeErrorHosts( int b, int t) const;
+	void writeErrorHosts( std::list<std::string> & o_list) const;
+
+	const std::string getErrorHostsListString() const; /// Get avoid hosts list.
+	virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
    const std::list<std::string> & getTaskLog( int block, int task);

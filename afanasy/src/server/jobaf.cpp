@@ -1344,7 +1344,7 @@ af::Msg * JobAf::writeProgress( bool json)
 	return msg;
 }
 
-af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes)
+af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const
 {
 //printf("JobAf::writeBlocks: bs=%d, ms=%d\n", i_block_ids.size(), i_modes.size());
 //printf("bids:");for(int i=0;i<i_block_ids.size();i++)printf(" %d",i_block_ids[i])    ;printf("\n");
@@ -1390,9 +1390,39 @@ af::TaskExec * JobAf::generateTask( int block, int task)
 const std::string JobAf::getErrorHostsListString() const
 {
    std::string str("Job \"");
-   str += m_name + "\" error hosts:";
-   for( int block = 0; block < m_blocksnum; block++) m_blocks[block]->getErrorHostsListString( str);
+   str += m_name + "\" error hosts:\n";
+	std::list<std::string> list;
+	writeErrorHosts( list);
+	str += af::strJoin( list, "\n");
    return str;
+}
+
+void JobAf::writeErrorHosts( std::list<std::string> & o_list) const
+{
+	for( int block = 0; block < m_blocksnum; block++)
+		m_blocks[block]->getErrorHostsList( o_list);
+}
+
+af::Msg * JobAf::writeErrorHosts() const
+{
+	std::list<std::string> list;
+	writeErrorHosts( list);
+	return af::jsonMsg("error_hosts", m_name, list);
+}
+
+af::Msg * JobAf::writeErrorHosts( int b, int t) const
+{
+	if( false == checkBlockTaskNumbers( b, t, "getErrorHostsList"))
+	{
+		return af::jsonMsgError( std::string("Job '") + m_name + "' invalid task number: " + af::itos(b) + ", " + af::itos(t) + ".");
+	}
+
+	std::list<std::string> list;
+	m_blocks[b]->m_tasks[t]->getErrorHostsList( list);
+	if( list.empty())
+		list.push_back("The task has no error hosts.");
+
+	return af::jsonMsg("error_hosts", m_name, list);
 }
 
 const std::string JobAf::getErrorHostsListString( int b, int t) const

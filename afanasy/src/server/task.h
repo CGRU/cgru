@@ -38,7 +38,7 @@ public:
 
    void errorHostsAppend( const std::string & hostname);
    bool avoidHostsCheck( const std::string & hostname) const;
-   virtual void getErrorHostsListString( std::string & str) const;
+	void getErrorHostsList( std::list<std::string> & o_list) const;
    const std::string getErrorHostsListString() const;
    inline void errorHostsReset() { errorHosts.clear(); errorHostsCounts.clear(); errorHostsTime.clear();}
 

@@ -18,6 +18,11 @@ g_monitor_buttons = [];
 
 g_Images = [];
 
+if( localStorage['user_name'] == null )
+	localStorage['user_name'] = 0;
+localStorage['user_name']++;
+
+
 function g_Register()
 {
 	if( g_id != 0)
@@ -61,9 +66,9 @@ function g_ProcessMsg( obj)
 		return;
 	}
 
-	if( obj.log )
+	if( obj.message )
 	{
-		g_ShowLog( obj.log);
+		g_ShowMessage( obj.message);
 		return;
 	}
 
@@ -81,7 +86,7 @@ function g_Refresh()
 	g_cycle++;
 	setTimeout("g_Refresh()", 1000);
 
-//	document.getElementById('id').innerHTML = 'ID = ' + g_id + ' c' + g_cycle;
+//	document.getElementById('id').textContent = 'ID = ' + g_id + ' c' + g_cycle;
 
 	if( g_id == 0 )
 		return;
@@ -109,7 +114,7 @@ function g_Init()
 
 function g_Registered()
 {
-	g_Info('Registed: ID = ' + g_id);
+	g_Info('Registed: ID = ' + g_id + ' User = ' + localStorage['user_name']);
 	g_OpenMonitor('jobs');
 //	g_OpenMonitor('renders');
 //	g_OpenMonitor('users');
@@ -146,13 +151,13 @@ function g_MButtonClick( evt)
 
 	g_CloseAllMonitors();
 
-	g_OpenMonitor( el.innerHTML);
+	g_OpenMonitor( el.textContent);
 }
 
 function g_OpenMonitor( i_type, i_id)
 {
 	for( var i = 0; i < g_monitor_buttons.length; i++)
-		if( g_monitor_buttons[i].innerHTML == i_type )
+		if( g_monitor_buttons[i].textContent == i_type )
 			g_monitor_buttons[i].classList.add('pushed');
 
 	new Monitor( document.getElementById('content'), i_type, i_id);
@@ -164,17 +169,18 @@ function g_OpenTasks( i_job_id)
 	g_OpenMonitor('tasks', i_job_id);
 }
 
-function g_ShowLog( log)
+function g_ShowMessage( msg)
 {
-	if( log.list == null ) return;
-	var wnd = window.open( null, 'Log', 'location=no');
-	cgru_LoadCSS(window.location+'afanasy/browser/style.css', wnd.document);
-	wnd.document.write('<div style="font: 12px Arial; background: #CCC; position:absolute;top:0;bottom:0;left:0;right:0;">');
-//	wnd.document.body.style.background = '#AAA';
-	wnd.document.write('<div>');
-	for( i = 0; i < log.list.length; i++)
-		wnd.document.write('<div>'+log.list[i]+'</div>');
-	wnd.document.write('</div>');
+	if( msg.list == null ) return;
+	var wnd = window.open( null, 'Log', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	wnd.document.writeln('<!DOCTYPE html>');
+	wnd.document.write('<html><head><title>'+msg.name+':'+msg.type+'</title></head>');
+	wnd.document.write('<body style="font: 12px Arial; background: #CCC;">');
+
+	for( i = 0; i < msg.list.length; i++)
+		wnd.document.write('<div>'+msg.list[i]+'</div>');
+
+	wnd.document.write('</body></html>');
 	wnd.focus();
 }
 
@@ -182,7 +188,7 @@ function g_Info( i_msg, i_elem)
 {
 	if( i_elem == null )
 		i_elem = 'info';
-	document.getElementById(i_elem).innerHTML=i_msg;
+	document.getElementById(i_elem).textContent=i_msg;
 }
 
 function g_Error( i_err)

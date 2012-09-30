@@ -1,4 +1,8 @@
-.cgru_dialog {
+.cgru_dialog_content * {
+margin: 0; padding: 0; overflow: hidden;
+font: 16px Arial;
+}
+.cgru_dialog_content {
 position: absolute;
 background: #AAA;
 border-radius: 4px;
@@ -12,32 +16,34 @@ position: absolute;
 background: rgba(0,0,0,0.5);
 top: 0; bottom: 0; left: 0; right: 0;
 }
-.cgru_dialog * {
-margin: 10px;
+.cgru_dialog_title, .cgru_dialog_status, .cgru_dialog_info, .cgru_dialog_button_cancel, .cgru_dialog_button_apply {
 background: #CCC;
-padding: 6px;
+padding: 6px 12px;
 border-radius: 8px;
 }
-.cgru_dialog_title {
-margin: 0;
-background: #CCC;
+.cgru_dialog_title, .cgru_dialog_status {
 padding: 4px;
 border-radius: 0px;
 box-shadow: 0px 0px 5px #000;
 }
 .cgru_dialog_info {
+margin: 10px;
 box-shadow: 0px 0px 5px #000 inset;
 }
 .cgru_dialog_input {
 background: #EEE;
+padding: 6px;
+height: 1.2em;
+text-align: center;
 box-shadow: 0px 0px 5px #000 inset;
 }
-.cgru_dialog_button {
-/*margin: 0;*/
+.cgru_dialog_button_left { float: left}
+.cgru_dialog_button_left, .cgru_dialog_button_right { width: 50%; }
+.cgru_dialog_button_cancel, .cgru_dialog_button_apply {
+margin: 10px;
+cursor: pointer;
 box-shadow: 0px 0px 5px #000;
 text-align: center;
-width: 40%;
-float: left;
 }
 
 
@@ -52,8 +58,12 @@ box-shadow: 0px 0px 5px #000;
 padding: 4px 10px;
 top: 0; left: 0;
 }
-.cgru_menu_item { box-shadow: 0px 0px 10px #AAA inset; border-radius: 4px; padding: 2px; border-top: 1px solid #999;}
+.cgru_menu_item { box-shadow: 0px 0px 10px #AAA inset; padding: 2px; border-top: 1px solid #999;}
 .cgru_menu_item:first-child { border-style: none;}
-.cgru_menu_item:hover { background: #DFF;}
+.cgru_menu_item:hover { background: #DFF; border-radius: 4px;}
 .cgru_menu_item.disabled { color: #555;}
 .cgru_menu_item.disabled:hover { background: #AAA;}
+
+
+.cgru_error_back { background: #F77;}
+

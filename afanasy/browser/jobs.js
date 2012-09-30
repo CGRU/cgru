@@ -531,17 +531,25 @@ JobBlock.prototype.update = function( i_displayFull)
 
 JobNode.actions = [];
 
-JobNode.actions.push(['context', 'log',               'menuHandleGet',       'Show Log']);
-JobNode.actions.push(['context', 'reset_error_hosts', 'menuHandleOperation', 'Reset Error Hosts']);
-JobNode.actions.push(['context', 'restart_errors',    'menuHandleOperation', 'Restart Errors']);
-JobNode.actions.push(['context',  null,                null,                  null]);
-JobNode.actions.push(['context', 'start',             'menuHandleOperation', 'Start']);
-JobNode.actions.push(['context', 'pause',             'menuHandleOperation', 'Pause']);
-JobNode.actions.push(['context', 'stop',              'menuHandleOperation', 'Stop']);
-JobNode.actions.push(['context', 'restart',           'menuHandleOperation', 'Restart']);
-JobNode.actions.push(['context', 'restart_pause',     'menuHandleOperation', 'Restart&Pause']);
-JobNode.actions.push(['context', 'delete',            'menuHandleOperation', 'Delete']);
+JobNode.actions.push(['context', 'log',               null, 'menuHandleGet',       'Show Log']);
+JobNode.actions.push(['context', 'error_hosts',       null, 'menuHandleGet',       'Show Error Hosts']);
+JobNode.actions.push(['context',  null,               null,  null,                  null]);
+JobNode.actions.push(['context', 'reset_error_hosts', null, 'menuHandleOperation', 'Reset Error Hosts']);
+JobNode.actions.push(['context', 'restart_errors',    null, 'menuHandleOperation', 'Restart Errors']);
+JobNode.actions.push(['context',  null,               null,  null,                  null]);
+JobNode.actions.push(['context', 'start',             null, 'menuHandleOperation', 'Start']);
+JobNode.actions.push(['context', 'pause',             null, 'menuHandleOperation', 'Pause']);
+JobNode.actions.push(['context', 'stop',              null, 'menuHandleOperation', 'Stop']);
+JobNode.actions.push(['context', 'restart',           null, 'menuHandleOperation', 'Restart']);
+JobNode.actions.push(['context', 'restart_pause',     null, 'menuHandleOperation', 'Restart&Pause']);
+JobNode.actions.push(['context', 'delete',            null, 'menuHandleOperation', 'Delete']);
 
-JobNode.actions.push(['set', 'priority',   'menuHandleSet', 'Priority']);
-JobNode.actions.push(['set', 'annotation', 'menuHandleSet', 'Annotation']);
+JobNode.actions.push(['set', 'depend_mask',                'reg', 'menuHandleSet', 'Depend Mask']);
+JobNode.actions.push(['set', 'depend_mask_global',         'reg', 'menuHandleSet', 'Global Depend Mask']);
+JobNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
+JobNode.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
+JobNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
+JobNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
+JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleSet', 'Priority']);
+JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleSet', 'Annotation']);
 

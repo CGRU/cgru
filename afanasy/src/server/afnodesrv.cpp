@@ -268,23 +268,6 @@ int AfNodeSrv::calcLogWeight() const
 
 af::Msg * AfNodeSrv::writeLog() const
 {
-	af::Msg * msg = new af::Msg();
-	std::ostringstream stream;
-
-	stream << "{\"log\":{\"id\":" << m_node->m_id;
-	stream << ",\"name\":\"" << m_node->m_name << "\"";
-	stream << ",\"list\":[";
-	for( std::list<std::string>::const_iterator it = m_log.begin(); it != m_log.end(); it++)
-	{
-		if( it != m_log.begin())
-			stream << ",";
-		stream << "\"" << af::strEscape(*it) << "\"";
-	}
-	stream << "]}}";
-
-	std::string string = stream.str();
-	msg->setData( string.size(), string.c_str(), af::Msg::TJSON);
-
-	return msg;
+	return af::jsonMsg( "log", m_node->m_name, m_log);
 }
 

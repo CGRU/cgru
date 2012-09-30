@@ -1,0 +1,8 @@
+{
+	"get":
+	{
+		"type" : "jobs",
+		"mode" : "error_hosts",
+		"ids"  : [2]
+	}
+}

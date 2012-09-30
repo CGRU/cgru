@@ -61,7 +61,7 @@ public:
    void clearCommands();
 
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring);
-   virtual void getErrorHostsListString( std::string & str) const;
+	virtual void getErrorHostsList( std::list<std::string> & o_list) const;
    virtual void startTask( af::TaskExec * taskexec, RenderAf * render, MonitorContainer * monitoring);
    virtual void errorHostsAppend( int task, int hostId, RenderContainer * renders);
    virtual void errorHostsReset();
