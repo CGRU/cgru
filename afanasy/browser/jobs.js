@@ -224,6 +224,7 @@ JobBlock.prototype.onContextMenu = function( evt)
 	var el = evt.currentTarget;
 	if( el == null ) return;
 g_Info('block context');
+	evt.stopPropagation();
 return false;
 }
 
