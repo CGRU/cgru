@@ -25,22 +25,34 @@ function Monitor( i_element, i_type, i_id)
 	this.elList.monitor = this;
 	this.elList.EType = 'list';*/
 
-	this.elCtrlSet = document.createElement('span');
-	this.elCtrl.appendChild( this.elCtrlSet);
-	this.elCtrlSet.classList.add('menubutton');
+	this.elCtrlButtons = document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlButtons);
+	this.elCtrlButtons.style.position = 'absolute';
+	this.elCtrlButtons.style.width = '100px';
+
+	this.elCtrlSet = document.createElement('div');
+	this.elCtrlButtons.appendChild( this.elCtrlSet);
+	this.elCtrlSet.classList.add('ctrl_button');
 	this.elCtrlSet.textContent = 'SET';
-	this.elCtrlSet.style.top = '7px';
 	this.elCtrlSet.onmouseover = this.onMouseOverSet;
 
+	this.elCtrlSortFilter = document.createElement('div');
+	this.elCtrl.appendChild( this.elCtrlSortFilter);
+	this.elCtrlSortFilter.style.position = 'absolute';
+	this.elCtrlSortFilter.style.left = '100px';
+	this.elCtrlSortFilter.style.right = '0';
+	this.elCtrlSortFilter.style.top = '0';
+	this.elCtrlSortFilter.style.bottom = '0';
+//this.elCtrlSortFilter.style.border = '1px solid #333';
+
 	this.elCtrlSort = document.createElement('div');
-	this.elCtrl.appendChild( this.elCtrlSort);
-	this.elCtrlSort.classList.add('sort');
+	this.elCtrlSortFilter.appendChild( this.elCtrlSort);
+	this.elCtrlSort.classList.add('ctrl_sort');
 	this.elCtrlSort.textContent = 'Sort:';
 
 	this.elCtrlFilter = document.createElement('div');
-	this.elCtrl.appendChild( this.elCtrlFilter);
-//	this.elCtrlFilter.classList.add('sort');
-	this.elCtrlFilter.classList.add('filter');
+	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
+	this.elCtrlFilter.classList.add('ctrl_filter');
 	this.elCtrlFilter.textContent = 'Filter:';
 
 	this.elInfoText = document.createElement('div');

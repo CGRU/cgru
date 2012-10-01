@@ -54,16 +54,6 @@ color: #353;
 box-shadow: 0px 0px 5px #000 inset;
 }
 
-.menubutton {
-background: #AAA;
-box-shadow: 0px 0px 5px #000 inset;
-border-radius: 4px;
-cursor: pointer;
-margin: 4px;
-padding: 4px;
-position: relative;
-}
-
 .monitor {
 font-weight: bold;
 position: absolute;
@@ -92,17 +82,30 @@ bottom: 40px;
 -moz-user-select: none;
 }
 
-.monitor .ctrl .sort,.filter {
+.ctrl_button {
+background: #AAA;
+box-shadow: 0px 0px 5px #000 inset;
+border-radius: 4px;
+cursor: pointer;
+margin: 8px;
+padding: 4px;
+float: left;
+/*
+position: relative;
 position: absolute;
-top: 5px;
-bottom: 5px;
+*/
+}
+
+.ctrl_sort, .ctrl_filter {
+position: absolute;
 box-shadow: 0px 0px 5px #000 inset;
 background: #789;
+margin: 8px;
 padding: 5px;
 border-radius: 4px;
 }
-.monitor .ctrl .sort { left: 50px; right: 60%; }
-.monitor .ctrl .filter { left: 41%; right: 5px; }
+.ctrl_sort   { left: 5px; right: 60%; }
+.ctrl_filter { left: 41%; right: 5px; }
 
 .monitor .info .text {
 position: absolute;

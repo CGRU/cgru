@@ -150,6 +150,7 @@ function JobBlock( i_elParent, i_block)
 
 	this.elRoot = document.createElement('div');
 	i_elParent.appendChild( this.elRoot);
+this.elRoot.oncontextmenu = this.onContextMenu;
 
 	this.service = this.params.service;
 	this.elIcon = document.createElement('img');
@@ -218,6 +219,13 @@ function JobBlock( i_elParent, i_block)
 	this.elNeedProperties = cm_ElCreateFloatText( this.element, 'right', 'Needed Properties');
 }
 
+JobBlock.prototype.onContextMenu = function( evt)
+{
+	var el = evt.currentTarget;
+	if( el == null ) return;
+g_Info('block context');
+return false;
+}
 
 JobBlock.prototype.constructFull = function()
 {

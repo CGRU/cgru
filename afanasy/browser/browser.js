@@ -172,7 +172,7 @@ function g_OpenTasks( i_job_id)
 function g_ShowMessage( msg)
 {
 	if( msg.list == null ) return;
-	var wnd = window.open( null, 'Log', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	var wnd = window.open( null, 'Message', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
 	wnd.document.writeln('<!DOCTYPE html>');
 	wnd.document.write('<html><head><title>'+msg.name+':'+msg.type+'</title></head>');
 	wnd.document.write('<body style="font: 12px Arial; background: #CCC;">');
