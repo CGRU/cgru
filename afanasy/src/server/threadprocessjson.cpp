@@ -91,7 +91,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						else if(( mode == "log" ) && ( job != NULL ))
 							o_msg_response = job->writeLog();
 					}
-					else
+					if( o_msg_response == NULL )
 						o_msg_response = i_args->jobs->generateList(
 							full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
 				}

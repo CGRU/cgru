@@ -32,9 +32,8 @@ box-shadow: 0px 0px 5px #000 inset;
 }
 .cgru_dialog_input {
 background: #EEE;
-padding: 6px;
+padding: 6px 18px;
 height: 1.2em;
-text-align: center;
 box-shadow: 0px 0px 5px #000 inset;
 }
 .cgru_dialog_button_left { float: left}

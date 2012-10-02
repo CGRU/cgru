@@ -137,8 +137,8 @@ border-radius: 4px;
 .item.ERR { background: #965;}
 .item.OFF { background: #777;}
 .item.selected {
-background: #DDFFDD;
-color: #000000;
+background: #DFD;
+color: #000;
 }
 
 .item .resources {
@@ -173,12 +173,14 @@ top: 2px; left: 2px;
 /*height: 24px;*/
 }
 
-.item .jobblock {
-/*border: 1px solid #666;*/
+.jobblock {
 margin: 2px;
 padding: 2px 5px;
 border-radius: 4px;
 box-shadow: 0px 0px 5px #000 inset;
+}
+.jobblock.selected {
+background: #DFD;
 }
 
 .item.block {

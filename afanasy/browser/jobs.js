@@ -145,12 +145,14 @@ JobNode.prototype.onDoubleClick = function()
 function JobBlock( i_elParent, i_block)
 {
 	this.params = i_block;
+	this.job = i_elParent.item;
 
 	this.tasks_num = this.params.tasks_num;
 
 	this.elRoot = document.createElement('div');
 	i_elParent.appendChild( this.elRoot);
-this.elRoot.oncontextmenu = this.onContextMenu;
+	this.elRoot.block = this;
+	this.elRoot.oncontextmenu = function(e){ return e.currentTarget.block.onContextMenu(e);}
 
 	this.service = this.params.service;
 	this.elIcon = document.createElement('img');
@@ -221,11 +223,57 @@ this.elRoot.oncontextmenu = this.onContextMenu;
 
 JobBlock.prototype.onContextMenu = function( evt)
 {
-	var el = evt.currentTarget;
-	if( el == null ) return;
-g_Info('block context');
 	evt.stopPropagation();
-return false;
+
+	g_cur_monitor = this.job.monitor;
+
+	if( this.job.monitor.menu ) this.job.monitor.menu.destroy();
+	this.element.classList.add('selected');
+
+	if( this.job.element.selected === false )
+		this.job.monitor.selectAll( false);
+
+	var menu = new cgru_Menu( document, document.body, evt, this, 'jobblock_context', 'onContextMenuDestroy');
+	this.job.monitor.menu = menu;
+	var actions = JobBlock.actions;
+	for( var i = 0; i < actions.length; i++)
+//		if( actions[i][0] == 'context' )
+			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
+	menu.show();
+
+	return false;
+}
+JobBlock.prototype.onContextMenuDestroy = function()
+{
+	this.element.classList.remove('selected');
+	this.job.monitor.menu = null;
+}
+JobBlock.prototype.menuHandleSet = function( i_parameter)
+{
+	var ptype = null;
+	var actions = JobBlock.actions;
+	for( var i = 0; i < actions.length; i++)
+		if( i_parameter == actions[i][1])
+			ptype = actions[i][2];
+	new cgru_Dialog( document, document.body, this, 'setParameter', i_parameter, ptype, this.params[i_parameter], 'jobblock_parameter');
+}
+JobBlock.prototype.setParameter = function( i_parameter, i_value)
+{
+	var params = {};
+	params[i_parameter] = i_value;
+g_Info( this.job.params.name+'['+this.params.name+'].'+i_parameter+' = ' + i_value);
+	this.action( null, params);
+}
+JobBlock.prototype.action = function( i_operation, i_params)
+{
+	var jids = this.job.monitor.getSelectedIds();
+	var bids = [-1];
+	if( jids.length == 0 )
+	{
+		jids = [this.job.params.id];
+		bids = [this.params.block_num];
+	}
+	nw_Action('jobs', jids, i_operation, i_params, bids);
 }
 
 JobBlock.prototype.constructFull = function()
@@ -374,12 +422,12 @@ JobBlock.prototype.update = function( i_displayFull)
 			if( eah == 0 ) errTit = ' (unlimited)';
 			else if( eah == -1 ) errTit = ' (user settings used)';
 
-			errTxt += '-' + eth + 'T';
+			errTxt += ',' + eth + 'T';
 			errTit += '\nAvoid Task Same Host: ' + eth;
 			if( eth == 0 ) errTit = ' (unlimited)';
 			else if( eth == -1 ) errTit = ' (user settings used)';
 
-			errTxt += '-' + ert + 'R';
+			errTxt += ',' + ert + 'R';
 			errTit += '\nTask Errors Retries: ' + ert;
 			if( ert == 0 ) errTit = ' (unlimited)';
 			else if( ert == -1 ) errTit = ' (user settings used)';
@@ -559,6 +607,24 @@ JobNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet
 JobNode.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
 JobNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
 JobNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
+JobNode.actions.push(['set', 'time_wait',                  'tim', 'menuHandleSet', 'Time Wait']);
 JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleSet', 'Priority']);
+JobNode.actions.push(['set', 'need_os',                    'reg', 'menuHandleSet', 'OS Needed']);
+JobNode.actions.push(['set', 'need_properties',            'reg', 'menuHandleSet', 'Need Properties']);
+JobNode.actions.push(['set',  null,                         null,  null,            null]);
 JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleSet', 'Annotation']);
+
+JobBlock.actions = [];
+JobBlock.actions.push(['set', 'capacity',                   'num', 'menuHandleSet', 'Capacity']);
+JobBlock.actions.push(['set',  null,                         null,  null,            null]);
+JobBlock.actions.push(['set', 'errors_retries',             'num', 'menuHandleSet', 'Errors Retries']);
+JobBlock.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleSet', 'Errors Avoid Host']);
+JobBlock.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleSet', 'Errors Task Same Host']);
+JobBlock.actions.push(['set',  null,                         null,  null,            null]);
+JobBlock.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
+JobBlock.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
+JobBlock.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
+JobBlock.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
+JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleSet', 'Depend Mask']);
+JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleSet', 'Tasks Depend Mask']);
 

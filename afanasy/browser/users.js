@@ -84,9 +84,9 @@ UserNode.prototype.update = function()
 
 	var errstr = 'Err:';
 	var errtit = 'Errors solving:';
-	errstr += this.params.errors_avoid_host + 'J-';
+	errstr += this.params.errors_avoid_host + 'J,';
 	errtit += '\nJob blocks to avoid host: ' + this.params.errors_avoid_host;
-	errstr += this.params.errors_task_same_host + 'T-';
+	errstr += this.params.errors_task_same_host + 'T,';
 	errtit += '\nJob tasks to avoid host: ' + this.params.errors_task_same_host;
 	errstr += this.params.errors_retries + 'R';
 	errtit += '\nError task retries: ' + this.params.errors_retries;

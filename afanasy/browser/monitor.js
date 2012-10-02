@@ -34,7 +34,8 @@ function Monitor( i_element, i_type, i_id)
 	this.elCtrlButtons.appendChild( this.elCtrlSet);
 	this.elCtrlSet.classList.add('ctrl_button');
 	this.elCtrlSet.textContent = 'SET';
-	this.elCtrlSet.onmouseover = this.onMouseOverSet;
+	this.elCtrlSet.monitor = this;
+	this.elCtrlSet.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e);}
 
 	this.elCtrlSortFilter = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSortFilter);
@@ -92,13 +93,14 @@ function Monitor( i_element, i_type, i_id)
 
 	g_cur_monitor = this;
 
+	this.menu = null;
 	this.cycle = 0;
 }
 
 Monitor.prototype.destroy = function()
 {
-	if( g_cur_monitor == this )
-		g_cur_monitor = null;
+	if( this.menu ) this.menu.destroy();
+	if( g_cur_monitor == this ) g_cur_monitor = null;
 	cm_ArrayRemove(	g_recievers, this);
 	cm_ArrayRemove(	g_refreshers, this);
 	cm_ArrayRemove(	g_monitors, this);
@@ -388,11 +390,13 @@ Monitor.prototype.onContextMenu = function( evt)
 	if( el.monitor == null ) return
 
 	g_cur_monitor = el.monitor;
+	if( g_cur_monitor.menu ) g_cur_monitor.menu.destroy();
 	if( el.selected != true )
 		g_cur_monitor.selectAll( false);
 	g_cur_monitor.elSetSelected( el, true);
 
-	var menu = new cgru_Menu( document.body, evt, g_cur_monitor, this.type+'_context');
+	var menu = new cgru_Menu( document, document.body, evt, g_cur_monitor, this.type+'_context', 'onMenuDestroy');
+	g_cur_monitor.menu = menu;
 	var actions = g_cur_monitor.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == 'context' )
@@ -401,6 +405,7 @@ Monitor.prototype.onContextMenu = function( evt)
 
 	return false;
 }
+Monitor.prototype.onMenuDestroy = function() { this.menu = null;}
 Monitor.prototype.menuHandleOperation = function( i_name)
 {
 g_Info('Operation = ' + i_name);
@@ -416,12 +421,13 @@ g_Info('Get = ' + i_name);
 
 Monitor.prototype.onMouseOverSet = function( evt)
 {
-	if( g_cur_monitor == null ) return;
-	if( g_cur_monitor.cur_item == null ) return;
-	if( g_cur_monitor.hasSelection() == false ) return;
+	if( this.menu ) this.menu.destroy();
+	if( this.cur_item == null ) return;
+	if( this.hasSelection() == false ) return;
 
-	var menu = new cgru_Menu( document.body, evt, g_cur_monitor, this.type+'_set');
-	var actions = g_cur_monitor.cur_item.constructor.actions;
+	var menu = new cgru_Menu( document, document.body, evt, this, this.type+'_set', 'onMenuDestroy');
+	this.menu = menu;
+	var actions = this.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == 'set' )
 			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
@@ -439,13 +445,10 @@ Monitor.prototype.menuHandleSet = function( i_parameter)
 Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
 	var params = {};
-//	if( typeof(this.cur_item.params[i_parameter]) == 'number')
-//		i_value = parseInt( i_value);
 	params[i_parameter] = i_value;
 g_Info('params.'+i_parameter+'="'+i_value+'";');
 	this.action( null, params);
 }
-
 
 Monitor.prototype.action = function( i_operation, i_params)
 {

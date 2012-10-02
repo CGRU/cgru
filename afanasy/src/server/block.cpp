@@ -375,7 +375,7 @@ bool Block::action( Action & i_action)
 			if( changes.empty())
 				return false;
 
-			i_action.log = "\nBlock['" + m_data->getName() + "']:" + changes;
+			i_action.log += "\nBlock['" + m_data->getName() + "']:" + changes;
 
 			blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;

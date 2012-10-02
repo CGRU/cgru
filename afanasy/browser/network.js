@@ -122,7 +122,7 @@ function nw_ConstructActionObject( i_type, i_ids)
 	return obj;
 }
 
-function nw_Action( i_type, i_ids, i_operation, i_params)
+function nw_Action( i_type, i_ids, i_operation, i_params, i_block_ids)
 {
 	if( i_ids.length == 0 )
 	{
@@ -132,11 +132,9 @@ function nw_Action( i_type, i_ids, i_operation, i_params)
 
 	var obj = nw_ConstructActionObject( i_type, i_ids);
 
-	if( i_operation )
-		obj.action.operation = i_operation;
-	
-	if( i_params )
-		obj.action.params = i_params;
+	if( i_operation ) obj.action.operation = i_operation;
+	if( i_params    ) obj.action.params = i_params;
+	if( i_block_ids ) obj.action.block_ids = i_block_ids;
 
 	nw_Send( obj);
 }

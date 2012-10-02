@@ -178,7 +178,7 @@ function g_ShowMessage( msg)
 	wnd.document.write('<body style="font: 12px Arial; background: #CCC;">');
 
 	for( i = 0; i < msg.list.length; i++)
-		wnd.document.write('<div>'+msg.list[i]+'</div>');
+		wnd.document.write('<div>'+msg.list[i].replace('\n','<br/>')+'</div>');
 
 	wnd.document.write('</body></html>');
 	wnd.focus();
