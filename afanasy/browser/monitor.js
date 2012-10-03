@@ -19,8 +19,6 @@ function Monitor( i_element, i_type, i_id)
 	this.elInfo.classList.add('info');
 
 //	this.elList.onmousedown = function(e) { return false;}
-//	this.elList.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
-//	this.elList.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
 /*	this.elList.oncontextmenu = this.onContextMenu;
 	this.elList.monitor = this;
 	this.elList.EType = 'list';*/
@@ -279,9 +277,9 @@ Monitor.prototype.onMouseDown = function( i_evt, i_el)
 		return;
 	}
 
-	if( false == g_key_ctrl )
+	if( false == i_evt.ctrlKey )
 		this.selectAll( false);
-	if( g_key_shift && this.cur_item )
+	if( i_evt.shiftKey && this.cur_item )
 	{
 		var i = this.items.indexOf( this.cur_item);
 		var ci = this.items.indexOf( i_el.item);
@@ -304,8 +302,8 @@ Monitor.prototype.onMouseDown = function( i_evt, i_el)
 
 Monitor.prototype.onMouseOver = function( i_evt, i_el)
 {
-	if( false == g_mouse_down ) return;
-	this.elSetSelected( i_evt.currentTarget, g_key_ctrl == false);
+	if( i_evt.buttons != 1 ) return;
+	this.elSetSelected( i_evt.currentTarget, i_evt.ctrlKey == false);
 }
 
 Monitor.prototype.elSetSelected = function( el, on)
@@ -368,7 +366,7 @@ Monitor.prototype.selectNext = function( previous)
 	if( next_index == cur_index ) return;
 
 	this.cur_item = this.items[next_index]; 
-	if( false == g_key_shift )
+	if( false == i_evt.shiftKey )
 		this.selectAll( false);
 	this.elSetSelected( this.cur_item.element, true);
 }

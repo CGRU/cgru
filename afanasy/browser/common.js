@@ -2,11 +2,6 @@ function cm_Init()
 {
 //	document.body.style.MozUserSelect='none';
 	document.body.onkeydown = cm_OnKeyDown;
-	document.body.onkeyup = cm_OnKeyUp;
-//	document.body.onmousedown = function(e) { if(e.button==0){g_mouse_down=true;  return false;}}
-//	document.body.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false; return false;}}
-	document.body.onmousedown = function(e) { if(e.button==0){g_mouse_down=true; }}
-	document.body.onmouseup   = function(e) { if(e.button==0){g_mouse_down=false;}}
 }
 
 function cm_OnKeyDown(e)
@@ -14,9 +9,6 @@ function cm_OnKeyDown(e)
 	if(!e) return;
 	if(e.keyCode==27) // ESC
 	{
-		g_key_shift=false;
-		g_key_ctrl=false;
-		g_mouse_down=false;
 		for( var i = 0; i < g_monitors.length; i++)
 		{
 			g_monitors[i].selectAll( false);
@@ -27,9 +19,7 @@ function cm_OnKeyDown(e)
 
 	if( cgru_DialogsAll.length || cgru_MenusAll.length ) return;
 
-	if(e.keyCode==16) g_key_shift=true; // SHIFT
-	else if(e.keyCode==17) g_key_ctrl=true; // CTRL
-	else if(e.keyCode==65 && g_key_ctrl) // CTRL+A
+	if(e.keyCode==65 && e.ctrlKey) // CTRL+A
 	{
 		if( g_cur_monitor) g_cur_monitor.selectAll( true);
 		return false;
@@ -39,15 +29,6 @@ function cm_OnKeyDown(e)
 //	else if(evt.keyCode==116) return false; // F5
 //document.getElementById('test').textContent='key down: ' + e.keyCode;
 //	return true; 
-}
-
-function cm_OnKeyUp(e)
-{ 
-	if(!e) return;
-	if(e.keyCode==16) g_key_shift=false; // SHIFT
-	if(e.keyCode==17) g_key_ctrl=false; // CTRL
-//document.getElementById('test').textContent='key up: ' + e.keyCode;
-//	return false; 
 }
 
 function info( i_msg, i_elem)

@@ -6,10 +6,6 @@ g_version = 'browser';
 g_user_name = "jimmy";
 g_host_name = "pc01";
 
-g_mouse_down = false;
-g_key_ctrl = false;
-g_key_shift = false;
-
 g_recievers = [];
 g_refreshers = [];
 g_monitors = [];
