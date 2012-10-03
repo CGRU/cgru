@@ -10,7 +10,7 @@ function cm_Init()
 }
 
 function cm_OnKeyDown(e)
-{ 
+{
 	if(!e) return;
 	if(e.keyCode==27) // ESC
 	{
@@ -22,8 +22,12 @@ function cm_OnKeyDown(e)
 			g_monitors[i].selectAll( false);
 		}
 		cgru_ClosePopus();
+		return;
 	}
-	else if(e.keyCode==16) g_key_shift=true; // SHIFT
+
+	if( cgru_DialogsAll.length || cgru_MenusAll.length ) return;
+
+	if(e.keyCode==16) g_key_shift=true; // SHIFT
 	else if(e.keyCode==17) g_key_ctrl=true; // CTRL
 	else if(e.keyCode==65 && g_key_ctrl) // CTRL+A
 	{

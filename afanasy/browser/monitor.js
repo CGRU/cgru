@@ -256,10 +256,10 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 	i_item.monitor = this;
 	i_item.element.monitor = this;
 	i_item.element.item = i_item;
-	i_item.element.onmousedown = this.onMouseDown;
-	i_item.element.onmouseover = this.onMouseOver;
-	i_item.element.ondblclick = this.onDoubleClick;
-	i_item.element.oncontextmenu = this.onContextMenu;
+	i_item.element.onmousedown = function(e){ if(e.button==0) return e.currentTarget.monitor.onMouseDown(e,e.currentTarget);}
+	i_item.element.onmouseover = function(e){ if(e.button==0) return e.currentTarget.monitor.onMouseOver(e,e.currentTarget);}
+	i_item.element.ondblclick = function(e){ return e.currentTarget.item.onDoubleClick();}
+	i_item.element.oncontextmenu = function(e){ return e.currentTarget.monitor.onContextMenu(e,e.currentTarget);}
 
 	i_item.init();
 	i_item.update();
@@ -270,52 +270,42 @@ Monitor.prototype.info = function( i_str)
 	this.elInfoText.textContent = i_str;
 }
 
-Monitor.prototype.onDoubleClick = function(evt)
+Monitor.prototype.onMouseDown = function( i_evt, i_el)
 {
-	if( evt == null ) return;
-	var item = evt.currentTarget.item;
-	if( item == null ) return;
-	item.onDoubleClick();
-}
-
-Monitor.prototype.onMouseDown = function(evt)
-{
-	if( evt.button != 0 ) return;
-	var el = evt.currentTarget;
-	if( el == null ) return;
-	if( el.monitor == null ) return
-
-	g_cur_monitor = el.monitor;
-	if( false == g_key_ctrl )
-		g_cur_monitor.selectAll( false);
-	if( g_key_shift && g_cur_monitor.cur_item )
+	g_cur_monitor = this;
+	if( this.menu )
 	{
-		var i = g_cur_monitor.items.indexOf( g_cur_monitor.cur_item);
-		var ci = g_cur_monitor.items.indexOf( el.item);
+		this.menu.destroy();
+		return;
+	}
+
+	if( false == g_key_ctrl )
+		this.selectAll( false);
+	if( g_key_shift && this.cur_item )
+	{
+		var i = this.items.indexOf( this.cur_item);
+		var ci = this.items.indexOf( i_el.item);
 		if(( i != ci ) && ( i != -1) && ( ci != -1))
 		{
-			g_cur_monitor.elSetSelected( el, true);
+			this.elSetSelected( i_el, true);
 			var d = 1;
 			if( i > ci ) d = -1;
-//info('i='+i+' ci='+ci+' d='+d);
 			while( i != ci )
 			{
-				g_cur_monitor.elSetSelected( g_cur_monitor.items[i].element, true);
+				this.elSetSelected( this.items[i].element, true);
 				i += d;
 			}
 			return;
 		}
 	}
 		
-	g_cur_monitor.elSelectToggle( el);
+	this.elSelectToggle( i_el);
 }
 
-Monitor.prototype.onMouseOver = function(evt)
+Monitor.prototype.onMouseOver = function( i_evt, i_el)
 {
-	if( evt.button != 0 ) return;
 	if( false == g_mouse_down ) return;
-	g_cur_monitor = evt.currentTarget.monitor;
-	g_cur_monitor.elSetSelected( evt.currentTarget, g_key_ctrl == false);
+	this.elSetSelected( i_evt.currentTarget, g_key_ctrl == false);
 }
 
 Monitor.prototype.elSetSelected = function( el, on)
@@ -383,21 +373,17 @@ Monitor.prototype.selectNext = function( previous)
 	this.elSetSelected( this.cur_item.element, true);
 }
 
-Monitor.prototype.onContextMenu = function( evt)
+Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
-	var el = evt.currentTarget;
-	if( el == null ) return;
-	if( el.monitor == null ) return
+	g_cur_monitor = this;
+	if( this.menu ) this.menu.destroy();
+	if( i_el.selected != true )
+		this.selectAll( false);
+	this.elSetSelected( i_el, true);
 
-	g_cur_monitor = el.monitor;
-	if( g_cur_monitor.menu ) g_cur_monitor.menu.destroy();
-	if( el.selected != true )
-		g_cur_monitor.selectAll( false);
-	g_cur_monitor.elSetSelected( el, true);
-
-	var menu = new cgru_Menu( document, document.body, evt, g_cur_monitor, this.type+'_context', 'onMenuDestroy');
-	g_cur_monitor.menu = menu;
-	var actions = g_cur_monitor.cur_item.constructor.actions;
+	var menu = new cgru_Menu( document, document.body, i_evt, this, this.type+'_context', 'onMenuDestroy');
+	this.menu = menu;
+	var actions = i_el.item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == 'context' )
 			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
@@ -419,13 +405,13 @@ g_Info('Get = ' + i_name);
 	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
 }
 
-Monitor.prototype.onMouseOverSet = function( evt)
+Monitor.prototype.onMouseOverSet = function( i_evt)
 {
 	if( this.menu ) this.menu.destroy();
 	if( this.cur_item == null ) return;
 	if( this.hasSelection() == false ) return;
 
-	var menu = new cgru_Menu( document, document.body, evt, this, this.type+'_set', 'onMenuDestroy');
+	var menu = new cgru_Menu( document, document.body, i_evt, this, this.type+'_set', 'onMenuDestroy');
 	this.menu = menu;
 	var actions = this.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
@@ -436,7 +422,7 @@ Monitor.prototype.onMouseOverSet = function( evt)
 Monitor.prototype.menuHandleSet = function( i_parameter)
 {
 	var ptype = null;
-	var actions = g_cur_monitor.cur_item.constructor.actions;
+	var actions = this.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( i_parameter == actions[i][1])
 			ptype = actions[i][2];

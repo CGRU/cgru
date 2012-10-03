@@ -230,11 +230,22 @@ JobBlock.prototype.onContextMenu = function( evt)
 	if( this.job.monitor.menu ) this.job.monitor.menu.destroy();
 	this.element.classList.add('selected');
 
-	if( this.job.element.selected === false )
+	var onlyBlockIsSelected = false;
+	if(( this.job.element.selected == null ) || ( this.job.element.selected == false ))
+	{
 		this.job.monitor.selectAll( false);
+		onlyBlockIsSelected = true;
+	}
 
 	var menu = new cgru_Menu( document, document.body, evt, this, 'jobblock_context', 'onContextMenuDestroy');
 	this.job.monitor.menu = menu;
+
+	if( onlyBlockIsSelected )
+		menu.addItem( null, null, '<b>'+this.params.name+'</b>', false);
+	else
+		menu.addItem( null, null, '<b>All Blocks</b>', false);
+	
+
 	var actions = JobBlock.actions;
 	for( var i = 0; i < actions.length; i++)
 //		if( actions[i][0] == 'context' )
@@ -620,6 +631,8 @@ JobBlock.actions.push(['set',  null,                         null,  null,       
 JobBlock.actions.push(['set', 'errors_retries',             'num', 'menuHandleSet', 'Errors Retries']);
 JobBlock.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleSet', 'Errors Avoid Host']);
 JobBlock.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleSet', 'Errors Task Same Host']);
+JobBlock.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleSet', 'Errors Forgive Time']);
+JobBlock.actions.push(['set', 'tasks_max_run_time',         'hrs', 'menuHandleSet', 'Tasks Max Run Time']);
 JobBlock.actions.push(['set',  null,                         null,  null,            null]);
 JobBlock.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
 JobBlock.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
