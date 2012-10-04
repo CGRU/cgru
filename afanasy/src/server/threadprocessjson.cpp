@@ -100,7 +100,24 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		else if( type == "users")
 		{
 			AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
-			o_msg_response = i_args->users->generateList( af::Msg::TUsersList, type, ids, mask, json);
+			if( mode.size())
+			{
+				UserAf * user = NULL;
+				if( ids.size() == 1 )
+				{
+					UserContainerIt it( i_args->users);
+					user = it.getUser( ids[0]);
+					if( user == NULL )
+						o_msg_response = af::jsonMsgError( "Invalid ID");
+				}
+				if( user )
+				{
+					if( mode == "log" )
+						o_msg_response = user->writeLog();
+				}
+			}
+			if( o_msg_response == NULL )
+				o_msg_response = i_args->users->generateList( af::Msg::TUsersList, type, ids, mask, json);
 		}
 		else if( type == "renders")
 		{

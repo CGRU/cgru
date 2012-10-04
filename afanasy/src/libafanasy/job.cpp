@@ -41,7 +41,6 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
-	jr_string("annotation",   m_annotation,   i_object, io_changes);
 	jr_string("description",  m_description,  i_object, io_changes);
 	jr_string("command_pre",  m_command_pre,  i_object, io_changes);
 	jr_string("command_post", m_command_post, i_object, io_changes);
@@ -134,8 +133,6 @@ void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
 		o_str << ",\"cmd_pre\":\""      << af::strEscape( m_command_pre     ) << "\"";
 	if( m_command_post.size())
 		o_str << ",\"cmd_post\":\""     << af::strEscape( m_command_post    ) << "\"";
-	if( m_annotation.size())
-		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
 	if( m_description.size())
 		o_str << ",\"description\":\""  << af::strEscape( m_description ) << "\"";
 

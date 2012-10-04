@@ -72,8 +72,8 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	o_str << ",\"errors_task_same_host\":" << int(m_errors_task_same_host);
 	o_str << ",\"errors_forgive_time\":" << m_errors_forgive_time;
 
-	if( isPermanent() )
-		o_str << ",\"permanent\":true";
+	if( false == isPermanent() )
+		o_str << ",\"permanent\":false";
 	if( solveJobsParallel() )
 		o_str << ",\"solve_parallel\":true";
 
@@ -84,8 +84,6 @@ void User::v_jsonWrite( std::ostringstream & o_str, int i_type)
 
 	if( m_host_name.size())
 		o_str << ",\"host_name\":\"" << m_host_name << "\"";
-	if( m_annotation.size())
-		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
 	if( hasHostsMask())
 		o_str << ",\"hosts_mask\":\""  << af::strEscape( m_hosts_mask.getPattern() ) << "\"";
 	if( hasHostsMaskExclude())
@@ -109,7 +107,26 @@ void User::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
-	jr_string("annotation",    m_annotation,    i_object, io_changes);
+	jr_int32 ("max_running_tasks",     m_max_running_tasks,     i_object, io_changes);
+	jr_regexp("hosts_mask",            m_hosts_mask,            i_object, io_changes);
+	jr_regexp("hosts_mask_exclude",    m_hosts_mask_exclude,    i_object, io_changes);
+	jr_uint8 ("errors_retries",        m_errors_retries,        i_object, io_changes);
+	jr_uint8 ("errors_avoid_host",     m_errors_avoid_host,     i_object, io_changes);
+	jr_uint8 ("errors_task_same_host", m_errors_task_same_host, i_object, io_changes);
+	jr_int32 ("errors_forgive_time",   m_errors_forgive_time,   i_object, io_changes);
+	jr_int32 ("jobs_life_time",        m_jobs_life_time,        i_object, io_changes);
+
+	bool solve_parallel = false;
+	jr_bool("solve_parallel", solve_parallel, i_object, io_changes);
+	if( solve_parallel )
+		setJobsSolveMethod( af::Node::SolveByPriority);
+	else
+		setJobsSolveMethod( af::Node::SolveByOrder);
+
+	bool permanent = true;
+	jr_bool("permanent", permanent, i_object, io_changes);
+	if( permanent != isPermanent())
+		setPermanent( permanent);
 }
 
 void User::readwrite( Msg * msg)
@@ -134,7 +151,7 @@ void User::readwrite( Msg * msg)
 	rw_RegExp  ( m_hosts_mask,            msg);
 	rw_RegExp  ( m_hosts_mask_exclude,    msg);
 	rw_String  ( m_annotation,            msg);
-	rw_String  ( m_customdata,            msg);
+	rw_String  ( m_custom_data,           msg);
 }
 
 void User::setPermanent( bool value)
@@ -219,7 +236,7 @@ void User::generateInfoStream( std::ostringstream & stream, bool full) const
       else stream << "\n (user is temporal)";
       stream << "\n Online time = " << time2str( m_time_online);
       if( m_annotation.size()) stream << "\n" << m_annotation;
-      if( m_customdata.size()) stream << "\nCustom Data:\n" << m_customdata;
+      if( m_custom_data.size()) stream << "\nCustom Data:\n" << m_custom_data;
       //stream << "\n Memory = " << calcWeight() << " bytes.";
    }
    else

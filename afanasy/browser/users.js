@@ -7,7 +7,7 @@ UserNode.prototype.init = function()
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
-	this.elName.title = 'User name';
+	this.elName.title = 'User Name';
 
 	this.elPriority = document.createElement('span');
 	this.element.appendChild( this.elPriority);
@@ -60,7 +60,10 @@ UserNode.prototype.init = function()
 
 UserNode.prototype.update = function()
 {
-	this.elName.textContent = this.params.name;
+	if( this.params.permanent == false )
+		this.elName.innerHTML = '<i>'+this.params.name+'</i>';
+	else
+		this.elName.textContent = this.params.name;
 
 	this.elPriority.textContent = '-' + this.params.priority;
 
@@ -73,7 +76,7 @@ UserNode.prototype.update = function()
 	if( this.params.hosts_mask ) this.elHostsMask.textContent = 'H('+this.params.hosts_mask+')';
 	else this.elHostsMask.textContent = '';
 
-	if( this.params.hosts_mask_exclude ) this.elHostsMaskExclude.textContent = 'E('+this.params.hosts_mask+')';
+	if( this.params.hosts_mask_exclude ) this.elHostsMaskExclude.textContent = 'E('+this.params.hosts_mask_exclude+')';
 	else this.elHostsMaskExclude.textContent = '';
 
 	if( this.params.errors_forgive_time ) this.elForgive.textContent = 'F'+ cm_TimeStringFromSeconds( this.params.errors_forgive_time);
@@ -146,4 +149,26 @@ UserNode.prototype.refresh = function()
 UserNode.prototype.onDoubleClick = function()
 {
 }
+
+UserNode.actions = [];
+
+UserNode.actions.push(['context', 'log',               null, 'menuHandleGet',       'Show Log']);
+
+UserNode.actions.push(['set', 'priority',                   'num', 'menuHandleSet', 'Priority']);
+UserNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
+UserNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
+UserNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
+UserNode.actions.push(['set',  null,                         null,  null,            null]);
+UserNode.actions.push(['set', 'errors_retries',             'num', 'menuHandleSet', 'Errors Retries']);
+UserNode.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleSet', 'Errors Avoid Host']);
+UserNode.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleSet', 'Errors Task Same Host']);
+UserNode.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleSet', 'Errors Forgive Time']);
+UserNode.actions.push(['set',  null,                         null,  null,            null]);
+UserNode.actions.push(['set', 'solve_parallel',             'bl1', 'menuHandleSet', 'Solve Jobs Parallel']);
+UserNode.actions.push(['set',  null,                         null,  null,            null]);
+UserNode.actions.push(['set', 'jobs_life_time',             'hrs', 'menuHandleSet', 'Jobs Life Time']);
+UserNode.actions.push(['set',  null,                         null,  null,            null]);
+UserNode.actions.push(['set', 'permanent'     ,             'bl1', 'menuHandleSet', 'Permanent (Exists in Database)']);
+UserNode.actions.push(['set',  null,                         null,  null,            null]);
+UserNode.actions.push(['set', 'annotation',                 'str', 'menuHandleSet', 'Annotation']);
 

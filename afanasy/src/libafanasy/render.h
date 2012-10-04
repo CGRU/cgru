@@ -77,10 +77,6 @@ public:
    inline const std::list<TaskExec*> & getTasks() { return m_tasks;}
    inline int getTasksNumber() const { return int(m_tasks.size());}
 
-//   const std::string getResourcesString() const;
-
-   inline const std::string & getAnnontation() const { return m_annotation;}
-
    virtual void v_jsonWrite( std::ostringstream & o_str, int type);
 
    void jsonRead( const JSON & i_object, std::string * io_changes);
@@ -111,8 +107,6 @@ protected:
 	int32_t m_max_tasks;
 
 	std::string m_services_disabled;
-	std::string m_custom_data;
-	std::string m_annotation;
 
 	Host     m_host;
 	HostRes  m_hres;

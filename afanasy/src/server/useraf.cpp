@@ -50,13 +50,27 @@ void UserAf::v_priorityChanged( MonitorContainer * i_monitoring) { ms_users->sor
 
 void UserAf::v_action( Action & i_action)
 {
+	bool was_permanent = isPermanent();
+
 	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
 		jsonRead( params, &i_action.log);
 
+
+	if( was_permanent != isPermanent())
+	{
+		if( isPermanent())
+			AFCommon::QueueDBAddItem( this);
+		else
+			AFCommon::QueueDBDelItem( this);
+	}
+
 	if( i_action.log.size() )
 	{
-		AFCommon::QueueDBUpdateItem( this);
+		// Update database only is permanent parameter was not changed.
+		// If it was, user is just added to or deleted from database.
+		if( was_permanent == isPermanent())
+			AFCommon::QueueDBUpdateItem( this);
 		i_action.monitors->addEvent( af::Msg::TMonitorUsersChanged, m_id);
 	}
 }

@@ -51,7 +51,6 @@ public:
 	inline const std::string & getCmdPre()       const { return m_command_pre;     }
 	inline const std::string & getCmdPost()      const { return m_command_post;    }
 	inline const std::string & getDescription()  const { return m_description; }
-	inline const std::string & getAnnontation()  const { return m_annotation;  }
 
 	inline bool isStarted() const {return m_time_started != 0 ; }                ///< Whether a job is started.
 	inline bool isReady()   const {return m_state & AFJOB::STATE_READY_MASK;   } ///< Whether a job is ready.
@@ -116,7 +115,6 @@ protected:
 	int32_t m_user_list_order;   ///< Job order in user jobs list.
 
 	std::string m_description; ///< Job description for statistics purposes only.
-	std::string m_annotation;
 
 	std::string m_user_name;    ///< Job user ( creator ) name.
 	std::string m_host_name;    ///< Computer name, where job was created.

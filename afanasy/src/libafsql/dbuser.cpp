@@ -44,7 +44,7 @@ void DBUser::addDBAttributes()
    dbAddAttr( new DBAttrRegExp( DBAttr::_hostsmask_exclude,    &m_hosts_mask_exclude   ));
    dbAddAttr( new DBAttrInt64 ( DBAttr::_time_register,        &m_time_register       ));
    dbAddAttr( new DBAttrString( DBAttr::_annotation,           &m_annotation          ));
-   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &m_customdata          ));
+   dbAddAttr( new DBAttrString( DBAttr::_customdata,           &m_custom_data          ));
 
    dbAddAttr( new DBAttrString( DBAttr::_name,                 &m_name                ));
 

@@ -39,6 +39,8 @@ void Node::v_priorityChanged( MonitorContainer * i_monitoring ){}
 
 void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorContainer * i_monitoring)
 {
+	jr_string("annotation", m_annotation, i_object, io_changes);
+
 	int32_t priority = -1;
 	jr_int32 ("priority", priority, i_object, io_changes);
 	if( priority > 255 ) m_priority = 255;
@@ -72,6 +74,8 @@ void Node::v_jsonWrite( std::ostringstream & o_str, int i_type)
 		o_str << ",\"locked\":true";
 	if( isHidden())
 		o_str << ",\"hidden\":true";
+	if( m_annotation.size())
+		o_str << ",\"annotation\":\"" << af::strEscape( m_annotation) << "\"";
 }
 
 int Node::calcWeight() const

@@ -28,6 +28,8 @@ public:
    inline void  getName( std::string & str) const { str =  m_name;    } ///< Get Node name.
    inline const std::string & getName()     const { return m_name;    } ///< Get Node name.
 
+	inline const std::string & getAnnontation() const { return m_annotation;}
+
 	friend class ::AfNodeSrv;
 	friend class ::AfContainer;
 	friend class ::AfList;
@@ -76,6 +78,9 @@ protected:
 
     uint32_t m_state;   ///< State.
     uint32_t m_flags;   ///< Flags.
+
+	std::string m_annotation;
+	std::string m_custom_data;
 
 private:
 /// Try to solve a node

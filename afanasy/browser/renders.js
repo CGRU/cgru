@@ -134,19 +134,17 @@ RenderNode.prototype.update = function()
 	this.elPower.textContent = '';
 	this.elNewLine.style.display = 'block';
 
-	var capacity = this.params.capacity;
-	if( capacity == null )
-		capacity = this.params.host.capacity;
-	capacity = this.params.capacity_used + '/' + capacity;
+	if( this.params.capacity == null)
+		this.params.capacity = this.params.host.capacity;
+	var capacity = this.params.capacity_used + '/' + this.params.capacity;
 	this.elCapacity.textContent = '['+capacity+']';
 
-	var max_tasks = this.params.max_tasks;
-	if( max_tasks == null )
-		max_tasks = this.params.host.max_tasks;
-	if( this.params.busy === true )
-		max_tasks = '(' + this.params.tasks.length + '/' + max_tasks + ')';
+	if( this.params.max_tasks == null )
+		this.params.max_tasks = this.params.host.max_tasks;
+	if( this.params.busy == true )
+		var max_tasks = '(' + this.params.tasks.length + '/' + max_tasks + ')';
 	else
-		max_tasks = '(0/' + max_tasks + ')';
+		var max_tasks = '(0/' + max_tasks + ')';
 	this.elMaxTasks.textContent = max_tasks;
 	
 	var r = this.params.host_resources;
@@ -305,7 +303,10 @@ RenderTask.prototype.destroy = function()
 
 RenderNode.actions = [];
 
-RenderNode.actions.push(['context', 'log',         null,      'menuHandleGet',       'Show Log']);
+RenderNode.actions.push(['context', 'log',       null, 'menuHandleGet', 'Show Log']);
 
+RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleSet', 'Capacity']);
+RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleSet', 'Maximum Tasks']);
+RenderNode.actions.push(['set',  null,           null,  null,            null]);
 RenderNode.actions.push(['set', 'annotation',   'str', 'menuHandleSet', 'Annotation']);
 

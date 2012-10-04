@@ -63,9 +63,6 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	if( m_wol_operation_time > 0 )
 		o_str << ",\"wol_operation_time\":" << m_wol_operation_time;
 
-	if( m_annotation.size())
-		o_str << ",\"annotation\":\""   << af::strEscape( m_annotation  ) << "\"";
-
 	if( m_tasks.size())
 	{
 		o_str << ",\"tasks\":[";
@@ -102,8 +99,10 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
-	jr_string("annotation",    m_annotation,    i_object, io_changes);
-	jr_string("user_name",     m_user_name,     i_object);
+	jr_int32 ("capacity",  m_capacity,  i_object, io_changes);
+	jr_int32 ("max_tasks", m_max_tasks, i_object, io_changes);
+	checkDirty();
+//	jr_string("user_name", m_user_name, i_object, io_changes);
 
 	bool nimby, NIMBY;
 	if( jr_bool("nimby", nimby, i_object, io_changes))

@@ -76,12 +76,7 @@ public:
 
 	void jsonRead( const JSON & i_object, std::string * io_changes);
 
-	inline const std::string & getAnnontation() const { return m_annotation;}
-
 protected:
-	std::string m_annotation;
-	std::string m_customdata;
-
 	std::string m_host_name;          ///< User host name.
 	int32_t  m_max_running_tasks;   ///< User maximum running tasks number hosts.
 
