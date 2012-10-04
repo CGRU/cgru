@@ -165,8 +165,7 @@ function JobBlock( i_elParent, i_block)
 	this.elRoot.appendChild( this.element);
 	this.element.classList.add('jobblock');
 
-	this.elTasks = document.createElement('span');
-	this.element.appendChild( this.elTasks);
+	this.elTasks = cm_ElCreateText( this.element);
 	var tasks = 't' + this.tasks_num;
 	var tasks_title = 'Block tasks:'
 	if( this.params.numeric )
@@ -191,21 +190,15 @@ function JobBlock( i_elParent, i_block)
 	{
 		tasks_title += ' Not numeric.';
 	}
-	if( this.params.non_sequential )
-	{
-		tasks += '*';
-		tasks_title += '\nNon-sequential solving.';
-	}
-	tasks += ': ';
+	tasks += ':';
 	this.elTasks.textContent = tasks;
 	this.elTasks.title = tasks_title;
 
-	this.elName = document.createElement('span');
-	this.element.appendChild( this.elName);
-	this.elName.title = 'Block name';
+	this.elNonSeq = cm_ElCreateText( this.element, 'Non-Sequential Tasks Running');
+	this.elNonSeq.textContent = '(N-S)';
 
-	this.elDepends = document.createElement('span');
-	this.element.appendChild( this.elDepends);
+	this.elName = cm_ElCreateText( this.element, 'Block Name');
+	this.elDepends = cm_ElCreateText( this.element);
 
 	this.elCapacity = cm_ElCreateFloatText( this.element, 'right', 'Tasks Capacity');
 	this.elErrSolving = cm_ElCreateFloatText( this.element, 'right');
@@ -384,6 +377,10 @@ JobBlock.prototype.update = function( i_displayFull)
 	if( this.params.name )
 	{
 		this.elName.textContent = this.params.name;
+
+		this.elNonSeq.style.display = this.params.non_sequential ? 'inline':'none';
+//		if( this.params.non_sequential ) this.elNonSeq.style.display = 'none';
+//		else this.elNonSeq.textContent = '';
 
 		if( this.service != this.params.service )
 		{
@@ -622,6 +619,9 @@ JobNode.actions.push(['set', 'time_wait',                  'tim', 'menuHandleSet
 JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleSet', 'Priority']);
 JobNode.actions.push(['set', 'need_os',                    'reg', 'menuHandleSet', 'OS Needed']);
 JobNode.actions.push(['set', 'need_properties',            'reg', 'menuHandleSet', 'Need Properties']);
+JobNode.actions.push(['set', 'time_life',                  'hrs', 'menuHandleSet', 'Life Time']);
+JobNode.actions.push(['set',  null,                         null,  null,            null]);
+JobNode.actions.push(['set', 'hidden',                     'bl1', 'menuHandleSet', 'Hidden']);
 JobNode.actions.push(['set',  null,                         null,  null,            null]);
 JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleSet', 'Annotation']);
 
@@ -634,10 +634,13 @@ JobBlock.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleSe
 JobBlock.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleSet', 'Errors Forgive Time']);
 JobBlock.actions.push(['set', 'tasks_max_run_time',         'hrs', 'menuHandleSet', 'Tasks Max Run Time']);
 JobBlock.actions.push(['set',  null,                         null,  null,            null]);
+JobBlock.actions.push(['set', 'non_sequential',             'bl1', 'menuHandleSet', 'Non-Sequential']);
+JobBlock.actions.push(['set',  null,                         null,  null,            null]);
 JobBlock.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
 JobBlock.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
 JobBlock.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
 JobBlock.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
 JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleSet', 'Depend Mask']);
 JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleSet', 'Tasks Depend Mask']);
+JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleSet', 'Properties Needed']);
 

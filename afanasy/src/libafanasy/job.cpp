@@ -63,6 +63,8 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	if( offline )
 		m_state |= AFJOB::STATE_OFFLINE_MASK;
 
+	// Paramers below are not editable and read only on creation
+	// When use edit parameters, log provided to store changes
 	if( io_changes )
 		return;
 
@@ -81,14 +83,14 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	const JSON & blocks = i_object["blocks"];
 	if( false == blocks.IsArray())
 	{
-		AFERROR("Job::Job: Can't find blocks array.");
+		AFERROR("Job::jsonRead: Can't find blocks array.");
 		return;
 	}
 
 	m_blocksnum = blocks.Size();
 	if( m_blocksnum < 1 )
 	{
-		AFERROR("Job::Job: Blocks array has zero size.");
+		AFERROR("Job::jsonRead: Blocks array has zero size.");
 		return;
 	}
 
@@ -99,7 +101,7 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 		m_blocksdata[b] = newBlockData( blocks[b], b);
 		if( m_blocksdata[b] == NULL)
 		{
-			AFERROR("Job::rw_blocks: Can not allocate memory for new block.\n");
+			AFERROR("Job::jsonRead: Can not allocate memory for new block.\n");
 			return;
 		}
 		if( false == m_blocksdata[b]->isValid())

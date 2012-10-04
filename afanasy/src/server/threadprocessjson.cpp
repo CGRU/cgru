@@ -64,8 +64,8 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				std::vector<int32_t> block_ids;
 				if( ids.size() == 1 )
 				{
-					JobContainerIt jobsIt( i_args->jobs);
-					job = jobsIt.getJob( ids[0]);
+					JobContainerIt it( i_args->jobs);
+					job = it.getJob( ids[0]);
 					if( job == NULL )
 					{
 						o_msg_response = af::jsonMsgError( "Invalid ID");
@@ -105,7 +105,24 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 		else if( type == "renders")
 		{
 			AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
-			o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
+			if( mode.size())
+			{
+				RenderAf * render = NULL;
+				if( ids.size() == 1 )
+				{
+					RenderContainerIt it( i_args->renders);
+					render = it.getRender( ids[0]);
+					if( render == NULL )
+						o_msg_response = af::jsonMsgError( "Invalid ID");
+				}
+				if( render )
+				{
+					if( mode == "log" )
+						o_msg_response = render->writeLog();
+				}
+			}
+			if( o_msg_response == NULL )
+				o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
 		}
 		else if( type == "monitors")
 		{

@@ -342,7 +342,7 @@ Monitor.prototype.selectAll = function( on)
 		this.elSetSelected( this.items[i].element, on);
 }
 
-Monitor.prototype.selectNext = function( previous)
+Monitor.prototype.selectNext = function( i_evt, previous)
 {
 	if( this.items.length == 0 ) return;
 

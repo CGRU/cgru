@@ -305,7 +305,7 @@ RenderTask.prototype.destroy = function()
 
 RenderNode.actions = [];
 
-RenderNode.actions.push(['context', 'log',               'menuHandleGet',       'Show Log']);
+RenderNode.actions.push(['context', 'log',         null,      'menuHandleGet',       'Show Log']);
 
-RenderNode.actions.push(['set', 'annotation', 'menuHandleSet', 'Annotation']);
+RenderNode.actions.push(['set', 'annotation',   'str', 'menuHandleSet', 'Annotation']);
 

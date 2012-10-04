@@ -44,6 +44,12 @@ void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorCon
 	if( priority > 255 ) m_priority = 255;
 	else if( priority != -1 ) m_priority = priority;
 
+	bool hidden = false;
+	jr_bool("hidden", hidden, i_object, io_changes);
+	setHidden( hidden);
+
+	// Paramers below are not editable and read only on creation
+	// When use edit parameters, log provided to store changes
 	if( io_changes )
 	{
 		if( priority != -1 )

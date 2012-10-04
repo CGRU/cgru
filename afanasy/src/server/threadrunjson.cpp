@@ -13,6 +13,7 @@
 
 void threadRunJSON( ThreadArgs * i_args, af::Msg * i_msg)
 {
+//write(1,i_msg->data(),i_msg->dataLen());write(1,"\n",1);
 	Action action( i_msg, i_args);
 	if( action.isInvalid())
 		return;

@@ -24,8 +24,8 @@ function cm_OnKeyDown(e)
 		if( g_cur_monitor) g_cur_monitor.selectAll( true);
 		return false;
 	}
-	else if((e.keyCode==38) && g_cur_monitor) g_cur_monitor.selectNext( true); // DOWN
-	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( false); // UP
+	else if((e.keyCode==38) && g_cur_monitor) g_cur_monitor.selectNext( e, true ); // UP
+	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( e, false); // DOWN
 //	else if(evt.keyCode==116) return false; // F5
 //document.getElementById('test').textContent='key down: ' + e.keyCode;
 //	return true; 
@@ -185,7 +185,8 @@ function cm_ElCreateFloatText( i_elParent, i_side, i_title)
 {
 	var element = document.createElement('span');
 	i_elParent.appendChild( element);
-	element.style.cssFloat = i_side;
+	if( i_side )
+		element.style.cssFloat = i_side;
 	if( i_title )
 		element.title = i_title;
 	if( i_side == 'right')
@@ -197,10 +198,5 @@ function cm_ElCreateFloatText( i_elParent, i_side, i_title)
 
 function cm_ElCreateText( i_elParent, i_title)
 {
-	var element = document.createElement('span');
-	i_elParent.appendChild( element);
-	if( i_title )
-		element.title = i_title;
-	element.style.marginLeft = '4px';
-	return element;
+	return cm_ElCreateFloatText( i_elParent, null, i_title);
 }

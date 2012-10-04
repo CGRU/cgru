@@ -159,9 +159,19 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	//jr_string("environment",         m_environment,           i_object, io_changes);
 	jr_int32 ("parser_coeff",          m_parser_coeff,          i_object, io_changes);
 
+	bool depend_sub_task = false;
+	jr_bool("depend_sub_task", depend_sub_task, i_object, io_changes);
+	setDependSubTask( depend_sub_task);
+
+	bool non_sequential = false;
+	jr_bool("non_sequential", non_sequential, i_object, io_changes);
+	setNonSequential( non_sequential);
+
 	if( m_capacity < 1 )
 		m_capacity = 1;
 
+	// Paramers below are not editable and read only on creation
+	// When use edit parameters, log provided to store changes
 	if( io_changes )
 		return;
 
@@ -199,9 +209,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	uint16_t    multihost_service_wait    = 0;
 	bool        multihost_master_on_slave = false;
 
-	bool depend_sub_task = false;
-	bool non_sequential  = false;
-
 	jr_string("multihost_service",     multihost_service,       i_object);
 
 	jr_int64 ("frame_first",     frame_first,     i_object);
@@ -217,8 +224,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	jr_bool  ("multihost_master_on_slave", multihost_master_on_slave, i_object);
 	//jr_int64 ("file_size_min", m_file_size_min, i_object);
 	//jr_int64 ("file_size_max", m_file_size_max, i_object);
-	jr_bool  ("depend_sub_task", depend_sub_task, i_object);
-	jr_bool  ("non_sequential",  non_sequential,  i_object);
 
 /*
 //	case Msg::TBlocksProgress:
@@ -256,12 +261,6 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 	if(( multihost_min != -1 ) || ( multihost_max != -1 ))
 		setMultiHost( multihost_min, multihost_max, multihost_max_wait,
 				multihost_master_on_slave, multihost_service, multihost_service_wait);
-
-	if( depend_sub_task )
-		setDependSubTask( true );
-
-	if( non_sequential )
-		setNonSequential( true );
 }
 
 void BlockData::jsonWrite( std::ostringstream & o_str, const std::string & i_datamode)
