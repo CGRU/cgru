@@ -390,18 +390,6 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 	return false;
 }
 Monitor.prototype.onMenuDestroy = function() { this.menu = null;}
-Monitor.prototype.menuHandleOperation = function( i_name)
-{
-g_Info('Operation = ' + i_name);
-	var operation = {};
-	operation.type = i_name;
-	this.action( operation, null);
-}
-Monitor.prototype.menuHandleGet = function( i_name)
-{
-g_Info('Get = ' + i_name);
-	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
-}
 
 Monitor.prototype.onMouseOverSet = function( i_evt)
 {
@@ -417,14 +405,42 @@ Monitor.prototype.onMouseOverSet = function( i_evt)
 			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
 	menu.show();
 }
-Monitor.prototype.menuHandleSet = function( i_parameter)
+Monitor.prototype.menuHandleParam = function( i_name)
 {
 	var ptype = null;
 	var actions = this.cur_item.constructor.actions;
+	
 	for( var i = 0; i < actions.length; i++)
-		if( i_parameter == actions[i][1])
+		if( i_name == actions[i][1])
+		{
+			var parameter = i_name;
+			if( actions[i][6] ) parameter = actions[i][6];
+			this.setParameter( parameter, actions[i][2]);
+			return;
+		}
+}
+Monitor.prototype.menuHandleDialog = function( i_name)
+{
+	var ptype = null;
+	var parameter = i_name;
+	var actions = this.cur_item.constructor.actions;
+	var reciever = this;
+	var handle = 'setParameter';
+	var value = this.cur_item.params[parameter];
+	for( var i = 0; i < actions.length; i++)
+	{
+		if( i_name == actions[i][1])
+		{
 			ptype = actions[i][2];
-	new cgru_Dialog( document, document.body, this, 'setParameter', i_parameter, ptype, this.cur_item.params[i_parameter], this.type+'_parameter');
+			if( actions[i][6] ) parameter = actions[i][6];
+			if( actions[i][7] )
+			{
+				reciever = this.cur_item;
+				handle = actions[i][7];
+			}
+		}
+	}
+	new cgru_Dialog( document, document.body, reciever, handle, parameter, ptype, value, this.type+'_parameter');
 }
 Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
@@ -432,6 +448,18 @@ Monitor.prototype.setParameter = function( i_parameter, i_value)
 	params[i_parameter] = i_value;
 g_Info('params.'+i_parameter+'="'+i_value+'";');
 	this.action( null, params);
+}
+Monitor.prototype.menuHandleOperation = function( i_name)
+{
+g_Info('Operation = ' + i_name);
+	var operation = {};
+	operation.type = i_name;
+	this.action( operation, null);
+}
+Monitor.prototype.menuHandleGet = function( i_name)
+{
+g_Info('Get = ' + i_name);
+	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
 }
 
 Monitor.prototype.action = function( i_operation, i_params)

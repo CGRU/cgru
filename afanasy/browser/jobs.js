@@ -252,7 +252,7 @@ JobBlock.prototype.onContextMenuDestroy = function()
 	this.element.classList.remove('selected');
 	this.job.monitor.menu = null;
 }
-JobBlock.prototype.menuHandleSet = function( i_parameter)
+JobBlock.prototype.menuHandleDialog = function( i_parameter)
 {
 	var ptype = null;
 	var actions = JobBlock.actions;
@@ -609,38 +609,38 @@ JobNode.actions.push(['context', 'restart',           null, 'menuHandleOperation
 JobNode.actions.push(['context', 'restart_pause',     null, 'menuHandleOperation', 'Restart&Pause']);
 JobNode.actions.push(['context', 'delete',            null, 'menuHandleOperation', 'Delete']);
 
-JobNode.actions.push(['set', 'depend_mask',                'reg', 'menuHandleSet', 'Depend Mask']);
-JobNode.actions.push(['set', 'depend_mask_global',         'reg', 'menuHandleSet', 'Global Depend Mask']);
-JobNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
-JobNode.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
-JobNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
-JobNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
-JobNode.actions.push(['set', 'time_wait',                  'tim', 'menuHandleSet', 'Time Wait']);
-JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleSet', 'Priority']);
-JobNode.actions.push(['set', 'need_os',                    'reg', 'menuHandleSet', 'OS Needed']);
-JobNode.actions.push(['set', 'need_properties',            'reg', 'menuHandleSet', 'Need Properties']);
-JobNode.actions.push(['set', 'time_life',                  'hrs', 'menuHandleSet', 'Life Time']);
-JobNode.actions.push(['set',  null,                         null,  null,            null]);
-JobNode.actions.push(['set', 'hidden',                     'bl1', 'menuHandleSet', 'Hidden']);
-JobNode.actions.push(['set',  null,                         null,  null,            null]);
-JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleSet', 'Annotation']);
+JobNode.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDialog', 'Depend Mask']);
+JobNode.actions.push(['set', 'depend_mask_global',         'reg', 'menuHandleDialog', 'Global Depend Mask']);
+JobNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleDialog', 'Max Runnig Tasks']);
+JobNode.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleDialog', 'Max Run Tasks Per Host']);
+JobNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleDialog', 'Hosts Mask']);
+JobNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
+JobNode.actions.push(['set', 'time_wait',                  'tim', 'menuHandleDialog', 'Time Wait']);
+JobNode.actions.push(['set', 'priority',                   'num', 'menuHandleDialog', 'Priority']);
+JobNode.actions.push(['set', 'need_os',                    'reg', 'menuHandleDialog', 'OS Needed']);
+JobNode.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Need Properties']);
+JobNode.actions.push(['set', 'time_life',                  'hrs', 'menuHandleDialog', 'Life Time']);
+JobNode.actions.push(['set',  null,                         null,  null,               null]);
+JobNode.actions.push(['set', 'hidden',                     'bl1', 'menuHandleDialog', 'Hidden']);
+JobNode.actions.push(['set',  null,                         null,  null,               null]);
+JobNode.actions.push(['set', 'annotation',                 'str', 'menuHandleDialog', 'Annotation']);
 
 JobBlock.actions = [];
-JobBlock.actions.push(['set', 'capacity',                   'num', 'menuHandleSet', 'Capacity']);
-JobBlock.actions.push(['set',  null,                         null,  null,            null]);
-JobBlock.actions.push(['set', 'errors_retries',             'num', 'menuHandleSet', 'Errors Retries']);
-JobBlock.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleSet', 'Errors Avoid Host']);
-JobBlock.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleSet', 'Errors Task Same Host']);
-JobBlock.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleSet', 'Errors Forgive Time']);
-JobBlock.actions.push(['set', 'tasks_max_run_time',         'hrs', 'menuHandleSet', 'Tasks Max Run Time']);
-JobBlock.actions.push(['set',  null,                         null,  null,            null]);
-JobBlock.actions.push(['set', 'non_sequential',             'bl1', 'menuHandleSet', 'Non-Sequential']);
-JobBlock.actions.push(['set',  null,                         null,  null,            null]);
-JobBlock.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleSet', 'Max Runnig Tasks']);
-JobBlock.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleSet', 'Max Run Tasks Per Host']);
-JobBlock.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleSet', 'Hosts Mask']);
-JobBlock.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleSet', 'Exclude Hosts Mask']);
-JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleSet', 'Depend Mask']);
-JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleSet', 'Tasks Depend Mask']);
-JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleSet', 'Properties Needed']);
+JobBlock.actions.push(['set', 'capacity',                   'num', 'menuHandleDialog', 'Capacity']);
+JobBlock.actions.push(['set',  null,                         null,  null,               null]);
+JobBlock.actions.push(['set', 'errors_retries',             'num', 'menuHandleDialog', 'Errors Retries']);
+JobBlock.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleDialog', 'Errors Avoid Host']);
+JobBlock.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleDialog', 'Errors Task Same Host']);
+JobBlock.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleDialog', 'Errors Forgive Time']);
+JobBlock.actions.push(['set', 'tasks_max_run_time',         'hrs', 'menuHandleDialog', 'Tasks Max Run Time']);
+JobBlock.actions.push(['set',  null,                         null,  null,               null]);
+JobBlock.actions.push(['set', 'non_sequential',             'bl1', 'menuHandleDialog', 'Non-Sequential']);
+JobBlock.actions.push(['set',  null,                         null,  null,               null]);
+JobBlock.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleDialog', 'Max Runnig Tasks']);
+JobBlock.actions.push(['set', 'max_running_tasks_per_host', 'num', 'menuHandleDialog', 'Max Run Tasks Per Host']);
+JobBlock.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleDialog', 'Hosts Mask']);
+JobBlock.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
+JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDialog', 'Depend Mask']);
+JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleDialog', 'Tasks Depend Mask']);
+JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Properties Needed']);
 

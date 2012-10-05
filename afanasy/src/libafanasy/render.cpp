@@ -99,10 +99,10 @@ void Render::jsonRead( const JSON &i_object, std::string * io_changes)
 		return;
 	}
 
+	jr_string("user_name", m_user_name, i_object, io_changes);
 	jr_int32 ("capacity",  m_capacity,  i_object, io_changes);
 	jr_int32 ("max_tasks", m_max_tasks, i_object, io_changes);
 	checkDirty();
-//	jr_string("user_name", m_user_name, i_object, io_changes);
 
 	bool nimby, NIMBY;
 	if( jr_bool("nimby", nimby, i_object, io_changes))

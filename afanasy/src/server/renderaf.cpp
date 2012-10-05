@@ -224,20 +224,33 @@ void RenderAf::v_action( Action & i_action)
 			exitClient( af::Msg::TClientExitRequest, i_action.jobs, i_action.monitors);
 			return;
 		}
-		if( type == "eject_tasks")
+		else if( type == "eject_tasks")
 		{
 			if( false == isBusy()) return;
 			appendLog("Task(s) ejected by " + i_action.author);
 			ejectTasks( i_action.jobs, i_action.monitors, af::TaskExec::UPEject);
 			return;
 		}
-		if( type == "eject_tasks_keep_my")
+		else if( type == "eject_tasks_keep_my")
 		{
 			if( false == isBusy()) return;
 			appendLog("Task(s) ejected keeping own by " + i_action.author);
-			//ejectTasks( jobs, i_monitoring, af::TaskExec::UPEject, &(af::strSplit(i_author,"@").front()));
 			ejectTasks( i_action.jobs, i_action.monitors, af::TaskExec::UPEject, &i_action.user_name);
 			return;
+		}
+		else if( type == "service")
+		{
+			std::string name; bool enable;
+			af::jr_string("name", name, operation);
+			af::jr_bool("enable", enable, operation);
+			setService( name, enable);
+		}
+		else if( type == "restore_defaults")
+		{
+			m_max_tasks = -1;
+			m_capacity = -1;
+			m_services_disabled.clear();
+			disableServices(); // Dirty check exists in that function
 		}
 		else
 		{
@@ -245,6 +258,9 @@ void RenderAf::v_action( Action & i_action)
 			return;
 		}
 		appendLog("Operation \"" + type + "\" by " + i_action.author);
+		i_action.monitors->addEvent( af::Msg::TMonitorRendersChanged, m_id);
+		AFCommon::QueueDBUpdateItem( this);
+		return;
 	}
 
 	const JSON & params = (*i_action.data)["params"];

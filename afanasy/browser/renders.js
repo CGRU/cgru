@@ -142,9 +142,9 @@ RenderNode.prototype.update = function()
 	if( this.params.max_tasks == null )
 		this.params.max_tasks = this.params.host.max_tasks;
 	if( this.params.busy == true )
-		var max_tasks = '(' + this.params.tasks.length + '/' + max_tasks + ')';
+		var max_tasks = '(' + this.params.tasks.length + '/' + this.params.max_tasks + ')';
 	else
-		var max_tasks = '(0/' + max_tasks + ')';
+		var max_tasks = '(0/' + this.params.max_tasks + ')';
 	this.elMaxTasks.textContent = max_tasks;
 	
 	var r = this.params.host_resources;
@@ -248,6 +248,20 @@ RenderNode.prototype.onDoubleClick = function()
 {
 }
 
+RenderNode.prototype.menuHandleService = function( i_name, i_value)
+{
+g_Info('menuHandleService = ' + i_name + ',' + i_value);
+	var operation = {};
+	operation.type = 'service';
+	operation.name = i_value;
+	if( i_name == 'enable_service' )
+		operation.enable = true;
+	else if( i_name == 'disable_service' )
+		operation.enable = false;
+	else return;
+	nw_Action( 'renders', this.monitor.getSelectedIds(), operation, null);
+}
+
 function RenderTask( i_task, i_elParent)
 {
 	this.elParent = i_elParent;
@@ -303,10 +317,29 @@ RenderTask.prototype.destroy = function()
 
 RenderNode.actions = [];
 
-RenderNode.actions.push(['context', 'log',       null, 'menuHandleGet', 'Show Log']);
+RenderNode.actions.push(['context', 'log',       null, 'menuHandleGet',   'Show Log']);
+RenderNode.actions.push(['context',  null]);
+RenderNode.actions.push(['context', 'nimby',     true, 'menuHandleParam', 'Set nimby']);
+RenderNode.actions.push(['context', 'NIMBY',     true, 'menuHandleParam', 'Set NIMBY']);
+RenderNode.actions.push(['context', 'nimbyOff', false, 'menuHandleParam', 'Set Free', true, 'nimby']);
+RenderNode.actions.push(['context',  null]);
+RenderNode.actions.push(['context', 'eject_tasks',         null, 'menuHandleOperation', 'Eject Tasks']);
+RenderNode.actions.push(['context', 'eject_tasks_keep_my', null, 'menuHandleOperation', 'Eject Not My']);
+RenderNode.actions.push(['context',  null]);
+RenderNode.actions.push(['context', 'wol_sleep',           null, 'menuHandleOperation', 'WOL Sleep']);
+RenderNode.actions.push(['context', 'wol_wake' ,           null, 'menuHandleOperation', 'WOL Wake']);
+RenderNode.actions.push(['context', 'exit',                null, 'menuHandleOperation', 'Exit Client']);
 
-RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleSet', 'Capacity']);
-RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleSet', 'Maximum Tasks']);
-RenderNode.actions.push(['set',  null,           null,  null,            null]);
-RenderNode.actions.push(['set', 'annotation',   'str', 'menuHandleSet', 'Annotation']);
+RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleDialog', 'Capacity']);
+RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleDialog', 'Maximum Tasks']);
+RenderNode.actions.push(['set', 'restore_defaults','num', 'menuHandleOperation', 'Restore Defaults']);
+RenderNode.actions.push(['set',  null]);
+RenderNode.actions.push(['set', 'enable_service',  'str', 'menuHandleDialog', 'Enable Service',  null, null, 'menuHandleService']);
+RenderNode.actions.push(['set', 'disable_service', 'str', 'menuHandleDialog', 'Disable Service', null, null, 'menuHandleService']);
+RenderNode.actions.push(['set',  null]);
+RenderNode.actions.push(['set', 'hidden',       'bl1', 'menuHandleDialog', 'Hide/Unhide']);
+RenderNode.actions.push(['set',  null]);
+RenderNode.actions.push(['set', 'user_name',    'str', 'menuHandleDialog', 'User Name']);
+RenderNode.actions.push(['set',  null]);
+RenderNode.actions.push(['set', 'annotation',   'str', 'menuHandleDialog', 'Annotation']);
 
