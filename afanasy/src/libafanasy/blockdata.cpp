@@ -263,7 +263,7 @@ void BlockData::jsonRead( const JSON & i_object, std::string * io_changes)
 				multihost_master_on_slave, multihost_service, multihost_service_wait);
 }
 
-void BlockData::jsonWrite( std::ostringstream & o_str, const std::string & i_datamode)
+void BlockData::jsonWrite( std::ostringstream & o_str, const std::string & i_datamode) const
 {
 	int type = 0;
 	if     ( i_datamode == DataMode_Progress   ) type = af::Msg::TBlocksProgress;
@@ -275,7 +275,7 @@ void BlockData::jsonWrite( std::ostringstream & o_str, const std::string & i_dat
 	jsonWrite( o_str, type);
 }
 
-void BlockData::jsonWrite( std::ostringstream & o_str, int i_type)
+void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
 {
     o_str << "{";
 

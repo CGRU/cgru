@@ -318,6 +318,8 @@ RenderTask.prototype.destroy = function()
 RenderNode.actions = [];
 
 RenderNode.actions.push(['context', 'log',       null, 'menuHandleGet',   'Show Log']);
+RenderNode.actions.push(['context', 'tasks_log', null, 'menuHandleGet',   'Tasks Log']);
+RenderNode.actions.push(['context', 'full',      null, 'menuHandleGet',   'Full Info']);
 RenderNode.actions.push(['context',  null]);
 RenderNode.actions.push(['context', 'nimby',     true, 'menuHandleParam', 'Set nimby']);
 RenderNode.actions.push(['context', 'NIMBY',     true, 'menuHandleParam', 'Set NIMBY']);
@@ -329,6 +331,9 @@ RenderNode.actions.push(['context',  null]);
 RenderNode.actions.push(['context', 'wol_sleep',           null, 'menuHandleOperation', 'WOL Sleep']);
 RenderNode.actions.push(['context', 'wol_wake' ,           null, 'menuHandleOperation', 'WOL Wake']);
 RenderNode.actions.push(['context', 'exit',                null, 'menuHandleOperation', 'Exit Client']);
+RenderNode.actions.push(['context', 'reboot',              null, 'menuHandleOperation', 'Reboot Machine']);
+RenderNode.actions.push(['context', 'shutdown',            null, 'menuHandleOperation', 'Shutdown Machine']);
+RenderNode.actions.push(['context', 'delete',              null, 'menuHandleOperation', 'Delete From Database']);
 
 RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleDialog', 'Capacity']);
 RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleDialog', 'Maximum Tasks']);

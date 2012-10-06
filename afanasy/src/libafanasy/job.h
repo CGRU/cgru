@@ -104,7 +104,7 @@ public:
 	virtual int calcWeight() const;                   ///< Calculate and return memory size.
 
 	void jsonRead( const JSON & i_object, std::string * io_changes = NULL);
-	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
+	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
 
 	void stdOutJobBlocksTasks() const;
 

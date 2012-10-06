@@ -29,8 +29,8 @@ public:
 	inline bool isNIMBY()   const { return (m_state & SNIMBY  ); }///< Whether Render is NIMBY.
 	inline bool isNimby()   const { return (m_state & Snimby  ); }///< Whether Render is nimby.
 	inline bool isFree()    const { return (((~m_state) & SNIMBY) && ((~m_state) & Snimby));}///< Whether Render is free.
-	inline bool isOffline() const { return !(m_state & SOnline );}///< Whether Render is offline.
-	inline bool isDirty()   const { return !(m_state & SDirty);}  ///< Whether Render is dirty.
+	inline bool isOffline() const { return false == (m_state & SOnline );}///< Whether Render is offline.
+	inline bool isDirty()   const { return m_state & SDirty;}  ///< Whether Render is dirty.
 
 	inline bool isWOLFalling()   const { return m_state & SWOLFalling;  }
 	inline bool isWOLSleeping()  const { return m_state & SWOLSleeping; }
@@ -77,7 +77,7 @@ public:
    inline const std::list<TaskExec*> & getTasks() { return m_tasks;}
    inline int getTasksNumber() const { return int(m_tasks.size());}
 
-   virtual void v_jsonWrite( std::ostringstream & o_str, int type);
+   virtual void v_jsonWrite( std::ostringstream & o_str, int type) const;
 
    void jsonRead( const JSON & i_object, std::string * io_changes);
 

@@ -48,7 +48,7 @@ Client::~Client()
    clearNetIFs();
 }
 
-void Client::v_jsonWrite( std::ostringstream & o_str, int type)
+void Client::v_jsonWrite( std::ostringstream & o_str, int type) const
 {
 	Node::v_jsonWrite( o_str, type);
 

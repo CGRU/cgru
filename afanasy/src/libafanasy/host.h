@@ -41,7 +41,7 @@ public:
 
     void readwrite( Msg * msg); ///< Read or write Host in message.
 
-	void jsonWrite( std::ostringstream & o_str);
+	void jsonWrite( std::ostringstream & o_str) const;
 
 private:
 	std::vector<std::string> m_services_names;
@@ -123,7 +123,7 @@ public:
 
     void copy( const HostRes & other);
 
-	void jsonWrite( std::ostringstream & o_str);
+	void jsonWrite( std::ostringstream & o_str) const;
 
     void readwrite( Msg * msg); ///< Read or write Host Resources in message.
 

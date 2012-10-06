@@ -112,7 +112,7 @@ void Job::jsonRead( const JSON &i_object, std::string * io_changes)
 	m_valid = true;
 }
 
-void Job::v_jsonWrite( std::ostringstream & o_str, int i_type)
+void Job::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	o_str << "{";
 

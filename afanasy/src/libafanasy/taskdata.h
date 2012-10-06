@@ -37,7 +37,7 @@ public:
 	bool checkDependMask( const std::string & str);
 
 	void jsonRead( const JSON & i_object);
-	void jsonWrite( std::ostringstream & o_str);
+	void jsonWrite( std::ostringstream & o_str) const;
 
 protected:
 	std::string m_name;        ///< Task name.

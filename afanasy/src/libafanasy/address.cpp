@@ -158,7 +158,7 @@ Address::Address( Msg * msg)
    read( msg);
 }
 
-void Address::jsonWrite( std::ostringstream & o_str)
+void Address::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "\"address\":{\"family\":";
 	switch( family)

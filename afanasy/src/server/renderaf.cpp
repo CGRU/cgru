@@ -238,6 +238,28 @@ void RenderAf::v_action( Action & i_action)
 			ejectTasks( i_action.jobs, i_action.monitors, af::TaskExec::UPEject, &i_action.user_name);
 			return;
 		}
+		else if( type == "delete")
+		{
+			if( isOnline() ) return;
+			appendLog( std::string("Deleted by ") + i_action.author);
+			offline( NULL, 0, i_action.monitors, true);
+			AFCommon::QueueDBDelItem( this);
+			return;
+		}
+		else if( type == "reboot")
+		{
+			if( false == isOnline() ) return;
+			appendLog( std::string("Reboot computer by ") + i_action.author);
+			exitClient( af::Msg::TClientRebootRequest, i_action.jobs, i_action.monitors);
+			return;
+		}
+		else if( type == "shutdown")
+		{
+			if( false == isOnline() ) return;
+			appendLog( std::string("Shutdown computer by ") + i_action.author);
+			exitClient( af::Msg::TClientShutdownRequest, i_action.jobs, i_action.monitors);
+			return;
+		}
 		else if( type == "service")
 		{
 			std::string name; bool enable;
@@ -405,20 +427,6 @@ bool RenderAf::action( const af::MCGeneral & mcgeneral, int type, AfContainer * 
       AFCommon::QueueDBDelItem( this);
       return true;
    }
-/*   case af::Msg::TClientRestartRequest:
-   {
-      if( false == isOnline() ) return true;
-      appendLog( std::string("Restarted by ") + userhost_string);
-      exitClient( af::Msg::TClientRestartRequest, jobs, monitoring);
-      return true;
-   }
-   case af::Msg::TRenderStart:
-   {
-      if( false == isOnline() ) return true;
-      appendLog( std::string("Starting another render by ") + userhost_string);
-      exitClient( af::Msg::TClientStartRequest, jobs, monitoring);
-      return true;
-   }*/
    case af::Msg::TRenderReboot:
    {
       if( false == isOnline() ) return true;

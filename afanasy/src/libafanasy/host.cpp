@@ -93,7 +93,7 @@ void Host::mergeParameters( const Host & other)
 	if( other.m_wol_idlesleep_time ) m_wol_idlesleep_time = other.m_wol_idlesleep_time;
 }
 
-void Host::jsonWrite( std::ostringstream & o_str)
+void Host::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "\"host\":{";
 
@@ -287,7 +287,7 @@ void HostRes::copy( const HostRes & other)
         *(custom[i]) = *(other.custom[i]);
 }
 
-void HostRes::jsonWrite( std::ostringstream & o_str)
+void HostRes::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "\"host_resources\":{";
 

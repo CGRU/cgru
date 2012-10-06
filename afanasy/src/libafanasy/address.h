@@ -81,7 +81,7 @@ public:
 
    static const int ms_addrdatalength = 16;
 
-   void jsonWrite( std::ostringstream & o_str);
+	void jsonWrite( std::ostringstream & o_str) const;
 
 private:
 

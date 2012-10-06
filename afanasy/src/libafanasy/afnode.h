@@ -57,7 +57,9 @@ public:
    };
 
 	void jsonRead( const JSON & i_object, std::string * io_changes = NULL, MonitorContainer * i_monitoring = NULL);
-	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type);
+	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
+
+	Msg * jsonWrite( const std::string & i_type, const std::string & i_name) const;
 
 protected:
     virtual void readwrite( Msg * msg);   ///< Read or write node attributes in message

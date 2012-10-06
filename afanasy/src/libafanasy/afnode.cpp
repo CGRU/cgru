@@ -64,7 +64,7 @@ void Node::jsonRead( const JSON & i_object, std::string * io_changes, MonitorCon
 	jr_bool  ("locked", m_locked, i_object);
 }
 
-void Node::v_jsonWrite( std::ostringstream & o_str, int i_type)
+void Node::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
     o_str << "\"name\":\""    << af::strEscape(m_name) << "\"";
 	if( m_id > 0 )
@@ -76,6 +76,15 @@ void Node::v_jsonWrite( std::ostringstream & o_str, int i_type)
 		o_str << ",\"hidden\":true";
 	if( m_annotation.size())
 		o_str << ",\"annotation\":\"" << af::strEscape( m_annotation) << "\"";
+}
+
+Msg * Node::jsonWrite( const std::string & i_type, const std::string & i_name ) const
+{
+	std::ostringstream str;
+	str << "{\"" << i_name << "\":\n";
+	v_jsonWrite( str, 0);
+	str << "\n}";
+	return jsonMsg( str);
 }
 
 int Node::calcWeight() const

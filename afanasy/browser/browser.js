@@ -67,6 +67,11 @@ function g_ProcessMsg( obj)
 		g_ShowMessage( obj.message);
 		return;
 	}
+	if( obj.object )
+	{
+		g_ShowObject( obj.object);
+		return;
+	}
 
 	if( g_id == 0 )
 		return;
@@ -175,6 +180,24 @@ function g_ShowMessage( msg)
 
 	for( i = 0; i < msg.list.length; i++)
 		wnd.document.write('<div>'+msg.list[i].replace('\n','<br/>')+'</div>');
+
+	wnd.document.write('</body></html>');
+	wnd.focus();
+}
+
+function g_ShowObject( obj)
+{
+	var title = 'Object';
+	if( obj.name ) title = obj.name;
+	var wnd = window.open( null, 'Message', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	wnd.document.writeln('<!DOCTYPE html>');
+	wnd.document.write('<html><head><title>'+title+'</title></head>');
+	wnd.document.write('<body style="font: 12px Arial; background: #CCC;">');
+
+	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
+	wnd.document.write( obj_str.replace(/\n/g,'<br/>'));
+//	for( i = 0; i < msg.list.length; i++)
+//		wnd.document.write('<div>'+msg.list[i].replace('\n','<br/>')+'</div>');
 
 	wnd.document.write('</body></html>');
 	wnd.focus();

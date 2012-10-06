@@ -45,7 +45,7 @@ Render::~Render()
 }
 
 
-void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
+void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	o_str << "{";
 
@@ -67,7 +67,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type)
 	{
 		o_str << ",\"tasks\":[";
 		bool first = true;
-		for( std::list<TaskExec*>::iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
+		for( std::list<TaskExec*>::const_iterator it = m_tasks.begin(); it != m_tasks.end(); it++)
 		{
 			if( false == first )
 				o_str << ',';

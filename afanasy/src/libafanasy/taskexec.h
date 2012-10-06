@@ -149,7 +149,7 @@ public:
 
    int calcWeight() const;
 
-   void jsonWrite( std::ostringstream & o_str, int i_type);
+   void jsonWrite( std::ostringstream & o_str, int i_type) const;
 
 private:
 	std::string m_name;               ///< Task name.

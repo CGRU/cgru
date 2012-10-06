@@ -36,7 +36,7 @@ void TaskData::jsonRead( const JSON & i_object)
 	//jr_string("custom_data", m_custom_data, i_object);
 }
 
-void TaskData::jsonWrite( std::ostringstream & o_str)
+void TaskData::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "{\"name\":\""      <<                m_name      << "\"";
 	o_str << ",\"command\":\""   << af::strEscape( m_command ) << "\"";

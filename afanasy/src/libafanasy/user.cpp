@@ -59,7 +59,7 @@ User::~User()
 AFINFO("User::~User:")
 }
 
-void User::v_jsonWrite( std::ostringstream & o_str, int i_type)
+void User::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	o_str << "{";
 
