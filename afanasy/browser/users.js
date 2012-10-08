@@ -152,23 +152,23 @@ UserNode.prototype.onDoubleClick = function()
 
 UserNode.actions = [];
 
-UserNode.actions.push(['context', 'log',               null, 'menuHandleGet',       'Show Log']);
-
-UserNode.actions.push(['set', 'priority',                   'num', 'menuHandleDialog', 'Priority']);
-UserNode.actions.push(['set', 'max_running_tasks',          'num', 'menuHandleDialog', 'Max Runnig Tasks']);
-UserNode.actions.push(['set', 'hosts_mask',                 'reg', 'menuHandleDialog', 'Hosts Mask']);
-UserNode.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
-UserNode.actions.push(['set',  null,                         null,  null,               null]);
-UserNode.actions.push(['set', 'errors_retries',             'num', 'menuHandleDialog', 'Errors Retries']);
-UserNode.actions.push(['set', 'errors_avoid_host',          'num', 'menuHandleDialog', 'Errors Avoid Host']);
-UserNode.actions.push(['set', 'errors_task_same_host',      'num', 'menuHandleDialog', 'Errors Task Same Host']);
-UserNode.actions.push(['set', 'errors_forgive_time',        'hrs', 'menuHandleDialog', 'Errors Forgive Time']);
-UserNode.actions.push(['set',  null,                         null,  null,               null]);
-UserNode.actions.push(['set', 'solve_parallel',             'bl1', 'menuHandleDialog', 'Solve Jobs Parallel']);
-UserNode.actions.push(['set',  null,                         null,  null,               null]);
-UserNode.actions.push(['set', 'jobs_life_time',             'hrs', 'menuHandleDialog', 'Jobs Life Time']);
-UserNode.actions.push(['set',  null,                         null,  null,               null]);
-UserNode.actions.push(['set', 'permanent'     ,             'bl1', 'menuHandleDialog', 'Permanent (Exists in Database)']);
-UserNode.actions.push(['set',  null,                         null,  null,               null]);
-UserNode.actions.push(['set', 'annotation',                 'str', 'menuHandleDialog', 'Annotation']);
+UserNode.actions.push(['context', 'log',                    null, 'menuHandleGet',    'Show Log']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'priority',              'num', 'menuHandleDialog', 'Priority']);
+UserNode.actions.push(['context', 'max_running_tasks',     'num', 'menuHandleDialog', 'Max Runnig Tasks']);
+UserNode.actions.push(['context', 'hosts_mask',            'reg', 'menuHandleDialog', 'Hosts Mask']);
+UserNode.actions.push(['context', 'hosts_mask_exclude',    'reg', 'menuHandleDialog', 'Exclude Hosts Mask']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'errors_retries',        'num', 'menuHandleDialog', 'Errors Retries']);
+UserNode.actions.push(['context', 'errors_avoid_host',     'num', 'menuHandleDialog', 'Errors Avoid Host']);
+UserNode.actions.push(['context', 'errors_task_same_host', 'num', 'menuHandleDialog', 'Errors Task Same Host']);
+UserNode.actions.push(['context', 'errors_forgive_time',   'hrs', 'menuHandleDialog', 'Errors Forgive Time']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'solve_parallel',        'bl1', 'menuHandleDialog', 'Solve Jobs Parallel']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'jobs_life_time',        'hrs', 'menuHandleDialog', 'Jobs Life Time']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'permanent'     ,        'bl1', 'menuHandleDialog', 'Set Permanent']);
+UserNode.actions.push(['context']);
+UserNode.actions.push(['context', 'annotation',            'str', 'menuHandleDialog', 'Annotate']);
 

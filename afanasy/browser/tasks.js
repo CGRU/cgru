@@ -7,36 +7,31 @@ BlockItem.prototype.init = function()
 {
 	this.element.classList.add('block');
 
-	this.name = document.createElement('span');
-	this.name.classList.add('name');
-	this.element.appendChild( this.name);
-	this.name.title = 'Block name';
+	this.elName = cm_ElCreateText( this.element, 'Block Name');
 
-	this.props = document.createElement('span');
-	this.element.appendChild( this.props);
-	this.props.style.cssFloat = 'right';
-	this.props.title = 'Block properties';
-
-	this.state = document.createElement('span');
-	this.element.appendChild( this.state);
-	this.state.style.cssFloat = 'right';
-	this.state.title = 'Block state';
+	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Block State');
+	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
 }
 
 BlockItem.prototype.update = function()
 {
-	cm_GetState( this.params.state, this.element, this.state);
+	cm_GetState( this.params.state, this.element, this.elState);
 
-	if( this.params.tasks )
-		this.props.textContent = 'array';
-	else
-		this.props.textContent = 'numeric';
+	if( this.params.name )
+	{
+		if( this.params.tasks )
+			this.elProperties.textContent = 'array';
+		else
+			this.elProperties.textContent = 'numeric';
 
-	this.name.textContent = this.params.name;
+		this.elName.textContent = this.params.name;
+	}
 }
 
-function TaskItem( i_task_num )
+function TaskItem( i_job, i_block, i_task_num )
 {
+	this.job = i_job;
+	this.block = i_block;
 	this.task_num = i_task_num;
 }
 
@@ -47,28 +42,20 @@ TaskItem.prototype.init = function()
 	this.progress = document.createElement('span');
 	this.element.appendChild( this.progress);
 	this.progress.classList.add('bar');
-//	this.progress.style.zIndex = 1;
 
-	this.name = document.createElement('span');
-	this.element.appendChild( this.name);
-	this.name.title = 'Task name';
-//	this.name.style.position = 'relative';
-//	this.name.style.zIndex = 2;
+	this.elName = document.createElement('span');
+	this.element.appendChild( this.elName);
+	this.elName.title = 'Task name';
 
 	this.percent = document.createElement('span');
 	this.element.appendChild( this.percent);
-//	this.percent.style.position = 'relative';
-//	this.percent.style.zIndex = 2;
 
-	this.state = document.createElement('span');
-	this.element.appendChild( this.state);
-	this.state.style.cssFloat = 'right';
-	this.state.title = 'Task state';
+	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Task State');
 }
 
 TaskItem.prototype.update = function()
 {
-	this.name.textContent = this.genName();
+	this.elName.textContent = this.genName();
 
 	if( this.params.running === true )
 	{
@@ -83,17 +70,17 @@ TaskItem.prototype.updateProgress = function( i_progress)
 {
 //	this.progress = progress;
 
-	cm_GetState( i_progress.state, this.element, this.state);
-//	this.state.textContent = state.string;
+	cm_GetState( i_progress.state, this.element, this.elState);
+//	this.elState.textContent = state.string;
 
 	var percent = 0;
-	if( this.state.RUN && i_progress.per ) percent = i_progress.per;
-	if( this.state.DON ) percent = 100;
-	if( this.state.SKP ) percent = 100;
+	if( this.elState.RUN && i_progress.per ) percent = i_progress.per;
+	if( this.elState.DON ) percent = 100;
+	if( this.elState.SKP ) percent = 100;
 	if( percent < 0 ) percent = 0;
 	if( percent > 100 ) percent = 100;
 
-	if( this.state.RUN )
+	if( this.elState.RUN )
 		this.percent.textContent = ' ' + percent + '%';
 	else
 		this.percent.textContent = '';
@@ -158,3 +145,48 @@ TaskItem.prototype.genFrames = function()
 	else
 		this.frames_num = this.frame_end - this.frame_start + 1;
 }
+
+TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
+{
+	var operation = {};
+	operation.type = i_name;
+
+	var bids = [];
+	var tids = [];
+
+	var blocks = this.monitor.blocks;
+	for( var b = 0; b < blocks.length; b++)
+	{
+		if( blocks[b].element.selected )
+		{
+			bids.push( b);
+			break;
+		}
+		else
+		{
+			var tasks = blocks[b].tasks;
+			for( var t = 0; t < tasks.length; t++)
+			{
+				if( tasks[t].element.selected )
+				{
+					tids.push(t);
+				}
+			}
+			if( tids.length )
+			{
+				bids.push( b);
+				break;
+			}
+		}
+	}
+
+	nw_Action('jobs', [this.job.id], operation, null, bids, tids);
+//g_Info('Operation['+bids+','+tids+'] = ' + i_name);
+}
+
+TaskItem.actions = [];
+
+TaskItem.actions.push(['context', 'log',     null, 'menuHandleGet', 'Show Log']);
+
+TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Restart']);
+

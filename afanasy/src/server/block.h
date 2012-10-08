@@ -82,6 +82,8 @@ private:
 private:
    void constructDependBlocks();
 
+	void skipRestartTasks( const Action & i_action, const JSON & i_operation, const std::string & i_type);
+
    void addRenderCounts( RenderAf * render);
    int  getRenderCounts( RenderAf * render) const;
    void remRenderCounts( RenderAf * render);

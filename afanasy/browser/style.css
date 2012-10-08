@@ -123,7 +123,7 @@ user-select: text;
 
 .item {
 background: #AAAAAA;
-border: 1px solid #676767;
+border: 1px solid #777;
 position: relative;
 margin: 3px;
 padding: 1px 7px;
@@ -137,6 +137,7 @@ border-radius: 4px;
 .item.RUN { background: #8A6;}
 .item.ERR { background: #965;}
 .item.OFF { background: #777;}
+.item.DRT { border: 1px solid #955;}
 .item.selected {
 background: #DFD;
 color: #000;

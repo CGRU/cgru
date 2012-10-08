@@ -188,17 +188,9 @@ void Render::checkDirty()
    if( m_capacity == m_host.m_capacity ) m_capacity = -1;
    if( m_max_tasks == m_host.m_max_tasks ) m_max_tasks = -1;
    if(( m_capacity == -1 ) && ( m_max_tasks == -1 ) && ( m_services_disabled.empty() ))
-	  m_state = m_state | SDirty;
-   else
 	  m_state = m_state & (~SDirty);
-}
-
-void Render::restoreDefaults()
-{
-   m_capacity = -1;//host.capacity;
-   m_max_tasks = -1;//host.maxtasks;
-   m_services_disabled.clear();
-   m_state = m_state & (~SDirty);
+   else
+	  m_state = m_state | SDirty;
 }
 
 int Render::calcWeight() const

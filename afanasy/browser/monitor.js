@@ -28,17 +28,35 @@ function Monitor( i_element, i_type, i_id)
 	this.elCtrlButtons.style.position = 'absolute';
 	this.elCtrlButtons.style.width = '100px';
 
-	this.elCtrlSet = document.createElement('div');
-	this.elCtrlButtons.appendChild( this.elCtrlSet);
-	this.elCtrlSet.classList.add('ctrl_button');
-	this.elCtrlSet.textContent = 'SET';
-	this.elCtrlSet.monitor = this;
-	this.elCtrlSet.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e);}
+	var buttons_width = 0;
+	if( this.type == 'jobs' || this.type == 'renders')
+	{
+		this.elCtrlSet = document.createElement('div');
+		this.elCtrlButtons.appendChild( this.elCtrlSet);
+		this.elCtrlSet.classList.add('ctrl_button');
+		this.elCtrlSet.textContent = 'SET';
+		this.elCtrlSet.monitor = this;
+		this.elCtrlSet.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e);}
+
+		buttons_width = 50;
+
+		if( this.type == 'renders' )
+		{
+			this.elCtrlAux1 = document.createElement('div');
+			this.elCtrlButtons.appendChild( this.elCtrlAux1);
+			this.elCtrlAux1.classList.add('ctrl_button');
+			this.elCtrlAux1.textContent = 'POW';
+			this.elCtrlAux1.monitor = this;
+			this.elCtrlAux1.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'pow');}
+
+			buttons_width = 100;
+		}
+	}
 
 	this.elCtrlSortFilter = document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSortFilter);
 	this.elCtrlSortFilter.style.position = 'absolute';
-	this.elCtrlSortFilter.style.left = '100px';
+	this.elCtrlSortFilter.style.left = buttons_width+'px';
 	this.elCtrlSortFilter.style.right = '0';
 	this.elCtrlSortFilter.style.top = '0';
 	this.elCtrlSortFilter.style.bottom = '0';
@@ -384,25 +402,45 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 	var actions = i_el.item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == 'context' )
-			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
+			this.addMenuItem( menu, actions[i]);
 	menu.show();
 
 	return false;
 }
 Monitor.prototype.onMenuDestroy = function() { this.menu = null;}
 
-Monitor.prototype.onMouseOverSet = function( i_evt)
+Monitor.prototype.addMenuItem = function( i_menu, i_action)
+{
+	var name = i_action[1];
+	if( name == null )
+	{
+		i_menu.addItem();
+		return;
+	}
+	var receiver = this.cur_item;
+	var handle = i_action[3];
+	var title = i_action[4];
+	var enabled = i_action[5];
+	if( receiver[handle] == null ) receiver = this;
+	if( receiver[handle] )
+		i_menu.addItem( name, receiver, handle, title, enabled);
+	else
+		i_menu.addItem('invalid', 'invalid', 'invalid', 'invalid '+name, false);
+}
+
+Monitor.prototype.onMouseOverSet = function( i_evt, i_name)
 {
 	if( this.menu ) this.menu.destroy();
 	if( this.cur_item == null ) return;
 	if( this.hasSelection() == false ) return;
+	if( i_name == null ) i_name = 'set';
 
 	var menu = new cgru_Menu( document, document.body, i_evt, this, this.type+'_set', 'onMenuDestroy');
 	this.menu = menu;
 	var actions = this.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
-		if( actions[i][0] == 'set' )
-			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
+		if( actions[i][0] == i_name )
+			this.addMenuItem( menu, actions[i]);
 	menu.show();
 }
 Monitor.prototype.menuHandleParam = function( i_name)
@@ -433,11 +471,11 @@ Monitor.prototype.menuHandleDialog = function( i_name)
 		{
 			ptype = actions[i][2];
 			if( actions[i][6] ) parameter = actions[i][6];
-			if( actions[i][7] )
+/*			if( actions[i][7] )
 			{
 				reciever = this.cur_item;
 				handle = actions[i][7];
-			}
+			}*/
 		}
 	}
 	new cgru_Dialog( document, document.body, reciever, handle, parameter, ptype, value, this.type+'_parameter');
@@ -497,7 +535,7 @@ Monitor.prototype.jobConstruct = function( job)
 		block.tasks = [];
 		for( var t = 0; t < this.job.blocks[b].tasks_num; t++)
 		{
-			var task = new TaskItem( t);
+			var task = new TaskItem( job, block, t);
 			this.createItem( task, this.job.blocks[b]);
 			this.items.push( task);
 			block.tasks.push( task);
@@ -535,12 +573,12 @@ Monitor.prototype.jobProgress = function( progress)
 
 Monitor.prototype.tasksProgress = function( tasks_progress)
 {
-g_Info('Monitor.prototype.tasksProgress = function( tasks_progress)');
+//g_Info('Monitor.prototype.tasksProgress = function( tasks_progress)');
 	var j = -1;
 	
 	for( var i = 0; i < tasks_progress.length; i++)
 	{
-g_Info(' jid='+tasks_progress[i].job_id+' this='+this.job_id);
+//g_Info(' jid='+tasks_progress[i].job_id+' this='+this.job_id);
 		if( tasks_progress[i].job_id == this.job_id)
 		{
 			j = i;

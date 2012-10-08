@@ -116,8 +116,8 @@ function g_Init()
 function g_Registered()
 {
 	g_Info('Registed: ID = ' + g_id + ' User = ' + localStorage['user_name']);
-//	g_OpenMonitor('jobs');
-	g_OpenMonitor('renders');
+	g_OpenMonitor('jobs');
+//	g_OpenMonitor('renders');
 //	g_OpenMonitor('users');
 }
 

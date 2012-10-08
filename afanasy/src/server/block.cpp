@@ -356,6 +356,10 @@ bool Block::action( Action & i_action)
 			if( blockchanged_type < af::Msg::TBlocksProperties ) blockchanged_type = af::Msg::TBlocksProperties;
 			job_progress_changed = true;
 		}
+		else if(( type == "restart") || ( type == "skip") || ("restart_running"))
+		{
+			skipRestartTasks( i_action, operation, type);
+		}
 		else
 		{
 			appendJobLog("Unknown operation \"" + type + "\" by " + i_action.author);
@@ -389,6 +393,49 @@ bool Block::action( Action & i_action)
 	}
 
 	return job_progress_changed;
+}
+
+void Block::skipRestartTasks( const Action & i_action, const JSON & i_operation, const std::string & i_type)
+{
+	bool skip = false;
+	bool only_running = false;
+	if( i_type == "skip")
+		skip = true;
+	else if( i_type == "restart_running")
+		only_running = true;
+
+	std::string message;
+	if( skip ) message = "Skip request by ";
+	else       message = "Restart request by ";
+	message += i_action.author;
+
+	std::vector<int32_t> tasks_vec;
+	af::jr_int32vec("task_ids", tasks_vec, i_operation);
+
+	int length = m_data->getTasksNum();
+	if( tasks_vec.size())
+		length = tasks_vec.size();
+
+	AFCommon::QueueDBUpdateTask_begin();
+	for( int i = 0; i < length; i++)
+	{
+		int t = i;
+		if( tasks_vec.size())
+		{
+			t = tasks_vec[i];
+			if(( t >= m_data->getTasksNum()) || ( t < 0 ))
+			{
+				appendJobLog("Operation '"+i_type+"' invalid task numer="+af::itos(t)+" by "+i_action.author);
+				break;
+			}
+		}
+
+		if( skip )
+			m_tasks[t]->skip( message, i_action.renders, i_action.monitors);
+		else
+			m_tasks[t]->restart( only_running, message, i_action.renders, i_action.monitors);
+	}
+	AFCommon::QueueDBUpdateTask_end();
 }
 
 uint32_t Block::action( const af::MCGeneral & mcgeneral, int type, AfContainer * pointer, MonitorContainer * monitoring)

@@ -97,7 +97,6 @@ public:
 
 protected:
    inline void setBusy(  bool Busy ) { if(Busy ) m_state = m_state | SBusy;  else m_state = m_state & (~SBusy );}
-   void restoreDefaults();       ///< Restore host capacity and reset disabled services.
    void checkDirty();
 
 protected:

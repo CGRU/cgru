@@ -4,27 +4,21 @@
 		"user_name"  : "jimmy",
 		"host_name"  : "pc01",
 		"mask"       : "_empty_.*",
-		"ids"        : [1],
+		"ids"        : [4],
 		"type"       : "jobs",
 		"-type"       : "renders",
 		"-type"       : "users",
 		"-type"       : "monitors",
 		"-type"       : "talks",
-		"-block_ids"  : [0,2],
+		"block_ids"  : [0,2],
 		"operation" :
 		{
-			"type"   : "exit",
+			"-type"   : "exit",
+			"type"    : "restart",
+			"task_ids": [0],
 			"-type"   : "service",
 			"-name"   : "nuke",
 			"-enable" : true
-		},
-		"params"     :
-		{
-			"nimby"       : true,
-			"-hidden"     : true,
-			"-priority"   : 75,
-			"-annotation" : "json action",
-			"hosts_mask"  : "bhm.*"
 		}
 	}
 }

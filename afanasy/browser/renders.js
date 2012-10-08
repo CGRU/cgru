@@ -246,17 +246,22 @@ RenderNode.prototype.refresh = function()
 
 RenderNode.prototype.onDoubleClick = function()
 {
+	nw_GetNodes('renders', [this.params.id], 'full');
 }
 
-RenderNode.prototype.menuHandleService = function( i_name, i_value)
+RenderNode.prototype.menuHandleServiceDialog = function( i_name)
+{
+	new cgru_Dialog( document, document.body, this, 'menuHandleServiceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
+}
+RenderNode.prototype.menuHandleServiceApply = function( i_name, i_value)
 {
 g_Info('menuHandleService = ' + i_name + ',' + i_value);
 	var operation = {};
 	operation.type = 'service';
 	operation.name = i_value;
-	if( i_name == 'enable_service' )
+	if( i_name == 'enable' )
 		operation.enable = true;
-	else if( i_name == 'disable_service' )
+	else if( i_name == 'disable' )
 		operation.enable = false;
 	else return;
 	nw_Action( 'renders', this.monitor.getSelectedIds(), operation, null);
@@ -327,24 +332,24 @@ RenderNode.actions.push(['context', 'nimbyOff', false, 'menuHandleParam', 'Set F
 RenderNode.actions.push(['context',  null]);
 RenderNode.actions.push(['context', 'eject_tasks',         null, 'menuHandleOperation', 'Eject Tasks']);
 RenderNode.actions.push(['context', 'eject_tasks_keep_my', null, 'menuHandleOperation', 'Eject Not My']);
-RenderNode.actions.push(['context',  null]);
-RenderNode.actions.push(['context', 'wol_sleep',           null, 'menuHandleOperation', 'WOL Sleep']);
-RenderNode.actions.push(['context', 'wol_wake' ,           null, 'menuHandleOperation', 'WOL Wake']);
-RenderNode.actions.push(['context', 'exit',                null, 'menuHandleOperation', 'Exit Client']);
-RenderNode.actions.push(['context', 'reboot',              null, 'menuHandleOperation', 'Reboot Machine']);
-RenderNode.actions.push(['context', 'shutdown',            null, 'menuHandleOperation', 'Shutdown Machine']);
-RenderNode.actions.push(['context', 'delete',              null, 'menuHandleOperation', 'Delete From Database']);
 
 RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleDialog', 'Capacity']);
 RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleDialog', 'Maximum Tasks']);
 RenderNode.actions.push(['set', 'restore_defaults','num', 'menuHandleOperation', 'Restore Defaults']);
 RenderNode.actions.push(['set',  null]);
-RenderNode.actions.push(['set', 'enable_service',  'str', 'menuHandleDialog', 'Enable Service',  null, null, 'menuHandleService']);
-RenderNode.actions.push(['set', 'disable_service', 'str', 'menuHandleDialog', 'Disable Service', null, null, 'menuHandleService']);
+RenderNode.actions.push(['set', 'enable',  null, 'menuHandleServiceDialog', 'Enable Service']);
+RenderNode.actions.push(['set', 'disable', null, 'menuHandleServiceDialog', 'Disable Service']);
 RenderNode.actions.push(['set',  null]);
 RenderNode.actions.push(['set', 'hidden',       'bl1', 'menuHandleDialog', 'Hide/Unhide']);
 RenderNode.actions.push(['set',  null]);
 RenderNode.actions.push(['set', 'user_name',    'str', 'menuHandleDialog', 'User Name']);
 RenderNode.actions.push(['set',  null]);
 RenderNode.actions.push(['set', 'annotation',   'str', 'menuHandleDialog', 'Annotation']);
+
+RenderNode.actions.push(['pow', 'wol_sleep', null, 'menuHandleOperation', 'WOL Sleep']);
+RenderNode.actions.push(['pow', 'wol_wake' , null, 'menuHandleOperation', 'WOL Wake']);
+RenderNode.actions.push(['pow', 'exit',      null, 'menuHandleOperation', 'Exit Client']);
+RenderNode.actions.push(['pow', 'reboot',    null, 'menuHandleOperation', 'Reboot Machine']);
+RenderNode.actions.push(['pow', 'shutdown',  null, 'menuHandleOperation', 'Shutdown Machine']);
+RenderNode.actions.push(['pow', 'delete',    null, 'menuHandleOperation', 'Delete From DB']);
 
