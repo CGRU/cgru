@@ -45,6 +45,8 @@ public:
 
 	af::Msg * writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std::string> i_modes) const;
 
+	af::Msg * writeTask( int i_b, int i_t, const std::string & i_mode) const;
+
 	af::Msg * writeErrorHosts() const;
 	af::Msg * writeErrorHosts( int b, int t) const;
 	void writeErrorHosts( std::list<std::string> & o_list) const;
@@ -53,9 +55,9 @@ public:
 	virtual const std::string getErrorHostsListString( int b, int t) const; /// Get avoid hosts list for \c t task in \c b block.
 
 /// Get \c task task from \c block log.
-   const std::list<std::string> & getTaskLog( int block, int task);
+   const std::list<std::string> & getTaskLog( int block, int task) const;
 
-   virtual af::TaskExec * generateTask( int block, int task);
+	af::TaskExec * generateTask( int block, int task) const;
 
 /// Construct message for retrieveing output from running remote host or filename if task is not running
 /** return \c true in success, or \c false with error message to send back to client.

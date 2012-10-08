@@ -234,15 +234,14 @@ JobBlock.prototype.onContextMenu = function( evt)
 	this.job.monitor.menu = menu;
 
 	if( onlyBlockIsSelected )
-		menu.addItem( null, null, '<b>'+this.params.name+'</b>', false);
+		menu.addItem( null, null, null, '<b>'+this.params.name+'</b>', false);
 	else
-		menu.addItem( null, null, '<b>All Blocks</b>', false);
+		menu.addItem( null, null, null, '<b>All Blocks</b>', false);
 	menu.addItem();
 
 	var actions = JobBlock.actions;
 	for( var i = 0; i < actions.length; i++)
-//		if( actions[i][0] == 'context' )
-			menu.addItem( actions[i][1], actions[i][3], actions[i][4]);
+		menu.addItem( actions[i][1], this, actions[i][3], actions[i][4]);
 	menu.show();
 
 	return false;

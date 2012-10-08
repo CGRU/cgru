@@ -1374,14 +1374,32 @@ af::Msg * JobAf::writeBlocks( std::vector<int32_t> i_block_ids, std::vector<std:
 	return af::jsonMsg( str);
 }
 
-const std::list<std::string> & JobAf::getTaskLog( int block, int task)
+af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
+{
+	std::ostringstream str;
+	str << "{";
+
+	if( i_mode == "log" )
+		return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+","+af::itos(i_t)+"]", getTaskLog( i_b, i_t));
+	if( i_mode == "info" )
+	{
+		af::TaskExec * task = generateTask( i_b, i_t);
+		if( task )
+			task->jsonWrite( str, af::Msg::TTask);
+	}
+
+	str << "}";
+	return af::jsonMsg( str);
+}
+
+const std::list<std::string> & JobAf::getTaskLog( int block, int task) const
 {
    static const std::list<std::string> emptylog;
    if( false == checkBlockTaskNumbers( block, task, "getTaskLog")) return emptylog;
    return m_blocks[block]->m_tasks[task]->getLog();
 }
 
-af::TaskExec * JobAf::generateTask( int block, int task)
+af::TaskExec * JobAf::generateTask( int block, int task) const
 {
    if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
    return m_blocks[block]->m_data->genTask( task);

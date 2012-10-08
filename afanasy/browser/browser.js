@@ -72,6 +72,11 @@ function g_ProcessMsg( obj)
 		g_ShowObject( obj.object);
 		return;
 	}
+	if( obj.task_exec )
+	{
+		g_ShowObject( obj.task_exec);
+		return;
+	}
 
 	if( g_id == 0 )
 		return;

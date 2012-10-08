@@ -107,11 +107,15 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	o_str << "{\"name\":\""       << m_name       << "\"";
 	o_str << ",\"service\":\""    << m_service    << "\"";
-	o_str << ",\"user_name\":\""  << m_user_name  << "\"";
-	o_str << ",\"block_name\":\"" << m_block_name << "\"";
-	o_str << ",\"job_name\":\""   << m_job_name   << "\"";
-	o_str << ",\"time_start\":"   << m_time_start;
 	o_str << ",\"capacity\":"     << m_capacity;
+	o_str << ",\"time_start\":"   << m_time_start;
+
+	if( m_user_name.size())
+		o_str << ",\"user_name\":\""  << m_user_name  << "\"";
+	if( m_block_name.size())
+		o_str << ",\"block_name\":\"" << m_block_name << "\"";
+	if( m_job_name.size())
+		o_str << ",\"job_name\":\""   << m_job_name   << "\"";
 
 	if( m_capacity_coeff > 0 )
 		o_str << ",\"capacity_coeff\":\"" << m_capacity_coeff;
@@ -125,7 +129,7 @@ void TaskExec::jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\"frame_start\":" << m_frame_start;
 		o_str << ",\"frame_finish\":" << m_frame_finish;
 
-		if( m_parser_coeff != 0 )
+		if( m_parser_coeff > 1 )
 			o_str << ",\"parser_coeff\":" << m_parser_coeff;
 		if( m_file_size_min > 0 )
 			o_str << ",\"file_size_min\":" << m_file_size_min;

@@ -75,7 +75,7 @@ function nw_GetEvents()
 	nw_Send(obj);
 }
 
-function nw_GetNodes( i_type, i_ids, i_mode, i_blocks)
+function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks)
 {
 	var obj = {};
 	obj.get = {};
@@ -86,6 +86,8 @@ function nw_GetNodes( i_type, i_ids, i_mode, i_blocks)
 		obj.get.mode = i_mode;
 	if( i_blocks )
 		obj.get.block_ids = i_blocks;
+	if( i_tasks )
+		obj.get.task_ids = i_tasks;
 
 	nw_Send(obj);
 }
@@ -122,7 +124,7 @@ function nw_ConstructActionObject( i_type, i_ids)
 	return obj;
 }
 
-function nw_Action( i_type, i_ids, i_operation, i_params, i_block_ids, i_task_ids)
+function nw_Action( i_type, i_ids, i_operation, i_params, i_block_ids)
 {
 	if( i_ids.length == 0 )
 	{
@@ -133,11 +135,7 @@ function nw_Action( i_type, i_ids, i_operation, i_params, i_block_ids, i_task_id
 	var obj = nw_ConstructActionObject( i_type, i_ids);
 
 	if( i_params    ) obj.action.params = i_params;
-	if( i_operation )
-	{
-		obj.action.operation = i_operation;
-		if( i_task_ids ) obj.action.operation.task_ids = i_task_ids;
-	}
+	if( i_operation ) obj.action.operation = i_operation;
 	if( i_block_ids ) obj.action.block_ids = i_block_ids;
 
 	nw_Send( obj);

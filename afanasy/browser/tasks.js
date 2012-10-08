@@ -146,20 +146,14 @@ TaskItem.prototype.genFrames = function()
 		this.frames_num = this.frame_end - this.frame_start + 1;
 }
 
-TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
+TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 {
-	var operation = {};
-	operation.type = i_name;
-
-	var bids = [];
-	var tids = [];
-
 	var blocks = this.monitor.blocks;
 	for( var b = 0; b < blocks.length; b++)
 	{
 		if( blocks[b].element.selected )
 		{
-			bids.push( b);
+			o_bids.push( b);
 			break;
 		}
 		else
@@ -169,24 +163,48 @@ TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 			{
 				if( tasks[t].element.selected )
 				{
-					tids.push(t);
+					o_tids.push(t);
 				}
 			}
-			if( tids.length )
+			if( o_tids.length )
 			{
-				bids.push( b);
+				o_bids.push( b);
 				break;
 			}
 		}
 	}
-
-	nw_Action('jobs', [this.job.id], operation, null, bids, tids);
-//g_Info('Operation['+bids+','+tids+'] = ' + i_name);
+g_Info('bids='+o_bids+' tids='+o_tids);
 }
+
+TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
+{
+	var operation = {};
+	operation.type = i_name;
+	var bids = []; var tids = [];
+	this.getBlockTasksIds( bids, tids);
+	if( tids.length ) operation.task_ids = tids;
+	nw_Action('jobs', [this.job.id], operation, null, bids);
+}
+
+TaskItem.prototype.onDoubleClick = function()
+{
+	this.menuHandleGet('info');
+}
+
+TaskItem.prototype.menuHandleGet = function( i_name)
+{
+	var bids = []; var tids = [];
+	this.getBlockTasksIds( bids, tids);
+	nw_GetNodes('jobs', [this.job.id], i_name, bids, tids)
+}
+
 
 TaskItem.actions = [];
 
-TaskItem.actions.push(['context', 'log',     null, 'menuHandleGet', 'Show Log']);
+TaskItem.actions.push(['context', 'output',  null, 'menuHandleGet', 'Output']);
+TaskItem.actions.push(['context', 'log',     null, 'menuHandleGet', 'Log']);
+TaskItem.actions.push(['context', 'info',    null, 'menuHandleGet', 'Info']);
 
 TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Restart']);
+TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
 

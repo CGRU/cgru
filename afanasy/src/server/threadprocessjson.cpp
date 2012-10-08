@@ -61,28 +61,32 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);
 				JobAf * job = NULL;
 				bool was_error = false;
-				std::vector<int32_t> block_ids;
 				if( ids.size() == 1 )
 				{
 					JobContainerIt it( i_args->jobs);
 					job = it.getJob( ids[0]);
 					if( job == NULL )
-					{
 						o_msg_response = af::jsonMsgError( "Invalid ID");
-						was_error = true;
-					}
-					af::jr_int32vec("block_ids", block_ids, getObj);
 				}
 
-				if( was_error == false )
+				if( job )
 				{
-					if( block_ids.size() && ( job != NULL ))
+					std::vector<int32_t> block_ids;
+					af::jr_int32vec("block_ids", block_ids, getObj);
+					if( block_ids.size())
 					{
-						std::vector<std::string> modes;
-						af::jr_stringvec("mode", modes, getObj);
-						o_msg_response = job->writeBlocks( block_ids, modes);
+						std::vector<int32_t> task_ids;
+						af::jr_int32vec("task_ids", task_ids, getObj);
+						if( task_ids.size())
+							o_msg_response = job->writeTask( block_ids[0], task_ids[0], mode);
+						else
+						{
+							std::vector<std::string> modes;
+							af::jr_stringvec("mode", modes, getObj);
+							o_msg_response = job->writeBlocks( block_ids, modes);
+						}
 					}
-					if( mode.size())
+					else if( mode.size())
 					{
 						if(( mode == "progress" ) && ( job != NULL ))
 							o_msg_response = job->writeProgress( json);
@@ -91,10 +95,11 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						else if(( mode == "log" ) && ( job != NULL ))
 							o_msg_response = job->writeLog();
 					}
-					if( o_msg_response == NULL )
-						o_msg_response = i_args->jobs->generateList(
-							full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
 				}
+				
+				if( o_msg_response == NULL )
+					o_msg_response = i_args->jobs->generateList(
+						full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
 			}
 		}
 		else if( type == "users")
