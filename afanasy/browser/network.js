@@ -26,7 +26,8 @@ document.getElementById('send').textContent='c' + nw_send_count + ' send: ' + ob
 document.getElementById('recv').textContent='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
 				nw_error_count = 0;
 				nw_connected = true;
-				g_ProcessMsg( eval('('+xhr.responseText+')'));
+//				g_ProcessMsg( eval('('+xhr.responseText+')'));
+				g_ProcessMsg( JSON.parse( xhr.responseText));
 				return;
 			}
 			nw_error_count++;

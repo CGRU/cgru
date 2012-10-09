@@ -237,18 +237,37 @@ const std::string af::strEscape( const std::string & i_str)
 	if( i_str.size() == 0)
 		return str;
 
-	char esc[] = "\\\"\n\r\t";
-	int esc_len = 5;
+	char esc_add[] = "\\\"";
+	int  esc_add_len = 2;
+	char esc_replace[] = "\n\r\t";
+	char esc_replace_to[] = "nrt";
+	int  esc_replace_len = 3;
 	for( std::string::const_iterator it = i_str.begin(); it != i_str.end(); it++)
 	{
-		for( int i = 0; i < esc_len; i++)
+		bool replaced = false;
+		for( int i = 0; i < esc_replace_len; i++)
 		{
-			if( *it == esc[i])
+			if( *it == esc_replace[i])
+			{
+				str += '\\';
+				str += esc_replace_to[i];
+				replaced = true;
+				break;
+			}
+		}
+
+		if( replaced )
+			continue;
+
+		for( int i = 0; i < esc_add_len; i++)
+		{
+			if( *it == esc_add[i])
 			{
 				str += '\\';
 				break;
 			}
 		}
+
 		str += *it;
 	}
 	return str;

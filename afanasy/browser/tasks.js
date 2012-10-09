@@ -51,6 +51,9 @@ TaskItem.prototype.init = function()
 	this.element.appendChild( this.percent);
 
 	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Task State');
+	this.elStarts = cm_ElCreateFloatText( this.element, 'right', 'Starts Count');
+	this.elErrors = cm_ElCreateFloatText( this.element, 'right', 'Errors Count');
+	this.elHost = cm_ElCreateFloatText( this.element, 'right', 'Last Running Host');
 }
 
 TaskItem.prototype.update = function()
@@ -72,6 +75,12 @@ TaskItem.prototype.updateProgress = function( i_progress)
 
 	cm_GetState( i_progress.state, this.element, this.elState);
 //	this.elState.textContent = state.string;
+
+	if( i_progress.str ) this.elStarts.textContent = 's' + i_progress.str;
+	else this.elStarts.textContent = 's0';
+	if( i_progress.err ) this.elErrors.textContent = 'e' + i_progress.err;
+	else this.elErrors.textContent = 'e0';
+	if( i_progress.hst ) this.elHost.textContent = i_progress.hst;
 
 	var percent = 0;
 	if( this.elState.RUN && i_progress.per ) percent = i_progress.per;
