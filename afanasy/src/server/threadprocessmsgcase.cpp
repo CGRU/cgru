@@ -618,82 +618,82 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
    }
    case af::Msg::TTaskOutputRequest:
    {
-      af::Msg * msg_request_render = NULL;
-      std::string filename;
-      af::MCTaskPos mctaskpos( i_msg);
-      o_msg_response = new af::Msg();
-//printf("ThreadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", mctaskpos.getJobId(), mctaskpos.getNumBlock(), mctaskpos.getNumTask(), mctaskpos.getNumber());
-      {
-         AfContainerLock jLock( i_args->jobs,    AfContainerLock::READLOCK);
-         AfContainerLock rLock( i_args->renders, AfContainerLock::READLOCK);
+		af::Msg * msg_request_render = NULL;
+		std::string filename, error;
+		af::MCTaskPos tp( i_msg);
+//printf("ThreadReadMsg::msgCase: case af::Msg::TJobTaskOutputRequest: job=%d, block=%d, task=%d, number=%d\n", tp.getJobId(), tp.getNumBlock(), tp.getNumTask(), tp.getNumber());
+		{
+			AfContainerLock jLock( i_args->jobs,    AfContainerLock::READLOCK);
+			AfContainerLock rLock( i_args->renders, AfContainerLock::READLOCK);
 
-         JobContainerIt jobsIt( i_args->jobs);
-         JobAf* job = jobsIt.getJob( mctaskpos.getJobId());
-         if( job != NULL )
-         {
-            // Trying to set message to request output from running remote host.
-            if( job->getTaskStdOut( mctaskpos, o_msg_response, filename, i_args->renders) == false )
-            {
-               // If false, message contains error text to send back to client.
-               break;
-            }
-         }
-         else
-         {
-            o_msg_response->setString("Job is NULL.");
-            break;
-         }
-      }
-      if( o_msg_response->isNull() )
-      {
-      //
-      //    Retrieving output from file
-      //
-         std::string err;
-         int readsize = -1;
-         char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &err);
-         if( data )
-         {
-            o_msg_response->setData( readsize, data);
-            delete [] data;
-         }
-         if( err.size())
-         {
-            err = std::string("Getting task output: ") + err;
-            AFCommon::QueueLogError( err);
-            if( o_msg_response->isNull())
-            {
-               if( af::pathFileExists( filename))
-               {
-                  err = std::string("ERROR: ") + err;
-                  o_msg_response->setString( err);
-               }
-               else
-               {
-                  o_msg_response->setString("No output exists.");
-               }
-            }
-         }
-      }
-      else
-      {
-      //
-      //    Retrieving output from render
-      //
-         msg_request_render = o_msg_response;
-         msg_request_render->setReceiving();
-//         o_msg_response = new af::Msg();
-         bool ok;
-         o_msg_response = af::msgsend( msg_request_render, ok, af::VerboseOn);
-//         if( af::msgRequest( msg_request_render, o_msg_response) == false )
-         if( o_msg_response == NULL )
-         {
-//            delete o_msg_response;
-            o_msg_response = new af::Msg();
-            o_msg_response->setString("Retrieving output from render failed. See server logs for details.");
-         }
-         delete msg_request_render;
-      }
+			JobContainerIt jobsIt( i_args->jobs);
+			JobAf* job = jobsIt.getJob( tp.getJobId());
+			if( job == NULL )
+			{
+				o_msg_response = af::jsonMsgError("Job is NULL.");
+				AFCommon::QueueLogError("Jobs is NULL");
+				break;
+			}
+
+			// Trying to set message to request output from running remote host.
+			msg_request_render = job->v_getTaskStdOut( tp.getNumBlock(), tp.getNumTask(), tp.getNumber(),
+				i_args->renders, filename, error);
+
+			if( error.size())
+			{
+				if( msg_request_render )
+					delete msg_request_render;
+				o_msg_response = af::jsonMsgError( error);
+				AFCommon::QueueLogError( error);
+				break;
+			}
+		}
+		if( filename.size())
+		{
+		//
+		//    Retrieving output from file
+		//
+			int readsize = -1;
+			char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &error);
+			if( data )
+			{
+				o_msg_response = new af::Msg();
+				o_msg_response->setData( readsize, data);
+				delete [] data;
+			}
+			else if( error.size())
+			{
+				error = std::string("Getting task output: ") + error;
+				AFCommon::QueueLogError( error);
+				o_msg_response = af::jsonMsgError( error);
+			}
+		}
+		else if( msg_request_render)
+		{
+		//
+		//    Retrieving output from render
+		//
+			msg_request_render->setReceiving();
+			bool ok;
+			o_msg_response = af::msgsend( msg_request_render, ok, af::VerboseOn);
+			if( o_msg_response == NULL )
+			{
+				error = "Retrieving output from render failed. See server logs for details.";
+				o_msg_response = af::jsonMsgError( error);
+				AFCommon::QueueLogError( error);
+			}
+			delete msg_request_render;
+		}
+		else
+		{
+			if( error.size())
+			{
+				o_msg_response = af::jsonMsgError( error);
+				AFCommon::QueueLogError("TTaskOutputRequest: Neiter message nor filename\n" + error);
+			}
+			else
+				AFCommon::QueueLogError("TTaskOutputRequest: Neiter message nor filename.");
+		}
       break;
    }
    case af::Msg::TJobsWeightRequest:

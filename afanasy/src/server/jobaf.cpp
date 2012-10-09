@@ -1381,11 +1381,14 @@ af::Msg * JobAf::writeTask( int i_b, int i_t, const std::string & i_mode) const
 
 	if( i_mode == "log" )
 		return af::jsonMsg( "log", getName()+"["+af::itos(i_b)+","+af::itos(i_t)+"]", getTaskLog( i_b, i_t));
-	if( i_mode == "info" )
+	else if( i_mode == "info" )
 	{
 		af::TaskExec * task = generateTask( i_b, i_t);
 		if( task )
 			task->jsonWrite( str, af::Msg::TTask);
+	}
+	else if( i_mode == "output")
+	{
 	}
 
 	str << "}";
@@ -1403,6 +1406,12 @@ af::TaskExec * JobAf::generateTask( int block, int task) const
 {
    if( false == checkBlockTaskNumbers( block, task, "generateTask")) return NULL;
    return m_blocks[block]->m_data->genTask( task);
+}
+
+const std::string JobAf::generateTaskName( int i_b, int i_t) const
+{
+	if( false == checkBlockTaskNumbers( i_b, i_t, "generateTaskName")) return "Invalid ids.";
+	else return m_blocks[i_b]->m_data->genTaskName( i_t);
 }
 
 const std::string JobAf::getErrorHostsListString() const
@@ -1471,15 +1480,16 @@ bool JobAf::checkBlockTaskNumbers( int BlockNum, int TaskNum, const char * str) 
    return true;
 }
 
-bool JobAf::getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::string & filename, RenderContainer * renders)
+af::Msg * JobAf::v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
+	std::string & o_filename, std::string & o_error) const
 {
 //printf("JobAf::getTaskStdOut:\n");
-   if( false == checkBlockTaskNumbers( taskpos.getNumBlock(), taskpos.getNumTask(), "getTaskStdOut"))
-   {
-      msg->setString("JobAf::getTaskStdOut: invalid job and task numbers");
-      return false;
-   }
-   return m_blocks[taskpos.getNumBlock()]->m_tasks[taskpos.getNumTask()]->getOutput( taskpos.getNumber(), msg, filename, renders);
+	if( false == checkBlockTaskNumbers( i_b, i_t, "getTaskStdOut"))
+	{
+		o_error = "Invalid blockb and task numbers";
+		return NULL;
+	}
+	return m_blocks[i_b]->m_tasks[i_t]->getOutput( i_n, i_renders, o_filename, o_error);
 }
 
 void JobAf::listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders)

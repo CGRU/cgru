@@ -415,14 +415,14 @@ void TaskRunMulti::releaseHost( RenderContainer * renders, MonitorContainer * mo
    }
 }
 
-bool TaskRunMulti::getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const
+af::Msg * TaskRunMulti::v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const
 {
-   if( progress->state & AFJOB::STATE_READY_MASK)
-   {
-      msg->setString("Task is waiting for hosts.");
-      return false;
-   }
-  return TaskRun::getOutput( startcount, msg, renders);
+	if( progress->state & AFJOB::STATE_READY_MASK)
+	{
+		o_error = "Waiting for hosts.";
+		return NULL;
+	}
+	return TaskRun::v_getOutput( i_startcount, i_renders, o_error);
 }
 
 void TaskRunMulti::stdOut( bool full) const

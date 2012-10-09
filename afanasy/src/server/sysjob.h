@@ -123,7 +123,8 @@ public:
    static void appendJobLog( const std::string & message);
 
    // Functions than informate that it is a system task, and this info is not abailable:
-   virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::string & filename, RenderContainer * renders);
+	virtual af::Msg * v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
+		std::string & o_filename, std::string & o_error) const;
    virtual const std::string getErrorHostsListString( int b, int t) const;
 
 protected:

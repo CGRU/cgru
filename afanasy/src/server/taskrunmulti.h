@@ -34,10 +34,8 @@ public:
 /// Do some work every period of time. Return true if there are some changes for database and monitoring.
    virtual bool refresh( time_t currentTime, RenderContainer * renders, MonitorContainer * monitoring, int & errorHostId);
 
-/// Set null message to special message for request output from its running render.
-/** Return \c true and constuct valid message on success. On fail return \c false and message with error text for client
-**/
-   virtual bool getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const;
+	/// Return special message for request output from its running render.
+	virtual af::Msg * v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const;
 
    virtual void stdOut( bool full = false) const;
 

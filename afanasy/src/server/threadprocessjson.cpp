@@ -56,6 +56,67 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				AfContainerLock uLock( i_args->users, AfContainerLock::READLOCK);
 				o_msg_response = i_args->users->generateJobsList( uids, type, json);
 			}
+			else if( mode == "output")
+			{
+				std::vector<int32_t> block_ids;
+				std::vector<int32_t> task_ids;
+				af::jr_int32vec("block_ids", block_ids, getObj);
+				af::jr_int32vec("task_ids", task_ids, getObj);
+				if(( ids.size() == 1 ) && ( block_ids.size() == 1 ) && ( task_ids.size() == 1 ))
+				{
+					af::Msg * msg_request_render = NULL;
+					std::string filename, error, name;
+
+					// Get output from job, it can return a request message for render or a filename
+					{
+						AfContainerLock jlock( i_args->jobs,    AfContainerLock::READLOCK);
+						AfContainerLock rLock( i_args->renders, AfContainerLock::READLOCK);
+
+						JobContainerIt it( i_args->jobs);
+						JobAf * job = it.getJob( ids[0]);
+						if( job == NULL )
+							o_msg_response = af::jsonMsgError("Invalid ID");
+						else
+						{
+							msg_request_render = job->v_getTaskStdOut( block_ids[0], task_ids[0], 0,
+								i_args->renders, filename, error);
+							name = job->generateTaskName( block_ids[0], task_ids[0]);
+						}
+					}
+
+					if( filename.size()) // Reading output from file
+					{
+						int readsize = -1;
+						char * data = af::fileRead( filename, readsize, af::Msg::SizeDataMax, &error);
+						if( data )
+						{
+							o_msg_response = af::jsonMsg( mode, name, data, readsize);
+							delete [] data;
+						}
+					}
+					else if( msg_request_render) // Retrieving output from render
+					{
+						msg_request_render->setReceiving();
+						bool ok;
+						af::Msg * response = af::msgsend( msg_request_render, ok, af::VerboseOn);
+						if( response )
+						{
+							o_msg_response = af::jsonMsg( mode, name, response->data(), response->dataLen());
+							delete response;
+						}
+						else
+							error = "Retrieving output from render failed. See server logs for details.";
+						delete msg_request_render;
+					}
+	
+					if( error.size())
+					{
+						if( o_msg_response == NULL )
+							o_msg_response = af::jsonMsgError( error);
+						AFCommon::QueueLogError("TTaskOutputRequest: " + error);
+					}
+				}
+			}
 			else
 			{
 				AfContainerLock lock( i_args->jobs, AfContainerLock::READLOCK);

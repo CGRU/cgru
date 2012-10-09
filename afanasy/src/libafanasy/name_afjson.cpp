@@ -84,6 +84,16 @@ af::Msg * af::jsonMsg( const std::ostringstream & i_stream)
 	return o_msg;
 }
 
+af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, char * i_data, int i_size)
+{
+	return af::jsonMsg( i_type, i_name, std::string( i_data, i_size));
+}
+af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, const std::string & i_string)
+{
+	std::list<std::string> list;
+	list.push_back( i_string);
+	return af::jsonMsg( i_type, i_name, list);
+}
 af::Msg * af::jsonMsg( const std::string & i_type, const std::string & i_name, const std::list<std::string> & i_list)
 {
 	std::ostringstream stream;

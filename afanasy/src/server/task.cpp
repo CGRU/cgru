@@ -280,35 +280,33 @@ const std::string Task::getOutputFileName( int startcount) const
    return filename;
 }
 
-bool Task::getOutput( int startcount, af::Msg *msg, std::string & filename, RenderContainer * renders) const
+af::Msg * Task::getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const
 {
 //printf("Task::getOutput:\n");
-   if( progress->starts_count < 1 )
-   {
-      msg->setString("Task is not started.");
-      return false;
-   }
-   if( startcount > progress->starts_count )
-   {
-      std::ostringstream stream;
-      stream << "Task was started " << progress->starts_count << " times ( less than " << startcount << " times ).";
-      msg->setString( stream.str());
-      return false;
-   }
-   if( startcount == 0 )
-   {
-      if( run )
-      {
-         return run->getOutput( startcount, msg, renders);
-      }
-      else
-      {
-         startcount = progress->starts_count;
-      }
-   }
+	if( progress->starts_count < 1 )
+	{
+		o_error = "Task is not started.";
+		return NULL;
+	}
+	if( i_startcount > progress->starts_count )
+	{
+		o_error += "Task was started "+af::itos(progress->starts_count)+" times ( less than "+af::itos(i_startcount)+" times ).";
+		return NULL;
+	}
+	if( i_startcount == 0 )
+	{
+		if( run )
+		{
+			return run->v_getOutput( i_startcount, i_renders, o_error);
+		}
+		else
+		{
+			i_startcount = progress->starts_count;
+		}
+	}
 
-   filename = getOutputFileName( startcount);
-   return true;
+	o_filename = getOutputFileName( i_startcount);
+	return NULL;
 }
 
 const std::string Task::getInfo( bool full) const

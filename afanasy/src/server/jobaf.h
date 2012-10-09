@@ -59,10 +59,12 @@ public:
 
 	af::TaskExec * generateTask( int block, int task) const;
 
-/// Construct message for retrieveing output from running remote host or filename if task is not running
-/** return \c true in success, or \c false with error message to send back to client.
-**/
-   virtual bool getTaskStdOut( const af::MCTaskPos &taskpos, af::Msg *msg, std::string & filename, RenderContainer * renders);
+	const std::string generateTaskName( int i_b, int i_t) const;
+
+/// Construct message for retrieveing output from running remote host or filename if task is not running.
+/** Virtual for system job, it just sets an error that output is not available.**/
+	virtual af::Msg * v_getTaskStdOut( int i_b, int i_t, int i_n, RenderContainer * i_renders,
+		std::string & o_filename, std::string & o_error) const;
 
 /// Whether the job can produce a task
 /** Used to limit nodes for heavy solve algorithm **/

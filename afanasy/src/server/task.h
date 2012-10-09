@@ -50,9 +50,7 @@ public:
    const std::string getOutputFileName( int startcount) const;
 
 /// Construct message for request output from render if task is running, or filename to read output from, if task is not running.
-/** Return \c true on success (and valid message or filename) or \c false on fail with error message for client
-**/
-   bool getOutput( int startcount, af::Msg *msg, std::string & filename, RenderContainer * renders) const;
+	af::Msg * getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_filename, std::string & o_error) const;
 
    void listenOutput( af::MCListenAddress & mclisten, RenderContainer * renders);
 

@@ -44,8 +44,8 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().toUtf8().data(),
    progress->percentframe = -1;
    progress->hostname.clear();
 
-   // Skip starting task if executable is not set (multihost task)
-   if( exec == false) return;
+	// Skip starting task if executable is not set (multihost task)
+	if( exec == NULL) return;
 
    progress->state = AFJOB::STATE_RUNNING_MASK;
    progress->starts_count++;
@@ -314,36 +314,33 @@ printf("Listening running task:"); mclisten.stdOut();
    if( render != NULL) render->sendOutput( mclisten, block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
 }
 
-bool TaskRun::getOutput( int startcount, af::Msg *msg, RenderContainer * renders) const
+af::Msg * TaskRun::v_getOutput( int i_startcount, RenderContainer * i_renders, std::string & o_error) const
 {
-   if( exec == NULL)
-   {
-      msg->setString("TaskRun::getOutput: Task is not started.");
-      return false;
-   }
-   if( hostId > 0 )
-   {
-      RenderContainerIt rendersIt( renders);
-      RenderAf * render = rendersIt.getRender( hostId);
-      if( render != NULL )
-      {
-         af::MCTaskPos taskpos( block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
-         msg->set( af::Msg::TTaskOutputRequest, &taskpos);
-         msg->setAddress( render);
-         return true;
-      }
-      else
-      {
-         msg->setString("TaskRun::getOutput: render == NULL");
-         return false;
-      }
-   }
-   else
-   {
-      msg->setString("TaskRun::getOutput: render_id == 0");
-      return false;
-   }
-  return true;
+	if( exec == NULL)
+	{
+		o_error = "Not started.";
+		return NULL;
+	}
+	if( hostId > 0 )
+	{
+		RenderContainerIt rendersIt( i_renders);
+		RenderAf * render = rendersIt.getRender( hostId);
+		if( render != NULL )
+		{
+			af::MCTaskPos taskpos( block->m_job->getId(), block->m_data->getBlockNum(), tasknum);
+			af::Msg * msg = new af::Msg( af::Msg::TTaskOutputRequest, &taskpos);
+			msg->setAddress( render);
+			return msg;
+		}
+		else
+		{
+			o_error = "TaskRun::getOutput: render is NULL.";
+			return NULL;
+		}
+	}
+
+	o_error = "TaskRun::getOutput: Zero render_id.";
+	return NULL;
 }
 
 int TaskRun::calcWeight() const
