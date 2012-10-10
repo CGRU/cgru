@@ -394,8 +394,11 @@ af::Msg * MonitorAf::getEvents()
 	// Tasks progress:
 	if( m_tp.size())
 	{
-		if( hasevents ) stream << ",";
-		stream << "\n{\"tasks_progress\":[";
+		if( hasevents )
+			stream << ",";
+		else
+			stream << "{";
+		stream << "\n\"tasks_progress\":[";
 		for( int j = 0; j < m_tp.size(); j++)
 		{
 			if( j > 0 ) stream << ",";

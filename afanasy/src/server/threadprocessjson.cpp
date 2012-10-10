@@ -60,8 +60,10 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			{
 				std::vector<int32_t> block_ids;
 				std::vector<int32_t> task_ids;
+				int number = 0;
 				af::jr_int32vec("block_ids", block_ids, getObj);
 				af::jr_int32vec("task_ids", task_ids, getObj);
+				af::jr_int("number", number, getObj);
 				if(( ids.size() == 1 ) && ( block_ids.size() == 1 ) && ( task_ids.size() == 1 ))
 				{
 					af::Msg * msg_request_render = NULL;
@@ -78,9 +80,11 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 							o_msg_response = af::jsonMsgError("Invalid ID");
 						else
 						{
-							msg_request_render = job->v_getTaskStdOut( block_ids[0], task_ids[0], 0,
+							msg_request_render = job->v_getTaskStdOut( block_ids[0], task_ids[0], number,
 								i_args->renders, filename, error);
 							name = job->generateTaskName( block_ids[0], task_ids[0]);
+							if( number > 0 )
+								name += "["+af::itos(number)+"]";
 						}
 					}
 

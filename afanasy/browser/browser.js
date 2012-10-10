@@ -35,6 +35,7 @@ function g_Register()
 
 function g_ProcessMsg( obj)
 {
+//g_Info( g_cycle+' Progessing '+g_recievers.length+' recieves');
 	if( obj.files && obj.path )
 	{
 		for( var i = 0; i < obj.files.length; i++)
@@ -160,19 +161,36 @@ function g_MButtonClick( evt)
 	g_OpenMonitor( el.textContent);
 }
 
-function g_OpenMonitor( i_type, i_id)
+function g_OpenMonitor( i_type, i_document, i_id, i_name)
 {
+	var elParent = document.getElementById('content');
+	if( i_document == null )
+		i_document = document;
+	else
+		elParent = i_document.body;
+
 	for( var i = 0; i < g_monitor_buttons.length; i++)
 		if( g_monitor_buttons[i].textContent == i_type )
 			g_monitor_buttons[i].classList.add('pushed');
 
-	new Monitor( document.getElementById('content'), i_type, i_id);
+	return new Monitor( i_document, elParent, i_type, i_id, i_name);
 }
 
-function g_OpenTasks( i_job_id)
+function g_OpenTasks( i_job_name, i_job_id)
 {
-	g_CloseAllMonitors();
-	g_OpenMonitor('tasks', i_job_id);
+//g_CloseAllMonitors();g_OpenMonitor('tasks', null, i_job_id);return;
+	var wnd = window.open( null, i_job_name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+
+	wnd.document.write('<html><head><title>'+i_job_name+'</title>');
+	wnd.document.write('<link type="text/css" rel="stylesheet" href="lib/styles.css">');
+	wnd.document.write('<link type="text/css" rel="stylesheet" href="afanasy/browser/style.css">');
+	wnd.document.write('</head><body></body></html>');
+
+	var monitor = g_OpenMonitor('tasks', wnd.document, i_job_id, i_job_name);
+	wnd.monitor = monitor;
+	wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
+
+	wnd.focus();
 }
 
 function g_ShowMessage( msg)

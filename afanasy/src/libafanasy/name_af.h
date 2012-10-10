@@ -221,6 +221,7 @@ namespace af
 	bool jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_regexp( const char * i_name, RegExp      & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_bool  ( const char * i_name, bool        & o_attr, const JSON & i_object, std::string * o_str = NULL);
+	bool jr_int   ( const char * i_name, int         & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int8  ( const char * i_name, int8_t      & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_uint8 ( const char * i_name, uint8_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_int16 ( const char * i_name, int16_t     & o_attr, const JSON & i_object, std::string * o_str = NULL);

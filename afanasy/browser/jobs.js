@@ -18,7 +18,6 @@ JobNode.prototype.init = function()
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
-	this.elName.title = 'Job Name';
 
 	this.elUserName = cm_ElCreateFloatText( this.element,	'right', 'User Name');
 
@@ -61,6 +60,7 @@ JobNode.prototype.update = function()
 		displayFull = true;
 
 	this.elName.textContent = this.params.name;
+	this.elName.title = 'ID = '+this.params.id;
 	this.elPriority.textContent = 'P' + this.params.priority;
 	this.elUserName.textContent = this.params.user_name;
 
@@ -139,7 +139,7 @@ JobNode.prototype.refresh = function()
 
 JobNode.prototype.onDoubleClick = function()
 {
-	g_OpenTasks( this.params.id );
+	g_OpenTasks( this.params.name, this.params.id );
 }
 
 function JobBlock( i_elParent, i_block)

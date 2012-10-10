@@ -11,7 +11,7 @@ function nw_Send( obj)
 
 document.getElementById('send').textContent='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
 
-	var xhr = new XMLHttpRequest;
+	var xhr = new XMLHttpRequest();
 	xhr.overrideMimeType('application/json');
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 	xhr.open('POST', '/', true); 
@@ -27,7 +27,19 @@ document.getElementById('recv').textContent='c' + nw_recv_count + ' recv: ' + xh
 				nw_error_count = 0;
 				nw_connected = true;
 //				g_ProcessMsg( eval('('+xhr.responseText+')'));
-				g_ProcessMsg( JSON.parse( xhr.responseText));
+//				g_ProcessMsg( JSON.parse( xhr.responseText));
+
+				var newobj = null;
+				try { newobj = JSON.parse( xhr.responseText);}
+				catch( err)
+				{
+					window.console.log(err.message+'\n\n'+xhr.responseText);
+					newobj = null;
+				}
+
+				if( newobj )
+					g_ProcessMsg( JSON.parse( xhr.responseText));
+
 				return;
 			}
 			nw_error_count++;
@@ -76,7 +88,7 @@ function nw_GetEvents()
 	nw_Send(obj);
 }
 
-function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks)
+function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number)
 {
 	var obj = {};
 	obj.get = {};
@@ -89,6 +101,8 @@ function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks)
 		obj.get.block_ids = i_blocks;
 	if( i_tasks )
 		obj.get.task_ids = i_tasks;
+	if( i_number )
+		obj.get.number = i_number;
 
 	nw_Send(obj);
 }

@@ -39,15 +39,15 @@ TaskItem.prototype.init = function()
 {
 	this.element.classList.add('task');
 
-	this.elProgress = document.createElement('span');
+	this.elProgress = this.monitor.document.createElement('span');
 	this.element.appendChild( this.elProgress);
 	this.elProgress.classList.add('bar');
 
-	this.elName = document.createElement('span');
+	this.elName = this.monitor.document.createElement('span');
 	this.element.appendChild( this.elName);
 	this.elName.title = 'Task name';
 
-	this.elPercent = document.createElement('span');
+	this.elPercent = this.monitor.document.createElement('span');
 	this.element.appendChild( this.elPercent);
 
 	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Task State');
@@ -187,14 +187,42 @@ g_Info('bids='+o_bids+' tids='+o_tids);
 
 TaskItem.prototype.onContextMenu = function( i_menu)
 {
-	i_menu.addItem('output', this, 'menuHandleGet', 'Output');
 	if( this.prgs.str && ( this.prgs.str > 1 ))
-		i_menu.addItem('output#', this, 'menuHandleGet', 'Output #');
+	{
+		for( var i = this.prgs.str; i > 0; i--)
+		{
+			if( i <= this.prgs.str - 3) break;
+			i_menu.addItem('output', this, 'menuHandleOutput', 'Output '+i, true, i);
+		}
+		if( this.prgs.str > 3 )
+			i_menu.addItem('output', this, 'menuHandleOutput', 'Output...', true, -1);
+	}
+	else
+		i_menu.addItem('output', this, 'menuHandleOutput', 'Output');
+	i_menu.addItem();
 	i_menu.addItem('log',    this, 'menuHandleGet', 'Log');
 	i_menu.addItem('info',   this, 'menuHandleGet', 'Info');
 	i_menu.addItem();
 	i_menu.addItem('restart', this, 'menuHandleOperation', 'Restart');
 	i_menu.addItem('skip',    this, 'menuHandleOperation', 'Skip');
+}
+
+TaskItem.prototype.menuHandleOutput = function( i_number)
+{
+	if( i_number == -1 )
+	{
+		new cgru_Dialog( this.monitor.document, this.monitor.document.body, this, 'menuHandleGet', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
+		return;
+	}
+//	this.menuHandleGet('output', i_number);
+	nw_GetNodes('jobs', [this.job.id], 'output', [this.block.block_num], [this.task_num], i_number)
+}
+
+TaskItem.prototype.menuHandleGet = function( i_name, i_number)
+{
+	var bids = []; var tids = [];
+	this.getBlockTasksIds( bids, tids);
+	nw_GetNodes('jobs', [this.job.id], i_name, bids, tids, i_number)
 }
 
 TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
@@ -210,13 +238,6 @@ TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 TaskItem.prototype.onDoubleClick = function()
 {
 	this.menuHandleGet('info');
-}
-
-TaskItem.prototype.menuHandleGet = function( i_name)
-{
-	var bids = []; var tids = [];
-	this.getBlockTasksIds( bids, tids);
-	nw_GetNodes('jobs', [this.job.id], i_name, bids, tids)
 }
 
 /*

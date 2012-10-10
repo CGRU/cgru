@@ -1,16 +1,18 @@
-function Monitor( i_element, i_type, i_id)
+function Monitor( i_document, i_element, i_type, i_id, i_name)
 {
+	this.document = i_document;
 	this.type = i_type;
 	this.elParent = i_element;
+	this.name = i_name ? i_name : i_type;
 
-	this.elMonitor = document.createElement('div');
+	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild( this.elMonitor);
 	this.elMonitor.classList.add('monitor');
 	this.elMonitor.monitor = this;
 
-	this.elList = document.createElement('div');
-	this.elCtrl = document.createElement('div');
-	this.elInfo = document.createElement('div');
+	this.elList = this.document.createElement('div');
+	this.elCtrl = this.document.createElement('div');
+	this.elInfo = this.document.createElement('div');
 	this.elMonitor.appendChild( this.elList);
 	this.elMonitor.appendChild( this.elCtrl);
 	this.elMonitor.appendChild( this.elInfo);
@@ -18,12 +20,11 @@ function Monitor( i_element, i_type, i_id)
 	this.elCtrl.classList.add('ctrl');
 	this.elInfo.classList.add('info');
 
-//	this.elList.onmousedown = function(e) { return false;}
-/*	this.elList.oncontextmenu = this.onContextMenu;
 	this.elList.monitor = this;
-	this.elList.EType = 'list';*/
+	this.elList.oncontextmenu = function(e){ return e.currentTarget.monitor.noneSelected(e);}
+	this.elList.onmousedown   = function(e){ return e.currentTarget.monitor.noneSelected(e);}
 
-	this.elCtrlButtons = document.createElement('div');
+	this.elCtrlButtons = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlButtons);
 	this.elCtrlButtons.style.position = 'absolute';
 	this.elCtrlButtons.style.width = '100px';
@@ -31,7 +32,7 @@ function Monitor( i_element, i_type, i_id)
 	var buttons_width = 0;
 	if( this.type == 'jobs' || this.type == 'renders')
 	{
-		this.elCtrlSet = document.createElement('div');
+		this.elCtrlSet = this.document.createElement('div');
 		this.elCtrlButtons.appendChild( this.elCtrlSet);
 		this.elCtrlSet.classList.add('ctrl_button');
 		this.elCtrlSet.textContent = 'SET';
@@ -42,7 +43,7 @@ function Monitor( i_element, i_type, i_id)
 
 		if( this.type == 'renders' )
 		{
-			this.elCtrlAux1 = document.createElement('div');
+			this.elCtrlAux1 = this.document.createElement('div');
 			this.elCtrlButtons.appendChild( this.elCtrlAux1);
 			this.elCtrlAux1.classList.add('ctrl_button');
 			this.elCtrlAux1.textContent = 'POW';
@@ -53,7 +54,7 @@ function Monitor( i_element, i_type, i_id)
 		}
 	}
 
-	this.elCtrlSortFilter = document.createElement('div');
+	this.elCtrlSortFilter = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSortFilter);
 	this.elCtrlSortFilter.style.position = 'absolute';
 	this.elCtrlSortFilter.style.left = buttons_width+'px';
@@ -62,17 +63,17 @@ function Monitor( i_element, i_type, i_id)
 	this.elCtrlSortFilter.style.bottom = '0';
 //this.elCtrlSortFilter.style.border = '1px solid #333';
 
-	this.elCtrlSort = document.createElement('div');
+	this.elCtrlSort = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('ctrl_sort');
 	this.elCtrlSort.textContent = 'Sort:';
 
-	this.elCtrlFilter = document.createElement('div');
+	this.elCtrlFilter = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
 	this.elCtrlFilter.classList.add('ctrl_filter');
 	this.elCtrlFilter.textContent = 'Filter:';
 
-	this.elInfoText = document.createElement('div');
+	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
 	this.elInfoText.textContent = this.type;
 	this.elInfo.appendChild( this.elInfoText);
@@ -84,9 +85,9 @@ function Monitor( i_element, i_type, i_id)
 //	this.valid = false;
 	for( i = 0; i < g_recievers.length; i++)
 	{
-		if( g_recievers[i].type == this.type )
+		if( g_recievers[i].name == this.name )
 		{
-			info('ERROR: Monitor[' + this.type + '] list already exists.');
+			g_Info('ERROR: Monitor[' + this.name + '] list already exists.');
 			return;
 		}
 	}
@@ -115,6 +116,7 @@ function Monitor( i_element, i_type, i_id)
 
 Monitor.prototype.destroy = function()
 {
+g_Info('Destroying '+this.name);
 	if( this.menu ) this.menu.destroy();
 	if( g_cur_monitor == this ) g_cur_monitor = null;
 	cm_ArrayRemove(	g_recievers, this);
@@ -130,7 +132,8 @@ Monitor.prototype.destroy = function()
 
 	this.items = [];
 
-	this.elParent.removeChild( this.elMonitor);
+	if( this.elParent )
+		this.elParent.removeChild( this.elMonitor);
 }
 
 Monitor.prototype.refresh = function()
@@ -156,6 +159,7 @@ Monitor.prototype.refresh = function()
 
 Monitor.prototype.processMsg = function( obj)
 {
+//this.info('New message '+this.cycle+':'+JSON.stringify(obj));
 	if( obj.events != null )
 	{
 		if( this.type == 'tasks')
@@ -264,7 +268,7 @@ Monitor.prototype.newNode = function( i_obj)
 
 Monitor.prototype.createItem = function( i_item, i_obj)
 {
-	i_item.element = document.createElement('div');
+	i_item.element = this.document.createElement('div');
 	i_item.element.className = 'item';
 	this.elList.appendChild( i_item.element);
 
@@ -288,6 +292,7 @@ Monitor.prototype.info = function( i_str)
 
 Monitor.prototype.onMouseDown = function( i_evt, i_el)
 {
+	i_evt.stopPropagation();
 	g_cur_monitor = this;
 	if( this.menu )
 	{
@@ -391,13 +396,14 @@ Monitor.prototype.selectNext = function( i_evt, previous)
 
 Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
+	i_evt.stopPropagation();
 	g_cur_monitor = this;
 	if( this.menu ) this.menu.destroy();
 	if( i_el.selected != true )
 		this.selectAll( false);
 	this.elSetSelected( i_el, true);
 
-	var menu = new cgru_Menu( document, document.body, i_evt, this, this.type+'_context', 'onMenuDestroy');
+	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_context', 'onMenuDestroy');
 	this.menu = menu;
 	if( i_el.item.onContextMenu )
 		i_el.item.onContextMenu( menu);
@@ -440,7 +446,7 @@ Monitor.prototype.onMouseOverSet = function( i_evt, i_name)
 	if( this.hasSelection() == false ) return;
 	if( i_name == null ) i_name = 'set';
 
-	var menu = new cgru_Menu( document, document.body, i_evt, this, this.type+'_set', 'onMenuDestroy');
+	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_set', 'onMenuDestroy');
 	this.menu = menu;
 	var actions = this.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
@@ -483,7 +489,7 @@ Monitor.prototype.menuHandleDialog = function( i_name)
 			}*/
 		}
 	}
-	new cgru_Dialog( document, document.body, reciever, handle, parameter, ptype, value, this.type+'_parameter');
+	new cgru_Dialog( this.document, this.document.body, reciever, handle, parameter, ptype, value, this.name+'_parameter');
 }
 Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
@@ -524,6 +530,17 @@ Monitor.prototype.hasSelection = function()
 	for( var i = 0; i < this.items.length; i++)
 		if( this.items[i].element.selected == true )
 			return true;
+	return false;
+}
+
+Monitor.prototype.noneSelected = function( i_evt)
+{//return false;
+	i_evt.stopPropagation();
+	if( i_evt.ctrlKey  ) return false;
+	if( i_evt.shiftKey ) return false;
+//	this.selectAll( false);
+	if( this.menu)
+		this.menu.destroy();
 	return false;
 }
 
@@ -608,7 +625,7 @@ Monitor.prototype.getBlocks = function( i_block_ids)
 	modes = [];
 
 //var test = 'block ids:'
-//document.getElementById('test').textContent = test;
+//this.document.getElementById('test').textContent = test;
 
 	for( var i = 0; i < i_block_ids.job_id.length; i++)
 	{
@@ -619,7 +636,7 @@ Monitor.prototype.getBlocks = function( i_block_ids)
 		modes.push( i_block_ids.mode[i]);
 	}
 
-//document.getElementById('test').textContent = test;
+//this.document.getElementById('test').textContent = test;
 
 	if( blocks.length == 0 ) return;
 

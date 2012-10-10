@@ -146,6 +146,16 @@ bool af::jr_bool  ( const char * i_name, bool        & o_attr, const JSON & i_ob
 	return true;
 }
 
+bool af::jr_int   ( const char * i_name, int         & o_attr, const JSON & i_object, std::string * o_str)
+{
+	const JSON & value = i_object[i_name];
+	if( false == value.IsInt()) return false;
+	o_attr = value.GetInt();
+	if( o_str ) *o_str += std::string("\n\"") + i_name + "\" set to " + af::itos(o_attr) + "";
+	return true;
+}
+
+
 bool af::jr_int8  ( const char * i_name, int8_t      & o_attr, const JSON & i_object, std::string * o_str)
 {
 	const JSON & value = i_object[i_name];
