@@ -399,10 +399,15 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 
 	var menu = new cgru_Menu( document, document.body, i_evt, this, this.type+'_context', 'onMenuDestroy');
 	this.menu = menu;
-	var actions = i_el.item.constructor.actions;
-	for( var i = 0; i < actions.length; i++)
-		if( actions[i][0] == 'context' )
-			this.addMenuItem( menu, actions[i]);
+	if( i_el.item.onContextMenu )
+		i_el.item.onContextMenu( menu);
+	else
+	{
+		var actions = i_el.item.constructor.actions;
+		for( var i = 0; i < actions.length; i++)
+			if( actions[i][0] == 'context' )
+				this.addMenuItem( menu, actions[i]);
+	}
 	menu.show();
 
 	return false;

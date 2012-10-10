@@ -39,16 +39,16 @@ TaskItem.prototype.init = function()
 {
 	this.element.classList.add('task');
 
-	this.progress = document.createElement('span');
-	this.element.appendChild( this.progress);
-	this.progress.classList.add('bar');
+	this.elProgress = document.createElement('span');
+	this.element.appendChild( this.elProgress);
+	this.elProgress.classList.add('bar');
 
 	this.elName = document.createElement('span');
 	this.element.appendChild( this.elName);
 	this.elName.title = 'Task name';
 
-	this.percent = document.createElement('span');
-	this.element.appendChild( this.percent);
+	this.elPercent = document.createElement('span');
+	this.element.appendChild( this.elPercent);
 
 	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Task State');
 	this.elStarts = cm_ElCreateFloatText( this.element, 'right', 'Starts Count');
@@ -71,29 +71,29 @@ TaskItem.prototype.update = function()
 
 TaskItem.prototype.updateProgress = function( i_progress)
 {
-//	this.progress = progress;
+	this.prgs = i_progress;
 
-	cm_GetState( i_progress.state, this.element, this.elState);
+	cm_GetState( this.prgs.state, this.element, this.elState);
 //	this.elState.textContent = state.string;
 
-	if( i_progress.str ) this.elStarts.textContent = 's' + i_progress.str;
+	if( this.prgs.str ) this.elStarts.textContent = 's' + this.prgs.str;
 	else this.elStarts.textContent = 's0';
-	if( i_progress.err ) this.elErrors.textContent = 'e' + i_progress.err;
+	if( this.prgs.err ) this.elErrors.textContent = 'e' + this.prgs.err;
 	else this.elErrors.textContent = 'e0';
-	if( i_progress.hst ) this.elHost.textContent = i_progress.hst;
+	if( this.prgs.hst ) this.elHost.textContent = this.prgs.hst;
 
 	var percent = 0;
-	if( this.elState.RUN && i_progress.per ) percent = i_progress.per;
+	if( this.elState.RUN && this.prgs.per ) percent = this.prgs.per;
 	if( this.elState.DON ) percent = 100;
 	if( this.elState.SKP ) percent = 100;
 	if( percent < 0 ) percent = 0;
 	if( percent > 100 ) percent = 100;
 
 	if( this.elState.RUN )
-		this.percent.textContent = ' ' + percent + '%';
+		this.elPercent.textContent = ' ' + percent + '%';
 	else
-		this.percent.textContent = '';
-	this.progress.style.width = ( percent + '%');
+		this.elPercent.textContent = '';
+	this.elProgress.style.width = ( percent + '%');
 }
 
 TaskItem.prototype.genName = function()
@@ -185,6 +185,18 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 g_Info('bids='+o_bids+' tids='+o_tids);
 }
 
+TaskItem.prototype.onContextMenu = function( i_menu)
+{
+	i_menu.addItem('output', this, 'menuHandleGet', 'Output');
+	if( this.prgs.str && ( this.prgs.str > 1 ))
+		i_menu.addItem('output#', this, 'menuHandleGet', 'Output #');
+	i_menu.addItem('log',    this, 'menuHandleGet', 'Log');
+	i_menu.addItem('info',   this, 'menuHandleGet', 'Info');
+	i_menu.addItem();
+	i_menu.addItem('restart', this, 'menuHandleOperation', 'Restart');
+	i_menu.addItem('skip',    this, 'menuHandleOperation', 'Skip');
+}
+
 TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 {
 	var operation = {};
@@ -207,7 +219,7 @@ TaskItem.prototype.menuHandleGet = function( i_name)
 	nw_GetNodes('jobs', [this.job.id], i_name, bids, tids)
 }
 
-
+/*
 TaskItem.actions = [];
 
 TaskItem.actions.push(['context', 'output',  null, 'menuHandleGet', 'Output']);
@@ -216,4 +228,5 @@ TaskItem.actions.push(['context', 'info',    null, 'menuHandleGet', 'Info']);
 
 TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Restart']);
 TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
+*/
 
