@@ -1,4 +1,5 @@
 g_cycle = 0;
+g_last_msg_cycle = g_cycle;
 g_id = 0;
 g_uids = [0];
 g_name = 'web';
@@ -6,6 +7,7 @@ g_version = 'browser';
 g_user_name = "jimmy";
 g_host_name = "pc01";
 
+g_windows = [];
 g_recievers = [];
 g_refreshers = [];
 g_monitors = [];
@@ -17,7 +19,6 @@ g_Images = [];
 if( localStorage['user_name'] == null )
 	localStorage['user_name'] = 0;
 localStorage['user_name']++;
-
 
 function g_Register()
 {
@@ -35,6 +36,7 @@ function g_Register()
 
 function g_ProcessMsg( obj)
 {
+g_last_msg_cycle = g_cycle;
 //g_Info( g_cycle+' Progessing '+g_recievers.length+' recieves');
 	if( obj.files && obj.path )
 	{
@@ -47,7 +49,7 @@ function g_ProcessMsg( obj)
 		return;
 	}
 
-	if( obj.id )
+	if( obj.id != null )
 	{
 		if(( g_id == 0 ) && ( obj.id > 0 ))
 		{
@@ -90,6 +92,12 @@ function g_ProcessMsg( obj)
 
 function g_Refresh()
 {
+	if(( g_last_msg_cycle != null ) && ( g_last_msg_cycle < g_cycle - 10 ))
+	{
+g_Info( g_last_msg_cycle + ' < ' + g_cycle );
+		g_ConnectionLost();
+	}
+
 	g_cycle++;
 	setTimeout("g_Refresh()", 1000);
 
@@ -116,7 +124,19 @@ function g_Init()
 	nw_GetSoftwareIcons();
 	g_Register();
 	g_Refresh();
-	cm_Init();
+
+	window.onbeforeunload = g_OnClose;
+	document.body.onkeydown = g_OnKeyDown;
+}
+
+function g_OnClose()
+{
+	var operation = {};
+	operation.type = 'deregister';
+	if( g_id)
+		nw_Action('monitors', [g_id], operation);
+	g_CloseAllWindows();
+	g_CloseAllMonitors();
 }
 
 function g_Registered()
@@ -129,6 +149,7 @@ function g_Registered()
 
 function g_Deregistered()
 {
+//g_Info('Deregistered.');
 	g_id = 0;
 	g_CloseAllMonitors();
 	g_Register();
@@ -136,6 +157,7 @@ function g_Deregistered()
 
 function g_ConnectionLost()
 {
+	g_Info('Connection Lost.');
 	g_Deregistered();
 }
 
@@ -179,51 +201,64 @@ function g_OpenMonitor( i_type, i_document, i_id, i_name)
 function g_OpenTasks( i_job_name, i_job_id)
 {
 //g_CloseAllMonitors();g_OpenMonitor('tasks', null, i_job_id);return;
-	var wnd = window.open( null, i_job_name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
-
-	wnd.document.write('<html><head><title>'+i_job_name+'</title>');
-	wnd.document.write('<link type="text/css" rel="stylesheet" href="lib/styles.css">');
-	wnd.document.write('<link type="text/css" rel="stylesheet" href="afanasy/browser/style.css">');
-	wnd.document.write('</head><body></body></html>');
-
+	var wnd = g_OpenWindow( i_job_name, i_job_name);
 	var monitor = g_OpenMonitor('tasks', wnd.document, i_job_id, i_job_name);
 	wnd.monitor = monitor;
 	wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
-
-	wnd.focus();
 }
 
 function g_ShowMessage( msg)
 {
 	if( msg.list == null ) return;
-	var wnd = window.open( null, 'Message', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
-	wnd.document.writeln('<!DOCTYPE html>');
-	wnd.document.write('<html><head><title>'+msg.name+':'+msg.type+'</title></head>');
-	wnd.document.write('<body style="font: 12px Arial; background: #CCC;">');
-
+	var name = msg.name+'_'+msg.type;
+	var title = msg.name+':'+msg.type;
+	var wnd = g_OpenWindow( name, title);
 	for( i = 0; i < msg.list.length; i++)
 		wnd.document.write('<div>'+((msg.list[i]).replace(/\n/g,'<br/>'))+'</div>');
-
-	wnd.document.write('</body></html>');
-	wnd.focus();
 }
 
 function g_ShowObject( obj)
 {
 	var title = 'Object';
 	if( obj.name ) title = obj.name;
-	var wnd = window.open( null, 'Message', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
-	wnd.document.writeln('<!DOCTYPE html>');
-	wnd.document.write('<html><head><title>'+title+'</title></head>');
-	wnd.document.write('<body style="font: 12px Arial; background: #CCC;">');
-
+	var wnd = g_OpenWindow( title, title);
 	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
 	wnd.document.write( obj_str.replace(/\n/g,'<br/>'));
-//	for( i = 0; i < msg.list.length; i++)
-//		wnd.document.write('<div>'+msg.list[i].replace('\n','<br/>')+'</div>');
+}
 
-	wnd.document.write('</body></html>');
+function g_OpenWindow( i_name, i_title, i_focus )
+{
+	for( var i = 0; i < g_windows.length; i++)
+		if( g_windows[i].name == i_name )
+			if( i_focus )
+			{
+				g_windows[i].focus();
+				return;
+			}
+			else
+			{
+				g_windows[i].close();
+			}
+
+	var wnd = window.open( null, i_name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	g_windows.push( wnd);
+	wnd.name = i_name;
+
+	wnd.document.writeln('<!DOCTYPE html>');
+	wnd.document.write('<html><head><title>'+i_title+'</title>');
+	wnd.document.write('<link type="text/css" rel="stylesheet" href="lib/styles.css">');
+	wnd.document.write('<link type="text/css" rel="stylesheet" href="afanasy/browser/style.css">');
+	wnd.document.write('</head><body></body></html>');
+	wnd.document.body.onkeydown = g_OnKeyDown;
 	wnd.focus();
+
+	return wnd;
+}
+
+function g_CloseAllWindows()
+{
+	for( var i = 0; i < g_windows.length; i++)
+		g_windows[i].close();
 }
 
 function g_Info( i_msg, i_elem)
@@ -236,4 +271,31 @@ function g_Info( i_msg, i_elem)
 function g_Error( i_err)
 {
 	g_Info('Error: ' + i_err);
+}
+
+function g_OnKeyDown(e)
+{
+	if(!e) return;
+	if(e.keyCode==27) // ESC
+	{
+		for( var i = 0; i < g_monitors.length; i++)
+		{
+			g_monitors[i].selectAll( false);
+		}
+		cgru_ClosePopus();
+		return;
+	}
+
+	if( cgru_DialogsAll.length || cgru_MenusAll.length ) return;
+
+	if(e.keyCode==65 && e.ctrlKey) // CTRL+A
+	{
+		if( g_cur_monitor) g_cur_monitor.selectAll( true);
+		return false;
+	}
+	else if((e.keyCode==38) && g_cur_monitor) g_cur_monitor.selectNext( e, true ); // UP
+	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( e, false); // DOWN
+//	else if(evt.keyCode==116) return false; // F5
+//document.getElementById('test').textContent='key down: ' + e.keyCode;
+//	return true; 
 }

@@ -9,6 +9,7 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elParent.appendChild( this.elMonitor);
 	this.elMonitor.classList.add('monitor');
 	this.elMonitor.monitor = this;
+//	this.elMonitor.onkeydown = cm_OnKeyDown;
 
 	this.elList = this.document.createElement('div');
 	this.elCtrl = this.document.createElement('div');

@@ -1,9 +1,9 @@
 body {
-font: 16px Arial;
+font: 12px Arial;
 background: #ab8;
 }
 
-* {
+#content,#header,#footer * {
 margin: 0;
 padding: 0;
 overflow: hidden;
@@ -11,14 +11,13 @@ user-select: none;
 -moz-user-select: none;
 -webkit-user-select: none;
 }
-
 #header,#footer {
 position: absolute;
 left: 0; right: 0;
 height: 46px;
 border: 2px solid #555;
 box-shadow: 0px 0px 10px #000;
-/*background: #AAA;*/
+overflow: hidden;
 }
 #header { top: 0; }
 #footer {
@@ -31,10 +30,11 @@ position: absolute;
 left: 0; right: 0;
 top: 50px;
 bottom: 50px;
-/*overflow: auto;*/
+overflow: hidden;
 }
 
 .mbutton {
+font: 16px Arial;
 font-weight: bold;
 position: relative;
 background: #DDD;

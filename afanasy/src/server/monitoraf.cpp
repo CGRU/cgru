@@ -63,6 +63,11 @@ void MonitorAf::v_action( Action & i_action)
 			AFCommon::QueueMsgDispatch( msg);
 			return;
 		}
+		if( optype == "deregister")
+		{
+			setZombie();
+			i_action.monitors->addEvent( af::Msg::TMonitorMonitorsDel, getId());
+		}
 		if( optype == "watch")
 		{
 			std::string opclass, opstatus;
@@ -93,7 +98,7 @@ void MonitorAf::v_action( Action & i_action)
 				std::vector<int32_t> jids;
 				af::jr_int32vec("ids", jids, operation);
 				if( subscribe )
-					setJobIds( jids);
+					addJobIds( jids);
 				else
 					delJobIds( jids);
 			}
@@ -251,7 +256,8 @@ bool MonitorAf::hasJobId( int id) const
 
 void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 {
-	for( int i = 0; i < i_ids[i]; i++)
+//printf("MonitorAf::addJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
+	for( int i = 0; i < i_ids.size(); i++)
 	{
 		if( hasJobId( i_ids[i]) == false)
 		{
@@ -262,12 +268,14 @@ void MonitorAf::addJobIds( const std::vector<int32_t> & i_ids)
 
 void MonitorAf::setJobIds( const std::vector<int32_t> & i_ids)
 {
+//printf("MonitorAf::setJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
 	jobsIds.clear();
 	for( int i = 0; i < i_ids.size(); i++) jobsIds.push_back( i_ids[i]);
 }
 
 void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 {
+//printf("MonitorAf::delJobIds:[%d]",getId());for(int i=0;i<i_ids.size();i++)printf(" %d",i_ids[i]);printf("\n");
 	for( int i = 0; i < i_ids.size(); i++) jobsIds.remove( i_ids[i]);
 }
 
