@@ -107,6 +107,14 @@ border-radius: 4px;
 }
 .ctrl_sort   { left: 5px; right: 60%; }
 .ctrl_filter { left: 41%; right: 5px; }
+.ctrl_filter_label { float: left;}
+.ctrl_filter_input
+{
+position: absolute;
+box-shadow: 0px 0px 5px #000 inset;
+left: 45px; top: 2px; bottom: 2px; right: 10px;
+padding: 3px;
+}
 
 .monitor .info .text {
 position: absolute;

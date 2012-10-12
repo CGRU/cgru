@@ -12,6 +12,7 @@ g_recievers = [];
 g_refreshers = [];
 g_monitors = [];
 g_cur_monitor = null;
+g_main_monitor = null;
 g_monitor_buttons = [];
 
 g_Images = [];
@@ -36,8 +37,9 @@ function g_Register()
 
 function g_ProcessMsg( obj)
 {
-g_last_msg_cycle = g_cycle;
 //g_Info( g_cycle+' Progessing '+g_recievers.length+' recieves');
+	g_last_msg_cycle = g_cycle;
+
 	if( obj.files && obj.path )
 	{
 		for( var i = 0; i < obj.files.length; i++)
@@ -93,15 +95,10 @@ g_last_msg_cycle = g_cycle;
 function g_Refresh()
 {
 	if(( g_last_msg_cycle != null ) && ( g_last_msg_cycle < g_cycle - 10 ))
-	{
-g_Info( g_last_msg_cycle + ' < ' + g_cycle );
 		g_ConnectionLost();
-	}
 
 	g_cycle++;
 	setTimeout("g_Refresh()", 1000);
-
-//	document.getElementById('id').textContent = 'ID = ' + g_id + ' c' + g_cycle;
 
 	if( g_id == 0 )
 		return;
@@ -119,7 +116,7 @@ function g_Init()
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
 	for( var i = 0; i < g_monitor_buttons.length; i++)
-		g_monitor_buttons[i].onclick = g_MButtonClick;
+		g_monitor_buttons[i].onclick = function(e){return g_MButtonClicked(e.currentTarget.textContent,e);};
 
 	nw_GetSoftwareIcons();
 	g_Register();
@@ -129,22 +126,10 @@ function g_Init()
 	document.body.onkeydown = g_OnKeyDown;
 }
 
-function g_OnClose()
-{
-	var operation = {};
-	operation.type = 'deregister';
-	if( g_id)
-		nw_Action('monitors', [g_id], operation);
-	g_CloseAllWindows();
-	g_CloseAllMonitors();
-}
-
 function g_Registered()
 {
 	g_Info('Registed: ID = ' + g_id + ' User = ' + localStorage['user_name']);
-	g_OpenMonitor('jobs');
-//	g_OpenMonitor('renders');
-//	g_OpenMonitor('users');
+	g_MButtonClicked('jobs');
 }
 
 function g_Deregistered()
@@ -161,6 +146,74 @@ function g_ConnectionLost()
 	g_Deregistered();
 }
 
+function g_MButtonClicked( i_type, i_evt)
+{
+	for( var i = 0; i < g_monitor_buttons.length; i++)
+		if( g_monitor_buttons[i].textContent == i_type )
+			if( g_monitor_buttons[i].classList.contains('pushed'))
+				return;
+			else
+				g_monitor_buttons[i].classList.add('pushed');
+
+	var new_wnd = true;
+	if( i_evt )
+	{
+		if( i_evt.shiftKey ) new_wnd = false;
+		if( i_evt.ctrlKey ) new_wnd = false;
+		if( i_evt.altKey ) new_wnd = false;
+	}
+	else
+		new_wnd = false;
+
+	g_OpenMonitor( i_type, new_wnd);
+}
+
+function g_MonitorClosed( i_name)
+{
+	for( var i = 0; i < g_monitor_buttons.length; i++)
+		if( g_monitor_buttons[i].textContent == i_name )
+			g_monitor_buttons[i].classList.remove('pushed');
+}
+
+function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
+{
+	if( i_name == null )
+		i_name = i_type;
+
+	for( var i = 0; i < g_monitors.length; i++)
+		if( g_monitors[i].name == i_name )
+		{
+			g_Error('Monitor "'+i_name+'" already opened.');
+			return;
+		}
+
+	var doc = document;
+	var elParent = document.getElementById('content');
+	var wnd = null;
+	if( i_new_wnd )
+	{
+		wnd = g_OpenWindow( i_name);
+		if( wnd == null ) return;
+		doc = wnd.document;
+		elParent = doc.body;
+	}
+	else if( g_main_monitor )
+		g_main_monitor.destroy();
+
+	var monitor = new Monitor( doc, elParent, i_type, i_id, i_name);
+
+	if( i_new_wnd )
+	{
+		wnd.monitor = monitor;
+		wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
+	}
+	else
+		g_main_monitor = monitor;
+
+	return monitor;
+}
+function g_OpenTasks( i_job_name, i_job_id) { g_OpenMonitor('tasks', true, i_job_id, i_job_name);}
+
 function g_CloseAllMonitors()
 {
 	cgru_ClosePopus();
@@ -172,47 +225,13 @@ function g_CloseAllMonitors()
 		g_monitors[0].destroy();
 }
 
-function g_MButtonClick( evt)
-{
-	if( evt == null ) return;
-	var el = evt.currentTarget;
-	if( el == null ) return;
-
-	g_CloseAllMonitors();
-
-	g_OpenMonitor( el.textContent);
-}
-
-function g_OpenMonitor( i_type, i_document, i_id, i_name)
-{
-	var elParent = document.getElementById('content');
-	if( i_document == null )
-		i_document = document;
-	else
-		elParent = i_document.body;
-
-	for( var i = 0; i < g_monitor_buttons.length; i++)
-		if( g_monitor_buttons[i].textContent == i_type )
-			g_monitor_buttons[i].classList.add('pushed');
-
-	return new Monitor( i_document, elParent, i_type, i_id, i_name);
-}
-
-function g_OpenTasks( i_job_name, i_job_id)
-{
-//g_CloseAllMonitors();g_OpenMonitor('tasks', null, i_job_id);return;
-	var wnd = g_OpenWindow( i_job_name, i_job_name);
-	var monitor = g_OpenMonitor('tasks', wnd.document, i_job_id, i_job_name);
-	wnd.monitor = monitor;
-	wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
-}
-
 function g_ShowMessage( msg)
 {
 	if( msg.list == null ) return;
 	var name = msg.name+'_'+msg.type;
 	var title = msg.name+':'+msg.type;
 	var wnd = g_OpenWindow( name, title);
+	if( wnd == null ) return;
 	for( i = 0; i < msg.list.length; i++)
 		wnd.document.write('<div>'+((msg.list[i]).replace(/\n/g,'<br/>'))+'</div>');
 }
@@ -222,12 +241,16 @@ function g_ShowObject( obj)
 	var title = 'Object';
 	if( obj.name ) title = obj.name;
 	var wnd = g_OpenWindow( title, title);
+	if( wnd == null ) return;
 	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
 	wnd.document.write( obj_str.replace(/\n/g,'<br/>'));
 }
 
 function g_OpenWindow( i_name, i_title, i_focus )
 {
+	if( i_title == null )
+		i_title = i_name;
+
 	for( var i = 0; i < g_windows.length; i++)
 		if( g_windows[i].name == i_name )
 			if( i_focus )
@@ -241,6 +264,12 @@ function g_OpenWindow( i_name, i_title, i_focus )
 			}
 
 	var wnd = window.open( null, i_name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	if( wnd == null )
+	{
+		g_Error('Can`t open new browser window.');
+		return;
+	}
+
 	g_windows.push( wnd);
 	wnd.name = i_name;
 
@@ -271,6 +300,16 @@ function g_Info( i_msg, i_elem)
 function g_Error( i_err)
 {
 	g_Info('Error: ' + i_err);
+}
+
+function g_OnClose()
+{
+	var operation = {};
+	operation.type = 'deregister';
+	if( g_id)
+		nw_Action('monitors', [g_id], operation);
+	g_CloseAllWindows();
+	g_CloseAllMonitors();
 }
 
 function g_OnKeyDown(e)

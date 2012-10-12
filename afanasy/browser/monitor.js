@@ -72,7 +72,16 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elCtrlFilter = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
 	this.elCtrlFilter.classList.add('ctrl_filter');
-	this.elCtrlFilter.textContent = 'Filter:';
+	this.elCtrlFilterLabel = this.document.createElement('div');
+	this.elCtrlFilter.appendChild( this.elCtrlFilterLabel);
+	this.elCtrlFilterLabel.classList.add('ctrl_filter_label');
+	this.elCtrlFilterLabel.textContent = 'Filter:';
+	this.elCtrlFilterInput = this.document.createElement('div');
+	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
+	this.elCtrlFilterInput.classList.add('ctrl_filter_input');
+	this.elCtrlFilterInput.contentEditable = true;
+	this.elCtrlFilterInput.monitor = this;
+	this.elCtrlFilterInput.onkeydown = function(e){e.currentTarget.monitor.filterKeyDown(e);}
 
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
@@ -117,7 +126,7 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 
 Monitor.prototype.destroy = function()
 {
-g_Info('Destroying '+this.name);
+g_Info('Destroying "'+this.name+'"');
 	if( this.menu ) this.menu.destroy();
 	if( g_cur_monitor == this ) g_cur_monitor = null;
 	cm_ArrayRemove(	g_recievers, this);
@@ -135,6 +144,8 @@ g_Info('Destroying '+this.name);
 
 	if( this.elParent )
 		this.elParent.removeChild( this.elMonitor);
+
+	g_MonitorClosed( this.name);
 }
 
 Monitor.prototype.refresh = function()
@@ -544,6 +555,19 @@ Monitor.prototype.noneSelected = function( i_evt)
 		this.menu.destroy();
 	return false;
 }
+
+Monitor.prototype.filterKeyDown = function( i_evt)
+{
+	if( i_evt.keyCode == 13 || i_evt.keyCode == 27 )
+	{
+		i_evt.currentTarget.blur();
+		i_evt.stopPropagation();
+	}
+g_Info('filter: '+i_evt.keyCode);
+g_Info('filter: '+this.elCtrlFilterInput.textContent);
+}
+
+
 
 Monitor.prototype.jobConstruct = function( job)
 {
