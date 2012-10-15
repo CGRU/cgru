@@ -14,41 +14,38 @@ user-select: none;
 #header,#footer {
 position: absolute;
 left: 0; right: 0;
-height: 46px;
 border: 2px solid #555;
 box-shadow: 0px 0px 10px #000;
 overflow: hidden;
 }
-#header { top: 0; }
-#footer {
-bottom: 0;
-font-size: 12px;
-}
+#header { height: 26px; top: 0; }
+#footer { height: 46px; bottom: 0; font-size: 12px;}
 
 #content {
 position: absolute;
 left: 0; right: 0;
-top: 50px;
+top: 30px;
 bottom: 50px;
 overflow: hidden;
 }
 
-.mbutton {
+#header .mbutton {
 font: 16px Arial;
 font-weight: bold;
 position: relative;
 background: #DDD;
 border: 1px solid #676767;
 border-radius: 6px;
-/*top: 10px;*/
-margin: 10px;
-padding: 5px;
+/*top: 0px;*/
+margin: 0px 10px;
+padding: 4px 8px 3px 8px;
 cursor: pointer;
 text-transform: uppercase;
+text-align: center;
 color: #222;
 box-shadow: 0px 0px 2px #000;
 }
-.mbutton.pushed {
+#header .mbutton.pushed {
 background: #EFD;
 border: 1px inset #555;
 color: #353;
@@ -65,7 +62,7 @@ font-size: 12px;
 .monitor .ctrl,.info {
 position: absolute;
 left: 0; right: 0;
-height: 40px;
+height: 30px;
 /*border: 2px solid #555;*/
 box-shadow: 0px 0px 10px #000;
 /*background: #DDC;*/
@@ -77,8 +74,8 @@ box-shadow: 0px 0px 10px #000;
 position: absolute;
 left: 0; right: 0;
 overflow: auto;
-top: 40px;
-bottom: 40px;
+top: 30px;
+bottom: 30px;
 /*background: #CCD;*/
 -moz-user-select: none;
 }
@@ -88,7 +85,7 @@ background: #AAA;
 box-shadow: 0px 0px 5px #000 inset;
 border-radius: 4px;
 cursor: pointer;
-margin: 8px;
+margin: 3px 8px;
 padding: 4px;
 float: left;
 /*
@@ -101,30 +98,39 @@ position: absolute;
 position: absolute;
 box-shadow: 0px 0px 5px #000 inset;
 background: #789;
-margin: 8px;
-padding: 5px;
+margin: 3px 8px;
 border-radius: 4px;
 }
-.ctrl_sort   { left: 5px; right: 60%; }
-.ctrl_filter { left: 41%; right: 5px; }
-.ctrl_filter_label { float: left;}
-.ctrl_filter_input
+.ctrl_filter.filtering { background: #FA6;}
+.ctrl_sort   { left: 5px; width: 124px; }
+.ctrl_filter { left: 138px; right: 3%; }
+.ctrl_sort .label, .ctrl_filter .label { float: left; margin: 5px 10px; width: 30px;}
+.ctrl_filter .param, .ctrl_sort .param 
+{
+float: left;
+box-shadow: 0px 0px 2px #000 inset;
+margin: 2px;
+padding: 3px 0px;
+width: 60px;
+cursor: pointer;
+text-align: center;
+}
+.ctrl_filter .input
 {
 position: absolute;
 box-shadow: 0px 0px 5px #000 inset;
-left: 45px; top: 2px; bottom: 2px; right: 10px;
-padding: 3px;
+left: 120px; top: 0px; bottom: 0px; right: 10px;
+margin: 2px; padding: 3px;
 }
 
 .monitor .info .text {
 position: absolute;
-top: 5px; left: 8px; right: 8px; bottom: 8px;
+top: 4px; left: 8px; right: 8px; bottom: 3px;
 background: #CCC;
 border: 1px solid #444;
 box-shadow: 0px 0px 5px #222 inset;
 border-radius: 4px;
-/*margin: 5px;*/
-padding: 5px;
+padding: 4px 8px;
 user-select: text;
 -moz-user-select: text;
 }

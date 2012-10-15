@@ -146,9 +146,7 @@ UserNode.prototype.refresh = function()
 	this.elBar.textContent = label;
 }
 
-UserNode.prototype.onDoubleClick = function()
-{
-}
+UserNode.prototype.onDoubleClick = function() { g_ShowObject( this.params);}
 
 UserNode.actions = [];
 
@@ -171,4 +169,7 @@ UserNode.actions.push(['context']);
 UserNode.actions.push(['context', 'permanent'     ,        'bl1', 'menuHandleDialog', 'Set Permanent']);
 UserNode.actions.push(['context']);
 UserNode.actions.push(['context', 'annotation',            'str', 'menuHandleDialog', 'Annotate']);
+
+UserNode.sort = ['priority','name','host_name'];
+UserNode.filter = ['user_name','name','host_name'];
 

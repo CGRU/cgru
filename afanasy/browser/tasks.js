@@ -251,3 +251,5 @@ TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Resta
 TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
 */
 
+TaskItem.sort = ['name','host_name'];
+TaskItem.filter = ['name','host_name'];

@@ -137,10 +137,8 @@ JobNode.prototype.refresh = function()
 	this.elTime.textContent = '';
 }
 
-JobNode.prototype.onDoubleClick = function()
-{
-	g_OpenTasks( this.params.name, this.params.id );
-}
+JobNode.prototype.onDoubleClick = function() { g_OpenTasks( this.params.name, this.params.id );}
+JobNode.prototype.menuHandleShowObj = function() { g_ShowObject( this.params );}
 
 function JobBlock( i_elParent, i_block)
 {
@@ -597,6 +595,7 @@ JobNode.actions = [];
 
 JobNode.actions.push(['context', 'log',               null, 'menuHandleGet',       'Show Log']);
 JobNode.actions.push(['context', 'error_hosts',       null, 'menuHandleGet',       'Show Error Hosts']);
+JobNode.actions.push(['context', 'show_obj',          null, 'menuHandleShowObj',   'Show Object']);
 JobNode.actions.push(['context',  null,               null,  null,                  null]);
 JobNode.actions.push(['context', 'reset_error_hosts', null, 'menuHandleOperation', 'Reset Error Hosts']);
 JobNode.actions.push(['context', 'restart_errors',    null, 'menuHandleOperation', 'Restart Errors']);
@@ -642,4 +641,7 @@ JobBlock.actions.push(['set', 'hosts_mask_exclude',         'reg', 'menuHandleDi
 JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDialog', 'Depend Mask']);
 JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleDialog', 'Tasks Depend Mask']);
 JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Properties Needed']);
+
+JobNode.sort = ['priority','user_name','name','host_name'];
+JobNode.filter = ['user_name','name','host_name'];
 

@@ -5,11 +5,16 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elParent = i_element;
 	this.name = i_name ? i_name : i_type;
 
+	this.nodeConstructor = null;
+	if     ( this.type == 'jobs'   ) this.nodeConstructor = JobNode;
+	else if( this.type == 'renders') this.nodeConstructor = RenderNode;
+	else if( this.type == 'users'  ) this.nodeConstructor = UserNode;
+	else if( this.type == 'tasks'  ) this.nodeConstructor = TaskItem;
+
 	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild( this.elMonitor);
 	this.elMonitor.classList.add('monitor');
 	this.elMonitor.monitor = this;
-//	this.elMonitor.onkeydown = cm_OnKeyDown;
 
 	this.elList = this.document.createElement('div');
 	this.elCtrl = this.document.createElement('div');
@@ -67,21 +72,54 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elCtrlSort = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlSort);
 	this.elCtrlSort.classList.add('ctrl_sort');
-	this.elCtrlSort.textContent = 'Sort:';
+
+	this.elCtrlSortLabel = this.document.createElement('span');
+	this.elCtrlSort.appendChild( this.elCtrlSortLabel);
+	this.elCtrlSortLabel.classList.add('label');
+	this.elCtrlSortLabel.textContent = 'Sort:';
+
+	this.elCtrlSortParam = this.document.createElement('span');
+	this.elCtrlSort.appendChild( this.elCtrlSortParam);
+	this.elCtrlSortParam.classList.add('param');
+	this.elCtrlSortParam.textContent = 'null';
+	this.elCtrlSortParam.monitor = this;
+	this.elCtrlSortParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'sort');}
+	for( var i = 0; i < cm_Attrs.length; i++)
+		if( cm_Attrs[i][0] == this.nodeConstructor.sort[0] )
+		{
+			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
+			this.sortParm = cm_Attrs[i][0];
+		}
 
 	this.elCtrlFilter = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
 	this.elCtrlFilter.classList.add('ctrl_filter');
+
 	this.elCtrlFilterLabel = this.document.createElement('div');
 	this.elCtrlFilter.appendChild( this.elCtrlFilterLabel);
-	this.elCtrlFilterLabel.classList.add('ctrl_filter_label');
+	this.elCtrlFilterLabel.classList.add('label');
 	this.elCtrlFilterLabel.textContent = 'Filter:';
+
+	this.elCtrlFilterParam = this.document.createElement('div');
+	this.elCtrlFilter.appendChild( this.elCtrlFilterParam);
+	this.elCtrlFilterParam.classList.add('param');
+	this.elCtrlFilterParam.textContent = 'null';
+	this.elCtrlFilterParam.monitor = this;
+	this.elCtrlFilterParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'filter');}
+	for( var i = 0; i < cm_Attrs.length; i++)
+		if( cm_Attrs[i][0] == this.nodeConstructor.filter[0] )
+		{
+			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
+			this.filterParm = cm_Attrs[i][0];
+		}
+
 	this.elCtrlFilterInput = this.document.createElement('div');
 	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
-	this.elCtrlFilterInput.classList.add('ctrl_filter_input');
+	this.elCtrlFilterInput.classList.add('input');
 	this.elCtrlFilterInput.contentEditable = true;
 	this.elCtrlFilterInput.monitor = this;
-	this.elCtrlFilterInput.onkeydown = function(e){e.currentTarget.monitor.filterKeyDown(e);}
+	this.elCtrlFilterInput.onkeyup = function(e){return e.currentTarget.monitor.filterKeyUp(e);}
+	this.elCtrlFilterInput.onmouseout = function(e){return e.currentTarget.blur();}
 
 	this.elInfoText = this.document.createElement('div');
 	this.elInfoText.classList.add('text');	
@@ -126,7 +164,6 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 
 Monitor.prototype.destroy = function()
 {
-g_Info('Destroying "'+this.name+'"');
 	if( this.menu ) this.menu.destroy();
 	if( g_cur_monitor == this ) g_cur_monitor = null;
 	cm_ArrayRemove(	g_recievers, this);
@@ -142,10 +179,18 @@ g_Info('Destroying "'+this.name+'"');
 
 	this.items = [];
 
-	if( this.elParent )
-		this.elParent.removeChild( this.elMonitor);
+	if( this.elParent && this.elMonitor )
+		try
+		{
+			this.elParent.removeChild( this.elMonitor);
+		}
+		catch( err)
+		{
+			g_Error(err.message);
+		}
 
 	g_MonitorClosed( this.name);
+g_Info('Destroying "'+this.name+'"');
 }
 
 Monitor.prototype.refresh = function()
@@ -229,6 +274,7 @@ Monitor.prototype.processMsg = function( obj)
 			{
 				this.items[i].params = nodes[j];
 				this.items[i].update();
+				this.filterItem( this.items[i]);
 				founded = true;
 				updated = updated + 1;
 				break;
@@ -240,9 +286,10 @@ Monitor.prototype.processMsg = function( obj)
 
 	for( i = 0; i < new_ids.length; i++)
 	{
-		var node = this.newNode( nodes[new_ids[i]]);
-		if( node != null )
-			this.items.push( node);
+		var node = new this.nodeConstructor();
+		this.createItem( node, nodes[new_ids[i]]);
+		this.filterItem( node);
+		this.items.push( node);
 	}
 
 //g_Info(this.type + ':' + g_cycle + ' nodes processed ' + nodes.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
@@ -263,19 +310,6 @@ Monitor.prototype.delNodes = function( i_ids)
 				this.items.splice(i,1);
 				break;
 			}
-}
-
-Monitor.prototype.newNode = function( i_obj)
-{
-	var node = null
-	if     ( this.type == 'jobs'   ) node = new    JobNode();
-	else if( this.type == 'renders') node = new RenderNode();
-	else if( this.type == 'users'  ) node = new   UserNode();
-	else return null;
-
-	this.createItem( node, i_obj);
-
-	return node;
 }
 
 Monitor.prototype.createItem = function( i_item, i_obj)
@@ -300,6 +334,11 @@ Monitor.prototype.createItem = function( i_item, i_obj)
 Monitor.prototype.info = function( i_str)
 {
 	this.elInfoText.textContent = i_str;
+}
+
+Monitor.prototype.error = function( i_str)
+{
+	this.elInfoText.textContent = 'Error: ' + i_str;
 }
 
 Monitor.prototype.onMouseDown = function( i_evt, i_el)
@@ -351,14 +390,12 @@ Monitor.prototype.elSetSelected = function( el, on)
 		el.selected = true;
 		if( false == el.classList.contains('selected'))
 			el.classList.add('selected');
-//		el.textContent='selected';
 	}
 	else
 	{
 		if( false == el.selected ) return;
 		el.selected = false;
 		el.classList.remove('selected');
-//		el.textContent='';
 	}
 }
 
@@ -494,11 +531,6 @@ Monitor.prototype.menuHandleDialog = function( i_name)
 		{
 			ptype = actions[i][2];
 			if( actions[i][6] ) parameter = actions[i][6];
-/*			if( actions[i][7] )
-			{
-				reciever = this.cur_item;
-				handle = actions[i][7];
-			}*/
 		}
 	}
 	new cgru_Dialog( this.document, this.document.body, reciever, handle, parameter, ptype, value, this.name+'_parameter');
@@ -507,19 +539,19 @@ Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
 	var params = {};
 	params[i_parameter] = i_value;
-g_Info('params.'+i_parameter+'="'+i_value+'";');
+this.info('params.'+i_parameter+'="'+i_value+'";');
 	this.action( null, params);
 }
 Monitor.prototype.menuHandleOperation = function( i_name)
 {
-g_Info('Operation = ' + i_name);
+this.info('Operation = ' + i_name);
 	var operation = {};
 	operation.type = i_name;
 	this.action( operation, null);
 }
 Monitor.prototype.menuHandleGet = function( i_name)
 {
-g_Info('Get = ' + i_name);
+this.info('Get = ' + i_name);
 	nw_GetNodes( this.type, [this.cur_item.params.id], i_name);
 }
 
@@ -556,19 +588,112 @@ Monitor.prototype.noneSelected = function( i_evt)
 	return false;
 }
 
-Monitor.prototype.filterKeyDown = function( i_evt)
+Monitor.prototype.sortItems = function()
 {
-	if( i_evt.keyCode == 13 || i_evt.keyCode == 27 )
-	{
-		i_evt.currentTarget.blur();
-		i_evt.stopPropagation();
-	}
-g_Info('filter: '+i_evt.keyCode);
-g_Info('filter: '+this.elCtrlFilterInput.textContent);
+	for( var i = this.items.length-1; i > 0; i--)
+		for( var j = 0; j < i; j++)
+		{
+			var itemA = this.items[j];
+			var itemB = this.items[j+1];
+			if( cm_CompareItems( itemA, itemB, this.sortParm, false ))
+			{
+//window.console.log( itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] + ' TRUE');
+				this.elList.removeChild( itemB.element);
+				this.elList.insertBefore( itemB.element, itemA.element);
+				this.items[j] = itemB;
+				this.items[j+1] = itemA;
+			}
+//else window.console.log( itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] + ' FALSE');
+		}
 }
 
 
 
+// --------------- Sorting: -------------------//
+Monitor.prototype.sortFilterParmMenu = function( i_evt, i_type)
+{
+	if( this.menu ) this.menu.destroy();
+	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_'+i_type, 'onMenuDestroy');
+	this.menu = menu;
+	for( var i = 0; i < this.nodeConstructor[i_type].length; i++)
+		for( var j = 0; j < cm_Attrs.length; j++)
+			if( this.nodeConstructor[i_type][i] == cm_Attrs[j][0] )
+				menu.addItem( cm_Attrs[j][0], this, i_type+'ParmChanged', cm_Attrs[j][2]);
+	menu.show();
+	i_evt.stopPropagation();
+	return false;
+}
+Monitor.prototype.sortParmChanged = function( i_name)
+{
+	this.elCtrlSortParam.textContent = i_name;
+	for( var i = 0; i < cm_Attrs.length; i++)
+		if( cm_Attrs[i][0] == i_name )
+			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
+	this.sortParm = i_name;
+	this.info('Sort: '+i_name);
+	this.sortItems();
+}
+// --------------- Filtering: -------------------//
+Monitor.prototype.filterParmChanged = function( i_name)
+{
+	this.elCtrlFilterParam.textContent = i_name;
+	for( var i = 0; i < cm_Attrs.length; i++)
+		if( cm_Attrs[i][0] == i_name )
+			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
+	this.filterParm = i_name;
+	this.info('Filter: '+i_name);
+	this.filterItems();
+}
+Monitor.prototype.filterKeyUp = function( i_evt)
+{
+	if( i_evt.keyCode == 13 || i_evt.keyCode == 27 ) /* ENTER or ESC */
+	{
+		i_evt.currentTarget.blur();
+		i_evt.stopPropagation();
+	}
+	this.filterExpr = null;
+	var expr = this.elCtrlFilterInput.textContent;
+	if( expr && expr.length )
+	{
+		this.info('Filter: '+expr);
+		try { this.filterExpr = new RegExp( expr);}
+		catch( err ) { this.filterExpr = null; this.error( err.message);}
+	}
+	this.filterItems();
+}
+Monitor.prototype.filterItem = function( i_item)
+{
+//g_Info('filtering "'+i_item.params.name+'" p"'+this.filterParm+'"');
+	var hide = false;
+	if( i_item.params.hidden && ( i_item.params.hidden == true ))
+		hide = true;
+	else if( this.filterExpr && this.filterParm && i_item.params[this.filterParm] )
+	{
+		if( false == this.filterExpr.test( i_item.params[this.filterParm]))
+			hide = true;
+	}
+	if( hide )
+		i_item.element.style.display = 'none';
+	else
+		i_item.element.style.display = 'block';
+}
+Monitor.prototype.filterItems = function()
+{
+	if( this.filterExpr && this.filterParm )
+	{
+		this.elCtrlFilter.classList.add('filtering');
+	}
+	else
+	{
+		this.elCtrlFilter.classList.remove('filtering');
+	}
+	for( i = 0; i < this.items.length; i++)
+		this.filterItem( this.items[i]);
+}
+
+
+
+// --------------- Job Tasks specific: -------------------//
 Monitor.prototype.jobConstruct = function( job)
 {
 	this.job = job;

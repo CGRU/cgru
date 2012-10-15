@@ -353,3 +353,6 @@ RenderNode.actions.push(['pow', 'reboot',    null, 'menuHandleOperation', 'Reboo
 RenderNode.actions.push(['pow', 'shutdown',  null, 'menuHandleOperation', 'Shutdown Machine']);
 RenderNode.actions.push(['pow', 'delete',    null, 'menuHandleOperation', 'Delete From DB']);
 
+RenderNode.sort = ['priority','user_name','name'];
+RenderNode.filter = ['user_name','name','host_name'];
+
