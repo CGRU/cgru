@@ -58,7 +58,14 @@ position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
 }
-
+.monitor * {
+margin: 0;
+padding: 0;
+overflow: hidden;
+user-select: none;
+-moz-user-select: none;
+-webkit-user-select: none;
+}
 .monitor .ctrl,.info {
 position: absolute;
 left: 0; right: 0;
@@ -76,8 +83,6 @@ left: 0; right: 0;
 overflow: auto;
 top: 30px;
 bottom: 30px;
-/*background: #CCD;*/
--moz-user-select: none;
 }
 
 .ctrl_button {

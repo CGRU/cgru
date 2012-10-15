@@ -58,32 +58,33 @@ TaskItem.prototype.init = function()
 
 TaskItem.prototype.update = function()
 {
-	this.elName.textContent = this.genName();
-
-	if( this.params.running === true )
+	this.params.name = this.genName();
+	this.elName.textContent = this.params.name;
+/*	if( this.params.running === true )
 	{
 		if( false == this.element.classList.contains('running'))
 		this.element.classList.add('running');
 	}
 	else
-		this.element.classList.remove('running');
+		this.element.classList.remove('running');*/
 }
 
 TaskItem.prototype.updateProgress = function( i_progress)
 {
-	this.prgs = i_progress;
+	for( var attr in i_progress )
+		this.params[attr] = i_progress[attr];
 
-	cm_GetState( this.prgs.state, this.element, this.elState);
+	cm_GetState( this.params.state, this.element, this.elState);
 //	this.elState.textContent = state.string;
 
-	if( this.prgs.str ) this.elStarts.textContent = 's' + this.prgs.str;
+	if( this.params.str ) this.elStarts.textContent = 's' + this.params.str;
 	else this.elStarts.textContent = 's0';
-	if( this.prgs.err ) this.elErrors.textContent = 'e' + this.prgs.err;
+	if( this.params.err ) this.elErrors.textContent = 'e' + this.params.err;
 	else this.elErrors.textContent = 'e0';
-	if( this.prgs.hst ) this.elHost.textContent = this.prgs.hst;
+	if( this.params.hst ) this.elHost.textContent = this.params.hst;
 
 	var percent = 0;
-	if( this.elState.RUN && this.prgs.per ) percent = this.prgs.per;
+	if( this.elState.RUN && this.params.per ) percent = this.params.per;
 	if( this.elState.DON ) percent = 100;
 	if( this.elState.SKP ) percent = 100;
 	if( percent < 0 ) percent = 0;
@@ -182,19 +183,19 @@ TaskItem.prototype.getBlockTasksIds = function( o_bids, o_tids)
 			}
 		}
 	}
-g_Info('bids='+o_bids+' tids='+o_tids);
+//g_Info('bids='+o_bids+' tids='+o_tids);
 }
 
 TaskItem.prototype.onContextMenu = function( i_menu)
 {
-	if( this.prgs.str && ( this.prgs.str > 1 ))
+	if( this.params.str && ( this.params.str > 1 ))
 	{
-		for( var i = this.prgs.str; i > 0; i--)
+		for( var i = this.params.str; i > 0; i--)
 		{
-			if( i <= this.prgs.str - 3) break;
+			if( i <= this.params.str - 3) break;
 			i_menu.addItem('output', this, 'menuHandleOutput', 'Output '+i, true, i);
 		}
-		if( this.prgs.str > 3 )
+		if( this.params.str > 3 )
 			i_menu.addItem('output', this, 'menuHandleOutput', 'Output...', true, -1);
 	}
 	else
@@ -237,6 +238,7 @@ TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 
 TaskItem.prototype.onDoubleClick = function()
 {
+g_Info( this.params.name);
 	this.menuHandleGet('info');
 }
 
@@ -251,5 +253,5 @@ TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Resta
 TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
 */
 
-TaskItem.sort = ['name','host_name'];
+TaskItem.sort = ['name','host_name','str'];
 TaskItem.filter = ['name','host_name'];

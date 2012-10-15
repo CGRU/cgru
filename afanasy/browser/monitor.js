@@ -83,6 +83,8 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elCtrlSortParam.classList.add('param');
 	this.elCtrlSortParam.textContent = 'null';
 	this.elCtrlSortParam.monitor = this;
+	this.elCtrlSortParam.ondblclick = function(e){return e.currentTarget.monitor.sortDirChanged(e);}
+	this.elCtrlSortParam.title = 'Sort Parameter\nContext menu to select.\nDouble click to toggle direction.';
 	this.elCtrlSortParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'sort');}
 	for( var i = 0; i < cm_Attrs.length; i++)
 		if( cm_Attrs[i][0] == this.nodeConstructor.sort[0] )
@@ -104,8 +106,10 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elCtrlFilter.appendChild( this.elCtrlFilterParam);
 	this.elCtrlFilterParam.classList.add('param');
 	this.elCtrlFilterParam.textContent = 'null';
+	this.elCtrlFilterParam.title = 'Filter Parameter\nContext menu to select.\nDouble click to toggle exclude.';
 	this.elCtrlFilterParam.monitor = this;
 	this.elCtrlFilterParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'filter');}
+	this.elCtrlFilterParam.ondblclick = function(e){return e.currentTarget.monitor.filterExcludeChanged(e);}
 	for( var i = 0; i < cm_Attrs.length; i++)
 		if( cm_Attrs[i][0] == this.nodeConstructor.filter[0] )
 		{
@@ -447,13 +451,11 @@ Monitor.prototype.onContextMenu = function( i_evt, i_el)
 {
 	i_evt.stopPropagation();
 	g_cur_monitor = this;
-	if( this.menu ) this.menu.destroy();
 	if( i_el.selected != true )
 		this.selectAll( false);
 	this.elSetSelected( i_el, true);
 
-	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_context', 'onMenuDestroy');
-	this.menu = menu;
+	var menu = this.createMenu( i_evt, 'context');
 	if( i_el.item.onContextMenu )
 		i_el.item.onContextMenu( menu);
 	else
@@ -490,13 +492,11 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 
 Monitor.prototype.onMouseOverSet = function( i_evt, i_name)
 {
-	if( this.menu ) this.menu.destroy();
 	if( this.cur_item == null ) return;
 	if( this.hasSelection() == false ) return;
 	if( i_name == null ) i_name = 'set';
 
-	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_set', 'onMenuDestroy');
-	this.menu = menu;
+	var menu = this.createMenu( i_evt, 'set');
 	var actions = this.cur_item.constructor.actions;
 	for( var i = 0; i < actions.length; i++)
 		if( actions[i][0] == i_name )
@@ -590,31 +590,47 @@ Monitor.prototype.noneSelected = function( i_evt)
 
 Monitor.prototype.sortItems = function()
 {
+//for( var i = 0; i < this.items.length-1; i++) window.console.log(this.items[i].params.name);
+this.info('Sort '+(this.sortDirection ? 'descending':'ascending')+': '+this.sortParm);
 	for( var i = this.items.length-1; i > 0; i--)
 		for( var j = 0; j < i; j++)
 		{
 			var itemA = this.items[j];
 			var itemB = this.items[j+1];
-			if( cm_CompareItems( itemA, itemB, this.sortParm, false ))
+			if( cm_CompareItems( itemA, itemB, this.sortParm, this.sortDirection ))
 			{
-//window.console.log( itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] + ' TRUE');
+//window.console.log( itemA.params.name+' '+itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] +' '+itemB.params.name+ ' TRUE');
 				this.elList.removeChild( itemB.element);
 				this.elList.insertBefore( itemB.element, itemA.element);
 				this.items[j] = itemB;
 				this.items[j+1] = itemA;
 			}
-//else window.console.log( itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] + ' FALSE');
+//window.console.log( itemA.params.name+' '+itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] +' '+itemB.params.name+ ' FALSE');
 		}
+}
+
+Monitor.prototype.createMenu = function( i_evt, i_name)
+{
+	if( this.menu ) this.menu.destroy();
+	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_'+i_name, 'onMenuDestroy');
+	this.menu = menu;
+	return menu;
 }
 
 
 
 // --------------- Sorting: -------------------//
+Monitor.prototype.sortDirChanged = function( i_evt)
+{
+//	i_evt.stopPropagation();
+	if( this.sortDirection ) this.sortDirection = false;
+	else this.sortDirection = true;
+	this.sortItems();
+	return false;
+}
 Monitor.prototype.sortFilterParmMenu = function( i_evt, i_type)
 {
-	if( this.menu ) this.menu.destroy();
-	var menu = new cgru_Menu( this.document, this.document.body, i_evt, this, this.type+'_'+i_type, 'onMenuDestroy');
-	this.menu = menu;
+	var menu = this.createMenu( i_evt, i_type);
 	for( var i = 0; i < this.nodeConstructor[i_type].length; i++)
 		for( var j = 0; j < cm_Attrs.length; j++)
 			if( this.nodeConstructor[i_type][i] == cm_Attrs[j][0] )
@@ -630,10 +646,15 @@ Monitor.prototype.sortParmChanged = function( i_name)
 		if( cm_Attrs[i][0] == i_name )
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 	this.sortParm = i_name;
-	this.info('Sort: '+i_name);
 	this.sortItems();
 }
 // --------------- Filtering: -------------------//
+Monitor.prototype.filterExcludeChanged = function( i_evt)
+{
+	if( this.filterExclude ) this.filterExclude = false;
+	else this.filterExclude = true;
+	this.filterItems();
+}
 Monitor.prototype.filterParmChanged = function( i_name)
 {
 	this.elCtrlFilterParam.textContent = i_name;
@@ -641,7 +662,7 @@ Monitor.prototype.filterParmChanged = function( i_name)
 		if( cm_Attrs[i][0] == i_name )
 			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
 	this.filterParm = i_name;
-	this.info('Filter: '+i_name);
+	this.info('Filter'+(this.filterExclude?' E':'')+': '+i_name);
 	this.filterItems();
 }
 Monitor.prototype.filterKeyUp = function( i_evt)
@@ -670,7 +691,9 @@ Monitor.prototype.filterItem = function( i_item)
 	else if( this.filterExpr && this.filterParm && i_item.params[this.filterParm] )
 	{
 		if( false == this.filterExpr.test( i_item.params[this.filterParm]))
-			hide = true;
+			hide = ( this.filterExclude ? false : true );
+		else
+			hide = ( this.filterExclude ? true : false );
 	}
 	if( hide )
 		i_item.element.style.display = 'none';
@@ -722,7 +745,7 @@ Monitor.prototype.jobProgress = function( progress)
 {
 	if( this.blocks.length != progress.length )
 	{
-		cm_Error('Job progress bocks length mismatch: job_id='
+		g_Error('Job progress bocks length mismatch: job_id='
 			+ this.job_id + ' ' + this.blocks.length + '!=' + progress.length);
 		return;
 	}
@@ -731,7 +754,7 @@ Monitor.prototype.jobProgress = function( progress)
 	{
 		if( this.blocks[b].tasks.length != progress[b].length )
 		{
-			cm_Error('Job progress tasks length mismatch: job_id='
+			g_Error('Job progress tasks length mismatch: job_id='
 				+ this.job_id + ' block=' + b + ' ' + this.blocks[b].tasks.length + '!=' + progress[b].length);
 			return;
 		}

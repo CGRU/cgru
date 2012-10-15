@@ -6,9 +6,12 @@ cm_Attrs.push(['priority',      'Priority', 'Priority']);
 cm_Attrs.push(['time_creation', 'Created',  'Time Created']);
 cm_Attrs.push(['time_started',  'Started',  'Time Started']);
 cm_Attrs.push(['time_done',     'Finished', 'Time Finished']);
+cm_Attrs.push(['str',           'Starts',   'Starts Cout']);
 
 function cm_CompareItems( i_itemA, i_itemB, i_param, i_greater )
 {
+	if( i_greater == null ) i_greater = false;
+
 	if( i_itemA == null || i_itemB == null )
 		return false;
 
