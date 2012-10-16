@@ -2,12 +2,16 @@ body {
 font: 12px Arial;
 background: #ab8;
 }
+#afbody { overflow:hidden;}
 
 #content,#header,#footer * {
 margin: 0;
 padding: 0;
 overflow: hidden;
-user-select: none;
+}
+
+#header * {
+-o-select: none;
 -moz-user-select: none;
 -webkit-user-select: none;
 }
@@ -22,25 +26,6 @@ overflow: hidden;
 -webkit-transition: all .3s ease-in-out;
 }
 #header { height: 26px; top: 0; }
-#footer { height: 196px; bottom: -150px; font-size: 12px;}
-#footer.opened { bottom: 0;}
-#footer #button {
-/*position: absolute;*/
-float: left;
-box-shadow: 0px 0px 2px #000;
-width: 12px; height: 12px;
-margin: 3px;
-text-align: center;
-}
-
-#content {
-position: absolute;
-left: 0; right: 0;
-top: 30px;
-bottom: 50px;
-overflow: hidden;
-}
-
 #header .mbutton {
 font: 16px Arial;
 font-weight: bold;
@@ -64,20 +49,43 @@ color: #353;
 box-shadow: 0px 0px 5px #000 inset;
 }
 
+#content {
+position: absolute;
+left: 0; right: 0;
+top: 30px;
+bottom: 50px;
+overflow: hidden;
+}
+
+#footer { height: 196px; bottom: -150px; font-size: 12px; background: #ab8;}
+#footer.opened { bottom: 0;}
+#footeropenbutton {
+/*position: absolute;*/
+font-weight: bold;
+float: left;
+box-shadow: 0px 0px 2px #000;
+width: 12px; height: 15px;
+margin: 3px;
+text-align: center;
+cursor: pointer;
+}
+#info {
+box-shadow: 0px 0px 2px #000 inset;
+padding: 3px 9px; margin: 3px 9px;
+border-radius: 6px;
+}
+#version {
+float: right;
+padding: 3px; margin: 3px;
+}
+
 .monitor {
 font-weight: bold;
 position: absolute;
 top: 0; bottom: 0; left: 0; right: 0;
 font-size: 12px;
 }
-.monitor * {
-margin: 0;
-padding: 0;
-overflow: hidden;
-user-select: none;
--moz-user-select: none;
--webkit-user-select: none;
-}
+.monitor * { overflow: hidden; }
 .monitor .ctrl,.info {
 position: absolute;
 left: 0; right: 0;
@@ -88,7 +96,11 @@ box-shadow: 0px 0px 10px #000;
 }
 .monitor .ctrl { top: 0; }
 .monitor .info { bottom: 0;}
-
+.monitor .ctrl,.list {
+-o-select: none;
+-moz-user-select: none;
+-webkit-user-select: none;
+}
 .monitor .list {
 position: absolute;
 left: 0; right: 0;
@@ -143,7 +155,6 @@ box-shadow: 0px 0px 5px #000 inset;
 left: 120px; top: 0px; bottom: 0px; right: 10px;
 margin: 2px; padding: 3px;
 }
-
 .monitor .info .text {
 position: absolute;
 top: 4px; left: 8px; right: 8px; bottom: 3px;
@@ -152,8 +163,6 @@ border: 1px solid #444;
 box-shadow: 0px 0px 5px #222 inset;
 border-radius: 4px;
 padding: 4px 8px;
-user-select: text;
--moz-user-select: text;
 }
 
 .item {

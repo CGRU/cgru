@@ -16,7 +16,7 @@
 <script type="text/javascript" src="afanasy/browser/users.js"></script>
 <script type="text/javascript" src="afanasy/browser/browser.js"></script>
 </head>
-<body onload="g_Init()">
+<body id="afbody" onload="g_Init()">
 
 <div id="content"></div>
 
@@ -27,7 +27,8 @@
 </div>
 
 <div id="footer">
-<div id="button" onclick="g_FooterButtonClicked()">^</div>
+<div id="footeropenbutton" onclick="g_FooterButtonClicked()">&uarr;</div>
+<div id="version">v0</div>
 <div id="info"></div>
 <div id="send"></div>
 <div id="recv"></div>

@@ -294,17 +294,18 @@ function g_CloseAllWindows()
 
 function g_FooterButtonClicked()
 {
-	var el = document.getElementById('footer');
+	var footer = document.getElementById('footer');
+	var button = document.getElementById('footeropenbutton');
 	if( g_FooterOpened )
 	{
-		g_Info('Closing Info.');
-		el.style.bottom = '-150px';
+		footer.style.bottom = '-150px';
+		button.innerHTML = '&uarr;';
 		g_FooterOpened = false;
 	}
 	else
 	{
-		g_Info('Opening Info...');
-		el.style.bottom = '0px';
+		footer.style.bottom = '0px';
+		button.innerHTML = '&darr;';
 		g_FooterOpened = true;
 	}
 }
