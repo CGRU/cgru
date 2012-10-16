@@ -289,12 +289,7 @@ Monitor.prototype.processMsg = function( obj)
 	}
 
 	for( i = 0; i < new_ids.length; i++)
-	{
-		var node = new this.nodeConstructor();
-		this.createItem( node, nodes[new_ids[i]]);
-		this.filterItem( node);
-		this.items.push( node);
-	}
+		this.createNode( nodes[new_ids[i]]);
 
 //g_Info(this.type + ':' + g_cycle + ' nodes processed ' + nodes.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
 }
@@ -316,11 +311,39 @@ Monitor.prototype.delNodes = function( i_ids)
 			}
 }
 
-Monitor.prototype.createItem = function( i_item, i_obj)
+Monitor.prototype.createNode = function( i_obj)
+{
+	var node = new this.nodeConstructor();
+	this.createItem( node, i_obj, false);
+	this.filterItem( node);
+
+	var index = this.items.length;
+	var nodeBefore = null;
+
+	if( this.sortParm )
+		for( var i = 0; i < this.items.length; i++)
+			if( cm_CompareItems( node, this.items[i], this.sortParm, true ))
+			{
+				index = i;
+				break;
+			}
+
+	if( index < this.items.length )
+	{
+		nodeBefore = this.items[index].element;
+		//window.console.log('Index='+index+' before='+nodeBefore.item.params.name);
+	}
+
+	this.items.splice( index, 0, node);
+	this.elList.insertBefore( node.element, nodeBefore);
+}
+
+Monitor.prototype.createItem = function( i_item, i_obj, i_appendChild)
 {
 	i_item.element = this.document.createElement('div');
 	i_item.element.className = 'item';
-	this.elList.appendChild( i_item.element);
+	if( i_appendChild == true )
+		this.elList.appendChild( i_item.element);
 
 	i_item.params = i_obj;
 	i_item.monitor = this;
@@ -592,8 +615,28 @@ Monitor.prototype.sortItems = function()
 {
 //for( var i = 0; i < this.items.length-1; i++) window.console.log(this.items[i].params.name);
 this.info('Sort '+(this.sortDirection ? 'descending':'ascending')+': '+this.sortParm);
-	for( var i = this.items.length-1; i > 0; i--)
-		for( var j = 0; j < i; j++)
+	this.elCtrlSort.classList.add('sorting');
+	if( this.type == 'tasks' )
+	{
+		var pos = 0;
+		for( var b = 0; b < this.job.blocks.length; b++)
+		{
+			var tasks_num = this.job.blocks[b].tasks_num;
+			if( tasks_num > 1 )
+				this.sortItemsSet( pos + 1, pos + tasks_num);
+g_Info('st: '+pos+'-'+(pos+tasks_num));
+			pos += tasks_num + 1;
+		}
+	}
+	else
+		this.sortItemsSet( 0, this.items.length-1);
+	this.elCtrlSort.classList.remove('sorting');
+}
+Monitor.prototype.sortItemsSet = function( i_a, i_b)
+{
+//	for( var i = this.items.length-1; i > 0; i--)
+	for( var i = i_b; i > i_a; i--)
+		for( var j = i_a; j < i; j++)
 		{
 			var itemA = this.items[j];
 			var itemB = this.items[j+1];
@@ -724,14 +767,14 @@ Monitor.prototype.jobConstruct = function( job)
 	for( var b = 0; b < this.job.blocks.length; b++)
 	{
 		var block = new BlockItem(b);
-		this.createItem( block, this.job.blocks[b]);
+		this.createItem( block, this.job.blocks[b], true);
 		this.items.push( block);
 		this.blocks.push( block);
 		block.tasks = [];
 		for( var t = 0; t < this.job.blocks[b].tasks_num; t++)
 		{
 			var task = new TaskItem( job, block, t);
-			this.createItem( task, this.job.blocks[b]);
+			this.createItem( task, null, true);
 			this.items.push( task);
 			block.tasks.push( task);
 		}

@@ -333,6 +333,7 @@ RenderNode.actions.push(['context',  null]);
 RenderNode.actions.push(['context', 'eject_tasks',         null, 'menuHandleOperation', 'Eject Tasks']);
 RenderNode.actions.push(['context', 'eject_tasks_keep_my', null, 'menuHandleOperation', 'Eject Not My']);
 
+RenderNode.actions.push(['set', 'priority',     'num', 'menuHandleDialog', 'Priority']);
 RenderNode.actions.push(['set', 'capacity',     'num', 'menuHandleDialog', 'Capacity']);
 RenderNode.actions.push(['set', 'max_tasks',    'num', 'menuHandleDialog', 'Maximum Tasks']);
 RenderNode.actions.push(['set', 'restore_defaults','num', 'menuHandleOperation', 'Restore Defaults']);

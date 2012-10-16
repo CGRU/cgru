@@ -37,6 +37,7 @@ function TaskItem( i_job, i_block, i_task_num )
 
 TaskItem.prototype.init = function() 
 {
+	this.params = {};
 	this.element.classList.add('task');
 
 	this.elProgress = this.monitor.document.createElement('span');
@@ -74,14 +75,16 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	for( var attr in i_progress )
 		this.params[attr] = i_progress[attr];
 
+	if( this.params.hst == null ) this.params.hst = '';
+	if( this.params.str == null ) this.params.str = 0;
+	if( this.params.err == null ) this.params.err = 0;
+
 	cm_GetState( this.params.state, this.element, this.elState);
 //	this.elState.textContent = state.string;
 
-	if( this.params.str ) this.elStarts.textContent = 's' + this.params.str;
-	else this.elStarts.textContent = 's0';
-	if( this.params.err ) this.elErrors.textContent = 'e' + this.params.err;
-	else this.elErrors.textContent = 'e0';
-	if( this.params.hst ) this.elHost.textContent = this.params.hst;
+	this.elStarts.textContent = 's' + this.params.str;
+	this.elErrors.textContent = 'e' + this.params.err;
+	this.elHost.textContent = this.params.hst;
 
 	var percent = 0;
 	if( this.elState.RUN && this.params.per ) percent = this.params.per;
@@ -101,10 +104,10 @@ TaskItem.prototype.genName = function()
 {
 	var t = this.task_num;
 	var name = 'task ' + t;
-	var tasks_name = this.params.tasks_name;
-	if( this.params.tasks )
+	var tasks_name = this.block.params.tasks_name;
+	if( this.block.params.tasks )
 	{
-		var task_name = this.params.tasks[t].name;
+		var task_name = this.block.params.tasks[t].name;
 		if( task_name )
 		{
 			if( tasks_name && ( tasks_name != '' ))
@@ -136,7 +139,7 @@ TaskItem.prototype.genName = function()
 
 TaskItem.prototype.genFrames = function()
 {
-	var p = this.params;
+	var p = this.block.params;
 
 	var offset = this.task_num * p.frames_per_task * p.frames_inc;
 	if( p.frames_inc > 1 )
@@ -253,5 +256,5 @@ TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Resta
 TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
 */
 
-TaskItem.sort = ['name','host_name','str'];
-TaskItem.filter = ['name','host_name'];
+TaskItem.sort = ['name','hst','str','err'];
+TaskItem.filter = ['name','hst'];

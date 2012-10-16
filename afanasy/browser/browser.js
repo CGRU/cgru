@@ -15,6 +15,8 @@ g_cur_monitor = null;
 g_main_monitor = null;
 g_monitor_buttons = [];
 
+g_FooterOpened = false;
+
 g_Images = [];
 
 if( localStorage['user_name'] == null )
@@ -288,6 +290,23 @@ function g_CloseAllWindows()
 {
 	for( var i = 0; i < g_windows.length; i++)
 		g_windows[i].close();
+}
+
+function g_FooterButtonClicked()
+{
+	var el = document.getElementById('footer');
+	if( g_FooterOpened )
+	{
+		g_Info('Closing Info.');
+		el.style.bottom = '-150px';
+		g_FooterOpened = false;
+	}
+	else
+	{
+		g_Info('Opening Info...');
+		el.style.bottom = '0px';
+		g_FooterOpened = true;
+	}
 }
 
 function g_Info( i_msg, i_elem)

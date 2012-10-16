@@ -17,9 +17,21 @@ left: 0; right: 0;
 border: 2px solid #555;
 box-shadow: 0px 0px 10px #000;
 overflow: hidden;
+-o-transition: all .3s ease-in-out;
+-moz-transition: all .3s ease-in-out;
+-webkit-transition: all .3s ease-in-out;
 }
 #header { height: 26px; top: 0; }
-#footer { height: 46px; bottom: 0; font-size: 12px;}
+#footer { height: 196px; bottom: -150px; font-size: 12px;}
+#footer.opened { bottom: 0;}
+#footer #button {
+/*position: absolute;*/
+float: left;
+box-shadow: 0px 0px 2px #000;
+width: 12px; height: 12px;
+margin: 3px;
+text-align: center;
+}
 
 #content {
 position: absolute;
@@ -105,10 +117,14 @@ box-shadow: 0px 0px 5px #000 inset;
 background: #789;
 margin: 3px 8px;
 border-radius: 4px;
+/*-o-transition: all .3s ease-in-out;
+-moz-transition: all .3s ease-in-out;
+-webkit-transition: all .3s ease-in-out;*/
 }
-.ctrl_filter.filtering { background: #FA6;}
 .ctrl_sort   { left: 5px; width: 124px; }
 .ctrl_filter { left: 138px; right: 3%; }
+.ctrl_filter.filtering { background: #fa6;}
+.ctrl_sort.sorting { background: #fa6;}
 .ctrl_sort .label, .ctrl_filter .label { float: left; margin: 5px 10px; width: 30px;}
 .ctrl_filter .param, .ctrl_sort .param 
 {
