@@ -1,6 +1,4 @@
 nw_connected = false;
-nw_send_count = 0;
-nw_recv_count = 0;
 nw_error_count = 0;
 nw_error_count_max = 5;
 nw_error_total = 0;
@@ -9,7 +7,7 @@ function nw_Send( obj)
 {
 	var obj_str = JSON.stringify(obj);
 
-document.getElementById('send').textContent='c' + nw_send_count + ' send: ' + obj_str; nw_send_count++;
+	var log = '<i>send:</i> '+ obj_str;
 
 	var xhr = new XMLHttpRequest();
 	xhr.overrideMimeType('application/json');
@@ -23,7 +21,8 @@ document.getElementById('send').textContent='c' + nw_send_count + ' send: ' + ob
 		{
 			if( xhr.status == 200 )
 			{
-document.getElementById('recv').textContent='c' + nw_recv_count + ' recv: ' + xhr.responseText; nw_recv_count++;
+				log += '<br/><i>recv:</i> '+ xhr.responseText;
+
 				nw_error_count = 0;
 				nw_connected = true;
 //				g_ProcessMsg( eval('('+xhr.responseText+')'));
@@ -33,25 +32,27 @@ document.getElementById('recv').textContent='c' + nw_recv_count + ' recv: ' + xh
 				try { newobj = JSON.parse( xhr.responseText);}
 				catch( err)
 				{
-					window.console.log(err.message+'\n\n'+xhr.responseText);
+					g_Log(err.message+'\n\n'+xhr.responseText);
 					newobj = null;
 				}
 
 				if( newobj )
 					g_ProcessMsg( JSON.parse( xhr.responseText));
-
-				return;
 			}
-			nw_error_count++;
-			nw_error_total++;
+			else
+			{
+				nw_error_count++;
+				nw_error_total++;
 //document.getElementById("status").textContent=nw_error_count+': Status number = ' + xhr.status;
 //document.getElementById("statustext").textContent='Status text: ' + xhr.statusText;
-			if(( nw_error_count > nw_error_count_max ) && nw_connected )
-			{
-				nw_connected = false;
-				g_Error('Connection lost.');
-				g_ConnectionLost();
+				if(( nw_error_count > nw_error_count_max ) && nw_connected )
+				{
+					nw_connected = false;
+					g_Error('Connection lost.');
+					g_ConnectionLost();
+				}
 			}
+			g_Log( log, 'netlog');
 		}
 	}
 }

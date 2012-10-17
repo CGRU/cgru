@@ -21,17 +21,22 @@
 <div id="content"></div>
 
 <div id="header">
-<span class="mbutton">jobs</span>
-<span class="mbutton">renders</span>
-<span class="mbutton">users</span>
+	<div id="headermain">
+		<div id="headeropenbutton" onclick="g_HeaderButtonClicked()">&darr;</div>
+		<span class="mbutton">jobs</span>
+		<span class="mbutton">renders</span>
+		<span class="mbutton">users</span>
+	</div>
 </div>
 
 <div id="footer">
-<div id="footeropenbutton" onclick="g_FooterButtonClicked()">&uarr;</div>
-<div id="version">v0</div>
-<div id="info"></div>
-<div id="send"></div>
-<div id="recv"></div>
+	<div id="footeropenbutton" onclick="g_FooterButtonClicked()">&uarr;</div>
+	<div id="version">v0</div>
+	<div id="netlog_btn" onclick="g_LogButtonClicked('net')">Net</div>
+	<div id="log_btn" onclick="g_LogButtonClicked('log')">Log</div>
+	<div id="info"></div>
+	<div id="log"></div>
+	<div id="netlog"></div>
 </div>
 
 </body>

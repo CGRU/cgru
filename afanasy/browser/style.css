@@ -16,6 +16,7 @@ overflow: hidden;
 -webkit-user-select: none;
 }
 #header,#footer {
+background: #ab8;
 position: absolute;
 left: 0; right: 0;
 border: 2px solid #555;
@@ -25,8 +26,12 @@ overflow: hidden;
 -moz-transition: all .3s ease-in-out;
 -webkit-transition: all .3s ease-in-out;
 }
-#header { height: 26px; top: 0; }
-#header .mbutton {
+#header { height: 226px; top: -200px; }
+#headermain {
+position: absolute;
+left: 0; right: 0; bottom: 0; top: 200px;
+}
+#headermain .mbutton {
 font: 16px Arial;
 font-weight: bold;
 position: relative;
@@ -35,14 +40,14 @@ border: 1px solid #676767;
 border-radius: 6px;
 /*top: 0px;*/
 margin: 0px 10px;
-padding: 4px 8px 3px 8px;
+padding: 6px 8px 3px 8px;
 cursor: pointer;
 text-transform: uppercase;
 text-align: center;
 color: #222;
 box-shadow: 0px 0px 2px #000;
 }
-#header .mbutton.pushed {
+#headermain .mbutton.pushed {
 background: #EFD;
 border: 1px inset #555;
 color: #353;
@@ -53,22 +58,34 @@ box-shadow: 0px 0px 5px #000 inset;
 position: absolute;
 left: 0; right: 0;
 top: 30px;
-bottom: 50px;
+bottom: 30px;
 overflow: hidden;
 }
 
-#footer { height: 196px; bottom: -150px; font-size: 12px; background: #ab8;}
+#footer { height: 226px; bottom: -200px; font-size: 12px;}
 #footer.opened { bottom: 0;}
-#footeropenbutton {
-/*position: absolute;*/
-font-weight: bold;
-float: left;
+#footeropenbutton, #headeropenbutton, #log_btn, #netlog_btn {
+cursor: pointer;
+text-align: center;
+}
+#footeropenbutton, #headeropenbutton {
 box-shadow: 0px 0px 2px #000;
+float: left;
 width: 12px; height: 15px;
 margin: 3px;
-text-align: center;
-cursor: pointer;
 }
+#log_btn, #netlog_btn {
+box-shadow: 0px 0px 3px #000;
+float: right;
+display: none;
+padding: 3px 6px;
+margin: 6px 3px 0px 6px;
+border-top-left-radius: 4px;
+border-top-right-radius: 4px;
+border-bottom-right-radius: 0;
+border-bottom-left-radius: 0;
+}
+#log_btn.pushed, #netlog_btn.pushed { /*background: #CDE;*/ box-shadow: 0px 0px 1px #000;}
 #info {
 box-shadow: 0px 0px 2px #000 inset;
 padding: 3px 9px; margin: 3px 9px;
@@ -77,6 +94,14 @@ border-radius: 6px;
 #version {
 float: right;
 padding: 3px; margin: 3px;
+}
+#log, #netlog {
+overflow: auto;
+display: none;
+box-shadow: 0px 0px 2px #000 inset;
+padding: 3px 9px; margin: 0px 9px;
+border-radius: 6px;
+height: 190px;
 }
 
 .monitor {

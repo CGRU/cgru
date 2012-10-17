@@ -15,6 +15,7 @@ g_cur_monitor = null;
 g_main_monitor = null;
 g_monitor_buttons = [];
 
+g_HeaderOpened = false;
 g_FooterOpened = false;
 
 g_Images = [];
@@ -292,31 +293,100 @@ function g_CloseAllWindows()
 		g_windows[i].close();
 }
 
+function g_HeaderButtonClicked()
+{
+	var header = document.getElementById('header');
+	var button = document.getElementById('headeropenbutton');
+	if( g_HeaderOpened )
+	{
+		header.style.top = '-200px';
+		button.innerHTML = '&darr;';
+		g_HeaderOpened = false;
+	}
+	else
+	{
+		header.style.top = '0px';
+		button.innerHTML = '&uarr;';
+		g_HeaderOpened = true;
+	}
+}
 function g_FooterButtonClicked()
 {
 	var footer = document.getElementById('footer');
 	var button = document.getElementById('footeropenbutton');
 	if( g_FooterOpened )
 	{
-		footer.style.bottom = '-150px';
+		footer.style.bottom = '-200px';
 		button.innerHTML = '&uarr;';
+		document.getElementById('log_btn').classList.remove('pushed');
+		document.getElementById('netlog_btn').classList.remove('pushed');
+		document.getElementById('log').style.display = 'none';
+		document.getElementById('netlog').style.display = 'none';
+		document.getElementById('log_btn').style.display = 'none';
+		document.getElementById('netlog_btn').style.display = 'none';
 		g_FooterOpened = false;
 	}
 	else
 	{
 		footer.style.bottom = '0px';
 		button.innerHTML = '&darr;';
+		document.getElementById('log_btn').classList.add('pushed');
+		document.getElementById('log').style.display = 'block';
+		document.getElementById('log_btn').style.display = 'block';
+		document.getElementById('netlog_btn').style.display = 'block';
 		g_FooterOpened = true;
 	}
 }
-
-function g_Info( i_msg, i_elem)
+function g_LogButtonClicked( i_type)
 {
-	if( i_elem == null )
-		i_elem = 'info';
-	document.getElementById(i_elem).textContent=i_msg;
+	var btn_log = document.getElementById('log_btn');
+	var btn_net = document.getElementById('netlog_btn');
+	var log = document.getElementById('log');
+	var netlog = document.getElementById('netlog');
+	if( i_type == 'log' )
+	{
+		btn_log.classList.add('pushed');
+		btn_net.classList.remove('pushed');
+		log.style.display = 'block';
+		netlog.style.display = 'none';
+	}
+	else
+	{
+		btn_net.classList.add('pushed');
+		btn_log.classList.remove('pushed');
+		netlog.style.display = 'block';
+		log.style.display = 'none';
+	}
 }
+function g_Log( i_msg, i_log)
+{
+	if( i_log == null ) i_log = 'log';
+	var log = document.getElementById( i_log);
+	var lines = log.getElementsByTagName('div');
+	if( lines.length && ( i_msg == lines[0].msg ))
+	{
+		var count = lines[0].msg_count + 1;
+		var msg = '<i>'+g_cycle+' x'+count+':</i> '+i_msg;
+		lines[0].innerHTML = msg;
+		lines[0].msg_count = count;
+		return;
+	}
 
+	var line = document.createElement('div');
+	line.msg = i_msg;
+	line.msg_count = 1;
+	var msg = '<i>'+g_cycle+':</i> '+i_msg;
+	line.innerHTML = msg;
+	log.insertBefore( line, lines[0]);
+	if( lines.length > 100 )
+		log.removeChild( lines[100]);
+}
+function g_Info( i_msg, i_log)
+{
+	document.getElementById('info').textContent=i_msg;
+	if( i_log == null || i_log == true )
+		g_Log( i_msg);
+}
 function g_Error( i_err)
 {
 	g_Info('Error: ' + i_err);
