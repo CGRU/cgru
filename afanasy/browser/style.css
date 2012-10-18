@@ -27,6 +27,7 @@ overflow: hidden;
 -webkit-transition: all .3s ease-in-out;
 }
 #header { height: 226px; top: -200px; }
+#header { height: 226px; top: 0px; }
 #headermain {
 position: absolute;
 left: 0; right: 0; bottom: 0; top: 200px;
@@ -52,6 +53,34 @@ background: #EFD;
 border: 1px inset #555;
 color: #353;
 box-shadow: 0px 0px 5px #000 inset;
+}
+#settings {
+position: absolute;
+left: 4px; right: 4px; top: 4px; bottom: 40px;
+/*margin: 4px 8px;*/
+/*padding: 4px;*/
+border-radius: 6px;
+box-shadow: 0px 0px 5px #000 inset;
+}
+#settings > * {
+/*margin: 2px;
+padding: 2px 8px;
+border-radius: 4px;*/
+height: 20px;
+box-shadow: 0px 0px 2px #000 inset;
+}
+#settings * {
+position: absolute;
+}
+#settings .parameter { /*height: 18px;*/ }
+#settings .parameter .label { text-align: center; float: left; padding: 2px 8px;box-shadow: 0px 0px 5px #000 inset;}
+#settings .parameter .input {
+padding: 2px 8px;
+height: 15px;
+/*left: 100px; right: 20px;*/
+background: #DDD;
+box-shadow: 0px 0px 5px #000 inset;
+border-radius: 2px;
 }
 
 #content {
