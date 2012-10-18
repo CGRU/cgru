@@ -20,10 +20,6 @@ g_FooterOpened = false;
 
 g_Images = [];
 
-if( localStorage['user_name'] == null )
-	localStorage['user_name'] = 0;
-localStorage['user_name']++;
-
 function g_Register()
 {
 	if( g_id != 0)
@@ -427,4 +423,22 @@ function g_OnKeyDown(e)
 //	else if(evt.keyCode==116) return false; // F5
 //document.getElementById('test').textContent='key down: ' + e.keyCode;
 //	return true; 
+}
+
+function g_SetUserNameButton() { g_SetUserNameDialog();}
+function g_SetUserNameDialog()
+{
+	new cgru_Dialog( document, document.body, window, 'g_SetUserName', 'user_name', 'str', '', 'settings', 'Set User Name', 'You should restart GUI<br/>Just refresh browser');
+}
+function g_SetUserName( i_parameter, i_value)
+{
+	var value = i_value;
+	if( value == null )
+		var value = localStorage['user_name'];
+//	if( value == null )
+//	localStorage['user_name'] = 0;
+//localStorage['user_name']++;
+
+	document.getElementById('username').textContent = i_value;
+//g_Info( i_parameter+'='+i_value);
 }
