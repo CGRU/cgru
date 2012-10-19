@@ -281,7 +281,8 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	}
 	else if( document.HasMember("monitor"))
 	{
-		AfContainerLock lock( i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
+		AfContainerLock ulock( i_args->users,    AfContainerLock::READLOCK);
 		MonitorAf * newMonitor = new MonitorAf( document["monitor"]);
 		newMonitor->setAddressIP( i_msg->getAddress());
 		o_msg_response = i_args->monitors->addMonitor( newMonitor, true);

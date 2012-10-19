@@ -22,7 +22,7 @@ overflow: hidden;
 -webkit-transition: all .3s ease-in-out;
 }
 #header { height: 226px; top: -200px; }
-#header { height: 226px; top: 0px; }
+/*#header { height: 226px; top: 0px; }*/
 #headermain {
 position: absolute;
 left: 0; right: 0; bottom: 0; top: 200px;
@@ -64,25 +64,31 @@ box-shadow: 0px 0px 5px #000 inset;
 }
 #settings > * {
 margin: 5px 10px;
-/*padding: 2px 8px;
-border-radius: 4px;*/
+}
+#settings .parameter {
+/*
+padding: 2px 8px;
+box-shadow: 0px 0px 2px #000 inset;
+*/
 height: 20px;
 }
 #settings * {
 position: absolute;
+/*
+position: relative;
+*/
 text-align: center;
 white-space:nowrap;
 /*box-shadow: 0px 0px 2px #000 inset;*/
 }
-#settings .parameter {}
-#settings .parameter .label { padding: 3px 8px;}
-#settings .parameter .variable {
+#settings .label { padding: 3px 8px;}
+#settings .variable {
 padding: 2px 8px;
 height: 15px;
 box-shadow: 0px 0px 2px #000 inset;
 border-radius: 2px;
 }
-#settings .parameter .button {
+#settings .button {
 cursor: pointer;
 padding: 3px 8px;
 box-shadow: 0px 0px 2px #000;

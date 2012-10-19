@@ -32,6 +32,8 @@
 			<div id="hostname" style="left:40%;right:45px" class="variable"></div>
 			<div class="button" style="right:0;">Edit</div>
 		</div>
+		<div class="button" style="top:30px;" onclick="g_LocalStorageShow()">Show Local Storage</div>
+		<div class="button" style="left:150px;top:30px;" onclick="g_LocalStorageClearClicked()">Clear Local Storage</div>
 	</div>
 	<div id="headermain">
 		<div id="headeropenbutton" onclick="g_HeaderButtonClicked()">&darr;</div>
@@ -43,7 +45,7 @@
 
 <div id="footer">
 	<div id="footeropenbutton" onclick="g_FooterButtonClicked()">&uarr;</div>
-	<div id="version">v0</div>
+	<div id="version">v0.0.0</div>
 	<div id="netlog_btn" onclick="g_LogButtonClicked('net')">Net</div>
 	<div id="log_btn" onclick="g_LogButtonClicked('log')">Log</div>
 	<div id="info"></div>

@@ -132,8 +132,8 @@ function nw_ConstructActionObject( i_type, i_ids)
 {
 	var obj = {};
 	obj.action = {};
-	obj.action.user_name = g_user_name;
-	obj.action.host_name = g_host_name;
+	obj.action.user_name = localStorage["user_name"];
+	obj.action.host_name = localStorage["host_name"];
 	obj.action.type = i_type;
 	obj.action.ids = i_ids;
 

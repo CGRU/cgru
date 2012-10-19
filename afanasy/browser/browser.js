@@ -2,10 +2,10 @@ g_cycle = 0;
 g_last_msg_cycle = g_cycle;
 g_id = 0;
 g_uids = [0];
-g_name = 'web';
+/*g_name = 'web';
 g_version = 'browser';
 g_user_name = "jimmy";
-g_host_name = "pc01";
+g_host_name = "pc01";*/
 
 g_windows = [];
 g_recievers = [];
@@ -20,18 +20,18 @@ g_FooterOpened = false;
 
 g_Images = [];
 
-function g_Register()
+function g_RegisterSend()
 {
 	if( g_id != 0)
 		return;
 
 	var obj = {};
 	obj.monitor = {};
-	obj.monitor.name = g_name;
-	obj.monitor.version = g_version;
+	obj.monitor.name = localStorage["name"];
+	obj.monitor.user_name = localStorage['user_name'];
 	nw_Send(obj);
 
-	setTimeout("g_Register()", 5000);
+	setTimeout("g_RegisterSend()", 5000);
 }
 
 function g_ProcessMsg( obj)
@@ -55,8 +55,7 @@ function g_ProcessMsg( obj)
 		if(( g_id == 0 ) && ( obj.id > 0 ))
 		{
 			// Monitor is not registered and recieved an ID:
-			g_id = obj.id;
-			g_Registered();
+			g_RegisterRecieved( obj);
 		}
 		else if( obj.id != g_id )
 		{
@@ -112,22 +111,28 @@ function g_Refresh()
 
 function g_Init()
 {
+	window.onbeforeunload = g_OnClose;
+	document.body.onkeydown = g_OnKeyDown;
+
+	nw_GetSoftwareIcons();
+
+	localStorage["name"] = 'webgui';
+	localStorage["host_name"] = "pc";
+	g_SetUserName();
+
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
 	for( var i = 0; i < g_monitor_buttons.length; i++)
 		g_monitor_buttons[i].onclick = function(e){return g_MButtonClicked(e.currentTarget.textContent,e);};
 
-	nw_GetSoftwareIcons();
-	g_Register();
+	g_RegisterSend();
 	g_Refresh();
-
-	window.onbeforeunload = g_OnClose;
-	document.body.onkeydown = g_OnKeyDown;
 }
 
-function g_Registered()
+function g_RegisterRecieved( i_obj)
 {
-	g_Info('Registed: ID = ' + g_id + ' User = ' + localStorage['user_name']);
+	g_id = i_obj.id;
+	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"');
 	g_MButtonClicked('jobs');
 }
 
@@ -136,7 +141,7 @@ function g_Deregistered()
 //g_Info('Deregistered.');
 	g_id = 0;
 	g_CloseAllMonitors();
-	g_Register();
+	g_RegisterSend();
 }
 
 function g_ConnectionLost()
@@ -432,13 +437,32 @@ function g_SetUserNameDialog()
 }
 function g_SetUserName( i_parameter, i_value)
 {
-	var value = i_value;
+	var value = null;
+	if( i_value && i_value.length )
+		value = i_value;
 	if( value == null )
-		var value = localStorage['user_name'];
-//	if( value == null )
-//	localStorage['user_name'] = 0;
-//localStorage['user_name']++;
+		value = localStorage['user_name'];
+	if( value == null )
+	{
+		g_SetUserNameDialog()
+		return;
+	}
 
-	document.getElementById('username').textContent = i_value;
-//g_Info( i_parameter+'='+i_value);
+	localStorage['user_name'] = value;
+	g_Info('User name set to "'+value+'"');
+	document.getElementById('username').textContent = value;
+}
+function g_LocalStorageShow() { g_ShowObject( localStorage);}
+function g_LocalStorageClearClicked()
+{
+	new cgru_Dialog( document, document.body, window, 'g_LocalStorageClear', 'local_storage_clear', 'str', '', 'settings', 'Clear Local Storage', 'Are You Sure?<br/>Type "yes".');
+}
+function g_LocalStorageClear( i_name, i_value)
+{
+	if( i_name && i_value )
+		if( i_value != 'yes' )
+			return;
+	localStorage.clear();
+	g_Info('Local Storage Cleared.');
+	g_SetUserName();
 }
