@@ -254,8 +254,6 @@ int main(int argc, char *argv[])
     */
     AFCommon afcommon( &threadArgs );
 
-    AFINFA("Thread (id = %lu) is main, creating other threads.", (long unsigned)DlThread::Self())
-
     /*
       Start the thread that is responsible of listening to the port
       for incoming connections.

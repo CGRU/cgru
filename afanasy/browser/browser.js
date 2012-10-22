@@ -1,11 +1,8 @@
 g_cycle = 0;
 g_last_msg_cycle = g_cycle;
 g_id = 0;
-g_uids = [0];
-/*g_name = 'web';
-g_version = 'browser';
-g_user_name = "jimmy";
-g_host_name = "pc01";*/
+g_uid = -1;
+g_keysdown = '';
 
 g_windows = [];
 g_recievers = [];
@@ -27,11 +24,13 @@ function g_RegisterSend()
 
 	var obj = {};
 	obj.monitor = {};
-	obj.monitor.name = localStorage["name"];
+	obj.monitor.name = localStorage['name'];
 	obj.monitor.user_name = localStorage['user_name'];
+	obj.monitor.host_name = localStorage['host_name'];
+	obj.monitor.engine = 'web';
 	nw_Send(obj);
 
-	setTimeout("g_RegisterSend()", 5000);
+	setTimeout('g_RegisterSend()', 5000);
 }
 
 function g_ProcessMsg( obj)
@@ -50,14 +49,14 @@ function g_ProcessMsg( obj)
 		return;
 	}
 
-	if( obj.id != null )
+	if( obj.monitor )
 	{
-		if(( g_id == 0 ) && ( obj.id > 0 ))
+		if(( g_id == 0 ) && ( obj.monitor.id > 0 ))
 		{
 			// Monitor is not registered and recieved an ID:
-			g_RegisterRecieved( obj);
+			g_RegisterRecieved( obj.monitor);
 		}
-		else if( obj.id != g_id )
+		else if( obj.monitor.id != g_id )
 		{
 			// Recieved ID does not match:
 			g_Deregistered();
@@ -116,8 +115,8 @@ function g_Init()
 
 	nw_GetSoftwareIcons();
 
-	localStorage["name"] = 'webgui';
-	localStorage["host_name"] = "pc";
+	localStorage['name'] = 'webgui';
+	localStorage['host_name'] = 'pc';
 	g_SetUserName();
 
 	var header = document.getElementById('header');
@@ -132,8 +131,16 @@ function g_Init()
 function g_RegisterRecieved( i_obj)
 {
 	g_id = i_obj.id;
-	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"');
+	if( i_obj.uid && ( i_obj.uid > 0 ))
+		g_uid = i_obj.uid;
+	if( g_uid < 0 )
+	{
+		g_visor = true;
+		g_god = true;
+	}
+	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
 	g_MButtonClicked('jobs');
+	g_SuperUserProcessGUI();
 }
 
 function g_Deregistered()
@@ -317,7 +324,7 @@ function g_FooterButtonClicked()
 	var button = document.getElementById('footeropenbutton');
 	if( g_FooterOpened )
 	{
-		footer.style.bottom = '-200px';
+		footer.style.height = '26px';
 		button.innerHTML = '&uarr;';
 		document.getElementById('log_btn').classList.remove('pushed');
 		document.getElementById('netlog_btn').classList.remove('pushed');
@@ -329,7 +336,7 @@ function g_FooterButtonClicked()
 	}
 	else
 	{
-		footer.style.bottom = '0px';
+		footer.style.height = '226px';
 		button.innerHTML = '&darr;';
 		document.getElementById('log_btn').classList.add('pushed');
 		document.getElementById('log').style.display = 'block';
@@ -427,7 +434,13 @@ function g_OnKeyDown(e)
 	else if((e.keyCode==40) && g_cur_monitor) g_cur_monitor.selectNext( e, false); // DOWN
 //	else if(evt.keyCode==116) return false; // F5
 //document.getElementById('test').textContent='key down: ' + e.keyCode;
-//	return true; 
+//	return true;
+
+	g_keysdown += String.fromCharCode( e.keyCode);
+	if( g_keysdown.length > 5 )
+		g_keysdown = g_keysdown.slice( g_keysdown.length - 5, g_keysdown.length);
+//g_Info( g_keysdown );
+	g_CheckSequence();
 }
 
 function g_SetUserNameButton() { g_SetUserNameDialog();}
@@ -466,3 +479,69 @@ function g_LocalStorageClear( i_name, i_value)
 	g_Info('Local Storage Cleared.');
 	g_SetUserName();
 }
+
+function g_CheckSequence()
+{
+	var god = ( g_keysdown == 'IDDQD' );
+	var visor = false;
+	if( god ) visor = true;
+	else visor = ( g_keysdown == 'IDKFA' );
+
+	if(( visor == false ) && ( god == false ))
+		return;
+
+	if( localStorage['visor'] )
+	{
+		localStorage.removeItem('visor');
+		localStorage.removeItem('god');
+		g_Info('USER MODE');
+	}
+	else
+	{
+		if( visor )
+		{
+			localStorage['visor'] = true;
+			g_Info('VISOR MODE');
+		}
+		if( god )
+		{
+			localStorage['god'] = true;
+			g_Info('GOD MODE');
+		}
+	}
+	g_SuperUserProcessGUI();
+}
+function g_VISOR()
+{
+	if( localStorage['visor'] ) return true;
+	if( g_uid < 1 ) return true;
+	return false;
+}
+function g_GOD()
+{
+	if( localStorage['god'] ) return true;
+	if( g_uid < 1 ) return true;
+	return false;
+}
+function g_SuperUserProcessGUI()
+{
+//g_Info('g_SuperUserProcessGUI()')
+	if( g_GOD())
+	{
+		document.getElementById('header').classList.add('su_god');
+		document.getElementById('footer').classList.add('su_god');
+	}
+	else if( g_VISOR())
+	{
+		document.getElementById('header').classList.add('su_visor');
+		document.getElementById('footer').classList.add('su_visor');
+	}
+	else
+	{
+		document.getElementById('header').classList.remove('su_visor');
+		document.getElementById('header').classList.remove('su_god');
+		document.getElementById('footer').classList.remove('su_visor');
+		document.getElementById('footer').classList.remove('su_god');
+	}
+}
+

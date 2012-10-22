@@ -52,10 +52,31 @@ void UserAf::v_action( Action & i_action)
 {
 	bool was_permanent = isPermanent();
 
+	const JSON & operation = (*i_action.data)["operation"];
+	if( operation.IsObject())
+	{
+		std::string type;
+		af::jr_string("type", type, operation);
+		if( type.find("move_jobs_") == 0 )
+		{
+			std::vector<int32_t> jids;
+			af::jr_int32vec("jids", jids, operation);
+			if( type == "move_jobs_up" )
+				m_jobslist.moveNodes( jids, AfList::MoveUp);
+			else if( type == "move_jobs_down" )
+				m_jobslist.moveNodes( jids, AfList::MoveDown);
+			else if( type == "move_jobs_top" )
+				m_jobslist.moveNodes( jids, AfList::MoveTop);
+			else if( type == "move_jobs_bottom" )
+				m_jobslist.moveNodes( jids, AfList::MoveBottom);
+			updateJobsOrder();
+        	i_action.monitors->addUser( this);
+		}
+	}
+
 	const JSON & params = (*i_action.data)["params"];
 	if( params.IsObject())
 		jsonRead( params, &i_action.log);
-
 
 	if( was_permanent != isPermanent())
 	{
@@ -246,7 +267,7 @@ bool UserAf::getJobs( std::ostringstream & o_str)
 		if( false == first )
 			o_str << ",\n";
 		first = false;
-		((af::Job*)(job))->v_jsonWrite( o_str, af::Msg::TJobsList);
+		((JobAf*)(job))->v_jsonWrite( o_str, af::Msg::TJobsList);
 		has_jobs = true;
 	}
 	return has_jobs;
@@ -257,6 +278,24 @@ void UserAf::jobsinfo( af::MCAfNodes &mcjobs)
 	AfListIt jobsListIt( &m_jobslist);
 	for( AfNodeSrv *job = jobsListIt.node(); job != NULL; jobsListIt.next(), job = jobsListIt.node())
 		mcjobs.addNode( job->node());
+}
+
+af::Msg * UserAf::writeJobdsOrder() const
+{
+	std::vector<int32_t> jids = m_jobslist.generateIdsList();
+	std::ostringstream str;
+
+	str << "{\"events\":{\"jobs_order\":{\"uids\":[";
+	str << getId();
+	str << "],\"jids\":[[";
+	for( int j = 0; j < jids.size(); j++)
+	{
+		if( j > 0 ) str << ",";
+		str << jids[j];
+	}
+	str << "]]}}}";
+
+	return af::jsonMsg( str);
 }
 
 void UserAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -422,13 +461,6 @@ void UserAf::moveJobs( const af::MCGeneral & mcgeneral, int type)
       }
    }
    updateJobsOrder();
-}
-
-void UserAf::generateJobsIds( af::MCGeneral & ids) const
-{
-   if( ids.getCount()) ids.clearIds();
-   ids.setId( m_id);
-   m_jobslist.generateIds( ids);
 }
 
 int UserAf::calcWeight() const

@@ -139,6 +139,19 @@ JobNode.prototype.refresh = function()
 
 JobNode.prototype.onDoubleClick = function() { g_OpenTasks( this.params.name, this.params.id );}
 JobNode.prototype.menuHandleShowObj = function() { g_ShowObject( this.params );}
+JobNode.prototype.menuHandleMove = function( i_name)
+{
+	if( g_uid < 1 )
+	{
+		g_Error('Can`t move nodes for uid < 1');
+		return;
+	}
+	var operation = {};
+	operation.type = i_name;
+	operation.jids = this.monitor.getSelectedIds();
+	nw_Action('users', [g_uid], operation);
+	this.monitor.info('Moving Jobs');
+}
 
 function JobBlock( i_elParent, i_block)
 {
@@ -600,6 +613,11 @@ JobNode.actions.push(['context',  null,               null,  null,              
 JobNode.actions.push(['context', 'reset_error_hosts', null, 'menuHandleOperation', 'Reset Error Hosts']);
 JobNode.actions.push(['context', 'restart_errors',    null, 'menuHandleOperation', 'Restart Errors']);
 JobNode.actions.push(['context',  null,               null,  null,                  null]);
+JobNode.actions.push(['context', 'move_jobs_up',      null, 'menuHandleMove',      'Move Up',     'user']);
+JobNode.actions.push(['context', 'move_jobs_down',    null, 'menuHandleMove',      'Move Down',   'user']);
+JobNode.actions.push(['context', 'move_jobs_top',     null, 'menuHandleMove',      'Move Top',    'user']);
+JobNode.actions.push(['context', 'move_jobs_bottom',  null, 'menuHandleMove',      'Move Bottom', 'user']);
+JobNode.actions.push(['context',  null,               null,  null,                  null]);
 JobNode.actions.push(['context', 'start',             null, 'menuHandleOperation', 'Start']);
 JobNode.actions.push(['context', 'pause',             null, 'menuHandleOperation', 'Pause']);
 JobNode.actions.push(['context', 'stop',              null, 'menuHandleOperation', 'Stop']);
@@ -642,6 +660,8 @@ JobBlock.actions.push(['set', 'depend_mask',                'reg', 'menuHandleDi
 JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleDialog', 'Tasks Depend Mask']);
 JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Properties Needed']);
 
-JobNode.sort = ['priority','user_name','name','host_name'];
-JobNode.filter = ['user_name','name','host_name'];
+JobNode.sortVisor = 'time_creation';
+JobNode.sort = ['user_list_order','time_creation','priority','user_name','name','host_name'];
+JobNode.filter = ['name','host_name','user_name'];
+JobNode.filterVisor = 'user_name';
 

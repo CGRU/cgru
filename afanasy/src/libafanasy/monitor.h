@@ -33,12 +33,18 @@ public:
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
+	virtual void v_jsonWrite( std::ostringstream & o_str, int i_type) const;
+	
    static const int EventsCount;
    static const int EventsShift;
 	static const char EventsNames[18][32];
 //	static const char EventsClasses[18][32];
 
 protected:
+	int32_t m_uid;
+	std::string m_host_name;
+	std::string m_engine;
+
    bool  *  events;
    std::list<int32_t> jobsUsersIds;
    std::list<int32_t> jobsIds;

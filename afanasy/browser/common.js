@@ -1,15 +1,17 @@
 cm_Attrs = [];
-cm_Attrs.push(['name',          'Name',     'Name']);
-cm_Attrs.push(['user_name',     'User',     'User Name']);
-cm_Attrs.push(['host_name',     'Host',     'Host Name']);
-cm_Attrs.push(['priority',      'Priority', 'Priority']);
-cm_Attrs.push(['time_creation', 'Created',  'Time Created']);
-cm_Attrs.push(['time_started',  'Started',  'Time Started']);
-cm_Attrs.push(['time_done',     'Finished', 'Time Finished']);
+cm_Attrs.push(['name',            'Name',     'Name']);
+cm_Attrs.push(['user_name',       'User',     'User Name']);
+cm_Attrs.push(['host_name',       'Host',     'Host Name']);
+cm_Attrs.push(['priority',        'Priority', 'Priority']);
+cm_Attrs.push(['time_creation',   'Created',  'Time Created']);
+cm_Attrs.push(['time_started',    'Started',  'Time Started']);
+cm_Attrs.push(['time_done',       'Finished', 'Time Finished']);
+cm_Attrs.push(['user_list_order', 'Order',    'Order']);
+
 // This is task progress parameters short names:
-cm_Attrs.push(['str',           'Starts',   'Starts Count']);
-cm_Attrs.push(['err',           'Errors',   'Errors Count']);
-cm_Attrs.push(['hst'      ,     'Host',     'Host Name']);
+cm_Attrs.push(['str',             'Starts',   'Starts Count']);
+cm_Attrs.push(['err',             'Errors',   'Errors Count']);
+cm_Attrs.push(['hst',             'Host',     'Host Name']);
 
 function cm_CompareItems( i_itemA, i_itemB, i_param, i_greater )
 {
@@ -23,18 +25,11 @@ function cm_CompareItems( i_itemA, i_itemB, i_param, i_greater )
 	if( i_itemA.params[i_param] < i_itemB.params[i_param] )
 		return i_greater == false;
 
-	var param = 'name';
-	if( i_param == param )
-		return i_greater == false;
-
-	if( i_greater )
-		if( i_itemA.params[param] > i_itemB.params[param] )
+	if( i_param != 'name' )
+		if( i_itemA.params['name'] < i_itemB.params['name'] )
 			return true;
-	else
-		if( i_itemA.params[param] < i_itemB.params[param] )
-			return false;
 
-	return i_greater == false;
+	return false;
 }
 
 function cm_ArrayRemove( io_arr, i_value)

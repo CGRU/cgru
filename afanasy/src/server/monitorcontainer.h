@@ -50,7 +50,7 @@ private:
 
    std::list<af::MCTasksProgress*> tasks;
 
-   std::list<UserAf*> users;
+	std::list<UserAf*> usersJobOrderChanged;
 
    void clearEvents();
 };

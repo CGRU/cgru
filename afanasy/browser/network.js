@@ -71,7 +71,13 @@ function nw_Subscribe( i_class, i_subscribe, i_ids)
 		obj.action.operation.status = 'unsubscribe';
 	if( i_ids != null )
 		obj.action.operation.ids = i_ids;
-	obj.action.operation.uids = g_uids;
+	if( i_class == 'jobs' )
+	{
+		var uid = g_uid;
+		if( g_VISOR() || g_GOD() || ( uid < 0 ))
+			uid = 0
+		obj.action.operation.uids = [uid];
+	}
 
 	nw_Send(obj);
 }
@@ -94,8 +100,12 @@ function nw_GetNodes( i_type, i_ids, i_mode, i_blocks, i_tasks, i_number)
 	var obj = {};
 	obj.get = {};
 	obj.get.type = i_type;
+
 	if(( i_ids != null ) && ( i_ids.length > 0 ))
 		obj.get.ids = i_ids;
+	else if(( i_type == 'jobs') && ( false == ( g_VISOR() || g_GOD() )))
+		obj.get.uids = [g_uid];
+
 	if( i_mode )
 		obj.get.mode = i_mode;
 	if( i_blocks )
@@ -132,8 +142,8 @@ function nw_ConstructActionObject( i_type, i_ids)
 {
 	var obj = {};
 	obj.action = {};
-	obj.action.user_name = localStorage["user_name"];
-	obj.action.host_name = localStorage["host_name"];
+	obj.action.user_name = localStorage['user_name'];
+	obj.action.host_name = localStorage['host_name'];
 	obj.action.type = i_type;
 	obj.action.ids = i_ids;
 

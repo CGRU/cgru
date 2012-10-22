@@ -7,6 +7,7 @@
 #include "action.h"
 #include "afcommon.h"
 #include "monitorcontainer.h"
+#include "usercontainer.h"
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -21,11 +22,20 @@ MonitorAf::MonitorAf( af::Msg * msg):
 {
 }
 
-MonitorAf::MonitorAf( const JSON & obj):
+MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 	AfNodeSrv( this),
-	af::Monitor( obj)
+	af::Monitor( i_obj)
 {
 	m_event_nodeids = new std::list<int32_t>[af::Monitor::EventsCount];
+
+	UserContainerIt usersIt( i_users);
+	for( af::User *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
+	{
+		if( user->getName() == m_user_name)
+		{
+			m_uid = user->getId();
+		}
+	}
 }
 
 MonitorAf::~MonitorAf()
@@ -357,6 +367,19 @@ void MonitorAf::addBlock( int i_j, int i_b, int i_mode)
 	m_bids[i].mode = i_mode;
 }
 
+void MonitorAf::addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids)
+{
+	for( int i = 0; i < m_jobs_order_uids.size(); i++)
+		if( m_jobs_order_uids[i] == i_uid )
+		{
+			m_jobs_order_jids[i] = i_jids;
+			return;
+		}
+
+	m_jobs_order_uids.push_back( i_uid);
+	m_jobs_order_jids.push_back( i_jids);
+}
+
 af::Msg * MonitorAf::getEvents()
 {
 	updateTime();
@@ -382,6 +405,7 @@ af::Msg * MonitorAf::getEvents()
 			stream << ",";
 		else
 			stream << "{";
+
 		stream << "\n\"" << af::Monitor::EventsNames[e] << "\":";
 		stream << "[";
 
@@ -406,6 +430,7 @@ af::Msg * MonitorAf::getEvents()
 			stream << ",";
 		else
 			stream << "{";
+
 		stream << "\n\"tasks_progress\":[";
 		for( int j = 0; j < m_tp.size(); j++)
 		{
@@ -439,7 +464,11 @@ af::Msg * MonitorAf::getEvents()
 	// Blocks ids:
 	if( m_bids.size())
 	{
-		if( hasevents ) stream << ",";
+		if( hasevents )
+			stream << ",";
+		else
+			stream << "{";
+
 		stream << "\n\"block_ids\":{";
 
 		stream << "\"job_id\":[";
@@ -467,8 +496,43 @@ af::Msg * MonitorAf::getEvents()
 		stream << "]}";
 
 		hasevents = true;
+
 		m_bids.clear();
 	}
+
+	if( m_jobs_order_uids.size())
+	{
+		if( hasevents )
+			stream << ",";
+		else
+			stream << "{";
+
+		stream << "\"jobs_order\":{\"uids\":[";
+		for( int i = 0; i < m_jobs_order_uids.size(); i++)
+		{
+			if( i > 0 ) stream << ",";
+			stream << m_jobs_order_uids[i];
+		}
+		stream << "],\"jids\":[";
+		for( int i = 0; i < m_jobs_order_jids.size(); i++)
+		{
+			if( i > 0 ) stream << ",";
+			stream << "[";
+			for( int j = 0; j < m_jobs_order_jids[i].size(); j++)
+			{
+				if( j > 0 ) stream << ",";
+				stream << m_jobs_order_jids[i][j];
+			}
+			stream << "]";
+		}
+		stream << "]}";
+
+		hasevents = true;
+
+		m_jobs_order_uids.clear();
+		m_jobs_order_jids.clear();
+	}
+
 
 	if( false == hasevents )
 		stream << "\nnull";

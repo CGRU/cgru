@@ -6,6 +6,7 @@
 #include "afnodesrv.h"
 
 class Action;
+class UserContainer;
 
 class MonitorAf: public af::Monitor, public AfNodeSrv
 {
@@ -13,7 +14,7 @@ public:
 
    MonitorAf( af::Msg * msg);
 
-	MonitorAf( const JSON & obj);
+	MonitorAf( const JSON & i_obj, UserContainer * i_users);
 
    ~MonitorAf();
 
@@ -45,6 +46,8 @@ public:
 
 	void addBlock( int i_j, int i_b, int i_mode);
 
+	void addUserJobsOrder( int32_t i_uid, std::vector<int32_t> i_jids);
+
 private:
    void setEvents( const std::vector<int32_t> & i_ids, bool value);
    void setJobsUsersIds( const std::vector<int32_t> & i_ids);
@@ -69,6 +72,9 @@ private:
 		int mode;
 	};
 	std::vector<MBlocksIds> m_bids;
+
+	std::vector<int32_t> m_jobs_order_uids;
+	std::vector<std::vector<int32_t> > m_jobs_order_jids;
 
 private:
 	static MonitorContainer * m_monitors;

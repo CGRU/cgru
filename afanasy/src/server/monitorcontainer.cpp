@@ -71,12 +71,11 @@ af::Msg * MonitorContainer::addMonitor( MonitorAf * i_monitor, bool i_json)
 	if( i_json == false )
 		return new af::Msg( af::Msg::TMonitorId, id);
 
-	std::string data = "{\"id\":";
-	data += af::itos(id);
-	data += "}";
-	af::Msg * msg = new af::Msg();
-	msg->setData( data.size(), data.c_str(), af::Msg::TJSON);
-	return msg;
+	std::ostringstream str;
+	str << "{\"monitor\":{";
+	i_monitor->v_jsonWrite( str, 0);
+	str << "}}";
+	return af::jsonMsg( str);
 }
 
 bool MonitorContainer::setInterest( int type, af::MCGeneral & ids)
@@ -292,33 +291,63 @@ void MonitorContainer::dispatch()
    }
    }
 
-   //
-   // Users jobs order:
-   //
-   {
-   MonitorContainerIt monitorsIt( this);
-   for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
-   {
-      std::list<UserAf*>::iterator uIt = users.begin();
-      while( uIt != users.end())
-      {
-         if( monitor->hasJobUid((*uIt)->getId()))
-         {
-            af::MCGeneral ids;
-            (*uIt)->generateJobsIds( ids);
-            af::Msg * msg = new af::Msg( af::Msg::TUserJobsOrder, &ids);
-            msg->setAddress( monitor);
-            AFCommon::QueueMsgDispatch( msg);
-         }
-         uIt++;
-      }
-   }
-   }
+	//
+	// Users jobs order:
+	//
+	{
+/*	MonitorContainerIt monitorsIt( this);
+	for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+	{
+		std::list<UserAf*>::iterator uIt = usersJobOrderChanged.begin();
+		while( uIt != usersJobOrderChanged.end())
+		{
+			if( monitor->hasJobUid((*uIt)->getId()))
+			{
+				af::MCGeneral ids;
+				(*uIt)->generateJobsIds( ids);
+				af::Msg * msg = new af::Msg( af::Msg::TUserJobsOrder, &ids);
+				msg->setAddress( monitor);
+				AFCommon::QueueMsgDispatch( msg);
+			}
+			uIt++;
+		}
+	}*/
+	std::list<UserAf*>::iterator uIt = usersJobOrderChanged.begin();
+	while( uIt != usersJobOrderChanged.end())
+	{
+		af::Msg * msg = NULL;
+		std::vector<int32_t> ids = (*uIt)->generateJobsIds();
+		af::MCGeneral mcIds;
+		mcIds.setId( (*uIt)->getId());
+		mcIds.setList( ids);
 
-   //
-   // Delete all events:
-   //
-   clearEvents();
+		MonitorContainerIt monitorsIt( this);
+		for( MonitorAf * monitor = monitorsIt.monitor(); monitor != NULL; monitorsIt.next(), monitor = monitorsIt.monitor())
+			if( monitor->hasJobUid((*uIt)->getId()))
+			{
+				if( monitor->collectingEvents() )
+				{
+					monitor->addUserJobsOrder((*uIt)->getId(), ids);
+				}
+				else
+				{
+					if( msg == NULL )
+						msg = new af::Msg( af::Msg::TUserJobsOrder, &mcIds);
+					msg->addAddress( monitor);
+				}
+			}
+
+		if( msg )
+			AFCommon::QueueMsgDispatch( msg);
+
+		uIt++;
+	}
+	}
+
+	//
+	// Delete all events:
+	//
+	clearEvents();
 }
 
 void MonitorContainer::clearEvents()
@@ -343,7 +372,7 @@ void MonitorContainer::clearEvents()
    blocks.clear();
    blocks_types.clear();
 
-   users.clear();
+   usersJobOrderChanged.clear();
 }
 
 void MonitorContainer::sendMessage( const af::MCGeneral & mcgeneral)
@@ -425,9 +454,11 @@ void MonitorContainer::addBlock( int type, af::BlockData * block)
 
 void MonitorContainer::addUser( UserAf * user)
 {
-   std::list<UserAf*>::const_iterator uIt = users.begin();
-   while( uIt != users.end()) if( *(uIt++) == user) return;
-   users.push_back( user);
+	std::list<UserAf*>::const_iterator uIt = usersJobOrderChanged.begin();
+	while( uIt != usersJobOrderChanged.end())
+		if( *(uIt++) == user)
+			return;
+	usersJobOrderChanged.push_back( user);
 }
 
 //##############################################################################

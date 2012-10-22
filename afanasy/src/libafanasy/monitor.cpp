@@ -80,11 +80,15 @@ Monitor::Monitor( const JSON & obj):
 	construct();
 	jr_string("name",      m_name,      obj);
 	jr_string("user_name", m_user_name, obj);
-	jr_string("version",   m_version,   obj);
+	jr_string("host_name", m_host_name, obj);
+	jr_string("engine",    m_engine,    obj);
+
+	m_version = af::Environment::getVersionCGRU();
 }
 
 bool Monitor::construct()
 {
+	m_uid = -1;
    events = new bool[EventsCount];
    if( events == NULL)
    {
@@ -116,6 +120,13 @@ void Monitor::readwrite( Msg * msg)
    rw_Int32_List( jobsIds,      msg);
 
    m_address.readwrite( msg);
+}
+
+void Monitor::v_jsonWrite( std::ostringstream & o_str, int i_type) const
+{
+	Client::v_jsonWrite( o_str, i_type);
+
+	o_str << ",\"uid\":" << m_uid;
 }
 
 bool Monitor::hasEvent( int type) const

@@ -55,7 +55,9 @@ public:
 
     inline AfList * getJobsList() { return &m_jobslist; }
 
-    void generateJobsIds( af::MCGeneral & ids) const;
+	inline const std::vector<int32_t> generateJobsIds() const { return m_jobslist.generateIdsList();}
+
+	af::Msg * writeJobdsOrder() const;
 
 	/// Set container.
 	inline static void setUserContainer( UserContainer * i_users ) { ms_users = i_users;}

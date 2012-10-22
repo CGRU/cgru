@@ -48,9 +48,9 @@ Client::~Client()
    clearNetIFs();
 }
 
-void Client::v_jsonWrite( std::ostringstream & o_str, int type) const
+void Client::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
-	Node::v_jsonWrite( o_str, type);
+	Node::v_jsonWrite( o_str, i_type);
 
 	o_str << ",\"user_name\":\"" << m_user_name << "\"";
 	o_str << ",\"time_register\":" << m_time_register;

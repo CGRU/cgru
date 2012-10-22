@@ -4,6 +4,7 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.type = i_type;
 	this.elParent = i_element;
 	this.name = i_name ? i_name : i_type;
+	this.elementsSU = [];
 
 	this.nodeConstructor = null;
 	if     ( this.type == 'jobs'   ) this.nodeConstructor = JobNode;
@@ -25,6 +26,8 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elList.classList.add('list');
 	this.elCtrl.classList.add('ctrl');
 	this.elInfo.classList.add('info');
+	this.elementsSU.push( this.elCtrl);
+	this.elementsSU.push( this.elInfo);
 
 	this.elList.monitor = this;
 	this.elList.oncontextmenu = function(e){ return e.currentTarget.monitor.noneSelected(e);}
@@ -47,7 +50,7 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 
 		buttons_width = 50;
 
-		if( this.type == 'renders' )
+		if( this.type == 'renders' && g_GOD())
 		{
 			this.elCtrlAux1 = this.document.createElement('div');
 			this.elCtrlButtons.appendChild( this.elCtrlAux1);
@@ -86,12 +89,6 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elCtrlSortParam.ondblclick = function(e){return e.currentTarget.monitor.sortDirChanged(e);}
 	this.elCtrlSortParam.title = 'Sort Parameter\nContext menu to select.\nDouble click to toggle direction.';
 	this.elCtrlSortParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'sort');}
-	for( var i = 0; i < cm_Attrs.length; i++)
-		if( cm_Attrs[i][0] == this.nodeConstructor.sort[0] )
-		{
-			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
-			this.sortParm = cm_Attrs[i][0];
-		}
 
 	this.elCtrlFilter = this.document.createElement('div');
 	this.elCtrlSortFilter.appendChild( this.elCtrlFilter);
@@ -110,12 +107,6 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 	this.elCtrlFilterParam.monitor = this;
 	this.elCtrlFilterParam.oncontextmenu = function(e){return e.currentTarget.monitor.sortFilterParmMenu(e,'filter');}
 	this.elCtrlFilterParam.ondblclick = function(e){return e.currentTarget.monitor.filterExcludeChanged(e);}
-	for( var i = 0; i < cm_Attrs.length; i++)
-		if( cm_Attrs[i][0] == this.nodeConstructor.filter[0] )
-		{
-			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
-			this.filterParm = cm_Attrs[i][0];
-		}
 
 	this.elCtrlFilterInput = this.document.createElement('div');
 	this.elCtrlFilter.appendChild( this.elCtrlFilterInput);
@@ -144,9 +135,39 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 		}
 	}
 
+	for( var i = 0; i < this.elementsSU.length; i++)
+		if( g_GOD())
+			this.elementsSU[i].classList.add('su_god');
+		else if ( g_VISOR())
+			this.elementsSU[i].classList.add('su_visor');
+
+	
+	if( this.nodeConstructor.sortVisor && g_VISOR() )
+		this.sortParm = this.nodeConstructor.sortVisor;
+	else
+		this.sortParm = this.nodeConstructor.sort[0];
+	for( var i = 0; i < cm_Attrs.length; i++)
+		if( cm_Attrs[i][0] == this.sortParm )
+			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
+	this.sortDirection = false;
+	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order'))
+		this.sortDirection = true;
+
+	if( this.nodeConstructor.filterVisor && g_VISOR())
+		this.filterParm = this.nodeConstructor.filterVisor;
+	else
+		this.filterParm = this.nodeConstructor.filter[0];
+	for( var i = 0; i < cm_Attrs.length; i++)
+		if( cm_Attrs[i][0] == this.filterParm )
+			this.elCtrlFilterParam.textContent = cm_Attrs[i][1];
+
 	this.items = [];
 	g_recievers.push( this);
 	g_monitors.push( this);
+
+	g_cur_monitor = this;
+	this.menu = null;
+	this.cycle = 0;
 
 	if( this.type == 'tasks')
 	{
@@ -159,11 +180,6 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 		nw_Subscribe( this.type, true);
 		nw_GetNodes( this.type);
 	}
-
-	g_cur_monitor = this;
-
-	this.menu = null;
-	this.cycle = 0;
 }
 
 Monitor.prototype.destroy = function()
@@ -194,7 +210,7 @@ Monitor.prototype.destroy = function()
 		}
 
 	g_MonitorClosed( this.name);
-g_Info('Destroying "'+this.name+'"');
+//g_Info('Destroying "'+this.name+'"');
 }
 
 Monitor.prototype.refresh = function()
@@ -239,6 +255,11 @@ Monitor.prototype.processMsg = function( obj)
 		ids = cm_IdsMerge( eval('obj.events.'+this.type+'_change'), eval('obj.events.'+this.type+'_add'));
 		if( ids.length > 0 )
 			nw_GetNodes( this.type, ids);
+
+		if(( this.type == 'jobs') && obj.events.jobs_order )
+			if( g_uid == obj.events.jobs_order.uids[0] )
+				this.sortByIds( obj.events.jobs_order.jids[0] );
+
 		return;
 	}
 
@@ -267,7 +288,7 @@ Monitor.prototype.processMsg = function( obj)
 	if( nodes == null ) return;
 
 	var new_ids = [];
-	var updated = 0;
+	var updated = [];
 
 	for( j = 0; j < nodes.length; j++)
 	{
@@ -278,9 +299,9 @@ Monitor.prototype.processMsg = function( obj)
 			{
 				this.items[i].params = nodes[j];
 				this.items[i].update();
+				updated.push( this.items[i]);
 				this.filterItem( this.items[i]);
 				founded = true;
-				updated = updated + 1;
 				break;
 			}
 		}
@@ -288,10 +309,17 @@ Monitor.prototype.processMsg = function( obj)
 			new_ids.push(j);
 	}
 
-	for( i = 0; i < new_ids.length; i++)
+	if(( this.type != 'jobs' ) || ( this.sortParm != 'user_list_order'))
+		for( var i = 0; i < updated.length; i++)
+			this.sortItem( updated[i]);
+
+	for( var i = 0; i < new_ids.length; i++)
 		this.createNode( nodes[new_ids[i]]);
 
-//g_Info(this.type + ':' + g_cycle + ' nodes processed ' + nodes.length + ': old:' + this.items.length + ' new:' + new_ids.length + ' up:' + updated);
+	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order'))
+		if( new_ids.length || updated.length )
+			nw_GetNodes('users',[g_uid],'jobs_order');
+//this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:' + updated.length);
 }
 
 Monitor.prototype.delNodes = function( i_ids)
@@ -316,26 +344,34 @@ Monitor.prototype.createNode = function( i_obj)
 	var node = new this.nodeConstructor();
 	this.createItem( node, i_obj, false);
 	this.filterItem( node);
-
+	this.addItemSorted( node);
+}
+Monitor.prototype.addItemSorted = function( i_item)
+{
 	var index = this.items.length;
 	var nodeBefore = null;
 
 	if( this.sortParm )
 		for( var i = 0; i < this.items.length; i++)
-			if( cm_CompareItems( node, this.items[i], this.sortParm, true ))
+		{
+//var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <> '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name;
+			if( cm_CompareItems( i_item, this.items[i], this.sortParm, false == this.sortDirection ))
 			{
+//log += ' TRUE index='+index;
 				index = i;
 				break;
 			}
+//			else
+//log += ' FALSE';
+//window.console.log(log);
+		}
 
 	if( index < this.items.length )
-	{
 		nodeBefore = this.items[index].element;
-		//window.console.log('Index='+index+' before='+nodeBefore.item.params.name);
-	}
 
-	this.items.splice( index, 0, node);
-	this.elList.insertBefore( node.element, nodeBefore);
+//if( index < this.items.length ) g_Info('Monitor.prototype.addItemSorted = '+i_item.params.name+'['+index+']');
+	this.items.splice( index, 0, i_item);
+	this.elList.insertBefore( i_item.element, nodeBefore);
 }
 
 Monitor.prototype.createItem = function( i_item, i_obj, i_appendChild)
@@ -505,10 +541,20 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 	var receiver = this.cur_item;
 	var handle = i_action[3];
 	var title = i_action[4];
-	var enabled = i_action[5];
+	var permission = i_action[5];
+
+	if(( permission == 'user') && g_VISOR()) return;
+	if( g_VISOR() && permission )
+	{
+		if( g_GOD() && ( permission != 'god' ))
+			return;
+		if( permission != 'visor' )
+			return;
+	}
+
 	if( receiver[handle] == null ) receiver = this;
 	if( receiver[handle] )
-		i_menu.addItem( name, receiver, handle, title, enabled);
+		i_menu.addItem( name, receiver, handle, title);
 	else
 		i_menu.addItem('invalid', 'invalid', 'invalid', 'invalid '+name, false);
 }
@@ -614,7 +660,7 @@ Monitor.prototype.noneSelected = function( i_evt)
 Monitor.prototype.sortItems = function()
 {
 //for( var i = 0; i < this.items.length-1; i++) window.console.log(this.items[i].params.name);
-this.info('Sort '+(this.sortDirection ? 'descending':'ascending')+': '+this.sortParm);
+this.info('Sort '+(this.sortDirection ? 'ascending':'descending')+': '+this.sortParm);
 	this.elCtrlSort.classList.add('sorting');
 	if( this.type == 'tasks' )
 	{
@@ -624,7 +670,7 @@ this.info('Sort '+(this.sortDirection ? 'descending':'ascending')+': '+this.sort
 			var tasks_num = this.job.blocks[b].tasks_num;
 			if( tasks_num > 1 )
 				this.sortItemsSet( pos + 1, pos + tasks_num);
-g_Info('st: '+pos+'-'+(pos+tasks_num));
+//g_Info('st: '+pos+'-'+(pos+tasks_num));
 			pos += tasks_num + 1;
 		}
 	}
@@ -634,7 +680,6 @@ g_Info('st: '+pos+'-'+(pos+tasks_num));
 }
 Monitor.prototype.sortItemsSet = function( i_a, i_b)
 {
-//	for( var i = this.items.length-1; i > 0; i--)
 	for( var i = i_b; i > i_a; i--)
 		for( var j = i_a; j < i; j++)
 		{
@@ -651,6 +696,54 @@ Monitor.prototype.sortItemsSet = function( i_a, i_b)
 //window.console.log( itemA.params.name+' '+itemA.params[this.sortParm] + ' < ' + itemB.params[this.sortParm] +' '+itemB.params.name+ ' FALSE');
 		}
 }
+Monitor.prototype.sortItem = function( i_item)
+{
+	var i = this.items.indexOf( i_item);
+	var needsort = false;
+	if( i > 0 )
+		if( cm_CompareItems( i_item, this.items[i-1], this.sortParm, this.sortDirection ) == false )
+			needsort = true;
+	if( i < (this.items.length-1))
+		if( cm_CompareItems( i_item, this.items[i+1], this.sortParm, this.sortDirection ) == true )
+			needsort = true;
+
+	if( false == needsort )
+		return;
+
+	this.elList.removeChild( i_item.element);
+	this.items.splice( i, 1);
+
+	this.addItemSorted( i_item);
+}
+Monitor.prototype.sortByIds = function( i_ids)
+{
+	if( i_ids.length != this.items.length )
+	{
+		g_Error('User jobs order Ids and jobs size mismatch.');
+		return;
+	}
+
+	var items = this.items.slice();
+
+	for( var i = 0; i < this.items.length; i++)
+		this.elList.removeChild( this.items[i].element );
+	this.items = [];
+
+	for( var i = 0; i < i_ids.length; i++)
+	{
+		for( var j = 0; j < items.length; j++)
+		{
+			if( i_ids[i] == items[j].params.id )
+			{
+				if( items[j].params['user_list_order'] )
+					items[j].params['user_list_order'] = i;
+				this.items.push( items[j]);
+				this.elList.appendChild( items[j].element);
+				break;
+			}
+		}
+	}
+}
 
 Monitor.prototype.createMenu = function( i_evt, i_name)
 {
@@ -665,7 +758,7 @@ Monitor.prototype.createMenu = function( i_evt, i_name)
 // --------------- Sorting: -------------------//
 Monitor.prototype.sortDirChanged = function( i_evt)
 {
-//	i_evt.stopPropagation();
+	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order')) return;
 	if( this.sortDirection ) this.sortDirection = false;
 	else this.sortDirection = true;
 	this.sortItems();
@@ -689,6 +782,7 @@ Monitor.prototype.sortParmChanged = function( i_name)
 		if( cm_Attrs[i][0] == i_name )
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 	this.sortParm = i_name;
+	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order')) this.sortDirection = true;
 	this.sortItems();
 }
 // --------------- Filtering: -------------------//

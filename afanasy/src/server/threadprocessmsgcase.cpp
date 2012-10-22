@@ -427,7 +427,8 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
          break;
       }
       af::MCGeneral ids;
-      user->generateJobsIds( ids);
+		ids.setId( user->getId());
+		ids.setList( user->generateJobsIds());
       o_msg_response = new af::Msg( af::Msg::TUserJobsOrder, &ids);
       break;
    }

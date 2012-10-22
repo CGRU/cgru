@@ -1,6 +1,6 @@
 body {
 font: 12px Arial;
-background: #ab8;
+background: #AB8;
 }
 #afbody { overflow:hidden;}
 
@@ -11,7 +11,7 @@ overflow: hidden;
 }
 
 #header,#footer {
-background: #ab8;
+/*background: #AB8;*/
 position: absolute;
 left: 0; right: 0;
 border: 2px solid #555;
@@ -47,6 +47,9 @@ text-transform: uppercase;
 text-align: center;
 color: #222;
 box-shadow: 0px 0px 2px #000;
+-o-transition: all .3s ease-in-out;
+-moz-transition: all .3s ease-in-out;
+-webkit-transition: all .3s ease-in-out;
 }
 #headermain .mbutton.pushed {
 background: #EFD;
@@ -103,7 +106,7 @@ bottom: 30px;
 overflow: hidden;
 }
 
-#footer { height: 226px; bottom: -200px; font-size: 12px;}
+#footer { height: 26px; bottom: 0px; font-size: 12px;}
 #footer.opened { bottom: 0;}
 #footeropenbutton, #headeropenbutton, #log_btn, #netlog_btn {
 cursor: pointer;
@@ -192,7 +195,7 @@ position: absolute;
 .ctrl_sort, .ctrl_filter {
 position: absolute;
 box-shadow: 0px 0px 5px #000 inset;
-background: #789;
+background: #897;
 margin: 3px 8px;
 border-radius: 4px;
 /*-o-transition: all .3s ease-in-out;
@@ -201,8 +204,8 @@ border-radius: 4px;
 }
 .ctrl_sort   { left: 5px; width: 124px; }
 .ctrl_filter { left: 138px; right: 3%; }
-.ctrl_filter.filtering { background: #fa6;}
-.ctrl_sort.sorting { background: #fa6;}
+.ctrl_filter.filtering { background: #FC6;}
+.ctrl_sort.sorting { background: #FC6;}
 .ctrl_sort .label, .ctrl_filter .label { float: left; margin: 5px 10px; width: 30px;}
 .ctrl_filter .param, .ctrl_sort .param 
 {
@@ -368,4 +371,8 @@ width: 16px; height: 16px;
 .font-done  { color: #130;}
 .font-error { color: #F00;}
 */
+
+.su_user  { background: #AB8;}
+.su_visor { background: #FF8;}
+.su_god   { background: #EFF;}
 

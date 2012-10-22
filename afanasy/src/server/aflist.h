@@ -35,7 +35,7 @@ public:
       MoveBottom
    };
 
-   void generateIds( af::MCGeneral & ids) const;
+	const std::vector<int32_t> generateIdsList() const;
 
    friend class AfContainer;
    friend class AfListIt;

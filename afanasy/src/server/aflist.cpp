@@ -323,8 +323,13 @@ printf("Inserting at \"%s\"-%d\n", node_move->getName().c_str(), node_move->getI
    }
 }
 
-void AfList::generateIds( af::MCGeneral & ids) const
+const std::vector<int32_t> AfList::generateIdsList() const
 {
+	std::vector<int32_t> ids;
 	std::list<AfNodeSrv*>::const_iterator it = nodes_list.begin();
-	while( it != nodes_list.end()) ids.addId( (*(it++))->m_node->m_id);
+	while( it != nodes_list.end())
+		ids.push_back( (*(it++))->m_node->m_id);
+
+	return ids;
 }
+

@@ -182,7 +182,9 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				}
 				if( user )
 				{
-					if( mode == "log" )
+					if( mode == "jobs_order" )
+						o_msg_response = user->writeJobdsOrder();
+					else if( mode == "log" )
 						o_msg_response = user->writeLog();
 				}
 			}
@@ -283,7 +285,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 	{
 		AfContainerLock mlock( i_args->monitors, AfContainerLock::WRITELOCK);
 		AfContainerLock ulock( i_args->users,    AfContainerLock::READLOCK);
-		MonitorAf * newMonitor = new MonitorAf( document["monitor"]);
+		MonitorAf * newMonitor = new MonitorAf( document["monitor"], i_args->users);
 		newMonitor->setAddressIP( i_msg->getAddress());
 		o_msg_response = i_args->monitors->addMonitor( newMonitor, true);
 	}
