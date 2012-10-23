@@ -529,13 +529,13 @@ function g_SetParameterDialog( i_param)
 		}
 	if( localStorage[i_param])
 		value = localStorage[i_param];
-	new cgru_Dialog( document, document.body, window, 'g_SetParameter', i_param, 'str', value, 'settings', title, info);
+	new cgru_Dialog( window, window, 'g_SetParameter', i_param, 'str', value, 'settings', title, info);
 }
 
 function g_LocalStorageShow() { g_ShowObject( localStorage);}
 function g_LocalStorageClearClicked()
 {
-	new cgru_Dialog( document, document.body, window, 'g_LocalStorageClear', 'local_storage_clear', 'str', '', 'settings', 'Clear Local Storage', 'Are You Sure?<br/>Type "yes".');
+	new cgru_Dialog( window, window, 'g_LocalStorageClear', 'local_storage_clear', 'str', '', 'settings', 'Clear Local Storage', 'Are You Sure?<br/>Type "yes".');
 }
 function g_LocalStorageClear( i_name, i_value)
 {
