@@ -78,10 +78,12 @@ Monitor::Monitor( const JSON & obj):
 	m_time_launch = time(NULL);
 	m_time_activity = 0;
 	construct();
-	jr_string("name",      m_name,      obj);
+	jr_string("gui_name",  m_gui_name,  obj);
 	jr_string("user_name", m_user_name, obj);
 	jr_string("host_name", m_host_name, obj);
 	jr_string("engine",    m_engine,    obj);
+
+	m_name = m_user_name+"@"+m_host_name+":"+m_gui_name;
 
 	m_version = af::Environment::getVersionCGRU();
 }

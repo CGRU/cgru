@@ -43,6 +43,7 @@ public:
 protected:
 	int32_t m_uid;
 	std::string m_host_name;
+	std::string m_gui_name;
 	std::string m_engine;
 
    bool  *  events;

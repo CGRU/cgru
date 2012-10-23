@@ -165,7 +165,7 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	this.items = [];
 	g_recievers.push( this);
 	g_monitors.push( this);
-
+	this.setWindowTitle();
 	g_cur_monitor = this;
 	this.menu = null;
 	this.cycle = 0;
@@ -320,7 +320,28 @@ Monitor.prototype.processMsg = function( obj)
 	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order'))
 		if( new_ids.length || updated.length )
 			nw_GetNodes('users',[g_uid],'jobs_order');
+
+	this.setWindowTitle();
 //this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:' + updated.length);
+}
+
+Monitor.prototype.setWindowTitle = function()
+{
+	var title = null;
+	title = 'A'+this.type.toUpperCase().charAt(0);
+	title += this.items.length;
+	if( this.type == 'jobs' )
+	{
+		var run = 0;
+//		for( var i = 0; i < this.items.length; i++)
+	}
+	else if( this.type == 'tasks' )
+	{
+		title = null;
+	}
+
+	if( title )
+		this.document.title = title;
 }
 
 Monitor.prototype.delNodes = function( i_ids)

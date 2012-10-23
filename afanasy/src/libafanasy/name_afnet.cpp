@@ -144,7 +144,7 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 		if( get_finish - get_start > 1 )
 		{
 			datafile = std::string( buffer + get_start, get_finish - get_start);
-printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
+//printf("GET[%d,%d]=%s\n", get_start, get_finish, datafile.c_str());
 			if(( datafile.find("..") == -1 ) && ( datafile.find(':') == -1 ))
 			{
 				datafile = af::Environment::getCGRULocation() + AFGENERAL::PATH_SEPARATOR + datafile;
