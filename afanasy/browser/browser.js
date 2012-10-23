@@ -24,10 +24,10 @@ function g_RegisterSend()
 
 	var obj = {};
 	obj.monitor = {};
-	obj.monitor.name = localStorage['name'];
+	obj.monitor.name = localStorage['gui_name'];
 	obj.monitor.user_name = localStorage['user_name'];
 	obj.monitor.host_name = localStorage['host_name'];
-	obj.monitor.engine = 'web';
+	obj.monitor.engine = navigator.userAgent;
 	nw_Send(obj);
 
 	setTimeout('g_RegisterSend()', 5000);
@@ -83,7 +83,7 @@ function g_ProcessMsg( obj)
 	if( g_id == 0 )
 		return;
 
-	for( i = 0; i < g_recievers.length; i++)
+	for( var i = 0; i < g_recievers.length; i++)
 	{
 		g_recievers[i].processMsg( obj);
 	}
@@ -102,7 +102,7 @@ function g_Refresh()
 
 	nw_GetEvents('monitors','events');
 
-	for( i = 0; i < g_refreshers.length; i++)
+	for( var i = 0; i < g_refreshers.length; i++)
 	{
 		g_refreshers[i].refresh();
 	}
@@ -115,9 +115,8 @@ function g_Init()
 
 	nw_GetSoftwareIcons();
 
-	localStorage['name'] = 'webgui';
-	localStorage['host_name'] = 'pc';
-	g_SetUserName();
+	g_ConstructSettingsGUI();
+	g_InitSettings();
 
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
@@ -138,8 +137,13 @@ function g_RegisterRecieved( i_obj)
 		g_visor = true;
 		g_god = true;
 	}
+
 	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
+
 	g_MButtonClicked('jobs');
+//	g_MButtonClicked('renders');
+//	g_MButtonClicked('users');
+
 	g_SuperUserProcessGUI();
 }
 
@@ -198,20 +202,18 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 			return;
 		}
 
-	var doc = document;
 	var elParent = document.getElementById('content');
-	var wnd = null;
+	var wnd = window;
 	if( i_new_wnd )
 	{
 		wnd = g_OpenWindow( i_name);
 		if( wnd == null ) return;
-		doc = wnd.document;
-		elParent = doc.body;
+		elParent = wnd.document.body;
 	}
 	else if( g_main_monitor )
 		g_main_monitor.destroy();
 
-	var monitor = new Monitor( doc, elParent, i_type, i_id, i_name);
+	var monitor = new Monitor( wnd, elParent, i_type, i_id, i_name);
 
 	if( i_new_wnd )
 	{
@@ -243,7 +245,7 @@ function g_ShowMessage( msg)
 	var title = msg.name+':'+msg.type;
 	var wnd = g_OpenWindow( name, title);
 	if( wnd == null ) return;
-	for( i = 0; i < msg.list.length; i++)
+	for( var i = 0; i < msg.list.length; i++)
 		wnd.document.write('<div>'+((msg.list[i]).replace(/\n/g,'<br/>'))+'</div>');
 }
 
@@ -443,28 +445,90 @@ function g_OnKeyDown(e)
 	g_CheckSequence();
 }
 
-function g_SetUserNameButton() { g_SetUserNameDialog();}
-function g_SetUserNameDialog()
+g_params = [];
+g_params.push(['user_name','User Name', null,'Enter User Name<br/>Need Restart (F5)']);
+g_params.push(['host_name','Host Name', 'pc','Enter Host Name']);
+g_params.push(['gui_name','GUI Name', 'webgui','Enter GUI Name<br/>Needed For Logs Only']);
+g_params.push(['run_symbol','Run Symbol', '★','Enter Any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">Unicode<a/><br/>You Should Copy&Paste<br/>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
+function g_ConstructSettingsGUI()
 {
-	new cgru_Dialog( document, document.body, window, 'g_SetUserName', 'user_name', 'str', '', 'settings', 'Set User Name', 'You should restart GUI<br/>Just refresh browser');
-}
-function g_SetUserName( i_parameter, i_value)
-{
-	var value = null;
-	if( i_value && i_value.length )
-		value = i_value;
-	if( value == null )
-		value = localStorage['user_name'];
-	if( value == null )
+	var elParams = document.getElementById('parameters');
+	for( var i = 0; i < g_params.length; i++)
 	{
-		g_SetUserNameDialog()
+		var elParam = document.createElement('div');
+		elParam.classList.add('parameter');
+		elParam.style.top = (i*30)+'px';
+		elParams.appendChild( elParam);
+
+		var elLabel = document.createElement('div');
+		elParam.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = g_params[i][1];
+
+		var elVariable = document.createElement('div');
+		elParam.appendChild( elVariable);
+		elVariable.classList.add('variable');
+
+		var elButton = document.createElement('div');
+		elParam.appendChild( elButton);
+		elButton.classList.add('button');
+		elButton.textContent = 'Edit';
+		elButton.param = g_params[i][0];
+		elButton.onclick = function(e){g_SetParameterDialog(e.currentTarget.param);}
+
+		g_params[i].splice( 0, 0, elVariable);
+	}
+}
+function g_InitSettings()
+{
+	for( var i = 0; i < g_params.length; i++)
+		g_SetParameter( g_params[i][1]);
+}
+function g_SetParameter( i_param, i_value)
+{
+	var initial = null;
+	var title = null;
+	var pos;
+	for( pos = 0; pos < g_params.length; pos++)
+		if( i_param == g_params[pos][1] )
+		{
+			title = g_params[pos][2];
+			initial = g_params[pos][3];
+			break;
+		}
+
+	if( i_value == null )
+		i_value = localStorage[i_param];
+	if( i_value == null )
+		i_value = initial;
+//window.console.log(i_param+'='+i_value);
+	if( i_value == null )
+	{
+		g_SetParameterDialog( i_param)
 		return;
 	}
 
-	localStorage['user_name'] = value;
-	g_Info('User name set to "'+value+'"');
-	document.getElementById('username').textContent = value;
+	localStorage[i_param] = i_value;
+
+	g_params[pos][0].innerHTML = i_value;
 }
+function g_SetParameterDialog( i_param)
+{
+	var value = '';
+	var title = 'Set Parameter';
+	var info = null; 
+	for( var i = 0; i < g_params.length; i++)
+		if( i_param == g_params[i][1] )
+		{
+			title = 'Set '+g_params[i][2];
+			value = g_params[i][3];
+			info = g_params[i][4];
+		}
+	if( localStorage[i_param])
+		value = localStorage[i_param];
+	new cgru_Dialog( document, document.body, window, 'g_SetParameter', i_param, 'str', value, 'settings', title, info);
+}
+
 function g_LocalStorageShow() { g_ShowObject( localStorage);}
 function g_LocalStorageClearClicked()
 {
@@ -477,7 +541,7 @@ function g_LocalStorageClear( i_name, i_value)
 			return;
 	localStorage.clear();
 	g_Info('Local Storage Cleared.');
-	g_SetUserName();
+	g_InitSettings();
 }
 
 function g_CheckSequence()

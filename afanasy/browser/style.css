@@ -21,8 +21,8 @@ overflow: hidden;
 -moz-transition: all .3s ease-in-out;
 -webkit-transition: all .3s ease-in-out;
 }
+#header { height: 226px; top: 0px; }
 #header { height: 226px; top: -200px; }
-/*#header { height: 226px; top: 0px; }*/
 #headermain {
 position: absolute;
 left: 0; right: 0; bottom: 0; top: 200px;
@@ -68,32 +68,49 @@ box-shadow: 0px 0px 5px #000 inset;
 #settings > * {
 margin: 5px 10px;
 }
-#settings .parameter {
-/*
-padding: 2px 8px;
-box-shadow: 0px 0px 2px #000 inset;
-*/
-height: 20px;
-}
 #settings * {
 position: absolute;
 /*
+overflow: hidden;
 position: relative;
 */
 text-align: center;
 white-space:nowrap;
 /*box-shadow: 0px 0px 2px #000 inset;*/
 }
-#settings .label { padding: 3px 8px;}
+#settings #parameters {
+left: 50%; right: 0; top: 0; bottom: 0;
+border-radius: 4px;
+box-shadow: 0px 0px 2px #000 inset;
+}
+#settings .parameter {
+box-shadow: 0px 0px 1px #000 inset;
+border-radius: 4px;
+left: 0; right: 0;
+/*
+padding: 8px;
+*/
+height: 30px;
+}
+#settings * {
+overflow: hidden;
+}
+#settings .parameter * {
+margin: 5px;
+padding: 3px 6px;
+}
+#settings .label {
+left: 0; width: 100px;
+}
 #settings .variable {
-padding: 2px 8px;
+left: 100px; right: 52px;
 height: 15px;
 box-shadow: 0px 0px 2px #000 inset;
 border-radius: 2px;
 }
 #settings .button {
 cursor: pointer;
-padding: 3px 8px;
+width: 30px; right: 5px;
 box-shadow: 0px 0px 2px #000;
 border-radius: 2px;
 }
@@ -256,11 +273,11 @@ background: #DFD;
 color: #000;
 }
 
-.item .resources {
+.render .resources {
 background: #EEEE99;
 position: absolute;
 top: 0;
-left: 50%;
+left: 54%;
 width: 0;
 overflow: visible;
 /*
@@ -371,6 +388,26 @@ width: 16px; height: 16px;
 .font-done  { color: #130;}
 .font-error { color: #F00;}
 */
+
+.item > .prestar { margin-left: 56px;}
+.item.render > .prestar { margin-left: 46px;}
+.star {
+display: none;
+font-size: 32px;
+/*border: 1px solid #000;*/
+position: absolute;
+top: 0; left: 2px;
+width: 58px; height: 32px;
+color: #FF5;
+text-shadow: 0px 0px 2px #000;
+}
+.star .count {
+position: absolute;
+top: 0px; left: 10px; right: 0; bottom: 0;
+font-size: 18px;
+text-align: center;
+text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
+}
 
 .su_user  { background: #AB8;}
 .su_visor { background: #FF8;}

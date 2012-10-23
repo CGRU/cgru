@@ -48,10 +48,10 @@ function cm_IdsMerge( i_ids1, i_ids2)
 	{
 		if( o_ids.length > 0 )
 		{
-			for( i = 0; i < i_ids2.length; i++)
+			for( var i = 0; i < i_ids2.length; i++)
 			{
 				founded = false;
-				for( o = 0; o < o_ids.length; o++)
+				for( var o = 0; o < o_ids.length; o++)
 				{
 					if( o_ids[o] == i_ids2[i] )
 					{
@@ -189,3 +189,15 @@ function cm_ElCreateText( i_elParent, i_title)
 {
 	return cm_ElCreateFloatText( i_elParent, null, i_title);
 }
+
+function cm_CreateStart( i_item)
+{
+	i_item.elStar = document.createElement('div');
+	i_item.element.appendChild( i_item.elStar);
+	i_item.elStar.classList.add('star');
+	i_item.elStar.innerHTML = localStorage.run_symbol;
+	i_item.elStarCount = document.createElement('div');
+	i_item.elStar.appendChild( i_item.elStarCount);
+	i_item.elStarCount.classList.add('count');
+}
+

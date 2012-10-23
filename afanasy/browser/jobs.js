@@ -15,9 +15,12 @@ JobNode.prototype.init = function()
 {
 	this.element.classList.add('job');
 
+	cm_CreateStart( this);
+
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
+	this.elName.classList.add('prestar');
 
 	this.elUserName = cm_ElCreateFloatText( this.element,	'right', 'User Name');
 
@@ -26,6 +29,7 @@ JobNode.prototype.init = function()
 	this.elState = document.createElement('span');
 	this.element.appendChild( this.elState);
 	this.elState.title = 'Job State';
+	this.elState.classList.add('prestar');
 
 	this.elTime = cm_ElCreateFloatText( this.element, 'right', 'Running Time');
 	this.elLifeTime = cm_ElCreateFloatText( this.element, 'right', 'Life Time');
@@ -104,11 +108,22 @@ JobNode.prototype.update = function()
 		this.elAnnotation.textContent = this.params.annotation;
 	else this.elAnnotation.textContent = '';
 
+	var running_tasks_counter = 0;
 	for( var b = 0; b < this.params.blocks.length; b++)
 	{
 		this.blocks[b].params = this.params.blocks[b];
 		this.blocks[b].update( displayFull);
+		if( this.blocks[b].params.running_tasks_counter )
+			running_tasks_counter += this.blocks[b].params.running_tasks_counter;
 	}
+
+	if( running_tasks_counter )
+	{
+		this.elStar.style.display = 'block';
+		this.elStarCount.textContent = running_tasks_counter;
+	}
+	else
+		this.elStar.style.display = 'none';
 
 	this.refresh();
 }
@@ -269,7 +284,7 @@ JobBlock.prototype.menuHandleDialog = function( i_parameter)
 	for( var i = 0; i < actions.length; i++)
 		if( i_parameter == actions[i][1])
 			ptype = actions[i][2];
-	new cgru_Dialog( document, document.body, this, 'setParameter', i_parameter, ptype, this.params[i_parameter], 'jobblock_parameter');
+	new cgru_Dialog( this.job.monitor.window, this, 'setParameter', i_parameter, ptype, this.params[i_parameter], 'jobblock_parameter');
 }
 JobBlock.prototype.setParameter = function( i_parameter, i_value)
 {

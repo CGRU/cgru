@@ -4,8 +4,11 @@ RenderNode.prototype.init = function()
 {
 	this.element.classList.add('render');
 
+	cm_CreateStart( this);
+
 	this.elName = cm_ElCreateText( this.element, 'Client Host Name');
 	this.elName.classList.add('name');
+	this.elName.classList.add('prestar');
 
 	this.elVersion = cm_ElCreateText( this.element, 'Client Version');
 
@@ -19,11 +22,9 @@ RenderNode.prototype.init = function()
 	this.elResources = document.createElement('div');
 	this.element.appendChild( this.elResources);
 	this.elResources.className = 'resources';
-//	this.elResources.style.textAlign = 'center';
 
 	this.elPower = document.createElement('div');
 	this.element.appendChild( this.elPower);
-//	this.elResources.appendChild( this.elPower);
 	this.elPower.style.position = 'absolute';
 	this.elPower.style.textAlign = 'center';
 	this.elPower.style.top = '1px';
@@ -34,6 +35,7 @@ RenderNode.prototype.init = function()
 	this.element.appendChild( this.elNewLine);
 
 	this.elCapacity = cm_ElCreateText( this.element, 'Capacity: Used/Total');
+	this.elCapacity.classList.add('prestar');
 	this.elMaxTasks = cm_ElCreateText( this.element, 'Tasks: Running/Maximum');
 	this.elStateTime = cm_ElCreateFloatText( this.element, 'right', 'Busy/Free Status and Time');
 
@@ -141,12 +143,20 @@ RenderNode.prototype.update = function()
 
 	if( this.params.max_tasks == null )
 		this.params.max_tasks = this.params.host.max_tasks;
-	if( this.params.busy == true )
+
+	if( this.state.RUN == true )
+	{
+		this.elStar.style.display = 'block';
+		this.elStarCount.textContent = this.params.tasks.length;
 		var max_tasks = '(' + this.params.tasks.length + '/' + this.params.max_tasks + ')';
+	}
 	else
+	{
+		this.elStar.style.display = 'none';
 		var max_tasks = '(0/' + this.params.max_tasks + ')';
-	this.elMaxTasks.textContent = max_tasks;
-	
+	}
+	this.elMaxTasks.textContent = max_tasks;	
+
 	var r = this.params.host_resources;
 
 	if( became_online )
@@ -251,7 +261,7 @@ RenderNode.prototype.onDoubleClick = function()
 
 RenderNode.prototype.menuHandleServiceDialog = function( i_name)
 {
-	new cgru_Dialog( document, document.body, this, 'menuHandleServiceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
+	new cgru_Dialog( this.monitor.window, this, 'menuHandleServiceApply', i_name, 'str', null, this.type+'_parameter', (i_name == 'enable' ? 'Enable':'Disable') + ' Service', 'Enter Service Name:');
 }
 RenderNode.prototype.menuHandleServiceApply = function( i_name, i_value)
 {

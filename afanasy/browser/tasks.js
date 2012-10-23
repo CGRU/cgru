@@ -215,7 +215,7 @@ TaskItem.prototype.menuHandleOutput = function( i_number)
 {
 	if( i_number == -1 )
 	{
-		new cgru_Dialog( this.monitor.document, this.monitor.document.body, this, 'menuHandleGet', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
+		new cgru_Dialog( this.monitor.window, this, 'menuHandleGet', 'output', 'num', null, this.job.name, 'Get Task Process Output', 'Enter Start Number');
 		return;
 	}
 //	this.menuHandleGet('output', i_number);

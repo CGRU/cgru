@@ -4,10 +4,13 @@ UserNode.prototype.init = function()
 {
 	this.element.classList.add('user');
 
+	cm_CreateStart( this);
+
 	this.elName = document.createElement('span');
 	this.elName.classList.add('name');
 	this.element.appendChild( this.elName);
 	this.elName.title = 'User Name';
+	this.elName.classList.add('prestar');
 
 	this.elPriority = document.createElement('span');
 	this.element.appendChild( this.elPriority);
@@ -23,6 +26,7 @@ UserNode.prototype.init = function()
 	this.elCenter.style.right = '0';
 	this.elCenter.style.top = '1px';
 	this.elCenter.style.textAlign = 'center';
+	this.elCenter.classList.add('prestar');
 
 	this.elMaxRunningTasks = cm_ElCreateText( this.elCenter, 'Maximum Running Tasks');
 	this.elHostsMask = cm_ElCreateText( this.elCenter, 'Hosts Mask');
@@ -34,6 +38,7 @@ UserNode.prototype.init = function()
 	this.element.appendChild( document.createElement('br'));
 
 	this.elJobs = cm_ElCreateFloatText( this.element, 'left', 'Jobs: All/Running');
+	this.elJobs.classList.add('prestar');
 
 	this.elSolving = cm_ElCreateFloatText( this.element, 'right');
 
@@ -43,11 +48,12 @@ UserNode.prototype.init = function()
 	this.element.appendChild( this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
 	this.elAnnotation.style.textAlign = 'center';
+	this.elAnnotation.classList.add('prestar');
 
 	this.elBarParent = document.createElement('div');
 	this.element.appendChild( this.elBarParent);
 	this.elBarParent.style.position = 'absolute';
-	this.elBarParent.style.left = '50px';
+	this.elBarParent.style.left = '120px';
 	this.elBarParent.style.right = '50px';
 	this.elBarParent.style.top = '18px';
 	this.elBarParent.style.height = '12px';
@@ -85,6 +91,14 @@ UserNode.prototype.update = function()
 	if( this.params.jobs_life_time ) this.elJobsLifeTime.textContent = 'L'+ cm_TimeStringFromSeconds( this.params.jobs_life_time);
 	else this.elJobsLifeTime.textContent = '';
 
+	if( this.params.running_tasks_num )
+	{
+		this.elStar.style.display = 'block';
+		this.elStarCount.textContent = this.params.running_tasks_num;
+	}
+	else
+		this.elStar.style.display = 'none';
+
 	var errstr = 'Err:';
 	var errtit = 'Errors solving:';
 	errstr += this.params.errors_avoid_host + 'J,';
@@ -101,13 +115,10 @@ UserNode.prototype.update = function()
 		jobs += this.params.jobs_num;
 	else
 		jobs += '0';
-	jobs += '/';
 	if( this.params.running_jobs_num )
-		jobs += this.params.running_jobs_num;
-	else
-		jobs += '0';
-	if( this.params.running_tasks_num )
-		jobs += '-' + this.params.running_tasks_num;
+		jobs += '/'+this.params.running_jobs_num;
+//	if( this.params.running_tasks_num )
+//		jobs += '-' + this.params.running_tasks_num;
 	this.elJobs.textContent = jobs;
 
 	var solving = 'User jobs solving method:';
@@ -144,6 +155,7 @@ UserNode.prototype.refresh = function()
 		percent = '0';
 	this.elBar.style.width = percent + '%';
 	this.elBar.textContent = label;
+//window.console.log(this.params.name+'-'+percent+'% ('+this.monitor.type+'_max='+this.monitor.max_tasks+')')
 }
 
 UserNode.prototype.onDoubleClick = function() { g_ShowObject( this.params);}

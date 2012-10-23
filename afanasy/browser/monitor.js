@@ -1,6 +1,7 @@
-function Monitor( i_document, i_element, i_type, i_id, i_name)
+function Monitor( i_window, i_element, i_type, i_id, i_name)
 {
-	this.document = i_document;
+	this.window = i_window;
+	this.document = this.window.document;
 	this.type = i_type;
 	this.elParent = i_element;
 	this.name = i_name ? i_name : i_type;
@@ -126,7 +127,7 @@ function Monitor( i_document, i_element, i_type, i_id, i_name)
 //this.elInfo.textContent='info';
 //*/
 //	this.valid = false;
-	for( i = 0; i < g_recievers.length; i++)
+	for( var i = 0; i < g_recievers.length; i++)
 	{
 		if( g_recievers[i].name == this.name )
 		{
@@ -194,7 +195,7 @@ Monitor.prototype.destroy = function()
 	else
 		nw_Subscribe( this.type, false);
 
-//	for( i = 0; i < this.items.length; i++)
+//	for( var i = 0; i < this.items.length; i++)
 //		this.element.removeChild(this.items[i].element);
 
 	this.items = [];
@@ -218,7 +219,7 @@ Monitor.prototype.refresh = function()
 	if( this.type == 'users' )
 	{
 		this.max_tasks = 0;
-		for( i = 0; i < this.items.length; i++)
+		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].params.running_tasks_num )
 				if( this.items[i].params.running_tasks_num > this.max_tasks )
 					this.max_tasks = this.items[i].params.running_tasks_num;
@@ -228,7 +229,7 @@ Monitor.prototype.refresh = function()
 		nw_ReqestRendersResources();
 	}
 
-	for( i = 0; i < this.items.length; i++)
+	for( var i = 0; i < this.items.length; i++)
 		this.items[i].refresh();
 
 	this.cycle++;
@@ -290,10 +291,10 @@ Monitor.prototype.processMsg = function( obj)
 	var new_ids = [];
 	var updated = [];
 
-	for( j = 0; j < nodes.length; j++)
+	for( var j = 0; j < nodes.length; j++)
 	{
 		founded = false;
-		for( i = 0; i < this.items.length; i++)
+		for( var i = 0; i < this.items.length; i++)
 		{
 			if( this.items[i].params.id == nodes[j].id )
 			{
@@ -329,8 +330,8 @@ Monitor.prototype.delNodes = function( i_ids)
 	if( i_ids.length == 0 ) return;
 	if( this.items.length == 0 ) return;
 
-	for( d = 0; d < i_ids.length; d++ )
-		for( i = 0; i < this.items.length; i++)
+	for( var d = 0; d < i_ids.length; d++ )
+		for( var i = 0; i < this.items.length; i++)
 			if( this.items[i].params.id == i_ids[d] )
 			{
 				this.elList.removeChild( this.items[i].element);
@@ -602,7 +603,7 @@ Monitor.prototype.menuHandleDialog = function( i_name)
 			if( actions[i][6] ) parameter = actions[i][6];
 		}
 	}
-	new cgru_Dialog( this.document, this.document.body, reciever, handle, parameter, ptype, value, this.name+'_parameter');
+	new cgru_Dialog( this.window, reciever, handle, parameter, ptype, value, this.name+'_parameter');
 }
 Monitor.prototype.setParameter = function( i_parameter, i_value)
 {
@@ -847,7 +848,7 @@ Monitor.prototype.filterItems = function()
 	{
 		this.elCtrlFilter.classList.remove('filtering');
 	}
-	for( i = 0; i < this.items.length; i++)
+	for( var i = 0; i < this.items.length; i++)
 		this.filterItem( this.items[i]);
 }
 

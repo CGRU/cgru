@@ -23,17 +23,11 @@
 <div id="header" class="su_user">
 	<div id="settings">
 		<div class="parameter" style="left:0;right:50%;">
-			<div class="label" style="right:60%;">User Name</div>
-			<div id="username" style="left:40%;right:45px" class="variable"></div>
-			<div class="button" style="right:0;" onclick="g_SetUserNameButton()">Edit</div>
+			<div class="label" style="left:0;">Local Storage</div>
+			<div class="button" style="left:100px;" onclick="g_LocalStorageShow()">Show</div>
+			<div class="button" style="left:150px;" onclick="g_LocalStorageClearClicked()">Clear</div>
 		</div>
-		<div class="parameter" style="left:50%;right:0;">
-			<div class="label" style="right:60%;">Host Name</div>
-			<div id="hostname" style="left:40%;right:45px" class="variable"></div>
-			<div class="button" style="right:0;">Edit</div>
-		</div>
-		<div class="button" style="top:30px;" onclick="g_LocalStorageShow()">Show Local Storage</div>
-		<div class="button" style="left:150px;top:30px;" onclick="g_LocalStorageClearClicked()">Clear Local Storage</div>
+		<div id="parameters"></div>
 	</div>
 	<div id="headermain">
 		<div id="headeropenbutton" onclick="g_HeaderButtonClicked()">&darr;</div>
