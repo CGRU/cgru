@@ -59,6 +59,7 @@ function g_ProcessMsg( obj)
 		else if( obj.monitor.id != g_id )
 		{
 			// Recieved ID does not match:
+			g_Info('This ID = '+g_id+' != '+obj.monitor.id+' recieved.');
 			g_Deregistered();
 		}
 		return;
@@ -132,13 +133,11 @@ function g_RegisterRecieved( i_obj)
 	g_id = i_obj.id;
 	if( i_obj.uid && ( i_obj.uid > 0 ))
 		g_uid = i_obj.uid;
-	if( g_uid < 0 )
-	{
-		g_visor = true;
-		g_god = true;
-	}
 
 	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
+	document.getElementById('registered').textContent = 'Registered';
+	document.getElementById('id').textContent = g_id;
+	document.getElementById('uid').textContent = g_uid;
 
 	g_MButtonClicked('jobs');
 //	g_MButtonClicked('renders');
@@ -149,8 +148,12 @@ function g_RegisterRecieved( i_obj)
 
 function g_Deregistered()
 {
-//g_Info('Deregistered.');
 	g_id = 0;
+	g_uid = -1;
+	g_Info('Deregistered.');
+	document.getElementById('registered').textContent = 'Deregistered';
+	document.getElementById('id').textContent = g_id;
+	document.getElementById('uid').textContent = g_uid;
 	g_CloseAllMonitors();
 	g_RegisterSend();
 }

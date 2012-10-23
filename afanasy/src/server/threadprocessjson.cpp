@@ -232,7 +232,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 					}
 					else
 					{
-						o_msg_response = af::jsonMsg("{\"id\":0}");
+						o_msg_response = af::jsonMsg("{\"monitor\":{\"id\":0}}");
 					}
 				}
 				else

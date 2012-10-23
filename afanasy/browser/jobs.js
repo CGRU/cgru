@@ -637,6 +637,7 @@ JobNode.actions.push(['context', 'start',             null, 'menuHandleOperation
 JobNode.actions.push(['context', 'pause',             null, 'menuHandleOperation', 'Pause']);
 JobNode.actions.push(['context', 'stop',              null, 'menuHandleOperation', 'Stop']);
 JobNode.actions.push(['context', 'restart',           null, 'menuHandleOperation', 'Restart']);
+JobNode.actions.push(['context', 'restart_running',   null, 'menuHandleOperation', 'Restart Running']);
 JobNode.actions.push(['context', 'restart_pause',     null, 'menuHandleOperation', 'Restart&Pause']);
 JobNode.actions.push(['context', 'delete',            null, 'menuHandleOperation', 'Delete']);
 
