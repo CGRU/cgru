@@ -272,6 +272,7 @@ void af::jw_state( uint32_t i_state, std::ostringstream & o_str, bool i_render)
 		if( i_state & AFJOB::STATE_WARNING_MASK         ) o_str << " WRN";
 		if( i_state & AFJOB::STATE_PARSERERROR_MASK     ) o_str << " PER";
 		if( i_state & AFJOB::STATE_PARSERBADRESULT_MASK ) o_str << " PBR";
+		if( i_state & AFJOB::STATE_PARSERSUCCESS_MASK   ) o_str << " PSC";
 		if( i_state & AFJOB::STATE_WAITDEP_MASK         ) o_str << " WDP";
 		if( i_state & AFJOB::STATE_WAITTIME_MASK        ) o_str << " WTM";
 		if( i_state & AFJOB::STATE_STDOUT_MASK          ) o_str << " STO";

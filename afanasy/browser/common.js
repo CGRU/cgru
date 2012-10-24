@@ -146,26 +146,23 @@ function cm_TimeStringFromSeconds( i_seconds)
 	return str;
 }
 
-cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY'];
-function cm_GetState( i_state, i_elParent, i_elChild)
+cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PER','PBR','PSC'];
+function cm_GetState( i_state, o_state, o_element)
 {
-	if( i_state == null )
-		i_elChild.textContent = '-';
-	else
-		i_elChild.textContent = i_state;
-
 	for( var i = 0; i < cm_States.length; i++)
 	{
-		i_elParent.classList.remove( cm_States[i]);
+		if( o_element )
+			o_element.classList.remove( cm_States[i]);
 		if( i_state )
 		{
 			if( i_state.indexOf( cm_States[i]) != -1 )
 			{
-				eval('i_elChild.' + cm_States[i] + ' = true;');
-				i_elParent.classList.add( cm_States[i]);
+				o_state[cm_States[i]] = true;
+				if( o_element )
+					o_element.classList.add( cm_States[i]);
 			}
 			else
-				eval('i_elChild.' + cm_States[i] + ' = false;');
+				o_state[cm_States[i]] = false;
 		}
 	}
 }

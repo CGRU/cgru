@@ -328,16 +328,72 @@ Monitor.prototype.processMsg = function( obj)
 Monitor.prototype.setWindowTitle = function()
 {
 	var title = null;
-	title = 'A'+this.type.toUpperCase().charAt(0);
-	title += this.items.length;
 	if( this.type == 'jobs' )
 	{
-		var run = 0;
-//		for( var i = 0; i < this.items.length; i++)
+		title = 'AJ';
+		var tasks = 0;
+		for( var i = 0; i < this.items.length; i++)
+			if( this.items[i].state.RUN )
+				tasks += this.items[i].running_tasks;
+		if( tasks > 0 )
+			title += ' '+tasks;
+		if( this.cur_item )
+		{
+			if( this.cur_item.state.RUN )
+				title += ' '+this.cur_item.percentage+'%';
+			title += this.cur_item.params.state;
+		}
 	}
-	else if( this.type == 'tasks' )
+	else if( this.type == 'renders' )
 	{
-		title = null;
+		title = 'AR';
+		var tasks = 0;
+		for( var i = 0; i < this.items.length; i++)
+			if( this.items[i].state.RUN )
+				tasks += this.items[i].params.tasks.length;
+		if( tasks > 0 )
+			title += ' '+tasks;
+	}
+	else if( this.type == 'users' )
+	{
+		title = 'AU';
+		var tasks = 0;
+		for( var i = 0; i < this.items.length; i++)
+			if( this.items[i].params.running_tasks_num )
+				tasks += this.items[i].params.running_tasks_num;
+		if( tasks > 0 )
+			title += ' '+tasks;
+	}
+	else if( this.type == 'tasks' && this.job )
+	{
+		var count = 0;
+		var percent = 0;
+		var run = 0;
+		var error = 0;
+		for( var i = 0; i < this.items.length; i++)
+			if( this.items[i].task_num )
+			{
+				if( this.items[i].state.DON )
+					percent += 100;
+				else if( this.items[i].percent )
+					percent += this.items[i].percent;
+				if( this.items[i].state.RUN )
+					run++;
+				if( this.items[i].state.ERR )
+					error++;
+				count++;
+			}
+		if( count )
+		{
+			title = '';
+			if( error )
+				title += 'E'+error+' ';
+			if( run )
+				title +='R'+run+' ';
+			percent = Math.round( percent / count );
+			title += percent+'%';
+			title += ' '+this.job.name;
+		}
 	}
 
 	if( title )
@@ -923,6 +979,7 @@ Monitor.prototype.jobProgress = function( progress)
 			this.blocks[b].tasks[t].updateProgress( progress[b][t]);
 		}
 	}
+	this.setWindowTitle();
 }
 
 Monitor.prototype.tasksProgress = function( tasks_progress)
@@ -949,6 +1006,7 @@ Monitor.prototype.tasksProgress = function( tasks_progress)
 		var p = tasks_progress[j].progress[i];
 		this.blocks[b].tasks[t].updateProgress( p);
 	}
+	this.setWindowTitle();
 }
 
 Monitor.prototype.getBlocks = function( i_block_ids)

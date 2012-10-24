@@ -11,11 +11,14 @@ BlockItem.prototype.init = function()
 
 	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Block State');
 	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
+
+	this.state = {};
 }
 
 BlockItem.prototype.update = function()
 {
-	cm_GetState( this.params.state, this.element, this.elState);
+	this.elState.textContent = this.params.state;
+	cm_GetState( this.params.state, this.state, this.element);
 
 	if( this.params.name )
 	{
@@ -37,37 +40,44 @@ function TaskItem( i_job, i_block, i_task_num )
 
 TaskItem.prototype.init = function() 
 {
-	this.params = {};
 	this.element.classList.add('task');
 
-	this.elProgress = this.monitor.document.createElement('span');
-	this.element.appendChild( this.elProgress);
-	this.elProgress.classList.add('bar');
+	this.elBar = this.monitor.document.createElement('div');
+	this.element.appendChild( this.elBar);
+	this.elBar.classList.add('bar');
+//this.elBar.textContent='bar';
+
+	this.elStar = this.monitor.document.createElement('div');
+	this.element.appendChild( this.elStar);
+	this.elStar.classList.add('star');
+	this.elStar.textContent = localStorage.run_symbol;
+
+	this.elBody = this.monitor.document.createElement('div');
+	this.element.appendChild( this.elBody);
+	this.elBody.classList.add('body');
+//this.elBody.textContent='body';
 
 	this.elName = this.monitor.document.createElement('span');
-	this.element.appendChild( this.elName);
+	this.elBody.appendChild( this.elName);
 	this.elName.title = 'Task name';
 
 	this.elPercent = this.monitor.document.createElement('span');
-	this.element.appendChild( this.elPercent);
+	this.elBody.appendChild( this.elPercent);
 
-	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Task State');
-	this.elStarts = cm_ElCreateFloatText( this.element, 'right', 'Starts Count');
-	this.elErrors = cm_ElCreateFloatText( this.element, 'right', 'Errors Count');
-	this.elHost = cm_ElCreateFloatText( this.element, 'right', 'Last Running Host');
+	this.elStarts = cm_ElCreateFloatText( this.elBody, 'right', 'Starts Count');
+	this.elErrors = cm_ElCreateFloatText( this.elBody, 'right', 'Errors Count');
+	this.elHost = cm_ElCreateFloatText( this.elBody, 'right', 'Last Running Host');
+	this.elState = cm_ElCreateFloatText( this.elBody, 'right', 'Task State');
+
+	this.params = {};
+	this.percent = 0;
+	this.state = {};
 }
 
 TaskItem.prototype.update = function()
 {
 	this.params.name = this.genName();
 	this.elName.textContent = this.params.name;
-/*	if( this.params.running === true )
-	{
-		if( false == this.element.classList.contains('running'))
-		this.element.classList.add('running');
-	}
-	else
-		this.element.classList.remove('running');*/
 }
 
 TaskItem.prototype.updateProgress = function( i_progress)
@@ -79,25 +89,31 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	if( this.params.str == null ) this.params.str = 0;
 	if( this.params.err == null ) this.params.err = 0;
 
-	cm_GetState( this.params.state, this.element, this.elState);
-//	this.elState.textContent = state.string;
+	this.elState.textContent = this.params.state;
+	cm_GetState( this.params.state, this.state, this.element);
 
 	this.elStarts.textContent = 's' + this.params.str;
 	this.elErrors.textContent = 'e' + this.params.err;
 	this.elHost.textContent = this.params.hst;
 
-	var percent = 0;
-	if( this.elState.RUN && this.params.per ) percent = this.params.per;
-	if( this.elState.DON ) percent = 100;
-	if( this.elState.SKP ) percent = 100;
-	if( percent < 0 ) percent = 0;
-	if( percent > 100 ) percent = 100;
+	this.percent = 0;
+	if( this.state.RUN && this.params.per ) this.percent = this.params.per;
+	if( this.state.DON ) this.percent = 100;
+	if( this.state.SKP ) this.percent = 100;
+	if( this.percent < 0 ) this.percent = 0;
+	if( this.percent > 100 ) this.percent = 100;
 
-	if( this.elState.RUN )
-		this.elPercent.textContent = ' ' + percent + '%';
+	if( this.state.RUN )
+	{
+		this.elPercent.textContent = ' ' + this.percent + '%';
+		this.elStar.style.display = 'block';
+	}
 	else
+	{
 		this.elPercent.textContent = '';
-	this.elProgress.style.width = ( percent + '%');
+		this.elStar.style.display = 'none';
+	}
+	this.elBar.style.width = ( this.percent + '%');
 }
 
 TaskItem.prototype.genName = function()
@@ -241,7 +257,6 @@ TaskItem.prototype.menuHandleOperation = function( i_name, i_value)
 
 TaskItem.prototype.onDoubleClick = function()
 {
-g_Info( this.params.name);
 	this.menuHandleGet('info');
 }
 

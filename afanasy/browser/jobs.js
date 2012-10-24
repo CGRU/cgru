@@ -52,15 +52,20 @@ JobNode.prototype.init = function()
 	this.element.appendChild( this.elAnnotation);
 	this.elAnnotation.title = 'Annotation';
 	this.elAnnotation.style.textAlign = 'center';
+
+	this.state = {};
+	this.running_tasks = 0;
+	this.percentage = 0;
 }
 
 JobNode.prototype.update = function()
 {
-	cm_GetState( this.params.state, this.element, this.elState);
+	this.elState.textContent = this.params.state;
+	cm_GetState( this.params.state, this.state, this.element);
 
 	var displayFull = false;
-	if( this.elState.ERR || this.elState.RUN || this.elState.SKP ||
-	  ((this.elState.DON == false) && (this.params.time_started > 0 )))
+	if( this.state.ERR || this.state.RUN || this.state.SKP ||
+	  ((this.state.DON == false) && (this.params.time_started > 0 )))
 		displayFull = true;
 
 	this.elName.textContent = this.params.name;
@@ -108,19 +113,22 @@ JobNode.prototype.update = function()
 		this.elAnnotation.textContent = this.params.annotation;
 	else this.elAnnotation.textContent = '';
 
-	var running_tasks_counter = 0;
+	this.running_tasks = 0;
+	this.percentage = 0;
 	for( var b = 0; b < this.params.blocks.length; b++)
 	{
 		this.blocks[b].params = this.params.blocks[b];
 		this.blocks[b].update( displayFull);
 		if( this.blocks[b].params.running_tasks_counter )
-			running_tasks_counter += this.blocks[b].params.running_tasks_counter;
+			this.running_tasks += this.blocks[b].params.running_tasks_counter;
+		if( this.blocks[b].params.p_percentage )
+			this.percentage += this.blocks[b].params.p_percentage/this.params.blocks.length;
 	}
 
-	if( running_tasks_counter )
+	if( this.running_tasks )
 	{
 		this.elStar.style.display = 'block';
-		this.elStarCount.textContent = running_tasks_counter;
+		this.elStarCount.textContent = this.running_tasks;
 	}
 	else
 		this.elStar.style.display = 'none';
@@ -131,7 +139,7 @@ JobNode.prototype.update = function()
 JobNode.prototype.refresh = function()
 {
 	var time = this.params.time_wait;
-	if( time && this.elState.WTM )
+	if( time && this.state.WTM )
 	{
 		time = cm_TimeStringInterval( new Date().getTime()/1000, time);
 		this.elTime.textContent = time;
@@ -141,7 +149,7 @@ JobNode.prototype.refresh = function()
 	time = this.params.time_started;
 	if( time )
 	{
-		if( this.elState.DON == true )
+		if( this.state.DON == true )
 			time = cm_TimeStringInterval( this.params.time_started, this.params.time_done )
 		else
 			time = cm_TimeStringInterval( time);

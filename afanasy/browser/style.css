@@ -327,16 +327,18 @@ height: 12px;
 border-radius: 0px;
 }
 
-.DON { background: #363;}
-.RUN { background: #FF0;}
-.ERR { background: #F00;}
-
-.task .bar {
-background: #0A0;
-/*margin: 0px; padding: 0px;*/
+.task .bar,.body {
 position: absolute;
-top: 0; bottom: 0; left: 0; width: 0;
-opacity: 0.3;
+}
+.task .bar {
+background: #486;
+top: 2px; bottom: 2px; left: 0; width: 0;
+box-shadow: 0px 0px 3px #486;
+opacity: 0.9;
+}
+.task .body {
+top: 0; bottom: 0; left: 18px; right: 5px;
+/*box-shadow: 0px 0px 2px #000 inset;*/
 }
 
 .user .bar {
@@ -351,14 +353,15 @@ text-align: center;
 box-shadow: 0px 0px 8px #000 inset;
 }
 
-.job .bar {
-}
-
-.job .progress {
+.jobblock .progress {
 border: 1px solid #444;
 margin: 2px;
 border-radius: 3px;
 }
+.jobblock .progress .bar {}
+.jobblock .progress .bar.DON { background: #363;}
+.jobblock .progress .bar.RUN { background: #FF0;}
+.jobblock .progress .bar.ERR { background: #F00;}
 
 .item .name {
 font-size: 14px;
@@ -408,6 +411,7 @@ font-size: 18px;
 text-align: center;
 text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 }
+.task .star {font-size: 12px;}
 
 .su_user  { background: #AB8;}
 .su_visor { background: #FF8;}

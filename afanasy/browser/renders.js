@@ -89,7 +89,7 @@ RenderNode.prototype.init = function()
 RenderNode.prototype.update = function()
 {
 	var was_online = ( this.state.ONL == true )
-	cm_GetState( this.params.state, this.element, this.state);
+	cm_GetState( this.params.state, this.state, this.element);
 	var became_online = false;
 	if( this.state.ONL && ( was_online == false ))
 		became_online = true;
