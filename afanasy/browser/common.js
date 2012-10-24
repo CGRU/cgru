@@ -6,7 +6,7 @@ cm_Attrs.push(['priority',        'Priority', 'Priority']);
 cm_Attrs.push(['time_creation',   'Created',  'Time Created']);
 cm_Attrs.push(['time_started',    'Started',  'Time Started']);
 cm_Attrs.push(['time_done',       'Finished', 'Time Finished']);
-cm_Attrs.push(['user_list_order', 'Order',    'Order']);
+cm_Attrs.push(['order',           'Order',    'Order']);
 
 // This is task progress parameters short names:
 cm_Attrs.push(['str',             'Starts',   'Starts Count']);

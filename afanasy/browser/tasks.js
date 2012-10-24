@@ -64,12 +64,14 @@ TaskItem.prototype.init = function()
 	this.elPercent = this.monitor.document.createElement('span');
 	this.elBody.appendChild( this.elPercent);
 
+	this.elTime = cm_ElCreateFloatText( this.elBody, 'right', 'Run Time');
 	this.elStarts = cm_ElCreateFloatText( this.elBody, 'right', 'Starts Count');
 	this.elErrors = cm_ElCreateFloatText( this.elBody, 'right', 'Errors Count');
 	this.elHost = cm_ElCreateFloatText( this.elBody, 'right', 'Last Running Host');
 	this.elState = cm_ElCreateFloatText( this.elBody, 'right', 'Task State');
 
 	this.params = {};
+	this.params.order = this.task_num;
 	this.percent = 0;
 	this.state = {};
 }
@@ -96,12 +98,21 @@ TaskItem.prototype.updateProgress = function( i_progress)
 	this.elErrors.textContent = 'e' + this.params.err;
 	this.elHost.textContent = this.params.hst;
 
+	if( this.params.tst )
+		if( this.params.tdn && ( this.state.RUN != true ))
+			this.elTime.textContent = cm_TimeStringInterval( this.params.tst, this.params.tdn);
+		else
+			this.elTime.textContent = cm_TimeStringInterval( this.params.tst);
+
 	this.percent = 0;
-	if( this.state.RUN && this.params.per ) this.percent = this.params.per;
-	if( this.state.DON ) this.percent = 100;
-	if( this.state.SKP ) this.percent = 100;
-	if( this.percent < 0 ) this.percent = 0;
-	if( this.percent > 100 ) this.percent = 100;
+	if( this.state.RUN && this.params.per )
+	{
+		this.percent = this.params.per;
+		if( this.percent < 0 ) this.percent = 0;
+		else if( this.percent > 100 ) this.percent = 100;
+	}
+//	if( this.state.DON ) this.percent = 100;
+//	if( this.state.SKP ) this.percent = 100;
 
 	if( this.state.RUN )
 	{
@@ -271,5 +282,5 @@ TaskItem.actions.push(['context', 'restart', null, 'menuHandleOperation', 'Resta
 TaskItem.actions.push(['context', 'skip',    null, 'menuHandleOperation', 'Skip']);
 */
 
-TaskItem.sort = ['name','hst','str','err'];
+TaskItem.sort = ['order','name','hst','str','err'];
 TaskItem.filter = ['name','hst'];

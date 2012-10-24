@@ -60,6 +60,9 @@ JobNode.prototype.init = function()
 
 JobNode.prototype.update = function()
 {
+	if( this.params.user_list_order != null )
+		this.params.order = this.params.user_list_order;
+
 	this.elState.textContent = this.params.state;
 	cm_GetState( this.params.state, this.state, this.element);
 
@@ -685,7 +688,7 @@ JobBlock.actions.push(['set', 'tasks_depend_mask',          'reg', 'menuHandleDi
 JobBlock.actions.push(['set', 'need_properties',            'reg', 'menuHandleDialog', 'Properties Needed']);
 
 JobNode.sortVisor = 'time_creation';
-JobNode.sort = ['user_list_order','time_creation','priority','user_name','name','host_name'];
+JobNode.sort = ['order','time_creation','priority','user_name','name','host_name'];
 JobNode.filter = ['name','host_name','user_name'];
 JobNode.filterVisor = 'user_name';
 

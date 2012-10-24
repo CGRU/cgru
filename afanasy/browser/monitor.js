@@ -151,7 +151,7 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 		if( cm_Attrs[i][0] == this.sortParm )
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 	this.sortDirection = false;
-	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order'))
+	if( this.sortParm == 'order')
 		this.sortDirection = true;
 
 	if( this.nodeConstructor.filterVisor && g_VISOR())
@@ -310,14 +310,14 @@ Monitor.prototype.processMsg = function( obj)
 			new_ids.push(j);
 	}
 
-	if(( this.type != 'jobs' ) || ( this.sortParm != 'user_list_order'))
+	if( this.sortParm != 'order')
 		for( var i = 0; i < updated.length; i++)
 			this.sortItem( updated[i]);
 
 	for( var i = 0; i < new_ids.length; i++)
 		this.createNode( nodes[new_ids[i]]);
 
-	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order'))
+	if(( this.type == 'jobs' ) && ( this.sortParm == 'order'))
 		if( new_ids.length || updated.length )
 			nw_GetNodes('users',[g_uid],'jobs_order');
 
@@ -375,11 +375,13 @@ Monitor.prototype.setWindowTitle = function()
 			{
 				if( this.items[i].state.DON )
 					percent += 100;
-				else if( this.items[i].percent )
-					percent += this.items[i].percent;
-				if( this.items[i].state.RUN )
+				else if( this.items[i].state.RUN )
+				{
 					run++;
-				if( this.items[i].state.ERR )
+					if( this.items[i].percent )
+						percent += this.items[i].percent;
+				}
+				else if( this.items[i].state.ERR )
 					error++;
 				count++;
 			}
@@ -439,9 +441,7 @@ Monitor.prototype.addItemSorted = function( i_item)
 				index = i;
 				break;
 			}
-//			else
-//log += ' FALSE';
-//window.console.log(log);
+//else log += ' FALSE'; window.console.log(log);
 		}
 
 	if( index < this.items.length )
@@ -737,8 +737,7 @@ Monitor.prototype.noneSelected = function( i_evt)
 
 Monitor.prototype.sortItems = function()
 {
-//for( var i = 0; i < this.items.length-1; i++) window.console.log(this.items[i].params.name);
-this.info('Sort '+(this.sortDirection ? 'ascending':'descending')+': '+this.sortParm);
+//this.info('Sort '+(this.sortDirection ? 'ascending':'descending')+': '+this.sortParm);
 	this.elCtrlSort.classList.add('sorting');
 	if( this.type == 'tasks' )
 	{
@@ -797,7 +796,7 @@ Monitor.prototype.sortByIds = function( i_ids)
 {
 	if( i_ids.length != this.items.length )
 	{
-		g_Error('User jobs order Ids and jobs size mismatch.');
+		g_Error('Order Ids and items size mismatch.');
 		return;
 	}
 
@@ -813,8 +812,8 @@ Monitor.prototype.sortByIds = function( i_ids)
 		{
 			if( i_ids[i] == items[j].params.id )
 			{
-				if( items[j].params['user_list_order'] )
-					items[j].params['user_list_order'] = i;
+				if( items[j].params['order'] )
+					items[j].params['order'] = i;
 				this.items.push( items[j]);
 				this.elList.appendChild( items[j].element);
 				break;
@@ -836,7 +835,7 @@ Monitor.prototype.createMenu = function( i_evt, i_name)
 // --------------- Sorting: -------------------//
 Monitor.prototype.sortDirChanged = function( i_evt)
 {
-	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order')) return;
+	if( this.sortParm == 'order') return;
 	if( this.sortDirection ) this.sortDirection = false;
 	else this.sortDirection = true;
 	this.sortItems();
@@ -860,7 +859,7 @@ Monitor.prototype.sortParmChanged = function( i_name)
 		if( cm_Attrs[i][0] == i_name )
 			this.elCtrlSortParam.textContent = cm_Attrs[i][1];
 	this.sortParm = i_name;
-	if(( this.type == 'jobs' ) && ( this.sortParm == 'user_list_order')) this.sortDirection = true;
+	if( this.sortParm == 'order') this.sortDirection = true;
 	this.sortItems();
 }
 // --------------- Filtering: -------------------//
