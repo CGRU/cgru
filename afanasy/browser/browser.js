@@ -10,6 +10,7 @@ g_refreshers = [];
 g_monitors = [];
 g_cur_monitor = null;
 g_main_monitor = null;
+g_main_monitor_type = 'jobs';
 g_monitor_buttons = [];
 
 g_HeaderOpened = false;
@@ -139,9 +140,7 @@ function g_RegisterRecieved( i_obj)
 	document.getElementById('id').textContent = g_id;
 	document.getElementById('uid').textContent = g_uid;
 
-	g_MButtonClicked('jobs');
-//	g_MButtonClicked('renders');
-//	g_MButtonClicked('users');
+	g_MButtonClicked( g_main_monitor_type);
 
 	g_SuperUserProcessGUI();
 }
@@ -230,7 +229,11 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 		wnd.onbeforeunload = function(e){e.currentTarget.monitor.destroy()};
 	}
 	else
+	{
 		g_main_monitor = monitor;
+		g_main_monitor_type = i_type;
+		localStorage.main_monitor = i_type;
+	}
 
 	return monitor;
 }
@@ -490,6 +493,9 @@ function g_ConstructSettingsGUI()
 }
 function g_InitSettings()
 {
+	if( localStorage.main_monitor == null ) localStorage.main_monitor = g_main_monitor_type;
+	else g_main_monitor_type = localStorage.main_monitor;
+
 	for( var i = 0; i < g_params.length; i++)
 		g_SetParameter( g_params[i][1]);
 }
