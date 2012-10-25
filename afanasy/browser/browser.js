@@ -23,6 +23,8 @@ function g_RegisterSend()
 	if( g_id != 0)
 		return;
 
+	g_Info('Sending register request.');
+
 	var obj = {};
 	obj.monitor = {};
 	obj.monitor.gui_name = localStorage['gui_name'];
@@ -112,6 +114,7 @@ function g_Refresh()
 
 function g_Init()
 {
+	g_Info('Initialization:');
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
 
@@ -464,6 +467,7 @@ g_params.push(['gui_name','GUI Name', 'webgui','Enter GUI Name<br/>Needed For Lo
 g_params.push(['run_symbol','Run Symbol', '★','Enter Any <a href="http://en.wikipedia.org/wiki/Miscellaneous_Symbols" target="_blank">Unicode<a/><br/>You Should Copy&Paste<br/>★☀☢☠☣☮☯☼♚♛♜☹♿⚔☻⚓⚒⚛⚡⚑☭']);
 function g_ConstructSettingsGUI()
 {
+	g_Info('Constructing settings GUI.');
 	var elParams = document.getElementById('parameters');
 	for( var i = 0; i < g_params.length; i++)
 	{
@@ -493,6 +497,7 @@ function g_ConstructSettingsGUI()
 }
 function g_InitSettings()
 {
+	g_Info('Initializing settings.');
 	if( localStorage.main_monitor == null ) localStorage.main_monitor = g_main_monitor_type;
 	else g_main_monitor_type = localStorage.main_monitor;
 

@@ -70,34 +70,67 @@ bool writedata( int fd, const char * data, int len)
     return true;
 }
 
-// Return header offset
+// Return header offset or -1, if it was not recognized. GET request processed here.
 int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 {
 //printf("\nReceived %d bytes:\n", i_bytes);
 	char * buffer = io_msg->buffer();
 	int offset = 0;
-	bool founded = false;
-	int min_after = 13;
 
+	// Process HTTP header:
 	if( strncmp( buffer, "POST", 4) == 0 )
 	{
-writedata( 1, buffer, i_bytes); write(1,"\n",1);
+		//writedata( 1, buffer, i_bytes); write(1,"\n",1);
 		offset = 4;
-		while( offset+min_after < i_bytes )
+		int magic, sid, size;
+		bool header_processed = false;
+		for( offset = 4; offset < i_bytes; offset++)
 		{
-			if( strncmp("[ * AFANASY * ]", buffer+offset, 15) == 0)
+			// Look for line end:
+			if( buffer[offset] == '\n' )
 			{
-				founded = true;
-				break;
+				// Goto line begin:
+				offset++;
+				if( offset == i_bytes )
+					break;
+
+				// If header founded, body can start in the same data packet:
+				if( header_processed && ( buffer[offset] == '{' ))
+				{
+					//write(1,"\nBODY FOUNDED:\n", 15);
+					//write(1, buffer+offset, i_bytes - offset);
+					//write(1,"\n",1);
+					break;
+				}
+
+				// Look for a special header:
+				if( strncmp("AFANASY: ", buffer+offset, 9) == 0)
+				{
+					//printf("\nAFANASY FOUNDED:\n");
+					offset += 9;
+					if( 3 == sscanf( buffer + offset, "%d %d %d", &magic, &sid, &size))
+					{
+						//printf("\nHEADER FOUNDED: magic=%d sid=%d size=%d\n", magic, sid, size);
+						header_processed = true;
+					}
+					else return -1;
+				}
 			}
-			else
-				while( offset+min_after < i_bytes )
-					if( buffer[offset++] == '\n')
-						break;
 		}
+
+		// If header founded, construct message:
+		if( header_processed )
+		{
+			io_msg->setHeader( magic, sid, af::Msg::TJSON, size, offset, i_bytes);
+			return offset;
+		}
+
+		// Header not recongnized:
+		return -1;
 	}
 
-	if( founded || ( strncmp("[ * AFANASY * ]", buffer, 15) == 0 ))
+	// Simple header for JSON (used for example in python api and afcmd)
+	if( strncmp("[ * AFANASY * ]", buffer, 15) == 0 )
 	{
 		offset += 15;
 //writedata( 1, buffer+offset, i_bytes);
@@ -127,6 +160,8 @@ writedata( 1, buffer, i_bytes); write(1,"\n",1);
 					}
 				}
 			}
+
+			// Header not recongnized:
 			return -1;
 		}
 	}
@@ -170,7 +205,11 @@ writedata( 1, buffer, i_bytes); write(1,"\n",1);
 			writedata( i_desc, httpHeader, strlen(httpHeader));
 			writedata( i_desc, data, datalen);
 		}
+
+		// Header not recongnized:
 		return -1;
+		// It is recognized and processed here (directly in the thread that was raised to read a socket)
+		// and there is no need to construct message for Afanasy
 	}
 
 	io_msg->readHeader( i_bytes);
@@ -430,7 +469,7 @@ AFINFO("af::msgread:\n");
       return false;
    }
 
-	// Header offset is variable on not binary header (http)
+	// Header offset is variable on not binary header (for example HTTP)
 	int header_offset = processHeader( msg, bytes, desc);
 	if( header_offset < 1)
 		return false;
@@ -465,12 +504,14 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 	int offset = 0;
 	if( i_msg->type() == af::Msg::TJSON )
 	{
-		offset = af::Msg::SizeHeader;
-//		::writedata( i_desc, "HTTP/1.1 200 OK", 16);
-//		::writedata( i_desc, "Content-Type: application/json", 32);
+		offset = 1;
+//		offset = af::Msg::SizeHeader;
+//		::writedata( i_desc, "HTTP/1.1 200 OK\r\n", 17);
+//		::writedata( i_desc, "Content-Type: application/json\r\n", 32);
 //                            1234567890123456789012345678901234567890
 //                            0         1         2         3
-//		::writedata( i_desc, "\r\n\r\n", 4);
+//		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n", 19);
+//		::writedata( i_desc, "\r\n", 2);
 	}
 
     if( false == ::writedata( i_desc, i_msg->buffer() + offset, i_msg->writeSize() - offset ))

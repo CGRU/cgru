@@ -330,16 +330,21 @@ void Msg::rw_header( bool write)
     {
         AFERROR("Msg::rw_header: Message is invalid.")
     }
-    static const int int32_size = 4;
-    int offset = 0;
-    rw_int32( m_version, m_buffer+offset, write); offset+=int32_size;
-    rw_int32( m_magic,   m_buffer+offset, write); offset+=int32_size;
-    rw_int32( m_sid,     m_buffer+offset, write); offset+=int32_size;
-    rw_int32( m_type,    m_buffer+offset, write); offset+=int32_size;
-    rw_int32( m_int32,   m_buffer+offset, write); offset+=int32_size;
-    #ifdef AFOUTPUT
-    printf("Msg::readwrite: at %p: ", mbuffer); stdOut();
-    #endif
+
+	if(( m_type == TJSON ) && write )
+	{
+		strncpy( m_buffer, " HTTP/1.1 200 OK\r\n\r\n", 20);
+	}
+	else
+	{
+	    static const int int32_size = 4;
+	    int offset = 0;
+	    rw_int32( m_version, m_buffer+offset, write); offset+=int32_size;
+	    rw_int32( m_magic,   m_buffer+offset, write); offset+=int32_size;
+	    rw_int32( m_sid,     m_buffer+offset, write); offset+=int32_size;
+	    rw_int32( m_type,    m_buffer+offset, write); offset+=int32_size;
+	    rw_int32( m_int32,   m_buffer+offset, write); offset+=int32_size;
+	}
     if(( false == write ) && ( false == checkValidness( true) ))
     {
         AFERROR("Msg::rw_header: Message is invalid.")
