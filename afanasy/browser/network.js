@@ -10,9 +10,14 @@ function nw_Send( obj)
 	var log = '<i>send:</i> '+ obj_str;
 
 	var xhr = new XMLHttpRequest();
+
+
 	xhr.overrideMimeType('application/json');
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
-	xhr.open('POST', '/', true); 
+	xhr.open('POST', '/', true);
+
+	xhr.setRequestHeader('AFANASY', ('1,0,'+obj_str.length));
+
 	xhr.send('[ * AFANASY * ] 1 0 '+obj_str.length+' JSON'+obj_str);
 
 	xhr.onreadystatechange = function()

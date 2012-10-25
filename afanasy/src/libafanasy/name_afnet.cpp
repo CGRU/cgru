@@ -81,6 +81,7 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 
 	if( strncmp( buffer, "POST", 4) == 0 )
 	{
+writedata( 1, buffer, i_bytes); write(1,"\n",1);
 		offset = 4;
 		while( offset+min_after < i_bytes )
 		{
