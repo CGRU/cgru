@@ -148,6 +148,9 @@ function g_RegisterRecieved( i_obj)
 
 function g_Deregistered()
 {
+	if( g_id == 0 )
+		return;
+
 	g_id = 0;
 	g_uid = -1;
 	g_Info('Deregistered.');
@@ -160,6 +163,9 @@ function g_Deregistered()
 
 function g_ConnectionLost()
 {
+	if( g_id == 0 )
+		return;
+
 	g_Info('Connection Lost.');
 	g_Deregistered();
 }
@@ -173,24 +179,24 @@ function g_MButtonClicked( i_type, i_evt)
 			else
 				g_monitor_buttons[i].classList.add('pushed');
 
-	var new_wnd = true;
+	var new_wnd = false;
 	if( i_evt )
 	{
-		if( i_evt.shiftKey ) new_wnd = false;
-		if( i_evt.ctrlKey ) new_wnd = false;
-		if( i_evt.altKey ) new_wnd = false;
+		if( i_evt.shiftKey ) new_wnd = true;
+		if( i_evt.ctrlKey ) new_wnd = true;
+		if( i_evt.altKey ) new_wnd = true;
 	}
-	else
-		new_wnd = false;
 
 	g_OpenMonitor( i_type, new_wnd);
 }
 
-function g_MonitorClosed( i_name)
+function g_MonitorClosed( i_monitor)
 {
 	for( var i = 0; i < g_monitor_buttons.length; i++)
-		if( g_monitor_buttons[i].textContent == i_name )
+		if( g_monitor_buttons[i].textContent == i_monitor.name )
 			g_monitor_buttons[i].classList.remove('pushed');
+	if( g_main_monitor == i_monitor )
+		g_main_monitor = null;
 }
 
 function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)

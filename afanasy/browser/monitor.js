@@ -210,7 +210,7 @@ Monitor.prototype.destroy = function()
 			g_Error(err.message);
 		}
 
-	g_MonitorClosed( this.name);
+	g_MonitorClosed( this);
 //g_Info('Destroying "'+this.name+'"');
 }
 
@@ -431,13 +431,14 @@ Monitor.prototype.addItemSorted = function( i_item)
 	var index = this.items.length;
 	var nodeBefore = null;
 
+//window.console.log('addItemSorted='+i_item.params.name+' (len='+this.items.length+')');
 	if( this.sortParm )
 		for( var i = 0; i < this.items.length; i++)
 		{
 //var log = i_item.params.name+'['+this.sortParm+']='+i_item.params[this.sortParm]+' <> '+this.items[i].params[this.sortParm]+'=['+this.sortParm+']'+this.items[i].params.name;
 			if( cm_CompareItems( i_item, this.items[i], this.sortParm, false == this.sortDirection ))
 			{
-//log += ' TRUE index='+index;
+//log += ' TRUE index='+index;window.console.log(log);
 				index = i;
 				break;
 			}
