@@ -64,8 +64,10 @@ UserNode.prototype.init = function()
 //	this.elBar.style.textAlign = 'right';
 }
 
-UserNode.prototype.update = function()
+UserNode.prototype.update = function( i_obj)
 {
+	if( i_obj ) this.params = i_obj;
+
 	if( this.params.permanent == false )
 		this.elName.innerHTML = '<i>'+this.params.name+'</i>';
 	else

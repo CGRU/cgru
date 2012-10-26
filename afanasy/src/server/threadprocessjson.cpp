@@ -167,30 +167,6 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 						full ? af::Msg::TJob : af::Msg::TJobsList, type, ids, mask, json);
 			}
 		}
-		else if( type == "users")
-		{
-			AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
-			if( mode.size())
-			{
-				UserAf * user = NULL;
-				if( ids.size() == 1 )
-				{
-					UserContainerIt it( i_args->users);
-					user = it.getUser( ids[0]);
-					if( user == NULL )
-						o_msg_response = af::jsonMsgError( "Invalid ID");
-				}
-				if( user )
-				{
-					if( mode == "jobs_order" )
-						o_msg_response = user->writeJobdsOrder();
-					else if( mode == "log" )
-						o_msg_response = user->writeLog();
-				}
-			}
-			if( o_msg_response == NULL )
-				o_msg_response = i_args->users->generateList( af::Msg::TUsersList, type, ids, mask, json);
-		}
 		else if( type == "renders")
 		{
 			AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
@@ -215,7 +191,36 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				}
 			}
 			if( o_msg_response == NULL )
-				o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
+			{
+				if( mode == "resources" )
+					o_msg_response = i_args->renders->generateList( af::Msg::TRendersResources, type, ids, mask, json);
+				else
+					o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, type, ids, mask, json);
+			}
+		}
+		else if( type == "users")
+		{
+			AfContainerLock lock( i_args->users, AfContainerLock::READLOCK);
+			if( mode.size())
+			{
+				UserAf * user = NULL;
+				if( ids.size() == 1 )
+				{
+					UserContainerIt it( i_args->users);
+					user = it.getUser( ids[0]);
+					if( user == NULL )
+						o_msg_response = af::jsonMsgError( "Invalid ID");
+				}
+				if( user )
+				{
+					if( mode == "jobs_order" )
+						o_msg_response = user->writeJobdsOrder();
+					else if( mode == "log" )
+						o_msg_response = user->writeLog();
+				}
+			}
+			if( o_msg_response == NULL )
+				o_msg_response = i_args->users->generateList( af::Msg::TUsersList, type, ids, mask, json);
 		}
 		else if( type == "monitors")
 		{

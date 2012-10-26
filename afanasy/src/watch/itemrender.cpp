@@ -280,7 +280,7 @@ void ItemRender::updateValues( af::Node *node, int type)
 
       if( false == becameOnline) break;
    }
-   case af::Msg::TRendersListUpdates:
+   case af::Msg::TRendersResources:
    {
       if( online == false ) break;
 

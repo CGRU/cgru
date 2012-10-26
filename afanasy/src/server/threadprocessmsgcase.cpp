@@ -300,12 +300,12 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
       o_msg_response = i_args->renders->generateList( af::Msg::TRendersList, ids);
       break;
    }
-   case af::Msg::TRendersUpdateRequestIds:
+   case af::Msg::TRendersResourcesRequestIds:
    {
       AfContainerLock lock( i_args->renders, AfContainerLock::READLOCK);
 
       af::MCGeneral ids( i_msg);
-      o_msg_response = i_args->renders->generateList( af::Msg::TRendersListUpdates, ids);
+      o_msg_response = i_args->renders->generateList( af::Msg::TRendersResources, ids);
       break;
    }
    case af::Msg::TRenderLogRequestId:

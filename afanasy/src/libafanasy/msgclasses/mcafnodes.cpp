@@ -76,7 +76,7 @@ Af* MCAfNodes::newNode( Msg * msg )
          return new Job( msg);
 
       case Msg::TRendersList:
-      case Msg::TRendersListUpdates:
+      case Msg::TRendersResources:
          return new Render( msg);
 
       case Msg::TUsersList:

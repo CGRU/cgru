@@ -160,7 +160,7 @@ void ListRenders::requestResources()
 
    if( ids.getCount())
    {
-      Watch::sendMsg( new af::Msg( af::Msg::TRendersUpdateRequestIds, &ids, true));
+      Watch::sendMsg( new af::Msg( af::Msg::TRendersResourcesRequestIds, &ids, true));
    }
 }
 
@@ -389,7 +389,7 @@ bool ListRenders::caseMessage( af::Msg * msg)
    {
    case af::Msg::TRendersList:
       subscribe();
-   case af::Msg::TRendersListUpdates:
+   case af::Msg::TRendersResources:
    {
       updateItems( msg);
       calcTitle();

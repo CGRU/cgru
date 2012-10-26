@@ -142,6 +142,7 @@ function g_RegisterRecieved( i_obj)
 	document.getElementById('registered').textContent = 'Registered';
 	document.getElementById('id').textContent = g_id;
 	document.getElementById('uid').textContent = g_uid;
+	document.getElementById('version').textContent = i_obj.version;
 
 	g_MButtonClicked( g_main_monitor_type);
 

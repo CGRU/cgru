@@ -633,9 +633,9 @@ const char * Msg::TNAMES[]=
     "TRenderRegister",
     "TRenderUpdate",              ///< Update Render, message contains its resources.
     "TRendersListRequestIds",     ///< Request a list of Renders with given ids.
-    "TRendersUpdateRequestIds",   ///< Request a list of resources of Renders with given ids.
+    "TRendersResourcesRequestIds",///< Request a list of resources of Renders with given ids.
     "TRendersList",               ///< Message with a list of Renders.
-    "TRendersListUpdates",        ///< Message with a list of resources of Renders.
+    "TRendersResources",          ///< Message with a list of resources of Renders.
     "TRenderSetPriority",         ///< Set Render priority,
     "TRenderSetCapacity",         ///< Set Render capacity,
     "TRenderSetMaxTasks",         ///< Set Render maximum tasks,

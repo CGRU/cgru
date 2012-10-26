@@ -138,7 +138,7 @@ function nw_GetSoftwareIcons()
 
 function nw_ReqestRendersResources()
 {
-	nw_GetNodes('renders');
+	nw_GetNodes('renders', null, 'resources');
 }
 
 function nw_ConstructActionObject( i_type, i_ids)

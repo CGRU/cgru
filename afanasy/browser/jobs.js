@@ -58,8 +58,10 @@ JobNode.prototype.init = function()
 	this.percentage = 0;
 }
 
-JobNode.prototype.update = function()
+JobNode.prototype.update = function( i_obj)
 {
+	if( i_obj ) this.params = i_obj;
+
 	if( this.params.user_list_order != null )
 		this.params.order = this.params.user_list_order;
 

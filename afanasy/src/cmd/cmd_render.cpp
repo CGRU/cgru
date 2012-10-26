@@ -37,8 +37,8 @@ CmdRenderResoucesList::CmdRenderResoucesList()
    setCmd("rrlist");
    setArgsCount(1);
    setInfo("List of resources of Renders specified by mask.");
-   setMsgType( af::Msg::TRendersUpdateRequestIds);
-   setMsgOutType( af::Msg::TRendersListUpdates);
+   setMsgType( af::Msg::TRendersResourcesRequestIds);
+   setMsgOutType( af::Msg::TRendersResources);
    setRecieving();
 }
 CmdRenderResoucesList::~CmdRenderResoucesList(){}

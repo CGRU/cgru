@@ -35,7 +35,7 @@ function Plotter( i_plottersArray, i_pElement, i_label, i_title)
 	this.canvas.style.height = Plotter_H + 'px';
 	this.element.appendChild( this.canvas);
 
-	if( this.canvas.getContext)
+/*	if( this.canvas.getContext)
 	{
 		var ctx = this.canvas.getContext('2d');
 		ctx.fillStyle = 'rgb(200,80,0)';
@@ -43,7 +43,7 @@ function Plotter( i_plottersArray, i_pElement, i_label, i_title)
 		ctx.fillStyle = 'rgb(0,0,200)';
 		ctx.fillRect( Plotter_W/2, Plotter_H/2, Plotter_W/2, Plotter_H/2);
 	}
-
+*/
 	this.elLabel = document.createElement('div');
 	this.element.appendChild( this.elLabel);
 	this.elLabel.classList.add('label');

@@ -298,8 +298,7 @@ Monitor.prototype.processMsg = function( obj)
 		{
 			if( this.items[i].params.id == nodes[j].id )
 			{
-				this.items[i].params = nodes[j];
-				this.items[i].update();
+				this.items[i].update( nodes[j]);
 				updated.push( this.items[i]);
 				this.filterItem( this.items[i]);
 				founded = true;

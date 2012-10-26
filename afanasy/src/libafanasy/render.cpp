@@ -49,6 +49,18 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 {
 	o_str << "{";
 
+	if( i_type == af::Msg::TRendersResources )
+	{
+		o_str << "\"id\":"   << m_id;
+		if( isOnline())
+		{
+			o_str << ",";
+			m_hres.jsonWrite( o_str);
+		}
+		o_str << "}";
+		return;
+	}
+
 	Client::v_jsonWrite( o_str, i_type);
 
 	o_str << ",";
@@ -81,12 +93,6 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 
 	o_str << ',';
 	m_host.jsonWrite( o_str);
-
-	if( isOnline())
-	{
-		o_str << ',';
-		m_hres.jsonWrite( o_str);
-	}
 
 	o_str << "}";
 }
@@ -160,7 +166,7 @@ void Render::readwrite( Msg * msg)
 	  m_address.readwrite( msg);
 
    case Msg::TRenderUpdate:
-   case Msg::TRendersListUpdates:
+   case Msg::TRendersResources:
 
 	  m_hres.readwrite( msg);
 

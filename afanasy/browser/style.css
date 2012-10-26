@@ -350,9 +350,9 @@ margin: 2px;
 border-radius: 3px;
 }
 .jobblock .progress .bar {}
-.jobblock .progress .bar.DON { background: #363;}
-.jobblock .progress .bar.RUN { background: #FF0;}
-.jobblock .progress .bar.ERR { background: #F00;}
+.DON { background: #363;}
+.RUN { background: #FF0;}
+.ERR { background: #F00;}
 
 .item .name {
 font-size: 14px;
