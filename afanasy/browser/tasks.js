@@ -84,6 +84,9 @@ TaskItem.prototype.update = function()
 
 TaskItem.prototype.updateProgress = function( i_progress)
 {
+	if( i_progress.per == null )
+		i_progress.per = 0;
+
 	for( var attr in i_progress )
 		this.params[attr] = i_progress[attr];
 
@@ -105,17 +108,13 @@ TaskItem.prototype.updateProgress = function( i_progress)
 			this.elTime.textContent = cm_TimeStringInterval( this.params.tst);
 
 	this.percent = 0;
-	if( this.state.RUN && this.params.per )
+
+	if( this.state.RUN )
 	{
 		this.percent = this.params.per;
 		if( this.percent < 0 ) this.percent = 0;
 		else if( this.percent > 100 ) this.percent = 100;
-	}
-//	if( this.state.DON ) this.percent = 100;
-//	if( this.state.SKP ) this.percent = 100;
 
-	if( this.state.RUN )
-	{
 		this.elPercent.textContent = ' ' + this.percent + '%';
 		this.elStar.style.display = 'block';
 	}

@@ -7,7 +7,7 @@ function nw_Send( obj)
 {
 	var obj_str = JSON.stringify(obj);
 
-	var log = '<i>send:</i> '+ obj_str;
+	var log = '<b><i>send:</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest();
 	xhr.overrideMimeType('application/json');
@@ -24,7 +24,7 @@ function nw_Send( obj)
 		{
 			if(( xhr.status == 200 ) && xhr.responseText.length )
 			{
-				log += '<br/><i>recv:</i> '+ xhr.responseText;
+				log += '<br/><b><i>recv:</i></b> '+ xhr.responseText;
 
 				nw_error_count = 0;
 				nw_connected = true;

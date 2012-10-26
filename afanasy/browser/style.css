@@ -60,8 +60,6 @@ box-shadow: 0px 0px 5px #000 inset;
 #settings {
 position: absolute;
 left: 4px; right: 4px; top: 4px; bottom: 40px;
-/*margin: 4px 8px;*/
-/*padding: 4px;*/
 border-radius: 6px;
 box-shadow: 0px 0px 5px #000 inset;
 }
@@ -70,12 +68,9 @@ margin: 5px 10px;
 }
 #settings * {
 position: absolute;
-/*
-overflow: hidden;
-position: relative;
-*/
 text-align: center;
 white-space:nowrap;
+overflow: hidden;
 /*box-shadow: 0px 0px 2px #000 inset;*/
 }
 #settings #parameters {
@@ -87,13 +82,7 @@ box-shadow: 0px 0px 2px #000 inset;
 box-shadow: 0px 0px 1px #000 inset;
 border-radius: 4px;
 left: 0; right: 0;
-/*
-padding: 8px;
-*/
 height: 30px;
-}
-#settings * {
-overflow: hidden;
 }
 #settings .parameter * {
 margin: 5px;
@@ -135,7 +124,7 @@ float: left;
 width: 12px; height: 15px;
 margin: 3px;
 }
-#log_btn, #netlog_btn {
+#footer #log_btn, #netlog_btn {
 box-shadow: 0px 0px 3px #000;
 float: right;
 display: none;
@@ -146,24 +135,26 @@ border-top-right-radius: 4px;
 border-bottom-right-radius: 0;
 border-bottom-left-radius: 0;
 }
-#log_btn.pushed, #netlog_btn.pushed { /*background: #CDE;*/ box-shadow: 0px 0px 1px #000;}
-#info {
+#footer #log_btn.pushed, #netlog_btn.pushed { /*background: #CDE;*/ box-shadow: 0px 0px 1px #000;}
+#footer #info {
 box-shadow: 0px 0px 2px #000 inset;
 padding: 3px 9px; margin: 3px 9px;
 border-radius: 6px;
 }
-#version {
+#footer #version {
 float: right;
 padding: 3px; margin: 3px;
 }
-#log, #netlog {
+#footer #log, #netlog {
 overflow: auto;
+word-wrap:break-word;
 display: none;
 box-shadow: 0px 0px 2px #000 inset;
 padding: 3px 9px; margin: 0px 9px;
 border-radius: 6px;
 height: 190px;
 }
+#footer #log *, #footer #netlog * { margin: 4px 0px;}
 
 .monitor {
 font-weight: bold;
