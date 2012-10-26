@@ -87,6 +87,8 @@ void Msg::construct()
     m_int32 = 0;
     m_sid = 0;
 
+	m_header_offset = 0;
+
     m_receive = false;
     m_sendfailed = false;
 
@@ -194,7 +196,12 @@ bool Msg::setData( int i_size, const char * i_msgData, int i_type)
    w_data( i_msgData, this, i_size);
 
    m_int32 = i_size;
-   rw_header( true);
+
+	if( m_type == Msg::TJSON )
+		m_header_offset = Msg::SizeHeader;
+
+	rw_header( true);
+
    return true;
 }
 
@@ -331,25 +338,35 @@ void Msg::rw_header( bool write)
         AFERROR("Msg::rw_header: Message is invalid.")
     }
 
-	if(( m_type == TJSON ) && write )
-	{
-		strncpy( m_buffer, " HTTP/1.1 200 OK\r\n\r\n", 20);
-	}
-	else
-	{
-	    static const int int32_size = 4;
-	    int offset = 0;
-	    rw_int32( m_version, m_buffer+offset, write); offset+=int32_size;
-	    rw_int32( m_magic,   m_buffer+offset, write); offset+=int32_size;
-	    rw_int32( m_sid,     m_buffer+offset, write); offset+=int32_size;
-	    rw_int32( m_type,    m_buffer+offset, write); offset+=int32_size;
-	    rw_int32( m_int32,   m_buffer+offset, write); offset+=int32_size;
-	}
+	if( write && af::Environment::isServer() && ( m_type != TJSON ) && ( m_type != THTTP ))
+		m_magic = AFGENERAL::MAGIC_NUMBER_ANY;
+
+    static const int int32_size = 4;
+    int offset = 0;
+    rw_int32( m_version, m_buffer+offset, write); offset+=int32_size;
+    rw_int32( m_magic,   m_buffer+offset, write); offset+=int32_size;
+    rw_int32( m_sid,     m_buffer+offset, write); offset+=int32_size;
+    rw_int32( m_type,    m_buffer+offset, write); offset+=int32_size;
+    rw_int32( m_int32,   m_buffer+offset, write); offset+=int32_size;
+
     if(( false == write ) && ( false == checkValidness( true) ))
     {
         AFERROR("Msg::rw_header: Message is invalid.")
     }
     m_writtensize = 0;
+}
+
+void Msg::createHTTPHeader()
+{
+	if( m_type != Msg::TJSON )
+	{
+		AFERROR("Msg::createHTTPHeader(): Type is not JSON.")
+		stdOut();
+		return;
+	}
+	m_type = Msg::THTTP;
+	m_header_offset = 1;
+	strncpy( m_buffer, " HTTP/1.1 200 OK\r\n\r\n", 20);
 }
 
 bool Msg::checkValidness( bool checkMagic)
@@ -749,7 +766,7 @@ const char * Msg::TNAMES[]=
     "TRESERVED12",
     "TRESERVED13",
     "TRESERVED14",
-    "TRESERVED15",
+	"THTTP",                      ///< HTTP - with JSON POST data
 	"TJSON",                      ///< JSON
 	"TBlockNonSequential",        ///< Set block task solving to non-sequential.
 	"TRenderHideShow",            ///< Hide or show renders.

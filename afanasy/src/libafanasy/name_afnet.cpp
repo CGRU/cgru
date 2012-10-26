@@ -121,7 +121,7 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 		// If header founded, construct message:
 		if( header_processed )
 		{
-			io_msg->setHeader( magic, sid, af::Msg::TJSON, size, offset, i_bytes);
+			io_msg->setHeader( magic, sid, af::Msg::THTTP, size, offset, i_bytes);
 			return offset;
 		}
 
@@ -501,20 +501,24 @@ AFINFO("af::msgread:\n");
 
 bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 {
-	int offset = 0;
-	if( i_msg->type() == af::Msg::TJSON )
-	{
-		offset = 1;
+//	int offset = 0;
+//	if( i_msg->type() == af::Msg::TJSON )
+//	if( i_msg->type() == af::Msg::THTTP )
+//	if(( i_msg->type() == af::Msg::TJSON ) || ( i_msg->type() == af::Msg::THTTP ))
+//	{
+//		offset = 1;
 //		offset = af::Msg::SizeHeader;
 //		::writedata( i_desc, "HTTP/1.1 200 OK\r\n", 17);
 //		::writedata( i_desc, "Content-Type: application/json\r\n", 32);
 //                            1234567890123456789012345678901234567890
 //                            0         1         2         3
+//	if( i_msg->type() == af::Msg::THTTP )
 //		::writedata( i_desc, "HTTP/1.1 200 OK\r\n\r\n", 19);
 //		::writedata( i_desc, "\r\n", 2);
-	}
+//	}
 
-    if( false == ::writedata( i_desc, i_msg->buffer() + offset, i_msg->writeSize() - offset ))
+//    if( false == ::writedata( i_desc, i_msg->buffer() + offset, i_msg->writeSize() - offset ))
+    if( false == ::writedata( i_desc, i_msg->buffer() + i_msg->getHeaderOffset(), i_msg->writeSize() - i_msg->getHeaderOffset() ))
     {
         AFERROR("com::msgsend: Error writing message.\n");
         return false;
@@ -527,8 +531,8 @@ bool af::msgwrite( int i_desc, const af::Msg * i_msg)
 
 af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 {
-	if( af::Environment::isServer())
-		i_msg->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
+//	if( af::Environment::isServer())
+//		i_msg->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
 
     if( i_msg->isReceiving() && ( i_msg->addressesCount() > 0 ))
     {

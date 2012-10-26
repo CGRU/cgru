@@ -125,8 +125,12 @@ printf("Request:  "); msg_request->stdOut();
 	msg_response->setSid( msg_request->sid());
 	if( msg_response->type() == af::Msg::TMagicMismatch )
 		msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_BAD);
-	else
-		msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
+//	else // Now it is always set in af::Msg::rw_header private function
+//		msg_response->setMagicNumber( AFGENERAL::MAGIC_NUMBER_ANY);
+
+	// Create HTTP response header for web browsers:
+	if( msg_response && ( msg_request->type() == af::Msg::THTTP ))
+		msg_response->createHTTPHeader();
 
 #ifdef AFOUTPUT
 printf("Response: "); msg_response->stdOut();

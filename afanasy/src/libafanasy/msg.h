@@ -343,7 +343,7 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 /**/TRESERVED12/**/,
 /**/TRESERVED13/**/,
 /**/TRESERVED14/**/,
-/**/TRESERVED15/**/,
+/**/THTTP/**/,                      ///< HTTP - with JSON POST data
 /**/TJSON/**/,                      ///< JSON
 /**/TBlockNonSequential/**/,        ///< Set block task solving to non-sequential.
 /**/TRenderHideShow/**/,			///< Hide or show renders.
@@ -359,8 +359,6 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
     inline int   dataLen() const { return m_int32; }///< Get data length.
     inline int   int32()   const { return m_int32; }///< Get 32-bit integer, data lenght for data messages.
     inline int   sid()     const { return m_sid;   }///< Get sender id.
-
-	inline void setSid( uint32_t i_sid) { m_sid = i_sid; rw_header( true);}
 
     inline char* buffer() const { return m_buffer;}///< Get buffer pointer.
 
@@ -438,6 +436,11 @@ And when Render can't connect to Afanasy. Afanasy register new Render and send b
 	inline bool isMagicValid()   const { return m_magic == Msg::Magic; }
 	inline bool isMagicInvalid() const { return m_magic != Msg::Magic; }
 	inline void setMagicNumber( int i_number) { m_magic =  i_number; rw_header( true); }
+	inline void setSid( uint32_t i_sid) { m_sid = i_sid; rw_header( true);}
+
+	void createHTTPHeader();
+
+	inline int getHeaderOffset() const { return m_header_offset;}
 
 private:
 
@@ -457,6 +460,7 @@ private:
     int  m_buffer_size;              ///< Buffer size.
     int  m_data_maxsize;             ///< Data maximum size ( = buffer size - header size).
     int  m_writtensize;              ///< Number of bytes already written in message buffer.
+	int  m_header_offset;            ///< Header offset
 
 // communication parameters:
     Address m_address;                ///< Address, where message came from or will be send.

@@ -73,6 +73,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 		i_msg->stdOutData();
 		break;
 	}
+	case af::Msg::THTTP:
 	case af::Msg::TJSON:
     {
 		return threadProcessJSON( i_args, i_msg);

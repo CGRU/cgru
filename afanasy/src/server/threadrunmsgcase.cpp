@@ -26,6 +26,7 @@ void threadRunCycleCase( ThreadArgs * i_args, af::Msg * i_msg)
 {
 switch ( i_msg->type())
 {
+	case af::Msg::THTTP:
 	case af::Msg::TJSON:
 	{
 		threadRunJSON( i_args, i_msg);
