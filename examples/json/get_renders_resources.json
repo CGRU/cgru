@@ -1,0 +1,8 @@
+{
+	"get":
+	{
+		"type" : "renders",
+		"mode" : "resources",
+		"null" : null
+	}
+}
