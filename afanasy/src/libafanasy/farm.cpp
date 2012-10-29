@@ -58,6 +58,20 @@ void ServiceLimit::generateInfoStream( std::ostringstream & stream, bool full) c
    else
       stream << "c" << counter << "/" <<  maxcount << " h" << hostslist.size() << "/" << maxhosts;
 }
+void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
+{
+	o_str << "{";
+	o_str << "\"count\":" << counter;
+	o_str << ",\"max_count\":" << maxcount;
+	o_str << ",\"hosts\":[";
+	for( std::list<std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
+	{
+		if( it != hostslist.begin()) o_str << ",";
+		o_str << "\"" << *it << "\"";
+	}
+	o_str << "],\"max_hosts\":" << maxhosts;
+	o_str << "}";
+}
 
 bool ServiceLimit::increment( const std::string & hostname)
 {
@@ -547,3 +561,17 @@ const std::string Farm::serviceLimitsInfoString( bool full) const
 
    return stream.str();
 }
+void Farm::jsonWriteLimits( std::ostringstream & o_str) const
+{
+	o_str << "\"services_limits\":{";
+
+	for( std::map<std::string, ServiceLimit*>::const_iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
+	{
+		if( it != servicelimits.begin()) o_str << ",";
+		o_str << "\"" << (*it).first << "\":";
+		(*it).second->jsonWrite( o_str);
+	}
+
+	o_str << "}";
+}
+

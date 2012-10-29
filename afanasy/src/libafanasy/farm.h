@@ -14,6 +14,7 @@ public:
    ServiceLimit( int MaxCount, int MaxHosts);
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
+	void jsonWrite( std::ostringstream & o_str) const; /// Generate information.
 
    bool canRun( const std::string & hostname) const;
    bool increment( const std::string & hostname);
@@ -55,6 +56,8 @@ public:
    void servicesLimitsGetUsage( const Farm & other);
 
    const std::string serviceLimitsInfoString( bool full = false) const; /// Generate services limits information.
+
+	void jsonWriteLimits( std::ostringstream & o_str) const; /// Generate services limits information.
 
 private:
    int count;

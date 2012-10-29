@@ -787,6 +787,26 @@ const std::string RenderAf::getServicesString() const
 
    return str;
 }
+void RenderAf::jsonWriteServices( std::ostringstream & o_str) const
+{
+	o_str << "\"services\":{";
+
+	for( int i = 0; i < servicesnum; i++)
+	{
+		if( i > 0 ) o_str << ",";
+		o_str << "\"" << m_host.getServiceName(i) << "\":[" << int( servicescounts[i]);
+		if( m_host.getServiceCount(i) > 0)
+			o_str << ",\"max\"," << int( m_host.getServiceCount(i));
+		if( disabledservices[i] ) o_str << ",false";
+		o_str << "]";
+	}
+
+	o_str << "}";
+
+	if( false == m_services_disabled.empty())
+		o_str << ",\"services_disabled\":\"" << m_services_disabled << "\"";
+
+}
 
 bool RenderAf::canRunService( const std::string & type) const
 {
@@ -865,6 +885,33 @@ void RenderAf::closeLostTask( const af::MCTaskUp &taskup)
    af::Msg* msg = new af::Msg( af::Msg::TRenderCloseTask, &taskpos);
    msg->setAddress( render);
    AFCommon::QueueMsgDispatch( msg);
+}
+
+af::Msg * RenderAf::jsonWriteSrvFarm() const
+{
+	std::ostringstream str;
+	str << "{\"object\":{";
+
+	str << "\"name\":\"" << m_name << "\"";
+	str << ",\"id\":" << m_id;
+
+	str << ",\"render\":";
+	af::Render::v_jsonWrite( str, af::Msg::TRendersList);
+
+	str << ",";
+	jsonWriteServices( str);
+
+	str << ",";
+	af::farm()->jsonWriteLimits( str);
+
+	if( isOnline())
+	{
+		str << ",";
+		m_hres.jsonWrite( str);
+	}
+	
+	str << "}}";
+	return af::jsonMsg( str);
 }
 
 int RenderAf::calcWeight() const

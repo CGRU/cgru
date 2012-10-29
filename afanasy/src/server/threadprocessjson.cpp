@@ -183,7 +183,7 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 				if( render )
 				{
 					if( full )
-						o_msg_response = render->jsonWrite( type, "object");
+						o_msg_response = render->jsonWriteSrvFarm();
 					else if( mode == "log" )
 						o_msg_response = render->writeLog();
 					else if( mode == "tasks_log" )

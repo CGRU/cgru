@@ -69,6 +69,7 @@ public:
 
    inline const std::list<std::string> & getTasksLog() { return tasksloglist; }  ///< Get tasks log list.
    const std::string getServicesString() const;                      ///< Get services information.
+	void jsonWriteServices( std::ostringstream & o_str) const; ///< Get services information.
 
    virtual int calcWeight() const; ///< Calculate and return memory size.
 
@@ -78,6 +79,9 @@ public:
 
    // Called directly from solve cycle if it was not solved.
    void notSolved();
+
+	// Need for server to write some farm parameters (gui double-click):
+	af::Msg * jsonWriteSrvFarm() const;
 
 public:
    /// Set container.

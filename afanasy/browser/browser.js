@@ -114,7 +114,7 @@ function g_Refresh()
 
 function g_Init()
 {
-	g_Info('Initialization:');
+	g_Info('HTML body load.');
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
 
