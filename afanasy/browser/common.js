@@ -160,10 +160,10 @@ function cm_GetState( i_state, o_state, o_element)
 				o_state[cm_States[i]] = true;
 				if( o_element )
 					o_element.classList.add( cm_States[i]);
+				continue;
 			}
-			else
-				o_state[cm_States[i]] = false;
 		}
+		o_state[cm_States[i]] = false;
 	}
 }
 

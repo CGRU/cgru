@@ -65,8 +65,9 @@ JobNode.prototype.update = function( i_obj)
 	if( this.params.user_list_order != null )
 		this.params.order = this.params.user_list_order;
 
-	this.elState.textContent = this.params.state;
 	cm_GetState( this.params.state, this.state, this.element);
+	if( this.params.state == null ) this.params.state = '';
+	this.elState.textContent = this.params.state;
 
 	var displayFull = false;
 	if( this.state.ERR || this.state.RUN || this.state.SKP ||

@@ -313,12 +313,19 @@ Monitor.prototype.processMsg = function( obj)
 		for( var i = 0; i < updated.length; i++)
 			this.sortItem( updated[i]);
 
+	var new_nodes = [];
 	for( var i = 0; i < new_ids.length; i++)
-		this.createNode( nodes[new_ids[i]]);
+		new_nodes.push( this.createNode( nodes[new_ids[i]]));
 
 	if(( this.type == 'jobs' ) && ( this.sortParm == 'order'))
 		if( new_ids.length || updated.length )
 			nw_GetNodes('users',[g_uid],'jobs_order');
+
+	if( false == this.hasSelection())
+		if( new_nodes.length )
+			this.cur_item = new_nodes[new_nodes.length-1];
+		else if( updated.length )
+			this.cur_item = updated[updated.length-1];
 
 	this.setWindowTitle();
 //this.info( 'c' + this.cycle + ': nodes processed: ' + nodes.length + ' new:' + new_ids.length + ' up:' + updated.length);
@@ -424,6 +431,7 @@ Monitor.prototype.createNode = function( i_obj)
 	this.createItem( node, i_obj, false);
 	this.filterItem( node);
 	this.addItemSorted( node);
+	return node;
 }
 Monitor.prototype.addItemSorted = function( i_item)
 {
@@ -531,6 +539,8 @@ Monitor.prototype.elSetSelected = function( el, on)
 		el.selected = true;
 		if( false == el.classList.contains('selected'))
 			el.classList.add('selected');
+		if( this.type == 'jobs' )
+			this.setWindowTitle();
 	}
 	else
 	{
