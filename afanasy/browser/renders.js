@@ -184,6 +184,7 @@ RenderNode.prototype.update = function( i_obj)
 
 	if( this.state.OFF == true )
 	{
+		this.elStar.style.display = 'none';
 		this.clearTasks();
 //		this.elPower.textContent = 'Offline';
 		this.elCapacity.textContent = '';
