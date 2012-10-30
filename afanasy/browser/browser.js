@@ -138,6 +138,7 @@ function g_RegisterRecieved( i_obj)
 	if( i_obj.uid && ( i_obj.uid > 0 ))
 		g_uid = i_obj.uid;
 
+	this.document.title = 'AF';
 	g_Info('Registed: ID = '+g_id+' User = "'+localStorage['user_name']+'"['+g_uid+"]");
 	document.getElementById('registered').textContent = 'Registered';
 	document.getElementById('id').textContent = g_id;
@@ -154,6 +155,7 @@ function g_Deregistered()
 	if( g_id == 0 )
 		return;
 
+	this.document.title = 'AF (deregistered)';
 	g_id = 0;
 	g_uid = -1;
 	g_Info('Deregistered.');
