@@ -575,3 +575,11 @@ af::Msg * af::msgsend( Msg * i_msg, bool & io_ok, VerboseMode i_verbose )
 
     return NULL;
 }
+
+af::Msg * af::msgString( const std::string & i_str)
+{
+	af::Msg * o_msg = new af::Msg();
+	o_msg->setString( i_str);
+	return o_msg;
+}
+
