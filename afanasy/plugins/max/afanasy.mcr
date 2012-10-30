@@ -68,8 +68,8 @@ rollout AfanasyDialog "Afanasy"
 -- Job name:
    edittext jobnameControl "Job Name" text:jobname
 -- Frame range:
-   spinner startFrameControl "Start Frame" range:[1,99999,startFrame] type:#integer scale:1 toolTip:"First frame to render."
-   spinner endFrameControl "End Frame" range:[1,99999,endFrame] type:#integer scale:1 toolTip:"Last Frame to render."
+   spinner startFrameControl "Start Frame" range:[0,99999,startFrame] type:#integer scale:1 toolTip:"First frame to render."
+   spinner endFrameControl "End Frame" range:[0,99999,endFrame] type:#integer scale:1 toolTip:"Last Frame to render."
    spinner byFrameControl "By Frame" range:[1,999,byFrame] type:#integer scale:1 toolTip:"Render every Nth frame."
    spinner taskFrameNumberControl "Frames Per Task" range:[1,999,taskFrameNumber] type:#integer scale:1 toolTip:"Number of frames in one task."
 -- Cameras:
