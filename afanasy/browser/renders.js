@@ -99,8 +99,12 @@ RenderNode.prototype.update = function( i_obj)
 
 		if( r == null ) return;
 
-		if( this.state.ONL != true ) // Render just become onlune:
+		if(( this.state.ONL != true ) || ( this.host_resources == null ))
 		{
+			// If render just become online,
+			// or resources reciedved fisrt time,
+			// we need to set plotter scales:
+
 			this.plotterC.setTitle('CPU: '+r.cpu_mhz+' MHz x'+r.cpu_num);
 
 			this.plotterM.setTitle('Memory: '+r.mem_total_mb+' Mb');
@@ -121,6 +125,8 @@ RenderNode.prototype.update = function( i_obj)
 			this.plotterH.setTitle('HDD Space: '+r.hdd_total_gb+' Gb');
 			this.plotterH.setScale( r.hdd_total_gb, 95 * r.hdd_total_gb / 100, r.hdd_total_gb);
 		}
+
+		this.host_resources = r;
 
 		var usr = r.cpu_user + r.cpu_nice;
 		var sys = r.cpu_system + r.cpu_iowait + r.cpu_irq + r.cpu_softirq;
