@@ -203,6 +203,8 @@ namespace af
     /// Solve host address.
     const af::Address solveNetName( const std::string & i_name, int i_port, int i_type = AF_UNSPEC, VerboseMode i_verbose = VerboseOff);
 
+	Msg * msgString( const std::string & i_str);
+
     /// Recieve message from given file discriptor \c desc to \c buffer
     /** Return true if success. This function will block process.**/
     bool msgread( int desc, af::Msg* msg);
