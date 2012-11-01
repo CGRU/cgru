@@ -213,6 +213,7 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 		if( g_monitors[i].name == i_name )
 		{
 			g_Info('Monitor "'+i_name+'" already opened.', false);
+			g_monitors[i].window.focus();
 			return;
 		}
 
