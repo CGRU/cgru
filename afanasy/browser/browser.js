@@ -422,10 +422,13 @@ function g_Error( i_err)
 
 function g_OnClose()
 {
+	localStorage.main_monitor = g_main_monitor_type
+;
 	var operation = {};
 	operation.type = 'deregister';
 	if( g_id)
 		nw_Action('monitors', [g_id], operation);
+
 	g_CloseAllWindows();
 	g_CloseAllMonitors();
 }
