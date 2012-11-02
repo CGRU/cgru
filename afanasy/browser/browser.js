@@ -212,7 +212,8 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 	for( var i = 0; i < g_monitors.length; i++)
 		if( g_monitors[i].name == i_name )
 		{
-			g_Error('Monitor "'+i_name+'" already opened.');
+			g_Info('Monitor "'+i_name+'" already opened.', false);
+			g_monitors[i].window.focus();
 			return;
 		}
 
@@ -415,17 +416,20 @@ function g_Info( i_msg, i_log)
 	if( i_log == null || i_log == true )
 		g_Log( i_msg);
 }
-function g_Error( i_err)
+function g_Error( i_err, i_log)
 {
-	g_Info('Error: ' + i_err);
+	g_Info('Error: ' + i_err, i_log);
 }
 
 function g_OnClose()
 {
+	localStorage.main_monitor = g_main_monitor_type
+;
 	var operation = {};
 	operation.type = 'deregister';
 	if( g_id)
 		nw_Action('monitors', [g_id], operation);
+
 	g_CloseAllWindows();
 	g_CloseAllMonitors();
 }

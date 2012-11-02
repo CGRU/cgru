@@ -641,6 +641,7 @@ JobNode.actions.push(['context', 'show_obj',          null, 'menuHandleShowObj',
 JobNode.actions.push(['context',  null,               null,  null,                  null]);
 JobNode.actions.push(['context', 'reset_error_hosts', null, 'menuHandleOperation', 'Reset Error Hosts']);
 JobNode.actions.push(['context', 'restart_errors',    null, 'menuHandleOperation', 'Restart Errors']);
+JobNode.actions.push(['context', 'restart_running',   null, 'menuHandleOperation', 'Restart Running']);
 JobNode.actions.push(['context',  null,               null,  null,                  null]);
 JobNode.actions.push(['context', 'move_jobs_up',      null, 'menuHandleMove',      'Move Up',     'user']);
 JobNode.actions.push(['context', 'move_jobs_down',    null, 'menuHandleMove',      'Move Down',   'user']);
@@ -651,7 +652,6 @@ JobNode.actions.push(['context', 'start',             null, 'menuHandleOperation
 JobNode.actions.push(['context', 'pause',             null, 'menuHandleOperation', 'Pause']);
 JobNode.actions.push(['context', 'stop',              null, 'menuHandleOperation', 'Stop']);
 JobNode.actions.push(['context', 'restart',           null, 'menuHandleOperation', 'Restart']);
-JobNode.actions.push(['context', 'restart_running',   null, 'menuHandleOperation', 'Restart Running']);
 JobNode.actions.push(['context', 'restart_pause',     null, 'menuHandleOperation', 'Restart&Pause']);
 JobNode.actions.push(['context', 'delete',            null, 'menuHandleOperation', 'Delete']);
 
