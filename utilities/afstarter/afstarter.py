@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 import os, sys, time
 
 import cgrupyqt
@@ -193,8 +194,8 @@ class Dialog( QtGui.QWidget):
       lFileType.addWidget( QtGui.QLabel('Override Service Type:', self))
       self.fields['servicetype'] = QtGui.QComboBox( self)
       lFileType.addWidget( self.fields['servicetype'] )
-      QtCore.QObject.connect( self.fields['servicetype'], 
-                              QtCore.SIGNAL('currentIndexChanged(int)'), 
+      QtCore.QObject.connect( self.fields['servicetype'],
+                              QtCore.SIGNAL('currentIndexChanged(int)'),
                               self.setFileType)
 
       # Scene:
@@ -269,8 +270,8 @@ class Dialog( QtGui.QWidget):
       self.labels['node'].setToolTip(self.labelNode_tooltip['default'])
       self.fields['node'] = QtGui.QLineEdit( self)
       lNode.addWidget( self.fields['node'])
-      QtCore.QObject.connect( self.fields['node'], 
-                              QtCore.SIGNAL('textEdited(QString)'), 
+      QtCore.QObject.connect( self.fields['node'],
+                              QtCore.SIGNAL('textEdited(QString)'),
                               self.evaluate)
       self.labels['take'] = QtGui.QLabel(self.labelTake_name['default'])
       lNode.addWidget( self.labels['take'] )
@@ -288,14 +289,16 @@ class Dialog( QtGui.QWidget):
       osLayout.addWidget( QtGui.QLabel('Operating System Type:'))
       self.fields['os'] = QtGui.QLineEdit( self)
       osLayout.addWidget( self.fields['os'])
-      QtCore.QObject.connect( self.fields['os'], 
-                              QtCore.SIGNAL('textEdited(QString)'), 
+      QtCore.QObject.connect( self.fields['os'],
+                              QtCore.SIGNAL('textEdited(QString)'),
                               self.evaluate)
 
       # Tasks Command:
       exelayout = QtGui.QHBoxLayout()
       advlayout.addLayout( exelayout)
-      exelayout.addWidget( QtGui.QLabel('Tasks Command:'))
+      label = QtGui.QLabel('Tasks Executable:')
+      label.setToolTip('Override launching programm')
+      exelayout.addWidget( label)
       self.fields['exec'] = QtGui.QLineEdit( self)
       exelayout.addWidget( self.fields['exec'])
       QtCore.QObject.connect( self.fields['exec'], QtCore.SIGNAL('textEdited(QString)'), self.evaluate)
@@ -421,7 +424,7 @@ class Dialog( QtGui.QWidget):
       self.refreshRecent()
 
       # Load last settings:
-      if not self.load( FileLast): 
+      if not self.load( FileLast):
          self.evaluate()
 
    def browseScene( self):
@@ -485,7 +488,7 @@ class Dialog( QtGui.QWidget):
 
          self.fields['servicetype'].clear()
          for i in range(len(theFileTypes)):
-            self.fields['servicetype'].addItem(theFileTypes[i], 
+            self.fields['servicetype'].addItem(theFileTypes[i],
                                     theFileTypesData[i])
 
          theFileTypeData = ''
@@ -546,7 +549,7 @@ class Dialog( QtGui.QWidget):
          elif isinstance( self.fields[key], QtGui.QSpinBox):
             value = str( self.fields[key].value())
          elif isinstance( self.fields[key], QtGui.QCheckBox):
-            value = str( int( self.fields[key].isChecked())) 
+            value = str( int( self.fields[key].isChecked()))
          elif isinstance( self.fields[key], QtGui.QComboBox):
             # value = str( self.fields[key].itemData( self.fields[key].currentIndex()).toString())
             value = str( self.fields[key].itemData( self.fields[key].currentIndex()))
@@ -625,7 +628,7 @@ class Dialog( QtGui.QWidget):
          if pos < 1: continue
          key = line[:pos]
          if key not in self.fields: continue
-         value = line[pos+1:].strip()         
+         value = line[pos+1:].strip()
          if isinstance( self.fields[key], QtGui.QLineEdit):
             self.fields[key].setText( value)
          elif isinstance( self.fields[key], QtGui.QSpinBox):
