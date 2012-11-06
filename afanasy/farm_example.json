@@ -1,0 +1,82 @@
+{"farm":{
+	"":"Copy this file into 'farm.xml' and describe you own",
+
+	"":"You can limit service on your farm:",
+	"":"'maxhosts' - maximum number if various hosts (renders) service can run on",
+	"":"'maxcount' - total maximum number of service starts, no matter on the same host or not",
+	"limits":[
+		{"service":"service_a", "maxhosts":10, "maxcount":20},
+		{"service":"service_b", "maxhosts":10, "maxcount":20}
+	],
+
+	"patterns":[
+	{
+		"name":"Some Host",
+		"mask":".*",
+			"":"Mask '.*' will match any render name. So here defined some default settings for any host.",
+
+		"description":"Default machine",
+		"capacity":1100,
+		"maxtasks":10,
+		"power":1000,
+
+		"services":[
+			{"name":"generic"},
+			{"name":"system"},
+			{"name":"wakeonlan"},
+			{"name":"postcmd"},
+
+			{"name":"afterfx"},
+			{"name":"blender"},
+			{"name":"blender"},
+			{"name":"c4d"},
+			{"name":"hbatch"},
+			{"name":"hbatch_prman"},
+			{"name":"hbatch_mantra"},
+			{"name":"mantra"},
+			{"name":"max"},
+			{"name":"maya"},
+			{"name":"maya_delight"},
+			{"name":"maya_mental"},
+			{"name":"mentalray"},
+			{"name":"movgen"},
+			{"name":"nuke"},
+			{"name":"prman"},
+			{"name":"shake"},
+			{"name":"xsi"},
+			{"name":"yafray"}
+		],
+
+			"":"Comment it if you agree with build in os detection (names)",
+		"-os":"linux mac windows",
+			"":"You can specify several platforms, if host can take tasks for diffent platforms."
+
+	},{
+
+		"name":"Render",
+		"mask":"lrf.*",
+		"description":"Linux render farm.",
+		"capacity":8800,
+		"maxtasks":80,
+		"power":8000,
+		"remservices":["afterfx","max","xsi"]
+
+	},{
+
+		"name":"Server",
+		"mask":"server.*|srv.*|cap.*",
+		"description":"Captain.",
+		"capacity":1100,
+		"maxtasks":2,
+		"power":1000,
+		"remservices":[],
+		"services":[
+			{"name":"generic","count":1},
+			{"name":"system"},
+			{"name":"movgen"},
+			{"name":"wakeonlan"},
+			{"name":"postcmd"}
+		]
+
+	}]
+}}
