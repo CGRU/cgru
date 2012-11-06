@@ -170,6 +170,7 @@ function cm_GetState( i_state, o_state, o_element)
 function cm_ElCreateFloatText( i_elParent, i_side, i_title)
 {
 	var element = document.createElement('span');
+	element.classList.add('text');
 	i_elParent.appendChild( element);
 	if( i_side )
 		element.style.cssFloat = i_side;

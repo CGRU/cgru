@@ -353,6 +353,13 @@ border-radius: 3px;
 .DON { background: #363;}
 .RUN { background: #FF0;}
 .ERR { background: #F00;}
+.text.ERR {
+color: #300;
+background: #F74;
+border-radius: 2px;
+padding: 0px 5px;
+box-shadow: 0px 0px 6px #400 inset;
+}
 
 .item .name {
 font-size: 14px;

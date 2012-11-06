@@ -385,6 +385,7 @@ JobBlock.prototype.constructFull = function()
 //	this.elTasksRun.classList.add('font-run');
 //	this.elTasksErr.classList.add('font-error');
 	this.elTasksErr.classList.add('ERR');
+	this.elTasksErr.style.display = 'none';
 
 	this.elRunTime = cm_ElCreateFloatText( this.elFull, 'right');
 
@@ -550,8 +551,13 @@ JobBlock.prototype.update = function( i_displayFull)
 		{
 			tasks_err = this.params.p_tasks_error;
 			this.elTasksErr.textContent = 'err:'+tasks_err;
+			this.elTasksErr.style.display = 'inline';
 		}
-		else this.elTasksErr.textContent = '';
+		else
+		{
+			this.elTasksErr.textContent = '';
+			this.elTasksErr.style.display = 'none';
+		}
 
 		var tasks_skp = 0;
 		if( this.params.p_tasks_skipped )
