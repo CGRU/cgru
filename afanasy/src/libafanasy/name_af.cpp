@@ -146,17 +146,17 @@ af::Farm * af::farm()
 
 bool af::loadFarm( bool verbose)
 {
-    std::string filename = af::Environment::getAfRoot() + "/farm.xml";
-    if( loadFarm( filename,  verbose) == false)
-    {
-        filename = af::Environment::getAfRoot() + "/farm_example.xml";
-        if( loadFarm( filename,  verbose) == false)
-        {
-            AFERRAR("Can't load default farm settings file:\n%s\n", filename.c_str());
-            return false;
-        }
-    }
-    return true;
+	std::string filename = af::Environment::getAfRoot() + "/farm.json";
+	if( loadFarm( filename,  verbose) == false)
+	{
+		filename = af::Environment::getAfRoot() + "/farm_example.json";
+		if( loadFarm( filename,  verbose) == false)
+		{
+			AFERRAR("Can't load default farm settings file:\n%s\n", filename.c_str());
+			return false;
+		}
+	}
+	return true;
 }
 
 bool af::loadFarm( const std::string & filename, bool verbose )

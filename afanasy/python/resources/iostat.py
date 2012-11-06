@@ -12,22 +12,20 @@ DEFAULT_DEVICE='sda'
 
 COL_rMBs=5
 COL_wMBs=6
-COL_util=11
+COL_util=-1
 COL_avgrqsz=7
 COL_avgqusz=8
 COL_awaitsz=9
-COL_svctm=10
+COL_svctm=-2
 
 class iostat(resbase.resbase):
    'IO Stat - linux iostat command output'
    def __init__( self):
       resbase.resbase.__init__( self)
-      self.env = afenv.Env()
-      if self.env.valid == False: print 'ERROR: iostat: Invalid environment, may be some problems.'
       self.value = 0
 
       self.device = DEFAULT_DEVICE
-      if ENV_KEY in self.env.Vars: self.device = self.env.Vars[ENV_KEY]
+      if ENV_KEY in afenv.VARS: self.device = afenv.VARS[ENV_KEY]
       self.device = os.getenv('AF_IOSTAT_DEVICE', self.device)
       print 'Python IO Stat Device = "%s"' % self.device
       self.regexp = re.compile(self.device)
@@ -68,9 +66,6 @@ class iostat(resbase.resbase):
             return
          fieldsline = data[fields_pos]
          fields = fieldsline.split()
-         if len(fields) != 12:
-            print 'ERROR: iostat: Unexpected number of fields.'
-            return
 
          matcheddevices = ''
          rMBs     = 0.0
@@ -88,9 +83,6 @@ class iostat(resbase.resbase):
             match = self.regexp.match( device)
             if match is None: continue
             if match.group(0) != device: continue
-            if len(values) != 12:
-               print 'WARNING: iostat: Unexpected number of values.'
-               continue
             matcheddevices += ' '+device
             try:
                f_rMBs    = float(values[COL_rMBs])

@@ -43,8 +43,8 @@ RenderHost::RenderHost( int32_t i_state, uint8_t i_priority):
     m_host.m_os = af::Environment::getPlatform();
     GetResources( m_host, m_hres);
 
-    std::list<std::string> resclasses = af::strSplit( af::Environment::getRenderResClasses(), ";");
-    for( std::list<std::string>::const_iterator it = resclasses.begin(); it != resclasses.end(); it++)
+    std::vector<std::string> resclasses = af::Environment::getRenderResClasses();
+    for( std::vector<std::string>::const_iterator it = resclasses.begin(); it != resclasses.end(); it++)
     {
         if( (*it).empty() ) continue;
         printf("Adding custom resource meter '%s'\n", (*it).c_str());

@@ -811,7 +811,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
     case af::Msg::TUserMoveJobsBottom:
     case af::Msg::TTalkExit:
     case af::Msg::TTalkDeregister:
-	{
+/*	{
 		// Check magic number mismatch mode:
 		// All message types above are not allowed in "GetOnly" mode.
 		if( i_msg->isMagicInvalid() && ( af::Environment::getMagicMode() <= af::MMM_GetOnly ))
@@ -827,7 +827,7 @@ af::Msg* threadProcessMsgCase( ThreadArgs * i_args, af::Msg * i_msg)
 			return o_msg_response;
 		}
 		// Only Monitor message types are allowed in "GetOnly" mode.
-	}
+	}*/
     case af::Msg::TMonitorSubscribe:
     case af::Msg::TMonitorUnsubscribe:
     case af::Msg::TMonitorDeregister:

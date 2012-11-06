@@ -29,7 +29,7 @@ ButtonMenu::ButtonMenu( const QString & i_file, const QString & i_wdir, QWidget 
 	m_file( i_file),
 	m_wdir( i_wdir)
 {
-	std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
+	std::vector<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
 	for( ; it != af::Environment::getPreviewCmds().end(); it++)
 	{
 		QString cmd( afqt::stoq(*it));

@@ -75,7 +75,7 @@ public:
 /// Read or write address in buffer.
    void readwrite( Msg * msg);
 
-   static bool readIpMask( const std::string & i_serveripmask, bool i_verbose);
+   static bool readIpMask( const std::vector<std::string> & i_masks, bool i_verbose);
 
    bool matchIpMask() const;
 

@@ -82,5 +82,5 @@ class Window( QtGui.QTextEdit ):
          c.insertText( 'undefined', self.fundefined)
       else:
          c.insertText( ' = ', self.fvalue)
-         c.insertText( value, self.fvalue)
+         c.insertText( str(value), self.fvalue)
       c.insertText( '\n')

@@ -326,11 +326,9 @@ int Address::calcWeight() const
    return weight;
 }
 
-bool Address::readIpMask( const std::string & i_serveripmask, bool i_verbose)
+bool Address::readIpMask( const std::vector<std::string> & i_masks, bool i_verbose)
 {
-    if( i_verbose ) printf("Server IP Mask = '%s'\n", i_serveripmask.c_str());
-    std::list<std::string> masks = strSplit( i_serveripmask, " ");
-    for( std::list<std::string>::const_iterator it = masks.begin(); it != masks.end(); it++)
+    for( std::vector<std::string>::const_iterator it = i_masks.begin(); it != i_masks.end(); it++)
     {
         int mask_len = 0;
         char mask_bytes[ms_addrdatalength];

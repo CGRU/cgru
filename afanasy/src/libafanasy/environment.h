@@ -3,8 +3,6 @@
 #include "name_af.h"
 #include "netif.h"
 
-#include "rapidxml/rapidxml.hpp"
-
 namespace af
 {
 class Passwd;
@@ -46,9 +44,9 @@ public:
     static bool reload();
 
     static void setVerboseInit( bool value = true) { m_verbose_init = value;}
-    static bool getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name );
-    static bool getVar( const rapidxml::xml_node<> * pnode, int         & value, const char * name );
-    static bool getVar( const rapidxml::xml_node<> * pnode, std::list<std::string> & value, const char * name );
+	static bool getVar( const JSON & i_obj, std::string & o_value, const char * i_name );
+	static bool getVar( const JSON & i_obj, int & o_value, const char * i_name );
+	static bool getVar( const JSON & i_obj, std::vector<std::string> & o_value, const char * i_name );
 
     /// Check current key matching password sequence.
     static bool checkKey( const char key);
@@ -83,9 +81,9 @@ public:
 
     static inline int            getFileNameSizeMax()  { return filenamesizemax; } ///< Get maximum size for filenames.
 
-    static inline const std::list<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get preview commands
-    static inline const std::list<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
-    static inline const std::list<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
+    static inline const std::vector<std::string> & getPreviewCmds()     { return previewcmds;} ///< Get preview commands
+    static inline const std::vector<std::string> & getRenderCmds()      { return rendercmds; } ///< Get render commands
+    static inline const std::vector<std::string> & getRenderCmdsAdmin() { return rendercmds_admin; } ///< Get render commands for admin
 
     static inline int getWatchRefreshInterval()        { return watch_refreshinterval;     }
     static inline int getWatchConnectRetries()         { return watch_connectretries;      }
@@ -152,7 +150,7 @@ public:
     static inline const std::string & getRenderNetworkIF()     { return render_networkif;       }
     static inline const std::string & getRenderHDDSpacePath()  { return render_hddspace_path;   }
     static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
-    static inline const std::string & getRenderResClasses()    { return render_resclasses;      }
+    static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;}
 
 	static inline int getAfNodeLogsRotate()  { return afnode_logs_rotate;   }
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
@@ -179,16 +177,16 @@ private:
     static bool m_solveservername;  ///< Whether to solve server name
     static bool m_server;           ///< Whether the it is a server
 
-   static std::list<std::string> cmdarguments;
-   static std::list<std::string> cmdarguments_usagearg;
-   static std::list<std::string> cmdarguments_usagehelp;
+   static std::vector<std::string> cmdarguments;
+   static std::vector<std::string> cmdarguments_usagearg;
+   static std::vector<std::string> cmdarguments_usagehelp;
    static bool help_mode;
 
    static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
    static void printUsage(); ///< Output command usage
    static void load();
    static bool load( const std::string & filename, bool Verbose);
-   static void getVars( const rapidxml::xml_node<> * pnode);
+	static void getVars( const JSON & i_obj);
    static bool init();
 
 	static int magic_mode_index;
@@ -208,7 +206,7 @@ private:
 /// Afanasy server name
    static std::string servername;
     static Address serveraddress;
-   static std::string serveripmask;
+	static std::vector<std::string> serveripmask;
 
 /// User name
 /** Try to get \c USERNAME or \c USER environment variable at first.
@@ -236,9 +234,9 @@ private:
 
    static int clientport;
 
-   static std::list<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
-   static std::list<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
-   static std::list<std::string> rendercmds_admin; ///< Render commannds for admin only
+	static std::vector<std::string> previewcmds;      ///< Preview commannds, separated by AFWATCH::CMDS_SEPARATOR
+	static std::vector<std::string> rendercmds;       ///< Render commannds, separated by AFWATCH::CMDS_SEPARATOR
+	static std::vector<std::string> rendercmds_admin; ///< Render commannds for admin only
    static int watch_refreshinterval;
    static int watch_connectretries;
    static int watch_waitforconnected;
@@ -270,7 +268,7 @@ private:
    static std::string render_cmd_wolwake;
    static std::string render_hddspace_path;
    static std::string render_iostat_device;
-   static std::string render_resclasses;
+   static std::vector<std::string> render_resclasses;
    static std::string render_networkif;
 
    static int errors_avoid_host;

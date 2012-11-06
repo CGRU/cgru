@@ -219,7 +219,7 @@ void ListTasks::contextMenuEvent(QContextMenuEvent *event)
 				{
 					QMenu * submenu_cmd = new QMenu( "Preview", this);
 					int p = 0;
-					for( std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
+					for( std::vector<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin(); it != af::Environment::getPreviewCmds().end(); it++, p++)
 					{
 						if( files.size() > 1)
 						{
@@ -712,10 +712,8 @@ void ListTasks::actTaskPreview( int num_cmd, int num_img)
       displayError( "No such command number.");
       return;
    }
-   std::list<std::string>::const_iterator it = af::Environment::getPreviewCmds().begin();
-   for( int i = 0; i < num_cmd; i++ ) it++;
 
-   QString cmd( afqt::stoq(*it));
+   QString cmd( afqt::stoq( af::Environment::getPreviewCmds()[num_cmd]));
    cmd = cmd.replace( AFWATCH::CMDS_ARGUMENT, arg);
 
    Watch::startProcess( cmd, wdir);

@@ -108,10 +108,8 @@ std::string Environment::renderslogsdir;
 std::string Environment::tasksstdoutdir;
 std::string Environment::userslogsdir;
 
-std::string Environment::render_resclasses;
 std::string Environment::timeformat =                 AFGENERAL::TIME_FORMAT;
 std::string Environment::servername =                 AFADDR::SERVER_NAME;
-std::string Environment::serveripmask =                 AFADDR::SERVER_IPMASK;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
@@ -135,12 +133,14 @@ bool Environment::visor_mode     = false;
 
 Passwd * Environment::passwd = NULL;
 
-std::list<std::string> Environment::cmdarguments;
-std::list<std::string> Environment::cmdarguments_usagearg;
-std::list<std::string> Environment::cmdarguments_usagehelp;
-std::list<std::string> Environment::previewcmds;
-std::list<std::string> Environment::rendercmds;
-std::list<std::string> Environment::rendercmds_admin;
+std::vector<std::string> Environment::cmdarguments;
+std::vector<std::string> Environment::cmdarguments_usagearg;
+std::vector<std::string> Environment::cmdarguments_usagehelp;
+std::vector<std::string> Environment::previewcmds;
+std::vector<std::string> Environment::rendercmds;
+std::vector<std::string> Environment::rendercmds_admin;
+std::vector<std::string> Environment::serveripmask;
+std::vector<std::string> Environment::render_resclasses;
 
 std::string Environment::version_revision;
 std::string Environment::version_cgru;
@@ -148,299 +148,278 @@ std::string Environment::version_python;
 std::string Environment::version_gcc;
 std::string Environment::version_date;
 
-void Environment::getVars( const rapidxml::xml_node<> * pnode)
+void Environment::getVars( const JSON & i_obj)
 {
-    getVar( pnode, af::Msg::Magic,                    "magic_number"                      );
-    getVar( pnode, magic_mode,                        "magic_mode"                        );
+	getVar( i_obj, af::Msg::Magic,                    "magic_number"                      );
+	getVar( i_obj, magic_mode,                        "magic_mode"                        );
 
-    getVar( pnode, filenamesizemax,                   "filenamesizemax"                   );
-	getVar( pnode, afnode_log_lines_max,              "afnode_log_lines_max"              );
-	getVar( pnode, afnode_logs_rotate,                "afnode_logs_rotate"                );
-	getVar( pnode, timeformat,                        "timeformat"                        );
-    getVar( pnode, priority,                          "priority"                          );
-    getVar( pnode, maxrunningtasks,                   "maxrunningtasks"                   );
+	getVar( i_obj, filenamesizemax,                   "filenamesizemax"                   );
+	getVar( i_obj, afnode_log_lines_max,              "afnode_log_lines_max"              );
+	getVar( i_obj, afnode_logs_rotate,                "afnode_logs_rotate"                );
+	getVar( i_obj, timeformat,                        "timeformat"                        );
+	getVar( i_obj, priority,                          "priority"                          );
+	getVar( i_obj, maxrunningtasks,                   "maxrunningtasks"                   );
 
-    getVar( pnode, servername,                        "servername"                        );
-    getVar( pnode, serveripmask,                      "serveripmask"                      );
-    getVar( pnode, serverport,                        "serverport"                        );
-    getVar( pnode, clientport,                        "clientport"                        );
+	getVar( i_obj, servername,                        "servername"                        );
+	getVar( i_obj, serveripmask,                      "serveripmask"                      );
+	getVar( i_obj, serverport,                        "serverport"                        );
+	getVar( i_obj, clientport,                        "clientport"                        );
 
-    getVar( pnode, tempdirectory,                     "tempdirectory"                     );
+	getVar( i_obj, tempdirectory,                     "tempdirectory"                     );
 
-    getVar( pnode, db_conninfo,                       "db_conninfo"                       );
-    getVar( pnode, db_stringquotes,                   "db_stringquotes"                   );
-    getVar( pnode, db_stringnamelen,                  "db_stringnamelen"                  );
-    getVar( pnode, db_stringexprlen,                  "db_stringexprlen"                  );
+	getVar( i_obj, db_conninfo,                       "db_conninfo"                       );
+	getVar( i_obj, db_stringquotes,                   "db_stringquotes"                   );
+	getVar( i_obj, db_stringnamelen,                  "db_stringnamelen"                  );
+	getVar( i_obj, db_stringexprlen,                  "db_stringexprlen"                  );
 
-    getVar( pnode, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
-    getVar( pnode, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
+	getVar( i_obj, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
+	getVar( i_obj, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
 
-    getVar( pnode, task_default_capacity,             "task_default_capacity"             );
-    getVar( pnode, task_update_timeout,               "task_update_timeout"               );
-    getVar( pnode, task_log_linesmax,                 "task_log_linesmax"                 );
+	getVar( i_obj, task_default_capacity,             "task_default_capacity"             );
+	getVar( i_obj, task_update_timeout,               "task_update_timeout"               );
+	getVar( i_obj, task_log_linesmax,                 "task_log_linesmax"                 );
 
-    getVar( pnode, cmd_shell,                         "cmd_shell"                         );
-    getVar( pnode, render_default_capacity,           "render_default_capacity"           );
-    getVar( pnode, render_default_maxtasks,           "render_default_maxtasks"           );
-    getVar( pnode, render_exec,                       "render_exec"                       );
-    getVar( pnode, render_cmd_reboot,                 "render_cmd_reboot"                 );
-    getVar( pnode, render_cmd_shutdown,               "render_cmd_shutdown"               );
-    getVar( pnode, render_cmd_wolsleep,               "render_cmd_wolsleep"               );
-    getVar( pnode, render_cmd_wolwake,                "render_cmd_wolwake"                );
-    getVar( pnode, render_hddspace_path,              "render_hddspace_path"              );
-    getVar( pnode, render_networkif,                  "render_networkif"                  );
-    getVar( pnode, render_iostat_device,              "render_iostat_device"              );
-    getVar( pnode, render_resclasses,                 "render_resclasses"                 );
-    getVar( pnode, render_nice,                       "render_nice"                       );
-    getVar( pnode, render_update_sec,                 "render_update_sec"                 );
-    getVar( pnode, render_updatetaskperiod,           "render_updatetaskperiod"           );
-    getVar( pnode, render_zombietime,                 "render_zombietime"                 );
-    getVar( pnode, render_connectretries,             "render_connectretries"             );
-    getVar( pnode, render_waitforconnected,           "render_waitforconnected"           );
-    getVar( pnode, render_waitforreadyread,           "render_waitforreadyread"           );
-    getVar( pnode, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
+	getVar( i_obj, cmd_shell,                         "cmd_shell"                         );
+	getVar( i_obj, render_default_capacity,           "render_default_capacity"           );
+	getVar( i_obj, render_default_maxtasks,           "render_default_maxtasks"           );
+	getVar( i_obj, render_exec,                       "render_exec"                       );
+	getVar( i_obj, render_cmd_reboot,                 "render_cmd_reboot"                 );
+	getVar( i_obj, render_cmd_shutdown,               "render_cmd_shutdown"               );
+	getVar( i_obj, render_cmd_wolsleep,               "render_cmd_wolsleep"               );
+	getVar( i_obj, render_cmd_wolwake,                "render_cmd_wolwake"                );
+	getVar( i_obj, render_hddspace_path,              "render_hddspace_path"              );
+	getVar( i_obj, render_networkif,                  "render_networkif"                  );
+	getVar( i_obj, render_iostat_device,              "render_iostat_device"              );
+	getVar( i_obj, render_resclasses,                 "render_resclasses"                 );
+	getVar( i_obj, render_nice,                       "render_nice"                       );
+	getVar( i_obj, render_update_sec,                 "render_update_sec"                 );
+	getVar( i_obj, render_updatetaskperiod,           "render_updatetaskperiod"           );
+	getVar( i_obj, render_zombietime,                 "render_zombietime"                 );
+	getVar( i_obj, render_connectretries,             "render_connectretries"             );
+	getVar( i_obj, render_waitforconnected,           "render_waitforconnected"           );
+	getVar( i_obj, render_waitforreadyread,           "render_waitforreadyread"           );
+	getVar( i_obj, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
 
-    getVar( pnode, previewcmds,                       "previewcmds"                       );
-    getVar( pnode, rendercmds,                        "rendercmds"                        );
-    getVar( pnode, rendercmds_admin,                  "rendercmds_admin"                  );
-    getVar( pnode, watch_refreshinterval,             "watch_refreshinterval"             );
-    getVar( pnode, watch_connectretries,              "watch_connectretries"              );
-    getVar( pnode, watch_waitforconnected,            "watch_waitforconnected"            );
-    getVar( pnode, watch_waitforreadyread,            "watch_waitforreadyread"            );
-    getVar( pnode, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
+	getVar( i_obj, previewcmds,                       "previewcmds"                       );
+	getVar( i_obj, rendercmds,                        "rendercmds"                        );
+	getVar( i_obj, rendercmds_admin,                  "rendercmds_admin"                  );
+	getVar( i_obj, watch_refreshinterval,             "watch_refreshinterval"             );
+	getVar( i_obj, watch_connectretries,              "watch_connectretries"              );
+	getVar( i_obj, watch_waitforconnected,            "watch_waitforconnected"            );
+	getVar( i_obj, watch_waitforreadyread,            "watch_waitforreadyread"            );
+	getVar( i_obj, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
 
-    getVar( pnode, pswd_visor,                        "pswd_visor"                        );
-    getVar( pnode, pswd_god,                          "pswd_god"                          );
+	getVar( i_obj, pswd_visor,                        "pswd_visor"                        );
+	getVar( i_obj, pswd_god,                          "pswd_god"                          );
 
-    getVar( pnode, errors_forgivetime,                "errors_forgivetime"                );
-    getVar( pnode, errors_avoid_host,                 "errors_avoid_host"                 );
-    getVar( pnode, task_error_retries,                "task_error_retries"                );
-    getVar( pnode, task_errors_same_host,             "task_errors_same_host"             );
+	getVar( i_obj, errors_forgivetime,                "errors_forgivetime"                );
+	getVar( i_obj, errors_avoid_host,                 "errors_avoid_host"                 );
+	getVar( i_obj, task_error_retries,                "task_error_retries"                );
+	getVar( i_obj, task_errors_same_host,             "task_errors_same_host"             );
 
-    getVar( pnode, sysjob_tasklife,                   "sysjob_tasklife"                   );
-    getVar( pnode, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
-    getVar( pnode, sysjob_postcmd_service,            "sysjob_postcmd_service"            );
-    getVar( pnode, sysjob_wol_service,                "sysjob_wol_service"                );
+	getVar( i_obj, sysjob_tasklife,                   "sysjob_tasklife"                   );
+	getVar( i_obj, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
+	getVar( i_obj, sysjob_postcmd_service,            "sysjob_postcmd_service"            );
+	getVar( i_obj, sysjob_wol_service,                "sysjob_wol_service"                );
 
-    getVar( pnode, user_zombietime,                   "user_zombietime"                   );
+	getVar( i_obj, user_zombietime,                   "user_zombietime"                   );
 
-    getVar( pnode, talk_updateperiod,                 "talk_updateperiod"                 );
-    getVar( pnode, talk_zombietime,                   "talk_zombietime"                   );
-    getVar( pnode, talk_connectretries,               "talk_connectretries"               );
-    getVar( pnode, talk_waitforconnected,             "talk_waitforconnected"             );
-    getVar( pnode, talk_waitforreadyread,             "talk_waitforreadyread"             );
-    getVar( pnode, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
+	getVar( i_obj, talk_updateperiod,                 "talk_updateperiod"                 );
+	getVar( i_obj, talk_zombietime,                   "talk_zombietime"                   );
+	getVar( i_obj, talk_connectretries,               "talk_connectretries"               );
+	getVar( i_obj, talk_waitforconnected,             "talk_waitforconnected"             );
+	getVar( i_obj, talk_waitforreadyread,             "talk_waitforreadyread"             );
+	getVar( i_obj, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
 
-    getVar( pnode, monitor_updateperiod,              "monitor_updateperiod"              );
-    getVar( pnode, monitor_zombietime,                "monitor_zombietime"                );
-    getVar( pnode, monitor_connectretries,            "monitor_connectretries"            );
-    getVar( pnode, monitor_waitforconnected,          "monitor_waitforconnected"          );
-    getVar( pnode, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
-    getVar( pnode, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
+	getVar( i_obj, monitor_updateperiod,              "monitor_updateperiod"              );
+	getVar( i_obj, monitor_zombietime,                "monitor_zombietime"                );
+	getVar( i_obj, monitor_connectretries,            "monitor_connectretries"            );
+	getVar( i_obj, monitor_waitforconnected,          "monitor_waitforconnected"          );
+	getVar( i_obj, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
+	getVar( i_obj, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
 }
 
-bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::string & value, const char * name)
+bool Environment::getVar( const JSON & i_obj, std::string & o_value, const char * i_name)
 {
-   rapidxml::xml_node<> * node = pnode->first_node( name);
-   if( node == NULL ) return false;
-   char * data = node->value();
-   if( data )
-   {
-      value = strStrip( data);
-      PRINT("\t%s = '%s'\n", name, value.c_str());
-      return true;
-   }
-   return false;
+	if( af::jr_string( i_name, o_value, i_obj))
+	{
+		PRINT("\t%s = '%s'\n", i_name, o_value.c_str());
+		return true;
+	}
+	return false;
 }
 
-bool Environment::getVar( const rapidxml::xml_node<> * pnode, int & value, const char * name)
+bool Environment::getVar( const JSON & i_obj, int & o_value, const char * i_name)
 {
-   std::string str;
-   if( getVar( pnode, str, name))
-   {
-      bool ok; int number = af::stoi( str, &ok);
-      if( ok == false)
-      {
-         AFERRAR("Invalid number in '%s' element.\n", name)
-         return false;
-      }
-      value = number;
-      return true;
-   }
-   return false;
+	if( af::jr_int( i_name, o_value, i_obj))
+	{
+		PRINT("\t%s = %d\n", i_name, o_value);
+		return true;
+	}
+	return false;
 }
 
-bool Environment::getVar( const rapidxml::xml_node<> * pnode, std::list<std::string> & value, const char * name)
+bool Environment::getVar( const JSON & i_obj, std::vector<std::string> & o_value, const char * i_name)
 {
-   rapidxml::xml_node<> * node = pnode->first_node( name);
-   if( node == NULL ) return false;
-   while( node != NULL )
-   {
-      char * data = node->value();
-      if( data == NULL ) value.clear();
-      else
-      {
-         std::string str = data;
-         if( str.empty() ) value.clear();
-         else value.push_back( str);
-      }
-      node = node->next_sibling( name);
-   }
-   if( m_verbose_init )
-   {
-      printf("\t%s:\n", name);
-      for( std::list<std::string>::const_iterator it = value.begin(); it != value.end(); it++)
-         printf("\t\t%s\n", (*it).c_str());
-   }
-   return true;
+	if( af::jr_stringvec( i_name, o_value, i_obj))
+	{
+		if( m_verbose_init )
+		{
+			printf("\t%s:\n", i_name);
+			for( int i = 0; i < o_value.size(); i++)
+				printf("\t\t%s\n", o_value[i].c_str());
+		}
+		return true;
+	}
+	return false;
 }
 
 Environment::Environment( uint32_t flags, int argc, char** argv )
 {
-    m_verbose_init = flags & Verbose;
-    m_quiet_init = flags & Quiet;
-    m_solveservername = flags & SolveServerName;
+	m_verbose_init = flags & Verbose;
+	m_quiet_init = flags & Quiet;
+	m_solveservername = flags & SolveServerName;
 	m_server = flags & Server;
-    if( m_quiet_init ) m_verbose_init = false;
+	if( m_quiet_init ) m_verbose_init = false;
 //
 // Init command arguments:
-   initCommandArguments( argc, argv);
+	initCommandArguments( argc, argv);
 
 //
 //############ afanasy root directory:
-    afroot = getenv("AF_ROOT");
-    if( afroot.size() == 0 )
-    {
-        afroot = argv[0];
-        afroot = af::pathAbsolute( afroot);
-        afroot = af::pathUp( afroot);
-        afroot = af::pathUp( afroot);
-        QUIET("Setting Afanasy root to \"%s\"\n", afroot.c_str());
-    }
-    else
-    {
-        PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
-    }
-    if( af::pathIsFolder( afroot ) == false)
-    {
-        AFERRAR("AF_ROOT directory = '%s' does not exists.", afroot.c_str())
-        return;
-    }
+	afroot = getenv("AF_ROOT");
+	if( afroot.size() == 0 )
+	{
+		 afroot = argv[0];
+		 afroot = af::pathAbsolute( afroot);
+		 afroot = af::pathUp( afroot);
+		 afroot = af::pathUp( afroot);
+		 QUIET("Setting Afanasy root to \"%s\"\n", afroot.c_str());
+	}
+	else
+	{
+		 PRINT("Afanasy root directory = '%s'\n", afroot.c_str());
+	}
+	if( af::pathIsFolder( afroot ) == false)
+	{
+		 AFERRAR("AF_ROOT directory = '%s' does not exists.", afroot.c_str())
+		 return;
+	}
 
 //
 //############ cgru root directory:
-    cgrulocation = getenv("CGRU_LOCATION");
-    if( cgrulocation.size() == 0 )
-    {
-        cgrulocation = afroot;
-        cgrulocation = af::pathUp( cgrulocation);
-        std::string version_txt = cgrulocation + AFGENERAL::PATH_SEPARATOR + "version.txt";
-        if( false == af::pathFileExists( version_txt))
-            cgrulocation = af::pathUp( cgrulocation);
-        QUIET("Setting CRGU location to \"%s\"\n", cgrulocation.c_str());
-    }
-    else
-    {
-        PRINT("CGRU_LOCATION = '%s'\n", cgrulocation.c_str());
-    }
-    if( af::pathIsFolder( cgrulocation) == false)
-    {
-        AFERRAR("CGRU_LOCATION directory = '%s' does not exists.", cgrulocation.c_str())
-        return;
-    }
+	cgrulocation = getenv("CGRU_LOCATION");
+	if( cgrulocation.size() == 0 )
+	{
+		 cgrulocation = afroot;
+		 cgrulocation = af::pathUp( cgrulocation);
+		 std::string version_txt = cgrulocation + AFGENERAL::PATH_SEPARATOR + "version.txt";
+		 if( false == af::pathFileExists( version_txt))
+			   cgrulocation = af::pathUp( cgrulocation);
+		 QUIET("Setting CRGU location to \"%s\"\n", cgrulocation.c_str());
+	}
+	else
+	{
+		 PRINT("CGRU_LOCATION = '%s'\n", cgrulocation.c_str());
+	}
+	if( af::pathIsFolder( cgrulocation) == false)
+	{
+		 AFERRAR("CGRU_LOCATION directory = '%s' does not exists.", cgrulocation.c_str())
+		 return;
+	}
 
 //
 // Afanasy python path:
-   if( flags & AppendPythonPath)
-   {
-      std::string afpython = getenv("AF_PYTHON");
-      if( afpython.size() == 0 )
-      {
-         std::string script = ""
-         "import os\n"
-         "import sys\n"
-         "afpython = os.path.join( '" + afroot + "', 'python')\n"
-         "if not afpython in sys.path:\n"
-         "   print('PYTHONPATH: appending \"%s\"' % afpython)\n"
-         "   sys.path.append( afpython)\n"
-         ;
-         PyRun_SimpleString( script.c_str());
-          }
-   }
+	if( flags & AppendPythonPath)
+	{
+		std::string afpython = getenv("AF_PYTHON");
+		if( afpython.size() == 0 )
+		{
+			std::string script = ""
+			"import os\n"
+			"import sys\n"
+			"afpython = os.path.join( '" + afroot + "', 'python')\n"
+			"if not afpython in sys.path:\n"
+			"   print('PYTHONPATH: appending \"%s\"' % afpython)\n"
+			"   sys.path.append( afpython)\n"
+			;
+			PyRun_SimpleString( script.c_str());
+			 }
+	}
 
 
 //
 //############ home directory:
-   home = af::pathHome();
-   PRINT("User home directory = '%s'\n", home.c_str());
-   home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy";
-   PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
-   if( af::pathMakeDir( home_afanasy, af::VerboseOn ) == false)
-   {
-      AFERRAR("Can't make home directory '%s'", home_afanasy.c_str())
-   }
+	home = af::pathHome();
+	PRINT("User home directory = '%s'\n", home.c_str());
+	home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy";
+	PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
+	if( af::pathMakeDir( home_afanasy, af::VerboseOn ) == false)
+	{
+		AFERRAR("Can't make home directory '%s'", home_afanasy.c_str())
+	}
 //
 //############ user name:
-    username = getenv("AF_USERNAME");
-    if( username.size() == 0) username = getenv("USER");
-    if( username.size() == 0) username = getenv("USERNAME");
-    if( username.size() == 0)
-    {
+	username = getenv("AF_USERNAME");
+	if( username.size() == 0) username = getenv("USER");
+	if( username.size() == 0) username = getenv("USERNAME");
+	if( username.size() == 0)
+	{
 #ifdef WINNT
-        char acUserName[256];
-        DWORD nUserName = sizeof(acUserName);
-        if( GetUserName(acUserName, &nUserName)) username = acUserName;
+		 char acUserName[256];
+		 DWORD nUserName = sizeof(acUserName);
+		 if( GetUserName(acUserName, &nUserName)) username = acUserName;
 #else
-        uid_t uid = geteuid ();
-        struct passwd * pw = getpwuid (uid);
-        if( pw ) username = pw->pw_name;
+		 uid_t uid = geteuid ();
+		 struct passwd * pw = getpwuid (uid);
+		 if( pw ) username = pw->pw_name;
 #endif
-    }
-    if( username.size() == 0) username = "unknown";
+	}
+	if( username.size() == 0) username = "unknown";
 
-    // Convert to lowercase:
-    std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-    // cut DOMAIN/
-    size_t dpos = username.rfind('/');
-    if( dpos == std::string::npos) dpos = username.rfind('\\');
-    if( dpos != std::string::npos) username = username.substr( dpos + 1);
-    std::transform( username.begin(), username.end(), username.begin(), ::tolower);
-    PRINT("Afanasy user name = '%s'\n", username.c_str());
+	// Convert to lowercase:
+	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
+	// cut DOMAIN/
+	size_t dpos = username.rfind('/');
+	if( dpos == std::string::npos) dpos = username.rfind('\\');
+	if( dpos != std::string::npos) username = username.substr( dpos + 1);
+	std::transform( username.begin(), username.end(), username.begin(), ::tolower);
+	PRINT("Afanasy user name = '%s'\n", username.c_str());
 //
 //############ local host name:
-   hostname = getenv("AF_HOSTNAME");
+	hostname = getenv("AF_HOSTNAME");
 
 //
 //############ Platform: #############################
-   {
-   // OS Type:
-   platform = "Unix";
-   #ifdef WINNT
-      platform = "MS Windows";
-   #endif
-   #ifdef MACOSX
-      platform += ": MacOSX";
-   #endif
-   #ifdef LINUX
-      platform += ": Linux";
-   #endif
-   int psize = sizeof( void *);
-   switch(psize)
-   {
-      case 4: platform += " 32bit"; break;
-      case 8: platform += " 64bit"; break;
-   }
-   }
+	{
+	// OS Type:
+	platform = "Unix";
+	#ifdef WINNT
+		platform = "MS Windows";
+	#endif
+	#ifdef MACOSX
+		platform += ": MacOSX";
+	#endif
+	#ifdef LINUX
+		platform += ": Linux";
+	#endif
+	int psize = sizeof( void *);
+	switch(psize)
+	{
+		case 4: platform += " 32bit"; break;
+		case 8: platform += " 64bit"; break;
+	}
+	}
 //
 //############ Versions: ########################
 
-   // Date:
-   version_date = std::string(__DATE__) + " " __TIME__;
-   QUIET("Compilation date = \"%s\"\n", version_date.c_str());
+	// Date:
+	version_date = std::string(__DATE__) + " " __TIME__;
+	QUIET("Compilation date = \"%s\"\n", version_date.c_str());
 
-   // CGRU:
-   version_cgru = getenv("CGRU_VERSION");
-   QUIET("CGRU version = \"%s\"\n", version_cgru.c_str());
+	// CGRU:
+	version_cgru = getenv("CGRU_VERSION");
+	QUIET("CGRU version = \"%s\"\n", version_cgru.c_str());
 
 	// Build Revision:
 	#ifdef CGRU_REVISION
@@ -450,102 +429,96 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 	QUIET("Afanasy build revision = \"%s\"\n", version_revision.c_str());
 	#endif
 
-   // Python:
-   version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);
-   QUIET("Python version = \"%s\"\n", version_python.c_str());
+	// Python:
+	version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);
+	QUIET("Python version = \"%s\"\n", version_python.c_str());
 
-   // GCC:
+	// GCC:
 #ifdef __GNUC__
-   version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
-   QUIET("GCC version = \"%s\"\n", version_gcc.c_str());
+	version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
+	QUIET("GCC version = \"%s\"\n", version_gcc.c_str());
 #endif
 
 //###################################################
 
-   load();
-   m_valid = init();
+	load();
+	m_valid = init();
 
-   PRINT("Render host name = '%s'\n", hostname.c_str());
+	PRINT("Render host name = '%s'\n", hostname.c_str());
 }
 
 Environment::~Environment()
 {
-   if( passwd != NULL) delete passwd;
-   printUsage();
+	if( passwd != NULL) delete passwd;
+	printUsage();
 }
 
 void Environment::load()
 {
-   std::string filename;
-   filename = ( afroot + "/config_default.xml");
-   load( filename, m_verbose_init);
-   filename = ( afroot + "/config.xml");
-   load( filename, m_verbose_init);
-   filename = ( home_afanasy + "/config.xml");
-   load( filename, m_verbose_init);
-   bool _verbose_init = m_verbose_init;
-   m_verbose_init = false;
-   filename = ( afroot + "/config_shadow.xml");
-   load( filename, m_verbose_init);
-   m_verbose_init=_verbose_init;
+	std::string filename;
+	filename = ( cgrulocation + "/config_default.json");
+	load( filename, m_verbose_init);
+	filename = ( cgrulocation + "/config.json");
+	load( filename, m_verbose_init);
+	filename = ( afroot + "/config_default.json");
+	load( filename, m_verbose_init);
+	filename = ( afroot + "/config.json");
+	load( filename, m_verbose_init);
+	filename = ( home_afanasy + "/config.json");
+	load( filename, m_verbose_init);
+	bool _verbose_init = m_verbose_init;
+	m_verbose_init = false;
+	filename = ( afroot + "/config_shadow.json");
+	load( filename, m_verbose_init);
+	m_verbose_init=_verbose_init;
 }
 
 bool Environment::load( const std::string & filename, bool Verbose)
 {
-   bool retval = false;
-   m_verbose_init = Verbose;
+	m_verbose_init = Verbose;
 
-   if( false == pathFileExists( filename)) return retval;
+	if( false == pathFileExists( filename))
+		return false;
 
-   if( m_verbose_init) printf("Parsing XML file '%s':\n", filename.c_str());
+	if( m_verbose_init) printf("Parsing config file '%s':\n", filename.c_str());
 
-   int filesize = -1;
-   char * buffer = fileRead( filename, filesize);
-   if( buffer != NULL )
-   {
-      rapidxml::xml_document<> xmldoc;
+	int filesize = -1;
+	char * buffer = fileRead( filename, filesize);
+	if( buffer == NULL )
+		return false;
 
-      bool parse_error = false;
+	rapidjson::Document doc;
+	char * data = jsonParseData( doc, buffer, filesize);
+	if( data == NULL )
+	{
+		delete [] buffer;
+		return false;
+	}
 
-      try
-      {
-         xmldoc.parse<0>( buffer);
-      }
-      catch ( rapidxml::parse_error err)
-      {
-         AFERRAR("Parsing error: %s.", err.what())
-         parse_error = true;
-      }
-      catch ( ... )
-      {
-         AFERROR("Unknown exeption.")
-         parse_error = true;
-      }
+	bool retval = false;
+	const JSON & obj = doc["cgru_config"];
+	if( false == obj.IsObject())
+	{
+		AFERRAR("Can't find document root \"cgru_config\": object:\n%s", filename.c_str())
+	}
+	else
+	{
+		getVars( obj);
+		retval = true;
+	}
 
-      if( false == parse_error )
-      {
-         rapidxml::xml_node<> * root_node = xmldoc.first_node("afanasy");
-         if( root_node == NULL )
-         {
-            AFERRAR("Can't find document root \"afanasy\": node:\n%s", filename.c_str())
-         }
-         else
-         {
-            getVars( root_node);
-            retval = true;
-         }
-      }
-      delete [] buffer;
-   }
-   return retval;
+	delete [] data;
+	delete [] buffer;
+
+	return retval;
 }
 
 bool Environment::reload()
 {
-    m_verbose_init = true;
-    load();
-    m_valid = init();
-    return m_valid;
+	m_verbose_init = true;
+	load();
+	m_valid = init();
+	return m_valid;
 }
 
 bool Environment::checkKey( const char key) { return passwd->checkKey( key, visor_mode, god_mode); }
@@ -554,137 +527,137 @@ bool Environment::init()
 {
 //############ Local host name:
 #ifdef WINNT
-    computername = getenv("COMPUTERNAME");
+	computername = getenv("COMPUTERNAME");
 
-    WSADATA wsaData;
-    WORD wVersionRequested = MAKEWORD(2, 2);
-    if ( WSAStartup( wVersionRequested, &wsaData) != 0) {
-        AFERROR("Environment::init(): WSAStartup failed.");
-        return false;
-    }
+	WSADATA wsaData;
+	WORD wVersionRequested = MAKEWORD(2, 2);
+	if ( WSAStartup( wVersionRequested, &wsaData) != 0) {
+		 AFERROR("Environment::init(): WSAStartup failed.");
+		 return false;
+	}
 #else
-   computername = getenv("HOSTNAME");
+	computername = getenv("HOSTNAME");
 #endif
-   if( computername.empty())
-   {
-      static const int buflen = 256;
-      static char buffer[buflen];
+	if( computername.empty())
+	{
+		static const int buflen = 256;
+		static char buffer[buflen];
 #ifndef WINNT
-      if( gethostname( buffer, buflen) != 0 )
+		if( gethostname( buffer, buflen) != 0 )
 #else
-      DWORD win_buflen = buflen;
-      if( GetComputerName( buffer, &win_buflen) != 0 )
+		DWORD win_buflen = buflen;
+		if( GetComputerName( buffer, &win_buflen) != 0 )
 #endif
-      {
-         AFERRPE("Can't get local host name")
-         return false;
-      }
-      computername = buffer;
-   }
-   if( hostname.size() == 0 ) hostname = computername;
-   std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
-   std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
-   PRINT("Local computer name = '%s'\n", computername.c_str());
+		{
+			AFERRPE("Can't get local host name")
+			return false;
+		}
+		computername = buffer;
+	}
+	if( hostname.size() == 0 ) hostname = computername;
+	std::transform( hostname.begin(), hostname.end(), hostname.begin(), ::tolower);
+	std::transform( computername.begin(), computername.end(), computername.begin(), ::tolower);
+	PRINT("Local computer name = '%s'\n", computername.c_str());
 
-   tasksstdoutdir = tempdirectory + AFGENERAL::PATH_SEPARATOR +    AFJOB::TASKS_OUTPUTDIR;
-   renderslogsdir = tempdirectory + AFGENERAL::PATH_SEPARATOR + AFRENDER::LOGS_DIRECTORY;
-   userslogsdir   = tempdirectory + AFGENERAL::PATH_SEPARATOR +   AFUSER::LOGS_DIRECTORY;
+	tasksstdoutdir = tempdirectory + AFGENERAL::PATH_SEPARATOR +    AFJOB::TASKS_OUTPUTDIR;
+	renderslogsdir = tempdirectory + AFGENERAL::PATH_SEPARATOR + AFRENDER::LOGS_DIRECTORY;
+	userslogsdir   = tempdirectory + AFGENERAL::PATH_SEPARATOR +   AFUSER::LOGS_DIRECTORY;
 
-   //############ Server Accept IP Addresses Mask:
-   if( false == Address::readIpMask( serveripmask, m_verbose_init))
-   {
-       return false;
-   }
+	//############ Server Accept IP Addresses Mask:
+	if( false == Address::readIpMask( serveripmask, m_verbose_init))
+	{
+		return false;
+	}
 
-    // Solve server name
-    if( m_solveservername )
-        serveraddress = af::solveNetName( servername, serverport, AF_UNSPEC, m_verbose_init ? VerboseOn : VerboseOff);
+	// Solve server name
+	if( m_solveservername )
+		 serveraddress = af::solveNetName( servername, serverport, AF_UNSPEC, m_verbose_init ? VerboseOn : VerboseOff);
 
-   //############ VISOR and GOD passwords:
-   if( passwd != NULL) delete passwd;
-   passwd = new Passwd( pswd_visor, pswd_god);
+	//############ VISOR and GOD passwords:
+	if( passwd != NULL) delete passwd;
+	passwd = new Passwd( pswd_visor, pswd_god);
 
 //   //############ Message Magic Number Mismatch Mode:
 	if      ( magic_mode == "getonly" ) magic_mode_index = MMM_GetOnly;
 	else if ( magic_mode == "notasks" ) magic_mode_index = MMM_NoTasks;
 
-   return true;
+	return true;
 }
 
 void Environment::initCommandArguments( int argc, char** argv)
 {
-   if(( argc == 0 ) || ( argv == NULL )) return;
+	if(( argc == 0 ) || ( argv == NULL )) return;
 
-   for( int i = 0; i < argc; i++)
-   {
-      cmdarguments.push_back(argv[i]);
+	for( int i = 0; i < argc; i++)
+	{
+		cmdarguments.push_back(argv[i]);
 
-      if( false == m_verbose_mode)
-      if(( cmdarguments.back() == "-V"    ) ||
-         ( cmdarguments.back() == "--V"   ) ||
-         ( cmdarguments.back() == "--Verbose")
-        )
-      {
-         printf("Verbose is on.\n");
-         m_verbose_mode = true;
-      }
+		if( false == m_verbose_mode)
+		if(( cmdarguments.back() == "-V"    ) ||
+			( cmdarguments.back() == "--V"   ) ||
+			( cmdarguments.back() == "--Verbose")
+			)
+		{
+			printf("Verbose is on.\n");
+			m_verbose_mode = true;
+		}
 
-      if( false == help_mode)
-      if(( cmdarguments.back() == "-"     ) ||
-         ( cmdarguments.back() == "--"    ) ||
-         ( cmdarguments.back() == "-?"    ) ||
-         ( cmdarguments.back() == "?"     ) ||
-         ( cmdarguments.back() == "/?"    ) ||
-         ( cmdarguments.back() == "h"     ) ||
-         ( cmdarguments.back() == "-h"    ) ||
-         ( cmdarguments.back() == "--h"   ) ||
-         ( cmdarguments.back() == "help"  ) ||
-         ( cmdarguments.back() == "-help" ) ||
-         ( cmdarguments.back() == "--help")
-         )
-      {
-         help_mode = true;
-      }
-   }
-   addUsage("-h --help", "Display this help.");
-   addUsage("-V --Verbose", "Verbose mode.");
+		if( false == help_mode)
+		if(( cmdarguments.back() == "-"     ) ||
+			( cmdarguments.back() == "--"    ) ||
+			( cmdarguments.back() == "-?"    ) ||
+			( cmdarguments.back() == "?"     ) ||
+			( cmdarguments.back() == "/?"    ) ||
+			( cmdarguments.back() == "h"     ) ||
+			( cmdarguments.back() == "-h"    ) ||
+			( cmdarguments.back() == "--h"   ) ||
+			( cmdarguments.back() == "help"  ) ||
+			( cmdarguments.back() == "-help" ) ||
+			( cmdarguments.back() == "--help")
+			)
+		{
+			help_mode = true;
+		}
+	}
+	addUsage("-h --help", "Display this help.");
+	addUsage("-V --Verbose", "Verbose mode.");
 }
 
 bool Environment::hasArgument( const std::string & argument)
 {
-   for( std::list<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
-      if( *it == argument )
-         return true;
-   return false;
+	for( std::vector<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
+		if( *it == argument )
+			return true;
+	return false;
 }
 
 bool Environment::getArgument( const std::string & argument, std::string & value)
 {
-   for( std::list<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
-   {
-      if( *it == argument )
-      {
-         // check for next argument:
-         it++;
-         if( it != cmdarguments.end()) value = *it;
-         return true;
-      }
-   }
-   return false;
+	for( std::vector<std::string>::const_iterator it = cmdarguments.begin(); it != cmdarguments.end(); it++)
+	{
+		if( *it == argument )
+		{
+			// check for next argument:
+			it++;
+			if( it != cmdarguments.end()) value = *it;
+			return true;
+		}
+	}
+	return false;
 }
 
 void Environment::printUsage()
 {
-   if( false == help_mode ) return;
-   if( cmdarguments_usagearg.empty() ) return;
-   printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
-   std::list<std::string>::const_iterator aIt = cmdarguments_usagearg.begin();
-   std::list<std::string>::const_iterator hIt = cmdarguments_usagehelp.begin();
-   for( ; aIt != cmdarguments_usagearg.end(); aIt++, hIt++)
-   {
-      printf("   %s:\n      %s\n",
-             (*aIt).c_str(),
-             (*hIt).c_str()
-             );
-   }
+	if( false == help_mode ) return;
+	if( cmdarguments_usagearg.empty() ) return;
+	printf("USAGE: %s [arguments]\n", cmdarguments.front().c_str());
+	std::vector<std::string>::const_iterator aIt = cmdarguments_usagearg.begin();
+	std::vector<std::string>::const_iterator hIt = cmdarguments_usagehelp.begin();
+	for( ; aIt != cmdarguments_usagearg.end(); aIt++, hIt++)
+	{
+		printf("   %s:\n      %s\n",
+			(*aIt).c_str(),
+			(*hIt).c_str()
+			);
+	}
 }

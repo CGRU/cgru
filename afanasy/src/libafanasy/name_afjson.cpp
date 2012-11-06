@@ -20,19 +20,23 @@ const std::string af::jsonMakeHeader( int size)
 	return header;
 }
 
-char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::string * o_err)
+char * af::jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err)
 {
-	int datalen = i_msg->dataLen();
-	char * data = new char[datalen+1];
-	memcpy( data, i_msg->data(), datalen);
-	data[datalen] = '\0';
+	return af::jsonParseData( o_doc, i_msg->data(), i_msg->dataLen(), o_err);
+}
+
+char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err)
+{
+	char * data = new char[i_data_len+1];
+	memcpy( data, i_data, i_data_len);
+	data[i_data_len] = '\0';
 //printf("af::jsonParseMsg:\n");printf("%s\n", data);
 
 	std::string err;
 	if( o_doc.ParseInsitu<0>(data).HasParseError())
 	{
 		err = "JSON first 300 characters:\n";
-		err += std::string( i_msg->data(), datalen < 300 ? datalen : 300);
+		err += std::string( i_data, i_data_len < 300 ? i_data_len : 300);
 		err += "\nJSON: Parsing failed at character " + af::itos( int( o_doc.GetErrorOffset()));
 		err += ":\n";
 		err += o_doc.GetParseError();
@@ -43,17 +47,20 @@ char * af::jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::stri
 	if( data && ( false == o_doc.IsObject()))
 	{
 		err = "JSON frist 100 characters:\n";
-		err += std::string( data, datalen < 100 ? datalen : 100);
+		err += std::string( i_data, i_data_len < 100 ? i_data_len : 100);
 		err += ":\n";
 		err += "JSON: Can't find root object.";
 		delete [] data;
 		data = NULL;
 	}
 
-	if( o_err )
-		*o_err = err;
-	else
-		AFERRAR("%s", err.c_str())
+	if( err.size())
+	{
+		if( o_err )
+			*o_err = err;
+		else
+			AFERRAR("%s", err.c_str())
+	}
 
 	return data;
 }
@@ -224,6 +231,7 @@ bool af::jr_int32vec( const char * i_name, std::vector<int32_t> & o_attr, const 
 	if( false == array.IsArray())
 		return false;
 
+	o_attr.clear();
 	for( int i = 0; i < array.Size(); i++)
 		if( array[i].IsInt())
 			o_attr.push_back( array[i].GetInt());

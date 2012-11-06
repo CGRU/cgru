@@ -1,6 +1,6 @@
 #include "farm.h"
 
-#include <string.h>
+//#include <string.h>
 
 #define AFOUTPUT
 #undef AFOUTPUT
@@ -8,60 +8,40 @@
 
 using namespace af;
 
-const char XMLNAME_PATTERN[]          = "pattern";
-const char XMLNAME_PATTERNNAME[]      = "name";
-const char XMLNAME_DESCRIPTION[]      = "description";
-const char XMLNAME_MASK[]             = "mask";
-const char XMLNAME_OS[]               = "os";
-const char XMLNAME_PROPERTIES[]       = "properties";
-const char XMLNAME_POWER[]            = "power";
-const char XMLNAME_RESOURCES[]        = "resources";
-const char XMLNAME_DATA[]             = "data";
-const char XMLNAME_CAPACITY[]         = "capacity";
-const char XMLNAME_MAXTASKS[]         = "maxtasks";
-const char XMLNAME_SERVICE[]          = "service";
-const char XMLNAME_SERVICEREMOVE[]    = "remservice";
-const char XMLNAME_SERVICESCLEAR[]    = "clearservices";
-const char XMLNAME_SERVICENAME[]      = "name";
-const char XMLNAME_SERVICECOUNT[]     = "count";
-const char XMLNAME_SERVICEMAXHOSTS[]  = "maxhosts";
-const char XMLNAME_SERVICEMAXCOUNT[]  = "maxcount";
-const char XMLNAME_WOLIDLESLEEPTIME[] = "wolidlesleeptime";
-
 ServiceLimit::ServiceLimit( int MaxCount, int MaxHosts):
-   maxcount( MaxCount),
-   maxhosts( MaxHosts),
-   counter( 0)
+	maxcount( MaxCount),
+	maxhosts( MaxHosts),
+	counter( 0)
 {
 }
 
 
 bool ServiceLimit::canRun( const std::string & hostname) const
 {
-   if( maxcount != -1 ) if( counter >= maxcount ) return false; // Check maximum count
-   if( maxhosts != -1 ) // Check maximum hosts
-   {
-      // If host already exists service can run on it:
-      for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
-         if( *it == hostname ) return true;
+	if( maxcount != -1 ) if( counter >= maxcount ) return false; // Check maximum m_count
+	if( maxhosts != -1 ) // Check maximum hosts
+	{
+		// If host already exists service can run on it:
+		for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
+			if( *it == hostname ) return true;
 
-      // Check whether we can add one more host:
-      if( hostslist.size() >= maxhosts ) return false;
-   }
-   return true;
+		// Check whether we can add one more host:
+		if( hostslist.size() >= maxhosts ) return false;
+	}
+	return true;
 }
 
 void ServiceLimit::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   if( full)
-      stream << "Count = " << counter << "/" <<  maxcount << "; Hosts = " << hostslist.size() << "/" << maxhosts;
-   else
-      stream << "c" << counter << "/" <<  maxcount << " h" << hostslist.size() << "/" << maxhosts;
+	if( full)
+		stream << "Count = " << counter << "/" <<  maxcount << "; Hosts = " << hostslist.size() << "/" << maxhosts;
+	else
+		stream << "c" << counter << "/" <<  maxcount << " h" << hostslist.size() << "/" << maxhosts;
 }
 void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
 {
 	o_str << "{";
-	o_str << "\"count\":" << counter;
+	o_str << "\"m_count\":" << counter;
 	o_str << ",\"max_count\":" << maxcount;
 	o_str << ",\"hosts\":[";
 	for( std::list<std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
@@ -75,499 +55,397 @@ void ServiceLimit::jsonWrite( std::ostringstream & o_str) const
 
 bool ServiceLimit::increment( const std::string & hostname)
 {
-   bool retval = true;
+	bool retval = true;
 
-   if( counter >= maxcount ) retval = false; // Check counter
-   counter++;                                // Increase counter
+	if( counter >= maxcount ) retval = false; // Check counter
+	counter++;										  // Increase counter
 
-   if( hostslist.size() >= maxhosts ) retval = false; // Check hosts list
+	if( hostslist.size() >= maxhosts ) retval = false; // Check hosts list
 
-   bool hostexists = false;
-   for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
-      if( *it == hostname )
-      {
-         hostexists = true;
-         break;
-      }
-   if( false == hostexists ) hostslist.push_back( hostname); // Appent hostslist with hostname if it does not exist
+	bool hostexists = false;
+	for( std::list< std::string>::const_iterator it = hostslist.begin(); it != hostslist.end(); it++)
+		if( *it == hostname )
+		{
+			hostexists = true;
+			break;
+		}
+	if( false == hostexists ) hostslist.push_back( hostname); // Appent hostslist with hostname if it does not exist
 
-   return retval;
+	return retval;
 }
 
 bool ServiceLimit::releaseHost( const std::string & hostname)
 {
-   bool retval = true;
+	bool retval = true;
 
-   if( counter <= 0 ) retval = false;
-   else counter--;
+	if( counter <= 0 ) retval = false;
+	else counter--;
 
-   bool hostexists = false;
-   std::list< std::string>::iterator it = hostslist.begin();
-   for( ; it != hostslist.end(); it++)
-      if( *it == hostname )
-      {
-         hostexists = true;
-         hostslist.erase( it);
-         break;
-      }
-   if( false == hostexists ) retval = false;
+	bool hostexists = false;
+	std::list< std::string>::iterator it = hostslist.begin();
+	for( ; it != hostslist.end(); it++)
+		if( *it == hostname )
+		{
+			hostexists = true;
+			hostslist.erase( it);
+			break;
+		}
+	if( false == hostexists ) retval = false;
 
-   return retval;
+	return retval;
 }
 
 void ServiceLimit::getLimits( const ServiceLimit & other)
 {
-   if( other.counter >= 0 ) counter = other.counter;
-   hostslist = other.hostslist;
+	if( other.counter >= 0 ) counter = other.counter;
+	hostslist = other.hostslist;
 }
 
 //############################################## Farm ########################################
 
 Farm::Farm( const std::string & File, bool Verbose ):
-   count( 0),
-   filename( File),
-   ptr_first( NULL),
-   ptr_last( NULL),
-   valid( false)
+	m_count( 0),
+	m_filename( File),
+	m_ptr_first( NULL),
+	m_ptr_last( NULL),
+	m_valid( false)
 {
-   if( false == pathFileExists( filename))
-   {
-      return;
-   }
+	if( false == pathFileExists( m_filename))
+	{
+		return;
+	}
 
-   int filesize = -1;
-   char * buffer = fileRead( filename, filesize);
-   if( buffer == NULL )
-   {
-      printf("Farm file \"%s\" reading error.\n", filename.c_str());
-      return;
-   }
-   else
-   {
-      rapidxml::xml_document<> xmldoc;
+	int filesize = -1;
+	char * buffer = fileRead( m_filename, filesize);
+	if( buffer == NULL )
+	{
+		printf("Farm: File \"%s\" reading error.\n", m_filename.c_str());
+		return;
+	}
 
-      bool parse_error = false;
+	rapidjson::Document document;
+	char * data = af::jsonParseData( document, buffer, filesize);
+	if( data == NULL )
+	{
+		delete buffer;
+		return;
+	}
 
-      try
-      {
-         xmldoc.parse<0>( buffer);
-      }
-      catch ( rapidxml::parse_error err)
-      {
-         AFERRAR("Parsing error: %s.\n", err.what())
-         parse_error = true;
-      }
-      catch ( ... )
-      {
-         AFERROR("Unknown exeption.\n")
-         parse_error = true;
-      }
+	const JSON & obj = document["farm"];
+	if( false == obj.IsObject())
+	{
+		AFERRAR("Farm: Can't find document root \"farm\": object:\n%s\n", m_filename.c_str())
+	}
+	else
+	{
+		m_valid = getFarm( obj);
+	}
 
-      if( false == parse_error )
-      {
-         rapidxml::xml_node<> * root_node = xmldoc.first_node("farm");
-         if( root_node == NULL )
-         {
-            AFERRAR("Can't find document root \"farm\": node:\n%s\n", filename.c_str())
-         }
-         else
-         {
-            valid = getPatterns( root_node);
-         }
-      }
-      delete [] buffer;
-   }
+	delete [] buffer;
+	delete [] data;
 }
 
-bool Farm::getPatterns( const rapidxml::xml_node<> * pnode)
+bool Farm::getFarm( const JSON & i_obj)
 {
+	const JSON & patterns = i_obj["patterns"];
+	if( false == patterns.IsArray())
+	{
+		AFERROR("Farm: \"patterns\" should be an array.\n");
+		return false;
+	}
+	if( patterns.Size() < 1 )
+	{
+		AFERROR("Farm: \"patterns\" array has zero size.\n");
+		return false;
+	}
 
-   for( rapidxml::xml_node<> * node = pnode->first_node(); node != NULL; node = node->next_sibling())
-   {
-      if( strcmp( XMLNAME_PATTERN, node->name()) ==  0)
-      {
-         std::string patname, description, mask;
-         Host host;
-         std::list<std::string> remservices;
-         bool clear_services = false;
+	for( int i = 0; i < patterns.Size(); i++)
+	{
+		if( false == patterns[i].IsObject() )
+		{
+			AFERRAR("Farm: Pattern[%d] is not an object.", i)
+			return false;
+		}
 
-         rapidxml::xml_attribute<> * attr;
+		std::string name, description, mask;
+		std::vector<std::string> remservices;
+		bool clear_services = false;
 
-         attr = node->first_attribute( XMLNAME_PATTERNNAME);
-         if( attr != NULL ) patname = attr->value();
+		jr_string("name", name, patterns[i]);
+		jr_string("mask", mask, patterns[i]);
 
-         if( patname.empty())
-         {
-            AFERROR("Pattern has no name.")
-            return false;
-         }
+		if( name.empty())
+		{
+			AFERRAR("Pattern[%d] has no name.", i)
+			return false;
+		}
+		if( mask.empty())
+		{
+			AFERRAR("Pattern '%s' has an empty hosts name mask.", name.c_str())
+			return false;
+		}
 
-         for( rapidxml::xml_node<> * cnode = node->first_node(); cnode != NULL; cnode = cnode->next_sibling())
-         {
-            std::string cnode_name;
-            if( cnode->name() != NULL ) cnode_name = cnode->name();
-            if( cnode_name.empty())
-            {
-               AFERRAR("Empty node name in pattern \"%s\".", patname.c_str())
-               return false;
-            }
+		Host host;
 
-            if( cnode_name == XMLNAME_SERVICE )
-            {
-               std::string servicename, servicecount_str;
-               int servicecount = 0;
+		jr_string("description", description, patterns[i]);
+		jr_string("properties", host.m_properties, patterns[i]);
+		jr_string("os", host.m_os, patterns[i]);
+		jr_int32("capacity", host.m_capacity, patterns[i]);
+		jr_int32("power", host.m_power, patterns[i]);
+		jr_int32("maxtasks", host.m_max_tasks, patterns[i]);
+		if( jr_stringvec("remservices", remservices, patterns[i]))
+			if( remservices.size() == 0 )
+				clear_services = true;
 
-               attr = cnode->first_attribute( XMLNAME_SERVICENAME);
-               if( attr != NULL ) servicename = attr->value();
-               if( servicename.empty())
-               {
-                  AFERRAR("Service has no name in pattern \"%s\".", patname.c_str())
-                  return false;
-               }
+		const JSON & services = patterns[i]["services"];
+		if( services.IsArray())
+		{
+			for( int j = 0; j < services.Size(); j++)
+			{
+				std::string service_name;
+				int service_count = 0;
 
-               attr = cnode->first_attribute( XMLNAME_SERVICECOUNT);
-               if( attr != NULL ) servicecount_str = attr->value();
-               if( false == servicecount_str.empty())
-               {
-                  bool ok;
-                  servicecount = stoi( servicecount_str, &ok);
-                  if( false == ok )
-                  {
-                     AFERRAR("Service \"%s\" has invalid count \"%s\" in pattern \"%s\".", servicename.c_str(), servicecount_str.c_str(), patname.c_str())
-                     return false;
-                  }
-               }
+				jr_string("name", service_name, services[j]);
+				if( name.empty())
+				{
+					AFERRAR("Farm: Pattern['%s'] service[%d] has no name.", name.c_str(), j)
+					return false;
+				}
 
-               host.setService( servicename, servicecount);
-            }
-            else if( cnode_name == XMLNAME_SERVICEREMOVE )
-            {
-               std::string servicename;
-               attr = cnode->first_attribute( XMLNAME_SERVICENAME);
-               if( attr != NULL ) servicename = attr->value();
-               if( servicename.empty())
-               {
-                  AFERRAR("Service to remove has no name in pattern \"%s\".", patname.c_str())
-                  return false;
-               }
-               remservices.push_back( servicename);
-            }
-            else if( cnode_name == XMLNAME_SERVICESCLEAR)
-            {
-               clear_services = true;
-            }
-            else
-            {
-               std::string cnode_value;
-               if( cnode->value() != NULL ) cnode_value = cnode->value();
-               if( cnode_value.empty())
-               {
-                  AFERRAR("Empty node \"%s\" value in pattern \"%s\".", cnode_name.c_str(), patname.c_str())
-                  return false;
-               }
+				jr_int("count", service_count, services[j]);
 
-               bool numberOk = false;
-               int number = stoi( cnode_value, &numberOk);
+				host.setService( service_name, service_count);
+			}
+		}
 
-               if     ( cnode_name == XMLNAME_MASK          ) mask            = cnode_value;
-               else if( cnode_name == XMLNAME_DESCRIPTION   ) description     = cnode_value;
-               else if( cnode_name == XMLNAME_OS            ) host.m_os         = cnode_value;
-               else if( cnode_name == XMLNAME_PROPERTIES    ) host.m_properties = cnode_value;
-               else if( cnode_name == XMLNAME_RESOURCES     ) host.m_resources  = cnode_value;
-               else if( cnode_name == XMLNAME_DATA          ) host.m_data       = cnode_value;
-               else if( cnode_name == XMLNAME_CAPACITY      )
-               {
-                  if( false == numberOk )
-                  {
-                     AFERRAR("Invalid machine capacity \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
-                     return false;
-                  }
-                  host.m_capacity = number;
-               }
-               else if( cnode_name == XMLNAME_MAXTASKS)
-               {
-                  if( false == numberOk )
-                  {
-                     AFERRAR("Invalid machine maxtasks \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
-                     return false;
-                  }
-                  host.m_max_tasks = number;
-               }
-               else if( cnode_name == XMLNAME_POWER)
-               {
-                  if( false == numberOk )
-                  {
-                     AFERRAR("Invalid machine power \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
-                     return false;
-                  }
-                  host.m_power = number;
-               }
-               else if( cnode_name == XMLNAME_WOLIDLESLEEPTIME)
-               {
-                  if( false == numberOk )
-                  {
-                     AFERRAR("Invalid machine WOL idle sleep time \"%s\" in pattern \"%s\".", cnode_value.c_str(), patname.c_str())
-                     return false;
-                  }
-                  host.m_wol_idlesleep_time = number;
-               }
-            }
-         }
+		Pattern * pat = new Pattern( name);
+		pat->setMask( mask);
+		pat->setDescription( description);
+		if( clear_services )
+		{
+			pat->clearServices();
+		}
+		else
+		{
+			pat->remServices( remservices);
+		}
+		pat->setHost( host);
+		if( addPattern( pat) == false)
+		{
+			delete pat;
+			return false;
+		}
+	}
 
-         Pattern * pat = new Pattern( patname);
-         pat->setMask( mask);
-         pat->setDescription( description);
-         if( clear_services )
-         {
-            pat->clearServices();
-         }
-         else
-         {
-            pat->remServices( remservices);
-         }
-         pat->setHost( host);
-         if( addPattern( pat) == false)
-         {
-            delete pat;
-            return false;
-         }
+	const JSON & limits = i_obj["limits"];
+	if( false == limits.IsArray())
+		return true;
 
-      }
-      if( strcmp( XMLNAME_SERVICE, node->name()) ==  0)
-      {
-         rapidxml::xml_attribute<> * attr;
+	for( int i = 0; i < limits.Size(); i++)
+	{
+		if( false == limits[i].IsObject())
+		{
+			AFERRAR("Farm: limit[%d] is not an object.", i)
+			return false;
+		}
 
-         std::string servicename;
-         attr = node->first_attribute( XMLNAME_SERVICENAME);
-         if( attr != NULL ) servicename = attr->value();
-         if( servicename.empty() == 1)
-         {
-            AFERROR("Service limit has no name.")
-            return false;
-         }
+		std::string service;
+		jr_string("service", service, limits[i]);
+		if( service.empty())
+		{
+			AFERRAR("Farm: limit[%d] has no service name.", i)
+			return false;
+		}
+		
+		int maxcount, maxhosts = -1;
+		jr_int("maxcount", maxcount, limits[i]);
+		jr_int("maxhosts", maxhosts, limits[i]);
 
-         std::string servicemaxcount_str, servicemaxhosts_str;
-         int servicemaxcount = -1;
-         int servicemaxhosts = -1;
-         bool ok = false;
+		if(( maxcount < 0 ) && ( maxhosts < 0 ))
+		{
+			AFERRAR("Service \"%s\" has invalid limits.", service.c_str())
+			return false;
+		}
 
-         attr = node->first_attribute( XMLNAME_SERVICEMAXCOUNT);
-         if( attr != NULL ) servicemaxcount_str = attr->value();
-         if( false == servicemaxcount_str.empty())
-         {
-            servicemaxcount = stoi( servicemaxcount_str, &ok);
-            if( !ok)
-            {
-               AFERRAR("Service limit \"%s\" has invalid maximum total count \"%s\".", servicename.c_str(), servicemaxcount_str.c_str())
-               return false;
-            }
-         }
+		addServiceLimit( service, maxcount, maxhosts);
+	}
 
-         attr = node->first_attribute( XMLNAME_SERVICEMAXHOSTS);
-         if( attr != NULL ) servicemaxhosts_str = attr->value();
-         if( false == servicemaxhosts_str.empty())
-         {
-            servicemaxhosts = stoi( servicemaxhosts_str, &ok);
-            if( !ok)
-            {
-               AFERRAR("Service limit \"%s\" has invalid maximum hosts count \"%s\".", servicename.c_str(), servicemaxhosts_str.c_str())
-               return false;
-            }
-         }
-
-         if(( servicemaxcount < 0 ) && ( servicemaxhosts < 0 ))
-         {
-            AFERRAR("Service \"%s\" has invalid limits.", servicename.c_str())
-            return false;
-         }
-
-         addServiceLimit( servicename, servicemaxcount, servicemaxhosts);
-      }
-
-   }
-
-   if( count < 1 )
-   {
-      AFERRAR("No patterns founded in \"%s\"", filename.c_str())
-      return false;
-   }
-
-   return true;
+	return true;
 }
 
 Farm::~Farm()
 {
-   while( ptr_first != NULL)
-   {
-      ptr_last = ptr_first;
-      ptr_first = ptr_first->ptr_next;
-      delete ptr_last;
-   }
-   for( std::map<std::string, ServiceLimit*>::const_iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
-      delete (*it).second;
+	while( m_ptr_first != NULL)
+	{
+		m_ptr_last = m_ptr_first;
+		m_ptr_first = m_ptr_first->ptr_next;
+		delete m_ptr_last;
+	}
+	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
+		delete (*it).second;
 }
 
 void Farm::addServiceLimit( const std::string & name, int maxcount, int maxhosts)
 {
-   if( servicelimits.find( name) != servicelimits.end())
-   {
-      AFERRAR("Farm::addService: Service \"%s\" already exists.", name.c_str())
-      return;
-   }
-   if( maxcount < -1 )
-   {
-      AFERRAR("Farm::addService: Service \"%s\" maxcount value is invalid \"%d\". Setting as \"-1\"", name.c_str(), maxcount)
-      maxcount = -1;
-   }
-   if( maxhosts < -1 )
-   {
-      AFERRAR("Farm::addService: Service \"%s\" maxhosts value is invalid \"%d\". Setting as \"-1\"", name.c_str(), maxhosts)
-      maxhosts = -1;
-   }
-   if(( maxcount == -1 ) && ( maxhosts == -1 ))
-   {
-      AFERRAR("Farm::addService: Service \"%s\" has and maxcount and maxhosts negative values.", name.c_str())
-      return;
-   }
-   servicelimits[name] = new ServiceLimit( maxcount, maxhosts);
+	if( m_servicelimits.find( name) != m_servicelimits.end())
+	{
+		AFERRAR("Farm::addService: Service \"%s\" already exists.", name.c_str())
+		return;
+	}
+	if( maxcount < -1 )
+	{
+		AFERRAR("Farm::addService: Service \"%s\" maxcount value is invalid \"%d\". Setting as \"-1\"", name.c_str(), maxcount)
+		maxcount = -1;
+	}
+	if( maxhosts < -1 )
+	{
+		AFERRAR("Farm::addService: Service \"%s\" maxhosts value is invalid \"%d\". Setting as \"-1\"", name.c_str(), maxhosts)
+		maxhosts = -1;
+	}
+	if(( maxcount == -1 ) && ( maxhosts == -1 ))
+	{
+		AFERRAR("Farm::addService: Service \"%s\" has and maxcount and maxhosts negative values.", name.c_str())
+		return;
+	}
+	m_servicelimits[name] = new ServiceLimit( maxcount, maxhosts);
 }
 
-bool Farm::addPattern( Pattern * patern)
+bool Farm::addPattern( Pattern * pattern)
 {
-   if( patern->isValid() == false)
-   {
-      AFERRAR("Farm::addPattern: invalid pattern \"%s\"", patern->getName().c_str())
-      return false;
-   }
-   if( ptr_first == NULL)
-   {
-      ptr_first = patern;
-   }
-   else
-   {
-      ptr_last->ptr_next = patern;
-   }
-   ptr_last = patern;
-   count++;
-   return true;
+	if( pattern->isValid() == false)
+	{
+		AFERRAR("Farm::addPattern: invalid pattern \"%s\"", pattern->getName().c_str())
+		return false;
+	}
+	if( m_ptr_first == NULL)
+	{
+		m_ptr_first = pattern;
+	}
+	else
+	{
+		m_ptr_last->ptr_next = pattern;
+	}
+	m_ptr_last = pattern;
+	m_count++;
+	return true;
 }
 
 void Farm::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   stream << "Farm filename = \"" << filename << "\":";
-   Pattern * patern = ptr_first;
-   while( patern != NULL)
-   {
-      stream << std::endl;
-      patern->generateInfoStream( stream, full);
-      patern = patern->ptr_next;
-   }
+	stream << "Farm filename = \"" << m_filename << "\":";
+	Pattern * pattern = m_ptr_first;
+	while( pattern != NULL)
+	{
+		stream << std::endl;
+		pattern->generateInfoStream( stream, full);
+		pattern = pattern->ptr_next;
+	}
 
-   if( servicelimits.empty()) return;
+	if( m_servicelimits.empty()) return;
 
-   if( full ) stream << "\nServices Limits:";
-   else stream << " limits:";
-   for( std::map<std::string, ServiceLimit*>::const_iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
-   {
-      stream << std::endl;
-      if( full ) stream << "   ";
-      stream << (*it).first << ": ";
-      (*it).second->generateInfoStream( stream, full);
-   }
+	if( full ) stream << "\n\nServices Limits:";
+	else stream << " limits:";
+	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
+	{
+		stream << std::endl;
+		if( full ) stream << "	";
+		stream << (*it).first << ": ";
+		(*it).second->generateInfoStream( stream, full);
+	}
 }
 
 void Farm::stdOut( bool full) const
 {
-   std::ostringstream stream;
-   generateInfoStream( stream, full);
-   std::cout << stream.str() << std::endl;
+	std::ostringstream stream;
+	generateInfoStream( stream, full);
+	std::cout << stream.str() << std::endl;
 }
 
 bool Farm::getHost( const std::string & hostname, Host & host, std::string & name, std::string & description) const
 {
-   Pattern * ptr = NULL;
-   for( Pattern * p = ptr_first; p != NULL; p = p->ptr_next)
-   {
-      if( p->match( hostname)) ptr = p;
-      if( ptr == NULL) continue;
-      ptr->getHost( host);
-   }
-   if( ptr == NULL ) return false;
-   name = ptr->getName();
-   description = ptr->getDescription();
-   return true;
+	Pattern * ptr = NULL;
+	for( Pattern * p = m_ptr_first; p != NULL; p = p->ptr_next)
+	{
+		if( p->match( hostname)) ptr = p;
+		if( ptr == NULL) continue;
+		ptr->getHost( host);
+	}
+	if( ptr == NULL ) return false;
+	name = ptr->getName();
+	description = ptr->getDescription();
+	return true;
 }
 
 bool Farm::serviceLimitCheck( const std::string & service, const std::string & hostname) const
 {
-   // Find a service:
-   std::map< std::string, ServiceLimit * >::const_iterator it = servicelimits.find( service);
+	// Find a service:
+	std::map< std::string, ServiceLimit * >::const_iterator it = m_servicelimits.find( service);
 
-   // If there is no limits description, it can be run in anyway:
-   if( it == servicelimits.end()) return true;
+	// If there is no limits description, it can be run in anyway:
+	if( it == m_servicelimits.end()) return true;
 
-   return (*it).second->canRun( hostname);
+	return (*it).second->canRun( hostname);
 }
 
 bool Farm::serviceLimitAdd( const std::string & service, const std::string & hostname)
 {
-   // Find a service:
-   std::map< std::string, ServiceLimit * >::const_iterator it = servicelimits.find( service);
+	// Find a service:
+	std::map< std::string, ServiceLimit * >::const_iterator it = m_servicelimits.find( service);
 
-   // If there is no limits description, we do not add it:
-   if( it == servicelimits.end()) return true;
+	// If there is no limits description, we do not add it:
+	if( it == m_servicelimits.end()) return true;
 
-   return (*it).second->increment( hostname);
+	return (*it).second->increment( hostname);
 }
 
 bool Farm::serviceLimitRelease( const std::string & service, const std::string & hostname)
 {
-   // Find a service:
-   std::map< std::string, ServiceLimit * >::const_iterator it = servicelimits.find( service);
+	// Find a service:
+	std::map< std::string, ServiceLimit * >::const_iterator it = m_servicelimits.find( service);
 
-   // If there is no limits description, we do not add it:
-   if( it == servicelimits.end()) return true;
+	// If there is no limits description, we do not add it:
+	if( it == m_servicelimits.end()) return true;
 
-   return (*it).second->releaseHost( hostname);
+	return (*it).second->releaseHost( hostname);
 }
 
 void Farm::servicesLimitsGetUsage( const Farm & other)
 {
-   for( std::map<std::string, ServiceLimit*>::iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
-   {
-      for( std::map<std::string, ServiceLimit*>::const_iterator oit = other.servicelimits.begin(); oit != other.servicelimits.end(); oit++)
-      {
-         if((*it).first == (*oit).first)
-            (*it).second->getLimits(*((*oit).second));
-      }
-   }
+	for( std::map<std::string, ServiceLimit*>::iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
+	{
+		for( std::map<std::string, ServiceLimit*>::const_iterator oit = other.m_servicelimits.begin(); oit != other.m_servicelimits.end(); oit++)
+		{
+			if((*it).first == (*oit).first)
+				(*it).second->getLimits(*((*oit).second));
+		}
+	}
 }
 
 const std::string Farm::serviceLimitsInfoString( bool full) const
 {
-   if( servicelimits.size() < 1 ) return std::string();
+	if( m_servicelimits.size() < 1 ) return std::string();
 
-   std::ostringstream stream;
+	std::ostringstream stream;
 
-   if( full ) stream << "Services Limits:";
-   else stream << " limits:";
-   for( std::map<std::string, ServiceLimit*>::const_iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
-   {
-      stream << std::endl;
-      if( full ) stream << "   ";
-      stream << (*it).first << ": ";
-      (*it).second->generateInfoStream( stream, full);
-   }
+	if( full ) stream << "Services Limits:";
+	else stream << " limits:";
+	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
+	{
+		stream << std::endl;
+		if( full ) stream << "	";
+		stream << (*it).first << ": ";
+		(*it).second->generateInfoStream( stream, full);
+	}
 
-   return stream.str();
+	return stream.str();
 }
 void Farm::jsonWriteLimits( std::ostringstream & o_str) const
 {
 	o_str << "\"services_limits\":{";
 
-	for( std::map<std::string, ServiceLimit*>::const_iterator it = servicelimits.begin(); it != servicelimits.end(); it++)
+	for( std::map<std::string, ServiceLimit*>::const_iterator it = m_servicelimits.begin(); it != m_servicelimits.end(); it++)
 	{
-		if( it != servicelimits.begin()) o_str << ",";
+		if( it != m_servicelimits.begin()) o_str << ",";
 		o_str << "\"" << (*it).first << "\":";
 		(*it).second->jsonWrite( o_str);
 	}

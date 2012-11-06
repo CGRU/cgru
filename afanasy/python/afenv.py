@@ -4,7 +4,7 @@
 import os
 import re
 import socket
-import xml.parsers.expat
+import json
 
 VARS = dict()
 
@@ -13,8 +13,10 @@ class Initialize:
 		self.verbose = Verbose
 		self.valid = False
 
+		cgru = os.getenv('CGRU_LOCATION')
+
 		afroot = os.getenv('AF_ROOT')
-		if afroot == None:
+		if afroot is None:
 			print('Error: AF_ROOT is not defined.')
 			return
 
@@ -27,6 +29,7 @@ class Initialize:
 		dpos = username.rfind('/')
 		if dpos == -1: dpos = username.rfind('\\')
 		if dpos != -1: username = username[dpos+1:]
+		username = username.lower()
 
 		hostname = os.getenv('AF_HOSTNAME', socket.gethostname()).lower()
 		if self.verbose:
@@ -35,45 +38,45 @@ class Initialize:
 			print('User name = "%s"' % username)
 			print('User home = "%s"' % home)
 
-		#self.Vars = {'afroot':afroot, 'home':home, 'username':username, 'hostname':hostname}
 		VARS['AF_ROOT'] = afroot
 		VARS['HOME'] = home
 		VARS['USERNAME'] = username
 		VARS['HOSTNAME'] = hostname
 		VARS['HOME_AFANASY'] = os.path.join( home, '.afanasy')
 
-		self.element = ''
-		self.element_hasdata = False
-		filenames = [ afroot+'/config_default.xml', afroot+'/config.xml', home+'/.afanasy/config.xml']
+		filenames = []
+		if cgru:
+			VARS['CGRU_LOCATION'] = cgru
+			filenames.extend([cgru+'/config_default.json', cgru+'/config.json', home+'/.cgru/config.json'])
+		filenames.extend([afroot+'/config_default.json', afroot+'/config.json', home+'/.afanasy/config.json'])
+
 		for filename in filenames:
-			if self.verbose: print('Trying to open %s' % filename)
-			if os.path.isfile( filename):
-				file = open( filename, 'r')
-				filedata = file.read()
-				file.close()
-				parser = xml.parsers.expat.ParserCreate()
-				parser.StartElementHandler    = self.start_element
-				parser.EndElementHandler      = self.end_element
-				parser.CharacterDataHandler   = self.char_data
-				if self.verbose: print('Parsing %s' % filename)
-				parser.Parse( filedata)
+			if self.verbose:
+				print('Trying to open %s' % filename)
+			if not os.path.isfile( filename):
+				continue
+
+			file = open( filename, 'r')
+			filedata = file.read()
+			file.close()
+
+			success = True
+			try:
+				obj = json.loads( filedata)['cgru_config']
+			except:
+				success = False
+				self.valid = False
+				print( filename)
+				print( str(sys.exc_info()[1]))
+
+			if False == success:
+				continue
+
+			for key in obj:
+				if len(key):
+					VARS[key] = obj[key];
+
 		self.valid = True
 		if self.verbose: print(self.Vars)
-
-	def start_element( self, name, attrs ):
-		self.element_hasdata = False
-		if name != 'afanasy': self.element = name
-		else: self.element = ''
-
-	def end_element( self, name ):
-		if self.element == '': return
-		if self.element_hasdata == False: VARS[self.element] = ''
-		if self.verbose: print('\t' + self.element + ' = "%s"' % self.Vars[self.element])
-		self.element = ''
-
-	def char_data( self, data ):
-		if self.element == '': return
-		VARS[self.element] = str(data)
-		self.element_hasdata = True
 
 Initialize()

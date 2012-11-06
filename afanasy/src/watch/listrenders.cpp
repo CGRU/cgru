@@ -293,7 +293,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
    {
       menu.addSeparator();
       custom_submenu = new QMenu( "Custom", this);
-      for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, custom_cmd_index++)
+      for( std::vector<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++, custom_cmd_index++)
       {
          ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
@@ -308,7 +308,7 @@ void ListRenders::contextMenuEvent( QContextMenuEvent *event)
          menu.addSeparator();
          custom_submenu = new QMenu( "Custom", this);
       }
-     for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++, custom_cmd_index++)
+     for( std::vector<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++, custom_cmd_index++)
       {
          ActionId * actionid = new ActionId( custom_cmd_index, QString("%1").arg( afqt::stoq(*it)), this);
          connect( actionid, SIGNAL( triggeredId( int ) ), this, SLOT( actCommand( int ) ));
@@ -638,9 +638,9 @@ void ListRenders::actCommand( int number)
 {
    std::list<std::string> commands;
    // Create a list that contains and user and admin commands:
-   for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++)
+   for( std::vector<std::string>::const_iterator it = af::Environment::getRenderCmds().begin(); it != af::Environment::getRenderCmds().end(); it++)
       commands.push_back( *it);
-   for( std::list<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++)
+   for( std::vector<std::string>::const_iterator it = af::Environment::getRenderCmdsAdmin().begin(); it != af::Environment::getRenderCmdsAdmin().end(); it++)
       commands.push_back( *it);
 
    if( number >= commands.size())

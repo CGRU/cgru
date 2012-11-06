@@ -11,7 +11,7 @@ public:
     ~Host();
 
     void setService(  const std::string & name, int count);
-    void remServices( const std::list<std::string> & remNames);
+    void remServices( const std::vector<std::string> & remNames);
     void clearServices();
 
     void copy(  const Host & other);

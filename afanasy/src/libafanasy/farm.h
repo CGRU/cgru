@@ -2,8 +2,6 @@
 
 #include <map>
 
-#include "rapidxml/rapidxml.hpp"
-
 #include "pattern.h"
 
 namespace af
@@ -34,7 +32,7 @@ public:
    Farm( const std::string & File, bool Verbose = false);
    ~Farm();
 
-   inline bool isValid() const { return valid;}
+   inline bool isValid() const { return m_valid;}
 
    void generateInfoStream( std::ostringstream & stream, bool full = false) const; /// Generate information.
 
@@ -60,19 +58,19 @@ public:
 	void jsonWriteLimits( std::ostringstream & o_str) const; /// Generate services limits information.
 
 private:
-   int count;
-   bool valid;
+	int m_count;
+	bool m_valid;
 
-   std::string filename;
+	std::string m_filename;
 
-   Pattern * ptr_first;
-   Pattern * ptr_last;
+	Pattern * m_ptr_first;
+	Pattern * m_ptr_last;
 
-   /// Services limits description:
-   std::map< std::string, ServiceLimit * > servicelimits;
+	/// Services limits description:
+	std::map< std::string, ServiceLimit * > m_servicelimits;
 
 private:
-   bool getPatterns( const rapidxml::xml_node<> * pnode);
-   void addServiceLimit( const std::string & name, int maxcount, int maxhosts);
+	bool getFarm( const JSON & i_obj);
+	void addServiceLimit( const std::string & name, int maxcount, int maxhosts);
 };
 }

@@ -42,26 +42,28 @@ void Pattern::getHost( Host & newhost) const
 
 void Pattern::generateInfoStream( std::ostringstream & stream, bool full) const
 {
-   host.generateInfoStream( stream, full);
-   stream << std::endl;
-   host.generateServicesStream( stream);
-   if( full)
-   {
-      stream << std::endl;
-      stream << "Pattern: \"" << name << "\" (" << description << "):";
-      stream << " Mask =\"" << regexp.getPattern() << "\"";
-      if( clear_services ) stream << "\n   Clear services.\n";
-      else if( remservices.size())
-      {
-         stream << "\n   Remove services:";
-         for( std::list<std::string>::const_iterator it = remservices.begin(); it != remservices.end(); it++)
-            stream << " \"" << *it << "\"";
-      }
-   }
-   else
-   {
-      stream << "P:\"" << regexp.getPattern() << "\"-\"" << name << "\": ";
-   }
+	if( full)
+	{
+		stream << "\nPattern: \"" << name << "\" (" << description << "):";
+		stream << "\n    Mask =\"" << regexp.getPattern() << "\"";
+		if( clear_services ) stream << "\n    Clear services.";
+		else if( remservices.size())
+		{
+			stream << "\n    Remove services:";
+			for( int i = 0; i < remservices.size(); i++)
+				stream << " \"" << remservices[i] << "\"";
+		}
+		stream << std::endl;
+	}
+
+	host.generateInfoStream( stream, full);
+	stream << std::endl;
+	host.generateServicesStream( stream);
+
+	if( false == full )
+	{
+		stream << "P:\"" << regexp.getPattern() << "\"-\"" << name << "\": ";
+	}
 }
 
 void Pattern::stdOut( bool full) const

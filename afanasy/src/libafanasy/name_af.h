@@ -219,7 +219,8 @@ namespace af
     bool PyGetString( PyObject * obj, std::string & str, const char * errMsg = NULL);
 
 	const std::string jsonMakeHeader( int size);
-	char * jsonParseMsg( rapidjson::Document & o_doc, af::Msg * i_msg, std::string * o_err = NULL);
+	char * jsonParseData( rapidjson::Document & o_doc, const char * i_data, int i_data_len, std::string * o_err = NULL);
+	char * jsonParseMsg( rapidjson::Document & o_doc, const af::Msg * i_msg, std::string * o_err = NULL);
 	bool jr_string( const char * i_name, std::string & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_regexp( const char * i_name, RegExp      & o_attr, const JSON & i_object, std::string * o_str = NULL);
 	bool jr_bool  ( const char * i_name, bool        & o_attr, const JSON & i_object, std::string * o_str = NULL);

@@ -29,7 +29,6 @@ namespace AFGENERAL
 namespace AFADDR
 {
     const char  SERVER_NAME[]   = "localhost";
-    const char  SERVER_IPMASK[] = "*.*.*.*";
     const uint16_t SERVER_PORT  = 50000;
     const uint16_t CLIENT_PORT  = 50001;
 }
