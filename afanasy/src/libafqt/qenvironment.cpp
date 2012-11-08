@@ -200,7 +200,7 @@ QEnvironment::QEnvironment( const QString & i_name)
     ms_attrs_gui.append( &clr_textstars       );
 
     ms_filename = stoq( af::Environment::getHomeAfanasy())
-           + AFGENERAL::PATH_SEPARATOR + ms_appname.toUtf8().data() + ".xml";
+           + AFGENERAL::PATH_SEPARATOR + ms_appname.toUtf8().data() + ".json";
     ms_themes_folder = stoq( af::Environment::getAfRoot().c_str())
            + AFGENERAL::PATH_SEPARATOR + "icons" + AFGENERAL::PATH_SEPARATOR + "watch";
 
@@ -214,40 +214,33 @@ QEnvironment::QEnvironment( const QString & i_name)
     loadTheme( theme.str);
     loadAttrs( ms_filename);
 
-    QDomDocument doc( ms_appname);
-    if( openXMLDomDocument( doc, ms_filename))
-    {
-        QDomNodeList wndRectNodes = doc.elementsByTagName( AttrRect::WndTagName);
-        for( int i = 0; i < wndRectNodes.size(); i++)
-        {
-            AttrRect * attrrect = AttrRect::readNode( wndRectNodes.at(i));
-            if( attrrect == NULL) continue;
-            ms_attrs_wndrects.append( attrrect);
-        }
-    }
+	int datalen = -1;
+	char * data = af::fileRead( qtos( ms_filename), datalen);
+	if( data )
+	{
+		rapidjson::Document doc;
+		char * buffer = af::jsonParseData( doc, data, datalen);
+		if( buffer )
+		{
+			const JSON & obj = doc["watch"];
+			const JSON & wndrects = obj["wnd_rects"];
+			if( wndrects.IsArray())
+				for( int i = 0; i < wndrects.Size(); i++)
+		        {
+		            AttrRect * attrrect = AttrRect::readObj( wndrects[i]);
+		            if( attrrect == NULL) continue;
+		            ms_attrs_wndrects.append( attrrect);
+		        }
+			delete [] buffer;
+		}
+		delete [] data;
+	}
 
     initFonts();
 
     solveServerAddress();
 
     printf("Qt version = \"%s\"\n", qVersion());
-}
-
-bool QEnvironment::openXMLDomDocument( QDomDocument & o_doc, const QString & i_filename)
-{
-   QFile file( i_filename);
-   if( file.open(QIODevice::ReadOnly) == false) return false;
-
-   QString errorMsg; int errorLine = 0; int errorColumn = 0;
-   if( o_doc.setContent( &file, &errorMsg, &errorLine, &errorColumn) == false)
-   {
-      AFERRAR("Parse error '%s' [Line %d - Col %d]:", i_filename.toUtf8().data(), errorLine, errorColumn)
-      printf("%s\n", errorMsg.toUtf8().data());
-      file.close();
-      return false;
-   }
-   file.close();
-   return true;
 }
 
 void QEnvironment::initFonts()
@@ -300,13 +293,25 @@ bool QEnvironment::save()
 {
    QByteArray data;
 
-   data.append(QByteArray("<!-- Created by ") + ms_appname.toUtf8() + " -->\n");
-   data.append("<watch>\n");
-   for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->write( data);
-   if( saveGUIOnExit.n != 0) saveGUI( data);
-   if( saveWndRectsOnExit.n != 0) saveWndRects( data);
+	data.append( QByteArray("{\"watch\":{\n\"\":\"Created by ") + ms_appname.toUtf8() + "\",\n");
 
-   data.append("</watch>\n");
+	for( int i = 0; i < ms_attrs_prefs.size(); i++)
+	{
+		if( i ) data.append(",\n");
+		ms_attrs_prefs[i]->v_write( data);
+	}
+	if( saveGUIOnExit.n != 0)
+	{
+		data.append(",\n");
+		saveGUI( data);
+	}
+	if( saveWndRectsOnExit.n != 0)
+	{
+		data.append(",\n");
+		saveWndRects( data);
+	}
+
+	data.append("}}\n");
 
    QFile file( ms_filename);
    if( file.open( QIODevice::WriteOnly) == false)
@@ -322,12 +327,23 @@ bool QEnvironment::save()
 
 void QEnvironment::saveGUI( QByteArray & data)
 {
-   for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->write( data);
+	for( int i = 0; i < ms_attrs_gui.size(); i++)
+	{
+		if( i ) data.append(",\n");
+		ms_attrs_gui[i]->v_write( data);
+	}
 }
 
 void QEnvironment::saveWndRects( QByteArray & data)
 {
-   for( int i = 0; i < ms_attrs_wndrects.size(); i++) ms_attrs_wndrects[i]->write( data);
+	data.append("    \"wnd_rects\":[");
+	for( int i = 0; i < ms_attrs_wndrects.size(); i++)
+	{
+		if( i ) data.append(",");
+		data.append("\n        ");
+		ms_attrs_wndrects[i]->v_write( data);
+	}
+	data.append("\n    ]\n");
 }
 
 bool QEnvironment::getRect( const QString & i_name, QRect & rect)
@@ -437,7 +453,7 @@ const QStringList QEnvironment::getThemes()
 
 bool QEnvironment::loadTheme( const QString & i_theme)
 {
-    QString filename = ms_themes_folder + AFGENERAL::PATH_SEPARATOR + i_theme + AFGENERAL::PATH_SEPARATOR + "watch.xml";
+    QString filename = ms_themes_folder + AFGENERAL::PATH_SEPARATOR + i_theme + AFGENERAL::PATH_SEPARATOR + "watch.json";
     if( loadAttrs( filename))
     {
         theme.str = i_theme;
@@ -450,16 +466,31 @@ bool QEnvironment::loadTheme( const QString & i_theme)
 
 bool QEnvironment::loadAttrs( const QString & i_filename )
 {
-    QDomDocument doc( ms_appname);
-    if( openXMLDomDocument( doc, i_filename))
-    {
-        for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->read( doc);
-        for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->read( doc);
-    }
-    else
-    {
-        return false;
-    }
+	int datalen = -1;
+	char * data = af::fileRead( qtos( i_filename), datalen);
+	if( data == NULL )
+	{
+		AFERRAR("AFQT: Unable to load config file:\n%s", i_filename.toUtf8().data())
+		return false;
+	}
+
+	rapidjson::Document doc;
+	char * buffer = af::jsonParseData( doc, data, datalen);
+	if( buffer == NULL )
+	{
+		delete [] data;
+		return false;
+	}
+
+	const JSON & obj = doc["watch"];
+	if( obj.IsObject())
+	{
+		for( int i = 0; i < ms_attrs_prefs.size(); i++) ms_attrs_prefs[i]->v_read( obj);
+		for( int i = 0; i < ms_attrs_gui.size(); i++) ms_attrs_gui[i]->v_read( obj);
+	}
+
+	delete [] buffer;
+	delete [] data;
 
     initFonts();
 

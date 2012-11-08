@@ -136,8 +136,6 @@ public:
 private:
    static void solveServerAddress();
 
-   static bool openXMLDomDocument(  QDomDocument & doc, const QString & i_filename);
-
 private:
     static bool ms_valid;
     static QString ms_appname;

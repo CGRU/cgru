@@ -13,11 +13,12 @@ public:
    AttrColor( const QString & Name, const QString & Label, const QString & initString);
    ~AttrColor();
 
-   bool readData();
-   void writeData();
+	virtual bool v_read( const JSON & i_obj);
+	const QString v_writeData();
 
 public:
    QColor c;
 
 private:
+	bool readColor();
 };

@@ -18,20 +18,13 @@ AttrNumber::~AttrNumber()
 {
 }
 
-bool AttrNumber::readData()
+bool AttrNumber::v_read( const JSON & i_obj)
 {
-   bool ok;
-   int number = str.toInt( &ok);
-   if( false == ok)
-   {
-      AFERRAR("'%s' is not valid number string.\n", str.toUtf8().data());
-      return false;
-   }
-   n = number;
-   return true;
+	af::jr_int( qtos( getName()).c_str(), n, i_obj);
+	return true;
 }
 
-void AttrNumber::writeData()
+const QString AttrNumber::v_writeData()
 {
-   str = QString::number(n);
+	return QString::number(n);
 }

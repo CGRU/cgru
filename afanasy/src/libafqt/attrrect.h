@@ -14,10 +14,10 @@ public:
     AttrRect( const QString & Name, const QRect & initRect);
     ~AttrRect();
 
-    void write( QByteArray & data);
+	void v_write( QByteArray & o_data);
 
 public:
-    static AttrRect * readNode( QDomNode node);
+    static AttrRect * readObj( const JSON & i_obj);
 
 public:
     static const QString WndTagName;

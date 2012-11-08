@@ -13,8 +13,8 @@ public:
    AttrNumber( const QString & Name, const QString & Label, int initNumber);
    ~AttrNumber();
 
-   bool readData();
-   void writeData();
+	virtual bool v_read( const JSON & i_obj);
+	const QString v_writeData();
 
 public:
    int n;
