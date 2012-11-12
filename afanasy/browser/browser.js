@@ -18,7 +18,8 @@ g_FooterOpened = false;
 
 g_Images = [];
 
-g_CGRUConfig = null;
+g_CGRUConfig = {};
+g_platform = ['unix'];
 
 function g_RegisterSend()
 {
@@ -56,7 +57,7 @@ function g_ProcessMsg( obj)
 
 	if( obj.cgru_config )
 	{
-		g_CGRUConfig = obj.cgru_config;
+		g_CGRUConfigRecieved( obj.cgru_config);
 		return;
 	}
 
@@ -132,6 +133,14 @@ function g_Init()
 	g_ConstructSettingsGUI();
 	g_InitSettings();
 
+	if( navigator.platform.indexOf('Linux') != -1 )
+		g_platform.push('linux');
+	else if( navigator.platform.indexOf('Mac') != -1 )
+		g_platform.push('macosx');
+	else if( navigator.platform.indexOf('Win') != -1 )
+		g_platform = ['windows'];
+	document.getElementById('platform').textContent = g_platform;
+
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
 	for( var i = 0; i < g_monitor_buttons.length; i++)
@@ -182,6 +191,30 @@ function g_ConnectionLost()
 
 	g_Info('Connection Lost.');
 	g_Deregistered();
+}
+
+function g_CGRUConfigRecieved( i_obj)
+{
+	if(( i_obj.length == null ) || ( i_obj.length == 0))
+	{
+		g_Error('Invalid config recieved.');
+		return;
+	}
+	for( var i = 0; i < i_obj.length; i++)
+	{
+		obj = i_obj[i].cgru_config;
+		if( obj == null )
+			continue;
+
+		for( var attr in obj)
+		{
+			if( attr.length < 1 ) continue;
+			if( attr.charAt(0) == '-') continue;
+			if( attr.charAt(0) == ' ') continue;
+			if( attr == 'include') continue;
+			g_CGRUConfig[attr] = obj[attr];
+		}
+	}
 }
 
 function g_MButtonClicked( i_type, i_evt)

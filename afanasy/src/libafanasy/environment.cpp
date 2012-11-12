@@ -472,6 +472,25 @@ void Environment::load()
 	loadFile( cgrulocation + "/config_default.json");
 	loadFile( home_afanasy + "/config.json");
 
+	// Remove magic number string:
+	int pos = 0;
+	for(;;)
+	{
+		pos = m_config_data.find("\"magic_number\"", pos);
+		if( pos == -1 ) break;
+
+		int pos_b = m_config_data.find(",", pos);
+		if( pos_b == -1 ) break;
+
+		int len = pos_b - pos + 1;
+		if( len <= 1 ) break;
+
+		std::string replace = "\"\":\"\",";
+		replace.resize( len, ' ');
+
+		m_config_data.replace( pos, len, replace);
+	}
+
 	m_config_data += "{}]}";
 /*
 	m_verbose_init = false;
