@@ -35,11 +35,16 @@ char * af::jsonParseData( rapidjson::Document & o_doc, const char * i_data, int 
 	std::string err;
 	if( o_doc.ParseInsitu<0>(data).HasParseError())
 	{
-		err = "JSON first 300 characters:\n";
-		err += std::string( i_data, i_data_len < 300 ? i_data_len : 300);
-		err += "\nJSON: Parsing failed at character " + af::itos( int( o_doc.GetErrorOffset()));
-		err += ":\n";
-		err += o_doc.GetParseError();
+		int pos = o_doc.GetErrorOffset();
+		err = err + "JSON: " + o_doc.GetParseError();
+		err = err + "(at character " + af::itos( pos) + "):\n";
+		if(( pos >= 0 ) && ( pos < i_data_len ))
+		{
+			int begin = pos - 100;
+			if( begin < 0 ) begin = 0;
+			int len = pos - begin + 1;
+			err += std::string( i_data + begin, len);
+		}
 		delete [] data;
 		data = NULL;
 	}

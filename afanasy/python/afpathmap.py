@@ -3,8 +3,7 @@
 import os
 import sys
 
-import afenv
-
+import cgruconfig
 import cgruutils
 
 #PathSeparators = ' ";=,\''
@@ -77,44 +76,27 @@ def findPathMapFiles( folder):
 class PathMap:
 	def __init__( self, UnixSeparators = False, Verbose = False):
 		self.initialized = False
-		PathMapFile = 'pathmap'
 		self.UnixSeparators = UnixSeparators
 		self.PathClient = []
 		self.PathServer = []
-		pathmap_files = []
 
-		pathmap_files.extend( findPathMapFiles( afenv.VARS['HOME_AFANASY']))
-		pathmap_files.extend( findPathMapFiles( '.'))
-		pathmap_files.extend( findPathMapFiles( afenv.VARS['AF_ROOT']))
+		if not 'pathsmap' in cgruconfig.VARS:
+			return
 
-		for filename in pathmap_files:
-			if Verbose:
-				print('Opening file: "%s"' % filename)
-
-			file = open( filename, 'r')
-			for line in file:
-				if not isinstance( line, str): line = cgruutils.toStr( line)
-				line = line.strip()
-				linelen = len(line)
-				if linelen <= 3: continue
-				if line[0] == '#': continue
-				pos = line.rfind(' ')
-				if pos <= 2 or pos >= linelen:
-					print('Error: Ivalid line in "%s":' % filename)
-					print(line)
-					continue
-				path_client = line[:pos].strip()
-				path_server = line[pos:].strip()
-				if sys.platform.find('win') == 0:
-					path_client = path_client.lower()
-				if self.UnixSeparators:
-					path_client = path_client.replace('\\','/')
-					path_server = path_server.replace('\\','/')
-				self.PathClient.append( path_client)
-				self.PathServer.append( path_server)
-				self.initialized = True
-
-			file.close()
+		for pair in cgruconfig.VARS['pathsmap']:
+			if len( pair) != 2:
+				print('ERROR: Pathmap is not a pair.')
+				return
+			path_client = pair[0]
+			path_server = pair[1]
+			if sys.platform.find('win') == 0:
+				path_client = path_client.lower()
+			if self.UnixSeparators:
+				path_client = path_client.replace('\\','/')
+				path_server = path_server.replace('\\','/')
+			self.PathClient.append( path_client)
+			self.PathServer.append( path_server)
+			self.initialized = True
 
 		if Verbose:
 			print('Pathes map:')

@@ -30,11 +30,13 @@ void outJSON( rapidjson::Value & i_value, int i_depth = 0)
 		rapidjson::Value::MemberIterator it = i_value.MemberBegin();
 		while( it != i_value.MemberEnd())
 		{
-			printf("\n");
-			//printf("%d", i_depth);
-			for(int i = 0; i < i_depth; i++ ) printf("   ");
-			printf("%s:", (char *) it->name.GetString());
-			outJSON( it->value, i_depth+1);
+			if( strlen(it->name.GetString()) && ( it->name.GetString()[0] != '-'))
+			{
+				printf("\n");
+				for(int i = 0; i < i_depth; i++ ) printf("   ");
+				printf("%s:", (char *) it->name.GetString());
+				outJSON( it->value, i_depth+1);
+			}
 			it++;
 		}
 		printf("}");
@@ -87,7 +89,7 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		}
 
 		if( Verbose )
-			printf("Trying to open:\n%s", filename.c_str());
+			printf("Trying to open:\n%s\n", filename.c_str());
 
 		data = af::fileRead( filename, datalen);
 
@@ -113,47 +115,12 @@ bool CmdJSON::processArguments( int argc, char** argv, af::Msg &msg)
 		data[datalen] = '\0';
 	}
 
-	char * data_copy = new char[datalen];
-	memcpy( data_copy, data, datalen);
-
 	rapidjson::Document document;
-	if (document.ParseInsitu<0>(data_copy).HasParseError())
+	char * data_copy = af::jsonParseData( document, data, datalen);
+	if( data_copy == NULL )
 	{
-		int pos = document.GetErrorOffset();
-		AFERRAR("Parsing failed at character %d:", pos)
-		AFERRAR("%s:", document.GetParseError())
-		int len = 60;
-		int pos_a = pos;
-		while( --pos_a > 0 )
-		{
-			if( data[pos_a] == '\n' )
-			{
-				pos_a++;
-				break;
-			}
-			if( pos-pos_a >= len/2 )
-				break;
-		}
-		int pos_b = pos;
-		while( ++pos_b < datalen-1 )
-		{
-			if( data[pos_b] == '\n' )
-			{
-				pos_b--;
-				break;
-			}
-			if( pos_b-pos >= len/2 )
-				break;
-		}
-		len = pos_b - pos_a + 1;
-		int unused;
-		unused = write( 1, data + pos_a, len);
-		unused = write( 1, "\n", 1);
-		for( int i = 0; i < pos - pos_a; i++)
-			unused = write( 1, " ", 1);
-		unused = write( 1, "^", 1);
-		unused = write( 1, "\n", 1);
-		return true;
+		delete [] data;
+		return false;
 	}
 
 	if( document.IsObject())

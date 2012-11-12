@@ -1,16 +1,4 @@
 {"cgru_config":{
-	"":"Copy this file into 'config.json' and setup you own",
-	"":"To disable property you can just prefix it with '-'",
-
-	"cmdprefix":"",
-		"":"If 'AF_CMD_PREFIX' environment variable exists, it will be used. All commands with be prefixed with it.",
-
-	"af_node_log_lines_max":100,
-	"af_node_logs_rotate":10,
-		"":"Changes log for any afnode (job, render, user)",
-
-	"priority":99,
-	"maxrunningtasks":-1,
 
 	"servername":"127.0.0.1",
 		"":"User server name or direct IP address literals",
@@ -28,10 +16,38 @@
 	"serverport":51000,
 	"clientport":51001,
 
+		"":"Commands arguments:",
+		"":"@ARG@ - will be replaced with render name:",
+		"":"@ASK@ - raise dialog to ask a string:",
+		"":"@IP@  - will be replaced with render ip address:",
+
+	"OS_unix":{
+		"rendercmds":["vncviewer @ARG@","xterm -e \"ping @ARG@; read -s -n 1\"","xterm -e \"ping @IP@; read -s -n 1\""],
+		"rendercmds_admin":["xterm -e \"ssh @ARG@; read -s -n 1\"","xterm -e \"ssh @ARG@ \\\"@ASK@\\\"; read -s -n 1\""],
+		"tempdirectory":"/var/tmp/afanasy",
+		"render_cmd_wolsleep":"wolsleep",
+		"":"On UNIX sleep command usually needs root privileges, try to use 'sudo wolsleep' and add a line in /etc/sudoers: render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep, Or configure your own way to sleep.",
+		"cmd_shell":"/bin/sh -c"
+	},
+	"OS_windows":{
+		"rendercmds":["vncviewer @ARG@","start ping /t @ARG@","start ping /t @IP@"],
+		"tempdirectory":"/temp/afanasy",
+		"render_cmd_wolsleep":"cmd.exe /c wolsleep",
+		"cmd_shell":"cmd.exe /c"
+	},
+
+	"cmdprefix":"",
+		"":"If 'AF_CMD_PREFIX' environment variable exists, it will be used. All commands with be prefixed with it.",
+
+	"af_node_log_lines_max":100,
+	"af_node_logs_rotate":10,
+		"":"Changes log for any afnode (job, render, user)",
+
+	"priority":99,
+	"maxrunningtasks":-1,
+
 	"srv_so_rcvtimeo_sec":2,
 	"srv_so_sndtimeo_sec":2,
-
-	"-tempdirectory":"/var/tmp/afanasy",
  
 "":"Job:",
 	"task_default_capacity":1000,
@@ -39,9 +55,6 @@
 	"task_log_linesmax":100,
 
 "":"Render:",
-	"-cmd_shell":"/bin/sh -c", "":"This is default for UNIX",
-	"-cmd_shell":"cmd.exe /c", "":"This is default for MSWIN",
-
 	"render_default_capacity":1000,
 	"render_default_maxtasks":5,
 	"-render_networkif":"eth0",
@@ -69,10 +82,6 @@
 	"render_cmd_reboot":"shutdown /r",
 	"render_cmd_shutdown":"shutdown /s",
 	"render_cmd_wolwake":"wolwake",
-	"render_cmd_wolsleep":"wolsleep",
-		"":"On UNIX sleep command usually needs root privileges, try to use 'sudo wolsleep' and add a line in /etc/sudoers: render ALL = (ALL) NOPASSWD: /opt/cgru/bin/wolsleep, Or configure your own way to sleep.",
-		"":"On MS Windows it should be something like:",
-	"-render_cmd_wolsleep":"cmd.exe /c wolsleep",
 
 "":"User:",
 	"errors_avoid_host":3,
@@ -85,17 +94,7 @@
 	"pswd_visor":"1832116180fdc61b64fd978401e462e9",
 	"pswd_god":"73bcaaa458bff0d27989ed331b68b64d",
 
-		"":"Commands argument = '@ARG@'",
 	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],
-
-		"":"Commands arguments:",
-		"":"@ARG@ - will be replaced with render name:",
-		"":"@ASK@ - raise dialog to ask a string:",
-		"":"@IP@  - will be replaced with render ip address:",
-	"rendercmds":["vncviewer @ARG@","xterm -e \"ping @ARG@; read -s -n 1\"","xterm -e \"ping @IP@; read -s -n 1\""],
-	"rendercmds_admin":["xterm -e \"ssh @ARG@; read -s -n 1\"","xterm -e \"ssh @ARG@ \\\"@ASK@\\\"; read -s -n 1\""],
-		"":"Example for MS Windows:",
-	"-rendercmds":["vncviewer @ARG@","start ping /t @ARG@","start ping /t @IP@"],
 
 	"watch_connectretries":3,
 	"watch_waitforconnected":8000,

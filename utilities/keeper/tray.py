@@ -126,9 +126,6 @@ class Tray( QtGui.QSystemTrayIcon):
       action = QtGui.QAction('Set Server...', self)
       QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.setAFANASYServer)
       self.menu['AFANASY'].addAction( action)
-      action = QtGui.QAction('Edit User Config...', self)
-      QtCore.QObject.connect( action, QtCore.SIGNAL('triggered()'), cmd.editAFANASYConfig)
-      self.menu['AFANASY'].addAction( action)
 
       self.menu['AFANASY'].addSeparator()
 

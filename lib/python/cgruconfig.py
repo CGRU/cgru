@@ -38,9 +38,23 @@ class Config:
 	def __init__( self, variables = VARS, configfiles = None, Verbose = False):
 		self.verbose = Verbose
 		self.Vars = variables
+		self.recursion = False
 
 		if configfiles is None:
-			self.Vars['hostname'] = socket.gethostname().lower()
+			self.recursion = True
+			self.Vars['filenames'] = []
+
+			self.Vars['platform'] = ['unix']
+			if sys.platform[:3] == 'win':
+				self.Vars['platform'] = ['windows']
+			elif sys.platform[:6] == 'darwin':
+				self.Vars['platform'].append('macosx')
+			elif sys.platform[:5] == 'linux':
+				self.Vars['platform'].append('linux')
+			if self.verbose:
+				print('Platform: "%s"' % self.Vars['platform'])
+
+			self.Vars['HOSTNAME'] = socket.gethostname().lower()
 
 			cgrulocation =  os.getenv('CGRU_LOCATION')
 			if cgrulocation is None or cgrulocation == '': return
@@ -60,51 +74,79 @@ class Config:
 			else:
 				self.Vars['editor'] = 'xterm -e vi "%s"'
 
-			self.Vars['config_file'] = os.path.join( cgrulocation, 'config.json')
+			afroot = os.getenv('AF_ROOT')
+			if afroot is None:
+				afroot = os.path.join( cgrulocation, 'afanasy')
+			self.Vars['AF_ROOT'] = afroot
+
+			username = os.getenv('CGRU_USERNAME', os.getenv('AF_USERNAME', os.getenv('USER', os.getenv('USERNAME'))))
+			if username == None: username = 'None'
+			# cut DOMAIN from username:
+			dpos = username.rfind('/')
+			if dpos == -1: dpos = username.rfind('\\')
+			if dpos != -1: username = username[dpos+1:]
+			username = username.lower()
+			self.Vars['USERNAME'] = username
+
 			home = os.getenv('HOME', os.getenv('HOMEPATH'))
 			self.Vars['HOME'] = home
 			self.Vars['HOME_CGRU'] = os.path.join( home, '.cgru')
-			self.Vars['HOME_AFANASY'] = os.path.join( home, '.afanasy')
 			self.Vars['config_file_home'] = os.path.join( self.Vars['HOME_CGRU'], 'config.json')
-			self.Vars['config_afanasy'] = os.path.join( self.Vars['HOME_AFANASY'], 'config.json')
 			if sys.platform.find('win') == 0 or os.geteuid() != 0:
 				cgruutils.createFolder( self.Vars['HOME_CGRU']	 )
-				cgruutils.createFolder( self.Vars['HOME_AFANASY'] )
 				# Create cgru home config file if not preset
 				checkConfigFile( self.Vars['config_file_home'])
-				# Create afanasy home config file if not preset
-				checkConfigFile( self.Vars['config_afanasy'])
 
 			configfiles = []
 			configfiles.append( os.path.join( cgrulocation, 'config_default.json'))
-			configfiles.append( self.Vars['config_file'])
 			configfiles.append( self.Vars['config_file_home'])
-			configfiles.append( self.Vars['config_afanasy'])
 
 		for filename in configfiles:
-			if self.verbose:
-				print('Trying to open %s' % filename)
-			if not os.path.isfile( filename):
-				continue
+			self.load( filename)
 
-			file = open( filename, 'r')
-			filedata = file.read()
-			file.close()
-
-			success = True
-			try:
-				obj = json.loads( filedata)['cgru_config']
-			except:
-				success = False
+	def load( self, filename):
+		if self.recursion:
+			if filename in self.Vars['filenames']:
+				print('ERROR: Config file already included:')
 				print( filename)
-				print( str(sys.exc_info()[1]))
+				return
+			self.Vars['filenames'].append( filename)
 
-			if False == success:
-				continue
+		if self.verbose:
+			print('Trying to open %s' % filename)
+		if not os.path.isfile( filename):
+			return
 
-			for key in obj:
-				if len(key):
-					self.Vars[key] = obj[key];
+		file = open( filename, 'r')
+		filedata = file.read()
+		file.close()
+
+		success = True
+		try:
+			obj = json.loads( filedata)['cgru_config']
+		except:
+			success = False
+			print( filename)
+			print( str(sys.exc_info()[1]))
+
+		if False == success:
+			return
+
+		self.getVars( obj, filename)
+
+	def getVars( self, obj, filename):
+		for key in obj:
+			if len(key) == 0: continue
+			if key[0] == '-': continue
+			if key == 'include' and self.recursion:
+				for afile in obj[key]:
+					afile = os.path.join( os.path.dirname( filename), afile)
+					self.load( afile)
+			elif key[:3] == 'OS_':
+				if key[3:] in VARS['platform']:
+					self.getVars( obj[key], filename)
+			else:
+				self.Vars[key] = obj[key]
 
 Config()
 

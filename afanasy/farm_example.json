@@ -1,5 +1,5 @@
 {"farm":{
-	"":"Copy this file into 'farm.xml' and describe you own",
+	"":"Copy this file into 'farm.json' and describe you own",
 
 	"":"You can limit service on your farm:",
 	"":"'maxhosts' - maximum number if various hosts (renders) service can run on",

@@ -47,8 +47,8 @@ class Window( QtGui.QTextEdit ):
       self.appendEnvVar('PATH')
       self.appendVar('PWD', os.getcwd())
 
-      self.appendConfigFile( cgruconfig.VARS['config_file'])
-      self.appendConfigFile( cgruconfig.VARS['config_file_home'])
+      for afile in cgruconfig.VARS['filenames']:
+	      self.appendConfigFile( afile)
 
       # Set window icon:
       iconpath = cgruutils.getIconFileName('info')

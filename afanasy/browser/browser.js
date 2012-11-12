@@ -18,6 +18,8 @@ g_FooterOpened = false;
 
 g_Images = [];
 
+g_CGRUConfig = null;
+
 function g_RegisterSend()
 {
 	if( g_id != 0)
@@ -49,6 +51,12 @@ function g_ProcessMsg( obj)
 			img.src = obj.path + "/" + obj.files[i];
 			g_Images.push( img);
 		}
+		return;
+	}
+
+	if( obj.cgru_config )
+	{
+		g_CGRUConfig = obj.cgru_config;
 		return;
 	}
 
@@ -119,6 +127,7 @@ function g_Init()
 	document.body.onkeydown = g_OnKeyDown;
 
 	nw_GetSoftwareIcons();
+	nw_GetCGRUConfig();
 
 	g_ConstructSettingsGUI();
 	g_InitSettings();
@@ -570,6 +579,7 @@ function g_LocalStorageClear( i_name, i_value)
 	g_Info('Local Storage Cleared.');
 	g_InitSettings();
 }
+function g_CGRUConfigShow() { g_ShowObject( g_CGRUConfig);}
 
 function g_CheckSequence()
 {

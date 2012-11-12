@@ -136,6 +136,15 @@ function nw_GetSoftwareIcons()
 	nw_Send(obj);
 }
 
+function nw_GetCGRUConfig()
+{
+	var obj = {};
+	obj.get = {};
+	obj.get.type = 'config';
+
+	nw_Send(obj);
+}
+
 function nw_ReqestRendersResources()
 {
 	nw_GetNodes('renders', null, 'resources');

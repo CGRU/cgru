@@ -6,6 +6,8 @@
 #include "threadargs.h"
 #include "usercontainer.h"
 
+#include "../libafanasy/environment.cpp"
+
 #define AFOUTPUT
 #undef AFOUTPUT
 #include "../include/macrooutput.h"
@@ -264,6 +266,10 @@ af::Msg * threadProcessJSON( ThreadArgs * i_args, af::Msg * i_msg)
 			}
 			files << "]}";
 			o_msg_response = af::jsonMsg( files);
+		}
+		else if( type == "config" )
+		{
+			o_msg_response = af::jsonMsg( af::Environment::getConfigData());
 		}
 	}
 	else if( document.HasMember("action"))

@@ -24,20 +24,10 @@ def showInfo( tray = None):
 	WndInfo.setWindowTitle('AFANASY Render Information:')
 	WndInfo.show()
 
-#def getParameter( data, parm, default):
-#	if parm in data:#
-#		return data[parm]
-#	return default
-
 def refresh():
 	renders = af.Cmd().renderGetLocal()
 	if renders is not None and len( renders):
 		render = renders[0]
-		#print( render)
-#		online = not getParameter( render, 'offline', False)
-#		nimby = getParameter( render, 'nimby', False)
-#		NIMBY = getParameter( render, 'NIMBY', False)
-#		busy = getParameter( render, 'busy', False)
 		if "state" in render:
 			online = render["state"].find('OFF') == -1
 			nimby  = render["state"].find('NbY') != -1

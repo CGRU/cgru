@@ -7,7 +7,7 @@ import re
 import sys
 import time
 
-import afenv
+import cgruconfig
 import afnetwork
 import services
 
@@ -26,7 +26,7 @@ def checkRegExp( pattern):
 
 def checkClass( name, folder):
 	filename = name + '.py'
-	path = os.path.join( afenv.VARS['AF_ROOT'], 'python')
+	path = os.path.join( cgruconfig.VARS['AF_ROOT'], 'python')
 	path = os.path.join( path, folder)
 	if filename in os.listdir( path): return True
 	return False
@@ -51,8 +51,8 @@ class Block:
 	def __init__( self, blockname = 'block', service = 'generic'):
 		self.data = dict()
 		self.data["name"] = blockname
-		self.data["capacity"] = int( afenv.VARS['task_default_capacity'])
-		self.data["working_directory"] = os.getenv('PWD', os.getcwd())
+		self.data["capacity"] = int( cgruconfig.VARS['task_default_capacity'])
+		self.data['working_directory'] = pathmap.toServer( os.getenv('PWD', os.getcwd()))
 		self.tasks = []
 		if self.setService( service):
 			__import__("services", globals(), locals(), [self.data["service"]])
@@ -109,7 +109,7 @@ class Block:
 		self.data["working_directory"] = working_directory
 
 	def setCommand( self, command, prefix = True, TransferToServer = True):
-		if prefix: command = os.getenv('AF_CMD_PREFIX', afenv.VARS['cmdprefix']) + command
+		if prefix: command = os.getenv('AF_CMD_PREFIX', cgruconfig.VARS['cmdprefix']) + command
 		if TransferToServer: command = pathmap.toServer( command)
 		self.data["command"] = command
 
@@ -163,9 +163,9 @@ class Job:
 	def __init__( self, jobname = None, verbose = False):
 		self.data = dict()
 		self.data["name"] = "noname"
-		self.data["user_name"] = afenv.VARS['USERNAME']
-		self.data["host_name"] = afenv.VARS['HOSTNAME']
-		self.data["priority"]  = afenv.VARS['priority']
+		self.data["user_name"] = cgruconfig.VARS['USERNAME']
+		self.data["host_name"] = cgruconfig.VARS['HOSTNAME']
+		self.data["priority"]  = cgruconfig.VARS['priority']
 		self.data["time_creation"] = int(time.time())
 		self.setName( jobname)
 		self.blocks = []
@@ -242,8 +242,8 @@ class Job:
 class Cmd:
 	def __init__( self ):
 		self.data = dict()
-		self.data['user_name'] = afenv.VARS['USERNAME']
-		self.data['host_name'] = afenv.VARS['HOSTNAME']
+		self.data['user_name'] = cgruconfig.VARS['USERNAME']
+		self.data['host_name'] = cgruconfig.VARS['HOSTNAME']
 		self.action = None
    
 	def _sendRequest(self, verbose = False):
@@ -285,56 +285,56 @@ class Cmd:
 	def renderSetNimby( self, text):
 		self.action = 'action'
 		self.data['type'] = 'renders'
-		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
 		self.data['params'] = {'nimby':True}
 		self._sendRequest()
 
 	def renderSetNIMBY( self, text):
 		self.action = 'action'
 		self.data['type'] = 'renders'
-		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
 		self.data['params'] = {'NIMBY':True}
 		self._sendRequest()
 
 	def renderSetFree( self, text):
 		self.action = 'action'
 		self.data['type'] = 'renders'
-		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
 		self.data['params'] = {'nimby':False}
 		self._sendRequest()
 
 	def renderEjectTasks( self, text):
 		self.action = 'action'
 		self.data['type'] = 'renders'
-		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
 		self.data['operation'] = {'type':'eject_tasks'}
 		self._sendRequest()
 
 	def renderEjectNotMyTasks( self, text):
 		self.action = 'action'
 		self.data['type'] = 'renders'
-		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
 		self.data['operation'] = {'type':'eject_tasks_keep_my'}
 		self._sendRequest()
 
 	def renderExit( self, text):
 		self.action = 'action'
 		self.data['type'] = 'renders'
-		self.data['mask'] = afenv.VARS['HOSTNAME']
+		self.data['mask'] = cgruconfig.VARS['HOSTNAME']
 		self.data['operation'] = {'type':'exit'}
 		self._sendRequest()
 
 	def talkExit( self, text):
 		self.action = 'action'
 		self.data['type'] = 'talks'
-		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*'
+		self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + cgruconfig.VARS['HOSTNAME'] + ':.*'
 		self.data['operation'] = {'type':'exit'}
 		self._sendRequest()
 
 	def monitorExit( self, text):
 		self.action = 'action'
 		self.data['type'] = 'monitors'
-		self.data['mask'] = afenv.VARS['USERNAME'] + '@' + afenv.VARS['HOSTNAME'] + ':.*'
+		self.data['mask'] = cgruconfig.VARS['USERNAME'] + '@' + cgruconfig.VARS['HOSTNAME'] + ':.*'
 		self.data['operation'] = {'type':'exit'}
 		self._sendRequest()
 
@@ -349,4 +349,4 @@ class Cmd:
 				return data['renders']
 		return None
 
-	def renderGetLocal( self): return self.renderGetList( afenv.VARS['HOSTNAME'])
+	def renderGetLocal( self): return self.renderGetList( cgruconfig.VARS['HOSTNAME'])

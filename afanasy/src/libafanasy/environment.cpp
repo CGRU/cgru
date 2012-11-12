@@ -113,7 +113,6 @@ std::string Environment::servername =                 AFADDR::SERVER_NAME;
 std::string Environment::username;
 std::string Environment::computername;
 std::string Environment::hostname;
-std::string Environment::platform;
 std::string Environment::cgrulocation;
 std::string Environment::afroot;
 std::string Environment::home;
@@ -130,9 +129,12 @@ bool Environment::m_verbose_mode = false;
 bool Environment::m_solveservername = false;
 bool Environment::m_server          = false;
 bool Environment::visor_mode     = false;
+std::vector<std::string> Environment::m_config_files;
+std::string Environment::m_config_data;
 
 Passwd * Environment::passwd = NULL;
 
+std::vector<std::string> Environment::platform;
 std::vector<std::string> Environment::cmdarguments;
 std::vector<std::string> Environment::cmdarguments_usagearg;
 std::vector<std::string> Environment::cmdarguments_usagehelp;
@@ -150,6 +152,12 @@ std::string Environment::version_date;
 
 void Environment::getVars( const JSON & i_obj)
 {
+	if( false == i_obj.IsObject())
+	{
+		AFERROR("Environment::getVars: Not an object.")
+		return;
+	}
+
 	getVar( i_obj, af::Msg::Magic,                    "magic_number"                      );
 	getVar( i_obj, magic_mode,                        "magic_mode"                        );
 
@@ -352,7 +360,7 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //############ home directory:
 	home = af::pathHome();
 	PRINT("User home directory = '%s'\n", home.c_str());
-	home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".afanasy";
+	home_afanasy = home + AFGENERAL::PATH_SEPARATOR + ".cgru";
 	PRINT("Afanasy home directory = '%s'\n", home_afanasy.c_str());
 	if( af::pathMakeDir( home_afanasy, af::VerboseOn ) == false)
 	{
@@ -393,50 +401,51 @@ Environment::Environment( uint32_t flags, int argc, char** argv )
 //############ Platform: #############################
 	{
 	// OS Type:
-	platform = "Unix";
 	#ifdef WINNT
-		platform = "MS Windows";
+		platform.push_back("windows");
+	#else
+		platform.push_back("unix");
 	#endif
 	#ifdef MACOSX
-		platform += ": MacOSX";
+		platform.push_back("macosx");
 	#endif
 	#ifdef LINUX
-		platform += ": Linux";
+		platform.push_back("linux");
 	#endif
-	int psize = sizeof( void *);
-	switch(psize)
+	switch( sizeof(void*))
 	{
-		case 4: platform += " 32bit"; break;
-		case 8: platform += " 64bit"; break;
+		case 4: platform.push_back("32"); break;
+		case 8: platform.push_back("64"); break;
 	}
 	}
+	PRINT("Platform: '%s'\n", af::strJoin( platform).c_str());
 //
 //############ Versions: ########################
 
 	// Date:
 	version_date = std::string(__DATE__) + " " __TIME__;
-	QUIET("Compilation date = \"%s\"\n", version_date.c_str());
+	QUIET("Compilation date = '%s'\n", version_date.c_str());
 
 	// CGRU:
 	version_cgru = getenv("CGRU_VERSION");
-	QUIET("CGRU version = \"%s\"\n", version_cgru.c_str());
+	QUIET("CGRU version = '%s'\n", version_cgru.c_str());
 
 	// Build Revision:
 	#ifdef CGRU_REVISION
 	#define STRINGIFY(x) #x
 	#define EXPAND(x) STRINGIFY(x)
 	version_revision = EXPAND(CGRU_REVISION);
-	QUIET("Afanasy build revision = \"%s\"\n", version_revision.c_str());
+	QUIET("Afanasy build revision = '%s'\n", version_revision.c_str());
 	#endif
 
 	// Python:
 	version_python = af::itos(PY_MAJOR_VERSION) + "." + af::itos(PY_MINOR_VERSION) + "." + af::itos(PY_MICRO_VERSION);
-	QUIET("Python version = \"%s\"\n", version_python.c_str());
+	QUIET("Python version = '%s'\n", version_python.c_str());
 
 	// GCC:
 #ifdef __GNUC__
 	version_gcc = af::itos(__GNUC__) + "." + af::itos(__GNUC_MINOR__) + "." + af::itos(__GNUC_PATCHLEVEL__);
-	QUIET("GCC version = \"%s\"\n", version_gcc.c_str());
+	QUIET("GCC version = '%s'\n", version_gcc.c_str());
 #endif
 
 //###################################################
@@ -455,62 +464,95 @@ Environment::~Environment()
 
 void Environment::load()
 {
-	std::string filename;
-	filename = ( cgrulocation + "/config_default.json");
-	load( filename, m_verbose_init);
-	filename = ( cgrulocation + "/config.json");
-	load( filename, m_verbose_init);
-	filename = ( afroot + "/config_default.json");
-	load( filename, m_verbose_init);
-	filename = ( afroot + "/config.json");
-	load( filename, m_verbose_init);
-	filename = ( home_afanasy + "/config.json");
-	load( filename, m_verbose_init);
-	bool _verbose_init = m_verbose_init;
+	m_config_files.clear();
+	m_config_data.clear();
+
+	m_config_data = "{\"cgru_config\":[";
+
+	loadFile( cgrulocation + "/config_default.json");
+	loadFile( home_afanasy + "/config.json");
+
+	m_config_data += "{}]}";
+/*
 	m_verbose_init = false;
 	filename = ( afroot + "/config_shadow.json");
-	load( filename, m_verbose_init);
 	m_verbose_init=_verbose_init;
+*/
 }
 
-bool Environment::load( const std::string & filename, bool Verbose)
+void Environment::loadFile( const std::string & i_filename)
 {
-	m_verbose_init = Verbose;
+	// Check that file is not alreadt loaded, to prevent cyclic include
+	for( int i = 0; i < m_config_files.size(); i++)
+		if( m_config_files[i] == i_filename )
+		{
+			AFERRAR("Config file already included:\n%s", i_filename.c_str())
+			return;
+		}
 
-	if( false == pathFileExists( filename))
-		return false;
+	// Add file to store loaded:
+	m_config_files.push_back( i_filename);
 
-	if( m_verbose_init) printf("Parsing config file '%s':\n", filename.c_str());
+	if( false == pathFileExists( i_filename))
+	{
+		printf("Config file does not exist:\n%s\n", i_filename.c_str());
+		return;
+	}
+
+	PRINT("Parsing config file '%s':\n", i_filename.c_str());
 
 	int filesize = -1;
-	char * buffer = fileRead( filename, filesize);
+	char * buffer = fileRead( i_filename, filesize);
 	if( buffer == NULL )
-		return false;
+		return;
 
 	rapidjson::Document doc;
 	char * data = jsonParseData( doc, buffer, filesize);
 	if( data == NULL )
 	{
 		delete [] buffer;
-		return false;
+		return;
 	}
 
-	bool retval = false;
+	// Add file data, it can be asked from server:
+	m_config_data += std::string( buffer, filesize) + ",\n";
+
 	const JSON & obj = doc["cgru_config"];
 	if( false == obj.IsObject())
 	{
-		AFERRAR("Can't find document root \"cgru_config\": object:\n%s", filename.c_str())
+		AFERRAR("Can't find document root \"cgru_config\": object:\n%s", i_filename.c_str())
 	}
 	else
 	{
 		getVars( obj);
-		retval = true;
+
+		for( int i = 0; i < platform.size(); i++)
+		{
+			std::string obj_os_name = "OS_";
+			obj_os_name += platform[i];
+			const JSON & obj_os = obj[obj_os_name.c_str()];
+			if( obj_os.IsObject())
+			{
+				PRINT("'%s' secific parameters:\n", obj_os_name.c_str());
+				getVars( obj_os);
+			}
+		}
+
+		std::vector<std::string> include;
+		jr_stringvec("include", include, obj);
+		for( int i = 0; i < include.size(); i++)
+		{
+			std::string filename = include[i];
+			if( false == pathIsAbsolute( filename ))
+				filename = pathUp( i_filename) + AFGENERAL::PATH_SEPARATOR + filename;
+			loadFile( filename);
+		}
 	}
 
 	delete [] data;
 	delete [] buffer;
 
-	return retval;
+	return;
 }
 
 bool Environment::reload()

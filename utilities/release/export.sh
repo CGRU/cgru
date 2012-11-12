@@ -11,9 +11,8 @@ function createDir(){
    [ -d $1 ] || mkdir -p $1
 }
 
-exclude="$exclude --exclude 'config.xml'"
-exclude="$exclude --exclude 'farm.xml'"
-exclude="$exclude --exclude 'pathmap_*.cmd'"
+exclude="$exclude --exclude 'config.json'"
+exclude="$exclude --exclude 'farm.json'"
 exclude="$exclude --exclude 'override.sh'"
 exclude="$exclude --exclude '.svn'"
 exclude="$exclude --exclude '.git'"

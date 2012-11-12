@@ -26,8 +26,8 @@ for archive in `ls`; do
    find "${archive_dir}" -type d -name .svn -exec rm -rvf {} \;
    find "${archive_dir}" -type f -name *.pyc -exec rm -vf {} \;
    find "${archive_dir}" -type d -name __pycache__ -exec rm -rvf {} \;
-   find "${archive_dir}" -type f -name config.xml -exec rm -vf {} \;
-   find "${archive_dir}" -type f -name pathmap_*.txt -exec rm -vf {} \;
+   find "${archive_dir}" -type f -name config.json -exec rm -vf {} \;
+   find "${archive_dir}" -type f -name farm.json -exec rm -vf {} \;
    rm -fv ${archive_dir}/software_setup/locate_*
 
    # Run specific script:

@@ -1,5 +1,24 @@
 {"cgru_config":{
-	"":"Copy this file into 'config.json' and setup you own",
+		"":"Describe your own configuration in 'config.json', it will be included last",
+		"":"To disable property you can just prefix it with '-'",
+
+	"include":["afanasy/config.json","config.json"],
+
+	"":"'OS_unix': Any UNIX (Linux, MacOSX) specific settings",
+	"":"'OS_windows': MS Windows specific settings",
+	"":"'OS_linux': Linix specific settings",
+	"":"'OS_macosx': MacOSX specific settings",
+
+
+	"OS_windows":{
+			"":"This is a paths map example (disabled)",
+			"":"Client:Server",
+		"pathsmap":[
+			["//server/projects/","/mnt/prj/"]
+		],
+			"":"Client slashes direction plays no role, as it tries both slashes when searchs a path to replace.",
+			"":"But will replace with specified slashes, if unix slashes not forced (for Nuke, for example)."
+	},
 
 	"docs_host":"localhost",
 

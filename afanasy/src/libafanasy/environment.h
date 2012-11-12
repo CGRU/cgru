@@ -48,6 +48,8 @@ public:
 	static bool getVar( const JSON & i_obj, int & o_value, const char * i_name );
 	static bool getVar( const JSON & i_obj, std::vector<std::string> & o_value, const char * i_name );
 
+	static const std::string & getConfigData() { return m_config_data;}
+
     /// Check current key matching password sequence.
     static bool checkKey( const char key);
 
@@ -75,7 +77,7 @@ public:
     static inline const std::string & getUserName()    { return username;      } ///< Get current user name.
     static inline const std::string & getHostName()    { return hostname;      } ///< Get Render host name.
     static inline const std::string & getComputerName(){ return computername;  } ///< Get local computer name.
-    static inline const std::string & getPlatform()    { return platform;      } ///< Get platform name.
+    static inline const std::vector<std::string> & getPlatform() { return platform;} ///< Get platform name.
 
     static inline const Address & getServerAddress() { return serveraddress; }
 
@@ -176,6 +178,8 @@ private:
     static bool m_verbose_mode;     ///< Application verbose mode
     static bool m_solveservername;  ///< Whether to solve server name
     static bool m_server;           ///< Whether the it is a server
+	static std::vector<std::string> m_config_files;
+	static std::string m_config_data;
 
    static std::vector<std::string> cmdarguments;
    static std::vector<std::string> cmdarguments_usagearg;
@@ -185,7 +189,7 @@ private:
    static void initCommandArguments( int argc = 0, char** argv = NULL); ///< Initialize command arguments
    static void printUsage(); ///< Output command usage
    static void load();
-   static bool load( const std::string & filename, bool Verbose);
+   static void loadFile( const std::string & i_filename);
 	static void getVars( const JSON & i_obj);
    static bool init();
 
@@ -218,7 +222,7 @@ private:
 /// Render host name
    static std::string hostname;
 /// Platform:
-   static std::string platform;
+   static std::vector<std::string> platform;
 
    static int filenamesizemax;
    static int afnode_logs_rotate;
