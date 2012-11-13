@@ -94,7 +94,7 @@ You can upgrade only one client to check changes, the is no need to update all c
 	AfWatch GUI turning will be reset.
 	<br/>
 	<span style="color:darkred;font-weight:bold">
-		You should rewrite all config files.
+		You should reconfigure Afanasy.
 	</span>
 </p>
 <p>
@@ -120,7 +120,7 @@ You can upgrade only one client to check changes, the is no need to update all c
 </p>
 <p>
 	Afanasy on start-up reads CGRU config file and does not tries to find some specific config itself.
-	CRGU config file simple includes Afanasy specific config file.
+	CGRU config file simple includes Afanasy specific config file.
 	All Afanasy specific parameters has "af_" prefix now.
 </p>
 <p>
@@ -137,7 +137,7 @@ You can upgrade only one client to check changes, the is no need to update all c
 <p>
 	All Python applications with GUI in CGRU can use and PySide and PyQt.
 	At first PySide will be tried to import and than PyQt.
-	It means that if you have PySide instaled it will be used.
+	It means that if you have PySide installed it will be used.
 	PySide has LGPL license, PyQt - only GPL.
 	So now <b>all components in CGRU has LGPL license</b> or similar.
 </p>
@@ -225,7 +225,7 @@ Render hosts (farm) should be updated too to recognize such options, as not only
 
 <p>
 API is based on <a href="../afanasy/doc/json.html">JSON</a> now.
-Python API is the same but no binary module needed, it communicates with server itself by json build-in module.
+Python API is the same but no binary module needed, it communicates with server itself by JSON build-in module.
 (All Python API is written on Python language, not on Python C API.)
 You can communicate with Afanasy server within any language/script that can create JSON structures.
 (No libafanasy needed to send and get data, all possible linking problems are in the past.)
