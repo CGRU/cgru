@@ -89,7 +89,7 @@ function g_ProcessMsg( obj)
 	}
 	if( obj.task_exec )
 	{
-		g_ShowObject( obj.task_exec);
+		g_ShowTask( obj.task_exec);
 		return;
 	}
 
@@ -180,6 +180,7 @@ function g_Deregistered()
 	document.getElementById('registered').textContent = 'Deregistered';
 	document.getElementById('id').textContent = g_id;
 	document.getElementById('uid').textContent = g_uid;
+	g_CloseAllWindows();
 	g_CloseAllMonitors();
 	g_RegisterSend();
 }
@@ -200,20 +201,30 @@ function g_CGRUConfigRecieved( i_obj)
 		g_Error('Invalid config recieved.');
 		return;
 	}
-	for( var i = 0; i < i_obj.length; i++)
-	{
-		obj = i_obj[i].cgru_config;
-		if( obj == null )
-			continue;
 
-		for( var attr in obj)
+	for( var i = 0; i < i_obj.length; i++)
+		g_CGRUConfigJoin( i_obj[i].cgru_config);
+}
+
+function g_CGRUConfigJoin( i_obj)
+{
+	if( i_obj == null )
+		return;
+
+	for( var attr in i_obj)
+	{
+		if( attr.length < 1 ) continue;
+		if( attr.charAt(0) == '-') continue;
+		if( attr.charAt(0) == ' ') continue;
+		if( attr == 'include') continue;
+		if( attr.indexOf('OS_') == 0 )
 		{
-			if( attr.length < 1 ) continue;
-			if( attr.charAt(0) == '-') continue;
-			if( attr.charAt(0) == ' ') continue;
-			if( attr == 'include') continue;
-			g_CGRUConfig[attr] = obj[attr];
+			for( var i = 0; i < g_platform.length; i++)
+				if( attr == ('OS_'+g_platform[i]))
+					g_CGRUConfigJoin( i_obj[attr]);
+			continue;
 		}
+		g_CGRUConfig[attr] = i_obj[attr];
 	}
 }
 
@@ -679,3 +690,46 @@ function g_SuperUserProcessGUI()
 	}
 }
 
+function g_ShowTask( i_obj)
+{
+	var title = i_obj.name;
+	var wnd = g_OpenWindow( title, title);
+	if( wnd == null ) return;
+	var doc = wnd.document;
+	var obj_str = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp');
+	doc.body.classList.add('task_exec');
+	doc.write('<div><i>Name:</i> <b>'+i_obj.name+'</b></div>');
+	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
+	doc.write('<div><i>Working Directory:</i></div>');
+	doc.write('<div class="param">'+i_obj.working_directory+'</div>');
+	doc.write('<div><i>Command:</i></div>');
+	doc.write('<div class="param">'+i_obj.command+'</div>');
+	doc.write('<div><i>Files:</i></div>');
+
+	var files = i_obj.files.split(';');
+	for( var f = 0; f < files.length; f++)
+	{
+		var elFileBlock = doc.createElement('div');
+		doc.body.appendChild( elFileBlock);
+
+		var elFileOrig = doc.createElement('div');
+		elFileBlock.appendChild( elFileOrig);
+		elFileOrig.textContent = files[f];
+		elFileOrig.classList.add('param');
+
+		var cmds = g_CGRUConfig.previewcmds;
+		for( var c = 0; c < cmds.length; c++ )
+		{
+			cmd = cmds[c];
+			cmd = cmd.replace('@ARG@', files[f]);
+
+			var elPreview = doc.createElement('div');
+			elFileBlock.appendChild( elPreview);
+			elPreview.textContent = cmd;
+		}
+	}
+
+	doc.write('<div>Raw Object:</div><div class="task_data">');
+	doc.write( obj_str.replace(/\n/g,'<br/>'));
+	doc.write('</div>');
+}

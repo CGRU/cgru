@@ -415,3 +415,16 @@ text-shadow: 0px 0px 1px #000, 0px 0px 2px #000, 0px 0px 4px #000;
 .su_visor { background: #FF8;}
 .su_god   { background: #EFF;}
 
+.task_exec div {
+/*border: 1px solid #000;*/
+margin: 12px 4px;
+}
+.task_exec b, .task_exec .param, .task_exec .task_data {
+border-radius: 4px;
+box-shadow: 0px 0px 3px #555 inset;
+margin: 6px;
+padding: 4px 8px;
+}
+.task_exec .param {
+font-weight: bold;
+}
