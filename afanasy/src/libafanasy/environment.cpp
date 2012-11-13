@@ -158,93 +158,94 @@ void Environment::getVars( const JSON & i_obj)
 		return;
 	}
 
-	getVar( i_obj, af::Msg::Magic,                    "magic_number"                      );
-	getVar( i_obj, magic_mode,                        "magic_mode"                        );
-
 	getVar( i_obj, filenamesizemax,                   "filenamesizemax"                   );
-	getVar( i_obj, afnode_log_lines_max,              "afnode_log_lines_max"              );
-	getVar( i_obj, afnode_logs_rotate,                "afnode_logs_rotate"                );
 	getVar( i_obj, timeformat,                        "timeformat"                        );
-	getVar( i_obj, priority,                          "priority"                          );
-	getVar( i_obj, maxrunningtasks,                   "maxrunningtasks"                   );
-
-	getVar( i_obj, servername,                        "servername"                        );
-	getVar( i_obj, serveripmask,                      "serveripmask"                      );
-	getVar( i_obj, serverport,                        "serverport"                        );
-	getVar( i_obj, clientport,                        "clientport"                        );
-
-	getVar( i_obj, tempdirectory,                     "tempdirectory"                     );
-
-	getVar( i_obj, db_conninfo,                       "db_conninfo"                       );
-	getVar( i_obj, db_stringquotes,                   "db_stringquotes"                   );
-	getVar( i_obj, db_stringnamelen,                  "db_stringnamelen"                  );
-	getVar( i_obj, db_stringexprlen,                  "db_stringexprlen"                  );
-
-	getVar( i_obj, server_so_rcvtimeo_sec,            "server_so_rcvtimeo_sec"            );
-	getVar( i_obj, server_so_sndtimeo_sec,            "server_so_sndtimeo_sec"            );
-
-	getVar( i_obj, task_default_capacity,             "task_default_capacity"             );
-	getVar( i_obj, task_update_timeout,               "task_update_timeout"               );
-	getVar( i_obj, task_log_linesmax,                 "task_log_linesmax"                 );
-
-	getVar( i_obj, cmd_shell,                         "cmd_shell"                         );
-	getVar( i_obj, render_default_capacity,           "render_default_capacity"           );
-	getVar( i_obj, render_default_maxtasks,           "render_default_maxtasks"           );
-	getVar( i_obj, render_exec,                       "render_exec"                       );
-	getVar( i_obj, render_cmd_reboot,                 "render_cmd_reboot"                 );
-	getVar( i_obj, render_cmd_shutdown,               "render_cmd_shutdown"               );
-	getVar( i_obj, render_cmd_wolsleep,               "render_cmd_wolsleep"               );
-	getVar( i_obj, render_cmd_wolwake,                "render_cmd_wolwake"                );
-	getVar( i_obj, render_hddspace_path,              "render_hddspace_path"              );
-	getVar( i_obj, render_networkif,                  "render_networkif"                  );
-	getVar( i_obj, render_iostat_device,              "render_iostat_device"              );
-	getVar( i_obj, render_resclasses,                 "render_resclasses"                 );
-	getVar( i_obj, render_nice,                       "render_nice"                       );
-	getVar( i_obj, render_update_sec,                 "render_update_sec"                 );
-	getVar( i_obj, render_updatetaskperiod,           "render_updatetaskperiod"           );
-	getVar( i_obj, render_zombietime,                 "render_zombietime"                 );
-	getVar( i_obj, render_connectretries,             "render_connectretries"             );
-	getVar( i_obj, render_waitforconnected,           "render_waitforconnected"           );
-	getVar( i_obj, render_waitforreadyread,           "render_waitforreadyread"           );
-	getVar( i_obj, render_waitforbyteswritten,        "render_waitforbyteswritten"        );
-
 	getVar( i_obj, previewcmds,                       "previewcmds"                       );
-	getVar( i_obj, rendercmds,                        "rendercmds"                        );
-	getVar( i_obj, rendercmds_admin,                  "rendercmds_admin"                  );
-	getVar( i_obj, watch_refreshinterval,             "watch_refreshinterval"             );
-	getVar( i_obj, watch_connectretries,              "watch_connectretries"              );
-	getVar( i_obj, watch_waitforconnected,            "watch_waitforconnected"            );
-	getVar( i_obj, watch_waitforreadyread,            "watch_waitforreadyread"            );
-	getVar( i_obj, watch_waitforbyteswritten,         "watch_waitforbyteswritten"         );
+	getVar( i_obj, cmd_shell,                         "cmd_shell"                         );
 
 	getVar( i_obj, pswd_visor,                        "pswd_visor"                        );
 	getVar( i_obj, pswd_god,                          "pswd_god"                          );
 
-	getVar( i_obj, errors_forgivetime,                "errors_forgivetime"                );
-	getVar( i_obj, errors_avoid_host,                 "errors_avoid_host"                 );
-	getVar( i_obj, task_error_retries,                "task_error_retries"                );
-	getVar( i_obj, task_errors_same_host,             "task_errors_same_host"             );
+	getVar( i_obj, af::Msg::Magic,                    "af_magic_number"                      );
+	getVar( i_obj, magic_mode,                        "af_magic_mode"                        );
 
-	getVar( i_obj, sysjob_tasklife,                   "sysjob_tasklife"                   );
-	getVar( i_obj, sysjob_tasksmax,                   "sysjob_tasksmax"                   );
-	getVar( i_obj, sysjob_postcmd_service,            "sysjob_postcmd_service"            );
-	getVar( i_obj, sysjob_wol_service,                "sysjob_wol_service"                );
+	getVar( i_obj, afnode_log_lines_max,              "af_node_log_lines_max"              );
+	getVar( i_obj, afnode_logs_rotate,                "af_node_logs_rotate"                );
+	getVar( i_obj, priority,                          "af_priority"                          );
+	getVar( i_obj, maxrunningtasks,                   "af_maxrunningtasks"                   );
 
-	getVar( i_obj, user_zombietime,                   "user_zombietime"                   );
+	getVar( i_obj, servername,                        "af_servername"                        );
+	getVar( i_obj, serveripmask,                      "af_serveripmask"                      );
+	getVar( i_obj, serverport,                        "af_serverport"                        );
+	getVar( i_obj, clientport,                        "af_clientport"                        );
 
-	getVar( i_obj, talk_updateperiod,                 "talk_updateperiod"                 );
-	getVar( i_obj, talk_zombietime,                   "talk_zombietime"                   );
-	getVar( i_obj, talk_connectretries,               "talk_connectretries"               );
-	getVar( i_obj, talk_waitforconnected,             "talk_waitforconnected"             );
-	getVar( i_obj, talk_waitforreadyread,             "talk_waitforreadyread"             );
-	getVar( i_obj, talk_waitforbyteswritten,          "talk_waitforbyteswritten"          );
+	getVar( i_obj, tempdirectory,                     "af_tempdirectory"                     );
 
-	getVar( i_obj, monitor_updateperiod,              "monitor_updateperiod"              );
-	getVar( i_obj, monitor_zombietime,                "monitor_zombietime"                );
-	getVar( i_obj, monitor_connectretries,            "monitor_connectretries"            );
-	getVar( i_obj, monitor_waitforconnected,          "monitor_waitforconnected"          );
-	getVar( i_obj, monitor_waitforreadyread,          "monitor_waitforreadyread"          );
-	getVar( i_obj, monitor_waitforbyteswritten,       "monitor_waitforbyteswritten"       );
+	getVar( i_obj, db_conninfo,                       "af_db_conninfo"                       );
+	getVar( i_obj, db_stringquotes,                   "af_db_stringquotes"                   );
+	getVar( i_obj, db_stringnamelen,                  "af_db_stringnamelen"                  );
+	getVar( i_obj, db_stringexprlen,                  "af_db_stringexprlen"                  );
+
+	getVar( i_obj, server_so_rcvtimeo_sec,            "af_server_so_rcvtimeo_sec"            );
+	getVar( i_obj, server_so_sndtimeo_sec,            "af_server_so_sndtimeo_sec"            );
+
+	getVar( i_obj, task_default_capacity,             "af_task_default_capacity"             );
+	getVar( i_obj, task_update_timeout,               "af_task_update_timeout"               );
+	getVar( i_obj, task_log_linesmax,                 "af_task_log_linesmax"                 );
+
+	getVar( i_obj, render_default_capacity,           "af_render_default_capacity"           );
+	getVar( i_obj, render_default_maxtasks,           "af_render_default_maxtasks"           );
+	getVar( i_obj, render_exec,                       "af_render_exec"                       );
+	getVar( i_obj, render_cmd_reboot,                 "af_render_cmd_reboot"                 );
+	getVar( i_obj, render_cmd_shutdown,               "af_render_cmd_shutdown"               );
+	getVar( i_obj, render_cmd_wolsleep,               "af_render_cmd_wolsleep"               );
+	getVar( i_obj, render_cmd_wolwake,                "af_render_cmd_wolwake"                );
+	getVar( i_obj, render_hddspace_path,              "af_render_hddspace_path"              );
+	getVar( i_obj, render_networkif,                  "af_render_networkif"                  );
+	getVar( i_obj, render_iostat_device,              "af_render_iostat_device"              );
+	getVar( i_obj, render_resclasses,                 "af_render_resclasses"                 );
+	getVar( i_obj, render_nice,                       "af_render_nice"                       );
+	getVar( i_obj, render_update_sec,                 "af_render_update_sec"                 );
+	getVar( i_obj, render_updatetaskperiod,           "af_render_updatetaskperiod"           );
+	getVar( i_obj, render_zombietime,                 "af_render_zombietime"                 );
+	getVar( i_obj, render_connectretries,             "af_render_connectretries"             );
+	getVar( i_obj, render_waitforconnected,           "af_render_waitforconnected"           );
+	getVar( i_obj, render_waitforreadyread,           "af_render_waitforreadyread"           );
+	getVar( i_obj, render_waitforbyteswritten,        "af_render_waitforbyteswritten"        );
+
+	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
+	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );
+	getVar( i_obj, watch_refreshinterval,             "af_watch_refreshinterval"             );
+	getVar( i_obj, watch_connectretries,              "af_watch_connectretries"              );
+	getVar( i_obj, watch_waitforconnected,            "af_watch_waitforconnected"            );
+	getVar( i_obj, watch_waitforreadyread,            "af_watch_waitforreadyread"            );
+	getVar( i_obj, watch_waitforbyteswritten,         "af_watch_waitforbyteswritten"         );
+
+	getVar( i_obj, errors_forgivetime,                "af_errors_forgivetime"                );
+	getVar( i_obj, errors_avoid_host,                 "af_errors_avoid_host"                 );
+	getVar( i_obj, task_error_retries,                "af_task_error_retries"                );
+	getVar( i_obj, task_errors_same_host,             "af_task_errors_same_host"             );
+
+	getVar( i_obj, sysjob_tasklife,                   "af_sysjob_tasklife"                   );
+	getVar( i_obj, sysjob_tasksmax,                   "af_sysjob_tasksmax"                   );
+	getVar( i_obj, sysjob_postcmd_service,            "af_sysjob_postcmd_service"            );
+	getVar( i_obj, sysjob_wol_service,                "af_sysjob_wol_service"                );
+
+	getVar( i_obj, user_zombietime,                   "af_user_zombietime"                   );
+
+	getVar( i_obj, talk_updateperiod,                 "af_talk_updateperiod"                 );
+	getVar( i_obj, talk_zombietime,                   "af_talk_zombietime"                   );
+	getVar( i_obj, talk_connectretries,               "af_talk_connectretries"               );
+	getVar( i_obj, talk_waitforconnected,             "af_talk_waitforconnected"             );
+	getVar( i_obj, talk_waitforreadyread,             "af_talk_waitforreadyread"             );
+	getVar( i_obj, talk_waitforbyteswritten,          "af_talk_waitforbyteswritten"          );
+
+	getVar( i_obj, monitor_updateperiod,              "af_monitor_updateperiod"              );
+	getVar( i_obj, monitor_zombietime,                "af_monitor_zombietime"                );
+	getVar( i_obj, monitor_connectretries,            "af_monitor_connectretries"            );
+	getVar( i_obj, monitor_waitforconnected,          "af_monitor_waitforconnected"          );
+	getVar( i_obj, monitor_waitforreadyread,          "af_monitor_waitforreadyread"          );
+	getVar( i_obj, monitor_waitforbyteswritten,       "af_monitor_waitforbyteswritten"       );
 }
 
 bool Environment::getVar( const JSON & i_obj, std::string & o_value, const char * i_name)
@@ -476,7 +477,7 @@ void Environment::load()
 	int pos = 0;
 	for(;;)
 	{
-		pos = m_config_data.find("\"magic_number\"", pos);
+		pos = m_config_data.find("\"af_magic_number\"", pos);
 		if( pos == -1 ) break;
 
 		int pos_b = m_config_data.find(",", pos);

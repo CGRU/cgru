@@ -38,8 +38,8 @@ color: #D00000;
 .biglink {
 display: block;
 text-align: center;
-margin: 5px;
-padding: 10px;
+margin: 4px;
+padding: 8px;
 overflow: hidden;
 border-radius: 5px;
 -o-transition: all 1s ease-in-out;

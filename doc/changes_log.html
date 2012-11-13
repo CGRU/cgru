@@ -85,6 +85,54 @@ You can upgrade only one client to check changes, the is no need to update all c
 <br/>
 
 
+<p><a id="release167"><b>1.6.7</b></a> 2012.11.13</p>
+<p>
+	All CGRU config files moved to JSON.
+	It refers to any Afanasy configuration, farm setup, paths map.
+	XML is removed from the project at all.
+	Any XML config file will not works.
+	AfWatch GUI turning will be reset.
+	<br/>
+	<span style="color:darkred;font-weight:bold">
+		You should rewrite all config files.
+	</span>
+</p>
+<p>
+	Afanasy user 'home' configuration files moved to <kbd>HOME/.cgru</kbd> from <kbd>HOME/.afanasy</kbd>.
+</p>
+<p>
+	One config file can include another file(s).
+	Specify a files to be included in "include" string array.
+	All include files will be included after all file will be read (not like include directive in most common program languages).
+	This is done to override file contents.
+	Any next occurrence of a variable with the same name will override previous value.
+</p>
+	Config file can have OS specific section.
+	So you can setup different OS-es configs in the same file.
+<p>
+	Paths map setup moved to common config files.
+	And you can setup paths map for all OS-es in the same file.
+</p>
+<p>
+	Some general config parameters, as time format, maximum file name length, command shell, preview commands,
+	moved from Afanasy specific config to global CGRU config.
+	As they can be used later by other CGRU tools.
+</p>
+<p>
+	Afanasy on start-up reads CGRU config file and does not tries to find some specific config itself.
+	CRGU config file simple includes Afanasy specific config file.
+	All Afanasy specific parameters has "af_" prefix now.
+</p>
+<p>
+	Bugs Fixed:
+</p>
+<p>
+</p>
+
+
+<br/>
+
+
 <p><a id="release166"><b>1.6.6</b></a> 2012.09.26</p>
 <p>
 	All Python applications with GUI in CGRU can use and PySide and PyQt.

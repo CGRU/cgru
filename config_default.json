@@ -9,16 +9,22 @@
 	"":"'OS_linux': Linix specific settings",
 	"":"'OS_macosx': MacOSX specific settings",
 
-
+	"OS_unix":{
+		"cmd_shell":"/bin/sh -c"
+	},
 	"OS_windows":{
+		"cmd_shell":"cmd.exe /c",
+
 			"":"This is a paths map example (disabled)",
 			"":"Client:Server",
-		"pathsmap":[
+		"-pathsmap":[
 			["//server/projects/","/mnt/prj/"]
 		],
 			"":"Client slashes direction plays no role, as it tries both slashes when searchs a path to replace.",
 			"":"But will replace with specified slashes, if unix slashes not forced (for Nuke, for example)."
 	},
+
+	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],
 
 	"docs_host":"localhost",
 
@@ -29,6 +35,8 @@
 
 	"filenamesizemax":250,
 
+	"pswd_visor":"1832116180fdc61b64fd978401e462e9",
+	"pswd_god":"73bcaaa458bff0d27989ed331b68b64d",
 
 	"":""
 }}
