@@ -5,7 +5,7 @@ if exist Backup rd /s /q Backup
 
 cd Scenes
 For /F "Tokens=*" %%I in ('dir /b') Do if not "%%I" == "scene.scn" del "%%I"
-git checkout scene.scn
+call git checkout scene.scn
 cd ..
 
 cd system

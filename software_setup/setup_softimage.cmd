@@ -4,7 +4,7 @@ call %CGRU_LOCATION%\software_setup\setup__all.cmd
 set XSI_CGRU_PATH=%CGRU_LOCATION%\plugins\xsi
 set XSI_AF_PATH=%AF_ROOT%\plugins\xsi
 
-set XSI_LOCATION=C:\Program Files\Autodesk\Softimage 2013\Application
+set XSI_LOCATION=C:\Program Files\Autodesk\Softimage 2013 SP1\Application
 
 if defined XSI_PLUGINS (
    set XSI_PLUGINS=%XSI_CGRU_PATH%;%XSI_PLUGINS%
