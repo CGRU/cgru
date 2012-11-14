@@ -8,11 +8,11 @@ import sys
 import time
 
 import cgruconfig
+import cgrupathmap
 import afnetwork
 import services
 
-from afpathmap import PathMap
-pathmap = PathMap()
+Pathmap = cgrupathmap.PathMap()
 
 def checkRegExp( pattern):
 	result = True
@@ -40,11 +40,11 @@ class Task:
 		if name != '': self.data["name"] = name
 
 	def setCommand( self, command, TransferToServer = True):
-		if TransferToServer: command = pathmap.toServer( command)
+		if TransferToServer: command = Pathmap.toServer( command)
 		self.data["command"] = command
 
 	def setFiles( self, files, TransferToServer = True):
-		if TransferToServer: files = pathmap.toServer( files)
+		if TransferToServer: files = Pathmap.toServer( files)
 		self.data["files"] = files
 
 class Block:
@@ -52,7 +52,7 @@ class Block:
 		self.data = dict()
 		self.data["name"] = blockname
 		self.data["capacity"] = int( cgruconfig.VARS['af_task_default_capacity'])
-		self.data['working_directory'] = pathmap.toServer( os.getenv('PWD', os.getcwd()))
+		self.data['working_directory'] = Pathmap.toServer( os.getenv('PWD', os.getcwd()))
 		self.tasks = []
 		if self.setService( service):
 			__import__("services", globals(), locals(), [self.data["service"]])
@@ -105,24 +105,24 @@ class Block:
 			self.data["capacity_coeff_max"] = capacity_coeff_max
 
 	def setWorkingDirectory( self, working_directory, TransferToServer = True):
-		if TransferToServer: working_directory = pathmap.toServer( working_directory)
+		if TransferToServer: working_directory = Pathmap.toServer( working_directory)
 		self.data["working_directory"] = working_directory
 
 	def setCommand( self, command, prefix = True, TransferToServer = True):
 		if prefix: command = os.getenv('AF_CMD_PREFIX', cgruconfig.VARS['af_cmdprefix']) + command
-		if TransferToServer: command = pathmap.toServer( command)
+		if TransferToServer: command = Pathmap.toServer( command)
 		self.data["command"] = command
 
 	def setCmdPre(  self, command_pre, TransferToServer = True):
-		if TransferToServer: command_pre = pathmap.toServer( command_pre)
+		if TransferToServer: command_pre = Pathmap.toServer( command_pre)
 		self.data["command_pre"] = command_pre
 
 	def setCmdPost( self, command_post, TransferToServer = True):
-		if TransferToServer: command_post = pathmap.toServer( command_post)
+		if TransferToServer: command_post = Pathmap.toServer( command_post)
 		self.data["command_post"] = command_post
 
 	def setFiles(  self, files, TransferToServer = True):
-		if TransferToServer: files = pathmap.toServer( files)
+		if TransferToServer: files = Pathmap.toServer( files)
 		self.data["files"] = files
 
 	def setName(               self, value): self.data["name"] = value
@@ -186,11 +186,11 @@ class Job:
 		self.data["priority"] = priority
 
 	def setCmdPre(  self, command, TransferToServer = True):
-		if TransferToServer: command = pathmap.toServer( command)
+		if TransferToServer: command = Pathmap.toServer( command)
 		self.data["command_pre"] = command
 
 	def setCmdPost( self, command, TransferToServer = True):
-		if TransferToServer: command = pathmap.toServer( command)
+		if TransferToServer: command = Pathmap.toServer( command)
 		self.data["command_post"] = command
 
 	def fillBlocks( self):

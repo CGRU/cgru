@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import afpathmap
+import cgrupathmap
 
 str_capacity = '@AF_CAPACITY@'
 str_hosts = '@AF_HOSTS@'
@@ -16,7 +16,7 @@ class service:
       self.hosts = hosts
       self.files = files
 
-      self.pm = afpathmap.PathMap()
+      self.pm = cgrupathmap.PathMap()
 
       self.str_capacity = str_capacity
       self.str_hosts = str_hosts

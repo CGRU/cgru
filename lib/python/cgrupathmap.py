@@ -8,7 +8,7 @@ import cgruutils
 
 #PathSeparators = ' ";=,\''
 PathSeparators = ' ";=,\':'
-#if sys.platform.find('win') != 0: PathSeparators += ':'
+#if 'unix' in cgruconfig.VARS['platform']: PathSeparators += ':'
 
 def findPathEnd( path):
 	position = 0
@@ -43,7 +43,7 @@ def findSeparator( path):
 #    print('Separator for "%s" = "%s"' % ( path, sep))
 	return sep
 
-def replaceSeperators( path, path_from, path_to):
+def replaceSeparators( path, path_from, path_to):
 	newpath = path
 	sep_from = findSeparator( path_from)
 	sep_to    = findSeparator( path_to)
@@ -87,13 +87,8 @@ class PathMap:
 			if len( pair) != 2:
 				print('ERROR: Pathmap is not a pair.')
 				return
-			path_client = pair[0]
-			path_server = pair[1]
-			if sys.platform.find('win') == 0:
-				path_client = path_client.lower()
-			if self.UnixSeparators:
-				path_client = path_client.replace('\\','/')
-				path_server = path_server.replace('\\','/')
+			path_client = pair[0].replace('\\','/')
+			path_server = pair[1].replace('\\','/')
 			self.PathClient.append( path_client)
 			self.PathServer.append( path_server)
 			self.initialized = True
@@ -127,25 +122,27 @@ class PathMap:
 				else:
 					path_from = self.PathServer[i]
 					path_to   = self.PathClient[i]
+
 				pathfounded = False
-				if sys.platform.find('win') == 0 and toserver:
+
+				if 'windows' in cgruconfig.VARS['platform'] and toserver:
 					path_search = path_search.lower()
-					path_search = path_search.replace('/','\\')
-					if path_search.find(path_from) == 0:
-						pathfounded = True
-					else:
-						path_search = path_search.replace('\\','/')
-						if path_search.find(path_from) == 0:
-							pathfounded = True
+					path_from = path_from.replace('/','\\').lower()
+
+				if path_search.find( path_from) == 0:
+					pathfounded = True
 				else:
-#                    print('finding "%s" in "%s"' % (path_from,path_search))
-					if path_search.find(path_from) == 0:
+					path_from = path_from.replace('\\','/')
+					if path_search.find( path_from) == 0:
 						pathfounded = True
+
 				if pathfounded:
 					part1 = newpath[:position]
 					part2 = newpath[position+len(path_from):]
 					if not self.UnixSeparators:
-						part2 = replaceSeperators( part2, path_from, path_to)
+						if 'windows' in cgruconfig.VARS['platform'] and not toserver:
+							path_to = path_to.replace('/','\\')
+					part2 = replaceSeparators( part2, path_from, path_to)
 					newpath = part1 + path_to + part2
 					position = len(part1 + path_to)
 					newpath = part1 + path_to + part2
@@ -154,6 +151,7 @@ class PathMap:
 						print(path)
 						print(newpath)
 					break
+
 			old_position = position
 			position = findNextPosition( position, newpath)
 			if position != -1 and position <= old_position:
@@ -163,6 +161,7 @@ class PathMap:
 			if cycle > maxcycles:
 				print('Path translation error: Cycle > maxcycles (%d>%d).' % (cycle, maxcycles))
 				break
+
 		return newpath
 
 	def toServer( self, path, Verbose = False): return self.translatePath( path, True , Verbose)
