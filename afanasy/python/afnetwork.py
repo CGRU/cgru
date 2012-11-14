@@ -12,7 +12,7 @@ AF_SENDERID=0
 
 def genHeader( data_size):
 	data = '[ * AFANASY * ]'
-	data += ' ' + str(int(cgruconfig.VARS['magic_number']))
+	data += ' ' + str(int(cgruconfig.VARS['af_magic_number']))
 	data += ' ' + str(AF_SENDERID)
 	data += ' ' + str(data_size)
 	data += ' JSON'
@@ -26,8 +26,8 @@ def sendServer( data, receive = True, verbose = False):
 	datalen = len(data)
 	#return True, None
 
-	host = cgruconfig.VARS['servername']
-	port = cgruconfig.VARS['serverport']
+	host = cgruconfig.VARS['af_servername']
+	port = cgruconfig.VARS['af_serverport']
 
 	s = None
 	err_msg = ''

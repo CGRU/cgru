@@ -51,7 +51,7 @@ class Block:
 	def __init__( self, blockname = 'block', service = 'generic'):
 		self.data = dict()
 		self.data["name"] = blockname
-		self.data["capacity"] = int( cgruconfig.VARS['task_default_capacity'])
+		self.data["capacity"] = int( cgruconfig.VARS['af_task_default_capacity'])
 		self.data['working_directory'] = pathmap.toServer( os.getenv('PWD', os.getcwd()))
 		self.tasks = []
 		if self.setService( service):
@@ -109,7 +109,7 @@ class Block:
 		self.data["working_directory"] = working_directory
 
 	def setCommand( self, command, prefix = True, TransferToServer = True):
-		if prefix: command = os.getenv('AF_CMD_PREFIX', cgruconfig.VARS['cmdprefix']) + command
+		if prefix: command = os.getenv('AF_CMD_PREFIX', cgruconfig.VARS['af_cmdprefix']) + command
 		if TransferToServer: command = pathmap.toServer( command)
 		self.data["command"] = command
 
@@ -165,7 +165,7 @@ class Job:
 		self.data["name"] = "noname"
 		self.data["user_name"] = cgruconfig.VARS['USERNAME']
 		self.data["host_name"] = cgruconfig.VARS['HOSTNAME']
-		self.data["priority"]  = cgruconfig.VARS['priority']
+		self.data["priority"]  = cgruconfig.VARS['af_priority']
 		self.data["time_creation"] = int(time.time())
 		self.setName( jobname)
 		self.blocks = []

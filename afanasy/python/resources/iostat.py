@@ -1,12 +1,12 @@
 import resbase
 
-import afenv
+import cgruconfig
 
 import re
 import os
 import subprocess
 
-ENV_KEY='render_customiostat_devices'
+ENV_KEY='af_render_customiostat_devices'
 ENV_VAR='AF_CUSTOMIOSTAT_DEVICES'
 DEFAULT_DEVICE='sda'
 
@@ -25,7 +25,7 @@ class iostat(resbase.resbase):
       self.value = 0
 
       self.device = DEFAULT_DEVICE
-      if ENV_KEY in afenv.VARS: self.device = afenv.VARS[ENV_KEY]
+      if ENV_KEY in cgruconfig.VARS: self.device = cgruconfig.VARS[ENV_KEY]
       self.device = os.getenv('AF_IOSTAT_DEVICE', self.device)
       print 'Python IO Stat Device = "%s"' % self.device
       self.regexp = re.compile(self.device)
