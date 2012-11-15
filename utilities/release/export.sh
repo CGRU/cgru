@@ -94,6 +94,8 @@ rcopy plugins/maya/icons $dest/plugins/maya
 rcopy plugins/maya/mel $dest/plugins/maya
 [ -d plugins/maya/mll ] && rcopy plugins/maya/mll $dest/plugins/maya
 
+cp -fpv afanasy/config.json $dest/afanasy/config.json 
+
 CGRU_VERSION=`cat version.txt`
 cd utilities
 source ./getrevision.sh $cgru
