@@ -2,7 +2,7 @@ import os, sys
 import shutil
 import socket
 
-from afpathmap import PathMap
+from cgrupathmap import PathMap
 
 import nuke
 

@@ -87,8 +87,8 @@ else: errorExit('Error creating temp directory.', False)
 
 # Transfer scene paths:
 if not options.nopathsmap:
-	afpathmap = __import__('afpathmap', globals(), locals(), [])
-	pm = afpathmap.PathMap( UnixSeparators = True, Verbose = True)
+	cgrupathmap = __import__('cgrupathmap', globals(), locals(), [])
+	pm = cgrupathmap.PathMap( UnixSeparators = True, Verbose = True)
 	if pm.initialized:
 		pmscene = os.path.basename(xscene)
 		pmscene = os.path.join( tmpdir, pmscene)

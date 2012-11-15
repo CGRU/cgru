@@ -617,8 +617,8 @@ def renderNodes( nodes, fparams, storeframes):
       return
 
 
-   afpathmap = __import__('afpathmap', globals(), locals(), [])
-   pm = afpathmap.PathMap( UnixSeparators = True, Verbose = True)
+   cgrupathmap = __import__('cgrupathmap', globals(), locals(), [])
+   pm = cgrupathmap.PathMap( UnixSeparators = True, Verbose = False)
 
    changed = nuke.modified()
    for i in range(len(jobs)):
