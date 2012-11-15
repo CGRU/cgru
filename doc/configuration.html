@@ -57,7 +57,30 @@ CGRU Keeper and AfWatch stores settings in <kbd>HOME/.cgru/config.json</kbd>.
 It is read with the same rules as the main config.
 User can use it to set its own properties and override global config settings.
 </p>
-
+<p>
+Each parameter should be preset only once in a config file.
+If there will several parameters with the same name in a same file, which will be chosen is undefined.
+Parameters order plays no role.
+Included files are read after the end of file, no matter where include line is.
+If in the next included file there will be a parameter with the same name, it value will be overridden.
+</p>
+<p>
+<a href="http://json.org">JSON syntax reference.</a> *
+</p>
+<p>
+Better to check config with <kbd>afcmd</kbd>. Just run this command with no arguments.
+On error it will output error message, position and some text around it.
+You can also view configuration in Keeper, but it can not to start on bad config at all.
+Keeper Configuration window will display result configuration and each config file contents in the order they where read (included).
+</p>
+<p>
+* There is no comments in JSON syntax. But there are ways to comment JSON files.
+For example you can create an object with no name: <br/>
+<kbd>"":"Some comment text."</kbd><br/>
+Or create an object with some unused name.
+To disable (comment) some parameter you can change it name to unused.
+For example you can just prefix name with "-".
+</p>
 
 <!--FOOTER-->
 </td></tr></table>
