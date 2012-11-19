@@ -41,7 +41,7 @@ function cm_ArrayRemove( io_arr, i_value)
 
 function cm_IdsMerge( i_ids1, i_ids2)
 {
-	o_ids = i_ids1;
+	var o_ids = i_ids1;
 	if( o_ids == null )
 		o_ids = [];
 	if(( i_ids2 != null ) && ( i_ids2.length > 0 ))
@@ -60,7 +60,7 @@ function cm_IdsMerge( i_ids1, i_ids2)
 					}
 				}
 				if( founded == false )
-					o_ids.push(i_ids[i])
+					o_ids.push( i_ids2[i])
 			}
 		}
 		else
