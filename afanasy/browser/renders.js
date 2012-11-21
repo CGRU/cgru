@@ -349,7 +349,7 @@ RenderNode.actions.push(['context', 'full',      null, 'menuHandleGet',   'Full 
 RenderNode.actions.push(['context',  null]);
 RenderNode.actions.push(['context', 'nimby',     true, 'menuHandleParam', 'Set nimby']);
 RenderNode.actions.push(['context', 'NIMBY',     true, 'menuHandleParam', 'Set NIMBY']);
-RenderNode.actions.push(['context', 'nimbyOff', false, 'menuHandleParam', 'Set Free', true, 'nimby']);
+RenderNode.actions.push(['context', 'nimbyOff', false, 'menuHandleParam', 'Set Free', null, 'nimby']);
 RenderNode.actions.push(['context',  null]);
 RenderNode.actions.push(['context', 'eject_tasks',         null, 'menuHandleOperation', 'Eject Tasks']);
 RenderNode.actions.push(['context', 'eject_tasks_keep_my', null, 'menuHandleOperation', 'Eject Not My']);
