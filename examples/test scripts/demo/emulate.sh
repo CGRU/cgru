@@ -27,6 +27,10 @@ while [ ! -z "$1" ]; do
 		numtasks=$2
 		shift
 		;;
+	"pause" )
+		PauseTime=$2
+		shift
+		;;
 	"nopost" )
 		nocmdpost=1
 		;;
@@ -46,6 +50,7 @@ done
 
 echo "Jobs Pack    = $JobsPack"
 echo "Tasks Number = $numtasks"
+[ ! -z "$nocmdpost" ] && echo "No post command"
 
 # Temporary folder:
 tmpdir=/tmp/afanasy_emulate

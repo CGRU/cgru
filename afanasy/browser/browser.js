@@ -18,9 +18,6 @@ g_FooterOpened = false;
 
 g_Images = [];
 
-g_CGRUConfig = {};
-g_platform = ['unix'];
-
 function g_RegisterSend()
 {
 	if( g_id != 0)
@@ -57,7 +54,8 @@ function g_ProcessMsg( obj)
 
 	if( obj.cgru_config )
 	{
-		g_CGRUConfigRecieved( obj.cgru_config);
+		if( false == cgru_ConfigLoad( obj.cgru_config))
+			g_Error('Invalid config recieved.');
 		return;
 	}
 
@@ -124,6 +122,8 @@ function g_Refresh()
 function g_Init()
 {
 	g_Info('HTML body load.');
+	cgru_Init();
+
 	window.onbeforeunload = g_OnClose;
 	document.body.onkeydown = g_OnKeyDown;
 
@@ -133,13 +133,7 @@ function g_Init()
 	g_ConstructSettingsGUI();
 	g_InitSettings();
 
-	if( navigator.platform.indexOf('Linux') != -1 )
-		g_platform.push('linux');
-	else if( navigator.platform.indexOf('Mac') != -1 )
-		g_platform.push('macosx');
-	else if( navigator.platform.indexOf('Win') != -1 )
-		g_platform = ['windows'];
-	document.getElementById('platform').textContent = g_platform;
+	document.getElementById('platform').textContent = cgru_Platform;
 
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
@@ -192,40 +186,6 @@ function g_ConnectionLost()
 
 	g_Info('Connection Lost.');
 	g_Deregistered();
-}
-
-function g_CGRUConfigRecieved( i_obj)
-{
-	if(( i_obj.length == null ) || ( i_obj.length == 0))
-	{
-		g_Error('Invalid config recieved.');
-		return;
-	}
-
-	for( var i = 0; i < i_obj.length; i++)
-		g_CGRUConfigJoin( i_obj[i].cgru_config);
-}
-
-function g_CGRUConfigJoin( i_obj)
-{
-	if( i_obj == null )
-		return;
-
-	for( var attr in i_obj)
-	{
-		if( attr.length < 1 ) continue;
-		if( attr.charAt(0) == '-') continue;
-		if( attr.charAt(0) == ' ') continue;
-		if( attr == 'include') continue;
-		if( attr.indexOf('OS_') == 0 )
-		{
-			for( var i = 0; i < g_platform.length; i++)
-				if( attr == ('OS_'+g_platform[i]))
-					g_CGRUConfigJoin( i_obj[attr]);
-			continue;
-		}
-		g_CGRUConfig[attr] = i_obj[attr];
-	}
 }
 
 function g_MButtonClicked( i_type, i_evt)
@@ -623,7 +583,7 @@ function g_LocalStorageClear( i_name, i_value)
 	g_Info('Local Storage Cleared.');
 	g_InitSettings();
 }
-function g_CGRUConfigShow() { g_ShowObject( g_CGRUConfig);}
+function g_CGRUConfigShow() { g_ShowObject( cgru_Config);}
 
 function g_CheckSequence()
 {
@@ -702,8 +662,10 @@ function g_ShowTask( i_obj)
 	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
 	doc.write('<div><i>Working Directory:</i></div>');
 	doc.write('<div class="param">'+i_obj.working_directory+'</div>');
+	doc.write('<div class="param">'+cgru_PM(i_obj.working_directory)+'</div>');
 	doc.write('<div><i>Command:</i></div>');
 	doc.write('<div class="param">'+i_obj.command+'</div>');
+	doc.write('<div class="param">'+cgru_PM(i_obj.command)+'</div>');
 	doc.write('<div><i>Files:</i></div>');
 
 	var files = i_obj.files.split(';');
@@ -717,7 +679,7 @@ function g_ShowTask( i_obj)
 		elFileOrig.textContent = files[f];
 		elFileOrig.classList.add('param');
 
-		var cmds = g_CGRUConfig.previewcmds;
+		var cmds = cgru_Config.previewcmds;
 		for( var c = 0; c < cmds.length; c++ )
 		{
 			cmd = cmds[c];

@@ -58,21 +58,6 @@ def replaceSeparators( path, path_from, path_to):
 		newpath = part1 + part2
 	return newpath
 
-def findPathMapFiles( folder):
-	PathMapFile = 'pathmap'
-	pathmap_files = []
-	if folder is not None:
-		folder = cgruutils.toStr( folder)
-		if os.path.isdir( folder):
-			files = os.listdir( folder)
-			for afile in files:
-				afile = cgruutils.toStr( afile)
-				if afile.find( PathMapFile) != 0: continue
-				filename = os.path.join( folder, afile)
-				if not os.path.isfile( filename): continue
-				pathmap_files.append( filename)
-	return pathmap_files
-
 class PathMap:
 	def __init__( self, UnixSeparators = False, Verbose = False):
 		self.initialized = False
