@@ -656,18 +656,42 @@ function g_ShowTask( i_obj)
 	var wnd = g_OpenWindow( title, title);
 	if( wnd == null ) return;
 	var doc = wnd.document;
+
 	var obj_str = JSON.stringify( i_obj, null, '&nbsp&nbsp&nbsp&nbsp');
+	var cmd = i_obj.command;
+	var cmdPM = cgru_PM( cmd);
+	var wdir = i_obj.working_directory;
+	var wdirPM = cgru_PM( wdir);
+
 	doc.body.classList.add('task_exec');
 	doc.write('<div><i>Name:</i> <b>'+i_obj.name+'</b></div>');
 	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
-	doc.write('<div><i>Working Directory:</i></div>');
-	doc.write('<div class="param">'+i_obj.working_directory+'</div>');
-	doc.write('<div class="param">'+cgru_PM(i_obj.working_directory)+'</div>');
-	doc.write('<div><i>Command:</i></div>');
-	doc.write('<div class="param">'+i_obj.command+'</div>');
-	doc.write('<div class="param">'+cgru_PM(i_obj.command)+'</div>');
-	doc.write('<div><i>Files:</i></div>');
+	if( wdir == wdirPM )
+	{
+		doc.write('<div><i>Working Directory:</i></div>');
+		doc.write('<div class="param">'+wdir+'</div>');
+	}
+	else
+	{
+		doc.write('<div><i>Working Directory:</i></div>');
+		doc.write('<div class="param">'+wdir+'</div>');
+		doc.write('<div><i>Working Directory Client = "'+cgru_Platform+'":</i></div>');
+		doc.write('<div class="param">'+wdirPM+'</div>');
+	}
+	if( cmd == cmdPM )
+	{
+		doc.write('<div><i>Command:</i></div>');
+		doc.write('<div class="param">'+cmd+'</div>');
+	}
+	else
+	{
+		doc.write('<div><i>Command:</i></div>');
+		doc.write('<div class="param">'+cmd+'</div>');
+		doc.write('<div><i>Command Client = "'+cgru_Platform+'":</i></div>');
+		doc.write('<div class="param">'+cmdPM+'</div>');
+	}
 
+	doc.write('<div><i>Files:</i></div>');
 	var files = i_obj.files.split(';');
 	for( var f = 0; f < files.length; f++)
 	{
@@ -682,12 +706,12 @@ function g_ShowTask( i_obj)
 		var cmds = cgru_Config.previewcmds;
 		for( var c = 0; c < cmds.length; c++ )
 		{
-			cmd = cmds[c];
-			cmd = cmd.replace('@ARG@', files[f]);
+			cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, files[f]));
 
 			var elPreview = doc.createElement('div');
 			elFileBlock.appendChild( elPreview);
 			elPreview.textContent = cmd;
+			elPreview.classList.add('cmdexec');
 		}
 	}
 

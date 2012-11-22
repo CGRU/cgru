@@ -428,3 +428,10 @@ padding: 4px 8px;
 .task_exec .param {
 font-weight: bold;
 }
+.cmdexec {
+background: #DD8;
+border-radius: 4px;
+box-shadow: 0px 0px 3px #000 inset;
+padding: 4px 8px;
+font-weight: bold;
+}
