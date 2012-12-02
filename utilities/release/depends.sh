@@ -23,6 +23,10 @@ case ${DISTRIBUTIVE} in
 		export DEPENDS_AFANASY="libpq5.4"
 		export DEPENDS_CGRU="python-module-PyQt4 ImageMagick"
 		;;
+	CentOS )
+		export DEPENDS_AFANASY="postgresql-libs"
+		export DEPENDS_CGRU="PyQt4"
+		;;
 	*)
 		export DEPENDS_AFANASY="libpq5"
 		export DEPENDS_CGRU="PyQt4"
