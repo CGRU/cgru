@@ -17,8 +17,7 @@ MonitorContainer * MonitorAf::m_monitors = NULL;
 
 MonitorAf::MonitorAf( af::Msg * msg):
 	af::Monitor( msg),
-	AfNodeSrv( this),
-	m_event_nodeids( NULL)
+	AfNodeSrv( this)
 {
 }
 
@@ -26,7 +25,7 @@ MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 	AfNodeSrv( this),
 	af::Monitor( i_obj)
 {
-	m_event_nodeids = new std::list<int32_t>[af::Monitor::EventsCount];
+	m_event_nodeids.resize( af::Monitor::EventsCount);
 
 	UserContainerIt usersIt( i_users);
 	for( af::User *user = usersIt.user(); user != NULL; usersIt.next(), user = usersIt.user())
@@ -40,7 +39,6 @@ MonitorAf::MonitorAf( const JSON & i_obj, UserContainer * i_users):
 
 MonitorAf::~MonitorAf()
 {
-   if( m_event_nodeids != NULL ) delete [] m_event_nodeids;
 }
 
 void MonitorAf::refresh( time_t currentTime, AfContainer * pointer, MonitorContainer * monitoring)
@@ -291,7 +289,7 @@ void MonitorAf::delJobIds( const std::vector<int32_t> & i_ids)
 
 void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 {
-	if( m_event_nodeids == NULL)
+	if( m_event_nodeids.size() == 0)
 	{
 		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
 		return;
@@ -306,7 +304,7 @@ void MonitorAf::addEvents( int i_type, const std::list<int32_t> i_ids)
 	std::list<int32_t>::const_iterator it = i_ids.begin();
 	while( it != i_ids.end())
 	{
-		af::addUniqueToList( m_event_nodeids[i_type], *it);
+		af::addUniqueToVect( m_event_nodeids[i_type], *it);
 		it++;
 	}
 
@@ -385,7 +383,7 @@ af::Msg * MonitorAf::getEvents()
 	updateTime();
 
 	af::Msg * msg = new af::Msg();
-	if( m_event_nodeids == NULL)
+	if( false == collectingEvents())
 	{
 		AFERRAR("Monitor '%s' does not collecting events.", m_name.c_str())
 		return msg;
@@ -409,13 +407,11 @@ af::Msg * MonitorAf::getEvents()
 		stream << "\n\"" << af::Monitor::EventsNames[e] << "\":";
 		stream << "[";
 
-		std::list<int32_t>::const_iterator it = m_event_nodeids[e].begin();
-		while( it != m_event_nodeids[e].end())
+		for( int i = 0; i < m_event_nodeids[e].size(); i++)
 		{
-			if( it != m_event_nodeids[e].begin())
+			if( i )
 				stream << ",";
-			stream << *it;
-			it++;
+			stream << m_event_nodeids[e][i];
 		}
 
 		stream << "]";

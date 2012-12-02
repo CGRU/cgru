@@ -36,7 +36,7 @@ public:
 
 	static void setMonitorContainer( MonitorContainer * i_monitors) { m_monitors = i_monitors;}
 
-	inline bool collectingEvents() { return m_event_nodeids != NULL;}
+	inline bool collectingEvents() { return m_event_nodeids.size() != 0;}
 
 	void addEvents( int i_type, const std::list<int32_t> i_ids);
 
@@ -56,7 +56,7 @@ private:
    void delJobIds( const std::vector<int32_t> & i_ids);
 
 private:
-	std::list<int32_t> * m_event_nodeids;
+	std::vector<std::vector<int> > m_event_nodeids;
 
 	struct MTaskProgresses {
 		int job_id;

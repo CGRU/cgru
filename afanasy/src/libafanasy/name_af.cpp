@@ -297,6 +297,15 @@ bool af::addUniqueToList( std::list<int32_t> & o_list, int i_value)
 	return true;
 }
 
+bool af::addUniqueToVect( std::vector<int> & o_vect, int i_value)
+{
+	for( int i = 0; i < o_vect.size(); i++)
+		if( o_vect[i] == i_value)
+			return false;
+	o_vect.push_back( i_value);
+	return true;
+}
+
 int af::getReadyTaskNumber( int i_quantity, af::TaskProgress ** i_tp, int32_t flags, int i_startFrom)
 {
 //printf("af::getReadyTaskNumber:\n");
