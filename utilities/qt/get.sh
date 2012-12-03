@@ -1,6 +1,6 @@
 #!/bin/bash
 
-ver=4.8.2
+ver=4.8.4
 [ -z "$1" ] || ver=$1
 lcation="http://releases.qt-project.org/qt4/source"
 foldername="qt-everywhere-opensource-src-$ver"
