@@ -26,7 +26,8 @@
 
 	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],
 
-	"docs_host":"localhost",
+	"docs_host":"localhost/info.cgru",
+	"-docs_host":"cgru.info",
 
 	"keeper_port":50999,
 

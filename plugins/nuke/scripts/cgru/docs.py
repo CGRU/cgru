@@ -22,21 +22,5 @@ def docsCGRU():
    cgrudocs.show()
 
 def docsNuke():
-   cgru = getenv('CGRU_LOCATION')
-   if cgru is None: return
-   path = getenv('NUKE_CGRU_PATH')
-   if path is None: return
-   path = path.replace( cgru, '')
-   path = os.path.join( path, 'doc')
-   path = os.path.join( path, 'index.html')
-   cgrudocs.show( path)
+   cgrudocs.show('nuke')
 
-def docsAfanasy():
-   cgru = getenv('CGRU_LOCATION')
-   if cgru is None: return
-   path = getenv('NUKE_AF_PATH')
-   if path is None: return 
-   path = path.replace( cgru, '')
-   path = os.path.join( path, 'doc')
-   path = os.path.join( path, 'afanasy.html')
-   cgrudocs.show( path)
