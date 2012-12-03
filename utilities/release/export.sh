@@ -51,15 +51,10 @@ rcopy software_setup $dest
 rcopy start $dest
 rcopy examples $dest
 
-copy doc $dest/doc
-rcopy doc/fun $dest/doc
-rcopy doc/icons $dest/doc
-rcopy doc/images $dest/doc
-
 copy afanasy $dest/afanasy
 rcopy afanasy/bin $dest/afanasy
+rm $dest/afanasy/bin/afmonitor
 rcopy afanasy/browser $dest/afanasy
-rcopy afanasy/doc $dest/afanasy
 rcopy afanasy/icons $dest/afanasy
 rcopy afanasy/init $dest/afanasy
 rcopy afanasy/plugins $dest/afanasy
@@ -67,14 +62,6 @@ rcopy afanasy/python $dest/afanasy
 rcopy afanasy/webvisor $dest/afanasy
 
 copy utilities $dest/utilities
-rcopy utilities/doc $dest/utilities
-
-createDir $dest/utilities/release
-rcopy utilities/release/doc $dest/utilities/release
-
-createDir $dest/utilities/site
-rcopy utilities/site/doc $dest/utilities/site
-
 rcopy utilities/afstarter $dest/utilities
 rcopy utilities/keeper $dest/utilities
 rcopy utilities/moviemaker $dest/utilities
@@ -89,7 +76,6 @@ rcopy plugins/max $dest/plugins
 rcopy plugins/c4d $dest/plugins
 
 copy plugins/maya $dest/plugins/maya
-rcopy plugins/maya/doc $dest/plugins/maya
 rcopy plugins/maya/icons $dest/plugins/maya
 rcopy plugins/maya/mel $dest/plugins/maya
 [ -d plugins/maya/mll ] && rcopy plugins/maya/mll $dest/plugins/maya

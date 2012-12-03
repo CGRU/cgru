@@ -24,20 +24,14 @@ xcopy examples %dest%\examples\ /ys
 xcopy software_setup %dest%\software_setup\ /ys
 xcopy start %dest%\start\ /ys
 
-xcopy doc %dest%\doc\ /y
-xcopy doc\fun %dest%\doc\fun\ /ys
-xcopy doc\icons %dest%\doc\icons\ /ys
-xcopy doc\images %dest%\doc\images\ /ys
-
 xcopy afanasy %dest%\afanasy\ /y
 xcopy afanasy\bin %dest%\afanasy\bin\ /y
+del %dest%\afanasy\bin\afmonitor.exe
 xcopy afanasy\icons %dest%\afanasy\icons\ /ys
 xcopy afanasy\plugins %dest%\afanasy\plugins\ /ys
 xcopy afanasy\python %dest%\afanasy\python\ /ys
-xcopy afanasy\doc %dest%\afanasy\doc\ /ys
 
 xcopy utilities\ %dest%\utilities\ /y
-xcopy utilities\doc %dest%\utilities\doc\ /ys
 xcopy utilities\keeper %dest%\utilities\keeper\ /ys
 xcopy utilities\moviemaker %dest%\utilities\moviemaker\ /ys
 xcopy utilities\afstarter %dest%\utilities\afstarter\ /ys
@@ -54,7 +48,6 @@ xcopy plugins\max %dest%\plugins\max\ /ys
 xcopy plugins\c4d %dest%\plugins\c4d\ /ys
 
 xcopy plugins\maya %dest%\plugins\maya\ /y
-xcopy plugins\maya\doc %dest%\plugins\maya\doc\ /ys
 xcopy plugins\maya\icons %dest%\plugins\maya\icons\ /ys
 xcopy plugins\maya\mel %dest%\plugins\maya\mel\ /ys
 xcopy plugins\maya\mll %dest%\plugins\maya\mll\ /ys
