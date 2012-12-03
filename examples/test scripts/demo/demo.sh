@@ -22,7 +22,7 @@ sleep 1
 afcmd rpri wl0. 100
 sleep 1
 
-afcmd ruser wl00 tima
+afcmd ruser wl00 timurhai
 afcmd ruser wl01 john
 afcmd ruser wl02 bob
 afcmd ruser wl03 alex
@@ -32,7 +32,7 @@ sleep 1
 afcmd rnimby "wl0."
 afcmd rNIMBY "wl0[0\|2]"
 
-export AF_USERNAME=tima
+export AF_USERNAME=timurhai
 export AF_HOSTNAME=wl00
 python ./job.py --name BFT103.moviePAL --labels convert:encode --services movgen -n100 -t5
 python ./job.py --name BFT103.comp --labels dpx:key:back --services nuke -n100 -t5
