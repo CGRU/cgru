@@ -81,8 +81,12 @@ if fby < 1: errorExit('By frame (%(fby)d) must be grater or equal 1' % vars(), F
 if not os.path.isfile( xscene): errorExit('File "%s" not founded.' % xscene, False)
 
 # Create and check temp directory:
-tmpdir = tempfile.mkdtemp('.afrender.nuke')
-if os.path.exists( tmpdir): print('Temp directory = "%s"' % tmpdir)
+tmpdir = '/tmp'
+if sys.platform.find('win') == 0: tmpdir = os.getenv('TEMP','c:\\temp')
+tmpdir = os.path.join( tmpdir,'.afrender.nuke.'+os.path.basename(xscene)+'.'+str(os.getpid()))
+if os.path.exists( tmpdir): shutil.rmtree( tmpdir)
+os.makedirs( tmpdir)
+if os.path.isdir( tmpdir): print('Temp directory = "%s"' % tmpdir)
 else: errorExit('Error creating temp directory.', False)
 
 # Transfer scene paths:

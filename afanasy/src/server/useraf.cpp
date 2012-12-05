@@ -419,8 +419,10 @@ bool UserAf::solve( RenderAf * i_render, MonitorContainer * i_monitoring)
 
     if( m_jobslist.solve( solve_method, i_render, i_monitoring))
     {
-        // Increase running tasks counter
-        m_running_tasks_num++;
+        // Increase running tasks counter if render is online
+		// It can be online for WOL wake test
+		if( i_render->isOnline())
+	        m_running_tasks_num++;
 
         // Return true - that node was solved
         return true;

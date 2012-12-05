@@ -15,7 +15,8 @@ Host::Host():
 	m_os(""),
 	m_properties(""),
 	m_services_num(0),
-	m_wol_idlesleep_time(0)
+	m_wol_idlesleep_time(0),
+	m_idle_cpu(0)
 {
 }
 
@@ -91,6 +92,7 @@ void Host::mergeParameters( const Host & other)
 	if( other.m_data.size()      ) m_data         = other.m_data;
 
 	if( other.m_wol_idlesleep_time ) m_wol_idlesleep_time = other.m_wol_idlesleep_time;
+	if( other.m_idle_cpu ) m_idle_cpu = other.m_idle_cpu;
 }
 
 void Host::jsonWrite( std::ostringstream & o_str) const
@@ -105,6 +107,9 @@ void Host::jsonWrite( std::ostringstream & o_str) const
 		o_str << ",\"os\":\"" << m_os << "\"";
 	if( m_properties.size())
 		o_str << ",\"properties\":\"" << m_properties << "\"";
+	if( m_wol_idlesleep_time > 0 )
+		o_str << ",\"wol_idlesleep_time\":" << m_wol_idlesleep_time;
+	o_str << ",\"idle_cpu\":"  << m_idle_cpu;
 /*	if( m_resources.size())
 		o_str << ",\"resources\":\"" << m_resources << "\"";
 	if( m_data.size())
@@ -135,8 +140,9 @@ void Host::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << std::endl;
 	  stream << "   Capacity = " << m_capacity << ", Max Tasks = " << m_max_tasks << ", Power = " << m_power;
 
-	  if( m_wol_idlesleep_time )
-		 stream << "\n   WOL Sleep Idle Time = " << time2strHMS( m_wol_idlesleep_time, true );
+		if( m_wol_idlesleep_time )
+			stream << "\n   WOL Sleep Idle Time = " << time2strHMS( m_wol_idlesleep_time, true );
+		stream << "\n   Idle CPU = " << m_idle_cpu << "%";
 
    }
    else

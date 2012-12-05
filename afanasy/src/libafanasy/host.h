@@ -38,6 +38,7 @@ public:
 	std::string m_data;
 
 	int32_t m_wol_idlesleep_time;
+	int32_t m_idle_cpu;
 
     void readwrite( Msg * msg); ///< Read or write Host in message.
 

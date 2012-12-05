@@ -6,6 +6,13 @@ RenderNode.prototype.init = function()
 
 	cm_CreateStart( this);
 
+	this.elWOLIdleSleepBox = document.createElement('div');
+	this.elWOLIdleSleepBox.classList.add('wolidlesleep_box');
+	this.element.appendChild( this.elWOLIdleSleepBox);
+	this.elWOLIdleSleepBar = document.createElement('div');
+	this.elWOLIdleSleepBar.classList.add('wolidlesleep_bar');
+	this.elWOLIdleSleepBox.appendChild( this.elWOLIdleSleepBar);
+
 	this.elName = cm_ElCreateText( this.element, 'Client Host Name');
 	this.elName.classList.add('name');
 	this.elName.classList.add('prestar');
@@ -247,10 +254,31 @@ RenderNode.prototype.refresh = function()
 		if( this.params.wol_operation_time )
 			power += ' ' + cm_TimeStringInterval( this.params.wol_operation_time);
 		this.elPower.textContent = power;
+		this.elWOLIdleSleepBox.style.display = 'none';
 		return;
 	}
 
 	var stateTime = 'NEW';
+	var stateTimeTitle = 'Idle time: ' + cm_TimeStringInterval( this.params.idle_time);
+	stateTimeTitle += '\nIdle CPU < ' + this.params.host.idle_cpu + '%';
+	if( this.params.host.wol_idlesleep_time )
+	{
+		stateTimeTitle += '\nWOL idle sleep time: ' + cm_TimeStringFromSeconds( this.params.host.wol_idlesleep_time);
+		var curtime = new Date();
+		var seconds = curtime.valueOf() / 1000.0 - this.params.idle_time;
+		var percent = Math.round( 100.0 * seconds / this.params.host.wol_idlesleep_time );
+		if( percent > 100 ) percent = 100;
+		if( percent <  10 ) percent = 0;
+		this.elWOLIdleSleepBox.style.display = 'block';
+		this.elWOLIdleSleepBar.style.width = percent+'%';
+		seconds = Math.round( this.params.host.wol_idlesleep_time - seconds);
+		if( seconds > 0 )
+			this.elWOLIdleSleepBar.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
+		else
+			this.elWOLIdleSleepBar.title = 'WOL sleep';
+	}
+	else
+		this.elWOLIdleSleepBox.style.display = 'none';
 	if(( this.params.task_start_finish_time != null ) && ( this.params.task_start_finish_time > 0 ))
 	{
 		stateTime = cm_TimeStringInterval( this.params.task_start_finish_time);
@@ -260,6 +288,7 @@ RenderNode.prototype.refresh = function()
 			stateTime += ' free';
 	}
 	this.elStateTime.textContent = stateTime;
+	this.elStateTime.title = stateTimeTitle;
 
 	for( var t = 0; t < this.tasks.length; t++)
 		this.tasks[t].refresh();

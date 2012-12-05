@@ -366,6 +366,19 @@ font-size: 14px;
 /*font-weight: bold;*/
 }
 
+.wolidlesleep_box {
+display: none;
+position: absolute;
+height: 5px;
+right: 0px;
+top: 14px;
+width: 90px;
+}
+.wolidlesleep_bar {
+background: #00F;
+position: absolute;
+left: 0; top: 0; bottom: 0;
+}
 /*.item.render .task {*/
 .rendertask {
 background: #DD3;

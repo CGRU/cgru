@@ -158,7 +158,7 @@ public:
 	inline void setErrorsForgiveTime(     int value) { m_errors_forgive_time  = value; }
 
 	bool setNumeric( long long start, long long end, long long perTask = 1, long long increment = 1);
-	void setFramesPerTask( long long perTask); ///< For sting tasks and per tasr dependency solve
+	void setFramesPerTask( long long perTask); ///< For string tasks and per tasr dependency solve
 
 	inline const std::string & getName()         const { return m_name;                }  ///< Get name.
 	inline const std::string & getWDir()         const { return m_working_directory;                }  ///< Get working directory.

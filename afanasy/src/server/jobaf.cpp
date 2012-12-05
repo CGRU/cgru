@@ -1074,6 +1074,14 @@ bool JobAf::solve( RenderAf *render, MonitorContainer * monitoring)
 				return false;
 			}
 
+			// Check if render is online
+			// It can be solved with offline render to check whether to WOL wake it
+			if( taskexec && render->isOffline())
+			{
+				delete taskexec;
+				return true;
+			}
+
 			// No task was generated:
 			if( taskexec == NULL ) continue;
 

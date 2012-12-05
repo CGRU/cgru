@@ -76,6 +76,7 @@ AFINFO("ThreadRun::run: Refreshing data:")
 //
 // Jobs sloving:
 //
+		{
       AFINFO("ThreadRun::run: Solving jobs:")
       RenderContainerIt rendersIt( a->renders);
       std::list<int> rIds;
@@ -125,6 +126,28 @@ AFINFO("ThreadRun::run: Refreshing data:")
             rIt = rIds.erase( rIt);
          }
       }
+		}
+
+//
+// Wake-On-Lan:
+//
+		{
+		AFINFO("ThreadRun::run: Wake-On-Lan:")
+		RenderContainerIt rendersIt( a->renders);
+		{
+			for( RenderAf *render = rendersIt.render(); render != NULL; rendersIt.next(), render = rendersIt.render())
+			{
+				if( render->isWOLWakeAble())
+				{
+					if( a->users->solve( render, a->monitors))
+					{
+						render->wolWake( a->monitors, std::string("Automatic waking by a job."));
+						continue;
+					}
+				}
+			}
+		}
+		}
 
 //
 // Dispatch events to monitors:

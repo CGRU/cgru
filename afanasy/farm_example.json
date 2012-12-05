@@ -19,6 +19,7 @@
 		"capacity":1100,
 		"maxtasks":10,
 		"power":1000,
+		"idle_cpu": 10,
 
 		"services":[
 			{"name":"generic"},
@@ -53,12 +54,13 @@
 
 	},{
 
-		"name":"Render",
-		"mask":"lrf.*",
-		"description":"Linux render farm.",
-		"capacity":8800,
-		"maxtasks":80,
-		"power":8000,
+		"name":"Linux Render",
+		"mask":"linux_render.*",
+		"description":"Linux render farm machine.",
+		"capacity":10000,
+		"maxtasks":100,
+		"power":10000,
+		"wol_idlesleep_time": 30,
 		"remservices":["afterfx","max","xsi"]
 
 	},{

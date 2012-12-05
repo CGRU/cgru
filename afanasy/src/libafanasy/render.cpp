@@ -38,6 +38,7 @@ void Render::construct()
 	m_capacity = -1;
 	m_capacity_used = 0;
 	m_wol_operation_time = 0;
+	m_idle_time = 0;
 }
 
 Render::~Render()
@@ -74,6 +75,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << ",\"max_tasks\":" << m_max_tasks;
 	if( m_wol_operation_time > 0 )
 		o_str << ",\"wol_operation_time\":" << m_wol_operation_time;
+	o_str << ",\"idle_time\":" << m_idle_time;
 
 	if( m_tasks.size())
 	{
@@ -235,6 +237,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
 	  if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
+		stream << "\n Idle Time = " << time2str( m_idle_time) << "%";
 	  if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
 	  if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
 

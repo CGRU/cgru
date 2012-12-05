@@ -56,6 +56,17 @@ public:
             ( false == isWOLFalling())
          );}
 
+	inline bool isWOLWakeAble() const { return (
+			isOffline() &&
+			isWOLSleeping() &&
+			( false == isWOLWaking()) &&
+			( m_host.m_wol_idlesleep_time > 0 ) &&
+			( false == isNimby()) &&
+			( getCapacity() > 0 ) &&
+			( getMaxTasks() > 0 ) &&
+			( m_priority > 0 )
+		);}
+
    inline const Host    & getHost()    const { return m_host;}
    inline const HostRes & getHostRes() const { return m_hres;}
 
@@ -113,8 +124,8 @@ protected:
 	std::list<TaskExec*> m_tasks;
 
 	int64_t m_task_start_finish_time; ///< Task start or finish time.
-
 	int64_t m_wol_operation_time;   ///< Last WOL operation time (to sleep or to wake).
+	int64_t m_idle_time; ///< Time when render became idle (free and cpu < idle_cpu).
 
 private:
    void construct();
