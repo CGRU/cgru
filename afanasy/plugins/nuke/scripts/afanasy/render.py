@@ -400,6 +400,8 @@ class JobParameters:
       self.dependmask         = None
       self.dependmaskglobal   = None
       self.nodename           = None
+      self.tmpimage          = 1
+      self.pathsmap          = 1
       if afnode != None:
          self.startpaused        = int(afnode.knob('startpaused').value())
          self.maxhosts           = int(afnode.knob('maxhosts').value())
@@ -410,6 +412,8 @@ class JobParameters:
          self.dependmask         = afnode.knob('dependmask').value()
          self.dependmaskglobal   = afnode.knob('dependmaskglbl').value()
          self.nodename           = afnode.name()
+         self.tmpimage          = int( afnode.knob('tmpimage').value())
+         self.pathsmap          = int( afnode.knob('pathsmap').value())
 
       self.blocksparameters   = []
 
@@ -623,11 +627,12 @@ def renderNodes( nodes, fparams, storeframes):
    changed = nuke.modified()
    for i in range(len(jobs)):
       scenename = jobsparameters[i].scenename
-      if pm.initialized:
-         pm_scenename = scenename + '.pm'
-         nuke.scriptSave( pm_scenename)
-         pm.toServerFile( pm_scenename, scenename, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
-         os.remove( pm_scenename)
+      if jobsparameters[i].tmpimage or jobsparameters[i].pathsmap:
+         if pm.initialized:
+            pm_scenename = scenename + '.pm'
+            nuke.scriptSave( pm_scenename)
+            pm.toServerFile( pm_scenename, scenename, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
+            os.remove( pm_scenename)
       else:
          nuke.scriptSave( scenename)
       if jobs[i].send() == False:
