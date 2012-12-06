@@ -627,12 +627,11 @@ def renderNodes( nodes, fparams, storeframes):
    changed = nuke.modified()
    for i in range(len(jobs)):
       scenename = jobsparameters[i].scenename
-      if jobsparameters[i].tmpimage or jobsparameters[i].pathsmap:
-         if pm.initialized:
-            pm_scenename = scenename + '.pm'
-            nuke.scriptSave( pm_scenename)
-            pm.toServerFile( pm_scenename, scenename, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
-            os.remove( pm_scenename)
+      if jobsparameters[i].pathsmap and pm.initialized:
+         pm_scenename = scenename + '.pm'
+         nuke.scriptSave( pm_scenename)
+         pm.toServerFile( pm_scenename, scenename, SearchStrings = ['file ','font ', 'project_directory '], Verbose = False)
+         os.remove( pm_scenename)
       else:
          nuke.scriptSave( scenename)
       if jobs[i].send() == False:

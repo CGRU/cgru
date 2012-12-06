@@ -55,7 +55,7 @@ void Render::v_jsonWrite( std::ostringstream & o_str, int i_type) const
 		o_str << "\"id\":"   << m_id;
 		if( isOnline())
 		{
-			o_str << ",";
+			o_str << ",\"idle_time\":" << m_idle_time << ",";
 			m_hres.jsonWrite( o_str);
 		}
 		o_str << "}";

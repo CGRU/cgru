@@ -102,6 +102,9 @@ RenderNode.prototype.update = function( i_obj)
 
 	if(( i_obj != null ) && ( i_obj.name == null ))
 	{
+		if( i_obj.idle_time )
+			this.params.idle_time = i_obj.idle_time;
+
 		var r = i_obj.host_resources;
 
 		if( r == null ) return;
