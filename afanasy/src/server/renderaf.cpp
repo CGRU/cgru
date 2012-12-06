@@ -62,6 +62,7 @@ void RenderAf::setRegisterTime()
 
 	m_task_start_finish_time = 0;
 	m_wol_operation_time = 0;
+	m_idle_time = time(NULL);
 
 	if( isOnline()) appendLog("Registered online.");
 	else appendLog("Registered offline.");
