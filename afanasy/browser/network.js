@@ -40,7 +40,7 @@ function nw_Send( obj)
 				}
 
 				if( newobj )
-					g_ProcessMsg( JSON.parse( xhr.responseText));
+					g_ProcessMsg( newobj);
 			}
 			else
 			{
