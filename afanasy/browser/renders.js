@@ -30,14 +30,6 @@ RenderNode.prototype.init = function()
 	this.element.appendChild( this.elResources);
 	this.elResources.className = 'resources';
 
-	this.elPower = document.createElement('div');
-	this.element.appendChild( this.elPower);
-	this.elPower.style.position = 'absolute';
-	this.elPower.style.textAlign = 'center';
-	this.elPower.style.top = '1px';
-	this.elPower.style.left = '0';
-	this.elPower.style.right = '0';
-
 	this.elNewLine = document.createElement('br');
 	this.element.appendChild( this.elNewLine);
 
@@ -88,6 +80,14 @@ RenderNode.prototype.init = function()
 	this.plotterD.setColor([20, 200, 90], [ 250, 50, 90]);
 	this.plotterD.setScale(-1, 10000, 100000);
 	this.plotterD.setAutoScale( 1000, 100000);
+
+	this.elPower = document.createElement('div');
+	this.element.appendChild( this.elPower);
+	this.elPower.style.position = 'absolute';
+	this.elPower.style.textAlign = 'center';
+	this.elPower.style.bottom = '1px';
+	this.elPower.style.left = '0';
+	this.elPower.style.right = '0';
 
 	this.state = {};
 	this.tasks = [];
@@ -199,7 +199,6 @@ RenderNode.prototype.update = function( i_obj)
 	{
 		this.elStar.style.display = 'none';
 		this.clearTasks();
-//		this.elPower.textContent = 'Offline';
 		this.elCapacity.textContent = '';
 		this.elMaxTasks.textContent = '';
 		this.state.textContent = '';
@@ -248,14 +247,19 @@ RenderNode.prototype.clearTasks = function()
 
 RenderNode.prototype.refresh = function()
 {
-	if( this.state.OFF == true )
+	if( this.state.OFF || this.state.WFL )
 	{
 		var power = this.offlineState;
 		if( this.params.wol_operation_time )
 			power += ' ' + cm_TimeStringInterval( this.params.wol_operation_time);
 		this.elPower.textContent = power;
+		if( this.state.WFL || this.state.WSL || this.state.WWK )
+			this.elPower.style.color = '#FF0';
+		else
+			this.elPower.style.color = '###';
 		this.elWOLIdleSleepBox.style.display = 'none';
-		return;
+		if( this.state.OFF )
+			return;
 	}
 
 	var stateTime = 'NEW';
@@ -268,14 +272,14 @@ RenderNode.prototype.refresh = function()
 		var seconds = curtime.valueOf() / 1000.0 - this.params.idle_time;
 		var percent = Math.round( 100.0 * seconds / this.params.host.wol_idlesleep_time );
 		if( percent > 100 ) percent = 100;
-		if( percent <  10 ) percent = 0;
+		if( percent <   0 ) percent = 0;
 		this.elWOLIdleSleepBox.style.display = 'block';
 		this.elWOLIdleSleepBar.style.width = percent+'%';
 		seconds = Math.round( this.params.host.wol_idlesleep_time - seconds);
 		if( seconds > 0 )
-			this.elWOLIdleSleepBar.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
+			this.elWOLIdleSleepBox.title = 'WOL idle sleep in '+cm_TimeStringFromSeconds( seconds);
 		else
-			this.elWOLIdleSleepBar.title = 'WOL sleep';
+			this.elWOLIdleSleepBox.title = 'WOL sleep';
 	}
 	else
 		this.elWOLIdleSleepBox.style.display = 'none';

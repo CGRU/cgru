@@ -370,14 +370,18 @@ font-size: 14px;
 display: none;
 position: absolute;
 height: 5px;
-right: 0px;
+right: 5px;
 top: 14px;
-width: 90px;
+width: 15%;
+border-radius: 2px;
+box-shadow: 0px 0px 2px #000 inset;
 }
 .wolidlesleep_bar {
-background: #00F;
+background: #00A;
+opacity: .3;
 position: absolute;
 left: 0; top: 0; bottom: 0;
+border-radius: 2px;
 }
 /*.item.render .task {*/
 .rendertask {

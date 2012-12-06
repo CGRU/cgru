@@ -19,7 +19,7 @@
 		"capacity":1100,
 		"maxtasks":10,
 		"power":1000,
-		"idle_cpu": 10,
+		"idle_cpu": 5,
 
 		"services":[
 			{"name":"generic"},
@@ -60,7 +60,7 @@
 		"capacity":10000,
 		"maxtasks":100,
 		"power":10000,
-		"wol_idlesleep_time": 30,
+		"wol_idlesleep_time": 3600,
 		"remservices":["afterfx","max","xsi"]
 
 	},{

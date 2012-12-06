@@ -146,7 +146,7 @@ function cm_TimeStringFromSeconds( i_seconds)
 	return str;
 }
 
-cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PER','PBR','PSC'];
+cm_States = ['ONL','RDY','RUN','DON','ERR','SKP','OFF','WDP','WTM','DRT','NbY','NBY','PER','PBR','PSC','WFL','WSL','WWK'];
 function cm_GetState( i_state, o_state, o_element)
 {
 	for( var i = 0; i < cm_States.length; i++)
