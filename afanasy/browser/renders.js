@@ -259,7 +259,7 @@ RenderNode.prototype.refresh = function()
 		if( this.state.WFL || this.state.WSL || this.state.WWK )
 			this.elPower.style.color = '#FF0';
 		else
-			this.elPower.style.color = '###';
+			this.elPower.style.color = '#000';
 		this.elWOLIdleSleepBox.style.display = 'none';
 		if( this.state.OFF )
 			return;
