@@ -260,11 +260,17 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
    {
 		if( isOnline())     stream << " ON ";
 		if( isOffline())    stream << " off";
-		if( isBusy())       stream << " BUSY";
-		else                stream << "     ";
+
+		if( isBusy()) stream << " BUSY"; else stream << "     ";
+
+		if( isWOLFalling())  stream << " WFL"; else stream << "    ";
+		if( isWOLSleeping()) stream << " WSL"; else stream << "    ";
+		if( isWOLWaking())   stream << " WWK"; else stream << "    ";
+
 		if( isNimby())      stream << " n";
 		else if( isNIMBY()) stream << " N";
 		else                stream << "  ";
+
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
 		stream << " v'" << m_version << "'";
 		stream << " ";
