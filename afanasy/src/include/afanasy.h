@@ -23,6 +23,8 @@ namespace AFGENERAL
     const char   FILENAME_INVALIDCHARACTERREPLACE = '_';
 	const int  LOG_LINES_MAX = 100;        ///< Maximum number of lines in each node log.
 	const int  LOGS_ROTATE   = 10;         ///< Number of logs to keep.
+
+	const char HTML_BROWSER[] = "/browser/index.html";
 }
 
 /// Addresses:

@@ -237,7 +237,7 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
       stream << "\n Max Tasks = " << getMaxTasks() << " ( " << getTasksNumber() << " running )";
 
 	  if( m_wol_operation_time ) stream << "\n WOL operation time = " << time2str( m_wol_operation_time);
-		stream << "\n Idle Time = " << time2str( m_idle_time) << "%";
+		stream << "\n Idle Time = " << time2str( m_idle_time) << " CPU < " << m_host.m_idle_cpu << "%";
 	  if( m_time_launch   ) stream << "\n Launched at: " << time2str( m_time_launch   );
 	  if( m_time_register ) stream << "\n Registered at: " << time2str( m_time_register );
 
@@ -272,6 +272,10 @@ void Render::generateInfoStream( std::ostringstream & stream, bool full) const
 		else                stream << "  ";
 
 		stream << " " << m_name << "@" << m_user_name << "[" << m_id << "]";
+
+		if( m_wol_operation_time ) stream << " W:" << time2str( m_wol_operation_time);
+		stream << " I:" << time2str( m_idle_time);
+
 		stream << " v'" << m_version << "'";
 		stream << " ";
 		m_address.generateInfoStream( stream ,full);

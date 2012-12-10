@@ -1,3 +1,7 @@
+# Settings
+config.json
+farm.json
+
 # Override scripts
 override.sh
 override.cmd

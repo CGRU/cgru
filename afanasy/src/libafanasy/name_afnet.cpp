@@ -190,7 +190,7 @@ int processHeader( af::Msg * io_msg, int i_bytes, int i_desc)
 		}
 		else
 		{
-			datafile = af::Environment::getAfRoot() + "/" + "browser.html";
+			datafile = af::Environment::getAfRoot() + AFGENERAL::HTML_BROWSER;
 			data = af::fileRead( datafile, datalen);
 		}
 

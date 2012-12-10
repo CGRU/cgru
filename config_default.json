@@ -2,7 +2,7 @@
 		"":"Describe your own configuration in 'config.json', it will be included last",
 		"":"To disable property you can just prefix it with '-'",
 
-	"include":["afanasy/config.json","config.json"],
+	"include":["afanasy/config_default.json","config.json"],
 
 	"":"'OS_unix': Any UNIX (Linux, MacOSX) specific settings",
 	"":"'OS_windows': MS Windows specific settings",
