@@ -286,10 +286,14 @@ function g_ShowObject( obj)
 {
 	var title = 'Object';
 	if( obj.name ) title = obj.name;
-	var wnd = g_OpenWindow( title);
+	var wnd = window.open('afanasy/browser/window.html', title, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
 	if( wnd == null ) return;
 	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
-	wnd.document.write( obj_str.replace(/\n/g,'<br/>'));
+	wnd.onload = function(){
+		var el = wnd.document.createElement('p');
+		el.innerHTML = obj_str.replace(/\n/g,'<br/>');
+		wnd.document.body.appendChild(el);
+	};
 }
 
 function g_OpenWindow( i_name, i_title, i_notFinishWrite )
