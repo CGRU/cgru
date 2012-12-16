@@ -7,9 +7,9 @@ import cgrupyqt
 from cgrupyqt import QtCore, QtGui
 
 Names = ['Blender','Houdini','Maya','Nuke', 'NukeX']
-if sys.platform.find('win') == 0:
+if 'windows' in cgruconfig.VARS['platform']:
    Names.extend(['3DSMax','Softimage','AfterFX'])
-if sys.platform.find('darwin') == 0:
+if 'windows' in cgruconfig.VARS['platform'] or 'macosx' in cgruconfig.VARS['platform']:
    Names.extend(['C4D'])
 
 def startDetached( command):
@@ -47,7 +47,7 @@ def exampleSoftware( folder, script):
    QtCore.QProcess.startDetached( '"%s"' % cmd)
 
 def exampleBlender():   exampleSoftware('blender','start_blender')
-def exampleC4D():       exampleSoftware('c4d','start_c4d')
+def exampleC4D():       exampleSoftware('Cinema 4D','start_c4d')
 def exampleHoudini():   exampleSoftware('houdini','start_houdini')
 def exampleMaya():      exampleSoftware('maya','start_maya')
 def exampleNuke():      exampleSoftware('nuke','start_nuke')
