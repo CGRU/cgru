@@ -57,7 +57,7 @@ class FromCinema2Nuke(plugins.CommandData):
         #Sets Default-Values
         #self.defaultExportPath = '/Users/jober/Desktop/'
         #self.defaultExportPath = 'C:/Users/jober/Desktop/maya2nuke/2/'
-        self.defaultExportPath = os.environ["HOME"] + '/Desktop/ExportNuke/' 
+        self.defaultExportPath = os.getenv('HOME', os.getenv('HOMEPATH', '')) + '/Desktop/ExportNuke/' 
         self.defaultNukeExportScriptName = 'NukeScene.nk'
         self.defaultExportTypeValue = 2 #Preset Export-Type - Values(1-> FBX, 2->OBJ)
         self.defaultExportGeometrySequence = False #Preset Export Geometry Sequence - Values(True,False) - Case-Sensetive

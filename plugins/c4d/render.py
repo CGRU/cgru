@@ -109,12 +109,11 @@ except:
 # We have to be in the correct working-directory
 os.chdir(temp_directory)
 
-command_run = ' '.join(parameteres)
-print("Running Command: %s" % command_run)
+print("Running Command: %s" % (' '.join(parameteres)))
 sys.stdout.flush()
 
 # Now execute the command
-process = subprocess.Popen(command_run, shell=True, stdout=subprocess.PIPE)
+process = subprocess.Popen( parameteres, shell=True, stdout=subprocess.PIPE)
 
 
 re_frame   = re.compile(r'Rendering frame \d+')
