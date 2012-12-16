@@ -235,7 +235,7 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 	var wnd = window;
 	if( i_new_wnd )
 	{
-		wnd = g_OpenWindow( i_name);
+		wnd = g_OpenWindowWrite( i_name);
 		if( wnd == null ) return;
 		elParent = wnd.document.body;
 	}
@@ -276,27 +276,53 @@ function g_ShowMessage( msg)
 	if( msg.list == null ) return;
 	var name = msg.name+'_'+msg.type;
 	var title = msg.name+':'+msg.type;
-	var wnd = g_OpenWindow( name, title);
+	var wnd = g_OpenWindowLoad('window.html', name);
 	if( wnd == null ) return;
-	for( var i = 0; i < msg.list.length; i++)
-		wnd.document.write('<div>'+((msg.list[i]).replace(/\n/g,'<br/>'))+'</div>');
+	wnd.onload = function(){
+		for( var i = 0; i < msg.list.length; i++)
+		{
+			var el = wnd.document.createElement('p');
+			el.innerHTML = msg.list[i].replace(/\n/g,'<br/>');
+			wnd.document.body.appendChild(el);
+		}
+		wnd.document.title = title;
+	}
 }
 
 function g_ShowObject( obj)
 {
 	var title = 'Object';
 	if( obj.name ) title = obj.name;
-	var wnd = window.open('afanasy/browser/window.html', title, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	var wnd = g_OpenWindowLoad('window.html', title);
 	if( wnd == null ) return;
 	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
 	wnd.onload = function(){
 		var el = wnd.document.createElement('p');
 		el.innerHTML = obj_str.replace(/\n/g,'<br/>');
 		wnd.document.body.appendChild(el);
+		wnd.document.title = title;
 	};
 }
 
-function g_OpenWindow( i_name, i_title, i_notFinishWrite )
+function g_OpenWindowLoad( i_file, i_name)
+{
+	for( var i = 0; i < g_windows.length; i++)
+		if( g_windows[i].name == i_name )
+			g_windows[i].close();
+
+	var wnd = window.open('afanasy/browser/' + i_file, name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	if( wnd == null )
+	{
+		g_Error('Can`t open window "'+i_file+'"');
+		return;
+	}
+	g_windows.push( wnd);
+	wnd.name = i_name;
+	wnd.focus();
+	return wnd;
+}
+
+function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 {
 	if( i_title == null )
 		i_title = i_name;
@@ -653,7 +679,7 @@ function g_SuperUserProcessGUI()
 function g_ShowTask( i_obj)
 {
 	var title = i_obj.name;
-	var wnd = g_OpenWindow( title, title, true);
+	var wnd = g_OpenWindowWrite( title, title, true);
 	if( wnd == null ) return;
 	var doc = wnd.document;
 

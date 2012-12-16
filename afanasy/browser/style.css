@@ -121,8 +121,9 @@ text-align: center;
 }
 #footeropenbutton, #headeropenbutton {
 box-shadow: 0px 0px 2px #000, 0px 0px 3px rgba(255,255,255,.5) inset;
+border-radius: 3px;
 float: left;
-width: 12px; height: 15px;
+width: 12px; height: 18px;
 margin: 3px;
 }
 #footer #log_btn, #netlog_btn {
@@ -139,7 +140,7 @@ border-bottom-left-radius: 0;
 #footer #log_btn.pushed, #netlog_btn.pushed { box-shadow: 0px 0px 1px #000, 0px 0px 5px rgba(255,255,255,.5) inset;}
 #footer #info {
 box-shadow: 0px 0px 2px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
-padding: 3px 9px; margin: 3px 9px;
+padding: 3px 9px; margin: 3px 24px;
 border-radius: 6px;
 }
 #footer #version {
