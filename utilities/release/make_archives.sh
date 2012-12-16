@@ -23,6 +23,7 @@ for archive in `ls`; do
    # Cleanup archive folders:
    echo "Clearing '${archive}':"
    find "${archive_dir}" -type d -name .git -exec rm -rvf {} \;
+   find "${archive_dir}" -type f -name .gitignore -exec rm -vf {} \;
    find "${archive_dir}" -type d -name .svn -exec rm -rvf {} \;
    find "${archive_dir}" -type f -name *.pyc -exec rm -vf {} \;
    find "${archive_dir}" -type d -name __pycache__ -exec rm -rvf {} \;

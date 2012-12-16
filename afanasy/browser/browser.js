@@ -134,6 +134,7 @@ function g_Init()
 	g_InitSettings();
 
 	document.getElementById('platform').textContent = cgru_Platform;
+	document.getElementById('browser').textContent = cgru_Browser;
 
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
@@ -234,7 +235,7 @@ function g_OpenMonitor( i_type, i_new_wnd, i_id, i_name)
 	var wnd = window;
 	if( i_new_wnd )
 	{
-		wnd = g_OpenWindow( i_name);
+		wnd = g_OpenWindowWrite( i_name);
 		if( wnd == null ) return;
 		elParent = wnd.document.body;
 	}
@@ -275,38 +276,60 @@ function g_ShowMessage( msg)
 	if( msg.list == null ) return;
 	var name = msg.name+'_'+msg.type;
 	var title = msg.name+':'+msg.type;
-	var wnd = g_OpenWindow( name, title);
+	var wnd = g_OpenWindowLoad('window.html', name);
 	if( wnd == null ) return;
-	for( var i = 0; i < msg.list.length; i++)
-		wnd.document.write('<div>'+((msg.list[i]).replace(/\n/g,'<br/>'))+'</div>');
+	wnd.onload = function(){
+		for( var i = 0; i < msg.list.length; i++)
+		{
+			var el = wnd.document.createElement('p');
+			el.innerHTML = msg.list[i].replace(/\n/g,'<br/>');
+			wnd.document.body.appendChild(el);
+		}
+		wnd.document.title = title;
+	}
 }
 
 function g_ShowObject( obj)
 {
 	var title = 'Object';
 	if( obj.name ) title = obj.name;
-	var wnd = g_OpenWindow( title, title);
+	var wnd = g_OpenWindowLoad('window.html', title);
 	if( wnd == null ) return;
 	var obj_str = JSON.stringify( obj, null, '&nbsp&nbsp&nbsp&nbsp');
-	wnd.document.write( obj_str.replace(/\n/g,'<br/>'));
+	wnd.onload = function(){
+		var el = wnd.document.createElement('p');
+		el.innerHTML = obj_str.replace(/\n/g,'<br/>');
+		wnd.document.body.appendChild(el);
+		wnd.document.title = title;
+	};
 }
 
-function g_OpenWindow( i_name, i_title, i_focus )
+function g_OpenWindowLoad( i_file, i_name)
+{
+	for( var i = 0; i < g_windows.length; i++)
+		if( g_windows[i].name == i_name )
+			g_windows[i].close();
+
+	var wnd = window.open('afanasy/browser/' + i_file, name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	if( wnd == null )
+	{
+		g_Error('Can`t open window "'+i_file+'"');
+		return;
+	}
+	g_windows.push( wnd);
+	wnd.name = i_name;
+	wnd.focus();
+	return wnd;
+}
+
+function g_OpenWindowWrite( i_name, i_title, i_notFinishWrite )
 {
 	if( i_title == null )
 		i_title = i_name;
 
 	for( var i = 0; i < g_windows.length; i++)
 		if( g_windows[i].name == i_name )
-			if( i_focus )
-			{
-				g_windows[i].focus();
-				return;
-			}
-			else
-			{
-				g_windows[i].close();
-			}
+			g_windows[i].close();
 
 	var wnd = window.open( null, i_name, 'location=no,scrollbars=yes,resizable=yes,menubar=no');
 	if( wnd == null )
@@ -322,8 +345,11 @@ function g_OpenWindow( i_name, i_title, i_focus )
 	wnd.document.write('<html><head><title>'+i_title+'</title>');
 	wnd.document.write('<link type="text/css" rel="stylesheet" href="lib/styles.css">');
 	wnd.document.write('<link type="text/css" rel="stylesheet" href="afanasy/browser/style.css">');
-	wnd.document.write('</head><body></body></html>');
-	wnd.document.body.onkeydown = g_OnKeyDown;
+	if(( i_notFinishWrite == null ) || ( i_notFinishWrite == false ))
+	{
+		wnd.document.write('</head><body></body></html>');
+		wnd.document.body.onkeydown = g_OnKeyDown;
+	}
 	wnd.focus();
 
 	return wnd;
@@ -653,7 +679,7 @@ function g_SuperUserProcessGUI()
 function g_ShowTask( i_obj)
 {
 	var title = i_obj.name;
-	var wnd = g_OpenWindow( title, title);
+	var wnd = g_OpenWindowWrite( title, title, true);
 	if( wnd == null ) return;
 	var doc = wnd.document;
 
@@ -663,7 +689,8 @@ function g_ShowTask( i_obj)
 	var wdir = i_obj.working_directory;
 	var wdirPM = cgru_PM( wdir);
 
-	doc.body.classList.add('task_exec');
+//	doc.body.classList.add('task_exec');
+	doc.write('</head><body class="task_exec">');
 	doc.write('<div><i>Name:</i> <b>'+i_obj.name+'</b></div>');
 	doc.write('<div><i>Capacity:</i> <b>'+i_obj.capacity+'</b> <i>Service:</i> <b>'+i_obj.service+'</b> <i>Parser:</i> <b>'+i_obj.parser+'</b></div>');
 	if( wdir == wdirPM )
@@ -695,27 +722,23 @@ function g_ShowTask( i_obj)
 	var files = i_obj.files.split(';');
 	for( var f = 0; f < files.length; f++)
 	{
-		var elFileBlock = doc.createElement('div');
-		doc.body.appendChild( elFileBlock);
-
-		var elFileOrig = doc.createElement('div');
-		elFileBlock.appendChild( elFileOrig);
-		elFileOrig.textContent = files[f];
-		elFileOrig.classList.add('param');
-
+		doc.write('<div>');
+		doc.write('<div class="param">'+files[f]+'</div>');
 		var cmds = cgru_Config.previewcmds;
 		for( var c = 0; c < cmds.length; c++ )
 		{
 			cmd = cmds[c].replace('@ARG@', cgru_PathJoin( wdirPM, files[f]));
-
-			var elPreview = doc.createElement('div');
-			elFileBlock.appendChild( elPreview);
-			elPreview.textContent = cmd;
-			elPreview.classList.add('cmdexec');
+			doc.write('<div class="cmdexec">'+cmd+'</div>');
 		}
+		doc.write('</div>');
 	}
 
 	doc.write('<div>Raw Object:</div><div class="task_data">');
 	doc.write( obj_str.replace(/\n/g,'<br/>'));
 	doc.write('</div>');
+
+	doc.write('</body></html>');
+	doc.close();
+	if( cgru_Browser == 'firefox')
+		wnd.location.reload();
 }

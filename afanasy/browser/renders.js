@@ -82,12 +82,8 @@ RenderNode.prototype.init = function()
 	this.plotterD.setAutoScale( 1000, 100000);
 
 	this.elPower = document.createElement('div');
+	this.elPower.classList.add('power');
 	this.element.appendChild( this.elPower);
-	this.elPower.style.position = 'absolute';
-	this.elPower.style.textAlign = 'center';
-	this.elPower.style.bottom = '1px';
-	this.elPower.style.left = '0';
-	this.elPower.style.right = '0';
 
 	this.state = {};
 	this.tasks = [];
