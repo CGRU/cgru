@@ -129,9 +129,6 @@ class Block:
 	def setTasksName(          self, value): self.data["tasks_name"] = value
 	def setFramesPerTask(      self, value): self.data["frames_per_task"] = value
 	def setParserCoeff(        self, value): self.data["parser_coeff"] = value
-	def setMaxRunningTasks(    self, value): self.data["max_running_tasks"] = value
-	def setMaxRunTasksPerHost( self, value): self.data["max_running_tasks_per_host"] = value
-	def setTasksMaxRunTime(    self, value): self.data["tasks_max_run_time"] = value
 	def setErrorsAvoidHost(    self, value): self.data["errors_avoid_host"] = value
 	def setErrorsForgiveTime(  self, value): self.data["errors_forgive_time"] = value
 	def setErrorsRetries(      self, value): self.data["errors_retries"] = value
@@ -141,6 +138,12 @@ class Block:
 	def setNeedPower(          self, value): self.data["need_power"] = value
 	def setNonSequential( self, value = True ): self.data["non_sequential"] = value
 	def setDependSubTask( self, value = True ): self.data["depend_sub_task"] = value
+	def setTasksMaxRunTime(    self, value):
+		if( value > 0 ): self.data["tasks_max_run_time"] = value
+	def setMaxRunningTasks(    self, value):
+		if( value >= 0 ): self.data["max_running_tasks"] = value
+	def setMaxRunTasksPerHost( self, value):
+		if( value >= 0 ): self.data["max_running_tasks_per_host"] = value
 
 	def setHostsMask(        self, value):
 		if checkRegExp(value): self.data["hosts_mask"] = value
@@ -216,9 +219,12 @@ class Job:
 
 	def setAnnotation(         self, value): self.data["annotation"] = value
 	def setDescription(        self, value): self.data["description"] = value
-	def setWaitTime(           self, value): self.data["time_wait"] = value
-	def setMaxRunningTasks(    self, value): self.data["max_running_tasks"] = value
-	def setMaxRunTasksPerHost( self, value): self.data["max_running_tasks_per_host"] = value
+	def setWaitTime(           self, value):
+		if( value > 0 ): self.data["time_wait"] = value
+	def setMaxRunningTasks(    self, value):
+		if( value >= 0 ): self.data["max_running_tasks"] = value
+	def setMaxRunTasksPerHost( self, value):
+		if( value >= 0 ): self.data["max_running_tasks_per_host"] = value
 
 	def setHostsMask(        self, value):
 		if checkRegExp(value): self.data["hosts_mask"] = value

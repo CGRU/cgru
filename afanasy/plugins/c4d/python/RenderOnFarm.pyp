@@ -5,6 +5,8 @@ import sys
 import shutil
 import subprocess
 
+import af
+
 from c4d import gui, plugins, bitmaps
 
 #------------------------------	
@@ -385,91 +387,50 @@ class RenderOnFarm(plugins.CommandData):
 	
 	
 	def startFarmRender(self):
-	  
-		# Create Command
-		cmd = os.path.join(os.environ["AF_ROOT"],"python", "afjob.py")
-		cmd += ' "' + os.path.join(self.filePath, self.fileName) + '"'
-		cmd += ' %d %d -by %d -fpt %d -pwd "%s" -priority %d -capacity %d -maxruntime %d' % (self.startFrame,  self.endFrame, self.byFrame, self.framesPerTask, self.filePath, self.priority, self.capacity, self.maxRuntime*60)
-		if  self.jobName != "":
-			cmd += ' -name "%s"' %  self.jobName
-		
+
+		scenePath = os.path.join( self.filePath, self.fileName)
+	
+		# Create Job:
+		job = af.Job( self.fileName);
+		job.setPriority( self.priority)
+		job.setMaxRunningTasks( self.maxHosts)
+		if  self.jobName != '':
+			job.setName( self.jobName)
 		if self.createJobPaused:
-			cmd += " -pause"
-			
+			job.setOffline()
+		if self.hostsMask != '':
+			job.setHostsMask( self.hostsMask)
+		if self.excludeHostsMask != '':
+			job.setHostsMaskExclude( self.excludeHostsMask)
+		if self.dependMask != '':
+			job.setDependMask( self.dependMask)
+		if self.dependMaskGlobal != '':
+			job.setDependMaskGlobal( self.dependMaskGlobal)
+
+		block = af.Block('c4d', 'c4d');
+		job.blocks.append( block)
+		block.setCapacity( self.capacity)
+		block.setTasksMaxRunTime( self.maxRuntime*60)
+		block.setNumeric( int(self.startFrame), int(self.endFrame), int(self.framesPerTask), int(self.byFrame))
+
+		# c4drender command should get used (which copies all the stuff locally)
+		cmd = 'c4drender'
 		if self.doNotCopyLocally:
-			cmd += " -extrargs no_copy"
-
-		if self.output != "":
-			cmd += " -output %s" % self.output
-
-		if self.hostsMask != "":
-			cmd += " -hostsmask %s" % self.hostsMask
-
-		if self.excludeHostsMask != "":
-			cmd += " -hostsexcl %s" % self.excludeHostsMask
-			
-		if self.dependMask != "":
-			cmd += " -depmask %s" % self.dependMask
-			
-		if self.dependMaskGlobal != "":
-			cmd += " -depglbl %s" % self.dependMaskGlobal
-
-		if self.maxHosts != -1:
-			cmd += " -maxruntasks %d" % self.maxHosts
-
+			cmd = 'c4d'
+		cmd += ' -nogui -render "' + scenePath + '" -frame @#@ @#@ ' + str( self.byFrame)
+		if self.output != '':
+			cmd += ' -oimage "%s"' % self.output
+			block.setFiles( self.output)
+		block.setCommand( cmd)
 
 		# When Constraints got backed a temp-scene got created and has to be deleted in the end
 		if self.bakeConstraints:
-			cmd += " -deletescene"
-					
-		cmd += " -os any"
+			job.setCmdPost('deletefiles "%s"' % scenePath)
 
-
-		# Use the CGRU Python to start
-		try:
-			pythonExe = os.environ["CGRU_PYTHONEXE"]
-		except:
-			pythonExe = "python"
-
-		cmd = pythonExe + " " + cmd
-
-
-
-		# Look for a temp-directory
-		try:
-			tempdir = os.environ["TMP"]
-		except:
-			try:
-				tempdir = os.environ["TEMP"]
-			except:
-				tempdir = os.path.join(os.environ["HOME"], "tmp")
-		
-		# Make sure it really exists
-		if not os.path.isdir(tempdir):
-			os.makedirs(tempdir)
-		
-		# Define output-file
-		outputfile = "afanasy_submint_c4d.txt"
-		outputfile = os.path.join(tempdir, outputfile)
-		commandOutput = None
-		
-		# Now Start the Render
-		print("afjob command:\n%s" % cmd)
-		if sys.platform.find('win') == 0:
-			# MS Windows simplyfications, as there are errors with subprocess in c4d
-			exitCode = os.system( cmd)
-		else:
-			submitProcess = subprocess.Popen( cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-			exitCode = submitProcess.wait()
-			commandOutput = submitProcess.stdout.readlines()
-			outputfileVar = open( outputfile,"w")
-			outputfileVar.writelines( commandOutput)
-			outputfileVar.close()
-
-		# The user gets now displayed if everything worked fine or if there were problems
-		if exitCode != 0 and commandOutput:
+		# Sending the job to server:
+		if not job.send():
 			# If there was a problem tell him what happend
-			c4d.gui.MessageDialog('There was a problem with submitting the job.\n\nThis error occured:\n\n--------------------------------------------\n%s\n--------------------------------------------' % "\n".join(commandOutput))
+			c4d.gui.MessageDialog('There was a problem with submitting the job.')
 
 
 
