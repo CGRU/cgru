@@ -13,6 +13,9 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	else if( this.type == 'users'  ) this.nodeConstructor = UserNode;
 	else if( this.type == 'tasks'  ) this.nodeConstructor = TaskItem;
 
+	if( this.nodeConstructor.createActions)
+		this.nodeConstructor.createActions();
+
 	this.elMonitor = this.document.createElement('div');
 	this.elParent.appendChild( this.elMonitor);
 	this.elMonitor.classList.add('monitor');
@@ -37,7 +40,6 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 	this.elCtrlButtons = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlButtons);
 	this.elCtrlButtons.style.position = 'absolute';
-	this.elCtrlButtons.style.width = '100px';
 
 	var buttons_width = 0;
 	if( this.type == 'jobs' || this.type == 'renders')
@@ -49,20 +51,33 @@ function Monitor( i_window, i_element, i_type, i_id, i_name)
 		this.elCtrlSet.monitor = this;
 		this.elCtrlSet.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e);}
 
-		buttons_width = 50;
+		buttons_width += 50;
+	}
 
-		if( this.type == 'renders' && g_GOD())
+	if( this.type == 'renders')
+	{
+		this.elCtrlCmd = this.document.createElement('div');
+		this.elCtrlButtons.appendChild( this.elCtrlCmd);
+		this.elCtrlCmd.classList.add('ctrl_button');
+		this.elCtrlCmd.textContent = 'CMD';
+		this.elCtrlCmd.monitor = this;
+		this.elCtrlCmd.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'cmd');}
+
+		buttons_width += 50;
+
+		if( g_GOD())
 		{
-			this.elCtrlAux1 = this.document.createElement('div');
-			this.elCtrlButtons.appendChild( this.elCtrlAux1);
-			this.elCtrlAux1.classList.add('ctrl_button');
-			this.elCtrlAux1.textContent = 'POW';
-			this.elCtrlAux1.monitor = this;
-			this.elCtrlAux1.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'pow');}
+			this.elCtrlPow = this.document.createElement('div');
+			this.elCtrlButtons.appendChild( this.elCtrlPow);
+			this.elCtrlPow.classList.add('ctrl_button');
+			this.elCtrlPow.textContent = 'POW';
+			this.elCtrlPow.monitor = this;
+			this.elCtrlPow.onmouseover = function(e){ return e.currentTarget.monitor.onMouseOverSet(e,'pow');}
 
-			buttons_width = 100;
+			buttons_width += 50;
 		}
 	}
+//	this.elCtrlButtons.style.width = 50+buttons_width+'px';
 
 	this.elCtrlSortFilter = this.document.createElement('div');
 	this.elCtrl.appendChild( this.elCtrlSortFilter);
@@ -631,15 +646,38 @@ Monitor.prototype.addMenuItem = function( i_menu, i_action)
 	var title = i_action[4];
 	var permission = i_action[5];
 
-	if(( permission == 'user') && g_VISOR()) return;
-	if( g_VISOR() && permission )
+	if( permission )
 	{
-		if( g_GOD() && ( permission != 'god' ))
-			return;
-		if( permission != 'visor' )
+		if( g_VISOR())
+		{
+			if( permission == 'user') return;
+			if( g_GOD())
+			{
+				if( permission != 'god' )
+					return;
+			}
+			else if( permission != 'visor' )
+				return;
+		}
+		else if( permission != 'user')
 			return;
 	}
 
+	if( i_action[0] == 'cmd')
+	{
+		var cmds = [];
+		for( var i = 0; i < this.items.length; i++)
+			if( this.items[i].element.selected == true )
+			{
+				cmd = handle;
+				cmd = cmd.replace(/@ARG@/g, this.items[i].params.name);
+				if( this.items[i].params.address.ip )
+					cmd = cmd.replace(/@IP@/g, this.items[i].params.address.ip);
+				cmds.push( cmd);
+			}
+		i_menu.addItem( name, 'cmdexec', cmds, title);
+		return;
+	}
 	if( receiver[handle] == null ) receiver = this;
 	if( receiver[handle] )
 		i_menu.addItem( name, receiver, handle, title);

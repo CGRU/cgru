@@ -189,10 +189,10 @@ bottom: 30px;
 
 .ctrl_button {
 background: #AAA;
-box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
+box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
 border-radius: 4px;
 cursor: pointer;
-margin: 3px 8px;
+margin: 4px 8px;
 padding: 4px;
 float: left;
 /*
@@ -449,12 +449,5 @@ margin: 6px;
 padding: 4px 8px;
 }
 .task_exec .param {
-font-weight: bold;
-}
-.cmdexec {
-background: #DD8;
-border-radius: 4px;
-box-shadow: 0px 0px 3px #000 inset;
-padding: 4px 8px;
 font-weight: bold;
 }

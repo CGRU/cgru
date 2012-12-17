@@ -66,3 +66,10 @@ top: 0; left: 0;
 
 .cgru_error_back { background: #F77;}
 
+.cmdexec {
+background: #DD8;
+border-radius: 4px;
+box-shadow: 0px 0px 3px #000 inset;
+padding: 4px 8px;
+font-weight: bold;
+}
