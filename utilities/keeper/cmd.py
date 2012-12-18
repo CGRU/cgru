@@ -2,6 +2,7 @@ import os, sys
 
 import cgrudocs
 import cgruconfig
+import cgruutils
 
 import af
 
@@ -25,6 +26,8 @@ def quit(): Application.quit()
 def setAFANASYServer(): getVar('servername','Set AFANASY Server','Enter host name or IP address:')
 def setDocsURL(): getVar('docshost','Set Docs Host','Enter host name or IP address:')
 def setTextEditor(): getVar('editor','Set Text Editor','Enter command with "%s":')
+def setWebBrowser(): getVar('webbrowser','Set Web Browser','Enter command with "%s":')
+def afwebgui(): cgruutils.webbrowse( cgruconfig.VARS['af_servername']+':'+str(cgruconfig.VARS['af_serverport']))
 
 def exitRender(  text = '(keeper)'): af.Cmd().renderExit( text)
 def exitTalk(    text = '(keeper)'): af.Cmd().talkExit( text)

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Test Run</title>
+<style>
+body {
+background: #DDD;
+}
+div {
+box-shadow: 0px 0px 10px #000 inset;
+border-radius: 8px;
+margin: 10px;
+padding: 10px;
+}
+.button {
+cursor: pointer;
+box-shadow: 0px 0px 10px #000, 0px 0px 10px #FFF inset;
+border-radius: 5px;
+background: #EEE;
+}
+.cmdexec {
+background: #FF5;
+}
+</style>
+<script type="text/javascript">
+function init()
+{
+	var elParent = document.getElementById('execscript');
+	var elExec = document.createElement('div');
+	elExec.classList.add('cmdexec');
+	elParent.appendChild( elExec);
+	elExec.textContent = 'kwrite asd';
+
+	elParent = document.getElementById('execarray');
+	elExec = document.createElement('div');
+	elExec.classList.add('cmdexec');
+	elParent.appendChild( elExec);
+	elExec.textContent = 'kwrite asd_[i]';
+	cmd = 'kwrite asd_';
+	cmdexec = [];
+	for( var i = 0; i < 10; i++)
+		cmdexec.push( cmd+i );
+	elExec.setAttribute('cmdexec', JSON.stringify(cmdexec));
+}
+
+function openWndWrite()
+{
+	var wnd = window.open( null, 'CMDEXEC', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	wnd.document.writeln('<!DOCTYPE html>');
+	wnd.document.write('<html><head><title>CMDEXEC</title>');
+	wnd.document.write('</head><body>');
+	wnd.document.write('<div class="cmdexec">kwrite asd</div>');
+	wnd.document.write('</body></html>');
+	wnd.document.close();
+	wnd.focus();
+	wnd.location.reload();
+}
+
+g_doc = null;
+function createCmdExec( i_doc)
+{
+	var doc = i_doc;
+	var el = doc.createElement('div');
+	el.textContent = 'kwite asd';
+	el.classList.add('cmdexec');
+	doc.body.appendChild( el);
+//alert('"cmdexec" created.');
+}
+
+function openWndScript()
+{
+	var wnd = window.open( null, 'CMDEXEC', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+	wnd.document.writeln('<!DOCTYPE html>');
+	wnd.document.write('<html><head><title>CMDEXEC</title>');
+	wnd.document.write('</head><body onload="asd()">');
+	wnd.document.write('</body></html>');
+	wnd.document.close();
+	wnd.focus();
+//	wnd.location.reload();
+
+	createCmdExec( wnd.document);
+}
+
+function openWndLoad()
+{
+	var wnd = window.open('cmdexec.html', 'CMDEXEC', 'location=no,scrollbars=yes,resizable=yes,menubar=no');
+//	var wnd = window.open( null);
+//	wnd.location = 'cmdexec.html';
+//	wnd.onload = function(){alert('wow!');this.location.reload();}
+//	wnd.addEventListener('load', wow, false);
+//	wnd.location.reload();
+//	window.open( 'cmdexec.html');
+}
+function wow() { this.location.reload();}
+</script>
+</head>
+<body onload="init()">
+
+<div> Exec inline:
+<div class="cmdexec">kwrite asd</div>
+</div>
+
+<div id="execscript"> Exec script:</div>
+
+<div id="execarray"> Exec array script:</div>
+
+<div onclick="openWndWrite()" class="button">Popup write only</div>
+
+<div onclick="openWndScript()" class="button">Popup write + script</div>
+
+<div onclick="openWndLoad()" class="button">Popup this</div>
+
+</body>
+</html>

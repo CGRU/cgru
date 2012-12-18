@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import os
 import shutil
 import stat
 import sys
 import time
-import datetime
 import re
+import webbrowser
 
 def copy_file(source_file, destination_file, delete_original = False, debug=False):
     
@@ -175,3 +176,19 @@ def toStr( data):
 		return str( data)
 
 	return str( data, 'utf-8')
+
+def webbrowse( i_url):
+	if i_url[:7] != 'http://':
+		i_url = 'http://'+i_url
+
+	if 'webbrowser' in cgruconfig.VARS:
+		cmd = cgruconfig.VARS['webbrowser']
+		if cmd.find('%s') != -1:
+			cmd = cmd % i_url
+		else:
+			cmd = '%s "%s"' % ( cmd, i_url)
+		os.system( cmd)
+		return
+
+	webbrowser.open( i_url)
+
