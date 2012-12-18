@@ -21,13 +21,13 @@ if PythonQtType == 'PyQt4':
 	print('You can install PySide if interested in LGPL license.')
 	PySide = False
 
-def GetOpenFileName( i_qwidget, i_title, i_path):
+def GetOpenFileName( i_qwidget, i_title, i_path = None):
 	if PySide:
 		afile, filter = QtGui.QFileDialog.getOpenFileName( i_qwidget, i_title, i_path)
 		return afile
 	return str( QtGui.QFileDialog.getOpenFileName( i_qwidget, i_title, i_path))
 
-def GetSaveFileName( i_qwdget, i_title, i_path):
+def GetSaveFileName( i_qwdget, i_title, i_path = None):
 	if PySide:
 		afile, filter = QtGui.QFileDialog.getSaveFileName( i_qwdget, i_title, i_path)
 		return afile
