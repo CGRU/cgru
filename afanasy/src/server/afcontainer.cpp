@@ -11,7 +11,7 @@
 #include "afcontainerit.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 AfContainer::AfContainer(  std::string ContainerName, int MaximumSize):
@@ -168,7 +168,8 @@ int AfContainer::add( AfNodeSrv * i_node)
 
    if( !founded )
       AFERROR("AfContainer::add: nodes table full.")
-   AFINFA("AfContainer::add: new id = %u, count = %u", i_node->m_id, count)
+   //AFINFA("AfContainer::add: new id = %u, count = %u", i_node->m_id, count)
+   AFINFA("AfContainer::add: new id = %u, count = %u", i_node->m_node->m_id, count)
    return newId;
 }
 

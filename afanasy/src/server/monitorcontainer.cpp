@@ -12,7 +12,7 @@
 #include "useraf.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 MonitorContainer::MonitorContainer():
@@ -26,7 +26,8 @@ MonitorContainer::MonitorContainer():
    jobEventsCount = af::Msg::TMonitorJobEvents_END - af::Msg::TMonitorJobEvents_BEGIN - 1;
    jobEvents     = new std::list<int32_t>[ jobEventsCount];
    jobEventsUids = new std::list<int32_t>[ jobEventsCount];
-AFINFA("MonitorContainer::MonitorContainer: Events Count = %d, Job Events = %d\n", eventsCount, jobEventsCount);
+//AFINFA("MonitorContainer::MonitorContainer: Events Count = %d, Job Events = %d\n", eventsCount, jobEventsCount);
+AFINFA("MonitorContainer::MonitorContainer: Events Count = %d, Job Events = %d\n", af::Monitor::EventsCount, jobEventsCount);
 }
 
 MonitorContainer::~MonitorContainer()

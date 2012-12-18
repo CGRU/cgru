@@ -14,7 +14,7 @@
 #include "task.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 Block::Block( JobAf * blockJob, af::BlockData * blockData, af::JobProgress * progress):

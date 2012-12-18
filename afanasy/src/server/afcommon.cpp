@@ -17,7 +17,7 @@
 #include "threadargs.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 af::MsgQueue      * AFCommon::MsgDispatchQueue  = NULL;
@@ -133,6 +133,7 @@ bool AFCommon::writeFile( const char * data, const int length, const std::string
    /* FIXME: do we need this chmod() ? If so, in what case ? */
    chmod( filename.c_str(), 0644);
 
-   AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
+   // AFINFA("AFCommon::writeFile - \"%s\"", filename.toUtf8().data())
+   AFINFA("AFCommon::writeFile - \"%s\"", filename.c_str())
    return true;
 }

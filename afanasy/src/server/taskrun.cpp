@@ -15,7 +15,7 @@
 #include "task.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 TaskRun::TaskRun( Task * runningTask,
@@ -36,7 +36,7 @@ TaskRun::TaskRun( Task * runningTask,
    stopTime( 0),
    zombie( false)
 {
-AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().toUtf8().data(), block->m_data->getBlockNum(), tasknum)
+AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
    (*counter)++;
 
    progress->percent = -1;
@@ -62,7 +62,7 @@ AFINFA("TaskRun::TaskRun: %s[%d][%d]:", block->m_job->getName().toUtf8().data(),
 
 TaskRun::~TaskRun()
 {
-AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", block->m_job->getName().toUtf8().data(), block->m_data->getBlockNum(), tasknum)
+AFINFA("TaskRun:: ~ TaskRun: %s[%d][%d]:", block->m_job->getName().c_str(), block->m_data->getBlockNum(), tasknum)
    if   ( *counter == 0) AFERRAR("Tasks counter is negative ! (%d)", *counter)
    else ( *counter )--;
    if( exec) delete exec;
