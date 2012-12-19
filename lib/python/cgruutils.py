@@ -187,6 +187,10 @@ def webbrowse( i_url):
 			cmd = cmd % i_url
 		else:
 			cmd = '%s "%s"' % ( cmd, i_url)
+		if 'windows' in cgruconfig.VARS['platform']:
+			cmd = 'start "Web GUI" '+cmd
+		else:
+			cmd += ' &'
 		os.system( cmd)
 		return
 
