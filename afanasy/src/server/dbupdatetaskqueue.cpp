@@ -8,7 +8,7 @@
 #include "afcommon.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 char DBTaskUpdateData::ms_db_prepare_name[] = "tasks_progress_update";
@@ -23,7 +23,7 @@ DBTaskUpdateData::DBTaskUpdateData( int i_id_job, int i_id_block, int i_id_task,
     m_starts_count(  i_taskprogress->starts_count  ),
     m_errors_count(  i_taskprogress->errors_count  )
 {
-    AFINFA("DBTaskUpdateData::DBTaskUpdateData: %d[%d][%d]", i_jobid, i_blocknum, i_tasknum)
+    AFINFA( "DBTaskUpdateData::DBTaskUpdateData: %d[%d][%d]", i_id_job, i_id_block, i_id_task )
 }
 
 DBTaskUpdateData::~DBTaskUpdateData(){}
@@ -135,9 +135,10 @@ bool DBUpdateTaskQueue::writeItem( af::AfQueueItem* item)
 
     DBTaskUpdateData * taskUp = (DBTaskUpdateData*)item;
 
-    AFINFA("DBUpdateTaskQueue::writeItem: %d[%d][%d]", taskUp->jobid, taskUp->blocknum, taskUp->tasknum)
+    //AFINFA("DBUpdateTaskQueue::writeItem: %d[%d][%d]", taskUp->jobid, taskUp->blocknum, taskUp->tasknum)
+    AFINFA( "DBUpdateTaskQueue::writeItem: %d[%d][%d]", taskUp->get_job_id(), taskUp->get_block_id(), taskUp->get_task_id() )
 
     if( PQstatus( m_conn) != CONNECTION_OK ) return false;
 
-    return taskUp->prepareExec( m_conn);
+    return taskUp->prepareExec( m_conn );
 }

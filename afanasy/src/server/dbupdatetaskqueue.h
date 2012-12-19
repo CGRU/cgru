@@ -11,6 +11,10 @@ public:
 
    static bool prepare( PGconn * i_conn);
    bool prepareExec( PGconn * i_conn) const;
+   
+   int get_job_id() {return m_id_job; };
+   int get_block_id() { return m_id_block; };
+   int get_task_id() { return m_id_task; };
 
 private:
     int m_id_job;

@@ -15,7 +15,7 @@
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 afsql::DBConnection * JobContainer::m_afDB = NULL;
@@ -110,7 +110,8 @@ int JobContainer::job_register( JobAf *job, UserContainer *users, MonitorContain
 
         if( monitoring) AfContainerLock mLock( monitoring, AfContainerLock::WRITELOCK  );
 
-        AFINFA("JobContainer::job_register: Checking job user '%s'", job->getUserName().toUtf8().data())
+        //AFINFA("JobContainer::job_register: Checking job user '%s'", job->getUserName().toUtf8().data())
+        AFINFA( "JobContainer::job_register: Checking job user '%s'", job->getUserName().c_str() )
         user = users->addUser( job->getUserName(), job->getHostName(), monitoring);
         if( user == NULL )
         {

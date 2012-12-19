@@ -4,7 +4,7 @@
 #include "afcommon.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 AfContainerLock::AfContainerLock( AfContainer* afcontainer, LockType locktype):

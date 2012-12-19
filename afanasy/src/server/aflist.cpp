@@ -6,7 +6,7 @@
 #include "../libafanasy/dlScopeLocker.h"
 
 #define AFOUTPUT
-#undef AFOUTPUT
+//#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 
@@ -142,7 +142,8 @@ printf("AfList::moveNodes:\n");
          if( (*it)->m_node->m_id == i_list[n] )
          {
 #ifdef AFOUTPUT
-printf("Founded a node \"%s\"-%d\n", (*it)->getName().c_str(), (*it)->m_node->m_id);
+//printf("Founded a node \"%s\"-%d\n", (*it)->getName().c_str(), (*it)->m_node->m_id);
+printf("Founded a node \"%s\"-%d\n", (*it)->m_node->m_name.c_str(), (*it)->m_node->m_id );
 #endif
             move_list.push_back( *it);
             break;
@@ -184,7 +185,8 @@ printf("Founded a node \"%s\"-%d\n", (*it)->getName().c_str(), (*it)->m_node->m_
          it_move++;
       }
 #ifdef AFOUTPUT
-printf("Processing node \"%s\"-%d\n", node->getName().c_str(), node->getId());
+//printf("Processing node \"%s\"-%d\n", node->getName().c_str(), node->getId());
+printf("Processing node \"%s\"-%d\n",  node->m_node->m_name.c_str(), node->m_node->m_id );
 #endif
       std::list<AfNodeSrv*>::iterator it_insert = nodes_list.begin();
       while( it_insert != it_end)
@@ -316,7 +318,8 @@ printf("Node is already at it's position.\n");
       }
 
 #ifdef AFOUTPUT
-printf("Inserting at \"%s\"-%d\n", node_move->getName().c_str(), node_move->getId());
+//printf("Inserting at \"%s\"-%d\n", node_move->getName().c_str(), node_move->getId());
+printf("Inserting at \"%s\"-%d\n", node_move->m_node->m_name.c_str(), node_move->m_node->m_id );
 #endif
       nodes_list.remove( node);
       nodes_list.insert( it_insert, node);

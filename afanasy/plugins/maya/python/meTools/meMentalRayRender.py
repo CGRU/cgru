@@ -617,6 +617,7 @@ class meMentalRayRender( object ):
 
       block1 = af.Block( 'render', 'mentalray' )
       block1.setWorkingDirectory( self.rootDir )
+      block1.setCapacity ( af_capacity )
       
       pad_str = '#'
       if mi_padding > 0 and mi_perframe == True :
@@ -630,8 +631,10 @@ class meMentalRayRender( object ):
       
       for img in range( 0, len( images ) ) :
         # use relative pathnames if possible
-        imageFileName += self.fromNativePath ( cmds.workspace( projectPath = images[ img ] ) )
-        #imageFileName += images[ img ]
+        # imageFileName += self.fromNativePath ( cmds.workspace( projectPath = images[ img ] ) )
+        
+        # in some cases full path name works better, though...
+        imageFileName += images[ img ]
         if img < ( len( images ) - 1 ) : 
            imageFileName += ';'
       
