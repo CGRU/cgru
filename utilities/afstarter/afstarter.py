@@ -158,7 +158,7 @@ class Dialog( QtGui.QWidget):
       self.constructed = False
       self.evaluated   = False
       self.output      = ''
-      self.setWindowTitle('Afanasy Starter   CGRU ' + os.environ['CGRU_VERSION'])
+      self.setWindowTitle('Afanasy Starter   CGRU ' + os.getenv('CGRU_VERSION', ''))
       self.fields = dict()
       self.labels = dict()
 
