@@ -165,7 +165,9 @@ bool af::pathMakePath( const std::string & i_path, VerboseMode i_verbose)
 			path = folders[i];
 		else
 			path += sc + folders[i];
-
+#ifdef WINNT
+		if( folders[i].find(':') == 1 ) continue; // Skip MS Windows disk:
+#endif
 		if( false == af::pathMakeDir( path, i_verbose))
 			return false;
 	}
