@@ -772,20 +772,28 @@ void RenderAf::disableServices()
 	disabledservices.resize( servicesnum, 0);
 	if( false == m_services_disabled.empty())
 	{
-		std::list<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
-		for( std::list<std::string>::const_iterator it = dissrvlist.begin(); it != dissrvlist.end(); it++)
-			for( int i = 0; i < servicesnum; i++)
-				if( *it == m_host.getServiceName(i))
-					disabledservices[i] = 1;
+		std::vector<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
+		for( int i = 0; i < dissrvlist.size(); i++)
+			for( int j = 0; j < servicesnum; j++)
+				if( dissrvlist[i] == m_host.getServiceName(j))
+					disabledservices[j] = 1;
 	}
 	checkDirty();
 }
 
 void RenderAf::setService( const std::string & srvname, bool enable)
 {
-	std::list<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
-	if( enable) dissrvlist.remove( srvname);
-	else dissrvlist.push_back( srvname);
+	std::vector<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
+	std::vector<std::string> dissrvlist_new;
+	if( enable)
+		for( int i = 0; i < dissrvlist_new.size(); i++)
+			if( dissrvlist[i] != srvname )
+				dissrvlist_new.push_back( dissrvlist[i]);
+	else
+	{
+		dissrvlist_new = dissrvlist;
+		dissrvlist_new.push_back( srvname);
+	}
 
 	if( dissrvlist.size()) m_services_disabled = af::strJoin( dissrvlist, ";");
 	else m_services_disabled.clear();

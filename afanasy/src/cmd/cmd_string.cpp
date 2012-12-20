@@ -20,10 +20,10 @@ bool CmdString::processArguments( int argc, char** argv, af::Msg &msg)
    std::string str( argv[1]);
    if( operation == "split")
    {
-      std::list<std::string> strlist = af::strSplit( str);
+      std::vector<std::string> strlist = af::strSplit( str);
       std::cout << "Splitted list:";
-      for( std::list<std::string>::const_iterator it = strlist.begin(); it != strlist.end(); it++)
-         std::cout << "\n   \"" << *it << "\"";
+      for( int i = 0; i < strlist.size(); i++)
+         std::cout << "\n   \"" << strlist[i] << "\"";
       std::cout << std::endl;
    }
    else if( operation == "join")

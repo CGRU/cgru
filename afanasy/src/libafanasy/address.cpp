@@ -344,29 +344,29 @@ bool Address::readIpMask( const std::vector<std::string> & i_masks, bool i_verbo
             // IPv4
             mask_family = Address::IPv4;
 
-            std::list<std::string> byte_strs = strSplit( *it, ".");
+            std::vector<std::string> byte_strs = strSplit( *it, ".");
             if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 4 ))
             {
                 AFERRAR("Invalid Server IPv4 Mask: '%s' - should be 2 - 4 entries separated with '.'", (*it).c_str());
                 return false;
             }
 
-            for( std::list<std::string>::const_iterator bit = byte_strs.begin(); bit != byte_strs.end(); bit++)
+            for( int i = 0; i < byte_strs.size(); i++)
             {
-                if( *bit == "*")
+                if( byte_strs[i] == "*")
                 {
                     break;
                 }
                 bool ok;
-                unsigned byte = (unsigned)af::stoi( *bit, &ok);
+                unsigned byte = (unsigned)af::stoi( byte_strs[i], &ok);
                 if( false == ok )
                 {
-                    AFERRAR("Invalid Server IP Mask: '%s': Invalid decimal number '%s'.", (*it).c_str(), (*bit).c_str());
+                    AFERRAR("Invalid Server IP Mask: '%s': Invalid decimal number '%s'.", (*it).c_str(), byte_strs[i].c_str());
                     return false;
                 }
                 if( byte > 0xff )
                 {
-                    AFERRAR("Invalid Server IP Mask: '%s': Too big decimal number '%s'.", (*it).c_str(), (*bit).c_str());
+                    AFERRAR("Invalid Server IP Mask: '%s': Too big decimal number '%s'.", (*it).c_str(), byte_strs[i].c_str());
                     return false;
                 }
                 mask_bytes[mask_len] = byte;
@@ -378,22 +378,22 @@ bool Address::readIpMask( const std::vector<std::string> & i_masks, bool i_verbo
             // IPv6
             mask_family = Address::IPv6;
 
-            std::list<std::string> byte_strs = strSplit( *it, ":");
+            std::vector<std::string> byte_strs = strSplit( *it, ":");
             if(( byte_strs.size() < 2 ) || ( byte_strs.size() > 8 ))
             {
                 AFERRAR("Invalid Server IPv6 Mask: '%s' - should be 2 - 8 entries separated with ':'", (*it).c_str());
                 return false;
             }
 
-            for( std::list<std::string>::const_iterator bit = byte_strs.begin(); bit != byte_strs.end(); bit++)
+            for( int i = 0; i < byte_strs.size(); i++)
             {
-                if( *bit == "*")
+                if( byte_strs[i] == "*")
                 {
                     break;
                 }
 
                 unsigned byte;
-                sscanf( (*bit).c_str(), "%x", &byte);
+                sscanf( byte_strs[i].c_str(), "%x", &byte);
                 uint8_t hi = byte >> 8;
                 uint8_t lo = byte - (int(hi) << 8);
                 mask_bytes[mask_len++] = hi;

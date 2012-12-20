@@ -273,9 +273,9 @@ const std::string af::strEscape( const std::string & i_str)
 	return str;
 }
 
-const std::list<std::string> af::strSplit( const std::string & str, const std::string & separators)
+const std::vector<std::string> af::strSplit( const std::string & str, const std::string & separators)
 {
-	std::list<std::string> strlist;
+	std::vector<std::string> strlist;
 	// Skip delimiters at beginning.
 	std::string::size_type lastPos = str.find_first_not_of( separators, 0);
 	// Find first "non-delimiter".

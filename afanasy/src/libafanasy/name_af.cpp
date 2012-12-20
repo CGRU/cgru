@@ -81,15 +81,16 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
     if( i_wdir.size() > 0 )
         wdir = i_wdir.c_str();
 
-	std::list<std::string> shellWithArgs = af::strSplit( af::Environment::getCmdShell());
-	const char * shell = shellWithArgs.front().c_str();
-	
+	std::vector<std::string> shellWithArgs = af::strSplit( af::Environment::getCmdShell());
 	if( shellWithArgs.size() == 0 )
 	{
 		AFERROR("af::launchProgram: Shell is not defined.")
 		return 0;
 	}
-	else if( shellWithArgs.size() == 2)
+
+	const char * shell = shellWithArgs.front().c_str();
+	
+	if( shellWithArgs.size() == 2)
 	{
 		// Shell has one argunet - most common case:
 		// "bash -c" or "cmd.exe /c"
@@ -106,7 +107,7 @@ int af::launchProgram( const std::string & i_commandline, const std::string & i_
 	{
 		// Collect each shell argument pointer in a single array:
 		const char ** args = new const char *[ shellWithArgs.size()+1];
-		std::list<std::string>::iterator it = shellWithArgs.begin();
+		std::vector<std::string>::iterator it = shellWithArgs.begin();
 		it++;
 		int i = 0;
 		while( i < shellWithArgs.size() - 1)

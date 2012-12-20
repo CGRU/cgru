@@ -149,6 +149,29 @@ bool af::pathMakeDir( const std::string & i_path, VerboseMode i_verbose)
 	return true;
 }
 
+bool af::pathMakePath( const std::string & i_path, VerboseMode i_verbose)
+{
+	char sc = '/';
+	if( i_path.find('\\') != -1 )
+		sc = '\\';
+	bool startsWithSep = ( i_path.find( sc) == 0 );
+
+	std::vector<std::string> folders = af::strSplit( i_path, std::string( 1, sc));
+
+	std::string path;
+	for( int i = 0; i < folders.size(); i++)
+	{
+		if(( i == 0 ) && ( startsWithSep == false ))
+			path = folders[i];
+		else
+			path += sc + folders[i];
+
+		if( false == af::pathMakeDir( path, i_verbose))
+			return false;
+	}
+	return true;
+}
+
 char * af::fileRead( const std::string & filename, int & readsize, int maxfilesize, std::string * errOutput)
 {
 	struct stat st;

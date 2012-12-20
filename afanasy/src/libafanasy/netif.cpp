@@ -137,11 +137,10 @@ int NetIF::calcWeight() const
 
 void NetIF::getNetIFs( std::string str, std::vector<NetIF*> & netIFs)
 {
-   std::list<std::string> strings = af::strSplit( str, " ");
-   std::list<std::string>::const_iterator it = strings.begin();
-   for( ; it != strings.end(); it++)
+   std::vector<std::string> strings = af::strSplit( str, " ");
+   for( int i = 0; i < strings.size(); i++)
    {
-      NetIF * netif = new NetIF(*it);
+      NetIF * netif = new NetIF(strings[i]);
       if( false == netif->isNull())
          netIFs.push_back( netif);
    }

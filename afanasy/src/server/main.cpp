@@ -62,7 +62,7 @@ int main(int argc, char *argv[])
     if( ENV.isHelpMode()) return 0;
 
     // create directories if it is not exists
-    if( af::pathMakeDir( ENV.getTempDirectory(),  af::VerboseOn ) == false) return 1;
+    if( af::pathMakePath( ENV.getTempDirectory(), af::VerboseOn ) == false) return 1;
     if( af::pathMakeDir( ENV.getTasksStdOutDir(), af::VerboseOn ) == false) return 1;
     if( af::pathMakeDir( ENV.getUsersLogsDir(),   af::VerboseOn ) == false) return 1;
     if( af::pathMakeDir( ENV.getRendersLogsDir(), af::VerboseOn ) == false) return 1;
