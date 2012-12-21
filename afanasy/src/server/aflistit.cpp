@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 AfListIt::AfListIt( AfList* i_aflist):

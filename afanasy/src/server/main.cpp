@@ -20,7 +20,7 @@
 
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 extern bool AFRunning;

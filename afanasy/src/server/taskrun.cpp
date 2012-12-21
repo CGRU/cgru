@@ -15,7 +15,7 @@
 #include "task.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 TaskRun::TaskRun( Task * runningTask,

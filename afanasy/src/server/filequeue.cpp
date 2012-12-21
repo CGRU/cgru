@@ -3,7 +3,7 @@
 #include "afcommon.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 FileQueue::FileQueue( const std::string & QueueName):

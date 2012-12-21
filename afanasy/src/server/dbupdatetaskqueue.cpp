@@ -8,7 +8,7 @@
 #include "afcommon.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 char DBTaskUpdateData::ms_db_prepare_name[] = "tasks_progress_update";

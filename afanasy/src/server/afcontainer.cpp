@@ -11,7 +11,7 @@
 #include "afcontainerit.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 AfContainer::AfContainer(  std::string ContainerName, int MaximumSize):

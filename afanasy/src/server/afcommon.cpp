@@ -17,7 +17,7 @@
 #include "threadargs.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 af::MsgQueue      * AFCommon::MsgDispatchQueue  = NULL;

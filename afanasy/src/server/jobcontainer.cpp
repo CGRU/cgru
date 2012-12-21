@@ -15,7 +15,7 @@
 #include "monitorcontainer.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 afsql::DBConnection * JobContainer::m_afDB = NULL;

@@ -6,7 +6,7 @@
 #include "../libafanasy/dlScopeLocker.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 

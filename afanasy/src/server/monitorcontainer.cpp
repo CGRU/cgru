@@ -12,7 +12,7 @@
 #include "useraf.h"
 
 #define AFOUTPUT
-//#undef AFOUTPUT
+#undef AFOUTPUT
 #include "../include/macrooutput.h"
 
 MonitorContainer::MonitorContainer():
