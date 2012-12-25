@@ -62,16 +62,38 @@ function listDir( $i_readdir, &$o_out)
 			}
 		}
 		closedir($handle);
+		sort( $out['folders']);
+		sort( $out['files']);
+		sort( $out['rufiles']);
 	}
 
 	$o_out['readdir'] = $out;
+}
+
+function readConfig( $i_file, &$o_out)
+{
+	if( $fHandle = fopen( $i_file, 'r'))
+	{
+		$data = fread( $fHandle, 1000000);
+		fclose($fHandle);
+		$o_out[$i_file] = json_decode( $data, true);
+		if( $o_out[$i_file]['cgru_config']['include'] )
+			foreach( $o_out[$i_file]['cgru_config']['include'] as $file )
+				readConfig( $file, $o_out);
+	}
 }
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
 if( $recv['readdir'])
 {
-	listDir($recv, $out); 
+	listDir($recv, $out);
+}
+else if( $recv['readconfig'])
+{
+	$configs = array();
+	readConfig( $recv['readconfig'], $configs); 
+	$out['config'] = $configs;
 }
 
 echo json_encode( $out);

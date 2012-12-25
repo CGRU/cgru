@@ -1,3 +1,42 @@
+.cgru_window_back {
+position: absolute;
+background: rgba(0,0,0,0.5);
+top: 0; bottom: 0; left: 0; right: 0;
+}
+.cgru_window_window {
+position: absolute;
+background: #999;
+top: 10%; bottom: 10%; left: 10%; right: 10%;
+border-radius: 10px;
+box-shadow: 0px 0px 10px #000;
+}
+.cgru_window_content {
+overflow: auto;
+background: #BBB;
+position: absolute;
+padding: 20px;
+top: 24px; bottom: 4px; left: 4px; right: 4px;
+box-shadow: 0px 0px 6px #000 inset;
+border-radius: 8px;
+}
+.cgru_window_title {
+background: #CCC;
+position: absolute;
+height: 20px;
+text-align: center;
+top: 0; left: 0; right: 0;
+}
+.cgru_window_close {
+cursor: pointer;
+background: #DDD;
+border-radius: 4px;
+position: absolute;
+top: 0px; right: 10px;
+padding: 0px 4px;
+box-shadow: 0px 0px 4px #000;
+}
+.cgru_window_close:hover { background: #FFF; }
+
 .cgru_dialog_content * {
 margin: 0; padding: 0; overflow: hidden;
 font: 16px Arial;

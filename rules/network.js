@@ -1,3 +1,10 @@
+function n_ReadConfig()
+{
+	var request = {};
+	request.readconfig = 'config_default.json';
+	return c_Parse( n_Request( request));
+}
+
 function n_ReadDir( i_path)
 {
 	var path = i_path;

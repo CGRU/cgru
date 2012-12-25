@@ -2,11 +2,6 @@ RULES = {};
 RULES.rules = 'rules';
 RULES_TOP = {};
 
-g_params = [];
-g_params.push(['user_name','User Name', 'admin', 'Enter User Name<br/>Need Restart (F5)']);
-g_params.push(['user_title','User Title', 'Administrator', 'Enter User Title']);
-g_params.push(['host_name','Host Name', 'pc','Enter Host Name<br/>Needed For Logs Only']);
-
 g_elements = ['asset','data','navig','info','log','assets'];
 g_el = {};
 
@@ -19,6 +14,10 @@ function g_Init()
 	cgru_Init();
 	c_Init();
 
+	var config = n_ReadConfig();
+	for( var file in config.config )
+		cgru_ConfigJoin( config.config[file].cgru_config );
+
 	var top_dir = n_ReadDir('.');
 	if( top_dir )
 		c_RulesMerge( top_dir.rules);
@@ -28,8 +27,14 @@ function g_Init()
 	g_el.navig.m_path = '/';
 
 	window.onhashchange = g_PathChanged;
+	document.body.onkeydown = g_OnKeyDown;
 
 	g_PathChanged();
+}
+
+function g_OnKeyDown(e)
+{
+	if( e.keyCode == 27 ) cgru_ClosePopus();// ESC
 }
 
 function g_GO( i_path)
@@ -124,8 +129,6 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 		g_elCurFolder.m_dir = n_ReadDir( i_path);
 	if( g_elCurFolder.m_dir == null )
 		return false;
-
-	g_elCurFolder.m_dir.folders = g_elCurFolder.m_dir.folders.sort();
 
 	c_RulesMerge( g_elCurFolder.m_dir.rules);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
