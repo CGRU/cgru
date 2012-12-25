@@ -2,6 +2,9 @@
 config.json
 farm.json
 
+# Rules root
+root
+
 # Override scripts
 override.sh
 override.cmd

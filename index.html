@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>RULES</title>
+<link type="text/css" rel="stylesheet" href="lib/styles.css">
+<link type="text/css" rel="stylesheet" href="rules/styles.css">
+<script type="text/javascript" src="lib/cgru.js"></script>
+<script type="text/javascript" src="rules/asset.js"></script>
+<script type="text/javascript" src="rules/common.js"></script>
+<script type="text/javascript" src="rules/general.js"></script>
+<script type="text/javascript" src="rules/network.js"></script>
+</head>
+<body onload="g_Init()">
+
+<div id="content">
+<div id="asset"></div>
+<div id="data"></div>
+</div>
+
+<div id="navig"></div>
+
+<div id="header">
+	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; border-radius: 5px; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px">
+		<div style="top: 0px; bottom: 0px; width: 250px; position: absolute; /*border: 1px solid #000;*/">
+			<div class="parameter">
+				<div class="label">Browser Storage</div>
+				<div class="button" style="left:120px" onclick="cgru_LocalStorageShow()">Show</div>
+				<div class="button" style="left:170px" onclick="c_LocalStorageClearClicked()">Clear</div>
+			</div>
+			<div class="parameter">
+				<div class="label">CGRU Config</div>
+				<div class="button" style="left:120px" onclick="cgru_ConfigShow()">Show</div>
+			</div>
+			<div class="parameter">
+				<div class="label">Platform:</div>
+				<div class="variable" id="platform" style="left:70px;right:15px">unknown</div>
+			</div>
+			<div class="parameter">
+				<div class="label">Browser:</div>
+				<div class="variable" id="browser" style="left:70px;right:15px">unknown</div>
+			</div>
+		</div>
+		<div id="parameters" style="position:absolute; left: 250px; width: 300px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
+	</div>
+	<div class="openbtn" onclick="c_HeaderOpenButtonClicked(this,'header','-200px')">&darr;</div>
+	<div class="panel">
+		<div class="button" onclick="g_GO('/')">Home</div>
+		<div id="assets"></div>
+	</div>
+</div>
+
+<div id="footer">
+	<div class="openbtn" onclick="c_HeaderOpenButtonClicked(this,'footer','-200px')">&uarr;</div>
+	<div id="version">v?</div>
+	<div id="info"></div>
+	<div id="log"></div>
+</div>
+
+</body>
+</html>

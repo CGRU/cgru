@@ -1,0 +1,195 @@
+body {
+font: 16px Arial;
+background: #ab8;
+}
+
+* {
+margin: 0;
+padding: 0;
+overflow: hidden;
+}
+
+#header, #footer, #navig {
+background: #ab7;
+position: absolute;
+box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 15px #FFF inset;
+}
+
+#header,#footer {
+left: 0; right: 0;
+height: 238px;
+-o-transition: all .3s ease-in-out;
+-moz-transition: all .3s ease-in-out;
+-webkit-transition: all .3s ease-in-out;
+}
+#header {
+top: -200px;
+/*
+top: 0;
+*/
+}
+#footer {
+bottom: -200px;
+/*
+bottom: 0;
+*/
+}
+.openbtn {
+cursor: pointer;
+position: absolute;
+left: 10px;
+width: 9px; height: 20px;
+padding: 2px;
+box-shadow: 0px 0px 4px #000, 0px 0px 1px #000 inset, 0px 0px 5px #FFF inset;
+border-radius: 3px;
+}
+#header .openbtn { bottom: 8px;}
+#footer .openbtn { top: 8px;}
+.parameter {
+box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
+border-radius: 4px;
+margin: 5px 10px;
+position: relative;
+height: 24px;
+}
+.parameter * {
+text-align: center;
+position: absolute;
+}
+.parameter .label { padding: 5px 10px }
+.parameter .button {
+border-radius: 4px;
+cursor: pointer;
+width: 30px; right: 5px;
+top: 2px; bottom: 2px;
+box-shadow: 0px 0px 3px rgba(0,0,0,.5), 0px 0px 5px rgba(255,255,255,.5) inset;
+padding: 3px 8px;
+}
+.parameter .variable {
+border-radius: 2px;
+position: absolute;
+left: 80px; right: 60px;
+top: 2px; bottom: 2px;
+box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
+padding: 3px 8px;
+}
+#header .panel {
+position: absolute;
+left: 40px; right: 10px; bottom: 5px; height: 30px;
+/*box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
+border-radius: 5px;*/
+}
+#header .panel .button {
+float: left;
+cursor: pointer;
+padding: 4px 8px;
+margin: 1px 8px;
+box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
+border-radius: 4px;
+}
+
+#footer #version {
+float: right;
+margin: 10px;
+}
+#footer #info {
+background: #DDD;
+border-radius: 4px;
+margin: 8px 30px;
+padding: 3px 10px;
+height: 20px;
+box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.5);
+}
+#footer #log {
+position: absolute;
+overflow: auto;
+border-radius: 6px;
+left: 10px; right: 10px; top: 40px; bottom: 5px;
+box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.5);
+padding: 2px 6px;
+font-size: 12px;
+}
+#footer #log * { margin: 4px 1px;}
+
+#navig {
+width: 300px; top: 38px; bottom: 38px; left: 0; 
+overflow-y: scroll;
+/*user-select: none;*/
+-moz-user-select: none;
+-webkit-user-select: none;
+}
+
+#content {
+position: absolute;
+left: 300px; right: 0;
+top: 38px;
+bottom: 38px;
+padding: 10px;
+overflow-y: scroll;
+}
+
+.folder {
+cursor: pointer;
+box-shadow: 0px 0px 3px #000 inset;
+border: 1px solid rgba(255,255,255,.2);
+padding: 0px 0px 0px 16px;
+border-radius: 4px;
+font-weight: normal;
+}
+.folder.opened {
+padding-top: 4px;
+padding-bottom: 4px;
+background: rgba(200,255,255,.1);
+font-weight: bold;
+}
+.folder.current {
+background: rgba(200,255,255,.7);
+}
+
+#assets {
+background: rgba(200,255,255,.3);
+box-shadow: 0px 0px 3px #000 inset, 0px 0px 5px rgba(255,255,255,.7);
+border-radius: 12px;
+height: 30px;
+margin: 0px 100px;
+padding: 0px 10px;
+}
+#assets .asset {
+float: left;
+margin: 1px 4px;
+padding: 5px 4px;
+}
+#assets .asset .type {
+padding: 0px 4px;
+float: left;
+}
+#assets .asset .name {
+padding: 0px 4px;
+font-weight: bold;
+float: left;
+}
+
+#content #asset {}
+
+#content #asset > div {
+box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
+border-radius: 10px;
+margin: 6px;
+padding: 20px;
+}
+
+#content #data {
+font-family: courier;
+overflow: hidden;
+/*background-color: #010;
+color: #7F4;
+font-weight: bold;*/
+font-size: 12px;
+padding: 10px 20px;
+margin: 6px;
+opacity: 0.9;
+box-shadow: 0px 0px 5px #000 inset;
+border-radius: 10px;
+/*border: 3px solid #000;*/
+/*text-shadow: 0px 0px 20px #060, 20px 1px 2px #010;*/
+}

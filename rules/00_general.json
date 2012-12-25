@@ -1,0 +1,26 @@
+{
+"root":".",
+"rules":"rules",
+"assets":["project","scene","shot"],
+"assets_seek":{
+	"project":["/"],
+	"scene":["/[project]/SCENES/","/[project]/SHOTS/"],
+	"shot":["/[project]/SCENES/[scene]/","/[project]/SHOTS/[scene]/"]
+},
+
+"assets_data":{
+"shot":{
+	"source":["SOURCE/SCAN"],
+	"result":["RESULT/HRES/JPG","RESULT/JPG"],
+	"dailies":["RESULT/DAILIES"]
+}
+},
+
+"company":"CGRU",
+"fps":"24",
+"dailies":
+{
+	"resolution":"1280x720",
+	"fps":"25"
+}
+}
