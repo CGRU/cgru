@@ -12,11 +12,27 @@
 "shot":{
 	"source":["SOURCE/SCAN"],
 	"result":{
-		"path":["RESULT/HRES/JPG","RESULT/JPG"],
-		"cmdexec":["kwrite @PATH@","xterm -e \"cd @PATH@; ls -l; read -s -n 1\""]
+		"path":["RESULT/HRES/DPX","RESULT/DPX","RESULT/HRES/JPG","RESULT/JPG"],
+		"cmdexec":"play_sequence"
 	},
 	"dailies":["RESULT/DAILIES"]
 }
+},
+
+"OS_unix":{
+	"cmdexec":{
+		"play_sequence":[
+			"djv_view @PATH@",
+			"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""
+		]
+	}
+},
+"OS_windows":{
+	"cmdexec":{
+		"play_sequence":[
+			"pdplayer @PATH@"
+		]
+	}
 },
 
 "company":"CGRU",

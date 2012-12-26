@@ -45,7 +45,7 @@ function c_RulesMergeObjs( o_rules, i_rules_new)
 		{
 			for( var i = 0; i < cgru_Platform.length; i++)
 				if( attr == ('OS_'+cgru_Platform[i]))
-					g_RulesMerge( o_rules, i_rules_new[attr]);
+					c_RulesMergeObjs( o_rules, i_rules_new[attr]);
 			continue;
 		}
 		if(( typeof( i_rules_new[attr]) == 'object') && ( o_rules[attr] != null ))

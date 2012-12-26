@@ -6,9 +6,16 @@ const RunTime = require('runtime');
 Info = function( i_msg) { console.log('CGRU: '+i_msg);}
 
 Info('OS = "'+RunTime.OS+'"');
-Info('USER = "'+get('USER')+'"');
 var CmdShell = ['/bin/bash','-c'];
-if( RunTime.OS == 'WINNT' ) CmdShell = ['cmd.exe','/c'];
+if( RunTime.OS == 'WINNT' )
+{
+	CmdShell = [ get('ComSpec'),'/c'];
+	Info('USER = "'+get('USERNAME')+'"');
+}
+else
+{
+	Info('USER = "'+get('USER')+'"');
+}
 Info('CmdShell = "'+CmdShell[0]+' '+CmdShell[1]+'"');
 
 var menuItem = ContextMenu.Item({

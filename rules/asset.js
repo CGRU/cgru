@@ -232,7 +232,7 @@ function a_onMouseOver_ResultCmd( i_evt)
 	cgru_MenusCloseAll();
 	var menu = new cgru_Menu( document, document.body, i_evt, null, 'asset');
 	var path = cgru_PM( i_evt.currentTarget.m_path);
-	var exec = i_evt.currentTarget.m_exec;
+	var exec = RULES.cmdexec[i_evt.currentTarget.m_exec];
 	for( var c = 0; c < exec.length; c++)
 	{
 		var cmd = exec[c].replace('@PATH@', path);
