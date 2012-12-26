@@ -8,7 +8,7 @@ function a_Process()
 
 	a_ShowBody();
 
-	c_Info( g_elCurFolder.m_path);
+	c_Info( cgru_PM( '/'+RULES.root+g_elCurFolder.m_path));
 }
 
 function a_ShowBody()
@@ -26,37 +26,66 @@ function a_ShowBody()
 		{
 			var elResult = document.createElement('div');
 			g_el.asset.appendChild( elResult);
-			elResult.textContent = 'Result';
+			elResult.classList.add('result');
 
-			for( var r = 0; r < data.result.length; r++)
+			var founded = false;
+			for( var r = 0; r < data.result.path.length; r++)
 			{
-				var path = asset.path + '/' + data.result[r];
+				var path = asset.path + '/' + data.result.path[r];
 				var readdir = n_ReadDir( path);
 				if( readdir == null ) continue;
 				var folders = readdir.folders;
 				if( folders == null ) continue;
+				if( folders.length )
+				{
+					elPath = document.createElement('div');
+					elResult.appendChild( elPath);
+					elPath.textContent = data.result.path[r];
+				}
+				else
+					continue;
+
 				for( var f = 0; f < folders.length; f++)
 				{
-					var folder = folders[f];
+					var link = RULES.root + path + '/' + folders[f];
 
-					var elLinkDiv = document.createElement('div');
-					elResult.appendChild( elLinkDiv);
+					var elFolder = document.createElement('div');
+					elFolder.classList.add('folder');
+					elResult.appendChild( elFolder);
 
 					var elLinkA = document.createElement('a');
-					elLinkDiv.appendChild( elLinkA);
-					elLinkA.setAttribute('href', RULES.root + path + '/' + folder);
+					elFolder.appendChild( elLinkA);
+					elLinkA.setAttribute('href', link);
 					elLinkA.setAttribute('target', '_blank');
-					elLinkA.textContent = folder;
+					elLinkA.textContent = folders[f];
+
+					var elCmd = document.createElement('div');
+					elFolder.appendChild( elCmd);
+					elCmd.classList.add('menu');
+					elCmd.textContent = 'CMD';
+					elCmd.onmouseover = function(e){ return a_onMouseOver_ResultCmd(e);}
+					elCmd.m_path = '/'+link;
+					elCmd.m_exec = data.result.cmdexec;
+
+					var elMakeDailies = document.createElement('div');
+					elFolder.appendChild( elMakeDailies);
+					elMakeDailies.classList.add('button');
+					elMakeDailies.textContent = 'Make Dailies';
+
+					founded = true;
 				}
 			}
+
+			if( false == founded )
+				elResult.textContent = JSON.stringify( data.result.path );
 		}
 
 		if( data.dailies )
 		{
 			var elDailies = document.createElement('div');
 			g_el.asset.appendChild( elDailies);
-			elDailies.textContent = 'Dailies';
 
+			var founded = false;
 			for( var d = 0; d < data.dailies.length; d++)
 			{
 				var path = asset.path + '/' + data.dailies[d];
@@ -64,6 +93,15 @@ function a_ShowBody()
 				if( readdir == null ) continue;
 				var files = readdir.files;
 				if( files == null ) continue;
+				if( files.length )
+				{
+					elPath = document.createElement('div');
+					elDailies.appendChild( elPath);
+					elPath.textContent = data.dailies[d];
+				}
+				else
+					continue;
+
 				for( var f = 0; f < files.length; f++)
 				{
 					var file = files[f];
@@ -77,8 +115,13 @@ function a_ShowBody()
 					elLinkA.setAttribute('href', RULES.root + path + '/' + file);
 					elLinkA.setAttribute('target', '_blank');
 					elLinkA.textContent = file;
+
+					founded = true;
 				}
 			}
+
+			if( false == founded )
+				elDailies.textContent = JSON.stringify( data.dailies );
 		}
 	}
 
@@ -102,7 +145,7 @@ function a_Append( i_path, i_rules)
 			asset.name = RULES[attr];
 			asset.path = i_path;
 			ASSETS[attr] = asset;
-			c_Info('Asset: ' + asset.type + '=' + asset.name);
+			c_Log('Asset: ' + asset.type + '=' + asset.name);
 		}
 	}
 }
@@ -151,7 +194,7 @@ function a_AutoSeek()
 					if( path == '/' ) asset.path = '/' + folder;
 					else asset.path = path + '/' + folder;
 					ASSETS[asset_type] = asset;
-					c_Info('Asset founded: ' + asset.type + '=' + asset.name);
+					c_Log('Asset founded: ' + asset.type + '=' + asset.name);
 					break;
 				}
 			}
@@ -182,5 +225,19 @@ function a_ShowHeaders()
 		elName.classList.add('name');
 		elName.textContent = a_name;
 	}
+}
+
+function a_onMouseOver_ResultCmd( i_evt)
+{
+	cgru_MenusCloseAll();
+	var menu = new cgru_Menu( document, document.body, i_evt, null, 'asset');
+	var path = cgru_PM( i_evt.currentTarget.m_path);
+	var exec = i_evt.currentTarget.m_exec;
+	for( var c = 0; c < exec.length; c++)
+	{
+		var cmd = exec[c].replace('@PATH@', path);
+		menu.addItem( name, 'cmdexec', [cmd], cmd);
+	}
+	menu.show();
 }
 

@@ -128,7 +128,7 @@ padding: 10px;
 overflow-y: scroll;
 }
 
-.folder {
+#navig .folder {
 cursor: pointer;
 box-shadow: 0px 0px 3px #000 inset;
 border: 1px solid rgba(255,255,255,.2);
@@ -136,13 +136,13 @@ padding: 0px 0px 0px 16px;
 border-radius: 4px;
 font-weight: normal;
 }
-.folder.opened {
+#navig .folder.opened {
 padding-top: 4px;
 padding-bottom: 4px;
 background: rgba(200,255,255,.1);
 font-weight: bold;
 }
-.folder.current {
+#navig .folder.current {
 background: rgba(200,255,255,.7);
 }
 
@@ -193,3 +193,20 @@ border-radius: 10px;
 /*border: 3px solid #000;*/
 /*text-shadow: 0px 0px 20px #060, 20px 1px 2px #010;*/
 }
+
+.result {}
+.result .folder {
+border-radius: 4px;
+box-shadow: 0px 0px 3px #000 inset;
+padding: 2px 6px;
+margin: 2px;
+}
+.result .folder div {
+cursor: pointer;
+float: right;
+border-radius: 4px;
+padding: 0px 6px;
+margin: 0px 10px;
+}
+.result .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
+.result .folder .button { box-shadow: 0px 0px 2px #000; }

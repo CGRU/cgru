@@ -11,7 +11,10 @@
 "assets_data":{
 "shot":{
 	"source":["SOURCE/SCAN"],
-	"result":["RESULT/HRES/JPG","RESULT/JPG"],
+	"result":{
+		"path":["RESULT/HRES/JPG","RESULT/JPG"],
+		"cmdexec":["kwrite @PATH@","xterm -e \"cd @PATH@; ls -l; read -s -n 1\""]
+	},
 	"dailies":["RESULT/DAILIES"]
 }
 },

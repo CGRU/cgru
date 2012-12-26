@@ -22,6 +22,8 @@ function g_Init()
 	if( top_dir )
 		c_RulesMerge( top_dir.rules);
 	c_RulesMergeObjs( RULES_TOP, RULES);
+	if( RULES_TOP.cgru_config )
+		cgru_ConfigJoin( RULES_TOP.cgru_config );
 
 	g_el.navig.m_folder = '/';
 	g_el.navig.m_path = '/';
@@ -69,6 +71,7 @@ function g_Navigate( i_path)
 		g_elCurFolder.classList.remove('current');
 	g_elCurFolder = g_el.navig;
 
+	cgru_ClosePopus();
 	RULES = {};
 	ASSETS = {};
 
