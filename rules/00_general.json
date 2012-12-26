@@ -22,15 +22,18 @@
 "OS_unix":{
 	"cmdexec":{
 		"play_sequence":[
-			"djv_view @PATH@",
-			"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""
+			{"name":"DJV View",
+				"cmd":"djv_view @PATH@"},
+			{"name":"ls -l",
+				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""}
 		]
 	}
 },
 "OS_windows":{
 	"cmdexec":{
 		"play_sequence":[
-			"pdplayer @PATH@"
+			{"name":"Pdplayer",
+				"cmd":"pdplayer @PATH@"}
 		]
 	}
 },

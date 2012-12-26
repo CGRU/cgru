@@ -8,6 +8,8 @@ function a_Process()
 
 	a_ShowBody();
 
+	window.document.title = g_elCurFolder.m_path;
+
 	c_Info( cgru_PM( '/'+RULES.root+g_elCurFolder.m_path));
 }
 
@@ -59,13 +61,16 @@ function a_ShowBody()
 					elLinkA.setAttribute('target', '_blank');
 					elLinkA.textContent = folders[f];
 
-					var elCmd = document.createElement('div');
-					elFolder.appendChild( elCmd);
-					elCmd.classList.add('menu');
-					elCmd.textContent = 'CMD';
-					elCmd.onmouseover = function(e){ return a_onMouseOver_ResultCmd(e);}
-					elCmd.m_path = '/'+link;
-					elCmd.m_exec = data.result.cmdexec;
+					var localpath = cgru_PM( '/'+link);
+					var cmds = RULES.cmdexec[data.result.cmdexec];
+					for( var c = 0; c < cmds.length; c++)
+					{
+						var elCmd = document.createElement('div');
+						elFolder.appendChild( elCmd);
+						elCmd.classList.add('cmdexec');
+						elCmd.textContent = cmds[c].name;
+						elCmd.setAttribute('cmdexec', JSON.stringify( [cmds[c].cmd.replace( '@PATH@', localpath)]));
+					}
 
 					var elMakeDailies = document.createElement('div');
 					elFolder.appendChild( elMakeDailies);
@@ -226,7 +231,7 @@ function a_ShowHeaders()
 		elName.textContent = a_name;
 	}
 }
-
+/*
 function a_onMouseOver_ResultCmd( i_evt)
 {
 	cgru_MenusCloseAll();
@@ -240,4 +245,5 @@ function a_onMouseOver_ResultCmd( i_evt)
 	}
 	menu.show();
 }
+*/
 
