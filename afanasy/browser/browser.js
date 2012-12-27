@@ -678,7 +678,7 @@ function g_SuperUserProcessGUI()
 
 function g_ShowTask( i_obj)
 {
-	var title = i_obj.name;
+	var title = 'Task '+i_obj.name;
 	var wnd = g_OpenWindowWrite( title, title, true);
 	if( wnd == null ) return;
 	var doc = wnd.document;

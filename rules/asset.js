@@ -50,8 +50,6 @@ function a_ShowBody()
 				for( var f = 0; f < folders.length; f++)
 				{
 					var link = RULES.root + path + '/' + folders[f];
-					var serverpath = '/'+link;
-					var localpath = cgru_PM( serverpath);
 
 					var elFolder = document.createElement('div');
 					elFolder.classList.add('folder');
@@ -70,7 +68,8 @@ function a_ShowBody()
 						elFolder.appendChild( elCmd);
 						elCmd.classList.add('cmdexec');
 						elCmd.textContent = cmds[c].name;
-						elCmd.setAttribute('cmdexec', JSON.stringify( [cmds[c].cmd.replace( '@PATH@', localpath)]));
+						elCmd.setAttribute('cmdexec', JSON.stringify(
+							[cmds[c].cmd.replace( '@PATH@', cgru_PM('/'+link))]));
 					}
 
 					if( data.dailies )
@@ -79,8 +78,9 @@ function a_ShowBody()
 						elFolder.appendChild( elMakeDailies);
 						elMakeDailies.classList.add('button');
 						elMakeDailies.textContent = 'Make Dailies';
+						elMakeDailies.m_path = path + '/' + folders[f];
 						elMakeDailies.onclick = function(e){
-							d_Make( serverpath, '/'+RULES.root+asset.path+'/'+data.dailies[0])};
+							d_Make( e.currentTarget.m_path, asset.path+'/'+data.dailies[0])};
 					}
 
 					founded = true;
@@ -136,7 +136,7 @@ function a_ShowBody()
 		}
 	}
 
-	g_el.data.innerHTML = 'RULES='+JSON.stringify( RULES)+'<br><br>ASSETS='+JSON.stringify( ASSETS);
+	g_el.rules.innerHTML = 'RULES='+JSON.stringify( RULES)+'<br><br>ASSETS='+JSON.stringify( ASSETS);
 }
 
 function a_Append( i_path, i_rules)

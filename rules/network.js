@@ -57,6 +57,25 @@ document.getElementById('recv').textContent='recv: ' + xhr.responseText;
 	}
 */
 }
+
+function n_SendJob( job)
+{
+	if( job.user_name == null )
+		job.user_name = localStorage.user_name;
+	if( job.host_name == null )
+		job.host_name = localStorage.host_name;
+
+	var obj = {};
+	obj.afanasy = 1;
+	obj.job = job;
+	obj.address = cgru_Config.af_servername;
+	obj.port = cgru_Config.af_serverport;
+	obj.sender_id = 0;
+	obj.magick_number = cgru_Config.af_magic_number;
+	
+	n_Request( obj);
+}
+
 /*
 function n_Get( i_file)
 {

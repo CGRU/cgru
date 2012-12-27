@@ -83,6 +83,33 @@ function readConfig( $i_file, &$o_out)
 	}
 }
 
+function afanasy( $i_obj, &$o_out)
+{
+	$socket = fsockopen( $i_obj['address'], $i_obj['port'], $errno, $errstr);
+	if( !$socket)
+	{
+		$o_out['satus'] = 'error';
+		$o_out['error'] = $errstr;
+		return;
+	}
+
+	$obj = array();
+	$obj['job'] = $i_obj['job'];
+	$data = json_encode( $obj);
+
+	$header = '[ * AFANASY * ]';
+	$header = $header.' '.$i_obj['magick_number'];
+	$header = $header.' '.$i_obj['sender_id'];
+	$header = $header.' '.strlen($data);
+	$header = $header.' JSON';
+
+	fwrite( $socket, $header.$data);
+	fclose( $socket);
+
+	$o_out['satus'] = 'success';
+//	$o_out['header'] = $header;
+}
+
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
 if( $recv['readdir'])
@@ -94,6 +121,10 @@ else if( $recv['readconfig'])
 	$configs = array();
 	readConfig( $recv['readconfig'], $configs); 
 	$out['config'] = $configs;
+}
+else if( $recv['afanasy'])
+{
+	afanasy( $recv, $out);
 }
 
 echo json_encode( $out);

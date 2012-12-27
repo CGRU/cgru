@@ -178,7 +178,7 @@ margin: 6px;
 padding: 20px;
 }
 
-#content #data {
+#content #rules, .rules {
 font-family: courier;
 overflow: hidden;
 /*background-color: #010;
@@ -197,7 +197,7 @@ border-radius: 10px;
 .result {}
 .result .folder {
 border-radius: 4px;
-box-shadow: 0px 0px 3px #000 inset;
+box-shadow: 0 0 3px #000 inset;
 padding: 2px 6px;
 margin: 2px;
 }
@@ -210,3 +210,11 @@ margin: 0px 10px;
 }
 .result .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
 .result .folder .button { box-shadow: 0px 0px 2px #000; }
+
+.dailies div { margin: 4px; border-radius: 4px;}
+.dailies .label { float: left; text-transform: capitalize;}
+.dailies div .param, .dailies div div { margin: 4px 8px; padding: 3px 6px;}
+.dailies div .param, .dailies .rules { box-shadow: 0 0 4px #000 inset;}
+.dailies div .param { background: #DDD;}
+.dailies .rules { padding: 12px; }
+.dailies .button { cursor: pointer; box-shadow: 0 0 4px #000, 0 0 4px #FFF inset; text-align: center;}

@@ -2,7 +2,7 @@ RULES = {};
 RULES.rules = 'rules';
 RULES_TOP = {};
 
-g_elements = ['asset','data','navig','info','log','assets'];
+g_elements = ['asset','rules','navig','info','log','assets'];
 g_el = {};
 
 g_elCurFolder = null;
@@ -24,6 +24,9 @@ function g_Init()
 	c_RulesMergeObjs( RULES_TOP, RULES);
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
+
+	document.getElementById('afanasy_webgui').innerHTML =
+		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">Web GUI</a>';
 
 	g_el.navig.m_folder = '/';
 	g_el.navig.m_path = '/';
