@@ -50,6 +50,8 @@ function a_ShowBody()
 				for( var f = 0; f < folders.length; f++)
 				{
 					var link = RULES.root + path + '/' + folders[f];
+					var serverpath = '/'+link;
+					var localpath = cgru_PM( serverpath);
 
 					var elFolder = document.createElement('div');
 					elFolder.classList.add('folder');
@@ -61,7 +63,6 @@ function a_ShowBody()
 					elLinkA.setAttribute('target', '_blank');
 					elLinkA.textContent = folders[f];
 
-					var localpath = cgru_PM( '/'+link);
 					var cmds = RULES.cmdexec[data.result.cmdexec];
 					for( var c = 0; c < cmds.length; c++)
 					{
@@ -72,10 +73,15 @@ function a_ShowBody()
 						elCmd.setAttribute('cmdexec', JSON.stringify( [cmds[c].cmd.replace( '@PATH@', localpath)]));
 					}
 
-					var elMakeDailies = document.createElement('div');
-					elFolder.appendChild( elMakeDailies);
-					elMakeDailies.classList.add('button');
-					elMakeDailies.textContent = 'Make Dailies';
+					if( data.dailies )
+					{
+						var elMakeDailies = document.createElement('div');
+						elFolder.appendChild( elMakeDailies);
+						elMakeDailies.classList.add('button');
+						elMakeDailies.textContent = 'Make Dailies';
+						elMakeDailies.onclick = function(e){
+							d_Make( serverpath, '/'+RULES.root+asset.path+'/'+data.dailies[0])};
+					}
 
 					founded = true;
 				}

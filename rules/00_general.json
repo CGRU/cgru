@@ -43,6 +43,17 @@
 "dailies":
 {
 	"resolution":"1280x720",
-	"fps":"25"
+	"fps":"25",
+	"codec":"photojpg_high",
+	"template":"dailies_withlogo",
+	"slate":"dailies_slate",
+	"naming":"(s)_(v)_(d)",
+	"logo_slate_path":"logo.png",
+	"logo_slate_size":25,
+	"logo_slate_grav":"SouthEast",
+	"logo_frame_path":"logo.png",
+	"logo_frame_size":10,
+	"logo_frame_grav":"North",
+	"activity":"comp"
 }
 }
