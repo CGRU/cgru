@@ -21,34 +21,40 @@
 <div id="content"></div>
 
 <div id="header" class="su_user">
-	<div id="settings">
-		<div style="position:absolute;left:0;right:50%;top:0;bottom:0;">
-			<div class="parameter" style="top:0px">
-				<div class="label" style="left:0;">Local Storage</div>
-				<div class="button" style="left:100px;" onclick="g_LocalStorageShow()">Show</div>
-				<div class="button" style="left:150px;" onclick="g_LocalStorageClearClicked()">Clear</div>
+	<div id="settings" style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; border-radius: 5px; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px">
+		<div style="position:absolute;left:0;width:250px;top:0;bottom:0;">
+			<div class="cgru_parameter">
+				<div class="label">Browser Storage</div>
+				<div class="button" style="left:120px;" onclick="cgru_LocalStorageShow()">Show</div>
+				<div class="button" style="left:170px;" onclick="cgru_LocalStorageClearClicked()">Clear</div>
 			</div>
-			<div class="parameter" style="top:30px">
-				<div class="label" style="left:0;">CGRU Config</div>
-				<div class="button" style="left:100px;" onclick="g_CGRUConfigShow()">Show</div>
+			<div class="cgru_parameter">
+				<div class="label">CGRU Config</div>
+				<div class="button" style="left:120px;" onclick="cgru_ConfigShow()">Show</div>
 			</div>
-			<div class="parameter" style="top:60px">
-				<div>Platform:</div>
-				<div id="platform" style="left:60px;right:5px" class="variable">undefined</div>
+			<div class="cgru_parameter">
+				<div class="label">Platform:</div>
+				<div id="platform" style="left:70px;right:15px" class="variable">unknown</div>
 			</div>
-			<div class="parameter" style="top:90px">
-				<div>Browser:</div>
-				<div id="browser" style="left:60px;right:5px" class="variable">undefined</div>
+			<div class="cgru_parameter">
+				<div class="label">Browser:</div>
+				<div id="browser" style="left:70px;right:15px" class="variable">unknown</div>
 			</div>
-			<div class="parameter" style="top:120px">
-				<div id="registered">Not Registered</div>
-				<div style="left:90px;">ID:</div>
-				<div id="id" style="left:120px;">-</div>
-				<div style="left:150px;">UID:</div>
-				<div id="uid" style="left:180px;">-</div>
+			<div class="cgru_parameter">
+				<div class="label" id="registered">Not Registered</div>
+				<div class="label" style="left:75px;">ID:</div>
+				<div class="label" id="id" style="left:100px;">-</div>
+				<div class="label" style="left:120px;">UID:</div>
+				<div class="label" id="uid" style="left:150px;">-</div>
 			</div>
 		</div>
-		<div id="parameters"></div>
+		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 250px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
+		<div style="position:absolute; left: 500px; width: 150px; top:0;bottom:0; /*border: 1px solid #000;*/">
+			<div style="text-align:center; padding: 10px 0 0 0;">
+				<a href="http://cgru.info" target="_blank">Documentation</a></div>
+			<div style="text-align:center; padding: 10px 0 0 0;">
+				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank">Firefox Add-on</a></div>
+		</div>
 	</div>
 	<div id="headermain">
 		<div id="headeropenbutton" onclick="g_HeaderButtonClicked()">&darr;</div>

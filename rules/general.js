@@ -9,6 +9,8 @@ g_elCurFolder = null;
 
 g_cycle = 0;
 
+cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
+
 function g_Init()
 {
 	cgru_Init();

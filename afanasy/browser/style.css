@@ -58,52 +58,6 @@ border: 1px inset #555;
 color: #353;
 box-shadow: 0px 0px 5px #250 inset, 0px 0px 10px rgba(255,255,255,.7);
 }
-#settings {
-position: absolute;
-left: 4px; right: 4px; top: 4px; bottom: 40px;
-border-radius: 6px;
-box-shadow: 0px 0px 5px #000 inset;
-}
-#settings > * {
-margin: 5px 10px;
-}
-#settings * {
-position: absolute;
-text-align: center;
-white-space:nowrap;
-overflow: hidden;
-/*box-shadow: 0px 0px 2px #000 inset;*/
-}
-#settings #parameters {
-left: 50%; right: 0; top: 0; bottom: 0;
-border-radius: 4px;
-box-shadow: 0px 0px 2px #000 inset;
-}
-#settings .parameter {
-box-shadow: 0px 0px 1px #000 inset;
-border-radius: 4px;
-left: 0; right: 0;
-height: 30px;
-}
-#settings .parameter * {
-margin: 5px;
-padding: 3px 6px;
-}
-#settings .label {
-left: 0; width: 100px;
-}
-#settings .variable {
-left: 100px; right: 52px;
-height: 15px;
-box-shadow: 0px 0px 2px #000 inset;
-border-radius: 2px;
-}
-#settings .button {
-cursor: pointer;
-width: 30px; right: 5px;
-box-shadow: 0px 0px 2px #000;
-border-radius: 2px;
-}
 
 #content {
 position: absolute;
