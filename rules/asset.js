@@ -8,7 +8,10 @@ function a_Process()
 
 	a_ShowBody();
 
-	window.document.title = g_elCurFolder.m_path;
+	if( g_elCurFolder.m_path == '/')
+		window.document.title = 'CG-RULES';
+	else
+		window.document.title = g_elCurFolder.m_path;
 
 	c_Info( cgru_PM( '/'+RULES.root+g_elCurFolder.m_path));
 }

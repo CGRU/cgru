@@ -2,7 +2,7 @@ d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
 d_guiparams = ['input','output','artist','activity','version','filename'];
 d_pattern_version = /v\d{2,}.*/i;
-d_pattern_sequence = /\.\d{1,}\./;
+d_pattern_sequence = /\d{1,}\./;
 
 function d_Make( i_path, i_outfolder)
 {
@@ -25,8 +25,8 @@ function d_Make( i_path, i_outfolder)
 		{
 			match = match[match.length-1];
 			var pos = file.lastIndexOf( match);
-			var pattern = file.substr( 0, pos+1);
-			for( var d = 0; d < match.length-2; d++ ) pattern += '#';
+			var pattern = file.substr( 0, pos);
+			for( var d = 0; d < match.length-1; d++ ) pattern += '#';
 			pattern += file.substr( pos-1 + match.length);
 			i_path += '/' + pattern;
 			break;

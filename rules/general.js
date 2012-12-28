@@ -26,7 +26,7 @@ function g_Init()
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
 
 	document.getElementById('afanasy_webgui').innerHTML =
-		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">Web GUI</a>';
+		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
 	g_el.navig.m_folder = '/';
 	g_el.navig.m_path = '/';

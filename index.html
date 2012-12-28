@@ -44,14 +44,16 @@
 		</div>
 		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 300px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
 		<div style="position:absolute; left: 550px; width: 200px; top:0;bottom:0; /*border: 1px solid #000;*/">
-			<div style="text-align:center; padding: 10px 0 0 0;">AFANASY</div>
-			<div style="text-align:center;" id="afanasy_webgui"></div>
-			<div id="afanasy_statistics"></div>
+			<div style="text-align:center; padding: 10px 0 0 0;">
+				<a href="http://cgru.info" target="_blank">Documentation</a></div>
+			<div style="text-align:center; padding: 10px 0 0 0;" id="afanasy_webgui"></div>
+			<div style="text-align:center; padding: 10px 0 0 0;">
+				<a href="afanasy/webvisor/" target="_blank">Database Statistics</a></div>
 		</div>
 	</div>
 	<div class="openbtn" onclick="c_HeaderOpenButtonClicked(this,'header','-200px')">&darr;</div>
 	<div class="panel">
-		<div class="button" onclick="g_GO('/')">Home</div>
+		<div class="button" onclick="g_GO('/');window.location.reload();">Home</div>
 		<div id="assets"></div>
 	</div>
 </div>
