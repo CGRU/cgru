@@ -1,8 +1,6 @@
 d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
 d_guiparams = ['input','output','artist','activity','version','filename'];
-d_pattern_version = /v\d{2,}.*/i;
-d_pattern_sequence = /\d{1,}\./;
 
 function d_Make( i_path, i_outfolder)
 {
@@ -11,7 +9,8 @@ function d_Make( i_path, i_outfolder)
 	var params = {};
 
 	params.version = i_path.split('/');
-	var match = d_pattern_version.exec( params.version);
+	params.version = params.version[params.version.length-1];
+	var match = params.version.match(/v\d{2,}.*/gi);
 	if( match )
 		params.version = match[match.length-1];
 
@@ -20,7 +19,7 @@ function d_Make( i_path, i_outfolder)
 	for( var f = 0; f < readir.files.length; f++ )
 	{
 		var file = readir.files[f];
-		var match = d_pattern_sequence.exec(file);
+		var match = file.match(/\d{1,}\./g);
 		if( match )
 		{
 			match = match[match.length-1];
@@ -43,8 +42,8 @@ function d_Make( i_path, i_outfolder)
 	var dateObj = new Date();
 	date = ''+dateObj.getFullYear();
 	date = date.substr(2);
-	date += dateObj.getMonth() < 10 ? '0'+dateObj.getMonth() : dateObj.getMonth();
-	date += dateObj.getDate()  < 10 ? '0'+dateObj.getDate()  : dateObj.getDate();
+	date += (dateObj.getMonth()+1) < 10 ? '0'+(dateObj.getMonth()+1) : dateObj.getMonth()+1;
+	date +=  dateObj.getDate()     < 10 ? '0'+ dateObj.getDate()     : dateObj.getDate();
 
 	var naming = RULES.dailies.naming;
 	var filename = RULES.dailies.naming;
@@ -124,6 +123,7 @@ function d_ProcessGUI( i_wnd)
 	block.name = 'Dailies';
 	block.service = 'movgen';
 	block.parser = 'generic';
+	if( RULES.dailies.af_capacity ) block.capacity = RULES.dailies.af_capacity;
 	block.working_directory = cgru_PM('/'+RULES.root+params.output);
 	job.blocks = [block];
 

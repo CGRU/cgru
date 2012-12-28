@@ -20,8 +20,9 @@ function g_Init()
 
 	var top_dir = n_ReadDir('.');
 	if( top_dir )
-		c_RulesMerge( top_dir.rules);
-	c_RulesMergeObjs( RULES_TOP, RULES);
+		for( var attr in top_dir.rules)
+			c_RulesMergeObjs( RULES_TOP, top_dir.rules[attr])
+
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
 
@@ -75,10 +76,11 @@ function g_Navigate( i_path)
 	g_elCurFolder = g_el.navig;
 
 	cgru_ClosePopus();
-	RULES = {};
-	ASSETS = {};
 
-	c_RulesMergeObjs( RULES, RULES_TOP);
+//window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
+	RULES = JSON.parse( JSON.stringify( RULES_TOP));
+//	c_RulesMergeObjs( RULES, RULES_TOP);
+	ASSETS = {};
 
 	c_Log('Navigating to: '+i_path);
 //window.console.log( 'path = ' + i_path);
@@ -99,6 +101,7 @@ function g_Navigate( i_path)
 			break;
 	}
 
+//window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
 	g_elCurFolder.classList.add('current');
 
 	a_Process();
