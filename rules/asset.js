@@ -16,6 +16,20 @@ function a_Process()
 	c_Info( cgru_PM( '/'+RULES.root+g_elCurFolder.m_path));
 }
 
+function a_WalkDir( i_walk, o_list)
+{
+	if( o_list.folders == null )
+		o_list.folders = [];
+
+window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
+	if( i_walk.folders )
+		for( var folder in i_walk.folders)
+		{
+			o_list.folders.push( folder);
+			a_WalkDir( i_walk.folders[folder], o_list);
+		}
+}
+
 function a_ShowBody()
 {
 	g_el.asset.innerHTML = '';
@@ -34,14 +48,16 @@ function a_ShowBody()
 			elSource.classList.add('sequence');
 
 var walk = '';
-			var founded = false;
+//			var founded = false;
+			var list = {};
 			for( var r = 0; r < data.source.path.length; r++)
 			{
 				var path = asset.path + '/' + data.source.path[r];
+				a_WalkDir( n_WalkDir( path), list);
 walk += path + '<br>';
 walk += JSON.stringify( n_WalkDir( path)) + '<br><br>';
 			}
-elSource.innerHTML = walk;
+elSource.innerHTML = walk + JSON.stringify( list);
 		}	
 
 		if( data.result )

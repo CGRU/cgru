@@ -70,9 +70,39 @@ function listDir( $i_readdir, &$o_out)
 	$o_out['readdir'] = $out;
 }
 
-function walkDir( $i_readdir, &$o_out)
+function walkDir( $i_path, &$o_out)
 {
-	$o_out['folder'] = 'qwerty';
+	$dir = $i_path;
+	$dir = str_replace('../','', $dir);
+	$dir = str_replace('/..','', $dir);
+	$dir = str_replace('..','', $dir);
+
+	if( false == is_dir( $dir))
+	{
+		$o_out['error'] = 'No such folder.';
+	}
+	else if( $handle = opendir( $dir))
+	{
+		$o_out['folders'] = array();
+		$o_out['files'] = array();
+		$numfile = 0;
+		while (false !== ( $entry = readdir( $handle)))
+		{
+			if( $entry == '.') continue;
+			if( $entry == '..') continue;
+			$path = $dir.'/'.$entry;
+			if( is_dir( $path))
+			{
+				$o_out['folders'][$entry] = array();
+				walkDir( $path, $o_out['folders'][$entry]);
+			}
+			else
+				$o_out['files'][$numfile++] = $entry;
+		}
+		closedir($handle);
+		ksort( $o_out['folders']);
+		sort( $o_out['files']);
+	}
 }
 
 function readConfig( $i_file, &$o_out)
