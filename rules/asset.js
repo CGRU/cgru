@@ -27,11 +27,28 @@ function a_ShowBody()
 		var data = RULES.assets_data[a_type];
 		if( data == null ) continue;
 
+		if( data.source )
+		{			
+			var elSource = document.createElement('div');
+			g_el.asset.appendChild( elSource);
+			elSource.classList.add('sequence');
+
+var walk = '';
+			var founded = false;
+			for( var r = 0; r < data.source.path.length; r++)
+			{
+				var path = asset.path + '/' + data.source.path[r];
+walk += path + '<br>';
+walk += JSON.stringify( n_WalkDir( path)) + '<br><br>';
+			}
+elSource.innerHTML = walk;
+		}	
+
 		if( data.result )
 		{
 			var elResult = document.createElement('div');
 			g_el.asset.appendChild( elResult);
-			elResult.classList.add('result');
+			elResult.classList.add('sequence');
 
 			var founded = false;
 			for( var r = 0; r < data.result.path.length; r++)

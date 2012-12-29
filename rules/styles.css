@@ -166,22 +166,22 @@ border-radius: 10px;
 /*text-shadow: 0px 0px 20px #060, 20px 1px 2px #010;*/
 }
 
-.result {}
-.result .folder {
+.sequence {}
+.sequence .folder {
 border-radius: 4px;
 box-shadow: 0 0 3px #000 inset;
 padding: 2px 6px;
 margin: 2px;
 }
-.result .folder div {
+.sequence .folder div {
 cursor: pointer;
 float: right;
 border-radius: 4px;
 padding: 0px 6px;
 margin: 0px 10px;
 }
-.result .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
-.result .folder .button { box-shadow: 0px 0px 2px #000; }
+.sequence .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
+.sequence .folder .button { box-shadow: 0px 0px 2px #000; }
 
 .dailies div { margin: 4px; border-radius: 4px;}
 .dailies .label { float: left; text-transform: capitalize;}

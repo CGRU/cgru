@@ -18,18 +18,30 @@ function c_Parse( i_data)
 	try { obj = JSON.parse( i_data);}
 	catch( err)
 	{
-		c_Log(err.message+'\n\n'+i_data);
+		c_Error( err.message+'<br/><br/>'+i_data);
 		obj = null;
 	}
 
 	return obj;
 }
 
-function c_RulesMerge( i_rules_new)
+function c_CloneObj( i_obj)
 {
-	for( var attr in i_rules_new)
-		c_RulesMergeObjs( RULES, i_rules_new[attr])
-//	c_Info('RULES='+JSON.stringify( RULES));
+	return JSON.parse( JSON.stringify( RULES_TOP));
+}
+
+function c_RulesMergeDir( o_rules, i_dir)
+{
+	if( i_dir == null ) return;
+	if( i_dir.rules == null ) return;
+	for( var attr in i_dir.rules)
+	{
+		var obj = i_dir.rules[attr];
+		if( obj == null )
+			c_Error('RULES file "'+attr+'" in "'+i_dir.dir+'" is invalid.');
+		else
+			c_RulesMergeObjs( o_rules, obj);
+	}
 }
 
 function c_RulesMergeObjs( o_rules, i_rules_new)
@@ -96,7 +108,7 @@ function c_Info( i_msg)
 }
 function c_Error( i_err)
 {
-	c_Info('Error: ' + i_err);
+	c_Info('<b style="font-size:15px;color:#700">Error:</b> ' + i_err);
 }
 function c_Log( i_msg)
 {

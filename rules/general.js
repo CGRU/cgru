@@ -20,10 +20,7 @@ function g_Init()
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 
-	var top_dir = n_ReadDir('.');
-	if( top_dir )
-		for( var attr in top_dir.rules)
-			c_RulesMergeObjs( RULES_TOP, top_dir.rules[attr])
+	c_RulesMergeDir( RULES_TOP, n_ReadDir('.'));
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
@@ -79,13 +76,10 @@ function g_Navigate( i_path)
 
 	cgru_ClosePopus();
 
-//window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
-	RULES = JSON.parse( JSON.stringify( RULES_TOP));
-//	c_RulesMergeObjs( RULES, RULES_TOP);
+	RULES = c_CloneObj( RULES_TOP);
 	ASSETS = {};
 
 	c_Log('Navigating to: '+i_path);
-//window.console.log( 'path = ' + i_path);
 
 	folders = i_path.split('/');
 //window.console.log( folders);
@@ -141,7 +135,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	if( g_elCurFolder.m_dir == null )
 		return false;
 
-	c_RulesMerge( g_elCurFolder.m_dir.rules);
+	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
 
 	if( g_elCurFolder == g_el.navig )

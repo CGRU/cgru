@@ -23,11 +23,26 @@ function n_ReadDir( i_path)
 	return response.readdir;
 }
 
+function n_WalkDir( i_path)
+{
+	var path = RULES.root + i_path;
+
+	var request = {};
+	request.walkdir = path;
+	var data = n_Request( request);
+	var response = c_Parse( data);
+
+	if( response == null ) return null;
+	if( response.walkdir == null ) return null;
+
+	return response.walkdir;
+}
+
 function n_Request( i_obj)
 {
 	var obj_str = JSON.stringify( i_obj);
 
-	var log = '<b><i>send:</i></b> '+ obj_str;
+	var log = '<b style="color:#040"><i>send:</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.overrideMimeType('application/json');
@@ -37,7 +52,7 @@ function n_Request( i_obj)
 	xhr.send( obj_str);
 //window.console.log('n_Requestr='+obj_str);
 
-	log += '<br/><b><i>recv:</i></b> '+ xhr.responseText;
+	log += '<br/><b style="color:#040"><i>recv:</i></b> '+ xhr.responseText;
 	c_Log( log);
 
 //window.console.log('xhr.responseText='+xhr.responseText);

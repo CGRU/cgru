@@ -10,7 +10,10 @@
 
 "assets_data":{
 "shot":{
-	"source":["SOURCE/SCAN"],
+	"source":{
+		"path":["SOURCE/SCAN"],
+		"cmdexec":"play_sequence"
+	},
 	"result":{
 		"path":["RESULT/HRES/DPX","RESULT/DPX","RESULT/HRES/JPG","RESULT/JPG"],
 		"cmdexec":"play_sequence"

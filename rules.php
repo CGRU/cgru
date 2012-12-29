@@ -70,6 +70,11 @@ function listDir( $i_readdir, &$o_out)
 	$o_out['readdir'] = $out;
 }
 
+function walkDir( $i_readdir, &$o_out)
+{
+	$o_out['folder'] = 'qwerty';
+}
+
 function readConfig( $i_file, &$o_out)
 {
 	if( $fHandle = fopen( $i_file, 'r'))
@@ -77,7 +82,7 @@ function readConfig( $i_file, &$o_out)
 		$data = fread( $fHandle, 1000000);
 		fclose($fHandle);
 		$o_out[$i_file] = json_decode( $data, true);
-		if( $o_out[$i_file]['cgru_config']['include'] )
+		if( array_key_exists( 'include', $o_out[$i_file]['cgru_config']))
 			foreach( $o_out[$i_file]['cgru_config']['include'] as $file )
 				readConfig( $file, $o_out);
 	}
@@ -112,17 +117,23 @@ function afanasy( $i_obj, &$o_out)
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
-if( $recv['readdir'])
+if( array_key_exists('readdir', $recv))
 {
 	listDir($recv, $out);
 }
-else if( $recv['readconfig'])
+else if( array_key_exists('walkdir', $recv))
+{
+	$walkdir = array();
+	walkDir( $recv['walkdir'], $walkdir);
+	$out['walkdir'] = $walkdir;
+}
+else if( array_key_exists('readconfig', $recv))
 {
 	$configs = array();
 	readConfig( $recv['readconfig'], $configs); 
 	$out['config'] = $configs;
 }
-else if( $recv['afanasy'])
+else if( array_key_exists('afanasy', $recv))
 {
 	afanasy( $recv, $out);
 }
