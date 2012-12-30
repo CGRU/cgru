@@ -49,6 +49,7 @@ void DBTaskData::addDBAttributes()
    dbAddAttr( new DBAttrString( DBAttr::_files,       &m_files      ));
    dbAddAttr( new DBAttrString( DBAttr::_dependmask,  &m_depend_mask ));
    dbAddAttr( new DBAttrString( DBAttr::_customdata,  &m_custom_data ));
+   dbAddAttr( new DBAttrString( DBAttr::_thumbnail,   &m_thumbnail ));
 }
 
 DBTaskData::~DBTaskData()
@@ -93,6 +94,7 @@ bool DBTaskData::dbPrepareInsertExec( int id_job, int id_block, int id_task, PGc
     data_pointers[5] = m_files.c_str();
     data_pointers[6] = m_depend_mask.c_str();
     data_pointers[7] = m_custom_data.c_str();
+    data_pointers[8] = m_thumbnail.c_str();
 
     PGresult * res = PQexecPrepared( i_conn, ms_db_prepare_name,
                                      8, data_pointers,
