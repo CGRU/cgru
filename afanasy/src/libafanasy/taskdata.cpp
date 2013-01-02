@@ -34,14 +34,16 @@ void TaskData::jsonRead( const JSON & i_object)
 	jr_string("files",       m_files,       i_object);
 	//jr_string("depend_mask", m_depend_mask, i_object);
 	//jr_string("custom_data", m_custom_data, i_object);
+	jr_string("thumbnail",   m_thumbnail,   i_object);
 }
 
 void TaskData::jsonWrite( std::ostringstream & o_str) const
 {
-	o_str << "{\"name\":\""      <<                m_name      << "\"";
-	o_str << ",\"command\":\""   << af::strEscape( m_command ) << "\"";
+	o_str << "{\"name\":\""      <<                m_name        << "\"";
+	o_str << ",\"command\":\""   << af::strEscape( m_command )   << "\"";
 	if( m_files.size())
-		o_str << ",\"files\":\"" << af::strEscape( m_files   ) << "\"";
+		o_str << ",\"files\":\"" << af::strEscape( m_files   )   << "\"";
+	o_str << ",\"thumbnail\":\"" << af::strEscape( m_thumbnail ) << "\"";
 	o_str << '}';
 }
 
@@ -56,6 +58,7 @@ void TaskData::readwrite( Msg * msg)
 	rw_String( m_files,       msg);
 	rw_String( m_depend_mask, msg);
 	rw_String( m_custom_data, msg);
+	rw_String( m_thumbnail,   msg);
 }
 
 int TaskData::calcWeight() const
@@ -67,6 +70,7 @@ int TaskData::calcWeight() const
    weight += weigh(m_files);
    weight += weigh(m_depend_mask);
    weight += weigh(m_custom_data);
+   weight += weigh(m_thumbnail);
 
    return weight;
 }
@@ -80,6 +84,7 @@ void TaskData::generateInfoStream( std::ostringstream & o_str, bool full) const
       o_str << "\n        Files = '%s'" << m_files << "'";
       if( m_depend_mask.size()) o_str << "\n        Dependences = '" << m_depend_mask << "'";
       if( m_custom_data.size()) o_str << "\n        Custom Data = '" << m_custom_data << "'";
+      if( m_thumbnail.size()) o_str   << "\n          Thumbnail = '"   << m_thumbnail << "'";
       //o_str << "Memory: " << calcWeight() << " bytes\n";
    }
    else
@@ -88,6 +93,7 @@ void TaskData::generateInfoStream( std::ostringstream & o_str, bool full) const
       if( m_files.size()     ) o_str << " F'" << m_files << "'";
       if( m_depend_mask.size()) o_str << " D'" << m_depend_mask << "'";
       if( m_custom_data.size()) o_str << " cd'" << m_custom_data << "'";
+      if( m_thumbnail.size()) o_str << " thm'" << m_thumbnail << "'";
       o_str << " " << calcWeight() << " bytes";
       o_str << std::endl;
    }

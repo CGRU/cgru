@@ -25,14 +25,17 @@ public:
 	inline const std::string & getFiles()       const { return m_files;       }
 	inline const std::string & getDependMask()  const { return m_depend_mask; }
 	inline const std::string & getCustomData()  const { return m_custom_data; }
+	inline const std::string & getThumbnail()  const { return m_thumbnail;    }
 
 	inline void setFiles(      const std::string & str) { m_files       = str;  }
 	inline void setDependMask( const std::string & str) { m_depend_mask = str;  }
 	inline void setCustomData( const std::string & str) { m_custom_data = str;  }
+	inline void setThumbnail(  const std::string & str) { m_thumbnail = str;    }
 
 	inline bool hasFiles()        const { return       m_files.empty() == false;}  ///< Whether files are set.
 	inline bool hasDependMask()   const { return m_depend_mask.empty() == false;}  ///< Whether depend mask is set.
 	inline bool hasCustomData()   const { return m_custom_data.empty() == false;}  ///< Whether files are set.
+	inline bool hasThumbnail()    const { return   m_thumbnail.empty() == false;}    ///< Whether thumbnail is set.
 
 	bool checkDependMask( const std::string & str);
 
