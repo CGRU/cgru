@@ -268,7 +268,8 @@ background: #DFD;
 
 .item.block {
 margin: 4px 4px 0px 4px;
-height: 24px;
+padding-bottom: 12px;
+/*height: 24px;*/
 }
 
 .item.task {
@@ -290,6 +291,13 @@ opacity: 0.9;
 .task .body {
 top: 0; bottom: 0; left: 18px; right: 5px;
 /*box-shadow: 0px 0px 2px #000 inset;*/
+}
+.previewExpand {
+white-space: nowrap;
+overflow-x: auto;
+}
+.previewExpand > img {
+width: 100px;
 }
 
 .user .bar {

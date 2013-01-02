@@ -11,7 +11,20 @@ BlockItem.prototype.init = function()
 
 	this.elState = cm_ElCreateFloatText( this.element, 'right', 'Block State');
 	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
-
+	
+	this.element.appendChild(document.createElement("br"));
+	
+	this.elPreviewExpand = document.createElement("div");
+	this.elPreviewExpand.classList.add("previewExpand");
+	this.elPreviewExpand.toggled = false;
+	this.element.appendChild(this.elPreviewExpand)
+	
+	this.elPreviewLabel = document.createElement("span");
+	this.elPreviewLabel.textContent = "Preview";
+	
+	this.elPreviewExpand.appendChild(this.elPreviewLabel);
+	this.elPreviewExpand.appendChild(document.createElement("br"));
+	
 	this.state = {};
 }
 
@@ -79,6 +92,7 @@ TaskItem.prototype.init = function()
 TaskItem.prototype.update = function()
 {
 	this.params.name = this.genName();
+	this.genThumbnail();
 	this.elName.textContent = this.params.name;
 }
 
@@ -124,6 +138,21 @@ TaskItem.prototype.updateProgress = function( i_progress)
 		this.elStar.style.display = 'none';
 	}
 	this.elBar.style.width = ( this.percent + '%');
+}
+
+TaskItem.prototype.genThumbnail = function()
+{
+	var t = this.task_num;
+	if( this.block.params.tasks )
+	{
+		var task_thumbnail = this.block.params.tasks[t].thumbnail;
+		if (task_thumbnail)
+		{
+			var image = document.createElement("img");
+			image.src = task_thumbnail;
+			this.block.elPreviewExpand.appendChild(image);
+		}
+	}
 }
 
 TaskItem.prototype.genName = function()
