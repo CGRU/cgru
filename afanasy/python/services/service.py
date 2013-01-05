@@ -9,12 +9,13 @@ str_hostseparator = ','
 
 class service:
    "This is base service class."
-   def __init__( self, wdir, command, capacity, hosts, files = ''):
+   def __init__( self, wdir, command, capacity, hosts, files = '', taskInfo = {}):
       self.wdir = wdir
       self.command = command
       self.capacity = capacity
       self.hosts = hosts
       self.files = files
+      self.taskInfo = taskInfo
 
       self.pm = cgrupathmap.PathMap()
 
@@ -22,6 +23,8 @@ class service:
       self.str_hosts = str_hosts
       self.str_hostsprefix = str_hostsprefix
       self.str_hostseparator = str_hostseparator
+   def __del__(self):
+      self.doPost()
 
    def getWDir( self):
       return self.pm.toClient( self.wdir)
@@ -64,3 +67,6 @@ class service:
          print('Error: service::checkfiles: Files not set!')
          return False
       return True
+  
+   def doPost(self):
+      print("Doing post process")

@@ -42,6 +42,9 @@ private:
    std::string wdir;
    std::string command;
    std::string files;
+   int job_id;
+   int block_id;
+   int task_id;
    int capkoeff;
    std::list<std::string> hosts;
 };
