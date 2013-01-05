@@ -64,6 +64,10 @@ std::string Environment::render_networkif =            AFRENDER::NETWORK_IF;
 std::string Environment::render_hddspace_path =        AFRENDER::HDDSPACE_PATH;
 std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
 
+std::string Environment::thumbnail_cmd =               THUMBNAIL::CMD;
+std::string Environment::thumbnail_naming =            THUMBNAIL::NAMING;
+std::string Environment::thumbnail_http =              THUMBNAIL::HTTP;
+
 std::string Environment::pswd_visor =                  AFUSER::PSWD_VISOR;
 std::string Environment::pswd_god =                    AFUSER::PSWD_GOD;
 int     Environment::errors_forgivetime =              AFUSER::ERRORS_FORGIVETIME;
@@ -212,6 +216,10 @@ void Environment::getVars( const JSON & i_obj)
 	getVar( i_obj, render_waitforconnected,           "af_render_waitforconnected"           );
 	getVar( i_obj, render_waitforreadyread,           "af_render_waitforreadyread"           );
 	getVar( i_obj, render_waitforbyteswritten,        "af_render_waitforbyteswritten"        );
+
+	getVar( i_obj, thumbnail_cmd,                     "af_thumbnail_cmd"                     );
+	getVar( i_obj, thumbnail_naming,                  "af_thumbnail_naming"                  );
+	getVar( i_obj, thumbnail_http,                    "af_thumbnail_http"                    );
 
 	getVar( i_obj, rendercmds,                        "af_rendercmds"                        );
 	getVar( i_obj, rendercmds_admin,                  "af_rendercmds_admin"                  );

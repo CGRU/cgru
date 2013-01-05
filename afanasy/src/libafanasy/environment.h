@@ -154,6 +154,10 @@ public:
     static inline const std::string & getRenderIOStatDevice()  { return render_iostat_device;   }
     static inline const std::vector<std::string> & getRenderResClasses() { return render_resclasses;}
 
+    static inline const std::string & getThumbnailCmd()        { return thumbnail_cmd;   }
+    static inline const std::string & getThumbnailNaming()     { return thumbnail_naming;   }
+    static inline const std::string & getThumbnailHttp()       { return thumbnail_http;   }
+
 	static inline int getAfNodeLogsRotate()  { return afnode_logs_rotate;   }
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
 
@@ -274,6 +278,10 @@ private:
    static std::string render_iostat_device;
    static std::vector<std::string> render_resclasses;
    static std::string render_networkif;
+
+   static std::string thumbnail_cmd;
+   static std::string thumbnail_naming;
+   static std::string thumbnail_http;
 
    static int errors_avoid_host;
    static int task_error_retries;
