@@ -66,7 +66,7 @@ function c_RulesMergeObjs( o_rules, i_rules_new)
 
 function c_Info( i_msg)
 {
-	u_el.info.textContent=i_msg;
+	u_el.info.innerHTML = i_msg;
 	c_Log( i_msg);
 }
 function c_Error( i_err)

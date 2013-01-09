@@ -25,12 +25,15 @@
 <div id="sidepanel">
 	<div id="sidepanel_hide" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
 	<div id="sidepanel_playlist">
-		<div class="label" onclick="p_PlayListOnClick()">Playlist</div>
+		<div class="label" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
-			<div>
-				<div class="button" style="float:left;width:84px;" onclick="p_PlayListNewOnClick()">New Folder</div>
-				<div class="button" style="float:left;width:14px;" onclick="p_PlayListAddOnClick()">+</div>
-				<div class="button" style="float:left;width:14px;" onclick="p_PlayListDelOnClick()">-</div>
+			<div style="padding-left:8px;">
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="p_NewOnClick()">New Folder</div>
+				<div class="button" style="float:left;width:14px;" onclick="p_AddOnClick()">+</div>
+				<div class="button" style="float:left;width:14px;" onclick="p_DelOnClick()">-</div>
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="p_RenameOnClick()">Rename</div>
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>

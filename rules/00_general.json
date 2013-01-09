@@ -36,7 +36,11 @@
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"Pdplayer",
-				"cmd":"pdplayer @PATH@"}
+				"cmd":"pdplayer @PATH@"},
+			{"name":"Pd++",
+				"cmd":"pdplayer --attach @PATH@"},
+			{"name":"open",
+				"cmd":"start @PATH@"}
 		]
 	}
 },

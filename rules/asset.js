@@ -35,7 +35,7 @@ function a_WalkDir( i_walk, o_list, i_path)
 		}
 }
 
-function a_ShowSequence( i_element, i_data, i_path, i_title)
+function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
 {
 	var link = RULES.root + i_path;
 
@@ -74,7 +74,7 @@ function a_ShowSequence( i_element, i_data, i_path, i_title)
 		elMakeDailies.textContent = 'Make Dailies';
 		elMakeDailies.m_path = i_path;
 		elMakeDailies.onclick = function(e){
-			d_Make( e.currentTarget.m_path, asset.path+'/'+i_data.dailies[0])};
+			d_Make( e.currentTarget.m_path, i_asset.path+'/'+i_data.dailies[0])};
 	}
 }
 
@@ -108,7 +108,7 @@ function a_ShowBody()
 					elPath.textContent = data.source.path[r];
 					for( var f = 0; f < list.folders.length; f++)
 					{
-						a_ShowSequence( elSource, data, path + list.folders[f], list.folders[f]);
+						a_ShowSequence( elSource, asset, data, path + list.folders[f], list.folders[f]);
 						founded = true;
 					}
 				}
@@ -142,7 +142,7 @@ function a_ShowBody()
 
 				for( var f = 0; f < folders.length; f++)
 				{
-					a_ShowSequence( elResult, data, path + '/' + folders[f]);
+					a_ShowSequence( elResult, asset, data, path + '/' + folders[f]);
 					founded = true;
 				}
 			}

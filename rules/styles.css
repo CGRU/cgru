@@ -102,9 +102,9 @@ cursor: pointer;
 background: rgba(200,200,200,.2);
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 text-align: center;
-margin: 2px 6px;
+margin: 2px 2px;
 border-radius: 4px;
-padding: 1px 6px;
+padding: 1px 2px;
 }
 #sidepanel .label:hover, #sidepanel .button:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
 
@@ -115,13 +115,16 @@ cursor: pointer;
 font-weight: normal;
 border: 1px solid rgba(255,255,255,.2);
 padding: 0px 0px 0px 8px;
+color: rgba(0,0,0,.8);
 }
 #playlist .folder { font-size: 16px; }
-#playlist .link { font-size: 14px; }
+#playlist .link { font-size: 14px; color: #005;}
 #playlist .folder.opened { background: rgba(200,255,255,.2);/*font-weight: bold;*/}
-#playlist .folder div { display: none;}
-#playlist .folder.opened div { display: block;}
-#playlist .folder:hover, #playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.9) inset;;}
+#playlist .folder > div { display: none;}
+#playlist .folder.opened > div { display: block;}
+#playlist .current {font-weight: bold;}
+#playlist .folder:hover { box-shadow: 0 0 2px rgba(0,0,0,.9) inset; color: rgba(0,0,0,1.0);}
+#playlist .link:hover { box-shadow: 0 0 2px rgba(0,0,0,.9) inset; color: #00A;}
 
 #content {
 position: absolute;
@@ -134,7 +137,7 @@ overflow-y: scroll;
 
 #navig .folder {
 cursor: pointer;
-box-shadow: 0px 0px 3px #000 inset;
+box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 border: 1px solid rgba(255,255,255,.2);
 padding: 0px 0px 0px 16px;
 border-radius: 4px;
@@ -146,9 +149,8 @@ padding-bottom: 4px;
 background: rgba(200,255,255,.1);
 font-weight: bold;
 }
-#navig .folder.current {
-background: rgba(200,255,255,.7);
-}
+#navig .folder.current { background: rgba(200,255,255,.7); }
+#navig .folder:hover { box-shadow: 0px 0px 3px rgba(0,0,0,1.0) inset}
 
 #assets {
 background: rgba(200,255,255,.3);
