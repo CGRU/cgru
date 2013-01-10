@@ -88,14 +88,15 @@ function p_FolderOnClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var el = i_evt.currentTarget;
+//window.console.log('fclick: '+el.m_id)
 	p_elCurFolder = el;
 	p_SetCurItem( p_elCurFolder);
-//window.console.log('fclick: '+el.m_id)
 }
 function p_FolderOnDblClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var el = i_evt.currentTarget;
+window.console.log('dbl fclick: '+el.m_id)
 //if( el == p_elCurItem )
 //{
 	if( el.classList.contains('opened'))
@@ -180,6 +181,7 @@ function p_Action( i_obj, i_action)
 	p_Load();
 }
 
+function p_RefreshOnClick( i_evt) { p_Load();}
 function p_Load()
 {
 	var obj = c_Parse( n_Request({"readobj":"playlist.json"}));
