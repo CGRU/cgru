@@ -9,12 +9,17 @@ str_hostseparator = ','
 
 class service:
    "This is base service class."
-   def __init__( self, wdir, command, capacity, hosts, files = '', taskInfo = {}):
-      self.wdir = wdir
-      self.command = command
-      self.capacity = capacity
-      self.hosts = hosts
-      self.files = files
+   def __init__( self, taskInfo):
+      if taskInfo.has_key('wdir') and taskInfo.has_key('command') and taskInfo.has_key('capacity') and taskInfo.has_key('hosts'):
+         self.wdir = taskInfo['wdir']
+         self.command = taskInfo['command']
+         self.capacity = taskInfo['capacity']
+         self.hosts = taskInfo['hosts']
+      else:
+         return False
+         
+      self.files = taskInfo.get('files', '')
+      
       self.taskInfo = taskInfo
 
       self.pm = cgrupathmap.PathMap()
@@ -23,6 +28,7 @@ class service:
       self.str_hosts = str_hosts
       self.str_hostsprefix = str_hostsprefix
       self.str_hostseparator = str_hostseparator
+      
    def __del__(self):
       self.doPost()
 

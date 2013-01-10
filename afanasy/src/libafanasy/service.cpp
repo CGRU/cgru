@@ -66,23 +66,26 @@ void Service::initialize()
       }
 
    PyObject *pArgs;
-   pArgs = PyTuple_New( 6);
+   pArgs = PyTuple_New( 1);
 
    PyObject *taskInfo;
    taskInfo = PyDict_New();
+
+   PyDict_SetItemString(taskInfo, "wdir",             PyBytes_FromString( wdir.c_str()));
+   PyDict_SetItemString(taskInfo, "command",          PyBytes_FromString( command.c_str()));
+   PyDict_SetItemString(taskInfo, "capacity",         PyLong_FromLong( capkoeff));
+   PyDict_SetItemString(taskInfo, "hosts",            pHostsList);
+   PyDict_SetItemString(taskInfo, "files",            PyBytes_FromString( files.c_str()));
+
    PyDict_SetItemString(taskInfo, "thumbnail_cmd",    PyBytes_FromString(Environment::getThumbnailCmd().c_str()));
    PyDict_SetItemString(taskInfo, "thumbnail_naming", PyBytes_FromString(Environment::getThumbnailNaming().c_str()));
    PyDict_SetItemString(taskInfo, "thumbnail_http",   PyBytes_FromString(Environment::getThumbnailHttp().c_str()));
+   PyDict_SetItemString(taskInfo, "thumbnail_file",   PyBytes_FromString(Environment::getThumbnailFile().c_str()));
    PyDict_SetItemString(taskInfo, "job_id",           PyInt_FromLong(job_id));
    PyDict_SetItemString(taskInfo, "block_id",         PyInt_FromLong(block_id));
    PyDict_SetItemString(taskInfo, "task_id",          PyInt_FromLong(task_id));
 
-   PyTuple_SetItem( pArgs, 0, PyBytes_FromString( wdir.c_str()));
-   PyTuple_SetItem( pArgs, 1, PyBytes_FromString( command.c_str()));
-   PyTuple_SetItem( pArgs, 2, PyLong_FromLong( capkoeff));
-   PyTuple_SetItem( pArgs, 3, pHostsList );
-   PyTuple_SetItem( pArgs, 4, PyBytes_FromString( files.c_str()));
-   PyTuple_SetItem( pArgs, 5, taskInfo);
+   PyTuple_SetItem( pArgs, 0, taskInfo);
 
    // Try to import service class
    if( false == PyClass::init( AFPYNAMES::SERVICE_CLASSESDIR, name, pArgs))
