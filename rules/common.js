@@ -1,10 +1,5 @@
 function c_Init()
 {
-	for( var i = 0; i < g_elements.length; i++)
-		g_el[g_elements[i]] = document.getElementById( g_elements[i]);
-
-	c_Info('HTML body load.');
-
 	cgru_ConstructSettingsGUI();
 	cgru_InitParameters();
 
@@ -69,41 +64,9 @@ function c_RulesMergeObjs( o_rules, i_rules_new)
 	}
 }
 
-function c_HeaderOpenButtonClicked( i_elBtn, i_id, i_pos)
-{
-	if( i_elBtn.classList.contains('opened'))
-	{
-		i_elBtn.classList.remove('opened');
-		if( i_id == 'header')
-		{
-			i_elBtn.innerHTML = '&darr;';
-			document.getElementById( i_id).style.top = i_pos;
-		}
-		else
-		{
-			i_elBtn.innerHTML = '&uarr;';
-			document.getElementById( i_id).style.bottom = i_pos;
-		}
-	}
-	else
-	{
-		i_elBtn.classList.add('opened');
-		if( i_id == 'header')
-		{
-			i_elBtn.innerHTML = '&uarr;';
-			document.getElementById( i_id).style.top = '0px';
-		}
-		else
-		{
-			i_elBtn.innerHTML = '&darr;';
-			document.getElementById( i_id).style.bottom = '0px';
-		}
-	}
-}
-
 function c_Info( i_msg)
 {
-	g_el.info.textContent=i_msg;
+	u_el.info.innerHTML = i_msg;
 	c_Log( i_msg);
 }
 function c_Error( i_err)
@@ -115,7 +78,7 @@ function c_Log( i_msg)
 	var elLine = document.createElement('div');
 	elLine.innerHTML = '<i>'+g_cycle+':</i> '+i_msg;
 	var lines = log.getElementsByTagName('div');
-	g_el.log.insertBefore( elLine, lines[0]);
+	u_el.log.insertBefore( elLine, lines[0]);
 	if( lines.length > 100 )
-		g_el.log.removeChild( lines[100]);
+		u_el.log.removeChild( lines[100]);
 }
