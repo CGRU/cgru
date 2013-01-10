@@ -90,7 +90,6 @@ function n_SendJob( job)
 	
 	n_Request( obj);
 }
-
 /*
 function n_Get( i_file)
 {
@@ -115,3 +114,4 @@ function n_Get( i_file)
 	return xhr.responseText;
 }
 */
+

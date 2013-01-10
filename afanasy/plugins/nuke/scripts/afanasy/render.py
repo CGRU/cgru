@@ -165,19 +165,23 @@ class BlockParameters:
             # Get thow files for current view and fitst and last frames:
             octx = nuke.OutputContext()
             octx.setView( 1 + nuke.views().index(view))
+            octx_framefirst = self.framefirst;
+            octx_framelast = self.framelast;
+            if octx_framefirst < 0: octx_framefirst = 0
+            if octx_framelast  < 0: octx_framelast  = 0
             # If frame first and frame last are equal no sequence needed
-            if self.framefirst == self.framelast:
-               octx.setFrame( self.framefirst)
+            if octx_framefirst == octx_framelast:
+               octx.setFrame( octx_framefirst)
                self.imgfile += fileknob.getEvaluatedValue( octx)
             else:
                # Get files from first and last frames to calculate frames pattern:
-               octx.setFrame( self.framefirst)
+               octx.setFrame( octx_framefirst)
                images1 = fileknob.getEvaluatedValue( octx)
                if images1 is None or images1 == '':
                   nuke.message('Error:\n%s\nFiles are empty.\nView "%s", frame %d.' % ( self.writename, view, self.framefirst))
                   self.valid = False
                   return
-               octx.setFrame( self.framelast)
+               octx.setFrame( octx_framelast)
                images2 = fileknob.getEvaluatedValue( octx)
                if images2 is None or images2 == '':
                   nuke.message('Error:\n%s\nFiles are empty.\nView "%s", frame %d.' % ( self.writename, view, self.framelast))

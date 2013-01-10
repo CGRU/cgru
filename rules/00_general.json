@@ -15,7 +15,7 @@
 		"cmdexec":"play_sequence"
 	},
 	"result":{
-		"path":["RESULT/HRES/DPX","RESULT/DPX","RESULT/HRES/JPG","RESULT/JPG"],
+		"path":["RESULT/DPX","RESULT/JPG"],
 		"cmdexec":"play_sequence"
 	},
 	"dailies":["RESULT/DAILIES"]
@@ -36,7 +36,11 @@
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"Pdplayer",
-				"cmd":"pdplayer @PATH@"}
+				"cmd":"pdplayer @PATH@"},
+			{"name":"Pd++",
+				"cmd":"pdplayer --attach @PATH@"},
+			{"name":"open",
+				"cmd":"start @PATH@"}
 		]
 	}
 },

@@ -7,10 +7,12 @@
 <link type="text/css" rel="stylesheet" href="rules/styles.css">
 <script type="text/javascript" src="lib/cgru.js"></script>
 <script type="text/javascript" src="rules/asset.js"></script>
-<script type="text/javascript" src="rules/dailies.js"></script>
 <script type="text/javascript" src="rules/common.js"></script>
+<script type="text/javascript" src="rules/dailies.js"></script>
 <script type="text/javascript" src="rules/general.js"></script>
 <script type="text/javascript" src="rules/network.js"></script>
+<script type="text/javascript" src="rules/playlist.js"></script>
+<script type="text/javascript" src="rules/ui.js"></script>
 </head>
 <body onload="g_Init()">
 
@@ -20,6 +22,25 @@
 </div>
 
 <div id="navig"></div>
+<div id="sidepanel">
+	<div id="sidepanel_hide" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
+	<div id="sidepanel_playlist">
+		<div class="label" onclick="p_OnClick()">Playlist</div>
+		<div class="body">
+			<div style="padding-left:8px;">
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="p_NewOnClick()">+Folder</div>
+				<div class="button" style="float:left;width:14px;" onclick="p_AddOnClick()">+</div>
+				<div class="button" style="float:left;width:14px;" onclick="p_DelOnClick()">-</div>
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="p_RenameOnClick()">Rename</div>
+				<div class="button" style="float:left;width:14px;" onclick="p_RefreshOnClick()">&#10227;</div>
+			</div>
+			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
+				id="playlist"></div>
+		</div>
+	</div>
+</div>
 
 <div id="header">
 	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; border-radius: 5px; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px">
@@ -53,7 +74,7 @@
 				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank">Firefox Add-on</a></div>
 		</div>
 	</div>
-	<div class="openbtn" onclick="c_HeaderOpenButtonClicked(this,'header','-200px')">&darr;</div>
+	<div class="openbtn" onclick="u_HeaderOpenButtonOnClick(this,'header','-200px')">&darr;</div>
 	<div class="panel">
 		<div class="button" onclick="g_GO('/');window.location.reload();">Home</div>
 		<div id="assets"></div>
@@ -61,7 +82,7 @@
 </div>
 
 <div id="footer">
-	<div class="openbtn" onclick="c_HeaderOpenButtonClicked(this,'footer','-200px')">&uarr;</div>
+	<div class="openbtn" onclick="u_HeaderOpenButtonOnClick(this,'footer','-200px')">&uarr;</div>
 	<div id="version">v?</div>
 	<div id="info"></div>
 	<div id="log"></div>
