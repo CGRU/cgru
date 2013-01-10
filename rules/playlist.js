@@ -6,6 +6,7 @@ function p_Init()
 {
 	p_elCurFolder = u_el.playlist;
 	p_elCurFolder.m_path = '';
+	p_elCurFolder.m_id = '';
 	if( localStorage.playlist_opened == "true" ) p_Open();
 	else p_Close();
 	if( localStorage.playlist_opened_folders == null ) localStorage.playlist_opened_folders = '';
@@ -65,7 +66,6 @@ function p_NewFolder( i_param, i_value)
 	obj.label = i_value;
 	obj.id = p_elCurFolder.m_path + '/' + i_value;
 	obj.playlist = [];
-	var el = p_elCurFolder;
 	p_Action( obj, 'add');
 }
 function p_AddLink( i_param, i_value)
@@ -88,6 +88,16 @@ function p_FolderOnClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var el = i_evt.currentTarget;
+	p_elCurFolder = el;
+	p_SetCurItem( p_elCurFolder);
+//window.console.log('fclick: '+el.m_id)
+}
+function p_FolderOnDblClick( i_evt)
+{
+	i_evt.stopPropagation();
+	var el = i_evt.currentTarget;
+//if( el == p_elCurItem )
+//{
 	if( el.classList.contains('opened'))
 	{
 		el.classList.remove('opened');
@@ -104,6 +114,7 @@ function p_FolderOnClick( i_evt)
 		folders.push( el.m_id);
 		localStorage.playlist_opened_folders = folders.join(' ');
 	}
+//}
 	p_SetCurItem( p_elCurFolder);
 }
 function p_LinkOnClick( i_evt)
@@ -121,6 +132,8 @@ function p_DelOnClick()
 }
 function p_SetCurItem( i_el)
 {
+	if( i_el.classList.contains('current'))
+		return;
 	if( p_elCurItem )
 		p_elCurItem.classList.remove('current');
 	p_elCurItem = i_el;
@@ -155,9 +168,7 @@ function p_Action( i_obj, i_action)
 	else if( i_action == 'rename')
 	{
 		obj.objects = [i_obj];
-		obj.replace = 'label';
-window.console.log( JSON.stringify( obj));
-return;
+		obj.replace = true;
 	}
 	else
 	{
@@ -171,20 +182,53 @@ return;
 
 function p_Load()
 {
-	u_el.playlist.innerHTML = '';
-	p_elCurFolder = u_el.playlist;
-	p_elCurItem = null;
 	var obj = c_Parse( n_Request({"readobj":"playlist.json"}));
 	if( obj == null ) return;
 	if( obj.error == null )
 		p_noFile = false;
 
-	var wasopened = localStorage.playlist_opened_folders.split(' ');
-	var opened = [];
+	var params = {};
+	params.wasopened = localStorage.playlist_opened_folders.split(' ');
+	params.opened = [];
+	params.curfolderid = p_elCurFolder ? p_elCurFolder.m_id : null;
+	params.curitemid = p_elCurItem ? p_elCurItem.m_id : null;
 
-	p_Read( obj.playlist, wasopened, opened);
+	p_elCurFolder = u_el.playlist;
+	p_elCurItem = null;
 
-	localStorage.playlist_opened_folders = opened.join(' ');
+	u_el.playlist.innerHTML = '';
+
+	p_Read( obj.playlist, params, u_el.playlist);
+
+	localStorage.playlist_opened_folders = params.opened.join(' ');
+}
+function p_Read( i_playlist, i_params, i_elParent)
+{
+	if( i_playlist == null ) return;
+	if( i_playlist.length == null ) return;
+	i_playlist.sort( p_CompareItems );
+	for( var i = 0; i < i_playlist.length; i++)
+	{
+		var el = null;
+		if( i_playlist[i].playlist )
+		{
+			var el = p_CreateFolder( i_playlist[i], i_elParent);
+			if( el.m_id == i_params.curfolderid )
+				p_elCurFolder = el;
+			if( i_params.wasopened.indexOf( el.m_id ) != -1 )
+			{
+				el.classList.add('opened');
+				i_params.opened.push( el.m_id);
+			}
+			if( i_playlist[i].playlist.length )
+				p_Read( i_playlist[i].playlist, i_params, el);
+		}
+		else
+			el = p_CreateLink( i_playlist[i], i_elParent);
+
+		if( el && ( el.m_id == i_params.curitemid ))
+			p_SetCurItem( el);
+	}
 }
 function p_CompareItems(a,b)
 {
@@ -193,51 +237,29 @@ function p_CompareItems(a,b)
 	if( a[attr] > b[attr]) return 1;
 	return 0;
 }
-function p_Read( i_playlist, i_wasopened, o_opened)
+function p_CreateFolder( i_obj, i_elParent)
 {
-	if( i_playlist == null ) return;
-	if( i_playlist.length == null ) return;
-
-	i_playlist.sort( p_CompareItems );
-	for( var i = 0; i < i_playlist.length; i++)
-	{
-		if( i_playlist[i].playlist )
-		{
-			p_elCurFolder = p_CreateFolder( i_playlist[i]);
-			if( i_wasopened.indexOf( p_elCurFolder.m_id ) != -1 )
-			{
-				p_elCurFolder.classList.add('opened');
-				o_opened.push( p_elCurFolder.m_id);
-			}
-			if( i_playlist[i].playlist.length )
-				p_Read( i_playlist[i].playlist, i_wasopened, o_opened);
-			p_elCurFolder = p_elCurFolder.parentNode;
-		}
-		else
-			p_CreateLink( i_playlist[i]);
-	}
-}
-function p_CreateFolder( i_obj)
-{
-	var el = document.createElement('div');
-	p_elCurFolder.appendChild( el);
+	var el = p_CreateElement( i_obj, i_elParent);
 	el.classList.add('folder');
-	el.textContent = i_obj.label;
 	el.onclick = p_FolderOnClick;
-	el.m_label = i_obj.label;
-	el.m_path = i_obj.id;
-	el.m_id = i_obj.id;
+	el.ondblclick = p_FolderOnDblClick;
 	return el;
 }
-function p_CreateLink( i_obj)
+function p_CreateLink( i_obj, i_elParent)
+{
+	var el = p_CreateElement( i_obj, i_elParent);
+	el.classList.add('link');
+	el.onclick = p_LinkOnClick;
+	return el;
+}
+function p_CreateElement( i_obj, i_elParent)
 {
 	var el = document.createElement('div');
-	p_elCurFolder.appendChild( el);
-	el.classList.add('link');
+	i_elParent.appendChild( el);
 	el.textContent = i_obj.label;
-	el.onclick = p_LinkOnClick;
 	el.m_label = i_obj.label;
 	el.m_path = i_obj.path;
 	el.m_id = i_obj.id;
+	return el;
 }
 

@@ -135,7 +135,7 @@ function readObj( $i_file, &$o_out)
 
 function mergeObjs( &$o_obj, $i_obj)
 {
-error_log('mergeObjs: i='.json_encode($i_obj));
+//error_log('mergeObjs: i='.json_encode($i_obj));
 	if( is_null( $i_obj) || is_null( $o_obj)) return;
 	foreach( $i_obj as $key => $val )
 	{
@@ -158,7 +158,7 @@ error_log('mergeObjs: i='.json_encode($i_obj));
 }
 function pushArray( &$o_obj, $i_edit)
 {
-error_log('pushArray: '.json_encode($i_edit));
+//error_log('pushArray: '.json_encode($i_edit));
 	if( is_null( $i_edit) || is_null( $o_obj)) return;
 	if( array_key_exists('id', $o_obj) && ( $o_obj['id'] == $i_edit['id']))
 		if( array_key_exists( $i_edit['pusharray'], $o_obj) && is_array( $o_obj[$i_edit['pusharray']]))
@@ -203,6 +203,27 @@ function delObject( &$o_obj, $i_obj)
 		}
 	}
 }
+function replaceObject( &$o_obj, $i_obj)
+{
+	if( false == is_array( $o_obj))
+		return;
+
+	foreach( $o_obj as &$obj)
+		replaceObject( $obj, $i_obj);
+
+	if( array_key_exists('id', $o_obj) && ( $o_obj['id'] == $i_obj['id'] ))
+		foreach( $i_obj as $key => $val )
+			if( $key != 'id' )
+				$o_obj[$key] = $val;
+
+//static $replaceObjectCount = 0;
+//error_log('replace:'.$replaceObjectCount.' '.json_encode( $o_obj));
+//$replaceObjectCount++;
+//if( $replaceObjectCount > 5 ) return;
+
+//	if( array_key_exists( $i_attr, $o_obj))
+//		$o_obj[$i_attr] = $i_obj;
+}
 function editObj( $i_edit, &$o_out)
 {
 	$mode = 'w+';
@@ -216,6 +237,9 @@ function editObj( $i_edit, &$o_out)
 			mergeObjs( $obj, $i_edit['object']);
 		else if( array_key_exists('pusharray', $i_edit))
 			pushArray( $obj, $i_edit);
+		else if( array_key_exists('replace', $i_edit) && ( $i_edit['replace'] == true ))
+			foreach( $i_edit['objects'] as $newobj )
+				replaceObject( $obj, $newobj);
 		else if( array_key_exists('delobj', $i_edit) && ( $i_edit['delobj'] == true ))
 			foreach( $i_edit['objects'] as $delobj )
 				delObject( $obj, $delobj);
