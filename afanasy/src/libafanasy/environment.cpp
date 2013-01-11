@@ -67,6 +67,7 @@ std::string Environment::render_iostat_device =        AFRENDER::IOSTAT_DEVICE;
 std::string Environment::thumbnail_cmd =               THUMBNAIL::CMD;
 std::string Environment::thumbnail_naming =            THUMBNAIL::NAMING;
 std::string Environment::thumbnail_http =              THUMBNAIL::HTTP;
+std::string Environment::thumbnail_file =              THUMBNAIL::FILE;
 
 std::string Environment::pswd_visor =                  AFUSER::PSWD_VISOR;
 std::string Environment::pswd_god =                    AFUSER::PSWD_GOD;

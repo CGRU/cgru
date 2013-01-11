@@ -157,6 +157,7 @@ public:
     static inline const std::string & getThumbnailCmd()        { return thumbnail_cmd;   }
     static inline const std::string & getThumbnailNaming()     { return thumbnail_naming;   }
     static inline const std::string & getThumbnailHttp()       { return thumbnail_http;   }
+    static inline const std::string & getThumbnailFile()       { return thumbnail_file;   }
 
 	static inline int getAfNodeLogsRotate()  { return afnode_logs_rotate;   }
 	static inline int getAfNodeLogLinesMax() { return afnode_log_lines_max; }
@@ -282,6 +283,7 @@ private:
    static std::string thumbnail_cmd;
    static std::string thumbnail_naming;
    static std::string thumbnail_http;
+   static std::string thumbnail_file;
 
    static int errors_avoid_host;
    static int task_error_retries;
