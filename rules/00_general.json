@@ -23,16 +23,20 @@
 },
 
 "OS_unix":{
+	"open":"nautilus \"@PATH@\"",
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"DJV View",
 				"cmd":"djv_view @PATH@"},
 			{"name":"ls -l",
-				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""}
+				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""},
+			{"name":"open",
+				"cmd":"nautilus \"@PATH@\""}
 		]
 	}
 },
 "OS_windows":{
+	"open":"start @PATH@",
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"Pdplayer",
@@ -43,6 +47,11 @@
 				"cmd":"start @PATH@"}
 		]
 	}
+},
+
+"thumbnail":{
+	"filename":"thumbnail.jpg",
+	"create_cmd":"convert \"@INPUT@\" \"@OUTPUT@\""
 },
 
 "company":"CGRU",

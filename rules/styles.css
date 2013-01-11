@@ -21,40 +21,23 @@ box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 15px #FFF inset;
 #header { top: -200px; /*top: 0;*/}
 #footer { bottom: -200px; /*bottom: 0;*/}
 
-.openbtn {
-cursor: pointer;
-position: absolute;
-left: 10px;
-width: 9px; height: 20px;
-padding: 2px;
-box-shadow: 0px 0px 4px #000, 0px 0px 1px #000 inset, 0px 0px 5px #FFF inset;
-border-radius: 3px;
-}
-#header .openbtn { bottom: 8px;}
-#footer .openbtn { top: 8px;}
+.headeropenbtn { position: absolute; left: 10px; width: 9px; height: 20px; margin:0;padding:0;}
+#header .headeropenbtn { bottom: 8px;}
+#footer .headeropenbtn { top: 8px;}
 #header .panel {
 position: absolute;
 left: 40px; right: 10px; bottom: 5px; height: 30px;
 /*box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
 border-radius: 5px;*/
 }
-#header .panel .button {
-float: left;
-cursor: pointer;
-padding: 4px 8px;
-margin: 1px 8px;
-box-shadow: 0px 0px 3px rgba(0,0,0,.5) inset, 0px 0px 5px rgba(255,255,255,.5);
-border-radius: 4px;
-}
+#header .panel .button { float: left; padding: 4px 8px; margin: 1px 8px; }
 
-#footer #version {
-float: right;
-margin: 10px;
-}
+#footer #open { float: right; margin: 8px; }
+#footer #version { float: right; margin: 10px; }
 #footer #info {
 background: #DDD;
 border-radius: 4px;
-margin: 8px 30px;
+margin: 8px 40px;
 padding: 3px 10px;
 height: 20px;
 box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.5);
@@ -78,35 +61,28 @@ top: 38px; bottom: 38px;
 }
 #navig { overflow-y: scroll; width: 300px; left: 0; }
 
-#sidepanel { right: 0; }
-#sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
-#sidepanel #sidepanel_hide { display: none; cursor: pointer; padding: 4px;}
-#sidepanel.opened { overflow-y: scroll;}
-#sidepanel.opened #sidepanel_hide { display: block;}
-#sidepanel .label, #sidepanel #sidepanel_hide {
-padding: 4px;
+.button {
 cursor: pointer;
 text-align: center;
-word-wrap: break-word;
-box-shadow: 0 0 4px #000, 0 0 4px rgba(255,255,255,.5) inset;
-margin: 2px;
 border-radius: 4px;
+background: rgba(200,200,200,.2);
+box-shadow: 0 0 3px #000, 0 0 4px rgba(255,255,255,.5) inset;
+margin: 2px;
+padding: 2px;
 }
-#sidepanel .label { letter-spacing: 99px;}
+.button:hover { background: rgba(200,255,255,.2);}
+
+#sidepanel { right: 0; }
+#sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
+#sidepanel #sidepanel_hide { display: none;}
+#sidepanel.opened { overflow-y: scroll;}
+#sidepanel.opened #sidepanel_hide { display: block;}
+#sidepanel .label { word-wrap: break-word; letter-spacing: 99px;}
 #sidepanel.opened .label { letter-spacing: 1px;}
 #sidepanel .opened .label { background: rgba(200,255,255,.2); box-shadow: 0 0 2px #000;}
 #sidepanel .body { display: none; }
 #sidepanel.opened .opened .body { display: block; }
-#sidepanel .button {
-cursor: pointer;
-background: rgba(200,200,200,.2);
-box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
-text-align: center;
-margin: 2px 2px;
-border-radius: 4px;
-padding: 1px 2px;
-}
-#sidepanel .label:hover, #sidepanel .button:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
+#sidepanel .label:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
 
 #playlist .folder, #playlist .link {
 box-shadow: 0 0 2px rgba(0,0,0,.5) inset;
@@ -160,29 +136,17 @@ height: 30px;
 margin: 0px 100px;
 padding: 0px 10px;
 }
-#assets .asset {
-float: left;
-margin: 1px 4px;
-padding: 5px 4px;
-}
-#assets .asset .type {
-padding: 0px 4px;
-float: left;
-}
-#assets .asset .name {
-padding: 0px 4px;
-font-weight: bold;
-float: left;
-}
-
+#assets .asset { float: left; margin: 1px 4px; padding: 5px 4px; }
+#assets .asset .type { padding: 0px 4px; float: left; }
+#assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
 #content #asset {}
-
 #content #asset > div {
 box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
 border-radius: 10px;
 margin: 6px;
 padding: 20px;
 }
+#content #asset > div.button { padding: 4px;}
 
 #content #rules, .rules {
 font-family: courier;
@@ -200,22 +164,20 @@ border-radius: 10px;
 /*text-shadow: 0px 0px 20px #060, 20px 1px 2px #010;*/
 }
 
-.sequence {}
-.sequence .folder {
+.sequences {}
+.sequences .folder {
 border-radius: 4px;
 box-shadow: 0 0 3px #000 inset;
 padding: 2px 6px;
 margin: 2px;
 }
-.sequence .folder div {
-cursor: pointer;
+.sequences .folder div {
 float: right;
-border-radius: 4px;
-padding: 0px 6px;
+padding: 2px 6px;
 margin: 0px 10px;
+font-size: 14px;
 }
-.sequence .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
-.sequence .folder .button { box-shadow: 0px 0px 2px #000; }
+.sequences .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
 
 .dailies div { margin: 4px; border-radius: 4px;}
 .dailies .label { float: left; text-transform: capitalize;}
@@ -223,4 +185,4 @@ margin: 0px 10px;
 .dailies div .param, .dailies .rules { box-shadow: 0 0 4px #000 inset;}
 .dailies div .param { background: #DDD;}
 .dailies .rules { padding: 12px; }
-.dailies .button { cursor: pointer; box-shadow: 0 0 4px #000, 0 0 4px #FFF inset; text-align: center;}
+

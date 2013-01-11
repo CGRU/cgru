@@ -23,9 +23,9 @@
 
 <div id="navig"></div>
 <div id="sidepanel">
-	<div id="sidepanel_hide" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
+	<div id="sidepanel_hide" class="button" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
 	<div id="sidepanel_playlist">
-		<div class="label" onclick="p_OnClick()">Playlist</div>
+		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">
 			<div style="padding-left:8px;">
 				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
@@ -74,7 +74,7 @@
 				<a href="http://cgru.info/firefox/cgru-addon.xpi" target="_blank">Firefox Add-on</a></div>
 		</div>
 	</div>
-	<div class="openbtn" onclick="u_HeaderOpenButtonOnClick(this,'header','-200px')">&darr;</div>
+	<div class="headeropenbtn button" onclick="u_HeaderOpenButtonOnClick(this,'header','-200px')">&darr;</div>
 	<div class="panel">
 		<div class="button" onclick="g_GO('/');window.location.reload();">Home</div>
 		<div id="assets"></div>
@@ -82,8 +82,9 @@
 </div>
 
 <div id="footer">
-	<div class="openbtn" onclick="u_HeaderOpenButtonOnClick(this,'footer','-200px')">&uarr;</div>
+	<div class="headeropenbtn button" onclick="u_HeaderOpenButtonOnClick(this,'footer','-200px')">&uarr;</div>
 	<div id="version">v?</div>
+	<div id="open" class="cmdexec">Open</div>
 	<div id="info"></div>
 	<div id="log"></div>
 </div>
