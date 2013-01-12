@@ -102,6 +102,11 @@ function g_Navigate( i_path)
 //window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
 	g_elCurFolder.classList.add('current');
 
+	if( g_elCurFolder.m_path == '/')
+		window.document.title = 'CG-RULES';
+	else
+		window.document.title = g_elCurFolder.m_path;
+
 	a_Process();
 }
 
