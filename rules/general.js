@@ -27,6 +27,9 @@ function g_Init()
 	document.getElementById('afanasy_webgui').innerHTML =
 		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
+	if( RULES_TOP.company )
+		document.getElementById('rules_button').textContent = RULES_TOP.company+'-RULES';
+
 	u_el.navig.m_folder = '/';
 	u_el.navig.m_path = '/';
 

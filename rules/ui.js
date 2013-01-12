@@ -62,3 +62,17 @@ function u_SidePanelOpen()
 	u_el.sidepanel.style.width = localStorage.sidepanel_opened_width + 'px';
 }
 
+function u_RulesOnClick()
+{
+	if( u_el.rules.m_opened )
+	{
+		u_el.rules.m_opened = false;
+		u_el.rules.style.display = 'none';
+	}
+	else
+	{
+		u_el.rules.m_opened = true;
+		u_el.rules.style.display = 'block';
+	}
+}
+
