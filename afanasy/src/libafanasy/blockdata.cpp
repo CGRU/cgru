@@ -325,7 +325,7 @@ void BlockData::jsonWrite( std::ostringstream & o_str, int i_type) const
         o_str << ",\"service\":\""       << m_service << "\"";
         o_str << ",\"capacity\":"        << m_capacity;
 	//	o_str << ",\"flags",             << m_flags;
-		o_str << ",\"numeric\":"         << isNumeric() ? "true":"false";
+		o_str << ",\"numeric\":"         << (isNumeric() ? "true":"false");
 		o_str << ",\"tasks_num\":"       << m_tasks_num;
 		o_str << ",\"frame_first\":"     << m_frame_first;
         o_str << ",\"frame_last\":"      << m_frame_last;
@@ -902,8 +902,8 @@ const std::string BlockData::genFiles( int num, long long * fstart, long long * 
       }
    }
    else
-   {
-      str = af::replaceArgs( m_files, m_tasks_data[num]->getFiles());
+   {       
+      str = af::replaceArgs( m_files, m_tasks_data[num]->getFiles() );
    }
    return str;
 }
