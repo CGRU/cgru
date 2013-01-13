@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-import cgrupathmap
+import cgrupathmap, cgruconfig
 import os, sys, re
 
 if sys.version_info[0] == 2 and sys.version_info[1] >= 6:
@@ -90,7 +90,8 @@ class service:
          basename, ext = os.path.splitext(os.path.basename(filename))
          
          self.taskInfo['thumbnail_filename'] = "%s.jpg" % (basename)
-         tmp_path = "/tmp/afanasy/thumbnails"
+         
+         tmp_path = "%s/thumbnails" % cgruconfig.VARS['af_tempdirectory']
          self.taskInfo['thumbnail_tmp_filepath'] = os.path.join(tmp_path, self.taskInfo['thumbnail_filename'])
          thumbnail_path = self.taskInfo['thumbnail_naming'] % self.taskInfo
          http_adress = "%s%s" % (self.taskInfo['thumbnail_http'], thumbnail_path)
