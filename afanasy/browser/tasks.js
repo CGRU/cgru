@@ -13,6 +13,12 @@ BlockItem.prototype.init = function()
 	this.elProperties = cm_ElCreateFloatText( this.element, 'right', 'Block Properties');
 
 	this.state = {};
+	this.thumbnail_http_base = cgru_Config['af_thumbnail_http'];
+	this.thumbnail_http_naming = cgru_Config['af_thumbnail_naming'];
+	
+	this.thumbnail_http_path = this.thumbnail_http_base + this.thumbnail_http_naming;
+	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(job_id)d", this.params.job_id);
+	this.thumbnail_http_path = this.thumbnail_http_path.replace("%(block_id)d", this.params.block_num);
 }
 
 BlockItem.prototype.update = function()
@@ -74,6 +80,7 @@ TaskItem.prototype.init = function()
 	this.params.order = this.task_num;
 	this.percent = 0;
 	this.state = {};
+	
 }
 
 TaskItem.prototype.update = function()
@@ -147,6 +154,7 @@ TaskItem.prototype.genName = function()
 	}
 
 	this.genFrames();
+	this.generateThumbnails();
 	if( tasks_name && ( tasks_name != '' ))
 	{
 		name = tasks_name;
@@ -161,6 +169,26 @@ TaskItem.prototype.genName = function()
 	}
 
 	return name;
+}
+
+TaskItem.prototype.generateThumbnails = function()
+{
+	if (this.block.params.files)
+	{
+		thumbnail_http_path = this.block.thumbnail_http_path.replace("%(task_id)d", this.task_num);
+		//console.log(this);
+		var files = cm_FillNumbers(this.block.params.files, this.frame_start);
+		
+		var files_list = files.split(";");
+		for(i in files_list) {
+			var filepath = files_list[i];
+			var thumbnail_name = filepath.split("/").pop();
+			var temp = thumbnail_name.split(".");
+			temp.pop();
+			thumbnail_name = temp.join(".")+".jpg";
+			thumbnail_path = thumbnail_http_path.replace("%(thumbnail_filename)s", thumbnail_name);
+		}
+	}
 }
 
 TaskItem.prototype.genFrames = function()
