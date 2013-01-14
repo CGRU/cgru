@@ -38,8 +38,9 @@ function n_WalkDir( i_path)
 	return response.walkdir;
 }
 
-function n_Request( i_obj)
+function n_Request( i_obj, i_wait)
 {
+	if( i_wait == null) i_wait = true;
 	var obj_str = JSON.stringify( i_obj);
 
 	var log = '<b style="color:#040"><i>send:</i></b> '+ obj_str;
@@ -48,7 +49,7 @@ function n_Request( i_obj)
 	xhr.overrideMimeType('application/json');
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 //	xhr.open('POST', 'server.php', true); 
-	xhr.open('POST', 'rules.php', false); 
+	xhr.open('POST', 'rules.php', i_wait ? false : true); 
 	xhr.send( obj_str);
 //window.console.log('n_Requestr='+obj_str);
 
@@ -56,21 +57,20 @@ function n_Request( i_obj)
 	c_Log( log);
 
 //window.console.log('xhr.responseText='+xhr.responseText);
-	return xhr.responseText;
-/*	xhr.onreadystatechange = function()
+	if( i_wait )
+		return xhr.responseText;
+
+	xhr.onreadystatechange = function()
 	{
 		if( xhr.readyState == 4 )
 		{
 			if( xhr.status == 200 )
 			{
-document.getElementById('recv').textContent='recv: ' + xhr.responseText;
-				g_ProcessMsg( xhr.responseText);
+				c_Log('<b style="color:#044"><i>recv:</i></b> '+ xhr.responseText);
 				return;
 			}
-			g_ConnectionLost();
 		}
 	}
-*/
 }
 
 function n_SendJob( job)

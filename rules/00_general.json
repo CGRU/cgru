@@ -51,7 +51,7 @@
 
 "thumbnail":{
 	"filename":"thumbnail.jpg",
-	"create_cmd":"convert \"@INPUT@\" \"@OUTPUT@\""
+	"create_cmd":"rules/thumbnail.py -i \"@INPUT@\" -o \"@OUTPUT@\""
 },
 
 "company":"CGRU",

@@ -160,6 +160,7 @@ function pushArray( &$o_obj, $i_edit)
 {
 //error_log('pushArray: '.json_encode($i_edit));
 	if( is_null( $i_edit) || is_null( $o_obj)) return;
+	if( false == is_array( $o_obj)) return;
 	if( array_key_exists('id', $o_obj) && ( $o_obj['id'] == $i_edit['id']))
 		if( array_key_exists( $i_edit['pusharray'], $o_obj) && is_array( $o_obj[$i_edit['pusharray']]))
 		{
@@ -257,6 +258,13 @@ function editObj( $i_edit, &$o_out)
 	}
 }
 
+function cmdExec( $i_obj, &$o_out)
+{
+	$o_out['cmdexec'] = array();
+	foreach( $i_obj['cmds'] as $cmd)
+		array_push( $o_out['cmdexec'], shell_exec($cmd));
+}
+
 function afanasy( $i_obj, &$o_out)
 {
 	$socket = fsockopen( $i_obj['address'], $i_obj['port'], $errno, $errstr);
@@ -299,6 +307,10 @@ else if( array_key_exists('walkdir', $recv))
 else if( array_key_exists('readobj', $recv))
 {
 	readObj( $recv['readobj'], $out); 
+}
+else if( array_key_exists('cmdexec', $recv))
+{
+	cmdExec( $recv['cmdexec'], $out); 
 }
 else if( array_key_exists('editobj', $recv))
 {

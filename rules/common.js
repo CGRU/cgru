@@ -89,6 +89,6 @@ function c_MakeThumbnail( i_source, i_path)
 	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rules+'/' + RULES.thumbnail.filename, true);
 	var cmd = RULES.thumbnail.create_cmd.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
 //window.console.log( cmd);
-	var result = c_Parse( n_Request({"cmdexec":{"cmds":[cmd]}}));
+	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
