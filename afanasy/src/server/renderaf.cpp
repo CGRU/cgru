@@ -768,6 +768,7 @@ bool RenderAf::getFarmHost( af::Host * newHost)
 
 void RenderAf::disableServices()
 {
+//printf("RenderAf::disabledservices: %s\n", m_services_disabled.c_str());
 	disabledservices.clear();
 	disabledservices.resize( servicesnum, 0);
 	if( false == m_services_disabled.empty())
@@ -783,20 +784,23 @@ void RenderAf::disableServices()
 
 void RenderAf::setService( const std::string & srvname, bool enable)
 {
-	std::vector<std::string> dissrvlist = af::strSplit( m_services_disabled, ";");
+//printf("RenderAf::setService: %s %d\n", srvname.c_str(), enable);
+	std::vector<std::string> dissrvlist_old = af::strSplit( m_services_disabled, ";");
 	std::vector<std::string> dissrvlist_new;
-	if( enable)
-		for( int i = 0; i < dissrvlist_new.size(); i++)
-			if( dissrvlist[i] != srvname )
-				dissrvlist_new.push_back( dissrvlist[i]);
-	else
-	{
-		dissrvlist_new = dissrvlist;
-		dissrvlist_new.push_back( srvname);
-	}
 
-	if( dissrvlist.size()) m_services_disabled = af::strJoin( dissrvlist, ";");
-	else m_services_disabled.clear();
+	// Collect new disabled services list w/o specified service:
+	for( int i = 0; i < dissrvlist_old.size(); i++)
+		if( dissrvlist_old[i] != srvname )
+			dissrvlist_new.push_back( dissrvlist_old[i]);
+
+	// Add specified service in disabled list:
+	if( false == enable )
+		dissrvlist_new.push_back( srvname);
+
+	if( dissrvlist_new.size())
+		m_services_disabled = af::strJoin( dissrvlist_new, ";");
+	else
+		m_services_disabled.clear();
 
 	disableServices();
 }
