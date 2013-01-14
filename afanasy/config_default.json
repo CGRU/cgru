@@ -85,8 +85,8 @@
 	"af_render_cmd_wolwake":"wolwake",
 
 "":"Thumbnail:",
-    "af_thumbnail_cmd":"convert %(filename)s %(thumbnail_filename)s",
-    "af_thumbnail_naming":"%(job_id)d/%(block_id)d/%(task_id)d/%(thumbnail_filename)s.jpg",
+    "af_thumbnail_cmd":"convert %(filename)s -scale 100x100 %(thumbnail_tmp_filepath)s",
+    "af_thumbnail_naming":"%(job_id)d/%(block_id)d/%(task_id)d/%(thumbnail_filename)s",
     "af_thumbnail_http":"http://localhost:80/thumbnails/",
     "af_thumbnail_file":"//servername/sharename/thumbnails/",
 

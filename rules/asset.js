@@ -8,11 +8,6 @@ function a_Process()
 
 	a_ShowBody();
 
-	if( g_elCurFolder.m_path == '/')
-		window.document.title = 'CG-RULES';
-	else
-		window.document.title = g_elCurFolder.m_path;
-
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
 	c_Info( path);
 	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.open.replace(/@PATH@/g, path)]));
@@ -87,6 +82,9 @@ function a_ShowBody()
 	{
 		var asset = ASSETS[a_type];
 		var a_name = asset.name;
+
+		window.document.title = a_name + ' ' + window.document.title;
+
 
 		var data = RULES.assets_data[a_type];
 		if( data == null ) continue;
