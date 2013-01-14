@@ -8,63 +8,107 @@ function a_Process()
 
 	a_ShowBody();
 
-	if( g_elCurFolder.m_path == '/')
-		window.document.title = 'CG-RULES';
-	else
-		window.document.title = g_elCurFolder.m_path;
-
-	c_Info( cgru_PM( '/'+RULES.root+g_elCurFolder.m_path));
+	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
+	c_Info( path);
+	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.open.replace(/@PATH@/g, path)]));
 }
 
-function a_WalkDir( i_walk, o_list)
+function a_WalkDir( i_walk, o_list, i_path)
 {
 	if( o_list.folders == null )
 		o_list.folders = [];
+	if( i_path == null )
+		i_path = '';
 
-window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
+//window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
 	if( i_walk.folders )
 		for( var folder in i_walk.folders)
 		{
-			o_list.folders.push( folder);
-			a_WalkDir( i_walk.folders[folder], o_list);
+			path = i_path + '/' + folder;
+			walk = i_walk.folders[folder];
+			if( walk.files && walk.files.length)
+				o_list.folders.push( path);
+			a_WalkDir( walk, o_list, path);
 		}
+}
+
+function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
+{
+	var link = RULES.root + i_path;
+
+	if( i_title == null)
+	{
+		i_title = i_path.split('/');
+		i_title = i_title[i_title.length-1];
+	}
+
+	var elFolder = document.createElement('div');
+	elFolder.classList.add('folder');
+	i_element.appendChild( elFolder);
+
+	var elLinkA = document.createElement('a');
+	elFolder.appendChild( elLinkA);
+	elLinkA.setAttribute('href', link);
+	elLinkA.setAttribute('target', '_blank');
+	elLinkA.textContent = i_title;
+
+	var cmds = RULES.cmdexec[i_data.result.cmdexec];
+	for( var c = 0; c < cmds.length; c++)
+	{
+		var elCmd = document.createElement('div');
+		elFolder.appendChild( elCmd);
+		elCmd.classList.add('cmdexec');
+		elCmd.textContent = cmds[c].name;
+		elCmd.setAttribute('cmdexec', JSON.stringify(
+			[cmds[c].cmd.replace( '@PATH@', cgru_PM('/'+link))]));
+	}
+
+	if( i_data.dailies )
+	{
+		var elMakeDailies = document.createElement('div');
+		elFolder.appendChild( elMakeDailies);
+		elMakeDailies.classList.add('button');
+		elMakeDailies.textContent = 'Make Dailies';
+		elMakeDailies.m_path = i_path;
+		elMakeDailies.onclick = function(e){
+			d_Make( e.currentTarget.m_path, i_asset.path+'/'+i_data.dailies[0])};
+	}
 }
 
 function a_ShowBody()
 {
-	g_el.asset.innerHTML = '';
+	u_el.asset.innerHTML = '';
 	for( var a_type in ASSETS)
 	{
 		var asset = ASSETS[a_type];
 		var a_name = asset.name;
 
+		window.document.title = a_name + ' ' + window.document.title;
+
+
 		var data = RULES.assets_data[a_type];
 		if( data == null ) continue;
 
-		if( data.source )
-		{			
-			var elSource = document.createElement('div');
-			g_el.asset.appendChild( elSource);
-			elSource.classList.add('sequence');
+		var thumbnail = null;
 
-var walk = '';
-//			var founded = false;
-			var list = {};
-			for( var r = 0; r < data.source.path.length; r++)
-			{
-				var path = asset.path + '/' + data.source.path[r];
-				a_WalkDir( n_WalkDir( path), list);
-walk += path + '<br>';
-walk += JSON.stringify( n_WalkDir( path)) + '<br><br>';
-			}
-elSource.innerHTML = walk + JSON.stringify( list);
-		}	
+		if( data.source )
+		{
+			var elSource = document.createElement('div');
+			u_el.asset.appendChild( elSource);
+			elSource.classList.add('sequences');
+			elSource.classList.add('button');
+			elSource.textContent = 'Scan Sources';
+			elSource.onclick = a_OpenCloseSourceOnClick;
+
+			elSource.m_asset = asset;
+			elSource.m_data = data;
+		}
 
 		if( data.result )
 		{
 			var elResult = document.createElement('div');
-			g_el.asset.appendChild( elResult);
-			elResult.classList.add('sequence');
+			u_el.asset.appendChild( elResult);
+			elResult.classList.add('sequences');
 
 			var founded = false;
 			for( var r = 0; r < data.result.path.length; r++)
@@ -76,7 +120,7 @@ elSource.innerHTML = walk + JSON.stringify( list);
 				if( folders == null ) continue;
 				if( folders.length )
 				{
-					elPath = document.createElement('div');
+					var elPath = document.createElement('div');
 					elResult.appendChild( elPath);
 					elPath.textContent = data.result.path[r];
 				}
@@ -85,40 +129,9 @@ elSource.innerHTML = walk + JSON.stringify( list);
 
 				for( var f = 0; f < folders.length; f++)
 				{
-					var link = RULES.root + path + '/' + folders[f];
-
-					var elFolder = document.createElement('div');
-					elFolder.classList.add('folder');
-					elResult.appendChild( elFolder);
-
-					var elLinkA = document.createElement('a');
-					elFolder.appendChild( elLinkA);
-					elLinkA.setAttribute('href', link);
-					elLinkA.setAttribute('target', '_blank');
-					elLinkA.textContent = folders[f];
-
-					var cmds = RULES.cmdexec[data.result.cmdexec];
-					for( var c = 0; c < cmds.length; c++)
-					{
-						var elCmd = document.createElement('div');
-						elFolder.appendChild( elCmd);
-						elCmd.classList.add('cmdexec');
-						elCmd.textContent = cmds[c].name;
-						elCmd.setAttribute('cmdexec', JSON.stringify(
-							[cmds[c].cmd.replace( '@PATH@', cgru_PM('/'+link))]));
-					}
-
-					if( data.dailies )
-					{
-						var elMakeDailies = document.createElement('div');
-						elFolder.appendChild( elMakeDailies);
-						elMakeDailies.classList.add('button');
-						elMakeDailies.textContent = 'Make Dailies';
-						elMakeDailies.m_path = path + '/' + folders[f];
-						elMakeDailies.onclick = function(e){
-							d_Make( e.currentTarget.m_path, asset.path+'/'+data.dailies[0])};
-					}
-
+					var folder = path + '/' + folders[f];
+					a_ShowSequence( elResult, asset, data, folder);
+					thumbnail = folder;
 					founded = true;
 				}
 			}
@@ -130,7 +143,7 @@ elSource.innerHTML = walk + JSON.stringify( list);
 		if( data.dailies )
 		{
 			var elDailies = document.createElement('div');
-			g_el.asset.appendChild( elDailies);
+			u_el.asset.appendChild( elDailies);
 
 			var founded = false;
 			for( var d = 0; d < data.dailies.length; d++)
@@ -170,9 +183,12 @@ elSource.innerHTML = walk + JSON.stringify( list);
 			if( false == founded )
 				elDailies.textContent = JSON.stringify( data.dailies );
 		}
+
+		if( thumbnail )
+			c_MakeThumbnail( thumbnail, asset.path);
 	}
 
-	g_el.rules.innerHTML = 'RULES='+JSON.stringify( RULES)+'<br><br>ASSETS='+JSON.stringify( ASSETS);
+	u_el.rules.innerHTML = 'ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
 }
 
 function a_Append( i_path, i_rules)
@@ -251,7 +267,7 @@ function a_AutoSeek()
 
 function a_ShowHeaders()
 {
-	g_el.assets.innerHTML = '';
+	u_el.assets.innerHTML = '';
 
 	for( var a_type in ASSETS)
 	{
@@ -259,7 +275,7 @@ function a_ShowHeaders()
 		var a_name = asset.name;
 
 		elHeader = document.createElement('div');
-		g_el.assets.appendChild( elHeader);
+		u_el.assets.appendChild( elHeader);
 		elHeader.classList.add('asset');
 
 		elType = document.createElement('div');
@@ -273,19 +289,35 @@ function a_ShowHeaders()
 		elName.textContent = a_name;
 	}
 }
-/*
-function a_onMouseOver_ResultCmd( i_evt)
+
+function a_OpenCloseSourceOnClick( i_evt)
 {
-	cgru_MenusCloseAll();
-	var menu = new cgru_Menu( document, document.body, i_evt, null, 'asset');
-	var path = cgru_PM( i_evt.currentTarget.m_path);
-	var exec = RULES.cmdexec[i_evt.currentTarget.m_exec];
-	for( var c = 0; c < exec.length; c++)
+	var el = i_evt.currentTarget;
+	var asset = el.m_asset;
+	var data = el.m_data;
+	var elSource = el;
+	elSource.textContent = '';
+	elSource.classList.remove('button');
+
+	var founded = false;
+	for( var r = 0; r < data.source.path.length; r++)
 	{
-		var cmd = exec[c].replace('@PATH@', path);
-		menu.addItem( name, 'cmdexec', [cmd], cmd);
+		var list = {};
+		var path = asset.path + '/' + data.source.path[r];
+		a_WalkDir( n_WalkDir( path), list);
+		if( list.folders.length )
+		{
+			var elPath = document.createElement('div');
+			elSource.appendChild( elPath);
+			elPath.textContent = data.source.path[r];
+			for( var f = 0; f < list.folders.length; f++)
+			{
+				a_ShowSequence( elSource, asset, data, path + list.folders[f], list.folders[f]);
+				founded = true;
+			}
+		}
 	}
-	menu.show();
+	if( false == founded )
+		elSource.textContent = JSON.stringify( data.source.path);
 }
-*/
 

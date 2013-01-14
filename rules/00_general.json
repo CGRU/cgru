@@ -15,7 +15,7 @@
 		"cmdexec":"play_sequence"
 	},
 	"result":{
-		"path":["RESULT/HRES/DPX","RESULT/DPX","RESULT/HRES/JPG","RESULT/JPG"],
+		"path":["RESULT/DPX","RESULT/JPG"],
 		"cmdexec":"play_sequence"
 	},
 	"dailies":["RESULT/DAILIES"]
@@ -23,22 +23,35 @@
 },
 
 "OS_unix":{
+	"open":"nautilus \"@PATH@\"",
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"DJV View",
 				"cmd":"djv_view @PATH@"},
 			{"name":"ls -l",
-				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""}
+				"cmd":"xterm -e \"cd @PATH@; ls -l; read -s -n 1\""},
+			{"name":"open",
+				"cmd":"nautilus \"@PATH@\""}
 		]
 	}
 },
 "OS_windows":{
+	"open":"start @PATH@",
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"Pdplayer",
-				"cmd":"pdplayer @PATH@"}
+				"cmd":"pdplayer @PATH@"},
+			{"name":"Pd++",
+				"cmd":"pdplayer --attach @PATH@"},
+			{"name":"open",
+				"cmd":"start @PATH@"}
 		]
 	}
+},
+
+"thumbnail":{
+	"filename":"thumbnail.jpg",
+	"create_cmd":"convert \"@INPUT@\" \"@OUTPUT@\""
 },
 
 "company":"CGRU",

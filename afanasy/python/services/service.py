@@ -1,6 +1,13 @@
 # -*- coding: utf-8 -*-
 
-import cgrupathmap
+import cgrupathmap, cgruconfig
+import os, sys, re
+
+if sys.version_info[0] == 2 and sys.version_info[1] >= 6:
+   import httplib as http_client
+elif sys.version[0] == 3:
+   import http.client as http_client
+
 
 str_capacity = '@AF_CAPACITY@'
 str_hosts = '@AF_HOSTS@'
@@ -9,12 +16,18 @@ str_hostseparator = ','
 
 class service:
    "This is base service class."
-   def __init__( self, wdir, command, capacity, hosts, files = ''):
-      self.wdir = wdir
-      self.command = command
-      self.capacity = capacity
-      self.hosts = hosts
-      self.files = files
+   def __init__( self, taskInfo):
+      if taskInfo.has_key('wdir') and taskInfo.has_key('command') and taskInfo.has_key('capacity') and taskInfo.has_key('hosts'):
+         self.wdir = taskInfo['wdir']
+         self.command = taskInfo['command']
+         self.capacity = taskInfo['capacity']
+         self.hosts = taskInfo['hosts']
+      else:
+         return False
+         
+      self.files = taskInfo.get('files', '')
+      
+      self.taskInfo = taskInfo
 
       self.pm = cgrupathmap.PathMap()
 
@@ -22,6 +35,9 @@ class service:
       self.str_hosts = str_hosts
       self.str_hostsprefix = str_hostsprefix
       self.str_hostseparator = str_hostseparator
+      
+   def __del__(self):
+      self.doPost()
 
    def getWDir( self):
       return self.pm.toClient( self.wdir)
@@ -64,3 +80,54 @@ class service:
          print('Error: service::checkfiles: Files not set!')
          return False
       return True
+   
+   def generatethumbnail(self):
+      print("Generating thumbnails")
+      files_list = self.files.split(";")
+      for filename in files_list:
+         self.taskInfo['filename'] = filename
+         
+         basename, ext = os.path.splitext(os.path.basename(filename))
+         
+         self.taskInfo['thumbnail_filename'] = "%s.jpg" % (basename)
+         
+         tmp_path = "%s/thumbnails" % cgruconfig.VARS['af_tempdirectory']
+         self.taskInfo['thumbnail_tmp_filepath'] = os.path.join(tmp_path, self.taskInfo['thumbnail_filename'])
+         thumbnail_path = self.taskInfo['thumbnail_naming'] % self.taskInfo
+         http_adress = "%s%s" % (self.taskInfo['thumbnail_http'], thumbnail_path)
+         
+         convert_command = self.taskInfo['thumbnail_cmd'] % self.taskInfo
+         if not os.path.exists(tmp_path):
+            os.makedirs(tmp_path)
+            
+         os.system(convert_command)
+         
+         match = re.match("(\w+)://([\w\d:]+)(/.*)", http_adress)
+         if match:
+            protocol, servername, http_path = match.groups()
+            port = 80
+            if servername.find(":") != -1:
+               servername, port = servername.split(":")
+            
+            dav_server = http_client.HTTPConnection(servername, port)
+            
+            http_dir_list = http_path.split('/')
+            http_base_name = http_dir_list.pop()
+            http_dir = "%s" % http_dir_list.pop(0)
+            for dir_entry in http_dir_list:
+               http_dir += "/%s" % dir_entry
+               dav_server.request('MKCOL', http_dir)
+               dav_response = dav_server.getresponse()
+               dav_server.close()
+            
+            f = open(self.taskInfo['thumbnail_tmp_filepath'], 'rb')
+            dav_server.request('PUT', http_path, f.read())
+            dav_response = dav_server.getresponse()
+            f.close()
+         
+         os.unlink(self.taskInfo['thumbnail_tmp_filepath'])
+   
+   def doPost(self):
+      print("Doing post process")
+      self.generatethumbnail()
+         

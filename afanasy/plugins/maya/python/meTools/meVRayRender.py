@@ -1,51 +1,28 @@
 """
-  meMentalRayRender
+  meVRayRender.py
 
-  ver.0.3.9 13 Jan 2013
-    - added support for deferred .mi generation
-    - fixed handling of image names and padding
-
-  ver.0.3.8 27 Dec 2012
-    - job specific functions moved to mrayJob class
-    - backburner support dropped (temporary)
-    - enchanced Afanasy jobs support
-    - prepared support for deferred .mi generation
-
-  ver.0.3.7 22 Aug 2012
-    - backburner specific control fields are moved
-      to corresponded tab, some unused parameters removed
-
-  ver.0.3.6 9 Jul 2012
-    - attempt to add Afanasy support
-
-  ver.0.3.5 21 Mar 2012
-  ver.0.3.4 16 Mar 2012
-  ver.0.3.3 18 Nov 2011
-  ver.0.3.1 14 Nov 2011
+  ver.0.2.0 13 Jan 2013
+  ver.0.1.0 10 Jan 2013
+  ver.0.0.1 9 Jan 2013
 
   Author:
 
   Yuri Meshalkin (aka mesh)
   mesh@kpp.kiev.ua
 
-  (c) Kiev Post Production 2011
+  (c) Kiev Post Production 2013
 
   Description:
 
-  This UI script generates .mi files from open Maya scene
-  and submits them to mentalray Standalone directly or by
-  creating a job for backburner or Afanasy.
-
-  "Use Remote Render" mode allows you to submit backburner job
-  from your local OS to render-farm with other OS (e.g. linux)
-  by using Directory Mapping.
-
+  This UI script generates .vrscene files from open Maya scene
+  and submits them to VRay Standalone directly or by
+  creating a job for Afanasy.
 
   Usage:
 
-  import meTools.meMentalRayRender as mr
-  reload( mr ) # for debugging purposes
-  mr = mr.meMentalRayRender()
+  import meTools.meVRayRender as vr
+  reload( vr ) # for debugging purposes
+  vr = vr.meVRayRender()
 
   For using with Afanasy, add %AF_ROOT%\plugins\maya\python to %PYTHONPATH%
 """
@@ -56,20 +33,20 @@ from functools import partial
 import maya.cmds as cmds
 import maya.mel as mel
 
-from mrayJob import MentalRayJob, MentalRayAfanasyJob  #, MentalRayBackburnerJob
+from vrayJob import VRayJob, VRayAfanasyJob  #, MentalRayBackburnerJob
 
-self_prefix = 'meMentalRayRender_'
-meMentalRayRenderVer = '0.3.9'
-meMentalRayRenderMainWnd = self_prefix + 'MainWnd'
+self_prefix = 'meVRayRender_'
+meVRayRenderVer = '0.2.0'
+meVRayRenderMainWnd = self_prefix + 'MainWnd'
 #
-# meMentalRayRender
+# meVRayRender
 #
-class meMentalRayRender( object ):
+class meVRayRender( object ):
   #
   #
   #
   def __init__( self, selection='' ):
-    #print ">> meMentalRayRender: Class created"
+    #print ">> meVRayRender: Class created"
     self.selection = selection
     self.winMain = ''
 
@@ -84,21 +61,21 @@ class meMentalRayRender( object ):
 
     self.job = None
     self.job_param = {}
-    self.mi_param = {}
-    self.mr_param = {}
+    self.vr_param = {}
+    self.vray_param = {}
     self.img_param = {}
     self.afanasy_param = {}
     self.bkburn_param = {}
 
-    self.migenCommand = 'Mayatomr -miStream'
-    self.def_migenCommand = 'Render -r mi'
-    self.def_scene_name = '' # maya scene name used for deferred .mi generation
+    self.vrgenCommand = 'vrend'
+    self.def_vrgenCommand = 'Render -r vray'
+    self.def_scene_name = '' # maya scene name used for deferred .vrscene generation
 
     self.initParameters()
     self.ui=self.setupUI()
   #
   #
-  #def __del__( self ): print( ">> meMentalRayRender: Class deleted" )
+  #def __del__( self ): print( ">> meVRayRender: Class deleted" )
   #
   #
   def initParameters( self ):
@@ -118,42 +95,56 @@ class meMentalRayRender( object ):
     self.job_param['job_paused'] = self.getDefaultIntValue( 'job_paused', 1 ) is 1
     self.job_param['job_priority'] = self.getDefaultIntValue( 'job_priority', 50 )
 
-    self.job_param['job_cleanup_mi'] = self.getDefaultIntValue( 'job_cleanup_rib', 0 ) is 1
+    self.job_param['job_cleanup_vr'] = self.getDefaultIntValue( 'job_cleanup_vr', 0 ) is 1
     self.job_param['job_cleanup_script'] = self.getDefaultIntValue( 'job_cleanup_script', 0 ) is 1
 
+    self.job_param['job_padding'] = cmds.getAttr( 'vraySettings.fileNamePadding' )
     #
-    # .mi generation parameters
+    # .vrscene generation parameters
     #
-    self.mi_param['mi_reuse'] = self.getDefaultIntValue( 'mi_reuse', 1 ) is 1
-    #self.mi_param['mi_dir'] = self.getDefaultStrValue( 'mi_dir', 'mi' )
-    self.mi_param['mi_filename'] = 'mi/' + self.getMayaSceneName() + '.mi' # self.getDefaultStrValue( 'mi_filename',
-    self.mi_param['mi_padding'] = self.getDefaultIntValue( 'mi_padding', 4 )
+    self.vr_param['vr_reuse'] = self.getDefaultIntValue( 'vr_reuse', 1 ) is 1
 
-    self.mi_param['mi_perframe'] = self.getDefaultIntValue( 'mi_perframe', 1 ) is 1
-    self.mi_param['mi_selection'] = self.getDefaultIntValue( 'mi_selection', 0 ) is 1
-    self.mi_param['mi_filepaths'] = self.getDefaultStrValue( 'mi_filepaths', 'Relative' )
-    #self.mi_param['mi_compression'] = self.getDefaultStrValue( 'mi_compression', 'Off' )
-    #self.mi_param['mi_fileformat'] = self.getDefaultStrValue( 'mi_fileformat', 'ASCII' )
-    self.mi_param['mi_binary'] = self.getDefaultIntValue( 'mi_binary', 0 ) is 1
-    self.mi_param['mi_tabstop'] = self.getDefaultIntValue( 'mi_tabstop', 2 )
-    self.mi_param['mi_verbosity'] = self.getDefaultStrValue( 'mi_verbosity', 'none' )
+    #self.vr_param['vr_plugin_prefix'] = cmds.getAttr( 'vraySettings.misc_pluginsPrefix' )
+    #'vrscenes/' + self.getMayaSceneName() + '.vrscene'
+    scene_name = cmds.getAttr( 'vraySettings.vrscene_filename' )
 
-    self.mi_param['mi_deferred'] = self.getDefaultIntValue( 'mi_deferred', 0 ) is 1
-    self.mi_param['mi_local_migen'] = self.getDefaultIntValue( 'mi_local_migen', 1 ) is 1
-    self.mi_param['mi_def_task_size'] = self.getDefaultIntValue( 'mi_def_task_size', 4 )
-    #
-    # mentalray parameters
-    #
-    self.mr_param['mr_options'] = self.getDefaultStrValue( 'mr_options', '' )
-    self.mr_param['mr_verbosity'] = self.getDefaultStrValue( 'mr_verbosity', 'none' )
+    if scene_name == None or scene_name == '' :
+      scene_name = 'vrscenes/' + self.getMayaSceneName()
+    #print 'vr_filename = %s' % scene_name
+    self.vr_param['vr_filename'] = scene_name
+    self.vr_param['vr_padding'] = self.job_param['job_padding'] # self.getDefaultIntValue( 'vr_padding', 4 )
+    self.vr_param['vr_perframe'] = self.getDefaultIntValue( 'vr_perframe', 1 ) is 1 # vraySettings.misc_eachFrameInFile
 
-    self.mr_param['mr_progress_frequency'] = self.getDefaultIntValue( 'mr_progress_frequency', 1 )
-    self.mr_param['mr_threads'] = self.getDefaultIntValue( 'mr_threads', 4 )
-    self.mr_param['mr_texture_continue'] = self.getDefaultIntValue( 'mr_texture_continue', 1 )
+    self.vr_param['vr_separate'] = self.getDefaultIntValue( 'vr_separate', 0 ) is 1 # vraySettings.misc_separateFiles
+
+    self.vr_param['vr_export_lights'] = self.getDefaultIntValue( 'vr_export_lights', 0 ) is 1 # vraySettings.misc_exportLights
+    self.vr_param['vr_export_nodes'] = self.getDefaultIntValue( 'vr_export_nodes', 0 ) is 1 # vraySettings.misc_exportNodes
+    self.vr_param['vr_export_geometry'] = self.getDefaultIntValue( 'vr_export_geometry', 0 ) is 1 # vraySettings.misc_exportGeometry
+    self.vr_param['vr_export_materials'] = self.getDefaultIntValue( 'vr_export_materials', 0 ) is 1 # vraySettings.misc_exportMaterials
+    self.vr_param['vr_export_textures'] = self.getDefaultIntValue( 'vr_export_textures', 0 ) is 1 # vraySettings.misc_exportTextures
+    self.vr_param['vr_export_bitmaps'] = self.getDefaultIntValue( 'vr_export_textures', 0 ) is 1 # vraySettings.misc_exportBitmaps
+
+    self.vr_param['vr_hex_mesh'] = self.getDefaultIntValue( 'vr_hex_mesh', 0 ) is 1 # vraySettings.misc_meshAsHex
+    self.vr_param['vr_hex_transform'] = self.getDefaultIntValue( 'vr_hex_transform', 0 ) is 1 # vraySettings.misc_transformAsHex
+    self.vr_param['vr_compression'] = self.getDefaultIntValue( 'vr_compression', 0 ) is 1 # vraySettings.misc_compressedVrscene
+
+    self.vr_param['vr_deferred'] = self.getDefaultIntValue( 'vr_deferred', 0 ) is 1
+    self.vr_param['vr_local_vrgen'] = self.getDefaultIntValue( 'vr_local_migen', 1 ) is 1
+    self.vr_param['vr_def_task_size'] = self.getDefaultIntValue( 'vr_def_task_size', 4 )
+    #
+    # VRay parameters
+    #
+    self.vray_param['vray_options'] = self.getDefaultStrValue( 'vray_options', '' )
+    self.vray_param['vray_verbosity'] = self.getDefaultStrValue( 'vray_verbosity', 'none' )
+
+    self.vray_param['vray_progress_frequency'] = self.getDefaultIntValue( 'vray_progress_frequency', 1 )
+    self.vray_param['vray_threads'] = self.getDefaultIntValue( 'vray_threads', 4 )
+    self.vray_param['vray_low_thread_priority'] = self.getDefaultIntValue( 'vr_low_thread_priority', 0 ) is 1 # vraySettings.sys_low_thread_priority
+    self.vray_param['vray_clearRVOn'] = self.getDefaultIntValue( 'vr_clearRVOn', 0 ) is 1 # vraySettings.clearRVOn
     #
     # image parameters
     #
-    self.img_param['img_filename'] = self.getImageFileNamePrefix()
+    self.img_param['img_filename_prfix'] = self.getImageFileNamePrefix()
     self.img_param['img_format'] = self.getImageFormat()
     #
     # Afanasy parameters
@@ -165,8 +156,8 @@ class meMentalRayRender( object ):
     self.afanasy_param['af_cap_max'] = self.getDefaultFloatValue( 'af_cap_max', 1.0 )
     self.afanasy_param['af_max_running_tasks'] = self.getDefaultIntValue( 'af_max_running_tasks', -1 )
     self.afanasy_param['af_max_tasks_per_host'] = self.getDefaultIntValue( 'af_max_tasks_per_host', -1 )
-    self.afanasy_param['af_service'] = self.getDefaultStrValue( 'af_service', 'mentalray' )
-    self.afanasy_param['af_deferred_service'] = self.getDefaultStrValue( 'af_deferred_service', 'mayatomr' )
+    self.afanasy_param['af_service'] = self.getDefaultStrValue( 'af_service', 'vray' )
+    self.afanasy_param['af_deferred_service'] = self.getDefaultStrValue( 'af_deferred_service', 'mayatovray' )
     self.afanasy_param['af_os'] = self.getDefaultStrValue( 'af_os', '' ) #linux mac windows
     # Hosts Mask - Job run only on renders which host name matches this mask.
     self.afanasy_param['af_hostsmask'] = self.getDefaultStrValue( 'af_hostsmask', '.*' )
@@ -213,6 +204,7 @@ class meMentalRayRender( object ):
 #
 # Renderer params
 #
+    """
     mr_renderer_path = '/usr/autodesk/mrstand3.9.1-adsk2012-x64/bin/ray'
 
     if self.os == 'win': mr_renderer_path = 'C:/Autodesk/mrstand3.9.1-adsk2012/bin/ray.exe'
@@ -221,6 +213,7 @@ class meMentalRayRender( object ):
     self.mr_param['mr_renderer_local'] = self.getDefaultStrValue( 'mr_renderer_local', mr_renderer_path )
     self.mr_param['mr_renderer_remote'] = self.getDefaultStrValue( 'mr_renderer_remote', '/usr/autodesk/mrstand3.9.1-adsk2012-x64/bin/cmdray.sh' )
     self.mr_param['mr_root_as_param'] = self.getDefaultIntValue( 'mr_root_as_param', 0 ) is 1
+    """
 
   #
   # getDefaultStrValue
@@ -318,81 +311,18 @@ class meMentalRayRender( object ):
   #
   #
   def getImageFileNamePrefix( self ):
-    fileNamePrefix = cmds.getAttr( 'defaultRenderGlobals.imageFilePrefix' )
-    if fileNamePrefix == None or fileNamePrefix == '' :
+    fileNamePrefix = cmds.getAttr( 'vraySettings.fileNamePrefix' )
+    if fileNamePrefix is None or fileNamePrefix == '' or fileNamePrefix == 'None':
       fileNamePrefix = self.getMayaSceneName()
     return fileNamePrefix
   #
   # getImageFormat
   #
   def getImageFormat( self ):
-    imageFormatStr = ''
-    format_idx = cmds.getAttr( 'defaultRenderGlobals.imageFormat' )
-    if format_idx == 0 : # Gif
-      imageFormatStr = 'iff'
-    elif format_idx == 1: # Softimage (pic)
-      imageFormatStr = 'pic'
-    elif format_idx == 2: # Wavefront (rla)
-      imageFormatStr = 'rla'
-    elif format_idx == 3 : # Tiff
-      imageFormatStr = 'tif'
-    elif format_idx == 4 : # Tiff16
-      imageFormatStr = 'iff'
-    elif format_idx == 5 : # SGI (rgb)
-      imageFormatStr = 'rgb'
-    elif format_idx == 6 : # Alias (pix)
-      imageFormatStr = 'pix'
-    elif format_idx == 7 : # Maya IFF (iff)
-      imageFormatStr = 'iff'
-    elif format_idx == 8 : # JPEG (jpg)
-      imageFormatStr = 'jpg'
-    elif format_idx == 9 : # EPS (eps)
-      imageFormatStr = 'eps'
-    elif format_idx == 10 : # Maya 16 IFF (iff)
-      imageFormatStr = 'iff'
-    elif format_idx == 11 : # Cineon
-      imageFormatStr = 'iff'
-    elif format_idx == 12 : # Quantel PAL (yuv)
-      imageFormatStr = 'yuv'
-    elif format_idx == 13 : # SGI 16
-      imageFormatStr = 'iff'
-    elif format_idx == 19 : # Targa (tga)
-      imageFormatStr = 'tga'
-    elif format_idx == 20 : # Windows Bitmap (bmp)
-      imageFormatStr = 'bmp'
-    elif format_idx == 21 : # SGI Movie
-      imageFormatStr = 'iff'
-    elif format_idx == 22 : # Quicktime
-      imageFormatStr = 'iff'
-    elif format_idx == 23 : # AVI
-      imageFormatStr = 'iff'
-    elif format_idx == 30 : # MacPaint
-      imageFormatStr = 'iff'
-    elif format_idx == 31 : # PSD
-      imageFormatStr = 'psd'
-    elif format_idx == 32 : # PNG
-      imageFormatStr = 'png'
-    elif format_idx == 33 : # QuickDraw
-      imageFormatStr = 'iff'
-    elif format_idx == 34 : # QuickTime Image
-      imageFormatStr = 'iff'
-    elif format_idx == 35 : # DDS
-      imageFormatStr = 'iff'
-    elif format_idx == 36 : # PSD Layered
-      imageFormatStr = 'psd'
-    elif format_idx == 50 : # IMF plugin
-      imageFormatStr = 'iff'
-    elif format_idx == 51 : # Custom Image Format
-      imageFormatStr = 'tif'
-    elif format_idx == 60 : # Macromedia SWF (swf)
-      imageFormatStr = 'iff'
-    elif format_idx == 61 : # Adobe Illustrator (ai)
-      imageFormatStr = 'iff'
-    elif format_idx == 62 : # SVG (svg)
-      imageFormatStr = 'iff'
-    elif format_idx == 63 : # Swift3DImporter (swft)
-      imageFormatStr = 'iff'
-
+    imageFormatStr = cmds.getAttr( 'vraySettings.imageFormatStr' )
+    if imageFormatStr is None : # Sometimes it happends ...
+      imageFormatStr = 'png' 
+      
     return imageFormatStr
   #
   # isRelative
@@ -403,10 +333,6 @@ class meMentalRayRender( object ):
       if string.find( fileName, ':' ) == 1 or string.find( fileName, '/' ) == 0 or string.find( fileName, '\\' ) == 0:
         ret = False
     return ret
-  #
-  # checkShaders
-  #
-  def checkShaders( self, value ): mel.eval( "mrShaderManager" )
   #
   # checkTextures
   #
@@ -446,11 +372,6 @@ class meMentalRayRender( object ):
       #print ( "dirName = %s abspath = %s" ) % (dirNames[0], dirName)
       cmds.textFieldButtonGrp( control, e=True, text=fileName, forceChangeCommand=True )
   #
-  # validate_mi_FileName
-  #
-  def validate_mi_FileName( self, control, extFilter ):
-    pass
-  #
   # setup_dirmaps
   #
   def setupDirmaps ( self, enableDirmap=True, fromPath='', toPath='' ):
@@ -469,154 +390,150 @@ class meMentalRayRender( object ):
 
     cmds.dirmap( enable=enableDirmap )
   #
+  # getRenderCamerasList (renderable)
+  #
+
+  def getRenderCamerasList ( self  ) :
+    renderCamerasList = []
+    cameras = cmds.listCameras()
+    for cam in cameras :
+      camShapes = cmds.listRelatives( str(cam), shapes=True  )
+      camShape = camShapes[0]
+      renderable = cmds.getAttr( camShape + '.renderable' )
+      if renderable == 1 :
+        renderCamerasList.append( str(cam) )
+    return renderCamerasList
+  #
   # getDeferredCmd
   #
   def getDeferredCmd ( self  ) :
-    gen_cmd = self.def_migenCommand + ' '
+    gen_cmd = self.def_vrgenCommand + ' '
     gen_cmd += '-rd ' + '"' + self.rootDir + '"' + ' '
     #gen_cmd += '-im ' + '"images/' + self.getImageFileNamePrefix() + '"' + ' '
     #gen_cmd += '-of ' + self.getImageFormat() + ' '
-    gen_cmd += self.get_migen_options()
+    
+    gen_cmd += '-exportFileName "' + self.get_vr_file_names( False ) + '" '
+
+    gen_cmd += '-noRender '
+    gen_cmd += self.get_vrgen_options()
     
     return gen_cmd
   #
   # getRenderCmd
   #
   def getRenderCmd ( self  ) :
-    mray = self.winMain + '|f0|t0|tc2|fr1|fc1|'
-    render_cmd = 'ray'
-    options = str( cmds.textFieldGrp( mray + 'mr_options', q=True, text=True )).strip()
-    mr_threads = cmds.intFieldGrp( mray + 'mr_threads', q=True, value1=True )
+    vray = self.winMain + '|f0|t0|tc2|fr1|fc1|'
+    render_cmd = 'vray'
+    options = str( cmds.textFieldGrp( vray + 'vray_options', q=True, text=True )).strip()
+    vray_threads = cmds.intFieldGrp( vray + 'vray_threads', q=True, value1=True )
 
-    mr_verbosity_level = cmds.optionMenuGrp( mray + 'mr_verbosity', q=True, sl=True ) - 1
-    mr_progress_frequency = cmds.intFieldGrp( mray + 'mr_progress_frequency', q=True, value1=True )
-    mr_texture_continue = cmds.checkBoxGrp( mray + 'mr_texture_continue', q=True, value1=True )
+    vray_verbosity_level = cmds.optionMenuGrp( vray + 'vray_verbosity', q=True, sl=True ) - 1
+    vray_progress_frequency = cmds.intFieldGrp( vray + 'vray_progress_frequency', q=True, value1=True )
 
-    if mr_verbosity_level < 5: mr_verbosity_level = 5
-    if mr_progress_frequency == 0 : mr_progress_frequency = 1
+    if vray_verbosity_level < 3: vray_verbosity_level = 3
+    if vray_progress_frequency == 0 : vray_progress_frequency = 1
 
     cmd = render_cmd + ' '
-    if mr_verbosity_level != 0 : cmd += '-v ' + str( mr_verbosity_level ) + ' '
-    if mr_progress_frequency != 0 : cmd += '-progress_frequency ' + str( mr_progress_frequency ) + ' '
-    if mr_threads != 0 : cmd += '-threads ' + str( mr_threads ) + ' '
-    if mr_texture_continue != 0 : cmd += '-texture_continue on'  + ' '
+    cmd += '-display=0 '
+    cmd += '-showProgress=1 '
+    if vray_verbosity_level != 0 : cmd += '-verboseLevel=' + str( vray_verbosity_level ) + ' '
+    if vray_progress_frequency != 0 : cmd += '-progressIncrement=' + str( vray_progress_frequency ) + ' '
+    cmd += '-progressUseCR=0 '
+    if vray_threads != 0 : cmd += '-numThreads=' + str( vray_threads ) + ' '
     
-    cmd += '-file_dir "' + str( self.rootDir ) + '/images/" '
-    #cmd += '-file_name "' + self.getImageFileNamePrefix() + '" ' 
-    #cmd += '-file_type ' + self.getImageFormat() + ' '
-
+    cmd += '-imgFile=' + self.get_image_names( False ) + ' ' 
+    
     cmd += options
     return cmd
   #
+  # get_vr_file_names
   #
-  #
-  def get_mi_file_names ( self ) :
-    mi = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+  def get_vr_file_names ( self, frame_number = True ) :
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
 
-    mi_filename = cmds.textFieldGrp( mi + 'mi_filename', q=True, text=True )
-    mi_perframe = cmds.checkBoxGrp( mi + 'mi_perframe', q=True, value1=True )
-    mi_padding = cmds.intFieldGrp( mi + 'mi_padding', q=True, value1=True )
+    vr_filename = cmds.textFieldGrp( vr + 'vr_filename', q=True, text=True )
+    vr_padding = cmds.intFieldGrp( vr + 'vr_padding', q=True, value1=True )
+    vr_perframe = cmds.checkBoxGrp( vr + 'vr_perframe', q=True, value1=True )
+
+    full_filename = cmds.workspace( expandName=vr_filename )
+    ( filename, ext ) = os.path.splitext( full_filename )
+    if ext == '' or ext == '.' : ext = '.vrscene'
+
+    if vr_padding > 0 and vr_perframe == True :
+      pad_str = '#'
+      for i in range( 1, vr_padding ): pad_str += '#'
+
+      if frame_number :
+        filename += '_' + ('@' + pad_str + '@') # hardcoded in vrend ???
+    
+    filename += ext
+    return filename
+  
+  #
+  # get_image_names
+  #
+  def get_image_names ( self, frame_number = True ) :
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+
+    vr_perframe = cmds.checkBoxGrp( vr + 'vr_perframe', q=True, value1=True )
+    vr_padding = cmds.intFieldGrp( vr + 'vr_padding', q=True, value1=True )
+    
     pad_str = '#'
-    if mi_padding > 0 and mi_perframe == True :
-      for i in range( 1, mi_padding ):
+    if vr_padding > 0 and vr_perframe == True :
+      for i in range( 1, vr_padding ):
         pad_str += '#'
 
-    filename = cmds.workspace( expandName=mi_filename )
-    (name, ext) = os.path.splitext( filename )
-    #dot_pos = name.rfind('.')
-    #miFileName = name[0:dot_pos] + '.' + ('@' + pad_str + '@') + '.mi'
-    miFileName = name + '.' + ('@' + pad_str + '@') + '.mi'
-    return miFileName
-  #
-  #
-  #
-  def get_image_names ( self ) :
-    mi = self.winMain + '|f0|t0|tc1|fr1|fc1|'
 
-    mi_perframe = cmds.checkBoxGrp( mi + 'mi_perframe', q=True, value1=True )
-    mi_padding = cmds.intFieldGrp( mi + 'mi_padding', q=True, value1=True )
-    pad_str = '#'
-    if mi_padding > 0 and mi_perframe == True :
-      for i in range( 1, mi_padding ):
-        pad_str += '#'
+    # setAttr -type "string" vraySettings.fileNamePrefix "BBB";
+    # setAttr "vraySettings.imageFormatStr" 10;
+    # setAttr -type "string" vraySettings.defaultDir "";
+    # setAttr "vraySettings.fileNameFormat" 1; ??
+    # setAttr -type "string" vraySettings.imageFormatStr "tif";
+    # setAttr "vraySettings.dontSaveImage" 0;
 
-    imageFileName = ''
+    # setAttr "vraySettings.vfbOn" 1;
+    # setAttr "vraySettings.vfbOffBatch" 1;
+    # setAttr "vraySettings.clearRVOn" 0;
+    # setAttr "vraySettings.hideRVOn" 1;
 
-    images = cmds.renderSettings( fullPath = True, genericFrameImageName = ('@' + pad_str + '@')  )
-    imageFileName = ';'.join ( images )
-
+    fileNamePrefix = self.getImageFileNamePrefix()
+    ext = self.getImageFormat()
+    images_rule = cmds.workspace( fileRuleEntry='images' )
+    images_dir = cmds.workspace( expandName=images_rule )
+    
+    
+    #images = cmds.renderSettings( fullPath = True, genericFrameImageName = ('@' + pad_str + '@')  )
+    imageFileName = images_dir + '/' + fileNamePrefix
+    
+    if frame_number :
+      imageFileName += '.' + ('@' + pad_str + '@')
+    
+    imageFileName += '.' + ext
+    
     return self.fromNativePath( imageFileName )
   #
-  # get_migen_options
+  # get_vrgen_options
   #
-  def get_migen_options ( self ) :
+  def get_vrgen_options ( self ) :
     job = self.winMain + '|f0|t0|tc0|fr1|fc1|'
-    mi = self.winMain + '|f0|t0|tc1|fr1|fc1|'
-    mi_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+    vr_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
     
-    animation = cmds.checkBoxGrp( job + 'job_animation', q=True, value1=True )
-    start = cmds.intFieldGrp( job + 'job_range', q=True, value1=True )
-    stop = cmds.intFieldGrp( job + 'job_range', q=True, value2=True )
-    step = cmds.intFieldGrp( job + 'job_range', q=True, value3=True )
-
-    mi_reuse = cmds.checkBoxGrp( mi + 'mi_reuse', q=True, value1=True )
-    mi_selection = cmds.checkBoxGrp( mi + 'mi_selection', q=True, value1=True )
-
-    mi_filename = cmds.textFieldGrp( mi + 'mi_filename', q=True, text=True )
-    mi_padding = cmds.intFieldGrp( mi + 'mi_padding', q=True, value1=True )
-    mi_perframe = cmds.checkBoxGrp( mi + 'mi_perframe', q=True, value1=True )
-    mi_tabstop = cmds.intFieldGrp( mi + 'mi_tabstop', q=True, value1=True )
-    mi_binary = cmds.checkBoxGrp( mi + 'mi_binary', q=True, value1=True )
-    mi_filepaths = cmds.optionMenuGrp( mi + 'mi_filepaths', q=True, value=True )
-
-    # mi_compression = cmds.optionMenuGrp( mi + 'mi_compression', q=True, value=True )
-    # mi_verbosity_level = cmds.optionMenuGrp( mi + 'mi_verbosity', q=True, sl=True ) - 1
+    renderCamList = self.getRenderCamerasList()
+    currentCam = renderCamList[0]
+    print 'Using camera : %s' % currentCam
+    vrgen_cmd = ( ' -cam ' + currentCam )
     
-    filename = cmds.workspace( expandName=mi_filename )
-    (filename, ext) = os.path.splitext( filename )
-    if ext == '' or ext == '.' : ext = '.mi'
-    filename += ext
-    
-    migen_cmd = '-file \"' + filename + '\" '
-    
-    #if mi_verbosity_level < 5 : mi_verbosity_level = 5
-    #migen_cmd += '-v ' + str( mi_verbosity_level ) + ' '
-    
-    migen_cmd += '-perframe '
-    if mi_perframe :
-      migen_cmd += '2 ' # (name.#.ext)
-      migen_cmd += '-padframe ' + str( mi_padding ) + ' '
-    else:
-      migen_cmd += '0 ' # (single .mi file)
-
-    if mi_binary :
-      migen_cmd += '-binary '
-    else:
-      migen_cmd += '-tabstop ' + str( mi_tabstop ) + ' '
-
-    #migen_cmd += '-pcm ' # export pass contribition maps
-    #migen_cmd += '-pud ' # export pass user data
-
-    migen_cmd += '-exportPathNames nn'
-    if mi_filepaths == 'Absolute' :
-      migen_cmd += 'aaaaaaaa '
-    elif mi_filepaths == 'Relative':
-      migen_cmd += 'rrrrrrrr '
-    else:
-      migen_cmd += 'nnnnnnnn '
-
-    if mi_selection : migen_cmd += '-active '
-  
-    return migen_cmd
+    return vrgen_cmd
   #
-  # generate_mi
+  # generate_vrscene
   #
-  def generate_mi ( self, isSubmitingJob=False ):
+  def generate_vrscene ( self, isSubmitingJob=False ):
     #
     job = self.winMain + '|f0|t0|tc0|fr1|fc1|'
-    mi = self.winMain + '|f0|t0|tc1|fr1|fc1|'
-    mi_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
-
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+    vr_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
+    
     skipExport = False
 
     animation = cmds.checkBoxGrp( job + 'job_animation', q=True, value1=True )
@@ -624,35 +541,43 @@ class meMentalRayRender( object ):
     stop = cmds.intFieldGrp( job + 'job_range', q=True, value2=True )
     step = cmds.intFieldGrp( job + 'job_range', q=True, value3=True )
 
-    mi_reuse = cmds.checkBoxGrp( mi + 'mi_reuse', q=True, value1=True )
-    mi_selection = cmds.checkBoxGrp( mi + 'mi_selection', q=True, value1=True )
+    vr_reuse = cmds.checkBoxGrp( vr + 'vr_reuse', q=True, value1=True )
 
-    mi_filename = cmds.textFieldGrp( mi + 'mi_filename', q=True, text=True )
-    mi_padding = cmds.intFieldGrp( mi + 'mi_padding', q=True, value1=True )
-    mi_perframe = cmds.checkBoxGrp( mi + 'mi_perframe', q=True, value1=True )
-    mi_tabstop = cmds.intFieldGrp( mi + 'mi_tabstop', q=True, value1=True )
-    mi_binary = cmds.checkBoxGrp( mi + 'mi_binary', q=True, value1=True )
-    mi_filepaths = cmds.optionMenuGrp( mi + 'mi_filepaths', q=True, value=True )
+    vr_filename = cmds.textFieldGrp( vr + 'vr_filename', q=True, text=True )
+    vr_padding = cmds.intFieldGrp( vr + 'vr_padding', q=True, value1=True )
+    vr_perframe = cmds.checkBoxGrp( vr + 'vr_perframe', q=True, value1=True )
 
-    # mi_compression = cmds.optionMenuGrp( mi + 'mi_compression', q=True, value=True )
-    #mi_verbosity_level = cmds.optionMenuGrp( mi + 'mi_verbosity', q=True, sl=True ) - 1
+    vr_separate = cmds.checkBoxGrp( vr + 'vr_separate', q=True, value1=True )
 
-    mi_deferred = cmds.checkBoxGrp( mi_def + 'mi_deferred', q=True, value1=True )
+    vr_export_lights = cmds.checkBoxGrp( vr + 'vr_export_lights', q=True, value1=True )
+    vr_export_nodes = cmds.checkBoxGrp( vr + 'vr_export_nodes', q=True, value1=True )
+    vr_export_geometry = cmds.checkBoxGrp( vr + 'vr_export_geometry', q=True, value1=True )
+    vr_export_materials = cmds.checkBoxGrp( vr + 'vr_export_materials', q=True, value1=True )
+    vr_export_textures = cmds.checkBoxGrp( vr + 'vr_export_textures', q=True, value1=True )
+    vr_export_bitmaps = cmds.checkBoxGrp( vr + 'vr_export_bitmaps', q=True, value1=True )
 
-    filename = cmds.workspace( expandName=mi_filename )
-    (filename, ext) = os.path.splitext( filename )
-    if ext == '' or ext == '.' : ext = '.mi'
-    filename += ext
+    vr_hex_mesh = cmds.checkBoxGrp( vr + 'vr_hex_mesh', q=True, value1=True )
+    vr_hex_transform = cmds.checkBoxGrp( vr + 'vr_hex_transform', q=True, value1=True )
+    vr_compression = cmds.checkBoxGrp( vr + 'vr_compression', q=True, value1=True )
+    
+    vr_deferred = cmds.checkBoxGrp( vr_def + 'vr_deferred', q=True, value1=True )
 
+    full_filename = cmds.workspace( expandName=vr_filename )
+    (filename, ext) = os.path.splitext( full_filename )
+
+    #if ext == '' or ext == '.' : ext = '.vrscene'
+    #filename += ext
     dirname = os.path.dirname( filename )
     if not os.path.exists( dirname ):
-      print ( "path %s not exists" ) % dirname
+      print ( "path %s not exists... let's create it!" ) % dirname
       os.mkdir( dirname )
 
+    fileName = cmds.workspace( projectPath=self.fromNativePath( full_filename ) )
+
     # TODO!!! check if files are exist and have to be overriden
-    if isSubmitingJob and mi_reuse:
+    if isSubmitingJob and vr_reuse:
       skipExport = True
-      print "Skipping .mi files generation ..."
+      print "Skipping .vrscene files generation ..."
 
     if not skipExport:
       if not animation :
@@ -662,58 +587,130 @@ class meMentalRayRender( object ):
       # save RenderGlobals
       #
       defGlobals = 'defaultRenderGlobals'
-      saveGlobals = {}
-      saveGlobals['animation'] = cmds.getAttr( defGlobals + '.animation' )
-      saveGlobals['startFrame'] = cmds.getAttr( defGlobals + '.startFrame' )
-      saveGlobals['endFrame'] = cmds.getAttr( defGlobals + '.endFrame' )
-      saveGlobals['byFrameStep'] = cmds.getAttr( defGlobals + '.byFrameStep' )
-      saveGlobals['extensionPadding'] = cmds.getAttr( defGlobals + '.extensionPadding' )
-      saveGlobals['imageFilePrefix'] = str( cmds.getAttr( defGlobals + '.imageFilePrefix' ) )
+      vraySettings = 'vraySettings'
+      saveMayaGlobals = {}
+      saveVrayGlobals = {}
+      saveMayaGlobals['animation'] = cmds.getAttr( defGlobals + '.animation' )
+      saveMayaGlobals['startFrame'] = cmds.getAttr( defGlobals + '.startFrame' )
+      saveMayaGlobals['endFrame'] = cmds.getAttr( defGlobals + '.endFrame' )
+      saveMayaGlobals['byFrameStep'] = cmds.getAttr( defGlobals + '.byFrameStep' )
 
-      migen_cmd = self.migenCommand + ' ' + self.get_migen_options()
+      name = cmds.getAttr( vraySettings + '.fileNamePrefix' )
+      if name is None :
+        name = '' 
+      saveVrayGlobals['fileNamePrefix'] = str( name )
 
-      print "migen_cmd = %s" % migen_cmd
+      saveVrayGlobals['fileNamePadding'] = cmds.getAttr( vraySettings + '.fileNamePadding' )
+      saveVrayGlobals['animBatchOnly'] = cmds.getAttr( vraySettings + '.animBatchOnly' )
+      saveVrayGlobals['vrscene_render_on'] = cmds.getAttr( vraySettings + '.vrscene_render_on' )
+      saveVrayGlobals['vrscene_on'] = cmds.getAttr( vraySettings + '.vrscene_on' )
+      name = cmds.getAttr( vraySettings + '.vrscene_filename' )
+      if name is None :
+        name = ''
+      saveVrayGlobals['vrscene_filename'] = str( name )
+      #print 'saveVrayGlobals[vrscene_filename] = %s' % saveVrayGlobals['vrscene_filename']
+      saveVrayGlobals['misc_eachFrameInFile'] = cmds.getAttr( vraySettings + '.misc_eachFrameInFile' )
+      saveVrayGlobals['misc_separateFiles'] = cmds.getAttr( vraySettings + '.misc_separateFiles' )
+
+      saveVrayGlobals['misc_exportLights'] = cmds.getAttr( vraySettings + '.misc_exportLights' )
+      saveVrayGlobals['misc_exportNodes'] = cmds.getAttr( vraySettings + '.misc_exportNodes' )
+      saveVrayGlobals['misc_exportGeometry'] = cmds.getAttr( vraySettings + '.misc_exportGeometry' )
+      saveVrayGlobals['misc_exportMaterials'] = cmds.getAttr( vraySettings + '.misc_exportMaterials' )
+      saveVrayGlobals['misc_exportTextures'] = cmds.getAttr( vraySettings + '.misc_exportTextures' )
+      saveVrayGlobals['misc_exportBitmaps'] = cmds.getAttr( vraySettings + '.misc_exportBitmaps' )
+
+      saveVrayGlobals['misc_meshAsHex'] = cmds.getAttr( vraySettings + '.misc_meshAsHex' )
+      saveVrayGlobals['misc_transformAsHex'] = cmds.getAttr( vraySettings + '.misc_transformAsHex' )
+      saveVrayGlobals['misc_compressedVrscene'] = cmds.getAttr( vraySettings + '.misc_compressedVrscene' )
+
       #
       # override RenderGlobals
       #
-      cmds.setAttr( defGlobals + '.animation', True ) # True even for single frame, for proper image name
+      cmds.setAttr( defGlobals + '.animation', True ) # even for single frame, for proper image name
       cmds.setAttr( defGlobals + '.startFrame', start )
       cmds.setAttr( defGlobals + '.endFrame', stop )
       cmds.setAttr( defGlobals + '.byFrameStep', step )
-      cmds.setAttr( defGlobals + '.extensionPadding', mi_padding ) # set images padding same as .mi
-      
-      image_name = self.getImageFileNamePrefix()
 
-      if mi_deferred :
+      cmds.setAttr( vraySettings + '.fileNamePrefix', self.getImageFileNamePrefix(), type='string' ) # will use MayaSceneName if empty
+
+      cmds.setAttr( vraySettings + '.fileNamePadding', vr_padding )
+      cmds.setAttr( vraySettings + '.animBatchOnly', False )
+      cmds.setAttr( vraySettings + '.vrscene_render_on', False )
+      cmds.setAttr( vraySettings + '.vrscene_on', True )
+      cmds.setAttr( vraySettings + '.vrscene_filename', fileName, type='string' )
+      cmds.setAttr( vraySettings + '.misc_eachFrameInFile', vr_perframe )
+      cmds.setAttr( vraySettings + '.misc_separateFiles', vr_separate )
+      if vr_separate :
+        print 'vr_export_lights = %d' % vr_export_lights
+        print 'vr_export_nodes = %d' % vr_export_nodes
+        print 'vr_export_geometry  = %d' % vr_export_geometry
+        print 'vr_export_materials = %d' % vr_export_materials
+        print 'vr_export_textures = %d' % vr_export_textures
+        print 'vr_export_bitmaps = %d' % vr_export_bitmaps
+
+        cmds.setAttr( vraySettings + '.misc_exportLights', vr_export_lights )
+        cmds.setAttr( vraySettings + '.misc_exportNodes', vr_export_nodes )
+        cmds.setAttr( vraySettings + '.misc_exportGeometry', vr_export_geometry )
+        cmds.setAttr( vraySettings + '.misc_exportMaterials', vr_export_materials )
+        cmds.setAttr( vraySettings + '.misc_exportTextures', vr_export_textures )
+        cmds.setAttr( vraySettings + '.misc_exportBitmaps', vr_export_bitmaps )
+
+      cmds.setAttr( vraySettings + '.misc_meshAsHex', vr_hex_mesh )
+      cmds.setAttr( vraySettings + '.misc_transformAsHex', vr_hex_transform )
+      cmds.setAttr( vraySettings + '.misc_compressedVrscene', vr_compression )
+
+      vrgen_cmd = self.vrgenCommand  + ' ' + self.get_vrgen_options()
+      
+      print "vrgen_cmd = %s" % vrgen_cmd
+      
+      if vr_deferred :
       # generate uniquie maya scene name and save it
-      # with current render and .mi generation settings
-        print 'Use deferred .mi generation'
-        
-        cmds.setAttr( defGlobals + '.imageFilePrefix', ( 'images/' + image_name ), type='string' )
-        
+      # with current render and .vrscene generation settings
+        print 'Use deferred .vrscene generation'
+        #cmds.setAttr( defGlobals + '.imageFilePrefix', ( 'images/' + image_name ), type='string' )
         scene_name = self.getMayaSceneName() # get scene name without extension
         def_scene_name = scene_name + '_deferred'
 
         cmds.file( rename=def_scene_name )
         self.def_scene_name = cmds.file( save=True, de=True ) # save it with default extension
         cmds.file( rename=scene_name ) # rename scene back
-        
 
       else :
-        migen_cmd += '-pcm ' # export pass contribition maps
-        migen_cmd += '-pud ' # export pass user data
-        cmds.setAttr( defGlobals + '.imageFilePrefix', image_name, type='string' ) # will use MayaSceneName if empty
+        mel.eval( vrgen_cmd )
         
-        mel.eval( migen_cmd )
+      
       #
       # restore RenderGlobals
       #
-      cmds.setAttr( defGlobals + '.animation', saveGlobals['animation'] )
-      cmds.setAttr( defGlobals + '.startFrame', saveGlobals['startFrame'] )
-      cmds.setAttr( defGlobals + '.endFrame', saveGlobals['endFrame'] )
-      cmds.setAttr( defGlobals + '.byFrameStep', saveGlobals['byFrameStep'] )
-      cmds.setAttr( defGlobals + '.extensionPadding', saveGlobals['extensionPadding'] )
-      cmds.setAttr( defGlobals + '.imageFilePrefix', saveGlobals['imageFilePrefix'], type='string' )
+      cmds.setAttr( defGlobals + '.animation', saveMayaGlobals['animation'] )
+      cmds.setAttr( defGlobals + '.startFrame', saveMayaGlobals['startFrame'] )
+      cmds.setAttr( defGlobals + '.endFrame', saveMayaGlobals['endFrame'] )
+      cmds.setAttr( defGlobals + '.byFrameStep', saveMayaGlobals['byFrameStep'] )
+      name = saveVrayGlobals['fileNamePrefix']
+      if name is None :
+        name = ''
+      cmds.setAttr( vraySettings + '.fileNamePrefix', str( name ), type='string' )
+
+      cmds.setAttr( vraySettings + '.fileNamePadding', saveVrayGlobals['fileNamePadding'] )
+      cmds.setAttr( vraySettings + '.animBatchOnly', saveVrayGlobals['animBatchOnly'] )
+      cmds.setAttr( vraySettings + '.vrscene_render_on', saveVrayGlobals['vrscene_render_on'] )
+      cmds.setAttr( vraySettings + '.vrscene_on', saveVrayGlobals['vrscene_on'] )
+      #print 'saveVrayGlobals[vrscene_filename] = %s' % saveVrayGlobals['vrscene_filename']
+      name = saveVrayGlobals['vrscene_filename']
+      if name is None :
+        name = ''
+      cmds.setAttr( vraySettings + '.vrscene_filename', str( name ), type='string' )
+      cmds.setAttr( vraySettings + '.misc_eachFrameInFile', saveVrayGlobals['misc_eachFrameInFile'] )
+      cmds.setAttr( vraySettings + '.misc_separateFiles', saveVrayGlobals['misc_separateFiles'] )
+      cmds.setAttr( vraySettings + '.misc_exportLights', saveVrayGlobals['misc_exportLights'] )
+      cmds.setAttr( vraySettings + '.misc_exportNodes', saveVrayGlobals['misc_exportNodes'] )
+      cmds.setAttr( vraySettings + '.misc_exportGeometry', saveVrayGlobals['misc_exportGeometry'] )
+      cmds.setAttr( vraySettings + '.misc_exportMaterials', saveVrayGlobals['misc_exportMaterials'] )
+      cmds.setAttr( vraySettings + '.misc_exportTextures', saveVrayGlobals['misc_exportTextures'] )
+      cmds.setAttr( vraySettings + '.misc_exportBitmaps', saveVrayGlobals['misc_exportBitmaps'] )
+      cmds.setAttr( vraySettings + '.misc_meshAsHex', saveVrayGlobals['misc_meshAsHex'] )
+      cmds.setAttr( vraySettings + '.misc_transformAsHex', saveVrayGlobals['misc_transformAsHex'] )
+      cmds.setAttr( vraySettings + '.misc_compressedVrscene', saveVrayGlobals['misc_compressedVrscene'] )
   #
   # submitJob
   #
@@ -722,9 +719,9 @@ class meMentalRayRender( object ):
 
     job = self.winMain + '|f0|t0|tc0|fr1|fc1|'
     #job2 = self.winMain + '|f0|t0|tc0|fr2|fc2|'
-    mi = self.winMain + '|f0|t0|tc1|fr1|fc1|'
-    mi_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
-    mray = self.winMain + '|f0|t0|tc2|fr1|fc1|'
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+    vr_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
+    vray = self.winMain + '|f0|t0|tc2|fr1|fc1|'
     af = self.winMain + '|f0|t0|tc3|fr1|fc1|'
     bkburn = self.winMain + '|f0|t0|tc4|fr1|fc1|'
     bkburn2 = self.winMain + '|f0|t0|tc4|fr2|fc2|'
@@ -733,20 +730,20 @@ class meMentalRayRender( object ):
     if job_name == '' : job_name = self.getMayaSceneName()
     job_description = cmds.textFieldGrp( job + 'job_description', q=True, text=True )
 
-    mi_deferred = cmds.checkBoxGrp( mi_def + 'mi_deferred', q=True, value1=True )
-    mi_local_migen = cmds.checkBoxGrp( mi_def + 'mi_local_migen', q=True, value1=True )
-    mi_def_task_size = cmds.intFieldGrp( mi_def + 'mi_def_task_size', q=True, value1=True )
-    mi_reuse = cmds.checkBoxGrp( mi + 'mi_reuse', q=True, value1=True )
-
+    vr_deferred = cmds.checkBoxGrp( vr_def + 'vr_deferred', q=True, value1=True )
+    vr_local_migen = cmds.checkBoxGrp( vr_def + 'vr_local_vrgen', q=True, value1=True )
+    vr_def_task_size = cmds.intFieldGrp( vr_def + 'vr_def_task_size', q=True, value1=True )
+    vr_reuse = cmds.checkBoxGrp( vr + 'vr_reuse', q=True, value1=True )
+    
     job_dispatcher = cmds.optionMenuGrp( job + 'job_dispatcher', q=True, value=True )
 
     if job_dispatcher == 'afanasy' :
-      self.job = MentalRayAfanasyJob ( job_name, job_description )
+      self.job = VRayAfanasyJob ( job_name, job_description )
       self.job.capacity = cmds.intFieldGrp( af + 'af_capacity', q=True, value1=True )
       self.job.deferred_capacity = cmds.intFieldGrp( af + 'af_deferred_capacity', q=True, value1=True )
 
+
       self.job.use_var_capacity = cmds.checkBoxGrp( af + 'af_use_var_capacity', q=True, value1=True )
-      
       self.job.capacity_coeff_min = cmds.floatFieldGrp( af + 'af_var_capacity', q=True, value1=True )
       self.job.capacity_coeff_max = cmds.floatFieldGrp( af + 'af_var_capacity', q=True, value2=True )
 
@@ -766,8 +763,8 @@ class meMentalRayRender( object ):
       #self.job = MentalRayBackburnerJob ( job_name, job_description )
       return
     else :
-      mi_deferred = False
-      self.job = MentalRayJob ( job_name, job_description )
+      vr_deferred = False
+      self.job = VRayJob ( job_name, job_description )
 
     self.job.work_dir = self.rootDir
 
@@ -775,68 +772,73 @@ class meMentalRayRender( object ):
     self.job.paused = cmds.checkBoxGrp( job + 'job_paused', q=True, value1=True )
 
     self.job.task_size = cmds.intFieldGrp( job + 'job_size', q=True, value1=True )
-    self.job.padding = cmds.intFieldGrp( mi + 'mi_padding', q=True, value1=True )
+    self.job.padding = cmds.intFieldGrp( vr + 'vr_padding', q=True, value1=True )
 
     self.job.animation = cmds.checkBoxGrp( job + 'job_animation', q=True, value1=True )
     self.job.start = cmds.intFieldGrp( job + 'job_range', q=True, value1=True )
     self.job.stop = cmds.intFieldGrp( job + 'job_range', q=True, value2=True )
     self.job.step = cmds.intFieldGrp( job + 'job_range', q=True, value3=True )
 
-    self.generate_mi( True ) # isSubmitingJob=True
+    self.generate_vrscene( True ) # isSubmitingJob=True
 
     if not self.job.animation :
       self.job.start = int( cmds.currentTime( q=True ) )
       self.job.stop = self.job.start
       self.job.step = 1
 
-    if mi_deferred and not mi_reuse:
+    if vr_deferred and not vr_reuse:
       self.job.use_gen_cmd = True
       gen_cmd = self.getDeferredCmd ()
       gen_cmd += ( ' -s @#@' ) 
       gen_cmd += ( ' -e @#@' ) 
-      gen_cmd += ( ' -b ' + str( self.job.step ) ) 
-                
+      gen_cmd += ( ' -b ' + str( self.job.step ) )
+      
       self.job.gen_cmd = gen_cmd
       self.job.gen_scene_name = self.def_scene_name 
-      self.job.gen_task_size = mi_def_task_size
-      self.job.use_local_gen = mi_local_migen
+      self.job.gen_task_size = vr_def_task_size
+      self.job.use_local_gen = vr_local_migen
       
-      print 'gen_cmd = %s %s' % ( self.job.gen_cmd, self.job.gen_scene_name )
-
+      print 'gen_cmd = %s %s' % ( self.job.gen_cmd, self.job.gen_scene_name ) 
+    
     self.job.cmd = self.getRenderCmd ()
-    self.job.mi_files = self.get_mi_file_names ()
+    self.job.vrscene_files = self.get_vr_file_names ()
     self.job.images = self.get_image_names ()
 
+    print 'self.get_vr_file_names = %s' % self.get_vr_file_names()
+    print 'self.get_image_names = %s' % self.get_image_names()
+
     self.job.begin ()
+    #self.job.once_per_job_tasks ()
     self.job.frame_tasks ()
     self.job.end ()
   #
   #
   #
-  def miFileNameChanged( self, name, value ):
+  def vrFileNameChanged( self, name, value ):
     self.setDefaultStrValue( name, value )
     self.setResolvedPath()
   #
   #
   #
   def setResolvedPath( self ):
-    mi = self.winMain + '|f0|t0|tc1|fr1|fc1|'
-    mi2 = self.winMain + '|f0|t0|tc1|fr2|fc2|'
-    mi_filename = cmds.textFieldGrp( mi + 'mi_filename', q=True, text=True )
-    mi_padding = cmds.intFieldGrp( mi + 'mi_padding', q=True, value1=True )
-    mi_perframe = cmds.checkBoxGrp( mi + 'mi_perframe', q=True, value1=True )
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+    vr2 = self.winMain + '|f0|t0|tc1|fr2|fc2|'
 
-    filename = cmds.workspace( expandName=mi_filename )
-    (filename, ext) = os.path.splitext( filename )
-    if ext == '' or ext == '.' : ext = '.mi'
+    vr_filename = cmds.textFieldGrp( vr + 'vr_filename', q=True, text=True )
+    vr_padding = cmds.intFieldGrp( vr + 'vr_padding', q=True, value1=True )
+    vr_perframe = cmds.checkBoxGrp( vr + 'vr_perframe', q=True, value1=True )
 
-    if mi_padding > 0 and mi_perframe == True :
-      filename += '.'
+    full_filename = cmds.workspace( expandName=vr_filename )
+    ( filename, ext ) = os.path.splitext( full_filename )
+    if ext == '' or ext == '.' : ext = '.vrscene'
+
+    if vr_padding > 0 and vr_perframe == True :
+      filename += '_' # hardcoded in vrend ???
       pad_str = '#'
-      for i in range( 1, mi_padding ): pad_str += '#'
+      for i in range( 1, vr_padding ): pad_str += '#'
       filename += pad_str
     filename += ext
-    cmds.textFieldGrp( mi2 + 'mi_resolved_path', edit=True, text=filename )
+    cmds.textFieldGrp( vr2 + 'vr_resolved_path', edit=True, text=filename )
   #
   # Open Maya Render Settings window
   #
@@ -859,12 +861,24 @@ class meMentalRayRender( object ):
   #
   #
   #
+  def enable_separate ( self, arg ) :
+    vr = self.winMain + '|f0|t0|tc1|fr1|fc1|'
+    self.setDefaultIntValue( 'vr_separate', arg )
+    cmds.checkBoxGrp( vr + 'vr_export_lights', edit = True, enable = arg )
+    cmds.checkBoxGrp( vr + 'vr_export_nodes', edit = True, enable = arg )
+    cmds.checkBoxGrp( vr + 'vr_export_geometry', edit = True, enable = arg )
+    cmds.checkBoxGrp( vr + 'vr_export_materials', edit = True, enable = arg )
+    cmds.checkBoxGrp( vr + 'vr_export_textures', edit = True, enable = arg )
+    cmds.checkBoxGrp( vr + 'vr_export_bitmaps', edit = True, enable = arg )
+  #
+  #
+  #
   def enable_deferred ( self, arg ) :
-    mi_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
+    vr_def = self.winMain + '|f0|t0|tc1|fr3|fc3|'
 
-    self.setDefaultIntValue( 'mi_deferred', arg )
-    cmds.checkBoxGrp( mi_def + 'mi_local_migen', edit = True, enable = arg )
-    cmds.intFieldGrp( mi_def + 'mi_def_task_size', edit = True, enable = arg )
+    self.setDefaultIntValue( 'vr_deferred', arg )
+    cmds.checkBoxGrp( vr_def + 'vr_local_vrgen', edit = True, enable = arg )
+    cmds.intFieldGrp( vr_def + 'vr_def_task_size', edit = True, enable = arg )
   #
   # setupUI
   #
@@ -874,17 +888,16 @@ class meMentalRayRender( object ):
     #
     # Main window setup
     #
-    self.winMain = cmds.window( meMentalRayRenderMainWnd,
-                                title='meMentalRayRender ver.' + meMentalRayRenderVer + ' (' + self.os + ')' ,
+    self.winMain = cmds.window( meVRayRenderMainWnd,
+                                title='meVRayRender ver.' + meVRayRenderVer + ' (' + self.os + ')' ,
                                 menuBar=True,
                                 retain=False,
                                 widthHeight=(420, 460) )
 
     self.mainMenu = cmds.menu( label="Commands", tearOff=False )
     cmds.menuItem( label='Render Globals ...', command = self.maya_render_globals )
-    cmds.menuItem( label='Check Shaders ...', command=self.checkShaders )
     cmds.menuItem( label='Check Texture Paths ...', command=self.checkTextures )
-    cmds.menuItem( label='Generate .mi', command=self.generate_mi )
+    cmds.menuItem( label='Generate .vrscene', command=self.generate_vrscene )
     cmds.menuItem( label='Submit Job', command=self.submitJob )
     cmds.menuItem( divider=True )
     cmds.menuItem( label='Close', command=self.deleteUI )
@@ -958,9 +971,9 @@ class meMentalRayRender( object ):
     cmds.frameLayout( 'fr2', label=' Cleanup ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi, cll=True, cl=True  )
     cmds.columnLayout( 'fc2', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
 
-    cmds.checkBoxGrp( 'job_cleanup_mi', cw=( (1, cw1), (2, cw1 * 2 ) ),
-                      label='', label1=' .mi files',
-                      value1=self.job_param['job_cleanup_mi'],
+    cmds.checkBoxGrp( 'job_cleanup_vr', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label='', label1=' .vrscene files',
+                      value1=self.job_param['job_cleanup_vr'],
                       enable=False,
                       cc = partial( self.setDefaultIntValue, 'job_cleanup_mi' ) )
     cmds.checkBoxGrp( 'job_cleanup_script', cw=( (1, cw1), (2, cw1 * 2 ) ),
@@ -974,81 +987,89 @@ class meMentalRayRender( object ):
 
     cmds.setParent( '..' )
     #
-    # .mi files generation tab
+    # .vrscene files generation tab
     #
-    tab_miparam = cmds.columnLayout( 'tc1', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
+    tab_vrparam = cmds.columnLayout( 'tc1', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
     cmds.frameLayout( 'fr1', label=' Export Settings ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi  )
     cmds.columnLayout( 'fc1', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
     #
-    cmds.checkBoxGrp( 'mi_reuse', cw=( (1, cw1), (2, cw1 * 2 ) ),
-                      label="Use existing .mi files ",
-                      ann = "Do not generate .mi files if they are exist",
-                      value1=self.mi_param['mi_reuse'],
-                      cc=partial( self.setDefaultIntValue, 'mi_reuse' ) )
+    cmds.checkBoxGrp( 'vr_reuse', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label="Use existing .vrscene ",
+                      ann = "Do not generate .vrscene files if they are exist",
+                      value1=self.vr_param['vr_reuse'],
+                      cc=partial( self.setDefaultIntValue, 'vr_reuse' ) )
     cmds.text( label='' )
     #mi_dir = cmds.textFieldButtonGrp( cw=( 1, cw1 ), adj=2, label="Directory ", buttonLabel="...", text=self.mi_param['mi_dir'] )
-    #cmds.textFieldButtonGrp( mi_dir, edit=True, bc=partial( self.browseDirectory, mi_dir ), cc=partial( self.setDefaultStrValue, 'mi_dir' ) )
-    mi_filename = cmds.textFieldButtonGrp( 'mi_filename', cw=( 1, cw1 ), adj=2,
+
+    vr_filename = cmds.textFieldButtonGrp( 'vr_filename', cw=( 1, cw1 ), adj=2,
                                            label="File Name ", buttonLabel="...",
-                                           text=self.mi_param['mi_filename'],
-                                           cc=partial( self.miFileNameChanged, 'mi_filename' ) )
-    cmds.textFieldButtonGrp( mi_filename, edit=True, bc=partial( self.browseFile, mi_filename, 'mentalray files (*.mi)' ) )
+                                           text=self.vr_param['vr_filename'],
+                                           cc=partial( self.vrFileNameChanged, 'vr_filename' ) )
+    cmds.textFieldButtonGrp( vr_filename, edit=True, bc=partial( self.browseFile, vr_filename, 'vray scene files (*.vrscene)' ) )
+
     #cmds.text( label='' )
     # Resolved Path
     #
-    cmds.intFieldGrp( 'mi_padding', cw=( (1, cw1), (2, cw2) ),
+    cmds.intFieldGrp( 'vr_padding', cw=( (1, cw1), (2, cw2) ),
                       label="Frame Padding ",
-                      value1=self.mi_param['mi_padding'],
-                      cc=partial( self.miFileNameChanged, 'mi_padding' ) )
-    cmds.checkBoxGrp( 'mi_perframe', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      value1=self.vr_param['vr_padding'],
+                      cc=partial( self.vrFileNameChanged, 'vr_padding' ) )
+    cmds.checkBoxGrp( 'vr_perframe', cw=( (1, cw1), (2, cw1 * 2 ) ),
                       label = '', label1 = " File Per Frame ",
-                      value1=self.mi_param['mi_perframe'],
-                      cc=partial( self.miFileNameChanged, 'mi_perframe' ) )
+                      value1=self.vr_param['vr_perframe'],
+                      cc=partial( self.vrFileNameChanged, 'vr_perframe' ) )
     #cmds.text( label='' )
-    cmds.checkBoxGrp( 'mi_selection', cw=( (1, cw1), (2, cw1 * 2 ) ),
-                      label = '', label1 = " Export Only Selected Objects",
-                      value1=self.mi_param['mi_selection'],
-                      cc=partial( self.setDefaultIntValue, 'mi_selection' ) )
+    cmds.checkBoxGrp( 'vr_separate', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = 'Separate Files ', label1 = "",
+                      value1=self.vr_param['vr_separate'],
+                      cc=partial( self.enable_separate )) #partial( self.setDefaultIntValue, 'vr_separate' ) )
+
+    cmds.checkBoxGrp( 'vr_export_lights', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " Export Lights",
+                      value1=self.vr_param['vr_export_lights'],
+                      enable = self.vr_param[ 'vr_separate' ],
+                      cc=partial( self.setDefaultIntValue, 'vr_export_lights' ) )
+    cmds.checkBoxGrp( 'vr_export_nodes', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " Export Nodes",
+                      value1=self.vr_param['vr_export_nodes'],
+                      enable = self.vr_param[ 'vr_separate' ],
+                      cc=partial( self.setDefaultIntValue, 'vr_export_nodes' ) )
+    cmds.checkBoxGrp( 'vr_export_geometry', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " Export Geometry",
+                      value1=self.vr_param['vr_export_geometry'],
+                      enable = self.vr_param[ 'vr_separate' ],
+                      cc=partial( self.setDefaultIntValue, 'vr_export_geometry' ) )
+    cmds.checkBoxGrp( 'vr_export_materials', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " Export Materials",
+                      value1=self.vr_param['vr_export_materials'],
+                      enable = self.vr_param[ 'vr_separate' ],
+                      cc=partial( self.setDefaultIntValue, 'vr_export_materials' ) )
+    cmds.checkBoxGrp( 'vr_export_textures', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " Export Textures",
+                      value1=self.vr_param['vr_export_textures'],
+                      enable = self.vr_param[ 'vr_separate' ],
+                      cc=partial( self.setDefaultIntValue, 'vr_export_textures' ) )
+    cmds.checkBoxGrp( 'vr_export_bitmaps', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " Export Bitmaps",
+                      value1=self.vr_param['vr_export_bitmaps'],
+                      enable = self.vr_param[ 'vr_separate' ],
+                      cc=partial( self.setDefaultIntValue, 'vr_export_bitmaps' ) )
+
     #cmds.text( label='' )
 
+    cmds.checkBoxGrp( 'vr_hex_mesh', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = 'Write in hex format ', label1 = " mesh data",
+                      value1 = self.vr_param [ 'vr_hex_mesh' ],
+                      cc = partial( self.setDefaultIntValue, 'vr_hex_mesh' ) )
+    cmds.checkBoxGrp( 'vr_hex_transform', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = '', label1 = " transform data",
+                      value1 = self.vr_param [ 'vr_hex_transform' ],
+                      cc = partial( self.setDefaultIntValue, 'vr_hex_transform' ) )
 
-    #mi_fileformat = cmds.optionMenuGrp( 'mi_fileformat', cw=( (1, cw1), ), cal=(1, 'right'),
-    #                                    label="Format .mi ",
-    #                                    cc=partial( self.setDefaultStrValue, 'mi_fileformat' ) )
-    #for name in ('Binary', 'ASCII'):
-    #  cmds.menuItem( label=name )
-    #cmds.optionMenuGrp( mi_fileformat, e=True, value=self.mi_param['mi_fileformat'] )
-    cmds.checkBoxGrp( 'mi_binary', cw=( (1, cw1), (2, cw1 * 2 ) ),
-                      label = '', label1 = " Binary",
-                      value1 = self.mi_param [ 'mi_binary' ],
-                      cc = partial( self.setDefaultIntValue, 'mi_binary' ) )
-
-    cmds.intFieldGrp( 'mi_tabstop', cw=( (1, cw1), (2, cw2) ),
-                      label="Tab stop (ASCII) ",
-                      value1=self.mi_param['mi_tabstop'],
-                      cc=partial( self.setDefaultIntValue, 'mi_tabstop' ) )
-    #mi_compression = cmds.optionMenuGrp( 'mi_compression', cw=( (1, cw1), ), label="Compression ", cal=(1, 'right'), cc=partial( self.setDefaultStrValue, 'mi_compression' ) )
-    #cmds.menuItem( label='Off' )
-    #cmds.menuItem( label='GzipBestSpeed' )
-    #cmds.menuItem( label='GzipDefault' )
-    #cmds.menuItem( label='GzipBest' )
-    #cmds.optionMenuGrp( mi_compression, e=True, value=self.mi_param['mi_compression'] )
-
-    mi_filepaths = cmds.optionMenuGrp( 'mi_filepaths', cw=( (1, cw1), ), cal=(1, 'right'),
-                                       label="Export File Paths ",
-                                       cc=partial( self.setDefaultStrValue, 'mi_filepaths' ) )
-    for name in ( 'NoPath', 'Relative', 'Absolute' ):
-      cmds.menuItem( label=name )
-    cmds.optionMenuGrp( mi_filepaths, e=True, value=self.mi_param['mi_filepaths'] )
-
-    # mi_verbosity = none, fatal, error, warning, info, progress, and details
-    #mi_verbosity = cmds.optionMenuGrp( 'mi_verbosity', cw=( (1, cw1), ), cal=(1, 'right'),
-    #                                   label="Verbosity ",
-    #                                   cc=partial( self.setDefaultStrValue, 'mi_verbosity' ) )
-    #for name in ('none', 'fatal', 'error', 'warning', 'info', 'progress', 'details'):
-    #  cmds.menuItem( label=name )
-
-    #cmds.optionMenuGrp( mi_verbosity, e=True, value=self.mi_param['mi_verbosity'] )
+    cmds.checkBoxGrp( 'vr_compression', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label = 'Compressed ', label1 = "",
+                      value1 = self.vr_param [ 'vr_compression' ],
+                      cc = partial( self.setDefaultIntValue, 'vr_compression' ) )
     #
     cmds.setParent( '..' )
     cmds.setParent( '..' )
@@ -1056,31 +1077,31 @@ class meMentalRayRender( object ):
     cmds.frameLayout( 'fr2', label=' Resolved Path ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi  )
     cmds.columnLayout( 'fc2', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
     #
-    cmds.textFieldGrp( 'mi_resolved_path', cw=( 1, 0 ), adj=2, label='', text='', editable=False )
+    cmds.textFieldGrp( 'vr_resolved_path', cw=( 1, 0 ), adj=2, label='', text='', editable=False )
     self.setResolvedPath()
     #
     cmds.setParent( '..' )
     cmds.setParent( '..' )
-    cmds.frameLayout( 'fr3', label=' Deferred .mi generation ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi, cll=True, cl=True  )
+    cmds.frameLayout( 'fr3', label=' Deferred .vrscene generation ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi, cll=True, cl=True  )
     cmds.columnLayout( 'fc3', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
-    cmds.checkBoxGrp( 'mi_deferred', cw=( (1, cw1), (2, cw1 * 2 ) ),
+    cmds.checkBoxGrp( 'vr_deferred', cw=( (1, cw1), (2, cw1 * 2 ) ),
                       label = "Use deferred ",
-                      ann = "Generate .mi files in background process",
-                      value1 = self.mi_param[ 'mi_deferred' ],
+                      ann = "Generate .vrscene files in background process",
+                      value1 = self.vr_param[ 'vr_deferred' ],
                       cc = partial( self.enable_deferred )) # self.setDefaultIntValue, 'rib_deferred_ribgen' ) )
 
-    cmds.checkBoxGrp( 'mi_local_migen', cw=( (1, cw1), (2, cw1 * 2 ) ),
+    cmds.checkBoxGrp( 'vr_local_vrgen', cw=( (1, cw1), (2, cw1 * 2 ) ),
                       label = '', label1 = " Only on localhost ",
                       ann = "Do not use remote hosts",
-                      value1 = self.mi_param[ 'mi_local_migen' ],
-                      enable = self.mi_param[ 'mi_deferred' ],
-                      cc = partial( self.setDefaultIntValue, 'mi_local_migen' ) )
+                      value1 = self.vr_param[ 'vr_local_vrgen' ],
+                      enable = self.vr_param[ 'vr_deferred' ],
+                      cc = partial( self.setDefaultIntValue, 'vr_local_vrgen' ) )
 
-    cmds.intFieldGrp( 'mi_def_task_size', cw=( (1, cw1), (2, cw2) ),
+    cmds.intFieldGrp( 'vr_def_task_size', cw=( (1, cw1), (2, cw2) ),
                       label = "Task Size ",
-                      value1 = self.mi_param [ 'mi_def_task_size' ],
-                      enable = self.mi_param[ 'mi_deferred' ],
-                      cc = partial( self.setDefaultIntValue, 'mi_def_task_size' ) )
+                      value1 = self.vr_param [ 'vr_def_task_size' ],
+                      enable = self.vr_param[ 'vr_deferred' ],
+                      cc = partial( self.setDefaultIntValue, 'def_task_size' ) )
     cmds.setParent( '..' )
     cmds.setParent( '..' )
 
@@ -1088,39 +1109,42 @@ class meMentalRayRender( object ):
     #
     # Renderer tab
     #
-    tab_mray = cmds.columnLayout( 'tc2', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
+    tab_vray = cmds.columnLayout( 'tc2', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
     #cmds.text( label='' )
-    cmds.frameLayout( 'fr1', label=' MentalRay command line options ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi  )
+    cmds.frameLayout( 'fr1', label=' VRay command line options ', borderVisible=True, borderStyle='etchedIn', marginHeight=mr_hi  )
     cmds.columnLayout( 'fc1', columnAttach=('left',0), rowSpacing=0, adjustableColumn=True )
 
-    cmds.textFieldGrp( 'mr_options', cw=( 1, cw1 ), adj=2,
+    cmds.textFieldGrp( 'vray_options', cw=( 1, cw1 ), adj=2,
                        label="Additional Options ",
-                       text=self.mr_param['mr_options'],
-                       cc=partial( self.setDefaultStrValue, 'mr_options' ) )
+                       text=self.vray_param['vray_options'],
+                       cc=partial( self.setDefaultStrValue, 'vray_options' ) )
     cmds.text( label='' )
-    mr_verbosity = cmds.optionMenuGrp( 'mr_verbosity', cw=( (1, cw1), ), cal=(1, 'right'),
+    vray_verbosity = cmds.optionMenuGrp( 'vray_verbosity', cw=( (1, cw1), ), cal=(1, 'right'),
                                        label="Verbosity ",
-                                       cc=partial( self.setDefaultStrValue, 'mr_verbosity' ) )
-    for name in ('none', 'fatal', 'error', 'warning', 'info', 'progress', 'debug', 'details'):
+                                       cc=partial( self.setDefaultStrValue, 'vray_verbosity' ) )
+    for name in ('none', 'errors', 'warning', 'info', 'details'):
       cmds.menuItem( label=name )
 
-    cmds.optionMenuGrp( mr_verbosity, e=True, value=self.mr_param['mr_verbosity'] )
+    cmds.optionMenuGrp( vray_verbosity, e=True, value=self.vray_param['vray_verbosity'] )
 
-    cmds.intFieldGrp( 'mr_progress_frequency', cw=( (1, cw1), (2, cw2) ),
+    cmds.intFieldGrp( 'vray_progress_frequency', cw=( (1, cw1), (2, cw2) ),
                       label="Progress frequency ",
                       ann = 'Progress information should be emitted only when this percentage of the whole render time has passed.',
-                      value1=self.mr_param['mr_progress_frequency'],
-                      cc=partial( self.setDefaultIntValue, 'mr_progress_frequency' ) )
-    cmds.intFieldGrp( 'mr_threads', cw=( (1, cw1), (2, cw2) ),
+                      value1=self.vray_param['vray_progress_frequency'],
+                      cc=partial( self.setDefaultIntValue, 'vray_progress_frequency' ) )
+    cmds.intFieldGrp( 'vray_threads', cw=( (1, cw1), (2, cw2) ),
                       label="Threads ",
                       ann = 'The number of threads.',
-                      value1=self.mr_param['mr_threads'],
-                      cc=partial( self.setDefaultIntValue, 'mr_threads' ) )
-    cmds.checkBoxGrp( 'mr_texture_continue', cw=( (1, cw1), (2, cw1 * 2 ) ),
-                      label='', label1=" Skip missing textures",
-                      ann = 'If this option is specified, mental ray will continue for missing texture files',
-                      value1=self.mr_param['mr_texture_continue'],
-                      cc=partial( self.setDefaultIntValue, 'mr_texture_continue' ) )
+                      value1=self.vray_param['vray_threads'],
+                      cc=partial( self.setDefaultIntValue, 'vray_threads' ) )
+    cmds.checkBoxGrp( 'vray_low_thread_priority', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label='', label1=" Low Thread Priority",
+                      value1=self.vray_param['vray_low_thread_priority'],
+                      cc=partial( self.setDefaultIntValue, 'vray_low_thread_priority' ) )
+    cmds.checkBoxGrp( 'vray_clearRVOn', cw=( (1, cw1), (2, cw1 * 2 ) ),
+                      label='', label1=" Clear Render View",
+                      value1=self.vray_param['vray_clearRVOn'],
+                      cc=partial( self.setDefaultIntValue, 'vray_clearRVOn' ) )
 
     cmds.setParent( '..' )
     cmds.setParent( '..' )
@@ -1137,17 +1161,17 @@ class meMentalRayRender( object ):
                       label="Task Capacity ",
                       value1=self.afanasy_param['af_capacity'],
                       cc=partial( self.setDefaultIntValue, 'af_capacity' ) )
-                      
-    cmds.intFieldGrp( 'af_deferred_capacity', cw=( (1, cw1), (2, cw2) ),
-                      label="Deferred Capacity ",
-                      value1=self.afanasy_param['af_deferred_capacity'],
-                      cc=partial( self.setDefaultIntValue, 'af_deferred_capacity' ) )                      
 
     cmds.checkBoxGrp( 'af_use_var_capacity', cw=( (1, cw1), (2, cw1 * 2 ) ),
                       label = "Use Variable Capacity ",
                       ann = "Block can generate tasks with capacity*coefficient to fit free render capacity",
                       value1 = self.afanasy_param[ 'af_use_var_capacity' ],
                       cc = partial( self.enable_var_capacity ) )
+    
+    cmds.intFieldGrp( 'af_deferred_capacity', cw=( (1, cw1), (2, cw2) ),
+                      label="Deferred Capacity ",
+                      value1=self.afanasy_param['af_deferred_capacity'],
+                      cc=partial( self.setDefaultIntValue, 'af_deferred_capacity' ) )
 
     cmds.floatFieldGrp( 'af_var_capacity', cw=( (1, cw1), (2, cw2), (3, cw2), (4, cw2) ), nf=2, pre=2,
                        label="Min/Max coefficient ",
@@ -1218,15 +1242,15 @@ class meMentalRayRender( object ):
 
     cmds.tabLayout( tab, edit=True,
                     tabLabel=( ( tab_job, "Job" ),
-                               ( tab_miparam, ".mi" ),
-                               ( tab_mray, "Renderer" ),
+                               ( tab_vrparam, ".vrscene" ),
+                               ( tab_vray, "Renderer" ),
                                ( tab_afanasy, "Afanasy" )
                              )
                   )
 
     cmds.setParent( form )
-    btn_sbm = cmds.button( label="Submit", command=self.submitJob, ann='Generate .mi files and submit to dispatcher' )
-    btn_gen = cmds.button( label="Generate .mi", command=self.generate_mi, ann='Force .mi files generation' )
+    btn_sbm = cmds.button( label="Submit", command=self.submitJob, ann='Generate .vrscene files and submit to dispatcher' )
+    btn_gen = cmds.button( label="Generate .vrscene", command=self.generate_vrscene, ann='Force .vrscene files generation' )
     btn_cls = cmds.button( label="Close", command=self.deleteUI )
 
     cmds.formLayout(  form, edit=True,
@@ -1258,13 +1282,12 @@ class meMentalRayRender( object ):
   # deleteUI
   #
   def deleteUI( self, param ):
-    #print (">> meMentalRayRender: deleteUI() "  )
-    winMain = meMentalRayRenderMainWnd
+    winMain = meVRayRenderMainWnd
 
     if cmds.window( winMain, exists=True ): cmds.deleteUI( winMain, window=True )
     if cmds.windowPref( winMain, exists=True ): cmds.windowPref( winMain, remove=True )
 #
 #
 #
-print 'meMentalRayRender sourced ...'
+print 'meVRayRender sourced ...'
 

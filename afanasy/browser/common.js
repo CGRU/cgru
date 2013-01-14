@@ -199,3 +199,18 @@ function cm_CreateStart( i_item)
 	i_item.elStarCount.classList.add('count');
 }
 
+function cm_FillNumbers( i_string, i_number)
+{
+	var pattern = /@#+@/g;
+	var match = i_string.match(pattern);
+	for(i in match)
+	{
+		var replace_mask = match[i];
+		if(replace_mask.length > i_number.toString().length)
+		{
+			var replace_string = Array(replace_mask.length - i_number.toString().length - 1).join("0") + i_number.toString();
+			i_string = i_string.replace(replace_mask, replace_string);
+		}
+	}
+	return i_string;
+}

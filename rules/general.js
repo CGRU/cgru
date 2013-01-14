@@ -2,9 +2,6 @@ RULES = {};
 RULES.rules = 'rules';
 RULES_TOP = {};
 
-g_elements = ['asset','rules','navig','info','log','assets'];
-g_el = {};
-
 g_elCurFolder = null;
 
 g_cycle = 0;
@@ -14,6 +11,8 @@ cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title'])
 function g_Init()
 {
 	cgru_Init();
+	u_Init();
+	p_Init();
 	c_Init();
 
 	var config = n_ReadConfig();
@@ -28,8 +27,11 @@ function g_Init()
 	document.getElementById('afanasy_webgui').innerHTML =
 		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
 
-	g_el.navig.m_folder = '/';
-	g_el.navig.m_path = '/';
+	if( RULES_TOP.company )
+		document.getElementById('rules_button').textContent = RULES_TOP.company+'-RULES';
+
+	u_el.navig.m_folder = '/';
+	u_el.navig.m_path = '/';
 
 	window.onhashchange = g_PathChanged;
 	document.body.onkeydown = g_OnKeyDown;
@@ -72,7 +74,7 @@ function g_Navigate( i_path)
 {
 	if( g_elCurFolder )
 		g_elCurFolder.classList.remove('current');
-	g_elCurFolder = g_el.navig;
+	g_elCurFolder = u_el.navig;
 
 	cgru_ClosePopus();
 
@@ -99,6 +101,11 @@ function g_Navigate( i_path)
 
 //window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));
 	g_elCurFolder.classList.add('current');
+
+	if( g_elCurFolder.m_path == '/')
+		window.document.title = 'CG-RULES';
+	else
+		window.document.title = g_elCurFolder.m_path;
 
 	a_Process();
 }
@@ -138,7 +145,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
 
-	if( g_elCurFolder == g_el.navig )
+	if( g_elCurFolder == u_el.navig )
 		g_OpenFolder( g_elCurFolder );
 
 	return true;

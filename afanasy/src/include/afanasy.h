@@ -104,6 +104,15 @@ namespace AFRENDER
     const int  TASK_READ_BUFFER_SIZE    = 1024*1024;  ///< Task process read buffer.
 }
 
+/// Thumbnail options:
+namespace THUMBNAIL
+{
+	const char CMD[]                    = "convert %(filename)s %(thumbnail_filename)s";     ///< thumbnail create command.
+	const char NAMING[]                 = "%(job_id)d/%(block_id)d/%(task_id)d/%(thumbnail_filename)s";        ///< thumbnail naming template.
+	const char HTTP[]                   = "http://username:password@localhost:80/thumbnails/";                 ///< thumbnail http basebath
+	const char FILE[]                   = "//servername/sharename/thumbnails/";                                ///< thumbnail file basebath
+}
+
 /// Watch options:
 namespace AFWATCH
 {
