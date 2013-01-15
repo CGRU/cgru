@@ -56,7 +56,9 @@ function n_Request( i_obj, i_wait)
 	xhr.send( obj_str);
 //window.console.log('n_Requestr='+obj_str);
 
-	log += '<br/><b style="color:#040"><i>recv:</i></b> '+ xhr.responseText;
+	if( i_wait )
+		log += '<br/><b style="color:#040"><i>recv:</i></b> '+ xhr.responseText;
+
 	c_Log( log);
 
 //window.console.log('xhr.responseText='+xhr.responseText);

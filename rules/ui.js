@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist',
+u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status',
 	'thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
@@ -74,5 +74,20 @@ function u_RulesOnClick()
 		u_el.rules.m_opened = true;
 		u_el.rules.style.display = 'block';
 	}
+}
+
+function u_StatusOnClick()
+{
+	if( u_el.status.m_editing )
+	{
+		u_el.status.classList.remove('editing');
+		u_el.status.m_editing = false;
+		u_el.status.contentEditable = 'false';
+		return;
+	}
+
+	u_el.status.classList.add('editing');
+	u_el.status.m_editing = true;
+	u_el.status.contentEditable = 'true';
 }
 

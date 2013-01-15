@@ -40,9 +40,9 @@
 	"cmdexec":{
 		"play_sequence":[
 			{"name":"Pdplayer",
-				"cmd":"pdplayer @PATH@"},
+				"cmd":"pdplayer --fps=@FPS@ @PATH@"},
 			{"name":"Pd++",
-				"cmd":"pdplayer --attach @PATH@"},
+				"cmd":"pdplayer --fps=@FPS@ --attach @PATH@"},
 			{"name":"open",
 				"cmd":"start @PATH@"}
 		]

@@ -72,6 +72,8 @@ padding: 2px;
 }
 .button:hover { background: rgba(200,255,255,.2);}
 
+.editing { background: #DDD; }
+
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
 #sidepanel #sidepanel_hide { display: none;}

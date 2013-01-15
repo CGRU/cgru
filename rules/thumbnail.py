@@ -27,7 +27,9 @@ Parser.add_option('-D', '--debug',   dest='debug',      action='store_true', def
 
 (Options, Args) = Parser.parse_args()
 
-if Options.input == '': Parser.error('Input image not specified.')
+if Options.input == '':
+	print('ERROR: :Input not specified.')
+	sys.exit(1)
 
 Images = []
 MTime = 0
@@ -43,6 +45,9 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 	img_mtime = 0
 	for folder in folders:
 		if Options.verbose: print('Scanning folder "%s"...' % folder)
+		if not os.path.isdir( folder):
+			print('ERROR: folder "%s" does not exist.' % folder)
+			continue
 		for root, dirs, files in os.walk( folder):
 			if len( files) == 0: continue
 			images = []
@@ -60,7 +65,9 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 					Images.append( os.path.join( root, images[num]))
 				img_mtime = new_mtime
 else:
-	if not os.path.isfile( Options.input): Parser.error('Can`t fide input file:\n' + str( Options.input))
+	if not os.path.isfile( Options.input):
+		print('ERROR: Input does not exist:\n' + str( Options.input))
+		sys.exit(1)
 
 if len( Images ) == 0:
 	print('ERROR: Can`t find images in "%s"' % Options.input)
