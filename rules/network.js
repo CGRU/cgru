@@ -43,7 +43,10 @@ function n_Request( i_obj, i_wait)
 	if( i_wait == null) i_wait = true;
 	var obj_str = JSON.stringify( i_obj);
 
-	var log = '<b style="color:#040"><i>send:</i></b> '+ obj_str;
+	var log = '<b style="color:';
+	if( i_wait ) log += '#040';
+	else log += '#044';
+	log += '"><i>send:</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.overrideMimeType('application/json');

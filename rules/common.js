@@ -83,12 +83,16 @@ function c_Log( i_msg)
 		u_el.log.removeChild( lines[100]);
 }
 
-function c_MakeThumbnail( i_source, i_path)
+function c_MakeThumbnail( i_sources, i_path)
 {
-	var input = cgru_PM('/' + RULES.root + i_source, true);
+	var input = null;
+	for( var i = 0; i < i_sources.length; i++ )
+	{
+		if( input ) input += ',';
+		input += cgru_PM('/' + RULES.root + i_sources[i], true);
+	}
 	var output = cgru_PM('/' + RULES.root + i_path + '/'+RULES.rules+'/' + RULES.thumbnail.filename, true);
 	var cmd = RULES.thumbnail.create_cmd.replace(/@INPUT@/g, input).replace(/@OUTPUT@/g, output);
-//window.console.log( cmd);
 	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 

@@ -89,7 +89,7 @@ function a_ShowBody()
 		var data = RULES.assets_data[a_type];
 		if( data == null ) continue;
 
-		var thumbnail = null;
+		var thumbnails = [];
 
 		if( data.source )
 		{
@@ -131,7 +131,7 @@ function a_ShowBody()
 				{
 					var folder = path + '/' + folders[f];
 					a_ShowSequence( elResult, asset, data, folder);
-					thumbnail = folder;
+					thumbnails.push( folder);
 					founded = true;
 				}
 			}
@@ -184,8 +184,8 @@ function a_ShowBody()
 				elDailies.textContent = JSON.stringify( data.dailies );
 		}
 
-		if( thumbnail )
-			c_MakeThumbnail( thumbnail, asset.path);
+		if( thumbnails )
+			c_MakeThumbnail( thumbnails, asset.path);
 	}
 
 	u_el.rules.innerHTML = 'ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);

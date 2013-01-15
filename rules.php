@@ -46,7 +46,7 @@ function listDir( $i_readdir, &$o_out)
 					if( $entry == '.') continue;
 					if( $entry == '..') continue;
 					$out['rufiles'][$numrufile++] = $entry;
-					if( strrpos( $entry,'.json') == strlen($entry)-5)
+					if(( strrpos( $entry,'.json') == ( strlen($entry)-5 )) && ( strlen($entry) > 5 ))
 					{
 						if( $fHandle = fopen( $path.'/'.$entry, 'r'))
 						{
