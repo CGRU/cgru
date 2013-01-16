@@ -142,6 +142,11 @@ font-weight: bold;
 }
 #navig .folder.current { background: rgba(200,255,255,.7); }
 #navig .folder:hover { box-shadow: 0px 0px 3px rgba(0,0,0,1.0) inset}
+#navig .folder .fstatus {
+float: right;
+font-weight: normal;
+padding-right:4px;
+}
 
 #assets {
 background: rgba(200,255,255,.3);

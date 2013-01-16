@@ -14,6 +14,15 @@ function u_Init()
 	else u_SidePanelClose();
 }
 
+function u_Process()
+{
+	if( RULES.status )
+		u_el.status.innerHTML = RULES.status.annotation;
+	else
+		u_el.status.innerHTML = '';
+//		u_el.status.innerHTML = '<span style="font-size:10px">STATUS</span>';
+}
+
 function u_HeaderOpenButtonOnClick( i_elBtn, i_id, i_pos)
 {
 	if( i_elBtn.classList.contains('opened'))
@@ -81,11 +90,16 @@ function u_StatusEditOnClick()
 	if( u_el.status.m_editing )
 		return;
 
+	var text = '';
+	if( RULES.status ) text = RULES.status.annotation;
+
 	u_el.content_status.classList.add('opened');
-	u_el.status.m_text = u_el.status.innerHTML;
+	u_el.status.m_text = text;
+	u_el.status.textContent = text;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
 	u_el.status.contentEditable = 'true';
+	u_el.status.focus();
 }
 
 function u_StatusCancelOnClick()
@@ -103,6 +117,13 @@ function u_StatusSaveOnClick()
 	u_el.status.m_text = text;
 	u_StatusCancelOnClick();
 	RULES.status = {};
-	RULES.status.text = text;
+	RULES.status.annotation = text;
+//return;
+
+	var obj = {};
+	obj.object = {"status":RULES.status};
+	obj.add = true;
+	obj.file = RULES.root + g_elCurFolder.m_path + '/' + RULES.rules + '/status.json';
+	n_Request({"editobj":obj});
 }
 

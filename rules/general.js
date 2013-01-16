@@ -95,6 +95,8 @@ function g_Navigate( i_path)
 		else
 			path += '/' + folders[i];
 
+		RULES.status = null;
+
 		if( false == g_Goto( folders[i], path))
 			break;
 	}
@@ -109,6 +111,7 @@ function g_Navigate( i_path)
 
 	u_el.thumbnail.setAttribute('src', RULES.root+path+'/'+RULES.rules+'/thumbnail.jpg');
 
+	u_Process();
 	a_Process();
 }
 
@@ -140,7 +143,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	}
 
 	if( g_elCurFolder.m_dir == null )
-		g_elCurFolder.m_dir = n_ReadDir( i_path);
+		g_elCurFolder.m_dir = n_ReadDir( i_path, ['status']);
 	if( g_elCurFolder.m_dir == null )
 		return false;
 
@@ -153,6 +156,13 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	return true;
 }
 
+function g_CompareFolders(a,b)
+{
+	var attr = 'name';
+	if( a[attr] < b[attr]) return -1;
+	if( a[attr] > b[attr]) return 1;
+	return 0;
+}
 function g_OpenFolder( i_elFolder )
 {
 	if( i_elFolder.classList.contains('opened'))
@@ -162,13 +172,31 @@ function g_OpenFolder( i_elFolder )
 	if( i_elFolder.m_dir == null )
 		return;
 
+	i_elFolder.m_dir.folders.sort( g_CompareFolders );
+
 	for( var i = 0; i < i_elFolder.m_dir.folders.length; i++)
 	{
-		var folder = i_elFolder.m_dir.folders[i];
+		var fobject = i_elFolder.m_dir.folders[i];
+		var folder = fobject.name;
 		if( folder.charAt(0) == '.' ) continue;
+
 		var elFolder = document.createElement('div');
 		elFolder.classList.add('folder');
-		elFolder.textContent = folder;
+
+		var fstatus = fobject.status;
+		if( fstatus )
+		{
+			var elStatus = document.createElement('div');
+			elFolder.appendChild( elStatus);
+			elStatus.classList.add('fstatus');
+			elStatus.textContent = fstatus.annotation.split(' ')[0];
+		}
+
+		var elName = document.createElement('div');
+		elFolder.appendChild( elName);
+		elFolder.classList.add('fname');
+		elName.textContent = folder;
+
 		elFolder.m_folder = folder;
 		if( i_elFolder.m_path == '/' )
 			elFolder.m_path = '/'+folder;

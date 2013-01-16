@@ -5,7 +5,7 @@ function n_ReadConfig()
 	return c_Parse( n_Request( request));
 }
 
-function n_ReadDir( i_path)
+function n_ReadDir( i_path, i_scan)
 {
 	var path = i_path;
 	if( RULES.root )
@@ -14,6 +14,7 @@ function n_ReadDir( i_path)
 	var request = {};
 	request.readdir = path;
 	request.rules = RULES.rules;
+	request.scan = i_scan;
 	var data = n_Request( request);
 	var response = c_Parse( data);
 

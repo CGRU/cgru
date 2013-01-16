@@ -5,6 +5,9 @@ function listDir( $i_readdir, &$o_out)
 	$out = array();
 	$dir = $i_readdir['readdir'];
 	$rules = $i_readdir['rules'];
+	$scan = null;
+	if( array_key_exists( 'scan', $i_readdir))
+		$scan = $i_readdir['scan'];
 	$out['dir'] = $dir;
 
 	$dir = str_replace('../','', $dir);
@@ -34,7 +37,27 @@ function listDir( $i_readdir, &$o_out)
 				continue;
 			}
 
-			$out['folders'][$numdir++] = $entry;
+			if( is_null($scan) || ( false == is_array($scan)))
+				$out['folders'][$numdir++] = $entry;
+			else
+			{
+				$folder = array();
+				$folder['name'] = $entry;
+				foreach( $scan as $sfile )
+				{
+					$sfilepath = $path.'/'.$rules.'/'.$sfile.'.json';
+					if( is_file( $sfilepath))
+					{
+						if( $fHandle = fopen( $sfilepath, 'r'))
+						{
+							$data = fread( $fHandle, 1000000);
+							fclose( $fHandle);
+							mergeObjs( $folder, json_decode( $data, true));
+						}
+					}
+				}
+				$out['folders'][$numdir++] = $folder;
+			}
 
 			if( $entry != $rules ) continue;
 
@@ -229,6 +252,8 @@ function editObj( $i_edit, &$o_out)
 {
 	$mode = 'w+';
 	if( file_exists( $i_edit['file'])) $mode = 'r+';
+	if( false == is_dir( dirname($i_edit['file'])))
+		mkdir( dirname($i_edit['file']));
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
 		$data = fread( $fHandle, 1000000);
