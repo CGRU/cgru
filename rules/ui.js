@@ -1,5 +1,5 @@
 u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status',
-	'thumbnail','sidepanel','sidepanel_playlist'];
+	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
 function u_Init()
@@ -76,18 +76,33 @@ function u_RulesOnClick()
 	}
 }
 
-function u_StatusOnClick()
+function u_StatusEditOnClick()
 {
 	if( u_el.status.m_editing )
-	{
-		u_el.status.classList.remove('editing');
-		u_el.status.m_editing = false;
-		u_el.status.contentEditable = 'false';
 		return;
-	}
 
+	u_el.content_status.classList.add('opened');
+	u_el.status.m_text = u_el.status.innerHTML;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
 	u_el.status.contentEditable = 'true';
+}
+
+function u_StatusCancelOnClick()
+{
+	u_el.status.innerHTML = u_el.status.m_text;
+	u_el.status.classList.remove('editing');
+	u_el.content_status.classList.remove('opened');
+	u_el.status.m_editing = false;
+	u_el.status.contentEditable = 'false';
+}
+
+function u_StatusSaveOnClick()
+{
+	var text = u_el.status.innerHTML;
+	u_el.status.m_text = text;
+	u_StatusCancelOnClick();
+	RULES.status = {};
+	RULES.status.text = text;
 }
 

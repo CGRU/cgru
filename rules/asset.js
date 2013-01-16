@@ -299,6 +299,9 @@ function a_OpenCloseSourceOnClick( i_evt)
 	var asset = el.m_asset;
 	var data = el.m_data;
 	var elSource = el;
+
+	if( elSource.m_scanned ) return;
+	elSource.m_scanned = true;
 	elSource.textContent = '';
 	elSource.classList.remove('button');
 

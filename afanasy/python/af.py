@@ -239,6 +239,9 @@ class Job:
 	def setNeedProperties(   self, value):
 		if checkRegExp(value): self.data["need_properties"] = value
 
+	def setNativeOS( self): self.data["need_os"] = cgruconfig.VARS['platform'][-1]
+	def setAnyOS(    self): self.data["need_os"] = ''
+
 	def pause(      self): self.data["offline"] = True
 	def setPaused(  self): self.data["offline"] = True
 	def setOffline( self): self.data["offline"] = True

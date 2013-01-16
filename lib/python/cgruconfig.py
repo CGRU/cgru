@@ -52,7 +52,7 @@ class Config:
 			elif sys.platform[:5] == 'linux':
 				self.Vars['platform'].append('linux')
 			if self.verbose:
-				print('Platform: "%s"' % self.Vars['platform'])
+				print('Platform: "%s"' % self.Vars['platform'].join(' '))
 
 			self.Vars['HOSTNAME'] = socket.gethostname().lower()
 

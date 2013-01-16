@@ -18,9 +18,20 @@
 
 <div id="content">
 	<div style="text-align: center"><img id="thumbnail" style="box-shadow:0 0 6px #FFF;border-radius:8px"></div>
-	<div>
-		<div style="float:left" class="button" onclick="u_StatusOnClick()">Status:</div>
-		<div id="status">ololo</div>
+	<div id="content_info" class="closed" onclick="this.classList.remove('closed')">
+		<div id="content_status">
+			<div class="label" style="float:left;">Status:</div>
+			<div style="float:right;font-size:12px;">
+				<div class="button edit" onclick="u_StatusEditOnClick()">Edit</div>
+				<div class="button save" onclick="u_StatusSaveOnClick()">Save</div>
+				<div class="button save" onclick="u_StatusCancelOnClick()">Cancel</div>
+			</div>
+			<div id="status">ololo</div>
+		</div>
+		<!--div id="content_description">
+		</div>
+		<div id="content_task">
+		</div-->
 	</div>
 	<div id="asset"></div>
 	<div>
