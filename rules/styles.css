@@ -72,6 +72,8 @@ padding: 2px;
 }
 .button:hover { background: rgba(200,255,255,.2);}
 
+.editing { background: #DDD; }
+
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
 #sidepanel #sidepanel_hide { display: none;}
@@ -110,6 +112,19 @@ bottom: 38px;
 padding: 10px;
 overflow-y: scroll;
 }
+#content_info {
+box-shadow: 0 0 2px #000 inset;
+border-radius: 10px;
+padding: 4px;
+}
+#content_info .label { padding-right:4px; font-size:12px;}
+#content_info.closed { cursor:pointer; text-align:center;}
+#content_info.closed .label, #content_info.closed .button { display:none;}
+/*#content_status .button.edit { display:block;}*/
+#content_status .button.save { display:none;}
+#content_status.opened .button.edit { display:none;}
+#content_status.opened .button.save { display:block;}
+#content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px}
 
 #navig .folder {
 cursor: pointer;

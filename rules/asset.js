@@ -59,8 +59,10 @@ function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
 		elFolder.appendChild( elCmd);
 		elCmd.classList.add('cmdexec');
 		elCmd.textContent = cmds[c].name;
-		elCmd.setAttribute('cmdexec', JSON.stringify(
-			[cmds[c].cmd.replace( '@PATH@', cgru_PM('/'+link))]));
+		var cmd = cmds[c].cmd;
+		cmd = cmd.replace('@PATH@', cgru_PM('/'+link));
+		cmd = cmd.replace('@FPS@', RULES.fps);
+		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 	}
 
 	if( i_data.dailies )
@@ -89,7 +91,7 @@ function a_ShowBody()
 		var data = RULES.assets_data[a_type];
 		if( data == null ) continue;
 
-		var thumbnail = null;
+		var thumbnails = [];
 
 		if( data.source )
 		{
@@ -127,11 +129,12 @@ function a_ShowBody()
 				else
 					continue;
 
+				thumbnails.push( path);
+
 				for( var f = 0; f < folders.length; f++)
 				{
 					var folder = path + '/' + folders[f];
 					a_ShowSequence( elResult, asset, data, folder);
-					thumbnail = folder;
 					founded = true;
 				}
 			}
@@ -184,8 +187,8 @@ function a_ShowBody()
 				elDailies.textContent = JSON.stringify( data.dailies );
 		}
 
-		if( thumbnail )
-			c_MakeThumbnail( thumbnail, asset.path);
+		if( thumbnails.length )
+			c_MakeThumbnail( thumbnails, asset.path);
 	}
 
 	u_el.rules.innerHTML = 'ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
@@ -296,6 +299,9 @@ function a_OpenCloseSourceOnClick( i_evt)
 	var asset = el.m_asset;
 	var data = el.m_data;
 	var elSource = el;
+
+	if( elSource.m_scanned ) return;
+	elSource.m_scanned = true;
 	elSource.textContent = '';
 	elSource.classList.remove('button');
 

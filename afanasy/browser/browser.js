@@ -37,6 +37,9 @@ function g_Init()
 	document.getElementById('platform').textContent = cgru_Platform;
 	document.getElementById('browser').textContent = cgru_Browser;
 
+	if( localStorage.main_monitor )
+		g_main_monitor_type = localStorage.main_monitor;
+
 	var header = document.getElementById('header');
 	g_monitor_buttons = header.getElementsByClassName('mbutton');
 	for( var i = 0; i < g_monitor_buttons.length; i++)

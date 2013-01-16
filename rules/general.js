@@ -107,6 +107,8 @@ function g_Navigate( i_path)
 	else
 		window.document.title = g_elCurFolder.m_path;
 
+	u_el.thumbnail.setAttribute('src', RULES.root+path+'/'+RULES.rules+'/thumbnail.jpg');
+
 	a_Process();
 }
 

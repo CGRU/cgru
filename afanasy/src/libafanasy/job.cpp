@@ -203,7 +203,7 @@ void Job::initDefaultValues()
 	m_need_os.setCaseInsensitive();
 	m_need_os.setContain();
 	m_need_properties.setCaseSensitive();
-	m_need_os.setContain();
+	m_need_properties.setContain();
 }
 
 Job::~Job()
