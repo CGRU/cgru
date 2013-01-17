@@ -23,13 +23,17 @@ function u_Process()
 	
 	if( RULES.status )
 		u_StatusSetColor( RULES.status.color );
-}
-function u_StatusSetColor( c)
-{
-	if( c )
-		u_el.content_status.parentNode.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
 	else
-		u_el.content_status.parentNode.style.background = '';
+		u_StatusSetColor();
+}
+function u_StatusSetColor( c, i_el)
+{
+	if( i_el == null )
+		i_el = u_el.content_status.parentNode;
+	if( c )
+		i_el.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+	else
+		i_el.style.background = '';
 }
 
 function u_Finish()
@@ -105,19 +109,26 @@ function u_StatusEditOnClick()
 		return;
 
 	var text = '';
-	if( RULES.status ) text = RULES.status.annotation;
+	var color = null;
+	if( RULES.status )
+	{
+		text = RULES.status.annotation;
+		color = RULES.status.color;
+	}
 
 	u_el.content_status.classList.add('opened');
 	u_el.status.m_text = text;
+	u_el.status.m_color_saved = color;
 	u_el.status.textContent = text;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
 
 	elColor = document.getElementById('status_color');
-	var ccol = 30;
+	elColor.style.display = 'block';
+	var ccol = 35;
 	var crow = 3;
+	var cstep = 5;
 	var cnum = crow * ccol;
-	var i = 0;
 	for( var cr = 0; cr < crow; cr++)
 	{
 		elRaw = document.createElement('div');
@@ -129,17 +140,41 @@ function u_StatusEditOnClick()
 			el.style.width = 100/ccol + '%';
 			el.onclick = u_StatusColorOnClick;
 
-			var r = (i / cnum * 9) % 1;
-			var g = (i / cnum * 3) % 1;
-			var b = (i / cnum * 1) % 1;
+			var r = 0, g = 0, b = 0;
+			r = ( ( cc % cstep ) + 1 ) / ( cstep + 1 );
+
+			if     (cc < cstep  ) { r = cc/cstep; g = r; b = r; }
+			else if(cc < cstep*2) { r = r; }
+			else if(cc < cstep*3) { g = r; r = 0; }
+			else if(cc < cstep*4) { b = r; r = 0; }
+			else if(cc < cstep*5) { g = r; }
+			else if(cc < cstep*6) { b = r; }
+			else if(cc < cstep*7) { g = r; b = r; r = 0; }
+
+			if( cr > 0 )
+			{
+				var avg = (r+g+b)/2.5;
+				var sat = 2, add = .1;
+				if( cr > 1 ) { sat = 1.2; add = .2};
+				r += add+(avg-r)/sat;
+				g += add+(avg-g)/sat;
+				b += add+(avg-b)/sat;
+			}
+
 			r = Math.round( 255*r);
 			g = Math.round( 255*g);
 			b = Math.round( 255*b);
+			if( r > 255 ) r = 255;
+			if( g > 255 ) g = 255;
+			if( b > 255 ) b = 255;
 
-			el.style.background = 'rgb('+r+','+g+','+b+')';
-			el.m_color = [r,g,b];
-
-			i++;
+			if( cr && (cc < cstep))
+				el.m_color = null;
+			else
+			{
+				el.style.background = 'rgb('+r+','+g+','+b+')';
+				el.m_color = [r,g,b];
+			}
 //window.console.log('rgb('+r+','+g+','+b+')');
 		}
 	}
@@ -162,16 +197,22 @@ function u_StatusCancelOnClick()
 	u_el.content_status.classList.remove('opened');
 	u_el.status.m_editing = false;
 	u_el.status.m_color = null;
+	u_StatusSetColor( u_el.status.m_color_saved);
 	u_el.status.contentEditable = 'false';
 	document.getElementById('status_color').innerHTML = '';
+	document.getElementById('status_color').style.display  = 'none';
 }
 
 function u_StatusSaveOnClick()
 {
 	var text = u_el.status.innerHTML;
 	var color = u_el.status.m_color;
+	u_el.status.m_color_saved = color;
+
 	u_el.status.m_text = text;
 	u_StatusCancelOnClick();
+	u_StatusSetColor( color, g_elCurFolder.m_elColor);
+
 	RULES.status = {};
 	RULES.status.annotation = text;
 	RULES.status.color = color;

@@ -184,18 +184,27 @@ function g_OpenFolder( i_elFolder )
 		var elFolder = document.createElement('div');
 		elFolder.classList.add('folder');
 
+		var elColor = document.createElement('div');
+		elFolder.appendChild( elColor);
+		elFolder.m_elColor = elColor;
+		elColor.classList.add('fcolor');
+
 		var fstatus = fobject.status;
 		if( fstatus )
 		{
 			var elStatus = document.createElement('div');
+//			elColor.appendChild( elStatus);
 			elFolder.appendChild( elStatus);
 			elStatus.classList.add('fstatus');
 			elStatus.textContent = fstatus.annotation.split(' ')[0];
+
+			u_StatusSetColor( fstatus.color, elColor);
 		}
 
 		var elName = document.createElement('div');
+//		elColor.appendChild( elName);
 		elFolder.appendChild( elName);
-		elFolder.classList.add('fname');
+		elName.classList.add('fname');
 		elName.textContent = folder;
 
 		elFolder.m_folder = folder;

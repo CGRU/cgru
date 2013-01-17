@@ -125,10 +125,11 @@ padding: 4px;
 #content_status.opened .button.edit { display:none;}
 #content_status.opened .button.save { display:block;}
 #content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px; margin:2px;}
-#status_color { border-radius: 6px;margin:2px;}
+#status_color { display: none; border-radius: 6px; margin: 2px; border: 1px solid #000;}
 #status_color div div { height:20px;float:left;}
 
 #navig .folder {
+position: relative;
 cursor: pointer;
 box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
 border: 1px solid rgba(255,255,255,.2);
@@ -144,7 +145,15 @@ font-weight: bold;
 }
 #navig .folder.current { background: rgba(200,255,255,.7); }
 #navig .folder:hover { box-shadow: 0px 0px 3px rgba(0,0,0,1.0) inset}
-#navig .folder .fstatus {
+#navig .folder .fcolor {
+position: absolute;
+/*height: 22px;*/
+left:2px;right:2px;top:2px;bottom:2px;
+border-radius: 4px;
+}
+#navig .folder.current .fcolor { opacity: 0.5; }
+#navig .folder .fname {position: relative;}
+#navig .folder .fstatus {position: relative;
 float: right;
 font-weight: normal;
 padding-right:4px;
