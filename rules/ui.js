@@ -16,11 +16,25 @@ function u_Init()
 
 function u_Process()
 {
-	if( RULES.status )
+	if( RULES.status && RULES.status.annotation )
 		u_el.status.innerHTML = RULES.status.annotation;
 	else
 		u_el.status.innerHTML = '';
-//		u_el.status.innerHTML = '<span style="font-size:10px">STATUS</span>';
+	
+	if( RULES.status )
+		u_StatusSetColor( RULES.status.color );
+}
+function u_StatusSetColor( c)
+{
+	if( c )
+		u_el.content_status.parentNode.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+	else
+		u_el.content_status.parentNode.style.background = '';
+}
+
+function u_Finish()
+{
+	u_StatusCancelOnClick();
 }
 
 function u_HeaderOpenButtonOnClick( i_elBtn, i_id, i_pos)
@@ -98,8 +112,47 @@ function u_StatusEditOnClick()
 	u_el.status.textContent = text;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
+
+	elColor = document.getElementById('status_color');
+	var ccol = 30;
+	var crow = 3;
+	var cnum = crow * ccol;
+	var i = 0;
+	for( var cr = 0; cr < crow; cr++)
+	{
+		elRaw = document.createElement('div');
+		elColor.appendChild( elRaw);
+		for( var cc = 0; cc < ccol; cc++)
+		{
+			el = document.createElement('div');
+			elRaw.appendChild( el);
+			el.style.width = 100/ccol + '%';
+			el.onclick = u_StatusColorOnClick;
+
+			var r = (i / cnum * 9) % 1;
+			var g = (i / cnum * 3) % 1;
+			var b = (i / cnum * 1) % 1;
+			r = Math.round( 255*r);
+			g = Math.round( 255*g);
+			b = Math.round( 255*b);
+
+			el.style.background = 'rgb('+r+','+g+','+b+')';
+			el.m_color = [r,g,b];
+
+			i++;
+//window.console.log('rgb('+r+','+g+','+b+')');
+		}
+	}
+
 	u_el.status.contentEditable = 'true';
 	u_el.status.focus();
+}
+
+function u_StatusColorOnClick( i_evt)
+{
+	var el = i_evt.currentTarget;
+	u_el.status.m_color = el.m_color;
+	u_StatusSetColor( el.m_color);
 }
 
 function u_StatusCancelOnClick()
@@ -108,16 +161,20 @@ function u_StatusCancelOnClick()
 	u_el.status.classList.remove('editing');
 	u_el.content_status.classList.remove('opened');
 	u_el.status.m_editing = false;
+	u_el.status.m_color = null;
 	u_el.status.contentEditable = 'false';
+	document.getElementById('status_color').innerHTML = '';
 }
 
 function u_StatusSaveOnClick()
 {
 	var text = u_el.status.innerHTML;
+	var color = u_el.status.m_color;
 	u_el.status.m_text = text;
 	u_StatusCancelOnClick();
 	RULES.status = {};
 	RULES.status.annotation = text;
+	RULES.status.color = color;
 //return;
 
 	var obj = {};

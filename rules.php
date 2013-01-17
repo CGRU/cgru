@@ -164,12 +164,12 @@ function mergeObjs( &$o_obj, $i_obj)
 	{
 		if( array_key_exists( $key, $o_obj) && is_array( $val) && is_array( $o_obj[$key]))
 		{
-			if( is_int( key($o_obj[$key])) && is_int( key($val)))
+/*			if( is_int( key($o_obj[$key])) && is_int( key($val)))
 			{
 				foreach( $val as $v )
 					array_push( $o_obj[$key], $v);
 				continue;
-			}
+			}*/
 			if( is_string( key($o_obj[$key])) && is_string( key($val)))
 			{
 				mergeObjs( $o_obj[$key], $val);

@@ -124,7 +124,9 @@ padding: 4px;
 #content_status .button.save { display:none;}
 #content_status.opened .button.edit { display:none;}
 #content_status.opened .button.save { display:block;}
-#content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px}
+#content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px; margin:2px;}
+#status_color { border-radius: 6px;margin:2px;}
+#status_color div div { height:20px;float:left;}
 
 #navig .folder {
 cursor: pointer;

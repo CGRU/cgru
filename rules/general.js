@@ -77,6 +77,7 @@ function g_Navigate( i_path)
 	g_elCurFolder = u_el.navig;
 
 	cgru_ClosePopus();
+	u_Finish();
 
 	RULES = c_CloneObj( RULES_TOP);
 	ASSETS = {};
@@ -202,10 +203,12 @@ function g_OpenFolder( i_elFolder )
 			elFolder.m_path = '/'+folder;
 		else
 			elFolder.m_path = i_elFolder.m_path+'/'+folder;
-		elFolder.onclick = g_FolderClicked;
-		elFolder.ondblclick = g_FolderClicked;
-		g_elCurFolder.appendChild( elFolder);
-		g_elCurFolder.m_elFolders.push( elFolder);
+		elFolder.onclick = g_FolderOnClick;
+//		elFolder.ondblclick = g_FolderOnDblClick;
+//		elFolder.ondblclick = g_FolderOnClick;
+
+		i_elFolder.appendChild( elFolder);
+		i_elFolder.m_elFolders.push( elFolder);
 	}
 	i_elFolder.classList.add('opened');
 }
@@ -222,7 +225,7 @@ function g_CloseFolder( i_elFolder )
 	i_elFolder.classList.remove('opened');
 }
 
-function g_FolderClicked( i_evt)
+function g_FolderOnClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
@@ -237,5 +240,23 @@ function g_FolderClicked( i_evt)
 	}
 
 	window.location.hash = elFolder.m_path;
+}
+
+function g_FolderOnDblClick( i_evt)
+{
+window.console.log('g_FolderOnDblClick( i_evt)');
+return;
+g_FolderOnClick( i_evt);
+	i_evt.stopPropagation();
+	var elFolder = i_evt.currentTarget;
+
+	if( elFolder.classList.contains('opened'))
+		g_CloseFolder( elFolder);
+	else
+	{
+		if( elFolder.m_dir == null )
+			elFolder.m_dir = n_ReadDir( elFolder.m_path, ['status']);
+		g_OpenFolder( elFolder);
+	}
 }
 
