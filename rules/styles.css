@@ -72,7 +72,7 @@ padding: 2px;
 }
 .button:hover { background: rgba(200,255,255,.2);}
 
-.editing { background: #DDD; }
+.editing { background: #DDD; color: #000; }
 
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
@@ -131,7 +131,7 @@ padding: 4px;
 #navig .folder {
 position: relative;
 cursor: pointer;
-box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
+/*box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;*/
 border: 1px solid rgba(255,255,255,.2);
 padding: 0px 0px 0px 16px;
 border-radius: 4px;
@@ -144,14 +144,19 @@ background: rgba(200,255,255,.1);
 font-weight: bold;
 }
 #navig .folder.current { background: rgba(200,255,255,.7); }
-#navig .folder:hover { box-shadow: 0px 0px 3px rgba(0,0,0,1.0) inset}
+/*#navig .folder:hover { box-shadow: 0px 0px 3px rgba(0,0,0,1.0) inset}*/
+#navig .folder:hover { box-shadow: 0px 0px 3px rgba(200,255,255,1.0)}
 #navig .folder .fcolor {
 position: absolute;
-/*height: 22px;*/
-left:2px;right:2px;top:2px;bottom:2px;
+/*height: 22px;
 border-radius: 4px;
+left:2px;right:2px;top:2px;bottom:2px;*/
+left:0;right:0;top:0;bottom:0;
+box-shadow: 0px 0px 3px rgba(0,0,0,.6) inset;
+opacity: 0.9;
 }
-#navig .folder.current .fcolor { opacity: 0.5; }
+#navig .folder.current .fcolor { opacity: 0.7; }
+/*#navig .folder .fcolor:hover { box-shadow: 0px 0px 3px rgba(255,0,0,1.0) inset}*/
 #navig .folder .fname {position: relative;}
 #navig .folder .fstatus {position: relative;
 float: right;

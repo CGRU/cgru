@@ -26,14 +26,25 @@ function u_Process()
 	else
 		u_StatusSetColor();
 }
-function u_StatusSetColor( c, i_el)
+function u_StatusSetColor( c, i_elB, i_elC)
 {
-	if( i_el == null )
-		i_el = u_el.content_status.parentNode;
+	if( i_elB == null ) i_elB = u_el.content_status.parentNode;
+	if( i_elC == null ) i_elC = u_el.content_status.parentNode;
+
 	if( c )
-		i_el.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+	{
+		i_elB.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+		if( c[0]+c[1]+c[2] > 200 )
+			i_elC.style.color = '#000';
+		else
+			i_elC.style.color = '#FFF';
+//window.console.log(c[0]+c[1]+c[2])
+	}
 	else
-		i_el.style.background = '';
+	{
+		i_elB.style.background = '';
+		i_elC.style.color = '#000';
+	}
 }
 
 function u_Finish()
@@ -119,6 +130,7 @@ function u_StatusEditOnClick()
 	u_el.content_status.classList.add('opened');
 	u_el.status.m_text = text;
 	u_el.status.m_color_saved = color;
+	u_el.status.m_color = color;
 	u_el.status.textContent = text;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
@@ -143,7 +155,7 @@ function u_StatusEditOnClick()
 			var r = 0, g = 0, b = 0;
 			r = ( ( cc % cstep ) + 1 ) / ( cstep + 1 );
 
-			if     (cc < cstep  ) { r = cc/cstep; g = r; b = r; }
+			if     (cc < cstep  ) { r = cc/(cstep-1); g = r; b = r; }
 			else if(cc < cstep*2) { r = r; }
 			else if(cc < cstep*3) { g = r; r = 0; }
 			else if(cc < cstep*4) { b = r; r = 0; }
@@ -211,7 +223,8 @@ function u_StatusSaveOnClick()
 
 	u_el.status.m_text = text;
 	u_StatusCancelOnClick();
-	u_StatusSetColor( color, g_elCurFolder.m_elColor);
+	g_StatusSetColor( color);
+	g_elCurFolder.m_elStatus.innerHTML = text;
 
 	RULES.status = {};
 	RULES.status.annotation = text;

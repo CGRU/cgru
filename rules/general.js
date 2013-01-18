@@ -46,6 +46,11 @@ function g_OnKeyDown(e)
 
 function g_GO( i_path)
 {
+	if( i_path == '..' )
+	{
+		i_path = g_elCurFolder.m_path;
+		i_path = i_path.substr( 0, i_path.lastIndexOf('/'));
+	}
 	window.location.hash = i_path;
 }
 
@@ -190,15 +195,15 @@ function g_OpenFolder( i_elFolder )
 		elColor.classList.add('fcolor');
 
 		var fstatus = fobject.status;
+		var elStatus = document.createElement('div');
+//		elColor.appendChild( elStatus);
+		elFolder.appendChild( elStatus);
+		elFolder.m_elStatus = elStatus;
+		elStatus.classList.add('fstatus');
 		if( fstatus )
 		{
-			var elStatus = document.createElement('div');
-//			elColor.appendChild( elStatus);
-			elFolder.appendChild( elStatus);
-			elStatus.classList.add('fstatus');
 			elStatus.textContent = fstatus.annotation.split(' ')[0];
-
-			u_StatusSetColor( fstatus.color, elColor);
+			g_StatusSetColor( fstatus.color, elFolder);
 		}
 
 		var elName = document.createElement('div');
@@ -220,6 +225,11 @@ function g_OpenFolder( i_elFolder )
 		i_elFolder.m_elFolders.push( elFolder);
 	}
 	i_elFolder.classList.add('opened');
+}
+function g_StatusSetColor( i_clr, i_el)
+{
+	if( i_el == null ) i_el = g_elCurFolder;
+	u_StatusSetColor( i_clr, i_el.m_elColor, i_el);
 }
 
 function g_CloseFolder( i_elFolder )

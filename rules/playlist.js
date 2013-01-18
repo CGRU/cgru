@@ -5,7 +5,6 @@ p_noFile = true;
 function p_Init()
 {
 	p_elCurFolder = u_el.playlist;
-	p_elCurFolder.m_path = '';
 	p_elCurFolder.m_id = '';
 	if( localStorage.playlist_opened == "true" ) p_Open();
 	else p_Close();
@@ -64,7 +63,7 @@ function p_NewFolder( i_param, i_value)
 {
 	var obj = {};
 	obj.label = i_value;
-	obj.id = p_elCurFolder.m_path + '/' + i_value;
+	obj.id = p_elCurFolder.m_id + '/' + i_value;
 	obj.playlist = [];
 	p_Action( obj, 'add');
 }
@@ -73,7 +72,7 @@ function p_AddLink( i_param, i_value)
 	var obj = {};
 	obj.label = i_value;
 	obj.path = g_elCurFolder.m_path;
-	obj.id = p_elCurFolder.m_path + '/' + i_value;
+	obj.id = p_elCurFolder.m_id + '/' + i_value;
 	p_Action( obj, 'add');
 }
 function p_Rename( i_param, i_value)
@@ -96,7 +95,7 @@ function p_FolderOnDblClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var el = i_evt.currentTarget;
-window.console.log('dbl fclick: '+el.m_id)
+//window.console.log('dbl fclick: '+el.m_id)
 //if( el == p_elCurItem )
 //{
 	if( el.classList.contains('opened'))
@@ -250,6 +249,7 @@ function p_CreateFolder( i_obj, i_elParent)
 function p_CreateLink( i_obj, i_elParent)
 {
 	var el = p_CreateElement( i_obj, i_elParent);
+	el.m_path = i_obj.path;
 	el.classList.add('link');
 	el.onclick = p_LinkOnClick;
 	return el;
@@ -260,7 +260,6 @@ function p_CreateElement( i_obj, i_elParent)
 	i_elParent.appendChild( el);
 	el.textContent = i_obj.label;
 	el.m_label = i_obj.label;
-	el.m_path = i_obj.path;
 	el.m_id = i_obj.id;
 	return el;
 }
