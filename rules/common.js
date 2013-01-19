@@ -63,6 +63,13 @@ function c_RulesMergeObjs( o_rules, i_rules_new)
 		o_rules[attr] = i_rules_new[attr];
 	}
 }
+function c_PadZero( i_num, i_len)
+{
+	if( i_len == null ) i_len = 2;
+	var str = ''+i_num;
+	while( str.length < i_len) str = '0'+str;
+	return str;
+}
 
 function c_Info( i_msg)
 {
@@ -75,8 +82,10 @@ function c_Error( i_err)
 }
 function c_Log( i_msg)
 {
+	var date = new Date();
+	var time = c_PadZero(date.getHours())+':'+c_PadZero(date.getMinutes())+':'+c_PadZero(date.getSeconds())+'.'+c_PadZero(date.getMilliseconds(),3);
 	var elLine = document.createElement('div');
-	elLine.innerHTML = '<i>'+g_cycle+':</i> '+i_msg;
+	elLine.innerHTML = '<i>'+time+':</i> '+i_msg;
 	var lines = log.getElementsByTagName('div');
 	u_el.log.insertBefore( elLine, lines[0]);
 	if( lines.length > 100 )

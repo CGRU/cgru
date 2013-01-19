@@ -186,7 +186,7 @@ margin: 6px;
 padding: 20px;
 }
 #asset > div.button { padding: 4px;}
-#asset .thumbnail { float: left; margin-right: 20px;}
+#asset .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 
 #content #rules, .rules {
 font-family: courier;

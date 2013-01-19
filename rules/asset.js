@@ -201,6 +201,8 @@ function a_ShowBody()
 			var elImg = document.createElement('img');
 			elFolder.appendChild( elImg);
 			elImg.classList.add('thumbnail');
+			elImg.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
+			elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
 			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rules + '/' + RULES.thumbnail.filename;
 
 			var elName = document.createElement('div');
@@ -349,7 +351,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 		{
 			var elPath = document.createElement('div');
 			elSource.appendChild( elPath);
-			elPath.textContent = data.source.path[r];
+			elPath.textContent = ASSET.source.path[r];
 			for( var f = 0; f < list.folders.length; f++)
 			{
 				a_ShowSequence( elSource, path + list.folders[f], list.folders[f]);
@@ -358,6 +360,6 @@ function a_OpenCloseSourceOnClick( i_evt)
 		}
 	}
 	if( false == founded )
-		elSource.textContent = JSON.stringify( data.source.path);
+		elSource.textContent = JSON.stringify( ASSET.source.path);
 }
 

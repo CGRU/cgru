@@ -4,8 +4,6 @@ RULES_TOP = {};
 
 g_elCurFolder = null;
 
-g_cycle = 0;
-
 cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
 
 function g_Init()
@@ -123,7 +121,6 @@ function g_Navigate( i_path)
 
 function g_Goto( i_folder, i_path)
 {
-g_cycle++;
 //window.console.log('Goto='+i_folder);
 /*
 window.console.log('Current='+g_elCurFolder.m_folder);
@@ -149,7 +146,10 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	}
 
 	if( g_elCurFolder.m_dir == null )
+	{
 		g_elCurFolder.m_dir = n_ReadDir( i_path, ['status']);
+		g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+	}
 	if( g_elCurFolder.m_dir == null )
 		return false;
 
@@ -177,8 +177,6 @@ function g_OpenFolder( i_elFolder )
 	i_elFolder.m_elFolders = [];
 	if( i_elFolder.m_dir == null )
 		return;
-
-	i_elFolder.m_dir.folders.sort( g_CompareFolders );
 
 	for( var i = 0; i < i_elFolder.m_dir.folders.length; i++)
 	{
