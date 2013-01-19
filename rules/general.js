@@ -83,9 +83,9 @@ function g_Navigate( i_path)
 
 	cgru_ClosePopus();
 	u_Finish();
+	a_Finish();
 
 	RULES = c_CloneObj( RULES_TOP);
-	ASSETS = {};
 
 	c_Log('Navigating to: '+i_path);
 
@@ -117,8 +117,8 @@ function g_Navigate( i_path)
 
 	u_el.thumbnail.setAttribute('src', RULES.root+path+'/'+RULES.rules+'/thumbnail.jpg');
 
-	u_Process();
 	a_Process();
+	u_Process();
 }
 
 function g_Goto( i_folder, i_path)

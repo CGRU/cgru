@@ -25,11 +25,14 @@ function u_Process()
 		u_StatusSetColor( RULES.status.color );
 	else
 		u_StatusSetColor();
+
+	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
+//	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>RULES='+JSON.stringify( RULES);
 }
 function u_StatusSetColor( c, i_elB, i_elC)
 {
 	if( i_elB == null ) i_elB = u_el.content_status.parentNode;
-	if( i_elC == null ) i_elC = u_el.content_status.parentNode;
+	if( i_elC == null ) i_elC = i_elB;
 
 	if( c )
 	{

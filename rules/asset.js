@@ -1,8 +1,18 @@
 ASSETS = {};
+ASSET = null;
+
+function a_Finish()
+{
+	ASSETS = {};
+	ASSET = null;
+}
 
 function a_Process()
 {
 	a_AutoSeek();
+
+	if( ASSET )
+		c_RulesMergeObjs( ASSET, RULES.assets[ASSET.type]);
 
 	a_ShowHeaders();
 
@@ -32,7 +42,7 @@ function a_WalkDir( i_walk, o_list, i_path)
 		}
 }
 
-function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
+function a_ShowSequence( i_element, i_path, i_title)
 {
 	var link = RULES.root + i_path;
 
@@ -52,7 +62,7 @@ function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
 	elLinkA.setAttribute('target', '_blank');
 	elLinkA.textContent = i_title;
 
-	var cmds = RULES.cmdexec[i_data.result.cmdexec];
+	var cmds = RULES.cmdexec[ASSET.result.cmdexec];
 	for( var c = 0; c < cmds.length; c++)
 	{
 		var elCmd = document.createElement('div');
@@ -65,7 +75,7 @@ function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
 		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 	}
 
-	if( i_data.dailies )
+	if( ASSET.dailies )
 	{
 		var elMakeDailies = document.createElement('div');
 		elFolder.appendChild( elMakeDailies);
@@ -73,125 +83,161 @@ function a_ShowSequence( i_element, i_asset, i_data, i_path, i_title)
 		elMakeDailies.textContent = 'Make Dailies';
 		elMakeDailies.m_path = i_path;
 		elMakeDailies.onclick = function(e){
-			d_Make( e.currentTarget.m_path, i_asset.path+'/'+i_data.dailies[0])};
+			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies[0])};
 	}
 }
 
 function a_ShowBody()
 {
 	u_el.asset.innerHTML = '';
-	for( var a_type in ASSETS)
+	if( ASSET == null ) return;
+
+	thumbnails = [];
+
+	window.document.title = ASSET.name + ' ' + window.document.title;
+
+	if( ASSET.source )
 	{
-		var asset = ASSETS[a_type];
-		var a_name = asset.name;
-
-		window.document.title = a_name + ' ' + window.document.title;
-
-
-		var data = RULES.assets_data[a_type];
-		if( data == null ) continue;
-
-		var thumbnails = [];
-
-		if( data.source )
-		{
-			var elSource = document.createElement('div');
-			u_el.asset.appendChild( elSource);
-			elSource.classList.add('sequences');
-			elSource.classList.add('button');
-			elSource.textContent = 'Scan Sources';
-			elSource.onclick = a_OpenCloseSourceOnClick;
-
-			elSource.m_asset = asset;
-			elSource.m_data = data;
-		}
-
-		if( data.result )
-		{
-			var elResult = document.createElement('div');
-			u_el.asset.appendChild( elResult);
-			elResult.classList.add('sequences');
-
-			var founded = false;
-			for( var r = 0; r < data.result.path.length; r++)
-			{
-				var path = asset.path + '/' + data.result.path[r];
-				var readdir = n_ReadDir( path);
-				if( readdir == null ) continue;
-				var folders = readdir.folders;
-				if( folders == null ) continue;
-				if( folders.length )
-				{
-					var elPath = document.createElement('div');
-					elResult.appendChild( elPath);
-					elPath.textContent = data.result.path[r];
-				}
-				else
-					continue;
-
-				thumbnails.push( path);
-
-				for( var f = 0; f < folders.length; f++)
-				{
-					var folder = path + '/' + folders[f];
-					a_ShowSequence( elResult, asset, data, folder);
-					founded = true;
-				}
-			}
-
-			if( false == founded )
-				elResult.textContent = JSON.stringify( data.result.path );
-		}
-
-		if( data.dailies )
-		{
-			var elDailies = document.createElement('div');
-			u_el.asset.appendChild( elDailies);
-
-			var founded = false;
-			for( var d = 0; d < data.dailies.length; d++)
-			{
-				var path = asset.path + '/' + data.dailies[d];
-				var readdir = n_ReadDir( path);
-				if( readdir == null ) continue;
-				var files = readdir.files;
-				if( files == null ) continue;
-				if( files.length )
-				{
-					elPath = document.createElement('div');
-					elDailies.appendChild( elPath);
-					elPath.textContent = data.dailies[d];
-				}
-				else
-					continue;
-
-				for( var f = 0; f < files.length; f++)
-				{
-					var file = files[f];
-					if( file.indexOf('.mov') == -1 ) continue;
-
-					var elLinkDiv = document.createElement('div');
-					elDailies.appendChild( elLinkDiv);
-
-					var elLinkA = document.createElement('a');
-					elLinkDiv.appendChild( elLinkA);
-					elLinkA.setAttribute('href', RULES.root + path + '/' + file);
-					elLinkA.setAttribute('target', '_blank');
-					elLinkA.textContent = file;
-
-					founded = true;
-				}
-			}
-
-			if( false == founded )
-				elDailies.textContent = JSON.stringify( data.dailies );
-		}
-
-		if( thumbnails.length )
-			c_MakeThumbnail( thumbnails, asset.path);
+		var elSource = document.createElement('div');
+		u_el.asset.appendChild( elSource);
+		elSource.classList.add('sequences');
+		elSource.classList.add('button');
+		elSource.textContent = 'Scan Sources';
+		elSource.onclick = a_OpenCloseSourceOnClick;
 	}
 
-	u_el.rules.innerHTML = 'ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
+	if( ASSET.result )
+	{
+		var elResult = document.createElement('div');
+		u_el.asset.appendChild( elResult);
+		elResult.classList.add('sequences');
+
+		var founded = false;
+		for( var r = 0; r < ASSET.result.path.length; r++)
+		{
+			var path = ASSET.path + '/' + ASSET.result.path[r];
+			var readdir = n_ReadDir( path);
+			if( readdir == null ) continue;
+			var folders = readdir.folders;
+			if( folders == null ) continue;
+			if( folders.length )
+			{
+				var elPath = document.createElement('div');
+				elResult.appendChild( elPath);
+				elPath.textContent = ASSET.result.path[r];
+			}
+			else
+				continue;
+
+			thumbnails.push( path);
+
+			for( var f = 0; f < folders.length; f++)
+			{
+				var folder = path + '/' + folders[f];
+				a_ShowSequence( elResult, folder);
+				founded = true;
+			}
+		}
+
+		if( false == founded )
+			elResult.textContent = JSON.stringify( ASSET.result.path );
+	}
+
+	if( ASSET.dailies )
+	{
+		var elDailies = document.createElement('div');
+		u_el.asset.appendChild( elDailies);
+
+		var founded = false;
+		for( var d = 0; d < ASSET.dailies.length; d++)
+		{
+			var path = ASSET.path + '/' + ASSET.dailies[d];
+			var readdir = n_ReadDir( path);
+			if( readdir == null ) continue;
+			var files = readdir.files;
+			if( files == null ) continue;
+			if( files.length )
+			{
+				elPath = document.createElement('div');
+				elDailies.appendChild( elPath);
+				elPath.textContent = ASSET.dailies[d];
+			}
+			else
+				continue;
+
+			for( var f = 0; f < files.length; f++)
+			{
+				var file = files[f];
+				if( file.indexOf('.mov') == -1 ) continue;
+
+				var elLinkDiv = document.createElement('div');
+				elDailies.appendChild( elLinkDiv);
+
+				var elLinkA = document.createElement('a');
+				elLinkDiv.appendChild( elLinkA);
+				elLinkA.setAttribute('href', RULES.root + path + '/' + file);
+				elLinkA.setAttribute('target', '_blank');
+				elLinkA.textContent = file;
+
+				founded = true;
+			}
+		}
+
+		if( false == founded )
+			elDailies.textContent = JSON.stringify( ASSET.dailies );
+	}
+
+	if( ASSET.statuses )
+	{
+		var folders = g_elCurFolder.m_dir.folders;
+		for( var f = 0; f < folders.length; f++ )
+		{
+			if( folders[f].name.indexOf('.') == 0 ) continue;
+
+			var elFolder = document.createElement('div');
+			u_el.asset.appendChild( elFolder);
+			elFolder.style.padding = '4px';
+
+			var elImg = document.createElement('img');
+			elFolder.appendChild( elImg);
+			elImg.classList.add('thumbnail');
+			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rules + '/' + RULES.thumbnail.filename;
+
+			var elName = document.createElement('div');
+			elFolder.appendChild( elName);
+			elName.classList.add('button');
+			elName.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
+			elName.onclick = function(e){g_GO(e.currentTarget.m_path)};
+			elName.textContent = folders[f].name;
+
+			var elStatus = document.createElement('div');
+			elFolder.appendChild( elStatus);
+
+			if( folders[f].status )
+			{
+				if( folders[f].status.annotation )
+					elStatus.textContent = folders[f].status.annotation;
+
+				if( folders[f].status.color )
+					u_StatusSetColor( folders[f].status.color, elFolder);
+			}
+		}
+//window.console.log( JSON.stringify( folders));
+	}
+
+	if( thumbnails.length )
+		c_MakeThumbnail( thumbnails, ASSET.path);
+}
+
+function a_Create( i_type, i_name, i_path)
+{
+	var asset = {};
+	asset.name = i_name;
+	asset.path = i_path;
+	asset.type = i_type;
+
+	ASSETS[i_type] = asset;
+	ASSET = asset;
 }
 
 function a_Append( i_path, i_rules)
@@ -202,23 +248,18 @@ function a_Append( i_path, i_rules)
 	for( var attr in i_rules[rules])
 	{
 //window.console.log('attr='+attr);
-		for( var a = 0; a < RULES.assets.length; a++)
+		for( var atype in RULES.assets)
 		{
-			if( ASSETS[attr] ) continue;
-			if( attr != RULES.assets[a] ) continue;
-			asset = {};
-			asset.type = attr;
-			asset.name = RULES[attr];
-			asset.path = i_path;
-			ASSETS[attr] = asset;
-			c_Log('Asset: ' + asset.type + '=' + asset.name);
+			if( ASSETS[atype] ) continue;
+			if( attr != atype ) continue;
+			a_Create( atype, RULES[attr], i_path);
+			c_Log('Asset: ' + atype + '=' + asset.name);
 		}
 	}
 }
 
 function a_AutoSeek()
 {
-
 	var folders = g_elCurFolder.m_path.split('/');
 	var path = '';
 	for( var i = 0; i < folders.length-1; i++ )
@@ -233,13 +274,12 @@ function a_AutoSeek()
 		else
 			path += '/' + folders[i];
 //window.console.log('path='+path);
-		for( var j = 0; j < RULES.assets.length; j++)
+		for( var asset_type in RULES.assets)
 		{
-			var asset_type = RULES.assets[j];
 			if( ASSETS[asset_type]) continue;
 //window.console.log( asset_type);
-			if( RULES.assets_seek[asset_type] == null ) continue;
-			var apaths = RULES.assets_seek[asset_type];
+			var apaths = RULES.assets[asset_type].seek;
+			if( apaths == null ) continue;
 			for( var l = 0; l < apaths.length; l++)
 			{
 				var apath = apaths[l].substr( 0, apaths[l].lastIndexOf('/'));
@@ -253,14 +293,10 @@ function a_AutoSeek()
 //window.console.log('apath='+apath);
 				if( path == apath )
 				{
-					var asset_name = folder;
-					var asset = {};
-					asset.name = asset_name;
-					asset.type = asset_type;
-					if( path == '/' ) asset.path = '/' + folder;
-					else asset.path = path + '/' + folder;
-					ASSETS[asset_type] = asset;
-					c_Log('Asset founded: ' + asset.type + '=' + asset.name);
+					if( apath == '/' ) apath = '/' + folder;
+					else apath = apath + '/' + folder;
+					a_Create( asset_type, folder, apath);
+					c_Log('Asset founded: ' + asset_type + '=' + folder);
 					break;
 				}
 			}
@@ -296,8 +332,6 @@ function a_ShowHeaders()
 function a_OpenCloseSourceOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
-	var asset = el.m_asset;
-	var data = el.m_data;
 	var elSource = el;
 
 	if( elSource.m_scanned ) return;
@@ -306,10 +340,10 @@ function a_OpenCloseSourceOnClick( i_evt)
 	elSource.classList.remove('button');
 
 	var founded = false;
-	for( var r = 0; r < data.source.path.length; r++)
+	for( var r = 0; r < ASSET.source.path.length; r++)
 	{
 		var list = {};
-		var path = asset.path + '/' + data.source.path[r];
+		var path = ASSET.path + '/' + ASSET.source.path[r];
 		a_WalkDir( n_WalkDir( path), list);
 		if( list.folders.length )
 		{
@@ -318,7 +352,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 			elPath.textContent = data.source.path[r];
 			for( var f = 0; f < list.folders.length; f++)
 			{
-				a_ShowSequence( elSource, asset, data, path + list.folders[f], list.folders[f]);
+				a_ShowSequence( elSource, path + list.folders[f], list.folders[f]);
 				founded = true;
 			}
 		}

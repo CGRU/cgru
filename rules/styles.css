@@ -74,6 +74,8 @@ padding: 2px;
 
 .editing { background: #DDD; color: #000; }
 
+.thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
+
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
 #sidepanel #sidepanel_hide { display: none;}
@@ -175,14 +177,16 @@ padding: 0px 10px;
 #assets .asset { float: left; margin: 1px 4px; padding: 5px 4px; }
 #assets .asset .type { padding: 0px 4px; float: left; }
 #assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
-#content #asset {}
-#content #asset > div {
+
+#asset {}
+#asset > div {
 box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
 border-radius: 10px;
 margin: 6px;
 padding: 20px;
 }
-#content #asset > div.button { padding: 4px;}
+#asset > div.button { padding: 4px;}
+#asset .thumbnail { float: left; margin-right: 20px;}
 
 #content #rules, .rules {
 font-family: courier;
