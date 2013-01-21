@@ -4,9 +4,11 @@ function listDir( $i_readdir, &$o_out)
 {
 	$out = array();
 	$dir = $i_readdir['readdir'];
-	$rules = $i_readdir['rules'];
+	$rules = null;
+	if( array_key_exists('rules', $i_readdir))
+		$rules = $i_readdir['rules'];
 	$scan = null;
-	if( array_key_exists( 'scan', $i_readdir))
+	if( array_key_exists('scan', $i_readdir))
 		$scan = $i_readdir['scan'];
 	$out['dir'] = $dir;
 
@@ -36,6 +38,8 @@ function listDir( $i_readdir, &$o_out)
 				$out['files'][$numfile++] = $entry;
 				continue;
 			}
+
+			if( is_null( $rules)) continue;
 
 			if( is_null($scan) || ( false == is_array($scan)))
 				$out['folders'][$numdir++] = $entry;

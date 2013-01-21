@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status',
+u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle',
 	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 

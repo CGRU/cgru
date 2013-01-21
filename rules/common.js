@@ -1,3 +1,5 @@
+c_logCount = 0;
+
 function c_Init()
 {
 	cgru_ConstructSettingsGUI();
@@ -82,14 +84,21 @@ function c_Error( i_err)
 }
 function c_Log( i_msg)
 {
+	u_el.cycle.classList.remove('timeout');
+	u_el.cycle.style.opacity = '1';
+
 	var date = new Date();
 	var time = c_PadZero(date.getHours())+':'+c_PadZero(date.getMinutes())+':'+c_PadZero(date.getSeconds())+'.'+c_PadZero(date.getMilliseconds(),3);
 	var elLine = document.createElement('div');
-	elLine.innerHTML = '<i>'+time+':</i> '+i_msg;
+	elLine.innerHTML = '<i><b>#</b>'+c_logCount+' '+time+':</i> '+i_msg;
 	var lines = log.getElementsByTagName('div');
 	u_el.log.insertBefore( elLine, lines[0]);
 	if( lines.length > 100 )
 		u_el.log.removeChild( lines[100]);
+	c_logCount++;
+
+	setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
+//	u_el.cycle.style.opacity = '.1';
 }
 
 function c_MakeThumbnail( i_sources, i_path)

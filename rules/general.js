@@ -121,6 +121,7 @@ function g_Navigate( i_path)
 
 function g_Goto( i_folder, i_path)
 {
+	c_Log('Goto "'+i_folder+'"');
 //window.console.log('Goto='+i_folder);
 /*
 window.console.log('Current='+g_elCurFolder.m_folder);

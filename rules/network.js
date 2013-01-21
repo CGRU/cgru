@@ -1,3 +1,6 @@
+n_sendCount = 0;
+n_recvCount = 0;
+
 function n_ReadConfig()
 {
 	var request = {};
@@ -47,7 +50,7 @@ function n_Request( i_obj, i_wait)
 	var log = '<b style="color:';
 	if( i_wait ) log += '#040';
 	else log += '#044';
-	log += '"><i>send:</i></b> '+ obj_str;
+	log += '"><i>send'+(n_sendCount++)+':</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.overrideMimeType('application/json');
@@ -58,7 +61,7 @@ function n_Request( i_obj, i_wait)
 //window.console.log('n_Requestr='+obj_str);
 
 	if( i_wait )
-		log += '<br/><b style="color:#040"><i>recv:</i></b> '+ xhr.responseText;
+		log += '<br/><b style="color:#040"><i>recv'+(n_recvCount++)+':</i></b> '+ xhr.responseText;
 
 	c_Log( log);
 
@@ -72,7 +75,7 @@ function n_Request( i_obj, i_wait)
 		{
 			if( xhr.status == 200 )
 			{
-				c_Log('<b style="color:#044"><i>recv:</i></b> '+ xhr.responseText);
+				c_Log('<b style="color:#044"><i>recv'+(n_recvCount++)+':</i></b> '+ xhr.responseText);
 				return;
 			}
 		}

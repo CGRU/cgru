@@ -32,8 +32,6 @@ border-radius: 5px;*/
 }
 #header .panel .button { float: left; padding: 4px 8px; margin: 1px 8px; }
 
-#footer #open { float: right; margin: 8px; }
-#footer #version { float: right; margin: 10px; }
 #footer #info {
 background: #DDD;
 border-radius: 4px;
@@ -52,6 +50,18 @@ padding: 2px 6px;
 font-size: 12px;
 }
 #footer #log * { margin: 4px 1px;}
+#footer #cycle {
+position:absolute;
+top:16px;left:30px;height:10px;width:5px;
+border-radius: 3px;
+background: #FFA;
+box-shadow: 0px 0px 5px #FA6;
+}
+#footer #cycle.timeout {
+-o-transition: all 1.5s ease-out;
+-moz-transition: all 1.5s ease-out;
+-webkit-transition: all 1.5s ease-out;
+}
 
 #navig, #sidepanel {
 top: 38px; bottom: 38px;
