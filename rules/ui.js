@@ -16,6 +16,8 @@ function u_Init()
 
 function u_Process()
 {
+	u_el.thumbnail.setAttribute('src', RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/thumbnail.jpg');
+
 	if( RULES.status && RULES.status.annotation )
 		u_el.status.innerHTML = RULES.status.annotation;
 	else
@@ -237,7 +239,7 @@ function u_StatusSaveOnClick()
 	var obj = {};
 	obj.object = {"status":RULES.status};
 	obj.add = true;
-	obj.file = RULES.root + g_elCurFolder.m_path + '/' + RULES.rules + '/status.json';
+	obj.file = RULES.root + g_elCurFolder.m_path + '/' + RULES.rufolder + '/status.json';
 	n_Request({"editobj":obj});
 }
 

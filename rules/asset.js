@@ -116,7 +116,7 @@ function a_ShowBody()
 		for( var r = 0; r < ASSET.result.path.length; r++)
 		{
 			var path = ASSET.path + '/' + ASSET.result.path[r];
-			var readdir = n_ReadDir( path);
+			var readdir = n_ListDir( path);
 			if( readdir == null ) continue;
 			var folders = readdir.folders;
 			if( folders == null ) continue;
@@ -152,7 +152,7 @@ function a_ShowBody()
 		for( var d = 0; d < ASSET.dailies.length; d++)
 		{
 			var path = ASSET.path + '/' + ASSET.dailies[d];
-			var readdir = n_ReadDir( path);
+			var readdir = n_ListDir( path);
 			if( readdir == null ) continue;
 			var files = readdir.files;
 			if( files == null ) continue;
@@ -203,7 +203,7 @@ function a_ShowBody()
 			elImg.classList.add('thumbnail');
 			elImg.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
 			elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
-			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rules + '/' + RULES.thumbnail.filename;
+			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
 
 			var elName = document.createElement('div');
 			elFolder.appendChild( elName);

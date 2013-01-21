@@ -1,5 +1,5 @@
 RULES = {};
-RULES.rules = 'rules';
+RULES.rufolder = 'rules';
 RULES_TOP = {};
 
 g_elCurFolder = null;
@@ -17,7 +17,7 @@ function g_Init()
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 
-	c_RulesMergeDir( RULES_TOP, n_ReadDir('.'));
+	c_RulesMergeDir( RULES_TOP, n_ListDir('.', RULES.rufolder, ['rules']));
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
@@ -113,8 +113,6 @@ function g_Navigate( i_path)
 	else
 		window.document.title = g_elCurFolder.m_path;
 
-	u_el.thumbnail.setAttribute('src', RULES.root+path+'/'+RULES.rules+'/thumbnail.jpg');
-
 	a_Process();
 	u_Process();
 }
@@ -148,7 +146,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	if( g_elCurFolder.m_dir == null )
 	{
-		g_elCurFolder.m_dir = n_ReadDir( i_path, ['status']);
+		g_elCurFolder.m_dir = n_ListDir( i_path, RULES.rufolder, ['rules'], ['status']);
 		g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 	}
 	if( g_elCurFolder.m_dir == null )

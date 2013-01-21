@@ -1,15 +1,15 @@
 <?php
 
-function listDir( $i_readdir, &$o_out)
+function listDir( $i_listdir, &$o_out)
 {
 	$out = array();
-	$dir = $i_readdir['readdir'];
-	$rules = null;
-	if( array_key_exists('rules', $i_readdir))
-		$rules = $i_readdir['rules'];
+	$dir = $i_listdir['listdir'];
+	$rufolder = null;
+	if( array_key_exists('rufolder', $i_listdir))
+		$rufolder = $i_listdir['rufolder'];
 	$scan = null;
-	if( array_key_exists('scan', $i_readdir))
-		$scan = $i_readdir['scan'];
+	if( array_key_exists('scan', $i_listdir))
+		$scan = $i_listdir['scan'];
 	$out['dir'] = $dir;
 
 	$dir = str_replace('../','', $dir);
@@ -39,17 +39,15 @@ function listDir( $i_readdir, &$o_out)
 				continue;
 			}
 
-			if( is_null( $rules)) continue;
-
 			if( is_null($scan) || ( false == is_array($scan)))
 				$out['folders'][$numdir++] = $entry;
-			else
+			else if( $rufolder)
 			{
 				$folder = array();
 				$folder['name'] = $entry;
 				foreach( $scan as $sfile )
 				{
-					$sfilepath = $path.'/'.$rules.'/'.$sfile.'.json';
+					$sfilepath = $path.'/'.$rufolder.'/'.$sfile.'.json';
 					if( is_file( $sfilepath))
 					{
 						if( $fHandle = fopen( $sfilepath, 'r'))
@@ -63,7 +61,8 @@ function listDir( $i_readdir, &$o_out)
 				$out['folders'][$numdir++] = $folder;
 			}
 
-			if( $entry != $rules ) continue;
+			if( is_null( $rufolder)) continue;
+			if( $entry != $rufolder ) continue;
 
 			$numrufile = 0;
 			if( $rHandle = opendir( $path))
@@ -94,7 +93,7 @@ function listDir( $i_readdir, &$o_out)
 		sort( $out['rufiles']);
 	}
 
-	$o_out['readdir'] = $out;
+	$o_out['listdir'] = $out;
 }
 
 function walkDir( $i_path, &$o_out)
@@ -323,7 +322,7 @@ function afanasy( $i_obj, &$o_out)
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
-if( array_key_exists('readdir', $recv))
+if( array_key_exists('listdir', $recv))
 {
 	listDir($recv, $out);
 }

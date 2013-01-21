@@ -58,9 +58,9 @@ background: #FFA;
 box-shadow: 0px 0px 5px #FA6;
 }
 #footer #cycle.timeout {
--o-transition: all 1.5s ease-out;
--moz-transition: all 1.5s ease-out;
--webkit-transition: all 1.5s ease-out;
+-o-transition: all 1s ease-out;
+-moz-transition: all 1s ease-out;
+-webkit-transition: all 1s ease-out;
 }
 
 #navig, #sidepanel {

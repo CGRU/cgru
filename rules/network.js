@@ -8,23 +8,24 @@ function n_ReadConfig()
 	return c_Parse( n_Request( request));
 }
 
-function n_ReadDir( i_path, i_scan)
+function n_ListDir( i_path, i_rufolder, i_rufiles, i_scan)
 {
 	var path = i_path;
 	if( RULES.root )
 		path = RULES.root + path;
 
 	var request = {};
-	request.readdir = path;
-	request.rules = RULES.rules;
-	request.scan = i_scan;
+	request.listdir = path;
+	if( i_rufolder ) request.rufolder = i_rufolder;
+	if( i_rufiles ) request.rufiles = i_rufiles;
+	if( i_scan ) request.scan = i_scan;
 	var data = n_Request( request);
 	var response = c_Parse( data);
 
 	if( response == null ) return null;
-	if( response.readdir == null ) return null;
+	if( response.listdir == null ) return null;
 
-	return response.readdir;
+	return response.listdir;
 }
 
 function n_WalkDir( i_path)
