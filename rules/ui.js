@@ -228,13 +228,12 @@ function u_StatusSaveOnClick()
 
 	u_el.status.m_text = text;
 	u_StatusCancelOnClick();
-	g_StatusSetColor( color);
-	g_elCurFolder.m_elStatus.innerHTML = text;
 
 	RULES.status = {};
 	RULES.status.annotation = text;
 	RULES.status.color = color;
 //return;
+	g_FolderSetStatus( RULES.status);
 
 	var obj = {};
 	obj.object = {"status":RULES.status};

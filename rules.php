@@ -7,9 +7,12 @@ function listDir( $i_listdir, &$o_out)
 	$rufolder = null;
 	if( array_key_exists('rufolder', $i_listdir))
 		$rufolder = $i_listdir['rufolder'];
-	$scan = null;
-	if( array_key_exists('scan', $i_listdir))
-		$scan = $i_listdir['scan'];
+	$rufiles = null;
+	if( array_key_exists('rufiles', $i_listdir))
+		$rufiles = $i_listdir['rufiles'];
+	$lookahead = null;
+	if( array_key_exists('lookahead', $i_listdir))
+		$lookahead = $i_listdir['lookahead'];
 	$out['dir'] = $dir;
 
 	$dir = str_replace('../','', $dir);
@@ -39,13 +42,13 @@ function listDir( $i_listdir, &$o_out)
 				continue;
 			}
 
-			if( is_null($scan) || ( false == is_array($scan)))
+			if( is_null($lookahead) || ( false == is_array($lookahead)))
 				$out['folders'][$numdir++] = $entry;
 			else if( $rufolder)
 			{
 				$folder = array();
 				$folder['name'] = $entry;
-				foreach( $scan as $sfile )
+				foreach( $lookahead as $sfile )
 				{
 					$sfilepath = $path.'/'.$rufolder.'/'.$sfile.'.json';
 					if( is_file( $sfilepath))
@@ -72,15 +75,24 @@ function listDir( $i_listdir, &$o_out)
 					if( $entry == '.') continue;
 					if( $entry == '..') continue;
 					$out['rufiles'][$numrufile++] = $entry;
-					if(( strrpos( $entry,'.json') == ( strlen($entry)-5 )) && ( strlen($entry) > 5 ))
-					{
-						if( $fHandle = fopen( $path.'/'.$entry, 'r'))
+
+					if( strrpos( $entry,'.json') === false ) continue;
+
+					$founded = false;
+					foreach( $rufiles as $rufile )
+						if( strpos( $entry, $rufile ) === 0 )
 						{
-							$rudata = fread( $fHandle, 1000000);
-							$ruobj = json_decode( $rudata, true);
-							$out['rules'][$entry] = $ruobj;
-							fclose($fHandle);
+							$founded = true;
+							break;
 						}
+					if( false == $founded ) continue;
+
+					if( $fHandle = fopen( $path.'/'.$entry, 'r'))
+					{
+						$rudata = fread( $fHandle, 1000000);
+						$ruobj = json_decode( $rudata, true);
+						$out['rules'][$entry] = $ruobj;
+						fclose($fHandle);
 					}
 				}
 				closedir($rHandle);
@@ -96,8 +108,11 @@ function listDir( $i_listdir, &$o_out)
 	$o_out['listdir'] = $out;
 }
 
-function walkDir( $i_path, &$o_out)
+function walkDir( $i_path, &$o_out, $i_maxdepth, &$o_depth)
 {
+	if( $o_depth > $i_maxdepth ) return;
+	$o_depth++;
+
 	$dir = $i_path;
 	$dir = str_replace('../','', $dir);
 	$dir = str_replace('/..','', $dir);
@@ -120,7 +135,7 @@ function walkDir( $i_path, &$o_out)
 			if( is_dir( $path))
 			{
 				$o_out['folders'][$entry] = array();
-				walkDir( $path, $o_out['folders'][$entry]);
+				walkDir( $path, $o_out['folders'][$entry], $i_maxdepth, $o_depth);
 			}
 			else
 				$o_out['files'][$numfile++] = $entry;
@@ -329,7 +344,8 @@ if( array_key_exists('listdir', $recv))
 else if( array_key_exists('walkdir', $recv))
 {
 	$walkdir = array();
-	walkDir( $recv['walkdir'], $walkdir);
+	$depth = 0;
+	walkDir( $recv['walkdir'], $walkdir, $recv['depth'], $depth);
 	$out['walkdir'] = $walkdir;
 }
 else if( array_key_exists('readobj', $recv))

@@ -1,6 +1,7 @@
 {
 "root":".",
 "rufolder":"rules",
+"playlist":"rules/playlist.json",
 
 "assets":{
 "shot":{
@@ -14,6 +15,10 @@
 		"cmdexec":"play_sequence"
 	},
 	"dailies":["RESULT/DAILIES"]
+},
+"scenes":{
+	"name":["/[project]/SCENES/","/[project]/SHOTS/"],
+	"thumbnails":2
 },
 "scene":{
 	"seek":["/[project]/SCENES/","/[project]/SHOTS/"],

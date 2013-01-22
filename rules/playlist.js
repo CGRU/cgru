@@ -1,9 +1,11 @@
 p_elCurFolder = null;
 p_elCurItem = null;
-p_noFile = true;
+p_file = 'playlist.json';
+p_fileExist = false;
 
 function p_Init()
 {
+	if( RULES_TOP.playlist ) p_file = RULES_TOP.playlist;
 	p_elCurFolder = u_el.playlist;
 	p_elCurFolder.m_id = '';
 	if( localStorage.playlist_opened == "true" ) p_Open();
@@ -148,16 +150,16 @@ function p_Action( i_obj, i_action)
 
 	if( i_action == 'add' )
 	{
-		if( p_noFile )
-		{
-			obj.object = {"id":"","playlist":[i_obj]};
-			obj.add = true;
-		}
-		else
+		if( p_fileExist )
 		{	
 			obj.objects = [i_obj];
 			obj.pusharray = 'playlist';
 			obj.id = p_elCurFolder.m_id;
+		}
+		else
+		{
+			obj.object = {"id":"","playlist":[i_obj]};
+			obj.add = true;
 		}
 	}
 	else if( i_action == 'del')
@@ -175,7 +177,7 @@ function p_Action( i_obj, i_action)
 		c_Error('Playlist: Unknown action = '+i_action+'<br> Object: '+JSON.stringify(i_obj));
 		return;
 	}
-	obj.file = 'playlist.json';
+	obj.file = p_file;
 	n_Request({"editobj":obj});
 	p_Load();
 }
@@ -183,10 +185,10 @@ function p_Action( i_obj, i_action)
 function p_RefreshOnClick( i_evt) { p_Load();}
 function p_Load()
 {
-	var obj = c_Parse( n_Request({"readobj":"playlist.json"}));
+	var obj = c_Parse( n_Request({"readobj":p_file}));
 	if( obj == null ) return;
 	if( obj.error == null )
-		p_noFile = false;
+		p_fileExist = true;
 
 	var params = {};
 	params.wasopened = localStorage.playlist_opened_folders.split(' ');
