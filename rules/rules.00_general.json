@@ -1,15 +1,11 @@
 {
 "root":".",
-"rules":"rules",
-"assets":["project","scene","shot"],
-"assets_seek":{
-	"project":["/"],
-	"scene":["/[project]/SCENES/","/[project]/SHOTS/"],
-	"shot":["/[project]/SCENES/[scene]/","/[project]/SHOTS/[scene]/"]
-},
+"rufolder":"rules",
+"playlist":"rules/playlist.json",
 
-"assets_data":{
+"assets":{
 "shot":{
+	"seek":["/[project]/SCENES/[scene]/","/[project]/SHOTS/[scene]/"],
 	"source":{
 		"path":["SOURCE/SCAN"],
 		"cmdexec":"play_sequence"
@@ -19,6 +15,17 @@
 		"cmdexec":"play_sequence"
 	},
 	"dailies":["RESULT/DAILIES"]
+},
+"scenes":{
+	"name":["/[project]/SCENES/","/[project]/SHOTS/"],
+	"thumbnails":2
+},
+"scene":{
+	"seek":["/[project]/SCENES/","/[project]/SHOTS/"],
+	"statuses":true
+},
+"project":{
+	"seek":["/"]
 }
 },
 

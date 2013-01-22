@@ -1,10 +1,8 @@
 RULES = {};
-RULES.rules = 'rules';
+RULES.rufolder = 'rules';
 RULES_TOP = {};
 
 g_elCurFolder = null;
-
-g_cycle = 0;
 
 cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
 
@@ -12,17 +10,18 @@ function g_Init()
 {
 	cgru_Init();
 	u_Init();
-	p_Init();
 	c_Init();
 
 	var config = n_ReadConfig();
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 
-	c_RulesMergeDir( RULES_TOP, n_ReadDir('.'));
+	c_RulesMergeDir( RULES_TOP, n_ListDir('.', RULES.rufolder, ['rules']));
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
+
+	p_Init();
 
 	document.getElementById('afanasy_webgui').innerHTML =
 		'<a href="http://'+cgru_Config.af_servername+':'+cgru_Config.af_serverport+'" target="_blank">AFANASY</a>';
@@ -46,6 +45,11 @@ function g_OnKeyDown(e)
 
 function g_GO( i_path)
 {
+	if( i_path == '..' )
+	{
+		i_path = g_elCurFolder.m_path;
+		i_path = i_path.substr( 0, i_path.lastIndexOf('/'));
+	}
 	window.location.hash = i_path;
 }
 
@@ -77,9 +81,10 @@ function g_Navigate( i_path)
 	g_elCurFolder = u_el.navig;
 
 	cgru_ClosePopus();
+	u_Finish();
+	a_Finish();
 
 	RULES = c_CloneObj( RULES_TOP);
-	ASSETS = {};
 
 	c_Log('Navigating to: '+i_path);
 
@@ -95,7 +100,9 @@ function g_Navigate( i_path)
 		else
 			path += '/' + folders[i];
 
-		if( false == g_Goto( folders[i], path))
+//		RULES.status = null;
+
+		if( false == g_Goto( folders[i], path, i == (folders.length-1)))
 			break;
 	}
 
@@ -107,14 +114,13 @@ function g_Navigate( i_path)
 	else
 		window.document.title = g_elCurFolder.m_path;
 
-	u_el.thumbnail.setAttribute('src', RULES.root+path+'/'+RULES.rules+'/thumbnail.jpg');
-
 	a_Process();
+	u_Process();
 }
 
-function g_Goto( i_folder, i_path)
+function g_Goto( i_folder, i_path, i_last)
 {
-g_cycle++;
+	c_Log('Goto "'+i_folder+'"'+(i_last?'*':''));
 //window.console.log('Goto='+i_folder);
 /*
 window.console.log('Current='+g_elCurFolder.m_folder);
@@ -139,8 +145,15 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 //			return false;
 	}
 
+	var rufiles = ['rules'];
+	if( i_last )
+		rufiles.push('status');
+
 	if( g_elCurFolder.m_dir == null )
-		g_elCurFolder.m_dir = n_ReadDir( i_path);
+	{
+		g_elCurFolder.m_dir = n_ListDir( i_path, RULES.rufolder, rufiles, ['status']);
+		g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+	}
 	if( g_elCurFolder.m_dir == null )
 		return false;
 
@@ -153,6 +166,13 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	return true;
 }
 
+function g_CompareFolders(a,b)
+{
+	var attr = 'name';
+	if( a[attr] < b[attr]) return -1;
+	if( a[attr] > b[attr]) return 1;
+	return 0;
+}
 function g_OpenFolder( i_elFolder )
 {
 	if( i_elFolder.classList.contains('opened'))
@@ -164,22 +184,68 @@ function g_OpenFolder( i_elFolder )
 
 	for( var i = 0; i < i_elFolder.m_dir.folders.length; i++)
 	{
-		var folder = i_elFolder.m_dir.folders[i];
+		var fobject = i_elFolder.m_dir.folders[i];
+		var folder = fobject.name;
 		if( folder.charAt(0) == '.' ) continue;
+
 		var elFolder = document.createElement('div');
 		elFolder.classList.add('folder');
-		elFolder.textContent = folder;
+		elFolder.m_fobject = fobject;
+
+		var elColor = document.createElement('div');
+		elFolder.appendChild( elColor);
+		elFolder.m_elColor = elColor;
+		elColor.classList.add('fcolor');
+
+		var elStatus = document.createElement('div');
+//		elColor.appendChild( elStatus);
+		elFolder.appendChild( elStatus);
+		elFolder.m_elStatus = elStatus;
+		elStatus.classList.add('fstatus');
+
+
+		var elName = document.createElement('div');
+//		elColor.appendChild( elName);
+		elFolder.appendChild( elName);
+		elName.classList.add('fname');
+		elName.textContent = folder;
+
 		elFolder.m_folder = folder;
 		if( i_elFolder.m_path == '/' )
 			elFolder.m_path = '/'+folder;
 		else
 			elFolder.m_path = i_elFolder.m_path+'/'+folder;
-		elFolder.onclick = g_FolderClicked;
-		elFolder.ondblclick = g_FolderClicked;
-		g_elCurFolder.appendChild( elFolder);
-		g_elCurFolder.m_elFolders.push( elFolder);
+
+		elFolder.onclick = g_FolderOnClick;
+//		elFolder.ondblclick = g_FolderOnDblClick;
+//		elFolder.ondblclick = g_FolderOnClick;
+
+		g_FolderSetStatus( fobject.status, elFolder);
+
+		i_elFolder.appendChild( elFolder);
+		i_elFolder.m_elFolders.push( elFolder);
 	}
 	i_elFolder.classList.add('opened');
+}
+
+function g_FolderSetStatus( i_status, i_elFolder)
+{
+	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
+	var color = null;
+	var text = '';
+	if( i_status  )
+	{
+		color = i_status.color;
+		if( i_status.annotation )
+			text = i_status.annotation.split(' ')[0];
+	}
+
+	i_elFolder.m_fobject.status = i_status;
+	if( i_elFolder.m_dir )
+		i_elFolder.m_dir.rules['status.json'] = {"status":i_status};
+
+	i_elFolder.m_elStatus.innerHTML = text;
+	u_StatusSetColor( color, i_elFolder.m_elColor, i_elFolder);
 }
 
 function g_CloseFolder( i_elFolder )
@@ -194,7 +260,7 @@ function g_CloseFolder( i_elFolder )
 	i_elFolder.classList.remove('opened');
 }
 
-function g_FolderClicked( i_evt)
+function g_FolderOnClick( i_evt)
 {
 	i_evt.stopPropagation();
 	var elFolder = i_evt.currentTarget;
@@ -209,5 +275,23 @@ function g_FolderClicked( i_evt)
 	}
 
 	window.location.hash = elFolder.m_path;
+}
+
+function g_FolderOnDblClick( i_evt)
+{
+window.console.log('g_FolderOnDblClick( i_evt)');
+return;
+g_FolderOnClick( i_evt);
+	i_evt.stopPropagation();
+	var elFolder = i_evt.currentTarget;
+
+	if( elFolder.classList.contains('opened'))
+		g_CloseFolder( elFolder);
+	else
+	{
+		if( elFolder.m_dir == null )
+			elFolder.m_dir = n_ReadDir( elFolder.m_path, ['status']);
+		g_OpenFolder( elFolder);
+	}
 }
 

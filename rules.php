@@ -1,10 +1,18 @@
 <?php
 
-function listDir( $i_readdir, &$o_out)
+function listDir( $i_listdir, &$o_out)
 {
 	$out = array();
-	$dir = $i_readdir['readdir'];
-	$rules = $i_readdir['rules'];
+	$dir = $i_listdir['listdir'];
+	$rufolder = null;
+	if( array_key_exists('rufolder', $i_listdir))
+		$rufolder = $i_listdir['rufolder'];
+	$rufiles = null;
+	if( array_key_exists('rufiles', $i_listdir))
+		$rufiles = $i_listdir['rufiles'];
+	$lookahead = null;
+	if( array_key_exists('lookahead', $i_listdir))
+		$lookahead = $i_listdir['lookahead'];
 	$out['dir'] = $dir;
 
 	$dir = str_replace('../','', $dir);
@@ -34,9 +42,30 @@ function listDir( $i_readdir, &$o_out)
 				continue;
 			}
 
-			$out['folders'][$numdir++] = $entry;
+			if( is_null($lookahead) || ( false == is_array($lookahead)))
+				$out['folders'][$numdir++] = $entry;
+			else if( $rufolder)
+			{
+				$folder = array();
+				$folder['name'] = $entry;
+				foreach( $lookahead as $sfile )
+				{
+					$sfilepath = $path.'/'.$rufolder.'/'.$sfile.'.json';
+					if( is_file( $sfilepath))
+					{
+						if( $fHandle = fopen( $sfilepath, 'r'))
+						{
+							$data = fread( $fHandle, 1000000);
+							fclose( $fHandle);
+							mergeObjs( $folder, json_decode( $data, true));
+						}
+					}
+				}
+				$out['folders'][$numdir++] = $folder;
+			}
 
-			if( $entry != $rules ) continue;
+			if( is_null( $rufolder)) continue;
+			if( $entry != $rufolder ) continue;
 
 			$numrufile = 0;
 			if( $rHandle = opendir( $path))
@@ -46,15 +75,24 @@ function listDir( $i_readdir, &$o_out)
 					if( $entry == '.') continue;
 					if( $entry == '..') continue;
 					$out['rufiles'][$numrufile++] = $entry;
-					if(( strrpos( $entry,'.json') == ( strlen($entry)-5 )) && ( strlen($entry) > 5 ))
-					{
-						if( $fHandle = fopen( $path.'/'.$entry, 'r'))
+
+					if( strrpos( $entry,'.json') === false ) continue;
+
+					$founded = false;
+					foreach( $rufiles as $rufile )
+						if( strpos( $entry, $rufile ) === 0 )
 						{
-							$rudata = fread( $fHandle, 1000000);
-							$ruobj = json_decode( $rudata, true);
-							$out['rules'][$entry] = $ruobj;
-							fclose($fHandle);
+							$founded = true;
+							break;
 						}
+					if( false == $founded ) continue;
+
+					if( $fHandle = fopen( $path.'/'.$entry, 'r'))
+					{
+						$rudata = fread( $fHandle, 1000000);
+						$ruobj = json_decode( $rudata, true);
+						$out['rules'][$entry] = $ruobj;
+						fclose($fHandle);
 					}
 				}
 				closedir($rHandle);
@@ -67,11 +105,14 @@ function listDir( $i_readdir, &$o_out)
 		sort( $out['rufiles']);
 	}
 
-	$o_out['readdir'] = $out;
+	$o_out['listdir'] = $out;
 }
 
-function walkDir( $i_path, &$o_out)
+function walkDir( $i_path, &$o_out, $i_maxdepth, &$o_depth)
 {
+	if( $o_depth > $i_maxdepth ) return;
+	$o_depth++;
+
 	$dir = $i_path;
 	$dir = str_replace('../','', $dir);
 	$dir = str_replace('/..','', $dir);
@@ -94,7 +135,7 @@ function walkDir( $i_path, &$o_out)
 			if( is_dir( $path))
 			{
 				$o_out['folders'][$entry] = array();
-				walkDir( $path, $o_out['folders'][$entry]);
+				walkDir( $path, $o_out['folders'][$entry], $i_maxdepth, $o_depth);
 			}
 			else
 				$o_out['files'][$numfile++] = $entry;
@@ -141,12 +182,12 @@ function mergeObjs( &$o_obj, $i_obj)
 	{
 		if( array_key_exists( $key, $o_obj) && is_array( $val) && is_array( $o_obj[$key]))
 		{
-			if( is_int( key($o_obj[$key])) && is_int( key($val)))
+/*			if( is_int( key($o_obj[$key])) && is_int( key($val)))
 			{
 				foreach( $val as $v )
 					array_push( $o_obj[$key], $v);
 				continue;
-			}
+			}*/
 			if( is_string( key($o_obj[$key])) && is_string( key($val)))
 			{
 				mergeObjs( $o_obj[$key], $val);
@@ -229,6 +270,8 @@ function editObj( $i_edit, &$o_out)
 {
 	$mode = 'w+';
 	if( file_exists( $i_edit['file'])) $mode = 'r+';
+	if( false == is_dir( dirname($i_edit['file'])))
+		mkdir( dirname($i_edit['file']));
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
 		$data = fread( $fHandle, 1000000);
@@ -294,14 +337,15 @@ function afanasy( $i_obj, &$o_out)
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
-if( array_key_exists('readdir', $recv))
+if( array_key_exists('listdir', $recv))
 {
 	listDir($recv, $out);
 }
 else if( array_key_exists('walkdir', $recv))
 {
 	$walkdir = array();
-	walkDir( $recv['walkdir'], $walkdir);
+	$depth = 0;
+	walkDir( $recv['walkdir'], $walkdir, $recv['depth'], $depth);
 	$out['walkdir'] = $walkdir;
 }
 else if( array_key_exists('readobj', $recv))

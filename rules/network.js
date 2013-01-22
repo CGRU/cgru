@@ -1,3 +1,6 @@
+n_sendCount = 0;
+n_recvCount = 0;
+
 function n_ReadConfig()
 {
 	var request = {};
@@ -5,30 +8,34 @@ function n_ReadConfig()
 	return c_Parse( n_Request( request));
 }
 
-function n_ReadDir( i_path)
+function n_ListDir( i_path, i_rufolder, i_rufiles, i_lookahead)
 {
 	var path = i_path;
 	if( RULES.root )
 		path = RULES.root + path;
 
 	var request = {};
-	request.readdir = path;
-	request.rules = RULES.rules;
+	request.listdir = path;
+	if( i_rufolder ) request.rufolder = i_rufolder;
+	if( i_rufiles ) request.rufiles = i_rufiles;
+	if( i_lookahead ) request.lookahead = i_lookahead;
 	var data = n_Request( request);
 	var response = c_Parse( data);
 
 	if( response == null ) return null;
-	if( response.readdir == null ) return null;
+	if( response.listdir == null ) return null;
 
-	return response.readdir;
+	return response.listdir;
 }
 
-function n_WalkDir( i_path)
+function n_WalkDir( i_path, i_depth)
 {
 	var path = RULES.root + i_path;
+	if( i_depth == null ) i_depth = 9;
 
 	var request = {};
 	request.walkdir = path;
+	request.depth = i_depth;
 	var data = n_Request( request);
 	var response = c_Parse( data);
 
@@ -46,7 +53,7 @@ function n_Request( i_obj, i_wait)
 	var log = '<b style="color:';
 	if( i_wait ) log += '#040';
 	else log += '#044';
-	log += '"><i>send:</i></b> '+ obj_str;
+	log += '"><i>send'+(n_sendCount++)+':</i></b> '+ obj_str;
 
 	var xhr = new XMLHttpRequest;
 	xhr.overrideMimeType('application/json');
@@ -57,7 +64,7 @@ function n_Request( i_obj, i_wait)
 //window.console.log('n_Requestr='+obj_str);
 
 	if( i_wait )
-		log += '<br/><b style="color:#040"><i>recv:</i></b> '+ xhr.responseText;
+		log += '<br/><b style="color:#040"><i>recv'+(n_recvCount++)+':</i></b> '+ xhr.responseText;
 
 	c_Log( log);
 
@@ -71,7 +78,7 @@ function n_Request( i_obj, i_wait)
 		{
 			if( xhr.status == 200 )
 			{
-				c_Log('<b style="color:#044"><i>recv:</i></b> '+ xhr.responseText);
+				c_Log('<b style="color:#044"><i>recv'+(n_recvCount++)+':</i></b> '+ xhr.responseText);
 				return;
 			}
 		}
