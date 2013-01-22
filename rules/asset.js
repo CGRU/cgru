@@ -218,7 +218,7 @@ function a_ShowBody()
 			if( folders[f].status )
 			{
 				if( folders[f].status.annotation )
-					elStatus.textContent = folders[f].status.annotation;
+					elStatus.innerHTML = folders[f].status.annotation;
 
 				if( folders[f].status.color )
 					u_StatusSetColor( folders[f].status.color, elFolder);
