@@ -79,7 +79,7 @@ class PathMap:
 			self.initialized = True
 
 		if Verbose:
-			print('Pathes map:')
+			print('Path map:')
 			n = 0
 			for path in self.PathClient:
 				print('    "%s" <-> "%s"' % (path, self.PathServer[n]))
@@ -132,7 +132,7 @@ class PathMap:
 					position = len(part1 + path_to)
 					newpath = part1 + path_to + part2
 					if Verbose:
-						print('Pathes mapped:')
+						print('Paths mapped:')
 						print(path)
 						print(newpath)
 					break
@@ -161,22 +161,25 @@ class PathMap:
 		filein = open( infile, 'r')
 		inlines = filein.readlines()
 		filein.close()
-		outdata = ''
+		outdata = []
 		for line in inlines:
 			if not isinstance( line, str): line = cgruutils.toStr( line)
 			toskip = False
 			if len( SearchStrings): toskip = True
 			for searchstr in SearchStrings:
+#				if line[0:len(searchstr)] == searchstr:
 				if line.find( searchstr) != -1:
+#					print('"%s" == "%s"' % (line[0:len(searchstr)], searchstr))
 					toskip = False
-					continue
+					break
 			if toskip:
-				lineout = line
+				outdata.append( line)
 			else:
-				lineout = self.translatePath( line, toserver , Verbose)
-			outdata += lineout + '\n'
+#				print('Translating: "%s"' % line)
+				outdata.append( self.translatePath( line, toserver , Verbose))
+#				print( outdata[-1])
 		fileout = open( outfile, 'w')
-		fileout.write(outdata)
+		fileout.writelines(outdata)
 		fileout.close()
 		return True
 

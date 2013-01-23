@@ -55,6 +55,8 @@ function u_StatusSetColor( c, i_elB, i_elC)
 function u_Finish()
 {
 	u_StatusCancelOnClick();
+	u_el.status.textContent = '';
+	u_StatusSetColor();
 }
 
 function u_HeaderOpenButtonOnClick( i_elBtn, i_id, i_pos)
