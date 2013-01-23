@@ -11,8 +11,7 @@ function a_Process()
 {
 	a_AutoSeek();
 
-	if( ASSET )
-		c_RulesMergeObjs( ASSET, RULES.assets[ASSET.type]);
+//	if( ASSET ) c_RulesMergeObjs( ASSET, RULES.assets[ASSET.type]);
 
 	a_ShowHeaders();
 
@@ -21,25 +20,6 @@ function a_Process()
 	var path = cgru_PM('/'+RULES.root+g_elCurFolder.m_path);
 	c_Info( path);
 	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.open.replace(/@PATH@/g, path)]));
-}
-
-function a_WalkDir( i_walk, o_list, i_path)
-{
-	if( o_list.folders == null )
-		o_list.folders = [];
-	if( i_path == null )
-		i_path = '';
-
-//window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
-	if( i_walk.folders )
-		for( var folder in i_walk.folders)
-		{
-			path = i_path + '/' + folder;
-			walk = i_walk.folders[folder];
-			if( walk.files && walk.files.length)
-				o_list.folders.push( path);
-			a_WalkDir( walk, o_list, path);
-		}
 }
 
 function a_ShowSequence( i_element, i_path, i_title)
@@ -227,6 +207,36 @@ function a_ShowBody()
 //window.console.log( JSON.stringify( folders));
 	}
 
+	if( ASSET.thumbnails && ( ASSET.thumbnails > 0 ))
+	{
+		var walk = n_WalkDir( ASSET.path, ASSET.thumbnails);
+		for( var scene in walk.folders)
+		{
+			if( scene.indexOf('.') == 0 ) continue;
+			var elScene = document.createElement('div');
+			u_el.asset.appendChild( elScene);
+			elScene.classList.add('scene');
+//			elScene.textContent = scene;
+			elScene.m_path = ASSET.path + '/' + scene;
+			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
+
+			for( var shot in walk.folders[scene].folders)
+			{
+				if( shot.indexOf('.') == 0 ) continue;
+				var elShot = document.createElement('div');
+				elScene.appendChild( elShot);
+				elShot.classList.add('shot');
+				elShot.textContent = shot;
+				elShot.m_path = elScene.m_path + '/' + shot;
+				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
+
+				var elImg = document.createElement('img');
+				elShot.appendChild( elImg);
+				elImg.src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
+			}
+		}
+	}
+
 	if( thumbnails.length )
 		c_MakeThumbnail( thumbnails, ASSET.path);
 }
@@ -237,6 +247,8 @@ function a_Create( i_type, i_name, i_path)
 	asset.name = i_name;
 	asset.path = i_path;
 	asset.type = i_type;
+
+	c_RulesMergeObjs( asset, RULES.assets[i_type]);
 
 	ASSETS[i_type] = asset;
 	ASSET = asset;
@@ -264,12 +276,13 @@ function a_AutoSeek()
 {
 	var folders = g_elCurFolder.m_path.split('/');
 	var path = '';
-	for( var i = 0; i < folders.length-1; i++ )
+	for( var i = 0; i < folders.length; i++ )
 	{
 		if(( folders[i].length == 0 ) && ( i != 0 )) continue;
 
-		var folder = folders[i+1];
-		if( folder == '' ) continue;
+		var nextfolder = null;
+		if( i < folders.length ) nextfolder = folders[i+1];
+		if( nextfolder == '' ) continue;
 
 		if( path == '/' )
 			path += folders[i];
@@ -280,25 +293,44 @@ function a_AutoSeek()
 		{
 			if( ASSETS[asset_type]) continue;
 //window.console.log( asset_type);
-			var apaths = RULES.assets[asset_type].seek;
-			if( apaths == null ) continue;
-			for( var l = 0; l < apaths.length; l++)
+			var seekpaths = RULES.assets[asset_type].seek;
+			if( seekpaths == null ) continue;
+			for( var l = 0; l < seekpaths.length; l++)
 			{
-				var apath = apaths[l].substr( 0, apaths[l].lastIndexOf('/'));
-				if( apath == '') apath = '/';
+				var subfolder = ( seekpaths[l].lastIndexOf('/') == (seekpaths[l].length-1))
+//window.console.log('seekpath-'+subfolder+'='+seekpaths[l]);
+				var seekpath = seekpaths[l];
+				if( subfolder )
+				{
+					if( nextfolder == null ) break;
+					seekpath = seekpaths[l].substr( 0, seekpaths[l].lastIndexOf('/'));
+				}
+
+				if( seekpath == '') seekpath = '/';
+
 				for( var a_type in ASSETS)
 				{
 					var a_name = ASSETS[a_type].name;
 					if( a_name == null ) continue;
-					apath = apath.replace('['+a_type+']', a_name);
+					seekpath = seekpath.replace('['+a_type+']', a_name);
 				}
+
+				var apath = path;
+				var aname = folders[i];
+				if( subfolder )
+					aname = nextfolder;
+//window.console.log('seekpath-'+subfolder+'='+seekpath);
 //window.console.log('apath='+apath);
-				if( path == apath )
+
+				if( apath == seekpath )
 				{
-					if( apath == '/' ) apath = '/' + folder;
-					else apath = apath + '/' + folder;
-					a_Create( asset_type, folder, apath);
-					c_Log('Asset founded: ' + asset_type + '=' + folder);
+					if( subfolder )
+					{
+						if( apath == '/' ) apath = '/' + nextfolder;
+						else apath = apath + '/' + nextfolder;
+					}
+					a_Create( asset_type, aname, apath);
+					c_Log('Asset founded: ' + asset_type + '=' + aname);
 					break;
 				}
 			}
@@ -313,11 +345,14 @@ function a_ShowHeaders()
 	for( var a_type in ASSETS)
 	{
 		var asset = ASSETS[a_type];
+//		if( RULES.assets[a_type].showontop === false ) continue;
 		var a_name = asset.name;
 
 		elHeader = document.createElement('div');
 		u_el.assets.appendChild( elHeader);
 		elHeader.classList.add('asset');
+		elHeader.m_path = asset.path;
+		elHeader.onclick = function(e){g_GO(e.currentTarget.m_path)};
 
 		elType = document.createElement('div');
 		elHeader.appendChild( elType);
@@ -346,7 +381,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 	{
 		var list = {};
 		var path = ASSET.path + '/' + ASSET.source.path[r];
-		a_WalkDir( n_WalkDir( path), list);
+		a_SourceWalkFind( n_WalkDir( path), list);
 		if( list.folders.length )
 		{
 			var elPath = document.createElement('div');
@@ -361,5 +396,24 @@ function a_OpenCloseSourceOnClick( i_evt)
 	}
 	if( false == founded )
 		elSource.textContent = JSON.stringify( ASSET.source.path);
+}
+
+function a_SourceWalkFind( i_walk, o_list, i_path)
+{
+	if( o_list.folders == null )
+		o_list.folders = [];
+	if( i_path == null )
+		i_path = '';
+
+//window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
+	if( i_walk.folders )
+		for( var folder in i_walk.folders)
+		{
+			path = i_path + '/' + folder;
+			walk = i_walk.folders[folder];
+			if( walk.files && walk.files.length)
+				o_list.folders.push( path);
+			a_SourceWalkFind( walk, o_list, path);
+		}
 }
 

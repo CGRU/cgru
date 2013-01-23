@@ -108,10 +108,9 @@ function listDir( $i_listdir, &$o_out)
 	$o_out['listdir'] = $out;
 }
 
-function walkDir( $i_path, &$o_out, $i_maxdepth, &$o_depth)
+function walkDir( $i_path, &$o_out, $i_maxdepth, $i_depth)
 {
-	if( $o_depth > $i_maxdepth ) return;
-	$o_depth++;
+	if( $i_depth > $i_maxdepth ) return;
 
 	$dir = $i_path;
 	$dir = str_replace('../','', $dir);
@@ -135,7 +134,7 @@ function walkDir( $i_path, &$o_out, $i_maxdepth, &$o_depth)
 			if( is_dir( $path))
 			{
 				$o_out['folders'][$entry] = array();
-				walkDir( $path, $o_out['folders'][$entry], $i_maxdepth, $o_depth);
+				walkDir( $path, $o_out['folders'][$entry], $i_maxdepth, $i_depth+1);
 			}
 			else
 				$o_out['files'][$numfile++] = $entry;
@@ -344,8 +343,7 @@ if( array_key_exists('listdir', $recv))
 else if( array_key_exists('walkdir', $recv))
 {
 	$walkdir = array();
-	$depth = 0;
-	walkDir( $recv['walkdir'], $walkdir, $recv['depth'], $depth);
+	walkDir( $recv['walkdir'], $walkdir, $recv['depth'], 0);
 	$out['walkdir'] = $walkdir;
 }
 else if( array_key_exists('readobj', $recv))

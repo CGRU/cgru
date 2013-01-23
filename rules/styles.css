@@ -184,7 +184,14 @@ height: 30px;
 margin: 0px 100px;
 padding: 0px 10px;
 }
-#assets .asset { float: left; margin: 1px 4px; padding: 5px 4px; }
+#assets .asset {
+cursor: pointer;
+float: left;
+border-radius: 8px;
+margin: 1px 4px;
+padding: 5px 4px;
+}
+#assets .asset:hover {box-shadow:0 0 6px rgba(0,0,0,.3) inset, 0 0 8px rgba(255,255,255,.5);/* background: rgba(200,255,255,.1);*/}
 #assets .asset .type { padding: 0px 4px; float: left; }
 #assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
 
@@ -228,6 +235,15 @@ margin: 0px 10px;
 font-size: 14px;
 }
 .sequences .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
+
+.scene {
+cursor: pointer;
+}
+.scene .shot {
+float: left;
+border-radius: 6px;
+box-shadow: 0 0 4px #000 inset;
+}
 
 .dailies div { margin: 4px; border-radius: 4px;}
 .dailies .label { float: left; text-transform: capitalize;}
