@@ -173,6 +173,7 @@ function a_ShowBody()
 		for( var f = 0; f < folders.length; f++ )
 		{
 			if( folders[f].name.indexOf('.') == 0 ) continue;
+			if( folders[f].name.indexOf('_') == 0 ) continue;
 
 			var elFolder = document.createElement('div');
 			u_el.asset.appendChild( elFolder);
@@ -213,6 +214,8 @@ function a_ShowBody()
 		for( var scene in walk.folders)
 		{
 			if( scene.indexOf('.') == 0 ) continue;
+			if( scene.indexOf('_') == 0 ) continue;
+
 			var elScene = document.createElement('div');
 			u_el.asset.appendChild( elScene);
 			elScene.classList.add('scene');
@@ -220,19 +223,30 @@ function a_ShowBody()
 			elScene.m_path = ASSET.path + '/' + scene;
 			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
 
+			var elName = document.createElement('div');
+			elScene.appendChild( elName);
+			elName.classList.add('name');
+			elName.textContent = scene;
+
 			for( var shot in walk.folders[scene].folders)
 			{
 				if( shot.indexOf('.') == 0 ) continue;
+				if( shot.indexOf('_') == 0 ) continue;
+
 				var elShot = document.createElement('div');
 				elScene.appendChild( elShot);
 				elShot.classList.add('shot');
-				elShot.textContent = shot;
 				elShot.m_path = elScene.m_path + '/' + shot;
 				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
 
 				var elImg = document.createElement('img');
 				elShot.appendChild( elImg);
 				elImg.src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
+
+				var elName = document.createElement('div');
+				elShot.appendChild( elName);
+				elName.classList.add('name');
+				elName.textContent = shot;
 			}
 		}
 	}
