@@ -65,9 +65,9 @@ bool DBTaskData::dbPrepareInsert( PGconn * i_conn)
 {
     PGresult * res = PQprepare( i_conn, ms_db_prepare_name,
     "INSERT INTO tasks"
-    " (id_job,id_block,id_task,name,command,files,dependmask,customdata,thumbnail)"
-    " VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9);",
-    9, NULL);
+    " (id_job,id_block,id_task,name,command,files,dependmask,customdata)"
+    " VALUES($1,$2,$3,$4,$5,$6,$7,$8);",
+    8, NULL);
     bool o_result = true;
     if( PQresultStatus(res) != PGRES_COMMAND_OK)
     {
@@ -95,7 +95,7 @@ bool DBTaskData::dbPrepareInsertExec( int id_job, int id_block, int id_task, PGc
     data_pointers[7] = m_custom_data.c_str();
 
     PGresult * res = PQexecPrepared( i_conn, ms_db_prepare_name,
-                                     9, data_pointers,
+                                     8, data_pointers,
                                      NULL, NULL, 0);
     bool o_result = true;
     if( PQresultStatus(res) != PGRES_COMMAND_OK)
