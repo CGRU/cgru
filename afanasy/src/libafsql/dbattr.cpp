@@ -93,7 +93,6 @@ void DBAttr::init()
    DBName[_time_register         ] = "time_register";
    DBName[_time_started          ] = "time_started";
    DBName[_time_wait             ] = "time_wait";
-   DBName[_thumbnail             ] = "thumbnail";
    DBName[_userlistorder         ] = "userlistorder";
    DBName[_username              ] = "username";
    DBName[_wdir                  ] = "wdir";

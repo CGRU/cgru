@@ -48,7 +48,6 @@ protected:
 	std::string m_files;       ///< Files.
 	std::string m_depend_mask;  ///< Dependences.
 	std::string m_custom_data;  ///< Some custom data.
-	std::string m_thumbnail;    ///< Thumbnail.
 
 protected:
 	/// Read or write task data.

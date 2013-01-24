@@ -105,7 +105,6 @@ public:
          _need_properties,
          _services_disabled,
          _tasksdependmask,
-         _thumbnail,
          _wdir,
       _STRINGEXPR_END_,
 
