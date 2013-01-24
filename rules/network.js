@@ -8,34 +8,19 @@ function n_ReadConfig()
 	return c_Parse( n_Request( request));
 }
 
-function n_ListDir( i_path, i_rufolder, i_rufiles, i_lookahead)
+function n_WalkDir( i_path, i_depth, i_rufolder, i_rufiles, i_lookahead)
 {
 	var path = i_path;
 	if( RULES.root )
 		path = RULES.root + path;
-
-	var request = {};
-	request.listdir = path;
-	if( i_rufolder ) request.rufolder = i_rufolder;
-	if( i_rufiles ) request.rufiles = i_rufiles;
-	if( i_lookahead ) request.lookahead = i_lookahead;
-	var data = n_Request( request);
-	var response = c_Parse( data);
-
-	if( response == null ) return null;
-	if( response.listdir == null ) return null;
-
-	return response.listdir;
-}
-
-function n_WalkDir( i_path, i_depth)
-{
-	var path = RULES.root + i_path;
-	if( i_depth == null ) i_depth = 9;
+	if( i_depth == null ) i_depth = 3;
 
 	var request = {};
 	request.walkdir = path;
 	request.depth = i_depth;
+	if( i_rufolder ) request.rufolder = i_rufolder;
+	if( i_rufiles ) request.rufiles = i_rufiles;
+	if( i_lookahead ) request.lookahead = i_lookahead;
 	var data = n_Request( request);
 	var response = c_Parse( data);
 

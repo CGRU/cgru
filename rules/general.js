@@ -16,7 +16,7 @@ function g_Init()
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 
-	c_RulesMergeDir( RULES_TOP, n_ListDir('.', RULES.rufolder, ['rules']));
+	c_RulesMergeDir( RULES_TOP, n_WalkDir('.', 0, RULES.rufolder, ['rules']));
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
@@ -151,7 +151,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 
 	if( g_elCurFolder.m_dir == null )
 	{
-		g_elCurFolder.m_dir = n_ListDir( i_path, RULES.rufolder, rufiles, ['status']);
+		g_elCurFolder.m_dir = n_WalkDir( i_path, 0, RULES.rufolder, rufiles, ['status']);
 		g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 	}
 	if( g_elCurFolder.m_dir == null )

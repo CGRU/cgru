@@ -1,53 +1,82 @@
 <?php
 
-function listDir( $i_listdir, &$o_out)
+function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 {
-	$out = array();
-	$dir = $i_listdir['listdir'];
+	if( $i_depth > $i_recv['depth'] ) return;
+
 	$rufolder = null;
-	if( array_key_exists('rufolder', $i_listdir))
-		$rufolder = $i_listdir['rufolder'];
+	if( array_key_exists('rufolder', $i_recv))
+		$rufolder = $i_recv['rufolder'];
 	$rufiles = null;
-	if( array_key_exists('rufiles', $i_listdir))
-		$rufiles = $i_listdir['rufiles'];
+	if( array_key_exists('rufiles', $i_recv))
+		$rufiles = $i_recv['rufiles'];
 	$lookahead = null;
-	if( array_key_exists('lookahead', $i_listdir))
-		$lookahead = $i_listdir['lookahead'];
-	$out['dir'] = $dir;
+	if( array_key_exists('lookahead', $i_recv))
+		$lookahead = $i_recv['lookahead'];
 
-	$dir = str_replace('../','', $dir);
-	$dir = str_replace('/..','', $dir);
-	$dir = str_replace('..','', $dir);
-
-	if( false == is_dir( $dir))
+	if( false == is_dir( $i_dir))
 	{
-		$out['error'] = 'No such folder.';
+		$o_out['error'] = 'No such folder.';
 	}
-	else if( $handle = opendir( $dir))
+	else if( $handle = opendir( $i_dir))
 	{
-		$out['folders'] = array();
-		$out['files'] = array();
-		$out['rufiles'] = array();
-		$out['rules'] = array();
-		$numdir = 0;
-		$numfile = 0;
+		$o_out['folders'] = array();
+		$o_out['files'] = array();
+
 		while (false !== ( $entry = readdir( $handle)))
 		{
 			if( $entry == '.') continue;
 			if( $entry == '..') continue;
-			$path = $dir.'/'.$entry;
+			$path = $i_dir.'/'.$entry;
 			if( false == is_dir( $path))
 			{
-				$out['files'][$numfile++] = $entry;
+				array_push( $o_out['files'], $entry);
 				continue;
 			}
 
-			if( is_null($lookahead) || ( false == is_array($lookahead)))
-				$out['folders'][$numdir++] = $entry;
-			else if( $rufolder)
+			if( $entry == $rufolder )
 			{
-				$folder = array();
-				$folder['name'] = $entry;
+				$o_out['rufiles'] = array();
+				$o_out['rules'] = array();
+
+				if( $rHandle = opendir( $path))
+				{
+					while (false !== ( $ruentry = readdir( $rHandle)))
+					{
+						if( $ruentry == '.') continue;
+						if( $ruentry == '..') continue;
+
+						array_push( $o_out['rufiles'], $ruentry);
+
+						if( strrpos( $ruentry,'.json') === false ) continue;
+
+						$founded = false;
+						foreach( $rufiles as $rufile )
+							if( strpos( $ruentry, $rufile ) === 0 )
+							{
+								$founded = true;
+								break;
+							}
+						if( false == $founded ) continue;
+
+						if( $fHandle = fopen( $path.'/'.$ruentry, 'r'))
+						{
+							$rudata = fread( $fHandle, 1000000);
+							$ruobj = json_decode( $rudata, true);
+							$o_out['rules'][$ruentry] = $ruobj;
+							fclose($fHandle);
+						}
+					}
+					closedir($rHandle);
+					sort( $o_out['rufiles']);
+					ksort($o_out['rules']);
+				}
+			}
+
+			$folderObj = array();
+			$folderObj['name'] = $entry;
+
+			if( $rufolder && $lookahead )
 				foreach( $lookahead as $sfile )
 				{
 					$sfilepath = $path.'/'.$rufolder.'/'.$sfile.'.json';
@@ -57,90 +86,19 @@ function listDir( $i_listdir, &$o_out)
 						{
 							$data = fread( $fHandle, 1000000);
 							fclose( $fHandle);
-							mergeObjs( $folder, json_decode( $data, true));
+							mergeObjs( $folderObj, json_decode( $data, true));
 						}
 					}
 				}
-				$out['folders'][$numdir++] = $folder;
-			}
 
-			if( is_null( $rufolder)) continue;
-			if( $entry != $rufolder ) continue;
+			if( $i_depth < $i_recv['depth'] )
+				walkDir( $i_recv, $path, &$folderObj, $i_depth+1);
 
-			$numrufile = 0;
-			if( $rHandle = opendir( $path))
-			{
-				while (false !== ( $entry = readdir( $rHandle)))
-				{
-					if( $entry == '.') continue;
-					if( $entry == '..') continue;
-					$out['rufiles'][$numrufile++] = $entry;
+			array_push( $o_out['folders'], $folderObj);
 
-					if( strrpos( $entry,'.json') === false ) continue;
-
-					$founded = false;
-					foreach( $rufiles as $rufile )
-						if( strpos( $entry, $rufile ) === 0 )
-						{
-							$founded = true;
-							break;
-						}
-					if( false == $founded ) continue;
-
-					if( $fHandle = fopen( $path.'/'.$entry, 'r'))
-					{
-						$rudata = fread( $fHandle, 1000000);
-						$ruobj = json_decode( $rudata, true);
-						$out['rules'][$entry] = $ruobj;
-						fclose($fHandle);
-					}
-				}
-				closedir($rHandle);
-				ksort($out['rules']);
-			}
 		}
 		closedir($handle);
-		sort( $out['folders']);
-		sort( $out['files']);
-		sort( $out['rufiles']);
-	}
-
-	$o_out['listdir'] = $out;
-}
-
-function walkDir( $i_path, &$o_out, $i_maxdepth, $i_depth)
-{
-	if( $i_depth > $i_maxdepth ) return;
-
-	$dir = $i_path;
-	$dir = str_replace('../','', $dir);
-	$dir = str_replace('/..','', $dir);
-	$dir = str_replace('..','', $dir);
-
-	if( false == is_dir( $dir))
-	{
-		$o_out['error'] = 'No such folder.';
-	}
-	else if( $handle = opendir( $dir))
-	{
-		$o_out['folders'] = array();
-		$o_out['files'] = array();
-		$numfile = 0;
-		while (false !== ( $entry = readdir( $handle)))
-		{
-			if( $entry == '.') continue;
-			if( $entry == '..') continue;
-			$path = $dir.'/'.$entry;
-			if( is_dir( $path))
-			{
-				$o_out['folders'][$entry] = array();
-				walkDir( $path, $o_out['folders'][$entry], $i_maxdepth, $i_depth+1);
-			}
-			else
-				$o_out['files'][$numfile++] = $entry;
-		}
-		closedir($handle);
-		ksort( $o_out['folders']);
+		sort( $o_out['folders']);
 		sort( $o_out['files']);
 	}
 }
@@ -336,14 +294,14 @@ function afanasy( $i_obj, &$o_out)
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
-if( array_key_exists('listdir', $recv))
+if( array_key_exists('walkdir', $recv))
 {
-	listDir($recv, $out);
-}
-else if( array_key_exists('walkdir', $recv))
-{
+	$dir = $recv['walkdir'];
+	$dir = str_replace('../','', $dir);
+	$dir = str_replace('/..','', $dir);
+	$dir = str_replace('..','', $dir);
 	$walkdir = array();
-	walkDir( $recv['walkdir'], $walkdir, $recv['depth'], 0);
+	walkDir( $recv, $dir, $walkdir, 0);
 	$out['walkdir'] = $walkdir;
 }
 else if( array_key_exists('readobj', $recv))

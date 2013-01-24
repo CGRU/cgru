@@ -96,7 +96,7 @@ function a_ShowBody()
 		for( var r = 0; r < ASSET.result.path.length; r++)
 		{
 			var path = ASSET.path + '/' + ASSET.result.path[r];
-			var readdir = n_ListDir( path);
+			var readdir = n_WalkDir( path, 0);
 			if( readdir == null ) continue;
 			var folders = readdir.folders;
 			if( folders == null ) continue;
@@ -113,8 +113,8 @@ function a_ShowBody()
 
 			for( var f = 0; f < folders.length; f++)
 			{
-				var folder = path + '/' + folders[f];
-				a_ShowSequence( elResult, folder);
+				var fname = path + '/' + folders[f].name;
+				a_ShowSequence( elResult, fname);
 				founded = true;
 			}
 		}
@@ -132,7 +132,7 @@ function a_ShowBody()
 		for( var d = 0; d < ASSET.dailies.length; d++)
 		{
 			var path = ASSET.path + '/' + ASSET.dailies[d];
-			var readdir = n_ListDir( path);
+			var readdir = n_WalkDir( path, 0);
 			if( readdir == null ) continue;
 			var files = readdir.files;
 			if( files == null ) continue;
@@ -211,8 +211,9 @@ function a_ShowBody()
 	if( ASSET.thumbnails && ( ASSET.thumbnails > 0 ))
 	{
 		var walk = n_WalkDir( ASSET.path, ASSET.thumbnails);
-		for( var scene in walk.folders)
+		for( var sc = 0; sc < walk.folders.length; sc++)
 		{
+			var scene = walk.folders[sc].name;
 			if( scene.indexOf('.') == 0 ) continue;
 			if( scene.indexOf('_') == 0 ) continue;
 
@@ -228,8 +229,9 @@ function a_ShowBody()
 			elName.classList.add('name');
 			elName.textContent = scene;
 
-			for( var shot in walk.folders[scene].folders)
+			for( var s = 0; s < walk.folders[sc].folders.length; s++)
 			{
+				var shot = walk.folders[sc].folders[s].name;
 				if( shot.indexOf('.') == 0 ) continue;
 				if( shot.indexOf('_') == 0 ) continue;
 
@@ -393,17 +395,18 @@ function a_OpenCloseSourceOnClick( i_evt)
 	var founded = false;
 	for( var r = 0; r < ASSET.source.path.length; r++)
 	{
-		var list = {};
 		var path = ASSET.path + '/' + ASSET.source.path[r];
-		a_SourceWalkFind( n_WalkDir( path), list);
-		if( list.folders.length )
+		var flist = [];
+		a_SourceWalkFind( n_WalkDir( path, 5), flist);
+		if( flist.length )
 		{
 			var elPath = document.createElement('div');
 			elSource.appendChild( elPath);
 			elPath.textContent = ASSET.source.path[r];
-			for( var f = 0; f < list.folders.length; f++)
+			for( var f = 0; f < flist.length; f++)
 			{
-				a_ShowSequence( elSource, path + list.folders[f], list.folders[f]);
+				var fname = flist[f];
+				a_ShowSequence( elSource, path + fname, fname);
 				founded = true;
 			}
 		}
@@ -414,20 +417,19 @@ function a_OpenCloseSourceOnClick( i_evt)
 
 function a_SourceWalkFind( i_walk, o_list, i_path)
 {
-	if( o_list.folders == null )
-		o_list.folders = [];
 	if( i_path == null )
 		i_path = '';
 
 //window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
 	if( i_walk.folders )
-		for( var folder in i_walk.folders)
+		for( var f = 0; f < i_walk.folders.length; f++)
 		{
-			path = i_path + '/' + folder;
-			walk = i_walk.folders[folder];
-			if( walk.files && walk.files.length)
-				o_list.folders.push( path);
-			a_SourceWalkFind( walk, o_list, path);
+			var fobj = i_walk.folders[f];
+			path = i_path + '/' + fobj.name;
+			if( fobj.files && fobj.files.length)
+				o_list.push( path);
+			if( fobj.walkdir )
+				a_SourceWalkFind( fobj, o_list, path);
 		}
 }
 
