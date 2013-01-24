@@ -176,7 +176,6 @@ void TaskExec::readwrite( Msg * msg)
 		rw_int64_t ( m_file_size_max,     msg);
 
 		rw_StringList( m_multihost_names, msg);
-	break;
 
 	case Msg::TRendersList:
 		rw_String  ( m_service,           msg);
