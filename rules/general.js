@@ -16,7 +16,7 @@ function g_Init()
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 
-	c_RulesMergeDir( RULES_TOP, n_WalkDir('.', 0, RULES.rufolder, ['rules']));
+	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 
 	if( RULES_TOP.cgru_config )
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
@@ -90,19 +90,31 @@ function g_Navigate( i_path)
 
 	folders = i_path.split('/');
 //window.console.log( folders);
+	var walk = {};
+	walk.paths = [];
+	walk.folders = [];
 	var path = '';
 	for( var i = 0; i < folders.length; i++ )
 	{
 		if(( folders[i].length == 0 ) && ( i != 0 )) continue;
-
 		if( path == '/' )
 			path += folders[i];
 		else
 			path += '/' + folders[i];
+		walk.folders.push( folders[i]);
+		walk.paths.push( path);
+	}
 
-//		RULES.status = null;
+//	var rufiles = ['rules'];
+//	if( i_last )
+//		rufiles.push('status');
 
-		if( false == g_Goto( folders[i], path, i == (folders.length-1)))
+	walk.walks = n_WalkDir( walk.paths, 0, RULES.rufolder, ['rules','status'], ['status']);
+
+	for( var i = 0; i < walk.paths.length; i++ )
+	{
+		RULES.status = null;
+		if( false == g_Goto( walk.folders[i], walk.paths[i], walk.walks[i], i == (walk.paths.length-1)))
 			break;
 	}
 
@@ -118,9 +130,15 @@ function g_Navigate( i_path)
 	u_Process();
 }
 
-function g_Goto( i_folder, i_path, i_last)
+function g_Goto( i_folder, i_path, i_walk, i_last)
 {
 	c_Log('Goto "'+i_folder+'"'+(i_last?'*':''));
+
+	if( i_walk.error )
+	{
+		c_Error( i_walk.error);
+		return false;
+	}
 //window.console.log('Goto='+i_folder);
 /*
 window.console.log('Current='+g_elCurFolder.m_folder);
@@ -145,17 +163,8 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 //			return false;
 	}
 
-	var rufiles = ['rules'];
-	if( i_last )
-		rufiles.push('status');
-
-	if( g_elCurFolder.m_dir == null )
-	{
-		g_elCurFolder.m_dir = n_WalkDir( i_path, 0, RULES.rufolder, rufiles, ['status']);
-		g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
-	}
-	if( g_elCurFolder.m_dir == null )
-		return false;
+	g_elCurFolder.m_dir = i_walk;
+	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
 
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);

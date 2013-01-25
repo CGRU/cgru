@@ -63,7 +63,7 @@ function a_ShowSequence( i_element, i_path, i_title)
 		elMakeDailies.textContent = 'Make Dailies';
 		elMakeDailies.m_path = i_path;
 		elMakeDailies.onclick = function(e){
-			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies[0])};
+			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
 	}
 }
 
@@ -86,6 +86,28 @@ function a_ShowBody()
 		elSource.onclick = a_OpenCloseSourceOnClick;
 	}
 
+	var walk = {};
+	walk.paths = [];
+	if( ASSET.result )
+	{
+		walk.result = [];
+		for( var r = 0; r < ASSET.result.path.length; r++)
+		{
+			walk.result.push( walk.paths.length);
+			walk.paths.push( ASSET.path + '/' + ASSET.result.path[r]);
+		}
+	}
+	if( ASSET.dailies )
+	{
+		walk.dailies = [];
+		for( var r = 0; r < ASSET.dailies.path.length; r++)
+		{
+			walk.dailies.push( walk.paths.length);
+			walk.paths.push( ASSET.path + '/' + ASSET.dailies.path[r]);
+		}
+	}
+	walk.walks = n_WalkDir( walk.paths, 0);
+
 	if( ASSET.result )
 	{
 		var elResult = document.createElement('div');
@@ -93,18 +115,16 @@ function a_ShowBody()
 		elResult.classList.add('sequences');
 
 		var founded = false;
-		for( var r = 0; r < ASSET.result.path.length; r++)
+		for( var i = 0; i < walk.result.length; i++)
 		{
-			var path = ASSET.path + '/' + ASSET.result.path[r];
-			var readdir = n_WalkDir( path, 0);
-			if( readdir == null ) continue;
-			var folders = readdir.folders;
+			var folders = walk.walks[walk.result[i]].folders;
+			var path = walk.paths[walk.result[i]];
 			if( folders == null ) continue;
 			if( folders.length )
 			{
 				var elPath = document.createElement('div');
 				elResult.appendChild( elPath);
-				elPath.textContent = ASSET.result.path[r];
+				elPath.textContent = ASSET.result.path[i];
 			}
 			else
 				continue;
@@ -129,18 +149,16 @@ function a_ShowBody()
 		u_el.asset.appendChild( elDailies);
 
 		var founded = false;
-		for( var d = 0; d < ASSET.dailies.length; d++)
+		for( var i = 0; i < walk.dailies.length; i++)
 		{
-			var path = ASSET.path + '/' + ASSET.dailies[d];
-			var readdir = n_WalkDir( path, 0);
-			if( readdir == null ) continue;
-			var files = readdir.files;
+			var path = walk.paths[walk.dailies[i]];
+			var files = walk.walks[walk.dailies[i]].files;
 			if( files == null ) continue;
 			if( files.length )
 			{
 				elPath = document.createElement('div');
 				elDailies.appendChild( elPath);
-				elPath.textContent = ASSET.dailies[d];
+				elPath.textContent = ASSET.dailies.path[i];
 			}
 			else
 				continue;
@@ -210,35 +228,43 @@ function a_ShowBody()
 
 	if( ASSET.thumbnails && ( ASSET.thumbnails > 0 ))
 	{
-		var walk = n_WalkDir( ASSET.path, ASSET.thumbnails);
+		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
 		for( var sc = 0; sc < walk.folders.length; sc++)
 		{
-			var scene = walk.folders[sc].name;
-			if( scene.indexOf('.') == 0 ) continue;
-			if( scene.indexOf('_') == 0 ) continue;
+			var fobj = walk.folders[sc];
+			if( fobj.name.indexOf('.') == 0 ) continue;
+			if( fobj.name.indexOf('_') == 0 ) continue;
 
 			var elScene = document.createElement('div');
 			u_el.asset.appendChild( elScene);
 			elScene.classList.add('scene');
-//			elScene.textContent = scene;
-			elScene.m_path = ASSET.path + '/' + scene;
+			elScene.m_path = ASSET.path + '/' + fobj.name;
 			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
 
 			var elName = document.createElement('div');
 			elScene.appendChild( elName);
 			elName.classList.add('name');
-			elName.textContent = scene;
+			elName.textContent = fobj.name;
+
+			var elStatus = document.createElement('div');
+			elScene.appendChild( elStatus);
+			elStatus.classList.add('status');
+//window.console.log(JSON.stringify(fobj));
+			if( fobj.status )
+			{
+				elStatus.textContent = fobj.status.annotation;
+			}
 
 			for( var s = 0; s < walk.folders[sc].folders.length; s++)
 			{
-				var shot = walk.folders[sc].folders[s].name;
-				if( shot.indexOf('.') == 0 ) continue;
-				if( shot.indexOf('_') == 0 ) continue;
+				var fobj = walk.folders[sc].folders[s];
+				if( fobj.name.indexOf('.') == 0 ) continue;
+				if( fobj.name.indexOf('_') == 0 ) continue;
 
 				var elShot = document.createElement('div');
 				elScene.appendChild( elShot);
 				elShot.classList.add('shot');
-				elShot.m_path = elScene.m_path + '/' + shot;
+				elShot.m_path = elScene.m_path + '/' + fobj.name;
 				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
 
 				var elImg = document.createElement('img');
@@ -248,7 +274,17 @@ function a_ShowBody()
 				var elName = document.createElement('div');
 				elShot.appendChild( elName);
 				elName.classList.add('name');
-				elName.textContent = shot;
+				elName.textContent = fobj.name;
+
+				var elStatus = document.createElement('div');
+				elShot.appendChild( elStatus);
+				elStatus.classList.add('status');
+//window.console.log(JSON.stringify(fobj));
+				if( fobj.status )
+				{
+					elStatus.textContent = fobj.status.annotation;
+					u_StatusSetColor( fobj.status.color, elShot);
+				}
 			}
 		}
 	}
@@ -393,16 +429,19 @@ function a_OpenCloseSourceOnClick( i_evt)
 	elSource.classList.remove('button');
 
 	var founded = false;
-	for( var r = 0; r < ASSET.source.path.length; r++)
+	var paths = [];
+	for( var i = 0; i < ASSET.source.path.length; i++)
+		paths.push( ASSET.path + '/' + ASSET.source.path[i]);
+	var walkdir = n_WalkDir( paths, 5);
+	for( var i = 0; i < walkdir.length; i++)
 	{
-		var path = ASSET.path + '/' + ASSET.source.path[r];
 		var flist = [];
-		a_SourceWalkFind( n_WalkDir( path, 5), flist);
+		a_SourceWalkFind( walkdir[i], flist);
 		if( flist.length )
 		{
 			var elPath = document.createElement('div');
 			elSource.appendChild( elPath);
-			elPath.textContent = ASSET.source.path[r];
+			elPath.textContent = ASSET.source.path[i];
 			for( var f = 0; f < flist.length; f++)
 			{
 				var fname = flist[f];

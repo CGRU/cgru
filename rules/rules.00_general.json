@@ -26,7 +26,9 @@
 		"path":["RESULT/DPX","RESULT/JPG"],
 		"cmdexec":"play_sequence"
 	},
-	"dailies":["RESULT/DAILIES"]
+	"dailies":{
+		"path":["RESULT/DAILIES"]
+	}
 }
 },
 

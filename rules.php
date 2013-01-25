@@ -296,13 +296,16 @@ $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
 if( array_key_exists('walkdir', $recv))
 {
-	$dir = $recv['walkdir'];
-	$dir = str_replace('../','', $dir);
-	$dir = str_replace('/..','', $dir);
-	$dir = str_replace('..','', $dir);
-	$walkdir = array();
-	walkDir( $recv, $dir, $walkdir, 0);
-	$out['walkdir'] = $walkdir;
+	$out['walkdir'] = array();
+	foreach( $recv['walkdir'] as $dir)
+	{
+		$dir = str_replace('../','', $dir);
+		$dir = str_replace('/..','', $dir);
+		$dir = str_replace('..','', $dir);
+		$walkdir = array();
+		walkDir( $recv, $dir, $walkdir, 0);
+		array_push( $out['walkdir'], $walkdir);
+	}
 }
 else if( array_key_exists('readobj', $recv))
 {

@@ -8,15 +8,25 @@ function n_ReadConfig()
 	return c_Parse( n_Request( request));
 }
 
-function n_WalkDir( i_path, i_depth, i_rufolder, i_rufiles, i_lookahead)
+function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 {
-	var path = i_path;
-	if( RULES.root )
-		path = RULES.root + path;
+	if( typeof( i_paths) != 'object')
+	{
+		c_Error('PATH "'+i_paths+'" not on object.');
+		return null;
+	}
+
 	if( i_depth == null ) i_depth = 3;
 
+	var paths = [];
+	for( var i = 0; i < i_paths.length; i++)
+		if( RULES.root )
+			paths.push( RULES.root + i_paths[i]);
+		else
+			paths.push( i_paths[i]);
+
 	var request = {};
-	request.walkdir = path;
+	request.walkdir = paths;
 	request.depth = i_depth;
 	if( i_rufolder ) request.rufolder = i_rufolder;
 	if( i_rufiles ) request.rufiles = i_rufiles;
