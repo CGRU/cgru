@@ -182,7 +182,7 @@ function a_ShowBody()
 		}
 
 		if( false == founded )
-			elDailies.textContent = JSON.stringify( ASSET.dailies );
+			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
 	if( ASSET.statuses )
@@ -213,15 +213,11 @@ function a_ShowBody()
 
 			var elStatus = document.createElement('div');
 			elFolder.appendChild( elStatus);
+			u_StatusSetElLabel( elStatus, folders[f].status);
 
 			if( folders[f].status )
-			{
-				if( folders[f].status.annotation )
-					elStatus.innerHTML = folders[f].status.annotation;
-
 				if( folders[f].status.color )
-					u_StatusSetColor( folders[f].status.color, elFolder);
-			}
+					u_StatusSetColor( folders[f].status, elFolder);
 		}
 //window.console.log( JSON.stringify( folders));
 	}
@@ -250,10 +246,9 @@ function a_ShowBody()
 			elScene.appendChild( elStatus);
 			elStatus.classList.add('status');
 //window.console.log(JSON.stringify(fobj));
+			u_StatusSetElLabel( elStatus, fobj.status);
 			if( fobj.status )
-			{
-				elStatus.textContent = fobj.status.annotation;
-			}
+				u_StatusSetColor( fobj.status, elScene);
 
 			for( var s = 0; s < walk.folders[sc].folders.length; s++)
 			{
@@ -279,12 +274,10 @@ function a_ShowBody()
 				var elStatus = document.createElement('div');
 				elShot.appendChild( elStatus);
 				elStatus.classList.add('status');
+				u_StatusSetElLabel( elStatus, fobj.status);
 //window.console.log(JSON.stringify(fobj));
 				if( fobj.status )
-				{
-					elStatus.textContent = fobj.status.annotation;
-					u_StatusSetColor( fobj.status.color, elShot);
-				}
+					u_StatusSetColor( fobj.status, elShot);
 			}
 		}
 	}

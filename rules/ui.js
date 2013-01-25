@@ -28,21 +28,28 @@ function u_Process()
 	else
 		u_el.status.innerHTML = '';
 	
-	if( RULES.status )
-		u_StatusSetColor( RULES.status.color );
-	else
-		u_StatusSetColor();
+	u_StatusSetColor( RULES.status );
 
 	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
 //	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>RULES='+JSON.stringify( RULES);
 }
-function u_StatusSetColor( c, i_elB, i_elC)
+function u_StatusSetElLabel( i_el, i_status)
+{
+	if( i_status && i_status.annotation)
+	{
+		i_el.innerHTML = i_status.annotation.split(' ')[0];
+	}
+	else
+		i_el.textContent = '';
+}
+function u_StatusSetColor( i_status, i_elB, i_elC)
 {
 	if( i_elB == null ) i_elB = u_el.content_status.parentNode;
 	if( i_elC == null ) i_elC = i_elB;
 
-	if( c )
+	if( i_status &&  i_status.color)
 	{
+		var c = i_status.color;
 		i_elB.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
 		if( c[0]+c[1]+c[2] > 200 )
 			i_elC.style.color = '#000';
@@ -135,19 +142,27 @@ function u_StatusEditOnClick()
 	if( u_el.status.m_editing )
 		return;
 
-	var text = '';
-	var color = null;
+//	var text = '';
+//	var color = null;
+u_el.status.m_status = {};
+u_el.status.m_status.annotation = '';
+u_el.status.m_status.color = null;
 	if( RULES.status )
 	{
-		text = RULES.status.annotation;
-		color = RULES.status.color;
+//		text = RULES.status.annotation;
+//		color = RULES.status.color;
+		if( RULES.status.annotation ) u_el.status.m_status.annotation = RULES.status.annotation;
+		if( RULES.status.color ) u_el.status.m_status.color = RULES.status.color;
 	}
+	RULES.status = {};
+	RULES.status.annotation = u_el.status.m_status.annotation;
+	RULES.status.color = u_el.status.m_status.color;
 
 	u_el.content_status.classList.add('opened');
-	u_el.status.m_text = text;
-	u_el.status.m_color_saved = color;
-	u_el.status.m_color = color;
-	u_el.status.textContent = text;
+//	u_el.status.m_text = text;
+//	u_el.status.m_color_saved = color;
+//	u_el.status.m_color = color;
+	u_el.status.textContent = u_el.status.m_status.annotation;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
 
@@ -214,18 +229,19 @@ function u_StatusEditOnClick()
 function u_StatusColorOnClick( i_evt)
 {
 	var el = i_evt.currentTarget;
-	u_el.status.m_color = el.m_color;
-	u_StatusSetColor( el.m_color);
+	u_el.status.m_status.color = el.m_color;
+	u_StatusSetColor( u_el.status.m_status);
 }
 
 function u_StatusCancelOnClick()
 {
-	u_el.status.innerHTML = u_el.status.m_text;
+	if( RULES.status )
+		u_el.status.innerHTML = RULES.status.annotation;
+	u_StatusSetColor( RULES.status);
 	u_el.status.classList.remove('editing');
 	u_el.content_status.classList.remove('opened');
 	u_el.status.m_editing = false;
-	u_el.status.m_color = null;
-	u_StatusSetColor( u_el.status.m_color_saved);
+//	u_el.status.m_color = null;
 	u_el.status.contentEditable = 'false';
 	document.getElementById('status_color').innerHTML = '';
 	document.getElementById('status_color').style.display  = 'none';
@@ -234,15 +250,16 @@ function u_StatusCancelOnClick()
 function u_StatusSaveOnClick()
 {
 	var text = u_el.status.innerHTML;
-	var color = u_el.status.m_color;
-	u_el.status.m_color_saved = color;
-
-	u_el.status.m_text = text;
-	u_StatusCancelOnClick();
+	var color = u_el.status.m_status.color;
 
 	RULES.status = {};
 	RULES.status.annotation = text;
 	RULES.status.color = color;
+//	u_el.status.m_color_saved = color;
+
+//	u_el.status.m_text = text;
+	u_StatusCancelOnClick();
+
 //return;
 	g_FolderSetStatus( RULES.status);
 
