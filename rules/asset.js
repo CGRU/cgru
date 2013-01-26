@@ -438,7 +438,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 			for( var f = 0; f < flist.length; f++)
 			{
 				var fname = flist[f];
-				a_ShowSequence( elSource, path + fname, fname);
+				a_ShowSequence( elSource, paths[i]+'/'+fname, fname);
 				founded = true;
 			}
 		}
@@ -449,15 +449,17 @@ function a_OpenCloseSourceOnClick( i_evt)
 
 function a_SourceWalkFind( i_walk, o_list, i_path)
 {
-	if( i_path == null )
-		i_path = '';
+//	if( i_path == null )
+//		i_path = '';
 
 //window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
 	if( i_walk.folders )
 		for( var f = 0; f < i_walk.folders.length; f++)
 		{
 			var fobj = i_walk.folders[f];
-			path = i_path + '/' + fobj.name;
+			var path = i_path;
+			if( path ) path += '/' + fobj.name;
+			else path = fobj.name;
 			if( fobj.files && fobj.files.length)
 				o_list.push( path);
 			if( fobj.walkdir )

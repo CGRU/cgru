@@ -7,6 +7,7 @@
 <link type="text/css" rel="stylesheet" href="rules/styles.css">
 <script type="text/javascript" src="lib/cgru.js"></script>
 <script type="text/javascript" src="rules/asset.js"></script>
+<script type="text/javascript" src="rules/comments.js"></script>
 <script type="text/javascript" src="rules/common.js"></script>
 <script type="text/javascript" src="rules/dailies.js"></script>
 <script type="text/javascript" src="rules/general.js"></script>
@@ -35,6 +36,13 @@
 		</div-->
 	</div>
 	<div id="asset"></div>
+	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
+		<div>
+			<div class="button" style="float:left" onclick="cm_OpenOnClick()">Comments</div>
+			<div class="button" style="float:right" onclick="cm_NewOnClick()">New Comment</div>
+		</div>
+		<div id="comments" style="/*display:none*/"></div>
+	</div>
 	<div>
 		<div id="rules_button" class="button" onclick="u_RulesOnClick()">CG-RULES</div>
 		<div id="rules" style="display:none"></div>

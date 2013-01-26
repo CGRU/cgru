@@ -242,8 +242,8 @@ function g_FolderSetStatus( i_status, i_elFolder)
 	if( i_elFolder == null ) i_elFolder = g_elCurFolder;
 
 	i_elFolder.m_fobject.status = i_status;
-	if( i_elFolder.m_dir )
-		i_elFolder.m_dir.rules['status.json'] = {"status":i_status};
+//	if( i_elFolder.m_dir )
+//		i_elFolder.m_dir.rules['status.json'] = {"status":i_status};
 
 	u_StatusSetElLabel( i_elFolder.m_elStatus, i_status);
 	u_StatusSetColor( i_status, i_elFolder.m_elColor, i_elFolder);

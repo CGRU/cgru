@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle',
+u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle','comments',
 	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
@@ -41,6 +41,8 @@ function u_StatusSetElLabel( i_el, i_status)
 	}
 	else
 		i_el.textContent = '';
+
+	cm_Process();
 }
 function u_StatusSetColor( i_status, i_elB, i_elC)
 {
@@ -69,6 +71,8 @@ function u_Finish()
 	u_StatusCancelOnClick();
 	u_el.status.textContent = '';
 	u_StatusSetColor();
+
+	cm_Finish();
 }
 
 function u_OpenCloseHeaderFooter( i_elBtn, i_id, i_pos)
