@@ -37,8 +37,12 @@
 	</div>
 	<div id="asset"></div>
 	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
+		<div class="button" id="files_btn" onclick="u_FilesOnClick()"=>Files</div>
+		<div id="files"></div>
+	</div>
+	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">
 		<div>
-			<div class="button" style="float:left" onclick="cm_OpenOnClick()">Comments</div>
+			<div class="button" style="float:left" id="comments_open_btn" onclick="cm_OpenOnClick()">Comments</div>
 			<div class="button" style="float:right" onclick="cm_NewOnClick()">New Comment</div>
 		</div>
 		<div id="comments" style="/*display:none*/"></div>

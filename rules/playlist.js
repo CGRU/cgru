@@ -91,7 +91,10 @@ function p_FolderOnClick( i_evt)
 	var el = i_evt.currentTarget;
 //window.console.log('fclick: '+el.m_id)
 	p_elCurFolder = el;
-	p_SetCurItem( p_elCurFolder);
+	if( p_elCurItem == el)
+		p_FolderOnDblClick( i_evt);
+	else
+		p_SetCurItem( p_elCurFolder);
 }
 function p_FolderOnDblClick( i_evt)
 {
@@ -245,7 +248,7 @@ function p_CreateFolder( i_obj, i_elParent)
 	var el = p_CreateElement( i_obj, i_elParent);
 	el.classList.add('folder');
 	el.onclick = p_FolderOnClick;
-	el.ondblclick = p_FolderOnDblClick;
+//	el.ondblclick = p_FolderOnDblClick;
 	return el;
 }
 function p_CreateLink( i_obj, i_elParent)

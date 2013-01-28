@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle','comments',
+u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle','comments','files',
 	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
@@ -21,7 +21,16 @@ function u_OpenCloseFooter(){u_OpenCloseHeaderFooter(document.getElementById('fo
 
 function u_Process()
 {
-	u_el.thumbnail.setAttribute('src', RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/thumbnail.jpg');
+	if( g_elCurFolder.m_dir.rufiles && ( g_elCurFolder.m_dir.rufiles.indexOf( RULES.thumbnail.filename ) != -1 ))
+	{
+		u_el.thumbnail.setAttribute('src', RULES.root+g_elCurFolder.m_path+'/'+RULES.rufolder+'/'+RULES.thumbnail.filename);
+		u_el.thumbnail.style.display = 'inline';
+	}
+	else
+	{
+		u_el.thumbnail.setAttribute('src', null );
+		u_el.thumbnail.style.display = 'none';
+	}
 
 	if( RULES.status && RULES.status.annotation )
 		u_el.status.innerHTML = RULES.status.annotation;
@@ -32,6 +41,13 @@ function u_Process()
 
 	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
 //	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>RULES='+JSON.stringify( RULES);
+
+	if( ASSET.path == g_elCurFolder.m_path )
+		u_el.files.parentNode.style.display = 'none';
+	else
+		u_el.files.parentNode.style.display = 'block';
+
+	cm_Process();
 }
 function u_StatusSetElLabel( i_el, i_status)
 {
@@ -41,8 +57,6 @@ function u_StatusSetElLabel( i_el, i_status)
 	}
 	else
 		i_el.textContent = '';
-
-	cm_Process();
 }
 function u_StatusSetColor( i_status, i_elB, i_elC)
 {
@@ -66,10 +80,35 @@ function u_StatusSetColor( i_status, i_elB, i_elC)
 	}
 }
 
+function u_FilesOnClick( i_el)
+{
+	if( u_el.files.m_opened ) return;
+	u_el.files.m_opened = true;
+
+	document.getElementById('files_btn').classList.remove('button');
+
+	var files = g_elCurFolder.m_dir.files;
+	for( var i = 0; i < files.length; i++)
+	{
+		var el = document.createElement('div');
+		u_el.files.appendChild( el);
+
+		var elLink = document.createElement('a');
+		el.appendChild( elLink);
+		elLink.textContent = files[i];
+		elLink.href = RULES.root + g_elCurFolder.m_path + '/' + files[i];
+		elLink.target = '_blank';
+	}
+}
+
 function u_Finish()
 {
+	document.getElementById('files_btn').classList.add('button');
+	u_el.files.m_opened = false;
+
 	u_StatusCancelOnClick();
 	u_el.status.textContent = '';
+	u_el.files.textContent = '';
 	u_StatusSetColor();
 
 	cm_Finish();
@@ -146,15 +185,11 @@ function u_StatusEditOnClick()
 	if( u_el.status.m_editing )
 		return;
 
-//	var text = '';
-//	var color = null;
-u_el.status.m_status = {};
-u_el.status.m_status.annotation = '';
-u_el.status.m_status.color = null;
+	u_el.status.m_status = {};
+	u_el.status.m_status.annotation = '';
+	u_el.status.m_status.color = null;
 	if( RULES.status )
 	{
-//		text = RULES.status.annotation;
-//		color = RULES.status.color;
 		if( RULES.status.annotation ) u_el.status.m_status.annotation = RULES.status.annotation;
 		if( RULES.status.color ) u_el.status.m_status.color = RULES.status.color;
 	}
@@ -163,15 +198,21 @@ u_el.status.m_status.color = null;
 	RULES.status.color = u_el.status.m_status.color;
 
 	u_el.content_status.classList.add('opened');
-//	u_el.status.m_text = text;
-//	u_el.status.m_color_saved = color;
-//	u_el.status.m_color = color;
-	u_el.status.textContent = u_el.status.m_status.annotation;
+	u_el.status.innerHTML = u_el.status.m_status.annotation;
 	u_el.status.classList.add('editing');
 	u_el.status.m_editing = true;
 
 	elColor = document.getElementById('status_color');
 	elColor.style.display = 'block';
+	u_DrawColorBars( elColor, u_StatusColorOnClick);
+
+	u_el.status.contentEditable = 'true';
+	u_el.status.focus();
+}
+
+function u_DrawColorBars( i_el, i_onclick)
+{
+	i_el.classList.add('colorbars');
 	var ccol = 35;
 	var crow = 3;
 	var cstep = 5;
@@ -179,13 +220,13 @@ u_el.status.m_status.color = null;
 	for( var cr = 0; cr < crow; cr++)
 	{
 		elRaw = document.createElement('div');
-		elColor.appendChild( elRaw);
+		i_el.appendChild( elRaw);
 		for( var cc = 0; cc < ccol; cc++)
 		{
 			el = document.createElement('div');
 			elRaw.appendChild( el);
 			el.style.width = 100/ccol + '%';
-			el.onclick = u_StatusColorOnClick;
+			el.onclick = i_onclick;
 
 			var r = 0, g = 0, b = 0;
 			r = ( ( cc % cstep ) + 1 ) / ( cstep + 1 );
@@ -225,9 +266,6 @@ u_el.status.m_status.color = null;
 //window.console.log('rgb('+r+','+g+','+b+')');
 		}
 	}
-
-	u_el.status.contentEditable = 'true';
-	u_el.status.focus();
 }
 
 function u_StatusColorOnClick( i_evt)
@@ -245,7 +283,6 @@ function u_StatusCancelOnClick()
 	u_el.status.classList.remove('editing');
 	u_el.content_status.classList.remove('opened');
 	u_el.status.m_editing = false;
-//	u_el.status.m_color = null;
 	u_el.status.contentEditable = 'false';
 	document.getElementById('status_color').innerHTML = '';
 	document.getElementById('status_color').style.display  = 'none';
@@ -259,12 +296,9 @@ function u_StatusSaveOnClick()
 	RULES.status = {};
 	RULES.status.annotation = text;
 	RULES.status.color = color;
-//	u_el.status.m_color_saved = color;
 
-//	u_el.status.m_text = text;
 	u_StatusCancelOnClick();
 
-//return;
 	g_FolderSetStatus( RULES.status);
 
 	var obj = {};

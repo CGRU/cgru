@@ -106,7 +106,9 @@ function a_ShowBody()
 			walk.paths.push( ASSET.path + '/' + ASSET.dailies.path[r]);
 		}
 	}
-	walk.walks = n_WalkDir( walk.paths, 0);
+
+	if( walk.paths.length )
+		walk.walks = n_WalkDir( walk.paths, 0);
 
 	if( ASSET.result )
 	{
@@ -312,7 +314,7 @@ function a_Append( i_path, i_rules)
 			if( ASSETS[atype] ) continue;
 			if( attr != atype ) continue;
 			a_Create( atype, RULES[attr], i_path);
-			c_Log('Asset: ' + atype + '=' + asset.name);
+			c_Log('Asset: ' + atype + '=' + RULES[attr]);
 		}
 	}
 }

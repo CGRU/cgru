@@ -86,6 +86,9 @@ padding: 2px;
 
 .thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
 
+.colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
+.colorbars div div { height:20px;float:left;}
+
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
 #sidepanel #sidepanel_hide { display: none;}
@@ -137,9 +140,7 @@ padding: 4px;
 #content_status.opened .button.edit { display:none;}
 #content_status.opened .button.save { display:block;}
 #content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px; margin:2px;}
-#status_color { display: none; border-radius: 6px; margin: 2px; border: 1px solid #000;}
-#status_color div div { height:20px;float:left;}
-
+#status_color { display: none; }
 #navig .folder {
 position: relative;
 cursor: pointer;
@@ -268,6 +269,38 @@ margin: 4px 8px;
 border: 1px solid #000;
 box-shadow: 0 0 4px rgba(255,255,255,.7);
 opacity:.9;
+}
+
+.comment {
+box-shadow: 0 0 3px #000 inset, 0 0 3px #FFF;
+border-radius: 4px;
+margin: 4px;
+}
+.comment .text {
+box-shadow: 0 0 2px #000 inset, 0 0 2px #FFF;
+border-radius: 4px;
+padding: 4px;
+margin: 4px;
+margin-top: 0px;
+}
+.comment .panel { margin: 0px;}
+.comment .panel .info { font-size: 14px; padding: 2px 4px;}
+.comment .panel .button { font-size: 12px; float: right;}
+.comment .duration div { float: left; margin: 1px;}
+.comment .duration .sample {
+text-align: center;
+border: 1px solid rgba(0,0,0,.3);
+width: 20px;
+border-radius: 4px;
+cursor: pointer;
+}
+.comment .duration .sample:hover { border: 1px solid rgba(200,255,255,.3);}
+.comment .duration .editing {
+text-align: center;
+border: 1px solid rgba(200,255,255,.3);
+width: 30px;
+border-radius: 4px;
+box-shadow: 0 0 4px #000 inset;
 }
 
 .dailies div { margin: 4px; border-radius: 4px;}
