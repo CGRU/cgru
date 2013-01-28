@@ -98,8 +98,15 @@ if OutDir != '':
 Cmds = []
 Thumbnails = []
 cmd = 'convert'
+cmd += ' "%s"'
+ImgType = Images[0].rfind('.');
+if ImgType > 0:
+	ImgType = Images[0][ImgType+1:].lower()
+	if   ImgType == 'exr': cmd += ' -set colorspace sRGB'
+	elif ImgType == 'dpx': cmd += ' -set colorspace Log'
+	elif ImgType == 'cin': cmd += ' -set colorspace Log'
 cmd += ' -resize %dx%d' % (Options.xres, Options.yres)
-cmd += ' "%s" "%s"'
+cmd += ' "%s"'
 for i in range( len( Images)):
 	thumbnail = os.path.join( OutDir, 'thumbnail_%d.jpg' % i)
 	Cmds.append( cmd % ( Images[i], thumbnail))

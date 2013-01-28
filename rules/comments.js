@@ -137,7 +137,8 @@ function cm_Init( i_el)
 	if( i_el.m_obj.text )
 		i_el.m_elText.innerHTML = i_el.m_obj.text;
 
-	u_StatusSetColor( i_el.m_obj, i_el);
+	i_el.color = i_el.m_obj.color;
+	u_StatusSetColor( i_el, i_el);
 
 	if( i_el.m_obj.deleted )
 		i_el.style.display = 'none';
