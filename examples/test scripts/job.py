@@ -36,7 +36,7 @@ parser.add_option(      '--mhmax',        dest='mhmax',        type='int',    de
 parser.add_option(      '--mhwaitmax',    dest='mhwaitmax',    type='int',    default=0,  help='multi host tasks max hosts wait time seconds')
 parser.add_option(      '--mhwaitsrv',    dest='mhwaitsrv',    type='int',    default=0,  help='multi host tasks service start wait time seconds')
 parser.add_option(      '--mhsame',       dest='mhsame',       type='int',    default=0,  help='multi host tasks same host slave and master')
-parser.add_option(      '--mhservice',    dest='mhservice',    type='int',    default=-1, help='multi host tasks service emulaton sleep seconds')
+parser.add_option(      '--mhservice',    dest='mhservice',    type='str',    default='', help='multi host tasks service command')
 parser.add_option(      '--cmdpre',       dest='cmdpre',       type='string', default='', help='job pre command')
 parser.add_option(      '--cmdpost',      dest='cmdpost',      type='string', default='', help='job post command')
 parser.add_option(      '--parser',       dest='parser',       type='string', default='', help='parser type, default if not set')
@@ -111,9 +111,7 @@ for b in range( numblocks):
 
    str_hosts = ''
    if options.mhmin != -1 or options.mhmax != -1:
-      cmdservice = ''
-      if options.mhservice != -1: cmdservice = 'sleep ' + str(options.mhservice)
-      block.setMultiHost( options.mhmin, options.mhmax, options.mhwaitmax, options.mhsame, cmdservice, options.mhwaitsrv)
+      block.setMultiHost( options.mhmin, options.mhmax, options.mhwaitmax, options.mhsame, options.mhservice, options.mhwaitsrv)
       str_hosts = ' ' + services.service.str_hosts
 
    negative_pertask = False

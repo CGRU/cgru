@@ -156,6 +156,28 @@ class Block:
 	def setNeedProperties(   self, value):
 		if checkRegExp(value): self.data["need_properties"] = value
 
+	def setMultiHost( self, h_min, h_max, h_max_wait, master_on_slave = False, service = None, service_wait = -1):
+		if h_min < 1:
+			print('Error: Block::setMultiHost: Minimum must be greater then zero.')
+			return False
+		if h_max < h_min:
+			print('Block::setMultiHost: Maximum must be greater or equal then minimum.')
+			return False
+		if master_on_slave and service is None:
+			print('Error: Block::setMultiHost: Master in slave is enabled but service was not specified.')
+			return False
+
+		self.data['multihost_min'] = h_min
+		self.data['multihost_max'] = h_max
+		self.data['multihost_max_wait'] = h_max_wait
+		if master_on_slave:
+			self.data['multihost_master_on_slave'] = master_on_slave
+		if service:
+			self.data['multihost_service'] = service
+		if service_wait > 0:
+			self.data['multihost_service_wait'] = service_wait
+
+
 	def fillTasks( self):
 		if len( self.tasks):
 			self.data["tasks"] = []
