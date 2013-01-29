@@ -1,6 +1,13 @@
 """
   meMentalRayRender
   
+  ver.0.4.5 (29 Jan 2013) 
+    - distributed render support
+  ver.0.4.4 (28 Jan 2013) 
+    - attempt to add distributed render support
+  ver.0.4.3 (28 Jan 2013) 
+    - export compressed .mi files
+    - minor bugs fixed
   ver.0.4.2 (23 Jan 2013) 
     - fixed minor problems with render layers
   ver.0.4.1 (18 Jan 2013)
@@ -9,24 +16,19 @@
     - new RenderJob class
     - new AfanasyRenderJob class
     - some procedures moved to maya_ui_proc.py
-  
   ver.0.3.9 (13 Jan 2013)
     - added support for deferred .mi generation
     - fixed handling of image names and padding
-
   ver.0.3.8 (27 Dec 2012)
     - job specific functions moved to mrayJob class
     - backburner support dropped (temporary)
     - enchanced Afanasy jobs support
     - prepared support for deferred .mi generation
-
   ver.0.3.7 (22 Aug 2012)
     - backburner specific control fields are moved
       to corresponded tab, some unused parameters removed
-
   ver.0.3.6 (9 Jul 2012)
     - attempt to add Afanasy support
-
   ver.0.3.5 (21 Mar 2012)
   ver.0.3.4 (16 Mar 2012)
   ver.0.3.3 (18 Nov 2011)
@@ -42,13 +44,7 @@
   Description:
 
   This UI script generates .mi files from open Maya scene
-  and submits them to mentalray Standalone directly or by
-  creating a job for backburner or Afanasy.
-
-  "Use Remote Render" mode allows you to submit backburner job
-  from your local OS to render-farm with other OS (e.g. linux)
-  by using Directory Mapping.
-
+  and submits them to mentalray Standalone by creating a job for Afanasy.
 
   Usage:
   You can add this code as shelf button :
@@ -74,8 +70,19 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meMentalRayRender_'
-meMentalRayRenderVer = '0.4.2'
+meMentalRayRenderVer = '0.4.5'
 meMentalRayRenderMainWnd = self_prefix + 'MainWnd'
+
+# Nice Tip ( found at http://mayastation.typepad.com ) for enabling gzip compression option for Maya command line .mi export :
+# in $MAYA_LOCATION\bin\rendererDesc\miRenderer.xml
+# in <sep desc="Export:"/> section, add the follwing line:
+# <mel n="compression" s='$opt +=" -compression %1"' p="1" t="int" h="Compression level: 0='Off', 1='GzipBestSpeed', 6='GzipDefault', 9='GzipBest' "/> 
+# Then you can set patched_miRenderer = True
+patched_miRenderer = True
+
+mi_compression_list = [ 'Off', 'GzipBestSpeed', 'GzipDefault', 'GzipBest' ]
+mi_filepaths_list = [ 'NoChange', 'NoPath', 'Relative', 'Absolute' ]
+mr_verbosity_list = [ 'none', 'fatal', 'error', 'warning', 'info', 'progress', 'debug', 'details' ]
 #
 # meMentalRayRender
 #
@@ -112,6 +119,9 @@ class meMentalRayRender ( object ):
     self.def_migenCommand = 'Render -r mi'
     self.def_scene_name   = '' # maya scene name used for deferred .mi generation
 
+    self.save_frame_bgc = [ 0, 0, 0 ]
+    self.def_frame_bgc = [ 0.75, 0.5, 0 ]
+    
     self.initParameters ()
     self.ui = self.setupUI ()
   #
@@ -147,11 +157,17 @@ class meMentalRayRender ( object ):
     self.mi_param [ 'mi_binary' ]        = getDefaultIntValue ( self_prefix, 'mi_binary', 0 ) is 1
     self.mi_param [ 'mi_tabstop' ]       = getDefaultIntValue ( self_prefix, 'mi_tabstop', 2 )
     self.mi_param [ 'mi_verbosity' ]     = getDefaultStrValue ( self_prefix, 'mi_verbosity', 'none' )
+    
     self.mi_param [ 'mi_deferred' ]      = getDefaultIntValue ( self_prefix, 'mi_deferred', 0 ) is 1
     self.mi_param [ 'mi_local_migen' ]   = getDefaultIntValue ( self_prefix, 'mi_local_migen', 1 ) is 1
     self.mi_param [ 'mi_def_task_size' ] = getDefaultIntValue ( self_prefix, 'mi_def_task_size', 4 )
     self.mi_param [ 'mi_export_all_layers' ] = getDefaultIntValue ( self_prefix, 'mi_export_all_layers', 0 ) is 1
-    #self.mi_param['mi_compression'] = self.getDefaultStrValue( 'mi_compression', 'Off' )
+    # compression isn't supported for deferred generation ( This is very strange...)
+    # you have to patch miRenderer.xml
+    if self.mi_param [ 'mi_deferred' ] and not patched_miRenderer: 
+      self.mi_param [ 'mi_compression' ] = 'Off'
+    else :
+      self.mi_param [ 'mi_compression' ]   = getDefaultStrValue( self_prefix, 'mi_compression', 'Off' )
     #
     # mentalray parameters
     #
@@ -159,7 +175,15 @@ class meMentalRayRender ( object ):
     self.mr_param [ 'mr_verbosity' ]          = getDefaultStrValue ( self_prefix, 'mr_verbosity', 'none' )
     self.mr_param [ 'mr_progress_frequency' ] = getDefaultIntValue ( self_prefix, 'mr_progress_frequency', 1 )
     self.mr_param [ 'mr_threads' ]            = getDefaultIntValue ( self_prefix, 'mr_threads', 4 )
-    self.mr_param [ 'mr_texture_continue' ]   = getDefaultIntValue ( self_prefix, 'mr_texture_continue', 1 )
+    self.mr_param [ 'mr_texture_continue' ]   = getDefaultIntValue ( self_prefix, 'mr_texture_continue', 1 ) is 1
+    
+    self.mr_param [ 'mr_distributed' ]   = getDefaultIntValue ( self_prefix, 'mr_distributed', 0 ) is 1
+    self.mr_param [ 'mr_nomaster' ]      = getDefaultIntValue ( self_prefix, 'mr_nomaster', 0 ) is 1
+    self.mr_param [ 'mr_hosts' ]         = getDefaultStrValue ( self_prefix, 'mr_hosts', '' ) # @AF_HOSTS@
+    self.mr_param [ 'mr_port' ]          = getDefaultIntValue ( self_prefix, 'mr_port', 39010 )
+    self.mr_param [ 'mr_hosts_min' ]     = getDefaultIntValue ( self_prefix, 'mr_hosts_min', 1 )
+    self.mr_param [ 'mr_hosts_max' ]     = getDefaultIntValue ( self_prefix, 'mr_hosts_max', 4 )
+    self.mr_param [ 'mr_threads_limit' ] = getDefaultIntValue ( self_prefix, 'mr_threads_limit', 4 )
     #
     # image parameters
     #
@@ -277,8 +301,7 @@ class meMentalRayRender ( object ):
   #
   def getRenderCmd ( self, layer = None  ) :
     #
-    verbosity = [ 'none', 'fatal', 'error', 'warning', 'info', 'progress', 'debug', 'details' ]
-    mr_verbosity_level    = verbosity.index ( self.mr_param [ 'mr_verbosity' ] )
+    mr_verbosity_level    = mr_verbosity_list.index ( self.mr_param [ 'mr_verbosity' ] )
     options               = str ( self.mr_param [ 'mr_options' ] ).strip ()
     mr_threads            = self.mr_param [ 'mr_threads' ]
     mr_progress_frequency = self.mr_param [ 'mr_progress_frequency' ]
@@ -310,7 +333,9 @@ class meMentalRayRender ( object ):
     #dot_pos = name.rfind('.')
     #miFileName = name[0:dot_pos] + '.' + ('@' + pad_str + '@') + '.mi'
     pad_str = getPadStr ( self.mi_param [ 'mi_padding' ], self.mi_param [ 'mi_perframe' ] )
-    return ( name + '.' + ('@' + pad_str + '@') + '.mi' )
+    ext = '.mi'
+    if self.mi_param [ 'mi_compression' ] != 'Off' : ext += '.gz'
+    return ( name + '.' + ('@' + pad_str + '@') + ext )
   #
   # get_image_names
   #
@@ -339,7 +364,7 @@ class meMentalRayRender ( object ):
     mi_binary    = self.mi_param [ 'mi_binary' ]
     mi_filepaths = self.mi_param [ 'mi_filepaths' ]
     mi_deferred  = self.mi_param [ 'mi_deferred' ]
-    # mi_compression = cmds.optionMenuGrp( mi + 'mi_compression', q=True, value=True )
+
     # mi_verbosity_level = cmds.optionMenuGrp( mi + 'mi_verbosity', q=True, sl=True ) - 1
     migen_cmd = ''
     filename = cmds.workspace( expandName = mi_filename )
@@ -352,8 +377,10 @@ class meMentalRayRender ( object ):
         layer_in_filename = layer
         if layer == 'defaultRenderLayer' : layer_in_filename = 'masterLayer'
         filename += '_' + layer_in_filename
-        # this flag doesn't work with deferred generation
-        migen_cmd += '-layer ' + layer + ' '  
+
+        # '-layer doesn't work with deferred generation
+        migen_cmd += '-layer ' + layer + ' '
+
     filename += ext
     migen_cmd += '-file \"' + filename + '\" '
     #if mi_verbosity_level < 5 : mi_verbosity_level = 5
@@ -370,6 +397,15 @@ class meMentalRayRender ( object ):
       else           : migen_cmd += '-binary '
     else:
       migen_cmd += '-tabstop ' + str ( mi_tabstop ) + ' '
+
+    # compression isn't supported for deferred generation ( This is very strange...)
+    # you have to patch miRenderer.xml
+    if not ( mi_deferred and not patched_miRenderer ) : 
+      mi_compression_level = mi_compression_list.index ( self.mi_param [ 'mi_compression' ] )
+      if mi_compression_level > 0 : # 0 1 6 9 
+        if mi_compression_level > 1 : mi_compression_level *= 3
+        migen_cmd += '-compression ' + str ( mi_compression_level ) + ' '  
+
     #migen_cmd += '-pcm ' # export pass contribition maps
     #migen_cmd += '-pud ' # export pass user data
     if mi_deferred :
@@ -410,8 +446,6 @@ class meMentalRayRender ( object ):
     mi_binary    = self.mi_param [ 'mi_binary' ]
     mi_filepaths = self.mi_param [ 'mi_filepaths' ]
     mi_deferred  = self.mi_param [ 'mi_deferred' ]
-    # mi_compression = cmds.optionMenuGrp( mi + 'mi_compression', q=True, value=True )
-    # mi_verbosity_level = cmds.optionMenuGrp( mi + 'mi_verbosity', q=True, sl=True ) - 1
 
     filename = cmds.workspace ( expandName = mi_filename )
     ( filename, ext ) = os.path.splitext ( filename )
@@ -604,9 +638,35 @@ class meMentalRayRender ( object ):
         
         frame_block = AfanasyRenderBlock ( ('render_' + layer_name ), service, self.job )
         frame_block.capacity = capacity     
-        frame_block.cmd = self.getRenderCmd ( layer )
         frame_block.input_files = self.get_mi_file_names ( layer_name )
         frame_block.out_files = self.get_image_names ()
+        render_cmd = self.getRenderCmd ( layer )
+        
+        if self.mr_param [ 'mr_distributed' ] :
+          frame_block.distributed = True
+          frame_block.hosts_min = self.mr_param [ 'mr_hosts_min' ]
+          frame_block.hosts_max = self.mr_param [ 'mr_hosts_max' ]
+          if frame_block.hosts_max <= 0 : frame_block.hosts_max = 1 
+          if frame_block.hosts_min > frame_block.hosts_max : frame_block.hosts_min = 1
+            
+          if self.mr_param [ 'mr_nomaster' ] :
+            render_cmd += ' -nomaster '  
+          hosts_str = str ( self.mr_param [ 'mr_hosts' ] ).strip ()
+          if hosts_str != '' :
+            hosts = ' -hosts '
+            #hosts_list = hosts_str.split ( ' ' )
+            #for host in hosts_list :
+            #  hosts += ( '"%s:%d' % ( host, self.mr_param [ 'mr_port' ]) )
+            #  if self.mr_param [ 'mr_threads_limit' ] > 0 :
+            #    hosts += ( ' -threads %d' % self.mr_param [ 'mr_threads_limit' ] ) 
+            #  hosts += ( '" ' ) 
+            hosts += hosts_str
+            render_cmd += ( hosts + ' -- ') 
+          else :
+            render_cmd += ' @AF_HOSTS@ '  
+          
+        frame_block.cmd = render_cmd
+        
         frame_block.setup ()
         self.job.frames_blocks.append ( frame_block )
 
@@ -620,10 +680,10 @@ class meMentalRayRender ( object ):
   #
   def miFileNameChanged ( self, name, value ):
     #
-    if name == 'mi_filename' :
+    if name in ( 'mi_filename', 'mi_compression' ) :
       setDefaultStrValue ( self_prefix, name, self.mi_param, value )
-    else:
-      self.setDefaultIntValue ( self_prefix, name, self.mi_param, value )
+    else: # mi_padding, mi_perframe
+      setDefaultIntValue ( self_prefix, name, self.mi_param, value )
     self.setResolvedPath ()
   #
   # setResolvedPath
@@ -637,8 +697,10 @@ class meMentalRayRender ( object ):
     if self.mi_param[ 'mi_padding' ] > 0 and self.mi_param[ 'mi_perframe' ] == True :
       filename += '.'
       pad_str = getPadStr ( self.mi_param [ 'mi_padding' ], self.mi_param [ 'mi_perframe' ] )
+      filename += pad_str
     
-    if ext == '' or ext == '.' : ext = '.mi'
+    ext = '.mi'
+    if self.mi_param [ 'mi_compression' ] != 'Off' : ext += '.gz'
     filename += ext
     cmds.textFieldGrp ( self.winMain + '|f0|t0|tc1|fr2|fc2|' + 'mi_resolved_path', edit = True, text = filename )
   #
@@ -662,12 +724,37 @@ class meMentalRayRender ( object ):
     #
     mi_def_frame = self.winMain + '|f0|t0|tc1|fr3'
     mi_def       = mi_def_frame + '|fc3|'
+    mi_compression = self.winMain + '|f0|t0|tc1|fr1|fc1|mi_compression'
+    
     setDefaultIntValue ( self_prefix, 'mi_deferred', self.mi_param, arg )
     cmds.checkBoxGrp ( mi_def + 'mi_local_migen', edit = True, enable = arg )
     cmds.intFieldGrp ( mi_def + 'mi_def_task_size', edit = True, enable = arg )
+    cmds.optionMenuGrp ( mi_compression, e = True, enable = ( not ( arg and not patched_miRenderer ) ) )
+    
     bg_color = self.save_frame_bgc 
     if arg : bg_color = self.def_frame_bgc
     cmds.frameLayout ( mi_def_frame, edit = True, bgc = bg_color ) # , enableBackground=False
+    
+    # compression isn't supported for deferred generation ( This is very strange...)
+    if arg and not patched_miRenderer :
+      cmds.optionMenuGrp ( mi_compression, e = True, value = 'Off' )
+      self.miFileNameChanged ( 'mi_compression', 'Off' )
+  #
+  # enable_distributed
+  #
+  def enable_distributed ( self, arg ) :
+    mr_distr_frame = self.winMain + '|f0|t0|tc2|fr2'
+    mr_distr = mr_distr_frame + '|fc2|'
+    setDefaultIntValue ( self_prefix, 'mr_distributed', self.mr_param, arg )
+    cmds.checkBoxGrp ( mr_distr + 'mr_nomaster', edit = True, enable = arg )
+    #cmds.intFieldGrp ( mr_distr + 'mr_port', edit = True, enable = arg )
+    cmds.intFieldGrp ( mr_distr + 'mr_hosts_min', edit = True, enable = arg )
+    cmds.intFieldGrp ( mr_distr + 'mr_hosts_max', edit = True, enable = arg )
+    #cmds.intFieldGrp ( mr_distr + 'mr_threads_limit', edit = True, enable = arg )
+    cmds.textFieldGrp ( mr_distr + 'mr_hosts', edit = True, enable = arg )
+    bg_color = self.save_frame_bgc 
+    if arg : bg_color = self.def_frame_bgc
+    cmds.frameLayout ( mr_distr_frame, edit = True, bgc = bg_color ) # , enableBackground=False
   #
   # onRenderLayerSelected
   #
@@ -802,9 +889,10 @@ class meMentalRayRender ( object ):
     cmds.frameLayout ( 'fr1', label = ' Parameters ', borderVisible = True, borderStyle = 'etchedIn', marginHeight = mr_hi  )
     cmds.columnLayout ( 'fc1', columnAttach = ( 'left', 0 ), rowSpacing = 0, adjustableColumn = True )
     #
-    job_dispatcher = cmds.optionMenuGrp ( 'job_dispatcher', cw = ( ( 1, cw1 ), ), cal = ( 1, 'right' ),
-                                          label = 'Job Dispatcher ',  
-                                          cc = partial ( setDefaultStrValue, self_prefix, 'job_dispatcher',self.job_param ) )
+    job_dispatcher = cmds.optionMenuGrp ( 'job_dispatcher', cw = ( ( 1, cw1 ), ), 
+                        cal = ( 1, 'right' ),
+                        label = 'Job Dispatcher ',  
+                        cc = partial ( setDefaultStrValue, self_prefix, 'job_dispatcher',self.job_param ) )
     for name in ( 'none', 'afanasy' ): cmds.menuItem ( label = name ) # 'backburner',
     cmds.optionMenuGrp ( job_dispatcher, e = True, value = self.job_param [ 'job_dispatcher' ] )
     cmds.text ( label = '' )
@@ -889,11 +977,11 @@ class meMentalRayRender ( object ):
                        value1 = self.mi_param [ 'mi_def_task_size' ],
                        enable = self.mi_param [ 'mi_deferred' ],
                        cc = partial ( setDefaultIntValue, self_prefix, 'mi_def_task_size', self.mi_param ) )
-    self.save_frame_bgc = cmds.frameLayout ( 'fr3', query = True, bgc = True )
-    self.def_frame_bgc = [ 0.75, 0.5, 0 ]
+    #self.save_frame_bgc = cmds.frameLayout ( 'fr3', query = True, bgc = True )
+    #self.def_frame_bgc = [ 0.75, 0.5, 0 ]
     bg_color = self.save_frame_bgc 
     if self.mi_param [ 'mi_deferred' ] : bg_color = self.def_frame_bgc
-    cmds.frameLayout ( 'fr3', edit = True, bgc = bg_color ) # , enableBackground=False
+    cmds.frameLayout ( self.winMain + '|f0|t0|tc1|fr3', edit = True, bgc = bg_color ) # , enableBackground=False
     cmds.setParent ( '..' )
     cmds.setParent ( '..' )
     cmds.frameLayout ( 'fr1', label = ' Export Settings ', 
@@ -909,11 +997,12 @@ class meMentalRayRender ( object ):
     cmds.text ( label = '' )
     #mi_dir = cmds.textFieldButtonGrp( cw=( 1, cw1 ), adj=2, label="Directory ", buttonLabel="...", text=self.mi_param['mi_dir'] )
     #cmds.textFieldButtonGrp( mi_dir, edit=True, bc=partial( browseDirectory, self.rootDir, mi_dir ), cc=partial( self.setDefaultStrValue, 'mi_dir' ) )
-    mi_filename = cmds.textFieldButtonGrp ( 'mi_filename', cw = ( 1, cw1 ), adj = 2,
-                                           label = 'File Name ', 
-                                           buttonLabel = '...',
-                                           text = self.mi_param [ 'mi_filename' ],
-                                           cc = partial ( self.miFileNameChanged, 'mi_filename' ) )
+    mi_filename = cmds.textFieldButtonGrp ( 'mi_filename', cw = ( 1, cw1 ), 
+                       adj = 2,
+                       label = 'File Name ', 
+                       buttonLabel = '...',
+                       text = self.mi_param [ 'mi_filename' ],
+                       cc = partial ( self.miFileNameChanged, 'mi_filename' ) )
     cmds.textFieldButtonGrp ( mi_filename, edit = True, bc = partial ( browseFile, self.rootDir, mi_filename, 'mentalray files (*.mi)' ) )
     cmds.intFieldGrp ( 'mi_padding', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
                        label = 'Frame Padding ',
@@ -935,19 +1024,21 @@ class meMentalRayRender ( object ):
                        value1 = self.mi_param [ 'mi_binary' ],
                        cc = partial ( setDefaultIntValue, self_prefix, 'mi_binary', self.mi_param ) )
     cmds.intFieldGrp ( 'mi_tabstop', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
-                       label = "Tab stop (ASCII) ",
+                       label = 'Tab stop (ASCII) ',
                        value1 = self.mi_param [ 'mi_tabstop' ],
                        cc = partial ( setDefaultIntValue, self_prefix, 'mi_tabstop', self.mi_param ) )
-    #mi_compression = cmds.optionMenuGrp( 'mi_compression', cw=( (1, cw1), ), label="Compression ", cal=(1, 'right'), cc=partial( self.setDefaultStrValue, 'mi_compression' ) )
-    #cmds.menuItem( label='Off' )
-    #cmds.menuItem( label='GzipBestSpeed' )
-    #cmds.menuItem( label='GzipDefault' )
-    #cmds.menuItem( label='GzipBest' )
-    #cmds.optionMenuGrp( mi_compression, e=True, value=self.mi_param['mi_compression'] )
-    mi_filepaths = cmds.optionMenuGrp ( 'mi_filepaths', cw = ( ( 1, cw1 ), ), cal = ( 1, 'right' ),
-                                        label = 'Export File Paths ',
-                                        cc = partial ( setDefaultStrValue, self_prefix, 'mi_filepaths', self.mi_param ) )
-    for name in ( 'NoChange', 'NoPath', 'Relative', 'Absolute' ): cmds.menuItem ( label = name )
+    mi_compression = cmds.optionMenuGrp ( 'mi_compression', cw=( (1, cw1), ),
+                       cal=(1, 'right'),  
+                       label = 'Compression ', 
+                       enable = ( not ( self.mi_param [ 'mi_deferred' ] and not patched_miRenderer ) ),
+                       cc = partial ( self.miFileNameChanged, 'mi_compression' ) )
+    for name in mi_compression_list : cmds.menuItem ( label = name )
+    cmds.optionMenuGrp ( mi_compression, e = True, value = self.mi_param [ 'mi_compression' ] )
+    mi_filepaths = cmds.optionMenuGrp ( 'mi_filepaths', cw = ( ( 1, cw1 ), ), 
+                       cal = ( 1, 'right' ),
+                       label = 'Export File Paths ',
+                       cc = partial ( setDefaultStrValue, self_prefix, 'mi_filepaths', self.mi_param ) )
+    for name in mi_filepaths_list : cmds.menuItem ( label = name )
     cmds.optionMenuGrp( mi_filepaths, e = True, value = self.mi_param [ 'mi_filepaths' ] )
     # mi_verbosity = none, fatal, error, warning, info, progress, and details
     #mi_verbosity = cmds.optionMenuGrp( 'mi_verbosity', cw=( (1, cw1), ), cal=(1, 'right'),
@@ -978,6 +1069,56 @@ class meMentalRayRender ( object ):
     tab_render = cmds.columnLayout ( 'tc2', columnAttach = ( 'left', 0 ), 
                                       rowSpacing = 0, 
                                       adjustableColumn = True )
+    cmds.frameLayout ( 'fr2', label = ' Distributed render ', 
+                       borderVisible = True, 
+                       borderStyle = 'etchedIn', 
+                       marginHeight = mr_hi, 
+                       cll = True, cl = True )
+    cmds.columnLayout ( 'fc2', columnAttach = ( 'left', 0 ), rowSpacing = 0, adjustableColumn = True )
+    cmds.checkBoxGrp ( 'mr_distributed', cw = ( ( 1, cw1 ), ( 2, cw1 * 2 ) ),
+                       label = 'Use distributed ',
+                       ann = 'Use slave hosts for rendering',
+                       value1 = self.mr_param [ 'mr_distributed' ],
+                       cc = partial ( self.enable_distributed ) ) 
+    cmds.checkBoxGrp ( 'mr_nomaster', cw = ( ( 1, cw1 ), ( 2, cw1 * 2 ) ),
+                       label = '', 
+                       label1 = " No Master ",
+                       ann = "When rendering with multiple hosts, schedule all jobs on slaves only, if possible",
+                       value1 = self.mr_param [ 'mr_nomaster' ],
+                       enable = self.mr_param [ 'mr_distributed' ],
+                       cc = partial ( setDefaultIntValue, self_prefix, 'mr_nomaster', self.mr_param ) )
+    #cmds.intFieldGrp ( 'mr_port', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
+    #                   label = 'Port ',
+    #                   value1 = self.mr_param [ 'mr_port' ],
+    #                   enable = self.mr_param [ 'mr_distributed' ],
+    #                   cc = partial ( setDefaultIntValue, self_prefix, 'mr_port', self.mr_param ) )
+    cmds.intFieldGrp ( 'mr_hosts_min', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
+                       label = 'Min Hosts ',
+                       value1 = self.mr_param [ 'mr_hosts_min' ],
+                       enable = self.mr_param [ 'mr_distributed' ],
+                       cc = partial ( setDefaultIntValue, self_prefix, 'mr_hosts_min', self.mr_param ) )
+    cmds.intFieldGrp ( 'mr_hosts_max', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
+                       label = 'Max Hosts ',
+                       value1 = self.mr_param [ 'mr_hosts_max' ],
+                       enable = self.mr_param [ 'mr_distributed' ],
+                       cc = partial ( setDefaultIntValue, self_prefix, 'mr_hosts_max', self.mr_param ) )
+    #cmds.intFieldGrp ( 'mr_threads_limit', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
+    #                   label = 'Threads Limit ',
+    #                   ann = 'Max threads per host. All available threads will be used if 0',
+    #                   value1 = self.mr_param [ 'mr_threads_limit' ],
+    #                   enable = self.mr_param [ 'mr_distributed' ],
+    #                   cc = partial ( setDefaultIntValue, self_prefix, 'mr_threads_limit', self.mr_param ) )
+    cmds.textFieldGrp ( 'mr_hosts', cw = ( 1, cw1 ), adj = 2,
+                       label = 'Remote Hosts ',
+                       ann = 'Remote hosts names (if empty, will be filled by Render Manager)',
+                       text = self.mr_param [ 'mr_hosts' ],
+                       enable = self.mr_param [ 'mr_distributed' ],
+                       cc = partial ( setDefaultStrValue, self_prefix, 'mr_hosts', self.mr_param ) )                       
+    bg_color = self.save_frame_bgc 
+    if self.mr_param [ 'mr_distributed' ] : bg_color = self.def_frame_bgc
+    cmds.frameLayout ( self.winMain + '|f0|t0|tc2|fr2', edit = True, bgc = bg_color ) # , enableBackground=False
+    cmds.setParent ( '..' )
+    cmds.setParent ( '..' )
     cmds.frameLayout ( 'fr1', label = ' MentalRay options ', 
                        borderVisible = True, 
                        borderStyle = 'etchedIn', 
@@ -993,7 +1134,7 @@ class meMentalRayRender ( object ):
     mr_verbosity = cmds.optionMenuGrp ( 'mr_verbosity', cw = ( ( 1, cw1 ), ), cal = ( 1, 'right' ),
                        label = 'Verbosity ',
                        cc = partial ( setDefaultStrValue, self_prefix, 'mr_verbosity', self.mr_param ) )
-    for name in ( 'none', 'fatal', 'error', 'warning', 'info', 'progress', 'debug', 'details' ): cmds.menuItem ( label = name )
+    for name in mr_verbosity_list : cmds.menuItem ( label = name )
     cmds.optionMenuGrp ( mr_verbosity, e = True, value = self.mr_param [ 'mr_verbosity' ] )
     cmds.intFieldGrp ( 'mr_progress_frequency', cw = ( ( 1, cw1 ), ( 2, cw2 ) ),
                        label = 'Progress frequency ',

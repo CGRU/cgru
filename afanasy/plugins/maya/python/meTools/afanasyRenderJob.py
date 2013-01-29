@@ -1,7 +1,8 @@
 """
   afanasyRenderJob.py
 
-  ver.0.0.1 16 Jan 2013
+  ver.0.1.0 (28 Jan 2013)
+  ver.0.0.1 (16 Jan 2013)
 
   Author:
 
@@ -29,6 +30,11 @@ class AfanasyRenderBlock ( RenderBlock ) :
     self.hostsmask = ''
     self.parentJob = parentJob
     
+    self.distributed = False
+    self.sameHostMaster = False
+    self.hosts_min = 0
+    self.hosts_max = 0
+    
     if parentJob is not None :
       # setup general parameters from parent job
       self.start = parentJob.start
@@ -37,7 +43,7 @@ class AfanasyRenderBlock ( RenderBlock ) :
       self.task_size = parentJob.task_size
       self.af_block.setWorkingDirectory ( parentJob.work_dir )
       if local :
-        self.af_block.setHostsMask ( parentJob.data['host_name'] ) 
+        self.af_block.setHostsMask ( parentJob.af_job.data [ 'host_name' ] ) 
   #
   #
   def setup ( self ) : 
@@ -45,6 +51,8 @@ class AfanasyRenderBlock ( RenderBlock ) :
     if self.parentJob is not None :
       if self.parentJob.use_var_capacity :
         self.af_block.setVariableCapacity ( self.parentJob.capacity_coeff_min, self.parentJob.capacity_coeff_max )      
+    if self.distributed :
+      self.af_block.setMultiHost ( self.hosts_min, self.hosts_max, 0, self.sameHostMaster, '', 0 )  
     self.af_block.setCommand ( self.cmd + ' ' + self.input_files )
     self.af_block.setFiles ( self.out_files )
     if self.isNumeric :
@@ -86,6 +94,15 @@ class AfanasyRenderJob ( RenderJob ) :
     # This commands are executed on render farm hosts by special system job.
     # Working directory of such system task will be the first block working folder.
     self.command_post = ''
+    
+    self.distributed = False
+    self.sameHostMaster = True
+    self.hosts_min = 0
+    self.hosts_max = 0
+    self.threads_limit = 0
+    self.port = 39010 # mentalray standalone slave port
+    self.hosts = ''
+    
   #
   #
   def setup ( self ) :
