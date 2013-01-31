@@ -9,6 +9,27 @@ function c_Init()
 	document.getElementById('browser').textContent = cgru_Browser;
 }
 
+function c_GetHashPath()
+{
+	var path = document.location.hash;
+//window.console.log( 'hash = ' + path);
+	if( path.indexOf('#') == 0 )
+		path = path.substr(1);
+	else
+		path = '/';
+
+	if( path.charAt(0) != '/' )
+		path = '/'+path;
+
+	while( path.indexOf('//') != -1 )
+		path = path.replace(/\/\//g,'/');
+
+	if(( path.length > 1 ) && ( path.charAt(path.length-1) == '/'))
+		path = path.substr( 0, path.length-1);
+
+	return path;
+}
+
 function c_Parse( i_data)
 {
 	var obj = null;
@@ -73,10 +94,11 @@ function c_PadZero( i_num, i_len)
 	return str;
 }
 
-function c_Info( i_msg)
+function c_Info( i_msg, i_log)
 {
+	if( i_log == null ) i_log = true;
 	u_el.info.innerHTML = i_msg;
-	c_Log( i_msg);
+	if( i_log ) c_Log( i_msg);
 }
 function c_Error( i_err)
 {

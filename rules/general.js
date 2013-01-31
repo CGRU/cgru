@@ -55,23 +55,7 @@ function g_GO( i_path)
 
 function g_PathChanged()
 {
-	var path = document.location.hash;
-//window.console.log( 'hash = ' + path);
-	if( path.indexOf('#') == 0 )
-		path = path.substr(1);
-	else
-		path = '/';
-
-	if( path.charAt(0) != '/' )
-		path = '/'+path;
-
-	while( path.indexOf('//') != -1 )
-		path = path.replace(/\/\//g,'/');
-
-	if(( path.length > 1 ) && ( path.charAt(path.length-1) == '/'))
-		path = path.substring( 0, path.length-1);
-
-	g_Navigate( path);
+	g_Navigate( c_GetHashPath());
 }
 
 function g_Navigate( i_path)

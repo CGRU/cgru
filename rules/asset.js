@@ -24,8 +24,6 @@ function a_Process()
 
 function a_ShowSequence( i_element, i_path, i_title)
 {
-	var link = RULES.root + i_path;
-
 	if( i_title == null)
 	{
 		i_title = i_path.split('/');
@@ -38,7 +36,7 @@ function a_ShowSequence( i_element, i_path, i_title)
 
 	var elLinkA = document.createElement('a');
 	elFolder.appendChild( elLinkA);
-	elLinkA.setAttribute('href', link);
+	elLinkA.setAttribute('href', 'rules/player.html#'+i_path);
 	elLinkA.setAttribute('target', '_blank');
 	elLinkA.textContent = i_title;
 
@@ -50,7 +48,7 @@ function a_ShowSequence( i_element, i_path, i_title)
 		elCmd.classList.add('cmdexec');
 		elCmd.textContent = cmds[c].name;
 		var cmd = cmds[c].cmd;
-		cmd = cmd.replace('@PATH@', cgru_PM('/'+link));
+		cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
 		cmd = cmd.replace('@FPS@', RULES.fps);
 		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 	}

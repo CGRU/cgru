@@ -17,9 +17,9 @@ position: absolute;
 box-shadow: 0px 0px 10px #000, 0px 0px 5px #000 inset, 0px 0px 15px #FFF inset;
 }
 
-#header, #footer { left: 0; right: 0; height: 238px; }
-#header { top: -200px; /*top: 0;*/}
-#footer { bottom: -200px; /*bottom: 0;*/}
+#header, #footer { left: 0; right: 0; }
+#header { top: -200px; height: 238px; }
+#footer { bottom: 0px; height: 38px; }
 
 .headeropenbtn { position: absolute; left: 10px; width: 9px; height: 20px; margin:0;padding:0;}
 #header .headeropenbtn { bottom: 8px;}
@@ -41,6 +41,7 @@ height: 20px;
 box-shadow: 0px 0px 5px #000 inset, 0px 0px 5px rgba(255,255,255,.5);
 }
 #footer #log {
+display: none;
 position: absolute;
 overflow: auto;
 border-radius: 6px;
@@ -72,6 +73,8 @@ top: 38px; bottom: 38px;
 #navig { overflow-y: scroll; width: 300px; left: 0; }
 
 .button {
+-moz-user-select: none;
+-webkit-user-select: none;
 cursor: pointer;
 text-align: center;
 border-radius: 4px;
@@ -81,13 +84,17 @@ margin: 2px;
 padding: 2px;
 }
 .button:hover { background: rgba(200,255,255,.2);}
+.button.pushed {
+background: transparent;
+box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
+}
 
 .editing { background: #DDD; color: #000; }
 
 .thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
 
 .colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
-.colorbars div div { height:20px;float:left;}
+.colorbars div div { float:left;}
 
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}

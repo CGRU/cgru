@@ -1,5 +1,6 @@
 n_sendCount = 0;
 n_recvCount = 0;
+n_server = 'rules.php';
 
 function n_ReadConfig()
 {
@@ -16,7 +17,7 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 		return null;
 	}
 
-	if( i_depth == null ) i_depth = 3;
+	if( i_depth == null ) i_depth = 0;
 
 	var paths = [];
 	for( var i = 0; i < i_paths.length; i++)
@@ -54,7 +55,7 @@ function n_Request( i_obj, i_wait)
 	xhr.overrideMimeType('application/json');
 //	xhr.onerror = function() { g_Error(xhr.status + ':' + xhr.statusText); }
 //	xhr.open('POST', 'server.php', true); 
-	xhr.open('POST', 'rules.php', i_wait ? false : true); 
+	xhr.open('POST', n_server, i_wait ? false : true); 
 	xhr.send( obj_str);
 //window.console.log('n_Requestr='+obj_str);
 
@@ -74,6 +75,8 @@ function n_Request( i_obj, i_wait)
 			if( xhr.status == 200 )
 			{
 				c_Log('<b style="color:#044"><i>recv'+(n_recvCount++)+':</i></b> '+ xhr.responseText);
+				if( window.n_MessageReceived )
+					window.n_MessageReceived( c_Parse( xhr.responseText));
 				return;
 			}
 		}

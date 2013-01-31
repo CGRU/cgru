@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>PLAYER</title>
+<link type="text/css" rel="stylesheet" href="../lib/styles.css">
+<link type="text/css" rel="stylesheet" href="styles.css">
+<link type="text/css" rel="stylesheet" href="player.css">
+<script type="text/javascript" src="../lib/cgru.js"></script>
+<script type="text/javascript" src="common.js"></script>
+<script type="text/javascript" src="player.js"></script>
+<script type="text/javascript" src="network.js"></script>
+<script type="text/javascript" src="ui.js"></script>
+</head>
+<body onload="p_Init()">
+
+<div id="player_content">
+	<div id="view"></div>
+</div>
+
+<div id="header">
+	<div style="box-shadow: 0px 0px 10px #000 inset, 0px 0px 10px #FFF; border-radius: 5px; position:absolute;top: 5px; bottom: 40px; left: 5px; right: 5px; font-size: 12px; background: #AAA">
+		<div style="top: 0px; bottom: 0px; width: 250px; position: absolute; /*border: 1px solid #000;*/">
+			<div class="cgru_parameter">
+				<div class="label">Browser Storage</div>
+				<div class="button" style="left:120px" onclick="cgru_LocalStorageShow()">Show</div>
+				<div class="button" style="left:170px" onclick="cgru_LocalStorageClearClicked()">Clear</div>
+			</div>
+			<div class="cgru_parameter">
+				<div class="label">CGRU Config</div>
+				<div class="button" style="left:120px" onclick="cgru_ConfigShow()">Show</div>
+			</div>
+			<div class="cgru_parameter">
+				<div class="label">Platform:</div>
+				<div class="variable" id="platform" style="left:70px;right:15px">unknown</div>
+			</div>
+			<div class="cgru_parameter">
+				<div class="label">Browser:</div>
+				<div class="variable" id="browser" style="left:70px;right:15px">unknown</div>
+			</div>
+		</div>
+		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 300px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
+		<div style="position:absolute; left: 550px; width: 200px; top:0;bottom:0; /*border: 1px solid #000;*/">
+			<div style="text-align:center; padding: 10px 0 0 0;">
+				<a href="http://cgru.info" target="_blank">Documentation</a></div>
+		</div>
+	</div>
+	<div id="headeropenbtn" class="headeropenbtn button" onclick="p_OpenCloseHeader()">&darr;</div>
+	<div class="panel">
+		<div class="button" id="btn_paint" onclick="p_Paint()">Paint</div>
+		<div id="paint" style="display:none">
+			<div class="button" id="btn_save" onclick="p_Save()">Save</div>
+			<div id="colors">
+			</div>
+		</div>
+	</div>
+</div>
+
+<div id="footer">
+	<div id="slider">
+		<div id="progress"></div>
+	</div>
+	<div id="footeropenbtn" class="headeropenbtn button" style="top:20px" onclick="p_OpenCloseFooter()">&uarr;</div>
+	<div id="cycle" style="top:30px"></div>
+	<div class="controls">
+		<div id="btn_rewind" class="button" onclick="p_Rewind(0)">&laquo;</div>
+		<div id="btn_reverse" class="button" onclick="p_Reverse()">&lt;</div>
+		<div id="btn_prev" class="button" onclick="p_NextFrame(-1)">|&lt;</div>
+		<div id="btn_next" class="button" onclick="p_NextFrame(1)">&gt;|</div>
+		<div id="btn_play" class="button" onclick="p_Play()">&gt;</div>
+		<div id="btn_forward" class="button" onclick="p_Rewind(1)">&raquo;</div>
+	</div>
+	<div id="version" style="float:right;margin:22px 10px 10px 10px;">v?</div>
+	<div id="info"></div>
+	<div id="log"></div>
+</div>
+
+</body>
+</html>

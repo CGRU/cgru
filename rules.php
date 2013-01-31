@@ -292,8 +292,36 @@ function afanasy( $i_obj, &$o_out)
 //	$o_out['header'] = $header;
 }
 
+function save( $i_recv, &$o_out)
+{
+	$filename = $i_recv['save'];
+	$dirname = dirname($filename);
+
+	$o_out['file'] = $filename;
+
+	if( false == is_dir( $dirname))
+	{
+		mkdir( $dirname, 0777, true);
+		if( false == is_dir( $dirname))
+		{
+			$o_out['error'] = 'Unable to create directory '.$dirname;
+			return;
+		}		
+	}
+
+	if( $fHandle = fopen( $filename, 'wb'))
+	{
+		fwrite( $fHandle, base64_decode( $i_recv['data']));
+		fclose( $fHandle );
+		return;
+	}
+
+	$o_out['error'] = 'Unable to open file for writing '.$filename;
+}
+
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
 $out = array();
+umask(0000);
 if( array_key_exists('walkdir', $recv))
 {
 	$out['walkdir'] = array();
@@ -324,6 +352,12 @@ else if( array_key_exists('readconfig', $recv))
 	$configs = array();
 	readConfig( $recv['readconfig'], $configs); 
 	$out['config'] = $configs;
+}
+else if( array_key_exists('save', $recv))
+{
+	$save = array();
+	save( $recv, $save);
+	$out['save'] = $save;
 }
 else if( array_key_exists('afanasy', $recv))
 {
