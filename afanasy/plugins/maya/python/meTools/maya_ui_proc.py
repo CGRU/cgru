@@ -1,6 +1,7 @@
 """
   maya_ui_proc.py
   
+  ver.0.3.0 (28 Jan 2013)
   ver.0.2.0 (18 Jan 2013)
   ver.0.1.0 (17 Jan 2013)
 
@@ -152,10 +153,10 @@ def getDirName ( image_name ) :
 #
 def getPadStr ( padding, perframe ) :
   pad_str = ''
+  #print 'padding = %d perframe = %s' % ( padding, str ( perframe ) )
   if padding > 0 and perframe == True :
     pad_str = '#'
-    for i in range( 1, padding ):
-      pad_str += '#'  
+    for i in range( 1, padding ): pad_str += '#'  
   return pad_str
 #
 # browseDirectory
