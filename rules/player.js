@@ -115,6 +115,7 @@ function p_PathChanged()
 		var img = new Image();
 		img.src = '../'+p_path + '/' + p_files[i];
 		img.onload = function(){p_ImgLoaded();}
+		img.onerror = function(){p_ImgLoaded();}
 		p_Images.push( img);
 	}
 }
