@@ -114,15 +114,15 @@ function p_PathChanged()
 	{
 		var img = new Image();
 		img.src = '../'+p_path + '/' + p_files[i];
-		img.onload = function(){p_ImgLoaded( i, p_files[i]);}
+		img.onload = function(){p_ImgLoaded();}
 		p_Images.push( img);
 	}
 }
 
-function p_ImgLoaded( i_i, i_file)
+function p_ImgLoaded()
 {
 	p_numloaded++;
-	c_Info('Loaded: '+i_file+' '+p_numloaded+' of '+p_files.length, false);
+	c_Info('Loaded '+p_numloaded+' of '+p_files.length+' images', false);
 
 	if( p_numloaded < p_files.length ) return;
 
