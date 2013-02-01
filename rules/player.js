@@ -124,6 +124,7 @@ function p_ImgLoaded()
 {
 	p_numloaded++;
 	c_Info('Loaded '+p_numloaded+' of '+p_files.length+' images', false);
+	p_el.progress.style.width = Math.round(100.0*p_numloaded/p_files.length) + '%';
 
 	if( p_numloaded < p_files.length ) return;
 
@@ -139,11 +140,6 @@ function p_ImgLoaded()
 		elImg.onmousedown = function(){return false;}
 		p_elImg.push( elImg);
 
-		c_Info( p_files[i], false);
-		var width = '100%';
-		if( p_files.length > 1)
-			width = Math.round(100.0*i/(p_files.length-1)) + '%';
-		p_el.progress.style.width = width;
 	}
 
 	p_ShowFrame( p_frame);
