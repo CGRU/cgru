@@ -142,7 +142,7 @@ function p_ImgLoaded()
 		c_Info( p_files[i], false);
 		var width = '100%';
 		if( p_files.length > 1)
-			width = 100.0*i/(p_files.length-1) + '%';
+			width = Math.round(100.0*i/(p_files.length-1)) + '%';
 		p_el.progress.style.width = width;
 	}
 
