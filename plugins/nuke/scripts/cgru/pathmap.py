@@ -2,75 +2,89 @@ import os, sys
 import shutil
 import socket
 
-from cgrupathmap import PathMap
+import cgrupathmap
+import cgruconfig
 
 import nuke
 
-SERVER_PATHS_SUFFIX = 'SERVERPATHS'
-CLIENT_PATHS_SUFFIX = 'CLIENTPATHS'
+PathMap = cgrupathmap.PathMap( UnixSeparators = True)
+
+PMaps = dict()
+if 'platforms' in cgruconfig.VARS:
+	for platform in cgruconfig.VARS['platforms']:
+		if ('OS_'+platform) in cgruconfig.VARS:
+			if 'pathsmap' in cgruconfig.VARS['OS_'+platform]:
+				pm = cgrupathmap.PathMap( UnixSeparators = True)
+				pm.init( cgruconfig.VARS['OS_'+platform]['pathsmap'])
+				if pm.initialized:
+					PMaps[platform] = pm
+
 SearchStrings = ['file ','font ', 'project_directory ']
 
-def pmSaveToServer():
-   print 'Saving scene to server paths...'
-   pm = PathMap( UnixSeparators = True, Verbose = True)
-   nuke.scriptSave()
+def pmFilenameFilter( filename):
+#	print('FilenameFilter before:\n'+filename)
+	# Transfer scene paths to server from all patforms:
+	for key in PMaps:
+		filename = PMaps[key].toServer( filename)
+	# Transfer scene paths from server clinet native patform:
+	if PathMap.initialized:
+		filename = PMaps[key].toClient( filename)
+#	print('FilenameFilter after:\n'+filename)
+	return filename
 
-   # Get server scene name:
-   scenename = nuke.root().name()
-   scenename_server = scenename + '.' + SERVER_PATHS_SUFFIX + '.nk'
+if 'nuke_filenamefilter' in cgruconfig.VARS and cgruconfig.VARS['nuke_filenamefilter']:
+	if 'platforms' in cgruconfig.VARS and 'pathsmap' in cgruconfig.VARS:
+		nuke.addFilenameFilter( pmFilenameFilter)
+		info = 'CGRU filenameFilter added:'
+		for key in PMaps: info += ' '+key
+		print( info)
 
-   # Map paths from client to server:
-   error_msg = ''
-   if pm.initialized:
-      pm.toServerFile( scenename, scenename_server, SearchStrings, Verbose = True)
-   else:
-      print 'No paths map preset. Just copying scene to:'
-      print scenename_server
-      try:
-         shutil.copy( scenename, scenename_server)
-      except:
-         error_msg = str(sys.exc_info()[1])
-         print 'File copied with error:'
-         print error_msg
+def pmOpenTranslated():
+	print('Opening scene with paths map...')
 
-   if error_msg != '': nuke.message('Server scene copy error:\n' + error_msg)
+	# Get scene name:
+	scenename_server = nuke.getFilename('Select a scene','*.nk')
+	if scenename_server is None: return
 
-def pmOpenFromServer():
-   print 'Opening scene with server paths...'
-   pm = PathMap( UnixSeparators = True, Verbose = True)
+	tmp_scenes = []
+	last_scene = scenename_server
+	# Transfer scene paths to server from all patforms:
+	for key in PMaps:
+		tmp_scenes.append( scenename_server+'.'+key)
+		print('Transfering from "%s" to "%s"' % ( key, os.path.basename( tmp_scenes[-1])))
+		PMaps[key].toServerFile( last_scene, tmp_scenes[-1], SearchStrings, Verbose = True)
+		last_scene = tmp_scenes[-1]
 
-   # Get server scene name:
-   scenename_server = nuke.getFilename('Select a scene with server paths','*.nk')
-   if scenename_server is None: return
+	error_msg = ''
+	# Transfer scene paths from server clinet native patform:
+	scenename_client = scenename_server + '.' + socket.gethostname() + '.nk'
+	if PathMap.initialized:
+		print('Transfering from server to "%s"' %  os.path.basename( scenename_client))
+		PathMap.toClientFile( last_scene, scenename_client, SearchStrings, Verbose = True)
+	else:
+		print('No paths map preset. Just copying scene to:')
+		print( scenename_client)
+		try:
+			shutil.copy( scenename_server, scenename_client)
+		except:
+			error_msg = str(sys.exc_info()[1])
+			print('File copied with error:')
+			print( error_msg)
+			error_msg = '\n' + error_msg
 
-   # Get client scene name
-   scenename_client = scenename_server
-   clientname = CLIENT_PATHS_SUFFIX
-   clientname += '-' + socket.gethostname()
-   if scenename_client.find( SERVER_PATHS_SUFFIX) != -1:
-      scenename_client = scenename_client.replace( SERVER_PATHS_SUFFIX, clientname)
-   else:
-      scenename_client += '.' + clientname + '.nk'
+	# Remove temp scenes:
+	for scene in tmp_scenes:
+		try:
+			os.remove( scene)
+		except:
+			print( str(sys.exc_info()[1]))
+			print('Error removing "%s"' % scene)
 
-   # Map paths from server to client:
-   error_msg = ''
-   if pm.initialized:
-      pm.toClientFile( scenename_server, scenename_client, SearchStrings, Verbose = True)
-   else:
-      print 'No paths map preset. Just copying scene to:'
-      print scenename_client
-      try:
-         shutil.copy( scenename_server, scenename_client)
-      except:
-         error_msg = str(sys.exc_info()[1])
-         print 'File copied with error:'
-         print error_msg
-         error_msg = '\n' + error_msg
+	# Check if new scene exists:
+	if not os.path.isfile(scenename_client):
+		nuke.message('Client scene was not created.' + error_msg)
+		return
 
-   # Check if new scene exists:
-   if not os.path.isfile(scenename_client):
-      nuke.message('Client scene was not created.' + error_msg)
-      return
+	# Open client scene:
+	nuke.scriptOpen( scenename_client)
 
-   # Open client scene:
-   nuke.scriptOpen( scenename_client)

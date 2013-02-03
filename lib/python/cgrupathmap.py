@@ -65,10 +65,15 @@ class PathMap:
 		self.PathClient = []
 		self.PathServer = []
 
-		if not 'pathsmap' in cgruconfig.VARS:
-			return
+		if 'pathsmap' in cgruconfig.VARS:
+			self.init( cgruconfig.VARS['pathsmap'], Verbose)
 
-		for pair in cgruconfig.VARS['pathsmap']:
+	def init( self, pathsmap, Verbose = False):
+		self.initialized = False
+		self.PathClient = []
+		self.PathServer = []
+
+		for pair in pathsmap:
 			if len( pair) != 2:
 				print('ERROR: Pathmap is not a pair.')
 				return

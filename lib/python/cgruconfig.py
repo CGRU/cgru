@@ -132,21 +132,26 @@ class Config:
 		if False == success:
 			return
 
-		self.getVars( obj, filename)
+		self.getVars( self.Vars, obj, filename)
 
-	def getVars( self, obj, filename):
-		for key in obj:
+	def getVars( self, o_vars, i_obj, i_filename):
+		for key in i_obj:
 			if len(key) == 0: continue
 			if key[0] == '-': continue
 			if key == 'include' and self.recursion:
-				for afile in obj[key]:
-					afile = os.path.join( os.path.dirname( filename), afile)
+				for afile in i_obj[key]:
+					afile = os.path.join( os.path.dirname( i_filename), afile)
 					self.load( afile)
-			elif key[:3] == 'OS_':
+					continue
+			if key[:3] == 'OS_':
 				if key[3:] in VARS['platform']:
-					self.getVars( obj[key], filename)
-			else:
-				self.Vars[key] = obj[key]
+					self.getVars( o_vars, i_obj[key], i_filename)
+			if type(i_obj[key]) == type(dict()):
+				if key in o_vars:
+					if type(o_vars[key]) == type(dict()):
+						self.getVars( o_vars[key], i_obj[key], i_filename)
+						continue
+			o_vars[key] = i_obj[key]
 
 Config()
 

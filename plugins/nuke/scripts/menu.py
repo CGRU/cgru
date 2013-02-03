@@ -9,8 +9,7 @@ cgru_submenu = cgru_menu.addMenu("Paths")
 cgru_submenu.addCommand('Cut Working Directory', 'cgru.pathcurdir.cut()')
 cgru_submenu.addCommand('Add Working Directory', 'cgru.pathcurdir.add()')
 cgru_submenu.addCommand("-", "", "")
-cgru_submenu.addCommand('Save Scene To Server Paths', 'cgru.pmSaveToServer()')
-cgru_submenu.addCommand('Open Scene From Server Paths', 'cgru.pmOpenFromServer()')
+cgru_submenu.addCommand('Open Translated', 'cgru.pmOpenTranslated()')
 
 cgru_menu.addCommand("-", "", "")
 

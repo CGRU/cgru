@@ -17,12 +17,16 @@
 
 			"":"This is a paths map example (disabled)",
 			"":"Client:Server",
-		"-pathsmap":[
+		"pathsmap":[
 			["//server/projects/","/mnt/prj/"]
 		],
 			"":"Client slashes direction plays no role, as it tries both slashes when searchs a path to replace.",
 			"":"But will replace with specified slashes, if unix slashes not forced (for Nuke, for example)."
 	},
+
+	"platforms":["linux","mac","windows"],
+
+	"-nuke_filenamefilter":true,
 
 	"previewcmds":["nuke -v \"@ARG@\"","imf_disp \"@ARG@\"","mplay \"@ARG@\""],
 

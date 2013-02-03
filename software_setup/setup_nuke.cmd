@@ -25,8 +25,10 @@ SET NUKE_AF_RENDERTHREADS=2
 rem Nuke render launcher:
 SET NUKE_AF_RENDER=nuke -i
 
-SET NUKE_DIR=C:\Program Files\Nuke6.3v4
-SET NUKE_EXEC=%NUKE_DIR%\Nuke6.3.exe
+For /F "Tokens=*" %%I in ('dir /b "C:\Program Files\Nuke*"') Do set "NUKE_DIR=C:\Program Files\%%I"
+rem echo %NUKE_DIR%
+For /F "Tokens=*" %%I in ('dir /b "%NUKE_DIR%\Nuke*.*.exe"') Do set "NUKE_EXEC=%NUKE_DIR%\%%I"
+rem echo %NUKE_EXEC%
 
 SET APP_DIR=%NUKE_DIR%
 SET APP_EXE=%NUKE_EXEC%

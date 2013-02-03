@@ -79,7 +79,7 @@ Gizmo {
 	tmpimage        1
 	pathsmap        1
 
-   help "- Please, Afanasy, help me to render."
+   help "Afanasy gizmo\n F10 create\n F11 render"
 }
 
 for { set i 0 } { $i < 100 } { incr i } {
