@@ -65,7 +65,7 @@ def pmOpenTranslated():
 		print('No paths map preset. Just copying scene to:')
 		print( scenename_client)
 		try:
-			shutil.copy( scenename_server, scenename_client)
+			shutil.copy( last_scene, scenename_client)
 		except:
 			error_msg = str(sys.exc_info()[1])
 			print('File copied with error:')
