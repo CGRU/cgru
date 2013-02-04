@@ -2,7 +2,8 @@
 
 import re, os, sys
 
-Extesions = ['dpx','exr','jpg','jpeg','png','tif']
+ImgExtensions = ['dpx','exr','jpg','jpeg','png','tif']
+MovExtensions = ['mov','avi','mp4','mpg','mpeg']
 
 from optparse import OptionParser
 
@@ -32,6 +33,7 @@ if Options.input == '':
 	sys.exit(1)
 
 Images = []
+Movie = None
 MTime = 0
 if os.path.isfile( Options.output):
 	MTime = os.path.getmtime( Options.output)
@@ -42,7 +44,7 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 	folders = [Options.input]
 	if folders[0].find(',') != -1:
 		folders = folders[0].split(',')
-	img_mtime = 0
+	cur_mtime = 0
 	for folder in folders:
 		if Options.verbose: print('Scanning folder "%s"...' % folder)
 		if not os.path.isdir( folder):
@@ -53,34 +55,46 @@ if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 			images = []
 			for afile in files:
 				split = re.split( r'\d\.', afile)
-				if len(split) > 1 and split[-1] in Extesions:
+				if len(split) > 1 and split[-1] in ImgExtensions:
 					images.append( afile)
+				else:
+					split = afile.split('.')
+					if len(split) > 1 and split[-1] in MovExtensions:
+						new_movie = os.path.join( root, afile)
+						new_mtime = int( os.path.getmtime( new_movie))
+						if new_movie > cur_mtime:
+							Movie = new_movie
+							cur_mtime = new_mtime
 			if len( images) == 0: continue
-			new_mtime = int( os.path.getmtime(root))
-			if new_mtime > img_mtime:
+			new_mtime = int( os.path.getmtime(os.path.join( root, images[0])))
+			if new_mtime > cur_mtime:
 				Images = []
+				Movie = None
 				images.sort()
 				for i in range( Options.number):
 					num = int( len(images) * (i+1.0) / (Options.number+1.0) )
 					Images.append( os.path.join( root, images[num]))
-				img_mtime = new_mtime
+				cur_mtime = new_mtime
 else:
 	if not os.path.isfile( Options.input):
 		print('ERROR: Input does not exist:\n' + str( Options.input))
 		sys.exit(1)
 
-if len( Images ) == 0:
+if len( Images ) == 0 and Movie is None:
 	print('ERROR: Can`t find images in "%s"' % Options.input)
 	sys.exit(1)
 
 if Options.verbose:
-	print('Images:');
-	for img in Images:
-		print( img)
+	if Movie is not None:
+		print('Movie: '+Movie)
+	else:
+		print('Images:')
+		for img in Images:
+			print( img)
 
-if MTime >= img_mtime:
+if MTime >= cur_mtime:
 	if Options.verbose:
-		print('Thumbnail is up to date (%d %d)' % (MTime, img_mtime))
+		print('Thumbnail is up to date (%d %d)' % (MTime, cur_mtime))
 	if Options.force:
 		if Options.verbose:
 			print('Forcing thumbnail creation')
@@ -97,14 +111,26 @@ if OutDir != '':
 
 Cmds = []
 Thumbnails = []
+
+if Movie is not None:
+	frame = os.path.join( OutDir, 'frame.%07d.jpg')
+	cmd = 'avconv -y'
+	cmd += ' -i "%s"' % Movie
+	cmd += ' -f image2 -vframes %d' % Options.number
+	cmd += ' "%s"' % frame
+	for i in range( 0, Options.number):
+		Images.append( frame % (i+1) )
+	Cmds.append( cmd)
+
 cmd = 'convert'
 cmd += ' "%s"'
-ImgType = Images[0].rfind('.');
-if ImgType > 0:
-	ImgType = Images[0][ImgType+1:].lower()
-	if   ImgType == 'exr': cmd += ' -set colorspace sRGB'
-	elif ImgType == 'dpx': cmd += ' -set colorspace Log'
-	elif ImgType == 'cin': cmd += ' -set colorspace Log'
+if Movie is None:
+	imgtype = Images[0].rfind('.');
+	if imgtype > 0:
+		imgtype = Images[0][imgtype+1:].lower()
+		if   imgtype == 'exr': cmd += ' -set colorspace sRGB'
+		elif imgtype == 'dpx': cmd += ' -set colorspace Log'
+		elif imgtype == 'cin': cmd += ' -set colorspace Log'
 cmd += ' -resize %dx%d' % (Options.xres, Options.yres)
 cmd += ' "%s"'
 for i in range( len( Images)):
