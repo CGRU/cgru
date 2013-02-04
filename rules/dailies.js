@@ -2,6 +2,8 @@ d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
 d_guiparams = ['input','output','artist','activity','version','filename'];
 
+d_expguiparams = ['quality','resolution'];
+
 function d_Make( i_path, i_outfolder)
 {
 	c_Log('Make Dailies: '+i_path);
@@ -169,5 +171,65 @@ function d_MakeCmd( i_params)
 //python "/cgru/utilities/moviemaker/makemovie.py" -c "/cgru/utilities/moviemaker/codecs/photojpg_best.ffmpeg" -f 25 -n mov --fs 1 --fe 20 -r 720x576x1.09 -g 1.00 -s "dailies_slate" -t "dailies_withlogo" --project "ENCODE" --shot "preview" --ver "preview" --artist "Timurhai" --activity "comp" --tmpformat tga --lgspath "logo.png" --lgssize 25 --lgsgrav SouthEast --lgfpath "logo.png" --lgfsize 10 --lgfgrav North "/data/tools/encode/preview/preview.####.jpg" "/data/tools/encode/preview_preview_121226"
 
 	return cmd;
+}
+
+function d_Explode( i_path)
+{
+	var params = {};
+	params.quality = 5;
+	params.resolution = -1;
+
+	var wnd = new cgru_Window('dailes','Explode Movie');
+	wnd.elContent.classList.add('dailies');
+
+	wnd.m_elements = {};
+	for( var p = 0; p < d_expguiparams.length; p++)
+	{
+		var elDiv = document.createElement('div');
+		wnd.elContent.appendChild( elDiv);
+
+		var elLabel = document.createElement('div');
+		elDiv.appendChild( elLabel);
+		elLabel.classList.add('label');
+		elLabel.textContent = d_expguiparams[p]+':';
+
+		var elParam = document.createElement('div');
+		elDiv.appendChild( elParam);
+		elParam.classList.add('param');
+		elParam.textContent = params[d_expguiparams[p]];
+		elParam.contentEditable = 'true';
+
+		wnd.m_elements[d_expguiparams[p]] = elParam;
+	}
+
+	var elBtns = document.createElement('div');
+	wnd.elContent.appendChild( elBtns);
+
+	var elSend = document.createElement('div');
+	elBtns.appendChild( elSend);
+	elSend.textContent = 'Explode';
+	elSend.classList.add('button');
+	elSend.onclick = function(e){ d_ExpProcessGUI( e.currentTarget.m_wnd);}
+	elSend.m_wnd = wnd;
+
+	wnd.m_path = i_path;
+}
+
+function d_ExpProcessGUI( i_wnd)
+{
+	var params = {};
+	for( var p = 0; p < d_expguiparams.length; p++)
+		params[d_expguiparams[p]] = i_wnd.m_elements[d_expguiparams[p]].textContent;
+
+	var cmd = 'python utilities/moviemaker/mov2seq.py -t jpg';
+	cmd += ' -q ' + params.quality;
+	if( params.resolution.length && ( params.resolution != '-1' ))
+		cmd += ' -x ' + params.resolution;
+	cmd += ' "' + cgru_PM('/' + RULES.root + i_wnd.m_path, true) + '"';
+
+	n_Request({"cmdexec":{"cmds":[cmd]}}, true);
+
+//	i_wnd.destroy();
+	window.location.reload();
 }
 

@@ -2,6 +2,8 @@ u_elements = ['asset','assets','content','info','open','log','navig','rules','pl
 	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
+u_movtypes = ['mov','avi','mp4','mpg','mpeg'];
+
 function u_Init()
 {
 	for( var i = 0; i < u_elements.length; i++)
@@ -89,6 +91,8 @@ function u_FilesOnClick( i_el)
 
 	document.getElementById('files_btn').classList.remove('button');
 
+	u_ShowFolder( u_el.files, g_elCurFolder.m_path, g_elCurFolder.m_dir);
+return;
 	var files = g_elCurFolder.m_dir.files;
 	for( var i = 0; i < files.length; i++)
 	{
@@ -315,5 +319,88 @@ function u_StatusSaveOnClick()
 	obj.add = true;
 	obj.file = RULES.root + g_elCurFolder.m_path + '/' + RULES.rufolder + '/status.json';
 	n_Request({"editobj":obj});
+}
+
+function u_ShowFolder( i_element, i_path, i_walk)
+{
+	if( i_walk.folders)
+		for( var i = 0; i < i_walk.folders.length; i++)
+			u_ShowSequence( i_element, i_path + '/' + i_walk.folders[i].name)
+
+	if( i_walk.files)
+		for( var i = 0; i < i_walk.files.length; i++)
+			u_ShowFile( i_element, i_path + '/' + i_walk.files[i])
+}
+
+function u_ShowSequence( i_element, i_path, i_name)
+{
+	if( i_name == null)
+	{
+		i_name = i_path.split('/');
+		i_name = i_name[i_name.length-1];
+	}
+
+	if( i_name.indexOf('.') == 0 ) return;
+
+	var elFolder = document.createElement('div');
+	elFolder.classList.add('folder');
+	i_element.appendChild( elFolder);
+
+	var elLinkA = document.createElement('a');
+	elFolder.appendChild( elLinkA);
+	elLinkA.setAttribute('href', 'rules/player.html#'+i_path);
+	elLinkA.setAttribute('target', '_blank');
+	elLinkA.textContent = i_name;
+
+	var cmds = RULES.cmdexec.play_sequence;
+	for( var c = 0; c < cmds.length; c++)
+	{
+		var elCmd = document.createElement('div');
+		elFolder.appendChild( elCmd);
+		elCmd.classList.add('cmdexec');
+		elCmd.textContent = cmds[c].name;
+		var cmd = cmds[c].cmd;
+		cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
+		cmd = cmd.replace('@FPS@', RULES.fps);
+		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
+	}
+
+	if( ASSET.dailies )
+	{
+		var elMakeDailies = document.createElement('div');
+		elFolder.appendChild( elMakeDailies);
+		elMakeDailies.classList.add('button');
+		elMakeDailies.textContent = 'Make Dailies';
+		elMakeDailies.m_path = i_path;
+		elMakeDailies.onclick = function(e){
+			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
+	}
+}
+
+function u_ShowFile( i_element, i_path)
+{
+	var name = i_path.substr( i_path.lastIndexOf('/')+1);
+	if( name.indexOf('.') == 0 ) return;
+	var type = name.substr( name.lastIndexOf('.')+1);
+
+	var elFile = document.createElement('div');
+	i_element.appendChild( elFile);
+	elFile.classList.add('folder');
+
+	var elLinkA = document.createElement('a');
+	elFile.appendChild( elLinkA);
+	elLinkA.href = RULES.root + i_path;
+	elLinkA.target = '_blank';
+	elLinkA.textContent = name;
+
+	if( u_movtypes.indexOf(type) != -1)
+	{
+		var elExplode = document.createElement('div');
+		elFile.appendChild( elExplode);
+		elExplode.classList.add('button');
+		elExplode.textContent = 'Explode';
+		elExplode.m_path = i_path;
+		elExplode.onclick = function(e){ d_Explode( e.currentTarget.m_path)};
+	}
 }
 

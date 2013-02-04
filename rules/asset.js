@@ -22,49 +22,6 @@ function a_Process()
 	u_el.open.setAttribute('cmdexec', JSON.stringify([RULES.open.replace(/@PATH@/g, path)]));
 }
 
-function a_ShowSequence( i_element, i_path, i_title)
-{
-	if( i_title == null)
-	{
-		i_title = i_path.split('/');
-		i_title = i_title[i_title.length-1];
-	}
-
-	var elFolder = document.createElement('div');
-	elFolder.classList.add('folder');
-	i_element.appendChild( elFolder);
-
-	var elLinkA = document.createElement('a');
-	elFolder.appendChild( elLinkA);
-	elLinkA.setAttribute('href', 'rules/player.html#'+i_path);
-	elLinkA.setAttribute('target', '_blank');
-	elLinkA.textContent = i_title;
-
-	var cmds = RULES.cmdexec[ASSET.result.cmdexec];
-	for( var c = 0; c < cmds.length; c++)
-	{
-		var elCmd = document.createElement('div');
-		elFolder.appendChild( elCmd);
-		elCmd.classList.add('cmdexec');
-		elCmd.textContent = cmds[c].name;
-		var cmd = cmds[c].cmd;
-		cmd = cmd.replace('@PATH@', cgru_PM('/'+RULES.root + i_path));
-		cmd = cmd.replace('@FPS@', RULES.fps);
-		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
-	}
-
-	if( ASSET.dailies )
-	{
-		var elMakeDailies = document.createElement('div');
-		elFolder.appendChild( elMakeDailies);
-		elMakeDailies.classList.add('button');
-		elMakeDailies.textContent = 'Make Dailies';
-		elMakeDailies.m_path = i_path;
-		elMakeDailies.onclick = function(e){
-			d_Make( e.currentTarget.m_path, ASSET.path+'/'+ASSET.dailies.path[0])};
-	}
-}
-
 function a_ShowBody()
 {
 	u_el.asset.innerHTML = '';
@@ -112,7 +69,7 @@ function a_ShowBody()
 	{
 		var elResult = document.createElement('div');
 		u_el.asset.appendChild( elResult);
-		elResult.classList.add('sequences');
+//		elResult.classList.add('sequences');
 
 		var founded = false;
 		for( var i = 0; i < walk.result.length; i++)
@@ -129,12 +86,10 @@ function a_ShowBody()
 			else
 				continue;
 
-			thumbnails.push( path);
-
-			for( var f = 0; f < folders.length; f++)
+			if( folders.length )
 			{
-				var fname = path + '/' + folders[f].name;
-				a_ShowSequence( elResult, fname);
+				thumbnails.push( path);
+				u_ShowFolder( elResult, path, {"folders":folders})
 				founded = true;
 			}
 		}
@@ -153,30 +108,13 @@ function a_ShowBody()
 		{
 			var path = walk.paths[walk.dailies[i]];
 			var files = walk.walks[walk.dailies[i]].files;
-			if( files == null ) continue;
-			if( files.length )
+			var folders = walk.walks[walk.dailies[i]].folders;
+			if(( files && files.length ) || ( folders && folders.length ))
 			{
 				elPath = document.createElement('div');
 				elDailies.appendChild( elPath);
 				elPath.textContent = ASSET.dailies.path[i];
-			}
-			else
-				continue;
-
-			for( var f = 0; f < files.length; f++)
-			{
-				var file = files[f];
-				if( file.indexOf('.mov') == -1 ) continue;
-
-				var elLinkDiv = document.createElement('div');
-				elDailies.appendChild( elLinkDiv);
-
-				var elLinkA = document.createElement('a');
-				elLinkDiv.appendChild( elLinkA);
-				elLinkA.href = RULES.root + path + '/' + file;
-				elLinkA.target = '_blank';
-				elLinkA.textContent = file;
-
+				u_ShowFolder( elDailies, path, walk.walks[walk.dailies[i]]);
 				founded = true;
 			}
 		}
@@ -438,7 +376,7 @@ function a_OpenCloseSourceOnClick( i_evt)
 			for( var f = 0; f < flist.length; f++)
 			{
 				var fname = flist[f];
-				a_ShowSequence( elSource, paths[i]+'/'+fname, fname);
+				u_ShowSequence( elSource, paths[i]+'/'+fname);
 				founded = true;
 			}
 		}

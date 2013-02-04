@@ -229,20 +229,19 @@ border-radius: 10px;
 /*text-shadow: 0px 0px 20px #060, 20px 1px 2px #010;*/
 }
 
-.sequences {}
-.sequences .folder {
+#content .folder {
 border-radius: 4px;
 box-shadow: 0 0 3px #000 inset;
 padding: 2px 6px;
 margin: 2px;
 }
-.sequences .folder div {
+#content .folder div {
 float: right;
 padding: 2px 6px;
 margin: 0px 10px;
 font-size: 14px;
 }
-.sequences .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
+#content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
 
 .scene {
 cursor: pointer;

@@ -19,12 +19,10 @@
 "shot":{
 	"seek":["/[project]/SCENES/[scene]/","/[project]/SHOTS/[scene]/"],
 	"source":{
-		"path":["SOURCE/SCAN"],
-		"cmdexec":"play_sequence"
+		"path":["SOURCE/SCAN"]
 	},
 	"result":{
-		"path":["RESULT/DPX","RESULT/JPG"],
-		"cmdexec":"play_sequence"
+		"path":["RESULT/DPX","RESULT/JPG"]
 	},
 	"dailies":{
 		"path":["RESULT/DAILIES"]
