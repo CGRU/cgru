@@ -2,7 +2,9 @@ d_moviemaker = '/cgru/utilities/moviemaker';
 d_makemovie = d_moviemaker+'/makemovie.py';
 d_guiparams = ['input','output','artist','activity','version','filename'];
 
-d_expguiparams = ['quality','resolution'];
+d_expguiparams = [];
+d_expguiparams.push({"name":'quality',"label":'Compression rate, 1 is the best quality'});
+d_expguiparams.push({"name":'resolution'});
 
 function d_Make( i_path, i_outfolder)
 {
@@ -78,6 +80,7 @@ function d_Make( i_path, i_outfolder)
 		elDiv.appendChild( elLabel);
 		elLabel.classList.add('label');
 		elLabel.textContent = d_guiparams[p]+':';
+		elLabel.style.textTransform = 'capitalize';
 
 		var elParam = document.createElement('div');
 		elDiv.appendChild( elParam);
@@ -185,21 +188,29 @@ function d_Explode( i_path)
 	wnd.m_elements = {};
 	for( var p = 0; p < d_expguiparams.length; p++)
 	{
+		var name = d_expguiparams[p].name;
+		var label = d_expguiparams[p].label;
+
 		var elDiv = document.createElement('div');
 		wnd.elContent.appendChild( elDiv);
 
 		var elLabel = document.createElement('div');
 		elDiv.appendChild( elLabel);
 		elLabel.classList.add('label');
-		elLabel.textContent = d_expguiparams[p]+':';
+		if( label == null )
+		{
+			label = name;
+			elLabel.style.textTransform = 'capitalize';
+		}
+		elLabel.textContent = label + ':';
 
 		var elParam = document.createElement('div');
 		elDiv.appendChild( elParam);
 		elParam.classList.add('param');
-		elParam.textContent = params[d_expguiparams[p]];
+		elParam.textContent = params[name];
 		elParam.contentEditable = 'true';
 
-		wnd.m_elements[d_expguiparams[p]] = elParam;
+		wnd.m_elements[name] = elParam;
 	}
 
 	var elBtns = document.createElement('div');
@@ -219,9 +230,10 @@ function d_ExpProcessGUI( i_wnd)
 {
 	var params = {};
 	for( var p = 0; p < d_expguiparams.length; p++)
-		params[d_expguiparams[p]] = i_wnd.m_elements[d_expguiparams[p]].textContent;
+		params[d_expguiparams[p].name] = i_wnd.m_elements[d_expguiparams[p].name].textContent;
 
 	var cmd = 'python utilities/moviemaker/mov2seq.py -t jpg';
+	cmd += ' -a ' + RULES.avconv;
 	cmd += ' -q ' + params.quality;
 	if( params.resolution.length && ( params.resolution != '-1' ))
 		cmd += ' -x ' + params.resolution;

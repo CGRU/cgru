@@ -6,12 +6,14 @@ import subprocess
 
 from optparse import OptionParser
 Parser = OptionParser(usage="%prog [options] input [second_input] output\ntype \"%prog -h\" for help", version="%prog 1.  0")
-Parser.add_option('-t', '--type',   dest='type',   type  ='string', default='png',   help='Images type')
-Parser.add_option('-n', '--name',   dest='name',   type  ='string', default='frame', help='Images files name')
-Parser.add_option('-o', '--outdir', dest='outdir', type  ='string', default='',      help='Output folder')
-Parser.add_option('-x', '--xres',   dest='xres',   type  ='int',    default=-1,      help='Images x resolution')
-Parser.add_option('-y', '--yres',   dest='yres',   type  ='int',    default=-1,      help='Images y resolution')
-Parser.add_option('-q', '--qscale', dest='qscale', type  ='int',    default=5,       help='JPEG compression rate')
+
+Parser.add_option('-a', '--avconv', dest='avconv', type  ='string', default='ffmpeg', help='AV convert command (ffmpeg)')
+Parser.add_option('-t', '--type',   dest='type',   type  ='string', default='png',    help='Images type (png)')
+Parser.add_option('-n', '--name',   dest='name',   type  ='string', default='frame',  help='Images files name (frame)')
+Parser.add_option('-o', '--outdir', dest='outdir', type  ='string', default='',       help='Output folder (auto)')
+Parser.add_option('-x', '--xres',   dest='xres',   type  ='int',    default=-1,       help='Images x resolution (no change)')
+Parser.add_option('-y', '--yres',   dest='yres',   type  ='int',    default=-1,       help='Images y resolution (no change)')
+Parser.add_option('-q', '--qscale', dest='qscale', type  ='int',    default=5,        help='JPEG compression rate (5)')
 
 (Options, argv) = Parser.parse_args()
 
@@ -29,7 +31,7 @@ outseq = Options.outdir
 if outseq == '':
 	outseq = os.path.join( inputmov +'.'+Options.type)
 
-args = ['ffmpeg']
+args = [ Options.avconv ]
 args.extend(['-y','-i', inputmov,'-an','-f','image2'])
 if Options.type == 'jpg':
 	args.extend(['-qscale', str(Options.qscale)])
@@ -49,7 +51,12 @@ outseq = os.path.join( outseq, Options.name+'.%07d.'+Options.type)
 args.append( outseq)
 #print( args)
 
-process = subprocess.Popen( args, shell=False, stderr=subprocess.PIPE)
+try:
+	process = subprocess.Popen( args, shell=False, stderr=subprocess.PIPE)
+except:
+	print('Command execution error:')
+	print( str(sys.exc_info()[1]))
+	sys.exit(1)
 #cmd = 'ffmpeg -y -i "%s" -an -sn -f image2 "%s"' % ( inputmov, outseq)
 #print(cmd)
 #process = subprocess.Popen( cmd, shell=True, stderr=subprocess.PIPE)

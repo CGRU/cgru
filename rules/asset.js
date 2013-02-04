@@ -115,6 +115,8 @@ function a_ShowBody()
 				elDailies.appendChild( elPath);
 				elPath.textContent = ASSET.dailies.path[i];
 				u_ShowFolder( elDailies, path, walk.walks[walk.dailies[i]]);
+				if( thumbnails.length == 0 )
+					thumbnails.push( path);
 				founded = true;
 			}
 		}
