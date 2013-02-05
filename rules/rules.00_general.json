@@ -62,6 +62,10 @@
 	"create_cmd":"rules/thumbnail.py -i \"@INPUT@\" -o \"@OUTPUT@\""
 },
 
+"avconv":"ffmpeg",
+"movtypes":["mov","avi","mp4","mpg","mpeg"],
+"skipfiles":[".","Thumbs.db"],
+
 "company":"CGRU",
 "fps":"24",
 "dailies":

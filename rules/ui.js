@@ -2,8 +2,6 @@ u_elements = ['asset','assets','content','info','open','log','navig','rules','pl
 	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
-u_movtypes = ['mov','avi','mp4','mpg','mpeg'];
-
 function u_Init()
 {
 	for( var i = 0; i < u_elements.length; i++)
@@ -325,11 +323,13 @@ function u_ShowFolder( i_element, i_path, i_walk)
 {
 	if( i_walk.folders)
 		for( var i = 0; i < i_walk.folders.length; i++)
-			u_ShowSequence( i_element, i_path + '/' + i_walk.folders[i].name)
+			if( false == u_SkipFile( i_walk.folders[i].name))
+				u_ShowSequence( i_element, i_path + '/' + i_walk.folders[i].name)
 
 	if( i_walk.files)
 		for( var i = 0; i < i_walk.files.length; i++)
-			u_ShowFile( i_element, i_path + '/' + i_walk.files[i])
+			if( false == u_SkipFile( i_walk.files[i]))
+				u_ShowFile( i_element, i_path + '/' + i_walk.files[i])
 }
 
 function u_ShowSequence( i_element, i_path, i_name)
@@ -339,8 +339,6 @@ function u_ShowSequence( i_element, i_path, i_name)
 		i_name = i_path.split('/');
 		i_name = i_name[i_name.length-1];
 	}
-
-	if( i_name.indexOf('.') == 0 ) return;
 
 	var elFolder = document.createElement('div');
 	elFolder.classList.add('folder');
@@ -380,7 +378,6 @@ function u_ShowSequence( i_element, i_path, i_name)
 function u_ShowFile( i_element, i_path)
 {
 	var name = i_path.substr( i_path.lastIndexOf('/')+1);
-	if( name.indexOf('.') == 0 ) return;
 	var type = name.substr( name.lastIndexOf('.')+1);
 
 	var elFile = document.createElement('div');
@@ -393,7 +390,7 @@ function u_ShowFile( i_element, i_path)
 	elLinkA.target = '_blank';
 	elLinkA.textContent = name;
 
-	if( u_movtypes.indexOf(type) != -1)
+	if( RULES.movtypes.indexOf(type) != -1)
 	{
 		var elExplode = document.createElement('div');
 		elFile.appendChild( elExplode);
@@ -402,5 +399,15 @@ function u_ShowFile( i_element, i_path)
 		elExplode.m_path = i_path;
 		elExplode.onclick = function(e){ d_Explode( e.currentTarget.m_path)};
 	}
+}
+
+function u_SkipFile( i_filename)
+{
+	if( i_filename.indexOf('/') != -1 )
+		i_filename = i_filename.substr( i_filename.lastIndexOf('/')+1);
+	for( var i = 0; i < RULES.skipfiles.length; i++ )
+		if( i_filename.indexOf( RULES.skipfiles[i]) == 0 )
+			return true;
+	return false;
 }
 
