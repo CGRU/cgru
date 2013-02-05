@@ -22,12 +22,14 @@ if PythonQtType == 'PyQt4':
 	PySide = False
 
 def GetOpenFileName( i_qwidget, i_title, i_path = None):
+	if i_path is None: i_path = '.'
 	if PySide:
 		afile, filter = QtGui.QFileDialog.getOpenFileName( i_qwidget, i_title, i_path)
 		return afile
 	return str( QtGui.QFileDialog.getOpenFileName( i_qwidget, i_title, i_path))
 
 def GetSaveFileName( i_qwdget, i_title, i_path = None):
+	if i_path is None: i_path = '.'
 	if PySide:
 		afile, filter = QtGui.QFileDialog.getSaveFileName( i_qwdget, i_title, i_path)
 		return afile
