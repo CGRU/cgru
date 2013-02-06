@@ -14,7 +14,7 @@
 },
 "scene":{
 	"seek":["/[project]/SCENES/","/[project]/SHOTS/"],
-	"statuses":true
+	"thumbnails":0
 },
 "shot":{
 	"seek":["/[project]/SCENES/[scene]/","/[project]/SHOTS/[scene]/"],

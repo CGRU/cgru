@@ -6,7 +6,7 @@ cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title'])
 
 p_path = null;
 p_elImg = [];
-p_Images = [];
+p_images = [];
 p_frame = null;
 p_playing = null;
 p_timer = null;
@@ -20,10 +20,10 @@ p_slidering = false;
 p_slidertimer = null;
 
 p_painting = false;
-p_elCanvas = [];
-p_color = null;
-p_size = 5;
-p_ctx = null;
+p_paintElCanvas = [];
+p_paintColor = null;
+p_paintSize = 5;
+p_paintCtx = null;
 
 p_saving = false;
 p_filestosave = 0;
@@ -92,8 +92,8 @@ function p_PathChanged()
 		p_el.view.removeChild( p_elImg[i]);
 
 	p_elImg = [];
-	p_Images = [];
-	p_elCanvas = [];
+	p_images = [];
+	p_paintElCanvas = [];
 
 	p_path = c_GetHashPath();
 //	p_path = '../'+RULES_TOP.root + p_path;
@@ -116,7 +116,7 @@ function p_PathChanged()
 		img.src = '../'+p_path + '/' + p_files[i];
 		img.onload = function(){p_ImgLoaded();}
 		img.onerror = function(){p_ImgLoaded();}
-		p_Images.push( img);
+		p_images.push( img);
 	}
 }
 
@@ -284,8 +284,8 @@ function p_NextFrame( i_val)
 	if( p_loaded == false ) return;
 p_elImg[p_frame].style.display = 'none';
 
-	if( p_elCanvas[p_frame])
-		p_elCanvas[p_frame].style.display = 'none';
+	if( p_paintElCanvas[p_frame])
+		p_paintElCanvas[p_frame].style.display = 'none';
 
 	if( i_val )
 	{
@@ -305,8 +305,8 @@ p_elImg[p_frame].style.display = 'none';
 p_elImg[p_frame].style.display = 'block';
 //p_elImg[0].style.display = 'block';
 //p_elImg[0].src = p_path + '/' + p_files[p_frame];
-	if( p_elCanvas[p_frame])
-		p_elCanvas[p_frame].style.display = 'block';
+	if( p_paintElCanvas[p_frame])
+		p_paintElCanvas[p_frame].style.display = 'block';
 
 	c_Info( p_files[p_frame], false);
 	var width = '100%';
@@ -378,14 +378,14 @@ i_evt.stopPropagation();
 	if( p_painting == false ) return;
 
 	var canvas = null;
-	if( p_elCanvas[p_frame] )
+	if( p_paintElCanvas[p_frame] )
 	{
-		canvas = p_elCanvas[p_frame];
+		canvas = p_paintElCanvas[p_frame];
 	}
 	else
 	{
 		canvas = document.createElement('canvas');
-		p_elCanvas[p_frame] = canvas;
+		p_paintElCanvas[p_frame] = canvas;
 		p_el.view.appendChild( canvas);
 		canvas.width = p_elImg[p_frame].width;
 		canvas.height = p_elImg[p_frame].height;
@@ -395,12 +395,12 @@ i_evt.stopPropagation();
 	}
 
 	var c = p_GetCtxCoords( i_evt);
-	p_ctx = canvas.getContext('2d');
-	p_ctx.globalCompositeOperation = 'source-over';
-	p_ctx.beginPath();
-	p_ctx.lineWidth = 10;
-	p_ctx.lineCap = 'round';
-	p_ctx.strokeStyle = 'rgb(255,255,0)';
+	p_paintCtx = canvas.getContext('2d');
+	p_paintCtx.globalCompositeOperation = 'source-over';
+	p_paintCtx.beginPath();
+	p_paintCtx.lineWidth = 10;
+	p_paintCtx.lineCap = 'round';
+	p_paintCtx.strokeStyle = 'rgb(255,255,0)';
 
 	p_SetPaintState();
 }
@@ -420,22 +420,22 @@ window.console.log('e['+i_evt.clientX+','+i_evt.clientY+']'+
 }
 function p_ViewOnMouseMove( i_evt)
 {
-	if( p_ctx == null ) return;
+	if( p_paintCtx == null ) return;
 	var c = p_GetCtxCoords( i_evt);
-	p_ctx.lineTo( c.x, c.y);
-	var wasedited = p_elCanvas[p_frame].m_edited;
-	p_elCanvas[p_frame].m_edited = true;
-	p_elCanvas[p_frame].m_saved = false;
-	p_ctx.stroke();
+	p_paintCtx.lineTo( c.x, c.y);
+	var wasedited = p_paintElCanvas[p_frame].m_edited;
+	p_paintElCanvas[p_frame].m_edited = true;
+	p_paintElCanvas[p_frame].m_saved = false;
+	p_paintCtx.stroke();
 	p_SetPaintState();
 }
 function p_ViewOnMouseUp()
 {
-	p_ctx = null;
+	p_paintCtx = null;
 }
 function p_ViewOnMouseOver()
 {
-	p_ctx = null;
+	p_paintCtx = null;
 }
 
 function p_ColorChanged()
@@ -454,7 +454,7 @@ function p_Save()
 	p_el.btn_save.classList.add('pushed');
 	for( var f = 0; f < p_files.length; f++)
 	{
-		var canvas = p_elCanvas[f];
+		var canvas = p_paintElCanvas[f];
 		if( canvas == null ) continue;
 		if( canvas.m_edited != true ) continue;
 		if( canvas.m_saved ) continue;
@@ -497,8 +497,8 @@ function n_MessageReceived( i_msg)
 			p_filessaved++;
 			var name = file.substr( file.lastIndexOf('/')+1);
 			var frame = p_files.indexOf(name);
-			if( p_elCanvas[frame])
-				p_elCanvas[frame].m_saved = true;
+			if( p_paintElCanvas[frame])
+				p_paintElCanvas[frame].m_saved = true;
 			p_SetPaintState();
 			c_Info('Saved "'+name +'" '+p_filessaved+' of '+p_filestosave);
 			if( p_filessaved >= p_filestosave )
@@ -520,13 +520,13 @@ function p_SavingFinished( folder)
 function p_SetPaintState()
 {
 	var shadow = '0 0 4px #000';
-	if( p_elCanvas[p_frame] )
+	if( p_paintElCanvas[p_frame] )
 	{
 		shadow = '0 0 4px #FF0';
-		if( p_elCanvas[p_frame].m_edited )
+		if( p_paintElCanvas[p_frame].m_edited )
 		{
 			shadow = '0 0 4px #F00';
-			if( p_elCanvas[p_frame].m_saved )
+			if( p_paintElCanvas[p_frame].m_saved )
 				shadow = '0 0 4px #0F0';
 		}
 	}

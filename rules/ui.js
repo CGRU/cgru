@@ -44,7 +44,7 @@ function u_Process()
 	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
 //	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>RULES='+JSON.stringify( RULES);
 
-	if( ASSET.path == g_elCurFolder.m_path )
+	if( ASSET && ( ASSET.path == g_elCurFolder.m_path ))
 		u_el.files.parentNode.style.display = 'none';
 	else
 		u_el.files.parentNode.style.display = 'block';

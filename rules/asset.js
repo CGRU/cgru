@@ -125,7 +125,7 @@ function a_ShowBody()
 			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
-	if( ASSET.statuses )
+	if( ASSET.thumbnails === 0 )
 	{
 		var folders = g_elCurFolder.m_dir.folders;
 		for( var f = 0; f < folders.length; f++ )
