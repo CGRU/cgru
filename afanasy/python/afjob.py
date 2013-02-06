@@ -112,6 +112,7 @@ images			= ''
 image			= ''
 extrargs		= ''
 blocktype		= ''
+blockparser     = ''
 platform		= ''
 varirender	= False
 simulate		= False
@@ -120,6 +121,7 @@ script			= ''
 cmd = None
 cmds = []
 blocknames = []
+blockparsers = []
 
 #
 # checking some critical argumens values
@@ -354,10 +356,23 @@ if ext == 'shk':
 # Blender:
 if ext == 'blend':
 	scenetype = 'blender'
+	blockparser = 'blender_render'
 	if cmd is None: cmd = 'blender' + cmdextension
 	cmd += ' -b "%s"' % scene
-	if extrargs != '': cmd += ' ' + extrargs
+	if extrargs != '':
+		cmd += ' ' + extrargs
+		if extrargs.find('CYCLES') > 0:
+			blockparser = 'blender_cycles'
+	if output != '':
+		cmd += ' -o "%s"' % output
+		if images == '':
+			images = output
+			pos = images.find('#')
+			if pos > 0: images = images[:pos] + '@' + images[pos:]
+			pos = images.rfind('#')
+			if pos > 0: images = images[:pos+1] + '@' + images[pos+1:]
 	cmd += ' -s @#@ -e @#@ -j %d -a' % by
+	blockname = blockparser
 
 # Nuke:
 elif ext == 'nk':
@@ -535,9 +550,13 @@ if blocktype == '': blocktype = scenetype
 if len( cmds) == 0:
 	cmds.append( cmd)
 	blocknames.append( blockname)
+if len(blockparsers) == 0 and blockparser != '':
+	blockparsers.append( blockparser)
 i = 0
 for cmd in cmds:
 	block = af.Block( blocknames[i], blocktype)
+	if len( blockparsers):
+		block.setParser( blockparsers[i])
 	block.setWorkingDirectory( pwd )
 	block.setNumeric( s, e, fpt, by)
 	if scenetype == 'max': block.setCommand( cmd, False, False )
@@ -565,6 +584,10 @@ if platform != '':
 
 # Add a Block to a Job:
 job.blocks.extend( blocks)
+
+
+# Print job information:
+#job.output( True)
 
 # Send Job to server:
 if job.send() == False: sys.exit(1)
