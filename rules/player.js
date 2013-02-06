@@ -29,7 +29,7 @@ p_saving = false;
 p_filestosave = 0;
 p_filessaved = 0;
 
-p_fps = 25.0;
+p_fps = 24.0;
 p_interval = 40;
 p_drawTime = new Date();
 
@@ -63,7 +63,7 @@ function p_Init()
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
 //	RULES = RULES_TOP;
 
-	if( localStorage.player_precreate == null ) localStorage.player_precreate = 'ON';
+	if( localStorage.player_precreate == null ) localStorage.player_precreate = 'OFF';
 	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
 	if( localStorage.player_usewebgl == null ) localStorage.player_usewebgl = 'ON';
 	if( localStorage.player_usewebgl == 'ON' )
@@ -99,12 +99,22 @@ function p_PrecreateOnClick()
 	if( localStorage.player_precreate == 'ON' ) localStorage.player_precreate = 'OFF';
 	else localStorage.player_precreate = 'ON';
 	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
+	p_Deactivate();
 }
 function p_UseWebGLOnClick()
 {
 	if( localStorage.player_usewebgl == 'ON' ) localStorage.player_usewebgl = 'OFF';
 	else localStorage.player_usewebgl = 'ON';
 	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
+	p_Deactivate();
+}
+
+function p_Deactivate()
+{
+	p_loaded = false;
+	p_StopTimer();
+	for( var btn in p_elb ) p_elb[btn].style.display = 'none';
+	c_Info('DEACTIVATED. Need to be restarted (F5).');
 }
 
 function p_PathChanged()
@@ -274,6 +284,7 @@ function p_Play()
 	}
 	p_PushButton('play');
 	p_playing = 1;
+	p_interval = Math.round(1000/p_fps);
 	p_NextFrame();
 }
 
@@ -287,6 +298,7 @@ function p_Reverse()
 	}
 	p_PushButton('reverse');
 	p_playing = -1;
+	p_interval = Math.round(1000/p_fps);
 	p_NextFrame();
 }
 
@@ -371,7 +383,8 @@ function p_NextFrame( i_val)
 	var now = new Date();
 	var delta = now.valueOf() - p_drawTime.valueOf();
 	var fps = 1000 / delta;
-	p_el.framerate.textContent = (''+fps).substr(0,5);
+//	p_el.framerate.textContent = (''+fps).substr(0,5);
+	p_el.framerate.textContent = Math.round( fps);
 	p_drawTime = now;
 	if( fps < p_fps ) p_interval--;
 	else p_interval++;
@@ -749,8 +762,8 @@ function gl_InitBuffers()
 	gl.bindBuffer(gl.ARRAY_BUFFER, gl_vtxUVBuf);
 
 	var textureCoordinates = [
-	0.0,  1.1,
-	1.0,  1.1,
+	0.0,  1.0,
+	1.0,  1.0,
 	1.0,  0.0,
 	0.0,  0.0 ];
 

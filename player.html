@@ -66,10 +66,9 @@ Activated after reload (F5).">WebGL:</div>
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="p_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
-		<div style="float:left;margin:2px;">
+		<div id="FPS">
 			<div style="float:left;margin:2px;padding:2px;">FPS:</div>
-			<div style="width:40px;height:18px;color:#140;float:left;background:#222;border-radius:4px;margin:2px;padding:2px 4px;box-shadow:0 0 4px #000 inset, 0 0 4px #555;"
-				id="framerate">0.0</div>
+			<div id="framerate"></div>
 		</div>
 		<div class="button" id="btn_paint" onclick="p_Paint()">Paint</div>
 		<div id="paint" style="display:none">

@@ -41,3 +41,16 @@ overflow: hidden;
 #paint .button {
 float:left;
 }
+
+#FPS {float:left;margin:2px;}
+#framerate {
+float:left;
+width:16px; height:18px;
+background:#222;
+color:#140;
+border-radius:4px;
+margin:2px; padding:2px 12px;
+box-shadow:0 0 4px #000 inset, 0 0 4px #555;
+}
+#FPS:hover #framerate { color:#291; }
+
