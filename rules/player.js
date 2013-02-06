@@ -29,7 +29,11 @@ p_saving = false;
 p_filestosave = 0;
 p_filessaved = 0;
 
-p_elements = ['player_content','progress','slider','view','header','footer','paint','colors','btn_save','btn_paint'];
+p_fps = 25.0;
+p_interval = 40;
+p_drawTime = new Date();
+
+p_elements = ['player_content','progress','slider','view','header','footer','paint','colors','btn_save','btn_paint','framerate'];
 p_el = {};
 p_buttons = ['play','prev','next','reverse','rewind','forward'];
 p_elb = {};
@@ -59,6 +63,20 @@ function p_Init()
 		cgru_ConfigJoin( RULES_TOP.cgru_config );
 //	RULES = RULES_TOP;
 
+	if( localStorage.player_precreate == null ) localStorage.player_precreate = 'ON';
+	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
+	if( localStorage.player_usewebgl == null ) localStorage.player_usewebgl = 'ON';
+	if( localStorage.player_usewebgl == 'ON' )
+	{
+		gl_Init();
+		if( gl == null )
+		{
+			localStorage.player_usewebgl = 'OFF';
+			alert('Unable to initialize WebGL. Your browser may not support it.\nIt is disabled now, 2d canvas will be used.\nYou can open settings in upper left corner.');
+		}
+	}
+	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
+
 	u_DrawColorBars( p_el.colors, p_ColorChanged(), 25);
 	p_el.view.onmousedown = p_ViewOnMouseDown;
 	p_el.view.onmousemove = p_ViewOnMouseMove;
@@ -76,6 +94,19 @@ function p_Init()
 	p_PathChanged();
 }
 
+function p_PrecreateOnClick()
+{
+	if( localStorage.player_precreate == 'ON' ) localStorage.player_precreate = 'OFF';
+	else localStorage.player_precreate = 'ON';
+	document.getElementById('player_precreate').textContent = localStorage.player_precreate;
+}
+function p_UseWebGLOnClick()
+{
+	if( localStorage.player_usewebgl == 'ON' ) localStorage.player_usewebgl = 'OFF';
+	else localStorage.player_usewebgl = 'ON';
+	document.getElementById('player_usewebgl').textContent = localStorage.player_usewebgl;
+}
+
 function p_PathChanged()
 {
 	p_loaded = false;
@@ -86,10 +117,6 @@ function p_PathChanged()
 	p_frame = 0;
 	p_playing = 0;
 
-	for( var i = 0; i < p_elImg.length; i++)
-		p_el.view.removeChild( p_elImg[i]);
-
-	p_elImg = [];
 	p_images = [];
 	p_paintElCanvas = [];
 
@@ -98,7 +125,7 @@ function p_PathChanged()
 	var walk = n_WalkDir([p_path])[0];
 	p_files = walk.files;
 
-	if( p_files == null )
+	if( p_files == null || ( p_files.length == 0 ))
 	{
 		if( walk.error )
 			c_Error( walk.error);
@@ -106,6 +133,8 @@ function p_PathChanged()
 			c_Error('No Files Founded.');
 		return;
 	}
+
+	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_files[0];
 
 	for( var i = 0; i < p_files.length; i++)
 	{
@@ -128,23 +157,37 @@ function p_ImgLoaded()
 	p_loaded = true;
 	p_PushButton();
 
-	for( var i = 0; i < p_files.length; i++)
-	{
-		var elImg = document.createElement('img');
-		p_el.view.appendChild( elImg);
-		elImg.src = p_path + '/' + p_files[i];
-		elImg.style.display = 'none';
-		elImg.onmousedown = function(){return false;}
-		p_elImg.push( elImg);
-
-	}
+	if( localStorage.player_usewebgl == 'ON' )
+		gl_Start();
+	else
+		p_CreateImages();
 
 	p_ShowFrame( p_frame);
 
 	p_HomeView();
 //	setTimeout('p_HomeView();',100);
 
-	c_Info('Loaded '+p_files.length+' images '+p_elImg[0].width+'x'+p_elImg[0].height);
+	c_Info('Loaded '+p_images.length+' images '+p_images[0].width+'x'+p_images[0].height);
+}
+
+function p_CreateImages()
+{
+	for( var i = 0; i < p_elImg.length; i++)
+		p_el.view.removeChild( p_elImg[i]);
+	p_elImg = [];
+
+	var imgnum = 1;
+	if( localStorage.player_precreate == 'ON' ) imgnum = p_images.length;
+	for( var i = 0; i < imgnum; i++)
+	{
+		var elImg = document.createElement('img');
+		p_el.view.appendChild( elImg);
+		elImg.src = p_path + '/' + p_files[i];
+		if( localStorage.player_precreate == 'ON' )
+			elImg.style.display = 'none';
+		elImg.onmousedown = function(){return false;}
+		p_elImg.push( elImg);
+	}
 }
 
 function p_HomeView()
@@ -152,8 +195,8 @@ function p_HomeView()
 //window.console.log(p_elImg[0].width+' x '+p_elImg[0].height);
 //window.console.log(p_el.player_content.clientWidth+' x '+p_el.player_content.clientHeight);
 	var ml = '0px', mt = '0px';
-	var img_w = p_elImg[0].width;
-	var img_h = p_elImg[0].height;
+	var img_w = p_images[0].width;
+	var img_h = p_images[0].height;
 	if(( img_w > 0 ) && ( img_h > 0 ))
 	{
 		var wnd_w = p_el.player_content.clientWidth;
@@ -161,6 +204,8 @@ function p_HomeView()
 		ml = Math.round((wnd_w - img_w) / 2)+'px';
 		mt = Math.round((wnd_h - img_h) / 2)+'px';
 	}
+	p_el.view.style.width = img_w+'px';
+	p_el.view.style.height = img_h+'px';
 	p_el.view.style.marginLeft = ml;
 	p_el.view.style.marginTop = mt;
 }
@@ -263,7 +308,7 @@ function p_Rewind( i_dir)
 {
 	if( p_loaded == false ) return;
 	if( i_dir )
-		p_ShowFrame( p_elImg.length - 1);
+		p_ShowFrame( p_images.length - 1);
 	else
 		p_ShowFrame( 0);
 }
@@ -272,14 +317,17 @@ function p_ShowFrame( i_val)
 {
 	if( p_loaded == false ) return;
 	if( i_val == -1 )
-		i_val = p_elImg.length - 1;
+		i_val = p_images.length - 1;
 	p_NextFrame( i_val - p_frame );
 }
 
 function p_NextFrame( i_val)
 {
 	if( p_loaded == false ) return;
-p_elImg[p_frame].style.display = 'none';
+
+	if( localStorage.player_usewebgl == 'OFF' )
+		if( localStorage.player_precreate == 'ON' )
+			p_elImg[p_frame].style.display = 'none';
 
 	if( p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'none';
@@ -296,28 +344,43 @@ p_elImg[p_frame].style.display = 'none';
 		p_frame += p_playing;
 	}
 
-	if( p_frame >= p_elImg.length ) p_frame = 0;
-	if( p_frame < 0 ) p_frame = p_elImg.length - 1;
+	if( p_frame >= p_images.length ) p_frame = 0;
+	if( p_frame < 0 ) p_frame = p_images.length - 1;
 
-p_elImg[p_frame].style.display = 'block';
-//p_elImg[0].style.display = 'block';
-//p_elImg[0].src = p_path + '/' + p_files[p_frame];
+	if( localStorage.player_usewebgl == 'ON' )
+		gl_DrawScene();
+	else
+	{
+		if( localStorage.player_precreate == 'ON' )
+			p_elImg[p_frame].style.display = 'block';
+		else
+			p_elImg[0].src = p_path + '/' + p_files[p_frame];
+	}
+
 	if( p_paintElCanvas[p_frame])
 		p_paintElCanvas[p_frame].style.display = 'block';
 
 	c_Info( p_files[p_frame], false);
 	var width = '100%';
-	if( p_elImg.length > 1 )
-		width = 100.0*p_frame/(p_elImg.length-1) + '%';
+	if( p_images.length > 1 )
+		width = 100.0*p_frame/(p_images.length-1) + '%';
 	p_el.progress.style.width = width;
+
+	p_SetPaintState();
+
+	var now = new Date();
+	var delta = now.valueOf() - p_drawTime.valueOf();
+	var fps = 1000 / delta;
+	p_el.framerate.textContent = (''+fps).substr(0,5);
+	p_drawTime = now;
+	if( fps < p_fps ) p_interval--;
+	else p_interval++;
 
 	if( p_playing != 0 )
 	{
 		p_StopTimer();
-		p_timer = setTimeout('p_NextFrame()', 40);
+		p_timer = setTimeout('p_NextFrame()', p_interval);
 	}
-
-	p_SetPaintState();
 }
 
 function p_SliderOnMouseDown( i_evt)
@@ -338,8 +401,8 @@ function p_SliderOnMouseMove( i_evt)
 	if( false == p_slidering ) return;
 	var width = p_el.slider.clientWidth - 1;
 	var offset = i_evt.clientX - p_el.slider.offsetLeft;
-	p_el.progress.style.width = 100.0*offset/width + '%';
-	p_ShowFrame( Math.floor(p_elImg.length * offset / width ));
+//	p_el.progress.style.width = 100.0*offset/width + '%';
+	p_ShowFrame( Math.floor( p_images.length * offset / width ));
 	return false;
 }
 function p_SliderOnMouseUp()
@@ -384,8 +447,8 @@ i_evt.stopPropagation();
 		canvas = document.createElement('canvas');
 		p_paintElCanvas[p_frame] = canvas;
 		p_el.view.appendChild( canvas);
-		canvas.width = p_elImg[p_frame].width;
-		canvas.height = p_elImg[p_frame].height;
+		canvas.width = p_images[0].width;
+		canvas.height = p_images[0].height;
 		canvas.style.width = canvas.width + 'px';
 		canvas.style.height = canvas.height + 'px';
 		c_Info('Canvas for "'+p_files[p_frame]+'" created.');
@@ -449,7 +512,7 @@ function p_Save()
 	p_filessaved = 0;
 
 	p_el.btn_save.classList.add('pushed');
-	for( var f = 0; f < p_files.length; f++)
+	for( var f = 0; f < p_images.length; f++)
 	{
 		var canvas = p_paintElCanvas[f];
 		if( canvas == null ) continue;
@@ -529,5 +592,215 @@ function p_SetPaintState()
 	}
 	p_el.view.style.boxShadow = shadow;
 	p_el.btn_paint.style.boxShadow = shadow;
+}
+
+// ====================== WEB GL ======================
+
+var gl;
+
+var gl_elCanvas;
+var gl_textures = [];
+
+var gl_vtxBuf;
+var gl_vtxUVBuf;
+var gl_vtxIndexBuf;
+
+var gl_camMatrix;
+var gl_objMatrix;
+var gl_shaderProgram;
+var gl_vtxPosAttr;
+var gl_uvAttr;
+
+var gl_fragmentShaderSource = 'varying highp vec2 vTextureCoord; uniform sampler2D uSampler; void main(void) { gl_FragColor = texture2D(uSampler, vec2(vTextureCoord.s, vTextureCoord.t));}';
+var gl_vertexShaderSource = 'attribute vec3 aVertexPosition; attribute vec2 aTextureCoord; uniform mat4 uMVMatrix; uniform mat4 uPMatrix; varying highp vec2 vTextureCoord;	void main(void) {gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0); vTextureCoord = aTextureCoord;}';
+
+function gl_Init()
+{
+	gl = null;
+
+	gl_elCanvas = document.createElement('canvas');
+	gl_elCanvas.width = 64;
+	gl_elCanvas.height = 64;
+	p_el.view.appendChild( gl_elCanvas);
+
+	try
+	{
+		gl = gl_elCanvas.getContext("webgl") || gl_elCanvas.getContext("experimental-webgl");
+	}
+	catch(e)
+	{
+		p_el.view.removeChild( gl_elCanvas);
+	}
+}
+
+function gl_Start()
+{
+	if( gl == null )
+	{
+		c_Error('GL is not created.');
+		return;
+	}
+
+	gl_elCanvas.width = p_images[0].width;
+	gl_elCanvas.height = p_images[0].height;
+	gl.viewport( 0, 0, p_images[0].width, p_images[0].height);
+
+	gl.clearColor(0.0, 0.0, 0.0, 1.0);  // Clear to black, fully opaque
+	gl.clearDepth(1.0);                 // Clear everything
+	gl.enable(gl.DEPTH_TEST);           // Enable depth testing
+	gl.depthFunc(gl.LEQUAL);            // Near things obscure far things
+
+	// Ortho camera projection
+	gl_camMatrix = new Float32Array(	[1, 0, 0, 0,
+										 0, 1, 0, 0,
+										 0, 0, 0, 0,
+										 0, 0, 0, 1]);
+	// Object space
+	gl_objMatrix = new Float32Array(	[1, 0, 0, 0,
+										 0, 1, 0, 0,
+										 0, 0, 1, 0,
+										 0, 0, 0, 1]);
+
+	gl_InitShaders();
+	gl_InitBuffers();
+	gl_InitTextures();
+
+//	setInterval("drawScene()", 40);
+}
+
+function gl_InitShaders()
+{
+	// Create the shader program
+	gl_shaderProgram = gl.createProgram();
+	gl.attachShader( gl_shaderProgram, gl_InitShader( gl_vertexShaderSource, gl.VERTEX_SHADER));
+	gl.attachShader( gl_shaderProgram, gl_InitShader( gl_fragmentShaderSource, gl.FRAGMENT_SHADER));
+	gl.linkProgram( gl_shaderProgram);
+
+	// If creating the shader program failed, alert
+	if (!gl.getProgramParameter( gl_shaderProgram, gl.LINK_STATUS))
+		c_Error('Unable to initialize the shader program.');
+
+	gl.useProgram( gl_shaderProgram);
+	gl_vtxPosAttr = gl.getAttribLocation( gl_shaderProgram, "aVertexPosition");
+	gl.enableVertexAttribArray( gl_vtxPosAttr);
+	gl_uvAttr = gl.getAttribLocation( gl_shaderProgram, "aTextureCoord");
+	gl.enableVertexAttribArray( gl_uvAttr);
+}
+function gl_InitShader( i_src, i_type)
+{
+	var shader = gl.createShader( i_type);
+	// Send the source to the shader object
+	gl.shaderSource( shader, i_src);
+	// Compile the shader program
+	gl.compileShader( shader);
+	// See if it compiled successfully
+	if( !gl.getShaderParameter( shader, gl.COMPILE_STATUS))
+	{
+		c_Error('An error occurred compiling the shaders: ' + gl.getShaderInfoLog( shader));
+		return null;
+	}
+	return shader;
+}
+
+function gl_InitTextures()
+{
+	var numtex = 1;
+	if( localStorage.player_precreate == 'ON' ) numtex = p_images.length;
+	for( var i = 0; i < numtex; i++)
+	{
+		gl_textures[i] = gl.createTexture();
+		gl_InitTexture( i, i);
+	}
+}
+function gl_InitTexture( i_tex, i_img)
+{
+	gl.bindTexture(gl.TEXTURE_2D, gl_textures[i_tex]);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, p_images[i_img]);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);// NEAREST
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+	gl.bindTexture(gl.TEXTURE_2D, null);
+}
+
+function gl_InitBuffers()
+{
+	// Create a buffer for the cube's vertices.
+	gl_vtxBuf = gl.createBuffer();
+
+	// Select the gl_vtxBuf as the one to apply vertex
+	// operations to from here out.
+	gl.bindBuffer(gl.ARRAY_BUFFER, gl_vtxBuf);
+
+	// Now create an array of vertices for the cube.
+	var vertices = [
+		-1.0, -1.0, 0.0,
+		1.0, -1.0, 0.0,
+		1.0, 1.0, 0.0,
+		-1.0, 1.0, 0.0 ];
+
+	// Now pass the list of vertices into WebGL to build the shape. We
+	// do this by creating a Float32Array from the JavaScript array,
+	// then use it to fill the current vertex buffer.
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+	// Map the texture onto the cube's faces.
+	gl_vtxUVBuf = gl.createBuffer();
+	gl.bindBuffer(gl.ARRAY_BUFFER, gl_vtxUVBuf);
+
+	var textureCoordinates = [
+	0.0,  1.1,
+	1.0,  1.1,
+	1.0,  0.0,
+	0.0,  0.0 ];
+
+	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(textureCoordinates), gl.STATIC_DRAW);
+
+	// Build the element array buffer; this specifies the indices
+	// into the vertex array for each face's vertices.
+	gl_vtxIndexBuf = gl.createBuffer();
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl_vtxIndexBuf);
+
+	// This array defines each face as two triangles, using the
+	// indices into the vertex array to specify each triangle's
+	// position.
+	var cubeVertexIndices = [ 0, 1, 2,   0, 2, 3 ];
+
+	// Now send the element array to GL
+	gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(cubeVertexIndices), gl.STATIC_DRAW);
+}
+
+function gl_DrawScene()
+{
+	// Clear the canvas before we start drawing on it.
+	gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+
+	// Draw the plane by binding the array buffer to the planes's vertices
+	// array, setting attributes, and pushing it to GL
+	gl.bindBuffer(gl.ARRAY_BUFFER, gl_vtxBuf);
+	gl.vertexAttribPointer( gl_vtxPosAttr, 3, gl.FLOAT, false, 0, 0);
+
+	// Set the texture coordinates attribute for the vertices
+	gl.bindBuffer(gl.ARRAY_BUFFER, gl_vtxUVBuf);
+	gl.vertexAttribPointer( gl_uvAttr, 2, gl.FLOAT, false, 0, 0);
+
+	// Specify the texture to map onto the faces
+	gl.activeTexture( gl.TEXTURE0);
+	if( localStorage.player_precreate == 'ON' )
+		gl.bindTexture( gl.TEXTURE_2D, gl_textures[p_frame]);
+	else
+	{
+		gl_InitTexture( 0, p_frame);
+		gl.bindTexture( gl.TEXTURE_2D, gl_textures[0]);
+	}
+	gl.uniform1i( gl.getUniformLocation( gl_shaderProgram, 'uSampler'), 0);
+
+	// Draw plane
+	gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, gl_vtxIndexBuf);
+
+	gl.uniformMatrix4fv( gl.getUniformLocation( gl_shaderProgram, 'uPMatrix'), false, gl_camMatrix);
+	gl.uniformMatrix4fv( gl.getUniformLocation( gl_shaderProgram, 'uMVMatrix'), false, gl_objMatrix);
+
+	gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
 }
 

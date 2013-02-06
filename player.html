@@ -38,6 +38,25 @@
 				<div class="label">Browser:</div>
 				<div class="variable" id="browser" style="left:70px;right:15px">unknown</div>
 			</div>
+			<div class="cgru_parameter">
+				<div class="label" title="Pre create all frames to speed up.
+Reduce flickering without WebGL.
+Need more RAM.
+Even more RAM with WebGL.
+Activated after reload (F5).">PreCreate:</div>
+				<div class="variable" id="player_precreate"
+					style="left:70px;right:120px;cursor:pointer"
+					onclick="p_PrecreateOnClick()">OFF</div>
+				<div class="label" style="left:120px" title="Use Browser OpenGL.
+CAN add more speed.
+Reduce flickering without 'PreCreate'.
+Need more RAM.
+Need lots of RAM with 'PreCreate'.
+Activated after reload (F5).">WebGL:</div>
+				<div class="variable" id="player_usewebgl"
+					style="left:175px;right:15px;cursor:pointer"
+					onclick="p_UseWebGLOnClick()">OFF</div>
+			</div>
 		</div>
 		<div id="cgru_parameters" style="position:absolute; left: 250px; width: 300px; top:0;bottom:0; /*border: 1px solid #000;*/"></div>
 		<div style="position:absolute; left: 550px; width: 200px; top:0;bottom:0; /*border: 1px solid #000;*/">
@@ -47,6 +66,11 @@
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="p_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
+		<div style="float:left;margin:2px;">
+			<div style="float:left;margin:2px;padding:2px;">FPS:</div>
+			<div style="width:40px;height:18px;color:#140;float:left;background:#222;border-radius:4px;margin:2px;padding:2px 4px;box-shadow:0 0 4px #000 inset, 0 0 4px #555;"
+				id="framerate">0.0</div>
+		</div>
 		<div class="button" id="btn_paint" onclick="p_Paint()">Paint</div>
 		<div id="paint" style="display:none">
 			<div class="button" id="btn_save" onclick="p_Save()">Save</div>
