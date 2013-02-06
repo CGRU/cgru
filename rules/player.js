@@ -49,8 +49,6 @@ function p_Init()
 	for( var i = 0; i < p_buttons.length; i++)
 		p_elb[p_buttons[i]] = document.getElementById('btn_'+p_buttons[i]);
 
-	n_server = '../rules.php';
-
 	var config = n_ReadConfig();
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
@@ -96,7 +94,6 @@ function p_PathChanged()
 	p_paintElCanvas = [];
 
 	p_path = c_GetHashPath();
-//	p_path = '../'+RULES_TOP.root + p_path;
 	p_path = RULES_TOP.root + p_path;
 	var walk = n_WalkDir([p_path])[0];
 	p_files = walk.files;
@@ -113,7 +110,7 @@ function p_PathChanged()
 	for( var i = 0; i < p_files.length; i++)
 	{
 		var img = new Image();
-		img.src = '../'+p_path + '/' + p_files[i];
+		img.src = p_path + '/' + p_files[i];
 		img.onload = function(){p_ImgLoaded();}
 		img.onerror = function(){p_ImgLoaded();}
 		p_images.push( img);
@@ -135,7 +132,7 @@ function p_ImgLoaded()
 	{
 		var elImg = document.createElement('img');
 		p_el.view.appendChild( elImg);
-		elImg.src = '../' + p_path + '/' + p_files[i];
+		elImg.src = p_path + '/' + p_files[i];
 		elImg.style.display = 'none';
 		elImg.onmousedown = function(){return false;}
 		p_elImg.push( elImg);

@@ -346,7 +346,7 @@ function u_ShowSequence( i_element, i_path, i_name)
 
 	var elLinkA = document.createElement('a');
 	elFolder.appendChild( elLinkA);
-	elLinkA.setAttribute('href', 'rules/player.html#'+i_path);
+	elLinkA.setAttribute('href', 'player.html#'+i_path);
 	elLinkA.setAttribute('target', '_blank');
 	elLinkA.textContent = i_name;
 
