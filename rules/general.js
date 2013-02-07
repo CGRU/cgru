@@ -53,9 +53,42 @@ function g_GO( i_path)
 	window.location.hash = i_path;
 }
 
+function g_SetLocationArgs( i_args)
+{
+	g_GO( g_elCurFolder.m_path + '?' + encodeURI( JSON.stringify( i_args)));
+}
+
+function g_ClearLocationArgs()
+{
+	g_GO( g_elCurFolder.m_path);
+}
+
 function g_PathChanged()
 {
-	g_Navigate( c_GetHashPath());
+	var old_path = null;
+	if( g_elCurFolder ) old_path =  g_elCurFolder.m_path;
+
+	var new_path = c_GetHashPath();
+	var args = null;
+	if( new_path.indexOf('?') != -1 )
+	{
+		new_path = new_path.split('?');
+		if( new_path.length > 0 )
+			args = new_path[1];
+		new_path = new_path[0];
+	}
+
+	if( new_path != old_path )
+	g_Navigate( new_path);
+
+	if( args == null ) return;
+
+	args = c_Parse( decodeURI( args));
+	for( var func in args)
+		if( window[func])
+			window[func](args[func]);
+		else
+			c_Error('Function "'+func+'" does not exist.');
 }
 
 function g_Navigate( i_path)

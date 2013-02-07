@@ -51,11 +51,14 @@ function u_Process()
 
 	cm_Process();
 }
-function u_StatusSetElLabel( i_el, i_status)
+function u_StatusSetElLabel( i_el, i_status, i_full)
 {
 	if( i_status && i_status.annotation)
 	{
-		i_el.innerHTML = i_status.annotation.split(' ')[0];
+		if( i_full )
+			i_el.innerHTML = i_status.annotation;
+		else
+			i_el.innerHTML = i_status.annotation.split(' ')[0];
 	}
 	else
 		i_el.textContent = '';

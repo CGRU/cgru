@@ -1,10 +1,18 @@
 ASSETS = {};
 ASSET = null;
 
+a_elThumbnails = null;
+a_elFolders = null;
+a_elFilter = null;
+
 function a_Finish()
 {
 	ASSETS = {};
 	ASSET = null;
+
+	a_elThumbnails = null;
+	a_elFolders = null;
+	a_elFilter = null;
 }
 
 function a_Process()
@@ -316,16 +324,34 @@ function a_SourceWalkFind( i_walk, o_list, i_path)
 
 function a_ShowThumbnails()
 {
-	var elFilter = document.createElement('div');
-	u_el.asset.appendChild( elFilter);
-	elFilter.style.padding = '4px';
+	a_elThumbnails = [];
+
+	a_elFilter = document.createElement('div');
+	u_el.asset.appendChild( a_elFilter);
+	a_elFilter.style.padding = '4px';
 
 	var elLabel = document.createElement('div');
-	elFilter.appendChild( elLabel);
-	elLabel.textContent = 'Filter:';
+	a_elFilter.appendChild( elLabel);
+	a_elFilter.m_elLabel = elLabel;
+	elLabel.textContent = 'Filter';
+	elLabel.style.cursor = 'pointer';
+	elLabel.onclick = function(e){
+		var el = e.currentTarget.parentNode;
+		if( el.m_filtering )
+		{
+			var args = {};
+			args.status = el.m_elStatus.textContent;
+			g_SetLocationArgs({"a_TFilter":args});
+			return;
+		}
+		el.m_filtering = true;
+		el.m_elBody.style.display='block';
+		el.m_elLabel.classList.add('button');
+	};
 
 	var elBody = document.createElement('div');
-	elFilter.appendChild( elBody);
+	a_elFilter.appendChild( elBody);
+	a_elFilter.m_elBody = elBody;
 	elBody.style.display = 'none';
 
 	var elStatusLabel = document.createElement('div');
@@ -335,9 +361,16 @@ function a_ShowThumbnails()
 
 	var elStatus = document.createElement('div');
 	elBody.appendChild( elStatus);
+	a_elFilter.m_elStatus = elStatus;
 	elStatus.style.height = '20px';
 	elStatus.contentEditable = 'true';
 	elStatus.classList.add('editing');
+
+	var elBtnShowAll = document.createElement('div');
+	elBody.appendChild( elBtnShowAll);
+	elBtnShowAll.textContent = 'Show All';
+	elBtnShowAll.onclick = function(e){g_ClearLocationArgs();a_ShowAllThumbnails();};
+	elBtnShowAll.classList.add('button');
 
 	if( ASSET.thumbnails === 0 )
 	{
@@ -348,6 +381,8 @@ function a_ShowThumbnails()
 			if( folders[f].name.indexOf('_') == 0 ) continue;
 
 			var elFolder = document.createElement('div');
+			a_elThumbnails.push( elFolder);
+			elFolder.m_status = folders[f].status;
 			u_el.asset.appendChild( elFolder);
 			elFolder.style.padding = '4px';
 
@@ -367,10 +402,10 @@ function a_ShowThumbnails()
 
 			var elStatus = document.createElement('div');
 			elFolder.appendChild( elStatus);
-			u_StatusSetElLabel( elStatus, folders[f].status);
+			u_StatusSetElLabel( elStatus, folders[f].status, true);
 
-			if( folders[f].status )
-				if( folders[f].status.color )
+//			if( folders[f].status )
+//				if( folders[f].status.color )
 					u_StatusSetColor( folders[f].status, elFolder);
 		}
 //window.console.log( JSON.stringify( folders));
@@ -378,7 +413,10 @@ function a_ShowThumbnails()
 
 	if( ASSET.thumbnails > 0 )
 	{
+		a_elFolders = [];
+
 		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
+
 		for( var sc = 0; sc < walk.folders.length; sc++)
 		{
 			var fobj = walk.folders[sc];
@@ -386,6 +424,8 @@ function a_ShowThumbnails()
 			if( fobj.name.indexOf('_') == 0 ) continue;
 
 			var elScene = document.createElement('div');
+			a_elFolders.push( elScene);
+			elScene.m_elThumbnails = [];
 			u_el.asset.appendChild( elScene);
 			elScene.classList.add('scene');
 			elScene.m_path = ASSET.path + '/' + fobj.name;
@@ -411,7 +451,10 @@ function a_ShowThumbnails()
 				if( fobj.name.indexOf('_') == 0 ) continue;
 
 				var elShot = document.createElement('div');
+				a_elThumbnails.push( elShot);
+				elShot.m_status = fobj.status;
 				elScene.appendChild( elShot);
+				elScene.m_elThumbnails.push( elShot);
 				elShot.classList.add('shot');
 				elShot.m_path = elScene.m_path + '/' + fobj.name;
 				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
@@ -429,11 +472,99 @@ function a_ShowThumbnails()
 				elShot.appendChild( elStatus);
 				elStatus.classList.add('status');
 				u_StatusSetElLabel( elStatus, fobj.status);
-//window.console.log(JSON.stringify(fobj));
-				if( fobj.status )
+
+//				if( fobj.status )
 					u_StatusSetColor( fobj.status, elShot);
 			}
 		}
 	}
+}
+
+function a_TFilter( i_args)
+{
+//c_Info( JSON.stringify(i_args));
+	if( a_elFilter )
+	{
+		if( a_elFilter.m_filtering == null )
+		{
+			a_elFilter.m_elBody.style.display = 'block';
+			a_elFilter.m_elStatus.textContent = i_args.status;
+		}
+	}
+
+	if( a_elThumbnails == null )
+	{
+		c_Error('Asset does not have any thumbnails.');
+		return;
+	}
+
+	var anns_or = i_args.status.split(',');
+	var anns = [];
+	for( var o = 0; o < anns_or.length; o++)
+		anns.push( anns_or[o].split(' '));
+
+	for( var i = 0; i < a_elThumbnails.length; i++)
+	{
+		var founded = false;
+
+		if( a_elThumbnails[i].m_status )
+			if( a_elThumbnails[i].m_status.annotation )
+				for( var o = 0; o < anns_or.length; o++)
+				{
+					var founded_and = true;
+					for( var a = 0; a < anns[o].length; a++)
+					{
+						if( a_elThumbnails[i].m_status.annotation.indexOf( anns[o][a]) == -1 )
+						{
+							founded_and = false;
+							break;
+						}
+					}
+					if( founded_and )
+					{
+						founded = true;
+						break;
+					}
+				}
+
+		if( founded )
+		{
+			a_elThumbnails[i].style.display = 'block';
+			a_elThumbnails[i].m_hidden = false;
+		}
+		else
+		{
+			a_elThumbnails[i].style.display = 'none';
+			a_elThumbnails[i].m_hidden = true;
+		}
+	}
+
+	if( a_elFolders )
+		for( var f = 0; f < a_elFolders.length; f++)
+		{
+			var oneShown = false;
+			for( var t = 0; t < a_elFolders[f].m_elThumbnails.length; t++)
+			{
+				if( a_elFolders[f].m_elThumbnails[t].m_hidden != true )
+				{
+					oneShown = true;
+					break;
+				}
+			}
+			if( oneShown )
+				a_elFolders[f].style.display = 'block';
+			else
+				a_elFolders[f].style.display = 'none';
+		}
+}
+
+function a_ShowAllThumbnails()
+{
+	for( var i = 0; i < a_elThumbnails.length; i++)
+		a_elThumbnails[i].style.display = 'block';
+
+	if( a_elFolders )
+		for( var i = 0; i < a_elFolders.length; i++)
+			a_elFolders[i].style.display = 'block';
 }
 
