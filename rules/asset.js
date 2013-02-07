@@ -31,6 +31,12 @@ function a_ShowBody()
 
 	window.document.title = ASSET.name + ' ' + window.document.title;
 
+	if( ASSET.thumbnails != null )
+	{
+		a_ShowThumbnails();
+		return;
+	}
+
 	if( ASSET.source )
 	{
 		var elSource = document.createElement('div');
@@ -125,102 +131,6 @@ function a_ShowBody()
 			elDailies.textContent = JSON.stringify( ASSET.dailies.path );
 	}
 
-	if( ASSET.thumbnails === 0 )
-	{
-		var folders = g_elCurFolder.m_dir.folders;
-		for( var f = 0; f < folders.length; f++ )
-		{
-			if( folders[f].name.indexOf('.') == 0 ) continue;
-			if( folders[f].name.indexOf('_') == 0 ) continue;
-
-			var elFolder = document.createElement('div');
-			u_el.asset.appendChild( elFolder);
-			elFolder.style.padding = '4px';
-
-			var elImg = document.createElement('img');
-			elFolder.appendChild( elImg);
-			elImg.classList.add('thumbnail');
-			elImg.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
-			elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
-			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
-
-			var elName = document.createElement('div');
-			elFolder.appendChild( elName);
-			elName.classList.add('button');
-			elName.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
-			elName.onclick = function(e){g_GO(e.currentTarget.m_path)};
-			elName.textContent = folders[f].name;
-
-			var elStatus = document.createElement('div');
-			elFolder.appendChild( elStatus);
-			u_StatusSetElLabel( elStatus, folders[f].status);
-
-			if( folders[f].status )
-				if( folders[f].status.color )
-					u_StatusSetColor( folders[f].status, elFolder);
-		}
-//window.console.log( JSON.stringify( folders));
-	}
-
-	if( ASSET.thumbnails && ( ASSET.thumbnails > 0 ))
-	{
-		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
-		for( var sc = 0; sc < walk.folders.length; sc++)
-		{
-			var fobj = walk.folders[sc];
-			if( fobj.name.indexOf('.') == 0 ) continue;
-			if( fobj.name.indexOf('_') == 0 ) continue;
-
-			var elScene = document.createElement('div');
-			u_el.asset.appendChild( elScene);
-			elScene.classList.add('scene');
-			elScene.m_path = ASSET.path + '/' + fobj.name;
-			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
-
-			var elName = document.createElement('div');
-			elScene.appendChild( elName);
-			elName.classList.add('name');
-			elName.textContent = fobj.name;
-
-			var elStatus = document.createElement('div');
-			elScene.appendChild( elStatus);
-			elStatus.classList.add('status');
-//window.console.log(JSON.stringify(fobj));
-			u_StatusSetElLabel( elStatus, fobj.status);
-			if( fobj.status )
-				u_StatusSetColor( fobj.status, elScene);
-
-			for( var s = 0; s < walk.folders[sc].folders.length; s++)
-			{
-				var fobj = walk.folders[sc].folders[s];
-				if( fobj.name.indexOf('.') == 0 ) continue;
-				if( fobj.name.indexOf('_') == 0 ) continue;
-
-				var elShot = document.createElement('div');
-				elScene.appendChild( elShot);
-				elShot.classList.add('shot');
-				elShot.m_path = elScene.m_path + '/' + fobj.name;
-				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
-
-				var elImg = document.createElement('img');
-				elShot.appendChild( elImg);
-				elImg.src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
-
-				var elName = document.createElement('div');
-				elShot.appendChild( elName);
-				elName.classList.add('name');
-				elName.textContent = fobj.name;
-
-				var elStatus = document.createElement('div');
-				elShot.appendChild( elStatus);
-				elStatus.classList.add('status');
-				u_StatusSetElLabel( elStatus, fobj.status);
-//window.console.log(JSON.stringify(fobj));
-				if( fobj.status )
-					u_StatusSetColor( fobj.status, elShot);
-			}
-		}
-	}
 
 	if( thumbnails.length )
 		c_MakeThumbnail( thumbnails, ASSET.path);
@@ -401,6 +311,129 @@ function a_SourceWalkFind( i_walk, o_list, i_path)
 		if( fobj.files && fobj.files.length)
 			o_list.push( path);
 		a_SourceWalkFind( fobj, o_list, path);
+	}
+}
+
+function a_ShowThumbnails()
+{
+	var elFilter = document.createElement('div');
+	u_el.asset.appendChild( elFilter);
+	elFilter.style.padding = '4px';
+
+	var elLabel = document.createElement('div');
+	elFilter.appendChild( elLabel);
+	elLabel.textContent = 'Filter:';
+
+	var elBody = document.createElement('div');
+	elFilter.appendChild( elBody);
+	elBody.style.display = 'none';
+
+	var elStatusLabel = document.createElement('div');
+	elBody.appendChild( elStatusLabel);
+	elStatusLabel.textContent = 'Status:';
+	elStatusLabel.style.cssFloat = 'left';
+
+	var elStatus = document.createElement('div');
+	elBody.appendChild( elStatus);
+	elStatus.style.height = '20px';
+	elStatus.contentEditable = 'true';
+	elStatus.classList.add('editing');
+
+	if( ASSET.thumbnails === 0 )
+	{
+		var folders = g_elCurFolder.m_dir.folders;
+		for( var f = 0; f < folders.length; f++ )
+		{
+			if( folders[f].name.indexOf('.') == 0 ) continue;
+			if( folders[f].name.indexOf('_') == 0 ) continue;
+
+			var elFolder = document.createElement('div');
+			u_el.asset.appendChild( elFolder);
+			elFolder.style.padding = '4px';
+
+			var elImg = document.createElement('img');
+			elFolder.appendChild( elImg);
+			elImg.classList.add('thumbnail');
+			elImg.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
+			elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
+			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+
+			var elName = document.createElement('div');
+			elFolder.appendChild( elName);
+			elName.classList.add('button');
+			elName.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
+			elName.onclick = function(e){g_GO(e.currentTarget.m_path)};
+			elName.textContent = folders[f].name;
+
+			var elStatus = document.createElement('div');
+			elFolder.appendChild( elStatus);
+			u_StatusSetElLabel( elStatus, folders[f].status);
+
+			if( folders[f].status )
+				if( folders[f].status.color )
+					u_StatusSetColor( folders[f].status, elFolder);
+		}
+//window.console.log( JSON.stringify( folders));
+	}
+
+	if( ASSET.thumbnails > 0 )
+	{
+		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
+		for( var sc = 0; sc < walk.folders.length; sc++)
+		{
+			var fobj = walk.folders[sc];
+			if( fobj.name.indexOf('.') == 0 ) continue;
+			if( fobj.name.indexOf('_') == 0 ) continue;
+
+			var elScene = document.createElement('div');
+			u_el.asset.appendChild( elScene);
+			elScene.classList.add('scene');
+			elScene.m_path = ASSET.path + '/' + fobj.name;
+			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
+
+			var elName = document.createElement('div');
+			elScene.appendChild( elName);
+			elName.classList.add('name');
+			elName.textContent = fobj.name;
+
+			var elStatus = document.createElement('div');
+			elScene.appendChild( elStatus);
+			elStatus.classList.add('status');
+//window.console.log(JSON.stringify(fobj));
+			u_StatusSetElLabel( elStatus, fobj.status);
+			if( fobj.status )
+				u_StatusSetColor( fobj.status, elScene);
+
+			for( var s = 0; s < walk.folders[sc].folders.length; s++)
+			{
+				var fobj = walk.folders[sc].folders[s];
+				if( fobj.name.indexOf('.') == 0 ) continue;
+				if( fobj.name.indexOf('_') == 0 ) continue;
+
+				var elShot = document.createElement('div');
+				elScene.appendChild( elShot);
+				elShot.classList.add('shot');
+				elShot.m_path = elScene.m_path + '/' + fobj.name;
+				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
+
+				var elImg = document.createElement('img');
+				elShot.appendChild( elImg);
+				elImg.src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
+
+				var elName = document.createElement('div');
+				elShot.appendChild( elName);
+				elName.classList.add('name');
+				elName.textContent = fobj.name;
+
+				var elStatus = document.createElement('div');
+				elShot.appendChild( elStatus);
+				elStatus.classList.add('status');
+				u_StatusSetElLabel( elStatus, fobj.status);
+//window.console.log(JSON.stringify(fobj));
+				if( fobj.status )
+					u_StatusSetColor( fobj.status, elShot);
+			}
+		}
 	}
 }
 

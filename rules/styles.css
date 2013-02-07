@@ -89,7 +89,12 @@ background: transparent;
 box-shadow: 0 0 2px #000, 0 0 4px rgba(255,255,255,.5) inset;
 }
 
-.editing { background: #DDD; color: #000; }
+.editing {
+background: #DDD;
+color: #000;
+border-radius: 4px;
+box-shadow: 0 0 2px #000 inset;
+}
 
 .thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
 

@@ -363,7 +363,7 @@ function u_ShowSequence( i_element, i_path, i_name)
 		elCmd.setAttribute('cmdexec', JSON.stringify([cmd]));
 	}
 
-	if( ASSET.dailies )
+	if( ASSET && ( ASSET.dailies ))
 	{
 		var elMakeDailies = document.createElement('div');
 		elFolder.appendChild( elMakeDailies);
