@@ -1,5 +1,13 @@
 <?php
 
+/*if (!isset($_SERVER['PHP_AUTH_USER']))
+{
+	header('WWW-Authenticate: Basic realm="CGRU"');
+	header('HTTP/1.0 401 Unauthorized');
+	echo 'You must enter a valid login ID and password to access this resource';
+	exit;
+}*/
+
 function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 {
 	if( $i_depth > $i_recv['depth'] ) return;
@@ -363,6 +371,10 @@ else if( array_key_exists('afanasy', $recv))
 {
 	afanasy( $recv, $out);
 }
+/*else
+{
+	$out = $_SERVER;
+}*/
 
 echo json_encode( $out);
 

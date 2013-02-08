@@ -329,12 +329,15 @@ function a_ShowThumbnails()
 	a_elFilter = document.createElement('div');
 	u_el.asset.appendChild( a_elFilter);
 	a_elFilter.style.padding = '4px';
+	a_elFilter.style.position = 'relative';
 
 	var elLabel = document.createElement('div');
 	a_elFilter.appendChild( elLabel);
 	a_elFilter.m_elLabel = elLabel;
 	elLabel.textContent = 'Filter';
+	elLabel.style.textAlign = 'center';
 	elLabel.style.cursor = 'pointer';
+	elLabel.style.width = '50%';
 	elLabel.onclick = function(e){
 		var el = e.currentTarget.parentNode;
 		if( el.m_filtering )
@@ -369,8 +372,13 @@ function a_ShowThumbnails()
 	var elBtnShowAll = document.createElement('div');
 	elBody.appendChild( elBtnShowAll);
 	elBtnShowAll.textContent = 'Show All';
-	elBtnShowAll.onclick = function(e){g_ClearLocationArgs();a_ShowAllThumbnails();};
+//	elBtnShowAll.onclick = function(e){g_ClearLocationArgs();a_ShowAllThumbnails();};
+	elBtnShowAll.onclick = function(e){g_SetLocationArgs({"a_TFilter":null});};
 	elBtnShowAll.classList.add('button');
+	elBtnShowAll.style.position = 'absolute';
+	elBtnShowAll.style.top = '4px';
+	elBtnShowAll.style.right = '4px';
+	elBtnShowAll.style.width = '40%';
 
 	if( ASSET.thumbnails === 0 )
 	{
@@ -485,11 +493,11 @@ function a_TFilter( i_args)
 //c_Info( JSON.stringify(i_args));
 	if( a_elFilter )
 	{
-		if( a_elFilter.m_filtering == null )
-		{
-			a_elFilter.m_elBody.style.display = 'block';
-			a_elFilter.m_elStatus.textContent = i_args.status;
-		}
+		a_elFilter.m_elBody.style.display = 'block';
+		a_elFilter.m_elLabel.classList.add('button');
+		if( i_args )
+			if( i_args.status )
+				a_elFilter.m_elStatus.textContent = i_args.status;
 	}
 
 	if( a_elThumbnails == null )
@@ -498,18 +506,22 @@ function a_TFilter( i_args)
 		return;
 	}
 
-	var anns_or = i_args.status.split(',');
-	var anns = [];
-	for( var o = 0; o < anns_or.length; o++)
-		anns.push( anns_or[o].split(' '));
+	var anns = null;
+	if( i_args && i_args.status )
+	{
+		var anns_or = i_args.status.split(',');
+		anns = [];
+		for( var o = 0; o < anns_or.length; o++)
+			anns.push( anns_or[o].split(' '));
+	}
 
 	for( var i = 0; i < a_elThumbnails.length; i++)
 	{
-		var founded = false;
+		var founded = (i_args == null);
 
-		if( a_elThumbnails[i].m_status )
+		if( a_elThumbnails[i].m_status && anns )
 			if( a_elThumbnails[i].m_status.annotation )
-				for( var o = 0; o < anns_or.length; o++)
+				for( var o = 0; o < anns.length; o++)
 				{
 					var founded_and = true;
 					for( var a = 0; a < anns[o].length; a++)
