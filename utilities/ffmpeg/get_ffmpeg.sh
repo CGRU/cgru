@@ -2,8 +2,9 @@
 
 if [ -d ffmpeg ]; then
    cd ffmpeg
-   svn up
+   git pull
    cd ..
 else
-   svn checkout svn://svn.ffmpeg.org/ffmpeg/trunk ffmpeg
+	git clone git://source.ffmpeg.org/ffmpeg.git ffmpeg
 fi
+

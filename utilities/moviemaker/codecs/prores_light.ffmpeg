@@ -1,0 +1,2 @@
+ProRes Light
+ffmpeg -y -r @FPS@ -i "@INPUT@" -vcodec prores -profile:v 1 "@OUTPUT@.@CONTAINER@"
