@@ -15,6 +15,13 @@ function g_Init()
 	var config = n_ReadConfig();
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
+	if( config.user_name && ( localStorage.user_name != config.user_name))
+	{
+		if( cgru_SetUserName( config.user_name))
+			c_Info('<span style="font-size:20px;font-weight:bold;color:#550055">User is set to "'+localStorage.user_name+'".</span>');
+		else
+			c_Error('Invalid user name recieved: '+JSON.stringify(config.user_name)+'.');
+	}
 
 	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 

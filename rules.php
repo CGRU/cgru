@@ -360,6 +360,8 @@ else if( array_key_exists('readconfig', $recv))
 	$configs = array();
 	readConfig( $recv['readconfig'], $configs); 
 	$out['config'] = $configs;
+	if( isset($_SERVER['PHP_AUTH_USER']))
+		$out['user_name'] = $_SERVER['PHP_AUTH_USER'];
 }
 else if( array_key_exists('save', $recv))
 {
