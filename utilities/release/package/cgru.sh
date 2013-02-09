@@ -8,3 +8,7 @@ installdir=$3
 
 # Moving icons to standart linux location:
 cp -r $src/icons/icons $pack/usr/local/share
+
+# chmod /usr:
+chmod -R 755 $pack/usr
+
