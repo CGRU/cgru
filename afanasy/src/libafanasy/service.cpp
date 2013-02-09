@@ -54,7 +54,7 @@ void Service::initialize()
    PyObj_FuncGetWDir = NULL;
    PyObj_FuncGetCommand = NULL;
    PyObj_FuncGetFiles = NULL;
-   PyObj_FuncCheckFiles = NULL;
+	PyObj_FuncDoPost = NULL;
    initialized = false;
 
    PyObject * pHostsList = PyList_New(0);
@@ -77,10 +77,10 @@ void Service::initialize()
    PyDict_SetItemString(taskInfo, "hosts",            pHostsList);
    PyDict_SetItemString(taskInfo, "files",            PyBytes_FromString( files.c_str()));
 
-   PyDict_SetItemString(taskInfo, "thumbnail_cmd",    PyBytes_FromString(Environment::getThumbnailCmd().c_str()));
-   PyDict_SetItemString(taskInfo, "thumbnail_naming", PyBytes_FromString(Environment::getThumbnailNaming().c_str()));
-   PyDict_SetItemString(taskInfo, "thumbnail_http",   PyBytes_FromString(Environment::getThumbnailHttp().c_str()));
-   PyDict_SetItemString(taskInfo, "thumbnail_file",   PyBytes_FromString(Environment::getThumbnailFile().c_str()));
+//   PyDict_SetItemString(taskInfo, "thumbnail_cmd",    PyBytes_FromString(Environment::getThumbnailCmd().c_str()));
+//   PyDict_SetItemString(taskInfo, "thumbnail_naming", PyBytes_FromString(Environment::getThumbnailNaming().c_str()));
+//   PyDict_SetItemString(taskInfo, "thumbnail_http",   PyBytes_FromString(Environment::getThumbnailHttp().c_str()));
+//   PyDict_SetItemString(taskInfo, "thumbnail_file",   PyBytes_FromString(Environment::getThumbnailFile().c_str()));
    PyDict_SetItemString(taskInfo, "job_id",           PyInt_FromLong(job_id));
    PyDict_SetItemString(taskInfo, "block_id",         PyInt_FromLong(block_id));
    PyDict_SetItemString(taskInfo, "task_id",          PyInt_FromLong(task_id));
@@ -102,8 +102,8 @@ void Service::initialize()
    if( PyObj_FuncGetCommand == NULL ) return;
    PyObj_FuncGetFiles = getFunction( AFPYNAMES::SERVICE_FUNC_GETFILES);
    if( PyObj_FuncGetFiles == NULL ) return;
-   PyObj_FuncCheckFiles = getFunction( AFPYNAMES::SERVICE_FUNC_CHECKFILES);
-   if( PyObj_FuncCheckFiles == NULL ) return;
+   PyObj_FuncDoPost = getFunction( AFPYNAMES::SERVICE_FUNC_DOPOST);
+   if( PyObj_FuncDoPost == NULL ) return;
 
    PyObject * pResult;
 
@@ -165,7 +165,23 @@ Service::~Service()
 {
 }
 
-bool Service::checkFiles( int sizemin, int sizemax)
+const std::string Service::doPost()
 {
-   return true;
+	AFINFA("Service::doPost()")
+
+	std::string o_errMsg;
+
+	PyObject * pResult = PyObject_CallObject( PyObj_FuncDoPost, NULL);
+	if( pResult )
+	{
+		if( false == af::PyGetString( pResult, o_errMsg))
+			AFERROR("Service:FuncGetCommand: Returned object is not a string.")
+
+		Py_DECREF( pResult);
+	}
+	else if( PyErr_Occurred())
+		PyErr_Print();
+
+	return o_errMsg;
 }
+

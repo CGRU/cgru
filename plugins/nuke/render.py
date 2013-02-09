@@ -14,9 +14,9 @@ tmpdir = None
 
 # Interrupt function to delete temp directory:
 def interrupt( signum, frame):
-   print('\nInterrupt received...')
-   if tmpdir is not None and os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
-   exit(1)
+	print('\nInterrupt received...')
+	if tmpdir is not None and os.path.isdir( tmpdir): shutil.rmtree( tmpdir)
+	exit(1)
 
 # Set interrupt function:
 #signal.signal( signal.SIGINT,  interrupt)
@@ -28,12 +28,12 @@ def interrupt( signum, frame):
 
 # Error function to print(message) and delete temp directory:
 def errorExit( msg, deletetemp):
-   print(msg)
-   if deletetemp:
-      print('Removing temp directory:')
-      print(tmpdir)
-      shutil.rmtree( tmpdir)
-   exit(1)
+	print(msg)
+	if deletetemp:
+		print('Removing temp directory:')
+		print(tmpdir)
+		shutil.rmtree( tmpdir)
+	exit(1)
 
 # Parse arguments:
 ArgsParser = optparse.OptionParser( usage="usage: %prog [options] (like nuke --help)", version="%prog 1.0")
@@ -58,20 +58,20 @@ if frange is None: errorExit('No numbers in frame range founded', False)
 if len(frange) == 2: frange.append('1')
 if len(frange) != 3: errorExit('Invalid frame range specified, type A-BxC - [from]-[to]x[by]', False)
 try:
-   ffirst = int(frange[0])
-   flast  = int(frange[1])
-   fby    = int(frange[2])
+	ffirst = int(frange[0])
+	flast  = int(frange[1])
+	fby    = int(frange[2])
 except:
-   errorExit( str(sys.exc_info()[1]) + '\nInvalid frame range syntax, type A-BxC - [from]-[to]x[by]', False)
+	errorExit( str(sys.exc_info()[1]) + '\nInvalid frame range syntax, type A-BxC - [from]-[to]x[by]', False)
 
 # Check for negative numbers:
 pos = srange.find(frange[0])
 if pos > 0:
-   if srange[pos-1] == '-': ffirst = -ffirst
+	if srange[pos-1] == '-': ffirst = -ffirst
 srange = srange[pos+len(frange[0]):]
 pos = srange.find(frange[1])
 if pos > 1:
-   if srange[pos-2:pos] == '--': flast = -flast
+	if srange[pos-2:pos] == '--': flast = -flast
 
 # Check first and last frame values:
 if flast < ffirst: errorExit('First frame (%(ffirst)d) must be grater or equal last frame (%(flast)d)' % vars(), False)
@@ -114,28 +114,34 @@ if nuke.toNode('root').knob('proxy').value(): fileknob = writenode['proxy']
 else: fileknob = writenode['file']
 # Get views and images folders:
 imagesdirs = []
+views_str = None
 views = []
 views_num = 0
+multiview_file = False
 try:
-    views_str = writenode['views'].value()
-    print('Views = "%s"' % views_str)
-    for view in views_str.split(' '):
-        view = view.strip()
-        if view != '':
-            if not view in nuke.views():
-                print('Warning: Skipping invalid view: "%s"' % view)
-                print( parser.str_warning)
-                continue
-            views_num += 1
-            views.append( view)
-            octx = nuke.OutputContext()
-            octx.setView( 1 + nuke.views().index( view))
-            imagesdirs.append( os.path.dirname( fileknob.getEvaluatedValue( octx)))
+	views_str = writenode['views'].value()
+	print('Views = "%s"' % views_str)
+	for view in views_str.split(' '):
+		view = view.strip()
+		if view != '':
+			if not view in nuke.views():
+				print('Warning: Skipping invalid view: "%s"' % view)
+				print( parser.str_warning)
+				continue
+			views_num += 1
+			views.append( view)
+			octx = nuke.OutputContext()
+			octx.setView( 1 + nuke.views().index( view))
+			filename = fileknob.getEvaluatedValue( octx)
+			imagesdirs.append( os.path.dirname( filename))
+			if len( views) > 1:
+				if filename.find('%V') == -1 and filename.find('%v') == -1:
+					multiview_file = True
 except:
-    errorExit('Can`t process views on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
+	errorExit('Can`t process views on "%s" write node:\n' % xnode + str(sys.exc_info()[1]), True)
 # Check for valid view founded:
 if views_num < 1:
-    errorExit('Can`t find valid views on "%s" write node.' % xnode, True)
+	errorExit('Can`t find valid views on "%s" write node.' % xnode, True)
 
 # Change render images folder to temporary:
 if not options.notmpimage:
@@ -160,82 +166,94 @@ print('Number of views = %d' % views_num)
 exitcode = 0
 frame = ffirst
 while frame <= flast:
-   print('Rendering frame %d:' % frame)
-   sys.stdout.flush()
+	print('Rendering frame %d:' % frame)
+	sys.stdout.flush()
 
-   # Iterate views:
-   view_num = 0
-   for view in views:
-      if views_num > 1: print('Executing view "%s":' % view)
+	# Iterate views:
+	view_num = 0
+	for view in views:
+		if views_num > 1:
+			if multiview_file == False: print('Executing view "%s":' % view)
+			else: print('Trying to execute several views in the same file.')
 
-      # Try to execute write node:
-      try:
-         if nuke.env['NukeVersionMajor'] < 6:
-            nuke.execute( writenode.name(), frame, frame)
-         else:
-            nuke.execute( writenode, frame, frame, 1, [view])
-      except:
-         print('Node execution error:')
-         print(str(sys.exc_info()[1]))
-         exitcode = 1
+		# Try to execute write node:
+		try:
+			if nuke.env['NukeVersionMajor'] < 6:
+				nuke.execute( writenode.name(), frame, frame)
+			else:
+				if multiview_file:
+					nuke.execute( writenode, frame, frame, 1, views)
+				else:
+					nuke.execute( writenode, frame, frame, 1, [view])
+		except:
+			print('Node execution error:')
+			print(str(sys.exc_info()[1]))
+			exitcode = 1
 
-      if options.notmpimage: continue
+		if options.notmpimage:
+			if multiview_file:
+				break
+			else:
+				continue
 
-      # Copy image files from temp directory:
-      allitems = os.listdir( tmpdir)
-      moveditems = 0
-      for item in allitems:
-         if item.rfind('.tmp') == len(item)-4: continue
-         if item.rfind('.nk') == len(item)-3: continue
-         src  = os.path.join( tmpdir, item)
-         dest = os.path.join( imagesdirs[view_num], item)
+		# Copy image files from temp directory:
+		allitems = os.listdir( tmpdir)
+		moveditems = 0
+		for item in allitems:
+			if item.rfind('.tmp') == len(item)-4: continue
+			if item.rfind('.nk') == len(item)-3: continue
+			src  = os.path.join( tmpdir, item)
+			dest = os.path.join( imagesdirs[view_num], item)
 
-         # Delete old image if any:
-         if os.path.isfile( dest):
-            try:
-               print('Deleting old "%s"' % dest)
-               os.remove( dest)
-            except:
-               print(str(sys.exc_info()[1]))
-               print('Unable to remove destination file:')
-               print(dest)
-               exitcode = 1
+			# Delete old image if any:
+			if os.path.isfile( dest):
+				try:
+					print('Deleting old "%s"' % dest)
+					os.remove( dest)
+				except:
+					print(str(sys.exc_info()[1]))
+					print('Unable to remove destination file:')
+					print(dest)
+					exitcode = 1
 
-         # Move temporary image:
-         try:
-            print('Moving "%s"' % dest)
-            shutil.move( src, imagesdirs[view_num])
-         except:
-            print('File moved with error:')
-            print(str(sys.exc_info()[1]))
-            print(src)
-            print(dest)
+			# Move temporary image:
+			try:
+				print('Moving "%s"' % dest)
+				shutil.move( src, imagesdirs[view_num])
+			except:
+				print('File moved with error:')
+				print(str(sys.exc_info()[1]))
+				print(src)
+				print(dest)
 
-         # Check destination image:
-         if not os.path.isfile( dest):
-            print('Error: Destination file does not exist.')
-            exitcode = 1
-         else:
-            moveditems += 1
+			# Check destination image:
+			if not os.path.isfile( dest):
+				print('Error: Destination file does not exist.')
+				exitcode = 1
+			else:
+				moveditems += 1
 
-      if moveditems < 1:
-         print('Error: No images generated.')
-         exitcode = 1
-      else:
-         print('Images generated: %d' % moveditems)
+		if moveditems < 1:
+			print('Error: No images generated.')
+			exitcode = 1
+		else:
+			print('Images generated: %d' % moveditems)
 
-      sys.stdout.flush()
+		sys.stdout.flush()
 
-      if exitcode != 0: break
+		if exitcode != 0: break
 
-      view_num += 1
+		view_num += 1
 
-   if exitcode != 0: break
+		if multiview_file: break
 
-   frame += fby
+	if exitcode != 0: break
+
+	frame += fby
 
 # Remove temp directory:
 shutil.rmtree( tmpdir)
 
 # Exit:
 exit( exitcode)
+

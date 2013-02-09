@@ -110,6 +110,7 @@ public:
       UPFinishedParserError,
       UPFinishedParserBadResult,
       UPFinishedParserSuccess,
+// NEW_VERSION UPFinishedFailedPost,
 
       UPRenderDeregister,
       UPRenderExit,

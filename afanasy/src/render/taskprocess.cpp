@@ -417,7 +417,13 @@ printf("Finished PID=%d: Exit Code=%d %s\n", m_pid, i_exitCode, m_stop_time ? "(
     }
     else
     {
-        m_update_status = af::TaskExec::UPFinishedSuccess;
+		std::string errMsg;
+//		errMsg = m_service.doPost();
+		if( errMsg.empty())
+	        m_update_status = af::TaskExec::UPFinishedSuccess;
+		else
+			m_update_status = af::TaskExec::UPFinishedError;
+//	NEW_VERSION			m_update_status = af::TaskExec::UPFinishedFailedPost;
     }
 }
 

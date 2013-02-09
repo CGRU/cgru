@@ -36,9 +36,6 @@ class service:
       self.str_hostsprefix = str_hostsprefix
       self.str_hostseparator = str_hostseparator
       
-   def __del__(self):
-      self.doPost()
-
    def getWDir( self):
       return self.pm.toClient( self.wdir)
 
@@ -93,10 +90,10 @@ class service:
          
          tmp_path = "%s/thumbnails" % cgruconfig.VARS['af_tempdirectory']
          self.taskInfo['thumbnail_tmp_filepath'] = os.path.join(tmp_path, self.taskInfo['thumbnail_filename'])
-         thumbnail_path = self.taskInfo['thumbnail_naming'] % self.taskInfo
-         http_adress = "%s%s" % (self.taskInfo['thumbnail_http'], thumbnail_path)
+         thumbnail_path = cgruconfig.VARS['af_thumbnail_naming'] % self.taskInfo
+         http_adress = "%s%s" % ( cgruconfig.VARS['af_thumbnail_http'], thumbnail_path)
          
-         convert_command = self.taskInfo['thumbnail_cmd'] % self.taskInfo
+         convert_command = cgruconfig,VARS['af_thumbnail_cmd'] % self.taskInfo
          if not os.path.exists(tmp_path):
             os.makedirs(tmp_path)
             
@@ -130,4 +127,4 @@ class service:
    def doPost(self):
       print("Doing post process")
       self.generatethumbnail()
-         
+

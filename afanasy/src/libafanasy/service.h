@@ -24,7 +24,8 @@ public:
    const std::string getCommand() const { return command; }
    const std::string getFiles() const   { return files;   }
 
-   bool checkFiles( int sizemin, int sizemax);
+	// Return an empty string on sucess or an error message on error
+	const std::string doPost();
 
 private:
    void initialize();
@@ -35,7 +36,7 @@ private:
    PyObject* PyObj_FuncGetWDir;
    PyObject* PyObj_FuncGetCommand;
    PyObject* PyObj_FuncGetFiles;
-   PyObject* PyObj_FuncCheckFiles;
+	PyObject* PyObj_FuncDoPost;
 
    bool initialized;
 
