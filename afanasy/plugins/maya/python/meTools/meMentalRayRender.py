@@ -1,6 +1,9 @@
 """
   meMentalRayRender
   
+  ver.0.4.6 (7 Feb 2013) 
+    - minor bug with single masterLayer case for deferred migen
+    
   ver.0.4.5 (29 Jan 2013) 
     - distributed render support
   ver.0.4.4 (28 Jan 2013) 
@@ -70,7 +73,7 @@ from maya_ui_proc import *
 from afanasyRenderJob import *
 
 self_prefix = 'meMentalRayRender_'
-meMentalRayRenderVer = '0.4.5'
+meMentalRayRenderVer = '0.4.6'
 meMentalRayRenderMainWnd = self_prefix + 'MainWnd'
 
 # Nice Tip ( found at http://mayastation.typepad.com ) for enabling gzip compression option for Maya command line .mi export :
@@ -329,7 +332,11 @@ class meMentalRayRender ( object ):
     #
     filename = cmds.workspace ( expandName = self.mi_param [ 'mi_filename' ] )
     ( name, ext ) = os.path.splitext ( filename )
-    if layer is not None : name += '_' + layer
+    if layer is not None : 
+      if not ( self.mi_param [ 'mi_deferred' ] and len ( getRenderLayersList ( False ) ) == 1 ) :
+        # do not add layer name for single render layer in scene
+        # during deferred migen
+        name += '_' + layer
     #dot_pos = name.rfind('.')
     #miFileName = name[0:dot_pos] + '.' + ('@' + pad_str + '@') + '.mi'
     pad_str = getPadStr ( self.mi_param [ 'mi_padding' ], self.mi_param [ 'mi_perframe' ] )
@@ -693,7 +700,11 @@ class meMentalRayRender ( object ):
     filename = cmds.workspace ( expandName = self.mi_param[ 'mi_filename' ] )
     ( filename, ext ) = os.path.splitext ( filename )
 
-    filename += '_' + str ( self.layer )
+    if not ( self.mi_param [ 'mi_deferred' ] and len ( getRenderLayersList ( False ) ) == 1 ) :
+      # do not add layer name for single render layer in scene
+      # during deferred migen
+      filename += '_' + str ( self.layer )
+      
     if self.mi_param[ 'mi_padding' ] > 0 and self.mi_param[ 'mi_perframe' ] == True :
       filename += '.'
       pad_str = getPadStr ( self.mi_param [ 'mi_padding' ], self.mi_param [ 'mi_perframe' ] )
