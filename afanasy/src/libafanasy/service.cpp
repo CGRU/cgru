@@ -81,9 +81,9 @@ void Service::initialize()
 //   PyDict_SetItemString(taskInfo, "thumbnail_naming", PyBytes_FromString(Environment::getThumbnailNaming().c_str()));
 //   PyDict_SetItemString(taskInfo, "thumbnail_http",   PyBytes_FromString(Environment::getThumbnailHttp().c_str()));
 //   PyDict_SetItemString(taskInfo, "thumbnail_file",   PyBytes_FromString(Environment::getThumbnailFile().c_str()));
-   PyDict_SetItemString(taskInfo, "job_id",           PyInt_FromLong(job_id));
-   PyDict_SetItemString(taskInfo, "block_id",         PyInt_FromLong(block_id));
-   PyDict_SetItemString(taskInfo, "task_id",          PyInt_FromLong(task_id));
+   PyDict_SetItemString(taskInfo, "job_id",           PyLong_FromLong(job_id));
+   PyDict_SetItemString(taskInfo, "block_id",         PyLong_FromLong(block_id));
+   PyDict_SetItemString(taskInfo, "task_id",          PyLong_FromLong(task_id));
 
    PyTuple_SetItem( pArgs, 0, taskInfo);
 
