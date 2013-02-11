@@ -3,6 +3,7 @@ RULES.rufolder = 'rules';
 RULES_TOP = {};
 
 g_elCurFolder = null;
+g_auth_user = null;
 
 cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
 
@@ -13,14 +14,24 @@ function g_Init()
 	c_Init();
 
 	var config = n_ReadConfig();
+	if( config == null ) return;
+
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
-	if( config.user_name && ( localStorage.user_name != config.user_name))
+	if( config.user )
 	{
-		if( cgru_SetUserName( config.user_name))
-			c_Info('<span style="font-size:20px;font-weight:bold;color:#550055">User is set to "'+localStorage.user_name+'".</span>');
-		else
-			c_Error('Invalid user name recieved: '+JSON.stringify(config.user_name)+'.');
+		g_auth_user = config.user.id;
+		s_Init( config.user);
+
+		if( localStorage.user_name != config.user.id )
+		{
+			if( cgru_SetUserName( config.user.id ))
+			{
+				c_Info('<span style="font-size:20px;font-weight:bold;color:#550055">User is set to "'+localStorage.user_name+'".</span>');
+			}
+			else
+			c_Error('Invalid user name recieved: '+JSON.stringify(config.user.id)+'.');
+		}
 	}
 
 	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
@@ -44,6 +55,8 @@ function g_Init()
 
 	g_PathChanged();
 }
+
+function g_CurPath() { return g_elCurFolder.m_path;}
 
 function g_OnKeyDown(e)
 {
@@ -139,7 +152,7 @@ function g_Navigate( i_path)
 	{
 		RULES.status = null;
 		if( false == g_Goto( walk.folders[i], walk.paths[i], walk.walks[i], i == (walk.paths.length-1)))
-			break;
+			return;
 	}
 
 //window.console.log('RULES_TOP='+JSON.stringify(RULES_TOP).replace(/,/g,', '));

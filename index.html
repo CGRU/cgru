@@ -14,10 +14,19 @@
 <script type="text/javascript" src="rules/network.js"></script>
 <script type="text/javascript" src="rules/playlist.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
+<script type="text/javascript" src="rules/subscription.js"></script>
 </head>
 <body onload="g_Init()">
 
 <div id="content">
+	<div id="panel">
+		<div id="subscribe" style="display:none">
+			<div id="subscribe_btn" class="button" onclick="s_Subscribe()">Subscribe</div>
+			<div id="subscribe_label">Subscribed</div>
+			<div id="subscribe_path"></div>
+			<div id="subscribe_watched" class="button" onclick="s_Watched()">Watched</div>
+		</div>
+	</div>
 	<div style="text-align: center"><img id="thumbnail" class="thumbnail" ></div>
 	<div id="content_info" class="closed" onclick="this.classList.remove('closed')">
 		<div id="content_status">
@@ -108,7 +117,7 @@
 	</div>
 	<div id="headeropenbtn" class="headeropenbtn button" onclick="u_OpenCloseHeader()">&darr;</div>
 	<div class="panel">
-		<div class="button" onclick="g_GO('/');window.location.reload();">Home</div>
+		<div class="button" onclick="g_GO('/');window.location.reload();">Root</div>
 		<div class="button" onclick="g_GO('..')">Up</div>
 		<div id="assets"></div>
 	</div>

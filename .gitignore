@@ -5,6 +5,9 @@ farm.json
 # Rules root
 root
 
+# Access
+.htaccess
+
 # Override scripts
 override.sh
 override.cmd

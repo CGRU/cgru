@@ -66,7 +66,16 @@ function n_Request( i_obj, i_wait)
 
 //window.console.log('xhr.responseText='+xhr.responseText);
 	if( i_wait )
+	{
+		if( xhr.getResponseHeader('WWW-Authenticate'))
+		{
+			c_Error('Authorization Required');
+			g_GO('/');
+//			window.location.reload();
+			return null;
+		}
 		return xhr.responseText;
+	}
 
 	xhr.onreadystatechange = function()
 	{

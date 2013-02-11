@@ -32,6 +32,8 @@ function c_GetHashPath()
 
 function c_Parse( i_data)
 {
+	if( i_data == null ) return null;
+
 	var obj = null;
 	try { obj = JSON.parse( i_data);}
 	catch( err)
@@ -119,7 +121,8 @@ function c_Log( i_msg)
 		u_el.log.removeChild( lines[100]);
 	c_logCount++;
 
-	setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
+	if( u_el && u_el.cycle )
+		setTimeout('u_el.cycle.classList.add("timeout");u_el.cycle.style.opacity = ".1";',1)
 //	u_el.cycle.style.opacity = '.1';
 }
 

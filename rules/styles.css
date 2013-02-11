@@ -102,6 +102,14 @@ padding-left: 6px;
 .colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
 .colorbars div div { float:left;}
 
+#panel { padding: 2px;}
+#panel div {
+float: left;
+text-align: center;
+margin: 0px 8px;
+padding: 2px 8px;
+}
+
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
 #sidepanel #sidepanel_hide { display: none;}

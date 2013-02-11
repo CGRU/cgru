@@ -10,6 +10,9 @@ function a_Finish()
 	ASSETS = {};
 	ASSET = null;
 
+	u_el.assets.innerHTML = '';
+	u_el.asset.innerHTML = '';
+
 	a_elThumbnails = null;
 	a_elFolders = null;
 	a_elFilter = null;

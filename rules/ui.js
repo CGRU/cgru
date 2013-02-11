@@ -49,6 +49,7 @@ function u_Process()
 	else
 		u_el.files.parentNode.style.display = 'block';
 
+	s_Process();
 	cm_Process();
 }
 function u_StatusSetElLabel( i_el, i_status, i_full)
@@ -117,6 +118,8 @@ function u_Finish()
 	u_el.status.textContent = '';
 	u_el.files.textContent = '';
 	u_StatusSetColor();
+
+	u_el.thumbnail.style.display = 'none';
 
 	cm_Finish();
 }

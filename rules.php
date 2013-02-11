@@ -1,16 +1,92 @@
 <?php
 
-/*if (!isset($_SERVER['PHP_AUTH_USER']))
+$AccessFileName = '.htaccess';
+$RuleMaxLength = 100000;
+$UserName = null;
+
+if( isset($_SERVER['PHP_AUTH_USER']))
 {
-	header('WWW-Authenticate: Basic realm="CGRU"');
-	header('HTTP/1.0 401 Unauthorized');
-	echo 'You must enter a valid login ID and password to access this resource';
-	exit;
-}*/
+	global $UserName;
+
+	$UserName = $_SERVER['PHP_AUTH_USER'];
+}
+
+function htaccessFolder( $i_folder)
+{
+	global $RuleMaxLength, $AccessFileName, $UserName;
+
+	if( $UserName == null ) return true;
+
+	$htaccess = $i_folder.'/'.$AccessFileName;
+//error_log('checking file '.$htaccess);
+	if( is_file( $htaccess))
+	{
+		if( $fHandle = fopen( $htaccess, 'r'))
+		{
+			$data = fread( $fHandle, $RuleMaxLength);
+			fclose( $fHandle);
+
+			$pos = strrpos( $data, 'Require user ');
+			if( $pos !== false )
+			{
+				$data = substr( $data, $pos+13);
+//error_log('checking string1['.$pos.':]: '.$data);
+				$end = strpos( $data, PHP_EOL);
+//error_log('checking string2['.$pos.':'.$end.']: '.substr( $data, 0, $end));
+				if( $end !== false )
+				{
+					$list = explode(' ', substr( $data, 0, $end));
+					foreach( $list as $user )
+					{
+//error_log('checking user: "'.$user.'"');
+						if( $user == $UserName )
+							return true;
+					}
+					return false;
+				}
+			}
+		}
+	}
+
+	return true;
+}
+
+function htaccessPath( $i_path)
+{
+//error_log('Checking access path "'.$i_path.'"');
+	$folders = explode('/', $i_path);
+	$path = null;
+	foreach( $folders as $folder)
+	{
+		if( $path != null )
+			$path = $path.'/'.$folder;
+		else
+			$path = $folder;
+//error_log('Checking access folder "'.$path.'"');
+		if( false == htaccessFolder($path))
+			return false;
+	}
+
+	return true;
+}
 
 function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 {
+	global $RuleMaxLength;
+
 	if( $i_depth > $i_recv['depth'] ) return;
+
+	if( false == is_dir( $i_dir))
+	{
+		$o_out['error'] = 'No such folder.';
+		return;
+	}
+
+	if( false == htaccessPath($i_dir))
+	{
+		$o_out['error'] = 'Access denied.';
+		return;
+	}
 
 	$rufolder = null;
 	if( array_key_exists('rufolder', $i_recv))
@@ -22,11 +98,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 	if( array_key_exists('lookahead', $i_recv))
 		$lookahead = $i_recv['lookahead'];
 
-	if( false == is_dir( $i_dir))
-	{
-		$o_out['error'] = 'No such folder.';
-	}
-	else if( $handle = opendir( $i_dir))
+	if( $handle = opendir( $i_dir))
 	{
 		$o_out['folders'] = array();
 		$o_out['files'] = array();
@@ -69,7 +141,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 						if( $fHandle = fopen( $path.'/'.$ruentry, 'r'))
 						{
-							$rudata = fread( $fHandle, 1000000);
+							$rudata = fread( $fHandle, $RuleMaxLength);
 							$ruobj = json_decode( $rudata, true);
 							$o_out['rules'][$ruentry] = $ruobj;
 							fclose($fHandle);
@@ -80,6 +152,9 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					ksort($o_out['rules']);
 				}
 			}
+
+			if( false == htaccessFolder( $path))
+				continue;
 
 			$folderObj = array();
 			$folderObj['name'] = $entry;
@@ -92,7 +167,7 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 					{
 						if( $fHandle = fopen( $sfilepath, 'r'))
 						{
-							$data = fread( $fHandle, 1000000);
+							$data = fread( $fHandle, $RuleMaxLength);
 							fclose( $fHandle);
 							mergeObjs( $folderObj, json_decode( $data, true));
 						}
@@ -113,9 +188,11 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 function readConfig( $i_file, &$o_out)
 {
+	global $RuleMaxLength;
+
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		$data = fread( $fHandle, 1000000);
+		$data = fread( $fHandle, $RuleMaxLength);
 		fclose($fHandle);
 		$o_out[$i_file] = json_decode( $data, true);
 		if( array_key_exists( 'include', $o_out[$i_file]['cgru_config']))
@@ -126,9 +203,11 @@ function readConfig( $i_file, &$o_out)
 
 function readObj( $i_file, &$o_out)
 {
+	global $RuleMaxLength;
+
 	if( $fHandle = fopen( $i_file, 'r'))
 	{
-		$data = fread( $fHandle, 1000000);
+		$data = fread( $fHandle, $RuleMaxLength);
 		fclose($fHandle);
 		$o_out = json_decode( $data, true);
 	}
@@ -233,13 +312,15 @@ function replaceObject( &$o_obj, $i_obj)
 }
 function editObj( $i_edit, &$o_out)
 {
+	global $RuleMaxLength;
+
 	$mode = 'w+';
 	if( file_exists( $i_edit['file'])) $mode = 'r+';
 	if( false == is_dir( dirname($i_edit['file'])))
 		mkdir( dirname($i_edit['file']));
 	if( $fHandle = fopen( $i_edit['file'], $mode))
 	{
-		$data = fread( $fHandle, 1000000);
+		$data = fread( $fHandle, $RuleMaxLength);
 		$obj = json_decode( $data, true);
 		if( is_null( $obj)) $obj = array();
 		if( array_key_exists('add', $i_edit) && ( $i_edit['add'] == true ))
@@ -360,8 +441,7 @@ else if( array_key_exists('readconfig', $recv))
 	$configs = array();
 	readConfig( $recv['readconfig'], $configs); 
 	$out['config'] = $configs;
-	if( isset($_SERVER['PHP_AUTH_USER']))
-		$out['user_name'] = $_SERVER['PHP_AUTH_USER'];
+	processUser( $out);
 }
 else if( array_key_exists('save', $recv))
 {
@@ -373,12 +453,51 @@ else if( array_key_exists('afanasy', $recv))
 {
 	afanasy( $recv, $out);
 }
-/*else
-{
-	$out = $_SERVER;
-}*/
 
 echo json_encode( $out);
+
+function processUser( &$o_out)
+{
+	global $UserName;
+
+	if( $UserName == null ) return;
+
+//	$o_out['user_name'] = $UserName;
+
+	$filename = 'users/'.$UserName.'.json';
+	$user = array();
+
+	$editobj = array();
+	$editobj['add'] = true;
+	$editobj['file'] = $filename;
+
+	if( false == is_file( $filename))
+	{
+		$user['id'] = $UserName;
+		$user['subscribe'] = array();
+		$user['events'] = array();
+		$user['ctime'] = time();
+
+		$editobj['object'] = $user;
+		$out = array();
+		editObj( $editobj, $out);
+	}
+
+	readObj( $filename, &$user);
+
+	if( array_key_exists('error', $user))
+	{
+		error_log( $user['error']);
+		return;
+	}
+
+	$user['rtime'] = time();
+	$editobj['object'] = $user;
+	$out = array();
+	editObj( $editobj, $out);
+
+	$o_out['user'] = $user;
+}
 
 ?>
 
