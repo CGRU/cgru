@@ -17,14 +17,11 @@ str_hostseparator = ','
 class service:
    "This is base service class."
    def __init__( self, taskInfo):
-      if taskInfo.has_key('wdir') and taskInfo.has_key('command') and taskInfo.has_key('capacity') and taskInfo.has_key('hosts'):
-         self.wdir = taskInfo['wdir']
-         self.command = taskInfo['command']
-         self.capacity = taskInfo['capacity']
-         self.hosts = taskInfo['hosts']
-      else:
-         return False
-         
+      self.wdir = taskInfo['wdir']
+      self.command = taskInfo['command']
+      self.capacity = taskInfo['capacity']
+      self.hosts = taskInfo['hosts']
+
       self.files = taskInfo.get('files', '')
       
       self.taskInfo = taskInfo
