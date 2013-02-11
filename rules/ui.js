@@ -121,6 +121,7 @@ function u_Finish()
 
 	u_el.thumbnail.style.display = 'none';
 
+	s_Process();
 	cm_Finish();
 }
 
