@@ -39,7 +39,7 @@ case ${DISTRIBUTIVE} in
         ;;
     Ubuntu)
         export ADD_CMAKE_MODULE_PATH="$PWD"
-        export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
+#        export AF_ADD_LFLAGS="$AF_ADD_LFLAGS -lpthread"
         ;;
     Mint)
         export ADD_CMAKE_MODULE_PATH="$PWD"
