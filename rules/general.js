@@ -20,8 +20,8 @@ function g_Init()
 		cgru_ConfigJoin( config.config[file].cgru_config );
 	if( config.user )
 	{
-		g_auth_user = config.user.id;
-		s_Init( config.user);
+		g_auth_user = config.user;
+		s_Init();
 
 		if( localStorage.user_name != config.user.id )
 		{

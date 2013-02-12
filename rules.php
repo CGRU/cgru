@@ -457,6 +457,10 @@ else if( array_key_exists('afanasy', $recv))
 {
 	afanasy( $recv, $out);
 }
+else if( array_key_exists('htdigest', $recv))
+{
+	htdigest( $recv['htdigest'], $out);
+}
 
 echo json_encode( $out);
 
@@ -468,7 +472,8 @@ function processUser( &$o_out)
 
 //	$o_out['user_name'] = $UserName;
 
-	$filename = 'users/'.$UserName.'.json';
+	$dirname = 'users';
+	$filename = $dirname.'/'.$UserName.'.json';
 	$user = array();
 
 	$editobj = array();
@@ -478,9 +483,14 @@ function processUser( &$o_out)
 	if( false == is_file( $filename))
 	{
 		$user['id'] = $UserName;
-		$user['subscribe'] = array();
-		$user['events'] = array();
+		$user['channels'] = array();
+		$user['news'] = array();
 		$user['ctime'] = time();
+
+		if( false == is_dir( $dirname ))
+			$user['role'] = 'admin';
+		else
+			$user['role'] = 'user';
 
 		$editobj['object'] = $user;
 		$out = array();
@@ -513,7 +523,7 @@ function makeNews( $i_news, &$o_out)
 		return;
 	}
 
-	$users_all = array();	
+	$users = array();	
 	if( $fHandle = opendir('users'))
 	{
 		while (false !== ( $uEntry = readdir( $fHandle)))
@@ -525,36 +535,113 @@ function makeNews( $i_news, &$o_out)
 				fclose( $uHandle);
 				$uobj = json_decode( $udata, true);
 				if( is_null( $uobj)) continue;
-				array_push( $users_all, $uobj);
+				array_push( $users, $uobj);
 			}
 		}
 		closedir($fHandle);
 	}
 
-	if( count( $users_all) == 0 )
+	if( count( $users) == 0 )
 	{
 		$o_out['error'] = 'No users founded.';
 		return;
 	}
 
-	$users = array();
-	foreach( $users_all as $user )
+	$o_out['users'] = array();
+
+	foreach( $users as &$user )
 	{
-		foreach( $uses['subscribe'] as $subscribe )
+		foreach( $user['channels'] as $channel )
 		{
-			if( $i_news['path'] == $subscribe['id'] )
+			if( strpos( $i_news['path'], $channel['id'] ) === 0 )
 			{
-				array_push( $users_sbs, $user);
+				array_push( $o_out['users'], $user['id']);
+
+				$i_news['user'] = $UserName;
+
+				$has_event = false;
+				foreach( $user['news'] as &$event )
+				{
+					if( $event['path'] == $i_news['path'])
+					{
+						$has_event = true;
+						$event = $i_news;
+						break;
+					}
+				}
+
+				if( false == $has_event )
+					array_push( $user['news'], $i_news);
+
+				$filename = 'users/'.$user['id'].'.json';
+				if( $fHandle = fopen( $filename, 'w'))
+				{
+					fwrite( $fHandle, json_encode( $user));
+					fclose($fHandle);
+				}
+//error_log('New wrote in '.$filename);
+
 				break;
 			}
 		}
 	}
+}
 
-	$o_out['users'] = array();
-	foreach( $users as &$user )
+function htdigest( $i_recv, &$o_out)
+{
+	global $RuleMaxLength, $UserName;
+
+	if( is_null( $UserName))
 	{
-		array_push( $o_out['users'], $user['id']);
+		$o_out['error'] = 'Access denied.';
+		return;
 	}
+
+	$htdigest_file = '.htdigest';
+	$user = $i_recv['user'];
+	$p = $i_recv['p'];
+	$hash = md5("$user:RULES:$p");
+	$new_line = "$user:RULES:$hash";
+
+//error_log($new_line);
+
+	$data = '';
+	if( $fHandle = fopen( $htdigest_file, 'r'))
+	{
+		$data = fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+	}
+	$old_lines = explode("\n", $data);
+	$new_lines = array();
+	foreach( $old_lines as $line )
+	{
+		$values = explode(':', $line);
+		if( count( $values ) == 3 )
+		{
+			if( $values[0] == $user )
+				$o_out['status'] = 'User '.$user.' updated.';
+			else
+			{
+				$o_out['status'] = 'User '.$user.' created.';
+				array_push( $new_lines, $line);
+			}
+		}
+	}
+
+	array_push( $new_lines, $new_line);
+
+	$data = implode("\n", $new_lines)."\n";
+
+	if( $fHandle = fopen( $htdigest_file, 'w' ))
+	{
+		fwrite( $fHandle, $data );
+		fclose( $fHandle );
+	}
+	else
+	{
+		$o_out['error'] = 'Unable to write into the file.';
+	}
+//error_log($data);
 }
 
 ?>

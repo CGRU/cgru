@@ -1,5 +1,5 @@
 u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle','comments','files',
-	'content_status','thumbnail','sidepanel','sidepanel_playlist','news','sidepanel_news'];
+	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
 function u_Init()

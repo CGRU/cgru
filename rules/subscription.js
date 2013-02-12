@@ -1,19 +1,17 @@
-s_subscribes = [];
-s_events = [];
-
 s_initialized = false;
-s_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','channels'];
+s_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels'];
 s_el = {};
 
-function s_Init( i_user)
+function s_Init()
 {
+	if( g_auth_user == null ) return;
+
 	for( var i = 0; i < s_elements.length; i++)
 		s_el[s_elements[i]] = document.getElementById( s_elements[i]);
 
-	s_subscribes = i_user.subscribe;
-	s_events = i_user.events;
+	g_auth_user.news = g_auth_user.news;
 	s_el.subscribe.style.display = 'block';
-	u_el.sidepanel_news.style.display = 'block';
+	s_el.sidepanel_news.style.display = 'block';
 	s_initialized = true;
 
 	if( localStorage.news_opened == "true" ) s_NewsOpen();
@@ -26,12 +24,12 @@ function s_Init( i_user)
 function s_UpdateChannels()
 {
 	s_el.channels.innerHTML = '';
-	for( var i = 0; i < s_subscribes.length; i++ )
+	for( var i = 0; i < g_auth_user.channels.length; i++ )
 	{
-		s_path = s_subscribes[i].id;
+		s_path = g_auth_user.channels[i].id;
 		var el = document.createElement('div');
 		s_el.channels.appendChild( el);
-		el.title = 'Subscribed by '+s_subscribes[i].user+' at\n'+c_DT_StrFromS( s_subscribes[i].time);
+		el.title = 'Subscribed by '+g_auth_user.channels[i].user+' at\n'+c_DT_StrFromS( g_auth_user.channels[i].time);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
@@ -51,12 +49,12 @@ function s_Process()
 {
 	if( false == s_initialized ) return;
 
-//window.console.log(s_subscribes);
+//window.console.log(g_auth_user.channels);
 	var subscribed = false;
 	var path = g_CurPath();
-	for( var i = 0; i < s_subscribes.length; i++ )
+	for( var i = 0; i < g_auth_user.channels.length; i++ )
 	{
-		s_path = s_subscribes[i].id;
+		var s_path = g_auth_user.channels[i].id;
 		if( path.indexOf( s_path) == 0 )
 		{
 			subscribed = true;
@@ -81,8 +79,6 @@ function s_Process()
 	}
 	else
 		s_Finish();
-
-	if( s_events.length == 0 ) return;
 }
 
 function s_Finish()
@@ -100,20 +96,20 @@ function s_Subscribe( i_path)
 	if( i_path == null )
 		i_path = g_CurPath();
 
-	var subscribe = {};
-	subscribe.id = i_path;
-	subscribe.time = c_DT_CurSeconds();
-	subscribe.user = g_auth_user;
+	var channel = {};
+	channel.id = i_path;
+	channel.time = c_DT_CurSeconds();
+	channel.user = g_auth_user.id;
 
 	var obj = {};
-	obj.objects = [subscribe];
-	obj.pusharray = 'subscribe';
-	obj.id = g_auth_user;
-	obj.file = 'users/' + g_auth_user + '.json';
+	obj.objects = [channel];
+	obj.pusharray = 'channels';
+	obj.id = g_auth_user.id;
+	obj.file = 'users/' + g_auth_user.id + '.json';
 
 	n_Request({"editobj":obj});
 
-	s_subscribes.push( subscribe);
+	g_auth_user.channels.push( channel);
 	s_Process();
 	s_UpdateChannels();
 
@@ -130,15 +126,15 @@ function s_Unsubscribe( i_path)
 
 	obj.objects = [{"id":i_path}];
 	obj.delobj = true;
-	obj.id = g_auth_user;
-	obj.file = 'users/' + g_auth_user + '.json';
+	obj.id = g_auth_user.id;
+	obj.file = 'users/' + g_auth_user.id + '.json';
 
 	n_Request({"editobj":obj});
 
-	for( i = 0; i < s_subscribes.length; i++)
-		if( s_subscribes[i].id == i_path )
+	for( i = 0; i < g_auth_user.channels.length; i++)
+		if( g_auth_user.channels[i].id == i_path )
 		{
-			s_subscribes.splice( i, 1);
+			g_auth_user.channels.splice( i, 1);
 			break;
 		}
 
@@ -152,7 +148,7 @@ function s_NewsOnClick()
 {
 	if( u_el['sidepanel'].classList.contains('opened'))
 	{
-		if( u_el['sidepanel_news'].classList.contains('opened'))
+		if( s_el.sidepanel_news.classList.contains('opened'))
 			s_NewsClose();
 		else
 			s_NewsOpen();
@@ -166,19 +162,21 @@ function s_NewsOnClick()
 
 function s_NewsClose()
 {
-	u_el['sidepanel_news'].classList.remove('opened');
-//	u_el['playlist'].innerHTML = '';
+	s_el.sidepanel_news.classList.remove('opened');
+	s_el.news.innerHTML = '';
 	localStorage.news_opened = false;
+	g_auth_user.news = null;
 }
 function s_NewsOpen()
 {
-	u_el['sidepanel_news'].classList.add('opened');
+	s_el.sidepanel_news.classList.add('opened');
 	localStorage.news_opened = true;
-//	p_Load();
+	s_NewsLoad();
 }
 
 function s_MakeNewsDialog()
 {
+	if( g_auth_user == null ) return;
 	new cgru_Dialog( window, window, 's_MakeNews', null, 'str', '', 'news',
 		'Create News', 'Enter News Title');
 }
@@ -186,10 +184,89 @@ function s_MakeNewsDialog()
 function s_MakeNews( i_param, i_value)
 {
 //window.console.log(i_value);
+	if( g_auth_user == null ) return;
 	var news = {};
 	news.time = c_DT_CurSeconds();
 	news.path = g_CurPath();
 	news.title = i_value;
-	n_Request({"news":news});
+	news.id = g_auth_user.id+'_'+news.time+'_'+news.path;
+
+	var msg = c_Parse( n_Request({"news":news}));
+	if( msg.error )
+	{
+		c_Error( msg.error);
+		return;
+	}
+	else
+		s_NewsLoad();
+
+	if( msg.users.length == 0 )
+	{
+		c_Error('No subscribed users founded.');
+		return;
+	}
+
+	var info = 'Subscibed users:';
+	for( var i = 0; i < msg.users.length; i++)
+		info += ' '+msg.users[i];
+	c_Info( info);
+}
+
+function s_NewsLoad()
+{
+	if( g_auth_user == null ) return;
+
+	s_el.news.innerHTML = '';
+
+	if( g_auth_user.news == null )
+	{
+		var filename = 'users/'+g_auth_user.id+'.json';
+		var user = c_Parse( n_Request({"readobj":filename}));
+		if( user == null ) return;
+		if( user.error )
+		{
+			c_Error( user.error);
+			return;
+		}
+		g_auth_user.news = user.news;
+	}
+
+	for( var i = 0; i < g_auth_user.news.length; i++ )
+	{
+		var news = g_auth_user.news[i];
+
+		var el = document.createElement('div');
+		s_el.news.appendChild( el);
+		el.title = news.title + '\nby '+news.user+' at\n'+c_DT_StrFromS( news.time);
+
+		var elBtn = document.createElement('div');
+		el.appendChild( elBtn);
+		elBtn.classList.add('button');
+		elBtn.textContent = '-';
+		elBtn.m_id = news.id;
+		elBtn.ondblclick = function(e){ s_RemoveNews( e.currentTarget.m_id);};
+
+		var elLabel = document.createElement('div');
+		el.appendChild( elLabel);
+		elLabel.classList.add('news_label');
+		elLabel.textContent = news.user+': '+news.title;
+
+		var elLink = document.createElement('a');
+		el.appendChild( elLink);
+		elLink.href = '#'+news.path;
+		elLink.textContent = news.path;
+	}
+
+	g_auth_user.news = null;
+}
+
+function s_RemoveNews( i_id)
+{
+	var obj = {};
+	obj.objects = [{"id":i_id}];
+	obj.delobj = true;
+	obj.file = 'users/'+g_auth_user.id+'.json';
+	n_Request({"editobj":obj});
+	s_NewsLoad();
 }
 

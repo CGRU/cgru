@@ -158,3 +158,32 @@ function c_MakeThumbnail( i_sources, i_path)
 	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
+function c_SetPasswordOnclick()
+{
+	if( g_auth_user == null ) return;
+
+	if( g_auth_user.role == 'admin' )
+		new cgru_Dialog( window, window, 'c_SetPasswordDialog', null, 'str', g_auth_user.id, 'password',
+			'Create New Password', 'Enter User ID');
+	else
+		c_SetPasswordDialog( null, g_auth_user.id )
+}
+
+function c_SetPasswordDialog( not_used, i_user_id)
+{
+	new cgru_Dialog( window, window, 'c_SetPassword', i_user_id, 'str', '', 'password',
+		'Change New Password', 'Enter New Password');
+}
+
+function c_SetPassword( i_user_id, i_passwd)
+{
+//window.console.log(i_user_id);
+//window.console.log(i_passwd);
+	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}));
+
+	if( result.error )
+		c_Error( result.error);
+	else if( result.status )
+		c_Info( result.status);
+}
+
