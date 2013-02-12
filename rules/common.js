@@ -126,6 +126,24 @@ function c_Log( i_msg)
 //	u_el.cycle.style.opacity = '.1';
 }
 
+function c_DT_StrFromS( i_time) { return c_DT_StrFromMS( i_time*1000);}
+function c_DT_StrFromMS( i_time)
+{
+	var date = new Date(i_time);
+	date = date.toString();
+	date = date.substr( 0, date.indexOf(' GMT'));
+	return date;
+}
+function c_DT_CurSeconds() { return Math.round((new Date).valueOf()/1000);}
+
+function c_ElDisplayToggle( i_el)
+{
+	if( i_el.style.display == 'none')
+		i_el.style.display = 'block';
+	else
+		i_el.style.display = 'none';
+}
+
 function c_MakeThumbnail( i_sources, i_path)
 {
 	var input = null;

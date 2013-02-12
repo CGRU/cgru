@@ -23,8 +23,9 @@
 		<div id="subscribe" style="display:none">
 			<div id="subscribe_btn" class="button" onclick="s_Subscribe()">Subscribe</div>
 			<div id="subscribe_label">Subscribed</div>
+			<div id="unsubscribe_btn" class="button" onclick="s_Unsubscribe()">Unsubscribe</div>
 			<div id="subscribe_path"></div>
-			<div id="subscribe_watched" class="button" onclick="s_Watched()">Watched</div>
+			<div id="subscribe_makenew" class="button" onclick="s_MakeNewsDialog()">Make News</div>
 		</div>
 	</div>
 	<div style="text-align: center"><img id="thumbnail" class="thumbnail" ></div>
@@ -65,6 +66,23 @@
 <div id="navig"></div>
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
+	<div id="sidepanel_news" style="display:none">
+		<div class="label button" onclick="s_NewsOnClick()">News</div>
+		<div class="body">
+			<div style="padding-left:8px;">
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="s_ClearOnClick()">Clear All</div>
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="s_RemoveOnClick()">Remove</div>
+				<div class="button" style="float:left;width:14px;" onclick="s_RefreshOnClick()">&#10227;</div>
+			</div>
+			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;" id="news"></div>
+			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;">
+				<div class="button" onclick="c_ElDisplayToggle(document.getElementById('channels'))">Channels:</div>
+				<div id="channels" style="display:none"></div>
+			</div>
+		</div>
+	</div>
 	<div id="sidepanel_playlist">
 		<div class="label button" onclick="p_OnClick()">Playlist</div>
 		<div class="body">

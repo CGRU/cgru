@@ -443,6 +443,10 @@ else if( array_key_exists('readconfig', $recv))
 	$out['config'] = $configs;
 	processUser( $out);
 }
+else if( array_key_exists('news', $recv))
+{
+	makeNews( $recv['news'], $out);
+}
 else if( array_key_exists('save', $recv))
 {
 	$save = array();
@@ -497,6 +501,60 @@ function processUser( &$o_out)
 	editObj( $editobj, $out);
 
 	$o_out['user'] = $user;
+}
+
+function makeNews( $i_news, &$o_out)
+{
+	global $UserName, $RuleMaxLength;
+
+	if( $UserName == null )
+	{
+		$o_out['error'] = 'No authentificated user founded.';
+		return;
+	}
+
+	$users_all = array();	
+	if( $fHandle = opendir('users'))
+	{
+		while (false !== ( $uEntry = readdir( $fHandle)))
+		{			
+			if( strrpos( $uEntry,'.json') === false ) continue;
+			if( $uHandle = fopen( 'users/'.$uEntry, 'r'))
+			{
+				$udata = fread( $uHandle, $RuleMaxLength);
+				fclose( $uHandle);
+				$uobj = json_decode( $udata, true);
+				if( is_null( $uobj)) continue;
+				array_push( $users_all, $uobj);
+			}
+		}
+		closedir($fHandle);
+	}
+
+	if( count( $users_all) == 0 )
+	{
+		$o_out['error'] = 'No users founded.';
+		return;
+	}
+
+	$users = array();
+	foreach( $users_all as $user )
+	{
+		foreach( $uses['subscribe'] as $subscribe )
+		{
+			if( $i_news['path'] == $subscribe['id'] )
+			{
+				array_push( $users_sbs, $user);
+				break;
+			}
+		}
+	}
+
+	$o_out['users'] = array();
+	foreach( $users as &$user )
+	{
+		array_push( $o_out['users'], $user['id']);
+	}
 }
 
 ?>

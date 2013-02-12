@@ -12,15 +12,19 @@ function createDir(){
 }
 
 exclude="$exclude --exclude 'config.json'"
+exclude="$exclude --exclude 'doxygen/output'"
 exclude="$exclude --exclude 'farm.json'"
 exclude="$exclude --exclude 'override.sh'"
-exclude="$exclude --exclude '.svn'"
+exclude="$exclude --exclude 'playlist.json'"
+exclude="$exclude --exclude 'rules.10_common.json'"
 exclude="$exclude --exclude '.git'"
 exclude="$exclude --exclude '.gitignore'"
+exclude="$exclude --exclude '.svn'"
 exclude="$exclude --exclude '*.cmd'"
 exclude="$exclude --exclude '*.pyc'"
+exclude="$exclude --exclude '*.swp'"
+exclude="$exclude --exclude '*.swo'"
 exclude="$exclude --exclude '__pycache__'"
-exclude="$exclude --exclude 'doxygen/output'"
 
 function  copy()
 {
@@ -45,11 +49,12 @@ cgru=$PWD
 copy . $dest
 
 rcopy bin $dest
-rcopy lib $dest
+rcopy examples $dest
 rcopy icons $dest
+rcopy lib $dest
+rcopy rules $dest
 rcopy software_setup $dest
 rcopy start $dest
-rcopy examples $dest
 
 copy afanasy $dest/afanasy
 rcopy afanasy/bin $dest/afanasy

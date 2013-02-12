@@ -536,9 +536,8 @@ function p_Save()
 
 		var ctx = canvas.getContext('2d');
 		ctx.globalCompositeOperation = 'destination-over';
-		ctx.drawImage( p_elImg[f], 0, 0);
+		ctx.drawImage( p_images[f], 0, 0);
 
-		var data = canvas.toDataURL();
 		var data = canvas.toDataURL('image/jpeg',.8);
 		data = data.substr( data.indexOf(',')+1);
 

@@ -120,14 +120,14 @@ function cm_Init( i_el)
 		i_el.m_new = true;
 	}
 
-	var date = cm_DateTime( i_el.m_obj.ctime);
+	var date = c_DT_StrFromMS( i_el.m_obj.ctime);
 
 	var info = i_el.m_obj.user_title+' '+date;
 	if( i_el.m_obj.duration )
 		info = i_el.m_obj.duration+' '+info;
 	if( i_el.m_obj.mtime )
 	{
-		var date = cm_DateTime( i_el.m_obj.mtime);
+		var date = c_DT_StrFromMS( i_el.m_obj.mtime);
 		info += '<br>Modified: ';
 		info += i_el.m_obj.muser_title+' '+date;
 	}
@@ -247,13 +247,5 @@ function cm_Save( i_el)
 
 //window.console.log( JSON.stringify( edit));
 	n_Request({"editobj":edit});
-}
-
-function cm_DateTime( i_time)
-{
-	var date = new Date(i_time);
-	date = date.toString();
-	date = date.substr( 0, date.indexOf(' GMT'));
-	return date;
 }
 
