@@ -9,7 +9,6 @@ function s_Init()
 	for( var i = 0; i < s_elements.length; i++)
 		s_el[s_elements[i]] = document.getElementById( s_elements[i]);
 
-	g_auth_user.news = g_auth_user.news;
 	s_el.subscribe.style.display = 'block';
 	s_el.sidepanel_news.style.display = 'block';
 	s_initialized = true;

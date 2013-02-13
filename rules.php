@@ -656,7 +656,7 @@ function htdigest( $i_recv, &$o_out)
 //error_log($data);
 }
 
-function getusers( $i_args, &$o_out)
+function getallusers( $i_args, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -682,6 +682,219 @@ function getusers( $i_args, &$o_out)
 	}
 	closedir($dHandle);
 	ksort($o_out['users']);
+}
+
+function usersadd( $i_args, &$o_out)
+{
+	global $RuleMaxLength;
+	if( false == isAdmin())
+	{
+		$o_out['error'] = 'Access denied.';
+		return;
+	}
+
+	$htaccess = $i_args['path'].'/.htaccess';
+
+	$htaccess_read = $htaccess;
+	if( false === is_file( $htaccess_read ))
+	$htaccess_read = '.htaccess';
+	if( false === is_file( $htaccess_read ))
+	{
+		$o_out['error'] = 'Can`t find access file.';
+		return;
+	}
+
+	$fHandle = fopen( $htaccess_read, 'r');
+	if( $fHandle === false )
+	{
+		$o_out['error'] = 'Can`t read access file.';
+		return;
+	}
+	$data = fread( $fHandle, $RuleMaxLength);
+	fclose( $fHandle);
+
+	$old_lines = explode("\n", $data);
+	$new_lines = array();
+	$users = array();
+	$founded = false;
+	foreach( $old_lines as $line )
+	{
+		if( strlen($line) <= 1 ) continue;
+		$users = explode(' ', $line);
+
+		if( $users[0] == 'Require' )
+		{
+			if( $users[1] == 'valid-user')
+				$users = array('Require','user');
+			foreach( $users as $user)
+				if( $user == $i_args['id'])
+				{
+					$o_out['error'] = 'User "'.$i_args['id'].'" aready exists.';
+					return;
+				}
+			$founded = true;
+			break;
+		}
+		array_push( $new_lines, $line);
+	}
+	if( false == $founded )
+	{
+		$o_out['error'] = 'Unable to find users in the file.';
+		return;
+	}
+
+	array_push( $users, $i_args['id']);
+	array_push( $new_lines, implode(' ', $users));
+
+	$data = implode("\n", $new_lines)."\n";
+//error_log($data);
+
+	if( $fHandle = fopen( $htaccess, 'w' ))
+	{
+		fwrite( $fHandle, $data );
+		fclose( $fHandle );
+	}
+	else
+		$o_out['error'] = 'Unable to write into the file.';
+}
+
+function usersdel( $i_args, &$o_out)
+{
+	global $RuleMaxLength;
+	if( false == isAdmin())
+	{
+		$o_out['error'] = 'Access denied.';
+		return;
+	}
+
+	$htaccess = $i_args['path'].'/.htaccess';
+
+	if( false === is_file( $htaccess ))
+	{
+		$o_out['error'] = 'Can`t find access file.';
+		return;
+	}
+
+	$fHandle = fopen( $htaccess, 'r');
+	if( $fHandle === false )
+	{
+		$o_out['error'] = 'Can`t read access file.';
+		return;
+	}
+	$data = fread( $fHandle, $RuleMaxLength);
+	fclose( $fHandle);
+
+	$old_lines = explode("\n", $data);
+	$new_lines = array();
+	$users = array();
+	$founded = false;
+	foreach( $old_lines as $line )
+	{
+		if( strlen($line) <= 1 ) continue;
+		$words = explode(' ', $line);
+
+		if(( $words[0] == 'Require') && ( $words[1] == 'user'))
+		{
+			foreach( $words as $user)
+				if( $user == $i_args['id'])
+					$founded = true;
+				else
+					array_push( $users, $user);
+			continue;
+		}
+		array_push( $new_lines, $line);
+	}
+	if( false == $founded )
+	{
+		$o_out['error'] = 'Unable to find user in the file.';
+		return;
+	}
+
+	array_push( $new_lines, implode(' ', $users));
+
+	$data = implode("\n", $new_lines)."\n";
+//error_log($data);return;
+
+	if( $fHandle = fopen( $htaccess, 'w' ))
+	{
+		fwrite( $fHandle, $data );
+		fclose( $fHandle );
+	}
+	else
+		$o_out['error'] = 'Unable to write into the file.';
+}
+
+function usersclear( $i_args, &$o_out)
+{
+	if( false == isAdmin())
+	{
+		$o_out['error'] = 'Access denied.';
+		return;
+	}
+
+	$htaccess = $i_args['path'].'/.htaccess';
+	if( false === is_file( $htaccess))
+	{
+		$o_out['error'] = 'Can`t find the file.';
+		return;
+	}
+
+	unlink( $htaccess);
+
+	if( is_file( $htaccess))
+	{
+		$o_out['error'] = 'Can`t remove the file.';
+		return;
+	}
+}
+
+function usersget( $i_args, &$o_out)
+{
+	global $RuleMaxLength;
+	if( false == isAdmin())
+	{
+		$o_out['error'] = 'Access denied.';
+		return;
+	}
+
+	$o_out['users'] = array();
+	$htaccess = $i_args['path'].'/.htaccess';
+	if( false === is_file( $htaccess)) return;
+	$fHandle = fopen( $htaccess, 'r');
+	if( $fHandle === false )
+	{
+		$o_out['error'] = 'Can`t open the file.';
+		return;
+	}
+	$data = fread( $fHandle, $RuleMaxLength);
+	fclose( $fHandle);
+
+	$lines = explode("\n", $data);
+	$users = array();
+	foreach( $lines as $line )
+	{
+		if( strlen($line) <= 1 ) continue;
+		$words = explode(' ', $line);
+//error_log( implode(' ',$words));
+		if( $words[0] == 'Require' )
+		{
+			if( $words[1] == 'user' )
+			{
+				unset($words[0]);
+				unset($words[1]);
+				foreach( $words as $user) array_push( $users, $user);
+			}
+			$founded = true;
+			break;
+		}
+	}
+	if( false == $founded )
+	{
+		$o_out['error'] = 'Unable to find users in the file.';
+		return;
+	}
+
+	$o_out['users'] = $users;
 }
 
 ?>

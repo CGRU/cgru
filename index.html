@@ -70,13 +70,6 @@
 	<div id="sidepanel_news" style="display:none">
 		<div class="label button" onclick="s_NewsOnClick()">News</div>
 		<div class="body">
-			<!--div style="padding-left:8px;">
-				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="s_ClearOnClick()">Clear All</div>
-				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
-					onclick="s_RemoveOnClick()">Remove</div>
-				<div class="button" style="float:left;width:14px;" onclick="s_RefreshOnClick()">&#10227;</div>
-			</div-->
 			<div id="news" style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"></div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;">
 				<div class="button" onclick="c_ElDisplayToggle(document.getElementById('channels'))">Channels</div>
@@ -98,6 +91,19 @@
 			</div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
 				id="playlist"></div>
+		</div>
+	</div>
+	<div id="sidepanel_users" style="display:none">
+		<div class="label button" onclick="ad_UsersOnClick()">Users</div>
+		<div class="body">
+			<div style="padding-left:8px;">
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="ad_UsersClearOnClick()">Clear</div>
+				<div class="button" style="float:left;font-size:11px;padding:4px 4px"
+					onclick="ad_UsersAddOnClick()">Add</div>
+			</div>
+			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"
+				id="users"></div>
 		</div>
 	</div>
 </div>

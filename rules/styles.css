@@ -345,6 +345,9 @@ box-shadow: 0 0 4px #000 inset;
 .dailies div .param { background: #DDD;}
 .dailies .rules { padding: 12px; }
 
-.admin_users div div { float: left; }
-.admin_users .labels { background: #999;}
+.admin_users div div { float: left; text-align: center; /*margin: 1px 3px*/; border:1px solid rgba(0,0,0,.1); }
+/*.admin_users .button { padding: 0px; width: 20px; height:14px; }*/
+#users > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
+#users > div div { padding: 0px 4px;}
+#users > div .button { float: left; margin: 0px;}
 

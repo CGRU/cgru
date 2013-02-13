@@ -21,9 +21,7 @@ function g_Init()
 	if( config.user )
 	{
 		g_auth_user = config.user;
-		document.getElementById('set_password').style.display = 'block';
-		if( g_auth_user.role == 'admin' )
-			document.getElementById('admin_window').style.display = 'block';
+		ad_Init();
 		s_Init();
 
 		if( localStorage.user_name != config.user.id )
@@ -61,7 +59,7 @@ function g_Init()
 	g_PathChanged();
 }
 
-function g_CurPath() { return g_elCurFolder.m_path;}
+function g_CurPath() { if( g_elCurFolder ) return g_elCurFolder.m_path; else return null;}
 
 function g_OnKeyDown(e)
 {
@@ -125,6 +123,7 @@ function g_Navigate( i_path)
 	cgru_ClosePopus();
 	u_Finish();
 	a_Finish();
+	ad_UsersFinish();
 
 	RULES = c_CloneObj( RULES_TOP);
 
@@ -170,6 +169,7 @@ function g_Navigate( i_path)
 
 	a_Process();
 	u_Process();
+	ad_UsersProcess();
 }
 
 function g_Goto( i_folder, i_path, i_walk, i_last)
