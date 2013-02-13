@@ -21,6 +21,9 @@ function g_Init()
 	if( config.user )
 	{
 		g_auth_user = config.user;
+		document.getElementById('set_password').style.display = 'block';
+		if( g_auth_user.role == 'admin' )
+			document.getElementById('admin_window').style.display = 'block';
 		s_Init();
 
 		if( localStorage.user_name != config.user.id )
@@ -33,6 +36,8 @@ function g_Init()
 			c_Error('Invalid user name recieved: '+JSON.stringify(config.user.id)+'.');
 		}
 	}
+	if( config.version )
+		document.getElementById('version').innerHTML = config.version;
 
 	c_RulesMergeDir( RULES_TOP, n_WalkDir(['.'], 0, RULES.rufolder, ['rules'])[0]);
 

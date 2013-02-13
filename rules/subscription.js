@@ -191,7 +191,7 @@ function s_MakeNews( i_param, i_value)
 	news.title = i_value;
 	news.id = g_auth_user.id+'_'+news.time+'_'+news.path;
 
-	var msg = c_Parse( n_Request({"news":news}));
+	var msg = c_Parse( n_Request({"makenews":news}));
 	if( msg.error )
 	{
 		c_Error( msg.error);

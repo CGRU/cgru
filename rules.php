@@ -201,7 +201,7 @@ function readConfig( $i_file, &$o_out)
 	}
 }
 
-function readObj( $i_file, &$o_out)
+function readobj( $i_file, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -310,7 +310,7 @@ function replaceObject( &$o_obj, $i_obj)
 //	if( array_key_exists( $i_attr, $o_obj))
 //		$o_obj[$i_attr] = $i_obj;
 }
-function editObj( $i_edit, &$o_out)
+function editobj( $i_edit, &$o_out)
 {
 	global $RuleMaxLength;
 
@@ -347,11 +347,15 @@ function editObj( $i_edit, &$o_out)
 	}
 }
 
-function cmdExec( $i_obj, &$o_out)
+function cmdexec( $i_obj, &$o_out)
 {
 	$o_out['cmdexec'] = array();
 	foreach( $i_obj['cmds'] as $cmd)
-		array_push( $o_out['cmdexec'], shell_exec($cmd));
+	{
+		$rem = array('../','../','..','&','|','>','<');
+		$cmd = str_replace( $rem, '', $cmd);
+		array_push( $o_out['cmdexec'], shell_exec("./$cmd"));
+	}
 }
 
 function afanasy( $i_obj, &$o_out)
@@ -381,12 +385,12 @@ function afanasy( $i_obj, &$o_out)
 //	$o_out['header'] = $header;
 }
 
-function save( $i_recv, &$o_out)
+function save( $i_save, &$o_out)
 {
-	$filename = $i_recv['save'];
+	$filename = $i_save['file'];
 	$dirname = dirname($filename);
 
-	$o_out['file'] = $filename;
+	$o_out['save'] = $filename;
 
 	if( false == is_dir( $dirname))
 	{
@@ -400,7 +404,7 @@ function save( $i_recv, &$o_out)
 
 	if( $fHandle = fopen( $filename, 'wb'))
 	{
-		fwrite( $fHandle, base64_decode( $i_recv['data']));
+		fwrite( $fHandle, base64_decode( $i_save['data']));
 		fclose( $fHandle );
 		return;
 	}
@@ -409,6 +413,9 @@ function save( $i_recv, &$o_out)
 }
 
 $recv = json_decode( $HTTP_RAW_POST_DATA, true);
+if( is_null($recv))
+	$recv = json_decode( base64_decode( $HTTP_RAW_POST_DATA), true);
+
 $out = array();
 umask(0000);
 if( array_key_exists('walkdir', $recv))
@@ -416,25 +423,12 @@ if( array_key_exists('walkdir', $recv))
 	$out['walkdir'] = array();
 	foreach( $recv['walkdir'] as $dir)
 	{
-		$dir = str_replace('../','', $dir);
-		$dir = str_replace('/..','', $dir);
-		$dir = str_replace('..','', $dir);
+		$rem = array('../','../','..');
+		$dir = str_replace( $rem, '', $dir);
 		$walkdir = array();
 		walkDir( $recv, $dir, $walkdir, 0);
 		array_push( $out['walkdir'], $walkdir);
 	}
-}
-else if( array_key_exists('readobj', $recv))
-{
-	readObj( $recv['readobj'], $out); 
-}
-else if( array_key_exists('cmdexec', $recv))
-{
-	cmdExec( $recv['cmdexec'], $out); 
-}
-else if( array_key_exists('editobj', $recv))
-{
-	editObj( $recv['editobj'], $out); 
 }
 else if( array_key_exists('readconfig', $recv))
 {
@@ -442,24 +436,23 @@ else if( array_key_exists('readconfig', $recv))
 	readConfig( $recv['readconfig'], $configs); 
 	$out['config'] = $configs;
 	processUser( $out);
-}
-else if( array_key_exists('news', $recv))
-{
-	makeNews( $recv['news'], $out);
-}
-else if( array_key_exists('save', $recv))
-{
-	$save = array();
-	save( $recv, $save);
-	$out['save'] = $save;
+	if( $fHandle = fopen('version.txt','r'))
+	{
+		$out['version'] = fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+	}
 }
 else if( array_key_exists('afanasy', $recv))
 {
 	afanasy( $recv, $out);
 }
-else if( array_key_exists('htdigest', $recv))
+else if( count( $recv))
 {
-	htdigest( $recv['htdigest'], $out);
+	foreach( $recv as $func => $args )
+		if( function_exists($func))
+			$func( $args, $out);
+		else
+			$out['error'] = 'Function "'.$func.'" does not exist.';
 }
 
 echo json_encode( $out);
@@ -469,8 +462,6 @@ function processUser( &$o_out)
 	global $UserName;
 
 	if( $UserName == null ) return;
-
-//	$o_out['user_name'] = $UserName;
 
 	$dirname = 'users';
 	$filename = $dirname.'/'.$UserName.'.json';
@@ -494,10 +485,10 @@ function processUser( &$o_out)
 
 		$editobj['object'] = $user;
 		$out = array();
-		editObj( $editobj, $out);
+		editobj( $editobj, $out);
 	}
 
-	readObj( $filename, &$user);
+	readobj( $filename, &$user);
 
 	if( array_key_exists('error', $user))
 	{
@@ -508,12 +499,12 @@ function processUser( &$o_out)
 	$user['rtime'] = time();
 	$editobj['object'] = $user;
 	$out = array();
-	editObj( $editobj, $out);
+	editobj( $editobj, $out);
 
 	$o_out['user'] = $user;
 }
 
-function makeNews( $i_news, &$o_out)
+function makenews( $i_news, &$o_out)
 {
 	global $UserName, $RuleMaxLength;
 
@@ -587,9 +578,22 @@ function makeNews( $i_news, &$o_out)
 	}
 }
 
+function isAdmin()
+{
+	global $RuleMaxLength, $UserName;
+	if( is_null( $UserName )) return false;
+	$user = array();
+	readobj( "users/$UserName.json", &$user);
+	if( array_key_exists( 'role', $user))
+		if( $user['role'] == 'admin')
+			return true;
+	return false;
+}
+
 function htdigest( $i_recv, &$o_out)
 {
 	global $RuleMaxLength, $UserName;
+	$htdigest_file = '.htdigest';
 
 	if( is_null( $UserName))
 	{
@@ -597,8 +601,16 @@ function htdigest( $i_recv, &$o_out)
 		return;
 	}
 
-	$htdigest_file = '.htdigest';
 	$user = $i_recv['user'];
+	# Only admin can change or set other user password
+	if( $user != $UserName )
+		if( false == isAdmin())
+		{
+			$o_out['error'] = 'Access denied.';
+			return;
+		}
+
+	# Construct md5 hash
 	$p = $i_recv['p'];
 	$hash = md5("$user:RULES:$p");
 	$new_line = "$user:RULES:$hash";
@@ -642,6 +654,34 @@ function htdigest( $i_recv, &$o_out)
 		$o_out['error'] = 'Unable to write into the file.';
 	}
 //error_log($data);
+}
+
+function getusers( $i_args, &$o_out)
+{
+	global $RuleMaxLength;
+
+	$dHandle = opendir('users');
+	if( $dHandle === false )
+	{
+		$o_out['error'] = 'Can`t open users folder.';
+		return;
+	}
+
+	$o_out['users'] = array();
+
+	while (false !== ( $entry = readdir( $dHandle)))
+	{
+		if( false === is_file("users/$entry")) continue;
+		if( strrpos( $entry,'.json') === false ) continue;
+
+		if( $fHandle = fopen( "users/$entry", 'r'))
+		{
+			$o_out['users'][$entry] = json_decode( fread( $fHandle, $RuleMaxLength), true);
+			fclose($fHandle);
+		}
+	}
+	closedir($dHandle);
+	ksort($o_out['users']);
 }
 
 ?>

@@ -172,14 +172,12 @@ function c_SetPasswordOnclick()
 function c_SetPasswordDialog( not_used, i_user_id)
 {
 	new cgru_Dialog( window, window, 'c_SetPassword', i_user_id, 'str', '', 'password',
-		'Change New Password', 'Enter New Password');
+		'Set Password', 'Enter New Password');
 }
 
 function c_SetPassword( i_user_id, i_passwd)
 {
-//window.console.log(i_user_id);
-//window.console.log(i_passwd);
-	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}));
+	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}, true, true));
 
 	if( result.error )
 		c_Error( result.error);

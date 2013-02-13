@@ -345,3 +345,6 @@ box-shadow: 0 0 4px #000 inset;
 .dailies div .param { background: #DDD;}
 .dailies .rules { padding: 12px; }
 
+.admin_users div div { float: left; }
+.admin_users .labels { background: #999;}
+

@@ -545,7 +545,7 @@ function p_Save()
 		var folder = p_path.substr( p_path.lastIndexOf('/')+1);
 		path = path+'/'+folder+'.painted/'+p_files[f];
 
-		n_Request({"save":path,"data":data}, false);
+		n_Request({"save":{"file":path,"data":data}}, false);
 	}
 
 	if( p_filestosave == 0 )
@@ -555,27 +555,23 @@ function p_Save()
 function n_MessageReceived( i_msg)
 {
 //window.console.log(JSON.stringify(i_msg));
-	var file = null;
-	if( i_msg.save )
+	if( i_msg.error )
 	{
-		if( i_msg.save.error )
-		{
-			c_Error( i_msg.save.error);
-			return;
-		}
-		file =  i_msg.save.file;
-		if( file )
-		{
-			p_filessaved++;
-			var name = file.substr( file.lastIndexOf('/')+1);
-			var frame = p_files.indexOf(name);
-			if( p_paintElCanvas[frame])
-				p_paintElCanvas[frame].m_saved = true;
-			p_SetPaintState();
-			c_Info('Saved "'+name +'" '+p_filessaved+' of '+p_filestosave);
-			if( p_filessaved >= p_filestosave )
-				p_SavingFinished( file.substr( 0, file.lastIndexOf('/')).substr( file.indexOf('/')));
-		}
+		c_Error( i_msg.error);
+		return;
+	}
+	var file =  i_msg.save;
+	if( file )
+	{
+		p_filessaved++;
+		var name = file.substr( file.lastIndexOf('/')+1);
+		var frame = p_files.indexOf(name);
+		if( p_paintElCanvas[frame])
+			p_paintElCanvas[frame].m_saved = true;
+		p_SetPaintState();
+		c_Info('Saved "'+name +'" '+p_filessaved+' of '+p_filestosave);
+		if( p_filessaved >= p_filestosave )
+			p_SavingFinished( file.substr( 0, file.lastIndexOf('/')).substr( file.indexOf('/')));
 	}
 }
 

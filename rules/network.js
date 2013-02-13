@@ -41,10 +41,12 @@ function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 	return response.walkdir;
 }
 
-function n_Request( i_obj, i_wait)
+function n_Request( i_obj, i_wait, i_encode)
 {
 	if( i_wait == null) i_wait = true;
 	var obj_str = JSON.stringify( i_obj);
+	if( i_encode == true )
+		var obj_str = btoa(obj_str);
 
 	var log = '<b style="color:';
 	if( i_wait ) log += '#040';
