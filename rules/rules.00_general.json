@@ -59,7 +59,7 @@
 
 "thumbnail":{
 	"filename":"thumbnail.jpg",
-	"create_cmd":"rules/thumbnail.py -i \"@INPUT@\" -o \"@OUTPUT@\""
+	"create_cmd":"rules/thumbnail.py -i \"@INPUT@\" -t 600 -o \"@OUTPUT@\""
 },
 
 "avconv":"ffmpeg",

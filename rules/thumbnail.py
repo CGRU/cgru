@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import re, os, sys
+import re, os, sys, time
 
 ImgExtensions = ['dpx','exr','jpg','jpeg','png','tif']
 MovExtensions = ['mov','avi','mp4','mpg','mpeg']
@@ -19,6 +19,8 @@ Parser.add_option('-i', '--input',   dest='input',      type  ='string',     def
 	help='Input image')
 Parser.add_option('-o', '--output',  dest='output',     type  ='string',     default='thumbnail.jpg',
 	help='Output image')
+Parser.add_option('-t', '--time',    dest='time',       type  ='int',        default=0,
+	help='Midification test time')
 Parser.add_option('-f', '--force',   dest='force',      action='store_true', default=False,
 	help='Force creation, no modification time check.')
 Parser.add_option('-V', '--verbose', dest='verbose',    action='store_true', default=False,
@@ -39,6 +41,10 @@ if os.path.isfile( Options.output):
 	MTime = os.path.getmtime( Options.output)
 	if Options.verbose:
 		print('Thumbnail "%s" already exists.' % Options.output)
+	if Options.time > 0:
+		if time.time() - MTime < Options.time:
+			print('thumbnail is up to date:'+Options.output)
+			sys.exit(0)
 
 if Options.input.find(',') != -1 or os.path.isdir( Options.input):
 	folders = [Options.input]
@@ -93,12 +99,12 @@ if Options.verbose:
 			print( img)
 
 if MTime >= cur_mtime:
-	if Options.verbose:
-		print('Thumbnail is up to date (%d %d)' % (MTime, cur_mtime))
 	if Options.force:
 		if Options.verbose:
 			print('Forcing thumbnail creation')
 	else:
+		os.utime( Options.output, None)
+		print('thumbnail time updated:'+Options.output)
 		sys.exit(0)
 
 OutDir = os.path.dirname( Options.output )
@@ -156,4 +162,6 @@ if Options.debug:
 
 for cmd in Cmds:
 	os.system( cmd)
+
+print('thumbnail generated:'+Options.output)
 

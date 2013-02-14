@@ -90,23 +90,8 @@ function u_FilesOnClick( i_el)
 {
 	if( u_el.files.m_opened ) return;
 	u_el.files.m_opened = true;
-
 	document.getElementById('files_btn').classList.remove('button');
-
 	u_ShowFolder( u_el.files, g_elCurFolder.m_path, g_elCurFolder.m_dir);
-return;
-	var files = g_elCurFolder.m_dir.files;
-	for( var i = 0; i < files.length; i++)
-	{
-		var el = document.createElement('div');
-		u_el.files.appendChild( el);
-
-		var elLink = document.createElement('a');
-		el.appendChild( elLink);
-		elLink.textContent = files[i];
-		elLink.href = RULES.root + g_elCurFolder.m_path + '/' + files[i];
-		elLink.target = '_blank';
-	}
 }
 
 function u_Finish()

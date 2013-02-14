@@ -2,8 +2,10 @@
 config.json
 farm.json
 
-# Rules root
+# Rules
 root
+users
+playlist.json
 
 # Access
 .htaccess
