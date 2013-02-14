@@ -417,7 +417,7 @@ function a_ShowThumbnails()
 
 //			if( folders[f].status )
 //				if( folders[f].status.color )
-					u_StatusSetColor( folders[f].status, elFolder);
+					st_StatusSetColor( folders[f].status, elFolder);
 		}
 //window.console.log( JSON.stringify( folders));
 	}
@@ -453,7 +453,7 @@ function a_ShowThumbnails()
 //window.console.log(JSON.stringify(fobj));
 			u_StatusSetElLabel( elStatus, fobj.status);
 			if( fobj.status )
-				u_StatusSetColor( fobj.status, elScene);
+				st_StatusSetColor( fobj.status, elScene);
 
 			for( var s = 0; s < walk.folders[sc].folders.length; s++)
 			{
@@ -485,7 +485,7 @@ function a_ShowThumbnails()
 				u_StatusSetElLabel( elStatus, fobj.status);
 
 //				if( fobj.status )
-					u_StatusSetColor( fobj.status, elShot);
+					st_StatusSetColor( fobj.status, elShot);
 			}
 		}
 	}

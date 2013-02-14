@@ -1,5 +1,5 @@
 u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle','comments','files',
-	'content_status','thumbnail','sidepanel','sidepanel_playlist'];
+	'content_info','content_status','thumbnail','sidepanel','sidepanel_playlist'];
 u_el = {};
 
 function u_Init()
@@ -34,13 +34,6 @@ function u_Process()
 		u_el.thumbnail.style.display = 'none';
 	}
 
-	if( RULES.status && RULES.status.annotation )
-		u_el.status.innerHTML = RULES.status.annotation;
-	else
-		u_el.status.innerHTML = '';
-	
-	u_StatusSetColor( RULES.status );
-
 	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>ASSETS='+JSON.stringify( ASSETS)+'<br><br>RULES='+JSON.stringify( RULES);
 //	u_el.rules.innerHTML = 'ASSET='+JSON.stringify( ASSET)+'<br><br>RULES='+JSON.stringify( RULES);
 
@@ -49,8 +42,16 @@ function u_Process()
 	else
 		u_el.files.parentNode.style.display = 'block';
 
+	u_StatusApply();
 	s_Process();
 	cm_Process();
+}
+function u_StatusApply( i_status)
+{
+	if( i_status != null )
+		RULES.status =  i_status;
+	st_StatusSetElLabel( u_el.status, RULES.status, true);
+	st_StatusSetColor( RULES.status, u_el.content_info);
 }
 function u_StatusSetElLabel( i_el, i_status, i_full)
 {
@@ -102,7 +103,7 @@ function u_Finish()
 	u_StatusCancelOnClick();
 	u_el.status.textContent = '';
 	u_el.files.textContent = '';
-	u_StatusSetColor();
+	st_StatusSetColor( null, u_el.content_info);
 
 	u_el.thumbnail.style.display = 'none';
 
@@ -180,6 +181,8 @@ function u_RulesOnClick()
 
 function u_StatusEditOnClick()
 {
+st_CreateEditUI( u_el.status, g_CurPath(), RULES.status, u_StatusApply, null);return;
+
 	if( u_el.status.m_editing )
 		return;
 

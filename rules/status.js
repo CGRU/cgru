@@ -4,6 +4,7 @@ st_elParent = null;
 st_elToHide = null
 st_path = null;
 st_status = null;
+st_FuncApply = null;
 
 function st_StatusSetElLabel( i_el, i_status, i_full)
 {
@@ -39,7 +40,7 @@ function st_StatusSetColor( i_status, i_elB, i_elC)
 	}
 }
 
-function st_CreateEditUI( i_elParent, i_path, i_status, i_elToHide)
+function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 {
 	if( i_elToHide )
 		i_elToHide.style.display = 'none';
@@ -50,20 +51,40 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_elToHide)
 	st_elToHide = i_elToHide;
 	st_path = i_path;
 	st_status = i_status;
+	st_FuncApply = i_FuncApply;
 
 	st_elRoot = document.createElement('div');
 	st_elParent.appendChild( st_elRoot);
 	st_elRoot.classList.add('status_edit');
 
-	st_elAnnLabel = document.createElement('div');
-	st_elRoot.appendChild( st_elAnnLabel);
-	st_elAnnLabel.textContent = 'Status:';
+	var elBtns = document.createElement('div');
+	st_elRoot.appendChild( elBtns);
+	elBtns.style.cssFloat = 'right';
+
+	var elBtnSave = document.createElement('div');
+	elBtns.appendChild( elBtnSave);
+	elBtnSave.classList.add('button');
+	elBtnSave.textContent = 'Save';
+	elBtnSave.onclick = st_SaveOnClick;
+
+	var elBtnCancel = document.createElement('div');
+	elBtns.appendChild( elBtnCancel);
+	elBtnCancel.classList.add('button');
+	elBtnCancel.textContent = 'Cancel';
+	elBtnCancel.onclick = st_DestroyEditUI;
+
+	var elAnnLabel = document.createElement('div');
+	st_elRoot.appendChild( elAnnLabel);
+	elAnnLabel.textContent = 'Status:';
+	elAnnLabel.style.cssFloat = 'left';
 
 	st_elAnn = document.createElement('div');
 	st_elRoot.appendChild( st_elAnn);
+	st_elAnn.classList.add('editing');
 	st_elAnn.contentEditable = 'true';
 
 	st_elColor = document.createElement('div');
+	st_elRoot.appendChild( st_elColor);
 	u_DrawColorBars( st_elColor, st_EditColorOnClick);
 
 	st_FillEditUI( i_status);
@@ -92,6 +113,7 @@ function st_DestroyEditUI()
 	st_elRoot = null;
 	st_elParent = null;
 	st_elToHide = null;
+	st_status = null;
 }
 
 function st_EditColorOnClick( i_evt)
@@ -103,19 +125,16 @@ function st_EditColorOnClick( i_evt)
 
 function st_SaveOnClick()
 {
-	var text = st_elAnn.innerHTML;
-	var color = st_elColor.m_status.color;
+	st_status.annotation = st_elAnn.innerHTML;
 
-	RULES.status = {};
-	RULES.status.annotation = text;
-	RULES.status.color = color;
+	st_DestroyEditUI();
 
-//	u_StatusCancelOnClick();
-
-//	g_FolderSetStatus( RULES.status);
+	st_FuncApply( st_status);
+	if( g_CurPath() == st_path )
+		g_FolderSetStatus( st_status);
 
 	var obj = {};
-	obj.object = {"status":RULES.status};
+	obj.object = {"status":st_status};
 	obj.add = true;
 	obj.file = RULES.root + st_path + '/' + RULES.rufolder + '/status.json';
 
