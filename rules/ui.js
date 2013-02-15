@@ -1,11 +1,9 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','playlist','status','cycle','comments','files',
-	'content_info','content_status','thumbnail','sidepanel','sidepanel_playlist'];
+u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','cycle','comments','files','content_info','content_status','thumbnail','sidepanel'];
 u_el = {};
 
 function u_Init()
 {
-	for( var i = 0; i < u_elements.length; i++)
-		u_el[u_elements[i]] = document.getElementById( u_elements[i]);
+	for( var i = 0; i < u_elements.length; i++) u_el[u_elements[i]] = document.getElementById( u_elements[i]);
 
 	if( u_el.sidepanel )
 	{
@@ -43,48 +41,15 @@ function u_Process()
 		u_el.files.parentNode.style.display = 'block';
 
 	u_StatusApply();
-	s_Process();
+	nw_Process();
 	cm_Process();
 }
 function u_StatusApply( i_status)
 {
 	if( i_status != null )
-		RULES.status =  i_status;
-	st_StatusSetElLabel( u_el.status, RULES.status, true);
+		RULES.status = c_CloneObj( i_status);
+	st_StatusSetElLabel( u_el.status_annotation, RULES.status, true);
 	st_StatusSetColor( RULES.status, u_el.content_info);
-}
-function u_StatusSetElLabel( i_el, i_status, i_full)
-{
-	if( i_status && i_status.annotation)
-	{
-		if( i_full )
-			i_el.innerHTML = i_status.annotation;
-		else
-			i_el.innerHTML = i_status.annotation.split(' ')[0];
-	}
-	else
-		i_el.textContent = '';
-}
-function u_StatusSetColor( i_status, i_elB, i_elC)
-{
-	if( i_elB == null ) i_elB = u_el.content_status.parentNode;
-	if( i_elC == null ) i_elC = i_elB;
-
-	if( i_status &&  i_status.color)
-	{
-		var c = i_status.color;
-		i_elB.style.background = 'rgb('+c[0]+','+c[1]+','+c[2]+')';
-		if( c[0]+c[1]+c[2] > 200 )
-			i_elC.style.color = '#000';
-		else
-			i_elC.style.color = '#FFF';
-//window.console.log(c[0]+c[1]+c[2])
-	}
-	else
-	{
-		i_elB.style.background = '';
-		i_elC.style.color = '#000';
-	}
 }
 
 function u_FilesOnClick( i_el)
@@ -100,14 +65,15 @@ function u_Finish()
 	document.getElementById('files_btn').classList.add('button');
 	u_el.files.m_opened = false;
 
-	u_StatusCancelOnClick();
-	u_el.status.textContent = '';
+//	u_StatusCancelOnClick();
+	st_DestroyEditUI();
+	u_el.status_annotation.textContent = '';
 	u_el.files.textContent = '';
 	st_StatusSetColor( null, u_el.content_info);
 
 	u_el.thumbnail.style.display = 'none';
 
-	s_Process();
+	nw_Finish();
 	cm_Finish();
 }
 
@@ -181,34 +147,7 @@ function u_RulesOnClick()
 
 function u_StatusEditOnClick()
 {
-st_CreateEditUI( u_el.status, g_CurPath(), RULES.status, u_StatusApply, null);return;
-
-	if( u_el.status.m_editing )
-		return;
-
-	u_el.status.m_status = {};
-	u_el.status.m_status.annotation = '';
-	u_el.status.m_status.color = null;
-	if( RULES.status )
-	{
-		if( RULES.status.annotation ) u_el.status.m_status.annotation = RULES.status.annotation;
-		if( RULES.status.color ) u_el.status.m_status.color = RULES.status.color;
-	}
-	RULES.status = {};
-	RULES.status.annotation = u_el.status.m_status.annotation;
-	RULES.status.color = u_el.status.m_status.color;
-
-	u_el.content_status.classList.add('opened');
-	u_el.status.innerHTML = u_el.status.m_status.annotation;
-	u_el.status.classList.add('editing');
-	u_el.status.m_editing = true;
-
-	elColor = document.getElementById('status_color');
-	elColor.style.display = 'block';
-	u_DrawColorBars( elColor, u_StatusColorOnClick);
-
-	u_el.status.contentEditable = 'true';
-	u_el.status.focus();
+	st_CreateEditUI( u_el.content_info, g_CurPath(), RULES.status, u_StatusApply, u_el.content_status);
 }
 
 function u_DrawColorBars( i_el, i_onclick, i_height)
@@ -272,46 +211,6 @@ function u_DrawColorBars( i_el, i_onclick, i_height)
 //window.console.log('rgb('+r+','+g+','+b+')');
 		}
 	}
-}
-
-function u_StatusColorOnClick( i_evt)
-{
-	var el = i_evt.currentTarget;
-	u_el.status.m_status.color = el.m_color;
-	u_StatusSetColor( u_el.status.m_status);
-}
-
-function u_StatusCancelOnClick()
-{
-	if( RULES.status )
-		u_el.status.innerHTML = RULES.status.annotation;
-	u_StatusSetColor( RULES.status);
-	u_el.status.classList.remove('editing');
-	u_el.content_status.classList.remove('opened');
-	u_el.status.m_editing = false;
-	u_el.status.contentEditable = 'false';
-	document.getElementById('status_color').innerHTML = '';
-	document.getElementById('status_color').style.display  = 'none';
-}
-
-function u_StatusSaveOnClick()
-{
-	var text = u_el.status.innerHTML;
-	var color = u_el.status.m_status.color;
-
-	RULES.status = {};
-	RULES.status.annotation = text;
-	RULES.status.color = color;
-
-	u_StatusCancelOnClick();
-
-	g_FolderSetStatus( RULES.status);
-
-	var obj = {};
-	obj.object = {"status":RULES.status};
-	obj.add = true;
-	obj.file = RULES.root + g_elCurFolder.m_path + '/' + RULES.rufolder + '/status.json';
-	n_Request({"editobj":obj});
 }
 
 function u_ShowFolder( i_element, i_path, i_walk)

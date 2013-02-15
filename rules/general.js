@@ -22,7 +22,7 @@ function g_Init()
 	{
 		g_auth_user = config.user;
 		ad_Init();
-		s_Init();
+		nw_Init();
 
 		if( localStorage.user_name != config.user.id )
 		{

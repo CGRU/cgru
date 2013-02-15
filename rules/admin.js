@@ -185,13 +185,8 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		var elDel = document.createElement('div');
 		el.appendChild( elDel);
 		elDel.style.width = '20px';
-//		if( i_row )
-		{
-//			elDel.classList.add('button');
-			elDel.textContent = '-';
-		}
-//		else elDel.textContent = 'DEL';
-		elDel.title = 'Double to delete user';
+		elDel.textContent = '-';
+		elDel.title = 'Double click to delete user';
 
 		var elName = document.createElement('div');
 		el.appendChild( elName);
@@ -203,6 +198,7 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		elRole.style.width = '100px';
 		elRole.textContent = i_user.role;
 		elRole.m_user_id = i_user.id;
+		elRole.title = 'Double click edit role';
 		if( i_row ) elRole.ondblclick = function(e){ad_ChangeRoleOnCkick(e.currentTarget.m_user_id);};
 
 		var elPasswd = document.createElement('div');
@@ -228,14 +224,15 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 		var elCTime = document.createElement('div');
 		el.appendChild( elCTime);
-		if( i_row ) elCTime.textContent = c_DT_StrFromS( i_user.ctime);
-		else elCTime.textContent = 'Creation Time';
-		elCTime.style.width = '200px';
+//		if( i_row ) elCTime.textContent = (new Date(i_user.ctime*1000)).toDateString().substr(4);//c_DT_StrFromS( i_user.ctime);
+		if( i_row ) elCTime.textContent = c_DT_StrFromS( i_user.ctime).substr(4,11);
+		else elCTime.textContent = 'Created';
+		elCTime.style.width = '150px';
 
 		var elRTime = document.createElement('div');
 		el.appendChild( elRTime);
-		if( i_row ) elRTime.textContent = c_DT_StrFromS( i_user.rtime);
-		else elRTime.textContent = 'Refresh Time';
+		if( i_row ) elRTime.textContent = c_DT_StrFromS( i_user.rtime).substr(4);
+		else elRTime.textContent = 'Entered';
 		elRTime.style.width = '200px';
 }
 

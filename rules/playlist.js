@@ -3,10 +3,15 @@ p_elCurItem = null;
 p_file = 'playlist.json';
 p_fileExist = false;
 
+p_elements = ['playlist','sidepanel_playlist'];
+p_el = {};
+
 function p_Init()
 {
+	for( var i = 0; i < p_elements.length; i++) p_el[p_elements[i]] = document.getElementById( p_elements[i]);
+
 	if( RULES_TOP.playlist ) p_file = RULES_TOP.playlist;
-	p_elCurFolder = u_el.playlist;
+	p_elCurFolder = p_el.playlist;
 	p_elCurFolder.m_id = '';
 	if( localStorage.playlist_opened == "true" ) p_Open();
 	else p_Close();
@@ -15,22 +20,22 @@ function p_Init()
 
 function p_Close()
 {
-	u_el['sidepanel_playlist'].classList.remove('opened');
-	u_el['playlist'].innerHTML = '';
+	p_el.sidepanel_playlist.classList.remove('opened');
+	p_el.playlist.innerHTML = '';
 	localStorage.playlist_opened = false;
 }
 function p_Open()
 {
-	u_el['sidepanel_playlist'].classList.add('opened');
+	p_el.sidepanel_playlist.classList.add('opened');
 	localStorage.playlist_opened = true;
 	p_Load();
 }
 
 function p_OnClick()
 {
-	if( u_el['sidepanel'].classList.contains('opened'))
+	if( u_el.sidepanel.classList.contains('opened'))
 	{
-		if( u_el['sidepanel_playlist'].classList.contains('opened'))
+		if( p_el.sidepanel_playlist.classList.contains('opened'))
 			p_Close();
 		else
 			p_Open();
@@ -199,12 +204,12 @@ function p_Load()
 	params.curfolderid = p_elCurFolder ? p_elCurFolder.m_id : null;
 	params.curitemid = p_elCurItem ? p_elCurItem.m_id : null;
 
-	p_elCurFolder = u_el.playlist;
+	p_elCurFolder = p_el.playlist;
 	p_elCurItem = null;
 
-	u_el.playlist.innerHTML = '';
+	p_el.playlist.innerHTML = '';
 
-	p_Read( obj.playlist, params, u_el.playlist);
+	p_Read( obj.playlist, params, p_el.playlist);
 
 	localStorage.playlist_opened_folders = params.opened.join(' ');
 }

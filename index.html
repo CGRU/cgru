@@ -13,9 +13,9 @@
 <script type="text/javascript" src="rules/dailies.js"></script>
 <script type="text/javascript" src="rules/general.js"></script>
 <script type="text/javascript" src="rules/network.js"></script>
+<script type="text/javascript" src="rules/news.js"></script>
 <script type="text/javascript" src="rules/playlist.js"></script>
 <script type="text/javascript" src="rules/status.js"></script>
-<script type="text/javascript" src="rules/subscription.js"></script>
 <script type="text/javascript" src="rules/ui.js"></script>
 </head>
 <body onload="g_Init()">
@@ -23,11 +23,11 @@
 <div id="content">
 	<div id="panel">
 		<div id="subscribe" style="display:none">
-			<div id="subscribe_btn" class="button" onclick="s_Subscribe()">Subscribe</div>
+			<div id="subscribe_btn" class="button" onclick="nw_Subscribe()">Subscribe</div>
 			<div id="subscribe_label">Subscribed</div>
-			<div id="unsubscribe_btn" class="button" onclick="s_Unsubscribe()">Unsubscribe</div>
+			<div id="unsubscribe_btn" class="button" onclick="nw_Unsubscribe()">Unsubscribe</div>
 			<div id="subscribe_path"></div>
-			<div id="subscribe_makenew" class="button" onclick="s_MakeNewsDialog()">Make News</div>
+			<div id="subscribe_makenew" class="button" onclick="nw_MakeNewsDialog()">Make News</div>
 		</div>
 	</div>
 	<div style="text-align: center"><img id="thumbnail" class="thumbnail" ></div>
@@ -39,8 +39,8 @@
 				<div class="button save" onclick="u_StatusSaveOnClick()">Save</div>
 				<div class="button save" onclick="u_StatusCancelOnClick()">Cancel</div>
 			</div>
-			<div id="status"></div>
-			<div id="status_color" style="clear:left;"></div>
+			<div id="status_annotation"></div>
+			<div id="status_progress"><div id="status_progressbar"></div></div>
 		</div>
 		<!--div id="content_description">
 		</div>
@@ -69,7 +69,7 @@
 <div id="sidepanel">
 	<div id="sidepanel_hide" class="button" onclick="u_SidePanelHideOnClick()">&rarr; Hide &rarr;</div>
 	<div id="sidepanel_news" style="display:none">
-		<div class="label button" onclick="s_NewsOnClick()">News</div>
+		<div class="label button" onclick="nw_NewsOnClick()">News</div>
 		<div class="body">
 			<div id="news" style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;"></div>
 			<div style="border-radius:4px;box-shadow:0 0 4px #000 inset, 0 0 4px #FFF;margin:4px;padding:4px;">

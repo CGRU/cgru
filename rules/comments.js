@@ -247,5 +247,7 @@ function cm_Save( i_el)
 
 //window.console.log( JSON.stringify( edit));
 	n_Request({"editobj":edit});
+
+	nw_MakeNews('<i>comments</i>');
 }
 

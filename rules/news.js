@@ -1,71 +1,71 @@
-s_initialized = false;
-s_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels'];
-s_el = {};
+nw_initialized = false;
+nw_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels'];
+nw_el = {};
 
-function s_Init()
+function nw_Init()
 {
 	if( g_auth_user == null ) return;
 
-	for( var i = 0; i < s_elements.length; i++)
-		s_el[s_elements[i]] = document.getElementById( s_elements[i]);
+	for( var i = 0; i < nw_elements.length; i++) nw_el[nw_elements[i]] = document.getElementById( nw_elements[i]);
 
-	s_el.subscribe.style.display = 'block';
-	s_el.sidepanel_news.style.display = 'block';
-	s_initialized = true;
+	nw_el.subscribe.style.display = 'block';
+	nw_el.sidepanel_news.style.display = 'block';
+	nw_initialized = true;
 
-	if( localStorage.news_opened == "true" ) s_NewsOpen();
-	else s_NewsClose();
+	if( localStorage.newnw_opened == "true" ) nw_NewsOpen();
+	else nw_NewsClose();
 
-	s_Finish();
-	s_UpdateChannels();
+	nw_Finish();
+	nw_UpdateChannels();
 }
 
-function s_UpdateChannels()
+function nw_UpdateChannels()
 {
-	s_el.channels.innerHTML = '';
+	nw_el.channels.innerHTML = '';
 	for( var i = 0; i < g_auth_user.channels.length; i++ )
 	{
-		s_path = g_auth_user.channels[i].id;
+		nw_path = g_auth_user.channels[i].id;
 		var el = document.createElement('div');
-		s_el.channels.appendChild( el);
+		nw_el.channels.appendChild( el);
 		el.title = 'Subscribed by '+g_auth_user.channels[i].user+' at\n'+c_DT_StrFromS( g_auth_user.channels[i].time);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
-		elBtn.m_path = s_path;
-		elBtn.ondblclick = function(e){ s_Unsubscribe( e.currentTarget.m_path);};
+		elBtn.m_path = nw_path;
+		elBtn.ondblclick = function(e){ nw_Unsubscribe( e.currentTarget.m_path);};
 
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
-		elLink.href = '#'+s_path;
-		elLink.textContent = s_path;
+		elLink.href = '#'+nw_path;
+		elLink.textContent = nw_path;
 	}
 }
 
-function s_Process()
+function nw_Process()
 {
-	if( false == s_initialized ) return;
+	if( false == nw_initialized ) return;
 
 //window.console.log(g_auth_user.channels);
 	var subscribed = false;
 	var path = g_CurPath();
 	for( var i = 0; i < g_auth_user.channels.length; i++ )
 	{
-		var s_path = g_auth_user.channels[i].id;
-		if( path.indexOf( s_path) == 0 )
+		var nw_path = g_auth_user.channels[i].id;
+		if( path.indexOf( nw_path) == 0 )
 		{
 			subscribed = true;
-			if( path == s_path )
+			if( path == nw_path )
 			{
-				s_el.subscribe_path.style.display = 'none';
-				s_el.unsubscribe_btn.style.display = 'block';
+				nw_el.subscribe_path.style.display = 'none';
+				nw_el.unsubscribe_btn.style.display = 'block';
 			}
 			else
 			{
-				s_el.subscribe_path.style.display = 'block';
-				s_el.subscribe_path.innerHTML = 'at <a href="#'+s_path+'">'+s_path+'</a>';
+				nw_el.subscribe_path.style.display = 'block';
+				nw_el.unsubscribe_btn.style.display = 'none';
+				nw_el.subscribe_path.innerHTML = 'at <a href="#'+nw_path+'">'+nw_path+'</a>';
 			}
 			break;
 		}
@@ -73,24 +73,24 @@ function s_Process()
 
 	if( subscribed )
 	{
-		s_el.subscribe_label.style.display = 'block';
-		s_el.subscribe_btn.style.display = 'none';
+		nw_el.subscribe_label.style.display = 'block';
+		nw_el.subscribe_btn.style.display = 'none';
 	}
 	else
-		s_Finish();
+		nw_Finish();
 }
 
-function s_Finish()
+function nw_Finish()
 {
-	if( false == s_initialized ) return;
+	if( false == nw_initialized ) return;
 
-	s_el.subscribe_label.style.display = 'none';
-	s_el.subscribe_btn.style.display = 'block';
-	s_el.unsubscribe_btn.style.display = 'none';
-	s_el.subscribe_path.style.display = 'none';
+	nw_el.subscribe_label.style.display = 'none';
+	nw_el.subscribe_btn.style.display = 'block';
+	nw_el.unsubscribe_btn.style.display = 'none';
+	nw_el.subscribe_path.style.display = 'none';
 }
 
-function s_Subscribe( i_path)
+function nw_Subscribe( i_path)
 {
 	if( i_path == null )
 		i_path = g_CurPath();
@@ -109,13 +109,13 @@ function s_Subscribe( i_path)
 	n_Request({"editobj":obj});
 
 	g_auth_user.channels.push( channel);
-	s_Process();
-	s_UpdateChannels();
+	nw_Process();
+	nw_UpdateChannels();
 
 	c_Info('Subscribed on ' + i_path);
 }
 
-function s_Unsubscribe( i_path)
+function nw_Unsubscribe( i_path)
 {
 	if( i_path == null )
 		i_path = g_CurPath();
@@ -137,50 +137,50 @@ function s_Unsubscribe( i_path)
 			break;
 		}
 
-	s_Process();
-	s_UpdateChannels();
+	nw_Process();
+	nw_UpdateChannels();
 
 	c_Info('Unsubscribed from ' + i_path);
 }
 
-function s_NewsOnClick()
+function nw_NewsOnClick()
 {
 	if( u_el['sidepanel'].classList.contains('opened'))
 	{
-		if( s_el.sidepanel_news.classList.contains('opened'))
-			s_NewsClose();
+		if( nw_el.sidepanel_news.classList.contains('opened'))
+			nw_NewsClose();
 		else
-			s_NewsOpen();
+			nw_NewsOpen();
 	}
 	else
 	{
 		u_SidePanelOpen();
-		s_NewsOpen();
+		nw_NewsOpen();
 	}
 }
 
-function s_NewsClose()
+function nw_NewsClose()
 {
-	s_el.sidepanel_news.classList.remove('opened');
-	s_el.news.innerHTML = '';
-	localStorage.news_opened = false;
+	nw_el.sidepanel_news.classList.remove('opened');
+	nw_el.news.innerHTML = '';
+	localStorage.newnw_opened = false;
 	g_auth_user.news = null;
 }
-function s_NewsOpen()
+function nw_NewsOpen()
 {
-	s_el.sidepanel_news.classList.add('opened');
-	localStorage.news_opened = true;
-	s_NewsLoad();
+	nw_el.sidepanel_news.classList.add('opened');
+	localStorage.newnw_opened = true;
+	nw_NewsLoad();
 }
 
-function s_MakeNewsDialog()
+function nw_MakeNewsDialog()
 {
 	if( g_auth_user == null ) return;
-	new cgru_Dialog( window, window, 's_MakeNews', null, 'str', '', 'news',
+	new cgru_Dialog( window, window, 'nw_MakeNews', null, 'str', '', 'news',
 		'Create News', 'Enter News Title');
 }
 
-function s_MakeNews( i_param, i_value)
+function nw_MakeNews( i_value)
 {
 //window.console.log(i_value);
 	if( g_auth_user == null ) return;
@@ -197,7 +197,7 @@ function s_MakeNews( i_param, i_value)
 		return;
 	}
 	else
-		s_NewsLoad();
+		nw_NewsLoad();
 
 	if( msg.users.length == 0 )
 	{
@@ -211,11 +211,11 @@ function s_MakeNews( i_param, i_value)
 	c_Info( info);
 }
 
-function s_NewsLoad()
+function nw_NewsLoad()
 {
 	if( g_auth_user == null ) return;
 
-	s_el.news.innerHTML = '';
+	nw_el.news.innerHTML = '';
 
 	if( g_auth_user.news == null )
 	{
@@ -235,20 +235,20 @@ function s_NewsLoad()
 		var news = g_auth_user.news[i];
 
 		var el = document.createElement('div');
-		s_el.news.appendChild( el);
-		el.title = news.title + '\nby '+news.user+' at\n'+c_DT_StrFromS( news.time);
+		nw_el.news.appendChild( el);
+		el.title = c_DT_StrFromS( news.time);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
 		elBtn.classList.add('button');
 		elBtn.textContent = '-';
 		elBtn.m_id = news.id;
-		elBtn.ondblclick = function(e){ s_RemoveNews( e.currentTarget.m_id);};
+		elBtn.ondblclick = function(e){ nw_RemoveNews( e.currentTarget.m_id);};
 
 		var elLabel = document.createElement('div');
 		el.appendChild( elLabel);
-		elLabel.classList.add('news_label');
-		elLabel.textContent = news.user+': '+news.title;
+		elLabel.classList.add('newnw_label');
+		elLabel.innerHTML = news.user+': '+news.title;
 
 		var elLink = document.createElement('a');
 		el.appendChild( elLink);
@@ -259,13 +259,13 @@ function s_NewsLoad()
 	g_auth_user.news = null;
 }
 
-function s_RemoveNews( i_id)
+function nw_RemoveNews( i_id)
 {
 	var obj = {};
 	obj.objects = [{"id":i_id}];
 	obj.delobj = true;
 	obj.file = 'users/'+g_auth_user.id+'.json';
 	n_Request({"editobj":obj});
-	s_NewsLoad();
+	nw_NewsLoad();
 }
 

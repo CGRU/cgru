@@ -133,27 +133,30 @@ function p_PathChanged()
 	p_path = c_GetHashPath();
 	p_path = RULES_TOP.root + p_path;
 	var walk = n_WalkDir([p_path])[0];
-	p_files = walk.files;
+	p_files = [];
+
+	for( var i = 0; i < walk.files.length; i++)
+	{
+		var file = walk.files[i];
+		if( file.split('.').pop() != 'jpg') continue;
+		var img = new Image();
+		img.src = p_path + '/' + file;
+		img.onload = function(){p_ImgLoaded();}
+		img.onerror = function(){p_ImgLoaded();}
+		p_files.push( file)
+		p_images.push( img);
+	}
 
 	if( p_files == null || ( p_files.length == 0 ))
 	{
 		if( walk.error )
 			c_Error( walk.error);
 		else
-			c_Error('No Files Founded.');
+			c_Error('No JPEG Files Founded.');
 		return;
 	}
 
 	window.document.title = p_path.substr( p_path.lastIndexOf('/')+1)+'/'+p_files[0];
-
-	for( var i = 0; i < p_files.length; i++)
-	{
-		var img = new Image();
-		img.src = p_path + '/' + p_files[i];
-		img.onload = function(){p_ImgLoaded();}
-		img.onerror = function(){p_ImgLoaded();}
-		p_images.push( img);
-	}
 }
 
 function p_ImgLoaded()
