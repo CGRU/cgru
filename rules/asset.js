@@ -413,7 +413,7 @@ function a_ShowThumbnails()
 
 			var elStatus = document.createElement('div');
 			elFolder.appendChild( elStatus);
-			u_StatusSetElLabel( elStatus, folders[f].status, true);
+			st_StatusSetElLabel( elStatus, folders[f].status, true);
 
 //			if( folders[f].status )
 //				if( folders[f].status.color )
@@ -451,7 +451,7 @@ function a_ShowThumbnails()
 			elScene.appendChild( elStatus);
 			elStatus.classList.add('status');
 //window.console.log(JSON.stringify(fobj));
-			u_StatusSetElLabel( elStatus, fobj.status);
+			st_StatusSetElLabel( elStatus, fobj.status);
 			if( fobj.status )
 				st_StatusSetColor( fobj.status, elScene);
 
@@ -482,7 +482,7 @@ function a_ShowThumbnails()
 				var elStatus = document.createElement('div');
 				elShot.appendChild( elStatus);
 				elStatus.classList.add('status');
-				u_StatusSetElLabel( elStatus, fobj.status);
+				st_StatusSetElLabel( elStatus, fobj.status);
 
 //				if( fobj.status )
 					st_StatusSetColor( fobj.status, elShot);
