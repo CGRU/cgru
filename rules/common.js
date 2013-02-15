@@ -47,7 +47,7 @@ function c_Parse( i_data)
 
 function c_CloneObj( i_obj)
 {
-	return JSON.parse( JSON.stringify( RULES_TOP));
+	return JSON.parse( JSON.stringify( i_obj));
 }
 
 function c_RulesMergeDir( o_rules, i_dir)

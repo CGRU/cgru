@@ -138,6 +138,8 @@ function d_ProcessGUI( i_wnd)
 	block.tasks = [task];
 
 	n_SendJob( job);
+
+	nw_MakeNews('<i>dailies</i>');
 }
 
 function d_MakeCmd( i_params)

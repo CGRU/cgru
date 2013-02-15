@@ -176,7 +176,21 @@ padding: 4px;
 #content_status.opened .button.edit { display:none;}
 #content_status.opened .button.save { display:block;}
 #content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px; margin:2px;}
-#status_color { display: none; }
+#status_progress {
+height: 10px;
+width: 100%;
+border-radius: 4px;
+box-shadow: 0 0 2px #000 inset;
+background: #BB4;
+}
+#status_progressbar {
+height: 10px;
+width: 0%;
+border-radius: 4px;
+box-shadow: 0 0 2px #000 inset;
+background: #492;
+}
+
 #navig .folder {
 position: relative;
 cursor: pointer;

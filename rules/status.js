@@ -42,6 +42,7 @@ function st_StatusSetColor( i_status, i_elB, i_elC)
 
 function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 {
+//console.log(JSON.stringify(i_status));
 	if( i_elToHide )
 		i_elToHide.style.display = 'none';
 
@@ -50,8 +51,13 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elParent = i_elParent;
 	st_elToHide = i_elToHide;
 	st_path = i_path;
-	st_status = i_status;
 	st_FuncApply = i_FuncApply;
+	st_status = {};
+	if( i_status )
+		st_status = c_CloneObj( i_status);
+//console.log(JSON.stringify(st_status));
+//	st_status.annotation = i_status.annotation;
+//	st_status.color = i_status.color;
 
 	st_elRoot = document.createElement('div');
 	st_elParent.appendChild( st_elRoot);
@@ -87,14 +93,13 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elRoot.appendChild( st_elColor);
 	u_DrawColorBars( st_elColor, st_EditColorOnClick);
 
-	st_FillEditUI( i_status);
-}
-
-function st_FillEditUI( i_status )
-{
-	st_status = i_status;
-	if( st_status == null )
-		st_status = {};
+//	st_FillEditUI( i_status);
+//}
+//function st_FillEditUI( i_status )
+//{
+//	st_status = i_status;
+//	if( st_status == null )
+//		st_status = {};
 
 	st_StatusSetElLabel( st_elAnn, st_status, true);
 	st_StatusSetColor( st_status);
@@ -105,7 +110,11 @@ function st_FillEditUI( i_status )
 function st_DestroyEditUI()
 {
 	if( st_elRoot && st_elParent )
+	{
+//console.log( st_elParent);
+//console.log( st_elRoot);
 		st_elParent.removeChild( st_elRoot);
+	}
 
 	if( st_elToHide )
 		st_elToHide.style.display = 'block';
@@ -127,8 +136,6 @@ function st_SaveOnClick()
 {
 	st_status.annotation = st_elAnn.innerHTML;
 
-	st_DestroyEditUI();
-
 	st_FuncApply( st_status);
 	if( g_CurPath() == st_path )
 		g_FolderSetStatus( st_status);
@@ -138,6 +145,9 @@ function st_SaveOnClick()
 	obj.add = true;
 	obj.file = RULES.root + st_path + '/' + RULES.rufolder + '/status.json';
 
-c_Info(JSON.stringify(obj));
-//	n_Request({"editobj":obj});
+	n_Request({"editobj":obj});
+
+	nw_MakeNews('<i>status</i>');
+
+	st_DestroyEditUI();
 }
