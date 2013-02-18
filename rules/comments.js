@@ -138,7 +138,7 @@ function cm_Init( i_el)
 		i_el.m_elText.innerHTML = i_el.m_obj.text;
 
 	i_el.color = i_el.m_obj.color;
-	u_StatusSetColor( i_el, i_el);
+	st_SetElColor( i_el, i_el);
 
 	if( i_el.m_obj.deleted )
 		i_el.style.display = 'none';
@@ -194,7 +194,7 @@ function cm_ColorOnclick( e)
 	var color = el.m_color;
 	el = el.parentNode.parentNode.parentNode;
 	el.color = color;
-	u_StatusSetColor( el, el);
+	st_SetElColor( el, el);
 }
 
 function cm_Cancel( i_el)

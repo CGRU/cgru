@@ -31,21 +31,15 @@
 		</div>
 	</div>
 	<div style="text-align: center"><img id="thumbnail" class="thumbnail" ></div>
-	<div id="content_info" class="closed" onclick="this.classList.remove('closed')">
+	<div id="content_info">
 		<div id="content_status">
-			<div class="label" style="float:left;">Status:</div>
-			<div style="float:right;font-size:12px;">
-				<div class="button edit" onclick="u_StatusEditOnClick()">Edit</div>
-				<div class="button save" onclick="u_StatusSaveOnClick()">Save</div>
-				<div class="button save" onclick="u_StatusCancelOnClick()">Cancel</div>
-			</div>
+			<div class="button" style="float:right;font-size:10px;" onclick="u_StatusEditOnClick()">Edit</div>
+			<div id="status_percentage"></div>
 			<div id="status_annotation"></div>
+			<div id="status_artists"></div>
+			<div id="status_tags"></div>
 			<div id="status_progress"><div id="status_progressbar"></div></div>
 		</div>
-		<!--div id="content_description">
-		</div>
-		<div id="content_task">
-		</div-->
 	</div>
 	<div id="asset"></div>
 	<div style="box-shadow: 0 0 4px #000 inset, 0 0 2px #FFF; margin: 2px; padding: 4px; border-radius: 6px;">

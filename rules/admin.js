@@ -160,6 +160,7 @@ function ad_OpenWindow()
 
 	var labels = {};
 	labels.id = 'Name';
+	labels.title = 'Title';
 	labels.role = 'Role';
 	labels.channels = {}; labels.channels.length = 'Cnls';
 	labels.news = {}; labels.news.length = 'News';
@@ -192,6 +193,11 @@ function ad_WndAddUser( i_el, i_user, i_row)
 		el.appendChild( elName);
 		elName.style.width = '100px';
 		elName.textContent = i_user.id;
+
+		var elTitle = document.createElement('div');
+		el.appendChild( elTitle);
+		elTitle.style.width = '150px';
+		elTitle.textContent = i_user.title;
 
 		var elRole = document.createElement('div');
 		el.appendChild( elRole);

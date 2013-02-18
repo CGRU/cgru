@@ -4,6 +4,7 @@ RULES_TOP = {};
 
 g_elCurFolder = null;
 g_auth_user = null;
+g_users = null;
 
 cgru_params.push(['user_title','User Title', 'Coordinator', 'Enter User Title']);
 
@@ -13,11 +14,20 @@ function g_Init()
 	u_Init();
 	c_Init();
 
-	var config = n_ReadConfig();
+	var request = {};
+	request.user = {};
+	request.user.title = localStorage.user_title;
+	var config = c_Parse( n_Request({"initialize":request}));
 	if( config == null ) return;
+	if( config.error )
+	{
+		c_Error( config.error);
+		return;
+	}
 
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
+	g_users = config.users;
 	if( config.user )
 	{
 		g_auth_user = config.user;
@@ -254,12 +264,18 @@ function g_OpenFolder( i_elFolder )
 		elFolder.m_elStatus = elStatus;
 		elStatus.classList.add('fstatus');
 
-
 		var elName = document.createElement('div');
 //		elColor.appendChild( elName);
 		elFolder.appendChild( elName);
 		elName.classList.add('fname');
 		elName.textContent = folder;
+
+		elFolder.m_elProgress = document.createElement('div');
+		elFolder.appendChild( elFolder.m_elProgress);
+		elFolder.m_elProgress.classList.add('progress');
+		elFolder.m_elProgressBar = document.createElement('div');
+		elFolder.m_elProgress.appendChild( elFolder.m_elProgressBar);
+		elFolder.m_elProgressBar.classList.add('progressbar');
 
 		elFolder.m_folder = folder;
 		if( i_elFolder.m_path == '/' )
@@ -285,8 +301,9 @@ function g_FolderSetStatus( i_status, i_elFolder)
 
 	i_elFolder.m_fobject.status = i_status;
 
-	st_StatusSetElLabel( i_elFolder.m_elStatus, i_status);
-	st_StatusSetColor( i_status, i_elFolder.m_elColor, i_elFolder);
+	st_SetElLabel( i_elFolder.m_elStatus, i_status);
+	st_SetElColor( i_status, i_elFolder.m_elColor, i_elFolder);
+	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
 }
 
 function g_CloseFolder( i_elFolder )

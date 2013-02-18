@@ -2,13 +2,13 @@ n_sendCount = 0;
 n_recvCount = 0;
 n_server = 'rules.php';
 
-function n_ReadConfig()
+/*function n_ReadConfig()
 {
 	var request = {};
 	request.readconfig = 'config_default.json';
 	return c_Parse( n_Request( request));
 }
-
+*/
 function n_WalkDir( i_paths, i_depth, i_rufolder, i_rufiles, i_lookahead)
 {
 	if( typeof( i_paths) != 'object')

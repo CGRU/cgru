@@ -1,7 +1,9 @@
 {
 "root":".",
 "rufolder":"rules",
+"company":"CGRU",
 "playlist":"rules/playlist.json",
+"tags":["started","done","error","hold"],
 
 "assets":{
 "project":{
@@ -66,7 +68,6 @@
 "movtypes":["mov","avi","mp4","mpg","mpeg"],
 "skipfiles":[".","Thumbs.db"],
 
-"company":"CGRU",
 "fps":"24",
 "dailies":
 {

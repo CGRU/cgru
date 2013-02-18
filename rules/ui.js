@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','cycle','comments','files','content_info','content_status','thumbnail','sidepanel'];
+u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','comments','files','content_info','content_status','thumbnail','sidepanel'];
 u_el = {};
 
 function u_Init()
@@ -48,8 +48,14 @@ function u_StatusApply( i_status)
 {
 	if( i_status != null )
 		RULES.status = c_CloneObj( i_status);
-	st_StatusSetElLabel( u_el.status_annotation, RULES.status, true);
-	st_StatusSetColor( RULES.status, u_el.content_info);
+	else
+		i_status = RULES.status;
+
+	st_SetElLabel( u_el.status_annotation, i_status, true);
+	st_SetElColor( i_status, u_el.content_info);
+	st_SetElProgress( i_status, u_el.status_progressbar, u_el.status_progress, u_el.status_percentage);
+	st_setElArtists( i_status, u_el.status_artists);
+	st_setElTags( i_status, u_el.status_tags);
 }
 
 function u_FilesOnClick( i_el)
@@ -65,11 +71,12 @@ function u_Finish()
 	document.getElementById('files_btn').classList.add('button');
 	u_el.files.m_opened = false;
 
-//	u_StatusCancelOnClick();
 	st_DestroyEditUI();
-	u_el.status_annotation.textContent = '';
 	u_el.files.textContent = '';
-	st_StatusSetColor( null, u_el.content_info);
+
+	u_StatusApply( null);
+//	u_el.status_annotation.textContent = '';
+//	st_StatusSetColor( null, u_el.content_info);
 
 	u_el.thumbnail.style.display = 'none';
 

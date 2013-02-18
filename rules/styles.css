@@ -168,15 +168,17 @@ box-shadow: 0 0 2px #000 inset;
 border-radius: 10px;
 padding: 4px;
 }
-#content_info .label { padding-right:4px; font-size:12px;}
-#content_info.closed { cursor:pointer; text-align:center;}
-#content_info.closed .label, #content_info.closed .button { display:none;}
-/*#content_status .button.edit { display:block;}*/
-#content_status .button.save { display:none;}
-#content_status.opened .button.edit { display:none;}
-#content_status.opened .button.save { display:block;}
-#content_info .editing { box-shadow: 0 0 2px #000 inset; border-radius: 4px; padding: 4px; margin:2px;}
+#status_percentage { margin: 0px 5px; float:left;}
+#status_annotation { margin: 0px 5px; float:left;}
+#status_artists, #status_tags {
+margin: 0px 5px;
+float:left;
+box-shadow: 0 0 2px #000 inset; border-radius: 3px;
+padding: 0 4px;
+}
+#status_tags { color:#080;}
 #status_progress {
+clear: both;
 height: 10px;
 width: 100%;
 border-radius: 4px;
@@ -190,6 +192,19 @@ border-radius: 4px;
 box-shadow: 0 0 2px #000 inset;
 background: #492;
 }
+
+.status_edit .progress { float:left; margin: 0px 6px; }
+.status_edit .color { clear:both;}
+.status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
+.status_edit .list .button { margin:0 4px;padding:0 4px;}
+.status_edit .list .item {
+float:left;
+cursor: pointer;
+border-radius: 3px;
+box-shadow: 0 0 2px #000 inset;
+margin:0 4px; padding:0 4px;
+}
+.status_edit .list .item.selected { background: rgba(200,255,255,.4);}
 
 #navig .folder {
 position: relative;
@@ -226,6 +241,17 @@ float: right;
 font-weight: normal;
 padding-right:4px;
 }
+#navig .folder .progress {
+position: relative;
+background: rgba(0,0,0,.5);
+height: 4px;
+border-radius: 2px;
+width: 100%;
+}
+#navig .folder .progressbar {
+position:absolute;
+top:0;bottom:0;left:0;width:35%;
+background:rgba(0,255,0,.5);}
 
 #assets {
 background: rgba(200,255,255,.3);

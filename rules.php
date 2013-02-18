@@ -430,18 +430,6 @@ if( array_key_exists('walkdir', $recv))
 		array_push( $out['walkdir'], $walkdir);
 	}
 }
-else if( array_key_exists('readconfig', $recv))
-{
-	$configs = array();
-	readConfig( $recv['readconfig'], $configs); 
-	$out['config'] = $configs;
-	processUser( $out);
-	if( $fHandle = fopen('version.txt','r'))
-	{
-		$out['version'] = fread( $fHandle, $RuleMaxLength);
-		fclose($fHandle);
-	}
-}
 else if( array_key_exists('afanasy', $recv))
 {
 	afanasy( $recv, $out);
@@ -457,7 +445,24 @@ else if( count( $recv))
 
 echo json_encode( $out);
 
-function processUser( &$o_out)
+function initialize( $i_arg, &$o_out)
+{
+	global $RuleMaxLength;
+
+	$configs = array();
+	readConfig('config_default.json', $configs); 
+	$o_out['config'] = $configs;
+
+	processUser( $i_arg['user'], $o_out);
+
+	if( $fHandle = fopen('version.txt','r'))
+	{
+		$o_out['version'] = fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+	}
+}
+
+function processUser( $i_user, &$o_out)
 {
 	global $UserName;
 
@@ -492,16 +497,39 @@ function processUser( &$o_out)
 
 	if( array_key_exists('error', $user))
 	{
-		error_log( $user['error']);
+		$o_out['error'] = $user['error'];
 		return;
 	}
 
 	$user['rtime'] = time();
+	$user['title'] = $i_user['title'];
 	$editobj['object'] = $user;
 	$out = array();
 	editobj( $editobj, $out);
+	if( array_key_exists('error', $out))
+	{
+		$o_out['error'] = $out['error'];
+		return;
+	}
 
 	$o_out['user'] = $user;
+
+	$out = array();
+	getallusers( null, $out);
+	if( array_key_exists('error', $out))
+	{
+		$o_out['error'] = $out['error'];
+		return;
+	}
+
+	$o_out['users'] = array();
+	foreach( $out['users'] as $obj)
+	{
+		$user = array();
+		$user['id'] = $obj['id'];
+		$user['title'] = $obj['title'];
+		$o_out['users'][$obj['id']] = $user;
+	}
 }
 
 function makenews( $i_news, &$o_out)
