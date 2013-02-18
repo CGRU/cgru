@@ -53,7 +53,11 @@ function p_Init()
 	for( var i = 0; i < p_buttons.length; i++)
 		p_elb[p_buttons[i]] = document.getElementById('btn_'+p_buttons[i]);
 
-	var config = n_ReadConfig();
+	var request = {};
+//	request.user = {};
+//	request.user.title = localStorage.user_title;
+	var config = c_Parse( n_Request({"initialize":request}));
+//	var config = n_ReadConfig();
 	for( var file in config.config )
 		cgru_ConfigJoin( config.config[file].cgru_config );
 
@@ -389,7 +393,11 @@ function p_NextFrame( i_val)
 //	p_el.framerate.textContent = (''+fps).substr(0,5);
 	p_el.framerate.textContent = Math.round( fps);
 	p_drawTime = now;
-	if( fps < p_fps ) p_interval--;
+	if( fps < p_fps)
+	{
+		 if( p_interval > 0 ) p_interval--;
+//		 p_interval--;
+	}
 	else p_interval++;
 
 	if( p_playing != 0 )

@@ -3,7 +3,7 @@
 "rufolder":"rules",
 "company":"CGRU",
 "playlist":"rules/playlist.json",
-"tags":["started","done","error","hold"],
+"tags":["done","error","hold","started","animatic"],
 
 "assets":{
 "project":{

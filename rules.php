@@ -453,7 +453,30 @@ function initialize( $i_arg, &$o_out)
 	readConfig('config_default.json', $configs); 
 	$o_out['config'] = $configs;
 
-	processUser( $i_arg['user'], $o_out);
+	processUser( $o_out);
+	if( array_key_exists('error', $o_out))
+	{
+		$o_out['error'] = $out['error'];
+		return;
+	}
+
+	$out = array();
+	getallusers( null, $out);
+	if( array_key_exists('error', $out))
+	{
+		$o_out['error'] = $out['error'];
+		return;
+	}
+
+	$o_out['users'] = array();
+	foreach( $out['users'] as $obj)
+	{
+		$user = array();
+		$user['id'] = $obj['id'];
+		if( isset( $obj['role'])) $user['role'] = $obj['role'];
+		if( isset( $obj['title'])) $user['title'] = $obj['title'];
+		$o_out['users'][$obj['id']] = $user;
+	}
 
 	if( $fHandle = fopen('version.txt','r'))
 	{
@@ -462,7 +485,7 @@ function initialize( $i_arg, &$o_out)
 	}
 }
 
-function processUser( $i_user, &$o_out)
+function processUser( &$o_out)
 {
 	global $UserName;
 
@@ -502,7 +525,7 @@ function processUser( $i_user, &$o_out)
 	}
 
 	$user['rtime'] = time();
-	$user['title'] = $i_user['title'];
+//	$user['title'] = $i_user['title'];
 	$editobj['object'] = $user;
 	$out = array();
 	editobj( $editobj, $out);
@@ -513,23 +536,6 @@ function processUser( $i_user, &$o_out)
 	}
 
 	$o_out['user'] = $user;
-
-	$out = array();
-	getallusers( null, $out);
-	if( array_key_exists('error', $out))
-	{
-		$o_out['error'] = $out['error'];
-		return;
-	}
-
-	$o_out['users'] = array();
-	foreach( $out['users'] as $obj)
-	{
-		$user = array();
-		$user['id'] = $obj['id'];
-		$user['title'] = $obj['title'];
-		$o_out['users'][$obj['id']] = $user;
-	}
 }
 
 function makenews( $i_news, &$o_out)
@@ -684,6 +690,68 @@ function htdigest( $i_recv, &$o_out)
 //error_log($data);
 }
 
+function deleteuser( $i_user_id, &$o_out)
+{
+	global $RuleMaxLength;
+
+	if( false == isAdmin())
+	{
+		$o_out['error'] = 'Access denied.';
+		return;
+	}
+
+	$dHandle = opendir('users');
+	if( $dHandle === false )
+	{
+		$o_out['error'] = 'Can`t open users folder.';
+		return;
+	}
+
+	while (false !== ( $entry = readdir( $dHandle)))
+	{
+		if( false === is_file("users/$entry")) continue;
+
+		$ufile = "$i_user_id.json";
+		if( $entry != $ufile ) continue;
+
+		unlink( $ufile);
+		break;
+	}
+	closedir($dHandle);
+
+	$htdigest_file = '.htdigest';
+	$data = '';
+	if( $fHandle = fopen( $htdigest_file, 'r'))
+	{
+		$data = fread( $fHandle, $RuleMaxLength);
+		fclose($fHandle);
+	}
+	else
+	{
+		$o_out['error'] = 'Unable to read the file.';
+		return;
+	}
+	$old_lines = explode("\n", $data);
+	$new_lines = array();
+	foreach( $old_lines as $line )
+	{
+		$values = explode(':', $line);
+		if( count( $values ) == 3 )
+		{
+			if( $values[0] != $i_user_id )
+				array_push( $new_lines, $line);
+		}
+	}
+	$data = implode("\n", $new_lines)."\n";
+
+	if( $fHandle = fopen( $htdigest_file, 'w' ))
+	{
+		fwrite( $fHandle, $data );
+		fclose( $fHandle );
+	}
+	else $o_out['error'] = 'Unable to write into the file.';
+}
+
 function getallusers( $i_args, &$o_out)
 {
 	global $RuleMaxLength;
@@ -704,7 +772,8 @@ function getallusers( $i_args, &$o_out)
 
 		if( $fHandle = fopen( "users/$entry", 'r'))
 		{
-			$o_out['users'][$entry] = json_decode( fread( $fHandle, $RuleMaxLength), true);
+			$user = json_decode( fread( $fHandle, $RuleMaxLength), true);
+			$o_out['users'][$user['id']] = $user;
 			fclose($fHandle);
 		}
 	}

@@ -176,21 +176,21 @@ float:left;
 box-shadow: 0 0 2px #000 inset; border-radius: 3px;
 padding: 0 4px;
 }
-#status_tags { color:#080;}
+#status_tags, .status_edit .tags { font-style:italic;}
 #status_progress {
 clear: both;
 height: 10px;
 width: 100%;
 border-radius: 4px;
 box-shadow: 0 0 2px #000 inset;
-background: #BB4;
+background: rgba(0,0,0,.5);
 }
 #status_progressbar {
 height: 10px;
 width: 0%;
 border-radius: 4px;
 box-shadow: 0 0 2px #000 inset;
-background: #492;
+background: rgba(0,255,0,.5);
 }
 
 .status_edit .progress { float:left; margin: 0px 6px; }
@@ -373,7 +373,7 @@ cursor: pointer;
 .comment .duration .editing {
 text-align: center;
 border: 1px solid rgba(200,255,255,.3);
-width: 30px;
+width: 30px; height: 20px;
 border-radius: 4px;
 box-shadow: 0 0 4px #000 inset;
 }
@@ -385,8 +385,8 @@ box-shadow: 0 0 4px #000 inset;
 .dailies div .param { background: #DDD;}
 .dailies .rules { padding: 12px; }
 
-.admin_users div div { float: left; text-align: center; /*margin: 1px 3px*/; border:1px solid rgba(0,0,0,.1); }
-/*.admin_users .button { padding: 0px; width: 20px; height:14px; }*/
+.admin_users div div { float: left; text-align: center; border:1px solid rgba(0,0,0,.1); }
+
 #users > div { margin: 1px 0px; border-radius: 4px; box-shadow: 0 0 2px #000 inset;}
 #users > div div { padding: 0px 4px;}
 #users > div .button { float: left; margin: 0px;}

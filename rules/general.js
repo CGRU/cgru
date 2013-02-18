@@ -15,8 +15,8 @@ function g_Init()
 	c_Init();
 
 	var request = {};
-	request.user = {};
-	request.user.title = localStorage.user_title;
+//	request.user = {};
+//	request.user.title = localStorage.user_title;
 	var config = c_Parse( n_Request({"initialize":request}));
 	if( config == null ) return;
 	if( config.error )

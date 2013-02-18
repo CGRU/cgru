@@ -158,30 +158,16 @@ function c_MakeThumbnail( i_sources, i_path)
 	n_Request({"cmdexec":{"cmds":[cmd]}}, false);
 }
 
-function c_SetPasswordOnclick()
+function c_GetUserTitle( i_uid)
 {
-	if( g_auth_user == null ) return;
-
-	if( g_auth_user.role == 'admin' )
-		new cgru_Dialog( window, window, 'c_SetPasswordDialog', null, 'str', g_auth_user.id, 'password',
-			'Create New Password', 'Enter User ID');
-	else
-		c_SetPasswordDialog( null, g_auth_user.id )
+	if( g_users && g_users[i_uid] && g_users[i_uid].title && ( g_users[i_uid].title != 'Coordinator'))
+		return g_users[i_uid].title;
+	return i_uid;
 }
 
-function c_SetPasswordDialog( not_used, i_user_id)
+function cgru_params_OnChange( i_param, i_value)
 {
-	new cgru_Dialog( window, window, 'c_SetPassword', i_user_id, 'str', '', 'password',
-		'Set Password', 'Enter New Password');
-}
-
-function c_SetPassword( i_user_id, i_passwd)
-{
-	var result = c_Parse( n_Request({"htdigest":{"user":i_user_id,"p":i_passwd}}, true, true));
-
-	if( result.error )
-		c_Error( result.error);
-	else if( result.status )
-		c_Info( result.status);
+//window.console.log( i_param+':'+i_value);
+	if( i_param == 'user_title' && g_auth_user ) ad_ChangeTitle( g_auth_user.id, i_value);
 }
 

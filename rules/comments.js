@@ -113,23 +113,23 @@ function cm_Init( i_el)
 	{
 		var cm = {};
 		cm.user_name = localStorage.user_name;
-		cm.user_title = localStorage.user_title;
+//		cm.user_title = localStorage.user_title;
 		cm.ctime = (new Date()).getTime();
-		cm.duration = 1.5;
+//		cm.duration = 1.5;
 		i_el.m_obj = cm;
 		i_el.m_new = true;
 	}
 
 	var date = c_DT_StrFromMS( i_el.m_obj.ctime);
 
-	var info = i_el.m_obj.user_title+' '+date;
+	var info = c_GetUserTitle(i_el.m_obj.user_name)+' '+date;
 	if( i_el.m_obj.duration )
 		info = i_el.m_obj.duration+' '+info;
 	if( i_el.m_obj.mtime )
 	{
 		var date = c_DT_StrFromMS( i_el.m_obj.mtime);
 		info += '<br>Modified: ';
-		info += i_el.m_obj.muser_title+' '+date;
+		info += c_GetUserTitle(i_el.m_obj.muser_name)+' '+date;
 	}
 
 	i_el.m_elInfo.innerHTML = info;
@@ -166,7 +166,7 @@ function cm_Edit( i_el)
 	elDrtn.classList.add('editing');
 	elDrtn.contentEditable = 'true';
 	i_el.m_elDrtn = elDrtn;
-	i_el.m_elDrtn.textContent = i_el.m_obj.duration;
+	if( i_el.m_obj.duration ) i_el.m_elDrtn.textContent = i_el.m_obj.duration;
 
 	for( var i = 0; i < cm_durations.length; i++)
 	{
@@ -230,7 +230,7 @@ function cm_Save( i_el)
 	{
 		i_el.m_obj.mtime = (new Date()).getTime();
 		i_el.m_obj.muser_name = localStorage.user_name;
-		i_el.m_obj.muser_title = localStorage.user_title;
+//		i_el.m_obj.muser_title = localStorage.user_title;
 	}
 
 	cm_Init( i_el);

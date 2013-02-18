@@ -39,7 +39,10 @@ function st_setElArtists( i_status, i_elArtists)
 	var text = '';
 	if( i_status && i_status.artists )
 		for( var i = 0; i < i_status.artists.length; i++)
-			text += ' '+i_status.artists[i];
+		{
+			if( i ) text += ', ';
+			text += c_GetUserTitle( i_status.artists[i]);
+		}
 	i_elArtists.textContent = text;
 }
 function st_setElTags( i_status, i_elTags)
@@ -143,6 +146,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elArtists = document.createElement('div');
 	st_elRoot.appendChild( st_elArtists);
 	st_elArtists.classList.add('list');
+	st_elArtists.classList.add('artists');
 	st_elArtists.m_elBtn = document.createElement('div');
 	st_elArtists.appendChild( st_elArtists.m_elBtn);
 	st_elArtists.m_elBtn.classList.add('button');
@@ -157,14 +161,16 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 		{
 			var el = document.createElement('div');
 			st_elArtists.m_elList.appendChild( el);
-			el.textContent = st_status.artists[i];
+			el.textContent = c_GetUserTitle( st_status.artists[i]);
 			el.classList.add('item');
+			el.classList.add('selected');
 		}
 
 
 	st_elTags = document.createElement('div');
 	st_elRoot.appendChild( st_elTags);
 	st_elTags.classList.add('list');
+	st_elTags.classList.add('tags');
 	st_elTags.m_elBtn = document.createElement('div');
 	st_elTags.appendChild( st_elTags.m_elBtn);
 	st_elTags.m_elBtn.classList.add('button');
@@ -180,6 +186,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			st_elTags.m_elList.appendChild( el);
 			el.textContent = st_status.tags[i];
 			el.classList.add('item');
+			el.classList.add('selected');
 		}
 
 
@@ -244,7 +251,11 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 		var el = document.createElement('div');
 		i_elParent.appendChild( el);
 		el.classList.add('item');
-		el.textContent = item;
+		if( i_list[item].title )
+//			el.textContent = i_list[item].title;
+			el.textContent = c_GetUserTitle( item);
+		else
+			el.textContent = item;
 		el.m_item = i_list[item];
 		if( st_status[i_stParam] && ( st_status[i_stParam].indexOf( item) != -1 ))
 		{

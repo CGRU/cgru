@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd `dirname "$0"`
+
 dest=$1
 
 if [ -z "$dest" ]; then
@@ -52,7 +54,7 @@ rcopy bin $dest
 rcopy examples $dest
 rcopy icons $dest
 rcopy lib $dest
-rcopy rules $dest
+copy rules $dest/rules
 rcopy software_setup $dest
 rcopy start $dest
 
