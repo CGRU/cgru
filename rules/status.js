@@ -34,7 +34,7 @@ function st_SetElLabel( i_el, i_status, i_full)
 	else
 		i_el.innerHTML = '';
 }
-function st_setElArtists( i_status, i_elArtists)
+function st_SetElArtists( i_status, i_elArtists)
 {
 	var text = '';
 	if( i_status && i_status.artists )
@@ -45,7 +45,7 @@ function st_setElArtists( i_status, i_elArtists)
 		}
 	i_elArtists.textContent = text;
 }
-function st_setElTags( i_status, i_elTags)
+function st_SetElTags( i_status, i_elTags)
 {
 	var text = '';
 	if( i_status && i_status.tags )
@@ -102,17 +102,17 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elRoot.appendChild( elBtns);
 	elBtns.style.cssFloat = 'right';
 
-	var elBtnSave = document.createElement('div');
-	elBtns.appendChild( elBtnSave);
-	elBtnSave.classList.add('button');
-	elBtnSave.textContent = 'Save';
-	elBtnSave.onclick = st_SaveOnClick;
-
 	var elBtnCancel = document.createElement('div');
 	elBtns.appendChild( elBtnCancel);
 	elBtnCancel.classList.add('button');
 	elBtnCancel.textContent = 'Cancel';
 	elBtnCancel.onclick = st_DestroyEditUI;
+
+	var elBtnSave = document.createElement('div');
+	elBtns.appendChild( elBtnSave);
+	elBtnSave.classList.add('button');
+	elBtnSave.textContent = 'Save';
+	elBtnSave.onclick = st_SaveOnClick;
 
 	var elAnnDiv = document.createElement('div');
 	st_elRoot.appendChild( elAnnDiv);
@@ -128,7 +128,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	var elProgressDiv = document.createElement('div');
 	st_elRoot.appendChild( elProgressDiv);
 //	elProgressDiv.style.cssFloat = 'left';
-	elProgressDiv.classList.add('progress');
+	elProgressDiv.classList.add('percent');
 	var elProgressLabel = document.createElement('div');
 	elProgressDiv.appendChild( elProgressLabel);
 	elProgressLabel.textContent = 'Progress:';
@@ -316,7 +316,7 @@ function st_SaveOnClick()
 
 	n_Request({"editobj":obj});
 
-	nw_MakeNews('<i>status</i>');
+	nw_MakeNews('<i>status</i>', st_path);
 
 	st_DestroyEditUI();
 }

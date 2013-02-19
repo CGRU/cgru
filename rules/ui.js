@@ -54,8 +54,13 @@ function u_StatusApply( i_status)
 	st_SetElLabel( u_el.status_annotation, i_status, true);
 	st_SetElColor( i_status, u_el.content_info);
 	st_SetElProgress( i_status, u_el.status_progressbar, u_el.status_progress, u_el.status_percentage);
-	st_setElArtists( i_status, u_el.status_artists);
-	st_setElTags( i_status, u_el.status_tags);
+	st_SetElArtists( i_status, u_el.status_artists);
+	st_SetElTags( i_status, u_el.status_tags);
+}
+
+function u_StatusEditOnClick()
+{
+	st_CreateEditUI( u_el.content_info, g_CurPath(), RULES.status, u_StatusApply, u_el.content_status);
 }
 
 function u_FilesOnClick( i_el)
@@ -150,11 +155,6 @@ function u_RulesOnClick()
 		u_el.rules.m_opened = true;
 		u_el.rules.style.display = 'block';
 	}
-}
-
-function u_StatusEditOnClick()
-{
-	st_CreateEditUI( u_el.content_info, g_CurPath(), RULES.status, u_StatusApply, u_el.content_status);
 }
 
 function u_DrawColorBars( i_el, i_onclick, i_height)

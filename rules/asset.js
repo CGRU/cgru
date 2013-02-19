@@ -4,6 +4,7 @@ ASSET = null;
 a_elThumbnails = null;
 a_elFolders = null;
 a_elFilter = null;
+a_elCurEditStatus = null;
 
 function a_Finish()
 {
@@ -391,35 +392,72 @@ function a_ShowThumbnails()
 			if( folders[f].name.indexOf('.') == 0 ) continue;
 			if( folders[f].name.indexOf('_') == 0 ) continue;
 
+			var path = g_elCurFolder.m_path + '/' + folders[f].name;
+
 			var elFolder = document.createElement('div');
 			a_elThumbnails.push( elFolder);
 			elFolder.m_status = folders[f].status;
+			elFolder.m_path = path;
 			u_el.asset.appendChild( elFolder);
 			elFolder.style.padding = '4px';
+			elFolder.classList.add('shot');
 
 			var elImg = document.createElement('img');
 			elFolder.appendChild( elImg);
 			elImg.classList.add('thumbnail');
-			elImg.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
+			elImg.m_path = path;
 			elImg.onclick = function(e){g_GO(e.currentTarget.m_path)};
-			elImg.src = RULES.root + g_elCurFolder.m_path + '/' + folders[f].name + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
+			elImg.src = RULES.root + path + '/' + RULES.rufolder + '/' + RULES.thumbnail.filename;
 
 			var elName = document.createElement('div');
 			elFolder.appendChild( elName);
 			elName.classList.add('button');
-			elName.m_path = g_elCurFolder.m_path + '/' + folders[f].name;
+			elName.m_path = path;
 			elName.onclick = function(e){g_GO(e.currentTarget.m_path)};
 			elName.textContent = folders[f].name;
 
-			var elStatus = document.createElement('div');
-			elFolder.appendChild( elStatus);
-			st_SetElLabel( elStatus, folders[f].status, true);
+			elFolder.m_elStatus = document.createElement('div');
+			elFolder.appendChild( elFolder.m_elStatus);
+			elFolder.m_elStatus.classList.add('status');
 
-//			if( folders[f].status )
-//				if( folders[f].status.color )
-					st_SetElColor( folders[f].status, elFolder);
+			elFolder.m_elEdit = document.createElement('div');
+			elFolder.m_elStatus.appendChild( elFolder.m_elEdit);
+			elFolder.m_elEdit.classList.add('button');
+			elFolder.m_elEdit.classList.add('btn_edit');
+			elFolder.m_elEdit.textContent = 'Edit';
+			elFolder.m_elEdit.m_elFolder = elFolder;
+			elFolder.m_elEdit.onclick = function(e){
+				var el = e.currentTarget.m_elFolder;
+				a_elCurEditStatus = el;
+				st_CreateEditUI( el, el.m_path, el.m_status, a_ThumbStatusApply, el.m_elStatus);
+			};
+
+			elFolder.m_elProgress = document.createElement('div');
+			elFolder.m_elStatus.appendChild( elFolder.m_elProgress);
+			elFolder.m_elProgress.classList.add('progress');
+			elFolder.m_elProgressBar = document.createElement('div');
+			elFolder.m_elProgress.appendChild( elFolder.m_elProgressBar);
+			elFolder.m_elProgressBar.classList.add('progressbar');
+
+			elFolder.m_elPercent = document.createElement('div');
+			elFolder.m_elStatus.appendChild( elFolder.m_elPercent);
+			elFolder.m_elPercent.classList.add('percent');
+
+			elFolder.m_elAnn = document.createElement('div');
+			elFolder.m_elStatus.appendChild( elFolder.m_elAnn);
+			elFolder.m_elAnn.classList.add('annotation');
+
+			elFolder.m_elArtists = document.createElement('div');
+			elFolder.m_elStatus.appendChild( elFolder.m_elArtists);
+			elFolder.m_elArtists.classList.add('artists');
+
+			elFolder.m_elTags = document.createElement('div');
+			elFolder.m_elStatus.appendChild( elFolder.m_elTags);
+			elFolder.m_elTags.classList.add('tags');
+
+			a_elCurEditStatus = elFolder;
+			a_ThumbStatusApply( folders[f].status);
 		}
-//window.console.log( JSON.stringify( folders));
 	}
 
 	if( ASSET.thumbnails > 0 )
@@ -479,16 +517,41 @@ function a_ShowThumbnails()
 				elName.classList.add('name');
 				elName.textContent = fobj.name;
 
-				var elStatus = document.createElement('div');
-				elShot.appendChild( elStatus);
-				elStatus.classList.add('status');
-				st_SetElLabel( elStatus, fobj.status);
+				elShot.m_elStatus = document.createElement('div');
+				elShot.appendChild( elShot.m_elStatus);
+				elShot.m_elStatus.classList.add('status');
 
-//				if( fobj.status )
-					st_SetElColor( fobj.status, elShot);
+				elShot.m_elProgress = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elProgress);
+				elShot.m_elProgress.classList.add('progress');
+				elShot.m_elProgressBar = document.createElement('div');
+				elShot.m_elProgress.appendChild( elShot.m_elProgressBar);
+				elShot.m_elProgressBar.classList.add('progressbar');
+
+				elShot.m_elPercent = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elPercent);
+
+				elShot.m_elAnn = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elAnn);
+
+				a_elCurEditStatus = elShot;
+//				a_ThumbStatusApply( fobj.status);
+				var i_status = fobj.status;
+	st_SetElLabel( a_elCurEditStatus.m_elAnn, i_status);
+	st_SetElColor( i_status, a_elCurEditStatus);
+	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);
 			}
 		}
 	}
+}
+
+function a_ThumbStatusApply( i_status)
+{
+	st_SetElLabel( a_elCurEditStatus.m_elAnn, i_status, true);
+	st_SetElArtists( i_status, a_elCurEditStatus.m_elArtists);
+	st_SetElTags( i_status, a_elCurEditStatus.m_elTags);
+	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);
+	st_SetElColor( i_status, a_elCurEditStatus);
 }
 
 function a_TFilter( i_args)

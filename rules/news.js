@@ -180,13 +180,16 @@ function nw_MakeNewsDialog()
 		'Create News', 'Enter News Title');
 }
 
-function nw_MakeNews( i_value)
+function nw_MakeNews( i_value, i_path)
 {
 //window.console.log(i_value);
 	if( g_auth_user == null ) return;
+
+	if( i_path == null ) i_path = g_CurPath();
+
 	var news = {};
 	news.time = c_DT_CurSeconds();
-	news.path = g_CurPath();
+	news.path = i_path;
 	news.title = i_value;
 	news.id = g_auth_user.id+'_'+news.time+'_'+news.path;
 

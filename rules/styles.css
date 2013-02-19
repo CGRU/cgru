@@ -99,16 +99,20 @@ padding-left: 6px;
 
 .thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
 
+.artists, .tags { box-shadow: 0 0 2px #000 inset; border-radius: 3px; padding: 0 4px; }
+.tags { font-style:italic;}
+
+#status_progress {
+clear: both;
+border-radius: 4px;
+}
+
+.progress, .progressbar { border-radius: 3px; box-shadow: 0 0 2px #000 inset; }
+.progress { position: relative; background:rgba(0,0,0,.5); }
+.progressbar { background:rgba(0,255,0,.5); }
+
 .colorbars { border-radius: 6px; margin: 2px; border: 1px solid #000;}
 .colorbars div div { float:left;}
-
-#panel { padding: 2px;}
-#panel div {
-float: left;
-text-align: center;
-margin: 0px 8px;
-padding: 2px 8px;
-}
 
 #sidepanel { right: 0; }
 #sidepanel > div { box-shadow: 0 0 4px #000 inset, 0 0 4px #FFF; border-radius: 4px;}
@@ -163,37 +167,27 @@ bottom: 38px;
 padding: 10px;
 overflow-y: scroll;
 }
-#content_info {
+#content #panel { padding: 2px;}
+#content #panel div {
+float: left;
+text-align: center;
+margin: 0px 8px;
+padding: 2px 8px;
+}
+#content #content_info {
 box-shadow: 0 0 2px #000 inset;
 border-radius: 10px;
 padding: 4px;
 }
+
 #status_percentage { margin: 0px 5px; float:left;}
 #status_annotation { margin: 0px 5px; float:left;}
-#status_artists, #status_tags {
-margin: 0px 5px;
-float:left;
-box-shadow: 0 0 2px #000 inset; border-radius: 3px;
-padding: 0 4px;
-}
-#status_tags, .status_edit .tags { font-style:italic;}
-#status_progress {
-clear: both;
-height: 10px;
-width: 100%;
-border-radius: 4px;
-box-shadow: 0 0 2px #000 inset;
-background: rgba(0,0,0,.5);
-}
-#status_progressbar {
-height: 10px;
-width: 0%;
-border-radius: 4px;
-box-shadow: 0 0 2px #000 inset;
-background: rgba(0,255,0,.5);
-}
+#status_artists, #status_tags { margin: 0px 5px; float:left;}
+#status_progress { clear: both; border-radius: 4px; }
+#status_progressbar { height: 10px; border-radius: 4px; }
 
-.status_edit .progress { float:left; margin: 0px 6px; }
+.status_edit { clear: both; }
+.status_edit .percent { float:left; margin: 0px 6px; }
 .status_edit .color { clear:both;}
 .status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
@@ -241,17 +235,7 @@ float: right;
 font-weight: normal;
 padding-right:4px;
 }
-#navig .folder .progress {
-position: relative;
-background: rgba(0,0,0,.5);
-height: 4px;
-border-radius: 2px;
-width: 100%;
-}
-#navig .folder .progressbar {
-position:absolute;
-top:0;bottom:0;left:0;width:35%;
-background:rgba(0,255,0,.5);}
+#navig .folder .progressbar { height: 6px;}
 
 #assets {
 background: rgba(200,255,255,.3);
@@ -271,16 +255,6 @@ padding: 5px 4px;
 #assets .asset:hover {box-shadow:0 0 6px rgba(0,0,0,.3) inset, 0 0 8px rgba(255,255,255,.5);/* background: rgba(200,255,255,.1);*/}
 #assets .asset .type { padding: 0px 4px; float: left; }
 #assets .asset .name { padding: 0px 4px; font-weight: bold; float: left; }
-
-#asset {}
-#asset > div {
-box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
-border-radius: 10px;
-margin: 6px;
-padding: 20px;
-}
-#asset > div.button { padding: 4px;}
-#asset .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
 
 #content #rules, .rules {
 font-family: courier;
@@ -312,9 +286,25 @@ font-size: 14px;
 }
 #content .folder .menu { box-shadow: 0px 0px 2px #000 inset; }
 
-.scene {
-cursor: pointer;
+#asset {}
+#asset > div {
+box-shadow: 0px 0px 6px #000 inset, 0px 0px 6px rgba(255,255,255,.7);
+border-radius: 10px;
+margin: 6px;
+padding: 20px;
 }
+#asset > div.button { padding: 4px;}
+
+.shot .thumbnail { float: left; margin-right: 20px; cursor: pointer;}
+.shot .status { clear:both; /*border: 1px solid #000;*/ }
+.shot .status .btn_edit { float: right; font-size: 10px; }
+.shot .status .percent { float: left; margin-right: 5px; }
+.shot .status .annotation { float: left; margin-right: 5px; }
+.shot .status .artists { float: left; margin-right: 5px; }
+.shot .status .tags { float: left; margin-right: 5px; }
+.shot .status .progressbar { clear: both; height: 8px; }
+
+.scene { cursor: pointer; }
 .scene .shot {
 position: relative;
 float: left;

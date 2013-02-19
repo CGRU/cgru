@@ -237,12 +237,6 @@ function ad_WndAddUser( i_el, i_user, i_row)
 	}
 	else el.style.backgroundColor = '#999999';
 
-	var elDel = document.createElement('div');
-	el.appendChild( elDel);
-	elDel.style.width = '20px';
-	elDel.textContent = '-';
-	elDel.title = 'Double click to delete user';
-
 	var elName = document.createElement('div');
 	el.appendChild( elName);
 	elName.style.width = '100px';
@@ -381,6 +375,7 @@ function ad_DeleteUser( not_used, i_user_id)
 		return;
 	}
 	c_Info('User "'+i_user_id+'" deleted.');
+	ad_WndRefresh();
 }
 
 function ad_SetPasswordOnclick()

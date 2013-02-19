@@ -665,10 +665,10 @@ function htdigest( $i_recv, &$o_out)
 		if( count( $values ) == 3 )
 		{
 			if( $values[0] == $user )
-				$o_out['status'] = 'User '.$user.' updated.';
+				$o_out['status'] = 'User "'.$user.'" updated.';
 			else
 			{
-				$o_out['status'] = 'User '.$user.' created.';
+				$o_out['status'] = 'User "'.$user.'" set.';
 				array_push( $new_lines, $line);
 			}
 		}
@@ -710,11 +710,8 @@ function deleteuser( $i_user_id, &$o_out)
 	while (false !== ( $entry = readdir( $dHandle)))
 	{
 		if( false === is_file("users/$entry")) continue;
-
-		$ufile = "$i_user_id.json";
-		if( $entry != $ufile ) continue;
-
-		unlink( $ufile);
+		if( $entry != "$i_user_id.json" ) continue;
+		unlink("users/$entry");
 		break;
 	}
 	closedir($dHandle);
