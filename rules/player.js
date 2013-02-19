@@ -139,6 +139,7 @@ function p_PathChanged()
 	var walk = n_WalkDir([p_path])[0];
 	p_files = [];
 
+	walk.files.sort();
 	for( var i = 0; i < walk.files.length; i++)
 	{
 		var file = walk.files[i];

@@ -304,7 +304,9 @@ padding: 20px;
 .shot .status .tags { float: left; margin-right: 5px; }
 .shot .status .progressbar { clear: both; height: 8px; }
 
-.scene { cursor: pointer; }
+/*.scene { cursor: pointer; }*/
+.scene a { color: inherit; display:block; }
+.scene a:hover { color: #AFF;}
 .scene .shot {
 position: relative;
 float: left;
@@ -313,22 +315,37 @@ margin: 4px;
 box-shadow: 0 0 4px #FFF, 0 0 6px #000 inset;
 border: 2px solid #000;
 width: 200px;
-height: 40px;
+height: 44px;
 }
-.scene .shot:hover {border: 2px solid #5AA;}
-.scene .shot .name, .scene .shot .status {
+.scene .shot .status_edit { position: relative; top: 44px;}
+.scene .shot.status_editing {
+clear: both;
+width: 100%;
+left: 0; right: 0;
+height: 170px;
+border: 2px solid #FF0;
+}
+/*.scene .shot:hover {border: 2px solid #5AA;}*/
+/*.scene .shot .name,*/
+.scene .shot .status {
 position:absolute;
-top:0;
-padding:10px;
+top:0;left:0;bottom:0;right:0;
+padding: 0px 4px;
+font-size: 12px;
+font-weight: bold;
 text-shadow: 0 0 1px #000, 0 0 2px #000, 0 0 4px #000;
 color: #FFF;
+width: 190px;
+height: 44px;
 }
-.scene .shot .name { left:0;}
-.scene .shot .status { right:0;}
+.scene .shot .status .percent { float:right;}
+.scene .shot .status .annotation { float:right;}
+.scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
+.scene .shot .status .artists, .scene .shot .status .tags { clear:both; font-size: 10px;}
 .scene .shot img {
 position: absolute;
 width: 182px;
-height: 30px;
+height: 34px;
 border-radius: 4px;
 margin: 4px 8px;
 border: 1px solid #000;

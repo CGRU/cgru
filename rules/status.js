@@ -84,6 +84,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_DestroyEditUI();
 
 	st_elParent = i_elParent;
+	st_elParent.classList.add('status_editing');
 	st_elToHide = i_elToHide;
 	st_path = i_path;
 	st_FuncApply = i_FuncApply;
@@ -212,11 +213,10 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 
 function st_DestroyEditUI()
 {
-	if( st_elRoot && st_elParent )
+	if( st_elParent )
 	{
-//console.log( st_elParent);
-//console.log( st_elRoot);
-		st_elParent.removeChild( st_elRoot);
+		st_elParent.classList.remove('status_editing');
+		if( st_elRoot ) st_elParent.removeChild( st_elRoot);
 	}
 
 	if( st_elToHide )

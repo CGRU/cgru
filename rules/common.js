@@ -171,3 +171,11 @@ function cgru_params_OnChange( i_param, i_value)
 	if( i_param == 'user_title' && g_auth_user ) ad_ChangeTitle( g_auth_user.id, i_value);
 }
 
+function c_CompareFolders(a,b)
+{
+	var attr = 'name';
+	if( a[attr] < b[attr]) return -1;
+	if( a[attr] > b[attr]) return 1;
+	return 0;
+}
+

@@ -223,14 +223,20 @@ function u_DrawColorBars( i_el, i_onclick, i_height)
 function u_ShowFolder( i_element, i_path, i_walk)
 {
 	if( i_walk.folders)
+	{
+		i_walk.folders.sort( c_CompareFolders );
 		for( var i = 0; i < i_walk.folders.length; i++)
 			if( false == u_SkipFile( i_walk.folders[i].name))
 				u_ShowSequence( i_element, i_path + '/' + i_walk.folders[i].name)
+	}
 
 	if( i_walk.files)
+	{
+		i_walk.files.sort();
 		for( var i = 0; i < i_walk.files.length; i++)
 			if( false == u_SkipFile( i_walk.files[i]))
 				u_ShowFile( i_element, i_path + '/' + i_walk.files[i])
+	}
 }
 
 function u_ShowSequence( i_element, i_path, i_name)

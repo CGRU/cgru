@@ -314,6 +314,7 @@ function a_SourceWalkFind( i_walk, o_list, i_path)
 //window.console.log( JSON.stringify( i_walk).replace(/,/g,', '));
 	if( i_walk.folders == null ) return;
 
+	i_walk.folders.sort( c_CompareFolders );
 	for( var f = 0; f < i_walk.folders.length; f++)
 	{
 		var fobj = i_walk.folders[f];
@@ -457,6 +458,7 @@ function a_ShowThumbnails()
 
 			a_elCurEditStatus = elFolder;
 			a_ThumbStatusApply( folders[f].status);
+			a_elCurEditStatus = null;
 		}
 	}
 
@@ -465,6 +467,7 @@ function a_ShowThumbnails()
 		a_elFolders = [];
 
 		var walk = n_WalkDir([ASSET.path], ASSET.thumbnails, RULES.rufolder,['rules','status'],['status'])[0];
+		walk.folders.sort( c_CompareFolders );
 
 		for( var sc = 0; sc < walk.folders.length; sc++)
 		{
@@ -478,21 +481,22 @@ function a_ShowThumbnails()
 			u_el.asset.appendChild( elScene);
 			elScene.classList.add('scene');
 			elScene.m_path = ASSET.path + '/' + fobj.name;
-			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
+//			elScene.onclick = function(e){g_GO(e.currentTarget.m_path)};
 
-			var elName = document.createElement('div');
+			var elName = document.createElement('a');
 			elScene.appendChild( elName);
 			elName.classList.add('name');
 			elName.textContent = fobj.name;
+			elName.href = '#'+elScene.m_path;
 
 			var elStatus = document.createElement('div');
 			elScene.appendChild( elStatus);
 			elStatus.classList.add('status');
 //window.console.log(JSON.stringify(fobj));
 			st_SetElLabel( elStatus, fobj.status);
-			if( fobj.status )
-				st_SetElColor( fobj.status, elScene);
+			st_SetElColor( fobj.status, elScene);
 
+			walk.folders[sc].folders.sort( c_CompareFolders );
 			for( var s = 0; s < walk.folders[sc].folders.length; s++)
 			{
 				var fobj = walk.folders[sc].folders[s];
@@ -506,20 +510,36 @@ function a_ShowThumbnails()
 				elScene.m_elThumbnails.push( elShot);
 				elShot.classList.add('shot');
 				elShot.m_path = elScene.m_path + '/' + fobj.name;
-				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
+//				elShot.onclick = function(e){e.stopPropagation();g_GO(e.currentTarget.m_path)};
+				elShot.ondblclick = function(e){
+					var el = e.currentTarget;
+					a_elCurEditStatus = el;
+					st_CreateEditUI( el, el.m_path, el.m_status, a_ThumbStatusApply);
+					return false;
+				};
 
 				var elImg = document.createElement('img');
 				elShot.appendChild( elImg);
 				elImg.src = RULES.root + elShot.m_path +'/'+ RULES.rufolder +'/'+ RULES.thumbnail.filename;
 
-				var elName = document.createElement('div');
-				elShot.appendChild( elName);
-				elName.classList.add('name');
-				elName.textContent = fobj.name;
-
 				elShot.m_elStatus = document.createElement('div');
 				elShot.appendChild( elShot.m_elStatus);
 				elShot.m_elStatus.classList.add('status');
+
+				elShot.m_elAnn = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elAnn);
+				elShot.m_elAnn.classList.add('annotation');
+
+				elShot.m_elPercent = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elPercent);
+				elShot.m_elPercent.classList.add('percent');
+
+//				var elName = document.createElement('div');
+				var elName = document.createElement('a');
+				elShot.m_elStatus.appendChild( elName);
+				elName.classList.add('name');
+				elName.textContent = fobj.name;
+				elName.href = '#'+elShot.m_path;
 
 				elShot.m_elProgress = document.createElement('div');
 				elShot.m_elStatus.appendChild( elShot.m_elProgress);
@@ -528,18 +548,17 @@ function a_ShowThumbnails()
 				elShot.m_elProgress.appendChild( elShot.m_elProgressBar);
 				elShot.m_elProgressBar.classList.add('progressbar');
 
-				elShot.m_elPercent = document.createElement('div');
-				elShot.m_elStatus.appendChild( elShot.m_elPercent);
+				elShot.m_elTags = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elTags);
+				elShot.m_elTags.classList.add('tags');
 
-				elShot.m_elAnn = document.createElement('div');
-				elShot.m_elStatus.appendChild( elShot.m_elAnn);
+				elShot.m_elArtists = document.createElement('div');
+				elShot.m_elStatus.appendChild( elShot.m_elArtists);
+				elShot.m_elArtists.classList.add('artists');
 
 				a_elCurEditStatus = elShot;
-//				a_ThumbStatusApply( fobj.status);
-				var i_status = fobj.status;
-	st_SetElLabel( a_elCurEditStatus.m_elAnn, i_status);
-	st_SetElColor( i_status, a_elCurEditStatus);
-	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);
+				a_ThumbStatusApply( fobj.status);
+				a_elCurEditStatus = null;
 			}
 		}
 	}
@@ -547,7 +566,8 @@ function a_ShowThumbnails()
 
 function a_ThumbStatusApply( i_status)
 {
-	st_SetElLabel( a_elCurEditStatus.m_elAnn, i_status, true);
+	if( i_status != null ) a_elCurEditStatus.m_status = c_CloneObj( i_status);
+	st_SetElLabel( a_elCurEditStatus.m_elAnn, i_status, false);
 	st_SetElArtists( i_status, a_elCurEditStatus.m_elArtists);
 	st_SetElTags( i_status, a_elCurEditStatus.m_elTags);
 	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);

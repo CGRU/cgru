@@ -181,8 +181,8 @@ function walkDir( $i_recv, $i_dir, &$o_out, $i_depth)
 
 		}
 		closedir($handle);
-		sort( $o_out['folders']);
-		sort( $o_out['files']);
+//		sort( $o_out['folders']);
+//		sort( $o_out['files']);
 	}
 }
 

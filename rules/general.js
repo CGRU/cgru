@@ -216,7 +216,7 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	}
 
 	g_elCurFolder.m_dir = i_walk;
-	g_elCurFolder.m_dir.folders.sort( g_CompareFolders );
+	g_elCurFolder.m_dir.folders.sort( c_CompareFolders );
 
 	c_RulesMergeDir( RULES, g_elCurFolder.m_dir);
 	a_Append( i_path, g_elCurFolder.m_dir.rules);
@@ -227,13 +227,6 @@ window.console.log('Folders='+g_elCurFolder.m_dir.folders);
 	return true;
 }
 
-function g_CompareFolders(a,b)
-{
-	var attr = 'name';
-	if( a[attr] < b[attr]) return -1;
-	if( a[attr] > b[attr]) return 1;
-	return 0;
-}
 function g_OpenFolder( i_elFolder )
 {
 	if( i_elFolder.classList.contains('opened'))
