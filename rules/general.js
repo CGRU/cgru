@@ -294,7 +294,7 @@ function g_FolderSetStatus( i_status, i_elFolder)
 
 	i_elFolder.m_fobject.status = i_status;
 
-	st_SetElLabel( i_elFolder.m_elStatus, i_status);
+	st_SetElLabel( i_status, i_elFolder.m_elStatus);
 	st_SetElColor( i_status, i_elFolder.m_elColor, i_elFolder);
 	st_SetElProgress( i_status, i_elFolder.m_elProgressBar, i_elFolder.m_elProgress);
 }

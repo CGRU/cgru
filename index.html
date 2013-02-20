@@ -39,6 +39,10 @@
 			<div id="status_artists" class="artists"></div>
 			<div id="status_tags" class="tags"></div>
 			<div id="status_progress" class="progress"><div id="status_progressbar" class="progressbar"></div></div>
+			<div id="status_description_div" style="clear:both">
+				<span class="button">+</span>
+				<span id="status_description"></span>
+			</div>
 		</div>
 	</div>
 	<div id="asset"></div>
@@ -141,6 +145,7 @@
 	<div class="panel">
 		<div class="button" onclick="g_GO('/');window.location.reload();">Root</div>
 		<div class="button" onclick="g_GO('..')">Up</div>
+		<div id="news_count" title="News Counter" onclick="u_SidePanelOpen();nw_NewsOpen()"></div>
 		<div id="assets"></div>
 	</div>
 </div>

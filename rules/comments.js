@@ -120,14 +120,14 @@ function cm_Init( i_el)
 		i_el.m_new = true;
 	}
 
-	var date = c_DT_StrFromMS( i_el.m_obj.ctime);
+	var date = c_DT_StrFromMSec( i_el.m_obj.ctime);
 
 	var info = c_GetUserTitle(i_el.m_obj.user_name)+' '+date;
 	if( i_el.m_obj.duration )
 		info = i_el.m_obj.duration+' '+info;
 	if( i_el.m_obj.mtime )
 	{
-		var date = c_DT_StrFromMS( i_el.m_obj.mtime);
+		var date = c_DT_StrFromMSec( i_el.m_obj.mtime);
 		info += '<br>Modified: ';
 		info += c_GetUserTitle(i_el.m_obj.muser_name)+' '+date;
 	}

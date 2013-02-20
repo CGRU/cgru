@@ -126,8 +126,8 @@ function c_Log( i_msg)
 //	u_el.cycle.style.opacity = '.1';
 }
 
-function c_DT_StrFromS( i_time) { return c_DT_StrFromMS( i_time*1000);}
-function c_DT_StrFromMS( i_time)
+function c_DT_StrFromSec( i_time) { return c_DT_StrFromMSec( i_time*1000);}
+function c_DT_StrFromMSec( i_time)
 {
 	var date = new Date(i_time);
 	date = date.toString();
@@ -135,6 +135,29 @@ function c_DT_StrFromMS( i_time)
 	return date;
 }
 function c_DT_CurSeconds() { return Math.round((new Date).valueOf()/1000);}
+function c_DT_SecFromStr( i_str) { return  Math.round( c_DT_DateFromStr( i_str).valueOf()/1000);}
+function c_DT_DateFromStr( i_str)
+{
+	var nums = i_str.split(/\D{1,}/);
+	var day = nums[0];
+	var mon = nums[1];
+	var year = nums[2];
+	var hour = 0;
+	var mins = 0;
+	if( nums[0].length == 4 ) { day = nums[2]; year = nums[0]; }
+	if( nums.length > 3 ) hour = nums[3];
+	if( nums.length > 4 ) mins = nums[4];
+	if( year < 100 ) year += 2000;
+
+	var date = new Date(0);
+	date.setFullYear( year);
+	date.setMonth( mon-1);
+	date.setDate( day);
+	date.setHours( hour-1);
+	date.setMinutes( mins-1);
+
+	return date;
+}
 
 function c_ElDisplayToggle( i_el)
 {

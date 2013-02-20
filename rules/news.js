@@ -1,5 +1,5 @@
 nw_initialized = false;
-nw_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels'];
+nw_elements = ['subscribe','subscribe_btn','unsubscribe_btn','subscribe_label','subscribe_path','sidepanel_news','news','channels','news_count'];
 nw_el = {};
 
 function nw_Init()
@@ -7,6 +7,8 @@ function nw_Init()
 	if( g_auth_user == null ) return;
 
 	for( var i = 0; i < nw_elements.length; i++) nw_el[nw_elements[i]] = document.getElementById( nw_elements[i]);
+
+	nw_ShowCount();
 
 	nw_el.subscribe.style.display = 'block';
 	nw_el.sidepanel_news.style.display = 'block';
@@ -27,7 +29,7 @@ function nw_UpdateChannels()
 		nw_path = g_auth_user.channels[i].id;
 		var el = document.createElement('div');
 		nw_el.channels.appendChild( el);
-		el.title = 'Subscribed by '+g_auth_user.channels[i].user+' at\n'+c_DT_StrFromS( g_auth_user.channels[i].time);
+		el.title = 'Subscribed by '+g_auth_user.channels[i].user+' at\n'+c_DT_StrFromSec( g_auth_user.channels[i].time);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);
@@ -214,6 +216,20 @@ function nw_MakeNews( i_value, i_path)
 	c_Info( info);
 }
 
+function nw_ShowCount()
+{
+	if( g_auth_user && g_auth_user.news && g_auth_user.news.length )
+	{
+		nw_el.news_count.textContent = g_auth_user.news.length;
+		nw_el.news_count.style.display = 'block';
+	}
+	else
+	{
+		nw_el.news_count.style.display = 'none';
+		nw_el.news_count.textContent = text;
+	}
+}
+
 function nw_NewsLoad()
 {
 	if( g_auth_user == null ) return;
@@ -233,6 +249,8 @@ function nw_NewsLoad()
 		g_auth_user.news = user.news;
 	}
 
+	nw_ShowCount();
+
 	g_auth_user.news.sort( function(a,b){var attr='time';if(a[attr]>b[attr])return -1;if(a[attr]<b[attr])return 1;return 0;});
 	for( var i = 0; i < g_auth_user.news.length; i++ )
 	{
@@ -240,7 +258,7 @@ function nw_NewsLoad()
 
 		var el = document.createElement('div');
 		nw_el.news.appendChild( el);
-		el.title = c_DT_StrFromS( news.time);
+		el.title = c_DT_StrFromSec( news.time);
 
 		var elBtn = document.createElement('div');
 		el.appendChild( elBtn);

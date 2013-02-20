@@ -22,14 +22,22 @@ function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPerc
 	}
 }
 
-function st_SetElLabel( i_el, i_status, i_full)
+function st_SetElLabel( i_status, i_el, i_full)
 {
-	if( i_status && i_status.annotation)
+	if( i_full == null ) i_full = false;
+	st_SetElAnnotation( i_status, i_el, i_full);
+}
+function st_SetElAnnotation( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'annotation', i_full);}
+function st_SetElDescription( i_status, i_el, i_full) { st_SetElText( i_status, i_el,'description', i_full);}
+function st_SetElText( i_status, i_el, i_field, i_full)
+{
+	if( i_full == null ) i_full = true;
+	if( i_status && i_status[i_field])
 	{
 		if( i_full )
-			i_el.innerHTML = i_status.annotation;
+			i_el.innerHTML = i_status[i_field];
 		else
-			i_el.innerHTML = i_status.annotation.split(' ')[0];
+			i_el.innerHTML = i_status[i_field].split(' ')[0];
 	}
 	else
 		i_el.innerHTML = '';
@@ -115,6 +123,19 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	elBtnSave.textContent = 'Save';
 	elBtnSave.onclick = st_SaveOnClick;
 
+	var elFinishDiv = document.createElement('div');
+	st_elRoot.appendChild( elFinishDiv);
+	elFinishDiv.style.cssFloat = 'right';
+	elFinishDiv.style.width = '150px';
+	var elFinishLabel = document.createElement('div');
+	elFinishDiv.appendChild( elFinishLabel);
+	elFinishLabel.style.cssFloat = 'left';
+	elFinishLabel.textContent = 'Finish:';
+	st_elFinish = document.createElement('div');
+	elFinishDiv.appendChild( st_elFinish);
+	st_elFinish.classList.add('editing');
+	st_elFinish.contentEditable = 'true';
+
 	var elAnnDiv = document.createElement('div');
 	st_elRoot.appendChild( elAnnDiv);
 	var elAnnLabel = document.createElement('div');
@@ -143,7 +164,6 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elProgress.classList.add('editing');
 	st_elProgress.style.textAlign = 'center';
 
-
 	st_elArtists = document.createElement('div');
 	st_elRoot.appendChild( st_elArtists);
 	st_elArtists.classList.add('list');
@@ -167,7 +187,6 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			el.classList.add('selected');
 		}
 
-
 	st_elTags = document.createElement('div');
 	st_elRoot.appendChild( st_elTags);
 	st_elTags.classList.add('list');
@@ -190,21 +209,24 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			el.classList.add('selected');
 		}
 
+	var elDescDiv = document.createElement('div');
+	st_elRoot.appendChild( elDescDiv);
+	var elDescLabel = document.createElement('div');
+	elDescDiv.appendChild( elDescLabel);
+	elDescLabel.textContent = 'Description:';
+	elDescLabel.style.cssFloat = 'left';
+	st_elDesc = document.createElement('div');
+	elDescDiv.appendChild( st_elDesc);
+	st_elDesc.classList.add('editing');
+	st_elDesc.contentEditable = 'true';
 
 	st_elColor = document.createElement('div');
 	st_elRoot.appendChild( st_elColor);
 	st_elColor.classList.add('color');
 	u_DrawColorBars( st_elColor, st_EditColorOnClick);
 
-//	st_FillEditUI( i_status);
-//}
-//function st_FillEditUI( i_status )
-//{
-//	st_status = i_status;
-//	if( st_status == null )
-//		st_status = {};
-
-	st_SetElLabel( st_elAnn, st_status, true);
+	st_SetElAnnotation( st_status, st_elAnn);
+	st_SetElDescription( st_status, st_elDesc);
 	st_SetElColor( st_status);
 	if( st_status.progress != null ) st_elProgress.textContent = st_status.progress;
 
@@ -288,7 +310,11 @@ function st_EditColorOnClick( i_evt)
 
 function st_SaveOnClick()
 {
+	var finish = c_DT_SecFromStr( st_elFinish.textContent);
+window.console.log( new Date(finish*1000).toString());
+
 	st_status.annotation = st_elAnn.innerHTML;
+	st_status.description = st_elDesc.innerHTML;
 	st_status.progress = parseInt( st_elProgress.textContent);
 	if( st_elArtists.m_elListAll )
 	{

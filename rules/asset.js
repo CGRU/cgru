@@ -493,7 +493,7 @@ function a_ShowThumbnails()
 			elScene.appendChild( elStatus);
 			elStatus.classList.add('status');
 //window.console.log(JSON.stringify(fobj));
-			st_SetElLabel( elStatus, fobj.status);
+			st_SetElLabel( fobj.status, elStatus);
 			st_SetElColor( fobj.status, elScene);
 
 			walk.folders[sc].folders.sort( c_CompareFolders );
@@ -567,7 +567,7 @@ function a_ShowThumbnails()
 function a_ThumbStatusApply( i_status)
 {
 	if( i_status != null ) a_elCurEditStatus.m_status = c_CloneObj( i_status);
-	st_SetElLabel( a_elCurEditStatus.m_elAnn, i_status, false);
+	st_SetElLabel( i_status, a_elCurEditStatus.m_elAnn, false);
 	st_SetElArtists( i_status, a_elCurEditStatus.m_elArtists);
 	st_SetElTags( i_status, a_elCurEditStatus.m_elTags);
 	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);

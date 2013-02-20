@@ -279,13 +279,13 @@ function ad_WndAddUser( i_el, i_user, i_row)
 
 	var elCTime = document.createElement('div');
 	el.appendChild( elCTime);
-	if( i_row ) elCTime.textContent = c_DT_StrFromS( i_user.ctime).substr(4,11);
+	if( i_row ) elCTime.textContent = c_DT_StrFromSec( i_user.ctime).substr(4,11);
 	else elCTime.textContent = 'Created';
 	elCTime.style.width = '150px';
 
 	var elRTime = document.createElement('div');
 	el.appendChild( elRTime);
-	if( i_row ) elRTime.textContent = c_DT_StrFromS( i_user.rtime).substr(4);
+	if( i_row ) elRTime.textContent = c_DT_StrFromSec( i_user.rtime).substr(4);
 	else elRTime.textContent = 'Entered';
 	elRTime.style.width = '200px';
 }

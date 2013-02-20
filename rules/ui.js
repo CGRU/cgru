@@ -1,4 +1,4 @@
-u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','comments','files','content_info','content_status','thumbnail','sidepanel'];
+u_elements = ['asset','assets','content','info','open','log','navig','rules','status_annotation','status_description','status_artists','status_tags','status_percentage','status_progress','status_progressbar','cycle','comments','files','content_info','content_status','thumbnail','sidepanel','status_description_div'];
 u_el = {};
 
 function u_Init()
@@ -51,11 +51,24 @@ function u_StatusApply( i_status)
 	else
 		i_status = RULES.status;
 
-	st_SetElLabel( u_el.status_annotation, i_status, true);
+	st_SetElAnnotation( i_status, u_el.status_annotation);
 	st_SetElColor( i_status, u_el.content_info);
 	st_SetElProgress( i_status, u_el.status_progressbar, u_el.status_progress, u_el.status_percentage);
 	st_SetElArtists( i_status, u_el.status_artists);
 	st_SetElTags( i_status, u_el.status_tags);
+	u_StatusShowDescription();
+}
+function u_StatusShowDescription( i_toggleBrief)
+{
+	if( RULES.status && RULES.status.description )
+	{
+		u_el.status_description_div.style.display = 'block';
+		u_el.status_description.innerHTML = RULES.status.description.replace(/<br>/g, ' ').substr(0,30)+'...';
+	}
+	else
+	{
+		u_el.status_description_div.style.display = 'none';
+	}
 }
 
 function u_StatusEditOnClick()

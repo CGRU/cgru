@@ -95,17 +95,15 @@ color: #000;
 border-radius: 4px;
 box-shadow: 0 0 2px #000 inset;
 padding-left: 6px;
+padding: 2px;/* width: 30px;*/
+top: 0px; bottom: 0px; position: relative; left: 0; right: 0;
+min-height: 19px;
 }
 
 .thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
 
 .artists, .tags { box-shadow: 0 0 2px #000 inset; border-radius: 3px; padding: 0 4px; }
 .tags { font-style:italic;}
-
-#status_progress {
-clear: both;
-border-radius: 4px;
-}
 
 .progress, .progressbar { border-radius: 3px; box-shadow: 0 0 2px #000 inset; }
 .progress { position: relative; background:rgba(0,0,0,.5); }
@@ -126,6 +124,21 @@ border-radius: 4px;
 #sidepanel.opened .opened .body { display: block; }
 #sidepanel .label:hover, #sidepanel #sidepanel_hide:hover { background: rgba(200,255,255,.4);}
 
+#news_count {
+float:right;
+cursor: pointer;
+margin: 2px 8px;
+padding: 4px 4px;
+width: 60px;
+text-align: center;
+box-shadow: 0 0 4px #030 inset, 0 0 4px #AFA;
+border-radius: 4px;
+background: rgba(0,20,0,.5);
+color: #00FF00;
+text-shadow: 0 0 4px #00FF00, 0 0 8px #00FF00;
+font-weight: bold;
+display: none;
+}
 #news > div, #channels > div {
 box-shadow: 0 0 2px #000 inset;
 border-radius: 4px;
@@ -185,6 +198,7 @@ padding: 4px;
 #status_artists, #status_tags { margin: 0px 5px; float:left;}
 #status_progress { clear: both; border-radius: 4px; }
 #status_progressbar { height: 10px; border-radius: 4px; }
+#status_description {/*clear: both;*/ }
 
 .status_edit { clear: both; }
 .status_edit .percent { float:left; margin: 0px 6px; }
