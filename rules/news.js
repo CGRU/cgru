@@ -226,7 +226,7 @@ function nw_ShowCount()
 	else
 	{
 		nw_el.news_count.style.display = 'none';
-		nw_el.news_count.textContent = text;
+		nw_el.news_count.textContent = '';
 	}
 }
 

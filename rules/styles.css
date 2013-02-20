@@ -193,9 +193,8 @@ border-radius: 10px;
 padding: 4px;
 }
 
-#status_percentage { margin: 0px 5px; float:left;}
-#status_annotation { margin: 0px 5px; float:left;}
-#status_artists, #status_tags { margin: 0px 5px; float:left;}
+#status_percentage, #status_annotation, #status_artists, #status_tags, #status_finish
+{ margin: 0px 5px; float:left;}
 #status_progress { clear: both; border-radius: 4px; }
 #status_progressbar { height: 10px; border-radius: 4px; }
 #status_description {/*clear: both;*/ }

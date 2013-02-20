@@ -158,7 +158,13 @@ function a_Create( i_type, i_name, i_path)
 	c_RulesMergeObjs( asset, RULES.assets[i_type]);
 
 	ASSETS[i_type] = asset;
-	ASSET = asset;
+	if( ASSET )
+	{
+		if( asset.path.length > ASSET.path.length )
+			ASSET = asset;
+	}
+	else
+		ASSET = asset;
 }
 
 function a_Append( i_path, i_rules)
@@ -216,11 +222,7 @@ function a_AutoSeek()
 				if( seekpath == '') seekpath = '/';
 
 				for( var a_type in ASSETS)
-				{
-					var a_name = ASSETS[a_type].name;
-					if( a_name == null ) continue;
-					seekpath = seekpath.replace('['+a_type+']', a_name);
-				}
+					seekpath = seekpath.replace('['+a_type+']', ASSETS[a_type].path);
 
 				var apath = path;
 				var aname = folders[i];
@@ -249,10 +251,15 @@ function a_ShowHeaders()
 {
 	u_el.assets.innerHTML = '';
 
-	for( var a_type in ASSETS)
+	var assets = [];
+	for( var a_type in ASSETS ) assets.push( ASSETS[a_type]);
+	assets.sort(function(a,b){if(a.path.length>b.path.length)return 1;return -1;});
+
+	for( var i = 0; i < assets.length; i++)
 	{
-		var asset = ASSETS[a_type];
+		var asset = assets[i];
 //		if( RULES.assets[a_type].showontop === false ) continue;
+		var a_type = asset.type;
 		var a_name = asset.name;
 
 		elHeader = document.createElement('div');

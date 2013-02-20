@@ -5,10 +5,11 @@ st_elToHide = null
 st_path = null;
 st_status = null;
 st_FuncApply = null;
+st_progress = null;
 
 function st_SetElProgress( i_status, i_elProgressBar, i_elProgressHide, i_elPercentage)
 {
-	if( i_status && i_status.progress )
+	if( i_status && ( i_status.progress != null ) && ( i_status.progress >= 0 ))
 	{
 		if( i_elProgressBar) i_elProgressBar.style.width = i_status.progress+'%';
 		if( i_elPercentage) i_elPercentage.textContent = i_status.progress+'%';
@@ -82,6 +83,13 @@ function st_SetElColor( i_status, i_elB, i_elC)
 		i_elC.style.color = '#000';
 	}
 }
+function st_SetElFinish( i_status, i_elFinish)
+{
+	var text = '';
+	if( i_status && i_status.finish )
+			text = 'Finish at: '+c_DT_StrFromSec( i_status.finish).substr(0,15);
+	i_elFinish.textContent = text;
+}
 
 function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 {
@@ -95,10 +103,17 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_elParent.classList.add('status_editing');
 	st_elToHide = i_elToHide;
 	st_path = i_path;
+	st_progress = null;
 	st_FuncApply = i_FuncApply;
 	st_status = {};
+
 	if( i_status )
+	{
 		st_status = c_CloneObj( i_status);
+		// Store progress to see whether progress update needed
+		if( i_status.progress != null )
+			st_progress = i_status.progress;
+	}
 //console.log(JSON.stringify(st_status));
 //	st_status.annotation = i_status.annotation;
 //	st_status.color = i_status.color;
@@ -126,11 +141,14 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	var elFinishDiv = document.createElement('div');
 	st_elRoot.appendChild( elFinishDiv);
 	elFinishDiv.style.cssFloat = 'right';
-	elFinishDiv.style.width = '150px';
+	elFinishDiv.style.width = '200px';
+	elFinishDiv.style.textAlign = 'center';
+	elFinishDiv.style.marginLeft = '10px';
 	var elFinishLabel = document.createElement('div');
 	elFinishDiv.appendChild( elFinishLabel);
 	elFinishLabel.style.cssFloat = 'left';
 	elFinishLabel.textContent = 'Finish:';
+	elFinishLabel.ondblclick  = function(){ st_elFinish.textContent = c_DT_FormStrNow();};
 	st_elFinish = document.createElement('div');
 	elFinishDiv.appendChild( st_elFinish);
 	st_elFinish.classList.add('editing');
@@ -228,6 +246,8 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	st_SetElAnnotation( st_status, st_elAnn);
 	st_SetElDescription( st_status, st_elDesc);
 	st_SetElColor( st_status);
+	if( st_status.finish )
+		st_elFinish.textContent = c_DT_FormStrFromSec( st_status.finish);
 	if( st_status.progress != null ) st_elProgress.textContent = st_status.progress;
 
 	st_elAnn.focus();
@@ -310,8 +330,13 @@ function st_EditColorOnClick( i_evt)
 
 function st_SaveOnClick()
 {
-	var finish = c_DT_SecFromStr( st_elFinish.textContent);
-window.console.log( new Date(finish*1000).toString());
+	var finish = st_elFinish.textContent;
+	if( finish.length )
+	{
+		finish = c_DT_SecFromStr( st_elFinish.textContent);
+		if( finish == 0 ) return;
+		st_status.finish = finish;
+	}
 
 	st_status.annotation = st_elAnn.innerHTML;
 	st_status.description = st_elDesc.innerHTML;
@@ -344,5 +369,85 @@ window.console.log( new Date(finish*1000).toString());
 
 	nw_MakeNews('<i>status</i>', st_path);
 
+	if( st_elProgress.textContent.length )
+		if( st_progress != st_status.progress )
+			st_UpdateProgresses( st_path);
+
 	st_DestroyEditUI();
 }
+
+function st_UpdateProgresses( i_path)
+{
+	var folders = i_path.split('/');
+	var path = '';
+
+	paths = [];
+	progresses = {};
+
+	for( var i = 1; i < folders.length-1; i++)
+	{
+		path += '/'+folders[i];
+		paths.push( path);
+	}
+//window.console.log( paths);
+	walks = n_WalkDir( paths, 0, RULES.rufolder, ['status'], ['status']);
+	if( walks == null ) return;
+
+	for( var w = walks.length-1; w >= 0; w--)
+	{
+//window.console.log( walks[w]);
+		if( walks[w].error )
+		{
+			c_Error( walks[w].error);
+			return;
+		}
+		if(( walks[w].folders == null ) || ( walks[w].folders.length == 0 ))
+		{
+			c_Error('Can`t find folders in ' + paths[w]);
+			return;
+		}
+
+		var progress = 0;
+		var progress_count = 0;
+		for( var f = 0; f < walks[w].folders.length; f++ )
+		{
+			var folder = walks[w].folders[f];
+			var path = paths[w] + '/' + folder.name;
+			if( progresses[path] != null )
+			{
+				progress += progresses[path];
+			}
+			else
+			{
+
+				if( folder.status == null ) continue;
+				if( folder.status.progress == null ) continue;
+				if( folder.status.progress < 0 ) continue;
+
+				progress += folder.status.progress;
+			}
+			progress_count++;
+		}
+
+		if( progress_count == 0 )
+		{
+			return;
+		}
+
+		progress = Math.round( progress / progress_count);
+		progresses[paths[w]] = progress;
+	}
+
+	for( var path in progresses)
+	{
+//window.console.log( path +':'+ progresses[path]);
+		var obj = {};
+		obj.object = {"status":{"progress":progresses[path]}};
+		obj.add = true;
+		obj.file = RULES.root + path + '/' + RULES.rufolder + '/status.json';
+
+		n_Request({"editobj":obj}, false);
+//window.console.log( obj);
+	}
+}
+

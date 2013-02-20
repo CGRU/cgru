@@ -135,10 +135,14 @@ function c_DT_StrFromMSec( i_time)
 	return date;
 }
 function c_DT_CurSeconds() { return Math.round((new Date).valueOf()/1000);}
+function c_DT_FormStrNow() { return c_DT_FormStrFromSec( c_DT_CurSeconds());}
 function c_DT_SecFromStr( i_str) { return  Math.round( c_DT_DateFromStr( i_str).valueOf()/1000);}
 function c_DT_DateFromStr( i_str)
 {
 	var nums = i_str.split(/\D{1,}/);
+	c_Error('Invalid date: "'+i_str+'"');
+	var date = new Date(0);
+	if( nums.length < 3 ) return date;
 	var day = nums[0];
 	var mon = nums[1];
 	var year = nums[2];
@@ -149,15 +153,25 @@ function c_DT_DateFromStr( i_str)
 	if( nums.length > 4 ) mins = nums[4];
 	if( year < 100 ) year += 2000;
 
-	var date = new Date(0);
 	date.setFullYear( year);
 	date.setMonth( mon-1);
 	date.setDate( day);
-	date.setHours( hour-1);
-	date.setMinutes( mins-1);
+	date.setHours( hour);
+	date.setMinutes( mins);
 
 	return date;
 }
+function c_DT_FormStrFromSec( i_sec)
+{
+    var date = new Date( i_sec * 1000);
+    var str = date.getFullYear();
+    str += '.'+c_PadZero(date.getMonth()+1,2);
+    str += '.'+c_PadZero(date.getDate(),2);
+    str += ' '+c_PadZero(date.getHours(),2);
+    str += ':'+c_PadZero(date.getMinutes(),2);
+	return str;
+}
+
 
 function c_ElDisplayToggle( i_el)
 {
