@@ -38,7 +38,7 @@ function st_SetElText( i_status, i_el, i_field, i_full)
 		if( i_full )
 			i_el.innerHTML = i_status[i_field];
 		else
-			i_el.innerHTML = i_status[i_field].split(' ')[0];
+			i_el.innerHTML = i_status[i_field].replace(/^\s+/,'').split(' ')[0];
 	}
 	else
 		i_el.innerHTML = '';
@@ -83,11 +83,34 @@ function st_SetElColor( i_status, i_elB, i_elC)
 		i_elC.style.color = '#000';
 	}
 }
-function st_SetElFinish( i_status, i_elFinish)
+function st_SetElFinish( i_status, i_elFinish, i_full)
 {
+	if( i_full == null ) i_full = true;
 	var text = '';
+	var shadow = '';
+	var alpha = 0;
 	if( i_status && i_status.finish )
-			text = 'Finish at: '+c_DT_StrFromSec( i_status.finish).substr(0,15);
+	{
+		var secs = i_status.finish - (new Date()/1000);
+		var days = secs / ( 60 * 60 * 24 );
+		var alpha = 1 /( 1 + days );
+		days = Math.round( days*10) / 10;
+		if( alpha < 0 ) alpha = 0;
+		if( alpha > 1 ) alpha = 1;
+		if( days <= 1 ) alpha = 1;
+		if( i_full )
+		{
+			text += 'Finish at: ';
+			text += c_DT_StrFromSec( i_status.finish).substr(0,15);
+			text += ' ('+days+' days left)';
+		}
+		else
+			text += days+'days';
+	}
+	shadow = '0 0 2px rgba(255,0,0,'+alpha+'),';
+	shadow+= '0 0 4px rgba(255,0,0,'+alpha+')';
+	i_elFinish.style.textShadow = shadow;
+	i_elFinish.style.color = 'rgb('+Math.round(255*alpha)+',0,0)';
 	i_elFinish.textContent = text;
 }
 
@@ -148,7 +171,8 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 	elFinishDiv.appendChild( elFinishLabel);
 	elFinishLabel.style.cssFloat = 'left';
 	elFinishLabel.textContent = 'Finish:';
-	elFinishLabel.ondblclick  = function(){ st_elFinish.textContent = c_DT_FormStrNow();};
+	elFinishLabel.onclick  = function(){ st_elFinish.textContent = c_DT_FormStrNow();};
+	elFinishLabel.style.cursor = 'pointer';
 	st_elFinish = document.createElement('div');
 	elFinishDiv.appendChild( st_elFinish);
 	st_elFinish.classList.add('editing');
@@ -201,7 +225,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			var el = document.createElement('div');
 			st_elArtists.m_elList.appendChild( el);
 			el.textContent = c_GetUserTitle( st_status.artists[i]);
-			el.classList.add('item');
+			el.classList.add('tag');
 			el.classList.add('selected');
 		}
 
@@ -223,7 +247,7 @@ function st_CreateEditUI( i_elParent, i_path, i_status, i_FuncApply, i_elToHide)
 			var el = document.createElement('div');
 			st_elTags.m_elList.appendChild( el);
 			el.textContent = st_status.tags[i];
-			el.classList.add('item');
+			el.classList.add('tag');
 			el.classList.add('selected');
 		}
 
@@ -292,7 +316,7 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 	{
 		var el = document.createElement('div');
 		i_elParent.appendChild( el);
-		el.classList.add('item');
+		el.classList.add('tag');
 		if( i_list[item].title )
 //			el.textContent = i_list[item].title;
 			el.textContent = c_GetUserTitle( item);
@@ -333,14 +357,14 @@ function st_SaveOnClick()
 	var finish = st_elFinish.textContent;
 	if( finish.length )
 	{
-		finish = c_DT_SecFromStr( st_elFinish.textContent);
+		finish = c_DT_SecFromStr( st_elFinish.textContent.replace(/^\s+|\s+$/g,''));
 		if( finish == 0 ) return;
 		st_status.finish = finish;
 	}
 
-	st_status.annotation = st_elAnn.innerHTML;
-	st_status.description = st_elDesc.innerHTML;
-	st_status.progress = parseInt( st_elProgress.textContent);
+	st_status.annotation = st_elAnn.innerHTML.replace(/^\s+|\s+$/g,'');
+	st_status.description = st_elDesc.innerHTML.replace(/^\s+|\s+$/g,'');
+	st_status.progress = parseInt( st_elProgress.textContent.replace(/^\s+|\s+$/g,''));
 	if( st_elArtists.m_elListAll )
 	{
 		st_status.artists = [];

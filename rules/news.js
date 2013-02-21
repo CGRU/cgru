@@ -284,8 +284,16 @@ function nw_NewsLoad()
 function nw_RemoveNews( i_id)
 {
 	var obj = {};
-	obj.objects = [{"id":i_id}];
-	obj.delobj = true;
+	if( i_id == null )
+	{
+		obj.object = {"news":[]};
+		obj.add = true;
+	}
+	else
+	{
+		obj.objects = [{"id":i_id}];
+		obj.delobj = true;
+	}
 	obj.file = 'users/'+g_auth_user.id+'.json';
 	n_Request({"editobj":obj});
 	nw_NewsLoad();

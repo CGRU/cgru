@@ -3,6 +3,9 @@ font: 16px Arial;
 background: #ab8;
 }
 
+/* ================================ */
+/* ========== LAYOUT: ============= */
+
 #header, #footer, #sidepanel, #content {
 -o-transition: all .3s ease-in-out;
 -moz-transition: all .3s ease-in-out;
@@ -72,6 +75,10 @@ top: 38px; bottom: 38px;
 }
 #navig { overflow-y: scroll; width: 300px; left: 0; }
 
+
+/* ========================================== */
+/* ============== GLOBALS: ================== */
+
 .button {
 -moz-user-select: none;
 -webkit-user-select: none;
@@ -102,6 +109,8 @@ min-height: 19px;
 
 .thumbnail { box-shadow:0 0 6px #FFF;border-radius:8px; }
 
+.tag { float:left; cursor: pointer; border-radius: 3px; box-shadow: 0 0 2px #000 inset; margin:0 4px; padding:0 4px; }
+.tag.selected { background: rgba(200,255,255,.4);}
 .artists, .tags { box-shadow: 0 0 2px #000 inset; border-radius: 3px; padding: 0 4px; }
 .tags { font-style:italic;}
 
@@ -204,14 +213,6 @@ padding: 4px;
 .status_edit .color { clear:both;}
 .status_edit .list { border-radius: 3px; border: 1px solid rgba(0,0,0,.2); }
 .status_edit .list .button { margin:0 4px;padding:0 4px;}
-.status_edit .list .item {
-float:left;
-cursor: pointer;
-border-radius: 3px;
-box-shadow: 0 0 2px #000 inset;
-margin:0 4px; padding:0 4px;
-}
-.status_edit .list .item.selected { background: rgba(200,255,255,.4);}
 
 #navig .folder {
 position: relative;
@@ -248,7 +249,7 @@ float: right;
 font-weight: normal;
 padding-right:4px;
 }
-#navig .folder .progressbar { height: 6px;}
+#navig .folder .progressbar { height: 6px; }
 
 #assets {
 background: rgba(200,255,255,.3);
@@ -318,7 +319,7 @@ padding: 20px;
 .shot .status .progressbar { clear: both; height: 8px; }
 
 /*.scene { cursor: pointer; }*/
-.scene a { color: inherit; display:block; }
+.scene a { color: inherit; /*display:block;*/ }
 .scene a:hover { color: #AFF;}
 .scene .shot {
 position: relative;
@@ -351,8 +352,10 @@ color: #FFF;
 width: 190px;
 height: 44px;
 }
+.scene .shot .status .name { float:left;}
 .scene .shot .status .percent { float:right;}
 .scene .shot .status .annotation { float:right;}
+.scene .shot .status .progress { clear:both;}
 .scene .shot .status .progressbar { height: 6px; margin-top: 0px;}
 .scene .shot .status .artists, .scene .shot .status .tags { clear:both; font-size: 10px;}
 .scene .shot img {

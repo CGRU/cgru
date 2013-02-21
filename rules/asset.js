@@ -342,26 +342,19 @@ function a_ShowThumbnails()
 	u_el.asset.appendChild( a_elFilter);
 	a_elFilter.style.padding = '4px';
 	a_elFilter.style.position = 'relative';
+	a_elFilter.classList.add('filter');
 
 	var elLabel = document.createElement('div');
 	a_elFilter.appendChild( elLabel);
 	a_elFilter.m_elLabel = elLabel;
-	elLabel.textContent = 'Filter';
+	elLabel.textContent = 'Filter Thumbnails';
 	elLabel.style.textAlign = 'center';
 	elLabel.style.cursor = 'pointer';
 	elLabel.style.width = '50%';
 	elLabel.onclick = function(e){
 		var el = e.currentTarget.parentNode;
-		if( el.m_filtering )
-		{
-			var args = {};
-			args.status = el.m_elStatus.textContent;
-			g_SetLocationArgs({"a_TFilter":args});
-			return;
-		}
-		el.m_filtering = true;
+		el.m_elLabel.style.display = 'none';
 		el.m_elBody.style.display='block';
-		el.m_elLabel.classList.add('button');
 	};
 
 	var elBody = document.createElement('div');
@@ -369,28 +362,78 @@ function a_ShowThumbnails()
 	a_elFilter.m_elBody = elBody;
 	elBody.style.display = 'none';
 
-	var elStatusLabel = document.createElement('div');
-	elBody.appendChild( elStatusLabel);
-	elStatusLabel.textContent = 'Status:';
-	elStatusLabel.style.cssFloat = 'left';
+	var elBtnsDiv = document.createElement('div');
+	elBody.appendChild( elBtnsDiv);
 
-	var elStatus = document.createElement('div');
-	elBody.appendChild( elStatus);
-	a_elFilter.m_elStatus = elStatus;
-	elStatus.style.height = '20px';
-	elStatus.contentEditable = 'true';
-	elStatus.classList.add('editing');
+	var elBtnFilter = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnFilter);
+	elBtnFilter.classList.add('button');
+	elBtnFilter.textContent = 'Filter';
+	elBtnFilter.style.cssFloat = 'left';
+	elBtnFilter.onclick = a_ThumbFilterOnClick;
 
 	var elBtnShowAll = document.createElement('div');
-	elBody.appendChild( elBtnShowAll);
+	elBtnsDiv.appendChild( elBtnShowAll);
 	elBtnShowAll.textContent = 'Show All';
-//	elBtnShowAll.onclick = function(e){g_ClearLocationArgs();a_ShowAllThumbnails();};
 	elBtnShowAll.onclick = function(e){g_SetLocationArgs({"a_TFilter":null});};
 	elBtnShowAll.classList.add('button');
-	elBtnShowAll.style.position = 'absolute';
-	elBtnShowAll.style.top = '4px';
-	elBtnShowAll.style.right = '4px';
-	elBtnShowAll.style.width = '40%';
+	elBtnShowAll.style.cssFloat = 'left';
+
+	var elBtnClose = document.createElement('div');
+	elBtnsDiv.appendChild( elBtnClose);
+	elBtnClose.textContent = 'Close';
+	elBtnClose.style.cssFloat = 'right';
+	elBtnClose.classList.add('button');
+	elBtnClose.onclick = function(e){
+		g_ClearLocationArgs();
+		a_ShowAllThumbnails();
+		a_elFilter.m_elBody.style.display = 'none';
+		a_elFilter.m_elLabel.style.display = 'block';
+	};
+
+	var elStatusDiv = document.createElement('div');
+	elBody.appendChild( elStatusDiv);
+	var elStatusLabel = document.createElement('div');
+	elStatusDiv.appendChild( elStatusLabel);
+	elStatusLabel.textContent = 'Status:';
+	elStatusLabel.style.cssFloat = 'left';
+	var elStatus = document.createElement('div');
+	elStatusDiv.appendChild( elStatus);
+	elStatus.contentEditable = 'true';
+	elStatus.classList.add('editing');
+	a_elFilter.m_elStatus = elStatus;
+
+	var elArtistsDiv = document.createElement('div');
+	elBody.appendChild( elArtistsDiv);
+	var elArtistsLabel = document.createElement('div');
+	elArtistsDiv.appendChild( elArtistsLabel);
+	elArtistsLabel.textContent = 'Artists:';
+	elArtistsLabel.style.cssFloat = 'left';
+	var elArtists = document.createElement('div');
+	a_elFilter.m_elArtists = elArtists;
+	elArtistsDiv.appendChild( elArtists);
+	elArtists.classList.add('artists');
+	for( var user in g_users )
+	{
+		el = document.createElement('div');
+		elArtists.appendChild( el);
+		el.style.cssFloat = 'left';
+		el.textContent = c_GetUserTitle( user);
+		el.classList.add('tag');
+		el.onclick = function(e){
+			var el = e.currentTarget;
+			if( el.m_selected )
+			{
+				el.classList.remove('selected');
+				el.m_selected = false;
+			}
+			else
+			{
+				el.classList.add('selected');
+				el.m_selected = true;
+			}
+		};
+	}
 
 	if( ASSET.thumbnails === 0 )
 	{
@@ -581,13 +624,19 @@ function a_ThumbStatusApply( i_status)
 	st_SetElColor( i_status, a_elCurEditStatus);
 }
 
+function a_ThumbFilterOnClick()
+{
+	var args = {};
+	args.status = a_elFilter.m_elStatus.textContent;
+	g_SetLocationArgs({"a_TFilter":args});
+}
 function a_TFilter( i_args)
 {
 //c_Info( JSON.stringify(i_args));
 	if( a_elFilter )
 	{
+		a_elFilter.m_elLabel.style.display = 'none';
 		a_elFilter.m_elBody.style.display = 'block';
-		a_elFilter.m_elLabel.classList.add('button');
 		if( i_args )
 			if( i_args.status )
 				a_elFilter.m_elStatus.textContent = i_args.status;
