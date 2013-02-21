@@ -139,7 +139,7 @@ function c_DT_FormStrNow() { return c_DT_FormStrFromSec( c_DT_CurSeconds());}
 function c_DT_SecFromStr( i_str) { return  Math.round( c_DT_DateFromStr( i_str).valueOf()/1000);}
 function c_DT_DateFromStr( i_str)
 {
-	var nums = i_str.split(/\D{1,}/);
+	var nums = c_Strip( i_str).split(/\D{1,}/);
 	c_Error('Invalid date: "'+i_str+'"');
 	var date = new Date(0);
 	if( nums.length < 3 ) return date;
@@ -215,4 +215,29 @@ function c_CompareFolders(a,b)
 	if( a[attr] > b[attr]) return 1;
 	return 0;
 }
+
+function c_ElToggleSelected( i_e)
+{
+	var el = i_e;
+	if( i_e.currentTarget ) el = i_e.currentTarget;
+	c_ElSetSelected( el, el.m_selected != true );
+}
+
+function c_ElSetSelected( i_e, i_selected )
+{
+	var el = i_e;
+	if( i_e.currentTarget ) el = i_e.currentTarget;
+	if( i_selected )
+	{
+		el.classList.add('selected');
+		el.m_selected = true;
+	}
+	else
+	{
+		el.classList.remove('selected');
+		el.m_selected = false;
+	}
+}
+
+function c_Strip( i_str) { return i_str.replace(/^\s+|\s+$|^<br>|<br>$/g,''); }
 

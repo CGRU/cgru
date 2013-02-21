@@ -110,7 +110,7 @@ function st_SetElFinish( i_status, i_elFinish, i_full)
 	shadow = '0 0 2px rgba(255,0,0,'+alpha+'),';
 	shadow+= '0 0 4px rgba(255,0,0,'+alpha+')';
 	i_elFinish.style.textShadow = shadow;
-	i_elFinish.style.color = 'rgb('+Math.round(255*alpha)+',0,0)';
+	i_elFinish.style.color = 'rgb('+Math.round(150*alpha)+',0,0)';
 	i_elFinish.textContent = text;
 }
 
@@ -328,19 +328,7 @@ function st_EditShowList( i_elParent, i_stParam, i_list)
 			el.m_selected = true;
 			el.classList.add('selected');
 		}
-		el.onclick = function(e){
-			el = e.currentTarget;
-			if( el.m_selected )
-			{
-				el.m_selected = false;
-				el.classList.remove('selected');
-			}
-			else
-			{
-				el.m_selected = true;
-				el.classList.add('selected');
-			}
-		};
+		el.onclick = c_ElToggleSelected;
 		i_elParent.m_elListAll.push( el);
 	}
 }
@@ -357,14 +345,14 @@ function st_SaveOnClick()
 	var finish = st_elFinish.textContent;
 	if( finish.length )
 	{
-		finish = c_DT_SecFromStr( st_elFinish.textContent.replace(/^\s+|\s+$/g,''));
+		finish = c_DT_SecFromStr( st_elFinish.textContent);
 		if( finish == 0 ) return;
 		st_status.finish = finish;
 	}
 
-	st_status.annotation = st_elAnn.innerHTML.replace(/^\s+|\s+$/g,'');
-	st_status.description = st_elDesc.innerHTML.replace(/^\s+|\s+$/g,'');
-	st_status.progress = parseInt( st_elProgress.textContent.replace(/^\s+|\s+$/g,''));
+	st_status.annotation = c_Strip( st_elAnn.innerHTML);
+	st_status.description = c_Strip( st_elDesc.innerHTML);
+	st_status.progress = parseInt( c_Strip( st_elProgress.textContent));
 	if( st_elArtists.m_elListAll )
 	{
 		st_status.artists = [];

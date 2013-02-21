@@ -370,7 +370,7 @@ function a_ShowThumbnails()
 	elBtnFilter.classList.add('button');
 	elBtnFilter.textContent = 'Filter';
 	elBtnFilter.style.cssFloat = 'left';
-	elBtnFilter.onclick = a_ThumbFilterOnClick;
+	elBtnFilter.onclick = a_ThumbFilterApply;
 
 	var elBtnShowAll = document.createElement('div');
 	elBtnsDiv.appendChild( elBtnShowAll);
@@ -410,29 +410,41 @@ function a_ShowThumbnails()
 	elArtistsLabel.textContent = 'Artists:';
 	elArtistsLabel.style.cssFloat = 'left';
 	var elArtists = document.createElement('div');
-	a_elFilter.m_elArtists = elArtists;
 	elArtistsDiv.appendChild( elArtists);
 	elArtists.classList.add('artists');
+	a_elFilter.m_elArtists = [];
 	for( var user in g_users )
 	{
 		el = document.createElement('div');
 		elArtists.appendChild( el);
 		el.style.cssFloat = 'left';
 		el.textContent = c_GetUserTitle( user);
+		el.m_user = user;
 		el.classList.add('tag');
-		el.onclick = function(e){
-			var el = e.currentTarget;
-			if( el.m_selected )
-			{
-				el.classList.remove('selected');
-				el.m_selected = false;
-			}
-			else
-			{
-				el.classList.add('selected');
-				el.m_selected = true;
-			}
-		};
+		el.onclick = function(e){ c_ElToggleSelected(e); a_ThumbFilterApply()};
+		a_elFilter.m_elArtists.push( el);
+	}
+
+	var elTagsDiv = document.createElement('div');
+	elBody.appendChild( elTagsDiv);
+	var elTagsLabel = document.createElement('div');
+	elTagsDiv.appendChild( elTagsLabel);
+	elTagsLabel.textContent = 'Tags:';
+	elTagsLabel.style.cssFloat = 'left';
+	var elTags = document.createElement('div');
+	elTagsDiv.appendChild( elTags);
+	elTags.classList.add('tags');
+	a_elFilter.m_elTags = []
+	for( var i = 0; i < RULES.tags.length; i++)
+	{
+		el = document.createElement('div');
+		elTags.appendChild( el);
+		el.style.cssFloat = 'left';
+		el.textContent = RULES.tags[i];
+		el.m_tag = RULES.tags[i];
+		el.classList.add('tag');
+		el.onclick = function(e){ c_ElToggleSelected(e); a_ThumbFilterApply()};
+		a_elFilter.m_elTags.push( el);
 	}
 
 	if( ASSET.thumbnails === 0 )
@@ -466,6 +478,9 @@ function a_ShowThumbnails()
 			elName.m_path = path;
 			elName.onclick = function(e){g_GO(e.currentTarget.m_path)};
 			elName.textContent = folders[f].name;
+
+			elFolder.m_elFinish = document.createElement('div');
+			elFolder.appendChild( elFolder.m_elFinish);
 
 			elFolder.m_elStatus = document.createElement('div');
 			elFolder.appendChild( elFolder.m_elStatus);
@@ -576,6 +591,9 @@ function a_ShowThumbnails()
 				elShot.appendChild( elShot.m_elStatus);
 				elShot.m_elStatus.classList.add('status');
 
+				elShot.m_elFinish = document.createElement('div');
+//				elShot.m_elStatus.appendChild( elShot.m_elFinish);
+
 				elShot.m_elAnn = document.createElement('div');
 				elShot.m_elStatus.appendChild( elShot.m_elAnn);
 				elShot.m_elAnn.classList.add('annotation');
@@ -621,13 +639,30 @@ function a_ThumbStatusApply( i_status)
 	st_SetElArtists( i_status, a_elCurEditStatus.m_elArtists);
 	st_SetElTags( i_status, a_elCurEditStatus.m_elTags);
 	st_SetElProgress( i_status, a_elCurEditStatus.m_elProgressBar, a_elCurEditStatus.m_elProgress, a_elCurEditStatus.m_elPercent);
+	st_SetElFinish( i_status, a_elCurEditStatus.m_elFinish);
 	st_SetElColor( i_status, a_elCurEditStatus);
 }
 
-function a_ThumbFilterOnClick()
+function a_ThumbFilterApply()
 {
 	var args = {};
-	args.status = a_elFilter.m_elStatus.textContent;
+	if( a_elFilter.m_elStatus.textContent.length )
+		args.ann = a_elFilter.m_elStatus.textContent;
+
+	for( var i = 0; i < a_elFilter.m_elArtists.length; i++)
+		if( a_elFilter.m_elArtists[i].m_selected )
+		{
+			if( args.artists == null ) args.artists = [];
+			args.artists.push( a_elFilter.m_elArtists[i].m_user);
+		}
+
+	for( var i = 0; i < a_elFilter.m_elTags.length; i++)
+		if( a_elFilter.m_elTags[i].m_selected )
+		{
+			if( args.tags == null ) args.tags = [];
+			args.tags.push( a_elFilter.m_elTags[i].m_tag);
+		}
+
 	g_SetLocationArgs({"a_TFilter":args});
 }
 function a_TFilter( i_args)
@@ -638,8 +673,8 @@ function a_TFilter( i_args)
 		a_elFilter.m_elLabel.style.display = 'none';
 		a_elFilter.m_elBody.style.display = 'block';
 		if( i_args )
-			if( i_args.status )
-				a_elFilter.m_elStatus.textContent = i_args.status;
+			if( i_args.ann )
+				a_elFilter.m_elStatus.textContent = i_args.ann;
 	}
 
 	if( a_elThumbnails == null )
@@ -649,26 +684,48 @@ function a_TFilter( i_args)
 	}
 
 	var anns = null;
-	if( i_args && i_args.status )
+	var artists = null;
+	var tags = null;
+
+	if( i_args )
 	{
-		var anns_or = i_args.status.split(',');
-		anns = [];
-		for( var o = 0; o < anns_or.length; o++)
-			anns.push( anns_or[o].split(' '));
+		if( i_args.ann )
+		{
+			var anns_or = i_args.ann.split(',');
+			anns = [];
+			for( var o = 0; o < anns_or.length; o++)
+				anns.push( anns_or[o].split(' '));
+		}
+		if( i_args.artists )
+		{
+			artists = i_args.artists;
+			for( i = 0; i < a_elFilter.m_elArtists.length; i++ )
+				c_ElSetSelected( a_elFilter.m_elArtists[i], artists.indexOf( a_elFilter.m_elArtists[i].m_user ) != -1 )
+		}
+		if( i_args.tags ) 
+		{
+			tags = i_args.tags;
+			for( i = 0; i < a_elFilter.m_elTags.length; i++ )
+				c_ElSetSelected( a_elFilter.m_elTags[i], tags.indexOf( a_elFilter.m_elTags[i].m_tag ) != -1 )
+		}
 	}
 
-	for( var i = 0; i < a_elThumbnails.length; i++)
+	for( var th = 0; th < a_elThumbnails.length; th++)
 	{
-		var founded = (i_args == null);
+		var el = a_elThumbnails[th];
+		var founded = ( i_args == null );
 
-		if( a_elThumbnails[i].m_status && anns )
-			if( a_elThumbnails[i].m_status.annotation )
+		if( el.m_status == null ) el.m_status = {};
+
+		if( anns )
+		{
+			if( el.m_status.annotation )
 				for( var o = 0; o < anns.length; o++)
 				{
 					var founded_and = true;
 					for( var a = 0; a < anns[o].length; a++)
 					{
-						if( a_elThumbnails[i].m_status.annotation.indexOf( anns[o][a]) == -1 )
+						if( el.m_status.annotation.indexOf( anns[o][a]) == -1 )
 						{
 							founded_and = false;
 							break;
@@ -680,16 +737,36 @@ function a_TFilter( i_args)
 						break;
 					}
 				}
+		}
+		else founded = true;
+
+		if( tags && founded )
+		{
+			founded = false;
+			if( el.m_status.tags )
+				for( i = 0; i < tags.length; i++ )
+					if( el.m_status.tags.indexOf( tags[i]) != -1 )
+						{ founded = true; break; }
+		}
+
+		if( artists && founded )
+		{
+			founded = false;
+			if( el.m_status.artists )
+				for( i = 0; i < artists.length; i++ )
+					if( el.m_status.artists.indexOf( artists[i]) != -1 )
+						{ founded = true; break; }
+		}
 
 		if( founded )
 		{
-			a_elThumbnails[i].style.display = 'block';
-			a_elThumbnails[i].m_hidden = false;
+			el.style.display = 'block';
+			el.m_hidden = false;
 		}
 		else
 		{
-			a_elThumbnails[i].style.display = 'none';
-			a_elThumbnails[i].m_hidden = true;
+			el.style.display = 'none';
+			el.m_hidden = true;
 		}
 	}
 

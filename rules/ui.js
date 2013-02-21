@@ -71,13 +71,18 @@ function u_StatusShowDescription( i_elToggleBrief)
 		else
 			i_elToggleBrief.textContent = '-';
 	}
-	if( RULES.status && RULES.status.description )
+	if( RULES.status && RULES.status.description && c_Strip(RULES.status.description).length )
 	{
 		u_el.status_description_div.style.display = 'block';
+		var text = c_Strip( RULES.status.description);
+		var maxlen = 48;
 		if( u_status_description_brief )
-			u_el.status_description.innerHTML = RULES.status.description.replace(/<br>/g, ' ').substr(0,48)+'...';
-		else
-			u_el.status_description.innerHTML = RULES.status.description;
+		{
+			text = text.replace(/<br>/g, ' ');
+			if( text.length > maxlen )
+				text = text.substr(0,maxlen)+'...';
+		}
+		u_el.status_description.innerHTML = text;
 	}
 	else
 	{
